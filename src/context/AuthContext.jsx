@@ -140,7 +140,6 @@ export function AuthProvider({ children }) {
             sede: "Sede Global",
             emails: [normalizedEmail]
           };
-          console.warn("Bypass activo para Super Admin");
         } else {
           await auth.signOut();
           showToast('ACCESO DENEGADO: Tu correo no se encuentra en el Directorio Oficial de CREAR. Contacta a Gerencia.', 'error');

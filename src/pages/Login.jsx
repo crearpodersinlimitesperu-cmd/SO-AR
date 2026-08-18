@@ -17,7 +17,7 @@ export default function Login() {
   const handleLogin = async () => {
     try {
       await loginWithGoogle();
-      navigate('/home');
+      // La redirección la maneja el useEffect cuando currentUser cambia
     } catch (error) {
       console.error("Error al iniciar sesión", error);
       showToast("Hubo un error al iniciar sesión. Intenta nuevamente.", "error");
