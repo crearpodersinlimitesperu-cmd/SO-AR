@@ -8,8 +8,8 @@ service cloud.firestore {
       // y tener un email corporativo de CREAR o ser el SuperAdmin
       return request.auth != null && (
         request.auth.token.email == 'jose.sanchez@crearpsl.net' ||
-        request.auth.token.email.matches('.*@crearpsl\.net') ||
-        request.auth.token.email.matches('.*@crearpls\.com')
+        request.auth.token.email.matches('.*@crearpsl[.]net') ||
+        request.auth.token.email.matches('.*@crearpls[.]com')
       );
     }
     
