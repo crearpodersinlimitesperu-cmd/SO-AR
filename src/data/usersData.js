@@ -41,9 +41,10 @@ export const normalizeSede = (sede) => {
   if (s === 'CUE' || s.toLowerCase().includes('cuenca')) return 'Cuenca';
   if (s === 'GYE' || s.toLowerCase().includes('guayaquil')) return 'Guayaquil';
   if (s === 'MEX' || s.toLowerCase().includes('mex') || s.toLowerCase().includes('méxico')) return 'México';
-  if (s === 'UIO-C1' || s.toLowerCase().includes('ciclo 1') || s.toLowerCase().includes('ciclo1')) return 'Quito Ciclo 1';
-  if (s === 'UIO-C2' || s.toLowerCase().includes('ciclo 2') || s.toLowerCase().includes('ciclo2')) return 'Quito Ciclo 2';
-  if (s === 'UIO' || s.toLowerCase().includes('quito')) return 'Quito Ciclo 1';
+  if (s === 'UIO-C1' || s === 'UIO-C2' || s === 'UIO' ||
+      s.toLowerCase().includes('ciclo 1') || s.toLowerCase().includes('ciclo1') ||
+      s.toLowerCase().includes('ciclo 2') || s.toLowerCase().includes('ciclo2') ||
+      s.toLowerCase().includes('quito')) return 'Quito';
   if (s === 'INT' || s.toLowerCase().includes('intern')) return 'Internacional';
   if (s.toLowerCase().includes('global')) return 'Sede Global';
   return s;
@@ -52,8 +53,7 @@ export const normalizeSede = (sede) => {
 
 export const OPERATIONAL_SEDES = [
   'Lima',
-  'Quito Ciclo 1',
-  'Quito Ciclo 2',
+  'Quito',       // Ciclo 1 + Ciclo 2 fusionados (operan juntos)
   'Cuenca',
   'Guayaquil',
   'Medellín',

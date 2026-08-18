@@ -374,6 +374,45 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
               </div>
             </div>
 
+            {/* Botón de Simulación — Solo SuperAdmin */}
+            {currentUser?.isSuperAdmin && (
+              <div style={{ marginTop: '1rem' }}>
+                <button
+                  onClick={() => {
+                    simulateUser(user);
+                    onClose();
+                    navigate('/home');
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '0.6rem 1rem',
+                    borderRadius: '10px',
+                    border: '1px solid rgba(251, 191, 36, 0.4)',
+                    background: 'rgba(251, 191, 36, 0.08)',
+                    color: 'var(--crear-gold)',
+                    fontWeight: 'bold',
+                    fontSize: '0.85rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.5rem',
+                    transition: 'all 0.2s',
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.background = 'rgba(251, 191, 36, 0.2)';
+                    e.currentTarget.style.borderColor = 'var(--crear-gold)';
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.background = 'rgba(251, 191, 36, 0.08)';
+                    e.currentTarget.style.borderColor = 'rgba(251, 191, 36, 0.4)';
+                  }}
+                >
+                  <Eye size={16} /> Simular como {user.name.split(' ')[0]}
+                </button>
+              </div>
+            )}
+
             {/* Navigation Tabs */}
             <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1.2rem' }}>
               <button 

@@ -54,16 +54,19 @@ export function CyclesProvider({ children }) {
     };
     
     let userSede = userSedeRaw.toLowerCase().trim();
-    if (userSede === 'quito') userSede = 'uio';
-    if (userSede === 'quito ciclo 1') userSede = 'uio c1';
-    if (userSede === 'quito c1') userSede = 'uio c1';
-    if (userSede === 'quito ciclo 2') userSede = 'uio c2';
-    if (userSede === 'quito c2') userSede = 'uio c2';
+    // Quito fusionado: cualquier variante de Quito C1 o C2 → 'uio'
+    if (userSede === 'quito' || userSede === 'quito ciclo 1' || userSede === 'quito ciclo 2' ||
+        userSede === 'quito c1' || userSede === 'quito c2') userSede = 'uio';
     
     const sedeCode = sedeMap[userSede] || userSede.toUpperCase();
 
+    // Para Quito fusionado, mostrar eventos de UIO, UIO-C1 y UIO-C2
+    const isQuito = sedeCode === 'UIO';
     const sedeEvents = allEvents.filter(e => {
         const evSede = (e.sede || e.sedeTag || '').toUpperCase();
+        if (isQuito) {
+          return evSede === 'UIO' || evSede.startsWith('UIO');
+        }
         return evSede.startsWith(sedeCode) || evSede === sedeCode;
     });
 
