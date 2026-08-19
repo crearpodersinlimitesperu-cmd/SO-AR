@@ -17,10 +17,10 @@ export default function Login() {
   const handleLogin = async () => {
     try {
       await loginWithGoogle();
-      // La redirección la maneja el useEffect cuando currentUser cambia
+      navigate('/home');
     } catch (error) {
       console.error("Error al iniciar sesión", error);
-      showToast(error.message || "Hubo un error al iniciar sesión. Intenta nuevamente.", "error");
+      showToast("Hubo un error al iniciar sesión. Intenta nuevamente.", "error");
     }
   };
 

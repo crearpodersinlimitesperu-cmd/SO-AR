@@ -4,15 +4,18 @@ service cloud.firestore {
     
     // Funciones de verificación de identidad y roles corporativos
     function isAuthenticated() {
-      // Verificación: usuario autenticado con Firebase (Google OAuth)
-      // La app ya verifica que el email esté en el Directorio Oficial (AuthContext)
-      // Aquí solo confirmamos que existe una sesión activa válida de Firebase
-      return request.auth != null;
+      return request.auth != null && (
+        request.auth.token.email == 'jose.sanchez@crearpsl.net' ||
+        exists(/databases/$(database)/documents/users/$(request.auth.uid))
+      );
     }
     
     function isSuperAdmin() {
-      return request.auth != null &&
-        request.auth.token.email == 'jose.sanchez@crearpsl.net';
+      return isAuthenticated() && (
+        request.auth.token.email == 'jose.sanchez@crearpsl.net' ||
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'superadmin' ||
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'direccion'
+      );
     }
     
     function isGerente() {
@@ -46,13 +49,7 @@ service cloud.firestore {
     // Colección de Perfiles y Notas Privadas (user_profiles)
     match /user_profiles/{userDocId} {
       allow read: if isAuthenticated();
-      // Cada usuario puede escribir su propio perfil (historial de ingresos)
-      // Gerentes y SuperAdmin pueden escribir cualquier perfil
-      allow write: if isAuthenticated() && (
-        request.auth.token.email == userDocId ||
-        isGerente() ||
-        isSuperAdmin()
-      );
+      allow write: if isGerente() || isSuperAdmin();
     }
 
     // Colección de Notificaciones (notifications)
