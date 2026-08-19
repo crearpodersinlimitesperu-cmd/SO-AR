@@ -12,6 +12,9 @@ import GoalsBoard from './pages/GoalsBoard'
 import ReportesBoard from './pages/ReportesBoard'
 import SuperAdminPanel from './pages/SuperAdminPanel'
 import ManualGuia from './pages/ManualGuia'
+import MisKPIs from './pages/MisKPIs'
+import AuditoriaKPIs from './pages/AuditoriaKPIs'
+import CentroManagers from './pages/CentroManagers'
 import PromptModal from './components/PromptModal'
 import HelpModal from './components/HelpModal'
 import { useState } from 'react'
@@ -152,12 +155,30 @@ function App() {
             </RoleRoute>
           } />
 
+          <Route path="/mis-kpis" element={
+            <RoleRoute allowedRoles={['coord_c1', 'coord_maestria', 'qt', 'capitan']} requireSuperAdmin={false}>
+              <MisKPIs />
+            </RoleRoute>
+          } />
+
+          <Route path="/auditoria-kpis" element={
+            <RoleRoute allowedRoles={['gerente', 'direccion', 'director_maestria']} requireSuperAdmin={false}>
+              <AuditoriaKPIs />
+            </RoleRoute>
+          } />
+
           <Route path="/superadmin" element={
             <RoleRoute allowedRoles={['gerente', 'direccion', 'director_maestria']} requireSuperAdmin={false}>
               <SuperAdminPanel />
             </RoleRoute>
           } />
           
+          <Route path="/centro-managers" element={
+            <PrivateRoute>
+              <CentroManagers />
+            </PrivateRoute>
+          } />
+
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

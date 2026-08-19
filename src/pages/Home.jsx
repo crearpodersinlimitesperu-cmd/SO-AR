@@ -32,6 +32,7 @@ export default function Home() {
   const [timeFilter, setTimeFilter] = useState('futuros'); // 'todos', 'pasados', 'hoy', 'futuros'
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [showVenueModal, setShowVenueModal] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   const handleAddEventToGoogle = async (ev, startDate, endDate) => {
     const token = sessionStorage.getItem('googleAccessToken');
@@ -76,11 +77,12 @@ export default function Home() {
     <div style={{ maxWidth: '900px', margin: '0 auto', padding: '2rem 1rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h1 className="text-gold" style={{ margin: 0, fontSize: '2rem' }}>
+          <img src="/logo.png" alt="CREAR PODER SIN LÍMITES" style={{ height: '180px', marginBottom: '1.5rem', objectFit: 'contain', filter: 'drop-shadow(0 10px 25px rgba(212, 175, 55, 0.6)) drop-shadow(0 4px 10px rgba(41, 171, 226, 0.4))', display: 'block', transform: 'scale(1.1)', transformOrigin: 'left center' }} />
+          <h1 className="text-gold" style={{ margin: 0, fontSize: '2.5rem', fontWeight: '900', letterSpacing: '-0.5px' }}>
             {time.getHours() < 12 ? 'Buenos días' : time.getHours() < 19 ? 'Buenas tardes' : 'Buenas noches'}, {currentUser?.displayName || 'Equipo'}
           </h1>
           <p className="text-muted" style={{ margin: '0.5rem 0 0', textTransform: 'uppercase' }}>
-            {currentCycle ? `${currentCycle.name} • ETAPA ACTUAL: ${currentStage}` : 'CARGANDO CICLO...'}
+            {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') ? 'MÚLTIPLES EQUIPOS (GLOBAL) • VISIÓN MÚLTIPLES SEDES' : (currentCycle ? `${currentCycle.name} • ETAPA ACTUAL: ${currentStage}` : 'CARGANDO CICLO...')}
           </p>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '1rem' }}>
             <Clock size={16} className="text-blue" />
@@ -92,7 +94,7 @@ export default function Home() {
             </span>
           </div>
         </div>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
           <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <span style={{ fontSize: '0.9rem', fontWeight: 'bold', color: 'var(--text-main)' }}>{currentUser?.name || currentUser?.displayName || 'Usuario'}</span>
             <span style={{ fontSize: '0.75rem', color: 'var(--crear-gold)', fontWeight: 'bold', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'flex-end' }}>
@@ -140,11 +142,32 @@ export default function Home() {
             <ThemeSelector />
           </div>
 
-          <div style={{ position: 'relative', cursor: 'pointer', marginLeft: '0.25rem', marginRight: '0.25rem' }} onClick={markAllAsRead}>
-            <Bell size={22} className="text-white" />
-            {unreadCount > 0 && (
-              <div style={{ position: 'absolute', top: '-5px', right: '-5px', background: 'var(--color-error)', color: 'white', borderRadius: '50%', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 'bold' }}>
-                {unreadCount}
+          <div style={{ position: 'relative', marginLeft: '0.25rem', marginRight: '0.25rem' }}>
+            <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', height: '100%' }} onClick={() => setShowNotifications(!showNotifications)}>
+              <Bell size={22} className="text-white" />
+              {unreadCount > 0 && (
+                <div style={{ position: 'absolute', top: '-5px', right: '-5px', background: 'var(--color-error)', color: 'white', borderRadius: '50%', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 'bold' }}>
+                  {unreadCount}
+                </div>
+              )}
+            </div>
+            
+            {showNotifications && (
+              <div className="glass-panel" style={{ position: 'absolute', top: '120%', right: 0, width: '320px', zIndex: 100, padding: '1rem', boxShadow: '0 10px 40px rgba(0,0,0,0.8)', border: '1px solid rgba(41, 171, 226, 0.3)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.5rem' }}>
+                  <h4 style={{ margin: 0, color: 'var(--crear-gold)' }}>🔔 Notificaciones</h4>
+                  <button onClick={() => { markAllAsRead(); setShowNotifications(false); }} style={{ background: 'transparent', border: 'none', color: 'var(--crear-cyan)', fontSize: '0.75rem', cursor: 'pointer', fontWeight: 'bold' }}>Marcar leídas</button>
+                </div>
+                <div style={{ maxHeight: '350px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.8rem', paddingRight: '0.5rem' }}>
+                  {notifications?.length > 0 ? notifications.map(n => (
+                    <div key={n.id} style={{ fontSize: '0.8rem', padding: '0.75rem', background: n.read ? 'rgba(0,0,0,0.4)' : 'rgba(41, 171, 226, 0.15)', borderRadius: '8px', borderLeft: n.read ? 'none' : '3px solid var(--crear-cyan)' }}>
+                      <strong style={{ color: n.read ? 'var(--text-muted)' : '#ffffff', display: 'block', marginBottom: '0.2rem' }}>{n.title || 'Alerta'}</strong>
+                      <p style={{ margin: 0, color: 'var(--text-main)', lineHeight: '1.4' }}>{n.message}</p>
+                    </div>
+                  )) : (
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', margin: '1rem 0' }}>No tienes notificaciones recientes.</p>
+                  )}
+                </div>
               </div>
             )}
           </div>
@@ -160,13 +183,53 @@ export default function Home() {
           </button>
           
           {currentUser?.isGerente && (
-            <button onClick={() => navigate('/gerente')} className="btn-primary" style={{ padding: '0.45rem 1rem', fontSize: '0.85rem', display: 'flex', gap: '0.5rem', alignItems: 'center', marginLeft: '0.25rem', background: 'var(--crear-gold)', color: 'black' }}>
-               SO-AR Gerencial
+            <>
+              <button onClick={() => navigate('/gerente')} className="btn-primary" style={{ padding: '0.45rem 1rem', fontSize: '0.85rem', display: 'flex', gap: '0.5rem', alignItems: 'center', marginLeft: '0.25rem', background: 'var(--crear-gold)', color: 'black' }}>
+                 SO-AR Gerencial
+              </button>
+              <button onClick={() => navigate('/auditoria-kpis')} className="btn-primary" style={{ padding: '0.45rem 1rem', fontSize: '0.85rem', display: 'flex', gap: '0.5rem', alignItems: 'center', marginLeft: '0.25rem', background: 'linear-gradient(135deg, #10b981, #047857)', color: 'white', border: 'none' }}>
+                <span style={{ fontSize: '1.2rem' }}>📈</span> Auditoría KPIs
+              </button>
+            </>
+          )}
+          
+          {['coord_c1', 'coord_maestria', 'qt', 'capitan'].includes(currentUser?.appRole) && (
+            <button onClick={() => navigate('/mis-kpis')} className="btn-primary" style={{ padding: '0.45rem 1rem', fontSize: '0.85rem', display: 'flex', gap: '0.5rem', alignItems: 'center', marginLeft: '0.25rem', background: 'linear-gradient(135deg, #10b981, #047857)', color: 'white', border: 'none' }}>
+              📊 Mis KPIs
             </button>
           )}
-          {currentUser?.isSuperAdmin && (
+          {currentUser?.appRole === 'direccion' && (
+            <a href="https://docs.google.com/spreadsheets/u/1/d/1u0tc4GeooPmSwNxZ0CErKGtRU4oD-mO3l--ZSQM-KPs/edit?gid=1326951636#gid=1326951636" target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ padding: '0.45rem 1rem', fontSize: '0.85rem', display: 'flex', gap: '0.5rem', alignItems: 'center', marginLeft: '0.25rem', background: '#10b981', color: 'white', border: 'none', textDecoration: 'none' }}>
+              👥 Editar Entrenadores
+            </a>
+          )}
+          {(currentUser?.isSuperAdmin || currentUser?.appRole === 'gerente' || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'director_maestria') && (
             <button onClick={() => navigate('/superadmin')} className="btn-primary" style={{ padding: '0.45rem 1rem', fontSize: '0.85rem', display: 'flex', gap: '0.5rem', alignItems: 'center', marginLeft: '0.25rem', background: 'linear-gradient(135deg, #8b5cf6, #29abe2)', color: 'white', border: 'none' }}>
-              🌐 Centro de Mando
+              {currentUser?.isSuperAdmin ? '🌐 Centro de Mando' : '👥 Directorio de Equipo'}
+            </button>
+          )}
+
+          {(currentUser?.isSuperAdmin || currentUser?.appRole === 'gerente' || currentUser?.appRole === 'direccion') && (
+            <button onClick={() => window.open('/calendario_global.html?v=' + Date.now() + '&email=' + encodeURIComponent(currentUser?.email || '') + '&name=' + encodeURIComponent(currentUser?.displayName || currentUser?.name || ''), '_blank')} className="btn-primary" style={{ padding: '0.45rem 1rem', fontSize: '0.85rem', display: 'flex', gap: '0.5rem', alignItems: 'center', marginLeft: '0.25rem', background: 'linear-gradient(135deg, #f59e0b, #ef4444)', color: 'white', border: 'none' }}>
+              📅 Calendario Global
+            </button>
+          )}
+
+          {(currentUser?.isSuperAdmin || ['gerente', 'direccion', 'cc1y2', 'capitan', 'qt'].includes(currentUser?.appRole)) && (
+            <button onClick={() => window.open('https://cpsl-campus-interactivo.vercel.app/ruta', '_blank')} className="btn-primary" style={{ padding: '0.45rem 1rem', fontSize: '0.85rem', display: 'flex', gap: '0.5rem', alignItems: 'center', marginLeft: '0.25rem', background: 'linear-gradient(135deg, #10b981, #059669)', color: 'white', border: 'none' }}>
+              🎓 Campus Interactivo
+            </button>
+          )}
+
+          {(currentUser?.isSuperAdmin || ['gerente', 'direccion', 'director_maestria', 'coordinador_c1c2', 'coordinador_mj', 'coord_c1', 'coord_maestria', 'coordinador', 'finanzas', 'cfo', 'entrenador_llamadas'].includes(currentUser?.appRole) || true) && (
+            <button onClick={() => navigate('/centro-managers')} className="btn-primary" style={{ padding: '0.45rem 1rem', fontSize: '0.85rem', display: 'flex', gap: '0.5rem', alignItems: 'center', marginLeft: '0.25rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#000', fontWeight: 'bold', border: 'none' }}>
+              🎯 Centro de Managers
+            </button>
+          )}
+
+          {(currentUser?.isSuperAdmin || ['gerente', 'direccion', 'director_maestria', 'coordinador_c1c2', 'coordinador_mj', 'coord_c1', 'coord_maestria', 'coordinador', 'finanzas', 'cfo'].includes(currentUser?.appRole)) && (
+            <button onClick={() => window.open('https://imo.crearpslglobal.com/auth/login', '_blank')} className="btn-primary" style={{ padding: '0.45rem 1rem', fontSize: '0.85rem', display: 'flex', gap: '0.5rem', alignItems: 'center', marginLeft: '0.25rem', background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)', color: 'white', border: 'none' }}>
+              👥 Sistema NODUS
             </button>
           )}
 
@@ -331,9 +394,9 @@ export default function Home() {
               let isLocales = activeEventTab === 'locales' || currentUser?.appRole !== 'gerente';
               
               if (isLocales) {
-                const sedeMap = { 'cuenca': 'CUE', 'lima': 'LIM', 'med': 'MED', 'méxico': 'MEX', 'mexico': 'MEX', 'uio': 'UIO', 'guayaquil': 'GYE' };
+                const sedeMap = { 'cuenca': 'CUE', 'lima': 'LIM', 'medellin': 'MED', 'medellín': 'MED', 'med': 'MED', 'méxico': 'MEX', 'mexico': 'MEX', 'uio': 'UIO', 'quito': 'UIO', 'guayaquil': 'GYE' };
                 const userSede = currentUser?.sede?.toLowerCase().trim();
-                const eventSedeCode = userSede ? sedeMap[userSede] : null;
+                const eventSedeCode = userSede ? (sedeMap[userSede] || userSede.toUpperCase()) : null;
                 
                 if (eventSedeCode && userSede !== 'global') {
                   displayEvents = displayEvents.filter(ev => {

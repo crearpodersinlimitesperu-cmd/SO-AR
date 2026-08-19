@@ -29,7 +29,8 @@ export const normalizeRole = (role) => {
   // Impuestos
   if (r === 'asistente impuestos quito' || r === 'asistente_impuestos_quito' || r.includes('impuesto') || r.includes('tributar')) return 'asistente_impuestos_quito';
   // SST
-  if (r === 'técnico sst' || r === 'tecnico sst' || r === 'técnico_sst' || r.includes('sst') || r.includes('seguridad y salud')) return 'técnico_sst';
+  // Entrenador de Llamadas / Coach
+  if (r === 'entrenador_llamadas' || r === 'entrenador' || r === 'coach' || r.includes('entrenador') || r.includes('coach')) return 'entrenador_llamadas';
   return r;
 };
 
@@ -75,7 +76,8 @@ export const ROLE_DISPLAY_NAMES = {
   finanzas: 'Finanzas',
   coordinador: 'Coordinación Administrativa',
   talento_humano: 'Talento Humano',
-  legal: 'Legal / Jurídico'
+  legal: 'Legal / Jurídico',
+  entrenador_llamadas: 'Entrenador de Llamadas'
 };
 
 export const ROLE_COLORS = {
@@ -95,7 +97,8 @@ export const ROLE_COLORS = {
   asistente_impuestos_quito: '#64748b',
   talento_humano: '#06b6d4',
   legal: '#a855f7',
-  técnico_sst: '#14b8a6'
+  técnico_sst: '#14b8a6',
+  entrenador_llamadas: '#38bdf8'
 };
 
 /**

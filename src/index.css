@@ -226,3 +226,25 @@ h1, h2, h3, h4, h5, h6 {
 .text-role-equipo { color: var(--role-equipo) !important; }
 .text-role-capitan { color: var(--role-capitan) !important; }
 .uppercase { text-transform: uppercase; letter-spacing: 2px; font-weight: 700; }
+/* =========================================================================
+   ANIMACIONES
+   ========================================================================= */
+@keyframes kenBurns {
+  0% {
+    transform: scale(1);
+    background-position: center;
+  }
+  50% {
+    transform: scale(1.05);
+    background-position: center bottom;
+  }
+  100% {
+    transform: scale(1);
+    background-position: center;
+  }
+}
+
+.bg-animated {
+  animation: kenBurns 40s ease-in-out infinite;
+  transform-origin: center;
+}

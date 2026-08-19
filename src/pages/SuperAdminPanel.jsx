@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useChecklist } from '../context/ChecklistContext';
 import { useAuth } from '../context/AuthContext';
 import { useCycles } from '../context/CyclesContext';
 import { useUI } from '../context/UIContext';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { usersData, normalizeRole, normalizeSede, OPERATIONAL_SEDES } from '../data/usersData';
 import { Globe, Building2, Users, ArrowLeft, ChevronDown, ChevronRight, Eye, CheckCircle2, Clock, AlertTriangle, TrendingUp, UserCheck, FileText, Search, X, PlusCircle } from 'lucide-react';
@@ -238,6 +238,74 @@ function SedeBlock({ sede, tasks, navigate, onSelectUser, onAssignTask, currentU
   );
 }
 
+function AuditLogView() {
+  const [logs, setLogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchLogs = async () => {
+      try {
+        const q = query(collection(db, 'audit_logs'), orderBy('timestamp', 'desc'), limit(100));
+        const snap = await getDocs(q);
+        const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setLogs(data);
+      } catch (error) {
+        console.error("Error fetching audit logs", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchLogs();
+  }, []);
+
+  return (
+    <div className="glass-panel" style={{ padding: '2rem' }}>
+      <h2 style={{ color: 'var(--crear-gold)', marginTop: 0 }}>🛡️ Auditoría de Accesos</h2>
+      <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>Últimos 100 movimientos en la plataforma.</p>
+      
+      {loading ? (
+        <p style={{ color: 'var(--text-muted)' }}>Cargando registros...</p>
+      ) : (
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+                <th style={{ padding: '0.8rem', color: 'var(--crear-cyan)' }}>Fecha y Hora</th>
+                <th style={{ padding: '0.8rem', color: 'var(--crear-cyan)' }}>Usuario</th>
+                <th style={{ padding: '0.8rem', color: 'var(--crear-cyan)' }}>Rol</th>
+                <th style={{ padding: '0.8rem', color: 'var(--crear-cyan)' }}>Acción</th>
+                <th style={{ padding: '0.8rem', color: 'var(--crear-cyan)' }}>Ubicación e IP</th>
+                <th style={{ padding: '0.8rem', color: 'var(--crear-cyan)' }}>Dispositivo</th>
+              </tr>
+            </thead>
+            <tbody>
+              {logs.map(log => {
+                const date = log.timestamp ? log.timestamp.toDate().toLocaleString('es-ES') : 'Desconocida';
+                const actionColor = log.action === 'LOGIN' ? '#22c55e' : '#ef4444';
+                return (
+                  <tr key={log.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                    <td style={{ padding: '0.8rem' }}>{date}</td>
+                    <td style={{ padding: '0.8rem', fontWeight: 'bold' }}>{log.name}<br/><span style={{ fontSize: '0.75rem', fontWeight: 'normal', color: 'var(--text-muted)' }}>{log.email}</span></td>
+                    <td style={{ padding: '0.8rem' }}>{log.role}</td>
+                    <td style={{ padding: '0.8rem', color: actionColor, fontWeight: 'bold' }}>{log.action}</td>
+                    <td style={{ padding: '0.8rem' }}><strong>{log.sede || 'Desconocida'}</strong><br/><span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>IP: {log.location} ({log.ip})</span></td>
+                    <td style={{ padding: '0.8rem', fontSize: '0.75rem', color: 'var(--text-muted)', maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={log.userAgent}>{log.userAgent}</td>
+                  </tr>
+                );
+              })}
+              {logs.length === 0 && (
+                <tr>
+                  <td colSpan={6} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>No hay registros de auditoría aún.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function GlobalView({ tasks, navigate }) {
   const { showToast } = useUI();
   
@@ -429,7 +497,7 @@ export default function SuperAdminPanel() {
   const navigate = useNavigate();
   const { tasks } = useChecklist();
   const { currentStage } = useCycles();
-  const [activeView, setActiveView] = useState((currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'director_maestria') ? 'global' : 'sede');
+  const [activeView, setActiveView] = useState((currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'director_maestria' || currentUser?.appRole === 'gerente') ? 'global' : 'sede');
   const [selectedUser, setSelectedUser] = useState(null);
   const [assignUser, setAssignUser] = useState(null);
   const [showUserModal, setShowUserModal] = useState(false);
@@ -580,12 +648,15 @@ export default function SuperAdminPanel() {
         /* Vistas normales por pestañas */
         <>
           <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
-            {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'director_maestria') && (
+            {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'director_maestria' || currentUser?.appRole === 'gerente') && (
               <button style={tabStyle('global')} onClick={() => setActiveView('global')}>🌐 Global</button>
             )}
             <button style={tabStyle('sede')} onClick={() => setActiveView('sede')}>🏢 Por Sede</button>
-            {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'director_maestria') && (
+            {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'director_maestria' || currentUser?.appRole === 'gerente') && (
               <button style={tabStyle('rol')} onClick={() => setActiveView('rol')}>👥 Por Rol</button>
+            )}
+            {currentUser?.isSuperAdmin && (
+              <button style={tabStyle('auditoria')} onClick={() => setActiveView('auditoria')}>🛡️ Auditoría</button>
             )}
           </div>
           {activeView === 'global' && <GlobalView tasks={tasks} navigate={navigate} />}
@@ -593,7 +664,7 @@ export default function SuperAdminPanel() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <p className="text-muted text-sm" style={{ marginBottom: '0.5rem' }}>Clic en una sede para expandir y ver el detalle de cada persona y su avance operativo.</p>
               {ALL_SEDES.filter(sede => {
-                if (currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'director_maestria') return true;
+                if (currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'director_maestria' || currentUser?.appRole === 'gerente') return true;
                 return normalizeSede(currentUser?.sede) === sede;
               }).map(sede => (
                 <SedeBlock 
@@ -616,6 +687,9 @@ export default function SuperAdminPanel() {
               onAssignTask={setAssignUser}
               currentUser={currentUser}
             />
+          )}
+          {activeView === 'auditoria' && (
+            <AuditLogView />
           )}
         </>
       )}

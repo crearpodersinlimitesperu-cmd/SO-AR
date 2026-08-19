@@ -374,8 +374,8 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
               </div>
             </div>
 
-            {/* Botón de Simulación — Solo SuperAdmin */}
-            {currentUser?.isSuperAdmin && (
+            {/* Botón de Simulación — Solo Creador (Jose Sanchez) */}
+            {currentUser?.email && (currentUser.email.toLowerCase() === 'jose.sanchez@crearpsl.com' || currentUser.email.toLowerCase() === 'jose.sanchez@crearpsl.net') && (
               <div style={{ marginTop: '1rem' }}>
                 <button
                   onClick={() => {

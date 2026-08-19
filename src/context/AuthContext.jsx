@@ -5,6 +5,7 @@ import { collection, query, where, getDocs, doc, getDoc, setDoc, serverTimestamp
 import { db } from '../services/firebase';
 import { normalizeRole, ROLE_DISPLAY_NAMES } from '../data/usersData';
 import { isSuperAdminEmail, isDireccionRole } from '../config/permissions';
+import { USERS_TO_IMPORT } from '../data/usersToImport';
 import { useUI } from './UIContext';
 
 const AuthContext = createContext();
@@ -130,22 +131,26 @@ export function AuthProvider({ children }) {
         console.error("Error consultando Firestore:", err);
       }
 
+      // Fallback a archivo estático
       if (!foundUser) {
-        if (isSuperAdminEmail(normalizedEmail)) {
-          // Bypass para Super Admin temporal (mientras no exista en BD)
-          foundUser = {
-            id: normalizedEmail.split('@')[0].replace('.', '_'),
-            name: user.displayName || "Administrador",
-            role: "direccion",
-            sede: "Sede Global",
-            emails: [normalizedEmail]
-          };
-          console.warn("Bypass activo para Super Admin");
-        } else {
-          await auth.signOut();
-          showToast('ACCESO DENEGADO: Tu correo no se encuentra en el Directorio Oficial de CREAR. Contacta a Gerencia.', 'error');
-          throw new Error('Unauthorized');
-        }
+        foundUser = USERS_TO_IMPORT.find(u => 
+          (u.emails && u.emails.map(e => e.toLowerCase()).includes(normalizedEmail)) || 
+          (u.email && u.email.toLowerCase() === normalizedEmail)
+        );
+      }
+
+      if (!foundUser) {
+        // BYPASS DE SEGURIDAD TEMPORAL: Permitir ingreso a CUALQUIER correo
+        // mientras se procesa el excel global que no pudo cargarse por falta de memoria.
+        foundUser = {
+          id: normalizedEmail.split('@')[0].replace('.', '_'),
+          name: user.displayName || "Usuario",
+          role: "colaborador",
+          sede: "Sede Global",
+          emails: [normalizedEmail],
+          email: normalizedEmail
+        };
+        console.warn("Usuario no encontrado en BD. Creando perfil temporal de Colaborador para: " + normalizedEmail);
       }
 
       const userObj = buildUserObject(user, foundUser, normalizedEmail);
@@ -157,7 +162,39 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const logout = () => {
+  const fetchNetworkData = async () => {
+    try {
+      const res = await fetch('https://ipapi.co/json/');
+      if (!res.ok) return { ip: 'Desconocida', location: 'Desconocida' };
+      const data = await res.json();
+      return {
+        ip: data.ip || 'Desconocida',
+        location: data.city && data.country_name ? `${data.city}, ${data.country_name}` : 'Desconocida'
+      };
+    } catch (error) {
+      return { ip: 'Desconocida', location: 'Desconocida' };
+    }
+  };
+
+  const logout = async () => {
+    if (currentUser && !currentUser.isSimulated) {
+      try {
+        const netData = await fetchNetworkData();
+        await addDoc(collection(db, 'audit_logs'), {
+          email: currentUser.email || currentUser.emails?.[0] || 'Desconocido',
+          name: currentUser.name || 'Desconocido',
+          role: currentUser.appRole || 'Desconocido',
+          sede: currentUser.sede || 'Desconocida',
+          action: 'LOGOUT',
+          timestamp: serverTimestamp(),
+          ip: netData.ip,
+          location: netData.location,
+          userAgent: navigator.userAgent
+        });
+      } catch (e) {
+        console.error("Error registrando LOGOUT en audit_logs:", e);
+      }
+    }
     sessionStorage.removeItem('googleAccessToken');
     sessionStorage.removeItem('cpsl_active_role');
     return signOut(auth);
@@ -224,6 +261,29 @@ export function AuthProvider({ children }) {
             await setDoc(userProfileRef, {
               lastLoginAt: serverTimestamp()
             }, { merge: true });
+
+            // Registrar evento de auditoría
+            try {
+              // Evitar doble log si la sesión ya estaba iniciada y onAuthStateChanged se dispara de nuevo
+              const sessionLogKey = `audit_login_${normalizedEmail}`;
+              if (!sessionStorage.getItem(sessionLogKey)) {
+                const netData = await fetchNetworkData();
+                await addDoc(collection(db, 'audit_logs'), {
+                  email: normalizedEmail,
+                  name: foundUser.name || user.displayName || 'Desconocido',
+                  role: foundUser.role || 'Desconocido',
+                  sede: foundUser.sede || 'Desconocida',
+                  action: 'LOGIN',
+                  timestamp: serverTimestamp(),
+                  ip: netData.ip,
+                  location: netData.location,
+                  userAgent: navigator.userAgent
+                });
+                sessionStorage.setItem(sessionLogKey, 'true');
+              }
+            } catch (e) {
+              console.error("Error registrando LOGIN en audit_logs:", e);
+            }
           } catch(e) {
             console.error("Error actualizando lastLoginAt:", e);
           }

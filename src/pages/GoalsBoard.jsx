@@ -7,6 +7,7 @@ import { useCycles } from '../context/CyclesContext';
 import { useUI } from '../context/UIContext';
 import { ArrowLeft, Target, Settings, GitMerge, Users, UserPlus, Award, CheckCircle2, Plus, Edit3 } from 'lucide-react';
 import GoalDivisionModal from '../components/GoalDivisionModal';
+import { normalizeSede } from '../data/usersData';
 
 export default function GoalsBoard() {
   const { currentUser } = useAuth();
@@ -15,6 +16,7 @@ export default function GoalsBoard() {
   const navigate = useNavigate();
   const [goals, setGoals] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedSedeFilter, setSelectedSedeFilter] = useState('Todas');
 
   // Modal de Asignación / División de Metas
   const [selectedGoalForAssignment, setSelectedGoalForAssignment] = useState(null);
@@ -38,10 +40,13 @@ export default function GoalsBoard() {
   // Estructura para guardar las metas del wizard
   const [wizardData, setWizardData] = useState(
     stages.reduce((acc, stage) => {
-      acc[stage.id] = { px: '', aliados: '', managers: '' };
+      acc[stage.id] = { px: '', aliados: '', managers: '', apoyos: '' };
       return acc;
     }, {})
   );
+  
+  const [quitoCycle, setQuitoCycle] = useState('C1');
+
 
   useEffect(() => {
     const goalsRef = collection(db, 'goals');
@@ -78,10 +83,11 @@ export default function GoalsBoard() {
     try {
       const batch = writeBatch(db);
       const cycleGoalRef = doc(collection(db, 'goals'));
+      const suffix = currentUser.sede === 'Quito' ? ` (${quitoCycle})` : '';
       
       // 1. Crear Meta Maestra del Ciclo
       batch.set(cycleGoalRef, {
-        title: `Meta Global del Ciclo ${currentCycle?.name || ''}`,
+        title: `Meta Global del Ciclo ${currentCycle?.name || ''}${suffix}`,
         kpi: 'Cumplimiento General (%)',
         progress: 0,
         targetValue: 100,
@@ -135,9 +141,26 @@ export default function GoalsBoard() {
         }
         if (data.managers && Number(data.managers) > 0) {
           batch.set(doc(collection(db, 'goals')), {
-             title: `Managers - ${stage.name}`,
+             title: `Managers - ${stage.name}${suffix}`,
              kpi: 'Cantidad de Managers',
              targetValue: Number(data.managers),
+             currentValue: 0,
+             progress: 0,
+             scope: 'ENTRENAMIENTO',
+             cyclePhase: phaseCode,
+             parentId: cycleGoalRef.id,
+             stage: stage.id,
+             ownerId: currentUser.uid,
+             sede: currentUser.sede || '',
+             assignedCoordinators: [],
+             createdAt: new Date().toISOString()
+          });
+        }
+        if (data.apoyos && Number(data.apoyos) > 0) {
+          batch.set(doc(collection(db, 'goals')), {
+             title: `Apoyos en Mesa - ${stage.name}${suffix}`,
+             kpi: 'Cantidad de Apoyos',
+             targetValue: Number(data.apoyos),
              currentValue: 0,
              progress: 0,
              scope: 'ENTRENAMIENTO',
@@ -322,6 +345,15 @@ export default function GoalsBoard() {
               }}>
                 {goal.scope}
               </span>
+
+              {goal.sede && (
+                <span style={{
+                  fontSize: '0.7rem', fontWeight: 'bold', padding: '0.2rem 0.6rem', borderRadius: '4px',
+                  background: 'rgba(255, 255, 255, 0.1)', color: 'var(--text-muted)'
+                }}>
+                  📍 {goal.sede}
+                </span>
+              )}
               
               {isAssigned && (
                 <span style={{
@@ -515,10 +547,37 @@ export default function GoalsBoard() {
         )}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem' }}>
-        {loading ? <p className="text-muted text-center">Cargando metas...</p> : (
-          goals.length > 0 ? goals.map(renderGoal) : <p className="text-muted" style={{ textAlign: 'center' }}>No hay metas configuradas. Inicia el Setup de Ciclo.</p>
+        {(currentUser?.isSuperAdmin || currentUser?.isDireccion) && (
+          <div style={{ marginBottom: '1.5rem' }}>
+            <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>Filtro de Sede (Vista Global):</label>
+            <select 
+              className="form-select" 
+              value={selectedSedeFilter} 
+              onChange={e => setSelectedSedeFilter(e.target.value)} 
+              style={{ width: '100%', maxWidth: '300px', padding: '0.5rem', borderRadius: '8px', background: 'rgba(0,0,0,0.2)', color: 'white', border: '1px solid var(--border-subtle)' }}
+            >
+              <option value="Todas">🌍 Todas las Sedes</option>
+              <option value="Lima">Lima</option>
+              <option value="Quito">Quito</option>
+              <option value="Medellín">Medellín</option>
+              <option value="Guayaquil">Guayaquil</option>
+              <option value="Cuenca">Cuenca</option>
+              <option value="México">México</option>
+            </select>
+          </div>
         )}
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.5rem' }}>
+        {loading ? <p className="text-muted text-center">Cargando metas...</p> : (() => {
+          if (goals.length === 0) {
+            return <p className="text-muted" style={{ textAlign: 'center' }}>No hay metas configuradas. Inicia el Setup de Ciclo.</p>;
+          }
+          const filteredGoals = goals.filter(g => selectedSedeFilter === 'Todas' || normalizeSede(g.sede || '') === normalizeSede(selectedSedeFilter));
+          if (filteredGoals.length === 0) {
+            return <p className="text-muted" style={{ textAlign: 'center' }}>No se encontraron metas para la sede <strong>{selectedSedeFilter}</strong>.</p>;
+          }
+          return filteredGoals.map(renderGoal);
+        })()}
       </div>
 
       {/* MODAL PARA DIVIDIR Y ASIGNAR METAS ENTRE COORDINADORAS */}
@@ -535,11 +594,23 @@ export default function GoalsBoard() {
           <div className="glass-panel" style={{ width: '100%', maxWidth: '600px', padding: '2rem', maxHeight: '90vh', overflowY: 'auto' }}>
             <h2 className="text-gold" style={{ marginTop: 0 }}>Wizard: Setup de Ciclo</h2>
             <p className="text-muted">Define las metas de Entrenamiento para cada fase.</p>
+            
+            {currentUser.sede === 'Quito' && (
+              <div style={{ marginTop: '1rem', padding: '1rem', background: 'rgba(255, 215, 0, 0.1)', borderRadius: '8px', border: '1px solid rgba(255, 215, 0, 0.3)' }}>
+                <label style={{ display: 'block', color: 'var(--crear-gold)', fontWeight: 'bold', marginBottom: '0.5rem' }}>Aplica para (Sede Quito):</label>
+                <select className="form-select" value={quitoCycle} onChange={e => setQuitoCycle(e.target.value)} style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', background: 'rgba(0,0,0,0.2)', color: 'white', border: '1px solid var(--border-subtle)' }}>
+                  <option value="C1">Ciclo 1</option>
+                  <option value="C2">Ciclo 2</option>
+                  <option value="C1 y C2">Ambos Ciclos</option>
+                </select>
+              </div>
+            )}
+
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginTop: '1.5rem' }}>
               {stages.map(stage => (
                 <div key={stage.id} style={{ padding: '1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
                   <h4 style={{ margin: '0 0 1rem 0', color: 'var(--crear-cyan)' }}>{stage.name}</h4>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '1rem' }}>
                     <div>
                       <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Px</label>
                       <input type="number" min="0" className="form-input" value={wizardData[stage.id].px} onChange={e => handleWizardChange(stage.id, 'px', e.target.value)} placeholder="0" />
@@ -551,6 +622,10 @@ export default function GoalsBoard() {
                     <div>
                       <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Managers</label>
                       <input type="number" min="0" className="form-input" value={wizardData[stage.id].managers} onChange={e => handleWizardChange(stage.id, 'managers', e.target.value)} placeholder="0" />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }} title="6 apoyos por coordinador">Apoyos (Mesa)</label>
+                      <input type="number" min="0" className="form-input" value={wizardData[stage.id].apoyos} onChange={e => handleWizardChange(stage.id, 'apoyos', e.target.value)} placeholder="0" />
                     </div>
                   </div>
                 </div>

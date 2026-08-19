@@ -25,23 +25,38 @@ export default function Login() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', background: 'var(--bg-dark)' }}>
-      <div className="glass-panel" style={{ padding: '4rem', maxWidth: '500px', width: '100%', textAlign: 'center' }}>
-        <img src="https://crearpsl.net/logo_crear_blanco.png" alt="CREAR PODER SIN LIMITES" className="logo-holographic" style={{ width: '200px', margin: '0 auto 2rem', display: 'block' }} onError={(e) => e.target.style.display = 'none'} />
-        
-        <h1 className="text-gold uppercase" style={{ fontSize: '2rem', marginBottom: '0.5rem', letterSpacing: '2px' }}>CENTRO OPERATIVO</h1>
-        <p className="text-muted" style={{ marginBottom: '3rem', fontSize: '1.1rem' }}>Plataforma de Gestión por Ciclos</p>
+    <div className="bg-animated" style={{ 
+      minHeight: '100vh', 
+      display: 'flex', 
+      flexDirection: 'column', 
+      justifyContent: 'flex-end', 
+      alignItems: 'center', 
+      background: 'url(/leones_bg_v2.jpg) no-repeat center center fixed',
+      backgroundSize: 'cover',
+      paddingBottom: '10vh'
+    }}>
+      <div className="glass-panel" style={{ 
+        padding: '2.5rem', 
+        maxWidth: '450px', 
+        width: '100%', 
+        textAlign: 'center',
+        background: 'rgba(10, 15, 30, 0.75)',
+        backdropFilter: 'blur(10px)',
+        borderTop: '2px solid var(--crear-gold)'
+      }}>
+        <h1 className="text-gold uppercase" style={{ fontSize: '1.6rem', marginBottom: '0.5rem', letterSpacing: '2px' }}>CENTRO OPERATIVO</h1>
+        <p className="text-muted" style={{ marginBottom: '2.5rem', fontSize: '1rem', color: '#e2e8f0' }}>Gestión por Ciclos</p>
         
         <button 
           onClick={handleLogin}
           className="btn-primary" 
-          style={{ width: '100%', padding: '1rem', fontSize: '1.1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.8rem' }}
+          style={{ width: '100%', padding: '1rem', fontSize: '1.1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.8rem', background: 'linear-gradient(135deg, #8b5cf6, #29abe2)', border: 'none', color: 'white' }}
         >
           <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" style={{ width: '24px', height: '24px', background: 'white', borderRadius: '50%', padding: '2px' }} />
           Continuar con Google
         </button>
         
-        <p className="text-muted" style={{ marginTop: '2rem', fontSize: '0.8rem' }}>Acceso exclusivo para equipo CREAR</p>
+        <p className="text-muted" style={{ marginTop: '1.5rem', fontSize: '0.75rem', opacity: 0.8 }}>Acceso exclusivo para la manada CREAR</p>
       </div>
     </div>
   );

@@ -47,6 +47,8 @@ export function CyclesProvider({ children }) {
       'cuenca': 'CUE',
       'lima': 'LIM',
       'med': 'MED',
+      'medellin': 'MED',
+      'medellín': 'MED',
       'méxico': 'MEX',
       'mexico': 'MEX',
       'uio': 'UIO',
@@ -98,15 +100,40 @@ export function CyclesProvider({ children }) {
     }
 
     const equipo = nextEvent.equipo;
-    const equipoEvents = sedeEvents.filter(e => String(e.equipo) === String(equipo) || String(e.equipo).includes(String(equipo)));
+    const equipoStr = String(equipo);
+    const nextEventDate = new Date((nextEvent.fecha_inicio || nextEvent.start).replace('Z', ''));
+    const timeWindow = 180 * 24 * 60 * 60 * 1000; // 6 meses
+
+    // Filtrar eventos que compartan parte del nombre del equipo (para manejar '343536' machacado con '34', '35')
+    // Y limitamos a +/- 6 meses para no agarrar el equipo '3' de hace años si el string es '343536'
+    let equipoEvents = sedeEvents.filter(e => {
+        const d = new Date((e.fecha_inicio || e.start).replace('Z', ''));
+        if (Math.abs(d - nextEventDate) > timeWindow) return false;
+
+        const eEq = String(e.equipo);
+        return eEq === equipoStr || eEq.includes(equipoStr) || equipoStr.includes(eEq);
+    });
+
+    // Ordenar descendente para que find() tome el evento más reciente si hay varios (ej. 3 C1s distintos)
+    equipoEvents.sort((a, b) => new Date(b.fecha_inicio || b.start) - new Date(a.fecha_inicio || a.start));
 
     const c1 = equipoEvents.find(e => (e.nombre || e.name) === 'CAPITULO UNO');
     const c2 = equipoEvents.find(e => (e.nombre || e.name) === 'CAPITULO DOS');
     const mj = equipoEvents.find(e => (e.nombre || e.name) === 'MAESTRIA DEL JUEGO');
 
+    // Mejoramos la visualización del nombre si viene machacado y es muy largo
+    let displayNombre = equipoStr;
+    if (displayNombre.length === 6 && !displayNombre.includes(' ')) {
+       displayNombre = `${displayNombre.slice(0,2)}, ${displayNombre.slice(2,4)}, ${displayNombre.slice(4,6)}`;
+    } else if (displayNombre.length === 4 && !displayNombre.includes(' ')) {
+       displayNombre = `${displayNombre.slice(0,2)}, ${displayNombre.slice(2,4)}`;
+    } else if (displayNombre.length === 3 && !displayNombre.includes(' ')) {
+       displayNombre = `${displayNombre.slice(0,1)}, ${displayNombre.slice(1,2)}, ${displayNombre.slice(2,3)}`;
+    }
+
     const active = {
-        id: `${sedeCode}-EQ-${equipo}`,
-        name: `Equipo ${equipo}`,
+        id: `${sedeCode}-EQ-${equipoStr}`,
+        name: `Equipo ${displayNombre}`,
         c1_start: c1 ? (c1.fecha_inicio || c1.start) : '',
         c1_end: c1 ? (c1.fecha_fin || c1.end) : '',
         c2_start: c2 ? (c2.fecha_inicio || c2.start) : '',

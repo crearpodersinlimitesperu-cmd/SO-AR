@@ -3,7 +3,7 @@ import { Target, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useChecklist } from '../context/ChecklistContext';
 import { getAssignableRoles } from '../config/permissions';
-import { normalizeRole } from '../data/usersData';
+import { usersData, normalizeRole, OPERATIONAL_SEDES } from '../data/usersData';
 
 export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = null }) {
   const { currentUser } = useAuth();
@@ -140,12 +140,37 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
             {canAssignSpecific && (
               <>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--crear-cyan)', marginBottom: '0.3rem' }}>[Admin/Gerente] Email Específico:</label>
-                  <input type="email" placeholder="email@crearpsl.net" value={newTask.assignedToEmail || ''} onChange={e => setNewTask({...newTask, assignedToEmail: e.target.value})} className="input-field" style={{ width: '100%', borderColor: 'var(--crear-cyan)' }} disabled={isSubmitting} />
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--crear-cyan)', marginBottom: '0.3rem' }}>[Admin/Gerente] Asignar a Usuario (Opcional):</label>
+                  <select 
+                    value={newTask.assignedToEmail || ''} 
+                    onChange={e => setNewTask({...newTask, assignedToEmail: e.target.value})} 
+                    className="input-field" 
+                    style={{ width: '100%', borderColor: 'var(--crear-cyan)' }} 
+                    disabled={isSubmitting}
+                  >
+                    <option value="">Cualquiera en este Rol (No específico)</option>
+                    {usersData
+                      .filter(u => normalizeRole(u.role) === newTask.role || u.role === newTask.role)
+                      .map(u => (
+                        <option key={u.email} value={u.email}>{u.name} ({u.email})</option>
+                      ))
+                    }
+                  </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--crear-cyan)', marginBottom: '0.3rem' }}>[Admin/Gerente] Sede:</label>
-                  <input type="text" placeholder="Ej. Lima, Cuenca" value={newTask.assignedSede || ''} onChange={e => setNewTask({...newTask, assignedSede: e.target.value})} className="input-field" style={{ width: '100%', borderColor: 'var(--crear-cyan)' }} disabled={isSubmitting} />
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--crear-cyan)', marginBottom: '0.3rem' }}>[Admin/Gerente] Sede Específica:</label>
+                  <select 
+                    value={newTask.assignedSede || ''} 
+                    onChange={e => setNewTask({...newTask, assignedSede: e.target.value})} 
+                    className="input-field" 
+                    style={{ width: '100%', borderColor: 'var(--crear-cyan)' }} 
+                    disabled={isSubmitting}
+                  >
+                    <option value="">Cualquier Sede / Global</option>
+                    {OPERATIONAL_SEDES.map(s => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
                 </div>
               </>
             )}

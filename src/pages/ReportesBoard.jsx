@@ -203,8 +203,20 @@ export default function ReportesBoard() {
       );
     }
 
+    if (reportType === 'QT_Contexto') {
+      return (
+        <div style={{ display: 'grid', gap: '1rem' }}>
+          <h4 className="text-blue">Reporte de Contexto (QT)</h4>
+          <textarea name="contexto" placeholder="Escribe aquí lo que estás viendo en el contexto..." onChange={handleChange} className="form-input" rows="8"></textarea>
+        </div>
+      );
+    }
+
     return <p className="text-muted">Selecciona un tipo de reporte para ver el formato.</p>;
   };
+
+  const role = currentUser?.activeRole || currentUser?.appRole || '';
+  const isDireccion = role === 'direccion';
 
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem 1rem' }}>
@@ -228,51 +240,61 @@ export default function ReportesBoard() {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '2rem' }}>
-            <label className="text-white" style={{ display: 'block', marginBottom: '0.5rem' }}>Tipo de Reporte a Enviar:</label>
-            <select 
-              value={reportType} 
-              onChange={e => setReportType(e.target.value)} 
-              className="form-input"
-            >
-              <option value="">-- Selecciona Formato Oficial Autorizado --</option>
-              {(() => {
-                const role = currentUser?.activeRole || currentUser?.appRole || '';
-                const isSuper = currentUser?.isSuperAdmin || currentUser?.isGerente || ['direccion', 'superadmin', 'gerente'].includes(role);
-                const options = [];
-
-                if (isSuper || ['coord_c1', 'coordinador_c1c2'].includes(role)) {
-                  options.push(<option key="Llamadas" value="Llamadas">1. Reporte de Llamadas (C1)</option>);
-                  options.push(<option key="C2" value="C2">3. Reporte Capítulo Dos</option>);
-                }
-                if (isSuper || ['capitan', 'qt'].includes(role)) {
-                  options.push(<option key="FDS" value="FDS">2. Reporte FDS (Sede)</option>);
-                }
-                if (isSuper || ['coord_maestria', 'coordinador_mj', 'director_maestria'].includes(role)) {
-                  options.push(<option key="MJ" value="MJ">4. Reporte Maestría del Juego</option>);
-                }
-
-                return options.length > 0 ? options : [
-                  <option key="FDS" value="FDS">2. Reporte FDS (Sede)</option>
-                ];
-              })()}
-            </select>
+        {isDireccion ? (
+          <div style={{ padding: '2rem', textAlign: 'center', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
+            <p className="text-muted">Rol de Dirección Global: Solo recibes y monitoreas reportes, no envías. (Modo Lectura)</p>
           </div>
+        ) : (
+          <form onSubmit={handleSubmit}>
+            <div style={{ marginBottom: '2rem' }}>
+              <label className="text-white" style={{ display: 'block', marginBottom: '0.5rem' }}>Tipo de Reporte a Enviar:</label>
+              <select 
+                value={reportType} 
+                onChange={e => setReportType(e.target.value)} 
+                className="form-input"
+              >
+                <option value="">-- Selecciona Formato Oficial Autorizado --</option>
+                {(() => {
+                  const isSuper = currentUser?.isSuperAdmin || currentUser?.isGerente || ['superadmin', 'gerente'].includes(role);
+                  const options = [];
 
-          {reportType && (
-            <div style={{ background: 'rgba(255,255,255,0.02)', padding: '1.5rem', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '8px', marginBottom: '2rem' }}>
-              {renderFormFields()}
+                  if (role === 'qt') {
+                    options.push(<option key="QT" value="QT_Contexto">Reporte de Contexto (QT)</option>);
+                  } else {
+                    if (isSuper || ['coord_c1', 'coordinador_c1c2'].includes(role)) {
+                      options.push(<option key="Llamadas" value="Llamadas">1. Reporte de Llamadas (C1)</option>);
+                      options.push(<option key="C2" value="C2">3. Reporte Capítulo Dos</option>);
+                    }
+                    if (isSuper || ['capitan'].includes(role)) {
+                      options.push(<option key="FDS" value="FDS">2. Reporte FDS (Sede)</option>);
+                    }
+                    if (isSuper || ['coord_maestria', 'coordinador_mj', 'director_maestria'].includes(role)) {
+                      options.push(<option key="MJ" value="MJ">4. Reporte Maestría del Juego</option>);
+                    }
+                  }
+
+                  return options.length > 0 ? options : [
+                    <option key="FDS" value="FDS">2. Reporte FDS (Sede)</option>
+                  ];
+                })()}
+              </select>
             </div>
-          )}
 
-          {reportType && (
-            <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', padding: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', fontSize: '1.1rem' }}>
-              <Send size={20} /> {loading ? 'Enviando...' : 'Enviar Reporte y Acumular Datos'}
-            </button>
-          )}
-        </form>
+            {reportType && (
+              <div style={{ background: 'rgba(255,255,255,0.02)', padding: '1.5rem', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '8px', marginBottom: '2rem' }}>
+                {renderFormFields()}
+              </div>
+            )}
+
+            {reportType && (
+              <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', padding: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', fontSize: '1.1rem' }}>
+                <Send size={20} /> {loading ? 'Enviando...' : 'Enviar Reporte y Acumular Datos'}
+              </button>
+            )}
+          </form>
+        )}
       </div>
+
     </div>
   );
 }

@@ -9,6 +9,7 @@
  */
 export const SUPER_ADMIN_EMAILS = [
   'jose.sanchez@crearpsl.net',
+  'armando.pilacuan@gmail.com'
 ];
 
 /**
@@ -48,6 +49,72 @@ export const isDireccionRole = (role) => {
 export const isGerenciaRole = (role) => {
   return GERENCIA_ROLES.includes(role);
 };
+
+/**
+ * Verifica si un usuario puede agregar nuevos managers (Coordinador Maestría, Director Maestría o SuperAdmin)
+ */
+export const canAddManagers = (currentUser) => {
+  if (!currentUser) return false;
+  if (currentUser.isSuperAdmin) return true;
+  const r = currentUser.appRole;
+  return r === 'director_maestria' || r === 'coord_maestria' || r === 'coordinador_mj';
+};
+
+/**
+ * Verifica si un usuario puede asignar o reasignar entrenadores a managers
+ * (Coordinadores de Maestría, Director de Maestría y José Sánchez / SuperAdmin)
+ */
+export const canAssignTrainer = (currentUser) => {
+  if (!currentUser) return false;
+  if (currentUser.isSuperAdmin) return true;
+  if (currentUser.email === 'jose.sanchez@crearpsl.net') return true;
+  const r = currentUser.appRole;
+  return r === 'director_maestria' || r === 'coord_maestria' || r === 'coordinador_mj';
+};
+
+/**
+ * Verifica si un usuario puede cambiar el estado de un manager (Graduado / Desertor).
+ * SOLO: Coordinadores de Maestría y Director de Maestría (Andrés Gómez).
+ * Los entrenadores NO pueden cambiar estados.
+ */
+export const canChangeManagerStatus = (currentUser) => {
+  if (!currentUser) return false;
+  if (currentUser.isSuperAdmin) return true;
+  if (currentUser.email === 'jose.sanchez@crearpsl.net') return true;
+  const r = currentUser.appRole;
+  return r === 'director_maestria' || r === 'coord_maestria' || r === 'coordinador_mj';
+};
+
+/**
+ * Verifica si un usuario puede ver TODOS los managers de todas las sedes.
+ * SOLO: Director de Maestría y José Sánchez / SuperAdmin.
+ */
+export const canViewAllManagers = (currentUser) => {
+  if (!currentUser) return false;
+  if (currentUser.isSuperAdmin) return true;
+  if (currentUser.email === 'jose.sanchez@crearpsl.net') return true;
+  return currentUser.appRole === 'director_maestria';
+};
+
+/**
+ * Verifica si el usuario puede ver managers de su sede (Coordinadores de Maestría).
+ */
+export const canViewSede = (currentUser) => {
+  if (!currentUser) return false;
+  const r = currentUser.appRole;
+  return r === 'coord_maestria' || r === 'coordinador_mj';
+};
+
+/**
+ * Emails de entrenadores que TAMBIÉN tienen un rol corporativo (dual-role).
+ * Estos usuarios pueden alternar entre su vista de entrenador y su rol de oficina.
+ */
+export const DUAL_ROLE_TRAINER_EMAILS = [
+  'andres.gomez@crearpsl.net',     // Director Maestría + Entrenador C2+MJ
+  'fer.aragon@crearpsl.net',        // Corporativo + Entrenador C1
+  'paul.sosa@crearpsl.net',         // Corporativo + Entrenador C2+MJ
+  'leandro.brunis@crearpsl.net',    // Corporativo + Entrenador C1
+];
 
 /**
  * Devuelve la lista de roles a los que el usuario actual puede asignar tareas,

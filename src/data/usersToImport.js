@@ -886,5 +886,131 @@ export const USERS_TO_IMPORT = [
       "maferflores2013@gmail.com"
     ],
     email: "maferflores2013@gmail.com"
+  },
+  {
+    id: "coach_jesus_acosta",
+    name: "Jesús Adrián Acosta",
+    role: "entrenador_llamadas",
+    sede: "Sede Global",
+    entrenamientos: "MJ",
+    emails: ["chuyacostar88@gmail.com"],
+    email: "chuyacostar88@gmail.com"
+  },
+  {
+    id: "coach_ana_monroy",
+    name: "Ana Elena Monroy",
+    role: "entrenador_llamadas",
+    sede: "Sede Global",
+    entrenamientos: "MJ",
+    emails: ["anamonroyt@gmail.com"],
+    email: "anamonroyt@gmail.com"
+  },
+  {
+    id: "coach_lourdes_patino",
+    name: "María de Lourdes Patiño Galarraga",
+    role: "entrenador_llamadas",
+    sede: "Sede Global",
+    entrenamientos: "MJ",
+    emails: ["marylourdespat@gmail.com"],
+    email: "marylourdespat@gmail.com"
+  },
+  {
+    id: "coach_alejandro_diaz",
+    name: "Alejandro Díaz",
+    role: "entrenador_llamadas",
+    sede: "Sede Global",
+    entrenamientos: "MJ",
+    emails: ["emalejodiaz@gmail.com"],
+    email: "emalejodiaz@gmail.com"
+  },
+  {
+    id: "coach_mildred_munoz",
+    name: "Mildred Muñoz Vasquez",
+    role: "entrenador_llamadas",
+    sede: "Sede Global",
+    entrenamientos: "C2+MJ",
+    emails: ["mildredmunozv@gmail.com"],
+    email: "mildredmunozv@gmail.com"
+  },
+  {
+    id: "coach_mike_boada",
+    name: "Mike Boada",
+    role: "entrenador_llamadas",
+    sede: "Sede Global",
+    entrenamientos: "MJ",
+    emails: ["maboadar@gmail.com", "direccion@bmbgbrokers.com"],
+    email: "maboadar@gmail.com"
+  },
+  {
+    id: "coach_juan_angel",
+    name: "Juan Angel",
+    role: "entrenador_llamadas",
+    sede: "Sede Global",
+    entrenamientos: "C2+MJ",
+    emails: ["jarreolamorales@gmail.com"],
+    email: "jarreolamorales@gmail.com"
+  },
+  {
+    id: "coach_fer_aragon",
+    name: "Fer Aragón",
+    role: "entrenador_llamadas",
+    sede: "Sede Global",
+    entrenamientos: "C1",
+    emails: ["fer.aragon@crearpsl.net"],
+    email: "fer.aragon@crearpsl.net"
+  },
+  {
+    id: "coach_paul_sosa",
+    name: "Paul Sosa",
+    role: "entrenador_llamadas",
+    sede: "Sede Global",
+    entrenamientos: "C2+MJ",
+    emails: ["paul.sosa@crearpsl.net"],
+    email: "paul.sosa@crearpsl.net"
+  },
+  {
+    id: "coach_alonso_solares",
+    name: "Alonso Solares Salazar",
+    role: "entrenador_llamadas",
+    sede: "Sede Global",
+    entrenamientos: "MJ",
+    emails: ["solaresalonso@gmail.com"],
+    email: "solaresalonso@gmail.com"
+  },
+  {
+    id: "coach_andres_idrobo",
+    name: "Andres Idrobo",
+    role: "entrenador_llamadas",
+    sede: "Sede Global",
+    entrenamientos: "MJ",
+    emails: ["e.andresid@gmail.com"],
+    email: "e.andresid@gmail.com"
+  },
+  {
+    id: "coach_cirilo_martinez",
+    name: "Cirilo Agustín Martínez",
+    role: "entrenador_llamadas",
+    sede: "Sede Global",
+    entrenamientos: "MJ",
+    emails: ["ciriloagustin21@gmail.com"],
+    email: "ciriloagustin21@gmail.com"
+  },
+  {
+    id: "coach_leandro_brunis",
+    name: "Leandro Brunis",
+    role: "entrenador_llamadas",
+    sede: "Sede Global",
+    entrenamientos: "C1",
+    emails: ["leandro.brunis@crearpsl.net"],
+    email: "leandro.brunis@crearpsl.net"
+  },
+  {
+    id: "coach_mauricio_perez",
+    name: "Mauricio Pérez",
+    role: "entrenador_llamadas",
+    sede: "Sede Global",
+    entrenamientos: "C1",
+    emails: ["mperez.ttw@gmail.com"],
+    email: "mperez.ttw@gmail.com"
   }
 ];
