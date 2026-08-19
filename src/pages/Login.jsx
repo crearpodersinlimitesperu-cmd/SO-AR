@@ -20,7 +20,7 @@ export default function Login() {
       // La redirección la maneja el useEffect cuando currentUser cambia
     } catch (error) {
       console.error("Error al iniciar sesión", error);
-      showToast("Hubo un error al iniciar sesión. Intenta nuevamente.", "error");
+      showToast(error.message || "Hubo un error al iniciar sesión. Intenta nuevamente.", "error");
     }
   };
 
