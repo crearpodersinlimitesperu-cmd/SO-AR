@@ -137,6 +137,13 @@ export default function GerenteDashboard() {
               👥 Directorio de Equipo
             </button>
           )}
+          <button 
+            className="btn-primary" 
+            onClick={() => window.open('https://cartas.crearpsl.net/', '_blank')} 
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'linear-gradient(135deg, #f59e0b, #ec4899)', color: 'white', border: 'none' }}
+          >
+            <Mail size={16} /> Sistema de Cartas
+          </button>
           <button className="btn-secondary" onClick={() => navigate('/')}>Volver</button>
         </div>
       </div>
