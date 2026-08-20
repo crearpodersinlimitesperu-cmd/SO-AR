@@ -1,3 +1,4 @@
+import { getWhatsAppUrl } from '../utils/phoneUtils';
 import { useState, useEffect } from 'react';
 import { 
   X, User, CheckCircle2, Clock, AlertTriangle, 
@@ -391,9 +392,31 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
                     </span>
                   )}
                   {user.phone && (
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                      📱 {user.phone}
-                    </span>
+                    <a
+                      href={getWhatsAppUrl(user.phone, user.sede)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                        color: '#25D366',
+                        background: 'rgba(37, 211, 102, 0.12)',
+                        border: '1px solid rgba(37, 211, 102, 0.35)',
+                        padding: '2px 8px',
+                        borderRadius: '6px',
+                        textDecoration: 'none',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease'
+                      }}
+                      title="Abrir chat directo en WhatsApp"
+                    >
+                      <span style={{ fontSize: '0.95rem' }}>💬</span>
+                      <span>{user.phone}</span>
+                      <span style={{ fontSize: '0.7rem', color: '#10b981', background: 'rgba(16, 185, 129, 0.2)', padding: '1px 4px', borderRadius: '4px' }}>WhatsApp</span>
+                    </a>
                   )}
                 </div>
               </div>

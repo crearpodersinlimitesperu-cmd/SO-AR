@@ -1,3 +1,4 @@
+import { getWhatsAppUrl } from '../utils/phoneUtils';
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -1075,7 +1076,7 @@ export default function CentroManagers() {
                           </div>
                           <div style={{ color: textMuted, fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem', marginTop: '0.25rem' }}>
                             {m.telefono ? (
-                              <a href={`https://wa.me/${m.telefono.replace(/\D/g,'')}`} target="_blank" rel="noreferrer" style={{ color: '#10b981', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.2rem', fontWeight: 600 }}>
+                              <a href={`${getWhatsAppUrl(m.telefono, selectedSede || m.sede)}`} target="_blank" rel="noreferrer" style={{ color: '#10b981', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.2rem', fontWeight: 600 }}>
                                 📱 {m.telefono}
                               </a>
                             ) : (
@@ -1359,7 +1360,7 @@ export default function CentroManagers() {
                                 </span>
                                 <span style={{ fontWeight: 700, color: '#713f12' }}>{m.nombre}</span>
                                 {m.telefono && (
-                                  <a href={`https://wa.me/${m.telefono.replace(/\D/g,'')}`} target="_blank" rel="noreferrer" title="Contactar por WhatsApp" style={{ color: '#10b981', textDecoration: 'none' }}>
+                                  <a href={`${getWhatsAppUrl(m.telefono, selectedSede || m.sede)}`} target="_blank" rel="noreferrer" title="Contactar por WhatsApp" style={{ color: '#10b981', textDecoration: 'none' }}>
                                     📱
                                   </a>
                                 )}
@@ -1394,7 +1395,7 @@ export default function CentroManagers() {
                               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                 <span style={{ fontWeight: 600, color: pillText }}>{m.nombre}</span>
                                 {m.telefono && (
-                                  <a href={`https://wa.me/${m.telefono.replace(/\D/g,'')}`} target="_blank" rel="noreferrer" title="Contactar por WhatsApp" style={{ color: '#10b981', textDecoration: 'none' }}>
+                                  <a href={`${getWhatsAppUrl(m.telefono, selectedSede || m.sede)}`} target="_blank" rel="noreferrer" title="Contactar por WhatsApp" style={{ color: '#10b981', textDecoration: 'none' }}>
                                     📱
                                   </a>
                                 )}
@@ -2495,7 +2496,7 @@ export default function CentroManagers() {
                         </span>
                       )}
                       <span style={{ fontSize: '0.9rem', fontWeight: 600, color: textDark }}>{m.nombre}</span>
-                      {m.telefono && <span style={{ fontSize: '0.75rem', color: textMuted }}>({m.telefono})</span>}
+                      {m.telefono && <a href={getWhatsAppUrl(m.telefono, selectedSede || m.sede)} target='_blank' rel='noreferrer' style={{ fontSize: '0.75rem', color: '#10b981', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '2px', marginLeft: '4px' }}>💬 {m.telefono}</a>}
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                       <span style={{ fontSize: '0.8rem', fontWeight: 700, color: checked ? '#16a34a' : '#dc2626' }}>
