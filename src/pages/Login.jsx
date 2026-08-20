@@ -20,7 +20,18 @@ export default function Login() {
       navigate('/home');
     } catch (error) {
       console.error("Error al iniciar sesión", error);
-      showToast("Hubo un error al iniciar sesión. Intenta nuevamente.", "error");
+      if (error?.code === 'auth/popup-closed-by-user' || error?.code === 'auth/cancelled-popup-request') {
+        return;
+      }
+      if (error?.code === 'auth/popup-blocked') {
+        showToast("Tu navegador bloqueó la ventana emergente de Google. Por favor habilita los popups.", "error");
+        return;
+      }
+      if (error?.code === 'auth/unauthorized-domain') {
+        showToast("Dominio no autorizado en Firebase Auth.", "error");
+        return;
+      }
+      showToast("Hubo un error al iniciar sesión. Intenta nuevamente con tu cuenta @crearpsl.net.", "error");
     }
   };
 
