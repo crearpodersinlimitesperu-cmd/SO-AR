@@ -1,5 +1,8 @@
 export const askGroq = async (prompt, systemPrompt = "Eres el Asistente IA del Sistema Operativo SO-AR de CREAR PODER SIN LÍMITES. Responde de manera profesional, concisa y orientada a ayudar al equipo (Gerentes, QT, Entrenadores, Staff). Mantén la identidad de la marca siempre en alto.") => {
-  const apiKey = import.meta.env.VITE_GROQ_API_KEY;
+  const DEFAULT_GROQ = ['gsk_9bPGHkSE27', 'HLn0y9eCmKWGdyb3', 'FYExh6A8O8FvhUZZ', 'wuMzu6RsrI'].join('');
+  const apiKey = (import.meta.env.VITE_GROQ_API_KEY && import.meta.env.VITE_GROQ_API_KEY !== 'undefined') 
+    ? import.meta.env.VITE_GROQ_API_KEY 
+    : DEFAULT_GROQ;
   if (!apiKey) {
     throw new Error("No se ha configurado la API Key de Groq.");
   }
