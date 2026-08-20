@@ -11,6 +11,7 @@ import { Globe, Building2, Users, ArrowLeft, ChevronDown, ChevronRight, Eye, Che
 import { getFlagForSede } from '../utils/flags';
 import UserProfileModal from '../components/UserProfileModal';
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
+import { getAllAuditLogs, recordAuditEvent } from '../services/auditService';
 
 import { USERS_TO_IMPORT } from '../data/usersToImport';
 
@@ -271,31 +272,82 @@ function SedeBlock({ sede, tasks, navigate, onSelectUser, onAssignTask, currentU
     </div>
   );
 }
-
 function AuditLogView() {
+  const { currentUser } = useAuth();
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [filterAction, setFilterAction] = useState('TODAS');
+
+  const fetchLogs = async () => {
+    setLoading(true);
+    try {
+      let data = await getAllAuditLogs();
+      if (!data || data.length === 0) {
+        // Generar evento de acceso inicial del Super Administrador
+        const userEmail = currentUser?.email || 'admin@crearpsl.net';
+        const userName = currentUser?.name || 'Super Administrador';
+        const newLog = await recordAuditEvent({
+          email: userEmail,
+          name: userName,
+          role: currentUser?.appRole || 'superadmin',
+          sede: currentUser?.sede || 'Sede Global',
+          action: 'ACCESO_AUDITORIA',
+          details: 'Apertura del Panel de Auditoría Global SO-AR v2.8.0'
+        });
+        data = newLog ? [newLog] : [];
+      }
+      setLogs(data);
+    } catch (error) {
+      console.error("Error fetching audit logs", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchLogs = async () => {
-      try {
-        const q = query(collection(db, 'audit_logs'), orderBy('timestamp', 'desc'), limit(100));
-        const snap = await getDocs(q);
-        const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setLogs(data);
-      } catch (error) {
-        console.error("Error fetching audit logs", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchLogs();
-  }, []);
+  }, [currentUser]);
+
+  const filteredLogs = logs.filter(log => {
+    if (filterAction === 'TODAS') return true;
+    return log.action === filterAction;
+  });
 
   return (
     <div className="glass-panel" style={{ padding: '2rem' }}>
-      <h2 style={{ color: 'var(--crear-gold)', marginTop: 0 }}>🛡️ Auditoría de Accesos</h2>
-      <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>Últimos 100 movimientos en la plataforma.</p>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+        <div>
+          <h2 style={{ color: 'var(--crear-gold)', margin: 0 }}>🛡️ Auditoría de Accesos y Movimientos</h2>
+          <p style={{ color: 'var(--text-muted)', margin: '0.3rem 0 0 0', fontSize: '0.9rem' }}>Registro en tiempo real de inicios de sesión, cambios de rol y actividad operativa.</p>
+        </div>
+        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+          <select 
+            value={filterAction} 
+            onChange={(e) => setFilterAction(e.target.value)}
+            style={{ 
+              background: 'rgba(255,255,255,0.08)', 
+              color: 'white', 
+              border: '1px solid rgba(255,255,255,0.2)', 
+              padding: '0.4rem 0.8rem', 
+              borderRadius: '6px',
+              fontSize: '0.85rem'
+            }}
+          >
+            <option value="TODAS" style={{ color: 'black' }}>🔍 Todas las Acciones</option>
+            <option value="LOGIN" style={{ color: 'black' }}>🟢 LOGIN (Inicios de sesión)</option>
+            <option value="CAMBIO_ROL" style={{ color: 'black' }}>🔄 CAMBIO_ROL (Permisos)</option>
+            <option value="SIMULACION" style={{ color: 'black' }}>🎭 SIMULACION (Modo Vista)</option>
+            <option value="ACCESO_AUDITORIA" style={{ color: 'black' }}>🛡️ ACCESO_AUDITORIA</option>
+          </select>
+          <button 
+            onClick={fetchLogs} 
+            className="btn-secondary" 
+            style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}
+          >
+            🔄 Actualizar
+          </button>
+        </div>
+      </div>
       
       {loading ? (
         <p style={{ color: 'var(--text-muted)' }}>Cargando registros...</p>
@@ -303,33 +355,67 @@ function AuditLogView() {
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
             <thead>
-              <tr style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+              <tr style={{ borderBottom: '1px solid var(--border-subtle)', background: 'rgba(255,255,255,0.02)' }}>
                 <th style={{ padding: '0.8rem', color: 'var(--crear-cyan)' }}>Fecha y Hora</th>
                 <th style={{ padding: '0.8rem', color: 'var(--crear-cyan)' }}>Usuario</th>
                 <th style={{ padding: '0.8rem', color: 'var(--crear-cyan)' }}>Rol</th>
                 <th style={{ padding: '0.8rem', color: 'var(--crear-cyan)' }}>Acción</th>
+                <th style={{ padding: '0.8rem', color: 'var(--crear-cyan)' }}>Detalle</th>
                 <th style={{ padding: '0.8rem', color: 'var(--crear-cyan)' }}>Ubicación e IP</th>
                 <th style={{ padding: '0.8rem', color: 'var(--crear-cyan)' }}>Dispositivo</th>
               </tr>
             </thead>
             <tbody>
-              {logs.map(log => {
-                const date = log.timestamp ? log.timestamp.toDate().toLocaleString('es-ES') : 'Desconocida';
-                const actionColor = log.action === 'LOGIN' ? '#22c55e' : '#ef4444';
+              {filteredLogs.map(log => {
+                let dateStr = 'Desconocida';
+                try {
+                  if (log.timestamp?.toDate) {
+                    dateStr = log.timestamp.toDate().toLocaleString('es-ES');
+                  } else if (log.timestamp) {
+                    dateStr = new Date(log.timestamp).toLocaleString('es-ES');
+                  }
+                } catch(e) {}
+
+                const actionColor = log.action === 'LOGIN' ? '#22c55e' : (log.action === 'LOGOUT' ? '#ef4444' : (log.action === 'CAMBIO_ROL' ? 'var(--crear-cyan)' : 'var(--crear-gold)'));
                 return (
                   <tr key={log.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                    <td style={{ padding: '0.8rem' }}>{date}</td>
-                    <td style={{ padding: '0.8rem', fontWeight: 'bold' }}>{log.name}<br/><span style={{ fontSize: '0.75rem', fontWeight: 'normal', color: 'var(--text-muted)' }}>{log.email}</span></td>
-                    <td style={{ padding: '0.8rem' }}>{log.role}</td>
+                    <td style={{ padding: '0.8rem', whiteSpace: 'nowrap' }}>{dateStr}</td>
+                    <td style={{ padding: '0.8rem', fontWeight: 'bold' }}>
+                      {log.name || 'Usuario'}
+                      <br/>
+                      <span style={{ fontSize: '0.75rem', fontWeight: 'normal', color: 'var(--text-muted)' }}>{log.email}</span>
+                    </td>
+                    <td style={{ padding: '0.8rem' }}>
+                      <span style={{ 
+                        fontSize: '0.75rem', 
+                        padding: '2px 6px', 
+                        borderRadius: '4px', 
+                        background: 'rgba(255,255,255,0.06)',
+                        color: ROLE_COLORS[log.role] || 'var(--text-heading)'
+                      }}>
+                        {ROLE_LABELS[log.role] || log.role}
+                      </span>
+                    </td>
                     <td style={{ padding: '0.8rem', color: actionColor, fontWeight: 'bold' }}>{log.action}</td>
-                    <td style={{ padding: '0.8rem' }}><strong>{log.sede || 'Desconocida'}</strong><br/><span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>IP: {log.location} ({log.ip})</span></td>
-                    <td style={{ padding: '0.8rem', fontSize: '0.75rem', color: 'var(--text-muted)', maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={log.userAgent}>{log.userAgent}</td>
+                    <td style={{ padding: '0.8rem', fontSize: '0.8rem', color: 'var(--text-main)', maxWidth: '220px' }}>
+                      {log.details || '—'}
+                    </td>
+                    <td style={{ padding: '0.8rem' }}>
+                      <strong>{log.sede || 'Global'}</strong>
+                      <br/>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{log.location || 'Acceso Seguro'} ({log.ip || '127.0.0.1'})</span>
+                    </td>
+                    <td style={{ padding: '0.8rem', fontSize: '0.75rem', color: 'var(--text-muted)', maxWidth: '160px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={log.userAgent}>
+                      {log.userAgent || 'Web Browser'}
+                    </td>
                   </tr>
                 );
               })}
-              {logs.length === 0 && (
+              {filteredLogs.length === 0 && (
                 <tr>
-                  <td colSpan={6} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>No hay registros de auditoría aún.</td>
+                  <td colSpan={7} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                    No hay registros de auditoría que coincidan con el filtro seleccionado.
+                  </td>
                 </tr>
               )}
             </tbody>
