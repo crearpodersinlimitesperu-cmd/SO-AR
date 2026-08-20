@@ -1,11 +1,11 @@
 // src/services/qtSheetService.js
-// Conexión y sincronización en tiempo real del Directorio Oficial de Quantum Team (QT) desde Google Sheets
+// Conexión, saneamiento inteligente y sincronización en tiempo real del Directorio Oficial de Quantum Team (QT) desde Google Sheets
 
 export const QT_SHEET_CSV_URL = import.meta.env.VITE_QT_SHEET_CSV_URL || 'https://docs.google.com/spreadsheets/d/10sz7KNvZ31GOgGDhzH0P3gbISGLW8HPBsSAZwOw5L8U/export?format=csv&gid=0';
 export const QT_SHEET_EDIT_URL = import.meta.env.VITE_QT_SHEET_EDIT_URL || 'https://docs.google.com/spreadsheets/d/10sz7KNvZ31GOgGDhzH0P3gbISGLW8HPBsSAZwOw5L8U/edit?gid=0#gid=0';
 
-const CACHE_KEY = 'cpsl_qt_members_cache_v2';
-const CACHE_TIME_KEY = 'cpsl_qt_members_cache_time_v2';
+const CACHE_KEY = 'cpsl_qt_members_cache_v3';
+const CACHE_TIME_KEY = 'cpsl_qt_members_cache_time_v3';
 const CACHE_TTL_MS = 1000 * 60 * 15; // 15 minutos de caché automático
 
 export function clearQTCache() {
@@ -28,7 +28,56 @@ export const normalizeQTSede = (rawSede = '') => {
   if (s === 'LIM' || s.includes('LIMA')) return 'Lima';
   if (s === 'MED' || s.includes('MEDELLIN') || s.includes('MEDELLÍN')) return 'Medellín';
   if (s === 'MEX' || s.includes('MEXICO') || s.includes('MÉXICO') || s.includes('CDMX')) return 'México';
-  return s || 'Global';
+  return rawSede.trim() || 'Global';
+};
+
+// ==========================================
+// HEURÍSTICAS DE VALIDACIÓN SEMÁNTICA
+// ==========================================
+const isEmail = (val = '') => /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/.test(val.trim());
+const isDate = (val = '') => /^\d{4}-\d{2}-\d{2}$/.test(val.trim()) || /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(val.trim());
+
+const isPhone = (val = '') => {
+  const clean = val.replace(/[^0-9+]/g, '').trim();
+  return clean.length >= 8 && (
+    clean.startsWith('+') || 
+    clean.startsWith('09') || 
+    clean.startsWith('593') || 
+    clean.startsWith('51') || 
+    clean.startsWith('57') || 
+    clean.startsWith('52') || 
+    clean.length >= 9
+  );
+};
+
+const isTalla = (val = '') => {
+  const v = val.trim().toUpperCase();
+  return ['XS', 'S', 'M', 'L', 'XL', 'XXL', '2XL', '3XL', 'S (MUJER)', 'M (HOMBRE)', 'L (HOMBRE)', 'S (HOMBRE)', 'M (MUJER)', 'L (MUJER)'].includes(v);
+};
+
+const isEdicion = (val = '') => {
+  const v = val.trim().toLowerCase();
+  return v.includes('edicion') || v.includes('ediciones') || v.includes('primera vez') || v.includes('senior') || v.includes('graduado');
+};
+
+const isInstagram = (val = '') => {
+  const v = val.trim();
+  if (!v) return false;
+  const upper = v.toUpperCase();
+  if (upper.includes('ACTIVO') || upper.includes('VERIFICADO') || upper.includes('FEMENINO') || upper.includes('MASCULINO')) return false;
+  if (v.length > 35) return false;
+  if (v.includes(' ') && !v.startsWith('@')) return false;
+  return v.startsWith('@') || v.includes('instagram.com') || /^[a-zA-Z0-9._]{3,30}$/.test(v);
+};
+
+const isEstado = (val = '') => {
+  const upper = val.trim().toUpperCase();
+  return ['ACTIVO - VERIFICADO', 'ACTIVO', 'INACTIVO', 'VERIFICADO', 'PENDIENTE', 'SUSPENDIDO'].some(k => upper.includes(k));
+};
+
+const isDeclaracion = (val = '') => {
+  const v = val.trim();
+  return v.length > 25 && !isEmail(v) && !isEdicion(v);
 };
 
 /**
@@ -85,82 +134,154 @@ export function parseCSV(text) {
 }
 
 /**
- * Transforma las filas crudas del CSV en objetos de miembros de QT
+ * Transforma y SANEAMENTE INTELIGENTE de las filas crudas del CSV en objetos de miembros de QT
+ * Corrige automáticamente filas desfasadas, datos invertidos y elimina duplicados.
  */
 export function mapRowsToQTMembers(rows) {
   if (!rows || rows.length < 2) return [];
 
-  // Fila 0 es el encabezado
   const dataRows = rows.slice(1);
+  const seenDocs = new Set();
+  const validMembers = [];
 
-  return dataRows
-    .filter(r => r && r.length >= 3 && r[2] && r[2].trim() !== '')
-    .map((r, index) => {
-      const timestamp = r[0] || '';
-      const rawSede = r[1] || '';
-      const sede = normalizeQTSede(rawSede);
-      const nombre = (r[2] || '').trim();
-      const docTipo = r[3] || 'DNI';
-      const docNumero = (r[4] || '').trim();
-      const fechaNacimiento = r[5] || '';
-      const genero = r[6] || '';
-      const email = (r[7] || '').trim().toLowerCase();
-      const rawWhatsapp = (r[8] || '').trim();
-      const estatura = r[9] || '';
-      const pesoActual = r[10] || '';
-      const pesoIdeal = r[11] || '';
-      const talla = (r[12] || '').trim().toUpperCase();
-      const ediciones = (r[13] || '').trim();
-      const instagram = (r[14] || '').trim();
-      const declaracion = (r[15] || '').trim();
-      const estado = (r[16] || 'ACTIVO - VERIFICADO').trim();
+  for (let index = 0; index < dataRows.length; index++) {
+    const r = dataRows[index];
+    if (!r || r.length < 3) continue;
 
-      // Formatear WhatsApp para wa.me
-      let cleanPhone = rawWhatsapp.replace(/[^0-9+]/g, '');
-      if (cleanPhone.startsWith('+')) {
-        cleanPhone = cleanPhone.substring(1);
+    const rawTimestamp = r[0] || '';
+    const rawSede = r[1] || '';
+    const sede = normalizeQTSede(rawSede);
+    const nombre = (r[2] || '').trim();
+    if (!nombre) continue;
+
+    const docTipo = (r[3] || 'Cédula').trim();
+    let docNumero = (r[4] || '').trim();
+
+    // Recolectar campos adicionales para análisis semántico inteligente
+    const extraValues = r.slice(5).map(v => (v || '').trim()).filter(Boolean);
+
+    // Ranuras objetivo
+    let email = '';
+    let phone = '';
+    let birthDate = '';
+    let talla = '';
+    let ediciones = '';
+    let instagram = '';
+    let declaracion = '';
+    let estado = 'ACTIVO - VERIFICADO';
+
+    // 1er Pase: Clasificación por reglas semánticas fuertes
+    const remaining = [];
+    for (const val of extraValues) {
+      if (!email && isEmail(val)) {
+        email = val.toLowerCase();
+      } else if (!birthDate && isDate(val)) {
+        birthDate = val;
+      } else if (!estado && isEstado(val)) {
+        estado = val;
+      } else if (!ediciones && isEdicion(val)) {
+        ediciones = val;
+      } else if (!declaracion && isDeclaracion(val)) {
+        declaracion = val;
+      } else {
+        remaining.push(val);
       }
-      // Asegurar código si es 9 dígitos local
-      if (cleanPhone.length === 9 || cleanPhone.length === 10) {
-        if (sede === 'Lima') cleanPhone = '51' + cleanPhone;
-        else if (['Quito', 'Guayaquil', 'Cuenca'].includes(sede)) {
-          if (cleanPhone.startsWith('0')) cleanPhone = cleanPhone.substring(1);
-          cleanPhone = '593' + cleanPhone;
-        } else if (sede === 'Medellín') cleanPhone = '57' + cleanPhone;
-        else if (sede === 'México') cleanPhone = '52' + cleanPhone;
+    }
+
+    // 2do Pase: Identificar talla, teléfono e instagram
+    for (const val of remaining) {
+      if (!talla && isTalla(val)) {
+        talla = val.toUpperCase();
+      } else if (!phone && isPhone(val)) {
+        phone = val;
+      } else if (!instagram && isInstagram(val)) {
+        instagram = val;
       }
+    }
 
-      // ID determinístico basado en DNI o email o nombre
-      const id = docNumero ? `qt_${docNumero}` : email ? `qt_${email.replace(/[^a-z0-9]/g, '_')}` : `qt_${index + 1}`;
+    // Fallback posicional estándar si las heurísticas no detectaron algún campo
+    if (!email && r[7] && isEmail(r[7])) email = r[7].trim().toLowerCase();
+    if (!phone && r[8] && isPhone(r[8])) phone = r[8].trim();
+    if (!talla && r[12] && isTalla(r[12])) talla = r[12].trim().toUpperCase();
+    if (!ediciones && r[13] && isEdicion(r[13])) ediciones = r[13].trim();
+    if (!instagram && r[14] && isInstagram(r[14])) instagram = r[14].trim();
+    if (!declaracion && r[15] && isDeclaracion(r[15])) declaracion = r[15].trim();
+    if (!estado && r[16] && isEstado(r[16])) estado = r[16].trim();
 
-      return {
-        id,
-        index: index + 1,
-        timestamp,
-        sedeCode: rawSede,
-        sede,
-        nombre,
-        docTipo,
-        docNumero,
-        fechaNacimiento,
-        genero,
-        email,
-        whatsapp: rawWhatsapp,
-        cleanPhone,
-        whatsappUrl: cleanPhone ? `https://wa.me/${cleanPhone}` : null,
-        estatura,
-        pesoActual,
-        pesoIdeal,
-        talla,
-        ediciones,
-        isSenior: ediciones.toLowerCase().includes('senior') || ediciones.toLowerCase().includes('más de 15') || ediciones.toLowerCase().includes('9 a 15'),
-        instagram: instagram ? (instagram.startsWith('@') ? instagram : `@${instagram.replace(/^https?:\/\/(www\.)?instagram\.com\//, '').replace(/\/$/, '')}`) : '',
-        instagramUrl: instagram ? (instagram.startsWith('http') ? instagram : `https://instagram.com/${instagram.replace('@', '')}`) : null,
-        declaracion,
-        estado,
-        esActivo: estado.toUpperCase().includes('ACTIVO')
-      };
+    // Valores por defecto consistentes
+    if (!ediciones) ediciones = '1 a 3 ediciones';
+
+    // Saneamiento y limpieza de Instagram
+    let cleanInstagram = '';
+    if (instagram) {
+      let rawInsta = instagram.replace(/^https?:\/\/(www\.)?instagram\.com\//i, '').replace(/\/$/, '').trim();
+      if (!rawInsta.toUpperCase().includes('FEMENINO') && !rawInsta.toUpperCase().includes('MASCULINO') && !rawInsta.toUpperCase().includes('ACTIVO')) {
+        if (!rawInsta.startsWith('@') && rawInsta.length > 0) {
+          cleanInstagram = '@' + rawInsta;
+        } else {
+          cleanInstagram = rawInsta;
+        }
+      }
+    }
+
+    // Formatear WhatsApp para enlace wa.me
+    let cleanPhone = (phone || '').replace(/[^0-9+]/g, '');
+    if (cleanPhone.startsWith('+')) {
+      cleanPhone = cleanPhone.substring(1);
+    }
+    if (cleanPhone.length === 9 || cleanPhone.length === 10) {
+      if (sede === 'Lima' && !cleanPhone.startsWith('51')) {
+        cleanPhone = '51' + cleanPhone;
+      } else if (['Quito', 'Guayaquil', 'Cuenca'].includes(sede) && !cleanPhone.startsWith('593')) {
+        if (cleanPhone.startsWith('0')) cleanPhone = cleanPhone.substring(1);
+        cleanPhone = '593' + cleanPhone;
+      } else if (sede === 'Medellín' && !cleanPhone.startsWith('57')) {
+        cleanPhone = '57' + cleanPhone;
+      } else if (sede === 'México' && !cleanPhone.startsWith('52')) {
+        cleanPhone = '52' + cleanPhone;
+      }
+    }
+
+    // Deduplicación por Documento o Email
+    const dedupeKey = docNumero ? `doc_${docNumero}` : email ? `email_${email}` : `nom_${nombre.toLowerCase().replace(/[^a-z0-9]/g, '')}`;
+    if (seenDocs.has(dedupeKey)) {
+      continue; // Omitir duplicados
+    }
+    seenDocs.add(dedupeKey);
+
+    const id = docNumero ? `qt_${docNumero}` : email ? `qt_${email.replace(/[^a-z0-9]/g, '_')}` : `qt_${index + 1}`;
+
+    const isSenior = ediciones.toLowerCase().includes('senior') || 
+                     ediciones.toLowerCase().includes('más de 15') || 
+                     ediciones.toLowerCase().includes('mas de 15') || 
+                     ediciones.toLowerCase().includes('9 a 15');
+
+    validMembers.push({
+      id,
+      index: validMembers.length + 1,
+      timestamp: rawTimestamp,
+      sedeCode: rawSede,
+      sede,
+      nombre,
+      docTipo,
+      docNumero,
+      birthDate,
+      email,
+      whatsapp: phone,
+      cleanPhone,
+      whatsappUrl: cleanPhone ? `https://wa.me/${cleanPhone}` : null,
+      talla,
+      ediciones,
+      isSenior,
+      instagram: cleanInstagram,
+      instagramUrl: cleanInstagram ? `https://instagram.com/${cleanInstagram.replace('@', '')}` : null,
+      declaracion,
+      estado,
+      esActivo: estado.toUpperCase().includes('ACTIVO')
     });
+  }
+
+  return validMembers;
 }
 
 /**
