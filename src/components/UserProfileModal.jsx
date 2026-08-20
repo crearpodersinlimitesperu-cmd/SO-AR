@@ -8,47 +8,54 @@ import { db } from '../services/firebase';
 import { doc, onSnapshot, setDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { useAuth } from '../context/AuthContext';
 import { useChecklist } from '../context/ChecklistContext';
-import { normalizeRole } from '../data/usersData';
+import { normalizeRole, normalizeSede, getRoleDisplayName } from '../data/usersData';
 import { useUI } from '../context/UIContext';
 import { useNavigate } from 'react-router-dom';
+import { isSuperAdminEmail, canSimulate } from '../config/permissions';
+import { getFlagForSede } from '../utils/flags';
 import TaskAssignmentModal from './TaskAssignmentModal';
 
 const ROLE_LABELS = {
   gerente: 'Gerente de Sede',
-  coordinador_c1c2: 'Coordinador C1/C2',
-  coord_c1: 'Coordinador C1/C2',
-  coordinador_mj: 'Coordinador Maestría',
-  coord_maestria: 'Coordinador Maestría',
-  director_maestria: 'Director de Maestría',
+  coordinador_c1c2: 'Coordinador Capítulo 1 y 2 (C1 / C2)',
+  coord_c1: 'Coordinador Capítulo 1 y 2 (C1 / C2)',
+  coordinador_mj: 'Coordinador Maestría del Juego (MJ)',
+  coord_maestria: 'Coordinador Maestría del Juego (MJ)',
+  director_maestria: 'Director Maestría del Juego (MJ)',
   capitan: 'Capitán',
   manager: 'Manager',
-  qt: 'Quantum Team',
-  direccion: 'Dirección Global',
-  cfo: 'CFO (Chief Financial Officer)',
-  finanzas: 'Finanzas',
-  coordinador: 'Coordinación Adm.',
   talento_humano: 'Talento Humano',
-  legal: 'Legal',
+  legal: 'Legal / Finanzas',
+  entrenador: 'Entrenador',
+  entrenador_llamadas: 'Entrenador de Llamadas',
+  qt: 'Quantum Team',
+  corporativo: 'Dirección Corporativa',
+  direccion: 'Dirección Global',
+  cfo: 'CFO',
+  cco: 'CCO',
+  ceo: 'CEO',
+  admin: 'Administración'
 };
 
 const ROLE_COLORS = {
-  gerente: '#f59e0b',
-  coordinador_c1c2: '#29abe2',
-  coord_c1: '#29abe2',
-  coordinador_mj: '#8b5cf6',
-  coord_maestria: '#8b5cf6',
-  director_maestria: '#ec4899',
-  capitan: '#22c55e',
-  manager: '#10b981',
-  qt: '#ec4899',
   direccion: '#ef4444',
-  cfo: '#eab308',
-  finanzas: '#6b7280',
-  talento_humano: '#06b6d4'
+  director_maestria: '#f97316',
+  gerente: '#22c55e',
+  coord_maestria: '#a855f7',
+  coordinador_mj: '#a855f7',
+  coord_c1: '#3b82f6',
+  coordinador_c1c2: '#3b82f6',
+  capitan: '#eab308',
+  manager: '#ec4899',
+  qt: '#14b8a6',
+  talento_humano: '#06b6d4',
+  legal: '#a855f7',
+  entrenador: '#fbbf24',
+  entrenador_llamadas: '#38bdf8'
 };
 
 export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] }) {
-  const { currentUser, simulateUser } = useAuth();
+  const { currentUser, originalAdminUser, simulateUser } = useAuth();
   const navigate = useNavigate();
   const { toggleTask } = useChecklist();
   const { showToast } = useUI();
@@ -75,14 +82,43 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
     const userDocRef = doc(db, 'user_profiles', userDocId);
 
     const unsubscribe = onSnapshot(userDocRef, (docSnap) => {
+      let localConns = {};
+      try {
+        localConns = JSON.parse(localStorage.getItem('cpsl_user_connections') || '{}');
+      } catch(e) {}
+      const localUserConn = localConns[userDocId];
+
       if (docSnap.exists()) {
         const data = docSnap.data();
+        let lastLoginFormatted = null;
+        if (data.lastLoginAt?.toDate) {
+          lastLoginFormatted = data.lastLoginAt.toDate().toLocaleString('es-ES');
+        } else if (data.lastLoginAtIso) {
+          lastLoginFormatted = new Date(data.lastLoginAtIso).toLocaleString('es-ES');
+        } else if (localUserConn?.lastLoginAt) {
+          lastLoginFormatted = new Date(localUserConn.lastLoginAt).toLocaleString('es-ES');
+        }
+
         setProfileData({
           notes: data.notes || [],
-          documents: data.documents || []
+          documents: data.documents || [],
+          lastLoginAt: lastLoginFormatted,
+          lastIp: data.lastIp || localUserConn?.ip || null,
+          lastLocation: data.lastLocation || localUserConn?.location || null,
+          lastUserAgent: data.lastUserAgent || localUserConn?.userAgent || null,
+          hasConnected: !!(lastLoginFormatted || data.lastLoginAt || localUserConn?.lastLoginAt)
         });
       } else {
-        setProfileData({ notes: [], documents: [] });
+        const lastLoginFormatted = localUserConn?.lastLoginAt ? new Date(localUserConn.lastLoginAt).toLocaleString('es-ES') : null;
+        setProfileData({
+          notes: [],
+          documents: [],
+          lastLoginAt: lastLoginFormatted,
+          lastIp: localUserConn?.ip || null,
+          lastLocation: localUserConn?.location || null,
+          lastUserAgent: localUserConn?.userAgent || null,
+          hasConnected: !!lastLoginFormatted
+        });
       }
       setLoadingMeta(false);
     }, (err) => {
@@ -312,11 +348,22 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
                   {(user.roles && user.roles.length > 0 ? user.roles : [user.role]).map(r => {
                     const rNorm = normalizeRole(r);
                     const rCol = ROLE_COLORS[rNorm] || roleColor;
-                    const rLab = ROLE_LABELS[rNorm] || ROLE_LABELS[r] || r;
+                    const rLab = getRoleDisplayName(r);
                     return (
                       <span key={r} style={{
-                        padding: '0.2rem 0.6rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 'bold',
-                        background: `${rCol}20`, color: rCol, border: `1px solid ${rCol}60`
+                        padding: '0.3rem 0.8rem',
+                        borderRadius: '9999px',
+                        fontSize: '0.78rem',
+                        fontWeight: 700,
+                        fontFamily: 'var(--font-heading)',
+                        letterSpacing: '0.3px',
+                        background: `${rCol}25`,
+                        color: rCol,
+                        border: `1px solid ${rCol}60`,
+                        boxShadow: `0 2px 8px ${rCol}15`,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.35rem'
                       }}>
                         {rLab}
                       </span>
@@ -324,9 +371,9 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
                   })}
                 </div>
 
-                <div style={{ display: 'flex', gap: '1.2rem', marginTop: '0.5rem', fontSize: '0.82rem', color: 'var(--text-muted)', flexWrap: 'wrap' }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                    <Building2 size={14} color="var(--crear-gold)" /> Sede: <strong style={{ color: 'var(--text-heading)' }}>{user.sede || 'Global'}</strong>
+                <div style={{ display: 'flex', gap: '1.2rem', marginTop: '0.6rem', fontSize: '0.85rem', color: 'var(--text-muted)', flexWrap: 'wrap' }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                    <Building2 size={15} color="var(--crear-gold)" /> Sede: <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>{getFlagForSede(user.sede)} <strong style={{ color: 'var(--text-heading)' }}>{normalizeSede(user.sede)}</strong></span>
                   </span>
                   {user.corporateEmail && (
                     <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }} title="Correo Corporativo Oficial">
@@ -374,9 +421,51 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
               </div>
             </div>
 
-            {/* Botón de Simulación — Solo Creador (Jose Sanchez) */}
-            {currentUser?.email && (currentUser.email.toLowerCase() === 'jose.sanchez@crearpsl.com' || currentUser.email.toLowerCase() === 'jose.sanchez@crearpsl.net') && (
-              <div style={{ marginTop: '1rem' }}>
+            {/* Estado de Conexión del Usuario */}
+            <div style={{
+              marginTop: '1rem',
+              padding: '0.75rem 1rem',
+              borderRadius: '10px',
+              background: profileData.hasConnected ? 'rgba(34, 197, 94, 0.08)' : 'rgba(255, 255, 255, 0.03)',
+              border: profileData.hasConnected ? '1px solid rgba(34, 197, 94, 0.3)' : '1px solid rgba(255, 255, 255, 0.08)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '0.8rem'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <span style={{
+                  width: '12px', height: '12px', borderRadius: '50%',
+                  background: profileData.hasConnected ? '#22c55e' : '#94a3b8',
+                  boxShadow: profileData.hasConnected ? '0 0 10px #22c55e' : 'none',
+                  display: 'inline-block'
+                }} />
+                <div>
+                  <span style={{
+                    fontSize: '0.85rem',
+                    fontWeight: 'bold',
+                    color: profileData.hasConnected ? '#22c55e' : 'var(--text-muted)'
+                  }}>
+                    {profileData.hasConnected ? '✅ Usuario Conectado a SO-AR' : '⚪ Sin Conexión Registrada'}
+                  </span>
+                  <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                    {profileData.hasConnected 
+                      ? `Último acceso: ${profileData.lastLoginAt} ${profileData.lastLocation ? `• ${profileData.lastLocation}` : ''} ${profileData.lastIp ? `(${profileData.lastIp})` : ''}`
+                      : 'Este colaborador aún no ha iniciado sesión en la plataforma'}
+                  </p>
+                </div>
+              </div>
+              {profileData.hasConnected && profileData.lastUserAgent && (
+                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', maxWidth: '240px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={profileData.lastUserAgent}>
+                  🖥️ {profileData.lastUserAgent}
+                </span>
+              )}
+            </div>
+
+            {/* Botón de Simulación — SOLO Super Administradores */}
+            {canSimulate(currentUser, originalAdminUser) && (
+              <div style={{ marginTop: '0.8rem' }}>
                 <button
                   onClick={() => {
                     simulateUser(user);
@@ -467,7 +556,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
                     <CheckSquare size={18} color="var(--crear-cyan)" /> Matriz Operativa de {user.name}
                   </h4>
                   <div style={{ display: 'flex', gap: '0.8rem' }}>
-                    {currentUser?.isSuperAdmin && (
+                    {canSimulate(currentUser, originalAdminUser) && (
                       <button 
                         onClick={() => {
                           onClose();

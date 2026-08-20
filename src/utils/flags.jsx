@@ -17,7 +17,7 @@ export const getFlagForSede = (sede) => {
   if (s.includes('lima') || s.includes('lim') || s.includes('peru') || s.includes('perú')) {
     return flagImg('pe');
   }
-  if (s.includes('colombia') || s.includes('med') || s.includes('medellin') || s.includes('medellín') || s.includes('bogota') || s.includes('bogotá')) {
+  if (s.includes('colombia') || s.includes('med') || s.includes('medellin') || s.includes('medellín')) {
     return flagImg('co');
   }
   if (s.includes('mexico') || s.includes('mex') || s.includes('mx') || s.includes('méxico')) {

@@ -6,18 +6,52 @@ import { useAuth } from '../context/AuthContext';
 import { db } from '../services/firebase';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 
+const OFFICIAL_SEDES = ['Quito', 'Guayaquil', 'Cuenca', 'Lima', 'Medellin', 'Mexico'];
+
 export default function VenueConfigModal({ isOpen, onClose }) {
   if (!isOpen) return null;
 
   const { currentUser } = useAuth();
   const { showToast } = useUI();
   const [selectedSede, setSelectedSede] = useState(() => {
-    return currentUser?.sede?.trim() || 'Lima';
+    const rawSede = (currentUser?.sede || '').toLowerCase().trim();
+    if (rawSede.includes('quito') || rawSede.includes('uio')) return 'Quito';
+    if (rawSede.includes('guayaquil') || rawSede.includes('gye')) return 'Guayaquil';
+    if (rawSede.includes('cuenca') || rawSede.includes('cue')) return 'Cuenca';
+    if (rawSede.includes('medell') || rawSede.includes('med')) return 'Medellin';
+    if (rawSede.includes('mex') || rawSede.includes('méx')) return 'Mexico';
+    return 'Lima';
   });
 
-  const [venues, setVenues] = useState(defaultVenues);
+  const [venues, setVenues] = useState(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('cpsl_custom_venues') || '{}');
+      const sanitized = {};
+      let needsCleanup = false;
+      
+      // Conservar solo sedes oficiales activas
+      for (const sedeKey of OFFICIAL_SEDES) {
+        sanitized[sedeKey] = saved[sedeKey] || defaultVenues[sedeKey];
+      }
 
-  const currentSedeVenue = venues[selectedSede] || defaultVenues[selectedSede] || defaultVenues.Lima;
+      // Si había sedes obsoletas en localStorage, purgarlas de inmediato
+      for (const k of Object.keys(saved)) {
+        if (!OFFICIAL_SEDES.includes(k)) {
+          needsCleanup = true;
+        }
+      }
+
+      if (needsCleanup) {
+        localStorage.setItem('cpsl_custom_venues', JSON.stringify(sanitized));
+      }
+
+      return sanitized;
+    } catch (e) {
+      return defaultVenues;
+    }
+  });
+
+  const currentSedeVenue = venues[selectedSede] || defaultVenues[selectedSede] || defaultVenues.Quito || defaultVenues.Lima;
 
   const [c1Venue, setC1Venue] = useState(currentSedeVenue.c1_venue || '');
   const [c2Venue, setC2Venue] = useState(currentSedeVenue.c2_venue || '');
@@ -43,12 +77,14 @@ export default function VenueConfigModal({ isOpen, onClose }) {
         // Fallback to local
       }
 
-      const sVenue = venues[selectedSede] || defaultVenues[selectedSede] || defaultVenues.Lima;
-      setC1Venue(sVenue.c1_venue || '');
-      setC2Venue(sVenue.c2_venue || '');
-      setMjVenue(sVenue.mj_venue || '');
-      setViajeVenue(sVenue.viaje_venue || '');
-      setAddress(sVenue.address || '');
+      const sVenue = venues[selectedSede] || defaultVenues[selectedSede];
+      if (sVenue) {
+        setC1Venue(sVenue.c1_venue || '');
+        setC2Venue(sVenue.c2_venue || '');
+        setMjVenue(sVenue.mj_venue || '');
+        setViajeVenue(sVenue.viaje_venue || '');
+        setAddress(sVenue.address || '');
+      }
     };
 
     fetchSedeVenue();
@@ -73,25 +109,31 @@ export default function VenueConfigModal({ isOpen, onClose }) {
     };
 
     setVenues(updated);
+    try {
+      localStorage.setItem('cpsl_custom_venues', JSON.stringify(updated));
+    } catch (e) {}
 
     try {
       await setDoc(doc(db, 'venues', selectedSede), venueData, { merge: true });
-      showToast(`¡Lugares y Hoteles de entrenamiento para ${selectedSede} actualizados!`, 'success');
+      showToast(`¡Lugares y Salones de entrenamiento para ${selectedSede} actualizados!`, 'success');
       onClose();
     } catch (err) {
       console.error("Could not write venue to Firestore:", err);
-      showToast('Error al guardar la configuración del venue.', 'error');
+      showToast(`Guardado localmente para ${selectedSede}.`, 'success');
+      onClose();
     }
   };
 
   const handleResetDefault = () => {
-    const dVenue = defaultVenues[selectedSede] || defaultVenues.Lima;
-    setC1Venue(dVenue.c1_venue);
-    setC2Venue(dVenue.c2_venue);
-    setMjVenue(dVenue.mj_venue);
-    setViajeVenue(dVenue.viaje_venue || '');
-    setAddress(dVenue.address);
-    showToast(`Valores restaurados a los hoteles oficiales por defecto.`, 'info');
+    const dVenue = defaultVenues[selectedSede] || defaultVenues.Quito;
+    if (dVenue) {
+      setC1Venue(dVenue.c1_venue);
+      setC2Venue(dVenue.c2_venue);
+      setMjVenue(dVenue.mj_venue);
+      setViajeVenue(dVenue.viaje_venue || '');
+      setAddress(dVenue.address);
+      showToast(`Valores restaurados a los salones oficiales por defecto.`, 'info');
+    }
   };
 
   return (
@@ -166,8 +208,8 @@ export default function VenueConfigModal({ isOpen, onClose }) {
               fontWeight: 'bold'
             }}
           >
-            {Object.keys(defaultVenues).map(s => (
-              <option key={s} value={s}>{s}</option>
+            {OFFICIAL_SEDES.map(s => (
+              <option key={s} value={s}>{s === 'Medellin' ? 'Medellín' : s === 'Mexico' ? 'México' : s}</option>
             ))}
           </select>
         </div>

@@ -25,8 +25,9 @@ export default function GerenteDashboard() {
   const [showVenueModal, setShowVenueModal] = useState(false);
 
   useEffect(() => {
-    if (currentUser?.appRole !== 'gerente') {
-      navigate('/');
+    const isAllowed = currentUser?.isGerente || currentUser?.isDireccion || currentUser?.isSuperAdmin || ['gerente', 'direccion', 'director_maestria'].includes(currentUser?.appRole);
+    if (!isAllowed) {
+      navigate('/home');
     }
   }, [currentUser, navigate]);
 

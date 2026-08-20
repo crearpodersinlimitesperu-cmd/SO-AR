@@ -3,7 +3,17 @@ export const roles = [
   { id: 'coord_maestria', name: 'Coordinador/a Maestría (CMJ)' },
   { id: 'coord_c1', name: 'Coordinador/a C1/C2' },
   { id: 'capitan', name: 'Capitán' },
-  { id: 'qt', name: 'Quantum Team' }
+  { id: 'qt', name: 'Quantum Team' },
+  { id: 'entrenador', name: 'Entrenador (Coach)' },
+  { id: 'entrenador_llamadas', name: 'Entrenador de Llamadas' },
+  { id: 'director_maestria', name: 'Director de Maestría' },
+  { id: 'direccion', name: 'Dirección Global' },
+  { id: 'manager', name: 'Manager' },
+  { id: 'cfo', name: 'CFO (Finanzas)' },
+  { id: 'finanzas', name: 'Finanzas' },
+  { id: 'coordinador', name: 'Coordinación Administrativa' },
+  { id: 'talento_humano', name: 'Talento Humano' },
+  { id: 'legal', name: 'Legal / Jurídico' }
 ];
 
 // Fases oficiales del SO-AR:
@@ -97,9 +107,35 @@ export const checklistData = [
   // --- MAESTRÍA (MJ) ---
   { id: 'soar_27', role: 'gerente', cyclePhase: 'MJ', task: 'Monitorear indicadores ejecutivos: Operación, Finanzas, Riesgos.', isCritical: false },
   { id: 'soar_28', role: 'coord_maestria', cyclePhase: 'MJ', task: 'Dirigir la operación logística de los FDS, asistencia y soporte a entrenadores.', isCritical: true },
-  { id: 'cc1y2_mj_1', role: 'coord_c1', cyclePhase: 'MJ', task: 'Martes a Jueves: Foco 100% telefónico para reinsertar rezagados de C1/C2 (no se abre mesa).', isCritical: true },  // --- POST-MJ ---
+  // --- POST-MJ ---
   { id: 'soar_29', role: 'gerente', cyclePhase: 'POST-MJ', task: 'Auditoría final y Cierre de Oro.', isCritical: true },
-  { id: 'soar_30', role: 'coord_maestria', cyclePhase: 'POST-MJ', task: 'Consolidar métricas y entregar aprendizajes.', isCritical: true }
+  { id: 'soar_30', role: 'coord_maestria', cyclePhase: 'POST-MJ', task: 'Consolidar métricas y entregar aprendizajes.', isCritical: true },
+
+  // --- ENTRENADOR (COACH) ---
+  { id: 'coach_1', role: 'entrenador', cyclePhase: 'GATE 1', task: 'Confirmar disponibilidad de fecha y contrato de entrenamiento con Gerencia.', isCritical: true },
+  { id: 'coach_2', role: 'entrenador', cyclePhase: 'PRE-C1', task: 'Validar itinerario de vuelos, hotel y traslados con Coordinación de Sede.', isCritical: true },
+  { id: 'coach_3', role: 'entrenador', cyclePhase: 'PRE-C1', task: 'Reunión de alineación y contexto con el Capitán y Coordinador de la Sede.', isCritical: true },
+  { id: 'coach_4', role: 'entrenador', cyclePhase: 'C1', task: 'Liderar sala de entrenamiento C1 y ejecutar drills con los más altos estándares.', isCritical: true },
+  { id: 'coach_5', role: 'entrenador', cyclePhase: 'C1', task: 'Debriefing diario al cierre con Capitán y Quantum Team para calibración.', isCritical: true },
+  { id: 'coach_6', role: 'entrenador', cyclePhase: 'POST-C1', task: 'Entregar reporte de quiebres y observaciones clave del entrenamiento a Dirección.', isCritical: true },
+  { id: 'coach_7', role: 'entrenador', cyclePhase: 'C2', task: 'Liderar sala C2 y pase de enrolamiento de alto impacto a Maestría del Juego.', isCritical: true },
+  { id: 'coach_8', role: 'entrenador', cyclePhase: 'MJ', task: 'Liderar módulos de Maestría (FDS 1, 2, 3) y supervisar efectividad de llamadas.', isCritical: true },
+
+  // --- ENTRENADOR DE LLAMADAS ---
+  { id: 'coach_ll_1', role: 'entrenador_llamadas', cyclePhase: 'PRE-MJ', task: 'Revisar directorio de managers asignados y calendarizar llamadas semanales.', isCritical: true },
+  { id: 'coach_ll_2', role: 'entrenador_llamadas', cyclePhase: 'PRE-MJ', task: 'Ejecutar llamada semanal de alineación con cada equipo asignado (#).', isCritical: true },
+  { id: 'coach_ll_3', role: 'entrenador_llamadas', cyclePhase: 'MJ', task: 'Registrar asistencia y estatus de conexión en el Centro de Managers.', isCritical: true },
+  { id: 'coach_ll_4', role: 'entrenador_llamadas', cyclePhase: 'MJ', task: 'Identificar managers en riesgo de deserción y reportar quiebres a Coordinación.', isCritical: true },
+
+  // --- DIRECTOR DE MAESTRÍA ---
+  { id: 'dir_m_1', role: 'director_maestria', cyclePhase: 'PRE-MJ', task: 'Supervisar la asignación equilibrada de managers y cobertura de entrenadores.', isCritical: true },
+  { id: 'dir_m_2', role: 'director_maestria', cyclePhase: 'MJ', task: 'Monitorear la tasa de asistencia y efectividad de llamadas grupales en el Centro de Managers.', isCritical: true },
+  { id: 'dir_m_3', role: 'director_maestria', cyclePhase: 'POST-MJ', task: 'Consolidar métricas globales de retención y graduación con Dirección.', isCritical: true },
+
+  // --- MANAGERS ---
+  { id: 'mngr_1', role: 'manager', cyclePhase: 'PRE-MJ', task: 'Contactar a los participantes de su equipo (#) para bienvenida y confirmación.', isCritical: true },
+  { id: 'mngr_2', role: 'manager', cyclePhase: 'PRE-MJ', task: 'Conectarse puntualmente a la llamada grupal semanal con su Entrenador asignado.', isCritical: true },
+  { id: 'mngr_3', role: 'manager', cyclePhase: 'MJ', task: 'Dar seguimiento a compromisos y asistencia de los integrantes de su equipo a los FDS.', isCritical: true }
 ];
 
 export const getTasksByRole = (roleId) => checklistData.filter(t => t.role === roleId);

@@ -5,18 +5,58 @@ import { useCycles } from '../context/CyclesContext';
 import { useChecklist } from '../context/ChecklistContext';
 import { useUI } from '../context/UIContext';
 import { useNotifications } from '../context/NotificationContext';
-import { LogOut, Clock, Calendar as CalendarIcon, MapPin, CheckCircle2, AlertCircle, Circle, RefreshCw, CalendarPlus, Bell, Users, AtSign, BookOpen, Lightbulb } from 'lucide-react';
+import { LogOut, Clock, Calendar as CalendarIcon, MapPin, CheckCircle2, AlertCircle, Circle, RefreshCw, CalendarPlus, Bell, Users, AtSign, BookOpen, Lightbulb, Search, X, Filter } from 'lucide-react';
 import { getFlagForSede } from '../utils/flags';
 import { createGoogleEvent } from '../services/googleSync';
 import { calculateAutomaticDeadline } from '../utils/soarDates';
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
-import ThemeSelector from '../components/ThemeSelector';
 import VenueConfigModal from '../components/VenueConfigModal';
 import { getVenueForTraining } from '../data/venuesData';
 import { ROLE_DISPLAY_NAMES } from '../data/usersData';
+import { canAssignTrainer } from '../config/permissions';
+
+/**
+ * Normaliza y verifica si un evento está asignado a un entrenador específico
+ */
+const isTrainerMatchingUser = (evTrainer, user) => {
+  if (!evTrainer || !user) return false;
+  const normalize = (str) => (str || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+
+  const trainerStr = normalize(evTrainer);
+  const userName = normalize(user.name || user.displayName || '');
+  const userEmail = normalize(user.email || '');
+
+  if (!trainerStr || trainerStr === 'tba' || /^\d+$/.test(trainerStr) || /^eq\s*\d+$/i.test(trainerStr)) return false;
+
+  // Coincidencia directa / contenida
+  if (userName && (trainerStr.includes(userName) || userName.includes(trainerStr))) return true;
+
+  // Coincidencia por tokens de nombre (ej. "Paul" y "Sosa" en "PAUL SOSA / ...")
+  const nameParts = userName.split(/\s+/).filter(p => p.length >= 3);
+  const trainerParts = trainerStr.split(/[\/\s,\-]+/).filter(p => p.length >= 3);
+  
+  if (nameParts.length > 0) {
+    const matchedTokens = nameParts.filter(part => trainerParts.some(tp => tp.includes(part) || part.includes(tp)));
+    if (matchedTokens.length >= Math.min(2, nameParts.length)) return true;
+  }
+
+  // Coincidencia por prefijo del correo electrónico (ej. "paul.sosa@crearpsl.net" -> "paul", "sosa")
+  const emailPrefix = userEmail.split('@')[0];
+  const emailTokens = emailPrefix.split(/[\._\-]/).filter(t => t.length >= 3);
+  if (emailTokens.length > 0) {
+    const matchedEmailTokens = emailTokens.filter(tok => trainerParts.some(tp => tp.includes(tok) || tok.includes(tp)));
+    if (matchedEmailTokens.length >= Math.min(2, emailTokens.length)) return true;
+  }
+
+  return false;
+};
 
 export default function Home() {
-  const { currentUser, logout } = useAuth();
+  const { currentUser, logout, switchRole } = useAuth();
   const { currentCycle, currentStage, events, loadingEvents } = useCycles();
   const { tasks: allTasks, loading: loadingTasks, syncTasksToGoogle, acceptCollaboration, rejectCollaboration } = useChecklist();
   const { showToast } = useUI();
@@ -30,6 +70,9 @@ export default function Home() {
   // Eventos locales provienen del contexto ahora
   const [activeEventTab, setActiveEventTab] = useState('locales');
   const [timeFilter, setTimeFilter] = useState('futuros'); // 'todos', 'pasados', 'hoy', 'futuros'
+  const [selectedSedeFilter, setSelectedSedeFilter] = useState('todas'); // 'todas', 'UIO', 'GYE', 'CUE', 'LIM', 'MED', 'MEX'
+  const [selectedTrainingFilter, setSelectedTrainingFilter] = useState('todos'); // 'todos', 'C1', 'C2', 'MJ', 'VIAJE', 'OTROS'
+  const [searchQuery, setSearchQuery] = useState('');
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [showVenueModal, setShowVenueModal] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -98,22 +141,22 @@ export default function Home() {
           <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <span style={{ fontSize: '0.9rem', fontWeight: 'bold', color: 'var(--text-main)' }}>{currentUser?.name || currentUser?.displayName || 'Usuario'}</span>
             <span style={{ fontSize: '0.75rem', color: 'var(--crear-gold)', fontWeight: 'bold', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'flex-end' }}>
-              {currentUser?.isSuperAdmin 
+              {currentUser?.isSuperAdmin && !currentUser?.isSimulated
                 ? <>Super Admin | Gerente de Lima {getFlagForSede('Lima')}</>
                 : <>{ROLE_DISPLAY_NAMES[currentUser?.appRole] || currentUser?.appRole?.replace(/_/g, ' ') || 'Miembro'} {getFlagForSede(currentUser?.sede)}</>}
             </span>
             {currentUser?.roles && currentUser.roles.length > 1 && (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.3rem', marginTop: '3px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.4rem', marginTop: '3px' }}>
                 <select
                   value={currentUser.activeRole || currentUser.appRole}
-                  onChange={(e) => currentUser.switchRole(e.target.value)}
+                  onChange={(e) => switchRole(e.target.value)}
                   style={{
                     padding: '0.2rem 0.5rem',
                     borderRadius: '6px',
                     background: 'rgba(255, 183, 3, 0.15)',
                     border: '1px solid var(--crear-gold)',
                     color: 'var(--text-heading)',
-                    fontSize: '0.72rem',
+                    fontSize: '0.75rem',
                     fontWeight: 'bold',
                     cursor: 'pointer',
                     outline: 'none'
@@ -126,6 +169,23 @@ export default function Home() {
                     </option>
                   ))}
                 </select>
+                <button
+                  type="button"
+                  onClick={() => navigate('/roles')}
+                  className="btn-secondary hover-glow"
+                  style={{
+                    padding: '0.2rem 0.5rem',
+                    fontSize: '0.72rem',
+                    borderRadius: '6px',
+                    border: '1px solid rgba(255, 183, 3, 0.4)',
+                    color: 'var(--crear-gold)',
+                    background: 'rgba(255, 183, 3, 0.08)',
+                    cursor: 'pointer'
+                  }}
+                  title="Abrir Selector de Roles Completo"
+                >
+                  Selector ↗
+                </button>
               </div>
             )}
           </div>
@@ -137,11 +197,7 @@ export default function Home() {
             </div>
           )}
           
-          {/* SELECTOR DE TEMA DÍA / NOCHE / AUTO */}
-          <div style={{ marginLeft: '0.25rem', marginRight: '0.25rem' }}>
-            <ThemeSelector />
-          </div>
-
+          {/* Notificaciones */}
           <div style={{ position: 'relative', marginLeft: '0.25rem', marginRight: '0.25rem' }}>
             <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', height: '100%' }} onClick={() => setShowNotifications(!showNotifications)}>
               <Bell size={22} className="text-white" />
@@ -182,7 +238,7 @@ export default function Home() {
             <span>TAREA</span>
           </button>
           
-          {currentUser?.isGerente && (
+          {(currentUser?.isGerente || currentUser?.isDireccion || currentUser?.isSuperAdmin) && (
             <>
               <button onClick={() => navigate('/gerente')} className="btn-primary" style={{ padding: '0.45rem 1rem', fontSize: '0.85rem', display: 'flex', gap: '0.5rem', alignItems: 'center', marginLeft: '0.25rem', background: 'var(--crear-gold)', color: 'black' }}>
                  SO-AR Gerencial
@@ -198,44 +254,58 @@ export default function Home() {
               📊 Mis KPIs
             </button>
           )}
-          {currentUser?.appRole === 'direccion' && (
+          {canAssignTrainer(currentUser) && (
             <a href="https://docs.google.com/spreadsheets/u/1/d/1u0tc4GeooPmSwNxZ0CErKGtRU4oD-mO3l--ZSQM-KPs/edit?gid=1326951636#gid=1326951636" target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ padding: '0.45rem 1rem', fontSize: '0.85rem', display: 'flex', gap: '0.5rem', alignItems: 'center', marginLeft: '0.25rem', background: '#10b981', color: 'white', border: 'none', textDecoration: 'none' }}>
               👥 Editar Entrenadores
             </a>
           )}
-          {(currentUser?.isSuperAdmin || currentUser?.appRole === 'gerente' || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'director_maestria') && (
+          
+          <button 
+            onClick={() => navigate('/directorio-qt')} 
+            className="btn-primary" 
+            style={{ padding: '0.45rem 1rem', fontSize: '0.85rem', display: 'flex', gap: '0.5rem', alignItems: 'center', marginLeft: '0.25rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: 'white', border: 'none', fontWeight: 700, boxShadow: '0 2px 8px rgba(245, 158, 11, 0.3)' }}
+          >
+            ⚡ Directorio QT
+          </button>
+          {(currentUser?.isSuperAdmin || currentUser?.isGerente || currentUser?.isDireccion || currentUser?.appRole === 'director_maestria') && (
             <button onClick={() => navigate('/superadmin')} className="btn-primary" style={{ padding: '0.45rem 1rem', fontSize: '0.85rem', display: 'flex', gap: '0.5rem', alignItems: 'center', marginLeft: '0.25rem', background: 'linear-gradient(135deg, #8b5cf6, #29abe2)', color: 'white', border: 'none' }}>
               {currentUser?.isSuperAdmin ? '🌐 Centro de Mando' : '👥 Directorio de Equipo'}
             </button>
           )}
 
-          {(currentUser?.isSuperAdmin || currentUser?.appRole === 'gerente' || currentUser?.appRole === 'direccion') && (
+          {(currentUser?.isSuperAdmin || currentUser?.isGerente || currentUser?.isDireccion) && (
             <button onClick={() => window.open('/calendario_global.html?v=' + Date.now() + '&email=' + encodeURIComponent(currentUser?.email || '') + '&name=' + encodeURIComponent(currentUser?.displayName || currentUser?.name || ''), '_blank')} className="btn-primary" style={{ padding: '0.45rem 1rem', fontSize: '0.85rem', display: 'flex', gap: '0.5rem', alignItems: 'center', marginLeft: '0.25rem', background: 'linear-gradient(135deg, #f59e0b, #ef4444)', color: 'white', border: 'none' }}>
               📅 Calendario Global
             </button>
           )}
 
-          {(currentUser?.isSuperAdmin || ['gerente', 'direccion', 'cc1y2', 'capitan', 'qt'].includes(currentUser?.appRole)) && (
+          {(currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.isGerente || ['coord_c1', 'coordinador_c1c2', 'coord_c2', 'coordinador', 'cc1y2', 'capitan', 'qt'].includes(currentUser?.appRole)) && (
             <button onClick={() => window.open('https://cpsl-campus-interactivo.vercel.app/ruta', '_blank')} className="btn-primary" style={{ padding: '0.45rem 1rem', fontSize: '0.85rem', display: 'flex', gap: '0.5rem', alignItems: 'center', marginLeft: '0.25rem', background: 'linear-gradient(135deg, #10b981, #059669)', color: 'white', border: 'none' }}>
               🎓 Campus Interactivo
             </button>
           )}
 
-          {(currentUser?.isSuperAdmin || ['gerente', 'direccion', 'director_maestria', 'coordinador_c1c2', 'coordinador_mj', 'coord_c1', 'coord_maestria', 'coordinador', 'finanzas', 'cfo', 'entrenador_llamadas'].includes(currentUser?.appRole) || true) && (
+          {currentUser?.appRole !== 'qt' && (currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.isGerente || ['director_maestria', 'coordinador_mj', 'coord_maestria', 'finanzas', 'cfo', 'entrenador_llamadas', 'entrenador'].includes(currentUser?.appRole)) && (
             <button onClick={() => navigate('/centro-managers')} className="btn-primary" style={{ padding: '0.45rem 1rem', fontSize: '0.85rem', display: 'flex', gap: '0.5rem', alignItems: 'center', marginLeft: '0.25rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#000', fontWeight: 'bold', border: 'none' }}>
               🎯 Centro de Managers
             </button>
           )}
 
-          {(currentUser?.isSuperAdmin || ['gerente', 'direccion', 'director_maestria', 'coordinador_c1c2', 'coordinador_mj', 'coord_c1', 'coord_maestria', 'coordinador', 'finanzas', 'cfo'].includes(currentUser?.appRole)) && (
+          {currentUser?.appRole !== 'qt' && (currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.isGerente || ['director_maestria', 'coordinador_c1c2', 'coordinador_mj', 'coord_c1', 'coord_maestria', 'coordinador', 'finanzas', 'cfo'].includes(currentUser?.appRole)) && (
             <button onClick={() => window.open('https://imo.crearpslglobal.com/auth/login', '_blank')} className="btn-primary" style={{ padding: '0.45rem 1rem', fontSize: '0.85rem', display: 'flex', gap: '0.5rem', alignItems: 'center', marginLeft: '0.25rem', background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)', color: 'white', border: 'none' }}>
               👥 Sistema NODUS
             </button>
           )}
 
-          <button onClick={() => navigate('/manual')} className="btn-secondary" style={{ padding: '0.45rem 1rem', fontSize: '0.85rem', display: 'flex', gap: '0.5rem', alignItems: 'center', marginLeft: '0.25rem', color: 'var(--crear-blue)', borderColor: 'var(--crear-blue)' }}>
-            <BookOpen size={16} /> Manual
-          </button>
+          {currentUser?.appRole === 'qt' ? (
+            <button onClick={() => window.open('https://crearpsl.net/manual_quantum_team.html', '_blank')} className="btn-secondary hover-glow" style={{ padding: '0.45rem 1rem', fontSize: '0.85rem', display: 'flex', gap: '0.5rem', alignItems: 'center', marginLeft: '0.25rem', color: 'var(--crear-gold)', borderColor: 'var(--crear-gold)', background: 'rgba(255, 183, 3, 0.12)', fontWeight: 'bold' }}>
+              <BookOpen size={16} /> 📘 Manual Quantum Team ↗
+            </button>
+          ) : (
+            <button onClick={() => navigate('/manual')} className="btn-secondary" style={{ padding: '0.45rem 1rem', fontSize: '0.85rem', display: 'flex', gap: '0.5rem', alignItems: 'center', marginLeft: '0.25rem', color: 'var(--crear-blue)', borderColor: 'var(--crear-blue)' }}>
+              <BookOpen size={16} /> Manual
+            </button>
+          )}
 
           <a href="mailto:sistemas@crearpsl.net?subject=Sugerencias%20Plataforma%20SO-AR" className="btn-secondary" style={{ padding: '0.45rem 1rem', fontSize: '0.85rem', display: 'flex', gap: '0.5rem', alignItems: 'center', marginLeft: '0.25rem', textDecoration: 'none', color: 'var(--crear-gold)', borderColor: 'var(--crear-gold)' }}>
             <Lightbulb size={16} /> Sugerencias
@@ -304,7 +374,17 @@ export default function Home() {
       })()}
 
       {(() => {
-        const myTasksForProgress = allTasks.filter(t => t.role === currentUser?.appRole || t.assignedToEmail === currentUser?.email);
+        const userEmail = (currentUser?.email || '').toLowerCase().trim();
+        const activeRole = currentUser?.appRole || currentUser?.role || 'gerente';
+        const myTasksForProgress = allTasks.filter(t => {
+          const isAssigned = (t.assignedToEmail && t.assignedToEmail.toLowerCase().trim() === userEmail) ||
+                             (t.collaborators && t.collaborators.map(c => c.toLowerCase().trim()).includes(userEmail));
+          if (isAssigned) return true;
+          if (activeRole === 'consolidado' || activeRole === 'direccion') {
+            return t.role === 'direccion' || t.role === 'gerente';
+          }
+          return t.role === activeRole;
+        });
         const completedForProgress = myTasksForProgress.filter(t => t.completed || t.status === 'Completada').length;
         const progressPercentage = myTasksForProgress.length > 0 ? Math.round((completedForProgress / myTasksForProgress.length) * 100) : 0;
         
@@ -324,21 +404,9 @@ export default function Home() {
           <h3 className="text-blue" style={{ marginTop: 0, marginBottom: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <CalendarIcon size={18} /> EVENTOS
           </h3>
-          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-            {/* Filtro de Tiempo */}
-            <select 
-              value={timeFilter}
-              onChange={(e) => setTimeFilter(e.target.value)}
-              style={{ background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid rgba(255,255,255,0.1)', padding: '0.3rem 0.5rem', borderRadius: '4px', fontSize: '0.85rem' }}
-            >
-              <option value="todos" style={{ color: 'black' }}>Todas las fechas</option>
-              <option value="futuros" style={{ color: 'black' }}>Próximos</option>
-              <option value="hoy" style={{ color: 'black' }}>Hoy</option>
-              <option value="pasados" style={{ color: 'black' }}>Históricos (Pasados)</option>
-            </select>
-
-            {/* Botón Configurar Hoteles / Salones - Solo gerentes y directores */}
-            {currentUser?.appRole !== 'qt' && (
+          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            {/* Botón Configurar Hoteles / Salones - Directivos y Gerentes */}
+            {(currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.isGerente || ['gerente', 'direccion', 'director_maestria', 'qt'].includes(currentUser?.appRole)) && (
               <button 
                 type="button"
                 onClick={() => setShowVenueModal(true)}
@@ -350,8 +418,8 @@ export default function Home() {
               </button>
             )}
 
-            {/* Enlace al Calendario Global Oficial - Solo gerentes y directores */}
-            {(currentUser?.appRole === 'gerente' || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'director_maestria' || currentUser?.isSuperAdmin) && (
+            {/* Enlace al Calendario Global Oficial - Directivos y Gerentes */}
+            {(currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.isGerente || ['gerente', 'direccion', 'director_maestria', 'qt'].includes(currentUser?.appRole)) && (
               <a 
                 href="https://crearpsl.net/calendario_global.html" 
                 target="_blank" 
@@ -364,15 +432,18 @@ export default function Home() {
               </a>
             )}
 
-            {/* Pestañas Sede/Global */}
+            {/* Pestañas Sede/Global/Fechas Asignadas */}
             <div style={{ display: 'flex', gap: '0.5rem', borderLeft: '1px solid rgba(255,255,255,0.1)', paddingLeft: '0.75rem' }}>
               <button 
-                onClick={() => setActiveEventTab('locales')}
+                onClick={() => {
+                  setActiveEventTab('locales');
+                  setSelectedSedeFilter('todas');
+                }}
                 style={{ background: 'none', border: 'none', color: activeEventTab === 'locales' ? 'var(--crear-gold)' : 'var(--text-muted)', fontWeight: activeEventTab === 'locales' ? 'bold' : 'normal', cursor: 'pointer', transition: 'color 0.2s' }}
               >
-                MI SEDE
+                {['entrenador', 'entrenador_llamadas'].includes(currentUser?.appRole) ? 'MIS FECHAS ASIGNADAS' : 'MI SEDE'}
               </button>
-              {(currentUser?.appRole === 'gerente' || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'director_maestria' || currentUser?.isSuperAdmin) && (
+              {(currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.isGerente || ['gerente', 'direccion', 'director_maestria', 'qt', 'cfo'].includes(currentUser?.appRole) || currentUser?.sede?.toLowerCase().includes('global')) && (
                 <button 
                   onClick={() => setActiveEventTab('globales')}
                   style={{ background: 'none', border: 'none', color: activeEventTab === 'globales' ? 'var(--crear-gold)' : 'var(--text-muted)', fontWeight: activeEventTab === 'globales' ? 'bold' : 'normal', cursor: 'pointer', transition: 'color 0.2s' }}
@@ -383,27 +454,261 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+        {/* Barra de Filtros, Selector de Sede, Selector de Entrenamiento y Buscador */}
+        <div style={{ 
+          display: 'flex', 
+          gap: '0.6rem', 
+          alignItems: 'center', 
+          flexWrap: 'wrap', 
+          marginBottom: '1.25rem', 
+          background: 'rgba(255,255,255,0.03)', 
+          padding: '0.6rem 0.8rem', 
+          borderRadius: '8px', 
+          border: '1px solid rgba(255,255,255,0.06)' 
+        }}>
+          {/* 1. Filtro de Tiempo */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+            <Clock size={14} style={{ color: 'var(--crear-blue)' }} />
+            <select 
+              value={timeFilter}
+              onChange={(e) => setTimeFilter(e.target.value)}
+              style={{ 
+                background: 'rgba(255,255,255,0.07)', 
+                color: 'white', 
+                border: '1px solid rgba(255,255,255,0.15)', 
+                padding: '0.35rem 0.6rem', 
+                borderRadius: '6px', 
+                fontSize: '0.82rem',
+                cursor: 'pointer'
+              }}
+            >
+              <option value="futuros" style={{ color: 'black' }}>⏱️ Próximos</option>
+              <option value="hoy" style={{ color: 'black' }}>⏱️ Hoy</option>
+              <option value="pasados" style={{ color: 'black' }}>⏱️ Históricos</option>
+              <option value="todos" style={{ color: 'black' }}>⏱️ Todas las fechas</option>
+            </select>
+          </div>
+
+          {/* 2. Selector de Sede (Para quienes tienen acceso global o están en pestaña Global) */}
+          {(currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.isGerente || ['gerente', 'direccion', 'director_maestria', 'qt', 'cfo'].includes(currentUser?.appRole) || currentUser?.sede?.toLowerCase().includes('global') || activeEventTab === 'globales') && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+              <MapPin size={14} style={{ color: 'var(--crear-gold)' }} />
+              <select 
+                value={selectedSedeFilter}
+                onChange={(e) => setSelectedSedeFilter(e.target.value)}
+                style={{ 
+                  background: 'rgba(255,255,255,0.07)', 
+                  color: 'white', 
+                  border: '1px solid rgba(255,255,255,0.15)', 
+                  padding: '0.35rem 0.6rem', 
+                  borderRadius: '6px', 
+                  fontSize: '0.82rem',
+                  cursor: 'pointer'
+                }}
+                title="Filtrar por Sede"
+              >
+                <option value="todas" style={{ color: 'black' }}>🌐 Todas las Sedes</option>
+                <option value="UIO" style={{ color: 'black' }}>🇪🇨 Quito (UIO)</option>
+                <option value="GYE" style={{ color: 'black' }}>🇪🇨 Guayaquil (GYE)</option>
+                <option value="CUE" style={{ color: 'black' }}>🇪🇨 Cuenca (CUE)</option>
+                <option value="LIM" style={{ color: 'black' }}>🇵🇪 Lima (LIM)</option>
+                <option value="MED" style={{ color: 'black' }}>🇨🇴 Medellín (MED)</option>
+                <option value="MEX" style={{ color: 'black' }}>🇲🇽 México (MEX)</option>
+              </select>
+            </div>
+          )}
+
+          {/* 3. Selector de Entrenamiento */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+            <BookOpen size={14} style={{ color: 'var(--crear-blue)' }} />
+            <select 
+              value={selectedTrainingFilter}
+              onChange={(e) => setSelectedTrainingFilter(e.target.value)}
+              style={{ 
+                background: 'rgba(255,255,255,0.07)', 
+                color: 'white', 
+                border: '1px solid rgba(255,255,255,0.15)', 
+                padding: '0.35rem 0.6rem', 
+                borderRadius: '6px', 
+                fontSize: '0.82rem',
+                cursor: 'pointer'
+              }}
+              title="Filtrar por Tipo de Entrenamiento"
+            >
+              <option value="todos" style={{ color: 'black' }}>🎓 Todos los Entrenamientos</option>
+              <option value="C1" style={{ color: 'black' }}>⚡ C1 (Crear Uno)</option>
+              <option value="C2" style={{ color: 'black' }}>🔥 C2 (Crear Dos)</option>
+              <option value="MJ" style={{ color: 'black' }}>👑 Maestría del Juego (MJ)</option>
+              <option value="VIAJE" style={{ color: 'black' }}>✈️ Viaje / Módulos</option>
+              <option value="OTROS" style={{ color: 'black' }}>🎯 Talleres / Tanque / Otros</option>
+            </select>
+          </div>
+
+          {/* 4. Buscador Inteligente en Tiempo Real */}
+          <div style={{ flex: '1 1 200px', minWidth: '180px', position: 'relative', display: 'flex', alignItems: 'center' }}>
+            <Search size={14} style={{ position: 'absolute', left: '0.65rem', color: 'var(--text-muted)' }} />
+            <input 
+              type="text"
+              placeholder="Buscar evento, coach, hotel, sede..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '0.35rem 1.8rem 0.35rem 2.1rem',
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                borderRadius: '6px',
+                color: 'white',
+                fontSize: '0.82rem',
+                outline: 'none'
+              }}
+            />
+            {searchQuery && (
+              <button 
+                type="button"
+                onClick={() => setSearchQuery('')}
+                style={{
+                  position: 'absolute',
+                  right: '0.5rem',
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--text-muted)',
+                  cursor: 'pointer',
+                  padding: 0,
+                  display: 'flex',
+                  alignItems: 'center'
+                }}
+                title="Limpiar búsqueda"
+              >
+                <X size={13} />
+              </button>
+            )}
+          </div>
+
+          {/* Botón Restablecer Filtros si hay alguno activo */}
+          {(selectedSedeFilter !== 'todas' || selectedTrainingFilter !== 'todos' || searchQuery.trim() !== '') && (
+            <button 
+              type="button"
+              onClick={() => {
+                setSelectedSedeFilter('todas');
+                setSelectedTrainingFilter('todos');
+                setSearchQuery('');
+              }}
+              className="btn-secondary"
+              style={{ padding: '0.3rem 0.6rem', fontSize: '0.78rem', borderColor: 'rgba(255, 100, 100, 0.4)', color: '#ff8888', background: 'rgba(255, 0, 0, 0.05)' }}
+              title="Restablecer filtros"
+            >
+              ✕ Limpiar
+            </button>
+          )}
+        </div>
+
         {loadingEvents ? (
           <p className="text-muted">Cargando inteligencia global...</p>
         ) : events.length > 0 ? (
           <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
             {(() => {
               let displayEvents = events;
-              
-              // Filtro estricto: Si NO es gerente, siempre forzar a ver solo locales
-              let isLocales = activeEventTab === 'locales' || currentUser?.appRole !== 'gerente';
-              
-              if (isLocales) {
-                const sedeMap = { 'cuenca': 'CUE', 'lima': 'LIM', 'medellin': 'MED', 'medellín': 'MED', 'med': 'MED', 'méxico': 'MEX', 'mexico': 'MEX', 'uio': 'UIO', 'quito': 'UIO', 'guayaquil': 'GYE' };
-                const userSede = currentUser?.sede?.toLowerCase().trim();
-                const eventSedeCode = userSede ? (sedeMap[userSede] || userSede.toUpperCase()) : null;
+              const isEntrenador = ['entrenador', 'entrenador_llamadas'].includes(currentUser?.appRole);
+              const canViewGlobal = currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.isGerente || ['gerente', 'direccion', 'director_maestria', 'qt', 'cfo'].includes(currentUser?.appRole) || currentUser?.sede?.toLowerCase().includes('global');
+
+              if (isEntrenador) {
+                // Entrenadores SOLO ven eventos/fechas asignadas a su nombre
+                displayEvents = displayEvents.filter(ev => {
+                  return isTrainerMatchingUser(ev.trainer || ev.entrenador, currentUser);
+                });
+              } else {
+                // Filtro por pestaña de Sede vs Global
+                let isLocales = activeEventTab === 'locales' && !canViewGlobal;
                 
-                if (eventSedeCode && userSede !== 'global') {
-                  displayEvents = displayEvents.filter(ev => {
-                    const evSede = (ev.sede || ev.sedeTag || '').toUpperCase();
-                    return evSede.includes(eventSedeCode);
-                  });
+                if (isLocales) {
+                  const sedeMap = {
+                    'cuenca': 'CUE',
+                    'cue': 'CUE',
+                    'lima': 'LIM',
+                    'lim': 'LIM',
+                    'medellin': 'MED',
+                    'medellín': 'MED',
+                    'med': 'MED',
+                    'méxico': 'MEX',
+                    'mexico': 'MEX',
+                    'mex': 'MEX',
+                    'cdmx': 'MEX',
+                    'uio': 'UIO',
+                    'quito': 'UIO',
+                    'guayaquil': 'GYE',
+                    'gye': 'GYE'
+                  };
+                  const userSede = currentUser?.sede?.toLowerCase().trim() || '';
+                  const isGlobalSede = !userSede || userSede.includes('global');
+                  
+                  if (!isGlobalSede) {
+                    let matchedCode = null;
+                    for (const [key, code] of Object.entries(sedeMap)) {
+                      if (userSede.includes(key)) {
+                        matchedCode = code;
+                        break;
+                      }
+                    }
+                    if (matchedCode) {
+                      displayEvents = displayEvents.filter(ev => {
+                        const evSede = (ev.sede || ev.sedeTag || ev.place || ev.address || '').toUpperCase();
+                        return evSede.includes(matchedCode);
+                      });
+                    }
+                  }
                 }
+              }
+
+              // Filtro por Selector de Sede explícito
+              if (selectedSedeFilter !== 'todas') {
+                displayEvents = displayEvents.filter(ev => {
+                  const evSede = (ev.sede || ev.sedeTag || ev.place || ev.address || ev.lugar || '').toUpperCase();
+                  if (selectedSedeFilter === 'UIO') return evSede.includes('UIO') || evSede.includes('QUITO');
+                  if (selectedSedeFilter === 'GYE') return evSede.includes('GYE') || evSede.includes('GUAYAQUIL');
+                  if (selectedSedeFilter === 'CUE') return evSede.includes('CUE') || evSede.includes('CUENCA');
+                  if (selectedSedeFilter === 'LIM') return evSede.includes('LIM') || evSede.includes('LIMA');
+                  if (selectedSedeFilter === 'MED') return evSede.includes('MED') || evSede.includes('MEDELL');
+                  if (selectedSedeFilter === 'MEX') return evSede.includes('MEX') || evSede.includes('CDMX') || evSede.includes('MÉXICO') || evSede.includes('MEXICO');
+                  return evSede.includes(selectedSedeFilter.toUpperCase());
+                });
+              }
+
+              // Filtro por Selector de Entrenamiento
+              if (selectedTrainingFilter !== 'todos') {
+                displayEvents = displayEvents.filter(ev => {
+                  const eventName = (ev.nombre || ev.name || "").toUpperCase();
+                  if (selectedTrainingFilter === 'C1') {
+                    return eventName.includes("UNO") || eventName.includes("CAPÍTULO 1") || eventName.includes("CAPITULO 1") || eventName.includes("C1");
+                  }
+                  if (selectedTrainingFilter === 'C2') {
+                    return eventName.includes("DOS") || eventName.includes("CAPÍTULO 2") || eventName.includes("CAPITULO 2") || eventName.includes("C2");
+                  }
+                  if (selectedTrainingFilter === 'MJ') {
+                    return eventName.includes("MAESTR") || eventName.includes("JUEGO") || eventName.includes("MJ");
+                  }
+                  if (selectedTrainingFilter === 'VIAJE') {
+                    return eventName.includes("VIAJE") || eventName.includes("MÓDULO") || eventName.includes("MODULO");
+                  }
+                  if (selectedTrainingFilter === 'OTROS') {
+                    return eventName.includes("CONFIANZA") || eventName.includes("TANQUE") || eventName.includes("TALLER");
+                  }
+                  return true;
+                });
+              }
+
+              // Filtro por Buscador en Tiempo Real
+              if (searchQuery.trim()) {
+                const q = searchQuery.toLowerCase().trim();
+                displayEvents = displayEvents.filter(ev => {
+                  const name = (ev.nombre || ev.name || '').toLowerCase();
+                  const trainer = (ev.trainer || ev.entrenador || ev.equipo || '').toLowerCase();
+                  const sede = (ev.sede || ev.sedeTag || ev.place || ev.address || ev.lugar || '').toLowerCase();
+                  const details = (ev.detalles || '').toLowerCase();
+                  const dateStr = (ev.fecha_inicio || ev.start || '').toLowerCase();
+                  return name.includes(q) || trainer.includes(q) || sede.includes(q) || details.includes(q) || dateStr.includes(q);
+                });
               }
 
               // Filtro por tiempo (Futuros, Hoy, Pasados)
@@ -506,7 +811,15 @@ export default function Home() {
               const isScrollable = displayEvents.length > 4;
 
               if (displayEvents.length === 0) {
-                return <p className="text-muted">No hay eventos próximos registrados en esta vista.</p>;
+                return (
+                  <div style={{ padding: '2rem 1rem', textAlign: 'center' }}>
+                    <p className="text-muted" style={{ margin: 0 }}>
+                      {isEntrenador 
+                        ? 'No tienes entrenamientos asignados en este rango de fechas.' 
+                        : 'No hay eventos próximos registrados en esta vista.'}
+                    </p>
+                  </div>
+                );
               }
 
               return (
@@ -681,7 +994,17 @@ export default function Home() {
           ) : (
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               {(() => {
-                const myTasks = allTasks.filter(t => t.role === currentUser?.appRole || t.assignedToEmail === currentUser?.email);
+                const userEmail = (currentUser?.email || '').toLowerCase().trim();
+                const activeRole = currentUser?.appRole || currentUser?.role || 'gerente';
+                const myTasks = allTasks.filter(t => {
+                  const isAssigned = (t.assignedToEmail && t.assignedToEmail.toLowerCase().trim() === userEmail) ||
+                                     (t.collaborators && t.collaborators.map(c => c.toLowerCase().trim()).includes(userEmail));
+                  if (isAssigned) return true;
+                  if (activeRole === 'consolidado' || activeRole === 'direccion') {
+                    return t.role === 'direccion' || t.role === 'gerente';
+                  }
+                  return t.role === activeRole;
+                });
                 const completed = myTasks.filter(t => t.completed || t.status === 'Completada').length;
                 const criticas = myTasks.filter(t => !t.completed && (t.isCritical || t.priority === '🔴 ROJO')).length;
                 const importantes = myTasks.filter(t => !t.completed && t.status !== 'Completada' && !t.isCritical && t.priority !== '🔴 ROJO').length;
@@ -735,7 +1058,14 @@ export default function Home() {
           ) : (
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               {(() => {
-                const myTasks = allTasks.filter(t => t.role === currentUser?.appRole && !t.completed && t.status !== 'Completada' && t.status !== 'Pendiente de validación');
+                const userEmail = (currentUser?.email || '').toLowerCase().trim();
+                const activeRole = currentUser?.appRole || currentUser?.role || 'gerente';
+                const myTasks = allTasks.filter(t => {
+                  const isAssigned = (t.assignedToEmail && t.assignedToEmail.toLowerCase().trim() === userEmail) ||
+                                     (t.collaborators && t.collaborators.map(c => c.toLowerCase().trim()).includes(userEmail));
+                  const isRoleMatch = (activeRole === 'consolidado' || activeRole === 'direccion') ? (t.role === 'direccion' || t.role === 'gerente') : (t.role === activeRole);
+                  return (isAssigned || isRoleMatch) && !t.completed && t.status !== 'Completada' && t.status !== 'Pendiente de validación';
+                });
                 // Ordenar: críticas/rojas primero, luego importantes/amarillas
                 myTasks.sort((a, b) => {
                   const valA = (a.isCritical || a.priority === '🔴 ROJO') ? 3 : (a.priority === '🟡 AMARILLO' ? 2 : 1);
@@ -792,13 +1122,17 @@ export default function Home() {
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-        <button className="btn-primary" onClick={() => navigate(currentUser?.isGerente ? '/gerente' : `/checklist/${currentUser?.appRole || 'capitan'}`)} style={{ padding: '1rem 2rem', fontSize: '1.1rem' }}>
-          IR A MI CHECKLIST OPERATIVO
+        <button 
+          className="btn-primary" 
+          onClick={() => navigate(currentUser?.appRole === 'gerente' ? '/gerente' : `/checklist/${currentUser?.appRole || 'capitan'}`)} 
+          style={{ padding: '1rem 2rem', fontSize: '1.1rem' }}
+        >
+          IR A MI CHECKLIST OPERATIVO ({ROLE_DISPLAY_NAMES[currentUser?.appRole] || currentUser?.appRole?.toUpperCase()})
         </button>
         <button className="btn-secondary" onClick={() => navigate('/metas')} style={{ padding: '1rem 2rem', fontSize: '1.1rem' }}>
           VER MIS METAS
         </button>
-        {(currentUser?.isSuperAdmin || currentUser?.isGerente || ['coord_c1', 'coord_maestria', 'capitan', 'qt', 'direccion'].includes(currentUser?.appRole)) && (
+        {(currentUser?.isSuperAdmin || currentUser?.isGerente || ['coord_c1', 'coord_maestria', 'capitan', 'qt', 'direccion', 'director_maestria'].includes(currentUser?.appRole)) && (
           <button className="btn-secondary" onClick={() => navigate('/reportes')} style={{ padding: '1rem 2rem', fontSize: '1.1rem' }}>
             ENVIAR REPORTES
           </button>

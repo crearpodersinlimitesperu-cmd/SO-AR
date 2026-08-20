@@ -45,14 +45,20 @@ export function CyclesProvider({ children }) {
 
     const sedeMap = {
       'cuenca': 'CUE',
+      'cue': 'CUE',
       'lima': 'LIM',
+      'lim': 'LIM',
       'med': 'MED',
       'medellin': 'MED',
       'medellín': 'MED',
       'méxico': 'MEX',
       'mexico': 'MEX',
+      'cdmx': 'MEX',
+      'mex': 'MEX',
       'uio': 'UIO',
-      'guayaquil': 'GYE'
+      'quito': 'UIO',
+      'guayaquil': 'GYE',
+      'gye': 'GYE'
     };
     
     let userSede = userSedeRaw.toLowerCase().trim();
@@ -62,14 +68,35 @@ export function CyclesProvider({ children }) {
     
     const sedeCode = sedeMap[userSede] || userSede.toUpperCase();
 
-    // Para Quito fusionado, mostrar eventos de UIO, UIO-C1 y UIO-C2
-    const isQuito = sedeCode === 'UIO';
+    // Filtro tolerante de eventos por sede
+    const isQuito = sedeCode === 'UIO' || userSede.includes('uio') || userSede.includes('quito');
+    const isMexico = sedeCode === 'MEX' || userSede.includes('mex') || userSede.includes('cdmx');
+    const isMedellin = sedeCode === 'MED' || userSede.includes('med');
+    const isGuayaquil = sedeCode === 'GYE' || userSede.includes('gye') || userSede.includes('guayaquil');
+    const isCuenca = sedeCode === 'CUE' || userSede.includes('cue') || userSede.includes('cuenca');
+    const isLima = sedeCode === 'LIM' || userSede.includes('lim') || userSede.includes('lima');
+
     const sedeEvents = allEvents.filter(e => {
-        const evSede = (e.sede || e.sedeTag || '').toUpperCase();
+        const evSede = (e.sede || e.sedeTag || e.place || e.address || '').toUpperCase();
         if (isQuito) {
-          return evSede === 'UIO' || evSede.startsWith('UIO');
+          return evSede.includes('UIO') || evSede.includes('QUITO');
         }
-        return evSede.startsWith(sedeCode) || evSede === sedeCode;
+        if (isMexico) {
+          return evSede.includes('MEX') || evSede.includes('CDMX') || evSede.includes('MÉXICO') || evSede.includes('MEXICO') || evSede.includes('CIUDAD DE M');
+        }
+        if (isMedellin) {
+          return evSede.includes('MED') || evSede.includes('MEDELL');
+        }
+        if (isGuayaquil) {
+          return evSede.includes('GYE') || evSede.includes('GUAYAQUIL');
+        }
+        if (isCuenca) {
+          return evSede.includes('CUE') || evSede.includes('CUENCA');
+        }
+        if (isLima) {
+          return evSede.includes('LIM') || evSede.includes('LIMA');
+        }
+        return evSede.includes(sedeCode) || evSede === sedeCode || evSede.includes(userSede.toUpperCase());
     });
 
     const today = new Date();
@@ -121,15 +148,14 @@ export function CyclesProvider({ children }) {
     const c2 = equipoEvents.find(e => (e.nombre || e.name) === 'CAPITULO DOS');
     const mj = equipoEvents.find(e => (e.nombre || e.name) === 'MAESTRIA DEL JUEGO');
 
-    // Mejoramos la visualización del nombre si viene machacado y es muy largo
-    let displayNombre = equipoStr;
-    if (displayNombre.length === 6 && !displayNombre.includes(' ')) {
+    // Mejoramos la visualización del nombre si viene con asteriscos o delimitadores
+    let displayNombre = equipoStr.replace(/\*/g, ', ');
+    if (displayNombre.length === 6 && /^\d+$/.test(displayNombre)) {
        displayNombre = `${displayNombre.slice(0,2)}, ${displayNombre.slice(2,4)}, ${displayNombre.slice(4,6)}`;
-    } else if (displayNombre.length === 4 && !displayNombre.includes(' ')) {
+    } else if (displayNombre.length === 4 && /^\d+$/.test(displayNombre)) {
        displayNombre = `${displayNombre.slice(0,2)}, ${displayNombre.slice(2,4)}`;
-    } else if (displayNombre.length === 3 && !displayNombre.includes(' ')) {
-       displayNombre = `${displayNombre.slice(0,1)}, ${displayNombre.slice(1,2)}, ${displayNombre.slice(2,3)}`;
     }
+    // NOTA: Los equipos de 3 dígitos (ej. Equipo 126 en Quito) se mantienen intactos como 126.
 
     const active = {
         id: `${sedeCode}-EQ-${equipoStr}`,

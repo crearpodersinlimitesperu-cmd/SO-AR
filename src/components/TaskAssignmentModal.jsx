@@ -1,34 +1,59 @@
 import { useState, useEffect } from 'react';
-import { Target, X } from 'lucide-react';
+import { Target, X, Zap, Calendar, Clock } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useChecklist } from '../context/ChecklistContext';
 import { getAssignableRoles } from '../config/permissions';
-import { usersData, normalizeRole, OPERATIONAL_SEDES } from '../data/usersData';
+import { usersData, normalizeRole, OPERATIONAL_SEDES, getRoleDisplayName } from '../data/usersData';
+import { recordAuditEvent } from '../services/auditService';
 
 export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = null }) {
   const { currentUser } = useAuth();
   const { addCustomTask } = useChecklist();
 
+  const getTodayStr = () => new Date().toISOString().split('T')[0];
+  const getTomorrowStr = () => {
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    return d.toISOString().split('T')[0];
+  };
+  const getInDaysStr = (days) => {
+    const d = new Date();
+    d.setDate(d.getDate() + days);
+    return d.toISOString().split('T')[0];
+  };
+
   const [newTask, setNewTask] = useState({
     title: '',
-    role: currentUser?.appRole || 'capitan',
-    deadlineDate: '',
+    role: currentUser?.appRole || 'gerente',
+    deadlineDate: getTodayStr(),
     deadlineTime: '18:00',
     assignedToEmail: '',
-    assignedSede: '',
+    assignedSede: currentUser?.sede || '',
     priority: '🟡 AMARILLO'
   });
 
   useEffect(() => {
-    if (isOpen && prefilledUser) {
-      setNewTask(prev => ({
-        ...prev,
-        role: normalizeRole(prefilledUser.role) || prefilledUser.role || prev.role,
-        assignedToEmail: prefilledUser.email || '',
-        assignedSede: prefilledUser.sede || '',
-      }));
+    if (isOpen) {
+      if (prefilledUser) {
+        setNewTask({
+          title: '',
+          role: normalizeRole(prefilledUser.role) || prefilledUser.role || currentUser?.appRole || 'gerente',
+          deadlineDate: getTodayStr(),
+          deadlineTime: '18:00',
+          assignedToEmail: prefilledUser.email || '',
+          assignedSede: prefilledUser.sede || currentUser?.sede || '',
+          priority: '🟡 AMARILLO'
+        });
+      } else {
+        setNewTask(prev => ({
+          ...prev,
+          role: currentUser?.appRole || prev.role || 'gerente',
+          deadlineDate: prev.deadlineDate || getTodayStr(),
+          assignedSede: currentUser?.sede || prev.assignedSede || '',
+        }));
+      }
     }
-  }, [isOpen, prefilledUser]);
+  }, [isOpen, prefilledUser, currentUser]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -42,37 +67,56 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!newTask.title.trim()) return;
     setIsSubmitting(true);
     
-    const finalRole = newTask.role;
-    const deadlineISO = new Date(`${newTask.deadlineDate}T${newTask.deadlineTime}:00`).toISOString();
+    const finalRole = newTask.role || currentUser?.appRole || 'general';
+    const finalDate = newTask.deadlineDate || getTodayStr();
+    const finalTime = newTask.deadlineTime || '18:00';
+    const deadlineISO = new Date(`${finalDate}T${finalTime}:00`).toISOString();
     
     const taskData = {
-      task: newTask.title,
+      task: newTask.title.trim(),
       role: finalRole,
       deadline: deadlineISO,
       priority: newTask.priority,
       isCritical: newTask.priority === '🔴 ROJO',
       createdBy: currentUser.email,
-      assignedToEmail: canAssignSpecific ? newTask.assignedToEmail : (prefilledUser?.email || ''),
-      assignedSede: canAssignSpecific ? newTask.assignedSede : (prefilledUser?.sede || '')
+      assignedToEmail: canAssignSpecific ? (newTask.assignedToEmail || currentUser?.email) : (prefilledUser?.email || currentUser?.email || ''),
+      assignedSede: canAssignSpecific ? (newTask.assignedSede || currentUser?.sede || 'Global') : (prefilledUser?.sede || currentUser?.sede || 'Global')
     };
 
     const success = await addCustomTask(taskData);
-    setIsSubmitting(false);
     
     if (success) {
+      try {
+        await recordAuditEvent({
+          action: 'NUEVA_TAREA_CREADA',
+          user: currentUser,
+          details: {
+            taskTitle: newTask.title.trim(),
+            assignedRole: finalRole,
+            assignedEmail: taskData.assignedToEmail,
+            priority: newTask.priority,
+            deadline: deadlineISO
+          }
+        });
+      } catch (err) {
+        console.warn("Audit log notice:", err);
+      }
+
       onClose();
       setNewTask({
         title: '',
-        role: currentUser?.appRole || 'capitan',
-        deadlineDate: '',
+        role: currentUser?.appRole || 'gerente',
+        deadlineDate: getTodayStr(),
         deadlineTime: '18:00',
         assignedToEmail: '',
-        assignedSede: '',
+        assignedSede: currentUser?.sede || '',
         priority: '🟡 AMARILLO'
       });
     }
+    setIsSubmitting(false);
   };
 
   return (
@@ -175,20 +219,75 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
               </>
             )}
 
-            <div>
-              <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--crear-gold)', marginBottom: '0.3rem', fontWeight: 'bold' }}>📅 Fecha Límite:</label>
-              <input type="date" value={newTask.deadlineDate} onChange={e => setNewTask({...newTask, deadlineDate: e.target.value})} className="input-field" style={{ width: '100%' }} required disabled={isSubmitting} />
-            </div>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--crear-gold)', marginBottom: '0.3rem', fontWeight: 'bold' }}>⏰ Hora Límite:</label>
-              <input type="time" value={newTask.deadlineTime} onChange={e => setNewTask({...newTask, deadlineTime: e.target.value})} className="input-field" style={{ width: '100%' }} required disabled={isSubmitting} />
+            <div style={{ gridColumn: '1 / -1' }}>
+              <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--crear-gold)', marginBottom: '0.4rem', fontWeight: 'bold' }}>
+                📅 Plazo / Fecha Límite Rápida:
+              </label>
+              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.5rem' }}>
+                <button
+                  type="button"
+                  onClick={() => setNewTask(prev => ({ ...prev, deadlineDate: getTodayStr(), deadlineTime: '18:00' }))}
+                  style={{
+                    padding: '0.3rem 0.75rem',
+                    borderRadius: '20px',
+                    fontSize: '0.75rem',
+                    fontWeight: 'bold',
+                    border: '1px solid var(--crear-gold)',
+                    background: newTask.deadlineDate === getTodayStr() ? 'var(--crear-gold)' : 'rgba(255,183,3,0.1)',
+                    color: newTask.deadlineDate === getTodayStr() ? '#000' : 'var(--text-heading)',
+                    cursor: 'pointer'
+                  }}
+                >
+                  ⚡ Hoy (18:00)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setNewTask(prev => ({ ...prev, deadlineDate: getTomorrowStr(), deadlineTime: '12:00' }))}
+                  style={{
+                    padding: '0.3rem 0.75rem',
+                    borderRadius: '20px',
+                    fontSize: '0.75rem',
+                    fontWeight: 'bold',
+                    border: '1px solid var(--crear-cyan)',
+                    background: newTask.deadlineDate === getTomorrowStr() ? 'var(--crear-cyan)' : 'rgba(0,212,255,0.1)',
+                    color: newTask.deadlineDate === getTomorrowStr() ? '#000' : 'var(--text-heading)',
+                    cursor: 'pointer'
+                  }}
+                >
+                  🌅 Mañana (12:00)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setNewTask(prev => ({ ...prev, deadlineDate: getInDaysStr(3), deadlineTime: '18:00' }))}
+                  style={{
+                    padding: '0.3rem 0.75rem',
+                    borderRadius: '20px',
+                    fontSize: '0.75rem',
+                    fontWeight: 'bold',
+                    border: '1px solid rgba(255,255,255,0.3)',
+                    background: newTask.deadlineDate === getInDaysStr(3) ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.05)',
+                    color: 'var(--text-heading)',
+                    cursor: 'pointer'
+                  }}
+                >
+                  🗓️ En 3 días
+                </button>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                <div>
+                  <input type="date" value={newTask.deadlineDate} onChange={e => setNewTask({...newTask, deadlineDate: e.target.value})} className="input-field" style={{ width: '100%' }} required disabled={isSubmitting} />
+                </div>
+                <div>
+                  <input type="time" value={newTask.deadlineTime} onChange={e => setNewTask({...newTask, deadlineTime: e.target.value})} className="input-field" style={{ width: '100%' }} required disabled={isSubmitting} />
+                </div>
+              </div>
             </div>
           </div>
           
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1rem' }}>
             <button type="button" className="btn-secondary" onClick={onClose} disabled={isSubmitting}>Cancelar</button>
             <button type="submit" className="btn-primary" disabled={isSubmitting}>
-              {isSubmitting ? 'Guardando...' : 'Asignar Tarea'}
+              {isSubmitting ? 'Guardando...' : '⚡ Guardar Tarea'}
             </button>
           </div>
         </form>

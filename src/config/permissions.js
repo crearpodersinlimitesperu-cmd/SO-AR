@@ -9,13 +9,15 @@
  */
 export const SUPER_ADMIN_EMAILS = [
   'jose.sanchez@crearpsl.net',
-  'armando.pilacuan@gmail.com'
+  'armando.pilacuan@gmail.com',
+  'paul.sosa@crearpsl.net',
+  'paul.sosa@crearpsl.com'
 ];
 
 /**
  * Roles que otorgan privilegios de Dirección (equivalente a SuperAdmin por rol)
  */
-export const DIRECCION_ROLES = ['direccion', 'cfo'];
+export const DIRECCION_ROLES = ['direccion', 'cfo', 'cco', 'ceo'];
 
 /**
  * Roles que otorgan privilegios de Gerencia
@@ -30,6 +32,22 @@ export const GERENCIA_ROLES = ['gerente', ...DIRECCION_ROLES];
 export const isSuperAdminEmail = (email) => {
   if (!email) return false;
   return SUPER_ADMIN_EMAILS.includes(email.trim().toLowerCase());
+};
+
+/**
+ * Verifica si el usuario actual tiene permisos para simular vistas de otros colaboradores.
+ * REGLA ESTRICTA DE SEGURIDAD:
+ * ÚNICA Y EXCLUSIVAMENTE los Super Administradores pueden simular usuarios.
+ * @param {Object} currentUser
+ * @param {Object} originalAdminUser
+ * @returns {boolean}
+ */
+export const canSimulate = (currentUser, originalAdminUser = null) => {
+  if (originalAdminUser) {
+    return Boolean(originalAdminUser.isSuperAdmin || isSuperAdminEmail(originalAdminUser.email));
+  }
+  if (!currentUser) return false;
+  return Boolean(currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email));
 };
 
 /**
@@ -55,54 +73,71 @@ export const isGerenciaRole = (role) => {
  */
 export const canAddManagers = (currentUser) => {
   if (!currentUser) return false;
-  if (currentUser.isSuperAdmin) return true;
+  if (currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email)) return true;
   const r = currentUser.appRole;
   return r === 'director_maestria' || r === 'coord_maestria' || r === 'coordinador_mj';
 };
 
 /**
- * Verifica si un usuario puede asignar o reasignar entrenadores a managers
- * (Coordinadores de Maestría, Director de Maestría y José Sánchez / SuperAdmin)
+ * Verifica si un usuario puede asignar o reasignar entrenadores a managers.
+ * REGLA ESTRICTA:
+ * SOLO Fer Aragón, Paul Sosa y los SuperAdministradores (José Sánchez, Armando Pilacuán, etc.)
+ * tienen permiso para editar o reasignar entrenadores. Nadie más.
  */
 export const canAssignTrainer = (currentUser) => {
   if (!currentUser) return false;
-  if (currentUser.isSuperAdmin) return true;
-  if (currentUser.email === 'jose.sanchez@crearpsl.net') return true;
-  const r = currentUser.appRole;
-  return r === 'director_maestria' || r === 'coord_maestria' || r === 'coordinador_mj';
+  if (currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email)) return true;
+  
+  const email = (currentUser.email || '').trim().toLowerCase();
+
+  // Fer y Paul autorizados exclusivamente
+  const allowedEmails = [
+    'fer.aragon@crearpsl.net',
+    'fer.aragon@crearpls.com',
+    'paul.sosa@crearpsl.net',
+    'paul.sosa@crearpsl.com'
+  ];
+  if (allowedEmails.includes(email)) return true;
+
+  const name = (currentUser.name || currentUser.displayName || '').toLowerCase();
+  if (name.includes('fer aragon') || name.includes('fernando aragon') || name.includes('paul sosa')) {
+    return true;
+  }
+
+  return false;
 };
 
 /**
- * Verifica si un usuario puede cambiar el estado de un manager (Graduado / Desertor).
- * SOLO: Coordinadores de Maestría y Director de Maestría (Andrés Gómez).
- * Los entrenadores NO pueden cambiar estados.
+ * Verifica si un usuario puede cambiar el estado de un manager (Graduaciones / Deserciones).
+ * REGLA ESTRICTA DE GOBERNANZA (INVIOLABLE):
+ * Restringida ÚNICA Y EXCLUSIVAMENTE a:
+ * 1. Coordinación de Maestría del Juego (coord_maestria / coordinador_mj)
+ * 2. Dirección de Maestría (director_maestria)
+ * 3. Super Administradores
+ * 
+ * Entrenadores, capitanes, coordinadores C1/C2, gerentes de sede y demás roles NO pueden cambiar estados.
  */
 export const canChangeManagerStatus = (currentUser) => {
   if (!currentUser) return false;
-  if (currentUser.isSuperAdmin) return true;
-  if (currentUser.email === 'jose.sanchez@crearpsl.net') return true;
+  if (currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email)) return true;
   const r = currentUser.appRole;
   return r === 'director_maestria' || r === 'coord_maestria' || r === 'coordinador_mj';
 };
 
-/**
- * Verifica si un usuario puede ver TODOS los managers de todas las sedes.
- * SOLO: Director de Maestría y José Sánchez / SuperAdmin.
- */
 export const canViewAllManagers = (currentUser) => {
   if (!currentUser) return false;
-  if (currentUser.isSuperAdmin) return true;
-  if (currentUser.email === 'jose.sanchez@crearpsl.net') return true;
-  return currentUser.appRole === 'director_maestria';
+  if (currentUser.isSuperAdmin || currentUser.isDireccion || isSuperAdminEmail(currentUser.email)) return true;
+  const r = currentUser.appRole;
+  return r === 'director_maestria' || isDireccionRole(r);
 };
 
 /**
- * Verifica si el usuario puede ver managers de su sede (Coordinadores de Maestría).
+ * Verifica si el usuario puede ver managers de su sede (Coordinadores de Maestría y Gerentes de Sede).
  */
 export const canViewSede = (currentUser) => {
   if (!currentUser) return false;
   const r = currentUser.appRole;
-  return r === 'coord_maestria' || r === 'coordinador_mj';
+  return r === 'coord_maestria' || r === 'coordinador_mj' || r === 'gerente' || currentUser.isGerente;
 };
 
 /**
@@ -113,7 +148,11 @@ export const DUAL_ROLE_TRAINER_EMAILS = [
   'andres.gomez@crearpsl.net',     // Director Maestría + Entrenador C2+MJ
   'fer.aragon@crearpsl.net',        // Corporativo + Entrenador C1
   'paul.sosa@crearpsl.net',         // Corporativo + Entrenador C2+MJ
-  'leandro.brunis@crearpsl.net',    // Corporativo + Entrenador C1
+  'leandro.brunis@crearpsl.net',    // Dirección / Corporativo + Entrenador C1 (Leandro Brunis)
+  'leandro.brunis@crearpsl.com',
+  'carlos.brunis@crearpsl.net',     // Coordinador QT Global + Entrenador (Carlos Brunis)
+  'carlos.brunis@crearpsl.com',
+  'brunische66@gmail.com',
 ];
 
 /**

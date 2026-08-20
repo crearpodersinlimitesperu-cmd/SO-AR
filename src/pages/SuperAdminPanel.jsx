@@ -18,11 +18,11 @@ const ROLE_LABELS = {
   direccion: 'Dirección Global',
   cfo: 'CFO (Chief Financial Officer)',
   gerente: 'Gerente de Sede',
-  director_maestria: 'Director de Maestría',
-  coordinador_c1c2: 'Coordinador C1/C2',
-  coordinador_mj: 'Coordinador Maestría',
-  coord_c1: 'Coordinador C1/C2',
-  coord_maestria: 'Coordinador Maestría',
+  director_maestria: 'Director Maestría del Juego (MJ)',
+  coordinador_c1c2: 'Coordinador Capítulo 1 y 2 (C1 / C2)',
+  coordinador_mj: 'Coordinador Maestría del Juego (MJ)',
+  coord_c1: 'Coordinador Capítulo 1 y 2 (C1 / C2)',
+  coord_maestria: 'Coordinador Maestría del Juego (MJ)',
   capitan: 'Capitán',
   manager: 'Manager',
   qt: 'Quantum Team',
@@ -68,6 +68,7 @@ function ProgressBar({ value, color = 'var(--crear-gold)', height = '8px' }) {
 
 function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, currentUser }) {
   const canonicalRole = normalizeRole(person.role);
+  const normalizedSedeName = normalizeSede(person.sede);
   const myTasks = tasks.filter(t => {
     const isAssigned = t.assignedToEmail && t.assignedToEmail.toLowerCase() === person.email?.toLowerCase();
     const isCollab = t.collaborators && t.collaborators.includes(person.email);
@@ -116,13 +117,46 @@ function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, curre
         cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between'
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          {getFlagForSede(person.sede)}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+        <div 
+          style={{ 
+            width: '42px', 
+            height: '42px', 
+            borderRadius: '50%', 
+            background: 'rgba(255,255,255,0.08)', 
+            border: '1px solid rgba(255,255,255,0.15)',
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            flexShrink: 0
+          }} 
+          title={`Sede: ${normalizedSedeName}`}
+        >
+          <div style={{ transform: 'scale(1.2)' }}>{getFlagForSede(person.sede)}</div>
         </div>
         <div>
-          <h4 style={{ margin: 0, fontSize: '1rem', color: 'var(--text-heading)' }}>{person.name}</h4>
-          <p style={{ margin: 0, fontSize: '0.8rem', color: roleColor }}>{ROLE_LABELS[canonicalRole] || person.role}</p>
+          <h4 style={{ margin: 0, fontSize: '0.95rem', color: 'var(--text-heading)' }}>{person.name}</h4>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '2px', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '0.78rem', color: roleColor, fontWeight: 600 }}>
+              {ROLE_LABELS[canonicalRole] || person.role}
+            </span>
+            {person.sede && (
+              <span style={{ 
+                fontSize: '0.72rem', 
+                color: 'var(--crear-gold)', 
+                background: 'rgba(255, 183, 3, 0.1)', 
+                border: '1px solid rgba(255, 183, 3, 0.25)',
+                padding: '1px 6px', 
+                borderRadius: '4px', 
+                display: 'inline-flex', 
+                alignItems: 'center', 
+                gap: '3px',
+                fontWeight: 700
+              }}>
+                📍 {normalizedSedeName}
+              </span>
+            )}
+          </div>
         </div>
       </div>
       <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.3rem' }}>
@@ -307,23 +341,6 @@ function AuditLogView() {
 }
 
 function GlobalView({ tasks, navigate }) {
-  const { showToast } = useUI();
-  
-  const handleSyncUsers = async () => {
-    if (!window.confirm('¿Migrar Directorio Original a Firestore? (Esto inyectará 49 usuarios para restaurar el login)')) return;
-    try {
-      for (const u of USERS_TO_IMPORT) {
-        await setDoc(doc(db, 'users', u.id), u);
-      }
-      showToast('Directorio sincronizado. Acceso restaurado para todo el equipo.', 'success');
-    } catch (e) {
-      console.error(e);
-      showToast('Error sincronizando a Firebase: ' + e.message, 'error');
-    }
-  };
-
-
-
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter(t => t.completed || t.status === 'Completada').length;
   const criticalTasks = tasks.filter(t => !t.completed && t.status !== 'Completada' && (t.isCritical || t.priority === '🔴 ROJO' || t.priority?.includes('ROJO'))).length;
@@ -351,17 +368,6 @@ function GlobalView({ tasks, navigate }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-      
-      <div className="glass-panel" style={{ padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderLeft: '4px solid #ef4444' }}>
-        <div>
-          <h3 style={{ margin: 0, color: '#ef4444' }}>Sistema de Emergencia — Sincronización</h3>
-          <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)' }}>Utiliza este botón para inyectar la lista de usuarios original a la base de datos segura y permitir que todo el equipo inicie sesión.</p>
-        </div>
-        <button onClick={handleSyncUsers} className="btn-primary" style={{ background: '#ef4444', border: 'none', padding: '0.8rem 1.5rem', fontWeight: 'bold' }}>
-          Restaurar Accesos
-        </button>
-      </div>
-
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
         {[
           { icon: <CheckCircle2 size={22} color="#22c55e" />, label: 'Tareas Completadas', value: completedTasks, sub: `de ${totalTasks} totales`, color: '#22c55e', path: '/reportes' },
@@ -504,24 +510,6 @@ export default function SuperAdminPanel() {
   const [searchTerm, setSearchTerm] = useState('');
   const { showToast } = useUI();
 
-  const handleMigrateUsers = async () => {
-    if (!window.confirm("¿Estás seguro de migrar el directorio completo de usersData.js a Firestore? Esto sobrescribirá los datos actuales en Firestore.")) return;
-    try {
-      showToast('Iniciando migración...', 'info');
-      let count = 0;
-      for (const u of usersData) {
-        // Usar un ID único, ej el email normalizado, o el u.id si existe
-        const docId = u.id || u.email.split('@')[0];
-        await setDoc(doc(db, 'users', docId), u);
-        count++;
-      }
-      showToast(`✅ Migración exitosa: ${count} usuarios en Firestore.`, 'success');
-    } catch(err) {
-      console.error(err);
-      showToast('Error migrando usuarios: ' + err.message, 'error');
-    }
-  };
-
   const handleOpenUserModal = (user) => {
     setSelectedUser(user);
     setShowUserModal(true);
@@ -559,11 +547,6 @@ export default function SuperAdminPanel() {
           <h1 className="text-gold uppercase" style={{ fontSize: '2rem', margin: '0 0 0.5rem 0' }}>{currentUser?.isSuperAdmin ? 'Panel Super Admin' : 'Directorio de Equipo'} — Monitoreo Global</h1>
           <p className="text-muted" style={{ margin: 0 }}>Visibilidad total del sistema SO-AR en todas las sedes y roles.</p>
         </div>
-        {currentUser?.isSuperAdmin && (
-          <button onClick={handleMigrateUsers} className="btn-primary" style={{ padding: '0.6rem 1rem', fontSize: '0.9rem' }}>
-            ☁️ Migrar Directorio a Firestore
-          </button>
-        )}
       </div>
 
       <TaskAssignmentModal 

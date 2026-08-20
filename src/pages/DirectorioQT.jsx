@@ -1,0 +1,461 @@
+import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { useUI } from '../context/UIContext';
+import { 
+  getQTMembers, 
+  QT_SHEET_EDIT_URL 
+} from '../services/qtSheetService';
+import CountryFlag from '../components/CountryFlag';
+import { 
+  Users, 
+  RefreshCw, 
+  ExternalLink, 
+  Search, 
+  ArrowLeft, 
+  Award, 
+  Phone, 
+  Mail, 
+  CheckCircle2, 
+  ShieldCheck,
+  Grid,
+  List,
+  Flame,
+  FileSpreadsheet
+} from 'lucide-react';
+
+function InstagramIcon({ size = 14 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ verticalAlign: 'middle' }}>
+      <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+      <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+    </svg>
+  );
+}
+
+export default function DirectorioQT() {
+  const { currentUser } = useAuth();
+  const { showToast } = useUI();
+  const navigate = useNavigate();
+
+  const [members, setMembers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState(null);
+  
+  // Filtros
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedSede, setSelectedSede] = useState('Todas');
+  const [selectedEdicion, setSelectedEdicion] = useState('Todas');
+  const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'table'
+
+  useEffect(() => {
+    loadMembers(false);
+  }, []);
+
+  const loadMembers = async (forceRefresh = false) => {
+    if (forceRefresh) setRefreshing(true);
+    else setLoading(true);
+
+    try {
+      const result = await getQTMembers({ forceRefresh });
+      setMembers(result.data || []);
+      setLastUpdated(result.lastUpdated);
+      
+      if (forceRefresh) {
+        showToast(`¡Sincronización exitosa! ${result.total} integrantes de Quantum Team actualizados.`, 'success');
+      }
+    } catch (err) {
+      console.error("Error cargando directorio QT:", err);
+      showToast("Error al cargar los datos desde Google Sheets.", "error");
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  // Filtrado reactivo
+  const filteredMembers = useMemo(() => {
+    return members.filter(m => {
+      // Filtro por sede
+      if (selectedSede !== 'Todas' && m.sede !== selectedSede) {
+        return false;
+      }
+
+      // Filtro por experiencia / edición
+      if (selectedEdicion !== 'Todas') {
+        if (selectedEdicion === 'senior' && !m.isSenior) return false;
+        if (selectedEdicion === 'reciente' && !m.ediciones.toLowerCase().includes('primera')) return false;
+        if (selectedEdicion === 'intermedio' && !(m.ediciones.includes('1 a 3') || m.ediciones.includes('4 a 8'))) return false;
+      }
+
+      // Búsqueda libre
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase().trim();
+        const matchName = (m.nombre || '').toLowerCase().includes(q);
+        const matchDoc = (m.docNumero || '').includes(q);
+        const matchEmail = (m.email || '').toLowerCase().includes(q);
+        const matchInsta = (m.instagram || '').toLowerCase().includes(q);
+        const matchDec = (m.declaracion || '').toLowerCase().includes(q);
+        const matchSede = (m.sede || '').toLowerCase().includes(q);
+        return matchName || matchDoc || matchEmail || matchInsta || matchDec || matchSede;
+      }
+
+      return true;
+    });
+  }, [members, selectedSede, selectedEdicion, searchQuery]);
+
+  // Estadísticas rápidas
+  const stats = useMemo(() => {
+    const total = members.length;
+    const seniors = members.filter(m => m.isSenior).length;
+    const sedesCount = new Set(members.map(m => m.sede)).size;
+    const activos = members.filter(m => m.esActivo).length;
+    return { total, seniors, sedesCount, activos };
+  }, [members]);
+
+  const formatLastUpdated = (isoDate) => {
+    if (!isoDate) return 'Desconocido';
+    try {
+      const d = new Date(isoDate);
+      return isNaN(d.getTime()) ? 'Reciente' : d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' (' + d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }) + ')';
+    } catch (e) {
+      return 'Reciente';
+    }
+  };
+
+  return (
+    <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '2rem 1.5rem', color: 'var(--text-main, #0f172a)' }}>
+      {/* HEADER SUPERIOR */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+        <button 
+          onClick={() => navigate('/home')} 
+          className="btn-secondary" 
+          style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', borderRadius: '8px', cursor: 'pointer' }}
+        >
+          <ArrowLeft size={16} /> Volver a SO-AR
+        </button>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <button 
+            onClick={() => loadMembers(true)}
+            disabled={refreshing || loading}
+            className="btn-secondary"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.55rem 1.1rem', borderRadius: '8px', background: 'var(--bg-card, #ffffff)', border: '1px solid var(--border-subtle, #cbd5e1)', cursor: 'pointer', fontWeight: 600 }}
+          >
+            <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} style={{ animation: refreshing ? 'spin 1s linear infinite' : 'none' }} />
+            {refreshing ? 'Sincronizando...' : 'Sincronizar Google Sheets'}
+          </button>
+
+          <a 
+            href={QT_SHEET_EDIT_URL} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="btn-primary"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.55rem 1.1rem', borderRadius: '8px', background: 'linear-gradient(135deg, #10b981, #047857)', color: '#ffffff', textDecoration: 'none', fontWeight: 700, border: 'none', boxShadow: '0 2px 8px rgba(16,185,129,0.3)' }}
+          >
+            <FileSpreadsheet size={16} /> Editar Google Sheet <ExternalLink size={14} />
+          </a>
+        </div>
+      </div>
+
+      {/* TITULO Y DESCRIPCIÓN */}
+      <div className="glass-panel" style={{ padding: '2rem', borderRadius: '16px', background: 'var(--bg-card, #ffffff)', border: '1px solid var(--border-subtle, #e2e8f0)', boxShadow: '0 4px 20px rgba(0,0,0,0.05)', marginBottom: '1.5rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.4rem' }}>
+              <div style={{ background: 'linear-gradient(135deg, #f59e0b, #d97706)', padding: '0.6rem', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+                <Flame size={24} />
+              </div>
+              <div>
+                <h1 style={{ margin: 0, fontSize: '1.8rem', fontWeight: 800, color: 'var(--text-heading, #0f172a)' }}>
+                  Directorio Oficial Quantum Team (QT)
+                </h1>
+                <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-muted, #64748b)' }}>
+                  Sincronizado en tiempo real con la base de datos maestra de Google Sheets de CREAR PODER SIN LÍMITES.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted, #64748b)', display: 'block', fontWeight: 500 }}>
+              Última sincronización: <strong>{formatLastUpdated(lastUpdated)}</strong>
+            </span>
+            <span style={{ fontSize: '0.75rem', background: '#dcfce7', color: '#15803d', padding: '2px 8px', borderRadius: '12px', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.25rem', marginTop: '4px' }}>
+              <CheckCircle2 size={12} /> Conexión Activa
+            </span>
+          </div>
+        </div>
+
+        {/* MÉTRICAS KPI DEL DIRECTORIO */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1rem', marginTop: '1.5rem' }}>
+          <div style={{ background: 'var(--bg-card-hover, #f8fafc)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--border-subtle, #e2e8f0)' }}>
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted, #64748b)', fontWeight: 600 }}>Total Integrantes QT</div>
+            <div style={{ fontSize: '1.7rem', fontWeight: 800, color: 'var(--text-heading, #0f172a)' }}>{stats.total}</div>
+          </div>
+          <div style={{ background: 'var(--bg-card-hover, #f8fafc)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--border-subtle, #e2e8f0)' }}>
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted, #64748b)', fontWeight: 600 }}>Líderes Senior (+9 ed.)</div>
+            <div style={{ fontSize: '1.7rem', fontWeight: 800, color: '#f59e0b' }}>{stats.seniors}</div>
+          </div>
+          <div style={{ background: 'var(--bg-card-hover, #f8fafc)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--border-subtle, #e2e8f0)' }}>
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted, #64748b)', fontWeight: 600 }}>Sedes Cubiertas</div>
+            <div style={{ fontSize: '1.7rem', fontWeight: 800, color: '#3b82f6' }}>{stats.sedesCount}</div>
+          </div>
+          <div style={{ background: 'var(--bg-card-hover, #f8fafc)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--border-subtle, #e2e8f0)' }}>
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted, #64748b)', fontWeight: 600 }}>Perfiles Verificados</div>
+            <div style={{ fontSize: '1.7rem', fontWeight: 800, color: '#10b981' }}>{stats.activos}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* BARRA DE FILTROS Y CONTROLES */}
+      <div className="glass-panel" style={{ padding: '1.25rem 1.5rem', borderRadius: '14px', background: 'var(--bg-card, #ffffff)', border: '1px solid var(--border-subtle, #e2e8f0)', marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1, minWidth: '280px', flexWrap: 'wrap' }}>
+          {/* Buscador */}
+          <div style={{ position: 'relative', flex: 1, minWidth: '220px' }}>
+            <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted, #64748b)' }} />
+            <input 
+              type="text"
+              placeholder="Buscar por nombre, cédula/DNI, email, instagram..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '0.55rem 1rem 0.55rem 2.25rem',
+                borderRadius: '8px',
+                border: '1px solid var(--border-subtle, #cbd5e1)',
+                background: 'var(--bg-card, #ffffff)',
+                color: 'var(--text-main, #0f172a)',
+                fontSize: '0.9rem'
+              }}
+            />
+          </div>
+
+          {/* Filtro Sede */}
+          <select
+            value={selectedSede}
+            onChange={(e) => setSelectedSede(e.target.value)}
+            style={{ padding: '0.55rem 0.9rem', borderRadius: '8px', border: '1px solid var(--border-subtle, #cbd5e1)', background: 'var(--bg-card, #ffffff)', color: 'var(--text-main, #0f172a)', fontWeight: 600, fontSize: '0.85rem' }}
+          >
+            <option value="Todas">🌍 Todas las Sedes</option>
+            <option value="Quito">🇪🇨 Quito</option>
+            <option value="Guayaquil">🇪🇨 Guayaquil</option>
+            <option value="Cuenca">🇪🇨 Cuenca</option>
+            <option value="Lima">🇵🇪 Lima</option>
+            <option value="Medellín">🇨🇴 Medellín</option>
+            <option value="México">🇲🇽 México</option>
+          </select>
+
+          {/* Filtro Experiencia */}
+          <select
+            value={selectedEdicion}
+            onChange={(e) => setSelectedEdicion(e.target.value)}
+            style={{ padding: '0.55rem 0.9rem', borderRadius: '8px', border: '1px solid var(--border-subtle, #cbd5e1)', background: 'var(--bg-card, #ffffff)', color: 'var(--text-main, #0f172a)', fontWeight: 600, fontSize: '0.85rem' }}
+          >
+            <option value="Todas">⭐ Toda Experiencia</option>
+            <option value="senior">🏆 Líderes Senior (+9 a +15 ed.)</option>
+            <option value="intermedio">✨ 1 a 8 Ediciones</option>
+            <option value="reciente">🌱 Graduados Recientes</option>
+          </select>
+        </div>
+
+        {/* Vista Toggle & Contador */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted, #64748b)' }}>
+            Mostrando {filteredMembers.length} de {members.length}
+          </span>
+          <div style={{ display: 'flex', border: '1px solid var(--border-subtle, #cbd5e1)', borderRadius: '8px', overflow: 'hidden' }}>
+            <button 
+              onClick={() => setViewMode('grid')}
+              style={{ background: viewMode === 'grid' ? '#3b82f6' : 'transparent', color: viewMode === 'grid' ? '#fff' : 'var(--text-muted, #64748b)', border: 'none', padding: '0.45rem 0.75rem', cursor: 'pointer' }}
+              title="Vista de Cuadrícula"
+            >
+              <Grid size={16} />
+            </button>
+            <button 
+              onClick={() => setViewMode('table')}
+              style={{ background: viewMode === 'table' ? '#3b82f6' : 'transparent', color: viewMode === 'table' ? '#fff' : 'var(--text-muted, #64748b)', border: 'none', padding: '0.45rem 0.75rem', cursor: 'pointer' }}
+              title="Vista de Tabla"
+            >
+              <List size={16} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* CONTENIDO PRINCIPAL */}
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: '4rem 1rem', color: 'var(--crear-gold, #f59e0b)', fontWeight: 700 }}>
+          <RefreshCw size={32} className="animate-spin" style={{ animation: 'spin 1s linear infinite', margin: '0 auto 1rem' }} />
+          <div>Cargando e integrando directorio de Quantum Team desde Google Sheets...</div>
+        </div>
+      ) : filteredMembers.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: '4rem 1rem', background: 'var(--bg-card, #ffffff)', borderRadius: '16px', border: '1px solid var(--border-subtle, #e2e8f0)' }}>
+          <Users size={48} style={{ color: 'var(--text-muted, #64748b)', marginBottom: '1rem' }} />
+          <h3 style={{ margin: '0 0 0.5rem', fontWeight: 700 }}>No se encontraron integrantes de Quantum Team</h3>
+          <p style={{ margin: 0, color: 'var(--text-muted, #64748b)', fontSize: '0.9rem' }}>Intenta cambiando los filtros o la búsqueda.</p>
+        </div>
+      ) : viewMode === 'grid' ? (
+        /* VISTA DE CUADRÍCULA (CARDS) */
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '1.25rem' }}>
+          {filteredMembers.map((m) => (
+            <div 
+              key={m.id}
+              style={{
+                background: 'var(--bg-card, #ffffff)',
+                borderRadius: '14px',
+                border: '1px solid',
+                borderColor: m.isSenior ? 'rgba(245, 158, 11, 0.4)' : 'var(--border-subtle, #e2e8f0)',
+                padding: '1.4rem',
+                boxShadow: '0 4px 14px rgba(0,0,0,0.03)',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                position: 'relative'
+              }}
+            >
+              {m.isSenior && (
+                <div style={{ position: 'absolute', top: '12px', right: '12px', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#fff', fontSize: '0.68rem', fontWeight: 800, padding: '2px 8px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
+                  <Award size={11} /> SENIOR
+                </div>
+              )}
+
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem', paddingRight: m.isSenior ? '60px' : '0' }}>
+                  <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-heading, #0f172a)' }}>
+                    {m.nombre}
+                  </h3>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.85rem', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '0.75rem', background: '#e0f2fe', color: '#0369a1', padding: '2px 8px', borderRadius: '12px', display: 'inline-flex', alignItems: 'center', gap: '0.2rem', fontWeight: 700 }}>
+                    <CountryFlag sede={m.sede} /> {m.sede}
+                  </span>
+                  <span style={{ fontSize: '0.75rem', background: '#f1f5f9', color: '#475569', padding: '2px 8px', borderRadius: '12px', fontWeight: 600 }}>
+                    {m.docTipo}: {m.docNumero}
+                  </span>
+                  {m.talla && (
+                    <span style={{ fontSize: '0.75rem', background: '#fef3c7', color: '#b45309', padding: '2px 8px', borderRadius: '12px', fontWeight: 700 }}>
+                      Talla: {m.talla}
+                    </span>
+                  )}
+                </div>
+
+                <div style={{ fontSize: '0.82rem', color: 'var(--text-muted, #64748b)', marginBottom: '0.85rem' }}>
+                  <strong>Ediciones:</strong> {m.ediciones}
+                </div>
+
+                {m.declaracion && (
+                  <div style={{ background: 'var(--bg-card-hover, #f8fafc)', padding: '0.85rem', borderRadius: '8px', borderLeft: '3px solid var(--crear-gold, #f59e0b)', marginBottom: '1rem', fontStyle: 'italic', fontSize: '0.83rem', color: 'var(--text-main, #334155)', lineHeight: '1.4' }}>
+                    "{m.declaracion}"
+                  </div>
+                )}
+              </div>
+
+              <div style={{ borderTop: '1px solid var(--border-subtle, #e2e8f0)', paddingTop: '0.9rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  {m.whatsappUrl && (
+                    <a 
+                      href={m.whatsappUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="btn-secondary"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', padding: '0.35rem 0.75rem', borderRadius: '6px', fontSize: '0.78rem', background: '#dcfce7', color: '#15803d', border: 'none', fontWeight: 700, textDecoration: 'none' }}
+                      title="Abrir WhatsApp"
+                    >
+                      <Phone size={13} /> WhatsApp
+                    </a>
+                  )}
+
+                  {m.instagramUrl && (
+                    <a 
+                      href={m.instagramUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="btn-secondary"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', padding: '0.35rem 0.75rem', borderRadius: '6px', fontSize: '0.78rem', background: '#fdf2f8', color: '#be185d', border: 'none', fontWeight: 700, textDecoration: 'none' }}
+                      title="Ver Instagram"
+                    >
+                      <InstagramIcon size={13} /> {m.instagram}
+                    </a>
+                  )}
+                </div>
+
+                {m.email && (
+                  <a 
+                    href={`mailto:${m.email}`}
+                    style={{ fontSize: '0.78rem', color: 'var(--text-muted, #64748b)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+                    title={m.email}
+                  >
+                    <Mail size={13} /> Contactar
+                  </a>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        /* VISTA DE TABLA */
+        <div className="glass-panel" style={{ overflowX: 'auto', borderRadius: '14px', background: 'var(--bg-card, #ffffff)', border: '1px solid var(--border-subtle, #e2e8f0)', boxShadow: '0 4px 14px rgba(0,0,0,0.03)' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
+            <thead>
+              <tr style={{ background: 'var(--bg-card-hover, #f8fafc)', borderBottom: '2px solid var(--border-subtle, #e2e8f0)' }}>
+                <th style={{ padding: '0.9rem 1rem', fontWeight: 700 }}>#</th>
+                <th style={{ padding: '0.9rem 1rem', fontWeight: 700 }}>Nombre & Sede</th>
+                <th style={{ padding: '0.9rem 1rem', fontWeight: 700 }}>Documento</th>
+                <th style={{ padding: '0.9rem 1rem', fontWeight: 700 }}>Ediciones en QT</th>
+                <th style={{ padding: '0.9rem 1rem', fontWeight: 700 }}>Talla</th>
+                <th style={{ padding: '0.9rem 1rem', fontWeight: 700 }}>Instagram</th>
+                <th style={{ padding: '0.9rem 1rem', fontWeight: 700 }}>Contacto</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredMembers.map((m, idx) => (
+                <tr key={m.id} style={{ borderBottom: '1px solid var(--border-subtle, #f1f5f9)' }}>
+                  <td style={{ padding: '0.85rem 1rem', color: 'var(--text-muted, #64748b)' }}>{idx + 1}</td>
+                  <td style={{ padding: '0.85rem 1rem' }}>
+                    <div style={{ fontWeight: 700, color: 'var(--text-heading, #0f172a)' }}>{m.nombre}</div>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--text-muted, #64748b)', display: 'flex', alignItems: 'center', gap: '0.3rem', marginTop: '2px' }}>
+                      <CountryFlag sede={m.sede} /> {m.sede}
+                    </div>
+                  </td>
+                  <td style={{ padding: '0.85rem 1rem', color: 'var(--text-main, #334155)' }}>
+                    {m.docTipo}: {m.docNumero}
+                  </td>
+                  <td style={{ padding: '0.85rem 1rem' }}>
+                    <span style={{ fontSize: '0.8rem', background: m.isSenior ? '#fef3c7' : '#f1f5f9', color: m.isSenior ? '#b45309' : '#475569', padding: '2px 8px', borderRadius: '10px', fontWeight: m.isSenior ? 700 : 500 }}>
+                      {m.ediciones}
+                    </span>
+                  </td>
+                  <td style={{ padding: '0.85rem 1rem', fontWeight: 700 }}>{m.talla || '-'}</td>
+                  <td style={{ padding: '0.85rem 1rem' }}>
+                    {m.instagram ? (
+                      <a href={m.instagramUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#be185d', textDecoration: 'none', fontWeight: 600 }}>
+                        {m.instagram}
+                      </a>
+                    ) : '-'}
+                  </td>
+                  <td style={{ padding: '0.85rem 1rem' }}>
+                    <div style={{ display: 'flex', gap: '0.4rem' }}>
+                      {m.whatsappUrl && (
+                        <a href={m.whatsappUrl} target="_blank" rel="noopener noreferrer" style={{ background: '#dcfce7', color: '#15803d', padding: '4px 8px', borderRadius: '6px', textDecoration: 'none', fontWeight: 700, fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
+                          <Phone size={11} /> Chat
+                        </a>
+                      )}
+                      {m.email && (
+                        <a href={`mailto:${m.email}`} style={{ background: '#f1f5f9', color: '#334155', padding: '4px 8px', borderRadius: '6px', textDecoration: 'none', fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
+                          <Mail size={11} /> Mail
+                        </a>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}

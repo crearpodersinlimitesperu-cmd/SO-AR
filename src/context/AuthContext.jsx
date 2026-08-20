@@ -4,9 +4,10 @@ import { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from
 import { collection, query, where, getDocs, doc, getDoc, setDoc, serverTimestamp, addDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { normalizeRole, ROLE_DISPLAY_NAMES } from '../data/usersData';
-import { isSuperAdminEmail, isDireccionRole } from '../config/permissions';
+import { isSuperAdminEmail, isDireccionRole, isGerenciaRole, canSimulate } from '../config/permissions';
 import { USERS_TO_IMPORT } from '../data/usersToImport';
 import { useUI } from './UIContext';
+import { recordAuditEvent, fetchNetworkInfo } from '../services/auditService';
 
 const AuthContext = createContext();
 
@@ -21,38 +22,83 @@ export function AuthProvider({ children }) {
     sessionStorage.setItem('cpsl_active_role', canonicalNewRole);
     setCurrentUser(prev => {
       if (!prev) return null;
-      return {
+      const isConsolidated = canonicalNewRole === 'consolidado';
+      const userRoles = prev.roles || [prev.appRole || ''];
+      const hasDireccion = userRoles.some(r => isDireccionRole(r)) || isDireccionRole(prev.role) || isDireccionRole(prev.rawRole);
+      const hasGerente = userRoles.some(r => isGerenciaRole(r)) || isGerenciaRole(prev.role);
+      const isSuper = prev.isSuperAdmin || isSuperAdminEmail(prev.email);
+
+      const isDireccion = isSuper || (isConsolidated ? hasDireccion : isDireccionRole(canonicalNewRole));
+      const isGerente = isSuper || isDireccion || (isConsolidated ? (hasGerente || hasDireccion) : (canonicalNewRole === 'gerente' || canonicalNewRole === 'director_maestria'));
+
+      const updated = {
         ...prev,
         activeRole: canonicalNewRole,
-        appRole: canonicalNewRole
+        appRole: canonicalNewRole,
+        isConsolidatedView: isConsolidated,
+        isDireccion,
+        isGerente,
+        isSuperAdmin: isSuper
       };
+
+      recordAuditEvent({
+        email: prev.email || '',
+        name: prev.name || prev.displayName || 'Usuario',
+        role: canonicalNewRole,
+        sede: prev.sede || 'Global',
+        action: 'CAMBIO_ROL',
+        details: `Cambió de rol activo a: ${ROLE_DISPLAY_NAMES[canonicalNewRole] || canonicalNewRole}`
+      });
+
+      return updated;
     });
     showToast(`Rol activo cambiado a: ${ROLE_DISPLAY_NAMES[canonicalNewRole] || canonicalNewRole}`, 'info');
   };
 
   const simulateUser = (targetUser) => {
-    if (!currentUser?.isSuperAdmin) {
+    if (!canSimulate(currentUser, originalAdminUser)) {
       showToast('Acceso Denegado: Solo el Super Administrador puede simular usuarios.', 'error');
       return;
     }
     setOriginalAdminUser(currentUser);
+    sessionStorage.removeItem('cpsl_active_role');
     
+    const targetEmail = targetUser.emails?.[0] || targetUser.email || '';
     const mockAuthUser = {
-      email: targetUser.emails?.[0] || targetUser.email || '',
+      email: targetEmail,
       displayName: targetUser.name,
       uid: targetUser.id || 'simulated_uid'
     };
 
-    const simulatedUser = buildUserObject(mockAuthUser, targetUser, mockAuthUser.email);
+    const simulatedUser = buildUserObject(mockAuthUser, targetUser, targetEmail);
     setCurrentUser({
       ...simulatedUser,
       isSimulated: true
     });
+
+    recordAuditEvent({
+      email: targetEmail,
+      name: targetUser.name,
+      role: targetUser.role || 'miembro',
+      sede: targetUser.sede || 'Global',
+      action: 'SIMULACION',
+      details: `Simulado por Administrador (${currentUser?.email})`
+    });
+
     showToast(`Iniciando simulación como ${targetUser.name}`, 'success');
   };
 
   const stopSimulation = () => {
     if (originalAdminUser) {
+      sessionStorage.removeItem('cpsl_active_role');
+      recordAuditEvent({
+        email: originalAdminUser.email || '',
+        name: originalAdminUser.name || 'Admin',
+        role: originalAdminUser.appRole || 'direccion',
+        sede: originalAdminUser.sede || 'Global',
+        action: 'FIN_SIMULACION',
+        details: 'Fin de sesión simulada'
+      });
       setCurrentUser(originalAdminUser);
       setOriginalAdminUser(null);
       showToast('Simulación terminada. Bienvenido de vuelta, Admin.', 'success');
@@ -61,20 +107,34 @@ export function AuthProvider({ children }) {
 
   const buildUserObject = (user, foundUser, normalizedEmail) => {
     const canonicalRole = normalizeRole(foundUser.role);
-    const isDireccion = isDireccionRole(canonicalRole);
-    const isSuperAdmin = isSuperAdminEmail(normalizedEmail);
-    const isGerente = isSuperAdmin || isDireccion || canonicalRole === 'gerente';
+    const isSuperAdmin = isSuperAdminEmail(normalizedEmail) || isSuperAdminEmail(foundUser.email);
 
-    // Obtener todos los roles asignados a esta persona
-    const assignedRoles = (foundUser.roles && foundUser.roles.length > 0)
-      ? Array.from(new Set(foundUser.roles.map(r => normalizeRole(r))))
-      : [canonicalRole];
+    // Get all roles
+    let assignedRoles = [canonicalRole];
+    if (foundUser.roles && foundUser.roles.length > 0) {
+      assignedRoles = foundUser.roles.map(r => normalizeRole(r));
+    }
+    // ensure unique
+    assignedRoles = Array.from(new Set(assignedRoles.filter(r => r && r !== 'miembro')));
+    if (assignedRoles.length === 0) assignedRoles = ['miembro'];
 
-    // Verificar si el usuario tenía un rol activo previamente guardado
+    const hasDireccion = assignedRoles.some(r => isDireccionRole(r)) || isDireccionRole(canonicalRole);
+    const hasGerente = assignedRoles.some(r => isGerenciaRole(r)) || isGerenciaRole(canonicalRole);
+
     const savedActiveRole = sessionStorage.getItem('cpsl_active_role');
-    const activeRole = (savedActiveRole && assignedRoles.includes(savedActiveRole))
-      ? savedActiveRole
-      : canonicalRole;
+    const isConsolidated = savedActiveRole === 'consolidado';
+    
+    let activeRole = canonicalRole;
+    if (isConsolidated) {
+      activeRole = 'consolidado';
+    } else if (savedActiveRole && assignedRoles.includes(savedActiveRole)) {
+      activeRole = savedActiveRole;
+    } else if (assignedRoles.length > 0) {
+      activeRole = assignedRoles[0];
+    }
+
+    const isDireccion = isSuperAdmin || (isConsolidated ? hasDireccion : isDireccionRole(activeRole));
+    const isGerente = isSuperAdmin || isDireccion || (isConsolidated ? (hasGerente || hasDireccion) : (activeRole === 'gerente' || activeRole === 'director_maestria'));
 
     return {
       ...user,
@@ -82,23 +142,16 @@ export function AuthProvider({ children }) {
       appRole: activeRole,
       activeRole: activeRole,
       roles: assignedRoles,
-      rawRole: foundUser.role,
-      sede: foundUser.sede,
-      sedeTag: foundUser.sedeTag,
-      corporateEmail: foundUser.corporateEmail || (foundUser.email?.endsWith('@crearpsl.net') ? foundUser.email : null),
-      personalEmail: foundUser.personalEmail || (!foundUser.email?.endsWith('@crearpsl.net') ? foundUser.email : null),
-      emails: foundUser.emails || [foundUser.email],
-      docType: foundUser.docType,
-      docNum: foundUser.docNum,
-      phone: foundUser.phone,
+      isConsolidatedView: isConsolidated,
+      isGerente,
       isSuperAdmin,
       isDireccion,
-      isGerente,
-      switchRole,
-      canAccessRole: (targetRole) => {
-        const tNorm = normalizeRole(targetRole);
-        return isSuperAdmin || isGerente || assignedRoles.includes(tNorm) || activeRole === tNorm;
-      }
+      sede: foundUser.sede || 'Global',
+      document: foundUser.document || '',
+      docType: foundUser.docType || '',
+      dbId: foundUser.id,
+      rawRole: foundUser.role,
+      role: canonicalRole
     };
   };
 
@@ -140,8 +193,6 @@ export function AuthProvider({ children }) {
       }
 
       if (!foundUser) {
-        // BYPASS DE SEGURIDAD TEMPORAL: Permitir ingreso a CUALQUIER correo
-        // mientras se procesa el excel global que no pudo cargarse por falta de memoria.
         foundUser = {
           id: normalizedEmail.split('@')[0].replace('.', '_'),
           name: user.displayName || "Usuario",
@@ -150,11 +201,20 @@ export function AuthProvider({ children }) {
           emails: [normalizedEmail],
           email: normalizedEmail
         };
-        console.warn("Usuario no encontrado en BD. Creando perfil temporal de Colaborador para: " + normalizedEmail);
       }
 
       const userObj = buildUserObject(user, foundUser, normalizedEmail);
       setCurrentUser(userObj);
+
+      recordAuditEvent({
+        email: normalizedEmail,
+        name: userObj.name,
+        role: userObj.appRole,
+        sede: userObj.sede,
+        action: 'LOGIN',
+        details: 'Inicio de sesión con Google'
+      });
+
       return user;
     } catch (error) {
       console.error("Error signing in with Google", error);
@@ -162,38 +222,18 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const fetchNetworkData = async () => {
-    try {
-      const res = await fetch('https://ipapi.co/json/');
-      if (!res.ok) return { ip: 'Desconocida', location: 'Desconocida' };
-      const data = await res.json();
-      return {
-        ip: data.ip || 'Desconocida',
-        location: data.city && data.country_name ? `${data.city}, ${data.country_name}` : 'Desconocida'
-      };
-    } catch (error) {
-      return { ip: 'Desconocida', location: 'Desconocida' };
-    }
-  };
-
   const logout = async () => {
     if (currentUser && !currentUser.isSimulated) {
       try {
-        const netData = await fetchNetworkData();
-        await addDoc(collection(db, 'audit_logs'), {
+        await recordAuditEvent({
           email: currentUser.email || currentUser.emails?.[0] || 'Desconocido',
           name: currentUser.name || 'Desconocido',
           role: currentUser.appRole || 'Desconocido',
           sede: currentUser.sede || 'Desconocida',
           action: 'LOGOUT',
-          timestamp: serverTimestamp(),
-          ip: netData.ip,
-          location: netData.location,
-          userAgent: navigator.userAgent
+          details: 'Cierre de sesión manual'
         });
-      } catch (e) {
-        console.error("Error registrando LOGOUT en audit_logs:", e);
-      }
+      } catch (e) {}
     }
     sessionStorage.removeItem('googleAccessToken');
     sessionStorage.removeItem('cpsl_active_role');
@@ -214,12 +254,19 @@ export function AuthProvider({ children }) {
           console.error("Error de auth con Firestore:", e);
         }
         
+        if (!foundUser) {
+          foundUser = USERS_TO_IMPORT.find(u => 
+            (u.emails && u.emails.map(e => e.toLowerCase()).includes(normalizedEmail)) || 
+            (u.email && u.email.toLowerCase() === normalizedEmail)
+          );
+        }
+        
         if (!foundUser && isSuperAdminEmail(normalizedEmail)) {
           foundUser = {
             id: normalizedEmail.split('@')[0].replace('.', '_'),
             name: user.displayName || "Administrador",
-            role: "direccion",
-            sede: "Sede Global",
+            role: "gerente",
+            sede: "Global",
             emails: [normalizedEmail]
           };
         }
@@ -228,64 +275,22 @@ export function AuthProvider({ children }) {
           const userObj = buildUserObject(user, foundUser, normalizedEmail);
           setCurrentUser(userObj);
           
-          // Registrar último login para el sistema de inactividad
+          // Registrar último login y auditoría
           try {
-            const userProfileRef = doc(db, 'user_profiles', normalizedEmail);
-            const userProfileSnap = await getDoc(userProfileRef);
-            
-            if (userProfileSnap.exists()) {
-              const profileData = userProfileSnap.data();
-              if (profileData.lastLoginAt) {
-                const lastLogin = profileData.lastLoginAt.toDate();
-                const now = new Date();
-                const diffHours = (now - lastLogin) / (1000 * 60 * 60);
-                
-                // Si la diferencia es mayor a 72 horas, enviamos alerta
-                if (diffHours > 72) {
-                  await addDoc(collection(db, 'mail'), {
-                    to: 'sistemas@crearpsl.net',
-                    message: {
-                      subject: `⚠️ Alerta de Inactividad: ${foundUser.name}`,
-                      html: `<h2>Alerta de Inactividad en SO-AR</h2>
-                             <p>El usuario <strong>${foundUser.name}</strong> (${normalizedEmail}) acaba de ingresar a la plataforma después de <strong>${Math.floor(diffHours)} horas</strong> de inactividad.</p>
-                             <p>Rol: ${foundUser.role || 'Desconocido'}</p>
-                             <p>Sede: ${foundUser.sede || 'Desconocida'}</p>
-                             <hr/>
-                             <p><small>Sistema Automático de Alertas SO-AR</small></p>`
-                    }
-                  });
-                }
-              }
-            }
-
-            await setDoc(userProfileRef, {
-              lastLoginAt: serverTimestamp()
-            }, { merge: true });
-
-            // Registrar evento de auditoría
-            try {
-              // Evitar doble log si la sesión ya estaba iniciada y onAuthStateChanged se dispara de nuevo
-              const sessionLogKey = `audit_login_${normalizedEmail}`;
-              if (!sessionStorage.getItem(sessionLogKey)) {
-                const netData = await fetchNetworkData();
-                await addDoc(collection(db, 'audit_logs'), {
-                  email: normalizedEmail,
-                  name: foundUser.name || user.displayName || 'Desconocido',
-                  role: foundUser.role || 'Desconocido',
-                  sede: foundUser.sede || 'Desconocida',
-                  action: 'LOGIN',
-                  timestamp: serverTimestamp(),
-                  ip: netData.ip,
-                  location: netData.location,
-                  userAgent: navigator.userAgent
-                });
-                sessionStorage.setItem(sessionLogKey, 'true');
-              }
-            } catch (e) {
-              console.error("Error registrando LOGIN en audit_logs:", e);
+            const sessionLogKey = `audit_login_${normalizedEmail}`;
+            if (!sessionStorage.getItem(sessionLogKey)) {
+              await recordAuditEvent({
+                email: normalizedEmail,
+                name: foundUser.name || user.displayName || 'Desconocido',
+                role: foundUser.role || 'Desconocido',
+                sede: foundUser.sede || 'Desconocida',
+                action: 'LOGIN',
+                details: 'Inicio de sesión / Reconexión'
+              });
+              sessionStorage.setItem(sessionLogKey, 'true');
             }
           } catch(e) {
-            console.error("Error actualizando lastLoginAt:", e);
+            console.error("Error actualizando login en auditoría:", e);
           }
         } else {
           sessionStorage.removeItem('googleAccessToken');

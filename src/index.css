@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;600;700;800;900&display=swap');
 
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 :root {
   --crear-gold: #ffb703;
   --crear-gold-hover: #ffc933;
@@ -59,16 +63,21 @@
   --bg-card-hover: #f8fafc;
   --bg-glass-heavy: rgba(255, 255, 255, 0.98);
   
-  --border-subtle: rgba(0, 0, 0, 0.12);
-  --border-strong: rgba(0, 0, 0, 0.25);
+  --border-subtle: rgba(15, 23, 42, 0.12);
+  --border-strong: rgba(15, 23, 42, 0.28);
   
   --text-main: #0f172a;
   --text-muted: #475569;
-  --text-heading: #0f172a;
+  --text-heading: #090e17;
   --text-inverted: #ffffff;
   
   --card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
   --card-shadow-hover: 0 12px 30px -4px rgba(0, 0, 0, 0.12), 0 0 15px rgba(0, 180, 216, 0.2);
+}
+
+[data-theme="light"] body {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
 }
 
 [data-theme="light"] input,
@@ -76,7 +85,7 @@
 [data-theme="light"] textarea {
   background-color: #ffffff !important;
   color: #0f172a !important;
-  border-color: rgba(0, 0, 0, 0.2) !important;
+  border: 1px solid rgba(15, 23, 42, 0.25) !important;
 }
 
 [data-theme="light"] input::placeholder,
@@ -91,13 +100,66 @@
 
 [data-theme="light"] .glass-panel {
   background: #ffffff !important;
-  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+  border: 1px solid rgba(15, 23, 42, 0.12) !important;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06) !important;
-  color: #0f172a;
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .glass-panel p,
+[data-theme="light"] .glass-panel li {
+  color: #1e293b;
+}
+
+[data-theme="light"] .glass-panel h1,
+[data-theme="light"] .glass-panel h2,
+[data-theme="light"] .glass-panel h3:not([class*="text-"]):not([style*="color: var("]):not([style*="color: #"]):not([style*="color: rgb("]),
+[data-theme="light"] .glass-panel h4:not([class*="text-"]):not([style*="color: var("]):not([style*="color: #"]):not([style*="color: rgb("]),
+[data-theme="light"] .glass-panel h5,
+[data-theme="light"] .glass-panel h6 {
+  color: #0f172a !important;
 }
 
 [data-theme="light"] .text-white {
   color: #0f172a !important;
+}
+
+[data-theme="light"] .text-muted {
+  color: #475569 !important;
+}
+
+[data-theme="light"] .text-gold {
+  color: #b45309 !important;
+}
+
+[data-theme="light"] .btn-secondary {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid rgba(15, 23, 42, 0.2) !important;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.04) !important;
+}
+
+[data-theme="light"] .btn-secondary:hover {
+  background: #f1f5f9 !important;
+  border-color: #0f172a !important;
+  color: #000000 !important;
+}
+
+/* Fallback override for any inline translucent white colors in light mode */
+[data-theme="light"] [style*="color: rgba(255,255,255,"],
+[data-theme="light"] [style*="color: rgba(255, 255, 255,"],
+[data-theme="light"] [style*="color: rgb(255, 255, 255)"],
+[data-theme="light"] [style*="color: #ffffff"],
+[data-theme="light"] [style*="color: #fff"] {
+  color: #0f172a !important;
+}
+
+/* Ensure light backgrounds for elements with dark translucent styles */
+[data-theme="light"] [style*="background: rgba(0,0,0,"],
+[data-theme="light"] [style*="background: rgba(0, 0, 0,"],
+[data-theme="light"] [style*="background: rgba(255,255,255,0.03)"],
+[data-theme="light"] [style*="background: rgba(255, 255, 255, 0.03)"] {
+  background: #f8fafc !important;
+  border-color: rgba(15, 23, 42, 0.1) !important;
 }
 
 body {

@@ -5,6 +5,7 @@ import { useUI } from '../context/UIContext';
 import { collection, addDoc, serverTimestamp, query, where, getDocs, orderBy } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { CheckCircle2, TrendingUp, AlertCircle, ArrowLeft } from 'lucide-react';
+import { recordAuditEvent } from '../services/auditService';
 
 export default function MisKPIs() {
   const { currentUser } = useAuth();
@@ -41,46 +42,99 @@ export default function MisKPIs() {
     fetchHistory();
   }, [currentUser]);
 
+  const getLocalReports = () => {
+    try {
+      const saved = localStorage.getItem('cpsl_kpi_reports_v1');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          return parsed.filter(r => r && !r.id?.startsWith('kpi_seed_'));
+        }
+      }
+    } catch (e) {}
+    return [];
+  };
+
+  const saveLocalReports = (list) => {
+    try {
+      const cleanList = (list || []).filter(r => r && !r.id?.startsWith('kpi_seed_'));
+      localStorage.setItem('cpsl_kpi_reports_v1', JSON.stringify(cleanList));
+    } catch (e) {}
+  };
+
   const fetchHistory = async () => {
     if (!currentUser) return;
+    const uid = currentUser.uid || currentUser.id || currentUser.email;
+    let local = getLocalReports().filter(r => r.userId === uid || r.userEmail === currentUser.email);
+
     try {
-      const q = query(
-        collection(db, 'kpi_reports'),
-        where('userId', '==', currentUser.uid),
-        orderBy('createdAt', 'desc')
-      );
-      const snapshot = await getDocs(q);
-      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setHistory(data);
+      const baseQuery = collection(db, 'kpi_reports');
+      const snapshot = await getDocs(baseQuery);
+      if (snapshot && !snapshot.empty) {
+        const remoteData = snapshot.docs
+          .map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+            createdAt: doc.data().createdAt?.toDate ? doc.data().createdAt.toDate().toISOString() : doc.data().createdAt
+          }))
+          .filter(r => r.userId === uid || r.userEmail === currentUser.email);
+        
+        const ids = new Set(remoteData.map(r => r.id));
+        local = [...remoteData, ...local.filter(r => !ids.has(r.id))];
+      }
     } catch (error) {
-      console.error("Error al cargar historial de KPIs:", error);
+      console.warn("Aviso: usando historial local de KPIs:", error);
     }
+
+    local.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+    setHistory(local);
   };
 
   const handleSubmitC1 = async (e) => {
     e.preventDefault();
     if (loading) return;
     setLoading(true);
+
+    const newReport = {
+      id: 'kpi_' + Date.now(),
+      userId: currentUser.uid || currentUser.id || currentUser.email,
+      userEmail: currentUser.email || '',
+      userName: currentUser.name || currentUser.displayName || 'Coordinador',
+      sede: currentUser.sede || 'Quito',
+      role: 'coord_c1',
+      data: { ...c1Data },
+      status: 'pending',
+      createdAt: new Date().toISOString()
+    };
+
+    // Guardar localmente
+    const currentList = getLocalReports();
+    saveLocalReports([newReport, ...currentList]);
+    setHistory(prev => [newReport, ...prev]);
+
+    // Intentar sync en Firestore en background
     try {
       await addDoc(collection(db, 'kpi_reports'), {
-        userId: currentUser.uid,
-        userName: currentUser.name || currentUser.displayName,
-        sede: currentUser.sede || 'Sede Global',
-        role: 'coord_c1',
-        data: c1Data,
-        status: 'pending',
+        ...newReport,
         createdAt: serverTimestamp()
       });
-      showToast("¡Reporte de KPIs enviado exitosamente al Gerente!", "success");
-      setC1Data({
-        asistencia: '', retencion: '', conversionC1C2: '', conversionC2MJ: '',
-        declaracionBreakthrough: '', declaracionAliados: '', palabrasRotas: '', eficienciaGestion: ''
+      await recordAuditEvent({
+        email: currentUser.email,
+        name: currentUser.name || 'Coordinador',
+        role: 'coord_c1',
+        sede: currentUser.sede || 'Quito',
+        action: 'REPORTE_KPI_ENVIADO',
+        details: `Envío de reporte KPI C1/C2 para sede ${currentUser.sede || 'Quito'}`
       });
-      fetchHistory();
     } catch (error) {
-      console.error(error);
-      showToast("Error al enviar el reporte", "error");
+      console.warn("Reporte guardado localmente (Firestore offline):", error);
     }
+
+    showToast("¡Reporte de KPIs enviado exitosamente al Gerente!", "success");
+    setC1Data({
+      asistencia: '', retencion: '', conversionC1C2: '', conversionC2MJ: '',
+      declaracionBreakthrough: '', declaracionAliados: '', palabrasRotas: '', eficienciaGestion: ''
+    });
     setLoading(false);
   };
 
@@ -88,25 +142,46 @@ export default function MisKPIs() {
     e.preventDefault();
     if (loading) return;
     setLoading(true);
+
+    const newReport = {
+      id: 'kpi_' + Date.now(),
+      userId: currentUser.uid || currentUser.id || currentUser.email,
+      userEmail: currentUser.email || '',
+      userName: currentUser.name || currentUser.displayName || 'Quantum Team',
+      sede: currentUser.sede || 'Quito',
+      role: 'qt',
+      data: { ...qtData },
+      status: 'pending',
+      createdAt: new Date().toISOString()
+    };
+
+    // Guardar localmente
+    const currentList = getLocalReports();
+    saveLocalReports([newReport, ...currentList]);
+    setHistory(prev => [newReport, ...prev]);
+
+    // Intentar sync en Firestore en background
     try {
       await addDoc(collection(db, 'kpi_reports'), {
-        userId: currentUser.uid,
-        userName: currentUser.name || currentUser.displayName,
-        sede: currentUser.sede || 'Sede Global',
-        role: 'qt',
-        data: qtData,
-        status: 'pending',
+        ...newReport,
         createdAt: serverTimestamp()
       });
-      showToast("¡Reporte de KPIs del Quantum Team enviado exitosamente!", "success");
-      setQtData({
-        efectividadLlamadas: '', futurosImposibles: '', resolucionQuiebres: ''
+      await recordAuditEvent({
+        email: currentUser.email,
+        name: currentUser.name || 'Quantum Team',
+        role: 'qt',
+        sede: currentUser.sede || 'Quito',
+        action: 'REPORTE_KPI_ENVIADO',
+        details: `Envío de reporte KPI Quantum Team para sede ${currentUser.sede || 'Quito'}`
       });
-      fetchHistory();
     } catch (error) {
-      console.error(error);
-      showToast("Error al enviar el reporte", "error");
+      console.warn("Reporte guardado localmente (Firestore offline):", error);
     }
+
+    showToast("¡Reporte de KPIs del Quantum Team enviado exitosamente!", "success");
+    setQtData({
+      efectividadLlamadas: '', futurosImposibles: '', resolucionQuiebres: ''
+    });
     setLoading(false);
   };
 

@@ -80,7 +80,7 @@ export function ChecklistProvider({ children }) {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [currentUser?.sede, currentUser?.email, currentUser?.appRole]);
 
   const toggleTask = async (taskId, currentStatus) => {
     try {

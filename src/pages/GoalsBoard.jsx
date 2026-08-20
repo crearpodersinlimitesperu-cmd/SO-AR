@@ -49,28 +49,63 @@ export default function GoalsBoard() {
 
 
   useEffect(() => {
-    const goalsRef = collection(db, 'goals');
-    let q;
-    
-    // Si no es SuperAdmin ni Dirección, filtrar solo las metas de su sede
-    if (!currentUser.isSuperAdmin && !currentUser.isDireccion && currentUser.sede) {
-      q = query(
-        goalsRef, 
-        where('sede', '==', currentUser.sede.trim()),
-        orderBy('createdAt', 'desc')
-      );
-    } else {
-      // SuperAdmin o Dirección ven todas las metas
-      q = query(goalsRef, orderBy('createdAt', 'desc'));
+    // Cargar caché local inmediato si existe
+    try {
+      const cached = localStorage.getItem('cpsl_goals_cache');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setGoals(parsed);
+          setLoading(false);
+        }
+      }
+    } catch (e) {
+      console.warn("Error leyendo cpsl_goals_cache:", e);
     }
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const loadedGoals = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-      setGoals(loadedGoals);
+    const goalsRef = collection(db, 'goals');
+
+    const unsubscribe = onSnapshot(
+      goalsRef,
+      (snapshot) => {
+        let loadedGoals = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        
+        // Ordenar en memoria por createdAt descendente
+        loadedGoals.sort((a, b) => {
+          const dateA = new Date(a.createdAt || 0).getTime();
+          const dateB = new Date(b.createdAt || 0).getTime();
+          return dateB - dateA;
+        });
+
+        // Filtrar por sede si no es SuperAdmin ni Dirección
+        const isSuper = currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion' || currentUser?.isDireccion;
+        if (!isSuper && currentUser?.sede) {
+          const mySedeNorm = normalizeSede(currentUser.sede);
+          loadedGoals = loadedGoals.filter(g => !g.sede || normalizeSede(g.sede) === mySedeNorm || g.sede === 'Global');
+        }
+
+        setGoals(loadedGoals);
+        try {
+          localStorage.setItem('cpsl_goals_cache', JSON.stringify(loadedGoals));
+        } catch(e) {}
+        setLoading(false);
+      },
+      (error) => {
+        console.warn("Error en onSnapshot de goals (fallback a caché):", error);
+        setLoading(false);
+      }
+    );
+
+    // Timeout de seguridad: Si Firestore tarda más de 2.5s, quitar spinner
+    const timer = setTimeout(() => {
       setLoading(false);
-    });
-    return () => unsubscribe();
-  }, []);
+    }, 2500);
+
+    return () => {
+      unsubscribe();
+      clearTimeout(timer);
+    };
+  }, [currentUser?.sede, currentUser?.isSuperAdmin, currentUser?.appRole, currentUser?.isDireccion]);
 
   const handleWizardChange = (stageId, field, value) => {
     setWizardData(prev => ({
@@ -83,7 +118,10 @@ export default function GoalsBoard() {
     try {
       const batch = writeBatch(db);
       const cycleGoalRef = doc(collection(db, 'goals'));
-      const suffix = currentUser.sede === 'Quito' ? ` (${quitoCycle})` : '';
+      const suffix = currentUser?.sede === 'Quito' ? ` (${quitoCycle})` : '';
+      const currentUserId = currentUser?.uid || currentUser?.id || 'admin';
+      const currentUserName = currentUser?.displayName || currentUser?.name || 'Administrador';
+      const userSede = currentUser?.sede || '';
       
       // 1. Crear Meta Maestra del Ciclo
       batch.set(cycleGoalRef, {
@@ -94,9 +132,9 @@ export default function GoalsBoard() {
         currentValue: 0,
         scope: 'CICLO',
         parentId: null,
-        ownerId: currentUser.uid,
-        ownerName: currentUser.displayName,
-        sede: currentUser.sede || '',
+        ownerId: currentUserId,
+        ownerName: currentUserName,
+        sede: userSede,
         createdAt: new Date().toISOString()
       });
 
@@ -116,8 +154,8 @@ export default function GoalsBoard() {
              cyclePhase: phaseCode,
              parentId: cycleGoalRef.id,
              stage: stage.id,
-             ownerId: currentUser.uid,
-             sede: currentUser.sede || '',
+             ownerId: currentUserId,
+             sede: userSede,
              assignedCoordinators: [],
              createdAt: new Date().toISOString()
           });
@@ -133,8 +171,8 @@ export default function GoalsBoard() {
              cyclePhase: phaseCode,
              parentId: cycleGoalRef.id,
              stage: stage.id,
-             ownerId: currentUser.uid,
-             sede: currentUser.sede || '',
+             ownerId: currentUserId,
+             sede: userSede,
              assignedCoordinators: [],
              createdAt: new Date().toISOString()
           });
@@ -150,8 +188,8 @@ export default function GoalsBoard() {
              cyclePhase: phaseCode,
              parentId: cycleGoalRef.id,
              stage: stage.id,
-             ownerId: currentUser.uid,
-             sede: currentUser.sede || '',
+             ownerId: currentUserId,
+             sede: userSede,
              assignedCoordinators: [],
              createdAt: new Date().toISOString()
           });
@@ -167,8 +205,8 @@ export default function GoalsBoard() {
              cyclePhase: phaseCode,
              parentId: cycleGoalRef.id,
              stage: stage.id,
-             ownerId: currentUser.uid,
-             sede: currentUser.sede || '',
+             ownerId: currentUserId,
+             sede: userSede,
              assignedCoordinators: [],
              createdAt: new Date().toISOString()
           });
@@ -202,8 +240,8 @@ export default function GoalsBoard() {
         scope: 'DIARIA',
         cyclePhase: parentGoal?.cyclePhase || 'DIA',
         parentId: dailyData.parentId,
-        ownerId: currentUser.uid,
-        sede: currentUser.sede || '',
+        ownerId: currentUser?.uid || currentUser?.id || 'admin',
+        sede: currentUser?.sede || '',
         assignedCoordinators: [],
         createdAt: new Date().toISOString()
       });
@@ -595,7 +633,7 @@ export default function GoalsBoard() {
             <h2 className="text-gold" style={{ marginTop: 0 }}>Wizard: Setup de Ciclo</h2>
             <p className="text-muted">Define las metas de Entrenamiento para cada fase.</p>
             
-            {currentUser.sede === 'Quito' && (
+            {currentUser?.sede === 'Quito' && (
               <div style={{ marginTop: '1rem', padding: '1rem', background: 'rgba(255, 215, 0, 0.1)', borderRadius: '8px', border: '1px solid rgba(255, 215, 0, 0.3)' }}>
                 <label style={{ display: 'block', color: 'var(--crear-gold)', fontWeight: 'bold', marginBottom: '0.5rem' }}>Aplica para (Sede Quito):</label>
                 <select className="form-select" value={quitoCycle} onChange={e => setQuitoCycle(e.target.value)} style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', background: 'rgba(0,0,0,0.2)', color: 'white', border: '1px solid var(--border-subtle)' }}>

@@ -73,7 +73,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 1,
     "equipo": "TRINA MUNAY KI",
     "tieneEntrenador": "No",
-    "entrenador": "Erika Gavilnez",
+    "entrenador": "Erika Gavilanez",
     "coordinador": "MIGUEL TORRES",
     "sede": "Cuenca",
     "estado": "Graduado"
@@ -346,7 +346,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 3,
     "equipo": "TORA BUSHIDO",
     "tieneEntrenador": "SI",
-    "entrenador": "Erika Gavilnez",
+    "entrenador": "Erika Gavilanez",
     "coordinador": "DANIELA MONROY",
     "sede": "CDMX",
     "estado": "Activo"
@@ -697,7 +697,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 9,
     "equipo": "Fenixkingo",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilnez",
+    "entrenador": "Erika Gavilanez",
     "coordinador": "",
     "sede": "Sin Sede",
     "estado": "Graduado"
@@ -723,7 +723,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 10,
     "equipo": "UKA KALLPA",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilnez",
+    "entrenador": "Erika Gavilanez",
     "coordinador": "KERLY CARRILLO",
     "sede": "Cuenca",
     "estado": "Graduado"
@@ -918,7 +918,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 12,
     "equipo": "ANSTASIS",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilnez",
+    "entrenador": "Erika Gavilanez",
     "coordinador": "KERLY CARRILLO",
     "sede": "Cuenca",
     "estado": "Graduado"
@@ -1036,7 +1036,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "SIC PARVIS MAGNA",
     "tieneEntrenador": "SI",
     "entrenador": "Andres Idrobo",
-    "coordinador": "KERLY CARRILLO - JUANFER REINOSO",
+    "coordinador": "KERLY CARRILLO / JUAN FERNANDO REINOSO",
     "sede": "Cuenca",
     "estado": "Graduado"
   },
@@ -1048,8 +1048,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 13,
     "equipo": "SIC PARVIS MAGNA",
     "tieneEntrenador": "SI",
-    "entrenador": "Erika Gavilnez",
-    "coordinador": "KERLY CARRILLO - JUANFER REINOSO",
+    "entrenador": "Erika Gavilanez",
+    "coordinador": "KERLY CARRILLO / JUAN FERNANDO REINOSO",
     "sede": "Cuenca",
     "estado": "Graduado"
   },
@@ -1062,7 +1062,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "SIC PARVIS MAGNA",
     "tieneEntrenador": "SI",
     "entrenador": "Jose Sanchez",
-    "coordinador": "KERLY CARRILLO - JUANFER REINOSO",
+    "coordinador": "KERLY CARRILLO / JUAN FERNANDO REINOSO",
     "sede": "Cuenca",
     "estado": "Graduado"
   },
@@ -1113,7 +1113,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 13,
     "equipo": "WARANKA KALLPAWAN",
     "tieneEntrenador": "No",
-    "entrenador": "Chuy Acosta",
+    "entrenador": "Jesus Adrian Acosta",
     "coordinador": "",
     "sede": "Sin Sede",
     "estado": "Graduado"
@@ -1269,7 +1269,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 14,
     "equipo": "LEONKUNA",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilnez",
+    "entrenador": "Erika Gavilanez",
     "coordinador": "",
     "sede": "Sin Sede",
     "estado": "Graduado"
@@ -1347,7 +1347,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 15,
     "equipo": "DRAGONES CUNTICOS",
     "tieneEntrenador": "Sí",
-    "entrenador": "Erika Gavilnez",
+    "entrenador": "Erika Gavilanez",
     "coordinador": "",
     "sede": "Sin Sede",
     "estado": "Graduado"
@@ -1360,7 +1360,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 15,
     "equipo": "DRAGONES CUNTICOS",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramrez",
+    "entrenador": "Mauricio Ramirez",
     "coordinador": "",
     "sede": "Sin Sede",
     "estado": "Graduado"
@@ -1386,7 +1386,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 15,
     "equipo": "DRAGONES CUNTICOS",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramrez",
+    "entrenador": "Mauricio Ramirez",
     "coordinador": "",
     "sede": "Sin Sede",
     "estado": "Graduado"
@@ -1425,7 +1425,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 15,
     "equipo": "URUZ MERAKI",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilnez",
+    "entrenador": "Erika Gavilanez",
     "coordinador": "",
     "sede": "Sin Sede",
     "estado": "Graduado"
@@ -1438,7 +1438,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 15,
     "equipo": "URUZ MERAKI",
     "tieneEntrenador": "Si",
-    "entrenador": "Chuy Acosta",
+    "entrenador": "Jesus Adrian Acosta",
     "coordinador": "",
     "sede": "Sin Sede",
     "estado": "Graduado"
@@ -1464,7 +1464,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 15,
     "equipo": "LIDER-ATIK",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilnez",
+    "entrenador": "Erika Gavilanez",
     "coordinador": "JUAN FERNANDO REINOSO",
     "sede": "Cuenca",
     "estado": "Graduado"
@@ -1581,7 +1581,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 16,
     "equipo": "CERBERUS",
     "tieneEntrenador": "SI",
-    "entrenador": "Jesus Acosta",
+    "entrenador": "Jesus Adrian Acosta",
     "coordinador": "MAURICIO RAMIREZ",
     "sede": "Medellin",
     "estado": "Activo"
@@ -1594,7 +1594,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 16,
     "equipo": "CERBERUS",
     "tieneEntrenador": "SI",
-    "entrenador": "Jesus Acosta",
+    "entrenador": "Jesus Adrian Acosta",
     "coordinador": "MAURICIO RAMIREZ",
     "sede": "Medellin",
     "estado": "Activo"
@@ -1620,7 +1620,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 17,
     "equipo": "HATUM BRAHMA",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilnez",
+    "entrenador": "Erika Gavilanez",
     "coordinador": "",
     "sede": "Sin Sede",
     "estado": "Graduado"
@@ -1763,7 +1763,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 17,
     "equipo": "JAGUARES DE ORO",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilnez",
+    "entrenador": "Erika Gavilanez",
     "coordinador": "",
     "sede": "Sin Sede",
     "estado": "Graduado"
@@ -1777,7 +1777,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "JATARI",
     "tieneEntrenador": "SI",
     "entrenador": "Julio Narvaez",
-    "coordinador": "JUAN FER REINOSO",
+    "coordinador": "JUAN FERNANDO REINOSO",
     "sede": "Cuenca",
     "estado": "Graduado"
   },
@@ -1790,7 +1790,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "JATARI",
     "tieneEntrenador": "SI",
     "entrenador": "Julio Narvaez",
-    "coordinador": "JUAN FER REINOSO",
+    "coordinador": "JUAN FERNANDO REINOSO",
     "sede": "Cuenca",
     "estado": "Graduado"
   },
@@ -1803,7 +1803,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "JATARI",
     "tieneEntrenador": "SI",
     "entrenador": "Julio Narvaez",
-    "coordinador": "JUAN FER REINOSO",
+    "coordinador": "JUAN FERNANDO REINOSO",
     "sede": "Cuenca",
     "estado": "Graduado"
   },
@@ -1815,7 +1815,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 18,
     "equipo": "NGELES DE FUEGO",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilnez",
+    "entrenador": "Erika Gavilanez",
     "coordinador": "",
     "sede": "Sin Sede",
     "estado": "Graduado"
@@ -1828,7 +1828,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 18,
     "equipo": "SUMAQ KAWSAYKUNA",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilnez",
+    "entrenador": "Erika Gavilanez",
     "coordinador": "",
     "sede": "Sin Sede",
     "estado": "Graduado"
@@ -1893,7 +1893,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 18,
     "equipo": "NGELES DE FUEGO",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramrez",
+    "entrenador": "Mauricio Ramirez",
     "coordinador": "",
     "sede": "Sin Sede",
     "estado": "Graduado"
@@ -2049,7 +2049,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 19,
     "equipo": "RYBAS IKIGAI",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilnez",
+    "entrenador": "Erika Gavilanez",
     "coordinador": "",
     "sede": "Sin Sede",
     "estado": "Graduado"
@@ -2153,8 +2153,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 19,
     "equipo": "KAIROS-CUM",
     "tieneEntrenador": "SI",
-    "entrenador": "Erika Gavilnez",
-    "coordinador": "JUAN FER REINOSO",
+    "entrenador": "Erika Gavilanez",
+    "coordinador": "JUAN FERNANDO REINOSO",
     "sede": "Cuenca",
     "estado": "Activo"
   },
@@ -2166,8 +2166,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 19,
     "equipo": "KAIROS-CUM",
     "tieneEntrenador": "SI",
-    "entrenador": "Erika Gavilnez",
-    "coordinador": "JUAN FER REINOSO",
+    "entrenador": "Erika Gavilanez",
+    "coordinador": "JUAN FERNANDO REINOSO",
     "sede": "Cuenca",
     "estado": "Activo"
   },
@@ -2296,7 +2296,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 21,
     "equipo": "RAGNAROK",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilnez",
+    "entrenador": "Erika Gavilanez",
     "coordinador": "",
     "sede": "Guayaquil",
     "estado": "Graduado"
@@ -2335,7 +2335,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 21,
     "equipo": "TEMPLARIOS DEL ALBA",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramrez",
+    "entrenador": "Mauricio Ramirez",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Graduado"
@@ -2348,7 +2348,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 22,
     "equipo": "TITANES KOTETSU",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilnez",
+    "entrenador": "Erika Gavilanez",
     "coordinador": "",
     "sede": "Guayaquil",
     "estado": "Graduado"
@@ -2374,7 +2374,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 22,
     "equipo": "LEGENDARIOS DEL SAMSARA",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramrez",
+    "entrenador": "Mauricio Ramirez",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Graduado"
@@ -2401,7 +2401,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "TITANES KOTETSU",
     "tieneEntrenador": "Si",
     "entrenador": "Mila Campuzano",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Guayaquil",
     "estado": "Activo"
   },
@@ -2414,7 +2414,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "TITANES KOTETSU",
     "tieneEntrenador": "Si",
     "entrenador": "Mila Campuzano",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Guayaquil",
     "estado": "Activo"
   },
@@ -2427,7 +2427,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "TITANES KOTETSU",
     "tieneEntrenador": "Si",
     "entrenador": "Mike Boada",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Guayaquil",
     "estado": "Activo"
   },
@@ -2491,7 +2491,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 23,
     "equipo": "SAMURAI KALLPA",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilnez",
+    "entrenador": "Erika Gavilanez",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Graduado"
@@ -2543,7 +2543,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 24,
     "equipo": "KAIRU",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilnez",
+    "entrenador": "Erika Gavilanez",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Graduado"
@@ -2556,7 +2556,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 24,
     "equipo": "KAIRU",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilnez",
+    "entrenador": "Erika Gavilanez",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Graduado"
@@ -2569,7 +2569,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 24,
     "equipo": "KAIRU",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilnez",
+    "entrenador": "Erika Gavilanez",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Graduado"
@@ -2582,7 +2582,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 24,
     "equipo": "KAIRU",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilnez",
+    "entrenador": "Erika Gavilanez",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Graduado"
@@ -2595,7 +2595,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 24,
     "equipo": "KAIRU",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilnez",
+    "entrenador": "Erika Gavilanez",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Graduado"
@@ -2608,7 +2608,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 24,
     "equipo": "KAIRU",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilnez",
+    "entrenador": "Erika Gavilanez",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Graduado"
@@ -2621,7 +2621,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 24,
     "equipo": "KAIRU",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilnez",
+    "entrenador": "Erika Gavilanez",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Graduado"
@@ -2634,7 +2634,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 24,
     "equipo": "KAIRU",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilnez",
+    "entrenador": "Erika Gavilanez",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Graduado"
@@ -2647,7 +2647,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 24,
     "equipo": "KAIRU",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilnez",
+    "entrenador": "Erika Gavilanez",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Graduado"
@@ -2660,7 +2660,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 24,
     "equipo": "KAIRU",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilnez",
+    "entrenador": "Erika Gavilanez",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Graduado"
@@ -2673,7 +2673,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 25,
     "equipo": "WAKANDA TAKEMARU",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilnez",
+    "entrenador": "Erika Gavilanez",
     "coordinador": "",
     "sede": "Guayaquil",
     "estado": "Graduado"
@@ -2713,7 +2713,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "WAKANDA TAKEMARU",
     "tieneEntrenador": "Si",
     "entrenador": "Alejandro Diaz",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Guayaquil",
     "estado": "Activo"
   },
@@ -2726,7 +2726,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "WAKANDA TAKEMARU",
     "tieneEntrenador": "Si",
     "entrenador": "Andres Idrobo",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Guayaquil",
     "estado": "Activo"
   },
@@ -2739,7 +2739,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "WAKANDA TAKEMARU",
     "tieneEntrenador": "Si",
     "entrenador": "Pamela Carrillo",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Guayaquil",
     "estado": "Activo"
   },
@@ -2751,8 +2751,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 25,
     "equipo": "WAKANDA TAKEMARU",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramrez",
-    "coordinador": "JOSU VERA",
+    "entrenador": "Mauricio Ramirez",
+    "coordinador": "JOSUE VERA",
     "sede": "Guayaquil",
     "estado": "Activo"
   },
@@ -2764,8 +2764,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 26,
     "equipo": "NINA RIKUKUNA",
     "tieneEntrenador": "SI",
-    "entrenador": "Erika Gavilnez",
-    "coordinador": "JOSU VERA",
+    "entrenador": "Erika Gavilanez",
+    "coordinador": "JOSUE VERA",
     "sede": "Guayaquil",
     "estado": "Graduado"
   },
@@ -2778,7 +2778,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "NINA RIKUKUNA",
     "tieneEntrenador": "SI",
     "entrenador": "Mila Campuzano",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Guayaquil",
     "estado": "Activo"
   },
@@ -2791,7 +2791,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "NINA RIKUKUNA",
     "tieneEntrenador": "SI",
     "entrenador": "Mike Boada",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Guayaquil",
     "estado": "Activo"
   },
@@ -2869,7 +2869,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "AQA MAGMA",
     "tieneEntrenador": "SI",
     "entrenador": "Alejandro Diaz",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Guayaquil",
     "estado": "Activo"
   },
@@ -2882,7 +2882,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "AQA MAGMA",
     "tieneEntrenador": "SI",
     "entrenador": "Mike Boada",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Guayaquil",
     "estado": "Activo"
   },
@@ -3141,7 +3141,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 32,
     "equipo": "ALQUIMIA",
     "tieneEntrenador": "SI",
-    "entrenador": "Erika Gavilnez",
+    "entrenador": "Erika Gavilanez",
     "coordinador": "JONATHAN LA ROSA",
     "sede": "Guayaquil",
     "estado": "Activo"
@@ -3154,7 +3154,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 32,
     "equipo": "ALQUIMIA",
     "tieneEntrenador": "SI",
-    "entrenador": "Erika Gavilnez",
+    "entrenador": "Erika Gavilanez",
     "coordinador": "JONATHAN LA ROSA",
     "sede": "Guayaquil",
     "estado": "Activo"
@@ -3167,7 +3167,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 33,
     "equipo": "ARTAM TSUNKI",
     "tieneEntrenador": "SI",
-    "entrenador": "Mauricio Ramrez",
+    "entrenador": "Mauricio Ramirez",
     "coordinador": "JONATHAN LA ROSA",
     "sede": "Guayaquil",
     "estado": "Activo"
@@ -3180,7 +3180,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 33,
     "equipo": "ARTAM TSUNKI",
     "tieneEntrenador": "SI",
-    "entrenador": "Mauricio Ramrez",
+    "entrenador": "Mauricio Ramirez",
     "coordinador": "JONATHAN LA ROSA",
     "sede": "Guayaquil",
     "estado": "Activo"
@@ -3193,7 +3193,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 33,
     "equipo": "ARTAM TSUNKI",
     "tieneEntrenador": "SI",
-    "entrenador": "Mauricio Ramrez",
+    "entrenador": "Mauricio Ramirez",
     "coordinador": "JONATHAN LA ROSA",
     "sede": "Guayaquil",
     "estado": "Activo"
@@ -3206,7 +3206,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 34,
     "equipo": "FRACTAL SHINE",
     "tieneEntrenador": "SI",
-    "entrenador": "Kerlie Carrillo",
+    "entrenador": "Kerly Carrillo",
     "coordinador": "JONATHAN LA ROSA",
     "sede": "Guayaquil",
     "estado": "Activo"
@@ -3219,7 +3219,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 34,
     "equipo": "FRACTAL SHINE",
     "tieneEntrenador": "SI",
-    "entrenador": "Kerlie Carrillo",
+    "entrenador": "Kerly Carrillo",
     "coordinador": "JONATHAN LA ROSA",
     "sede": "Guayaquil",
     "estado": "Activo"
@@ -3232,7 +3232,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 34,
     "equipo": "FRACTAL SHINE",
     "tieneEntrenador": "SI",
-    "entrenador": "Kerlie Carrillo",
+    "entrenador": "Kerly Carrillo",
     "coordinador": "JONATHAN LA ROSA",
     "sede": "Guayaquil",
     "estado": "Activo"
@@ -3245,7 +3245,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 34,
     "equipo": "FRACTAL SHINE",
     "tieneEntrenador": "SI",
-    "entrenador": "Kerlie Carrillo",
+    "entrenador": "Kerly Carrillo",
     "coordinador": "JONATHAN LA ROSA",
     "sede": "Guayaquil",
     "estado": "Activo"
@@ -3258,7 +3258,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 34,
     "equipo": "FRACTAL SHINE",
     "tieneEntrenador": "SI",
-    "entrenador": "Kerlie Carrillo",
+    "entrenador": "Kerly Carrillo",
     "coordinador": "JONATHAN LA ROSA",
     "sede": "Guayaquil",
     "estado": "Activo"
@@ -3272,7 +3272,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Ayni Inti Sarpay",
     "tieneEntrenador": "Si",
     "entrenador": "Alejandro Diaz",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3285,7 +3285,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Ayni Inti Sarpay",
     "tieneEntrenador": "Si",
     "entrenador": "Mike Boada",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3298,7 +3298,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Ayni Inti Sarpay",
     "tieneEntrenador": "Si",
     "entrenador": "Andres Gomez",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3311,7 +3311,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Vuitanta",
     "tieneEntrenador": "Si",
     "entrenador": "Lourdes Patino",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3324,7 +3324,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Vuitanta",
     "tieneEntrenador": "Si",
     "entrenador": "Alejandro Diaz",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3337,7 +3337,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Vuitanta",
     "tieneEntrenador": "Si",
     "entrenador": "Jose Torron",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3350,7 +3350,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Vuitanta",
     "tieneEntrenador": "Si",
     "entrenador": "Christian Tito",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3363,7 +3363,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Vuitanta",
     "tieneEntrenador": "Si",
     "entrenador": "Christian Tito",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3375,8 +3375,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 81,
     "equipo": "Dracarys",
     "tieneEntrenador": "Si",
-    "entrenador": "Chuy Acosta",
-    "coordinador": "JOSU VERA",
+    "entrenador": "Jesus Adrian Acosta",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3389,7 +3389,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Dracarys",
     "tieneEntrenador": "Si",
     "entrenador": "Alejandro Diaz",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3402,7 +3402,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Dracarys",
     "tieneEntrenador": "Si",
     "entrenador": "Andres Gomez",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3415,7 +3415,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Dracarys",
     "tieneEntrenador": "Si",
     "entrenador": "Jose Torron",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3428,7 +3428,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Dracarys",
     "tieneEntrenador": "Si",
     "entrenador": "Mildred Munoz",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3441,7 +3441,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Toruk Makto",
     "tieneEntrenador": "Si",
     "entrenador": "Andres Gomez",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3453,8 +3453,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 82,
     "equipo": "Toruk Makto",
     "tieneEntrenador": "Si",
-    "entrenador": "Chuy Acosta",
-    "coordinador": "JOSU VERA",
+    "entrenador": "Jesus Adrian Acosta",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3467,7 +3467,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Toruk Makto",
     "tieneEntrenador": "Si",
     "entrenador": "Alejandro Diaz",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3480,7 +3480,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Toruk Makto",
     "tieneEntrenador": "Si",
     "entrenador": "Julio Narvaez",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3493,7 +3493,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Toruk Makto",
     "tieneEntrenador": "Si",
     "entrenador": "Mildred Munoz",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3506,7 +3506,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Toruk Makto",
     "tieneEntrenador": "Si",
     "entrenador": "Mike Boada",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3518,8 +3518,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 82,
     "equipo": "Toruk Makto",
     "tieneEntrenador": "Si",
-    "entrenador": "Chuy Acosta",
-    "coordinador": "JOSU VERA",
+    "entrenador": "Jesus Adrian Acosta",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3532,7 +3532,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Toruk Makto",
     "tieneEntrenador": "Si",
     "entrenador": "Mike Boada",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3545,7 +3545,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Toruk Makto",
     "tieneEntrenador": "Si",
     "entrenador": "Mildred Munoz",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3558,7 +3558,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Tzucan",
     "tieneEntrenador": "Si",
     "entrenador": "Mike Boada",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3571,7 +3571,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Tzucan",
     "tieneEntrenador": "Si",
     "entrenador": "Andres Gomez",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3584,7 +3584,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Tzucan",
     "tieneEntrenador": "Si",
     "entrenador": "Fernando Mendoza",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3597,7 +3597,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Tzucan",
     "tieneEntrenador": "Si",
     "entrenador": "Andres Idrobo",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3610,7 +3610,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Tzucan",
     "tieneEntrenador": "Si",
     "entrenador": "Mike Boada",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3623,7 +3623,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Tzucan",
     "tieneEntrenador": "Si",
     "entrenador": "Mike Boada",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3636,7 +3636,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Tzucan",
     "tieneEntrenador": "Si",
     "entrenador": "Fernando Mendoza",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3649,7 +3649,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Tzucan",
     "tieneEntrenador": "Si",
     "entrenador": "Andres Gomez",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3662,7 +3662,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Tzucan",
     "tieneEntrenador": "Si",
     "entrenador": "Mike Boada",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3675,7 +3675,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Tzucan",
     "tieneEntrenador": "Si",
     "entrenador": "Andres Gomez",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3688,7 +3688,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Tzucan",
     "tieneEntrenador": "Si",
     "entrenador": "Fernando Mendoza",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3701,7 +3701,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Tzucan",
     "tieneEntrenador": "Si",
     "entrenador": "Mildred Munoz",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3714,7 +3714,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Tzucan",
     "tieneEntrenador": "Si",
     "entrenador": "Andres Idrobo",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3727,7 +3727,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Tzucan",
     "tieneEntrenador": "Si",
     "entrenador": "Alejandro Diaz",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3740,7 +3740,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Byakko Hanshi",
     "tieneEntrenador": "Si",
     "entrenador": "Lourdes Patino",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3753,7 +3753,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Byakko Hanshi",
     "tieneEntrenador": "Si",
     "entrenador": "Andres Idrobo",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3766,7 +3766,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Byakko Hanshi",
     "tieneEntrenador": "Si",
     "entrenador": "Andres Idrobo",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3779,7 +3779,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Byakko Hanshi",
     "tieneEntrenador": "Si",
     "entrenador": "Mildred Munoz",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3792,7 +3792,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Byakko Hanshi",
     "tieneEntrenador": "Si",
     "entrenador": "Andres Idrobo",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3805,7 +3805,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Byakko Hanshi",
     "tieneEntrenador": "Si",
     "entrenador": "Fernando Mendoza",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3818,7 +3818,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Byakko Hanshi",
     "tieneEntrenador": "Si",
     "entrenador": "Fernando Mendoza",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3831,7 +3831,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Byakko Hanshi",
     "tieneEntrenador": "Si",
     "entrenador": "Lourdes Patino",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3844,7 +3844,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Byakko Hanshi",
     "tieneEntrenador": "Si",
     "entrenador": "Lourdes Patino",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3857,7 +3857,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Byakko Hanshi",
     "tieneEntrenador": "Si",
     "entrenador": "Lourdes Patino",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3870,7 +3870,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Byakko Hanshi",
     "tieneEntrenador": "Si",
     "entrenador": "Christian Tito",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3883,7 +3883,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Byakko Hanshi",
     "tieneEntrenador": "Si",
     "entrenador": "Christian Tito",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3896,7 +3896,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Byakko Hanshi",
     "tieneEntrenador": "Si",
     "entrenador": "Christian Tito",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3909,7 +3909,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Byakko Hanshi",
     "tieneEntrenador": "Si",
     "entrenador": "Christian Tito",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3922,7 +3922,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Byakko Hanshi",
     "tieneEntrenador": "Si",
     "entrenador": "Alejandro Diaz",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3935,7 +3935,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Byakko Hanshi",
     "tieneEntrenador": "Si",
     "entrenador": "Alejandro Diaz",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3948,7 +3948,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Byakko Hanshi",
     "tieneEntrenador": "Si",
     "entrenador": "Josue Vera",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3961,7 +3961,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Byakko Hanshi",
     "tieneEntrenador": "Si",
     "entrenador": "Josue Vera",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3974,7 +3974,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Ahaba Jai",
     "tieneEntrenador": "Si",
     "entrenador": "Julio Narvaez",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3987,7 +3987,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Ahaba Jai",
     "tieneEntrenador": "Si",
     "entrenador": "Jose Torron",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -3999,8 +3999,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 85,
     "equipo": "Ahaba Jai",
     "tieneEntrenador": "Si",
-    "entrenador": "Chuy Acosta",
-    "coordinador": "JOSU VERA",
+    "entrenador": "Jesus Adrian Acosta",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4013,7 +4013,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Ahaba Jai",
     "tieneEntrenador": "Si",
     "entrenador": "Julio Narvaez",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4026,7 +4026,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Ahaba Jai",
     "tieneEntrenador": "Si",
     "entrenador": "Andres Idrobo",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4039,7 +4039,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Sula Amay",
     "tieneEntrenador": "Si",
     "entrenador": "Maria Jose Roman",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4052,7 +4052,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Sula Amay",
     "tieneEntrenador": "Si",
     "entrenador": "Maria Jose Roman",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4065,7 +4065,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Sula Amay",
     "tieneEntrenador": "Si",
     "entrenador": "Andres Gomez",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4078,7 +4078,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Sula Amay",
     "tieneEntrenador": "Si",
     "entrenador": "Maria Jose Roman",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4091,7 +4091,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Sula Amay",
     "tieneEntrenador": "Si",
     "entrenador": "Maria Jose Roman",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4104,7 +4104,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Sula Amay",
     "tieneEntrenador": "Si",
     "entrenador": "Diego Bravo",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4117,7 +4117,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Sula Amay",
     "tieneEntrenador": "Si",
     "entrenador": "Lourdes Patino",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4130,7 +4130,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Sula Amay",
     "tieneEntrenador": "Si",
     "entrenador": "Diego Bravo",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4143,7 +4143,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Sula Amay",
     "tieneEntrenador": "Si",
     "entrenador": "Diego Bravo",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4156,7 +4156,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Grifus Invictus",
     "tieneEntrenador": "Si",
     "entrenador": "Andres Idrobo",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4169,7 +4169,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Grifus Invictus",
     "tieneEntrenador": "Si",
     "entrenador": "Andres Gomez",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4182,7 +4182,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Grifus Invictus",
     "tieneEntrenador": "Si",
     "entrenador": "Diego Bravo",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4195,7 +4195,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Grifus Invictus",
     "tieneEntrenador": "Si",
     "entrenador": "Mildred Munoz",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4208,7 +4208,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Grifus Invictus",
     "tieneEntrenador": "Si",
     "entrenador": "Diego Bravo",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4221,7 +4221,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Grifus Invictus",
     "tieneEntrenador": "Si",
     "entrenador": "Maria Jose Roman",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4234,7 +4234,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Grifus Invictus",
     "tieneEntrenador": "Si",
     "entrenador": "Ana Monroy",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4246,8 +4246,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 87,
     "equipo": "Grifus Invictus",
     "tieneEntrenador": "Si",
-    "entrenador": "Chuy Acosta",
-    "coordinador": "JOSU VERA",
+    "entrenador": "Jesus Adrian Acosta",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4260,7 +4260,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Grifus Invictus",
     "tieneEntrenador": "Si",
     "entrenador": "Ana Monroy",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4272,8 +4272,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 87,
     "equipo": "Grifus Invictus",
     "tieneEntrenador": "Si",
-    "entrenador": "Chuy Acosta",
-    "coordinador": "JOSU VERA",
+    "entrenador": "Jesus Adrian Acosta",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4286,7 +4286,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Grifus Invictus",
     "tieneEntrenador": "Si",
     "entrenador": "Mildred Munoz",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4299,7 +4299,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Grifus Invictus",
     "tieneEntrenador": "Si",
     "entrenador": "Ana Monroy",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4312,7 +4312,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Grifus Invictus",
     "tieneEntrenador": "Si",
     "entrenador": "Mike Boada",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4325,7 +4325,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "CATEPHRIA",
     "tieneEntrenador": "Si",
     "entrenador": "Alejandro Diaz",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4338,7 +4338,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "CATEPHRIA",
     "tieneEntrenador": "Si",
     "entrenador": "Isaac Betancourt",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4351,7 +4351,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "CATEPHRIA",
     "tieneEntrenador": "Si",
     "entrenador": "Andres Gomez",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4364,7 +4364,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "CATEPHRIA",
     "tieneEntrenador": "Si",
     "entrenador": "Fernando Mendoza",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4377,7 +4377,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "CATEPHRIA",
     "tieneEntrenador": "Si",
     "entrenador": "Isaac Betancourt",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4390,7 +4390,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "CATEPHRIA",
     "tieneEntrenador": "Si",
     "entrenador": "Mike Boada",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4403,7 +4403,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "CATEPHRIA",
     "tieneEntrenador": "Si",
     "entrenador": "Jose Torron",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4416,7 +4416,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "CATEPHRIA",
     "tieneEntrenador": "Si",
     "entrenador": "Mike Boada",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4429,7 +4429,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "CATEPHRIA",
     "tieneEntrenador": "Si",
     "entrenador": "Isaac Betancourt",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4441,8 +4441,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 88,
     "equipo": "CATEPHRIA",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilnez",
-    "coordinador": "JOSU VERA",
+    "entrenador": "Erika Gavilanez",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4455,7 +4455,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "SHAKTI EMUNAH",
     "tieneEntrenador": "Si",
     "entrenador": "Julio Narvaez",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4468,7 +4468,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "SHAKTI EMUNAH",
     "tieneEntrenador": "Si",
     "entrenador": "Fernando Mendoza",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4481,7 +4481,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "SHAKTI EMUNAH",
     "tieneEntrenador": "Si",
     "entrenador": "Fernando Mendoza",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4494,7 +4494,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "SHAKTI EMUNAH",
     "tieneEntrenador": "Si",
     "entrenador": "Mildred Munoz",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4507,7 +4507,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "SHAKTI EMUNAH",
     "tieneEntrenador": "Si",
     "entrenador": "Maria Jose Roman",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4520,7 +4520,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "SHAKTI EMUNAH",
     "tieneEntrenador": "Si",
     "entrenador": "Alejandro Diaz",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4533,7 +4533,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "ACADIA SEMPER FI",
     "tieneEntrenador": "Si",
     "entrenador": "Isaac Betancourt",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4546,7 +4546,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "ACADIA SEMPER FI",
     "tieneEntrenador": "Si",
     "entrenador": "Lourdes Patino",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4559,7 +4559,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "ACADIA SEMPER FI",
     "tieneEntrenador": "Si",
     "entrenador": "Lourdes Patino",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4572,7 +4572,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "ACADIA SEMPER FI",
     "tieneEntrenador": "Si",
     "entrenador": "Jose Torron",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4585,7 +4585,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "ACADIA SEMPER FI",
     "tieneEntrenador": "Si",
     "entrenador": "Julio Narvaez",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4598,7 +4598,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "ACADIA SEMPER FI",
     "tieneEntrenador": "Si",
     "entrenador": "Fernando Mendoza",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4610,8 +4610,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 90,
     "equipo": "ACADIA SEMPER FI",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilnez",
-    "coordinador": "JOSU VERA",
+    "entrenador": "Erika Gavilanez",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4623,8 +4623,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 90,
     "equipo": "ACADIA SEMPER FI",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilnez",
-    "coordinador": "JOSU VERA",
+    "entrenador": "Erika Gavilanez",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4637,7 +4637,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "ACADIA SEMPER FI",
     "tieneEntrenador": "Si",
     "entrenador": "Isaac Betancourt",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4650,7 +4650,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "ACADIA SEMPER FI",
     "tieneEntrenador": "Si",
     "entrenador": "Josue Vera",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4662,8 +4662,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 90,
     "equipo": "ACADIA SEMPER FI",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilnez",
-    "coordinador": "JOSU VERA",
+    "entrenador": "Erika Gavilanez",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4676,7 +4676,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "HAMSA TADAKATSU",
     "tieneEntrenador": "Si",
     "entrenador": "Maria Jose Roman",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4689,7 +4689,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "HAMSA TADAKATSU",
     "tieneEntrenador": "Si",
     "entrenador": "Julio Narvaez",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4702,7 +4702,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "HAMSA TADAKATSU",
     "tieneEntrenador": "Si",
     "entrenador": "Josue Vera",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4715,7 +4715,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "HAMSA TADAKATSU",
     "tieneEntrenador": "Si",
     "entrenador": "Lourdes Patino",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4728,7 +4728,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "HAMSA TADAKATSU",
     "tieneEntrenador": "Si",
     "entrenador": "Josue Vera",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4741,7 +4741,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "HAMSA TADAKATSU",
     "tieneEntrenador": "Si",
     "entrenador": "Julio Narvaez",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4754,7 +4754,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "APIS TITANIUM",
     "tieneEntrenador": "Si",
     "entrenador": "Diego Bravo",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4767,7 +4767,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "APIS TITANIUM",
     "tieneEntrenador": "Si",
     "entrenador": "Diego Bravo",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -4779,7 +4779,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 1,
     "equipo": "TRINA MUNAY KI",
     "tieneEntrenador": "No",
-    "entrenador": "Chuy Acosta",
+    "entrenador": "Jesus Adrian Acosta",
     "coordinador": "MIGUEL TORRES",
     "sede": "Cuenca",
     "estado": "Desertor"
@@ -4909,7 +4909,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 8,
     "equipo": "METANOIA",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramrez",
+    "entrenador": "Mauricio Ramirez",
     "coordinador": "KERLY CARRILLO",
     "sede": "Cuenca",
     "estado": "Desertor"
@@ -5027,7 +5027,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "SIC PARVIS MAGNA",
     "tieneEntrenador": "SI",
     "entrenador": "Mila Campuzano",
-    "coordinador": "KERLY CARRILLO - JUANFER REINOSO",
+    "coordinador": "KERLY CARRILLO / JUAN FERNANDO REINOSO",
     "sede": "Cuenca",
     "estado": "Desertor"
   },
@@ -5117,7 +5117,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 17,
     "equipo": "JAGUARES DE ORO",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramrez",
+    "entrenador": "Mauricio Ramirez",
     "coordinador": "",
     "sede": "Cuenca",
     "estado": "Desertor"
@@ -5208,7 +5208,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 19,
     "equipo": "VIKINGOS DE FUEGO",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramrez",
+    "entrenador": "Mauricio Ramirez",
     "coordinador": "",
     "sede": "Lima",
     "estado": "Desertor"
@@ -5312,7 +5312,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 20,
     "equipo": "KUNTUR MARKA",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilnez",
+    "entrenador": "Erika Gavilanez",
     "coordinador": "",
     "sede": "Lima",
     "estado": "Desertor"
@@ -5351,7 +5351,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 21,
     "equipo": "TEMPLARIOS DEL ALBA",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilnez",
+    "entrenador": "Erika Gavilanez",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Desertor"
@@ -5377,7 +5377,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 22,
     "equipo": "TITANES KOTETSU",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilnez",
+    "entrenador": "Erika Gavilanez",
     "coordinador": "",
     "sede": "Guayaquil",
     "estado": "Desertor"
@@ -5429,7 +5429,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 24,
     "equipo": "ALKHEMIA FINIX",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilnez",
+    "entrenador": "Erika Gavilanez",
     "coordinador": "",
     "sede": "Guayaquil",
     "estado": "Desertor"
@@ -5443,7 +5443,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Dracarys",
     "tieneEntrenador": "Si",
     "entrenador": "Mildred Munoz",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -5456,7 +5456,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Dracarys",
     "tieneEntrenador": "Si",
     "entrenador": "Alejandro Diaz",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -5469,7 +5469,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Tzucan",
     "tieneEntrenador": "Si",
     "entrenador": "Mike Boada",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -5482,7 +5482,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Byakko Hanshi",
     "tieneEntrenador": "Si",
     "entrenador": "Fernando Mendoza",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Cuenca",
     "estado": "Desertor"
   },
@@ -5495,7 +5495,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Byakko Hanshi",
     "tieneEntrenador": "Si",
     "entrenador": "Alejandro Diaz",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Cuenca",
     "estado": "Desertor"
   },
@@ -5507,8 +5507,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 84,
     "equipo": "Byakko Hanshi",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilnez",
-    "coordinador": "JOSU VERA",
+    "entrenador": "Erika Gavilanez",
+    "coordinador": "JOSUE VERA",
     "sede": "Cuenca",
     "estado": "Desertor"
   },
@@ -5521,7 +5521,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Byakko Hanshi",
     "tieneEntrenador": "Si",
     "entrenador": "Mike Boada",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -5534,7 +5534,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Ahaba Jai",
     "tieneEntrenador": "Si",
     "entrenador": "Jose Torron",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Cuenca",
     "estado": "Desertor"
   },
@@ -5547,7 +5547,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "Ahaba Jai",
     "tieneEntrenador": "Si",
     "entrenador": "Jose Torron",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Cuenca",
     "estado": "Desertor"
   },
@@ -5560,7 +5560,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "CATEPHRIA",
     "tieneEntrenador": "Si",
     "entrenador": "Josue Vera",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -5573,7 +5573,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "CATEPHRIA",
     "tieneEntrenador": "Si",
     "entrenador": "Alejandro Diaz",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -5586,7 +5586,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "SHAKTI EMUNAH",
     "tieneEntrenador": "Si",
     "entrenador": "Julio Narvaez",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -5599,7 +5599,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "SHAKTI EMUNAH",
     "tieneEntrenador": "Si",
     "entrenador": "Diego Bravo",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -5612,7 +5612,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "SHAKTI EMUNAH",
     "tieneEntrenador": "Si",
     "entrenador": "Diego Bravo",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -5625,7 +5625,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "ACADIA SEMPER FI",
     "tieneEntrenador": "Si",
     "entrenador": "Fernando Mendoza",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -5638,7 +5638,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "ACADIA SEMPER FI",
     "tieneEntrenador": "Si",
     "entrenador": "Josue Vera",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -5651,7 +5651,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "ACADIA SEMPER FI",
     "tieneEntrenador": "Si",
     "entrenador": "Jose Torron",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -5664,7 +5664,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "ACADIA SEMPER FI",
     "tieneEntrenador": "Si",
     "entrenador": "Isaac Betancourt",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -5676,8 +5676,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 90,
     "equipo": "ACADIA SEMPER FI",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilnez",
-    "coordinador": "JOSU VERA",
+    "entrenador": "Erika Gavilanez",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -5690,7 +5690,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "HAMSA TADAKATSU",
     "tieneEntrenador": "Si",
     "entrenador": "Jose Torron",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -5703,7 +5703,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "METATRON",
     "tieneEntrenador": "Si",
     "entrenador": "Maria Jose Roman",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -5716,7 +5716,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "LYUN USHUAY RHUA",
     "tieneEntrenador": "Si",
     "entrenador": "Mike Boada",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -5729,7 +5729,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "NINARI",
     "tieneEntrenador": "Si",
     "entrenador": "Josue Vera",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -5742,7 +5742,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "NINARI",
     "tieneEntrenador": "Si",
     "entrenador": "Maria Jose Roman",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -5755,7 +5755,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "VALHALLA DRAKI",
     "tieneEntrenador": "Si",
     "entrenador": "Maria Jose Roman",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -5768,7 +5768,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "VALHALLA DRAKI",
     "tieneEntrenador": "Si",
     "entrenador": "Julio Narvaez",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -5781,7 +5781,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "VALHALLA DRAKI",
     "tieneEntrenador": "Si",
     "entrenador": "Jose Sanchez",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -5794,7 +5794,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "HENSU CHIKARA",
     "tieneEntrenador": "Si",
     "entrenador": "Diego Bravo",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -5807,7 +5807,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "HENSU CHIKARA",
     "tieneEntrenador": "Si",
     "entrenador": "Josue Vera",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -5820,7 +5820,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "SUMAQ SHIN",
     "tieneEntrenador": "Si",
     "entrenador": "Lourdes Patino",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -5833,7 +5833,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "RIKCHARI MUNAY",
     "tieneEntrenador": "Si",
     "entrenador": "Maria Jose Roman",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -5846,7 +5846,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "RIKCHARI MUNAY",
     "tieneEntrenador": "Si",
     "entrenador": "David Sosa",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -5859,7 +5859,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "RIKCHARI MUNAY",
     "tieneEntrenador": "Si",
     "entrenador": "Mike Boada",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -5872,7 +5872,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "MEMENTO MORI",
     "tieneEntrenador": "Si",
     "entrenador": "Diego Bravo",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -5885,7 +5885,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "MEMENTO MORI",
     "tieneEntrenador": "Si",
     "entrenador": "Julio Narvaez",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -5898,7 +5898,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "MEMENTO MORI",
     "tieneEntrenador": "Si",
     "entrenador": "Jose Sanchez",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -6079,7 +6079,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 106,
     "equipo": "KAIZEN MUKETSU",
     "tieneEntrenador": "SI",
-    "entrenador": "Mauricio Ramrez",
+    "entrenador": "Mauricio Ramirez",
     "coordinador": "ALEJANDRO DIAZ",
     "sede": "Quito",
     "estado": "Desertor"
@@ -6106,7 +6106,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "ARUTAM REN",
     "tieneEntrenador": "Si",
     "entrenador": "Kriscia Rodas",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -6119,7 +6119,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "ARUTAM REN",
     "tieneEntrenador": "Si",
     "entrenador": "Josue Vera",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -6132,7 +6132,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "ARUTAM REN",
     "tieneEntrenador": "Si",
     "entrenador": "Diego Bravo",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -6145,7 +6145,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "ARUTAM REN",
     "tieneEntrenador": "Si",
     "entrenador": "Jose Sanchez",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -6158,7 +6158,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "ARUTAM REN",
     "tieneEntrenador": "Si",
     "entrenador": "Julio Narvaez",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -6171,7 +6171,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "ARUTAM REN",
     "tieneEntrenador": "Si",
     "entrenador": "Lourdes Patino",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -6183,8 +6183,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 107,
     "equipo": "ARUTAM REN",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramrez",
-    "coordinador": "ISAAC BETANCOURTH",
+    "entrenador": "Mauricio Ramirez",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -6223,7 +6223,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "NITYA LIKTHAM",
     "tieneEntrenador": "Si",
     "entrenador": "Diego Bravo",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -6236,7 +6236,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "NITYA LIKTHAM",
     "tieneEntrenador": "Si",
     "entrenador": "Kriscia Rodas",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -6249,7 +6249,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "NITYA LIKTHAM",
     "tieneEntrenador": "Si",
     "entrenador": "Diego Bravo",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -6274,8 +6274,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 111,
     "equipo": "SAN SARU",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramrez",
-    "coordinador": "ISAAC BETANCOURTH",
+    "entrenador": "Mauricio Ramirez",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -6326,7 +6326,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 114,
     "equipo": "KIA AMORIS",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramrez",
+    "entrenador": "Mauricio Ramirez",
     "coordinador": "ALEJANDRO DIAZ",
     "sede": "Quito",
     "estado": "Desertor"
@@ -6340,7 +6340,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "UBUNTU QUASAR",
     "tieneEntrenador": "SI",
     "entrenador": "Linid Valencia",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -6353,7 +6353,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "APIS TITANIUM",
     "tieneEntrenador": "Si",
     "entrenador": "Ana Monroy",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6379,7 +6379,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "APIS TITANIUM",
     "tieneEntrenador": "Si",
     "entrenador": "Maria Jose Roman",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6392,7 +6392,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "APIS TITANIUM",
     "tieneEntrenador": "Si",
     "entrenador": "Fernando Mendoza",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6405,7 +6405,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "METATRON",
     "tieneEntrenador": "Si",
     "entrenador": "Diego Bravo",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6418,7 +6418,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "METATRON",
     "tieneEntrenador": "Si",
     "entrenador": "Fernando Mendoza",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6431,7 +6431,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "METATRON",
     "tieneEntrenador": "Si",
     "entrenador": "Jose Sanchez",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6444,7 +6444,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "METATRON",
     "tieneEntrenador": "Si",
     "entrenador": "Mildred Munoz",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6457,7 +6457,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "METATRON",
     "tieneEntrenador": "Si",
     "entrenador": "Diego Bravo",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6470,7 +6470,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "METATRON",
     "tieneEntrenador": "Si",
     "entrenador": "Jose Sanchez",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6483,7 +6483,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "METATRON",
     "tieneEntrenador": "Si",
     "entrenador": "Ana Monroy",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6496,7 +6496,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "METATRON",
     "tieneEntrenador": "Si",
     "entrenador": "Alejandro Diaz",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6509,7 +6509,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "METATRON",
     "tieneEntrenador": "Si",
     "entrenador": "Alejandro Diaz",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6522,7 +6522,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "METATRON",
     "tieneEntrenador": "Si",
     "entrenador": "Maria Jose Roman",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6535,7 +6535,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "EAYN ALNASR",
     "tieneEntrenador": "Si",
     "entrenador": "Andres Idrobo",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6548,7 +6548,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "EAYN ALNASR",
     "tieneEntrenador": "Si",
     "entrenador": "Lourdes Patino",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6561,7 +6561,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "EAYN ALNASR",
     "tieneEntrenador": "Si",
     "entrenador": "Ana Monroy",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6574,7 +6574,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "EAYN ALNASR",
     "tieneEntrenador": "Si",
     "entrenador": "Jose Sanchez",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6587,7 +6587,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "EAYN ALNASR",
     "tieneEntrenador": "Si",
     "entrenador": "Andres Idrobo",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6600,7 +6600,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "EAYN ALNASR",
     "tieneEntrenador": "Si",
     "entrenador": "Fernando Mendoza",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6613,7 +6613,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "LYUN USHUAY RHUA",
     "tieneEntrenador": "Si",
     "entrenador": "Josue Vera",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6626,7 +6626,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "LYUN USHUAY RHUA",
     "tieneEntrenador": "Si",
     "entrenador": "Lourdes Patino",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6639,7 +6639,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "LYUN USHUAY RHUA",
     "tieneEntrenador": "Si",
     "entrenador": "Lourdes Patino",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6665,7 +6665,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "LYUN USHUAY RHUA",
     "tieneEntrenador": "Si",
     "entrenador": "Fernando Mendoza",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6678,7 +6678,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "LYUN USHUAY RHUA",
     "tieneEntrenador": "Si",
     "entrenador": "Mildred Munoz",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6691,7 +6691,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "LYUN USHUAY RHUA",
     "tieneEntrenador": "Si",
     "entrenador": "Josue Vera",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6704,7 +6704,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "LYUN USHUAY RHUA",
     "tieneEntrenador": "Si",
     "entrenador": "Ana Monroy",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6717,7 +6717,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "LYUN USHUAY RHUA",
     "tieneEntrenador": "Si",
     "entrenador": "Andres Idrobo",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6729,8 +6729,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 96,
     "equipo": "NINARI",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramrez",
-    "coordinador": "JOSU VERA",
+    "entrenador": "Mauricio Ramirez",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6743,7 +6743,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "JATARI",
     "tieneEntrenador": "SI",
     "entrenador": "Julio Narvaez",
-    "coordinador": "JUAN FER REINOSO",
+    "coordinador": "JUAN FERNANDO REINOSO",
     "sede": "Cuenca",
     "estado": "Desertor"
   },
@@ -6755,7 +6755,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 24,
     "equipo": "KAIRU",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilnez",
+    "entrenador": "Erika Gavilanez",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Desertor"
@@ -6782,7 +6782,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "NINARI",
     "tieneEntrenador": "Si",
     "entrenador": "Mike Boada",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6795,7 +6795,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "NINARI",
     "tieneEntrenador": "Si",
     "entrenador": "Alejandro Diaz",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6807,7 +6807,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 24,
     "equipo": "KAIRU",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilnez",
+    "entrenador": "Erika Gavilanez",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Desertor"
@@ -6847,7 +6847,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "BINDU MUHOPO",
     "tieneEntrenador": "Si",
     "entrenador": "Diego Bravo",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6860,7 +6860,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "BINDU MUHOPO",
     "tieneEntrenador": "Si",
     "entrenador": "Jose Sanchez",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6873,7 +6873,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "BINDU MUHOPO",
     "tieneEntrenador": "Si",
     "entrenador": "Alejandro Diaz",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6886,7 +6886,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "BINDU MUHOPO",
     "tieneEntrenador": "Si",
     "entrenador": "Maria Jose Roman",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6898,8 +6898,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 97,
     "equipo": "BINDU MUHOPO",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramrez",
-    "coordinador": "JOSU VERA",
+    "entrenador": "Mauricio Ramirez",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6912,7 +6912,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "BINDU MUHOPO",
     "tieneEntrenador": "Si",
     "entrenador": "Lourdes Patino",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6925,7 +6925,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "BINDU MUHOPO",
     "tieneEntrenador": "Si",
     "entrenador": "Alejandro Diaz",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6938,7 +6938,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "BINDU MUHOPO",
     "tieneEntrenador": "Si",
     "entrenador": "Lourdes Patino",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6950,8 +6950,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 97,
     "equipo": "BINDU MUHOPO",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramrez",
-    "coordinador": "JOSU VERA",
+    "entrenador": "Mauricio Ramirez",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -6990,7 +6990,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "VALHALLA DRAKI",
     "tieneEntrenador": "Si",
     "entrenador": "Julio Narvaez",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7016,7 +7016,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "VALHALLA DRAKI",
     "tieneEntrenador": "Si",
     "entrenador": "Mila Campuzano",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7029,7 +7029,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "HENSU CHIKARA",
     "tieneEntrenador": "Si",
     "entrenador": "Jose Sanchez",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7042,7 +7042,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "HENSU CHIKARA",
     "tieneEntrenador": "Si",
     "entrenador": "Mike Boada",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7055,7 +7055,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "HENSU CHIKARA",
     "tieneEntrenador": "Si",
     "entrenador": "Fernando Mendoza",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7068,7 +7068,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "HENSU CHIKARA",
     "tieneEntrenador": "Si",
     "entrenador": "Julio Narvaez",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7081,7 +7081,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "DUNAMIS PATSAK",
     "tieneEntrenador": "Si",
     "entrenador": "David Sosa",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7094,7 +7094,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "DUNAMIS PATSAK",
     "tieneEntrenador": "Si",
     "entrenador": "Isaac Betancourt",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7107,7 +7107,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "DUNAMIS PATSAK",
     "tieneEntrenador": "Si",
     "entrenador": "Fernando Mendoza",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7120,7 +7120,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "DUNAMIS PATSAK",
     "tieneEntrenador": "Si",
     "entrenador": "Isaac Betancourt",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7146,7 +7146,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "DUNAMIS PATSAK",
     "tieneEntrenador": "Si",
     "entrenador": "Mike Boada",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7159,7 +7159,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "DUNAMIS PATSAK",
     "tieneEntrenador": "Si",
     "entrenador": "Lourdes Patino",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7172,7 +7172,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "DUNAMIS PATSAK",
     "tieneEntrenador": "Si",
     "entrenador": "Josue Vera",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7185,7 +7185,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "DUNAMIS PATSAK",
     "tieneEntrenador": "Si",
     "entrenador": "Jose Sanchez",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7198,7 +7198,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "DUNAMIS PATSAK",
     "tieneEntrenador": "Si",
     "entrenador": "Maria Jose Roman",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7211,7 +7211,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "DUNAMIS PATSAK",
     "tieneEntrenador": "Si",
     "entrenador": "Julio Narvaez",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7224,7 +7224,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "DUNAMIS PATSAK",
     "tieneEntrenador": "Si",
     "entrenador": "Jose Sanchez",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7237,7 +7237,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "DUNAMIS PATSAK",
     "tieneEntrenador": "Si",
     "entrenador": "David Sosa",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7250,7 +7250,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "DUNAMIS PATSAK",
     "tieneEntrenador": "Si",
     "entrenador": "Maria Jose Roman",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7263,7 +7263,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "DUNAMIS PATSAK",
     "tieneEntrenador": "Si",
     "entrenador": "Maria Jose Roman",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7289,7 +7289,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "SUMAQ SHIN",
     "tieneEntrenador": "Si",
     "entrenador": "Josue Vera",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7302,7 +7302,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "SUMAQ SHIN",
     "tieneEntrenador": "Si",
     "entrenador": "Andres Idrobo",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7328,7 +7328,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "RIKCHARI MUNAY",
     "tieneEntrenador": "Si",
     "entrenador": "Diego Bravo",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7341,7 +7341,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "RIKCHARI MUNAY",
     "tieneEntrenador": "Si",
     "entrenador": "Jose Sanchez",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7354,7 +7354,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "RIKCHARI MUNAY",
     "tieneEntrenador": "Si",
     "entrenador": "Josue Vera",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7366,8 +7366,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 102,
     "equipo": "RIKCHARI MUNAY",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramrez",
-    "coordinador": "JOSU VERA",
+    "entrenador": "Mauricio Ramirez",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7380,7 +7380,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "UBUNTU QUASAR",
     "tieneEntrenador": "SI",
     "entrenador": "Linid Valencia",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -7419,7 +7419,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "UBUNTU QUASAR",
     "tieneEntrenador": "SI",
     "entrenador": "Linid Valencia",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -7432,7 +7432,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "MEMENTO MORI",
     "tieneEntrenador": "Si",
     "entrenador": "Ana Monroy",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7445,7 +7445,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "MEMENTO MORI",
     "tieneEntrenador": "Si",
     "entrenador": "Andres Idrobo",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7458,7 +7458,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "MEMENTO MORI",
     "tieneEntrenador": "Si",
     "entrenador": "Fernando Mendoza",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7471,7 +7471,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "MEMENTO MORI",
     "tieneEntrenador": "Si",
     "entrenador": "Lourdes Patino",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7483,8 +7483,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 103,
     "equipo": "MEMENTO MORI",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramrez",
-    "coordinador": "JOSU VERA",
+    "entrenador": "Mauricio Ramirez",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7497,7 +7497,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "MEMENTO MORI",
     "tieneEntrenador": "Si",
     "entrenador": "Pamela Carrillo",
-    "coordinador": "JOSU VERA",
+    "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7626,7 +7626,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 105,
     "equipo": "KRALLARI IPSOFACTO",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramrez",
+    "entrenador": "Mauricio Ramirez",
     "coordinador": "ERIKA GAVILANEZ",
     "sede": "Quito",
     "estado": "Graduado"
@@ -7639,7 +7639,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 105,
     "equipo": "KRALLARI IPSOFACTO",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramrez",
+    "entrenador": "Mauricio Ramirez",
     "coordinador": "ERIKA GAVILANEZ",
     "sede": "Quito",
     "estado": "Graduado"
@@ -7692,7 +7692,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "UBUNTU QUASAR",
     "tieneEntrenador": "SI",
     "entrenador": "Linid Valencia",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -7705,7 +7705,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "ARUTAM REN",
     "tieneEntrenador": "Si",
     "entrenador": "Ana Monroy",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7718,7 +7718,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "ARUTAM REN",
     "tieneEntrenador": "Si",
     "entrenador": "Fernando Mendoza",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7731,7 +7731,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "ARUTAM REN",
     "tieneEntrenador": "Si",
     "entrenador": "Julio Narvaez",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7744,7 +7744,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "ARUTAM REN",
     "tieneEntrenador": "Si",
     "entrenador": "Pamela Carrillo",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7809,7 +7809,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "NITYA LIKTHAM",
     "tieneEntrenador": "Si",
     "entrenador": "Ana Monroy",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7822,7 +7822,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "NITYA LIKTHAM",
     "tieneEntrenador": "Si",
     "entrenador": "Julio Narvaez",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7835,7 +7835,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "NITYA LIKTHAM",
     "tieneEntrenador": "Si",
     "entrenador": "Mike Boada",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7887,7 +7887,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "SAN SARU",
     "tieneEntrenador": "Si",
     "entrenador": "Julio Narvaez",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7900,7 +7900,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "SAN SARU",
     "tieneEntrenador": "Si",
     "entrenador": "Josue Vera",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7913,7 +7913,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "SAN SARU",
     "tieneEntrenador": "Si",
     "entrenador": "Diego Bravo",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7926,7 +7926,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "SAN SARU",
     "tieneEntrenador": "Si",
     "entrenador": "Jose Sanchez",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -7939,7 +7939,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "SAN SARU",
     "tieneEntrenador": "Si",
     "entrenador": "Lourdes Patino",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -8081,7 +8081,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 114,
     "equipo": "KIA AMORIS",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramrez",
+    "entrenador": "Mauricio Ramirez",
     "coordinador": "ALEJANDRO DIAZ",
     "sede": "Quito",
     "estado": "Desertor"
@@ -8094,7 +8094,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 114,
     "equipo": "KIA AMORIS",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramrez",
+    "entrenador": "Mauricio Ramirez",
     "coordinador": "ALEJANDRO DIAZ",
     "sede": "Quito",
     "estado": "Graduado"
@@ -8107,7 +8107,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 114,
     "equipo": "KIA AMORIS",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramrez",
+    "entrenador": "Mauricio Ramirez",
     "coordinador": "ALEJANDRO DIAZ",
     "sede": "Quito",
     "estado": "Graduado"
@@ -8120,7 +8120,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 114,
     "equipo": "KIA AMORIS",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramrez",
+    "entrenador": "Mauricio Ramirez",
     "coordinador": "ALEJANDRO DIAZ",
     "sede": "Quito",
     "estado": "Desertor"
@@ -8134,7 +8134,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "UBUNTU QUASAR",
     "tieneEntrenador": "SI",
     "entrenador": "Linid Valencia",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -8147,7 +8147,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "UBUNTU QUASAR",
     "tieneEntrenador": "SI",
     "entrenador": "Linid Valencia",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -8160,7 +8160,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "UBUNTU QUASAR",
     "tieneEntrenador": "SI",
     "entrenador": "Linid Valencia",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -8173,7 +8173,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "UBUNTU QUASAR",
     "tieneEntrenador": "SI",
     "entrenador": "Linid Valencia",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -8406,8 +8406,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 119,
     "equipo": "AURA IWIA",
     "tieneEntrenador": "SI",
-    "entrenador": "Mauricio Ramrez",
-    "coordinador": "ISAAC BETANCOURTH",
+    "entrenador": "Mauricio Ramirez",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -8419,8 +8419,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 119,
     "equipo": "AURA IWIA",
     "tieneEntrenador": "SI",
-    "entrenador": "Mauricio Ramrez",
-    "coordinador": "ISAAC BETANCOURTH",
+    "entrenador": "Mauricio Ramirez",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -8432,8 +8432,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 119,
     "equipo": "AURA IWIA",
     "tieneEntrenador": "SI",
-    "entrenador": "Mauricio Ramrez",
-    "coordinador": "ISAAC BETANCOURTH",
+    "entrenador": "Mauricio Ramirez",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -8445,8 +8445,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 119,
     "equipo": "AURA IWIA",
     "tieneEntrenador": "SI",
-    "entrenador": "Mauricio Ramrez",
-    "coordinador": "ISAAC BETANCOURTH",
+    "entrenador": "Mauricio Ramirez",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -8458,8 +8458,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 119,
     "equipo": "AURA IWIA",
     "tieneEntrenador": "SI",
-    "entrenador": "Mauricio Ramrez",
-    "coordinador": "ISAAC BETANCOURTH",
+    "entrenador": "Mauricio Ramirez",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -8471,8 +8471,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 119,
     "equipo": "AURA IWIA",
     "tieneEntrenador": "SI",
-    "entrenador": "Mauricio Ramrez",
-    "coordinador": "ISAAC BETANCOURTH",
+    "entrenador": "Mauricio Ramirez",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -8484,8 +8484,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 119,
     "equipo": "AURA IWIA",
     "tieneEntrenador": "SI",
-    "entrenador": "Mauricio Ramrez",
-    "coordinador": "ISAAC BETANCOURTH",
+    "entrenador": "Mauricio Ramirez",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -8523,8 +8523,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 119,
     "equipo": "AURA IWIA",
     "tieneEntrenador": "SI",
-    "entrenador": "Mauricio Ramrez",
-    "coordinador": "ISAAC BETANCOURTH",
+    "entrenador": "Mauricio Ramirez",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -8536,8 +8536,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 119,
     "equipo": "AURA IWIA",
     "tieneEntrenador": "SI",
-    "entrenador": "Mauricio Ramrez",
-    "coordinador": "ISAAC BETANCOURTH",
+    "entrenador": "Mauricio Ramirez",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -8549,8 +8549,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 119,
     "equipo": "AURA IWIA",
     "tieneEntrenador": "SI",
-    "entrenador": "Mauricio Ramrez",
-    "coordinador": "ISAAC BETANCOURTH",
+    "entrenador": "Mauricio Ramirez",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -8562,7 +8562,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 34,
     "equipo": "FRACTAL SHINE",
     "tieneEntrenador": "SI",
-    "entrenador": "Kerlie Carrillo",
+    "entrenador": "Kerly Carrillo",
     "coordinador": "JONATHAN LA ROSA",
     "sede": "Guayaquil",
     "estado": "Activo"
@@ -8575,7 +8575,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 34,
     "equipo": "FRACTAL SHINE",
     "tieneEntrenador": "SI",
-    "entrenador": "Kerlie Carrillo",
+    "entrenador": "Kerly Carrillo",
     "coordinador": "JONATHAN LA ROSA",
     "sede": "Guayaquil",
     "estado": "Activo"
@@ -8589,7 +8589,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "MAHORI KAYA",
     "tieneEntrenador": "SI",
     "entrenador": "Lourdes Patino",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Activo"
   },
@@ -8602,7 +8602,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "MAHORI KAYA",
     "tieneEntrenador": "SI",
     "entrenador": "Lourdes Patino",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Activo"
   },
@@ -8615,7 +8615,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "MAHORI KAYA",
     "tieneEntrenador": "SI",
     "entrenador": "Lourdes Patino",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Activo"
   },
@@ -8628,7 +8628,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "MAHORI KAYA",
     "tieneEntrenador": "SI",
     "entrenador": "Lourdes Patino",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -8641,7 +8641,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "MAHORI KAYA",
     "tieneEntrenador": "SI",
     "entrenador": "Lourdes Patino",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -8654,7 +8654,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "MAHORI KAYA",
     "tieneEntrenador": "SI",
     "entrenador": "Lourdes Patino",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -8667,7 +8667,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "MAHORI KAYA",
     "tieneEntrenador": "SI",
     "entrenador": "Lourdes Patino",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Activo"
   },
@@ -8680,7 +8680,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "MAHORI KAYA",
     "tieneEntrenador": "SI",
     "entrenador": "Lourdes Patino",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Activo"
   },
@@ -8693,7 +8693,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "MAHORI KAYA",
     "tieneEntrenador": "SI",
     "entrenador": "Lourdes Patino",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Activo"
   },
@@ -8888,7 +8888,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "KAIZEN MAINICHI",
     "tieneEntrenador": "NO",
     "entrenador": "",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Activo"
   },
@@ -8901,7 +8901,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "KAIZEN MAINICHI",
     "tieneEntrenador": "NO",
     "entrenador": "",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Activo"
   },
@@ -8914,7 +8914,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "KAIZEN MAINICHI",
     "tieneEntrenador": "NO",
     "entrenador": "",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Activo"
   },
@@ -8927,7 +8927,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "KAIZEN MAINICHI",
     "tieneEntrenador": "NO",
     "entrenador": "",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Activo"
   },
@@ -8940,7 +8940,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "KAIZEN MAINICHI",
     "tieneEntrenador": "NO",
     "entrenador": "",
-    "coordinador": "ISAAC BETANCOURTH",
+    "coordinador": "ISAAC BETANCOURT",
     "sede": "Quito",
     "estado": "Activo"
   },
@@ -8975,105 +8975,105 @@ export const INITIAL_MANAGERS = [
 export const INITIAL_LLAMADOS = {
   "JULIO2026": [
     {
-      "entrenador": "Erika Gavilnez",
+      "entrenador": "Erika Gavilanez",
       "manager": "David Gonzalez",
       "sede": "Medelln",
       "equipo": 15.0,
       "tarifa": 400.0
     },
     {
-      "entrenador": "Erika Gavilnez",
+      "entrenador": "Erika Gavilanez",
       "manager": "Gabriel Ordz",
       "sede": "CDMX",
       "equipo": 3.0,
       "tarifa": 400.0
     },
     {
-      "entrenador": "Erika Gavilnez",
+      "entrenador": "Erika Gavilanez",
       "manager": "Karina Valdiviezo",
       "sede": "Cuenca",
       "equipo": 19.0,
       "tarifa": 400.0
     },
     {
-      "entrenador": "Erika Gavilnez",
+      "entrenador": "Erika Gavilanez",
       "manager": "Marcelo Riera",
       "sede": "Cuenca",
       "equipo": 19.0,
       "tarifa": 400.0
     },
     {
-      "entrenador": "Erika Gavilnez",
+      "entrenador": "Erika Gavilanez",
       "manager": "Isabella Torres",
       "sede": "Guayaquil",
       "equipo": 32.0,
       "tarifa": 200.0
     },
     {
-      "entrenador": "Erika Gavilnez",
+      "entrenador": "Erika Gavilanez",
       "manager": "Ivonne Recaurte",
       "sede": "Guayaquil",
       "equipo": 33.0,
       "tarifa": 200.0
     },
     {
-      "entrenador": "Josu Vera",
+      "entrenador": "Josue Vera",
       "manager": "Anita Esperanza Flores Tipismana",
       "sede": "Lima",
       "equipo": 26.0,
       "tarifa": 44.44444444
     },
     {
-      "entrenador": "Josu Vera",
+      "entrenador": "Josue Vera",
       "manager": "Brian Steve Sangay Salvatierra",
       "sede": "Lima",
       "equipo": 26.0,
       "tarifa": 44.44444444
     },
     {
-      "entrenador": "Josu Vera",
+      "entrenador": "Josue Vera",
       "manager": "Bryan Rodny Lopez Hanco",
       "sede": "Lima",
       "equipo": 26.0,
       "tarifa": 44.44444444
     },
     {
-      "entrenador": "Josu Vera",
+      "entrenador": "Josue Vera",
       "manager": "Camila Alegria Verastegui Duran",
       "sede": "Lima",
       "equipo": 26.0,
       "tarifa": 44.44444444
     },
     {
-      "entrenador": "Josu Vera",
+      "entrenador": "Josue Vera",
       "manager": "Fabio Alessandro Canqui Lloyd",
       "sede": "Lima",
       "equipo": 26.0,
       "tarifa": 44.44444444
     },
     {
-      "entrenador": "Josu Vera",
+      "entrenador": "Josue Vera",
       "manager": "Jolber Vargas Enriquez",
       "sede": "Lima",
       "equipo": 26.0,
       "tarifa": 44.44444444
     },
     {
-      "entrenador": "Josu Vera",
+      "entrenador": "Josue Vera",
       "manager": "Jose Guillermo Curi Salvador",
       "sede": "Lima",
       "equipo": 26.0,
       "tarifa": 44.44444444
     },
     {
-      "entrenador": "Josu Vera",
+      "entrenador": "Josue Vera",
       "manager": "Maria Olarte Barrientos",
       "sede": "Lima",
       "equipo": 26.0,
       "tarifa": 44.44444444
     },
     {
-      "entrenador": "Josu Vera",
+      "entrenador": "Josue Vera",
       "manager": "Piero Alessandro Portal Pasquel",
       "sede": "Lima",
       "equipo": 26.0,
@@ -9115,91 +9115,91 @@ export const INITIAL_LLAMADOS = {
       "tarifa": 80.0
     },
     {
-      "entrenador": "Mauricio Ramrez",
+      "entrenador": "Mauricio Ramirez",
       "manager": "Carolina Herrera",
       "sede": "Quito",
       "equipo": 119.0,
       "tarifa": 40.0
     },
     {
-      "entrenador": "Mauricio Ramrez",
+      "entrenador": "Mauricio Ramirez",
       "manager": "Christian Sosa",
       "sede": "Quito",
       "equipo": 119.0,
       "tarifa": 40.0
     },
     {
-      "entrenador": "Mauricio Ramrez",
+      "entrenador": "Mauricio Ramirez",
       "manager": "Enrrique Franco",
       "sede": "Guayaquil",
       "equipo": 33.0,
       "tarifa": 133.3333333
     },
     {
-      "entrenador": "Mauricio Ramrez",
+      "entrenador": "Mauricio Ramirez",
       "manager": "Evelyn Orellana",
       "sede": "Guayaquil",
       "equipo": 33.0,
       "tarifa": 133.3333333
     },
     {
-      "entrenador": "Mauricio Ramrez",
+      "entrenador": "Mauricio Ramirez",
       "manager": "Fernanda Ibaez",
       "sede": "Guayaquil",
       "equipo": 33.0,
       "tarifa": 133.3333333
     },
     {
-      "entrenador": "Mauricio Ramrez",
+      "entrenador": "Mauricio Ramirez",
       "manager": "Gabriela Altuna",
       "sede": "Quito",
       "equipo": 119.0,
       "tarifa": 40.0
     },
     {
-      "entrenador": "Mauricio Ramrez",
+      "entrenador": "Mauricio Ramirez",
       "manager": "Jennifer Marmol",
       "sede": "Quito",
       "equipo": 119.0,
       "tarifa": 40.0
     },
     {
-      "entrenador": "Mauricio Ramrez",
+      "entrenador": "Mauricio Ramirez",
       "manager": "Jhonny Cuascota",
       "sede": "Quito",
       "equipo": 119.0,
       "tarifa": 40.0
     },
     {
-      "entrenador": "Mauricio Ramrez",
+      "entrenador": "Mauricio Ramirez",
       "manager": "Lluli Miniguano",
       "sede": "Quito",
       "equipo": 119.0,
       "tarifa": 40.0
     },
     {
-      "entrenador": "Mauricio Ramrez",
+      "entrenador": "Mauricio Ramirez",
       "manager": "Robert Espinoza",
       "sede": "Quito",
       "equipo": 119.0,
       "tarifa": 40.0
     },
     {
-      "entrenador": "Mauricio Ramrez",
+      "entrenador": "Mauricio Ramirez",
       "manager": "Santiago Proao",
       "sede": "Quito",
       "equipo": 119.0,
       "tarifa": 40.0
     },
     {
-      "entrenador": "Mauricio Ramrez",
+      "entrenador": "Mauricio Ramirez",
       "manager": "Verito Muzo",
       "sede": "Quito",
       "equipo": 119.0,
       "tarifa": 40.0
     },
     {
-      "entrenador": "Mauricio Ramrez",
+      "entrenador": "Mauricio Ramirez",
       "manager": "Vielka Altuna",
       "sede": "Quito",
       "equipo": 119.0,
@@ -9257,21 +9257,21 @@ export const INITIAL_LLAMADOS = {
   ],
   "JUNIO2026": [
     {
-      "entrenador": "Andrs Idrobo",
+      "entrenador": "Andres Idrobo",
       "manager": "MARTN QUIROZ",
       "sede": "Quito",
       "equipo": 116.0,
       "tarifa": 200.0
     },
     {
-      "entrenador": "Andrs Idrobo",
+      "entrenador": "Andres Idrobo",
       "manager": "PAOLA CAMACHO",
       "sede": "Quito",
       "equipo": 116.0,
       "tarifa": 200.0
     },
     {
-      "entrenador": "Jos Snchez",
+      "entrenador": "Jose Sanchez",
       "manager": "MARIANA CATRILLON",
       "sede": "Medelln",
       "equipo": 14.0,
@@ -9371,42 +9371,42 @@ export const INITIAL_LLAMADOS = {
       "tarifa": 200.0
     },
     {
-      "entrenador": "Julio Narvez",
+      "entrenador": "Julio Narvaez",
       "manager": "ERNESTO SEPLVEDA",
       "sede": "CDMX",
       "equipo": 2.0,
       "tarifa": 200.0
     },
     {
-      "entrenador": "Julio Narvez",
+      "entrenador": "Julio Narvaez",
       "manager": "MARTHA GUERRERO",
       "sede": "CDMX",
       "equipo": 2.0,
       "tarifa": 200.0
     },
     {
-      "entrenador": "Julio Narvez",
+      "entrenador": "Julio Narvaez",
       "manager": "JOSUE AVILES",
       "sede": "Cuenca",
       "equipo": 17.0,
       "tarifa": 100.0
     },
     {
-      "entrenador": "Julio Narvez",
+      "entrenador": "Julio Narvaez",
       "manager": "ESTEFANIA CASTILLO",
       "sede": "Cuenca",
       "equipo": 17.0,
       "tarifa": 100.0
     },
     {
-      "entrenador": "Julio Narvez",
+      "entrenador": "Julio Narvaez",
       "manager": "JUAN DIEGO JARA",
       "sede": "Cuenca",
       "equipo": 17.0,
       "tarifa": 100.0
     },
     {
-      "entrenador": "Julio Narvez",
+      "entrenador": "Julio Narvaez",
       "manager": "MARTHA REA",
       "sede": "Cuenca",
       "equipo": 17.0,
@@ -9497,70 +9497,70 @@ export const INITIAL_LLAMADOS = {
       "tarifa": 50.0
     },
     {
-      "entrenador": "Lourdes Patio",
+      "entrenador": "Lourdes Patino",
       "manager": "DAVID RODRIGUEZ",
       "sede": "Lima",
       "equipo": 25.0,
       "tarifa": 80.0
     },
     {
-      "entrenador": "Lourdes Patio",
+      "entrenador": "Lourdes Patino",
       "manager": "HELAR MUGURUZA",
       "sede": "Lima",
       "equipo": 25.0,
       "tarifa": 80.0
     },
     {
-      "entrenador": "Lourdes Patio",
+      "entrenador": "Lourdes Patino",
       "manager": "JHEN PONCE",
       "sede": "Lima",
       "equipo": 25.0,
       "tarifa": 80.0
     },
     {
-      "entrenador": "Lourdes Patio",
+      "entrenador": "Lourdes Patino",
       "manager": "MANUEL YAKIMA RIVERA",
       "sede": "Lima",
       "equipo": 25.0,
       "tarifa": 80.0
     },
     {
-      "entrenador": "Lourdes Patio",
+      "entrenador": "Lourdes Patino",
       "manager": "MARCO ANTONIO VILLARREAL",
       "sede": "Lima",
       "equipo": 25.0,
       "tarifa": 80.0
     },
     {
-      "entrenador": "Mauricio Ramrez",
+      "entrenador": "Mauricio Ramirez",
       "manager": "BRYAN PESANTEZ",
       "sede": "Quito",
       "equipo": 114.0,
       "tarifa": 80.0
     },
     {
-      "entrenador": "Mauricio Ramrez",
+      "entrenador": "Mauricio Ramirez",
       "manager": "ERICK BRAVO",
       "sede": "Quito",
       "equipo": 114.0,
       "tarifa": 80.0
     },
     {
-      "entrenador": "Mauricio Ramrez",
+      "entrenador": "Mauricio Ramirez",
       "manager": "GUIDO GAMBOA",
       "sede": "Quito",
       "equipo": 114.0,
       "tarifa": 80.0
     },
     {
-      "entrenador": "Mauricio Ramrez",
+      "entrenador": "Mauricio Ramirez",
       "manager": "MONICA CASANOVA",
       "sede": "Quito",
       "equipo": 114.0,
       "tarifa": 80.0
     },
     {
-      "entrenador": "Mauricio Ramrez",
+      "entrenador": "Mauricio Ramirez",
       "manager": "WILSON ALBUJA",
       "sede": "Quito",
       "equipo": 114.0,
@@ -9583,49 +9583,49 @@ export const INITIAL_LLAMADOS = {
       "tarifa": 300.0
     },
     {
-      "entrenador": "Andrs Gmez",
+      "entrenador": "Andres Gomez",
       "manager": "Diego Camargo",
       "sede": "Medelln",
       "equipo": 1.0,
       "tarifa": 300.0
     },
     {
-      "entrenador": "Andrs Gmez",
+      "entrenador": "Andres Gomez",
       "manager": "Miguel Patio",
       "sede": "Medelln",
       "equipo": 2.0,
       "tarifa": 300.0
     },
     {
-      "entrenador": "Andrs Gmez",
+      "entrenador": "Andres Gomez",
       "manager": "Ledis Daza",
       "sede": "Medelln",
       "equipo": 3.0,
       "tarifa": 300.0
     },
     {
-      "entrenador": "Andrs Gmez",
+      "entrenador": "Andres Gomez",
       "manager": "LAURA VANESSA DURANGO ARAQUE",
       "sede": "Medelln",
       "equipo": 8.0,
       "tarifa": 300.0
     },
     {
-      "entrenador": "Andrs Gmez",
+      "entrenador": "Andres Gomez",
       "manager": "EQUIPO 12",
       "sede": "Medelln",
       "equipo": 12.0,
       "tarifa": 400.0
     },
     {
-      "entrenador": "Andrs Gmez",
+      "entrenador": "Andres Gomez",
       "manager": "KARLA JIMENEZ",
       "sede": "Guayaquil",
       "equipo": 23.0,
       "tarifa": 125.0
     },
     {
-      "entrenador": "Andrs Idrobo",
+      "entrenador": "Andres Idrobo",
       "manager": "EQUIPO 113",
       "sede": "Quito",
       "equipo": 113.0,
@@ -9639,7 +9639,7 @@ export const INITIAL_LLAMADOS = {
       "tarifa": 325.0
     },
     {
-      "entrenador": "Erika Gavilnez",
+      "entrenador": "Erika Gavilanez",
       "manager": "EQUIPO 24",
       "sede": "Lima",
       "equipo": 24.0,
@@ -9653,7 +9653,7 @@ export const INITIAL_LLAMADOS = {
       "tarifa": 300.0
     },
     {
-      "entrenador": "Jos Snchez",
+      "entrenador": "Jose Sanchez",
       "manager": "EQUIPO 1",
       "sede": "CDMX",
       "equipo": 1.0,
@@ -9667,14 +9667,14 @@ export const INITIAL_LLAMADOS = {
       "tarifa": 300.0
     },
     {
-      "entrenador": "Lourdes Patio",
+      "entrenador": "Lourdes Patino",
       "manager": "ARIANNA MENDEZ",
       "sede": "Quito",
       "equipo": 112.0,
       "tarifa": 275.0
     },
     {
-      "entrenador": "Lourdes Patio",
+      "entrenador": "Lourdes Patino",
       "manager": "EQUIPO 30",
       "sede": "Guayaquil",
       "equipo": 30.0,
@@ -9683,7 +9683,7 @@ export const INITIAL_LLAMADOS = {
   ],
   "MARZO2026": [
     {
-      "entrenador": "Andrs Idrobo",
+      "entrenador": "Andres Idrobo",
       "manager": "MABEL ROBBYS",
       "sede": "Guayaquil",
       "equipo": 29.0,
@@ -9711,14 +9711,14 @@ export const INITIAL_LLAMADOS = {
       "tarifa": 325.0
     },
     {
-      "entrenador": "Erika Gavilnez",
+      "entrenador": "Erika Gavilanez",
       "manager": "ANDREA MEDINA",
       "sede": "Cuenca",
       "equipo": 15.0,
       "tarifa": 350.0
     },
     {
-      "entrenador": "Erika Gavilnez",
+      "entrenador": "Erika Gavilanez",
       "manager": "GARETH RAMOS PREZ",
       "sede": "Lima",
       "equipo": 23.0,
@@ -9746,28 +9746,28 @@ export const INITIAL_LLAMADOS = {
       "tarifa": 325.0
     },
     {
-      "entrenador": "Jos Snchez",
+      "entrenador": "Jose Sanchez",
       "manager": "KAROL VILLARUEL",
       "sede": "Quito",
       "equipo": 111.0,
       "tarifa": 275.0
     },
     {
-      "entrenador": "Jos Snchez",
+      "entrenador": "Jose Sanchez",
       "manager": "GRECIA MENDEZ",
       "sede": "Quito",
       "equipo": 112.0,
       "tarifa": 200.0
     },
     {
-      "entrenador": "Josu Vera",
+      "entrenador": "Josue Vera",
       "manager": "JONATHAN CARIUS",
       "sede": "Quito",
       "equipo": 111.0,
       "tarifa": 375.0
     },
     {
-      "entrenador": "Julio Narvez",
+      "entrenador": "Julio Narvaez",
       "manager": "EDWIN CALERO",
       "sede": "Quito",
       "equipo": 111.0,
@@ -9790,7 +9790,7 @@ export const INITIAL_LLAMADOS = {
       "tarifa": 275.0
     },
     {
-      "entrenador": "Andrs Idrobo",
+      "entrenador": "Andres Idrobo",
       "manager": "ROSMERY OCHOA FERRER",
       "sede": "Lima",
       "equipo": 22.0,
@@ -9825,70 +9825,70 @@ export const INITIAL_LLAMADOS = {
       "tarifa": 75.0
     },
     {
-      "entrenador": "Jos Snchez",
+      "entrenador": "Jose Sanchez",
       "manager": "PAUL PINOS",
       "sede": "Cuenca",
       "equipo": 14.0,
       "tarifa": 350.0
     },
     {
-      "entrenador": "Josu Vera",
+      "entrenador": "Josue Vera",
       "manager": "RUTH CALVACHE",
       "sede": "Quito",
       "equipo": 110.0,
       "tarifa": 225.0
     },
     {
-      "entrenador": "Josu Vera",
+      "entrenador": "Josue Vera",
       "manager": "WILLIAMS SANCHEZ",
       "sede": "Quito",
       "equipo": 110.0,
       "tarifa": 175.0
     },
     {
-      "entrenador": "Julio Narvez",
+      "entrenador": "Julio Narvaez",
       "manager": "VERONICA GALLEGO TABORDA",
       "sede": "Medelln",
       "equipo": 10.0,
       "tarifa": 300.0
     },
     {
-      "entrenador": "Julio Narvez",
+      "entrenador": "Julio Narvaez",
       "manager": "LUIS SABAY",
       "sede": "Quito",
       "equipo": 109.0,
       "tarifa": 350.0
     },
     {
-      "entrenador": "Lourdes Patio",
+      "entrenador": "Lourdes Patino",
       "manager": "JUAN PABLO LEMA BERMUDEZ",
       "sede": "Medelln",
       "equipo": 10.0,
       "tarifa": 325.0
     },
     {
-      "entrenador": "Lourdes Patio",
+      "entrenador": "Lourdes Patino",
       "manager": "FABIAN NAULA",
       "sede": "Cuenca",
       "equipo": 14.0,
       "tarifa": 300.0
     },
     {
-      "entrenador": "Lourdes Patio",
+      "entrenador": "Lourdes Patino",
       "manager": "LAURA TOAPANTA",
       "sede": "Guayaquil",
       "equipo": 28.0,
       "tarifa": 300.0
     },
     {
-      "entrenador": "Mauricio Ramrez",
+      "entrenador": "Mauricio Ramirez",
       "manager": "GREZIA MAIA JOLLY VERA",
       "sede": "Lima",
       "equipo": 22.0,
       "tarifa": 350.0
     },
     {
-      "entrenador": "Mauricio Ramrez",
+      "entrenador": "Mauricio Ramirez",
       "manager": "VALERIA CEVALLOS",
       "sede": "Quito",
       "equipo": 111.0,
@@ -9918,28 +9918,28 @@ export const INITIAL_LLAMADOS = {
       "tarifa": 300.0
     },
     {
-      "entrenador": "Erika Gavilnez",
+      "entrenador": "Erika Gavilanez",
       "manager": "PAUL OCHOA",
       "sede": "Cuenca",
       "equipo": 13.0,
       "tarifa": 325.0
     },
     {
-      "entrenador": "Jos Snchez",
+      "entrenador": "Jose Sanchez",
       "manager": "MIRIAM ORDOEZ",
       "sede": "Cuenca",
       "equipo": 13.0,
       "tarifa": 300.0
     },
     {
-      "entrenador": "Jos Snchez",
+      "entrenador": "Jose Sanchez",
       "manager": "NATALIA CAJAS",
       "sede": "Quito",
       "equipo": 110.0,
       "tarifa": 150.0
     },
     {
-      "entrenador": "Julio Narvez",
+      "entrenador": "Julio Narvaez",
       "manager": "PAOLA ALMEIDA",
       "sede": "Quito",
       "equipo": 107.0,
@@ -9960,7 +9960,7 @@ export const INITIAL_LLAMADOS = {
       "tarifa": 225.0
     },
     {
-      "entrenador": "Maurcio Ramirez",
+      "entrenador": "Mauricio Ramirez",
       "manager": "MILAGROS CASTAEDA ORBE",
       "sede": "Lima",
       "equipo": 21.0,
@@ -10004,14 +10004,14 @@ export const INITIAL_LLAMADOS = {
       "tarifa": 300.0
     },
     {
-      "entrenador": "Andrs Idrobo",
+      "entrenador": "Andres Idrobo",
       "manager": "JOHN BENITEZ",
       "sede": "Medelln",
       "equipo": 9.0,
       "tarifa": 225.0
     },
     {
-      "entrenador": "Andrs Idrobo",
+      "entrenador": "Andres Idrobo",
       "manager": "MABE CATOTA",
       "sede": "Cuenca",
       "equipo": 13.0,
@@ -10039,21 +10039,21 @@ export const INITIAL_LLAMADOS = {
       "tarifa": 125.0
     },
     {
-      "entrenador": "Erika Gavilnez",
+      "entrenador": "Erika Gavilanez",
       "manager": "JHEN PONCE ESPINOZA",
       "sede": "Lima",
       "equipo": 21.0,
       "tarifa": 125.0
     },
     {
-      "entrenador": "Erika Gavilnez",
+      "entrenador": "Erika Gavilanez",
       "manager": "JAHAIRA MUOZ",
       "sede": "Guayaquil",
       "equipo": 26.0,
       "tarifa": 300.0
     },
     {
-      "entrenador": "Erika Gavilnez",
+      "entrenador": "Erika Gavilanez",
       "manager": "BELEN MUQUINCHO",
       "sede": "Cuenca",
       "equipo": 12.0,
@@ -10074,42 +10074,42 @@ export const INITIAL_LLAMADOS = {
       "tarifa": 300.0
     },
     {
-      "entrenador": "Jos Snchez",
+      "entrenador": "Jose Sanchez",
       "manager": "LAURA VILLAGOMEZ",
       "sede": "Quito",
       "equipo": 106.0,
       "tarifa": 300.0
     },
     {
-      "entrenador": "Josu Vera",
+      "entrenador": "Josue Vera",
       "manager": "MATEO PACHACAMA",
       "sede": "Quito",
       "equipo": 107.0,
       "tarifa": 275.0
     },
     {
-      "entrenador": "Josu Vera",
+      "entrenador": "Josue Vera",
       "manager": "PAUL GAMARRA",
       "sede": "Lima",
       "equipo": 22.0,
       "tarifa": 275.0
     },
     {
-      "entrenador": "Josu Vera",
+      "entrenador": "Josue Vera",
       "manager": "STEFANY QUILUMBA",
       "sede": "Quito",
       "equipo": 106.0,
       "tarifa": 300.0
     },
     {
-      "entrenador": "Julio Narvez",
+      "entrenador": "Julio Narvaez",
       "manager": "MARTIN GARCIA",
       "sede": "Quito",
       "equipo": 107.0,
       "tarifa": 125.0
     },
     {
-      "entrenador": "Julio Narvez",
+      "entrenador": "Julio Narvaez",
       "manager": "XIMENA BRIONES",
       "sede": "Quito",
       "equipo": 108.0,
@@ -10137,28 +10137,28 @@ export const INITIAL_LLAMADOS = {
       "tarifa": 125.0
     },
     {
-      "entrenador": "Lourdes Patio",
+      "entrenador": "Lourdes Patino",
       "manager": "ALEXANDRA TAPULLIMA",
       "sede": "Lima",
       "equipo": 20.0,
       "tarifa": 25.0
     },
     {
-      "entrenador": "Lourdes Patio",
+      "entrenador": "Lourdes Patino",
       "manager": "CAMILA LUCA LEN MORE",
       "sede": "Lima",
       "equipo": 21.0,
       "tarifa": 100.0
     },
     {
-      "entrenador": "Maurcio Ramirez",
+      "entrenador": "Mauricio Ramirez",
       "manager": "BRYAN IZA",
       "sede": "Quito",
       "equipo": 107.0,
       "tarifa": 125.0
     },
     {
-      "entrenador": "Maurcio Ramirez",
+      "entrenador": "Mauricio Ramirez",
       "manager": "MARCO CLAVIJO",
       "sede": "Quito",
       "equipo": 106.0,
@@ -10237,49 +10237,49 @@ export const INITIAL_LLAMADOS = {
       "tarifa": 300.0
     },
     {
-      "entrenador": "Josu Vera",
+      "entrenador": "Josue Vera",
       "manager": "TITUANA SUQUILLO MARIA PAULINA",
       "sede": "Quito",
       "equipo": 104.0,
       "tarifa": 25.0
     },
     {
-      "entrenador": "Josu Vera",
+      "entrenador": "Josue Vera",
       "manager": "BENITEZ SANTIAGO",
       "sede": "Quito",
       "equipo": 105.0,
       "tarifa": 275.0
     },
     {
-      "entrenador": "Josu Vera",
+      "entrenador": "Josue Vera",
       "manager": "GUERRERO MORAIMA",
       "sede": "Quito",
       "equipo": 105.0,
       "tarifa": 275.0
     },
     {
-      "entrenador": "Julio Narvez",
+      "entrenador": "Julio Narvaez",
       "manager": "PIERO ALESSANDRO PORTAL PASQUEL",
       "sede": "Lima",
       "equipo": 20.0,
       "tarifa": 300.0
     },
     {
-      "entrenador": "Lourdes Patio",
+      "entrenador": "Lourdes Patino",
       "manager": "ALEXANDRA TAPULLIMA",
       "sede": "Lima",
       "equipo": 20.0,
       "tarifa": 250.0
     },
     {
-      "entrenador": "Mauricio Ramrez",
+      "entrenador": "Mauricio Ramirez",
       "manager": "HATTY CHRISTIAN",
       "sede": "Quito",
       "equipo": 105.0,
       "tarifa": 275.0
     },
     {
-      "entrenador": "Mauricio Ramrez",
+      "entrenador": "Mauricio Ramirez",
       "manager": "NAVAS YAMILEX",
       "sede": "Quito",
       "equipo": 105.0,
@@ -10337,28 +10337,28 @@ export const INITIAL_LLAMADOS = {
       "tarifa": 300.0
     },
     {
-      "entrenador": "Andrs Idrobo",
+      "entrenador": "Andres Idrobo",
       "manager": "KATIA DE PAZ",
       "sede": "Lima",
       "equipo": 20.0,
       "tarifa": 125.0
     },
     {
-      "entrenador": "Andrs Idrobo",
+      "entrenador": "Andres Idrobo",
       "manager": "PAZ CRISTINA",
       "sede": "Quito",
       "equipo": 105.0,
       "tarifa": 250.0
     },
     {
-      "entrenador": "Andrs Idrobo",
+      "entrenador": "Andres Idrobo",
       "manager": "LUIS PRUNA",
       "sede": "Guayaquil",
       "equipo": 25.0,
       "tarifa": 275.0
     },
     {
-      "entrenador": "Andrs Idrobo",
+      "entrenador": "Andres Idrobo",
       "manager": "VASCO BASANTES JOHANNA PAOLA",
       "sede": "Quito",
       "equipo": 104.0,
@@ -10400,14 +10400,14 @@ export const INITIAL_LLAMADOS = {
       "tarifa": 125.0
     },
     {
-      "entrenador": "Erika Gavilnez",
+      "entrenador": "Erika Gavilanez",
       "manager": "RHANIA INTIVEROS REQUEJO",
       "sede": "Lima",
       "equipo": 20.0,
       "tarifa": 125.0
     },
     {
-      "entrenador": "Erika Gavilnez",
+      "entrenador": "Erika Gavilanez",
       "manager": "MARIELA LOPEZ",
       "sede": "Guayaquil",
       "equipo": 25.0,
@@ -10428,112 +10428,112 @@ export const INITIAL_LLAMADOS = {
       "tarifa": 275.0
     },
     {
-      "entrenador": "Jos Snchez",
+      "entrenador": "Jose Sanchez",
       "manager": "ALISSON BARREROS",
       "sede": "Quito",
       "equipo": 107.0,
       "tarifa": 100.0
     },
     {
-      "entrenador": "Jos Snchez",
+      "entrenador": "Jose Sanchez",
       "manager": "BENITEZ NIETO TATIANA MISHELL",
       "sede": "Quito",
       "equipo": 104.0,
       "tarifa": 250.0
     },
     {
-      "entrenador": "Jos Snchez",
+      "entrenador": "Jose Sanchez",
       "manager": "PAULY CEDILLO",
       "sede": "Cuenca",
       "equipo": 11.0,
       "tarifa": 300.0
     },
     {
-      "entrenador": "Josu Vera",
+      "entrenador": "Josue Vera",
       "manager": "TITUANA SUQUILLO MARIA PAULINA",
       "sede": "Quito",
       "equipo": 104.0,
       "tarifa": 275.0
     },
     {
-      "entrenador": "Julio Narvez",
+      "entrenador": "Julio Narvaez",
       "manager": "ANGELLA MARIA BOLLET GOMEZ",
       "sede": "Lima",
       "equipo": 19.0,
       "tarifa": 300.0
     },
     {
-      "entrenador": "Julio Narvez",
+      "entrenador": "Julio Narvaez",
       "manager": "CASTILLO REYES JUAN FERNANDO",
       "sede": "Quito",
       "equipo": 104.0,
       "tarifa": 300.0
     },
     {
-      "entrenador": "Lourdes Patio",
+      "entrenador": "Lourdes Patino",
       "manager": "JORGE GAUNULEMA",
       "sede": "Quito",
       "equipo": 107.0,
       "tarifa": 125.0
     },
     {
-      "entrenador": "Lourdes Patio",
+      "entrenador": "Lourdes Patino",
       "manager": "ANTHONY LEO ALTAMIRANO LLACCUAS",
       "sede": "Lima",
       "equipo": 19.0,
       "tarifa": 150.0
     },
     {
-      "entrenador": "Lourdes Patio",
+      "entrenador": "Lourdes Patino",
       "manager": "Martha Londoo",
       "sede": "Medelln",
       "equipo": 7.0,
       "tarifa": 250.0
     },
     {
-      "entrenador": "Lourdes Patio",
+      "entrenador": "Lourdes Patino",
       "manager": "MERINO TARQUI MARGARITA NOEMI",
       "sede": "Quito",
       "equipo": 104.0,
       "tarifa": 300.0
     },
     {
-      "entrenador": "Mauricio Ramrez",
+      "entrenador": "Mauricio Ramirez",
       "manager": "BRYAN IZA",
       "sede": "Quito",
       "equipo": 107.0,
       "tarifa": 125.0
     },
     {
-      "entrenador": "Mauricio Ramrez",
+      "entrenador": "Mauricio Ramirez",
       "manager": "HECTOR CANQUI VALLADARES",
       "sede": "Lima",
       "equipo": 19.0,
       "tarifa": 50.0
     },
     {
-      "entrenador": "Mauricio Ramrez",
+      "entrenador": "Mauricio Ramirez",
       "manager": "LIDIA CRSITINA MARTINEZ PUENTE",
       "sede": "Lima",
       "equipo": 18.0,
       "tarifa": 75.0
     },
     {
-      "entrenador": "Mauricio Ramrez",
+      "entrenador": "Mauricio Ramirez",
       "manager": "ANAHI REYES",
       "sede": "Quito",
       "equipo": 102.0,
       "tarifa": 75.0
     },
     {
-      "entrenador": "Mauricio Ramrez",
+      "entrenador": "Mauricio Ramirez",
       "manager": "NATT ARTEAGA",
       "sede": "Quito",
       "equipo": 103.0,
       "tarifa": 100.0
     },
     {
-      "entrenador": "Mauricio Ramrez",
+      "entrenador": "Mauricio Ramirez",
       "manager": "SHIRLEY VELASQUEZ",
       "sede": "Guayaquil",
       "equipo": 25.0,
@@ -10572,24 +10572,21 @@ export const INITIAL_LLAMADOS = {
 
 export const ENTRENADORES_LIST = [
   "Alejandro Diaz",
-  "Alonso Solares Salazar",
+  "Alonso Solares",
   "Ana Cristina Sanchez",
-  "Ana Elena Monroy",
   "Ana Monroy",
   "Andres Gomez",
   "Andres Idrobo",
+  "Carlos Brunis",
   "Christian Tito",
-  "Chuy Acosta",
   "Cirilo Agustin Martinez",
   "Daniela Monroy",
   "David Sosa",
   "Diego Bravo",
   "Erika Gavilanez",
-  "Erika Gavilnez",
   "Fer Aragon",
   "Fernando Mendoza",
   "Isaac Betancourt",
-  "Jesus Acosta",
   "Jesus Adrian Acosta",
   "Jose Sanchez",
   "Jose Torron",
@@ -10597,19 +10594,17 @@ export const ENTRENADORES_LIST = [
   "Juan Angel",
   "Juan Fernando Reinoso",
   "Julio Narvaez",
-  "Kerlie Carrillo",
+  "Kerly Carrillo",
   "Kriscia Rodas",
   "Leandro Brunis",
   "Linid Valencia",
   "Lourdes Patino",
   "Maria Jose Roman",
-  "Maria de Lourdes Patino Galarraga",
   "Mauricio Perez",
-  "Mauricio Ramrez",
+  "Mauricio Ramirez",
   "Mike Boada",
   "Mila Campuzano",
   "Mildred Munoz",
-  "Mildred Munoz Vasquez",
   "Pamela Carrillo",
   "Paul Sosa"
 ];
@@ -10620,14 +10615,11 @@ export const COORDINADORES_LIST = [
   "DANIELA MONROY",
   "ERIKA GAVILANEZ",
   "FERNANDO MENDOZA",
-  "ISAAC BETANCOURTH",
+  "ISAAC BETANCOURT",
   "JONATHAN LA ROSA",
-  "JOSU VERA",
   "JOSUE VERA",
-  "JUAN FER REINOSO",
   "JUAN FERNANDO REINOSO",
   "KERLY CARRILLO",
-  "KERLY CARRILLO - JUANFER REINOSO",
   "KERLY CARRILLO / JUAN FERNANDO REINOSO",
   "LEYLA PASQUEL",
   "LILI CUBILLO",
@@ -10695,8 +10687,80 @@ export const TRAINER_METADATA = {
     "email": "leandro.brunis@crearpsl.net",
     "programa": "C1"
   },
+  "Carlos Brunis": {
+    "email": "carlos.brunis@crearpsl.net",
+    "programa": "QT+C1"
+  },
   "Mauricio Perez": {
     "email": "mperez.ttw@gmail.com",
     "programa": "C1"
   }
+};
+
+export const normalizeTrainer = (name) => {
+  if (!name) return '';
+  const clean = name.trim();
+  const map = {
+  "Carlos Brunis": "Carlos Brunis",
+  "Leandro Brunis": "Leandro Brunis",
+  "Andrs Gmez": "Andres Gomez",
+  "Andrés Gómez": "Andres Gomez",
+  "Andres Gomez": "Andres Gomez",
+  "Andrs Idrobo": "Andres Idrobo",
+  "Andrés Idrobo": "Andres Idrobo",
+  "Andres Idrobo": "Andres Idrobo",
+  "Ana Elena Monroy": "Ana Monroy",
+  "Ana Monroy": "Ana Monroy",
+  "Alonso Solares Salazar": "Alonso Solares",
+  "Alonso Solares": "Alonso Solares",
+  "Chuy Acosta": "Jesus Adrian Acosta",
+  "Jesus Acosta": "Jesus Adrian Acosta",
+  "Jesus Adrian Acosta": "Jesus Adrian Acosta",
+  "Jesús Acosta": "Jesus Adrian Acosta",
+  "Jesús Adrián Acosta": "Jesus Adrian Acosta",
+  "Erika Gavilnez": "Erika Gavilanez",
+  "Erika Gavilanez": "Erika Gavilanez",
+  "Érika Gavilánez": "Erika Gavilanez",
+  "Jos Snchez": "Jose Sanchez",
+  "José Sánchez": "Jose Sanchez",
+  "Jose Sanchez": "Jose Sanchez",
+  "Josu Vera": "Josue Vera",
+  "Josue Vera": "Josue Vera",
+  "Josué Vera": "Josue Vera",
+  "Julio Narvez": "Julio Narvaez",
+  "Julio Narvaez": "Julio Narvaez",
+  "Julio Narváez": "Julio Narvaez",
+  "Kerlie Carrillo": "Kerly Carrillo",
+  "Kerly Carrillo": "Kerly Carrillo",
+  "Kerly Carrillo Garzon": "Kerly Carrillo",
+  "Lourdes Patio": "Lourdes Patino",
+  "Lourdes Patino": "Lourdes Patino",
+  "Maria de Lourdes Patino Galarraga": "Lourdes Patino",
+  "María de Lourdes Patiño": "Lourdes Patino",
+  "Maurcio Ramirez": "Mauricio Ramirez",
+  "Mauricio Ramrez": "Mauricio Ramirez",
+  "Mauricio Ramirez": "Mauricio Ramirez",
+  "Mauricio Ramírez": "Mauricio Ramirez",
+  "Mildred Munoz Vasquez": "Mildred Munoz",
+  "Mildred Munoz": "Mildred Munoz",
+  "Mildred Muñoz": "Mildred Munoz",
+  "Isaac Betancourth": "Isaac Betancourt",
+  "Isaac Betancourt": "Isaac Betancourt",
+  "Juan Fer Reinoso": "Juan Fernando Reinoso",
+  "Juan Fernando Reinoso": "Juan Fernando Reinoso"
+};
+  return map[clean] || clean;
+};
+
+export const normalizeCoordinator = (name) => {
+  if (!name) return '';
+  const clean = name.trim();
+  const map = {
+  "ISAAC BETANCOURTH": "ISAAC BETANCOURT",
+  "JOSU VERA": "JOSUE VERA",
+  "JUAN FER REINOSO": "JUAN FERNANDO REINOSO",
+  "KERLY CARRILLO - JUANFER REINOSO": "KERLY CARRILLO / JUAN FERNANDO REINOSO",
+  "KERLY CARRILLO / JUANFER REINOSO": "KERLY CARRILLO / JUAN FERNANDO REINOSO"
+};
+  return map[clean] || clean;
 };

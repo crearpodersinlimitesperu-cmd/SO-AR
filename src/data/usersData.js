@@ -1,36 +1,61 @@
+import { USERS_TO_IMPORT } from './usersToImport';
+
+export const usersData = USERS_TO_IMPORT;
+
 export const normalizeRole = (role) => {
   if (!role) return 'miembro';
-  const r = role.toLowerCase().trim();
-  // Coordinadores C1/C2
-  if (r === 'coordinador_c1c2' || r === 'coord_c1' || r === 'coordinador_c1' || r.includes('capítulo uno') || r.includes('capitulo uno') || r.includes('capítulo 1') || r.includes('capitulo 1')) return 'coord_c1';
-  // Coordinadores Maestría
-  if (r === 'coordinador_mj' || r === 'coord_maestria' || r === 'coordinador_maestria' || r.includes('maestría del juego') || r.includes('maestria del juego') || r === 'coordinador global maestría' || r === 'coordinador global maestria') return 'coord_maestria';
+  
+  const r = role.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+
+  // Coordinadores Capítulo 1 / Capítulo 2 (C1 / C2)
+  if (r === 'coordinador_c1c2' || r === 'coord_c1' || r === 'coord_c2' || r === 'coordinador_c1' || r === 'coordinador_c2' || r.includes('capitulo uno') || r.includes('capitulo 1') || r.includes('capitulo dos') || r.includes('capitulo 2') || r === 'c1' || r === 'c2' || r === 'c1/c2' || r === 'c1c2') return 'coord_c1';
+  
+  // Coordinadores Maestría del Juego (MJ)
+  if (r === 'coordinador_mj' || r === 'coord_maestria' || r === 'coordinador_maestria' || r.includes('maestria del juego') || r.includes('maestria') || r.includes('coordinador global maestria') || r === 'mj') return 'coord_maestria';
+  
   // Gerentes
-  if (r === 'gerente' || r === 'gerente_sede' || r === 'gerente de sede') return 'gerente';
+  if (r === 'gerente' || r === 'gerente_sede' || r.includes('gerente de sede')) return 'gerente';
+  
   // Capitanes
-  if (r === 'capitan' || r === 'capitán') return 'capitan';
-  // Quantum Team
-  if (r === 'qt' || r === 'quantum_team' || r === 'quantum team' || r === 'quantum') return 'qt';
-  // Director Maestría
-  if (r === 'director_maestria' || r === 'director_mj' || r.includes('director') && r.includes('maestr')) return 'director_maestria';
+  if (r === 'capitan') return 'capitan';
+  
+  // Quantum Team & Coordinación QT Global
+  if (r === 'qt' || r === 'quantum_team' || r.includes('quantum') || r.includes('coord_qt') || r.includes('coordinador qt') || r.includes('coordinador_qt') || r.includes('qt global')) return 'qt';
+  
+  // Director Maestría del Juego (MJ)
+  if (r === 'director_maestria' || r === 'director_mj' || (r.includes('director') && (r.includes('maestr') || r.includes('mj')))) return 'director_maestria';
+  
   // Manager
   if (r === 'manager' || r === 'managers') return 'manager';
-  // Dirección (CEO, CCO, Socio)
-  if (r === 'ceo global' || r === 'cco global' || r === 'socio' || r === 'direccion' || r === 'dirección') return 'direccion';
+  
+  // Direccion (CEO, CCO, Socio)
+  if (r.includes('ceo') || r.includes('cco') || r.includes('socio') || r.includes('direccion') || r.includes('dirección')) return 'direccion';
+  
   // CFO / Finanzas
-  if (r === 'cfo' || r === 'jefa financiera' || r === 'jefe financiero') return 'cfo';
-  if (r === 'facturación' || r === 'facturacion' || r === 'asistente facturación' || r === 'asistente facturacion' || r === 'contador lima' || r === 'contador medellín' || r === 'contador medellin') return 'finanzas';
-  // Coordinación Administrativa
-  if (r === 'coordinadora administrativa' || r === 'coordinador administrativo' || r === 'coordinador' || r === 'coordinadora') return 'coordinador';
+  if (r === 'cfo' || r.includes('jefa financiera') || r.includes('jefe financiero')) return 'cfo';
+  if (r.includes('facturacion') || r.includes('contador lima') || r.includes('contador medellin') || r.includes('finanzas')) return 'finanzas';
+  
+  // Coordinacion Administrativa
+  if (r === 'coordinadora administrativa' || r === 'coordinador administrativo' || r === 'coordinador' || r === 'coordinadora' || r.includes('coordinacion administrativa')) return 'coordinador';
+  
   // Talento Humano
-  if (r === 'talento humano' || r === 'talento_humano') return 'talento_humano';
+  if (r.includes('talento humano')) return 'talento_humano';
+  
   // Legal
-  if (r === 'legal' || r.includes('legal') || r.includes('jurídico') || r.includes('juridico')) return 'legal';
+  if (r.includes('legal') || r.includes('juridico')) return 'legal';
+  
   // Impuestos
-  if (r === 'asistente impuestos quito' || r === 'asistente_impuestos_quito' || r.includes('impuesto') || r.includes('tributar')) return 'asistente_impuestos_quito';
+  if (r.includes('impuesto') || r.includes('tributar')) return 'asistente_impuestos_quito';
+  
   // SST
+  if (r.includes('sst') || r.includes('seguridad y salud')) return 'tecnico_sst';
+  
   // Entrenador de Llamadas / Coach
-  if (r === 'entrenador_llamadas' || r === 'entrenador' || r === 'coach' || r.includes('entrenador') || r.includes('coach')) return 'entrenador_llamadas';
+  if (r === 'entrenador_llamadas' || r.includes('llamadas')) return 'entrenador_llamadas';
+  
+  // Entrenador (Coach)
+  if (r === 'entrenador' || r === 'coach' || r.includes('entrenador') || r.includes('coach')) return 'entrenador';
+  
   return r;
 };
 
@@ -62,14 +87,14 @@ export const OPERATIONAL_SEDES = [
 ];
 
 export const ROLE_DISPLAY_NAMES = {
-  coord_c1: 'Coordinador C1 / C2',
-  coordinador_c1c2: 'Coordinador C1 / C2',
-  coord_maestria: 'Coordinador Maestría (MJ)',
-  coordinador_mj: 'Coordinador Maestría (MJ)',
+  coord_c1: 'Coordinador Capítulo 1 y 2 (C1 / C2)',
+  coordinador_c1c2: 'Coordinador Capítulo 1 y 2 (C1 / C2)',
+  coord_maestria: 'Coordinador Maestría del Juego (MJ)',
+  coordinador_mj: 'Coordinador Maestría del Juego (MJ)',
   gerente: 'Gerente de Sede',
   capitan: 'Capitán de Sede',
-  qt: 'Quantum Team (QT)',
-  director_maestria: 'Director de Maestría',
+  qt: 'Coordinador QT Global / QT',
+  director_maestria: 'Director Maestría del Juego (MJ)',
   manager: 'Manager',
   cfo: 'CFO (Chief Financial Officer)',
   direccion: 'Dirección Global',
@@ -77,7 +102,23 @@ export const ROLE_DISPLAY_NAMES = {
   coordinador: 'Coordinación Administrativa',
   talento_humano: 'Talento Humano',
   legal: 'Legal / Jurídico',
+  asistente_impuestos_quito: 'Impuestos & Tributación',
+  tecnico_sst: 'Seguridad y Salud (SST)',
+  entrenador: 'Entrenador (Coach)',
   entrenador_llamadas: 'Entrenador de Llamadas'
+};
+
+export const getRoleDisplayName = (role) => {
+  if (!role) return 'Colaborador';
+  const canonical = normalizeRole(role);
+  if (ROLE_DISPLAY_NAMES[canonical]) return ROLE_DISPLAY_NAMES[canonical];
+  if (ROLE_DISPLAY_NAMES[role]) return ROLE_DISPLAY_NAMES[role];
+  return String(role)
+    .replace(/_/g, ' ')
+    .split(' ')
+    .filter(Boolean)
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
 };
 
 export const ROLE_COLORS = {
@@ -97,14 +138,14 @@ export const ROLE_COLORS = {
   asistente_impuestos_quito: '#64748b',
   talento_humano: '#06b6d4',
   legal: '#a855f7',
-  técnico_sst: '#14b8a6',
+  tecnico_sst: '#14b8a6',
+  entrenador: '#fbbf24',
   entrenador_llamadas: '#38bdf8'
 };
 
 /**
  * Busca un usuario por cualquiera de sus correos (corporativo @crearpsl.net o personal Gmail)
  */
-import { USERS_TO_IMPORT } from './usersToImport';
 
 export const findUserByAnyEmail = (searchEmail) => {
   if (!searchEmail) return null;
@@ -118,4 +159,3 @@ export const findUserByAnyEmail = (searchEmail) => {
   }) || null;
 };
 
-export const usersData = USERS_TO_IMPORT;

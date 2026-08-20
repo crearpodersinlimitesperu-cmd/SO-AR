@@ -11,6 +11,8 @@ export default function HelpModal({ isOpen, onClose }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
 
+  const isQT = currentUser?.appRole === 'qt' || (currentUser?.roles || []).includes('qt');
+
   if (!isOpen) return null;
 
   const handleSendSuggestion = async (e) => {
@@ -109,7 +111,47 @@ export default function HelpModal({ isOpen, onClose }) {
               <h3 style={{ color: 'var(--crear-gold)', marginTop: 0 }}>Bienvenido al Sistema Operativo de Alto Rendimiento (SO-AR)</h3>
               <p>Esta herramienta centraliza todas las tareas, reportes y métricas de CREAR Poder Sin Límites para lograr una operación eficiente y transparente en todas las sedes.</p>
 
-              <div style={{ background: 'rgba(239, 68, 68, 0.1)', borderLeft: '4px solid #ef4444', padding: '1rem', margin: '1.5rem 0', borderRadius: '4px' }}>
+              {/* ENLACE DIRECTO MANUAL QUANTUM TEAM (SOLO PARA QT) */}
+              {isQT && (
+                <div style={{ background: 'rgba(255, 183, 3, 0.1)', border: '1px solid var(--crear-gold)', padding: '1rem', margin: '1rem 0', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.8rem' }}>
+                  <div>
+                    <h4 style={{ color: 'var(--crear-gold)', margin: '0 0 0.3rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <BookOpen size={18} /> Manual Quantum Team (QT) Oficial
+                    </h4>
+                    <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-main)' }}>Accede al manual interactivo para salas y dinámicas de CREAR.</p>
+                  </div>
+                  <a 
+                    href="https://crearpsl.net/manual_quantum_team.html" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="btn-primary" 
+                    style={{ padding: '0.4rem 1rem', fontSize: '0.8rem', textDecoration: 'none', borderRadius: '6px' }}
+                  >
+                    Abrir Manual QT ↗
+                  </a>
+                </div>
+              )}
+
+              {/* RECURSO OFICIAL: PROTOCOLO DE EMERGENCIAS CREAR GLOBAL */}
+              <div style={{ background: 'rgba(239, 68, 68, 0.12)', border: '1px solid #ef4444', padding: '1rem', margin: '1rem 0', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.8rem' }}>
+                <div>
+                  <h4 style={{ color: '#ef4444', margin: '0 0 0.3rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <AlertTriangle size={18} /> Protocolo de Emergencias CREAR Global
+                  </h4>
+                  <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-main)' }}>Manual oficial de contingencias médicas, contención emocional y evacuación.</p>
+                </div>
+                <a 
+                  href="/documents/manual_practico_protocolo_emergencias_crear_global_actualizado.pdf" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="btn-primary" 
+                  style={{ background: '#ef4444', borderColor: '#ef4444', color: '#fff', padding: '0.4rem 1rem', fontSize: '0.8rem', textDecoration: 'none', borderRadius: '6px', fontWeight: 700 }}
+                >
+                  Abrir PDF Oficial ↗
+                </a>
+              </div>
+
+              <div style={{ background: 'rgba(239, 68, 68, 0.08)', borderLeft: '4px solid #ef4444', padding: '1rem', margin: '1.5rem 0', borderRadius: '4px' }}>
                 <h4 style={{ color: '#ef4444', margin: '0 0 0.5rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <AlertTriangle size={18} /> Regla de Inactividad (72 horas)
                 </h4>

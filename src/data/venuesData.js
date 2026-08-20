@@ -2,6 +2,39 @@
 // Configuración de Sedes, Hoteles y Salones Oficiales por Defecto
 
 export const defaultVenues = {
+  Quito: {
+    sede: 'Quito',
+    c1_venue: 'CREAR PODER SIN LIMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)',
+    c2_venue: 'CREAR PODER SIN LIMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)',
+    mj_venue: 'CREAR PODER SIN LIMITES FORTALEZA CUÁNTICA (De los Naranjos, 170124 Quito, Ecuador)',
+    viaje_venue: 'Quito (El Viaje)',
+    caminata_venue: 'Quito, Ecuador',
+    address: 'De los Naranjos, 170124 Quito, Ecuador',
+    city: 'Quito',
+    country: 'Ecuador'
+  },
+  Guayaquil: {
+    sede: 'Guayaquil',
+    c1_venue: 'Guayaquil',
+    c2_venue: 'Guayaquil',
+    mj_venue: 'Guayaquil',
+    viaje_venue: 'Guayaquil (El Viaje)',
+    caminata_venue: 'Guayaquil, Ecuador',
+    address: 'Guayaquil, Ecuador',
+    city: 'Guayaquil',
+    country: 'Ecuador'
+  },
+  Cuenca: {
+    sede: 'Cuenca',
+    c1_venue: 'Cuenca',
+    c2_venue: 'Cuenca',
+    mj_venue: 'Cuenca',
+    viaje_venue: 'Cuenca (El Viaje)',
+    caminata_venue: 'Cuenca, Ecuador',
+    address: 'Cuenca, Ecuador',
+    city: 'Cuenca',
+    country: 'Ecuador'
+  },
   Lima: {
     sede: 'Lima',
     c1_venue: 'Hotel José Antonio Deluxe Miraflores (Calle Bellavista 133, Miraflores)',
@@ -13,52 +46,24 @@ export const defaultVenues = {
     city: 'Lima',
     country: 'Perú'
   },
-  Quito: {
-    sede: 'Quito',
-    c1_venue: 'Lugar Quito',
-    c2_venue: 'Lugar Quito',
-    mj_venue: 'Lugar Quito',
-    viaje_venue: 'Lugar Viaje Quito',
-    address: 'Quito, Ecuador',
-    city: 'Quito',
-    country: 'Ecuador'
-  },
-  Cuenca: {
-    sede: 'Cuenca',
-    c1_venue: 'Lugar Cuenca',
-    c2_venue: 'Lugar Cuenca',
-    mj_venue: 'Lugar Cuenca',
-    viaje_venue: 'Lugar Viaje Cuenca',
-    address: 'Cuenca, Ecuador',
-    city: 'Cuenca',
-    country: 'Ecuador'
-  },
-  Guayaquil: {
-    sede: 'Guayaquil',
-    c1_venue: 'Lugar Guayaquil',
-    c2_venue: 'Lugar Guayaquil',
-    mj_venue: 'Lugar Guayaquil',
-    viaje_venue: 'Lugar Viaje Guayaquil',
-    address: 'Guayaquil, Ecuador',
-    city: 'Guayaquil',
-    country: 'Ecuador'
-  },
   Medellin: {
     sede: 'Medellín',
-    c1_venue: 'Lugar Medellín',
-    c2_venue: 'Lugar Medellín',
-    mj_venue: 'Lugar Medellín',
-    viaje_venue: 'Lugar Viaje Medellín',
+    c1_venue: 'Medellín',
+    c2_venue: 'Medellín',
+    mj_venue: 'Medellín',
+    viaje_venue: 'Medellín (El Viaje)',
+    caminata_venue: 'Medellín, Colombia',
     address: 'Medellín, Colombia',
     city: 'Medellín',
     country: 'Colombia'
   },
   Mexico: {
     sede: 'México',
-    c1_venue: 'Lugar México',
-    c2_venue: 'Lugar México',
-    mj_venue: 'Lugar México',
-    viaje_venue: 'Lugar Viaje México',
+    c1_venue: 'Ciudad de México',
+    c2_venue: 'Ciudad de México',
+    mj_venue: 'Ciudad de México',
+    viaje_venue: 'México (El Viaje)',
+    caminata_venue: 'Ciudad de México, México',
     address: 'Ciudad de México, México',
     city: 'Ciudad de México',
     country: 'México'
@@ -72,17 +77,30 @@ export function getVenueForTraining(sede, trainingLevel = 'C1', rawPlace = '', r
   const normSede = (sede || '').trim().toLowerCase();
   const level = (trainingLevel || '').toUpperCase();
   
-  let matchKey = 'Lima';
-  if (normSede.includes('lima') || normSede === 'lim' || normSede.includes('pe lim') || normSede === 'pe') matchKey = 'Lima';
-  else if (normSede.includes('quito') || normSede === 'uio' || normSede.includes('ec uio')) matchKey = 'Quito';
-  else if (normSede.includes('cuenca') || normSede === 'cue' || normSede.includes('ec cue')) matchKey = 'Cuenca';
-  else if (normSede.includes('guayaquil') || normSede === 'gye' || normSede.includes('ec gye')) matchKey = 'Guayaquil';
-  else if (normSede.includes('medell') || normSede === 'med' || normSede.includes('co med')) matchKey = 'Medellin';
-  else if (normSede.includes('mex') || normSede.includes('méx') || normSede.includes('mx')) matchKey = 'Mexico';
+  let matchKey = null;
+  if (normSede.includes('lima') || normSede === 'lim' || normSede.includes('pe lim') || normSede === 'pe' || normSede.startsWith('lim')) {
+    matchKey = 'Lima';
+  } else if (normSede.includes('quito') || normSede.includes('uio') || normSede.includes('ec uio') || normSede.startsWith('uio')) {
+    matchKey = 'Quito';
+  } else if (normSede.includes('cuenca') || normSede.includes('cue') || normSede.includes('ec cue') || normSede.startsWith('cue')) {
+    matchKey = 'Cuenca';
+  } else if (normSede.includes('guayaquil') || normSede.includes('gye') || normSede.includes('ec gye') || normSede.startsWith('gye')) {
+    matchKey = 'Guayaquil';
+  } else if (normSede.includes('medell') || normSede.includes('med') || normSede.includes('co med') || normSede.startsWith('med')) {
+    matchKey = 'Medellin';
+  } else if (normSede.includes('mex') || normSede.includes('méx') || normSede.includes('mx') || normSede.includes('cdmx')) {
+    matchKey = 'Mexico';
+  }
 
-  const venueObj = defaultVenues[matchKey] || defaultVenues.Lima;
+  // SI NO ES LIMA, JAMÁS USAR LIMA COMO DEFAULT
+  if (!matchKey) {
+    const fallbackName = (sede || 'Sede Local').trim();
+    return fallbackName;
+  }
 
-  // Si el evento es "El Viaje", SIEMPRE devolver por defecto el hostal/lugar de retiro asignado
+  const venueObj = defaultVenues[matchKey];
+
+  // Si el evento es "El Viaje", devolver el lugar específico de retiro
   if (level.includes('VIAJE') || level.includes('RETIRO') || level.includes('CIE') || level.includes('SOL Y LUNA')) {
     try {
       const customVenues = JSON.parse(localStorage.getItem('cpsl_custom_venues') || '{}');
@@ -90,15 +108,15 @@ export function getVenueForTraining(sede, trainingLevel = 'C1', rawPlace = '', r
         return customVenues[matchKey].viaje_venue;
       }
     } catch (e) {}
-    return venueObj.viaje_venue || (matchKey === 'Lima' ? 'Hostal Sol y Luna (Cieneguilla, Lima, Perú)' : venueObj.mj_venue);
+    return venueObj.viaje_venue || (matchKey === 'Lima' ? 'Hostal Sol y Luna (Cieneguilla, Lima, Perú)' : `${venueObj.city} (El Viaje)`);
   }
 
-  // Si viene un nombre específico de hotel con más de 20 caracteres y contiene 'hotel', 'hostal', 'hostería' o 'salón', usarlo
+  // Si viene un nombre específico en rawPlace, pero verificar que si no es Lima no traiga hoteles de Lima
   const cleanPlace = (rawPlace || '').trim();
   const isGeneric = !cleanPlace || 
-                    cleanPlace.toLowerCase() === 'lima, perú' || 
-                    cleanPlace.toLowerCase() === 'lima, peru' ||
-                    cleanPlace.toLowerCase() === 'lima' ||
+                    cleanPlace.toLowerCase().includes('lima') && matchKey !== 'Lima' ||
+                    cleanPlace.toLowerCase().includes('jose antonio') && matchKey !== 'Lima' ||
+                    cleanPlace.toLowerCase().includes('miraflores') && matchKey !== 'Lima' ||
                     cleanPlace.toLowerCase() === 'quito, ecuador' ||
                     cleanPlace.toLowerCase() === 'quito' ||
                     cleanPlace.toLowerCase() === 'cuenca, ecuador' ||
@@ -108,10 +126,9 @@ export function getVenueForTraining(sede, trainingLevel = 'C1', rawPlace = '', r
                     cleanPlace.toLowerCase() === 'medellin' ||
                     cleanPlace.toLowerCase() === 'méxico' ||
                     cleanPlace.toLowerCase() === 'mexico' ||
-                    cleanPlace.toLowerCase().includes('pe lim') ||
                     cleanPlace.toLowerCase().includes('por confirmar');
 
-  if (!isGeneric && (cleanPlace.toLowerCase().includes('hotel') || cleanPlace.toLowerCase().includes('hostal') || cleanPlace.toLowerCase().includes('hoster') || cleanPlace.toLowerCase().includes('salon') || cleanPlace.toLowerCase().includes('salón') || cleanPlace.length > 25)) {
+  if (!isGeneric && (cleanPlace.toLowerCase().includes('hotel') || cleanPlace.toLowerCase().includes('hostal') || cleanPlace.toLowerCase().includes('hoster') || cleanPlace.toLowerCase().includes('salon') || cleanPlace.toLowerCase().includes('salón') || cleanPlace.toLowerCase().includes('fortaleza') || cleanPlace.length > 25)) {
     return cleanPlace;
   }
 
@@ -131,3 +148,4 @@ export function getVenueForTraining(sede, trainingLevel = 'C1', rawPlace = '', r
   if (level.includes('CAMINATA') || level.includes('FUEGO')) return venueObj.caminata_venue || venueObj.c1_venue;
   return venueObj.c1_venue;
 }
+

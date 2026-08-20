@@ -226,7 +226,7 @@ export default function GoalDivisionModal({ isOpen, onClose, goal, onSaveAssignm
                   borderColor: selectedRoleFilter === 'CC1Y2' ? 'var(--crear-blue)' : 'rgba(255,255,255,0.1)'
                 }}
               >
-                Solo CC1Y2
+                Capítulo 1 y 2 (C1/C2)
               </button>
               <button
                 type="button"
@@ -239,7 +239,7 @@ export default function GoalDivisionModal({ isOpen, onClose, goal, onSaveAssignm
                   borderColor: selectedRoleFilter === 'CMJ' ? 'var(--role-mj)' : 'rgba(255,255,255,0.1)'
                 }}
               >
-                Solo CMJ
+                Maestría del Juego (MJ)
               </button>
               <button
                 type="button"
@@ -252,7 +252,7 @@ export default function GoalDivisionModal({ isOpen, onClose, goal, onSaveAssignm
                   borderColor: selectedRoleFilter === 'ALL' ? 'var(--color-success)' : 'rgba(255,255,255,0.1)'
                 }}
               >
-                Todas (CC1Y2 + CMJ)
+                Todas (C1/C2 + MJ)
               </button>
             </div>
           </div>

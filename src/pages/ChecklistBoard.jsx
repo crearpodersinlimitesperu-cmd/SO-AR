@@ -5,7 +5,7 @@ import { useChecklist } from '../context/ChecklistContext';
 import { useCycles } from '../context/CyclesContext';
 import { useUI } from '../context/UIContext';
 import { roles } from '../data/checklistData';
-import { usersData, normalizeRole, ROLE_COLORS, ROLE_DISPLAY_NAMES } from '../data/usersData';
+import { usersData, normalizeRole, ROLE_COLORS, ROLE_DISPLAY_NAMES, getRoleDisplayName } from '../data/usersData';
 import { calculateAutomaticDeadline } from '../utils/soarDates';
 import { ArrowLeft, Target, Link as LinkIcon, Edit3, Filter, Clock, Calendar, ShieldAlert, Users, AtSign } from 'lucide-react';
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
@@ -24,9 +24,10 @@ export default function ChecklistBoard() {
   const { currentUser } = useAuth();
   const { tasks, toggleTask, updateTaskDetails, inviteCollaborator } = useChecklist();
   const { currentCycle, currentStage } = useCycles();
-  const { showPrompt } = useUI();
-
-  const role = roles.find(r => r.id === roleId);
+  const role = roles.find(r => r.id === roleId) || {
+    id: roleId,
+    name: getRoleDisplayName(roleId)
+  };
 
   // Verificación de Autorización por Rol (N7)
   const isAuthorized = currentUser?.canAccessRole ? currentUser.canAccessRole(roleId) : true;
@@ -79,34 +80,39 @@ export default function ChecklistBoard() {
   } else if (filterParam === 'importantes') {
     activeTasks = myTasks.filter(t => !t.completed && !t.isCritical && t.priority !== 'Crítica');
     viewTitle = "Mostrando: Tareas Importantes";
-  } else if (roleId === 'qt') {
-    // Para QT: visualización prolija de sus fases autorizadas (PRE-C1, C1, POST-C1 / C2)
+  } else if (roleId === 'qt' || roleId === 'coord_c1') {
+    // Para QT y Coordinación C1/C2: visualización prolija de sus fases operativas
     if (qtPhaseFilter === 'PRE-C1') {
       activeTasks = myTasks.filter(t => t.cyclePhase === 'PRE-C1');
-      viewTitle = "Quantum Team: Fase PRE-C1 (Logística & Armado)";
+      viewTitle = `${role?.name || 'Coordinación'}: Fase PRE-C1 (Logística, Grounding & Armado)`;
     } else if (qtPhaseFilter === 'C1') {
       activeTasks = myTasks.filter(t => t.cyclePhase === 'C1');
-      viewTitle = "Quantum Team: Fase C1 (Sala & Operaciones en Vivo)";
+      viewTitle = `${role?.name || 'Coordinación'}: Fase C1 (Sala, Mesas & Operaciones en Vivo)`;
     } else if (qtPhaseFilter === 'POST-C1') {
-      activeTasks = myTasks.filter(t => t.cyclePhase === 'POST-C1' || t.cyclePhase === 'C2');
-      viewTitle = "Quantum Team: Fase POST-C1 / C2 (Cierre & Conversión)";
+      activeTasks = myTasks.filter(t => t.cyclePhase === 'POST-C1');
+      viewTitle = `${role?.name || 'Coordinación'}: Fase POST-C1 (Post-Mortem & Re-enrolamiento)`;
+    } else if (qtPhaseFilter === 'C2') {
+      activeTasks = myTasks.filter(t => t.cyclePhase === 'C2');
+      viewTitle = `${role?.name || 'Coordinación'}: Fase C2 (Operación Avanzada & Cierres)`;
     } else {
       activeTasks = myTasks;
-      viewTitle = "Quantum Team: Catálogo Completo de Tareas (PRE-C1, C1 y C2)";
+      viewTitle = `${role?.name || 'Coordinación'}: Catálogo Operativo Integral (PRE-C1, C1, POST-C1 y C2)`;
     }
   } else {
     // Vista Normal del Checklist Activo para otros roles
-    activeTasks = myTasks.filter(t => 
-      (t.cyclePhase === currentStage) || (t.associatedGoal && !t.completed) || (t.isCritical && !t.completed)
-    );
-  }
-
-  if (!role) {
-    return <div className="text-gold" style={{ padding: '2rem', textAlign: 'center' }}>Rol no encontrado</div>;
+    if (currentStage && currentStage !== 'GLOBAL' && currentStage !== 'INACTIVO') {
+      activeTasks = myTasks.filter(t => 
+        (t.cyclePhase === currentStage) || (t.associatedGoal && !t.completed) || (t.isCritical && !t.completed)
+      );
+    } else {
+      activeTasks = myTasks;
+    }
   }
 
   // El progreso siempre es de mis tareas totales de la fase, no de la vista filtrada
-  const stageTasks = myTasks.filter(t => t.cyclePhase === currentStage || t.associatedGoal);
+  const stageTasks = (currentStage && currentStage !== 'GLOBAL' && currentStage !== 'INACTIVO') 
+    ? myTasks.filter(t => t.cyclePhase === currentStage || t.associatedGoal)
+    : myTasks;
   const completedActive = stageTasks.filter(t => t.completed || t.status === 'Completada').length;
   const progress = stageTasks.length > 0 ? Math.round((completedActive / stageTasks.length) * 100) : 100;
 
@@ -186,8 +192,8 @@ export default function ChecklistBoard() {
         </div>
         <p className="text-gold" style={{ marginTop: '0.5rem', fontWeight: 'bold' }}>{progress}% Completado en esta Fase</p>
 
-        {/* NAVEGACIÓN PROLIJA DE FASES PARA QUANTUM TEAM */}
-        {roleId === 'qt' && (
+        {/* NAVEGACIÓN PROLIJA DE FASES PARA QUANTUM TEAM Y COORDINACIÓN C1/C2 */}
+        {(roleId === 'qt' || roleId === 'coord_c1') && (
           <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1.25rem', flexWrap: 'wrap', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '1rem' }}>
             <button
               onClick={() => setQtPhaseFilter('all')}
@@ -202,7 +208,7 @@ export default function ChecklistBoard() {
                 border: `1px solid ${qtPhaseFilter === 'all' ? 'var(--crear-blue)' : 'rgba(255,255,255,0.1)'}`
               }}
             >
-              📋 Todas las Tareas QT ({myTasks.length})
+              📋 Todas las Tareas ({myTasks.length})
             </button>
             <button
               onClick={() => setQtPhaseFilter('PRE-C1')}
@@ -247,7 +253,22 @@ export default function ChecklistBoard() {
                 border: `1px solid ${qtPhaseFilter === 'POST-C1' ? '#8b5cf6' : 'rgba(255,255,255,0.1)'}`
               }}
             >
-              🚀 POST-C1 / C2 ({myTasks.filter(t => t.cyclePhase === 'POST-C1' || t.cyclePhase === 'C2').length})
+              🚀 POST-C1 ({myTasks.filter(t => t.cyclePhase === 'POST-C1').length})
+            </button>
+            <button
+              onClick={() => setQtPhaseFilter('C2')}
+              style={{
+                padding: '0.35rem 0.8rem',
+                borderRadius: '6px',
+                fontSize: '0.8rem',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                background: qtPhaseFilter === 'C2' ? '#ec4899' : 'rgba(255,255,255,0.05)',
+                color: qtPhaseFilter === 'C2' ? '#ffffff' : 'var(--text-muted)',
+                border: `1px solid ${qtPhaseFilter === 'C2' ? '#ec4899' : 'rgba(255,255,255,0.1)'}`
+              }}
+            >
+              🔥 C2 ({myTasks.filter(t => t.cyclePhase === 'C2').length})
             </button>
           </div>
         )}

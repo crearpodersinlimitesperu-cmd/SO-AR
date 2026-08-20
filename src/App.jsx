@@ -15,8 +15,10 @@ import ManualGuia from './pages/ManualGuia'
 import MisKPIs from './pages/MisKPIs'
 import AuditoriaKPIs from './pages/AuditoriaKPIs'
 import CentroManagers from './pages/CentroManagers'
+import DirectorioQT from './pages/DirectorioQT'
 import PromptModal from './components/PromptModal'
 import HelpModal from './components/HelpModal'
+import ThemeSelector from './components/ThemeSelector'
 import { useState } from 'react'
 import { HelpCircle } from 'lucide-react'
 
@@ -55,7 +57,10 @@ function RoleRoute({ children, allowedRoles = [], requireSuperAdmin = false }) {
 
   // Verificación de Roles permitidos
   if (allowedRoles.length > 0) {
-    const hasRole = allowedRoles.includes(currentUser.appRole) || currentUser.isSuperAdmin;
+    const hasRole = allowedRoles.includes(currentUser.appRole) || 
+                    currentUser.isSuperAdmin || 
+                    currentUser.isDireccion || 
+                    (currentUser.roles || []).some(r => allowedRoles.includes(r));
     if (!hasRole) {
       showToast(`ACCESO DENEGADO: Tu rol actual (${currentUser.appRole}) no tiene acceso a esta sección.`, "error");
       return <Navigate to="/home" replace />;
@@ -174,8 +179,14 @@ function App() {
           } />
           
           <Route path="/centro-managers" element={
-            <PrivateRoute>
+            <RoleRoute allowedRoles={['gerente', 'direccion', 'director_maestria', 'coordinador_mj', 'coord_maestria', 'finanzas', 'cfo', 'entrenador_llamadas', 'entrenador']}>
               <CentroManagers />
+            </RoleRoute>
+          } />
+
+          <Route path="/directorio-qt" element={
+            <PrivateRoute>
+              <DirectorioQT />
             </PrivateRoute>
           } />
 
@@ -183,6 +194,20 @@ function App() {
         </Routes>
       </main>
       
+      {/* SELECTOR DE TEMA GLOBAL PERSISTENTE EN TODA LA NAVEGACIÓN */}
+      <div 
+        style={{
+          position: 'fixed',
+          bottom: '2rem',
+          left: '2rem',
+          zIndex: 9990,
+          boxShadow: '0 8px 30px rgba(0,0,0,0.3)',
+          borderRadius: '9999px'
+        }}
+      >
+        <ThemeSelector />
+      </div>
+
       {/* Botón flotante de ayuda */}
       {currentUser && (
         <button
