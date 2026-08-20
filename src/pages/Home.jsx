@@ -136,6 +136,23 @@ export default function Home() {
               {time.toLocaleDateString([], { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
             </span>
           </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginTop: '0.4rem', flexWrap: 'wrap' }}>
+            <span style={{ 
+              background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(6, 95, 70, 0.3))', 
+              border: '1px solid #10b981', 
+              color: '#10b981', 
+              padding: '2px 10px', 
+              borderRadius: '12px', 
+              fontSize: '0.75rem', 
+              fontWeight: 700, 
+              display: 'inline-flex', 
+              alignItems: 'center', 
+              gap: '6px' 
+            }}>
+              <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#10b981', display: 'inline-block', boxShadow: '0 0 6px #10b981' }}></span>
+              SO-AR v2.8.0 ONLINE
+            </span>
+          </div>
         </div>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
           <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
