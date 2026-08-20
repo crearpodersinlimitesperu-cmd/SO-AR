@@ -40,11 +40,15 @@ jobs:
 
       - name: 🚀 Deploy to Firebase Hosting
         env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          RAW_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
         run: |
-          if [ -n "$FIREBASE_TOKEN" ]; then
-            echo "Deploying to Firebase Hosting with FIREBASE_TOKEN..."
-            npx --yes firebase-tools@latest deploy --only hosting --token "$FIREBASE_TOKEN" --project centro-operativo-cpsl --non-interactive
+          if [ -n "$RAW_TOKEN" ]; then
+            TOKEN="$RAW_TOKEN"
+            if [[ "$TOKEN" != 1//* ]]; then
+              TOKEN="1//$TOKEN"
+            fi
+            echo "Deploying to Firebase Hosting with formatted token..."
+            npx --yes firebase-tools@latest deploy --only hosting --token "$TOKEN" --project centro-operativo-cpsl --non-interactive
           else
             echo "FIREBASE_TOKEN not set, skipping hosting deploy."
           fi
