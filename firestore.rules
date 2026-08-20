@@ -12,7 +12,12 @@ service cloud.firestore {
     
     function isSuperAdmin() {
       return isAuthenticated() && (
-        request.auth.token.email == 'jose.sanchez@crearpsl.net' ||
+        request.auth.token.email in [
+          'jose.sanchez@crearpsl.net',
+          'armando.pilacuan@gmail.com',
+          'paul.sosa@crearpsl.net',
+          'paul.sosa@crearpsl.com'
+        ] ||
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'superadmin' ||
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'direccion'
       );

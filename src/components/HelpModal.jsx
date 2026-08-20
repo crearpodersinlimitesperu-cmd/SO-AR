@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import { X, HelpCircle, Mail, Send, CheckCircle2, BookOpen, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../services/firebase';
@@ -44,7 +45,7 @@ export default function HelpModal({ isOpen, onClose }) {
       }, 3000);
     } catch (error) {
       console.error("Error enviando sugerencia:", error);
-      alert("Hubo un error enviando la sugerencia. Por favor intenta de nuevo.");
+      toast.error("Hubo un error enviando la sugerencia. Por favor intenta de nuevo.");
     } finally {
       setIsSubmitting(false);
     }

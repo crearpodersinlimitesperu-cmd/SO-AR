@@ -1,12 +1,21 @@
-﻿// src/services/qtSheetService.js
+// src/services/qtSheetService.js
 // Conexión y sincronización en tiempo real del Directorio Oficial de Quantum Team (QT) desde Google Sheets
 
-export const QT_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/10sz7KNvZ31GOgGDhzH0P3gbISGLW8HPBsSAZwOw5L8U/export?format=csv&gid=0';
-export const QT_SHEET_EDIT_URL = 'https://docs.google.com/spreadsheets/d/10sz7KNvZ31GOgGDhzH0P3gbISGLW8HPBsSAZwOw5L8U/edit?gid=0#gid=0';
+export const QT_SHEET_CSV_URL = import.meta.env.VITE_QT_SHEET_CSV_URL || 'https://docs.google.com/spreadsheets/d/10sz7KNvZ31GOgGDhzH0P3gbISGLW8HPBsSAZwOw5L8U/export?format=csv&gid=0';
+export const QT_SHEET_EDIT_URL = import.meta.env.VITE_QT_SHEET_EDIT_URL || 'https://docs.google.com/spreadsheets/d/10sz7KNvZ31GOgGDhzH0P3gbISGLW8HPBsSAZwOw5L8U/edit?gid=0#gid=0';
 
 const CACHE_KEY = 'cpsl_qt_members_cache_v2';
 const CACHE_TIME_KEY = 'cpsl_qt_members_cache_time_v2';
 const CACHE_TTL_MS = 1000 * 60 * 15; // 15 minutos de caché automático
+
+export function clearQTCache() {
+  try {
+    localStorage.removeItem(CACHE_KEY);
+    localStorage.removeItem(CACHE_TIME_KEY);
+  } catch (e) {
+    console.warn("Error al limpiar caché de QT:", e);
+  }
+}
 
 /**
  * Mapeo de código de sede a nombre oficial y país

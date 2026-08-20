@@ -30,6 +30,13 @@
 
 ### 🛡️ Historial Completo de Versiones y Registro de Cambios
 
+#### [Versión 2.7.9] - 2026-08-20
+- **Remediación de Hallazgos de Auditoría Integral (Seguridad, Gobernanza & UX):**
+  1. **Seguridad en Permisos (`canAssignTrainer`):** Validación por lista exhaustiva e inmutable de emails exactos (`fer.aragon@crearpsl.net`, `paul.sosa@crearpsl.net`) y verificación de SuperAdmins, erradicando cualquier ambigüedad de subcadenas.
+  2. **Reglas de Firestore (`firestore.rules`):** Ampliación del array de SuperAdmins con validación de tokens de sesión para `jose.sanchez@crearpsl.net`, `armando.pilacuan@gmail.com` y `paul.sosa@crearpsl.net`.
+  3. **Directorio QT Resiliente:** Soporte de variable de entorno `VITE_QT_SHEET_CSV_URL` con fallback seguro y función de invalidación manual de caché `clearQTCache()`.
+  4. **Estandarización de Notificaciones UX:** Sustitución definitiva de cuadros de diálogo nativos (`alert`) por toasts reactivos enriquecidos (`react-hot-toast`) en modales de asignación de cuotas y sugerencias.
+
 #### [Versión 2.7.8] - 2026-08-20
 - **Normalización de Nomenclatura de Entrenamientos Complementarios:**
   - Corrección canónica del entrenamiento complementario de presión a su denominación oficial exacta: **Tanque** (removiendo el artículo "El").

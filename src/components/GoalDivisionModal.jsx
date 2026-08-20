@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import { usersData, normalizeRole } from '../data/usersData';
 import { Users, CheckCircle2, Shield, UserCheck, Calculator, X, Sparkles } from 'lucide-react';
 
@@ -110,17 +111,18 @@ export default function GoalDivisionModal({ isOpen, onClose, goal, onSaveAssignm
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (assignedCoordinators.length === 0) {
-      alert("Por favor selecciona al menos una coordinadora para la meta.");
+      toast.error("Por favor selecciona al menos una coordinadora para la meta.");
       return;
     }
 
     setIsSaving(true);
     try {
       await onSaveAssignment(goal.id, assignedCoordinators);
+      toast.success("Asignación de cuotas guardada correctamente.");
       onClose();
     } catch (err) {
       console.error(err);
-      alert("Hubo un error al guardar la asignación.");
+      toast.error("Hubo un error al guardar la asignación.");
     } finally {
       setIsSaving(false);
     }
