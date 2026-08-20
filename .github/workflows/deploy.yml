@@ -38,10 +38,19 @@ jobs:
           VITE_QT_SHEET_CSV_URL: ${{ secrets.VITE_QT_SHEET_CSV_URL }}
         run: npm run build
 
-      - name: 🔥 Deploy a Firebase Hosting
+      - name: Deploy to Firebase Hosting (Service Account)
+        id: deploy_sa
+        continue-on-error: true
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_CENTRO_OPERATIVO_CPSL || secrets.FIREBASE_SERVICE_ACCOUNT }}
           channelId: live
           projectId: centro-operativo-cpsl
+
+      - name: Deploy to Firebase Hosting (Token Fallback)
+        if: steps.deploy_sa.outcome != 'success' && env.HAS_FIREBASE_TOKEN == 'true'
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          HAS_FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN != '' }}
+        run: npx firebase-tools deploy --only hosting --token "$FIREBASE_TOKEN" --project centro-operativo-cpsl
