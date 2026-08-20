@@ -418,6 +418,34 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
                       <span style={{ fontSize: '0.7rem', color: '#10b981', background: 'rgba(16, 185, 129, 0.2)', padding: '1px 4px', borderRadius: '4px' }}>WhatsApp</span>
                     </a>
                   )}
+
+                  {/* Última Conexión Visible para Directorio y Super Admin */}
+                  <span 
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.4rem',
+                      padding: '2px 10px',
+                      borderRadius: '6px',
+                      fontSize: '0.82rem',
+                      fontWeight: 600,
+                      background: profileData.hasConnected ? 'rgba(34, 197, 94, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+                      color: profileData.hasConnected ? '#22c55e' : 'var(--text-muted)',
+                      border: profileData.hasConnected ? '1px solid rgba(34, 197, 94, 0.35)' : '1px solid rgba(255, 255, 255, 0.1)',
+                      boxShadow: profileData.hasConnected ? '0 0 10px rgba(34, 197, 94, 0.2)' : 'none'
+                    }}
+                    title={profileData.hasConnected ? `IP: ${profileData.lastIp || 'N/A'} • ${profileData.lastLocation || ''}` : 'Sin inicios de sesión registrados'}
+                  >
+                    <span style={{
+                      width: '8px', height: '8px', borderRadius: '50%',
+                      background: profileData.hasConnected ? '#22c55e' : '#94a3b8',
+                      boxShadow: profileData.hasConnected ? '0 0 6px #22c55e' : 'none'
+                    }} />
+                    <span>{profileData.hasConnected ? `🟢 Último acceso: ${profileData.lastLoginAt}` : '⚪ Sin conexión'}</span>
+                    {profileData.lastLocation && (
+                      <span style={{ fontSize: '0.75rem', opacity: 0.85, color: '#e2e8f0' }}>({profileData.lastLocation})</span>
+                    )}
+                  </span>
                 </div>
               </div>
 

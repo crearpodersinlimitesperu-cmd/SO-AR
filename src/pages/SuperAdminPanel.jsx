@@ -11,7 +11,7 @@ import { Globe, Building2, Users, ArrowLeft, ChevronDown, ChevronRight, Eye, Che
 import { getFlagForSede } from '../utils/flags';
 import UserProfileModal from '../components/UserProfileModal';
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
-import { getAllAuditLogs, recordAuditEvent } from '../services/auditService';
+import { getAllAuditLogs, recordAuditEvent, getAllUserConnections } from '../services/auditService';
 
 import { USERS_TO_IMPORT } from '../data/usersToImport';
 
@@ -67,7 +67,7 @@ function ProgressBar({ value, color = 'var(--crear-gold)', height = '8px' }) {
   );
 }
 
-function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, currentUser }) {
+function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, currentUser, userConnections = {} }) {
   const canonicalRole = normalizeRole(person.role);
   const normalizedSedeName = normalizeSede(person.sede);
   const myTasks = tasks.filter(t => {
@@ -158,6 +158,28 @@ function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, curre
               </span>
             )}
           </div>
+          {/* Indicador de Última Conexión en Tarjeta */}
+          {(() => {
+            const emailKey = (person.email || '').toLowerCase().trim();
+            const conn = userConnections[emailKey];
+            const hasConnected = !!(conn?.hasConnected || conn?.lastLoginFormatted || conn?.lastLoginAt);
+            return (
+              <div style={{ marginTop: '4px', display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.75rem' }}>
+                <span style={{
+                  width: '7px', height: '7px', borderRadius: '50%',
+                  background: hasConnected ? '#22c55e' : '#94a3b8',
+                  boxShadow: hasConnected ? '0 0 6px #22c55e' : 'none',
+                  display: 'inline-block'
+                }} />
+                <span style={{ color: hasConnected ? '#22c55e' : 'var(--text-muted)', fontWeight: hasConnected ? 600 : 400 }}>
+                  {hasConnected ? `Último acceso: ${conn.lastLoginFormatted || 'Conectado'}` : 'Sin conexión'}
+                </span>
+                {hasConnected && conn?.lastLocation && (
+                  <span style={{ color: 'var(--text-muted)', fontSize: '0.7rem' }}>• {conn.lastLocation}</span>
+                )}
+              </div>
+            );
+          })()}
         </div>
       </div>
       <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.3rem' }}>
@@ -186,7 +208,7 @@ function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, curre
   );
 }
 
-function SedeBlock({ sede, tasks, navigate, onSelectUser, onAssignTask, currentUser }) {
+function SedeBlock({ sede, tasks, navigate, onSelectUser, onAssignTask, currentUser, userConnections = {} }) {
   const [expanded, setExpanded] = useState(false);
   const members = usersData.filter(u => normalizeSede(u.sede) === sede);
   
@@ -529,7 +551,7 @@ function GlobalView({ tasks, navigate }) {
   );
 }
 
-function RoleView({ tasks, navigate, onSelectUser, onAssignTask }) {
+function RoleView({ tasks, navigate, onSelectUser, onAssignTask, userConnections = {}, currentUser }) {
   const roles = [
     { id: 'direccion', label: 'Dirección Global' },
     { id: 'cfo', label: 'CFO (Chief Financial Officer)' },
@@ -709,6 +731,7 @@ export default function SuperAdminPanel() {
                   onSelectUser={handleOpenUserModal}
                   onAssignTask={setAssignUser}
                   currentUser={currentUser}
+                  userConnections={userConnections}
                 />
               ))}
             </div>
@@ -745,6 +768,7 @@ export default function SuperAdminPanel() {
                   onSelectUser={handleOpenUserModal}
                   onAssignTask={setAssignUser}
                   currentUser={currentUser}
+                  userConnections={userConnections}
                 />
               ))}
             </div>
@@ -756,6 +780,7 @@ export default function SuperAdminPanel() {
               onSelectUser={handleOpenUserModal}
               onAssignTask={setAssignUser}
               currentUser={currentUser}
+              userConnections={userConnections}
             />
           )}
           {activeView === 'auditoria' && (
