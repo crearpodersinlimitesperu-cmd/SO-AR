@@ -400,6 +400,10 @@ export default function Home() {
                   </button>
                 )}
 
+                <button onClick={() => { setShowToolsDropdown(false); navigate('/protocolo-emergencias'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.4)', background: 'rgba(239, 68, 68, 0.1)', fontWeight: 'bold' }}>
+                  🚨 Protocolo de Emergencias
+                </button>
+
                 {currentUser?.appRole === 'qt' ? (
                   <button onClick={() => { setShowToolsDropdown(false); window.open('https://crearpsl.net/manual_quantum_team.html', '_blank'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                     📘 Manual Quantum Team ↗

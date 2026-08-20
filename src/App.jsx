@@ -16,6 +16,7 @@ import MisKPIs from './pages/MisKPIs'
 import AuditoriaKPIs from './pages/AuditoriaKPIs'
 import CentroManagers from './pages/CentroManagers'
 import DirectorioQT from './pages/DirectorioQT'
+import ProtocoloEmergencias from './pages/ProtocoloEmergencias'
 import PromptModal from './components/PromptModal'
 import HelpModal from './components/HelpModal'
 import ThemeSelector from './components/ThemeSelector'
@@ -187,6 +188,12 @@ function App() {
           <Route path="/directorio-qt" element={
             <PrivateRoute>
               <DirectorioQT />
+            </PrivateRoute>
+          } />
+
+          <Route path="/protocolo-emergencias" element={
+            <PrivateRoute>
+              <ProtocoloEmergencias />
             </PrivateRoute>
           } />
 

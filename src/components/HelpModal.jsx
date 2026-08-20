@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { X, HelpCircle, Mail, Send, CheckCircle2, BookOpen, AlertTriangle } from 'lucide-react';
+import { X, HelpCircle, Mail, Send, CheckCircle2, BookOpen, AlertTriangle, ShieldAlert, HeartPulse, PhoneCall, Zap, ExternalLink } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../services/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 export default function HelpModal({ isOpen, onClose }) {
   const { currentUser } = useAuth();
-  const [activeTab, setActiveTab] = useState('manual'); // 'manual' | 'suggestions'
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('manual'); // 'manual' | 'protocol' | 'suggestions'
   const [suggestion, setSuggestion] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -93,6 +95,17 @@ export default function HelpModal({ isOpen, onClose }) {
             <BookOpen size={18} /> Manual de Usuario
           </button>
           <button
+            onClick={() => setActiveTab('protocol')}
+            style={{
+              flex: 1, padding: '1rem', border: 'none', background: 'transparent', cursor: 'pointer',
+              color: activeTab === 'protocol' ? '#ef4444' : 'var(--text-muted)',
+              borderBottom: activeTab === 'protocol' ? '2px solid #ef4444' : '2px solid transparent',
+              fontWeight: 'bold', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem'
+            }}
+          >
+            <ShieldAlert size={18} /> Protocolo de Emergencias
+          </button>
+          <button
             onClick={() => setActiveTab('suggestions')}
             style={{
               flex: 1, padding: '1rem', border: 'none', background: 'transparent', cursor: 'pointer',
@@ -107,7 +120,66 @@ export default function HelpModal({ isOpen, onClose }) {
 
         {/* Content */}
         <div style={{ padding: '2rem', overflowY: 'auto', flex: 1 }}>
-          {activeTab === 'manual' ? (
+          {activeTab === 'protocol' ? (
+            <div style={{ color: 'var(--text-body)', lineHeight: '1.6' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                <div>
+                  <h3 style={{ color: '#ef4444', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <ShieldAlert size={22} /> Protocolo Global de Emergencias Médicas
+                  </h3>
+                  <p style={{ margin: '0.3rem 0 0 0', fontSize: '0.88rem', color: 'var(--text-muted)' }}>
+                    Aplicación obligatoria en todas las sedes de Crear Poder Sin Límites.
+                  </p>
+                </div>
+                <button 
+                  onClick={() => { onClose(); navigate('/protocolo-emergencias'); }}
+                  className="btn-primary"
+                  style={{ background: '#ef4444', borderColor: '#ef4444', color: '#fff', padding: '0.4rem 1rem', fontSize: '0.82rem', fontWeight: 700 }}
+                >
+                  Ver Pantalla Completa ↗
+                </button>
+              </div>
+
+              {/* Principio Operativo */}
+              <div style={{ padding: '1rem', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '8px', borderLeft: '4px solid #ef4444', marginBottom: '1.2rem' }}>
+                <h4 style={{ color: '#ef4444', margin: '0 0 0.4rem 0', fontWeight: 800 }}>1. Principio Operativo</h4>
+                <p style={{ margin: 0, fontSize: '0.88rem', color: '#fff' }}>
+                  <strong>El entrenador no detiene ni abandona el entrenamiento.</strong> El coordinador o capitán designado asume el manejo exclusivo dentro del salón, organiza el perímetro, solicita apoyo y retira al paciente cuando proceda.
+                </p>
+              </div>
+
+              {/* 7 Pasos Breves */}
+              <h4 style={{ color: 'var(--crear-gold)', marginBottom: '0.6rem' }}>2. Los 7 Pasos de Oro</h4>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.2rem' }}>
+                <div style={{ padding: '0.6rem 0.8rem', background: 'rgba(255,255,255,0.03)', borderRadius: '6px' }}><strong>1. Detectar y avisar:</strong> El entrenador avisa con voz firme: "Emergencia en [lugar], coordinador requerido".</div>
+                <div style={{ padding: '0.6rem 0.8rem', background: 'rgba(255,255,255,0.03)', borderRadius: '6px' }}><strong>2. Asumir el salón:</strong> El coordinador toma el control y es la única voz de mando.</div>
+                <div style={{ padding: '0.6rem 0.8rem', background: 'rgba(255,255,255,0.03)', borderRadius: '6px' }}><strong>3. Proteger:</strong> Crear perímetro humano, despejar oxígeno y evitar grabaciones.</div>
+                <div style={{ padding: '0.6rem 0.8rem', background: 'rgba(255,255,255,0.03)', borderRadius: '6px' }}><strong>4. Evaluar y solicitar apoyo:</strong> Solicitar enfermera o brigadista certificado.</div>
+                <div style={{ padding: '0.6rem 0.8rem', background: 'rgba(255,255,255,0.03)', borderRadius: '6px' }}><strong>5. Retirar al paciente:</strong> Si es seguro. (NO mover si hay sospecha de cuello/columna).</div>
+                <div style={{ padding: '0.6rem 0.8rem', background: 'rgba(255,255,255,0.03)', borderRadius: '6px' }}><strong>6. Continuar:</strong> El entrenador retoma la atención del grupo con serenidad.</div>
+                <div style={{ padding: '0.6rem 0.8rem', background: 'rgba(255,255,255,0.03)', borderRadius: '6px' }}><strong>7. Trasladar y registrar:</strong> Ambulancia si procede, aviso a familiar y registro en plataforma.</div>
+              </div>
+
+              {/* Centrales de Emergencia Rápidas */}
+              <h4 style={{ color: 'var(--crear-cyan)', marginBottom: '0.6rem' }}>3. Centrales de Emergencia por Sede</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.5rem', marginBottom: '1.5rem' }}>
+                <div style={{ padding: '0.5rem', background: 'rgba(255,255,255,0.03)', borderRadius: '6px', fontSize: '0.85rem' }}>🇪🇨 Quito/GYE/CUE: <strong style={{ color: '#ef4444' }}>911</strong></div>
+                <div style={{ padding: '0.5rem', background: 'rgba(255,255,255,0.03)', borderRadius: '6px', fontSize: '0.85rem' }}>🇵🇪 Lima: <strong style={{ color: '#ef4444' }}>106 / 116</strong></div>
+                <div style={{ padding: '0.5rem', background: 'rgba(255,255,255,0.03)', borderRadius: '6px', fontSize: '0.85rem' }}>🇨🇴 Medellín: <strong style={{ color: '#ef4444' }}>123</strong></div>
+                <div style={{ padding: '0.5rem', background: 'rgba(255,255,255,0.03)', borderRadius: '6px', fontSize: '0.85rem' }}>🇲🇽 México: <strong style={{ color: '#ef4444' }}>911</strong></div>
+              </div>
+
+              <div style={{ textAlign: 'center' }}>
+                <button 
+                  onClick={() => { onClose(); navigate('/protocolo-emergencias'); }}
+                  className="btn-primary"
+                  style={{ width: '100%', padding: '0.8rem', fontSize: '0.95rem', background: '#ef4444', borderColor: '#ef4444', color: '#fff', fontWeight: 800 }}
+                >
+                  🚨 Ir al Módulo Interactivo de Emergencias y Checklist
+                </button>
+              </div>
+            </div>
+          ) : activeTab === 'manual' ? (
             <div style={{ color: 'var(--text-body)', lineHeight: '1.6' }}>
               <h3 style={{ color: 'var(--crear-gold)', marginTop: 0 }}>Bienvenido al Sistema Operativo de Alto Rendimiento (SO-AR)</h3>
               <p>Esta herramienta centraliza todas las tareas, reportes y métricas de CREAR Poder Sin Límites para lograr una operación eficiente y transparente en todas las sedes.</p>
@@ -134,22 +206,20 @@ export default function HelpModal({ isOpen, onClose }) {
               )}
 
               {/* RECURSO OFICIAL: PROTOCOLO DE EMERGENCIAS CREAR GLOBAL */}
-              <div style={{ background: 'rgba(239, 68, 68, 0.12)', border: '1px solid #ef4444', padding: '1rem', margin: '1rem 0', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.8rem' }}>
+              <div style={{ background: 'rgba(239, 68, 68, 0.12)', border: '1px solid #ef4444', padding: '1.2rem', margin: '1rem 0', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.8rem' }}>
                 <div>
                   <h4 style={{ color: '#ef4444', margin: '0 0 0.3rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <AlertTriangle size={18} /> Protocolo de Emergencias CREAR Global
+                    <ShieldAlert size={20} /> Protocolo Global de Emergencias Médicas
                   </h4>
-                  <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-main)' }}>Manual oficial de contingencias médicas, contención emocional y evacuación.</p>
+                  <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-main)' }}>Módulo interactivo completo con los 7 pasos de oro, cadena de mando, triage y checklist por sede.</p>
                 </div>
-                <a 
-                  href="/documents/manual_practico_protocolo_emergencias_crear_global_actualizado.pdf" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
+                <button 
+                  onClick={() => { onClose(); navigate('/protocolo-emergencias'); }}
                   className="btn-primary" 
-                  style={{ background: '#ef4444', borderColor: '#ef4444', color: '#fff', padding: '0.4rem 1rem', fontSize: '0.8rem', textDecoration: 'none', borderRadius: '6px', fontWeight: 700 }}
+                  style={{ background: '#ef4444', borderColor: '#ef4444', color: '#fff', padding: '0.5rem 1.2rem', fontSize: '0.85rem', cursor: 'pointer', borderRadius: '6px', fontWeight: 800 }}
                 >
-                  Abrir PDF Oficial ↗
-                </a>
+                  🚨 Abrir Protocolo Interactivo ↗
+                </button>
               </div>
 
               <div style={{ background: 'rgba(239, 68, 68, 0.08)', borderLeft: '4px solid #ef4444', padding: '1rem', margin: '1.5rem 0', borderRadius: '4px' }}>

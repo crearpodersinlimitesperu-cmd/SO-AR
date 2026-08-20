@@ -756,6 +756,24 @@ export default function ManualGuia() {
                 Protocolo de Seguridad & Manejo de Emergencias en Salón
               </h2>
             </div>
+            <button 
+              onClick={() => navigate('/protocolo-emergencias')}
+              className="btn-primary"
+              style={{
+                marginLeft: 'auto',
+                background: '#ef4444',
+                borderColor: '#ef4444',
+                color: '#fff',
+                padding: '0.5rem 1rem',
+                fontSize: '0.85rem',
+                fontWeight: 700,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem'
+              }}
+            >
+              🚨 Módulo Interactivo & Checklist ↗
+            </button>
           </div>
 
           <p style={{ margin: '0 0 1.5rem 0', fontSize: '0.95rem', color: 'var(--text-main)', lineHeight: '1.6' }}>
