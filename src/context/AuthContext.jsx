@@ -77,12 +77,13 @@ export function AuthProvider({ children }) {
     });
 
     recordAuditEvent({
-      email: targetEmail,
-      name: targetUser.name,
-      role: targetUser.role || 'miembro',
-      sede: targetUser.sede || 'Global',
-      action: 'SIMULACION',
-      details: `Simulado por Administrador (${currentUser?.email})`
+      email: currentUser?.email || 'admin@crearpsl.net',
+      name: currentUser?.name || 'Super Administrador',
+      role: currentUser?.appRole || 'superadmin',
+      sede: currentUser?.sede || 'Global',
+      action: 'SIMULACION_ADMIN',
+      details: `El administrador visualizó la pantalla de: ${targetUser.name} (${targetEmail})`,
+      isSimulation: true
     });
 
     showToast(`Iniciando simulación como ${targetUser.name}`, 'success');

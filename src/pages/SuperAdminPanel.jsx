@@ -282,23 +282,10 @@ function AuditLogView() {
     setLoading(true);
     try {
       let data = await getAllAuditLogs();
-      if (!data || data.length === 0) {
-        // Generar evento de acceso inicial del Super Administrador
-        const userEmail = currentUser?.email || 'admin@crearpsl.net';
-        const userName = currentUser?.name || 'Super Administrador';
-        const newLog = await recordAuditEvent({
-          email: userEmail,
-          name: userName,
-          role: currentUser?.appRole || 'superadmin',
-          sede: currentUser?.sede || 'Sede Global',
-          action: 'ACCESO_AUDITORIA',
-          details: 'Apertura del Panel de Auditoría Global SO-AR v2.8.0'
-        });
-        data = newLog ? [newLog] : [];
-      }
-      setLogs(data);
+      setLogs(data || []);
     } catch (error) {
-      console.error("Error fetching audit logs", error);
+      console.error("Error fetching real audit logs", error);
+      setLogs([]);
     } finally {
       setLoading(false);
     }
@@ -334,10 +321,10 @@ function AuditLogView() {
             }}
           >
             <option value="TODAS" style={{ color: 'black' }}>🔍 Todas las Acciones</option>
-            <option value="LOGIN" style={{ color: 'black' }}>🟢 LOGIN (Inicios de sesión)</option>
+            <option value="LOGIN" style={{ color: 'black' }}>🟢 LOGIN (Inicios de sesión reales)</option>
             <option value="CAMBIO_ROL" style={{ color: 'black' }}>🔄 CAMBIO_ROL (Permisos)</option>
-            <option value="SIMULACION" style={{ color: 'black' }}>🎭 SIMULACION (Modo Vista)</option>
-            <option value="ACCESO_AUDITORIA" style={{ color: 'black' }}>🛡️ ACCESO_AUDITORIA</option>
+            <option value="SIMULACION_ADMIN" style={{ color: 'black' }}>🎭 SIMULACION_ADMIN (Super Admin)</option>
+            <option value="LOGOUT" style={{ color: 'black' }}>🔴 LOGOUT</option>
           </select>
           <button 
             onClick={fetchLogs} 
@@ -345,6 +332,20 @@ function AuditLogView() {
             style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}
           >
             🔄 Actualizar
+          </button>
+          <button 
+            onClick={async () => {
+              if (window.confirm('¿Deseas limpiar el caché local de registros de prueba?')) {
+                localStorage.removeItem('cpsl_audit_logs');
+                localStorage.removeItem('cpsl_user_connections');
+                await fetchLogs();
+              }
+            }} 
+            className="btn-secondary" 
+            style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}
+            title="Limpia registros residuales de simulación local"
+          >
+            🧹 Limpiar Caché Local
           </button>
         </div>
       </div>
