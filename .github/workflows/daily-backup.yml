@@ -1,0 +1,54 @@
+name: Daily Zero-Loss Database Backup
+
+on:
+  schedule:
+    # Corre todos los días a las 05:00 UTC (12:00 AM hora Perú/México)
+    - cron: '0 5 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Check out repository
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🛡️ Execute Firestore Automated Backup
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_PASS: ${{ secrets.GMAIL_PASS }}
+          ADMIN_EMAIL: ${{ secrets.GMAIL_USER }}
+          ADMIN_PASS: ${{ secrets.GMAIL_PASS }}
+        run: node scripts/backupFirestore.js
+
+      - name: 📤 Upload Backup Artifact to GitHub Storage (90 Days Retention)
+        uses: actions/upload-artifact@v4
+        with:
+          name: database-backup-${{ github.run_id }}
+          path: backups/
+          retention-days: 90
+
+      - name: 💾 Commit & Push Backup to Git Repository
+        run: |
+          git config --global user.name "cpsl-backup-bot"
+          git config --global user.email "bot@crearpsl.net"
+          git add backups/
+          if git diff --staged --quiet; then
+            echo "No hay cambios nuevos para respaldar."
+          else
+            git commit -m "chore(backup): respaldo automático inmutable de base de datos [skip ci]"
+            git push origin master
+          fi

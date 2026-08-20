@@ -10,7 +10,9 @@
     "preview": "vite preview",
     "sync:qt": "node scripts/qtSyncDaemon.js",
     "mailer": "node scripts/mailerDaemon.js",
-    "bootstrap": "node scripts/bootstrapSync.js"
+    "bootstrap": "node scripts/bootstrapSync.js",
+    "backup": "node scripts/backupFirestore.js",
+    "restore": "node scripts/restoreFirestore.js"
   },
   "dependencies": {
     "dotenv": "^16.4.5",
