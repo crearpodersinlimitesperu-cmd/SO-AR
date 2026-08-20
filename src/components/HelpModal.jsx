@@ -2,6 +2,7 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { X, HelpCircle, Mail, Send, CheckCircle2, BookOpen, AlertTriangle, ShieldAlert, HeartPulse, PhoneCall, Zap, ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import OnboardingTourModal from './OnboardingTourModal';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../services/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
@@ -10,6 +11,7 @@ export default function HelpModal({ isOpen, onClose }) {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('manual'); // 'manual' | 'protocol' | 'suggestions'
+  const [showTour, setShowTour] = useState(false);
   const [suggestion, setSuggestion] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -181,6 +183,20 @@ export default function HelpModal({ isOpen, onClose }) {
             </div>
           ) : activeTab === 'manual' ? (
             <div style={{ color: 'var(--text-body)', lineHeight: '1.6' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.8rem', marginBottom: '1.2rem', padding: '1rem', background: 'rgba(255, 183, 3, 0.08)', borderRadius: '10px', border: '1px solid rgba(255, 183, 3, 0.3)' }}>
+                <div>
+                  <h3 style={{ color: 'var(--crear-gold)', margin: '0 0 0.3rem 0' }}>¿Primera vez en SO-AR?</h3>
+                  <p style={{ margin: 0, fontSize: '0.88rem', color: 'var(--text-main)' }}>Aprende qué hace cada botón, qué está permitido y qué no en un recorrido interactivo de 1 minuto.</p>
+                </div>
+                <button 
+                  onClick={() => setShowTour(true)}
+                  className="btn-primary"
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 1.2rem', fontSize: '0.85rem', fontWeight: 800 }}
+                >
+                  🧭 Iniciar Tour de Botones ↗
+                </button>
+              </div>
+
               <h3 style={{ color: 'var(--crear-gold)', marginTop: 0 }}>Bienvenido al Sistema Operativo de Alto Rendimiento (SO-AR)</h3>
               <p>Esta herramienta centraliza todas las tareas, reportes y métricas de CREAR Poder Sin Límites para lograr una operación eficiente y transparente en todas las sedes.</p>
 
@@ -285,6 +301,12 @@ export default function HelpModal({ isOpen, onClose }) {
           )}
         </div>
       </div>
+
+      <OnboardingTourModal 
+        isOpen={showTour}
+        onClose={() => setShowTour(false)}
+        user={currentUser}
+      />
     </div>
   );
 }
