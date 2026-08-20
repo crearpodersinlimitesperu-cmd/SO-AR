@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 
 const UIContext = createContext();
@@ -6,6 +6,44 @@ const UIContext = createContext();
 export const useUI = () => useContext(UIContext);
 
 export const UIProvider = ({ children }) => {
+  // Modo de visualización: 'lite' | 'compact' | 'pro'
+  const [viewMode, setViewModeState] = useState(() => {
+    return localStorage.getItem('soar_view_mode') || 'compact';
+  });
+
+  // Módulos visibles en modo personalizable
+  const [customModules, setCustomModulesState] = useState(() => {
+    try {
+      const saved = localStorage.getItem('soar_custom_modules');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    return {
+      todayTasks: true,
+      progress: true,
+      events: true,
+      shortcuts: true,
+      advancedTools: true
+    };
+  });
+
+  const setViewMode = (mode) => {
+    setViewModeState(mode);
+    localStorage.setItem('soar_view_mode', mode);
+  };
+
+  const setCustomModules = (modules) => {
+    setCustomModulesState(modules);
+    localStorage.setItem('soar_custom_modules', JSON.stringify(modules));
+  };
+
+  const toggleCustomModule = (key) => {
+    setCustomModulesState(prev => {
+      const next = { ...prev, [key]: !prev[key] };
+      localStorage.setItem('soar_custom_modules', JSON.stringify(next));
+      return next;
+    });
+  };
+
   const [promptState, setPromptState] = useState({
     isOpen: false,
     title: '',
@@ -51,7 +89,17 @@ export const UIProvider = ({ children }) => {
   }, [promptState]);
 
   return (
-    <UIContext.Provider value={{ showToast, showPrompt, promptState, handlePromptClose }}>
+    <UIContext.Provider value={{ 
+      showToast, 
+      showPrompt, 
+      promptState, 
+      handlePromptClose,
+      viewMode,
+      setViewMode,
+      customModules,
+      setCustomModules,
+      toggleCustomModule
+    }}>
       {children}
       <Toaster position="top-center" />
     </UIContext.Provider>
