@@ -172,7 +172,8 @@ export function AuthProvider({ children }) {
       }
       
       const user = result.user;
-      const normalizedEmail = user.email.trim().toLowerCase();
+      const rawEmail = user.email.trim().toLowerCase();
+      const normalizedEmail = rawEmail.replace('@crearpsl.com', '@crearpsl.net');
       
       // Buscar en Firestore
       let foundUser = null;
@@ -245,7 +246,8 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        const normalizedEmail = user.email.trim().toLowerCase();
+        const rawEmail = user.email.trim().toLowerCase();
+        const normalizedEmail = rawEmail.replace('@crearpsl.com', '@crearpsl.net');
         
         let foundUser = null;
         try {

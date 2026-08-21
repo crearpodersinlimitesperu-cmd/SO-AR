@@ -45,26 +45,34 @@ export default function ChecklistBoard() {
   }
 
   // Las tareas mías incluyen: rol directo, asignadas a mi correo O donde soy colaborador aceptado
+
   const myTasks = tasks.filter(t => {
+    const userEmailCom = currentUser?.email?.replace('@crearpsl.net', '@crearpsl.com')?.toLowerCase();
+    const userEmailNet = currentUser?.email?.replace('@crearpsl.com', '@crearpsl.net')?.toLowerCase();
+    
+    const isAssigned = t.assignedToEmail?.toLowerCase() === userEmailCom || t.assignedToEmail?.toLowerCase() === userEmailNet;
+    const isCollaborator = t.collaborators?.some(c => c.toLowerCase() === userEmailCom || c.toLowerCase() === userEmailNet);
+
     if (currentUser?.isSuperAdmin) {
-      return t.role === roleId || t.assignedToEmail === currentUser?.email || t.collaborators?.includes(currentUser?.email);
+      return t.role === roleId || isAssigned || isCollaborator;
     }
 
-    // Regla de privacidad para Gerentes y Directores:
-    // Solo pueden ver sus tareas globales, las que crearon, las asignadas a ellos o compartidas con ellos.
-    // No pueden ver las tareas específicas creadas por otro gerente para otro gerente.
     if ((roleId === 'gerente' || roleId === 'director_maestria') && t.role === roleId) {
-      if (!t.assignedToEmail) return true; // Tarea base global
+      if (!t.assignedToEmail) return true;
+      const isMyCreation = t.createdBy?.toLowerCase() === userEmailCom || t.createdBy?.toLowerCase() === userEmailNet;
+      return isAssigned || isMyCreation || isCollaborator;
+    }
+
       const isMine = t.assignedToEmail.toLowerCase() === currentUser?.email?.toLowerCase();
       const isMyCreation = t.createdBy?.toLowerCase() === currentUser?.email?.toLowerCase();
       const isCollab = t.collaborators?.includes(currentUser?.email);
       return isMine || isMyCreation || isCollab;
     }
 
-    return t.role === roleId || 
-           t.assignedToEmail === currentUser?.email ||
-           (t.collaborators && t.collaborators.includes(currentUser?.email));
+
+    return t.role === roleId || isAssigned || isCollaborator;
   });
+
 
   const filterParam = searchParams.get('filter');
 
