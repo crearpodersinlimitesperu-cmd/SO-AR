@@ -139,6 +139,7 @@ export function AuthProvider({ children }) {
 
     return {
       ...user,
+      email: foundUser.email || user.email, // 🚨 Unifica TODO sobre el correo primario para que coincida con DB y Checklist
       name: foundUser.name || user.displayName || 'Colaborador CREAR',
       appRole: activeRole,
       activeRole: activeRole,
@@ -208,7 +209,7 @@ export function AuthProvider({ children }) {
       setCurrentUser(userObj);
 
       recordAuditEvent({
-        email: normalizedEmail,
+        email: foundUser.email || normalizedEmail,
         name: userObj.name,
         role: userObj.appRole,
         sede: userObj.sede,
@@ -281,7 +282,7 @@ export function AuthProvider({ children }) {
             const sessionLogKey = `audit_login_${normalizedEmail}`;
             if (!sessionStorage.getItem(sessionLogKey)) {
               await recordAuditEvent({
-                email: normalizedEmail,
+                email: foundUser.email || normalizedEmail,
                 name: foundUser.name || user.displayName || 'Desconocido',
                 role: foundUser.role || 'Desconocido',
                 sede: foundUser.sede || 'Desconocida',

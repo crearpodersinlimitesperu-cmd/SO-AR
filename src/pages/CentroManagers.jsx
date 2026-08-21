@@ -246,8 +246,13 @@ export default function CentroManagers() {
           // Coordinadores ven su sede Y a los gerentes (como referencia directiva)
           const mRol = (m.rol || '').toLowerCase();
           if (mSede !== userSede && !mRol.includes('gerente')) return false;
+        } else if (userRole === 'qt') {
+          // QT: ven su sede y al Coordinador Global de QT (Carlos Brunis o Sede Global + Rol QT)
+          const mRol = (m.rol || '').toLowerCase();
+          const isGlobalQTCoordinator = m.id === 'staff_carlosbrunis' || m.email?.toLowerCase().includes('brunis') || (mRol.includes('qt') && (mSede === 'SEDE GLOBAL' || mSede === 'GLOBAL'));
+          if (mSede !== userSede && !isGlobalQTCoordinator) return false;
         } else {
-          // Por defecto (QT, Equipo), solo ven lo suyo (y si están asignados a un entrenador)
+          // Por defecto (Equipo), solo ven lo suyo (y si están asignados a un entrenador)
           if (!isTrainerMatch(m.entrenador, currentTrainerName) && mSede !== userSede) return false;
         }
       }

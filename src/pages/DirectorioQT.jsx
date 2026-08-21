@@ -5,7 +5,8 @@ import { useUI } from '../context/UIContext';
 import { 
   getQTMembers, 
   QT_SHEET_EDIT_URL,
-  clearQTCache 
+  clearQTCache,
+  normalizeQTSede
 } from '../services/qtSheetService';
 import CountryFlag from '../components/CountryFlag';
 import { 
@@ -39,6 +40,8 @@ export default function DirectorioQT() {
   const { currentUser } = useAuth();
   const { showToast } = useUI();
   const navigate = useNavigate();
+  
+  const userSede = normalizeQTSede(currentUser?.sede || '');
 
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -83,7 +86,6 @@ export default function DirectorioQT() {
   // Filtrado reactivo
   const filteredMembers = useMemo(() => {
     const userRole = currentUser?.appRole || '';
-    const userSede = currentUser?.sede || '';
     const isSuper = currentUser?.isSuperAdmin || userRole === 'director_maestria' || userRole === 'direccion' || currentUser?.email === 'jose.sanchez@crearpsl.net' || currentUser?.email === 'paul.sosa@crearpsl.net' || currentUser?.email === 'armando.pilacuan@gmail.com';
     const isGerente = userRole === 'gerente';
     
@@ -91,10 +93,19 @@ export default function DirectorioQT() {
       // 0. Reglas de Jerarquía Corporativa
       // - Directores/Super: sin restricciones
       // - Gerentes: ven su sede y Global
-      // - Coordinadores/QT/Resto: solo ven su sede
+      // - QT: ven su sede y al Coordinador Global
+      // - Resto: solo ven su sede
+      const userSede = currentUser?.sede || '';
+      const isGlobalUser = userSede.toLowerCase().includes('global');
+      
       if (!isSuper) {
-        if (isGerente) {
+        if (isGlobalUser) {
+          // Global users (like Carlos Brunis) see everything
+        } else if (isGerente) {
           if (m.sede !== userSede && m.sede !== 'Global') return false;
+        } else if (userRole === 'qt') {
+          const isGlobalQTCoordinator = m.sede === 'Global' || m.email?.toLowerCase().includes('brunis');
+          if (m.sede !== userSede && !isGlobalQTCoordinator) return false;
         } else {
           if (m.sede !== userSede) return false;
         }
@@ -161,15 +172,17 @@ export default function DirectorioQT() {
         </button>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-          <button 
-            onClick={() => loadMembers(true)}
-            disabled={refreshing || loading}
-            className="btn-secondary"
-            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.55rem 1.1rem', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}
-          >
-            <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} style={{ animation: refreshing ? 'spin 1s linear infinite' : 'none' }} />
-            {refreshing ? 'Sincronizando...' : 'Sincronizar Google Sheets'}
-          </button>
+          {currentUser?.isSuperAdmin && (
+            <button 
+              onClick={() => loadMembers(true)}
+              disabled={refreshing || loading}
+              className="btn-secondary"
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.55rem 1.1rem', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}
+            >
+              <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} style={{ animation: refreshing ? 'spin 1s linear infinite' : 'none' }} />
+              {refreshing ? 'Sincronizando...' : 'Sincronizar Google Sheets'}
+            </button>
+          )}
 
           {(currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.isGerente || currentUser?.appRole === 'director_maestria') && (
             <a 
@@ -261,13 +274,13 @@ export default function DirectorioQT() {
               colorScheme: 'dark'
             }}
           >
-            <option value="Todas" style={{ background: '#0d152d', color: '#ffffff' }}>🌍 Todas las Sedes Permitidas</option>
-            {(!currentUser || currentUser.isSuperAdmin || currentUser.appRole === 'director_maestria' || currentUser.appRole === 'direccion' || currentUser.appRole === 'gerente' || currentUser.sede === 'Quito') && <option value="Quito" style={{ background: '#0d152d', color: '#ffffff' }}>🇪🇨 Quito</option>}
-            {(!currentUser || currentUser.isSuperAdmin || currentUser.appRole === 'director_maestria' || currentUser.appRole === 'direccion' || currentUser.appRole === 'gerente' || currentUser.sede === 'Guayaquil') && <option value="Guayaquil" style={{ background: '#0d152d', color: '#ffffff' }}>🇪🇨 Guayaquil</option>}
-            {(!currentUser || currentUser.isSuperAdmin || currentUser.appRole === 'director_maestria' || currentUser.appRole === 'direccion' || currentUser.appRole === 'gerente' || currentUser.sede === 'Cuenca') && <option value="Cuenca" style={{ background: '#0d152d', color: '#ffffff' }}>🇪🇨 Cuenca</option>}
-            {(!currentUser || currentUser.isSuperAdmin || currentUser.appRole === 'director_maestria' || currentUser.appRole === 'direccion' || currentUser.appRole === 'gerente' || currentUser.sede === 'Lima') && <option value="Lima" style={{ background: '#0d152d', color: '#ffffff' }}>🇵🇪 Lima</option>}
-            {(!currentUser || currentUser.isSuperAdmin || currentUser.appRole === 'director_maestria' || currentUser.appRole === 'direccion' || currentUser.appRole === 'gerente' || currentUser.sede === 'Medellín') && <option value="Medellín" style={{ background: '#0d152d', color: '#ffffff' }}>🇨🇴 Medellín</option>}
-            {(!currentUser || currentUser.isSuperAdmin || currentUser.appRole === 'director_maestria' || currentUser.appRole === 'direccion' || currentUser.appRole === 'gerente' || currentUser.sede === 'México') && <option value="México" style={{ background: '#0d152d', color: '#ffffff' }}>🇲🇽 México</option>}
+            <option value="Todas" style={{ background: '#0d152d', color: '#ffffff' }}>Todas las Sedes Permitidas</option>
+            {(!currentUser || currentUser.isSuperAdmin || currentUser.appRole === 'director_maestria' || currentUser.appRole === 'direccion' || currentUser.appRole === 'gerente' || userSede === 'Quito') && <option value="Quito" style={{ background: '#0d152d', color: '#ffffff' }}>Quito</option>}
+            {(!currentUser || currentUser.isSuperAdmin || currentUser.appRole === 'director_maestria' || currentUser.appRole === 'direccion' || currentUser.appRole === 'gerente' || userSede === 'Guayaquil') && <option value="Guayaquil" style={{ background: '#0d152d', color: '#ffffff' }}>Guayaquil</option>}
+            {(!currentUser || currentUser.isSuperAdmin || currentUser.appRole === 'director_maestria' || currentUser.appRole === 'direccion' || currentUser.appRole === 'gerente' || userSede === 'Cuenca') && <option value="Cuenca" style={{ background: '#0d152d', color: '#ffffff' }}>Cuenca</option>}
+            {(!currentUser || currentUser.isSuperAdmin || currentUser.appRole === 'director_maestria' || currentUser.appRole === 'direccion' || currentUser.appRole === 'gerente' || userSede === 'Lima') && <option value="Lima" style={{ background: '#0d152d', color: '#ffffff' }}>Lima</option>}
+            {(!currentUser || currentUser.isSuperAdmin || currentUser.appRole === 'director_maestria' || currentUser.appRole === 'direccion' || currentUser.appRole === 'gerente' || userSede === 'Medellín') && <option value="Medellín" style={{ background: '#0d152d', color: '#ffffff' }}>Medellín</option>}
+            {(!currentUser || currentUser.isSuperAdmin || currentUser.appRole === 'director_maestria' || currentUser.appRole === 'direccion' || currentUser.appRole === 'gerente' || userSede === 'México') && <option value="México" style={{ background: '#0d152d', color: '#ffffff' }}>México</option>}
           </select>
 
           {/* Filtro Experiencia */}
@@ -286,7 +299,7 @@ export default function DirectorioQT() {
               colorScheme: 'dark'
             }}
           >
-            <option value="Todas" style={{ background: '#0d152d', color: '#ffffff' }}>⭐ Toda Experiencia</option>
+            <option value="Todas" style={{ background: '#0d152d', color: '#ffffff' }}>Toda Experiencia</option>
             <option value="senior" style={{ background: '#0d152d', color: '#ffffff' }}>🏆 Líderes Senior (+9 a +15 ed.)</option>
             <option value="intermedio" style={{ background: '#0d152d', color: '#ffffff' }}>✨ 1 a 8 Ediciones</option>
             <option value="reciente" style={{ background: '#0d152d', color: '#ffffff' }}>🌱 Graduados Recientes</option>

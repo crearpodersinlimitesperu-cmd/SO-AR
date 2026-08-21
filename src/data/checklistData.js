@@ -112,15 +112,11 @@ export const checklistData = [
   { id: 'soar_30', role: 'coord_maestria', cyclePhase: 'POST-MJ', task: 'Consolidar métricas y entregar aprendizajes.', isCritical: true },
 
   // --- ENTRENADOR (COACH) ---
-  { id: 'coach_1', role: 'entrenador', cyclePhase: 'GATE 1', task: 'Confirmar disponibilidad de fecha y contrato de entrenamiento con Gerencia.', isCritical: true },
-  { id: 'coach_2', role: 'entrenador', cyclePhase: 'PRE-C1', task: 'Validar itinerario de vuelos, hotel y traslados con Coordinación de Sede.', isCritical: true },
-  { id: 'coach_3', role: 'entrenador', cyclePhase: 'PRE-C1', task: 'Reunión de alineación y contexto con el Capitán y Coordinador de la Sede.', isCritical: true },
-  { id: 'coach_4', role: 'entrenador', cyclePhase: 'C1', task: 'Liderar sala de entrenamiento C1 y ejecutar drills con los más altos estándares.', isCritical: true },
-  { id: 'coach_5', role: 'entrenador', cyclePhase: 'C1', task: 'Debriefing diario al cierre con Capitán y Quantum Team para calibración.', isCritical: true },
-  { id: 'coach_6', role: 'entrenador', cyclePhase: 'POST-C1', task: 'Entregar reporte de quiebres y observaciones clave del entrenamiento a Dirección.', isCritical: true },
-  { id: 'coach_7', role: 'entrenador', cyclePhase: 'C2', task: 'Liderar sala C2 y pase de enrolamiento de alto impacto a Maestría del Juego.', isCritical: true },
-  { id: 'coach_8', role: 'entrenador', cyclePhase: 'MJ', task: 'Liderar módulos de Maestría (FDS 1, 2, 3) y supervisar efectividad de llamadas.', isCritical: true },
-
+  { id: 'coach_1', role: 'entrenador', cyclePhase: 'PRE-MJ', task: 'Contactar a los equipos de MJ donde se impartió FDS para iniciar seguimiento.', isCritical: true },
+  { id: 'coach_2', role: 'entrenador', cyclePhase: 'MJ', task: 'Realizar 1er seguimiento de la semana con el equipo de MJ.', isCritical: true },
+  { id: 'coach_3', role: 'entrenador', cyclePhase: 'MJ', task: 'Realizar 2do seguimiento de la semana con el equipo de MJ.', isCritical: true },
+  { id: 'coach_4', role: 'entrenador', cyclePhase: 'PRE-C1', task: 'Monitorear y asegurar que las personas enroladas por el equipo se sienten efectivamente en la sala del Capítulo.', isCritical: true },
+  { id: 'coach_5', role: 'entrenador', cyclePhase: 'C1', task: 'Validar asistencia en el Capítulo de los enrolados por el equipo de seguimiento.', isCritical: true },
   // --- ENTRENADOR DE LLAMADAS ---
   { id: 'coach_ll_1', role: 'entrenador_llamadas', cyclePhase: 'PRE-MJ', task: 'Revisar directorio de managers asignados y calendarizar llamadas semanales.', isCritical: true },
   { id: 'coach_ll_2', role: 'entrenador_llamadas', cyclePhase: 'PRE-MJ', task: 'Ejecutar llamada semanal de alineación con cada equipo asignado (#).', isCritical: true },

@@ -182,3 +182,8 @@ Todas las vistas, componentes, selectores, botones y documentos deben utilizar e
 
 **Documento Maestro Aprobado y Certificado:** 2026-08-20  
 **CREAR PODER SIN LÍMITES GLOBAL — Todos los derechos reservados.**
+
+### 9. DIRECTIVA OPERATIVA UNIVERSAL DE AUDITORÍA
+> **REGLA ESTRICTA:** Cada cosa que se revise o modifique para un usuario específico, DEBE ser revisada, replicada y estandarizada para TODOS los usuarios relevantes en el sistema.
+> **REGLA ESTRICTA:** TODO pedido se guarda, y TODA actualización se actualiza y documenta en el archivo maestro de auditoría.
+> **REGLA ESTRICTA:** ESTA INDICACIÓN ES PERMANENTE. JAMÁS se deben borrar o sobrescribir los avances, tareas o el historial de los usuarios.

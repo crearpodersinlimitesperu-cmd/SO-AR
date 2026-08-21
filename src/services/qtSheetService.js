@@ -64,10 +64,13 @@ const isInstagram = (val = '') => {
   const v = val.trim();
   if (!v) return false;
   const upper = v.toUpperCase();
+  // Filter out any potential sizes (including new form answers), genders, states
   if (upper.includes('ACTIVO') || upper.includes('VERIFICADO') || upper.includes('FEMENINO') || upper.includes('MASCULINO')) return false;
+  if (['XS', 'S', 'M', 'L', 'XL', 'XXL', '2XL', '3XL', 'S (MUJER)', 'M (HOMBRE)', 'L (HOMBRE)', 'S (HOMBRE)', 'M (MUJER)', 'L (MUJER)'].includes(upper)) return false;
+  
   if (v.length > 35) return false;
   if (v.includes(' ') && !v.startsWith('@')) return false;
-  return v.startsWith('@') || v.includes('instagram.com') || /^[a-zA-Z0-9._]{3,30}$/.test(v);
+  return v.startsWith('@') || v.includes('instagram.com');
 };
 
 const isEstado = (val = '') => {
@@ -204,7 +207,17 @@ export function mapRowsToQTMembers(rows) {
     if (!phone && r[8] && isPhone(r[8])) phone = r[8].trim();
     if (!talla && r[12] && isTalla(r[12])) talla = r[12].trim().toUpperCase();
     if (!ediciones && r[13] && isEdicion(r[13])) ediciones = r[13].trim();
+    
+    // Safety check: if instagram was mistakenly parsed as something that looks like a Talla
+    if (instagram && isTalla(instagram)) {
+      if (!talla) talla = instagram.toUpperCase();
+      instagram = '';
+    }
+
     if (!instagram && r[14] && isInstagram(r[14])) instagram = r[14].trim();
+    // Safety check again over r[14]
+    if (!instagram && r[14] && !isTalla(r[14]) && r[14].length > 1 && !r[14].includes(' ')) instagram = r[14].trim();
+
     if (!declaracion && r[15] && isDeclaracion(r[15])) declaracion = r[15].trim();
     if (!estado && r[16] && isEstado(r[16])) estado = r[16].trim();
 
@@ -213,7 +226,7 @@ export function mapRowsToQTMembers(rows) {
 
     // Saneamiento y limpieza de Instagram
     let cleanInstagram = '';
-    if (instagram) {
+    if (instagram && !isTalla(instagram)) {
       let rawInsta = instagram.replace(/^https?:\/\/(www\.)?instagram\.com\//i, '').replace(/\/$/, '').trim();
       if (!rawInsta.toUpperCase().includes('FEMENINO') && !rawInsta.toUpperCase().includes('MASCULINO') && !rawInsta.toUpperCase().includes('ACTIVO')) {
         if (!rawInsta.startsWith('@') && rawInsta.length > 0) {

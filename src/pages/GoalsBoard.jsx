@@ -594,7 +594,7 @@ export default function GoalsBoard() {
               onChange={e => setSelectedSedeFilter(e.target.value)} 
               style={{ width: '100%', maxWidth: '300px', padding: '0.5rem', borderRadius: '8px', background: 'rgba(0,0,0,0.2)', color: 'white', border: '1px solid var(--border-subtle)' }}
             >
-              <option value="Todas">🌍 Todas las Sedes</option>
+              <option value="Todas">Todas las Sedes</option>
               <option value="Lima">Lima</option>
               <option value="Quito">Quito</option>
               <option value="Medellín">Medellín</option>

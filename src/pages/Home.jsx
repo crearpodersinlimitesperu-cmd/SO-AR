@@ -372,9 +372,11 @@ export default function Home() {
                   </button>
                 )}
 
-                <button onClick={() => { setShowToolsDropdown(false); navigate('/directorio-qt'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
-                  ⚡ Directorio QT
-                </button>
+                {!['entrenador', 'entrenador_llamadas'].includes(currentUser?.appRole) && (
+                  <button onClick={() => { setShowToolsDropdown(false); navigate('/directorio-qt'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
+                    ⚡ Directorio QT
+                  </button>
+                )}
 
                 {(currentUser?.isSuperAdmin || currentUser?.isGerente || currentUser?.isDireccion || currentUser?.appRole === 'director_maestria') && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/superadmin'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
@@ -394,7 +396,7 @@ export default function Home() {
                   </button>
                 )}
 
-                {currentUser?.appRole !== 'qt' && (currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.isGerente || ['director_maestria', 'coordinador_mj', 'coord_maestria', 'finanzas', 'cfo', 'entrenador_llamadas', 'entrenador'].includes(currentUser?.appRole)) && (
+                {currentUser?.appRole !== 'qt' && (currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.isGerente || ['director_maestria', 'coordinador_mj', 'coord_maestria', 'finanzas', 'cfo'].includes(currentUser?.appRole)) && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/centro-managers'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                     🎯 Centro de Managers
                   </button>
@@ -404,11 +406,12 @@ export default function Home() {
                   🚨 Protocolo de Emergencias
                 </button>
 
-                {currentUser?.appRole === 'qt' ? (
+                {(currentUser?.appRole === 'qt' || currentUser?.isSuperAdmin) && (
                   <button onClick={() => { setShowToolsDropdown(false); window.open('https://crearpsl.net/manual_quantum_team.html', '_blank'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                     📘 Manual Quantum Team ↗
                   </button>
-                ) : (
+                )}
+                {currentUser?.appRole !== 'qt' && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/manual'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                     📘 Manual y Guía SO-AR
                   </button>
@@ -439,9 +442,17 @@ export default function Home() {
             </button>
           )}
 
-          <button onClick={() => navigate('/directorio-qt')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: 'white', border: 'none' }}>
-            ⚡ Directorio QT
-          </button>
+          {(currentUser?.appRole === 'qt' || currentUser?.isSuperAdmin) && (
+            <button onClick={() => window.open('https://crearpsl.net/manual_quantum_team.html', '_blank')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #0284c7, #2563eb)', color: 'white', border: 'none' }}>
+              📘 Manual QT
+            </button>
+          )}
+
+          {!['entrenador', 'entrenador_llamadas'].includes(currentUser?.appRole) && (
+            <button onClick={() => navigate('/directorio-qt')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: 'white', border: 'none' }}>
+              ⚡ Directorio QT
+            </button>
+          )}
 
           {(currentUser?.isSuperAdmin || currentUser?.isGerente || currentUser?.isDireccion || currentUser?.appRole === 'director_maestria') && (
             <button onClick={() => navigate('/superadmin')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #8b5cf6, #29abe2)', color: 'white', border: 'none' }}>
@@ -461,7 +472,7 @@ export default function Home() {
             </button>
           )}
 
-          {currentUser?.appRole !== 'qt' && (currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.isGerente || ['director_maestria', 'coordinador_mj', 'coord_maestria', 'finanzas', 'cfo', 'entrenador_llamadas', 'entrenador'].includes(currentUser?.appRole)) && (
+          {currentUser?.appRole !== 'qt' && (currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.isGerente || ['director_maestria', 'coordinador_mj', 'coord_maestria', 'finanzas', 'cfo'].includes(currentUser?.appRole)) && (
             <button onClick={() => navigate('/centro-managers')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#000', fontWeight: 'bold', border: 'none' }}>
               🎯 Centro Managers
             </button>
@@ -643,7 +654,7 @@ export default function Home() {
       {viewMode !== 'lite' && (
         <>
           {/* MI PROGRESO GENERAL */}
-          {(viewMode === 'compact' || customModules.progress !== false) && (
+          {(viewMode === 'compact' || customModules.progress !== false) && !['entrenador', 'entrenador_llamadas'].includes(currentUser?.appRole) && (
             <div className="glass-panel" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
                 <h3 className="text-main" style={{ margin: 0, fontSize: '1.1rem' }}>Mi Progreso General en el Ciclo</h3>
@@ -685,7 +696,7 @@ export default function Home() {
                     >
                       {['entrenador', 'entrenador_llamadas'].includes(currentUser?.appRole) ? 'MIS FECHAS' : 'MI SEDE'}
                     </button>
-                    {(currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.isGerente || ['gerente', 'direccion', 'director_maestria', 'qt', 'cfo'].includes(currentUser?.appRole) || currentUser?.sede?.toLowerCase().includes('global')) && (
+                    {(!['entrenador', 'entrenador_llamadas'].includes(currentUser?.appRole) && (currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.isGerente || ['gerente', 'direccion', 'director_maestria', 'qt', 'cfo'].includes(currentUser?.appRole) || currentUser?.sede?.toLowerCase().includes('global'))) && (
                       <button 
                         onClick={() => setActiveEventTab('globales')}
                         style={{ background: 'none', border: 'none', color: activeEventTab === 'globales' ? 'var(--crear-gold)' : 'var(--text-muted)', fontWeight: activeEventTab === 'globales' ? 'bold' : 'normal', cursor: 'pointer', fontSize: '0.85rem' }}
@@ -804,6 +815,11 @@ export default function Home() {
                                 <span style={{ fontSize: '0.75rem', color: 'var(--crear-cyan)', display: 'block', marginTop: '0.1rem' }}>
                                   🏨 {hotelVenue}
                                 </span>
+                                {(!['qt', 'capitan', 'manager'].includes(currentUser?.appRole)) && (
+                                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginTop: '0.1rem' }}>
+                                    🎙️ Trainer: {ev.trainer || ev.entrenador || ev.equipo || 'Por confirmar'}
+                                  </span>
+                                )}
                               </div>
                               <div style={{ textAlign: 'right', flexShrink: 0 }}>
                                 <span className="text-gold" style={{ fontWeight: 'bold', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.2rem', justifyContent: 'flex-end' }}>

@@ -161,7 +161,17 @@ function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, curre
           {/* Indicador de Última Conexión en Tarjeta */}
           {(() => {
             const emailKey = (person.email || '').toLowerCase().trim();
-            const conn = userConnections[emailKey];
+            const allEmails = [...new Set([emailKey, ...(person.emails || []).map(e => e.toLowerCase().trim())])];
+            
+            let conn = null;
+            for (const email of allEmails) {
+              if (userConnections[email] && (userConnections[email].hasConnected || userConnections[email].lastLoginFormatted || userConnections[email].lastLoginAt)) {
+                conn = userConnections[email];
+                break;
+              }
+            }
+            if (!conn) conn = userConnections[emailKey];
+
             const hasConnected = !!(conn?.hasConnected || conn?.lastLoginFormatted || conn?.lastLoginAt);
             return (
               <div style={{ marginTop: '4px', display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.75rem' }}>
