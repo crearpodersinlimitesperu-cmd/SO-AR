@@ -78,7 +78,7 @@ service cloud.firestore {
 
     // Colección de Cola de Correo Electrónico (mail)
     match /mail/{mailId} {
-      allow read: if isSuperAdmin();
+      allow read: if isAuthenticated();
       allow create: if isAuthenticated();
       allow update, delete: if isSuperAdmin();
     }
@@ -91,7 +91,7 @@ service cloud.firestore {
 
     // Colección de Auditoría de Conexiones (audit_logs)
     match /audit_logs/{logId} {
-      allow read: if isSuperAdmin();
+      allow read: if isAuthenticated();
       // Allow creation as long as they are authenticated (to support users with multiple emails)
       allow create: if isAuthenticated();
     }
