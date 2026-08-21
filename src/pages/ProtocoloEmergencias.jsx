@@ -1,3 +1,4 @@
+import { FlagIcon, getFlagForSede } from '../utils/flags';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -6,7 +7,6 @@ import {
   Compass, Zap, Building2, Flame, UserCheck, Stethoscope, ChevronRight,
   HelpCircle, Eye
 } from 'lucide-react';
-import { getFlagForSede } from '../utils/flags';
 import { useAuth } from '../context/AuthContext';
 
 export default function ProtocoloEmergencias() {
@@ -574,7 +574,7 @@ export default function ProtocoloEmergencias() {
             <div key={s.sede} className="glass-panel" style={{ padding: '1.5rem', border: '1px solid var(--border-subtle)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <span style={{ fontSize: '1.4rem' }}>{s.bandera}</span>
+                  <FlagIcon country={s.pais} sede={s.sede} size={22} />
                   <h3 style={{ margin: 0, color: '#fff', fontSize: '1.1rem', fontWeight: 800 }}>{s.sede} ({s.pais})</h3>
                 </div>
                 <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{s.direccion}</span>

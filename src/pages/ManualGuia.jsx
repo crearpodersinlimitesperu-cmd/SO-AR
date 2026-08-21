@@ -1,3 +1,4 @@
+import { FlagIcon, getFlagForSede } from '../utils/flags';
 import React, { useState } from 'react';
 import { 
   BookOpen, Target, CheckCircle2, Shield, Flame, Users, 
@@ -858,19 +859,19 @@ export default function ManualGuia() {
               </h4>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.75rem', fontSize: '0.88rem' }}>
                 <div style={{ padding: '0.6rem 0.8rem', background: 'rgba(255,255,255,0.03)', borderRadius: '6px' }}>
-                  <div style={{ color: '#ffffff', fontWeight: 700 }}>🇪🇨 Quito, Guayaquil, Cuenca:</div>
+                  <div style={{ color: '#ffffff', fontWeight: 700 }}><FlagIcon country="Ecuador" size={16} /> Quito, Guayaquil, Cuenca:</div>
                   <strong style={{ color: '#ef4444', fontSize: '1rem' }}>911 (ECU 911)</strong>
                 </div>
                 <div style={{ padding: '0.6rem 0.8rem', background: 'rgba(255,255,255,0.03)', borderRadius: '6px' }}>
-                  <div style={{ color: '#ffffff', fontWeight: 700 }}>🇵🇪 Lima:</div>
+                  <div style={{ color: '#ffffff', fontWeight: 700 }}><FlagIcon country="Peru" size={16} /> Lima:</div>
                   <strong style={{ color: '#ef4444', fontSize: '1rem' }}>106 (SAMU) / 116 / 105</strong>
                 </div>
                 <div style={{ padding: '0.6rem 0.8rem', background: 'rgba(255,255,255,0.03)', borderRadius: '6px' }}>
-                  <div style={{ color: '#ffffff', fontWeight: 700 }}>🇨🇴 Medellín:</div>
+                  <div style={{ color: '#ffffff', fontWeight: 700 }}><FlagIcon country="Colombia" size={16} /> Medellín:</div>
                   <strong style={{ color: '#ef4444', fontSize: '1rem' }}>123 (Emergencias)</strong>
                 </div>
                 <div style={{ padding: '0.6rem 0.8rem', background: 'rgba(255,255,255,0.03)', borderRadius: '6px' }}>
-                  <div style={{ color: '#ffffff', fontWeight: 700 }}>🇲🇽 México (CDMX):</div>
+                  <div style={{ color: '#ffffff', fontWeight: 700 }}><FlagIcon country="Mexico" size={16} /> México (CDMX):</div>
                   <strong style={{ color: '#ef4444', fontSize: '1rem' }}>911 (Emergencias)</strong>
                 </div>
               </div>

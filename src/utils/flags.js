@@ -1,1 +1,2 @@
-export { getFlagForSede } from './flags.jsx';
+export * from './flags.jsx';
+export { default } from './flags.jsx';

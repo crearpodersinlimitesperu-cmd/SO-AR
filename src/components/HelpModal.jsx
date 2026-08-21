@@ -1,3 +1,4 @@
+import { FlagIcon, getFlagForSede } from '../utils/flags';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { X, HelpCircle, Mail, Send, CheckCircle2, BookOpen, AlertTriangle, ShieldAlert, HeartPulse, PhoneCall, Zap, ExternalLink } from 'lucide-react';
@@ -165,10 +166,10 @@ export default function HelpModal({ isOpen, onClose }) {
               {/* Centrales de Emergencia Rápidas */}
               <h4 style={{ color: 'var(--crear-cyan)', marginBottom: '0.6rem' }}>3. Centrales de Emergencia por Sede</h4>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.5rem', marginBottom: '1.5rem' }}>
-                <div style={{ padding: '0.5rem', background: 'rgba(255,255,255,0.03)', borderRadius: '6px', fontSize: '0.85rem' }}>🇪🇨 Quito/GYE/CUE: <strong style={{ color: '#ef4444' }}>911</strong></div>
-                <div style={{ padding: '0.5rem', background: 'rgba(255,255,255,0.03)', borderRadius: '6px', fontSize: '0.85rem' }}>🇵🇪 Lima: <strong style={{ color: '#ef4444' }}>106 / 116</strong></div>
-                <div style={{ padding: '0.5rem', background: 'rgba(255,255,255,0.03)', borderRadius: '6px', fontSize: '0.85rem' }}>🇨🇴 Medellín: <strong style={{ color: '#ef4444' }}>123</strong></div>
-                <div style={{ padding: '0.5rem', background: 'rgba(255,255,255,0.03)', borderRadius: '6px', fontSize: '0.85rem' }}>🇲🇽 México: <strong style={{ color: '#ef4444' }}>911</strong></div>
+                <div style={{ padding: '0.5rem', background: 'rgba(255,255,255,0.03)', borderRadius: '6px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}><FlagIcon country="Ecuador" size={16} /> Quito/GYE/CUE: <strong style={{ color: '#ef4444' }}>911</strong></div>
+                <div style={{ padding: '0.5rem', background: 'rgba(255,255,255,0.03)', borderRadius: '6px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}><FlagIcon country="Peru" size={16} /> Lima: <strong style={{ color: '#ef4444' }}>106 / 116</strong></div>
+                <div style={{ padding: '0.5rem', background: 'rgba(255,255,255,0.03)', borderRadius: '6px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}><FlagIcon country="Colombia" size={16} /> Medellín: <strong style={{ color: '#ef4444' }}>123</strong></div>
+                <div style={{ padding: '0.5rem', background: 'rgba(255,255,255,0.03)', borderRadius: '6px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}><FlagIcon country="Mexico" size={16} /> México: <strong style={{ color: '#ef4444' }}>911</strong></div>
               </div>
 
               <div style={{ textAlign: 'center' }}>
