@@ -1,6 +1,6 @@
 {
   "version": "2.8.0",
-  "createdAt": "2026-08-20T23:37:17.148Z",
+  "createdAt": "2026-08-21T05:34:05.644Z",
   "projectId": "campus-crear",
   "collections": {
     "users": [],
@@ -9,7 +9,9 @@
     "events": [],
     "cycles": [],
     "venues": [],
-    "kpis": [],
+    "goals": [],
+    "reports": [],
+    "user_profiles": [],
     "notifications": [],
     "mail": []
   },
@@ -20,7 +22,9 @@
     "events": 0,
     "cycles": 0,
     "venues": 0,
-    "kpis": 0,
+    "goals": 0,
+    "reports": 0,
+    "user_profiles": 0,
     "notifications": 0,
     "mail": 0
   }
