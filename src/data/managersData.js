@@ -10691,6 +10691,21 @@ export const TRAINER_METADATA = {
     "email": "carlos.brunis@crearpsl.net",
     "programa": "QT+C1"
   },
+    "Mila Campuzano": {
+    "fullName": "Emily Gabriela Campuzano Rodríguez",
+    "email": "emily.campuzano@crearpsl.net",
+    "programa": "MJ"
+  },
+  "Emily Gabriela Campuzano Rodríguez": {
+    "fullName": "Emily Gabriela Campuzano Rodríguez",
+    "email": "emily.campuzano@crearpsl.net",
+    "programa": "MJ"
+  },
+  "Emily Campuzano": {
+    "fullName": "Emily Gabriela Campuzano Rodríguez",
+    "email": "emily.campuzano@crearpsl.net",
+    "programa": "MJ"
+  },
   "Mauricio Perez": {
     "email": "mperez.ttw@gmail.com",
     "programa": "C1"

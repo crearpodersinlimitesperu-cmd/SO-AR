@@ -538,10 +538,18 @@ export const USERS_TO_IMPORT = [
 },
 {
   "id": "staff_emilygabrielacampuzanorodrguez",
-  "name": "Emily Gabriela Campuzano Rodríguez",
+  "name": "Emily Gabriela Campuzano Rodríguez (Mila)",
+  "alias": "Mila Campuzano",
+  "aliases": [
+    "Mila Campuzano",
+    "Mila",
+    "Emily Campuzano",
+    "Emily Gabriela Campuzano Rodríguez"
+  ],
   "role": "gerente",
   "roles": [
-    "gerente"
+    "gerente",
+    "entrenador"
   ],
   "sede": "UIO",
   "emails": [
