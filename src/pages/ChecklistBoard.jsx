@@ -63,13 +63,6 @@ export default function ChecklistBoard() {
       return isAssigned || isMyCreation || isCollaborator;
     }
 
-      const isMine = t.assignedToEmail.toLowerCase() === currentUser?.email?.toLowerCase();
-      const isMyCreation = t.createdBy?.toLowerCase() === currentUser?.email?.toLowerCase();
-      const isCollab = t.collaborators?.includes(currentUser?.email);
-      return isMine || isMyCreation || isCollab;
-    }
-
-
     return t.role === roleId || isAssigned || isCollaborator;
   });
 
