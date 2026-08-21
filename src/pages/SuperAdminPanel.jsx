@@ -285,7 +285,7 @@ function SedeBlock({ sede, tasks, navigate, onSelectUser, onAssignTask, currentU
                 {ROLE_LABELS[normalizeRole(role)] || role}
               </h5>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
-                {pers.map(p => <PersonCard key={p.email || p.name} person={p} tasks={tasks} navigate={navigate} onSelectUser={onSelectUser} onAssignTask={onAssignTask} currentUser={currentUser} />)}
+                {pers.map(p => <PersonCard key={p.email || p.name} person={p} tasks={tasks} navigate={navigate} onSelectUser={onSelectUser} onAssignTask={onAssignTask} currentUser={currentUser} userConnections={userConnections} />)}
               </div>
             </div>
           ))}
@@ -597,6 +597,8 @@ function RoleView({ tasks, navigate, onSelectUser, onAssignTask, userConnections
                   navigate={navigate} 
                   onSelectUser={onSelectUser}
                   onAssignTask={onAssignTask}
+                  currentUser={currentUser}
+                  userConnections={userConnections}
                 />
               ))}
             </div>
@@ -617,7 +619,24 @@ export default function SuperAdminPanel() {
   const [assignUser, setAssignUser] = useState(null);
   const [showUserModal, setShowUserModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [userConnections, setUserConnections] = useState({});
   const { showToast } = useUI();
+
+  useEffect(() => {
+    let isMounted = true;
+    async function fetchConnections() {
+      try {
+        const conns = await getAllUserConnections();
+        if (isMounted && conns) {
+          setUserConnections(conns);
+        }
+      } catch (err) {
+        console.warn("Error loading user connections in SuperAdminPanel:", err);
+      }
+    }
+    fetchConnections();
+    return () => { isMounted = false; };
+  }, [currentUser]);
 
   const handleOpenUserModal = (user) => {
     setSelectedUser(user);
