@@ -748,22 +748,6 @@ export const USERS_TO_IMPORT = [
   "email": "e.andresid@gmail.com"
 },
 {
-  "id": "entrenador_carlosbrunis",
-  "name": "Carlos Brunis",
-  "role": "qt",
-  "roles": [
-    "qt",
-    "entrenador"
-  ],
-  "sede": "Global",
-  "emails": [
-    "brunische66@gmail.com",
-    "carlos.brunis@crearpsl.com",
-    "carlos.brunis@crearpsl.net"
-  ],
-  "email": "brunische66@gmail.com"
-},
-{
   "id": "entrenador_ciriloagustnmartnez",
   "name": "Cirilo Agustín Martínez",
   "role": "entrenador",
