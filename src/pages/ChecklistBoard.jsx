@@ -22,7 +22,7 @@ export default function ChecklistBoard() {
   const [qtPhaseFilter, setQtPhaseFilter] = useState('all'); // 'all', 'PRE-C1', 'C1', 'POST-C1'
 
   const { currentUser } = useAuth();
-  const { tasks, toggleTask, updateTaskDetails, inviteCollaborator } = useChecklist();
+  const { tasks, toggleTask, updateTaskDetails, inviteCollaborator, syncTasksToGoogle } = useChecklist();
   const { currentCycle, currentStage } = useCycles();
   const role = roles.find(r => r.id === roleId) || {
     id: roleId,
@@ -176,6 +176,15 @@ export default function ChecklistBoard() {
                 Limpiar Filtro
               </button>
             )}
+            <button 
+              type="button"
+              onClick={() => syncTasksToGoogle(roleId)} 
+              style={{ background: 'rgba(66, 133, 244, 0.1)', border: '1px solid rgba(66, 133, 244, 0.4)', color: '#4285F4', padding: '0.3rem 0.8rem', borderRadius: '4px', fontSize: '0.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 'bold' }}
+              title="Sincronizar tareas pendientes con Google Tasks"
+            >
+              <img src="https://www.gstatic.com/images/branding/product/1x/tasks_48dp.png" alt="Google Tasks" style={{ width: '14px', height: '14px' }} />
+              Sincronizar
+            </button>
             <button 
               type="button"
               onClick={() => setShowTaskModal(true)} 
