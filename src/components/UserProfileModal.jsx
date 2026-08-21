@@ -140,7 +140,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
   // 1. Base tasks of this user's role and sede
   // 2. Direct assigned custom tasks (assignedToEmail)
   const userTasks = allTasks.filter(t => {
-    const isAssigned = t.assignedToEmail && t.assignedToEmail.toLowerCase() === user.email?.toLowerCase();
+    const isAssigned = (t.assignedToEmails && t.assignedToEmails.some(e => e.toLowerCase() === user.email?.toLowerCase())) || (t.assignedToEmail && t.assignedToEmail.toLowerCase() === user.email?.toLowerCase());
     const isCollab = t.collaborators && t.collaborators.includes(user.email);
     
     if (isAssigned || isCollab) {
@@ -159,7 +159,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
       return true;
     }
 
-    if (t.assignedToEmail) return false; // Is a specific task for someone else
+    if (t.assignedToEmail || (t.assignedToEmails && t.assignedToEmails.length > 0)) return false; // Is a specific task for someone else
 
     const tRoleNorm = normalizeRole(t.role);
     const roleMatches = tRoleNorm === canonicalRole || t.role === user.role;
@@ -683,7 +683,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
                                     <Clock size={11} /> Límite: {new Date(task.deadline).toLocaleDateString()} {new Date(task.deadline).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                   </span>
                                 )}
-                                {task.assignedToEmail && (
+                                {(task.assignedToEmail || (task.assignedToEmails && task.assignedToEmails.length > 0)) && (
                                   <span style={{ color: 'var(--crear-cyan)' }}>Personalizada (Directa)</span>
                                 )}
                               </div>
@@ -891,3 +891,4 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
     </>
   );
 }
+

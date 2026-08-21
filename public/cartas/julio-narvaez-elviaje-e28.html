@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenido Julio | CREAR Poder Sin Límites</title>
+    
+    <!-- Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind Config for Custom Brand Colors -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        crear: {
+                            black: '#0a0a0a',
+                            dark: '#171717',
+                            gray: '#262626',
+                            light: '#e5e5e5',
+                            accent: '#38bdf8',
+                            primary: '#2563eb',
+                        }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0a0a0a;
+            color: #e5e5e5;
+            overflow-x: hidden;
+        }
+        .glass {
+            background: rgba(23, 23, 23, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .text-gradient {
+            background: linear-gradient(to right, #38bdf8, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0a0a0a; }
+        ::-webkit-scrollbar-thumb { background: #262626; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #38bdf8; }
+    </style>
+</head>
+<body class="antialiased selection:bg-crear-accent selection:text-white">
+
+    <!-- Welcome Overlay for Autoplay -->
+    <div id="welcomeOverlay" class="fixed inset-0 z-[100] bg-[#050505] flex flex-col items-center justify-center transition-opacity duration-1000">
+        <img src="logo_crear_blanco.png" alt="CREAR" class="h-28 md:h-40 mb-10 drop-shadow-[0_0_25px_rgba(251,191,36,0.5)] animate-pulse">
+        <button id="openLetterBtn" class="px-10 py-5 bg-[#f59e0b] text-black font-black text-xl rounded-full hover:scale-110 transition-transform shadow-[0_0_30px_rgba(251,191,36,0.6)] flex items-center gap-3 opacity-50 cursor-not-allowed pointer-events-none transition-all duration-500">
+            <i class="fa-solid fa-spinner fa-spin"></i> PREPARANDO EXPERIENCIA...
+        </button>
+        <p class="mt-6 text-gray-500 text-sm font-light">Enciende el volumen para la experiencia completa</p>
+    </div>
+    
+
+    <nav class="fixed w-full z-50 glass transition-all duration-300 shadow-lg" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex-shrink-0 flex items-center gap-2 cursor-pointer" onclick="window.scrollTo(0,0)">
+                    <img src="logo_crear_blanco.png" alt="CREAR" class="h-10 object-contain" />
+                </div>
+                <div class="flex space-x-8 items-center">
+                    <span class="text-crear-accent font-semibold tracking-wider text-sm uppercase">Radar Operativo</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="relative min-h-screen flex items-center justify-center pt-20 pb-12 overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/40 via-crear-black to-crear-black"></div>
+            <div class="absolute top-20 right-10 w-64 h-64 bg-crear-accent opacity-20 rounded-full blur-[100px] animate-float"></div>
+        </div>
+
+        <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center mt-12">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-sm font-semibold text-crear-accent mb-6 reveal shadow-[0_0_15px_rgba(56,189,248,0.3)]">
+                <i class="fa-solid fa-calendar-day"></i>
+                11 de Agosto, 2026
+            </div>
+            
+            <h1 class="text-5xl md:text-7xl font-black tracking-tight mb-6 reveal text-white" style="transition-delay: 100ms;">
+                ¡Bienvenido a Lima,<br/> <span class="text-gradient">Julio!</span>
+            </h1>
+            
+            <p class="mt-4 text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto mb-8 font-light reveal" style="transition-delay: 200ms;">
+                El Viaje para el Equipo 28 💥
+            </p>
+
+            <div class="inline-block px-8 py-3 rounded-full border border-[#f59e0b]/50 bg-[#f59e0b]/10 mb-8 reveal shadow-[0_0_20px_rgba(251,191,36,0.2)] hover:scale-105 transition-transform" style="transition-delay: 250ms;">
+                <p class="text-[#f59e0b] font-black text-xl md:text-2xl italic tracking-wider">"¡Integración y Renacer!"</p>
+            </div>
+
+            <!-- CUENTA REGRESIVA PREMIUM -->
+            <div class="reveal mb-12 flex flex-col md:flex-row gap-8 justify-center items-center" style="transition-delay: 275ms;">
+                <!-- Cuenta Regresiva Viaje -->
+                <div class="glass p-6 rounded-2xl border border-[#f59e0b]/20 shadow-[0_0_20px_rgba(251,191,36,0.2)] w-full max-w-sm">
+                    <h3 class="text-[#f59e0b] text-sm uppercase tracking-widest font-bold mb-4">✈️ Tiempo para tu Viaje</h3>
+                    <div id="countdown-flight" class="grid grid-cols-4 gap-2 text-center">
+                        <div><div class="text-3xl font-black text-white" id="fly-d">00</div><div class="text-[10px] text-gray-500 uppercase">Días</div></div>
+                        <div><div class="text-3xl font-black text-white" id="fly-h">00</div><div class="text-[10px] text-gray-500 uppercase">Hrs</div></div>
+                        <div><div class="text-3xl font-black text-white" id="fly-m">00</div><div class="text-[10px] text-gray-500 uppercase">Min</div></div>
+                        <div><div class="text-3xl font-black text-white" id="fly-s">00</div><div class="text-[10px] text-gray-500 uppercase">Seg</div></div>
+                    </div>
+                </div>
+                
+                <!-- Cuenta Regresiva Entrenamiento -->
+                <div class="glass p-6 rounded-2xl border border-[#f59e0b]/20 shadow-[0_0_20px_rgba(251,191,36,0.2)] w-full max-w-sm">
+                    <h3 class="text-[#f59e0b] text-sm uppercase tracking-widest font-bold mb-4">🔥 Inicio del C1 E30</h3>
+                    <div id="countdown-training" class="grid grid-cols-4 gap-2 text-center">
+                        <div><div class="text-3xl font-black text-white" id="trn-d">00</div><div class="text-[10px] text-gray-500 uppercase">Días</div></div>
+                        <div><div class="text-3xl font-black text-white" id="trn-h">00</div><div class="text-[10px] text-gray-500 uppercase">Hrs</div></div>
+                        <div><div class="text-3xl font-black text-white" id="trn-m">00</div><div class="text-[10px] text-gray-500 uppercase">Min</div></div>
+                        <div><div class="text-3xl font-black text-white" id="trn-s">00</div><div class="text-[10px] text-gray-500 uppercase">Seg</div></div>
+                    </div>
+                </div>
+            </div>
+            <div class="reveal mb-12 flex justify-center" style="transition-delay: 280ms;">
+                <a href="carta_invitacion_migraciones.html?nombre=Julionando+Aragon&doc=DNI+17.856.159&fechas=14+al+16+de+Agosto+2026&rol=Líder+Capítulo+Uno" target="_blank" class="glass border border-crear-accent/50 hover:bg-crear-accent/20 text-white px-6 py-3 rounded-full shadow-[0_0_20px_rgba(56,189,248,0.2)] transition-transform hover:scale-105 flex items-center gap-3 text-sm font-semibold tracking-wide uppercase">
+                    <i class="fa-solid fa-passport text-crear-accent"></i>
+                    Ver Carta para Migraciones
+                </a>
+            </div>
+            
+            <p id="timezone-indicator" class="text-xs text-gray-500 mb-8 tracking-widest uppercase reveal" style="transition-delay: 285ms;">Calculando huso horario local...</p>
+
+            <div class="glass p-8 rounded-2xl text-left reveal border border-gray-800 hover:border-crear-accent transition-colors duration-500 shadow-2xl" style="transition-delay: 300ms;">
+                <p class="text-gray-300 text-lg leading-relaxed mb-4">
+                    <strong>Querido Julio,</strong><br/><br/>
+                    Qué alegría recibirte en Lima para El Viaje. Tu sabiduría y contención son el faro que necesitan para navegar esta experiencia.
+                </p>
+                <p class="text-gray-300 text-lg leading-relaxed">
+                    Para que viajes ligero de equipaje y con la mente puesta únicamente en el equipo, aquí tienes tu logística operativa:
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Itinerary Sections -->
+    <section class="py-16 bg-crear-black relative z-10">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+            
+            <!-- 1. Misión -->
+            <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-crear-accent transition-all duration-300 hover:shadow-[0_0_30px_rgba(56,189,248,0.15)] hover:-translate-y-1">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-crear-accent text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                        <i class="fa-solid fa-crosshairs"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-white tracking-tight">1. Tu Misión (El Viaje - E28)</h2>
+                </div>
+                <div class="space-y-4 text-gray-300 ml-2 md:ml-18">
+                    <p class="text-lg"><strong>Fechas:</strong> Viernes 18 al Domingo 20 de Septiembre, 2026.</p>
+                    <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-1 h-full bg-crear-accent"></div>
+                        <h4 class="font-black text-white mb-3 text-crear-accent tracking-wide uppercase text-sm">Arranque (Viernes 14)</h4>
+                        <div class="space-y-2">
+                            <ul><li class="flex items-start gap-3"><i class="fa-regular fa-clock text-crear-accent mt-1"></i><span><strong>10:00 AM:</strong> Inicio de expedición.</span></li></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Vuelos -->
+            <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-purple-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(168,85,247,0.15)] hover:-translate-y-1">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-purple-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                        <i class="fa-solid fa-plane"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-white tracking-tight">2. Vuelos Confirmados</h2>
+                </div>
+                <div class="space-y-4 text-gray-300 ml-2 md:ml-18">
+                    <div class="flex flex-wrap gap-3 items-center">
+                        <span class="text-gray-400 text-sm">Reservas:</span> 
+                        <span class="bg-gray-800 border border-gray-700 px-3 py-1 rounded-md font-mono text-white text-sm">WEHJEI</span>
+                        <span class="text-gray-500 text-xs ml-2">(Boleto a nombre de: Julionando Aragon)</span>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-5 mt-5">
+                        <!-- Llegada -->
+                        <div class="bg-gradient-to-br from-gray-800/40 to-gray-900/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden">
+                            <div class="absolute top-0 left-0 w-full h-1 bg-purple-500"></div>
+                            <h4 class="font-black text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-plane-arrival text-purple-400"></i> Llegada (Jueves 13)</h4>
+                            <div class="space-y-2 text-sm">
+                                <p class="flex justify-between border-b border-gray-700/50 pb-2"><span class="text-gray-400">Vuelo</span> <span class="font-medium text-white">LATAM LA 2383 (Desde Quito)</span></p>
+                                <p class="flex justify-between border-b border-gray-700/50 pb-2 pt-1"><span class="text-gray-400">Salida</span> <span class="font-medium text-white">12:15 PM</span></p>
+                                <p class="flex justify-between pt-1"><span class="text-gray-400">Llegada a Lima</span> <span class="font-medium text-green-400">14:30 PM</span></p>
+                            </div>
+                        </div>
+                        
+                        <!-- Salida -->
+                        <div class="bg-gradient-to-br from-gray-800/40 to-gray-900/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden">
+                            <div class="absolute top-0 left-0 w-full h-1 bg-red-500"></div>
+                            <h4 class="font-black text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-plane-departure text-red-400"></i> Salida (Lunes 17 - Madrugada)</h4>
+                            <div class="space-y-2 text-sm">
+                                <p class="flex justify-between border-b border-gray-700/50 pb-2"><span class="text-gray-400">Vuelo</span> <span class="font-medium text-white">LATAM LA 2465 (A Buenos Aires)</span></p>
+                                <p class="flex justify-between border-b border-gray-700/50 pb-2 pt-1"><span class="text-gray-400">Salida de Lima</span> <span class="font-medium text-red-400">01:15 AM (Lunes)</span></p>
+                                <p class="flex justify-between pt-1"><span class="text-gray-400">Llegada</span> <span class="font-medium text-white">07:40 AM (Lunes)</span></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-red-500/10 border border-red-500/30 p-4 rounded-xl mt-4 flex items-start gap-4">
+                        <i class="fa-solid fa-triangle-exclamation text-red-500 text-xl mt-1 animate-pulse-slow"></i>
+                        <div>
+                            <h4 class="font-bold text-red-400 text-sm tracking-wide mb-1">OJO AL DATO (OPERACIÓN DE SALIDA)</h4>
+                            <p class="text-sm text-gray-300">Tu vuelo a Buenos Aires despega el lunes 17 de agosto a la 01:15 AM. Esto significa que saliendo de la graduación del C1 el domingo por la noche, el transporte te trasladará directo al aeropuerto <strong>(pasaremos por ti a las 22:15 PM)</strong>. No requieres hotel para la noche del domingo.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Movilidad y Sedes -->
+            <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-blue-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] hover:-translate-y-1">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-blue-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                        <i class="fa-solid fa-car"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-white tracking-tight">3. Movilidad y Sede</h2>
+                </div>
+                <div class="space-y-6 text-gray-300 ml-2 md:ml-18">
+                    <p class="text-lg"><strong>Tus traslados:</strong> Nosotros nos encargamos de moverte:</p>
+                    
+                    <div class="space-y-4">
+                        <div class="flex gap-4 items-start bg-gray-800/30 p-4 rounded-xl border border-gray-700/30">
+                            <div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 flex-shrink-0"><i class="fa-solid fa-suitcase"></i></div>
+                            <div>
+                                <div class="font-bold text-blue-400 mb-1">Jueves 13 (Llegada)</div>
+                                <div class="text-sm text-gray-300">Nuestro equipo de transporte te escribirá antes de que aterrices para coordinar tu recojo exacto, contemplando tus tiempos de migración y espera de maletas. De ahí, te llevaremos directo al hotel a descansar y aclimatarte.</div>
+                            </div>
+                        </div>
+                        <div class="flex gap-4 items-start bg-gray-800/30 p-4 rounded-xl border border-gray-700/30">
+                            <div class="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center text-red-400 flex-shrink-0"><i class="fa-solid fa-plane-departure"></i></div>
+                            <div>
+                                <div class="font-bold text-red-400 mb-1">Domingo 16 (Salida)</div>
+                                <div class="text-sm text-gray-300">Pasaremos por ti a la sede de la graduación a las <strong>22:15 PM</strong> en punto para trasladarte directamente al aeropuerto para tu vuelo internacional.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-r from-blue-900/20 to-transparent p-5 rounded-xl border-l-4 border-blue-500 mt-6">
+                        <h4 class="font-black text-white mb-2 flex items-center gap-2"><i class="fa-solid fa-hotel text-blue-400"></i> Hotel y Sede: <a href="https://maps.app.goo.gl/C7K8aFz6s9aYwT6q6" target="_blank" class="text-blue-400 hover:text-blue-300 underline decoration-blue-400/30 underline-offset-2 transition-colors">Hotel Jose Antonio Deluxe</a></h4>
+                        <p class="text-sm text-gray-300">Miraflores. Duermes y entrenas en el mismo edificio para tu total comodidad (hospedaje reservado desde el jueves 13 hasta el domingo 16 de agosto - incluye Late Checkout).</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Clima y Reglas -->
+            <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-amber-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(245,158,11,0.15)] hover:-translate-y-1">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-amber-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                        <i class="fa-solid fa-cloud"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-white tracking-tight">4. Clima y Reglas de Oro</h2>
+                </div>
+                <div class="grid md:grid-cols-2 gap-5 text-gray-300 ml-2 md:ml-18">
+                    <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/50">
+                        <h4 class="font-bold text-amber-400 mb-3 flex items-center gap-2"><i class="fa-solid fa-temperature-empty"></i> El Clima (Lima)</h4>
+                        <p class="text-sm">Lima se encuentra en pleno invierno. Los días son fríos, grises y muy húmedos. <strong>Trae ropa cómoda y abrigadora</strong> para los días de sala y tus salidas.</p>
+                    </div>
+                    <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/50">
+                        <h4 class="font-bold text-green-400 mb-3 flex items-center gap-2"><i class="fa-solid fa-leaf"></i> Cuidado de la Sede</h4>
+                        <ul class="text-sm space-y-2">
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-green-500 mt-1 text-xs"></i> <span><strong>11:00 PM:</strong> Hora límite e innegociable para desocupar el salón los 3 días de entrenamiento.</span></li>
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-green-500 mt-1 text-xs"></i> <span>Cero comida adentro.</span></li>
+                            <li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-green-500 mt-1 text-xs"></i> <span>Manejo prudente de los decibeles en los impactos para la óptima convivencia con el hotel.</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. Honorarios -->
+            <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-emerald-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(16,185,129,0.15)] hover:-translate-y-1">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-emerald-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                        <i class="fa-solid fa-file-invoice-dollar"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-white tracking-tight">5. Tus Honorarios</h2>
+                </div>
+                <div class="text-gray-300 ml-2 md:ml-18 bg-gray-800/30 p-5 rounded-xl border border-gray-700/50">
+                    <p class="text-lg">Mantenemos el acuerdo estándar.</p>
+                    <p class="mt-3 text-sm text-gray-400">Si tus datos bancarios de siempre (Banco, Cuenta, SWIFT) siguen siendo los mismos, el proceso administrativo se iniciará de forma automática al finalizar el fin de semana. Si requieres actualizar alguna información, por favor envíasela directamente a José Sánchez.</p>
+                </div>
+            </div>
+
+            <!-- 6. Escuadrón -->
+            <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-pink-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(236,72,153,0.15)] hover:-translate-y-1">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-pink-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-white tracking-tight">6. Tu Escuadrón de Soporte</h2>
+                </div>
+                <div class="text-gray-300 ml-2 md:ml-18">
+                    <div class="grid md:grid-cols-3 gap-4">
+                        <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/30 hover:border-pink-500/50 transition-colors">
+                            <h4 class="font-bold text-pink-400 mb-2 text-xs uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> Capitán</h4>
+                            <p class="text-white font-medium text-lg">Julionando Lopez Lopez</p>
+                            <p class="text-gray-400 text-sm mt-1"><a href="https://wa.me/51981237577" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 981 237 577</a></p>
+                        </div>
+                        
+                        <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/30 hover:border-pink-500/50 transition-colors">
+                            <h4 class="font-bold text-crear-accent mb-2 text-xs uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-bolt"></i> Escuderas Principales</h4>
+                            <div class="space-y-3">
+                                <div>
+                                    <p class="text-white font-medium text-sm">Diana Moscoso</p>
+                                    <p class="text-gray-400 text-xs mt-0.5"><a href="https://wa.me/51912379744" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 912 379 744</a></p>
+                                </div>
+                                <div class="w-full h-px bg-gray-700/50"></div>
+                                <div>
+                                    <p class="text-white font-medium text-sm">Joyce Marín</p>
+                                    <p class="text-gray-400 text-xs mt-0.5"><a href="https://wa.me/51933599903" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 933 599 903</a></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/30 hover:border-pink-500/50 transition-colors">
+                            <h4 class="font-bold text-purple-400 mb-2 text-xs uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-briefcase"></i> Soporte Gerencial</h4>
+                            <p class="text-white font-medium text-lg">José Sánchez</p>
+                            <p class="text-gray-400 text-sm mt-1"><a href="https://wa.me/51919563284" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 919 563 284</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Closing -->
+            <div class="text-center pt-16 pb-12 reveal">
+                <h3 class="text-2xl md:text-3xl font-black text-white mb-2 italic" id="random-quote"></h3>
+                <p class="text-lg text-crear-accent mb-10 font-semibold" id="random-author"></p>
+                <div class="inline-block glass px-10 py-5 rounded-2xl border border-crear-accent/40 shadow-[0_0_30px_rgba(56,189,248,0.25)] hover:scale-105 transition-transform duration-300">
+                    <p class="font-bold text-white text-lg">Un abrazo,</p>
+                    <p class="text-crear-accent font-black tracking-widest uppercase text-xl mt-1">El Equipo de CREAR PSL LIMA</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-[#050505] py-16 border-t border-gray-900 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="flex items-center justify-center gap-3 mb-10">
+                <img src="logo_crear_blanco.png" alt="CREAR" class="h-40 md:h-56 object-contain drop-shadow-[0_0_20px_rgba(251,191,36,0.6)] hover:drop-shadow-[0_0_35px_rgba(251,191,36,1)] hover:scale-105 transition-all duration-500" />
+            </div>
+            <div class="text-gray-600 text-sm font-medium tracking-wide">
+                &copy; 2026 CREAR Poder Sin Límites Sede Perú.<br/> Comunicación oficial vía Google Chat.
+            </div>
+        </div>
+    </footer>
+
+    <!-- LOGIC SCRIPT -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Navbar background change on scroll
+            const navbar = document.getElementById('navbar');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 20) {
+                    navbar.classList.add('bg-crear-black/95', 'shadow-lg');
+                    navbar.classList.remove('glass', 'shadow-lg');
+                } else {
+                    navbar.classList.remove('bg-crear-black/95', 'shadow-lg');
+                    navbar.classList.add('glass', 'shadow-lg');
+                }
+            });
+
+            // Intersection Observer for Scroll Reveals
+            const revealElements = document.querySelectorAll('.reveal');
+            const revealOptions = {
+                threshold: 0.1,
+                rootMargin: "0px 0px -50px 0px"
+            };
+
+            const revealOnScroll = new IntersectionObserver(function(entries, observer) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, revealOptions);
+
+            revealElements.forEach(el => {
+                revealOnScroll.observe(el);
+            });
+            
+            // Trigger initial check
+            setTimeout(() => {
+                revealElements.forEach(el => {
+                    const rect = el.getBoundingClientRect();
+                    if (rect.top < window.innerHeight && rect.width > 0 && rect.height > 0) {
+                        el.classList.add('active');
+                    }
+                });
+            }, 100);
+        });
+    </script>
+    <!-- Floating Music Button -->
+    <script src="quotes.js"></script>
+    <button id="musicToggleBtn" class="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full glass border border-gray-600 flex items-center justify-center text-white shadow-[0_0_15px_rgba(56,189,248,0.3)] hover:scale-110 transition-transform duration-300">
+        <i class="fa-solid fa-music"></i>
+    </button>
+    
+
+    <div id="ytplayer" class="absolute -left-[9999px] top-0 w-[300px] h-[300px] opacity-0 pointer-events-none"></div>
+      <script>
+          var tag = document.createElement('script');
+          tag.src = "https://www.youtube.com/iframe_api";
+          var firstScriptTag = document.getElementsByTagName('script')[0];
+          firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+  
+          var player;
+          var isPlaying = false;
+          var playerReady = false;
+  
+          function onYouTubeIframeAPIReady() {
+              player = new YT.Player('ytplayer', {
+                  height: '300',
+                  width: '300',
+                  videoId: 'FboYUBlvaL4',
+                  playerVars: {
+                      'autoplay': 0,
+                      'controls': 0,
+                      'loop': 1,
+                      'playlist': 'FboYUBlvaL4',
+                      'playsinline': 1,
+                      'rel': 0
+                  },
+                  events: {
+                      'onReady': onPlayerReady,
+                      'onStateChange': onPlayerStateChange
+                  }
+              });
+          }
+
+          function onPlayerStateChange(event) {
+              if (event.data === YT.PlayerState.PLAYING) {
+                  isPlaying = true;
+                  const icon = document.querySelector('#musicToggleBtn i');
+                  if(icon) {
+                      icon.classList.remove('fa-music');
+                      icon.classList.add('fa-pause', 'text-crear-accent', 'fa-beat-fade');
+                  }
+              } else if (event.data === YT.PlayerState.PAUSED) {
+                  isPlaying = false;
+                  const icon = document.querySelector('#musicToggleBtn i');
+                  if(icon) {
+                      icon.classList.remove('fa-pause', 'text-crear-accent', 'fa-beat-fade');
+                      icon.classList.add('fa-music');
+                  }
+              }
+          }
+  
+          function toggleMusic() {
+              if (!playerReady || !player) return;
+              if (isPlaying) {
+                  player.pauseVideo();
+              } else {
+                  player.playVideo();
+              }
+          }
+  
+          function onPlayerReady(event) {
+              playerReady = true;
+              const openBtn = document.getElementById('openLetterBtn');
+              if(openBtn) {
+                  openBtn.innerHTML = '<i class="fa-solid fa-envelope-open-text"></i> ABRIR CARTA';
+                  openBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
+                  openBtn.classList.add('animate-pulse');
+              }
+          }
+  
+          document.addEventListener('DOMContentLoaded', () => {
+              const overlay = document.getElementById('welcomeOverlay');
+              const openBtn = document.getElementById('openLetterBtn');
+              const musicBtn = document.getElementById('musicToggleBtn');
+  
+              if(openBtn && overlay) {
+                  openBtn.addEventListener('click', () => {
+                      overlay.style.opacity = '0';
+                      setTimeout(() => overlay.remove(), 1000);
+                      if (playerReady) {
+                          player.playVideo();
+                      }
+                  });
+              }
+  
+              if(musicBtn) {
+                  musicBtn.addEventListener('click', (e) => {
+                      e.stopPropagation();
+                      toggleMusic();
+                  });
+              }
+              
+              // Cuenta Regresiva (Logica Huso Horario)
+              const trainingDateLima = new Date("2026-09-18T10:00:00-05:00").getTime();
+              const flightDateLima = new Date("2026-09-18T10:10:00-05:00").getTime();
+              const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+              const indicator = document.getElementById('timezone-indicator');
+              if(indicator) indicator.innerText = `Mostrando cuenta regresiva detectando tu zona local: ${timeZone}`;
+              
+              function updateCountdowns() {
+                  const now = new Date().getTime();
+                  let distanceTrn = trainingDateLima - now;
+                  if (distanceTrn > 0) {
+                      document.getElementById("trn-d").innerText = String(Math.floor(distanceTrn / (1000 * 60 * 60 * 24))).padStart(2, '0');
+                      document.getElementById("trn-h").innerText = String(Math.floor((distanceTrn % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
+                      document.getElementById("trn-m").innerText = String(Math.floor((distanceTrn % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
+                      document.getElementById("trn-s").innerText = String(Math.floor((distanceTrn % (1000 * 60)) / 1000)).padStart(2, '0');
+                  } else {
+                      document.getElementById("countdown-training").innerHTML = "<div class='col-span-4 text-white font-bold tracking-widest uppercase'>¡El entrenamiento ha comenzado!</div>";
+                  }
+                  
+                  let distanceFly = flightDateLima - now;
+                  if (distanceFly > 0) {
+                      document.getElementById("fly-d").innerText = String(Math.floor(distanceFly / (1000 * 60 * 60 * 24))).padStart(2, '0');
+                      document.getElementById("fly-h").innerText = String(Math.floor((distanceFly % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
+                      document.getElementById("fly-m").innerText = String(Math.floor((distanceFly % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
+                      document.getElementById("fly-s").innerText = String(Math.floor((distanceFly % (1000 * 60)) / 1000)).padStart(2, '0');
+                  } else {
+                      document.getElementById("countdown-flight").innerHTML = "<div class='col-span-4 text-white font-bold tracking-widest uppercase'>¡Buen viaje!</div>";
+                  }
+              }
+              setInterval(updateCountdowns, 1000);
+              updateCountdowns();
+          });
+      </script>
+</body>
+
+
+
+

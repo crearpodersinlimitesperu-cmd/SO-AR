@@ -27,7 +27,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
     role: currentUser?.appRole || 'gerente',
     deadlineDate: getTodayStr(),
     deadlineTime: '18:00',
-    assignedToEmail: '',
+    assignedToEmails: [],
     assignedSede: currentUser?.sede || '',
     priority: '🟡 AMARILLO'
   });
@@ -40,7 +40,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
           role: normalizeRole(prefilledUser.role) || prefilledUser.role || currentUser?.appRole || 'gerente',
           deadlineDate: getTodayStr(),
           deadlineTime: '18:00',
-          assignedToEmail: prefilledUser.email || '',
+          assignedToEmails: prefilledUser.email ? [prefilledUser.email] : [],
           assignedSede: prefilledUser.sede || currentUser?.sede || '',
           priority: '🟡 AMARILLO'
         });
@@ -79,7 +79,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
       priority: newTask.priority,
       isCritical: newTask.priority === '🔴 ROJO',
       createdBy: currentUser.email,
-      assignedToEmail: canAssignSpecific ? (newTask.assignedToEmail || currentUser?.email) : (prefilledUser?.email || currentUser?.email || ''),
+      assignedToEmails: canAssignSpecific ? (newTask.assignedToEmails?.length > 0 ? newTask.assignedToEmails : [currentUser?.email]) : (prefilledUser?.email ? [prefilledUser.email] : [currentUser?.email]),
       assignedSede: canAssignSpecific ? (newTask.assignedSede || currentUser?.sede || 'Global') : (prefilledUser?.sede || currentUser?.sede || 'Global')
     };
 
@@ -93,7 +93,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
           details: {
             taskTitle: newTask.title.trim(),
             assignedRole: finalRole,
-            assignedEmail: taskData.assignedToEmail,
+            assignedEmails: taskData.assignedToEmails,
             priority: newTask.priority,
             deadline: deadlineISO
           }
@@ -108,7 +108,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
         role: currentUser?.appRole || 'gerente',
         deadlineDate: getTodayStr(),
         deadlineTime: '18:00',
-        assignedToEmail: '',
+        assignedToEmails: [],
         assignedSede: currentUser?.sede || '',
         priority: '🟡 AMARILLO'
       });
@@ -205,12 +205,17 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
             {canAssignSpecific && (
               <>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--crear-cyan)', marginBottom: '0.3rem' }}>Asignar a Colaborador Específico (Opcional):</label>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--crear-cyan)', marginBottom: '0.3rem' }}>Asignar a Colaborador(es) (Ctrl/Cmd + Click para varios):</label>
                   <select 
-                    value={newTask.assignedToEmail || ''} 
-                    onChange={e => setNewTask({...newTask, assignedToEmail: e.target.value})} 
+                    multiple
+                    value={newTask.assignedToEmails || []} 
+                    onChange={e => {
+                      const options = [...e.target.selectedOptions];
+                      const values = options.map(opt => opt.value).filter(val => val !== "");
+                      setNewTask({...newTask, assignedToEmails: values});
+                    }} 
                     className="input-field" 
-                    style={{ width: '100%', borderColor: 'var(--crear-cyan)' }} 
+                    style={{ width: '100%', borderColor: 'var(--crear-cyan)', minHeight: '80px' }} 
                     disabled={isSubmitting}
                   >
                     <option value="">Cualquiera en este Rol (No específico)</option>

@@ -84,12 +84,29 @@ export default function GerenteDashboard() {
 
   // Helper para resolver los responsables
   const getResponsiblesForTask = (task) => {
-    if (task.assignedToEmail) {
-      const u = usersData.find(usr => usr.email.toLowerCase() === task.assignedToEmail.toLowerCase());
-      if (u) return [u];
-      return [{ name: task.assignedToEmail.split('@')[0], email: task.assignedToEmail, role: task.role, sede: task.sede || currentUser?.sede }];
+    const collabs = task.collaboratorDetails || [];
+    
+    // Extraer todos los correos asignados (array o string)
+    let assignedEmails = [];
+    if (task.assignedToEmails && Array.isArray(task.assignedToEmails)) {
+      assignedEmails.push(...task.assignedToEmails);
+    } else if (task.assignedToEmail) {
+      assignedEmails.push(task.assignedToEmail);
     }
-    if (task.collaboratorDetails && task.collaboratorDetails.length > 0) return task.collaboratorDetails;
+    
+    // Remover nuestro propio email si somos el creador (para ver a quién delegamos)
+    if (task.createdBy === currentUser?.email) {
+      assignedEmails = assignedEmails.filter(email => email.toLowerCase() !== currentUser?.email?.toLowerCase());
+    }
+
+    const assignedUsers = assignedEmails.map(email => {
+       const u = usersData.find(usr => usr.email.toLowerCase() === email.toLowerCase());
+       return { name: u?.name?.split(' ')[0] || email.split('@')[0], email: email, role: u?.role || task.role, sede: u?.sede || task.assignedSede || currentUser?.sede };
+    });
+
+    if (assignedUsers.length > 0) {
+      return [...assignedUsers, ...collabs];
+    }
     
     const taskRoleNorm = normalizeRole(task.role);
     const targetSede = (task.sede || currentUser?.sede || '').toLowerCase().trim();

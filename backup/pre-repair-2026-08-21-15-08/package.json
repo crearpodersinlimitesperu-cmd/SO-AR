@@ -1,0 +1,35 @@
+{
+  "name": "cpsl-base-template",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "oxlint",
+    "preview": "vite preview",
+    "sync:qt": "node scripts/qtSyncDaemon.js",
+    "mailer": "node scripts/mailerDaemon.js",
+    "bootstrap": "node scripts/bootstrapSync.js",
+    "backup": "node scripts/backupFirestore.js",
+    "restore": "node scripts/restoreFirestore.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "firebase": "^12.17.1",
+    "lucide-react": "^1.31.0",
+    "nodemailer": "^6.9.13",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-hot-toast": "^2.6.0",
+    "react-router-dom": "^7.18.2",
+    "sanitize-html": "^2.13.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.1.0",
+    "oxlint": "^1.75.0",
+    "vite": "^8.2.2"
+  }
+}

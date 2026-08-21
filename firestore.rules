@@ -2,97 +2,111 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Funciones de verificación de identidad y roles corporativos
     function isAuthenticated() {
-      // Allow any logged-in user to pass this check (UI handles strict email whitelisting).
       return request.auth != null;
     }
     
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
     function isSuperAdmin() {
       return isAuthenticated() && (
         request.auth.token.email in [
           'jose.sanchez@crearpsl.net',
           'armando.pilacuan@gmail.com',
-          'paul.sosa@crearpsl.net',
           'paul.sosa@crearpsl.net'
         ] ||
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'superadmin' ||
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'direccion'
+        getUserData().role == 'superadmin' ||
+        getUserData().role == 'direccion'
       );
     }
     
     function isGerente() {
+      return isSuperAdmin() || (isAuthenticated() && getUserData().role == 'gerente');
+    }
+
+    function isOwner(resourceData) {
       return isAuthenticated() && (
-        isSuperAdmin() || 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'gerente'
+        resourceData.ownerId == request.auth.uid || 
+        resourceData.assignedToEmail == request.auth.token.email ||
+        (resourceData.assigned_to != null && resourceData.assigned_to == request.auth.token.email)
       );
     }
 
-    // Colección de Tareas SO-AR (tasks)
+    function isCollaborator(resourceData) {
+      return isAuthenticated() && resourceData.collaborators != null && request.auth.token.email in resourceData.collaborators;
+    }
+
+    // TASKS
     match /tasks/{taskId} {
       allow read: if isAuthenticated();
-      allow update: if isAuthenticated();
       allow create: if isAuthenticated();
-      allow delete: if isGerente();
+      
+      allow update: if isSuperAdmin() || isGerente() || 
+                    (isOwner(resource.data) && request.resource.data.ownerId == resource.data.ownerId) ||
+                    (isCollaborator(resource.data) && request.resource.data.diff(resource.data).affectedKeys().hasAny(['status', 'progress', 'evidence_url', 'evidenceUrl', 'completions']) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['assignedToEmail', 'role', 'sede', 'ownerId']));
+                    
+      allow delete: if isGerente() || isSuperAdmin();
     }
     
-    // Colección de Metas y Cuotas (goals)
+    // GOALS
     match /goals/{goalId} {
       allow read: if isAuthenticated();
-      allow create, update: if isAuthenticated();
+      allow create: if isGerente() || isSuperAdmin() || isAuthenticated(); // TODO: Restrict goal creation based on roles later
+      allow update: if isSuperAdmin() || isGerente() || isOwner(resource.data);
       allow delete: if isSuperAdmin();
     }
     
-    // Colección de Reportes Operativos (reports)
+    // REPORTS
     match /reports/{reportId} {
       allow read: if isAuthenticated();
       allow create: if isAuthenticated();
-      allow update, delete: if isGerente();
+      allow update, delete: if isGerente() || isSuperAdmin();
     }
 
-    // Colección de Perfiles y Notas Privadas (user_profiles)
+    // USER PROFILES
     match /user_profiles/{userDocId} {
       allow read: if isAuthenticated();
-      allow write: if isAuthenticated();
+      allow write: if isAuthenticated() && request.auth.uid == userDocId;
     }
 
-    // Colección de Notificaciones (notifications)
+    // NOTIFICATIONS
     match /notifications/{notifId} {
       allow read: if isAuthenticated();
       allow create: if isAuthenticated();
-      allow update: if isAuthenticated();
-      allow delete: if isAuthenticated();
+      allow update: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
     }
 
-    // Colección de Hoteles y Salones (venues)
+    // VENUES
     match /venues/{venueId} {
       allow read: if isAuthenticated();
-      allow write: if isGerente();
+      allow write: if isGerente() || isSuperAdmin();
     }
 
-    // Colección de Ciclos Operativos (cycles)
+    // CYCLES
     match /cycles/{cycleId} {
       allow read: if isAuthenticated();
-      allow write: if isGerente();
+      allow write: if isGerente() || isSuperAdmin();
     }
 
-    // Colección de Cola de Correo Electrónico (mail)
+    // MAIL
     match /mail/{mailId} {
       allow read: if isAuthenticated();
       allow create: if isAuthenticated();
       allow update, delete: if isSuperAdmin();
     }
 
-    // Colección de Usuarios y Directorio (users)
+    // USERS
     match /users/{userId} {
       allow read: if isAuthenticated();
       allow write: if isSuperAdmin();
     }
 
-    // Colección de Auditoría de Conexiones (audit_logs)
+    // AUDIT LOGS
     match /audit_logs/{logId} {
-      allow read: if isAuthenticated();
-      // Allow creation as long as they are authenticated (to support users with multiple emails)
+      allow read: if isSuperAdmin();
       allow create: if isAuthenticated();
     }
   }

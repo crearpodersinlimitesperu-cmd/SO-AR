@@ -72,7 +72,7 @@ function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, curre
   const canonicalRole = normalizeRole(person.role);
   const normalizedSedeName = normalizeSede(person.sede);
   const myTasks = tasks.filter(t => {
-    const isAssigned = t.assignedToEmail && t.assignedToEmail.toLowerCase() === person.email?.toLowerCase();
+    const isAssigned = (t.assignedToEmails && t.assignedToEmails.some(e => e.toLowerCase() === person.email?.toLowerCase())) || (t.assignedToEmail && t.assignedToEmail.toLowerCase() === person.email?.toLowerCase());
     const isCollab = t.collaborators && t.collaborators.includes(person.email);
     
     if (isAssigned || isCollab) {
@@ -90,7 +90,7 @@ function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, curre
       return true;
     }
     
-    if (t.assignedToEmail) return false;
+    if (t.assignedToEmail || (t.assignedToEmails && t.assignedToEmails.length > 0)) return false;
     const tNorm = normalizeRole(t.role);
     const matchesRole = tNorm === canonicalRole || t.role === person.role;
     if (!matchesRole) return false;
@@ -230,7 +230,7 @@ function SedeBlock({ sede, tasks, navigate, onSelectUser, onAssignTask, currentU
   members.forEach(person => {
     const canonicalRole = normalizeRole(person.role);
     const myTasks = tasks.filter(t => {
-      const isAssigned = t.assignedToEmail && t.assignedToEmail.toLowerCase() === person.email?.toLowerCase();
+      const isAssigned = (t.assignedToEmails && t.assignedToEmails.some(e => e.toLowerCase() === person.email?.toLowerCase())) || (t.assignedToEmail && t.assignedToEmail.toLowerCase() === person.email?.toLowerCase());
       const isCollab = t.collaborators && t.collaborators.includes(person.email);
       
       if (isAssigned || isCollab) {
@@ -248,7 +248,7 @@ function SedeBlock({ sede, tasks, navigate, onSelectUser, onAssignTask, currentU
         return true;
       }
       
-      if (t.assignedToEmail) return false;
+      if (t.assignedToEmail || (t.assignedToEmails && t.assignedToEmails.length > 0)) return false;
       const tNorm = normalizeRole(t.role);
       const matchesRole = tNorm === canonicalRole || t.role === person.role;
       if (!matchesRole) return false;
@@ -625,7 +625,7 @@ export default function SuperAdminPanel() {
   const navigate = useNavigate();
   const { tasks } = useChecklist();
   const { currentStage } = useCycles();
-  const [activeView, setActiveView] = useState((currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'director_maestria' || currentUser?.appRole === 'gerente') ? 'global' : 'sede');
+  const [activeView, setActiveView] = useState((currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'director_maestria') ? 'global' : 'sede');
   const [selectedUser, setSelectedUser] = useState(null);
   const [assignUser, setAssignUser] = useState(null);
   const [showUserModal, setShowUserModal] = useState(false);
@@ -771,11 +771,11 @@ export default function SuperAdminPanel() {
         /* Vistas normales por pestañas */
         <>
           <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
-            {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'director_maestria' || currentUser?.appRole === 'gerente') && (
+            {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'director_maestria') && (
               <button style={tabStyle('global')} onClick={() => setActiveView('global')}>🌐 Global</button>
             )}
             <button style={tabStyle('sede')} onClick={() => setActiveView('sede')}>🏢 Por Sede</button>
-            {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'director_maestria' || currentUser?.appRole === 'gerente') && (
+            {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'director_maestria') && (
               <button style={tabStyle('rol')} onClick={() => setActiveView('rol')}>👥 Por Rol</button>
             )}
             {currentUser?.isSuperAdmin && (
@@ -787,7 +787,7 @@ export default function SuperAdminPanel() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <p className="text-muted text-sm" style={{ marginBottom: '0.5rem' }}>Clic en una sede para expandir y ver el detalle de cada persona y su avance operativo.</p>
               {ALL_SEDES.filter(sede => {
-                if (currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'director_maestria' || currentUser?.appRole === 'gerente') return true;
+                if (currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'director_maestria') return true;
                 return normalizeSede(currentUser?.sede) === sede;
               }).map(sede => (
                 <SedeBlock 

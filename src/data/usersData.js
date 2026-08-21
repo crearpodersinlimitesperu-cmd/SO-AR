@@ -76,6 +76,25 @@ export const normalizeSede = (sede) => {
   return s;
 };
 
+export const normalizeUserRecord = (data) => {
+  if (!data) return null;
+  return {
+    ...data,
+    id: data.id || data.uid || data.email,
+    emails: Array.isArray(data.emails)
+      ? data.emails
+      : data.email
+        ? [data.email]
+        : [],
+    role: normalizeRole(data.role),
+    roles: Array.isArray(data.roles)
+      ? data.roles.map(normalizeRole)
+      : data.role
+        ? [normalizeRole(data.role)]
+        : [],
+    sede: normalizeSede(data.sede)
+  };
+};
 
 export const OPERATIONAL_SEDES = [
   'Lima',

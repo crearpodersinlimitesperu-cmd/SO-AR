@@ -17,6 +17,37 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const { showToast } = useUI();
 
+  // Búsqueda progresiva de usuarios en Firestore
+  const findUserInFirestore = async (normalizedEmail) => {
+    try {
+      const usersRef = collection(db, "users");
+      
+      // 1. emails array-contains
+      let q = query(usersRef, where("emails", "array-contains", normalizedEmail));
+      let snap = await getDocs(q);
+      if (!snap.empty) return snap.docs[0].data();
+
+      // 2. email ==
+      q = query(usersRef, where("email", "==", normalizedEmail));
+      snap = await getDocs(q);
+      if (!snap.empty) return snap.docs[0].data();
+
+      // 3. corporateEmail ==
+      q = query(usersRef, where("corporateEmail", "==", normalizedEmail));
+      snap = await getDocs(q);
+      if (!snap.empty) return snap.docs[0].data();
+
+      // 4. personalEmail ==
+      q = query(usersRef, where("personalEmail", "==", normalizedEmail));
+      snap = await getDocs(q);
+      if (!snap.empty) return snap.docs[0].data();
+
+    } catch (err) {
+      console.error("Error consultando Firestore:", err);
+    }
+    return null;
+  };
+
   const switchRole = (newRole) => {
     const canonicalNewRole = normalizeRole(newRole);
     sessionStorage.setItem('cpsl_active_role', canonicalNewRole);
@@ -175,17 +206,8 @@ export function AuthProvider({ children }) {
       const rawEmail = user.email.trim().toLowerCase();
       const normalizedEmail = rawEmail.replace('@crearpsl.com', '@crearpsl.net');
       
-      // Buscar en Firestore
-      let foundUser = null;
-      try {
-        const q = query(collection(db, "users"), where("emails", "array-contains", normalizedEmail));
-        const snap = await getDocs(q);
-        if (!snap.empty) {
-          foundUser = snap.docs[0].data();
-        }
-      } catch (err) {
-        console.error("Error consultando Firestore:", err);
-      }
+      // Buscar en Firestore con búsqueda progresiva
+      let foundUser = await findUserInFirestore(normalizedEmail);
 
       // Fallback a archivo estático
       if (!foundUser) {
@@ -249,14 +271,7 @@ export function AuthProvider({ children }) {
         const rawEmail = user.email.trim().toLowerCase();
         const normalizedEmail = rawEmail.replace('@crearpsl.com', '@crearpsl.net');
         
-        let foundUser = null;
-        try {
-          const q = query(collection(db, "users"), where("emails", "array-contains", normalizedEmail));
-          const snap = await getDocs(q);
-          if (!snap.empty) foundUser = snap.docs[0].data();
-        } catch(e) {
-          console.error("Error de auth con Firestore:", e);
-        }
+        let foundUser = await findUserInFirestore(normalizedEmail);
         
         if (!foundUser) {
           foundUser = USERS_TO_IMPORT.find(u => 

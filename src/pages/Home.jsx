@@ -134,7 +134,7 @@ export default function Home() {
   const userEmail = (currentUser?.email || '').toLowerCase().trim();
   const activeRole = currentUser?.appRole || currentUser?.role || 'gerente';
   const myTasksForProgress = allTasks.filter(t => {
-    const isAssigned = (t.assignedToEmail && t.assignedToEmail.toLowerCase().trim() === userEmail) ||
+    const isAssigned = (t.assignedToEmails && t.assignedToEmails.some(e => e.toLowerCase().trim() === userEmail)) || (t.assignedToEmail && t.assignedToEmail.toLowerCase().trim() === userEmail) ||
                        (t.collaborators && t.collaborators.map(c => c.toLowerCase().trim()).includes(userEmail));
     if (isAssigned) return true;
     if (activeRole === 'consolidado' || activeRole === 'direccion') {

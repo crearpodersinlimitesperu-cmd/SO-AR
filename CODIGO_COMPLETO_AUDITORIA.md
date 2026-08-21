@@ -1,119 +1,123 @@
-# 📑 REPORTE INTEGRAL DE AUDITORÍA DE CÓDIGO FUENTE
-### **CREAR PODER SIN LÍMITES — SISTEMA OPERATIVO SO-AR**
-**Fecha y Hora de Actualización:** `2026-08-17 20:53:51`  
-**Versión de Producción:** `v2.4.6 (Master Checklist V1.0, Multi-Rol, QT Verificado, Modo Día/Noche)`  
+﻿# ðŸ“‘ REPORTE INTEGRAL DE AUDITORÃA DE CÃ“DIGO FUENTE
+### **CREAR PODER SIN LÃMITES â€” SISTEMA OPERATIVO SO-AR**
+**Fecha y Hora de ActualizaciÃ³n:** `2026-08-17 20:53:51`  
+**Versión de Producción: `v2.4.8 (Estabilizado, RBAC Firestore, Bot IA Asignador Automático)`
 **Total de Archivos Auditados:** `65`
 
 ---
 
-## 🏛️ Resumen de Arquitectura y Módulos Activos
+## ðŸ›ï¸ Resumen de Arquitectura y MÃ³dulos Activos
 
-1. **Autenticación y Control de Acceso RBAC (`AuthContext.jsx`, `usersData.js`):**
-   - Autenticación Google OAuth2 integrada con verificación contra base de datos oficial.
-   - Perfiles Multi-Rol (`roles: ['coordinador_mj', 'coordinador_c1c2', 'qt']`) con **Role Switcher dinámico**.
-   - Unificación de cuentas corporativas `@crearpsl.net` y personales Gmail sin duplicación.
+1. **AutenticaciÃ³n y Control de Acceso RBAC (`AuthContext.jsx`, `usersData.js`):**
+   - AutenticaciÃ³n Google OAuth2 integrada con verificaciÃ³n contra base de datos oficial.
+   - Perfiles Multi-Rol (`roles: ['coordinador_mj', 'coordinador_c1c2', 'qt']`) con **Role Switcher dinÃ¡mico**.
+   - UnificaciÃ³n de cuentas corporativas `@crearpsl.net` y personales Gmail sin duplicaciÃ³n.
 
 2. **Base de Datos y Perfiles Quantum Team (QT):**
-   - 24 perfiles verificados y deduplicados con validación de código de país por sede y documentos oficiales.
+   - 24 perfiles verificados y deduplicados con validaciÃ³n de cÃ³digo de paÃ­s por sede y documentos oficiales.
    - Acceso restringido exclusivamente a las fases **PRE-C1, C1 y C2**.
 
-3. **Estandarización de Sedes Oficiales:**
-   - 7 Sedes Operativas: **Lima**, **Quito Ciclo 1**, **Quito Ciclo 2**, **Cuenca**, **Guayaquil**, **Medellín**, **México**.
-   - Separación formal de **Sede Global** para personal directivo y soporte.
+3. **EstandarizaciÃ³n de Sedes Oficiales:**
+   - 7 Sedes Operativas: **Lima**, **Quito Ciclo 1**, **Quito Ciclo 2**, **Cuenca**, **Guayaquil**, **MedellÃ­n**, **MÃ©xico**.
+   - SeparaciÃ³n formal de **Sede Global** para personal directivo y soporte.
 
-4. **Agendamiento Híbrido Zero-Failure a Google Calendar (`googleSync.js`, `venuesData.js`):**
-   - Resolución automática de hoteles oficiales (**Hotel José Antonio Deluxe Miraflores** para Lima Sala; **Hostal Sol y Luna en Cieneguilla** para El Viaje).
+4. **Agendamiento HÃ­brido Zero-Failure a Google Calendar (`googleSync.js`, `venuesData.js`):**
+   - ResoluciÃ³n automÃ¡tica de hoteles oficiales (**Hotel JosÃ© Antonio Deluxe Miraflores** para Lima Sala; **Hostal Sol y Luna en Cieneguilla** para El Viaje).
    - Enlace directo interactivo a **Google Maps** y fallback directo a Google Calendar Web prellenado.
 
-5. **Colaboración y Menciones entre Tareas (`TaskCollaborationModal.jsx`, `ChecklistContext.jsx`):**
-   - Asignación de colaboradores con invitaciones interactivas, aceptación en 1 clic y sincronización en tiempo real.
+5. **ColaboraciÃ³n y Menciones entre Tareas (`TaskCollaborationModal.jsx`, `ChecklistContext.jsx`):**
+   - AsignaciÃ³n de colaboradores con invitaciones interactivas, aceptaciÃ³n en 1 clic y sincronizaciÃ³n en tiempo real.
 
-6. **División Equitativa de Metas (`GoalDivisionModal.jsx`, `GoalsBoard.jsx`):**
-   - Reparto proporcional entre coordinadoras con reporte de cuotas y acumulación automática en Firestore.
+6. **DivisiÃ³n Equitativa de Metas (`GoalDivisionModal.jsx`, `GoalsBoard.jsx`):**
+   - Reparto proporcional entre coordinadoras con reporte de cuotas y acumulaciÃ³n automÃ¡tica en Firestore.
 
-7. **Compatibilidad Dual Total (Modo Día / Modo Noche / Automático):**
-   - Sistema de diseño con variables CSS de alto contraste (`--text-heading: #0f172a` en modo día).
+8. **Asistente Operativo IA (AIML API - GPT-5):**
+   - Agente inteligente capaz de procesar lenguaje natural para la asignación de tareas automáticas.
+   - Ejecución de comandos JSON integrados directamente con Firestore (`AIAssistant.jsx`, `groqService.js`).
+
+7. **Compatibilidad Dual Total (Modo DÃ­a / Modo Noche / AutomÃ¡tico):**
+   - Sistema de diseÃ±o con variables CSS de alto contraste (`--text-heading: #0f172a` en modo dÃ­a).
 
 8. **Master Checklist Operativo Gerente Sede V1.0 (`MASTER_CHECKLIST_OPERATIVO_GERENTE_SEDE_V1.md`):**
-   - Ciclo Operativo oficializado: **MJ → C1 → C2 → MJ**.
-   - Gates estrictos T-30 (Entrenador y Logística Pagada) y Gate C2→MJ (Meta de Rezagados).
-   - Terminología purificada (Equipo de Apoyo en lugar de QT, hitos temporales normalizados).
+   - Ciclo Operativo oficializado: **MJ â†’ C1 â†’ C2 â†’ MJ**.
+   - Gates estrictos T-30 (Entrenador y LogÃ­stica Pagada) y Gate C2â†’MJ (Meta de Rezagados).
+   - TerminologÃ­a purificada (Equipo de Apoyo en lugar de QT, hitos temporales normalizados).
 
 ---
 
-## 📦 Índice de Archivos en el Paquete de Auditoría
+## ðŸ“¦ Ãndice de Archivos en el Paquete de AuditorÃ­a
 
-- [`.env.example`](.env.example) — *0.3 KB*
-- [`.oxlintrc.json`](.oxlintrc.json) — *0.2 KB*
-- [`Codigo_Fuente_Revisar_IA.md`](Codigo_Fuente_Revisar_IA.md) — *107.1 KB*
-- [`MASTER_CHECKLIST_OPERATIVO_GERENTE_SEDE_V1.md`](MASTER_CHECKLIST_OPERATIVO_GERENTE_SEDE_V1.md) — *8.8 KB*
-- [`docs/01_Arquitectura_del_Sistema.md`](docs/01_Arquitectura_del_Sistema.md) — *0.4 KB*
-- [`docs/02_Modelo_de_Datos.md`](docs/02_Modelo_de_Datos.md) — *0.4 KB*
-- [`docs/03_Mapa_de_Roles.md`](docs/03_Mapa_de_Roles.md) — *0.4 KB*
-- [`docs/04_Mapa_de_Permisos.md`](docs/04_Mapa_de_Permisos.md) — *0.2 KB*
-- [`docs/05_Flujo_de_Ciclos.md`](docs/05_Flujo_de_Ciclos.md) — *0.4 KB*
-- [`docs/06_Manual_Usuario.md`](docs/06_Manual_Usuario.md) — *0.3 KB*
-- [`docs/07_Manual_Administrador.md`](docs/07_Manual_Administrador.md) — *0.3 KB*
-- [`docs/08_Configuracion_Checklists.md`](docs/08_Configuracion_Checklists.md) — *0.2 KB*
-- [`docs/09_Lista_Funcionalidades.md`](docs/09_Lista_Funcionalidades.md) — *0.5 KB*
-- [`docs/10_Funcionalidades_Pendientes.md`](docs/10_Funcionalidades_Pendientes.md) — *0.2 KB*
-- [`docs/11_Pruebas_Realizadas.md`](docs/11_Pruebas_Realizadas.md) — *0.2 KB*
-- [`docs/12_Riesgos_Detectados.md`](docs/12_Riesgos_Detectados.md) — *0.5 KB*
-- [`docs/13_Instrucciones_Despliegue.md`](docs/13_Instrucciones_Despliegue.md) — *0.3 KB*
-- [`docs/14_Instrucciones_Mantenimiento.md`](docs/14_Instrucciones_Mantenimiento.md) — *0.3 KB*
-- [`docs/MASTER_CHECKLIST_OPERATIVO_GERENTE_SEDE_V1.md`](docs/MASTER_CHECKLIST_OPERATIVO_GERENTE_SEDE_V1.md) — *16.7 KB*
-- [`firestore.rules`](firestore.rules) — *3.1 KB*
-- [`index.html`](index.html) — *0.9 KB*
-- [`package-lock.json`](package-lock.json) — *82.7 KB*
-- [`package.json`](package.json) — *0.7 KB*
-- [`scripts/mailerDaemon.js`](scripts/mailerDaemon.js) — *3.8 KB*
-- [`src/App.css`](src/App.css) — *0.0 KB*
-- [`src/App.jsx`](src/App.jsx) — *3.7 KB*
-- [`src/components/ErrorBoundary.jsx`](src/components/ErrorBoundary.jsx) — *2.6 KB*
-- [`src/components/GoalDivisionModal.jsx`](src/components/GoalDivisionModal.jsx) — *15.1 KB*
-- [`src/components/PromptModal.jsx`](src/components/PromptModal.jsx) — *2.1 KB*
-- [`src/components/TaskAssignmentModal.jsx`](src/components/TaskAssignmentModal.jsx) — *7.2 KB*
-- [`src/components/TaskCollaborationModal.jsx`](src/components/TaskCollaborationModal.jsx) — *9.4 KB*
-- [`src/components/ThemeSelector.jsx`](src/components/ThemeSelector.jsx) — *3.9 KB*
-- [`src/components/UserProfileModal.jsx`](src/components/UserProfileModal.jsx) — *31.5 KB*
-- [`src/components/VenueConfigModal.jsx`](src/components/VenueConfigModal.jsx) — *11.9 KB*
-- [`src/config/permissions.js`](src/config/permissions.js) — *3.2 KB*
-- [`src/context/AuthContext.jsx`](src/context/AuthContext.jsx) — *5.9 KB*
-- [`src/context/ChecklistContext.jsx`](src/context/ChecklistContext.jsx) — *15.6 KB*
-- [`src/context/CyclesContext.jsx`](src/context/CyclesContext.jsx) — *2.5 KB*
-- [`src/context/NotificationContext.jsx`](src/context/NotificationContext.jsx) — *3.8 KB*
-- [`src/context/ThemeContext.jsx`](src/context/ThemeContext.jsx) — *2.1 KB*
-- [`src/context/UIContext.jsx`](src/context/UIContext.jsx) — *1.7 KB*
-- [`src/data/checklistData.js`](src/data/checklistData.js) — *6.8 KB*
-- [`src/data/cyclesData.js`](src/data/cyclesData.js) — *0.3 KB*
-- [`src/data/usersData.js`](src/data/usersData.js) — *3.0 KB*
-- [`src/data/venuesData.js`](src/data/venuesData.js) — *6.7 KB*
-- [`src/index.css`](src/index.css) — *6.6 KB*
-- [`src/main.jsx`](src/main.jsx) — *1.1 KB*
-- [`src/pages/ChecklistBoard.jsx`](src/pages/ChecklistBoard.jsx) — *20.2 KB*
-- [`src/pages/GerenteDashboard.jsx`](src/pages/GerenteDashboard.jsx) — *23.3 KB*
-- [`src/pages/GoalsBoard.jsx`](src/pages/GoalsBoard.jsx) — *27.2 KB*
-- [`src/pages/Home.jsx`](src/pages/Home.jsx) — *42.1 KB*
-- [`src/pages/Login.jsx`](src/pages/Login.jsx) — *2.1 KB*
-- [`src/pages/ReportesBoard.jsx`](src/pages/ReportesBoard.jsx) — *13.6 KB*
-- [`src/pages/RoleSelector.jsx`](src/pages/RoleSelector.jsx) — *1.6 KB*
-- [`src/pages/SuperAdminPanel.jsx`](src/pages/SuperAdminPanel.jsx) — *25.6 KB*
-- [`src/pages/home-views/HomeCampo.jsx`](src/pages/home-views/HomeCampo.jsx) — *6.1 KB*
-- [`src/pages/home-views/HomeEjecutivo.jsx`](src/pages/home-views/HomeEjecutivo.jsx) — *3.8 KB*
-- [`src/pages/home-views/HomeOficina.jsx`](src/pages/home-views/HomeOficina.jsx) — *8.0 KB*
-- [`src/services/firebase.js`](src/services/firebase.js) — *1.2 KB*
-- [`src/services/googleSync.js`](src/services/googleSync.js) — *6.0 KB*
-- [`src/services/userService.js`](src/services/userService.js) — *1.2 KB*
-- [`src/utils/flags.js`](src/utils/flags.js) — *0.0 KB*
-- [`src/utils/flags.jsx`](src/utils/flags.jsx) — *0.8 KB*
-- [`src/utils/soarDates.js`](src/utils/soarDates.js) — *5.0 KB*
-- [`vite.config.js`](vite.config.js) — *0.2 KB*
+- [`.env.example`](.env.example) â€” *0.3 KB*
+- [`.oxlintrc.json`](.oxlintrc.json) â€” *0.2 KB*
+- [`Codigo_Fuente_Revisar_IA.md`](Codigo_Fuente_Revisar_IA.md) â€” *107.1 KB*
+- [`MASTER_CHECKLIST_OPERATIVO_GERENTE_SEDE_V1.md`](MASTER_CHECKLIST_OPERATIVO_GERENTE_SEDE_V1.md) â€” *8.8 KB*
+- [`docs/01_Arquitectura_del_Sistema.md`](docs/01_Arquitectura_del_Sistema.md) â€” *0.4 KB*
+- [`docs/02_Modelo_de_Datos.md`](docs/02_Modelo_de_Datos.md) â€” *0.4 KB*
+- [`docs/03_Mapa_de_Roles.md`](docs/03_Mapa_de_Roles.md) â€” *0.4 KB*
+- [`docs/04_Mapa_de_Permisos.md`](docs/04_Mapa_de_Permisos.md) â€” *0.2 KB*
+- [`docs/05_Flujo_de_Ciclos.md`](docs/05_Flujo_de_Ciclos.md) â€” *0.4 KB*
+- [`docs/06_Manual_Usuario.md`](docs/06_Manual_Usuario.md) â€” *0.3 KB*
+- [`docs/07_Manual_Administrador.md`](docs/07_Manual_Administrador.md) â€” *0.3 KB*
+- [`docs/08_Configuracion_Checklists.md`](docs/08_Configuracion_Checklists.md) â€” *0.2 KB*
+- [`docs/09_Lista_Funcionalidades.md`](docs/09_Lista_Funcionalidades.md) â€” *0.5 KB*
+- [`docs/10_Funcionalidades_Pendientes.md`](docs/10_Funcionalidades_Pendientes.md) â€” *0.2 KB*
+- [`docs/11_Pruebas_Realizadas.md`](docs/11_Pruebas_Realizadas.md) â€” *0.2 KB*
+- [`docs/12_Riesgos_Detectados.md`](docs/12_Riesgos_Detectados.md) â€” *0.5 KB*
+- [`docs/13_Instrucciones_Despliegue.md`](docs/13_Instrucciones_Despliegue.md) â€” *0.3 KB*
+- [`docs/14_Instrucciones_Mantenimiento.md`](docs/14_Instrucciones_Mantenimiento.md) â€” *0.3 KB*
+- [`docs/MASTER_CHECKLIST_OPERATIVO_GERENTE_SEDE_V1.md`](docs/MASTER_CHECKLIST_OPERATIVO_GERENTE_SEDE_V1.md) â€” *16.7 KB*
+- [`firestore.rules`](firestore.rules) â€” *3.1 KB*
+- [`index.html`](index.html) â€” *0.9 KB*
+- [`package-lock.json`](package-lock.json) â€” *82.7 KB*
+- [`package.json`](package.json) â€” *0.7 KB*
+- [`scripts/mailerDaemon.js`](scripts/mailerDaemon.js) â€” *3.8 KB*
+- [`src/App.css`](src/App.css) â€” *0.0 KB*
+- [`src/App.jsx`](src/App.jsx) â€” *3.7 KB*
+- [`src/components/ErrorBoundary.jsx`](src/components/ErrorBoundary.jsx) â€” *2.6 KB*
+- [`src/components/GoalDivisionModal.jsx`](src/components/GoalDivisionModal.jsx) â€” *15.1 KB*
+- [`src/components/PromptModal.jsx`](src/components/PromptModal.jsx) â€” *2.1 KB*
+- [`src/components/TaskAssignmentModal.jsx`](src/components/TaskAssignmentModal.jsx) â€” *7.2 KB*
+- [`src/components/TaskCollaborationModal.jsx`](src/components/TaskCollaborationModal.jsx) â€” *9.4 KB*
+- [`src/components/ThemeSelector.jsx`](src/components/ThemeSelector.jsx) â€” *3.9 KB*
+- [`src/components/UserProfileModal.jsx`](src/components/UserProfileModal.jsx) â€” *31.5 KB*
+- [`src/components/VenueConfigModal.jsx`](src/components/VenueConfigModal.jsx) â€” *11.9 KB*
+- [`src/config/permissions.js`](src/config/permissions.js) â€” *3.2 KB*
+- [`src/context/AuthContext.jsx`](src/context/AuthContext.jsx) â€” *5.9 KB*
+- [`src/context/ChecklistContext.jsx`](src/context/ChecklistContext.jsx) â€” *15.6 KB*
+- [`src/context/CyclesContext.jsx`](src/context/CyclesContext.jsx) â€” *2.5 KB*
+- [`src/context/NotificationContext.jsx`](src/context/NotificationContext.jsx) â€” *3.8 KB*
+- [`src/context/ThemeContext.jsx`](src/context/ThemeContext.jsx) â€” *2.1 KB*
+- [`src/context/UIContext.jsx`](src/context/UIContext.jsx) â€” *1.7 KB*
+- [`src/data/checklistData.js`](src/data/checklistData.js) â€” *6.8 KB*
+- [`src/data/cyclesData.js`](src/data/cyclesData.js) â€” *0.3 KB*
+- [`src/data/usersData.js`](src/data/usersData.js) â€” *3.0 KB*
+- [`src/data/venuesData.js`](src/data/venuesData.js) â€” *6.7 KB*
+- [`src/index.css`](src/index.css) â€” *6.6 KB*
+- [`src/main.jsx`](src/main.jsx) â€” *1.1 KB*
+- [`src/pages/ChecklistBoard.jsx`](src/pages/ChecklistBoard.jsx) â€” *20.2 KB*
+- [`src/pages/GerenteDashboard.jsx`](src/pages/GerenteDashboard.jsx) â€” *23.3 KB*
+- [`src/pages/GoalsBoard.jsx`](src/pages/GoalsBoard.jsx) â€” *27.2 KB*
+- [`src/pages/Home.jsx`](src/pages/Home.jsx) â€” *42.1 KB*
+- [`src/pages/Login.jsx`](src/pages/Login.jsx) â€” *2.1 KB*
+- [`src/pages/ReportesBoard.jsx`](src/pages/ReportesBoard.jsx) â€” *13.6 KB*
+- [`src/pages/RoleSelector.jsx`](src/pages/RoleSelector.jsx) â€” *1.6 KB*
+- [`src/pages/SuperAdminPanel.jsx`](src/pages/SuperAdminPanel.jsx) â€” *25.6 KB*
+- [`src/pages/home-views/HomeCampo.jsx`](src/pages/home-views/HomeCampo.jsx) â€” *6.1 KB*
+- [`src/pages/home-views/HomeEjecutivo.jsx`](src/pages/home-views/HomeEjecutivo.jsx) â€” *3.8 KB*
+- [`src/pages/home-views/HomeOficina.jsx`](src/pages/home-views/HomeOficina.jsx) â€” *8.0 KB*
+- [`src/services/firebase.js`](src/services/firebase.js) â€” *1.2 KB*
+- [`src/services/googleSync.js`](src/services/googleSync.js) â€” *6.0 KB*
+- [`src/services/userService.js`](src/services/userService.js) â€” *1.2 KB*
+- [`src/utils/flags.js`](src/utils/flags.js) â€” *0.0 KB*
+- [`src/utils/flags.jsx`](src/utils/flags.jsx) â€” *0.8 KB*
+- [`src/utils/soarDates.js`](src/utils/soarDates.js) â€” *5.0 KB*
+- [`vite.config.js`](vite.config.js) â€” *0.2 KB*
 
 ---
 
-## 💻 CÓDIGO FUENTE COMPLETO
+## ðŸ’» CÃ“DIGO FUENTE COMPLETO
 
-### 📄 Archivo: `.env.example`
+### ðŸ“„ Archivo: `.env.example`
 
 ```text
 VITE_FIREBASE_API_KEY=tu_api_key_aqui
@@ -128,7 +132,7 @@ VITE_FIREBASE_MEASUREMENT_ID=tu_measurement_id
 
 ---
 
-### 📄 Archivo: `.oxlintrc.json`
+### ðŸ“„ Archivo: `.oxlintrc.json`
 
 ```json
 {
@@ -144,7 +148,7 @@ VITE_FIREBASE_MEASUREMENT_ID=tu_measurement_id
 
 ---
 
-### 📄 Archivo: `Codigo_Fuente_Revisar_IA.md`
+### ðŸ“„ Archivo: `Codigo_Fuente_Revisar_IA.md`
 
 ```text
 # Cdigo Fuente de Plataforma Operativa CPSL
@@ -457,11 +461,11 @@ export function ChecklistProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Escuchar cambios en la colección "tasks" en tiempo real
+    // Escuchar cambios en la colecciÃ³n "tasks" en tiempo real
     const tasksRef = collection(db, 'tasks');
     const unsubscribe = onSnapshot(tasksRef, (snapshot) => {
       if (snapshot.empty) {
-        // Si está vacía, podríamos inicializarla, pero por ahora solo seteamos vacío
+        // Si estÃ¡ vacÃ­a, podrÃ­amos inicializarla, pero por ahora solo seteamos vacÃ­o
         setTasks([]);
       } else {
         const loadedTasks = snapshot.docs.map(doc => ({
@@ -496,7 +500,7 @@ export function ChecklistProvider({ children }) {
     try {
       const taskRef = doc(db, 'tasks', taskId);
       await updateDoc(taskRef, {
-        status: 'Pendiente de validación',
+        status: 'Pendiente de validaciÃ³n',
         evidence_url: evidenceUrl,
         date: new Date().toISOString()
       });
@@ -513,7 +517,7 @@ export function ChecklistProvider({ children }) {
     return Math.round((completed / roleTasks.length) * 100);
   };
 
-  // Función de utilidad para cargar las tareas iniciales a Firestore (Solo la usa el Gerente una vez)
+  // FunciÃ³n de utilidad para cargar las tareas iniciales a Firestore (Solo la usa el Gerente una vez)
   const initializeFirestore = async () => {
     try {
       const batch = writeBatch(db);
@@ -522,10 +526,10 @@ export function ChecklistProvider({ children }) {
         batch.set(taskRef, { ...task, completed: false });
       });
       await batch.commit();
-      alert("¡Base de datos inicializada correctamente!");
+      alert("Â¡Base de datos inicializada correctamente!");
     } catch (error) {
       console.error("Error initializing DB:", error);
-      alert("Error al inicializar. ¿Cambiaste las reglas de Firestore a true?");
+      alert("Error al inicializar. Â¿Cambiaste las reglas de Firestore a true?");
     }
   };
 
@@ -559,7 +563,7 @@ export function CyclesProvider({ children }) {
       const cycle = cyclesData[0];
       setCurrentCycle(cycle);
 
-      // Lógica simple para determinar la etapa basada en la fecha de hoy
+      // LÃ³gica simple para determinar la etapa basada en la fecha de hoy
       const today = new Date();
       const c1Start = new Date(cycle.c1_start);
       const c2Start = new Date(cycle.c2_start);
@@ -594,170 +598,170 @@ export function useCycles() {
 `javascript
 export const roles = [
   { id: 'gerente', name: 'Gerente' },
-  { id: 'coord_maestria', name: 'Coordinador/a Maestría' },
+  { id: 'coord_maestria', name: 'Coordinador/a MaestrÃ­a' },
   { id: 'coord_c1', name: 'Coordinador/a C1' },
-  { id: 'capitan', name: 'Capitán' },
+  { id: 'capitan', name: 'CapitÃ¡n' },
   { id: 'qt', name: 'Quantum Team' }
 ];
 
 export const checklistData = [
   // LUNES
-  { id: 't1', role: 'gerente', phase: 'Lunes — Auditoría y Seguimiento', task: 'Revisar tablero general de operación.' },
-  { id: 't2', role: 'gerente', phase: 'Lunes — Auditoría y Seguimiento', task: 'Revisar resultados del entrenamiento anterior.' },
-  { id: 't3', role: 'gerente', phase: 'Lunes — Auditoría y Seguimiento', task: 'Revisar asistencia.' },
-  { id: 't4', role: 'gerente', phase: 'Lunes — Auditoría y Seguimiento', task: 'Revisar conversiones.' },
-  { id: 't5', role: 'gerente', phase: 'Lunes — Auditoría y Seguimiento', task: 'Revisar pendientes críticos.' },
-  { id: 't6', role: 'gerente', phase: 'Lunes — Auditoría y Seguimiento', task: 'Revisar incidencias.' },
-  { id: 't7', role: 'gerente', phase: 'Lunes — Auditoría y Seguimiento', task: 'Revisar necesidades de cada coordinación.' },
-  { id: 't8', role: 'gerente', phase: 'Lunes — Auditoría y Seguimiento', task: 'Identificar quiebres que requieren intervención.' },
-  { id: 't9', role: 'gerente', phase: 'Lunes — Auditoría y Seguimiento', task: 'Definir prioridades de la semana.' },
-  { id: 't10', role: 'gerente', phase: 'Lunes — Auditoría y Seguimiento', task: 'Confirmar responsables y fechas de cumplimiento.' },
+  { id: 't1', role: 'gerente', phase: 'Lunes â€” AuditorÃ­a y Seguimiento', task: 'Revisar tablero general de operaciÃ³n.' },
+  { id: 't2', role: 'gerente', phase: 'Lunes â€” AuditorÃ­a y Seguimiento', task: 'Revisar resultados del entrenamiento anterior.' },
+  { id: 't3', role: 'gerente', phase: 'Lunes â€” AuditorÃ­a y Seguimiento', task: 'Revisar asistencia.' },
+  { id: 't4', role: 'gerente', phase: 'Lunes â€” AuditorÃ­a y Seguimiento', task: 'Revisar conversiones.' },
+  { id: 't5', role: 'gerente', phase: 'Lunes â€” AuditorÃ­a y Seguimiento', task: 'Revisar pendientes crÃ­ticos.' },
+  { id: 't6', role: 'gerente', phase: 'Lunes â€” AuditorÃ­a y Seguimiento', task: 'Revisar incidencias.' },
+  { id: 't7', role: 'gerente', phase: 'Lunes â€” AuditorÃ­a y Seguimiento', task: 'Revisar necesidades de cada coordinaciÃ³n.' },
+  { id: 't8', role: 'gerente', phase: 'Lunes â€” AuditorÃ­a y Seguimiento', task: 'Identificar quiebres que requieren intervenciÃ³n.' },
+  { id: 't9', role: 'gerente', phase: 'Lunes â€” AuditorÃ­a y Seguimiento', task: 'Definir prioridades de la semana.' },
+  { id: 't10', role: 'gerente', phase: 'Lunes â€” AuditorÃ­a y Seguimiento', task: 'Confirmar responsables y fechas de cumplimiento.' },
   
-  { id: 't11', role: 'coord_maestria', phase: 'Lunes — Auditoría y Seguimiento', task: 'Revisar estado de Maestría.' },
-  { id: 't12', role: 'coord_maestria', phase: 'Lunes — Auditoría y Seguimiento', task: 'Revisar compromisos pendientes.' },
-  { id: 't13', role: 'coord_maestria', phase: 'Lunes — Auditoría y Seguimiento', task: 'Revisar participantes que requieren seguimiento.' },
-  { id: 't14', role: 'coord_maestria', phase: 'Lunes — Auditoría y Seguimiento', task: 'Revisar necesidades del entrenador.' },
-  { id: 't15', role: 'coord_maestria', phase: 'Lunes — Auditoría y Seguimiento', task: 'Revisar avances de formación de equipo.' },
-  { id: 't16', role: 'coord_maestria', phase: 'Lunes — Auditoría y Seguimiento', task: 'Actualizar pendientes.' },
-  { id: 't17', role: 'coord_maestria', phase: 'Lunes — Auditoría y Seguimiento', task: 'Escalar quiebres al Gerente.' },
+  { id: 't11', role: 'coord_maestria', phase: 'Lunes â€” AuditorÃ­a y Seguimiento', task: 'Revisar estado de MaestrÃ­a.' },
+  { id: 't12', role: 'coord_maestria', phase: 'Lunes â€” AuditorÃ­a y Seguimiento', task: 'Revisar compromisos pendientes.' },
+  { id: 't13', role: 'coord_maestria', phase: 'Lunes â€” AuditorÃ­a y Seguimiento', task: 'Revisar participantes que requieren seguimiento.' },
+  { id: 't14', role: 'coord_maestria', phase: 'Lunes â€” AuditorÃ­a y Seguimiento', task: 'Revisar necesidades del entrenador.' },
+  { id: 't15', role: 'coord_maestria', phase: 'Lunes â€” AuditorÃ­a y Seguimiento', task: 'Revisar avances de formaciÃ³n de equipo.' },
+  { id: 't16', role: 'coord_maestria', phase: 'Lunes â€” AuditorÃ­a y Seguimiento', task: 'Actualizar pendientes.' },
+  { id: 't17', role: 'coord_maestria', phase: 'Lunes â€” AuditorÃ­a y Seguimiento', task: 'Escalar quiebres al Gerente.' },
 
-  { id: 't18', role: 'coord_c1', phase: 'Lunes — Auditoría y Seguimiento', task: 'Revisar base de participantes.' },
-  { id: 't19', role: 'coord_c1', phase: 'Lunes — Auditoría y Seguimiento', task: 'Revisar estados de confirmación.' },
-  { id: 't20', role: 'coord_c1', phase: 'Lunes — Auditoría y Seguimiento', task: 'Revisar casos pendientes.' },
-  { id: 't21', role: 'coord_c1', phase: 'Lunes — Auditoría y Seguimiento', task: 'Revisar llamadas realizadas.' },
-  { id: 't22', role: 'coord_c1', phase: 'Lunes — Auditoría y Seguimiento', task: 'Revisar participantes sin contacto.' },
-  { id: 't23', role: 'coord_c1', phase: 'Lunes — Auditoría y Seguimiento', task: 'Revisar devoluciones.' },
-  { id: 't24', role: 'coord_c1', phase: 'Lunes — Auditoría y Seguimiento', task: 'Revisar próximos pasos.' },
-  { id: 't25', role: 'coord_c1', phase: 'Lunes — Auditoría y Seguimiento', task: 'Actualizar CRM.' },
-  { id: 't26', role: 'coord_c1', phase: 'Lunes — Auditoría y Seguimiento', task: 'Asignar casos pendientes.' },
+  { id: 't18', role: 'coord_c1', phase: 'Lunes â€” AuditorÃ­a y Seguimiento', task: 'Revisar base de participantes.' },
+  { id: 't19', role: 'coord_c1', phase: 'Lunes â€” AuditorÃ­a y Seguimiento', task: 'Revisar estados de confirmaciÃ³n.' },
+  { id: 't20', role: 'coord_c1', phase: 'Lunes â€” AuditorÃ­a y Seguimiento', task: 'Revisar casos pendientes.' },
+  { id: 't21', role: 'coord_c1', phase: 'Lunes â€” AuditorÃ­a y Seguimiento', task: 'Revisar llamadas realizadas.' },
+  { id: 't22', role: 'coord_c1', phase: 'Lunes â€” AuditorÃ­a y Seguimiento', task: 'Revisar participantes sin contacto.' },
+  { id: 't23', role: 'coord_c1', phase: 'Lunes â€” AuditorÃ­a y Seguimiento', task: 'Revisar devoluciones.' },
+  { id: 't24', role: 'coord_c1', phase: 'Lunes â€” AuditorÃ­a y Seguimiento', task: 'Revisar prÃ³ximos pasos.' },
+  { id: 't25', role: 'coord_c1', phase: 'Lunes â€” AuditorÃ­a y Seguimiento', task: 'Actualizar CRM.' },
+  { id: 't26', role: 'coord_c1', phase: 'Lunes â€” AuditorÃ­a y Seguimiento', task: 'Asignar casos pendientes.' },
 
-  { id: 't27', role: 'capitan', phase: 'Lunes — Auditoría y Seguimiento', task: 'Revisar estado de su equipo.' },
-  { id: 't28', role: 'capitan', phase: 'Lunes — Auditoría y Seguimiento', task: 'Revisar comunicación con aliados.' },
-  { id: 't29', role: 'capitan', phase: 'Lunes — Auditoría y Seguimiento', task: 'Revisar participantes asignados.' },
-  { id: 't30', role: 'capitan', phase: 'Lunes — Auditoría y Seguimiento', task: 'Revisar compromisos.' },
-  { id: 't31', role: 'capitan', phase: 'Lunes — Auditoría y Seguimiento', task: 'Detectar quiebres.' },
-  { id: 't32', role: 'capitan', phase: 'Lunes — Auditoría y Seguimiento', task: 'Contactar a los aliados que requieran intervención.' },
-  { id: 't33', role: 'capitan', phase: 'Lunes — Auditoría y Seguimiento', task: 'Confirmar actividad del equipo.' },
+  { id: 't27', role: 'capitan', phase: 'Lunes â€” AuditorÃ­a y Seguimiento', task: 'Revisar estado de su equipo.' },
+  { id: 't28', role: 'capitan', phase: 'Lunes â€” AuditorÃ­a y Seguimiento', task: 'Revisar comunicaciÃ³n con aliados.' },
+  { id: 't29', role: 'capitan', phase: 'Lunes â€” AuditorÃ­a y Seguimiento', task: 'Revisar participantes asignados.' },
+  { id: 't30', role: 'capitan', phase: 'Lunes â€” AuditorÃ­a y Seguimiento', task: 'Revisar compromisos.' },
+  { id: 't31', role: 'capitan', phase: 'Lunes â€” AuditorÃ­a y Seguimiento', task: 'Detectar quiebres.' },
+  { id: 't32', role: 'capitan', phase: 'Lunes â€” AuditorÃ­a y Seguimiento', task: 'Contactar a los aliados que requieran intervenciÃ³n.' },
+  { id: 't33', role: 'capitan', phase: 'Lunes â€” AuditorÃ­a y Seguimiento', task: 'Confirmar actividad del equipo.' },
 
-  { id: 't34', role: 'qt', phase: 'Lunes — Auditoría y Seguimiento', task: 'Auditar estado de los equipos.' },
-  { id: 't35', role: 'qt', phase: 'Lunes — Auditoría y Seguimiento', task: 'Revisar productividad y seguimiento.' },
-  { id: 't36', role: 'qt', phase: 'Lunes — Auditoría y Seguimiento', task: 'Identificar aliados desconectados y participantes críticos.' },
-  { id: 't37', role: 'qt', phase: 'Lunes — Auditoría y Seguimiento', task: 'Informar quiebres al Capitán.' },
-  { id: 't38', role: 'qt', phase: 'Lunes — Auditoría y Seguimiento', task: 'Escalar al nivel correspondiente.' },
+  { id: 't34', role: 'qt', phase: 'Lunes â€” AuditorÃ­a y Seguimiento', task: 'Auditar estado de los equipos.' },
+  { id: 't35', role: 'qt', phase: 'Lunes â€” AuditorÃ­a y Seguimiento', task: 'Revisar productividad y seguimiento.' },
+  { id: 't36', role: 'qt', phase: 'Lunes â€” AuditorÃ­a y Seguimiento', task: 'Identificar aliados desconectados y participantes crÃ­ticos.' },
+  { id: 't37', role: 'qt', phase: 'Lunes â€” AuditorÃ­a y Seguimiento', task: 'Informar quiebres al CapitÃ¡n.' },
+  { id: 't38', role: 'qt', phase: 'Lunes â€” AuditorÃ­a y Seguimiento', task: 'Escalar al nivel correspondiente.' },
 
   // MARTES
-  { id: 't39', role: 'gerente', phase: 'Martes — Ejecución', task: 'Revisar cumplimiento de prioridades.' },
-  { id: 't40', role: 'gerente', phase: 'Martes — Ejecución', task: 'Resolver bloqueos.' },
-  { id: 't41', role: 'gerente', phase: 'Martes — Ejecución', task: 'Verificar coordinación entre áreas.' },
-  { id: 't42', role: 'gerente', phase: 'Martes — Ejecución', task: 'Revisar indicadores.' },
-  { id: 't43', role: 'gerente', phase: 'Martes — Ejecución', task: 'Confirmar que no existan pendientes críticos sin responsable.' },
+  { id: 't39', role: 'gerente', phase: 'Martes â€” EjecuciÃ³n', task: 'Revisar cumplimiento de prioridades.' },
+  { id: 't40', role: 'gerente', phase: 'Martes â€” EjecuciÃ³n', task: 'Resolver bloqueos.' },
+  { id: 't41', role: 'gerente', phase: 'Martes â€” EjecuciÃ³n', task: 'Verificar coordinaciÃ³n entre Ã¡reas.' },
+  { id: 't42', role: 'gerente', phase: 'Martes â€” EjecuciÃ³n', task: 'Revisar indicadores.' },
+  { id: 't43', role: 'gerente', phase: 'Martes â€” EjecuciÃ³n', task: 'Confirmar que no existan pendientes crÃ­ticos sin responsable.' },
 
-  { id: 't44', role: 'coord_c1', phase: 'Martes — Ejecución', task: 'Continuar seguimiento de participantes.' },
-  { id: 't45', role: 'coord_c1', phase: 'Martes — Ejecución', task: 'Actualizar estados y ejecutar derivaciones.' },
-  { id: 't46', role: 'coord_c1', phase: 'Martes — Ejecución', task: 'Cerrar casos resueltos y registrar conversaciones.' },
-  { id: 't47', role: 'coord_c1', phase: 'Martes — Ejecución', task: 'Identificar casos que necesitan intervención del Capitán/QT.' },
+  { id: 't44', role: 'coord_c1', phase: 'Martes â€” EjecuciÃ³n', task: 'Continuar seguimiento de participantes.' },
+  { id: 't45', role: 'coord_c1', phase: 'Martes â€” EjecuciÃ³n', task: 'Actualizar estados y ejecutar derivaciones.' },
+  { id: 't46', role: 'coord_c1', phase: 'Martes â€” EjecuciÃ³n', task: 'Cerrar casos resueltos y registrar conversaciones.' },
+  { id: 't47', role: 'coord_c1', phase: 'Martes â€” EjecuciÃ³n', task: 'Identificar casos que necesitan intervenciÃ³n del CapitÃ¡n/QT.' },
 
-  { id: 't48', role: 'capitan', phase: 'Martes — Ejecución', task: 'Mantener contacto con aliados y revisar compromisos.' },
-  { id: 't49', role: 'capitan', phase: 'Martes — Ejecución', task: 'Acompañar quiebres.' },
-  { id: 't50', role: 'capitan', phase: 'Martes — Ejecución', task: 'Verificar que cada aliado conozca sus responsabilidades.' },
-  { id: 't51', role: 'capitan', phase: 'Martes — Ejecución', task: 'Mantener actualizado el estado de su equipo.' },
+  { id: 't48', role: 'capitan', phase: 'Martes â€” EjecuciÃ³n', task: 'Mantener contacto con aliados y revisar compromisos.' },
+  { id: 't49', role: 'capitan', phase: 'Martes â€” EjecuciÃ³n', task: 'AcompaÃ±ar quiebres.' },
+  { id: 't50', role: 'capitan', phase: 'Martes â€” EjecuciÃ³n', task: 'Verificar que cada aliado conozca sus responsabilidades.' },
+  { id: 't51', role: 'capitan', phase: 'Martes â€” EjecuciÃ³n', task: 'Mantener actualizado el estado de su equipo.' },
 
-  { id: 't52', role: 'qt', phase: 'Martes — Ejecución', task: 'Acompañar a Capitanes y auditar ejecución.' },
-  { id: 't53', role: 'qt', phase: 'Martes — Ejecución', task: 'Corregir desviaciones y entrenar al equipo.' },
-  { id: 't54', role: 'qt', phase: 'Martes — Ejecución', task: 'Verificar cumplimiento de estándares.' },
+  { id: 't52', role: 'qt', phase: 'Martes â€” EjecuciÃ³n', task: 'AcompaÃ±ar a Capitanes y auditar ejecuciÃ³n.' },
+  { id: 't53', role: 'qt', phase: 'Martes â€” EjecuciÃ³n', task: 'Corregir desviaciones y entrenar al equipo.' },
+  { id: 't54', role: 'qt', phase: 'Martes â€” EjecuciÃ³n', task: 'Verificar cumplimiento de estÃ¡ndares.' },
 
   // MIERCOLES
-  { id: 't55', role: 'gerente', phase: 'Miércoles — Sostenimiento', task: 'Revisar compromisos y resolver quiebres antes del fin de semana.' },
-  { id: 't56', role: 'coord_maestria', phase: 'Miércoles — Sostenimiento', task: 'Revisar compromisos, resolver antes de fin de semana, registrar intervención.' },
-  { id: 't57', role: 'coord_c1', phase: 'Miércoles — Sostenimiento', task: 'Revisar compromisos, resolver antes de fin de semana, registrar intervención.' },
-  { id: 't58', role: 'capitan', phase: 'Miércoles — Sostenimiento', task: 'Revisar personalmente los grupos y contactar aliados que no ejecuten.' },
-  { id: 't59', role: 'capitan', phase: 'Miércoles — Sostenimiento', task: 'Revisar participantes críticos e informar al QT cualquier quiebre.' },
-  { id: 't60', role: 'qt', phase: 'Miércoles — Sostenimiento', task: 'Auditar Capitanes y revisar consistencia de ejecución.' },
-  { id: 't61', role: 'qt', phase: 'Miércoles — Sostenimiento', task: 'Identificar patrones repetitivos, entrenar y corregir.' },
+  { id: 't55', role: 'gerente', phase: 'MiÃ©rcoles â€” Sostenimiento', task: 'Revisar compromisos y resolver quiebres antes del fin de semana.' },
+  { id: 't56', role: 'coord_maestria', phase: 'MiÃ©rcoles â€” Sostenimiento', task: 'Revisar compromisos, resolver antes de fin de semana, registrar intervenciÃ³n.' },
+  { id: 't57', role: 'coord_c1', phase: 'MiÃ©rcoles â€” Sostenimiento', task: 'Revisar compromisos, resolver antes de fin de semana, registrar intervenciÃ³n.' },
+  { id: 't58', role: 'capitan', phase: 'MiÃ©rcoles â€” Sostenimiento', task: 'Revisar personalmente los grupos y contactar aliados que no ejecuten.' },
+  { id: 't59', role: 'capitan', phase: 'MiÃ©rcoles â€” Sostenimiento', task: 'Revisar participantes crÃ­ticos e informar al QT cualquier quiebre.' },
+  { id: 't60', role: 'qt', phase: 'MiÃ©rcoles â€” Sostenimiento', task: 'Auditar Capitanes y revisar consistencia de ejecuciÃ³n.' },
+  { id: 't61', role: 'qt', phase: 'MiÃ©rcoles â€” Sostenimiento', task: 'Identificar patrones repetitivos, entrenar y corregir.' },
 
   // JUEVES
-  { id: 't62', role: 'gerente', phase: 'Jueves — Mesa de Trabajo', task: 'Recibir indicadores relevantes y revisar desviaciones.' },
-  { id: 't63', role: 'gerente', phase: 'Jueves — Mesa de Trabajo', task: 'Intervenir cuando el quiebre supere el nivel operativo. Confirmar plan de acción.' },
+  { id: 't62', role: 'gerente', phase: 'Jueves â€” Mesa de Trabajo', task: 'Recibir indicadores relevantes y revisar desviaciones.' },
+  { id: 't63', role: 'gerente', phase: 'Jueves â€” Mesa de Trabajo', task: 'Intervenir cuando el quiebre supere el nivel operativo. Confirmar plan de acciÃ³n.' },
   
-  { id: 't64', role: 'capitan', phase: 'Jueves — Mesa de Trabajo', task: 'Revisar estado completo del equipo y productividad.' },
-  { id: 't65', role: 'capitan', phase: 'Jueves — Mesa de Trabajo', task: 'Revisar llamadas, participantes sin respuesta e indecisos, y PP%.' },
-  { id: 't66', role: 'capitan', phase: 'Jueves — Mesa de Trabajo', task: 'Definir intervención individual y registrar acuerdos con el QT.' },
+  { id: 't64', role: 'capitan', phase: 'Jueves â€” Mesa de Trabajo', task: 'Revisar estado completo del equipo y productividad.' },
+  { id: 't65', role: 'capitan', phase: 'Jueves â€” Mesa de Trabajo', task: 'Revisar llamadas, participantes sin respuesta e indecisos, y PP%.' },
+  { id: 't66', role: 'capitan', phase: 'Jueves â€” Mesa de Trabajo', task: 'Definir intervenciÃ³n individual y registrar acuerdos con el QT.' },
 
-  { id: 't67', role: 'qt', phase: 'Jueves — Mesa de Trabajo', task: 'Mesa con Capitán: Revisar estado del equipo, productividad, llamadas.' },
-  { id: 't68', role: 'qt', phase: 'Jueves — Mesa de Trabajo', task: 'Mesa con Capitán: Definir intervención individual y registrar acuerdos.' },
+  { id: 't67', role: 'qt', phase: 'Jueves â€” Mesa de Trabajo', task: 'Mesa con CapitÃ¡n: Revisar estado del equipo, productividad, llamadas.' },
+  { id: 't68', role: 'qt', phase: 'Jueves â€” Mesa de Trabajo', task: 'Mesa con CapitÃ¡n: Definir intervenciÃ³n individual y registrar acuerdos.' },
 
   // VIERNES (PRE)
-  { id: 't69', role: 'coord_c1', phase: 'Viernes — Antes de Abrir', task: 'Confirmar participantes, equipo y logística.' },
-  { id: 't70', role: 'coord_c1', phase: 'Viernes — Antes de Abrir', task: 'Confirmar materiales, sala, presentaciones, audio, iluminación, música.' },
+  { id: 't69', role: 'coord_c1', phase: 'Viernes â€” Antes de Abrir', task: 'Confirmar participantes, equipo y logÃ­stica.' },
+  { id: 't70', role: 'coord_c1', phase: 'Viernes â€” Antes de Abrir', task: 'Confirmar materiales, sala, presentaciones, audio, iluminaciÃ³n, mÃºsica.' },
   
-  { id: 't71', role: 'capitan', phase: 'Viernes — Antes de Abrir', task: 'Reunión de alineación completada y roles asignados.' },
-  { id: 't72', role: 'capitan', phase: 'Viernes — Antes de Abrir', task: 'Drills practicados y aliados alineados.' },
-  { id: 't73', role: 'capitan', phase: 'Viernes — Antes de Abrir', task: 'Directorios y gafetes revisados. Grupos de WhatsApp preparados.' },
+  { id: 't71', role: 'capitan', phase: 'Viernes â€” Antes de Abrir', task: 'ReuniÃ³n de alineaciÃ³n completada y roles asignados.' },
+  { id: 't72', role: 'capitan', phase: 'Viernes â€” Antes de Abrir', task: 'Drills practicados y aliados alineados.' },
+  { id: 't73', role: 'capitan', phase: 'Viernes â€” Antes de Abrir', task: 'Directorios y gafetes revisados. Grupos de WhatsApp preparados.' },
 
-  { id: 't74', role: 'qt', phase: 'Viernes — Antes de Abrir', task: 'Ensayar drills con aliados, confirmar postura y conocimiento del flujo.' },
-  { id: 't75', role: 'qt', phase: 'Viernes — Antes de Abrir', task: 'Confirmar música, luces, puertas, materiales, baúl de celulares y ambiente.' },
+  { id: 't74', role: 'qt', phase: 'Viernes â€” Antes de Abrir', task: 'Ensayar drills con aliados, confirmar postura y conocimiento del flujo.' },
+  { id: 't75', role: 'qt', phase: 'Viernes â€” Antes de Abrir', task: 'Confirmar mÃºsica, luces, puertas, materiales, baÃºl de celulares y ambiente.' },
 
   // DURANTE C1
-  { id: 't76', role: 'gerente', phase: 'Durante Capítulo 1', task: 'Mantener supervisión ejecutiva y resolver escalaciones sin interferir.' },
-  { id: 't77', role: 'gerente', phase: 'Durante Capítulo 1', task: 'Revisar cumplimiento de estándares y registrar incidencias.' },
+  { id: 't76', role: 'gerente', phase: 'Durante CapÃ­tulo 1', task: 'Mantener supervisiÃ³n ejecutiva y resolver escalaciones sin interferir.' },
+  { id: 't77', role: 'gerente', phase: 'Durante CapÃ­tulo 1', task: 'Revisar cumplimiento de estÃ¡ndares y registrar incidencias.' },
 
-  { id: 't78', role: 'coord_c1', phase: 'Durante Capítulo 1', task: 'Mantener control de participantes y resolver incidencias administrativas.' },
-  { id: 't79', role: 'coord_c1', phase: 'Durante Capítulo 1', task: 'Coordinar con oficina, atender derivaciones y registrar novedades.' },
+  { id: 't78', role: 'coord_c1', phase: 'Durante CapÃ­tulo 1', task: 'Mantener control de participantes y resolver incidencias administrativas.' },
+  { id: 't79', role: 'coord_c1', phase: 'Durante CapÃ­tulo 1', task: 'Coordinar con oficina, atender derivaciones y registrar novedades.' },
 
-  { id: 't80', role: 'capitan', phase: 'Durante Capítulo 1', task: 'Liderar equipo, mantener alineación y cuidar ejecución.' },
-  { id: 't81', role: 'capitan', phase: 'Durante Capítulo 1', task: 'Supervisar aliados, detectar quiebres y resolver desviaciones.' },
-  { id: 't82', role: 'capitan', phase: 'Viernes — Grupos de Creación', task: 'Verificar: Presentación, nombre, propósito, grito, reglas, WhatsApp, directorio.' },
+  { id: 't80', role: 'capitan', phase: 'Durante CapÃ­tulo 1', task: 'Liderar equipo, mantener alineaciÃ³n y cuidar ejecuciÃ³n.' },
+  { id: 't81', role: 'capitan', phase: 'Durante CapÃ­tulo 1', task: 'Supervisar aliados, detectar quiebres y resolver desviaciones.' },
+  { id: 't82', role: 'capitan', phase: 'Viernes â€” Grupos de CreaciÃ³n', task: 'Verificar: PresentaciÃ³n, nombre, propÃ³sito, grito, reglas, WhatsApp, directorio.' },
 
-  { id: 't83', role: 'qt', phase: 'Durante Capítulo 1', task: 'Ser soporte del entrenador y Capitán. Observar contexto y detectar quiebres.' },
-  { id: 't84', role: 'qt', phase: 'Durante Capítulo 1', task: 'Proteger experiencia del participante, mantener presencia y no abandonar posiciones.' },
+  { id: 't83', role: 'qt', phase: 'Durante CapÃ­tulo 1', task: 'Ser soporte del entrenador y CapitÃ¡n. Observar contexto y detectar quiebres.' },
+  { id: 't84', role: 'qt', phase: 'Durante CapÃ­tulo 1', task: 'Proteger experiencia del participante, mantener presencia y no abandonar posiciones.' },
 
   // SABADO
-  { id: 't85', role: 'coord_c1', phase: 'Sábado — Sostener', task: 'Resolver incidencias y mantener control de asistencia.' },
-  { id: 't86', role: 'coord_c1', phase: 'Sábado — Sostener', task: 'Coordinar requerimientos y preparar operación del domingo.' },
+  { id: 't85', role: 'coord_c1', phase: 'SÃ¡bado â€” Sostener', task: 'Resolver incidencias y mantener control de asistencia.' },
+  { id: 't86', role: 'coord_c1', phase: 'SÃ¡bado â€” Sostener', task: 'Coordinar requerimientos y preparar operaciÃ³n del domingo.' },
 
-  { id: 't87', role: 'capitan', phase: 'Sábado — Sostener', task: 'Llegar antes. Grounding del equipo.' },
-  { id: 't88', role: 'capitan', phase: 'Sábado — Sostener', task: 'Revisar energía. Detectar quiebres y coordinar con QT.' },
+  { id: 't87', role: 'capitan', phase: 'SÃ¡bado â€” Sostener', task: 'Llegar antes. Grounding del equipo.' },
+  { id: 't88', role: 'capitan', phase: 'SÃ¡bado â€” Sostener', task: 'Revisar energÃ­a. Detectar quiebres y coordinar con QT.' },
 
-  { id: 't89', role: 'qt', phase: 'Sábado — Sostener', task: 'Grounding. Revisar posiciones, aliados y observar participantes con atención.' },
-  { id: 't90', role: 'qt', phase: 'Sábado — Sostener', task: 'Mantener contexto, coordinar intervenciones y revisar operación de sala.' },
+  { id: 't89', role: 'qt', phase: 'SÃ¡bado â€” Sostener', task: 'Grounding. Revisar posiciones, aliados y observar participantes con atenciÃ³n.' },
+  { id: 't90', role: 'qt', phase: 'SÃ¡bado â€” Sostener', task: 'Mantener contexto, coordinar intervenciones y revisar operaciÃ³n de sala.' },
 
   // DOMINGO
-  { id: 't91', role: 'coord_c1', phase: 'Domingo — Cierre', task: 'Confirmar asistencia, consolidar información y registrar resultados.' },
-  { id: 't92', role: 'coord_c1', phase: 'Domingo — Cierre', task: 'Identificar pendientes, preparar seguimiento y coordinar proceso de C2.' },
+  { id: 't91', role: 'coord_c1', phase: 'Domingo â€” Cierre', task: 'Confirmar asistencia, consolidar informaciÃ³n y registrar resultados.' },
+  { id: 't92', role: 'coord_c1', phase: 'Domingo â€” Cierre', task: 'Identificar pendientes, preparar seguimiento y coordinar proceso de C2.' },
 
-  { id: 't93', role: 'capitan', phase: 'Domingo — Cierre', task: 'Preparar equipo para cierre. Identificar liderazgo emergente.' },
-  { id: 't94', role: 'capitan', phase: 'Domingo — Cierre', task: 'Acompañar conversaciones, coordinar cierre y entregar info al QT.' },
+  { id: 't93', role: 'capitan', phase: 'Domingo â€” Cierre', task: 'Preparar equipo para cierre. Identificar liderazgo emergente.' },
+  { id: 't94', role: 'capitan', phase: 'Domingo â€” Cierre', task: 'AcompaÃ±ar conversaciones, coordinar cierre y entregar info al QT.' },
 
-  { id: 't95', role: 'qt', phase: 'Domingo — Cierre', task: 'Identificar líderes potenciales y observar conversaciones.' },
-  { id: 't96', role: 'qt', phase: 'Domingo — Cierre', task: 'Revisar compromiso, avance hacia C2 y registrar oportunidades.' },
+  { id: 't95', role: 'qt', phase: 'Domingo â€” Cierre', task: 'Identificar lÃ­deres potenciales y observar conversaciones.' },
+  { id: 't96', role: 'qt', phase: 'Domingo â€” Cierre', task: 'Revisar compromiso, avance hacia C2 y registrar oportunidades.' },
 
   // POST-C1 Y PRE-C2
-  { id: 't97', role: 'capitan', phase: 'L-M-V Post-C1', task: 'Verificar contacto de aliados (Lunes, Miércoles, Viernes).' },
-  { id: 't98', role: 'capitan', phase: 'L-M-V Post-C1', task: 'Revisar participantes sin contacto, compromisos y escalar riesgos de pérdida.' },
+  { id: 't97', role: 'capitan', phase: 'L-M-V Post-C1', task: 'Verificar contacto de aliados (Lunes, MiÃ©rcoles, Viernes).' },
+  { id: 't98', role: 'capitan', phase: 'L-M-V Post-C1', task: 'Revisar participantes sin contacto, compromisos y escalar riesgos de pÃ©rdida.' },
   
-  { id: 't99', role: 'qt', phase: 'L-M-V Post-C1', task: 'Auditar seguimiento, revisar productividad/conversión.' },
-  { id: 't100', role: 'qt', phase: 'L-M-V Post-C1', task: 'Entrenar al Capitán e intervenir en casos críticos.' },
+  { id: 't99', role: 'qt', phase: 'L-M-V Post-C1', task: 'Auditar seguimiento, revisar productividad/conversiÃ³n.' },
+  { id: 't100', role: 'qt', phase: 'L-M-V Post-C1', task: 'Entrenar al CapitÃ¡n e intervenir en casos crÃ­ticos.' },
 
   { id: 't101', role: 'coord_c1', phase: 'Pre-C2', task: 'Confirmar participantes, pagos y asistencia. Actualizar base.' },
-  { id: 't102', role: 'capitan', phase: 'Pre-C2', task: 'Confirmar participantes de su equipo, acompañar decisiones y mantener comunicación.' },
-  { id: 't103', role: 'qt', phase: 'Pre-C2', task: 'Auditar conversión, revisar indecisos, llamadas y confirmar asientos de C2.' },
+  { id: 't102', role: 'capitan', phase: 'Pre-C2', task: 'Confirmar participantes de su equipo, acompaÃ±ar decisiones y mantener comunicaciÃ³n.' },
+  { id: 't103', role: 'qt', phase: 'Pre-C2', task: 'Auditar conversiÃ³n, revisar indecisos, llamadas y confirmar asientos de C2.' },
 
   // CAPITULO 2
-  { id: 't104', role: 'gerente', phase: 'Capítulo 2', task: 'Supervisión ejecutiva, indicadores, incidencias y coordinación general.' },
-  { id: 't105', role: 'coord_c1', phase: 'Capítulo 2', task: 'Asistencia, registro, información y cierre administrativo.' },
-  { id: 't106', role: 'capitan', phase: 'Capítulo 2', task: 'Liderar equipo, sostener aliados, acompañar participantes y mantener estándares.' },
-  { id: 't107', role: 'qt', phase: 'Capítulo 2', task: 'Auditar, observar, entrenar, corregir. Identificar liderazgo.' },
+  { id: 't104', role: 'gerente', phase: 'CapÃ­tulo 2', task: 'SupervisiÃ³n ejecutiva, indicadores, incidencias y coordinaciÃ³n general.' },
+  { id: 't105', role: 'coord_c1', phase: 'CapÃ­tulo 2', task: 'Asistencia, registro, informaciÃ³n y cierre administrativo.' },
+  { id: 't106', role: 'capitan', phase: 'CapÃ­tulo 2', task: 'Liderar equipo, sostener aliados, acompaÃ±ar participantes y mantener estÃ¡ndares.' },
+  { id: 't107', role: 'qt', phase: 'CapÃ­tulo 2', task: 'Auditar, observar, entrenar, corregir. Identificar liderazgo.' },
 
   // POST-C2 & PRE-MAESTRIA
-  { id: 't108', role: 'gerente', phase: 'Post-C2 & Pre-Maestría', task: 'Revisar resultados, aprendizajes y preparar reunión de cierre.' },
+  { id: 't108', role: 'gerente', phase: 'Post-C2 & Pre-MaestrÃ­a', task: 'Revisar resultados, aprendizajes y preparar reuniÃ³n de cierre.' },
   { id: 't109', role: 'coord_c1', phase: 'Post-C2', task: 'Actualizar base, cerrar casos y preparar reporte.' },
   { id: 't110', role: 'capitan', phase: 'Post-C2', task: 'Cerrar seguimiento, evaluar aliados y entregar info al QT.' },
   { id: 't111', role: 'qt', phase: 'Post-C2', task: 'Evaluar Capitanes/aliados. Preparar desarrollo del siguiente ciclo.' },
 
-  { id: 't112', role: 'coord_maestria', phase: 'Pre-Maestría & Cierre', task: 'Preparar operación, confirmar equipo, logística y consolidar resultados.' },
-  { id: 't113', role: 'qt', phase: 'Pre-Maestría', task: 'Preparar equipo, revisar evolución y preparar observaciones/recomendaciones.' },
+  { id: 't112', role: 'coord_maestria', phase: 'Pre-MaestrÃ­a & Cierre', task: 'Preparar operaciÃ³n, confirmar equipo, logÃ­stica y consolidar resultados.' },
+  { id: 't113', role: 'qt', phase: 'Pre-MaestrÃ­a', task: 'Preparar equipo, revisar evoluciÃ³n y preparar observaciones/recomendaciones.' },
   
-  { id: 't114', role: 'gerente', phase: 'Cierre de Ciclo', task: 'Auditoría Final: Resultados consolidados, aprendizajes y nuevo ciclo abierto.' }
+  { id: 't114', role: 'gerente', phase: 'Cierre de Ciclo', task: 'AuditorÃ­a Final: Resultados consolidados, aprendizajes y nuevo ciclo abierto.' }
 ];
 
 `
@@ -1171,23 +1175,23 @@ export default function ChecklistBoard() {
 
   const handleTaskClick = (task) => {
     if (task.completed || task.status === 'Completada') {
-      // Si está completada, permitir desmarcar (opcional)
+      // Si estÃ¡ completada, permitir desmarcar (opcional)
       toggleTask(task.id, true);
       return;
     }
 
-    if (task.status === 'Pendiente de validación') {
-      alert("Esta tarea está siendo revisada por gerencia.");
+    if (task.status === 'Pendiente de validaciÃ³n') {
+      alert("Esta tarea estÃ¡ siendo revisada por gerencia.");
       return;
     }
 
-    // Para la fase 2, asumimos que todas las tareas críticas o simplemente al hacer clic, pedimos evidencia.
+    // Para la fase 2, asumimos que todas las tareas crÃ­ticas o simplemente al hacer clic, pedimos evidencia.
     // Lo haremos con un simple confirm y prompt.
     const url = prompt("Introduce la URL de tu evidencia (Google Drive, Docs, etc.) para completar esta tarea:");
     if (url) {
       submitEvidence(task.id, url);
     } else if (url === "") {
-      // Si el usuario deja vacío, marcamos sin evidencia (o puedes forzarla).
+      // Si el usuario deja vacÃ­o, marcamos sin evidencia (o puedes forzarla).
       toggleTask(task.id, false);
     }
   };
@@ -1208,7 +1212,7 @@ export default function ChecklistBoard() {
               background: 'rgba(255,255,255,0.1)', borderRadius: '4px', fontSize: '0.9rem', color: 'white' 
             }}>
               <FilterIcon size={14} /> Filtro Activo: {filter.toUpperCase()}
-              <button onClick={() => setSearchParams({})} style={{ background: 'none', border: 'none', color: '#ffb347', cursor: 'pointer', marginLeft: '0.5rem', fontSize: '0.8rem' }}>✖ Limpiar</button>
+              <button onClick={() => setSearchParams({})} style={{ background: 'none', border: 'none', color: '#ffb347', cursor: 'pointer', marginLeft: '0.5rem', fontSize: '0.8rem' }}>âœ– Limpiar</button>
             </span>
           )}
         </p>
@@ -1229,7 +1233,7 @@ export default function ChecklistBoard() {
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {phaseTasks.map(task => {
                 const isCompleted = task.completed || task.status === 'Completada';
-                const isPending = task.status === 'Pendiente de validación';
+                const isPending = task.status === 'Pendiente de validaciÃ³n';
 
                 return (
                   <li 
@@ -1263,7 +1267,7 @@ export default function ChecklistBoard() {
                           {task.task}
                         </span>
                         {isPending && (
-                          <span style={{ color: '#f59e0b', fontSize: '0.8rem', fontWeight: 'bold' }}>Enviado para validación</span>
+                          <span style={{ color: '#f59e0b', fontSize: '0.8rem', fontWeight: 'bold' }}>Enviado para validaciÃ³n</span>
                         )}
                         {task.feedback && !isCompleted && !isPending && (
                           <div style={{ marginTop: '0.5rem', padding: '0.5rem', background: 'rgba(239, 68, 68, 0.1)', borderLeft: '2px solid #ef4444', fontSize: '0.85rem', color: '#fca5a5' }}>
@@ -1306,7 +1310,7 @@ export default function GerenteDashboard() {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  // Filtro "Solo lo que requiere mi intervención"
+  // Filtro "Solo lo que requiere mi intervenciÃ³n"
   const [interventionMode, setInterventionMode] = useState(false);
 
   useEffect(() => {
@@ -1343,7 +1347,7 @@ export default function GerenteDashboard() {
       if (isApproved) {
         await updateDoc(taskRef, { status: 'Completada', completed: true });
       } else {
-        const feedback = prompt("Razón del rechazo:");
+        const feedback = prompt("RazÃ³n del rechazo:");
         if (feedback === null) return;
         await updateDoc(taskRef, { 
           status: 'En progreso',
@@ -1352,14 +1356,14 @@ export default function GerenteDashboard() {
       }
     } catch (error) {
       console.error("Error al validar", error);
-      alert("Error al guardar la validación.");
+      alert("Error al guardar la validaciÃ³n.");
     }
   };
 
   // --- DERIVED DATA ---
   
   // Evidencias pendientes
-  const pendingEvidences = tasks.filter(t => t.status === 'Pendiente de validación');
+  const pendingEvidences = tasks.filter(t => t.status === 'Pendiente de validaciÃ³n');
 
   // Metas agrupadas
   const cicloGoals = goals.filter(g => g.scope === 'CICLO');
@@ -1375,10 +1379,10 @@ export default function GerenteDashboard() {
     if (!roleId) return;
     const roleTasks = tasks.filter(t => t.role === roleId);
     const completed = roleTasks.filter(t => t.completed || t.status === 'Completada').length;
-    const pendingReview = roleTasks.filter(t => t.status === 'Pendiente de validación').length;
+    const pendingReview = roleTasks.filter(t => t.status === 'Pendiente de validaciÃ³n').length;
     
-    // Simplificación: Tareas vencidas serían las que no están completadas y su fecha ya pasó.
-    // Como no tenemos deadline estricta aún, asumiremos riesgo si avance < 50% y hay muchas en progreso.
+    // SimplificaciÃ³n: Tareas vencidas serÃ­an las que no estÃ¡n completadas y su fecha ya pasÃ³.
+    // Como no tenemos deadline estricta aÃºn, asumiremos riesgo si avance < 50% y hay muchas en progreso.
     const progress = roleTasks.length > 0 ? Math.round((completed / roleTasks.length) * 100) : 0;
     
     let riskLevel = 'BAJO';
@@ -1413,7 +1417,7 @@ export default function GerenteDashboard() {
         <div>
           <h1 className="text-gold" style={{ margin: 0, fontSize: '2rem' }}>Centro de Mando Gerencial</h1>
           <p className="text-muted" style={{ margin: '0.5rem 0 0', textTransform: 'uppercase' }}>
-            {currentCycle ? `${currentCycle.name} • ETAPA ACTUAL: ${currentStage}` : 'CARGANDO CICLO...'}
+            {currentCycle ? `${currentCycle.name} â€¢ ETAPA ACTUAL: ${currentStage}` : 'CARGANDO CICLO...'}
           </p>
         </div>
         <div style={{ display: 'flex', gap: '1rem' }}>
@@ -1429,7 +1433,7 @@ export default function GerenteDashboard() {
               borderColor: interventionMode ? 'var(--color-error)' : 'var(--crear-blue)'
             }}
           >
-            <Filter size={18} /> {interventionMode ? "Mostrando Solo Críticos" : "Modo Intervención (Off)"}
+            <Filter size={18} /> {interventionMode ? "Mostrando Solo CrÃ­ticos" : "Modo IntervenciÃ³n (Off)"}
           </button>
           <button className="btn-secondary" onClick={() => navigate('/')}>Volver al Inicio</button>
         </div>
@@ -1544,12 +1548,12 @@ export default function GerenteDashboard() {
             </tbody>
           </table>
           {interventionMode && riskMatrix.filter(r => r.riskLevel === 'ALTO' || r.pendingReview > 0).length === 0 && (
-             <p className="text-muted text-center" style={{ margin: '2rem 0' }}>✅ No hay equipos en riesgo alto ni evidencias pendientes.</p>
+             <p className="text-muted text-center" style={{ margin: '2rem 0' }}>âœ… No hay equipos en riesgo alto ni evidencias pendientes.</p>
           )}
         </div>
       </div>
 
-      {/* PANEL DE VALIDACIÓN DE EVIDENCIAS */}
+      {/* PANEL DE VALIDACIÃ“N DE EVIDENCIAS */}
       {(!interventionMode || pendingEvidences.length > 0) && (
         <div className="glass-panel" style={{ padding: '2rem', marginBottom: '2rem', border: pendingEvidences.length > 0 ? '1px solid rgba(245, 158, 11, 0.3)' : 'none' }}>
           <h2 className="text-blue" style={{ marginTop: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -1557,7 +1561,7 @@ export default function GerenteDashboard() {
           </h2>
           
           {pendingEvidences.length === 0 ? (
-            <p className="text-muted">No hay evidencias pendientes de validación en este momento.</p>
+            <p className="text-muted">No hay evidencias pendientes de validaciÃ³n en este momento.</p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1.5rem' }}>
               {pendingEvidences.map(task => (
@@ -1567,7 +1571,7 @@ export default function GerenteDashboard() {
                     <p className="text-muted" style={{ margin: 0, fontSize: '0.85rem', textTransform: 'uppercase' }}>Rol: {task.role || task.responsible_role}</p>
                     {task.evidence_url && (
                       <a href={task.evidence_url} target="_blank" rel="noreferrer" style={{ display: 'inline-block', marginTop: '0.5rem', color: 'var(--crear-blue)', fontSize: '0.9rem', textDecoration: 'none' }}>
-                        🔗 Abrir Evidencia
+                        ðŸ”— Abrir Evidencia
                       </a>
                     )}
                   </div>
@@ -1648,10 +1652,10 @@ export default function GoalsBoard() {
   const [wizardStep, setWizardStep] = useState(0);
   
   const stages = [
-    { id: 'C1', name: 'Capítulo 1' },
-    { id: 'C2', name: 'Capítulo 2' },
-    { id: 'MJ_CREACION', name: 'MJ - Creación' },
-    { id: 'MJ_RELACION', name: 'MJ - Relación' },
+    { id: 'C1', name: 'CapÃ­tulo 1' },
+    { id: 'C2', name: 'CapÃ­tulo 2' },
+    { id: 'MJ_CREACION', name: 'MJ - CreaciÃ³n' },
+    { id: 'MJ_RELACION', name: 'MJ - RelaciÃ³n' },
     { id: 'MJ_GRATITUD', name: 'MJ - Gratitud' },
     { id: 'MJ_VIAJE', name: 'MJ - El Viaje' }
   ];
@@ -1851,8 +1855,8 @@ export default function GoalsBoard() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <Target size={32} className="text-gold" />
           <div>
-            <h1 className="text-gold uppercase" style={{ margin: 0 }}>Gestión de Metas</h1>
-            <p className="text-muted" style={{ margin: 0, fontSize: '0.9rem' }}>Seguimiento y acumulación operativa</p>
+            <h1 className="text-gold uppercase" style={{ margin: 0 }}>GestiÃ³n de Metas</h1>
+            <p className="text-muted" style={{ margin: 0, fontSize: '0.9rem' }}>Seguimiento y acumulaciÃ³n operativa</p>
           </div>
         </div>
         {currentUser?.appRole === 'gerente' && (
@@ -1872,9 +1876,9 @@ export default function GoalsBoard() {
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', zIndex: 100, overflowY: 'auto', padding: '2rem 0' }}>
           <div className="glass-panel" style={{ padding: '2rem', width: '90%', maxWidth: '600px', margin: 'auto' }}>
             <h2 className="text-gold" style={{ marginTop: 0, borderBottom: '1px solid rgba(255,215,0,0.2)', paddingBottom: '1rem' }}>
-              Configuración Maestra: {stages[wizardStep].name}
+              ConfiguraciÃ³n Maestra: {stages[wizardStep].name}
             </h2>
-            <p className="text-muted" style={{ marginBottom: '2rem' }}>Define los números objetivo (Sentados) para este entrenamiento.</p>
+            <p className="text-muted" style={{ marginBottom: '2rem' }}>Define los nÃºmeros objetivo (Sentados) para este entrenamiento.</p>
             
             <div style={{ display: 'grid', gap: '1.5rem', marginBottom: '2rem' }}>
               <div>
@@ -1914,7 +1918,7 @@ export default function GoalsBoard() {
               
               <div style={{ display: 'flex', gap: '0.5rem' }}>
                 {wizardStep > 0 && (
-                  <button className="btn-secondary" onClick={() => setWizardStep(prev => prev - 1)}>Atrás</button>
+                  <button className="btn-secondary" onClick={() => setWizardStep(prev => prev - 1)}>AtrÃ¡s</button>
                 )}
                 {wizardStep < stages.length - 1 ? (
                   <button className="btn-primary" onClick={() => setWizardStep(prev => prev + 1)}>Siguiente</button>
@@ -1973,7 +1977,7 @@ export default function Home() {
         const res = await fetch(API_URL);
         const data = await res.json();
         
-        // Filtrar y ordenar los eventos para mostrar solo los próximos 3
+        // Filtrar y ordenar los eventos para mostrar solo los prÃ³ximos 3
         if (Array.isArray(data)) {
            const now = new Date();
            // Removemos la parte de la hora para comparar solo fechas si queremos eventos de hoy en adelante
@@ -2001,7 +2005,7 @@ export default function Home() {
       await logout();
       navigate('/login');
     } catch (error) {
-      console.error("Error al cerrar sesión", error);
+      console.error("Error al cerrar sesiÃ³n", error);
     }
   };
 
@@ -2009,9 +2013,9 @@ export default function Home() {
     <div style={{ maxWidth: '900px', margin: '0 auto', padding: '2rem 1rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h1 className="text-gold" style={{ margin: 0, fontSize: '2rem' }}>Buenos días, {currentUser?.displayName || 'Equipo'}</h1>
+          <h1 className="text-gold" style={{ margin: 0, fontSize: '2rem' }}>Buenos dÃ­as, {currentUser?.displayName || 'Equipo'}</h1>
           <p className="text-muted" style={{ margin: '0.5rem 0 0', textTransform: 'uppercase' }}>
-            {currentCycle ? `${currentCycle.name} • ETAPA ACTUAL: ${currentStage}` : 'CARGANDO CICLO...'}
+            {currentCycle ? `${currentCycle.name} â€¢ ETAPA ACTUAL: ${currentStage}` : 'CARGANDO CICLO...'}
           </p>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '1rem' }}>
             <Clock size={16} className="text-blue" />
@@ -2041,7 +2045,7 @@ export default function Home() {
 
       <div className="glass-panel" style={{ padding: '1.5rem', marginBottom: '2rem' }}>
         <h3 className="text-blue" style={{ marginTop: 0, borderBottom: '1px solid rgba(0,212,255,0.2)', paddingBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <CalendarIcon size={18} /> ¿QUÉ ESTÁ OCURRIENDO EN LA COMPAÑÍA? (Eventos Globales)
+          <CalendarIcon size={18} /> Â¿QUÃ‰ ESTÃ OCURRIENDO EN LA COMPAÃ‘ÃA? (Eventos Globales)
         </h3>
         {loadingEvents ? (
           <p className="text-muted">Cargando inteligencia global...</p>
@@ -2067,7 +2071,7 @@ export default function Home() {
             ))}
           </ul>
         ) : (
-          <p className="text-muted">No hay eventos próximos registrados hoy.</p>
+          <p className="text-muted">No hay eventos prÃ³ximos registrados hoy.</p>
         )}
       </div>
 
@@ -2093,7 +2097,7 @@ export default function Home() {
                       onMouseOver={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)'}
                       onMouseOut={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'}
                     >
-                      <AlertCircle size={18} /> <strong>{criticas}</strong> críticas (Requieren acción hoy)
+                      <AlertCircle size={18} /> <strong>{criticas}</strong> crÃ­ticas (Requieren acciÃ³n hoy)
                     </li>
                     <li 
                       onClick={() => navigate(`/checklist/${currentUser?.appRole}?filter=importantes`)}
@@ -2126,8 +2130,8 @@ export default function Home() {
           ) : (
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               {(() => {
-                const myTasks = allTasks.filter(t => t.role === currentUser?.appRole && !t.completed && t.status !== 'Completada' && t.status !== 'Pendiente de validación');
-                // Ordenar: críticas primero, luego importantes, luego normales
+                const myTasks = allTasks.filter(t => t.role === currentUser?.appRole && !t.completed && t.status !== 'Completada' && t.status !== 'Pendiente de validaciÃ³n');
+                // Ordenar: crÃ­ticas primero, luego importantes, luego normales
                 myTasks.sort((a, b) => {
                   const valA = a.riskLevel === 'critico' ? 3 : (a.riskLevel === 'normal' || !a.riskLevel ? 1 : 2);
                   const valB = b.riskLevel === 'critico' ? 3 : (b.riskLevel === 'normal' || !b.riskLevel ? 1 : 2);
@@ -2137,7 +2141,7 @@ export default function Home() {
                 const top3 = myTasks.slice(0, 3);
                 
                 if (top3.length === 0) {
-                  return <li className="text-muted" style={{ padding: '1rem 0' }}>No tienes tareas urgentes pendientes. ¡Buen trabajo!</li>;
+                  return <li className="text-muted" style={{ padding: '1rem 0' }}>No tienes tareas urgentes pendientes. Â¡Buen trabajo!</li>;
                 }
 
                 return top3.map(task => {
@@ -2215,8 +2219,8 @@ export default function Login() {
       await loginWithGoogle();
       navigate('/home');
     } catch (error) {
-      console.error("Error al iniciar sesión", error);
-      alert("Hubo un error al iniciar sesión. Intenta nuevamente.");
+      console.error("Error al iniciar sesiÃ³n", error);
+      alert("Hubo un error al iniciar sesiÃ³n. Intenta nuevamente.");
     }
   };
 
@@ -2226,7 +2230,7 @@ export default function Login() {
         <img src="/interrupcion_logo.jpg" alt="Logo" className="logo-holographic" style={{ width: '120px', margin: '0 auto 2rem', display: 'block' }} onError={(e) => e.target.style.display = 'none'} />
         
         <h1 className="text-gold uppercase" style={{ fontSize: '2rem', marginBottom: '0.5rem', letterSpacing: '2px' }}>CENTRO OPERATIVO</h1>
-        <p className="text-muted" style={{ marginBottom: '3rem', fontSize: '1.1rem' }}>Plataforma de Gestión por Ciclos</p>
+        <p className="text-muted" style={{ marginBottom: '3rem', fontSize: '1.1rem' }}>Plataforma de GestiÃ³n por Ciclos</p>
         
         <button 
           onClick={handleLogin}
@@ -2271,7 +2275,7 @@ export default function ReportesBoard() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    // Intentar parsear a número si aplica
+    // Intentar parsear a nÃºmero si aplica
     const val = isNaN(value) || value === '' ? value : Number(value);
     setFormData(prev => ({ ...prev, [name]: val }));
   };
@@ -2301,7 +2305,7 @@ export default function ReportesBoard() {
         data: formData
       });
 
-      // 2. Regla de Negocio Crítica: Acumulación de Metas para "Llamadas"
+      // 2. Regla de Negocio CrÃ­tica: AcumulaciÃ³n de Metas para "Llamadas"
       if (reportType === 'Llamadas') {
         const totalOkNuevos = formData['nuevos_OK'] || 0;
         const totalOkRezagados = formData['rezagados_OK'] || 0;
@@ -2326,16 +2330,16 @@ export default function ReportesBoard() {
               progress: newProgress
             });
             
-            // Roll-up hacia CICLO (Opcional en MVP, el Gerente lo verá reflejado en la propia meta)
+            // Roll-up hacia CICLO (Opcional en MVP, el Gerente lo verÃ¡ reflejado en la propia meta)
             const parentId = data.parentId;
             if (parentId) {
-               // En una app completa, aquí iteraríamos los hermanos para promediar, similar a GoalsBoard
+               // En una app completa, aquÃ­ iterarÃ­amos los hermanos para promediar, similar a GoalsBoard
             }
           }
         }
       }
 
-      alert('¡Reporte enviado exitosamente!');
+      alert('Â¡Reporte enviado exitosamente!');
       setReportType('');
       setFormData({});
     } catch (err) {
@@ -2354,14 +2358,14 @@ export default function ReportesBoard() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
             <input type="number" name="px_llegaron_viernes" placeholder="Px que llegaron el viernes" onChange={handleChange} className="form-input" />
             <input type="number" name="px_bajaron" placeholder="Px que se bajaron durante fds" onChange={handleChange} className="form-input" />
-            <input type="number" name="declaracion_px" placeholder="Declaración Px" onChange={handleChange} className="form-input" />
+            <input type="number" name="declaracion_px" placeholder="DeclaraciÃ³n Px" onChange={handleChange} className="form-input" />
             <input type="number" name="enrolamiento" placeholder="Enrolamiento" onChange={handleChange} className="form-input" />
             <input type="number" name="px_en_0" placeholder="Px en 0" onChange={handleChange} className="form-input" />
-            <input type="text" name="capitan" placeholder="Nombre Capitán" onChange={handleChange} className="form-input" />
+            <input type="text" name="capitan" placeholder="Nombre CapitÃ¡n" onChange={handleChange} className="form-input" />
             <input type="number" name="managers_llegaron" placeholder="Managers que llegaron" onChange={handleChange} className="form-input" />
             <input type="number" name="capitan_quedo" placeholder="Capitanes que quedaron" onChange={handleChange} className="form-input" />
             <input type="number" name="managers_quedaron" placeholder="Managers que quedaron" onChange={handleChange} className="form-input" />
-            <input type="text" name="declaracion" placeholder="Declaración" onChange={handleChange} className="form-input" />
+            <input type="text" name="declaracion" placeholder="DeclaraciÃ³n" onChange={handleChange} className="form-input" />
             <input type="number" name="total" placeholder="Total" onChange={handleChange} className="form-input" />
             <input type="number" name="promedio" placeholder="Promedio fin de semana" onChange={handleChange} className="form-input" step="0.01" />
           </div>
@@ -2406,7 +2410,7 @@ export default function ReportesBoard() {
           </div>
           <div style={{ background: 'rgba(52, 168, 83, 0.1)', border: '1px solid #34a853', padding: '1rem', borderRadius: '8px' }}>
             <p style={{ margin: 0, color: '#34a853', fontSize: '0.9rem' }}>
-              💡 Al enviar este reporte, los "OK" se sumarán automáticamente a la Meta de Entrenamiento activa para evitar doble digitación.
+              ðŸ’¡ Al enviar este reporte, los "OK" se sumarÃ¡n automÃ¡ticamente a la Meta de Entrenamiento activa para evitar doble digitaciÃ³n.
             </p>
           </div>
         </div>
@@ -2416,8 +2420,8 @@ export default function ReportesBoard() {
     if (reportType === 'C2') {
       return (
         <div style={{ display: 'grid', gap: '1rem' }}>
-          <h4 className="text-blue">Reporte Capítulo Dos</h4>
-          <textarea name="detalle" placeholder="Detalle: (Px, Aliados, Capitán, Entrenador, Desertores)" onChange={handleChange} className="form-input" rows="4"></textarea>
+          <h4 className="text-blue">Reporte CapÃ­tulo Dos</h4>
+          <textarea name="detalle" placeholder="Detalle: (Px, Aliados, CapitÃ¡n, Entrenador, Desertores)" onChange={handleChange} className="form-input" rows="4"></textarea>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
              <input type="number" name="pagos_c2_mj" placeholder="C2 + MJ" onChange={handleChange} className="form-input" />
              <input type="number" name="pagos_rotos" placeholder="Pagos Rotos / Desertores" onChange={handleChange} className="form-input" />
@@ -2430,11 +2434,11 @@ export default function ReportesBoard() {
     if (reportType === 'MJ') {
       return (
         <div style={{ display: 'grid', gap: '1rem' }}>
-          <h4 className="text-blue">Reporte Maestría del Juego</h4>
+          <h4 className="text-blue">Reporte MaestrÃ­a del Juego</h4>
           <select name="subtipo" onChange={handleChange} className="form-input">
-            <option value="">Selecciona sección...</option>
+            <option value="">Selecciona secciÃ³n...</option>
             <option value="Asistencia">Asistencia</option>
-            <option value="Declaracion">Declaración</option>
+            <option value="Declaracion">DeclaraciÃ³n</option>
             <option value="Enrolamiento">Enrolamiento</option>
           </select>
           {formData.subtipo && (
@@ -2465,7 +2469,7 @@ export default function ReportesBoard() {
           <FileText size={32} className="text-gold" />
           <div>
             <h1 className="text-gold uppercase" style={{ margin: 0 }}>Reportes Operativos</h1>
-            <p className="text-muted" style={{ margin: 0, fontSize: '0.9rem' }}>Digitalización de Formatos de Comunicación</p>
+            <p className="text-muted" style={{ margin: 0, fontSize: '0.9rem' }}>DigitalizaciÃ³n de Formatos de ComunicaciÃ³n</p>
           </div>
         </div>
 
@@ -2480,8 +2484,8 @@ export default function ReportesBoard() {
               <option value="">-- Selecciona Formato Oficial --</option>
               <option value="Llamadas">1. Reporte de Llamadas (C1)</option>
               <option value="FDS">2. Reporte FDS (Sede)</option>
-              <option value="C2">3. Reporte Capítulo Dos</option>
-              <option value="MJ">4. Reporte Maestría del Juego</option>
+              <option value="C2">3. Reporte CapÃ­tulo Dos</option>
+              <option value="MJ">4. Reporte MaestrÃ­a del Juego</option>
             </select>
           </div>
 
@@ -2568,7 +2572,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
-// const analytics = getAnalytics(app); // Opcional, lo dejamos comentado por ahora si no está configurado
+// const analytics = getAnalytics(app); // Opcional, lo dejamos comentado por ahora si no estÃ¡ configurado
 
 export { db, auth, googleProvider };
 
@@ -2579,79 +2583,79 @@ export { db, auth, googleProvider };
 
 ---
 
-### 📄 Archivo: `MASTER_CHECKLIST_OPERATIVO_GERENTE_SEDE_V1.md`
+### ðŸ“„ Archivo: `MASTER_CHECKLIST_OPERATIVO_GERENTE_SEDE_V1.md`
 
 ```text
 # MASTER CHECKLIST DEL GERENTE DE SEDE
 
-## 1. Propósito del rol
-El Gerente de Sede es el **Responsable Ejecutivo del Ciclo Operativo**. Su propósito es asegurar que cada ciclo operativo de la sede se ejecute de manera ordenada, rentable, segura y trazable, garantizando que cada área tenga responsables claros, recursos disponibles, metas definidas y resultados medibles.
+## 1. PropÃ³sito del rol
+El Gerente de Sede es el **Responsable Ejecutivo del Ciclo Operativo**. Su propÃ³sito es asegurar que cada ciclo operativo de la sede se ejecute de manera ordenada, rentable, segura y trazable, garantizando que cada Ã¡rea tenga responsables claros, recursos disponibles, metas definidas y resultados medibles.
 
-## 2. Definición de ciclo operativo
-Para CREAR PODER SIN LÍMITES, un ciclo operativo completo comprende:
-**MJ → C1 → C2 → MJ**
+## 2. DefiniciÃ³n de ciclo operativo
+Para CREAR PODER SIN LÃMITES, un ciclo operativo completo comprende:
+**MJ â†’ C1 â†’ C2 â†’ MJ**
 
-Un ciclo comienza después del cierre de una Maestría del Juego y termina con el cierre de la siguiente Maestría del Juego.
+Un ciclo comienza despuÃ©s del cierre de una MaestrÃ­a del Juego y termina con el cierre de la siguiente MaestrÃ­a del Juego.
 
 ## 3. Responsabilidades del Gerente
 El Gerente NO es el ejecutor de todas las tareas. Sus 5 funciones principales son:
 1. **Planificar** el ciclo.
-2. **Asegurar recursos** financieros, humanos y logísticos.
+2. **Asegurar recursos** financieros, humanos y logÃ­sticos.
 3. **Asignar responsabilidades** claramente a los Coordinadores y Equipo de Apoyo.
 4. **Supervisar resultados** y verificar evidencias.
 5. **Resolver excepciones** que escalan los equipos.
 
-*Ejemplo de Operación:* El Gerente no divide las listas de asistencia; el Gerente **verifica que el Coordinador responsable haya distribuido el listado, asignado responsables y establecido fechas de cumplimiento.**
+*Ejemplo de OperaciÃ³n:* El Gerente no divide las listas de asistencia; el Gerente **verifica que el Coordinador responsable haya distribuido el listado, asignado responsables y establecido fechas de cumplimiento.**
 
 ## 4. Reglas de accountability
-**Ninguna tarea crítica puede quedar sin responsable, fecha límite y evidencia de cumplimiento.**
+**Ninguna tarea crÃ­tica puede quedar sin responsable, fecha lÃ­mite y evidencia de cumplimiento.**
 
-Para garantizar esto, toda acción en este manual debe tener:
-* **TAREA:** Acción específica.
-* **RESPONSABLE:** Dueño absoluto de la tarea.
-* **FECHA (Deadline):** Basado en notación T-.
-* **PRIORIDAD:** Crítica, Alta, Media, Baja.
+Para garantizar esto, toda acciÃ³n en este manual debe tener:
+* **TAREA:** AcciÃ³n especÃ­fica.
+* **RESPONSABLE:** DueÃ±o absoluto de la tarea.
+* **FECHA (Deadline):** Basado en notaciÃ³n T-.
+* **PRIORIDAD:** CrÃ­tica, Alta, Media, Baja.
 * **ESTADO:** Pendiente, En proceso, Completada, Bloqueada.
-* **EVIDENCIA:** Documento, foto o confirmación oficial.
-* **ESCALAMIENTO:** A quién contactar en caso de bloqueo.
+* **EVIDENCIA:** Documento, foto o confirmaciÃ³n oficial.
+* **ESCALAMIENTO:** A quiÃ©n contactar en caso de bloqueo.
 
 ## 5. Calendario maestro del ciclo
-El sistema funciona independientemente de la fecha del entrenamiento utilizando fechas relativas al evento (DÍA 0):
-* **T-30:** 30 días antes.
-* **T-21:** 21 días antes.
-* **T-14:** 14 días antes.
-* **T-7:** 7 días antes.
-* **T-1:** Día anterior.
-* **DÍA 0:** Día del entrenamiento.
-* **T+1:** Primer día posterior.
+El sistema funciona independientemente de la fecha del entrenamiento utilizando fechas relativas al evento (DÃA 0):
+* **T-30:** 30 dÃ­as antes.
+* **T-21:** 21 dÃ­as antes.
+* **T-14:** 14 dÃ­as antes.
+* **T-7:** 7 dÃ­as antes.
+* **T-1:** DÃ­a anterior.
+* **DÃA 0:** DÃ­a del entrenamiento.
+* **T+1:** Primer dÃ­a posterior.
 * **T+7:** Cierre posterior.
 
 ---
 
 ## 6. Gate T-30
-**ENTRENADOR 100% CONFIRMADO.** *30 días antes de cada entrenamiento.*
+**ENTRENADOR 100% CONFIRMADO.** *30 dÃ­as antes de cada entrenamiento.*
 
 * [ ] Gerente confirmado
 * [ ] Presupuesto aprobado
-* [ ] Salón definido
-* [ ] Salón separado
-* [ ] Salón pagado según corresponda
+* [ ] SalÃ³n definido
+* [ ] SalÃ³n separado
+* [ ] SalÃ³n pagado segÃºn corresponda
 * [ ] Entrenador confirmado
 * [ ] Hotel del entrenador confirmado
-* [ ] Hotel pagado según corresponda
+* [ ] Hotel pagado segÃºn corresponda
 * [ ] Vuelo confirmado
-* [ ] Vuelo pagado según corresponda
+* [ ] Vuelo pagado segÃºn corresponda
 * [ ] Transporte confirmado
-* [ ] Toda la logística del entrenador definida
+* [ ] Toda la logÃ­stica del entrenador definida
 * [ ] Responsable de cada traslado definido
-* [ ] Contactos de emergencia/logística disponibles
-* [ ] Documentación almacenada
+* [ ] Contactos de emergencia/logÃ­stica disponibles
+* [ ] DocumentaciÃ³n almacenada
 * [ ] Evidencias cargadas en el sistema
 
 **Resultados del Gate:**
 * **VERDE:** Todo completo.
-* **AMARILLO:** Existe una excepción documentada con responsable y deadline.
-* **ROJO:** Existe un elemento crítico sin resolver.
+* **AMARILLO:** Existe una excepciÃ³n documentada con responsable y deadline.
+* **ROJO:** Existe un elemento crÃ­tico sin resolver.
 
 ## 7. Gate T-21
 * [ ] Presupuesto operativo preliminar consolidado.
@@ -2661,146 +2665,146 @@ El sistema funciona independientemente de la fecha del entrenamiento utilizando 
 
 ## 8. Gate T-14
 * [ ] Convocatoria de Equipo de Apoyo cerrada.
-* [ ] Asignación de roles del Equipo de Apoyo confirmada.
+* [ ] AsignaciÃ³n de roles del Equipo de Apoyo confirmada.
 * [ ] Lista de llamadas operativas distribuida a responsables.
 
 ## 9. Gate T-7
 * [ ] Freeze de listas de asistencia iniciales.
-* [ ] Armado de baúles y materiales confirmados.
+* [ ] Armado de baÃºles y materiales confirmados.
 * [ ] Uniformes del Equipo de Apoyo verificados.
-* [ ] Confirmación de sala, acústica, micrófonos e iluminación.
+* [ ] ConfirmaciÃ³n de sala, acÃºstica, micrÃ³fonos e iluminaciÃ³n.
 
-## 10. Operación C1
+## 10. OperaciÃ³n C1
 * [ ] Registro puntual y resguardo de pertenencias operando.
 * [ ] Tolerancia Cero en ingreso y puertas cerradas.
-* [ ] Supervisión de métricas de asistencia y conciliación de caja sin microgestión.
+* [ ] SupervisiÃ³n de mÃ©tricas de asistencia y conciliaciÃ³n de caja sin microgestiÃ³n.
 * [ ] Cada incidencia/quiebre tiene un responsable asignado para resolverlo.
 
 ## 11. Cierre C1
-* [ ] Domingo 20:30: Devolución del salón impecable.
+* [ ] Domingo 20:30: DevoluciÃ³n del salÃ³n impecable.
 * [ ] Cierre comercial exhaustivo.
 * [ ] Reporte de ingresos, asistencia final y rezagados emitido a gerencia.
 
-## 12. Operación C2
-* [ ] Jueves: Arranque y grounding de equipo de oficina, Capitán y Entrenador.
+## 12. OperaciÃ³n C2
+* [ ] Jueves: Arranque y grounding de equipo de oficina, CapitÃ¡n y Entrenador.
 * [ ] Control estricto de Palabras Rotas e inasistencias.
-* [ ] Operación de mesas de enrolamiento a MJ.
+* [ ] OperaciÃ³n de mesas de enrolamiento a MJ.
 
 ## 13. Gate viernes C2
-**El Gerente debe verificar obligatoriamente dos controles estratégicos:**
+**El Gerente debe verificar obligatoriamente dos controles estratÃ©gicos:**
 
-### A. Maestría del Juego (Groundings FDS)
-El Coordinador de Maestría debe confirmar los groundings de los tres FDS.
+### A. MaestrÃ­a del Juego (Groundings FDS)
+El Coordinador de MaestrÃ­a debe confirmar los groundings de los tres FDS.
 | FDS MJ | Managers | Entrenador correspondiente | Grounding confirmado |
 | ------ | -------- | -------------------------- | -------------------- |
-| FDS 1  | ___      | ___                        | ☐                    |
-| FDS 2  | ___      | ___                        | ☐                    |
-| FDS 3  | ___      | ___                        | ☐                    |
+| FDS 1  | ___      | ___                        | â˜                    |
+| FDS 2  | ___      | ___                        | â˜                    |
+| FDS 3  | ___      | ___                        | â˜                    |
 
 ### B. Meta de Rezagados de C1
-El Gerente debe recibir y compartir la meta de rezagados del último C1 que deberán sentarse en el próximo C1.
-* [ ] Número de rezagados identificado
+El Gerente debe recibir y compartir la meta de rezagados del Ãºltimo C1 que deberÃ¡n sentarse en el prÃ³ximo C1.
+* [ ] NÃºmero de rezagados identificado
 * [ ] Meta definida y comunicada al equipo
 * [ ] Lista nominal disponible
 * [ ] Responsable de seguimiento asignado
-* [ ] Fecha límite de contacto definida
+* [ ] Fecha lÃ­mite de contacto definida
 
 ## 14. Cierre C2
 * [ ] Consolidar enrolamientos a MJ.
-* [ ] Emitir reportes financieros a Dirección.
-* [ ] Cerrar operación presencial del salón.
+* [ ] Emitir reportes financieros a DirecciÃ³n.
+* [ ] Cerrar operaciÃ³n presencial del salÃ³n.
 
-## 15. Preparación MJ
-* [ ] Firmas de declaración de caja por Managers completadas.
-* [ ] Relación estricta 1 Manager por cada 6 Participantes configurada en sistema.
+## 15. PreparaciÃ³n MJ
+* [ ] Firmas de declaraciÃ³n de caja por Managers completadas.
+* [ ] RelaciÃ³n estricta 1 Manager por cada 6 Participantes configurada en sistema.
 * [ ] Grounding virtual de contexto ejecutado.
 * [ ] Agenda del Entrenador bloqueada.
 
-## 16. Operación MJ
+## 16. OperaciÃ³n MJ
 * [ ] Jueves Pre-FDS: Entrenadores instalados en la ciudad.
 * [ ] Viernes 17:00: Mesa de registro estricta (Sin firmas de reglas no hay ingreso).
 * [ ] Lunes post-FDS: Seguimiento de Futuros Imposibles.
-* [ ] Ejecución continua FDS 1, 2 y 3.
+* [ ] EjecuciÃ³n continua FDS 1, 2 y 3.
 
 ## 17. Cierre MJ
-* [ ] Auditoría final de graduados.
+* [ ] AuditorÃ­a final de graduados.
 * [ ] Entrega de aprendizajes por el Equipo de Apoyo.
-* [ ] Certificación de Cierre de Oro (según métricas corporativas).
+* [ ] CertificaciÃ³n de Cierre de Oro (segÃºn mÃ©tricas corporativas).
 
 ## 18. Post-ciclo
-**JUEVES POST-C1/C2/MJ — Recuperación Operativa**
+**JUEVES POST-C1/C2/MJ â€” RecuperaciÃ³n Operativa**
 * Gerente no programa actividades operativas innecesarias.
-* Se prioriza la recuperación del personal.
-* Se atienden únicamente asuntos críticos de fuerza mayor.
+* Se prioriza la recuperaciÃ³n del personal.
+* Se atienden Ãºnicamente asuntos crÃ­ticos de fuerza mayor.
 
 ## 19. KPIs
-Los KPIs deben tener definición estricta: *Numerador / denominador / fuente / frecuencia / responsable*.
-* **Retención MJ:** (Participantes que completan MJ / Participantes elegibles para MJ) × 100.
-* **Conversión C1 a C2 (PP%):** (Inscritos en C2 / Graduados C1) × 100.
-* **Margen Operativo:** Según fórmula y política oficial del departamento financiero corporativo.
+Los KPIs deben tener definiciÃ³n estricta: *Numerador / denominador / fuente / frecuencia / responsable*.
+* **RetenciÃ³n MJ:** (Participantes que completan MJ / Participantes elegibles para MJ) Ã— 100.
+* **ConversiÃ³n C1 a C2 (PP%):** (Inscritos en C2 / Graduados C1) Ã— 100.
+* **Margen Operativo:** SegÃºn fÃ³rmula y polÃ­tica oficial del departamento financiero corporativo.
 
 ## 20. Matriz de escalamiento
-Ante excepciones o riesgos (Nivel Rojo), la línea oficial es:
-1. Equipo de Apoyo escala a **Capitán**.
-2. Capitán / Managers escalan a **Coordinador** (C1/C2 o MJ).
+Ante excepciones o riesgos (Nivel Rojo), la lÃ­nea oficial es:
+1. Equipo de Apoyo escala a **CapitÃ¡n**.
+2. CapitÃ¡n / Managers escalan a **Coordinador** (C1/C2 o MJ).
 3. Coordinador escala a **Gerente de Sede**.
-4. Gerente de Sede escala a **Dirección General**.
+4. Gerente de Sede escala a **DirecciÃ³n General**.
 
 ## 21. Evidencias obligatorias
 Toda tarea finalizada requiere respaldo trazable:
 * Transferencias bancarias (PDF/Captura).
 * Reportes de asistencia (Lista firmada/exportada).
-* Confirmaciones logísticas (Captura de chat con proveedor o email).
-* Acuerdos de managers (Declaración firmada).
+* Confirmaciones logÃ­sticas (Captura de chat con proveedor o email).
+* Acuerdos de managers (DeclaraciÃ³n firmada).
 
 ## 22. Dashboard del Gerente
-Herramienta tecnológica que muestra en 30 segundos:
-* **HOY:** Tareas pendientes (🔴 Críticas, 🟡 Próximas, 🟢 Completadas).
-* **PRÓXIMO GATE:** Estado visual de los requisitos para avanzar a la siguiente fase operativa.
+Herramienta tecnolÃ³gica que muestra en 30 segundos:
+* **HOY:** Tareas pendientes (ðŸ”´ CrÃ­ticas, ðŸŸ¡ PrÃ³ximas, ðŸŸ¢ Completadas).
+* **PRÃ“XIMO GATE:** Estado visual de los requisitos para avanzar a la siguiente fase operativa.
 * **ACCOUNTABILITY:** Porcentaje de cumplimiento delegado a Coordinadores y Equipos.
 
 ## 23. Checklist diario
 * Revisar el Radar de Riesgos en el Dashboard.
-* Validar tareas Críticas (🔴) con fecha T- vencida.
-* Coordinar la ejecución del Top 5 acciones directas.
+* Validar tareas CrÃ­ticas (ðŸ”´) con fecha T- vencida.
+* Coordinar la ejecuciÃ³n del Top 5 acciones directas.
 
 ## 24. Checklist semanal
-* Auditoría de flujo de caja y presupuesto.
-* Reuniones de alineación rápida con Coordinadores (Estado de Gates).
+* AuditorÃ­a de flujo de caja y presupuesto.
+* Reuniones de alineaciÃ³n rÃ¡pida con Coordinadores (Estado de Gates).
 * Revisar metas heredadas (Rezagados C1).
 
 ## 25. Checklist de ciclo
 * Asegurar que el Cierre de MJ conecte inmediatamente con la apertura de metas del siguiente C1.
-* Evaluación integral de desempeño de la sede.
+* EvaluaciÃ³n integral de desempeÃ±o de la sede.
 
 ## 26. Matriz RACI
 | Proceso/Gate | Responsible (Ejecuta) | Accountable (Aprueba) | Consulted (Asesora) | Informed (Notificado) |
 | :--- | :--- | :--- | :--- | :--- |
-| **Gate T-30 Logística** | Coord. Administrativo | Gerente Sede | Dirección | Entrenador |
-| **Operación C1/C2** | Coord. C1/C2 | Gerente Sede | Capitán / Entrenador | Dirección |
-| **Operación MJ** | Coord. Maestría | Gerente Sede | Entrenador | Dirección / Managers |
-| **Meta Rezagados C1** | Coord. C1/C2 | Gerente Sede | - | Dirección / Equipo Apoyo |
+| **Gate T-30 LogÃ­stica** | Coord. Administrativo | Gerente Sede | DirecciÃ³n | Entrenador |
+| **OperaciÃ³n C1/C2** | Coord. C1/C2 | Gerente Sede | CapitÃ¡n / Entrenador | DirecciÃ³n |
+| **OperaciÃ³n MJ** | Coord. MaestrÃ­a | Gerente Sede | Entrenador | DirecciÃ³n / Managers |
+| **Meta Rezagados C1** | Coord. C1/C2 | Gerente Sede | - | DirecciÃ³n / Equipo Apoyo |
 
 ```
 
 ---
 
-### 📄 Archivo: `docs/01_Arquitectura_del_Sistema.md`
+### ðŸ“„ Archivo: `docs/01_Arquitectura_del_Sistema.md`
 
 ```text
 # 1. Arquitectura del Sistema
 
 **Frontend:** React (Vite)
 **Backend/Base de Datos:** Firebase (Firestore)
-**Autenticación:** Firebase Auth (Google)
+**AutenticaciÃ³n:** Firebase Auth (Google)
 **Hosting:** Firebase Hosting
 
-*La plataforma está diseñada con una arquitectura orientada a eventos en tiempo real, lo que permite que gerentes y coordinadores vean el progreso sincronizado al instante.*
+*La plataforma estÃ¡ diseÃ±ada con una arquitectura orientada a eventos en tiempo real, lo que permite que gerentes y coordinadores vean el progreso sincronizado al instante.*
 ```
 
 ---
 
-### 📄 Archivo: `docs/02_Modelo_de_Datos.md`
+### ðŸ“„ Archivo: `docs/02_Modelo_de_Datos.md`
 
 ```text
 # 2. Modelo de Datos
@@ -2817,22 +2821,22 @@ Estructura de Firestore:
 
 ---
 
-### 📄 Archivo: `docs/03_Mapa_de_Roles.md`
+### ðŸ“„ Archivo: `docs/03_Mapa_de_Roles.md`
 
 ```text
 # 3. Mapa de Roles (RBAC)
 
-1. **Gerente:** Visión total, asignación de metas, creación de ciclos.
-2. **Coordinador Maestría:** Checklist de maestría, gestión de metas propias.
-3. **Coordinador C1 / C2:** Checklist específico de capítulo.
-4. **Capitán:** Seguimiento de aliados, checklist de piso.
-5. **Quantum Team (QT):** Auditoría operativa en sala, checklist de soporte.
+1. **Gerente:** VisiÃ³n total, asignaciÃ³n de metas, creaciÃ³n de ciclos.
+2. **Coordinador MaestrÃ­a:** Checklist de maestrÃ­a, gestiÃ³n de metas propias.
+3. **Coordinador C1 / C2:** Checklist especÃ­fico de capÃ­tulo.
+4. **CapitÃ¡n:** Seguimiento de aliados, checklist de piso.
+5. **Quantum Team (QT):** AuditorÃ­a operativa en sala, checklist de soporte.
 
 ```
 
 ---
 
-### 📄 Archivo: `docs/04_Mapa_de_Permisos.md`
+### ðŸ“„ Archivo: `docs/04_Mapa_de_Permisos.md`
 
 ```text
 # 4. Mapa de Permisos
@@ -2847,7 +2851,7 @@ Estructura de Firestore:
 
 ---
 
-### 📄 Archivo: `docs/05_Flujo_de_Ciclos.md`
+### ðŸ“„ Archivo: `docs/05_Flujo_de_Ciclos.md`
 
 ```text
 # 5. Flujo de Ciclos
@@ -2855,23 +2859,23 @@ Estructura de Firestore:
 El ciclo es la unidad de tiempo central.
 
 1. **Inicio:** Se define la fecha del C1.
-2. **Preparación (Pre-C1):** Tareas de confirmación, pagos y logística.
-3. **Ejecución (C1):** Operación de fin de semana.
-4. **Seguimiento (Post-C1/Pre-C2):** Seguimiento a indecisos y confirmación para C2.
-5. **Ejecución (C2):** Fin de semana del C2.
-6. **Cierre:** Consolidación, maestría y apertura del nuevo ciclo.
+2. **PreparaciÃ³n (Pre-C1):** Tareas de confirmaciÃ³n, pagos y logÃ­stica.
+3. **EjecuciÃ³n (C1):** OperaciÃ³n de fin de semana.
+4. **Seguimiento (Post-C1/Pre-C2):** Seguimiento a indecisos y confirmaciÃ³n para C2.
+5. **EjecuciÃ³n (C2):** Fin de semana del C2.
+6. **Cierre:** ConsolidaciÃ³n, maestrÃ­a y apertura del nuevo ciclo.
 
 ```
 
 ---
 
-### 📄 Archivo: `docs/06_Manual_Usuario.md`
+### ðŸ“„ Archivo: `docs/06_Manual_Usuario.md`
 
 ```text
 # 6. Manual de Usuario
 
 1. **Ingresar:** Pulsa en 'Continuar con Google'.
-2. **Pantalla Principal (Mi Día):** Revisa tus prioridades urgentes.
+2. **Pantalla Principal (Mi DÃ­a):** Revisa tus prioridades urgentes.
 3. **Mi Checklist:** Marca tus tareas a medida que las completes. Si requieren evidencia, sube el archivo.
 4. **Mis Metas:** Actualiza el % de avance de tus indicadores.
 
@@ -2879,95 +2883,95 @@ El ciclo es la unidad de tiempo central.
 
 ---
 
-### 📄 Archivo: `docs/07_Manual_Administrador.md`
+### ðŸ“„ Archivo: `docs/07_Manual_Administrador.md`
 
 ```text
 # 7. Manual del Administrador (Gerente)
 
-1. **Crear Ciclo:** Ve a Configuración > Ciclos > Nuevo.
-2. **Panel Gerencial:** Revisa los semáforos de cumplimiento (Verde, Naranja, Rojo).
+1. **Crear Ciclo:** Ve a ConfiguraciÃ³n > Ciclos > Nuevo.
+2. **Panel Gerencial:** Revisa los semÃ¡foros de cumplimiento (Verde, Naranja, Rojo).
 3. **Auditar Evidencias:** Entra al perfil de un coordinador y revisa los archivos adjuntos en sus tareas marcadas.
 
 ```
 
 ---
 
-### 📄 Archivo: `docs/08_Configuracion_Checklists.md`
+### ðŸ“„ Archivo: `docs/08_Configuracion_Checklists.md`
 
 ```text
-# 8. Configuración de Checklists
+# 8. ConfiguraciÃ³n de Checklists
 
-Las plantillas base están en `src/data/checklistData.js`.
-Próximamente se migrarán a Firebase para que el Gerente pueda agregar, editar o eliminar tareas desde la interfaz sin tocar código.
+Las plantillas base estÃ¡n en `src/data/checklistData.js`.
+PrÃ³ximamente se migrarÃ¡n a Firebase para que el Gerente pueda agregar, editar o eliminar tareas desde la interfaz sin tocar cÃ³digo.
 
 ```
 
 ---
 
-### 📄 Archivo: `docs/09_Lista_Funcionalidades.md`
+### ðŸ“„ Archivo: `docs/09_Lista_Funcionalidades.md`
 
 ```text
 # 9. Lista de Funcionalidades (Implementadas)
 
-- [x] Autenticación segura vía Google Auth (restringida a dominio y superadmins).
-- [x] Sincronización en tiempo real con Firestore para Metas, Tareas y Correos.
+- [x] AutenticaciÃ³n segura vÃ­a Google Auth (restringida a dominio y superadmins).
+- [x] SincronizaciÃ³n en tiempo real con Firestore para Metas, Tareas y Correos.
 - [x] Reglas de seguridad robustas implementadas a nivel de base de datos (`firestore.rules`).
-- [x] Dashboard "30 Segundos" para Gerentes con priorización Top 5 de tareas críticas.
-- [x] Wizard interactivo para Metas de Ciclo (Capítulos y MJ) y Metas Diarias.
+- [x] Dashboard "30 Segundos" para Gerentes con priorizaciÃ³n Top 5 de tareas crÃ­ticas.
+- [x] Wizard interactivo para Metas de Ciclo (CapÃ­tulos y MJ) y Metas Diarias.
 - [x] Demonio de correo seguro con Node.js y Nodemailer.
 
 ```
 
 ---
 
-### 📄 Archivo: `docs/10_Funcionalidades_Pendientes.md`
+### ðŸ“„ Archivo: `docs/10_Funcionalidades_Pendientes.md`
 
 ```text
 # 10. Funcionalidades Pendientes (Roadmap)
 
-- [ ] Integración con WhatsApp API para alertas automatizadas.
-- [ ] Dashboards analíticos avanzados de productividad a largo plazo.
-- [ ] Refinamiento del módulo de Evidencias (validaciones automatizadas).
+- [ ] IntegraciÃ³n con WhatsApp API para alertas automatizadas.
+- [ ] Dashboards analÃ­ticos avanzados de productividad a largo plazo.
+- [ ] Refinamiento del mÃ³dulo de Evidencias (validaciones automatizadas).
 
 ```
 
 ---
 
-### 📄 Archivo: `docs/11_Pruebas_Realizadas.md`
+### ðŸ“„ Archivo: `docs/11_Pruebas_Realizadas.md`
 
 ```text
 # 11. Pruebas Realizadas
 
 - Pruebas UI/UX: Interfaz Glassmorphism validada.
-- Pruebas Estado: Cambio de estados de tareas y recálculo de progreso % funcionales en entorno local.
+- Pruebas Estado: Cambio de estados de tareas y recÃ¡lculo de progreso % funcionales en entorno local.
 
 ```
 
 ---
 
-### 📄 Archivo: `docs/12_Riesgos_Detectados.md`
+### ðŸ“„ Archivo: `docs/12_Riesgos_Detectados.md`
 
 ```text
 # 12. Riesgos Detectados (Mitigados)
 
-- **Contraseñas en código:** Mitigado implementando variables de entorno en `mailerDaemon.js`.
-- **Fuga de autenticación:** Mitigado cerrando la brecha de `.*@gmail\.com$` en las Reglas de Firebase.
-- **Acceso horizontal de colecciones:** Mitigado asociando la verificación de privilegios a la consulta de Roles (Custom Claims en base de datos) en `firestore.rules`.
-- **Fuga de datos públicos:** Mitigado moviendo el directorio en duro de `usersData.js` hacia Firestore directamente.
+- **ContraseÃ±as en cÃ³digo:** Mitigado implementando variables de entorno en `mailerDaemon.js`.
+- **Fuga de autenticaciÃ³n:** Mitigado cerrando la brecha de `.*@gmail\.com$` en las Reglas de Firebase.
+- **Acceso horizontal de colecciones:** Mitigado asociando la verificaciÃ³n de privilegios a la consulta de Roles (Custom Claims en base de datos) en `firestore.rules`.
+- **Fuga de datos pÃºblicos:** Mitigado moviendo el directorio en duro de `usersData.js` hacia Firestore directamente.
 
 ```
 
 ---
 
-### 📄 Archivo: `docs/13_Instrucciones_Despliegue.md`
+### ðŸ“„ Archivo: `docs/13_Instrucciones_Despliegue.md`
 
 ```text
 # 13. Instrucciones de Despliegue
 
-Para poner esta aplicación en vivo y accesible desde cualquier navegador:
+Para poner esta aplicaciÃ³n en vivo y accesible desde cualquier navegador:
 
 1. Instalar Firebase CLI: `npm install -g firebase-tools`.
-2. Iniciar sesión: `firebase login`.
+2. Iniciar sesiÃ³n: `firebase login`.
 3. Inicializar: `firebase init hosting`.
 4. Construir app: `npm run build`.
 5. Desplegar: `firebase deploy`.
@@ -2976,167 +2980,167 @@ Para poner esta aplicación en vivo y accesible desde cualquier navegador:
 
 ---
 
-### 📄 Archivo: `docs/14_Instrucciones_Mantenimiento.md`
+### ðŸ“„ Archivo: `docs/14_Instrucciones_Mantenimiento.md`
 
 ```text
 # 14. Instrucciones de Mantenimiento
 
-- Revisar la consola de Firebase (`console.firebase.google.com`) mensualmente para monitorear uso y costos (el plan gratuito Spark suele ser más que suficiente).
+- Revisar la consola de Firebase (`console.firebase.google.com`) mensualmente para monitorear uso y costos (el plan gratuito Spark suele ser mÃ¡s que suficiente).
 - Actualizar dependencias `npm update` al menos cada 6 meses por temas de seguridad.
 
 ```
 
 ---
 
-### 📄 Archivo: `docs/MASTER_CHECKLIST_OPERATIVO_GERENTE_SEDE_V1.md`
+### ðŸ“„ Archivo: `docs/MASTER_CHECKLIST_OPERATIVO_GERENTE_SEDE_V1.md`
 
 ```text
-# 📋 MASTER CHECKLIST OPERATIVO DEL GERENTE DE SEDE
-## SISTEMA DE GESTIÓN DEL CICLO OPERATIVO — CREAR PODER SIN LÍMITES (SO-AR)
-**Versión:** `1.0 Oficial Corporativa`  
-**Código del Documento:** `CPSL-OPS-MCH-01`  
-**Aprobación:** Dirección Ejecutiva & Gerencia Global  
-**Ámbito de Aplicación:** Todas las Sedes Operativas (Lima, Quito Ciclo 1, Quito Ciclo 2, Cuenca, Guayaquil, Medellín, México)
+# ðŸ“‹ MASTER CHECKLIST OPERATIVO DEL GERENTE DE SEDE
+## SISTEMA DE GESTIÃ“N DEL CICLO OPERATIVO â€” CREAR PODER SIN LÃMITES (SO-AR)
+**VersiÃ³n:** `1.0 Oficial Corporativa`  
+**CÃ³digo del Documento:** `CPSL-OPS-MCH-01`  
+**AprobaciÃ³n:** DirecciÃ³n Ejecutiva & Gerencia Global  
+**Ãmbito de AplicaciÃ³n:** Todas las Sedes Operativas (Lima, Quito Ciclo 1, Quito Ciclo 2, Cuenca, Guayaquil, MedellÃ­n, MÃ©xico)
 
 ---
 
-## 01. PROPÓSITO
-Establecer el estándar operativo corporativo oficial, sin ambigüedades, que rige la planificación, ejecución, control financiero, supervisión logística y cierre de cada ciclo operativo en cada sede de CREAR PODER SIN LÍMITES. 
+## 01. PROPÃ“SITO
+Establecer el estÃ¡ndar operativo corporativo oficial, sin ambigÃ¼edades, que rige la planificaciÃ³n, ejecuciÃ³n, control financiero, supervisiÃ³n logÃ­stica y cierre de cada ciclo operativo en cada sede de CREAR PODER SIN LÃMITES. 
 
-El presente manual y checklist maestro transforma la gestión de sede en un sistema de **alto rendimiento, trazabilidad total y accountability estricto**, garantizando que cada resultado crítico cuente con un responsable único, una fecha límite relativa al ciclo, evidencias obligatorias verificables y reglas claras de escalamiento.
+El presente manual y checklist maestro transforma la gestiÃ³n de sede en un sistema de **alto rendimiento, trazabilidad total y accountability estricto**, garantizando que cada resultado crÃ­tico cuente con un responsable Ãºnico, una fecha lÃ­mite relativa al ciclo, evidencias obligatorias verificables y reglas claras de escalamiento.
 
 ---
 
 ## 02. ALCANCE
 Aplica obligatoriamente a:
 1. **Gerentes de Sede:** Como responsables ejecutivos integrales del ciclo operativo.
-2. **Coordinadores de Capítulo 1 y Capítulo 2 (C1 / C2):** En sus fases de convocatoria, enrolamiento, logística de sala y seguimiento.
-3. **Coordinadores de Maestría del Juego (MJ):** En la estructura de los 3 FDS, retiro "El Viaje", managers y graduaciones.
-4. **Equipo de Apoyo y Facilitación (Staff de Entrenamiento):** En el montaje, sala, acústica, acreditación y soporte de participantes.
-5. **Dirección Global y Finanzas:** En la auditoría de presupuestos, metas heredadas y cumplimiento de estándares.
+2. **Coordinadores de CapÃ­tulo 1 y CapÃ­tulo 2 (C1 / C2):** En sus fases de convocatoria, enrolamiento, logÃ­stica de sala y seguimiento.
+3. **Coordinadores de MaestrÃ­a del Juego (MJ):** En la estructura de los 3 FDS, retiro "El Viaje", managers y graduaciones.
+4. **Equipo de Apoyo y FacilitaciÃ³n (Staff de Entrenamiento):** En el montaje, sala, acÃºstica, acreditaciÃ³n y soporte de participantes.
+5. **DirecciÃ³n Global y Finanzas:** En la auditorÃ­a de presupuestos, metas heredadas y cumplimiento de estÃ¡ndares.
 
 ---
 
-## 03. DEFINICIÓN OFICIAL DEL CICLO OPERATIVO
+## 03. DEFINICIÃ“N OFICIAL DEL CICLO OPERATIVO
 
-> **CICLO OPERATIVO:** Período comprendido entre una Maestría del Juego y la siguiente Maestría del Juego, dentro del cual la sede ejecuta secuencialmente Capítulo 1, Capítulo 2 y Maestría del Juego.
+> **CICLO OPERATIVO:** PerÃ­odo comprendido entre una MaestrÃ­a del Juego y la siguiente MaestrÃ­a del Juego, dentro del cual la sede ejecuta secuencialmente CapÃ­tulo 1, CapÃ­tulo 2 y MaestrÃ­a del Juego.
 
 ### Flujo Continuo del Ciclo
 ```
-┌────────────────────────────────────────────────────────────────────────┐
-│                        CICLO OPERATIVO MAESTRO                         │
-│                                                                        │
-│   [ MAESTRÍA (MJ) ]  ──►  [ CAPÍTULO 1 (C1) ]  ──►  [ CAPÍTULO 2 (C2) ]│
-│           │                                                │           │
-│           └───────────◄── [ NUEVO CICLO: MJ ] ◄────────────┘           │
-└────────────────────────────────────────────────────────────────────────┘
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚                        CICLO OPERATIVO MAESTRO                         â”‚
+â”‚                                                                        â”‚
+â”‚   [ MAESTRÃA (MJ) ]  â”€â”€â–º  [ CAPÃTULO 1 (C1) ]  â”€â”€â–º  [ CAPÃTULO 2 (C2) ]â”‚
+â”‚           â”‚                                                â”‚           â”‚
+â”‚           â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â—„â”€â”€ [ NUEVO CICLO: MJ ] â—„â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜           â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 ```
 
 Cada entrenamiento dentro del ciclo se descompone en 3 fases:
-* **Pre-Entrenamiento:** Planificación y preparación desde T-30 días hasta T-1 día.
-* **Ejecución:** Operación presencial en sala durante el fin de semana (Viernes, Sábado y Domingo).
-* **Post-Entrenamiento:** Balance financiero, auditoría de participantes, autopsia operativa y traspaso de metas (T+1 a T+7 días).
+* **Pre-Entrenamiento:** PlanificaciÃ³n y preparaciÃ³n desde T-30 dÃ­as hasta T-1 dÃ­a.
+* **EjecuciÃ³n:** OperaciÃ³n presencial en sala durante el fin de semana (Viernes, SÃ¡bado y Domingo).
+* **Post-Entrenamiento:** Balance financiero, auditorÃ­a de participantes, autopsia operativa y traspaso de metas (T+1 a T+7 dÃ­as).
 
 ---
 
 ## 04. ROL Y RESPONSABILIDADES DEL GERENTE DE SEDE
 
-### Definición Oficial del Cargo:
+### DefiniciÃ³n Oficial del Cargo:
 **Responsable Ejecutivo del Ciclo Operativo**
 
-### Propósito del Cargo:
-> Asegurar que cada ciclo operativo de la sede se ejecute de manera ordenada, rentable, segura, trazable y conforme a los estándares corporativos, garantizando que cada área tenga responsables claros, recursos disponibles, metas definidas y resultados medibles.
+### PropÃ³sito del Cargo:
+> Asegurar que cada ciclo operativo de la sede se ejecute de manera ordenada, rentable, segura, trazable y conforme a los estÃ¡ndares corporativos, garantizando que cada Ã¡rea tenga responsables claros, recursos disponibles, metas definidas y resultados medibles.
 
 ### La Regla de Oro del Gerente:
-> **El Gerente de Sede no es el ejecutor de todas las tareas de la sede. Es el responsable de asegurar que cada resultado crítico tenga un dueño, una fecha, recursos suficientes, evidencia y seguimiento hasta su cierre.**
+> **El Gerente de Sede no es el ejecutor de todas las tareas de la sede. Es el responsable de asegurar que cada resultado crÃ­tico tenga un dueÃ±o, una fecha, recursos suficientes, evidencia y seguimiento hasta su cierre.**
 
 ---
 
 ## 05. PRINCIPIOS DE ACCOUNTABILITY CORPORATIVO
 
-Para erradicar la ambigüedad donde dos personas asumen que la otra ejecutará una labor, **toda tarea en el sistema debe contener obligatoriamente 8 atributos:**
+Para erradicar la ambigÃ¼edad donde dos personas asumen que la otra ejecutarÃ¡ una labor, **toda tarea en el sistema debe contener obligatoriamente 8 atributos:**
 
-| Atributo | Definición |
+| Atributo | DefiniciÃ³n |
 | :--- | :--- |
-| **1. Resultado Esperado** | Qué entregable tangible o condición verificada se debe alcanzar (no una actividad vaga). |
-| **2. Responsable Único** | Una sola persona con nombre, apellido y rol asignado. |
-| **3. Fecha Límite (Deadline)** | Momento temporal exacto calculado a partir de la lógica T- (relativo al entrenamiento). |
-| **4. Frecuencia** | Única por ciclo, diaria, semanal o por hito. |
-| **5. Dependencia** | Qué condición previa debe estar cumplida antes de iniciar. |
+| **1. Resultado Esperado** | QuÃ© entregable tangible o condiciÃ³n verificada se debe alcanzar (no una actividad vaga). |
+| **2. Responsable Ãšnico** | Una sola persona con nombre, apellido y rol asignado. |
+| **3. Fecha LÃ­mite (Deadline)** | Momento temporal exacto calculado a partir de la lÃ³gica T- (relativo al entrenamiento). |
+| **4. Frecuencia** | Ãšnica por ciclo, diaria, semanal o por hito. |
+| **5. Dependencia** | QuÃ© condiciÃ³n previa debe estar cumplida antes de iniciar. |
 | **6. Evidencia Obligatoria** | Documento, factura, itinerario, foto o acta que valida el cumplimiento. |
 | **7. Estado Operativo** | Pendiente, En proceso, Completado, Vencido, Bloqueado o Requiere Escalamiento. |
-| **8. Canal de Escalamiento** | A quién se notifica de inmediato si se detecta un desvío o retraso. |
+| **8. Canal de Escalamiento** | A quiÃ©n se notifica de inmediato si se detecta un desvÃ­o o retraso. |
 
 ---
 
-## 06. ESTADOS OPERATIVOS ESTÁNDAR
+## 06. ESTADOS OPERATIVOS ESTÃNDAR
 
 La plataforma digital y el panel de control clasifican cada tarea en 6 estados oficiales:
 
-* 🔵 **Pendiente:** Tarea programada cuya fecha límite aún no se alcanza y no ha iniciado.
-* 🟡 **En Proceso:** Cuenta con responsable asignado y se encuentra en ejecución activa.
-* 🟢 **Completado:** Resultado final alcanzado y evidencia verificada por supervisión.
-* 🔴 **Vencido:** La fecha límite expiró sin haberse obtenido el resultado o la evidencia.
-* ⚫ **Bloqueado:** Existe una dependencia externa no resuelta que impide avanzar.
-* 🟠 **Requiere Escalamiento:** El responsable no puede resolver la traba y requiere intervención gerencial inmediata.
+* ðŸ”µ **Pendiente:** Tarea programada cuya fecha lÃ­mite aÃºn no se alcanza y no ha iniciado.
+* ðŸŸ¡ **En Proceso:** Cuenta con responsable asignado y se encuentra en ejecuciÃ³n activa.
+* ðŸŸ¢ **Completado:** Resultado final alcanzado y evidencia verificada por supervisiÃ³n.
+* ðŸ”´ **Vencido:** La fecha lÃ­mite expirÃ³ sin haberse obtenido el resultado o la evidencia.
+* âš« **Bloqueado:** Existe una dependencia externa no resuelta que impide avanzar.
+* ðŸŸ  **Requiere Escalamiento:** El responsable no puede resolver la traba y requiere intervenciÃ³n gerencial inmediata.
 
 ---
 
-## 07. LÓGICA DE TIEMPO RELATIVO AL CICLO (NOTACIÓN T-)
+## 07. LÃ“GICA DE TIEMPO RELATIVO AL CICLO (NOTACIÃ“N T-)
 
 El sistema automatiza todas las fechas del calendario a partir de los hitos del entrenamiento:
 
-| Notación | Momento Temporal | Enfoque Principal |
+| NotaciÃ³n | Momento Temporal | Enfoque Principal |
 | :--- | :--- | :--- |
-| **T-30** | 30 días antes del inicio | Gate de Entrenador, Salón y Logística Crítica. |
-| **T-21** | 21 días antes del inicio | Presupuesto preliminar, revisión de convocatoria y primer corte. |
-| **T-14** | 14 días antes del inicio | Confirmación de materiales, equipo de apoyo y balance de llamadas. |
-| **T-7** | 7 días antes del inicio | Gate Logístico: salones, listas de enrolados, gafetes y viáticos. |
-| **T-3** | 3 días antes del inicio | Cierre de pagos de participantes, confirmación de vuelo/hotel de entrenador. |
-| **T-1** | 1 día antes del inicio | Montaje de sala, prueba técnica de audio, micrófonos y acreditación. |
-| **Día 1, 2, 3** | Durante el entrenamiento | Operación de sala, control de asistencia, dinámicas y soporte. |
-| **T+1** | Día siguiente al cierre | Traspaso de indecisos, balances de egresos preliminares. |
-| **T+3** | 3 días después del cierre | Liquidación financiera completa y conciliación de caja. |
-| **T+7** | 7 días después del cierre | Reunión de Autopsia Operativa y balance de Metas Heredadas. |
+| **T-30** | 30 dÃ­as antes del inicio | Gate de Entrenador, SalÃ³n y LogÃ­stica CrÃ­tica. |
+| **T-21** | 21 dÃ­as antes del inicio | Presupuesto preliminar, revisiÃ³n de convocatoria y primer corte. |
+| **T-14** | 14 dÃ­as antes del inicio | ConfirmaciÃ³n de materiales, equipo de apoyo y balance de llamadas. |
+| **T-7** | 7 dÃ­as antes del inicio | Gate LogÃ­stico: salones, listas de enrolados, gafetes y viÃ¡ticos. |
+| **T-3** | 3 dÃ­as antes del inicio | Cierre de pagos de participantes, confirmaciÃ³n de vuelo/hotel de entrenador. |
+| **T-1** | 1 dÃ­a antes del inicio | Montaje de sala, prueba tÃ©cnica de audio, micrÃ³fonos y acreditaciÃ³n. |
+| **DÃ­a 1, 2, 3** | Durante el entrenamiento | OperaciÃ³n de sala, control de asistencia, dinÃ¡micas y soporte. |
+| **T+1** | DÃ­a siguiente al cierre | Traspaso de indecisos, balances de egresos preliminares. |
+| **T+3** | 3 dÃ­as despuÃ©s del cierre | LiquidaciÃ³n financiera completa y conciliaciÃ³n de caja. |
+| **T+7** | 7 dÃ­as despuÃ©s del cierre | ReuniÃ³n de Autopsia Operativa y balance de Metas Heredadas. |
 
 ---
 
 ## 08. GATES DE CONTROL CORPORATIVO
 
-Un **Gate de Control** es un punto de validación obligatorio y no negociable. Si no se cumplen el 100% de los requisitos del Gate, el evento cambia automáticamente a estado de alerta.
+Un **Gate de Control** es un punto de validaciÃ³n obligatorio y no negociable. Si no se cumplen el 100% de los requisitos del Gate, el evento cambia automÃ¡ticamente a estado de alerta.
 
 ---
 
-### 🛑 GATE T-30 — ENTRENADOR Y LOGÍSTICA CRÍTICA
-**Plazo Límite:** Exactamente 30 días antes del inicio del entrenamiento.  
+### ðŸ›‘ GATE T-30 â€” ENTRENADOR Y LOGÃSTICA CRÃTICA
+**Plazo LÃ­mite:** Exactamente 30 dÃ­as antes del inicio del entrenamiento.  
 **Responsable:** Gerente de Sede.  
-**Regla:** *Si este Gate no está al 100%, el entrenamiento pasa a estado AMARILLO y se emite alerta a Dirección Global.*
+**Regla:** *Si este Gate no estÃ¡ al 100%, el entrenamiento pasa a estado AMARILLO y se emite alerta a DirecciÃ³n Global.*
 
 **Checklist del Gate T-30:**
-* [ ] **Entrenador Titular:** Confirmado formalmente con carta/contrato de asignación.
+* [ ] **Entrenador Titular:** Confirmado formalmente con carta/contrato de asignaciÃ³n.
 * [ ] **Honorarios Profesionales:** Monto acordado y calendario de desembolso aprobado por Finanzas.
-* [ ] **Salón Principal de Entrenamiento:** Contrato firmado y reserva garantizada según política de sede.
-* [ ] **Hotel del Entrenador:** Reserva confirmada en hotel oficial (ej. Hotel José Antonio Deluxe en Miraflores para Lima).
-* [ ] **Itinerario de Vuelos:** Boletos aéreos comprados y emitidos con equipaje correspondiente.
-* [ ] **Transporte Terrestre:** Chofer / traslado aeropuerto-hotel-salón programado con nombre y contacto.
+* [ ] **SalÃ³n Principal de Entrenamiento:** Contrato firmado y reserva garantizada segÃºn polÃ­tica de sede.
+* [ ] **Hotel del Entrenador:** Reserva confirmada en hotel oficial (ej. Hotel JosÃ© Antonio Deluxe en Miraflores para Lima).
+* [ ] **Itinerario de Vuelos:** Boletos aÃ©reos comprados y emitidos con equipaje correspondiente.
+* [ ] **Transporte Terrestre:** Chofer / traslado aeropuerto-hotel-salÃ³n programado con nombre y contacto.
 * [ ] **Presupuesto Base:** Hoja de costos del fin de semana cargada y validada.
 * [ ] **Evidencias en Sistema:** Reservas, boletos y contratos adjuntos en la plataforma.
 
 ---
 
-### 🛑 GATE DE TRANSICIÓN C2 → MJ (VIERNES DE C2)
-**Plazo Límite:** Viernes de Capítulo 2 a las 18:00 horas.  
-**Responsable Conjunto:** Coordinador de Maestría (CMJ) & Gerente de Sede.  
-**Regla:** *Asegura la continuidad operativa entre el cierre de C2 y la estructura de los 3 FDS de Maestría.*
+### ðŸ›‘ GATE DE TRANSICIÃ“N C2 â†’ MJ (VIERNES DE C2)
+**Plazo LÃ­mite:** Viernes de CapÃ­tulo 2 a las 18:00 horas.  
+**Responsable Conjunto:** Coordinador de MaestrÃ­a (CMJ) & Gerente de Sede.  
+**Regla:** *Asegura la continuidad operativa entre el cierre de C2 y la estructura de los 3 FDS de MaestrÃ­a.*
 
-**Checklist del Gate C2 → MJ:**
-* [ ] **Managers Asignados:** Lista oficial de los managers para los 3 FDS de Maestría completada.
-* [ ] **Managers por FDS:** Manager líder y co-manager asignados por cada fin de semana.
-* [ ] **Entrenador de Maestría:** Asignación confirmada y coordinada para cada módulo.
-* [ ] **Groundings Confirmados:** Fechas y salas de preparación de managers agendadas.
+**Checklist del Gate C2 â†’ MJ:**
+* [ ] **Managers Asignados:** Lista oficial de los managers para los 3 FDS de MaestrÃ­a completada.
+* [ ] **Managers por FDS:** Manager lÃ­der y co-manager asignados por cada fin de semana.
+* [ ] **Entrenador de MaestrÃ­a:** AsignaciÃ³n confirmada y coordinada para cada mÃ³dulo.
+* [ ] **Groundings Confirmados:** Fechas y salas de preparaciÃ³n de managers agendadas.
 * [ ] **Retiro "El Viaje":** Sede de campo confirmada y reservada (ej. Hostal Sol y Luna en Cieneguilla para Lima).
-* [ ] **Comunicación de Meta de Rezagados C1:** El Gerente publica en el sistema la meta oficial de rezagados de C1 a sentar en el siguiente ciclo.
-* [ ] **Asignación de Dueño de Meta:** Registro del coordinador o capitán responsable de la meta de rezagados con fecha de seguimiento semanal.
+* [ ] **ComunicaciÃ³n de Meta de Rezagados C1:** El Gerente publica en el sistema la meta oficial de rezagados de C1 a sentar en el siguiente ciclo.
+* [ ] **AsignaciÃ³n de DueÃ±o de Meta:** Registro del coordinador o capitÃ¡n responsable de la meta de rezagados con fecha de seguimiento semanal.
 
 ---
 
@@ -3146,28 +3150,28 @@ Un **Gate de Control** es un punto de validación obligatorio y no negociable. S
 
 | Hito | Tarea / Resultado Esperado | Responsable | Deadline | Evidencia Obligatoria | Escalamiento |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **T-30** | Confirmar y asegurar Entrenador, Salón, Vuelos y Hotel | Gerente | T-30 días | Contratos, Itinerarios y Reservas | Dirección Global |
-| **T-21** | Validación de presupuesto de operación y punto de equilibrio | Gerente | T-21 días | Hoja de Presupuesto aprobada | Finanzas Global |
-| **T-14** | Convocatoria y conformación del Equipo de Apoyo en Sala | Coordinador C1/MJ | T-14 días | Lista de Staff confirmada | Gerente de Sede |
-| **T-14** | Inventario físico de insumos, papelería y botiquín | Equipo de Apoyo | T-14 días | Acta de Inventario de Sede | Gerente de Sede |
-| **T-7** | Corte formal de participantes inscritos y balance de llamadas | Coordinador C1/C2 | T-7 días | Reporte oficial de inscritos | Gerente de Sede |
-| **T-7** | Envío de orden de gafetes, manuales y materiales de impresión | Gerente | T-7 días | Orden de producción y muestras | Finanzas Global |
-| **T-3** | Verificación de depósito final / viáticos y check-in del entrenador | Gerente | T-3 días | Pases de abordar y voucher de hotel | Dirección Global |
-| **T-3** | Cierre de confirmaciones telefónicas y logística especial | Coordinador C1/C2 | T-3 días | Base de datos con estado 100% OK | Gerente de Sede |
-| **T-1** | Montaje de salón, alineación de sillas, acústica y pruebas de audio | Equipo de Apoyo | T-1 (18:00h) | Check visual y prueba de sonido OK | Gerente de Sede |
-| **T-1** | Recepción del entrenador en aeropuerto y traslado a hotel | Gerente / Chofer | T-1 (Llegada) | Reporte de llegada a hotel OK | Dirección Global |
+| **T-30** | Confirmar y asegurar Entrenador, SalÃ³n, Vuelos y Hotel | Gerente | T-30 dÃ­as | Contratos, Itinerarios y Reservas | DirecciÃ³n Global |
+| **T-21** | ValidaciÃ³n de presupuesto de operaciÃ³n y punto de equilibrio | Gerente | T-21 dÃ­as | Hoja de Presupuesto aprobada | Finanzas Global |
+| **T-14** | Convocatoria y conformaciÃ³n del Equipo de Apoyo en Sala | Coordinador C1/MJ | T-14 dÃ­as | Lista de Staff confirmada | Gerente de Sede |
+| **T-14** | Inventario fÃ­sico de insumos, papelerÃ­a y botiquÃ­n | Equipo de Apoyo | T-14 dÃ­as | Acta de Inventario de Sede | Gerente de Sede |
+| **T-7** | Corte formal de participantes inscritos y balance de llamadas | Coordinador C1/C2 | T-7 dÃ­as | Reporte oficial de inscritos | Gerente de Sede |
+| **T-7** | EnvÃ­o de orden de gafetes, manuales y materiales de impresiÃ³n | Gerente | T-7 dÃ­as | Orden de producciÃ³n y muestras | Finanzas Global |
+| **T-3** | VerificaciÃ³n de depÃ³sito final / viÃ¡ticos y check-in del entrenador | Gerente | T-3 dÃ­as | Pases de abordar y voucher de hotel | DirecciÃ³n Global |
+| **T-3** | Cierre de confirmaciones telefÃ³nicas y logÃ­stica especial | Coordinador C1/C2 | T-3 dÃ­as | Base de datos con estado 100% OK | Gerente de Sede |
+| **T-1** | Montaje de salÃ³n, alineaciÃ³n de sillas, acÃºstica y pruebas de audio | Equipo de Apoyo | T-1 (18:00h) | Check visual y prueba de sonido OK | Gerente de Sede |
+| **T-1** | RecepciÃ³n del entrenador en aeropuerto y traslado a hotel | Gerente / Chofer | T-1 (Llegada) | Reporte de llegada a hotel OK | DirecciÃ³n Global |
 
 ---
 
-### FASE 2: EJECUCIÓN DEL ENTRENAMIENTO (DÍAS 1, 2 Y 3)
+### FASE 2: EJECUCIÃ“N DEL ENTRENAMIENTO (DÃAS 1, 2 Y 3)
 
 | Momento | Tarea / Resultado Esperado | Responsable | Deadline | Evidencia Obligatoria | Escalamiento |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Viernes AM** | Apertura de acreditaciones y entrega de gafetes | Equipo de Apoyo | 08:00h | Lista de asistencia firmada | Gerente de Sede |
-| **Viernes PM** | Reporte de sentados reales vs meta del ciclo | Gerente | 14:00h | Reporte FDS enviado al sistema | Dirección Global |
-| **Sábado** | Supervisión de refrigerios, hidratación y tiempos de sesión | Equipo de Apoyo | Continuo | Bitácora de tiempos de sala | Gerente de Sede |
-| **Sábado Noche** | Balance de cobranza de saldos y confirmación para C2 | Coordinador C1/C2 | 21:00h | Cuadre de caja de inscripciones | Gerente de Sede |
-| **Domingo** | Coordinación de ceremonia de cierre y graduación | Equipo de Apoyo | 17:00h | Salón de invitados listo | Gerente de Sede |
+| **Viernes PM** | Reporte de sentados reales vs meta del ciclo | Gerente | 14:00h | Reporte FDS enviado al sistema | DirecciÃ³n Global |
+| **SÃ¡bado** | SupervisiÃ³n de refrigerios, hidrataciÃ³n y tiempos de sesiÃ³n | Equipo de Apoyo | Continuo | BitÃ¡cora de tiempos de sala | Gerente de Sede |
+| **SÃ¡bado Noche** | Balance de cobranza de saldos y confirmaciÃ³n para C2 | Coordinador C1/C2 | 21:00h | Cuadre de caja de inscripciones | Gerente de Sede |
+| **Domingo** | CoordinaciÃ³n de ceremonia de cierre y graduaciÃ³n | Equipo de Apoyo | 17:00h | SalÃ³n de invitados listo | Gerente de Sede |
 | **Domingo Cierre**| Registro formal de desertores, graduados y enrolados al siguiente nivel | Coordinador C1/MJ | 21:00h | Acta de Cierre de Entrenamiento | Gerente de Sede |
 
 ---
@@ -3177,10 +3181,10 @@ Un **Gate de Control** es un punto de validación obligatorio y no negociable. S
 | Hito | Tarea / Resultado Esperado | Responsable | Deadline | Evidencia Obligatoria | Escalamiento |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **T+1** | Traspaso inmediato de lista de participantes indecisos al equipo | Coordinador C1/C2 | Lunes 12:00h | Lista asignada en CRM / Sistema | Gerente de Sede |
-| **T+3** | Conciliación total de ingresos, egresos y depósitos bancarios | Gerente | Miércoles 18:00h | Balance Financiero de Sede firmado | Finanzas Global |
-| **T+3** | Pago y finiquito de servicios de hotel, salón y proveedores | Gerente | Miércoles 18:00h | Comprobantes de pago cargados | Finanzas Global |
-| **T+7** | Reunión de Autopsia Operativa (Lecciones Aprendidas) | Gerente | Viernes 17:00h | Minuta de Autopsia con acuerdos | Dirección Global |
-| **T+7** | Alta de Metas Heredadas en el nuevo ciclo operativo | Gerente | Viernes 19:00h | Metas registradas en SO-AR | Dirección Global |
+| **T+3** | ConciliaciÃ³n total de ingresos, egresos y depÃ³sitos bancarios | Gerente | MiÃ©rcoles 18:00h | Balance Financiero de Sede firmado | Finanzas Global |
+| **T+3** | Pago y finiquito de servicios de hotel, salÃ³n y proveedores | Gerente | MiÃ©rcoles 18:00h | Comprobantes de pago cargados | Finanzas Global |
+| **T+7** | ReuniÃ³n de Autopsia Operativa (Lecciones Aprendidas) | Gerente | Viernes 17:00h | Minuta de Autopsia con acuerdos | DirecciÃ³n Global |
+| **T+7** | Alta de Metas Heredadas en el nuevo ciclo operativo | Gerente | Viernes 19:00h | Metas registradas en SO-AR | DirecciÃ³n Global |
 
 ---
 
@@ -3191,26 +3195,26 @@ Una de las innovaciones fundamentales del SO-AR es que **ninguna meta se pierde 
 ### Ciclo de Vida de una Meta Heredada:
 ```
 [ FIN DE CICLO ANTERIOR: C2 / MJ ]
-                  │
-                  ▼
+                  â”‚
+                  â–¼
   Gerente define: "Meta de Rezagados C1 = 35 personas"
-                  │
-                  ▼
+                  â”‚
+                  â–¼
         [ SISTEMA SO-AR ]
-  Crea automáticamente el registro de Meta Heredada
-                  │
-                  ▼
-  Asigna a: Coordinador de Capítulo 1
-                  │
-                  ▼
+  Crea automÃ¡ticamente el registro de Meta Heredada
+                  â”‚
+                  â–¼
+  Asigna a: Coordinador de CapÃ­tulo 1
+                  â”‚
+                  â–¼
   Seguimiento Semanal: Reportes de Llamadas (OK, XC, NC, NI)
-                  │
-                  ▼
-  [ DÍA 1 DEL PRÓXIMO C1 ]
+                  â”‚
+                  â–¼
+  [ DÃA 1 DEL PRÃ“XIMO C1 ]
   Conteo de Sentados Reales
-                  │
-                  ▼
-  Cálculo de % Cumplimiento y Cierre formal en Balance Gerencial
+                  â”‚
+                  â–¼
+  CÃ¡lculo de % Cumplimiento y Cierre formal en Balance Gerencial
 ```
 
 ---
@@ -3218,41 +3222,41 @@ Una de las innovaciones fundamentales del SO-AR es que **ninguna meta se pierde 
 ## 11. MATRIZ RACI GENERAL DE LA SEDE
 
 * **R (Responsible):** Quien realiza la labor.
-* **A (Accountable):** Quien responde por el resultado final (único).
-* **C (Consulted):** A quien se le consulta información previa.
+* **A (Accountable):** Quien responde por el resultado final (Ãºnico).
+* **C (Consulted):** A quien se le consulta informaciÃ³n previa.
 * **I (Informed):** A quien se le notifica el resultado.
 
-| Proceso Crítico | Gerente de Sede | Coordinador C1 / C2 | Coordinador Maestría | Equipo de Apoyo | Finanzas Global | Dirección Global |
+| Proceso CrÃ­tico | Gerente de Sede | Coordinador C1 / C2 | Coordinador MaestrÃ­a | Equipo de Apoyo | Finanzas Global | DirecciÃ³n Global |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Contratación de Entrenador (Gate T-30)** | **A / R** | I | I | I | C | I |
+| **ContrataciÃ³n de Entrenador (Gate T-30)** | **A / R** | I | I | I | C | I |
 | **Reserva de Hoteles y Salones** | **A / R** | I | I | I | C | I |
 | **Convocatoria y Enrolamiento C1** | A | **R** | I | C | I | I |
-| **Estructura y Managers de Maestría** | A | I | **R** | C | I | I |
-| **Montaje de Sala y Logística Presencial** | A | C | C | **R** | I | I |
+| **Estructura y Managers de MaestrÃ­a** | A | I | **R** | C | I | I |
+| **Montaje de Sala y LogÃ­stica Presencial** | A | C | C | **R** | I | I |
 | **Control de Presupuesto y Gastos** | **A / R** | I | I | I | C | I |
-| **Definición de Metas Heredadas** | **A / R** | C | C | I | I | I |
-| **Envío de Reportes Operativos** | A | **R** | **R** | **R** | I | I |
+| **DefiniciÃ³n de Metas Heredadas** | **A / R** | C | C | I | I | I |
+| **EnvÃ­o de Reportes Operativos** | A | **R** | **R** | **R** | I | I |
 
 ---
 
-## 12. ESPECIFICACIÓN PARA LA PLATAFORMA DIGITAL (SO-AR)
+## 12. ESPECIFICACIÃ“N PARA LA PLATAFORMA DIGITAL (SO-AR)
 
-La aplicación web debe implementar esta arquitectura bajo las siguientes directivas:
+La aplicaciÃ³n web debe implementar esta arquitectura bajo las siguientes directivas:
 
 1. **Dashboard Gerencial "30 Segundos":**
-   - **¿Dónde estamos?:** Indicador del Ciclo activo (MJ → C1 → C2 → MJ) y días faltantes para el próximo hito.
-   - **¿Qué está en riesgo?:** Conteo de tareas vencidas (🔴), próximas a vencer (🟠) o bloqueadas (⚫).
-   - **¿Qué debo hacer hoy?:** Top 5 de acciones prioritarias del día con botón de ejecución directa.
-   - **¿Qué está delegado?:** Resumen de tareas asignadas a coordinadores y equipo de apoyo con sus % de avance.
+   - **Â¿DÃ³nde estamos?:** Indicador del Ciclo activo (MJ â†’ C1 â†’ C2 â†’ MJ) y dÃ­as faltantes para el prÃ³ximo hito.
+   - **Â¿QuÃ© estÃ¡ en riesgo?:** Conteo de tareas vencidas (ðŸ”´), prÃ³ximas a vencer (ðŸŸ ) o bloqueadas (âš«).
+   - **Â¿QuÃ© debo hacer hoy?:** Top 5 de acciones prioritarias del dÃ­a con botÃ³n de ejecuciÃ³n directa.
+   - **Â¿QuÃ© estÃ¡ delegado?:** Resumen de tareas asignadas a coordinadores y equipo de apoyo con sus % de avance.
 
-2. **Lógica de Bloqueo por Gates:**
-   - La plataforma no permitirá marcar como "Listo para Inicio" un entrenamiento si el **Gate T-30** o el **Gate C2 → MJ** presentan elementos pendientes o sin evidencia cargada.
+2. **LÃ³gica de Bloqueo por Gates:**
+   - La plataforma no permitirÃ¡ marcar como "Listo para Inicio" un entrenamiento si el **Gate T-30** o el **Gate C2 â†’ MJ** presentan elementos pendientes o sin evidencia cargada.
 
 3. **Multi-Rol Transparente:**
-   - El personal con múltiples funciones (ej. Coordinación de Maestría + Coordinación C1 + Equipo de Apoyo) alternará su perfil mediante el **Role Switcher** superior sin duplicar cuentas ni perder trazabilidad.
+   - El personal con mÃºltiples funciones (ej. CoordinaciÃ³n de MaestrÃ­a + CoordinaciÃ³n C1 + Equipo de Apoyo) alternarÃ¡ su perfil mediante el **Role Switcher** superior sin duplicar cuentas ni perder trazabilidad.
 
-4. **Persistencia Híbrida y Modo Zero-Failure:**
-   - Sincronización en tiempo real con Firestore y respaldo local ante cortes de conectividad.
+4. **Persistencia HÃ­brida y Modo Zero-Failure:**
+   - SincronizaciÃ³n en tiempo real con Firestore y respaldo local ante cortes de conectividad.
    - Enlace directo de hoteles oficiales con Google Maps y agendamiento en Google Calendar.
 
 ---
@@ -3263,14 +3267,14 @@ La aplicación web debe implementar esta arquitectura bajo las siguientes direct
 
 ---
 
-### 📄 Archivo: `firestore.rules`
+### ðŸ“„ Archivo: `firestore.rules`
 
 ```text
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Funciones de verificación de identidad y roles corporativos
+    // Funciones de verificaciÃ³n de identidad y roles corporativos
     function isAuthenticated() {
       return request.auth != null && (
         request.auth.token.email == 'jose.sanchez@crearpsl.net' ||
@@ -3293,34 +3297,34 @@ service cloud.firestore {
       );
     }
 
-    // Colección de Tareas SO-AR (tasks)
+    // ColecciÃ³n de Tareas SO-AR (tasks)
     match /tasks/{taskId} {
       allow read: if isAuthenticated();
       allow update: if isAuthenticated();
       allow create, delete: if isGerente();
     }
     
-    // Colección de Metas y Cuotas (goals)
+    // ColecciÃ³n de Metas y Cuotas (goals)
     match /goals/{goalId} {
       allow read: if isAuthenticated();
       allow create, update: if isAuthenticated();
       allow delete: if isSuperAdmin();
     }
     
-    // Colección de Reportes Operativos (reports)
+    // ColecciÃ³n de Reportes Operativos (reports)
     match /reports/{reportId} {
       allow read: if isAuthenticated();
       allow create: if isAuthenticated();
       allow update, delete: if isGerente();
     }
 
-    // Colección de Perfiles y Notas Privadas (user_profiles)
+    // ColecciÃ³n de Perfiles y Notas Privadas (user_profiles)
     match /user_profiles/{userDocId} {
       allow read: if isAuthenticated();
       allow write: if isGerente() || isSuperAdmin();
     }
 
-    // Colección de Notificaciones (notifications)
+    // ColecciÃ³n de Notificaciones (notifications)
     match /notifications/{notifId} {
       allow read: if isAuthenticated() && (
         resource.data.targetEmail == request.auth.token.email || 
@@ -3335,19 +3339,19 @@ service cloud.firestore {
       allow delete: if isSuperAdmin();
     }
 
-    // Colección de Hoteles y Salones (venues)
+    // ColecciÃ³n de Hoteles y Salones (venues)
     match /venues/{venueId} {
       allow read: if isAuthenticated();
       allow write: if isGerente();
     }
 
-    // Colección de Ciclos Operativos (cycles)
+    // ColecciÃ³n de Ciclos Operativos (cycles)
     match /cycles/{cycleId} {
       allow read: if isAuthenticated();
       allow write: if isGerente();
     }
 
-    // Colección de Cola de Correo Electrónico (mail)
+    // ColecciÃ³n de Cola de Correo ElectrÃ³nico (mail)
     match /mail/{mailId} {
       allow read: if isSuperAdmin();
       allow create: if isGerente() && 
@@ -3356,7 +3360,7 @@ service cloud.firestore {
       allow update, delete: if isSuperAdmin();
     }
 
-    // Colección de Usuarios y Directorio (users)
+    // ColecciÃ³n de Usuarios y Directorio (users)
     match /users/{userId} {
       allow read: if isAuthenticated();
       allow write: if isSuperAdmin();
@@ -3368,7 +3372,7 @@ service cloud.firestore {
 
 ---
 
-### 📄 Archivo: `index.html`
+### ðŸ“„ Archivo: `index.html`
 
 ```html
 <!doctype html>
@@ -3377,10 +3381,10 @@ service cloud.firestore {
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="CREAR PODER SIN LÍMITES — Sistema Operativo de Alto Rendimiento SO-AR" />
+    <meta name="description" content="CREAR PODER SIN LÃMITES â€” Sistema Operativo de Alto Rendimiento SO-AR" />
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
-    <title>CREAR PODER SIN LÍMITES — SO-AR</title>
+    <title>CREAR PODER SIN LÃMITES â€” SO-AR</title>
     <!-- Fuentes de Google -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -3396,7 +3400,7 @@ service cloud.firestore {
 
 ---
 
-### 📄 Archivo: `package-lock.json`
+### ðŸ“„ Archivo: `package-lock.json`
 
 ```json
 {
@@ -5812,7 +5816,7 @@ service cloud.firestore {
 
 ---
 
-### 📄 Archivo: `package.json`
+### ðŸ“„ Archivo: `package.json`
 
 ```json
 {
@@ -5850,7 +5854,7 @@ service cloud.firestore {
 
 ---
 
-### 📄 Archivo: `scripts/mailerDaemon.js`
+### ðŸ“„ Archivo: `scripts/mailerDaemon.js`
 
 ```javascript
 require('dotenv').config();
@@ -5859,7 +5863,7 @@ const sanitizeHtml = require('sanitize-html');
 const { initializeApp } = require('firebase/app');
 const { getFirestore, collection, onSnapshot, doc, updateDoc, query, where, getDocs } = require('firebase/firestore');
 
-// --- 1. CONFIGURACIÓN DE FIREBASE CLIENT ---
+// --- 1. CONFIGURACIÃ“N DE FIREBASE CLIENT ---
 // NOTA: Para ejecutar esto necesitas "npm install nodemailer firebase dotenv"
 // Reemplaza esto con los datos de tu src/services/firebase.js
 const firebaseConfig = {
@@ -5874,9 +5878,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// --- 2. CONFIGURACIÓN DE GMAIL (NODEMAILER) ---
+// --- 2. CONFIGURACIÃ“N DE GMAIL (NODEMAILER) ---
 if (!process.env.GMAIL_USER || !process.env.GMAIL_PASS) {
-  console.error("❌ Faltan credenciales de Gmail (GMAIL_USER o GMAIL_PASS). El daemon no puede iniciar.");
+  console.error("âŒ Faltan credenciales de Gmail (GMAIL_USER o GMAIL_PASS). El daemon no puede iniciar.");
   process.exit(1);
 }
 
@@ -5888,9 +5892,9 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-console.log("🚀 Mailer Daemon Iniciado. Escuchando nuevos correos en Firestore...");
+console.log("ðŸš€ Mailer Daemon Iniciado. Escuchando nuevos correos en Firestore...");
 
-// --- 3. ESCUCHAR LA COLECCIÓN 'mail' ---
+// --- 3. ESCUCHAR LA COLECCIÃ“N 'mail' ---
 onSnapshot(collection(db, 'mail'), (snapshot) => {
   snapshot.docChanges().forEach(async (change) => {
     if (change.type === 'added') {
@@ -5907,10 +5911,10 @@ onSnapshot(collection(db, 'mail'), (snapshot) => {
           const q = query(collection(db, "users"), where("emails", "array-contains", data.to?.toLowerCase().trim()));
           const snap = await getDocs(q);
           if (snap.empty) {
-            console.warn(`⚠️ Intento de envío a correo no registrado en el directorio: ${data.to}`);
+            console.warn(`âš ï¸ Intento de envÃ­o a correo no registrado en el directorio: ${data.to}`);
             await updateDoc(doc(db, 'mail', change.doc.id), { 
               'delivery.state': 'REJECTED', 
-              reason: 'Correo externo no pertenece a ningún usuario registrado' 
+              reason: 'Correo externo no pertenece a ningÃºn usuario registrado' 
             });
             return;
           }
@@ -5921,9 +5925,9 @@ onSnapshot(collection(db, 'mail'), (snapshot) => {
         }
       }
 
-      console.log(`📧 Nuevo correo detectado para: ${data.to}`);
+      console.log(`ðŸ“§ Nuevo correo detectado para: ${data.to}`);
 
-      const rawHtml = data.message?.html || '<p>Tienes una notificación.</p>';
+      const rawHtml = data.message?.html || '<p>Tienes una notificaciÃ³n.</p>';
       const cleanHtml = sanitizeHtml(rawHtml, {
         allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img', 'h1', 'h2']),
         allowedAttributes: {
@@ -5934,15 +5938,15 @@ onSnapshot(collection(db, 'mail'), (snapshot) => {
       });
 
       const mailOptions = {
-        from: '"CREAR Poder Sin Límites" <servidorcrearpsl@gmail.com>',
+        from: '"CREAR Poder Sin LÃ­mites" <servidorcrearpsl@gmail.com>',
         to: data.to,
-        subject: data.message?.subject || 'Notificación SO-AR',
+        subject: data.message?.subject || 'NotificaciÃ³n SO-AR',
         html: cleanHtml
       };
 
       try {
         await transporter.sendMail(mailOptions);
-        console.log(`✅ Correo enviado a ${data.to}`);
+        console.log(`âœ… Correo enviado a ${data.to}`);
         
         // Marcar como enviado en Firestore
         await updateDoc(doc(db, 'mail', change.doc.id), {
@@ -5950,7 +5954,7 @@ onSnapshot(collection(db, 'mail'), (snapshot) => {
           'delivery.endTime': new Date().toISOString()
         });
       } catch (error) {
-        console.error(`❌ Error al enviar a ${data.to}:`, error);
+        console.error(`âŒ Error al enviar a ${data.to}:`, error);
         await updateDoc(doc(db, 'mail', change.doc.id), {
           'delivery.state': 'ERROR',
           'delivery.error': error.message
@@ -5964,7 +5968,7 @@ onSnapshot(collection(db, 'mail'), (snapshot) => {
 
 ---
 
-### 📄 Archivo: `src/App.css`
+### ðŸ“„ Archivo: `src/App.css`
 
 ```css
 /* App Specific Styles - Migrated to index.css */
@@ -5973,7 +5977,7 @@ onSnapshot(collection(db, 'mail'), (snapshot) => {
 
 ---
 
-### 📄 Archivo: `src/App.jsx`
+### ðŸ“„ Archivo: `src/App.jsx`
 
 ```javascript
 import { Routes, Route, Navigate } from 'react-router-dom'
@@ -5991,7 +5995,7 @@ import ReportesBoard from './pages/ReportesBoard'
 import SuperAdminPanel from './pages/SuperAdminPanel'
 import PromptModal from './components/PromptModal'
 
-// Componente para proteger autenticación básica
+// Componente para proteger autenticaciÃ³n bÃ¡sica
 function PrivateRoute({ children }) {
   const { currentUser, loading } = useAuth();
   
@@ -6002,7 +6006,7 @@ function PrivateRoute({ children }) {
   return currentUser ? children : <Navigate to="/login" replace />;
 }
 
-// Componente para proteger autorización por Roles (S3 / Audit Fix)
+// Componente para proteger autorizaciÃ³n por Roles (S3 / Audit Fix)
 function RoleRoute({ children, allowedRoles = [], requireSuperAdmin = false }) {
   const { currentUser, loading } = useAuth();
   const { showToast } = useUI();
@@ -6015,20 +6019,20 @@ function RoleRoute({ children, allowedRoles = [], requireSuperAdmin = false }) {
     return <Navigate to="/login" replace />;
   }
 
-  // Verificación de Super Admin
+  // VerificaciÃ³n de Super Admin
   if (requireSuperAdmin) {
     if (currentUser.isSuperAdmin) {
       return children;
     }
-    showToast("ACCESO DENEGADO: Esta sección requiere privilegios de Super Administrador.", "error");
+    showToast("ACCESO DENEGADO: Esta secciÃ³n requiere privilegios de Super Administrador.", "error");
     return <Navigate to="/home" replace />;
   }
 
-  // Verificación de Roles permitidos
+  // VerificaciÃ³n de Roles permitidos
   if (allowedRoles.length > 0) {
     const hasRole = allowedRoles.includes(currentUser.appRole) || currentUser.isSuperAdmin;
     if (!hasRole) {
-      showToast(`ACCESO DENEGADO: Tu rol actual (${currentUser.appRole}) no tiene acceso a esta sección.`, "error");
+      showToast(`ACCESO DENEGADO: Tu rol actual (${currentUser.appRole}) no tiene acceso a esta secciÃ³n.`, "error");
       return <Navigate to="/home" replace />;
     }
   }
@@ -6101,7 +6105,7 @@ export default App
 
 ---
 
-### 📄 Archivo: `src/components/ErrorBoundary.jsx`
+### ðŸ“„ Archivo: `src/components/ErrorBoundary.jsx`
 
 ```javascript
 import React from 'react';
@@ -6139,9 +6143,9 @@ export class ErrorBoundary extends React.Component {
               <AlertTriangle size={48} color="#ef4444" />
             </div>
             
-            <h2 style={{ color: '#fff', margin: '0 0 0.5rem', fontSize: '1.6rem' }}>Ocurrió una interrupción inesperada</h2>
+            <h2 style={{ color: '#fff', margin: '0 0 0.5rem', fontSize: '1.6rem' }}>OcurriÃ³ una interrupciÃ³n inesperada</h2>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', marginBottom: '1.5rem', lineHeight: '1.5' }}>
-              El sistema SO-AR detectó un error en la ejecución. Tus datos en Firestore permanecen seguros.
+              El sistema SO-AR detectÃ³ un error en la ejecuciÃ³n. Tus datos en Firestore permanecen seguros.
             </p>
 
             {this.state.error && (
@@ -6173,7 +6177,7 @@ export class ErrorBoundary extends React.Component {
 
 ---
 
-### 📄 Archivo: `src/components/GoalDivisionModal.jsx`
+### ðŸ“„ Archivo: `src/components/GoalDivisionModal.jsx`
 
 ```javascript
 import React, { useState, useEffect } from 'react';
@@ -6188,7 +6192,7 @@ export default function GoalDivisionModal({ isOpen, onClose, goal, onSaveAssignm
   const [assignedCoordinators, setAssignedCoordinators] = useState([]);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Lista única de sedes disponibles
+  // Lista Ãºnica de sedes disponibles
   const sedesList = [...new Set(usersData.map(u => u.sede?.trim()).filter(Boolean))];
 
   // Obtener coordinadores disponibles
@@ -6199,9 +6203,9 @@ export default function GoalDivisionModal({ isOpen, onClose, goal, onSaveAssignm
     return isCoord && matchSede;
   });
 
-  // Inicializar o sincronizar selección cuando cambia la meta o filtro
+  // Inicializar o sincronizar selecciÃ³n cuando cambia la meta o filtro
   useEffect(() => {
-    // Si la meta ya tenía asignaciones previas, cargarlas
+    // Si la meta ya tenÃ­a asignaciones previas, cargarlas
     if (goal.assignedCoordinators && Array.isArray(goal.assignedCoordinators) && goal.assignedCoordinators.length > 0) {
       setAssignedCoordinators(goal.assignedCoordinators);
       if (goal.assignedCoordinators[0]?.sede) {
@@ -6210,7 +6214,7 @@ export default function GoalDivisionModal({ isOpen, onClose, goal, onSaveAssignm
       return;
     }
 
-    // Si no, pre-seleccionar según el tipo de meta
+    // Si no, pre-seleccionar segÃºn el tipo de meta
     applyPreset('AUTO');
   }, [goal, selectedSede]);
 
@@ -6221,7 +6225,7 @@ export default function GoalDivisionModal({ isOpen, onClose, goal, onSaveAssignm
     if (presetType === 'CC1Y2' || (presetType === 'AUTO' && (roleNorm === 'C1' || roleNorm === 'C2' || goal.title?.includes('C1') || goal.title?.includes('C2')))) {
       setSelectedRoleFilter('CC1Y2');
       filtered = availableCoordinators.filter(u => normalizeRole(u.role) === 'coord_c1');
-    } else if (presetType === 'CMJ' || (presetType === 'AUTO' && (roleNorm.startsWith('MJ') || goal.title?.includes('MJ') || goal.title?.includes('Maestría')))) {
+    } else if (presetType === 'CMJ' || (presetType === 'AUTO' && (roleNorm.startsWith('MJ') || goal.title?.includes('MJ') || goal.title?.includes('MaestrÃ­a')))) {
       setSelectedRoleFilter('CMJ');
       filtered = availableCoordinators.filter(u => normalizeRole(u.role) === 'coord_maestria');
     } else {
@@ -6263,7 +6267,7 @@ export default function GoalDivisionModal({ isOpen, onClose, goal, onSaveAssignm
       }];
     }
 
-    // Recalcular división equitativa
+    // Recalcular divisiÃ³n equitativa
     const count = updated.length || 1;
     const targetVal = Number(goal.targetValue || 0);
     const quotaPerPerson = Math.round((targetVal / count) * 10) / 10;
@@ -6298,7 +6302,7 @@ export default function GoalDivisionModal({ isOpen, onClose, goal, onSaveAssignm
       onClose();
     } catch (err) {
       console.error(err);
-      alert("Hubo un error al guardar la asignación.");
+      alert("Hubo un error al guardar la asignaciÃ³n.");
     } finally {
       setIsSaving(false);
     }
@@ -6330,7 +6334,7 @@ export default function GoalDivisionModal({ isOpen, onClose, goal, onSaveAssignm
         boxShadow: '0 20px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(0, 210, 255, 0.15)',
         position: 'relative'
       }}>
-        {/* BOTÓN CERRAR */}
+        {/* BOTÃ“N CERRAR */}
         <button
           onClick={onClose}
           style={{
@@ -6354,14 +6358,14 @@ export default function GoalDivisionModal({ isOpen, onClose, goal, onSaveAssignm
               Dividir y Asignar Meta a Coordinadoras
             </h2>
             <p className="text-muted" style={{ margin: 0, fontSize: '0.85rem' }}>
-              {goal.title} — Meta Total: <strong style={{ color: 'var(--crear-gold)' }}>{targetVal} {goal.kpi || 'unidades'}</strong>
+              {goal.title} â€” Meta Total: <strong style={{ color: 'var(--crear-gold)' }}>{targetVal} {goal.kpi || 'unidades'}</strong>
             </p>
           </div>
         </div>
 
         <hr style={{ borderColor: 'rgba(255, 255, 255, 0.08)', margin: '1.25rem 0' }} />
 
-        {/* SELECTOR DE SEDE Y PRESETS RÁPIDOS */}
+        {/* SELECTOR DE SEDE Y PRESETS RÃPIDOS */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1rem', marginBottom: '1.5rem' }}>
           <div>
             <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--text-muted)', marginBottom: '0.4rem' }}>
@@ -6390,7 +6394,7 @@ export default function GoalDivisionModal({ isOpen, onClose, goal, onSaveAssignm
 
           <div>
             <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--text-muted)', marginBottom: '0.4rem' }}>
-              División Automática Rápida:
+              DivisiÃ³n AutomÃ¡tica RÃ¡pida:
             </label>
             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
               <button
@@ -6436,7 +6440,7 @@ export default function GoalDivisionModal({ isOpen, onClose, goal, onSaveAssignm
           </div>
         </div>
 
-        {/* RESUMEN DE LA ECUACIÓN DE DIVISIÓN */}
+        {/* RESUMEN DE LA ECUACIÃ“N DE DIVISIÃ“N */}
         <div style={{
           background: 'rgba(0, 210, 255, 0.06)',
           border: '1px solid rgba(0, 210, 255, 0.25)',
@@ -6451,10 +6455,10 @@ export default function GoalDivisionModal({ isOpen, onClose, goal, onSaveAssignm
         }}>
           <div>
             <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>
-              Ecuación de Reparto
+              EcuaciÃ³n de Reparto
             </div>
             <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#ffffff', marginTop: '0.2rem' }}>
-              {targetVal} {goal.kpi || 'meta'} ÷ {assignedCoordinators.length || 0} coordinadoras = <span style={{ color: 'var(--crear-gold)' }}>{assignedCoordinators.length > 0 ? (Math.round((targetVal / assignedCoordinators.length) * 10) / 10) : 0} c/u</span>
+              {targetVal} {goal.kpi || 'meta'} Ã· {assignedCoordinators.length || 0} coordinadoras = <span style={{ color: 'var(--crear-gold)' }}>{assignedCoordinators.length > 0 ? (Math.round((targetVal / assignedCoordinators.length) * 10) / 10) : 0} c/u</span>
             </div>
           </div>
 
@@ -6468,7 +6472,7 @@ export default function GoalDivisionModal({ isOpen, onClose, goal, onSaveAssignm
               color: isBalanced ? '#22c55e' : '#ef4444',
               border: `1px solid ${isBalanced ? 'rgba(34, 197, 94, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`
             }}>
-              {isBalanced ? '✅ Cuotas Balanceadas (100%)' : `⚠️ Suma: ${totalAssignedQuota} de ${targetVal}`}
+              {isBalanced ? 'âœ… Cuotas Balanceadas (100%)' : `âš ï¸ Suma: ${totalAssignedQuota} de ${targetVal}`}
             </span>
           </div>
         </div>
@@ -6511,7 +6515,7 @@ export default function GoalDivisionModal({ isOpen, onClose, goal, onSaveAssignm
                         {coord.name}
                       </div>
                       <div style={{ fontSize: '0.75rem', color: isC1 ? 'var(--crear-blue)' : 'var(--role-mj)' }}>
-                        {isC1 ? 'Coordinadora C1 / C2' : 'Coordinadora Maestría (CMJ)'} • {coord.sede}
+                        {isC1 ? 'Coordinadora C1 / C2' : 'Coordinadora MaestrÃ­a (CMJ)'} â€¢ {coord.sede}
                       </div>
                     </div>
                   </label>
@@ -6563,7 +6567,7 @@ export default function GoalDivisionModal({ isOpen, onClose, goal, onSaveAssignm
             className="btn-neon-action"
             style={{ padding: '0.6rem 1.6rem' }}
           >
-            {isSaving ? 'Guardando...' : '🚀 Guardar y Asignar Metas'}
+            {isSaving ? 'Guardando...' : 'ðŸš€ Guardar y Asignar Metas'}
           </button>
         </div>
       </div>
@@ -6575,7 +6579,7 @@ export default function GoalDivisionModal({ isOpen, onClose, goal, onSaveAssignm
 
 ---
 
-### 📄 Archivo: `src/components/PromptModal.jsx`
+### ðŸ“„ Archivo: `src/components/PromptModal.jsx`
 
 ```javascript
 import React, { useState, useEffect } from 'react';
@@ -6644,7 +6648,7 @@ export default function PromptModal() {
 
 ---
 
-### 📄 Archivo: `src/components/TaskAssignmentModal.jsx`
+### ðŸ“„ Archivo: `src/components/TaskAssignmentModal.jsx`
 
 ```javascript
 import { useState, useEffect } from 'react';
@@ -6665,7 +6669,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
     deadlineTime: '18:00',
     assignedToEmail: '',
     assignedSede: '',
-    priority: '🟡 AMARILLO'
+    priority: 'ðŸŸ¡ AMARILLO'
   });
 
   useEffect(() => {
@@ -6697,7 +6701,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
       role: finalRole,
       deadline: deadlineISO,
       priority: newTask.priority,
-      isCritical: newTask.priority === '🔴 ROJO',
+      isCritical: newTask.priority === 'ðŸ”´ ROJO',
       createdBy: currentUser.email,
       assignedToEmail: currentUser.isSuperAdmin ? newTask.assignedToEmail : '',
       assignedSede: currentUser.isSuperAdmin ? newTask.assignedSede : ''
@@ -6715,7 +6719,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
         deadlineTime: '18:00',
         assignedToEmail: '',
         assignedSede: '',
-        priority: '🟡 AMARILLO'
+        priority: 'ðŸŸ¡ AMARILLO'
       });
     }
   };
@@ -6744,7 +6748,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
         <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '1rem' }}>
           <input 
             type="text" 
-            placeholder="Título de la tarea (Ej. Revisar métricas)" 
+            placeholder="TÃ­tulo de la tarea (Ej. Revisar mÃ©tricas)" 
             value={newTask.title} 
             onChange={e => setNewTask({...newTask, title: e.target.value})} 
             className="input-field" 
@@ -6777,15 +6781,15 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                 style={{ width: '100%' }}
                 disabled={isSubmitting}
               >
-                <option value="🟡 AMARILLO">Normal (Amarillo)</option>
-                <option value="🔴 ROJO">Urgente/Crítica (Rojo)</option>
+                <option value="ðŸŸ¡ AMARILLO">Normal (Amarillo)</option>
+                <option value="ðŸ”´ ROJO">Urgente/CrÃ­tica (Rojo)</option>
               </select>
             </div>
 
             {currentUser?.isSuperAdmin && (
               <>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--crear-cyan)', marginBottom: '0.3rem' }}>[SuperAdmin] Email Específico:</label>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--crear-cyan)', marginBottom: '0.3rem' }}>[SuperAdmin] Email EspecÃ­fico:</label>
                   <input type="email" placeholder="email@crearpsl.net" value={newTask.assignedToEmail || ''} onChange={e => setNewTask({...newTask, assignedToEmail: e.target.value})} className="input-field" style={{ width: '100%', borderColor: 'var(--crear-cyan)' }} disabled={isSubmitting} />
                 </div>
                 <div>
@@ -6796,11 +6800,11 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
             )}
 
             <div>
-              <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--crear-gold)', marginBottom: '0.3rem', fontWeight: 'bold' }}>📅 Fecha Límite:</label>
+              <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--crear-gold)', marginBottom: '0.3rem', fontWeight: 'bold' }}>ðŸ“… Fecha LÃ­mite:</label>
               <input type="date" value={newTask.deadlineDate} onChange={e => setNewTask({...newTask, deadlineDate: e.target.value})} className="input-field" style={{ width: '100%' }} required disabled={isSubmitting} />
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--crear-gold)', marginBottom: '0.3rem', fontWeight: 'bold' }}>⏰ Hora Límite:</label>
+              <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--crear-gold)', marginBottom: '0.3rem', fontWeight: 'bold' }}>â° Hora LÃ­mite:</label>
               <input type="time" value={newTask.deadlineTime} onChange={e => setNewTask({...newTask, deadlineTime: e.target.value})} className="input-field" style={{ width: '100%' }} required disabled={isSubmitting} />
             </div>
           </div>
@@ -6821,7 +6825,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
 
 ---
 
-### 📄 Archivo: `src/components/TaskCollaborationModal.jsx`
+### ðŸ“„ Archivo: `src/components/TaskCollaborationModal.jsx`
 
 ```javascript
 import React, { useState } from 'react';
@@ -6845,13 +6849,13 @@ export default function TaskCollaborationModal({ isOpen, onClose, task, onSendIn
   const isCMJ = userRole === 'coord_maestria';
   const isCC1 = userRole === 'coord_c1';
 
-  // Filtrado de usuarios según permisos de mención
+  // Filtrado de usuarios segÃºn permisos de menciÃ³n
   // Gerentes: pueden mencionar a cualquier persona de su sede o global
   // CMJ y CC1Y2: pueden mencionar a cualquier persona de la oficina/sede
   const eligibleUsers = usersData.filter(u => {
     if (u.email === currentUser?.email) return false;
     
-    // Si ya está colaborando en esta tarea, excluir
+    // Si ya estÃ¡ colaborando en esta tarea, excluir
     if (task.collaborators && task.collaborators.includes(u.email)) return false;
 
     if (isGerenteOrAdmin) {
@@ -6881,7 +6885,7 @@ export default function TaskCollaborationModal({ isOpen, onClose, task, onSendIn
   const handleSend = async (e) => {
     e.preventDefault();
     if (!selectedUser) {
-      showToast("Por favor selecciona a un compañero para invitarlo.", "error");
+      showToast("Por favor selecciona a un compaÃ±ero para invitarlo.", "error");
       return;
     }
 
@@ -6891,7 +6895,7 @@ export default function TaskCollaborationModal({ isOpen, onClose, task, onSendIn
       onClose();
     } catch (err) {
       console.error(err);
-      showToast("Error al enviar la invitación.", "error");
+      showToast("Error al enviar la invitaciÃ³n.", "error");
     } finally {
       setIsSending(false);
     }
@@ -6919,7 +6923,7 @@ export default function TaskCollaborationModal({ isOpen, onClose, task, onSendIn
         boxShadow: '0 20px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(0, 210, 255, 0.15)',
         position: 'relative'
       }}>
-        {/* BOTÓN CERRAR */}
+        {/* BOTÃ“N CERRAR */}
         <button
           onClick={onClose}
           style={{
@@ -6943,7 +6947,7 @@ export default function TaskCollaborationModal({ isOpen, onClose, task, onSendIn
               Mencionar e Invitar a Colaborar
             </h2>
             <p className="text-muted" style={{ margin: 0, fontSize: '0.85rem' }}>
-              {isGerenteOrAdmin ? '👑 Vista Gerencial: Invita a cualquier miembro a tu cargo' : '🤝 Invita a un compañero de oficina para compartir esta tarea'}
+              {isGerenteOrAdmin ? 'ðŸ‘‘ Vista Gerencial: Invita a cualquier miembro a tu cargo' : 'ðŸ¤ Invita a un compaÃ±ero de oficina para compartir esta tarea'}
             </p>
           </div>
         </div>
@@ -6964,7 +6968,7 @@ export default function TaskCollaborationModal({ isOpen, onClose, task, onSendIn
           </div>
         </div>
 
-        {/* BUSCADOR DE COMPAÑEROS */}
+        {/* BUSCADOR DE COMPAÃ‘EROS */}
         <div style={{ marginBottom: '1rem' }}>
           <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--text-muted)', marginBottom: '0.4rem' }}>
             Buscar persona por nombre, rol o sede:
@@ -7028,7 +7032,7 @@ export default function TaskCollaborationModal({ isOpen, onClose, task, onSendIn
                       @{u.name}
                     </div>
                     <div style={{ fontSize: '0.75rem', color: isCoord ? 'var(--crear-gold)' : 'var(--text-muted)' }}>
-                      {u.role?.replace(/_/g, ' ')} • {u.sede || 'Global'} ({u.email})
+                      {u.role?.replace(/_/g, ' ')} â€¢ {u.sede || 'Global'} ({u.email})
                     </div>
                   </div>
 
@@ -7042,7 +7046,7 @@ export default function TaskCollaborationModal({ isOpen, onClose, task, onSendIn
         {/* MENSAJE PERSONALIZADO */}
         <div style={{ marginBottom: '1.5rem' }}>
           <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--text-muted)', marginBottom: '0.4rem' }}>
-            Mensaje o Instrucción (Opcional):
+            Mensaje o InstrucciÃ³n (Opcional):
           </label>
           <textarea
             rows="2"
@@ -7094,7 +7098,7 @@ export default function TaskCollaborationModal({ isOpen, onClose, task, onSendIn
 
 ---
 
-### 📄 Archivo: `src/components/ThemeSelector.jsx`
+### ðŸ“„ Archivo: `src/components/ThemeSelector.jsx`
 
 ```javascript
 import React from 'react';
@@ -7118,9 +7122,9 @@ export default function ThemeSelector({ compact = false }) {
         boxShadow: activeTheme === 'light' ? '0 2px 8px rgba(0, 0, 0, 0.05)' : '0 4px 15px rgba(0, 0, 0, 0.4)',
         transition: 'all 0.3s ease'
       }}
-      title={`Modo actual: ${themeMode === 'auto' ? `Automático (${activeTheme === 'light' ? '☀️ Día' : '🌙 Noche'})` : themeMode === 'light' ? '☀️ Día' : '🌙 Noche'}`}
+      title={`Modo actual: ${themeMode === 'auto' ? `AutomÃ¡tico (${activeTheme === 'light' ? 'â˜€ï¸ DÃ­a' : 'ðŸŒ™ Noche'})` : themeMode === 'light' ? 'â˜€ï¸ DÃ­a' : 'ðŸŒ™ Noche'}`}
     >
-      {/* BOTÓN DÍA */}
+      {/* BOTÃ“N DÃA */}
       <button
         type="button"
         onClick={() => setThemeMode('light')}
@@ -7146,10 +7150,10 @@ export default function ThemeSelector({ compact = false }) {
         }}
       >
         <Sun size={13} strokeWidth={2.5} />
-        {!compact && <span>DÍA</span>}
+        {!compact && <span>DÃA</span>}
       </button>
 
-      {/* BOTÓN NOCHE */}
+      {/* BOTÃ“N NOCHE */}
       <button
         type="button"
         onClick={() => setThemeMode('dark')}
@@ -7178,7 +7182,7 @@ export default function ThemeSelector({ compact = false }) {
         {!compact && <span>NOCHE</span>}
       </button>
 
-      {/* BOTÓN AUTOMÁTICO */}
+      {/* BOTÃ“N AUTOMÃTICO */}
       <button
         type="button"
         onClick={() => setThemeMode('auto')}
@@ -7214,7 +7218,7 @@ export default function ThemeSelector({ compact = false }) {
 
 ---
 
-### 📄 Archivo: `src/components/UserProfileModal.jsx`
+### ðŸ“„ Archivo: `src/components/UserProfileModal.jsx`
 
 ```javascript
 import { useState, useEffect } from 'react';
@@ -7235,16 +7239,16 @@ const ROLE_LABELS = {
   gerente: 'Gerente de Sede',
   coordinador_c1c2: 'Coordinador C1/C2',
   coord_c1: 'Coordinador C1/C2',
-  coordinador_mj: 'Coordinador Maestría',
-  coord_maestria: 'Coordinador Maestría',
-  director_maestria: 'Director de Maestría',
-  capitan: 'Capitán',
+  coordinador_mj: 'Coordinador MaestrÃ­a',
+  coord_maestria: 'Coordinador MaestrÃ­a',
+  director_maestria: 'Director de MaestrÃ­a',
+  capitan: 'CapitÃ¡n',
   manager: 'Manager',
   qt: 'Quantum Team',
-  direccion: 'Dirección Global',
+  direccion: 'DirecciÃ³n Global',
   cfo: 'CFO (Chief Financial Officer)',
   finanzas: 'Finanzas',
-  coordinador: 'Coordinación Adm.',
+  coordinador: 'CoordinaciÃ³n Adm.',
   talento_humano: 'Talento Humano',
   legal: 'Legal',
 };
@@ -7379,7 +7383,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
       }, { merge: true });
 
       setNewNoteText('');
-      showToast("Nota guardada con éxito", "success");
+      showToast("Nota guardada con Ã©xito", "success");
     } catch (err) {
       console.error("Error saving note:", err);
       showToast("Error al guardar la nota", "error");
@@ -7438,7 +7442,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
 
       setNewDocTitle('');
       setNewDocUrl('');
-      showToast("Documento enlazado con éxito", "success");
+      showToast("Documento enlazado con Ã©xito", "success");
     } catch (err) {
       console.error("Error saving document:", err);
       showToast("Error al guardar el enlace del documento", "error");
@@ -7544,7 +7548,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
                   )}
                   {user.phone && (
                     <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                      📱 {user.phone}
+                      ðŸ“± {user.phone}
                     </span>
                   )}
                 </div>
@@ -7566,7 +7570,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
                     <div style={{ height: '28px', width: '1px', background: 'rgba(255,255,255,0.1)' }} />
                     <div style={{ textAlign: 'center' }}>
                       <span style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#ef4444' }}>{criticalPending.length}</span>
-                      <p style={{ margin: 0, fontSize: '0.7rem', color: '#ef4444' }}>Críticas</p>
+                      <p style={{ margin: 0, fontSize: '0.7rem', color: '#ef4444' }}>CrÃ­ticas</p>
                     </div>
                   </>
                 )}
@@ -7598,7 +7602,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
                   transition: 'all 0.2s'
                 }}
               >
-                <FileText size={16} /> Notas y Bitácora ({profileData.notes.length})
+                <FileText size={16} /> Notas y BitÃ¡cora ({profileData.notes.length})
               </button>
 
               <button 
@@ -7680,7 +7684,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
                                 {task.cyclePhase && <span>Fase: <strong style={{ color: '#29abe2' }}>{task.cyclePhase}</strong></span>}
                                 {task.deadline && (
                                   <span style={{ display: 'flex', alignItems: 'center', gap: '0.2rem', color: 'var(--crear-gold)' }}>
-                                    <Clock size={11} /> Límite: {new Date(task.deadline).toLocaleDateString()} {new Date(task.deadline).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    <Clock size={11} /> LÃ­mite: {new Date(task.deadline).toLocaleDateString()} {new Date(task.deadline).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                   </span>
                                 )}
                                 {task.assignedToEmail && (
@@ -7708,17 +7712,17 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
               </div>
             )}
 
-            {/* TAB 2: NOTES & BITÁCORA */}
+            {/* TAB 2: NOTES & BITÃCORA */}
             {activeTab === 'notes' && (
               <div>
                 <form onSubmit={handleAddNote} style={{ marginBottom: '1.5rem', background: 'rgba(255,255,255,0.02)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)' }}>
                   <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--crear-gold)', fontWeight: 'bold', marginBottom: '0.4rem' }}>
-                    📝 Añadir Nota / Feedback para {user.name}:
+                    ðŸ“ AÃ±adir Nota / Feedback para {user.name}:
                   </label>
                   <textarea 
                     value={newNoteText}
                     onChange={e => setNewNoteText(e.target.value)}
-                    placeholder="Escribe observaciones de desempeño, compromisos de reunión, acuerdos o puntos a auditar..."
+                    placeholder="Escribe observaciones de desempeÃ±o, compromisos de reuniÃ³n, acuerdos o puntos a auditar..."
                     rows={3}
                     className="input-field"
                     style={{ width: '100%', marginBottom: '0.6rem', resize: 'vertical' }}
@@ -7741,7 +7745,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
                 {profileData.notes.length === 0 ? (
                   <div style={{ textAlign: 'center', padding: '2.5rem', color: 'var(--text-muted)' }}>
                     <FileText size={36} style={{ opacity: 0.3, marginBottom: '0.5rem' }} />
-                    <p>Aún no hay notas registradas para este usuario.</p>
+                    <p>AÃºn no hay notas registradas para este usuario.</p>
                   </div>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
@@ -7757,7 +7761,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', color: 'var(--crear-cyan)' }}>
                             <Shield size={13} />
                             <strong>{note.authorName || 'SuperAdmin'}</strong>
-                            <span style={{ color: 'var(--text-muted)' }}>• {new Date(note.createdAt).toLocaleString()}</span>
+                            <span style={{ color: 'var(--text-muted)' }}>â€¢ {new Date(note.createdAt).toLocaleString()}</span>
                           </div>
                           <button 
                             onClick={() => handleDeleteNote(note)}
@@ -7782,11 +7786,11 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
               <div>
                 <form onSubmit={handleAddDocument} style={{ marginBottom: '1.5rem', background: 'rgba(255,255,255,0.02)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)' }}>
                   <label style={{ display: 'block', fontSize: '0.85rem', color: 'var(--crear-cyan)', fontWeight: 'bold', marginBottom: '0.6rem' }}>
-                    🔗 Enlazar Documento / Enlace Externo (Google Drive, Docs, Reportes):
+                    ðŸ”— Enlazar Documento / Enlace Externo (Google Drive, Docs, Reportes):
                   </label>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr auto', gap: '0.6rem', alignItems: 'flex-end' }}>
                     <div>
-                      <label style={{ display: 'block', fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>Título del Documento:</label>
+                      <label style={{ display: 'block', fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '0.2rem' }}>TÃ­tulo del Documento:</label>
                       <input 
                         type="text"
                         placeholder="Ej. Plan Operativo Q3"
@@ -7852,7 +7856,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
                             </button>
                           </div>
                           <p style={{ margin: '0.3rem 0 0 0', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                            Subido por: {docItem.addedBy || 'Admin'} • {new Date(docItem.createdAt).toLocaleDateString()}
+                            Subido por: {docItem.addedBy || 'Admin'} â€¢ {new Date(docItem.createdAt).toLocaleDateString()}
                           </p>
                         </div>
 
@@ -7896,7 +7900,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
 
 ---
 
-### 📄 Archivo: `src/components/VenueConfigModal.jsx`
+### ðŸ“„ Archivo: `src/components/VenueConfigModal.jsx`
 
 ```javascript
 import React, { useState, useEffect } from 'react';
@@ -7977,11 +7981,11 @@ export default function VenueConfigModal({ isOpen, onClose }) {
 
     try {
       await setDoc(doc(db, 'venues', selectedSede), venueData, { merge: true });
-      showToast(`¡Lugares y Hoteles de entrenamiento para ${selectedSede} actualizados!`, 'success');
+      showToast(`Â¡Lugares y Hoteles de entrenamiento para ${selectedSede} actualizados!`, 'success');
       onClose();
     } catch (err) {
       console.error("Could not write venue to Firestore:", err);
-      showToast('Error al guardar la configuración del venue.', 'error');
+      showToast('Error al guardar la configuraciÃ³n del venue.', 'error');
     }
   };
 
@@ -8017,7 +8021,7 @@ export default function VenueConfigModal({ isOpen, onClose }) {
         boxShadow: '0 20px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(0, 210, 255, 0.15)',
         position: 'relative'
       }}>
-        {/* BOTÓN CERRAR */}
+        {/* BOTÃ“N CERRAR */}
         <button
           onClick={onClose}
           style={{
@@ -8038,10 +8042,10 @@ export default function VenueConfigModal({ isOpen, onClose }) {
           <Building size={28} color="var(--crear-gold)" />
           <div>
             <h2 style={{ margin: 0, fontSize: '1.35rem', color: '#ffffff' }}>
-              Configuración de Hoteles, Salones & El Viaje
+              ConfiguraciÃ³n de Hoteles, Salones & El Viaje
             </h2>
             <p className="text-muted" style={{ margin: 0, fontSize: '0.85rem' }}>
-              Establece el lugar oficial por defecto o modifícalo según la necesidad
+              Establece el lugar oficial por defecto o modifÃ­calo segÃºn la necesidad
             </p>
           </div>
         </div>
@@ -8076,14 +8080,14 @@ export default function VenueConfigModal({ isOpen, onClose }) {
         {/* LUGAR PARA C1 */}
         <div style={{ marginBottom: '1rem' }}>
           <label style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', fontWeight: 'bold', color: '#ffffff', marginBottom: '0.35rem' }}>
-            <span>🏨 Hotel / Salón para Capítulo 1 (C1):</span>
+            <span>ðŸ¨ Hotel / SalÃ³n para CapÃ­tulo 1 (C1):</span>
             <span style={{ fontSize: '0.75rem', color: 'var(--crear-blue)' }}>Por Defecto</span>
           </label>
           <input
             type="text"
             value={c1Venue}
             onChange={(e) => setC1Venue(e.target.value)}
-            placeholder="Ej: Hotel José Antonio Deluxe Miraflores"
+            placeholder="Ej: Hotel JosÃ© Antonio Deluxe Miraflores"
             style={{
               width: '100%',
               padding: '0.6rem 0.85rem',
@@ -8100,14 +8104,14 @@ export default function VenueConfigModal({ isOpen, onClose }) {
         {/* LUGAR PARA C2 */}
         <div style={{ marginBottom: '1rem' }}>
           <label style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', fontWeight: 'bold', color: '#ffffff', marginBottom: '0.35rem' }}>
-            <span>🏨 Hotel / Salón para Capítulo 2 (C2):</span>
+            <span>ðŸ¨ Hotel / SalÃ³n para CapÃ­tulo 2 (C2):</span>
             <span style={{ fontSize: '0.75rem', color: 'var(--crear-blue)' }}>Por Defecto</span>
           </label>
           <input
             type="text"
             value={c2Venue}
             onChange={(e) => setC2Venue(e.target.value)}
-            placeholder="Ej: Hotel José Antonio Deluxe Miraflores"
+            placeholder="Ej: Hotel JosÃ© Antonio Deluxe Miraflores"
             style={{
               width: '100%',
               padding: '0.6rem 0.85rem',
@@ -8124,14 +8128,14 @@ export default function VenueConfigModal({ isOpen, onClose }) {
         {/* LUGAR PARA MJ */}
         <div style={{ marginBottom: '1rem' }}>
           <label style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', fontWeight: 'bold', color: '#ffffff', marginBottom: '0.35rem' }}>
-            <span>🏨 Hotel / Salón para Maestría del Juego (MJ):</span>
+            <span>ðŸ¨ Hotel / SalÃ³n para MaestrÃ­a del Juego (MJ):</span>
             <span style={{ fontSize: '0.75rem', color: 'var(--role-mj)' }}>Por Defecto</span>
           </label>
           <input
             type="text"
             value={mjVenue}
             onChange={(e) => setMjVenue(e.target.value)}
-            placeholder="Ej: Hotel José Antonio Deluxe Miraflores"
+            placeholder="Ej: Hotel JosÃ© Antonio Deluxe Miraflores"
             style={{
               width: '100%',
               padding: '0.6rem 0.85rem',
@@ -8149,7 +8153,7 @@ export default function VenueConfigModal({ isOpen, onClose }) {
         <div style={{ marginBottom: '1rem' }}>
           <label style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', fontWeight: 'bold', color: '#ffffff', marginBottom: '0.35rem' }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#fbbf24' }}>
-              <Compass size={14} /> 🏕️ Lugar / Hostal para "El Viaje" (MJ Viaje):
+              <Compass size={14} /> ðŸ•ï¸ Lugar / Hostal para "El Viaje" (MJ Viaje):
             </span>
             <span style={{ fontSize: '0.75rem', color: '#fbbf24' }}>Especial Retiro</span>
           </label>
@@ -8157,7 +8161,7 @@ export default function VenueConfigModal({ isOpen, onClose }) {
             type="text"
             value={viajeVenue}
             onChange={(e) => setViajeVenue(e.target.value)}
-            placeholder="Ej: Hostal Sol y Luna (Cieneguilla, Lima, Perú)"
+            placeholder="Ej: Hostal Sol y Luna (Cieneguilla, Lima, PerÃº)"
             style={{
               width: '100%',
               padding: '0.6rem 0.85rem',
@@ -8171,16 +8175,16 @@ export default function VenueConfigModal({ isOpen, onClose }) {
           />
         </div>
 
-        {/* DIRECCIÓN OFICIAL */}
+        {/* DIRECCIÃ“N OFICIAL */}
         <div style={{ marginBottom: '1.5rem' }}>
           <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 'bold', color: 'var(--text-muted)', marginBottom: '0.35rem' }}>
-            📍 Dirección General de la Sede para Mapas:
+            ðŸ“ DirecciÃ³n General de la Sede para Mapas:
           </label>
           <input
             type="text"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
-            placeholder="Ej: Calle Bellavista 133, Miraflores, Lima, Perú"
+            placeholder="Ej: Calle Bellavista 133, Miraflores, Lima, PerÃº"
             style={{
               width: '100%',
               padding: '0.6rem 0.85rem',
@@ -8221,7 +8225,7 @@ export default function VenueConfigModal({ isOpen, onClose }) {
               style={{ padding: '0.5rem 1.4rem' }}
             >
               <Save size={14} />
-              <span>Guardar Configuración</span>
+              <span>Guardar ConfiguraciÃ³n</span>
             </button>
           </div>
         </div>
@@ -8234,24 +8238,24 @@ export default function VenueConfigModal({ isOpen, onClose }) {
 
 ---
 
-### 📄 Archivo: `src/config/permissions.js`
+### ðŸ“„ Archivo: `src/config/permissions.js`
 
 ```javascript
-// Configuración centralizada de permisos y roles administrativos
-// Este archivo es la ÚNICA fuente de verdad para emails con privilegios elevados.
-// Cualquier cambio de SuperAdmin se hace AQUÍ, no disperso en el código.
+// ConfiguraciÃ³n centralizada de permisos y roles administrativos
+// Este archivo es la ÃšNICA fuente de verdad para emails con privilegios elevados.
+// Cualquier cambio de SuperAdmin se hace AQUÃ, no disperso en el cÃ³digo.
 
 /**
  * Emails con privilegios de Super Administrador.
  * Estos usuarios tienen acceso total: Centro de Mando, reinicio de ciclos,
- * gestión de metas, y visibilidad global multi-sede.
+ * gestiÃ³n de metas, y visibilidad global multi-sede.
  */
 export const SUPER_ADMIN_EMAILS = [
   'jose.sanchez@crearpsl.net',
 ];
 
 /**
- * Roles que otorgan privilegios de Dirección (equivalente a SuperAdmin por rol)
+ * Roles que otorgan privilegios de DirecciÃ³n (equivalente a SuperAdmin por rol)
  */
 export const DIRECCION_ROLES = ['direccion', 'cfo'];
 
@@ -8271,7 +8275,7 @@ export const isSuperAdminEmail = (email) => {
 };
 
 /**
- * Verifica si un rol normalizado tiene privilegios de Dirección
+ * Verifica si un rol normalizado tiene privilegios de DirecciÃ³n
  * @param {string} role - Rol normalizado
  * @returns {boolean}
  */
@@ -8290,7 +8294,7 @@ export const isGerenciaRole = (role) => {
 
 /**
  * Devuelve la lista de roles a los que el usuario actual puede asignar tareas,
- * basado en la jerarquía del organigrama de CREAR PSL.
+ * basado en la jerarquÃ­a del organigrama de CREAR PSL.
  * @param {Object} currentUser - Objeto del usuario logueado
  * @returns {Array<{id: string, name: string}>}
  */
@@ -8302,10 +8306,10 @@ export const getAssignableRoles = (currentUser) => {
   if (currentUser.isSuperAdmin) {
     return [
       { id: 'gerente', name: 'Gerente de Sede' },
-      { id: 'director_maestria', name: 'Director de Maestría' },
-      { id: 'coord_maestria', name: 'Coordinador Maestría' },
+      { id: 'director_maestria', name: 'Director de MaestrÃ­a' },
+      { id: 'coord_maestria', name: 'Coordinador MaestrÃ­a' },
       { id: 'coord_c1', name: 'Coordinador C1/C2' },
-      { id: 'capitan', name: 'Capitán' },
+      { id: 'capitan', name: 'CapitÃ¡n' },
       { id: 'manager', name: 'Manager' },
       { id: 'qt', name: 'Quantum Team (QT)' },
       { id: 'admin', name: 'Equipo Administrativo' }
@@ -8314,39 +8318,39 @@ export const getAssignableRoles = (currentUser) => {
 
   if (normRole === 'director_maestria') {
     return [
-      { id: 'director_maestria', name: 'Director de Maestría (A mí mismo)' },
-      { id: 'coord_maestria', name: 'Coordinador Maestría' },
+      { id: 'director_maestria', name: 'Director de MaestrÃ­a (A mÃ­ mismo)' },
+      { id: 'coord_maestria', name: 'Coordinador MaestrÃ­a' },
       { id: 'manager', name: 'Manager' }
     ];
   }
 
   if (normRole === 'gerente') {
     return [
-      { id: 'gerente', name: 'Gerente (A mí mismo)' },
+      { id: 'gerente', name: 'Gerente (A mÃ­ mismo)' },
       { id: 'coord_c1', name: 'Coordinador C1/C2' },
       { id: 'admin', name: 'Equipo Administrativo' },
-      { id: 'capitan', name: 'Capitán' }
+      { id: 'capitan', name: 'CapitÃ¡n' }
     ];
   }
 
   if (normRole === 'coord_c1') {
     return [
-      { id: 'coord_c1', name: 'Coordinador C1/C2 (A mí mismo)' },
-      { id: 'capitan', name: 'Capitán' },
+      { id: 'coord_c1', name: 'Coordinador C1/C2 (A mÃ­ mismo)' },
+      { id: 'capitan', name: 'CapitÃ¡n' },
       { id: 'qt', name: 'Quantum Team (QT)' }
     ];
   }
 
   if (normRole === 'coord_maestria') {
     return [
-      { id: 'coord_maestria', name: 'Coordinador Maestría (A mí mismo)' },
+      { id: 'coord_maestria', name: 'Coordinador MaestrÃ­a (A mÃ­ mismo)' },
       { id: 'manager', name: 'Manager' }
     ];
   }
 
-  // Base roles: Capitán, Manager, QT, etc.
+  // Base roles: CapitÃ¡n, Manager, QT, etc.
   return [
-    { id: normRole, name: 'A mí mismo' }
+    { id: normRole, name: 'A mÃ­ mismo' }
   ];
 };
 
@@ -8354,7 +8358,7 @@ export const getAssignableRoles = (currentUser) => {
 
 ---
 
-### 📄 Archivo: `src/context/AuthContext.jsx`
+### ðŸ“„ Archivo: `src/context/AuthContext.jsx`
 
 ```javascript
 import { createContext, useContext, useEffect, useState } from 'react';
@@ -8398,7 +8402,7 @@ export function AuthProvider({ children }) {
       ? Array.from(new Set(foundUser.roles.map(r => normalizeRole(r))))
       : [canonicalRole];
 
-    // Verificar si el usuario tenía un rol activo previamente guardado
+    // Verificar si el usuario tenÃ­a un rol activo previamente guardado
     const savedActiveRole = sessionStorage.getItem('cpsl_active_role');
     const activeRole = (savedActiveRole && assignedRoles.includes(savedActiveRole))
       ? savedActiveRole
@@ -8529,7 +8533,7 @@ export function useAuth() {
 
 ---
 
-### 📄 Archivo: `src/context/ChecklistContext.jsx`
+### ðŸ“„ Archivo: `src/context/ChecklistContext.jsx`
 
 ```javascript
 import { createContext, useContext, useState, useEffect } from 'react';
@@ -8552,7 +8556,7 @@ export function ChecklistProvider({ children }) {
   const { currentUser } = useAuth();
 
   useEffect(() => {
-    // Escuchar cambios en la colección "tasks" en tiempo real
+    // Escuchar cambios en la colecciÃ³n "tasks" en tiempo real
     const tasksRef = collection(db, 'tasks');
     const unsubscribe = onSnapshot(tasksRef, (snapshot) => {
       const userSede = currentUser?.sede?.trim() || 'Global';
@@ -8579,7 +8583,7 @@ export function ChecklistProvider({ children }) {
         });
       }
 
-      // Merge de seguridad: Asegurar que todas las tareas del catálogo base (incluidas las nuevas de QT) existan
+      // Merge de seguridad: Asegurar que todas las tareas del catÃ¡logo base (incluidas las nuevas de QT) existan
       const existingIds = new Set(loadedTasks.map(t => t.id));
       const missingBaseTasks = checklistData.filter(t => !existingIds.has(t.id)).map(task => {
         const autoDeadline = calculateAutomaticDeadline(task);
@@ -8588,7 +8592,7 @@ export function ChecklistProvider({ children }) {
           id: task.id,
           completed: false,
           status: 'Pendiente',
-          priority: task.isCritical ? '🔴 ROJO' : '🟡 AMARILLO',
+          priority: task.isCritical ? 'ðŸ”´ ROJO' : 'ðŸŸ¡ AMARILLO',
           progressPercentage: 0,
           deadline: autoDeadline,
           created_at: new Date().toISOString()
@@ -8605,7 +8609,7 @@ export function ChecklistProvider({ children }) {
         ...task,
         completed: false,
         status: 'Pendiente',
-        priority: task.isCritical ? '🔴 ROJO' : '🟡 AMARILLO',
+        priority: task.isCritical ? 'ðŸ”´ ROJO' : 'ðŸŸ¡ AMARILLO',
         progressPercentage: 0,
         deadline: calculateAutomaticDeadline(task)
       }));
@@ -8647,7 +8651,7 @@ export function ChecklistProvider({ children }) {
   const addCustomTask = async (taskData) => {
     try {
       const batch = writeBatch(db);
-      // Creamos un ID único usando timestamp
+      // Creamos un ID Ãºnico usando timestamp
       const customId = `custom_${Date.now()}`;
       const taskRef = doc(db, 'tasks', customId);
       
@@ -8659,9 +8663,9 @@ export function ChecklistProvider({ children }) {
         created_at: new Date().toISOString()
       });
 
-      // Si la tarea tiene una asignación directa a un usuario, crear notificación e email
+      // Si la tarea tiene una asignaciÃ³n directa a un usuario, crear notificaciÃ³n e email
       if (taskData.assignedToEmail) {
-        // 1. Notificación In-App
+        // 1. NotificaciÃ³n In-App
         const notifRef = doc(collection(db, 'notifications'));
         batch.set(notifRef, {
           userId: taskData.assignedToEmail,
@@ -8672,7 +8676,7 @@ export function ChecklistProvider({ children }) {
           created_at: new Date().toISOString()
         });
 
-        // 2. Notificación por Correo (Vía Firebase Trigger Email Extension)
+        // 2. NotificaciÃ³n por Correo (VÃ­a Firebase Trigger Email Extension)
         const mailRef = doc(collection(db, 'mail'));
         batch.set(mailRef, {
           to: taskData.assignedToEmail,
@@ -8683,9 +8687,9 @@ export function ChecklistProvider({ children }) {
               <p><strong>Tarea:</strong> ${taskData.task || taskData.title}</p>
               <p><strong>Sede:</strong> ${taskData.assignedSede || 'Global'}</p>
               <p><strong>Prioridad:</strong> ${taskData.priority || 'Normal'}</p>
-              <p>Por favor, ingresa a la plataforma para revisarla y marcarla como completada cuando esté lista.</p>
+              <p>Por favor, ingresa a la plataforma para revisarla y marcarla como completada cuando estÃ© lista.</p>
               <br/>
-              <p><em>Equipo CREAR Poder Sin Límites</em></p>
+              <p><em>Equipo CREAR Poder Sin LÃ­mites</em></p>
             `
           }
         });
@@ -8704,7 +8708,7 @@ export function ChecklistProvider({ children }) {
     try {
       const taskRef = doc(db, 'tasks', taskId);
       await updateDoc(taskRef, {
-        status: 'Pendiente de validación',
+        status: 'Pendiente de validaciÃ³n',
         evidence_url: evidenceUrl,
         date: new Date().toISOString()
       });
@@ -8735,7 +8739,7 @@ export function ChecklistProvider({ children }) {
     return Math.round((completed / roleTasks.length) * 100);
   };
 
-  // Función de utilidad para cargar las tareas iniciales a Firestore (Protegido estrictamente)
+  // FunciÃ³n de utilidad para cargar las tareas iniciales a Firestore (Protegido estrictamente)
   const initializeFirestore = async (user = null) => {
     const activeAuthUser = user || auth.currentUser;
     if (!activeAuthUser) {
@@ -8747,13 +8751,13 @@ export function ChecklistProvider({ children }) {
     const isAuthorized = user?.isSuperAdmin || isGerenciaRole(norm) || isSuperAdminEmail(activeAuthUser.email);
     
     if (!isAuthorized) {
-      showToast("ACCESO DENEGADO: Solo la Gerencia o Dirección pueden reiniciar el ciclo operativo.", "error");
+      showToast("ACCESO DENEGADO: Solo la Gerencia o DirecciÃ³n pueden reiniciar el ciclo operativo.", "error");
       return false;
     }
 
-    const confirmText = await showPrompt("🚨 ¡ADVERTENCIA CRÍTICA!\n\nEsto reiniciará y sobreescribirá la matriz operativa del SO-AR en Firestore para un nuevo ciclo en blanco.\n\nEscribe CONFIRMAR para continuar:");
+    const confirmText = await showPrompt("ðŸš¨ Â¡ADVERTENCIA CRÃTICA!\n\nEsto reiniciarÃ¡ y sobreescribirÃ¡ la matriz operativa del SO-AR en Firestore para un nuevo ciclo en blanco.\n\nEscribe CONFIRMAR para continuar:");
     if (!confirmText || confirmText.toUpperCase() !== 'CONFIRMAR') {
-      showToast("Operación cancelada.", "info");
+      showToast("OperaciÃ³n cancelada.", "info");
       return false;
     }
     
@@ -8776,14 +8780,14 @@ export function ChecklistProvider({ children }) {
           completed: false, // Legacy fallback
           status: 'Pendiente', // Legacy fallback
           completions: initialCompletions,
-          priority: task.isCritical ? '🔴 ROJO' : '🟡 AMARILLO',
+          priority: task.isCritical ? 'ðŸ”´ ROJO' : 'ðŸŸ¡ AMARILLO',
           progressPercentage: 0,
           deadline: autoDeadline,
           created_at: new Date().toISOString()
         });
       });
       await batch.commit();
-      showToast("¡Base de datos SO-AR inicializada y sincronizada con éxito!", "success");
+      showToast("Â¡Base de datos SO-AR inicializada y sincronizada con Ã©xito!", "success");
       return true;
     } catch (error) {
       console.error("Error initializing DB:", error);
@@ -8795,11 +8799,11 @@ export function ChecklistProvider({ children }) {
   const syncTasksToGoogle = async (roleId) => {
     const token = sessionStorage.getItem('googleAccessToken');
     if (!token) {
-      showToast("No se encontró sesión con permisos de Google. Por favor, cierra sesión y vuelve a entrar.", "error");
+      showToast("No se encontrÃ³ sesiÃ³n con permisos de Google. Por favor, cierra sesiÃ³n y vuelve a entrar.", "error");
       return;
     }
 
-    // Buscamos tareas para este rol que NO estén completadas ni sincronizadas
+    // Buscamos tareas para este rol que NO estÃ©n completadas ni sincronizadas
     const myUnsyncedTasks = tasks.filter(t => t.role === roleId && !t.completed && !t.googleSynced);
     if (myUnsyncedTasks.length === 0) {
       showToast("No tienes tareas pendientes por sincronizar a Google.", "error");
@@ -8826,10 +8830,10 @@ export function ChecklistProvider({ children }) {
       }
     }
 
-    showToast(`¡Se sincronizaron ${successCount} tareas a tu cuenta de Google Tasks exitosamente!`, "success");
+    showToast(`Â¡Se sincronizaron ${successCount} tareas a tu cuenta de Google Tasks exitosamente!`, "success");
   };
 
-  // 1. Enviar invitación de colaboración / mención
+  // 1. Enviar invitaciÃ³n de colaboraciÃ³n / menciÃ³n
   const inviteCollaborator = async (task, targetUser, message) => {
     try {
       const batch = writeBatch(db);
@@ -8852,32 +8856,32 @@ export function ChecklistProvider({ children }) {
         pendingCollaborations: [...currentPending.filter(p => p.email !== targetUser.email), newPending]
       });
 
-      // Notificación interactiva al invitado
+      // NotificaciÃ³n interactiva al invitado
       const notifRef = doc(collection(db, 'notifications'));
       batch.set(notifRef, {
         userId: targetUser.email,
         type: 'COLLABORATION_INVITE',
-        title: `🤝 @${currentUser.displayName || 'Compañero'} te invitó a colaborar`,
+        title: `ðŸ¤ @${currentUser.displayName || 'CompaÃ±ero'} te invitÃ³ a colaborar`,
         message: message ? `"${message}" en la tarea: ${task.task || task.title}` : `Te ha invitado a colaborar en la tarea: ${task.task || task.title}`,
         taskId: task.id,
         taskTitle: task.task || task.title,
         inviterEmail: currentUser.email,
-        inviterName: currentUser.displayName || 'Compañero',
+        inviterName: currentUser.displayName || 'CompaÃ±ero',
         read: false,
         created_at: new Date().toISOString()
       });
 
       await batch.commit();
-      showToast(`¡Invitación enviada con éxito a @${targetUser.name}!`, 'success');
+      showToast(`Â¡InvitaciÃ³n enviada con Ã©xito a @${targetUser.name}!`, 'success');
       return true;
     } catch (err) {
       console.error("Error al invitar colaborador:", err);
-      showToast("Error al enviar la invitación.", "error");
+      showToast("Error al enviar la invitaciÃ³n.", "error");
       return false;
     }
   };
 
-  // 2. Aceptar invitación de colaboración
+  // 2. Aceptar invitaciÃ³n de colaboraciÃ³n
   const acceptCollaboration = async (notification) => {
     try {
       const batch = writeBatch(db);
@@ -8904,7 +8908,7 @@ export function ChecklistProvider({ children }) {
         updatedAt: new Date().toISOString()
       });
 
-      // Marcar notificación como leída
+      // Marcar notificaciÃ³n como leÃ­da
       const notifRef = doc(db, 'notifications', notification.id);
       batch.update(notifRef, { read: true, status: 'ACEPTADA' });
 
@@ -8913,7 +8917,7 @@ export function ChecklistProvider({ children }) {
         const replyNotifRef = doc(collection(db, 'notifications'));
         batch.set(replyNotifRef, {
           userId: notification.inviterEmail,
-          title: `🎉 @${currentUser.displayName} aceptó colaborar contigo`,
+          title: `ðŸŽ‰ @${currentUser.displayName} aceptÃ³ colaborar contigo`,
           message: `Ahora comparten y dan seguimiento conjunto a la tarea: "${notification.taskTitle || 'Tarea Compartida'}"`,
           read: false,
           created_at: new Date().toISOString()
@@ -8921,21 +8925,21 @@ export function ChecklistProvider({ children }) {
       }
 
       await batch.commit();
-      showToast(`¡Colaboración aceptada! La tarea ahora está en tu panel compartido.`, 'success');
+      showToast(`Â¡ColaboraciÃ³n aceptada! La tarea ahora estÃ¡ en tu panel compartido.`, 'success');
       return true;
     } catch (err) {
-      console.error("Error al aceptar colaboración:", err);
-      showToast("No se pudo aceptar la colaboración.", "error");
+      console.error("Error al aceptar colaboraciÃ³n:", err);
+      showToast("No se pudo aceptar la colaboraciÃ³n.", "error");
       return false;
     }
   };
 
-  // 3. Rechazar invitación
+  // 3. Rechazar invitaciÃ³n
   const rejectCollaboration = async (notification) => {
     try {
       const docRef = doc(db, 'notifications', notification.id);
       await updateDoc(docRef, { read: true, status: 'RECHAZADA' });
-      showToast("Invitación declinada.", "info");
+      showToast("InvitaciÃ³n declinada.", "info");
       return true;
     } catch (err) {
       console.error("Error al declinar:", err);
@@ -8971,7 +8975,7 @@ export function useChecklist() {
 
 ---
 
-### 📄 Archivo: `src/context/CyclesContext.jsx`
+### ðŸ“„ Archivo: `src/context/CyclesContext.jsx`
 
 ```javascript
 import { createContext, useContext, useState, useEffect } from 'react';
@@ -8997,13 +9001,13 @@ export function CyclesProvider({ children }) {
       });
 
       if (!active) {
-        // Fallback al ciclo más próximo
+        // Fallback al ciclo mÃ¡s prÃ³ximo
         active = cyclesData[0];
       }
 
       setCurrentCycle(active);
 
-      // Determinación precisa de la etapa operativa SO-AR
+      // DeterminaciÃ³n precisa de la etapa operativa SO-AR
       const c1Start = new Date(active.c1_start);
       const c1End = new Date(active.c1_end || active.c1_start);
       c1End.setHours(23, 59, 59);
@@ -9054,7 +9058,7 @@ export function useCycles() {
 
 ---
 
-### 📄 Archivo: `src/context/NotificationContext.jsx`
+### ðŸ“„ Archivo: `src/context/NotificationContext.jsx`
 
 ```javascript
 import { createContext, useContext, useState, useEffect } from 'react';
@@ -9188,7 +9192,7 @@ export function useNotifications() {
 
 ---
 
-### 📄 Archivo: `src/context/ThemeContext.jsx`
+### ðŸ“„ Archivo: `src/context/ThemeContext.jsx`
 
 ```javascript
 import React, { createContext, useContext, useState, useEffect } from 'react';
@@ -9217,8 +9221,8 @@ export function ThemeProvider({ children }) {
         return 'dark';
       }
       
-      // MODO AUTOMÁTICO: Basado en el momento del día y reloj solar
-      // Horario Día: 06:00 AM a 18:30 PM (6.0 a 18.5)
+      // MODO AUTOMÃTICO: Basado en el momento del dÃ­a y reloj solar
+      // Horario DÃ­a: 06:00 AM a 18:30 PM (6.0 a 18.5)
       const now = new Date();
       const currentHour = now.getHours() + now.getMinutes() / 60;
       const isDayTime = currentHour >= 6.0 && currentHour < 18.5;
@@ -9242,7 +9246,7 @@ export function ThemeProvider({ children }) {
 
     applyTheme();
 
-    // Actualizar automáticamente cada minuto si está en modo auto
+    // Actualizar automÃ¡ticamente cada minuto si estÃ¡ en modo auto
     const interval = setInterval(() => {
       if (themeMode === 'auto') {
         applyTheme();
@@ -9271,7 +9275,7 @@ export function useTheme() {
 
 ---
 
-### 📄 Archivo: `src/context/UIContext.jsx`
+### ðŸ“„ Archivo: `src/context/UIContext.jsx`
 
 ```javascript
 import React, { createContext, useContext, useState, useCallback } from 'react';
@@ -9338,14 +9342,14 @@ export const UIProvider = ({ children }) => {
 
 ---
 
-### 📄 Archivo: `src/data/checklistData.js`
+### ðŸ“„ Archivo: `src/data/checklistData.js`
 
 ```javascript
 export const roles = [
   { id: 'gerente', name: 'Gerente de Sede' },
-  { id: 'coord_maestria', name: 'Coordinador/a Maestría (CMJ)' },
+  { id: 'coord_maestria', name: 'Coordinador/a MaestrÃ­a (CMJ)' },
   { id: 'coord_c1', name: 'Coordinador/a C1/C2' },
-  { id: 'capitan', name: 'Capitán' },
+  { id: 'capitan', name: 'CapitÃ¡n' },
   { id: 'qt', name: 'Equipo de Apoyo' } // Replaced QT
 ];
 
@@ -9354,23 +9358,23 @@ export const checklistData = [
   // --- GATE T-30 ---
   { 
     id: 't30_presupuesto', role: 'gerente', cyclePhase: 'T-30', task: 'Presupuesto aprobado y fondos separados',
-    priority: 'Crítica', deadline: 'T-30', evidence: 'Reporte Financiero', dependency: 'Ninguna', escalation: 'Dirección General', isCritical: true
+    priority: 'CrÃ­tica', deadline: 'T-30', evidence: 'Reporte Financiero', dependency: 'Ninguna', escalation: 'DirecciÃ³n General', isCritical: true
   },
   { 
-    id: 't30_salon', role: 'gerente', cyclePhase: 'T-30', task: 'Salón definido, separado y pagado',
-    priority: 'Crítica', deadline: 'T-30', evidence: 'Contrato y Comprobante de Pago', dependency: 'Presupuesto aprobado', escalation: 'Dirección General', isCritical: true
+    id: 't30_salon', role: 'gerente', cyclePhase: 'T-30', task: 'SalÃ³n definido, separado y pagado',
+    priority: 'CrÃ­tica', deadline: 'T-30', evidence: 'Contrato y Comprobante de Pago', dependency: 'Presupuesto aprobado', escalation: 'DirecciÃ³n General', isCritical: true
   },
   { 
     id: 't30_entrenador', role: 'gerente', cyclePhase: 'T-30', task: 'Entrenador confirmado',
-    priority: 'Crítica', deadline: 'T-30', evidence: 'Correo/Mensaje de confirmación', dependency: 'Ninguna', escalation: 'Dirección General', isCritical: true
+    priority: 'CrÃ­tica', deadline: 'T-30', evidence: 'Correo/Mensaje de confirmaciÃ³n', dependency: 'Ninguna', escalation: 'DirecciÃ³n General', isCritical: true
   },
   { 
     id: 't30_hotel', role: 'gerente', cyclePhase: 'T-30', task: 'Hotel del entrenador confirmado y pagado',
-    priority: 'Crítica', deadline: 'T-30', evidence: 'Comprobante de Reserva/Pago', dependency: 'Entrenador confirmado', escalation: 'Dirección General', isCritical: true
+    priority: 'CrÃ­tica', deadline: 'T-30', evidence: 'Comprobante de Reserva/Pago', dependency: 'Entrenador confirmado', escalation: 'DirecciÃ³n General', isCritical: true
   },
   { 
     id: 't30_vuelo', role: 'gerente', cyclePhase: 'T-30', task: 'Vuelo del entrenador confirmado y pagado',
-    priority: 'Crítica', deadline: 'T-30', evidence: 'Boleto Electrónico', dependency: 'Entrenador confirmado', escalation: 'Dirección General', isCritical: true
+    priority: 'CrÃ­tica', deadline: 'T-30', evidence: 'Boleto ElectrÃ³nico', dependency: 'Entrenador confirmado', escalation: 'DirecciÃ³n General', isCritical: true
   },
 
   // --- GATE T-21 ---
@@ -9391,74 +9395,74 @@ export const checklistData = [
     priority: 'Alta', deadline: 'T-7', evidence: 'Lista Exportada', dependency: 'Censo preliminar', escalation: 'Gerente', isCritical: true
   },
   {
-    id: 't7_uniformes', role: 'qt', cyclePhase: 'T-7', task: 'Auditoría de uniformes de Equipo de Apoyo',
-    priority: 'Media', deadline: 'T-7', evidence: 'Checklist Fotográfico', dependency: 'Asignación Equipo de Apoyo', escalation: 'Capitán', isCritical: false
+    id: 't7_uniformes', role: 'qt', cyclePhase: 'T-7', task: 'AuditorÃ­a de uniformes de Equipo de Apoyo',
+    priority: 'Media', deadline: 'T-7', evidence: 'Checklist FotogrÃ¡fico', dependency: 'AsignaciÃ³n Equipo de Apoyo', escalation: 'CapitÃ¡n', isCritical: false
   },
 
-  // --- OPERACIÓN C1 ---
+  // --- OPERACIÃ“N C1 ---
   {
     id: 'c1_registro', role: 'coord_c1', cyclePhase: 'C1', task: 'Apertura de registro y resguardo de pertenencias',
-    priority: 'Crítica', deadline: 'DÍA 0 (Viernes)', evidence: 'Planillas de Ingreso', dependency: 'Listas Freeze', escalation: 'Gerente', isCritical: true
+    priority: 'CrÃ­tica', deadline: 'DÃA 0 (Viernes)', evidence: 'Planillas de Ingreso', dependency: 'Listas Freeze', escalation: 'Gerente', isCritical: true
   },
   {
-    id: 'c1_contencion', role: 'qt', cyclePhase: 'C1', task: 'Mantenimiento hermético de sala y contención silenciosa',
-    priority: 'Alta', deadline: 'DÍA 0', evidence: 'Ninguna', dependency: 'Sala instalada', escalation: 'Capitán', isCritical: true
+    id: 'c1_contencion', role: 'qt', cyclePhase: 'C1', task: 'Mantenimiento hermÃ©tico de sala y contenciÃ³n silenciosa',
+    priority: 'Alta', deadline: 'DÃA 0', evidence: 'Ninguna', dependency: 'Sala instalada', escalation: 'CapitÃ¡n', isCritical: true
   },
 
   // --- CIERRE C1 ---
   {
-    id: 'postc1_devolucion', role: 'qt', cyclePhase: 'POST-C1', task: 'Devolución del salón en estado impecable',
-    priority: 'Media', deadline: 'T+1 (Domingo)', evidence: 'Acta de entrega / Fotos', dependency: 'Ninguna', escalation: 'Capitán', isCritical: false
+    id: 'postc1_devolucion', role: 'qt', cyclePhase: 'POST-C1', task: 'DevoluciÃ³n del salÃ³n en estado impecable',
+    priority: 'Media', deadline: 'T+1 (Domingo)', evidence: 'Acta de entrega / Fotos', dependency: 'Ninguna', escalation: 'CapitÃ¡n', isCritical: false
   },
   {
     id: 'postc1_rezagados', role: 'coord_c1', cyclePhase: 'POST-C1', task: 'Reporte final de asistencia y Rezagados',
-    priority: 'Crítica', deadline: 'T+1 (Domingo Noche)', evidence: 'Reporte Financiero', dependency: 'Cierre de C1', escalation: 'Gerente', isCritical: true
+    priority: 'CrÃ­tica', deadline: 'T+1 (Domingo Noche)', evidence: 'Reporte Financiero', dependency: 'Cierre de C1', escalation: 'Gerente', isCritical: true
   },
 
-  // --- OPERACIÓN C2 ---
+  // --- OPERACIÃ“N C2 ---
   {
     id: 'c2_grounding', role: 'coord_c1', cyclePhase: 'C2', task: 'Arranque y grounding del equipo',
-    priority: 'Alta', deadline: 'DÍA 0 (Jueves)', evidence: 'Foto de Grounding', dependency: 'Ninguna', escalation: 'Gerente', isCritical: true
+    priority: 'Alta', deadline: 'DÃA 0 (Jueves)', evidence: 'Foto de Grounding', dependency: 'Ninguna', escalation: 'Gerente', isCritical: true
   },
   {
-    id: 'c2_mesas', role: 'coord_c1', cyclePhase: 'C2', task: 'Operación de mesas de enrolamiento a MJ',
-    priority: 'Crítica', deadline: 'DÍA 0 (Sábado/Domingo)', evidence: 'Vouchers/Registros', dependency: 'Ninguna', escalation: 'Gerente', isCritical: true
+    id: 'c2_mesas', role: 'coord_c1', cyclePhase: 'C2', task: 'OperaciÃ³n de mesas de enrolamiento a MJ',
+    priority: 'CrÃ­tica', deadline: 'DÃA 0 (SÃ¡bado/Domingo)', evidence: 'Vouchers/Registros', dependency: 'Ninguna', escalation: 'Gerente', isCritical: true
   },
 
   // --- GATE VIERNES C2 ---
   {
     id: 'gatec2_grounding', role: 'coord_maestria', cyclePhase: 'C2', task: 'Groundings de los tres FDS de MJ confirmados',
-    priority: 'Crítica', deadline: 'Viernes C2', evidence: 'Documento Firmado', dependency: 'Managers Confirmados', escalation: 'Gerente', isCritical: true
+    priority: 'CrÃ­tica', deadline: 'Viernes C2', evidence: 'Documento Firmado', dependency: 'Managers Confirmados', escalation: 'Gerente', isCritical: true
   },
   {
     id: 'gatec2_rezagados', role: 'coord_c1', cyclePhase: 'C2', task: 'Meta de Rezagados de C1 comunicada y responsable asignado',
-    priority: 'Crítica', deadline: 'Viernes C2', evidence: 'Meta en CRM/Sistema', dependency: 'Reporte Rezagados C1', escalation: 'Gerente', isCritical: true
+    priority: 'CrÃ­tica', deadline: 'Viernes C2', evidence: 'Meta en CRM/Sistema', dependency: 'Reporte Rezagados C1', escalation: 'Gerente', isCritical: true
   },
 
-  // --- PREPARACIÓN MJ ---
+  // --- PREPARACIÃ“N MJ ---
   {
-    id: 'premj_managers', role: 'coord_maestria', cyclePhase: 'PRE-MJ', task: 'Relación 1 Manager por cada 6 Participantes configurada',
-    priority: 'Crítica', deadline: 'Semana 1', evidence: 'Lista de Asignación', dependency: 'Graduados C2', escalation: 'Gerente', isCritical: true
+    id: 'premj_managers', role: 'coord_maestria', cyclePhase: 'PRE-MJ', task: 'RelaciÃ³n 1 Manager por cada 6 Participantes configurada',
+    priority: 'CrÃ­tica', deadline: 'Semana 1', evidence: 'Lista de AsignaciÃ³n', dependency: 'Graduados C2', escalation: 'Gerente', isCritical: true
   },
   {
     id: 'premj_entrenador', role: 'coord_maestria', cyclePhase: 'PRE-MJ', task: 'Agenda de Entrenador MJ bloqueada',
     priority: 'Alta', deadline: 'Jueves Pre-FDS', evidence: 'Captura Google Calendar', dependency: 'Ninguna', escalation: 'Gerente', isCritical: true
   },
 
-  // --- OPERACIÓN MJ ---
+  // --- OPERACIÃ“N MJ ---
   {
     id: 'mj_registro', role: 'coord_maestria', cyclePhase: 'MJ', task: 'Registro estricto (Sin firmas de reglas no hay ingreso)',
-    priority: 'Crítica', deadline: 'Viernes FDS 1', evidence: 'Actas Firmadas', dependency: 'Ninguna', escalation: 'Gerente', isCritical: true
+    priority: 'CrÃ­tica', deadline: 'Viernes FDS 1', evidence: 'Actas Firmadas', dependency: 'Ninguna', escalation: 'Gerente', isCritical: true
   },
   {
     id: 'mj_imposibles', role: 'coord_maestria', cyclePhase: 'MJ', task: 'Seguimiento de Futuros Imposibles',
-    priority: 'Media', deadline: 'Lunes post-FDS', evidence: 'Reporte a Entrenador', dependency: 'Ejecución FDS', escalation: 'Ninguno', isCritical: false
+    priority: 'Media', deadline: 'Lunes post-FDS', evidence: 'Reporte a Entrenador', dependency: 'EjecuciÃ³n FDS', escalation: 'Ninguno', isCritical: false
   },
 
   // --- CIERRE MJ ---
   {
-    id: 'cierre_mj_oro', role: 'coord_maestria', cyclePhase: 'POST-MJ', task: 'Certificación de Cierre de Oro',
-    priority: 'Crítica', deadline: 'T+7', evidence: 'Acta de Dirección', dependency: 'Graduación', escalation: 'Gerente', isCritical: true
+    id: 'cierre_mj_oro', role: 'coord_maestria', cyclePhase: 'POST-MJ', task: 'CertificaciÃ³n de Cierre de Oro',
+    priority: 'CrÃ­tica', deadline: 'T+7', evidence: 'Acta de DirecciÃ³n', dependency: 'GraduaciÃ³n', escalation: 'Gerente', isCritical: true
   }
 ];
 
@@ -9468,7 +9472,7 @@ export const getTasksByRole = (roleId) => checklistData.filter(t => t.role === r
 
 ---
 
-### 📄 Archivo: `src/data/cyclesData.js`
+### ðŸ“„ Archivo: `src/data/cyclesData.js`
 
 ```javascript
 export const cyclesData = [
@@ -9488,7 +9492,7 @@ export const cyclesData = [
 
 ---
 
-### 📄 Archivo: `src/data/usersData.js`
+### ðŸ“„ Archivo: `src/data/usersData.js`
 
 ```javascript
 export const normalizeRole = (role) => {
@@ -9497,7 +9501,7 @@ export const normalizeRole = (role) => {
   if (r === 'coordinador_c1c2' || r === 'coord_c1' || r === 'coordinador_c1') return 'coord_c1';
   if (r === 'coordinador_mj' || r === 'coord_maestria' || r === 'coordinador_maestria') return 'coord_maestria';
   if (r === 'gerente' || r === 'gerente_sede') return 'gerente';
-  if (r === 'capitan' || r === 'capitán') return 'capitan';
+  if (r === 'capitan' || r === 'capitÃ¡n') return 'capitan';
   if (r === 'qt' || r === 'quantum_team' || r === 'quantum team' || r === 'quantum') return 'qt';
   if (r === 'director_maestria' || r === 'director_mj') return 'director_maestria';
   if (r === 'manager' || r === 'managers') return 'manager';
@@ -9508,11 +9512,11 @@ export const normalizeRole = (role) => {
 export const normalizeSede = (sede) => {
   if (!sede) return 'Sede Global';
   const s = sede.trim();
-  if (s === 'MED' || s.toLowerCase().includes('medell')) return 'Medellín';
+  if (s === 'MED' || s.toLowerCase().includes('medell')) return 'MedellÃ­n';
   if (s === 'LIM' || s.toLowerCase().includes('lima')) return 'Lima';
   if (s === 'CUE' || s.toLowerCase().includes('cuenca')) return 'Cuenca';
   if (s === 'GYE' || s.toLowerCase().includes('guayaquil')) return 'Guayaquil';
-  if (s === 'MEX' || s.toLowerCase().includes('mex')) return 'México';
+  if (s === 'MEX' || s.toLowerCase().includes('mex')) return 'MÃ©xico';
   if (s === 'UIO-C1' || s.toLowerCase().includes('ciclo 1') || s.toLowerCase().includes('ciclo1')) return 'Quito Ciclo 1';
   if (s === 'UIO-C2' || s.toLowerCase().includes('ciclo 2') || s.toLowerCase().includes('ciclo2')) return 'Quito Ciclo 2';
   if (s === 'UIO' || s.toLowerCase().includes('quito')) return 'Quito Ciclo 1';
@@ -9526,26 +9530,26 @@ export const OPERATIONAL_SEDES = [
   'Quito Ciclo 2',
   'Cuenca',
   'Guayaquil',
-  'Medellín',
-  'México'
+  'MedellÃ­n',
+  'MÃ©xico'
 ];
 
 export const ROLE_DISPLAY_NAMES = {
   coord_c1: 'Coordinador C1 / C2',
   coordinador_c1c2: 'Coordinador C1 / C2',
-  coord_maestria: 'Coordinador Maestría (MJ)',
-  coordinador_mj: 'Coordinador Maestría (MJ)',
+  coord_maestria: 'Coordinador MaestrÃ­a (MJ)',
+  coordinador_mj: 'Coordinador MaestrÃ­a (MJ)',
   gerente: 'Gerente de Sede',
-  capitan: 'Capitán de Sede',
+  capitan: 'CapitÃ¡n de Sede',
   qt: 'Quantum Team (QT)',
-  director_maestria: 'Director de Maestría',
+  director_maestria: 'Director de MaestrÃ­a',
   manager: 'Manager',
   cfo: 'CFO (Chief Financial Officer)',
-  direccion: 'Dirección Global',
+  direccion: 'DirecciÃ³n Global',
   finanzas: 'Finanzas',
-  coordinador: 'Coordinación Administrativa',
+  coordinador: 'CoordinaciÃ³n Administrativa',
   talento_humano: 'Talento Humano',
-  legal: 'Legal / Jurídico'
+  legal: 'Legal / JurÃ­dico'
 };
 
 /**
@@ -9569,40 +9573,40 @@ export const usersData = [];
 
 ---
 
-### 📄 Archivo: `src/data/venuesData.js`
+### ðŸ“„ Archivo: `src/data/venuesData.js`
 
 ```javascript
 // src/data/venuesData.js
-// Configuración de Sedes, Hoteles y Salones Oficiales por Defecto
+// ConfiguraciÃ³n de Sedes, Hoteles y Salones Oficiales por Defecto
 
 export const defaultVenues = {
   Lima: {
     sede: 'Lima',
-    c1_venue: 'Hotel José Antonio Deluxe Miraflores (Calle Bellavista 133, Miraflores)',
-    c2_venue: 'Hotel José Antonio Deluxe Miraflores (Calle Bellavista 133, Miraflores)',
-    mj_venue: 'Hotel José Antonio Deluxe Miraflores (Calle Bellavista 133, Miraflores)',
-    viaje_venue: 'Hostal Sol y Luna (Cieneguilla, Lima, Perú)',
-    address: 'Calle Bellavista 133, Miraflores, Lima, Perú',
+    c1_venue: 'Hotel JosÃ© Antonio Deluxe Miraflores (Calle Bellavista 133, Miraflores)',
+    c2_venue: 'Hotel JosÃ© Antonio Deluxe Miraflores (Calle Bellavista 133, Miraflores)',
+    mj_venue: 'Hotel JosÃ© Antonio Deluxe Miraflores (Calle Bellavista 133, Miraflores)',
+    viaje_venue: 'Hostal Sol y Luna (Cieneguilla, Lima, PerÃº)',
+    address: 'Calle Bellavista 133, Miraflores, Lima, PerÃº',
     city: 'Lima',
-    country: 'Perú'
+    country: 'PerÃº'
   },
   Quito: {
     sede: 'Quito',
-    c1_venue: 'Hotel Dann Carlton Quito (Av. República de El Salvador N34-377)',
-    c2_venue: 'Hotel Dann Carlton Quito (Av. República de El Salvador N34-377)',
-    mj_venue: 'Hotel Dann Carlton Quito (Av. República de El Salvador N34-377)',
-    viaje_venue: 'Hostería Papagayo (Cotopaxi / Machachi, Ecuador)',
-    address: 'Av. República de El Salvador N34-377, Quito, Ecuador',
+    c1_venue: 'Hotel Dann Carlton Quito (Av. RepÃºblica de El Salvador N34-377)',
+    c2_venue: 'Hotel Dann Carlton Quito (Av. RepÃºblica de El Salvador N34-377)',
+    mj_venue: 'Hotel Dann Carlton Quito (Av. RepÃºblica de El Salvador N34-377)',
+    viaje_venue: 'HosterÃ­a Papagayo (Cotopaxi / Machachi, Ecuador)',
+    address: 'Av. RepÃºblica de El Salvador N34-377, Quito, Ecuador',
     city: 'Quito',
     country: 'Ecuador'
   },
   Cuenca: {
     sede: 'Cuenca',
-    c1_venue: 'Hotel Oro Verde Cuenca (Av. Ordóñez Lasso s/n)',
-    c2_venue: 'Hotel Oro Verde Cuenca (Av. Ordóñez Lasso s/n)',
-    mj_venue: 'Hotel Oro Verde Cuenca (Av. Ordóñez Lasso s/n)',
-    viaje_venue: 'Hostería Dos Chorreras (Cajas, Cuenca, Ecuador)',
-    address: 'Av. Ordóñez Lasso s/n, Cuenca, Ecuador',
+    c1_venue: 'Hotel Oro Verde Cuenca (Av. OrdÃ³Ã±ez Lasso s/n)',
+    c2_venue: 'Hotel Oro Verde Cuenca (Av. OrdÃ³Ã±ez Lasso s/n)',
+    mj_venue: 'Hotel Oro Verde Cuenca (Av. OrdÃ³Ã±ez Lasso s/n)',
+    viaje_venue: 'HosterÃ­a Dos Chorreras (Cajas, Cuenca, Ecuador)',
+    address: 'Av. OrdÃ³Ã±ez Lasso s/n, Cuenca, Ecuador',
     city: 'Cuenca',
     country: 'Ecuador'
   },
@@ -9611,30 +9615,30 @@ export const defaultVenues = {
     c1_venue: 'Hotel Wyndham Guayaquil (Puerto Santa Ana)',
     c2_venue: 'Hotel Wyndham Guayaquil (Puerto Santa Ana)',
     mj_venue: 'Hotel Wyndham Guayaquil (Puerto Santa Ana)',
-    viaje_venue: 'Hostería D’Franco (Bucay / Guayas, Ecuador)',
+    viaje_venue: 'HosterÃ­a Dâ€™Franco (Bucay / Guayas, Ecuador)',
     address: 'Calle Numa Pompilio Llona, Puerto Santa Ana, Guayaquil, Ecuador',
     city: 'Guayaquil',
     country: 'Ecuador'
   },
   Medellin: {
-    sede: 'Medellín',
+    sede: 'MedellÃ­n',
     c1_venue: 'Hotel Diez Category El Poblado (Calle 10A #34-11)',
     c2_venue: 'Hotel Diez Category El Poblado (Calle 10A #34-11)',
     mj_venue: 'Hotel Diez Category El Poblado (Calle 10A #34-11)',
-    viaje_venue: 'Hostería Llanogrande (Rionegro / Antioquia, Colombia)',
-    address: 'Calle 10A #34-11, El Poblado, Medellín, Colombia',
-    city: 'Medellín',
+    viaje_venue: 'HosterÃ­a Llanogrande (Rionegro / Antioquia, Colombia)',
+    address: 'Calle 10A #34-11, El Poblado, MedellÃ­n, Colombia',
+    city: 'MedellÃ­n',
     country: 'Colombia'
   },
   Mexico: {
-    sede: 'México',
-    c1_venue: 'Hotel Galería Plaza Reforma (Hamburgo 195, Juárez)',
-    c2_venue: 'Hotel Galería Plaza Reforma (Hamburgo 195, Juárez)',
-    mj_venue: 'Hotel Galería Plaza Reforma (Hamburgo 195, Juárez)',
-    viaje_venue: 'Hotel Misión Grand Valle de Bravo (Edo. de México)',
-    address: 'Hamburgo 195, Juárez, Cuauhtémoc, CDMX, México',
-    city: 'Ciudad de México',
-    country: 'México'
+    sede: 'MÃ©xico',
+    c1_venue: 'Hotel GalerÃ­a Plaza Reforma (Hamburgo 195, JuÃ¡rez)',
+    c2_venue: 'Hotel GalerÃ­a Plaza Reforma (Hamburgo 195, JuÃ¡rez)',
+    mj_venue: 'Hotel GalerÃ­a Plaza Reforma (Hamburgo 195, JuÃ¡rez)',
+    viaje_venue: 'Hotel MisiÃ³n Grand Valle de Bravo (Edo. de MÃ©xico)',
+    address: 'Hamburgo 195, JuÃ¡rez, CuauhtÃ©moc, CDMX, MÃ©xico',
+    city: 'Ciudad de MÃ©xico',
+    country: 'MÃ©xico'
   }
 };
 
@@ -9651,7 +9655,7 @@ export function getVenueForTraining(sede, trainingLevel = 'C1', rawPlace = '', r
   else if (normSede.includes('cuenca') || normSede === 'cue' || normSede.includes('ec cue')) matchKey = 'Cuenca';
   else if (normSede.includes('guayaquil') || normSede === 'gye' || normSede.includes('ec gye')) matchKey = 'Guayaquil';
   else if (normSede.includes('medell') || normSede === 'med' || normSede.includes('co med')) matchKey = 'Medellin';
-  else if (normSede.includes('mex') || normSede.includes('méx') || normSede.includes('mx')) matchKey = 'Mexico';
+  else if (normSede.includes('mex') || normSede.includes('mÃ©x') || normSede.includes('mx')) matchKey = 'Mexico';
 
   const venueObj = defaultVenues[matchKey] || defaultVenues.Lima;
 
@@ -9663,13 +9667,13 @@ export function getVenueForTraining(sede, trainingLevel = 'C1', rawPlace = '', r
         return customVenues[matchKey].viaje_venue;
       }
     } catch (e) {}
-    return venueObj.viaje_venue || (matchKey === 'Lima' ? 'Hostal Sol y Luna (Cieneguilla, Lima, Perú)' : venueObj.mj_venue);
+    return venueObj.viaje_venue || (matchKey === 'Lima' ? 'Hostal Sol y Luna (Cieneguilla, Lima, PerÃº)' : venueObj.mj_venue);
   }
 
-  // Si viene un nombre específico de hotel con más de 20 caracteres y contiene 'hotel', 'hostal', 'hostería' o 'salón', usarlo
+  // Si viene un nombre especÃ­fico de hotel con mÃ¡s de 20 caracteres y contiene 'hotel', 'hostal', 'hosterÃ­a' o 'salÃ³n', usarlo
   const cleanPlace = (rawPlace || '').trim();
   const isGeneric = !cleanPlace || 
-                    cleanPlace.toLowerCase() === 'lima, perú' || 
+                    cleanPlace.toLowerCase() === 'lima, perÃº' || 
                     cleanPlace.toLowerCase() === 'lima, peru' ||
                     cleanPlace.toLowerCase() === 'lima' ||
                     cleanPlace.toLowerCase() === 'quito, ecuador' ||
@@ -9677,14 +9681,14 @@ export function getVenueForTraining(sede, trainingLevel = 'C1', rawPlace = '', r
                     cleanPlace.toLowerCase() === 'cuenca, ecuador' ||
                     cleanPlace.toLowerCase() === 'cuenca' ||
                     cleanPlace.toLowerCase() === 'guayaquil' ||
-                    cleanPlace.toLowerCase() === 'medellín' ||
+                    cleanPlace.toLowerCase() === 'medellÃ­n' ||
                     cleanPlace.toLowerCase() === 'medellin' ||
-                    cleanPlace.toLowerCase() === 'méxico' ||
+                    cleanPlace.toLowerCase() === 'mÃ©xico' ||
                     cleanPlace.toLowerCase() === 'mexico' ||
                     cleanPlace.toLowerCase().includes('pe lim') ||
                     cleanPlace.toLowerCase().includes('por confirmar');
 
-  if (!isGeneric && (cleanPlace.toLowerCase().includes('hotel') || cleanPlace.toLowerCase().includes('hostal') || cleanPlace.toLowerCase().includes('hoster') || cleanPlace.toLowerCase().includes('salon') || cleanPlace.toLowerCase().includes('salón') || cleanPlace.length > 25)) {
+  if (!isGeneric && (cleanPlace.toLowerCase().includes('hotel') || cleanPlace.toLowerCase().includes('hostal') || cleanPlace.toLowerCase().includes('hoster') || cleanPlace.toLowerCase().includes('salon') || cleanPlace.toLowerCase().includes('salÃ³n') || cleanPlace.length > 25)) {
     return cleanPlace;
   }
 
@@ -9708,7 +9712,7 @@ export function getVenueForTraining(sede, trainingLevel = 'C1', rawPlace = '', r
 
 ---
 
-### 📄 Archivo: `src/index.css`
+### ðŸ“„ Archivo: `src/index.css`
 
 ```css
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;600;700;800;900&display=swap');
@@ -9877,7 +9881,7 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 10px 25px rgba(255, 183, 3, 0.5), 0 0 20px rgba(255, 183, 3, 0.3);
 }
 
-/* BOTÓN DE ACCIÓN NEÓN RADIANTE DE MÁXIMO CONTRASTE (100% VISIBLE EN CUALQUIER MODO) */
+/* BOTÃ“N DE ACCIÃ“N NEÃ“N RADIANTE DE MÃXIMO CONTRASTE (100% VISIBLE EN CUALQUIER MODO) */
 .btn-neon-action {
   background: linear-gradient(135deg, #00d2ff 0%, #0284c7 100%) !important;
   color: #030712 !important;
@@ -9944,7 +9948,7 @@ h1, h2, h3, h4, h5, h6 {
 
 ---
 
-### 📄 Archivo: `src/main.jsx`
+### ðŸ“„ Archivo: `src/main.jsx`
 
 ```javascript
 import React from 'react'
@@ -9986,7 +9990,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 
 ---
 
-### 📄 Archivo: `src/pages/ChecklistBoard.jsx`
+### ðŸ“„ Archivo: `src/pages/ChecklistBoard.jsx`
 
 ```javascript
 import { useState } from 'react';
@@ -10017,7 +10021,7 @@ export default function ChecklistBoard() {
 
   const role = roles.find(r => r.id === roleId);
 
-  // Verificación de Autorización por Rol (N7)
+  // VerificaciÃ³n de AutorizaciÃ³n por Rol (N7)
   const isAuthorized = currentUser?.canAccessRole ? currentUser.canAccessRole(roleId) : true;
   if (!isAuthorized) {
     return (
@@ -10025,14 +10029,14 @@ export default function ChecklistBoard() {
         <ShieldAlert size={48} color="#ef4444" style={{ marginBottom: '1rem' }} />
         <h2 style={{ color: '#fff', margin: '0 0 0.5rem' }}>Acceso Restringido</h2>
         <p className="text-muted" style={{ marginBottom: '1.5rem' }}>
-          Tu rol asignado ({currentUser?.appRole}) no tiene autorización para acceder al checklist de <strong>{role?.name || roleId}</strong>.
+          Tu rol asignado ({currentUser?.appRole}) no tiene autorizaciÃ³n para acceder al checklist de <strong>{role?.name || roleId}</strong>.
         </p>
         <button className="btn-secondary" onClick={() => navigate('/home')}>Volver a Mi Inicio</button>
       </div>
     );
   }
 
-  // Las tareas mías incluyen: rol directo, asignadas a mi correo O donde soy colaborador aceptado
+  // Las tareas mÃ­as incluyen: rol directo, asignadas a mi correo O donde soy colaborador aceptado
   const myTasks = tasks.filter(t => 
     t.role === roleId || 
     t.assignedToEmail === currentUser?.email ||
@@ -10048,25 +10052,25 @@ export default function ChecklistBoard() {
     activeTasks = myTasks.filter(t => t.completed || t.status === 'Completada');
     viewTitle = "Mostrando: Tareas Completadas";
   } else if (filterParam === 'criticas') {
-    activeTasks = myTasks.filter(t => !t.completed && (t.isCritical || t.priority === 'Crítica'));
-    viewTitle = "Mostrando: Tareas Críticas (Urgentes)";
+    activeTasks = myTasks.filter(t => !t.completed && (t.isCritical || t.priority === 'CrÃ­tica'));
+    viewTitle = "Mostrando: Tareas CrÃ­ticas (Urgentes)";
   } else if (filterParam === 'importantes') {
-    activeTasks = myTasks.filter(t => !t.completed && !t.isCritical && t.priority !== 'Crítica');
+    activeTasks = myTasks.filter(t => !t.completed && !t.isCritical && t.priority !== 'CrÃ­tica');
     viewTitle = "Mostrando: Tareas Importantes";
   } else if (roleId === 'qt') {
-    // Para QT: visualización prolija de sus fases autorizadas (PRE-C1, C1, POST-C1 / C2)
+    // Para QT: visualizaciÃ³n prolija de sus fases autorizadas (PRE-C1, C1, POST-C1 / C2)
     if (qtPhaseFilter === 'PRE-C1') {
       activeTasks = myTasks.filter(t => t.cyclePhase === 'PRE-C1');
-      viewTitle = "Quantum Team: Fase PRE-C1 (Logística & Armado)";
+      viewTitle = "Quantum Team: Fase PRE-C1 (LogÃ­stica & Armado)";
     } else if (qtPhaseFilter === 'C1') {
       activeTasks = myTasks.filter(t => t.cyclePhase === 'C1');
       viewTitle = "Quantum Team: Fase C1 (Sala & Operaciones en Vivo)";
     } else if (qtPhaseFilter === 'POST-C1') {
       activeTasks = myTasks.filter(t => t.cyclePhase === 'POST-C1' || t.cyclePhase === 'C2');
-      viewTitle = "Quantum Team: Fase POST-C1 / C2 (Cierre & Conversión)";
+      viewTitle = "Quantum Team: Fase POST-C1 / C2 (Cierre & ConversiÃ³n)";
     } else {
       activeTasks = myTasks;
-      viewTitle = "Quantum Team: Catálogo Completo de Tareas (PRE-C1, C1 y C2)";
+      viewTitle = "Quantum Team: CatÃ¡logo Completo de Tareas (PRE-C1, C1 y C2)";
     }
   } else {
     // Vista Normal del Checklist Activo para otros roles
@@ -10096,7 +10100,7 @@ export default function ChecklistBoard() {
   };
 
   const handleAddComment = async (task) => {
-    const comment = await showPrompt("Añadir comentario u observación:", task.comments || "");
+    const comment = await showPrompt("AÃ±adir comentario u observaciÃ³n:", task.comments || "");
     if (comment !== null) {
       updateTaskDetails(task.id, { comments: comment });
     }
@@ -10111,7 +10115,7 @@ export default function ChecklistBoard() {
 
   const handleSetDeadline = async (task) => {
     const current = task.deadline || "";
-    const newDeadline = await showPrompt("⏰ Establecer Fecha y Hora Límite obligatoria:\n(Ejemplo: 2026-08-22 18:00 o Lunes 09:00)", current);
+    const newDeadline = await showPrompt("â° Establecer Fecha y Hora LÃ­mite obligatoria:\n(Ejemplo: 2026-08-22 18:00 o Lunes 09:00)", current);
     if (newDeadline !== null && newDeadline.trim() !== "") {
       updateTaskDetails(task.id, { deadline: newDeadline.trim() });
     }
@@ -10119,7 +10123,7 @@ export default function ChecklistBoard() {
 
   const getPriorityColor = (priorityStr) => {
     if (!priorityStr) return 'var(--text-muted)';
-    if (priorityStr === 'Crítica') return '#ef4444';
+    if (priorityStr === 'CrÃ­tica') return '#ef4444';
     if (priorityStr === 'Alta') return '#f59e0b';
     if (priorityStr === 'Media') return '#29abe2';
     if (priorityStr === 'Baja') return '#22c55e';
@@ -10160,7 +10164,7 @@ export default function ChecklistBoard() {
         </div>
         <p className="text-gold" style={{ marginTop: '0.5rem', fontWeight: 'bold' }}>{progress}% Completado en esta Fase</p>
 
-        {/* NAVEGACIÓN PROLIJA DE FASES PARA QUANTUM TEAM */}
+        {/* NAVEGACIÃ“N PROLIJA DE FASES PARA QUANTUM TEAM */}
         {roleId === 'qt' && (
           <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1.25rem', flexWrap: 'wrap', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '1rem' }}>
             <button
@@ -10176,7 +10180,7 @@ export default function ChecklistBoard() {
                 border: `1px solid ${qtPhaseFilter === 'all' ? 'var(--crear-blue)' : 'rgba(255,255,255,0.1)'}`
               }}
             >
-              📋 Todas las Tareas QT ({myTasks.length})
+              ðŸ“‹ Todas las Tareas QT ({myTasks.length})
             </button>
             <button
               onClick={() => setQtPhaseFilter('PRE-C1')}
@@ -10191,7 +10195,7 @@ export default function ChecklistBoard() {
                 border: `1px solid ${qtPhaseFilter === 'PRE-C1' ? 'var(--crear-gold)' : 'rgba(255,255,255,0.1)'}`
               }}
             >
-              📦 PRE-C1 ({myTasks.filter(t => t.cyclePhase === 'PRE-C1').length})
+              ðŸ“¦ PRE-C1 ({myTasks.filter(t => t.cyclePhase === 'PRE-C1').length})
             </button>
             <button
               onClick={() => setQtPhaseFilter('C1')}
@@ -10206,7 +10210,7 @@ export default function ChecklistBoard() {
                 border: `1px solid ${qtPhaseFilter === 'C1' ? 'var(--color-success)' : 'rgba(255,255,255,0.1)'}`
               }}
             >
-              🏢 C1 Sala ({myTasks.filter(t => t.cyclePhase === 'C1').length})
+              ðŸ¢ C1 Sala ({myTasks.filter(t => t.cyclePhase === 'C1').length})
             </button>
             <button
               onClick={() => setQtPhaseFilter('POST-C1')}
@@ -10221,7 +10225,7 @@ export default function ChecklistBoard() {
                 border: `1px solid ${qtPhaseFilter === 'POST-C1' ? '#8b5cf6' : 'rgba(255,255,255,0.1)'}`
               }}
             >
-              🚀 POST-C1 / C2 ({myTasks.filter(t => t.cyclePhase === 'POST-C1' || t.cyclePhase === 'C2').length})
+              ðŸš€ POST-C1 / C2 ({myTasks.filter(t => t.cyclePhase === 'POST-C1' || t.cyclePhase === 'C2').length})
             </button>
           </div>
         )}
@@ -10247,14 +10251,14 @@ export default function ChecklistBoard() {
                       {task.task || task.title}
                     </h3>
 
-                    {/* FECHA Y HORA LÍMITE AUTOMÁTICA SO-AR */}
+                    {/* FECHA Y HORA LÃMITE AUTOMÃTICA SO-AR */}
                     {(() => {
                       const effectiveDeadline = task.deadline || calculateAutomaticDeadline(task, currentCycle);
                       return (
                         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.25rem 0.6rem', borderRadius: '6px', background: 'rgba(255, 215, 0, 0.1)', border: '1px solid rgba(255, 215, 0, 0.3)', marginBottom: '0.5rem', fontSize: '0.8rem' }}>
                           <Clock size={13} color="var(--crear-gold)" />
                           <span style={{ color: 'var(--crear-gold)', fontWeight: 'bold' }}>
-                            ⏰ Límite: {effectiveDeadline}
+                            â° LÃ­mite: {effectiveDeadline}
                           </span>
                           {!task.completed && (
                             <button 
@@ -10277,19 +10281,19 @@ export default function ChecklistBoard() {
 
                     {(task.dependency && task.dependency !== 'Ninguna') && (
                       <div style={{ fontSize: '0.8rem', color: '#f59e0b', marginTop: '0.3rem' }}>
-                        ⚠ Dependencia: <strong>{task.dependency}</strong>
+                        âš  Dependencia: <strong>{task.dependency}</strong>
                       </div>
                     )}
                     {task.escalation && (
                       <div style={{ fontSize: '0.8rem', color: '#ef4444', marginTop: '0.2rem' }}>
-                        ⇡ Escalamiento: <strong>{task.escalation}</strong>
+                        â‡¡ Escalamiento: <strong>{task.escalation}</strong>
                       </div>
                     )}
 
                     {/* COLABORADORES ACTIVOS DE LA TAREA */}
                     {task.collaboratorDetails && task.collaboratorDetails.length > 0 && (
                       <div style={{ marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
-                        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>🤝 Colaborando:</span>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>ðŸ¤ Colaborando:</span>
                         {task.collaboratorDetails.map(c => (
                           <span key={c.email} style={{ fontSize: '0.75rem', padding: '0.15rem 0.5rem', borderRadius: '9999px', background: 'rgba(0, 210, 255, 0.15)', color: 'var(--crear-blue)', border: '1px solid rgba(0, 210, 255, 0.3)' }}>
                             @{c.name}
@@ -10300,7 +10304,7 @@ export default function ChecklistBoard() {
 
                     {(task.comments || task.evidenceUrl) && (
                       <div style={{ marginTop: '0.8rem', padding: '0.8rem', background: 'rgba(0,0,0,0.2)', borderRadius: '6px', fontSize: '0.85rem' }}>
-                        {task.comments && <p className="text-muted" style={{ margin: '0 0 0.5rem 0' }}>💬 {task.comments}</p>}
+                        {task.comments && <p className="text-muted" style={{ margin: '0 0 0.5rem 0' }}>ðŸ’¬ {task.comments}</p>}
                         {task.evidenceUrl && <a href={task.evidenceUrl} target="_blank" rel="noreferrer" className="text-gold" style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', textDecoration: 'none' }}><LinkIcon size={12}/> Evidencia Adjunta</a>}
                       </div>
                     )}
@@ -10321,18 +10325,18 @@ export default function ChecklistBoard() {
                 </div>
               </div>
 
-              {/* Botones de Acción */}
+              {/* Botones de AcciÃ³n */}
               {!task.completed && (
                 <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem', marginLeft: '36px', flexWrap: 'wrap' }}>
                   <button 
                     onClick={() => { setSelectedTaskForCollab(task); setShowCollabModal(true); }}
                     style={{ background: 'rgba(0, 210, 255, 0.08)', border: '1px solid rgba(0, 210, 255, 0.35)', color: 'var(--crear-blue)', padding: '0.3rem 0.8rem', borderRadius: '4px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem', cursor: 'pointer' }}
-                    title="Mencionar e invitar a un compañero para colaborar en esta tarea"
+                    title="Mencionar e invitar a un compaÃ±ero para colaborar en esta tarea"
                   >
                     <Users size={14} /> @Invitar Colaborador
                   </button>
                   <button onClick={() => handleSetDeadline(task)} style={{ background: 'rgba(255,215,0,0.08)', border: '1px solid rgba(255,215,0,0.3)', color: 'var(--crear-gold)', padding: '0.3rem 0.8rem', borderRadius: '4px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem', cursor: 'pointer' }}>
-                    <Clock size={14} /> Fecha/Hora Límite
+                    <Clock size={14} /> Fecha/Hora LÃ­mite
                   </button>
                   <button onClick={() => handleAddComment(task)} style={{ background: 'none', border: '1px solid rgba(255,255,255,0.2)', color: 'var(--text-muted)', padding: '0.3rem 0.8rem', borderRadius: '4px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem', cursor: 'pointer' }}>
                     <Edit3 size={14} /> Notas
@@ -10352,7 +10356,7 @@ export default function ChecklistBoard() {
 
       <TaskAssignmentModal isOpen={showTaskModal} onClose={() => setShowTaskModal(false)} />
       
-      {/* MODAL DE COLABORACIÓN / MENCIÓN */}
+      {/* MODAL DE COLABORACIÃ“N / MENCIÃ“N */}
       <TaskCollaborationModal
         isOpen={showCollabModal}
         onClose={() => setShowCollabModal(false)}
@@ -10367,7 +10371,7 @@ export default function ChecklistBoard() {
 
 ---
 
-### 📄 Archivo: `src/pages/GerenteDashboard.jsx`
+### ðŸ“„ Archivo: `src/pages/GerenteDashboard.jsx`
 
 ```javascript
 import { useState, useEffect } from 'react';
@@ -10419,19 +10423,19 @@ export default function GerenteDashboard() {
 
   // --- DERIVED DATA ---
   
-  // 1. DÓNDE ESTAMOS
+  // 1. DÃ“NDE ESTAMOS
   const currentTraining = currentStage;
   const cycleFlow = ['GATE 1', 'PRE-C1', 'C1', 'POST-C1', 'C2', 'PRE-MJ', 'MJ', 'POST-MJ'];
   const currentIndex = cycleFlow.indexOf(currentStage);
-  const nextTraining = currentIndex !== -1 && currentIndex < cycleFlow.length - 1 ? cycleFlow[currentIndex + 1] : 'Próximo Ciclo';
+  const nextTraining = currentIndex !== -1 && currentIndex < cycleFlow.length - 1 ? cycleFlow[currentIndex + 1] : 'PrÃ³ximo Ciclo';
 
-  // 2. QUÉ ESTÁ EN RIESGO (Radar)
-  // Críticas / Vencidas / Rojas
-  const criticalTasks = tasks.filter(t => !t.completed && (t.priority === 'Crítica' || t.isCritical));
+  // 2. QUÃ‰ ESTÃ EN RIESGO (Radar)
+  // CrÃ­ticas / Vencidas / Rojas
+  const criticalTasks = tasks.filter(t => !t.completed && (t.priority === 'CrÃ­tica' || t.isCritical));
   // Proximas (Naranjas o sin completar)
-  const upcomingTasks = tasks.filter(t => !t.completed && !t.isCritical && t.priority !== 'Crítica');
+  const upcomingTasks = tasks.filter(t => !t.completed && !t.isCritical && t.priority !== 'CrÃ­tica');
 
-  // 3. QUÉ DEBO HACER HOY (Acciones Gerente)
+  // 3. QUÃ‰ DEBO HACER HOY (Acciones Gerente)
   const myPendingTasks = tasks.filter(t => t.role === 'gerente' && !t.completed && (t.cyclePhase === currentStage || t.isCritical));
   const topActions = myPendingTasks.slice(0, 5); // Limit to top 5 actions
 
@@ -10462,8 +10466,8 @@ export default function GerenteDashboard() {
   };
 
   const handleSendEmail = (email, taskTitle, taskRole) => {
-    const subject = `⚠️ URGENTE SO-AR: ${taskTitle}`;
-    const body = `Hola,\n\nRequiero actualización urgente sobre:\n📌 TAREA: ${taskTitle}\n\nPor favor reportar estado.\n\nGerencia Sede`;
+    const subject = `âš ï¸ URGENTE SO-AR: ${taskTitle}`;
+    const body = `Hola,\n\nRequiero actualizaciÃ³n urgente sobre:\nðŸ“Œ TAREA: ${taskTitle}\n\nPor favor reportar estado.\n\nGerencia Sede`;
     window.location.href = `mailto:${email || ''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 
@@ -10489,7 +10493,7 @@ export default function GerenteDashboard() {
           </button>
           {currentUser?.isSuperAdmin && (
             <button className="btn-primary" onClick={() => navigate('/superadmin')} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'linear-gradient(135deg, #8b5cf6, #29abe2)', color: 'white', border: 'none' }}>
-              🌐 Centro de Mando
+              ðŸŒ Centro de Mando
             </button>
           )}
           <button className="btn-secondary" onClick={() => navigate('/')}>Volver</button>
@@ -10502,13 +10506,13 @@ export default function GerenteDashboard() {
       {/* CUADRANTES EJECUTIVOS */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
         
-        {/* CUADRANTE 1: ¿DÓNDE ESTAMOS? */}
+        {/* CUADRANTE 1: Â¿DÃ“NDE ESTAMOS? */}
         <div className="glass-panel" style={{ padding: '1.5rem', position: 'relative', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', top: '-10px', right: '-10px', opacity: 0.05, transform: 'scale(1.5)' }}>
             <Target size={150} />
           </div>
           <h3 style={{ color: 'var(--crear-blue)', marginTop: 0, fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '1px', borderBottom: '1px solid rgba(0,212,255,0.2)', paddingBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Activity size={16} /> 1. ¿Dónde Estamos?
+            <Activity size={16} /> 1. Â¿DÃ³nde Estamos?
           </h3>
           
           <div style={{ marginTop: '1.5rem' }}>
@@ -10520,7 +10524,7 @@ export default function GerenteDashboard() {
 
           <div style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <div style={{ flex: 1, background: 'rgba(255,255,255,0.05)', borderRadius: '8px', padding: '1rem' }}>
-              <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)' }}>Próximo Hito Operativo</p>
+              <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)' }}>PrÃ³ximo Hito Operativo</p>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
                 <ChevronRight size={18} color="var(--crear-gold)" />
                 <span style={{ color: 'var(--text-heading)', fontWeight: 'bold', fontSize: '1.1rem' }}>{nextTraining}</span>
@@ -10600,16 +10604,16 @@ export default function GerenteDashboard() {
           )}
         </div>
 
-        {/* CUADRANTE 2: ¿QUÉ DEBO HACER HOY? (ACCIONES DEL GERENTE) */}
+        {/* CUADRANTE 2: Â¿QUÃ‰ DEBO HACER HOY? (ACCIONES DEL GERENTE) */}
         <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
           <h3 style={{ color: 'var(--crear-gold)', marginTop: 0, fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '1px', borderBottom: '1px solid rgba(255,215,0,0.2)', paddingBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <CheckSquare size={16} /> 2. ¿Qué debo hacer hoy? (Top 5)
+            <CheckSquare size={16} /> 2. Â¿QuÃ© debo hacer hoy? (Top 5)
           </h3>
           
           {topActions.length === 0 ? (
             <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', color: 'var(--color-success)', gap: '0.5rem', minHeight: '150px' }}>
               <CheckCircle size={32} />
-              <p style={{ margin: 0, fontWeight: 'bold' }}>Día Libre de Tareas Críticas</p>
+              <p style={{ margin: 0, fontWeight: 'bold' }}>DÃ­a Libre de Tareas CrÃ­ticas</p>
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1rem', flex: 1 }}>
@@ -10634,11 +10638,11 @@ export default function GerenteDashboard() {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '1.5rem' }}>
         
-        {/* CUADRANTE 3: ¿QUÉ ESTÁ EN RIESGO? */}
+        {/* CUADRANTE 3: Â¿QUÃ‰ ESTÃ EN RIESGO? */}
         <div className="glass-panel" style={{ padding: '1.5rem', border: criticalTasks.length > 0 ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(255,255,255,0.1)' }}>
           <h3 style={{ color: '#ef4444', marginTop: 0, fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '1px', borderBottom: '1px solid rgba(239,68,68,0.2)', paddingBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'space-between' }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <AlertTriangle size={16} /> 3. ¿Qué está en Riesgo?
+              <AlertTriangle size={16} /> 3. Â¿QuÃ© estÃ¡ en Riesgo?
             </span>
             <span style={{ background: '#ef4444', color: 'white', padding: '2px 8px', borderRadius: '12px', fontSize: '0.8rem', fontWeight: 'bold' }}>
               {criticalTasks.length}
@@ -10647,7 +10651,7 @@ export default function GerenteDashboard() {
 
           {criticalTasks.length === 0 ? (
             <p style={{ color: 'var(--color-success)', margin: '1.5rem 0 0', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <CheckCircle size={18} /> Ningún Gate ni Tarea Crítica en riesgo.
+              <CheckCircle size={18} /> NingÃºn Gate ni Tarea CrÃ­tica en riesgo.
             </p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1.5rem' }}>
@@ -10665,12 +10669,12 @@ export default function GerenteDashboard() {
                         </div>
                         {t.dependency && t.dependency !== 'Ninguna' && (
                           <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
-                            <span style={{ color: '#f59e0b' }}>⚠ Dependencia:</span> {t.dependency}
+                            <span style={{ color: '#f59e0b' }}>âš  Dependencia:</span> {t.dependency}
                           </div>
                         )}
                         {t.escalation && (
                           <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
-                            <span style={{ color: '#ef4444' }}>⇡ Escalamiento:</span> {t.escalation}
+                            <span style={{ color: '#ef4444' }}>â‡¡ Escalamiento:</span> {t.escalation}
                           </div>
                         )}
                       </div>
@@ -10701,17 +10705,17 @@ export default function GerenteDashboard() {
           )}
         </div>
 
-        {/* CUADRANTE 4: ¿QUÉ ESTÁ DELEGADO? (ACCOUNTABILITY) */}
+        {/* CUADRANTE 4: Â¿QUÃ‰ ESTÃ DELEGADO? (ACCOUNTABILITY) */}
         <div className="glass-panel" style={{ padding: '1.5rem' }}>
           <h3 style={{ color: 'var(--text-muted)', marginTop: 0, fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '1px', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Users size={16} /> 4. ¿Qué está delegado? (Progreso)
+            <Users size={16} /> 4. Â¿QuÃ© estÃ¡ delegado? (Progreso)
           </h3>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginTop: '1.5rem' }}>
             {[
-              { id: 'coord_c1', name: 'Coordinación C1 / C2' },
-              { id: 'coord_maestria', name: 'Coordinación Maestría' },
-              { id: 'capitan', name: 'Capitán' },
+              { id: 'coord_c1', name: 'CoordinaciÃ³n C1 / C2' },
+              { id: 'coord_maestria', name: 'CoordinaciÃ³n MaestrÃ­a' },
+              { id: 'capitan', name: 'CapitÃ¡n' },
               { id: 'qt', name: 'Equipo de Apoyo' }
             ].map(role => {
               const progress = getProgressByRole(role.id);
@@ -10733,10 +10737,10 @@ export default function GerenteDashboard() {
             })}
           </div>
 
-          {/* Botón de Reinicio Rápido */}
+          {/* BotÃ³n de Reinicio RÃ¡pido */}
           <div style={{ marginTop: '2.5rem', borderTop: '1px dashed rgba(255,255,255,0.1)', paddingTop: '1.5rem', textAlign: 'center' }}>
             <button onClick={() => initializeFirestore(currentUser)} style={{ background: 'transparent', border: '1px solid #ef4444', color: '#ef4444', padding: '0.5rem 1rem', borderRadius: '4px', fontSize: '0.85rem', cursor: 'pointer' }}>
-              ⚠ Reiniciar Ciclo / Vaciar Tareas
+              âš  Reiniciar Ciclo / Vaciar Tareas
             </button>
             <p style={{ margin: '0.5rem 0 0', fontSize: '0.75rem', color: 'var(--text-muted)' }}>Utilizar solo al finalizar el ciclo MJ</p>
           </div>
@@ -10751,7 +10755,7 @@ export default function GerenteDashboard() {
 
 ---
 
-### 📄 Archivo: `src/pages/GoalsBoard.jsx`
+### ðŸ“„ Archivo: `src/pages/GoalsBoard.jsx`
 
 ```javascript
 import React, { useState, useEffect } from 'react';
@@ -10772,7 +10776,7 @@ export default function GoalsBoard() {
   const [goals, setGoals] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Modal de Asignación / División de Metas
+  // Modal de AsignaciÃ³n / DivisiÃ³n de Metas
   const [selectedGoalForAssignment, setSelectedGoalForAssignment] = useState(null);
   const [showDivisionModal, setShowDivisionModal] = useState(false);
 
@@ -10783,10 +10787,10 @@ export default function GoalsBoard() {
   const [dailyData, setDailyData] = useState({ parentId: '', title: '', kpi: '', targetValue: 1 });
   
   const stages = [
-    { id: 'C1', name: 'Capítulo 1' },
-    { id: 'C2', name: 'Capítulo 2' },
-    { id: 'MJ_CREACION', name: 'MJ - Creación' },
-    { id: 'MJ_RELACION', name: 'MJ - Relación' },
+    { id: 'C1', name: 'CapÃ­tulo 1' },
+    { id: 'C2', name: 'CapÃ­tulo 2' },
+    { id: 'MJ_CREACION', name: 'MJ - CreaciÃ³n' },
+    { id: 'MJ_RELACION', name: 'MJ - RelaciÃ³n' },
     { id: 'MJ_GRATITUD', name: 'MJ - Gratitud' },
     { id: 'MJ_VIAJE', name: 'MJ - El Viaje' }
   ];
@@ -10803,7 +10807,7 @@ export default function GoalsBoard() {
     const goalsRef = collection(db, 'goals');
     let q;
     
-    // Si no es SuperAdmin ni Dirección, filtrar solo las metas de su sede
+    // Si no es SuperAdmin ni DirecciÃ³n, filtrar solo las metas de su sede
     if (!currentUser.isSuperAdmin && !currentUser.isDireccion && currentUser.sede) {
       q = query(
         goalsRef, 
@@ -10811,7 +10815,7 @@ export default function GoalsBoard() {
         orderBy('createdAt', 'desc')
       );
     } else {
-      // SuperAdmin o Dirección ven todas las metas
+      // SuperAdmin o DirecciÃ³n ven todas las metas
       q = query(goalsRef, orderBy('createdAt', 'desc'));
     }
 
@@ -10949,7 +10953,7 @@ export default function GoalsBoard() {
     }
   };
 
-  // GUARDAR ASIGNACIÓN Y DIVISIÓN DE CUOTAS A COORDINADORAS
+  // GUARDAR ASIGNACIÃ“N Y DIVISIÃ“N DE CUOTAS A COORDINADORAS
   const handleSaveAssignment = async (goalId, assignedList) => {
     try {
       const goalRef = doc(db, 'goals', goalId);
@@ -10968,17 +10972,17 @@ export default function GoalsBoard() {
       // Roll-up hacia metas superiores
       await performRollUp(goalId, newProgress);
 
-      showToast(`¡Meta dividida y asignada con éxito a ${assignedList.length} coordinadoras!`, 'success');
+      showToast(`Â¡Meta dividida y asignada con Ã©xito a ${assignedList.length} coordinadoras!`, 'success');
     } catch (err) {
       console.error(err);
-      showToast('Error al guardar la asignación de meta.', 'error');
+      showToast('Error al guardar la asignaciÃ³n de meta.', 'error');
     }
   };
 
   // ACTUALIZAR EL AVANCE INDIVIDUAL DE UNA COORDINADORA
   const handleUpdateCoordinatorProgress = async (goal, coordEmail, currentQuota, targetQuota, coordName) => {
     const newVal = await showPrompt(
-      `📊 Reportar Avance de ${coordName}:\nCuota Asignada: ${targetQuota}\nIngresa el nuevo total alcanzado:`,
+      `ðŸ“Š Reportar Avance de ${coordName}:\nCuota Asignada: ${targetQuota}\nIngresa el nuevo total alcanzado:`,
       currentQuota || 0
     );
 
@@ -11107,7 +11111,7 @@ export default function GoalsBoard() {
             </p>
           </div>
 
-          {/* BOTONES DE ACCIÓN PARA GERENTES Y COORDINADORAS */}
+          {/* BOTONES DE ACCIÃ“N PARA GERENTES Y COORDINADORAS */}
           {goal.targetValue && (
             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
               <button 
@@ -11118,7 +11122,7 @@ export default function GoalsBoard() {
                 title="Dividir la meta equitativamente entre las coordinadoras de la sede"
               >
                 <Users size={14} />
-                <span>{isAssigned ? 'Modificar Reparto' : '👥 Asignar / Dividir Meta'}</span>
+                <span>{isAssigned ? 'Modificar Reparto' : 'ðŸ‘¥ Asignar / Dividir Meta'}</span>
               </button>
 
               <button 
@@ -11161,7 +11165,7 @@ export default function GoalsBoard() {
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
               <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                📌 Cuotas Individuales & Reporte de Avance en Tiempo Real:
+                ðŸ“Œ Cuotas Individuales & Reporte de Avance en Tiempo Real:
               </span>
               <span style={{ fontSize: '0.75rem', color: 'var(--crear-blue)' }}>
                 Suma total: {goal.currentValue || 0} / {goal.targetValue}
@@ -11253,9 +11257,9 @@ export default function GoalsBoard() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <Target size={32} className="text-gold" />
           <div>
-            <h1 className="text-gold uppercase" style={{ margin: 0, fontSize: '1.8rem' }}>Gestión de Metas</h1>
+            <h1 className="text-gold uppercase" style={{ margin: 0, fontSize: '1.8rem' }}>GestiÃ³n de Metas</h1>
             <p className="text-muted" style={{ margin: 0, fontSize: '0.9rem' }}>
-              Seguimiento, asignación equitativa a coordinadoras y acumulación operativa
+              Seguimiento, asignaciÃ³n equitativa a coordinadoras y acumulaciÃ³n operativa
             </p>
           </div>
         </div>
@@ -11336,12 +11340,12 @@ export default function GoalsBoard() {
                 </select>
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)' }}>Título de la Meta Diaria</label>
+                <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)' }}>TÃ­tulo de la Meta Diaria</label>
                 <input type="text" className="form-input" value={dailyData.title} onChange={e => setDailyData({...dailyData, title: e.target.value})} placeholder="Ej. Cerrar 5 Px hoy" required />
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)' }}>Objetivo (Número)</label>
+                  <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)' }}>Objetivo (NÃºmero)</label>
                   <input type="number" min="1" className="form-input" value={dailyData.targetValue} onChange={e => setDailyData({...dailyData, targetValue: e.target.value})} required />
                 </div>
                 <div>
@@ -11365,7 +11369,7 @@ export default function GoalsBoard() {
 
 ---
 
-### 📄 Archivo: `src/pages/Home.jsx`
+### ðŸ“„ Archivo: `src/pages/Home.jsx`
 
 ```javascript
 import { useState, useEffect } from 'react';
@@ -11418,7 +11422,7 @@ export default function Home() {
 
     if (result.success) {
       if (result.via === 'api') {
-        showToast(`¡"${ev.nombre || ev.name}" añadido a tu Google Calendar exitosamente!`, "success");
+        showToast(`Â¡"${ev.nombre || ev.name}" aÃ±adido a tu Google Calendar exitosamente!`, "success");
       } else {
         showToast(`Abriendo Google Calendar para agendar "${ev.nombre || ev.name}"...`, "info");
       }
@@ -11449,7 +11453,7 @@ export default function Home() {
              'cuenca': 'CUE',
              'lima': 'LIM',
              'med': 'MED',
-             'méxico': 'MEX',
+             'mÃ©xico': 'MEX',
              'mexico': 'MEX',
              'uio': 'UIO',
              'uio ': 'UIO', // por si hay espacios
@@ -11476,7 +11480,7 @@ export default function Home() {
       await logout();
       navigate('/login');
     } catch (error) {
-      console.error("Error al cerrar sesión", error);
+      console.error("Error al cerrar sesiÃ³n", error);
     }
   };
 
@@ -11485,10 +11489,10 @@ export default function Home() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h1 className="text-gold" style={{ margin: 0, fontSize: '2rem' }}>
-            {time.getHours() < 12 ? 'Buenos días' : time.getHours() < 19 ? 'Buenas tardes' : 'Buenas noches'}, {currentUser?.displayName || 'Equipo'}
+            {time.getHours() < 12 ? 'Buenos dÃ­as' : time.getHours() < 19 ? 'Buenas tardes' : 'Buenas noches'}, {currentUser?.displayName || 'Equipo'}
           </h1>
           <p className="text-muted" style={{ margin: '0.5rem 0 0', textTransform: 'uppercase' }}>
-            {currentCycle ? `${currentCycle.name} • ETAPA ACTUAL: ${currentStage}` : 'CARGANDO CICLO...'}
+            {currentCycle ? `${currentCycle.name} â€¢ ETAPA ACTUAL: ${currentStage}` : 'CARGANDO CICLO...'}
           </p>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '1rem' }}>
             <Clock size={16} className="text-blue" />
@@ -11528,7 +11532,7 @@ export default function Home() {
                 >
                   {currentUser.roles.map(r => (
                     <option key={r} value={r} style={{ background: '#0d152d', color: '#ffffff' }}>
-                      🎭 {ROLE_DISPLAY_NAMES[r] || r.toUpperCase()}
+                      ðŸŽ­ {ROLE_DISPLAY_NAMES[r] || r.toUpperCase()}
                     </option>
                   ))}
                 </select>
@@ -11543,7 +11547,7 @@ export default function Home() {
             </div>
           )}
           
-          {/* SELECTOR DE TEMA DÍA / NOCHE / AUTO */}
+          {/* SELECTOR DE TEMA DÃA / NOCHE / AUTO */}
           <div style={{ marginLeft: '0.25rem', marginRight: '0.25rem' }}>
             <ThemeSelector />
           </div>
@@ -11574,7 +11578,7 @@ export default function Home() {
           )}
           {currentUser?.isSuperAdmin && (
             <button onClick={() => navigate('/superadmin')} className="btn-primary" style={{ padding: '0.45rem 1rem', fontSize: '0.85rem', display: 'flex', gap: '0.5rem', alignItems: 'center', marginLeft: '0.25rem', background: 'linear-gradient(135deg, #8b5cf6, #29abe2)', color: 'white', border: 'none' }}>
-              🌐 Centro de Mando
+              ðŸŒ Centro de Mando
             </button>
           )}
 
@@ -11586,7 +11590,7 @@ export default function Home() {
 
       <TaskAssignmentModal isOpen={showTaskModal} onClose={() => setShowTaskModal(false)} />
 
-      {/* BANNER INTERACTIVO DE SOLICITUDES DE COLABORACIÓN Y MENCIONES */}
+      {/* BANNER INTERACTIVO DE SOLICITUDES DE COLABORACIÃ“N Y MENCIONES */}
       {(() => {
         const pendingInvites = (notifications || []).filter(n => n.type === 'COLLABORATION_INVITE' && !n.read && n.status !== 'ACEPTADA' && n.status !== 'RECHAZADA');
         if (pendingInvites.length === 0) return null;
@@ -11596,7 +11600,7 @@ export default function Home() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
               <Users size={22} color="var(--crear-blue)" />
               <h3 style={{ margin: 0, fontSize: '1.15rem', color: '#ffffff' }}>
-                🤝 Invitaciones de Colaboración en Tareas ({pendingInvites.length} pendientes)
+                ðŸ¤ Invitaciones de ColaboraciÃ³n en Tareas ({pendingInvites.length} pendientes)
               </h3>
             </div>
 
@@ -11622,7 +11626,7 @@ export default function Home() {
                       className="btn-neon-action"
                       style={{ padding: '0.4rem 1rem', fontSize: '0.8rem' }}
                     >
-                      ✅ Aceptar y Colaborar
+                      âœ… Aceptar y Colaborar
                     </button>
                     <button
                       type="button"
@@ -11630,7 +11634,7 @@ export default function Home() {
                       className="btn-secondary"
                       style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}
                     >
-                      ❌ Declinar
+                      âŒ Declinar
                     </button>
                   </div>
                 </div>
@@ -11669,20 +11673,20 @@ export default function Home() {
               style={{ background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid rgba(255,255,255,0.1)', padding: '0.3rem 0.5rem', borderRadius: '4px', fontSize: '0.85rem' }}
             >
               <option value="todos" style={{ color: 'black' }}>Todas las fechas</option>
-              <option value="futuros" style={{ color: 'black' }}>Próximos</option>
+              <option value="futuros" style={{ color: 'black' }}>PrÃ³ximos</option>
               <option value="hoy" style={{ color: 'black' }}>Hoy</option>
-              <option value="pasados" style={{ color: 'black' }}>Históricos (Pasados)</option>
+              <option value="pasados" style={{ color: 'black' }}>HistÃ³ricos (Pasados)</option>
             </select>
 
-            {/* Botón Configurar Hoteles / Salones */}
+            {/* BotÃ³n Configurar Hoteles / Salones */}
             <button 
               type="button"
               onClick={() => setShowVenueModal(true)}
               className="btn-secondary"
               style={{ padding: '0.3rem 0.7rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}
-              title="Configurar el hotel o salón oficial por defecto de la sede"
+              title="Configurar el hotel o salÃ³n oficial por defecto de la sede"
             >
-              🏨 Hoteles / Salones
+              ðŸ¨ Hoteles / Salones
             </button>
 
             {/* Enlace al Calendario Global Oficial (Hermano) */}
@@ -11694,10 +11698,10 @@ export default function Home() {
               style={{ padding: '0.3rem 0.75rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.35rem', textDecoration: 'none', color: 'var(--crear-blue)', borderColor: 'rgba(0, 210, 255, 0.35)', background: 'rgba(0, 210, 255, 0.05)' }}
               title="Abrir el Calendario Global Maestro Oficial (crearpsl.net)"
             >
-              🌐 Calendario Global ↗
+              ðŸŒ Calendario Global â†—
             </a>
 
-            {/* Pestañas Sede/Global */}
+            {/* PestaÃ±as Sede/Global */}
             <div style={{ display: 'flex', gap: '0.5rem', borderLeft: '1px solid rgba(255,255,255,0.1)', paddingLeft: '0.75rem' }}>
               <button 
                 onClick={() => setActiveEventTab('locales')}
@@ -11727,7 +11731,7 @@ export default function Home() {
               let isLocales = activeEventTab === 'locales' || currentUser?.appRole !== 'gerente';
               
               if (isLocales) {
-                const sedeMap = { 'cuenca': 'CUE', 'lima': 'LIM', 'med': 'MED', 'méxico': 'MEX', 'mexico': 'MEX', 'uio': 'UIO', 'guayaquil': 'GYE' };
+                const sedeMap = { 'cuenca': 'CUE', 'lima': 'LIM', 'med': 'MED', 'mÃ©xico': 'MEX', 'mexico': 'MEX', 'uio': 'UIO', 'guayaquil': 'GYE' };
                 const userSede = currentUser?.sede?.toLowerCase().trim();
                 const eventSedeCode = userSede ? sedeMap[userSede] : null;
                 
@@ -11758,7 +11762,7 @@ export default function Home() {
                   evEndDate = new Date(ev.fecha_fin);
                 }
                 
-                // Ajustar horas específicas según el tipo de evento si es posible, por defecto 9PM
+                // Ajustar horas especÃ­ficas segÃºn el tipo de evento si es posible, por defecto 9PM
                 const eventName = (ev.nombre || ev.name || "").toUpperCase();
                 if (eventName.includes("UNO")) {
                    evEndDate.setHours(21,0,0,0); // Domingo 9 PM
@@ -11782,7 +11786,7 @@ export default function Home() {
                 todayEnd.setHours(23,59,59,999);
 
                 if (timeFilter === 'hoy') {
-                  // El evento abarca el día de hoy
+                  // El evento abarca el dÃ­a de hoy
                   return evDate <= todayEnd && evEndDate >= todayMidnight;
                 } else if (timeFilter === 'pasados') {
                   return evEndDate < todayMidnight;
@@ -11792,7 +11796,7 @@ export default function Home() {
                 }
               });
               
-              // Si vemos históricos, invertimos el orden para ver los más recientes primero
+              // Si vemos histÃ³ricos, invertimos el orden para ver los mÃ¡s recientes primero
               if (timeFilter === 'pasados') {
                 displayEvents = displayEvents.reverse();
               }
@@ -11801,13 +11805,13 @@ export default function Home() {
               const isScrollable = displayEvents.length > 4;
 
               if (displayEvents.length === 0) {
-                return <p className="text-muted">No hay eventos próximos registrados en esta vista.</p>;
+                return <p className="text-muted">No hay eventos prÃ³ximos registrados en esta vista.</p>;
               }
 
               return (
                 <div style={{ maxHeight: isScrollable ? '400px' : 'auto', overflowY: isScrollable ? 'auto' : 'visible', paddingRight: isScrollable ? '0.5rem' : '0' }}>
                   {displayEvents.map((ev, i) => {
-                    // TODAS las fechas se calculan FUERA del if para que el botón Agendar las tenga en su closure
+                    // TODAS las fechas se calculan FUERA del if para que el botÃ³n Agendar las tenga en su closure
                     const eventName = (ev.nombre || ev.name || "").toUpperCase();
                     const baseDate = ev.fecha_inicio || ev.start;
                     const evStartDate = new Date(baseDate || new Date());
@@ -11847,13 +11851,13 @@ export default function Home() {
                         const seconds = Math.floor((startDiff / 1000) % 60);
                         countdownStr = days > 30 ? `Faltan: ${Math.floor(days/30)}m ${days%30}d ${hours}h` : `Faltan: ${days}d ${hours}h ${minutes}m ${seconds}s`;
                       } else if (endDiff > 0) {
-                        countdownStr = '¡EN CURSO!';
+                        countdownStr = 'Â¡EN CURSO!';
                       } else {
                         countdownStr = 'FINALIZADO';
                       }
                     }
 
-                    // Limpiar nombre del entrenador (no puede ser número de equipo)
+                    // Limpiar nombre del entrenador (no puede ser nÃºmero de equipo)
                     const cleanTrainer = (ev.trainer && !/^\d+$/.test(String(ev.trainer).trim()) && !/^EQ\s*\d+$/i.test(String(ev.trainer).trim()) && String(ev.trainer).toLowerCase() !== 'tba') ? String(ev.trainer).trim() : '';
 
                     return (
@@ -11867,37 +11871,37 @@ export default function Home() {
                           )}
                           {((ev.nombre || "").toUpperCase().includes("UNO")) && (
                              <span style={{ display: 'block', fontSize: '0.75rem', marginTop: '0.3rem', color: '#ffb347' }}>
-                               🗓 Horario: Vie 9am-11pm | Sáb 9am-11pm | Dom 9am-9pm
+                               ðŸ—“ Horario: Vie 9am-11pm | SÃ¡b 9am-11pm | Dom 9am-9pm
                              </span>
                           )}
                           {((ev.nombre || "").toUpperCase().includes("DOS")) && (
                              <span style={{ display: 'block', fontSize: '0.75rem', marginTop: '0.3rem', color: '#ffb347' }}>
-                               🗓 Horario: Jue 1pm-11pm | Vie 8am-11pm | Sáb 8am-11pm | Dom 8am-8pm
+                               ðŸ—“ Horario: Jue 1pm-11pm | Vie 8am-11pm | SÃ¡b 8am-11pm | Dom 8am-8pm
                              </span>
                           )}
                           {((ev.nombre || "").toUpperCase().includes("MAESTR") || (ev.nombre || "").toUpperCase().includes("JUEGO")) && !((ev.nombre || "").toUpperCase().includes("VIAJE")) && (
                              <span style={{ display: 'block', fontSize: '0.75rem', marginTop: '0.3rem', color: '#ffb347' }}>
-                               🗓 Horario: Vie 5pm-11pm | Sáb 8am-11pm | Dom 8am-11pm
+                               ðŸ—“ Horario: Vie 5pm-11pm | SÃ¡b 8am-11pm | Dom 8am-11pm
                              </span>
                           )}
                           {((ev.nombre || "").toUpperCase().includes("VIAJE")) && (
                              <span style={{ display: 'block', fontSize: '0.75rem', marginTop: '0.3rem', color: '#ffb347' }}>
-                               🗓 Horario: Vie 5pm-11pm | Sáb 7am hasta Dom 5pm
+                               ðŸ—“ Horario: Vie 5pm-11pm | SÃ¡b 7am hasta Dom 5pm
                              </span>
                           )}
                           {((ev.nombre || "").toUpperCase().includes("CONFIANZA")) && (
                              <span style={{ display: 'block', fontSize: '0.75rem', marginTop: '0.3rem', color: '#ffb347' }}>
-                               🗓 Horario: Sáb 10am-2pm
+                               ðŸ—“ Horario: SÃ¡b 10am-2pm
                              </span>
                           )}
                           {((ev.nombre || "").toUpperCase().includes("TANQUE")) && (
                              <span style={{ display: 'block', fontSize: '0.75rem', marginTop: '0.3rem', color: '#ffb347' }}>
-                               🗓 Horario: Sáb 1pm-4pm
+                               ðŸ—“ Horario: SÃ¡b 1pm-4pm
                              </span>
                           )}
                           {((ev.nombre || "").toUpperCase().includes("REVISION")) && (
                              <span style={{ display: 'block', fontSize: '0.75rem', marginTop: '0.3rem', color: '#ffb347' }}>
-                               🗓 Horario: Según el día que se indica
+                               ðŸ—“ Horario: SegÃºn el dÃ­a que se indica
                              </span>
                           )}
                           {(ev.detalles || ev.details) && (
@@ -11928,9 +11932,9 @@ export default function Home() {
                                 }}
                                 onMouseOver={(e) => e.currentTarget.style.textDecoration = 'underline'}
                                 onMouseOut={(e) => e.currentTarget.style.textDecoration = 'none'}
-                                title="Hacer clic para abrir ubicación exacta en Google Maps ↗"
+                                title="Hacer clic para abrir ubicaciÃ³n exacta en Google Maps â†—"
                               >
-                                🏨 {hotelVenue} <span style={{ fontSize: '0.7rem', opacity: 0.8 }}>↗</span>
+                                ðŸ¨ {hotelVenue} <span style={{ fontSize: '0.7rem', opacity: 0.8 }}>â†—</span>
                               </a>
                             );
                           })()}
@@ -11943,7 +11947,7 @@ export default function Home() {
                             {ev.fecha_inicio ? ev.fecha_inicio.substring(0, 10) : ''}
                           </span>
                           {countdownStr && (
-                            <span style={{ display: 'block', fontSize: '0.75rem', marginTop: '0.2rem', color: countdownStr === '¡EN CURSO!' ? 'var(--color-success)' : (countdownStr === 'FINALIZADO' ? 'var(--text-muted)' : 'var(--crear-blue)'), fontWeight: 'bold', fontFamily: 'monospace' }}>
+                            <span style={{ display: 'block', fontSize: '0.75rem', marginTop: '0.2rem', color: countdownStr === 'Â¡EN CURSO!' ? 'var(--color-success)' : (countdownStr === 'FINALIZADO' ? 'var(--text-muted)' : 'var(--crear-blue)'), fontWeight: 'bold', fontFamily: 'monospace' }}>
                               {countdownStr}
                             </span>
                           )}
@@ -11963,7 +11967,7 @@ export default function Home() {
             })()}
           </ul>
         ) : (
-          <p className="text-muted">No hay eventos próximos registrados hoy.</p>
+          <p className="text-muted">No hay eventos prÃ³ximos registrados hoy.</p>
         )}
       </div>
 
@@ -11978,8 +11982,8 @@ export default function Home() {
               {(() => {
                 const myTasks = allTasks.filter(t => t.role === currentUser?.appRole || t.assignedToEmail === currentUser?.email);
                 const completed = myTasks.filter(t => t.completed || t.status === 'Completada').length;
-                const criticas = myTasks.filter(t => !t.completed && (t.isCritical || t.priority === '🔴 ROJO')).length;
-                const importantes = myTasks.filter(t => !t.completed && t.status !== 'Completada' && !t.isCritical && t.priority !== '🔴 ROJO').length;
+                const criticas = myTasks.filter(t => !t.completed && (t.isCritical || t.priority === 'ðŸ”´ ROJO')).length;
+                const importantes = myTasks.filter(t => !t.completed && t.status !== 'Completada' && !t.isCritical && t.priority !== 'ðŸ”´ ROJO').length;
                 
                 return (
                   <>
@@ -11989,7 +11993,7 @@ export default function Home() {
                       onMouseOver={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)'}
                       onMouseOut={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'}
                     >
-                      <AlertCircle size={18} /> <strong>{criticas}</strong> críticas (Requieren acción hoy)
+                      <AlertCircle size={18} /> <strong>{criticas}</strong> crÃ­ticas (Requieren acciÃ³n hoy)
                     </li>
                     <li 
                       onClick={() => navigate(`/checklist/${currentUser?.appRole}?filter=importantes`)}
@@ -12030,23 +12034,23 @@ export default function Home() {
           ) : (
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               {(() => {
-                const myTasks = allTasks.filter(t => t.role === currentUser?.appRole && !t.completed && t.status !== 'Completada' && t.status !== 'Pendiente de validación');
-                // Ordenar: críticas/rojas primero, luego importantes/amarillas
+                const myTasks = allTasks.filter(t => t.role === currentUser?.appRole && !t.completed && t.status !== 'Completada' && t.status !== 'Pendiente de validaciÃ³n');
+                // Ordenar: crÃ­ticas/rojas primero, luego importantes/amarillas
                 myTasks.sort((a, b) => {
-                  const valA = (a.isCritical || a.priority === '🔴 ROJO') ? 3 : (a.priority === '🟡 AMARILLO' ? 2 : 1);
-                  const valB = (b.isCritical || b.priority === '🔴 ROJO') ? 3 : (b.priority === '🟡 AMARILLO' ? 2 : 1);
+                  const valA = (a.isCritical || a.priority === 'ðŸ”´ ROJO') ? 3 : (a.priority === 'ðŸŸ¡ AMARILLO' ? 2 : 1);
+                  const valB = (b.isCritical || b.priority === 'ðŸ”´ ROJO') ? 3 : (b.priority === 'ðŸŸ¡ AMARILLO' ? 2 : 1);
                   return valB - valA;
                 });
                 
                 const top3 = myTasks.slice(0, 3);
                 
                 if (top3.length === 0) {
-                  return <li className="text-muted" style={{ padding: '1rem 0' }}>No tienes tareas urgentes pendientes. ¡Buen trabajo!</li>;
+                  return <li className="text-muted" style={{ padding: '1rem 0' }}>No tienes tareas urgentes pendientes. Â¡Buen trabajo!</li>;
                 }
 
                 return top3.map(task => {
-                  const isCrit = task.isCritical || task.priority === '🔴 ROJO';
-                  const isImp = task.priority === '🟡 AMARILLO';
+                  const isCrit = task.isCritical || task.priority === 'ðŸ”´ ROJO';
+                  const isImp = task.priority === 'ðŸŸ¡ AMARILLO';
                   const color = isCrit ? 'var(--color-error)' : (isImp ? '#ffb347' : 'var(--crear-blue)');
                   const bg = isCrit ? 'rgba(239, 68, 68, 0.1)' : (isImp ? 'rgba(245, 158, 11, 0.1)' : 'rgba(0, 212, 255, 0.1)');
                   
@@ -12074,7 +12078,7 @@ export default function Home() {
                           {task.task || task.title}
                         </span>
                         <span style={{ fontSize: '0.75rem', color: 'var(--crear-gold)', fontWeight: 'bold' }}>
-                          ⏰ Límite: {task.deadline || calculateAutomaticDeadline(task, currentCycle)}
+                          â° LÃ­mite: {task.deadline || calculateAutomaticDeadline(task, currentCycle)}
                         </span>
                       </div>
                     </li>
@@ -12100,7 +12104,7 @@ export default function Home() {
         )}
       </div>
 
-      {/* MODAL CONFIGURACIÓN DE HOTELES Y SALONES */}
+      {/* MODAL CONFIGURACIÃ“N DE HOTELES Y SALONES */}
       <VenueConfigModal
         isOpen={showVenueModal}
         onClose={() => setShowVenueModal(false)}
@@ -12114,7 +12118,7 @@ export default function Home() {
 
 ---
 
-### 📄 Archivo: `src/pages/Login.jsx`
+### ðŸ“„ Archivo: `src/pages/Login.jsx`
 
 ```javascript
 import { useEffect } from 'react';
@@ -12138,8 +12142,8 @@ export default function Login() {
       await loginWithGoogle();
       navigate('/home');
     } catch (error) {
-      console.error("Error al iniciar sesión", error);
-      showToast("Hubo un error al iniciar sesión. Intenta nuevamente.", "error");
+      console.error("Error al iniciar sesiÃ³n", error);
+      showToast("Hubo un error al iniciar sesiÃ³n. Intenta nuevamente.", "error");
     }
   };
 
@@ -12149,7 +12153,7 @@ export default function Login() {
         <img src="/interrupcion_logo.jpg" alt="Logo" className="logo-holographic" style={{ width: '120px', margin: '0 auto 2rem', display: 'block' }} onError={(e) => e.target.style.display = 'none'} />
         
         <h1 className="text-gold uppercase" style={{ fontSize: '2rem', marginBottom: '0.5rem', letterSpacing: '2px' }}>CENTRO OPERATIVO</h1>
-        <p className="text-muted" style={{ marginBottom: '3rem', fontSize: '1.1rem' }}>Plataforma de Gestión por Ciclos</p>
+        <p className="text-muted" style={{ marginBottom: '3rem', fontSize: '1.1rem' }}>Plataforma de GestiÃ³n por Ciclos</p>
         
         <button 
           onClick={handleLogin}
@@ -12170,7 +12174,7 @@ export default function Login() {
 
 ---
 
-### 📄 Archivo: `src/pages/ReportesBoard.jsx`
+### ðŸ“„ Archivo: `src/pages/ReportesBoard.jsx`
 
 ```javascript
 import { useState, useEffect } from 'react';
@@ -12199,7 +12203,7 @@ export default function ReportesBoard() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    // Intentar parsear a número si aplica
+    // Intentar parsear a nÃºmero si aplica
     const val = isNaN(value) || value === '' ? value : Number(value);
     setFormData(prev => ({ ...prev, [name]: val }));
   };
@@ -12229,7 +12233,7 @@ export default function ReportesBoard() {
         data: formData
       });
 
-      // 2. Regla de Negocio Crítica: Acumulación de Metas para "Llamadas"
+      // 2. Regla de Negocio CrÃ­tica: AcumulaciÃ³n de Metas para "Llamadas"
       if (reportType === 'Llamadas') {
         const totalOkNuevos = formData['nuevos_OK'] || 0;
         const totalOkRezagados = formData['rezagados_OK'] || 0;
@@ -12260,16 +12264,16 @@ export default function ReportesBoard() {
               updatedAt: new Date().toISOString()
             });
 
-            // Roll-up hacia CICLO (Opcional en MVP, el Gerente lo verá reflejado en la propia meta)
+            // Roll-up hacia CICLO (Opcional en MVP, el Gerente lo verÃ¡ reflejado en la propia meta)
             const parentId = data.parentId;
             if (parentId) {
-               // En una app completa, aquí iteraríamos los hermanos para promediar, similar a GoalsBoard
+               // En una app completa, aquÃ­ iterarÃ­amos los hermanos para promediar, similar a GoalsBoard
             }
           }
         }
       }
 
-      showToast('¡Reporte enviado exitosamente!', 'success');
+      showToast('Â¡Reporte enviado exitosamente!', 'success');
       setReportType('');
       setFormData({});
     } catch (err) {
@@ -12288,14 +12292,14 @@ export default function ReportesBoard() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
             <input type="number" name="px_llegaron_viernes" placeholder="Px que llegaron el viernes" onChange={handleChange} className="form-input" />
             <input type="number" name="px_bajaron" placeholder="Px que se bajaron durante fds" onChange={handleChange} className="form-input" />
-            <input type="number" name="declaracion_px" placeholder="Declaración Px" onChange={handleChange} className="form-input" />
+            <input type="number" name="declaracion_px" placeholder="DeclaraciÃ³n Px" onChange={handleChange} className="form-input" />
             <input type="number" name="enrolamiento" placeholder="Enrolamiento" onChange={handleChange} className="form-input" />
             <input type="number" name="px_en_0" placeholder="Px en 0" onChange={handleChange} className="form-input" />
-            <input type="text" name="capitan" placeholder="Nombre Capitán" onChange={handleChange} className="form-input" />
+            <input type="text" name="capitan" placeholder="Nombre CapitÃ¡n" onChange={handleChange} className="form-input" />
             <input type="number" name="managers_llegaron" placeholder="Managers que llegaron" onChange={handleChange} className="form-input" />
             <input type="number" name="capitan_quedo" placeholder="Capitanes que quedaron" onChange={handleChange} className="form-input" />
             <input type="number" name="managers_quedaron" placeholder="Managers que quedaron" onChange={handleChange} className="form-input" />
-            <input type="text" name="declaracion" placeholder="Declaración" onChange={handleChange} className="form-input" />
+            <input type="text" name="declaracion" placeholder="DeclaraciÃ³n" onChange={handleChange} className="form-input" />
             <input type="number" name="total" placeholder="Total" onChange={handleChange} className="form-input" />
             <input type="number" name="promedio" placeholder="Promedio fin de semana" onChange={handleChange} className="form-input" step="0.01" />
           </div>
@@ -12340,7 +12344,7 @@ export default function ReportesBoard() {
           </div>
           <div style={{ background: 'rgba(52, 168, 83, 0.1)', border: '1px solid #34a853', padding: '1rem', borderRadius: '8px' }}>
             <p style={{ margin: 0, color: '#34a853', fontSize: '0.9rem' }}>
-              💡 Al enviar este reporte, los "OK" se sumarán automáticamente a la Meta de Entrenamiento activa para evitar doble digitación.
+              ðŸ’¡ Al enviar este reporte, los "OK" se sumarÃ¡n automÃ¡ticamente a la Meta de Entrenamiento activa para evitar doble digitaciÃ³n.
             </p>
           </div>
         </div>
@@ -12350,8 +12354,8 @@ export default function ReportesBoard() {
     if (reportType === 'C2') {
       return (
         <div style={{ display: 'grid', gap: '1rem' }}>
-          <h4 className="text-blue">Reporte Capítulo Dos</h4>
-          <textarea name="detalle" placeholder="Detalle: (Px, Aliados, Capitán, Entrenador, Desertores)" onChange={handleChange} className="form-input" rows="4"></textarea>
+          <h4 className="text-blue">Reporte CapÃ­tulo Dos</h4>
+          <textarea name="detalle" placeholder="Detalle: (Px, Aliados, CapitÃ¡n, Entrenador, Desertores)" onChange={handleChange} className="form-input" rows="4"></textarea>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
              <input type="number" name="pagos_c2_mj" placeholder="C2 + MJ" onChange={handleChange} className="form-input" />
              <input type="number" name="pagos_rotos" placeholder="Pagos Rotos / Desertores" onChange={handleChange} className="form-input" />
@@ -12364,11 +12368,11 @@ export default function ReportesBoard() {
     if (reportType === 'MJ') {
       return (
         <div style={{ display: 'grid', gap: '1rem' }}>
-          <h4 className="text-blue">Reporte Maestría del Juego</h4>
+          <h4 className="text-blue">Reporte MaestrÃ­a del Juego</h4>
           <select name="subtipo" onChange={handleChange} className="form-input">
-            <option value="">Selecciona sección...</option>
+            <option value="">Selecciona secciÃ³n...</option>
             <option value="Asistencia">Asistencia</option>
-            <option value="Declaracion">Declaración</option>
+            <option value="Declaracion">DeclaraciÃ³n</option>
             <option value="Enrolamiento">Enrolamiento</option>
           </select>
           {formData.subtipo && (
@@ -12399,7 +12403,7 @@ export default function ReportesBoard() {
           <FileText size={32} className="text-gold" />
           <div>
             <h1 className="text-gold uppercase" style={{ margin: 0 }}>Reportes Operativos</h1>
-            <p className="text-muted" style={{ margin: 0, fontSize: '0.9rem' }}>Digitalización de Formatos de Comunicación</p>
+            <p className="text-muted" style={{ margin: 0, fontSize: '0.9rem' }}>DigitalizaciÃ³n de Formatos de ComunicaciÃ³n</p>
           </div>
         </div>
 
@@ -12419,13 +12423,13 @@ export default function ReportesBoard() {
 
                 if (isSuper || ['coord_c1', 'coordinador_c1c2'].includes(role)) {
                   options.push(<option key="Llamadas" value="Llamadas">1. Reporte de Llamadas (C1)</option>);
-                  options.push(<option key="C2" value="C2">3. Reporte Capítulo Dos</option>);
+                  options.push(<option key="C2" value="C2">3. Reporte CapÃ­tulo Dos</option>);
                 }
                 if (isSuper || ['capitan', 'qt'].includes(role)) {
                   options.push(<option key="FDS" value="FDS">2. Reporte FDS (Sede)</option>);
                 }
                 if (isSuper || ['coord_maestria', 'coordinador_mj', 'director_maestria'].includes(role)) {
-                  options.push(<option key="MJ" value="MJ">4. Reporte Maestría del Juego</option>);
+                  options.push(<option key="MJ" value="MJ">4. Reporte MaestrÃ­a del Juego</option>);
                 }
 
                 return options.length > 0 ? options : [
@@ -12456,7 +12460,7 @@ export default function ReportesBoard() {
 
 ---
 
-### 📄 Archivo: `src/pages/RoleSelector.jsx`
+### ðŸ“„ Archivo: `src/pages/RoleSelector.jsx`
 
 ```javascript
 import { useNavigate } from 'react-router-dom';
@@ -12501,7 +12505,7 @@ export default function RoleSelector() {
 
 ---
 
-### 📄 Archivo: `src/pages/SuperAdminPanel.jsx`
+### ðŸ“„ Archivo: `src/pages/SuperAdminPanel.jsx`
 
 ```javascript
 import { useState } from 'react';
@@ -12517,23 +12521,23 @@ import { getFlagForSede } from '../utils/flags';
 import UserProfileModal from '../components/UserProfileModal';
 
 const ROLE_LABELS = {
-  direccion: 'Dirección Global',
+  direccion: 'DirecciÃ³n Global',
   cfo: 'CFO (Chief Financial Officer)',
   gerente: 'Gerente de Sede',
-  director_maestria: 'Director de Maestría',
+  director_maestria: 'Director de MaestrÃ­a',
   coordinador_c1c2: 'Coordinador C1/C2',
-  coordinador_mj: 'Coordinador Maestría',
+  coordinador_mj: 'Coordinador MaestrÃ­a',
   coord_c1: 'Coordinador C1/C2',
-  coord_maestria: 'Coordinador Maestría',
-  capitan: 'Capitán',
+  coord_maestria: 'Coordinador MaestrÃ­a',
+  capitan: 'CapitÃ¡n',
   manager: 'Manager',
   qt: 'Quantum Team',
-  coordinador: 'Coordinación Administrativa',
+  coordinador: 'CoordinaciÃ³n Administrativa',
   finanzas: 'Finanzas',
   asistente_impuestos_quito: 'Impuestos / Tributaria',
   talento_humano: 'Talento Humano',
-  legal: 'Legal / Jurídico',
-  técnico_sst: 'Seguridad y Salud (SST)',
+  legal: 'Legal / JurÃ­dico',
+  tÃ©cnico_sst: 'Seguridad y Salud (SST)',
 };
 
 const ROLE_COLORS = {
@@ -12553,7 +12557,7 @@ const ROLE_COLORS = {
   asistente_impuestos_quito: '#64748b',
   talento_humano: '#06b6d4',
   legal: '#a855f7',
-  técnico_sst: '#14b8a6'
+  tÃ©cnico_sst: '#14b8a6'
 };
 
 const ALL_SEDES = [...OPERATIONAL_SEDES, 'Sede Global'];
@@ -12592,7 +12596,7 @@ function PersonCard({ person, tasks, navigate, onSelectUser }) {
     const isComp = t.completions && person.sede && t.completions[person.sede]
       ? t.completions[person.sede].completed
       : (t.completed || t.status === 'Completada');
-    return !isComp && (t.isCritical || t.priority === '🔴 ROJO' || t.priority?.includes('ROJO'));
+    return !isComp && (t.isCritical || t.priority === 'ðŸ”´ ROJO' || t.priority?.includes('ROJO'));
   }).length;
 
   const pct = myTasks.length > 0 ? Math.round((completed / myTasks.length) * 100) : 0;
@@ -12625,7 +12629,7 @@ function PersonCard({ person, tasks, navigate, onSelectUser }) {
           <span style={{ fontSize: '1.1rem', fontWeight: 'bold', color: pct === 100 ? '#22c55e' : 'var(--crear-gold)' }}>{pct}%</span>
           {critical > 0 && (
             <div style={{ fontSize: '0.7rem', color: '#ef4444', display: 'flex', alignItems: 'center', gap: '0.2rem', justifyContent: 'flex-end', marginTop: '2px' }}>
-              <AlertTriangle size={10} /> {critical} crítica{critical > 1 ? 's' : ''}
+              <AlertTriangle size={10} /> {critical} crÃ­tica{critical > 1 ? 's' : ''}
             </div>
           )}
         </div>
@@ -12634,7 +12638,7 @@ function PersonCard({ person, tasks, navigate, onSelectUser }) {
       <ProgressBar value={pct} color={roleColor} />
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.75rem', color: 'var(--text-muted)', paddingTop: '0.2rem' }}>
-        <span>✅ {completed}/{myTasks.length} tareas</span>
+        <span>âœ… {completed}/{myTasks.length} tareas</span>
         <button 
           onClick={(e) => {
             e.stopPropagation();
@@ -12674,8 +12678,8 @@ function SedeBlock({ sede, tasks, navigate, onSelectUser }) {
           <div style={{ flex: 1 }}>
             <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--text-heading)', fontWeight: 'bold' }}>{sede}</h3>
             <div style={{ display: 'flex', gap: '1rem', marginTop: '0.3rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-              <span>👥 {members.length} personas</span>
-              <span>✅ {sedeCompleted}/{sedeTasks.length} tareas</span>
+              <span>ðŸ‘¥ {members.length} personas</span>
+              <span>âœ… {sedeCompleted}/{sedeTasks.length} tareas</span>
             </div>
           </div>
           <span style={{ fontSize: '1.4rem', fontWeight: 'bold', color: sedePct === 100 ? '#22c55e' : 'var(--crear-gold)', marginRight: '1rem' }}>{sedePct}%</span>
@@ -12704,12 +12708,12 @@ function SedeBlock({ sede, tasks, navigate, onSelectUser }) {
 function GlobalView({ tasks, navigate }) {
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter(t => t.completed || t.status === 'Completada').length;
-  const criticalTasks = tasks.filter(t => !t.completed && (t.isCritical || t.priority === '🔴 ROJO')).length;
+  const criticalTasks = tasks.filter(t => !t.completed && (t.isCritical || t.priority === 'ðŸ”´ ROJO')).length;
   const globalPct = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
   const roleGroups = [
     { id: 'gerente', label: 'Gerentes de Sede' },
     { id: 'coordinador_c1c2', label: 'Coordinadores C1/C2', alias: 'coord_c1' },
-    { id: 'coordinador_mj', label: 'Coordinadores Maestría', alias: 'coord_maestria' },
+    { id: 'coordinador_mj', label: 'Coordinadores MaestrÃ­a', alias: 'coord_maestria' },
     { id: 'capitan', label: 'Capitanes' },
     { id: 'qt', label: 'Quantum Team' },
   ];
@@ -12732,7 +12736,7 @@ function GlobalView({ tasks, navigate }) {
         {[
           { icon: <CheckCircle2 size={22} color="#22c55e" />, label: 'Tareas Completadas', value: completedTasks, sub: `de ${totalTasks} totales`, color: '#22c55e', path: '/reportes' },
           { icon: <Clock size={22} color="var(--crear-gold)" />, label: 'Avance Global', value: `${globalPct}%`, sub: 'SO-AR del ciclo', color: 'var(--crear-gold)', path: '/reportes' },
-          { icon: <AlertTriangle size={22} color="#ef4444" />, label: 'Alertas Críticas', value: criticalTasks, sub: 'requieren acción HOY', color: '#ef4444', path: '/reportes' },
+          { icon: <AlertTriangle size={22} color="#ef4444" />, label: 'Alertas CrÃ­ticas', value: criticalTasks, sub: 'requieren acciÃ³n HOY', color: '#ef4444', path: '/reportes' },
           { icon: <Building2 size={22} color="#29abe2" />, label: 'Sedes Operativas', value: OPERATIONAL_SEDES.length, sub: 'sedes activas', color: '#29abe2', onClick: () => window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'}) },
         ].map((kpi, i) => (
           <div 
@@ -12749,7 +12753,7 @@ function GlobalView({ tasks, navigate }) {
         ))}
       </div>
       <div className="glass-panel" style={{ padding: '1.5rem' }}>
-        <h3 style={{ marginTop: 0, color: 'var(--crear-gold)' }}>Avance por Rol — Global</h3>
+        <h3 style={{ marginTop: 0, color: 'var(--crear-gold)' }}>Avance por Rol â€” Global</h3>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
           <div style={{ flex: 1 }}><ProgressBar value={globalPct} height="12px" /></div>
           <span style={{ fontWeight: 'bold', fontSize: '1.1rem', color: 'var(--crear-gold)', minWidth: '48px' }}>{globalPct}% total</span>
@@ -12804,21 +12808,21 @@ function GlobalView({ tasks, navigate }) {
 
 function RoleView({ tasks, navigate, onSelectUser }) {
   const roles = [
-    { id: 'direccion', label: 'Dirección Global' },
+    { id: 'direccion', label: 'DirecciÃ³n Global' },
     { id: 'cfo', label: 'CFO (Chief Financial Officer)' },
     { id: 'gerente', label: 'Gerentes de Sede' },
-    { id: 'director_maestria', label: 'Directores de Maestría' },
+    { id: 'director_maestria', label: 'Directores de MaestrÃ­a' },
     { id: 'coordinador_c1c2', label: 'Coordinadores C1/C2' },
-    { id: 'coordinador_mj', label: 'Coordinadores de Maestría' },
+    { id: 'coordinador_mj', label: 'Coordinadores de MaestrÃ­a' },
     { id: 'capitan', label: 'Capitanes' },
     { id: 'manager', label: 'Managers' },
     { id: 'qt', label: 'Quantum Team' },
-    { id: 'coordinador', label: 'Coordinación Administrativa' },
+    { id: 'coordinador', label: 'CoordinaciÃ³n Administrativa' },
     { id: 'finanzas', label: 'Finanzas' },
     { id: 'asistente_impuestos_quito', label: 'Impuestos / Tributaria' },
     { id: 'talento_humano', label: 'Talento Humano' },
-    { id: 'legal', label: 'Legal / Jurídico' },
-    { id: 'técnico_sst', label: 'Seguridad y Salud (SST)' },
+    { id: 'legal', label: 'Legal / JurÃ­dico' },
+    { id: 'tÃ©cnico_sst', label: 'Seguridad y Salud (SST)' },
   ];
 
   const listedRoleIds = new Set(roles.map(r => r.id));
@@ -12868,17 +12872,17 @@ export default function SuperAdminPanel() {
   const { showToast } = useUI();
 
   const handleMigrateUsers = async () => {
-    if (!window.confirm("¿Estás seguro de migrar el directorio completo de usersData.js a Firestore? Esto sobrescribirá los datos actuales en Firestore.")) return;
+    if (!window.confirm("Â¿EstÃ¡s seguro de migrar el directorio completo de usersData.js a Firestore? Esto sobrescribirÃ¡ los datos actuales en Firestore.")) return;
     try {
-      showToast('Iniciando migración...', 'info');
+      showToast('Iniciando migraciÃ³n...', 'info');
       let count = 0;
       for (const u of usersData) {
-        // Usar un ID único, ej el email normalizado, o el u.id si existe
+        // Usar un ID Ãºnico, ej el email normalizado, o el u.id si existe
         const docId = u.id || u.email.split('@')[0];
         await setDoc(doc(db, 'users', docId), u);
         count++;
       }
-      showToast(`✅ Migración exitosa: ${count} usuarios en Firestore.`, 'success');
+      showToast(`âœ… MigraciÃ³n exitosa: ${count} usuarios en Firestore.`, 'success');
     } catch(err) {
       console.error(err);
       showToast('Error migrando usuarios: ' + err.message, 'error');
@@ -12919,11 +12923,11 @@ export default function SuperAdminPanel() {
 
       <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <h1 className="text-gold uppercase" style={{ fontSize: '2rem', margin: '0 0 0.5rem 0' }}>Panel Super Admin — Monitoreo Global</h1>
+          <h1 className="text-gold uppercase" style={{ fontSize: '2rem', margin: '0 0 0.5rem 0' }}>Panel Super Admin â€” Monitoreo Global</h1>
           <p className="text-muted" style={{ margin: 0 }}>Visibilidad total del sistema SO-AR en todas las sedes y roles.</p>
         </div>
         <button onClick={handleMigrateUsers} className="btn-primary" style={{ padding: '0.6rem 1rem', fontSize: '0.9rem' }}>
-          ☁️ Migrar Directorio a Firestore
+          â˜ï¸ Migrar Directorio a Firestore
         </button>
       </div>
 
@@ -12940,7 +12944,7 @@ export default function SuperAdminPanel() {
           <Search size={20} color={searchTerm ? "var(--crear-gold)" : "var(--text-muted)"} />
           <input 
             type="text"
-            placeholder="🔍 Buscar persona por nombre, email, rol o sede (ej. Leyla, Darkwin, Quito, Quantum Team, Gerente)..."
+            placeholder="ðŸ” Buscar persona por nombre, email, rol o sede (ej. Leyla, Darkwin, Quito, Quantum Team, Gerente)..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{
@@ -12956,7 +12960,7 @@ export default function SuperAdminPanel() {
                 borderRadius: '50%', width: '24px', height: '24px', display: 'flex',
                 alignItems: 'center', justifyContent: 'center', cursor: 'pointer'
               }}
-              title="Limpiar búsqueda"
+              title="Limpiar bÃºsqueda"
             >
               <X size={14} />
             </button>
@@ -12968,13 +12972,13 @@ export default function SuperAdminPanel() {
         <div style={{ marginTop: '1rem', marginBottom: '2rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
             <h3 style={{ margin: 0, color: 'var(--crear-gold)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.1rem' }}>
-              <Users size={20} /> Resultados de Búsqueda ({searchFilteredUsers.length})
+              <Users size={20} /> Resultados de BÃºsqueda ({searchFilteredUsers.length})
             </h3>
             <button 
               onClick={() => setSearchTerm('')}
               style={{ background: 'transparent', border: 'none', color: 'var(--crear-cyan)', cursor: 'pointer', fontSize: '0.85rem' }}
             >
-              Cerrar búsqueda
+              Cerrar bÃºsqueda
             </button>
           </div>
 
@@ -12998,12 +13002,12 @@ export default function SuperAdminPanel() {
           )}
         </div>
       ) : (
-        /* Vistas normales por pestañas */
+        /* Vistas normales por pestaÃ±as */
         <>
           <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
-            <button style={tabStyle('global')} onClick={() => setActiveView('global')}>🌐 Global</button>
-            <button style={tabStyle('sede')} onClick={() => setActiveView('sede')}>🏢 Por Sede</button>
-            <button style={tabStyle('rol')} onClick={() => setActiveView('rol')}>👥 Por Rol</button>
+            <button style={tabStyle('global')} onClick={() => setActiveView('global')}>ðŸŒ Global</button>
+            <button style={tabStyle('sede')} onClick={() => setActiveView('sede')}>ðŸ¢ Por Sede</button>
+            <button style={tabStyle('rol')} onClick={() => setActiveView('rol')}>ðŸ‘¥ Por Rol</button>
           </div>
           {activeView === 'global' && <GlobalView tasks={tasks} navigate={navigate} />}
           {activeView === 'sede' && (
@@ -13047,7 +13051,7 @@ export default function SuperAdminPanel() {
 
 ---
 
-### 📄 Archivo: `src/pages/home-views/HomeCampo.jsx`
+### ðŸ“„ Archivo: `src/pages/home-views/HomeCampo.jsx`
 
 ```javascript
 import { useNavigate } from 'react-router-dom';
@@ -13064,12 +13068,12 @@ export default function HomeCampo() {
   const navigate = useNavigate();
 
   const myTasks = allTasks.filter(t => t.role === currentUser?.appRole);
-  const pendingTasks = myTasks.filter(t => !t.completed && t.status !== 'Completada' && t.status !== 'Pendiente de validación');
+  const pendingTasks = myTasks.filter(t => !t.completed && t.status !== 'Completada' && t.status !== 'Pendiente de validaciÃ³n');
   
   // Ordenar por prioridad (rojos primero)
   pendingTasks.sort((a, b) => {
-    const valA = (a.isCritical || a.priority === '🔴 ROJO') ? 3 : (a.priority === '🟡 AMARILLO' ? 2 : 1);
-    const valB = (b.isCritical || b.priority === '🔴 ROJO') ? 3 : (b.priority === '🟡 AMARILLO' ? 2 : 1);
+    const valA = (a.isCritical || a.priority === 'ðŸ”´ ROJO') ? 3 : (a.priority === 'ðŸŸ¡ AMARILLO' ? 2 : 1);
+    const valB = (b.isCritical || b.priority === 'ðŸ”´ ROJO') ? 3 : (b.priority === 'ðŸŸ¡ AMARILLO' ? 2 : 1);
     return valB - valA;
   });
 
@@ -13081,7 +13085,7 @@ export default function HomeCampo() {
       {/* Saludo y Contexto */}
       <div className="glass-panel" style={{ padding: '2rem', borderLeft: '4px solid var(--crear-gold)' }}>
         <h2 className="text-white" style={{ margin: '0 0 0.5rem 0', fontSize: '1.5rem' }}>
-          👋 Hola, {currentUser?.displayName?.split(' ')[0] || 'Equipo'}
+          ðŸ‘‹ Hola, {currentUser?.displayName?.split(' ')[0] || 'Equipo'}
         </h2>
         <p className="text-gold" style={{ margin: 0, fontSize: '1.1rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <Activity size={18} /> MODO CAMPO ACTIVO
@@ -13094,7 +13098,7 @@ export default function HomeCampo() {
       {/* LO QUE TOCA HOY */}
       <div className="glass-panel" style={{ padding: '1.5rem' }}>
         <h3 className="text-blue" style={{ marginTop: 0, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid rgba(0,212,255,0.2)', paddingBottom: '0.5rem' }}>
-          <ListTodo size={20} /> QUÉ TOCA AHORA (Top 3)
+          <ListTodo size={20} /> QUÃ‰ TOCA AHORA (Top 3)
         </h3>
         
         {loadingTasks ? (
@@ -13102,13 +13106,13 @@ export default function HomeCampo() {
         ) : topTasks.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '2rem 0' }}>
             <CheckCircle2 size={48} color="var(--color-success)" style={{ margin: '0 auto 1rem', opacity: 0.8 }} />
-            <p className="text-white" style={{ margin: '0 0 0.5rem', fontWeight: 'bold' }}>¡Estás al día!</p>
+            <p className="text-white" style={{ margin: '0 0 0.5rem', fontWeight: 'bold' }}>Â¡EstÃ¡s al dÃ­a!</p>
             <p className="text-muted" style={{ margin: 0, fontSize: '0.9rem' }}>No hay tareas urgentes pendientes para esta fase.</p>
           </div>
         ) : (
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {topTasks.map(task => {
-              const isCrit = task.isCritical || task.priority === '🔴 ROJO';
+              const isCrit = task.isCritical || task.priority === 'ðŸ”´ ROJO';
               const color = isCrit ? 'var(--color-error)' : 'var(--crear-blue)';
               const bg = isCrit ? 'rgba(239, 68, 68, 0.1)' : 'rgba(0, 212, 255, 0.1)';
               
@@ -13136,7 +13140,7 @@ export default function HomeCampo() {
                       {task.task || task.title}
                     </span>
                     <span style={{ fontSize: '0.85rem', color: 'var(--crear-gold)' }}>
-                      ⏰ Límite: {task.deadline || calculateAutomaticDeadline(task, currentCycle)}
+                      â° LÃ­mite: {task.deadline || calculateAutomaticDeadline(task, currentCycle)}
                     </span>
                   </div>
                 </li>
@@ -13146,7 +13150,7 @@ export default function HomeCampo() {
         )}
       </div>
 
-      {/* BOTÓN PRINCIPAL */}
+      {/* BOTÃ“N PRINCIPAL */}
       <button 
         className="btn-primary" 
         onClick={() => navigate(`/checklist/${currentUser?.appRole}`)} 
@@ -13155,7 +13159,7 @@ export default function HomeCampo() {
         IR A MI CHECKLIST OPERATIVO
       </button>
 
-      {/* ESTADÍSTICA RÁPIDA */}
+      {/* ESTADÃSTICA RÃPIDA */}
       <div style={{ display: 'flex', gap: '1rem' }}>
         <div className="glass-panel" style={{ padding: '1.5rem', flex: 1, textAlign: 'center' }}>
           <p className="text-muted" style={{ margin: '0 0 0.5rem', fontSize: '0.9rem' }}>Tareas Pendientes</p>
@@ -13174,7 +13178,7 @@ export default function HomeCampo() {
 
 ---
 
-### 📄 Archivo: `src/pages/home-views/HomeEjecutivo.jsx`
+### ðŸ“„ Archivo: `src/pages/home-views/HomeEjecutivo.jsx`
 
 ```javascript
 import { useNavigate } from 'react-router-dom';
@@ -13197,7 +13201,7 @@ export default function HomeEjecutivo() {
             Hola, {currentUser?.displayName?.split(' ')[0] || 'Gerente'}
           </h2>
           <p className="text-muted" style={{ margin: 0 }}>
-            Visión Global - Sede: <strong className="text-white">{currentUser?.sede || 'TODAS'}</strong>
+            VisiÃ³n Global - Sede: <strong className="text-white">{currentUser?.sede || 'TODAS'}</strong>
           </p>
         </div>
         <div style={{ textAlign: 'right' }}>
@@ -13213,7 +13217,7 @@ export default function HomeEjecutivo() {
         <div className="glass-panel hover-glow" onClick={() => navigate('/gerente')} style={{ padding: '2rem', textAlign: 'center', cursor: 'pointer', background: 'linear-gradient(135deg, rgba(255,215,0,0.1) 0%, rgba(255,215,0,0) 100%)', border: '1px solid rgba(255,215,0,0.3)' }}>
           <Activity size={48} color="var(--crear-gold)" style={{ margin: '0 auto 1rem' }} />
           <h3 className="text-white" style={{ margin: '0 0 0.5rem' }}>Panel de Control</h3>
-          <p className="text-muted" style={{ margin: 0, fontSize: '0.9rem' }}>Vista 360° de la operación, bloqueos y avance de cada rol en tiempo real.</p>
+          <p className="text-muted" style={{ margin: 0, fontSize: '0.9rem' }}>Vista 360Â° de la operaciÃ³n, bloqueos y avance de cada rol en tiempo real.</p>
           <button className="btn-primary" style={{ marginTop: '1.5rem', width: '100%' }}>Entrar al Panel</button>
         </div>
 
@@ -13249,7 +13253,7 @@ export default function HomeEjecutivo() {
 
 ---
 
-### 📄 Archivo: `src/pages/home-views/HomeOficina.jsx`
+### ðŸ“„ Archivo: `src/pages/home-views/HomeOficina.jsx`
 
 ```javascript
 import { useNavigate } from 'react-router-dom';
@@ -13269,14 +13273,14 @@ export default function HomeOficina() {
   
   // Contadores
   const completed = myTasks.filter(t => t.completed || t.status === 'Completada').length;
-  const criticas = myTasks.filter(t => !t.completed && (t.isCritical || t.priority === '🔴 ROJO')).length;
-  const importantes = myTasks.filter(t => !t.completed && t.status !== 'Completada' && !t.isCritical && t.priority !== '🔴 ROJO').length;
+  const criticas = myTasks.filter(t => !t.completed && (t.isCritical || t.priority === 'ðŸ”´ ROJO')).length;
+  const importantes = myTasks.filter(t => !t.completed && t.status !== 'Completada' && !t.isCritical && t.priority !== 'ðŸ”´ ROJO').length;
 
   // Tareas top
-  const pendingTasks = myTasks.filter(t => !t.completed && t.status !== 'Completada' && t.status !== 'Pendiente de validación');
+  const pendingTasks = myTasks.filter(t => !t.completed && t.status !== 'Completada' && t.status !== 'Pendiente de validaciÃ³n');
   pendingTasks.sort((a, b) => {
-    const valA = (a.isCritical || a.priority === '🔴 ROJO') ? 3 : (a.priority === '🟡 AMARILLO' ? 2 : 1);
-    const valB = (b.isCritical || b.priority === '🔴 ROJO') ? 3 : (b.priority === '🟡 AMARILLO' ? 2 : 1);
+    const valA = (a.isCritical || a.priority === 'ðŸ”´ ROJO') ? 3 : (a.priority === 'ðŸŸ¡ AMARILLO' ? 2 : 1);
+    const valB = (b.isCritical || b.priority === 'ðŸ”´ ROJO') ? 3 : (b.priority === 'ðŸŸ¡ AMARILLO' ? 2 : 1);
     return valB - valA;
   });
   const topTasks = pendingTasks.slice(0, 3);
@@ -13314,7 +13318,7 @@ export default function HomeOficina() {
               onClick={() => navigate(`/checklist/${currentUser?.appRole}?filter=criticas`)}
               style={{ padding: '0.8rem', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '8px', color: 'var(--color-error)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', border: '1px solid rgba(239, 68, 68, 0.2)' }}
             >
-              <AlertCircle size={18} /> <strong>{criticas}</strong> críticas (Requieren acción hoy)
+              <AlertCircle size={18} /> <strong>{criticas}</strong> crÃ­ticas (Requieren acciÃ³n hoy)
             </li>
             <li 
               onClick={() => navigate(`/checklist/${currentUser?.appRole}?filter=importantes`)}
@@ -13344,11 +13348,11 @@ export default function HomeOficina() {
           {loadingTasks ? (
             <p className="text-muted">Buscando tareas urgentes...</p>
           ) : topTasks.length === 0 ? (
-             <p className="text-muted" style={{ padding: '1rem 0' }}>No tienes tareas urgentes pendientes. ¡Buen trabajo!</p>
+             <p className="text-muted" style={{ padding: '1rem 0' }}>No tienes tareas urgentes pendientes. Â¡Buen trabajo!</p>
           ) : (
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               {topTasks.map(task => {
-                const isCrit = task.isCritical || task.priority === '🔴 ROJO';
+                const isCrit = task.isCritical || task.priority === 'ðŸ”´ ROJO';
                 const color = isCrit ? 'var(--color-error)' : 'var(--crear-blue)';
                 
                 return (
@@ -13363,7 +13367,7 @@ export default function HomeOficina() {
                         {task.task || task.title}
                       </span>
                       <span style={{ fontSize: '0.75rem', color: 'var(--crear-gold)', fontWeight: 'bold' }}>
-                        ⏰ Límite: {task.deadline || calculateAutomaticDeadline(task, currentCycle)}
+                        â° LÃ­mite: {task.deadline || calculateAutomaticDeadline(task, currentCycle)}
                       </span>
                     </div>
                   </li>
@@ -13396,7 +13400,7 @@ export default function HomeOficina() {
 
 ---
 
-### 📄 Archivo: `src/services/firebase.js`
+### ðŸ“„ Archivo: `src/services/firebase.js`
 
 ```javascript
 import { initializeApp } from "firebase/app";
@@ -13409,7 +13413,7 @@ const authDomain = import.meta.env.VITE_FIREBASE_AUTH_DOMAIN;
 const projectId = import.meta.env.VITE_FIREBASE_PROJECT_ID;
 
 if (!apiKey || !projectId) {
-  console.warn("⚠️ [Seguridad] Variables de entorno de Firebase no detectadas. Asegúrate de configurar el archivo .env");
+  console.warn("âš ï¸ [Seguridad] Variables de entorno de Firebase no detectadas. AsegÃºrate de configurar el archivo .env");
 }
 
 const firebaseConfig = {
@@ -13427,7 +13431,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
-// const analytics = getAnalytics(app); // Opcional, lo dejamos comentado por ahora si no está configurado
+// const analytics = getAnalytics(app); // Opcional, lo dejamos comentado por ahora si no estÃ¡ configurado
 
 export { db, auth, googleProvider };
 
@@ -13435,7 +13439,7 @@ export { db, auth, googleProvider };
 
 ---
 
-### 📄 Archivo: `src/services/googleSync.js`
+### ðŸ“„ Archivo: `src/services/googleSync.js`
 
 ```javascript
 // src/services/googleSync.js
@@ -13455,7 +13459,7 @@ function formatGoogleCalendarDate(dateInput) {
 export const generateGoogleCalendarUrl = (eventDetails) => {
   const text = encodeURIComponent(eventDetails.summary || eventDetails.nombre || eventDetails.name || 'Evento CREAR PSL');
   const details = encodeURIComponent(
-    `Entrenador: ${eventDetails.trainer || eventDetails.equipo || 'Por Confirmar'}\n${eventDetails.description || eventDetails.detalles || ''}\n\nOrganizado por CREAR Poder Sin Límites`
+    `Entrenador: ${eventDetails.trainer || eventDetails.equipo || 'Por Confirmar'}\n${eventDetails.description || eventDetails.detalles || ''}\n\nOrganizado por CREAR Poder Sin LÃ­mites`
   );
   const location = encodeURIComponent(eventDetails.location || eventDetails.direccion || eventDetails.lugar || eventDetails.sede || '');
   
@@ -13463,7 +13467,7 @@ export const generateGoogleCalendarUrl = (eventDetails) => {
   let endFormatted = formatGoogleCalendarDate(eventDetails.end || eventDetails.fecha_fin);
   
   if (!endFormatted && startFormatted) {
-    // Si no hay fecha fin, asignar 2 horas después
+    // Si no hay fecha fin, asignar 2 horas despuÃ©s
     const endDate = new Date(new Date(eventDetails.start || eventDetails.fecha_inicio).getTime() + 2 * 60 * 60 * 1000);
     endFormatted = formatGoogleCalendarDate(endDate);
   }
@@ -13545,12 +13549,12 @@ export const createGoogleTask = async (taskDetails, token) => {
 };
 
 /**
- * Agendador Híbrido Inteligente (Zero-Failure):
- * 1. Intenta vía API si hay token activo y válido.
- * 2. Si el token expiró o falta, abre directamente Google Calendar con el evento prellenado sin fallar.
+ * Agendador HÃ­brido Inteligente (Zero-Failure):
+ * 1. Intenta vÃ­a API si hay token activo y vÃ¡lido.
+ * 2. Si el token expirÃ³ o falta, abre directamente Google Calendar con el evento prellenado sin fallar.
  */
 export const createGoogleEvent = async (eventDetails, token) => {
-  // Si hay token, intentamos sincronizar directamente vía REST API
+  // Si hay token, intentamos sincronizar directamente vÃ­a REST API
   if (token) {
     try {
       const event = {
@@ -13581,7 +13585,7 @@ export const createGoogleEvent = async (eventDetails, token) => {
         return { success: true, via: 'api', data };
       }
     } catch (apiErr) {
-      console.warn("Fallo de API Calendar, usando redirección directa Web:", apiErr);
+      console.warn("Fallo de API Calendar, usando redirecciÃ³n directa Web:", apiErr);
     }
   }
 
@@ -13599,10 +13603,10 @@ export const createGoogleEvent = async (eventDetails, token) => {
 
 ---
 
-### 📄 Archivo: `src/services/userService.js`
+### ðŸ“„ Archivo: `src/services/userService.js`
 
 ```javascript
-// Servicio de Directorio y Gestión de Usuarios para Producción
+// Servicio de Directorio y GestiÃ³n de Usuarios para ProducciÃ³n
 import { db } from './firebase';
 import { doc, getDoc, setDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { usersData, normalizeRole } from '../data/usersData';
@@ -13646,7 +13650,7 @@ export async function getVerifiedUser(email) {
 
 ---
 
-### 📄 Archivo: `src/utils/flags.js`
+### ðŸ“„ Archivo: `src/utils/flags.js`
 
 ```javascript
 export { getFlagForSede } from './flags.jsx';
@@ -13655,38 +13659,38 @@ export { getFlagForSede } from './flags.jsx';
 
 ---
 
-### 📄 Archivo: `src/utils/flags.jsx`
+### ðŸ“„ Archivo: `src/utils/flags.jsx`
 
 ```javascript
 export const getFlagForSede = (sede) => {
-  if (!sede) return '🌎';
+  if (!sede) return 'ðŸŒŽ';
   const s = sede.toLowerCase();
 
   if (s.includes('ecuador') || s.includes('uio') || s.includes('quito') || s.includes('guayaquil') || s.includes('gye') || s.includes('cuenca') || s.includes('cue')) {
-    return '🇪🇨';
+    return 'ðŸ‡ªðŸ‡¨';
   }
-  if (s.includes('lima') || s.includes('lim') || s.includes('peru') || s.includes('perú')) {
-    return '🇵🇪';
+  if (s.includes('lima') || s.includes('lim') || s.includes('peru') || s.includes('perÃº')) {
+    return 'ðŸ‡µðŸ‡ª';
   }
-  if (s.includes('colombia') || s.includes('med') || s.includes('medellin') || s.includes('medellín') || s.includes('bogota') || s.includes('bogotá')) {
-    return '🇨🇴';
+  if (s.includes('colombia') || s.includes('med') || s.includes('medellin') || s.includes('medellÃ­n') || s.includes('bogota') || s.includes('bogotÃ¡')) {
+    return 'ðŸ‡¨ðŸ‡´';
   }
-  if (s.includes('mexico') || s.includes('mex') || s.includes('mx') || s.includes('méxico')) {
-    return '🇲🇽';
+  if (s.includes('mexico') || s.includes('mex') || s.includes('mx') || s.includes('mÃ©xico')) {
+    return 'ðŸ‡²ðŸ‡½';
   }
   
-  return '🌎'; // Global / Multinacional
+  return 'ðŸŒŽ'; // Global / Multinacional
 };
 
 ```
 
 ---
 
-### 📄 Archivo: `src/utils/soarDates.js`
+### ðŸ“„ Archivo: `src/utils/soarDates.js`
 
 ```javascript
-// Sistema de Cálculo Automático de Fechas y Horas Límite SO-AR
-// Conecta la información de los manuales operativos con las fechas del ciclo activo
+// Sistema de CÃ¡lculo AutomÃ¡tico de Fechas y Horas LÃ­mite SO-AR
+// Conecta la informaciÃ³n de los manuales operativos con las fechas del ciclo activo
 
 import { cyclesData } from '../data/cyclesData';
 
@@ -13696,7 +13700,7 @@ const addDays = (dateStr, days) => {
   return d.toISOString().split('T')[0];
 };
 
-// Reglas relativas extraídas de los manuales del SO-AR
+// Reglas relativas extraÃ­das de los manuales del SO-AR
 const TASK_DEADLINE_RULES = {
   // --- GATE T-30 ---
   't30_presupuesto': { base: 'c1_start', offsetDays: -30, time: '18:00', label: 'T-30' },
@@ -13729,21 +13733,21 @@ const TASK_DEADLINE_RULES = {
   'premj_managers': { base: 'maestria_start', offsetDays: -7, time: '18:00', label: 'T-7 MJ' },
   'premj_entrenador': { base: 'maestria_start', offsetDays: -7, time: '18:00', label: 'T-7 MJ' },
 
-  // --- MAESTRÍA (MJ) ---
+  // --- MAESTRÃA (MJ) ---
   'mj_registro': { base: 'maestria_start', offsetDays: 0, time: '08:00', label: 'MJ Viernes 08:00' },
-  'mj_imposibles': { base: 'maestria_start', offsetDays: 1, time: '15:00', label: 'MJ Sábado 15:00' },
+  'mj_imposibles': { base: 'maestria_start', offsetDays: 1, time: '15:00', label: 'MJ SÃ¡bado 15:00' },
 
-  // --- POST-MAESTRÍA ---
+  // --- POST-MAESTRÃA ---
   'cmj_post_1': { base: 'maestria_start', offsetDays: 4, time: '18:00', label: 'Lunes Post-MJ 18:00' },
   'cmj_post_2': { base: 'maestria_start', offsetDays: 5, time: '18:00', label: 'Martes Cierre de Oro 18:00' },
   'cierre_mj_oro': { base: 'maestria_end', offsetDays: 0, time: '20:00', label: 'Domingo MJ' }
 };
 
 /**
- * Calcula la fecha y hora límite automática de una tarea según el ciclo SO-AR
+ * Calcula la fecha y hora lÃ­mite automÃ¡tica de una tarea segÃºn el ciclo SO-AR
  * @param {Object} task - La tarea del checklist
  * @param {Object} cycle - El ciclo activo (o default a cyclesData[0])
- * @returns {String} Fecha y hora límite calculada automáticamente (ej. '2026-08-07 09:00')
+ * @returns {String} Fecha y hora lÃ­mite calculada automÃ¡ticamente (ej. '2026-08-07 09:00')
  */
 export const calculateAutomaticDeadline = (task, cycle = null) => {
   if (!task) return '';
@@ -13800,14 +13804,14 @@ export const calculateAutomaticDeadline = (task, cycle = null) => {
     return `${calculatedDate} 18:00`;
   }
 
-  return task.deadline || 'Fecha según ciclo';
+  return task.deadline || 'Fecha segÃºn ciclo';
 };
 
 ```
 
 ---
 
-### 📄 Archivo: `vite.config.js`
+### ðŸ“„ Archivo: `vite.config.js`
 
 ```javascript
 import { defineConfig } from 'vite'
@@ -13824,9 +13828,12 @@ export default defineConfig({
 
 
 
-## AUDITOR�A IA - 2026-08-21
-- Revisi�n de coherencia completada.
+## AUDITORÍA IA - 2026-08-21
+- Revisión de coherencia completada.
 - Credenciales Groq y Gmail validadas y aseguradas.
 - Tokens GitHub anexados.
-- Pol�tica de Cero P�rdida de Datos confirmada en Firebase.
+- Política de Cero Pérdida de Datos confirmada en Firebase.
+
+
+
 

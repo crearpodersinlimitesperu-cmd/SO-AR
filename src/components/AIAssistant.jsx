@@ -3,10 +3,11 @@ import { Bot, Send, X, Loader2 } from 'lucide-react';
 import { askGroq } from '../services/groqService';
 import { useAuth } from '../context/AuthContext';
 import { useChecklist } from '../context/ChecklistContext';
+import { usersData } from '../data/usersData';
 
 export default function AIAssistant() {
   const { currentUser } = useAuth();
-  const { tasks } = useChecklist();
+  const { tasks, addCustomTask } = useChecklist();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     { role: 'assistant', content: '¡Hola! Soy tu asistente de IA del Sistema Operativo SO-AR. ¿En qué te puedo ayudar hoy?' }
@@ -39,10 +40,82 @@ export default function AIAssistant() {
 - Nombre: ${currentUser?.name || 'Desconocido'}
 - Rol: ${currentUser?.appRole || 'Ninguno'}
 - Sede: ${currentUser?.sede || 'Global'}
-- Tareas Pendientes:\n${pendingTasks}\n\nEl usuario pregunta: ${userMessage.content}`;
+
+El usuario te dirá algo. Tienes dos modos de operación:
+MODO 1 (Conversacional): Si el usuario hace una pregunta, resúmenes o dudas, respóndele normalmente de forma breve y profesional.
+MODO 2 (Acción): Si el usuario te pide EXPLÍCITAMENTE asignar, delegar o crear una tarea para alguien (ej. "Asigna a Fernando y a Lourdes la tarea X", "Crea la tarea Y para mí"), DEBES incluir obligatoriamente en tu respuesta un bloque de código JSON con este formato exacto:
+\`\`\`json
+{
+  "action": "CREATE_TASK",
+  "task": "Nombre de la tarea",
+  "assigneesNames": ["Fernando", "Lourdes"],
+  "priority": "🔴 ROJO" // o 🟡 AMARILLO o 🟢 VERDE
+}
+\`\`\`
+Puedes agregar texto antes o después del JSON confirmando la acción. Trata de extraer los nombres de pila o apellidos a asignar. Si es el mismo usuario, pon "yo".
+
+El usuario dice: ${userMessage.content}`;
 
       const response = await askGroq(contextPrompt);
-      setMessages(prev => [...prev, { role: 'assistant', content: response }]);
+      
+      // Parsear posible JSON oculto en la respuesta
+      const jsonMatch = response.match(/```json\n([\s\S]*?)\n```/);
+      if (jsonMatch && jsonMatch[1]) {
+        try {
+          const actionData = JSON.parse(jsonMatch[1]);
+          if (actionData.action === "CREATE_TASK") {
+             // Buscar correos de los asignados
+             let emails = [];
+             let assignedSede = currentUser?.sede || 'Global';
+             
+             // Compatibilidad con la versión anterior si la IA devuelve string o array
+             const namesToProcess = actionData.assigneesNames || (actionData.assigneeName ? [actionData.assigneeName] : []);
+             
+             namesToProcess.forEach(name => {
+                 const targetName = name.toLowerCase();
+                 if (targetName && targetName !== 'yo' && targetName !== 'mi') {
+                    const foundUser = usersData.find(u => u.name.toLowerCase().includes(targetName) || u.email.toLowerCase().includes(targetName));
+                    if (foundUser) {
+                       emails.push(foundUser.email);
+                    }
+                 } else {
+                    emails.push(currentUser?.email);
+                 }
+             });
+
+             // Remover duplicados si los hay
+             emails = [...new Set(emails.filter(Boolean))];
+             
+             // Si no hay asignado, por defecto va al creador
+             if (emails.length === 0) emails.push(currentUser?.email);
+             
+             // Ejecutar la creación
+             const success = await addCustomTask({
+                task: actionData.task,
+                title: actionData.task,
+                assignedToEmails: emails, // Usamos el nuevo formato array
+                assignedToEmail: emails[0], // Guardamos el primero como fallback legacy por seguridad
+                assignedSede: assignedSede,
+                priority: actionData.priority || '🟡 AMARILLO',
+                role: 'coordinador_c1c2',
+                cyclePhase: 'Global'
+             });
+
+             if (success) {
+                // Modificar la respuesta de la IA para quitar el bloque JSON bruto
+                const cleanResponse = response.replace(/```json\n[\s\S]*?\n```/, '').trim();
+                const finalMessage = cleanResponse + `\n\n✅ **ACCIÓN AUTOMÁTICA**: Tarea "${actionData.task}" asignada a ${emails.join(', ')}.`;
+                setMessages(prev => [...prev, { role: 'assistant', content: finalMessage }]);
+                return;
+             }
+          }
+        } catch(e) {
+           console.error("Error parseando acción del bot:", e);
+        }
+      }
+
+      // Si no hubo acción o falló, mostrar respuesta normal
+      setMessages(prev => [...prev, { role: 'assistant', content: response.replace(/```json\n[\s\S]*?\n```/, '') }]);
     } catch (error) {
       setMessages(prev => [...prev, { role: 'assistant', content: 'Lo siento, hubo un error de conexión con mi sistema. Inténtalo más tarde.' }]);
       console.error(error);

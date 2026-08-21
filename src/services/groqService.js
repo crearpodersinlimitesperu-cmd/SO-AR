@@ -1,26 +1,22 @@
 export const askGroq = async (prompt, systemPrompt = "Eres el Asistente IA del Sistema Operativo SO-AR de CREAR PODER SIN LÍMITES. Responde de manera profesional, concisa y orientada a ayudar al equipo (Gerentes, QT, Entrenadores, Staff). Mantén la identidad de la marca siempre en alto.") => {
-  const DEFAULT_GROQ = ['gsk_9bPGHkSE27', 'HLn0y9eCmKWGdyb3', 'FYExh6A8O8FvhUZZ', 'wuMzu6RsrI'].join('');
-  const apiKey = (import.meta.env.VITE_GROQ_API_KEY && import.meta.env.VITE_GROQ_API_KEY !== 'undefined') 
-    ? import.meta.env.VITE_GROQ_API_KEY 
-    : DEFAULT_GROQ;
+  const apiKey = import.meta.env.VITE_AIML_API_KEY || 'd1268e139ad739ff141837be41bf913d';
+
   if (!apiKey) {
-    throw new Error("No se ha configurado la API Key de Groq.");
+    throw new Error("No se ha configurado la API Key de AIMLAPI.");
   }
 
-  const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+  const response = await fetch("https://api.aimlapi.com/v1/chat/completions", {
     method: "POST",
     headers: {
       "Authorization": `Bearer ${apiKey}`,
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      model: "llama3-8b-8192",
+      model: "openai/gpt-5-5",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: prompt }
-      ],
-      temperature: 0.7,
-      max_tokens: 1024,
+      ]
     })
   });
 

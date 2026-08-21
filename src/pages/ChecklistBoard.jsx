@@ -24,6 +24,7 @@ export default function ChecklistBoard() {
   const { currentUser } = useAuth();
   const { tasks, toggleTask, updateTaskDetails, inviteCollaborator, syncTasksToGoogle } = useChecklist();
   const { currentCycle, currentStage } = useCycles();
+  const { showPrompt } = useUI();
   const role = roles.find(r => r.id === roleId) || {
     id: roleId,
     name: getRoleDisplayName(roleId)
@@ -50,7 +51,7 @@ export default function ChecklistBoard() {
     const userEmailCom = currentUser?.email?.replace('@crearpsl.net', '@crearpsl.com')?.toLowerCase();
     const userEmailNet = currentUser?.email?.replace('@crearpsl.com', '@crearpsl.net')?.toLowerCase();
     
-    const isAssigned = t.assignedToEmail?.toLowerCase() === userEmailCom || t.assignedToEmail?.toLowerCase() === userEmailNet;
+    const isAssigned = (t.assignedToEmails && t.assignedToEmails.some(e => e.toLowerCase() === userEmailCom || e.toLowerCase() === userEmailNet)) || t.assignedToEmail?.toLowerCase() === userEmailCom || t.assignedToEmail?.toLowerCase() === userEmailNet;
     const isCollaborator = t.collaborators?.some(c => c.toLowerCase() === userEmailCom || c.toLowerCase() === userEmailNet);
 
     if (currentUser?.isSuperAdmin) {
@@ -58,7 +59,7 @@ export default function ChecklistBoard() {
     }
 
     if ((roleId === 'gerente' || roleId === 'director_maestria') && t.role === roleId) {
-      if (!t.assignedToEmail) return true;
+      if (!t.assignedToEmail && !(t.assignedToEmails && t.assignedToEmails.length > 0)) return true;
       const isMyCreation = t.createdBy?.toLowerCase() === userEmailCom || t.createdBy?.toLowerCase() === userEmailNet;
       return isAssigned || isMyCreation || isCollaborator;
     }
@@ -356,9 +357,11 @@ export default function ChecklistBoard() {
                     )}
 
                     {/* MOSTRAR QUIÉN ASIGNÓ LA TAREA (COLOR POR ROL) */}
-                    {task.createdBy && task.assignedToEmail && (() => {
-                      const creator = usersData.find(u => u.email.toLowerCase() === task.createdBy.toLowerCase());
-                      if (creator && creator.email !== task.assignedToEmail) {
+                    {task.createdBy && (task.assignedToEmail || (task.assignedToEmails && task.assignedToEmails.length > 0)) && (() => {
+                      const creator = usersData.find(u => u.email === task.createdBy);
+                      // Solo mostramos 'Delegado por' si el creador no es uno de los asignados
+                      const isCreatorAssigned = task.assignedToEmails ? task.assignedToEmails.includes(creator?.email) : creator?.email === task.assignedToEmail;
+                      if (creator && !isCreatorAssigned) {
                         const cRole = normalizeRole(creator.role);
                         const roleColor = ROLE_COLORS[cRole] || '#6b7280';
                         const roleName = ROLE_DISPLAY_NAMES[cRole] || creator.role;

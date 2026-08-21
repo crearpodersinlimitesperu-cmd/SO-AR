@@ -125,35 +125,45 @@ export function ChecklistProvider({ children }) {
         created_at: new Date().toISOString()
       });
 
-      // Si la tarea tiene una asignación directa a un usuario, crear notificación e email
-      if (taskData.assignedToEmail) {
-        // 1. Notificación In-App
-        const notifRef = doc(collection(db, 'notifications'));
-        batch.set(notifRef, {
-          userId: taskData.assignedToEmail,
-          title: taskData.task || taskData.title,
-          message: `Se te ha asignado una nueva tarea urgente en la sede ${taskData.assignedSede || 'Global'}.`,
-          read: false,
-          taskId: customId,
-          created_at: new Date().toISOString()
-        });
+      // Asegurarse de tener un arreglo unificado de correos (legacy o nuevo)
+      const emailsToNotify = [];
+      if (taskData.assignedToEmails && Array.isArray(taskData.assignedToEmails)) {
+        emailsToNotify.push(...taskData.assignedToEmails);
+      } else if (taskData.assignedToEmail) {
+        emailsToNotify.push(taskData.assignedToEmail);
+      }
 
-        // 2. Notificación por Correo (Vía Firebase Trigger Email Extension)
-        const mailRef = doc(collection(db, 'mail'));
-        batch.set(mailRef, {
-          to: [taskData.assignedToEmail],
-          message: {
-            subject: `NUEVA TAREA ASIGNADA SO-AR: ${taskData.task || taskData.title}`,
-            html: `
-              <h2>Hola, se te ha asignado una nueva tarea en el SO-AR</h2>
-              <p><strong>Tarea:</strong> ${taskData.task || taskData.title}</p>
-              <p><strong>Sede:</strong> ${taskData.assignedSede || 'Global'}</p>
-              <p><strong>Prioridad:</strong> ${taskData.priority || 'Normal'}</p>
-              <p>Por favor, ingresa a la plataforma para revisarla y marcarla como completada cuando esté lista.</p>
-              <br/>
-              <p><em>Equipo CREAR Poder Sin Límites</em></p>
-            `
-          }
+      // Si la tarea tiene asignaciones directas a uno o más usuarios
+      if (emailsToNotify.length > 0) {
+        emailsToNotify.forEach(email => {
+          // 1. Notificación In-App
+          const notifRef = doc(collection(db, 'notifications'));
+          batch.set(notifRef, {
+            userId: email,
+            title: taskData.task || taskData.title,
+            message: `Se te ha asignado una nueva tarea urgente en la sede ${taskData.assignedSede || 'Global'}.`,
+            read: false,
+            taskId: customId,
+            created_at: new Date().toISOString()
+          });
+
+          // 2. Notificación por Correo (Vía Firebase Trigger Email Extension)
+          const mailRef = doc(collection(db, 'mail'));
+          batch.set(mailRef, {
+            to: [email],
+            message: {
+              subject: `NUEVA TAREA ASIGNADA SO-AR: ${taskData.task || taskData.title}`,
+              html: `
+                <h2>Hola, se te ha asignado una nueva tarea en el SO-AR</h2>
+                <p><strong>Tarea:</strong> ${taskData.task || taskData.title}</p>
+                <p><strong>Sede:</strong> ${taskData.assignedSede || 'Global'}</p>
+                <p><strong>Prioridad:</strong> ${taskData.priority || 'Normal'}</p>
+                <p>Por favor, ingresa a la plataforma para revisarla y marcarla como completada cuando esté lista.</p>
+                <br/>
+                <p><em>Equipo CREAR Poder Sin Límites</em></p>
+              `
+            }
+          });
         });
       }
 
