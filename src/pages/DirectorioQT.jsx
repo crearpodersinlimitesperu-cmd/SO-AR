@@ -95,16 +95,17 @@ export default function DirectorioQT() {
         if (selectedEdicion === 'intermedio' && !(m.ediciones.includes('1 a 3') || m.ediciones.includes('4 a 8'))) return false;
       }
 
-      // Búsqueda libre
+      // Búsqueda libre con normalización sin tildes y multi-palabra
       if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase().trim();
-        const matchName = (m.nombre || '').toLowerCase().includes(q);
-        const matchDoc = (m.docNumero || '').includes(q);
-        const matchEmail = (m.email || '').toLowerCase().includes(q);
-        const matchInsta = (m.instagram || '').toLowerCase().includes(q);
-        const matchDec = (m.declaracion || '').toLowerCase().includes(q);
-        const matchSede = (m.sede || '').toLowerCase().includes(q);
-        return matchName || matchDoc || matchEmail || matchInsta || matchDec || matchSede;
+        const normalize = (str = '') => str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+        const qTokens = normalize(searchQuery).split(/\s+/).filter(Boolean);
+        
+        const targetString = normalize(
+          `${m.nombre || ''} ${m.docNumero || ''} ${m.email || ''} ${m.instagram || ''} ${m.sede || ''} ${m.talla || ''} ${m.ediciones || ''} ${m.whatsapp || ''} ${m.declaracion || ''}`
+        );
+
+        // Debe coincidir con todos los términos buscados (búsqueda flexible en cualquier orden)
+        return qTokens.every(token => targetString.includes(token));
       }
 
       return true;
