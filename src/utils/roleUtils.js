@@ -1,4 +1,4 @@
-﻿import { DIRECCION_ROLES, GERENCIA_ROLES } from './permissions';
+import { DIRECCION_ROLES, GERENCIA_ROLES } from '../config/permissions';
 
 export function hasRole(user, targetRole) {
   if (!user) return false;
