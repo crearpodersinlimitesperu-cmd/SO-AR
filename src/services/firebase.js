@@ -5,18 +5,17 @@ import { getStorage } from "firebase/storage";
 
 const getEnv = (val, fb) => (val && val !== 'undefined' ? val : fb);
 
-// Public client config for Firebase Web SDK
-const DEFAULT_KEY = ['AIzaSy', 'AxYg9g2hn7', 'fIGyaI1s', 'jLgVzf9X', 'MQ2B0HI'].join('');
-const DEFAULT_APP_ID = ['1:899912053762:web:', '1b78d6d9fc5471861e231b'].join('');
+const DEFAULT_KEY = ['AIzaSy', 'CTMrA6A64s', '1ppDBBso', 'l-fqam5V', 'ch_Q5B0'].join('');
+const DEFAULT_APP_ID = ['1:122588918051:web:', 'c85d6835b1b1f920fb1c96'].join('');
 
 const firebaseConfig = {
   apiKey: getEnv(import.meta.env.VITE_FIREBASE_API_KEY, DEFAULT_KEY),
-  authDomain: getEnv(import.meta.env.VITE_FIREBASE_AUTH_DOMAIN, "campus-crear.firebaseapp.com"),
-  projectId: getEnv(import.meta.env.VITE_FIREBASE_PROJECT_ID, "campus-crear"),
-  storageBucket: getEnv(import.meta.env.VITE_FIREBASE_STORAGE_BUCKET, "campus-crear.firebasestorage.app"),
-  messagingSenderId: getEnv(import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID, "899912053762"),
+  authDomain: getEnv(import.meta.env.VITE_FIREBASE_AUTH_DOMAIN, "centro-operativo-cpsl.firebaseapp.com"),
+  projectId: getEnv(import.meta.env.VITE_FIREBASE_PROJECT_ID, "centro-operativo-cpsl"),
+  storageBucket: getEnv(import.meta.env.VITE_FIREBASE_STORAGE_BUCKET, "centro-operativo-cpsl.firebasestorage.app"),
+  messagingSenderId: getEnv(import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID, "122588918051"),
   appId: getEnv(import.meta.env.VITE_FIREBASE_APP_ID, DEFAULT_APP_ID),
-  measurementId: getEnv(import.meta.env.VITE_FIREBASE_MEASUREMENT_ID, "G-FL7Q5KHNJN")
+  measurementId: getEnv(import.meta.env.VITE_FIREBASE_MEASUREMENT_ID, "G-XN2BX9CQYH")
 };
 
 // Initialize Firebase
