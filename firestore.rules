@@ -55,7 +55,7 @@ service cloud.firestore {
     // Colección de Perfiles y Notas Privadas (user_profiles)
     match /user_profiles/{userDocId} {
       allow read: if isAuthenticated();
-      allow write: if isGerente() || isSuperAdmin();
+      allow write: if isGerente() || isSuperAdmin() || (isAuthenticated() && request.auth.token.email.lower() == userDocId);
     }
 
     // Colección de Notificaciones (notifications)

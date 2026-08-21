@@ -130,14 +130,25 @@ export async function getAllUserConnections() {
       const data = d.data();
       const em = (data.email || d.id).toLowerCase().trim();
       let lastLoginDate = null;
+      let lastLoginFormatted = '';
       if (data.lastLoginAt?.toDate) {
-        lastLoginDate = data.lastLoginAt.toDate().toISOString();
+        const d = data.lastLoginAt.toDate();
+        lastLoginDate = d.toISOString();
+        lastLoginFormatted = d.toLocaleString('es-ES', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
       } else if (data.lastLoginAtIso) {
         lastLoginDate = data.lastLoginAtIso;
+        try {
+          const d = new Date(data.lastLoginAtIso);
+          if (!isNaN(d.getTime())) {
+            lastLoginFormatted = d.toLocaleString('es-ES', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+          }
+        } catch(e) {}
       }
       connections[em] = {
         ...data,
-        lastLoginAt: lastLoginDate || null
+        lastLoginAt: lastLoginDate || null,
+        lastLoginFormatted: lastLoginFormatted || null,
+        hasConnected: !!lastLoginDate
       };
     });
   } catch (e) {
