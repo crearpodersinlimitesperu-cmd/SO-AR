@@ -10,6 +10,7 @@ import { usersData, normalizeRole, normalizeSede, OPERATIONAL_SEDES } from '../d
 import { Globe, Building2, Users, ArrowLeft, ChevronDown, ChevronRight, Eye, CheckCircle2, Clock, AlertTriangle, TrendingUp, UserCheck, FileText, Search, X, PlusCircle } from 'lucide-react';
 import { getFlagForSede } from '../utils/flags';
 import UserProfileModal from '../components/UserProfileModal';
+import IAAuditor from '../components/IAAuditor';
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
 import { getAllAuditLogs, recordAuditEvent, getAllUserConnections } from '../services/auditService';
 

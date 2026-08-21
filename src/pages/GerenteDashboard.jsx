@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { Target, AlertTriangle, Users, PlusCircle, Activity, CheckCircle, Building, MessageSquare, Mail, ExternalLink, ArrowUpRight, Clock, ShieldAlert, ChevronRight, CheckSquare } from 'lucide-react';
 import { usersData, normalizeRole } from '../data/usersData';
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
+import IAAuditor from '../components/IAAuditor';
 import VenueConfigModal from '../components/VenueConfigModal';
 
 export default function GerenteDashboard() {

@@ -1,8 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Bot, Send, X, Loader2 } from 'lucide-react';
 import { askGroq } from '../services/groqService';
+import { useAuth } from '../context/AuthContext';
+import { useChecklist } from '../context/ChecklistContext';
 
 export default function AIAssistant() {
+  const { currentUser } = useAuth();
+  const { tasks } = useChecklist();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     { role: 'assistant', content: '¡Hola! Soy tu asistente de IA del Sistema Operativo SO-AR. ¿En qué te puedo ayudar hoy?' }
@@ -29,7 +33,15 @@ export default function AIAssistant() {
     setLoading(true);
 
     try {
-      const response = await askGroq(userMessage.content);
+      const pendingTasks = tasks ? tasks.filter(t => !t.completed).map(t => `- ${t.title || t.task} (Fase: ${t.cyclePhase || 'Global'}, Prioridad: ${t.priority || 'Normal'})`).join('\n') : 'Ninguna';
+      
+      const contextPrompt = `Contexto Operativo del Usuario:
+- Nombre: ${currentUser?.name || 'Desconocido'}
+- Rol: ${currentUser?.appRole || 'Ninguno'}
+- Sede: ${currentUser?.sede || 'Global'}
+- Tareas Pendientes:\n${pendingTasks}\n\nEl usuario pregunta: ${userMessage.content}`;
+
+      const response = await askGroq(contextPrompt);
       setMessages(prev => [...prev, { role: 'assistant', content: response }]);
     } catch (error) {
       setMessages(prev => [...prev, { role: 'assistant', content: 'Lo siento, hubo un error de conexión con mi sistema. Inténtalo más tarde.' }]);
