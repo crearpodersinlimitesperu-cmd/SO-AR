@@ -137,7 +137,8 @@ export const canViewAllManagers = (currentUser) => {
 export const canViewSede = (currentUser) => {
   if (!currentUser) return false;
   const r = currentUser.appRole;
-  return r === 'coord_maestria' || r === 'coordinador_mj' || r === 'gerente' || currentUser.isGerente;
+  // Gerentes, Coordinadores y Capitanes pueden ver su sede
+  return r === 'coord_maestria' || r === 'coordinador_mj' || r === 'coord_c1' || r === 'capitan' || r === 'gerente' || currentUser.isGerente;
 };
 
 /**

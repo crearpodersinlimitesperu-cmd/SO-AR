@@ -236,12 +236,19 @@ export default function CentroManagers() {
         // Solo ve los suyos como entrenador
         if (!isTrainerMatch(m.entrenador, currentTrainerName)) return false;
       } else if (!canViewAll) {
-        if (canViewOwnSede) {
-          // Coordinadores de maestría y gerentes: ven su sede normalizada
-          if (mSede !== userSede) return false;
+        const userRole = currentUser?.appRole;
+        const isGerente = userRole === 'gerente';
+        const isCoord = userRole === 'coord_maestria' || userRole === 'coordinador_mj' || userRole === 'coord_c1' || userRole === 'capitan';
+        
+        if (isGerente) {
+          if (mSede !== userSede && mSede !== 'GLOBAL') return false;
+        } else if (isCoord) {
+          // Coordinadores ven su sede Y a los gerentes (como referencia directiva)
+          const mRol = (m.rol || '').toLowerCase();
+          if (mSede !== userSede && !mRol.includes('gerente')) return false;
         } else {
-          // Por defecto, si no es dual role ni puede ver todo/sede, solo ve lo suyo
-          if (!isTrainerMatch(m.entrenador, currentTrainerName)) return false;
+          // Por defecto (QT, Equipo), solo ven lo suyo (y si están asignados a un entrenador)
+          if (!isTrainerMatch(m.entrenador, currentTrainerName) && mSede !== userSede) return false;
         }
       }
 
@@ -285,10 +292,19 @@ export default function CentroManagers() {
       // Permisos base de rol
       if (viewAsTrainer) {
         if (!isTrainerMatch(m.entrenador, currentTrainerName)) return false;
-      } else if (canViewOwnSede && !canViewAll) {
-        if (mSede !== userSede) return false;
-      } else if (!canViewAll && !canViewOwnSede) {
-        if (!isTrainerMatch(m.entrenador, currentTrainerName)) return false;
+      } else if (!canViewAll) {
+        const userRole = currentUser?.appRole;
+        const isGerente = userRole === 'gerente';
+        const isCoord = userRole === 'coord_maestria' || userRole === 'coordinador_mj' || userRole === 'coord_c1' || userRole === 'capitan';
+        
+        if (isGerente) {
+          if (mSede !== userSede && mSede !== 'GLOBAL') return false;
+        } else if (isCoord) {
+          const mRol = (m.rol || '').toLowerCase();
+          if (mSede !== userSede && !mRol.includes('gerente')) return false;
+        } else {
+          if (!isTrainerMatch(m.entrenador, currentTrainerName) && mSede !== userSede) return false;
+        }
       }
 
       // Filtros de Sede y Entrenador de la barra

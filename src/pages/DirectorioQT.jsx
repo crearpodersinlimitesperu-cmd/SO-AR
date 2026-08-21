@@ -82,8 +82,25 @@ export default function DirectorioQT() {
 
   // Filtrado reactivo
   const filteredMembers = useMemo(() => {
+    const userRole = currentUser?.appRole || '';
+    const userSede = currentUser?.sede || '';
+    const isSuper = currentUser?.isSuperAdmin || userRole === 'director_maestria' || userRole === 'direccion' || currentUser?.email === 'jose.sanchez@crearpsl.net' || currentUser?.email === 'paul.sosa@crearpsl.net' || currentUser?.email === 'armando.pilacuan@gmail.com';
+    const isGerente = userRole === 'gerente';
+    
     return members.filter(m => {
-      // Filtro por sede
+      // 0. Reglas de Jerarquía Corporativa
+      // - Directores/Super: sin restricciones
+      // - Gerentes: ven su sede y Global
+      // - Coordinadores/QT/Resto: solo ven su sede
+      if (!isSuper) {
+        if (isGerente) {
+          if (m.sede !== userSede && m.sede !== 'Global') return false;
+        } else {
+          if (m.sede !== userSede) return false;
+        }
+      }
+
+      // Filtro por sede manual de la UI
       if (selectedSede !== 'Todas' && m.sede !== selectedSede) {
         return false;
       }
@@ -244,13 +261,13 @@ export default function DirectorioQT() {
               colorScheme: 'dark'
             }}
           >
-            <option value="Todas" style={{ background: '#0d152d', color: '#ffffff' }}>🌍 Todas las Sedes</option>
-            <option value="Quito" style={{ background: '#0d152d', color: '#ffffff' }}>🇪🇨 Quito</option>
-            <option value="Guayaquil" style={{ background: '#0d152d', color: '#ffffff' }}>🇪🇨 Guayaquil</option>
-            <option value="Cuenca" style={{ background: '#0d152d', color: '#ffffff' }}>🇪🇨 Cuenca</option>
-            <option value="Lima" style={{ background: '#0d152d', color: '#ffffff' }}>🇵🇪 Lima</option>
-            <option value="Medellín" style={{ background: '#0d152d', color: '#ffffff' }}>🇨🇴 Medellín</option>
-            <option value="México" style={{ background: '#0d152d', color: '#ffffff' }}>🇲🇽 México</option>
+            <option value="Todas" style={{ background: '#0d152d', color: '#ffffff' }}>🌍 Todas las Sedes Permitidas</option>
+            {(!currentUser || currentUser.isSuperAdmin || currentUser.appRole === 'director_maestria' || currentUser.appRole === 'direccion' || currentUser.appRole === 'gerente' || currentUser.sede === 'Quito') && <option value="Quito" style={{ background: '#0d152d', color: '#ffffff' }}>🇪🇨 Quito</option>}
+            {(!currentUser || currentUser.isSuperAdmin || currentUser.appRole === 'director_maestria' || currentUser.appRole === 'direccion' || currentUser.appRole === 'gerente' || currentUser.sede === 'Guayaquil') && <option value="Guayaquil" style={{ background: '#0d152d', color: '#ffffff' }}>🇪🇨 Guayaquil</option>}
+            {(!currentUser || currentUser.isSuperAdmin || currentUser.appRole === 'director_maestria' || currentUser.appRole === 'direccion' || currentUser.appRole === 'gerente' || currentUser.sede === 'Cuenca') && <option value="Cuenca" style={{ background: '#0d152d', color: '#ffffff' }}>🇪🇨 Cuenca</option>}
+            {(!currentUser || currentUser.isSuperAdmin || currentUser.appRole === 'director_maestria' || currentUser.appRole === 'direccion' || currentUser.appRole === 'gerente' || currentUser.sede === 'Lima') && <option value="Lima" style={{ background: '#0d152d', color: '#ffffff' }}>🇵🇪 Lima</option>}
+            {(!currentUser || currentUser.isSuperAdmin || currentUser.appRole === 'director_maestria' || currentUser.appRole === 'direccion' || currentUser.appRole === 'gerente' || currentUser.sede === 'Medellín') && <option value="Medellín" style={{ background: '#0d152d', color: '#ffffff' }}>🇨🇴 Medellín</option>}
+            {(!currentUser || currentUser.isSuperAdmin || currentUser.appRole === 'director_maestria' || currentUser.appRole === 'direccion' || currentUser.appRole === 'gerente' || currentUser.sede === 'México') && <option value="México" style={{ background: '#0d152d', color: '#ffffff' }}>🇲🇽 México</option>}
           </select>
 
           {/* Filtro Experiencia */}
