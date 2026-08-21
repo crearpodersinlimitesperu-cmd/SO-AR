@@ -14,6 +14,7 @@ export default function HelpModal({ isOpen, onClose }) {
   const [activeTab, setActiveTab] = useState('manual'); // 'manual' | 'protocol' | 'suggestions'
   const [showTour, setShowTour] = useState(false);
   const [suggestion, setSuggestion] = useState('');
+  const [suggestionImage, setSuggestionImage] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
 
@@ -26,6 +27,25 @@ export default function HelpModal({ isOpen, onClose }) {
     if (!suggestion.trim()) return;
 
     setIsSubmitting(true);
+    let imageUrl = '';
+    
+    if (suggestionImage) {
+      const formData = new FormData();
+      formData.append('image', suggestionImage);
+      try {
+        const res = await fetch('https://api.imgbb.com/1/upload?key=67f13df5d688cf64ec5ba63b0a2bf062', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        if (data.success) {
+          imageUrl = data.data.url;
+        }
+      } catch (err) {
+        console.error("Error subiendo imagen:", err);
+      }
+    }
+
     try {
       await addDoc(collection(db, 'mail'), {
         to: 'sistemas@crearpsl.net',
@@ -38,12 +58,14 @@ export default function HelpModal({ isOpen, onClose }) {
             <p><strong>Sede:</strong> ${currentUser?.sede}</p>
             <hr />
             <p>${suggestion.replace(/\n/g, '<br>')}</p>
+            ${imageUrl ? `<br/><p><strong>Evidencia Adjunta:</strong><br/><a href="${imageUrl}" target="_blank"><img src="${imageUrl}" style="max-width: 500px; max-height: 500px; border-radius: 8px; margin-top: 10px;" /></a></p>` : ''}
           `
         },
         createdAt: serverTimestamp()
       });
       setSuccess(true);
       setSuggestion('');
+      setSuggestionImage(null);
       setTimeout(() => {
         setSuccess(false);
         onClose();
@@ -285,11 +307,39 @@ export default function HelpModal({ isOpen, onClose }) {
                     placeholder="Escribe tu sugerencia, reporte de bug o idea de mejora aquí..."
                     required
                     style={{
-                      flex: 1, minHeight: '200px', padding: '1rem', borderRadius: '8px',
+                      flex: 1, minHeight: '150px', padding: '1rem', borderRadius: '8px',
                       background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border-subtle)',
                       color: '#fff', fontSize: '1rem', resize: 'vertical', fontFamily: 'inherit'
                     }}
                   />
+                  
+                  <div style={{
+                    background: 'rgba(255,255,255,0.03)',
+                    border: '1px dashed var(--border-strong)',
+                    padding: '1rem',
+                    borderRadius: '8px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.5rem'
+                  }}>
+                    <label style={{ color: 'var(--crear-cyan)', fontWeight: 600, fontSize: '0.9rem' }}>
+                      📸 Adjunta una captura de pantalla (Opcional pero recomendado)
+                    </label>
+                    <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                      Si estás reportando un error o caso a corregir, una foto nos ayudará a comprenderlo mucho mejor.
+                    </p>
+                    <input 
+                      type="file" 
+                      accept="image/*"
+                      onChange={(e) => {
+                        if (e.target.files && e.target.files[0]) {
+                          setSuggestionImage(e.target.files[0]);
+                        }
+                      }}
+                      style={{ marginTop: '0.5rem', fontSize: '0.9rem' }}
+                    />
+                  </div>
+
                   <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
                     <button type="button" className="btn-secondary" onClick={onClose} style={{ padding: '0.8rem 1.5rem' }}>Cancelar</button>
                     <button type="submit" className="btn-primary" disabled={isSubmitting || !suggestion.trim()} style={{ background: 'var(--crear-cyan)', color: '#000', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.8rem 1.5rem' }}>

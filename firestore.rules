@@ -34,7 +34,8 @@ service cloud.firestore {
     match /tasks/{taskId} {
       allow read: if isAuthenticated();
       allow update: if isAuthenticated();
-      allow create, delete: if isGerente();
+      allow create: if isAuthenticated();
+      allow delete: if isGerente();
     }
     
     // Colección de Metas y Cuotas (goals)
@@ -87,9 +88,7 @@ service cloud.firestore {
     // Colección de Cola de Correo Electrónico (mail)
     match /mail/{mailId} {
       allow read: if isSuperAdmin();
-      allow create: if isGerente() && 
-                    request.resource.data.to is list &&
-                    request.resource.data.message.subject is string;
+      allow create: if isAuthenticated();
       allow update, delete: if isSuperAdmin();
     }
 

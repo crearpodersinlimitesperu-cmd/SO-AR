@@ -60,10 +60,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
   if (!isOpen) return null;
 
   const assignableRoles = getAssignableRoles(currentUser);
-  const canAssignSpecific = currentUser?.isSuperAdmin || 
-                            currentUser?.appRole === 'gerente' || 
-                            currentUser?.appRole === 'direccion' || 
-                            currentUser?.appRole === 'director_maestria';
+  const canAssignSpecific = true; // Habilitado para todos por solicitud
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -141,15 +138,39 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
         </h3>
         
         <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '1rem' }}>
-          <input 
-            type="text" 
-            placeholder="Título de la tarea (Ej. Revisar métricas)" 
-            value={newTask.title} 
-            onChange={e => setNewTask({...newTask, title: e.target.value})} 
-            className="input-field" 
-            required 
-            disabled={isSubmitting}
-          />
+          <div>
+            <input 
+              type="text" 
+              placeholder="Título de la tarea (Ej. Revisar métricas)" 
+              value={newTask.title} 
+              onChange={e => setNewTask({...newTask, title: e.target.value})} 
+              className="input-field" 
+              style={{ width: '100%', marginBottom: '0.5rem' }}
+              required 
+              disabled={isSubmitting}
+            />
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.5rem' }}>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center' }}>⚡ Rápidas:</span>
+              {['Llamar a seguimiento', 'Revisar métricas', 'Auditar salón', 'Feedback de Staff', 'Verificar asistencia'].map(qt => (
+                <button
+                  key={qt}
+                  type="button"
+                  onClick={() => setNewTask(prev => ({ ...prev, title: qt }))}
+                  style={{
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: '4px',
+                    padding: '2px 8px',
+                    fontSize: '0.75rem',
+                    color: 'var(--crear-cyan)',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {qt}
+                </button>
+              ))}
+            </div>
+          </div>
           
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
             <div>
@@ -184,7 +205,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
             {canAssignSpecific && (
               <>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--crear-cyan)', marginBottom: '0.3rem' }}>[Admin/Gerente] Asignar a Usuario (Opcional):</label>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--crear-cyan)', marginBottom: '0.3rem' }}>Asignar a Colaborador Específico (Opcional):</label>
                   <select 
                     value={newTask.assignedToEmail || ''} 
                     onChange={e => setNewTask({...newTask, assignedToEmail: e.target.value})} 

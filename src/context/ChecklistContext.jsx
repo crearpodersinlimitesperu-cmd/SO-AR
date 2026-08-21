@@ -141,7 +141,7 @@ export function ChecklistProvider({ children }) {
         // 2. Notificación por Correo (Vía Firebase Trigger Email Extension)
         const mailRef = doc(collection(db, 'mail'));
         batch.set(mailRef, {
-          to: taskData.assignedToEmail,
+          to: [taskData.assignedToEmail],
           message: {
             subject: `NUEVA TAREA ASIGNADA SO-AR: ${taskData.task || taskData.title}`,
             html: `
