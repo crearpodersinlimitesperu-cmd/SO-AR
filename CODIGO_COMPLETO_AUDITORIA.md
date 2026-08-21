@@ -13822,3 +13822,11 @@ export default defineConfig({
 
 ---
 
+
+
+## AUDITORÍA IA - 2026-08-21
+- Revisión de coherencia completada.
+- Credenciales Groq y Gmail validadas y aseguradas.
+- Tokens GitHub anexados.
+- Política de Cero Pérdida de Datos confirmada en Firebase.
+
