@@ -231,27 +231,47 @@ export default function DirectorioQT() {
           <select
             value={selectedSede}
             onChange={(e) => setSelectedSede(e.target.value)}
-            style={{ padding: '0.55rem 0.9rem', borderRadius: '8px', border: '1px solid var(--border-subtle, #cbd5e1)', background: 'var(--bg-card, #ffffff)', color: 'var(--text-main, #0f172a)', fontWeight: 600, fontSize: '0.85rem' }}
+            style={{ 
+              padding: '0.55rem 0.9rem', 
+              borderRadius: '8px', 
+              border: '1px solid var(--border-subtle, rgba(255, 255, 255, 0.2))', 
+              background: 'var(--bg-dark-alt, #0d152d)', 
+              color: 'var(--text-heading, #ffffff)', 
+              fontWeight: 700, 
+              fontSize: '0.85rem',
+              cursor: 'pointer',
+              colorScheme: 'dark'
+            }}
           >
-            <option value="Todas">🌍 Todas las Sedes</option>
-            <option value="Quito">🇪🇨 Quito</option>
-            <option value="Guayaquil">🇪🇨 Guayaquil</option>
-            <option value="Cuenca">🇪🇨 Cuenca</option>
-            <option value="Lima">🇵🇪 Lima</option>
-            <option value="Medellín">🇨🇴 Medellín</option>
-            <option value="México">🇲🇽 México</option>
+            <option value="Todas" style={{ background: '#0d152d', color: '#ffffff' }}>🌍 Todas las Sedes</option>
+            <option value="Quito" style={{ background: '#0d152d', color: '#ffffff' }}>🇪🇨 Quito</option>
+            <option value="Guayaquil" style={{ background: '#0d152d', color: '#ffffff' }}>🇪🇨 Guayaquil</option>
+            <option value="Cuenca" style={{ background: '#0d152d', color: '#ffffff' }}>🇪🇨 Cuenca</option>
+            <option value="Lima" style={{ background: '#0d152d', color: '#ffffff' }}>🇵🇪 Lima</option>
+            <option value="Medellín" style={{ background: '#0d152d', color: '#ffffff' }}>🇨🇴 Medellín</option>
+            <option value="México" style={{ background: '#0d152d', color: '#ffffff' }}>🇲🇽 México</option>
           </select>
 
           {/* Filtro Experiencia */}
           <select
             value={selectedEdicion}
             onChange={(e) => setSelectedEdicion(e.target.value)}
-            style={{ padding: '0.55rem 0.9rem', borderRadius: '8px', border: '1px solid var(--border-subtle, #cbd5e1)', background: 'var(--bg-card, #ffffff)', color: 'var(--text-main, #0f172a)', fontWeight: 600, fontSize: '0.85rem' }}
+            style={{ 
+              padding: '0.55rem 0.9rem', 
+              borderRadius: '8px', 
+              border: '1px solid var(--border-subtle, rgba(255, 255, 255, 0.2))', 
+              background: 'var(--bg-dark-alt, #0d152d)', 
+              color: 'var(--text-heading, #ffffff)', 
+              fontWeight: 700, 
+              fontSize: '0.85rem',
+              cursor: 'pointer',
+              colorScheme: 'dark'
+            }}
           >
-            <option value="Todas">⭐ Toda Experiencia</option>
-            <option value="senior">🏆 Líderes Senior (+9 a +15 ed.)</option>
-            <option value="intermedio">✨ 1 a 8 Ediciones</option>
-            <option value="reciente">🌱 Graduados Recientes</option>
+            <option value="Todas" style={{ background: '#0d152d', color: '#ffffff' }}>⭐ Toda Experiencia</option>
+            <option value="senior" style={{ background: '#0d152d', color: '#ffffff' }}>🏆 Líderes Senior (+9 a +15 ed.)</option>
+            <option value="intermedio" style={{ background: '#0d152d', color: '#ffffff' }}>✨ 1 a 8 Ediciones</option>
+            <option value="reciente" style={{ background: '#0d152d', color: '#ffffff' }}>🌱 Graduados Recientes</option>
           </select>
         </div>
 
