@@ -167,28 +167,32 @@ export const getAssignableRoles = (currentUser) => {
   
   if (!normRole) return [];
 
-  if (currentUser.isSuperAdmin) {
-    return [
-      { id: 'gerente', name: 'Gerente de Sede' },
-      { id: 'director_maestria', name: 'Director de Maestría' },
-      { id: 'coord_maestria', name: 'Coordinador Maestría' },
-      { id: 'coord_c1', name: 'Coordinador C1/C2' },
-      { id: 'capitan', name: 'Capitán' },
-      { id: 'manager', name: 'Manager' },
-      { id: 'qt', name: 'Quantum Team (QT)' },
-      { id: 'admin', name: 'Equipo Administrativo' }
-    ];
-  }
+  // Todos los roles corporativos / directivos
+  const directivos = [
+    { id: 'direccion', name: 'Dirección Global' },
+    { id: 'cfo', name: 'CFO' },
+    { id: 'ceo', name: 'CEO' },
+    { id: 'cco', name: 'CCO' }
+  ];
 
-  if (isDireccionRole(normRole) || normRole === 'director_maestria') {
+  const baseManagers = [
+    { id: 'gerente', name: 'Gerente de Sede' },
+    { id: 'director_maestria', name: 'Director de Maestría' },
+    { id: 'coord_maestria', name: 'Coordinador Maestría' },
+    { id: 'coord_c1', name: 'Coordinador C1/C2' },
+    { id: 'capitan', name: 'Capitán' },
+    { id: 'manager', name: 'Manager' },
+    { id: 'qt', name: 'Quantum Team (QT)' },
+    { id: 'coordinador', name: 'Coordinador Administrativo' },
+    { id: 'finanzas', name: 'Finanzas' },
+    { id: 'talento_humano', name: 'Talento Humano' },
+    { id: 'admin', name: 'Equipo Administrativo' }
+  ];
+
+  if (currentUser.isSuperAdmin || isDireccionRole(normRole) || normRole === 'director_maestria') {
     return [
-      { id: 'gerente', name: 'Gerente de Sede' },
-      { id: 'coord_maestria', name: 'Coordinador Maestría' },
-      { id: 'coord_c1', name: 'Coordinador C1/C2' },
-      { id: 'capitan', name: 'Capitán' },
-      { id: 'manager', name: 'Manager' },
-      { id: 'qt', name: 'Quantum Team (QT)' },
-      { id: 'admin', name: 'Equipo Administrativo' }
+      ...directivos,
+      ...baseManagers
     ];
   }
 

@@ -223,7 +223,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--crear-cyan)', marginBottom: '0.3rem' }}>[Admin/Gerente] Sede Específica:</label>
+                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--crear-cyan)', marginBottom: '0.3rem' }}>Sede Específica:</label>
                   <select 
                     value={newTask.assignedSede || ''} 
                     onChange={e => setNewTask({...newTask, assignedSede: e.target.value})} 
