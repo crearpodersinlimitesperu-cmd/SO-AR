@@ -93,7 +93,7 @@ export const USERS_TO_IMPORT = [
   "sede": "Global",
   "emails": [
     "asistente.facturacion@crearpsl.net",
-    "asistente.facturacion@crearpsl.com"
+    "asistente.facturacion@crearpsl.net"
   ],
   "email": "asistente.facturacion@crearpsl.net"
 },
@@ -120,10 +120,10 @@ export const USERS_TO_IMPORT = [
   ],
   "sede": "Global",
   "emails": [
-    "paul.sosa@crearpsl.com",
+    "paul.sosa@crearpsl.net",
     "paul.sosa@crearpsl.net"
   ],
-  "email": "paul.sosa@crearpsl.com"
+  "email": "paul.sosa@crearpsl.net"
 },
 {
   "id": "staff_feraragon",
@@ -135,10 +135,10 @@ export const USERS_TO_IMPORT = [
   ],
   "sede": "Global",
   "emails": [
-    "fer.aragon@crearpsl.com",
+    "fer.aragon@crearpsl.net",
     "fer.aragon@crearpsl.net"
   ],
-  "email": "fer.aragon@crearpsl.com"
+  "email": "fer.aragon@crearpsl.net"
 },
 {
   "id": "staff_gabrieladejessrivadeneyragaitn",
@@ -149,10 +149,10 @@ export const USERS_TO_IMPORT = [
   ],
   "sede": "Lima",
   "emails": [
-    "contabilidad.lima@crearpsl.com",
+    "contabilidad.lima@crearpsl.net",
     "contabilidad.lima@crearpsl.net"
   ],
-  "email": "contabilidad.lima@crearpsl.com"
+  "email": "contabilidad.lima@crearpsl.net"
 },
 {
   "id": "staff_hctorantoniogonzlesfranco",
@@ -164,7 +164,7 @@ export const USERS_TO_IMPORT = [
   "sede": "Global",
   "emails": [
     "contabilidad.medellin@crearpsl.net",
-    "contabilidad.medellin@crearpsl.com"
+    "contabilidad.medellin@crearpsl.net"
   ],
   "email": "contabilidad.medellin@crearpsl.net"
 },
@@ -178,11 +178,11 @@ export const USERS_TO_IMPORT = [
   ],
   "sede": "Global",
   "emails": [
-    "andres.gomez@crearpsl.com",
+    "andres.gomez@crearpsl.net",
     "andres.gomez@crearpsl.net",
     "gomeznueve@gmail.com"
   ],
-  "email": "andres.gomez@crearpsl.com"
+  "email": "andres.gomez@crearpsl.net"
 },
 {
   "id": "staff_karolfernandavillarruelynez",
@@ -194,7 +194,7 @@ export const USERS_TO_IMPORT = [
   "sede": "Global",
   "emails": [
     "coodinacion.administrativa@crearpsl.net",
-    "coodinacion.administrativa@crearpsl.com"
+    "coodinacion.administrativa@crearpsl.net"
   ],
   "email": "coodinacion.administrativa@crearpsl.net"
 },
@@ -208,7 +208,7 @@ export const USERS_TO_IMPORT = [
   "sede": "Global",
   "emails": [
     "facturacion.cartera@crearpsl.net",
-    "facturacion.cartera@crearpsl.com"
+    "facturacion.cartera@crearpsl.net"
   ],
   "email": "facturacion.cartera@crearpsl.net"
 },
@@ -222,7 +222,7 @@ export const USERS_TO_IMPORT = [
   "sede": "Global",
   "emails": [
     "contabilidad.global@crearpsl.net",
-    "contabilidad.global@crearpsl.com"
+    "contabilidad.global@crearpsl.net"
   ],
   "email": "contabilidad.global@crearpsl.net"
 },
@@ -236,10 +236,10 @@ export const USERS_TO_IMPORT = [
   ],
   "sede": "Global",
   "emails": [
-    "leandro.brunis@crearpsl.com",
+    "leandro.brunis@crearpsl.net",
     "leandro.brunis@crearpsl.net"
   ],
-  "email": "leandro.brunis@crearpsl.com"
+  "email": "leandro.brunis@crearpsl.net"
 },
 {
   "id": "staff_carlosbrunis",
@@ -252,7 +252,7 @@ export const USERS_TO_IMPORT = [
   "sede": "Global",
   "emails": [
     "brunische66@gmail.com",
-    "carlos.brunis@crearpsl.com",
+    "carlos.brunis@crearpsl.net",
     "carlos.brunis@crearpsl.net"
   ],
   "email": "carlos.brunis@crearpsl.net"
@@ -266,10 +266,10 @@ export const USERS_TO_IMPORT = [
   ],
   "sede": "Global",
   "emails": [
-    "talento.humano@crearpsl.com",
+    "talento.humano@crearpsl.net",
     "talento.humano@crearpsl.net"
   ],
-  "email": "talento.humano@crearpsl.com"
+  "email": "talento.humano@crearpsl.net"
 },
 {
   "id": "staff_pablofranciscomendieta",
@@ -281,7 +281,7 @@ export const USERS_TO_IMPORT = [
   "sede": "Global",
   "emails": [
     "legal@crearpsl.net",
-    "legal@crearpsl.com"
+    "legal@crearpsl.net"
   ],
   "email": "legal@crearpsl.net"
 },
@@ -294,10 +294,10 @@ export const USERS_TO_IMPORT = [
   ],
   "sede": "Guayaquil",
   "emails": [
-    "jonathan.larosa@crearpsl.com",
+    "jonathan.larosa@crearpsl.net",
     "jonathan.larosa@crearpsl.net"
   ],
-  "email": "jonathan.larosa@crearpsl.com"
+  "email": "jonathan.larosa@crearpsl.net"
 },
 {
   "id": "staff_brendavanessarodrguezprez",
@@ -308,10 +308,10 @@ export const USERS_TO_IMPORT = [
   ],
   "sede": "Guayaquil",
   "emails": [
-    "brenda.rodriguez@crearpsl.com",
+    "brenda.rodriguez@crearpsl.net",
     "brenda.rodriguez@crearpsl.net"
   ],
-  "email": "brenda.rodriguez@crearpsl.com"
+  "email": "brenda.rodriguez@crearpsl.net"
 },
 {
   "id": "staff_dianacarlotamacasmacas",
@@ -322,10 +322,10 @@ export const USERS_TO_IMPORT = [
   ],
   "sede": "Guayaquil",
   "emails": [
-    "diana.macas@crearpsl.com",
+    "diana.macas@crearpsl.net",
     "diana.macas@crearpsl.net"
   ],
-  "email": "diana.macas@crearpsl.com"
+  "email": "diana.macas@crearpsl.net"
 },
 {
   "id": "staff_marcosjosuveraavils",
@@ -338,7 +338,7 @@ export const USERS_TO_IMPORT = [
   "sede": "Guayaquil",
   "emails": [
     "josue.vera@crearpsl.net",
-    "josue.vera@crearpsl.com"
+    "josue.vera@crearpsl.net"
   ],
   "email": "josue.vera@crearpsl.net"
 },
@@ -352,7 +352,7 @@ export const USERS_TO_IMPORT = [
   "sede": "Lima",
   "emails": [
     "diana.moscoso@crearpsl.net",
-    "diana.moscoso@crearpsl.com"
+    "diana.moscoso@crearpsl.net"
   ],
   "email": "diana.moscoso@crearpsl.net"
 },
@@ -365,10 +365,10 @@ export const USERS_TO_IMPORT = [
   ],
   "sede": "Lima",
   "emails": [
-    "joyce.marin@crearpsl.com",
+    "joyce.marin@crearpsl.net",
     "joyce.marin@crearpsl.net"
   ],
-  "email": "joyce.marin@crearpsl.com"
+  "email": "joyce.marin@crearpsl.net"
 },
 {
   "id": "staff_linidvalencia",
@@ -380,10 +380,10 @@ export const USERS_TO_IMPORT = [
   ],
   "sede": "Lima",
   "emails": [
-    "linid.valencia@crearpsl.com",
+    "linid.valencia@crearpsl.net",
     "linid.valencia@crearpsl.net"
   ],
-  "email": "linid.valencia@crearpsl.com"
+  "email": "linid.valencia@crearpsl.net"
 },
 {
   "id": "staff_leylapasquel",
@@ -394,10 +394,10 @@ export const USERS_TO_IMPORT = [
   ],
   "sede": "Lima",
   "emails": [
-    "leyla.pasquel@crearpsl.com",
+    "leyla.pasquel@crearpsl.net",
     "leyla.pasquel@crearpsl.net"
   ],
-  "email": "leyla.pasquel@crearpsl.com"
+  "email": "leyla.pasquel@crearpsl.net"
 },
 {
   "id": "staff_josluissnchezmoreno",
@@ -410,7 +410,7 @@ export const USERS_TO_IMPORT = [
   "sede": "Lima",
   "emails": [
     "jose.sanchez@crearpsl.net",
-    "jose.sanchez@crearpsl.com"
+    "jose.sanchez@crearpsl.net"
   ],
   "email": "jose.sanchez@crearpsl.net"
 },
@@ -424,7 +424,7 @@ export const USERS_TO_IMPORT = [
   "sede": "MED",
   "emails": [
     "valentina.r@crearpsl.net",
-    "valentina.r@crearpsl.com"
+    "valentina.r@crearpsl.net"
   ],
   "email": "valentina.r@crearpsl.net"
 },
@@ -438,7 +438,7 @@ export const USERS_TO_IMPORT = [
   "sede": "MED",
   "emails": [
     "yurany.gonzalez@crearpsl.net",
-    "yurany.gonzalez@crearpsl.com"
+    "yurany.gonzalez@crearpsl.net"
   ],
   "email": "yurany.gonzalez@crearpsl.net"
 },
@@ -452,10 +452,10 @@ export const USERS_TO_IMPORT = [
   ],
   "sede": "MED",
   "emails": [
-    "mauricio.ramirez@crearpsl.com",
+    "mauricio.ramirez@crearpsl.net",
     "mauricio.ramirez@crearpsl.net"
   ],
-  "email": "mauricio.ramirez@crearpsl.com"
+  "email": "mauricio.ramirez@crearpsl.net"
 },
 {
   "id": "staff_davidgonzalezfranco",
@@ -519,7 +519,7 @@ export const USERS_TO_IMPORT = [
   "sede": "UIO",
   "emails": [
     "adrianna.guarochico@crearpsl.net",
-    "adrianna.guarochico@crearpsl.com"
+    "adrianna.guarochico@crearpsl.net"
   ],
   "email": "adrianna.guarochico@crearpsl.net"
 },
@@ -554,7 +554,7 @@ export const USERS_TO_IMPORT = [
   "sede": "UIO",
   "emails": [
     "emily.campuzano@crearpsl.net",
-    "emily.campuzano@crearpsl.com"
+    "emily.campuzano@crearpsl.net"
   ],
   "email": "emily.campuzano@crearpsl.net"
 },
@@ -569,7 +569,7 @@ export const USERS_TO_IMPORT = [
   "sede": "UIO",
   "emails": [
     "erika.gavilanez@crearpsl.net",
-    "erika.gavilanez@crearpsl.com"
+    "erika.gavilanez@crearpsl.net"
   ],
   "email": "erika.gavilanez@crearpsl.net"
 },
@@ -583,7 +583,7 @@ export const USERS_TO_IMPORT = [
   "sede": "UIO",
   "emails": [
     "freddy.sosa@crearpsl.net",
-    "freddy.sosa@crearpsl.com"
+    "freddy.sosa@crearpsl.net"
   ],
   "email": "freddy.sosa@crearpsl.net"
 },
@@ -597,7 +597,7 @@ export const USERS_TO_IMPORT = [
   "sede": "UIO",
   "emails": [
     "ibetancourth@crearpsl.net",
-    "ibetancourth@crearpsl.com"
+    "ibetancourth@crearpsl.net"
   ],
   "email": "ibetancourth@crearpsl.net"
 },
@@ -623,10 +623,10 @@ export const USERS_TO_IMPORT = [
   ],
   "sede": "UIO",
   "emails": [
-    "karla.pastrano@crearpsl.com",
+    "karla.pastrano@crearpsl.net",
     "karla.pastrano@crearpsl.net"
   ],
-  "email": "karla.pastrano@crearpsl.com"
+  "email": "karla.pastrano@crearpsl.net"
 },
 {
   "id": "staff_lilianalilibethcubillovera",
@@ -637,10 +637,10 @@ export const USERS_TO_IMPORT = [
   ],
   "sede": "UIO",
   "emails": [
-    "liliana.cubillo@crearpsl.com",
+    "liliana.cubillo@crearpsl.net",
     "liliana.cubillo@crearpsl.net"
   ],
-  "email": "liliana.cubillo@crearpsl.com"
+  "email": "liliana.cubillo@crearpsl.net"
 },
 {
   "id": "staff_marcojessgonzlezcaguado",
@@ -664,9 +664,9 @@ export const USERS_TO_IMPORT = [
   ],
   "sede": "UIO",
   "emails": [
-    "ketherine.aguirre@crearpsl.com"
+    "ketherine.aguirre@crearpsl.net"
   ],
-  "email": "ketherine.aguirre@crearpsl.com"
+  "email": "ketherine.aguirre@crearpsl.net"
 },
 {
   "id": "staff_santiagoproao",

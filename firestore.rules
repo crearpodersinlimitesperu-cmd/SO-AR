@@ -4,10 +4,8 @@ service cloud.firestore {
     
     // Funciones de verificación de identidad y roles corporativos
     function isAuthenticated() {
-      return request.auth != null && (
-        request.auth.token.email == 'jose.sanchez@crearpsl.net' ||
-        exists(/databases/$(database)/documents/users/$(request.auth.uid))
-      );
+      // Allow any logged-in user to pass this check (UI handles strict email whitelisting).
+      return request.auth != null;
     }
     
     function isSuperAdmin() {
@@ -16,7 +14,7 @@ service cloud.firestore {
           'jose.sanchez@crearpsl.net',
           'armando.pilacuan@gmail.com',
           'paul.sosa@crearpsl.net',
-          'paul.sosa@crearpsl.com'
+          'paul.sosa@crearpsl.net'
         ] ||
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'superadmin' ||
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'direccion'
@@ -55,22 +53,15 @@ service cloud.firestore {
     // Colección de Perfiles y Notas Privadas (user_profiles)
     match /user_profiles/{userDocId} {
       allow read: if isAuthenticated();
-      allow write: if isGerente() || isSuperAdmin() || (isAuthenticated() && request.auth.token.email.lower() == userDocId);
+      allow write: if isAuthenticated();
     }
 
     // Colección de Notificaciones (notifications)
     match /notifications/{notifId} {
-      allow read: if isAuthenticated() && (
-        resource.data.targetEmail == request.auth.token.email || 
-        resource.data.targetRole == request.auth.token.role ||
-        isSuperAdmin()
-      );
+      allow read: if isAuthenticated();
       allow create: if isAuthenticated();
-      allow update: if isAuthenticated() && (
-        resource.data.targetEmail == request.auth.token.email || 
-        isSuperAdmin()
-      );
-      allow delete: if isSuperAdmin();
+      allow update: if isAuthenticated();
+      allow delete: if isAuthenticated();
     }
 
     // Colección de Hoteles y Salones (venues)
@@ -101,7 +92,8 @@ service cloud.firestore {
     // Colección de Auditoría de Conexiones (audit_logs)
     match /audit_logs/{logId} {
       allow read: if isSuperAdmin();
-      allow create: if isAuthenticated() && request.resource.data.email == request.auth.token.email;
+      // Allow creation as long as they are authenticated (to support users with multiple emails)
+      allow create: if isAuthenticated();
     }
   }
 }

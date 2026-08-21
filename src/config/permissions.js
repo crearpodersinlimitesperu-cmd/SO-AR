@@ -11,7 +11,7 @@ export const SUPER_ADMIN_EMAILS = [
   'jose.sanchez@crearpsl.net',
   'armando.pilacuan@gmail.com',
   'paul.sosa@crearpsl.net',
-  'paul.sosa@crearpsl.com'
+  'paul.sosa@crearpsl.net'
 ];
 
 /**
@@ -95,7 +95,7 @@ export const canAssignTrainer = (currentUser) => {
     'fer.aragon@crearpsl.net',
     'fer.aragon@crearpls.com',
     'paul.sosa@crearpsl.net',
-    'paul.sosa@crearpsl.com'
+    'paul.sosa@crearpsl.net'
   ];
   if (allowedEmails.includes(email)) return true;
 
@@ -150,9 +150,9 @@ export const DUAL_ROLE_TRAINER_EMAILS = [
   'fer.aragon@crearpsl.net',        // Corporativo + Entrenador C1
   'paul.sosa@crearpsl.net',         // Corporativo + Entrenador C2+MJ
   'leandro.brunis@crearpsl.net',    // Dirección / Corporativo + Entrenador C1 (Leandro Brunis)
-  'leandro.brunis@crearpsl.com',
+  'leandro.brunis@crearpsl.net',
   'carlos.brunis@crearpsl.net',     // Coordinador QT Global + Entrenador (Carlos Brunis)
-  'carlos.brunis@crearpsl.com',
+  'carlos.brunis@crearpsl.net',
   'brunische66@gmail.com',
 ];
 
