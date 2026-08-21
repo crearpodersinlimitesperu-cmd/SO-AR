@@ -333,6 +333,24 @@ export function ChecklistProvider({ children }) {
         created_at: new Date().toISOString()
       });
 
+      // 3. Notificación por Correo (Vía Firebase Trigger Email Extension)
+      const mailRef = doc(collection(db, 'mail'));
+      batch.set(mailRef, {
+        to: [targetUser.email],
+        message: {
+          subject: `INVITACIÓN A COLABORAR SO-AR: ${task.task || task.title}`,
+          html: `
+            <h2>¡Hola, ${targetUser.name}!</h2>
+            <p><strong>@${currentUser.displayName || currentUser.email}</strong> te ha invitado a colaborar en la siguiente tarea:</p>
+            <p><strong>Tarea:</strong> ${task.task || task.title}</p>
+            ${message ? `<p><strong>Mensaje:</strong> "${message}"</p>` : ''}
+            <p>Por favor, ingresa al panel operativo SO-AR para <strong>Aceptar</strong> o <strong>Rechazar</strong> esta invitación.</p>
+            <br/>
+            <p><em>Equipo CREAR Poder Sin Límites</em></p>
+          `
+        }
+      });
+
       await batch.commit();
       showToast(`¡Invitación enviada con éxito a @${targetUser.name}!`, 'success');
       return true;
