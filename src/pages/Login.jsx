@@ -15,6 +15,13 @@ export default function Login() {
   }, [currentUser, navigate]);
 
   const handleLogin = async () => {
+    // Play lion roar!
+    try {
+      const audio = new Audio('/lion-roar.mp3');
+      audio.volume = 0.6;
+      audio.play().catch(e => console.log("Audio autoplay prevented by browser"));
+    } catch (e) {}
+
     try {
       await loginWithGoogle();
       navigate('/home');
