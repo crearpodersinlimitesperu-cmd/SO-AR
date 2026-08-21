@@ -790,6 +790,40 @@ export default function Home() {
                       });
                     }
 
+                    if (timeFilter !== 'todos') {
+                      const today = new Date();
+                      today.setHours(0, 0, 0, 0);
+                      const now = today.getTime();
+                      displayEvents = displayEvents.filter(ev => {
+                        const evDate = new Date(ev.fecha_inicio || ev.start || new Date());
+                        evDate.setHours(0, 0, 0, 0);
+                        const evTime = evDate.getTime();
+                        if (timeFilter === 'futuros') return evTime >= now;
+                        if (timeFilter === 'pasados') return evTime < now;
+                        if (timeFilter === 'hoy') return evTime === now;
+                        return true;
+                      });
+                    }
+
+                    if (selectedTrainingFilter !== 'todos') {
+                      displayEvents = displayEvents.filter(ev => {
+                        const name = (ev.nombre || ev.name || '').toUpperCase();
+                        if (selectedTrainingFilter === 'C1') return name.includes('CAPITULO UNO') || name.includes('C1') || name.includes('CAPÍTULO UNO');
+                        if (selectedTrainingFilter === 'C2') return name.includes('CAPITULO DOS') || name.includes('C2') || name.includes('CAPÍTULO DOS');
+                        if (selectedTrainingFilter === 'MJ') return name.includes('MAESTRIA') || name.includes('MJ') || name.includes('MAESTRÍA');
+                        if (selectedTrainingFilter === 'VIAJE') return name.includes('VIAJE') || name.includes('RETIRO');
+                        if (selectedTrainingFilter === 'OTROS') return !name.includes('CAPITULO') && !name.includes('MAESTRIA') && !name.includes('VIAJE') && !name.includes('CAPÍTULO') && !name.includes('MAESTRÍA');
+                        return true;
+                      });
+                    }
+
+                    // Sort events by date ascending so closest events show first
+                    displayEvents.sort((a, b) => {
+                      const dateA = new Date(a.fecha_inicio || a.start || 0).getTime();
+                      const dateB = new Date(b.fecha_inicio || b.start || 0).getTime();
+                      return timeFilter === 'pasados' ? dateB - dateA : dateA - dateB; // Past events descending, future ascending
+                    });
+
                     if (displayEvents.length === 0) {
                       return (
                         <div style={{ padding: '1.5rem 1rem', textAlign: 'center' }}>
