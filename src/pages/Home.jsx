@@ -784,7 +784,7 @@ export default function Home() {
                       const q = searchQuery.toLowerCase().trim();
                       displayEvents = displayEvents.filter(ev => {
                         const name = (ev.nombre || ev.name || '').toLowerCase();
-                        const trainer = (ev.trainer || ev.entrenador || ev.equipo || '').toLowerCase();
+                        const trainer = (ev.trainer || ev.entrenador || '').toLowerCase();
                         const sede = (ev.sede || ev.sedeTag || ev.place || ev.address || ev.lugar || '').toLowerCase();
                         return name.includes(q) || trainer.includes(q) || sede.includes(q);
                       });
@@ -851,7 +851,7 @@ export default function Home() {
                                 </span>
                                 {(!['qt', 'capitan', 'manager'].includes(currentUser?.appRole)) && (
                                   <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginTop: '0.1rem' }}>
-                                    🎙️ Trainer: {ev.trainer || ev.entrenador || ev.equipo || 'Por confirmar'}
+                                    🎙️ Trainer: {ev.trainer || ev.entrenador || 'Por confirmar'}
                                   </span>
                                 )}
                               </div>
