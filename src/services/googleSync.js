@@ -15,7 +15,7 @@ function formatGoogleCalendarDate(dateInput) {
 export const generateGoogleCalendarUrl = (eventDetails) => {
   const text = encodeURIComponent(eventDetails.summary || eventDetails.nombre || eventDetails.name || 'Evento CREAR PSL');
   const details = encodeURIComponent(
-    `Entrenador: ${eventDetails.trainer || eventDetails.equipo || 'Por Confirmar'}\n${eventDetails.description || eventDetails.detalles || ''}\n\nOrganizado por CREAR Poder Sin Límites`
+    `Entrenador: ${eventDetails.trainer || eventDetails.entrenador || 'Por Confirmar'}\n${eventDetails.description || eventDetails.detalles || ''}\n\nOrganizado por CREAR Poder Sin Límites`
   );
   const location = encodeURIComponent(eventDetails.location || eventDetails.direccion || eventDetails.lugar || eventDetails.sede || '');
   

@@ -5,14 +5,20 @@ import { useUI } from '../context/UIContext';
 import { Users, Send, X, AtSign, CheckCircle2, Shield } from 'lucide-react';
 
 export default function TaskCollaborationModal({ isOpen, onClose, task, onSendInvitation }) {
-  if (!isOpen || !task) return null;
-
   const { currentUser } = useAuth();
   const { showToast } = useUI();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUser, setSelectedUser] = useState(null);
   const [message, setMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
+
+  // IMPORTANTE: este guard debe ir DESPUÉS de todos los hooks (useAuth/useUI/useState).
+  // Antes estaba antes de los hooks, lo que viola las Reglas de Hooks de React: como este
+  // componente se monta de forma incondicional (isOpen llega como prop), al pasar de
+  // isOpen=false a true React ejecuta un número distinto de hooks entre renders y lanza
+  // "Rendered more hooks than during the previous render", tumbando toda la app (solo hay
+  // un ErrorBoundary global en main.jsx).
+  if (!isOpen || !task) return null;
 
   const userRole = normalizeRole(currentUser?.appRole);
   const isGerenteOrAdmin = currentUser?.isGerente || currentUser?.isSuperAdmin || userRole === 'gerente';
@@ -54,6 +60,7 @@ export default function TaskCollaborationModal({ isOpen, onClose, task, onSendIn
 
   const handleSend = async (e) => {
     e.preventDefault();
+    if (isSending) return;
     if (!selectedUser) {
       showToast("Por favor selecciona a un compañero para invitarlo.", "error");
       return;

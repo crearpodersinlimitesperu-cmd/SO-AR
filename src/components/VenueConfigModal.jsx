@@ -9,8 +9,6 @@ import { doc, setDoc, getDoc } from 'firebase/firestore';
 const OFFICIAL_SEDES = ['Quito', 'Guayaquil', 'Cuenca', 'Lima', 'Medellin', 'Mexico'];
 
 export default function VenueConfigModal({ isOpen, onClose }) {
-  if (!isOpen) return null;
-
   const { currentUser } = useAuth();
   const { showToast } = useUI();
   const [selectedSede, setSelectedSede] = useState(() => {
@@ -89,6 +87,14 @@ export default function VenueConfigModal({ isOpen, onClose }) {
 
     fetchSedeVenue();
   }, [selectedSede, venues]);
+
+  // IMPORTANTE: este guard debe ir DESPUÉS de todos los hooks (useAuth/useUI/useState/useEffect).
+  // Antes estaba antes de los hooks, lo que viola las Reglas de Hooks de React: como este
+  // componente se monta de forma incondicional (isOpen llega como prop), al pasar de
+  // isOpen=false a true React ejecuta un número distinto de hooks entre renders y lanza
+  // "Rendered more hooks than during the previous render", tumbando toda la app (solo hay
+  // un ErrorBoundary global en main.jsx).
+  if (!isOpen) return null;
 
   const handleSave = async () => {
     const venueData = {

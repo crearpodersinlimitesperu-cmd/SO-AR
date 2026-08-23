@@ -3,10 +3,12 @@ import toast from 'react-hot-toast';
 import { usersData, normalizeRole } from '../data/usersData';
 import { Users, CheckCircle2, Shield, UserCheck, Calculator, X, Sparkles } from 'lucide-react';
 
-export default function GoalDivisionModal({ isOpen, onClose, goal, onSaveAssignment }) {
-  if (!isOpen || !goal) return null;
+export default function GoalDivisionModal({ isOpen, onClose, goal, onSaveAssignment, currentUser }) {
+  // Determinar si el usuario es gerente (no superAdmin ni dirección)
+  const isGerente = currentUser?.appRole === 'gerente' && !currentUser?.isSuperAdmin && !currentUser?.isDireccion;
+  const userSede = currentUser?.sede || 'Lima';
 
-  const [selectedSede, setSelectedSede] = useState('Lima');
+  const [selectedSede, setSelectedSede] = useState(isGerente ? userSede : 'Lima');
   const [selectedRoleFilter, setSelectedRoleFilter] = useState('ALL'); // 'ALL' | 'CC1Y2' | 'CMJ' | 'CUSTOM'
   const [assignedCoordinators, setAssignedCoordinators] = useState([]);
   const [isSaving, setIsSaving] = useState(false);
@@ -24,6 +26,11 @@ export default function GoalDivisionModal({ isOpen, onClose, goal, onSaveAssignm
 
   // Inicializar o sincronizar selección cuando cambia la meta o filtro
   useEffect(() => {
+    // El modal puede estar montado con goal=null mientras isOpen=false; no hay nada que
+    // inicializar en ese caso (evita "Cannot read properties of null" ahora que el guard
+    // de abajo se movió después de los hooks).
+    if (!goal) return;
+
     // Si la meta ya tenía asignaciones previas, cargarlas
     if (goal.assignedCoordinators && Array.isArray(goal.assignedCoordinators) && goal.assignedCoordinators.length > 0) {
       setAssignedCoordinators(goal.assignedCoordinators);
@@ -36,6 +43,14 @@ export default function GoalDivisionModal({ isOpen, onClose, goal, onSaveAssignm
     // Si no, pre-seleccionar según el tipo de meta
     applyPreset('AUTO');
   }, [goal, selectedSede]);
+
+  // IMPORTANTE: este guard debe ir DESPUÉS de todos los hooks (useState x4 + useEffect).
+  // Antes estaba antes de los hooks, lo que viola las Reglas de Hooks de React: como este
+  // componente se monta de forma incondicional (isOpen/goal llegan como props), al abrir el
+  // modal React ejecutaba un número distinto de hooks entre renders y lanzaba
+  // "Rendered more hooks than during the previous render", tumbando toda la app (solo hay
+  // un ErrorBoundary global en main.jsx).
+  if (!isOpen || !goal) return null;
 
   const applyPreset = (presetType) => {
     let filtered = [];
@@ -110,6 +125,7 @@ export default function GoalDivisionModal({ isOpen, onClose, goal, onSaveAssignm
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSaving) return;
     if (assignedCoordinators.length === 0) {
       toast.error("Por favor selecciona al menos una coordinadora para la meta.");
       return;
@@ -192,24 +208,27 @@ export default function GoalDivisionModal({ isOpen, onClose, goal, onSaveAssignm
               Sede Operativa:
             </label>
             <select
-              value={selectedSede}
-              onChange={(e) => setSelectedSede(e.target.value)}
+              value={isGerente ? userSede : selectedSede}
+              onChange={(e) => !isGerente && setSelectedSede(e.target.value)}
+              disabled={isGerente}
               style={{
                 width: '100%',
                 padding: '0.6rem',
                 borderRadius: '8px',
-                background: 'rgba(0, 0, 0, 0.4)',
+                background: isGerente ? 'rgba(0, 0, 0, 0.6)' : 'rgba(0, 0, 0, 0.4)',
                 color: '#fff',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
+                border: `1px solid ${isGerente ? 'rgba(255, 215, 0, 0.4)' : 'rgba(255, 255, 255, 0.15)'}`,
                 fontSize: '0.85rem',
-                fontWeight: 'bold'
+                fontWeight: 'bold',
+                cursor: isGerente ? 'not-allowed' : 'pointer'
               }}
             >
               {sedesList.map(s => (
                 <option key={s} value={s}>{s}</option>
               ))}
-              <option value="GLOBAL">Todas las Sedes</option>
+              {!isGerente && <option value="GLOBAL">Todas las Sedes</option>}
             </select>
+            {isGerente && <p style={{ fontSize: '0.7rem', color: '#f59e0b', margin: '0.3rem 0 0 0' }}>🔒 Solo puedes asignar a tu sede</p>}
           </div>
 
           <div>

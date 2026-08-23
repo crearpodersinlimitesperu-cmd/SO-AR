@@ -100,7 +100,7 @@ export default function Home() {
     const result = await createGoogleEvent({
       summary: `CREAR: ${ev.nombre || ev.name}`,
       location: hotelLocation,
-      description: `Lugar / Hotel Oficial: ${hotelLocation}\n${ev.detalles || ''}${currentUser?.appRole !== 'qt' ? `\nEntrenador: ${ev.trainer || ev.equipo || 'TBA'}` : ''}`,
+      description: `Lugar / Hotel Oficial: ${hotelLocation}\n${ev.detalles || ''}${currentUser?.appRole !== 'qt' ? `\nEntrenador: ${ev.trainer || ev.entrenador || 'TBA'}` : ''}`,
       start: startDate,
       end: endDate
     }, token);
@@ -121,12 +121,16 @@ export default function Home() {
     return () => clearInterval(timer);
   }, []);
 
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const handleLogout = async () => {
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
     try {
       await logout();
       navigate('/login');
     } catch (error) {
       console.error("Error al cerrar sesión", error);
+      setIsLoggingOut(false);
     }
   };
 
@@ -360,11 +364,32 @@ export default function Home() {
                     <button onClick={() => { setShowToolsDropdown(false); navigate('/gerente'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                       💼 SO-AR Gerencial
                     </button>
+                    <button onClick={() => { setShowToolsDropdown(false); navigate('/portafolio'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: 'var(--crear-cyan)', background: 'rgba(41, 171, 226, 0.1)' }}>
+                      📈 Portafolio PMO (Planview)
+                    </button>
+                    <button onClick={() => { setShowToolsDropdown(false); navigate('/estrategia'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#10b981', background: 'rgba(16, 185, 129, 0.1)' }}>
+                      🎯 Estrategia OKRs (Cascade)
+                    </button>
                     <button onClick={() => { setShowToolsDropdown(false); navigate('/auditoria-kpis'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
-                      📈 Auditoría de KPIs
+                      📉 Auditoría de KPIs
                     </button>
                   </>
                 )}
+
+                <button onClick={() => { setShowToolsDropdown(false); navigate('/acuerdos'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#a855f7', background: 'rgba(168, 85, 247, 0.1)' }}>
+                  ✉️ Acuerdos Oficiales (Correo)
+                </button>
+                <button onClick={() => { setShowToolsDropdown(false); navigate('/calendario-equipo'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#f97316', background: 'rgba(249, 115, 22, 0.1)' }}>
+                  🗓️ Agenda y Time Boxing
+                </button>
+
+                <button onClick={() => { setShowToolsDropdown(false); navigate('/learning'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(41, 171, 226, 0.1)', color: 'var(--crear-cyan)' }}>
+                  🧠 Inteligencia Colectiva (Learning)
+                </button>
+
+                <button onClick={() => { setShowToolsDropdown(false); navigate('/excelencia'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(255, 183, 3, 0.15)', color: 'var(--crear-gold)' }}>
+                  👑 Excelencia Operativa
+                </button>
 
                 {['coord_c1', 'coord_maestria', 'qt', 'capitan'].includes(currentUser?.appRole) && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/mis-kpis'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
@@ -430,8 +455,14 @@ export default function Home() {
               <button onClick={() => navigate('/gerente')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'var(--crear-gold)', color: 'black' }}>
                 💼 SO-AR Gerencial
               </button>
-              <button onClick={() => navigate('/auditoria-kpis')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #047857)', color: 'white', border: 'none' }}>
-                📈 Auditoría KPIs
+              <button onClick={() => navigate('/portafolio')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #0ea5e9, #0369a1)', color: 'white', border: 'none' }}>
+                📈 Portafolio PMO
+              </button>
+              <button onClick={() => navigate('/estrategia')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #047857)', color: 'white', border: 'none' }}>
+                🎯 OKRs (Cascade)
+              </button>
+              <button onClick={() => navigate('/auditoria-kpis')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'transparent', border: '1px solid #10b981', color: '#10b981' }}>
+                📉 Auditoría KPIs
               </button>
             </>
           )}
