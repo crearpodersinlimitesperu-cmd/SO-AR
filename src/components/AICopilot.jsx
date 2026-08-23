@@ -1,16 +1,30 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Bot, Send, X, Sparkles, BrainCircuit, Loader2, Database, MessageSquarePlus, History, ChevronLeft, MessageCircle } from 'lucide-react';
-import { doc, getDoc, getDocs, getFirestore, collection, addDoc, updateDoc, query, orderBy } from 'firebase/firestore';
+import { doc, getDocs, getFirestore, collection, addDoc, updateDoc, query, orderBy } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 import { useAuth } from '../context/AuthContext';
-import { notebookKnowledge } from '../assets/notebookKnowledge';
+
+// NOTA (23/08/2026): Antes este componente llamaba directo a la API de Gemini
+// desde el navegador, con la API Key incrustada en el bundle público (primero
+// hardcodeada, luego vía import.meta.env.VITE_GEMINI_API_KEY — el mismo riesgo,
+// solo que la key vivía en .env en vez de en el código). Ahora llama a un backend
+// cerrado propio (Cloudflare Worker, ver /cloudflare-worker/src/index.js) que:
+//   - verifica el login real de Firebase Auth,
+//   - calcula el rol/sede del lado del servidor y filtra Nodus por permisos,
+//   - llama a Groq con una key que nunca sale del servidor.
+// Se eligió Cloudflare Workers (en vez de Firebase Cloud Functions) porque el
+// proyecto está en el plan gratuito Spark de Firebase, y Cloud Functions
+// requiere el plan Blaze (de pago) sin excepción. Queda también preparado
+// /functions/index.js por si en el futuro se decide subir a Blaze.
+// Requiere VITE_COPILOTO_WORKER_URL en .env (URL del Worker ya desplegado —
+// no es secreta, es solo la dirección pública del backend).
 
 export default function AICopilot() {
   const { currentUser } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [queryText, setQueryText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [nodusContext, setNodusContext] = useState('');
-  
+
   const defaultMessages = [
     { role: 'assistant', content: '¡Hola! Soy tu Copiloto Analítico. Estoy conectado en vivo a la base de datos de NODUS. Puedes preguntarme sobre enrolamientos, asistencias, coordinadores o facturación.' }
   ];
@@ -43,32 +57,10 @@ export default function AICopilot() {
     }
   }, [messages, showHistory]);
 
-  // Cargar Contexto de Nodus
-  useEffect(() => {
-    if (isOpen && !nodusContext) {
-      async function fetchNodusContext() {
-        try {
-          const db = getFirestore();
-          const docRef = doc(db, 'nodus_kpis_sincronizados', 'latest_snapshot');
-          const docSnap = await getDoc(docRef);
-          if (docSnap.exists()) {
-            const data = docSnap.data();
-            let contextStr = `CONTEXTO DE BASE DE DATOS (NODUS REAL): Fecha: ${data.timestamp}. \n`;
-            
-            // Enviar TODOS los KPIs de TODOS los coordinadores y secciones sin truncar
-            if(data.secciones) {
-               contextStr += "DATOS COMPLETOS DE NODUS (Coordinadores, Entrenadores, KPIs): \n";
-               contextStr += JSON.stringify(data.secciones);
-            }
-            setNodusContext(contextStr);
-          }
-        } catch (error) {
-          console.error("Error cargando contexto para IA:", error);
-        }
-      }
-      fetchNodusContext();
-    }
-  }, [isOpen, nodusContext]);
+  // El contexto de Nodus ya NO se carga aquí: lo arma el backend (Cloudflare
+  // Worker) del lado del servidor, filtrado según el rol/sede real del
+  // usuario (antes este componente pedía TODAS las secciones de Nodus sin
+  // filtrar por rol, lo cual no respetaba la Matriz de Permisos documentada).
 
   // Cargar Historial de Chats
   useEffect(() => {
@@ -114,12 +106,10 @@ export default function AICopilot() {
     setQueryText('');
     setIsLoading(true);
 
-    const apiKey = import.meta.env.VITE_GEMINI_API_KEY; // Sin fallback hardcodeado: la key expuesta fue rotada, ver .env.
-
-    if (!apiKey) {
-      setMessages(prev => [...prev, { 
-        role: 'assistant', 
-        content: '⚠️ Falta configurar la variable de entorno VITE_GEMINI_API_KEY en tu archivo .env.' 
+    if (!currentUser) {
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: '⚠️ Necesitas iniciar sesión para usar el Copiloto.'
       }]);
       setIsLoading(false);
       return;
@@ -150,51 +140,33 @@ export default function AICopilot() {
         });
       }
 
-      // LLM Request
-      const systemPrompt = `Eres el Analista Experto de la PMO de CREAR PODER SIN LIMITES. Responde de forma ultra-profesional y al grano. 
-REGLA ABSOLUTA: NO INVENTAR CIFRAS, RESULTADOS, NI DATOS BAJO NINGUNA CIRCUNSTANCIA.
-Si te preguntan por un KPI o un dato y no está explícitamente en el contexto proveído abajo, DEBES decir "No tengo esa información en este momento".
-
-Usa ESTA INFORMACIÓN REAL de la base de datos NODUS para responder (Si te preguntan por datos, búscalos AQUÍ):
-${nodusContext}
-
----
-BASE DE CONOCIMIENTO (NOTEBOOKLM):
-Usa esta base de conocimiento para responder a preguntas sobre procedimientos, reglas, operaciones, manuales y cultura de la organización:
-${notebookKnowledge}`;
-
-      // Preparamos los mensajes para Gemini (role: 'user' y 'model')
-      const geminiMessages = updatedMessages
-        .filter(m => m.role !== 'system' && !m.content.includes('⚠️'))
-        .map(m => ({
-          role: m.role === 'assistant' ? 'model' : 'user',
-          parts: [{ text: m.content }]
-        }));
-
-      // gemini-1.5-flash fue retirado por Google (shutdown 29/09/2025) → causaba el error
-      // "Hubo un error al conectar con la IA" para todo usuario que usara el Copiloto.
-      // Se usa el alias oficial "gemini-flash-latest" para no volver a romperse con
-      // futuros retiros de versión (Google lo actualiza automáticamente de su lado).
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          system_instruction: {
-            parts: { text: systemPrompt }
-          },
-          contents: geminiMessages
-        })
-      });
-
-      const data = await response.json();
-      
-      if (data.error) {
-        throw new Error(data.error.message);
+      // LLM Request — vía backend cerrado (Cloudflare Worker).
+      // El system prompt, el filtrado de Nodus por rol/sede y la key de Groq
+      // viven en el servidor (cloudflare-worker/src/index.js), nunca en el navegador.
+      const workerUrl = import.meta.env.VITE_COPILOTO_WORKER_URL;
+      if (!workerUrl) {
+        throw Object.assign(new Error('Falta VITE_COPILOTO_WORKER_URL'), { code: 'worker/not-configured' });
       }
 
-      const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No pude generar una respuesta.';
+      const mensajesParaBot = updatedMessages
+        .filter(m => m.role !== 'system' && !m.content.includes('⚠️'))
+        .map(m => ({ role: m.role, content: m.content }));
+
+      const idToken = await getAuth().currentUser.getIdToken();
+      const workerResponse = await fetch(workerUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`
+        },
+        body: JSON.stringify({ messages: mensajesParaBot })
+      });
+      const workerData = await workerResponse.json();
+      if (!workerResponse.ok) {
+        throw Object.assign(new Error(workerData.message || 'Error del backend'), { code: `worker/${workerData.error || 'unknown'}` });
+      }
+
+      const aiText = workerData.text || 'No pude generar una respuesta.';
       const finalMessages = [...updatedMessages, { role: 'assistant', content: aiText }];
       
       setMessages(finalMessages);
@@ -209,13 +181,18 @@ ${notebookKnowledge}`;
 
     } catch (error) {
       console.error("Error AI:", error);
-      let errorMsg = 'Hubo un error al conectar con la IA. Verifica tu conexión o tu API Key.';
-      if (error.message && (error.message.includes('API key not valid') || error.message.includes('PERMISSION_DENIED'))) {
-        errorMsg = '⚠️ Error de Autenticación: La API Key de Gemini es inválida o no tiene permisos. Por favor, asegúrate de configurar una VITE_GEMINI_API_KEY válida (de Google AI Studio) en tu archivo .env y reiniciar el servidor.';
+      let errorMsg = 'Hubo un error al conectar con el Copiloto. Intenta de nuevo en unos segundos.';
+      // Códigos que puede devolver el Worker (ver cloudflare-worker/src/index.js)
+      if (error.code === 'worker/not-configured') {
+        errorMsg = '⚠️ El Copiloto todavía no está configurado (falta VITE_COPILOTO_WORKER_URL en .env).';
+      } else if (error.code === 'worker/unauthenticated') {
+        errorMsg = '⚠️ Tu sesión expiró. Vuelve a iniciar sesión e intenta de nuevo.';
+      } else if (error.code === 'worker/permission-denied') {
+        errorMsg = '⚠️ Tu usuario no está registrado correctamente en el sistema. Contacta a un administrador.';
       }
-      setMessages(prev => [...prev, { 
-        role: 'assistant', 
-        content: errorMsg 
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: errorMsg
       }]);
     } finally {
       setIsLoading(false);

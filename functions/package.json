@@ -1,0 +1,19 @@
+{
+  "name": "so-ar-functions",
+  "description": "Backend cerrado del Copiloto Analítico (Groq) para SO-AR. Nunca debe exponer GROQ_API_KEY al cliente.",
+  "private": true,
+  "engines": {
+    "node": "20"
+  },
+  "main": "index.js",
+  "scripts": {
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "dependencies": {
+    "firebase-admin": "^14.3.0",
+    "firebase-functions": "^6.3.1"
+  }
+}

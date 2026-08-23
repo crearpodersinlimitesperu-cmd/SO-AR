@@ -1,0 +1,16 @@
+{
+  "name": "so-ar-copiloto-worker",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Backend cerrado (gratuito, Cloudflare Workers) del Copiloto Analítico de SO-AR. Nunca debe exponer GROQ_API_KEY ni la Service Account de Firebase al cliente.",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4.125.0"
+  },
+  "dependencies": {
+    "jose": "^6.2.10"
+  }
+}

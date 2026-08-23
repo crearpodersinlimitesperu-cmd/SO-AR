@@ -1,0 +1,9 @@
+name = "so-ar-copiloto"
+main = "src/index.js"
+compatibility_date = "2026-08-01"
+
+# Los secretos (GROQ_API_KEY, FIREBASE_SERVICE_ACCOUNT_JSON) NO van aquí.
+# Se configuran con:
+#   npx wrangler secret put GROQ_API_KEY
+#   npx wrangler secret put FIREBASE_SERVICE_ACCOUNT_JSON
+# Ver docs/BOT_CERRADO_DESPLIEGUE_CLOUDFLARE.md para el paso a paso completo.
