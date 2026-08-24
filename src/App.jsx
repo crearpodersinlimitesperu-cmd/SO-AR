@@ -20,6 +20,7 @@ import ProtocoloEmergencias from './pages/ProtocoloEmergencias'
 import PromptModal from './components/PromptModal'
 import HelpModal from './components/HelpModal'
 import ThemeSelector from './components/ThemeSelector'
+import AICopilot from './components/AICopilot'
 import { useState } from 'react'
 import { HelpCircle } from 'lucide-react'
 
@@ -222,7 +223,7 @@ function App() {
           title="Manual y Ayuda"
           style={{
             position: 'fixed',
-            bottom: '2rem',
+            bottom: '6rem', /* Elevado para no sobreponerse con el copiloto */
             right: '2rem',
             width: '56px',
             height: '56px',
@@ -244,6 +245,8 @@ function App() {
           <HelpCircle size={28} />
         </button>
       )}
+
+      {currentUser && <AICopilot />}
 
       <HelpModal isOpen={showHelp} onClose={() => setShowHelp(false)} />
     </div>
