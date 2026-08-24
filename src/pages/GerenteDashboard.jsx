@@ -126,7 +126,7 @@ export default function GerenteDashboard() {
   };
 
   const handleSendEmail = (email, taskTitle, taskRole) => {
-    const subject = `⚠️ URGENTE SO-AR: ${taskTitle}`;
+    const subject = `⚠️ URGENTE Causa OS: ${taskTitle}`;
     const body = `Hola,\n\nRequiero actualización urgente sobre:\n📌 TAREA: ${taskTitle}\n\nPor favor reportar estado.\n\nGerencia Sede`;
     window.location.href = `mailto:${email || ''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };

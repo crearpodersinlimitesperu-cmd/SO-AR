@@ -240,7 +240,7 @@ export default function Home() {
               gap: '5px' 
             }}>
               <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981', display: 'inline-block', boxShadow: '0 0 6px #10b981' }}></span>
-              SO-AR v2.8.0
+              Causa OS v2.8.0
             </span>
           </div>
         </div>
@@ -394,7 +394,7 @@ export default function Home() {
                 {(currentUser?.isGerente || currentUser?.isDireccion || currentUser?.isSuperAdmin) && (
                   <>
                     <button onClick={() => { setShowToolsDropdown(false); navigate('/gerente'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
-                      💼 SO-AR Gerencial
+                      💼 Causa OS Gerencial
                     </button>
                     <button onClick={() => { setShowToolsDropdown(false); navigate('/portafolio'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: 'var(--crear-cyan)', background: 'rgba(41, 171, 226, 0.1)' }}>
                       📈 Portafolio PMO (Planview)
@@ -470,7 +470,7 @@ export default function Home() {
                 )}
                 {currentUser?.appRole !== 'qt' && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/manual'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
-                    📘 Manual y Guía SO-AR
+                    📘 Manual y Guía Causa OS
                   </button>
                 )}
               </div>
@@ -485,7 +485,7 @@ export default function Home() {
           {(currentUser?.isGerente || currentUser?.isDireccion || currentUser?.isSuperAdmin) && (
             <>
               <button onClick={() => navigate('/gerente')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'var(--crear-gold)', color: 'black' }}>
-                💼 SO-AR Gerencial
+                💼 Causa OS Gerencial
               </button>
               <button onClick={() => navigate('/portafolio')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #0ea5e9, #0369a1)', color: 'white', border: 'none' }}>
                 📈 Portafolio PMO
@@ -691,6 +691,15 @@ export default function Home() {
 
             {/* BOTONES PRINCIPALES DE ACCIÓN */}
             <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap' }}>
+                  <button 
+                    onClick={() => navigate('/gerente-dashboard')}
+                    style={{ flex: 1, padding: '0.8rem', background: 'var(--crear-blue)', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', boxShadow: '0 4px 10px rgba(2, 132, 199, 0.3)' }}
+                  >
+                    <ArrowUpRight size={18} />
+                    <span>
+                      💼 Causa OS Gerencial
+                    </span>
+                  </button>
               <button 
                 className="btn-primary" 
                 onClick={() => navigate(currentUser?.appRole === 'gerente' ? '/gerente' : `/checklist/${currentUser?.appRole || 'capitan'}`)} 

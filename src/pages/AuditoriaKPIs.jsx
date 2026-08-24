@@ -172,7 +172,7 @@ export default function AuditoriaKPIs() {
     <div style={{ maxWidth: '1080px', margin: '0 auto', padding: '2rem 1rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
         <button onClick={() => navigate('/gerente')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <ArrowLeft size={16} /> Volver a SO-AR
+          <ArrowLeft size={16} /> Volver a Causa OS
         </button>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>

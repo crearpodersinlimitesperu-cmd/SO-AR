@@ -491,7 +491,7 @@ function GlobalView({ tasks, navigate }) {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
         {[
           { icon: <CheckCircle2 size={22} color="#22c55e" />, label: 'Tareas Completadas', value: completedTasks, sub: `de ${totalTasks} totales`, color: '#22c55e', path: '/reportes' },
-          { icon: <Clock size={22} color="var(--crear-gold)" />, label: 'Avance Global', value: `${globalPct}%`, sub: 'SO-AR del ciclo', color: 'var(--crear-gold)', path: '/reportes' },
+          { icon: <Clock size={22} color="var(--crear-gold)" />, label: 'Avance Global', value: `${globalPct}%`, sub: 'Causa OS del ciclo', color: 'var(--crear-gold)', path: '/reportes' },
           { icon: <AlertTriangle size={22} color="#ef4444" />, label: 'Alertas Críticas', value: criticalTasks, sub: 'requieren acción HOY', color: '#ef4444', path: '/reportes' },
           { icon: <Building2 size={22} color="#29abe2" />, label: 'Sedes Operativas', value: OPERATIONAL_SEDES.length, sub: 'sedes activas', color: '#29abe2', onClick: () => window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'}) },
         ].map((kpi, i) => (
@@ -684,7 +684,7 @@ export default function SuperAdminPanel() {
       <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h1 className="text-gold uppercase" style={{ fontSize: '2rem', margin: '0 0 0.5rem 0' }}>{currentUser?.isSuperAdmin ? 'Panel Super Admin' : 'Directorio de Equipo'} — Monitoreo Global</h1>
-          <p className="text-muted" style={{ margin: 0 }}>Visibilidad total del sistema SO-AR en todas las sedes y roles.</p>
+          <p className="text-muted" style={{ margin: 0 }}>Visibilidad total del sistema Causa OS en todas las sedes y roles.</p>
         </div>
       </div>
 
