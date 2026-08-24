@@ -166,36 +166,41 @@ export default function Home() {
         <div>
           <div style={{ 
             display: 'flex', 
-            gap: '1.5rem', 
+            gap: '2rem', 
             alignItems: 'center', 
             marginBottom: '1.5rem', 
             flexWrap: 'wrap',
-            background: viewMode === 'lite' ? 'transparent' : 'rgba(255, 255, 255, 0.03)',
-            padding: viewMode === 'lite' ? '0' : '1rem 1.5rem',
-            borderRadius: '20px',
-            border: viewMode === 'lite' ? 'none' : '1px solid rgba(255, 255, 255, 0.08)',
-            boxShadow: viewMode === 'lite' ? 'none' : '0 10px 30px rgba(0, 0, 0, 0.1)',
-            backdropFilter: viewMode === 'lite' ? 'none' : 'blur(10px)'
+            padding: '0.5rem 0'
           }}>
             <img 
               src="/logo.png" 
               alt="Crear Poder Sin Limites" 
               style={{ 
-                height: viewMode === 'lite' ? '80px' : '100px', 
+                height: viewMode === 'lite' ? '70px' : '85px', 
                 objectFit: 'contain', 
-                display: 'block'
+                display: 'block',
+                filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.08))',
+                transition: 'transform 0.3s ease'
               }} 
             />
-            <div style={{ height: '60px', width: '2px', backgroundColor: 'var(--border-strong)', display: viewMode === 'lite' ? 'none' : 'block' }}></div>
+            <div style={{ 
+              height: '50px', 
+              width: '1px', 
+              background: 'linear-gradient(to bottom, transparent, var(--border-strong), transparent)', 
+              display: viewMode === 'lite' ? 'none' : 'block',
+              opacity: 0.6
+            }}></div>
             <img 
               src="/causa-logo-transparent.png" 
               alt="Causa OS" 
               className="causa-logo"
               style={{ 
-                height: viewMode === 'lite' ? '80px' : '100px', 
+                height: viewMode === 'lite' ? '70px' : '85px', 
                 objectFit: 'contain', 
                 display: 'block', 
-                transformOrigin: 'left center' 
+                transformOrigin: 'left center',
+                filter: 'drop-shadow(0 4px 15px rgba(0, 191, 255, 0.2))',
+                transition: 'transform 0.3s ease'
               }} 
             />
           </div>
