@@ -166,18 +166,19 @@ export default function Home() {
         <div>
           <img 
             src="/logo.png" 
-            alt="CREAR PODER SIN LÍMITES" 
+            alt="Causa OS" 
             style={{ 
               height: viewMode === 'lite' ? '130px' : '170px', 
               marginBottom: '1rem', 
               objectFit: 'contain', 
-              filter: 'drop-shadow(0 10px 25px rgba(212, 175, 55, 0.6)) drop-shadow(0 4px 10px rgba(41, 171, 226, 0.4))', 
+              filter: 'drop-shadow(0 10px 25px rgba(100, 255, 218, 0.4)) drop-shadow(0 4px 10px rgba(100, 255, 218, 0.2))', 
               display: 'block', 
               transform: viewMode === 'lite' ? 'scale(1)' : 'scale(1.05)', 
               transformOrigin: 'left center' 
             }} 
           />
           <h1 className="text-gold" style={{ margin: 0, fontSize: viewMode === 'lite' ? '2rem' : '2.4rem', fontWeight: '900', letterSpacing: '-0.5px' }}>
+            Causa OS
             {time.getHours() < 12 ? 'Buenos días' : time.getHours() < 19 ? 'Buenas tardes' : 'Buenas noches'}, {currentUser?.displayName || 'Equipo'}
           </h1>
           <p className="text-muted" style={{ margin: '0.4rem 0 0', textTransform: 'uppercase', fontSize: '0.85rem' }}>
