@@ -53,7 +53,7 @@ service cloud.firestore {
     // GOALS
     match /goals/{goalId} {
       allow read: if isAuthenticated();
-      allow create: if isGerente() || isSuperAdmin() || isAuthenticated(); // TODO: Restrict goal creation based on roles later
+      allow create: if isGerente() || isSuperAdmin();
       allow update: if isSuperAdmin() || isGerente() || isOwner(resource.data);
       allow delete: if isSuperAdmin();
     }
