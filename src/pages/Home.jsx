@@ -164,20 +164,30 @@ export default function Home() {
       {/* CABECERA PRINCIPAL */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <img 
-            src="/causa-logo.png" 
-            alt="Causa OS" 
-            style={{ 
-              height: viewMode === 'lite' ? '130px' : '170px', 
-              marginBottom: '1.5rem', 
-              objectFit: 'contain', 
-              mixBlendMode: 'screen',
-              filter: 'drop-shadow(0 10px 25px rgba(100, 255, 218, 0.4)) drop-shadow(0 4px 10px rgba(100, 255, 218, 0.2))', 
-              display: 'block', 
-              transform: viewMode === 'lite' ? 'scale(1)' : 'scale(1.05)', 
-              transformOrigin: 'left center' 
-            }} 
-          />
+          <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+            <img 
+              src="/logo.png" 
+              alt="Crear Poder Sin Limites" 
+              style={{ 
+                height: viewMode === 'lite' ? '60px' : '75px', 
+                objectFit: 'contain', 
+                display: 'block'
+              }} 
+            />
+            <div style={{ height: '50px', width: '2px', backgroundColor: 'var(--border-strong)', display: viewMode === 'lite' ? 'none' : 'block' }}></div>
+            <img 
+              src="/causa-logo.png" 
+              alt="Causa OS" 
+              style={{ 
+                height: viewMode === 'lite' ? '80px' : '100px', 
+                objectFit: 'contain', 
+                mixBlendMode: 'screen',
+                filter: 'drop-shadow(0 10px 25px rgba(100, 255, 218, 0.4)) drop-shadow(0 4px 10px rgba(100, 255, 218, 0.2))', 
+                display: 'block', 
+                transformOrigin: 'left center' 
+              }} 
+            />
+          </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
             <h1 className="text-blue" style={{ margin: 0, fontSize: viewMode === 'lite' ? '2.5rem' : '3rem', fontWeight: '900', letterSpacing: '-1px', textShadow: '0 0 20px rgba(100, 255, 218, 0.3)' }}>
               Causa OS
