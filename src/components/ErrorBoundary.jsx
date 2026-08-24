@@ -35,7 +35,7 @@ export class ErrorBoundary extends React.Component {
             
             <h2 style={{ color: '#fff', margin: '0 0 0.5rem', fontSize: '1.6rem' }}>Ocurrió una interrupción inesperada</h2>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', marginBottom: '1.5rem', lineHeight: '1.5' }}>
-              El sistema SO-AR detectó un error en la ejecución. Tus datos en Firestore permanecen seguros.
+              Causa OS detectó un error en la ejecución. Tus datos en Firestore permanecen seguros.
             </p>
 
             {this.state.error && (

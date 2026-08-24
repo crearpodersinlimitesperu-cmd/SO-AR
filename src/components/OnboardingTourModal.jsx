@@ -17,10 +17,10 @@ export default function OnboardingTourModal({ isOpen, onClose, user }) {
       id: 'bienvenida',
       badge: '👋 BIENVENIDO AL SISTEMA',
       badgeColor: 'var(--crear-gold)',
-      title: 'Tu Centro Operativo de Alto Rendimiento (SO-AR)',
+      title: 'Tu Centro Operativo de Liderazgo (Causa OS)',
       subtitle: 'Crear Poder Sin Límites • Excelencia y Trazabilidad Operativa',
       icon: <Sparkles size={36} color="var(--crear-gold)" />,
-      description: 'SO-AR es la plataforma corporativa diseñada para acompañarte en tu labor diaria, garantizando que cada entrenamiento, sede y equipo opere con máxima sincronía y cero pérdida de información.',
+      description: 'Causa OS es la plataforma corporativa diseñada para acompañarte en tu labor diaria, garantizando que cada entrenamiento, sede y equipo opere con máxima sincronía y cero pérdida de información.',
       canDo: [
         'Gestionar tus responsabilidades operativas diarias y semanales.',
         'Ver el calendario de eventos y fechas clave de tu sede.',

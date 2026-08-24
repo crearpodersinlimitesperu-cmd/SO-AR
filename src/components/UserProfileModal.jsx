@@ -498,7 +498,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
                     fontWeight: 'bold',
                     color: profileData.hasConnected ? '#22c55e' : 'var(--text-muted)'
                   }}>
-                    {profileData.hasConnected ? '✅ Usuario Conectado a SO-AR' : '⚪ Sin Conexión Registrada'}
+                    {profileData.hasConnected ? '✅ Usuario Conectado a Causa OS' : '⚪ Sin Conexión Registrada'}
                   </span>
                   <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                     {profileData.hasConnected 
