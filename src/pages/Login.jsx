@@ -38,7 +38,7 @@ export default function Login() {
         showToast("Dominio no autorizado en Firebase Auth.", "error");
         return;
       }
-      showToast("Hubo un error al iniciar sesión. Intenta nuevamente con tu cuenta @crearpsl.net.", "error");
+      showToast(`Error de inicio de sesión: ${error?.code || 'Desconocido'} - ${error?.message || 'Revisa tu conexión o permisos.'}`, "error");
     }
   };
 
