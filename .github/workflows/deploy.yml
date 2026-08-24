@@ -33,6 +33,7 @@ jobs:
           VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}
           VITE_GROQ_API_KEY: ${{ secrets.VITE_GROQ_API_KEY }}
           VITE_QT_SHEET_CSV_URL: ${{ secrets.VITE_QT_SHEET_CSV_URL }}
+          VITE_COPILOTO_WORKER_URL: ${{ secrets.VITE_COPILOTO_WORKER_URL }}
         run: npm run build
 
       - name: 🚀 Deploy to Firebase Hosting
