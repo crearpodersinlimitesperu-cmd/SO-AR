@@ -148,11 +148,7 @@
   color: #0284c7 !important;
 }
 
-[data-theme="light"] .causa-logo {
-  mix-blend-mode: multiply !important;
-  /* Aumentamos brillo y contraste para que el fondo beige se vuelva blanco y desaparezca con multiply */
-  filter: contrast(1.2) brightness(1.05) !important;
-}
+/* Removidos hacks de mix-blend-mode de logo transparente */
 
 /* Fallback override for any inline translucent white colors in light mode */
 [data-theme="light"] [style*="color: rgba(255,255,255,"],
@@ -208,9 +204,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .causa-logo {
-  /* En modo oscuro, invertimos (beige->negro, rojo->cyan) y usamos screen para desaparecer el fondo negro */
-  mix-blend-mode: screen;
-  filter: invert(1) contrast(1.2) brightness(1.05);
+  filter: drop-shadow(0 4px 15px rgba(255, 69, 0, 0.4));
   transition: all 0.3s ease;
 }
 

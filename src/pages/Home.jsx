@@ -164,7 +164,19 @@ export default function Home() {
       {/* CABECERA PRINCIPAL */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+          <div style={{ 
+            display: 'flex', 
+            gap: '1.5rem', 
+            alignItems: 'center', 
+            marginBottom: '1.5rem', 
+            flexWrap: 'wrap',
+            background: viewMode === 'lite' ? 'transparent' : 'rgba(255, 255, 255, 0.03)',
+            padding: viewMode === 'lite' ? '0' : '1rem 1.5rem',
+            borderRadius: '20px',
+            border: viewMode === 'lite' ? 'none' : '1px solid rgba(255, 255, 255, 0.08)',
+            boxShadow: viewMode === 'lite' ? 'none' : '0 10px 30px rgba(0, 0, 0, 0.1)',
+            backdropFilter: viewMode === 'lite' ? 'none' : 'blur(10px)'
+          }}>
             <img 
               src="/logo.png" 
               alt="Crear Poder Sin Limites" 
@@ -176,7 +188,7 @@ export default function Home() {
             />
             <div style={{ height: '60px', width: '2px', backgroundColor: 'var(--border-strong)', display: viewMode === 'lite' ? 'none' : 'block' }}></div>
             <img 
-              src="/causa-logo.png" 
+              src="/causa-logo-transparent.png" 
               alt="Causa OS" 
               className="causa-logo"
               style={{ 
