@@ -169,12 +169,12 @@ export default function Home() {
               src="/logo.png" 
               alt="Crear Poder Sin Limites" 
               style={{ 
-                height: viewMode === 'lite' ? '60px' : '75px', 
+                height: viewMode === 'lite' ? '80px' : '100px', 
                 objectFit: 'contain', 
                 display: 'block'
               }} 
             />
-            <div style={{ height: '50px', width: '2px', backgroundColor: 'var(--border-strong)', display: viewMode === 'lite' ? 'none' : 'block' }}></div>
+            <div style={{ height: '60px', width: '2px', backgroundColor: 'var(--border-strong)', display: viewMode === 'lite' ? 'none' : 'block' }}></div>
             <img 
               src="/causa-logo.png" 
               alt="Causa OS" 
