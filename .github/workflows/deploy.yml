@@ -1,6 +1,9 @@
 name: 🚀 Deploy to Firebase Hosting
 
 on:
+  push:
+    branches:
+      - master
   workflow_dispatch: # Permite lanzar manualmente desde GitHub UI
 
 jobs:
