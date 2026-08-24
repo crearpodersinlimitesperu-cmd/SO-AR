@@ -178,11 +178,10 @@ export default function Home() {
             <img 
               src="/causa-logo.png" 
               alt="Causa OS" 
+              className="causa-logo"
               style={{ 
                 height: viewMode === 'lite' ? '80px' : '100px', 
                 objectFit: 'contain', 
-                mixBlendMode: 'screen',
-                filter: 'drop-shadow(0 10px 25px rgba(100, 255, 218, 0.4)) drop-shadow(0 4px 10px rgba(100, 255, 218, 0.2))', 
                 display: 'block', 
                 transformOrigin: 'left center' 
               }} 

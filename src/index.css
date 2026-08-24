@@ -144,6 +144,15 @@
   color: #000000 !important;
 }
 
+[data-theme="light"] .text-blue {
+  color: #0284c7 !important;
+}
+
+[data-theme="light"] .causa-logo {
+  mix-blend-mode: multiply !important;
+  filter: invert(1) drop-shadow(0 2px 8px rgba(0,0,0,0.15)) !important;
+}
+
 /* Fallback override for any inline translucent white colors in light mode */
 [data-theme="light"] [style*="color: rgba(255,255,255,"],
 [data-theme="light"] [style*="color: rgba(255, 255, 255,"],
@@ -194,6 +203,12 @@ h1, h2, h3, h4, h5, h6 {
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   box-shadow: var(--card-shadow);
+  transition: all 0.3s ease;
+}
+
+.causa-logo {
+  mix-blend-mode: screen;
+  filter: drop-shadow(0 10px 25px rgba(100, 255, 218, 0.4)) drop-shadow(0 4px 10px rgba(100, 255, 218, 0.2));
   transition: all 0.3s ease;
 }
 
