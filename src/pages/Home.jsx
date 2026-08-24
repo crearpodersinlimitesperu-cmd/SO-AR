@@ -169,19 +169,24 @@ export default function Home() {
             alt="Causa OS" 
             style={{ 
               height: viewMode === 'lite' ? '130px' : '170px', 
-              marginBottom: '1rem', 
+              marginBottom: '1.5rem', 
               objectFit: 'contain', 
+              mixBlendMode: 'screen',
               filter: 'drop-shadow(0 10px 25px rgba(100, 255, 218, 0.4)) drop-shadow(0 4px 10px rgba(100, 255, 218, 0.2))', 
               display: 'block', 
               transform: viewMode === 'lite' ? 'scale(1)' : 'scale(1.05)', 
               transformOrigin: 'left center' 
             }} 
           />
-          <h1 className="text-gold" style={{ margin: 0, fontSize: viewMode === 'lite' ? '2rem' : '2.4rem', fontWeight: '900', letterSpacing: '-0.5px' }}>
-            Causa OS
-            {time.getHours() < 12 ? 'Buenos días' : time.getHours() < 19 ? 'Buenas tardes' : 'Buenas noches'}, {currentUser?.displayName || 'Equipo'}
-          </h1>
-          <p className="text-muted" style={{ margin: '0.4rem 0 0', textTransform: 'uppercase', fontSize: '0.85rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+            <h1 className="text-blue" style={{ margin: 0, fontSize: viewMode === 'lite' ? '2.5rem' : '3rem', fontWeight: '900', letterSpacing: '-1px', textShadow: '0 0 20px rgba(100, 255, 218, 0.3)' }}>
+              Causa OS
+            </h1>
+            <h2 className="text-gold" style={{ margin: 0, fontSize: viewMode === 'lite' ? '1.5rem' : '1.8rem', fontWeight: '700', letterSpacing: '-0.5px' }}>
+              {time.getHours() < 12 ? 'Buenos días' : time.getHours() < 19 ? 'Buenas tardes' : 'Buenas noches'}, {currentUser?.displayName || currentUser?.name || 'Equipo'}
+            </h2>
+          </div>
+          <p className="text-muted" style={{ margin: '0.8rem 0 0', textTransform: 'uppercase', fontSize: '0.85rem' }}>
             {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') ? 'MÚLTIPLES EQUIPOS (GLOBAL) • VISIÓN MÚLTIPLES SEDES' : (currentCycle ? `${currentCycle.name} • ETAPA: ${currentStage}` : 'CARGANDO CICLO...')}
           </p>
           
