@@ -5,7 +5,7 @@ const ThemeContext = createContext();
 export function ThemeProvider({ children }) {
   // 'auto' | 'light' | 'dark'
   const [themeMode, setThemeModeState] = useState(() => {
-    return localStorage.getItem('cpsl_theme_mode') || 'auto';
+    return localStorage.getItem('cpsl_theme_mode') || 'dark';
   });
 
   const [activeTheme, setActiveTheme] = useState('dark');

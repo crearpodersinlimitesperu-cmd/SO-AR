@@ -165,7 +165,7 @@ export default function Home() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <img 
-            src="/logo.png" 
+            src="/causa-logo.png" 
             alt="Causa OS" 
             style={{ 
               height: viewMode === 'lite' ? '130px' : '170px', 
