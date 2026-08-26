@@ -100,8 +100,9 @@ export default function GerenteDashboard() {
     }
 
     const assignedUsers = assignedEmails.map(email => {
-       const u = usersData.find(usr => usr.email.toLowerCase() === email.toLowerCase());
-       return { name: u?.name?.split(' ')[0] || email.split('@')[0], email: email, role: u?.role || task.role, sede: u?.sede || task.assignedSede || currentUser?.sede };
+       const emailStr = email || '';
+       const u = usersData.find(usr => usr.email.toLowerCase() === emailStr.toLowerCase());
+       return { name: u?.name?.split(' ')[0] || emailStr.split('@')[0] || 'Desconocido', email: emailStr, role: u?.role || task.role, sede: u?.sede || task.assignedSede || currentUser?.sede };
     });
 
     if (assignedUsers.length > 0) {

@@ -56,10 +56,8 @@ export const normalizeRole = (role) => {
   // Entrenador (Coach)
   if (r === 'entrenador' || r === 'coach' || r.includes('entrenador') || r.includes('coach')) return 'entrenador';
   
-  // NOTA: "student" / "estudiante" NO es un rol del sistema SO-AR.
-  // Es un rol interno de CREAR que no participa en la plataforma operativa.
-  // Si llega de la base de datos, se ignora (se filtra en buildUserObject).
-  if (r === 'student' || r === 'estudiante' || r.includes('student') || r.includes('estudiante')) return null;
+  // Mapear student/estudiante a participante según lineamientos de marca
+  if (r === 'student' || r === 'estudiante' || r.includes('student') || r.includes('estudiante')) return 'participante';
   
   return r;
 };

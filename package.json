@@ -23,6 +23,7 @@
     "express": "^5.2.1",
     "firebase": "^12.18.0",
     "firebase-admin": "^14.3.0",
+    "googleapis": "^176.0.0",
     "lucide-react": "^1.31.0",
     "nodemailer": "^6.9.13",
     "puppeteer": "^25.8.0",

@@ -57265,6 +57265,7 @@ fetchAndDump();
     "express": "^5.2.1",
     "firebase": "^12.18.0",
     "firebase-admin": "^14.3.0",
+    "googleapis": "^176.0.0",
     "lucide-react": "^1.31.0",
     "nodemailer": "^6.9.13",
     "puppeteer": "^25.8.0",
@@ -91531,7 +91532,7 @@ function SedeBlock({ sede, tasks, navigate, onSelectUser, onAssignTask, currentU
   });
 
   const sedePct = totalSedeTasks > 0 ? Math.round((totalSedeCompleted / totalSedeTasks) * 100) : 0;
-  const groupedMembers = members.reduce((acc, m) => { const k = m.role || 'otro'; if (!acc[k]) acc[k] = []; acc[k].push(m); return acc; }, {});
+  const groupedMembers = members.reduce((acc, m) => { const k = normalizeRole(m.role || 'otro'); if (!acc[k]) acc[k] = []; acc[k].push(m); return acc; }, {});
   return (
     <div className="glass-panel" style={{ padding: '1.5rem', border: '1px solid var(--border-subtle)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} onClick={() => setExpanded(!expanded)}>
@@ -91843,6 +91844,7 @@ function RoleView({ tasks, navigate, onSelectUser, onAssignTask, userConnections
     { id: 'talento_humano', label: 'Talento Humano' },
     { id: 'legal', label: 'Legal / Jurídico' },
     { id: 'técnico_sst', label: 'Seguridad y Salud (SST)' },
+    { id: 'participante', label: 'Participantes' },
   ];
 
   const listedRoleIds = new Set(roles.map(r => r.id));
