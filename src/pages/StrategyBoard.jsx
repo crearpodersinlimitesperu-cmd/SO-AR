@@ -17,6 +17,7 @@ export default function StrategyBoard() {
   const [loading, setLoading] = useState(true);
   const [globalHealth, setGlobalHealth] = useState(0);
   const [okrs, setOkrs] = useState([]);
+  const [errorObj, setErrorObj] = useState(null);
 
   const bgLight = "#f8fafc";
   const bgCard = "#ffffff";
@@ -32,10 +33,6 @@ export default function StrategyBoard() {
         
         if (docSnap.exists()) {
           const data = docSnap.data();
-
-          
-
-          
           let okrGenerales = [];
 
           // OKR 1: ACTIVIDAD DE COORDINADORES (Tasa de Contactabilidad)
@@ -43,10 +40,8 @@ export default function StrategyBoard() {
           let totalAsignados = 0;
           
           if(data.secciones?.actividadCoordinadores?.kpis?.length > 0) {
-            // Buscaremos líneas de "Gestiones" y "Asignados" en las tarjetas
             data.secciones.actividadCoordinadores.kpis.forEach(kpi => {
               if (kpi.content) {
-                // Buscamos patrones de numeros
                 let gestiones = 0;
                 let asignados = 0;
                 kpi.content.forEach((line, index) => {
@@ -64,7 +59,6 @@ export default function StrategyBoard() {
           }
 
           let contactabilidadRate = totalAsignados > 0 ? Math.round((totalGestiones / totalAsignados) * 100) : 0;
-          // limit a 100
           if(contactabilidadRate > 100) contactabilidadRate = 100;
 
           okrGenerales.push({
@@ -82,7 +76,7 @@ export default function StrategyBoard() {
           let metaDeclaracion = 0;
 
           if(data.secciones?.reporteEntrenadores?.tablas?.length > 0) {
-            const tablaEnrol = data.secciones.reporteEntrenadores.tablas.find(t => t.headers && t.headers.includes("Total Enrolados")) || data.secciones.reporteEntrenadores.tablas[0];
+            const tablaEnrol = data.secciones.reporteEntrenadores.tablas.find(t => t.headers && (t.headers.includes("Total Enrolados") || t.headers.includes("TOTAL ENROLADOS"))) || data.secciones.reporteEntrenadores.tablas[0];
             if (tablaEnrol && tablaEnrol.rows) {
               tablaEnrol.rows.forEach(row => {
                 if (row["Tipo IMO"] === "PARTICIPANTE" || row["TIPO IMO"] === "PARTICIPANTE") {
@@ -113,10 +107,15 @@ export default function StrategyBoard() {
              prom = Math.round(okrGenerales.reduce((acc, curr) => acc + curr.progress, 0) / okrGenerales.length);
           }
           setGlobalHealth(prom || 78);
+          setErrorObj(null);
 
+        } else {
+          console.warn("No se encontró el snapshot de Nodus");
+          setErrorObj("No se encontró el archivo de datos sincronizados (latest_snapshot) en la base de datos.");
         }
       } catch (error) {
         console.error("Error obteniendo datos de Nodus:", error);
+        setErrorObj(error.message || "Ocurrió un error inesperado al leer los datos.");
       } finally {
         setLoading(false);
       }
@@ -165,6 +164,12 @@ export default function StrategyBoard() {
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem', color: textMuted }}>
             <Loader2 size={40} className="animate-spin text-green-500 mb-4" />
             <p>Calculando OKRs desde Nodus...</p>
+          </div>
+        ) : errorObj ? (
+          <div style={{ background: '#fef2f2', border: '1px solid #f87171', color: '#b91c1c', padding: '2rem', borderRadius: '12px', textAlign: 'center' }}>
+            <AlertCircle size={40} style={{ margin: '0 auto 1rem auto' }} />
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem' }}>Error de Sincronización</h2>
+            <p>{errorObj}</p>
           </div>
         ) : (
           <>

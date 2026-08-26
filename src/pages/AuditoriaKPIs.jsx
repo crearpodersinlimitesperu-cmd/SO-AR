@@ -325,9 +325,28 @@ export default function AuditoriaKPIs() {
   return (
     <div style={{ maxWidth: '1080px', margin: '0 auto', padding: '2rem 1rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-        <button onClick={() => navigate('/gerente')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <ArrowLeft size={16} /> Volver a Causa OS
-        </button>
+        <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center' }}>
+          <button onClick={() => navigate('/gerente')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <ArrowLeft size={16} /> Volver a Causa OS
+          </button>
+          <button 
+            onClick={() => navigate('/embudo-conversion')} 
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '0.5rem', 
+              background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', 
+              color: '#000', 
+              fontWeight: 'bold', 
+              padding: '0.6rem 1.2rem', 
+              borderRadius: '8px', 
+              border: 'none', 
+              cursor: 'pointer' 
+            }}
+          >
+            ⚡ Embudo C1 ➔ C2 ➔ MJ
+          </button>
+        </div>
       </div>
 
       {/* Barra de Filtros Estilo Nodus */}

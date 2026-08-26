@@ -57,7 +57,7 @@ const GROQ_API_KEY = defineSecret("GROQ_API_KEY");
 // tiene fecha de retiro anunciada — el mismo tipo de error que rompió el
 // Copiloto con Gemini (modelo retirado sin que nadie lo notara). Si Groq
 // vuelve a retirar este modelo, este es el único lugar que hay que tocar.
-const GROQ_MODEL = "llama-3.1-70b-versatile";
+const GROQ_MODEL = "groq/compound";
 
 const ROLES_GERENCIA = [
   "gerente", "direccion", "cfo", "cco", "ceo",

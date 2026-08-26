@@ -145,9 +145,13 @@ export function AuthProvider({ children }) {
     if (foundUser.roles && foundUser.roles.length > 0) {
       assignedRoles = foundUser.roles.map(r => normalizeRole(r));
     }
+
+    // Filtrar roles inválidos (null = roles que no son del sistema, como 'student')
+    assignedRoles = assignedRoles.filter(r => r != null);
     
     // Si es SuperAdmin, inyectarle los roles gerenciales y de consolidado para que tenga el selector
     if (isSuperAdmin) {
+      if (!assignedRoles.includes('gerente')) assignedRoles.push('gerente');
       if (!assignedRoles.includes('direccion')) assignedRoles.push('direccion');
       if (!assignedRoles.includes('consolidado')) assignedRoles.push('consolidado');
     }

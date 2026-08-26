@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Bot, Send, X, Sparkles, BrainCircuit, Loader2, Database, MessageSquarePlus, History, ChevronLeft, MessageCircle } from 'lucide-react';
 import { doc, getDocs, getFirestore, collection, addDoc, updateDoc, query, orderBy } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
+import { auth, db } from '../services/firebase';
 import { useAuth } from '../context/AuthContext';
 
 // NOTA (23/08/2026): Antes este componente llamaba directo a la API de Gemini
@@ -202,24 +202,28 @@ export default function AICopilot() {
       const db = getFirestore();
       let activeSessionId = currentSessionId;
       
-      if (!activeSessionId && currentUser) {
-        // Create new session
-        const newSessionRef = await addDoc(collection(db, 'users', currentUser.uid, 'copilot_chats'), {
-          title: currentQuery.length > 30 ? currentQuery.substring(0, 30) + '...' : currentQuery,
-          messages: updatedMessages,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        });
-        activeSessionId = newSessionRef.id;
-        setCurrentSessionId(activeSessionId);
-        // Reload sessions list to show it in history
-        loadSessions();
-      } else if (currentUser) {
-        // Update existing session
-        await updateDoc(doc(db, 'users', currentUser.uid, 'copilot_chats', activeSessionId), {
-          messages: updatedMessages,
-          updatedAt: new Date().toISOString()
-        });
+      try {
+        if (!activeSessionId && currentUser) {
+          // Create new session
+          const newSessionRef = await addDoc(collection(db, 'users', currentUser.uid, 'copilot_chats'), {
+            title: currentQuery.length > 30 ? currentQuery.substring(0, 30) + '...' : currentQuery,
+            messages: updatedMessages,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          });
+          activeSessionId = newSessionRef.id;
+          setCurrentSessionId(activeSessionId);
+          // Reload sessions list to show it in history
+          loadSessions();
+        } else if (currentUser) {
+          // Update existing session
+          await updateDoc(doc(db, 'users', currentUser.uid, 'copilot_chats', activeSessionId), {
+            messages: updatedMessages,
+            updatedAt: new Date().toISOString()
+          });
+        }
+      } catch (historyErr) {
+        console.warn("No se pudo guardar el historial de chat (posible error de permisos):", historyErr);
       }
 
       // LLM Request — vía backend cerrado (Cloudflare Worker).
@@ -234,7 +238,12 @@ export default function AICopilot() {
         .filter(m => m.role !== 'system' && !m.content.includes('⚠️'))
         .map(m => ({ role: m.role, content: m.content }));
 
-      const idToken = await getAuth().currentUser.getIdToken();
+      // Token de sesión de Firebase Auth
+      const firebaseUser = auth.currentUser;
+      if (!firebaseUser) {
+        throw Object.assign(new Error('No se detectó usuario activo en Firebase Auth. Cierra sesión e inicia nuevamente.'), { code: 'worker/unauthenticated' });
+      }
+      const idToken = await firebaseUser.getIdToken(true);
       const workerResponse = await fetch(workerUrl, {
         method: 'POST',
         headers: {
@@ -254,11 +263,15 @@ export default function AICopilot() {
       setMessages(finalMessages);
 
       // Save AI answer to Firestore
-      if (activeSessionId && currentUser) {
-        await updateDoc(doc(db, 'users', currentUser.uid, 'copilot_chats', activeSessionId), {
-          messages: finalMessages,
-          updatedAt: new Date().toISOString()
-        });
+      try {
+        if (activeSessionId && currentUser) {
+          await updateDoc(doc(db, 'users', currentUser.uid, 'copilot_chats', activeSessionId), {
+            messages: finalMessages,
+            updatedAt: new Date().toISOString()
+          });
+        }
+      } catch (historyErr) {
+        console.warn("No se pudo actualizar el historial con la respuesta IA (posible error de permisos):", historyErr);
       }
 
     } catch (error) {
@@ -269,15 +282,15 @@ export default function AICopilot() {
       if (error.code === 'worker/not-configured') {
         errorMsg = '⚠️ El Copiloto todavía no está configurado (falta VITE_COPILOTO_WORKER_URL en .env).';
       } else if (error.code === 'worker/unauthenticated') {
-        errorMsg = '⚠️ Tu sesión expiró. Vuelve a iniciar sesión e intenta de nuevo.';
+        errorMsg = `⚠️ Error de autenticación: ${error.message}`;
       } else if (error.code === 'worker/permission-denied') {
-        errorMsg = '⚠️ Tu usuario no está registrado correctamente en el sistema. Contacta a un administrador.';
+        errorMsg = `⚠️ Acceso restringido: ${error.message}`;
       } else if (error.code === 'worker/internal') {
         errorMsg = `⚠️ Error del servidor IA: ${error.message}`;
       } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
         errorMsg = `⚠️ Error de red al contactar al servidor IA. Revisa tu conexión o configuración CORS.`;
       } else {
-        errorMsg = `⚠️ Error inesperado: ${error.message}`;
+        errorMsg = `⚠️ Error: ${error.message}`;
       }
       
       setMessages(prev => [...prev, {

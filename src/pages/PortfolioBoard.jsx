@@ -25,6 +25,8 @@ export default function PortfolioBoard() {
   const textMuted = "#64748b";
   const borderLight = "#e2e8f0";
 
+  const [errorObj, setErrorObj] = useState(null);
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -33,23 +35,17 @@ export default function PortfolioBoard() {
         
         if (docSnap.exists()) {
           const data = docSnap.data();
-
           
-
-          
-          // ANALISIS DE DATOS DE NODUS PARA EL PORTAFOLIO
-          // Extraemos los enrolados del reporte de entrenadores
           let totalEnrolados = 0;
           let totalDesertores = 0;
+          const sedeFilter = selectedSede.toUpperCase();
           
           if(data.secciones?.reporteEntrenadores?.tablas?.length > 0) {
-            // Buscamos la tabla que tiene "Total Enrolados"
-            const tablaEnrol = data.secciones.reporteEntrenadores.tablas.find(t => t.headers && t.headers.includes("Total Enrolados")) || data.secciones.reporteEntrenadores.tablas[0];
+            const tablaEnrol = data.secciones.reporteEntrenadores.tablas.find(t => t.headers && (t.headers.includes("Total Enrolados") || t.headers.includes("TOTAL ENROLADOS"))) || data.secciones.reporteEntrenadores.tablas[0];
             
             if (tablaEnrol && tablaEnrol.rows) {
               tablaEnrol.rows.forEach(row => {
-                // Filtrar por sede si la tabla tiene la columna
-                if (!row.SEDE || row.SEDE.includes(selectedSede)) {
+                if (!row.SEDE || String(row.SEDE).toUpperCase().includes(sedeFilter)) {
                    totalEnrolados += parseInt(row["Total Enrolados"] || row["TOTAL ENROLADOS"] || 0);
                    totalDesertores += parseInt(row["Desertor FDS"] || row["DESERTOR FDS"] || 0);
                 }
@@ -57,14 +53,11 @@ export default function PortfolioBoard() {
             }
           }
 
-          // Extraemos total de participantes desde Facturación (como tamaño del ciclo)
           let totalParticipantes = 0;
           if(data.secciones?.facturacion?.tablas?.[0]?.rows) {
-            totalParticipantes = data.secciones.facturacion.tablas[0].rows.filter(r => !r.SEDE || r.SEDE.includes(selectedSede)).length;
+            totalParticipantes = data.secciones.facturacion.tablas[0].rows.filter(r => !r.SEDE || String(r.SEDE).toUpperCase().includes(sedeFilter)).length;
           }
 
-          // Generamos los ciclos dinámicamente basados en la data real
-          // Simularemos la salud del ciclo basado en la tasa de deserción
           const desercionRate = totalParticipantes > 0 ? (totalDesertores / totalParticipantes) * 100 : 0;
           let health = 'good';
           if (desercionRate > 10) health = 'warning';
@@ -110,12 +103,15 @@ export default function PortfolioBoard() {
             atrasado: ciclosReales.filter(c => c.health === 'warning').length,
             critico: ciclosReales.filter(c => c.health === 'critical').length
           });
+          setErrorObj(null);
 
         } else {
           console.warn("No se encontró el snapshot de Nodus");
+          setErrorObj("No se encontró el archivo de datos sincronizados (latest_snapshot) en la base de datos.");
         }
       } catch (error) {
         console.error("Error obteniendo datos de Nodus:", error);
+        setErrorObj(error.message || "Ocurrió un error inesperado al leer los datos.");
       } finally {
         setLoading(false);
       }
@@ -163,6 +159,12 @@ export default function PortfolioBoard() {
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem', color: textMuted }}>
             <Loader2 size={40} className="animate-spin text-blue-500 mb-4" />
             <p>Sincronizando con NODUS...</p>
+          </div>
+        ) : errorObj ? (
+          <div style={{ background: '#fef2f2', border: '1px solid #f87171', color: '#b91c1c', padding: '2rem', borderRadius: '12px', textAlign: 'center' }}>
+            <AlertCircle size={40} style={{ margin: '0 auto 1rem auto' }} />
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem' }}>Error de Sincronización</h2>
+            <p>{errorObj}</p>
           </div>
         ) : (
           <>

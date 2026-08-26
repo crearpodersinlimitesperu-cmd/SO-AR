@@ -56,8 +56,10 @@ export const normalizeRole = (role) => {
   // Entrenador (Coach)
   if (r === 'entrenador' || r === 'coach' || r.includes('entrenador') || r.includes('coach')) return 'entrenador';
   
-  // Student
-  if (r === 'student' || r === 'estudiante' || r.includes('student') || r.includes('estudiante')) return 'student';
+  // NOTA: "student" / "estudiante" NO es un rol del sistema SO-AR.
+  // Es un rol interno de CREAR que no participa en la plataforma operativa.
+  // Si llega de la base de datos, se ignora (se filtra en buildUserObject).
+  if (r === 'student' || r === 'estudiante' || r.includes('student') || r.includes('estudiante')) return null;
   
   return r;
 };
@@ -128,7 +130,7 @@ export const ROLE_DISPLAY_NAMES = {
   tecnico_sst: 'Seguridad y Salud (SST)',
   entrenador: 'Entrenador (Coach)',
   entrenador_llamadas: 'Entrenador de Llamadas',
-  student: 'Student (Estudiante)'
+  // student: eliminado — no es un rol del sistema SO-AR (es un rol interno de CREAR)
 };
 
 export const getRoleDisplayName = (role) => {
@@ -164,7 +166,7 @@ export const ROLE_COLORS = {
   tecnico_sst: '#14b8a6',
   entrenador: '#fbbf24',
   entrenador_llamadas: '#38bdf8',
-  student: '#f472b6' // Pink color for student
+  // student: eliminado — no es un rol del sistema SO-AR
 };
 
 /**

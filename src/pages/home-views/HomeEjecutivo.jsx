@@ -50,6 +50,16 @@ export default function HomeEjecutivo() {
             </div>
           </div>
 
+          <div className="glass-panel hover-glow" onClick={() => navigate('/embudo-conversion')} style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', cursor: 'pointer', border: '1px solid rgba(245, 158, 11, 0.4)', background: 'linear-gradient(135deg, rgba(245,158,11,0.15) 0%, rgba(245,158,11,0.02) 100%)' }}>
+            <div style={{ background: 'rgba(245, 158, 11, 0.2)', padding: '1rem', borderRadius: '50%' }}>
+              <Activity size={24} color="#f59e0b" />
+            </div>
+            <div>
+              <h4 className="text-white" style={{ margin: '0 0 0.3rem' }}>Embudo C1 ➔ C2 ➔ MJ</h4>
+              <p className="text-muted" style={{ margin: 0, fontSize: '0.85rem' }}>Conversión en tiempo real, entrenadores, llamadas y retención</p>
+            </div>
+          </div>
+
           <div className="glass-panel hover-glow" onClick={() => navigate('/reportes')} style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', cursor: 'pointer' }}>
             <div style={{ background: 'rgba(255, 255, 255, 0.05)', padding: '1rem', borderRadius: '50%' }}>
               <Users size={24} color="var(--text-main)" />

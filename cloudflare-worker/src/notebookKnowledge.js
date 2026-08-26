@@ -95,6 +95,97 @@ El organigrama unificado de cada sede de CPSL establece la siguiente jerarquía 
 7.  **Manager (en MJ):** Líder en entrenamiento profundo enfocado en enrolamiento y acompañamiento (1 manager por cada 6 participantes en MJ). *(No traducir como gerente)* [41, 42, 354, 629].
 8.  **Entrenador:** Máxima autoridad contextual en el salón, voz de la transformación y ejemplo de pulcritud innegociable [85, 354, 668].
 
+### 3.4 FILOSOFÍA Y METÁFORA CENTRAL DE IMO (LIDERAZGO, INNOVACIÓN Y ENROLAMIENTO)
+
+#### Concepto y Metáfora Central
+En **Crear Poder Sin Límites (CPSL)**, **Imo** es la metáfora central del liderazgo y la innovación: representa a la persona que innova primero, abre un camino que otros todavía no ven y logra que otra persona lo replique; es decir, **“enrola a alguien para que enrole”**.
+
+La historia de Imo está documentada científicamente como un caso de innovación y transmisión cultural entre macacos japoneses en la isla de Koshima: comenzó lavando camotes con agua para retirar la arena y posteriormente desarrolló una forma de separar trigo y arena mediante flotación en agua. La conducta se difundió primero entre sus pares y familiares, y luego en toda la tropa.
+
+Para Crear Poder Sin Límites, Imo no es simplemente “el macaco que lavó un camote”. La historia es la **metáfora viva de la innovación, el liderazgo y la influencia cultural**: Imo representa a la persona que transforma una acción aparentemente pequeña en una posibilidad visible y multiplicable para otros.
+
+#### Definición de Imo
+**Imo es quien abre el camino que otros todavía no ven.**
+No lidera por imposición, jerarquía o discurso. Lidera porque:
+1. Observa una posibilidad.
+2. Se atreve a probar algo diferente.
+3. Genera un resultado tangible.
+4. Despierta la curiosidad de otros.
+5. Logra que otros reproduzcan la experiencia.
+6. Convierte una innovación individual en una práctica colectiva.
+7. Hace que una persona enrole a otra.
+
+En Crear Poder Sin Límites, Imo representa el primer movimiento de una transformación: una persona se atreve a hacer algo nuevo; otra lo observa, lo prueba y luego ayuda a que alguien más se atreva. Así nace una cultura de posibilidad.
+
+#### Relación con Crear Poder Sin Límites
+*   **Crear:** Imo inventa una nueva forma de resolver un problema.
+*   **Poder:** Demuestra que una acción pequeña puede modificar una conducta colectiva.
+*   **Sin Límites:** No acepta que la manera habitual sea la única posible.
+*   **Liderazgo:** No obliga a otros; inspira mediante el ejemplo y la acción.
+*   **Enrolamiento:** Convierte su descubrimiento personal en una posibilidad compartida.
+*   **Transformación:** Una innovación se vuelve cultura cuando otros la incorporan.
+
+> **Frase Institucional Central:**
+> *"En Crear Poder Sin Límites, cada persona puede ser Imo: quien se atreve a abrir un camino, inspira a otros a recorrerlo y contribuye a que nuevas posibilidades se conviertan en cultura."*
+
+#### Definición Metodológica de Enrolamiento
+En este contexto, **enrolar NO significa convencer mediante presión**. Significa:
+**Conectar a una persona con una posibilidad de tal manera que pueda verla, elegirla y comprometerse voluntariamente con ella.**
+
+**Secuencia de Transformación:**
+Imo observa una posibilidad ↓ Imo se atreve a probar ↓ Imo genera una nueva práctica ↓ Otra persona observa ↓ Otra persona se anima a probar ↓ La práctica se comparte ↓ La posibilidad se convierte en cultura.
+
+**Fórmula de Liderazgo:**
+> *"El líder es la causa cuando abre posibilidades que otros pueden elegir y multiplicar."*
+
+#### Historia Narrativa de Imo (Versión Institucional)
+Hace varias décadas, en la isla japonesa de Koshima, una joven macaca llamada Imo realizó una acción aparentemente sencilla: tomó un camote cubierto de arena y lo llevó al agua para limpiarlo antes de comerlo.
+
+Lo extraordinario no fue únicamente la acción, sino lo que ocurrió después. Otros macacos observaron, aprendieron y comenzaron a repetir la conducta. Con el tiempo, la práctica se extendió por toda la comunidad. Imo también desarrolló una técnica para separar trigo y arena utilizando el agua.
+
+Imo no necesitó ordenar, imponer ni convencer con palabras. Abrió un camino. Su conducta mostró una nueva posibilidad y otros decidieron recorrerla. Lo que comenzó como una innovación individual terminó convirtiéndose en una práctica colectiva.
+
+En Crear Poder Sin Límites llamamos **Imo** a quien se atreve a iniciar una nueva posibilidad y logra que otros también se movilicen. Porque el liderazgo no es únicamente llegar primero: es abrir caminos para que otros puedan avanzar.
+
+#### Modelo de Liderazgo Imo vs Liderazgo en CPSL
+| Dimensión Imo | Liderazgo en Crear Poder Sin Límites |
+| :--- | :--- |
+| Observa algo que otros no han visto | Identifica una posibilidad emergente |
+| Prueba una conducta nueva | Se atreve a innovar |
+| Produce un resultado | Demuestra que la posibilidad funciona |
+| Es observada por otros | Genera influencia genuina |
+| La conducta se repite | Produce aprendizaje colectivo |
+| La práctica se extiende | Crea cultura organizacional |
+| Otros comienzan a replicarla | Genera enrolamiento voluntario |
+| La innovación permanece | Produce transformación sostenible |
+
+#### Metodología de Cinco Pasos de Imo
+1. **Observar:** Identificar una dificultad, una oportunidad o una forma distinta de hacer las cosas.
+2. **Experimentar:** Probar una acción concreta sin esperar a tener certeza absoluta.
+3. **Evidenciar:** Mostrar qué ocurrió, qué se aprendió y qué resultado produjo.
+4. **Enrolar:** Invitar a otra persona a observar, probar y elegir la posibilidad voluntariamente.
+5. **Multiplicar:** Lograr que la práctica se comparta, se adapte y se convierta en aprendizaje colectivo.
+
+$$\text{Innovación Individual} + \text{Enrolamiento} = \text{Transformación Colectiva}$$
+
+#### Declaración de Identidad de Imo
+> *"Soy Imo cuando dejo de esperar que alguien abra el camino por mí. Observo, pruebo, aprendo y muestro una nueva posibilidad. No obligo a otros a seguirme: los inspiro a elegir. Mi liderazgo comienza cuando me convierto en la causa de un movimiento que otros pueden continuar."*
+
+#### Frases de Marca Institucionales
+*   **Frase central:** *Imo: quien abre el camino para que otros también puedan abrir caminos.*
+*   **Con Crear Poder Sin Límites:** *Crear Poder Sin Límites: sé Imo, abre caminos y enrola posibilidades.*
+*   **Con Causa OS:** *Imo abre el camino. Causa OS identifica la causa y organiza la respuesta.*
+*   **Frases breves:**
+    *   *El primero que abre caminos.*
+    *   *Una posibilidad comienza con alguien que se atreve.*
+    *   *Hazlo posible. Muéstralo. Enrola.*
+    *   *El líder no empuja: abre caminos.*
+    *   *La innovación se vuelve cultura cuando otros la hacen suya.*
+    *   *Enrola a alguien para que enrole.*
+    *   *Sé la causa de una nueva posibilidad.*
+    *   *Lo que comienza en uno puede transformar a muchos.*
+    *   *Crear Poder Sin Límites forma personas Imo: líderes capaces de abrir caminos, demostrar nuevas posibilidades y enrolar a otros para que el cambio se multiplique.*
+
 ---
 
 ## 4. BASE ESTRUCTURADA DE DATOS PARA EL BOT (MÓDULOS DE ALIMENTACIÓN)
@@ -1136,6 +1227,116 @@ Para asegurar la transición exitosa de las sedes operativas internacionales hac
     4. Gobernanza cerrada del repositorio de Nodus, cerrando el ciclo de seguridad informática, datos y operaciones.
 *   **Responsable:** Director Regional de Operaciones de CPSL. | **Aprobador:** Dirección General.
 *   **Evidencias de Éxito:** 100% de las sedes operando de manera estandarizada bajo el ecosistema digital de la Plataforma Nodus, logrando una reducción del 15% en incidencias operativas globales.
+
+---
+
+## 11. GLOSARIO OFICIAL DE TÉRMINOS - CREAR PODER SIN LÍMITES
+
+### 11.1 Rezagado
+Un **rezagado** es un participante que ya se encuentra registrado, pagado o comprometido en ciclos anteriores, pero que por diversas circunstancias **postergó su inicio o continuación del entrenamiento**. 
+*   **Foco operativo:** La coordinación de C1/C2 y los managers de Maestría del Juego tienen la responsabilidad de contactarlos mediante llamadas telefónicas una semana antes del entrenamiento para re-enrolarlos, resolver sus dudas de "sobrevivencia" y **asignarles una nueva fecha definitiva de asistencia** en el sistema Nodus.
+
+---
+
+### 11.2 IMO
+Inspirado en la historia real de *Imo*, la joven macaca de un año y medio que en 1953 transformó los hábitos de su colonia en la isla de Koshima al lavar boniatos y separar el trigo de la arena en el agua:
+> **Un IMO es una persona que, inspirada en esta historia, descubre una nueva posibilidad, la incorpora de forma práctica a su vida (a través del ejemplo y la congruencia) y la comparte de forma responsable y respetuosa con otra persona, enrolándola al estilo de vida de CREAR PODER SIN LÍMITES.**
+
+El enrolamiento realizado por un IMO debe ser **claro, voluntario y libre de manipulación, presión o promesas de resultados garantizados**; simplemente expande la transformación mediante el contagio cultural por exposición.
+
+---
+
+### 11.3 Términos Clave de Administración y Transacciones (Nodus)
+*   **AC (Acuerdo de Pago):** Nomenclatura transaccional obligatoria en fichas y en la plataforma para registrar un **compromiso de pago firme, con fecha de vencimiento y monto definido** a cumplirse en los días hábiles posteriores.
+*   **ABONO:** Nomenclatura oficial para el **pago parcial de dinero recibido** en la mesa. La coordinación asume la tarea de seguimiento para cobrar la diferencia antes de las fechas límite.
+*   **F (Ficha de Interesado):** Registro de un participante que ha mostrado un **interés genuino en continuar** pero que aún no concreta un abono o acuerdo. El coordinador debe llamarlo para enrolarlo al siguiente paso.
+*   **Ticket Verde:** Comprobante físico de color verde entregado en la mesa de Capítulo Dos únicamente el viernes por la mañana a los participantes declarantes de *Breakthrough* que tienen sus **pagos o abonos completamente al día**.
+*   **Ticket Rojo:** Comprobante que representa el **pase de abordaje a Capítulo Dos**, entregado a los participantes que realizan su pago o compromiso de inscripción durante el fin de semana de Capítulo Uno.
+
+---
+
+### 11.4 Roles y Liderazgo de la Sede
+*   **Aliado:** Graduado del programa completo que regresa en calidad de **staff voluntario para sostener el contexto y la logística invisible** de sala. Su rol no es de asistente logístico menor, sino de espejo de responsabilidad e integridad para los participantes (ratio de 1 aliado por cada 6 participantes).
+*   **Manager (en Maestría del Juego):** Rol avanzado dentro del ciclo de 90 días encargado de **acompañar, entrenar y sostener el avance de un grupo de 6 participantes** en la creación de sus futuros imposibles. *Nota innegociable: no se traduce como gerente.*
+*   **Capitán:** Líder del equipo de aliados y **termómetro energético del salón**. Es el responsable directo de la excelencia operativa en el salón y de supervisar la guía de seguimiento de retos de los aliados entre semana.
+*   **Quantum Team (QT):** Fuerza de operaciones especiales de la sede. Actúan como las "sombras" de la coordinación, entrenando a los aliados y managers en drills de llamadas y asegurando el **enfoque riguroso en la manifestación de resultados**.
+
+---
+
+### 11.5 Conceptos Metodológicos y Dinámicas
+*   **Breakthrough:** Declaración de **compromiso de transformación profunda** que realizan los participantes de Capítulo Dos de forma pública el jueves por la noche en el salón.
+*   **Palabra Rota:** Estado que se activa de forma automática el viernes a las 14:01 hrs en la Plataforma Nodus si un participante declaró su *Breakthrough* el jueves por la noche pero **no efectuó su pago o abono antes del cierre de mesas del viernes a las 14:00 PM**. Implica la suspensión temporal del salón avanzado.
+*   **Futuro Imposible (FI):** Declaración escrita de una **meta extraordinaria, medible y desafiante** a manifestarse dentro del ciclo de 90 días de Maestría, la cual rompe el histórico lógico del participante.
+*   **Grounding:** Reunión innegociable de alineamiento, enfoque de energía y revisión de la mecánica del día para el staff antes de abrir las puertas del salón. Se rige bajo la regla de **cero tolerancia ante retrasos**.
+*   **Baúl:** Contenedor físico sellado y auditado que alberga el **100% de la papelería, materiales especiales y herramientas logísticas** necesarias para operar un fin de semana de entrenamiento.
+*   **Tanque:** Dinámica táctica y de rompimiento de barreras de Capítulo Dos que se realiza el sábado, montando el salón con las **sillas en arco o herradura** y en donde se trabaja la distinción de *Escucha Generosa*.
+*   **Vuelos:** Dinámica de alta exigencia física y técnica realizada el sábado por la noche en Capítulo Dos, en donde el equipo anfitrión opera de forma **totalmente silenciosa e invisible como ángeles de vuelo**.
+
+---
+
+## 12. ESTRUCTURA ANALÍTICA Y EMBUDO DE CONVERSIÓN C1 ➔ C2 ➔ MAESTRÍA DEL JUEGO (MJ) ➔ EL VIAJE
+
+### 12.1 Métricas del Entrenador: C1 ➔ C2 ➔ MJ ➔ El Viaje
+El Entrenador es el guardián del contexto y de la energía de transformación en sala. Su efectividad se mide por la calidad y solidez del enrolamiento que genera durante los fines de semana de entrenamiento, asegurando que las decisiones de los participantes sean pasos voluntarios y sostenibles de crecimiento.
+
+En la **Plataforma Nodus**, el embudo de conversión del Entrenador se calcula automáticamente cruzando los registros del mismo equipo de participantes (PX) a lo largo de su viaje de transformación:
+
+| ID de KPI | Nombre de la Métrica | Fórmula de Cálculo / Estado en Nodus | Meta Oficial | Origen de Datos (Nodus) |
+| :--- | :--- | :--- | :---: | :--- |
+| **KPI-ENT-001** | **Graduados de C1** | \`Total_Graduados_C1\` | Baseline | Check-out digital de C1 (Domingo 19:00). |
+| **KPI-ENT-002** | **Pagos Promocionales C1** | \`Total_Pagos_Domingo_C1 (C2 + C2+MJ)\` | **50%** | Registro de Caja / Fichas de Enrolamiento. |
+| **KPI-ENT-003** | **Tasa de Sentados en C2** | \`(Sentados_C2_Mismo_Equipo / Graduados_C1) * 100\` | **95%** | Lectura de QR / Manillas (Jueves C2 15:30). |
+| **KPI-ENT-004** | **Flujo a Creación (FDS 1)** | \`Total_PX_Sentados_Creación\` | **70%** | Check-in digital (Viernes de FDS 1 MJ). |
+| **KPI-ENT-005** | **Flujo a Relación (FDS 2)** | \`Total_PX_Sentados_Relación\` | Monitoreo | Check-in digital (Viernes de FDS 2 MJ). |
+| **KPI-ENT-006** | **Flujo a Gratitud (FDS 3)** | \`Total_PX_Sentados_Gratitud\` | Monitoreo | Check-in digital (Viernes de FDS 3 MJ). |
+| **KPI-ENT-007** | **Llegada a El Viaje (FDS 4)** | \`Total_Graduados_PX_Viaje\` | **90%** | Registro de Graduación de MJ (Semana 14). |
+
+*   **Nomenclatura Transaccional en Caja:** Los cobros capturados el domingo de C1 deben cargarse en Nodus bajo los estados estrictos de **\`C2\`** (pago exclusivo del avanzado) o **\`C2+MJ\`** (paquete completo de entrenamiento).
+*   **La Pregunta de Oro para el Entrenador:** De todos los participantes que terminaron C1 en tu salón, ¿cuántos completaron de manera efectiva sus 14 semanas de entrenamiento y asistieron físicamente a El Viaje?.
+
+---
+
+### 12.2 Métricas del Coordinador C1 y C2 (CC1Y2)
+El Coordinador de C1/C2 es el responsable directo de la cobranza de entre semana y del Blitz de llamadas telefónicas de re-enrolamiento. Su universo de trabajo está compuesto por todos los graduados de C1 que cerraron el domingo con saldos pendientes, fichas de interesados o acuerdos de pago (\`AC\`, \`ABONO\`, \`F\`).
+
+Embudo de llamadas entre el lunes y el miércoles previo a C2:
+\`\`\`
+[ Graduados C1 Pendientes ] ➔ [ Asignados a Llamada ] ➔ [ Contactados ] ➔ [ Confirmados ] ➔ [ Sentados C2 ]
+\`\`\`
+
+#### Embudo de Seguimiento de Llamadas (CC1Y2):
+*   **Total Enrolamientos Asignados:** 100% de los graduados de C1 con saldos pendientes al cierre del domingo.
+*   **% Confirmados:** Graduados que definen un acuerdo de pago sólido (\`AC\` o \`ABONO\`) mediante contacto telefónico.
+*   **% No Contestan:** Participantes inlocalizables tras un mínimo de 3 intentos de llamada documentados en el sistema.
+*   **% Siguiente Fecha (Rezagados):** Participantes que deciden postergar su Capítulo Dos, convirtiéndose formalmente en **rezagados** para futuros ciclos de la sede.
+*   **% No Interesados:** Graduados que expresan formalmente su decisión de no continuar con su entrenamiento en C1.
+*   **% Pendientes / Otros:** Casos especiales bajo revisión de la Gerencia de Sede.
+
+#### Métricas de Cierre y Caja (CC1Y2):
+*   **KPI-CC-001 (Conversión de Confirmados):** Mide la solidez del acuerdo telefónico de la semana:
+    $$\text{\% Confirmado} \rightarrow \text{Sentado} = \left(\frac{\text{Confirmados que se sentaron el jueves}}{\text{Total Confirmados en la semana}}\right) \times 100$$
+*   **KPI-CC-002 (Efectividad Total de la Coordinación):** Mide el impacto real de la gestión del CC1Y2 sobre toda su cartera asignada:
+    $$\text{\% Total Asignado} \rightarrow \text{Sentado} = \left(\frac{\text{Graduados asignados que se sentaron el jueves}}{\text{Total Graduados asignados al seguimiento}}\right) \times 100$$
+
+---
+
+### 12.3 Calidad y Auditoría del Salón de Capítulo Dos (C2)
+Para garantizar la retención global y salvaguardar el contenedor del salón de avanzado, Nodus auditará cuantitativamente el comportamiento de los participantes sentados el jueves en C2:
+
+*   **Total Sentados en C2:** El volumen total registrado por la coordinación en la mesa de apertura del jueves.
+*   **% Desertores en C2:** Participantes que abandonan el avanzado durante el fin de semana o que son dados de baja por quiebres del Código de Honor:
+    $$\text{\% Desertores C2} = \left(\frac{\text{Desertores en el Fin de Semana}}{\text{Total Sentados el Jueves}}\right) \times 100$$
+*   **% Completaron C2:** Participantes que alcanzan su graduación el domingo por la noche:
+    $$\text{\% Completaron C2} = \left(\frac{\text{Graduados de C2}}{\text{Total Sentados el Jueves}}\right) \times 100$$
+*   **% Provenientes Directamente de C1:** Participantes del embudo natural del ciclo inmediato anterior.
+*   **% Rezagados de C2:** Participantes recuperados de ciclos de Maestría anteriores que finalmente se sientan en este C2.
+
+---
+
+### 12.4 Control Financiero, Vías de Pago y Prevención de Desfases
+*   **Vías de Pago Válidas:** \`TRANSF\`, \`TC\`, \`LINK\`, \`EFECTIVO\`, \`USDT\`, \`PAYPHONE\`, \`PAYPAL\`.
+*   **Cierre Bancario:** Debe verificarse el dinero físicamente en el banco antes del lunes a las 12:00 PM.
+*   **Alerta de Integridad:** Queda terminantemente prohibido inflar confirmados con acuerdos débiles (\`AC\`) ficticios. Todo desfase dispara una alerta por **Quiebre de Integridad Administrativa** al Gerente de Sede.
 
 ---
 *Este documento constituye la hoja de ruta y manual de reingeniería de Crear Poder Sin Límites.*

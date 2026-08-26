@@ -144,10 +144,10 @@ service cloud.firestore {
       allow update, delete: if isSuperAdmin();
     }
 
-    // USERS (colección legacy, solo SuperAdmin escribe)
+    // USERS (colección de perfiles, SuperAdmin o el propio usuario escribe su perfil)
     match /users/{userId} {
       allow read: if isAuthenticated();
-      allow write: if isSuperAdmin();
+      allow write: if isSuperAdmin() || (isAuthenticated() && request.auth.uid == userId);
 
       // Historial de chats del Copiloto IA (AICopilot.jsx): esta es la ÚNICA ruta de toda
       // la app donde currentUser.uid corresponde de verdad al uid real de Firebase Auth

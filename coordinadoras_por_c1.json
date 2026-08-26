@@ -1,0 +1,402 @@
+{
+  "EQUIPO 30": {
+    "equipoId": 134,
+    "label": "LIMA C1E30",
+    "totalParticipantes": 216,
+    "coordinadoras": {
+      "DIANA": {
+        "asignados": 77,
+        "confirmados_1ra": 54,
+        "no_contesta_1ra": 10,
+        "siguiente_1ra": 9,
+        "asistieron_sentados": 42,
+        "desertores": 8,
+        "pagaron_c2": 9,
+        "pagaron_c2_mj": 8,
+        "con_abono": 1,
+        "sin_pago": 59
+      },
+      "JOYCE": {
+        "asignados": 135,
+        "confirmados_1ra": 92,
+        "no_contesta_1ra": 24,
+        "siguiente_1ra": 6,
+        "asistieron_sentados": 85,
+        "desertores": 23,
+        "pagaron_c2": 19,
+        "pagaron_c2_mj": 7,
+        "con_abono": 4,
+        "sin_pago": 105
+      },
+      "LEYLA": {
+        "asignados": 2,
+        "confirmados_1ra": 0,
+        "no_contesta_1ra": 0,
+        "siguiente_1ra": 0,
+        "asistieron_sentados": 2,
+        "desertores": 2,
+        "pagaron_c2": 0,
+        "pagaron_c2_mj": 0,
+        "con_abono": 0,
+        "sin_pago": 2
+      },
+      "LINID": {
+        "asignados": 2,
+        "confirmados_1ra": 0,
+        "no_contesta_1ra": 0,
+        "siguiente_1ra": 0,
+        "asistieron_sentados": 2,
+        "desertores": 0,
+        "pagaron_c2": 0,
+        "pagaron_c2_mj": 0,
+        "con_abono": 0,
+        "sin_pago": 2
+      }
+    }
+  },
+  "EQUIPO 29": {
+    "equipoId": 127,
+    "label": "LIMA C1E29",
+    "totalParticipantes": 284,
+    "coordinadoras": {
+      "DIANA": {
+        "asignados": 103,
+        "confirmados_1ra": 64,
+        "no_contesta_1ra": 27,
+        "siguiente_1ra": 1,
+        "asistieron_sentados": 58,
+        "desertores": 0,
+        "pagaron_c2": 8,
+        "pagaron_c2_mj": 15,
+        "con_abono": 1,
+        "sin_pago": 79
+      },
+      "GARETH SAID RAMOS PEREZ": {
+        "asignados": 2,
+        "confirmados_1ra": 2,
+        "no_contesta_1ra": 0,
+        "siguiente_1ra": 0,
+        "asistieron_sentados": 1,
+        "desertores": 0,
+        "pagaron_c2": 0,
+        "pagaron_c2_mj": 2,
+        "con_abono": 0,
+        "sin_pago": 0
+      },
+      "JOSE LUIS": {
+        "asignados": 8,
+        "confirmados_1ra": 1,
+        "no_contesta_1ra": 0,
+        "siguiente_1ra": 1,
+        "asistieron_sentados": 7,
+        "desertores": 0,
+        "pagaron_c2": 1,
+        "pagaron_c2_mj": 2,
+        "con_abono": 0,
+        "sin_pago": 5
+      },
+      "JOYCE": {
+        "asignados": 156,
+        "confirmados_1ra": 118,
+        "no_contesta_1ra": 23,
+        "siguiente_1ra": 7,
+        "asistieron_sentados": 76,
+        "desertores": 0,
+        "pagaron_c2": 8,
+        "pagaron_c2_mj": 16,
+        "con_abono": 0,
+        "sin_pago": 132
+      },
+      "OTTY ZULEY URTEAGA SILVA": {
+        "asignados": 4,
+        "confirmados_1ra": 1,
+        "no_contesta_1ra": 3,
+        "siguiente_1ra": 0,
+        "asistieron_sentados": 0,
+        "desertores": 0,
+        "pagaron_c2": 0,
+        "pagaron_c2_mj": 1,
+        "con_abono": 0,
+        "sin_pago": 3
+      },
+      "SIN COORDINADOR": {
+        "asignados": 5,
+        "confirmados_1ra": 0,
+        "no_contesta_1ra": 0,
+        "siguiente_1ra": 0,
+        "asistieron_sentados": 2,
+        "desertores": 0,
+        "pagaron_c2": 0,
+        "pagaron_c2_mj": 2,
+        "con_abono": 0,
+        "sin_pago": 3
+      },
+      "KRISTIAN DELGADO": {
+        "asignados": 3,
+        "confirmados_1ra": 0,
+        "no_contesta_1ra": 0,
+        "siguiente_1ra": 0,
+        "asistieron_sentados": 3,
+        "desertores": 0,
+        "pagaron_c2": 3,
+        "pagaron_c2_mj": 0,
+        "con_abono": 0,
+        "sin_pago": 0
+      },
+      "MARCELA": {
+        "asignados": 3,
+        "confirmados_1ra": 3,
+        "no_contesta_1ra": 0,
+        "siguiente_1ra": 0,
+        "asistieron_sentados": 0,
+        "desertores": 0,
+        "pagaron_c2": 0,
+        "pagaron_c2_mj": 0,
+        "con_abono": 0,
+        "sin_pago": 3
+      }
+    }
+  },
+  "EQUIPO 28": {
+    "equipoId": 111,
+    "label": "LIMA C1E28",
+    "totalParticipantes": 325,
+    "coordinadoras": {
+      "DIANA": {
+        "asignados": 79,
+        "confirmados_1ra": 38,
+        "no_contesta_1ra": 24,
+        "siguiente_1ra": 1,
+        "asistieron_sentados": 45,
+        "desertores": 0,
+        "pagaron_c2": 10,
+        "pagaron_c2_mj": 11,
+        "con_abono": 1,
+        "sin_pago": 57
+      },
+      "GARETH SAID RAMOS PEREZ": {
+        "asignados": 1,
+        "confirmados_1ra": 1,
+        "no_contesta_1ra": 0,
+        "siguiente_1ra": 0,
+        "asistieron_sentados": 1,
+        "desertores": 0,
+        "pagaron_c2": 0,
+        "pagaron_c2_mj": 1,
+        "con_abono": 0,
+        "sin_pago": 0
+      },
+      "JOSE LUIS": {
+        "asignados": 50,
+        "confirmados_1ra": 26,
+        "no_contesta_1ra": 18,
+        "siguiente_1ra": 3,
+        "asistieron_sentados": 14,
+        "desertores": 0,
+        "pagaron_c2": 1,
+        "pagaron_c2_mj": 1,
+        "con_abono": 6,
+        "sin_pago": 42
+      },
+      "JOYCE": {
+        "asignados": 183,
+        "confirmados_1ra": 140,
+        "no_contesta_1ra": 21,
+        "siguiente_1ra": 3,
+        "asistieron_sentados": 129,
+        "desertores": 0,
+        "pagaron_c2": 15,
+        "pagaron_c2_mj": 15,
+        "con_abono": 6,
+        "sin_pago": 147
+      },
+      "KRISCIA LISZET RODAS QUISPE": {
+        "asignados": 1,
+        "confirmados_1ra": 1,
+        "no_contesta_1ra": 0,
+        "siguiente_1ra": 0,
+        "asistieron_sentados": 1,
+        "desertores": 0,
+        "pagaron_c2": 0,
+        "pagaron_c2_mj": 1,
+        "con_abono": 0,
+        "sin_pago": 0
+      },
+      "LEYLA": {
+        "asignados": 1,
+        "confirmados_1ra": 1,
+        "no_contesta_1ra": 0,
+        "siguiente_1ra": 0,
+        "asistieron_sentados": 1,
+        "desertores": 0,
+        "pagaron_c2": 0,
+        "pagaron_c2_mj": 1,
+        "con_abono": 0,
+        "sin_pago": 0
+      },
+      "OTTY ZULEY URTEAGA SILVA": {
+        "asignados": 1,
+        "confirmados_1ra": 0,
+        "no_contesta_1ra": 0,
+        "siguiente_1ra": 0,
+        "asistieron_sentados": 1,
+        "desertores": 0,
+        "pagaron_c2": 0,
+        "pagaron_c2_mj": 1,
+        "con_abono": 0,
+        "sin_pago": 0
+      },
+      "LINID": {
+        "asignados": 6,
+        "confirmados_1ra": 0,
+        "no_contesta_1ra": 0,
+        "siguiente_1ra": 0,
+        "asistieron_sentados": 6,
+        "desertores": 0,
+        "pagaron_c2": 0,
+        "pagaron_c2_mj": 0,
+        "con_abono": 0,
+        "sin_pago": 6
+      },
+      "SIN COORDINADOR": {
+        "asignados": 3,
+        "confirmados_1ra": 3,
+        "no_contesta_1ra": 0,
+        "siguiente_1ra": 0,
+        "asistieron_sentados": 0,
+        "desertores": 0,
+        "pagaron_c2": 0,
+        "pagaron_c2_mj": 0,
+        "con_abono": 0,
+        "sin_pago": 3
+      }
+    }
+  },
+  "EQUIPO 27": {
+    "equipoId": 107,
+    "label": "LIMA C1E27",
+    "totalParticipantes": 387,
+    "coordinadoras": {
+      "ANEL ORIHUELA VELA": {
+        "asignados": 2,
+        "confirmados_1ra": 1,
+        "no_contesta_1ra": 1,
+        "siguiente_1ra": 0,
+        "asistieron_sentados": 2,
+        "desertores": 0,
+        "pagaron_c2": 0,
+        "pagaron_c2_mj": 1,
+        "con_abono": 0,
+        "sin_pago": 1
+      },
+      "DIANA": {
+        "asignados": 104,
+        "confirmados_1ra": 51,
+        "no_contesta_1ra": 16,
+        "siguiente_1ra": 7,
+        "asistieron_sentados": 66,
+        "desertores": 0,
+        "pagaron_c2": 8,
+        "pagaron_c2_mj": 10,
+        "con_abono": 1,
+        "sin_pago": 85
+      },
+      "GARETH SAID RAMOS PEREZ": {
+        "asignados": 2,
+        "confirmados_1ra": 2,
+        "no_contesta_1ra": 0,
+        "siguiente_1ra": 0,
+        "asistieron_sentados": 2,
+        "desertores": 0,
+        "pagaron_c2": 1,
+        "pagaron_c2_mj": 1,
+        "con_abono": 0,
+        "sin_pago": 0
+      },
+      "JOSE LUIS": {
+        "asignados": 3,
+        "confirmados_1ra": 2,
+        "no_contesta_1ra": 0,
+        "siguiente_1ra": 0,
+        "asistieron_sentados": 2,
+        "desertores": 0,
+        "pagaron_c2": 0,
+        "pagaron_c2_mj": 2,
+        "con_abono": 0,
+        "sin_pago": 1
+      },
+      "JOYCE": {
+        "asignados": 138,
+        "confirmados_1ra": 87,
+        "no_contesta_1ra": 26,
+        "siguiente_1ra": 1,
+        "asistieron_sentados": 51,
+        "desertores": 0,
+        "pagaron_c2": 2,
+        "pagaron_c2_mj": 10,
+        "con_abono": 0,
+        "sin_pago": 126
+      },
+      "KRISCIA LISZET RODAS QUISPE": {
+        "asignados": 4,
+        "confirmados_1ra": 4,
+        "no_contesta_1ra": 0,
+        "siguiente_1ra": 0,
+        "asistieron_sentados": 3,
+        "desertores": 0,
+        "pagaron_c2": 0,
+        "pagaron_c2_mj": 2,
+        "con_abono": 1,
+        "sin_pago": 1
+      },
+      "MONICA": {
+        "asignados": 2,
+        "confirmados_1ra": 1,
+        "no_contesta_1ra": 0,
+        "siguiente_1ra": 1,
+        "asistieron_sentados": 2,
+        "desertores": 0,
+        "pagaron_c2": 1,
+        "pagaron_c2_mj": 1,
+        "con_abono": 0,
+        "sin_pago": 0
+      },
+      "OTTY ZULEY URTEAGA SILVA": {
+        "asignados": 127,
+        "confirmados_1ra": 91,
+        "no_contesta_1ra": 32,
+        "siguiente_1ra": 1,
+        "asistieron_sentados": 99,
+        "desertores": 0,
+        "pagaron_c2": 7,
+        "pagaron_c2_mj": 18,
+        "con_abono": 0,
+        "sin_pago": 102
+      },
+      "LINID": {
+        "asignados": 2,
+        "confirmados_1ra": 0,
+        "no_contesta_1ra": 0,
+        "siguiente_1ra": 0,
+        "asistieron_sentados": 2,
+        "desertores": 0,
+        "pagaron_c2": 0,
+        "pagaron_c2_mj": 0,
+        "con_abono": 0,
+        "sin_pago": 2
+      },
+      "SIN COORDINADOR": {
+        "asignados": 3,
+        "confirmados_1ra": 0,
+        "no_contesta_1ra": 0,
+        "siguiente_1ra": 0,
+        "asistieron_sentados": 3,
+        "desertores": 0,
+        "pagaron_c2": 0,
+        "pagaron_c2_mj": 0,
+        "con_abono": 3,
+        "sin_pago": 0
+      }
+    }
+  }
+}

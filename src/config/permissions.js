@@ -8,10 +8,9 @@
  * gestión de metas, y visibilidad global multi-sede.
  */
 export const SUPER_ADMIN_EMAILS = [
-  'jose.sanchez@crearpsl.net',
-  'armando.pilacuan@gmail.com',
-  'paul.sosa@crearpsl.net',
-  'paul.sosa@crearpsl.net'
+  'jose.sanchez@crearpsl.net',   // José Sánchez — SuperAdmin + Gerente Lima
+  'armando.pilacuan@gmail.com',  // Armando Pilacuán — SuperAdmin
+  'paul.sosa@crearpsl.net'       // Paul Sosa — SuperAdmin
 ];
 
 /**
@@ -278,3 +277,143 @@ export const getAssignableRoles = (currentUser) => {
     { id: normRole, name: 'A mí mismo' }
   ];
 };
+
+/**
+ * MATRIZ OFICIAL DE PERMISOS Y VISTAS POR ROL (CREAR PODER SIN LÍMITES)
+ * Fuente: Matriz Oficial de Acceso y Visibilidad Causa OS
+ */
+export const OFFICIAL_PERMISSION_MATRIX = {
+  'causa_os': {
+    directivos: 'GLOBAL',
+    gerente: 'SEDE',
+    coord_c1: 'DASHBOARD',
+    coord_maestria: 'DASHBOARD',
+    entrenador: 'DASHBOARD',
+    qt: 'DASHBOARD',
+    capitan: 'DASHBOARD',
+    aliado: 'DASHBOARD',
+    manager: 'DASHBOARD'
+  },
+  'portafolio_pmo': {
+    directivos: 'GLOBAL',
+    gerente: 'SEDE'
+  },
+  'okrs_cascade': {
+    directivos: 'GLOBAL',
+    gerente: 'SEDE'
+  },
+  'auditoria_kpis': {
+    directivos: 'GLOBAL',
+    gerente: 'SEDE'
+  },
+  'manual_qt': {
+    directivos: 'GLOBAL',
+    gerente: 'GLOBAL',
+    coord_c1: 'GLOBAL',
+    qt: 'GLOBAL'
+  },
+  'directorio_qt': {
+    directivos: 'GLOBAL',
+    gerente: 'GLOBAL',
+    coord_c1: 'SEDE',
+    qt: 'GLOBAL'
+  },
+  'centro_de_mando': {
+    directivos: 'GLOBAL',
+    gerente: 'SEDE'
+  },
+  'calendario_global': {
+    directivos: 'GLOBAL',
+    gerente: 'GLOBAL',
+    coord_c1: 'GLOBAL',
+    coord_maestria: 'GLOBAL',
+    entrenador: 'GLOBAL',
+    qt: 'GLOBAL',
+    capitan: 'GLOBAL',
+    aliado: 'GLOBAL',
+    manager: 'GLOBAL'
+  },
+  'campus_interactivo': {
+    directivos: 'GLOBAL',
+    gerente: 'GLOBAL',
+    coord_c1: 'GLOBAL',
+    coord_maestria: 'GLOBAL'
+  },
+  'centro_managers': {
+    directivos: 'GLOBAL',
+    gerente: 'SEDE',
+    coord_maestria: 'SEDE',
+    entrenador: 'ASIGNADOS'
+  },
+  'hoteles_sede': {
+    directivos: 'GLOBAL',
+    gerente: 'SEDE'
+  },
+  'asignar_meta': {
+    directivos: 'GLOBAL',
+    gerente: 'SEDE'
+  },
+  'directorio_equipo': {
+    directivos: 'GLOBAL',
+    gerente: 'GLOBAL'
+  },
+  'sistema_cartas': {
+    gerente: 'GLOBAL',
+    directivos: 'GLOBAL'
+  },
+  'copilot': {
+    directivos: 'GLOBAL',
+    gerente: 'GLOBAL',
+    coord_c1: 'DASHBOARD',
+    coord_maestria: 'DASHBOARD',
+    entrenador: 'DASHBOARD',
+    qt: 'DASHBOARD',
+    capitan: 'DASHBOARD',
+    aliado: 'DASHBOARD',
+    manager: 'DASHBOARD'
+  }
+};
+
+/**
+ * Valida el nivel de acceso de un usuario para un módulo específico según la Matriz Oficial
+ * @param {Object} currentUser 
+ * @param {string} moduleKey 
+ * @returns {{ hasAccess: boolean, scope: 'GLOBAL' | 'SEDE' | 'DASHBOARD' | 'ASIGNADOS' | 'NONE' }}
+ */
+export const checkModuleAccess = (currentUser, moduleKey) => {
+  if (!currentUser) return { hasAccess: false, scope: 'NONE' };
+  
+  // Super Admin tiene acceso GLOBAL a todo
+  if (currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email)) {
+    return { hasAccess: true, scope: 'GLOBAL' };
+  }
+
+  const role = currentUser.appRole || 'participante';
+  const isDir = isDireccionRole(role) || currentUser.isDireccion;
+  const isGer = role === 'gerente' || currentUser.isGerente;
+
+  const matrixEntry = OFFICIAL_PERMISSION_MATRIX[moduleKey];
+  if (!matrixEntry) return { hasAccess: false, scope: 'NONE' };
+
+  if (isDir && matrixEntry.directivos) {
+    return { hasAccess: true, scope: matrixEntry.directivos };
+  }
+
+  if (isGer && matrixEntry.gerente) {
+    return { hasAccess: true, scope: matrixEntry.gerente };
+  }
+
+  // Mapear rol normalizado a claves de matriz
+  let roleKey = role;
+  if (role === 'coord_c2' || role === 'coordinador_c1c2') roleKey = 'coord_c1';
+  if (role === 'coordinador_mj' || role === 'director_maestria') roleKey = 'coord_maestria';
+  if (role === 'entrenador_llamadas') roleKey = 'entrenador';
+
+  const roleScope = matrixEntry[roleKey];
+  if (roleScope) {
+    return { hasAccess: true, scope: roleScope };
+  }
+
+  return { hasAccess: false, scope: 'NONE' };
+};
+

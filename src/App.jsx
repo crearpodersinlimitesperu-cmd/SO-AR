@@ -23,6 +23,7 @@ import PortfolioBoard from './pages/PortfolioBoard'
 import StrategyBoard from './pages/StrategyBoard'
 import OfficialAgreements from './pages/OfficialAgreements'
 import TeamCalendar from './pages/TeamCalendar'
+import EmbudoConversionBoard from './pages/EmbudoConversionBoard'
 import AICopilot from './components/AICopilot'
 import PromptModal from './components/PromptModal'
 import HelpModal from './components/HelpModal'
@@ -145,9 +146,15 @@ function App() {
           } />
           
           <Route path="/learning" element={
-            <PrivateRoute>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'director_maestria']}>
               <LearningDashboard />
-            </PrivateRoute>
+            </RoleRoute>
+          } />
+
+          <Route path="/manual" element={
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt']}>
+              <ManualGuia />
+            </RoleRoute>
           } />
 
           <Route path="/excelencia" element={
@@ -157,7 +164,7 @@ function App() {
           } />
           
           <Route path="/gerente" element={
-            <RoleRoute allowedRoles={['gerente', 'direccion', 'director_maestria']}>
+            <RoleRoute allowedRoles={['gerente', 'direccion', 'cfo', 'ceo', 'cco', 'superadmin']}>
               <GerenteDashboard />
             </RoleRoute>
           } />
@@ -226,6 +233,12 @@ function App() {
           <Route path="/estrategia" element={
             <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']} requireSuperAdmin={false}>
               <StrategyBoard />
+            </RoleRoute>
+          } />
+
+          <Route path="/embudo-conversion" element={
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'entrenador', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coordinador_mj']} requireSuperAdmin={false}>
+              <EmbudoConversionBoard />
             </RoleRoute>
           } />
 
