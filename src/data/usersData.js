@@ -56,6 +56,9 @@ export const normalizeRole = (role) => {
   // Entrenador (Coach)
   if (r === 'entrenador' || r === 'coach' || r.includes('entrenador') || r.includes('coach')) return 'entrenador';
   
+  // Student
+  if (r === 'student' || r === 'estudiante' || r.includes('student') || r.includes('estudiante')) return 'student';
+  
   return r;
 };
 
@@ -124,7 +127,8 @@ export const ROLE_DISPLAY_NAMES = {
   asistente_impuestos_quito: 'Impuestos & Tributación',
   tecnico_sst: 'Seguridad y Salud (SST)',
   entrenador: 'Entrenador (Coach)',
-  entrenador_llamadas: 'Entrenador de Llamadas'
+  entrenador_llamadas: 'Entrenador de Llamadas',
+  student: 'Student (Estudiante)'
 };
 
 export const getRoleDisplayName = (role) => {
@@ -159,7 +163,8 @@ export const ROLE_COLORS = {
   legal: '#a855f7',
   tecnico_sst: '#14b8a6',
   entrenador: '#fbbf24',
-  entrenador_llamadas: '#38bdf8'
+  entrenador_llamadas: '#38bdf8',
+  student: '#f472b6' // Pink color for student
 };
 
 /**
