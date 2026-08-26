@@ -225,7 +225,7 @@ export default function AICopilot() {
       // LLM Request — vía backend cerrado (Cloudflare Worker).
       // El system prompt, el filtrado de Nodus por rol/sede y la key de Groq
       // viven en el servidor (cloudflare-worker/src/index.js), nunca en el navegador.
-      const workerUrl = import.meta.env.VITE_COPILOTO_WORKER_URL;
+      const workerUrl = import.meta.env.VITE_COPILOTO_WORKER_URL || 'https://so-ar-copiloto.crearpsl-cpsl.workers.dev';
       if (!workerUrl) {
         throw Object.assign(new Error('Falta VITE_COPILOTO_WORKER_URL'), { code: 'worker/not-configured' });
       }
