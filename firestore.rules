@@ -67,7 +67,8 @@ service cloud.firestore {
         'yurany.gonzalez@crearpsl.net',
         'nora.zamora@crearpsl.net',
         'emily.campuzano@crearpsl.net',
-        'freddy.sosa@crearpsl.net'
+        'freddy.sosa@crearpsl.net',
+        'diana.moscoso@crearpsl.net'
       ]);
     }
 

@@ -78226,7 +78226,11 @@ export function AuthProvider({ children }) {
 
       // 🔥 CRÍTICO: Guardar el usuario en la colección "users"
       // Si no existe aquí, las reglas de Firestore (Hito 0) rechazarán todas sus peticiones.
-      await setDoc(doc(db, 'users', user.uid), canonicalUser, { merge: true });
+      try {
+        await setDoc(doc(db, 'users', user.uid), canonicalUser, { merge: true });
+      } catch (e) {
+        console.warn('Cannot update /users since only superadmin can, continuing login');
+      }
 
       const userObj = buildUserObject(user, canonicalUser, normalizedEmail);
       setCurrentUser(userObj);
@@ -78309,7 +78313,11 @@ export function AuthProvider({ children }) {
           
           // 🔥 CRÍTICO: Guardar el usuario en la colección "users"
           try {
-            await setDoc(doc(db, 'users', user.uid), canonicalUser, { merge: true });
+            try {
+        await setDoc(doc(db, 'users', user.uid), canonicalUser, { merge: true });
+      } catch (e) {
+        console.warn('Cannot update /users since only superadmin can, continuing login');
+      }
           } catch (err) {
             console.error("Error guardando perfil de usuario en auth state:", err);
           }
