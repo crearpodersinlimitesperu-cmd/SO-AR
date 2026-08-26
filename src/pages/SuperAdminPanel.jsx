@@ -313,7 +313,6 @@ function AuditLogView() {
   const [filterAction, setFilterAction] = useState('TODAS');
 
   const fetchLogs = async () => {
-    if (loading) return;
     setLoading(true);
     try {
       let data = await getAllAuditLogs();
@@ -666,7 +665,8 @@ export default function SuperAdminPanel() {
     async function fetchUsers() {
       try {
         const users = await getAllCompanyUsers();
-        if (isMounted) setRealUsersData(users);
+        const validUsers = users.filter(u => normalizeRole(u.role) !== null);
+        if (isMounted) setRealUsersData(validUsers);
       } catch (err) {
         console.error("Error cargando usuarios:", err);
       } finally {

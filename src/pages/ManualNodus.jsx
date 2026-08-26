@@ -204,6 +204,13 @@ export default function ManualNodus() {
                   <li><strong>Auditoría de Cajas Consolidadas:</strong> Revisa el reporte de ingresos general filtrando por sede y verificando la congruencia entre el flujo en Nodus y las cuentas bancarias.</li>
                   <li><strong>Desviaciones:</strong> Cualquier diferencia mayor a cero entre el número de sentados en sala y los confirmados en Nodus es una bandera roja que debe comunicarse inmediatamente al Gerente de Sede.</li>
                 </ul>
+                <button 
+                  onClick={() => navigate('/estrategia')}
+                  className="btn-primary" 
+                  style={{ marginTop: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', background: 'rgba(236, 72, 153, 0.15)', color: '#ec4899', border: '1px solid #ec4899', borderRadius: '8px' }}
+                >
+                  <TrendingUp size={16} /> Ir a Estrategia y OKRs
+                </button>
               </div>
 
               <div style={{ padding: '1.5rem', background: 'var(--bg-card)', borderRadius: '12px', border: '1px solid var(--border-subtle)' }}>
@@ -214,6 +221,13 @@ export default function ManualNodus() {
                   <li>Asegúrate de que los eventos de cada nuevo ciclo sean configurados en el sistema central antes de arrancar el enrolamiento (C1, C2, MJ).</li>
                   <li>Aprobar y auditar la creación de roles administrativos (Cajeros, Coordinadores) verificando que sus accesos correspondan a la sede física pertinente.</li>
                 </ul>
+                <button 
+                  onClick={() => navigate('/auditoria')}
+                  className="btn-primary" 
+                  style={{ marginTop: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', background: 'rgba(236, 72, 153, 0.15)', color: '#ec4899', border: '1px solid #ec4899', borderRadius: '8px' }}
+                >
+                  <Users size={16} /> Panel de Super Admin
+                </button>
               </div>
             </div>
           </div>
@@ -246,6 +260,13 @@ export default function ManualNodus() {
                 <p style={{ color: 'var(--text-muted)', margin: 0, lineHeight: '1.6', fontSize: '0.9rem' }}>
                   Todos los días, al finalizar la jornada de ventas/enrolamiento, el Gerente debe exportar el reporte de caja de Nodus. Cada recibo emitido físicamente y cada transferencia bancaria debe hacer <i>match</i> perfecto con las transacciones grabadas en el sistema.
                 </p>
+                <button 
+                  onClick={() => navigate('/gerente')}
+                  className="btn-primary" 
+                  style={{ marginTop: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', background: 'rgba(245, 158, 11, 0.15)', color: 'var(--crear-gold)', border: '1px solid var(--crear-gold)', borderRadius: '8px' }}
+                >
+                  <BarChart3 size={16} /> Ver Dashboard Gerencial
+                </button>
               </div>
 
               <div style={{ padding: '1.5rem', background: 'var(--bg-card-hover)', borderRadius: '12px', border: '1px solid var(--border-subtle)' }}>
@@ -255,6 +276,13 @@ export default function ManualNodus() {
                 <p style={{ color: 'var(--text-muted)', margin: 0, lineHeight: '1.6', fontSize: '0.9rem' }}>
                   Antes del inicio de cualquier nivel (C1 o C2), el Gerente valida junto al Coordinador la "Lista Oficial de Nodus". <strong>Ninguna persona sin contrato firmado y estado "Activo" en Nodus puede ingresar a sala.</strong>
                 </p>
+                <button 
+                  onClick={() => navigate('/checklist/gerente')}
+                  className="btn-primary" 
+                  style={{ marginTop: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', background: 'rgba(245, 158, 11, 0.15)', color: 'var(--crear-gold)', border: '1px solid var(--crear-gold)', borderRadius: '8px' }}
+                >
+                  <CheckCircle size={16} /> Validar Checklists
+                </button>
               </div>
 
               <div style={{ padding: '1.5rem', background: 'var(--bg-card-hover)', borderRadius: '12px', border: '1px solid var(--border-subtle)' }}>
@@ -298,6 +326,13 @@ export default function ManualNodus() {
                   <li>Toda persona enrolada pasa inmediatamente al Nodus con sus datos personales: Nombres completos, Cédula/ID, Teléfono y Correo Electrónico correctos.</li>
                   <li><strong>Exportación de Gafetes:</strong> Los gafetes para C1/C2 se generan EXCLUSIVAMENTE exportando la data de Nodus. No se usa Excel manual. Esto previene que se filtren personas no matriculadas o con deudas.</li>
                 </ul>
+                <button 
+                  onClick={() => navigate('/checklist/coord_c1')}
+                  className="btn-primary" 
+                  style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.4rem 0.8rem', background: 'rgba(0, 210, 255, 0.15)', color: 'var(--crear-blue)', border: '1px solid var(--crear-blue)', borderRadius: '6px', fontSize: '0.85rem' }}
+                >
+                  <Database size={14} /> Ir a Checklist de C1/C2
+                </button>
               </div>
 
               <div style={{ padding: '1.2rem', background: 'rgba(0, 210, 255, 0.05)', borderRadius: '10px', border: '1px solid rgba(0, 210, 255, 0.2)' }}>
@@ -351,6 +386,13 @@ export default function ManualNodus() {
                 <p style={{ color: 'var(--text-muted)', margin: 0, lineHeight: '1.6', fontSize: '0.95rem' }}>
                   El primer paso post-C2 es registrar en Nodus la división de los Equipos de Alto Impacto. Debes asignar a cada EAI su Capitán/Líder correspondiente en el sistema para que las vistas de control tengan sentido.
                 </p>
+                <button 
+                  onClick={() => navigate('/checklist/coord_maestria')}
+                  className="btn-primary" 
+                  style={{ marginTop: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', background: 'rgba(168, 85, 247, 0.15)', color: '#a855f7', border: '1px solid #a855f7', borderRadius: '8px' }}
+                >
+                  <Activity size={16} /> Checklist Maestría
+                </button>
               </div>
 
               <div style={{ padding: '1.5rem', background: 'var(--bg-card)', borderRadius: '12px', border: '1px solid var(--border-subtle)' }}>

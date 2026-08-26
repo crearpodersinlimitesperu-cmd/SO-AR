@@ -12,13 +12,25 @@ export async function getVerifiedUser(email) {
   const normalizedEmail = email.trim().toLowerCase();
 
   try {
-    const q = query(collection(db, 'users'), where('email', '==', normalizedEmail));
-    const snapshot = await getDocs(q);
+    const q1 = query(collection(db, 'users'), where('email', '==', normalizedEmail));
+    const q2 = query(collection(db, 'users'), where('emails', 'array-contains', normalizedEmail));
     
-    if (!snapshot.empty) {
-      const userDoc = snapshot.docs[0].data();
+    const [snapshot1, snapshot2] = await Promise.all([getDocs(q1), getDocs(q2)]);
+    
+    if (!snapshot1.empty) {
+      const userDoc = snapshot1.docs[0].data();
       return {
         ...userDoc,
+        email: userDoc.email || normalizedEmail,
+        appRole: normalizeRole(userDoc.role)
+      };
+    }
+
+    if (!snapshot2.empty) {
+      const userDoc = snapshot2.docs[0].data();
+      return {
+        ...userDoc,
+        email: userDoc.email || normalizedEmail,
         appRole: normalizeRole(userDoc.role)
       };
     }
@@ -50,11 +62,10 @@ export async function getAllCompanyUsers() {
     usersSnap.forEach(doc => allUsers.push({ id: doc.id, ...doc.data() }));
 
     // Opcional: Agregar QT si se manejan aparte, o si ya están en "users", esto se puede omitir.
-    // Lo mantenemos por si la migración de QT los puso sólo en qt_directory
     const qtSnap = await getDocs(collection(db, 'qt_directory'));
     qtSnap.forEach(doc => {
-      // Evitar duplicados si QT ya está en users
-      if (!allUsers.find(u => u.email === doc.data().email)) {
+      const docEmail = doc.data().email || (doc.data().emails && doc.data().emails[0]);
+      if (docEmail && !allUsers.find(u => (u.email === docEmail) || (u.emails && u.emails.includes(docEmail)))) {
         allUsers.push({ id: doc.id, ...doc.data() });
       }
     });
@@ -62,5 +73,14 @@ export async function getAllCompanyUsers() {
   } catch (error) {
     console.error("Error fetching company users:", error);
   }
+
+  // Merge fallback con registro estático local para usuarios que aún no están en Firestore
+  usersData.forEach(localUser => {
+    const localEmail = localUser.email;
+    if (localEmail && !allUsers.find(u => (u.email === localEmail) || (u.emails && u.emails.includes(localEmail)))) {
+      allUsers.push({ ...localUser, id: localUser.id || localUser.email, source: 'local_registry' });
+    }
+  });
+
   return allUsers;
 }

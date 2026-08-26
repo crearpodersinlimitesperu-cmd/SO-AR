@@ -18,6 +18,7 @@ import { calculateAutomaticDeadline } from '../utils/soarDates';
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
 import VenueConfigModal from '../components/VenueConfigModal';
 import ViewModeSelector from '../components/ViewModeSelector';
+import ThemeToggle from '../components/ThemeToggle';
 import { getVenueForTraining } from '../data/venuesData';
 import { ROLE_DISPLAY_NAMES } from '../data/usersData';
 import { canAssignTrainer } from '../config/permissions';
@@ -251,10 +252,16 @@ export default function Home() {
         {/* CONTROLES SUPERIORES Y SELECTOR DE VISTA */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.8rem' }}>
           
-          {/* SELECTOR DE MODO DE VISTA (LITE / COMPACTO / PRO) */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '600' }}>Vista:</span>
-            <ViewModeSelector />
+          {/* SELECTOR DE MODO DE VISTA Y TEMA */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '600' }}>Tema:</span>
+              <ThemeToggle />
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '600' }}>Vista:</span>
+              <ViewModeSelector />
+            </div>
           </div>
 
           <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
