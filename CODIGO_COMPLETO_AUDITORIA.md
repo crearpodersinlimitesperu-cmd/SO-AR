@@ -427,6 +427,29 @@ Este documento contiene el código fuente completo para duplicar y maximizar la 
 
 ---
 
+## Archivo: drive_folder_scan.json
+
+```json
+{
+  "title": "Google Drive: Acceso",
+  "files": {
+    "title": "Google Drive: Acceso",
+    "sampleTexts": [
+      "Correo electrónico o teléfono",
+      "¿Olvidaste el correo electrónico?",
+      "Más información para usar el modo de invitado",
+      "Siguiente",
+      "Crear cuenta",
+      "Ayuda",
+      "Privacidad",
+      "Condiciones"
+    ]
+  }
+}
+```
+
+---
+
 ## Archivo: dump_firebase.js
 
 ```js
