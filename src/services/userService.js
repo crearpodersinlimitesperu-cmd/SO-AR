@@ -34,6 +34,19 @@ export async function getVerifiedUser(email) {
         appRole: normalizeRole(userDoc.role)
       };
     }
+
+    // Check qt_directory if not found in users
+    const qtQ = query(collection(db, 'qt_directory'), where('email', '==', normalizedEmail));
+    const qtSnapshot = await getDocs(qtQ);
+    if (!qtSnapshot.empty) {
+      const qtDoc = qtSnapshot.docs[0].data();
+      return {
+        ...qtDoc,
+        email: qtDoc.email || normalizedEmail,
+        role: qtDoc.role || 'qt',
+        appRole: normalizeRole(qtDoc.role || 'qt')
+      };
+    }
   } catch (error) {
     console.warn("Firestore directory query fallback to local registry:", error.message);
   }
@@ -66,7 +79,12 @@ export async function getAllCompanyUsers() {
     qtSnap.forEach(doc => {
       const docEmail = doc.data().email || (doc.data().emails && doc.data().emails[0]);
       if (docEmail && !allUsers.find(u => (u.email === docEmail) || (u.emails && u.emails.includes(docEmail)))) {
-        allUsers.push({ id: doc.id, ...doc.data() });
+        const qtData = doc.data();
+        allUsers.push({ 
+          id: doc.id, 
+          ...qtData,
+          role: qtData.role || 'qt' 
+        });
       }
     });
     

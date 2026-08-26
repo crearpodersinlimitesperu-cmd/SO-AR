@@ -35,6 +35,7 @@ const ROLE_LABELS = {
   talento_humano: 'Talento Humano',
   legal: 'Legal / Jurídico',
   técnico_sst: 'Seguridad y Salud (SST)',
+  participante: 'Participantes',
 };
 
 const ROLE_COLORS = {
@@ -54,7 +55,8 @@ const ROLE_COLORS = {
   asistente_impuestos_quito: '#64748b',
   talento_humano: '#06b6d4',
   legal: '#a855f7',
-  técnico_sst: '#14b8a6'
+  técnico_sst: '#14b8a6',
+  participante: '#9ca3af'
 };
 
 const ALL_SEDES = [...OPERATIONAL_SEDES, 'Sede Global'];
@@ -271,7 +273,7 @@ function SedeBlock({ sede, tasks, navigate, onSelectUser, onAssignTask, currentU
   });
 
   const sedePct = totalSedeTasks > 0 ? Math.round((totalSedeCompleted / totalSedeTasks) * 100) : 0;
-  const groupedMembers = members.reduce((acc, m) => { const k = m.role || 'otro'; if (!acc[k]) acc[k] = []; acc[k].push(m); return acc; }, {});
+  const groupedMembers = members.reduce((acc, m) => { const k = normalizeRole(m.role || 'otro'); if (!acc[k]) acc[k] = []; acc[k].push(m); return acc; }, {});
   return (
     <div className="glass-panel" style={{ padding: '1.5rem', border: '1px solid var(--border-subtle)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} onClick={() => setExpanded(!expanded)}>
@@ -583,6 +585,7 @@ function RoleView({ tasks, navigate, onSelectUser, onAssignTask, userConnections
     { id: 'talento_humano', label: 'Talento Humano' },
     { id: 'legal', label: 'Legal / Jurídico' },
     { id: 'técnico_sst', label: 'Seguridad y Salud (SST)' },
+    { id: 'participante', label: 'Participantes' },
   ];
 
   const listedRoleIds = new Set(roles.map(r => r.id));
@@ -665,8 +668,7 @@ export default function SuperAdminPanel() {
     async function fetchUsers() {
       try {
         const users = await getAllCompanyUsers();
-        const validUsers = users.filter(u => normalizeRole(u.role) !== null);
-        if (isMounted) setRealUsersData(validUsers);
+        if (isMounted) setRealUsersData(users);
       } catch (err) {
         console.error("Error cargando usuarios:", err);
       } finally {
