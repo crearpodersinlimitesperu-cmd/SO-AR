@@ -1,0 +1,650 @@
+[
+  {
+    "email": "Sin correo",
+    "nombre": "Adrianna Michelle Guarochico Usuño",
+    "rol": "coord_c1",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Joao Alfonso Trujillo",
+    "rol": "coord_c1",
+    "sede": "Cuenca"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Andres Gomez",
+    "rol": "coord_maestria",
+    "sede": "Sede Global"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Deysi Fernanda Sangoquiza Chiluisa",
+    "rol": "asistente impuestos quito",
+    "sede": "Sede Global"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Alexis Patricio Terán Sánchez",
+    "rol": "asistente facturación",
+    "sede": "Sede Global"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Brenda Vanessa Rodríguez Pérez",
+    "rol": "coord_c1",
+    "sede": "Guayaquil"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Nancy Elizabeth Escobar Pérez",
+    "rol": "jefa financiera",
+    "sede": "Sede Global"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Gabriela de Jesús Rivadeneyra Gaitán",
+    "rol": "contador lima",
+    "sede": "Sede Global"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Héctor Antonio Gonzáles Franco",
+    "rol": "contador medellín",
+    "sede": "Sede Global"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Karol Fernanda Villarruel Yánez",
+    "rol": "coordinadora administrativa",
+    "sede": "Sede Global"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Daniela Esposito Farfán",
+    "rol": "coord_c1",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Daniela Monroy Fabbri",
+    "rol": "coord_maestria",
+    "sede": "México"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Danna Alejandra Guaman Rodríguez",
+    "rol": "coord_c1",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "David Gonzalez Franco",
+    "rol": "coord_c1",
+    "sede": "Medellín"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Diana Carlota Macas Macas",
+    "rol": "coord_c1",
+    "sede": "Guayaquil"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Diana Moscoso",
+    "rol": "coord_c1",
+    "sede": "Lima"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Diego Gustavo Flores Chávez",
+    "rol": "asistente facturación",
+    "sede": "Sede Global"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Emely Juliett León Chavez",
+    "rol": "gerente",
+    "sede": "Cuenca"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Emily Gabriela Campuzano Rodríguez",
+    "rol": "gerente",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Erika Gissell Gavilánez Gallardo",
+    "rol": "coord_maestria",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Evelyn Paulina Cedillo",
+    "rol": "coord_c1",
+    "sede": "Cuenca"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Francisco Sebastián Jácome Escobar",
+    "rol": "facturación",
+    "sede": "Sede Global"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Fer Aragon",
+    "rol": "direccion",
+    "sede": "Sede Global"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Freddy David Sosa Carrera",
+    "rol": "gerente",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "jose.sanchez@crearpsl.net",
+    "nombre": "José Luis Sánchez Moreno",
+    "rol": "gerente",
+    "sede": "Lima"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Isaac Gabriel Betancourt Patiño",
+    "rol": "coord_maestria",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Jonathan Alexander La Rosa Nieto",
+    "rol": "coord_maestria",
+    "sede": "Guayaquil"
+  },
+  {
+    "email": "jose.sanchez@crearpsl.net",
+    "nombre": "José Luis Sánchez Moreno",
+    "rol": "gerente",
+    "sede": "Lima"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "José Sánchez",
+    "rol": "direccion",
+    "sede": "Sede Global"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Marcos Josué Vera Avilés",
+    "rol": "gerente",
+    "sede": "Guayaquil"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Joyce Marin",
+    "rol": "coord_c1",
+    "sede": "Lima"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Juan Fernando Reinoso",
+    "rol": "coord_maestria",
+    "sede": "Cuenca"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Judith Regina Romero Rosales",
+    "rol": "coord_maestria",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Karla Viviana Pastrano Villegas",
+    "rol": "coord_c1",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Kerly Carrillo Garzon",
+    "rol": "coord_maestria",
+    "sede": "Cuenca"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Katherine Marcela Aguirre Parra",
+    "rol": "coord_c1",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Leandro Brunis",
+    "rol": "direccion",
+    "sede": "Sede Global"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Pablo Francisco Mendieta",
+    "rol": "legal",
+    "sede": "Sede Global"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Leyla Pasquel",
+    "rol": "coord_maestria",
+    "sede": "Lima"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Liliana Lilibeth Cubillo Vera",
+    "rol": "coord_maestria",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Linid Valencia",
+    "rol": "coord_maestria",
+    "sede": "Lima"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Marco Jesús González Caguado",
+    "rol": "coord_c1",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Mauricio Ramirez Silva",
+    "rol": "coord_maestria",
+    "sede": "Medellín"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Naomi Campos Soriano",
+    "rol": "coord_c1",
+    "sede": "México"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Nora Zamora Benítez",
+    "rol": "gerente",
+    "sede": "México"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Paul Sosa",
+    "rol": "direccion",
+    "sede": "Sede Global"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Alejandra Aracely Muñoz Contreras",
+    "rol": "qt",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Alejandra Aracely Muñoz Contreras",
+    "rol": "qt",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Anahi Alejandra Reyes Pazmiño",
+    "rol": "qt",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Anahi Alejandra Reyes Pazmiño",
+    "rol": "qt",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Andrea del Rocío Medina Coronel",
+    "rol": "qt",
+    "sede": "Cuenca"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Andrea del Rocío Medina Coronel",
+    "rol": "qt",
+    "sede": "Cuenca"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Belén Madeline García Valarezo",
+    "rol": "qt",
+    "sede": "Guayaquil"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Belén Madeline García Valarezo",
+    "rol": "qt",
+    "sede": "Guayaquil"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Daniel Vinicio Escobar Beltrán",
+    "rol": "qt",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Daniel Vinicio Escobar Beltrán",
+    "rol": "qt",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Dayana Nayeli Zambrano Andrade",
+    "rol": "qt",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "DELGADO ORTEGA DARKWIN GUSTAVO",
+    "rol": "qt",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Diego David Bravo Figueroa",
+    "rol": "qt",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Edison Ricardo Gavilánez Gallardo",
+    "rol": "qt",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Edison Ricardo Gavilánez Gallardo",
+    "rol": "qt",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Fernanda Michelle Pereira Armijos",
+    "rol": "qt",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Gabriela Lucía Altuna Alvarez",
+    "rol": "qt",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Gabriela Lucía Altuna Alvarez",
+    "rol": "qt",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Gabriela Verónica Román Barragán",
+    "rol": "qt",
+    "sede": "Guayaquil"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Gabriela Verónica Román Barragán",
+    "rol": "qt",
+    "sede": "Guayaquil"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Geovanna Katherine Amores López",
+    "rol": "qt",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Geovanna Katherine Amores López",
+    "rol": "qt",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Haydin Fernando Mendoza Clavijo",
+    "rol": "qt",
+    "sede": "Guayaquil"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Jennifer Katherine Pereira Armijos",
+    "rol": "qt",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Johanna Alexandra Herrera Vaca",
+    "rol": "qt",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Jorge Washington Ramírez Morejón",
+    "rol": "qt",
+    "sede": "Guayaquil"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Jorge Washington Ramírez Morejón",
+    "rol": "qt",
+    "sede": "Guayaquil"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Josseth Gabriela Espín Quezada",
+    "rol": "qt",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Josseth Gabriela Espín Quezada",
+    "rol": "qt",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "JUAN DIEGO JARA ROMEO",
+    "rol": "qt",
+    "sede": "Cuenca"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Ledis Yuliet Daza",
+    "rol": "qt",
+    "sede": "Medellín"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Leyla Kelly Pasquel Alfaro",
+    "rol": "qt",
+    "sede": "Lima"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Lizardo Zárate Peña",
+    "rol": "qt",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Lizardo Zárate Peña",
+    "rol": "qt",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Luis Javier Pruna Vásquez",
+    "rol": "qt",
+    "sede": "Guayaquil"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Mabel Marlene Robbys Ruiz",
+    "rol": "qt",
+    "sede": "Guayaquil"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "María Magaly Mendoza Zambrano",
+    "rol": "qt",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Maria Fernanda Flores Navarrete",
+    "rol": "qt",
+    "sede": "Guayaquil"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "María Magaly Mendoza Zambrano",
+    "rol": "qt",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Mariela Lorena Guerrero Aviles",
+    "rol": "qt",
+    "sede": "Guayaquil"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Mariela Ninoska Lopez De La Torre",
+    "rol": "qt",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Marjorie Ximena Martínez Guerrero",
+    "rol": "qt",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Marjorie Ximena Martínez Guerrero",
+    "rol": "qt",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Marta Lucía Londoño Areiza",
+    "rol": "qt",
+    "sede": "México"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Marta Lucía Londoño Areiza",
+    "rol": "qt",
+    "sede": "Medellín"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Mayra Alexandra Vivas Andrade",
+    "rol": "qt",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Myriam Pamela Tixi Quille",
+    "rol": "qt",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Pamela Dayana Villa Rodriguez",
+    "rol": "qt",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Rosmery Ochoa Ferrer",
+    "rol": "qt",
+    "sede": "Lima"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Santiago Alfonso Alarcón Suárez",
+    "rol": "qt",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Santiago Alfonso Alarcón Suárez",
+    "rol": "qt",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Sebastián Alexander Ulloa Romero",
+    "rol": "qt",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Sebastián Alexander Ulloa Romero",
+    "rol": "qt",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Vanessa Del Cisne Romero Rosales",
+    "rol": "qt",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Williams James Sánchez Trujillo",
+    "rol": "qt",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Williams James Sánchez Trujillo",
+    "rol": "qt",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Wilson Xavier Vallejo Flores",
+    "rol": "qt",
+    "sede": "Guayaquil"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Santiago Proaño",
+    "rol": "técnico sst",
+    "sede": "Quito Ciclo 1"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Lennin Fernando Chasi Lima",
+    "rol": "talento humano",
+    "sede": "Sede Global"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Valentina Rodriguez Castaño",
+    "rol": "coord_c1",
+    "sede": "Medellín"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Viviana Maribel Catota Yugsi",
+    "rol": "coord_c1",
+    "sede": "Cuenca"
+  },
+  {
+    "email": "Sin correo",
+    "nombre": "Yurany Gonzalez Franco",
+    "rol": "gerente",
+    "sede": "Medellín"
+  }
+]

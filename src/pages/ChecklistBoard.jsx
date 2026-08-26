@@ -58,6 +58,8 @@ export default function ChecklistBoard() {
   // Las tareas mías incluyen: rol directo, asignadas a mi correo O donde soy colaborador aceptado
 
   const myTasks = tasks.filter(t => {
+    if (roleId === 'consolidado') return true;
+
     const userEmailCom = currentUser?.email?.replace('@crearpsl.net', '@crearpsl.com')?.toLowerCase();
     const userEmailNet = currentUser?.email?.replace('@crearpsl.com', '@crearpsl.net')?.toLowerCase();
     

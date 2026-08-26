@@ -58,7 +58,7 @@ export default function GerenteDashboard() {
   const nextTraining = currentIndex !== -1 && currentIndex < cycleFlow.length - 1 ? cycleFlow[currentIndex + 1] : 'Próximo Ciclo';
 
   const isTaskVisibleToMe = (t) => {
-    if (currentUser?.isSuperAdmin) return true;
+    if (currentUser?.isSuperAdmin || currentUser?.appRole === 'consolidado') return true;
     if (t.assignedToEmail) {
       const isManagerRole = r => r === 'gerente' || r === 'director_maestria' || r === 'direccion';
       if (isManagerRole(currentUser?.appRole) && isManagerRole(normalizeRole(t.role))) {

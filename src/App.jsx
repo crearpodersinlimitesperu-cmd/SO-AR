@@ -14,6 +14,7 @@ import GoalsBoard from './pages/GoalsBoard'
 import ReportesBoard from './pages/ReportesBoard'
 import SuperAdminPanel from './pages/SuperAdminPanel'
 import ManualGuia from './pages/ManualGuia'
+import ManualNodus from './pages/ManualNodus'
 import MisKPIs from './pages/MisKPIs'
 import AuditoriaKPIs from './pages/AuditoriaKPIs'
 import CentroManagers from './pages/CentroManagers'
@@ -134,8 +135,14 @@ function App() {
           } />
 
           <Route path="/manual" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
               <ManualGuia />
+            </RoleRoute>
+          } />
+
+          <Route path="/manual-nodus" element={
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
+              <ManualNodus />
             </RoleRoute>
           } />
 
@@ -164,7 +171,7 @@ function App() {
           } />
           
           <Route path="/gerente" element={
-            <RoleRoute allowedRoles={['gerente', 'direccion', 'cfo', 'ceo', 'cco', 'superadmin']}>
+            <RoleRoute allowedRoles={['gerente', 'direccion', 'cfo', 'ceo', 'cco', 'superadmin', 'consolidado']}>
               <GerenteDashboard />
             </RoleRoute>
           } />
@@ -176,7 +183,7 @@ function App() {
           } />
 
           <Route path="/metas" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
               <GoalsBoard />
             </RoleRoute>
           } />
@@ -194,13 +201,13 @@ function App() {
           } />
 
           <Route path="/auditoria-kpis" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
               <AuditoriaKPIs />
             </RoleRoute>
           } />
 
           <Route path="/superadmin" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
               <SuperAdminPanel />
             </RoleRoute>
           } />
@@ -225,13 +232,13 @@ function App() {
 
           {/* PMO Culture Integrations */}
           <Route path="/portafolio" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
               <PortfolioBoard />
             </RoleRoute>
           } />
           
           <Route path="/estrategia" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
               <StrategyBoard />
             </RoleRoute>
           } />

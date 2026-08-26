@@ -1,0 +1,8 @@
+{
+  "sync_modules": [
+    "usuarios",
+    "participantes"
+  ],
+  "dry_run": true,
+  "confidence_threshold": 0.85
+}

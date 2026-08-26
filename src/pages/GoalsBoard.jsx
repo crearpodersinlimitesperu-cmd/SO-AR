@@ -77,8 +77,8 @@ export default function GoalsBoard() {
           return dateB - dateA;
         });
 
-        // Filtrar por sede si no es SuperAdmin ni Dirección
-        const isSuper = currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion' || currentUser?.isDireccion;
+        // Filtrar por sede si no es SuperAdmin ni Dirección ni Consolidado
+        const isSuper = currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'consolidado' || currentUser?.isDireccion;
         if (!isSuper && currentUser?.sede) {
           const mySedeNorm = normalizeSede(currentUser.sede);
           loadedGoals = loadedGoals.filter(g => !g.sede || normalizeSede(g.sede) === mySedeNorm || g.sede === 'Global');
