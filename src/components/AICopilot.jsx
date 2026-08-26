@@ -19,6 +19,88 @@ import { useAuth } from '../context/AuthContext';
 // Requiere VITE_COPILOTO_WORKER_URL en .env (URL del Worker ya desplegado —
 // no es secreta, es solo la dirección pública del backend).
 
+// Render de Markdown ligero para las respuestas del bot (agregado 23/08/2026:
+// el system prompt del Worker le pide al modelo usar **negritas** y listas
+// con "*", pero el chat las mostraba como texto plano con asteriscos — "modo
+// robot sin formato"). No se agregó ninguna librería nueva (react-markdown,
+// etc.) para no aumentar el tamaño del bundle — es un parser propio, chico,
+// que solo soporta lo que el bot realmente usa: párrafos, **negrita**, listas
+// con "*"/"-" y listas numeradas "1.". Los mensajes del usuario NO pasan por
+// esto (se muestran como texto plano tal cual los escribió).
+function renderInlineMarkdown(text, keyPrefix) {
+  const partes = text.split(/(\*\*[^*]+\*\*)/g);
+  return partes.map((parte, i) => {
+    if (parte.startsWith('**') && parte.endsWith('**') && parte.length > 4) {
+      return <strong key={`${keyPrefix}-b-${i}`}>{parte.slice(2, -2)}</strong>;
+    }
+    return parte ? <React.Fragment key={`${keyPrefix}-t-${i}`}>{parte}</React.Fragment> : null;
+  });
+}
+
+function renderMarkdown(texto) {
+  if (!texto) return null;
+  const lineas = texto.split('\n');
+  const bloques = [];
+  let listaActual = null; // { tipo: 'ul' | 'ol', items: [] }
+  let parrafoActual = [];
+
+  const cerrarParrafo = () => {
+    if (parrafoActual.length) {
+      bloques.push({ tipo: 'p', texto: parrafoActual.join(' ') });
+      parrafoActual = [];
+    }
+  };
+  const cerrarLista = () => {
+    if (listaActual) {
+      bloques.push(listaActual);
+      listaActual = null;
+    }
+  };
+
+  for (const linea of lineas) {
+    const l = linea.trim();
+    if (l === '') {
+      cerrarParrafo();
+      cerrarLista();
+      continue;
+    }
+    const bullet = l.match(/^[*-]\s+(.*)/);
+    const numerada = l.match(/^\d+[.)]\s+(.*)/);
+    if (bullet) {
+      cerrarParrafo();
+      if (!listaActual || listaActual.tipo !== 'ul') { cerrarLista(); listaActual = { tipo: 'ul', items: [] }; }
+      listaActual.items.push(bullet[1]);
+    } else if (numerada) {
+      cerrarParrafo();
+      if (!listaActual || listaActual.tipo !== 'ol') { cerrarLista(); listaActual = { tipo: 'ol', items: [] }; }
+      listaActual.items.push(numerada[1]);
+    } else {
+      cerrarLista();
+      parrafoActual.push(l);
+    }
+  }
+  cerrarParrafo();
+  cerrarLista();
+
+  return bloques.map((bloque, idx) => {
+    if (bloque.tipo === 'p') {
+      return (
+        <p key={idx} style={{ margin: idx === 0 ? '0' : '0.6rem 0 0 0' }}>
+          {renderInlineMarkdown(bloque.texto, idx)}
+        </p>
+      );
+    }
+    const Tag = bloque.tipo;
+    return (
+      <Tag key={idx} style={{ margin: '0.4rem 0', paddingLeft: '1.2rem' }}>
+        {bloque.items.map((item, i) => (
+          <li key={i} style={{ marginBottom: '0.25rem' }}>{renderInlineMarkdown(item, `${idx}-${i}`)}</li>
+        ))}
+      </Tag>
+    );
+  });
+}
+
 export default function AICopilot() {
   const { currentUser } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
@@ -321,7 +403,7 @@ export default function AICopilot() {
                   boxShadow: '0 2px 5px rgba(0,0,0,0.05)'
                 }}>
                   {msg.role === 'assistant' && <Sparkles size={16} color={colors.secondary} style={{ marginBottom: '0.3rem', display: 'inline-block', marginRight: '0.4rem' }} />}
-                  {msg.content}
+                  {msg.role === 'assistant' ? renderMarkdown(msg.content) : msg.content}
                 </div>
               </div>
             ))}

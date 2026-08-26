@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { db, auth } from '../services/firebase';
-import { collection, onSnapshot, doc, updateDoc, writeBatch } from 'firebase/firestore';
+import { collection, onSnapshot, doc, updateDoc, writeBatch, addDoc, query, where, orderBy, limit, getDocs, getDoc } from 'firebase/firestore';
 import { checklistData } from '../data/checklistData';
 import { usersData, normalizeRole } from '../data/usersData';
 import { isSuperAdminEmail, isGerenciaRole } from '../config/permissions';
@@ -176,6 +176,64 @@ export function ChecklistProvider({ children }) {
     }
   };
 
+  const editCustomTask = async (taskId, updatedData) => {
+    try {
+      const taskRef = doc(db, 'tasks', taskId);
+      const taskSnap = await getDoc(taskRef);
+      if (!taskSnap.exists()) return false;
+      const currentTask = taskSnap.data();
+
+      const batch = writeBatch(db);
+      batch.update(taskRef, updatedData);
+
+      // Calcular nuevos asignados (anti-spam)
+      const oldEmails = currentTask.assignedToEmails || (currentTask.assignedToEmail ? [currentTask.assignedToEmail] : []);
+      const newEmails = updatedData.assignedToEmails || (updatedData.assignedToEmail ? [updatedData.assignedToEmail] : []);
+      
+      const newlyAddedEmails = newEmails.filter(email => !oldEmails.includes(email));
+
+      if (newlyAddedEmails.length > 0) {
+        newlyAddedEmails.forEach(email => {
+          // 1. Notificación In-App
+          const notifRef = doc(collection(db, 'notifications'));
+          batch.set(notifRef, {
+            userId: email,
+            title: updatedData.task || currentTask.task,
+            message: `Se te ha asignado una tarea en la sede ${updatedData.assignedSede || currentTask.assignedSede || 'Global'}.`,
+            read: false,
+            taskId: taskId,
+            created_at: new Date().toISOString()
+          });
+
+          // 2. Notificación por Correo
+          const mailRef = doc(collection(db, 'mail'));
+          batch.set(mailRef, {
+            to: [email],
+            message: {
+              subject: `NUEVA TAREA ASIGNADA SO-AR: ${updatedData.task || currentTask.task}`,
+              html: `
+                <h2>Hola, se te ha asignado una tarea en el SO-AR</h2>
+                <p><strong>Tarea:</strong> ${updatedData.task || currentTask.task}</p>
+                <p><strong>Sede:</strong> ${updatedData.assignedSede || currentTask.assignedSede || 'Global'}</p>
+                <p><strong>Prioridad:</strong> ${updatedData.priority || currentTask.priority || 'Normal'}</p>
+                <p>Por favor, ingresa a la plataforma para revisarla.</p>
+                <br/>
+                <p><em>Equipo CREAR Poder Sin Límites</em></p>
+              `
+            }
+          });
+        });
+      }
+
+      await batch.commit();
+      return true;
+    } catch (error) {
+      console.error("Error editing custom task:", error);
+      showToast("No se pudo editar la tarea.", "error");
+      return false;
+    }
+  };
+
   const submitEvidence = async (taskId, evidenceUrl) => {
     try {
       const taskRef = doc(db, 'tasks', taskId);
@@ -303,6 +361,35 @@ export function ChecklistProvider({ children }) {
     }
 
     showToast(`¡Se sincronizaron ${successCount} tareas a tu cuenta de Google Tasks exitosamente!`, "success");
+    
+    // Guardar en el historial de sincronización
+    try {
+      await addDoc(collection(db, 'sync_history'), {
+        userEmail: currentUser?.email || 'Desconocido',
+        timestamp: new Date().toISOString(),
+        status: successCount > 0 ? 'Éxito' : 'Info',
+        details: successCount > 0 ? `Sincronizadas ${successCount} tareas.` : 'No hubo tareas nuevas por sincronizar.',
+        roleId: roleId
+      });
+    } catch (e) {
+      console.error("Error guardando historial de sync:", e);
+    }
+  };
+
+  const fetchSyncHistory = async (userEmail) => {
+    try {
+      const q = query(
+        collection(db, 'sync_history'),
+        where("userEmail", "==", userEmail),
+        orderBy("timestamp", "desc"),
+        limit(20)
+      );
+      const snap = await getDocs(q);
+      return snap.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+    } catch (e) {
+      console.error("Error fetching sync history:", e);
+      return [];
+    }
   };
 
   // 1. Enviar invitación de colaboración / mención
@@ -441,13 +528,15 @@ export function ChecklistProvider({ children }) {
     <ChecklistContext.Provider value={{ 
       tasks, 
       toggleTask, 
-      updateTaskDetails, 
+      updateTaskDetails,
+      editCustomTask, 
       submitEvidence, 
       getProgressByRole, 
       loading, 
       initializeFirestore, 
       addCustomTask, 
       syncTasksToGoogle,
+      fetchSyncHistory,
       inviteCollaborator,
       acceptCollaboration,
       rejectCollaboration

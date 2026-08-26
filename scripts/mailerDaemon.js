@@ -22,16 +22,16 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 // --- 2. CONFIGURACIÓN DE GMAIL (NODEMAILER) ---
-if (!process.env.GMAIL_USER || !process.env.GMAIL_PASS) {
-  console.error("❌ Faltan credenciales de Gmail (GMAIL_USER o GMAIL_PASS). El daemon no puede iniciar.");
+if (!process.env.GMAIL_SERVER_EMAIL || !process.env.GMAIL_SERVER_APP_PASSWORD) {
+  console.error("❌ Faltan credenciales de Gmail (GMAIL_SERVER_EMAIL o GMAIL_SERVER_APP_PASSWORD). El daemon no puede iniciar.");
   process.exit(1);
 }
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_PASS
+    user: process.env.GMAIL_SERVER_EMAIL,
+    pass: process.env.GMAIL_SERVER_APP_PASSWORD
   }
 });
 
@@ -83,7 +83,7 @@ async function processMailDoc(docSnap) {
   });
 
   const mailOptions = {
-    from: `"CREAR Poder Sin Límites" <${process.env.GMAIL_USER}>`,
+    from: `"CREAR Poder Sin Límites" <${process.env.GMAIL_SERVER_EMAIL}>`,
     to: data.to,
     subject: data.message?.subject || 'Notificación SO-AR — CREAR Poder Sin Límites',
     html: cleanHtml
@@ -135,9 +135,10 @@ async function checkInactivity() {
     
     for (const docSnap of profilesSnap.docs) {
       const data = docSnap.data();
+      const email = data.email || docSnap.id;
+
       if (!data.lastLoginAt) continue;
 
-      const email = docSnap.id;
       const lastLoginDate = data.lastLoginAt.toDate ? data.lastLoginAt.toDate() : new Date(data.lastLoginAt);
       const hoursSinceLogin = (now - lastLoginDate) / (1000 * 60 * 60);
 

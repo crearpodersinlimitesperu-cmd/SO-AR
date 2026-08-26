@@ -6,9 +6,9 @@ import { getAssignableRoles } from '../config/permissions';
 import { usersData, normalizeRole, OPERATIONAL_SEDES, getRoleDisplayName } from '../data/usersData';
 import { recordAuditEvent } from '../services/auditService';
 
-export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = null }) {
+export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = null, taskToEdit = null }) {
   const { currentUser } = useAuth();
-  const { addCustomTask } = useChecklist();
+  const { addCustomTask, editCustomTask } = useChecklist();
 
   const getTodayStr = () => new Date().toISOString().split('T')[0];
   const getTomorrowStr = () => {
@@ -34,7 +34,28 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
 
   useEffect(() => {
     if (isOpen) {
-      if (prefilledUser) {
+      if (taskToEdit) {
+        let dDate = getTodayStr();
+        let dTime = '18:00';
+        if (taskToEdit.deadline) {
+          try {
+            const dt = new Date(taskToEdit.deadline);
+            if (!isNaN(dt.getTime())) {
+              dDate = dt.toISOString().split('T')[0];
+              dTime = dt.toTimeString().substring(0, 5);
+            }
+          } catch(e){}
+        }
+        setNewTask({
+          title: taskToEdit.task || taskToEdit.title || '',
+          role: normalizeRole(taskToEdit.role) || taskToEdit.role || currentUser?.appRole || 'gerente',
+          deadlineDate: dDate,
+          deadlineTime: dTime,
+          assignedToEmails: taskToEdit.assignedToEmails || (taskToEdit.assignedToEmail ? [taskToEdit.assignedToEmail] : []),
+          assignedSede: taskToEdit.assignedSede || taskToEdit.sede || '',
+          priority: taskToEdit.priority || '🟡 AMARILLO'
+        });
+      } else if (prefilledUser) {
         setNewTask({
           title: '',
           role: normalizeRole(prefilledUser.role) || prefilledUser.role || currentUser?.appRole || 'gerente',
@@ -53,7 +74,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
         }));
       }
     }
-  }, [isOpen, prefilledUser, currentUser]);
+  }, [isOpen, prefilledUser, taskToEdit, currentUser]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -64,6 +85,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
     if (!newTask.title.trim()) return;
     setIsSubmitting(true);
     
@@ -83,14 +105,20 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
       assignedSede: canAssignSpecific ? (newTask.assignedSede || currentUser?.sede || 'Global') : (prefilledUser?.sede || currentUser?.sede || 'Global')
     };
 
-    const success = await addCustomTask(taskData);
+    let success = false;
+    if (taskToEdit) {
+      success = await editCustomTask(taskToEdit.id, taskData);
+    } else {
+      success = await addCustomTask(taskData);
+    }
     
     if (success) {
       try {
         await recordAuditEvent({
-          action: 'NUEVA_TAREA_CREADA',
+          action: taskToEdit ? 'TAREA_EDITADA' : 'NUEVA_TAREA_CREADA',
           user: currentUser,
           details: {
+            taskId: taskToEdit ? taskToEdit.id : null,
             taskTitle: newTask.title.trim(),
             assignedRole: finalRole,
             assignedEmails: taskData.assignedToEmails,
@@ -134,7 +162,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
         </button>
 
         <h3 className="text-gold" style={{ marginTop: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <Target size={20} /> {prefilledUser ? `Asignar Tarea a ${prefilledUser.name}` : 'Crear / Asignar Tarea'}
+          <Target size={20} /> {taskToEdit ? 'Editar Tarea' : (prefilledUser ? `Asignar Tarea a ${prefilledUser.name}` : 'Crear / Asignar Tarea')}
         </h3>
         
         <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '1rem' }}>
@@ -205,7 +233,32 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
             {canAssignSpecific && (
               <>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.75rem', color: 'var(--crear-cyan)', marginBottom: '0.3rem' }}>Asignar a Colaborador(es) (Ctrl/Cmd + Click para varios):</label>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
+                    <label style={{ fontSize: '0.75rem', color: 'var(--crear-cyan)', margin: 0 }}>Asignar a Colaborador(es) (Ctrl/Cmd + Click para varios):</label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setNewTask(prev => ({
+                          ...prev,
+                          role: currentUser?.appRole || 'gerente',
+                          assignedToEmails: [currentUser?.email],
+                          assignedSede: currentUser?.sede || ''
+                        }));
+                      }}
+                      style={{
+                        background: 'rgba(56, 189, 248, 0.1)',
+                        border: '1px solid var(--crear-cyan)',
+                        borderRadius: '4px',
+                        padding: '2px 8px',
+                        fontSize: '0.7rem',
+                        color: 'var(--crear-cyan)',
+                        cursor: 'pointer',
+                        fontWeight: 'bold'
+                      }}
+                    >
+                      🙋‍♂️ Asignarme a mí
+                    </button>
+                  </div>
                   <select 
                     multiple
                     value={newTask.assignedToEmails || []} 
@@ -313,7 +366,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1rem' }}>
             <button type="button" className="btn-secondary" onClick={onClose} disabled={isSubmitting}>Cancelar</button>
             <button type="submit" className="btn-primary" disabled={isSubmitting}>
-              {isSubmitting ? 'Guardando...' : '⚡ Guardar Tarea'}
+              {isSubmitting ? 'Guardando...' : (taskToEdit ? '💾 Guardar Cambios' : '⚡ Guardar Tarea')}
             </button>
           </div>
         </form>

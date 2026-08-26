@@ -450,21 +450,25 @@ export default function Home() {
       {/* BARRA PRO COMPLETA (SI ESTÁ EN MODO PRO) */}
       {viewMode === 'pro' && customModules.advancedTools !== false && (
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '1.5rem', padding: '0.75rem', background: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.06)' }}>
-          {(currentUser?.isGerente || currentUser?.isDireccion || currentUser?.isSuperAdmin) && (
+          {(currentUser?.isSuperAdmin || currentUser?.isGerente || currentUser?.isDireccion || currentUser?.appRole === 'director_maestria') && (
+            <button onClick={() => navigate('/gerente')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'var(--crear-gold)', color: 'black' }}>
+              💼 SO-AR Gerencial
+            </button>
+          )}
+          {(currentUser?.isSuperAdmin || currentUser?.isGerente || currentUser?.isDireccion || ['director_maestria', 'cfo'].includes(currentUser?.appRole)) && (
             <>
-              <button onClick={() => navigate('/gerente')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'var(--crear-gold)', color: 'black' }}>
-                💼 SO-AR Gerencial
-              </button>
               <button onClick={() => navigate('/portafolio')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #0ea5e9, #0369a1)', color: 'white', border: 'none' }}>
                 📈 Portafolio PMO
               </button>
               <button onClick={() => navigate('/estrategia')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #047857)', color: 'white', border: 'none' }}>
                 🎯 OKRs (Cascade)
               </button>
-              <button onClick={() => navigate('/auditoria-kpis')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'transparent', border: '1px solid #10b981', color: '#10b981' }}>
-                📉 Auditoría KPIs
-              </button>
             </>
+          )}
+          {(currentUser?.isSuperAdmin || currentUser?.isGerente || currentUser?.isDireccion || currentUser?.appRole === 'director_maestria') && (
+            <button onClick={() => navigate('/auditoria-kpis')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'transparent', border: '1px solid #10b981', color: '#10b981' }}>
+              📉 Auditoría KPIs
+            </button>
           )}
 
           {['coord_c1', 'coord_maestria', 'qt', 'capitan'].includes(currentUser?.appRole) && (
@@ -498,12 +502,12 @@ export default function Home() {
           )}
 
           {(currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.isGerente || ['coord_c1', 'coordinador_c1c2', 'coord_c2', 'coordinador', 'cc1y2', 'capitan', 'qt'].includes(currentUser?.appRole)) && (
-            <button onClick={() => window.open('https://cpsl-campus-interactivo.vercel.app/ruta', '_blank')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #059669)', color: 'white', border: 'none' }}>
+            <button onClick={() => window.open('https://cpsl-campus-interactivo.vercel.app/', '_blank')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #059669)', color: 'white', border: 'none' }}>
               🎓 Campus Interactivo
             </button>
           )}
 
-          {currentUser?.appRole !== 'qt' && (currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.isGerente || ['director_maestria', 'coordinador_mj', 'coord_maestria', 'finanzas', 'cfo'].includes(currentUser?.appRole)) && (
+          {currentUser?.appRole !== 'qt' && (currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.isGerente || ['director_maestria', 'coordinador_mj', 'coord_maestria', 'finanzas', 'cfo', 'entrenador', 'entrenador_llamadas'].includes(currentUser?.appRole)) && (
             <button onClick={() => navigate('/centro-managers')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#000', fontWeight: 'bold', border: 'none' }}>
               🎯 Centro Managers
             </button>

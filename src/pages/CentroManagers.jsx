@@ -25,6 +25,8 @@ import {
 } from '../data/managersData';
 import { OPERATIONAL_SEDES, normalizeRole, normalizeSede } from '../data/usersData';
 import { recordAuditEvent } from '../services/auditService';
+import { db } from '../services/firebase';
+import { collection, getDocs, doc, setDoc, updateDoc, deleteDoc, writeBatch, onSnapshot } from 'firebase/firestore';
 import CountryFlag from '../components/CountryFlag';
 import { 
   Users, PhoneCall, CheckCircle, XCircle, Calendar, Plus, PlusCircle,
@@ -112,32 +114,42 @@ export default function CentroManagers() {
   const [viewAsTrainer, setViewAsTrainer] = useState(isTrainerRole);
 
   // Estados de datos
-  const [managers, setManagers] = useState(() => {
-    try {
+  // Estados de datos
+  const [managers, setManagers] = useState([]);
+  const [llamadosData, setLlamadosData] = useState([]);
+  const [isLoadingData, setIsLoadingData] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, 'managers_directory'), (querySnapshot) => {
+      const firestoreManagers = [];
+      querySnapshot.forEach((doc) => {
+        firestoreManagers.push({ id: doc.id, ...doc.data() });
+      });
+
+      // Mapear y normalizar
+      const normalized = firestoreManagers.map(m => ({
+        ...m,
+        entrenador: normalizeTrainer(m.entrenador),
+        coordinador: normalizeCoordinator(m.coordinador),
+        sede: normalizeSede(m.sede)
+      }));
+      setManagers(normalized);
+      setIsLoadingData(false);
+    }, (error) => {
+      console.error("Error fetching managers from Firestore in real-time:", error);
+      // Fallback a localStorage si falla la conexión
       const saved = localStorage.getItem('cpsl_managers_data_v3');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length >= 50) {
-          return parsed.map(m => ({
-            ...m,
-            entrenador: normalizeTrainer(m.entrenador),
-            coordinador: normalizeCoordinator(m.coordinador),
-            sede: normalizeSede(m.sede)
-          }));
-        }
+        setManagers(parsed);
       }
-    } catch (e) {
-      console.error(e);
-    }
-    return INITIAL_MANAGERS.map(m => ({
-      ...m,
-      entrenador: normalizeTrainer(m.entrenador),
-      coordinador: normalizeCoordinator(m.coordinador),
-      sede: normalizeSede(m.sede)
-    }));
-  });
+      setIsLoadingData(false);
+    });
 
-  const [llamadosData, setLlamadosData] = useState(() => {
+    return () => unsubscribe();
+  }, []);
+
+  const [llamadosDataState, setLlamadosDataState] = useState(() => {
     try {
       const saved = localStorage.getItem('cpsl_llamados_data_v3');
       if (saved) return JSON.parse(saved);
@@ -148,8 +160,8 @@ export default function CentroManagers() {
   });
 
   useEffect(() => {
-    try { localStorage.setItem('cpsl_managers_data_v3', JSON.stringify(managers)); } catch (e) {}
-  }, [managers]);
+    setLlamadosData(llamadosDataState);
+  }, [llamadosDataState]);
 
   useEffect(() => {
     try { localStorage.setItem('cpsl_llamados_data_v3', JSON.stringify(llamadosData)); } catch (e) {}
@@ -161,16 +173,28 @@ export default function CentroManagers() {
   const [filterSede, setFilterSede] = useState('');
   const [statusFilter, setStatusFilter] = useState('Todos'); // 'Todos' | 'Activo' | 'Graduado' | 'Desertor'
 
+  // Estadísticas por Entrenador (Tab: Entrenadores)
+  const allTrainerNames = useMemo(() => {
+    const set = new Set(ENTRENADORES_LIST);
+    managers.forEach(m => {
+      if (m.entrenador && m.entrenador.trim() && m.entrenador !== 'Sin Asignar') {
+        parseTrainersList(m.entrenador).forEach(t => set.add(t));
+      }
+    });
+    return Array.from(set);
+  }, [managers]);
+
   // Determinar el entrenador actual para filtrado
   const currentTrainerName = useMemo(() => {
     if (!currentUser) return '';
-    const cleanUser = (currentUser.name || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
-    const match = ENTRENADORES_LIST.find(e => {
+    const userName = currentUser.name || currentUser.displayName || '';
+    const cleanUser = userName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+    const match = allTrainerNames.find(e => {
       const cleanE = e.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
       return cleanUser.includes(cleanE) || cleanE.includes(cleanUser);
     });
-    return match || currentUser.name;
-  }, [currentUser]);
+    return match || userName;
+  }, [currentUser, allTrainerNames]);
 
   const [filterEntrenador, setFilterEntrenador] = useState(viewAsTrainer ? currentTrainerName : '');
 
@@ -455,16 +479,7 @@ export default function CentroManagers() {
     return list;
   }, [managers, search]);
 
-  // Estadísticas por Entrenador (Tab: Entrenadores)
-  const allTrainerNames = useMemo(() => {
-    const set = new Set(ENTRENADORES_LIST);
-    managers.forEach(m => {
-      if (m.entrenador && m.entrenador.trim() && m.entrenador !== 'Sin Asignar') {
-        parseTrainersList(m.entrenador).forEach(t => set.add(t));
-      }
-    });
-    return Array.from(set);
-  }, [managers]);
+
 
   const trainersStats = useMemo(() => {
     let list = allTrainerNames.map(trainerName => {
@@ -525,16 +540,43 @@ export default function CentroManagers() {
     return { total, graduados, desertores, activos, pct };
   }, [managers, viewAsTrainer, canViewAll, canViewOwnSede, currentTrainerName, currentUser]);
 
-  const handleResetMasterData = () => {
-    if (window.confirm("¿Deseas restablecer la lista completa de managers originales desde la base maestra?")) {
-      setManagers(INITIAL_MANAGERS);
-      localStorage.setItem('cpsl_managers_data_v3', JSON.stringify(INITIAL_MANAGERS));
-      showToast('Datos maestros de managers restablecidos con éxito', 'success');
+  const handleResetMasterData = async () => {
+    if (window.confirm("¿Deseas restablecer la lista completa de managers originales desde la base maestra a LA NUBE? Esto sobreescribirá la base de datos.")) {
+      try {
+        showToast('Subiendo datos a la nube... por favor espera', 'info');
+        const batchArray = [];
+        batchArray.push(writeBatch(db));
+        let operationCounter = 0;
+        let batchIndex = 0;
+        
+        for (const m of INITIAL_MANAGERS) {
+          const docRef = doc(db, 'managers_directory', m.id.toString());
+          batchArray[batchIndex].set(docRef, m);
+          operationCounter++;
+          
+          if (operationCounter === 490) {
+            batchArray.push(writeBatch(db));
+            batchIndex++;
+            operationCounter = 0;
+          }
+        }
+        
+        for (const batch of batchArray) {
+          await batch.commit();
+        }
+        
+        setManagers(INITIAL_MANAGERS);
+        localStorage.removeItem('cpsl_managers_data_v3');
+        showToast('✅ Datos maestros subidos a Firebase con éxito', 'success');
+      } catch (error) {
+        console.error(error);
+        showToast('Error subiendo a Firebase', 'error');
+      }
     }
   };
 
   // Acciones
-  const handleUpdateManagerField = (id, field, value) => {
+  const handleUpdateManagerField = async (id, field, value) => {
     if (field === 'entrenador' && !userCanAssign) {
       showToast("Acceso restringido: Solo Fer, Paul y SuperAdmins pueden editar entrenadores.", "warning");
       return;
@@ -547,21 +589,51 @@ export default function CentroManagers() {
       : field === 'coordinador' ? normalizeCoordinator(value)
       : field === 'sede' ? normalizeSede(value)
       : value;
-    setManagers(prev => {
-      const updated = prev.map(m => m.id === id ? { ...m, [field]: finalValue } : m);
-      localStorage.setItem('cpsl_managers_data_v3', JSON.stringify(updated));
-      return updated;
-    });
-    showToast(`Actualizado: ${field}`, 'info');
+      
+    try {
+      const docRef = doc(db, 'managers_directory', id.toString());
+      await updateDoc(docRef, { [field]: finalValue });
+      
+      setManagers(prev => prev.map(m => m.id === id ? { ...m, [field]: finalValue } : m));
+      
+      const targetManager = managers.find(m => m.id === id);
+      const managerName = targetManager ? targetManager.nombre : id;
+
+      recordAuditEvent({
+        action: 'ACTUALIZAR_MANAGER',
+        user: currentUser?.email || currentUser?.name || 'Usuario',
+        details: `Se actualizó el campo "${field}" de ${managerName} a "${finalValue}"`
+      });
+
+      showToast(`Actualizado: ${field}`, 'info');
+    } catch (e) {
+      console.error(e);
+      showToast('Error al actualizar en la nube', 'error');
+    }
   };
 
-  const handleUpdateLlamada = (id, fecha, asistio) => {
-    setManagers(prev => {
-      const updated = prev.map(m => m.id === id ? { ...m, llamadaFecha: fecha, llamadaAsistio: asistio } : m);
-      localStorage.setItem('cpsl_managers_data_v3', JSON.stringify(updated));
-      return updated;
-    });
-    showToast(`Registro guardado: ${asistio === 'SI' ? 'Asistió' : 'No asistió'}`, 'success');
+  const handleUpdateLlamada = async (id, fecha, asistio) => {
+    try {
+      const docRef = doc(db, 'managers_directory', id.toString());
+      await updateDoc(docRef, { llamadaFecha: fecha, llamadaAsistio: asistio });
+      
+      // La actualización de managers en tiempo real ya se maneja por onSnapshot, pero por optimización optimista lo mantenemos aquí
+      setManagers(prev => prev.map(m => m.id === id ? { ...m, llamadaFecha: fecha, llamadaAsistio: asistio } : m));
+      
+      const targetManager = managers.find(m => m.id === id);
+      const managerName = targetManager ? targetManager.nombre : id;
+      
+      recordAuditEvent({
+        action: 'ACTUALIZAR_LLAMADA_MANAGER',
+        user: currentUser?.email || currentUser?.name || 'Usuario',
+        details: `Asistencia actualizada para ${managerName}: ${asistio === 'SI' ? 'Asistió' : 'No asistió'} el ${fecha}`
+      });
+
+      showToast(`Registro guardado: ${asistio === 'SI' ? 'Asistió' : 'No asistió'}`, 'success');
+    } catch (e) {
+      console.error(e);
+      showToast('Error al guardar en la nube', 'error');
+    }
   };
 
   const openGroupModal = (team) => {
@@ -571,10 +643,24 @@ export default function CentroManagers() {
     setGroupModal(team);
   };
 
-  const handleSaveGroupCall = () => {
+  const handleSaveGroupCall = async () => {
     if (!groupModal) return;
-    setManagers(prev => {
-      const updated = prev.map(m => {
+    
+    try {
+      const batch = writeBatch(db);
+      groupModal.managers.forEach(m => {
+        if (groupCallAttendance.hasOwnProperty(m.id)) {
+          const docRef = doc(db, 'managers_directory', m.id.toString());
+          batch.update(docRef, {
+            llamadaFecha: groupCallDate,
+            llamadaAsistio: groupCallAttendance[m.id] ? 'SI' : 'NO'
+          });
+        }
+      });
+      
+      await batch.commit();
+      
+      setManagers(prev => prev.map(m => {
         if (groupCallAttendance.hasOwnProperty(m.id)) {
           return {
             ...m,
@@ -583,16 +669,24 @@ export default function CentroManagers() {
           };
         }
         return m;
+      }));
+      
+      recordAuditEvent({
+        action: 'ACTUALIZAR_LLAMADA_GRUPAL',
+        user: currentUser?.email || currentUser?.name || 'Usuario',
+        details: `Llamada grupal registrada para el equipo "${groupModal.equipo}" el ${groupCallDate}. Integrantes actualizados: ${groupModal.managers.length}`
       });
-      localStorage.setItem('cpsl_managers_data_v3', JSON.stringify(updated));
-      return updated;
-    });
-    showToast(`Llamada grupal registrada para el equipo ${groupModal.equipo}`, 'success');
-    setGroupModal(null);
+
+      showToast(`Llamada grupal registrada en la nube para el equipo ${groupModal.equipo}`, 'success');
+      setGroupModal(null);
+    } catch (e) {
+      console.error(e);
+      showToast('Error al registrar llamada grupal en la nube', 'error');
+    }
   };
 
   // Guardar nuevo registro individual (Manager o Capitán)
-  const handleSaveNewManager = (e) => {
+  const handleSaveNewManager = async (e) => {
     e.preventDefault();
     if (!newManager.nombre.trim()) return showToast('El nombre completo es obligatorio', 'error');
 
@@ -616,11 +710,12 @@ export default function CentroManagers() {
       llamadaAsistio: ''
     };
 
-    setManagers(prev => {
-      const updated = [created, ...prev];
-      localStorage.setItem('cpsl_managers_data_v3', JSON.stringify(updated));
-      return updated;
-    });
+    try {
+      const docRef = doc(db, 'managers_directory', created.id.toString());
+      await setDoc(docRef, created);
+      setManagers(prev => [created, ...prev]);
+
+    } catch(e) { console.error(e); showToast('Error guardando en Firebase', 'error'); return; }
 
     recordAuditEvent({
       action: 'NUEVO_INTEGRANTE_MANAGER',
@@ -644,7 +739,7 @@ export default function CentroManagers() {
   };
 
   // Guardar nuevo equipo completo (Capitán + Managers)
-  const handleSaveNewTeam = (e) => {
+  const handleSaveNewTeam = async (e) => {
     e.preventDefault();
     if (!newTeam.equipo.trim()) return showToast('El nombre del equipo es obligatorio', 'error');
 
@@ -706,11 +801,19 @@ export default function CentroManagers() {
       return showToast('Debe ingresar al menos un integrante (Capitán o Manager) para el equipo', 'error');
     }
 
-    setManagers(prev => {
-      const updated = [...newRecords, ...prev];
-      localStorage.setItem('cpsl_managers_data_v3', JSON.stringify(updated));
-      return updated;
-    });
+    try {
+      const batch = writeBatch(db);
+      newRecords.forEach(record => {
+        const docRef = doc(db, 'managers_directory', record.id.toString());
+        batch.set(docRef, record);
+      });
+      await batch.commit();
+
+      setManagers(prev => [...newRecords, ...prev]);
+    } catch(e) {
+      console.error(e);
+      return showToast('Error guardando el equipo en la nube', 'error');
+    }
 
     recordAuditEvent({
       action: 'CREAR_EQUIPO_COMPLETO',
@@ -762,7 +865,7 @@ export default function CentroManagers() {
   };
 
   // Guardar edición de equipo completo
-  const handleSaveEditTeam = (e) => {
+  const handleSaveEditTeam = async (e) => {
     e.preventDefault();
     if (!editTeamModal) return;
     if (!editTeamModal.equipo.trim()) return showToast('El nombre del equipo es obligatorio', 'error');
@@ -784,14 +887,12 @@ export default function CentroManagers() {
       return showToast('El equipo debe tener al menos un integrante', 'error');
     }
 
-    setManagers(prev => {
-      // 1. Quitar miembros viejos del equipo
-      const others = prev.filter(m => {
-        const isMatch = normalizeSede(m.sede) === origSedeNorm && (m.equipo || '').trim().toUpperCase() === origEquipo;
-        return !isMatch;
-      });
-
-      // 2. Mapear los miembros editados/nuevos
+    try {
+      const batch = writeBatch(db);
+      
+      // We don't delete old members from DB here to avoid data loss on mistakes, 
+      // we only UPSERT the members in the edit modal.
+      
       const updatedMembers = validMembers.map(m => {
         const memberId = typeof m.id === 'number' && m.id > 100000 ? m.id : Date.now() + Math.floor(Math.random() * 10000);
         const trainerToUse = userCanAssign ? finalTrainers : (m.entrenador || finalTrainers);
@@ -812,10 +913,25 @@ export default function CentroManagers() {
         };
       });
 
-      const nextState = [...updatedMembers, ...others];
-      localStorage.setItem('cpsl_managers_data_v3', JSON.stringify(nextState));
-      return nextState;
-    });
+      updatedMembers.forEach(member => {
+        const docRef = doc(db, 'managers_directory', member.id.toString());
+        batch.set(docRef, member, { merge: true });
+      });
+
+      await batch.commit();
+
+      setManagers(prev => {
+        const others = prev.filter(m => {
+          const isMatch = normalizeSede(m.sede) === origSedeNorm && (m.equipo || '').trim().toUpperCase() === origEquipo;
+          return !isMatch;
+        });
+        return [...updatedMembers, ...others];
+      });
+
+    } catch(e) {
+      console.error(e);
+      return showToast('Error actualizando equipo en la nube', 'error');
+    }
 
     recordAuditEvent({
       action: 'EDITAR_EQUIPO_COMPLETO',
@@ -837,7 +953,7 @@ export default function CentroManagers() {
   };
 
   // Guardar edición individual
-  const handleSaveEditIndividual = (e) => {
+  const handleSaveEditIndividual = async (e) => {
     e.preventDefault();
     if (!editIndividualModal) return;
     if (!editIndividualModal.nombre.trim()) return showToast('El nombre es obligatorio', 'error');
@@ -846,29 +962,29 @@ export default function CentroManagers() {
       ? editIndividualModal.selectedTrainers.map(t => normalizeTrainer(t)).filter(Boolean).join(', ')
       : '';
 
-    setManagers(prev => {
-      const updated = prev.map(m => {
-        if (m.id === editIndividualModal.id) {
-          const trainerToUse = userCanAssign ? finalTrainers : m.entrenador;
-          return {
-            ...m,
-            nombre: editIndividualModal.nombre.trim(),
-            rol: editIndividualModal.rol || 'Manager',
-            telefono: (editIndividualModal.telefono || '').trim(),
-            sede: normalizeSede(editIndividualModal.sede),
-            equipo: (editIndividualModal.equipo || '').trim().toUpperCase(),
-            numEquipo: editIndividualModal.numEquipo ? Number(editIndividualModal.numEquipo) || editIndividualModal.numEquipo : '',
-            entrenador: trainerToUse,
-            tieneEntrenador: trainerToUse ? 'Si' : 'No',
-            coordinador: normalizeCoordinator(editIndividualModal.coordinador),
-            estado: canChangeStatus ? (editIndividualModal.estado || 'Activo') : m.estado
-          };
-        }
-        return m;
-      });
-      localStorage.setItem('cpsl_managers_data_v3', JSON.stringify(updated));
-      return updated;
-    });
+    try {
+      const trainerToUse = userCanAssign ? finalTrainers : editIndividualModal.entrenador;
+      const updatedData = {
+        nombre: editIndividualModal.nombre.trim(),
+        rol: editIndividualModal.rol || 'Manager',
+        telefono: (editIndividualModal.telefono || '').trim(),
+        sede: normalizeSede(editIndividualModal.sede),
+        equipo: (editIndividualModal.equipo || '').trim().toUpperCase(),
+        numEquipo: editIndividualModal.numEquipo ? Number(editIndividualModal.numEquipo) || editIndividualModal.numEquipo : '',
+        entrenador: trainerToUse,
+        tieneEntrenador: trainerToUse ? 'Si' : 'No',
+        coordinador: normalizeCoordinator(editIndividualModal.coordinador),
+        estado: canChangeStatus ? (editIndividualModal.estado || 'Activo') : editIndividualModal.estado
+      };
+
+      const docRef = doc(db, 'managers_directory', editIndividualModal.id.toString());
+      await updateDoc(docRef, updatedData);
+
+      setManagers(prev => prev.map(m => m.id === editIndividualModal.id ? { ...m, ...updatedData } : m));
+    } catch(e) {
+      console.error(e);
+      return showToast('Error actualizando integrante en la nube', 'error');
+    }
 
     recordAuditEvent({
       action: 'EDITAR_INDIVIDUAL_MANAGER',
@@ -881,37 +997,53 @@ export default function CentroManagers() {
   };
 
   // Eliminar manager individual
-  const handleDeleteManager = (id) => {
-    setManagers(prev => {
-      const updated = prev.filter(m => m.id !== id);
-      localStorage.setItem('cpsl_managers_data_v3', JSON.stringify(updated));
-      return updated;
-    });
-    recordAuditEvent({
-      action: 'ELIMINAR_INTEGRANTE_MANAGER',
-      user: currentUser?.email || 'Usuario',
-      details: `Eliminado integrante ID: ${id}`
-    });
-    showToast('Integrante eliminado', 'info');
-    setDeleteConfirm(null);
+  const handleDeleteManager = async (id) => {
+    try {
+      const docRef = doc(db, 'managers_directory', id.toString());
+      await deleteDoc(docRef);
+      
+      setManagers(prev => prev.filter(m => m.id !== id));
+      recordAuditEvent({
+        action: 'ELIMINAR_INTEGRANTE_MANAGER',
+        user: currentUser?.email || 'Usuario',
+        details: `Eliminado integrante ID: ${id}`
+      });
+      showToast('Integrante eliminado permanentemente', 'info');
+      setDeleteConfirm(null);
+    } catch(e) {
+      console.error(e);
+      showToast('Error eliminando de la nube', 'error');
+    }
   };
 
   // Eliminar equipo completo
-  const handleDeleteTeam = (sede, equipo) => {
+  const handleDeleteTeam = async (sede, equipo) => {
     const sNorm = normalizeSede(sede);
     const eqUpper = (equipo || '').trim().toUpperCase();
-    setManagers(prev => {
-      const updated = prev.filter(m => !(normalizeSede(m.sede) === sNorm && (m.equipo || '').trim().toUpperCase() === eqUpper));
-      localStorage.setItem('cpsl_managers_data_v3', JSON.stringify(updated));
-      return updated;
-    });
-    recordAuditEvent({
-      action: 'ELIMINAR_EQUIPO_COMPLETO',
-      user: currentUser?.email || 'Usuario',
-      details: `Equipo eliminado: ${eqUpper} (${sNorm})`
-    });
-    showToast(`Equipo "${eqUpper}" eliminado`, 'info');
-    setDeleteConfirm(null);
+    
+    try {
+      const toDelete = managers.filter(m => normalizeSede(m.sede) === sNorm && (m.equipo || '').trim().toUpperCase() === eqUpper);
+      if (toDelete.length > 0) {
+        const batch = writeBatch(db);
+        toDelete.forEach(m => {
+          const docRef = doc(db, 'managers_directory', m.id.toString());
+          batch.delete(docRef);
+        });
+        await batch.commit();
+      }
+
+      setManagers(prev => prev.filter(m => !(normalizeSede(m.sede) === sNorm && (m.equipo || '').trim().toUpperCase() === eqUpper)));
+      recordAuditEvent({
+        action: 'ELIMINAR_EQUIPO_COMPLETO',
+        user: currentUser?.email || 'Usuario',
+        details: `Equipo eliminado: ${eqUpper} (${sNorm})`
+      });
+      showToast(`Equipo "${eqUpper}" eliminado de la nube`, 'info');
+      setDeleteConfirm(null);
+    } catch(e) {
+      console.error(e);
+      showToast('Error eliminando equipo de la nube', 'error');
+    }
   };
 
   const totalPages = Math.ceil(filteredManagers.length / PAGE_SIZE) || 1;

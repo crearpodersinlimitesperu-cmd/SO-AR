@@ -37,3 +37,30 @@ export async function getVerifiedUser(email) {
 
   return null;
 }
+
+/**
+ * Obtiene todos los usuarios de la compañía consultando los tres directorios oficiales de Firestore.
+ * Esto reemplaza al archivo estático usersData.js
+ */
+export async function getAllCompanyUsers() {
+  const allUsers = [];
+  try {
+    // Los usuarios principales están en la colección "users"
+    const usersSnap = await getDocs(collection(db, 'users'));
+    usersSnap.forEach(doc => allUsers.push({ id: doc.id, ...doc.data() }));
+
+    // Opcional: Agregar QT si se manejan aparte, o si ya están en "users", esto se puede omitir.
+    // Lo mantenemos por si la migración de QT los puso sólo en qt_directory
+    const qtSnap = await getDocs(collection(db, 'qt_directory'));
+    qtSnap.forEach(doc => {
+      // Evitar duplicados si QT ya está en users
+      if (!allUsers.find(u => u.email === doc.data().email)) {
+        allUsers.push({ id: doc.id, ...doc.data() });
+      }
+    });
+    
+  } catch (error) {
+    console.error("Error fetching company users:", error);
+  }
+  return allUsers;
+}

@@ -1,12 +1,14 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
+import { Loader2 } from 'lucide-react';
 
 export default function Login() {
   const { currentUser, loginWithGoogle } = useAuth();
   const { showToast } = useUI();
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (currentUser) {
@@ -15,6 +17,8 @@ export default function Login() {
   }, [currentUser, navigate]);
 
   const handleLogin = async () => {
+    if (isLoading) return;
+    setIsLoading(true);
     // Play lion roar!
     try {
       const audio = new Audio('/lion-roar.mp3');
@@ -27,6 +31,7 @@ export default function Login() {
       navigate('/home');
     } catch (error) {
       console.error("Error al iniciar sesión", error);
+      setIsLoading(false);
       if (error?.code === 'auth/popup-closed-by-user' || error?.code === 'auth/cancelled-popup-request') {
         return;
       }
@@ -67,11 +72,16 @@ export default function Login() {
         
         <button 
           onClick={handleLogin}
+          disabled={isLoading}
           className="btn-primary" 
-          style={{ width: '100%', padding: '1rem', fontSize: '1.1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.8rem', background: 'linear-gradient(135deg, #8b5cf6, #29abe2)', border: 'none', color: 'white' }}
+          style={{ width: '100%', padding: '1rem', fontSize: '1.1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.8rem', background: 'linear-gradient(135deg, #8b5cf6, #29abe2)', border: 'none', color: 'white', opacity: isLoading ? 0.7 : 1, cursor: isLoading ? 'not-allowed' : 'pointer' }}
         >
-          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" style={{ width: '24px', height: '24px', background: 'white', borderRadius: '50%', padding: '2px' }} />
-          Continuar con Google
+          {isLoading ? (
+            <Loader2 className="spin" size={24} />
+          ) : (
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" style={{ width: '24px', height: '24px', background: 'white', borderRadius: '50%', padding: '2px' }} />
+          )}
+          {isLoading ? 'Iniciando...' : 'Continuar con Google'}
         </button>
         
         <p className="text-muted" style={{ marginTop: '1.5rem', fontSize: '0.75rem', opacity: 0.8 }}>Acceso exclusivo para la manada CREAR</p>

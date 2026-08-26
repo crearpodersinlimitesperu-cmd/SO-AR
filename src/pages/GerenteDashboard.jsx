@@ -6,7 +6,7 @@ import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useUI } from '../context/UIContext';
 import { useNavigate } from 'react-router-dom';
-import { Target, AlertTriangle, Users, PlusCircle, Activity, CheckCircle, Building, MessageSquare, Mail, ExternalLink, ArrowUpRight, Clock, ShieldAlert, ChevronRight, CheckSquare } from 'lucide-react';
+import { Target, AlertTriangle, Users, PlusCircle, Activity, CheckCircle, Building, MessageSquare, Mail, ExternalLink, ArrowRight, Clock, ShieldAlert, ChevronRight, CheckSquare } from 'lucide-react';
 import { usersData, normalizeRole } from '../data/usersData';
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
 import IAAuditor from '../components/IAAuditor';
@@ -121,8 +121,26 @@ export default function GerenteDashboard() {
   };
 
   const handleOpenGoogleChat = (email) => {
-    if (!email) window.open('https://chat.google.com/', '_blank');
-    else window.open(`https://mail.google.com/chat/u/0/#chat/dm/${email}`, '_blank');
+    // NOTA (23/08/2026): Google Chat no tiene una URL pública que abra el DM
+    // de una persona a partir de su email. Abrir un DM exacto por URL requiere
+    // la API de Chat (spaces.findDirectMessage) con el ID de usuario resuelto
+    // vía People/Directory API, no un enlace directo. Ver:
+    // https://developers.google.com/workspace/chat/find-direct-message-in-spaces
+    // Mientras no se construya esa integración (Opción B), copiamos el email
+    // al portapapeles y abrimos Google Chat para que el usuario lo pegue en el
+    // buscador y abra el chat correcto en 2 clics.
+    if (!email) {
+      window.open('https://chat.google.com/u/0/', '_blank');
+      return;
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(email)
+        .then(() => showToast(`Email copiado: ${email}. Pégalo en el buscador de Google Chat para abrir el chat.`, 'success'))
+        .catch(() => showToast(`No se pudo copiar automáticamente. Busca a: ${email}`, 'error'));
+    } else {
+      showToast(`Busca en Google Chat a: ${email}`, 'success');
+    }
+    window.open('https://chat.google.com/u/0/', '_blank');
   };
 
   const handleSendEmail = (email, taskTitle, taskRole) => {
@@ -346,7 +364,7 @@ export default function GerenteDashboard() {
                         )}
                       </div>
                       <button onClick={() => navigate(`/checklist/${t.role}?filter=criticas`)} style={{ background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.4)', color: '#ef4444', padding: '0.3rem 0.6rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', whiteSpace: 'nowrap' }}>
-                        Ver <ArrowUpRight size={13} />
+                        Ver <ArrowRight size={13} />
                       </button>
                     </div>
 

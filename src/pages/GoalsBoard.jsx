@@ -624,6 +624,7 @@ export default function GoalsBoard() {
         onClose={() => setShowDivisionModal(false)}
         goal={selectedGoalForAssignment}
         onSaveAssignment={handleSaveAssignment}
+        currentUser={currentUser}
       />
 
       {/* MODAL WIZARD SETUP DE CICLO */}

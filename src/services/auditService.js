@@ -32,7 +32,7 @@ export async function fetchNetworkInfo() {
 /**
  * Registra un evento de auditoría REAL en Cloud Firestore
  */
-export async function recordAuditEvent({ email, name, role, sede, action, details = '', ip, location, userAgent, isSimulation = false }) {
+export async function recordAuditEvent({ uid, email, name, role, sede, action, details = '', ip, location, userAgent, isSimulation = false }) {
   if (!email) return null;
 
   const netInfo = (ip && location) ? { ip, location } : await fetchNetworkInfo();
@@ -60,9 +60,10 @@ export async function recordAuditEvent({ email, name, role, sede, action, detail
       createdAtIso: nowIso
     });
 
-    // 2. Si es un LOGIN REAL (no simulación), actualizar perfil de conexión del usuario
-    if (action === 'LOGIN' && !isSimulation) {
-      const userProfileRef = doc(db, 'user_profiles', email.toLowerCase().trim());
+    // 2. Si es un LOGIN REAL (no simulación) y tenemos UID, actualizar perfil de conexión
+    if (action === 'LOGIN' && !isSimulation && uid) {
+      // FIX: Guardar con UID para cumplir con la regla de seguridad
+      const userProfileRef = doc(db, 'user_profiles', uid);
       await setDoc(userProfileRef, {
         email: email.toLowerCase().trim(),
         name: name || 'Colaborador',

@@ -6,7 +6,8 @@ import { useCycles } from '../context/CyclesContext';
 import { useUI } from '../context/UIContext';
 import { doc, setDoc, collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 import { db } from '../services/firebase';
-import { usersData, normalizeRole, normalizeSede, OPERATIONAL_SEDES } from '../data/usersData';
+import { normalizeRole, normalizeSede, OPERATIONAL_SEDES } from '../data/usersData';
+import { getAllCompanyUsers } from '../services/userService';
 import { Globe, Building2, Users, ArrowLeft, ChevronDown, ChevronRight, Eye, CheckCircle2, Clock, AlertTriangle, TrendingUp, UserCheck, FileText, Search, X, PlusCircle } from 'lucide-react';
 import { getFlagForSede } from '../utils/flags';
 import UserProfileModal from '../components/UserProfileModal';
@@ -219,9 +220,9 @@ function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, curre
   );
 }
 
-function SedeBlock({ sede, tasks, navigate, onSelectUser, onAssignTask, currentUser, userConnections = {} }) {
+function SedeBlock({ sede, tasks, navigate, onSelectUser, onAssignTask, currentUser, userConnections = {}, realUsersData = [] }) {
   const [expanded, setExpanded] = useState(false);
-  const members = usersData.filter(u => normalizeSede(u.sede) === sede);
+  const members = (realUsersData || []).filter(u => normalizeSede(u.sede) === sede);
   
   let totalSedeTasks = 0;
   let totalSedeCompleted = 0;
@@ -312,6 +313,7 @@ function AuditLogView() {
   const [filterAction, setFilterAction] = useState('TODAS');
 
   const fetchLogs = async () => {
+    if (loading) return;
     setLoading(true);
     try {
       let data = await getAllAuditLogs();
@@ -361,21 +363,24 @@ function AuditLogView() {
           </select>
           <button 
             onClick={fetchLogs} 
+            disabled={loading}
             className="btn-secondary" 
-            style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}
+            style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', opacity: loading ? 0.5 : 1, cursor: loading ? 'not-allowed' : 'pointer' }}
           >
-            🔄 Actualizar
+            {loading ? '⏳ Cargando...' : '🔄 Actualizar'}
           </button>
           <button 
             onClick={async () => {
+              if (loading) return;
               if (window.confirm('¿Deseas limpiar el caché local de registros de prueba?')) {
                 localStorage.removeItem('cpsl_audit_logs');
                 localStorage.removeItem('cpsl_user_connections');
                 await fetchLogs();
               }
             }} 
+            disabled={loading}
             className="btn-secondary" 
-            style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}
+            style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', color: 'var(--text-muted)', opacity: loading ? 0.5 : 1, cursor: loading ? 'not-allowed' : 'pointer' }}
             title="Limpia registros residuales de simulación local"
           >
             🧹 Limpiar Caché Local
@@ -460,7 +465,7 @@ function AuditLogView() {
   );
 }
 
-function GlobalView({ tasks, navigate }) {
+function GlobalView({ tasks, navigate, realUsersData = [] }) {
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter(t => t.completed || t.status === 'Completada').length;
   const criticalTasks = tasks.filter(t => !t.completed && t.status !== 'Completada' && (t.isCritical || t.priority === '🔴 ROJO' || t.priority?.includes('ROJO'))).length;
@@ -475,7 +480,7 @@ function GlobalView({ tasks, navigate }) {
   ];
 
   const sedesRanking = OPERATIONAL_SEDES.map(sede => {
-    const members = usersData.filter(u => u.sede === sede);
+    const members = (realUsersData || []).filter(u => u.sede === sede);
     const sRoles = [...new Set(members.map(m => m.role))];
     const sedeTasks = tasks.filter(t => sRoles.includes(t.role));
     const sedeCompleted = sedeTasks.filter(t => {
@@ -562,7 +567,7 @@ function GlobalView({ tasks, navigate }) {
   );
 }
 
-function RoleView({ tasks, navigate, onSelectUser, onAssignTask, userConnections = {}, currentUser }) {
+function RoleView({ tasks, navigate, onSelectUser, onAssignTask, userConnections = {}, currentUser, realUsersData = [] }) {
   const roles = [
     { id: 'direccion', label: 'Dirección Global' },
     { id: 'cfo', label: 'CFO (Chief Financial Officer)' },
@@ -582,7 +587,7 @@ function RoleView({ tasks, navigate, onSelectUser, onAssignTask, userConnections
   ];
 
   const listedRoleIds = new Set(roles.map(r => r.id));
-  const unlistedRoles = [...new Set(usersData.map(u => u.role).filter(r => !listedRoleIds.has(r)))];
+  const unlistedRoles = [...new Set((realUsersData || []).map(u => u.role).filter(r => r && !listedRoleIds.has(r)))];
   const allDisplayRoles = [
     ...roles,
     ...unlistedRoles.map(r => ({ id: r, label: ROLE_LABELS[r] || r }))
@@ -591,7 +596,7 @@ function RoleView({ tasks, navigate, onSelectUser, onAssignTask, userConnections
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
       {allDisplayRoles.map(role => {
-        const members = usersData.filter(u => u.role === role.id || normalizeRole(u.role) === role.id);
+        const members = (realUsersData || []).filter(u => u.role === role.id || normalizeRole(u.role) === role.id);
         if (members.length === 0) return null;
         const roleColor = ROLE_COLORS[role.id] || '#6b7280';
         return (
@@ -631,7 +636,46 @@ export default function SuperAdminPanel() {
   const [showUserModal, setShowUserModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [userConnections, setUserConnections] = useState({});
+  const [realUsersData, setRealUsersData] = useState([]);
+  const [usersLoading, setUsersLoading] = useState(true);
   const { showToast } = useUI();
+
+  // HOTFIX temporal para corregir el rol de José Sánchez en la base de datos
+  useEffect(() => {
+    if (currentUser?.email === 'jose.sanchez@crearpsl.net' && currentUser?.dbId) {
+      const fixRole = async () => {
+        try {
+          const { doc, updateDoc } = await import('firebase/firestore');
+          const userRef = doc(db, 'users', currentUser.dbId);
+          await updateDoc(userRef, {
+            role: 'gerente',
+            roles: ['gerente', 'qt', 'superadmin'],
+            sede: 'Lima'
+          });
+          console.log("Rol de José Sánchez corregido en DB.");
+        } catch (err) {
+          console.error("Error corrigiendo rol:", err);
+        }
+      };
+      fixRole();
+    }
+  }, [currentUser]);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function fetchUsers() {
+      try {
+        const users = await getAllCompanyUsers();
+        if (isMounted) setRealUsersData(users);
+      } catch (err) {
+        console.error("Error cargando usuarios:", err);
+      } finally {
+        if (isMounted) setUsersLoading(false);
+      }
+    }
+    fetchUsers();
+    return () => { isMounted = false; };
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -666,7 +710,7 @@ export default function SuperAdminPanel() {
     transition: 'all 0.2s',
   });
 
-  const searchFilteredUsers = searchTerm.trim() ? usersData.filter(u => {
+  const searchFilteredUsers = searchTerm.trim() ? (realUsersData || []).filter(u => {
     const term = searchTerm.toLowerCase().trim();
     const nameMatch = u.name?.toLowerCase().includes(term);
     const emailMatch = u.email?.toLowerCase().includes(term);
@@ -782,7 +826,7 @@ export default function SuperAdminPanel() {
               <button style={tabStyle('auditoria')} onClick={() => setActiveView('auditoria')}>🛡️ Auditoría</button>
             )}
           </div>
-          {activeView === 'global' && <GlobalView tasks={tasks} navigate={navigate} />}
+          {activeView === 'global' && <GlobalView tasks={tasks} navigate={navigate} realUsersData={realUsersData} />}
           {activeView === 'sede' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <p className="text-muted text-sm" style={{ marginBottom: '0.5rem' }}>Clic en una sede para expandir y ver el detalle de cada persona y su avance operativo.</p>
@@ -799,6 +843,7 @@ export default function SuperAdminPanel() {
                   onAssignTask={setAssignUser}
                   currentUser={currentUser}
                   userConnections={userConnections}
+                  realUsersData={realUsersData}
                 />
               ))}
             </div>
@@ -811,6 +856,7 @@ export default function SuperAdminPanel() {
               onAssignTask={setAssignUser}
               currentUser={currentUser}
               userConnections={userConnections}
+              realUsersData={realUsersData}
             />
           )}
           {activeView === 'auditoria' && (

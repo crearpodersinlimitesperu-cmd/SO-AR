@@ -109,9 +109,20 @@ export default function ReportesBoard() {
     if (reportType === 'FDS') {
       return (
         <div style={{ display: 'grid', gap: '1rem' }}>
-          <h4 className="text-blue">Reporte FDS (Sede)</h4>
+          <h4 className="text-blue">Reporte FDS (Sede C1)</h4>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-            <input type="number" name="px_llegaron_viernes" placeholder="Px que llegaron el viernes" onChange={handleChange} className="form-input" />
+            <input type="number" name="px_nuevos" placeholder="PX Nuevos Sentados" onChange={handleChange} className="form-input" />
+            <input type="number" name="px_rezagados" placeholder="PX Rezagados Sentados" onChange={handleChange} className="form-input" />
+            <div style={{ background: 'rgba(255,255,255,0.05)', padding: '0.5rem', borderRadius: '4px', gridColumn: '1 / -1' }}>
+                <span className="text-gold font-bold">Total PX Sentados: </span> 
+                <span className="text-white">{(parseInt(formData.px_nuevos) || 0) + (parseInt(formData.px_rezagados) || 0)}</span>
+            </div>
+            <input type="number" name="aliados_sentados" placeholder="Aliados Sentados" onChange={handleChange} className="form-input" />
+            {((parseInt(formData.aliados_sentados) || 0) < ((parseInt(formData.px_nuevos) || 0) + (parseInt(formData.px_rezagados) || 0)) / 6) && (
+                <div style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', padding: '0.5rem', borderRadius: '4px', gridColumn: '1 / -1', fontSize: '0.85rem' }}>
+                   ⚠️ Ratio de contención insuficiente (mínimo 1 aliado por cada 6 PX).
+                </div>
+            )}
             <input type="number" name="px_bajaron" placeholder="Px que se bajaron durante fds" onChange={handleChange} className="form-input" />
             <input type="number" name="declaracion_px" placeholder="Declaración Px" onChange={handleChange} className="form-input" />
             <input type="number" name="enrolamiento" placeholder="Enrolamiento" onChange={handleChange} className="form-input" />
@@ -177,10 +188,27 @@ export default function ReportesBoard() {
         <div style={{ display: 'grid', gap: '1rem' }}>
           <h4 className="text-blue">Reporte Capítulo Dos</h4>
           <textarea name="detalle" placeholder="Detalle: (Px, Aliados, Capitán, Entrenador, Desertores)" onChange={handleChange} className="form-input" rows="4"></textarea>
+          
+          <h5 className="text-gold" style={{ margin: '1rem 0 0.5rem 0' }}>Registro Financiero C2 (Obligatorio)</h5>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-             <input type="number" name="pagos_c2_mj" placeholder="C2 + MJ" onChange={handleChange} className="form-input" />
+             <select name="nomenclatura_pago" onChange={handleChange} className="form-input" required>
+                <option value="">-- Nomenclatura --</option>
+                <option value="C2">C2 (Solo Capítulo 2)</option>
+                <option value="C2+MJ">C2+MJ (Paquete Completo)</option>
+                <option value="MJ">MJ (Solo Maestría)</option>
+             </select>
+             <select name="via_pago" onChange={handleChange} className="form-input" required>
+                <option value="">-- Vía de Pago --</option>
+                <option value="TRANSF">TRANSF (Transferencia)</option>
+                <option value="TC">TC (Tarjeta Crédito)</option>
+                <option value="LINK">LINK (Botón Pagos)</option>
+                <option value="EFECTIVO">EFECTIVO</option>
+                <option value="USDT">USDT (Crypto)</option>
+                <option value="PAYPHONE">PAYPHONE</option>
+                <option value="PAYPAL">PAYPAL</option>
+             </select>
+             <input type="number" name="pagos_c2_mj" placeholder="Monto Total Procesado" onChange={handleChange} className="form-input" />
              <input type="number" name="pagos_rotos" placeholder="Pagos Rotos / Desertores" onChange={handleChange} className="form-input" />
-             <input type="number" name="total" placeholder="TOTAL PAGOS" onChange={handleChange} className="form-input" />
           </div>
         </div>
       );

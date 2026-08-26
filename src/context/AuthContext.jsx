@@ -4,10 +4,10 @@ import { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from
 import { collection, query, where, getDocs, doc, getDoc, setDoc, serverTimestamp, addDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { normalizeRole, ROLE_DISPLAY_NAMES } from '../data/usersData';
-import { isSuperAdminEmail, isDireccionRole, isGerenciaRole, canSimulate } from '../config/permissions';
-import { USERS_TO_IMPORT } from '../data/usersToImport';
+import { isSuperAdminEmail, isDireccionRole, isGerenciaRole, canSimulate, DUAL_ROLE_TRAINER_EMAILS } from '../config/permissions';
 import { useUI } from './UIContext';
 import { recordAuditEvent, fetchNetworkInfo } from '../services/auditService';
+import { normalizeUserRecord } from '../utils/userNormalizer';
 
 const AuthContext = createContext();
 
@@ -141,11 +141,25 @@ export function AuthProvider({ children }) {
     const canonicalRole = normalizeRole(foundUser.role);
     const isSuperAdmin = isSuperAdminEmail(normalizedEmail) || isSuperAdminEmail(foundUser.email);
 
-    // Get all roles
     let assignedRoles = [canonicalRole];
     if (foundUser.roles && foundUser.roles.length > 0) {
       assignedRoles = foundUser.roles.map(r => normalizeRole(r));
     }
+    
+    // Si es SuperAdmin, inyectarle los roles gerenciales y de consolidado para que tenga el selector
+    if (isSuperAdmin) {
+      if (!assignedRoles.includes('direccion')) assignedRoles.push('direccion');
+      if (!assignedRoles.includes('consolidado')) assignedRoles.push('consolidado');
+    }
+
+    // 🔥 GOBERNANZA: Si es un Entrenador Dual (ej. Andres Gomez) y por base de datos no tiene
+    // el array de roles, se inyecta obligatoriamente 'entrenador' para activar el selector.
+    if (DUAL_ROLE_TRAINER_EMAILS.includes(normalizedEmail)) {
+      if (!assignedRoles.includes('entrenador')) {
+        assignedRoles.push('entrenador');
+      }
+    }
+
     // ensure unique
     assignedRoles = Array.from(new Set(assignedRoles.filter(r => r && r !== 'miembro')));
     if (assignedRoles.length === 0) assignedRoles = ['miembro'];
@@ -209,35 +223,57 @@ export function AuthProvider({ children }) {
       // Buscar en Firestore con búsqueda progresiva
       let foundUser = await findUserInFirestore(normalizedEmail);
 
-      // Fallback a archivo estático
+      // Fallback a directorio de staff migrado
       if (!foundUser) {
-        foundUser = USERS_TO_IMPORT.find(u => 
-          (u.emails && u.emails.map(e => e.toLowerCase()).includes(normalizedEmail)) || 
-          (u.email && u.email.toLowerCase() === normalizedEmail)
-        );
+        try {
+          const staffRef = collection(db, "staff_directory");
+          
+          let sq = query(staffRef, where("emails", "array-contains", normalizedEmail));
+          let sSnap = await getDocs(sq);
+          if (!sSnap.empty) {
+            foundUser = sSnap.docs[0].data();
+          } else {
+            sq = query(staffRef, where("email", "==", normalizedEmail));
+            sSnap = await getDocs(sq);
+            if (!sSnap.empty) foundUser = sSnap.docs[0].data();
+          }
+        } catch (err) {
+          console.error("Error consultando staff_directory:", err);
+        }
       }
 
       if (!foundUser) {
         foundUser = {
-          id: normalizedEmail.split('@')[0].replace('.', '_'),
+          id: user.uid,
+          uid: user.uid,
           name: user.displayName || "Usuario",
           role: "colaborador",
-          sede: "Sede Global",
+          sede: "Global",
           emails: [normalizedEmail],
           email: normalizedEmail
         };
+      } else {
+        foundUser.uid = user.uid; // Asegurar que tenga el UID correcto
       }
 
-      const userObj = buildUserObject(user, foundUser, normalizedEmail);
+      // Normalizar el registro usando el esquema canónico (Hito 1)
+      const canonicalUser = normalizeUserRecord(foundUser, 'login');
+
+      // 🔥 CRÍTICO: Guardar el usuario en la colección "users"
+      // Si no existe aquí, las reglas de Firestore (Hito 0) rechazarán todas sus peticiones.
+      await setDoc(doc(db, 'users', user.uid), canonicalUser, { merge: true });
+
+      const userObj = buildUserObject(user, canonicalUser, normalizedEmail);
       setCurrentUser(userObj);
 
       recordAuditEvent({
-        email: foundUser.email || normalizedEmail,
-        name: userObj.name,
-        role: userObj.appRole,
-        sede: userObj.sede,
+        uid: user.uid,
+        email: normalizedEmail,
+        name: foundUser.name || user.displayName,
+        role: canonicalUser.appRole,
+        sede: canonicalUser.sede,
         action: 'LOGIN',
-        details: 'Inicio de sesión con Google'
+        details: 'Inicio de sesión exitoso'
       });
 
       return user;
@@ -274,27 +310,51 @@ export function AuthProvider({ children }) {
         let foundUser = await findUserInFirestore(normalizedEmail);
         
         if (!foundUser) {
-          foundUser = USERS_TO_IMPORT.find(u => 
-            (u.emails && u.emails.map(e => e.toLowerCase()).includes(normalizedEmail)) || 
-            (u.email && u.email.toLowerCase() === normalizedEmail)
-          );
+          try {
+            const staffRef = collection(db, "staff_directory");
+            let sq = query(staffRef, where("emails", "array-contains", normalizedEmail));
+            let sSnap = await getDocs(sq);
+            if (!sSnap.empty) {
+              foundUser = sSnap.docs[0].data();
+            } else {
+              sq = query(staffRef, where("email", "==", normalizedEmail));
+              sSnap = await getDocs(sq);
+              if (!sSnap.empty) foundUser = sSnap.docs[0].data();
+            }
+          } catch (err) {
+            console.error("Error consultando staff_directory:", err);
+          }
         }
         
         if (!foundUser && isSuperAdminEmail(normalizedEmail)) {
           foundUser = {
-            id: normalizedEmail.split('@')[0].replace('.', '_'),
+            id: user.uid,
+            uid: user.uid,
             name: user.displayName || "Administrador",
             role: "gerente",
             sede: "Global",
             emails: [normalizedEmail]
           };
+        } else if (foundUser) {
+          foundUser.uid = user.uid;
         }
 
         if (foundUser) {
-          const userObj = buildUserObject(user, foundUser, normalizedEmail);
+          const canonicalUser = normalizeUserRecord(foundUser, 'onAuthStateChanged');
+          
+          // 🔥 CRÍTICO: Guardar el usuario en la colección "users"
+          try {
+            await setDoc(doc(db, 'users', user.uid), canonicalUser, { merge: true });
+          } catch (err) {
+            console.error("Error guardando perfil de usuario en auth state:", err);
+          }
+
+          const userObj = buildUserObject(user, canonicalUser, normalizedEmail);
           setCurrentUser(userObj);
           
-          // Registrar último login y auditoría
+          if (!userObj.isSimulated) {
+            setLoading(false);
+          }
           try {
             const sessionLogKey = `audit_login_${normalizedEmail}`;
             if (!sessionStorage.getItem(sessionLogKey)) {

@@ -4,7 +4,6 @@ import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
 import { 
   getQTMembers, 
-  QT_SHEET_EDIT_URL,
   clearQTCache,
   normalizeQTSede
 } from '../services/qtSheetService';
@@ -194,17 +193,6 @@ export default function DirectorioQT() {
             </button>
           )}
 
-          {(!isNonOperationalDirector(currentUser) && (currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.isGerente || currentUser?.appRole === 'director_maestria')) && (
-            <a 
-              href={QT_SHEET_EDIT_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary"
-              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.55rem 1.1rem', borderRadius: '8px', textDecoration: 'none', fontWeight: 700 }}
-            >
-              <FileSpreadsheet size={16} /> Abrir Hoja Maestra ↗
-            </a>
-          )}
         </div>
       </div>
 

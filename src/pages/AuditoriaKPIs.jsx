@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
-import { collection, getDocs, updateDoc, doc } from 'firebase/firestore';
+import { collection, getDocs, updateDoc, doc, getDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { CheckCircle2, AlertCircle, ArrowLeft, Users, Target } from 'lucide-react';
 import CountryFlag from '../components/CountryFlag';
 import { recordAuditEvent } from '../services/auditService';
+import { OPERATIONAL_SEDES } from '../data/usersData';
 
 export default function AuditoriaKPIs() {
   const { currentUser } = useAuth();
@@ -16,10 +17,121 @@ export default function AuditoriaKPIs() {
   const [loading, setLoading] = useState(true);
   const [reports, setReports] = useState([]);
   const [filterSede, setFilterSede] = useState(currentUser?.sede || 'Todas');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [isScrapingLive, setIsScrapingLive] = useState(false);
+  const sedesDisponibles = ['Todas', ...OPERATIONAL_SEDES];
 
   useEffect(() => {
     fetchReports();
   }, [filterSede, currentUser?.sede]);
+
+  const parseNodusData = (data) => {
+    let allData = [];
+    if (data.secciones && data.secciones.actividadCoordinadores && data.secciones.actividadCoordinadores.kpis) {
+      const kpisList = data.secciones.actividadCoordinadores.kpis;
+      kpisList.forEach((kpi, index) => {
+        const content = kpi.content;
+        if (content && content.length > 5 && content[0].includes(' ')) {
+          const nameParts = content[0].split(' ');
+          const name = nameParts[0];
+          const sede = nameParts.slice(1).join(' ');
+          
+          const gestiones = content.includes('Gestiones') ? content[content.indexOf('Gestiones') - 1] : '0';
+          const asignados = content.includes('Asignados') ? content[content.indexOf('Asignados') - 1] : '0';
+          
+          const confirmadosStr = content.find(c => c.startsWith('Confirmado:'));
+          const confirmados = confirmadosStr ? confirmadosStr.split(': ')[1] : '0';
+          
+          let roleStr = 'coord_c1';
+          const sedeUpper = sede.toUpperCase();
+          if (sedeUpper.includes('MAESTR') || sedeUpper.includes('MJ')) {
+            roleStr = 'coord_maestria';
+          } else if (sedeUpper.includes('QT') || sedeUpper.includes('QUANTUM')) {
+            roleStr = 'qt';
+          }
+
+          const dynamicMetrics = [];
+          const statusPills = [];
+          for(let i = 1; i < content.length; i++) {
+            const str = content[i];
+            if (!str || typeof str !== 'string' || str.startsWith('Últ.')) continue;
+            
+            if (str.includes(':')) {
+              const parts = str.split(':');
+              const label = parts[0].trim();
+              const val = parts[1].trim();
+              
+              if (['Confirmado', 'Siguiente', 'En espera', 'Cierre'].some(keyword => label.includes(keyword))) {
+                statusPills.push({ label, value: val });
+              } else {
+                dynamicMetrics.push({ label, value: val });
+              }
+              continue;
+            }
+            
+            if (/[a-zA-Z]/.test(str)) { 
+              let val = '';
+              if (i > 0 && /^[0-9]/.test(content[i-1]) && !/[a-zA-Z]/.test(content[i-1])) {
+                  val = content[i-1];
+              } else if (i < content.length - 1 && /^[0-9]/.test(content[i+1])) {
+                  val = content[i+1];
+              }
+              if (val) {
+                  let label = str.trim();
+                  if (label.includes('Cobertura')) label = 'Cobertura';
+                  dynamicMetrics.push({ label, value: val });
+              }
+            }
+          }
+
+          allData.push({
+            id: `nodus_${index}`,
+            userName: name,
+            team: sede,
+            coordinator: name,
+            sede: sede,
+            role: roleStr,
+            gestionesTotal: parseInt(gestiones) || 0,
+            asignados: parseInt(asignados) || 0,
+            dynamicMetrics: dynamicMetrics,
+            statusPills: statusPills,
+            status: 'pending',
+            createdAt: data.timestamp || new Date().toISOString(),
+            rawContent: content
+          });
+        }
+      });
+    }
+    return allData;
+  };
+
+  const handleLiveFilter = async () => {
+    if (!startDate || !endDate) {
+      showToast("Por favor selecciona Desde y Hasta para filtrar en Nodus", "warning");
+      return;
+    }
+    
+    setIsScrapingLive(true);
+    showToast("Conectando con Nodus para extraer datos en vivo...", "info");
+    
+    try {
+      const response = await fetch('http://localhost:3001/api/scrape-nodus', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ startDate, endDate })
+      });
+      const data = await response.json();
+      const parsedData = parseNodusData(data);
+      setReports(parsedData);
+      showToast("Datos de Nodus actualizados.", "success");
+    } catch (err) {
+      console.error(err);
+      showToast("Error al extraer datos de Nodus", "error");
+    } finally {
+      setIsScrapingLive(false);
+    }
+  };
 
   const getLocalReports = () => {
     try {
@@ -48,41 +160,35 @@ export default function AuditoriaKPIs() {
     } catch (e) {}
   };
 
-  const fetchReports = async () => {
+    const fetchReports = async () => {
     setLoading(true);
-    let allData = getLocalReports();
 
     try {
-      const baseQuery = collection(db, 'kpi_reports');
-      const snapshot = await getDocs(baseQuery);
-      if (snapshot && !snapshot.empty) {
-        const remoteData = snapshot.docs.map(d => ({
-          id: d.id,
-          ...d.data(),
-          createdAt: d.data().createdAt?.toDate ? d.data().createdAt.toDate().toISOString() : d.data().createdAt
-        }));
-        // Fusionar datos remotos y locales sin duplicados
-        const ids = new Set(remoteData.map(r => r.id));
-        allData = [...remoteData, ...allData.filter(r => !ids.has(r.id))];
-        saveLocalReports(allData);
+      const nodusRef = doc(db, 'nodus_kpis_sincronizados', 'latest_snapshot');
+      const nodusSnap = await getDoc(nodusRef);
+      
+      let allData = [];
+      
+      if (nodusSnap.exists()) {
+        allData = parseNodusData(nodusSnap.data());
       }
+
+      // Filtrar por sede
+      const isGlobal = !currentUser?.sede || currentUser?.sede === 'Sede Global' || currentUser?.sede === 'Global' || currentUser?.appRole === 'direccion' || currentUser?.isSuperAdmin;
+      const sedeToFilter = isGlobal ? filterSede : currentUser?.sede;
+
+      let filtered = allData;
+      if (sedeToFilter && sedeToFilter !== 'Todas') {
+        // Adaptación flexible del nombre de la sede
+        const searchTerm = sedeToFilter.toUpperCase().replace('SEDE ', '');
+        filtered = filtered.filter(r => r.sede && r.sede.toUpperCase().includes(searchTerm));
+      }
+
+      setReports(filtered);
     } catch (error) {
-      console.warn("Aviso: usando base local de reportes KPI:", error);
+      console.warn("Aviso: Error cargando Nodus", error);
     }
 
-    // Filtrar por sede
-    const isGlobal = !currentUser?.sede || currentUser?.sede === 'Sede Global' || currentUser?.sede === 'Global' || currentUser?.appRole === 'direccion' || currentUser?.isSuperAdmin;
-    const sedeToFilter = isGlobal ? filterSede : currentUser?.sede;
-
-    let filtered = allData;
-    if (sedeToFilter && sedeToFilter !== 'Todas') {
-      filtered = filtered.filter(r => r.sede === sedeToFilter || (r.sede && r.sede.toLowerCase().includes(sedeToFilter.toLowerCase())));
-    }
-
-    // Ordenar por fecha descendente
-    filtered.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
-
-    setReports(filtered);
     setLoading(false);
   };
 
@@ -130,33 +236,81 @@ export default function AuditoriaKPIs() {
   };
 
   // Helpers de visualización
-  const renderC1Data = (data = {}) => (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
-      <KPIMetric label="Asistencia" value={`${data.asistencia || 0}%`} target={95} actual={parseFloat(data.asistencia || 0)} />
-      <KPIMetric label="Retención" value={`${data.retencion || 0}%`} target={10} actual={parseFloat(data.retencion || 0)} isInverse />
-      <KPIMetric label="Conv. a C2" value={`${data.conversionC1C2 || 0}%`} target={50} actual={parseFloat(data.conversionC1C2 || 0)} />
-      <KPIMetric label="Mov. a MJ" value={`${data.conversionC2MJ || 0}%`} target={70} actual={parseFloat(data.conversionC2MJ || 0)} />
-      <KPIMetric label="Breakthrough" value={`${data.declaracionBreakthrough || 0}%`} target={90} actual={parseFloat(data.declaracionBreakthrough || 0)} />
-      <KPIMetric label="Aliados" value={`${data.declaracionAliados || 0}%`} target={40} actual={parseFloat(data.declaracionAliados || 0)} />
-      <KPIMetric label="Palabras Rotas" value={`${data.palabrasRotas || 0}%`} target={5} actual={parseFloat(data.palabrasRotas || 0)} isInverse />
-      <KPIMetric label="Eficiencia" value={`${data.eficienciaGestion || 0}%`} target={100} actual={parseFloat(data.eficienciaGestion || 0)} />
-    </div>
-  );
+  const renderC1Data = (report = {}) => {
+    const data = report;
+    return (
+      <div style={{ marginTop: '1rem' }}>
+        {data.dynamicMetrics && data.dynamicMetrics.length > 0 && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
+            {data.dynamicMetrics.map((m, i) => {
+               const numericVal = parseFloat(String(m.value).replace(/[^0-9.]/g, '')) || 0;
+               const isInverse = m.label.toLowerCase().includes('rotas') || m.label.toLowerCase().includes('desercion');
+               return (
+                 <KPIMetric key={i} label={m.label} value={m.value} actual={numericVal} target={numericVal > 0 ? numericVal : 1} isInverse={isInverse} />
+               );
+            })}
+          </div>
+        )}
+        
+        {data.statusPills && data.statusPills.length > 0 && (
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '1rem' }}>
+            {data.statusPills.map((p, i) => {
+              let bg = '#f1f5f9';
+              let color = '#475569';
+              let label = p.label.toLowerCase();
+              if (label.includes('confirmado') && !label.includes('por')) { bg = '#10b981'; color = '#fff'; }
+              else if (label.includes('por confirmar')) { bg = '#f59e0b'; color = '#fff'; }
+              else if (label.includes('no contesta')) { bg = '#64748b'; color = '#fff'; }
+              else if (label.includes('siguiente')) { bg = '#0ea5e9'; color = '#fff'; }
+              else if (label.includes('interesa')) { bg = '#ef4444'; color = '#fff'; }
+              else if (label.includes('asisti')) { bg = '#3b82f6'; color = '#fff'; }
 
-  const renderQTData = (data = {}) => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
-        <KPIMetric label="Efectividad Llamadas" value={`${data.efectividadLlamadas || 0}%`} target={60} actual={parseFloat(data.efectividadLlamadas || 0)} />
-        <KPIMetric label="Futuros Imposibles" value={data.futurosImposibles || 0} target={2} actual={parseFloat(data.futurosImposibles || 0)} />
+              return (
+                <span key={i} style={{ padding: '0.4rem 0.8rem', background: bg, borderRadius: '20px', fontSize: '0.75rem', fontWeight: 600, color: color, border: 'none' }}>
+                  {p.label}: <strong>{p.value}</strong>
+                </span>
+              );
+            })}
+          </div>
+        )}
       </div>
-      {data.resolucionQuiebres && (
-        <div style={{ background: 'var(--bg-card, rgba(0,0,0,0.2))', padding: '1rem', borderRadius: '8px', border: '1px solid var(--border-subtle, rgba(255,255,255,0.1))' }}>
-          <h5 style={{ margin: '0 0 0.5rem', color: 'var(--crear-gold, #f59e0b)', fontWeight: 700 }}>Resolución de Quiebres:</h5>
-          <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-main, #334155)', whiteSpace: 'pre-wrap' }}>{data.resolucionQuiebres}</p>
+    );
+  };
+
+  const renderMaestriaData = (report = {}) => {
+    const data = report.data || report;
+    return (
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
+        <KPIMetric label="Graduados Viaje" value={data.graduadosViaje || 0} target={1} actual={parseInt(data.graduadosViaje || 0)} />
+        <KPIMetric label="Sentados FDS1" value={data.sentadosFDS1 || 0} target={1} actual={parseInt(data.sentadosFDS1 || 0)} />
+        <KPIMetric label="Sentados FDS2" value={data.sentadosFDS2 || 0} target={1} actual={parseInt(data.sentadosFDS2 || 0)} />
+        <KPIMetric label="Sentados FDS3" value={data.sentadosFDS3 || 0} target={1} actual={parseInt(data.sentadosFDS3 || 0)} />
+        <KPIMetric label="Deserción FDS1-2" value={`${data.desercion1 || 0}%`} target={10} actual={parseFloat(data.desercion1 || 0)} isInverse />
+        <KPIMetric label="Deserción FDS2-3" value={`${data.desercion2 || 0}%`} target={10} actual={parseFloat(data.desercion2 || 0)} isInverse />
+        <KPIMetric label="Efec. Enrol." value={`${data.efectividadEnrolamiento || 0}%`} target={90} actual={parseFloat(data.efectividadEnrolamiento || 0)} />
+        <KPIMetric label="Cump. FI" value={`${data.cumplimientoFI || 0}%`} target={80} actual={parseFloat(data.cumplimientoFI || 0)} />
+        <KPIMetric label="Conv. Aliados" value={`${data.conversionAliados || 0}%`} target={1} actual={parseFloat(data.conversionAliados || 0)} />
+      </div>
+    );
+  };
+
+  const renderQTData = (report = {}) => {
+    const data = report.data || report;
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
+          <KPIMetric label="Efectividad Llamadas" value={`${data.efectividadLlamadas || 0}%`} target={60} actual={parseFloat(data.efectividadLlamadas || 0)} />
+          <KPIMetric label="Futuros Imposibles" value={data.futurosImposibles || 0} target={2} actual={parseFloat(data.futurosImposibles || 0)} />
         </div>
-      )}
-    </div>
-  );
+        {data.resolucionQuiebres && (
+          <div style={{ background: 'var(--bg-card, rgba(0,0,0,0.2))', padding: '1rem', borderRadius: '8px', border: '1px solid var(--border-subtle, rgba(255,255,255,0.1))' }}>
+            <h5 style={{ margin: '0 0 0.5rem', color: 'var(--crear-gold, #f59e0b)', fontWeight: 700 }}>Resolución de Quiebres:</h5>
+            <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-main, #334155)', whiteSpace: 'pre-wrap' }}>{data.resolucionQuiebres}</p>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   const formatDate = (dateVal) => {
     if (!dateVal) return 'Reciente';
@@ -174,27 +328,101 @@ export default function AuditoriaKPIs() {
         <button onClick={() => navigate('/gerente')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <ArrowLeft size={16} /> Volver a SO-AR
         </button>
+      </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-          <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)' }}>Filtrar Sede:</label>
-          <select 
-            value={filterSede} 
-            onChange={(e) => setFilterSede(e.target.value)}
-            style={{ padding: '0.5rem 1rem', borderRadius: '8px', background: 'var(--bg-card, #ffffff)', color: 'var(--text-main, #0f172a)', border: '1px solid var(--border-subtle, #cbd5e1)', fontWeight: 600 }}
+      {/* Barra de Filtros Estilo Nodus */}
+      <div style={{ 
+        background: 'var(--bg-card, #ffffff)', 
+        padding: '1rem', 
+        borderRadius: '12px', 
+        border: '1px solid var(--border-subtle, #e2e8f0)', 
+        marginBottom: '1.5rem',
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '1.5rem',
+        alignItems: 'flex-end',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+      }}>
+        <div style={{ flex: '1 1 200px', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+          <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)' }}>Sede</label>
+          <div style={{ position: 'relative' }}>
+            <span style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#10b981' }}>📍</span>
+            <select 
+              value={filterSede} 
+              onChange={(e) => setFilterSede(e.target.value)}
+              style={{ width: '100%', padding: '0.6rem 1rem 0.6rem 2.2rem', borderRadius: '8px', background: '#f8fafc', color: 'var(--text-main, #0f172a)', border: '1px solid #cbd5e1', fontWeight: 600 }}
+            >
+              <option value="Todas">Todas las Sedes</option>
+              {sedesDisponibles.filter(s => s !== 'Todas').map(s => <option key={s} value={s}>{s}</option>)}
+              <option value="Global">Global</option>
+            </select>
+          </div>
+        </div>
+
+        <div style={{ flex: '1 1 150px', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+          <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)' }}>Desde</label>
+          <input 
+            type="date" 
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            style={{ padding: '0.6rem 1rem', borderRadius: '8px', background: '#f8fafc', color: 'var(--text-main, #0f172a)', border: '1px solid #cbd5e1', fontWeight: 500 }}
+          />
+        </div>
+
+        <div style={{ flex: '1 1 150px', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+          <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)' }}>Hasta</label>
+          <input 
+            type="date" 
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            style={{ padding: '0.6rem 1rem', borderRadius: '8px', background: '#f8fafc', color: 'var(--text-main, #0f172a)', border: '1px solid #cbd5e1', fontWeight: 500 }}
+          />
+        </div>
+
+        <div style={{ flex: '0 1 auto' }}>
+          <button 
+            onClick={handleLiveFilter}
+            disabled={isScrapingLive}
+            style={{ 
+              padding: '0.6rem 2rem', 
+              borderRadius: '8px', 
+              background: '#ffffff', 
+              color: '#0ea5e9', 
+              border: '1px solid #0ea5e9', 
+              fontWeight: 700,
+              cursor: isScrapingLive ? 'wait' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              opacity: isScrapingLive ? 0.7 : 1
+            }}
           >
-            <option value="Todas">Todas las Sedes</option>
-            <option value="Quito">Quito</option>
-            <option value="Guayaquil">Guayaquil</option>
-            <option value="Cuenca">Cuenca</option>
-            <option value="Lima">Lima</option>
-            <option value="Medellín">Medellín</option>
-            <option value="México">México</option>
-            <option value="Global">Global</option>
-          </select>
+            {isScrapingLive ? (
+              <>⏳ Filtrando...</>
+            ) : (
+              <>▽ Filtrar</>
+            )}
+          </button>
         </div>
       </div>
 
       <div className="glass-panel" style={{ padding: '2rem', borderRadius: '16px', background: 'var(--bg-card, #ffffff)', border: '1px solid var(--border-subtle, #e2e8f0)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+        
+        {/* GLOBAL DEBUG BLOCK A NIVEL PÁGINA */}
+        <div style={{ display: 'none', background: '#1a1a1a', padding: '15px', marginBottom: '20px', borderRadius: '8px', border: '2px solid #00ff00' }}>
+            <h4 style={{color: '#00ff00', margin: '0 0 10px 0'}}>🛑 ALERTA PARA SOPORTE (TOMA FOTO DE ESTO): 🛑</h4>
+            <pre style={{ fontSize: '11px', color: '#00ff00', margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all', maxHeight: '400px', overflowY: 'auto' }}>
+              === KEYS DISPONIBLES EN NODUS ===
+              {JSON.stringify(window.__nodusDebugKeys, null, 2)}
+              
+              === REPORTES DE ENTRENADORES ===
+              {JSON.stringify(window.__nodusDebugEntrenadores, null, 2)}
+              
+              === PRIMER COORDINADOR ===
+              {reports.length > 0 ? JSON.stringify(reports[0].rawContent, null, 2) : 'Vacio'}
+            </pre>
+        </div>
+
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
           <div>
             <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', fontSize: '1.7rem', margin: '0 0 0.4rem 0', fontWeight: 800, color: 'var(--text-heading, #0f172a)' }}>
@@ -233,7 +461,7 @@ export default function AuditoriaKPIs() {
                       </span>
                     </h3>
                     <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted, #64748b)' }}>
-                      {rep.role === 'qt' ? 'Quantum Team' : 'Coordinador C1/C2'} • Enviado: {formatDate(rep.createdAt)}
+                      {rep.role === 'qt' ? 'Quantum Team' : rep.role === 'coord_maestria' ? 'Coordinador de Maestría' : 'Coordinador C1/C2'} • Enviado: {formatDate(rep.createdAt)}
                     </p>
                   </div>
                   <div>
@@ -255,7 +483,7 @@ export default function AuditoriaKPIs() {
                   </div>
                 </div>
 
-                {rep.role === 'coord_c1' ? renderC1Data(rep.data) : renderQTData(rep.data)}
+                {rep.role === 'coord_c1' ? renderC1Data(rep) : rep.role === 'coord_maestria' ? renderMaestriaData(rep) : renderQTData(rep)}
                 
               </div>
             ))}

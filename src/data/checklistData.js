@@ -41,9 +41,10 @@ export const checklistData = [
   { id: 'soar_9', role: 'gerente', cyclePhase: 'PRE-C1', task: 'Coordinador responsable y equipos de apoyo confirmados.', isCritical: true },
   
   // TAREAS NUEVAS: PRE-C1 CC1Y2
-  { id: 'cc1y2_pre1', role: 'coord_c1', cyclePhase: 'PRE-C1', task: 'Martes 09:00 - 10:00: Reunión de Coordinación de Sede, validar salón y solicitar baúles.', isCritical: true },
-  { id: 'cc1y2_pre2', role: 'coord_c1', cyclePhase: 'PRE-C1', task: 'Miércoles 13:00: Ejecutar Freeze de listas de asistencia. Armar baúles con materiales.', isCritical: true },
-  { id: 'cc1y2_pre3', role: 'coord_c1', cyclePhase: 'PRE-C1', task: 'Jueves 19:00: Grounding presencial con Quantum Team (QT) y Aliados. Imprimir gafetes.', isCritical: true },
+  { id: 'cc1y2_pre1', role: 'coord_c1', cyclePhase: 'PRE-C1', task: 'Martes antes de 10:00 AM (Sedes UIO): Enviar correo solicitando baúles (C1, Confianza, Viaje) e insumos.', isCritical: true },
+  { id: 'cc1y2_pre1_b', role: 'coord_c1', cyclePhase: 'PRE-C1', task: 'Martes (Sedes sin logística): Inventariar y armar materiales de baúles (1 semana de anticipación).', isCritical: true },
+  { id: 'cc1y2_pre2', role: 'coord_c1', cyclePhase: 'PRE-C1', task: 'Miércoles 13:00: Ejecutar Freeze de listas de asistencia. Validar salón.', isCritical: true },
+  { id: 'cc1y2_pre3', role: 'coord_c1', cyclePhase: 'PRE-C1', task: 'Jueves 19:00: Grounding presencial con QT. Asignar al aliado con mayor rigor administrativo al rol de Baúl (verificar lámparas cargadas).', isCritical: true },
   { id: 'cc1y2_pre4', role: 'coord_c1', cyclePhase: 'PRE-C1', task: 'Viernes: Bloqueo final, últimas llamadas de confirmación y registro en base de datos.', isCritical: true },
   { id: 'cc1y2_rutina_diaria', role: 'coord_c1', cyclePhase: 'PRE-C1', task: 'DIARIO (Ma-Vi): 09:00 Inicialización / 10:30 Llamadas (Alta densidad) / 14:00 Escritura en CRM.', isCritical: false },
 
@@ -62,8 +63,8 @@ export const checklistData = [
   { id: 'cc1y2_c1_4', role: 'coord_c1', cyclePhase: 'C1', task: 'Viernes 21:00: Emitir reportes de conciliación de asistencia y control de caja.', isCritical: true },
   { id: 'cc1y2_c1_5', role: 'coord_c1', cyclePhase: 'C1', task: 'Sábado 08:00: Control y conteo exacto de los tickets naranja.', isCritical: true },
   { id: 'cc1y2_c1_6', role: 'coord_c1', cyclePhase: 'C1', task: 'Sábado 11:30/14:00/21:00: Despacho de métricas operativas al grupo de oficina.', isCritical: true },
-  { id: 'cc1y2_c1_7', role: 'coord_c1', cyclePhase: 'C1', task: 'Domingo 09:00: Capturar e indexar pagos de C2 y combos en mesa externa.', isCritical: true },
-  { id: 'cc1y2_c1_8', role: 'coord_c1', cyclePhase: 'C1', task: 'Domingo 19:00 - 21:00: Cierre comercial exhaustivo y conciliación con equipo contable.', isCritical: true },
+  { id: 'cc1y2_c1_7', role: 'coord_c1', cyclePhase: 'C1', task: 'Domingo 09:00: Capturar e indexar pagos en mesa externa (Mínimo 2 apoyos por mesa todo el día).', isCritical: true },
+  { id: 'cc1y2_c1_8', role: 'coord_c1', cyclePhase: 'C1', task: 'Domingo 19:00 - 21:00: Cierre comercial exhaustivo. Etiquetar fichas físicas con C2 o C2+MJ y vía de pago.', isCritical: true },
 
   // --- POST-C1 / PRE-C2 ---
   { id: 'soar_16', role: 'gerente', cyclePhase: 'POST-C1', task: 'Lunes: Revisar resultados C1, identificar desviaciones y rezagados.', isCritical: true },
@@ -82,11 +83,12 @@ export const checklistData = [
   { id: 'soar_21', role: 'coord_c1', cyclePhase: 'C2', task: 'Controlar operación, asistencia, quiebres financieros y metas.', isCritical: true },
   
   // TAREAS NUEVAS: C2 CC1Y2
-  { id: 'cc1y2_c2_1', role: 'coord_c1', cyclePhase: 'C2', task: 'Martes a Miércoles: Segunda llamada a inscritos C2 y ensamblaje de baúles avanzados.', isCritical: true },
-  { id: 'cc1y2_c2_2', role: 'coord_c1', cyclePhase: 'C2', task: 'Jueves 10:30 a 13:00: Arranque escalonado (Grounding con Capitán, Oficina y Entrenador).', isCritical: true },
+  { id: 'cc1y2_c2_1', role: 'coord_c1', cyclePhase: 'C2', task: 'Martes a Miércoles: Segunda llamada a inscritos C2.', isCritical: true },
+  { id: 'cc1y2_c2_1_b', role: 'coord_c1', cyclePhase: 'C2', task: 'Miércoles 14:00 PM (Innegociable): Baúl C2 y de actividades cerrado y verificado.', isCritical: true },
+  { id: 'cc1y2_c2_2', role: 'coord_c1', cyclePhase: 'C2', task: 'Jueves 10:30 Arranque / 11:45 AM: Grounding de apoyos en salón.', isCritical: true },
   { id: 'cc1y2_c2_3', role: 'coord_c1', cyclePhase: 'C2', task: 'Jueves 15:20 y 17:00: Reporte de ingreso y escaneo de fichas para contabilidad.', isCritical: true },
   { id: 'cc1y2_c2_4', role: 'coord_c1', cyclePhase: 'C2', task: 'Viernes 15:30: Consolidar reporte crítico de Palabras Rotas.', isCritical: true },
-  { id: 'cc1y2_c2_5', role: 'coord_c1', cyclePhase: 'C2', task: 'Sábado y Domingo: Operar mesa de enrolamiento con 4 apoyos para mover flujos a MJ.', isCritical: true },
+  { id: 'cc1y2_c2_5', role: 'coord_c1', cyclePhase: 'C2', task: 'Sábado: Asignación obligatoria de 4 apoyos en la mesa de enrolamiento para mover flujos a MJ.', isCritical: true },
   
   // --- GATE CRÍTICO: VIERNES DE C2 ---
   { id: 'soar_22', role: 'gerente', cyclePhase: 'C2', task: 'GATE C2: Confirmar que los 3 FDS de Maestría tienen estructura y responsable.', isCritical: true },

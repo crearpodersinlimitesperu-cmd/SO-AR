@@ -73,7 +73,8 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
   const [isSavingDoc, setIsSavingDoc] = useState(false);
 
   // Task assignment submodal
-  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [showTaskModal, setShowTaskModal] = useState(false);
+  const [taskToEdit, setTaskToEdit] = useState(null);
 
   // Firestore sync for user meta
   useEffect(() => {
@@ -135,6 +136,19 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
   const canonicalRole = normalizeRole(user.role);
   const roleColor = ROLE_COLORS[canonicalRole] || ROLE_COLORS[user.role] || '#29abe2';
   const roleLabel = ROLE_LABELS[canonicalRole] || ROLE_LABELS[user.role] || user.role;
+
+  const canEditTask = (task) => {
+    if (!currentUser) return false;
+    if (currentUser.isSuperAdmin) return true;
+    const taskCreator = task.createdBy ? String(task.createdBy).toLowerCase().trim() : '';
+    const userEmail = currentUser.email ? String(currentUser.email).toLowerCase().trim() : '';
+    return taskCreator !== '' && taskCreator === userEmail;
+  };
+
+  const handleEditClick = (task) => {
+    setTaskToEdit(task);
+    setShowTaskModal(true);
+  };
 
   // Filter tasks belonging to this user:
   // 1. Base tasks of this user's role and sede
@@ -626,7 +640,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
                       </button>
                     )}
                     <button 
-                      onClick={() => setShowAssignModal(true)}
+                      onClick={() => setShowTaskModal(true)}
                       className="btn-primary"
                       style={{
                         padding: '0.4rem 0.9rem', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '0.4rem',
@@ -670,12 +684,23 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
                               style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: 'var(--crear-gold)' }}
                             />
                             <div style={{ flex: 1 }}>
-                              <p style={{
-                                margin: 0, fontSize: '0.9rem', color: isCompleted ? 'var(--text-muted)' : '#fff',
-                                textDecoration: isCompleted ? 'line-through' : 'none', fontWeight: isCrit ? '600' : 'normal'
-                              }}>
-                                {task.task || task.title}
-                              </p>
+                              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1rem' }}>
+                                <p style={{
+                                  margin: 0, fontSize: '0.9rem', color: isCompleted ? 'var(--text-muted)' : '#fff',
+                                  textDecoration: isCompleted ? 'line-through' : 'none', fontWeight: isCrit ? '600' : 'normal'
+                                }}>
+                                  {task.task || task.title}
+                                </p>
+                                {canEditTask(task) && !isCompleted && (
+                                  <button 
+                                    onClick={() => handleEditClick(task)}
+                                    style={{ background: 'none', border: 'none', color: 'var(--crear-cyan)', cursor: 'pointer', padding: '0.2rem', display: 'flex', alignItems: 'center' }}
+                                    title="Editar Tarea"
+                                  >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                  </button>
+                                )}
+                              </div>
                               <div style={{ display: 'flex', gap: '0.8rem', marginTop: '0.2rem', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
                                 {task.cyclePhase && <span>Fase: <strong style={{ color: '#29abe2' }}>{task.cyclePhase}</strong></span>}
                                 {task.deadline && (
@@ -881,14 +906,17 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
       </div>
 
       {/* Embedded Task Assignment Modal for this specific user */}
-      {showAssignModal && (
+      {showTaskModal && (
         <TaskAssignmentModal 
-          isOpen={showAssignModal}
-          onClose={() => setShowAssignModal(false)}
+          isOpen={showTaskModal} 
+          onClose={() => {
+            setShowTaskModal(false);
+            setTaskToEdit(null);
+          }} 
           prefilledUser={user}
+          taskToEdit={taskToEdit}
         />
       )}
     </>
   );
 }
-

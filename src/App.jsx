@@ -3,6 +3,8 @@ import { useAuth } from './context/AuthContext'
 import { useUI } from './context/UIContext'
 import './index.css'
 
+import LearningDashboard from './pages/LearningDashboard'
+import ExcellenceDashboard from './pages/ExcellenceDashboard'
 import Login from './pages/Login'
 import Home from './pages/Home'
 import RoleSelector from './pages/RoleSelector'
@@ -17,9 +19,13 @@ import AuditoriaKPIs from './pages/AuditoriaKPIs'
 import CentroManagers from './pages/CentroManagers'
 import DirectorioQT from './pages/DirectorioQT'
 import ProtocoloEmergencias from './pages/ProtocoloEmergencias'
+import PortfolioBoard from './pages/PortfolioBoard'
+import StrategyBoard from './pages/StrategyBoard'
+import OfficialAgreements from './pages/OfficialAgreements'
+import TeamCalendar from './pages/TeamCalendar'
+import AICopilot from './components/AICopilot'
 import PromptModal from './components/PromptModal'
 import HelpModal from './components/HelpModal'
-import ThemeSelector from './components/ThemeSelector'
 import { useState } from 'react'
 import { HelpCircle } from 'lucide-react'
 
@@ -137,6 +143,18 @@ function App() {
             </PrivateRoute>
           } />
           
+          <Route path="/learning" element={
+            <PrivateRoute>
+              <LearningDashboard />
+            </PrivateRoute>
+          } />
+
+          <Route path="/excelencia" element={
+            <PrivateRoute>
+              <ExcellenceDashboard />
+            </PrivateRoute>
+          } />
+          
           <Route path="/gerente" element={
             <RoleRoute allowedRoles={['gerente', 'direccion', 'director_maestria']}>
               <GerenteDashboard />
@@ -168,7 +186,7 @@ function App() {
           } />
 
           <Route path="/auditoria-kpis" element={
-            <RoleRoute allowedRoles={['gerente', 'direccion', 'director_maestria']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['gerente', 'direccion', 'director_maestria', 'superadmin', 'cfo']} requireSuperAdmin={false}>
               <AuditoriaKPIs />
             </RoleRoute>
           } />
@@ -197,52 +215,66 @@ function App() {
             </PrivateRoute>
           } />
 
+          {/* PMO Culture Integrations */}
+          <Route path="/portafolio" element={
+            <RoleRoute allowedRoles={['gerente', 'direccion', 'director_maestria', 'cfo', 'superadmin']} requireSuperAdmin={false}>
+              <PortfolioBoard />
+            </RoleRoute>
+          } />
+          
+          <Route path="/estrategia" element={
+            <RoleRoute allowedRoles={['gerente', 'direccion', 'director_maestria', 'cfo', 'superadmin']} requireSuperAdmin={false}>
+              <StrategyBoard />
+            </RoleRoute>
+          } />
+
+          <Route path="/acuerdos" element={
+            <PrivateRoute>
+              <OfficialAgreements />
+            </PrivateRoute>
+          } />
+
+          <Route path="/calendario-equipo" element={
+            <PrivateRoute>
+              <TeamCalendar />
+            </PrivateRoute>
+          } />
+
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
       
-      {/* SELECTOR DE TEMA GLOBAL PERSISTENTE EN TODA LA NAVEGACIÓN */}
-      <div 
-        style={{
-          position: 'fixed',
-          bottom: '2rem',
-          left: '2rem',
-          zIndex: 9990,
-          boxShadow: '0 8px 30px rgba(0,0,0,0.3)',
-          borderRadius: '9999px'
-        }}
-      >
-        <ThemeSelector />
-      </div>
-
       {/* Botón flotante de ayuda */}
       {currentUser && (
-        <button
-          onClick={() => setShowHelp(true)}
-          title="Manual y Ayuda"
-          style={{
-            position: 'fixed',
-            bottom: '2rem',
-            right: '2rem',
-            width: '56px',
-            height: '56px',
-            borderRadius: '50%',
-            background: 'var(--crear-gold)',
-            color: '#000',
-            border: 'none',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
-            cursor: 'pointer',
-            zIndex: 9000,
-            transition: 'transform 0.2s ease',
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-          onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-        >
-          <HelpCircle size={28} />
-        </button>
+        <>
+          <AICopilot />
+          <button
+            onClick={() => setShowHelp(true)}
+            title="Manual y Ayuda"
+            style={{
+              position: 'fixed',
+              bottom: '2rem',
+              right: '6.5rem',
+              width: '56px',
+              height: '56px',
+              borderRadius: '50%',
+              background: 'var(--crear-gold)',
+              color: '#000',
+              border: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+              cursor: 'pointer',
+              zIndex: 9000,
+              transition: 'transform 0.2s ease',
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+          >
+            <HelpCircle size={28} />
+          </button>
+        </>
       )}
 
       <HelpModal isOpen={showHelp} onClose={() => setShowHelp(false)} />

@@ -190,13 +190,12 @@ export const canViewSede = (currentUser) => {
  * Estos usuarios pueden alternar entre su vista de entrenador y su rol de oficina.
  */
 export const DUAL_ROLE_TRAINER_EMAILS = [
+  'jose.sanchez@crearpsl.net',      // SuperAdmin + Gerente Lima + Entrenador
   'andres.gomez@crearpsl.net',     // Director Maestría + Entrenador C2+MJ
   'fer.aragon@crearpsl.net',        // Corporativo + Entrenador C1
   'paul.sosa@crearpsl.net',         // Corporativo + Entrenador C2+MJ
   'leandro.brunis@crearpsl.net',    // Dirección / Corporativo + Entrenador C1 (Leandro Brunis)
-  'leandro.brunis@crearpsl.net',
   'carlos.brunis@crearpsl.net',     // Coordinador QT Global + Entrenador (Carlos Brunis)
-  'carlos.brunis@crearpsl.net',
   'brunische66@gmail.com',
 ];
 

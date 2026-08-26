@@ -2,14 +2,19 @@ import { useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useChecklist } from '../context/ChecklistContext';
+
 import { useCycles } from '../context/CyclesContext';
 import { useUI } from '../context/UIContext';
+
 import { roles } from '../data/checklistData';
 import { usersData, normalizeRole, ROLE_COLORS, ROLE_DISPLAY_NAMES, getRoleDisplayName } from '../data/usersData';
 import { calculateAutomaticDeadline } from '../utils/soarDates';
-import { ArrowLeft, Target, Link as LinkIcon, Edit3, Filter, Clock, Calendar, ShieldAlert, Users, AtSign } from 'lucide-react';
+import { ArrowLeft, Target, Link as LinkIcon, Edit3, Clock, ShieldAlert, Users, Sparkles } from 'lucide-react';
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
 import TaskCollaborationModal from '../components/TaskCollaborationModal';
+import LearningReflectionModal from '../components/LearningReflectionModal';
+import NewExcellenceModal from '../components/NewExcellenceModal';
+import SyncHistoryModal from '../components/SyncHistoryModal';
 
 export default function ChecklistBoard() {
   const { roleId: rawRoleId } = useParams();
@@ -17,8 +22,13 @@ export default function ChecklistBoard() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [showTaskModal, setShowTaskModal] = useState(false);
+  const [taskToEdit, setTaskToEdit] = useState(null);
+  const [processingTasks, setProcessingTasks] = useState(new Set());
   const [showCollabModal, setShowCollabModal] = useState(false);
+  const [showSyncHistoryModal, setShowSyncHistoryModal] = useState(false);
   const [selectedTaskForCollab, setSelectedTaskForCollab] = useState(null);
+  const [taskForReflection, setTaskForReflection] = useState(null);
+  const [taskForExcellence, setTaskForExcellence] = useState(null);
   const [qtPhaseFilter, setQtPhaseFilter] = useState('all'); // 'all', 'PRE-C1', 'C1', 'POST-C1'
 
   const { currentUser } = useAuth();
@@ -118,8 +128,27 @@ export default function ChecklistBoard() {
   const completedActive = stageTasks.filter(t => t.completed || t.status === 'Completada').length;
   const progress = stageTasks.length > 0 ? Math.round((completedActive / stageTasks.length) * 100) : 100;
 
-  const handleStatusChange = (task) => {
-    toggleTask(task.id, task.completed);
+  const handleStatusChange = async (task) => {
+    if (processingTasks.has(task.id)) return;
+    
+    // Si la tarea se está marcando como completada y es crítica/alta prioridad, proponer reflexión
+    if (!task.completed && (task.isCritical || task.priority === 'Crítica' || task.priority === 'Alta')) {
+      setTaskForReflection(task);
+      return;
+    }
+    
+    try {
+      setProcessingTasks(prev => new Set(prev).add(task.id));
+      await toggleTask(task.id, task.completed);
+    } catch (err) {
+      console.error("Error toggling task status:", err);
+    } finally {
+      setProcessingTasks(prev => {
+        const next = new Set(prev);
+        next.delete(task.id);
+        return next;
+      });
+    }
   };
 
   const handleAddEvidence = async (task) => {
@@ -160,6 +189,19 @@ export default function ChecklistBoard() {
     return 'var(--text-muted)';
   };
 
+  const canEditTask = (task) => {
+    if (!currentUser) return false;
+    if (currentUser.isSuperAdmin) return true;
+    const taskCreator = task.createdBy ? String(task.createdBy).toLowerCase().trim() : '';
+    const userEmail = currentUser.email ? String(currentUser.email).toLowerCase().trim() : '';
+    return taskCreator !== '' && taskCreator === userEmail;
+  };
+
+  const handleEditClick = (task) => {
+    setTaskToEdit(task);
+    setShowTaskModal(true);
+  };
+
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem 1rem' }}>
       <button onClick={() => navigate(-1)} className="btn-secondary" style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem' }}>
@@ -186,6 +228,14 @@ export default function ChecklistBoard() {
             >
               <img src="https://www.gstatic.com/images/branding/product/1x/tasks_48dp.png" alt="Google Tasks" style={{ width: '14px', height: '14px' }} />
               Sincronizar
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowSyncHistoryModal(true)}
+              style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.2)', color: 'var(--text-muted)', padding: '0.3rem 0.6rem', borderRadius: '4px', cursor: 'pointer' }}
+              title="Ver Historial de Sincronizaciones"
+            >
+              <Clock size={16} />
             </button>
             <button 
               type="button"
@@ -296,14 +346,26 @@ export default function ChecklistBoard() {
                 <div style={{ flex: 1, display: 'flex', gap: '1rem' }}>
                   <input 
                     type="checkbox" 
+                    disabled={processingTasks.has(task.id)}
                     checked={task.completed || task.status === 'Completada'}
                     onChange={() => handleStatusChange(task)}
-                    style={{ width: '20px', height: '20px', cursor: 'pointer', marginTop: '3px' }}
+                    style={{ width: '20px', height: '20px', cursor: processingTasks.has(task.id) ? 'wait' : 'pointer', marginTop: '3px', opacity: processingTasks.has(task.id) ? 0.5 : 1 }}
                   />
                   <div>
-                    <h3 className={task.completed ? 'text-muted' : 'text-white'} style={{ margin: '0 0 0.4rem 0', textDecoration: task.completed ? 'line-through' : 'none', fontSize: '1.05rem' }}>
-                      {task.task || task.title}
-                    </h3>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1rem' }}>
+                      <h3 className={task.completed ? 'text-muted' : 'text-white'} style={{ margin: '0 0 0.4rem 0', textDecoration: task.completed ? 'line-through' : 'none', fontSize: '1.05rem' }}>
+                        {task.task || task.title}
+                      </h3>
+                      {canEditTask(task) && !task.completed && (
+                        <button 
+                          onClick={() => handleEditClick(task)}
+                          style={{ background: 'none', border: 'none', color: 'var(--crear-cyan)', cursor: 'pointer', padding: '0.2rem', display: 'flex', alignItems: 'center' }}
+                          title="Editar Tarea"
+                        >
+                          <Edit3 size={16} />
+                        </button>
+                      )}
+                    </div>
 
                     {/* FECHA Y HORA LÍMITE AUTOMÁTICA SO-AR */}
                     {(() => {
@@ -413,6 +475,12 @@ export default function ChecklistBoard() {
                   <button onClick={() => handleSetDeadline(task)} style={{ background: 'rgba(255,215,0,0.08)', border: '1px solid rgba(255,215,0,0.3)', color: 'var(--crear-gold)', padding: '0.3rem 0.8rem', borderRadius: '4px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem', cursor: 'pointer' }}>
                     <Clock size={14} /> Fecha/Hora Límite
                   </button>
+                  <button onClick={() => setTaskForReflection(task)} style={{ background: 'rgba(212, 175, 55, 0.1)', border: '1px solid var(--crear-gold)', color: 'var(--crear-gold)', padding: '0.3rem 0.8rem', borderRadius: '4px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem', cursor: 'pointer', fontWeight: 'bold' }}>
+                    <Sparkles size={14} /> Aprendizaje
+                  </button>
+                  <button onClick={() => setTaskForExcellence(task)} style={{ background: 'linear-gradient(135deg, rgba(255,183,3,0.15), rgba(245,158,11,0.15))', border: '1px solid #f59e0b', color: '#f59e0b', padding: '0.3rem 0.8rem', borderRadius: '4px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem', cursor: 'pointer', fontWeight: 'bold' }}>
+                    👑 Nueva Excelencia
+                  </button>
                   <button onClick={() => handleAddComment(task)} style={{ background: 'none', border: '1px solid rgba(255,255,255,0.2)', color: 'var(--text-muted)', padding: '0.3rem 0.8rem', borderRadius: '4px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem', cursor: 'pointer' }}>
                     <Edit3 size={14} /> Notas
                   </button>
@@ -429,7 +497,14 @@ export default function ChecklistBoard() {
         )}
       </div>
 
-      <TaskAssignmentModal isOpen={showTaskModal} onClose={() => setShowTaskModal(false)} />
+      <TaskAssignmentModal 
+        isOpen={showTaskModal} 
+        onClose={() => {
+          setShowTaskModal(false);
+          setTaskToEdit(null);
+        }} 
+        taskToEdit={taskToEdit}
+      />
       
       {/* MODAL DE COLABORACIÓN / MENCIÓN */}
       <TaskCollaborationModal
@@ -438,6 +513,26 @@ export default function ChecklistBoard() {
         task={selectedTaskForCollab}
         onSendInvitation={inviteCollaborator}
       />
+
+      {/* MODAL DE REFLEXIÓN Y APRENDIZAJE */}
+      <LearningReflectionModal
+        isOpen={!!taskForReflection}
+        onClose={() => setTaskForReflection(null)}
+        task={taskForReflection}
+        onComplete={async (taskId) => {
+          await toggleTask(taskId, false); // false porque antes no estaba completada
+          setTaskForReflection(null);
+        }}
+      />
+
+      {/* MODAL DE NUEVA EXCELENCIA */}
+      <NewExcellenceModal
+        isOpen={!!taskForExcellence}
+        onClose={() => setTaskForExcellence(null)}
+        task={taskForExcellence}
+      />
+
+      <SyncHistoryModal isOpen={showSyncHistoryModal} onClose={() => setShowSyncHistoryModal(false)} />
     </div>
   );
 }

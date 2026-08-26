@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { ROLE_DISPLAY_NAMES } from '../data/usersData';
@@ -6,14 +7,23 @@ export default function RoleSelector() {
   const navigate = useNavigate();
   const { currentUser, switchRole } = useAuth();
 
-  const handleRoleSelect = (roleId) => {
-    switchRole(roleId);
-    if (roleId === 'gerente') {
-      navigate('/gerente');
-    } else if (roleId === 'global' || roleId === 'consolidado') {
-      navigate('/home');
-    } else {
-      navigate(`/checklist/${roleId}`);
+  const [isSwitching, setIsSwitching] = useState(false);
+
+  const handleRoleSelect = async (roleId) => {
+    if (isSwitching) return;
+    setIsSwitching(true);
+    try {
+      await switchRole(roleId);
+      if (roleId === 'gerente') {
+        navigate('/gerente');
+      } else if (roleId === 'global' || roleId === 'consolidado') {
+        navigate('/home');
+      } else {
+        navigate(`/checklist/${roleId}`);
+      }
+    } catch(err) {
+      console.error(err);
+      setIsSwitching(false);
     }
   };
 
@@ -58,10 +68,11 @@ export default function RoleSelector() {
           {userRoles.length > 1 && (
             <button
               className="btn-primary"
-              style={{ width: '100%', padding: '1.2rem', fontSize: '1.2rem', background: 'linear-gradient(45deg, #d4af37, #f5d565)', color: '#111', fontWeight: 'bold' }}
+              disabled={isSwitching}
+              style={{ width: '100%', padding: '1.2rem', fontSize: '1.2rem', background: 'linear-gradient(45deg, #d4af37, #f5d565)', color: '#111', fontWeight: 'bold', opacity: isSwitching ? 0.7 : 1, cursor: isSwitching ? 'not-allowed' : 'pointer' }}
               onClick={() => handleRoleSelect('consolidado')}
             >
-              VISTA CONSOLIDADA (GLOBAL)
+              {isSwitching ? 'Cambiando...' : 'VISTA CONSOLIDADA (GLOBAL)'}
             </button>
           )}
 
@@ -69,7 +80,8 @@ export default function RoleSelector() {
             <button
               key={role}
               className="btn-secondary"
-              style={{ width: '100%', padding: '1rem', fontSize: '1.1rem', borderColor: '#4b5563' }}
+              disabled={isSwitching}
+              style={{ width: '100%', padding: '1rem', fontSize: '1.1rem', borderColor: '#4b5563', opacity: isSwitching ? 0.7 : 1, cursor: isSwitching ? 'not-allowed' : 'pointer' }}
               onClick={() => handleRoleSelect(role)}
             >
               Vista de: {ROLE_DISPLAY_NAMES[role] || role.toUpperCase()}
@@ -78,7 +90,8 @@ export default function RoleSelector() {
           
           <button
             className="btn-secondary"
-            style={{ width: '100%', padding: '1rem', fontSize: '1rem', marginTop: '1rem', opacity: 0.7 }}
+            disabled={isSwitching}
+            style={{ width: '100%', padding: '1rem', fontSize: '1rem', marginTop: '1rem', opacity: isSwitching ? 0.5 : 0.7, cursor: isSwitching ? 'not-allowed' : 'pointer' }}
             onClick={() => navigate('/home')}
           >
             Ir al Dashboard (Home)
