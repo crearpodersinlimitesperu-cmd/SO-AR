@@ -222,6 +222,14 @@ export function AuthProvider({ children }) {
       
       const user = result.user;
       const rawEmail = user.email.trim().toLowerCase();
+      
+      // FORZAR USO DE .NET (Excepto para los correos autorizados explicitamente de gmail)
+      const allowedGmails = ['armando.pilacuan@gmail.com', 'gomeznueve@gmail.com'];
+      if (!rawEmail.endsWith('@crearpsl.net') && !allowedGmails.includes(rawEmail)) {
+        // Rechazar acceso
+        await auth.signOut();
+        throw new Error('ACCESO DENEGADO: Por política corporativa, debes iniciar sesión exclusivamente con tu correo corporativo @crearpsl.net');
+      }
       const normalizedEmail = rawEmail.replace('@crearpsl.com', '@crearpsl.net');
       
       // Buscar en Firestore con búsqueda progresiva
