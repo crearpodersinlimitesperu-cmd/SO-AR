@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { doc, onSnapshot, getDoc } from 'firebase/firestore';
-import { db } from '../services/firebase';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db, auth } from '../services/firebase';
 import { 
   TrendingUp, Users, ArrowLeft, RefreshCw, CheckCircle2, 
   AlertCircle, ChevronRight, Filter, ShieldCheck, DollarSign, 
@@ -33,32 +33,49 @@ export default function EmbudoConversionBoard() {
 
   // Escuchar snapshot de Nodus en tiempo real desde Firestore
   useEffect(() => {
-    const docRef = doc(db, 'nodus_kpis_sincronizados', 'latest_snapshot');
-    const unsubscribe = onSnapshot(docRef, (docSnap) => {
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        setSnapshotData(data);
-        setLastUpdated(data.timestamp || new Date().toISOString());
+    let cancelled = false;
+    let unsubscribe = () => {};
 
-        // Detectar equipos en snapshot
-        if (data.secciones?.reporteAsistenciaPorEquipo) {
-          const keys = Object.keys(data.secciones.reporteAsistenciaPorEquipo).map(k => {
-            const match = k.match(/EQUIPO\s+\d+/i);
-            return match ? match[0].toUpperCase() : k;
-          });
-          const uniqueEquipos = Array.from(new Set(keys)).filter(Boolean);
-          if (uniqueEquipos.length > 0) {
-            setEquiposDisponibles([...uniqueEquipos, 'TODOS']);
+    function subscribe(alreadyRetried) {
+      const docRef = doc(db, 'nodus_kpis_sincronizados', 'latest_snapshot');
+      unsubscribe = onSnapshot(docRef, (docSnap) => {
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setSnapshotData(data);
+          setLastUpdated(data.timestamp || new Date().toISOString());
+
+          // Detectar equipos en snapshot
+          if (data.secciones?.reporteAsistenciaPorEquipo) {
+            const keys = Object.keys(data.secciones.reporteAsistenciaPorEquipo).map(k => {
+              const match = k.match(/EQUIPO\s+\d+/i);
+              return match ? match[0].toUpperCase() : k;
+            });
+            const uniqueEquipos = Array.from(new Set(keys)).filter(Boolean);
+            if (uniqueEquipos.length > 0) {
+              setEquiposDisponibles([...uniqueEquipos, 'TODOS']);
+            }
           }
         }
-      }
-      setLoading(false);
-    }, (err) => {
-      console.error("Error escuchando snapshot:", err);
-      setLoading(false);
-    });
+        setLoading(false);
+      }, async (err) => {
+        console.error("Error escuchando snapshot:", err);
+        // Un token de sesión cacheado/desactualizado puede rechazar la suscripción aunque
+        // el usuario esté realmente logueado. Se fuerza un refresco y se reintenta una sola vez.
+        if (err.code === 'permission-denied' && !alreadyRetried && auth.currentUser) {
+          try {
+            await auth.currentUser.getIdToken(true);
+            if (!cancelled) subscribe(true);
+            return;
+          } catch (refreshErr) {
+            console.error("Error refrescando token:", refreshErr);
+          }
+        }
+        setLoading(false);
+      });
+    }
 
-    return () => unsubscribe();
+    subscribe(false);
+    return () => { cancelled = true; unsubscribe(); };
   }, []);
 
   // Calcular las métricas del embudo relacional (Emulando la Vista SQL vista_embudo_conversion_c1_c2_mj)

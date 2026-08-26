@@ -26,7 +26,8 @@ export default function GerenteDashboard() {
   const [showVenueModal, setShowVenueModal] = useState(false);
 
   useEffect(() => {
-    const isAllowed = currentUser?.isGerente || currentUser?.isDireccion || currentUser?.isSuperAdmin || ['gerente', 'direccion', 'director_maestria'].includes(currentUser?.appRole);
+    const allowedRoles = ['gerente', 'direccion', 'director_maestria', 'superadmin', 'consolidado', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'entrenador', 'entrenador_llamadas', 'qt', 'capitan'];
+    const isAllowed = currentUser?.isGerente || currentUser?.isDireccion || currentUser?.isSuperAdmin || allowedRoles.includes(currentUser?.appRole);
     if (!isAllowed) {
       navigate('/home');
     }

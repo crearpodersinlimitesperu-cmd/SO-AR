@@ -1,3 +1,60 @@
 {
-  "files": []
+  "files": [
+    {
+      "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "size": "484841",
+      "id": "164p28NXFDaq_azmw_U5L3fYMypdDRvtL",
+      "name": "REPORTE CAP 1-2 2026.xlsx",
+      "modifiedTime": "2026-08-25T14:57:27.965Z"
+    },
+    {
+      "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "size": "483378",
+      "id": "17TDyo7n7QHijY8-1ynPIUQwrMBdll-Qd",
+      "name": "MAESTRIA LIMA.xlsx",
+      "modifiedTime": "2026-08-25T14:10:48.519Z"
+    },
+    {
+      "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "size": "87987",
+      "id": "17PAj3H3vXpH6GCuPTxprbYakbYozV6xU",
+      "name": "MJ MEDELLIN.xlsx",
+      "modifiedTime": "2026-08-25T13:28:56.229Z"
+    },
+    {
+      "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "size": "578257",
+      "id": "12RvEiUQl_M__VpUW3juguFjRZRv05NaD",
+      "name": "MAESTRIA GYE.xlsx",
+      "modifiedTime": "2026-08-25T13:22:19.367Z"
+    },
+    {
+      "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "size": "253810",
+      "id": "1TMaKPPzPbQE0sTmlWzwzgXBeed7nAcWq",
+      "name": "MAESTRIA CUENCA.xlsx",
+      "modifiedTime": "2026-08-25T13:17:00.209Z"
+    },
+    {
+      "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "size": "1122659",
+      "id": "16aFqD8BmPS2qxFoYK8b0IRBIB5DXC5Fg",
+      "name": "MAESTRIA QUITO.xlsx",
+      "modifiedTime": "2026-08-25T13:09:22.586Z"
+    },
+    {
+      "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "size": "36806",
+      "id": "1L-YT7qMwCU_sM3LJi142N7-17EH4J8XT",
+      "name": "MJ CDMX.xlsx",
+      "modifiedTime": "2026-08-24T14:30:31.100Z"
+    },
+    {
+      "mimeType": "application/vnd.google-apps.spreadsheet",
+      "size": "1024",
+      "id": "1Ax1jCJdiAMGaiLtGAZzQpci6LQdjcUUAP6mDUVZxJEs",
+      "name": "Dashboard Estadísticas - Fer",
+      "modifiedTime": "2026-06-30T13:12:23.940Z"
+    }
+  ]
 }

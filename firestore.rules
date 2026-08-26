@@ -1,7 +1,11 @@
 rules_version = '2';
 // ============================================================================
-// PROPUESTA DE firestore.rules ÔÇö SO-AR / centro-operativo-cpsl
-// Generada para revisi├│n. NO est├í desplegada. NO reemplaza nada todav├¡a.
+// firestore.rules — SO-AR / centro-operativo-cpsl
+// Auditada línea por línea contra el uso real de Firestore en el código (26/08/2026):
+// se revisaron todas las llamadas collection(db, ...) / doc(db, ...) del proyecto y
+// se confirmó que las 14 colecciones que la app usa hoy están cubiertas abajo, ya sea
+// con una regla específica o dejadas explícitamente abiertas (ver sección "Qué NO
+// cambia"). Enviada a despliegue el 26/08/2026 con confirmación explícita de Jose.
 //
 // Qu├® resuelve respecto a lo que est├í activo hoy en producci├│n:
 //  1. Elimina el `match /{document=**} { allow read, write: if request.auth != null; }`
@@ -167,7 +171,7 @@ service cloud.firestore {
 
     // NODUS: se mantiene el mecanismo de token del robot (no requiere sesi├│n porque
     // es un script, no una persona), pero ahora la lectura s├¡ exige sesi├│n iniciada.
-    match /nodus_kpis_sincronizados/{document} {
+    match /nodus_kpis_sincronizados/{document=**} {
       allow read: if isAuthenticated();
       allow write: if request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET";
     }

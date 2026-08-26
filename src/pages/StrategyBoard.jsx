@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Target, TrendingUp, AlertCircle, CheckCircle2, ChevronRight, BarChart2, Briefcase, ChevronDown, ArrowLeft, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../services/firebase';
+import { doc } from 'firebase/firestore';
+import { db, getDocResilient } from '../services/firebase';
 import { OPERATIONAL_SEDES } from '../data/usersData';
 
 export default function StrategyBoard() {
@@ -29,7 +29,7 @@ export default function StrategyBoard() {
     async function fetchData() {
       try {
         const docRef = doc(db, 'nodus_kpis_sincronizados', 'latest_snapshot');
-        const docSnap = await getDoc(docRef);
+        const docSnap = await getDocResilient(docRef);
         
         if (docSnap.exists()) {
           const data = docSnap.data();
@@ -115,7 +115,11 @@ export default function StrategyBoard() {
         }
       } catch (error) {
         console.error("Error obteniendo datos de Nodus:", error);
-        setErrorObj(error.message || "Ocurrió un error inesperado al leer los datos.");
+        if (error.code === 'permission-denied') {
+          setErrorObj("Sesión expirada o sin permisos. Por favor, cierra sesión y entra de nuevo.");
+        } else {
+          setErrorObj(error.message || "Ocurrió un error inesperado al leer los datos.");
+        }
       } finally {
         setLoading(false);
       }

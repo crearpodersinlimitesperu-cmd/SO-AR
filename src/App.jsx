@@ -141,7 +141,7 @@ function App() {
           } />
 
           <Route path="/manual-nodus" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'entrenador', 'qt', 'capitan', 'manager', 'aliado', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'director_maestria', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
               <ManualNodus />
             </RoleRoute>
           } />
@@ -158,11 +158,7 @@ function App() {
             </RoleRoute>
           } />
 
-          <Route path="/manual" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt']}>
-              <ManualGuia />
-            </RoleRoute>
-          } />
+
 
           <Route path="/excelencia" element={
             <PrivateRoute>
@@ -171,7 +167,7 @@ function App() {
           } />
           
           <Route path="/gerente" element={
-            <RoleRoute allowedRoles={['gerente', 'direccion', 'cfo', 'ceo', 'cco', 'superadmin', 'consolidado']}>
+            <RoleRoute allowedRoles={['gerente', 'direccion', 'cfo', 'ceo', 'cco', 'superadmin', 'consolidado', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'director_maestria', 'entrenador', 'entrenador_llamadas', 'qt', 'capitan']}>
               <GerenteDashboard />
             </RoleRoute>
           } />
@@ -256,9 +252,9 @@ function App() {
           } />
 
           <Route path="/calendario-equipo" element={
-            <PrivateRoute>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
               <TeamCalendar />
-            </PrivateRoute>
+            </RoleRoute>
           } />
 
           <Route path="*" element={<Navigate to="/" replace />} />
@@ -268,7 +264,10 @@ function App() {
       {/* Botón flotante de ayuda */}
       {currentUser && (
         <>
-          <AICopilot />
+          {/* Copiloto SO-AR: restringido a Gerentes y Directivos por decisión explícita (26/08/2026) */}
+          {(currentUser.isSuperAdmin || currentUser.isGerente || currentUser.isDireccion) && (
+            <AICopilot />
+          )}
           <button
             onClick={() => setShowHelp(true)}
             title="Manual y Ayuda"

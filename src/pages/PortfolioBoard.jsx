@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Briefcase, TrendingUp, AlertCircle, CheckCircle2, ChevronRight, Activity, Clock, ShieldCheck, Box, ArrowLeft, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../services/firebase';
+import { doc } from 'firebase/firestore';
+import { db, getDocResilient } from '../services/firebase';
 import { OPERATIONAL_SEDES } from '../data/usersData';
 
 export default function PortfolioBoard() {
@@ -31,7 +31,7 @@ export default function PortfolioBoard() {
     async function fetchData() {
       try {
         const docRef = doc(db, 'nodus_kpis_sincronizados', 'latest_snapshot');
-        const docSnap = await getDoc(docRef);
+        const docSnap = await getDocResilient(docRef);
         
         if (docSnap.exists()) {
           const data = docSnap.data();
@@ -111,7 +111,11 @@ export default function PortfolioBoard() {
         }
       } catch (error) {
         console.error("Error obteniendo datos de Nodus:", error);
-        setErrorObj(error.message || "Ocurrió un error inesperado al leer los datos.");
+        if (error.code === 'permission-denied') {
+          setErrorObj("Sesión expirada o sin permisos. Por favor, cierra sesión y entra de nuevo.");
+        } else {
+          setErrorObj(error.message || "Ocurrió un error inesperado al leer los datos.");
+        }
       } finally {
         setLoading(false);
       }
@@ -165,6 +169,17 @@ export default function PortfolioBoard() {
             <AlertCircle size={40} style={{ margin: '0 auto 1rem auto' }} />
             <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem' }}>Error de Sincronización</h2>
             <p>{errorObj}</p>
+            {errorObj.includes('cierra sesión') && (
+              <button 
+                onClick={() => {
+                  import('../services/firebase').then(({ auth }) => auth.signOut());
+                  navigate('/login');
+                }} 
+                style={{ marginTop: '1rem', padding: '0.5rem 1rem', background: '#ef4444', color: 'white', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}
+              >
+                Cerrar sesión ahora
+              </button>
+            )}
           </div>
         ) : (
           <>

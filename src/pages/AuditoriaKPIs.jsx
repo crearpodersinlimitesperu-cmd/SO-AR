@@ -2,12 +2,13 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
-import { collection, getDocs, updateDoc, doc, getDoc } from 'firebase/firestore';
-import { db } from '../services/firebase';
+import { collection, getDocs, updateDoc, doc } from 'firebase/firestore';
+import { db, getDocResilient } from '../services/firebase';
 import { CheckCircle2, AlertCircle, ArrowLeft, Users, Target } from 'lucide-react';
 import CountryFlag from '../components/CountryFlag';
 import { recordAuditEvent } from '../services/auditService';
 import { OPERATIONAL_SEDES } from '../data/usersData';
+import DriveDashboard from '../components/DriveDashboard';
 
 export default function AuditoriaKPIs() {
   const { currentUser } = useAuth();
@@ -165,7 +166,7 @@ export default function AuditoriaKPIs() {
 
     try {
       const nodusRef = doc(db, 'nodus_kpis_sincronizados', 'latest_snapshot');
-      const nodusSnap = await getDoc(nodusRef);
+      const nodusSnap = await getDocResilient(nodusRef);
       
       let allData = [];
       
@@ -186,7 +187,12 @@ export default function AuditoriaKPIs() {
 
       setReports(filtered);
     } catch (error) {
-      console.warn("Aviso: Error cargando Nodus", error);
+      if (error.code === 'permission-denied') {
+        console.error("Sesión expirada: Firestore rechazó la lectura", error);
+        showToast("Sesión expirada. Por favor, cierra sesión y entra de nuevo.", 'error');
+      } else {
+        console.warn("Aviso: Error cargando Nodus", error);
+      }
     }
 
     setLoading(false);
@@ -344,11 +350,14 @@ export default function AuditoriaKPIs() {
               cursor: 'pointer' 
             }}
           >
-            ⚡ Embudo C1 ➔ C2 ➔ MJ
+            📊 Embudo C1 ➔ C2 ➔ MJ
           </button>
         </div>
       </div>
 
+        {/* Dashboards Integrados de Google Drive (Reportes de Entrenadores Maestría) */}
+        <DriveDashboard />
+  
       {/* Barra de Filtros Estilo Nodus */}
       <div style={{ 
         background: 'var(--bg-card, #ffffff)', 

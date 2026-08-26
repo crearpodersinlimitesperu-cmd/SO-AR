@@ -28,7 +28,8 @@ import {
   Grid,
   List,
   Flame,
-  FileSpreadsheet
+  FileSpreadsheet,
+  MessageSquare
 } from 'lucide-react';
 
 function InstagramIcon({ size = 14 }) {
@@ -62,6 +63,21 @@ export default function DirectorioQT() {
   useEffect(() => {
     loadMembers(false);
   }, []);
+
+  const handleOpenGoogleChat = (email) => {
+    if (!email) {
+      window.open('https://chat.google.com/u/0/', '_blank');
+      return;
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(email)
+        .then(() => showToast(`Email copiado: ${email}. Pégalo en Google Chat.`, 'success'))
+        .catch(() => showToast(`No se pudo copiar automáticamente. Busca a: ${email}`, 'error'));
+    } else {
+      showToast(`Busca en Google Chat a: ${email}`, 'success');
+    }
+    window.open('https://chat.google.com/u/0/', '_blank');
+  };
 
   const loadMembers = async (forceRefresh = false) => {
     if (forceRefresh) {
@@ -428,13 +444,13 @@ export default function DirectorioQT() {
                 </div>
 
                 {m.email && (
-                  <a 
-                    href={`mailto:${m.email}`}
-                    style={{ fontSize: '0.78rem', color: 'var(--text-muted, #94a3b8)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+                  <button 
+                    onClick={() => handleOpenGoogleChat(m.email)}
+                    style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '0.78rem', color: 'var(--crear-blue)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
                     title={m.email}
                   >
-                    <Mail size={13} /> Contactar
-                  </a>
+                    <MessageSquare size={13} /> Chat Interno
+                  </button>
                 )}
               </div>
             </div>
@@ -489,9 +505,9 @@ export default function DirectorioQT() {
                         </a>
                       )}
                       {m.email && (
-                        <a href={`mailto:${m.email}`} style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-muted)', border: '1px solid rgba(255,255,255,0.1)', padding: '4px 8px', borderRadius: '6px', textDecoration: 'none', fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
-                          <Mail size={11} /> Mail
-                        </a>
+                        <button onClick={() => handleOpenGoogleChat(m.email)} style={{ cursor: 'pointer', background: 'rgba(0, 210, 255, 0.15)', color: 'var(--crear-blue)', border: '1px solid rgba(0, 210, 255, 0.3)', padding: '4px 8px', borderRadius: '6px', textDecoration: 'none', fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
+                          <MessageSquare size={11} /> Chat Interno
+                        </button>
                       )}
                     </div>
                   </td>

@@ -2,7 +2,7 @@ import { readFileSync, writeFileSync } from 'fs';
 import crypto from 'crypto';
 import fetch from 'node-fetch';
 
-const keyPath = "C:\\Users\\josem\\Downloads\\centro-operativo-cpsl-65ad52160f45.json";
+const keyPath = "C:\\\\Users\\\\josem\\\\Downloads\\\\SO-AR\\\\centro-operativo-cpsl-65ad52160f45.json";
 const sa = JSON.parse(readFileSync(keyPath, 'utf8'));
 
 console.log("🔑 Usando Service Account:", sa.client_email);

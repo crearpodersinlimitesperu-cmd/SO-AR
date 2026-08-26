@@ -69,33 +69,66 @@ export async function getVerifiedUser(email) {
  */
 export async function getAllCompanyUsers() {
   const allUsers = [];
+
+  // NOTA (26/08/2026): normalizamos (trim + minúsculas) todas las comparaciones de
+  // email para evitar duplicados por diferencias de mayúsculas/espacios entre
+  // "users", "qt_directory" y el registro local. No eliminamos registros sin email
+  // (docs "fantasma" de la colección "users") porque no hay forma segura de saber,
+  // sin ese dato, si corresponden o no a alguien ya listado — hacerlo arriesgaría
+  // ocultar a una persona real. Ver reporte de auditoría del 26/08/2026 para el
+  // detalle de por qué pueden existir esos docs sin email.
+  const normEmail = (e) => (e || '').toString().trim().toLowerCase();
+
+  const emailKeysOf = (u) => {
+    const keys = new Set();
+    const primary = normEmail(u.email);
+    if (primary) keys.add(primary);
+    (Array.isArray(u.emails) ? u.emails : []).forEach(e => {
+      const k = normEmail(e);
+      if (k) keys.add(k);
+    });
+    return keys;
+  };
+
+  const findExistingIndex = (candidateKeys) => {
+    if (candidateKeys.size === 0) return -1;
+    return allUsers.findIndex(u => {
+      const existingKeys = emailKeysOf(u);
+      for (const k of candidateKeys) {
+        if (existingKeys.has(k)) return true;
+      }
+      return false;
+    });
+  };
+
   try {
     // Los usuarios principales están en la colección "users"
     const usersSnap = await getDocs(collection(db, 'users'));
-    usersSnap.forEach(doc => allUsers.push({ id: doc.id, ...doc.data() }));
+    usersSnap.forEach(docSnap => allUsers.push({ id: docSnap.id, ...docSnap.data() }));
 
     // Opcional: Agregar QT si se manejan aparte, o si ya están en "users", esto se puede omitir.
     const qtSnap = await getDocs(collection(db, 'qt_directory'));
-    qtSnap.forEach(doc => {
-      const docEmail = doc.data().email || (doc.data().emails && doc.data().emails[0]);
-      if (docEmail && !allUsers.find(u => (u.email === docEmail) || (u.emails && u.emails.includes(docEmail)))) {
-        const qtData = doc.data();
-        allUsers.push({ 
-          id: doc.id, 
+    qtSnap.forEach(docSnap => {
+      const qtData = docSnap.data();
+      const candidate = { email: qtData.email, emails: qtData.emails };
+      const candidateKeys = emailKeysOf(candidate);
+      if (candidateKeys.size > 0 && findExistingIndex(candidateKeys) === -1) {
+        allUsers.push({
+          id: docSnap.id,
           ...qtData,
-          role: qtData.role || 'qt' 
+          role: qtData.role || 'qt'
         });
       }
     });
-    
+
   } catch (error) {
     console.error("Error fetching company users:", error);
   }
 
   // Merge fallback con registro estático local para usuarios que aún no están en Firestore
   usersData.forEach(localUser => {
-    const localEmail = localUser.email;
-    if (localEmail && !allUsers.find(u => (u.email === localEmail) || (u.emails && u.emails.includes(localEmail)))) {
+    const candidateKeys = emailKeysOf(localUser);
+    if (candidateKeys.size > 0 && findExistingIndex(candidateKeys) === -1) {
       allUsers.push({ ...localUser, id: localUser.id || localUser.email, source: 'local_registry' });
     }
   });

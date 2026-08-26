@@ -1,0 +1,853 @@
+{
+  "2026": [
+    {
+      "FECHAS": "EQUIPO"
+    },
+    {
+      "FECHAS": "PX que llegaron",
+      "6 FEBRERO": 11,
+      "13 MARZO": 26,
+      "17 ABRIL": 39,
+      "22 MAYO": 29,
+      "26 JUNIO": 37,
+      "31 JULIO": 45
+    },
+    {
+      "FECHAS": "Deserción",
+      "6 FEBRERO": 0,
+      "13 MARZO": 1,
+      "17 ABRIL": 9,
+      "22 MAYO": 5,
+      "26 JUNIO": 2,
+      "31 JULIO": 1
+    },
+    {
+      "FECHAS": "Px Terminaron",
+      "6 FEBRERO": 11,
+      "13 MARZO": 25,
+      "17 ABRIL": 30,
+      "22 MAYO": 24,
+      "26 JUNIO": 35,
+      "31 JULIO": 44
+    },
+    {
+      "FECHAS": "Declaración",
+      "6 FEBRERO": 58,
+      "13 MARZO": 88,
+      "17 ABRIL": 117,
+      "22 MAYO": 74,
+      "26 JUNIO": 95,
+      "31 JULIO": 150
+    },
+    {
+      "FECHAS": "Enrolamiento",
+      "6 FEBRERO": 44,
+      "13 MARZO": 58,
+      "17 ABRIL": 60,
+      "22 MAYO": 35,
+      "26 JUNIO": 56,
+      "31 JULIO": 75
+    },
+    {
+      "FECHAS": "%",
+      "6 FEBRERO": 4,
+      "13 MARZO": 2.230769230769231,
+      "17 ABRIL": 1.5384615384615385,
+      "22 MAYO": 1.206896551724138,
+      "26 JUNIO": 1.5135135135135136,
+      "31 JULIO": 1.6666666666666667
+    },
+    {
+      "FECHAS": "PX en 0",
+      "6 FEBRERO": 0,
+      "13 MARZO": 3,
+      "17 ABRIL": 1,
+      "22 MAYO": 3,
+      "26 JUNIO": 2,
+      "31 JULIO": 2
+    },
+    {
+      "FECHAS": "% PX EN 0",
+      "6 FEBRERO": 0,
+      "13 MARZO": 11.538461538461538,
+      "17 ABRIL": 2.564102564102564,
+      "22 MAYO": 10.344827586206897,
+      "26 JUNIO": 5.405405405405405,
+      "31 JULIO": 4.444444444444445
+    },
+    {
+      "FECHAS": "Managers",
+      "6 FEBRERO": 4,
+      "13 MARZO": 6,
+      "17 ABRIL": 7,
+      "22 MAYO": 4,
+      "26 JUNIO": 3,
+      "31 JULIO": 3
+    },
+    {
+      "FECHAS": "Declaración",
+      "6 FEBRERO": 15,
+      "13 MARZO": 22,
+      "17 ABRIL": 23,
+      "22 MAYO": 12,
+      "26 JUNIO": 13,
+      "31 JULIO": 9
+    },
+    {
+      "FECHAS": "Enrolamiento",
+      "6 FEBRERO": 15,
+      "13 MARZO": 21,
+      "17 ABRIL": 17,
+      "22 MAYO": 13,
+      "26 JUNIO": 12,
+      "31 JULIO": 16
+    },
+    {
+      "FECHAS": "%",
+      "6 FEBRERO": 3.75,
+      "13 MARZO": 3.5,
+      "17 ABRIL": 2.4285714285714284,
+      "22 MAYO": 3.25,
+      "26 JUNIO": 4,
+      "31 JULIO": 5.333333333333333
+    },
+    {
+      "FECHAS": "Enrolamiento",
+      "6 FEBRERO": 59,
+      "13 MARZO": 79,
+      "17 ABRIL": 77,
+      "22 MAYO": 48,
+      "26 JUNIO": 68,
+      "31 JULIO": 91
+    },
+    {
+      "FECHAS": "Declaración",
+      "6 FEBRERO": 73,
+      "13 MARZO": 110,
+      "17 ABRIL": 140,
+      "22 MAYO": 86,
+      "26 JUNIO": 108,
+      "31 JULIO": 159
+    },
+    {
+      "FECHAS": "PX + Seniors",
+      "6 FEBRERO": 15,
+      "13 MARZO": 31,
+      "17 ABRIL": 37,
+      "22 MAYO": 28,
+      "26 JUNIO": 38,
+      "31 JULIO": 47
+    },
+    {
+      "FECHAS": "%",
+      "6 FEBRERO": 3.933333333333333,
+      "13 MARZO": 2.5483870967741935,
+      "17 ABRIL": 2.081081081081081,
+      "22 MAYO": 1.7142857142857142,
+      "26 JUNIO": 1.7894736842105263,
+      "31 JULIO": 1.9361702127659575
+    }
+  ],
+  "6 FEB": [
+    {
+      "FECHA 6 FEB": "ENTRENADOR",
+      "1er": "JUAN"
+    },
+    {
+      "FECHA 6 FEB": "EQUIPO"
+    },
+    {
+      "FECHA 6 FEB": "PX que llegaron",
+      "1er": 11,
+      "TOTALES": 11
+    },
+    {
+      "FECHA 6 FEB": "Deserción",
+      "1er": 0,
+      "TOTALES": 0
+    },
+    {
+      "FECHA 6 FEB": "Px Terminaron",
+      "1er": 11,
+      "2do": 0,
+      "3er": 0,
+      "TOTALES": 11
+    },
+    {
+      "FECHA 6 FEB": "Declaración",
+      "1er": 58,
+      "TOTALES": 58
+    },
+    {
+      "FECHA 6 FEB": "Enrolamiento",
+      "1er": 44,
+      "TOTALES": 44
+    },
+    {
+      "FECHA 6 FEB": "%",
+      "1er": 4,
+      "2do": "#DIV/0!",
+      "3er": "#DIV/0!",
+      "TOTALES": 4
+    },
+    {
+      "FECHA 6 FEB": "PX en 0",
+      "1er": 0,
+      "TOTALES": 0
+    },
+    {
+      "FECHA 6 FEB": "% PX EN 0",
+      "1er": 0,
+      "2do": "#DIV/0!",
+      "3er": "#DIV/0!",
+      "TOTALES": 0
+    },
+    {
+      "FECHA 6 FEB": "Managers",
+      "1er": 4,
+      "TOTALES": 4
+    },
+    {
+      "FECHA 6 FEB": "Declaración",
+      "1er": 15,
+      "TOTALES": 15
+    },
+    {
+      "FECHA 6 FEB": "Enrolamiento",
+      "1er": 15,
+      "TOTALES": 15
+    },
+    {
+      "FECHA 6 FEB": "%",
+      "1er": 3.75,
+      "2do": "#DIV/0!",
+      "3er": "#DIV/0!",
+      "TOTALES": 3.75
+    },
+    {
+      "FECHA 6 FEB": "Enrolamiento",
+      "1er": 59,
+      "2do": 0,
+      "3er": 0,
+      "TOTALES": 59
+    },
+    {
+      "FECHA 6 FEB": "Declaración",
+      "1er": 73,
+      "2do": 0,
+      "3er": 0,
+      "TOTALES": 73
+    },
+    {
+      "FECHA 6 FEB": "PX + Seniors",
+      "1er": 15,
+      "2do": 0,
+      "3er": 0,
+      "TOTALES": 15
+    },
+    {
+      "FECHA 6 FEB": "%",
+      "1er": 3.933333333,
+      "2do": "#DIV/0!",
+      "3er": "#DIV/0!",
+      "TOTALES": 3.933333333
+    }
+  ],
+  "13 MAR": [
+    {
+      "FECHA 13 MARZO": "ENTRENADOR",
+      "1er": "CIRILO",
+      "2do": "ALONSO"
+    },
+    {
+      "FECHA 13 MARZO": "EQUIPO",
+      "1er": 2
+    },
+    {
+      "FECHA 13 MARZO": "PX que llegaron",
+      "1er": 16,
+      "2do": 10,
+      "TOTALES": 26
+    },
+    {
+      "FECHA 13 MARZO": "Deserción",
+      "1er": 1,
+      "2do": 0,
+      "TOTALES": 1
+    },
+    {
+      "FECHA 13 MARZO": "Px Terminaron",
+      "1er": 15,
+      "2do": 10,
+      "3er": 0,
+      "TOTALES": 25
+    },
+    {
+      "FECHA 13 MARZO": "Declaración",
+      "1er": 51,
+      "2do": 37,
+      "TOTALES": 88
+    },
+    {
+      "FECHA 13 MARZO": "Enrolamiento",
+      "1er": 41,
+      "2do": 17,
+      "TOTALES": 58
+    },
+    {
+      "FECHA 13 MARZO": "%",
+      "1er": 2.733333333,
+      "2do": 1.7,
+      "3er": "#DIV/0!",
+      "TOTALES": 2.230769231
+    },
+    {
+      "FECHA 13 MARZO": "PX en 0",
+      "1er": 1,
+      "2do": 2,
+      "TOTALES": 3
+    },
+    {
+      "FECHA 13 MARZO": "% PX EN 0",
+      "1er": 6.25,
+      "2do": 20,
+      "3er": "#DIV/0!",
+      "TOTALES": 11.53846154
+    },
+    {
+      "FECHA 13 MARZO": "Managers",
+      "1er": 2,
+      "2do": 4,
+      "TOTALES": 6
+    },
+    {
+      "FECHA 13 MARZO": "Declaración",
+      "1er": 10,
+      "2do": 12,
+      "TOTALES": 22
+    },
+    {
+      "FECHA 13 MARZO": "Enrolamiento",
+      "1er": 10,
+      "2do": 11,
+      "TOTALES": 21
+    },
+    {
+      "FECHA 13 MARZO": "%",
+      "1er": 5,
+      "2do": 2.75,
+      "3er": "#DIV/0!",
+      "TOTALES": 3.5
+    },
+    {
+      "FECHA 13 MARZO": "Enrolamiento",
+      "1er": 51,
+      "2do": 28,
+      "3er": 0,
+      "TOTALES": 79
+    },
+    {
+      "FECHA 13 MARZO": "Declaración",
+      "1er": 61,
+      "2do": 49,
+      "3er": 0,
+      "TOTALES": 110
+    },
+    {
+      "FECHA 13 MARZO": "PX + Seniors",
+      "1er": 17,
+      "2do": 14,
+      "3er": 0,
+      "TOTALES": 31
+    },
+    {
+      "FECHA 13 MARZO": "%",
+      "1er": 3,
+      "2do": 2,
+      "3er": "#DIV/0!",
+      "TOTALES": 2.548387097
+    }
+  ],
+  "17 ABR": [
+    {
+      "__EMPTY": "ENTRENADOR",
+      "1er": "JUAN",
+      "2do": "ANA",
+      "3er": "CIRILO"
+    },
+    {
+      "__EMPTY": "EQUIPO"
+    },
+    {
+      "__EMPTY": "PX que llegaron",
+      "1er": 18,
+      "2do": 11,
+      "3er": 10,
+      "TOTALES": 39
+    },
+    {
+      "__EMPTY": "Deserción",
+      "1er": 6,
+      "2do": 1,
+      "3er": 2,
+      "TOTALES": 9
+    },
+    {
+      "__EMPTY": "Px Terminaron",
+      "1er": 12,
+      "2do": 10,
+      "3er": 8,
+      "TOTALES": 30
+    },
+    {
+      "__EMPTY": "Declaración",
+      "1er": 53,
+      "2do": 28,
+      "3er": 36,
+      "TOTALES": 117
+    },
+    {
+      "__EMPTY": "Enrolamiento",
+      "1er": 26,
+      "2do": 17,
+      "3er": 17,
+      "TOTALES": 60
+    },
+    {
+      "__EMPTY": "%",
+      "1er": 2.166666667,
+      "2do": 1.7,
+      "3er": 2.125,
+      "TOTALES": 1.538461538
+    },
+    {
+      "__EMPTY": "PX en 0",
+      "1er": 0,
+      "2do": 1,
+      "3er": 0,
+      "TOTALES": 1
+    },
+    {
+      "__EMPTY": "% PX EN 0",
+      "1er": 0,
+      "2do": 9.090909091,
+      "3er": 0,
+      "TOTALES": 2.564102564
+    },
+    {
+      "__EMPTY": "Managers",
+      "1er": 1,
+      "2do": 2,
+      "3er": 4,
+      "TOTALES": 7
+    },
+    {
+      "__EMPTY": "Declaración",
+      "1er": 2,
+      "2do": 6,
+      "3er": 15,
+      "TOTALES": 23
+    },
+    {
+      "__EMPTY": "Enrolamiento",
+      "1er": 2,
+      "2do": 3,
+      "3er": 12,
+      "TOTALES": 17
+    },
+    {
+      "__EMPTY": "%",
+      "1er": 2,
+      "2do": 1.5,
+      "3er": 3,
+      "TOTALES": 2.428571429
+    },
+    {
+      "__EMPTY": "Enrolamiento",
+      "1er": 28,
+      "2do": 20,
+      "3er": 29,
+      "TOTALES": 77
+    },
+    {
+      "__EMPTY": "Declaración",
+      "1er": 55,
+      "2do": 34,
+      "3er": 51,
+      "TOTALES": 140
+    },
+    {
+      "__EMPTY": "PX + Seniors",
+      "1er": 13,
+      "2do": 12,
+      "3er": 12,
+      "TOTALES": 37
+    },
+    {
+      "__EMPTY": "%",
+      "1er": 2.153846154,
+      "2do": 1.666666667,
+      "3er": 2.416666667,
+      "TOTALES": 2.081081081
+    }
+  ],
+  "22 MAY": [
+    {
+      "__EMPTY": "ENTRENADOR",
+      "1er": "JUAN",
+      "2do": "ANA",
+      "3er": "MIKE"
+    },
+    {
+      "__EMPTY": "EQUIPO"
+    },
+    {
+      "__EMPTY": "PX que llegaron",
+      "1er": 16,
+      "2do": 6,
+      "3er": 7,
+      "TOTALES": 29
+    },
+    {
+      "__EMPTY": "Deserción",
+      "1er": 3,
+      "2do": 2,
+      "3er": 0,
+      "TOTALES": 5
+    },
+    {
+      "__EMPTY": "Px Terminaron",
+      "1er": 13,
+      "2do": 4,
+      "3er": 7,
+      "TOTALES": 24
+    },
+    {
+      "__EMPTY": "Declaración",
+      "1er": 40,
+      "2do": 15,
+      "3er": 19,
+      "TOTALES": 74
+    },
+    {
+      "__EMPTY": "Enrolamiento",
+      "1er": 15,
+      "2do": 7,
+      "3er": 13,
+      "TOTALES": 35
+    },
+    {
+      "__EMPTY": "%",
+      "1er": 1.153846154,
+      "2do": 1.75,
+      "3er": 1.857142857,
+      "TOTALES": 1.206896552
+    },
+    {
+      "__EMPTY": "PX en 0",
+      "1er": 3,
+      "3er": 0,
+      "TOTALES": 3
+    },
+    {
+      "__EMPTY": "% PX EN 0",
+      "1er": 18.75,
+      "2do": 0,
+      "3er": 0,
+      "TOTALES": 10.34482759
+    },
+    {
+      "__EMPTY": "Managers",
+      "1er": 1,
+      "2do": 1,
+      "3er": 2,
+      "TOTALES": 4
+    },
+    {
+      "__EMPTY": "Declaración",
+      "1er": 5,
+      "2do": 2,
+      "3er": 5,
+      "TOTALES": 12
+    },
+    {
+      "__EMPTY": "Enrolamiento",
+      "1er": 6,
+      "2do": 2,
+      "3er": 5,
+      "TOTALES": 13
+    },
+    {
+      "__EMPTY": "%",
+      "1er": 6,
+      "2do": 2,
+      "3er": 2.5,
+      "TOTALES": 3.25
+    },
+    {
+      "__EMPTY": "Enrolamiento",
+      "1er": 21,
+      "2do": 9,
+      "3er": 18,
+      "TOTALES": 48
+    },
+    {
+      "__EMPTY": "Declaración",
+      "1er": 45,
+      "2do": 17,
+      "3er": 24,
+      "TOTALES": 86
+    },
+    {
+      "__EMPTY": "PX + Seniors",
+      "1er": 14,
+      "2do": 5,
+      "3er": 9,
+      "TOTALES": 28
+    },
+    {
+      "__EMPTY": "%",
+      "1er": 1.5,
+      "2do": 1.8,
+      "3er": 2,
+      "TOTALES": 1.714285714
+    }
+  ],
+  "26 JUN": [
+    {
+      "__EMPTY": "ENTRENADOR",
+      "1er": "CIRILO",
+      "2do": "ANA"
+    },
+    {
+      "__EMPTY": "EQUIPO"
+    },
+    {
+      "__EMPTY": "PX que llegaron",
+      "1er": 24,
+      "2do": 13,
+      "TOTALES": 37
+    },
+    {
+      "__EMPTY": "Deserción",
+      "1er": 2,
+      "2do": 0,
+      "TOTALES": 2
+    },
+    {
+      "__EMPTY": "Px Terminaron",
+      "1er": 22,
+      "2do": 13,
+      "3er": 0,
+      "TOTALES": 35
+    },
+    {
+      "__EMPTY": "Declaración",
+      "1er": 69,
+      "2do": 26,
+      "TOTALES": 95
+    },
+    {
+      "__EMPTY": "Enrolamiento",
+      "1er": 41,
+      "2do": 15,
+      "TOTALES": 56
+    },
+    {
+      "__EMPTY": "%",
+      "1er": 1.863636364,
+      "2do": 1.153846154,
+      "3er": "#DIV/0!",
+      "TOTALES": 1.513513514
+    },
+    {
+      "__EMPTY": "PX en 0",
+      "1er": 2,
+      "2do": 0,
+      "3er": 0,
+      "TOTALES": 2
+    },
+    {
+      "__EMPTY": "% PX EN 0",
+      "1er": 8.333333333,
+      "2do": 0,
+      "3er": "#DIV/0!",
+      "TOTALES": 5.405405405
+    },
+    {
+      "__EMPTY": "Managers",
+      "1er": 2,
+      "2do": 1,
+      "TOTALES": 3
+    },
+    {
+      "__EMPTY": "Declaración",
+      "1er": 10,
+      "2do": 3,
+      "TOTALES": 13
+    },
+    {
+      "__EMPTY": "Enrolamiento",
+      "1er": 7,
+      "2do": 5,
+      "TOTALES": 12
+    },
+    {
+      "__EMPTY": "%",
+      "1er": 3.5,
+      "2do": 5,
+      "3er": "#DIV/0!",
+      "TOTALES": 4
+    },
+    {
+      "__EMPTY": "Enrolamiento",
+      "1er": 48,
+      "2do": 20,
+      "3er": 0,
+      "TOTALES": 68
+    },
+    {
+      "__EMPTY": "Declaración",
+      "1er": 79,
+      "2do": 29,
+      "3er": 0,
+      "TOTALES": 108
+    },
+    {
+      "__EMPTY": "PX + Seniors",
+      "1er": 24,
+      "2do": 14,
+      "3er": 0,
+      "TOTALES": 38
+    },
+    {
+      "__EMPTY": "%",
+      "1er": 2,
+      "2do": 1.428571429,
+      "3er": "#DIV/0!",
+      "TOTALES": 1.789473684
+    }
+  ],
+  "31 JUL": [
+    {
+      "__EMPTY": "ENTRENADOR",
+      "1er": "CHUY",
+      "2do": "JUAN",
+      "3er": "ALONSO"
+    },
+    {
+      "__EMPTY": "EQUIPO"
+    },
+    {
+      "__EMPTY": "PX que llegaron",
+      "1er": 14,
+      "2do": 16,
+      "3er": 15,
+      "TOTALES": 45
+    },
+    {
+      "__EMPTY": "Deserción",
+      "1er": 1,
+      "2do": 0,
+      "3er": 0,
+      "TOTALES": 1
+    },
+    {
+      "__EMPTY": "Px Terminaron",
+      "1er": 13,
+      "2do": 16,
+      "3er": 15,
+      "TOTALES": 44
+    },
+    {
+      "__EMPTY": "Declaración",
+      "1er": 59,
+      "2do": 56,
+      "3er": 35,
+      "TOTALES": 150
+    },
+    {
+      "__EMPTY": "Enrolamiento",
+      "1er": 27,
+      "2do": 32,
+      "3er": 16,
+      "TOTALES": 75
+    },
+    {
+      "__EMPTY": "%",
+      "1er": 2.076923077,
+      "2do": 2,
+      "3er": 1.066666667,
+      "TOTALES": 1.666666667
+    },
+    {
+      "__EMPTY": "PX en 0",
+      "1er": 2,
+      "3er": 0,
+      "TOTALES": 2
+    },
+    {
+      "__EMPTY": "% PX EN 0",
+      "1er": 14.28571429,
+      "2do": 0,
+      "3er": 0,
+      "TOTALES": 4.444444444
+    },
+    {
+      "__EMPTY": "Managers",
+      "1er": 0,
+      "2do": 2,
+      "3er": 1,
+      "TOTALES": 3
+    },
+    {
+      "__EMPTY": "Declaración",
+      "1er": 0,
+      "2do": 4,
+      "3er": 5,
+      "TOTALES": 9
+    },
+    {
+      "__EMPTY": "Enrolamiento",
+      "1er": 0,
+      "2do": 11,
+      "3er": 5,
+      "TOTALES": 16
+    },
+    {
+      "__EMPTY": "%",
+      "1er": "#DIV/0!",
+      "2do": 5.5,
+      "3er": 5,
+      "TOTALES": 5.333333333
+    },
+    {
+      "__EMPTY": "Enrolamiento",
+      "1er": 27,
+      "2do": 43,
+      "3er": 21,
+      "TOTALES": 91
+    },
+    {
+      "__EMPTY": "Declaración",
+      "1er": 59,
+      "2do": 60,
+      "3er": 40,
+      "TOTALES": 159
+    },
+    {
+      "__EMPTY": "PX + Seniors",
+      "1er": 13,
+      "2do": 18,
+      "3er": 16,
+      "TOTALES": 47
+    },
+    {
+      "__EMPTY": "%",
+      "1er": 2.076923077,
+      "2do": 2.388888889,
+      "3er": 1.3125,
+      "TOTALES": 1.936170213
+    }
+  ]
+}

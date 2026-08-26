@@ -9,7 +9,7 @@ import {
   LogOut, Clock, Calendar as CalendarIcon, MapPin, CheckCircle2, 
   AlertCircle, Circle, RefreshCw, CalendarPlus, Bell, Users, AtSign, 
   BookOpen, Lightbulb, Search, X, Filter, ChevronDown, Sparkles,
-  Zap, LayoutGrid, Sliders, CheckSquare, ArrowRight, ShieldCheck,
+  Zap, LayoutGrid, Sliders, CheckSquare, ArrowRight, ArrowUpRight, ShieldCheck,
   TrendingUp, Compass, HelpCircle
 } from 'lucide-react';
 import { getFlagForSede } from '../utils/flags';

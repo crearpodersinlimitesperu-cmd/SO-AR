@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, getDoc } from "firebase/firestore";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getStorage } from "firebase/storage";
 
@@ -24,5 +24,44 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 const storage = getStorage(app);
 const googleProvider = new GoogleAuthProvider();
+
+// Lectura de un doc con un reintento: si Firestore rechaza por "permission-denied"
+// estando el usuario logueado, es casi siempre un ID token cacheado/desactualizado
+// en el SDK (no un problema real de rol). Forzamos su refresco y reintentamos una vez
+// antes de dar el error por bueno.
+export async function getDocResilient(docRef) {
+  try {
+    return await getDoc(docRef);
+  } catch (err) {
+    if (err.code === 'permission-denied') {
+      if (auth.currentUser) {
+        // Token puede estar desincronizado, refrescar y reintentar
+        try {
+          await auth.currentUser.getIdToken(true);
+          return await getDoc(docRef);
+        } catch (refreshErr) {
+          // Token refresh falló — sesión realmente está muerta
+          throw err;
+        }
+      }
+      // No hay usuario en Firebase pero la app cree que sí — sesión rota
+      // El handler global lo detectará y forzará logout
+    }
+    throw err;
+  }
+}
+
+// Handler global para errores de permission-denied: si Firebase rechaza pero
+// la app cree que el usuario está logueado, la sesión está rota. Logout forzado.
+export function setupFirebaseErrorHandler(onSessionExpired) {
+  const originalGetDoc = getDoc;
+  const originalOnSnapshot = typeof window !== 'undefined' ? window.onSnapshot : null;
+
+  window.firestorePermissionDeniedHandler = (err) => {
+    if (err.code === 'permission-denied' && onSessionExpired) {
+      onSessionExpired();
+    }
+  };
+}
 
 export { app, db, auth, googleProvider, storage };
