@@ -264,14 +264,22 @@ export default function AICopilot() {
     } catch (error) {
       console.error("Error AI:", error);
       let errorMsg = 'Hubo un error al conectar con el Copiloto. Intenta de nuevo en unos segundos.';
-      // Códigos que puede devolver el Worker (ver cloudflare-worker/src/index.js)
+      
+      // Códigos que puede devolver el Worker o errores de red
       if (error.code === 'worker/not-configured') {
         errorMsg = '⚠️ El Copiloto todavía no está configurado (falta VITE_COPILOTO_WORKER_URL en .env).';
       } else if (error.code === 'worker/unauthenticated') {
         errorMsg = '⚠️ Tu sesión expiró. Vuelve a iniciar sesión e intenta de nuevo.';
       } else if (error.code === 'worker/permission-denied') {
         errorMsg = '⚠️ Tu usuario no está registrado correctamente en el sistema. Contacta a un administrador.';
+      } else if (error.code === 'worker/internal') {
+        errorMsg = `⚠️ Error del servidor IA: ${error.message}`;
+      } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        errorMsg = `⚠️ Error de red al contactar al servidor IA. Revisa tu conexión o configuración CORS.`;
+      } else {
+        errorMsg = `⚠️ Error inesperado: ${error.message}`;
       }
+      
       setMessages(prev => [...prev, {
         role: 'assistant',
         content: errorMsg

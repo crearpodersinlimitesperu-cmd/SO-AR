@@ -1,0 +1,1326 @@
+{
+  "robot_token": "NODUS_ROBOT_CPSL_2026_SECRET",
+  "secciones": {
+    "facturacion": {
+      "kpis": [],
+      "tablas": [
+        {
+          "tableId": "Tabla_1",
+          "headers": [
+            "#",
+            "NOMBRES",
+            "IDENTIFICACIÓN",
+            "TELÉFONO",
+            "SEDE",
+            "EQUIPO",
+            "COORDINADOR",
+            "INVITADOR",
+            "FORMA PAGO",
+            "PAGO C1",
+            "PAGO C2",
+            "TOTAL",
+            "ASISTENCIA",
+            "C1",
+            "C2",
+            "M",
+            "ACCIONES"
+          ],
+          "rows": [
+            {
+              "SEDE": "LIMA CICLO 1",
+              "PAGO C2": "—",
+              "ASISTENCIA": "Confirmado",
+              "IDENTIFICACIÓN": "42030629",
+              "NOMBRES": "LOURDES BARRAL\nloupromakeup@gmail.com",
+              "C1": "",
+              "COORDINADOR": "JOYCE",
+              "EQUIPO": "EQUIPO 30",
+              "TOTAL": "S/. 900.00",
+              "C2": "",
+              "M": "",
+              "ACCIONES": "",
+              "INVITADOR": "ANA CARINA CáRDENAS TERREROS",
+              "#": "6750",
+              "FORMA PAGO": "LINK",
+              "PAGO C1": "S/. 900.00",
+              "TELÉFONO": "989685107"
+            },
+            {
+              "PAGO C1": "S/. 505.00",
+              "TELÉFONO": "988428382",
+              "ACCIONES": "",
+              "INVITADOR": "FERNANDO JUAN LóPEZ MELO",
+              "TOTAL": "S/. 505.00",
+              "IDENTIFICACIÓN": "10196387",
+              "COORDINADOR": "DIANA",
+              "FORMA PAGO": "TRANSFERENCIA AHORROS",
+              "EQUIPO": "EQUIPO 30",
+              "C1": "",
+              "SEDE": "LIMA CICLO 1",
+              "C2": "",
+              "NOMBRES": "EDWIN RONALD BALCAZER PINEDA\nRbalcazer@gmail.com",
+              "M": "",
+              "ASISTENCIA": "Confirmado",
+              "#": "13967",
+              "PAGO C2": "—"
+            },
+            {
+              "#": "14139",
+              "COORDINADOR": "DIANA",
+              "INVITADOR": "KARIN PORTOCARRERO PEREA",
+              "M": "",
+              "ASISTENCIA": "CONFIRMADO",
+              "PAGO C1": "S/. 900.00",
+              "TELÉFONO": "950786368",
+              "C2": "",
+              "PAGO C2": "S/. 1,875.00",
+              "IDENTIFICACIÓN": "09277828",
+              "FORMA PAGO": "TRANSFERENCIA AHORROS",
+              "C1": "",
+              "NOMBRES": "ROSA MARILU RODRIGUEZ ALTAMIRANO\nmarilu.12majia@gmail.com",
+              "TOTAL": "S/. 2,775.00",
+              "ACCIONES": "",
+              "EQUIPO": "EQUIPO 30",
+              "SEDE": "LIMA CICLO 1"
+            },
+            {
+              "TELÉFONO": "940092352",
+              "INVITADOR": "GUSTAVO ADOLFO FERNANDEZ ESPINOZA",
+              "IDENTIFICACIÓN": "45267718",
+              "ASISTENCIA": "Confirmado",
+              "PAGO C1": "S/. 505.00",
+              "ACCIONES": "",
+              "SEDE": "LIMA CICLO 1",
+              "FORMA PAGO": "LINK",
+              "M": "",
+              "PAGO C2": "—",
+              "EQUIPO": "EQUIPO 30",
+              "TOTAL": "S/. 505.00",
+              "C1": "",
+              "COORDINADOR": "DIANA",
+              "#": "18518",
+              "NOMBRES": "ROSA MAXIMA FERNANDEZ ESPINOZA\nmiaanthonella14012018@gmail.com",
+              "C2": ""
+            },
+            {
+              "TOTAL": "S/. 505.00",
+              "NOMBRES": "OSCAR DANIEL MAQUERA MONTOYA\nosdaniel909@gmail.com",
+              "ACCIONES": "",
+              "PAGO C2": "—",
+              "FORMA PAGO": "LINK",
+              "C1": "",
+              "C2": "",
+              "COORDINADOR": "DIANA",
+              "IDENTIFICACIÓN": "72399803",
+              "ASISTENCIA": "Confirmado",
+              "M": "",
+              "PAGO C1": "S/. 505.00",
+              "SEDE": "LIMA CICLO 1",
+              "#": "18563",
+              "TELÉFONO": "903554585",
+              "EQUIPO": "EQUIPO 30",
+              "INVITADOR": "Jose Israel Maquera Montoya"
+            },
+            {
+              "COORDINADOR": "JOYCE",
+              "TOTAL": "S/. 4,430.00",
+              "M": "",
+              "PAGO C1": "S/. 900.00",
+              "IDENTIFICACIÓN": "71744024",
+              "#": "18580",
+              "FORMA PAGO": "TC(DATAFAST)",
+              "INVITADOR": "ELVIRA CARMEN NEYRA RODRiGUEZ",
+              "NOMBRES": "ANTONY RICHARD CORNEJO NEYRA\nelviraneyramicpa@hotmail.com",
+              "ASISTENCIA": "Confirmado",
+              "TELÉFONO": "906802907",
+              "SEDE": "LIMA CICLO 1",
+              "C1": "",
+              "PAGO C2": "S/. 3,530.00",
+              "EQUIPO": "EQUIPO 30",
+              "ACCIONES": "",
+              "C2": ""
+            },
+            {
+              "FORMA PAGO": "LINK",
+              "COORDINADOR": "JOYCE",
+              "M": "",
+              "ACCIONES": "",
+              "SEDE": "LIMA CICLO 1",
+              "C1": "",
+              "PAGO C1": "S/. 505.00",
+              "C2": "",
+              "#": "18606",
+              "IDENTIFICACIÓN": "09248711",
+              "EQUIPO": "EQUIPO 30",
+              "PAGO C2": "—",
+              "TELÉFONO": "977538881",
+              "ASISTENCIA": "Confirmado",
+              "TOTAL": "S/. 505.00",
+              "NOMBRES": "OFELIA JANET MONTOYA VALENCIA\nohmontoya@hotmail.com",
+              "INVITADOR": "Jose Israel Maquera Montoya"
+            },
+            {
+              "TOTAL": "S/. 900.00",
+              "PAGO C1": "S/. 900.00",
+              "FORMA PAGO": "TRANSFERENCIA AHORROS",
+              "INVITADOR": "KARINA MOLINA CHIPANA",
+              "COORDINADOR": "JOYCE",
+              "NOMBRES": "JESUS MESIAS SEGOVIA HUAMANI\njesussh0611@gmail.com",
+              "TELÉFONO": "904570312",
+              "ASISTENCIA": "Confirmado",
+              "M": "",
+              "PAGO C2": "—",
+              "SEDE": "LIMA CICLO 1",
+              "#": "18635",
+              "EQUIPO": "EQUIPO 30",
+              "C1": "",
+              "ACCIONES": "",
+              "C2": "",
+              "IDENTIFICACIÓN": "60015061"
+            },
+            {
+              "#": "18656",
+              "TOTAL": "S/. 900.00",
+              "ACCIONES": "",
+              "M": "",
+              "ASISTENCIA": "Confirmado",
+              "IDENTIFICACIÓN": "43533678",
+              "PAGO C1": "S/. 900.00",
+              "FORMA PAGO": "TC(DATAFAST)",
+              "PAGO C2": "—",
+              "TELÉFONO": "930540842",
+              "INVITADOR": "JORGE VICTOR HUARACAYA DUEnAS",
+              "NOMBRES": "MARTIN CAMACHO PACHECO\nmartinxamacho2024@gmail.com",
+              "COORDINADOR": "DIANA",
+              "C2": "",
+              "C1": "",
+              "SEDE": "LIMA CICLO 1",
+              "EQUIPO": "EQUIPO 30"
+            },
+            {
+              "ACCIONES": "",
+              "M": "",
+              "PAGO C2": "—",
+              "TELÉFONO": "955221939",
+              "FORMA PAGO": "YAPE",
+              "INVITADOR": "MARIA OLARTE BARRIENTOS",
+              "IDENTIFICACIÓN": "44602787",
+              "SEDE": "LIMA CICLO 1",
+              "C1": "",
+              "NOMBRES": "ESTELA YARANGA SAAVEDRA\nestelajoe2025@gmail.com",
+              "TOTAL": "S/. 505.00",
+              "#": "18660",
+              "C2": "",
+              "EQUIPO": "EQUIPO 30",
+              "COORDINADOR": "DIANA",
+              "ASISTENCIA": "Confirmado",
+              "PAGO C1": "S/. 505.00"
+            },
+            {
+              "PAGO C1": "S/. 900.00",
+              "FORMA PAGO": "TRANSFERENCIA AHORROS",
+              "SEDE": "LIMA CICLO 1",
+              "EQUIPO": "EQUIPO 30",
+              "M": "",
+              "IDENTIFICACIÓN": "473412999",
+              "ACCIONES": "",
+              "#": "18667",
+              "TELÉFONO": "951438202",
+              "COORDINADOR": "JOYCE",
+              "INVITADOR": "ViCTOR PAZ PILCO CALIZAYA",
+              "NOMBRES": "ALEX PILCO COLORADO\nalex2_450@hotmail.com",
+              "ASISTENCIA": "Confirmado",
+              "C1": "",
+              "TOTAL": "S/. 2,775.00",
+              "C2": "",
+              "PAGO C2": "S/. 1,875.00"
+            },
+            {
+              "PAGO C1": "S/. 900.00",
+              "TOTAL": "S/. 4,430.00",
+              "#": "18681",
+              "TELÉFONO": "932811698",
+              "M": "",
+              "SEDE": "LIMA CICLO 1",
+              "INVITADOR": "SAUL RODRIGUEZ BELLIDO",
+              "ACCIONES": "",
+              "ASISTENCIA": "Confirmado",
+              "COORDINADOR": "JOYCE",
+              "EQUIPO": "EQUIPO 30",
+              "C2": "",
+              "C1": "",
+              "IDENTIFICACIÓN": "70628233",
+              "FORMA PAGO": "LINK",
+              "NOMBRES": "BARBARA DANIELA RODRIGUEZ BELLIDO\nbarbara100.rodriguez@gmail.com",
+              "PAGO C2": "S/. 3,530.00"
+            },
+            {
+              "IDENTIFICACIÓN": "73073328",
+              "INVITADOR": "Jose Israel Maquera Montoya",
+              "C1": "",
+              "NOMBRES": "HEIDY NICOLE MEGO DE LA CRUZ\nnicidlcdelacruz@gmail.com",
+              "TELÉFONO": "927857471",
+              "C2": "",
+              "EQUIPO": "EQUIPO 30",
+              "M": "",
+              "SEDE": "LIMA CICLO 1",
+              "#": "20320",
+              "FORMA PAGO": "LINK",
+              "TOTAL": "S/. 505.00",
+              "ACCIONES": "",
+              "PAGO C2": "—",
+              "ASISTENCIA": "Confirmado",
+              "COORDINADOR": "JOYCE",
+              "PAGO C1": "S/. 505.00"
+            },
+            {
+              "INVITADOR": "ANTHONY HANS REYES MORALES",
+              "TELÉFONO": "999335690",
+              "PAGO C1": "S/. 900.00",
+              "SEDE": "LIMA CICLO 1",
+              "C1": "",
+              "TOTAL": "S/. 4,430.00",
+              "IDENTIFICACIÓN": "72613342",
+              "ASISTENCIA": "Confirmado",
+              "ACCIONES": "",
+              "C2": "",
+              "M": "",
+              "NOMBRES": "ALESSANDRO REYES MORALES\nalerreymor0104@gmail.com",
+              "FORMA PAGO": "LINK",
+              "PAGO C2": "S/. 3,530.00",
+              "#": "20332",
+              "COORDINADOR": "DIANA",
+              "EQUIPO": "EQUIPO 30"
+            },
+            {
+              "PAGO C1": "S/. 720.00",
+              "#": "20342",
+              "IDENTIFICACIÓN": "46039198",
+              "EQUIPO": "EQUIPO 30",
+              "C2": "",
+              "C1": "",
+              "ASISTENCIA": "Confirmado",
+              "M": "",
+              "ACCIONES": "",
+              "FORMA PAGO": "TC(DATAFAST)",
+              "NOMBRES": "JHON MICHAEL URRUTIA HUAMANI\njhon.urrutia18@gmail.com",
+              "TOTAL": "S/. 2,595.00",
+              "INVITADOR": "LOURDES CAROLIN SILVARA HUAMAN",
+              "COORDINADOR": "DIANA",
+              "SEDE": "LIMA CICLO 1",
+              "PAGO C2": "S/. 1,875.00",
+              "TELÉFONO": "984040072"
+            },
+            {
+              "PAGO C1": "S/. 505.00",
+              "EQUIPO": "EQUIPO 30",
+              "INVITADOR": "Jose Israel Maquera Montoya",
+              "IDENTIFICACIÓN": "70986743",
+              "SEDE": "LIMA CICLO 1",
+              "TELÉFONO": "910215063",
+              "FORMA PAGO": "LINK",
+              "COORDINADOR": "DIANA",
+              "TOTAL": "S/. 505.00",
+              "ASISTENCIA": "Confirmado",
+              "#": "20356",
+              "NOMBRES": "DAVID JAVIER OJEDA ARCE\ndavidojeda2002@gmail.com",
+              "ACCIONES": "",
+              "M": "",
+              "C2": "",
+              "C1": "",
+              "PAGO C2": "—"
+            },
+            {
+              "TOTAL": "S/. 2,775.00",
+              "TELÉFONO": "930737077",
+              "NOMBRES": "FABIOLA JAZMINTH MIRANDA VILLANUEVA\nfabiolamirvi96@gmail.com",
+              "COORDINADOR": "JOYCE",
+              "FORMA PAGO": "TC(DATAFAST)",
+              "INVITADOR": "KARINA MOLINA CHIPANA",
+              "#": "20406",
+              "PAGO C2": "S/. 1,875.00",
+              "C2": "",
+              "M": "",
+              "EQUIPO": "EQUIPO 30",
+              "C1": "",
+              "SEDE": "LIMA CICLO 1",
+              "IDENTIFICACIÓN": "70923636",
+              "ACCIONES": "",
+              "PAGO C1": "S/. 900.00",
+              "ASISTENCIA": "Confirmado"
+            },
+            {
+              "SEDE": "LIMA CICLO 1",
+              "INVITADOR": "SONIA ADELAIDA ALAMA PALOMINO",
+              "ACCIONES": "",
+              "EQUIPO": "EQUIPO 30",
+              "TELÉFONO": "987984514",
+              "ASISTENCIA": "Confirmado",
+              "PAGO C1": "S/. 900.00",
+              "IDENTIFICACIÓN": "10394825",
+              "TOTAL": "S/. 900.00",
+              "C1": "",
+              "FORMA PAGO": "YAPE",
+              "C2": "",
+              "M": "",
+              "PAGO C2": "—",
+              "#": "20426",
+              "NOMBRES": "JUAN CARLOS VELARDE\njuarcarlos@gamil.com",
+              "COORDINADOR": "DIANA"
+            },
+            {
+              "C2": "",
+              "#": "900095",
+              "PAGO C1": "S/. 900.00",
+              "C1": "",
+              "TELÉFONO": "992162849",
+              "INVITADOR": "ROSA MARIA STEPANY CALVO PORTAL",
+              "EQUIPO": "EQUIPO 30",
+              "M": "",
+              "ASISTENCIA": "Pendiente",
+              "NOMBRES": "JUAN LUIS CALVO PORTAL\njuancalvo@gmail.com",
+              "COORDINADOR": "DIANA",
+              "FORMA PAGO": "TC(DATAFAST)",
+              "ACCIONES": "",
+              "SEDE": "LIMA CICLO 1",
+              "PAGO C2": "—",
+              "TOTAL": "S/. 900.00",
+              "IDENTIFICACIÓN": "71141796"
+            },
+            {
+              "FORMA PAGO": "LINK",
+              "C2": "",
+              "#": "900099",
+              "C1": "",
+              "PAGO C1": "—",
+              "INVITADOR": "Liz Carol Trujillo Mallqui",
+              "TELÉFONO": "946587892",
+              "M": "",
+              "EQUIPO": "EQUIPO 30",
+              "NOMBRES": "JORDANY JHOSSUA ARAMBURU VALLADARES\njordanyaramburu10@gmail.com",
+              "TOTAL": "S/. 505.00",
+              "COORDINADOR": "JOYCE",
+              "PAGO C2": "—",
+              "ASISTENCIA": "Confirmado",
+              "IDENTIFICACIÓN": "77518404",
+              "ACCIONES": "",
+              "SEDE": "LIMA CICLO 1"
+            },
+            {
+              "TOTAL": "S/. 505.00",
+              "IDENTIFICACIÓN": "73971853",
+              "M": "",
+              "#": "900100",
+              "ASISTENCIA": "Confirmado",
+              "TELÉFONO": "+51 919 553 025",
+              "PAGO C1": "—",
+              "INVITADOR": "Giovana Elizabeth Palomino Marcos",
+              "FORMA PAGO": "TC(DATAFAST)",
+              "PAGO C2": "—",
+              "ACCIONES": "",
+              "NOMBRES": "GIANELLY ISLA SAMANIEGO\ngianellyislasamaniego56@gmail.com",
+              "C1": "",
+              "EQUIPO": "EQUIPO 30",
+              "SEDE": "LIMA CICLO 1",
+              "C2": "",
+              "COORDINADOR": "DIANA"
+            },
+            {
+              "NOMBRES": "CARLOS EMANUEL ELGEGREN OYARCE\ncarlos.elgegren@gmail.com",
+              "M": "",
+              "#": "900101",
+              "FORMA PAGO": "TC(DATAFAST)",
+              "PAGO C2": "—",
+              "ACCIONES": "",
+              "PAGO C1": "—",
+              "SEDE": "LIMA CICLO 1",
+              "EQUIPO": "EQUIPO 30",
+              "TOTAL": "S/. 505.00",
+              "ASISTENCIA": "Pendiente",
+              "TELÉFONO": "+51 932 576 647",
+              "C1": "",
+              "COORDINADOR": "JOYCE",
+              "INVITADOR": "Giovana Elizabeth Palomino Marcos",
+              "C2": "",
+              "IDENTIFICACIÓN": "70864327"
+            },
+            {
+              "#": "900102",
+              "PAGO C2": "—",
+              "ASISTENCIA": "Pendiente",
+              "IDENTIFICACIÓN": "46730128",
+              "SEDE": "LIMA CICLO 1",
+              "ACCIONES": "",
+              "NOMBRES": "MARIA DEL PILAR ROMERO FLORES\npilar2201@gmail.com",
+              "M": "",
+              "C2": "",
+              "TOTAL": "S/. 505.00",
+              "C1": "",
+              "EQUIPO": "EQUIPO 30",
+              "INVITADOR": "Giovana Elizabeth Palomino Marcos",
+              "PAGO C1": "—",
+              "FORMA PAGO": "TC(DATAFAST)",
+              "COORDINADOR": "DIANA",
+              "TELÉFONO": "+51 970 970 664"
+            },
+            {
+              "FORMA PAGO": "EFECTIVO",
+              "COORDINADOR": "JOYCE",
+              "INVITADOR": "PAMELA CYNTHIA CASTILLO RIOS",
+              "TELÉFONO": "+51 925823156",
+              "M": "",
+              "TOTAL": "S/. 505.00",
+              "ACCIONES": "",
+              "C1": "",
+              "#": "900103",
+              "SEDE": "LIMA CICLO 1",
+              "C2": "",
+              "IDENTIFICACIÓN": "71820698",
+              "PAGO C1": "—",
+              "PAGO C2": "—",
+              "ASISTENCIA": "Pendiente",
+              "NOMBRES": "GORYA YAQUELINE CLEMENTE SACSARA\npamelacr.080486@gmail.com",
+              "EQUIPO": "EQUIPO 30"
+            },
+            {
+              "SEDE": "LIMA CICLO 1",
+              "PAGO C2": "—",
+              "COORDINADOR": "DIANA",
+              "NOMBRES": "JIMMY SAMANIEGO MARCOS\nmarcosjimmy804@gmail.com",
+              "INVITADOR": "Giovana Elizabeth Palomino Marcos",
+              "EQUIPO": "EQUIPO 30",
+              "ASISTENCIA": "Pendiente",
+              "TOTAL": "S/. 505.00",
+              "TELÉFONO": "+51 907389051",
+              "M": "",
+              "FORMA PAGO": "TRANSFERENCIA AHORROS",
+              "C1": "",
+              "ACCIONES": "",
+              "IDENTIFICACIÓN": "43765343",
+              "PAGO C1": "—",
+              "#": "900104",
+              "C2": ""
+            }
+          ]
+        }
+      ]
+    },
+    "reporteAsistencia": {
+      "kpis": [
+        {
+          "cardId": "Tarjeta_1",
+          "content": [
+            "Equipo:",
+            "Seleccione un equipo...",
+            "EQUIPO 27 — LIMA CICLO 1 ✓",
+            "EQUIPO 28 — LIMA CICLO 1 ✓",
+            "EQUIPO 29 — LIMA CICLO 1 ✓",
+            "EQUIPO 30 — LIMA CICLO 1 ✓",
+            "EQUIPO 1000 — LIMA CICLO 1",
+            "EQUIPO 14 — LIMA CICLO 1",
+            "EQUIPO 15 — LIMA CICLO 1",
+            "EQUIPO 16 — LIMA CICLO 1",
+            "EQUIPO 17 — LIMA CICLO 1",
+            "EQUIPO 18 — LIMA CICLO 1",
+            "EQUIPO 19 — LIMA CICLO 1",
+            "EQUIPO 20 — LIMA CICLO 1",
+            "EQUIPO 21 — LIMA CICLO 1",
+            "EQUIPO 22 — LIMA CICLO 1",
+            "EQUIPO 23 — LIMA CICLO 1",
+            "EQUIPO 24 — LIMA CICLO 1",
+            "EQUIPO 25 — LIMA CICLO 1",
+            "EQUIPO 26 — LIMA CICLO 1"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_2",
+          "content": [
+            "Seleccione un equipo para ver el reporte de asistencia"
+          ]
+        }
+      ],
+      "tablas": []
+    },
+    "reporteEntrenadores": {
+      "tablas": [
+        {
+          "rows": [
+            {
+              "TOTAL ENROLADOS": "8",
+              "DESERTOR FDS": "0",
+              "DECLARACIÓN": "7",
+              "TIPO IMO": "CAPITAN",
+              "PARTICIPANTES EN JUEGO": "2"
+            },
+            {
+              "TOTAL ENROLADOS": "31",
+              "TIPO IMO": "MANAGER",
+              "DESERTOR FDS": "0",
+              "PARTICIPANTES EN JUEGO": "8",
+              "DECLARACIÓN": "28"
+            },
+            {
+              "PARTICIPANTES EN JUEGO": "55",
+              "DESERTOR FDS": "24",
+              "DECLARACIÓN": "121",
+              "TOTAL ENROLADOS": "98",
+              "TIPO IMO": "PARTICIPANTE"
+            }
+          ],
+          "tableId": "Tabla_1",
+          "headers": [
+            "TIPO IMO",
+            "PARTICIPANTES EN JUEGO",
+            "DECLARACIÓN",
+            "TOTAL ENROLADOS",
+            "DESERTOR FDS"
+          ]
+        },
+        {
+          "rows": [
+            {
+              "Participantes en Juego": "0",
+              "Tipo IMO": "CAPITAN",
+              "Desertor FDS": "0",
+              "Declaración": "0",
+              "Total Enrolados": "0"
+            },
+            {
+              "Tipo IMO": "MANAGER",
+              "Total Enrolados": "22",
+              "Declaración": "18",
+              "Desertor FDS": "0",
+              "Participantes en Juego": "4"
+            },
+            {
+              "Desertor FDS": "3",
+              "Tipo IMO": "PARTICIPANTE",
+              "Total Enrolados": "46",
+              "Declaración": "48",
+              "Participantes en Juego": "19"
+            }
+          ],
+          "headers": [
+            "Tipo IMO",
+            "Participantes en Juego",
+            "Declaración",
+            "Total Enrolados",
+            "Desertor FDS"
+          ],
+          "tableId": "Tabla_2"
+        },
+        {
+          "rows": [
+            {
+              "Nombres y Apellidos": "GINA CaRDENAS LOPEZ",
+              "Declaración": "5",
+              "N° Enrolados": "5",
+              "Identificación": "71396120"
+            },
+            {
+              "Declaración": "5",
+              "N° Enrolados": "3",
+              "Nombres y Apellidos": "GUSTAVO ADOLFO FERNANDEZ ESPINOZA",
+              "Identificación": "71046321"
+            },
+            {
+              "Declaración": "4",
+              "N° Enrolados": "5",
+              "Nombres y Apellidos": "Grezia Maria Jolly Vera",
+              "Identificación": "77923617"
+            },
+            {
+              "Declaración": "4",
+              "N° Enrolados": "9",
+              "Nombres y Apellidos": "Jose Israel Maquera Montoya",
+              "Identificación": "72399814"
+            }
+          ],
+          "tableId": "Tabla_3",
+          "headers": [
+            "Identificación",
+            "Nombres y Apellidos",
+            "Declaración",
+            "N° Enrolados"
+          ]
+        },
+        {
+          "tableId": "Tabla_4",
+          "headers": [
+            "Identificación",
+            "Nombres y Apellidos",
+            "Declaración",
+            "N° Enrolados"
+          ],
+          "rows": [
+            {
+              "Declaración": "2",
+              "Nombres y Apellidos": "SONIA ADELAIDA ALAMA PALOMINO",
+              "Identificación": "09991473",
+              "N° Enrolados": "2"
+            },
+            {
+              "N° Enrolados": "2",
+              "Nombres y Apellidos": "FERNANDO ALONSO ANAYA ROA",
+              "Declaración": "2",
+              "Identificación": "71248953"
+            },
+            {
+              "Declaración": "2",
+              "Nombres y Apellidos": "NOELIA BELEN APAESTEGUI RUIZ",
+              "Identificación": "72676594",
+              "N° Enrolados": "1"
+            },
+            {
+              "N° Enrolados": "0",
+              "Identificación": "44543572",
+              "Declaración": "0",
+              "Nombres y Apellidos": "SUSANA ATALAYA SANCHEZ"
+            },
+            {
+              "Declaración": "2",
+              "Nombres y Apellidos": "MELLY MERCEDES  CACHA MAGUInA",
+              "N° Enrolados": "2",
+              "Identificación": "43574400"
+            },
+            {
+              "Declaración": "3",
+              "Nombres y Apellidos": "MARiA ROSA FLORES RODRiGUEZ",
+              "N° Enrolados": "2",
+              "Identificación": "21565022"
+            },
+            {
+              "Declaración": "2",
+              "N° Enrolados": "2",
+              "Nombres y Apellidos": "MAGALY FRECIA HUALLPA ALVAREZ",
+              "Identificación": "43068565"
+            },
+            {
+              "Nombres y Apellidos": "JORGE VICTOR HUARACAYA DUEnAS",
+              "Declaración": "3",
+              "Identificación": "10419858",
+              "N° Enrolados": "4"
+            },
+            {
+              "N° Enrolados": "5",
+              "Identificación": "73347015",
+              "Declaración": "3",
+              "Nombres y Apellidos": "EDDY LOPEZ HUAMANRAYME"
+            },
+            {
+              "N° Enrolados": "5",
+              "Declaración": "5",
+              "Identificación": "41604364",
+              "Nombres y Apellidos": "FREDY LoPEZ HUAMANRAYME"
+            },
+            {
+              "N° Enrolados": "0",
+              "Declaración": "2",
+              "Nombres y Apellidos": "YULY ANDREA MACIAS GUARANDA",
+              "Identificación": "1726337692"
+            },
+            {
+              "N° Enrolados": "1",
+              "Nombres y Apellidos": "KARINA MARCOS TORRES",
+              "Identificación": "10139066",
+              "Declaración": "2"
+            },
+            {
+              "N° Enrolados": "2",
+              "Identificación": "60666318",
+              "Nombres y Apellidos": "ROSITA ADRIANA MARQUINA DAZA",
+              "Declaración": "2"
+            },
+            {
+              "N° Enrolados": "7",
+              "Declaración": "3",
+              "Nombres y Apellidos": "KARINA  MOLINA CHIPANA",
+              "Identificación": "61837421"
+            },
+            {
+              "Identificación": "07192405",
+              "Declaración": "2",
+              "Nombres y Apellidos": "ELVIRA CARMEN  NEYRA RODRiGUEZ",
+              "N° Enrolados": "3"
+            },
+            {
+              "Declaración": "5",
+              "N° Enrolados": "1",
+              "Identificación": "70280793",
+              "Nombres y Apellidos": "KATHERINE ROJAS LIMA"
+            },
+            {
+              "Identificación": "28595955",
+              "Declaración": "3",
+              "N° Enrolados": "2",
+              "Nombres y Apellidos": "TANIA EDELINA SALAZAR HUAMAN"
+            },
+            {
+              "Nombres y Apellidos": "LOURDES CAROLIN SILVARA HUAMAN",
+              "N° Enrolados": "2",
+              "Identificación": "44730522",
+              "Declaración": "2"
+            },
+            {
+              "Nombres y Apellidos": "VIRGINIA MEDALIT TEMOCHE RODRiGUEZ",
+              "Declaración": "3",
+              "N° Enrolados": "3",
+              "Identificación": "25682662"
+            }
+          ]
+        },
+        {
+          "rows": [
+            {
+              "Desertor FDS": "0",
+              "Participantes en Juego": "1",
+              "Declaración": "5",
+              "Total Enrolados": "6",
+              "Tipo IMO": "CAPITAN"
+            },
+            {
+              "Declaración": "6",
+              "Tipo IMO": "MANAGER",
+              "Desertor FDS": "0",
+              "Participantes en Juego": "2",
+              "Total Enrolados": "6"
+            },
+            {
+              "Desertor FDS": "10",
+              "Participantes en Juego": "10",
+              "Declaración": "26",
+              "Total Enrolados": "18",
+              "Tipo IMO": "PARTICIPANTE"
+            }
+          ],
+          "headers": [
+            "Tipo IMO",
+            "Participantes en Juego",
+            "Declaración",
+            "Total Enrolados",
+            "Desertor FDS"
+          ],
+          "tableId": "Tabla_5"
+        },
+        {
+          "rows": [
+            {
+              "Identificación": "09678253",
+              "Declaración": "3",
+              "N° Enrolados": "3",
+              "Nombres y Apellidos": "FRANCISCO MANUEL HUAMAN RIOS"
+            },
+            {
+              "Declaración": "5",
+              "Nombres y Apellidos": "Giovana Elizabeth Palomino Marcos",
+              "N° Enrolados": "6",
+              "Identificación": "46146483"
+            },
+            {
+              "N° Enrolados": "3",
+              "Declaración": "3",
+              "Nombres y Apellidos": "Liz Carol Trujillo Mallqui",
+              "Identificación": "40801629"
+            }
+          ],
+          "headers": [
+            "Identificación",
+            "Nombres y Apellidos",
+            "Declaración",
+            "N° Enrolados"
+          ],
+          "tableId": "Tabla_6"
+        },
+        {
+          "rows": [
+            {
+              "Identificación": "70373184",
+              "Declaración": "3",
+              "Nombres y Apellidos": "ROSA MARIA STEPANY CALVO PORTAL",
+              "N° Enrolados": "2"
+            },
+            {
+              "Nombres y Apellidos": "JASMYN RUBY CORNEJO NEYRA",
+              "Declaración": "2",
+              "Identificación": "72232249",
+              "N° Enrolados": "5"
+            },
+            {
+              "Nombres y Apellidos": "ELIANA ROCIO JARA AMPUERO",
+              "Identificación": "07938881",
+              "N° Enrolados": "1",
+              "Declaración": "2"
+            },
+            {
+              "Identificación": "77503706",
+              "N° Enrolados": "2",
+              "Nombres y Apellidos": "LIDIA PAULINA  MUNAYLLA GALINDO",
+              "Declaración": "5"
+            },
+            {
+              "N° Enrolados": "2",
+              "Nombres y Apellidos": "GILDA MAYTE NOLASCO CHIPANA",
+              "Identificación": "76357687",
+              "Declaración": "2"
+            },
+            {
+              "Nombres y Apellidos": "ERICA MAGALI PEREA NOGUNI",
+              "N° Enrolados": "1",
+              "Identificación": "10202624",
+              "Declaración": "3"
+            },
+            {
+              "Declaración": "2",
+              "Nombres y Apellidos": "EDITH PRESENTACIoN CaNTARO",
+              "Identificación": "10882623",
+              "N° Enrolados": "2"
+            },
+            {
+              "Nombres y Apellidos": "ANTHONY HANS REYES MORALES",
+              "Declaración": "3",
+              "Identificación": "72613338",
+              "N° Enrolados": "2"
+            },
+            {
+              "Declaración": "1",
+              "N° Enrolados": "0",
+              "Nombres y Apellidos": "VANESA ROZAS ILLA",
+              "Identificación": "46439508"
+            },
+            {
+              "Identificación": "09976870",
+              "Declaración": "3",
+              "Nombres y Apellidos": "LIDIA TORRES ORTIZ",
+              "N° Enrolados": "1"
+            }
+          ],
+          "tableId": "Tabla_7",
+          "headers": [
+            "Identificación",
+            "Nombres y Apellidos",
+            "Declaración",
+            "N° Enrolados"
+          ]
+        },
+        {
+          "rows": [
+            {
+              "Total Enrolados": "2",
+              "Declaración": "2",
+              "Participantes en Juego": "1",
+              "Tipo IMO": "CAPITAN",
+              "Desertor FDS": "0"
+            },
+            {
+              "Participantes en Juego": "2",
+              "Total Enrolados": "3",
+              "Tipo IMO": "MANAGER",
+              "Desertor FDS": "0",
+              "Declaración": "4"
+            },
+            {
+              "Declaración": "47",
+              "Total Enrolados": "34",
+              "Desertor FDS": "11",
+              "Participantes en Juego": "26",
+              "Tipo IMO": "PARTICIPANTE"
+            }
+          ],
+          "headers": [
+            "Tipo IMO",
+            "Participantes en Juego",
+            "Declaración",
+            "Total Enrolados",
+            "Desertor FDS"
+          ],
+          "tableId": "Tabla_8"
+        },
+        {
+          "headers": [
+            "Identificación",
+            "Nombres y Apellidos",
+            "Declaración",
+            "N° Enrolados"
+          ],
+          "tableId": "Tabla_9",
+          "rows": [
+            {
+              "Declaración": "2",
+              "Identificación": "46633278",
+              "Nombres y Apellidos": "RAYDA PEDRAZA",
+              "N° Enrolados": "1"
+            },
+            {
+              "Declaración": "2",
+              "Nombres y Apellidos": "ITALO ALONSO  ROMaN NOMURA",
+              "N° Enrolados": "2",
+              "Identificación": "70319817"
+            },
+            {
+              "Declaración": "2",
+              "Nombres y Apellidos": "TANIA AURORA  SaNCHEZ CASTRO",
+              "Identificación": "41903564",
+              "N° Enrolados": "2"
+            }
+          ]
+        },
+        {
+          "headers": [
+            "Identificación",
+            "Nombres y Apellidos",
+            "Declaración",
+            "N° Enrolados"
+          ],
+          "rows": [
+            {
+              "Identificación": "42863426",
+              "Declaración": "0",
+              "N° Enrolados": "0",
+              "Nombres y Apellidos": "JOHELL QUEEM AIRE DAVALOS"
+            },
+            {
+              "N° Enrolados": "3",
+              "Declaración": "5",
+              "Nombres y Apellidos": "REY JORGE ALFARO PEnA",
+              "Identificación": "71581627"
+            },
+            {
+              "Identificación": "45580544",
+              "Nombres y Apellidos": "LUZ JAQUELINE BAUTISTA BOLO",
+              "N° Enrolados": "4",
+              "Declaración": "3"
+            },
+            {
+              "Identificación": "40981917",
+              "Nombres y Apellidos": "JANETH CASTAnEDA TUMBALOBOS",
+              "N° Enrolados": "1",
+              "Declaración": "1"
+            },
+            {
+              "Identificación": "10531545",
+              "Nombres y Apellidos": "YENNY GISELA CASTILLO MALLMA",
+              "N° Enrolados": "2",
+              "Declaración": "1"
+            },
+            {
+              "Nombres y Apellidos": "DAVID ANTHONY CELESTINO",
+              "N° Enrolados": "2",
+              "Identificación": "76035813",
+              "Declaración": "2"
+            },
+            {
+              "N° Enrolados": "0",
+              "Declaración": "2",
+              "Identificación": "47424663",
+              "Nombres y Apellidos": "GODELIA INOCENTA COLCA JULCA"
+            },
+            {
+              "Identificación": "43997438",
+              "Declaración": "1",
+              "N° Enrolados": "1",
+              "Nombres y Apellidos": "DINA MARLENE CORNEJO AGUIRRE"
+            },
+            {
+              "Nombres y Apellidos": "SUMIKO DEL CARMEN BURGA ORTIZ",
+              "Declaración": "3",
+              "Identificación": "76192150",
+              "N° Enrolados": "2"
+            },
+            {
+              "Declaración": "1",
+              "N° Enrolados": "1",
+              "Identificación": "41186119",
+              "Nombres y Apellidos": "LUCIO ROMERLU FERRER MEJiA"
+            },
+            {
+              "N° Enrolados": "2",
+              "Declaración": "3",
+              "Nombres y Apellidos": "JEYDY LUZ HANCCO MAMANI",
+              "Identificación": "73634875"
+            },
+            {
+              "Declaración": "2",
+              "Nombres y Apellidos": "ANGELICA HERRERA PALOMINO",
+              "Identificación": "41723354",
+              "N° Enrolados": "4"
+            },
+            {
+              "Identificación": "43577711",
+              "Declaración": "0",
+              "N° Enrolados": "0",
+              "Nombres y Apellidos": "RONALD ARTURO HUAPAYA CHUMPITAZI"
+            },
+            {
+              "Nombres y Apellidos": "HASHLY IPÁRRAGUIRRE",
+              "N° Enrolados": "0",
+              "Identificación": "60949902",
+              "Declaración": "0"
+            },
+            {
+              "Nombres y Apellidos": "JOHANN STEVE LINO GARAY",
+              "Declaración": "2",
+              "N° Enrolados": "0",
+              "Identificación": "72257245"
+            },
+            {
+              "Nombres y Apellidos": "DAICY LoPEZ HUAMANRAYME",
+              "N° Enrolados": "0",
+              "Declaración": "4",
+              "Identificación": "73360442"
+            },
+            {
+              "Declaración": "2",
+              "Identificación": "77144510",
+              "Nombres y Apellidos": "ALDO LEONARDO MIRANDA HUAMAN",
+              "N° Enrolados": "1"
+            },
+            {
+              "Declaración": "3",
+              "Nombres y Apellidos": "JESSICA MONTILLA CORRALES",
+              "Identificación": "007041227",
+              "N° Enrolados": "2"
+            },
+            {
+              "Declaración": "2",
+              "Nombres y Apellidos": "ANA PAOLA  NunEZ ANTEZANA",
+              "Identificación": "74027502",
+              "N° Enrolados": "2"
+            },
+            {
+              "Nombres y Apellidos": "JOSUE ROVER ONOFRE VICUnA",
+              "Identificación": "44358075",
+              "Declaración": "3",
+              "N° Enrolados": "2"
+            },
+            {
+              "Nombres y Apellidos": "CIRILA PALOMINO PARIONA",
+              "Declaración": "1",
+              "N° Enrolados": "1",
+              "Identificación": "07334446"
+            },
+            {
+              "N° Enrolados": "3",
+              "Identificación": "46672970",
+              "Nombres y Apellidos": "LYLY DAIYU  PAREJA MADERA",
+              "Declaración": "3"
+            },
+            {
+              "N° Enrolados": "1",
+              "Nombres y Apellidos": "RUTH MERY QUISPE QUISPE",
+              "Identificación": "45141505",
+              "Declaración": "1"
+            },
+            {
+              "Declaración": "0",
+              "Identificación": "10880166",
+              "N° Enrolados": "0",
+              "Nombres y Apellidos": "JUDITH RAMIREZ JARA DE SANDOVAL"
+            },
+            {
+              "N° Enrolados": "0",
+              "Declaración": "2",
+              "Nombres y Apellidos": "JAINOR TORRES ORTIZ",
+              "Identificación": "10427086785"
+            },
+            {
+              "N° Enrolados": "0",
+              "Identificación": "74749862",
+              "Nombres y Apellidos": "ELIZABETH LOURDES VILCA CONDORI",
+              "Declaración": "0"
+            }
+          ],
+          "tableId": "Tabla_10"
+        },
+        {
+          "rows": [
+            {
+              "Tipo IMO": "CAPITAN",
+              "Total Enrolados": "0",
+              "Desertor FDS": "0",
+              "Participantes en Juego": "0",
+              "Declaración": "0"
+            },
+            {
+              "Total Enrolados": "0",
+              "Participantes en Juego": "0",
+              "Tipo IMO": "MANAGER",
+              "Desertor FDS": "0",
+              "Declaración": "0"
+            },
+            {
+              "Desertor FDS": "0",
+              "Total Enrolados": "0",
+              "Declaración": "0",
+              "Tipo IMO": "PARTICIPANTE",
+              "Participantes en Juego": "0"
+            }
+          ],
+          "tableId": "Tabla_11",
+          "headers": [
+            "Tipo IMO",
+            "Participantes en Juego",
+            "Declaración",
+            "Total Enrolados",
+            "Desertor FDS"
+          ]
+        }
+      ],
+      "kpis": [
+        {
+          "cardId": "Tarjeta_1",
+          "content": [
+            "Sede",
+            "Todas",
+            "LIMA CICLO 1",
+            "Buscar",
+            "Limpiar",
+            "Exportar Excel",
+            " Solo equipos en juego (activos hoy), cada uno en su etapa vigente — no se muestra histórico."
+          ]
+        },
+        {
+          "content": [
+            "Enrolamiento total — 4 equipo(s) en juego",
+            "TIPO IMO\tPARTICIPANTES EN JUEGO\tDECLARACIÓN\tTOTAL ENROLADOS\tDESERTOR FDS",
+            "CAPITAN\t2\t7\t8\t0",
+            "MANAGER\t8\t28\t31\t0",
+            "PARTICIPANTE\t55\t121\t98\t24",
+            "Total\t65\t156\t137\t24"
+          ],
+          "cardId": "Tarjeta_2"
+        }
+      ]
+    },
+    "actividadCoordinadores": {
+      "kpis": [
+        {
+          "cardId": "Tarjeta_1",
+          "content": [
+            "Sede",
+            "LIMA CICLO 1",
+            "Desde",
+            "Hasta",
+            "Filtrar"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_2",
+          "content": [
+            "JOYCE LIMA CICLO 1",
+            "Últ. conexión: 22/08/2026 08:11",
+            "2726",
+            "Gestiones",
+            "2347",
+            "C1",
+            "379",
+            "C2",
+            "922",
+            "Asignados",
+            "Cobertura (participantes con al menos 1 gestión)",
+            "900/922 (98%)",
+            "Últ. gestión: 21/08/2026 17:44",
+            "Por Confirmar: 323",
+            "No Contesta: 705",
+            "Confirmado: 1253",
+            "Siguiente: 208",
+            "No le Interesa: 236",
+            "Ya Asistiá: 1"
+          ]
+        },
+        {
+          "content": [
+            "LIMA CICLO 1"
+          ],
+          "cardId": "Tarjeta_3"
+        },
+        {
+          "cardId": "Tarjeta_4",
+          "content": [
+            "DIANA LIMA CICLO 1",
+            "Últ. conexión: 21/08/2026 22:09",
+            "2053",
+            "Gestiones",
+            "1781",
+            "C1",
+            "272",
+            "C2",
+            "880",
+            "Asignados",
+            "Cobertura (participantes con al menos 1 gestión)",
+            "837/880 (95%)",
+            "Últ. gestión: 21/08/2026 23:00",
+            "No Contesta: 619",
+            "Confirmado: 1081",
+            "Por Confirmar: 53",
+            "No le Interesa: 165",
+            "Siguiente: 135"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_5",
+          "content": [
+            "LIMA CICLO 1"
+          ]
+        },
+        {
+          "content": [
+            "LEYLA LIMA CICLO 1",
+            "Últ. conexión: 21/08/2026 20:37",
+            "627",
+            "Gestiones",
+            "600",
+            "C1",
+            "27",
+            "C2",
+            "96",
+            "Asignados",
+            "Cobertura (participantes con al menos 1 gestión)",
+            "211/96 (220%)",
+            "Últ. gestión: 15/04/2026 17:48",
+            "No Contesta: 225",
+            "Por Confirmar: 71",
+            "Confirmado: 260",
+            "Siguiente: 52",
+            "Devolución: 3",
+            "No le Interesa: 16"
+          ],
+          "cardId": "Tarjeta_6"
+        },
+        {
+          "cardId": "Tarjeta_7",
+          "content": [
+            "LIMA CICLO 1"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_8",
+          "content": [
+            "LINID LIMA CICLO 1",
+            "Sin conexiones registradas",
+            "0",
+            "Gestiones",
+            "0",
+            "C1",
+            "0",
+            "C2",
+            "73",
+            "Asignados",
+            "Cobertura (participantes con al menos 1 gestión)",
+            "0/73 (0%)",
+            "Últ. gestión: —",
+            "Sin gestiones registradas en este filtro."
+          ]
+        },
+        {
+          "cardId": "Tarjeta_9",
+          "content": [
+            "LIMA CICLO 1"
+          ]
+        }
+      ],
+      "tablas": []
+    }
+  },
+  "fuente": "Robot de Nodus V2 (Reportes y Facturación)",
+  "timestamp": "2026-08-22T17:59:30.709Z"
+}

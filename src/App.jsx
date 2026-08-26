@@ -133,9 +133,9 @@ function App() {
           } />
 
           <Route path="/manual" element={
-            <PrivateRoute>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin']} requireSuperAdmin={false}>
               <ManualGuia />
-            </PrivateRoute>
+            </RoleRoute>
           } />
 
           <Route path="/roles" element={
@@ -169,9 +169,9 @@ function App() {
           } />
 
           <Route path="/metas" element={
-            <PrivateRoute>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']} requireSuperAdmin={false}>
               <GoalsBoard />
-            </PrivateRoute>
+            </RoleRoute>
           } />
 
           <Route path="/reportes" element={
@@ -187,27 +187,27 @@ function App() {
           } />
 
           <Route path="/auditoria-kpis" element={
-            <RoleRoute allowedRoles={['gerente', 'direccion', 'director_maestria', 'superadmin', 'cfo']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']} requireSuperAdmin={false}>
               <AuditoriaKPIs />
             </RoleRoute>
           } />
 
           <Route path="/superadmin" element={
-            <RoleRoute allowedRoles={['gerente', 'direccion', 'director_maestria']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']} requireSuperAdmin={false}>
               <SuperAdminPanel />
             </RoleRoute>
           } />
           
           <Route path="/centro-managers" element={
-            <RoleRoute allowedRoles={['gerente', 'direccion', 'director_maestria', 'coordinador_mj', 'coord_maestria', 'finanzas', 'cfo', 'entrenador_llamadas', 'entrenador']}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas']} requireSuperAdmin={false}>
               <CentroManagers />
             </RoleRoute>
           } />
 
           <Route path="/directorio-qt" element={
-            <PrivateRoute>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt']} requireSuperAdmin={false}>
               <DirectorioQT />
-            </PrivateRoute>
+            </RoleRoute>
           } />
 
           <Route path="/protocolo-emergencias" element={
@@ -218,13 +218,13 @@ function App() {
 
           {/* PMO Culture Integrations */}
           <Route path="/portafolio" element={
-            <RoleRoute allowedRoles={['gerente', 'direccion', 'director_maestria', 'cfo', 'superadmin']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']} requireSuperAdmin={false}>
               <PortfolioBoard />
             </RoleRoute>
           } />
           
           <Route path="/estrategia" element={
-            <RoleRoute allowedRoles={['gerente', 'direccion', 'director_maestria', 'cfo', 'superadmin']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']} requireSuperAdmin={false}>
               <StrategyBoard />
             </RoleRoute>
           } />

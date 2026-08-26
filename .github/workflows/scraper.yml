@@ -1,0 +1,34 @@
+name: Nodus Daily Scraper
+
+on:
+  schedule:
+    # Ejecuta el scraper todos los días a las 00:00 (Medianoche UTC)
+    - cron: '0 0 * * *'
+  workflow_dispatch: # Permite ejecutarlo manualmente desde GitHub
+
+jobs:
+  scrape-nodus:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v3
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Instalar Dependencias
+        run: npm ci || npm install
+
+      - name: Instalar navegadores para Puppeteer
+        run: npx puppeteer browsers install chrome
+
+      - name: Ejecutar Robot Lector
+        env:
+          # AQUÍ ES DONDE GITHUB INYECTA TUS SECRETOS DE FORMA SEGURA
+          NODUS_USER: ${{ secrets.NODUS_USER }}
+          NODUS_PASSWORD: ${{ secrets.NODUS_PASSWORD }}
+          FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+        run: node scripts/nodusScraper.js

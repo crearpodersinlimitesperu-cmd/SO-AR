@@ -391,7 +391,7 @@ export default function Home() {
                 boxShadow: '0 10px 40px rgba(0,0,0,0.9)',
                 border: '1px solid rgba(41, 171, 226, 0.3)'
               }}>
-                {(currentUser?.isGerente || currentUser?.isDireccion || currentUser?.isSuperAdmin) && (
+                {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin'].includes(currentUser?.appRole) && (
                   <>
                     <button onClick={() => { setShowToolsDropdown(false); navigate('/gerente'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                       💼 Causa OS Gerencial
@@ -423,37 +423,35 @@ export default function Home() {
                   👑 Excelencia Operativa
                 </button>
 
-                {['coord_c1', 'coord_maestria', 'qt', 'capitan'].includes(currentUser?.appRole) && (
+                {['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan'].includes(currentUser?.appRole) && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/mis-kpis'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                     📊 Mis KPIs
                   </button>
                 )}
 
-                {!['entrenador', 'entrenador_llamadas'].includes(currentUser?.appRole) && (
+                {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin'].includes(currentUser?.appRole) && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/directorio-qt'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                     ⚡ Directorio QT
                   </button>
                 )}
 
-                {(currentUser?.isSuperAdmin || currentUser?.isGerente || currentUser?.isDireccion || currentUser?.appRole === 'director_maestria') && (
+                {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin'].includes(currentUser?.appRole) && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/superadmin'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
-                    {currentUser?.isSuperAdmin ? '🌐 Centro de Mando' : '👥 Directorio de Equipo'}
+                    🌐 Centro de Mando
                   </button>
                 )}
 
-                {(currentUser?.isSuperAdmin || currentUser?.isGerente || currentUser?.isDireccion) && (
-                  <button onClick={() => { setShowToolsDropdown(false); window.open('/calendario_global.html?v=' + Date.now() + '&email=' + encodeURIComponent(currentUser?.email || '') + '&name=' + encodeURIComponent(currentUser?.displayName || currentUser?.name || ''), '_blank'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
-                    📅 Calendario Global Maestro ↗
-                  </button>
-                )}
+                <button onClick={() => { setShowToolsDropdown(false); window.open('/calendario_global.html?v=' + Date.now() + '&email=' + encodeURIComponent(currentUser?.email || '') + '&name=' + encodeURIComponent(currentUser?.displayName || currentUser?.name || ''), '_blank'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
+                  📅 Calendario Global Maestro ↗
+                </button>
 
-                {(currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.isGerente || ['coord_c1', 'coordinador_c1c2', 'coord_c2', 'coordinador', 'cc1y2', 'capitan', 'qt'].includes(currentUser?.appRole)) && (
+                {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin'].includes(currentUser?.appRole) && (
                   <button onClick={() => { setShowToolsDropdown(false); window.open('https://cpsl-campus-interactivo.vercel.app/ruta', '_blank'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                     🎓 Campus Interactivo ↗
                   </button>
                 )}
 
-                {currentUser?.appRole !== 'qt' && (currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.isGerente || ['director_maestria', 'coordinador_mj', 'coord_maestria', 'finanzas', 'cfo'].includes(currentUser?.appRole)) && (
+                {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin'].includes(currentUser?.appRole) && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/centro-managers'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                     🎯 Centro de Managers
                   </button>
@@ -463,14 +461,9 @@ export default function Home() {
                   🚨 Protocolo de Emergencias
                 </button>
 
-                {(currentUser?.appRole === 'qt' || currentUser?.isSuperAdmin) && (
-                  <button onClick={() => { setShowToolsDropdown(false); window.open('https://crearpsl.net/manual_quantum_team.html', '_blank'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
-                    📘 Manual Quantum Team ↗
-                  </button>
-                )}
-                {currentUser?.appRole !== 'qt' && (
+                {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin'].includes(currentUser?.appRole) && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/manual'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
-                    📘 Manual y Guía Causa OS
+                    📘 Manual / Guía Causa OS / QT
                   </button>
                 )}
               </div>
@@ -482,65 +475,60 @@ export default function Home() {
       {/* BARRA PRO COMPLETA (SI ESTÁ EN MODO PRO) */}
       {viewMode === 'pro' && customModules.advancedTools !== false && (
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '1.5rem', padding: '0.75rem', background: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.06)' }}>
-          {(currentUser?.isSuperAdmin || currentUser?.isGerente || currentUser?.isDireccion || currentUser?.appRole === 'director_maestria') && (
+          {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin'].includes(currentUser?.appRole) && (
             <button onClick={() => navigate('/gerente')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'var(--crear-gold)', color: 'black' }}>
               💼 SO-AR Gerencial
             </button>
           )}
-          {(currentUser?.isSuperAdmin || currentUser?.isGerente || currentUser?.isDireccion || ['director_maestria', 'cfo'].includes(currentUser?.appRole)) && (
+          {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin'].includes(currentUser?.appRole) && (
             <>
-
               <button onClick={() => navigate('/portafolio')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #0ea5e9, #0369a1)', color: 'white', border: 'none' }}>
                 📈 Portafolio PMO
               </button>
               <button onClick={() => navigate('/estrategia')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #047857)', color: 'white', border: 'none' }}>
                 🎯 OKRs (Cascade)
               </button>
+              <button onClick={() => navigate('/auditoria-kpis')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'transparent', border: '1px solid #10b981', color: '#10b981' }}>
+                📉 Auditoría KPIs
+              </button>
             </>
           )}
-          {(currentUser?.isSuperAdmin || currentUser?.isGerente || currentUser?.isDireccion || currentUser?.appRole === 'director_maestria') && (
-            <button onClick={() => navigate('/auditoria-kpis')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'transparent', border: '1px solid #10b981', color: '#10b981' }}>
-              📉 Auditoría KPIs
-            </button>
-          )}
 
-          {['coord_c1', 'coord_maestria', 'qt', 'capitan'].includes(currentUser?.appRole) && (
+          {['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan'].includes(currentUser?.appRole) && (
             <button onClick={() => navigate('/mis-kpis')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #047857)', color: 'white', border: 'none' }}>
               📊 Mis KPIs
             </button>
           )}
 
-          {(currentUser?.appRole === 'qt' || currentUser?.isSuperAdmin) && (
-            <button onClick={() => window.open('https://crearpsl.net/manual_quantum_team.html', '_blank')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #0284c7, #2563eb)', color: 'white', border: 'none' }}>
+          {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin'].includes(currentUser?.appRole) && (
+            <button onClick={() => navigate('/manual')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #0284c7, #2563eb)', color: 'white', border: 'none' }}>
               📘 Manual QT
             </button>
           )}
 
-          {!['entrenador', 'entrenador_llamadas'].includes(currentUser?.appRole) && (
+          {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin'].includes(currentUser?.appRole) && (
             <button onClick={() => navigate('/directorio-qt')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: 'white', border: 'none' }}>
               ⚡ Directorio QT
             </button>
           )}
 
-          {(currentUser?.isSuperAdmin || currentUser?.isGerente || currentUser?.isDireccion || currentUser?.appRole === 'director_maestria') && (
+          {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin'].includes(currentUser?.appRole) && (
             <button onClick={() => navigate('/superadmin')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #8b5cf6, #29abe2)', color: 'white', border: 'none' }}>
-              {currentUser?.isSuperAdmin ? '🌐 Centro de Mando' : '👥 Directorio de Equipo'}
+              🌐 Centro de Mando
             </button>
           )}
 
-          {(currentUser?.isSuperAdmin || currentUser?.isGerente || currentUser?.isDireccion) && (
-            <button onClick={() => window.open('/calendario_global.html?v=' + Date.now() + '&email=' + encodeURIComponent(currentUser?.email || '') + '&name=' + encodeURIComponent(currentUser?.displayName || currentUser?.name || ''), '_blank')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #ef4444)', color: 'white', border: 'none' }}>
-              📅 Calendario Global
-            </button>
-          )}
+          <button onClick={() => window.open('/calendario_global.html?v=' + Date.now() + '&email=' + encodeURIComponent(currentUser?.email || '') + '&name=' + encodeURIComponent(currentUser?.displayName || currentUser?.name || ''), '_blank')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #ef4444)', color: 'white', border: 'none' }}>
+            📅 Calendario Global
+          </button>
 
-          {(currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.isGerente || ['coord_c1', 'coordinador_c1c2', 'coord_c2', 'coordinador', 'cc1y2', 'capitan', 'qt'].includes(currentUser?.appRole)) && (
-            <button onClick={() => window.open('https://cpsl-campus-interactivo.vercel.app/', '_blank')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #059669)', color: 'white', border: 'none' }}>
+          {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin'].includes(currentUser?.appRole) && (
+            <button onClick={() => window.open('https://cpsl-campus-interactivo.vercel.app/ruta', '_blank')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #059669)', color: 'white', border: 'none' }}>
               🎓 Campus Interactivo
             </button>
           )}
 
-          {currentUser?.appRole !== 'qt' && (currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.isGerente || ['director_maestria', 'coordinador_mj', 'coord_maestria', 'finanzas', 'cfo', 'entrenador', 'entrenador_llamadas'].includes(currentUser?.appRole)) && (
+          {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin'].includes(currentUser?.appRole) && (
             <button onClick={() => navigate('/centro-managers')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#000', fontWeight: 'bold', border: 'none' }}>
               🎯 Centro Managers
             </button>

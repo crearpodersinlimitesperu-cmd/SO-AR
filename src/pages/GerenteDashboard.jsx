@@ -166,21 +166,25 @@ export default function GerenteDashboard() {
           <button className="btn-secondary" onClick={() => setShowVenueModal(true)} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <Building size={16} /> Hoteles Sede
           </button>
-          <button className="btn-primary" onClick={() => setShowTaskForm(true)} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <PlusCircle size={16} /> Asignar Meta
-          </button>
-          {(currentUser?.isSuperAdmin || currentUser?.appRole === 'gerente' || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'director_maestria') && (
+          {(currentUser?.isSuperAdmin || currentUser?.appRole === 'gerente' || currentUser?.isDireccion || currentUser?.appRole === 'director_maestria') && (
+            <button className="btn-primary" onClick={() => setShowTaskForm(true)} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <PlusCircle size={16} /> Asignar Meta
+            </button>
+          )}
+          {(currentUser?.isSuperAdmin || currentUser?.appRole === 'gerente' || currentUser?.isDireccion || currentUser?.appRole === 'director_maestria') && (
             <button className="btn-primary" onClick={() => navigate('/superadmin')} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'linear-gradient(135deg, #8b5cf6, #29abe2)', color: 'white', border: 'none' }}>
               👥 Directorio de Equipo
             </button>
           )}
-          <button 
-            className="btn-primary" 
-            onClick={() => window.open('https://cartas.crearpsl.net/', '_blank')} 
-            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'linear-gradient(135deg, #f59e0b, #ec4899)', color: 'white', border: 'none' }}
-          >
-            <Mail size={16} /> Sistema de Cartas
-          </button>
+          {(currentUser?.appRole === 'gerente') && (
+            <button 
+              className="btn-primary" 
+              onClick={() => window.open('https://cartas.crearpsl.net/', '_blank')} 
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'linear-gradient(135deg, #f59e0b, #ec4899)', color: 'white', border: 'none' }}
+            >
+              <Mail size={16} /> Sistema de Cartas
+            </button>
+          )}
           <button className="btn-secondary" onClick={() => navigate('/')}>Volver</button>
         </div>
       </div>
