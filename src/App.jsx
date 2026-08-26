@@ -141,7 +141,7 @@ function App() {
           } />
 
           <Route path="/manual-nodus" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'entrenador', 'qt', 'capitan', 'manager', 'aliado', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
               <ManualNodus />
             </RoleRoute>
           } />
