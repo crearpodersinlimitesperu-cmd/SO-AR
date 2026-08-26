@@ -50,9 +50,9 @@ export default function HelpModal({ isOpen, onClose }) {
       await addDoc(collection(db, 'mail'), {
         to: 'sistemas@crearpsl.net',
         message: {
-          subject: `💡 Nueva Sugerencia SO-AR de ${currentUser?.name || 'Usuario'}`,
+          subject: `💡 Nueva Sugerencia Causa OS de ${currentUser?.name || 'Usuario'}`,
           html: `
-            <h3>Nueva sugerencia/reporte desde la plataforma SO-AR</h3>
+            <h3>Nueva sugerencia/reporte desde la plataforma Causa OS</h3>
             <p><strong>Usuario:</strong> ${currentUser?.name} (${currentUser?.email})</p>
             <p><strong>Rol:</strong> ${currentUser?.appRole}</p>
             <p><strong>Sede:</strong> ${currentUser?.sede}</p>
@@ -99,7 +99,7 @@ export default function HelpModal({ isOpen, onClose }) {
         }}>
           <h2 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.8rem', color: 'var(--crear-gold)' }}>
             <HelpCircle size={24} />
-            Centro de Ayuda SO-AR
+            Centro de Ayuda Causa OS
           </h2>
           <button onClick={onClose} style={{ background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer' }}>
             <X size={24} />
@@ -208,7 +208,7 @@ export default function HelpModal({ isOpen, onClose }) {
             <div style={{ color: 'var(--text-body)', lineHeight: '1.6' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.8rem', marginBottom: '1.2rem', padding: '1rem', background: 'rgba(255, 183, 3, 0.08)', borderRadius: '10px', border: '1px solid rgba(255, 183, 3, 0.3)' }}>
                 <div>
-                  <h3 style={{ color: 'var(--crear-gold)', margin: '0 0 0.3rem 0' }}>¿Primera vez en SO-AR?</h3>
+                  <h3 style={{ color: 'var(--crear-gold)', margin: '0 0 0.3rem 0' }}>¿Primera vez en Causa OS?</h3>
                   <p style={{ margin: 0, fontSize: '0.88rem', color: 'var(--text-main)' }}>Aprende qué hace cada botón, qué está permitido y qué no en un recorrido interactivo de 1 minuto.</p>
                 </div>
                 <button 
@@ -220,7 +220,7 @@ export default function HelpModal({ isOpen, onClose }) {
                 </button>
               </div>
 
-              <h3 style={{ color: 'var(--crear-gold)', marginTop: 0 }}>Bienvenido al Sistema Operativo de Alto Rendimiento (SO-AR)</h3>
+              <h3 style={{ color: 'var(--crear-gold)', marginTop: 0 }}>Bienvenido a Causa OS</h3>
               <p>Esta herramienta centraliza todas las tareas, reportes y métricas de CREAR Poder Sin Límites para lograr una operación eficiente y transparente en todas las sedes.</p>
 
               {/* ENLACE DIRECTO MANUAL QUANTUM TEAM (SOLO PARA QT) */}
@@ -297,7 +297,7 @@ export default function HelpModal({ isOpen, onClose }) {
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#22c55e' }}>
                   <CheckCircle2 size={48} style={{ marginBottom: '1rem' }} />
                   <h3 style={{ margin: 0 }}>¡Mensaje Enviado!</h3>
-                  <p>Gracias por ayudarnos a mejorar SO-AR.</p>
+                  <p>Gracias por ayudarnos a mejorar Causa OS.</p>
                 </div>
               ) : (
                 <form onSubmit={handleSendSuggestion} style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1.5rem', marginTop: '1rem' }}>

@@ -177,7 +177,7 @@ export default function DirectorioQT() {
           className="btn-secondary" 
           style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', borderRadius: '8px', cursor: 'pointer' }}
         >
-          <ArrowLeft size={16} /> Volver a SO-AR
+          <ArrowLeft size={16} /> Volver a Causa OS
         </button>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>

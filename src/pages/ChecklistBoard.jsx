@@ -81,7 +81,7 @@ export default function ChecklistBoard() {
   const filterParam = searchParams.get('filter');
 
   let activeTasks = myTasks;
-  let viewTitle = `Checklist SO-AR Activo: ${currentStage}`;
+  let viewTitle = `Checklist Causa OS Activo: ${currentStage}`;
 
   if (filterParam === 'completed') {
     activeTasks = myTasks.filter(t => t.completed || t.status === 'Completada');
@@ -367,7 +367,7 @@ export default function ChecklistBoard() {
                       )}
                     </div>
 
-                    {/* FECHA Y HORA LÍMITE AUTOMÁTICA SO-AR */}
+                    {/* FECHA Y HORA LÍMITE AUTOMÁTICA Causa OS */}
                     {(() => {
                       const effectiveDeadline = task.deadline || calculateAutomaticDeadline(task, currentCycle);
                       return (

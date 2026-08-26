@@ -10,7 +10,7 @@ export default function AIAssistant() {
   const { tasks, addCustomTask } = useChecklist();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { role: 'assistant', content: '¡Hola! Soy tu asistente de IA del Sistema Operativo SO-AR. ¿En qué te puedo ayudar hoy?' }
+    { role: 'assistant', content: '¡Hola! Soy tu asistente de IA de Causa OS. ¿En qué te puedo ayudar hoy?' }
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -142,7 +142,7 @@ El usuario dice: ${userMessage.content}`;
           <div className="bg-gray-800 border-b border-gray-700 p-4 flex justify-between items-center">
             <div className="flex items-center gap-2">
               <Bot className="text-[#d4af37]" />
-              <h3 className="text-[#d4af37] font-bold">Asistente SO-AR</h3>
+              <h3 className="text-[#d4af37] font-bold">Asistente Causa OS</h3>
             </div>
             <button onClick={() => setIsOpen(false)} className="text-gray-400 hover:text-white">
               <X size={20} />

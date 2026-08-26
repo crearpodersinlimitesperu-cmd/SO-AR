@@ -711,10 +711,10 @@ export default function ManualGuia() {
             </div>
           )}
 
-          {/* MÓDULOS CLAVE DE SO-AR */}
+          {/* MÓDULOS CLAVE DE Causa OS */}
           <div className="glass-panel" style={{ padding: '2rem' }}>
             <h3 style={{ color: 'var(--text-heading)', display: 'flex', alignItems: 'center', gap: '0.6rem', marginTop: 0, fontSize: '1.2rem' }}>
-              <CheckSquare size={20} color="var(--crear-gold)" /> Módulos Clave de SO-AR
+              <CheckSquare size={20} color="var(--crear-gold)" /> Módulos Clave de Causa OS
             </h3>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem', marginTop: '1rem' }}>

@@ -164,23 +164,55 @@ export default function Home() {
       {/* CABECERA PRINCIPAL */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <img 
-            src="/logo.png" 
-            alt="CREAR PODER SIN LÍMITES" 
-            style={{ 
-              height: viewMode === 'lite' ? '130px' : '170px', 
-              marginBottom: '1rem', 
-              objectFit: 'contain', 
-              filter: 'drop-shadow(0 10px 25px rgba(212, 175, 55, 0.6)) drop-shadow(0 4px 10px rgba(41, 171, 226, 0.4))', 
-              display: 'block', 
-              transform: viewMode === 'lite' ? 'scale(1)' : 'scale(1.05)', 
-              transformOrigin: 'left center' 
-            }} 
-          />
-          <h1 className="text-gold" style={{ margin: 0, fontSize: viewMode === 'lite' ? '2rem' : '2.4rem', fontWeight: '900', letterSpacing: '-0.5px' }}>
-            {time.getHours() < 12 ? 'Buenos días' : time.getHours() < 19 ? 'Buenas tardes' : 'Buenas noches'}, {currentUser?.displayName || 'Equipo'}
-          </h1>
-          <p className="text-muted" style={{ margin: '0.4rem 0 0', textTransform: 'uppercase', fontSize: '0.85rem' }}>
+          <div style={{ 
+            display: 'flex', 
+            gap: '2rem', 
+            alignItems: 'center', 
+            marginBottom: '1.5rem', 
+            flexWrap: 'wrap',
+            padding: '0.5rem 0'
+          }}>
+            <img 
+              src="/logo.png" 
+              alt="Crear Poder Sin Limites" 
+              style={{ 
+                height: viewMode === 'lite' ? '70px' : '85px', 
+                objectFit: 'contain', 
+                display: 'block',
+                filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.08))',
+                transition: 'transform 0.3s ease'
+              }} 
+            />
+            <div style={{ 
+              height: '50px', 
+              width: '1px', 
+              background: 'linear-gradient(to bottom, transparent, var(--border-strong), transparent)', 
+              display: viewMode === 'lite' ? 'none' : 'block',
+              opacity: 0.6
+            }}></div>
+            <img 
+              src="/causa-logo-transparent.png" 
+              alt="Causa OS" 
+              className="causa-logo"
+              style={{ 
+                height: viewMode === 'lite' ? '70px' : '85px', 
+                objectFit: 'contain', 
+                display: 'block', 
+                transformOrigin: 'left center',
+                filter: 'drop-shadow(0 4px 15px rgba(0, 191, 255, 0.2))',
+                transition: 'transform 0.3s ease'
+              }} 
+            />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+            <h1 className="text-blue" style={{ margin: 0, fontSize: viewMode === 'lite' ? '2.5rem' : '3rem', fontWeight: '900', letterSpacing: '-1px', textShadow: '0 0 20px rgba(100, 255, 218, 0.3)' }}>
+              Causa OS
+            </h1>
+            <h2 className="text-gold" style={{ margin: 0, fontSize: viewMode === 'lite' ? '1.5rem' : '1.8rem', fontWeight: '700', letterSpacing: '-0.5px' }}>
+              {time.getHours() < 12 ? 'Buenos días' : time.getHours() < 19 ? 'Buenas tardes' : 'Buenas noches'}, {currentUser?.displayName || currentUser?.name || 'Equipo'}
+            </h2>
+          </div>
+          <p className="text-muted" style={{ margin: '0.8rem 0 0', textTransform: 'uppercase', fontSize: '0.85rem' }}>
             {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') ? 'MÚLTIPLES EQUIPOS (GLOBAL) • VISIÓN MÚLTIPLES SEDES' : (currentCycle ? `${currentCycle.name} • ETAPA: ${currentStage}` : 'CARGANDO CICLO...')}
           </p>
           
@@ -208,7 +240,7 @@ export default function Home() {
               gap: '5px' 
             }}>
               <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981', display: 'inline-block', boxShadow: '0 0 6px #10b981' }}></span>
-              SO-AR v2.8.0
+              Causa OS v2.8.0
             </span>
           </div>
         </div>
@@ -362,7 +394,7 @@ export default function Home() {
                 {(currentUser?.isGerente || currentUser?.isDireccion || currentUser?.isSuperAdmin) && (
                   <>
                     <button onClick={() => { setShowToolsDropdown(false); navigate('/gerente'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
-                      💼 SO-AR Gerencial
+                      💼 Causa OS Gerencial
                     </button>
                     <button onClick={() => { setShowToolsDropdown(false); navigate('/portafolio'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: 'var(--crear-cyan)', background: 'rgba(41, 171, 226, 0.1)' }}>
                       📈 Portafolio PMO (Planview)
@@ -438,7 +470,7 @@ export default function Home() {
                 )}
                 {currentUser?.appRole !== 'qt' && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/manual'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
-                    📘 Manual y Guía SO-AR
+                    📘 Manual y Guía Causa OS
                   </button>
                 )}
               </div>
@@ -457,6 +489,7 @@ export default function Home() {
           )}
           {(currentUser?.isSuperAdmin || currentUser?.isGerente || currentUser?.isDireccion || ['director_maestria', 'cfo'].includes(currentUser?.appRole)) && (
             <>
+
               <button onClick={() => navigate('/portafolio')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #0ea5e9, #0369a1)', color: 'white', border: 'none' }}>
                 📈 Portafolio PMO
               </button>
@@ -663,6 +696,15 @@ export default function Home() {
 
             {/* BOTONES PRINCIPALES DE ACCIÓN */}
             <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap' }}>
+                  <button 
+                    onClick={() => navigate('/gerente-dashboard')}
+                    style={{ flex: 1, padding: '0.8rem', background: 'var(--crear-blue)', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', boxShadow: '0 4px 10px rgba(2, 132, 199, 0.3)' }}
+                  >
+                    <ArrowUpRight size={18} />
+                    <span>
+                      💼 Causa OS Gerencial
+                    </span>
+                  </button>
               <button 
                 className="btn-primary" 
                 onClick={() => navigate(currentUser?.appRole === 'gerente' ? '/gerente' : `/checklist/${currentUser?.appRole || 'capitan'}`)} 

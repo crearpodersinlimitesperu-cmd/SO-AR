@@ -26,6 +26,7 @@ import TeamCalendar from './pages/TeamCalendar'
 import AICopilot from './components/AICopilot'
 import PromptModal from './components/PromptModal'
 import HelpModal from './components/HelpModal'
+
 import { useState } from 'react'
 import { HelpCircle } from 'lucide-react'
 

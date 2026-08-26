@@ -5,12 +5,12 @@
 }
 
 :root {
-  --crear-gold: #ffb703;
-  --crear-gold-hover: #ffc933;
-  --crear-gold-light: rgba(255, 183, 3, 0.15);
+  --crear-gold: #FFC107;
+  --crear-gold-hover: #FFD54F;
+  --crear-gold-light: rgba(255, 193, 7, 0.15);
   
-  --crear-blue: #00d4ff;
-  --crear-blue-dark: #0088aa;
+  --crear-blue: #64FFDA;
+  --crear-blue-dark: #1DE9B6;
   
   --role-gerente: #ffb703;
   --role-c1c2: #00d4ff;
@@ -35,8 +35,8 @@
    TEMA OSCURO (DARK MODE - POR DEFECTO)
    ========================================================================= */
 :root, [data-theme="dark"] {
-  --bg-dark: #070d1f;
-  --bg-dark-alt: #0d152d;
+  --bg-dark: #0A192F;
+  --bg-dark-alt: #112240;
   --bg-card: rgba(255, 255, 255, 0.03);
   --bg-card-hover: rgba(255, 255, 255, 0.06);
   --bg-glass-heavy: rgba(13, 21, 45, 0.75);
@@ -144,6 +144,12 @@
   color: #000000 !important;
 }
 
+[data-theme="light"] .text-blue {
+  color: #0284c7 !important;
+}
+
+/* Removidos hacks de mix-blend-mode de logo transparente */
+
 /* Fallback override for any inline translucent white colors in light mode */
 [data-theme="light"] [style*="color: rgba(255,255,255,"],
 [data-theme="light"] [style*="color: rgba(255, 255, 255,"],
@@ -194,6 +200,11 @@ h1, h2, h3, h4, h5, h6 {
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   box-shadow: var(--card-shadow);
+  transition: all 0.3s ease;
+}
+
+.causa-logo {
+  filter: drop-shadow(0 4px 15px rgba(255, 69, 0, 0.4));
   transition: all 0.3s ease;
 }
 
