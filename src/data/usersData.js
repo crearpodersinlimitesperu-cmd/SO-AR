@@ -57,7 +57,7 @@ export const normalizeRole = (role) => {
   if (r === 'entrenador' || r === 'coach' || r.includes('entrenador') || r.includes('coach')) return 'entrenador';
   
   // Mapear student/estudiante a participante según lineamientos de marca
-  if (r === 'student' || r === 'estudiante' || r.includes('student') || r.includes('estudiante')) return 'participante';
+  if (r === 'student' || r === 'estudiante' || r.includes('student') || r.includes('estudiante')) return 'student';
   
   return r;
 };
@@ -128,7 +128,7 @@ export const ROLE_DISPLAY_NAMES = {
   tecnico_sst: 'Seguridad y Salud (SST)',
   entrenador: 'Entrenador (Coach)',
   entrenador_llamadas: 'Entrenador de Llamadas',
-  // student: eliminado — no es un rol del sistema SO-AR (es un rol interno de CREAR)
+  student: 'Participantes', student: '#6b7280', // student: eliminado — no es un rol del sistema SO-AR (es un rol interno de CREAR)
 };
 
 export const getRoleDisplayName = (role) => {

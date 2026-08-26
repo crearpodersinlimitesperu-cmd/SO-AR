@@ -79981,7 +79981,7 @@ export const normalizeRole = (role) => {
   if (r === 'entrenador' || r === 'coach' || r.includes('entrenador') || r.includes('coach')) return 'entrenador';
   
   // Mapear student/estudiante a participante según lineamientos de marca
-  if (r === 'student' || r === 'estudiante' || r.includes('student') || r.includes('estudiante')) return 'participante';
+  if (r === 'student' || r === 'estudiante' || r.includes('student') || r.includes('estudiante')) return 'student';
   
   return r;
 };
@@ -80052,7 +80052,7 @@ export const ROLE_DISPLAY_NAMES = {
   tecnico_sst: 'Seguridad y Salud (SST)',
   entrenador: 'Entrenador (Coach)',
   entrenador_llamadas: 'Entrenador de Llamadas',
-  // student: eliminado — no es un rol del sistema SO-AR (es un rol interno de CREAR)
+  student: 'Participantes', student: '#6b7280', // student: eliminado — no es un rol del sistema SO-AR (es un rol interno de CREAR)
 };
 
 export const getRoleDisplayName = (role) => {
@@ -92844,7 +92844,7 @@ function SedeBlock({ sede, tasks, navigate, onSelectUser, onAssignTask, currentU
       <div style={{ marginTop: '0.8rem' }}><ProgressBar value={sedePct} height="6px" /></div>
       {expanded && (
         <div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          {Object.entries(groupedMembers).map(([role, pers]) => (
+          {Object.entries(groupedMembers).filter(x => x[0] !== "participante" && x[0] !== "student").map(([role, pers]) => (
             <div key={role}>
               <h5 style={{ margin: '0 0 0.5rem 0', color: ROLE_COLORS[normalizeRole(role)] || 'var(--text-muted)', fontSize: '0.85rem', textTransform: 'uppercase' }}>
                 {ROLE_LABELS[normalizeRole(role)] || role}

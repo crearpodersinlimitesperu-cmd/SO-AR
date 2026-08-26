@@ -293,7 +293,7 @@ function SedeBlock({ sede, tasks, navigate, onSelectUser, onAssignTask, currentU
       <div style={{ marginTop: '0.8rem' }}><ProgressBar value={sedePct} height="6px" /></div>
       {expanded && (
         <div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          {Object.entries(groupedMembers).map(([role, pers]) => (
+          {Object.entries(groupedMembers).filter(x => x[0] !== "participante" && x[0] !== "student").map(([role, pers]) => (
             <div key={role}>
               <h5 style={{ margin: '0 0 0.5rem 0', color: ROLE_COLORS[normalizeRole(role)] || 'var(--text-muted)', fontSize: '0.85rem', textTransform: 'uppercase' }}>
                 {ROLE_LABELS[normalizeRole(role)] || role}
