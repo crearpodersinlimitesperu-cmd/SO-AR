@@ -32,7 +32,7 @@ jobs:
           VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
           VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
-          GMAIL_USER: ${{ secrets.GMAIL_USER }}
-          GMAIL_PASS: ${{ secrets.GMAIL_PASS }}
+          GMAIL_SERVER_EMAIL: ${{ secrets.GMAIL_USER }}
+          GMAIL_SERVER_APP_PASSWORD: ${{ secrets.GMAIL_PASS }}
         run: |
           node scripts/mailerDaemon.js --one-shot
