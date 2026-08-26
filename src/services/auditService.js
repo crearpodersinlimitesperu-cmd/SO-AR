@@ -60,10 +60,9 @@ export async function recordAuditEvent({ uid, email, name, role, sede, action, d
       createdAtIso: nowIso
     });
 
-    // 2. Si es un LOGIN REAL (no simulación) y tenemos UID, actualizar perfil de conexión
-    if (action === 'LOGIN' && !isSimulation && uid) {
-      // FIX: Guardar con UID para cumplir con la regla de seguridad
-      const userProfileRef = doc(db, 'user_profiles', uid);
+    // 2. Si es un LOGIN REAL (no simulación) y tenemos correo, actualizar perfil de conexión
+    if (action === 'LOGIN' && !isSimulation && email) {
+      const userProfileRef = doc(db, 'user_profiles', email.toLowerCase().trim());
       await setDoc(userProfileRef, {
         email: email.toLowerCase().trim(),
         name: name || 'Colaborador',
