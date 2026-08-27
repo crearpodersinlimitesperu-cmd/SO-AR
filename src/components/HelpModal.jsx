@@ -276,14 +276,23 @@ export default function HelpModal({ isOpen, onClose }) {
                 <li>Usa los filtros superiores para ver tareas vencidas, pendientes, en riesgo o completadas.</li>
               </ul>
 
-              <h4 style={{ color: 'var(--text-heading)' }}>2. Directorio y Reportes</h4>
-              <p>Los líderes pueden ver el avance de su equipo y de toda la organización.</p>
+              <h4 style={{ color: 'var(--text-heading)' }}>2. Directorios y Comunicación Directa</h4>
+              <p>El sistema cuenta con accesos directos para comunicarte y monitorear a los miembros del equipo.</p>
               <ul style={{ paddingLeft: '1.5rem', marginBottom: '1.5rem' }}>
-                <li><strong>Privacidad de Pares:</strong> Los gerentes y directores solo pueden ver las tareas de sus subordinados o aquellas en las que colaboran. Las tareas de otros gerentes de su mismo nivel son privadas.</li>
-                <li>Puedes asignar tareas directamente a cualquier miembro de tu equipo desde su tarjeta de perfil haciendo clic en el botón <strong>+ Tarea</strong>.</li>
+                <li><strong>Pantalla de Inicio:</strong> Encontrarás botones rápidos a los directorios principales (Directorio QT y Directorio Equipos).</li>
+                <li><strong>Comunicación:</strong> Al ver el perfil de un usuario, tendrás botones rápidos para escribirle por <strong>WhatsApp</strong> o enviarle un <strong>Correo</strong> directamente sin tener que guardarlos.</li>
+                <li><strong>Privacidad de Pares:</strong> Los gerentes y directores solo pueden ver las tareas de sus subordinados directos o aquellas en las que colaboran.</li>
               </ul>
 
-              <h4 style={{ color: 'var(--text-heading)' }}>3. Tareas Compartidas y Colaboradores</h4>
+              <h4 style={{ color: 'var(--text-heading)' }}>3. Auditoría de KPIs (Nuevo)</h4>
+              <p>La sección de KPIs ha sido reconstruida en tres pestañas (tabs) enfocadas para analizar mejor la salud operativa de cada Sede.</p>
+              <ul style={{ paddingLeft: '1.5rem', marginBottom: '1.5rem' }}>
+                <li><strong>Tab CMJ:</strong> Consolidado automático (desde Drive) que suma la retención, deserción y enrolamiento total de <em>todos</em> los Coordinadores de la Maestría de la sede seleccionada.</li>
+                <li><strong>Tab Entrenadores Maestría:</strong> Métricas operativas de avance, gráficas y cierres enfocadas en el desempeño del Entrenador por sede.</li>
+                <li><strong>Tab Auditoría de KPIs:</strong> Espacio exclusivo para revisar y auditar los formularios semanales cargados manualmente por el Quantum Team (QT y Coordinadores).</li>
+              </ul>
+
+              <h4 style={{ color: 'var(--text-heading)' }}>4. Tareas Compartidas y Colaboradores</h4>
               <p>Si necesitas ayuda de otra persona o sede, abre una tarea y selecciona <strong>"Añadir Colaborador"</strong>. La tarea aparecerá en el perfil de ambos.</p>
             </div>
           ) : (
