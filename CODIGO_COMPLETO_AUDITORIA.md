@@ -125846,7 +125846,10 @@ export default function CentroManagers() {
 
       recordAuditEvent({
         action: 'ACTUALIZAR_MANAGER',
-        user: currentUser?.email || currentUser?.name || 'Usuario',
+        email: currentUser?.email || 'admin@crearpsl.net',
+        name: currentUser?.name || 'Usuario',
+        role: currentUser?.appRole || 'gerente',
+        sede: currentUser?.sede || 'Global',
         details: `Se actualizó el campo "${field}" de ${managerName} a "${finalValue}"`
       });
 
@@ -125870,7 +125873,10 @@ export default function CentroManagers() {
       
       recordAuditEvent({
         action: 'ACTUALIZAR_LLAMADA_MANAGER',
-        user: currentUser?.email || currentUser?.name || 'Usuario',
+        email: currentUser?.email || 'admin@crearpsl.net',
+        name: currentUser?.name || 'Usuario',
+        role: currentUser?.appRole || 'gerente',
+        sede: currentUser?.sede || 'Global',
         details: `Asistencia actualizada para ${managerName}: ${asistio === 'SI' ? 'Asistió' : 'No asistió'} el ${fecha}`
       });
 
