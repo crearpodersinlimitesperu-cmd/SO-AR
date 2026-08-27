@@ -383,6 +383,18 @@ export default function AuditoriaKPIs() {
             <Users size={16} style={{ display: 'inline-block', verticalAlign: 'text-bottom', marginRight: '6px' }} />
             Entrenadores Maestría
           </button>
+          <button
+            onClick={() => setActiveTab('auditoria')}
+            style={{
+              padding: '0.6rem 1.2rem', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 'bold',
+              background: activeTab === 'auditoria' ? 'rgba(212, 175, 55, 0.15)' : 'transparent',
+              color: activeTab === 'auditoria' ? 'var(--crear-gold)' : 'var(--text-muted)',
+              borderBottom: activeTab === 'auditoria' ? '2px solid var(--crear-gold)' : '2px solid transparent'
+            }}
+          >
+            <AlertCircle size={16} style={{ display: 'inline-block', verticalAlign: 'text-bottom', marginRight: '6px' }} />
+            Auditoría de KPIs
+          </button>
         </div>
 
         {/* Dashboards Content */}
@@ -465,7 +477,8 @@ export default function AuditoriaKPIs() {
         </div>
       </div>
 
-      <div className="glass-panel" style={{ padding: '2rem', borderRadius: '16px', background: 'var(--bg-card, #ffffff)', border: '1px solid var(--border-subtle, #e2e8f0)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+      {activeTab === 'auditoria' && (
+        <div className="glass-panel" style={{ padding: '2rem', borderRadius: '16px', background: 'var(--bg-card, #ffffff)', border: '1px solid var(--border-subtle, #e2e8f0)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
         
         {/* GLOBAL DEBUG BLOCK A NIVEL PÁGINA */}
         <div style={{ display: 'none', background: '#1a1a1a', padding: '15px', marginBottom: '20px', borderRadius: '8px', border: '2px solid #00ff00' }}>
@@ -549,6 +562,7 @@ export default function AuditoriaKPIs() {
           </div>
         )}
       </div>
+      )}
     </div>
   );
 }
