@@ -131,8 +131,14 @@ export default function CentroManagers() {
         firestoreManagers.push({ id: doc.id, ...doc.data() });
       });
 
+      // Si Firestore está vacío, usamos INITIAL_MANAGERS como seed
+      let sourceManagers = firestoreManagers;
+      if (firestoreManagers.length === 0) {
+        sourceManagers = INITIAL_MANAGERS;
+      }
+
       // Mapear y normalizar
-      const normalized = firestoreManagers.map(m => ({
+      const normalized = sourceManagers.map(m => ({
         ...m,
         entrenador: normalizeTrainer(m.entrenador),
         coordinador: normalizeCoordinator(m.coordinador),
