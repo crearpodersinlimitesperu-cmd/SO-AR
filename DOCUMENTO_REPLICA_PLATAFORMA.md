@@ -72554,56 +72554,94 @@ import {
 import { Target, Users, AlertTriangle, Activity } from 'lucide-react';
 import DataJSON from '../data/SEGUIMIENTO_EQUIPOS.json';
 
-export default function CMJDashboard() {
+export default function CMJDashboard({ globalFilterSede }) {
   const [activeSede, setActiveSede] = useState('CDMX');
   const [processedData, setProcessedData] = useState({});
+
+  // Sync internal Sede with Global Sede if provided and valid
+  useEffect(() => {
+    if (!globalFilterSede || globalFilterSede === 'Todas' || globalFilterSede === 'Global') return;
+    const normalized = globalFilterSede === 'GYE' ? 'GUAYAQUIL' : globalFilterSede.toUpperCase();
+    if (processedData[normalized]) {
+      setActiveSede(normalized);
+    }
+  }, [globalFilterSede, processedData]);
 
   useEffect(() => {
     try {
       const sheet = DataJSON.Hoja1 || [];
       const sedesData = {};
 
-      // Parse the JSON data structure from the Excel
+      // Parse the JSON data structure from the Excel and aggregate by Sede
       sheet.forEach((row, index) => {
         if (index > 0) { // Skip header row
           const sedeName = (row['MAESTRIA DEL JUEGO '] || '').trim();
           if (sedeName && !sedeName.includes('SEDE')) {
             const cmjName = row['COORDINADOR MAESTRIA DEL JUEGO'] || 'Sin Asignar';
             
-            sedesData[sedeName] = {
-              cmj: cmjName,
-              metrics: {
-                enrolamientoC1: row['CAPITULO UNO'] || 0,
-                terminanC1: row['__EMPTY_2'] || 0,
-                paganC2: row['__EMPTY_3'] || 0,
-                inicianC2: row['__EMPTY_5'] || 0,
-                terminanC2: row['C2 A CREACION'] || 0,
-                pagosMJ: row['__EMPTY_6'] || 0,
-                managersDeclarados: row['__EMPTY_8'] || 0,
-                pxInicioMJ: row['__EMPTY_11'] || 0,
-                managersInicioMJ: row['__EMPTY_12'] || 0,
-                pxFinalMJ: row['__EMPTY_13'] || 0,
-                managersFinalMJ: row['__EMPTY_14'] || 0,
-                desercionPx: row['__EMPTY_15'] || 0,
-                desercionMg: row['__EMPTY_16'] || 0,
-                totalEnrolamiento: row['__EMPTY_19'] || 0,
-                tasaDesercionTotal: row['__EMPTY_44'] || 0,
-                status: row['STATUS DEL EQUIPO'] || 'N/A'
-              },
-              chartData: [
-                { name: 'C1', Enrolados: row['CAPITULO UNO'] || 0, Terminaron: row['__EMPTY_2'] || 0 },
-                { name: 'C2', Enrolados: row['__EMPTY_5'] || 0, Terminaron: row['C2 A CREACION'] || 0 },
-                { name: 'MJ', Enrolados: row['__EMPTY_11'] || 0, Terminaron: row['__EMPTY_13'] || 0 },
-              ],
-              funnelData: [
-                { step: 'C1 (Inician)', value: row['CAPITULO UNO'] || 0 },
-                { step: 'C2 (Pagan)', value: row['__EMPTY_3'] || 0 },
-                { step: 'MJ (Inician)', value: row['__EMPTY_11'] || 0 },
-                { step: 'MJ (Gradúan)', value: row['__EMPTY_13'] || 0 }
-              ]
-            };
+            if (!sedesData[sedeName]) {
+              sedesData[sedeName] = {
+                cmj: new Set([cmjName]),
+                metrics: {
+                  enrolamientoC1: 0,
+                  terminanC1: 0,
+                  paganC2: 0,
+                  inicianC2: 0,
+                  terminanC2: 0,
+                  pagosMJ: 0,
+                  managersDeclarados: 0,
+                  pxInicioMJ: 0,
+                  managersInicioMJ: 0,
+                  pxFinalMJ: 0,
+                  managersFinalMJ: 0,
+                  desercionPx: 0,
+                  desercionMg: 0,
+                  totalEnrolamiento: 0,
+                  equipos: 0,
+                }
+              };
+            }
+            
+            const s = sedesData[sedeName];
+            if (cmjName !== 'Sin Asignar') s.cmj.add(cmjName);
+            
+            s.metrics.equipos += 1;
+            s.metrics.enrolamientoC1 += Number(row['CAPITULO UNO']) || 0;
+            s.metrics.terminanC1 += Number(row['__EMPTY_2']) || 0;
+            s.metrics.paganC2 += Number(row['__EMPTY_3']) || 0;
+            s.metrics.inicianC2 += Number(row['__EMPTY_5']) || 0;
+            s.metrics.terminanC2 += Number(row['C2 A CREACION']) || 0;
+            s.metrics.pagosMJ += Number(row['__EMPTY_6']) || 0;
+            s.metrics.managersDeclarados += Number(row['__EMPTY_8']) || 0;
+            s.metrics.pxInicioMJ += Number(row['__EMPTY_11']) || 0;
+            s.metrics.managersInicioMJ += Number(row['__EMPTY_12']) || 0;
+            s.metrics.pxFinalMJ += Number(row['__EMPTY_13']) || 0;
+            s.metrics.managersFinalMJ += Number(row['__EMPTY_14']) || 0;
+            s.metrics.desercionPx += Number(row['__EMPTY_15']) || 0;
+            s.metrics.desercionMg += Number(row['__EMPTY_16']) || 0;
+            s.metrics.totalEnrolamiento += Number(row['__EMPTY_19']) || 0;
           }
         }
+      });
+      
+      // Post-process to calculate charts and formats
+      Object.keys(sedesData).forEach(sede => {
+        const s = sedesData[sede];
+        s.cmj = Array.from(s.cmj).join(', ') || 'Sin Asignar';
+        s.metrics.tasaDesercionTotal = s.metrics.pxInicioMJ > 0 ? (s.metrics.desercionPx / s.metrics.pxInicioMJ) : 0;
+        
+        s.chartData = [
+          { name: 'C1', Enrolados: s.metrics.enrolamientoC1, Terminaron: s.metrics.terminanC1 },
+          { name: 'C2', Enrolados: s.metrics.inicianC2, Terminaron: s.metrics.terminanC2 },
+          { name: 'MJ', Enrolados: s.metrics.pxInicioMJ, Terminaron: s.metrics.pxFinalMJ },
+        ];
+        
+        s.funnelData = [
+          { step: 'C1 (Inician)', value: s.metrics.enrolamientoC1 },
+          { step: 'C2 (Pagan)', value: s.metrics.paganC2 },
+          { step: 'MJ (Inician)', value: s.metrics.pxInicioMJ },
+          { step: 'MJ (Gradúan)', value: s.metrics.pxFinalMJ }
+        ];
       });
       
       setProcessedData(sedesData);
@@ -73060,10 +73098,19 @@ import {
 } from 'recharts';
 import { FolderUp, TrendingUp, Users, AlertTriangle } from 'lucide-react';
 
-export default function DriveDashboard() {
+export default function DriveDashboard({ globalFilterSede }) {
   const [activeTab, setActiveTab] = useState('LIMA');
   const [maestriaData, setMaestriaData] = useState({});
   const [loading, setLoading] = useState(true);
+
+  // Sync internal Sede with Global Sede if provided and valid
+  useEffect(() => {
+    if (!globalFilterSede || globalFilterSede === 'Todas' || globalFilterSede === 'Global') return;
+    const normalized = globalFilterSede === 'GYE' ? 'GYE' : globalFilterSede.toUpperCase();
+    if (maestriaData[normalized]) {
+      setActiveTab(normalized);
+    }
+  }, [globalFilterSede, maestriaData]);
 
   useEffect(() => {
     const loadDriveData = async () => {
@@ -113848,6 +113895,7 @@ import CountryFlag from '../components/CountryFlag';
 import { recordAuditEvent } from '../services/auditService';
 import { OPERATIONAL_SEDES } from '../data/usersData';
 import DriveDashboard from '../components/DriveDashboard';
+import CMJDashboard from '../components/CMJDashboard';
 
 export default function AuditoriaKPIs() {
   const { currentUser } = useAuth();
@@ -114194,8 +114242,9 @@ export default function AuditoriaKPIs() {
         </div>
       </div>
 
-        {/* Dashboards Integrados de Google Drive (Reportes de Entrenadores Maestría) */}
-        <DriveDashboard />
+        {/* Dashboards Integrados */}
+        <CMJDashboard globalFilterSede={filterSede} />
+        <DriveDashboard globalFilterSede={filterSede} />
   
       {/* Barra de Filtros Estilo Nodus */}
       <div style={{ 
@@ -115503,7 +115552,6 @@ export default function CentroManagers() {
           {[
             { id: 'directorio', icon: Users, label: `Directorio (${filteredManagers.length})` },
             { id: 'grupales', icon: Layers, label: `Grupales (${groupTeams.length})` },
-            { id: 'cmj', icon: Target, label: 'Reportes CMJ (Drive)' },
             ...(canViewAll ? [
               { id: 'dashboard', icon: Award, label: 'Sedes' },
               { id: 'entrenadores', icon: UserCheck, label: 'Entrenadores' }
@@ -116000,10 +116048,6 @@ export default function CentroManagers() {
               )}
             </div>
           </div>
-        )}
-
-        {activeTab === 'cmj' && (
-          <CMJDashboard />
         )}
 
         {/* SEDES */}

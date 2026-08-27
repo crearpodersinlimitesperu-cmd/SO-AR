@@ -1111,7 +1111,6 @@ export default function CentroManagers() {
           {[
             { id: 'directorio', icon: Users, label: `Directorio (${filteredManagers.length})` },
             { id: 'grupales', icon: Layers, label: `Grupales (${groupTeams.length})` },
-            { id: 'cmj', icon: Target, label: 'Reportes CMJ (Drive)' },
             ...(canViewAll ? [
               { id: 'dashboard', icon: Award, label: 'Sedes' },
               { id: 'entrenadores', icon: UserCheck, label: 'Entrenadores' }
@@ -1608,10 +1607,6 @@ export default function CentroManagers() {
               )}
             </div>
           </div>
-        )}
-
-        {activeTab === 'cmj' && (
-          <CMJDashboard />
         )}
 
         {/* SEDES */}

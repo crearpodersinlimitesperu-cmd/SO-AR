@@ -5,10 +5,19 @@ import {
 } from 'recharts';
 import { FolderUp, TrendingUp, Users, AlertTriangle } from 'lucide-react';
 
-export default function DriveDashboard() {
+export default function DriveDashboard({ globalFilterSede }) {
   const [activeTab, setActiveTab] = useState('LIMA');
   const [maestriaData, setMaestriaData] = useState({});
   const [loading, setLoading] = useState(true);
+
+  // Sync internal Sede with Global Sede if provided and valid
+  useEffect(() => {
+    if (!globalFilterSede || globalFilterSede === 'Todas' || globalFilterSede === 'Global') return;
+    const normalized = globalFilterSede === 'GYE' ? 'GYE' : globalFilterSede.toUpperCase();
+    if (maestriaData[normalized]) {
+      setActiveTab(normalized);
+    }
+  }, [globalFilterSede, maestriaData]);
 
   useEffect(() => {
     const loadDriveData = async () => {

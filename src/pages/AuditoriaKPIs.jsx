@@ -9,6 +9,7 @@ import CountryFlag from '../components/CountryFlag';
 import { recordAuditEvent } from '../services/auditService';
 import { OPERATIONAL_SEDES } from '../data/usersData';
 import DriveDashboard from '../components/DriveDashboard';
+import CMJDashboard from '../components/CMJDashboard';
 
 export default function AuditoriaKPIs() {
   const { currentUser } = useAuth();
@@ -355,8 +356,9 @@ export default function AuditoriaKPIs() {
         </div>
       </div>
 
-        {/* Dashboards Integrados de Google Drive (Reportes de Entrenadores Maestría) */}
-        <DriveDashboard />
+        {/* Dashboards Integrados */}
+        <CMJDashboard globalFilterSede={filterSede} />
+        <DriveDashboard globalFilterSede={filterSede} />
   
       {/* Barra de Filtros Estilo Nodus */}
       <div style={{ 
