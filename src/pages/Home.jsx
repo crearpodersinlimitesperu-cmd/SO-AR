@@ -462,9 +462,14 @@ export default function Home() {
                 )}
 
                 {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
-                  <button onClick={() => { setShowToolsDropdown(false); navigate('/centro-managers'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
-                    🎯 Centro de Managers
-                  </button>
+                  <div style={{ display: 'flex', gap: '0.2rem', padding: '0.2rem' }}>
+                    <button onClick={() => { setShowToolsDropdown(false); navigate('/centro-managers'); }} className="btn-secondary" style={{ flex: 1, textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
+                      🎯 Centro de Managers
+                    </button>
+                    <button onClick={() => { setShowToolsDropdown(false); navigate('/centro-managers?tab=directorio'); }} className="btn-secondary" style={{ padding: '0.5rem', fontSize: '0.82rem' }}>
+                      👥
+                    </button>
+                  </div>
                 )}
 
                 <button onClick={() => { setShowToolsDropdown(false); navigate('/protocolo-emergencias'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.4)', background: 'rgba(239, 68, 68, 0.1)', fontWeight: 'bold' }}>
@@ -551,9 +556,14 @@ export default function Home() {
           )}
 
           {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
-            <button onClick={() => navigate('/centro-managers')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#000', fontWeight: 'bold', border: 'none' }}>
-              🎯 Centro Managers
-            </button>
+            <>
+              <button onClick={() => navigate('/centro-managers')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#000', fontWeight: 'bold', border: 'none' }}>
+                👑 Centro Managers
+              </button>
+              <button onClick={() => navigate('/centro-managers?tab=directorio')} className="btn-secondary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem' }}>
+                👥 Directorio Equipos
+              </button>
+            </>
           )}
         </div>
       )}
