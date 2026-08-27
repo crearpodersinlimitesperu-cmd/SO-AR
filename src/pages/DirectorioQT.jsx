@@ -443,20 +443,20 @@ export default function DirectorioQT() {
                   )}
                 </div>
 
-                  {!m.whatsappUrl && m.email && !m.email.endsWith('@crearpsl.net') && (
+                  {!m.whatsappUrl && m.email && (
                     <a 
                       href={`mailto:${m.email}`}
                       style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '0.78rem', color: 'var(--crear-blue)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
-                      title={m.email}
+                      title={`Enviar correo a ${m.email}`}
                     >
-                      <MessageSquare size={13} /> Correo
+                      <Mail size={13} /> Correo
                     </a>
                   )}
-                  {m.email && m.email.endsWith('@crearpsl.net') && (
+                  {m.email && (
                     <a 
                       href={`https://mail.google.com/chat/u/0/#chat/dm/${m.email}`}
                       target="_blank" rel="noopener noreferrer"
-                      style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '0.78rem', color: 'var(--crear-blue)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+                      style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '0.78rem', color: '#10b981', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
                       title={`Google Chat con ${m.email}`}
                     >
                       <MessageSquare size={13} /> G. Chat
@@ -514,13 +514,13 @@ export default function DirectorioQT() {
                           <Phone size={11} /> WhatsApp
                         </a>
                       )}
-                      {!m.whatsappUrl && m.email && !m.email.endsWith('@crearpsl.net') && (
-                        <a href={`mailto:${m.email}`} style={{ background: 'rgba(0, 210, 255, 0.15)', color: 'var(--crear-blue)', border: '1px solid rgba(0, 210, 255, 0.3)', padding: '4px 8px', borderRadius: '6px', textDecoration: 'none', fontWeight: 700, fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
-                          <MessageSquare size={11} /> Correo
+                      {!m.whatsappUrl && m.email && (
+                        <a href={`mailto:${m.email}`} style={{ background: 'rgba(0, 210, 255, 0.15)', color: 'var(--crear-blue)', border: '1px solid rgba(0, 210, 255, 0.3)', padding: '4px 8px', borderRadius: '6px', textDecoration: 'none', fontWeight: 700, fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }} title={`Enviar correo a ${m.email}`}>
+                          <Mail size={11} /> Correo
                         </a>
                       )}
-                      {m.email && m.email.endsWith('@crearpsl.net') && (
-                        <a href={`https://mail.google.com/chat/u/0/#chat/dm/${m.email}`} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(0, 210, 255, 0.15)', color: 'var(--crear-blue)', border: '1px solid rgba(0, 210, 255, 0.3)', padding: '4px 8px', borderRadius: '6px', textDecoration: 'none', fontWeight: 700, fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
+                      {m.email && (
+                        <a href={`https://mail.google.com/chat/u/0/#chat/dm/${m.email}`} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '4px 8px', borderRadius: '6px', textDecoration: 'none', fontWeight: 700, fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }} title={`Google Chat con ${m.email}`}>
                           <MessageSquare size={11} /> G. Chat
                         </a>
                       )}

@@ -560,8 +560,8 @@ export default function Home() {
               <button onClick={() => navigate('/centro-managers')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#000', fontWeight: 'bold', border: 'none' }}>
                 👑 Centro Managers
               </button>
-              <button onClick={() => navigate('/centro-managers?tab=directorio')} className="btn-secondary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem' }}>
-                👥 Directorio Equipos
+              <button onClick={() => navigate('/directorio-qt')} className="btn-secondary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <Users size={14} /> Directorio Global
               </button>
             </>
           )}
