@@ -602,12 +602,12 @@ export default function CentroManagers() {
       : value;
       
     try {
+      const targetManager = managers.find(m => m.id === id) || { id };
       const docRef = doc(db, 'managers_directory', id.toString());
-      await updateDoc(docRef, { [field]: finalValue });
+      await setDoc(docRef, { ...targetManager, [field]: finalValue }, { merge: true });
       
       setManagers(prev => prev.map(m => m.id === id ? { ...m, [field]: finalValue } : m));
       
-      const targetManager = managers.find(m => m.id === id);
       const managerName = targetManager ? targetManager.nombre : id;
 
       recordAuditEvent({
@@ -625,13 +625,13 @@ export default function CentroManagers() {
 
   const handleUpdateLlamada = async (id, fecha, asistio) => {
     try {
+      const targetManager = managers.find(m => m.id === id) || { id };
       const docRef = doc(db, 'managers_directory', id.toString());
-      await updateDoc(docRef, { llamadaFecha: fecha, llamadaAsistio: asistio });
+      await setDoc(docRef, { ...targetManager, llamadaFecha: fecha, llamadaAsistio: asistio }, { merge: true });
       
       // La actualización de managers en tiempo real ya se maneja por onSnapshot, pero por optimización optimista lo mantenemos aquí
       setManagers(prev => prev.map(m => m.id === id ? { ...m, llamadaFecha: fecha, llamadaAsistio: asistio } : m));
       
-      const targetManager = managers.find(m => m.id === id);
       const managerName = targetManager ? targetManager.nombre : id;
       
       recordAuditEvent({
@@ -662,10 +662,11 @@ export default function CentroManagers() {
       groupModal.managers.forEach(m => {
         if (groupCallAttendance.hasOwnProperty(m.id)) {
           const docRef = doc(db, 'managers_directory', m.id.toString());
-          batch.update(docRef, {
+          batch.set(docRef, {
+            ...m,
             llamadaFecha: groupCallDate,
             llamadaAsistio: groupCallAttendance[m.id] ? 'SI' : 'NO'
-          });
+          }, { merge: true });
         }
       });
       
@@ -989,7 +990,7 @@ export default function CentroManagers() {
       };
 
       const docRef = doc(db, 'managers_directory', editIndividualModal.id.toString());
-      await updateDoc(docRef, updatedData);
+      await setDoc(docRef, updatedData, { merge: true });
 
       setManagers(prev => prev.map(m => m.id === editIndividualModal.id ? { ...m, ...updatedData } : m));
     } catch(e) {

@@ -138,15 +138,18 @@ export default function Home() {
   // Cálculo de tareas del usuario
   const userEmail = (currentUser?.email || '').toLowerCase().trim();
   const activeRole = currentUser?.appRole || currentUser?.role || 'gerente';
+  const isExecutiveUser = ['ceo', 'cco', 'socio', 'super_admin', 'direccion'].includes(activeRole) || 
+                          userEmail === 'fer.aragon@crearpsl.net' || 
+                          userEmail === 'paul.sosa@crearpsl.net';
+
   const myTasksForProgress = allTasks.filter(t => {
-    const isAssigned = (t.assignedToEmails && t.assignedToEmails.some(e => e.toLowerCase().trim() === userEmail)) || (t.assignedToEmail && t.assignedToEmail.toLowerCase().trim() === userEmail) ||
+    const isAssigned = (t.assignedToEmails && t.assignedToEmails.some(e => e.toLowerCase().trim() === userEmail)) || 
+                       (t.assignedToEmail && t.assignedToEmail.toLowerCase().trim() === userEmail) ||
                        (t.collaborators && t.collaborators.map(c => c.toLowerCase().trim()).includes(userEmail));
     if (isAssigned) return true;
+    if (isExecutiveUser) return false; // Roles ejecutivos / Fer y Paul no tienen tareas operativas por defecto
     if (activeRole === 'consolidado') {
       return true;
-    }
-    if (activeRole === 'direccion') {
-      return t.role === 'direccion' || t.role === 'gerente';
     }
     return t.role === activeRole;
   });

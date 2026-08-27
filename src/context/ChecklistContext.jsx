@@ -47,9 +47,12 @@ export function ChecklistProvider({ children }) {
 
       // Roles ejecutivos que NO deben recibir tareas del catálogo base automáticamente.
       // Fer Aragón (ceo), Paul Sosa (cco) y similares no operan el checklist operativo.
-      const EXECUTIVE_ROLES_NO_CHECKLIST = ['ceo', 'cco', 'socio', 'super_admin'];
+      const EXECUTIVE_ROLES_NO_CHECKLIST = ['ceo', 'cco', 'socio', 'super_admin', 'direccion'];
       const userRoleForMerge = currentUser?.appRole || currentUser?.role || '';
-      const skipCatalogMerge = EXECUTIVE_ROLES_NO_CHECKLIST.includes(userRoleForMerge);
+      const userEmailLower = (currentUser?.email || '').toLowerCase().trim();
+      const skipCatalogMerge = EXECUTIVE_ROLES_NO_CHECKLIST.includes(userRoleForMerge) || 
+                                userEmailLower === 'fer.aragon@crearpsl.net' || 
+                                userEmailLower === 'paul.sosa@crearpsl.net';
 
       // Merge de seguridad: Asegurar que todas las tareas del catálogo base (incluidas las nuevas de QT) existan
       // Solo se aplica a roles operativos — no a roles ejecutivos sin checklist propio.
@@ -74,9 +77,12 @@ export function ChecklistProvider({ children }) {
     }, (error) => {
       console.error("Error fetching tasks from Firestore:", error);
       // Fallback a checklistData local si Firestore falla
-      const EXECUTIVE_ROLES_NO_CHECKLIST = ['ceo', 'cco', 'socio', 'super_admin'];
+      const EXECUTIVE_ROLES_NO_CHECKLIST = ['ceo', 'cco', 'socio', 'super_admin', 'direccion'];
       const userRoleForFallback = currentUser?.appRole || currentUser?.role || '';
-      if (EXECUTIVE_ROLES_NO_CHECKLIST.includes(userRoleForFallback)) {
+      const userEmailLower = (currentUser?.email || '').toLowerCase().trim();
+      if (EXECUTIVE_ROLES_NO_CHECKLIST.includes(userRoleForFallback) || 
+          userEmailLower === 'fer.aragon@crearpsl.net' || 
+          userEmailLower === 'paul.sosa@crearpsl.net') {
         setTasks([]);
         setLoading(false);
         return;

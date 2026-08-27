@@ -78935,9 +78935,12 @@ export function ChecklistProvider({ children }) {
 
       // Roles ejecutivos que NO deben recibir tareas del catálogo base automáticamente.
       // Fer Aragón (ceo), Paul Sosa (cco) y similares no operan el checklist operativo.
-      const EXECUTIVE_ROLES_NO_CHECKLIST = ['ceo', 'cco', 'socio', 'super_admin'];
+      const EXECUTIVE_ROLES_NO_CHECKLIST = ['ceo', 'cco', 'socio', 'super_admin', 'direccion'];
       const userRoleForMerge = currentUser?.appRole || currentUser?.role || '';
-      const skipCatalogMerge = EXECUTIVE_ROLES_NO_CHECKLIST.includes(userRoleForMerge);
+      const userEmailLower = (currentUser?.email || '').toLowerCase().trim();
+      const skipCatalogMerge = EXECUTIVE_ROLES_NO_CHECKLIST.includes(userRoleForMerge) || 
+                                userEmailLower === 'fer.aragon@crearpsl.net' || 
+                                userEmailLower === 'paul.sosa@crearpsl.net';
 
       // Merge de seguridad: Asegurar que todas las tareas del catálogo base (incluidas las nuevas de QT) existan
       // Solo se aplica a roles operativos — no a roles ejecutivos sin checklist propio.
@@ -78962,9 +78965,12 @@ export function ChecklistProvider({ children }) {
     }, (error) => {
       console.error("Error fetching tasks from Firestore:", error);
       // Fallback a checklistData local si Firestore falla
-      const EXECUTIVE_ROLES_NO_CHECKLIST = ['ceo', 'cco', 'socio', 'super_admin'];
+      const EXECUTIVE_ROLES_NO_CHECKLIST = ['ceo', 'cco', 'socio', 'super_admin', 'direccion'];
       const userRoleForFallback = currentUser?.appRole || currentUser?.role || '';
-      if (EXECUTIVE_ROLES_NO_CHECKLIST.includes(userRoleForFallback)) {
+      const userEmailLower = (currentUser?.email || '').toLowerCase().trim();
+      if (EXECUTIVE_ROLES_NO_CHECKLIST.includes(userRoleForFallback) || 
+          userEmailLower === 'fer.aragon@crearpsl.net' || 
+          userEmailLower === 'paul.sosa@crearpsl.net') {
         setTasks([]);
         setLoading(false);
         return;
@@ -125830,12 +125836,12 @@ export default function CentroManagers() {
       : value;
       
     try {
+      const targetManager = managers.find(m => m.id === id) || { id };
       const docRef = doc(db, 'managers_directory', id.toString());
-      await updateDoc(docRef, { [field]: finalValue });
+      await setDoc(docRef, { ...targetManager, [field]: finalValue }, { merge: true });
       
       setManagers(prev => prev.map(m => m.id === id ? { ...m, [field]: finalValue } : m));
       
-      const targetManager = managers.find(m => m.id === id);
       const managerName = targetManager ? targetManager.nombre : id;
 
       recordAuditEvent({
@@ -125853,13 +125859,13 @@ export default function CentroManagers() {
 
   const handleUpdateLlamada = async (id, fecha, asistio) => {
     try {
+      const targetManager = managers.find(m => m.id === id) || { id };
       const docRef = doc(db, 'managers_directory', id.toString());
-      await updateDoc(docRef, { llamadaFecha: fecha, llamadaAsistio: asistio });
+      await setDoc(docRef, { ...targetManager, llamadaFecha: fecha, llamadaAsistio: asistio }, { merge: true });
       
       // La actualización de managers en tiempo real ya se maneja por onSnapshot, pero por optimización optimista lo mantenemos aquí
       setManagers(prev => prev.map(m => m.id === id ? { ...m, llamadaFecha: fecha, llamadaAsistio: asistio } : m));
       
-      const targetManager = managers.find(m => m.id === id);
       const managerName = targetManager ? targetManager.nombre : id;
       
       recordAuditEvent({
@@ -125890,10 +125896,11 @@ export default function CentroManagers() {
       groupModal.managers.forEach(m => {
         if (groupCallAttendance.hasOwnProperty(m.id)) {
           const docRef = doc(db, 'managers_directory', m.id.toString());
-          batch.update(docRef, {
+          batch.set(docRef, {
+            ...m,
             llamadaFecha: groupCallDate,
             llamadaAsistio: groupCallAttendance[m.id] ? 'SI' : 'NO'
-          });
+          }, { merge: true });
         }
       });
       
@@ -126217,7 +126224,7 @@ export default function CentroManagers() {
       };
 
       const docRef = doc(db, 'managers_directory', editIndividualModal.id.toString());
-      await updateDoc(docRef, updatedData);
+      await setDoc(docRef, updatedData, { merge: true });
 
       setManagers(prev => prev.map(m => m.id === editIndividualModal.id ? { ...m, ...updatedData } : m));
     } catch(e) {
@@ -131173,15 +131180,18 @@ export default function Home() {
   // Cálculo de tareas del usuario
   const userEmail = (currentUser?.email || '').toLowerCase().trim();
   const activeRole = currentUser?.appRole || currentUser?.role || 'gerente';
+  const isExecutiveUser = ['ceo', 'cco', 'socio', 'super_admin', 'direccion'].includes(activeRole) || 
+                          userEmail === 'fer.aragon@crearpsl.net' || 
+                          userEmail === 'paul.sosa@crearpsl.net';
+
   const myTasksForProgress = allTasks.filter(t => {
-    const isAssigned = (t.assignedToEmails && t.assignedToEmails.some(e => e.toLowerCase().trim() === userEmail)) || (t.assignedToEmail && t.assignedToEmail.toLowerCase().trim() === userEmail) ||
+    const isAssigned = (t.assignedToEmails && t.assignedToEmails.some(e => e.toLowerCase().trim() === userEmail)) || 
+                       (t.assignedToEmail && t.assignedToEmail.toLowerCase().trim() === userEmail) ||
                        (t.collaborators && t.collaborators.map(c => c.toLowerCase().trim()).includes(userEmail));
     if (isAssigned) return true;
+    if (isExecutiveUser) return false; // Roles ejecutivos / Fer y Paul no tienen tareas operativas por defecto
     if (activeRole === 'consolidado') {
       return true;
-    }
-    if (activeRole === 'direccion') {
-      return t.role === 'direccion' || t.role === 'gerente';
     }
     return t.role === activeRole;
   });
