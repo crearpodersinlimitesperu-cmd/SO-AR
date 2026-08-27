@@ -22,6 +22,7 @@ export default function AuditoriaKPIs() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [isScrapingLive, setIsScrapingLive] = useState(false);
+  const [activeTab, setActiveTab] = useState('cmj'); // 'cmj' or 'entrenadores'
   const sedesDisponibles = ['Todas', ...OPERATIONAL_SEDES];
 
   useEffect(() => {
@@ -356,9 +357,37 @@ export default function AuditoriaKPIs() {
         </div>
       </div>
 
-        {/* Dashboards Integrados */}
-        <CMJDashboard globalFilterSede={filterSede} />
-        <DriveDashboard globalFilterSede={filterSede} />
+        {/* Dashboards Integrados Tabs */}
+        <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '1rem' }}>
+          <button
+            onClick={() => setActiveTab('cmj')}
+            style={{
+              padding: '0.6rem 1.2rem', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 'bold',
+              background: activeTab === 'cmj' ? 'rgba(212, 175, 55, 0.15)' : 'transparent',
+              color: activeTab === 'cmj' ? 'var(--crear-gold)' : 'var(--text-muted)',
+              borderBottom: activeTab === 'cmj' ? '2px solid var(--crear-gold)' : '2px solid transparent'
+            }}
+          >
+            <Target size={16} style={{ display: 'inline-block', verticalAlign: 'text-bottom', marginRight: '6px' }} />
+            CMJs
+          </button>
+          <button
+            onClick={() => setActiveTab('entrenadores')}
+            style={{
+              padding: '0.6rem 1.2rem', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 'bold',
+              background: activeTab === 'entrenadores' ? 'rgba(212, 175, 55, 0.15)' : 'transparent',
+              color: activeTab === 'entrenadores' ? 'var(--crear-gold)' : 'var(--text-muted)',
+              borderBottom: activeTab === 'entrenadores' ? '2px solid var(--crear-gold)' : '2px solid transparent'
+            }}
+          >
+            <Users size={16} style={{ display: 'inline-block', verticalAlign: 'text-bottom', marginRight: '6px' }} />
+            Entrenadores Maestría
+          </button>
+        </div>
+
+        {/* Dashboards Content */}
+        {activeTab === 'cmj' && <CMJDashboard globalFilterSede={filterSede} />}
+        {activeTab === 'entrenadores' && <DriveDashboard globalFilterSede={filterSede} />}
   
       {/* Barra de Filtros Estilo Nodus */}
       <div style={{ 
