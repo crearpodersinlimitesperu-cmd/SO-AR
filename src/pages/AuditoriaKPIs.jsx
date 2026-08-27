@@ -378,7 +378,7 @@ export default function AuditoriaKPIs() {
             <select 
               value={filterSede} 
               onChange={(e) => setFilterSede(e.target.value)}
-              style={{ width: '100%', padding: '0.6rem 1rem 0.6rem 2.2rem', borderRadius: '8px', background: '#f8fafc', color: 'var(--text-main, #0f172a)', border: '1px solid #cbd5e1', fontWeight: 600 }}
+              style={{ width: '100%', padding: '0.6rem 1rem 0.6rem 2.2rem', borderRadius: '8px', background: 'var(--bg-dark-alt, #f8fafc)', color: 'var(--text-main, #0f172a)', border: '1px solid var(--border-subtle, #cbd5e1)', fontWeight: 600 }}
             >
               <option value="Todas">Todas las Sedes</option>
               {sedesDisponibles.filter(s => s !== 'Todas').map(s => <option key={s} value={s}>{s}</option>)}
@@ -393,7 +393,7 @@ export default function AuditoriaKPIs() {
             type="date" 
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            style={{ padding: '0.6rem 1rem', borderRadius: '8px', background: '#f8fafc', color: 'var(--text-main, #0f172a)', border: '1px solid #cbd5e1', fontWeight: 500 }}
+            style={{ padding: '0.6rem 1rem', borderRadius: '8px', background: 'var(--bg-dark-alt, #f8fafc)', color: 'var(--text-main, #0f172a)', border: '1px solid var(--border-subtle, #cbd5e1)', fontWeight: 500 }}
           />
         </div>
 
@@ -403,7 +403,7 @@ export default function AuditoriaKPIs() {
             type="date" 
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-            style={{ padding: '0.6rem 1rem', borderRadius: '8px', background: '#f8fafc', color: 'var(--text-main, #0f172a)', border: '1px solid #cbd5e1', fontWeight: 500 }}
+            style={{ padding: '0.6rem 1rem', borderRadius: '8px', background: 'var(--bg-dark-alt, #f8fafc)', color: 'var(--text-main, #0f172a)', border: '1px solid var(--border-subtle, #cbd5e1)', fontWeight: 500 }}
           />
         </div>
 
