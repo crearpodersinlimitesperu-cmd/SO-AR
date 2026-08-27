@@ -118080,15 +118080,15 @@ export default function DirectorioQT() {
                   )}
                 </div>
 
-                {m.email && (
-                  <button 
-                    onClick={() => handleOpenGoogleChat(m.email)}
-                    style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '0.78rem', color: 'var(--crear-blue)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
-                    title={m.email}
-                  >
-                    <MessageSquare size={13} /> Chat Interno
-                  </button>
-                )}
+                  {!m.whatsappUrl && m.email && (
+                    <a 
+                      href={`mailto:${m.email}`}
+                      style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '0.78rem', color: 'var(--crear-blue)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+                      title={m.email}
+                    >
+                      <MessageSquare size={13} /> Correo
+                    </a>
+                  )}
               </div>
             </div>
           ))}
@@ -118135,16 +118135,16 @@ export default function DirectorioQT() {
                     ) : '-'}
                   </td>
                   <td style={{ padding: '0.85rem 1rem' }}>
-                    <div style={{ display: 'flex', gap: '0.4rem' }}>
+                    <div style={{ display: 'flex', gap: '0.4rem', flexDirection: 'column' }}>
                       {m.whatsappUrl && (
                         <a href={m.whatsappUrl} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(34, 197, 94, 0.15)', color: '#22c55e', border: '1px solid rgba(34, 197, 94, 0.3)', padding: '4px 8px', borderRadius: '6px', textDecoration: 'none', fontWeight: 700, fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
-                          <Phone size={11} /> Chat
+                          <Phone size={11} /> WhatsApp
                         </a>
                       )}
-                      {m.email && (
-                        <button onClick={() => handleOpenGoogleChat(m.email)} style={{ cursor: 'pointer', background: 'rgba(0, 210, 255, 0.15)', color: 'var(--crear-blue)', border: '1px solid rgba(0, 210, 255, 0.3)', padding: '4px 8px', borderRadius: '6px', textDecoration: 'none', fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
-                          <MessageSquare size={11} /> Chat Interno
-                        </button>
+                      {!m.whatsappUrl && m.email && (
+                        <a href={`mailto:${m.email}`} style={{ background: 'rgba(0, 210, 255, 0.15)', color: 'var(--crear-blue)', border: '1px solid rgba(0, 210, 255, 0.3)', padding: '4px 8px', borderRadius: '6px', textDecoration: 'none', fontWeight: 700, fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
+                          <MessageSquare size={11} /> Correo
+                        </a>
                       )}
                     </div>
                   </td>
