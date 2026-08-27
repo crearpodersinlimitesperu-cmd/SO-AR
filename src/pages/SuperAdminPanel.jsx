@@ -219,21 +219,22 @@ function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, curre
                 title="Contactar por WhatsApp"
                 className="hover-glow"
                 style={{
-                  width: '26px',
-                  height: '26px',
+                  width: '28px',
+                  height: '28px',
                   borderRadius: '50%',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   flexShrink: 0,
-                  fontSize: '14px',
                   textDecoration: 'none',
-                  background: 'var(--crear-blue, #29abe2)',
-                  color: '#ffffff',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                  background: '#25D366',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.15)'
                 }}
               >
-                📱
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="#ffffff" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                  <path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.528 5.845L0 24l6.335-1.508A11.943 11.943 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.006-1.371l-.36-.214-3.727.977.995-3.638-.235-.374A9.818 9.818 0 1112 21.818z"/>
+                </svg>
               </a>
             )}
             {person.email && (
@@ -244,20 +245,25 @@ function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, curre
                   title={`Enviar correo a ${person.email}`}
                   className="hover-glow"
                   style={{
-                    width: '26px',
-                    height: '26px',
+                    width: '28px',
+                    height: '28px',
                     borderRadius: '50%',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     flexShrink: 0,
                     textDecoration: 'none',
-                    background: 'var(--crear-blue, #29abe2)',
-                    color: '#ffffff',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                    background: '#ffffff',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
                   }}
                 >
-                  <Mail size={14} color="#ffffff" />
+                  <svg viewBox="0 0 48 48" width="17" height="17" xmlns="http://www.w3.org/2000/svg">
+                    <path fill="#4caf50" d="M45,16.2l-5,2.75l-5,4.75L35,40h7c1.657,0,3-1.343,3-3V16.2z"/>
+                    <path fill="#1e88e5" d="M3,16.2l3.714,1.498L13,23.7V40H6c-1.657,0-3-1.343-3-3V16.2z"/>
+                    <polygon fill="#e53935" points="35,11.2 24,19.45 13,11.2 12,17 13,23.7 24,31.95 35,23.7 36,17"/>
+                    <path fill="#c62828" d="M3,12.298V16.2l10,7.5V11.2L9.876,8.859C9.132,8.301,8.228,8,7.298,8h0C4.924,8,3,9.924,3,12.298z"/>
+                    <path fill="#fbc02d" d="M45,12.298V16.2l-10,7.5V11.2l3.124-2.341C38.868,8.301,39.772,8,40.702,8h0 C43.076,8,45,9.924,45,12.298z"/>
+                  </svg>
                 </a>
                 <button
                   type="button"
@@ -279,8 +285,8 @@ function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, curre
                   title={`Abrir la conversación de Google Chat con ${person.email}`}
                   className="hover-glow"
                   style={{
-                    width: '26px',
-                    height: '26px',
+                    width: '28px',
+                    height: '28px',
                     borderRadius: '50%',
                     display: 'flex',
                     alignItems: 'center',
@@ -288,13 +294,15 @@ function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, curre
                     flexShrink: 0,
                     cursor: openingChat ? 'wait' : 'pointer',
                     opacity: openingChat ? 0.6 : 1,
-                    background: 'var(--crear-blue, #29abe2)',
-                    color: '#ffffff',
+                    background: '#ffffff',
                     border: 'none',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
                   }}
                 >
-                  <MessageCircle size={14} color="#ffffff" />
+                  <svg viewBox="0 0 48 48" width="17" height="17" xmlns="http://www.w3.org/2000/svg">
+                    <path fill="#1a73e8" d="M12 35.5L5 42V8c0-1.7 1.3-3 3-3h32c1.7 0 3 1.3 3 3v24.5c0 1.7-1.3 3-3 3H12z"/>
+                    <path fill="#ffffff" d="M17 18h14v3H17zm0 6h10v3H17z"/>
+                  </svg>
                 </button>
               </>
             )}

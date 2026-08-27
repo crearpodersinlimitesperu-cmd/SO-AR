@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import { useUI } from './context/UIContext'
 import './index.css'
@@ -28,6 +28,7 @@ import EmbudoConversionBoard from './pages/EmbudoConversionBoard'
 import AICopilot from './components/AICopilot'
 import PromptModal from './components/PromptModal'
 import HelpModal from './components/HelpModal'
+import ThemeToggle from './components/ThemeToggle'
 
 import { useState } from 'react'
 import { HelpCircle } from 'lucide-react'
@@ -83,6 +84,10 @@ function RoleRoute({ children, allowedRoles = [], requireSuperAdmin = false }) {
 function App() {
   const { originalAdminUser, currentUser, stopSimulation } = useAuth();
   const [showHelp, setShowHelp] = useState(false);
+  const location = useLocation();
+  // /home ya tiene su propio selector "Tema:" inline (junto al selector de Vista) —
+  // no se duplica aquí para no repetir el mismo control dos veces en esa página.
+  const showFloatingThemeToggle = !location.pathname.startsWith('/home');
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -264,6 +269,15 @@ function App() {
       {/* Botón flotante de ayuda */}
       {currentUser && (
         <>
+          {/* Selector Día/Noche/Auto: disponible en toda la plataforma (27/08/2026),
+              flotante para no interferir con el layout de cada página. Reutiliza
+              ThemeToggle tal cual (mismo componente que ya funcionaba en Home) —
+              no se tocó ThemeContext.jsx ni su lógica. */}
+          {showFloatingThemeToggle && (
+            <div style={{ position: 'fixed', top: '1rem', right: '1rem', zIndex: 8500 }}>
+              <ThemeToggle />
+            </div>
+          )}
           {/* Copiloto SO-AR: restringido a Gerentes y Directivos por decisión explícita (26/08/2026) */}
           {(currentUser.isSuperAdmin || currentUser.isGerente || currentUser.isDireccion) && (
             <AICopilot />

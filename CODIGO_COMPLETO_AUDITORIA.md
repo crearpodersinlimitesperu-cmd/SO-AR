@@ -69939,7 +69939,7 @@ runRestore()
 ## Archivo: src\App.jsx
 
 ```javascript
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import { useUI } from './context/UIContext'
 import './index.css'
@@ -69969,6 +69969,7 @@ import EmbudoConversionBoard from './pages/EmbudoConversionBoard'
 import AICopilot from './components/AICopilot'
 import PromptModal from './components/PromptModal'
 import HelpModal from './components/HelpModal'
+import ThemeToggle from './components/ThemeToggle'
 
 import { useState } from 'react'
 import { HelpCircle } from 'lucide-react'
@@ -70024,6 +70025,10 @@ function RoleRoute({ children, allowedRoles = [], requireSuperAdmin = false }) {
 function App() {
   const { originalAdminUser, currentUser, stopSimulation } = useAuth();
   const [showHelp, setShowHelp] = useState(false);
+  const location = useLocation();
+  // /home ya tiene su propio selector "Tema:" inline (junto al selector de Vista) —
+  // no se duplica aquí para no repetir el mismo control dos veces en esa página.
+  const showFloatingThemeToggle = !location.pathname.startsWith('/home');
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -70205,6 +70210,15 @@ function App() {
       {/* Botón flotante de ayuda */}
       {currentUser && (
         <>
+          {/* Selector Día/Noche/Auto: disponible en toda la plataforma (27/08/2026),
+              flotante para no interferir con el layout de cada página. Reutiliza
+              ThemeToggle tal cual (mismo componente que ya funcionaba en Home) —
+              no se tocó ThemeContext.jsx ni su lógica. */}
+          {showFloatingThemeToggle && (
+            <div style={{ position: 'fixed', top: '1rem', right: '1rem', zIndex: 8500 }}>
+              <ThemeToggle />
+            </div>
+          )}
           {/* Copiloto SO-AR: restringido a Gerentes y Directivos por decisión explícita (26/08/2026) */}
           {(currentUser.isSuperAdmin || currentUser.isGerente || currentUser.isDireccion) && (
             <AICopilot />
@@ -74041,14 +74055,23 @@ export default function HelpModal({ isOpen, onClose }) {
                 <li>Usa los filtros superiores para ver tareas vencidas, pendientes, en riesgo o completadas.</li>
               </ul>
 
-              <h4 style={{ color: 'var(--text-heading)' }}>2. Directorio y Reportes</h4>
-              <p>Los líderes pueden ver el avance de su equipo y de toda la organización.</p>
+              <h4 style={{ color: 'var(--text-heading)' }}>2. Directorios y Comunicación Directa</h4>
+              <p>El sistema cuenta con accesos directos para comunicarte y monitorear a los miembros del equipo.</p>
               <ul style={{ paddingLeft: '1.5rem', marginBottom: '1.5rem' }}>
-                <li><strong>Privacidad de Pares:</strong> Los gerentes y directores solo pueden ver las tareas de sus subordinados o aquellas en las que colaboran. Las tareas de otros gerentes de su mismo nivel son privadas.</li>
-                <li>Puedes asignar tareas directamente a cualquier miembro de tu equipo desde su tarjeta de perfil haciendo clic en el botón <strong>+ Tarea</strong>.</li>
+                <li><strong>Pantalla de Inicio:</strong> Encontrarás botones rápidos a los directorios principales (Directorio QT y Directorio Equipos).</li>
+                <li><strong>Comunicación:</strong> Al ver el perfil de un usuario, tendrás botones rápidos para escribirle por <strong>WhatsApp</strong> o enviarle un <strong>Correo</strong> directamente sin tener que guardarlos.</li>
+                <li><strong>Privacidad de Pares:</strong> Los gerentes y directores solo pueden ver las tareas de sus subordinados directos o aquellas en las que colaboran.</li>
               </ul>
 
-              <h4 style={{ color: 'var(--text-heading)' }}>3. Tareas Compartidas y Colaboradores</h4>
+              <h4 style={{ color: 'var(--text-heading)' }}>3. Auditoría de KPIs (Nuevo)</h4>
+              <p>La sección de KPIs ha sido reconstruida en tres pestañas (tabs) enfocadas para analizar mejor la salud operativa de cada Sede.</p>
+              <ul style={{ paddingLeft: '1.5rem', marginBottom: '1.5rem' }}>
+                <li><strong>Tab CMJ:</strong> Consolidado automático (desde Drive) que suma la retención, deserción y enrolamiento total de <em>todos</em> los Coordinadores de la Maestría de la sede seleccionada.</li>
+                <li><strong>Tab Entrenadores Maestría:</strong> Métricas operativas de avance, gráficas y cierres enfocadas en el desempeño del Entrenador por sede.</li>
+                <li><strong>Tab Auditoría de KPIs:</strong> Espacio exclusivo para revisar y auditar los formularios semanales cargados manualmente por el Quantum Team (QT y Coordinadores).</li>
+              </ul>
+
+              <h4 style={{ color: 'var(--text-heading)' }}>4. Tareas Compartidas y Colaboradores</h4>
               <p>Si necesitas ayuda de otra persona o sede, abre una tarea y selecciona <strong>"Añadir Colaborador"</strong>. La tarea aparecerá en el perfil de ambos.</p>
             </div>
           ) : (
@@ -114269,6 +114292,18 @@ export default function AuditoriaKPIs() {
             <Users size={16} style={{ display: 'inline-block', verticalAlign: 'text-bottom', marginRight: '6px' }} />
             Entrenadores Maestría
           </button>
+          <button
+            onClick={() => setActiveTab('auditoria')}
+            style={{
+              padding: '0.6rem 1.2rem', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 'bold',
+              background: activeTab === 'auditoria' ? 'rgba(212, 175, 55, 0.15)' : 'transparent',
+              color: activeTab === 'auditoria' ? 'var(--crear-gold)' : 'var(--text-muted)',
+              borderBottom: activeTab === 'auditoria' ? '2px solid var(--crear-gold)' : '2px solid transparent'
+            }}
+          >
+            <AlertCircle size={16} style={{ display: 'inline-block', verticalAlign: 'text-bottom', marginRight: '6px' }} />
+            Auditoría de KPIs
+          </button>
         </div>
 
         {/* Dashboards Content */}
@@ -114351,7 +114386,8 @@ export default function AuditoriaKPIs() {
         </div>
       </div>
 
-      <div className="glass-panel" style={{ padding: '2rem', borderRadius: '16px', background: 'var(--bg-card, #ffffff)', border: '1px solid var(--border-subtle, #e2e8f0)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+      {activeTab === 'auditoria' && (
+        <div className="glass-panel" style={{ padding: '2rem', borderRadius: '16px', background: 'var(--bg-card, #ffffff)', border: '1px solid var(--border-subtle, #e2e8f0)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
         
         {/* GLOBAL DEBUG BLOCK A NIVEL PÁGINA */}
         <div style={{ display: 'none', background: '#1a1a1a', padding: '15px', marginBottom: '20px', borderRadius: '8px', border: '2px solid #00ff00' }}>
@@ -114435,6 +114471,7 @@ export default function AuditoriaKPIs() {
           </div>
         )}
       </div>
+      )}
     </div>
   );
 }
@@ -114470,7 +114507,7 @@ function KPIMetric({ label, value, target, actual, isInverse = false }) {
 ```javascript
 import { getWhatsAppUrl } from '../utils/phoneUtils';
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
 import { 
@@ -114570,6 +114607,10 @@ export default function CentroManagers() {
   const { currentUser } = useAuth();
   const { showToast } = useUI();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const queryParams = new URLSearchParams(location.search);
+  const initialTab = queryParams.get('tab') || 'directorio';
 
   // Permisos avanzados
   const canViewAll = canViewAllManagers(currentUser);
@@ -114639,7 +114680,7 @@ export default function CentroManagers() {
   }, [llamadosData]);
 
   // UI State
-  const [activeTab, setActiveTab] = useState('directorio');
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [search, setSearch] = useState('');
   const [filterSede, setFilterSede] = useState('');
   const [statusFilter, setStatusFilter] = useState('Todos'); // 'Todos' | 'Activo' | 'Graduado' | 'Desertor'
@@ -115663,9 +115704,14 @@ export default function CentroManagers() {
               </div>
 
               <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                <button onClick={handleResetMasterData} title="Restablecer Datos Maestros" style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', padding: '0.55rem 0.8rem', borderRadius: '6px', border: `1px solid ${borderLight}`, background: 'transparent', color: textMuted, fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}>
-                  <RotateCcw size={14} /> Restaurar
-                </button>
+                <button onClick={() => {
+                    setFilterSede('');
+                    setFilterEntrenador('');
+                    setStatusFilter('Todos');
+                    setSearch('');
+                  }} title="Limpiar Filtros de Búsqueda" style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', padding: '0.55rem 0.8rem', borderRadius: '6px', border: `1px solid ${borderLight}`, background: 'transparent', color: textMuted, fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}>
+                    <RotateCcw size={14} /> Restaurar Filtros
+                  </button>
 
                 {userCanAdd && (
                   <button onClick={() => setShowModal(true)} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.6rem 1.2rem', borderRadius: '6px', border: 'none', background: '#3b82f6', color: '#fff', fontWeight: 600, cursor: 'pointer', boxShadow: '0 2px 4px rgba(59,130,246,0.3)' }}>
@@ -118157,9 +118203,19 @@ export default function DirectorioQT() {
                     <a 
                       href={`mailto:${m.email}`}
                       style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '0.78rem', color: 'var(--crear-blue)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
-                      title={m.email}
+                      title={`Enviar correo a ${m.email}`}
                     >
-                      <MessageSquare size={13} /> Correo
+                      <Mail size={13} /> Correo
+                    </a>
+                  )}
+                  {m.email && (
+                    <a 
+                      href={`https://mail.google.com/chat/u/0/#chat/dm/${m.email}`}
+                      target="_blank" rel="noopener noreferrer"
+                      style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '0.78rem', color: '#10b981', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+                      title={`Google Chat con ${m.email}`}
+                    >
+                      <MessageSquare size={13} /> G. Chat
                     </a>
                   )}
               </div>
@@ -118215,8 +118271,13 @@ export default function DirectorioQT() {
                         </a>
                       )}
                       {!m.whatsappUrl && m.email && (
-                        <a href={`mailto:${m.email}`} style={{ background: 'rgba(0, 210, 255, 0.15)', color: 'var(--crear-blue)', border: '1px solid rgba(0, 210, 255, 0.3)', padding: '4px 8px', borderRadius: '6px', textDecoration: 'none', fontWeight: 700, fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
-                          <MessageSquare size={11} /> Correo
+                        <a href={`mailto:${m.email}`} style={{ background: 'rgba(0, 210, 255, 0.15)', color: 'var(--crear-blue)', border: '1px solid rgba(0, 210, 255, 0.3)', padding: '4px 8px', borderRadius: '6px', textDecoration: 'none', fontWeight: 700, fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }} title={`Enviar correo a ${m.email}`}>
+                          <Mail size={11} /> Correo
+                        </a>
+                      )}
+                      {m.email && (
+                        <a href={`https://mail.google.com/chat/u/0/#chat/dm/${m.email}`} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '4px 8px', borderRadius: '6px', textDecoration: 'none', fontWeight: 700, fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }} title={`Google Chat con ${m.email}`}>
+                          <MessageSquare size={11} /> G. Chat
                         </a>
                       )}
                     </div>
@@ -120709,9 +120770,14 @@ export default function Home() {
                 )}
 
                 {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
-                  <button onClick={() => { setShowToolsDropdown(false); navigate('/centro-managers'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
-                    🎯 Centro de Managers
-                  </button>
+                  <div style={{ display: 'flex', gap: '0.2rem', padding: '0.2rem' }}>
+                    <button onClick={() => { setShowToolsDropdown(false); navigate('/centro-managers'); }} className="btn-secondary" style={{ flex: 1, textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
+                      🎯 Centro de Managers
+                    </button>
+                    <button onClick={() => { setShowToolsDropdown(false); navigate('/centro-managers?tab=directorio'); }} className="btn-secondary" style={{ padding: '0.5rem', fontSize: '0.82rem' }}>
+                      👥
+                    </button>
+                  </div>
                 )}
 
                 <button onClick={() => { setShowToolsDropdown(false); navigate('/protocolo-emergencias'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.4)', background: 'rgba(239, 68, 68, 0.1)', fontWeight: 'bold' }}>
@@ -120775,7 +120841,7 @@ export default function Home() {
             </button>
           )}
 
-          {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+          {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
             <button onClick={() => navigate('/directorio-qt')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: 'white', border: 'none' }}>
               ⚡ Directorio QT
             </button>
@@ -120799,7 +120865,7 @@ export default function Home() {
 
           {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
             <button onClick={() => navigate('/centro-managers')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#000', fontWeight: 'bold', border: 'none' }}>
-              🎯 Centro Managers
+              👑 Centro Managers
             </button>
           )}
         </div>
@@ -120970,13 +121036,23 @@ export default function Home() {
                 <span>👉 Ir a mi Checklist Completo</span>
                 <ArrowRight size={18} />
               </button>
-              <button 
-                className="btn-secondary" 
-                onClick={() => navigate('/metas')} 
+              <button
+                className="btn-secondary"
+                onClick={() => navigate('/metas')}
                 style={{ flex: 1, minWidth: '130px', padding: '0.85rem 1rem', fontSize: '0.95rem', fontWeight: 'bold' }}
               >
                 🎯 Mis Metas
               </button>
+              {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+                <button
+                  className="btn-secondary hover-glow"
+                  onClick={() => navigate('/superadmin')}
+                  title="Directorio Global — Panel Super Admin"
+                  style={{ flex: 1, minWidth: '150px', padding: '0.85rem 1rem', fontSize: '0.95rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', background: 'rgba(139, 92, 246, 0.12)', borderColor: 'rgba(139, 92, 246, 0.4)', color: '#a78bfa' }}
+                >
+                  🌐 Directorio Global
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -124865,7 +124941,9 @@ import { doc, setDoc, collection, query, orderBy, limit, getDocs } from 'firebas
 import { db } from '../services/firebase';
 import { normalizeRole, normalizeSede, OPERATIONAL_SEDES } from '../data/usersData';
 import { getAllCompanyUsers } from '../services/userService';
-import { Globe, Building2, Users, ArrowLeft, ChevronDown, ChevronRight, Eye, CheckCircle2, Clock, AlertTriangle, TrendingUp, UserCheck, FileText, Search, X, PlusCircle } from 'lucide-react';
+import { openOrCreateDirectMessage } from '../services/googleChatService';
+import { getWhatsAppUrl } from '../utils/phoneUtils';
+import { Globe, Building2, Users, ArrowLeft, ChevronDown, ChevronRight, Eye, CheckCircle2, Clock, AlertTriangle, TrendingUp, UserCheck, FileText, Search, X, PlusCircle, Mail, MessageCircle } from 'lucide-react';
 import { getFlagForSede } from '../utils/flags';
 import UserProfileModal from '../components/UserProfileModal';
 import IAAuditor from '../components/IAAuditor';
@@ -124929,18 +125007,20 @@ function ProgressBar({ value, color = 'var(--crear-gold)', height = '8px' }) {
 }
 
 function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, currentUser, userConnections = {} }) {
+  const { showToast } = useUI();
+  const [openingChat, setOpeningChat] = useState(false);
   const canonicalRole = normalizeRole(person.role);
   const normalizedSedeName = normalizeSede(person.sede);
   const myTasks = tasks.filter(t => {
     const isAssigned = (t.assignedToEmails && t.assignedToEmails.some(e => e.toLowerCase() === person.email?.toLowerCase())) || (t.assignedToEmail && t.assignedToEmail.toLowerCase() === person.email?.toLowerCase());
     const isCollab = t.collaborators && t.collaborators.includes(person.email);
-    
+
     if (isAssigned || isCollab) {
       if (!currentUser?.isSuperAdmin) {
         const myRole = currentUser?.appRole;
         const targetRole = normalizeRole(person.role);
         const isManagerRole = r => r === 'gerente' || r === 'director_maestria' || r === 'direccion';
-        
+
         if (isManagerRole(myRole) && isManagerRole(targetRole) && currentUser.email?.toLowerCase() !== person.email?.toLowerCase()) {
           const iAmCreator = t.createdBy?.toLowerCase() === currentUser?.email?.toLowerCase();
           const iAmCollaborator = t.collaborators?.includes(currentUser?.email);
@@ -124949,7 +125029,7 @@ function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, curre
       }
       return true;
     }
-    
+
     if (t.assignedToEmail || (t.assignedToEmails && t.assignedToEmails.length > 0)) return false;
     const tNorm = normalizeRole(t.role);
     const matchesRole = tNorm === canonicalRole || t.role === person.role;
@@ -124969,29 +125049,34 @@ function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, curre
 
   const pct = myTasks.length > 0 ? Math.round((completed / myTasks.length) * 100) : 0;
   const roleColor = ROLE_COLORS[canonicalRole] || ROLE_COLORS[person.role] || '#6b7280';
+  // WhatsApp: los QT sincronizados desde la hoja de Google ya traen whatsappUrl listo
+  // (ver qtSheetService.js); para otros registros se arma con la misma utilidad que
+  // ya usa el resto de la app (phoneUtils.getWhatsAppUrl), probando los distintos
+  // nombres de campo de teléfono que existen según la colección de origen.
+  const whatsappUrl = person.whatsappUrl || getWhatsAppUrl(person.whatsapp || person.phone || person.telefono, person.sede);
 
   return (
-    <div 
-      className="glass-panel hover-glow" 
+    <div
+      className="glass-panel hover-glow"
       onClick={() => onSelectUser && onSelectUser(person)}
-      style={{ 
-        padding: '1rem 1.2rem', borderLeft: `4px solid ${roleColor}`, 
+      style={{
+        padding: '1rem 1.2rem', borderLeft: `4px solid ${roleColor}`,
         cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between'
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-        <div 
-          style={{ 
-            width: '42px', 
-            height: '42px', 
-            borderRadius: '50%', 
-            background: 'rgba(255,255,255,0.08)', 
+        <div
+          style={{
+            width: '42px',
+            height: '42px',
+            borderRadius: '50%',
+            background: 'rgba(255,255,255,0.08)',
             border: '1px solid rgba(255,255,255,0.15)',
-            display: 'flex', 
-            alignItems: 'center', 
+            display: 'flex',
+            alignItems: 'center',
             justifyContent: 'center',
             flexShrink: 0
-          }} 
+          }}
           title={`Sede: ${normalizedSedeName}`}
         >
           <div style={{ transform: 'scale(1.2)' }}>{getFlagForSede(person.sede)}</div>
@@ -125003,15 +125088,15 @@ function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, curre
               {ROLE_LABELS[canonicalRole] || person.role}
             </span>
             {person.sede && (
-              <span style={{ 
-                fontSize: '0.72rem', 
-                color: 'var(--crear-gold)', 
-                background: 'rgba(255, 183, 3, 0.1)', 
+              <span style={{
+                fontSize: '0.72rem',
+                color: 'var(--crear-gold)',
+                background: 'rgba(255, 183, 3, 0.1)',
                 border: '1px solid rgba(255, 183, 3, 0.25)',
-                padding: '1px 6px', 
-                borderRadius: '4px', 
-                display: 'inline-flex', 
-                alignItems: 'center', 
+                padding: '1px 6px',
+                borderRadius: '4px',
+                display: 'inline-flex',
+                alignItems: 'center',
                 gap: '3px',
                 fontWeight: 700
               }}>
@@ -125023,7 +125108,7 @@ function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, curre
           {(() => {
             const emailKey = (person.email || '').toLowerCase().trim();
             const allEmails = [...new Set([emailKey, ...(person.emails || []).map(e => e.toLowerCase().trim())])];
-            
+
             let conn = null;
             for (const email of allEmails) {
               if (userConnections[email] && (userConnections[email].hasConnected || userConnections[email].lastLoginFormatted || userConnections[email].lastLoginAt)) {
@@ -125056,15 +125141,115 @@ function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, curre
       <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.3rem' }}>
         <p style={{ margin: 0, fontSize: '1.2rem', fontWeight: 'bold', color: pct === 100 ? '#22c55e' : 'var(--text-heading)' }}>{pct}%</p>
         <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)' }}>{completed}/{myTasks.length} tareas</p>
-        <button 
+        {(person.email || whatsappUrl) && (
+          <div style={{ display: 'flex', gap: '0.3rem' }}>
+            {whatsappUrl && (
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                title="Contactar por WhatsApp"
+                className="hover-glow"
+                style={{
+                  width: '28px',
+                  height: '28px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  textDecoration: 'none',
+                  background: '#25D366',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.15)'
+                }}
+              >
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="#ffffff" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                  <path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.554 4.118 1.528 5.845L0 24l6.335-1.508A11.943 11.943 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.006-1.371l-.36-.214-3.727.977.995-3.638-.235-.374A9.818 9.818 0 1112 21.818z"/>
+                </svg>
+              </a>
+            )}
+            {person.email && (
+              <>
+                <a
+                  href={`mailto:${person.email}`}
+                  onClick={(e) => e.stopPropagation()}
+                  title={`Enviar correo a ${person.email}`}
+                  className="hover-glow"
+                  style={{
+                    width: '28px',
+                    height: '28px',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    textDecoration: 'none',
+                    background: '#ffffff',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                  }}
+                >
+                  <svg viewBox="0 0 48 48" width="17" height="17" xmlns="http://www.w3.org/2000/svg">
+                    <path fill="#4caf50" d="M45,16.2l-5,2.75l-5,4.75L35,40h7c1.657,0,3-1.343,3-3V16.2z"/>
+                    <path fill="#1e88e5" d="M3,16.2l3.714,1.498L13,23.7V40H6c-1.657,0-3-1.343-3-3V16.2z"/>
+                    <polygon fill="#e53935" points="35,11.2 24,19.45 13,11.2 12,17 13,23.7 24,31.95 35,23.7 36,17"/>
+                    <path fill="#c62828" d="M3,12.298V16.2l10,7.5V11.2L9.876,8.859C9.132,8.301,8.228,8,7.298,8h0C4.924,8,3,9.924,3,12.298z"/>
+                    <path fill="#fbc02d" d="M45,12.298V16.2l-10,7.5V11.2l3.124-2.341C38.868,8.301,39.772,8,40.702,8h0 C43.076,8,45,9.924,45,12.298z"/>
+                  </svg>
+                </a>
+                <button
+                  type="button"
+                  disabled={openingChat}
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    setOpeningChat(true);
+                    const result = await openOrCreateDirectMessage(person.email);
+                    setOpeningChat(false);
+                    if (result.success) {
+                      window.open(result.spaceUri, '_blank', 'noopener,noreferrer');
+                    } else {
+                      showToast(
+                        `No se pudo abrir Google Chat con ${person.name} (${result.error}). Usa el botón de correo mientras tanto.`,
+                        'error'
+                      );
+                    }
+                  }}
+                  title={`Abrir la conversación de Google Chat con ${person.email}`}
+                  className="hover-glow"
+                  style={{
+                    width: '28px',
+                    height: '28px',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    cursor: openingChat ? 'wait' : 'pointer',
+                    opacity: openingChat ? 0.6 : 1,
+                    background: '#ffffff',
+                    border: 'none',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                  }}
+                >
+                  <svg viewBox="0 0 48 48" width="17" height="17" xmlns="http://www.w3.org/2000/svg">
+                    <path fill="#1a73e8" d="M12 35.5L5 42V8c0-1.7 1.3-3 3-3h32c1.7 0 3 1.3 3 3v24.5c0 1.7-1.3 3-3 3H12z"/>
+                    <path fill="#ffffff" d="M17 18h14v3H17zm0 6h10v3H17z"/>
+                  </svg>
+                </button>
+              </>
+            )}
+          </div>
+        )}
+        <button
           onClick={(e) => { e.stopPropagation(); onAssignTask && onAssignTask(person); }}
           className="btn-primary hover-glow"
-          style={{ 
-            padding: '0.2rem 0.6rem', 
-            fontSize: '0.75rem', 
-            borderRadius: '6px', 
-            background: 'rgba(41, 171, 226, 0.15)', 
-            color: 'var(--crear-cyan)', 
+          style={{
+            padding: '0.2rem 0.6rem',
+            fontSize: '0.75rem',
+            borderRadius: '6px',
+            background: 'rgba(41, 171, 226, 0.15)',
+            color: 'var(--crear-cyan)',
             border: '1px solid rgba(41, 171, 226, 0.3)',
             display: 'flex',
             alignItems: 'center',
@@ -125082,7 +125267,7 @@ function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, curre
 function SedeBlock({ sede, tasks, navigate, onSelectUser, onAssignTask, currentUser, userConnections = {}, realUsersData = [] }) {
   const [expanded, setExpanded] = useState(false);
   const members = (realUsersData || []).filter(u => normalizeSede(u.sede) === sede);
-  
+
   let totalSedeTasks = 0;
   let totalSedeCompleted = 0;
 
@@ -125092,13 +125277,13 @@ function SedeBlock({ sede, tasks, navigate, onSelectUser, onAssignTask, currentU
     const myTasks = tasks.filter(t => {
       const isAssigned = (t.assignedToEmails && t.assignedToEmails.some(e => e.toLowerCase() === person.email?.toLowerCase())) || (t.assignedToEmail && t.assignedToEmail.toLowerCase() === person.email?.toLowerCase());
       const isCollab = t.collaborators && t.collaborators.includes(person.email);
-      
+
       if (isAssigned || isCollab) {
         if (!currentUser?.isSuperAdmin) {
           const myRole = currentUser?.appRole;
           const targetRole = normalizeRole(person.role);
           const isManagerRole = r => r === 'gerente' || r === 'director_maestria' || r === 'direccion';
-          
+
           if (isManagerRole(myRole) && isManagerRole(targetRole) && currentUser.email?.toLowerCase() !== person.email?.toLowerCase()) {
             const iAmCreator = t.createdBy?.toLowerCase() === currentUser?.email?.toLowerCase();
             const iAmCollaborator = t.collaborators?.includes(currentUser?.email);
@@ -125107,7 +125292,7 @@ function SedeBlock({ sede, tasks, navigate, onSelectUser, onAssignTask, currentU
         }
         return true;
       }
-      
+
       if (t.assignedToEmail || (t.assignedToEmails && t.assignedToEmails.length > 0)) return false;
       const tNorm = normalizeRole(t.role);
       const matchesRole = tNorm === canonicalRole || t.role === person.role;
@@ -125201,14 +125386,14 @@ function AuditLogView() {
           <p style={{ color: 'var(--text-muted)', margin: '0.3rem 0 0 0', fontSize: '0.9rem' }}>Registro en tiempo real de inicios de sesión, cambios de rol y actividad operativa.</p>
         </div>
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-          <select 
-            value={filterAction} 
+          <select
+            value={filterAction}
             onChange={(e) => setFilterAction(e.target.value)}
-            style={{ 
-              background: 'rgba(255,255,255,0.08)', 
-              color: 'white', 
-              border: '1px solid rgba(255,255,255,0.2)', 
-              padding: '0.4rem 0.8rem', 
+            style={{
+              background: 'rgba(255,255,255,0.08)',
+              color: 'white',
+              border: '1px solid rgba(255,255,255,0.2)',
+              padding: '0.4rem 0.8rem',
               borderRadius: '6px',
               fontSize: '0.85rem'
             }}
@@ -125219,15 +125404,15 @@ function AuditLogView() {
             <option value="SIMULACION_ADMIN" style={{ color: 'black' }}>🎭 SIMULACION_ADMIN (Super Admin)</option>
             <option value="LOGOUT" style={{ color: 'black' }}>🔴 LOGOUT</option>
           </select>
-          <button 
-            onClick={fetchLogs} 
+          <button
+            onClick={fetchLogs}
             disabled={loading}
-            className="btn-secondary" 
+            className="btn-secondary"
             style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', opacity: loading ? 0.5 : 1, cursor: loading ? 'not-allowed' : 'pointer' }}
           >
             {loading ? '⏳ Cargando...' : '🔄 Actualizar'}
           </button>
-          <button 
+          <button
             onClick={async () => {
               if (loading) return;
               if (window.confirm('¿Deseas limpiar el caché local de registros de prueba?')) {
@@ -125235,9 +125420,9 @@ function AuditLogView() {
                 localStorage.removeItem('cpsl_user_connections');
                 await fetchLogs();
               }
-            }} 
+            }}
             disabled={loading}
-            className="btn-secondary" 
+            className="btn-secondary"
             style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', color: 'var(--text-muted)', opacity: loading ? 0.5 : 1, cursor: loading ? 'not-allowed' : 'pointer' }}
             title="Limpia registros residuales de simulación local"
           >
@@ -125245,7 +125430,7 @@ function AuditLogView() {
           </button>
         </div>
       </div>
-      
+
       {loading ? (
         <p style={{ color: 'var(--text-muted)' }}>Cargando registros...</p>
       ) : (
@@ -125271,7 +125456,7 @@ function AuditLogView() {
                   } else if (log.timestamp) {
                     dateStr = new Date(log.timestamp).toLocaleString('es-ES');
                   }
-                } catch(e) {}
+                } catch (e) { }
 
                 const actionColor = log.action === 'LOGIN' ? '#22c55e' : (log.action === 'LOGOUT' ? '#ef4444' : (log.action === 'CAMBIO_ROL' ? 'var(--crear-cyan)' : 'var(--crear-gold)'));
                 return (
@@ -125279,14 +125464,14 @@ function AuditLogView() {
                     <td style={{ padding: '0.8rem', whiteSpace: 'nowrap' }}>{dateStr}</td>
                     <td style={{ padding: '0.8rem', fontWeight: 'bold' }}>
                       {log.name || 'Usuario'}
-                      <br/>
+                      <br />
                       <span style={{ fontSize: '0.75rem', fontWeight: 'normal', color: 'var(--text-muted)' }}>{log.email}</span>
                     </td>
                     <td style={{ padding: '0.8rem' }}>
-                      <span style={{ 
-                        fontSize: '0.75rem', 
-                        padding: '2px 6px', 
-                        borderRadius: '4px', 
+                      <span style={{
+                        fontSize: '0.75rem',
+                        padding: '2px 6px',
+                        borderRadius: '4px',
                         background: 'rgba(255,255,255,0.06)',
                         color: ROLE_COLORS[log.role] || 'var(--text-heading)'
                       }}>
@@ -125299,7 +125484,7 @@ function AuditLogView() {
                     </td>
                     <td style={{ padding: '0.8rem' }}>
                       <strong>{log.sede || 'Global'}</strong>
-                      <br/>
+                      <br />
                       <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{log.location || 'Acceso Seguro'} ({log.ip || '127.0.0.1'})</span>
                     </td>
                     <td style={{ padding: '0.8rem', fontSize: '0.75rem', color: 'var(--text-muted)', maxWidth: '160px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={log.userAgent}>
@@ -125356,11 +125541,11 @@ function GlobalView({ tasks, navigate, realUsersData = [] }) {
           { icon: <CheckCircle2 size={22} color="#22c55e" />, label: 'Tareas Completadas', value: completedTasks, sub: `de ${totalTasks} totales`, color: '#22c55e', path: '/reportes' },
           { icon: <Clock size={22} color="var(--crear-gold)" />, label: 'Avance Global', value: `${globalPct}%`, sub: 'Causa OS del ciclo', color: 'var(--crear-gold)', path: '/reportes' },
           { icon: <AlertTriangle size={22} color="#ef4444" />, label: 'Alertas Críticas', value: criticalTasks, sub: 'requieren acción HOY', color: '#ef4444', path: '/reportes' },
-          { icon: <Building2 size={22} color="#29abe2" />, label: 'Sedes Operativas', value: OPERATIONAL_SEDES.length, sub: 'sedes activas', color: '#29abe2', onClick: () => window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'}) },
+          { icon: <Building2 size={22} color="#29abe2" />, label: 'Sedes Operativas', value: OPERATIONAL_SEDES.length, sub: 'sedes activas', color: '#29abe2', onClick: () => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }) },
         ].map((kpi, i) => (
-          <div 
-            key={i} 
-            className="glass-panel hover-glow" 
+          <div
+            key={i}
+            className="glass-panel hover-glow"
             style={{ padding: '1.2rem', textAlign: 'center', border: `1px solid ${kpi.color}33`, cursor: 'pointer', transition: 'all 0.3s' }}
             onClick={() => kpi.path ? navigate(kpi.path) : kpi.onClick?.()}
           >
@@ -125384,8 +125569,8 @@ function GlobalView({ tasks, navigate, realUsersData = [] }) {
             const rolePct = roleTasks.length > 0 ? Math.round((roleCompleted / roleTasks.length) * 100) : 0;
             const roleColor = ROLE_COLORS[role.id] || '#6b7280';
             return (
-              <div 
-                key={role.id} 
+              <div
+                key={role.id}
                 onClick={() => navigate(`/checklist/${role.id}`)}
                 className="hover-glow"
                 style={{ cursor: 'pointer', padding: '0.5rem', borderRadius: '8px', transition: 'background 0.3s' }}
@@ -125407,7 +125592,7 @@ function GlobalView({ tasks, navigate, realUsersData = [] }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
           {sedesRanking.map(({ sede, sedePct, sedeCompleted, total }, idx) => (
             <div key={sede} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <span style={{ color: idx === 0 ? '#f59e0b' : idx === 1 ? '#9ca3af' : idx === 2 ? '#cd7f32' : 'var(--text-muted)', fontWeight: 'bold', minWidth: '24px', fontSize: '0.85rem' }}>#{idx+1}</span>
+              <span style={{ color: idx === 0 ? '#f59e0b' : idx === 1 ? '#9ca3af' : idx === 2 ? '#cd7f32' : 'var(--text-muted)', fontWeight: 'bold', minWidth: '24px', fontSize: '0.85rem' }}>#{idx + 1}</span>
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '0.3rem' }}>
                   <span style={{ color: 'var(--text-heading)', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
@@ -125465,11 +125650,11 @@ function RoleView({ tasks, navigate, onSelectUser, onAssignTask, userConnections
             </h3>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '0.8rem' }}>
               {members.map(person => (
-                <PersonCard 
-                  key={person.id || person.email} 
-                  person={person} 
-                  tasks={tasks} 
-                  navigate={navigate} 
+                <PersonCard
+                  key={person.id || person.email}
+                  person={person}
+                  tasks={tasks}
+                  navigate={navigate}
                   onSelectUser={onSelectUser}
                   onAssignTask={onAssignTask}
                   currentUser={currentUser}
@@ -125591,10 +125776,10 @@ export default function SuperAdminPanel() {
         </div>
       </div>
 
-      <TaskAssignmentModal 
-        isOpen={!!assignUser} 
-        onClose={() => setAssignUser(null)} 
-        prefilledUser={assignUser} 
+      <TaskAssignmentModal
+        isOpen={!!assignUser}
+        onClose={() => setAssignUser(null)}
+        prefilledUser={assignUser}
       />
 
       <div className="glass-panel" style={{ padding: '0.8rem 1.2rem', marginBottom: '1.5rem', border: '1px solid var(--border-subtle)' }}>
@@ -125608,7 +125793,7 @@ export default function SuperAdminPanel() {
           border: '1px solid var(--border-subtle)'
         }}>
           <Search size={20} color={searchTerm ? "var(--crear-gold)" : "var(--text-muted)"} />
-          <input 
+          <input
             type="text"
             placeholder="🔍 Buscar persona por nombre, email, rol o sede (ej. Leyla, Darkwin, Quito, Quantum Team, Gerente)..."
             value={searchTerm}
@@ -125619,7 +125804,7 @@ export default function SuperAdminPanel() {
             }}
           />
           {searchTerm && (
-            <button 
+            <button
               onClick={() => setSearchTerm('')}
               style={{
                 background: 'var(--border-subtle)', border: 'none', color: 'var(--text-muted)',
@@ -125640,7 +125825,7 @@ export default function SuperAdminPanel() {
             <h3 style={{ margin: 0, color: 'var(--crear-gold)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.1rem' }}>
               <Users size={20} /> Resultados de Búsqueda ({searchFilteredUsers.length})
             </h3>
-            <button 
+            <button
               onClick={() => setSearchTerm('')}
               style={{ background: 'transparent', border: 'none', color: 'var(--crear-cyan)', cursor: 'pointer', fontSize: '0.85rem' }}
             >
@@ -125656,11 +125841,11 @@ export default function SuperAdminPanel() {
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '0.8rem' }}>
               {searchFilteredUsers.map(person => (
-                <PersonCard 
-                  key={person.id || person.email} 
-                  person={person} 
-                  tasks={tasks} 
-                  navigate={navigate} 
+                <PersonCard
+                  key={person.id || person.email}
+                  person={person}
+                  tasks={tasks}
+                  navigate={navigate}
                   onSelectUser={handleOpenUserModal}
                   onAssignTask={setAssignUser}
                   currentUser={currentUser}
@@ -125693,11 +125878,11 @@ export default function SuperAdminPanel() {
                 if (currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'director_maestria') return true;
                 return normalizeSede(currentUser?.sede) === sede;
               }).map(sede => (
-                <SedeBlock 
-                  key={sede} 
-                  sede={sede} 
-                  tasks={tasks} 
-                  navigate={navigate} 
+                <SedeBlock
+                  key={sede}
+                  sede={sede}
+                  tasks={tasks}
+                  navigate={navigate}
                   onSelectUser={handleOpenUserModal}
                   onAssignTask={setAssignUser}
                   currentUser={currentUser}
@@ -125708,9 +125893,9 @@ export default function SuperAdminPanel() {
             </div>
           )}
           {activeView === 'rol' && (
-            <RoleView 
-              tasks={tasks} 
-              navigate={navigate} 
+            <RoleView
+              tasks={tasks}
+              navigate={navigate}
               onSelectUser={handleOpenUserModal}
               onAssignTask={setAssignUser}
               currentUser={currentUser}
@@ -125726,7 +125911,7 @@ export default function SuperAdminPanel() {
 
       {/* Modal de Perfil de Usuario Completo */}
       {showUserModal && selectedUser && (
-        <UserProfileModal 
+        <UserProfileModal
           isOpen={showUserModal}
           onClose={() => setShowUserModal(false)}
           user={selectedUser}
@@ -126733,6 +126918,125 @@ export { app, db, auth, googleProvider, storage };
 
 ---
 
+## Archivo: src\services\googleChatService.js
+
+```js
+// Servicio de integración con Google Chat API (búsqueda/creación de DMs 1 a 1)
+//
+// Cómo funciona (documentado y verificado contra la referencia oficial de Google
+// antes de escribir este archivo — no se inventó ningún formato de URL):
+//
+// 1. Pide el scope 'chat.spaces' de forma INCREMENTAL: solo se solicita la primera
+//    vez que alguien hace clic en "Chat" en el Panel Super Admin, no en el login
+//    general de la app. Esto es intencional: la app está en modo "Externo / En
+//    producción" sin verificar ante Google, con un tope de por vida de 100 personas
+//    que pueden otorgar un permiso sensible sin aprobación. Pedirlo solo a quien
+//    realmente usa el botón (roles gerenciales/dirección, que ya es la única
+//    audiencia del Panel Super Admin) evita agotar ese cupo con gente que nunca
+//    toca esta función.
+// 2. Con ese token, llama a GET /v1/spaces:findDirectMessage?name=users/{email}
+//    (Google permite usar el correo directo como alias de {user} cuando se
+//    autentica como usuario — confirmado en la referencia oficial).
+// 3. Si no existe todavía (404), llama a POST /v1/spaces:setup para crearlo.
+// 4. En ambos casos, la respuesta trae el campo "spaceUri": la URL real de Google
+//    para abrir esa conversación en el navegador. Se usa esa URL tal cual — no se
+//    construye ningún enlace propio.
+//
+// Lo que NO está garantizado (ver reporte a José, 27/08/2026): que esto funcione
+// igual para cuentas @gmail.com externas a la organización (armando.pilacuan@gmail.com,
+// gomeznueve@gmail.com). Por eso todo el flujo tiene un fallback explícito: si algo
+// falla, la función devuelve { success:false } y quien llama debe ofrecer el botón
+// de "Correo" como respaldo, en vez de romper la experiencia.
+
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { auth } from './firebase';
+
+const CHAT_SCOPE = 'https://www.googleapis.com/auth/chat.spaces';
+const TOKEN_KEY = 'googleChatToken';
+
+/**
+ * Devuelve un access token con el scope de Chat, pidiéndolo con un popup de
+ * Google SOLO si todavía no lo tenemos guardado en esta sesión de navegador.
+ */
+export async function getChatAccessToken() {
+  const cached = sessionStorage.getItem(TOKEN_KEY);
+  if (cached) return cached;
+
+  const provider = new GoogleAuthProvider();
+  provider.addScope(CHAT_SCOPE);
+  // Reutiliza la cuenta ya logueada cuando es posible, en vez de forzar elegir cuenta de nuevo
+  provider.setCustomParameters({ login_hint: auth.currentUser?.email || '' });
+
+  const result = await signInWithPopup(auth, provider);
+  const credential = GoogleAuthProvider.credentialFromResult(result);
+  if (!credential?.accessToken) {
+    throw new Error('Google no devolvió un token de acceso con el permiso de Chat.');
+  }
+  sessionStorage.setItem(TOKEN_KEY, credential.accessToken);
+  return credential.accessToken;
+}
+
+async function findDirectMessageSpace(token, email) {
+  const res = await fetch(
+    `https://chat.googleapis.com/v1/spaces:findDirectMessage?name=users/${encodeURIComponent(email)}`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+  if (res.status === 404) return null; // no existe todavía, hay que crearlo
+  if (!res.ok) {
+    const body = await res.text().catch(() => '');
+    throw new Error(`findDirectMessage falló (HTTP ${res.status}): ${body}`);
+  }
+  return res.json();
+}
+
+async function createDirectMessageSpace(token, email) {
+  const res = await fetch('https://chat.googleapis.com/v1/spaces:setup', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      space: { spaceType: 'DIRECT_MESSAGE', singleUserBotDm: false },
+      memberships: [{ member: { name: `users/${email}`, type: 'HUMAN' } }]
+    })
+  });
+  if (!res.ok) {
+    const body = await res.text().catch(() => '');
+    throw new Error(`spaces:setup falló (HTTP ${res.status}): ${body}`);
+  }
+  return res.json();
+}
+
+/**
+ * Busca (o crea si no existe) la conversación 1 a 1 de Google Chat con `email`,
+ * y devuelve { success: true, spaceUri } con la URL real de Google para abrirla.
+ * Si algo falla (token, red, permisos, o el usuario destino no puede recibir DMs
+ * por API), devuelve { success: false, error } sin lanzar excepción, para que
+ * quien llama pueda ofrecer un respaldo (ej. el botón de Correo).
+ */
+export async function openOrCreateDirectMessage(email) {
+  if (!email) return { success: false, error: 'Sin correo' };
+  try {
+    const token = await getChatAccessToken();
+    let space = await findDirectMessageSpace(token, email);
+    if (!space) {
+      space = await createDirectMessageSpace(token, email);
+    }
+    if (!space?.spaceUri) {
+      return { success: false, error: 'La API no devolvió una URL de espacio (spaceUri).' };
+    }
+    return { success: true, spaceUri: space.spaceUri };
+  } catch (error) {
+    console.error('Error abriendo Google Chat:', error);
+    return { success: false, error: error.message || String(error) };
+  }
+}
+
+```
+
+---
+
 ## Archivo: src\services\googleSync.js
 
 ```js
@@ -127600,15 +127904,42 @@ export async function getAllCompanyUsers() {
   // detalle de por qué pueden existir esos docs sin email.
   const normEmail = (e) => (e || '').toString().trim().toLowerCase();
 
+  // NOTA (27/08/2026): src/utils/userNormalizer.js (usado en el login, ver
+  // AuthContext.jsx) ya sabe que el correo de una persona puede venir en más de
+  // un nombre de campo — "email", "correo" (algunos docs viejos), "emails"[],
+  // "corporateEmail" o "personalEmail" — pero getAllCompanyUsers() no aplicaba
+  // esa misma lógica: solo miraba "email"/"emails". Eso significa que una
+  // persona con su correo guardado bajo "correo" o solo en "corporateEmail"
+  // aparecía en el Panel Super Admin SIN botón de Correo/Chat (y a veces como
+  // tarjeta duplicada, porque tampoco se detectaba como la misma persona al
+  // fusionar). deriveEmail()/emailKeysOf() ahora reconocen esas variantes.
+  const deriveEmail = (u) => normEmail(
+    u.email || u.correo || u.corporateEmail || u.personalEmail ||
+    (Array.isArray(u.emails) && u.emails.find(e => e)) || ''
+  ) || null;
+
   const emailKeysOf = (u) => {
     const keys = new Set();
-    const primary = normEmail(u.email);
+    const primary = deriveEmail(u);
     if (primary) keys.add(primary);
     (Array.isArray(u.emails) ? u.emails : []).forEach(e => {
       const k = normEmail(e);
       if (k) keys.add(k);
     });
+    if (u.correo) keys.add(normEmail(u.correo));
+    if (u.corporateEmail) keys.add(normEmail(u.corporateEmail));
+    if (u.personalEmail) keys.add(normEmail(u.personalEmail));
     return keys;
+  };
+
+  // Devuelve el registro con un campo "email" de nivel superior garantizado
+  // (sin pisar uno que ya existiera), para que cualquier componente que solo
+  // lea person.email — como los botones de contacto del Panel Super Admin —
+  // lo encuentre sin importar en qué campo llegó originalmente el dato.
+  const withCanonicalEmail = (raw) => {
+    if (raw.email) return raw;
+    const derived = deriveEmail(raw);
+    return derived ? { ...raw, email: derived } : raw;
   };
 
   const findExistingIndex = (candidateKeys) => {
@@ -127623,22 +127954,56 @@ export async function getAllCompanyUsers() {
   };
 
   try {
-    // Los usuarios principales están en la colección "users"
+    // Los usuarios principales están en la colección "users".
+    // NOTA (27/08/2026): "users" puede tener más de un documento para la misma
+    // persona (ej. un doc viejo con otro id y uno nuevo con el uid actual, ambos
+    // con el mismo correo) — eso causaba tarjetas duplicadas en el Panel Super
+    // Admin. Se fusionan por correo igual que ya se hace con qt_directory abajo,
+    // sin perder ningún campo: el primer doc encontrado manda, y el duplicado
+    // solo rellena los campos que al primero le falten.
     const usersSnap = await getDocs(collection(db, 'users'));
-    usersSnap.forEach(docSnap => allUsers.push({ id: docSnap.id, ...docSnap.data() }));
+    usersSnap.forEach(docSnap => {
+      const uData = docSnap.data();
+      const candidateKeys = emailKeysOf(uData);
+      const existingIdx = candidateKeys.size > 0 ? findExistingIndex(candidateKeys) : -1;
+      if (existingIdx !== -1) {
+        allUsers[existingIdx] = withCanonicalEmail({ ...uData, ...allUsers[existingIdx] });
+        return;
+      }
+      allUsers.push(withCanonicalEmail({ id: docSnap.id, ...uData }));
+    });
 
-    // Opcional: Agregar QT si se manejan aparte, o si ya están en "users", esto se puede omitir.
+    // Agregar QT (y, cuando la persona ya existe como "users", rellenar sus campos
+    // de contacto de QT en vez de descartarlos).
+    // NOTA (27/08/2026): antes, cuando una persona de qt_directory YA tenía un doc
+    // en "users" (findExistingIndex !== -1), este bloque simplemente no hacía nada
+    // con ella — el registro que quedaba listado era el de "users", que no trae
+    // whatsapp/whatsappUrl/cleanPhone (esos campos solo los pobla qtSheetService.js
+    // sobre qt_directory). Eso dejaba sin botón de WhatsApp (y a veces sin correo,
+    // si "users" tampoco lo tenía) a QT que sí tienen esos datos en qt_directory.
+    // Ahora se rellenan esos campos en el registro existente, sin pisar ningún dato
+    // que "users" ya tuviera.
     const qtSnap = await getDocs(collection(db, 'qt_directory'));
+    const CONTACT_FIELDS_FROM_QT = ['whatsapp', 'whatsappUrl', 'cleanPhone', 'phone', 'telefono', 'email', 'correo', 'corporateEmail', 'personalEmail'];
     qtSnap.forEach(docSnap => {
       const qtData = docSnap.data();
-      const candidate = { email: qtData.email, emails: qtData.emails };
-      const candidateKeys = emailKeysOf(candidate);
-      if (candidateKeys.size > 0 && findExistingIndex(candidateKeys) === -1) {
-        allUsers.push({
+      const candidateKeys = emailKeysOf(qtData);
+      const existingIdx = candidateKeys.size > 0 ? findExistingIndex(candidateKeys) : -1;
+      if (existingIdx !== -1) {
+        CONTACT_FIELDS_FROM_QT.forEach(f => {
+          if (!allUsers[existingIdx][f] && qtData[f]) {
+            allUsers[existingIdx][f] = qtData[f];
+          }
+        });
+        allUsers[existingIdx] = withCanonicalEmail(allUsers[existingIdx]);
+        return;
+      }
+      if (candidateKeys.size > 0) {
+        allUsers.push(withCanonicalEmail({
           id: docSnap.id,
           ...qtData,
           role: qtData.role || 'qt'
-        });
+        }));
       }
     });
 
@@ -127650,7 +128015,7 @@ export async function getAllCompanyUsers() {
   usersData.forEach(localUser => {
     const candidateKeys = emailKeysOf(localUser);
     if (candidateKeys.size > 0 && findExistingIndex(candidateKeys) === -1) {
-      allUsers.push({ ...localUser, id: localUser.id || localUser.email, source: 'local_registry' });
+      allUsers.push(withCanonicalEmail({ ...localUser, id: localUser.id || localUser.email, source: 'local_registry' }));
     }
   });
 

@@ -533,7 +533,7 @@ export default function Home() {
             </button>
           )}
 
-          {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+          {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
             <button onClick={() => navigate('/directorio-qt')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: 'white', border: 'none' }}>
               ⚡ Directorio QT
             </button>
@@ -556,14 +556,9 @@ export default function Home() {
           )}
 
           {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
-            <>
-              <button onClick={() => navigate('/centro-managers')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#000', fontWeight: 'bold', border: 'none' }}>
-                👑 Centro Managers
-              </button>
-              <button onClick={() => navigate('/directorio-qt')} className="btn-secondary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                <Users size={14} /> Directorio Global
-              </button>
-            </>
+            <button onClick={() => navigate('/centro-managers')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#000', fontWeight: 'bold', border: 'none' }}>
+              👑 Centro Managers
+            </button>
           )}
         </div>
       )}
@@ -733,13 +728,23 @@ export default function Home() {
                 <span>👉 Ir a mi Checklist Completo</span>
                 <ArrowRight size={18} />
               </button>
-              <button 
-                className="btn-secondary" 
-                onClick={() => navigate('/metas')} 
+              <button
+                className="btn-secondary"
+                onClick={() => navigate('/metas')}
                 style={{ flex: 1, minWidth: '130px', padding: '0.85rem 1rem', fontSize: '0.95rem', fontWeight: 'bold' }}
               >
                 🎯 Mis Metas
               </button>
+              {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+                <button
+                  className="btn-secondary hover-glow"
+                  onClick={() => navigate('/superadmin')}
+                  title="Directorio Global — Panel Super Admin"
+                  style={{ flex: 1, minWidth: '150px', padding: '0.85rem 1rem', fontSize: '0.95rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', background: 'rgba(139, 92, 246, 0.12)', borderColor: 'rgba(139, 92, 246, 0.4)', color: '#a78bfa' }}
+                >
+                  🌐 Directorio Global
+                </button>
+              )}
             </div>
           </div>
         </div>
