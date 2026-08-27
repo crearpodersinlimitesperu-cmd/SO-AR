@@ -1,6 +1,6 @@
 import { getWhatsAppUrl } from '../utils/phoneUtils';
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
 import { 
@@ -100,6 +100,10 @@ export default function CentroManagers() {
   const { currentUser } = useAuth();
   const { showToast } = useUI();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const queryParams = new URLSearchParams(location.search);
+  const initialTab = queryParams.get('tab') || 'directorio';
 
   // Permisos avanzados
   const canViewAll = canViewAllManagers(currentUser);
@@ -169,7 +173,7 @@ export default function CentroManagers() {
   }, [llamadosData]);
 
   // UI State
-  const [activeTab, setActiveTab] = useState('directorio');
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [search, setSearch] = useState('');
   const [filterSede, setFilterSede] = useState('');
   const [statusFilter, setStatusFilter] = useState('Todos'); // 'Todos' | 'Activo' | 'Graduado' | 'Desertor'
