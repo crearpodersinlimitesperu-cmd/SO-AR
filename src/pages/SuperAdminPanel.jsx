@@ -8,7 +8,9 @@ import { doc, setDoc, collection, query, orderBy, limit, getDocs } from 'firebas
 import { db } from '../services/firebase';
 import { normalizeRole, normalizeSede, OPERATIONAL_SEDES } from '../data/usersData';
 import { getAllCompanyUsers } from '../services/userService';
-import { Globe, Building2, Users, ArrowLeft, ChevronDown, ChevronRight, Eye, CheckCircle2, Clock, AlertTriangle, TrendingUp, UserCheck, FileText, Search, X, PlusCircle } from 'lucide-react';
+import { openOrCreateDirectMessage } from '../services/googleChatService';
+import { getWhatsAppUrl } from '../utils/phoneUtils';
+import { Globe, Building2, Users, ArrowLeft, ChevronDown, ChevronRight, Eye, CheckCircle2, Clock, AlertTriangle, TrendingUp, UserCheck, FileText, Search, X, PlusCircle, Mail, MessageCircle } from 'lucide-react';
 import { getFlagForSede } from '../utils/flags';
 import UserProfileModal from '../components/UserProfileModal';
 import IAAuditor from '../components/IAAuditor';
@@ -72,6 +74,8 @@ function ProgressBar({ value, color = 'var(--crear-gold)', height = '8px' }) {
 }
 
 function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, currentUser, userConnections = {} }) {
+  const { showToast } = useUI();
+  const [openingChat, setOpeningChat] = useState(false);
   const canonicalRole = normalizeRole(person.role);
   const normalizedSedeName = normalizeSede(person.sede);
   const myTasks = tasks.filter(t => {
@@ -112,6 +116,11 @@ function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, curre
 
   const pct = myTasks.length > 0 ? Math.round((completed / myTasks.length) * 100) : 0;
   const roleColor = ROLE_COLORS[canonicalRole] || ROLE_COLORS[person.role] || '#6b7280';
+  // WhatsApp: los QT sincronizados desde la hoja de Google ya traen whatsappUrl listo
+  // (ver qtSheetService.js); para otros registros se arma con la misma utilidad que
+  // ya usa el resto de la app (phoneUtils.getWhatsAppUrl), probando los distintos
+  // nombres de campo de teléfono que existen según la colección de origen.
+  const whatsappUrl = person.whatsappUrl || getWhatsAppUrl(person.whatsapp || person.phone || person.telefono, person.sede);
 
   return (
     <div 
@@ -199,7 +208,94 @@ function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, curre
       <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.3rem' }}>
         <p style={{ margin: 0, fontSize: '1.2rem', fontWeight: 'bold', color: pct === 100 ? '#22c55e' : 'var(--text-heading)' }}>{pct}%</p>
         <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)' }}>{completed}/{myTasks.length} tareas</p>
-        <button 
+        {(person.email || whatsappUrl) && (
+          <div style={{ display: 'flex', gap: '0.3rem' }}>
+            {whatsappUrl && (
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                title="Contactar por WhatsApp"
+                className="btn-secondary hover-glow"
+                style={{
+                  width: '24px',
+                  height: '24px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  fontSize: '12px',
+                  textDecoration: 'none',
+                  border: '1px solid var(--text-muted)'
+                }}
+              >
+                📱
+              </a>
+            )}
+            {person.email && (
+            <>
+            <a
+              href={`mailto:${person.email}`}
+              onClick={(e) => e.stopPropagation()}
+              title={`Enviar correo a ${person.email}`}
+              className="btn-secondary hover-glow"
+              style={{
+                width: '24px',
+                height: '24px',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                textDecoration: 'none',
+                color: 'var(--text-main)',
+                border: '1px solid var(--text-muted)'
+              }}
+            >
+              <Mail size={12} color="var(--text-main)" />
+            </a>
+            <button
+              type="button"
+              disabled={openingChat}
+              onClick={async (e) => {
+                e.stopPropagation();
+                setOpeningChat(true);
+                const result = await openOrCreateDirectMessage(person.email);
+                setOpeningChat(false);
+                if (result.success) {
+                  window.open(result.spaceUri, '_blank', 'noopener,noreferrer');
+                } else {
+                  showToast(
+                    `No se pudo abrir Google Chat con ${person.name} (${result.error}). Usa el botón de correo mientras tanto.`,
+                    'error'
+                  );
+                }
+              }}
+              title={`Abrir la conversación de Google Chat con ${person.email}`}
+              className="btn-secondary hover-glow"
+              style={{
+                width: '24px',
+                height: '24px',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                cursor: openingChat ? 'wait' : 'pointer',
+                opacity: openingChat ? 0.6 : 1,
+                color: 'var(--text-main)',
+                border: '1px solid var(--text-muted)'
+              }}
+            >
+              <MessageCircle size={12} color="var(--text-main)" />
+            </button>
+            </>
+            )}
+          </div>
+        )}
+        <button
           onClick={(e) => { e.stopPropagation(); onAssignTask && onAssignTask(person); }}
           className="btn-primary hover-glow"
           style={{ 
