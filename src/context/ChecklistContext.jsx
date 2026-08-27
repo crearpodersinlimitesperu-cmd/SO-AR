@@ -45,9 +45,16 @@ export function ChecklistProvider({ children }) {
         });
       }
 
+      // Roles ejecutivos que NO deben recibir tareas del catálogo base automáticamente.
+      // Fer Aragón (ceo), Paul Sosa (cco) y similares no operan el checklist operativo.
+      const EXECUTIVE_ROLES_NO_CHECKLIST = ['ceo', 'cco', 'socio', 'super_admin'];
+      const userRoleForMerge = currentUser?.appRole || currentUser?.role || '';
+      const skipCatalogMerge = EXECUTIVE_ROLES_NO_CHECKLIST.includes(userRoleForMerge);
+
       // Merge de seguridad: Asegurar que todas las tareas del catálogo base (incluidas las nuevas de QT) existan
+      // Solo se aplica a roles operativos — no a roles ejecutivos sin checklist propio.
       const existingIds = new Set(loadedTasks.map(t => t.id));
-      const missingBaseTasks = checklistData.filter(t => !existingIds.has(t.id)).map(task => {
+      const missingBaseTasks = skipCatalogMerge ? [] : checklistData.filter(t => !existingIds.has(t.id)).map(task => {
         const autoDeadline = calculateAutomaticDeadline(task);
         return {
           ...task,
@@ -67,6 +74,13 @@ export function ChecklistProvider({ children }) {
     }, (error) => {
       console.error("Error fetching tasks from Firestore:", error);
       // Fallback a checklistData local si Firestore falla
+      const EXECUTIVE_ROLES_NO_CHECKLIST = ['ceo', 'cco', 'socio', 'super_admin'];
+      const userRoleForFallback = currentUser?.appRole || currentUser?.role || '';
+      if (EXECUTIVE_ROLES_NO_CHECKLIST.includes(userRoleForFallback)) {
+        setTasks([]);
+        setLoading(false);
+        return;
+      }
       const localTasks = checklistData.map(task => ({
         ...task,
         completed: false,

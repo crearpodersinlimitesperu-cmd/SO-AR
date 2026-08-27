@@ -1,4 +1,4 @@
-// Datos migrados a Firestore (managers_directory) en el Hito 0 por seguridad.
+﻿// Datos migrados a Firestore (managers_directory) en el Hito 0 por seguridad.
 export const INITIAL_MANAGERS = [];
 export const INITIAL_LLAMADOS = [];
 export const ENTRENADORES_LIST = [];
@@ -11,12 +11,12 @@ export const normalizeTrainer = (name) => {
   const map = {
   "Carlos Brunis": "Carlos Brunis",
   "Leandro Brunis": "Leandro Brunis",
+  "Andres Gomez": "Andres Gomez",
   "Andrs Gmez": "Andres Gomez",
   "Andrés Gómez": "Andres Gomez",
-  "Andres Gomez": "Andres Gomez",
+  "Andres Idrobo": "Andres Idrobo",
   "Andrs Idrobo": "Andres Idrobo",
   "Andrés Idrobo": "Andres Idrobo",
-  "Andres Idrobo": "Andres Idrobo",
   "Ana Elena Monroy": "Ana Monroy",
   "Ana Monroy": "Ana Monroy",
   "Alonso Solares Salazar": "Alonso Solares",
@@ -35,40 +35,11 @@ export const normalizeTrainer = (name) => {
   "Josu Vera": "Josue Vera",
   "Josue Vera": "Josue Vera",
   "Josué Vera": "Josue Vera",
-  "Julio Narvez": "Julio Narvaez",
-  "Julio Narvaez": "Julio Narvaez",
-  "Julio Narváez": "Julio Narvaez",
-  "Kerlie Carrillo": "Kerly Carrillo",
-  "Kerly Carrillo": "Kerly Carrillo",
-  "Kerly Carrillo Garzon": "Kerly Carrillo",
-  "Lourdes Patio": "Lourdes Patino",
-  "Lourdes Patino": "Lourdes Patino",
-  "Maria de Lourdes Patino Galarraga": "Lourdes Patino",
-  "María de Lourdes Patiño": "Lourdes Patino",
-  "Maurcio Ramirez": "Mauricio Ramirez",
-  "Mauricio Ramrez": "Mauricio Ramirez",
-  "Mauricio Ramirez": "Mauricio Ramirez",
-  "Mauricio Ramírez": "Mauricio Ramirez",
-  "Mildred Munoz Vasquez": "Mildred Munoz",
-  "Mildred Munoz": "Mildred Munoz",
-  "Mildred Muñoz": "Mildred Munoz",
-  "Isaac Betancourth": "Isaac Betancourt",
-  "Isaac Betancourt": "Isaac Betancourt",
-  "Juan Fer Reinoso": "Juan Fernando Reinoso",
-  "Juan Fernando Reinoso": "Juan Fernando Reinoso"
-};
+  };
   return map[clean] || clean;
 };
 
 export const normalizeCoordinator = (name) => {
   if (!name) return '';
-  const clean = name.trim();
-  const map = {
-  "ISAAC BETANCOURTH": "ISAAC BETANCOURT",
-  "JOSU VERA": "JOSUE VERA",
-  "JUAN FER REINOSO": "JUAN FERNANDO REINOSO",
-  "KERLY CARRILLO - JUANFER REINOSO": "KERLY CARRILLO / JUAN FERNANDO REINOSO",
-  "KERLY CARRILLO / JUANFER REINOSO": "KERLY CARRILLO / JUAN FERNANDO REINOSO"
-};
-  return map[clean] || clean;
+  return name.trim();
 };

@@ -78933,9 +78933,16 @@ export function ChecklistProvider({ children }) {
         });
       }
 
+      // Roles ejecutivos que NO deben recibir tareas del catálogo base automáticamente.
+      // Fer Aragón (ceo), Paul Sosa (cco) y similares no operan el checklist operativo.
+      const EXECUTIVE_ROLES_NO_CHECKLIST = ['ceo', 'cco', 'socio', 'super_admin'];
+      const userRoleForMerge = currentUser?.appRole || currentUser?.role || '';
+      const skipCatalogMerge = EXECUTIVE_ROLES_NO_CHECKLIST.includes(userRoleForMerge);
+
       // Merge de seguridad: Asegurar que todas las tareas del catálogo base (incluidas las nuevas de QT) existan
+      // Solo se aplica a roles operativos — no a roles ejecutivos sin checklist propio.
       const existingIds = new Set(loadedTasks.map(t => t.id));
-      const missingBaseTasks = checklistData.filter(t => !existingIds.has(t.id)).map(task => {
+      const missingBaseTasks = skipCatalogMerge ? [] : checklistData.filter(t => !existingIds.has(t.id)).map(task => {
         const autoDeadline = calculateAutomaticDeadline(task);
         return {
           ...task,
@@ -78955,6 +78962,13 @@ export function ChecklistProvider({ children }) {
     }, (error) => {
       console.error("Error fetching tasks from Firestore:", error);
       // Fallback a checklistData local si Firestore falla
+      const EXECUTIVE_ROLES_NO_CHECKLIST = ['ceo', 'cco', 'socio', 'super_admin'];
+      const userRoleForFallback = currentUser?.appRole || currentUser?.role || '';
+      if (EXECUTIVE_ROLES_NO_CHECKLIST.includes(userRoleForFallback)) {
+        setTasks([]);
+        setLoading(false);
+        return;
+      }
       const localTasks = checklistData.map(task => ({
         ...task,
         completed: false,
@@ -80339,7 +80353,7 @@ export const cyclesData = [
 ## Archivo: src\data\managersData.js
 
 ```js
-// Datos migrados a Firestore (managers_directory) en el Hito 0 por seguridad.
+﻿// Datos migrados a Firestore (managers_directory) en el Hito 0 por seguridad.
 export const INITIAL_MANAGERS = [];
 export const INITIAL_LLAMADOS = [];
 export const ENTRENADORES_LIST = [];
@@ -80352,12 +80366,12 @@ export const normalizeTrainer = (name) => {
   const map = {
   "Carlos Brunis": "Carlos Brunis",
   "Leandro Brunis": "Leandro Brunis",
+  "Andres Gomez": "Andres Gomez",
   "Andrs Gmez": "Andres Gomez",
   "Andrés Gómez": "Andres Gomez",
-  "Andres Gomez": "Andres Gomez",
+  "Andres Idrobo": "Andres Idrobo",
   "Andrs Idrobo": "Andres Idrobo",
   "Andrés Idrobo": "Andres Idrobo",
-  "Andres Idrobo": "Andres Idrobo",
   "Ana Elena Monroy": "Ana Monroy",
   "Ana Monroy": "Ana Monroy",
   "Alonso Solares Salazar": "Alonso Solares",
@@ -80376,42 +80390,13 @@ export const normalizeTrainer = (name) => {
   "Josu Vera": "Josue Vera",
   "Josue Vera": "Josue Vera",
   "Josué Vera": "Josue Vera",
-  "Julio Narvez": "Julio Narvaez",
-  "Julio Narvaez": "Julio Narvaez",
-  "Julio Narváez": "Julio Narvaez",
-  "Kerlie Carrillo": "Kerly Carrillo",
-  "Kerly Carrillo": "Kerly Carrillo",
-  "Kerly Carrillo Garzon": "Kerly Carrillo",
-  "Lourdes Patio": "Lourdes Patino",
-  "Lourdes Patino": "Lourdes Patino",
-  "Maria de Lourdes Patino Galarraga": "Lourdes Patino",
-  "María de Lourdes Patiño": "Lourdes Patino",
-  "Maurcio Ramirez": "Mauricio Ramirez",
-  "Mauricio Ramrez": "Mauricio Ramirez",
-  "Mauricio Ramirez": "Mauricio Ramirez",
-  "Mauricio Ramírez": "Mauricio Ramirez",
-  "Mildred Munoz Vasquez": "Mildred Munoz",
-  "Mildred Munoz": "Mildred Munoz",
-  "Mildred Muñoz": "Mildred Munoz",
-  "Isaac Betancourth": "Isaac Betancourt",
-  "Isaac Betancourt": "Isaac Betancourt",
-  "Juan Fer Reinoso": "Juan Fernando Reinoso",
-  "Juan Fernando Reinoso": "Juan Fernando Reinoso"
-};
+  };
   return map[clean] || clean;
 };
 
 export const normalizeCoordinator = (name) => {
   if (!name) return '';
-  const clean = name.trim();
-  const map = {
-  "ISAAC BETANCOURTH": "ISAAC BETANCOURT",
-  "JOSU VERA": "JOSUE VERA",
-  "JUAN FER REINOSO": "JUAN FERNANDO REINOSO",
-  "KERLY CARRILLO - JUANFER REINOSO": "KERLY CARRILLO / JUAN FERNANDO REINOSO",
-  "KERLY CARRILLO / JUANFER REINOSO": "KERLY CARRILLO / JUAN FERNANDO REINOSO"
-};
-  return map[clean] || clean;
+  return name.trim();
 };
 
 ```
