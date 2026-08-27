@@ -131,14 +131,26 @@ export default function CentroManagers() {
         firestoreManagers.push({ id: doc.id, ...doc.data() });
       });
 
-      // Si Firestore está vacío, usamos INITIAL_MANAGERS como seed
-      let sourceManagers = firestoreManagers;
-      if (firestoreManagers.length === 0) {
-        sourceManagers = INITIAL_MANAGERS;
-      }
+      // Merge inteligente: Mapear por ID
+      const firestoreMap = new Map();
+      firestoreManagers.forEach(m => firestoreMap.set(String(m.id), m));
+
+      // 1. Tomar todos los INITIAL_MANAGERS y reemplazar con los cambios de Firestore si existen
+      const mergedManagers = INITIAL_MANAGERS.map(initM => {
+        const fromFirestore = firestoreMap.get(String(initM.id));
+        return fromFirestore ? { ...initM, ...fromFirestore } : initM;
+      });
+
+      // 2. Agregar managers nuevos creados en Firestore que no estén en el catálogo inicial
+      const initialIds = new Set(INITIAL_MANAGERS.map(m => String(m.id)));
+      firestoreManagers.forEach(fm => {
+        if (!initialIds.has(String(fm.id))) {
+          mergedManagers.push(fm);
+        }
+      });
 
       // Mapear y normalizar
-      const normalized = sourceManagers.map(m => ({
+      const normalized = mergedManagers.map(m => ({
         ...m,
         entrenador: normalizeTrainer(m.entrenador),
         coordinador: normalizeCoordinator(m.coordinador),
