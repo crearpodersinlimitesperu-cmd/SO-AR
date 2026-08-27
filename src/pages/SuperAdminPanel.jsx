@@ -81,13 +81,13 @@ function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, curre
   const myTasks = tasks.filter(t => {
     const isAssigned = (t.assignedToEmails && t.assignedToEmails.some(e => e.toLowerCase() === person.email?.toLowerCase())) || (t.assignedToEmail && t.assignedToEmail.toLowerCase() === person.email?.toLowerCase());
     const isCollab = t.collaborators && t.collaborators.includes(person.email);
-    
+
     if (isAssigned || isCollab) {
       if (!currentUser?.isSuperAdmin) {
         const myRole = currentUser?.appRole;
         const targetRole = normalizeRole(person.role);
         const isManagerRole = r => r === 'gerente' || r === 'director_maestria' || r === 'direccion';
-        
+
         if (isManagerRole(myRole) && isManagerRole(targetRole) && currentUser.email?.toLowerCase() !== person.email?.toLowerCase()) {
           const iAmCreator = t.createdBy?.toLowerCase() === currentUser?.email?.toLowerCase();
           const iAmCollaborator = t.collaborators?.includes(currentUser?.email);
@@ -96,7 +96,7 @@ function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, curre
       }
       return true;
     }
-    
+
     if (t.assignedToEmail || (t.assignedToEmails && t.assignedToEmails.length > 0)) return false;
     const tNorm = normalizeRole(t.role);
     const matchesRole = tNorm === canonicalRole || t.role === person.role;
@@ -123,27 +123,27 @@ function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, curre
   const whatsappUrl = person.whatsappUrl || getWhatsAppUrl(person.whatsapp || person.phone || person.telefono, person.sede);
 
   return (
-    <div 
-      className="glass-panel hover-glow" 
+    <div
+      className="glass-panel hover-glow"
       onClick={() => onSelectUser && onSelectUser(person)}
-      style={{ 
-        padding: '1rem 1.2rem', borderLeft: `4px solid ${roleColor}`, 
+      style={{
+        padding: '1rem 1.2rem', borderLeft: `4px solid ${roleColor}`,
         cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between'
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-        <div 
-          style={{ 
-            width: '42px', 
-            height: '42px', 
-            borderRadius: '50%', 
-            background: 'rgba(255,255,255,0.08)', 
+        <div
+          style={{
+            width: '42px',
+            height: '42px',
+            borderRadius: '50%',
+            background: 'rgba(255,255,255,0.08)',
             border: '1px solid rgba(255,255,255,0.15)',
-            display: 'flex', 
-            alignItems: 'center', 
+            display: 'flex',
+            alignItems: 'center',
             justifyContent: 'center',
             flexShrink: 0
-          }} 
+          }}
           title={`Sede: ${normalizedSedeName}`}
         >
           <div style={{ transform: 'scale(1.2)' }}>{getFlagForSede(person.sede)}</div>
@@ -155,15 +155,15 @@ function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, curre
               {ROLE_LABELS[canonicalRole] || person.role}
             </span>
             {person.sede && (
-              <span style={{ 
-                fontSize: '0.72rem', 
-                color: 'var(--crear-gold)', 
-                background: 'rgba(255, 183, 3, 0.1)', 
+              <span style={{
+                fontSize: '0.72rem',
+                color: 'var(--crear-gold)',
+                background: 'rgba(255, 183, 3, 0.1)',
                 border: '1px solid rgba(255, 183, 3, 0.25)',
-                padding: '1px 6px', 
-                borderRadius: '4px', 
-                display: 'inline-flex', 
-                alignItems: 'center', 
+                padding: '1px 6px',
+                borderRadius: '4px',
+                display: 'inline-flex',
+                alignItems: 'center',
                 gap: '3px',
                 fontWeight: 700
               }}>
@@ -175,7 +175,7 @@ function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, curre
           {(() => {
             const emailKey = (person.email || '').toLowerCase().trim();
             const allEmails = [...new Set([emailKey, ...(person.emails || []).map(e => e.toLowerCase().trim())])];
-            
+
             let conn = null;
             for (const email of allEmails) {
               if (userConnections[email] && (userConnections[email].hasConnected || userConnections[email].lastLoginFormatted || userConnections[email].lastLoginAt)) {
@@ -217,93 +217,98 @@ function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, curre
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
                 title="Contactar por WhatsApp"
-                className="btn-secondary hover-glow"
+                className="hover-glow"
                 style={{
-                  width: '24px',
-                  height: '24px',
+                  width: '26px',
+                  height: '26px',
                   borderRadius: '50%',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   flexShrink: 0,
-                  fontSize: '12px',
+                  fontSize: '14px',
                   textDecoration: 'none',
-                  border: '1px solid var(--text-muted)'
+                  background: 'var(--crear-blue, #29abe2)',
+                  color: '#ffffff',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
                 }}
               >
                 📱
               </a>
             )}
             {person.email && (
-            <>
-            <a
-              href={`mailto:${person.email}`}
-              onClick={(e) => e.stopPropagation()}
-              title={`Enviar correo a ${person.email}`}
-              className="btn-secondary hover-glow"
-              style={{
-                width: '24px',
-                height: '24px',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-                textDecoration: 'none',
-                color: 'var(--text-main)',
-                border: '1px solid var(--text-muted)'
-              }}
-            >
-              <Mail size={12} color="var(--text-main)" />
-            </a>
-            <button
-              type="button"
-              disabled={openingChat}
-              onClick={async (e) => {
-                e.stopPropagation();
-                setOpeningChat(true);
-                const result = await openOrCreateDirectMessage(person.email);
-                setOpeningChat(false);
-                if (result.success) {
-                  window.open(result.spaceUri, '_blank', 'noopener,noreferrer');
-                } else {
-                  showToast(
-                    `No se pudo abrir Google Chat con ${person.name} (${result.error}). Usa el botón de correo mientras tanto.`,
-                    'error'
-                  );
-                }
-              }}
-              title={`Abrir la conversación de Google Chat con ${person.email}`}
-              className="btn-secondary hover-glow"
-              style={{
-                width: '24px',
-                height: '24px',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-                cursor: openingChat ? 'wait' : 'pointer',
-                opacity: openingChat ? 0.6 : 1,
-                color: 'var(--text-main)',
-                border: '1px solid var(--text-muted)'
-              }}
-            >
-              <MessageCircle size={12} color="var(--text-main)" />
-            </button>
-            </>
+              <>
+                <a
+                  href={`mailto:${person.email}`}
+                  onClick={(e) => e.stopPropagation()}
+                  title={`Enviar correo a ${person.email}`}
+                  className="hover-glow"
+                  style={{
+                    width: '26px',
+                    height: '26px',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    textDecoration: 'none',
+                    background: 'var(--crear-blue, #29abe2)',
+                    color: '#ffffff',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                  }}
+                >
+                  <Mail size={14} color="#ffffff" />
+                </a>
+                <button
+                  type="button"
+                  disabled={openingChat}
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    setOpeningChat(true);
+                    const result = await openOrCreateDirectMessage(person.email);
+                    setOpeningChat(false);
+                    if (result.success) {
+                      window.open(result.spaceUri, '_blank', 'noopener,noreferrer');
+                    } else {
+                      showToast(
+                        `No se pudo abrir Google Chat con ${person.name} (${result.error}). Usa el botón de correo mientras tanto.`,
+                        'error'
+                      );
+                    }
+                  }}
+                  title={`Abrir la conversación de Google Chat con ${person.email}`}
+                  className="hover-glow"
+                  style={{
+                    width: '26px',
+                    height: '26px',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    cursor: openingChat ? 'wait' : 'pointer',
+                    opacity: openingChat ? 0.6 : 1,
+                    background: 'var(--crear-blue, #29abe2)',
+                    color: '#ffffff',
+                    border: 'none',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                  }}
+                >
+                  <MessageCircle size={14} color="#ffffff" />
+                </button>
+              </>
             )}
           </div>
         )}
         <button
           onClick={(e) => { e.stopPropagation(); onAssignTask && onAssignTask(person); }}
           className="btn-primary hover-glow"
-          style={{ 
-            padding: '0.2rem 0.6rem', 
-            fontSize: '0.75rem', 
-            borderRadius: '6px', 
-            background: 'rgba(41, 171, 226, 0.15)', 
-            color: 'var(--crear-cyan)', 
+          style={{
+            padding: '0.2rem 0.6rem',
+            fontSize: '0.75rem',
+            borderRadius: '6px',
+            background: 'rgba(41, 171, 226, 0.15)',
+            color: 'var(--crear-cyan)',
             border: '1px solid rgba(41, 171, 226, 0.3)',
             display: 'flex',
             alignItems: 'center',
@@ -321,7 +326,7 @@ function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, curre
 function SedeBlock({ sede, tasks, navigate, onSelectUser, onAssignTask, currentUser, userConnections = {}, realUsersData = [] }) {
   const [expanded, setExpanded] = useState(false);
   const members = (realUsersData || []).filter(u => normalizeSede(u.sede) === sede);
-  
+
   let totalSedeTasks = 0;
   let totalSedeCompleted = 0;
 
@@ -331,13 +336,13 @@ function SedeBlock({ sede, tasks, navigate, onSelectUser, onAssignTask, currentU
     const myTasks = tasks.filter(t => {
       const isAssigned = (t.assignedToEmails && t.assignedToEmails.some(e => e.toLowerCase() === person.email?.toLowerCase())) || (t.assignedToEmail && t.assignedToEmail.toLowerCase() === person.email?.toLowerCase());
       const isCollab = t.collaborators && t.collaborators.includes(person.email);
-      
+
       if (isAssigned || isCollab) {
         if (!currentUser?.isSuperAdmin) {
           const myRole = currentUser?.appRole;
           const targetRole = normalizeRole(person.role);
           const isManagerRole = r => r === 'gerente' || r === 'director_maestria' || r === 'direccion';
-          
+
           if (isManagerRole(myRole) && isManagerRole(targetRole) && currentUser.email?.toLowerCase() !== person.email?.toLowerCase()) {
             const iAmCreator = t.createdBy?.toLowerCase() === currentUser?.email?.toLowerCase();
             const iAmCollaborator = t.collaborators?.includes(currentUser?.email);
@@ -346,7 +351,7 @@ function SedeBlock({ sede, tasks, navigate, onSelectUser, onAssignTask, currentU
         }
         return true;
       }
-      
+
       if (t.assignedToEmail || (t.assignedToEmails && t.assignedToEmails.length > 0)) return false;
       const tNorm = normalizeRole(t.role);
       const matchesRole = tNorm === canonicalRole || t.role === person.role;
@@ -440,14 +445,14 @@ function AuditLogView() {
           <p style={{ color: 'var(--text-muted)', margin: '0.3rem 0 0 0', fontSize: '0.9rem' }}>Registro en tiempo real de inicios de sesión, cambios de rol y actividad operativa.</p>
         </div>
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-          <select 
-            value={filterAction} 
+          <select
+            value={filterAction}
             onChange={(e) => setFilterAction(e.target.value)}
-            style={{ 
-              background: 'rgba(255,255,255,0.08)', 
-              color: 'white', 
-              border: '1px solid rgba(255,255,255,0.2)', 
-              padding: '0.4rem 0.8rem', 
+            style={{
+              background: 'rgba(255,255,255,0.08)',
+              color: 'white',
+              border: '1px solid rgba(255,255,255,0.2)',
+              padding: '0.4rem 0.8rem',
               borderRadius: '6px',
               fontSize: '0.85rem'
             }}
@@ -458,15 +463,15 @@ function AuditLogView() {
             <option value="SIMULACION_ADMIN" style={{ color: 'black' }}>🎭 SIMULACION_ADMIN (Super Admin)</option>
             <option value="LOGOUT" style={{ color: 'black' }}>🔴 LOGOUT</option>
           </select>
-          <button 
-            onClick={fetchLogs} 
+          <button
+            onClick={fetchLogs}
             disabled={loading}
-            className="btn-secondary" 
+            className="btn-secondary"
             style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', opacity: loading ? 0.5 : 1, cursor: loading ? 'not-allowed' : 'pointer' }}
           >
             {loading ? '⏳ Cargando...' : '🔄 Actualizar'}
           </button>
-          <button 
+          <button
             onClick={async () => {
               if (loading) return;
               if (window.confirm('¿Deseas limpiar el caché local de registros de prueba?')) {
@@ -474,9 +479,9 @@ function AuditLogView() {
                 localStorage.removeItem('cpsl_user_connections');
                 await fetchLogs();
               }
-            }} 
+            }}
             disabled={loading}
-            className="btn-secondary" 
+            className="btn-secondary"
             style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', color: 'var(--text-muted)', opacity: loading ? 0.5 : 1, cursor: loading ? 'not-allowed' : 'pointer' }}
             title="Limpia registros residuales de simulación local"
           >
@@ -484,7 +489,7 @@ function AuditLogView() {
           </button>
         </div>
       </div>
-      
+
       {loading ? (
         <p style={{ color: 'var(--text-muted)' }}>Cargando registros...</p>
       ) : (
@@ -510,7 +515,7 @@ function AuditLogView() {
                   } else if (log.timestamp) {
                     dateStr = new Date(log.timestamp).toLocaleString('es-ES');
                   }
-                } catch(e) {}
+                } catch (e) { }
 
                 const actionColor = log.action === 'LOGIN' ? '#22c55e' : (log.action === 'LOGOUT' ? '#ef4444' : (log.action === 'CAMBIO_ROL' ? 'var(--crear-cyan)' : 'var(--crear-gold)'));
                 return (
@@ -518,14 +523,14 @@ function AuditLogView() {
                     <td style={{ padding: '0.8rem', whiteSpace: 'nowrap' }}>{dateStr}</td>
                     <td style={{ padding: '0.8rem', fontWeight: 'bold' }}>
                       {log.name || 'Usuario'}
-                      <br/>
+                      <br />
                       <span style={{ fontSize: '0.75rem', fontWeight: 'normal', color: 'var(--text-muted)' }}>{log.email}</span>
                     </td>
                     <td style={{ padding: '0.8rem' }}>
-                      <span style={{ 
-                        fontSize: '0.75rem', 
-                        padding: '2px 6px', 
-                        borderRadius: '4px', 
+                      <span style={{
+                        fontSize: '0.75rem',
+                        padding: '2px 6px',
+                        borderRadius: '4px',
                         background: 'rgba(255,255,255,0.06)',
                         color: ROLE_COLORS[log.role] || 'var(--text-heading)'
                       }}>
@@ -538,7 +543,7 @@ function AuditLogView() {
                     </td>
                     <td style={{ padding: '0.8rem' }}>
                       <strong>{log.sede || 'Global'}</strong>
-                      <br/>
+                      <br />
                       <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{log.location || 'Acceso Seguro'} ({log.ip || '127.0.0.1'})</span>
                     </td>
                     <td style={{ padding: '0.8rem', fontSize: '0.75rem', color: 'var(--text-muted)', maxWidth: '160px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={log.userAgent}>
@@ -595,11 +600,11 @@ function GlobalView({ tasks, navigate, realUsersData = [] }) {
           { icon: <CheckCircle2 size={22} color="#22c55e" />, label: 'Tareas Completadas', value: completedTasks, sub: `de ${totalTasks} totales`, color: '#22c55e', path: '/reportes' },
           { icon: <Clock size={22} color="var(--crear-gold)" />, label: 'Avance Global', value: `${globalPct}%`, sub: 'Causa OS del ciclo', color: 'var(--crear-gold)', path: '/reportes' },
           { icon: <AlertTriangle size={22} color="#ef4444" />, label: 'Alertas Críticas', value: criticalTasks, sub: 'requieren acción HOY', color: '#ef4444', path: '/reportes' },
-          { icon: <Building2 size={22} color="#29abe2" />, label: 'Sedes Operativas', value: OPERATIONAL_SEDES.length, sub: 'sedes activas', color: '#29abe2', onClick: () => window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'}) },
+          { icon: <Building2 size={22} color="#29abe2" />, label: 'Sedes Operativas', value: OPERATIONAL_SEDES.length, sub: 'sedes activas', color: '#29abe2', onClick: () => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }) },
         ].map((kpi, i) => (
-          <div 
-            key={i} 
-            className="glass-panel hover-glow" 
+          <div
+            key={i}
+            className="glass-panel hover-glow"
             style={{ padding: '1.2rem', textAlign: 'center', border: `1px solid ${kpi.color}33`, cursor: 'pointer', transition: 'all 0.3s' }}
             onClick={() => kpi.path ? navigate(kpi.path) : kpi.onClick?.()}
           >
@@ -623,8 +628,8 @@ function GlobalView({ tasks, navigate, realUsersData = [] }) {
             const rolePct = roleTasks.length > 0 ? Math.round((roleCompleted / roleTasks.length) * 100) : 0;
             const roleColor = ROLE_COLORS[role.id] || '#6b7280';
             return (
-              <div 
-                key={role.id} 
+              <div
+                key={role.id}
                 onClick={() => navigate(`/checklist/${role.id}`)}
                 className="hover-glow"
                 style={{ cursor: 'pointer', padding: '0.5rem', borderRadius: '8px', transition: 'background 0.3s' }}
@@ -646,7 +651,7 @@ function GlobalView({ tasks, navigate, realUsersData = [] }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
           {sedesRanking.map(({ sede, sedePct, sedeCompleted, total }, idx) => (
             <div key={sede} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <span style={{ color: idx === 0 ? '#f59e0b' : idx === 1 ? '#9ca3af' : idx === 2 ? '#cd7f32' : 'var(--text-muted)', fontWeight: 'bold', minWidth: '24px', fontSize: '0.85rem' }}>#{idx+1}</span>
+              <span style={{ color: idx === 0 ? '#f59e0b' : idx === 1 ? '#9ca3af' : idx === 2 ? '#cd7f32' : 'var(--text-muted)', fontWeight: 'bold', minWidth: '24px', fontSize: '0.85rem' }}>#{idx + 1}</span>
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '0.3rem' }}>
                   <span style={{ color: 'var(--text-heading)', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
@@ -704,11 +709,11 @@ function RoleView({ tasks, navigate, onSelectUser, onAssignTask, userConnections
             </h3>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '0.8rem' }}>
               {members.map(person => (
-                <PersonCard 
-                  key={person.id || person.email} 
-                  person={person} 
-                  tasks={tasks} 
-                  navigate={navigate} 
+                <PersonCard
+                  key={person.id || person.email}
+                  person={person}
+                  tasks={tasks}
+                  navigate={navigate}
                   onSelectUser={onSelectUser}
                   onAssignTask={onAssignTask}
                   currentUser={currentUser}
@@ -830,10 +835,10 @@ export default function SuperAdminPanel() {
         </div>
       </div>
 
-      <TaskAssignmentModal 
-        isOpen={!!assignUser} 
-        onClose={() => setAssignUser(null)} 
-        prefilledUser={assignUser} 
+      <TaskAssignmentModal
+        isOpen={!!assignUser}
+        onClose={() => setAssignUser(null)}
+        prefilledUser={assignUser}
       />
 
       <div className="glass-panel" style={{ padding: '0.8rem 1.2rem', marginBottom: '1.5rem', border: '1px solid var(--border-subtle)' }}>
@@ -847,7 +852,7 @@ export default function SuperAdminPanel() {
           border: '1px solid var(--border-subtle)'
         }}>
           <Search size={20} color={searchTerm ? "var(--crear-gold)" : "var(--text-muted)"} />
-          <input 
+          <input
             type="text"
             placeholder="🔍 Buscar persona por nombre, email, rol o sede (ej. Leyla, Darkwin, Quito, Quantum Team, Gerente)..."
             value={searchTerm}
@@ -858,7 +863,7 @@ export default function SuperAdminPanel() {
             }}
           />
           {searchTerm && (
-            <button 
+            <button
               onClick={() => setSearchTerm('')}
               style={{
                 background: 'var(--border-subtle)', border: 'none', color: 'var(--text-muted)',
@@ -879,7 +884,7 @@ export default function SuperAdminPanel() {
             <h3 style={{ margin: 0, color: 'var(--crear-gold)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.1rem' }}>
               <Users size={20} /> Resultados de Búsqueda ({searchFilteredUsers.length})
             </h3>
-            <button 
+            <button
               onClick={() => setSearchTerm('')}
               style={{ background: 'transparent', border: 'none', color: 'var(--crear-cyan)', cursor: 'pointer', fontSize: '0.85rem' }}
             >
@@ -895,11 +900,11 @@ export default function SuperAdminPanel() {
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '0.8rem' }}>
               {searchFilteredUsers.map(person => (
-                <PersonCard 
-                  key={person.id || person.email} 
-                  person={person} 
-                  tasks={tasks} 
-                  navigate={navigate} 
+                <PersonCard
+                  key={person.id || person.email}
+                  person={person}
+                  tasks={tasks}
+                  navigate={navigate}
                   onSelectUser={handleOpenUserModal}
                   onAssignTask={setAssignUser}
                   currentUser={currentUser}
@@ -932,11 +937,11 @@ export default function SuperAdminPanel() {
                 if (currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'director_maestria') return true;
                 return normalizeSede(currentUser?.sede) === sede;
               }).map(sede => (
-                <SedeBlock 
-                  key={sede} 
-                  sede={sede} 
-                  tasks={tasks} 
-                  navigate={navigate} 
+                <SedeBlock
+                  key={sede}
+                  sede={sede}
+                  tasks={tasks}
+                  navigate={navigate}
                   onSelectUser={handleOpenUserModal}
                   onAssignTask={setAssignUser}
                   currentUser={currentUser}
@@ -947,9 +952,9 @@ export default function SuperAdminPanel() {
             </div>
           )}
           {activeView === 'rol' && (
-            <RoleView 
-              tasks={tasks} 
-              navigate={navigate} 
+            <RoleView
+              tasks={tasks}
+              navigate={navigate}
               onSelectUser={handleOpenUserModal}
               onAssignTask={setAssignUser}
               currentUser={currentUser}
@@ -965,7 +970,7 @@ export default function SuperAdminPanel() {
 
       {/* Modal de Perfil de Usuario Completo */}
       {showUserModal && selectedUser && (
-        <UserProfileModal 
+        <UserProfileModal
           isOpen={showUserModal}
           onClose={() => setShowUserModal(false)}
           user={selectedUser}
