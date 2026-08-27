@@ -1197,9 +1197,14 @@ export default function CentroManagers() {
               </div>
 
               <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                <button onClick={handleResetMasterData} title="Restablecer Datos Maestros" style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', padding: '0.55rem 0.8rem', borderRadius: '6px', border: `1px solid ${borderLight}`, background: 'transparent', color: textMuted, fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}>
-                  <RotateCcw size={14} /> Restaurar
-                </button>
+                <button onClick={() => {
+                    setFilterSede('');
+                    setFilterEntrenador('');
+                    setStatusFilter('Todos');
+                    setSearch('');
+                  }} title="Limpiar Filtros de Búsqueda" style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', padding: '0.55rem 0.8rem', borderRadius: '6px', border: `1px solid ${borderLight}`, background: 'transparent', color: textMuted, fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}>
+                    <RotateCcw size={14} /> Restaurar Filtros
+                  </button>
 
                 {userCanAdd && (
                   <button onClick={() => setShowModal(true)} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.6rem 1.2rem', borderRadius: '6px', border: 'none', background: '#3b82f6', color: '#fff', fontWeight: 600, cursor: 'pointer', boxShadow: '0 2px 4px rgba(59,130,246,0.3)' }}>
