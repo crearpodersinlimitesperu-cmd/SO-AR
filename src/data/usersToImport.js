@@ -535,7 +535,7 @@ export const USERS_TO_IMPORT = [
       "Mila Campuzano",
       "Mila",
       "Emily Campuzano",
-      "Emily Gabriela Campuzano Rodríguez"
+      "Emily Gabriela Campuzano RodrÃ­guez"
     ],
     "role": "gerente",
     "roles": [
@@ -659,7 +659,7 @@ export const USERS_TO_IMPORT = [
   },
   {
     "id": "staff_santiagoproao",
-    "name": "Santiago Proaño",
+    "name": "Santiago ProaÃ±o",
     "role": "tecnico_sst",
     "roles": [
       "tecnico_sst"
@@ -686,7 +686,7 @@ export const USERS_TO_IMPORT = [
   },
   {
     "id": "entrenador_alejandrodaz",
-    "name": "Alejandro Díaz",
+    "name": "Alejandro DÃ­az",
     "role": "entrenador",
     "roles": [
       "entrenador"
@@ -725,7 +725,7 @@ export const USERS_TO_IMPORT = [
   },
   {
     "id": "entrenador_andrsidrobo",
-    "name": "Andrés Idrobo",
+    "name": "AndrÃ©s Idrobo",
     "role": "entrenador",
     "roles": [
       "entrenador"
@@ -738,7 +738,7 @@ export const USERS_TO_IMPORT = [
   },
   {
     "id": "entrenador_ciriloagustnmartnez",
-    "name": "Cirilo Agustín Martínez",
+    "name": "Cirilo AgustÃ­n MartÃ­nez",
     "role": "entrenador",
     "roles": [
       "entrenador"
@@ -777,7 +777,7 @@ export const USERS_TO_IMPORT = [
   },
   {
     "id": "entrenador_jessadrinacosta",
-    "name": "Jesús Adrián Acosta",
+    "name": "JesÃºs AdriÃ¡n Acosta",
     "role": "entrenador",
     "roles": [
       "entrenador"
@@ -803,7 +803,7 @@ export const USERS_TO_IMPORT = [
   },
   {
     "id": "entrenador_juliocsarnarvez",
-    "name": "Julio César Narváez",
+    "name": "Julio CÃ©sar NarvÃ¡ez",
     "role": "entrenador",
     "roles": [
       "entrenador"
@@ -816,7 +816,7 @@ export const USERS_TO_IMPORT = [
   },
   {
     "id": "entrenador_maradelourdespatiopatiogalarraga",
-    "name": "María De Lourdes Patiño Patiño Galarraga",
+    "name": "MarÃ­a De Lourdes PatiÃ±o PatiÃ±o Galarraga",
     "role": "entrenador",
     "roles": [
       "entrenador"
@@ -829,7 +829,7 @@ export const USERS_TO_IMPORT = [
   },
   {
     "id": "entrenador_mauricioprez",
-    "name": "Mauricio Pérez",
+    "name": "Mauricio PÃ©rez",
     "role": "entrenador",
     "roles": [
       "entrenador"
@@ -856,7 +856,7 @@ export const USERS_TO_IMPORT = [
   },
   {
     "id": "entrenador_mildredmuozvasquez",
-    "name": "Mildred Muñoz Vasquez",
+    "name": "Mildred MuÃ±oz Vasquez",
     "role": "entrenador",
     "roles": [
       "entrenador"
@@ -895,7 +895,7 @@ export const USERS_TO_IMPORT = [
   },
   {
     "id": "qt_danielvinicioescobarbeltrn",
-    "name": "Daniel Vinicio Escobar Beltrán",
+    "name": "Daniel Vinicio Escobar BeltrÃ¡n",
     "role": "qt",
     "roles": [
       "qt"
@@ -908,7 +908,7 @@ export const USERS_TO_IMPORT = [
   },
   {
     "id": "qt_martalucalondooareiza",
-    "name": "Marta Lucía Londoño Areiza",
+    "name": "Marta LucÃ­a LondoÃ±o Areiza",
     "role": "qt",
     "roles": [
       "qt"
@@ -947,7 +947,7 @@ export const USERS_TO_IMPORT = [
   },
   {
     "id": "qt_santiagoalfonsoalarcnsurez",
-    "name": "Santiago Alfonso Alarcón Suárez",
+    "name": "Santiago Alfonso AlarcÃ³n SuÃ¡rez",
     "role": "qt",
     "roles": [
       "qt"
@@ -960,7 +960,7 @@ export const USERS_TO_IMPORT = [
   },
   {
     "id": "qt_maramagalymendozazambrano",
-    "name": "María Magaly Mendoza Zambrano",
+    "name": "MarÃ­a Magaly Mendoza Zambrano",
     "role": "qt",
     "roles": [
       "qt"
@@ -973,7 +973,7 @@ export const USERS_TO_IMPORT = [
   },
   {
     "id": "qt_edisonricardogavilnezgallardo",
-    "name": "Edison Ricardo Gavilánez Gallardo",
+    "name": "Edison Ricardo GavilÃ¡nez Gallardo",
     "role": "qt",
     "roles": [
       "qt"
@@ -986,7 +986,7 @@ export const USERS_TO_IMPORT = [
   },
   {
     "id": "qt_williamsjamessncheztrujillo",
-    "name": "Williams James Sánchez Trujillo",
+    "name": "Williams James SÃ¡nchez Trujillo",
     "role": "qt",
     "roles": [
       "qt"
@@ -999,7 +999,7 @@ export const USERS_TO_IMPORT = [
   },
   {
     "id": "qt_geovannakatherineamoreslpez",
-    "name": "Geovanna Katherine Amores López",
+    "name": "Geovanna Katherine Amores LÃ³pez",
     "role": "qt",
     "roles": [
       "qt"
@@ -1025,7 +1025,7 @@ export const USERS_TO_IMPORT = [
   },
   {
     "id": "qt_alejandraaracelymuozcontreras",
-    "name": "Alejandra Aracely Muñoz Contreras",
+    "name": "Alejandra Aracely MuÃ±oz Contreras",
     "role": "qt",
     "roles": [
       "qt"
@@ -1051,7 +1051,7 @@ export const USERS_TO_IMPORT = [
   },
   {
     "id": "qt_sebastinalexanderulloaromero",
-    "name": "Sebastián Alexander Ulloa Romero",
+    "name": "SebastiÃ¡n Alexander Ulloa Romero",
     "role": "qt",
     "roles": [
       "qt"
@@ -1077,7 +1077,7 @@ export const USERS_TO_IMPORT = [
   },
   {
     "id": "qt_anahialejandrareyespazmio",
-    "name": "Anahi Alejandra Reyes Pazmiño",
+    "name": "Anahi Alejandra Reyes PazmiÃ±o",
     "role": "qt",
     "roles": [
       "qt"
@@ -1116,7 +1116,7 @@ export const USERS_TO_IMPORT = [
   },
   {
     "id": "qt_lizardozratepea",
-    "name": "Lizardo Zárate Peña",
+    "name": "Lizardo ZÃ¡rate PeÃ±a",
     "role": "qt",
     "roles": [
       "qt"
@@ -1155,7 +1155,7 @@ export const USERS_TO_IMPORT = [
   },
   {
     "id": "qt_gabrielalucaaltunaalvarez",
-    "name": "Gabriela Lucía Altuna Alvarez",
+    "name": "Gabriela LucÃ­a Altuna Alvarez",
     "role": "qt",
     "roles": [
       "qt"
@@ -1181,7 +1181,7 @@ export const USERS_TO_IMPORT = [
   },
   {
     "id": "qt_marjorieximenamartnezguerrero",
-    "name": "Marjorie Ximena Martínez Guerrero",
+    "name": "Marjorie Ximena MartÃ­nez Guerrero",
     "role": "qt",
     "roles": [
       "qt"
@@ -1207,7 +1207,7 @@ export const USERS_TO_IMPORT = [
   },
   {
     "id": "qt_jossethgabrielaespnquezada",
-    "name": "Josseth Gabriela Espín Quezada",
+    "name": "Josseth Gabriela EspÃ­n Quezada",
     "role": "qt",
     "roles": [
       "qt"
@@ -1220,7 +1220,7 @@ export const USERS_TO_IMPORT = [
   },
   {
     "id": "qt_andreadelrocomedinacoronel",
-    "name": "Andrea del Rocío Medina Coronel",
+    "name": "Andrea del RocÃ­o Medina Coronel",
     "role": "qt",
     "roles": [
       "qt"
@@ -1233,7 +1233,7 @@ export const USERS_TO_IMPORT = [
   },
   {
     "id": "qt_gabrielavernicaromnbarragn",
-    "name": "Gabriela Verónica Román Barragán",
+    "name": "Gabriela VerÃ³nica RomÃ¡n BarragÃ¡n",
     "role": "qt",
     "roles": [
       "qt"
@@ -1246,7 +1246,7 @@ export const USERS_TO_IMPORT = [
   },
   {
     "id": "qt_belnmadelinegarcavalarezo",
-    "name": "Belén Madeline García Valarezo",
+    "name": "BelÃ©n Madeline GarcÃ­a Valarezo",
     "role": "qt",
     "roles": [
       "qt"
@@ -1272,7 +1272,7 @@ export const USERS_TO_IMPORT = [
   },
   {
     "id": "qt_jorgewashingtonramrezmorejn",
-    "name": "Jorge Washington Ramírez Morejón",
+    "name": "Jorge Washington RamÃ­rez MorejÃ³n",
     "role": "qt",
     "roles": [
       "qt"
@@ -1311,7 +1311,7 @@ export const USERS_TO_IMPORT = [
   },
   {
     "id": "qt_luisjavierprunavsquez",
-    "name": "Luis Javier Pruna Vásquez",
+    "name": "Luis Javier Pruna VÃ¡squez",
     "role": "qt",
     "roles": [
       "qt"
@@ -1350,7 +1350,7 @@ export const USERS_TO_IMPORT = [
   },
   {
     "id": "qt_sofacarolinavascotenesaca",
-    "name": "Sofía Carolina Vasco Tenesaca",
+    "name": "SofÃ­a Carolina Vasco Tenesaca",
     "role": "qt",
     "roles": [
       "qt"
@@ -1373,18 +1373,5 @@ export const USERS_TO_IMPORT = [
       "asistente.contable@crearpsl.net"
     ],
     "email": "asistente.contable@crearpsl.net"
-  },
-  {
-    "id": "staff_katherineaguirre",
-    "name": "Marce Aguirre",
-    "role": "coord_c1",
-    "roles": [
-      "coord_c1"
-    ],
-    "sede": "Quito",
-    "emails": [
-      "katherine.aguirre@crearpsl.net"
-    ],
-    "email": "katherine.aguirre@crearpsl.net"
   }
 ];

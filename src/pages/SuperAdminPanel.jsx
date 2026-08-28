@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useCycles } from '../context/CyclesContext';
 import { useUI } from '../context/UIContext';
 import { doc, setDoc, collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
-import { db } from '../services/firebase';
+import { db, auth } from '../services/firebase';
 import { normalizeRole, normalizeSede, OPERATIONAL_SEDES } from '../data/usersData';
 import { getAllCompanyUsers } from '../services/userService';
 import { openOrCreateDirectMessage } from '../services/googleChatService';
@@ -698,7 +698,7 @@ function RoleView({ tasks, navigate, onSelectUser, onAssignTask, userConnections
   ];
 
   const listedRoleIds = new Set(roles.map(r => r.id));
-  const unlistedRoles = [...new Set((realUsersData || []).map(u => u.role).filter(r => r && !listedRoleIds.has(r)))];
+  const unlistedRoles = [...new Set((realUsersData || []).map(u => u.role).filter(r => r && !listedRoleIds.has(r) && !listedRoleIds.has(normalizeRole(r))))];
   const allDisplayRoles = [
     ...roles,
     ...unlistedRoles.map(r => ({ id: r, label: ROLE_LABELS[r] || r }))
@@ -752,13 +752,30 @@ export default function SuperAdminPanel() {
   const [isSyncing, setIsSyncing] = useState(false);
   const { showToast } = useUI();
 
+  // NOTA (28/08/2026): este botón antes llamaba a 'http://localhost:3001/...',
+  // una dirección que solo existe en una máquina de desarrollo local — por eso
+  // siempre fallaba con "Failed to fetch" en producción. Ahora dispara el
+  // workflow real de GitHub Actions (.github/workflows/nodus-daily.yml, el
+  // mismo que corre automático a mediodía) bajo demanda, a través de un
+  // endpoint nuevo en el mismo Worker del Copiloto SO-AR
+  // (POST /trigger-nodus-scraper). No ejecuta el scraper aquí mismo: solo lo
+  // dispara y GitHub Actions hace el trabajo real en 2-5 minutos.
   const handleManualSync = async () => {
     try {
       setIsSyncing(true);
-      showToast("Iniciando extracción de Nodus en segundo plano...", "info");
-      const res = await fetch('http://localhost:3001/api/run-nodus-scraper', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
-      if (!res.ok) throw new Error("Error en la conexión con el servidor local");
-      showToast("¡Agente Nodus ejecutándose en segundo plano!", "success");
+      showToast("Disparando extracción de Nodus vía GitHub Actions...", "info");
+      const workerUrl = import.meta.env.VITE_COPILOTO_WORKER_URL || 'https://so-ar-copiloto.crearpsl-cpsl.workers.dev';
+      const firebaseUser = auth.currentUser;
+      if (!firebaseUser) throw new Error('No se detectó sesión activa. Cierra sesión e inicia nuevamente.');
+      const idToken = await firebaseUser.getIdToken(true);
+      const res = await fetch(`${workerUrl}/trigger-nodus-scraper`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
+        body: JSON.stringify({})
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.message || 'No se pudo disparar la extracción.');
+      showToast("¡Extracción de Nodus disparada! Corre en GitHub Actions (2-5 min) y actualiza el snapshot al terminar.", "success");
     } catch (e) {
       console.error(e);
       showToast("Error al iniciar Nodus: " + e.message, "error");
@@ -837,7 +854,16 @@ export default function SuperAdminPanel() {
     transition: 'all 0.2s',
   });
 
-  const searchFilteredUsers = searchTerm.trim() ? (realUsersData || []).filter(u => {
+  // CONTEXTO (28/08/2026): auditoría de roles encontró que este buscador ignoraba
+  // por completo la restricción "solo su sede" que sí aplica correctamente en la
+  // pestaña "Por Sede" (ver el filtro de ALL_SEDES más abajo) — un Gerente podía
+  // escribir el nombre de otra sede y ver personal que no le corresponde. Se usa
+  // la misma condición de rol global que ya protege esa pestaña.
+  const isGlobalViewRole = currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'director_maestria';
+  const searchableUsers = isGlobalViewRole
+    ? (realUsersData || [])
+    : (realUsersData || []).filter(u => normalizeSede(u.sede) === normalizeSede(currentUser?.sede));
+  const searchFilteredUsers = searchTerm.trim() ? searchableUsers.filter(u => {
     const term = searchTerm.toLowerCase().trim();
     const nameMatch = u.name?.toLowerCase().includes(term);
     const emailMatch = u.email?.toLowerCase().includes(term);
