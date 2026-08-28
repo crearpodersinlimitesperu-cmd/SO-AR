@@ -1,5 +1,6 @@
 ﻿import React, { useState, useEffect, useRef } from 'react';
 import { Search, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { getAllCompanyUsers } from '../services/userService';
 import { getFlagForSede } from '../utils/flags';
 
@@ -9,6 +10,7 @@ export default function GlobalSearch() {
   const [results, setResults] = useState([]);
   const [users, setUsers] = useState([]);
   const wrapperRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function load() {
@@ -99,9 +101,14 @@ export default function GlobalSearch() {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.5rem',
-                  transition: 'background 0.2s'
+                  transition: 'background 0.2s', cursor: 'pointer'
                 }}
                 className="hover-glow"
+                onClick={() => {
+                  setIsOpen(false);
+                  setQuery('');
+                  navigate(`/superadmin?search=` + encodeURIComponent(r.name || r.nombre || r.displayName || r.email || ''));
+                }}
               >
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: '0.9rem', fontWeight: 'bold', color: 'var(--text-heading)', display: 'flex', alignItems: 'center', gap: '5px' }}>
@@ -137,3 +144,6 @@ export default function GlobalSearch() {
     </div>
   );
 }
+
+
+
