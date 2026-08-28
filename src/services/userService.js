@@ -1,4 +1,4 @@
-﻿// Servicio de Directorio y GestiÃ³n de Usuarios para ProducciÃ³n
+// Servicio de Directorio y GestiÃ³n de Usuarios para ProducciÃ³n
 import { db } from './firebase';
 import { doc, getDoc, setDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { usersData, normalizeRole } from '../data/usersData';
@@ -111,7 +111,24 @@ export async function getAllCompanyUsers() {
   // (sin pisar uno que ya existiera), para que cualquier componente que solo
   // lea person.email â€” como los botones de contacto del Panel Super Admin â€”
   // lo encuentre sin importar en quÃ© campo llegÃ³ originalmente el dato.
+  const fixEncoding = (str) => {
+    if (!str || typeof str !== 'string' || !str.includes('Ã')) return str;
+    const map = {
+      'Ã¡': 'á', 'Ã©': 'é', 'Ã\xad': 'í', 'Ã³': 'ó', 'Ãº': 'ú', 'Ã±': 'ñ', 'Ã¼': 'ü',
+      'Ã ': 'Á', 'Ã‰': 'É', 'Ã\x8d': 'Í', 'Ã“': 'Ó', 'Ãš': 'Ú', 'Ã‘': 'Ñ', 'Ãœ': 'Ü'
+    };
+    let fixed = str;
+    for (let key in map) {
+      fixed = fixed.split(key).join(map[key]);
+    }
+    return fixed;
+  };
+
   const withCanonicalEmail = (raw) => {
+    if (raw.name) raw.name = fixEncoding(raw.name);
+    if (raw.nombre) raw.nombre = fixEncoding(raw.nombre);
+    if (raw.displayName) raw.displayName = fixEncoding(raw.displayName);
+
     if (!raw.name) {
       raw.name = raw.name || raw.nombre || raw.displayName || 'Sin Nombre';
     }
