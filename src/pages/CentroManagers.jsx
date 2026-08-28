@@ -1,4 +1,4 @@
-import { getWhatsAppUrl } from '../utils/phoneUtils';
+﻿import { getWhatsAppUrl } from '../utils/phoneUtils';
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -223,6 +223,10 @@ export default function CentroManagers() {
     if (email === 'andres.gomez@crearpsl.net') return 'Andres Gomez';
     if (email === 'leandro.brunis@crearpsl.net') return 'Leandro Brunis';
     if (email === 'carlos.brunis@crearpsl.net' || email === 'brunische66@gmail.com') return 'Carlos Brunis';
+    if (email === 'marylourdespat@gmail.com') return 'Lourdes Patino';
+    if (email === 'linid.valencia@crearpsl.net') return 'Linid Valencia';
+    if (email === 'marylourdespat@gmail.com') return 'Lourdes Patino';
+    if (email === 'marylourdespat@gmail.com') return 'Lourdes Patino';
 
     const userName = currentUser.name || currentUser.displayName || '';
     const cleanUser = userName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
@@ -2853,3 +2857,5 @@ export default function CentroManagers() {
     </div>
   );
 }
+
+
