@@ -1,6 +1,7 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Search, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import UserProfileModal from './UserProfileModal';
 import { getAllCompanyUsers } from '../services/userService';
 import { getFlagForSede } from '../utils/flags';
 
@@ -9,6 +10,7 @@ export default function GlobalSearch() {
   const [isOpen, setIsOpen] = useState(false);
   const [results, setResults] = useState([]);
   const [users, setUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
   const wrapperRef = useRef(null);
   const navigate = useNavigate();
 
@@ -49,6 +51,7 @@ export default function GlobalSearch() {
 
   return (
     <div ref={wrapperRef} style={{ position: 'relative', width: '300px', zIndex: 100 }}>
+      {selectedUser && <UserProfileModal isOpen={!!selectedUser} onClose={() => setSelectedUser(null)} user={selectedUser} />} style={{ position: 'relative', width: '300px', zIndex: 100 }}>
       <div style={{ position: 'relative' }}>
         <Search size={16} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
         <input 
@@ -107,7 +110,7 @@ export default function GlobalSearch() {
                 onClick={() => {
                   setIsOpen(false);
                   setQuery('');
-                  navigate(`/superadmin?search=` + encodeURIComponent(r.name || r.nombre || r.displayName || r.email || ''));
+                  setSelectedUser(r);
                 }}
               >
                 <div style={{ flex: 1 }}>
@@ -144,6 +147,8 @@ export default function GlobalSearch() {
     </div>
   );
 }
+
+
 
 
 
