@@ -64,8 +64,17 @@ async function authenticate() {
   if (!adminEmail || !adminPass) {
     throw new Error('Faltan credenciales ADMIN_EMAIL/ADMIN_PASS (o GMAIL_USER/GMAIL_PASS) — no se puede leer Firestore.');
   }
-  await signInWithEmailAndPassword(auth, adminEmail, adminPass);
-  console.log(`🔐 Autenticado como: ${adminEmail}`);
+  try {
+    await signInWithEmailAndPassword(auth, adminEmail, adminPass);
+    console.log(`🔐 Autenticado como: ${adminEmail}`);
+  } catch (e) {
+    // Re-lanzamos con más contexto (código de error de Firebase Auth incluido)
+    // para que, si esto falla en CI, el mensaje que llega al Issue de GitHub
+    // (el único canal de diagnóstico legible desde este entorno — los logs
+    // crudos de Actions están bloqueados) diga POR QUÉ falló el login, no solo
+    // que falló.
+    throw new Error(`Fallo de autenticación Firebase (código: ${e.code || 'desconocido'}): ${e.message}`);
+  }
 }
 
 async function fetchCollection(name, opts = {}) {
@@ -352,7 +361,22 @@ async function main() {
   }
 }
 
-main().catch(err => {
+main().catch(async (err) => {
   console.error('❌ ERROR FATAL en platform_audit.mjs:', err);
+  // Los logs crudos de este workflow no son legibles desde el entorno donde
+  // se diagnostica esto (bloqueados por política de red), así que además de
+  // loguear en consola, intentamos dejar el error visible en el Issue fijo de
+  // auditoría — es el único canal que sí se puede leer después. Si esto
+  // también falla (ej. sin GITHUB_TOKEN), no pasa nada más grave: seguimos al
+  // process.exit(1) igual.
+  try {
+    const errorMd = `# 🔍 Auditoría de Plataforma y Nodus — Estado Actual\n\n` +
+      `**Última corrida:** ${new Date().toISOString()}\n` +
+      `**Estado general:** 🔴 EL SCRIPT DE AUDITORÍA FALLÓ ANTES DE TERMINAR\n\n` +
+      `\`\`\`\n${err?.stack || err?.message || String(err)}\n\`\`\`\n`;
+    await upsertAuditIssue(errorMd, true);
+  } catch (reportErr) {
+    console.error('⚠️ Tampoco se pudo dejar constancia del error en el Issue:', reportErr.message);
+  }
   process.exit(1);
 });
