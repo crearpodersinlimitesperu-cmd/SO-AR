@@ -161,6 +161,8 @@ export default function Home() {
   const [selectedTrainingFilter, setSelectedTrainingFilter] = useState('todos');
   const [searchQuery, setSearchQuery] = useState('');
   const [showTaskModal, setShowTaskModal] = useState(false);
+  const [taskBeingEdited, setTaskBeingEdited] = useState(null); // tarea a editar desde el panel "Tareas que has asignado"
+  const [tareasAsignadasFilter, setTareasAsignadasFilter] = useState('Activas'); // 'Activas' | 'Vencidas' | 'Cumplidas' | 'Todas'
   const [showVenueModal, setShowVenueModal] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showToolsDropdown, setShowToolsDropdown] = useState(false);
@@ -1384,19 +1386,58 @@ export default function Home() {
           )}
 
           {/* PANEL: TAREAS QUE HAS ASIGNADO A OTROS (con cuenta regresiva) */}
-          {tareasQueHeAsignado.length > 0 && (
+          {tareasQueHeAsignado.length > 0 && (() => {
+            // Clasificación para las pestañas de filtro (Activas/Vencidas/Cumplidas/Todas).
+            const clasificadas = tareasQueHeAsignado.map(task => {
+              const isDone = task.completed || task.status === 'Completada';
+              const isOverdue = !isDone && getCountdownInfo(task.deadline, time).overdue;
+              return { task, isDone, isOverdue };
+            });
+            const counts = {
+              Activas: clasificadas.filter(c => !c.isDone && !c.isOverdue).length,
+              Vencidas: clasificadas.filter(c => c.isOverdue).length,
+              Cumplidas: clasificadas.filter(c => c.isDone).length,
+              Todas: clasificadas.length
+            };
+            const visibles = clasificadas.filter(c => {
+              if (tareasAsignadasFilter === 'Activas') return !c.isDone && !c.isOverdue;
+              if (tareasAsignadasFilter === 'Vencidas') return c.isOverdue;
+              if (tareasAsignadasFilter === 'Cumplidas') return c.isDone;
+              return true; // Todas
+            });
+
+            return (
             <div className="glass-panel" style={{ padding: '1.2rem', marginBottom: '2rem' }}>
               <h3 className="text-blue" style={{ marginTop: 0, borderBottom: '1px solid rgba(0,212,255,0.2)', paddingBottom: '0.4rem', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                 📋 TAREAS QUE HAS ASIGNADO ({tareasQueHeAsignado.length})
               </h3>
+              <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginTop: '0.8rem' }}>
+                {['Activas', 'Vencidas', 'Cumplidas', 'Todas'].map(f => (
+                  <button
+                    key={f}
+                    onClick={() => setTareasAsignadasFilter(f)}
+                    style={{
+                      padding: '0.3rem 0.75rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700,
+                      border: `1px solid ${tareasAsignadasFilter === f ? 'var(--crear-cyan)' : 'var(--border-subtle)'}`,
+                      background: tareasAsignadasFilter === f ? 'rgba(41, 171, 226, 0.18)' : 'transparent',
+                      color: tareasAsignadasFilter === f ? 'var(--crear-cyan)' : 'var(--text-muted)',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {f} ({counts[f]})
+                  </button>
+                ))}
+              </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.8rem', maxHeight: '360px', overflowY: 'auto' }}>
-                {tareasQueHeAsignado.map(task => {
+                {visibles.length === 0 && (
+                  <p className="text-muted" style={{ fontSize: '0.82rem', padding: '0.5rem 0' }}>No hay tareas en "{tareasAsignadasFilter}".</p>
+                )}
+                {visibles.map(({ task, isDone }) => {
                   const countdown = getCountdownInfo(task.deadline, time);
                   const emails = task.assignedToEmails && task.assignedToEmails.length > 0
                     ? task.assignedToEmails
                     : (task.assignedToEmail ? [task.assignedToEmail] : []);
                   const asignadosLabel = emails.length > 0 ? emails.map(resolveAssigneeName).join(', ') : 'Cualquiera en el rol';
-                  const isDone = task.completed || task.status === 'Completada';
 
                   return (
                     <div
@@ -1425,12 +1466,24 @@ export default function Home() {
                           {countdown.label}
                         </span>
                       )}
+                      <button
+                        onClick={() => { setTaskBeingEdited(task); setShowTaskModal(true); }}
+                        title="Editar tarea"
+                        style={{
+                          background: 'rgba(41, 171, 226, 0.12)', border: '1px solid rgba(41, 171, 226, 0.4)',
+                          borderRadius: '6px', padding: '0.3rem 0.6rem', fontSize: '0.72rem', fontWeight: 700,
+                          color: 'var(--crear-cyan)', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0
+                        }}
+                      >
+                        ✏️ Editar
+                      </button>
                     </div>
                   );
                 })}
               </div>
             </div>
-          )}
+            );
+          })()}
 
           {/* BOTONES INFERIORES */}
           {(viewMode === 'compact' || customModules.shortcuts !== false) && (
@@ -1456,7 +1509,11 @@ export default function Home() {
       )}
 
       {/* MODAL ASIGNAR TAREA */}
-      <TaskAssignmentModal isOpen={showTaskModal} onClose={() => setShowTaskModal(false)} />
+      <TaskAssignmentModal
+        isOpen={showTaskModal}
+        onClose={() => { setShowTaskModal(false); setTaskBeingEdited(null); }}
+        taskToEdit={taskBeingEdited}
+      />
 
       {/* MODAL CONFIGURACIÓN DE HOTELES Y SALONES */}
       <VenueConfigModal isOpen={showVenueModal} onClose={() => setShowVenueModal(false)} />

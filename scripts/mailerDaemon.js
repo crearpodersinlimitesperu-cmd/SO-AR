@@ -41,26 +41,51 @@ async function processMailDoc(docSnap) {
   const data = docSnap.data();
   if (data.delivery && data.delivery.state) return;
 
-  const isCorporate = ['@crearpsl.net', '@crearpsl.com'].some(d => data.to?.toLowerCase().endsWith(d));
-  
-  if (!isCorporate) {
+  // 'to' puede venir como string único o como array de strings (p.ej. tareas asignadas a varias
+  // personas). Normalizamos siempre a un array para no romper en .toLowerCase() sobre un array.
+  const rawRecipients = (Array.isArray(data.to) ? data.to : [data.to]).filter(Boolean);
+
+  if (rawRecipients.length === 0) {
+    console.warn(`⚠️ Documento de correo sin destinatario válido (doc ${docSnap.id})`);
+    await updateDoc(doc(db, 'mail', docSnap.id), {
+      'delivery.state': 'REJECTED',
+      reason: 'Documento de correo sin campo "to" válido'
+    });
+    return;
+  }
+
+  const validRecipients = [];
+  for (const rawTo of rawRecipients) {
+    const to = String(rawTo).toLowerCase().trim();
+    const isCorporate = ['@crearpsl.net', '@crearpsl.com'].some(d => to.endsWith(d));
+    if (isCorporate) {
+      validRecipients.push(rawTo);
+      continue;
+    }
     try {
-      const q = query(collection(db, "users"), where("emails", "array-contains", data.to?.toLowerCase().trim()));
+      const q = query(collection(db, "users"), where("emails", "array-contains", to));
       const snap = await getDocs(q);
       if (snap.empty) {
-        console.warn(`⚠️ Intento de envío a correo no registrado: ${data.to}`);
-        await updateDoc(doc(db, 'mail', docSnap.id), { 
-          'delivery.state': 'REJECTED', 
-          reason: 'Correo externo no pertenece a ningún usuario registrado' 
-        });
-        return;
+        console.warn(`⚠️ Intento de envío a correo no registrado: ${rawTo}`);
+      } else {
+        validRecipients.push(rawTo);
       }
     } catch (error) {
-      console.error("Error validando correo contra la base de datos:", error);
+      console.error("Error validando correo contra la base de datos:", error.message);
+      // No bloqueamos el envío por un error de validación (p.ej. Firestore momentáneamente inaccesible).
+      validRecipients.push(rawTo);
     }
   }
 
-  console.log(`📧 Procesando correo para: ${data.to}`);
+  if (validRecipients.length === 0) {
+    await updateDoc(doc(db, 'mail', docSnap.id), {
+      'delivery.state': 'REJECTED',
+      reason: 'Ningún destinatario pertenece a un usuario registrado'
+    });
+    return;
+  }
+
+  console.log(`📧 Procesando correo para: ${validRecipients.join(', ')}`);
 
   const rawHtml = data.message?.html || '<p>Tienes una notificación del sistema SO-AR.</p>';
   const cleanHtml = sanitizeHtml(rawHtml, {
@@ -84,20 +109,20 @@ async function processMailDoc(docSnap) {
 
   const mailOptions = {
     from: `"CREAR Poder Sin Límites" <${process.env.GMAIL_SERVER_EMAIL}>`,
-    to: data.to,
+    to: validRecipients,
     subject: data.message?.subject || 'Notificación SO-AR — CREAR Poder Sin Límites',
     html: cleanHtml
   };
 
   try {
     await transporter.sendMail(mailOptions);
-    console.log(`✅ Correo enviado con éxito a ${data.to}`);
+    console.log(`✅ Correo enviado con éxito a ${validRecipients.join(', ')}`);
     await updateDoc(doc(db, 'mail', docSnap.id), {
       'delivery.state': 'SUCCESS',
       'delivery.endTime': new Date().toISOString()
     });
   } catch (error) {
-    console.error(`❌ Error enviando a ${data.to}:`, error.message);
+    console.error(`❌ Error enviando a ${validRecipients.join(', ')}:`, error.message);
     await updateDoc(doc(db, 'mail', docSnap.id), {
       'delivery.state': 'ERROR',
       'delivery.error': error.message
@@ -183,11 +208,99 @@ async function checkInactivity() {
   }
 }
 
+// --- 5. RECORDATORIOS DE TAREAS VENCIDAS SIN ATENDER ---
+// Si una tarea asignada pasa su fecha límite y sigue sin completarse, se reenvía un correo de
+// recordatorio cada REMINDER_DEBOUNCE_HOURS hasta que la persona la marque como completada.
+const REMINDER_DEBOUNCE_HOURS = 24;
+
+async function checkOverdueTaskReminders() {
+  console.log("🔍 Iniciando chequeo de tareas vencidas sin atender...");
+  try {
+    const tasksSnap = await getDocs(collection(db, 'tasks'));
+    const now = new Date();
+
+    for (const docSnap of tasksSnap.docs) {
+      const data = docSnap.data();
+      const isDone = data.completed === true || data.status === 'Completada';
+      if (isDone) continue;
+      if (!data.deadline) continue;
+
+      const deadlineDate = new Date(data.deadline);
+      if (isNaN(deadlineDate.getTime())) continue;
+      if (deadlineDate >= now) continue; // aún no vence
+
+      const emails = Array.isArray(data.assignedToEmails) && data.assignedToEmails.length > 0
+        ? data.assignedToEmails
+        : (data.assignedToEmail ? [data.assignedToEmail] : []);
+      if (emails.length === 0) continue; // tarea sin asignación directa: nadie a quien recordar
+
+      const lastReminderDate = data.lastReminderAt?.toDate
+        ? data.lastReminderAt.toDate()
+        : (data.lastReminderAt ? new Date(data.lastReminderAt) : null);
+      const hoursSinceLastReminder = lastReminderDate ? (now - lastReminderDate) / (1000 * 60 * 60) : Infinity;
+      const hoursSinceLastReminderOrDeadline = lastReminderDate
+        ? hoursSinceLastReminder
+        : (now - deadlineDate) / (1000 * 60 * 60);
+
+      if (hoursSinceLastReminderOrDeadline < REMINDER_DEBOUNCE_HOURS) continue; // ya se recordó recientemente
+
+      const taskTitle = data.task || data.title || 'Tarea sin título';
+      console.log(`⏰ Tarea vencida sin completar: "${taskTitle}" (${docSnap.id}). Enviando recordatorio a: ${emails.join(', ')}`);
+
+      for (const email of emails) {
+        await addDoc(collection(db, 'mail'), {
+          to: [email],
+          message: {
+            subject: `⏰ RECORDATORIO: Tarea pendiente vencida — ${taskTitle}`,
+            html: `
+              <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
+                <div style="background-color: #ef4444; color: #fff; padding: 20px; text-align: center;">
+                  <h1 style="margin: 0; font-size: 22px;">⏰ Tarea Vencida Sin Completar</h1>
+                </div>
+                <div style="padding: 30px; background-color: #f9fafb;">
+                  <p style="font-size: 16px;">Hola,</p>
+                  <p style="font-size: 16px;">Tienes una tarea asignada en <strong>SO-AR</strong> que superó su fecha límite y aún no ha sido marcada como completada:</p>
+                  <p style="font-size: 16px;"><strong>Tarea:</strong> ${taskTitle}</p>
+                  <p style="font-size: 16px;"><strong>Fecha límite:</strong> ${formatDeadlineEsLocal(data.deadline)}</p>
+                  <p style="font-size: 16px;">Por favor ingresa a la plataforma y complétala o actualiza su estado a la brevedad. Recibirás recordatorios periódicos hasta que sea atendida.</p>
+                  <div style="text-align: center; margin: 30px 0;">
+                    <a href="https://centro-operativo-cpsl.web.app" style="background-color: #ef4444; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">Ingresar ahora a SO-AR</a>
+                  </div>
+                  <p style="font-size: 14px; color: #666; text-align: center; margin-top: 20px;">CREAR Poder Sin Límites - Sistema SO-AR</p>
+                </div>
+              </div>
+            `
+          },
+          createdAt: serverTimestamp()
+        });
+      }
+
+      await updateDoc(doc(db, 'tasks', docSnap.id), {
+        lastReminderAt: serverTimestamp()
+      });
+    }
+  } catch (error) {
+    console.error("❌ Error verificando tareas vencidas:", error.message);
+  }
+}
+
+function formatDeadlineEsLocal(iso) {
+  if (!iso) return 'Sin fecha límite definida';
+  try {
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return iso;
+    return d.toLocaleString('es-PE', { dateStyle: 'full', timeStyle: 'short' });
+  } catch (e) {
+    return iso;
+  }
+}
+
 // Ejecución
 if (isOneShot) {
   console.log("⚡ Ejecución en modo One-Shot (GitHub Actions / Tarea programada)...");
   await processPendingMails();
   await checkInactivity();
+  await checkOverdueTaskReminders();
   console.log("✅ Tarea de envío y verificación completada.");
   process.exit(0);
 } else {
@@ -201,5 +314,7 @@ if (isOneShot) {
   });
   checkInactivity();
   setInterval(checkInactivity, CHECK_INTERVAL_MS);
+  checkOverdueTaskReminders();
+  setInterval(checkOverdueTaskReminders, CHECK_INTERVAL_MS);
 }
 

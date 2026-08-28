@@ -221,20 +221,63 @@ export function ChecklistProvider({ children }) {
       const batch = writeBatch(db);
       batch.update(taskRef, updatedData);
 
-      // Calcular nuevos asignados (anti-spam)
+      // Calcular asignados: nuevos (recién agregados) vs los que ya estaban.
       const oldEmails = currentTask.assignedToEmails || (currentTask.assignedToEmail ? [currentTask.assignedToEmail] : []);
       const newEmails = updatedData.assignedToEmails || (updatedData.assignedToEmail ? [updatedData.assignedToEmail] : []);
-      
-      const newlyAddedEmails = newEmails.filter(email => !oldEmails.includes(email));
 
-      if (newlyAddedEmails.length > 0) {
-        newlyAddedEmails.forEach(email => {
+      const newlyAddedEmails = newEmails.filter(email => !oldEmails.includes(email));
+      const stillAssignedEmails = newEmails.filter(email => oldEmails.includes(email));
+
+      // "si o si notifique" (28/08/2026): antes, si editabas una tarea que
+      // YA tenía asignados (ej. le cambiabas la fecha límite o el título) sin
+      // agregar a nadie nuevo, esos asignados no se enteraban del cambio.
+      // Ahora, cualquier edición de un campo relevante (fecha límite, título,
+      // prioridad, sede) también notifica a quienes ya estaban asignados —
+      // no solo a los que se agregan de nuevo.
+      const relevantFieldChanged = ['deadline', 'task', 'title', 'priority', 'assignedSede'].some(
+        field => field in updatedData && updatedData[field] !== currentTask[field]
+      );
+
+      newlyAddedEmails.forEach(email => {
+        // 1. Notificación In-App
+        const notifRef = doc(collection(db, 'notifications'));
+        batch.set(notifRef, {
+          userId: email,
+          title: updatedData.task || currentTask.task,
+          message: `Se te ha asignado una tarea en la sede ${updatedData.assignedSede || currentTask.assignedSede || 'Global'}.`,
+          read: false,
+          taskId: taskId,
+          created_at: new Date().toISOString()
+        });
+
+        // 2. Notificación por Correo
+        const mailRef = doc(collection(db, 'mail'));
+        batch.set(mailRef, {
+          to: [email],
+          message: {
+            subject: `NUEVA TAREA ASIGNADA SO-AR: ${updatedData.task || currentTask.task}`,
+            html: `
+                <h2>Hola, se te ha asignado una tarea en el SO-AR</h2>
+                <p><strong>Tarea:</strong> ${updatedData.task || currentTask.task}</p>
+                <p><strong>⏰ Fecha límite:</strong> ${formatDeadlineEs(updatedData.deadline || currentTask.deadline)}</p>
+                <p><strong>Sede:</strong> ${updatedData.assignedSede || currentTask.assignedSede || 'Global'}</p>
+                <p><strong>Prioridad:</strong> ${updatedData.priority || currentTask.priority || 'Normal'}</p>
+                <p>Por favor, ingresa a la plataforma para revisarla.</p>
+                <br/>
+                <p><em>Equipo CREAR Poder Sin Límites</em></p>
+              `
+          }
+        });
+      });
+
+      if (relevantFieldChanged) {
+        stillAssignedEmails.forEach(email => {
           // 1. Notificación In-App
           const notifRef = doc(collection(db, 'notifications'));
           batch.set(notifRef, {
             userId: email,
             title: updatedData.task || currentTask.task,
-            message: `Se te ha asignado una tarea en la sede ${updatedData.assignedSede || currentTask.assignedSede || 'Global'}.`,
+            message: `Se actualizó una tarea que tenías asignada en la sede ${updatedData.assignedSede || currentTask.assignedSede || 'Global'}.`,
             read: false,
             taskId: taskId,
             created_at: new Date().toISOString()
@@ -245,14 +288,14 @@ export function ChecklistProvider({ children }) {
           batch.set(mailRef, {
             to: [email],
             message: {
-              subject: `NUEVA TAREA ASIGNADA SO-AR: ${updatedData.task || currentTask.task}`,
+              subject: `TAREA ACTUALIZADA SO-AR: ${updatedData.task || currentTask.task}`,
               html: `
-                <h2>Hola, se te ha asignado una tarea en el SO-AR</h2>
+                <h2>Hola, se actualizó una tarea que tienes asignada en el SO-AR</h2>
                 <p><strong>Tarea:</strong> ${updatedData.task || currentTask.task}</p>
                 <p><strong>⏰ Fecha límite:</strong> ${formatDeadlineEs(updatedData.deadline || currentTask.deadline)}</p>
                 <p><strong>Sede:</strong> ${updatedData.assignedSede || currentTask.assignedSede || 'Global'}</p>
                 <p><strong>Prioridad:</strong> ${updatedData.priority || currentTask.priority || 'Normal'}</p>
-                <p>Por favor, ingresa a la plataforma para revisarla.</p>
+                <p>Revisa los cambios en la plataforma.</p>
                 <br/>
                 <p><em>Equipo CREAR Poder Sin Límites</em></p>
               `
