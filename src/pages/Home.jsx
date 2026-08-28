@@ -18,6 +18,7 @@ import { calculateAutomaticDeadline } from '../utils/soarDates';
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
 import VenueConfigModal from '../components/VenueConfigModal';
 import ViewModeSelector from '../components/ViewModeSelector';
+import GlobalSearch from '../components/GlobalSearch';
 import ThemeToggle from '../components/ThemeToggle';
 import { getVenueForTraining } from '../data/venuesData';
 import { ROLE_DISPLAY_NAMES } from '../data/usersData';
@@ -62,10 +63,10 @@ const isTrainerMatchingUser = (evTrainer, user) => {
 
 export default function Home() {
   const { currentUser, logout, switchRole } = useAuth();
-  const { currentCycle, currentStage, events, loadingEvents } = useCycles();
+  const { currentCycle, currentStage, events, loadingEvents, syncEventsToGoogle } = useCycles();
   const { tasks: allTasks, loading: loadingTasks, syncTasksToGoogle, acceptCollaboration, rejectCollaboration } = useChecklist();
   const { showToast, viewMode, customModules } = useUI();
-  const { notifications, unreadCount, markAllAsRead } = useNotifications();
+  const { notifications, unreadCount, markAllAsRead, markAsRead } = useNotifications();
   const navigate = useNavigate();
 
   // Reloj local
@@ -79,20 +80,42 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [showVenueModal, setShowVenueModal] = useState(false);
+  const [syncingEvents, setSyncingEvents] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showToolsDropdown, setShowToolsDropdown] = useState(false);
   const toolsDropdownRef = useRef(null);
+  const notificationsRef = useRef(null);
 
-  // Cerrar dropdown al hacer click fuera
+  // Cerrar dropdowns al hacer click fuera (incluye el panel de notificaciones,
+  // que antes no se cerraba solo — había que volver a clickear la campana)
   useEffect(() => {
     function handleClickOutside(event) {
       if (toolsDropdownRef.current && !toolsDropdownRef.current.contains(event.target)) {
         setShowToolsDropdown(false);
       }
+      if (notificationsRef.current && !notificationsRef.current.contains(event.target)) {
+        setShowNotifications(false);
+      }
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Texto relativo simple para el timestamp de cada notificación (created_at
+  // viene de Firestore como string ISO — ver NotificationContext.jsx).
+  const formatTimeAgo = (isoDate) => {
+    if (!isoDate) return '';
+    const diffMs = Date.now() - new Date(isoDate).getTime();
+    if (Number.isNaN(diffMs)) return '';
+    const minutes = Math.floor(diffMs / 60000);
+    if (minutes < 1) return 'ahora';
+    if (minutes < 60) return `hace ${minutes} min`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `hace ${hours} h`;
+    const days = Math.floor(hours / 24);
+    if (days < 7) return `hace ${days} d`;
+    return new Date(isoDate).toLocaleDateString('es', { day: '2-digit', month: 'short' });
+  };
 
   const handleAddEventToGoogle = async (ev, startDate, endDate) => {
     const token = sessionStorage.getItem('googleAccessToken');
@@ -114,6 +137,64 @@ export default function Home() {
       }
     } else {
       showToast(result.error || "Hubo un error al abrir el calendario.", "error");
+    }
+  };
+
+  // Sincronización masiva con Google Calendar (28/08/2026) — el equivalente,
+  // para el calendario, del botón "Sincronizar" que ya existe para las tareas
+  // (ChecklistBoard.jsx -> syncTasksToGoogle). Sincroniza los MISMOS eventos
+  // que se ven por defecto en "MI SEDE"/"MIS FECHAS" + "Próximos" — no lo que
+  // esté filtrado en pantalla en ese momento (igual que la sincronización de
+  // tareas, que sincroniza todas las pendientes, no solo las que se ven).
+  const handleSyncAllEventsToGoogle = async () => {
+    const token = sessionStorage.getItem('googleAccessToken');
+    if (!token) {
+      showToast("No se encontró sesión con permisos de Google. Por favor, cierra sesión y vuelve a entrar.", "error");
+      return;
+    }
+
+    const isEntrenador = ['entrenador', 'entrenador_llamadas'].includes(currentUser?.appRole);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const now = today.getTime();
+
+    const myUpcomingEvents = (events || []).filter(ev => {
+      if (isEntrenador) {
+        if (!isTrainerMatchingUser(ev.trainer || ev.entrenador, currentUser)) return false;
+      } else {
+        const userSede = currentUser?.sede || '';
+        if (userSede && !userSede.toLowerCase().includes('global')) {
+          const evSede = ev.sede || ev.sedeTag || '';
+          const matchesSede = evSede.toLowerCase().includes(userSede.toLowerCase()) || userSede.toLowerCase().includes(evSede.toLowerCase());
+          if (!matchesSede) return false;
+        }
+      }
+      const evDate = new Date(ev.fecha_inicio || ev.start || new Date());
+      evDate.setHours(0, 0, 0, 0);
+      return evDate.getTime() >= now;
+    });
+
+    if (myUpcomingEvents.length === 0) {
+      showToast("No tienes próximos eventos para sincronizar.", "info");
+      return;
+    }
+
+    setSyncingEvents(true);
+    const result = await syncEventsToGoogle(myUpcomingEvents, currentUser?.email);
+    setSyncingEvents(false);
+
+    if (!result.success && result.error === 'no_token') {
+      showToast("No se encontró sesión con permisos de Google. Por favor, cierra sesión y vuelve a entrar.", "error");
+      return;
+    }
+
+    const { syncedCount, skippedCount, totalCount, failed } = result;
+    if (syncedCount === 0 && skippedCount === totalCount) {
+      showToast("Tus próximos eventos ya estaban sincronizados con Google Calendar.", "info");
+    } else if (failed && failed.length > 0) {
+      showToast(`Sincronizados ${syncedCount} de ${totalCount} eventos. ${failed.length} fallaron — intenta de nuevo más tarde.`, "error");
+    } else {
+      showToast(`¡${syncedCount} evento(s) sincronizados con tu Google Calendar!${skippedCount > 0 ? ` (${skippedCount} ya estaban al día)` : ''}`, "success");
     }
   };
 
@@ -215,9 +296,12 @@ export default function Home() {
             <h1 className="text-blue" style={{ margin: 0, fontSize: viewMode === 'lite' ? '2.5rem' : '3rem', fontWeight: '900', letterSpacing: '-1px', textShadow: '0 0 20px rgba(100, 255, 218, 0.3)' }}>
               Causa OS
             </h1>
-            <h2 className="text-gold" style={{ margin: 0, fontSize: viewMode === 'lite' ? '1.5rem' : '1.8rem', fontWeight: '700', letterSpacing: '-0.5px' }}>
-              {time.getHours() < 12 ? 'Buenos días' : time.getHours() < 19 ? 'Buenas tardes' : 'Buenas noches'}, {currentUser?.displayName || currentUser?.name || 'Equipo'}
-            </h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
+              <h2 className="text-gold" style={{ margin: 0, fontSize: viewMode === 'lite' ? '1.5rem' : '1.8rem', fontWeight: '700', letterSpacing: '-0.5px' }}>
+                {time.getHours() < 12 ? 'Buenos días' : time.getHours() < 19 ? 'Buenas tardes' : 'Buenas noches'}, {currentUser?.displayName || currentUser?.name || 'Equipo'}
+              </h2>
+              <GlobalSearch />
+            </div>
           </div>
           <p className="text-muted" style={{ margin: '0.8rem 0 0', textTransform: 'uppercase', fontSize: '0.85rem' }}>
             {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') ? 'MÚLTIPLES EQUIPOS (GLOBAL) • VISIÓN MÚLTIPLES SEDES' : (currentCycle ? `${currentCycle.name} • ETAPA: ${currentStage}` : 'CARGANDO CICLO...')}
@@ -312,30 +396,141 @@ export default function Home() {
             )}
             
             {/* Notificaciones */}
-            <div style={{ position: 'relative' }}>
-              <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }} onClick={() => setShowNotifications(!showNotifications)}>
-                <Bell size={20} className="text-white" />
+            <div style={{ position: 'relative' }} ref={notificationsRef}>
+              <button
+                type="button"
+                onClick={() => setShowNotifications(!showNotifications)}
+                title="Notificaciones"
+                className="btn-secondary hover-glow"
+                style={{
+                  width: '38px',
+                  height: '38px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  position: 'relative',
+                  padding: 0,
+                  ...(showNotifications ? { borderColor: 'var(--crear-cyan)', boxShadow: '0 0 0 3px rgba(41, 171, 226, 0.15)' } : {})
+                }}
+              >
+                <Bell size={18} strokeWidth={2} />
                 {unreadCount > 0 && (
-                  <div style={{ position: 'absolute', top: '-4px', right: '-4px', background: 'var(--color-error)', color: 'white', borderRadius: '50%', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.68rem', fontWeight: 'bold' }}>
-                    {unreadCount}
-                  </div>
+                  <span
+                    style={{
+                      position: 'absolute',
+                      top: '-3px',
+                      right: '-3px',
+                      background: 'linear-gradient(135deg, #ef4444, #dc2626)',
+                      color: '#fff',
+                      borderRadius: '50%',
+                      minWidth: '17px',
+                      height: '17px',
+                      padding: '0 3px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '0.62rem',
+                      fontWeight: 700,
+                      lineHeight: 1,
+                      border: '2px solid var(--bg-dark)',
+                      boxShadow: '0 2px 6px rgba(220, 38, 38, 0.5)',
+                      animation: 'notifPulse 2.2s ease-in-out infinite'
+                    }}
+                  >
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
                 )}
-              </div>
-              
+              </button>
+
               {showNotifications && (
-                <div className="glass-panel" style={{ position: 'absolute', top: '125%', right: 0, width: '320px', zIndex: 100, padding: '1rem', boxShadow: '0 10px 40px rgba(0,0,0,0.8)', border: '1px solid rgba(41, 171, 226, 0.3)' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.5rem' }}>
-                    <h4 style={{ margin: 0, color: 'var(--crear-gold)' }}>🔔 Notificaciones</h4>
-                    <button onClick={() => { markAllAsRead(); setShowNotifications(false); }} style={{ background: 'transparent', border: 'none', color: 'var(--crear-cyan)', fontSize: '0.75rem', cursor: 'pointer', fontWeight: 'bold' }}>Marcar leídas</button>
+                <div
+                  className="glass-panel"
+                  style={{
+                    position: 'absolute',
+                    top: 'calc(100% + 10px)',
+                    right: 0,
+                    width: '340px',
+                    zIndex: 100,
+                    padding: 0,
+                    overflow: 'hidden',
+                    // NOTA (28/08/2026): .glass-panel en modo oscuro usa un fondo casi
+                    // transparente (rgba(255,255,255,0.03)) pensado para tarjetas grandes
+                    // sobre el fondo de la página — pero en un panel flotante ENCIMA de
+                    // otros botones y texto, esa transparencia dejaba ver todo lo de
+                    // atrás mezclado con el panel (confirmado con captura del usuario en
+                    // modo noche). Se fuerza un fondo sólido y coherente con el tema
+                    // (oscuro: azul marino sólido; claro: ya era blanco sólido por la
+                    // regla !important existente) para que el panel sea legible siempre.
+                    background: 'var(--bg-dark-alt)',
+                    boxShadow: '0 20px 50px -12px rgba(0,0,0,0.5), 0 0 0 1px var(--border-subtle)',
+                    animation: 'notifPanelIn 0.18s cubic-bezier(0.16, 1, 0.3, 1)'
+                  }}
+                >
+                  <div style={{
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    padding: '0.9rem 1.1rem', borderBottom: '1px solid var(--border-subtle)'
+                  }}>
+                    <h4 style={{ margin: 0, color: 'var(--text-heading)', fontSize: '0.95rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <Bell size={15} style={{ color: 'var(--crear-gold)' }} /> Notificaciones
+                      {unreadCount > 0 && (
+                        <span style={{ fontSize: '0.68rem', fontWeight: 700, color: 'var(--crear-cyan)', background: 'rgba(41, 171, 226, 0.12)', borderRadius: '999px', padding: '1px 7px' }}>
+                          {unreadCount} sin leer
+                        </span>
+                      )}
+                    </h4>
+                    {unreadCount > 0 && (
+                      <button
+                        onClick={() => markAllAsRead()}
+                        style={{ background: 'transparent', border: 'none', color: 'var(--crear-cyan)', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600, padding: '2px 4px', borderRadius: '4px', transition: 'opacity 0.15s' }}
+                        onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+                        onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+                      >
+                        Marcar todo leído
+                      </button>
+                    )}
                   </div>
-                  <div style={{ maxHeight: '350px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.8rem', paddingRight: '0.5rem' }}>
-                    {notifications?.length > 0 ? notifications.map(n => (
-                      <div key={n.id} style={{ fontSize: '0.8rem', padding: '0.75rem', background: n.read ? 'rgba(0,0,0,0.4)' : 'rgba(41, 171, 226, 0.15)', borderRadius: '8px', borderLeft: n.read ? 'none' : '3px solid var(--crear-cyan)' }}>
-                        <strong style={{ color: n.read ? 'var(--text-muted)' : '#ffffff', display: 'block', marginBottom: '0.2rem' }}>{n.title || 'Alerta'}</strong>
-                        <p style={{ margin: 0, color: 'var(--text-main)', lineHeight: '1.4' }}>{n.message}</p>
+                  <div style={{ maxHeight: '360px', overflowY: 'auto' }}>
+                    {notifications?.length > 0 ? notifications.map((n, idx) => (
+                      <div
+                        key={n.id}
+                        onClick={() => !n.read && markAsRead && markAsRead(n.id)}
+                        style={{
+                          display: 'flex',
+                          gap: '0.6rem',
+                          padding: '0.85rem 1.1rem',
+                          cursor: n.read ? 'default' : 'pointer',
+                          background: n.read ? 'transparent' : 'rgba(41, 171, 226, 0.06)',
+                          borderBottom: idx < notifications.length - 1 ? '1px solid var(--border-subtle)' : 'none',
+                          transition: 'background 0.15s'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = n.read ? 'var(--bg-card-hover)' : 'rgba(41, 171, 226, 0.12)'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = n.read ? 'transparent' : 'rgba(41, 171, 226, 0.06)'}
+                      >
+                        <span style={{
+                          marginTop: '5px', width: '7px', height: '7px', borderRadius: '50%', flexShrink: 0,
+                          background: n.read ? 'transparent' : 'var(--crear-cyan)',
+                          boxShadow: n.read ? 'none' : '0 0 6px var(--crear-cyan)'
+                        }} />
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '0.5rem' }}>
+                            <strong style={{ color: n.read ? 'var(--text-muted)' : 'var(--text-heading)', fontSize: '0.83rem', fontWeight: 600 }}>
+                              {n.title || 'Alerta'}
+                            </strong>
+                            <span style={{ color: 'var(--text-muted)', fontSize: '0.68rem', flexShrink: 0 }}>
+                              {formatTimeAgo(n.created_at)}
+                            </span>
+                          </div>
+                          <p style={{ margin: '0.15rem 0 0', color: 'var(--text-muted)', fontSize: '0.78rem', lineHeight: '1.45' }}>
+                            {n.message}
+                          </p>
+                        </div>
                       </div>
                     )) : (
-                      <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', margin: '1rem 0' }}>No tienes notificaciones recientes.</p>
+                      <div style={{ textAlign: 'center', padding: '2.2rem 1rem' }}>
+                        <Bell size={26} style={{ color: 'var(--text-muted)', opacity: 0.4, marginBottom: '0.5rem' }} />
+                        <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem', margin: 0 }}>No tienes notificaciones recientes.</p>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -401,6 +596,9 @@ export default function Home() {
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '0.4rem',
+                // Mismo fondo sólido que el panel de notificaciones (28/08/2026): este
+                // dropdown tenía el mismo riesgo de transparencia excesiva en modo oscuro.
+                background: 'var(--bg-dark-alt)',
                 boxShadow: '0 10px 40px rgba(0,0,0,0.9)',
                 border: '1px solid rgba(41, 171, 226, 0.3)'
               }}>
@@ -417,6 +615,9 @@ export default function Home() {
                     </button>
                     <button onClick={() => { setShowToolsDropdown(false); navigate('/auditoria-kpis'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                       📉 Auditoría de KPIs
+                    </button>
+                    <button onClick={() => { setShowToolsDropdown(false); navigate('/nodus-data-map'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#f59e0b', background: 'rgba(245, 158, 11, 0.1)' }}>
+                      🗺️ Nodus Data Map
                     </button>
                   </>
                 )}
@@ -454,9 +655,11 @@ export default function Home() {
                   </button>
                 )}
 
-                <button onClick={() => { setShowToolsDropdown(false); window.open('/calendario_global.html?v=' + Date.now() + '&email=' + encodeURIComponent(currentUser?.email || '') + '&name=' + encodeURIComponent(currentUser?.displayName || currentUser?.name || ''), '_blank'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
-                  📅 Calendario Global Maestro ↗
-                </button>
+                {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+                  <button onClick={() => { setShowToolsDropdown(false); window.open('/calendario_global.html?v=' + Date.now() + '&email=' + encodeURIComponent(currentUser?.email || '') + '&name=' + encodeURIComponent(currentUser?.displayName || currentUser?.name || ''), '_blank'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
+                    📅 Calendario Global Maestro ↗
+                  </button>
+                )}
 
                 {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
                   <button onClick={() => { setShowToolsDropdown(false); window.open('https://cpsl-campus-interactivo.vercel.app/ruta', '_blank'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
@@ -548,9 +751,11 @@ export default function Home() {
             </button>
           )}
 
-          <button onClick={() => window.open('/calendario_global.html?v=' + Date.now() + '&email=' + encodeURIComponent(currentUser?.email || '') + '&name=' + encodeURIComponent(currentUser?.displayName || currentUser?.name || ''), '_blank')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #ef4444)', color: 'white', border: 'none' }}>
-            📅 Calendario Global
-          </button>
+          {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+            <button onClick={() => window.open('/calendario_global.html?v=' + Date.now() + '&email=' + encodeURIComponent(currentUser?.email || '') + '&name=' + encodeURIComponent(currentUser?.displayName || currentUser?.name || ''), '_blank')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #ef4444)', color: 'white', border: 'none' }}>
+              📅 Calendario Global
+            </button>
+          )}
 
           {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
             <button onClick={() => window.open('https://cpsl-campus-interactivo.vercel.app/ruta', '_blank')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #059669)', color: 'white', border: 'none' }}>
@@ -779,8 +984,19 @@ export default function Home() {
                   <CalendarIcon size={18} /> EVENTOS Y ENTRENAMIENTOS
                 </h3>
                 <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', flexWrap: 'wrap' }}>
-                  {(currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.isGerente || ['gerente', 'direccion', 'director_maestria', 'qt', 'consolidado'].includes(currentUser?.appRole)) && (
-                    <button 
+                  <button
+                    type="button"
+                    disabled={syncingEvents}
+                    onClick={handleSyncAllEventsToGoogle}
+                    style={{ background: 'rgba(66, 133, 244, 0.1)', border: '1px solid rgba(66, 133, 244, 0.4)', color: '#4285F4', padding: '0.25rem 0.6rem', borderRadius: '4px', fontSize: '0.78rem', cursor: syncingEvents ? 'wait' : 'pointer', opacity: syncingEvents ? 0.6 : 1, display: 'flex', alignItems: 'center', gap: '0.35rem', fontWeight: 'bold' }}
+                    title="Sincronizar tus próximos eventos con Google Calendar"
+                  >
+                    <CalendarPlus size={13} /> {syncingEvents ? 'Sincronizando…' : 'Sincronizar'}
+                  </button>
+                  {/* CONTEXTO (28/08/2026): la auditoría de roles pidió que solo Dirección/Gerencia
+                      vean "Hoteles Sede" — 'qt' estaba incluido aquí sin que la matriz lo pidiera. */}
+                  {(currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.isGerente || ['gerente', 'direccion', 'director_maestria', 'consolidado'].includes(currentUser?.appRole)) && (
+                    <button
                       type="button"
                       onClick={() => setShowVenueModal(true)}
                       className="btn-secondary"
