@@ -19,7 +19,21 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'npm'
+          # CONTEXTO (28/08/2026): se quitó "cache: 'npm'" porque el build falló 2
+          # veces seguidas (run 33206219486, intento 1 y 2) en el paso siguiente con
+          # "Rolldown failed to resolve import recharts" / "Cannot find native binding"
+          # — el mismo error que reproduje localmente con un node_modules con caché
+          # incompleta de un paquete opcional específico de plataforma (rolldown).
+          # Es el bug conocido de npm con dependencias opcionales
+          # (https://github.com/npm/cli/issues/4828). Con una instalación 100% limpia
+          # (sin caché de npm) el build sí funcionó, dos veces, en mi entorno.
+          # No pude confirmar el error exacto de CI porque el log crudo de GitHub
+          # Actions redirige a productionresultssa19.blob.core.windows.net, dominio
+          # bloqueado por la política de red de esta sesión — así que esto es una
+          # hipótesis fundamentada, no un hecho confirmado con el log real. Si el
+          # build vuelve a fallar después de este cambio, hay que revisar el log
+          # directamente desde github.com/.../actions (interfaz web) para descartar
+          # otra causa.
 
       - name: 📦 Instalar dependencias
         run: npm install --include=optional
