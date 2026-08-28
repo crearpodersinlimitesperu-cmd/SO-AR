@@ -1,11 +1,11 @@
 {
-  "name": "cpsl-base-template",
+  "name": "causa-os",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "python3 dump_code.py || python dump_code.py",
+    "prebuild": "(python3 dump_code.py || python dump_code.py || true)",
     "build": "vite build",
     "lint": "oxlint",
     "preview": "vite preview",

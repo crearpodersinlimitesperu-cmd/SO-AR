@@ -32,6 +32,7 @@ ACCESOS.md
 
 # Temp scripts & data files
 *.py
+!dump_code.py
 *.xlsx
 *_temp.csv
 centro-operativo-cpsl-*.json
