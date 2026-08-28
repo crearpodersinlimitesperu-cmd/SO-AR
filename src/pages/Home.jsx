@@ -136,11 +136,11 @@ const getCountdownInfo = (deadlineIso, now) => {
   const mins = Math.floor((absMs % 3600000) / 60000);
   const timeStr = days > 0 ? `${days}d ${totalHours % 24}h` : (totalHours > 0 ? `${totalHours}h ${mins}m` : `${mins}m`);
 
-  if (diffMs <= 0) return { label: `⏰ VENCIDA hace ${timeStr}`, color: '#ffffff', bg: '#7f1d1d', border: '#ef4444', overdue: true };
-  if (diffMs < 3 * 3600000) return { label: `${timeStr} restantes`, color: '#ef4444', bg: 'rgba(239, 68, 68, 0.15)', border: '#ef4444', overdue: false };
-  if (diffMs < 24 * 3600000) return { label: `${timeStr} restantes`, color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.15)', border: '#f59e0b', overdue: false };
-  if (diffMs < 72 * 3600000) return { label: `${timeStr} restantes`, color: '#eab308', bg: 'rgba(234, 179, 8, 0.15)', border: '#eab308', overdue: false };
-  return { label: `${timeStr} restantes`, color: '#22c55e', bg: 'rgba(34, 197, 94, 0.15)', border: '#22c55e', overdue: false };
+  if (diffMs <= 0) return { label: `⏰ VENCIDA hace ${timeStr}`, color: '#ffffff', bg: '#dc2626', border: '#7f1d1d', overdue: true };
+  if (diffMs < 3 * 3600000) return { label: `🔴 ${timeStr} restantes`, color: '#ffffff', bg: '#ef4444', border: '#b91c1c', overdue: false };
+  if (diffMs < 24 * 3600000) return { label: `🟠 ${timeStr} restantes`, color: '#ffffff', bg: '#f97316', border: '#c2410c', overdue: false };
+  if (diffMs < 72 * 3600000) return { label: `🟡 ${timeStr} restantes`, color: '#1a1300', bg: '#facc15', border: '#a16207', overdue: false };
+  return { label: `🟢 ${timeStr} restantes`, color: '#ffffff', bg: '#16a34a', border: '#166534', overdue: false };
 };
 
 export default function Home() {
@@ -1459,9 +1459,10 @@ export default function Home() {
                       </div>
                       {!isDone && (
                         <span style={{
-                          fontSize: '0.75rem', fontWeight: 700, padding: '0.3rem 0.7rem', borderRadius: '20px',
-                          color: countdown.color, background: countdown.bg, border: `1px solid ${countdown.border}`,
-                          whiteSpace: 'nowrap'
+                          fontSize: '0.88rem', fontWeight: 800, padding: '0.42rem 0.9rem', borderRadius: '20px',
+                          color: countdown.color, background: countdown.bg, border: `2px solid ${countdown.border}`,
+                          whiteSpace: 'nowrap', letterSpacing: '0.02em',
+                          boxShadow: '0 1px 4px rgba(0,0,0,0.25)'
                         }}>
                           {countdown.label}
                         </span>
