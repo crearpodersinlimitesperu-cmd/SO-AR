@@ -114,9 +114,13 @@ export default function CentroManagers() {
   
   // Dual Role Toggle para QT y Corporativos que también son entrenadores
   const userRole = currentUser?.appRole || currentUser?.role;
-  const isTrainerRole = userRole === 'entrenador' || userRole === 'entrenador_llamadas';
+  // Revisamos TODOS los roles del usuario, no solo el appRole activo
+  const allUserRoles = currentUser?.roles || (userRole ? [userRole] : []);
+  const isTrainerRole = userRole === 'entrenador' || userRole === 'entrenador_llamadas' ||
+    allUserRoles.includes('entrenador') || allUserRoles.includes('entrenador_llamadas') ||
+    DUAL_ROLE_TRAINER_EMAILS.includes((currentUser?.email || '').toLowerCase());
   const isDualRole = currentUser && (DUAL_ROLE_TRAINER_EMAILS.includes(currentUser.email) || (currentUser.roles && currentUser.roles.includes('entrenador') && currentUser.roles.length > 1));
-  const [viewAsTrainer, setViewAsTrainer] = useState(isTrainerRole);
+  const [viewAsTrainer, setViewAsTrainer] = useState(isTrainerRole && (userRole === 'entrenador' || userRole === 'entrenador_llamadas'));
 
   // Estados de datos
   // Estados de datos
@@ -317,9 +321,9 @@ export default function CentroManagers() {
         // Solo ve los suyos como entrenador
         if (!isTrainerMatch(m.entrenador, currentTrainerName)) return false;
       } else if (!canViewAll && !isGlobalQTCoordinator(currentUser)) {
-        const userRole = currentUser?.appRole;
-        const isGerente = userRole === 'gerente';
-        const isCoord = userRole === 'coord_maestria' || userRole === 'coordinador_mj' || userRole === 'coord_c1' || userRole === 'capitan';
+        const activeRole = currentUser?.appRole;
+        const isGerente = activeRole === 'gerente';
+        const isCoord = activeRole === 'coord_maestria' || activeRole === 'coordinador_mj' || activeRole === 'coord_c1' || activeRole === 'capitan';
         
         if (isGerente) {
           if (mSede !== userSede && mSede !== 'GLOBAL') return false;
@@ -332,8 +336,11 @@ export default function CentroManagers() {
           const mRol = (m.rol || '').toLowerCase();
           const isTargetGlobalQTCoordinator = m.id === 'staff_carlosbrunis' || m.email?.toLowerCase().includes('brunis') || (mRol.includes('qt') && (mSede === 'SEDE GLOBAL' || mSede === 'GLOBAL'));
           if (mSede !== userSede && !isTargetGlobalQTCoordinator) return false;
+        } else if (isTrainerRole && currentTrainerName) {
+          // ⚡ ENTRENADORES: siempre ven sus propios managers, sin importar el rol activo
+          if (!isTrainerMatch(m.entrenador, currentTrainerName)) return false;
         } else {
-          // Por defecto (Equipo), solo ven lo suyo (y si están asignados a un entrenador)
+          // Por defecto solo ven lo suyo
           if (!isTrainerMatch(m.entrenador, currentTrainerName) && mSede !== userSede) return false;
         }
       }
@@ -379,9 +386,9 @@ export default function CentroManagers() {
       if (viewAsTrainer) {
         if (!isTrainerMatch(m.entrenador, currentTrainerName)) return false;
       } else if (!canViewAll && !isGlobalQTCoordinator(currentUser)) {
-        const userRole = currentUser?.appRole;
-        const isGerente = userRole === 'gerente';
-        const isCoord = userRole === 'coord_maestria' || userRole === 'coordinador_mj' || userRole === 'coord_c1' || userRole === 'capitan';
+        const activeRole = currentUser?.appRole;
+        const isGerente = activeRole === 'gerente';
+        const isCoord = activeRole === 'coord_maestria' || activeRole === 'coordinador_mj' || activeRole === 'coord_c1' || activeRole === 'capitan';
         
         if (isGerente) {
           if (mSede !== userSede && mSede !== 'GLOBAL') return false;
@@ -393,6 +400,8 @@ export default function CentroManagers() {
           const mRol = (m.rol || '').toLowerCase();
           const isTargetGlobalQTCoordinator = m.id === 'staff_carlosbrunis' || m.email?.toLowerCase().includes('brunis') || (mRol.includes('qt') && (mSede === 'SEDE GLOBAL' || mSede === 'GLOBAL'));
           if (mSede !== userSede && !isTargetGlobalQTCoordinator) return false;
+        } else if (isTrainerRole && currentTrainerName) {
+          if (!isTrainerMatch(m.entrenador, currentTrainerName)) return false;
         } else {
           if (!isTrainerMatch(m.entrenador, currentTrainerName) && mSede !== userSede) return false;
         }
