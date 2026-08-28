@@ -11,6 +11,20 @@ import { useAuth } from './AuthContext';
 
 const ChecklistContext = createContext();
 
+// Formatea una fecha límite ISO a texto legible en español, para los correos
+// de asignación de tarea (agregado 28/08/2026 a pedido de José, para que el
+// correo indique la fecha/hora límite y no solo que "se asignó una tarea").
+const formatDeadlineEs = (iso) => {
+  if (!iso) return 'Sin fecha límite definida';
+  try {
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return iso;
+    return d.toLocaleString('es-PE', { dateStyle: 'full', timeStyle: 'short' });
+  } catch (e) {
+    return iso;
+  }
+};
+
 export function ChecklistProvider({ children }) {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -176,6 +190,7 @@ export function ChecklistProvider({ children }) {
               html: `
                 <h2>Hola, se te ha asignado una nueva tarea en el SO-AR</h2>
                 <p><strong>Tarea:</strong> ${taskData.task || taskData.title}</p>
+                <p><strong>⏰ Fecha límite:</strong> ${formatDeadlineEs(taskData.deadline)}</p>
                 <p><strong>Sede:</strong> ${taskData.assignedSede || 'Global'}</p>
                 <p><strong>Prioridad:</strong> ${taskData.priority || 'Normal'}</p>
                 <p>Por favor, ingresa a la plataforma para revisarla y marcarla como completada cuando esté lista.</p>
@@ -234,6 +249,7 @@ export function ChecklistProvider({ children }) {
               html: `
                 <h2>Hola, se te ha asignado una tarea en el SO-AR</h2>
                 <p><strong>Tarea:</strong> ${updatedData.task || currentTask.task}</p>
+                <p><strong>⏰ Fecha límite:</strong> ${formatDeadlineEs(updatedData.deadline || currentTask.deadline)}</p>
                 <p><strong>Sede:</strong> ${updatedData.assignedSede || currentTask.assignedSede || 'Global'}</p>
                 <p><strong>Prioridad:</strong> ${updatedData.priority || currentTask.priority || 'Normal'}</p>
                 <p>Por favor, ingresa a la plataforma para revisarla.</p>

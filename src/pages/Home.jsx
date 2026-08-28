@@ -114,6 +114,35 @@ const isModuleVisible = (mod, currentUser) => {
   return (mod.roles || []).includes(currentUser?.appRole);
 };
 
+// ============================================================================
+// TAREAS QUE HAS ASIGNADO — cuenta regresiva (28/08/2026)
+// ----------------------------------------------------------------------------
+// Calcula el texto y color de la cuenta regresiva hasta la fecha límite de una
+// tarea, a partir de "now" (se le pasa el estado "time" que ya existe en Home
+// y se actualiza cada segundo, así que esto queda "vivo" sin agregar un
+// segundo intervalo). Los umbrales de color (3h / 24h / 72h) son una
+// RECOMENDACIÓN razonable, no algo que José haya especificado con números
+// exactos — se puede ajustar si prefiere otros cortes.
+// ============================================================================
+const getCountdownInfo = (deadlineIso, now) => {
+  if (!deadlineIso) return { label: 'Sin fecha límite', color: '#9ca3af', bg: 'rgba(156,163,175,0.12)', border: '#9ca3af', overdue: false };
+  const deadline = new Date(deadlineIso).getTime();
+  if (isNaN(deadline)) return { label: 'Fecha inválida', color: '#9ca3af', bg: 'rgba(156,163,175,0.12)', border: '#9ca3af', overdue: false };
+
+  const diffMs = deadline - now.getTime();
+  const absMs = Math.abs(diffMs);
+  const totalHours = Math.floor(absMs / 3600000);
+  const days = Math.floor(totalHours / 24);
+  const mins = Math.floor((absMs % 3600000) / 60000);
+  const timeStr = days > 0 ? `${days}d ${totalHours % 24}h` : (totalHours > 0 ? `${totalHours}h ${mins}m` : `${mins}m`);
+
+  if (diffMs <= 0) return { label: `⏰ VENCIDA hace ${timeStr}`, color: '#ffffff', bg: '#7f1d1d', border: '#ef4444', overdue: true };
+  if (diffMs < 3 * 3600000) return { label: `${timeStr} restantes`, color: '#ef4444', bg: 'rgba(239, 68, 68, 0.15)', border: '#ef4444', overdue: false };
+  if (diffMs < 24 * 3600000) return { label: `${timeStr} restantes`, color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.15)', border: '#f59e0b', overdue: false };
+  if (diffMs < 72 * 3600000) return { label: `${timeStr} restantes`, color: '#eab308', bg: 'rgba(234, 179, 8, 0.15)', border: '#eab308', overdue: false };
+  return { label: `${timeStr} restantes`, color: '#22c55e', bg: 'rgba(34, 197, 94, 0.15)', border: '#22c55e', overdue: false };
+};
+
 export default function Home() {
   const { currentUser, logout, switchRole } = useAuth();
   const { currentCycle, currentStage, events, loadingEvents } = useCycles();
@@ -354,6 +383,32 @@ export default function Home() {
       navigate(`/centro-managers?tab=directorio&q=${encodeURIComponent(item.nombre)}&sede=${encodeURIComponent(item.sede)}`);
     }
   };
+
+  // ==========================================================================
+  // TAREAS QUE HAS ASIGNADO A OTROS (28/08/2026)
+  // --------------------------------------------------------------------------
+  // "tasks" (allTasks) ya trae TODA la colección "tasks" de Firestore sin
+  // filtrar (ChecklistContext hace onSnapshot sobre la colección completa),
+  // así que no hace falta una consulta nueva: solo filtramos por
+  // createdBy === mi correo. INFERENCIA sobre el alcance pedido ("todos los
+  // usuarios pueden ver las tareas que han asignado a otros"): se interpretó
+  // como "cada usuario ve las tareas QUE ÉL MISMO asignó", no un tablero
+  // global de todas las asignaciones de todos — si José quería lo segundo,
+  // hay que ajustarlo.
+  const userDisplayNameByEmail = {};
+  (realUsersData || []).forEach(u => {
+    if (u.email) userDisplayNameByEmail[u.email.toLowerCase().trim()] = u.name || u.displayName || u.email;
+  });
+  const resolveAssigneeName = (email) => userDisplayNameByEmail[(email || '').toLowerCase().trim()] || email;
+
+  const tareasQueHeAsignado = (allTasks || [])
+    .filter(t => (t.createdBy || '').toLowerCase().trim() === userEmail && userEmail)
+    .slice()
+    .sort((a, b) => {
+      const da = a.deadline ? new Date(a.deadline).getTime() : Infinity;
+      const dbTime = b.deadline ? new Date(b.deadline).getTime() : Infinity;
+      return da - dbTime;
+    });
 
   return (
     <div style={{ maxWidth: viewMode === 'lite' ? '780px' : '960px', margin: '0 auto', padding: viewMode === 'lite' ? '1.5rem 1rem' : '2rem 1rem' }}>
@@ -1324,6 +1379,55 @@ export default function Home() {
                     })
                   )}
                 </ul>
+              </div>
+            </div>
+          )}
+
+          {/* PANEL: TAREAS QUE HAS ASIGNADO A OTROS (con cuenta regresiva) */}
+          {tareasQueHeAsignado.length > 0 && (
+            <div className="glass-panel" style={{ padding: '1.2rem', marginBottom: '2rem' }}>
+              <h3 className="text-blue" style={{ marginTop: 0, borderBottom: '1px solid rgba(0,212,255,0.2)', paddingBottom: '0.4rem', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                📋 TAREAS QUE HAS ASIGNADO ({tareasQueHeAsignado.length})
+              </h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.8rem', maxHeight: '360px', overflowY: 'auto' }}>
+                {tareasQueHeAsignado.map(task => {
+                  const countdown = getCountdownInfo(task.deadline, time);
+                  const emails = task.assignedToEmails && task.assignedToEmails.length > 0
+                    ? task.assignedToEmails
+                    : (task.assignedToEmail ? [task.assignedToEmail] : []);
+                  const asignadosLabel = emails.length > 0 ? emails.map(resolveAssigneeName).join(', ') : 'Cualquiera en el rol';
+                  const isDone = task.completed || task.status === 'Completada';
+
+                  return (
+                    <div
+                      key={task.id}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap',
+                        padding: '0.65rem 0.8rem', borderRadius: '8px',
+                        background: isDone ? 'rgba(52, 168, 83, 0.08)' : 'rgba(255,255,255,0.03)',
+                        border: `1px solid ${isDone ? 'rgba(52, 168, 83, 0.25)' : 'var(--border-subtle)'}`
+                      }}
+                    >
+                      <div style={{ flex: 1, minWidth: '160px' }}>
+                        <span className="text-white" style={{ fontSize: '0.85rem', fontWeight: 600, display: 'block' }}>
+                          {isDone ? '✅ ' : ''}{task.task || task.title}
+                        </span>
+                        <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                          👤 Asignada a: {asignadosLabel}
+                        </span>
+                      </div>
+                      {!isDone && (
+                        <span style={{
+                          fontSize: '0.75rem', fontWeight: 700, padding: '0.3rem 0.7rem', borderRadius: '20px',
+                          color: countdown.color, background: countdown.bg, border: `1px solid ${countdown.border}`,
+                          whiteSpace: 'nowrap'
+                        }}>
+                          {countdown.label}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
