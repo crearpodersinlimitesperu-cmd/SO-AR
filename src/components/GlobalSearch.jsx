@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { Search, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import UserProfileModal from './UserProfileModal';
@@ -93,7 +93,8 @@ export default function GlobalSearch() {
             const phoneStr = (phoneVal || '').toString().replace(/\D/g, '');
             const phoneUrl = r.whatsappUrl || (phoneStr ? `https://wa.me/${phoneStr}` : null);
             const chatUrl = r.email ? `https://chat.google.com/dm/${r.email}` : null;
-            const roleLabel = (r.role || r.rol || 'Sin cargo').replace(/_/g, ' ').toUpperCase();
+            const rolesArr = (r.roles && r.roles.length > 0) ? r.roles : [r.role || r.rol || 'Sin cargo'];
+            const roleLabel = rolesArr.map(rl => rl.replace(/_/g, ' ').toUpperCase()).join(' • ');
 
             return (
               <div 
@@ -147,6 +148,7 @@ export default function GlobalSearch() {
     </div>
   );
 }
+
 
 
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useChecklist } from '../context/ChecklistContext';
 import { useAuth } from '../context/AuthContext';
@@ -151,9 +151,7 @@ function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, curre
         <div>
           <h4 style={{ margin: 0, fontSize: '0.95rem', color: 'var(--text-heading)' }}>{person.name}</h4>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '2px', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '0.78rem', color: roleColor, fontWeight: 600 }}>
-              {ROLE_LABELS[canonicalRole] || person.role}
-            </span>
+            {(person.roles && person.roles.length > 0 ? person.roles : [person.role]).map((r, i) => {                const rNorm = normalizeRole(r);                const rCol = ROLE_COLORS[rNorm] || '#6b7280';                const rLab = ROLE_LABELS[rNorm] || r;                return (                  <span key={r + i} style={{ fontSize: '0.78rem', color: rCol, fontWeight: 600 }}>                    {rLab}{i < (person.roles?.length || 1) - 1 ? ' • ' : ''}                  </span>                );              })}
             {person.sede && (
               <span style={{
                 fontSize: '0.72rem',
@@ -382,7 +380,18 @@ function SedeBlock({ sede, tasks, navigate, onSelectUser, onAssignTask, currentU
   });
 
   const sedePct = totalSedeTasks > 0 ? Math.round((totalSedeCompleted / totalSedeTasks) * 100) : 0;
-  const groupedMembers = members.reduce((acc, m) => { const k = normalizeRole(m.role || 'otro'); if (!acc[k]) acc[k] = []; acc[k].push(m); return acc; }, {});
+  const groupedMembers = members.reduce((acc, m) => {
+      const rolesToGroup = Array.isArray(m.roles) && m.roles.length > 0 ? m.roles : [m.role || 'otro'];
+      rolesToGroup.forEach(r => {
+        const k = normalizeRole(r);
+        if (!acc[k]) acc[k] = [];
+        // Evitar duplicados exactos si m.roles tiene roles que normalizan al mismo string
+        if (!acc[k].find(existing => existing.id === m.id || (existing.email && existing.email === m.email))) {
+          acc[k].push(m);
+        }
+      });
+      return acc;
+    }, {});
   return (
     <div className="glass-panel" style={{ padding: '1.5rem', border: '1px solid var(--border-subtle)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} onClick={() => setExpanded(!expanded)}>
@@ -707,7 +716,11 @@ function RoleView({ tasks, navigate, onSelectUser, onAssignTask, userConnections
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
       {allDisplayRoles.map(role => {
-        const members = (realUsersData || []).filter(u => u.role === role.id || normalizeRole(u.role) === role.id);
+        const members = (realUsersData || []).filter(u => {
+            const m1 = u.role === role.id || normalizeRole(u.role) === role.id;
+            const m2 = Array.isArray(u.roles) && u.roles.some(r => r === role.id || normalizeRole(r) === role.id);
+            return m1 || m2;
+          });
         if (members.length === 0) return null;
         const roleColor = ROLE_COLORS[role.id] || '#6b7280';
         return (
@@ -1040,3 +1053,6 @@ export default function SuperAdminPanel() {
     </div>
   );
 }
+
+
+

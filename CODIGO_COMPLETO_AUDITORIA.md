@@ -74126,7 +74126,7 @@ export class ErrorBoundary extends React.Component {
 ## Archivo: src\components\GlobalSearch.jsx
 
 ```javascript
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { Search, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import UserProfileModal from './UserProfileModal';
@@ -74221,7 +74221,8 @@ export default function GlobalSearch() {
             const phoneStr = (phoneVal || '').toString().replace(/\D/g, '');
             const phoneUrl = r.whatsappUrl || (phoneStr ? `https://wa.me/${phoneStr}` : null);
             const chatUrl = r.email ? `https://chat.google.com/dm/${r.email}` : null;
-            const roleLabel = (r.role || r.rol || 'Sin cargo').replace(/_/g, ' ').toUpperCase();
+            const rolesArr = (r.roles && r.roles.length > 0) ? r.roles : [r.role || r.rol || 'Sin cargo'];
+            const roleLabel = rolesArr.map(rl => rl.replace(/_/g, ' ').toUpperCase()).join(' • ');
 
             return (
               <div 
@@ -74275,6 +74276,7 @@ export default function GlobalSearch() {
     </div>
   );
 }
+
 
 
 
@@ -77519,7 +77521,7 @@ export default function UserAuditReport({ onClose }) {
 ## Archivo: src\components\UserProfileModal.jsx
 
 ```javascript
-import { getWhatsAppUrl } from '../utils/phoneUtils';
+﻿import { getWhatsAppUrl } from '../utils/phoneUtils';
 import { useState, useEffect } from 'react';
 import { 
   X, User, CheckCircle2, Clock, AlertTriangle, 
@@ -78563,6 +78565,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
   );
 }
 
+
 ```
 
 ---
@@ -79104,7 +79107,7 @@ export default function ViewModeSelector() {
 ## Archivo: src\config\permissions.js
 
 ```js
-// Configuración centralizada de permisos y roles administrativos
+﻿// Configuración centralizada de permisos y roles administrativos
 // Este archivo es la ÚNICA fuente de verdad para emails con privilegios elevados.
 // Cualquier cambio de SuperAdmin se hace AQUÍ, no disperso en el código.
 
@@ -79149,10 +79152,10 @@ export const isSuperAdminEmail = (email) => {
  */
 export const canSimulate = (currentUser, originalAdminUser = null) => {
   if (originalAdminUser) {
-    return Boolean(originalAdminUser.isSuperAdmin || isSuperAdminEmail(originalAdminUser.email));
+    return Boolean(originalAdminUser.isSuperAdmin || isSuperAdminEmail(originalAdminUser.email) || DIRECCION_ROLES.includes(originalAdminUser.appRole));
   }
   if (!currentUser) return false;
-  return Boolean(currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email));
+  return Boolean(currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email) || DIRECCION_ROLES.includes(currentUser.appRole));
 };
 
 /**
@@ -79525,6 +79528,8 @@ export const checkModuleAccess = (currentUser, moduleKey) => {
 };
 
 
+
+
 ```
 
 ---
@@ -79532,7 +79537,7 @@ export const checkModuleAccess = (currentUser, moduleKey) => {
 ## Archivo: src\context\AuthContext.jsx
 
 ```javascript
-import { createContext, useContext, useEffect, useState } from 'react';
+﻿import { createContext, useContext, useEffect, useState } from 'react';
 import { auth } from '../services/firebase';
 import { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'firebase/auth';
 import { collection, query, where, getDocs, doc, getDoc, setDoc, serverTimestamp, addDoc } from 'firebase/firestore';
@@ -79623,7 +79628,7 @@ export function AuthProvider({ children }) {
 
   const simulateUser = (targetUser) => {
     if (!canSimulate(currentUser, originalAdminUser)) {
-      showToast('Acceso Denegado: Solo el Super Administrador puede simular usuarios.', 'error');
+      showToast('Acceso Denegado: Solo Super Administradores y Directivos pueden simular usuarios.', 'error');
       return;
     }
     setOriginalAdminUser(currentUser);
@@ -79961,6 +79966,7 @@ export function AuthProvider({ children }) {
 export function useAuth() {
   return useContext(AuthContext);
 }
+
 
 ```
 
@@ -137778,7 +137784,7 @@ export default function StrategyBoard() {
 ## Archivo: src\pages\SuperAdminPanel.jsx
 
 ```javascript
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useChecklist } from '../context/ChecklistContext';
 import { useAuth } from '../context/AuthContext';
@@ -137931,9 +137937,7 @@ function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, curre
         <div>
           <h4 style={{ margin: 0, fontSize: '0.95rem', color: 'var(--text-heading)' }}>{person.name}</h4>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '2px', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '0.78rem', color: roleColor, fontWeight: 600 }}>
-              {ROLE_LABELS[canonicalRole] || person.role}
-            </span>
+            {(person.roles && person.roles.length > 0 ? person.roles : [person.role]).map((r, i) => {                const rNorm = normalizeRole(r);                const rCol = ROLE_COLORS[rNorm] || '#6b7280';                const rLab = ROLE_LABELS[rNorm] || r;                return (                  <span key={r + i} style={{ fontSize: '0.78rem', color: rCol, fontWeight: 600 }}>                    {rLab}{i < (person.roles?.length || 1) - 1 ? ' • ' : ''}                  </span>                );              })}
             {person.sede && (
               <span style={{
                 fontSize: '0.72rem',
@@ -138162,7 +138166,18 @@ function SedeBlock({ sede, tasks, navigate, onSelectUser, onAssignTask, currentU
   });
 
   const sedePct = totalSedeTasks > 0 ? Math.round((totalSedeCompleted / totalSedeTasks) * 100) : 0;
-  const groupedMembers = members.reduce((acc, m) => { const k = normalizeRole(m.role || 'otro'); if (!acc[k]) acc[k] = []; acc[k].push(m); return acc; }, {});
+  const groupedMembers = members.reduce((acc, m) => {
+      const rolesToGroup = Array.isArray(m.roles) && m.roles.length > 0 ? m.roles : [m.role || 'otro'];
+      rolesToGroup.forEach(r => {
+        const k = normalizeRole(r);
+        if (!acc[k]) acc[k] = [];
+        // Evitar duplicados exactos si m.roles tiene roles que normalizan al mismo string
+        if (!acc[k].find(existing => existing.id === m.id || (existing.email && existing.email === m.email))) {
+          acc[k].push(m);
+        }
+      });
+      return acc;
+    }, {});
   return (
     <div className="glass-panel" style={{ padding: '1.5rem', border: '1px solid var(--border-subtle)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} onClick={() => setExpanded(!expanded)}>
@@ -138487,7 +138502,11 @@ function RoleView({ tasks, navigate, onSelectUser, onAssignTask, userConnections
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
       {allDisplayRoles.map(role => {
-        const members = (realUsersData || []).filter(u => u.role === role.id || normalizeRole(u.role) === role.id);
+        const members = (realUsersData || []).filter(u => {
+            const m1 = u.role === role.id || normalizeRole(u.role) === role.id;
+            const m2 = Array.isArray(u.roles) && u.roles.some(r => r === role.id || normalizeRole(r) === role.id);
+            return m1 || m2;
+          });
         if (members.length === 0) return null;
         const roleColor = ROLE_COLORS[role.id] || '#6b7280';
         return (
@@ -138820,6 +138839,9 @@ export default function SuperAdminPanel() {
     </div>
   );
 }
+
+
+
 
 ```
 
