@@ -195,6 +195,7 @@ export const DUAL_ROLE_TRAINER_EMAILS = [
   'paul.sosa@crearpsl.net',         // Corporativo + Entrenador C2+MJ
   'leandro.brunis@crearpsl.net',    // Dirección / Corporativo + Entrenador C1 (Leandro Brunis)
   'carlos.brunis@crearpsl.net',     // Coordinador QT Global + Entrenador (Carlos Brunis)
+  'linid.valencia@crearpsl.net',    // Coordinadora MJ + Entrenadora
   'brunische66@gmail.com',
 ];
 
