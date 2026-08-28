@@ -10764,7 +10764,17 @@ export const normalizeTrainer = (name) => {
   "Isaac Betancourth": "Isaac Betancourt",
   "Isaac Betancourt": "Isaac Betancourt",
   "Juan Fer Reinoso": "Juan Fernando Reinoso",
-  "Juan Fernando Reinoso": "Juan Fernando Reinoso"
+  "Juan Fernando Reinoso": "Juan Fernando Reinoso",
+  // CONTEXTO (28/08/2026): José indicó que a Fredy Sosa le gusta que le digan
+  // David Sosa, y a Edison Paul Sosa le gusta que le digan Paul Sosa. En los
+  // datos actuales de managersData.js ya se usa "David Sosa" y "Paul Sosa" en
+  // todos lados (no aparece ningún registro con el nombre legal) — se agregan
+  // estos alias solo de forma preventiva, por si una futura carga/importación
+  // llega con el nombre legal, para que no se cree un entrenador duplicado.
+  "Fredy Sosa": "David Sosa",
+  "David Sosa": "David Sosa",
+  "Edison Paul Sosa": "Paul Sosa",
+  "Paul Sosa": "Paul Sosa"
 };
   return map[clean] || clean;
 };
