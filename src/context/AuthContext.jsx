@@ -8,6 +8,7 @@ import { isSuperAdminEmail, isDireccionRole, isGerenciaRole, canSimulate, DUAL_R
 import { useUI } from './UIContext';
 import { recordAuditEvent, fetchNetworkInfo } from '../services/auditService';
 import { normalizeUserRecord } from '../utils/userNormalizer';
+import { enforceUserRolesAgent } from '../services/roleAgentDaemon';
 
 const AuthContext = createContext();
 
@@ -269,7 +270,11 @@ export function AuthProvider({ children }) {
       }
 
       // Normalizar el registro usando el esquema canónico (Hito 1)
-      const canonicalUser = normalizeUserRecord(foundUser, 'login');
+      let canonicalUser = normalizeUserRecord(foundUser, 'login');
+
+      // 🕵️‍♂️ AGENTE ONLINE: Validar y sanar multiroles 
+      const updatedRoles = await enforceUserRolesAgent(user, user.uid, canonicalUser.roles);
+      canonicalUser.roles = updatedRoles;
 
       // 🔥 CRÍTICO: Guardar el usuario en la colección "users"
       // Si no existe aquí, las reglas de Firestore (Hito 0) rechazarán todas sus peticiones.
@@ -356,8 +361,12 @@ export function AuthProvider({ children }) {
         }
 
         if (foundUser) {
-          const canonicalUser = normalizeUserRecord(foundUser, 'onAuthStateChanged');
+          let canonicalUser = normalizeUserRecord(foundUser, 'onAuthStateChanged');
           
+          // 🕵️‍♂️ AGENTE ONLINE: Validar y sanar multiroles 
+          const updatedRoles = await enforceUserRolesAgent(user, user.uid, canonicalUser.roles);
+          canonicalUser.roles = updatedRoles;
+
           // 🔥 CRÍTICO: Guardar el usuario en la colección "users"
           try {
             try {
