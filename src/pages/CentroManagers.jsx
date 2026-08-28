@@ -104,6 +104,11 @@ export default function CentroManagers() {
 
   const queryParams = new URLSearchParams(location.search);
   const initialTab = queryParams.get('tab') || 'directorio';
+  // NOTA (28/08/2026): permite que el Buscador Global de Home.jsx traiga al
+  // usuario directo a un equipo/capitán/manager ya filtrado, vía
+  // /centro-managers?tab=grupales&q=<texto>&sede=<sede>
+  const initialSearchQuery = queryParams.get('q') || '';
+  const initialSedeQuery = queryParams.get('sede') || '';
 
   // Permisos avanzados
   const canViewAll = canViewAllManagers(currentUser);
@@ -196,8 +201,8 @@ export default function CentroManagers() {
 
   // UI State
   const [activeTab, setActiveTab] = useState(initialTab);
-  const [search, setSearch] = useState('');
-  const [filterSede, setFilterSede] = useState('');
+  const [search, setSearch] = useState(initialSearchQuery);
+  const [filterSede, setFilterSede] = useState(initialSedeQuery ? normalizeSede(initialSedeQuery) : '');
   const [statusFilter, setStatusFilter] = useState('Todos'); // 'Todos' | 'Activo' | 'Graduado' | 'Desertor'
 
   // Estadísticas por Entrenador (Tab: Entrenadores)

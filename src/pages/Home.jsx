@@ -20,8 +20,11 @@ import VenueConfigModal from '../components/VenueConfigModal';
 import ViewModeSelector from '../components/ViewModeSelector';
 import ThemeToggle from '../components/ThemeToggle';
 import { getVenueForTraining } from '../data/venuesData';
-import { ROLE_DISPLAY_NAMES } from '../data/usersData';
-import { canAssignTrainer } from '../config/permissions';
+import { ROLE_DISPLAY_NAMES, normalizeSede } from '../data/usersData';
+import { canAssignTrainer, canViewAllManagers, isDireccionRole, isGlobalQTCoordinator } from '../config/permissions';
+import { getAllCompanyUsers } from '../services/userService';
+import UserProfileModal from '../components/UserProfileModal';
+import { INITIAL_MANAGERS } from '../data/managersData';
 
 /**
  * Normaliza y verifica si un evento está asignado a un entrenador específico
@@ -60,6 +63,57 @@ const isTrainerMatchingUser = (evTrainer, user) => {
   return false;
 };
 
+// ============================================================================
+// BUSCADOR GLOBAL — Registro de módulos/páginas (28/08/2026)
+// ----------------------------------------------------------------------------
+// Refleja exactamente las mismas rutas y los mismos arrays de roles que ya
+// usan el menú "🛠️ Más Módulos y Herramientas" y la Barra Pro en este mismo
+// archivo (ver las secciones "MENÚ DESPLEGABLE DE MÁS MÓDULOS" y "BARRA PRO
+// COMPLETA" más abajo). Si se agrega, quita o re-permisiona un módulo ahí,
+// hay que actualizar también esta lista para que el buscador no muestre
+// accesos desactualizados o incorrectos.
+// ============================================================================
+const EXEC_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado'];
+const KPI_ROLES = ['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan'];
+const DIRECTORIO_QT_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'consolidado'];
+const CAMPUS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'consolidado'];
+const CENTRO_MANAGERS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'consolidado'];
+const MANUAL_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'consolidado'];
+const MANUAL_NODUS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'consolidado'];
+const REPORTES_VISIBLE = (u) => Boolean(
+  u?.isSuperAdmin || u?.isGerente ||
+  ['coord_c1', 'coord_maestria', 'capitan', 'qt', 'direccion', 'director_maestria', 'consolidado'].includes(u?.appRole)
+);
+
+const MODULE_REGISTRY = [
+  { id: 'gerencial', label: 'Causa OS Gerencial', emoji: '💼', route: '/gerente', roles: EXEC_ROLES },
+  { id: 'portafolio', label: 'Portafolio PMO (Planview)', emoji: '📈', route: '/portafolio', roles: EXEC_ROLES },
+  { id: 'estrategia', label: 'Estrategia OKRs (Cascade)', emoji: '🎯', route: '/estrategia', roles: EXEC_ROLES },
+  { id: 'auditoria-kpis', label: 'Auditoría de KPIs', emoji: '📉', route: '/auditoria-kpis', roles: EXEC_ROLES },
+  { id: 'acuerdos', label: 'Acuerdos Oficiales (Correo)', emoji: '✉️', route: '/acuerdos', roles: null },
+  { id: 'calendario-equipo', label: 'Agenda y Time Boxing', emoji: '🗓️', route: '/calendario-equipo', roles: null },
+  { id: 'learning', label: 'Inteligencia Colectiva (Learning)', emoji: '🧠', route: '/learning', roles: null },
+  { id: 'excelencia', label: 'Excelencia Operativa', emoji: '👑', route: '/excelencia', roles: null },
+  { id: 'mis-kpis', label: 'Mis KPIs', emoji: '📊', route: '/mis-kpis', roles: KPI_ROLES },
+  { id: 'directorio-qt', label: 'Directorio QT', emoji: '⚡', route: '/directorio-qt', roles: DIRECTORIO_QT_ROLES },
+  { id: 'superadmin', label: 'Centro de Mando', emoji: '🌐', route: '/superadmin', roles: EXEC_ROLES },
+  { id: 'calendario-global', label: 'Calendario Global Maestro', emoji: '📅', external: 'calendario-global', roles: null },
+  { id: 'campus', label: 'Campus Interactivo', emoji: '🎓', external: 'https://cpsl-campus-interactivo.vercel.app/ruta', roles: CAMPUS_ROLES },
+  { id: 'centro-managers', label: 'Centro de Managers', emoji: '🎯', route: '/centro-managers', roles: CENTRO_MANAGERS_ROLES },
+  { id: 'protocolo-emergencias', label: 'Protocolo de Emergencias', emoji: '🚨', route: '/protocolo-emergencias', roles: null },
+  { id: 'manual', label: 'Manual / Guía Causa OS / QT', emoji: '📘', route: '/manual', roles: MANUAL_ROLES },
+  { id: 'manual-nodus', label: 'Manual Práctico Nodus', emoji: '📗', route: '/manual-nodus', roles: MANUAL_NODUS_ROLES },
+  { id: 'checklist', label: 'Mi Checklist Operativo', emoji: '✅', route: (u) => `/checklist/${u?.appRole || 'capitan'}`, roles: null },
+  { id: 'metas', label: 'Mis Metas', emoji: '🏆', route: '/metas', roles: null },
+  { id: 'reportes', label: 'Enviar Reportes', emoji: '📤', route: '/reportes', roles: null, visible: REPORTES_VISIBLE },
+];
+
+const isModuleVisible = (mod, currentUser) => {
+  if (typeof mod.visible === 'function') return mod.visible(currentUser);
+  if (mod.roles === null) return true;
+  return (mod.roles || []).includes(currentUser?.appRole);
+};
+
 export default function Home() {
   const { currentUser, logout, switchRole } = useAuth();
   const { currentCycle, currentStage, events, loadingEvents } = useCycles();
@@ -82,6 +136,43 @@ export default function Home() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showToolsDropdown, setShowToolsDropdown] = useState(false);
   const toolsDropdownRef = useRef(null);
+
+  // BUSCADOR GLOBAL (28/08/2026) — Personas + Páginas y módulos + Equipos/Capitanes
+  const [globalSearchTerm, setGlobalSearchTerm] = useState('');
+  const [showGlobalSearchResults, setShowGlobalSearchResults] = useState(false);
+  const globalSearchRef = useRef(null);
+  const [realUsersData, setRealUsersData] = useState([]);
+  const [usersLoading, setUsersLoading] = useState(true);
+  const [selectedSearchUser, setSelectedSearchUser] = useState(null);
+  const [showSearchUserModal, setShowSearchUserModal] = useState(false);
+
+  // Carga de personas para el buscador (misma fuente que Centro de Mando: getAllCompanyUsers())
+  useEffect(() => {
+    let isMounted = true;
+    async function fetchUsersForSearch() {
+      try {
+        const users = await getAllCompanyUsers();
+        if (isMounted) setRealUsersData(users);
+      } catch (err) {
+        console.error("Error cargando usuarios para el buscador global:", err);
+      } finally {
+        if (isMounted) setUsersLoading(false);
+      }
+    }
+    fetchUsersForSearch();
+    return () => { isMounted = false; };
+  }, []);
+
+  // Cerrar el buscador global al hacer click fuera
+  useEffect(() => {
+    function handleClickOutsideSearch(event) {
+      if (globalSearchRef.current && !globalSearchRef.current.contains(event.target)) {
+        setShowGlobalSearchResults(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutsideSearch);
+    return () => document.removeEventListener("mousedown", handleClickOutsideSearch);
+  }, []);
 
   // Cerrar dropdown al hacer click fuera
   useEffect(() => {
@@ -164,6 +255,105 @@ export default function Home() {
     const valB = (b.isCritical || b.priority === '🔴 ROJO') ? 3 : (b.priority === '🟡 AMARILLO' ? 2 : 1);
     return valB - valA;
   });
+
+  // ==========================================================================
+  // BUSCADOR GLOBAL — lógica de resultados (28/08/2026)
+  // --------------------------------------------------------------------------
+  // DATO FALTANTE / INFERENCIA (declarado explícitamente por REGLA ABSOLUTA):
+  // Causa OS no tenía, antes de este cambio, un módulo de "buscador global"
+  // documentado con reglas de visibilidad propias, así que el alcance de
+  // "Personas" y "Equipos/Capitanes" aquí se apoya en el mismo criterio ya
+  // usado en otras pantallas de la app (canViewAllManagers/isDireccionRole =
+  // ver TODO; el resto = solo su propia sede + registros marcados como
+  // Sede Global). Si esto no es lo que José quiere, hay que ajustarlo.
+  // "Páginas y módulos" sí es un HECHO: son exactamente las mismas rutas y
+  // los mismos arrays de roles que ya usa el menú "Más Módulos y Herramientas"
+  // de este archivo.
+  // ==========================================================================
+  const canSeeGlobalDirectory = Boolean(
+    currentUser?.isSuperAdmin ||
+    currentUser?.isDireccion ||
+    isDireccionRole(currentUser?.appRole) ||
+    canViewAllManagers(currentUser)
+  );
+  const currentUserSedeNorm = normalizeSede(currentUser?.sede);
+  const globalSearchQ = globalSearchTerm.trim().toLowerCase();
+  const globalSearchActive = globalSearchQ.length >= 2;
+
+  const globalSearchPeopleResults = !globalSearchActive ? [] : (realUsersData || [])
+    .filter(u => {
+      if (canSeeGlobalDirectory) return true;
+      const uSede = normalizeSede(u.sede);
+      return uSede === currentUserSedeNorm || uSede === 'Sede Global' || isGlobalQTCoordinator({ email: u.email });
+    })
+    .filter(u => {
+      const name = (u.name || u.displayName || '').toLowerCase();
+      const email = (u.email || '').toLowerCase();
+      const role = (ROLE_DISPLAY_NAMES[u.role] || u.role || '').toLowerCase();
+      const sede = (u.sede || '').toLowerCase();
+      return name.includes(globalSearchQ) || email.includes(globalSearchQ) || role.includes(globalSearchQ) || sede.includes(globalSearchQ);
+    })
+    .slice(0, 8);
+
+  const globalSearchModuleResults = !globalSearchActive ? [] : MODULE_REGISTRY
+    .filter(mod => isModuleVisible(mod, currentUser))
+    .filter(mod => mod.label.toLowerCase().includes(globalSearchQ))
+    .slice(0, 8);
+
+  const globalSearchTeamResults = (() => {
+    if (!globalSearchActive) return [];
+    const seenTeams = new Map();
+    const capitanHits = [];
+    INITIAL_MANAGERS.forEach(m => {
+      const mSede = normalizeSede(m.sede);
+      if (!canSeeGlobalDirectory && mSede !== currentUserSedeNorm && mSede !== 'Sede Global') return;
+
+      if (m.equipo) {
+        const key = `${mSede}_${m.equipo}`;
+        const teamStr = `${m.equipo} ${m.numEquipo || ''} ${mSede} ${m.entrenador || ''}`.toLowerCase();
+        if (!seenTeams.has(key) && teamStr.includes(globalSearchQ)) {
+          seenTeams.set(key, { type: 'equipo', key, equipo: m.equipo, sede: mSede });
+        }
+      }
+
+      const rol = (m.rol || '').toLowerCase();
+      if (rol.includes('capitan') && (m.nombre || '').toLowerCase().includes(globalSearchQ)) {
+        capitanHits.push({ type: 'capitan', key: `cap_${m.id}`, id: m.id, nombre: m.nombre, equipo: m.equipo, sede: mSede });
+      }
+    });
+    return [...Array.from(seenTeams.values()).slice(0, 5), ...capitanHits.slice(0, 5)];
+  })();
+
+  const handleSelectSearchPerson = (u) => {
+    setSelectedSearchUser(u);
+    setShowSearchUserModal(true);
+    setShowGlobalSearchResults(false);
+    setGlobalSearchTerm('');
+  };
+
+  const handleSelectSearchModule = (mod) => {
+    setShowGlobalSearchResults(false);
+    setGlobalSearchTerm('');
+    if (mod.external === 'calendario-global') {
+      window.open('/calendario_global.html?v=' + Date.now() + '&email=' + encodeURIComponent(currentUser?.email || '') + '&name=' + encodeURIComponent(currentUser?.displayName || currentUser?.name || ''), '_blank');
+    } else if (mod.external) {
+      window.open(mod.external, '_blank');
+    } else if (typeof mod.route === 'function') {
+      navigate(mod.route(currentUser));
+    } else if (mod.route) {
+      navigate(mod.route);
+    }
+  };
+
+  const handleSelectSearchTeam = (item) => {
+    setShowGlobalSearchResults(false);
+    setGlobalSearchTerm('');
+    if (item.type === 'equipo') {
+      navigate(`/centro-managers?tab=grupales&q=${encodeURIComponent(item.equipo)}&sede=${encodeURIComponent(item.sede)}`);
+    } else {
+      navigate(`/centro-managers?tab=directorio&q=${encodeURIComponent(item.nombre)}&sede=${encodeURIComponent(item.sede)}`);
+    }
+  };
 
   return (
     <div style={{ maxWidth: viewMode === 'lite' ? '780px' : '960px', margin: '0 auto', padding: viewMode === 'lite' ? '1.5rem 1rem' : '2rem 1rem' }}>
@@ -265,6 +455,93 @@ export default function Home() {
               <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '600' }}>Vista:</span>
               <ViewModeSelector />
             </div>
+          </div>
+
+          {/* BUSCADOR GLOBAL (Personas + Páginas y módulos + Equipos/Capitanes) */}
+          <div ref={globalSearchRef} style={{ position: 'relative', width: '100%', maxWidth: '280px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-strong)', borderRadius: '8px', padding: '0.4rem 0.6rem' }}>
+              <Search size={15} className="text-muted" />
+              <input
+                type="text"
+                value={globalSearchTerm}
+                onChange={(e) => { setGlobalSearchTerm(e.target.value); setShowGlobalSearchResults(true); }}
+                onFocus={() => setShowGlobalSearchResults(true)}
+                placeholder="Buscar personas, páginas, equipos..."
+                style={{ flex: 1, minWidth: 0, background: 'transparent', border: 'none', outline: 'none', color: 'var(--text-main)', fontSize: '0.85rem' }}
+              />
+              {globalSearchTerm && (
+                <X size={14} className="text-muted" style={{ cursor: 'pointer', flexShrink: 0 }} onClick={() => { setGlobalSearchTerm(''); setShowGlobalSearchResults(false); }} />
+              )}
+            </div>
+
+            {showGlobalSearchResults && globalSearchActive && (
+              <div className="glass-panel" style={{ position: 'absolute', top: '110%', left: 0, right: 0, zIndex: 200, maxHeight: '420px', overflowY: 'auto', padding: '0.5rem', boxShadow: '0 10px 40px rgba(0,0,0,0.9)', border: '1px solid rgba(41, 171, 226, 0.3)', textAlign: 'left' }}>
+                {usersLoading && (
+                  <div className="text-muted" style={{ fontSize: '0.78rem', padding: '0.4rem' }}>Cargando personas...</div>
+                )}
+
+                {!usersLoading && globalSearchPeopleResults.length === 0 && globalSearchModuleResults.length === 0 && globalSearchTeamResults.length === 0 && (
+                  <div className="text-muted" style={{ fontSize: '0.8rem', padding: '0.5rem' }}>Sin resultados para "{globalSearchTerm}"</div>
+                )}
+
+                {globalSearchPeopleResults.length > 0 && (
+                  <div style={{ marginBottom: '0.5rem' }}>
+                    <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--crear-gold)', textTransform: 'uppercase', padding: '0.2rem 0.4rem' }}>Personas</div>
+                    {globalSearchPeopleResults.map((u, i) => (
+                      <button
+                        key={u.id || u.email || i}
+                        onClick={() => handleSelectSearchPerson(u)}
+                        style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', width: '100%', textAlign: 'left', padding: '0.45rem 0.5rem', background: 'transparent', border: 'none', borderRadius: '6px', cursor: 'pointer', color: 'var(--text-main)' }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(41,171,226,0.1)'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                      >
+                        <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>👤 {u.name || u.displayName || u.email}</span>
+                        <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{ROLE_DISPLAY_NAMES[u.role] || u.role || ''}{u.sede ? ` • ${u.sede}` : ''}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {globalSearchModuleResults.length > 0 && (
+                  <div style={{ marginBottom: '0.5rem' }}>
+                    <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--crear-cyan)', textTransform: 'uppercase', padding: '0.2rem 0.4rem' }}>Páginas y módulos</div>
+                    {globalSearchModuleResults.map(mod => (
+                      <button
+                        key={mod.id}
+                        onClick={() => handleSelectSearchModule(mod)}
+                        style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', width: '100%', textAlign: 'left', padding: '0.45rem 0.5rem', background: 'transparent', border: 'none', borderRadius: '6px', cursor: 'pointer', color: 'var(--text-main)', fontSize: '0.85rem' }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(41,171,226,0.1)'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                      >
+                        {mod.emoji} {mod.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {globalSearchTeamResults.length > 0 && (
+                  <div>
+                    <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#d97706', textTransform: 'uppercase', padding: '0.2rem 0.4rem' }}>Equipos y Capitanes (Centro de Managers)</div>
+                    {globalSearchTeamResults.map((item, i) => (
+                      <button
+                        key={item.key || i}
+                        onClick={() => handleSelectSearchTeam(item)}
+                        style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', width: '100%', textAlign: 'left', padding: '0.45rem 0.5rem', background: 'transparent', border: 'none', borderRadius: '6px', cursor: 'pointer', color: 'var(--text-main)' }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(217,119,6,0.1)'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                      >
+                        {item.type === 'equipo' ? (
+                          <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>👥 Equipo {item.equipo}</span>
+                        ) : (
+                          <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>🎖️ {item.nombre} (Capitán)</span>
+                        )}
+                        <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{item.sede}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
@@ -1079,6 +1356,11 @@ export default function Home() {
 
       {/* MODAL CONFIGURACIÓN DE HOTELES Y SALONES */}
       <VenueConfigModal isOpen={showVenueModal} onClose={() => setShowVenueModal(false)} />
+
+      {/* MODAL DE PERFIL DE PERSONA (abierto desde el Buscador Global) */}
+      {showSearchUserModal && selectedSearchUser && (
+        <UserProfileModal isOpen={showSearchUserModal} onClose={() => setShowSearchUserModal(false)} user={selectedSearchUser} allTasks={allTasks} />
+      )}
     </div>
   );
 }
