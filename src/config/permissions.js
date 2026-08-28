@@ -1,4 +1,4 @@
-// Configuración centralizada de permisos y roles administrativos
+﻿// Configuración centralizada de permisos y roles administrativos
 // Este archivo es la ÚNICA fuente de verdad para emails con privilegios elevados.
 // Cualquier cambio de SuperAdmin se hace AQUÍ, no disperso en el código.
 
@@ -43,10 +43,10 @@ export const isSuperAdminEmail = (email) => {
  */
 export const canSimulate = (currentUser, originalAdminUser = null) => {
   if (originalAdminUser) {
-    return Boolean(originalAdminUser.isSuperAdmin || isSuperAdminEmail(originalAdminUser.email));
+    return Boolean(originalAdminUser.isSuperAdmin || isSuperAdminEmail(originalAdminUser.email) || DIRECCION_ROLES.includes(originalAdminUser.appRole));
   }
   if (!currentUser) return false;
-  return Boolean(currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email));
+  return Boolean(currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email) || DIRECCION_ROLES.includes(currentUser.appRole));
 };
 
 /**
@@ -417,4 +417,6 @@ export const checkModuleAccess = (currentUser, moduleKey) => {
 
   return { hasAccess: false, scope: 'NONE' };
 };
+
+
 

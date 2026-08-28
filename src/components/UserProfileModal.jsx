@@ -1,4 +1,4 @@
-import { getWhatsAppUrl } from '../utils/phoneUtils';
+﻿import { getWhatsAppUrl } from '../utils/phoneUtils';
 import { useState, useEffect } from 'react';
 import { 
   X, User, CheckCircle2, Clock, AlertTriangle, 
@@ -1041,3 +1041,4 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
     </>
   );
 }
+

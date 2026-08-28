@@ -74179,7 +74179,7 @@ export default function GlobalSearch() {
 
   return (
     <div ref={wrapperRef} style={{ position: 'relative', width: '300px', zIndex: 100 }}>
-      {selectedUser && <UserProfileModal isOpen={!!selectedUser} onClose={() => setSelectedUser(null)} user={selectedUser} />} style={{ position: 'relative', width: '300px', zIndex: 100 }}>
+      {selectedUser && <UserProfileModal isOpen={!!selectedUser} onClose={() => setSelectedUser(null)} user={selectedUser} />}
       <div style={{ position: 'relative' }}>
         <Search size={16} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
         <input 

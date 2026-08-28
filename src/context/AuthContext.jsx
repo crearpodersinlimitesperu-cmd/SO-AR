@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+﻿import { createContext, useContext, useEffect, useState } from 'react';
 import { auth } from '../services/firebase';
 import { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'firebase/auth';
 import { collection, query, where, getDocs, doc, getDoc, setDoc, serverTimestamp, addDoc } from 'firebase/firestore';
@@ -89,7 +89,7 @@ export function AuthProvider({ children }) {
 
   const simulateUser = (targetUser) => {
     if (!canSimulate(currentUser, originalAdminUser)) {
-      showToast('Acceso Denegado: Solo el Super Administrador puede simular usuarios.', 'error');
+      showToast('Acceso Denegado: Solo Super Administradores y Directivos pueden simular usuarios.', 'error');
       return;
     }
     setOriginalAdminUser(currentUser);
@@ -427,3 +427,4 @@ export function AuthProvider({ children }) {
 export function useAuth() {
   return useContext(AuthContext);
 }
+
