@@ -15,7 +15,8 @@
     "backup": "node scripts/backupFirestore.js",
     "restore": "node scripts/restoreFirestore.js",
     "bot:sync": "node scripts/causa_sync_bot.mjs",
-    "bot:omni": "node scripts/causa_omni_auditor.mjs"
+    "bot:omni": "node scripts/causa_omni_auditor.mjs",
+    "audit:platform": "node scripts/platform_audit.mjs"
   },
   "dependencies": {
     "cors": "^2.8.6",

@@ -1,0 +1,46 @@
+name: 🔍 Auditoría de Plataforma y Nodus
+
+on:
+  schedule:
+    # Cada 5 horas (dentro del rango "cada 4-6 horas" pedido). El cron ancla
+    # en minuto 0; GitHub Actions no garantiza el minuto exacto de disparo,
+    # solo que corre aproximadamente en ese intervalo.
+    - cron: '0 */5 * * *'
+  workflow_dispatch: # Permite correrlo manualmente desde GitHub UI para probarlo
+
+permissions:
+  contents: read
+  issues: write # Necesario para crear/actualizar el Issue de estado de la auditoría
+
+jobs:
+  audit:
+    name: Auditoría heurística de Causa OS + Nodus
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Checkout código
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 📦 Instalar dependencias
+        run: npm ci
+
+      - name: 🔍 Ejecutar auditoría
+        env:
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_PASS: ${{ secrets.GMAIL_PASS }}
+          ADMIN_EMAIL: ${{ secrets.GMAIL_USER }}
+          ADMIN_PASS: ${{ secrets.GMAIL_PASS }}
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/platform_audit.mjs
