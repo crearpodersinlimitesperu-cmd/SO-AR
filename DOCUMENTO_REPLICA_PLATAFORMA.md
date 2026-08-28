@@ -92654,6 +92654,9 @@ export const normalizeTrainer = (name) => {
   "Josué Vera": "Josue Vera",
   "Marcos Vera": "Josue Vera",
   "Marcos Josue Vera": "Josue Vera",
+  "David Sosa": "Freddy Sosa",
+  "Freddy Sosa": "Freddy Sosa",
+  "Freddy David Sosa Carrera": "Freddy Sosa",
   "Julio Narvez": "Julio Narvaez",
   "Julio Narvaez": "Julio Narvaez",
   "Julio Narváez": "Julio Narvaez",
@@ -126816,6 +126819,8 @@ import {
   ShieldCheck, Lock, AlertTriangle, Target, ArrowUpDown, ArrowUp, ArrowDown
 } from 'lucide-react';
 import CMJDashboard from '../components/CMJDashboard';
+import UserProfileModal from '../components/UserProfileModal';
+import { getAllCompanyUsers } from '../services/userService';
 
 const SEDE_COLORS = {
   Quito: "#29abe2", Lima: "#ef4444", Guayaquil: "#f59e0b",
@@ -126876,6 +126881,28 @@ const isTrainerMatch = (mTrainer, targetTrainer) => {
 };
 
 export default function CentroManagers() {
+  const [directoryUsers, setDirectoryUsers] = useState([]);
+  const [selectedTrainerProfile, setSelectedTrainerProfile] = useState(null);
+
+  useEffect(() => {
+    getAllCompanyUsers().then(users => {
+      setDirectoryUsers(users);
+    }).catch(console.error);
+  }, []);
+
+  const handleTrainerClick = (trainerName) => {
+    if (!trainerName || trainerName === 'Sin Asignar') return;
+    const normSearch = trainerName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+    const match = directoryUsers.find(u => {
+      const uName = (u.name || u.displayName || u.nombre || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+      return uName === normSearch || uName.includes(normSearch) || normSearch.includes(uName);
+    });
+    if (match) {
+      setSelectedTrainerProfile(match);
+    } else {
+      setSelectedTrainerProfile({ name: trainerName, role: 'entrenador', roles: ['entrenador'], sede: 'Global' });
+    }
+  };
   const { currentUser } = useAuth();
   const { showToast } = useUI();
   const navigate = useNavigate();
@@ -128213,9 +128240,7 @@ export default function CentroManagers() {
                           {mTrainers.length > 0 && mTrainers[0] !== "" ? (
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem' }}>
                               {mTrainers.map(t => (
-                                <span key={t} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.2rem', background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', padding: '0.2rem 0.5rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600 }}>
-                                  🎓 {t}
-                                </span>
+                                <button key={t} onClick={() => handleTrainerClick(t)} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.2rem', background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', padding: '0.2rem 0.5rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}>🎓 {t}</button>
                               ))}
                             </div>
                           ) : (
