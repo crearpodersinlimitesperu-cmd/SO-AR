@@ -247,7 +247,7 @@ export default function CentroManagers() {
     if (email === 'andres.gomez@crearpsl.net') return 'Andres Gomez';
     if (email === 'leandro.brunis@crearpsl.net') return 'Leandro Brunis';
     if (email === 'carlos.brunis@crearpsl.net' || email === 'brunische66@gmail.com') return 'Carlos Brunis';
-    if (email === 'marylourdespat@gmail.com') return 'Lourdes Patino';
+    if (email === 'marylourdespat@gmail.com') return 'María De Lourdes Patiño Galarraga';
     if (email === 'linid.valencia@crearpsl.net') return 'Linid Valencia';
     if (email === 'marylourdespat@gmail.com') return 'Lourdes Patino';
     if (email === 'marylourdespat@gmail.com') return 'Lourdes Patino';

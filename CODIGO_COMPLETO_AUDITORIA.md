@@ -82113,7 +82113,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 2,
     "equipo": "INTI CAMARI",
     "tieneEntrenador": "Si",
-    "entrenador": "Lourdes Patino",
+    "entrenador": "María De Lourdes Patiño Galarraga",
     "coordinador": "MIGUEL TORRES",
     "sede": "Cuenca",
     "estado": "Graduado"
@@ -92553,7 +92553,7 @@ export const TRAINER_METADATA = {
     "email": "andres.gomez@crearpsl.net",
     "programa": "C2+MJ"
   },
-  "Maria de Lourdes Patino Galarraga": {
+  "María De Lourdes Patiño Galarraga": {
     "email": "marylourdespat@gmail.com",
     "programa": "MJ"
   },
@@ -92663,10 +92663,10 @@ export const normalizeTrainer = (name) => {
   "Kerlie Carrillo": "Kerly Carrillo",
   "Kerly Carrillo": "Kerly Carrillo",
   "Kerly Carrillo Garzon": "Kerly Carrillo",
-  "Lourdes Patio": "Lourdes Patino",
-  "Lourdes Patino": "Lourdes Patino",
-  "Maria de Lourdes Patino Galarraga": "Lourdes Patino",
-  "María de Lourdes Patiño": "Lourdes Patino",
+  "Lourdes Patio": "María De Lourdes Patiño Galarraga",
+  "Lourdes Patino": "María De Lourdes Patiño Galarraga",
+  "Maria de Lourdes Patino Galarraga": "María De Lourdes Patiño Galarraga",
+  "María de Lourdes Patiño": "María De Lourdes Patiño Galarraga",
   "Maurcio Ramirez": "Mauricio Ramirez",
   "Mauricio Ramrez": "Mauricio Ramirez",
   "Mauricio Ramirez": "Mauricio Ramirez",
@@ -127029,7 +127029,7 @@ export default function CentroManagers() {
     if (email === 'andres.gomez@crearpsl.net') return 'Andres Gomez';
     if (email === 'leandro.brunis@crearpsl.net') return 'Leandro Brunis';
     if (email === 'carlos.brunis@crearpsl.net' || email === 'brunische66@gmail.com') return 'Carlos Brunis';
-    if (email === 'marylourdespat@gmail.com') return 'Lourdes Patino';
+    if (email === 'marylourdespat@gmail.com') return 'María De Lourdes Patiño Galarraga';
     if (email === 'linid.valencia@crearpsl.net') return 'Linid Valencia';
     if (email === 'marylourdespat@gmail.com') return 'Lourdes Patino';
     if (email === 'marylourdespat@gmail.com') return 'Lourdes Patino';
