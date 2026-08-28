@@ -1,650 +1,1082 @@
 [
   {
-    "email": "Sin correo",
+    "id": "adrianna_guarochico",
     "nombre": "Adrianna Michelle Guarochico Usuño",
+    "email": "(sin correo)",
     "rol": "coord_c1",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "alfonso_trujillo",
     "nombre": "Joao Alfonso Trujillo",
+    "email": "(sin correo)",
     "rol": "coord_c1",
-    "sede": "Cuenca"
+    "sede": "Cuenca",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "andres_gomez",
     "nombre": "Andres Gomez",
+    "email": "(sin correo)",
     "rol": "coord_maestria",
-    "sede": "Sede Global"
+    "sede": "Sede Global",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "asistente_contable",
     "nombre": "Deysi Fernanda Sangoquiza Chiluisa",
+    "email": "(sin correo)",
     "rol": "asistente impuestos quito",
-    "sede": "Sede Global"
+    "sede": "Sede Global",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "asistente_facturacion",
     "nombre": "Alexis Patricio Terán Sánchez",
+    "email": "(sin correo)",
     "rol": "asistente facturación",
-    "sede": "Sede Global"
+    "sede": "Sede Global",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "brenda_rodriguez",
     "nombre": "Brenda Vanessa Rodríguez Pérez",
+    "email": "(sin correo)",
     "rol": "coord_c1",
-    "sede": "Guayaquil"
+    "sede": "Guayaquil",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "contabilidad_global",
     "nombre": "Nancy Elizabeth Escobar Pérez",
+    "email": "(sin correo)",
     "rol": "jefa financiera",
-    "sede": "Sede Global"
+    "sede": "Sede Global",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "contabilidad_lima",
     "nombre": "Gabriela de Jesús Rivadeneyra Gaitán",
+    "email": "(sin correo)",
     "rol": "contador lima",
-    "sede": "Sede Global"
+    "sede": "Sede Global",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "contabilidad_medellin",
     "nombre": "Héctor Antonio Gonzáles Franco",
+    "email": "(sin correo)",
     "rol": "contador medellín",
-    "sede": "Sede Global"
+    "sede": "Sede Global",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "coodinacion_administrativa",
     "nombre": "Karol Fernanda Villarruel Yánez",
+    "email": "(sin correo)",
     "rol": "coordinadora administrativa",
-    "sede": "Sede Global"
+    "sede": "Sede Global",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "daniela_esposito",
     "nombre": "Daniela Esposito Farfán",
+    "email": "(sin correo)",
     "rol": "coord_c1",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "daniela_monroy",
     "nombre": "Daniela Monroy Fabbri",
+    "email": "(sin correo)",
     "rol": "coord_maestria",
-    "sede": "México"
+    "sede": "México",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "danna_guaman",
     "nombre": "Danna Alejandra Guaman Rodríguez",
+    "email": "(sin correo)",
     "rol": "coord_c1",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "david_gonzalez",
     "nombre": "David Gonzalez Franco",
+    "email": "(sin correo)",
     "rol": "coord_c1",
-    "sede": "Medellín"
+    "sede": "Medellín",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "diana_macas",
     "nombre": "Diana Carlota Macas Macas",
+    "email": "(sin correo)",
     "rol": "coord_c1",
-    "sede": "Guayaquil"
+    "sede": "Guayaquil",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "diana_moscoso",
     "nombre": "Diana Moscoso",
+    "email": "(sin correo)",
     "rol": "coord_c1",
-    "sede": "Lima"
+    "sede": "Lima",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "diego_flores",
     "nombre": "Diego Gustavo Flores Chávez",
+    "email": "(sin correo)",
     "rol": "asistente facturación",
-    "sede": "Sede Global"
+    "sede": "Sede Global",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "emely_leon",
     "nombre": "Emely Juliett León Chavez",
+    "email": "(sin correo)",
     "rol": "gerente",
-    "sede": "Cuenca"
+    "sede": "Cuenca",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "emily_campuzano",
     "nombre": "Emily Gabriela Campuzano Rodríguez",
+    "email": "(sin correo)",
     "rol": "gerente",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "erika_gavilanez",
     "nombre": "Erika Gissell Gavilánez Gallardo",
+    "email": "(sin correo)",
     "rol": "coord_maestria",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "evelyn_cedillo",
     "nombre": "Evelyn Paulina Cedillo",
+    "email": "(sin correo)",
     "rol": "coord_c1",
-    "sede": "Cuenca"
+    "sede": "Cuenca",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "facturacion_cartera",
     "nombre": "Francisco Sebastián Jácome Escobar",
+    "email": "(sin correo)",
     "rol": "facturación",
-    "sede": "Sede Global"
+    "sede": "Sede Global",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "fer_aragon",
     "nombre": "Fer Aragon",
+    "email": "(sin correo)",
     "rol": "direccion",
-    "sede": "Sede Global"
+    "sede": "Sede Global",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "freddy_sosa",
     "nombre": "Freddy David Sosa Carrera",
+    "email": "(sin correo)",
     "rol": "gerente",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "jose.sanchez@crearpsl.net",
+    "id": "huSHoqB2u5dqoGUCEzMLUir77Vz1",
     "nombre": "José Luis Sánchez Moreno",
+    "email": "jose.sanchez@crearpsl.net",
     "rol": "gerente",
-    "sede": "Lima"
+    "sede": "Lima",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "ibetancourth",
     "nombre": "Isaac Gabriel Betancourt Patiño",
+    "email": "(sin correo)",
     "rol": "coord_maestria",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "jonathan_larosa",
     "nombre": "Jonathan Alexander La Rosa Nieto",
+    "email": "(sin correo)",
     "rol": "coord_maestria",
-    "sede": "Guayaquil"
+    "sede": "Guayaquil",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "jose.sanchez@crearpsl.net",
+    "id": "jose_sanchez",
     "nombre": "José Luis Sánchez Moreno",
+    "email": "jose.sanchez@crearpsl.net",
     "rol": "gerente",
-    "sede": "Lima"
+    "sede": "Lima",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "jose_sanchez_crearpsl",
     "nombre": "José Sánchez",
+    "email": "(sin correo)",
     "rol": "direccion",
-    "sede": "Sede Global"
+    "sede": "Sede Global",
+    "contacto": "(sin contacto)",
+    "superAdmin": "Sí",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "josue_vera",
     "nombre": "Marcos Josué Vera Avilés",
+    "email": "(sin correo)",
     "rol": "gerente",
-    "sede": "Guayaquil"
+    "sede": "Guayaquil",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "joyce_marin",
     "nombre": "Joyce Marin",
+    "email": "(sin correo)",
     "rol": "coord_c1",
-    "sede": "Lima"
+    "sede": "Lima",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "juan_reinoso",
     "nombre": "Juan Fernando Reinoso",
+    "email": "(sin correo)",
     "rol": "coord_maestria",
-    "sede": "Cuenca"
+    "sede": "Cuenca",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "judith_romero",
     "nombre": "Judith Regina Romero Rosales",
+    "email": "(sin correo)",
     "rol": "coord_maestria",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "karla_pastrano",
     "nombre": "Karla Viviana Pastrano Villegas",
+    "email": "(sin correo)",
     "rol": "coord_c1",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "kerly_carrillo",
     "nombre": "Kerly Carrillo Garzon",
+    "email": "(sin correo)",
     "rol": "coord_maestria",
-    "sede": "Cuenca"
+    "sede": "Cuenca",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "ketherine_aguirre",
     "nombre": "Katherine Marcela Aguirre Parra",
+    "email": "(sin correo)",
     "rol": "coord_c1",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "leandro_brunis",
     "nombre": "Leandro Brunis",
+    "email": "(sin correo)",
     "rol": "direccion",
-    "sede": "Sede Global"
+    "sede": "Sede Global",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "legal",
     "nombre": "Pablo Francisco Mendieta",
+    "email": "(sin correo)",
     "rol": "legal",
-    "sede": "Sede Global"
+    "sede": "Sede Global",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "leyla_pasquel",
     "nombre": "Leyla Pasquel",
+    "email": "(sin correo)",
     "rol": "coord_maestria",
-    "sede": "Lima"
+    "sede": "Lima",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "liliana_cubillo",
     "nombre": "Liliana Lilibeth Cubillo Vera",
+    "email": "(sin correo)",
     "rol": "coord_maestria",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "linid_valencia",
     "nombre": "Linid Valencia",
+    "email": "(sin correo)",
     "rol": "coord_maestria",
-    "sede": "Lima"
+    "sede": "Lima",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "marco_gonzalez",
     "nombre": "Marco Jesús González Caguado",
+    "email": "(sin correo)",
     "rol": "coord_c1",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "mauricio_ramirez",
     "nombre": "Mauricio Ramirez Silva",
+    "email": "(sin correo)",
     "rol": "coord_maestria",
-    "sede": "Medellín"
+    "sede": "Medellín",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "naomi_campos",
     "nombre": "Naomi Campos Soriano",
+    "email": "(sin correo)",
     "rol": "coord_c1",
-    "sede": "México"
+    "sede": "México",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "nora_zamora",
     "nombre": "Nora Zamora Benítez",
+    "email": "(sin correo)",
     "rol": "gerente",
-    "sede": "México"
+    "sede": "México",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "paul_sosa",
     "nombre": "Paul Sosa",
+    "email": "(sin correo)",
     "rol": "direccion",
-    "sede": "Sede Global"
+    "sede": "Sede Global",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_alejandraaracelymunozcontreras",
     "nombre": "Alejandra Aracely Muñoz Contreras",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_alejandraaracelymuozcontreras",
     "nombre": "Alejandra Aracely Muñoz Contreras",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_anahialejandrareyespazmino",
     "nombre": "Anahi Alejandra Reyes Pazmiño",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_anahialejandrareyespazmio",
     "nombre": "Anahi Alejandra Reyes Pazmiño",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_andreadelrociomedinacoronel",
     "nombre": "Andrea del Rocío Medina Coronel",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Cuenca"
+    "sede": "Cuenca",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_andreadelrocomedinacoronel",
     "nombre": "Andrea del Rocío Medina Coronel",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Cuenca"
+    "sede": "Cuenca",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_belenmadelinegarciavalarezo",
     "nombre": "Belén Madeline García Valarezo",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Guayaquil"
+    "sede": "Guayaquil",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_belnmadelinegarcavalarezo",
     "nombre": "Belén Madeline García Valarezo",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Guayaquil"
+    "sede": "Guayaquil",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_danielvinicioescobarbeltran",
     "nombre": "Daniel Vinicio Escobar Beltrán",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_danielvinicioescobarbeltrn",
     "nombre": "Daniel Vinicio Escobar Beltrán",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_dayananayelizambranoandrade",
     "nombre": "Dayana Nayeli Zambrano Andrade",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_delgadoortegadarkwingustavo",
     "nombre": "DELGADO ORTEGA DARKWIN GUSTAVO",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_diegodavidbravofigueroa",
     "nombre": "Diego David Bravo Figueroa",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_edisonricardogavilanezgallardo",
     "nombre": "Edison Ricardo Gavilánez Gallardo",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_edisonricardogavilnezgallardo",
     "nombre": "Edison Ricardo Gavilánez Gallardo",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_fernandamichellepereiraarmijos",
     "nombre": "Fernanda Michelle Pereira Armijos",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_gabrielalucaaltunaalvarez",
     "nombre": "Gabriela Lucía Altuna Alvarez",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_gabrielaluciaaltunaalvarez",
     "nombre": "Gabriela Lucía Altuna Alvarez",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_gabrielavernicaromnbarragn",
     "nombre": "Gabriela Verónica Román Barragán",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Guayaquil"
+    "sede": "Guayaquil",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_gabrielaveronicaromanbarragan",
     "nombre": "Gabriela Verónica Román Barragán",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Guayaquil"
+    "sede": "Guayaquil",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_geovannakatherineamoreslopez",
     "nombre": "Geovanna Katherine Amores López",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_geovannakatherineamoreslpez",
     "nombre": "Geovanna Katherine Amores López",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_haydinfernandomendozaclavijo",
     "nombre": "Haydin Fernando Mendoza Clavijo",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Guayaquil"
+    "sede": "Guayaquil",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_jenniferkatherinepereiraarmijos",
     "nombre": "Jennifer Katherine Pereira Armijos",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_johannaalexandraherreravaca",
     "nombre": "Johanna Alexandra Herrera Vaca",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_jorgewashingtonramirezmorejon",
     "nombre": "Jorge Washington Ramírez Morejón",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Guayaquil"
+    "sede": "Guayaquil",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_jorgewashingtonramrezmorejn",
     "nombre": "Jorge Washington Ramírez Morejón",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Guayaquil"
+    "sede": "Guayaquil",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_jossethgabrielaespinquezada",
     "nombre": "Josseth Gabriela Espín Quezada",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_jossethgabrielaespnquezada",
     "nombre": "Josseth Gabriela Espín Quezada",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_juandiegojararomeo",
     "nombre": "JUAN DIEGO JARA ROMEO",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Cuenca"
+    "sede": "Cuenca",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_ledisyulietdaza",
     "nombre": "Ledis Yuliet Daza",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Medellín"
+    "sede": "Medellín",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_leylakellypasquelalfaro",
     "nombre": "Leyla Kelly Pasquel Alfaro",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Lima"
+    "sede": "Lima",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_lizardozaratepena",
     "nombre": "Lizardo Zárate Peña",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_lizardozratepea",
     "nombre": "Lizardo Zárate Peña",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_luisjavierprunavasquez",
     "nombre": "Luis Javier Pruna Vásquez",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Guayaquil"
+    "sede": "Guayaquil",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_mabelmarlenerobbysruiz",
     "nombre": "Mabel Marlene Robbys Ruiz",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Guayaquil"
+    "sede": "Guayaquil",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_maramagalymendozazambrano",
     "nombre": "María Magaly Mendoza Zambrano",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_mariafernandafloresnavarrete",
     "nombre": "Maria Fernanda Flores Navarrete",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Guayaquil"
+    "sede": "Guayaquil",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_mariamagalymendozazambrano",
     "nombre": "María Magaly Mendoza Zambrano",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_marielalorenaguerreroaviles",
     "nombre": "Mariela Lorena Guerrero Aviles",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Guayaquil"
+    "sede": "Guayaquil",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_marielaninoskalopezdelatorre",
     "nombre": "Mariela Ninoska Lopez De La Torre",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_marjorieximenamartinezguerrero",
     "nombre": "Marjorie Ximena Martínez Guerrero",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_marjorieximenamartnezguerrero",
     "nombre": "Marjorie Ximena Martínez Guerrero",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_martalucalondooareiza",
     "nombre": "Marta Lucía Londoño Areiza",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "México"
+    "sede": "México",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_martalucialondonoareiza",
     "nombre": "Marta Lucía Londoño Areiza",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Medellín"
+    "sede": "Medellín",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_mayraalexandravivasandrade",
     "nombre": "Mayra Alexandra Vivas Andrade",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_myriampamelatixiquille",
     "nombre": "Myriam Pamela Tixi Quille",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_pameladayanavillarodriguez",
     "nombre": "Pamela Dayana Villa Rodriguez",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_rosmeryochoaferrer",
     "nombre": "Rosmery Ochoa Ferrer",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Lima"
+    "sede": "Lima",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_santiagoalfonsoalarcnsurez",
     "nombre": "Santiago Alfonso Alarcón Suárez",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_santiagoalfonsoalarconsuarez",
     "nombre": "Santiago Alfonso Alarcón Suárez",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_sebastianalexanderulloaromero",
     "nombre": "Sebastián Alexander Ulloa Romero",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_sebastinalexanderulloaromero",
     "nombre": "Sebastián Alexander Ulloa Romero",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_vanessadelcisneromerorosales",
     "nombre": "Vanessa Del Cisne Romero Rosales",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_williamsjamessancheztrujillo",
     "nombre": "Williams James Sánchez Trujillo",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_williamsjamessncheztrujillo",
     "nombre": "Williams James Sánchez Trujillo",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "qt_wilsonxaviervallejoflores",
     "nombre": "Wilson Xavier Vallejo Flores",
+    "email": "(sin correo)",
     "rol": "qt",
-    "sede": "Guayaquil"
+    "sede": "Guayaquil",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "sso",
     "nombre": "Santiago Proaño",
+    "email": "(sin correo)",
     "rol": "técnico sst",
-    "sede": "Quito Ciclo 1"
+    "sede": "Quito Ciclo 1",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "talento_humano",
     "nombre": "Lennin Fernando Chasi Lima",
+    "email": "(sin correo)",
     "rol": "talento humano",
-    "sede": "Sede Global"
+    "sede": "Sede Global",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "valentina_r",
     "nombre": "Valentina Rodriguez Castaño",
+    "email": "(sin correo)",
     "rol": "coord_c1",
-    "sede": "Medellín"
+    "sede": "Medellín",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "viviana_catota",
     "nombre": "Viviana Maribel Catota Yugsi",
+    "email": "(sin correo)",
     "rol": "coord_c1",
-    "sede": "Cuenca"
+    "sede": "Cuenca",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   },
   {
-    "email": "Sin correo",
+    "id": "yurany_gonzalez",
     "nombre": "Yurany Gonzalez Franco",
+    "email": "(sin correo)",
     "rol": "gerente",
-    "sede": "Medellín"
+    "sede": "Medellín",
+    "contacto": "(sin contacto)",
+    "superAdmin": "No",
+    "cumpleanos": ""
   }
 ]

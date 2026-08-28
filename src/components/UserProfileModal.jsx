@@ -56,7 +56,7 @@ const ROLE_COLORS = {
 };
 
 export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] }) {
-  const { currentUser, originalAdminUser, simulateUser } = useAuth();
+  const { currentUser, originalAdminUser, simulateUser, switchRole } = useAuth();
   const navigate = useNavigate();
   const { toggleTask } = useChecklist();
   const { showToast } = useUI();
@@ -75,6 +75,13 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
   // Task assignment submodal
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState(null);
+
+  // Cumpleaños (editable solo por Super Admin) — se guarda en users/{id}.cumpleanos
+  // para que quede en el mismo lugar que lee getAllCompanyUsers() y donde escribe
+  // el script de importación desde el Directorio Global.
+  const [editingBirthday, setEditingBirthday] = useState(false);
+  const [birthdayDraft, setBirthdayDraft] = useState(user?.cumpleanos || '');
+  const [isSavingBirthday, setIsSavingBirthday] = useState(false);
 
   // Firestore sync for user meta
   useEffect(() => {
@@ -201,6 +208,40 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
   });
 
   const pct = userTasks.length > 0 ? Math.round((completedTasks.length / userTasks.length) * 100) : 0;
+
+  // CONTEXTO (28/08/2026): pedido del usuario — que un colaborador con más de un rol
+  // (ej. los de config/permissions.js DUAL_ROLE_TRAINER_EMAILS) pueda cambiar su rol
+  // activo desde su propio perfil, no solo desde el selector pequeño del header de
+  // Home.jsx. Solo tiene sentido cuando esta persona ES quien está viendo su propio
+  // perfil (switchRole() cambia la sesión de quien mira, no la de otra persona) — se
+  // compara el correo normalizando @crearpsl.net/@crearpsl.com como en otras partes
+  // del código (ver ChecklistBoard.jsx).
+  const currentUserEmailCom = currentUser?.email?.replace('@crearpsl.net', '@crearpsl.com')?.toLowerCase();
+  const currentUserEmailNet = currentUser?.email?.replace('@crearpsl.com', '@crearpsl.net')?.toLowerCase();
+  const isOwnProfile = !!user?.email && (user.email.toLowerCase() === currentUserEmailCom || user.email.toLowerCase() === currentUserEmailNet);
+
+  // Handler: Guardar Cumpleaños (escribe en la colección "users", no en "user_profiles",
+  // para que quede consistente con userService.getAllCompanyUsers() y con el import
+  // desde el Directorio Global). Solo aplica cuando el usuario tiene un id real de
+  // Firestore (user.id) — un registro que solo viene del registro local (usersData.js,
+  // source: 'local_registry') no tiene doc propio en "users" y no se puede editar aquí.
+  const handleSaveBirthday = async () => {
+    if (!user?.id) {
+      showToast('Este perfil no tiene un documento en Firestore para editar (registro local).', 'error');
+      return;
+    }
+    setIsSavingBirthday(true);
+    try {
+      await updateDoc(doc(db, 'users', user.id), { cumpleanos: birthdayDraft || null });
+      showToast('Cumpleaños guardado.', 'success');
+      setEditingBirthday(false);
+    } catch (error) {
+      console.error('Error guardando cumpleaños:', error);
+      showToast('No se pudo guardar el cumpleaños: ' + error.message, 'error');
+    } finally {
+      setIsSavingBirthday(false);
+    }
+  };
 
   // Handler: Add Note
   const handleAddNote = async (e) => {
@@ -386,6 +427,34 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
                   })}
                 </div>
 
+                {isOwnProfile && currentUser?.roles && currentUser.roles.length > 1 && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.5rem' }}>
+                    <select
+                      value={currentUser.activeRole || currentUser.appRole}
+                      onChange={(e) => switchRole(e.target.value)}
+                      style={{
+                        padding: '0.3rem 0.6rem',
+                        borderRadius: '6px',
+                        background: 'rgba(255, 183, 3, 0.15)',
+                        border: '1px solid var(--crear-gold)',
+                        color: 'var(--text-heading)',
+                        fontSize: '0.8rem',
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                        outline: 'none'
+                      }}
+                      title="Cambiar tu rol activo"
+                    >
+                      {currentUser.roles.map(r => (
+                        <option key={r} value={r} style={{ background: '#0d152d', color: '#ffffff' }}>
+                          🎭 {getRoleDisplayName(r) || r.toUpperCase()}
+                        </option>
+                      ))}
+                    </select>
+                    <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Tienes varios roles — este es el que ves activo ahora.</span>
+                  </div>
+                )}
+
                 <div style={{ display: 'flex', gap: '1.2rem', marginTop: '0.6rem', fontSize: '0.85rem', color: 'var(--text-muted)', flexWrap: 'wrap' }}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                     <Building2 size={15} color="var(--crear-gold)" /> Sede: <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>{getFlagForSede(user.sede)} <strong style={{ color: 'var(--text-heading)' }}>{normalizeSede(user.sede)}</strong></span>
@@ -431,6 +500,58 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
                       <span>{user.phone}</span>
                       <span style={{ fontSize: '0.7rem', color: '#10b981', background: 'rgba(16, 185, 129, 0.2)', padding: '1px 4px', borderRadius: '4px' }}>WhatsApp</span>
                     </a>
+                  )}
+
+                  {/* Cumpleaños — visible para todos si ya está cargado; editable solo por Super Admin */}
+                  {editingBirthday ? (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }} onClick={(e) => e.stopPropagation()}>
+                      <Calendar size={14} color="var(--crear-gold)" />
+                      <input
+                        type="date"
+                        value={birthdayDraft || ''}
+                        onChange={(e) => setBirthdayDraft(e.target.value)}
+                        style={{
+                          padding: '2px 6px',
+                          borderRadius: '6px',
+                          border: '1px solid var(--crear-gold)',
+                          background: 'var(--bg-input, #1a1a1a)',
+                          color: 'var(--text-heading)',
+                          fontSize: '0.82rem'
+                        }}
+                      />
+                      <button
+                        onClick={handleSaveBirthday}
+                        disabled={isSavingBirthday}
+                        style={{ fontSize: '0.75rem', padding: '3px 8px', borderRadius: '6px', border: 'none', background: 'var(--crear-gold)', color: '#000', fontWeight: 700, cursor: 'pointer' }}
+                      >
+                        {isSavingBirthday ? '...' : 'Guardar'}
+                      </button>
+                      <button
+                        onClick={() => { setEditingBirthday(false); setBirthdayDraft(user?.cumpleanos || ''); }}
+                        style={{ fontSize: '0.75rem', padding: '3px 8px', borderRadius: '6px', border: '1px solid var(--text-muted)', background: 'transparent', color: 'var(--text-muted)', cursor: 'pointer' }}
+                      >
+                        Cancelar
+                      </button>
+                    </span>
+                  ) : (
+                    <span
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', cursor: currentUser?.isSuperAdmin ? 'pointer' : 'default' }}
+                      title={currentUser?.isSuperAdmin ? 'Clic para editar el cumpleaños' : undefined}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (currentUser?.isSuperAdmin) {
+                          setBirthdayDraft(user?.cumpleanos || '');
+                          setEditingBirthday(true);
+                        }
+                      }}
+                    >
+                      <Calendar size={14} color="var(--crear-gold)" />
+                      {user?.cumpleanos ? (
+                        <span>Cumpleaños: <strong style={{ color: 'var(--text-heading)' }}>{user.cumpleanos}</strong></span>
+                      ) : currentUser?.isSuperAdmin ? (
+                        <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Sin cumpleaños — clic para agregar</span>
+                      ) : null}
+                    </span>
                   )}
 
                   {/* Última Conexión Visible para Directorio y Super Admin */}

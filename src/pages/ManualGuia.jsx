@@ -19,6 +19,7 @@ const TABS = [
   { id: 'plataforma',  label: 'PARTE III: Causa OS — Plataforma', icon: <Cpu size={17} />,           color: '#10b981',           bg: 'rgba(16,185,129,0.1)' },
   { id: 'roles',       label: 'Guia por Rol',                     icon: <Compass size={17} />,       color: '#a855f7',           bg: 'rgba(168,85,247,0.12)' },
   { id: 'seguridad',   label: 'Seguridad & Crisis',               icon: <AlertOctagon size={17} />,  color: '#ef4444',           bg: 'rgba(239,68,68,0.12)' },
+  { id: 'maestro',     label: 'Manual Maestro de Operaciones',    icon: <Milestone size={17} />,     color: '#14b8a6',           bg: 'rgba(20,184,166,0.12)' },
 ];
 
 function TabBtn({ tab, active, onClick }) {
@@ -736,6 +737,112 @@ export default function ManualGuia() {
                 ))}
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* MANUAL MAESTRO DE OPERACIONES DE SEDE — integrado desde
+          "manual-maestro-operaciones-sede-v1.md" (Jose, 28/08/2026). El
+          cronograma hora a hora de C1/C2/MJ/FDS4 ya vive como checklist
+          accionable en cada rol — aqui solo se documenta lo que no estaba en
+          ningun otro lado: el marco Nodus + Causa OS y los canales/reglas
+          criticas de reporte, para no duplicar contenido. */}
+      {activeTab === 'maestro' && (
+        <div style={{ display: 'grid', gap: '2rem' }}>
+          <div className="glass-panel" style={{ padding: '2.25rem 2rem', borderRadius: '16px' }}>
+            <SectionHeader icon={<Milestone />} sup="MANUAL MAESTRO DE OPERACIONES DE SEDE (V1.0)" title="Sistema Cerrado de Direccion, Control de Procesos y Estandares Operativos" color="#14b8a6" bg="rgba(20,184,166,0.12)" />
+
+            <p style={{ margin: '0 0 1rem 0', lineHeight: '1.75', color: 'var(--text-main)', fontSize: '0.98rem' }}>
+              Este manual es el estandar de operacion logistica, administrativa y ontologica innegociable para todas las sedes de <strong>Crear Poder Sin Limites (CPSL)</strong>. Su proposito es blindar el contenedor de transformacion mediante la sincronizacion perfecta de la fisionomia de sala, el rigor comercial de oficina y la integridad de los datos.
+            </p>
+
+            <div style={{ padding: '1rem 1.2rem', background: 'rgba(20,184,166,0.08)', borderRadius: '10px', border: '1px solid rgba(20,184,166,0.25)', marginBottom: '2rem' }}>
+              <p style={{ margin: 0, fontSize: '0.87rem', color: 'var(--text-main)', lineHeight: '1.6' }}>
+                📋 <strong>El cronograma hora a hora de C1, C2, Maestria (MJ) y FDS4 "El Viaje"</strong> ya vive como checklist accionable, con su propio responsable y estado de cumplimiento, en el Checklist del Coordinador de C1/C2 y el Checklist del Coordinador de Maestria. Esta seccion documenta el marco que conecta todo eso — Nodus + Causa OS — y los canales/reglas de reporte oficiales, sin repetir lo que ya esta accionable alla.
+              </p>
+            </div>
+
+            <h3 style={{ margin: '0 0 1rem 0', color: '#14b8a6', fontSize: '1.15rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Compass size={19} color="#14b8a6" /> Seccion 1 — El Manifiesto Nodus + Causa OS
+            </h3>
+
+            <p style={{ margin: '0 0 1rem 0', color: 'var(--text-main)', fontSize: '0.94rem', lineHeight: '1.6' }}>
+              La operacion de cada sede se rige bajo un binomio cerrado de direccion:
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+              <InfoCard color="var(--crear-blue)" title="Plataforma Nodus (Datos e Informacion):">
+                Es la fuente unica y centralizada de la realidad operativa de la sede: registros reales, asistencias, estados de avance de tareas, transacciones de caja, firmas y evidencias, sin suposiciones.
+              </InfoCard>
+              <InfoCard color="#14b8a6" title="Causa OS (Analisis y Liderazgo Accionable):">
+                Es la capa de direccion, control y mejora estrategica que interpreta la realidad de Nodus para actuar sobre la causa de los resultados: "Directo al punto. El lider es la causa, no el efecto."
+              </InfoCard>
+            </div>
+
+            <p style={{ margin: '0 0 0.6rem 0', color: 'var(--text-main)', fontSize: '0.9rem', fontWeight: 700 }}>Principios de integracion y sinergia:</p>
+            <ul style={{ margin: '0 0 2rem 0', paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.45rem', color: 'var(--text-main)', fontSize: '0.88rem', lineHeight: '1.55' }}>
+              <li><strong>Nodus es la fuente operativa unica:</strong> si un dato no existe, se reporta estrictamente como "Sin actividad registrada" o "Sin dato"; nunca se completan campos vacios con suposiciones.</li>
+              <li><strong>Causa OS no altera la evidencia:</strong> analiza, propone y registra decisiones, pero jamas modifica registros contables o de asistencia sin autorizacion auditada.</li>
+              <li><strong>La trazabilidad es innegociable:</strong> cada cambio de estado registra que cambio, quien lo aprobo, cuando se ejecuto y cual fue el resultado.</li>
+              <li><strong>Toda metrica tiene una formula:</strong> no se permiten reportes con porcentajes vacios o aproximados.</li>
+              <li><strong>Las acciones sensibles requieren control humano:</strong> bloqueos de acceso QR, comunicaciones masivas, contratos, devoluciones de caja y cancelaciones exigen validacion humana de coordinacion o gerencia.</li>
+            </ul>
+
+            <div style={{ overflowX: 'auto', marginBottom: '0.5rem' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem', textAlign: 'left' }}>
+                <thead>
+                  <tr style={{ background: 'var(--bg-card-hover)', borderBottom: '2px solid var(--border-subtle)' }}>
+                    <th style={{ padding: '0.7rem 0.85rem', color: '#14b8a6', fontWeight: 800 }}>Etapa Operativa</th>
+                    <th style={{ padding: '0.7rem 0.85rem', color: 'var(--crear-blue)', fontWeight: 800 }}>Rol de Nodus (Datos)</th>
+                    <th style={{ padding: '0.7rem 0.85rem', color: 'var(--crear-gold)', fontWeight: 800 }}>Rol de Causa OS (Liderazgo)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    ['Registrar', 'Almacena asistencias, compromisos de pago (AC), abonos y estados en tiempo real.', 'Verifica la completitud, calidad y consistencia tecnica de los datos.'],
+                    ['Mostrar', 'Presenta listas, paneles de visualizacion y reportes consolidados por sede.', 'Interpreta tendencias y patrones de comportamiento sin desviar la fuente de verdad.'],
+                    ['Detectar', 'Alerta sobre registros vacios, duplicados, retrasos de cobro o firmas faltantes.', 'Clasifica la gravedad del quiebre, evalua el impacto financiero y diagnostica la causa raiz.'],
+                    ['Decidir', 'Aporta la telemetria operativa libre de interpretaciones emocionales.', 'Propone opciones viables de solucion, evalua riesgos y disena el plan de accion detallado.'],
+                    ['Ejecutar', 'Registra tareas especificas asignadas, responsables y fechas de vencimiento.', 'Coordina el Blitz telefonico en cancha, solicita firmas de autorizacion y audita resultados.'],
+                    ['Medir', 'Conserva el historico de metricas cerradas del fin de semana.', 'Evalua si las acciones correctivas lograron mover la aguja comercial o de retencion.'],
+                    ['Aprender', 'Guarda el historial de auditoria de los ciclos pasados.', 'Convierte las incidencias recurrentes en mejoras del proceso y actualizaciones de guias.'],
+                  ].map(([etapa, nodus, causa]) => (
+                    <tr key={etapa} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+                      <td style={{ padding: '0.75rem 0.85rem', fontWeight: 800, color: 'var(--text-heading)' }}>{etapa}</td>
+                      <td style={{ padding: '0.75rem 0.85rem', color: 'var(--text-main)', lineHeight: '1.5' }}>{nodus}</td>
+                      <td style={{ padding: '0.75rem 0.85rem', color: 'var(--text-main)', lineHeight: '1.5' }}>{causa}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className="glass-panel" style={{ padding: '2.25rem 2rem', borderRadius: '16px' }}>
+            <h3 style={{ margin: '0 0 1rem 0', color: '#14b8a6', fontSize: '1.15rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Radio size={19} color="#14b8a6" /> Seccion 6 — Canales de Reporte y Alertas Criticas
+            </h3>
+
+            <p style={{ margin: '0 0 0.6rem 0', color: 'var(--text-main)', fontSize: '0.9rem', fontWeight: 700 }}>6.1 Canales oficiales de comunicacion</p>
+            <p style={{ margin: '0 0 0.6rem 0', color: 'var(--text-main)', fontSize: '0.88rem', lineHeight: '1.6' }}>
+              Todos los reportes operativos de C1, C2 y MJ del fin de semana deben enviarse de manera puntual a:
+            </p>
+            <ul style={{ margin: '0 0 1.5rem 0', paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.25rem', color: 'var(--text-main)', fontSize: '0.88rem', lineHeight: '1.5' }}>
+              <li><strong>"Crear Global"</strong> (espacio de direccion, gerencia y operaciones generales) en Google Chat.</li>
+              <li><strong>"FDS con Entrenadores"</strong> (espacio de alineacion del equipo de facilitadores) en Google Chat.</li>
+            </ul>
+
+            <p style={{ margin: '0 0 0.5rem 0', color: 'var(--text-main)', fontSize: '0.9rem', fontWeight: 700 }}>6.2 Formato oficial de los reportes</p>
+            <div style={{ padding: '0.8rem 1rem', background: 'rgba(0,0,0,0.25)', borderRadius: '8px', border: '1px solid var(--border-subtle)', marginBottom: '1.5rem', fontFamily: 'monospace', fontSize: '0.83rem' }}>
+              <div style={{ color: 'var(--crear-gold)' }}>[SEDE] - [NOMBRE DE CICLO] - [NOMBRE DEL REPORTE]</div>
+              <div style={{ color: 'var(--text-muted)', marginTop: '0.3rem' }}>Ejemplo: [LIMA] - [LIMA-MJ-22] - Reporte de Asistencia Definitiva Viernes</div>
+            </div>
+
+            <p style={{ margin: '0 0 0.5rem 0', color: '#ef4444', fontSize: '0.9rem', fontWeight: 700 }}>6.3 Reglas criticas del contenedor de seguridad de sede</p>
+            <ul style={{ margin: 0, paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.45rem', color: 'var(--text-main)', fontSize: '0.88rem', lineHeight: '1.55' }}>
+              <li><strong>Cero Tolerancia en Groundings:</strong> si un manager o aliado llega un minuto tarde a un grounding (ej. el virtual de los miercoles a las 19:00, o los de sala), es eliminado de inmediato del chat operativo y queda suspendido de su rol para el ciclo.</li>
+              <li><strong>Gobernanza y Confidencialidad Extrema:</strong> bajo ninguna circunstancia se permite tomar fotos, videos o divulgar el nombre de los entrenadores de Maestria en chats generales o redes sociales. El secreto del proceso se protege con rigor de Nivel 3.</li>
+              <li><strong>Evidencias de FI en FDS3:</strong> en el fin de semana de Gratitud, solo los participantes y managers con un avance verificado de sus FI mayor o igual a 80% o al 100% de cumplimiento de evidencias fisicas tienen derecho a compartir su testimonio en el arco final de graduacion.</li>
+            </ul>
           </div>
         </div>
       )}

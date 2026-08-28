@@ -32,6 +32,13 @@ ACCESOS.md
 
 # Temp scripts & data files
 *.py
+!dump_code.py
 *.xlsx
 *_temp.csv
 centro-operativo-cpsl-*.json
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+!.env.example

@@ -11,7 +11,12 @@ const OFFICIAL_SEDES = ['Quito', 'Guayaquil', 'Cuenca', 'Lima', 'Medellin', 'Mex
 export default function VenueConfigModal({ isOpen, onClose }) {
   const { currentUser } = useAuth();
   const { showToast } = useUI();
-  const [selectedSede, setSelectedSede] = useState(() => {
+  // CONTEXTO (28/08/2026): auditoría de roles pidió que un Gerente solo pueda configurar
+  // los hoteles/salones de SU sede, no de cualquiera — el desplegable antes ofrecía las 6
+  // sedes libremente a cualquier rol que lograra abrir este modal. Dirección/superadmin sí
+  // mantienen acceso completo a todas las sedes.
+  const isGlobalVenueRole = currentUser?.isSuperAdmin || currentUser?.isDireccion || ['direccion', 'director_maestria', 'consolidado'].includes(currentUser?.appRole);
+  const resolveUserSede = () => {
     const rawSede = (currentUser?.sede || '').toLowerCase().trim();
     if (rawSede.includes('quito') || rawSede.includes('uio')) return 'Quito';
     if (rawSede.includes('guayaquil') || rawSede.includes('gye')) return 'Guayaquil';
@@ -19,7 +24,8 @@ export default function VenueConfigModal({ isOpen, onClose }) {
     if (rawSede.includes('medell') || rawSede.includes('med')) return 'Medellin';
     if (rawSede.includes('mex') || rawSede.includes('méx')) return 'Mexico';
     return 'Lima';
-  });
+  };
+  const [selectedSede, setSelectedSede] = useState(resolveUserSede);
 
   const [venues, setVenues] = useState(() => {
     try {
@@ -124,9 +130,13 @@ export default function VenueConfigModal({ isOpen, onClose }) {
       showToast(`¡Lugares y Salones de entrenamiento para ${selectedSede} actualizados!`, 'success');
       onClose();
     } catch (err) {
+      // CONTEXTO (28/08/2026): antes este mensaje decía "Guardado localmente" en tipo
+      // "success" aunque la escritura a Firestore hubiera fallado (por ejemplo, por las
+      // reglas de seguridad rechazando a un rol sin permiso) — el usuario creía que había
+      // actualizado el hotel oficial de la sede y en realidad nunca se guardó en el servidor.
+      // Ahora se avisa como error real y NO se cierra el modal solo, para que quede claro.
       console.error("Could not write venue to Firestore:", err);
-      showToast(`Guardado localmente para ${selectedSede}.`, 'success');
-      onClose();
+      showToast(`No se pudo guardar en el servidor para ${selectedSede}: ${err.message || 'sin permiso o sin conexión'}. Los cambios quedaron solo en este navegador, no son oficiales todavía.`, 'error');
     }
   };
 
@@ -203,6 +213,7 @@ export default function VenueConfigModal({ isOpen, onClose }) {
           <select
             value={selectedSede}
             onChange={(e) => setSelectedSede(e.target.value)}
+            disabled={!isGlobalVenueRole}
             style={{
               width: '100%',
               padding: '0.65rem 0.9rem',
@@ -211,13 +222,20 @@ export default function VenueConfigModal({ isOpen, onClose }) {
               color: '#ffffff',
               border: '1px solid rgba(255, 255, 255, 0.15)',
               fontSize: '0.95rem',
-              fontWeight: 'bold'
+              fontWeight: 'bold',
+              opacity: isGlobalVenueRole ? 1 : 0.7,
+              cursor: isGlobalVenueRole ? 'pointer' : 'not-allowed'
             }}
           >
-            {OFFICIAL_SEDES.map(s => (
+            {(isGlobalVenueRole ? OFFICIAL_SEDES : [selectedSede]).map(s => (
               <option key={s} value={s}>{s === 'Medellin' ? 'Medellín' : s === 'Mexico' ? 'México' : s}</option>
             ))}
           </select>
+          {!isGlobalVenueRole && (
+            <p className="text-muted" style={{ margin: '0.35rem 0 0', fontSize: '0.78rem' }}>
+              Solo puedes configurar los salones de tu propia sede.
+            </p>
+          )}
         </div>
 
         {/* LUGAR PARA C1 */}

@@ -4,16 +4,21 @@ import { Target, TrendingUp, AlertCircle, CheckCircle2, ChevronRight, BarChart2,
 import { useNavigate } from 'react-router-dom';
 import { doc } from 'firebase/firestore';
 import { db, getDocResilient } from '../services/firebase';
-import { OPERATIONAL_SEDES } from '../data/usersData';
+import { OPERATIONAL_SEDES, normalizeSede } from '../data/usersData';
 
 export default function StrategyBoard() {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
   const [showGoalModal, setShowGoalModal] = useState(false);
   const [selectedGoal, setSelectedGoal] = useState(null);
-  const [selectedSede, setSelectedSede] = useState('Lima');
+  // CONTEXTO (28/08/2026): mismo hallazgo de la auditoría de roles que en PortfolioBoard.jsx
+  // — arrancaba fijo en 'Lima' y el desplegable ofrecía GLOBAL + las 6 sedes libremente a
+  // cualquiera. Un Gerente ahora ve solo su sede; dirección/CFO/CEO/CCO/superadmin/consolidado
+  // (ver allowedRoles en App.jsx para /estrategia) conservan visión global.
+  const isGlobalStrategyRole = currentUser?.isSuperAdmin || ['direccion', 'cfo', 'ceo', 'cco', 'consolidado'].includes(currentUser?.appRole);
+  const [selectedSede, setSelectedSede] = useState(() => isGlobalStrategyRole ? 'GLOBAL' : normalizeSede(currentUser?.sede));
 
-  const sedesDisponibles = ['GLOBAL', ...OPERATIONAL_SEDES];
+  const sedesDisponibles = isGlobalStrategyRole ? ['GLOBAL', ...OPERATIONAL_SEDES] : [normalizeSede(currentUser?.sede)];
   const [loading, setLoading] = useState(true);
   const [globalHealth, setGlobalHealth] = useState(0);
   const [okrs, setOkrs] = useState([]);
@@ -148,10 +153,11 @@ export default function StrategyBoard() {
           <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
             <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
               <span style={{ fontSize: '0.8rem', fontWeight: 600, color: textMuted }}>SEDE:</span>
-              <select 
+              <select
                 value={selectedSede}
                 onChange={(e) => setSelectedSede(e.target.value)}
-                style={{ padding: '0.4rem 2rem 0.4rem 0.8rem', borderRadius: '6px', border: `1px solid ${borderLight}`, background: bgCard, color: textDark, fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', appearance: 'none', backgroundImage: 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23131313%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.7rem top 50%', backgroundSize: '0.65rem auto' }}
+                disabled={!isGlobalStrategyRole}
+                style={{ padding: '0.4rem 2rem 0.4rem 0.8rem', borderRadius: '6px', border: `1px solid ${borderLight}`, background: bgCard, color: textDark, fontWeight: 700, fontSize: '0.85rem', cursor: isGlobalStrategyRole ? 'pointer' : 'not-allowed', opacity: isGlobalStrategyRole ? 1 : 0.7, appearance: 'none', backgroundImage: 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23131313%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.7rem top 50%', backgroundSize: '0.65rem auto' }}
               >
                 {sedesDisponibles.map(s => <option key={s} value={s}>{s}</option>)}
               </select>

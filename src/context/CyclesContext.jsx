@@ -1,6 +1,12 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 
+// Genera un id estable para un evento del calendario oficial (viene de una hoja
+// de Google, sin "id" propio de Firestore), para poder recordar cuáles ya se
+// sincronizaron y no duplicarlos en el Google Calendar del usuario.
+const getEventSyncId = (ev) =>
+  ev.id || `${ev.nombre || ev.name || ''}|${ev.sede || ev.sedeTag || ''}|${ev.fecha_inicio || ev.start || ''}`;
+
 const CyclesContext = createContext();
 
 export function CyclesProvider({ children }) {
@@ -210,8 +216,83 @@ export function CyclesProvider({ children }) {
     }
   };
 
+  // Sincronización masiva de eventos con Google Calendar — el equivalente,
+  // para el calendario, del botón "Sincronizar" que ya existe para las tareas
+  // (ver ChecklistContext.jsx -> syncTasksToGoogle, que hace lo mismo con
+  // Google Tasks). DECISIÓN de implementación (28/08/2026): a diferencia de
+  // las tareas (que viven en Firestore y tienen un campo "synced"), estos
+  // eventos vienen de una hoja de Google de solo lectura sin ID propio de
+  // Firestore, así que aquí se recuerda qué ya se sincronizó guardando los
+  // IDs sincronizados en localStorage de este navegador (no en Firestore) —
+  // funciona por dispositivo/navegador, no se sincroniza entre dispositivos.
+  // Si el usuario quiere que esto sea igual en todos sus dispositivos, habría
+  // que moverlo a una colección de Firestore — no se hizo así todavía porque
+  // no se pidió explícitamente.
+  const syncEventsToGoogle = async (eventsToSync, ownerEmail) => {
+    const token = sessionStorage.getItem('googleAccessToken');
+    if (!token) {
+      return { success: false, error: 'no_token' };
+    }
+    if (!eventsToSync || eventsToSync.length === 0) {
+      return { success: true, syncedCount: 0, skippedCount: 0, totalCount: 0, failed: [] };
+    }
+
+    const storageKey = `causaos_synced_events_${(ownerEmail || 'anon').toLowerCase()}`;
+    let syncedIds = [];
+    try {
+      syncedIds = JSON.parse(localStorage.getItem(storageKey) || '[]');
+    } catch (e) {
+      syncedIds = [];
+    }
+    const syncedSet = new Set(syncedIds);
+
+    let syncedCount = 0;
+    let skippedCount = 0;
+    const failed = [];
+
+    for (const ev of eventsToSync) {
+      const id = getEventSyncId(ev);
+      if (syncedSet.has(id)) {
+        skippedCount++;
+        continue;
+      }
+
+      try {
+        const start = ev.fecha_inicio || ev.start;
+        const end = ev.fecha_fin || ev.end || new Date(new Date(start).getTime() + 2 * 3600000).toISOString();
+        const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const res = await fetch('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            summary: ev.nombre || ev.name || 'Evento CREAR PSL',
+            location: ev.sede || ev.sedeTag || ev.lugar || ev.direccion || '',
+            description: `Entrenador: ${ev.trainer || ev.entrenador || 'Por Confirmar'}\n${ev.detalles || ev.description || ''}\n\nOrganizado por CREAR Poder Sin Límites`,
+            start: { dateTime: new Date(start).toISOString(), timeZone },
+            end: { dateTime: new Date(end).toISOString(), timeZone }
+          })
+        });
+
+        if (res.ok) {
+          syncedSet.add(id);
+          syncedCount++;
+        } else {
+          failed.push(ev.nombre || ev.name || 'Evento sin nombre');
+        }
+      } catch (e) {
+        failed.push(ev.nombre || ev.name || 'Evento sin nombre');
+      }
+    }
+
+    try {
+      localStorage.setItem(storageKey, JSON.stringify([...syncedSet]));
+    } catch (e) { /* localStorage no disponible: no bloquea el resultado */ }
+
+    return { success: true, syncedCount, skippedCount, totalCount: eventsToSync.length, failed };
+  };
+
   return (
-    <CyclesContext.Provider value={{ currentCycle, currentStage, events, loadingEvents }}>
+    <CyclesContext.Provider value={{ currentCycle, currentStage, events, loadingEvents, syncEventsToGoogle }}>
       {children}
     </CyclesContext.Provider>
   );

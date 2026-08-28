@@ -25,8 +25,10 @@ import StrategyBoard from './pages/StrategyBoard'
 import OfficialAgreements from './pages/OfficialAgreements'
 import TeamCalendar from './pages/TeamCalendar'
 import EmbudoConversionBoard from './pages/EmbudoConversionBoard'
+import NodusDataMap from './pages/NodusDataMap'
 import AICopilot from './components/AICopilot'
 import PromptModal from './components/PromptModal'
+import BirthdayAlert from './components/BirthdayAlert'
 import HelpModal from './components/HelpModal'
 import ThemeToggle from './components/ThemeToggle'
 
@@ -127,6 +129,7 @@ function App() {
         </div>
       )}
       <PromptModal />
+      {currentUser && <BirthdayAlert />}
       <main style={{ flex: 1 }}>
         <Routes>
           <Route path="/login" element={<Login />} />
@@ -259,6 +262,15 @@ function App() {
           <Route path="/calendario-equipo" element={
             <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
               <TeamCalendar />
+            </RoleRoute>
+          } />
+
+          {/* Nodus Data Map (28/08/2026): mismo criterio de acceso que el Copiloto SO-AR
+              y que ROLES_GERENCIA en cloudflare-worker/src/index.js — solo gerencia/dirección,
+              decidido así explícitamente con José. */}
+          <Route path="/nodus-data-map" element={
+            <RoleRoute allowedRoles={['gerente', 'direccion', 'cfo', 'cco', 'ceo', 'director_maestria', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
+              <NodusDataMap />
             </RoleRoute>
           } />
 

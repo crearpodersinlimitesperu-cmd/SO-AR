@@ -165,9 +165,17 @@ export default function GerenteDashboard() {
           </p>
         </div>
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-          <button className="btn-secondary" onClick={() => setShowVenueModal(true)} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Building size={16} /> Hoteles Sede
-          </button>
+          {/* CONTEXTO (28/08/2026): auditoría de roles encontró que este botón no tenía
+              ningún condicional — cualquier rol que llegara a este dashboard (coordinador,
+              entrenador, QT, capitán) podía abrir el editor de sedes/hoteles. Firestore ya
+              bloqueaba la escritura del lado servidor, pero la interfaz ni debía ofrecer el
+              botón. Se gatea igual que "Asignar Meta" y "Directorio de Equipo" en esta misma
+              barra (gerencia/dirección). */}
+          {(currentUser?.isSuperAdmin || currentUser?.appRole === 'gerente' || currentUser?.isDireccion || currentUser?.appRole === 'director_maestria') && (
+            <button className="btn-secondary" onClick={() => setShowVenueModal(true)} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Building size={16} /> Hoteles Sede
+            </button>
+          )}
           {(currentUser?.isSuperAdmin || currentUser?.appRole === 'gerente' || currentUser?.isDireccion || currentUser?.appRole === 'director_maestria') && (
             <button className="btn-primary" onClick={() => setShowTaskForm(true)} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <PlusCircle size={16} /> Asignar Meta
