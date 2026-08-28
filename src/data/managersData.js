@@ -10742,6 +10742,8 @@ export const normalizeTrainer = (name) => {
   "Josu Vera": "Josue Vera",
   "Josue Vera": "Josue Vera",
   "Josué Vera": "Josue Vera",
+  "Marcos Vera": "Josue Vera",
+  "Marcos Josue Vera": "Josue Vera",
   "Julio Narvez": "Julio Narvaez",
   "Julio Narvaez": "Julio Narvaez",
   "Julio Narváez": "Julio Narvaez",
@@ -10773,6 +10775,8 @@ export const normalizeCoordinator = (name) => {
   const map = {
   "ISAAC BETANCOURTH": "ISAAC BETANCOURT",
   "JOSU VERA": "JOSUE VERA",
+  "MARCOS VERA": "JOSUE VERA",
+  "MARCOS JOSUE VERA": "JOSUE VERA",
   "JUAN FER REINOSO": "JUAN FERNANDO REINOSO",
   "KERLY CARRILLO - JUANFER REINOSO": "KERLY CARRILLO / JUAN FERNANDO REINOSO",
   "KERLY CARRILLO / JUANFER REINOSO": "KERLY CARRILLO / JUAN FERNANDO REINOSO"
