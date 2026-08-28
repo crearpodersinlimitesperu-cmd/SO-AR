@@ -34,7 +34,7 @@ import {
   ChevronLeft, ChevronRight, DollarSign, Layers, ArrowLeft,
   Sparkles, ToggleLeft, ToggleRight, Archive, RotateCcw, X,
   Edit3, Trash2, UserPlus, Shield, Crown, Check, CheckSquare, Square,
-  ShieldCheck, Lock, AlertTriangle, Target
+  ShieldCheck, Lock, AlertTriangle, Target, ArrowUpDown, ArrowUp, ArrowDown
 } from 'lucide-react';
 import CMJDashboard from '../components/CMJDashboard';
 
@@ -210,11 +210,28 @@ export default function CentroManagers() {
   // Determinar el entrenador actual para filtrado
   const currentTrainerName = useMemo(() => {
     if (!currentUser) return '';
+    const email = (currentUser.email || '').toLowerCase().trim();
+    
+    // Mapeo explícito para entrenadores duales cuyo nombre en Google no coincida exactamente con ENTRENADORES_LIST
+    if (email === 'fer.aragon@crearpsl.net' || email === 'fer.aragon@crearpls.com') return 'Fer Aragon';
+    if (email === 'paul.sosa@crearpsl.net') return 'Paul Sosa';
+    if (email === 'jose.sanchez@crearpsl.net') return 'Jose Sanchez';
+    if (email === 'andres.gomez@crearpsl.net') return 'Andres Gomez';
+    if (email === 'leandro.brunis@crearpsl.net') return 'Leandro Brunis';
+    if (email === 'carlos.brunis@crearpsl.net' || email === 'brunische66@gmail.com') return 'Carlos Brunis';
+
     const userName = currentUser.name || currentUser.displayName || '';
     const cleanUser = userName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
     const match = allTrainerNames.find(e => {
       const cleanE = e.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
-      return cleanUser.includes(cleanE) || cleanE.includes(cleanUser);
+      if (cleanUser.includes(cleanE) || cleanE.includes(cleanUser)) return true;
+      
+      const w1 = cleanUser.split(/\s+/);
+      const w2 = cleanE.split(/\s+/);
+      if (w1.length >= 2 && w2.length >= 2) {
+        if (w1[0] === w2[0] && (w1[1] === w2[1] || w1[w1.length - 1] === w2[w2.length - 1])) return true;
+      }
+      return false;
     });
     return match || userName;
   }, [currentUser, allTrainerNames]);
@@ -273,6 +290,20 @@ export default function CentroManagers() {
   const [currentPage, setCurrentPage] = useState(1);
   const PAGE_SIZE = 40;
   const [activeMes, setActiveMes] = useState('JULIO2026');
+
+  // Estados de ordenamiento de columnas en el Directorio
+  const [sortField, setSortField] = useState(null); // 'nombre' | 'sede' | 'entrenador' | 'estado' | 'llamada'
+  const [sortDirection, setSortDirection] = useState('asc'); // 'asc' | 'desc'
+
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+    setCurrentPage(1);
+  };
 
   // Filtrado principal
   const filteredManagers = useMemo(() => {
@@ -1076,11 +1107,41 @@ export default function CentroManagers() {
     }
   };
 
-  const totalPages = Math.ceil(filteredManagers.length / PAGE_SIZE) || 1;
+  const sortedManagers = useMemo(() => {
+    if (!sortField) return filteredManagers;
+
+    return [...filteredManagers].sort((a, b) => {
+      let valA = '';
+      let valB = '';
+
+      if (sortField === 'nombre') {
+        valA = (a.nombre || '').toLowerCase();
+        valB = (b.nombre || '').toLowerCase();
+      } else if (sortField === 'sede') {
+        valA = `${a.sede || ''} ${a.equipo || ''}`.toLowerCase();
+        valB = `${b.sede || ''} ${b.equipo || ''}`.toLowerCase();
+      } else if (sortField === 'entrenador') {
+        valA = (a.entrenador || '').toLowerCase();
+        valB = (b.entrenador || '').toLowerCase();
+      } else if (sortField === 'estado') {
+        valA = (a.estado || '').toLowerCase();
+        valB = (b.estado || '').toLowerCase();
+      } else if (sortField === 'llamada') {
+        valA = `${a.llamadaAsistio || 'NO'} ${a.llamadaFecha || ''}`.toLowerCase();
+        valB = `${b.llamadaAsistio || 'NO'} ${b.llamadaFecha || ''}`.toLowerCase();
+      }
+
+      if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
+      if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }, [filteredManagers, sortField, sortDirection]);
+
+  const totalPages = Math.ceil(sortedManagers.length / PAGE_SIZE) || 1;
   const paginatedManagers = useMemo(() => {
     const start = (currentPage - 1) * PAGE_SIZE;
-    return filteredManagers.slice(start, start + PAGE_SIZE);
-  }, [filteredManagers, currentPage]);
+    return sortedManagers.slice(start, start + PAGE_SIZE);
+  }, [sortedManagers, currentPage]);
 
   // Tema Claro Estilos
   const bgLight = "#f8fafc";
@@ -1227,7 +1288,9 @@ export default function CentroManagers() {
                     setFilterEntrenador('');
                     setStatusFilter('Todos');
                     setSearch('');
-                  }} title="Limpiar Filtros de Búsqueda" style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', padding: '0.55rem 0.8rem', borderRadius: '6px', border: `1px solid ${borderLight}`, background: 'transparent', color: textMuted, fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}>
+                    setSortField(null);
+                    setSortDirection('asc');
+                  }} title="Limpiar Filtros de Búsqueda y Ordenamiento" style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', padding: '0.55rem 0.8rem', borderRadius: '6px', border: `1px solid ${borderLight}`, background: 'transparent', color: textMuted, fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}>
                     <RotateCcw size={14} /> Restaurar Filtros
                   </button>
 
@@ -1243,11 +1306,76 @@ export default function CentroManagers() {
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
                 <thead>
                   <tr style={{ background: '#f1f5f9', color: '#475569', borderBottom: `2px solid ${borderLight}` }}>
-                    <th style={{ padding: '1rem' }}>Integrante & Rol</th>
-                    <th style={{ padding: '1rem' }}>Sede & Equipo</th>
-                    <th style={{ padding: '1rem' }}>Entrenador(es) Asignado(s)</th>
-                    <th style={{ padding: '1rem' }}>Estado</th>
-                    <th style={{ padding: '1rem', textAlign: 'center' }}>Confirmación de Llamada</th>
+                    <th 
+                      onClick={() => handleSort('nombre')} 
+                      style={{ padding: '1rem', cursor: 'pointer', userSelect: 'none', color: sortField === 'nombre' ? '#b45309' : '#475569', background: sortField === 'nombre' ? '#fef3c7' : 'transparent', transition: 'all 0.15s ease' }} 
+                      title="Ordenar por Integrante & Rol (A-Z / Z-A)"
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                        <span>Integrante & Rol</span>
+                        {sortField === 'nombre' ? (
+                          sortDirection === 'asc' ? <ArrowUp size={14} color="#b45309" /> : <ArrowDown size={14} color="#b45309" />
+                        ) : (
+                          <ArrowUpDown size={14} style={{ opacity: 0.35 }} />
+                        )}
+                      </div>
+                    </th>
+                    <th 
+                      onClick={() => handleSort('sede')} 
+                      style={{ padding: '1rem', cursor: 'pointer', userSelect: 'none', color: sortField === 'sede' ? '#b45309' : '#475569', background: sortField === 'sede' ? '#fef3c7' : 'transparent', transition: 'all 0.15s ease' }} 
+                      title="Ordenar por Sede y Equipo"
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                        <span>Sede & Equipo</span>
+                        {sortField === 'sede' ? (
+                          sortDirection === 'asc' ? <ArrowUp size={14} color="#b45309" /> : <ArrowDown size={14} color="#b45309" />
+                        ) : (
+                          <ArrowUpDown size={14} style={{ opacity: 0.35 }} />
+                        )}
+                      </div>
+                    </th>
+                    <th 
+                      onClick={() => handleSort('entrenador')} 
+                      style={{ padding: '1rem', cursor: 'pointer', userSelect: 'none', color: sortField === 'entrenador' ? '#b45309' : '#475569', background: sortField === 'entrenador' ? '#fef3c7' : 'transparent', transition: 'all 0.15s ease' }} 
+                      title="Ordenar por Entrenador(es) Asignado(s)"
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                        <span>Entrenador(es) Asignado(s)</span>
+                        {sortField === 'entrenador' ? (
+                          sortDirection === 'asc' ? <ArrowUp size={14} color="#b45309" /> : <ArrowDown size={14} color="#b45309" />
+                        ) : (
+                          <ArrowUpDown size={14} style={{ opacity: 0.35 }} />
+                        )}
+                      </div>
+                    </th>
+                    <th 
+                      onClick={() => handleSort('estado')} 
+                      style={{ padding: '1rem', cursor: 'pointer', userSelect: 'none', color: sortField === 'estado' ? '#b45309' : '#475569', background: sortField === 'estado' ? '#fef3c7' : 'transparent', transition: 'all 0.15s ease' }} 
+                      title="Ordenar por Estado (Activo / Graduado / Desertor)"
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                        <span>Estado</span>
+                        {sortField === 'estado' ? (
+                          sortDirection === 'asc' ? <ArrowUp size={14} color="#b45309" /> : <ArrowDown size={14} color="#b45309" />
+                        ) : (
+                          <ArrowUpDown size={14} style={{ opacity: 0.35 }} />
+                        )}
+                      </div>
+                    </th>
+                    <th 
+                      onClick={() => handleSort('llamada')} 
+                      style={{ padding: '1rem', textAlign: 'center', cursor: 'pointer', userSelect: 'none', color: sortField === 'llamada' ? '#b45309' : '#475569', background: sortField === 'llamada' ? '#fef3c7' : 'transparent', transition: 'all 0.15s ease' }} 
+                      title="Ordenar por Confirmación de Llamada"
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}>
+                        <span>Confirmación de Llamada</span>
+                        {sortField === 'llamada' ? (
+                          sortDirection === 'asc' ? <ArrowUp size={14} color="#b45309" /> : <ArrowDown size={14} color="#b45309" />
+                        ) : (
+                          <ArrowUpDown size={14} style={{ opacity: 0.35 }} />
+                        )}
+                      </div>
+                    </th>
                     <th style={{ padding: '1rem', textAlign: 'center' }}>Acciones</th>
                   </tr>
                 </thead>

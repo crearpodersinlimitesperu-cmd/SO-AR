@@ -90,8 +90,8 @@ export default function EmbudoConversionBoard() {
         base_c1: selectedEquipo === 'EQUIPO 30' ? 158 : selectedEquipo === 'EQUIPO 29' ? 228 : 175,
         pagos_promo_c1: selectedEquipo === 'EQUIPO 30' ? 37 : 55,
         pct_pagos_promo_domingo: selectedEquipo === 'EQUIPO 30' ? 39.4 : 43.3,
-        sentados_c2: selectedEquipo === 'EQUIPO 30' ? 37 : 55,
-        pct_tasa_sentados_c2: selectedEquipo === 'EQUIPO 30' ? 39.4 : 43.3,
+        sentados_c2: selectedEquipo === 'EQUIPO 30' ? 32 : 55,
+        pct_tasa_sentados_c2: selectedEquipo === 'EQUIPO 30' ? 34.0 : 43.3,
         total_asignados_coord: selectedEquipo === 'EQUIPO 30' ? 158 : 228,
         confirmados_coord: selectedEquipo === 'EQUIPO 30' ? 102 : 158,
         no_contesta: selectedEquipo === 'EQUIPO 30' ? 23 : 26,
@@ -411,7 +411,7 @@ export default function EmbudoConversionBoard() {
               </thead>
               <tbody>
                 {[
-                  { eq: 'EQUIPO 30', sede: 'LIMA', c1: 94, promo: 37, pctPromo: '39.4%', c2: 37, pctC2: '39.4%', asig: 158, conf: 102, pctConfSent: '92.2%', des: 22, viaje: 55, pctViaje: '83.3%' },
+                  { eq: 'EQUIPO 30', sede: 'LIMA', c1: 94, promo: 37, pctPromo: '39.4%', c2: 32, pctC2: '34.0%', asig: 158, conf: 102, pctConfSent: '92.2%', des: 22, viaje: 55, pctViaje: '83.3%' },
                   { eq: 'EQUIPO 29', sede: 'LIMA', c1: 127, promo: 55, pctPromo: '43.3%', c2: 55, pctC2: '43.3%', asig: 228, conf: 158, pctConfSent: '80.4%', des: 0, viaje: 75, pctViaje: '88.2%' },
                   { eq: 'EQUIPO 28', sede: 'LIMA', c1: 110, promo: 52, pctPromo: '47.3%', c2: 52, pctC2: '47.3%', asig: 175, conf: 115, pctConfSent: '95.7%', des: 0, viaje: 68, pctViaje: '85.0%' },
                   { eq: 'EQUIPO 27', sede: 'LIMA', c1: 188, promo: 63, pctPromo: '33.5%', c2: 63, pctC2: '33.5%', asig: 329, conf: 238, pctConfSent: '79.0%', des: 0, viaje: 90, pctViaje: '81.8%' }
@@ -442,8 +442,8 @@ export default function EmbudoConversionBoard() {
       {activeTab === 'coordinacion' && (() => {
         const coordsPerC1 = {
           'EQUIPO 30': {
-            joyce: { asignados: 135, confirmados: 92, pctConf: '68.1%', sentados: 85, pctSent: '92.4%', noContesta: 24, siguiente: 6, desertores: 23, monetizados: 26, abonos: 4 },
-            diana: { asignados: 77, confirmados: 54, pctConf: '70.1%', sentados: 42, pctSent: '77.8%', noContesta: 10, siguiente: 9, desertores: 8, monetizados: 17, abonos: 1 }
+            joyce: { asignados: 135, confirmados: 92, pctConf: '68.1%', sentados: 85, pctSent: '92.4%', noContesta: 24, siguiente: 6, desertores: 23, monetizados: 26, abonos: 4, c2_nuevos: 14, c2_meta: 18, c2_rezagados: 3, c2_sentados: 17 },
+            diana: { asignados: 77, confirmados: 54, pctConf: '70.1%', sentados: 42, pctSent: '77.8%', noContesta: 10, siguiente: 9, desertores: 8, monetizados: 17, abonos: 1, c2_nuevos: 14, c2_meta: 18, c2_rezagados: 1, c2_sentados: 15 }
           },
           'EQUIPO 29': {
             joyce: { asignados: 156, confirmados: 118, pctConf: '75.6%', sentados: 76, pctSent: '64.4%', noContesta: 23, siguiente: 7, desertores: 0, monetizados: 24, abonos: 0 },
@@ -502,10 +502,22 @@ export default function EmbudoConversionBoard() {
                     <span style={{ color: textMuted }}>Desertores en Salón:</span>
                     <strong style={{ color: currentEqData.joyce.desertores > 0 ? '#f87171' : textMuted }}>{currentEqData.joyce.desertores} PX</strong>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.4rem' }}>
                     <span style={{ color: textMuted }}>Monetizados hacia C2 (Pagos + Abonos):</span>
                     <strong style={{ color: gold }}>{currentEqData.joyce.monetizados} Pagados ({currentEqData.joyce.abonos} Abonos)</strong>
                   </div>
+                  {currentEqData.joyce.c2_sentados !== undefined && (
+                    <div style={{ background: '#3b82f61a', padding: '0.8rem', borderRadius: '8px', border: '1px solid #3b82f64d', marginTop: '0.5rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ color: '#60a5fa', fontWeight: 'bold' }}>Sentados en Capítulo 2:</span>
+                        <strong style={{ color: '#93c5fd', fontSize: '1.1rem' }}>{currentEqData.joyce.c2_sentados} PX</strong>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: textLight, marginTop: '0.4rem' }}>
+                        <span>Nuevos: {currentEqData.joyce.c2_nuevos}/{currentEqData.joyce.c2_meta}</span>
+                        <span>Rezagados: {currentEqData.joyce.c2_rezagados}</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -539,10 +551,22 @@ export default function EmbudoConversionBoard() {
                     <span style={{ color: textMuted }}>Desertores en Salón:</span>
                     <strong style={{ color: currentEqData.diana.desertores > 0 ? '#f87171' : textMuted }}>{currentEqData.diana.desertores} PX</strong>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.4rem' }}>
                     <span style={{ color: textMuted }}>Monetizados hacia C2 (Pagos + Abonos):</span>
                     <strong style={{ color: gold }}>{currentEqData.diana.monetizados} Pagados ({currentEqData.diana.abonos} Abonos)</strong>
                   </div>
+                  {currentEqData.diana.c2_sentados !== undefined && (
+                    <div style={{ background: '#3b82f61a', padding: '0.8rem', borderRadius: '8px', border: '1px solid #3b82f64d', marginTop: '0.5rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ color: '#60a5fa', fontWeight: 'bold' }}>Sentados en Capítulo 2:</span>
+                        <strong style={{ color: '#93c5fd', fontSize: '1.1rem' }}>{currentEqData.diana.c2_sentados} PX</strong>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: textLight, marginTop: '0.4rem' }}>
+                        <span>Nuevos: {currentEqData.diana.c2_nuevos}/{currentEqData.diana.c2_meta}</span>
+                        <span>Rezagados: {currentEqData.diana.c2_rezagados}</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 

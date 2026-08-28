@@ -1,0 +1,47 @@
+name: Nodus Daily Sync
+
+on:
+  schedule:
+    # 17:00 UTC = 12:00 PM Lima (UTC-5)
+    - cron: '0 17 * * *'
+  workflow_dispatch:  # Permite ejecución manual desde GitHub
+
+jobs:
+  sync-nodus:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Puppeteer dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libnss3 libatk1.0-0 libatk-bridge2.0-0 \
+            libcups2 libdrm2 libxkbcommon0 libxcomposite1 \
+            libxdamage1 libxrandr2 libgbm1 libasound2
+
+      - name: Run Nodus Scraper
+        env:
+          NODUS_USER: ${{ secrets.NODUS_USER }}
+          NODUS_PASSWORD: ${{ secrets.NODUS_PASSWORD }}
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+        run: node scripts/nodusScraper.js
+
+      - name: Notify success
+        if: success()
+        run: echo "✅ Nodus sync completed at $(date)"
+
+      - name: Notify failure
+        if: failure()
+        run: echo "❌ Nodus sync FAILED at $(date)"

@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import { runScraperWithDates } from './scripts/nodusScraper.js';
+import { spawn } from 'child_process';
 
 const app = express();
 app.use(cors());
@@ -20,6 +21,14 @@ app.post('/api/scrape-nodus', async (req, res) => {
     console.error("[API] Error en el scrapeo en vivo:", error);
     res.status(500).json({ success: false, message: error.message });
   }
+});
+
+app.post('/api/run-nodus-scraper', (req, res) => {
+  console.log('[API] Manual execution of nodusScraper started');
+  // Optional: check Authorization header if we implemented requireSuperAdmin
+  const child = spawn('node', ['scripts/nodusScraper.js'], { detached: true, stdio: 'ignore' });
+  child.unref();
+  res.json({ status: 'started', message: 'Nodus scraper is running in the background.' });
 });
 
 const PORT = 3001;

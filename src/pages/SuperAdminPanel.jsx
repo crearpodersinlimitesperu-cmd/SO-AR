@@ -749,7 +749,23 @@ export default function SuperAdminPanel() {
   const [userConnections, setUserConnections] = useState({});
   const [realUsersData, setRealUsersData] = useState([]);
   const [usersLoading, setUsersLoading] = useState(true);
+  const [isSyncing, setIsSyncing] = useState(false);
   const { showToast } = useUI();
+
+  const handleManualSync = async () => {
+    try {
+      setIsSyncing(true);
+      showToast("Iniciando extracción de Nodus en segundo plano...", "info");
+      const res = await fetch('http://localhost:3001/api/run-nodus-scraper', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
+      if (!res.ok) throw new Error("Error en la conexión con el servidor local");
+      showToast("¡Agente Nodus ejecutándose en segundo plano!", "success");
+    } catch (e) {
+      console.error(e);
+      showToast("Error al iniciar Nodus: " + e.message, "error");
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   // HOTFIX temporal para corregir el rol de José Sánchez en la base de datos
   useEffect(() => {
@@ -841,6 +857,16 @@ export default function SuperAdminPanel() {
           <h1 className="text-gold uppercase" style={{ fontSize: '2rem', margin: '0 0 0.5rem 0' }}>{currentUser?.isSuperAdmin ? 'Panel Super Admin' : 'Directorio de Equipo'} — Monitoreo Global</h1>
           <p className="text-muted" style={{ margin: 0 }}>Visibilidad total del sistema Causa OS en todas las sedes y roles.</p>
         </div>
+        {currentUser?.isSuperAdmin && (
+          <button 
+            onClick={handleManualSync}
+            disabled={isSyncing}
+            className="btn-primary" 
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1.2rem', background: isSyncing ? '#6b7280' : 'linear-gradient(135deg, #10b981, #047857)', color: '#fff', border: 'none', borderRadius: '8px', cursor: isSyncing ? 'not-allowed' : 'pointer' }}>
+            <Globe size={18} />
+            {isSyncing ? 'Sincronizando Nodus...' : 'Extraer Nodus'}
+          </button>
+        )}
       </div>
 
       <TaskAssignmentModal
