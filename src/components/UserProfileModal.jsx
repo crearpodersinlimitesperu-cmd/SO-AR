@@ -76,6 +76,13 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState(null);
 
+  // Cumpleaños (editable solo por Super Admin) — se guarda en users/{id}.cumpleanos
+  // para que quede en el mismo lugar que lee getAllCompanyUsers() y donde escribe
+  // el script de importación desde el Directorio Global.
+  const [editingBirthday, setEditingBirthday] = useState(false);
+  const [birthdayDraft, setBirthdayDraft] = useState(user?.cumpleanos || '');
+  const [isSavingBirthday, setIsSavingBirthday] = useState(false);
+
   // Firestore sync for user meta
   useEffect(() => {
     if (!isOpen || !user?.email) return;
@@ -201,6 +208,29 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
   });
 
   const pct = userTasks.length > 0 ? Math.round((completedTasks.length / userTasks.length) * 100) : 0;
+
+  // Handler: Guardar Cumpleaños (escribe en la colección "users", no en "user_profiles",
+  // para que quede consistente con userService.getAllCompanyUsers() y con el import
+  // desde el Directorio Global). Solo aplica cuando el usuario tiene un id real de
+  // Firestore (user.id) — un registro que solo viene del registro local (usersData.js,
+  // source: 'local_registry') no tiene doc propio en "users" y no se puede editar aquí.
+  const handleSaveBirthday = async () => {
+    if (!user?.id) {
+      showToast('Este perfil no tiene un documento en Firestore para editar (registro local).', 'error');
+      return;
+    }
+    setIsSavingBirthday(true);
+    try {
+      await updateDoc(doc(db, 'users', user.id), { cumpleanos: birthdayDraft || null });
+      showToast('Cumpleaños guardado.', 'success');
+      setEditingBirthday(false);
+    } catch (error) {
+      console.error('Error guardando cumpleaños:', error);
+      showToast('No se pudo guardar el cumpleaños: ' + error.message, 'error');
+    } finally {
+      setIsSavingBirthday(false);
+    }
+  };
 
   // Handler: Add Note
   const handleAddNote = async (e) => {
@@ -431,6 +461,58 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
                       <span>{user.phone}</span>
                       <span style={{ fontSize: '0.7rem', color: '#10b981', background: 'rgba(16, 185, 129, 0.2)', padding: '1px 4px', borderRadius: '4px' }}>WhatsApp</span>
                     </a>
+                  )}
+
+                  {/* Cumpleaños — visible para todos si ya está cargado; editable solo por Super Admin */}
+                  {editingBirthday ? (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }} onClick={(e) => e.stopPropagation()}>
+                      <Calendar size={14} color="var(--crear-gold)" />
+                      <input
+                        type="date"
+                        value={birthdayDraft || ''}
+                        onChange={(e) => setBirthdayDraft(e.target.value)}
+                        style={{
+                          padding: '2px 6px',
+                          borderRadius: '6px',
+                          border: '1px solid var(--crear-gold)',
+                          background: 'var(--bg-input, #1a1a1a)',
+                          color: 'var(--text-heading)',
+                          fontSize: '0.82rem'
+                        }}
+                      />
+                      <button
+                        onClick={handleSaveBirthday}
+                        disabled={isSavingBirthday}
+                        style={{ fontSize: '0.75rem', padding: '3px 8px', borderRadius: '6px', border: 'none', background: 'var(--crear-gold)', color: '#000', fontWeight: 700, cursor: 'pointer' }}
+                      >
+                        {isSavingBirthday ? '...' : 'Guardar'}
+                      </button>
+                      <button
+                        onClick={() => { setEditingBirthday(false); setBirthdayDraft(user?.cumpleanos || ''); }}
+                        style={{ fontSize: '0.75rem', padding: '3px 8px', borderRadius: '6px', border: '1px solid var(--text-muted)', background: 'transparent', color: 'var(--text-muted)', cursor: 'pointer' }}
+                      >
+                        Cancelar
+                      </button>
+                    </span>
+                  ) : (
+                    <span
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', cursor: currentUser?.isSuperAdmin ? 'pointer' : 'default' }}
+                      title={currentUser?.isSuperAdmin ? 'Clic para editar el cumpleaños' : undefined}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (currentUser?.isSuperAdmin) {
+                          setBirthdayDraft(user?.cumpleanos || '');
+                          setEditingBirthday(true);
+                        }
+                      }}
+                    >
+                      <Calendar size={14} color="var(--crear-gold)" />
+                      {user?.cumpleanos ? (
+                        <span>Cumpleaños: <strong style={{ color: 'var(--text-heading)' }}>{user.cumpleanos}</strong></span>
+                      ) : currentUser?.isSuperAdmin ? (
+                        <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Sin cumpleaños — clic para agregar</span>
+                      ) : null}
+                    </span>
                   )}
 
                   {/* Última Conexión Visible para Directorio y Super Admin */}

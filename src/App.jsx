@@ -27,6 +27,7 @@ import TeamCalendar from './pages/TeamCalendar'
 import EmbudoConversionBoard from './pages/EmbudoConversionBoard'
 import AICopilot from './components/AICopilot'
 import PromptModal from './components/PromptModal'
+import BirthdayAlert from './components/BirthdayAlert'
 import HelpModal from './components/HelpModal'
 import ThemeToggle from './components/ThemeToggle'
 
@@ -127,6 +128,7 @@ function App() {
         </div>
       )}
       <PromptModal />
+      {currentUser && <BirthdayAlert />}
       <main style={{ flex: 1 }}>
         <Routes>
           <Route path="/login" element={<Login />} />

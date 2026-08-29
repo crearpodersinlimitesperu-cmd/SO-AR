@@ -159,7 +159,11 @@ export async function getAllCompanyUsers() {
     // Ahora se rellenan esos campos en el registro existente, sin pisar ningún dato
     // que "users" ya tuviera.
     const qtSnap = await getDocs(collection(db, 'qt_directory'));
-    const CONTACT_FIELDS_FROM_QT = ['whatsapp', 'whatsappUrl', 'cleanPhone', 'phone', 'telefono', 'email', 'correo', 'corporateEmail', 'personalEmail'];
+    // (29/08/2026) Se agrega "cumpleanos" para la alerta de cumpleaños: el dato existe
+    // hoy en el directorio de QT (además del Directorio Global importado a "users"),
+    // así que se rellena igual que whatsapp/phone: solo si el registro existente
+    // todavía no tiene el campo, sin pisar un valor ya cargado.
+    const CONTACT_FIELDS_FROM_QT = ['whatsapp', 'whatsappUrl', 'cleanPhone', 'phone', 'telefono', 'email', 'correo', 'corporateEmail', 'personalEmail', 'cumpleanos'];
     qtSnap.forEach(docSnap => {
       const qtData = docSnap.data();
       const candidateKeys = emailKeysOf(qtData);
