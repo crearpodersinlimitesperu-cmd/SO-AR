@@ -35,6 +35,11 @@ rules_version = '2';
 // corr├¡gela antes de desplegar. Debe mantenerse igual que
 // src/config/permissions.js (GERENCIA_ROLES/SUPER_ADMIN_EMAILS); no se
 // sincronizan solas, as├¡ que si cambia gerencia hay que actualizar AMBOS lugares.
+//
+// ACTUALIZACIÓN 29/08/2026 (confirmada explícitamente por José): se agregó
+// isOperationalProgressUpdate() en la regla de "tasks" — ver esa función más abajo
+// para el detalle del bug real que corrige (permission-denied al marcar checklists
+// del catálogo base, reportado como "Revisa los permisos de Firestore").
 // ============================================================================
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -89,6 +94,23 @@ service cloud.firestore {
       return isAuthenticated() && resourceData.collaborators != null && email() in resourceData.collaborators;
     }
 
+    // (29/08/2026) FIX: las tareas del catálogo base (checklistData.js) son compartidas por
+    // sede vía el mapa "completions" — nunca tienen assignedToEmail/ownerId ni un arreglo
+    // "collaborators" explícito. Un Coordinador marcando su propio checklist (toggleTask,
+    // % de avance, evidencia) nunca cumplía isOwner() ni isCollaborator(), así que Firestore
+    // rechazaba la escritura con permission-denied ("Revisa los permisos de Firestore") en
+    // cuanto el documento de la tarea ya existía (después del primer toque, o si "Reiniciar
+    // Ciclo" ya corrió). Este helper permite a CUALQUIER autenticado tocar SOLO estos campos
+    // operativos de progreso/completitud — nunca campos estructurales (dueño, rol, sede,
+    // plazo, título), que siguen exigiendo isOwner()/isGerenteODireccion()/isSuperAdmin().
+    function isOperationalProgressUpdate() {
+      return isAuthenticated() &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'completed', 'status', 'completions', 'progress', 'progressPercentage',
+          'evidence_url', 'evidenceUrl', 'date', 'googleSynced'
+        ]);
+    }
+
     // TASKS
     match /tasks/{taskId} {
       allow read: if isAuthenticated();
@@ -97,7 +119,8 @@ service cloud.firestore {
                     isOwner(resource.data) ||
                     (isCollaborator(resource.data) &&
                      request.resource.data.diff(resource.data).affectedKeys().hasAny(['status', 'progress', 'evidence_url', 'evidenceUrl', 'completions']) &&
-                     !request.resource.data.diff(resource.data).affectedKeys().hasAny(['assignedToEmail', 'role', 'sede', 'ownerId']));
+                     !request.resource.data.diff(resource.data).affectedKeys().hasAny(['assignedToEmail', 'role', 'sede', 'ownerId'])) ||
+                    isOperationalProgressUpdate();
       allow delete: if isGerenteODireccion() || isSuperAdmin();
     }
 
