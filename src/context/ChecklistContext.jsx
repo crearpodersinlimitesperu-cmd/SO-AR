@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { db, auth } from '../services/firebase';
-import { collection, onSnapshot, doc, updateDoc, writeBatch, addDoc, query, where, orderBy, limit, getDocs, getDoc } from 'firebase/firestore';
+import { collection, onSnapshot, doc, updateDoc, setDoc, writeBatch, addDoc, query, where, orderBy, limit, getDocs, getDoc } from 'firebase/firestore';
 import { checklistData } from '../data/checklistData';
 import { usersData, normalizeRole } from '../data/usersData';
 import { isSuperAdminEmail, isGerenciaRole } from '../config/permissions';
@@ -30,6 +30,41 @@ export function ChecklistProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const { showToast, showPrompt } = useUI();
   const { currentUser } = useAuth();
+
+  // Escribe cambios en un documento de "tasks", creándolo primero si todavía no existe.
+  //
+  // CONTEXTO (29/08/2026): las tareas del catálogo base (checklistData.js) se muestran
+  // en pantalla y son clicables aunque nunca se haya creado su documento propio en
+  // Firestore — se fusionan del lado del cliente en el onSnapshot de arriba
+  // ("missingBaseTasks"), y solo quedan escritas de verdad si alguien corre
+  // initializeFirestore() o si esta función las crea al primer toque. updateDoc()
+  // exige que el documento YA exista; si no existe, las reglas de seguridad no pueden
+  // evaluar "resource" (es null) y Firestore lo rechaza como "permission-denied" —
+  // el mismo error que se ve como "revisa los permisos de Firestore", aunque la causa
+  // real no es un permiso mal configurado sino que el documento nunca se creó. Por eso
+  // se verifica primero si existe: si no, se crea con los datos base del catálogo (para
+  // que quede completo para cualquier otro que lo lea) + el cambio pedido; si ya existe,
+  // se actualiza normalmente sin tocar el resto de sus campos.
+  const writeTaskDoc = async (taskId, updates) => {
+    const taskRef = doc(db, 'tasks', taskId);
+    const snap = await getDoc(taskRef);
+    if (!snap.exists()) {
+      const baseTask = checklistData.find(t => t.id === taskId);
+      await setDoc(taskRef, {
+        ...(baseTask || {}),
+        id: taskId,
+        completed: false,
+        status: 'Pendiente',
+        priority: baseTask?.isCritical ? '🔴 ROJO' : '🟡 AMARILLO',
+        progressPercentage: 0,
+        deadline: baseTask ? calculateAutomaticDeadline(baseTask) : null,
+        created_at: new Date().toISOString(),
+        ...updates
+      });
+    } else {
+      await updateDoc(taskRef, updates);
+    }
+  };
 
   useEffect(() => {
     // Escuchar cambios en la colección "tasks" en tiempo real
@@ -118,11 +153,10 @@ export function ChecklistProvider({ children }) {
 
   const toggleTask = async (taskId, currentStatus) => {
     try {
-      const taskRef = doc(db, 'tasks', taskId);
       const userSede = currentUser?.sede?.trim() || 'Global';
-      
+
       // Update both legacy and map formats just in case it's a custom task
-      await updateDoc(taskRef, {
+      await writeTaskDoc(taskId, {
         completed: !currentStatus,
         status: !currentStatus ? 'Completada' : 'Pendiente',
         [`completions.${userSede}.completed`]: !currentStatus,
@@ -136,8 +170,7 @@ export function ChecklistProvider({ children }) {
 
   const updateTaskDetails = async (taskId, updates) => {
     try {
-      const taskRef = doc(db, 'tasks', taskId);
-      await updateDoc(taskRef, updates);
+      await writeTaskDoc(taskId, updates);
     } catch (error) {
       console.error("Error updating task details:", error);
       showToast("No se pudo actualizar la tarea.", "error");
@@ -315,8 +348,7 @@ export function ChecklistProvider({ children }) {
 
   const submitEvidence = async (taskId, evidenceUrl) => {
     try {
-      const taskRef = doc(db, 'tasks', taskId);
-      await updateDoc(taskRef, {
+      await writeTaskDoc(taskId, {
         status: 'Pendiente de validación',
         evidence_url: evidenceUrl,
         date: new Date().toISOString()
@@ -430,8 +462,7 @@ export function ChecklistProvider({ children }) {
       if (result.success) {
         // Actualizamos en Firestore para no volverla a sincronizar
         try {
-          const taskRef = doc(db, 'tasks', task.id);
-          await updateDoc(taskRef, { googleSynced: true });
+          await writeTaskDoc(task.id, { googleSynced: true });
           successCount++;
         } catch (e) {
           console.error("Error marcando tarea como sincronizada:", e);
