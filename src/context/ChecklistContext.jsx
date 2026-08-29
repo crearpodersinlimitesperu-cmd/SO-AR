@@ -8,6 +8,7 @@ import { calculateAutomaticDeadline } from '../utils/soarDates';
 import { createGoogleTask } from '../services/googleSync';
 import { useUI } from './UIContext';
 import { useAuth } from './AuthContext';
+import { useCycles } from './CyclesContext';
 
 const ChecklistContext = createContext();
 
@@ -30,6 +31,17 @@ export function ChecklistProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const { showToast, showPrompt } = useUI();
   const { currentUser } = useAuth();
+  // (28/08/2026, restaurado 29/08/2026) CORRECCIÓN: antes calculateAutomaticDeadline()
+  // se llamaba SIN el ciclo activo real, así que siempre usaba el único ciclo de
+  // ejemplo hardcodeado en src/data/cyclesData.js ("Equipo 30", fechas fijas) para
+  // TODOS los usuarios, sin importar su sede o equipo real. Eso hacía que los
+  // "Límite" mostrados en los checklists no correspondieran a las fechas reales del
+  // ciclo de cada sede — José lo reportó como "los horarios en los checklist no son
+  // coherentes con la tarea". Ahora se usa el ciclo real (currentCycle, calculado en
+  // CyclesContext.jsx a partir del calendario oficial en vivo) para que cada sede vea
+  // sus propias fechas.
+  const cyclesCtx = useCycles();
+  const currentCycle = cyclesCtx?.currentCycle || null;
 
   // Escribe cambios en un documento de "tasks", creándolo primero si todavía no existe.
   //
@@ -57,7 +69,7 @@ export function ChecklistProvider({ children }) {
         status: 'Pendiente',
         priority: baseTask?.isCritical ? '🔴 ROJO' : '🟡 AMARILLO',
         progressPercentage: 0,
-        deadline: baseTask ? calculateAutomaticDeadline(baseTask) : null,
+        deadline: baseTask ? calculateAutomaticDeadline(baseTask, currentCycle) : null,
         created_at: new Date().toISOString(),
         ...updates
       });
@@ -107,7 +119,7 @@ export function ChecklistProvider({ children }) {
       // Solo se aplica a roles operativos — no a roles ejecutivos sin checklist propio.
       const existingIds = new Set(loadedTasks.map(t => t.id));
       const missingBaseTasks = skipCatalogMerge ? [] : checklistData.filter(t => !existingIds.has(t.id)).map(task => {
-        const autoDeadline = calculateAutomaticDeadline(task);
+        const autoDeadline = calculateAutomaticDeadline(task, currentCycle);
         return {
           ...task,
           id: task.id,
@@ -142,14 +154,18 @@ export function ChecklistProvider({ children }) {
         status: 'Pendiente',
         priority: task.isCritical ? '🔴 ROJO' : '🟡 AMARILLO',
         progressPercentage: 0,
-        deadline: calculateAutomaticDeadline(task)
+        deadline: calculateAutomaticDeadline(task, currentCycle)
       }));
       setTasks(localTasks);
       setLoading(false);
     });
 
     return () => unsubscribe();
-  }, [currentUser?.sede, currentUser?.email, currentUser?.appRole]);
+    // currentCycle?.id se agrega para que, en cuanto CyclesContext termine de cargar
+    // el ciclo real (llega después del primer render, vía la API del calendario),
+    // este listener se vuelva a suscribir y recalcule los "deadline" faltantes con
+    // las fechas reales — antes se quedaban calculados con el ciclo de ejemplo.
+  }, [currentUser?.sede, currentUser?.email, currentUser?.appRole, currentCycle?.id, currentCycle?.name]);
 
   const toggleTask = async (taskId, currentStatus) => {
     try {
@@ -408,22 +424,28 @@ export function ChecklistProvider({ children }) {
       
       checklistData.forEach(task => {
         const taskRef = doc(db, 'tasks', task.id);
-        const autoDeadline = calculateAutomaticDeadline(task);
-        
+
         // Inicializar el mapa de completitud en falso para todas las sedes
         const initialCompletions = {};
         allSedes.forEach(s => {
           initialCompletions[s] = { completed: false, status: 'Pendiente' };
         });
 
-        batch.set(taskRef, { 
-          ...task, 
+        batch.set(taskRef, {
+          ...task,
           completed: false, // Legacy fallback
           status: 'Pendiente', // Legacy fallback
           completions: initialCompletions,
           priority: task.isCritical ? '🔴 ROJO' : '🟡 AMARILLO',
           progressPercentage: 0,
-          deadline: autoDeadline,
+          // (28/08/2026) CORRECCIÓN: ya NO se calcula ni se guarda un "deadline" fijo
+          // aquí. Este doc de "tasks" es GLOBAL (compartido por todas las sedes vía
+          // el mapa "completions"), así que no existe un único ciclo/fecha correcto
+          // para calcularlo en el momento del reinicio. Antes se guardaba un deadline
+          // calculado con el ciclo de ejemplo hardcodeado (mismo bug que en el merge
+          // de tareas faltantes), que quedaba INCORRECTO y CONGELADO para todas las
+          // sedes para siempre. Al dejarlo sin guardar, cada usuario lo calcula al
+          // vuelo con SU ciclo real.
           created_at: new Date().toISOString()
         });
       });
@@ -452,6 +474,7 @@ export function ChecklistProvider({ children }) {
     }
 
     let successCount = 0;
+    let lastError = null;
     for (let task of myUnsyncedTasks) {
       const result = await createGoogleTask({
         title: task.title,
@@ -467,18 +490,33 @@ export function ChecklistProvider({ children }) {
         } catch (e) {
           console.error("Error marcando tarea como sincronizada:", e);
         }
+      } else {
+        lastError = result.error || 'Error desconocido';
       }
     }
 
-    showToast(`¡Se sincronizaron ${successCount} tareas a tu cuenta de Google Tasks exitosamente!`, "success");
-    
+    // CONTEXTO (28/08/2026): antes este toast SIEMPRE decía "exitosamente" aunque
+    // successCount fuera 0 — el usuario reportó que "no sincroniza en la vida real"
+    // porque el botón parecía funcionar (mostraba éxito) pero nada llegaba a Google
+    // Tasks. Causa real más probable: el accessToken de Google se guarda una sola vez
+    // al iniciar sesión (sessionStorage) y NO se refresca — expira típicamente en ~1h,
+    // así que en sesiones largas createGoogleTask empieza a fallar en silencio.
+    // Ahora el mensaje refleja el resultado real de cada intento.
+    if (successCount === myUnsyncedTasks.length) {
+      showToast(`¡Se sincronizaron ${successCount} tareas a tu cuenta de Google Tasks exitosamente!`, "success");
+    } else if (successCount > 0) {
+      showToast(`Se sincronizaron ${successCount} de ${myUnsyncedTasks.length} tareas. Las demás fallaron${lastError ? `: ${lastError}` : ''}. Si persiste, cierra sesión y vuelve a entrar.`, "error");
+    } else {
+      showToast(`No se pudo sincronizar ninguna tarea a Google Tasks${lastError ? `: ${lastError}` : ''}. Tu permiso de Google probablemente expiró — cierra sesión y vuelve a entrar para renovarlo.`, "error");
+    }
+
     // Guardar en el historial de sincronización
     try {
       await addDoc(collection(db, 'sync_history'), {
         userEmail: currentUser?.email || 'Desconocido',
         timestamp: new Date().toISOString(),
-        status: successCount > 0 ? 'Éxito' : 'Info',
-        details: successCount > 0 ? `Sincronizadas ${successCount} tareas.` : 'No hubo tareas nuevas por sincronizar.',
+        status: successCount === myUnsyncedTasks.length ? 'Éxito' : (successCount > 0 ? 'Parcial' : 'Error'),
+        details: successCount > 0 ? `Sincronizadas ${successCount} de ${myUnsyncedTasks.length} tareas.` : `Fallaron las ${myUnsyncedTasks.length} tareas intentadas.${lastError ? ` Último error: ${lastError}` : ''}`,
         roleId: roleId
       });
     } catch (e) {

@@ -752,6 +752,9 @@ export default function Home() {
                     <button onClick={() => { setShowToolsDropdown(false); navigate('/auditoria-kpis'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                       📉 Auditoría de KPIs
                     </button>
+                    <button onClick={() => { setShowToolsDropdown(false); navigate('/nodus-data-map'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#f59e0b', background: 'rgba(245, 158, 11, 0.1)' }}>
+                      🗺️ Nodus Data Map
+                    </button>
                   </>
                 )}
 
@@ -788,9 +791,11 @@ export default function Home() {
                   </button>
                 )}
 
-                <button onClick={() => { setShowToolsDropdown(false); window.open('/calendario_global.html?v=' + Date.now() + '&email=' + encodeURIComponent(currentUser?.email || '') + '&name=' + encodeURIComponent(currentUser?.displayName || currentUser?.name || ''), '_blank'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
-                  📅 Calendario Global Maestro ↗
-                </button>
+                {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+                  <button onClick={() => { setShowToolsDropdown(false); window.open('/calendario_global.html?v=' + Date.now() + '&email=' + encodeURIComponent(currentUser?.email || '') + '&name=' + encodeURIComponent(currentUser?.displayName || currentUser?.name || ''), '_blank'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
+                    📅 Calendario Global Maestro ↗
+                  </button>
+                )}
 
                 {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
                   <button onClick={() => { setShowToolsDropdown(false); window.open('https://cpsl-campus-interactivo.vercel.app/ruta', '_blank'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
@@ -882,9 +887,11 @@ export default function Home() {
             </button>
           )}
 
-          <button onClick={() => window.open('/calendario_global.html?v=' + Date.now() + '&email=' + encodeURIComponent(currentUser?.email || '') + '&name=' + encodeURIComponent(currentUser?.displayName || currentUser?.name || ''), '_blank')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #ef4444)', color: 'white', border: 'none' }}>
-            📅 Calendario Global
-          </button>
+          {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+            <button onClick={() => window.open('/calendario_global.html?v=' + Date.now() + '&email=' + encodeURIComponent(currentUser?.email || '') + '&name=' + encodeURIComponent(currentUser?.displayName || currentUser?.name || ''), '_blank')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #ef4444)', color: 'white', border: 'none' }}>
+              📅 Calendario Global
+            </button>
+          )}
 
           {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
             <button onClick={() => window.open('https://cpsl-campus-interactivo.vercel.app/ruta', '_blank')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #059669)', color: 'white', border: 'none' }}>
