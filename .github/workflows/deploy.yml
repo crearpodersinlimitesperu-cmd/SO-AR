@@ -10,6 +10,9 @@ jobs:
   build-and-deploy:
     name: Build & Deploy
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write # Necesario para reportar el error real a un Issue si el deploy falla (ver paso final)
 
     steps:
       - name: ⬇️ Checkout código
@@ -49,6 +52,7 @@ jobs:
       - name: 🚀 Deploy to Firebase Hosting
         env:
           RAW_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if [ -n "$RAW_TOKEN" ]; then
             TOKEN="$RAW_TOKEN"
@@ -56,7 +60,20 @@ jobs:
               TOKEN="1//$TOKEN"
             fi
             echo "Deploying to Firebase Hosting with formatted token..."
-            npx --yes firebase-tools@latest deploy --only hosting --token "$TOKEN" --project centro-operativo-cpsl --non-interactive
+            npx --yes firebase-tools@latest deploy --only hosting --token "$TOKEN" --project centro-operativo-cpsl --non-interactive 2>&1 | tee /tmp/deploy_output.log
+            DEPLOY_EXIT=${PIPESTATUS[0]}
           else
-            echo "FIREBASE_TOKEN not set, skipping hosting deploy."
+            echo "FIREBASE_TOKEN not set, skipping hosting deploy." | tee /tmp/deploy_output.log
+            DEPLOY_EXIT=1
           fi
+
+          # DIAGNÓSTICO (29/08/2026): los logs crudos de este workflow no son legibles
+          # desde el entorno de Claude que mantiene este repo (bloqueados por política de
+          # red). Si el deploy falla, se reporta la salida real a un GitHub Issue vía
+          # scripts/report_deploy_failure.py — mismo patrón que platform_audit.mjs.
+          if [ "$DEPLOY_EXIT" -ne 0 ]; then
+            echo "❌ Deploy falló (exit $DEPLOY_EXIT). Reportando diagnóstico a un GitHub Issue..."
+            python3 scripts/report_deploy_failure.py /tmp/deploy_output.log || true
+          fi
+
+          exit $DEPLOY_EXIT
