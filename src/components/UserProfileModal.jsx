@@ -55,6 +55,20 @@ const ROLE_COLORS = {
   entrenador_llamadas: '#38bdf8'
 };
 
+// Formatea "YYYY-MM-DD" a "17 de marzo" — sin año, por privacidad (no se debe
+// exponer la edad de nadie). Si el valor no tiene ese formato, se muestra tal
+// cual en vez de asumir un formato distinto.
+const MESES_ES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+function formatBirthdayNoYear(cumpleanos) {
+  if (!cumpleanos) return '';
+  const m = String(cumpleanos).match(/^\d{4}-(\d{2})-(\d{2})$/);
+  if (!m) return cumpleanos;
+  const mesIdx = parseInt(m[1], 10) - 1;
+  const dia = parseInt(m[2], 10);
+  if (mesIdx < 0 || mesIdx > 11) return cumpleanos;
+  return `${dia} de ${MESES_ES[mesIdx]}`;
+}
+
 export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] }) {
   const { currentUser, originalAdminUser, simulateUser } = useAuth();
   const navigate = useNavigate();
@@ -508,7 +522,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
                     >
                       <Calendar size={14} color="var(--crear-gold)" />
                       {user?.cumpleanos ? (
-                        <span>Cumpleaños: <strong style={{ color: 'var(--text-heading)' }}>{user.cumpleanos}</strong></span>
+                        <span>Cumpleaños: <strong style={{ color: 'var(--text-heading)' }}>{formatBirthdayNoYear(user.cumpleanos)}</strong></span>
                       ) : currentUser?.isSuperAdmin ? (
                         <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Sin cumpleaños — clic para agregar</span>
                       ) : null}
