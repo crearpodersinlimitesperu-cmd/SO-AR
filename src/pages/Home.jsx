@@ -914,6 +914,17 @@ export default function Home() {
               👑 Centro Managers
             </button>
           )}
+
+          {/* Calendario de Maestría del Juego (31/08/2026): esta es la barra "Pro"
+              que realmente ve José (barra de botones siempre visible), distinta
+              del dropdown "Herramientas" donde se había agregado el acceso
+              antes — por eso no aparecía. Mismo criterio de roles que Centro
+              Managers, sin entrenadores (la edición es de CMJ/gerencia). */}
+          {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'director_maestria', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+            <button onClick={() => navigate('/calendario-mj')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #1a75bc, #29abe2)', color: 'white', border: 'none' }}>
+              📅 Calendario MJ
+            </button>
+          )}
         </div>
       )}
 
