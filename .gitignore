@@ -42,3 +42,8 @@ centro-operativo-cpsl-*.json
 .dev.vars*
 !.dev.vars.example
 !.env.example
+
+# Carpetas grandes que nunca debieron trackearse en git (reconciliacion 31/08/2026)
+venv/
+backup/pre-repair-2026-08-21-15-08/
+_cpsl-base-template_uncommitted_backup_2026-08-26/

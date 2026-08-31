@@ -1,8 +1,0 @@
-{
-  "step_index": 574,
-  "source": "MODEL",
-  "type": "GREP_SEARCH",
-  "status": "DONE",
-  "created_at": "2026-08-17T21:03:30Z",
-  "content": "Created At: 2026-08-17T16:03:30-05:00\nCompleted At: 2026-08-17T16:03:30-05:00\n{\"File\":\"c:\\\\Users\\\\josem\\\\Downloads\\\\cpsl-base-template\\\\src\\\\pages\\\\RoleSelector.jsx\",\"LineNumber\":2,\"LineContent\":\"import { roles } from '../data/checklistData';\"}\n{\"File\":\"c:\\\\Users\\\\josem\\\\Downloads\\\\cpsl-base-template\\\\src\\\\pages\\\\ChecklistBoard.jsx\",\"LineNumber\":7,\"LineContent\":\"import { roles } from '../data/checklistData';\"}\n{\"File\":\"c:\\\\Users\\\\josem\\\\Downloads\\\\cpsl-base-template\\\\src\\\\context\\\\ChecklistContext.jsx\",\"LineNumber\":4,\"LineContent\":\"import { checklistData } from '../data/checklistData';\"}\n{\"File\":\"c:\\\\Users\\\\josem\\\\Downloads\\\\cpsl-base-template\\\\src\\\\context\\\\ChecklistContext.jsx\",\"LineNumber\":208,\"LineContent\":\"      checklistData.forEach(task =\\u003e {\"}\n{\"File\":\"c:\\\\Users\\\\josem\\\\Downloads\\\\cpsl-base-template\\\\src\\\\data\\\\checklistData.js\",\"LineNumber\":19,\"LineContent\":\"export const checklistData = [\"}\n{\"File\":\"c:\\\\Users\\\\josem\\\\Downloads\\\\cpsl-base-template\\\\src\\\\data\\\\checklistData.js\",\"LineNumber\":146,\"LineContent\":\"export const getTasksByRole = (roleId) =\\u003e checklistData.filter(t =\\u003e t.role === roleId);\"}"
-}
