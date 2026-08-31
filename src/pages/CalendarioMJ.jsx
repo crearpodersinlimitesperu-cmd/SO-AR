@@ -2,13 +2,47 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
+import { useCycles } from '../context/CyclesContext';
 import { db } from '../services/firebase';
 import {
   collection, query, onSnapshot, doc, setDoc, deleteDoc, serverTimestamp
 } from 'firebase/firestore';
 import {
-  Calendar, Plus, ArrowLeft, Printer, Trash2, Edit3, Save, X, Copy, Lock
+  Calendar, Plus, ArrowLeft, Printer, Trash2, Edit3, Save, X, Copy, Lock, RefreshCw
 } from 'lucide-react';
+
+// Busca, en el calendario oficial ya cargado por CyclesContext (misma fuente
+// que usa toda la app para saber en qué etapa está cada equipo), el evento
+// "MAESTRIA DEL JUEGO" de una sede+equipo. Se usa SOLO para precargar la
+// fecha del Primer FDS (Creación) — el resto de fechas (Segundo/Tercer FDS,
+// Barco, Caminata sobre fuego, etc.) no vienen en esta fuente y siguen
+// siendo 100% manuales (confirmado con José: no hay fórmula fija de offsets).
+function findOfficialMJEvent(events, sede, equipoNumero) {
+  if (!sede?.trim() || !equipoNumero?.trim() || !events?.length) return null;
+  const sedeNorm = sede.trim().toLowerCase();
+  const equipoNorm = String(equipoNumero).trim();
+  const sedeAliases = [
+    ['lima', 'lim'], ['quito', 'uio'], ['guayaquil', 'gye'],
+    ['cuenca', 'cue'], ['medell', 'med'], ['mexico', 'mex'], ['méxico', 'mex'], ['cdmx', 'mex']
+  ];
+  return events.find(e => {
+    const nombre = e.nombre || e.name || '';
+    if (nombre !== 'MAESTRIA DEL JUEGO') return false;
+    const evSede = (e.sede || e.sedeTag || e.place || e.address || '').toLowerCase();
+    if (!evSede) return false;
+    const sedeMatches = evSede.includes(sedeNorm) || sedeNorm.includes(evSede) ||
+      sedeAliases.some(([a, b]) => (sedeNorm.includes(a) && evSede.includes(b)));
+    if (!sedeMatches) return false;
+    const evEquipo = String(e.equipo || '').trim();
+    return evEquipo === equipoNorm || evEquipo.includes(equipoNorm) || (equipoNorm && equipoNorm.includes(evEquipo));
+  }) || null;
+}
+
+function addDaysISO(isoDate, days) {
+  const d = new Date(isoDate + 'T00:00:00');
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0, 10);
+}
 
 // ============================================================================
 // CalendarioMJ.jsx (29/08/2026)
@@ -141,6 +175,7 @@ const FDS_LABELS = { creacion: 'PRIMER FDS: CREACIÓN', relacion: 'SEGUNDO FDS: 
 export default function CalendarioMJ() {
   const { currentUser } = useAuth();
   const { showToast } = useUI();
+  const { events } = useCycles();
   const navigate = useNavigate();
 
   const [calendars, setCalendars] = useState([]);
@@ -149,8 +184,43 @@ export default function CalendarioMJ() {
   const [form, setForm] = useState(emptyForm());
   const [saving, setSaving] = useState(false);
   const [previewId, setPreviewId] = useState(null);
+  const [autoFilledOnce, setAutoFilledOnce] = useState(false);
 
   const userCanEdit = canEdit(currentUser);
+
+  // Precarga automática de la fecha del Primer FDS al escribir sede + equipo
+  // (solo una vez por sesión de edición, para no pelear con lo que el
+  // usuario ya haya escrito a mano después).
+  useEffect(() => {
+    if (editing !== 'new' || autoFilledOnce) return;
+    if (!form.sede.trim() || !form.equipoNumero.trim()) return;
+    const match = findOfficialMJEvent(events, form.sede, form.equipoNumero);
+    if (match) {
+      const start = (match.fecha_inicio || match.start || '').replace('Z', '').slice(0, 10);
+      if (start) {
+        const end = addDaysISO(start, 2);
+        setForm(f => ({ ...f, fds: f.fds.map((fb, i) => i === 0 ? { ...fb, fechaInicio: start, fechaFin: end } : fb) }));
+        showToast('Fecha del Primer FDS precargada desde el calendario oficial — verifica que sea correcta.', 'success');
+        setAutoFilledOnce(true);
+      }
+    }
+  }, [form.sede, form.equipoNumero, events, editing, autoFilledOnce, showToast]);
+
+  const buscarEnCalendarioOficial = () => {
+    const match = findOfficialMJEvent(events, form.sede, form.equipoNumero);
+    if (!match) {
+      showToast('No se encontró este equipo en el calendario oficial. Ingresa las fechas manualmente.', 'error');
+      return;
+    }
+    const start = (match.fecha_inicio || match.start || '').replace('Z', '').slice(0, 10);
+    if (!start) {
+      showToast('El equipo se encontró pero sin fecha de inicio registrada.', 'error');
+      return;
+    }
+    const end = addDaysISO(start, 2);
+    setForm(f => ({ ...f, fds: f.fds.map((fb, i) => i === 0 ? { ...fb, fechaInicio: start, fechaFin: end } : fb) }));
+    showToast('Fecha del Primer FDS actualizada desde el calendario oficial.', 'success');
+  };
 
   useEffect(() => {
     const q = query(collection(db, COLLECTION_NAME));
@@ -178,6 +248,7 @@ export default function CalendarioMJ() {
 
   const startNew = () => {
     setForm(emptyForm());
+    setAutoFilledOnce(false);
     setEditing('new');
   };
 
@@ -205,12 +276,14 @@ export default function CalendarioMJ() {
       actividades: (cal.actividades || DEFAULT_ACTIVITIES).map(a => ({ ...a, fecha: '' })),
       infoText: cal.infoText || DEFAULT_INFO_TEXT
     });
+    setAutoFilledOnce(false);
     setEditing('new');
   };
 
   const cancelEdit = () => {
     setEditing(null);
     setForm(emptyForm());
+    setAutoFilledOnce(false);
   };
 
   const updateFdsField = (idx, field, value) => {
@@ -331,6 +404,7 @@ export default function CalendarioMJ() {
           updateActividad={updateActividad}
           addActividad={addActividad}
           removeActividad={removeActividad}
+          onBuscarOficial={buscarEnCalendarioOficial}
           onCancel={cancelEdit}
           onSave={handleSave}
           saving={saving}
@@ -381,7 +455,7 @@ export default function CalendarioMJ() {
 // ============================================================================
 // Editor
 // ============================================================================
-function CalendarioEditor({ form, setForm, updateFdsField, updateActividad, addActividad, removeActividad, onCancel, onSave, saving, isNew }) {
+function CalendarioEditor({ form, setForm, updateFdsField, updateActividad, addActividad, removeActividad, onBuscarOficial, onCancel, onSave, saving, isNew }) {
   const inputStyle = { width: '100%', padding: '0.5rem', borderRadius: '8px', border: '1px solid rgba(128,128,128,0.3)', background: 'transparent', color: 'inherit', fontSize: '0.85rem' };
   const textareaStyle = { ...inputStyle, minHeight: '60px', fontFamily: 'inherit', resize: 'vertical' };
 
@@ -403,6 +477,16 @@ function CalendarioEditor({ form, setForm, updateFdsField, updateActividad, addA
             <input style={inputStyle} value={form.equipoNombre} onChange={e => setForm(f => ({ ...f, equipoNombre: e.target.value }))} placeholder="Ej. Kay Theron" />
           </div>
         </div>
+        {onBuscarOficial && (
+          <div style={{ marginTop: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+            <button onClick={onBuscarOficial} className="btn-secondary" style={{ padding: '0.4rem 0.7rem', fontSize: '0.78rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+              <RefreshCw size={14} /> Buscar fecha en el calendario oficial
+            </button>
+            <span style={{ fontSize: '0.72rem', opacity: 0.6 }}>
+              Con sede + número de equipo se precarga sola la fecha del Primer FDS desde el calendario oficial de la plataforma. El resto de fechas (Segundo/Tercer FDS y cada actividad) no vienen ahí y se ajustan a mano.
+            </span>
+          </div>
+        )}
       </div>
 
       {form.fds.map((fdsBlock, idx) => (
