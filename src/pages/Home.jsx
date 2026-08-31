@@ -18,11 +18,13 @@ import { calculateAutomaticDeadline } from '../utils/soarDates';
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
 import VenueConfigModal from '../components/VenueConfigModal';
 import ViewModeSelector from '../components/ViewModeSelector';
-import GlobalSearch from '../components/GlobalSearch';
 import ThemeToggle from '../components/ThemeToggle';
 import { getVenueForTraining } from '../data/venuesData';
-import { ROLE_DISPLAY_NAMES } from '../data/usersData';
-import { canAssignTrainer } from '../config/permissions';
+import { ROLE_DISPLAY_NAMES, normalizeSede } from '../data/usersData';
+import { canAssignTrainer, canViewAllManagers, isDireccionRole, isGlobalQTCoordinator } from '../config/permissions';
+import { getAllCompanyUsers } from '../services/userService';
+import UserProfileModal from '../components/UserProfileModal';
+import { INITIAL_MANAGERS } from '../data/managersData';
 
 /**
  * Normaliza y verifica si un evento está asignado a un entrenador específico
@@ -61,12 +63,92 @@ const isTrainerMatchingUser = (evTrainer, user) => {
   return false;
 };
 
+// ============================================================================
+// BUSCADOR GLOBAL — Registro de módulos/páginas (28/08/2026)
+// ----------------------------------------------------------------------------
+// Refleja exactamente las mismas rutas y los mismos arrays de roles que ya
+// usan el menú "🛠️ Más Módulos y Herramientas" y la Barra Pro en este mismo
+// archivo (ver las secciones "MENÚ DESPLEGABLE DE MÁS MÓDULOS" y "BARRA PRO
+// COMPLETA" más abajo). Si se agrega, quita o re-permisiona un módulo ahí,
+// hay que actualizar también esta lista para que el buscador no muestre
+// accesos desactualizados o incorrectos.
+// ============================================================================
+const EXEC_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado'];
+const KPI_ROLES = ['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan'];
+const DIRECTORIO_QT_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'consolidado'];
+const CAMPUS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'consolidado'];
+const CENTRO_MANAGERS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'consolidado'];
+const MANUAL_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'consolidado'];
+const MANUAL_NODUS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'consolidado'];
+const REPORTES_VISIBLE = (u) => Boolean(
+  u?.isSuperAdmin || u?.isGerente ||
+  ['coord_c1', 'coord_maestria', 'capitan', 'qt', 'direccion', 'director_maestria', 'consolidado'].includes(u?.appRole)
+);
+
+const MODULE_REGISTRY = [
+  { id: 'gerencial', label: 'Causa OS Gerencial', emoji: '💼', route: '/gerente', roles: EXEC_ROLES },
+  { id: 'portafolio', label: 'Portafolio PMO (Planview)', emoji: '📈', route: '/portafolio', roles: EXEC_ROLES },
+  { id: 'estrategia', label: 'Estrategia OKRs (Cascade)', emoji: '🎯', route: '/estrategia', roles: EXEC_ROLES },
+  { id: 'auditoria-kpis', label: 'Auditoría de KPIs', emoji: '📉', route: '/auditoria-kpis', roles: EXEC_ROLES },
+  { id: 'acuerdos', label: 'Acuerdos Oficiales (Correo)', emoji: '✉️', route: '/acuerdos', roles: null },
+  { id: 'calendario-equipo', label: 'Agenda y Time Boxing', emoji: '🗓️', route: '/calendario-equipo', roles: null },
+  { id: 'learning', label: 'Inteligencia Colectiva (Learning)', emoji: '🧠', route: '/learning', roles: null },
+  { id: 'excelencia', label: 'Excelencia Operativa', emoji: '👑', route: '/excelencia', roles: null },
+  { id: 'mis-kpis', label: 'Mis KPIs', emoji: '📊', route: '/mis-kpis', roles: KPI_ROLES },
+  { id: 'directorio-qt', label: 'Directorio QT', emoji: '⚡', route: '/directorio-qt', roles: DIRECTORIO_QT_ROLES },
+  { id: 'superadmin', label: 'Centro de Mando', emoji: '🌐', route: '/superadmin', roles: EXEC_ROLES },
+  { id: 'calendario-global', label: 'Calendario Global Maestro', emoji: '📅', external: 'calendario-global', roles: null },
+  { id: 'campus', label: 'Campus Interactivo', emoji: '🎓', external: 'https://cpsl-campus-interactivo.vercel.app/ruta', roles: CAMPUS_ROLES },
+  { id: 'centro-managers', label: 'Centro de Managers', emoji: '🎯', route: '/centro-managers', roles: CENTRO_MANAGERS_ROLES },
+  { id: 'protocolo-emergencias', label: 'Protocolo de Emergencias', emoji: '🚨', route: '/protocolo-emergencias', roles: null },
+  { id: 'manual', label: 'Manual / Guía Causa OS / QT', emoji: '📘', route: '/manual', roles: MANUAL_ROLES },
+  { id: 'manual-nodus', label: 'Manual Práctico Nodus', emoji: '📗', route: '/manual-nodus', roles: MANUAL_NODUS_ROLES },
+  { id: 'checklist', label: 'Mi Checklist Operativo', emoji: '✅', route: (u) => `/checklist/${u?.appRole || 'capitan'}`, roles: null },
+  { id: 'metas', label: 'Mis Metas', emoji: '🏆', route: '/metas', roles: null },
+  { id: 'reportes', label: 'Enviar Reportes', emoji: '📤', route: '/reportes', roles: null, visible: REPORTES_VISIBLE },
+];
+
+const isModuleVisible = (mod, currentUser) => {
+  if (typeof mod.visible === 'function') return mod.visible(currentUser);
+  if (mod.roles === null) return true;
+  return (mod.roles || []).includes(currentUser?.appRole);
+};
+
+// ============================================================================
+// TAREAS QUE HAS ASIGNADO — cuenta regresiva (28/08/2026)
+// ----------------------------------------------------------------------------
+// Calcula el texto y color de la cuenta regresiva hasta la fecha límite de una
+// tarea, a partir de "now" (se le pasa el estado "time" que ya existe en Home
+// y se actualiza cada segundo, así que esto queda "vivo" sin agregar un
+// segundo intervalo). Los umbrales de color (3h / 24h / 72h) son una
+// RECOMENDACIÓN razonable, no algo que José haya especificado con números
+// exactos — se puede ajustar si prefiere otros cortes.
+// ============================================================================
+const getCountdownInfo = (deadlineIso, now) => {
+  if (!deadlineIso) return { label: 'Sin fecha límite', color: '#9ca3af', bg: 'rgba(156,163,175,0.12)', border: '#9ca3af', overdue: false };
+  const deadline = new Date(deadlineIso).getTime();
+  if (isNaN(deadline)) return { label: 'Fecha inválida', color: '#9ca3af', bg: 'rgba(156,163,175,0.12)', border: '#9ca3af', overdue: false };
+
+  const diffMs = deadline - now.getTime();
+  const absMs = Math.abs(diffMs);
+  const totalHours = Math.floor(absMs / 3600000);
+  const days = Math.floor(totalHours / 24);
+  const mins = Math.floor((absMs % 3600000) / 60000);
+  const timeStr = days > 0 ? `${days}d ${totalHours % 24}h` : (totalHours > 0 ? `${totalHours}h ${mins}m` : `${mins}m`);
+
+  if (diffMs <= 0) return { label: `⏰ VENCIDA hace ${timeStr}`, color: '#ffffff', bg: '#dc2626', border: '#7f1d1d', overdue: true };
+  if (diffMs < 3 * 3600000) return { label: `🔴 ${timeStr} restantes`, color: '#ffffff', bg: '#ef4444', border: '#b91c1c', overdue: false };
+  if (diffMs < 24 * 3600000) return { label: `🟠 ${timeStr} restantes`, color: '#ffffff', bg: '#f97316', border: '#c2410c', overdue: false };
+  if (diffMs < 72 * 3600000) return { label: `🟡 ${timeStr} restantes`, color: '#1a1300', bg: '#facc15', border: '#a16207', overdue: false };
+  return { label: `🟢 ${timeStr} restantes`, color: '#ffffff', bg: '#16a34a', border: '#166534', overdue: false };
+};
+
 export default function Home() {
   const { currentUser, logout, switchRole } = useAuth();
-  const { currentCycle, currentStage, events, loadingEvents, syncEventsToGoogle } = useCycles();
+  const { currentCycle, currentStage, events, loadingEvents } = useCycles();
   const { tasks: allTasks, loading: loadingTasks, syncTasksToGoogle, acceptCollaboration, rejectCollaboration } = useChecklist();
   const { showToast, viewMode, customModules } = useUI();
-  const { notifications, unreadCount, markAllAsRead, markAsRead } = useNotifications();
+  const { notifications, unreadCount, markAllAsRead } = useNotifications();
   const navigate = useNavigate();
 
   // Reloj local
@@ -79,43 +161,60 @@ export default function Home() {
   const [selectedTrainingFilter, setSelectedTrainingFilter] = useState('todos');
   const [searchQuery, setSearchQuery] = useState('');
   const [showTaskModal, setShowTaskModal] = useState(false);
+  const [taskBeingEdited, setTaskBeingEdited] = useState(null); // tarea a editar desde el panel "Tareas que has asignado"
+  const [tareasAsignadasFilter, setTareasAsignadasFilter] = useState('Activas'); // 'Activas' | 'Vencidas' | 'Cumplidas' | 'Todas'
   const [showVenueModal, setShowVenueModal] = useState(false);
-  const [syncingEvents, setSyncingEvents] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showToolsDropdown, setShowToolsDropdown] = useState(false);
   const toolsDropdownRef = useRef(null);
-  const notificationsRef = useRef(null);
 
-  // Cerrar dropdowns al hacer click fuera (incluye el panel de notificaciones,
-  // que antes no se cerraba solo — había que volver a clickear la campana)
+  // BUSCADOR GLOBAL (28/08/2026) — Personas + Páginas y módulos + Equipos/Capitanes
+  const [globalSearchTerm, setGlobalSearchTerm] = useState('');
+  const [showGlobalSearchResults, setShowGlobalSearchResults] = useState(false);
+  const globalSearchRef = useRef(null);
+  const [realUsersData, setRealUsersData] = useState([]);
+  const [usersLoading, setUsersLoading] = useState(true);
+  const [selectedSearchUser, setSelectedSearchUser] = useState(null);
+  const [showSearchUserModal, setShowSearchUserModal] = useState(false);
+
+  // Carga de personas para el buscador (misma fuente que Centro de Mando: getAllCompanyUsers())
+  useEffect(() => {
+    let isMounted = true;
+    async function fetchUsersForSearch() {
+      try {
+        const users = await getAllCompanyUsers();
+        if (isMounted) setRealUsersData(users);
+      } catch (err) {
+        console.error("Error cargando usuarios para el buscador global:", err);
+      } finally {
+        if (isMounted) setUsersLoading(false);
+      }
+    }
+    fetchUsersForSearch();
+    return () => { isMounted = false; };
+  }, []);
+
+  // Cerrar el buscador global al hacer click fuera
+  useEffect(() => {
+    function handleClickOutsideSearch(event) {
+      if (globalSearchRef.current && !globalSearchRef.current.contains(event.target)) {
+        setShowGlobalSearchResults(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutsideSearch);
+    return () => document.removeEventListener("mousedown", handleClickOutsideSearch);
+  }, []);
+
+  // Cerrar dropdown al hacer click fuera
   useEffect(() => {
     function handleClickOutside(event) {
       if (toolsDropdownRef.current && !toolsDropdownRef.current.contains(event.target)) {
         setShowToolsDropdown(false);
       }
-      if (notificationsRef.current && !notificationsRef.current.contains(event.target)) {
-        setShowNotifications(false);
-      }
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
-  // Texto relativo simple para el timestamp de cada notificación (created_at
-  // viene de Firestore como string ISO — ver NotificationContext.jsx).
-  const formatTimeAgo = (isoDate) => {
-    if (!isoDate) return '';
-    const diffMs = Date.now() - new Date(isoDate).getTime();
-    if (Number.isNaN(diffMs)) return '';
-    const minutes = Math.floor(diffMs / 60000);
-    if (minutes < 1) return 'ahora';
-    if (minutes < 60) return `hace ${minutes} min`;
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `hace ${hours} h`;
-    const days = Math.floor(hours / 24);
-    if (days < 7) return `hace ${days} d`;
-    return new Date(isoDate).toLocaleDateString('es', { day: '2-digit', month: 'short' });
-  };
 
   const handleAddEventToGoogle = async (ev, startDate, endDate) => {
     const token = sessionStorage.getItem('googleAccessToken');
@@ -137,64 +236,6 @@ export default function Home() {
       }
     } else {
       showToast(result.error || "Hubo un error al abrir el calendario.", "error");
-    }
-  };
-
-  // Sincronización masiva con Google Calendar (28/08/2026) — el equivalente,
-  // para el calendario, del botón "Sincronizar" que ya existe para las tareas
-  // (ChecklistBoard.jsx -> syncTasksToGoogle). Sincroniza los MISMOS eventos
-  // que se ven por defecto en "MI SEDE"/"MIS FECHAS" + "Próximos" — no lo que
-  // esté filtrado en pantalla en ese momento (igual que la sincronización de
-  // tareas, que sincroniza todas las pendientes, no solo las que se ven).
-  const handleSyncAllEventsToGoogle = async () => {
-    const token = sessionStorage.getItem('googleAccessToken');
-    if (!token) {
-      showToast("No se encontró sesión con permisos de Google. Por favor, cierra sesión y vuelve a entrar.", "error");
-      return;
-    }
-
-    const isEntrenador = ['entrenador', 'entrenador_llamadas'].includes(currentUser?.appRole);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const now = today.getTime();
-
-    const myUpcomingEvents = (events || []).filter(ev => {
-      if (isEntrenador) {
-        if (!isTrainerMatchingUser(ev.trainer || ev.entrenador, currentUser)) return false;
-      } else {
-        const userSede = currentUser?.sede || '';
-        if (userSede && !userSede.toLowerCase().includes('global')) {
-          const evSede = ev.sede || ev.sedeTag || '';
-          const matchesSede = evSede.toLowerCase().includes(userSede.toLowerCase()) || userSede.toLowerCase().includes(evSede.toLowerCase());
-          if (!matchesSede) return false;
-        }
-      }
-      const evDate = new Date(ev.fecha_inicio || ev.start || new Date());
-      evDate.setHours(0, 0, 0, 0);
-      return evDate.getTime() >= now;
-    });
-
-    if (myUpcomingEvents.length === 0) {
-      showToast("No tienes próximos eventos para sincronizar.", "info");
-      return;
-    }
-
-    setSyncingEvents(true);
-    const result = await syncEventsToGoogle(myUpcomingEvents, currentUser?.email);
-    setSyncingEvents(false);
-
-    if (!result.success && result.error === 'no_token') {
-      showToast("No se encontró sesión con permisos de Google. Por favor, cierra sesión y vuelve a entrar.", "error");
-      return;
-    }
-
-    const { syncedCount, skippedCount, totalCount, failed } = result;
-    if (syncedCount === 0 && skippedCount === totalCount) {
-      showToast("Tus próximos eventos ya estaban sincronizados con Google Calendar.", "info");
-    } else if (failed && failed.length > 0) {
-      showToast(`Sincronizados ${syncedCount} de ${totalCount} eventos. ${failed.length} fallaron — intenta de nuevo más tarde.`, "error");
-    } else {
-      showToast(`¡${syncedCount} evento(s) sincronizados con tu Google Calendar!${skippedCount > 0 ? ` (${skippedCount} ya estaban al día)` : ''}`, "success");
     }
   };
 
@@ -246,6 +287,131 @@ export default function Home() {
     return valB - valA;
   });
 
+  // ==========================================================================
+  // BUSCADOR GLOBAL — lógica de resultados (28/08/2026)
+  // --------------------------------------------------------------------------
+  // DATO FALTANTE / INFERENCIA (declarado explícitamente por REGLA ABSOLUTA):
+  // Causa OS no tenía, antes de este cambio, un módulo de "buscador global"
+  // documentado con reglas de visibilidad propias, así que el alcance de
+  // "Personas" y "Equipos/Capitanes" aquí se apoya en el mismo criterio ya
+  // usado en otras pantallas de la app (canViewAllManagers/isDireccionRole =
+  // ver TODO; el resto = solo su propia sede + registros marcados como
+  // Sede Global). Si esto no es lo que José quiere, hay que ajustarlo.
+  // "Páginas y módulos" sí es un HECHO: son exactamente las mismas rutas y
+  // los mismos arrays de roles que ya usa el menú "Más Módulos y Herramientas"
+  // de este archivo.
+  // ==========================================================================
+  const canSeeGlobalDirectory = Boolean(
+    currentUser?.isSuperAdmin ||
+    currentUser?.isDireccion ||
+    isDireccionRole(currentUser?.appRole) ||
+    canViewAllManagers(currentUser)
+  );
+  const currentUserSedeNorm = normalizeSede(currentUser?.sede);
+  const globalSearchQ = globalSearchTerm.trim().toLowerCase();
+  const globalSearchActive = globalSearchQ.length >= 2;
+
+  const globalSearchPeopleResults = !globalSearchActive ? [] : (realUsersData || [])
+    .filter(u => {
+      if (canSeeGlobalDirectory) return true;
+      const uSede = normalizeSede(u.sede);
+      return uSede === currentUserSedeNorm || uSede === 'Sede Global' || isGlobalQTCoordinator({ email: u.email });
+    })
+    .filter(u => {
+      const name = (u.name || u.displayName || '').toLowerCase();
+      const email = (u.email || '').toLowerCase();
+      const role = (ROLE_DISPLAY_NAMES[u.role] || u.role || '').toLowerCase();
+      const sede = (u.sede || '').toLowerCase();
+      return name.includes(globalSearchQ) || email.includes(globalSearchQ) || role.includes(globalSearchQ) || sede.includes(globalSearchQ);
+    })
+    .slice(0, 8);
+
+  const globalSearchModuleResults = !globalSearchActive ? [] : MODULE_REGISTRY
+    .filter(mod => isModuleVisible(mod, currentUser))
+    .filter(mod => mod.label.toLowerCase().includes(globalSearchQ))
+    .slice(0, 8);
+
+  const globalSearchTeamResults = (() => {
+    if (!globalSearchActive) return [];
+    const seenTeams = new Map();
+    const capitanHits = [];
+    INITIAL_MANAGERS.forEach(m => {
+      const mSede = normalizeSede(m.sede);
+      if (!canSeeGlobalDirectory && mSede !== currentUserSedeNorm && mSede !== 'Sede Global') return;
+
+      if (m.equipo) {
+        const key = `${mSede}_${m.equipo}`;
+        const teamStr = `${m.equipo} ${m.numEquipo || ''} ${mSede} ${m.entrenador || ''}`.toLowerCase();
+        if (!seenTeams.has(key) && teamStr.includes(globalSearchQ)) {
+          seenTeams.set(key, { type: 'equipo', key, equipo: m.equipo, sede: mSede });
+        }
+      }
+
+      const rol = (m.rol || '').toLowerCase();
+      if (rol.includes('capitan') && (m.nombre || '').toLowerCase().includes(globalSearchQ)) {
+        capitanHits.push({ type: 'capitan', key: `cap_${m.id}`, id: m.id, nombre: m.nombre, equipo: m.equipo, sede: mSede });
+      }
+    });
+    return [...Array.from(seenTeams.values()).slice(0, 5), ...capitanHits.slice(0, 5)];
+  })();
+
+  const handleSelectSearchPerson = (u) => {
+    setSelectedSearchUser(u);
+    setShowSearchUserModal(true);
+    setShowGlobalSearchResults(false);
+    setGlobalSearchTerm('');
+  };
+
+  const handleSelectSearchModule = (mod) => {
+    setShowGlobalSearchResults(false);
+    setGlobalSearchTerm('');
+    if (mod.external === 'calendario-global') {
+      window.open('/calendario_global.html?v=' + Date.now() + '&email=' + encodeURIComponent(currentUser?.email || '') + '&name=' + encodeURIComponent(currentUser?.displayName || currentUser?.name || ''), '_blank');
+    } else if (mod.external) {
+      window.open(mod.external, '_blank');
+    } else if (typeof mod.route === 'function') {
+      navigate(mod.route(currentUser));
+    } else if (mod.route) {
+      navigate(mod.route);
+    }
+  };
+
+  const handleSelectSearchTeam = (item) => {
+    setShowGlobalSearchResults(false);
+    setGlobalSearchTerm('');
+    if (item.type === 'equipo') {
+      navigate(`/centro-managers?tab=grupales&q=${encodeURIComponent(item.equipo)}&sede=${encodeURIComponent(item.sede)}`);
+    } else {
+      navigate(`/centro-managers?tab=directorio&q=${encodeURIComponent(item.nombre)}&sede=${encodeURIComponent(item.sede)}`);
+    }
+  };
+
+  // ==========================================================================
+  // TAREAS QUE HAS ASIGNADO A OTROS (28/08/2026)
+  // --------------------------------------------------------------------------
+  // "tasks" (allTasks) ya trae TODA la colección "tasks" de Firestore sin
+  // filtrar (ChecklistContext hace onSnapshot sobre la colección completa),
+  // así que no hace falta una consulta nueva: solo filtramos por
+  // createdBy === mi correo. INFERENCIA sobre el alcance pedido ("todos los
+  // usuarios pueden ver las tareas que han asignado a otros"): se interpretó
+  // como "cada usuario ve las tareas QUE ÉL MISMO asignó", no un tablero
+  // global de todas las asignaciones de todos — si José quería lo segundo,
+  // hay que ajustarlo.
+  const userDisplayNameByEmail = {};
+  (realUsersData || []).forEach(u => {
+    if (u.email) userDisplayNameByEmail[u.email.toLowerCase().trim()] = u.name || u.displayName || u.email;
+  });
+  const resolveAssigneeName = (email) => userDisplayNameByEmail[(email || '').toLowerCase().trim()] || email;
+
+  const tareasQueHeAsignado = (allTasks || [])
+    .filter(t => (t.createdBy || '').toLowerCase().trim() === userEmail && userEmail)
+    .slice()
+    .sort((a, b) => {
+      const da = a.deadline ? new Date(a.deadline).getTime() : Infinity;
+      const dbTime = b.deadline ? new Date(b.deadline).getTime() : Infinity;
+      return da - dbTime;
+    });
+
   return (
     <div style={{ maxWidth: viewMode === 'lite' ? '780px' : '960px', margin: '0 auto', padding: viewMode === 'lite' ? '1.5rem 1rem' : '2rem 1rem' }}>
       
@@ -296,12 +462,9 @@ export default function Home() {
             <h1 className="text-blue" style={{ margin: 0, fontSize: viewMode === 'lite' ? '2.5rem' : '3rem', fontWeight: '900', letterSpacing: '-1px', textShadow: '0 0 20px rgba(100, 255, 218, 0.3)' }}>
               Causa OS
             </h1>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
-              <h2 className="text-gold" style={{ margin: 0, fontSize: viewMode === 'lite' ? '1.5rem' : '1.8rem', fontWeight: '700', letterSpacing: '-0.5px' }}>
-                {time.getHours() < 12 ? 'Buenos días' : time.getHours() < 19 ? 'Buenas tardes' : 'Buenas noches'}, {currentUser?.displayName || currentUser?.name || 'Equipo'}
-              </h2>
-              <GlobalSearch />
-            </div>
+            <h2 className="text-gold" style={{ margin: 0, fontSize: viewMode === 'lite' ? '1.5rem' : '1.8rem', fontWeight: '700', letterSpacing: '-0.5px' }}>
+              {time.getHours() < 12 ? 'Buenos días' : time.getHours() < 19 ? 'Buenas tardes' : 'Buenas noches'}, {currentUser?.displayName || currentUser?.name || 'Equipo'}
+            </h2>
           </div>
           <p className="text-muted" style={{ margin: '0.8rem 0 0', textTransform: 'uppercase', fontSize: '0.85rem' }}>
             {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') ? 'MÚLTIPLES EQUIPOS (GLOBAL) • VISIÓN MÚLTIPLES SEDES' : (currentCycle ? `${currentCycle.name} • ETAPA: ${currentStage}` : 'CARGANDO CICLO...')}
@@ -351,6 +514,93 @@ export default function Home() {
             </div>
           </div>
 
+          {/* BUSCADOR GLOBAL (Personas + Páginas y módulos + Equipos/Capitanes) */}
+          <div ref={globalSearchRef} style={{ position: 'relative', width: '100%', maxWidth: '280px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-strong)', borderRadius: '8px', padding: '0.4rem 0.6rem' }}>
+              <Search size={15} className="text-muted" />
+              <input
+                type="text"
+                value={globalSearchTerm}
+                onChange={(e) => { setGlobalSearchTerm(e.target.value); setShowGlobalSearchResults(true); }}
+                onFocus={() => setShowGlobalSearchResults(true)}
+                placeholder="Buscar personas, páginas, equipos..."
+                style={{ flex: 1, minWidth: 0, background: 'transparent', border: 'none', outline: 'none', color: 'var(--text-main)', fontSize: '0.85rem' }}
+              />
+              {globalSearchTerm && (
+                <X size={14} className="text-muted" style={{ cursor: 'pointer', flexShrink: 0 }} onClick={() => { setGlobalSearchTerm(''); setShowGlobalSearchResults(false); }} />
+              )}
+            </div>
+
+            {showGlobalSearchResults && globalSearchActive && (
+              <div className="glass-panel" style={{ position: 'absolute', top: '110%', left: 0, right: 0, zIndex: 200, maxHeight: '420px', overflowY: 'auto', padding: '0.5rem', boxShadow: '0 10px 40px rgba(0,0,0,0.9)', border: '1px solid rgba(41, 171, 226, 0.3)', textAlign: 'left' }}>
+                {usersLoading && (
+                  <div className="text-muted" style={{ fontSize: '0.78rem', padding: '0.4rem' }}>Cargando personas...</div>
+                )}
+
+                {!usersLoading && globalSearchPeopleResults.length === 0 && globalSearchModuleResults.length === 0 && globalSearchTeamResults.length === 0 && (
+                  <div className="text-muted" style={{ fontSize: '0.8rem', padding: '0.5rem' }}>Sin resultados para "{globalSearchTerm}"</div>
+                )}
+
+                {globalSearchPeopleResults.length > 0 && (
+                  <div style={{ marginBottom: '0.5rem' }}>
+                    <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--crear-gold)', textTransform: 'uppercase', padding: '0.2rem 0.4rem' }}>Personas</div>
+                    {globalSearchPeopleResults.map((u, i) => (
+                      <button
+                        key={u.id || u.email || i}
+                        onClick={() => handleSelectSearchPerson(u)}
+                        style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', width: '100%', textAlign: 'left', padding: '0.45rem 0.5rem', background: 'transparent', border: 'none', borderRadius: '6px', cursor: 'pointer', color: 'var(--text-main)' }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(41,171,226,0.1)'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                      >
+                        <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>👤 {u.name || u.displayName || u.email}</span>
+                        <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{ROLE_DISPLAY_NAMES[u.role] || u.role || ''}{u.sede ? ` • ${u.sede}` : ''}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {globalSearchModuleResults.length > 0 && (
+                  <div style={{ marginBottom: '0.5rem' }}>
+                    <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--crear-cyan)', textTransform: 'uppercase', padding: '0.2rem 0.4rem' }}>Páginas y módulos</div>
+                    {globalSearchModuleResults.map(mod => (
+                      <button
+                        key={mod.id}
+                        onClick={() => handleSelectSearchModule(mod)}
+                        style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', width: '100%', textAlign: 'left', padding: '0.45rem 0.5rem', background: 'transparent', border: 'none', borderRadius: '6px', cursor: 'pointer', color: 'var(--text-main)', fontSize: '0.85rem' }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(41,171,226,0.1)'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                      >
+                        {mod.emoji} {mod.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {globalSearchTeamResults.length > 0 && (
+                  <div>
+                    <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#d97706', textTransform: 'uppercase', padding: '0.2rem 0.4rem' }}>Equipos y Capitanes (Centro de Managers)</div>
+                    {globalSearchTeamResults.map((item, i) => (
+                      <button
+                        key={item.key || i}
+                        onClick={() => handleSelectSearchTeam(item)}
+                        style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', width: '100%', textAlign: 'left', padding: '0.45rem 0.5rem', background: 'transparent', border: 'none', borderRadius: '6px', cursor: 'pointer', color: 'var(--text-main)' }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(217,119,6,0.1)'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                      >
+                        {item.type === 'equipo' ? (
+                          <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>👥 Equipo {item.equipo}</span>
+                        ) : (
+                          <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>🎖️ {item.nombre} (Capitán)</span>
+                        )}
+                        <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{item.sede}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
           <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
             <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <span style={{ fontSize: '0.9rem', fontWeight: 'bold', color: 'var(--text-main)' }}>{currentUser?.name || currentUser?.displayName || 'Usuario'}</span>
@@ -396,141 +646,30 @@ export default function Home() {
             )}
             
             {/* Notificaciones */}
-            <div style={{ position: 'relative' }} ref={notificationsRef}>
-              <button
-                type="button"
-                onClick={() => setShowNotifications(!showNotifications)}
-                title="Notificaciones"
-                className="btn-secondary hover-glow"
-                style={{
-                  width: '38px',
-                  height: '38px',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  position: 'relative',
-                  padding: 0,
-                  ...(showNotifications ? { borderColor: 'var(--crear-cyan)', boxShadow: '0 0 0 3px rgba(41, 171, 226, 0.15)' } : {})
-                }}
-              >
-                <Bell size={18} strokeWidth={2} />
+            <div style={{ position: 'relative' }}>
+              <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }} onClick={() => setShowNotifications(!showNotifications)}>
+                <Bell size={20} className="text-white" />
                 {unreadCount > 0 && (
-                  <span
-                    style={{
-                      position: 'absolute',
-                      top: '-3px',
-                      right: '-3px',
-                      background: 'linear-gradient(135deg, #ef4444, #dc2626)',
-                      color: '#fff',
-                      borderRadius: '50%',
-                      minWidth: '17px',
-                      height: '17px',
-                      padding: '0 3px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '0.62rem',
-                      fontWeight: 700,
-                      lineHeight: 1,
-                      border: '2px solid var(--bg-dark)',
-                      boxShadow: '0 2px 6px rgba(220, 38, 38, 0.5)',
-                      animation: 'notifPulse 2.2s ease-in-out infinite'
-                    }}
-                  >
-                    {unreadCount > 9 ? '9+' : unreadCount}
-                  </span>
-                )}
-              </button>
-
-              {showNotifications && (
-                <div
-                  className="glass-panel"
-                  style={{
-                    position: 'absolute',
-                    top: 'calc(100% + 10px)',
-                    right: 0,
-                    width: '340px',
-                    zIndex: 100,
-                    padding: 0,
-                    overflow: 'hidden',
-                    // NOTA (28/08/2026): .glass-panel en modo oscuro usa un fondo casi
-                    // transparente (rgba(255,255,255,0.03)) pensado para tarjetas grandes
-                    // sobre el fondo de la página — pero en un panel flotante ENCIMA de
-                    // otros botones y texto, esa transparencia dejaba ver todo lo de
-                    // atrás mezclado con el panel (confirmado con captura del usuario en
-                    // modo noche). Se fuerza un fondo sólido y coherente con el tema
-                    // (oscuro: azul marino sólido; claro: ya era blanco sólido por la
-                    // regla !important existente) para que el panel sea legible siempre.
-                    background: 'var(--bg-dark-alt)',
-                    boxShadow: '0 20px 50px -12px rgba(0,0,0,0.5), 0 0 0 1px var(--border-subtle)',
-                    animation: 'notifPanelIn 0.18s cubic-bezier(0.16, 1, 0.3, 1)'
-                  }}
-                >
-                  <div style={{
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                    padding: '0.9rem 1.1rem', borderBottom: '1px solid var(--border-subtle)'
-                  }}>
-                    <h4 style={{ margin: 0, color: 'var(--text-heading)', fontSize: '0.95rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <Bell size={15} style={{ color: 'var(--crear-gold)' }} /> Notificaciones
-                      {unreadCount > 0 && (
-                        <span style={{ fontSize: '0.68rem', fontWeight: 700, color: 'var(--crear-cyan)', background: 'rgba(41, 171, 226, 0.12)', borderRadius: '999px', padding: '1px 7px' }}>
-                          {unreadCount} sin leer
-                        </span>
-                      )}
-                    </h4>
-                    {unreadCount > 0 && (
-                      <button
-                        onClick={() => markAllAsRead()}
-                        style={{ background: 'transparent', border: 'none', color: 'var(--crear-cyan)', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600, padding: '2px 4px', borderRadius: '4px', transition: 'opacity 0.15s' }}
-                        onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
-                        onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
-                      >
-                        Marcar todo leído
-                      </button>
-                    )}
+                  <div style={{ position: 'absolute', top: '-4px', right: '-4px', background: 'var(--color-error)', color: 'white', borderRadius: '50%', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.68rem', fontWeight: 'bold' }}>
+                    {unreadCount}
                   </div>
-                  <div style={{ maxHeight: '360px', overflowY: 'auto' }}>
-                    {notifications?.length > 0 ? notifications.map((n, idx) => (
-                      <div
-                        key={n.id}
-                        onClick={() => !n.read && markAsRead && markAsRead(n.id)}
-                        style={{
-                          display: 'flex',
-                          gap: '0.6rem',
-                          padding: '0.85rem 1.1rem',
-                          cursor: n.read ? 'default' : 'pointer',
-                          background: n.read ? 'transparent' : 'rgba(41, 171, 226, 0.06)',
-                          borderBottom: idx < notifications.length - 1 ? '1px solid var(--border-subtle)' : 'none',
-                          transition: 'background 0.15s'
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.background = n.read ? 'var(--bg-card-hover)' : 'rgba(41, 171, 226, 0.12)'}
-                        onMouseLeave={(e) => e.currentTarget.style.background = n.read ? 'transparent' : 'rgba(41, 171, 226, 0.06)'}
-                      >
-                        <span style={{
-                          marginTop: '5px', width: '7px', height: '7px', borderRadius: '50%', flexShrink: 0,
-                          background: n.read ? 'transparent' : 'var(--crear-cyan)',
-                          boxShadow: n.read ? 'none' : '0 0 6px var(--crear-cyan)'
-                        }} />
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '0.5rem' }}>
-                            <strong style={{ color: n.read ? 'var(--text-muted)' : 'var(--text-heading)', fontSize: '0.83rem', fontWeight: 600 }}>
-                              {n.title || 'Alerta'}
-                            </strong>
-                            <span style={{ color: 'var(--text-muted)', fontSize: '0.68rem', flexShrink: 0 }}>
-                              {formatTimeAgo(n.created_at)}
-                            </span>
-                          </div>
-                          <p style={{ margin: '0.15rem 0 0', color: 'var(--text-muted)', fontSize: '0.78rem', lineHeight: '1.45' }}>
-                            {n.message}
-                          </p>
-                        </div>
+                )}
+              </div>
+              
+              {showNotifications && (
+                <div className="glass-panel" style={{ position: 'absolute', top: '125%', right: 0, width: '320px', zIndex: 100, padding: '1rem', boxShadow: '0 10px 40px rgba(0,0,0,0.8)', border: '1px solid rgba(41, 171, 226, 0.3)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.5rem' }}>
+                    <h4 style={{ margin: 0, color: 'var(--crear-gold)' }}>🔔 Notificaciones</h4>
+                    <button onClick={() => { markAllAsRead(); setShowNotifications(false); }} style={{ background: 'transparent', border: 'none', color: 'var(--crear-cyan)', fontSize: '0.75rem', cursor: 'pointer', fontWeight: 'bold' }}>Marcar leídas</button>
+                  </div>
+                  <div style={{ maxHeight: '350px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.8rem', paddingRight: '0.5rem' }}>
+                    {notifications?.length > 0 ? notifications.map(n => (
+                      <div key={n.id} style={{ fontSize: '0.8rem', padding: '0.75rem', background: n.read ? 'rgba(0,0,0,0.4)' : 'rgba(41, 171, 226, 0.15)', borderRadius: '8px', borderLeft: n.read ? 'none' : '3px solid var(--crear-cyan)' }}>
+                        <strong style={{ color: n.read ? 'var(--text-muted)' : '#ffffff', display: 'block', marginBottom: '0.2rem' }}>{n.title || 'Alerta'}</strong>
+                        <p style={{ margin: 0, color: 'var(--text-main)', lineHeight: '1.4' }}>{n.message}</p>
                       </div>
                     )) : (
-                      <div style={{ textAlign: 'center', padding: '2.2rem 1rem' }}>
-                        <Bell size={26} style={{ color: 'var(--text-muted)', opacity: 0.4, marginBottom: '0.5rem' }} />
-                        <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem', margin: 0 }}>No tienes notificaciones recientes.</p>
-                      </div>
+                      <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', margin: '1rem 0' }}>No tienes notificaciones recientes.</p>
                     )}
                   </div>
                 </div>
@@ -596,9 +735,6 @@ export default function Home() {
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '0.4rem',
-                // Mismo fondo sólido que el panel de notificaciones (28/08/2026): este
-                // dropdown tenía el mismo riesgo de transparencia excesiva en modo oscuro.
-                background: 'var(--bg-dark-alt)',
                 boxShadow: '0 10px 40px rgba(0,0,0,0.9)',
                 border: '1px solid rgba(41, 171, 226, 0.3)'
               }}>
@@ -676,6 +812,16 @@ export default function Home() {
                       👥
                     </button>
                   </div>
+                )}
+
+                {/* Calendario de Maestría del Juego (29/08/2026): mismo criterio de
+                    acceso que Centro de Managers, sin entrenadores/entrenador_llamadas
+                    (la edición es de CMJ/gerencia; los entrenadores no gestionan el
+                    calendario oficial del equipo). */}
+                {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'director_maestria', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+                  <button onClick={() => { setShowToolsDropdown(false); navigate('/calendario-mj'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#1a75bc', background: 'rgba(26, 117, 188, 0.1)' }}>
+                    📅 Calendario de Maestría del Juego
+                  </button>
                 )}
 
                 <button onClick={() => { setShowToolsDropdown(false); navigate('/protocolo-emergencias'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.4)', background: 'rgba(239, 68, 68, 0.1)', fontWeight: 'bold' }}>
@@ -766,6 +912,17 @@ export default function Home() {
           {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
             <button onClick={() => navigate('/centro-managers')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#000', fontWeight: 'bold', border: 'none' }}>
               👑 Centro Managers
+            </button>
+          )}
+
+          {/* Calendario de Maestría del Juego (31/08/2026): esta es la barra "Pro"
+              que realmente ve José (barra de botones siempre visible), distinta
+              del dropdown "Herramientas" donde se había agregado el acceso
+              antes — por eso no aparecía. Mismo criterio de roles que Centro
+              Managers, sin entrenadores (la edición es de CMJ/gerencia). */}
+          {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'director_maestria', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+            <button onClick={() => navigate('/calendario-mj')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #1a75bc, #29abe2)', color: 'white', border: 'none' }}>
+              📅 Calendario MJ
             </button>
           )}
         </div>
@@ -984,19 +1141,8 @@ export default function Home() {
                   <CalendarIcon size={18} /> EVENTOS Y ENTRENAMIENTOS
                 </h3>
                 <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', flexWrap: 'wrap' }}>
-                  <button
-                    type="button"
-                    disabled={syncingEvents}
-                    onClick={handleSyncAllEventsToGoogle}
-                    style={{ background: 'rgba(66, 133, 244, 0.1)', border: '1px solid rgba(66, 133, 244, 0.4)', color: '#4285F4', padding: '0.25rem 0.6rem', borderRadius: '4px', fontSize: '0.78rem', cursor: syncingEvents ? 'wait' : 'pointer', opacity: syncingEvents ? 0.6 : 1, display: 'flex', alignItems: 'center', gap: '0.35rem', fontWeight: 'bold' }}
-                    title="Sincronizar tus próximos eventos con Google Calendar"
-                  >
-                    <CalendarPlus size={13} /> {syncingEvents ? 'Sincronizando…' : 'Sincronizar'}
-                  </button>
-                  {/* CONTEXTO (28/08/2026): la auditoría de roles pidió que solo Dirección/Gerencia
-                      vean "Hoteles Sede" — 'qt' estaba incluido aquí sin que la matriz lo pidiera. */}
-                  {(currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.isGerente || ['gerente', 'direccion', 'director_maestria', 'consolidado'].includes(currentUser?.appRole)) && (
-                    <button
+                  {(currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.isGerente || ['gerente', 'direccion', 'director_maestria', 'qt', 'consolidado'].includes(currentUser?.appRole)) && (
+                    <button 
                       type="button"
                       onClick={() => setShowVenueModal(true)}
                       className="btn-secondary"
@@ -1267,6 +1413,107 @@ export default function Home() {
             </div>
           )}
 
+          {/* PANEL: TAREAS QUE HAS ASIGNADO A OTROS (con cuenta regresiva) */}
+          {tareasQueHeAsignado.length > 0 && (() => {
+            // Clasificación para las pestañas de filtro (Activas/Vencidas/Cumplidas/Todas).
+            const clasificadas = tareasQueHeAsignado.map(task => {
+              const isDone = task.completed || task.status === 'Completada';
+              const isOverdue = !isDone && getCountdownInfo(task.deadline, time).overdue;
+              return { task, isDone, isOverdue };
+            });
+            const counts = {
+              Activas: clasificadas.filter(c => !c.isDone && !c.isOverdue).length,
+              Vencidas: clasificadas.filter(c => c.isOverdue).length,
+              Cumplidas: clasificadas.filter(c => c.isDone).length,
+              Todas: clasificadas.length
+            };
+            const visibles = clasificadas.filter(c => {
+              if (tareasAsignadasFilter === 'Activas') return !c.isDone && !c.isOverdue;
+              if (tareasAsignadasFilter === 'Vencidas') return c.isOverdue;
+              if (tareasAsignadasFilter === 'Cumplidas') return c.isDone;
+              return true; // Todas
+            });
+
+            return (
+            <div className="glass-panel" style={{ padding: '1.2rem', marginBottom: '2rem' }}>
+              <h3 className="text-blue" style={{ marginTop: 0, borderBottom: '1px solid rgba(0,212,255,0.2)', paddingBottom: '0.4rem', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                📋 TAREAS QUE HAS ASIGNADO ({tareasQueHeAsignado.length})
+              </h3>
+              <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginTop: '0.8rem' }}>
+                {['Activas', 'Vencidas', 'Cumplidas', 'Todas'].map(f => (
+                  <button
+                    key={f}
+                    onClick={() => setTareasAsignadasFilter(f)}
+                    style={{
+                      padding: '0.3rem 0.75rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700,
+                      border: `1px solid ${tareasAsignadasFilter === f ? 'var(--crear-cyan)' : 'var(--border-subtle)'}`,
+                      background: tareasAsignadasFilter === f ? 'rgba(41, 171, 226, 0.18)' : 'transparent',
+                      color: tareasAsignadasFilter === f ? 'var(--crear-cyan)' : 'var(--text-muted)',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {f} ({counts[f]})
+                  </button>
+                ))}
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.8rem', maxHeight: '360px', overflowY: 'auto' }}>
+                {visibles.length === 0 && (
+                  <p className="text-muted" style={{ fontSize: '0.82rem', padding: '0.5rem 0' }}>No hay tareas en "{tareasAsignadasFilter}".</p>
+                )}
+                {visibles.map(({ task, isDone }) => {
+                  const countdown = getCountdownInfo(task.deadline, time);
+                  const emails = task.assignedToEmails && task.assignedToEmails.length > 0
+                    ? task.assignedToEmails
+                    : (task.assignedToEmail ? [task.assignedToEmail] : []);
+                  const asignadosLabel = emails.length > 0 ? emails.map(resolveAssigneeName).join(', ') : 'Cualquiera en el rol';
+
+                  return (
+                    <div
+                      key={task.id}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap',
+                        padding: '0.65rem 0.8rem', borderRadius: '8px',
+                        background: isDone ? 'rgba(52, 168, 83, 0.08)' : 'rgba(255,255,255,0.03)',
+                        border: `1px solid ${isDone ? 'rgba(52, 168, 83, 0.25)' : 'var(--border-subtle)'}`
+                      }}
+                    >
+                      <div style={{ flex: 1, minWidth: '160px' }}>
+                        <span className="text-white" style={{ fontSize: '0.85rem', fontWeight: 600, display: 'block' }}>
+                          {isDone ? '✅ ' : ''}{task.task || task.title}
+                        </span>
+                        <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                          👤 Asignada a: {asignadosLabel}
+                        </span>
+                      </div>
+                      {!isDone && (
+                        <span style={{
+                          fontSize: '0.88rem', fontWeight: 800, padding: '0.42rem 0.9rem', borderRadius: '20px',
+                          color: countdown.color, background: countdown.bg, border: `2px solid ${countdown.border}`,
+                          whiteSpace: 'nowrap', letterSpacing: '0.02em',
+                          boxShadow: '0 1px 4px rgba(0,0,0,0.25)'
+                        }}>
+                          {countdown.label}
+                        </span>
+                      )}
+                      <button
+                        onClick={() => { setTaskBeingEdited(task); setShowTaskModal(true); }}
+                        title="Editar tarea"
+                        style={{
+                          background: 'rgba(41, 171, 226, 0.12)', border: '1px solid rgba(41, 171, 226, 0.4)',
+                          borderRadius: '6px', padding: '0.3rem 0.6rem', fontSize: '0.72rem', fontWeight: 700,
+                          color: 'var(--crear-cyan)', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0
+                        }}
+                      >
+                        ✏️ Editar
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            );
+          })()}
+
           {/* BOTONES INFERIORES */}
           {(viewMode === 'compact' || customModules.shortcuts !== false) && (
             <div style={{ display: 'flex', justifyContent: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
@@ -1291,10 +1538,19 @@ export default function Home() {
       )}
 
       {/* MODAL ASIGNAR TAREA */}
-      <TaskAssignmentModal isOpen={showTaskModal} onClose={() => setShowTaskModal(false)} />
+      <TaskAssignmentModal
+        isOpen={showTaskModal}
+        onClose={() => { setShowTaskModal(false); setTaskBeingEdited(null); }}
+        taskToEdit={taskBeingEdited}
+      />
 
       {/* MODAL CONFIGURACIÓN DE HOTELES Y SALONES */}
       <VenueConfigModal isOpen={showVenueModal} onClose={() => setShowVenueModal(false)} />
+
+      {/* MODAL DE PERFIL DE PERSONA (abierto desde el Buscador Global) */}
+      {showSearchUserModal && selectedSearchUser && (
+        <UserProfileModal isOpen={showSearchUserModal} onClose={() => setShowSearchUserModal(false)} user={selectedSearchUser} allTasks={allTasks} />
+      )}
     </div>
   );
 }

@@ -18,6 +18,2998 @@ Este documento contiene el código fuente completo para duplicar y maximizar la 
 
 ---
 
+## Archivo: CentroManagers.jsx
+
+```javascript
+import { getWhatsAppUrl } from '../utils/phoneUtils';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { useUI } from '../context/UIContext';
+import { 
+  canAddManagers, 
+  canAssignTrainer, 
+  canChangeManagerStatus, 
+  canViewAllManagers, 
+  canViewSede,
+  isDireccionRole,
+  isGlobalQTCoordinator,
+  hasQTPrivileges,
+  DUAL_ROLE_TRAINER_EMAILS
+} from '../config/permissions';
+import { 
+  INITIAL_MANAGERS, 
+  INITIAL_LLAMADOS, 
+  ENTRENADORES_LIST, 
+  COORDINADORES_LIST,
+  TRAINER_METADATA,
+  normalizeTrainer,
+  normalizeCoordinator
+} from '../data/managersData';
+import { OPERATIONAL_SEDES, normalizeRole, normalizeSede } from '../data/usersData';
+import { recordAuditEvent } from '../services/auditService';
+import { db } from '../services/firebase';
+import { collection, getDocs, doc, setDoc, updateDoc, deleteDoc, writeBatch, onSnapshot } from 'firebase/firestore';
+import CountryFlag from '../components/CountryFlag';
+import { 
+  Users, PhoneCall, CheckCircle, XCircle, Calendar, Plus, PlusCircle,
+  Search, Filter, Award, Building, UserCheck, Clock, 
+  ChevronLeft, ChevronRight, DollarSign, Layers, ArrowLeft,
+  Sparkles, ToggleLeft, ToggleRight, Archive, RotateCcw, X,
+  Edit3, Trash2, UserPlus, Shield, Crown, Check, CheckSquare, Square,
+  ShieldCheck, Lock, AlertTriangle, Target, ArrowUpDown, ArrowUp, ArrowDown
+} from 'lucide-react';
+import CMJDashboard from '../components/CMJDashboard';
+
+const SEDE_COLORS = {
+  Quito: "#29abe2", Lima: "#ef4444", Guayaquil: "#f59e0b",
+  Cuenca: "#8b5cf6", Medellín: "#22c55e", Medellin: "#22c55e",
+  CDMX: "#f97316", México: "#f97316"
+};
+
+const MES_LABELS = {
+  JULIO2026: "Jul 2026", JUNIO2026: "Jun 2026", MAYO2026: "May 2026",
+  ABRIL2026: "Abr 2026", MARZO2026: "Mar 2026", FEBRERO2026: "Feb 2026",
+  ENERO2026: "Ene 2026", DICIEMBRE2025: "Dic 2025", NOVIEMBRE2025: "Nov 2025",
+  OCTUBRE2025: "Oct 2025"
+};
+
+// Parsea múltiples entrenadores de una cadena (separados por coma, barra, o punto medio)
+export const parseTrainersList = (trainerStr) => {
+  if (!trainerStr) return [];
+  if (Array.isArray(trainerStr)) return trainerStr.map(t => normalizeTrainer(t)).filter(Boolean);
+  return trainerStr
+    .split(/[,/&•]+/)
+    .map(t => normalizeTrainer(t.trim()))
+    .filter(Boolean);
+};
+
+const isTrainerMatch = (mTrainer, targetTrainer) => {
+  if (!mTrainer || !targetTrainer) return false;
+  if (mTrainer === targetTrainer) return true;
+  
+  const mTrainersList = parseTrainersList(mTrainer);
+  const targetTrainersList = parseTrainersList(targetTrainer);
+
+  if (mTrainersList.length === 0) mTrainersList.push(mTrainer);
+  if (targetTrainersList.length === 0) targetTrainersList.push(targetTrainer);
+
+  for (const t1 of mTrainersList) {
+    for (const t2 of targetTrainersList) {
+      const norm1 = normalizeTrainer(t1);
+      const norm2 = normalizeTrainer(t2);
+      if (norm1 === norm2) return true;
+
+      const clean1 = norm1.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+      const clean2 = norm2.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+      if (clean1 === clean2 || clean1.includes(clean2) || clean2.includes(clean1)) return true;
+
+      // Alias conocido: Jesus Acosta / Chuy Acosta / Jesus Adrian Acosta
+      if ((clean1.includes('chuy') || clean1.includes('jesus')) && (clean2.includes('chuy') || clean2.includes('jesus')) && (clean1.includes('acosta') || clean2.includes('acosta'))) {
+        return true;
+      }
+
+      const w1 = clean1.split(/\s+/);
+      const w2 = clean2.split(/\s+/);
+      if (w1.length >= 2 && w2.length >= 2) {
+        if (w1[0] === w2[0] && (w1[1] === w2[1] || w1[w1.length - 1] === w2[w2.length - 1])) return true;
+      }
+    }
+  }
+  return false;
+};
+
+export default function CentroManagers() {
+  const { currentUser } = useAuth();
+  const { showToast } = useUI();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const queryParams = new URLSearchParams(location.search);
+  const initialTab = queryParams.get('tab') || 'directorio';
+
+  // Permisos avanzados
+  const canViewAll = canViewAllManagers(currentUser);
+  const canViewOwnSede = canViewSede(currentUser);
+  const canChangeStatus = canChangeManagerStatus(currentUser);
+  const userCanAdd = canAddManagers(currentUser);
+  const userCanAssign = canAssignTrainer(currentUser);
+  
+  // Dual Role Toggle para QT y Corporativos que también son entrenadores
+  const userRole = currentUser?.appRole || currentUser?.role;
+  // Revisamos TODOS los roles del usuario, no solo el appRole activo
+  const allUserRoles = currentUser?.roles || (userRole ? [userRole] : []);
+  const isTrainerRole = userRole === 'entrenador' || userRole === 'entrenador_llamadas' ||
+    allUserRoles.includes('entrenador') || allUserRoles.includes('entrenador_llamadas') ||
+    DUAL_ROLE_TRAINER_EMAILS.includes((currentUser?.email || '').toLowerCase());
+  const isDualRole = currentUser && (DUAL_ROLE_TRAINER_EMAILS.includes(currentUser.email) || (currentUser.roles && currentUser.roles.includes('entrenador') && currentUser.roles.length > 1));
+  const [viewAsTrainer, setViewAsTrainer] = useState(isTrainerRole && (userRole === 'entrenador' || userRole === 'entrenador_llamadas'));
+
+  // Estados de datos
+  // Estados de datos
+  const [managers, setManagers] = useState([]);
+  const [llamadosData, setLlamadosData] = useState([]);
+  const [isLoadingData, setIsLoadingData] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, 'managers_directory'), (querySnapshot) => {
+      const firestoreManagers = [];
+      querySnapshot.forEach((doc) => {
+        firestoreManagers.push({ id: doc.id, ...doc.data() });
+      });
+
+      // Merge inteligente: Mapear por ID
+      const firestoreMap = new Map();
+      firestoreManagers.forEach(m => firestoreMap.set(String(m.id), m));
+
+      // 1. Tomar todos los INITIAL_MANAGERS y reemplazar con los cambios de Firestore si existen
+      const mergedManagers = INITIAL_MANAGERS.map(initM => {
+        const fromFirestore = firestoreMap.get(String(initM.id));
+        return fromFirestore ? { ...initM, ...fromFirestore } : initM;
+      });
+
+      // 2. Agregar managers nuevos creados en Firestore que no estén en el catálogo inicial
+      const initialIds = new Set(INITIAL_MANAGERS.map(m => String(m.id)));
+      firestoreManagers.forEach(fm => {
+        if (!initialIds.has(String(fm.id))) {
+          mergedManagers.push(fm);
+        }
+      });
+
+      // Mapear y normalizar
+      const normalized = mergedManagers.map(m => ({
+        ...m,
+        entrenador: normalizeTrainer(m.entrenador),
+        coordinador: normalizeCoordinator(m.coordinador),
+        sede: normalizeSede(m.sede)
+      }));
+      setManagers(normalized);
+      setIsLoadingData(false);
+    }, (error) => {
+      console.error("Error fetching managers from Firestore in real-time:", error);
+      // Fallback a localStorage si falla la conexión
+      const saved = localStorage.getItem('cpsl_managers_data_v3');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        setManagers(parsed);
+      }
+      setIsLoadingData(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const [llamadosDataState, setLlamadosDataState] = useState(() => {
+    try {
+      const saved = localStorage.getItem('cpsl_llamados_data_v3');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {
+      console.error(e);
+    }
+    return INITIAL_LLAMADOS;
+  });
+
+  useEffect(() => {
+    setLlamadosData(llamadosDataState);
+  }, [llamadosDataState]);
+
+  useEffect(() => {
+    try { localStorage.setItem('cpsl_llamados_data_v3', JSON.stringify(llamadosData)); } catch (e) {}
+  }, [llamadosData]);
+
+  // UI State
+  const [activeTab, setActiveTab] = useState(initialTab);
+  const [search, setSearch] = useState('');
+  const [filterSede, setFilterSede] = useState('');
+  const [statusFilter, setStatusFilter] = useState('Todos'); // 'Todos' | 'Activo' | 'Graduado' | 'Desertor'
+
+  // Estadísticas por Entrenador (Tab: Entrenadores)
+  const allTrainerNames = useMemo(() => {
+    const set = new Set(ENTRENADORES_LIST);
+    managers.forEach(m => {
+      if (m.entrenador && m.entrenador.trim() && m.entrenador !== 'Sin Asignar') {
+        parseTrainersList(m.entrenador).forEach(t => set.add(t));
+      }
+    });
+    return Array.from(set);
+  }, [managers]);
+
+  // Determinar el entrenador actual para filtrado
+  const currentTrainerName = useMemo(() => {
+    if (!currentUser) return '';
+    const email = (currentUser.email || '').toLowerCase().trim();
+    
+    // Mapeo explícito para entrenadores duales cuyo nombre en Google no coincida exactamente con ENTRENADORES_LIST
+    if (email === 'fer.aragon@crearpsl.net' || email === 'fer.aragon@crearpls.com') return 'Fer Aragon';
+    if (email === 'paul.sosa@crearpsl.net') return 'Paul Sosa';
+    if (email === 'jose.sanchez@crearpsl.net') return 'Jose Sanchez';
+    if (email === 'andres.gomez@crearpsl.net') return 'Andres Gomez';
+    if (email === 'leandro.brunis@crearpsl.net') return 'Leandro Brunis';
+    if (email === 'carlos.brunis@crearpsl.net' || email === 'brunische66@gmail.com') return 'Carlos Brunis';
+
+    const userName = currentUser.name || currentUser.displayName || '';
+    const cleanUser = userName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+    const match = allTrainerNames.find(e => {
+      const cleanE = e.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+      if (cleanUser.includes(cleanE) || cleanE.includes(cleanUser)) return true;
+      
+      const w1 = cleanUser.split(/\s+/);
+      const w2 = cleanE.split(/\s+/);
+      if (w1.length >= 2 && w2.length >= 2) {
+        if (w1[0] === w2[0] && (w1[1] === w2[1] || w1[w1.length - 1] === w2[w2.length - 1])) return true;
+      }
+      return false;
+    });
+    return match || userName;
+  }, [currentUser, allTrainerNames]);
+
+  const [filterEntrenador, setFilterEntrenador] = useState(viewAsTrainer ? currentTrainerName : '');
+
+  // Efecto para actualizar el filtro si cambia el toggle de dual role
+  useEffect(() => {
+    if (viewAsTrainer) {
+      setFilterEntrenador(currentTrainerName);
+    } else {
+      setFilterEntrenador('');
+    }
+  }, [viewAsTrainer, currentTrainerName]);
+
+
+  // Modales y estados de edición
+  const [showModal, setShowModal] = useState(false);
+  const [addMode, setAddMode] = useState('individual'); // 'individual' | 'equipo'
+
+  const [newManager, setNewManager] = useState({
+    nombre: '',
+    rol: 'Manager',
+    telefono: '',
+    sede: 'Quito',
+    equipo: '',
+    numEquipo: '',
+    selectedTrainers: [ENTRENADORES_LIST[0] || ''],
+    coordinador: COORDINADORES_LIST[0] || '',
+    estado: 'Activo'
+  });
+
+  const [newTeam, setNewTeam] = useState({
+    sede: 'Quito',
+    equipo: '',
+    numEquipo: '',
+    selectedTrainers: [ENTRENADORES_LIST[0] || ''],
+    coordinador: COORDINADORES_LIST[0] || '',
+    capitan: { nombre: '', telefono: '' },
+    managers: [{ id: 1, nombre: '', telefono: '' }]
+  });
+
+  // Modal para editar equipo completo
+  const [editTeamModal, setEditTeamModal] = useState(null);
+
+  // Modal para editar integrante individual (Manager o Capitán)
+  const [editIndividualModal, setEditIndividualModal] = useState(null);
+
+  // Modal de confirmación para eliminar
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
+
+  const [groupModal, setGroupModal] = useState(null);
+  const [groupCallDate, setGroupCallDate] = useState(new Date().toISOString().split('T')[0]);
+  const [groupCallAttendance, setGroupCallAttendance] = useState({}); // { managerId: boolean }
+
+  // CONTEXTO (28/08/2026): pedido de José — al hacer clic en el badge 🎓 de un
+  // entrenador (en la fila del Directorio o en la tarjeta de un Capitán) se debe
+  // abrir la "tarjeta" de esa persona con su resumen (equipos a cargo, efectividad
+  // de llamadas, activos/graduados/desertores) — el mismo cálculo que ya existía
+  // para la pestaña "Entrenadores", pero accesible desde cualquier vista sin tener
+  // que cambiar de pestaña. Solo guarda el NOMBRE del entrenador seleccionado; el
+  // resumen se recalcula al vuelo con getTrainerCardStats() más abajo.
+  const [trainerCardModal, setTrainerCardModal] = useState(null); // string | null (nombre del entrenador)
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 40;
+  const [activeMes, setActiveMes] = useState('JULIO2026');
+
+  // Estados de ordenamiento de columnas en el Directorio
+  const [sortField, setSortField] = useState(null); // 'nombre' | 'sede' | 'entrenador' | 'estado' | 'llamada'
+  const [sortDirection, setSortDirection] = useState('asc'); // 'asc' | 'desc'
+
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+    setCurrentPage(1);
+  };
+
+  // Filtrado principal
+  const filteredManagers = useMemo(() => {
+    const userSede = normalizeSede(currentUser?.sede);
+
+    return managers.filter(m => {
+      const mSede = normalizeSede(m.sede);
+
+      // 1. Filtrado de Visibilidad (Seguridad y Jerarquía)
+      if (viewAsTrainer) {
+        // Solo ve los suyos como entrenador
+        if (!isTrainerMatch(m.entrenador, currentTrainerName)) return false;
+      } else if (!canViewAll && !isGlobalQTCoordinator(currentUser)) {
+        const activeRole = currentUser?.appRole;
+        const isGerente = activeRole === 'gerente';
+        const isCoord = activeRole === 'coord_maestria' || activeRole === 'coordinador_mj' || activeRole === 'coord_c1' || activeRole === 'capitan';
+        
+        if (isGerente) {
+          if (mSede !== userSede && mSede !== 'GLOBAL') return false;
+        } else if (isCoord) {
+          // Coordinadores ven su sede Y a los gerentes (como referencia directiva)
+          const mRol = (m.rol || '').toLowerCase();
+          if (mSede !== userSede && !mRol.includes('gerente')) return false;
+        } else if (hasQTPrivileges(currentUser)) {
+          // QT: ven su sede y al Coordinador Global de QT
+          const mRol = (m.rol || '').toLowerCase();
+          const isTargetGlobalQTCoordinator = m.id === 'staff_carlosbrunis' || m.email?.toLowerCase().includes('brunis') || (mRol.includes('qt') && (mSede === 'SEDE GLOBAL' || mSede === 'GLOBAL'));
+          if (mSede !== userSede && !isTargetGlobalQTCoordinator) return false;
+        } else if (isTrainerRole && currentTrainerName) {
+          // ⚡ ENTRENADORES: siempre ven sus propios managers, sin importar el rol activo
+          if (!isTrainerMatch(m.entrenador, currentTrainerName)) return false;
+        } else {
+          // Por defecto solo ven lo suyo
+          if (!isTrainerMatch(m.entrenador, currentTrainerName) && mSede !== userSede) return false;
+        }
+      }
+
+      // 2. Filtro de Entrenador (UI dropdown)
+      if (filterEntrenador && !isTrainerMatch(m.entrenador, filterEntrenador)) return false;
+
+      // 3. Filtro Sede (UI dropdown)
+      if (filterSede && mSede !== normalizeSede(filterSede)) return false;
+
+      // 4. Filtro Estado (Todos / Activo / Graduado / Desertor)
+      if (statusFilter !== 'Todos' && m.estado !== statusFilter) return false;
+
+      // 5. Búsqueda texto
+      if (search.trim()) {
+        const q = search.toLowerCase();
+        const str = `${m.nombre} ${m.rol || ''} ${m.equipo || ''} ${m.entrenador || ''} ${m.telefono || ''} ${mSede}`.toLowerCase();
+        if (!str.includes(q)) return false;
+      }
+
+      return true;
+    });
+  }, [managers, search, filterSede, filterEntrenador, statusFilter, viewAsTrainer, canViewAll, canViewOwnSede, currentTrainerName, currentUser]);
+
+  // Agrupación de equipos
+  const [groupLifecycleFilter, setGroupLifecycleFilter] = useState('Activos'); // 'Activos' | 'Archivo' | 'Todos'
+  const [groupFilterStatus, setGroupFilterStatus] = useState('Todos'); // 'Todos' | 'Completos' | 'Parciales' | 'Pendientes'
+
+  const groupTeams = useMemo(() => {
+    const userSede = normalizeSede(currentUser?.sede);
+    const baseList = managers.filter(m => {
+      if (!m.equipo) return false;
+      const mSede = normalizeSede(m.sede);
+
+      // Filtro Activos / Archivo en Grupales
+      if (groupLifecycleFilter === 'Activos') {
+        if (m.estado === 'Desertor' || m.estado === 'Graduado' || m.estado === 'Archivado') return false;
+      } else if (groupLifecycleFilter === 'Archivo') {
+        if (m.estado === 'Activo') return false;
+      }
+
+      // Permisos base de rol
+      if (viewAsTrainer) {
+        if (!isTrainerMatch(m.entrenador, currentTrainerName)) return false;
+      } else if (!canViewAll && !isGlobalQTCoordinator(currentUser)) {
+        const activeRole = currentUser?.appRole;
+        const isGerente = activeRole === 'gerente';
+        const isCoord = activeRole === 'coord_maestria' || activeRole === 'coordinador_mj' || activeRole === 'coord_c1' || activeRole === 'capitan';
+        
+        if (isGerente) {
+          if (mSede !== userSede && mSede !== 'GLOBAL') return false;
+        } else if (isCoord) {
+          const mRol = (m.rol || '').toLowerCase();
+          if (mSede !== userSede && !mRol.includes('gerente')) return false;
+        } else if (hasQTPrivileges(currentUser)) {
+          // QT: ven su sede y al Coordinador Global de QT
+          const mRol = (m.rol || '').toLowerCase();
+          const isTargetGlobalQTCoordinator = m.id === 'staff_carlosbrunis' || m.email?.toLowerCase().includes('brunis') || (mRol.includes('qt') && (mSede === 'SEDE GLOBAL' || mSede === 'GLOBAL'));
+          if (mSede !== userSede && !isTargetGlobalQTCoordinator) return false;
+        } else if (isTrainerRole && currentTrainerName) {
+          if (!isTrainerMatch(m.entrenador, currentTrainerName)) return false;
+        } else {
+          if (!isTrainerMatch(m.entrenador, currentTrainerName) && mSede !== userSede) return false;
+        }
+      }
+
+      // Filtros de Sede y Entrenador de la barra
+      if (filterSede && mSede !== normalizeSede(filterSede)) return false;
+      if (filterEntrenador && !isTrainerMatch(m.entrenador, filterEntrenador)) return false;
+
+      return true;
+    });
+
+    const teams = {};
+    baseList.forEach(m => {
+      const key = `${normalizeSede(m.sede)}_${m.equipo}`;
+      if (!teams[key]) {
+        teams[key] = {
+          sede: normalizeSede(m.sede),
+          equipo: m.equipo,
+          numEquipo: m.numEquipo,
+          managers: [],
+          entrenadores: new Set(),
+          lastDate: ''
+        };
+      }
+      teams[key].managers.push(m);
+      if (m.entrenador) {
+        parseTrainersList(m.entrenador).forEach(t => teams[key].entrenadores.add(t));
+      }
+      if (m.llamadaFecha && (!teams[key].lastDate || m.llamadaFecha > teams[key].lastDate)) {
+        teams[key].lastDate = m.llamadaFecha;
+      }
+    });
+
+    let list = Object.values(teams).map(t => {
+      const asistieron = t.managers.filter(m => m.llamadaAsistio === 'SI').length;
+      const noAsistieron = t.managers.filter(m => m.llamadaAsistio === 'NO').length;
+      const total = t.managers.length;
+      const pct = total > 0 ? Math.round((asistieron / total) * 100) : 0;
+      const hasCall = t.managers.some(m => m.llamadaAsistio === 'SI' || m.llamadaAsistio === 'NO');
+      const entrenadoresArr = Array.from(t.entrenadores);
+      const entrenadorUnico = entrenadoresArr.length === 1 ? entrenadoresArr[0] : (entrenadoresArr.join(', ') || 'Sin Asignar');
+      const capitanes = t.managers.filter(m => (m.rol || '').toLowerCase().includes('capitan'));
+      const managersOnly = t.managers.filter(m => !(m.rol || '').toLowerCase().includes('capitan'));
+
+      let statusType = 'Pendiente';
+      if (hasCall) {
+        if (asistieron === total) statusType = 'Completo';
+        else if (asistieron > 0) statusType = 'Parcial';
+        else statusType = 'Ausente';
+      }
+
+      return {
+        ...t,
+        entrenadorUnico,
+        entrenadoresArr,
+        capitanes,
+        managersOnly,
+        asistieron,
+        noAsistieron,
+        total,
+        pct,
+        hasCall,
+        statusType
+      };
+    });
+
+    // Filtro por término de búsqueda en Grupales
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      list = list.filter(t => {
+        const teamMatch = `${t.equipo} ${t.numEquipo || ''} ${t.sede} ${t.entrenadorUnico}`.toLowerCase().includes(q);
+        const managerMatch = t.managers.some(m => `${m.nombre} ${m.telefono || ''}`.toLowerCase().includes(q));
+        return teamMatch || managerMatch;
+      });
+    }
+
+    // Filtro por estado de conexión
+    if (groupFilterStatus === 'Completos') return list.filter(t => t.statusType === 'Completo');
+    if (groupFilterStatus === 'Parciales') return list.filter(t => t.statusType === 'Parcial' || t.statusType === 'Ausente');
+    if (groupFilterStatus === 'Pendientes') return list.filter(t => t.statusType === 'Pendiente');
+    return list;
+  }, [managers, search, filterSede, filterEntrenador, groupLifecycleFilter, groupFilterStatus, viewAsTrainer, canViewAll, canViewOwnSede, currentTrainerName, currentUser]);
+
+  const groupStats = useMemo(() => {
+    let totalEq = groupTeams.length;
+    let conLlamada = groupTeams.filter(t => t.hasCall).length;
+    let totalMngrs = groupTeams.reduce((acc, t) => acc + t.total, 0);
+    let totalAsist = groupTeams.reduce((acc, t) => acc + t.asistieron, 0);
+    let avgPct = totalMngrs > 0 ? Math.round((totalAsist / totalMngrs) * 100) : 0;
+    return { totalEq, conLlamada, totalMngrs, totalAsist, avgPct };
+  }, [groupTeams]);
+
+  // Estadísticas por Sede (Tab: Sedes)
+  const sedesStats = useMemo(() => {
+    let list = OPERATIONAL_SEDES.map(sedeName => {
+      const normSede = normalizeSede(sedeName);
+      const sedeManagers = managers.filter(m => normalizeSede(m.sede) === normSede);
+      const total = sedeManagers.length;
+      const activos = sedeManagers.filter(m => m.estado === 'Activo').length;
+      const graduados = sedeManagers.filter(m => m.estado === 'Graduado').length;
+      const desertores = sedeManagers.filter(m => m.estado === 'Desertor').length;
+      const pctGrad = total > 0 ? Math.round((graduados / total) * 100) : 0;
+
+      // Equipos y llamadas
+      const sedeEquipos = new Set(sedeManagers.map(m => m.equipo).filter(Boolean));
+      const totalEquipos = sedeEquipos.size;
+      const asistieron = sedeManagers.filter(m => m.llamadaAsistio === 'SI').length;
+      const conLlamada = sedeManagers.filter(m => m.llamadaAsistio === 'SI' || m.llamadaAsistio === 'NO').length;
+      const pctAsist = conLlamada > 0 ? Math.round((asistieron / conLlamada) * 100) : 0;
+
+      // Entrenadores en la sede
+      const entrenadores = [...new Set(sedeManagers.flatMap(m => parseTrainersList(m.entrenador)))];
+
+      return {
+        sede: sedeName,
+        normSede,
+        total,
+        activos,
+        graduados,
+        desertores,
+        pctGrad,
+        totalEquipos,
+        asistieron,
+        conLlamada,
+        pctAsist,
+        entrenadores
+      };
+    }).filter(s => s.total > 0 || OPERATIONAL_SEDES.includes(s.sede));
+
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      list = list.filter(s =>
+        s.sede.toLowerCase().includes(q) ||
+        s.entrenadores.some(e => e.toLowerCase().includes(q))
+      );
+    }
+    return list;
+  }, [managers, search]);
+
+
+
+  const trainersStats = useMemo(() => {
+    let list = allTrainerNames.map(trainerName => {
+      const trainerManagers = managers.filter(m => isTrainerMatch(m.entrenador, trainerName));
+      const total = trainerManagers.length;
+      const activos = trainerManagers.filter(m => m.estado === 'Activo').length;
+      const graduados = trainerManagers.filter(m => m.estado === 'Graduado').length;
+      const desertores = trainerManagers.filter(m => m.estado === 'Desertor').length;
+      
+      const equipos = [...new Set(trainerManagers.map(m => m.equipo).filter(Boolean))];
+      const sedes = [...new Set(trainerManagers.map(m => normalizeSede(m.sede)).filter(Boolean))];
+
+      const asistieron = trainerManagers.filter(m => m.llamadaAsistio === 'SI').length;
+      const noAsistieron = trainerManagers.filter(m => m.llamadaAsistio === 'NO').length;
+      const conLlamada = asistieron + noAsistieron;
+      const pctAsist = conLlamada > 0 ? Math.round((asistieron / conLlamada) * 100) : 0;
+
+      return {
+        entrenador: trainerName,
+        total,
+        activos,
+        graduados,
+        desertores,
+        equipos,
+        sedes,
+        asistieron,
+        noAsistieron,
+        conLlamada,
+        pctAsist
+      };
+    }).filter(t => t.total > 0);
+
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      list = list.filter(t =>
+        t.entrenador.toLowerCase().includes(q) ||
+        t.sedes.some(s => s.toLowerCase().includes(q)) ||
+        t.equipos.some(eq => eq.toLowerCase().includes(q))
+      );
+    }
+    return list;
+  }, [allTrainerNames, managers, search]);
+
+  // Mismo cálculo que trainersStats de arriba pero SIN el filtro de `search` y
+  // para un solo nombre — usado por el modal "tarjeta de la persona" que se abre
+  // al hacer clic en un badge 🎓 de entrenador desde cualquier vista.
+  const getTrainerCardStats = (trainerName) => {
+    if (!trainerName) return null;
+    const trainerManagers = managers.filter(m => isTrainerMatch(m.entrenador, trainerName));
+    const total = trainerManagers.length;
+    const activos = trainerManagers.filter(m => m.estado === 'Activo').length;
+    const graduados = trainerManagers.filter(m => m.estado === 'Graduado').length;
+    const desertores = trainerManagers.filter(m => m.estado === 'Desertor').length;
+    const equipos = [...new Set(trainerManagers.map(m => m.equipo).filter(Boolean))];
+    const sedes = [...new Set(trainerManagers.map(m => normalizeSede(m.sede)).filter(Boolean))];
+    const asistieron = trainerManagers.filter(m => m.llamadaAsistio === 'SI').length;
+    const noAsistieron = trainerManagers.filter(m => m.llamadaAsistio === 'NO').length;
+    const conLlamada = asistieron + noAsistieron;
+    const pctAsist = conLlamada > 0 ? Math.round((asistieron / conLlamada) * 100) : 0;
+    return { entrenador: trainerName, total, activos, graduados, desertores, equipos, sedes, asistieron, noAsistieron, conLlamada, pctAsist };
+  };
+
+  const stats = useMemo(() => {
+    const userSede = normalizeSede(currentUser?.sede);
+    // Si la vista está restringida, calcular stats solo de lo que puede ver
+    const baseList = (viewAsTrainer || (!canViewAll && !canViewOwnSede)) 
+      ? managers.filter(m => isTrainerMatch(m.entrenador, currentTrainerName))
+      : (canViewOwnSede && !canViewAll) ? managers.filter(m => normalizeSede(m.sede) === userSede)
+      : managers;
+
+    const total = baseList.length;
+    const graduados = baseList.filter(m => m.estado === 'Graduado').length;
+    const desertores = baseList.filter(m => m.estado === 'Desertor').length;
+    const activos = baseList.filter(m => m.estado === 'Activo').length;
+    const pct = total > 0 ? Math.round((graduados / total) * 100) : 0;
+    return { total, graduados, desertores, activos, pct };
+  }, [managers, viewAsTrainer, canViewAll, canViewOwnSede, currentTrainerName, currentUser]);
+
+  const handleResetMasterData = async () => {
+    if (window.confirm("¿Deseas restablecer la lista completa de managers originales desde la base maestra a LA NUBE? Esto sobreescribirá la base de datos.")) {
+      try {
+        showToast('Subiendo datos a la nube... por favor espera', 'info');
+        const batchArray = [];
+        batchArray.push(writeBatch(db));
+        let operationCounter = 0;
+        let batchIndex = 0;
+        
+        for (const m of INITIAL_MANAGERS) {
+          const docRef = doc(db, 'managers_directory', m.id.toString());
+          batchArray[batchIndex].set(docRef, m);
+          operationCounter++;
+          
+          if (operationCounter === 490) {
+            batchArray.push(writeBatch(db));
+            batchIndex++;
+            operationCounter = 0;
+          }
+        }
+        
+        for (const batch of batchArray) {
+          await batch.commit();
+        }
+        
+        setManagers(INITIAL_MANAGERS);
+        localStorage.removeItem('cpsl_managers_data_v3');
+        showToast('✅ Datos maestros subidos a Firebase con éxito', 'success');
+      } catch (error) {
+        console.error(error);
+        showToast('Error subiendo a Firebase', 'error');
+      }
+    }
+  };
+
+  // Acciones
+  const handleUpdateManagerField = async (id, field, value) => {
+    if (field === 'entrenador' && !userCanAssign) {
+      showToast("Acceso restringido: Solo Fer, Paul y SuperAdmins pueden editar entrenadores.", "warning");
+      return;
+    }
+    if (field === 'estado' && !canChangeStatus) {
+      showToast("Acceso restringido: Las Graduaciones y Deserciones están restringidas a Coordinación de Maestría del Juego y Dirección de Maestría.", "warning");
+      return;
+    }
+    const finalValue = field === 'entrenador' ? normalizeTrainer(value)
+      : field === 'coordinador' ? normalizeCoordinator(value)
+      : field === 'sede' ? normalizeSede(value)
+      : value;
+      
+    try {
+      const targetManager = managers.find(m => m.id === id) || { id };
+      const docRef = doc(db, 'managers_directory', id.toString());
+      await setDoc(docRef, { ...targetManager, [field]: finalValue }, { merge: true });
+      
+      setManagers(prev => prev.map(m => m.id === id ? { ...m, [field]: finalValue } : m));
+      
+      const managerName = targetManager ? targetManager.nombre : id;
+
+      recordAuditEvent({
+        action: 'ACTUALIZAR_MANAGER',
+        email: currentUser?.email || 'admin@crearpsl.net',
+        name: currentUser?.name || 'Usuario',
+        role: currentUser?.appRole || 'gerente',
+        sede: currentUser?.sede || 'Global',
+        details: `Se actualizó el campo "${field}" de ${managerName} a "${finalValue}"`
+      });
+
+      showToast(`Actualizado: ${field}`, 'info');
+    } catch (e) {
+      console.error(e);
+      showToast('Error al actualizar en la nube', 'error');
+    }
+  };
+
+  const handleUpdateLlamada = async (id, fecha, asistio) => {
+    try {
+      const targetManager = managers.find(m => m.id === id) || { id };
+      const docRef = doc(db, 'managers_directory', id.toString());
+      await setDoc(docRef, { ...targetManager, llamadaFecha: fecha, llamadaAsistio: asistio }, { merge: true });
+      
+      // La actualización de managers en tiempo real ya se maneja por onSnapshot, pero por optimización optimista lo mantenemos aquí
+      setManagers(prev => prev.map(m => m.id === id ? { ...m, llamadaFecha: fecha, llamadaAsistio: asistio } : m));
+      
+      const managerName = targetManager ? targetManager.nombre : id;
+      
+      recordAuditEvent({
+        action: 'ACTUALIZAR_LLAMADA_MANAGER',
+        email: currentUser?.email || 'admin@crearpsl.net',
+        name: currentUser?.name || 'Usuario',
+        role: currentUser?.appRole || 'gerente',
+        sede: currentUser?.sede || 'Global',
+        details: `Asistencia actualizada para ${managerName}: ${asistio === 'SI' ? 'Asistió' : 'No asistió'} el ${fecha}`
+      });
+
+      showToast(`Registro guardado: ${asistio === 'SI' ? 'Asistió' : 'No asistió'}`, 'success');
+    } catch (e) {
+      console.error(e);
+      showToast('Error al guardar en la nube', 'error');
+    }
+  };
+
+  const openGroupModal = (team) => {
+    const initialAttendance = {};
+    team.managers.forEach(m => initialAttendance[m.id] = true); // Todos asisten por defecto
+    setGroupCallAttendance(initialAttendance);
+    setGroupModal(team);
+  };
+
+  const handleSaveGroupCall = async () => {
+    if (!groupModal) return;
+    
+    try {
+      const batch = writeBatch(db);
+      groupModal.managers.forEach(m => {
+        if (groupCallAttendance.hasOwnProperty(m.id)) {
+          const docRef = doc(db, 'managers_directory', m.id.toString());
+          batch.set(docRef, {
+            ...m,
+            llamadaFecha: groupCallDate,
+            llamadaAsistio: groupCallAttendance[m.id] ? 'SI' : 'NO'
+          }, { merge: true });
+        }
+      });
+      
+      await batch.commit();
+      
+      setManagers(prev => prev.map(m => {
+        if (groupCallAttendance.hasOwnProperty(m.id)) {
+          return {
+            ...m,
+            llamadaFecha: groupCallDate,
+            llamadaAsistio: groupCallAttendance[m.id] ? 'SI' : 'NO'
+          };
+        }
+        return m;
+      }));
+      
+      recordAuditEvent({
+        action: 'ACTUALIZAR_LLAMADA_GRUPAL',
+        user: currentUser?.email || currentUser?.name || 'Usuario',
+        details: `Llamada grupal registrada para el equipo "${groupModal.equipo}" el ${groupCallDate}. Integrantes actualizados: ${groupModal.managers.length}`
+      });
+
+      showToast(`Llamada grupal registrada en la nube para el equipo ${groupModal.equipo}`, 'success');
+      setGroupModal(null);
+    } catch (e) {
+      console.error(e);
+      showToast('Error al registrar llamada grupal en la nube', 'error');
+    }
+  };
+
+  // Guardar nuevo registro individual (Manager o Capitán)
+  const handleSaveNewManager = async (e) => {
+    e.preventDefault();
+    if (!newManager.nombre.trim()) return showToast('El nombre completo es obligatorio', 'error');
+
+    const finalTrainers = newManager.selectedTrainers && newManager.selectedTrainers.length > 0
+      ? newManager.selectedTrainers.map(t => normalizeTrainer(t)).filter(Boolean).join(', ')
+      : '';
+
+    const created = {
+      id: Date.now(),
+      nombre: newManager.nombre.trim(),
+      rol: newManager.rol || 'Manager',
+      telefono: newManager.telefono.trim(),
+      sede: normalizeSede(newManager.sede),
+      equipo: (newManager.equipo || '').trim().toUpperCase(),
+      numEquipo: newManager.numEquipo ? Number(newManager.numEquipo) || newManager.numEquipo : '',
+      entrenador: finalTrainers,
+      tieneEntrenador: finalTrainers ? 'Si' : 'No',
+      coordinador: normalizeCoordinator(newManager.coordinador),
+      estado: newManager.estado || 'Activo',
+      llamadaFecha: '',
+      llamadaAsistio: ''
+    };
+
+    try {
+      const docRef = doc(db, 'managers_directory', created.id.toString());
+      await setDoc(docRef, created);
+      setManagers(prev => [created, ...prev]);
+
+    } catch(e) { console.error(e); showToast('Error guardando en Firebase', 'error'); return; }
+
+    recordAuditEvent({
+      action: 'NUEVO_INTEGRANTE_MANAGER',
+      user: currentUser?.email || 'Usuario',
+      details: `Nuevo ${created.rol}: ${created.nombre} (${created.sede} - ${created.equipo || 'Sin Equipo'} - Coach: ${created.entrenador || 'N/A'})`
+    });
+
+    showToast(`✅ ${created.rol} "${created.nombre}" agregado con éxito`, 'success');
+    setShowModal(false);
+    setNewManager({
+      nombre: '',
+      rol: 'Manager',
+      telefono: '',
+      sede: 'Quito',
+      equipo: '',
+      numEquipo: '',
+      selectedTrainers: [ENTRENADORES_LIST[0] || ''],
+      coordinador: COORDINADORES_LIST[0] || '',
+      estado: 'Activo'
+    });
+  };
+
+  // Guardar nuevo equipo completo (Capitán + Managers)
+  const handleSaveNewTeam = async (e) => {
+    e.preventDefault();
+    if (!newTeam.equipo.trim()) return showToast('El nombre del equipo es obligatorio', 'error');
+
+    const finalTrainers = newTeam.selectedTrainers && newTeam.selectedTrainers.length > 0
+      ? newTeam.selectedTrainers.map(t => normalizeTrainer(t)).filter(Boolean).join(', ')
+      : '';
+
+    const sede = normalizeSede(newTeam.sede);
+    const equipo = newTeam.equipo.trim().toUpperCase();
+    const numEquipo = newTeam.numEquipo ? Number(newTeam.numEquipo) || newTeam.numEquipo : '';
+    const coordinador = normalizeCoordinator(newTeam.coordinador);
+
+    const newRecords = [];
+    const timestamp = Date.now();
+
+    // 1. Capitán (si se ingresó)
+    if (newTeam.capitan && newTeam.capitan.nombre.trim()) {
+      newRecords.push({
+        id: timestamp + 1,
+        nombre: newTeam.capitan.nombre.trim(),
+        rol: 'Capitan',
+        telefono: (newTeam.capitan.telefono || '').trim(),
+        sede,
+        equipo,
+        numEquipo,
+        entrenador: finalTrainers,
+        tieneEntrenador: finalTrainers ? 'Si' : 'No',
+        coordinador,
+        estado: 'Activo',
+        llamadaFecha: '',
+        llamadaAsistio: ''
+      });
+    }
+
+    // 2. Managers
+    if (Array.isArray(newTeam.managers)) {
+      newTeam.managers.forEach((m, idx) => {
+        if (m.nombre && m.nombre.trim()) {
+          newRecords.push({
+            id: timestamp + 2 + idx,
+            nombre: m.nombre.trim(),
+            rol: 'Manager',
+            telefono: (m.telefono || '').trim(),
+            sede,
+            equipo,
+            numEquipo,
+            entrenador: finalTrainers,
+            tieneEntrenador: finalTrainers ? 'Si' : 'No',
+            coordinador,
+            estado: 'Activo',
+            llamadaFecha: '',
+            llamadaAsistio: ''
+          });
+        }
+      });
+    }
+
+    if (newRecords.length === 0) {
+      return showToast('Debe ingresar al menos un integrante (Capitán o Manager) para el equipo', 'error');
+    }
+
+    try {
+      const batch = writeBatch(db);
+      newRecords.forEach(record => {
+        const docRef = doc(db, 'managers_directory', record.id.toString());
+        batch.set(docRef, record);
+      });
+      await batch.commit();
+
+      setManagers(prev => [...newRecords, ...prev]);
+    } catch(e) {
+      console.error(e);
+      return showToast('Error guardando el equipo en la nube', 'error');
+    }
+
+    recordAuditEvent({
+      action: 'CREAR_EQUIPO_COMPLETO',
+      user: currentUser?.email || 'Usuario',
+      details: `Equipo "${equipo}" creado en ${sede} con ${newRecords.length} integrantes y Coach(es): ${finalTrainers || 'Sin Asignar'}`
+    });
+
+    showToast(`✅ Equipo "${equipo}" registrado con ${newRecords.length} integrantes`, 'success');
+    setShowModal(false);
+    setNewTeam({
+      sede: 'Quito',
+      equipo: '',
+      numEquipo: '',
+      selectedTrainers: [ENTRENADORES_LIST[0] || ''],
+      coordinador: COORDINADORES_LIST[0] || '',
+      capitan: { nombre: '', telefono: '' },
+      managers: [{ id: 1, nombre: '', telefono: '' }]
+    });
+  };
+
+  // Abrir modal para editar equipo
+  const handleOpenEditTeam = (team) => {
+    const trainersInTeam = new Set();
+    team.managers.forEach(m => {
+      if (m.entrenador) {
+        parseTrainersList(m.entrenador).forEach(t => trainersInTeam.add(t));
+      }
+    });
+
+    setEditTeamModal({
+      originalSede: team.sede,
+      originalEquipo: team.equipo,
+      sede: team.sede,
+      equipo: team.equipo,
+      numEquipo: team.numEquipo || '',
+      selectedTrainers: Array.from(trainersInTeam).length > 0 ? Array.from(trainersInTeam) : [ENTRENADORES_LIST[0] || ''],
+      coordinador: team.managers[0]?.coordinador || COORDINADORES_LIST[0] || '',
+      members: team.managers.map(m => ({
+        id: m.id,
+        nombre: m.nombre || '',
+        rol: (m.rol || '').toLowerCase().includes('capitan') ? 'Capitan' : 'Manager',
+        telefono: m.telefono || '',
+        estado: m.estado || 'Activo',
+        entrenador: m.entrenador || '',
+        llamadaFecha: m.llamadaFecha || '',
+        llamadaAsistio: m.llamadaAsistio || ''
+      }))
+    });
+  };
+
+  // Guardar edición de equipo completo
+  const handleSaveEditTeam = async (e) => {
+    e.preventDefault();
+    if (!editTeamModal) return;
+    if (!editTeamModal.equipo.trim()) return showToast('El nombre del equipo es obligatorio', 'error');
+
+    const origSedeNorm = normalizeSede(editTeamModal.originalSede);
+    const origEquipo = (editTeamModal.originalEquipo || '').trim().toUpperCase();
+
+    const newSede = normalizeSede(editTeamModal.sede);
+    const newEquipo = editTeamModal.equipo.trim().toUpperCase();
+    const newNumEquipo = editTeamModal.numEquipo ? Number(editTeamModal.numEquipo) || editTeamModal.numEquipo : '';
+    const newCoordinador = normalizeCoordinator(editTeamModal.coordinador);
+    
+    const finalTrainers = editTeamModal.selectedTrainers && editTeamModal.selectedTrainers.length > 0
+      ? editTeamModal.selectedTrainers.map(t => normalizeTrainer(t)).filter(Boolean).join(', ')
+      : '';
+
+    const validMembers = editTeamModal.members.filter(m => m.nombre && m.nombre.trim());
+    if (validMembers.length === 0) {
+      return showToast('El equipo debe tener al menos un integrante', 'error');
+    }
+
+    try {
+      const batch = writeBatch(db);
+      
+      // We don't delete old members from DB here to avoid data loss on mistakes, 
+      // we only UPSERT the members in the edit modal.
+      
+      const updatedMembers = validMembers.map(m => {
+        const memberId = typeof m.id === 'number' && m.id > 100000 ? m.id : Date.now() + Math.floor(Math.random() * 10000);
+        const trainerToUse = userCanAssign ? finalTrainers : (m.entrenador || finalTrainers);
+        return {
+          id: memberId,
+          nombre: m.nombre.trim(),
+          rol: m.rol === 'Capitan' ? 'Capitan' : 'Manager',
+          telefono: (m.telefono || '').trim(),
+          sede: newSede,
+          equipo: newEquipo,
+          numEquipo: newNumEquipo,
+          coordinador: newCoordinador,
+          entrenador: trainerToUse,
+          tieneEntrenador: trainerToUse ? 'Si' : 'No',
+          estado: m.estado || 'Activo',
+          llamadaFecha: m.llamadaFecha || '',
+          llamadaAsistio: m.llamadaAsistio || ''
+        };
+      });
+
+      updatedMembers.forEach(member => {
+        const docRef = doc(db, 'managers_directory', member.id.toString());
+        batch.set(docRef, member, { merge: true });
+      });
+
+      await batch.commit();
+
+      setManagers(prev => {
+        const others = prev.filter(m => {
+          const isMatch = normalizeSede(m.sede) === origSedeNorm && (m.equipo || '').trim().toUpperCase() === origEquipo;
+          return !isMatch;
+        });
+        return [...updatedMembers, ...others];
+      });
+
+    } catch(e) {
+      console.error(e);
+      return showToast('Error actualizando equipo en la nube', 'error');
+    }
+
+    recordAuditEvent({
+      action: 'EDITAR_EQUIPO_COMPLETO',
+      user: currentUser?.email || 'Usuario',
+      details: `Equipo modificado: "${origEquipo}" -> "${newEquipo}" (${newSede}) con ${validMembers.length} integrantes.`
+    });
+
+    showToast(`✅ Equipo "${newEquipo}" actualizado correctamente`, 'success');
+    setEditTeamModal(null);
+  };
+
+  // Abrir modal de edición individual
+  const handleOpenEditIndividual = (m) => {
+    setEditIndividualModal({
+      ...m,
+      rol: (m.rol || '').toLowerCase().includes('capitan') ? 'Capitan' : 'Manager',
+      selectedTrainers: parseTrainersList(m.entrenador)
+    });
+  };
+
+  // Guardar edición individual
+  const handleSaveEditIndividual = async (e) => {
+    e.preventDefault();
+    if (!editIndividualModal) return;
+    if (!editIndividualModal.nombre.trim()) return showToast('El nombre es obligatorio', 'error');
+
+    const finalTrainers = editIndividualModal.selectedTrainers && editIndividualModal.selectedTrainers.length > 0
+      ? editIndividualModal.selectedTrainers.map(t => normalizeTrainer(t)).filter(Boolean).join(', ')
+      : '';
+
+    try {
+      const trainerToUse = userCanAssign ? finalTrainers : editIndividualModal.entrenador;
+      const updatedData = {
+        nombre: editIndividualModal.nombre.trim(),
+        rol: editIndividualModal.rol || 'Manager',
+        telefono: (editIndividualModal.telefono || '').trim(),
+        sede: normalizeSede(editIndividualModal.sede),
+        equipo: (editIndividualModal.equipo || '').trim().toUpperCase(),
+        numEquipo: editIndividualModal.numEquipo ? Number(editIndividualModal.numEquipo) || editIndividualModal.numEquipo : '',
+        entrenador: trainerToUse,
+        tieneEntrenador: trainerToUse ? 'Si' : 'No',
+        coordinador: normalizeCoordinator(editIndividualModal.coordinador),
+        estado: canChangeStatus ? (editIndividualModal.estado || 'Activo') : editIndividualModal.estado
+      };
+
+      const docRef = doc(db, 'managers_directory', editIndividualModal.id.toString());
+      await setDoc(docRef, updatedData, { merge: true });
+
+      setManagers(prev => prev.map(m => m.id === editIndividualModal.id ? { ...m, ...updatedData } : m));
+    } catch(e) {
+      console.error(e);
+      return showToast('Error actualizando integrante en la nube', 'error');
+    }
+
+    recordAuditEvent({
+      action: 'EDITAR_INDIVIDUAL_MANAGER',
+      user: currentUser?.email || 'Usuario',
+      details: `Editado: ${editIndividualModal.nombre} (${editIndividualModal.rol}) - Sede: ${editIndividualModal.sede}`
+    });
+
+    showToast(`✅ Registro de ${editIndividualModal.nombre} actualizado`, 'success');
+    setEditIndividualModal(null);
+  };
+
+  // Eliminar manager individual
+  const handleDeleteManager = async (id) => {
+    try {
+      const docRef = doc(db, 'managers_directory', id.toString());
+      await deleteDoc(docRef);
+      
+      setManagers(prev => prev.filter(m => m.id !== id));
+      recordAuditEvent({
+        action: 'ELIMINAR_INTEGRANTE_MANAGER',
+        user: currentUser?.email || 'Usuario',
+        details: `Eliminado integrante ID: ${id}`
+      });
+      showToast('Integrante eliminado permanentemente', 'info');
+      setDeleteConfirm(null);
+    } catch(e) {
+      console.error(e);
+      showToast('Error eliminando de la nube', 'error');
+    }
+  };
+
+  // Eliminar equipo completo
+  const handleDeleteTeam = async (sede, equipo) => {
+    const sNorm = normalizeSede(sede);
+    const eqUpper = (equipo || '').trim().toUpperCase();
+    
+    try {
+      const toDelete = managers.filter(m => normalizeSede(m.sede) === sNorm && (m.equipo || '').trim().toUpperCase() === eqUpper);
+      if (toDelete.length > 0) {
+        const batch = writeBatch(db);
+        toDelete.forEach(m => {
+          const docRef = doc(db, 'managers_directory', m.id.toString());
+          batch.delete(docRef);
+        });
+        await batch.commit();
+      }
+
+      setManagers(prev => prev.filter(m => !(normalizeSede(m.sede) === sNorm && (m.equipo || '').trim().toUpperCase() === eqUpper)));
+      recordAuditEvent({
+        action: 'ELIMINAR_EQUIPO_COMPLETO',
+        user: currentUser?.email || 'Usuario',
+        details: `Equipo eliminado: ${eqUpper} (${sNorm})`
+      });
+      showToast(`Equipo "${eqUpper}" eliminado de la nube`, 'info');
+      setDeleteConfirm(null);
+    } catch(e) {
+      console.error(e);
+      showToast('Error eliminando equipo de la nube', 'error');
+    }
+  };
+
+  const sortedManagers = useMemo(() => {
+    if (!sortField) return filteredManagers;
+
+    return [...filteredManagers].sort((a, b) => {
+      let valA = '';
+      let valB = '';
+
+      if (sortField === 'nombre') {
+        valA = (a.nombre || '').toLowerCase();
+        valB = (b.nombre || '').toLowerCase();
+      } else if (sortField === 'sede') {
+        valA = `${a.sede || ''} ${a.equipo || ''}`.toLowerCase();
+        valB = `${b.sede || ''} ${b.equipo || ''}`.toLowerCase();
+      } else if (sortField === 'entrenador') {
+        valA = (a.entrenador || '').toLowerCase();
+        valB = (b.entrenador || '').toLowerCase();
+      } else if (sortField === 'estado') {
+        valA = (a.estado || '').toLowerCase();
+        valB = (b.estado || '').toLowerCase();
+      } else if (sortField === 'llamada') {
+        valA = `${a.llamadaAsistio || 'NO'} ${a.llamadaFecha || ''}`.toLowerCase();
+        valB = `${b.llamadaAsistio || 'NO'} ${b.llamadaFecha || ''}`.toLowerCase();
+      }
+
+      if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
+      if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }, [filteredManagers, sortField, sortDirection]);
+
+  const totalPages = Math.ceil(sortedManagers.length / PAGE_SIZE) || 1;
+  const paginatedManagers = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE;
+    return sortedManagers.slice(start, start + PAGE_SIZE);
+  }, [sortedManagers, currentPage]);
+
+  // Tema Claro Estilos
+  const bgLight = "#f8fafc";
+  const bgCard = "#ffffff";
+  const textDark = "#0f172a";
+  const textMuted = "#64748b";
+  const borderLight = "#e2e8f0";
+
+  return (
+    <div style={{ minHeight: '100vh', background: bgLight, color: textDark, paddingBottom: '4rem', fontFamily: 'Inter, system-ui, sans-serif' }}>
+      
+      {/* HEADER TEMA CLARO */}
+      <header style={{ background: bgCard, borderBottom: `1px solid ${borderLight}`, padding: '1.2rem 2rem', position: 'sticky', top: 0, zIndex: 100, boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <button onClick={() => navigate('/home')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.4rem 0.8rem', fontSize: '0.85rem', color: textDark, borderColor: borderLight }}>
+              <ArrowLeft size={16} /> Inicio
+            </button>
+            <div>
+              <h1 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#d97706', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Users size={24} /> Centro de Managers
+              </h1>
+              <p style={{ fontSize: '0.75rem', color: textMuted, margin: 0 }}>Gestión de Asignaciones y Encuentros</p>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
+            {isDualRole && (
+               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#f1f5f9', padding: '0.5rem 1rem', borderRadius: '8px' }}>
+                 <span style={{ fontSize: '0.8rem', fontWeight: 600, color: textMuted }}>Vista:</span>
+                 <button onClick={() => setViewAsTrainer(!viewAsTrainer)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', color: viewAsTrainer ? '#3b82f6' : '#64748b', fontWeight: 'bold' }}>
+                   {viewAsTrainer ? <ToggleRight size={24} color="#3b82f6" /> : <ToggleLeft size={24} />}
+                   {viewAsTrainer ? 'Entrenador' : 'Corporativo'}
+                 </button>
+               </div>
+            )}
+            <div style={{ textAlign: 'center', cursor: 'pointer' }} onClick={() => { setStatusFilter('Todos'); setCurrentPage(1); }}>
+              <div style={{ fontSize: '1.4rem', fontWeight: 800, color: statusFilter === 'Todos' ? '#b45309' : '#d97706' }}>{stats.total}</div>
+              <div style={{ fontSize: '0.65rem', color: textMuted, fontWeight: 700 }}>TOTAL</div>
+            </div>
+            <div style={{ textAlign: 'center', cursor: 'pointer' }} onClick={() => { setStatusFilter('Graduado'); setCurrentPage(1); }}>
+              <div style={{ fontSize: '1.4rem', fontWeight: 800, color: statusFilter === 'Graduado' ? '#059669' : '#10b981' }}>{stats.graduados}</div>
+              <div style={{ fontSize: '0.65rem', color: textMuted, fontWeight: 700 }}>GRADUADOS</div>
+            </div>
+            <div style={{ textAlign: 'center', cursor: 'pointer' }} onClick={() => { setStatusFilter('Activo'); setCurrentPage(1); }}>
+              <div style={{ fontSize: '1.4rem', fontWeight: 800, color: statusFilter === 'Activo' ? '#1d4ed8' : '#3b82f6' }}>{stats.activos}</div>
+              <div style={{ fontSize: '0.65rem', color: textMuted, fontWeight: 700 }}>ACTIVOS</div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* TABS */}
+      <div style={{ background: bgCard, borderBottom: `1px solid ${borderLight}`, padding: '0 2rem' }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', gap: '1.5rem', overflowX: 'auto' }}>
+          {[
+            { id: 'directorio', icon: Users, label: `Directorio (${filteredManagers.length})` },
+            { id: 'grupales', icon: Layers, label: `Grupales (${groupTeams.length})` },
+            ...(canViewAll ? [
+              { id: 'dashboard', icon: Award, label: 'Sedes' },
+              { id: 'entrenadores', icon: UserCheck, label: 'Entrenadores' }
+            ] : [])
+          ].map(t => (
+            <button key={t.id} onClick={() => setActiveTab(t.id)} style={{
+              padding: '1rem 0.5rem', border: 'none', background: 'transparent',
+              color: activeTab === t.id ? '#d97706' : textMuted,
+              borderBottom: activeTab === t.id ? '3px solid #d97706' : '3px solid transparent',
+              fontWeight: activeTab === t.id ? 700 : 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem'
+            }}>
+              <t.icon size={18} /> {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <main style={{ maxWidth: '1400px', margin: '2rem auto', padding: '0 1.5rem' }}>
+
+        {/* DIRECTORIO */}
+        {activeTab === 'directorio' && (
+          <div style={{ background: bgCard, borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', border: `1px solid ${borderLight}` }}>
+            
+            <div style={{ padding: '1.25rem 1.5rem', borderBottom: `1px solid ${borderLight}`, display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', gap: '0.75rem', flex: 1, flexWrap: 'wrap', alignItems: 'center' }}>
+                <div style={{ position: 'relative', minWidth: '240px', flex: '1 1 260px', maxWidth: '360px' }}>
+                  <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: textMuted, pointerEvents: 'none' }} />
+                  <input
+                    type="text"
+                    placeholder="Buscar manager, equipo, entrenador o sede..."
+                    value={search}
+                    onChange={e => { setSearch(e.target.value); setCurrentPage(1); }}
+                    style={{ width: '100%', boxSizing: 'border-box', padding: '0.6rem 2.2rem 0.6rem 2.4rem', borderRadius: '8px', border: `1px solid ${borderLight}`, fontSize: '0.88rem', outline: 'none', background: bgCard, color: textDark }}
+                  />
+                  {search && (
+                    <button
+                      onClick={() => { setSearch(''); setCurrentPage(1); }}
+                      style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', cursor: 'pointer', color: textMuted, padding: 0 }}
+                      title="Limpiar búsqueda"
+                    >
+                      <X size={16} />
+                    </button>
+                  )}
+                </div>
+                
+                {canViewAll && (
+                  <select value={filterSede} onChange={e => { setFilterSede(e.target.value); setCurrentPage(1); }} style={{ padding: '0.55rem 0.75rem', borderRadius: '8px', border: `1px solid ${borderLight}`, background: bgCard, color: textDark, fontSize: '0.85rem' }}>
+                    <option value="">Todas las Sedes</option>
+                    {OPERATIONAL_SEDES.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                )}
+
+                {(canViewAll || canViewOwnSede) && !viewAsTrainer && (
+                  <select value={filterEntrenador} onChange={e => { setFilterEntrenador(e.target.value); setCurrentPage(1); }} style={{ padding: '0.55rem 0.75rem', borderRadius: '8px', border: `1px solid ${borderLight}`, background: bgCard, color: textDark, fontSize: '0.85rem' }}>
+                    <option value="">Todos los Entrenadores</option>
+                    {ENTRENADORES_LIST.map(e => <option key={e} value={e}>{e}</option>)}
+                  </select>
+                )}
+
+                {/* FILTROS DE ESTADO RÁPIDOS */}
+                <div style={{ display: 'flex', gap: '0.25rem', background: '#f1f5f9', padding: '0.25rem', borderRadius: '8px', flexShrink: 0 }}>
+                  {[
+                    { id: 'Todos', label: `Todos (${stats.total})` },
+                    { id: 'Activo', label: `⚡ Activos (${stats.activos})` },
+                    { id: 'Graduado', label: `🎓 Graduados (${stats.graduados})` },
+                    { id: 'Desertor', label: `⚠️ Desertores (${stats.desertores})` },
+                  ].map(st => (
+                    <button key={st.id} onClick={() => { setStatusFilter(st.id); setCurrentPage(1); }} style={{
+                      padding: '0.4rem 0.75rem', borderRadius: '6px', border: 'none',
+                      background: statusFilter === st.id ? '#ffffff' : 'transparent',
+                      color: statusFilter === st.id ? '#0f172a' : '#64748b',
+                      fontWeight: statusFilter === st.id ? 700 : 500,
+                      boxShadow: statusFilter === st.id ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                      fontSize: '0.78rem', cursor: 'pointer', whiteSpace: 'nowrap'
+                    }}>
+                      {st.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                <button onClick={() => {
+                    setFilterSede('');
+                    setFilterEntrenador('');
+                    setStatusFilter('Todos');
+                    setSearch('');
+                    setSortField(null);
+                    setSortDirection('asc');
+                  }} title="Limpiar Filtros de Búsqueda y Ordenamiento" style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', padding: '0.55rem 0.8rem', borderRadius: '6px', border: `1px solid ${borderLight}`, background: 'transparent', color: textMuted, fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}>
+                    <RotateCcw size={14} /> Restaurar Filtros
+                  </button>
+
+                {userCanAdd && (
+                  <button onClick={() => setShowModal(true)} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.6rem 1.2rem', borderRadius: '6px', border: 'none', background: '#3b82f6', color: '#fff', fontWeight: 600, cursor: 'pointer', boxShadow: '0 2px 4px rgba(59,130,246,0.3)' }}>
+                    <Plus size={16} /> Nuevo Manager / Equipo
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
+                <thead>
+                  <tr style={{ background: '#f1f5f9', color: '#475569', borderBottom: `2px solid ${borderLight}` }}>
+                    <th 
+                      onClick={() => handleSort('nombre')} 
+                      style={{ padding: '1rem', cursor: 'pointer', userSelect: 'none', color: sortField === 'nombre' ? '#b45309' : '#475569', background: sortField === 'nombre' ? '#fef3c7' : 'transparent', transition: 'all 0.15s ease' }} 
+                      title="Ordenar por Integrante & Rol (A-Z / Z-A)"
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                        <span>Integrante & Rol</span>
+                        {sortField === 'nombre' ? (
+                          sortDirection === 'asc' ? <ArrowUp size={14} color="#b45309" /> : <ArrowDown size={14} color="#b45309" />
+                        ) : (
+                          <ArrowUpDown size={14} style={{ opacity: 0.35 }} />
+                        )}
+                      </div>
+                    </th>
+                    <th 
+                      onClick={() => handleSort('sede')} 
+                      style={{ padding: '1rem', cursor: 'pointer', userSelect: 'none', color: sortField === 'sede' ? '#b45309' : '#475569', background: sortField === 'sede' ? '#fef3c7' : 'transparent', transition: 'all 0.15s ease' }} 
+                      title="Ordenar por Sede y Equipo"
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                        <span>Sede & Equipo</span>
+                        {sortField === 'sede' ? (
+                          sortDirection === 'asc' ? <ArrowUp size={14} color="#b45309" /> : <ArrowDown size={14} color="#b45309" />
+                        ) : (
+                          <ArrowUpDown size={14} style={{ opacity: 0.35 }} />
+                        )}
+                      </div>
+                    </th>
+                    <th 
+                      onClick={() => handleSort('entrenador')} 
+                      style={{ padding: '1rem', cursor: 'pointer', userSelect: 'none', color: sortField === 'entrenador' ? '#b45309' : '#475569', background: sortField === 'entrenador' ? '#fef3c7' : 'transparent', transition: 'all 0.15s ease' }} 
+                      title="Ordenar por Entrenador(es) Asignado(s)"
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                        <span>Entrenador(es) Asignado(s)</span>
+                        {sortField === 'entrenador' ? (
+                          sortDirection === 'asc' ? <ArrowUp size={14} color="#b45309" /> : <ArrowDown size={14} color="#b45309" />
+                        ) : (
+                          <ArrowUpDown size={14} style={{ opacity: 0.35 }} />
+                        )}
+                      </div>
+                    </th>
+                    <th 
+                      onClick={() => handleSort('estado')} 
+                      style={{ padding: '1rem', cursor: 'pointer', userSelect: 'none', color: sortField === 'estado' ? '#b45309' : '#475569', background: sortField === 'estado' ? '#fef3c7' : 'transparent', transition: 'all 0.15s ease' }} 
+                      title="Ordenar por Estado (Activo / Graduado / Desertor)"
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                        <span>Estado</span>
+                        {sortField === 'estado' ? (
+                          sortDirection === 'asc' ? <ArrowUp size={14} color="#b45309" /> : <ArrowDown size={14} color="#b45309" />
+                        ) : (
+                          <ArrowUpDown size={14} style={{ opacity: 0.35 }} />
+                        )}
+                      </div>
+                    </th>
+                    <th 
+                      onClick={() => handleSort('llamada')} 
+                      style={{ padding: '1rem', textAlign: 'center', cursor: 'pointer', userSelect: 'none', color: sortField === 'llamada' ? '#b45309' : '#475569', background: sortField === 'llamada' ? '#fef3c7' : 'transparent', transition: 'all 0.15s ease' }} 
+                      title="Ordenar por Confirmación de Llamada"
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}>
+                        <span>Confirmación de Llamada</span>
+                        {sortField === 'llamada' ? (
+                          sortDirection === 'asc' ? <ArrowUp size={14} color="#b45309" /> : <ArrowDown size={14} color="#b45309" />
+                        ) : (
+                          <ArrowUpDown size={14} style={{ opacity: 0.35 }} />
+                        )}
+                      </div>
+                    </th>
+                    <th style={{ padding: '1rem', textAlign: 'center' }}>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {paginatedManagers.map(m => {
+                    const isCapitan = (m.rol || '').toLowerCase().includes('capitan');
+                    const mTrainers = m.entrenador ? m.entrenador.split(',').map(t => t.trim()) : [];
+                    return (
+                      <tr key={m.id} style={{ borderBottom: `1px solid ${borderLight}`, background: isCapitan ? '#fffdf7' : 'transparent' }}>
+                        <td style={{ padding: '1rem' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <span style={{ fontWeight: 700, color: textDark, fontSize: '0.95rem' }}>{m.nombre}</span>
+                            {isCapitan ? (
+                              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.2rem', background: '#fef3c7', color: '#b45309', border: '1px solid #fde68a', padding: '0.15rem 0.5rem', borderRadius: '12px', fontSize: '0.72rem', fontWeight: 800 }}>
+                                <Crown size={12} color="#b45309" /> Capitán
+                              </span>
+                            ) : (
+                              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.2rem', background: '#f1f5f9', color: '#475569', padding: '0.15rem 0.45rem', borderRadius: '12px', fontSize: '0.72rem', fontWeight: 600 }}>
+                                Manager
+                              </span>
+                            )}
+                          </div>
+                          <div style={{ color: textMuted, fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem', marginTop: '0.25rem' }}>
+                            {m.telefono ? (
+                              <a href={`${getWhatsAppUrl(m.telefono, m.sede || filterSede)}`} target="_blank" rel="noreferrer" style={{ color: '#10b981', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.2rem', fontWeight: 600 }}>
+                                📱 {m.telefono}
+                              </a>
+                            ) : (
+                              <span style={{ color: '#94a3b8' }}>Sin teléfono</span>
+                            )}
+                          </div>
+                        </td>
+                        <td style={{ padding: '1rem' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontWeight: 600, color: textDark }}>
+                            <CountryFlag sede={m.sede} />
+                            <span>{m.sede}</span>
+                          </div>
+                          <div style={{ fontSize: '0.8rem', color: '#475569', marginTop: '0.2rem', fontWeight: 600 }}>
+                            {m.equipo || 'Sin Equipo'} {m.numEquipo ? `(#${m.numEquipo})` : ''}
+                          </div>
+                        </td>
+                        <td style={{ padding: '1rem' }}>
+                          {mTrainers.length > 0 && mTrainers[0] !== "" ? (
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem' }}>
+                              {mTrainers.map(t => (
+                                <button
+                                  key={t}
+                                  type="button"
+                                  onClick={() => setTrainerCardModal(t)}
+                                  title={`Ver tarjeta de ${t}`}
+                                  style={{ display: 'inline-flex', alignItems: 'center', gap: '0.2rem', background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', padding: '0.2rem 0.5rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
+                                >
+                                  🎓 {t}
+                                </button>
+                              ))}
+                            </div>
+                          ) : (
+                            <span style={{ color: '#94a3b8', fontSize: '0.8rem' }}>Sin Asignar</span>
+                          )}
+                        </td>
+                        <td style={{ padding: '1rem' }}>
+                          {canChangeStatus ? (
+                            <select value={m.estado} onChange={e => handleUpdateManagerField(m.id, 'estado', e.target.value)} style={{ padding: '0.3rem', borderRadius: '4px', border: 'none', background: m.estado==='Activo'?'#dbeafe':m.estado==='Graduado'?'#dcfce7':'#fee2e2', color: m.estado==='Activo'?'#2563eb':m.estado==='Graduado'?'#16a34a':'#dc2626', fontWeight: 700, fontSize: '0.8rem', cursor: 'pointer' }}>
+                              <option value="Activo">Activo</option><option value="Graduado">Graduado</option><option value="Desertor">Desertor</option>
+                            </select>
+                          ) : (
+                             <span style={{ padding: '0.3rem 0.6rem', borderRadius: '4px', background: m.estado==='Activo'?'#dbeafe':m.estado==='Graduado'?'#dcfce7':'#fee2e2', color: m.estado==='Activo'?'#2563eb':m.estado==='Graduado'?'#16a34a':'#dc2626', fontWeight: 700, fontSize: '0.8rem' }}>{m.estado}</span>
+                          )}
+                        </td>
+                        <td style={{ padding: '1rem' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                            <input type="date" value={m.llamadaFecha || ''} onChange={e => handleUpdateLlamada(m.id, e.target.value, m.llamadaAsistio || 'SI')} style={{ padding: '0.4rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.8rem' }} />
+                            <button onClick={() => handleUpdateLlamada(m.id, m.llamadaFecha || new Date().toISOString().split('T')[0], 'SI')} style={{ padding: '0.4rem 0.6rem', borderRadius: '6px', border: '1px solid #10b981', background: m.llamadaAsistio === 'SI' ? '#10b981' : '#fff', color: m.llamadaAsistio === 'SI' ? '#fff' : '#10b981', fontWeight: 700, cursor: 'pointer' }}>SÍ</button>
+                            <button onClick={() => handleUpdateLlamada(m.id, m.llamadaFecha || new Date().toISOString().split('T')[0], 'NO')} style={{ padding: '0.4rem 0.6rem', borderRadius: '6px', border: '1px solid #ef4444', background: m.llamadaAsistio === 'NO' ? '#ef4444' : '#fff', color: m.llamadaAsistio === 'NO' ? '#fff' : '#ef4444', fontWeight: 700, cursor: 'pointer' }}>NO</button>
+                          </div>
+                        </td>
+                        <td style={{ padding: '1rem', textAlign: 'center' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}>
+                            {userCanAdd && (
+                              <button
+                                onClick={() => handleOpenEditIndividual(m)}
+                                title="Editar Integrante"
+                                style={{ background: '#f1f5f9', border: `1px solid ${borderLight}`, color: '#0f172a', padding: '0.4rem', borderRadius: '6px', cursor: 'pointer' }}
+                              >
+                                <Edit3 size={15} />
+                              </button>
+                            )}
+                            {userCanAdd && (
+                              <button
+                                onClick={() => setDeleteConfirm({ type: 'manager', id: m.id, name: m.nombre })}
+                                title="Eliminar Integrante"
+                                style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626', padding: '0.4rem', borderRadius: '6px', cursor: 'pointer' }}
+                              >
+                                <Trash2 size={15} />
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {paginatedManagers.length === 0 && (
+                    <tr><td colSpan={6} style={{ padding: '3rem', textAlign: 'center', color: textMuted }}>No hay managers en esta vista.</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            <div style={{ padding: '1rem', display: 'flex', justifyContent: 'space-between', borderTop: `1px solid ${borderLight}` }}>
+               <span style={{ fontSize: '0.85rem', color: textMuted }}>Página {currentPage} de {totalPages}</span>
+               <div style={{ display: 'flex', gap: '0.5rem' }}>
+                 <button disabled={currentPage===1} onClick={() => setCurrentPage(p=>p-1)} style={{ padding: '0.3rem 0.8rem', borderRadius: '4px', border: `1px solid ${borderLight}`, background: '#fff', cursor: 'pointer' }}>Ant</button>
+                 <button disabled={currentPage>=totalPages} onClick={() => setCurrentPage(p=>p+1)} style={{ padding: '0.3rem 0.8rem', borderRadius: '4px', border: `1px solid ${borderLight}`, background: '#fff', cursor: 'pointer' }}>Sig</button>
+               </div>
+            </div>
+          </div>
+        )}
+
+        {/* GRUPALES */}
+        {activeTab === 'grupales' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            
+            {/* KPI BAR GRUPAL */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+              <div style={{ background: bgCard, borderRadius: '12px', padding: '1.2rem', border: `1px solid ${borderLight}`, display: 'flex', alignItems: 'center', gap: '1rem', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                <div style={{ background: '#fef3c7', padding: '0.8rem', borderRadius: '10px', color: '#d97706' }}><Users size={24} /></div>
+                <div>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 800, color: textDark }}>{groupStats.totalEq}</div>
+                  <div style={{ fontSize: '0.75rem', color: textMuted, fontWeight: 600 }}>Equipos ({groupLifecycleFilter})</div>
+                </div>
+              </div>
+              <div style={{ background: bgCard, borderRadius: '12px', padding: '1.2rem', border: `1px solid ${borderLight}`, display: 'flex', alignItems: 'center', gap: '1rem', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                <div style={{ background: '#dcfce7', padding: '0.8rem', borderRadius: '10px', color: '#16a34a' }}><CheckCircle size={24} /></div>
+                <div>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#16a34a' }}>{groupStats.conLlamada} / {groupStats.totalEq}</div>
+                  <div style={{ fontSize: '0.75rem', color: textMuted, fontWeight: 600 }}>Equipos con Llamada</div>
+                </div>
+              </div>
+              <div style={{ background: bgCard, borderRadius: '12px', padding: '1.2rem', border: `1px solid ${borderLight}`, display: 'flex', alignItems: 'center', gap: '1rem', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                <div style={{ background: '#dbeafe', padding: '0.8rem', borderRadius: '10px', color: '#2563eb' }}><PhoneCall size={24} /></div>
+                <div>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#2563eb' }}>{groupStats.avgPct}%</div>
+                  <div style={{ fontSize: '0.75rem', color: textMuted, fontWeight: 600 }}>Asistencia Promedio</div>
+                </div>
+              </div>
+              <div style={{ background: bgCard, borderRadius: '12px', padding: '1.2rem', border: `1px solid ${borderLight}`, display: 'flex', alignItems: 'center', gap: '1rem', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                <div style={{ background: '#f3e8ff', padding: '0.8rem', borderRadius: '10px', color: '#7c3aed' }}><Award size={24} /></div>
+                <div>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#7c3aed' }}>{groupStats.totalAsist} / {groupStats.totalMngrs}</div>
+                  <div style={{ fontSize: '0.75rem', color: textMuted, fontWeight: 600 }}>Integrantes Conectados</div>
+                </div>
+              </div>
+            </div>
+
+            {/* BARRA DE FILTROS PARA GRUPALES */}
+            <div style={{ background: bgCard, borderRadius: '12px', padding: '1.2rem 1.5rem', border: `1px solid ${borderLight}`, display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+              <div style={{ display: 'flex', gap: '0.75rem', flex: 1, flexWrap: 'wrap', alignItems: 'center' }}>
+                <div style={{ position: 'relative', minWidth: '240px', flex: '1 1 260px', maxWidth: '360px' }}>
+                  <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: textMuted, pointerEvents: 'none' }} />
+                  <input
+                    type="text"
+                    placeholder="Buscar equipo, #, manager, coach o sede..."
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                    style={{ width: '100%', boxSizing: 'border-box', padding: '0.6rem 2.2rem 0.6rem 2.4rem', borderRadius: '8px', border: `1px solid ${borderLight}`, fontSize: '0.88rem', outline: 'none', background: bgCard, color: textDark }}
+                  />
+                  {search && (
+                    <button
+                      onClick={() => setSearch('')}
+                      style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', cursor: 'pointer', color: textMuted, padding: 0 }}
+                      title="Limpiar búsqueda"
+                    >
+                      <X size={16} />
+                    </button>
+                  )}
+                </div>
+
+                {canViewAll && (
+                  <select value={filterSede} onChange={e => setFilterSede(e.target.value)} style={{ padding: '0.55rem 0.75rem', borderRadius: '8px', border: `1px solid ${borderLight}`, background: bgCard, color: textDark, fontSize: '0.85rem' }}>
+                    <option value="">Todas las Sedes</option>
+                    {OPERATIONAL_SEDES.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                )}
+
+                {(canViewAll || canViewOwnSede) && !viewAsTrainer && (
+                  <select value={filterEntrenador} onChange={e => setFilterEntrenador(e.target.value)} style={{ padding: '0.55rem 0.75rem', borderRadius: '8px', border: `1px solid ${borderLight}`, background: bgCard, color: textDark, fontSize: '0.85rem' }}>
+                    <option value="">Todos los Entrenadores</option>
+                    {ENTRENADORES_LIST.map(e => <option key={e} value={e}>{e}</option>)}
+                  </select>
+                )}
+
+                {/* FILTRO ACTIVOS / ARCHIVO / TODOS */}
+                <div style={{ display: 'flex', gap: '0.25rem', background: '#e2e8f0', padding: '0.25rem', borderRadius: '8px', flexShrink: 0 }}>
+                  {[
+                    { id: 'Activos', label: '⚡ Activos' },
+                    { id: 'Archivo', label: '📦 Archivo' },
+                    { id: 'Todos', label: '🌐 Todos' },
+                  ].map(lf => (
+                    <button key={lf.id} onClick={() => setGroupLifecycleFilter(lf.id)} style={{
+                      padding: '0.4rem 0.75rem', borderRadius: '6px', border: 'none',
+                      background: groupLifecycleFilter === lf.id ? '#ffffff' : 'transparent',
+                      color: groupLifecycleFilter === lf.id ? '#0f172a' : '#475569',
+                      fontWeight: groupLifecycleFilter === lf.id ? 800 : 600,
+                      boxShadow: groupLifecycleFilter === lf.id ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                      fontSize: '0.78rem', cursor: 'pointer', whiteSpace: 'nowrap'
+                    }}>
+                      {lf.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* FILTROS DE ASISTENCIA GRUPAL */}
+                <div style={{ display: 'flex', gap: '0.25rem', background: '#f1f5f9', padding: '0.25rem', borderRadius: '8px' }}>
+                  {[
+                    { id: 'Todos', label: 'Todos' },
+                    { id: 'Completos', label: '🟢 100%' },
+                    { id: 'Parciales', label: '🟡 Parcial' },
+                    { id: 'Pendientes', label: '⏳ Pendiente' }
+                  ].map(st => (
+                    <button key={st.id} onClick={() => setGroupFilterStatus(st.id)} style={{
+                      padding: '0.35rem 0.65rem', borderRadius: '6px', border: 'none',
+                      background: groupFilterStatus === st.id ? '#ffffff' : 'transparent',
+                      color: groupFilterStatus === st.id ? '#0f172a' : '#64748b',
+                      fontWeight: groupFilterStatus === st.id ? 700 : 500,
+                      boxShadow: groupFilterStatus === st.id ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                      fontSize: '0.78rem', cursor: 'pointer'
+                    }}>
+                      {st.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {userCanAdd && (
+                <button
+                  onClick={() => { setShowModal(true); setAddMode('equipo'); }}
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.6rem 1.2rem', borderRadius: '8px', border: 'none', background: '#3b82f6', color: '#fff', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 4px rgba(59,130,246,0.3)', whiteSpace: 'nowrap' }}
+                >
+                  <Plus size={16} /> + Nuevo Equipo
+                </button>
+              )}
+            </div>
+
+            {/* GRILLA DE EQUIPOS */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))', gap: '1.5rem' }}>
+              {groupTeams.map((t, idx) => {
+                const statusBadgeBg = t.statusType === 'Completo' ? '#dcfce7' : t.statusType === 'Parcial' ? '#fef3c7' : t.statusType === 'Ausente' ? '#fee2e2' : '#f1f5f9';
+                const statusBadgeColor = t.statusType === 'Completo' ? '#15803d' : t.statusType === 'Parcial' ? '#b45309' : t.statusType === 'Ausente' ? '#b91c1c' : '#475569';
+                const statusText = t.statusType === 'Completo' ? `🟢 ${t.pct}% (${t.asistieron}/${t.total})` : t.statusType === 'Parcial' ? `🟡 ${t.pct}% (${t.asistieron}/${t.total})` : t.statusType === 'Ausente' ? `🔴 0% (0/${t.total})` : `⏳ Sin Registro`;
+
+                return (
+                  <div key={idx} style={{ background: bgCard, borderRadius: '12px', padding: '1.5rem', border: `1px solid ${borderLight}`, borderTop: `4px solid ${SEDE_COLORS[t.sede] || '#3b82f6'}`, boxShadow: '0 2px 5px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                    <div>
+                      {/* HEADER TARJETA */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.8rem', gap: '0.5rem' }}>
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <h3 style={{ margin: 0, color: textDark, fontSize: '1.15rem', display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 800 }}>
+                              <CountryFlag sede={t.sede} />
+                              {t.equipo} {t.numEquipo ? `(#${t.numEquipo})` : ''}
+                            </h3>
+                            {userCanAdd && (
+                              <button
+                                onClick={() => handleOpenEditTeam(t)}
+                                title="Editar Equipo y Miembros"
+                                style={{ background: '#f1f5f9', border: `1px solid ${borderLight}`, color: '#2563eb', padding: '0.25rem 0.5rem', borderRadius: '6px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}
+                              >
+                                <Edit3 size={12} /> Editar
+                              </button>
+                            )}
+                          </div>
+                          
+                          {/* LISTA DE ENTRENADORES ASIGNADOS */}
+                          <div style={{ fontSize: '0.8rem', color: textMuted, marginTop: '0.4rem', display: 'flex', flexWrap: 'wrap', gap: '0.3rem', alignItems: 'center' }}>
+                            <span style={{ fontWeight: 600 }}>Coach(es):</span>
+                            {t.entrenadoresArr.length > 0 ? (
+                              t.entrenadoresArr.map(e => (
+                                <button
+                                  key={e}
+                                  type="button"
+                                  onClick={() => setTrainerCardModal(e)}
+                                  title={`Ver tarjeta de ${e}`}
+                                  style={{ background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', padding: '0.1rem 0.4rem', borderRadius: '4px', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer' }}
+                                >
+                                  🎓 {e}
+                                </button>
+                              ))
+                            ) : (
+                              <span style={{ color: '#94a3b8' }}>Sin Asignar</span>
+                            )}
+                            <span>•</span>
+                            <span style={{ fontWeight: 600 }}>{t.sede}</span>
+                          </div>
+                        </div>
+                        <div style={{ background: statusBadgeBg, color: statusBadgeColor, padding: '0.3rem 0.7rem', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 800, whiteSpace: 'nowrap' }}>
+                          {statusText}
+                        </div>
+                      </div>
+
+                      {/* FECHA ULTIMA LLAMADA */}
+                      <div style={{ fontSize: '0.78rem', color: t.lastDate ? '#2563eb' : textMuted, background: '#f8fafc', padding: '0.4rem 0.8rem', borderRadius: '6px', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.4rem', border: `1px solid ${borderLight}` }}>
+                        <Calendar size={14} />
+                        {t.lastDate ? <span>Última llamada: <strong>{t.lastDate}</strong></span> : <span>Sin llamadas grupales registradas aún</span>}
+                      </div>
+
+                      {/* LISTA DETALLADA DE INTEGRANTES DEL EQUIPO */}
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.5rem' }}>
+                        
+                        {/* 1. CAPITANES DESTACADOS */}
+                        {t.capitanes.map(m => {
+                          const isAsistio = m.llamadaAsistio === 'SI';
+                          const isNoAsistio = m.llamadaAsistio === 'NO';
+                          return (
+                            <div key={m.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.55rem 0.8rem', background: '#fefce8', border: '1px solid #fef08a', borderRadius: '8px', fontSize: '0.85rem' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                <span style={{ background: '#fef08a', color: '#854d0e', padding: '0.1rem 0.35rem', borderRadius: '4px', fontSize: '0.68rem', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: '0.15rem' }}>
+                                  <Crown size={11} color="#854d0e" /> Capitán
+                                </span>
+                                <span style={{ fontWeight: 700, color: '#713f12' }}>{m.nombre}</span>
+                                {m.telefono && (
+                                  <a href={`${getWhatsAppUrl(m.telefono, m.sede || filterSede)}`} target="_blank" rel="noreferrer" title="Contactar por WhatsApp" style={{ color: '#10b981', textDecoration: 'none' }}>
+                                    📱
+                                  </a>
+                                )}
+                              </div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                                <button
+                                  onClick={() => handleUpdateLlamada(m.id, m.llamadaFecha || new Date().toISOString().split('T')[0], isAsistio ? 'NO' : 'SI')}
+                                  title="Clic para cambiar estado de conexión"
+                                  style={{
+                                    border: 'none', background: isAsistio ? '#10b981' : isNoAsistio ? '#ef4444' : '#e2e8f0',
+                                    color: isAsistio || isNoAsistio ? '#fff' : '#64748b',
+                                    padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer'
+                                  }}
+                                >
+                                  {isAsistio ? '✅ Conectó' : isNoAsistio ? '❌ No Conectó' : '⏳ Pendiente'}
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+
+                        {/* 2. MANAGERS DEL EQUIPO */}
+                        {t.managersOnly.map(m => {
+                          const isAsistio = m.llamadaAsistio === 'SI';
+                          const isNoAsistio = m.llamadaAsistio === 'NO';
+                          const pillBg = isAsistio ? '#ecfdf5' : isNoAsistio ? '#fef2f2' : '#f8fafc';
+                          const pillBorder = isAsistio ? '#a7f3d0' : isNoAsistio ? '#fecaca' : borderLight;
+                          const pillText = isAsistio ? '#065f46' : isNoAsistio ? '#991b1b' : textDark;
+
+                          return (
+                            <div key={m.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.5rem 0.8rem', background: pillBg, border: `1px solid ${pillBorder}`, borderRadius: '8px', fontSize: '0.85rem' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <span style={{ fontWeight: 600, color: pillText }}>{m.nombre}</span>
+                                {m.telefono && (
+                                  <a href={`${getWhatsAppUrl(m.telefono, m.sede || filterSede)}`} target="_blank" rel="noreferrer" title="Contactar por WhatsApp" style={{ color: '#10b981', textDecoration: 'none' }}>
+                                    📱
+                                  </a>
+                                )}
+                              </div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                                <button
+                                  onClick={() => handleUpdateLlamada(m.id, m.llamadaFecha || new Date().toISOString().split('T')[0], isAsistio ? 'NO' : 'SI')}
+                                  title="Clic para cambiar estado de conexión"
+                                  style={{
+                                    border: 'none', background: isAsistio ? '#10b981' : isNoAsistio ? '#ef4444' : '#e2e8f0',
+                                    color: isAsistio || isNoAsistio ? '#fff' : '#64748b',
+                                    padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer'
+                                  }}
+                                >
+                                  {isAsistio ? '✅ Conectó' : isNoAsistio ? '❌ No Conectó' : '⏳ Pendiente'}
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* BOTONES DE ACCION DEL EQUIPO */}
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <button onClick={() => openGroupModal(t)} style={{ flex: 1, padding: '0.65rem', borderRadius: '8px', border: 'none', background: '#d97706', color: '#fff', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', boxShadow: '0 2px 4px rgba(217,119,6,0.2)' }}>
+                        <PhoneCall size={16} /> Llamada Grupal
+                      </button>
+                      {userCanAdd && (
+                        <button
+                          onClick={() => setDeleteConfirm({ type: 'team', sede: t.sede, equipo: t.equipo, name: t.equipo })}
+                          title="Eliminar Equipo"
+                          style={{ padding: '0.65rem', borderRadius: '8px', border: '1px solid #fecaca', background: '#fef2f2', color: '#dc2626', cursor: 'pointer' }}
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+              {groupTeams.length === 0 && (
+                <div style={{ gridColumn: '1 / -1', padding: '3rem', textAlign: 'center', background: bgCard, borderRadius: '12px', border: `1px solid ${borderLight}`, color: textMuted }}>
+                  <Users size={32} style={{ margin: '0 auto 1rem auto', display: 'block', opacity: 0.5 }} />
+                  No hay equipos con los filtros seleccionados ({groupLifecycleFilter}).
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* SEDES */}
+        {activeTab === 'dashboard' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {/* KPI BAR SEDES */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
+              <div style={{ background: bgCard, borderRadius: '12px', padding: '1.2rem', border: `1px solid ${borderLight}`, display: 'flex', alignItems: 'center', gap: '1rem', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                <div style={{ background: '#fef3c7', padding: '0.8rem', borderRadius: '10px', color: '#d97706' }}><Award size={24} /></div>
+                <div>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 800, color: textDark }}>{sedesStats.length}</div>
+                  <div style={{ fontSize: '0.75rem', color: textMuted, fontWeight: 600 }}>Sedes Operativas</div>
+                </div>
+              </div>
+              <div style={{ background: bgCard, borderRadius: '12px', padding: '1.2rem', border: `1px solid ${borderLight}`, display: 'flex', alignItems: 'center', gap: '1rem', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                <div style={{ background: '#dbeafe', padding: '0.8rem', borderRadius: '10px', color: '#2563eb' }}><Users size={24} /></div>
+                <div>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#2563eb' }}>{stats.total}</div>
+                  <div style={{ fontSize: '0.75rem', color: textMuted, fontWeight: 600 }}>Total Managers Global</div>
+                </div>
+              </div>
+              <div style={{ background: bgCard, borderRadius: '12px', padding: '1.2rem', border: `1px solid ${borderLight}`, display: 'flex', alignItems: 'center', gap: '1rem', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+                <div style={{ background: '#dcfce7', padding: '0.8rem', borderRadius: '10px', color: '#16a34a' }}><CheckCircle size={24} /></div>
+                <div>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#16a34a' }}>{stats.graduados} ({stats.pct}%)</div>
+                  <div style={{ fontSize: '0.75rem', color: textMuted, fontWeight: 600 }}>Graduados Totales</div>
+                </div>
+              </div>
+            </div>
+
+            {/* BARRA DE BUSQUEDA SEDES */}
+            <div style={{ background: bgCard, borderRadius: '12px', padding: '1rem 1.5rem', border: `1px solid ${borderLight}`, display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+              <div style={{ position: 'relative', minWidth: '280px', flex: '1 1 280px', maxWidth: '450px' }}>
+                <Search size={16} style={{ position: 'absolute', left: '12px', top: '12px', color: textMuted }} />
+                <input
+                  type="text"
+                  placeholder="Buscar sede o entrenador..."
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  style={{ width: '100%', padding: '0.6rem 2.2rem 0.6rem 2.4rem', borderRadius: '8px', border: `1px solid ${borderLight}`, fontSize: '0.9rem', outline: 'none', background: bgCard, color: textDark }}
+                />
+                {search && (
+                  <button
+                    onClick={() => setSearch('')}
+                    style={{ position: 'absolute', right: '10px', top: '10px', background: 'transparent', border: 'none', cursor: 'pointer', color: textMuted, padding: 0 }}
+                    title="Limpiar búsqueda"
+                  >
+                    <X size={16} />
+                  </button>
+                )}
+              </div>
+              <div style={{ fontSize: '0.82rem', color: textMuted, fontWeight: 600 }}>
+                {sedesStats.length} sedes operativas registradas
+              </div>
+            </div>
+
+            {/* GRILLA DE SEDES */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '1.5rem' }}>
+              {sedesStats.map(s => (
+                <div key={s.sede} style={{ background: bgCard, borderRadius: '12px', padding: '1.5rem', border: `1px solid ${borderLight}`, borderTop: `4px solid ${SEDE_COLORS[s.sede] || '#3b82f6'}`, boxShadow: '0 2px 4px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                      <h3 style={{ margin: 0, color: textDark, fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800 }}>
+                        <CountryFlag sede={s.sede} /> {s.sede}
+                      </h3>
+                      <span style={{ background: '#f1f5f9', color: '#475569', padding: '0.2rem 0.6rem', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 800 }}>
+                        {s.total} Managers
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem', marginBottom: '1rem', textAlign: 'center' }}>
+                      <div style={{ background: '#f8fafc', padding: '0.5rem', borderRadius: '8px', border: `1px solid ${borderLight}` }}>
+                        <div style={{ fontSize: '1.1rem', fontWeight: 800, color: textDark }}>{s.totalEquipos}</div>
+                        <div style={{ fontSize: '0.7rem', color: textMuted }}>Equipos</div>
+                      </div>
+                      <div style={{ background: '#f0fdf4', padding: '0.5rem', borderRadius: '8px', border: '1px solid #bbf7d0' }}>
+                        <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#16a34a' }}>{s.activos}</div>
+                        <div style={{ fontSize: '0.7rem', color: '#16a34a' }}>Activos</div>
+                      </div>
+                      <div style={{ background: '#fef2f2', padding: '0.5rem', borderRadius: '8px', border: '1px solid #fecaca' }}>
+                        <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#dc2626' }}>{s.desertores}</div>
+                        <div style={{ fontSize: '0.7rem', color: '#dc2626' }}>Desertores</div>
+                      </div>
+                    </div>
+
+                    {s.entrenadores.length > 0 && (
+                      <div style={{ fontSize: '0.78rem', marginBottom: '1rem' }}>
+                        <span style={{ color: textMuted, fontWeight: 600 }}>Entrenadores:</span>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem', marginTop: '0.3rem' }}>
+                          {s.entrenadores.map(e => (
+                            <button
+                              key={e}
+                              type="button"
+                              onClick={() => setTrainerCardModal(e)}
+                              title={`Ver tarjeta de ${e}`}
+                              style={{ background: '#eff6ff', color: '#1d4ed8', border: 'none', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer' }}
+                            >
+                              🎓 {e}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <button
+                    onClick={() => { setFilterSede(s.sede); setActiveTab('directorio'); setCurrentPage(1); }}
+                    style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: `1px solid ${borderLight}`, background: '#f8fafc', color: textDark, fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
+                  >
+                    Ver Directorio de {s.sede} ({s.total})
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ENTRENADORES */}
+        {activeTab === 'entrenadores' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <div style={{ background: bgCard, borderRadius: '12px', padding: '1rem 1.5rem', border: `1px solid ${borderLight}`, display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+              <div style={{ position: 'relative', minWidth: '280px', flex: '1 1 280px', maxWidth: '450px' }}>
+                <Search size={16} style={{ position: 'absolute', left: '12px', top: '12px', color: textMuted }} />
+                <input
+                  type="text"
+                  placeholder="Buscar entrenador, equipo o sede..."
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  style={{ width: '100%', padding: '0.6rem 2.2rem 0.6rem 2.4rem', borderRadius: '8px', border: `1px solid ${borderLight}`, fontSize: '0.9rem', outline: 'none', background: bgCard, color: textDark }}
+                />
+                {search && (
+                  <button
+                    onClick={() => setSearch('')}
+                    style={{ position: 'absolute', right: '10px', top: '10px', background: 'transparent', border: 'none', cursor: 'pointer', color: textMuted, padding: 0 }}
+                    title="Limpiar búsqueda"
+                  >
+                    <X size={16} />
+                  </button>
+                )}
+              </div>
+              <div style={{ fontSize: '0.82rem', color: textMuted, fontWeight: 600 }}>
+                {trainersStats.length} entrenadores encontrados
+              </div>
+            </div>
+
+            {/* GRILLA DE ENTRENADORES */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '1.5rem' }}>
+              {trainersStats.map(t => (
+                <div key={t.entrenador} style={{ background: bgCard, borderRadius: '12px', padding: '1.5rem', border: `1px solid ${borderLight}`, borderTop: '4px solid #7c3aed', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.8rem' }}>
+                      <div>
+                        <h3 style={{ margin: 0, color: textDark, fontSize: '1.15rem', fontWeight: 800 }}>
+                          🎓 {t.entrenador}
+                        </h3>
+                      </div>
+                      <span style={{ background: '#f3e8ff', color: '#7c3aed', padding: '0.25rem 0.6rem', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 800 }}>
+                        {t.total} Managers
+                      </span>
+                    </div>
+
+                    <div style={{ margin: '1rem 0 0.5rem 0' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '0.3rem' }}>
+                        <span style={{ color: textMuted }}>Efectividad de Llamadas:</span>
+                        <strong style={{ color: t.pctAsist >= 70 ? '#16a34a' : '#d97706' }}>{t.pctAsist}%</strong>
+                      </div>
+                      <div style={{ background: '#f1f5f9', height: '8px', borderRadius: '4px', overflow: 'hidden' }}>
+                        <div style={{ width: `${t.pctAsist}%`, height: '100%', background: t.pctAsist >= 70 ? '#10b981' : '#f59e0b', borderRadius: '4px', transition: 'width 0.4s ease' }} />
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem', margin: '1rem 0', textAlign: 'center' }}>
+                      <div style={{ background: '#f8fafc', padding: '0.5rem 0.3rem', borderRadius: '8px', border: `1px solid ${borderLight}` }}>
+                        <div style={{ fontSize: '1.05rem', fontWeight: 800, color: textDark }}>{t.equipos.length}</div>
+                        <div style={{ fontSize: '0.68rem', color: textMuted }}>Equipos</div>
+                      </div>
+                      <div style={{ background: '#f0fdf4', padding: '0.5rem 0.3rem', borderRadius: '8px', border: '1px solid #bbf7d0' }}>
+                        <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#16a34a' }}>{t.asistieron}</div>
+                        <div style={{ fontSize: '0.68rem', color: '#16a34a' }}>Conectaron</div>
+                      </div>
+                      <div style={{ background: '#fef2f2', padding: '0.5rem 0.3rem', borderRadius: '8px', border: '1px solid #fecaca' }}>
+                        <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#dc2626' }}>{t.noAsistieron}</div>
+                        <div style={{ fontSize: '0.68rem', color: '#dc2626' }}>Ausentes</div>
+                      </div>
+                    </div>
+
+                    {t.equipos.length > 0 && (
+                      <div style={{ fontSize: '0.78rem', marginBottom: '1rem' }}>
+                        <span style={{ color: textMuted, fontWeight: 600 }}>Equipos a cargo:</span>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem', marginTop: '0.3rem' }}>
+                          {t.equipos.map(eq => (
+                            <span key={eq} style={{ background: '#f1f5f9', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.72rem', color: '#334155', fontWeight: 500 }}>
+                              {eq}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem', borderTop: `1px solid ${borderLight}`, paddingTop: '1rem' }}>
+                    <button
+                      onClick={() => { setFilterEntrenador(t.entrenador); setActiveTab('directorio'); setCurrentPage(1); }}
+                      style={{ flex: 1, padding: '0.5rem', borderRadius: '6px', border: `1px solid ${borderLight}`, background: '#fff', color: textDark, fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem' }}
+                    >
+                      <Users size={14} /> Managers ({t.total})
+                    </button>
+                    <button
+                      onClick={() => { setFilterEntrenador(t.entrenador); setActiveTab('grupales'); }}
+                      style={{ flex: 1, padding: '0.5rem', borderRadius: '6px', border: 'none', background: '#7c3aed', color: '#fff', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem' }}
+                    >
+                      <Layers size={14} /> Equipos ({t.equipos.length})
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+      </main>
+
+      {/* ======================================================== */}
+      {/* MODAL MULTI-PROPÓSITO: NUEVO INTEGRANTE O EQUIPO COMPLETO */}
+      {/* ======================================================== */}
+      {showModal && userCanAdd && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(3px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+          <div style={{ background: bgCard, width: '100%', maxWidth: '680px', borderRadius: '16px', padding: '2rem', boxShadow: '0 25px 30px -5px rgba(0,0,0,0.2)', border: `1px solid ${borderLight}`, maxHeight: '90vh', overflowY: 'auto' }}>
+            
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.2rem' }}>
+              <h2 style={{ margin: 0, color: textDark, fontSize: '1.3rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <PlusCircle size={22} color="#3b82f6" /> Crear Nuevo Registro
+              </h2>
+              <button onClick={() => setShowModal(false)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: textMuted }}>
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* SELECTOR DE MODO: INDIVIDUAL VS EQUIPO COMPLETO */}
+            <div style={{ display: 'flex', gap: '0.5rem', background: '#f1f5f9', padding: '0.3rem', borderRadius: '10px', marginBottom: '1.5rem' }}>
+              <button
+                type="button"
+                onClick={() => setAddMode('individual')}
+                style={{
+                  flex: 1, padding: '0.6rem', borderRadius: '8px', border: 'none',
+                  background: addMode === 'individual' ? '#ffffff' : 'transparent',
+                  color: addMode === 'individual' ? '#2563eb' : '#64748b',
+                  fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer',
+                  boxShadow: addMode === 'individual' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem'
+                }}
+              >
+                <Users size={16} /> 👤 Integrante Individual (Manager / Capitán)
+              </button>
+              <button
+                type="button"
+                onClick={() => setAddMode('equipo')}
+                style={{
+                  flex: 1, padding: '0.6rem', borderRadius: '8px', border: 'none',
+                  background: addMode === 'equipo' ? '#ffffff' : 'transparent',
+                  color: addMode === 'equipo' ? '#2563eb' : '#64748b',
+                  fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer',
+                  boxShadow: addMode === 'equipo' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem'
+                }}
+              >
+                <Shield size={16} /> 🛡️ Equipo Completo (Capitán + Managers)
+              </button>
+            </div>
+
+            {/* FORMULARIO 1: INDIVIDUAL */}
+            {addMode === 'individual' && (
+              <form onSubmit={handleSaveNewManager} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1rem' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.3rem' }}>
+                      Nombre Completo *
+                    </label>
+                    <input
+                      required
+                      placeholder="Ej: Juan Pérez"
+                      value={newManager.nombre}
+                      onChange={e => setNewManager({ ...newManager, nombre: e.target.value })}
+                      style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: `1px solid ${borderLight}`, fontSize: '0.9rem' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.3rem' }}>
+                      Rol en el Equipo
+                    </label>
+                    <select
+                      value={newManager.rol}
+                      onChange={e => setNewManager({ ...newManager, rol: e.target.value })}
+                      style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: `1px solid ${borderLight}`, fontSize: '0.9rem', fontWeight: 600 }}
+                    >
+                      <option value="Manager">Manager</option>
+                      <option value="Capitan">👑 Capitán</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.3rem' }}>
+                      Teléfono WhatsApp
+                    </label>
+                    <input
+                      placeholder="Ej: +593 99 123 4567"
+                      value={newManager.telefono}
+                      onChange={e => setNewManager({ ...newManager, telefono: e.target.value })}
+                      style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: `1px solid ${borderLight}`, fontSize: '0.9rem' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.3rem' }}>
+                      Sede
+                    </label>
+                    <select
+                      value={newManager.sede}
+                      onChange={e => setNewManager({ ...newManager, sede: e.target.value })}
+                      style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: `1px solid ${borderLight}`, fontSize: '0.9rem' }}
+                    >
+                      {OPERATIONAL_SEDES.map(s => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1rem' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.3rem' }}>
+                      Nombre de Equipo
+                    </label>
+                    <input
+                      placeholder="Ej: FENIX, ALFA, TITANES..."
+                      value={newManager.equipo}
+                      onChange={e => setNewManager({ ...newManager, equipo: e.target.value })}
+                      style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: `1px solid ${borderLight}`, fontSize: '0.9rem' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.3rem' }}>
+                      # Número
+                    </label>
+                    <input
+                      placeholder="Ej: 1, 2, 4..."
+                      value={newManager.numEquipo}
+                      onChange={e => setNewManager({ ...newManager, numEquipo: e.target.value })}
+                      style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: `1px solid ${borderLight}`, fontSize: '0.9rem' }}
+                    />
+                  </div>
+                </div>
+
+                {/* SELECTOR DE MULTI-ENTRENADORES */}
+                <div style={{ border: `1px solid ${borderLight}`, borderRadius: '10px', padding: '0.8rem', background: '#f8fafc' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                    <label style={{ fontSize: '0.8rem', fontWeight: 700, color: textDark }}>
+                      🎓 Entrenador(es) Asignado(s)
+                    </label>
+                    {!userCanAssign && (
+                      <span style={{ fontSize: '0.72rem', color: '#b45309', display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
+                        <Lock size={12} /> Requiere permiso de Fer / Paul / SuperAdmin
+                      </span>
+                    )}
+                  </div>
+                  {userCanAssign ? (
+                    <div style={{ maxHeight: '140px', overflowY: 'auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '0.4rem' }}>
+                      {ENTRENADORES_LIST.map(e => {
+                        const isSelected = (newManager.selectedTrainers || []).includes(e);
+                        return (
+                          <button
+                            type="button"
+                            key={e}
+                            onClick={() => {
+                              const current = newManager.selectedTrainers || [];
+                              const updated = isSelected ? current.filter(t => t !== e) : [...current, e];
+                              setNewManager({ ...newManager, selectedTrainers: updated });
+                            }}
+                            style={{
+                              display: 'flex', alignItems: 'center', gap: '0.4rem',
+                              padding: '0.4rem 0.6rem', borderRadius: '6px',
+                              border: `1px solid ${isSelected ? '#3b82f6' : '#cbd5e1'}`,
+                              background: isSelected ? '#eff6ff' : '#ffffff',
+                              color: isSelected ? '#1d4ed8' : textDark,
+                              fontSize: '0.78rem', fontWeight: isSelected ? 700 : 500,
+                              cursor: 'pointer', textAlign: 'left'
+                            }}
+                          >
+                            {isSelected ? <CheckSquare size={14} color="#2563eb" /> : <Square size={14} color="#94a3b8" />}
+                            <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{e}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div style={{ color: textMuted, fontSize: '0.82rem' }}>
+                      {newManager.selectedTrainers?.length > 0 ? newManager.selectedTrainers.join(', ') : 'Sin Asignar'}
+                    </div>
+                  )}
+                </div>
+
+                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '1rem' }}>
+                  <button type="button" onClick={() => setShowModal(false)} style={{ padding: '0.6rem 1.2rem', borderRadius: '8px', border: `1px solid ${borderLight}`, background: '#fff', color: textDark, fontWeight: 600, cursor: 'pointer' }}>Cancelar</button>
+                  <button type="submit" style={{ padding: '0.6rem 1.5rem', borderRadius: '8px', border: 'none', background: '#3b82f6', color: '#fff', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 4px rgba(59,130,246,0.3)' }}>Guardar Integrante</button>
+                </div>
+              </form>
+            )}
+
+            {/* FORMULARIO 2: EQUIPO COMPLETO */}
+            {addMode === 'equipo' && (
+              <form onSubmit={handleSaveNewTeam} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr 1fr', gap: '0.8rem' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.3rem' }}>
+                      Sede *
+                    </label>
+                    <select
+                      value={newTeam.sede}
+                      onChange={e => setNewTeam({ ...newTeam, sede: e.target.value })}
+                      style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: `1px solid ${borderLight}`, fontSize: '0.9rem' }}
+                    >
+                      {OPERATIONAL_SEDES.map(s => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.3rem' }}>
+                      Nombre del Equipo *
+                    </label>
+                    <input
+                      required
+                      placeholder="Ej: TITANES, FENIX, IMPARABLES..."
+                      value={newTeam.equipo}
+                      onChange={e => setNewTeam({ ...newTeam, equipo: e.target.value })}
+                      style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: `1px solid ${borderLight}`, fontSize: '0.9rem', fontWeight: 700 }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.3rem' }}>
+                      # Número
+                    </label>
+                    <input
+                      placeholder="Ej: 1"
+                      value={newTeam.numEquipo}
+                      onChange={e => setNewTeam({ ...newTeam, numEquipo: e.target.value })}
+                      style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: `1px solid ${borderLight}`, fontSize: '0.9rem' }}
+                    />
+                  </div>
+                </div>
+
+                {/* SELECTOR MULTI-COACH PARA EQUIPO */}
+                <div style={{ border: `1px solid ${borderLight}`, borderRadius: '10px', padding: '0.8rem', background: '#f8fafc' }}>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.4rem' }}>
+                    🎓 Entrenador(es) Asignado(s) al Equipo
+                  </label>
+                  {userCanAssign ? (
+                    <div style={{ maxHeight: '130px', overflowY: 'auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '0.4rem' }}>
+                      {ENTRENADORES_LIST.map(e => {
+                        const isSelected = (newTeam.selectedTrainers || []).includes(e);
+                        return (
+                          <button
+                            type="button"
+                            key={e}
+                            onClick={() => {
+                              const current = newTeam.selectedTrainers || [];
+                              const updated = isSelected ? current.filter(t => t !== e) : [...current, e];
+                              setNewTeam({ ...newTeam, selectedTrainers: updated });
+                            }}
+                            style={{
+                              display: 'flex', alignItems: 'center', gap: '0.4rem',
+                              padding: '0.4rem 0.6rem', borderRadius: '6px',
+                              border: `1px solid ${isSelected ? '#3b82f6' : '#cbd5e1'}`,
+                              background: isSelected ? '#eff6ff' : '#ffffff',
+                              color: isSelected ? '#1d4ed8' : textDark,
+                              fontSize: '0.78rem', fontWeight: isSelected ? 700 : 500,
+                              cursor: 'pointer', textAlign: 'left'
+                            }}
+                          >
+                            {isSelected ? <CheckSquare size={14} color="#2563eb" /> : <Square size={14} color="#94a3b8" />}
+                            <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{e}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div style={{ color: textMuted, fontSize: '0.82rem' }}>
+                      {newTeam.selectedTrainers?.length > 0 ? newTeam.selectedTrainers.join(', ') : 'Sin Asignar'}
+                    </div>
+                  )}
+                </div>
+
+                {/* CAPITÁN DEL EQUIPO */}
+                <div style={{ background: '#fefce8', border: '1px solid #fef08a', borderRadius: '10px', padding: '1rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.6rem' }}>
+                    <Crown size={16} color="#854d0e" />
+                    <span style={{ fontSize: '0.85rem', fontWeight: 800, color: '#854d0e' }}>Capitán del Equipo</span>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '0.8rem' }}>
+                    <input
+                      placeholder="Nombre del Capitán"
+                      value={newTeam.capitan.nombre}
+                      onChange={e => setNewTeam({ ...newTeam, capitan: { ...newTeam.capitan, nombre: e.target.value } })}
+                      style={{ padding: '0.55rem', borderRadius: '6px', border: '1px solid #fde047', fontSize: '0.85rem', background: '#fff' }}
+                    />
+                    <input
+                      placeholder="Teléfono Capitán"
+                      value={newTeam.capitan.telefono}
+                      onChange={e => setNewTeam({ ...newTeam, capitan: { ...newTeam.capitan, telefono: e.target.value } })}
+                      style={{ padding: '0.55rem', borderRadius: '6px', border: '1px solid #fde047', fontSize: '0.85rem', background: '#fff' }}
+                    />
+                  </div>
+                </div>
+
+                {/* LISTA DINÁMICA DE MANAGERS DEL EQUIPO */}
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
+                    <label style={{ fontSize: '0.85rem', fontWeight: 700, color: textDark }}>
+                      Managers del Equipo ({newTeam.managers.length})
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setNewTeam({
+                        ...newTeam,
+                        managers: [...newTeam.managers, { id: Date.now() + Math.random(), nombre: '', telefono: '' }]
+                      })}
+                      style={{ background: '#ecfdf5', border: '1px solid #a7f3d0', color: '#059669', fontSize: '0.78rem', fontWeight: 700, padding: '0.3rem 0.6rem', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
+                    >
+                      <UserPlus size={14} /> + Agregar Manager
+                    </button>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '180px', overflowY: 'auto' }}>
+                    {newTeam.managers.map((m, idx) => (
+                      <div key={m.id || idx} style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr auto', gap: '0.5rem', alignItems: 'center' }}>
+                        <input
+                          placeholder={`Manager #${idx + 1}`}
+                          value={m.nombre}
+                          onChange={e => {
+                            const updated = [...newTeam.managers];
+                            updated[idx].nombre = e.target.value;
+                            setNewTeam({ ...newTeam, managers: updated });
+                          }}
+                          style={{ padding: '0.5rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.85rem' }}
+                        />
+                        <input
+                          placeholder="Teléfono"
+                          value={m.telefono}
+                          onChange={e => {
+                            const updated = [...newTeam.managers];
+                            updated[idx].telefono = e.target.value;
+                            setNewTeam({ ...newTeam, managers: updated });
+                          }}
+                          style={{ padding: '0.5rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.85rem' }}
+                        />
+                        {newTeam.managers.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const updated = newTeam.managers.filter((_, i) => i !== idx);
+                              setNewTeam({ ...newTeam, managers: updated });
+                            }}
+                            style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626', padding: '0.45rem', borderRadius: '6px', cursor: 'pointer' }}
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '1rem' }}>
+                  <button type="button" onClick={() => setShowModal(false)} style={{ padding: '0.6rem 1.2rem', borderRadius: '8px', border: `1px solid ${borderLight}`, background: '#fff', color: textDark, fontWeight: 600, cursor: 'pointer' }}>Cancelar</button>
+                  <button type="submit" style={{ padding: '0.6rem 1.5rem', borderRadius: '8px', border: 'none', background: '#3b82f6', color: '#fff', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 4px rgba(59,130,246,0.3)' }}>Guardar Equipo Completo</button>
+                </div>
+              </form>
+            )}
+
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* MODAL EDITAR EQUIPO COMPLETO Y SUS INTEGRANTES           */}
+      {/* ======================================================== */}
+      {editTeamModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(3px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+          <div style={{ background: bgCard, width: '100%', maxWidth: '720px', borderRadius: '16px', padding: '2rem', boxShadow: '0 25px 30px -5px rgba(0,0,0,0.2)', border: `1px solid ${borderLight}`, maxHeight: '90vh', overflowY: 'auto' }}>
+            
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.2rem' }}>
+              <div>
+                <h2 style={{ margin: 0, color: textDark, fontSize: '1.3rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <Edit3 size={22} color="#3b82f6" /> Editar Equipo: {editTeamModal.originalEquipo}
+                </h2>
+                <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: textMuted }}>
+                  Sede: {editTeamModal.originalSede} • {editTeamModal.members.length} integrantes
+                </p>
+              </div>
+              <button onClick={() => setEditTeamModal(null)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: textMuted }}>
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEditTeam} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr 1fr', gap: '0.8rem' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.3rem' }}>
+                    Sede
+                  </label>
+                  <select
+                    value={editTeamModal.sede}
+                    onChange={e => setEditTeamModal({ ...editTeamModal, sede: e.target.value })}
+                    style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: `1px solid ${borderLight}`, fontSize: '0.9rem' }}
+                  >
+                    {OPERATIONAL_SEDES.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.3rem' }}>
+                    Nombre del Equipo *
+                  </label>
+                  <input
+                    required
+                    value={editTeamModal.equipo}
+                    onChange={e => setEditTeamModal({ ...editTeamModal, equipo: e.target.value })}
+                    style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: `1px solid ${borderLight}`, fontSize: '0.9rem', fontWeight: 700 }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.3rem' }}>
+                    # Número
+                  </label>
+                  <input
+                    value={editTeamModal.numEquipo}
+                    onChange={e => setEditTeamModal({ ...editTeamModal, numEquipo: e.target.value })}
+                    style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: `1px solid ${borderLight}`, fontSize: '0.9rem' }}
+                  />
+                </div>
+              </div>
+
+              {/* ASIGNACIÓN DE MULTI-ENTRENADORES */}
+              <div style={{ border: `1px solid ${borderLight}`, borderRadius: '10px', padding: '0.8rem', background: '#f8fafc' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+                  <label style={{ fontSize: '0.8rem', fontWeight: 700, color: textDark }}>
+                    🎓 Entrenador(es) Asignado(s) al Equipo
+                  </label>
+                  {!userCanAssign && (
+                    <span style={{ fontSize: '0.72rem', color: '#b45309', display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
+                      <Lock size={12} /> Solo Fer, Paul y SuperAdmin pueden reasignar
+                    </span>
+                  )}
+                </div>
+                {userCanAssign ? (
+                  <div style={{ maxHeight: '130px', overflowY: 'auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '0.4rem' }}>
+                    {ENTRENADORES_LIST.map(e => {
+                      const isSelected = (editTeamModal.selectedTrainers || []).includes(e);
+                      return (
+                        <button
+                          type="button"
+                          key={e}
+                          onClick={() => {
+                            const current = editTeamModal.selectedTrainers || [];
+                            const updated = isSelected ? current.filter(t => t !== e) : [...current, e];
+                            setEditTeamModal({ ...editTeamModal, selectedTrainers: updated });
+                          }}
+                          style={{
+                            display: 'flex', alignItems: 'center', gap: '0.4rem',
+                            padding: '0.4rem 0.6rem', borderRadius: '6px',
+                            border: `1px solid ${isSelected ? '#3b82f6' : '#cbd5e1'}`,
+                            background: isSelected ? '#eff6ff' : '#ffffff',
+                            color: isSelected ? '#1d4ed8' : textDark,
+                            fontSize: '0.78rem', fontWeight: isSelected ? 700 : 500,
+                            cursor: 'pointer', textAlign: 'left'
+                          }}
+                        >
+                          {isSelected ? <CheckSquare size={14} color="#2563eb" /> : <Square size={14} color="#94a3b8" />}
+                          <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{e}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div style={{ color: textMuted, fontSize: '0.82rem' }}>
+                    {editTeamModal.selectedTrainers?.length > 0 ? editTeamModal.selectedTrainers.join(', ') : 'Sin Asignar'}
+                  </div>
+                )}
+              </div>
+
+              {/* GESTION DE INTEGRANTES DEL EQUIPO (EDITAR ROL / NOMBRE / TELÉFONO / AGREGAR / REMOVER) */}
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
+                  <label style={{ fontSize: '0.85rem', fontWeight: 800, color: textDark }}>
+                    Roster de Integrantes ({editTeamModal.members.length})
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setEditTeamModal({
+                      ...editTeamModal,
+                      members: [...editTeamModal.members, { id: Date.now() + Math.random(), nombre: '', rol: 'Manager', telefono: '', estado: 'Activo' }]
+                    })}
+                    style={{ background: '#eff6ff', border: '1px solid #bfdbfe', color: '#1d4ed8', fontSize: '0.78rem', fontWeight: 700, padding: '0.3rem 0.6rem', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
+                  >
+                    <UserPlus size={14} /> + Agregar Integrante
+                  </button>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', maxHeight: '240px', overflowY: 'auto', paddingRight: '4px' }}>
+                  {editTeamModal.members.map((m, idx) => {
+                    const isCap = m.rol === 'Capitan';
+                    return (
+                      <div key={m.id || idx} style={{ display: 'grid', gridTemplateColumns: '120px 1.5fr 1fr auto', gap: '0.5rem', alignItems: 'center', background: isCap ? '#fefce8' : '#f8fafc', padding: '0.4rem 0.6rem', borderRadius: '8px', border: `1px solid ${isCap ? '#fef08a' : borderLight}` }}>
+                        <select
+                          value={m.rol}
+                          onChange={e => {
+                            const updated = [...editTeamModal.members];
+                            updated[idx].rol = e.target.value;
+                            setEditTeamModal({ ...editTeamModal, members: updated });
+                          }}
+                          style={{ padding: '0.45rem', borderRadius: '6px', border: `1px solid ${isCap ? '#fde047' : borderLight}`, fontSize: '0.78rem', fontWeight: isCap ? 800 : 600, color: isCap ? '#854d0e' : textDark, background: '#fff' }}
+                        >
+                          <option value="Manager">Manager</option>
+                          <option value="Capitan">👑 Capitán</option>
+                        </select>
+                        <input
+                          placeholder="Nombre Completo"
+                          value={m.nombre}
+                          onChange={e => {
+                            const updated = [...editTeamModal.members];
+                            updated[idx].nombre = e.target.value;
+                            setEditTeamModal({ ...editTeamModal, members: updated });
+                          }}
+                          style={{ padding: '0.45rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.85rem', fontWeight: 600 }}
+                        />
+                        <input
+                          placeholder="Teléfono"
+                          value={m.telefono}
+                          onChange={e => {
+                            const updated = [...editTeamModal.members];
+                            updated[idx].telefono = e.target.value;
+                            setEditTeamModal({ ...editTeamModal, members: updated });
+                          }}
+                          style={{ padding: '0.45rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.85rem' }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updated = editTeamModal.members.filter((_, i) => i !== idx);
+                            setEditTeamModal({ ...editTeamModal, members: updated });
+                          }}
+                          title="Eliminar del equipo"
+                          style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626', padding: '0.45rem', borderRadius: '6px', cursor: 'pointer' }}
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '1rem' }}>
+                <button type="button" onClick={() => setEditTeamModal(null)} style={{ padding: '0.6rem 1.2rem', borderRadius: '8px', border: `1px solid ${borderLight}`, background: '#fff', color: textDark, fontWeight: 600, cursor: 'pointer' }}>Cancelar</button>
+                <button type="submit" style={{ padding: '0.6rem 1.5rem', borderRadius: '8px', border: 'none', background: '#3b82f6', color: '#fff', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 4px rgba(59,130,246,0.3)' }}>Guardar Cambios del Equipo</button>
+              </div>
+            </form>
+
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* MODAL EDITAR INTEGRANTE INDIVIDUAL                       */}
+      {/* ======================================================== */}
+      {editIndividualModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(3px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+          <div style={{ background: bgCard, width: '100%', maxWidth: '600px', borderRadius: '16px', padding: '2rem', boxShadow: '0 25px 30px -5px rgba(0,0,0,0.2)', border: `1px solid ${borderLight}`, maxHeight: '90vh', overflowY: 'auto' }}>
+            
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.2rem' }}>
+              <h2 style={{ margin: 0, color: textDark, fontSize: '1.25rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Edit3 size={20} color="#3b82f6" /> Editar Integrante: {editIndividualModal.nombre}
+              </h2>
+              <button onClick={() => setEditIndividualModal(null)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: textMuted }}>
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEditIndividual} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1rem' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.3rem' }}>
+                    Nombre Completo *
+                  </label>
+                  <input
+                    required
+                    value={editIndividualModal.nombre}
+                    onChange={e => setEditIndividualModal({ ...editIndividualModal, nombre: e.target.value })}
+                    style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: `1px solid ${borderLight}`, fontSize: '0.9rem' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.3rem' }}>
+                    Rol
+                  </label>
+                  <select
+                    value={editIndividualModal.rol}
+                    onChange={e => setEditIndividualModal({ ...editIndividualModal, rol: e.target.value })}
+                    style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: `1px solid ${borderLight}`, fontSize: '0.9rem', fontWeight: 600 }}
+                  >
+                    <option value="Manager">Manager</option>
+                    <option value="Capitan">👑 Capitán</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.3rem' }}>
+                    Teléfono WhatsApp
+                  </label>
+                  <input
+                    value={editIndividualModal.telefono || ''}
+                    onChange={e => setEditIndividualModal({ ...editIndividualModal, telefono: e.target.value })}
+                    style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: `1px solid ${borderLight}`, fontSize: '0.9rem' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.3rem' }}>
+                    Sede
+                  </label>
+                  <select
+                    value={editIndividualModal.sede}
+                    onChange={e => setEditIndividualModal({ ...editIndividualModal, sede: e.target.value })}
+                    style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: `1px solid ${borderLight}`, fontSize: '0.9rem' }}
+                  >
+                    {OPERATIONAL_SEDES.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '1rem' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.3rem' }}>
+                    Equipo
+                  </label>
+                  <input
+                    value={editIndividualModal.equipo || ''}
+                    onChange={e => setEditIndividualModal({ ...editIndividualModal, equipo: e.target.value })}
+                    style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: `1px solid ${borderLight}`, fontSize: '0.9rem' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.3rem' }}>
+                    # Número
+                  </label>
+                  <input
+                    value={editIndividualModal.numEquipo || ''}
+                    onChange={e => setEditIndividualModal({ ...editIndividualModal, numEquipo: e.target.value })}
+                    style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: `1px solid ${borderLight}`, fontSize: '0.9rem' }}
+                  />
+                </div>
+              </div>
+
+              {/* ASIGNACIÓN DE MULTI-ENTRENADOR */}
+              <div style={{ border: `1px solid ${borderLight}`, borderRadius: '10px', padding: '0.8rem', background: '#f8fafc' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+                  <label style={{ fontSize: '0.8rem', fontWeight: 700, color: textDark }}>
+                    🎓 Entrenador(es) Asignado(s)
+                  </label>
+                  {!userCanAssign && (
+                    <span style={{ fontSize: '0.72rem', color: '#b45309', display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
+                      <Lock size={12} /> Requiere permiso de Fer / Paul / SuperAdmin
+                    </span>
+                  )}
+                </div>
+                {userCanAssign ? (
+                  <div style={{ maxHeight: '130px', overflowY: 'auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '0.4rem' }}>
+                    {ENTRENADORES_LIST.map(e => {
+                      const isSelected = (editIndividualModal.selectedTrainers || []).includes(e);
+                      return (
+                        <button
+                          type="button"
+                          key={e}
+                          onClick={() => {
+                            const current = editIndividualModal.selectedTrainers || [];
+                            const updated = isSelected ? current.filter(t => t !== e) : [...current, e];
+                            setEditIndividualModal({ ...editIndividualModal, selectedTrainers: updated });
+                          }}
+                          style={{
+                            display: 'flex', alignItems: 'center', gap: '0.4rem',
+                            padding: '0.4rem 0.6rem', borderRadius: '6px',
+                            border: `1px solid ${isSelected ? '#3b82f6' : '#cbd5e1'}`,
+                            background: isSelected ? '#eff6ff' : '#ffffff',
+                            color: isSelected ? '#1d4ed8' : textDark,
+                            fontSize: '0.78rem', fontWeight: isSelected ? 700 : 500,
+                            cursor: 'pointer', textAlign: 'left'
+                          }}
+                        >
+                          {isSelected ? <CheckSquare size={14} color="#2563eb" /> : <Square size={14} color="#94a3b8" />}
+                          <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{e}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div style={{ color: textMuted, fontSize: '0.82rem' }}>
+                    {editIndividualModal.selectedTrainers?.length > 0 ? editIndividualModal.selectedTrainers.join(', ') : 'Sin Asignar'}
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
+                  <label style={{ fontSize: '0.8rem', fontWeight: 700, color: textDark }}>
+                    Estado (Graduación / Deserción)
+                  </label>
+                  {!canChangeStatus && (
+                    <span style={{ fontSize: '0.72rem', color: '#dc2626', display: 'flex', alignItems: 'center', gap: '0.2rem', fontWeight: 600 }}>
+                      <Lock size={12} /> Restringido a Coord. Maestría y Dirección
+                    </span>
+                  )}
+                </div>
+                {canChangeStatus ? (
+                  <select
+                    value={editIndividualModal.estado || 'Activo'}
+                    onChange={e => setEditIndividualModal({ ...editIndividualModal, estado: e.target.value })}
+                    style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: `1px solid ${borderLight}`, fontSize: '0.9rem', fontWeight: 600 }}
+                  >
+                    <option value="Activo">⚡ Activo</option>
+                    <option value="Graduado">🎓 Graduado</option>
+                    <option value="Desertor">⚠️ Desertor</option>
+                    <option value="Archivado">📦 Archivado</option>
+                  </select>
+                ) : (
+                  <div style={{ padding: '0.6rem 0.8rem', borderRadius: '8px', background: '#f8fafc', border: `1px solid ${borderLight}`, color: '#64748b', fontSize: '0.88rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <Lock size={14} color="#dc2626" />
+                    <span>{editIndividualModal.estado || 'Activo'}</span>
+                    <span style={{ fontSize: '0.75rem', color: '#94a3b8', marginLeft: 'auto' }}>Solo Lectura</span>
+                  </div>
+                )}
+              </div>
+
+              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '1rem' }}>
+                <button type="button" onClick={() => setEditIndividualModal(null)} style={{ padding: '0.6rem 1.2rem', borderRadius: '8px', border: `1px solid ${borderLight}`, background: '#fff', color: textDark, fontWeight: 600, cursor: 'pointer' }}>Cancelar</button>
+                <button type="submit" style={{ padding: '0.6rem 1.5rem', borderRadius: '8px', border: 'none', background: '#3b82f6', color: '#fff', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 4px rgba(59,130,246,0.3)' }}>Guardar Cambios</button>
+              </div>
+            </form>
+
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* MODAL CONFIRMACIÓN DE ELIMINACIÓN                        */}
+      {/* ======================================================== */}
+      {deleteConfirm && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(3px)', zIndex: 1100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+          <div style={{ background: bgCard, width: '100%', maxWidth: '440px', borderRadius: '16px', padding: '2rem', boxShadow: '0 25px 30px -5px rgba(0,0,0,0.2)', border: `1px solid ${borderLight}`, textAlign: 'center' }}>
+            <div style={{ background: '#fef2f2', width: '56px', height: '56px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem auto' }}>
+              <AlertTriangle size={28} color="#dc2626" />
+            </div>
+            <h3 style={{ margin: '0 0 0.5rem 0', color: textDark, fontSize: '1.2rem', fontWeight: 800 }}>
+              ¿Confirmar Eliminación?
+            </h3>
+            <p style={{ color: textMuted, fontSize: '0.88rem', margin: '0 0 1.5rem 0' }}>
+              {deleteConfirm.type === 'team'
+                ? `¿Estás seguro de que deseas eliminar el equipo "${deleteConfirm.name}" y a todos sus integrantes de ${deleteConfirm.sede}?`
+                : `¿Estás seguro de que deseas eliminar a "${deleteConfirm.name}"?`}
+            </p>
+            <div style={{ display: 'flex', gap: '0.8rem', justifyContent: 'center' }}>
+              <button
+                onClick={() => setDeleteConfirm(null)}
+                style={{ padding: '0.6rem 1.2rem', borderRadius: '8px', border: `1px solid ${borderLight}`, background: '#fff', color: textDark, fontWeight: 600, cursor: 'pointer' }}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => {
+                  if (deleteConfirm.type === 'team') {
+                    handleDeleteTeam(deleteConfirm.sede, deleteConfirm.equipo);
+                  } else {
+                    handleDeleteManager(deleteConfirm.id);
+                  }
+                }}
+                style={{ padding: '0.6rem 1.4rem', borderRadius: '8px', border: 'none', background: '#dc2626', color: '#fff', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 4px rgba(220,38,38,0.3)' }}
+              >
+                Sí, Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* MODAL ASISTENCIA LLAMADA GRUPAL                          */}
+      {/* ======================================================== */}
+      {groupModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(3px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+          <div style={{ background: bgCard, width: '100%', maxWidth: '540px', borderRadius: '12px', padding: '2rem', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.15)', border: `1px solid ${borderLight}` }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
+              <h2 style={{ margin: 0, color: textDark, fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800 }}>
+                <CountryFlag sede={groupModal.sede} /> {groupModal.equipo} {groupModal.numEquipo ? `(#${groupModal.numEquipo})` : ''}
+              </h2>
+              <span style={{ fontSize: '0.8rem', background: '#f1f5f9', padding: '0.2rem 0.6rem', borderRadius: '12px', fontWeight: 700, color: '#475569' }}>
+                {groupModal.managers.length} Integrantes
+              </span>
+            </div>
+            
+            <p style={{ margin: '0 0 1.2rem 0', color: textMuted, fontSize: '0.85rem' }}>
+              🎓 Entrenador(es): <strong>{groupModal.entrenadorUnico}</strong> • Sede: <strong>{groupModal.sede}</strong>
+            </p>
+            
+            <div style={{ marginBottom: '1.2rem' }}>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.4rem' }}>
+                Fecha de la Llamada:
+              </label>
+              <input type="date" value={groupCallDate} onChange={e => setGroupCallDate(e.target.value)} style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.9rem' }} />
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
+              <span style={{ fontSize: '0.8rem', fontWeight: 700, color: textDark }}>Asistencia Individual:</span>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const allTrue = {};
+                    groupModal.managers.forEach(m => allTrue[m.id] = true);
+                    setGroupCallAttendance(allTrue);
+                  }}
+                  style={{ border: 'none', background: '#ecfdf5', color: '#059669', fontSize: '0.75rem', fontWeight: 700, padding: '0.2rem 0.5rem', borderRadius: '4px', cursor: 'pointer' }}
+                >
+                  Marcar Todos ✅
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const allFalse = {};
+                    groupModal.managers.forEach(m => allFalse[m.id] = false);
+                    setGroupCallAttendance(allFalse);
+                  }}
+                  style={{ border: 'none', background: '#fef2f2', color: '#dc2626', fontSize: '0.75rem', fontWeight: 700, padding: '0.2rem 0.5rem', borderRadius: '4px', cursor: 'pointer' }}
+                >
+                  Marcar Todos ❌
+                </button>
+              </div>
+            </div>
+            
+            <div style={{ maxHeight: '280px', overflowY: 'auto', marginBottom: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', paddingRight: '4px' }}>
+              {groupModal.managers.map(m => {
+                const checked = !!groupCallAttendance[m.id];
+                const isCap = (m.rol || '').toLowerCase().includes('capitan');
+                return (
+                  <label key={m.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.65rem 1rem', background: checked ? '#f0fdf4' : '#fef2f2', borderRadius: '8px', border: `1px solid ${checked ? '#bbf7d0' : '#fecaca'}`, cursor: 'pointer', transition: 'all 0.15s ease' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      {isCap && (
+                        <span style={{ background: '#fef08a', color: '#854d0e', padding: '0.1rem 0.35rem', borderRadius: '4px', fontSize: '0.68rem', fontWeight: 800 }}>
+                          👑 Capitán
+                        </span>
+                      )}
+                      <span style={{ fontSize: '0.9rem', fontWeight: 600, color: textDark }}>{m.nombre}</span>
+                      {m.telefono && <a href={getWhatsAppUrl(m.telefono, m.sede || filterSede)} target='_blank' rel='noreferrer' style={{ fontSize: '0.75rem', color: '#10b981', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '2px', marginLeft: '4px' }}>💬 {m.telefono}</a>}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                      <span style={{ fontSize: '0.8rem', fontWeight: 700, color: checked ? '#16a34a' : '#dc2626' }}>
+                        {checked ? 'Conectó ✅' : 'No Asistió ❌'}
+                      </span>
+                      <input type="checkbox" checked={checked} onChange={e => setGroupCallAttendance({...groupCallAttendance, [m.id]: e.target.checked})} style={{ width: '18px', height: '18px', accentColor: '#10b981', cursor: 'pointer' }} />
+                    </div>
+                  </label>
+                );
+              })}
+            </div>
+
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+              <button onClick={() => setGroupModal(null)} style={{ padding: '0.6rem 1.2rem', borderRadius: '6px', border: `1px solid ${borderLight}`, background: '#fff', color: textDark, fontWeight: 600, cursor: 'pointer' }}>Cancelar</button>
+              <button onClick={handleSaveGroupCall} style={{ padding: '0.6rem 1.4rem', borderRadius: '6px', border: 'none', background: '#10b981', color: '#fff', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 4px rgba(16,185,129,0.3)' }}>Guardar Asistencia</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TARJETA DE LA PERSONA (Entrenador) — se abre al hacer clic en cualquier
+          badge 🎓 de un entrenador (Directorio, Equipos o Sedes). Pedido de José
+          el 28/08/2026: "cuando de click aqui debe de abrir la tarjeta de la persona". */}
+      {trainerCardModal && (() => {
+        const tc = getTrainerCardStats(trainerCardModal);
+        return (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(3px)', zIndex: 1200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }} onClick={() => setTrainerCardModal(null)}>
+            <div onClick={e => e.stopPropagation()} style={{ background: bgCard, width: '100%', maxWidth: '440px', borderRadius: '12px', padding: '1.8rem', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.15)', border: `1px solid ${borderLight}`, borderTop: '4px solid #7c3aed' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                <h2 style={{ margin: 0, color: textDark, fontSize: '1.2rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  🎓 {trainerCardModal}
+                </h2>
+                <button onClick={() => setTrainerCardModal(null)} title="Cerrar" style={{ background: '#f1f5f9', border: 'none', borderRadius: '6px', padding: '0.3rem', cursor: 'pointer', color: textMuted }}>
+                  <X size={16} />
+                </button>
+              </div>
+
+              {tc && tc.total > 0 ? (
+                <>
+                  <div style={{ margin: '0.5rem 0 1rem 0' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: '0.3rem' }}>
+                      <span style={{ color: textMuted }}>Efectividad de Llamadas:</span>
+                      <strong style={{ color: tc.pctAsist >= 70 ? '#16a34a' : '#d97706' }}>{tc.pctAsist}%</strong>
+                    </div>
+                    <div style={{ background: '#f1f5f9', height: '8px', borderRadius: '4px', overflow: 'hidden' }}>
+                      <div style={{ width: `${tc.pctAsist}%`, height: '100%', background: tc.pctAsist >= 70 ? '#10b981' : '#f59e0b', borderRadius: '4px' }} />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem', margin: '1rem 0', textAlign: 'center' }}>
+                    <div style={{ background: '#f8fafc', padding: '0.5rem 0.3rem', borderRadius: '8px', border: `1px solid ${borderLight}` }}>
+                      <div style={{ fontSize: '1.05rem', fontWeight: 800, color: textDark }}>{tc.total}</div>
+                      <div style={{ fontSize: '0.65rem', color: textMuted }}>Managers</div>
+                    </div>
+                    <div style={{ background: '#eff6ff', padding: '0.5rem 0.3rem', borderRadius: '8px', border: '1px solid #bfdbfe' }}>
+                      <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#2563eb' }}>{tc.activos}</div>
+                      <div style={{ fontSize: '0.65rem', color: '#2563eb' }}>Activos</div>
+                    </div>
+                    <div style={{ background: '#f0fdf4', padding: '0.5rem 0.3rem', borderRadius: '8px', border: '1px solid #bbf7d0' }}>
+                      <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#16a34a' }}>{tc.graduados}</div>
+                      <div style={{ fontSize: '0.65rem', color: '#16a34a' }}>Graduados</div>
+                    </div>
+                    <div style={{ background: '#fef2f2', padding: '0.5rem 0.3rem', borderRadius: '8px', border: '1px solid #fecaca' }}>
+                      <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#dc2626' }}>{tc.desertores}</div>
+                      <div style={{ fontSize: '0.65rem', color: '#dc2626' }}>Desertores</div>
+                    </div>
+                  </div>
+
+                  {tc.sedes.length > 0 && (
+                    <p style={{ margin: '0 0 0.6rem 0', fontSize: '0.8rem', color: textMuted }}>
+                      Sede(s): <strong style={{ color: textDark }}>{tc.sedes.join(', ')}</strong>
+                    </p>
+                  )}
+
+                  {tc.equipos.length > 0 && (
+                    <div style={{ fontSize: '0.78rem', marginBottom: '1rem' }}>
+                      <span style={{ color: textMuted, fontWeight: 600 }}>Equipos a cargo:</span>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem', marginTop: '0.3rem' }}>
+                        {tc.equipos.map(eq => (
+                          <span key={eq} style={{ background: '#f1f5f9', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.72rem', color: '#334155', fontWeight: 500 }}>
+                            {eq}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <p style={{ fontSize: '0.85rem', color: textMuted, margin: '0.5rem 0 1rem 0' }}>
+                  No se encontraron managers/capitanes asignados actualmente a este entrenador en el Centro de Managers.
+                </p>
+              )}
+
+              <button
+                onClick={() => { setFilterEntrenador(trainerCardModal); setActiveTab('directorio'); setCurrentPage(1); setTrainerCardModal(null); }}
+                style={{ width: '100%', padding: '0.65rem', borderRadius: '8px', border: 'none', background: '#7c3aed', color: '#fff', fontWeight: 700, cursor: 'pointer' }}
+              >
+                Ver Directorio de {trainerCardModal}
+              </button>
+            </div>
+          </div>
+        );
+      })()}
+
+    </div>
+  );
+}
+
+```
+
+---
+
 ## Archivo: coordinadoras_por_c1.json
 
 ```json
@@ -30366,6 +33358,10842 @@ fetchAndDump();
 
 ---
 
+## Archivo: managersData.js
+
+```js
+// Datos pre-cargados de Managers y Llamados - CREAR PODER SIN LIMITES
+export const INITIAL_MANAGERS = [
+  {
+    "id": 1,
+    "nombre": "David Valdiviezo",
+    "rol": "MANAGER",
+    "telefono": "0984833315",
+    "numEquipo": 14,
+    "equipo": "SHAI UBUNTU",
+    "tieneEntrenador": "Si",
+    "entrenador": "Pamela Carrillo",
+    "coordinador": "KERLY CARRILLO GARZON / JUAN FERNANDO REINOSO",
+    "sede": "Cuenca",
+    "estado": "Desertor"
+  },
+  {
+    "id": 2,
+    "nombre": "Michelle Zuniga",
+    "rol": "MANAGER",
+    "telefono": "0958758565",
+    "numEquipo": 14,
+    "equipo": "SHAI UBUNTU",
+    "tieneEntrenador": "SI",
+    "entrenador": "David Sosa",
+    "coordinador": "KERLY CARRILLO GARZON / JUAN FERNANDO REINOSO",
+    "sede": "Cuenca",
+    "estado": "Desertor"
+  },
+  {
+    "id": 3,
+    "nombre": "Diego Leon",
+    "rol": "MANAGER",
+    "telefono": "0992101126",
+    "numEquipo": 15,
+    "equipo": "LIDER-ATIK",
+    "tieneEntrenador": "Si",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "JUAN FERNANDO REINOSO",
+    "sede": "Cuenca",
+    "estado": "Desertor"
+  },
+  {
+    "id": 4,
+    "nombre": "Renato Marquez",
+    "rol": "MANAGER",
+    "telefono": "0961628015",
+    "numEquipo": 15,
+    "equipo": "LIDER-ATIK",
+    "tieneEntrenador": "Si",
+    "entrenador": "Isaac Gabriel Betancourt Patino",
+    "coordinador": "JUAN FERNANDO REINOSO",
+    "sede": "Cuenca",
+    "estado": "Desertor"
+  },
+  {
+    "id": 5,
+    "nombre": "Javier Torres",
+    "rol": "Capitan",
+    "telefono": "5930998024307",
+    "numEquipo": 1,
+    "equipo": "TRINA MUNAY KI",
+    "tieneEntrenador": "No",
+    "entrenador": "Mildred Munoz",
+    "coordinador": "MIGUEL TORRES",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 6,
+    "nombre": "Amada Amendao",
+    "rol": "Manager",
+    "telefono": "5930999084200",
+    "numEquipo": 1,
+    "equipo": "TRINA MUNAY KI",
+    "tieneEntrenador": "No",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "MIGUEL TORRES",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 7,
+    "nombre": "Andrea Medina",
+    "rol": "Manager",
+    "telefono": "5930983807026",
+    "numEquipo": 1,
+    "equipo": "TRINA MUNAY KI",
+    "tieneEntrenador": "No",
+    "entrenador": "Josue Vera",
+    "coordinador": "MIGUEL TORRES",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 8,
+    "nombre": "Santiago Yunga",
+    "rol": "Manager",
+    "telefono": "5930984959494",
+    "numEquipo": 1,
+    "equipo": "TRINA MUNAY KI",
+    "tieneEntrenador": "No",
+    "entrenador": "Alejandro Diaz",
+    "coordinador": "MIGUEL TORRES",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 9,
+    "nombre": "Diego Camargo",
+    "rol": "Capitan",
+    "telefono": "3103886732",
+    "numEquipo": 1,
+    "equipo": "HENKO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Gomez",
+    "coordinador": "",
+    "sede": "Medellin",
+    "estado": "Graduado"
+  },
+  {
+    "id": 10,
+    "nombre": "Juan Maya",
+    "rol": "Manager",
+    "telefono": "3134004302",
+    "numEquipo": 1,
+    "equipo": "HENKO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mike Boada",
+    "coordinador": "",
+    "sede": "Medellin",
+    "estado": "Graduado"
+  },
+  {
+    "id": 11,
+    "nombre": "Edith Castillo",
+    "rol": "CAPITANA",
+    "telefono": "5540843176",
+    "numEquipo": 1,
+    "equipo": "MARDUK AETT",
+    "tieneEntrenador": "SI",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "ALONSO SOLARES",
+    "sede": "CDMX",
+    "estado": "Activo"
+  },
+  {
+    "id": 12,
+    "nombre": "Daniela Monroy",
+    "rol": "MANAGER",
+    "telefono": "5527377589",
+    "numEquipo": 1,
+    "equipo": "MARDUK AETT",
+    "tieneEntrenador": "SI",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "ALONSO SOLARES",
+    "sede": "CDMX",
+    "estado": "Activo"
+  },
+  {
+    "id": 13,
+    "nombre": "Nora Zamora",
+    "rol": "MANAGER",
+    "telefono": "5539353705",
+    "numEquipo": 1,
+    "equipo": "MARDUK AETT",
+    "tieneEntrenador": "SI",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "ALONSO SOLARES",
+    "sede": "CDMX",
+    "estado": "Activo"
+  },
+  {
+    "id": 14,
+    "nombre": "Ulises Ordaz",
+    "rol": "MANAGER",
+    "telefono": "5514956218",
+    "numEquipo": 1,
+    "equipo": "MARDUK AETT",
+    "tieneEntrenador": "SI",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "ALONSO SOLARES",
+    "sede": "CDMX",
+    "estado": "Activo"
+  },
+  {
+    "id": 15,
+    "nombre": "Jennifer Iiguez",
+    "rol": "Manager",
+    "telefono": "0988817401",
+    "numEquipo": 2,
+    "equipo": "INTI CAMARI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jose Torron",
+    "coordinador": "MIGUEL TORRES",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 16,
+    "nombre": "Vanesa Quezada",
+    "rol": "Manager",
+    "telefono": "0968535607",
+    "numEquipo": 2,
+    "equipo": "INTI CAMARI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "MIGUEL TORRES",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 17,
+    "nombre": "Mauricio Ramirez",
+    "rol": "Capitan",
+    "telefono": "3052476502",
+    "numEquipo": 2,
+    "equipo": "NICAN AXCAN",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mildred Munoz",
+    "coordinador": "",
+    "sede": "Medellin",
+    "estado": "Graduado"
+  },
+  {
+    "id": 18,
+    "nombre": "Brian Morales",
+    "rol": "Manager",
+    "telefono": "34671265641",
+    "numEquipo": 2,
+    "equipo": "NICAN AXCAN",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mike Boada",
+    "coordinador": "",
+    "sede": "Medellin",
+    "estado": "Graduado"
+  },
+  {
+    "id": 19,
+    "nombre": "Daniela Perez",
+    "rol": "Manager",
+    "telefono": "3206949379",
+    "numEquipo": 2,
+    "equipo": "NICAN AXCAN",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "",
+    "sede": "Medellin",
+    "estado": "Graduado"
+  },
+  {
+    "id": 20,
+    "nombre": "Jaime Arenas",
+    "rol": "Manager",
+    "telefono": "3012779494",
+    "numEquipo": 2,
+    "equipo": "NICAN AXCAN",
+    "tieneEntrenador": "Si",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "",
+    "sede": "Medellin",
+    "estado": "Graduado"
+  },
+  {
+    "id": 21,
+    "nombre": "Miguel Patino",
+    "rol": "Manager",
+    "telefono": "3244391563",
+    "numEquipo": 2,
+    "equipo": "NICAN AXCAN",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Gomez",
+    "coordinador": "",
+    "sede": "Medellin",
+    "estado": "Graduado"
+  },
+  {
+    "id": 22,
+    "nombre": "Ernesto Seplveda",
+    "rol": "CAPITN",
+    "telefono": "7223057233",
+    "numEquipo": 2,
+    "equipo": "ALOHI MAU",
+    "tieneEntrenador": "SI",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "ALONSO SOLARES",
+    "sede": "CDMX",
+    "estado": "Activo"
+  },
+  {
+    "id": 23,
+    "nombre": "Martha Guerrero",
+    "rol": "MANAGER",
+    "telefono": "3511507519",
+    "numEquipo": 2,
+    "equipo": "ALOHI MAU",
+    "tieneEntrenador": "SI",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "ALONSO SOLARES",
+    "sede": "CDMX",
+    "estado": "Activo"
+  },
+  {
+    "id": 24,
+    "nombre": "Mabe Catota",
+    "rol": "Capitana",
+    "telefono": "593 98 333 5667",
+    "numEquipo": 3,
+    "equipo": "Athalaya Kumi",
+    "tieneEntrenador": "Si",
+    "entrenador": "Ana Monroy",
+    "coordinador": "MIGUEL TORRES",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 25,
+    "nombre": "Pamela Tixi",
+    "rol": "Manager",
+    "telefono": "593 99 554 7752",
+    "numEquipo": 3,
+    "equipo": "Athalaya Kumi",
+    "tieneEntrenador": "Si",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "MIGUEL TORRES",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 26,
+    "nombre": "Ledis Daza",
+    "rol": "Capitana",
+    "telefono": "+573246082756",
+    "numEquipo": 3,
+    "equipo": "KAIROS",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Gomez",
+    "coordinador": "",
+    "sede": "Medellin",
+    "estado": "Graduado"
+  },
+  {
+    "id": 27,
+    "nombre": "Gabriel Ordz",
+    "rol": "CAPITN",
+    "telefono": "5519706103",
+    "numEquipo": 3,
+    "equipo": "TORA BUSHIDO",
+    "tieneEntrenador": "SI",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "DANIELA MONROY FABBRI",
+    "sede": "CDMX",
+    "estado": "Activo"
+  },
+  {
+    "id": 28,
+    "nombre": "Kerlie Carrillo",
+    "rol": "Capitan",
+    "telefono": "0995815292",
+    "numEquipo": 4,
+    "equipo": "Alquimia",
+    "tieneEntrenador": "Si",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "JOSUE VERA",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 29,
+    "nombre": "Valentina Rodriguez",
+    "rol": "CAPITANA",
+    "telefono": "+573044072665",
+    "numEquipo": 4,
+    "equipo": "KHORA NOVA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Ana Monroy",
+    "coordinador": "",
+    "sede": "Medellin",
+    "estado": "Graduado"
+  },
+  {
+    "id": 30,
+    "nombre": "David Gonzalez Franco",
+    "rol": "MANAGER",
+    "telefono": "+573013053610",
+    "numEquipo": 4,
+    "equipo": "KHORA NOVA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Ana Monroy",
+    "coordinador": "",
+    "sede": "Medellin",
+    "estado": "Graduado"
+  },
+  {
+    "id": 31,
+    "nombre": "Nelson Jimenez",
+    "rol": "CAPITN",
+    "telefono": "9711213956",
+    "numEquipo": 4,
+    "equipo": "QUIRON 33",
+    "tieneEntrenador": "SI",
+    "entrenador": "Linid Valencia",
+    "coordinador": "DANIELA MONROY FABBRI",
+    "sede": "CDMX",
+    "estado": "Activo"
+  },
+  {
+    "id": 32,
+    "nombre": "Colombia Ochoa",
+    "rol": "Capitana",
+    "telefono": "0996849484",
+    "numEquipo": 5,
+    "equipo": "NovaPakari",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jose Torron",
+    "coordinador": "JOSUE VERA",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 33,
+    "nombre": "Ismael Marquez",
+    "rol": "Manager",
+    "telefono": "0988903378",
+    "numEquipo": 5,
+    "equipo": "NovaPakari",
+    "tieneEntrenador": "Si",
+    "entrenador": "Alejandro Diaz",
+    "coordinador": "JOSUE VERA",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 34,
+    "nombre": "Juan Fernando Reinoso",
+    "rol": "Manager",
+    "telefono": "0981966878",
+    "numEquipo": 5,
+    "equipo": "NovaPakari",
+    "tieneEntrenador": "Si",
+    "entrenador": "Diego David Bravo Figueroa",
+    "coordinador": "JOSUE VERA",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 35,
+    "nombre": "Amendao Rosa",
+    "rol": "Capitana",
+    "telefono": "0999084200",
+    "numEquipo": 6,
+    "equipo": "NUNA KAWSAY",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mildred Munoz",
+    "coordinador": "JOSUE VERA",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 36,
+    "nombre": "Maria Fernanda Alvarez",
+    "rol": "MANAGER",
+    "telefono": "+573225052109",
+    "numEquipo": 6,
+    "equipo": "ZENSEIS",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "",
+    "sede": "Medellin",
+    "estado": "Graduado"
+  },
+  {
+    "id": 37,
+    "nombre": "Anel Orihuela",
+    "rol": "Capitan",
+    "telefono": "+51 983 708 896",
+    "numEquipo": 6,
+    "equipo": "Atipaqkuna",
+    "tieneEntrenador": "No",
+    "entrenador": "Mildred Munoz",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 38,
+    "nombre": "Leyla Pasquel",
+    "rol": "Manager",
+    "telefono": "+51 996 820 944",
+    "numEquipo": 6,
+    "equipo": "Atipaqkuna",
+    "tieneEntrenador": "No",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 39,
+    "nombre": "Jose Galindo",
+    "rol": "CAPITAN",
+    "telefono": "0992848576",
+    "numEquipo": 7,
+    "equipo": "KAIROSTHER",
+    "tieneEntrenador": "Si",
+    "entrenador": "Ana Monroy",
+    "coordinador": "JOSUE VERA",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 40,
+    "nombre": "Jose Luis Prado",
+    "rol": "Managers",
+    "telefono": "0997244234",
+    "numEquipo": 7,
+    "equipo": "KAIROSTHER",
+    "tieneEntrenador": "si",
+    "entrenador": "Diego David Bravo Figueroa",
+    "coordinador": "JOSUE VERA",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 41,
+    "nombre": "Juan Manuel Granda",
+    "rol": "Manager",
+    "telefono": "+51 947 469 418",
+    "numEquipo": 7,
+    "equipo": "Espartanos",
+    "tieneEntrenador": "No",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "",
+    "sede": "Lima",
+    "estado": "Graduado"
+  },
+  {
+    "id": 42,
+    "nombre": "Daniela Perez",
+    "rol": "CAPITANA",
+    "telefono": "+573206949379",
+    "numEquipo": 7,
+    "equipo": "EXCELZUS",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Gomez",
+    "coordinador": "MAURICIO RAMIREZ SILVA",
+    "sede": "Medellin",
+    "estado": "Graduado"
+  },
+  {
+    "id": 43,
+    "nombre": "Martha Londoo",
+    "rol": "MANAGER",
+    "telefono": "+573146726436",
+    "numEquipo": 7,
+    "equipo": "EXCELZUS",
+    "tieneEntrenador": "Si",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "MAURICIO RAMIREZ SILVA",
+    "sede": "Medellin",
+    "estado": "Graduado"
+  },
+  {
+    "id": 44,
+    "nombre": "Alba Abad",
+    "rol": "Capitana",
+    "telefono": "0999731178",
+    "numEquipo": 8,
+    "equipo": "METANOIA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "KERLY CARRILLO GARZON",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 45,
+    "nombre": "Carlos Puglla",
+    "rol": "Manager",
+    "telefono": "0963451858",
+    "numEquipo": 8,
+    "equipo": "METANOIA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mila Campuzano",
+    "coordinador": "KERLY CARRILLO GARZON",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 46,
+    "nombre": "Manuel Vivanco",
+    "rol": "Capitan",
+    "telefono": "+51 985 610 048",
+    "numEquipo": 8,
+    "equipo": "Pretorianos Infinitos",
+    "tieneEntrenador": "No",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 47,
+    "nombre": "Lucy Giovanna Ostoa Bernaola",
+    "rol": "Manager",
+    "telefono": "+51 949 191 577",
+    "numEquipo": 8,
+    "equipo": "Pretorianos Infinitos",
+    "tieneEntrenador": "No",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 48,
+    "nombre": "Roberto Condezo",
+    "rol": "Manager",
+    "telefono": "+51 999 105 525",
+    "numEquipo": 8,
+    "equipo": "Pretorianos Infinitos",
+    "tieneEntrenador": "No",
+    "entrenador": "Ana Cristina Sanchez",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 49,
+    "nombre": "Tonny Gutierrez",
+    "rol": "Manager",
+    "telefono": "+51 958 058 579",
+    "numEquipo": 8,
+    "equipo": "Pretorianos Infinitos",
+    "tieneEntrenador": "No",
+    "entrenador": "Ana Cristina Sanchez",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 50,
+    "nombre": "Viviana Alcantara",
+    "rol": "Manager",
+    "telefono": "+51 987 020 591",
+    "numEquipo": 8,
+    "equipo": "Pretorianos Infinitos",
+    "tieneEntrenador": "No",
+    "entrenador": "Ana Cristina Sanchez",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 51,
+    "nombre": "Vernica Prado",
+    "rol": "CAPITANA",
+    "telefono": "0994481646",
+    "numEquipo": 9,
+    "equipo": "ATARAXIA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "KERLY CARRILLO GARZON",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 52,
+    "nombre": "Geovanni Dominguez",
+    "rol": "MANAGER",
+    "telefono": "0993893819",
+    "numEquipo": 9,
+    "equipo": "ATARAXIA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "KERLY CARRILLO GARZON",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 53,
+    "nombre": "Rosemary De Paz",
+    "rol": "Capitana",
+    "telefono": "+51 907 418 863",
+    "numEquipo": 9,
+    "equipo": "Fenixkingo",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mildred Munoz",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 54,
+    "nombre": "Carmen Gricelda Prez Chinchay",
+    "rol": "Manager",
+    "telefono": "+51 936 558 835",
+    "numEquipo": 9,
+    "equipo": "Fenixkingo",
+    "tieneEntrenador": "Si",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 55,
+    "nombre": "Nancy Huallipe",
+    "rol": "Manager",
+    "telefono": "+51 944 243 222",
+    "numEquipo": 9,
+    "equipo": "Fenixkingo",
+    "tieneEntrenador": "Si",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 56,
+    "nombre": "Rosy Bayas",
+    "rol": "MANAGER",
+    "telefono": "0995889161",
+    "numEquipo": 10,
+    "equipo": "UKA KALLPA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "KERLY CARRILLO GARZON",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 57,
+    "nombre": "Carlos Mejia",
+    "rol": "CAPITAN",
+    "telefono": "0998899953",
+    "numEquipo": 10,
+    "equipo": "UKA KALLPA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mike Boada",
+    "coordinador": "KERLY CARRILLO GARZON",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 58,
+    "nombre": "Juan Pablo Lema Bermudez",
+    "rol": "MANAGER",
+    "telefono": "+573017628483",
+    "numEquipo": 10,
+    "equipo": "KRATOS MAGNUS",
+    "tieneEntrenador": "Si",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "MAURICIO RAMIREZ SILVA",
+    "sede": "Medellin",
+    "estado": "Graduado"
+  },
+  {
+    "id": 59,
+    "nombre": "Veronica Gallego Taborda",
+    "rol": "MANAGER",
+    "telefono": "+573215607716",
+    "numEquipo": 10,
+    "equipo": "KRATOS MAGNUS",
+    "tieneEntrenador": "Si",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "MAURICIO RAMIREZ SILVA",
+    "sede": "Medellin",
+    "estado": "Graduado"
+  },
+  {
+    "id": 60,
+    "nombre": "July Len",
+    "rol": "Capitana",
+    "telefono": "+51 907 503 084",
+    "numEquipo": 10,
+    "equipo": "David Poderosos",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mildred Munoz",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 61,
+    "nombre": "Bryan Caicedo",
+    "rol": "Manager",
+    "telefono": "+593 96 353 4655",
+    "numEquipo": 10,
+    "equipo": "David Poderosos",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jose Torron",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 62,
+    "nombre": "Pamela Carrillo",
+    "rol": "Manager",
+    "telefono": "+593 99 249 2027",
+    "numEquipo": 10,
+    "equipo": "David Poderosos",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jose Torron",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 63,
+    "nombre": "Juanjo Carranza",
+    "rol": "CAPITAN",
+    "telefono": "0995780948",
+    "numEquipo": 11,
+    "equipo": "ZNTI BRAMHADES",
+    "tieneEntrenador": "Si",
+    "entrenador": "Ana Monroy",
+    "coordinador": "KERLY CARRILLO GARZON",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 64,
+    "nombre": "Edwin Jimbo",
+    "rol": "MANAGER",
+    "telefono": "0997258052",
+    "numEquipo": 11,
+    "equipo": "ZNTI BRAMHADES",
+    "tieneEntrenador": "Si",
+    "entrenador": "Alejandro Diaz",
+    "coordinador": "KERLY CARRILLO GARZON",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 65,
+    "nombre": "Pauly Cedillo",
+    "rol": "MANAGER",
+    "telefono": "0958927854",
+    "numEquipo": 11,
+    "equipo": "ZNTI BRAMHADES",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "KERLY CARRILLO GARZON",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 66,
+    "nombre": "Elizabeth Morales Carceln",
+    "rol": "CAPITANA",
+    "telefono": "+51 998 450 224",
+    "numEquipo": 11,
+    "equipo": "Lobos",
+    "tieneEntrenador": "Si",
+    "entrenador": "Ana Cristina Sanchez",
+    "coordinador": "",
+    "sede": "Lima",
+    "estado": "Graduado"
+  },
+  {
+    "id": 67,
+    "nombre": "Leyla Kelly Pasquel Alfaro",
+    "rol": "CAPITANA",
+    "telefono": "+51 996 820 944",
+    "numEquipo": 11,
+    "equipo": "Lobos",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mildred Munoz",
+    "coordinador": "",
+    "sede": "Lima",
+    "estado": "Graduado"
+  },
+  {
+    "id": 68,
+    "nombre": "Marco Antonio Villarreal Valdiviezo",
+    "rol": "CAPITANA",
+    "telefono": "+51 962 511 575",
+    "numEquipo": 11,
+    "equipo": "Lobos",
+    "tieneEntrenador": "Si",
+    "entrenador": "Isaac Gabriel Betancourt Patino",
+    "coordinador": "",
+    "sede": "Lima",
+    "estado": "Graduado"
+  },
+  {
+    "id": 69,
+    "nombre": "Christian Robalino",
+    "rol": "MANAGER",
+    "telefono": "0981327243",
+    "numEquipo": 12,
+    "equipo": "ANSTASIS",
+    "tieneEntrenador": "Si",
+    "entrenador": "Alejandro Diaz",
+    "coordinador": "KERLY CARRILLO GARZON",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 70,
+    "nombre": "Juan Fernando Reinoso",
+    "rol": "CAPITAN",
+    "telefono": "0981966878",
+    "numEquipo": 12,
+    "equipo": "ANSTASIS",
+    "tieneEntrenador": "SI",
+    "entrenador": "Ana Monroy",
+    "coordinador": "KERLY CARRILLO GARZON",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 71,
+    "nombre": "Belen Muquincho",
+    "rol": "MANAGER",
+    "telefono": "0988718274",
+    "numEquipo": 12,
+    "equipo": "ANSTASIS",
+    "tieneEntrenador": "Si",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "KERLY CARRILLO GARZON",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 72,
+    "nombre": "Kriscia Liszet Rodas Quispe",
+    "rol": "CAPITANA",
+    "telefono": "+51 964 140 549",
+    "numEquipo": 12,
+    "equipo": "INVICTUS GIBBOR",
+    "tieneEntrenador": "Si",
+    "entrenador": "Josue Vera",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 73,
+    "nombre": "Manuel Yakima Rivera",
+    "rol": "CAPITANA",
+    "telefono": "+51 996 612 880",
+    "numEquipo": 12,
+    "equipo": "INVICTUS GIBBOR",
+    "tieneEntrenador": "Si",
+    "entrenador": "Alejandro Diaz",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 74,
+    "nombre": "Maria Celli Huayanca Diaz",
+    "rol": "CAPITANA",
+    "telefono": "+51 989 947 797",
+    "numEquipo": 12,
+    "equipo": "INVICTUS GIBBOR",
+    "tieneEntrenador": "Si",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 75,
+    "nombre": "Roberto Condezo",
+    "rol": "CAPITANA",
+    "telefono": "+51 999 105 525",
+    "numEquipo": 12,
+    "equipo": "INVICTUS GIBBOR",
+    "tieneEntrenador": "Si",
+    "entrenador": "Josue Vera",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 76,
+    "nombre": "Viviana Elizabeth Alcntara Maurtua",
+    "rol": "CAPITANA",
+    "telefono": "+51 987 020 591",
+    "numEquipo": 12,
+    "equipo": "INVICTUS GIBBOR",
+    "tieneEntrenador": "Si",
+    "entrenador": "Alejandro Diaz",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 77,
+    "nombre": "Elizabeth Dominguez",
+    "rol": "MANAGER",
+    "telefono": "+573123063012",
+    "numEquipo": 12,
+    "equipo": "APOLO 12",
+    "tieneEntrenador": "SI",
+    "entrenador": "Andres Gomez",
+    "coordinador": "MAURICIO RAMIREZ SILVA",
+    "sede": "Medellin",
+    "estado": "Graduado"
+  },
+  {
+    "id": 78,
+    "nombre": "Katherine Ospina Duque",
+    "rol": "MANAGER",
+    "telefono": "+573163270732",
+    "numEquipo": 12,
+    "equipo": "APOLO 12",
+    "tieneEntrenador": "SI",
+    "entrenador": "Andres Gomez",
+    "coordinador": "MAURICIO RAMIREZ SILVA",
+    "sede": "Medellin",
+    "estado": "Graduado"
+  },
+  {
+    "id": 79,
+    "nombre": "Martha Lucia Londoo",
+    "rol": "CAPITANA",
+    "telefono": "+573146726436",
+    "numEquipo": 12,
+    "equipo": "APOLO 12",
+    "tieneEntrenador": "SI",
+    "entrenador": "Andres Gomez",
+    "coordinador": "MAURICIO RAMIREZ SILVA",
+    "sede": "Medellin",
+    "estado": "Graduado"
+  },
+  {
+    "id": 80,
+    "nombre": "Mabe Catota",
+    "rol": "CAPITANA",
+    "telefono": "0983335667",
+    "numEquipo": 13,
+    "equipo": "SIC PARVIS MAGNA",
+    "tieneEntrenador": "SI",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "KERLY CARRILLO GARZON / JUAN FERNANDO REINOSO",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 81,
+    "nombre": "Paul Ochoa",
+    "rol": "MANAGER",
+    "telefono": "0995862422",
+    "numEquipo": 13,
+    "equipo": "SIC PARVIS MAGNA",
+    "tieneEntrenador": "SI",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "KERLY CARRILLO GARZON / JUAN FERNANDO REINOSO",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 82,
+    "nombre": "Miriam Ordoez",
+    "rol": "MANAGER",
+    "telefono": "0993746081",
+    "numEquipo": 13,
+    "equipo": "SIC PARVIS MAGNA",
+    "tieneEntrenador": "SI",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "KERLY CARRILLO GARZON / JUAN FERNANDO REINOSO",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 83,
+    "nombre": "Jorge Luis Len De Los Ros",
+    "rol": "CAPITANA",
+    "telefono": "+51 998 044 097",
+    "numEquipo": 13,
+    "equipo": "guilas De Fuego",
+    "tieneEntrenador": "Si",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 84,
+    "nombre": "Juan Manuel Granda",
+    "rol": "CAPITANA",
+    "telefono": "+51 947 469 418",
+    "numEquipo": 13,
+    "equipo": "guilas De Fuego",
+    "tieneEntrenador": "Si",
+    "entrenador": "Diego David Bravo Figueroa",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 85,
+    "nombre": "Sarita Ramos",
+    "rol": "CAPITANA",
+    "telefono": "+51 953 656 959",
+    "numEquipo": 13,
+    "equipo": "guilas De Fuego",
+    "tieneEntrenador": "Si",
+    "entrenador": "Maria Jose Roman",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 86,
+    "nombre": "Diana Macas",
+    "rol": "CAPITANA",
+    "telefono": "593980927921",
+    "numEquipo": 13,
+    "equipo": "WARANKA KALLPAWAN",
+    "tieneEntrenador": "No",
+    "entrenador": "Jesus Adrian Acosta",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 87,
+    "nombre": "Estefania Chavarria",
+    "rol": "MANAGER",
+    "telefono": "+57 3195952194",
+    "numEquipo": 13,
+    "equipo": "KRONOS DYNATUS",
+    "tieneEntrenador": "SI",
+    "entrenador": "Ana Monroy",
+    "coordinador": "MAURICIO RAMIREZ SILVA",
+    "sede": "Medellin",
+    "estado": "Graduado"
+  },
+  {
+    "id": 88,
+    "nombre": "Vanessa Giraldo",
+    "rol": "CAPITANA",
+    "telefono": "+57 3243611278",
+    "numEquipo": 13,
+    "equipo": "KRONOS DYNATUS",
+    "tieneEntrenador": "SI",
+    "entrenador": "Ana Monroy",
+    "coordinador": "MAURICIO RAMIREZ SILVA",
+    "sede": "Medellin",
+    "estado": "Graduado"
+  },
+  {
+    "id": 89,
+    "nombre": "Andreina Tenelema",
+    "rol": "CAPITANA",
+    "telefono": "593990196376",
+    "numEquipo": 14,
+    "equipo": "KAMINARI KUNTURI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jose Torron",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 90,
+    "nombre": "Gaby Roman",
+    "rol": "CAPITANA",
+    "telefono": "593999881365",
+    "numEquipo": 14,
+    "equipo": "KAMINARI KUNTURI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 91,
+    "nombre": "Jonathan Vargas",
+    "rol": "CAPITANA",
+    "telefono": "593963291572",
+    "numEquipo": 14,
+    "equipo": "KAMINARI KUNTURI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jose Torron",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 92,
+    "nombre": "Kevin Tiban",
+    "rol": "CAPITANA",
+    "telefono": "593969532866",
+    "numEquipo": 14,
+    "equipo": "KAMINARI KUNTURI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 93,
+    "nombre": "Camila Len Moore",
+    "rol": "CAPITANA",
+    "telefono": "981701570",
+    "numEquipo": 14,
+    "equipo": "LEONKUNA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mildred Munoz",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 94,
+    "nombre": "Crmen Prez Prez",
+    "rol": "CAPITANA",
+    "telefono": "936558835",
+    "numEquipo": 14,
+    "equipo": "LEONKUNA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mildred Munoz",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 95,
+    "nombre": "Gareth Said Ramos Prez",
+    "rol": "CAPITANA",
+    "telefono": "946011882",
+    "numEquipo": 14,
+    "equipo": "LEONKUNA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Maria Jose Roman",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 96,
+    "nombre": "Gregoria Alhuay Rojas",
+    "rol": "CAPITANA",
+    "telefono": "975242055",
+    "numEquipo": 14,
+    "equipo": "LEONKUNA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Diego David Bravo Figueroa",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 97,
+    "nombre": "Reyna Jaramillo",
+    "rol": "CAPITANA",
+    "telefono": "954821488",
+    "numEquipo": 14,
+    "equipo": "LEONKUNA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jose Torron",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 98,
+    "nombre": "Rony Landeo",
+    "rol": "CAPITANA",
+    "telefono": "971248667",
+    "numEquipo": 14,
+    "equipo": "LEONKUNA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 99,
+    "nombre": "Sandra Marlene Lpez Chahua",
+    "rol": "CAPITANA",
+    "telefono": "970870801",
+    "numEquipo": 14,
+    "equipo": "LEONKUNA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Maria Jose Roman",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 100,
+    "nombre": "Paul Pinos",
+    "rol": "MANAGER",
+    "telefono": "0958881296",
+    "numEquipo": 14,
+    "equipo": "SHAI UBUNTU",
+    "tieneEntrenador": "SI",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "KERLY CARRILLO GARZON / JUAN FERNANDO REINOSO",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 101,
+    "nombre": "Fabian Naula",
+    "rol": "CAPITAN",
+    "telefono": "0998410632",
+    "numEquipo": 14,
+    "equipo": "SHAI UBUNTU",
+    "tieneEntrenador": "SI",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "KERLY CARRILLO GARZON / JUAN FERNANDO REINOSO",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 102,
+    "nombre": "Mariana Catrillon",
+    "rol": "MANAGER",
+    "telefono": "+573137791253",
+    "numEquipo": 14,
+    "equipo": "RAGNAROK",
+    "tieneEntrenador": "SI",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "MAURICIO RAMIREZ SILVA",
+    "sede": "Medellin",
+    "estado": "Activo"
+  },
+  {
+    "id": 103,
+    "nombre": "Alexandra Tapullima",
+    "rol": "CAPITANA",
+    "telefono": "+51 941 482840",
+    "numEquipo": 15,
+    "equipo": "DRAGONES CUNTICOS",
+    "tieneEntrenador": "Si",
+    "entrenador": "Josue Vera",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 104,
+    "nombre": "Daysi Requejo",
+    "rol": "CAPITANA",
+    "telefono": "+51 945 111938",
+    "numEquipo": 15,
+    "equipo": "DRAGONES CUNTICOS",
+    "tieneEntrenador": "Sí",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 105,
+    "nombre": "Diego Barbieri",
+    "rol": "CAPITANA",
+    "telefono": "+51 951 815674",
+    "numEquipo": 15,
+    "equipo": "DRAGONES CUNTICOS",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 106,
+    "nombre": "Elizabeth Morales",
+    "rol": "CAPITANA",
+    "telefono": "+51 998 450224",
+    "numEquipo": 15,
+    "equipo": "DRAGONES CUNTICOS",
+    "tieneEntrenador": "Sí",
+    "entrenador": "Ana Monroy",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 107,
+    "nombre": "Liz Trujillo",
+    "rol": "CAPITANA",
+    "telefono": "+51 980 496819",
+    "numEquipo": 15,
+    "equipo": "DRAGONES CUNTICOS",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 108,
+    "nombre": "Marco Antonio Villarreal Valdiviezo",
+    "rol": "CAPITANA",
+    "telefono": "+51 962 511575",
+    "numEquipo": 15,
+    "equipo": "DRAGONES CUNTICOS",
+    "tieneEntrenador": "Si",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 109,
+    "nombre": "Anita Guevara",
+    "rol": "CAPITANA",
+    "telefono": "593980636031",
+    "numEquipo": 15,
+    "equipo": "URUZ MERAKI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Josue Vera",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 110,
+    "nombre": "Jhomaira Esparza",
+    "rol": "CAPITANA",
+    "telefono": "593980899920",
+    "numEquipo": 15,
+    "equipo": "URUZ MERAKI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 111,
+    "nombre": "Myriam Crespin",
+    "rol": "CAPITANA",
+    "telefono": "593983238632",
+    "numEquipo": 15,
+    "equipo": "URUZ MERAKI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jesus Adrian Acosta",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 112,
+    "nombre": "Rutc Vera",
+    "rol": "CAPITANA",
+    "telefono": "593986678514",
+    "numEquipo": 15,
+    "equipo": "URUZ MERAKI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Josue Vera",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 113,
+    "nombre": "Andrea Medina",
+    "rol": "CAPITANA",
+    "telefono": "0980184471",
+    "numEquipo": 15,
+    "equipo": "LIDER-ATIK",
+    "tieneEntrenador": "Si",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "JUAN FERNANDO REINOSO",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 114,
+    "nombre": "David Gonzalez",
+    "rol": "CAPITAN",
+    "telefono": "+573013053610",
+    "numEquipo": 15,
+    "equipo": "NEO DRAKARYS",
+    "tieneEntrenador": "SI",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "MAURICIO RAMIREZ SILVA",
+    "sede": "Medellin",
+    "estado": "Activo"
+  },
+  {
+    "id": 115,
+    "nombre": "Jorge Ramirez",
+    "rol": "CAPITANA",
+    "telefono": "593989743818",
+    "numEquipo": 16,
+    "equipo": "Ara Ambiguus",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mildred Munoz",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 116,
+    "nombre": "Luis Pruna",
+    "rol": "CAPITANA",
+    "telefono": "593988759534",
+    "numEquipo": 16,
+    "equipo": "Ara Ambiguus",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mike Boada",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 117,
+    "nombre": "Allyzon Len Suarez",
+    "rol": "CAPITANA",
+    "telefono": "+51 991 215 652",
+    "numEquipo": 16,
+    "equipo": "ATMA DE TITANES",
+    "tieneEntrenador": "Si",
+    "entrenador": "Maria Jose Roman",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 118,
+    "nombre": "Diana Moscosso",
+    "rol": "CAPITANA",
+    "telefono": "+51 924 105 061",
+    "numEquipo": 16,
+    "equipo": "ATMA DE TITANES",
+    "tieneEntrenador": "Si",
+    "entrenador": "Ana Monroy",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 119,
+    "nombre": "Manuel Yakima Rivera",
+    "rol": "CAPITANA",
+    "telefono": "+51 996 612 880",
+    "numEquipo": 16,
+    "equipo": "ATMA DE TITANES",
+    "tieneEntrenador": "Si",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 120,
+    "nombre": "Cristina Vintimilla",
+    "rol": "MANAGER",
+    "telefono": "0999737261",
+    "numEquipo": 16,
+    "equipo": "ARTAM",
+    "tieneEntrenador": "Si",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "KERLY CARRILLO GARZON",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 121,
+    "nombre": "Gerard Avila",
+    "rol": "CAPITAN",
+    "telefono": "0969497795",
+    "numEquipo": 16,
+    "equipo": "ARTAM",
+    "tieneEntrenador": "Si",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "KERLY CARRILLO GARZON",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 122,
+    "nombre": "Juan Esteban Ossa",
+    "rol": "MANAGER",
+    "telefono": "+573216507980",
+    "numEquipo": 16,
+    "equipo": "CERBERUS",
+    "tieneEntrenador": "SI",
+    "entrenador": "Jesus Adrian Acosta",
+    "coordinador": "MAURICIO RAMIREZ SILVA",
+    "sede": "Medellin",
+    "estado": "Activo"
+  },
+  {
+    "id": 123,
+    "nombre": "Brian Morales",
+    "rol": "MANAGER",
+    "telefono": "+573233644192",
+    "numEquipo": 16,
+    "equipo": "CERBERUS",
+    "tieneEntrenador": "SI",
+    "entrenador": "Jesus Adrian Acosta",
+    "coordinador": "MAURICIO RAMIREZ SILVA",
+    "sede": "Medellin",
+    "estado": "Activo"
+  },
+  {
+    "id": 124,
+    "nombre": "Jammel Arvelaez",
+    "rol": "CAPITANA",
+    "telefono": "593986361725",
+    "numEquipo": 17,
+    "equipo": "HATUM BRAHMA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Ana Cristina Sanchez",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 125,
+    "nombre": "Valeria Tiban",
+    "rol": "CAPITANA",
+    "telefono": "593968991462",
+    "numEquipo": 17,
+    "equipo": "HATUM BRAHMA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 126,
+    "nombre": "Xavier Calero",
+    "rol": "CAPITANA",
+    "telefono": "593998559879",
+    "numEquipo": 17,
+    "equipo": "HATUM BRAHMA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Ana Monroy",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 127,
+    "nombre": "Rocio De La Paz Huaytalla",
+    "rol": "CAPITANA",
+    "telefono": "+51 924 255 051",
+    "numEquipo": 17,
+    "equipo": "JAGUARES DE ORO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Ana Monroy",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 128,
+    "nombre": "Anamelva Quionez",
+    "rol": "MANAGER",
+    "telefono": "+51 920 122 990",
+    "numEquipo": 17,
+    "equipo": "JAGUARES DE ORO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Alejandro Diaz",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 129,
+    "nombre": "Britney Safiro Olenka",
+    "rol": "MANAGER",
+    "telefono": "+51 981 087 758",
+    "numEquipo": 17,
+    "equipo": "JAGUARES DE ORO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Josue Vera",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 130,
+    "nombre": "Isabel Correa",
+    "rol": "MANAGER",
+    "telefono": "+51 996 592 870",
+    "numEquipo": 17,
+    "equipo": "JAGUARES DE ORO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 131,
+    "nombre": "Jean Carlos Rios",
+    "rol": "MANAGER",
+    "telefono": "+51 991 512 467",
+    "numEquipo": 17,
+    "equipo": "JAGUARES DE ORO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Diego David Bravo Figueroa",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 132,
+    "nombre": "Juana Maria Falcon",
+    "rol": "MANAGER",
+    "telefono": "+51 973 827 510",
+    "numEquipo": 17,
+    "equipo": "JAGUARES DE ORO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mila Campuzano",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 133,
+    "nombre": "Pamela Morales",
+    "rol": "MANAGER",
+    "telefono": "+51 952 372 756",
+    "numEquipo": 17,
+    "equipo": "JAGUARES DE ORO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 134,
+    "nombre": "Raul Chavez Inche",
+    "rol": "MANAGER",
+    "telefono": "+51 930 702 843",
+    "numEquipo": 17,
+    "equipo": "JAGUARES DE ORO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Alejandro Diaz",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 135,
+    "nombre": "Rosmery Ochoa Ferrer",
+    "rol": "MANAGER",
+    "telefono": "+51 907 418 863",
+    "numEquipo": 17,
+    "equipo": "JAGUARES DE ORO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 136,
+    "nombre": "Yusmely Garca",
+    "rol": "MANAGER",
+    "telefono": "+51 921 979 246",
+    "numEquipo": 17,
+    "equipo": "JAGUARES DE ORO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 137,
+    "nombre": "Josue Aviles",
+    "rol": "CAPITANA",
+    "telefono": "0984975094",
+    "numEquipo": 17,
+    "equipo": "JATARI",
+    "tieneEntrenador": "SI",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "JUAN FERNANDO REINOSO",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 138,
+    "nombre": "Estefania Castillo",
+    "rol": "MANAGER",
+    "telefono": "0983937853",
+    "numEquipo": 17,
+    "equipo": "JATARI",
+    "tieneEntrenador": "SI",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "JUAN FERNANDO REINOSO",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 139,
+    "nombre": "Juan Diego Jara",
+    "rol": "MANAGER",
+    "telefono": "0987408003",
+    "numEquipo": 17,
+    "equipo": "JATARI",
+    "tieneEntrenador": "SI",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "JUAN FERNANDO REINOSO",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 140,
+    "nombre": "Elvis Cuellar",
+    "rol": "MANAGER",
+    "telefono": "+51943064793",
+    "numEquipo": 18,
+    "equipo": "NGELES DE FUEGO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 141,
+    "nombre": "Evelyn Munoz",
+    "rol": "MANAGER",
+    "telefono": "593958714988",
+    "numEquipo": 18,
+    "equipo": "SUMAQ KAWSAYKUNA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 142,
+    "nombre": "Jaime Ibarra",
+    "rol": "MANAGER",
+    "telefono": "593996161745",
+    "numEquipo": 18,
+    "equipo": "SUMAQ KAWSAYKUNA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 143,
+    "nombre": "Jonathan La Rosa",
+    "rol": "MANAGER",
+    "telefono": "593989838161",
+    "numEquipo": 18,
+    "equipo": "SUMAQ KAWSAYKUNA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 144,
+    "nombre": "Soledad Ramirez",
+    "rol": "MANAGER",
+    "telefono": "593988674650",
+    "numEquipo": 18,
+    "equipo": "SUMAQ KAWSAYKUNA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 145,
+    "nombre": "Joyce Marin",
+    "rol": "MANAGER",
+    "telefono": "+593993027018",
+    "numEquipo": 18,
+    "equipo": "NGELES DE FUEGO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Diego David Bravo Figueroa",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 146,
+    "nombre": "Lidia Crsitina Martinez Puente",
+    "rol": "MANAGER",
+    "telefono": "+51940243206",
+    "numEquipo": 18,
+    "equipo": "NGELES DE FUEGO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 147,
+    "nombre": "Raquel Riveros Ramos",
+    "rol": "MANAGER",
+    "telefono": "+51931059726",
+    "numEquipo": 18,
+    "equipo": "NGELES DE FUEGO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 148,
+    "nombre": "Rocio Ayvar Vega",
+    "rol": "MANAGER",
+    "telefono": "+51967197761",
+    "numEquipo": 18,
+    "equipo": "NGELES DE FUEGO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 149,
+    "nombre": "Tonny Gutirrez",
+    "rol": "CAPITAN",
+    "telefono": "+51958058579",
+    "numEquipo": 18,
+    "equipo": "NGELES DE FUEGO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 150,
+    "nombre": "Alexander Yunga",
+    "rol": "MANAGER",
+    "telefono": "0999890352",
+    "numEquipo": 18,
+    "equipo": "VALHARYN",
+    "tieneEntrenador": "SI",
+    "entrenador": "Ana Monroy",
+    "coordinador": "KERLY CARRILLO GARZON",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 151,
+    "nombre": "Blanca Orellana",
+    "rol": "MANAGER",
+    "telefono": "0983869325",
+    "numEquipo": 18,
+    "equipo": "VALHARYN",
+    "tieneEntrenador": "SI",
+    "entrenador": "Ana Monroy",
+    "coordinador": "KERLY CARRILLO GARZON",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 152,
+    "nombre": "Cynthia Tixi",
+    "rol": "CAPITANA",
+    "telefono": "0958814888",
+    "numEquipo": 18,
+    "equipo": "VALHARYN",
+    "tieneEntrenador": "SI",
+    "entrenador": "Ana Monroy",
+    "coordinador": "KERLY CARRILLO GARZON",
+    "sede": "Cuenca",
+    "estado": "Graduado"
+  },
+  {
+    "id": 153,
+    "nombre": "Leisi Medina Idrogo",
+    "rol": "MANAGER",
+    "telefono": "+51989063639",
+    "numEquipo": 19,
+    "equipo": "VIKINGOS DE FUEGO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Graduado"
+  },
+  {
+    "id": 154,
+    "nombre": "Angella Maria Bollet Gomez",
+    "rol": "MANAGER",
+    "telefono": "+51989455869",
+    "numEquipo": 19,
+    "equipo": "VIKINGOS DE FUEGO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Graduado"
+  },
+  {
+    "id": 155,
+    "nombre": "Juan Manuel Granda",
+    "rol": "CAPITAN",
+    "telefono": "+51947469418",
+    "numEquipo": 19,
+    "equipo": "VIKINGOS DE FUEGO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mike Boada",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Graduado"
+  },
+  {
+    "id": 156,
+    "nombre": "Lucas Alberto Sanchez Silva",
+    "rol": "MANAGER",
+    "telefono": "+51999927725",
+    "numEquipo": 19,
+    "equipo": "VIKINGOS DE FUEGO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mila Campuzano",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Graduado"
+  },
+  {
+    "id": 157,
+    "nombre": "Batioja Alexys",
+    "rol": "MANAGER",
+    "telefono": "0996856906",
+    "numEquipo": 19,
+    "equipo": "RYBAS IKIGAI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 158,
+    "nombre": "Batioja Arturo",
+    "rol": "MANAGER",
+    "telefono": "0986672823",
+    "numEquipo": 19,
+    "equipo": "RYBAS IKIGAI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 159,
+    "nombre": "Bustos Alexander",
+    "rol": "MANAGER",
+    "telefono": "0988790330",
+    "numEquipo": 19,
+    "equipo": "RYBAS IKIGAI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 160,
+    "nombre": "Castilllo Ana Laura",
+    "rol": "MANAGER",
+    "telefono": "0993813010",
+    "numEquipo": 19,
+    "equipo": "RYBAS IKIGAI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 161,
+    "nombre": "Chvez Alexandra",
+    "rol": "MANAGER",
+    "telefono": "0982907381",
+    "numEquipo": 19,
+    "equipo": "RYBAS IKIGAI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 162,
+    "nombre": "Mendoza Mauricio",
+    "rol": "MANAGER",
+    "telefono": "0990832845",
+    "numEquipo": 19,
+    "equipo": "RYBAS IKIGAI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 163,
+    "nombre": "Robbys Mabel",
+    "rol": "MANAGER",
+    "telefono": "0986074127",
+    "numEquipo": 19,
+    "equipo": "RYBAS IKIGAI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 164,
+    "nombre": "Valdez Heidy",
+    "rol": "MANAGER",
+    "telefono": "0983487965",
+    "numEquipo": 19,
+    "equipo": "RYBAS IKIGAI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 165,
+    "nombre": "Vallejo Xavier",
+    "rol": "MANAGER",
+    "telefono": "0981767888",
+    "numEquipo": 19,
+    "equipo": "RYBAS IKIGAI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Graduado"
+  },
+  {
+    "id": 166,
+    "nombre": "Marcelo Riera",
+    "rol": "CAPITAN",
+    "telefono": "0983834620",
+    "numEquipo": 19,
+    "equipo": "KAIROS-CUM",
+    "tieneEntrenador": "SI",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "JUAN FERNANDO REINOSO",
+    "sede": "Cuenca",
+    "estado": "Activo"
+  },
+  {
+    "id": 167,
+    "nombre": "Karina Valdiviezo",
+    "rol": "MANAGER",
+    "telefono": "0967241443",
+    "numEquipo": 19,
+    "equipo": "KAIROS-CUM",
+    "tieneEntrenador": "SI",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "JUAN FERNANDO REINOSO",
+    "sede": "Cuenca",
+    "estado": "Activo"
+  },
+  {
+    "id": 168,
+    "nombre": "Correa Cristian",
+    "rol": "MANAGER",
+    "telefono": "0960641112",
+    "numEquipo": 20,
+    "equipo": "NANKURUNAISA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jose Torron",
+    "coordinador": "",
+    "sede": "Guayaquil",
+    "estado": "Graduado"
+  },
+  {
+    "id": 169,
+    "nombre": "Tenelema Andreina",
+    "rol": "MANAGER",
+    "telefono": "0990196376",
+    "numEquipo": 20,
+    "equipo": "NANKURUNAISA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Ana Monroy",
+    "coordinador": "",
+    "sede": "Guayaquil",
+    "estado": "Graduado"
+  },
+  {
+    "id": 170,
+    "nombre": "Diego Barbieri",
+    "rol": "MANAGER",
+    "telefono": "951815674",
+    "numEquipo": 20,
+    "equipo": "KUNTUR MARKA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Alejandro Diaz",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Graduado"
+  },
+  {
+    "id": 171,
+    "nombre": "Piero Alessandro Portal Pasquel",
+    "rol": "MANAGER",
+    "telefono": "962559832",
+    "numEquipo": 20,
+    "equipo": "KUNTUR MARKA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Graduado"
+  },
+  {
+    "id": 172,
+    "nombre": "Alexandra Tapullima",
+    "rol": "CAPITANA",
+    "telefono": "941842840",
+    "numEquipo": 20,
+    "equipo": "KUNTUR MARKA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Graduado"
+  },
+  {
+    "id": 173,
+    "nombre": "Paulina Cedillo",
+    "rol": "CAPITANA",
+    "telefono": "0958927854",
+    "numEquipo": 20,
+    "equipo": "KISMET WAYRA",
+    "tieneEntrenador": "SI",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "KERLY CARRILLO GARZON",
+    "sede": "Cuenca",
+    "estado": "Activo"
+  },
+  {
+    "id": 174,
+    "nombre": "Edison Yunga",
+    "rol": "MANAGER",
+    "telefono": "0998280875",
+    "numEquipo": 20,
+    "equipo": "KISMET WAYRA",
+    "tieneEntrenador": "SI",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "KERLY CARRILLO GARZON",
+    "sede": "Cuenca",
+    "estado": "Activo"
+  },
+  {
+    "id": 175,
+    "nombre": "Carlos Moncayo",
+    "rol": "MANAGER",
+    "telefono": "0963021449",
+    "numEquipo": 20,
+    "equipo": "KISMET WAYRA",
+    "tieneEntrenador": "SI",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "KERLY CARRILLO GARZON",
+    "sede": "Cuenca",
+    "estado": "Activo"
+  },
+  {
+    "id": 176,
+    "nombre": "Guarochico Adrianna",
+    "rol": "MANAGER",
+    "telefono": "0984613232",
+    "numEquipo": 21,
+    "equipo": "RAGNAROK",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mildred Munoz",
+    "coordinador": "",
+    "sede": "Guayaquil",
+    "estado": "Graduado"
+  },
+  {
+    "id": 177,
+    "nombre": "Ramrez Jorge",
+    "rol": "MANAGER",
+    "telefono": "0989743818",
+    "numEquipo": 21,
+    "equipo": "RAGNAROK",
+    "tieneEntrenador": "Si",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "",
+    "sede": "Guayaquil",
+    "estado": "Graduado"
+  },
+  {
+    "id": 178,
+    "nombre": "Ariskerla Montano Miranda",
+    "rol": "MANAGER",
+    "telefono": "979375441",
+    "numEquipo": 21,
+    "equipo": "TEMPLARIOS DEL ALBA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mila Campuzano",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Graduado"
+  },
+  {
+    "id": 179,
+    "nombre": "Jose Alonso Galvez Lopez",
+    "rol": "MANAGER",
+    "telefono": "962338667",
+    "numEquipo": 21,
+    "equipo": "TEMPLARIOS DEL ALBA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Alejandro Diaz",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Graduado"
+  },
+  {
+    "id": 180,
+    "nombre": "Milagros Castaeda Orbe",
+    "rol": "MANAGER",
+    "telefono": "934593496",
+    "numEquipo": 21,
+    "equipo": "TEMPLARIOS DEL ALBA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Graduado"
+  },
+  {
+    "id": 181,
+    "nombre": "Axel Angulo",
+    "rol": "MANAGER",
+    "telefono": "0985726631",
+    "numEquipo": 22,
+    "equipo": "TITANES KOTETSU",
+    "tieneEntrenador": "Si",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "",
+    "sede": "Guayaquil",
+    "estado": "Graduado"
+  },
+  {
+    "id": 182,
+    "nombre": "Charo Yaneth Aponte Prez",
+    "rol": "MANAGER",
+    "telefono": "980648582",
+    "numEquipo": 22,
+    "equipo": "LEGENDARIOS DEL SAMSARA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Ana Monroy",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Graduado"
+  },
+  {
+    "id": 183,
+    "nombre": "Grezia Maia Jolly Vera",
+    "rol": "MANAGER",
+    "telefono": "920738765",
+    "numEquipo": 22,
+    "equipo": "LEGENDARIOS DEL SAMSARA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Graduado"
+  },
+  {
+    "id": 184,
+    "nombre": "Rosmery Ochoa Ferrer",
+    "rol": "CAPITANA",
+    "telefono": "989665820",
+    "numEquipo": 22,
+    "equipo": "LEGENDARIOS DEL SAMSARA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Graduado"
+  },
+  {
+    "id": 185,
+    "nombre": "Francisco Montoya",
+    "rol": "MANAGER",
+    "telefono": "0968103800",
+    "numEquipo": 22,
+    "equipo": "TITANES KOTETSU",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mila Campuzano",
+    "coordinador": "JOSUE VERA",
+    "sede": "Guayaquil",
+    "estado": "Activo"
+  },
+  {
+    "id": 186,
+    "nombre": "Pedro Solis",
+    "rol": "MANAGER",
+    "telefono": "0990893926",
+    "numEquipo": 22,
+    "equipo": "TITANES KOTETSU",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mila Campuzano",
+    "coordinador": "JOSUE VERA",
+    "sede": "Guayaquil",
+    "estado": "Activo"
+  },
+  {
+    "id": 187,
+    "nombre": "Sharon Andrade",
+    "rol": "CAPITANA",
+    "telefono": "0998579112",
+    "numEquipo": 22,
+    "equipo": "TITANES KOTETSU",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mike Boada",
+    "coordinador": "JOSUE VERA",
+    "sede": "Guayaquil",
+    "estado": "Activo"
+  },
+  {
+    "id": 188,
+    "nombre": "Giovanna Palomino Marcos",
+    "rol": "MANAGER",
+    "telefono": "993 717 944",
+    "numEquipo": 23,
+    "equipo": "SAMURAI KALLPA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Alejandro Diaz",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Graduado"
+  },
+  {
+    "id": 189,
+    "nombre": "Jessica Lpez Lpez",
+    "rol": "MANAGER",
+    "telefono": "951 381 389",
+    "numEquipo": 23,
+    "equipo": "SAMURAI KALLPA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Alejandro Diaz",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Graduado"
+  },
+  {
+    "id": 190,
+    "nombre": "Fernando Abel Lpez Lpez",
+    "rol": "MANAGER",
+    "telefono": "981 237 577",
+    "numEquipo": 23,
+    "equipo": "SAMURAI KALLPA",
+    "tieneEntrenador": "Si",
+    "entrenador": "David Sosa",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Graduado"
+  },
+  {
+    "id": 191,
+    "nombre": "Gissella Huaman Celestino",
+    "rol": "MANAGER",
+    "telefono": "969 587 076",
+    "numEquipo": 23,
+    "equipo": "SAMURAI KALLPA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Diego David Bravo Figueroa",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Graduado"
+  },
+  {
+    "id": 192,
+    "nombre": "Gareth Ramos Prez",
+    "rol": "MANAGER",
+    "telefono": "946 011 882",
+    "numEquipo": 23,
+    "equipo": "SAMURAI KALLPA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Graduado"
+  },
+  {
+    "id": 193,
+    "nombre": "Vaneza Ramrez",
+    "rol": "MANAGER",
+    "telefono": "913 863 730",
+    "numEquipo": 23,
+    "equipo": "SAMURAI KALLPA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Graduado"
+  },
+  {
+    "id": 194,
+    "nombre": "David Emerson Contreras Luchine",
+    "rol": "MANAGER",
+    "telefono": "941 433 268",
+    "numEquipo": 23,
+    "equipo": "SAMURAI KALLPA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Isaac Gabriel Betancourt Patino",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Graduado"
+  },
+  {
+    "id": 195,
+    "nombre": "Eduardo Haro",
+    "rol": "MANAGER",
+    "telefono": "098057981",
+    "numEquipo": 24,
+    "equipo": "ALKHEMIA FINIX",
+    "tieneEntrenador": "Si",
+    "entrenador": "David Sosa",
+    "coordinador": "",
+    "sede": "Guayaquil",
+    "estado": "Graduado"
+  },
+  {
+    "id": 196,
+    "nombre": "Ana Carina Cardenas",
+    "rol": "MANAGER",
+    "telefono": "+51996468297",
+    "numEquipo": 24,
+    "equipo": "KAIRU",
+    "tieneEntrenador": "Si",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Graduado"
+  },
+  {
+    "id": 197,
+    "nombre": "Elizabeth Huamani",
+    "rol": "MANAGER",
+    "telefono": "+51947676664",
+    "numEquipo": 24,
+    "equipo": "KAIRU",
+    "tieneEntrenador": "Si",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Graduado"
+  },
+  {
+    "id": 198,
+    "nombre": "Fernando Juan Lopez Melo",
+    "rol": "MANAGER",
+    "telefono": "+51978581515",
+    "numEquipo": 24,
+    "equipo": "KAIRU",
+    "tieneEntrenador": "Si",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Graduado"
+  },
+  {
+    "id": 199,
+    "nombre": "Geraldine Stephanie Otrera",
+    "rol": "MANAGER",
+    "telefono": "+51944521634",
+    "numEquipo": 24,
+    "equipo": "KAIRU",
+    "tieneEntrenador": "Si",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Graduado"
+  },
+  {
+    "id": 200,
+    "nombre": "Isabel Correa",
+    "rol": "CAPITANA",
+    "telefono": "+51996592870",
+    "numEquipo": 24,
+    "equipo": "KAIRU",
+    "tieneEntrenador": "Si",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Graduado"
+  },
+  {
+    "id": 201,
+    "nombre": "Lely Altamirano Llantoy",
+    "rol": "MANAGER",
+    "telefono": "+51969721562",
+    "numEquipo": 24,
+    "equipo": "KAIRU",
+    "tieneEntrenador": "Si",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Graduado"
+  },
+  {
+    "id": 202,
+    "nombre": "Luis Alberto Hernandez Mendoza",
+    "rol": "MANAGER",
+    "telefono": "+51956268830",
+    "numEquipo": 24,
+    "equipo": "KAIRU",
+    "tieneEntrenador": "Si",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Graduado"
+  },
+  {
+    "id": 203,
+    "nombre": "Marina Patricia Cruzado Mamani",
+    "rol": "MANAGER",
+    "telefono": "+51987724882",
+    "numEquipo": 24,
+    "equipo": "KAIRU",
+    "tieneEntrenador": "Si",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Graduado"
+  },
+  {
+    "id": 204,
+    "nombre": "Otty Zuley Urteaga Silva",
+    "rol": "MANAGER",
+    "telefono": "+51976232368",
+    "numEquipo": 24,
+    "equipo": "KAIRU",
+    "tieneEntrenador": "Si",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Graduado"
+  },
+  {
+    "id": 205,
+    "nombre": "Yenny Paola Flores Tipismana",
+    "rol": "MANAGER",
+    "telefono": "+51963421178",
+    "numEquipo": 24,
+    "equipo": "KAIRU",
+    "tieneEntrenador": "Si",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Graduado"
+  },
+  {
+    "id": 206,
+    "nombre": "Mariela Lopez",
+    "rol": "MANAGER",
+    "telefono": "0997035955",
+    "numEquipo": 25,
+    "equipo": "WAKANDA TAKEMARU",
+    "tieneEntrenador": "Si",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "",
+    "sede": "Guayaquil",
+    "estado": "Graduado"
+  },
+  {
+    "id": 207,
+    "nombre": "Manuel Yakima Rivera",
+    "rol": "CAPITAN",
+    "telefono": "996612880",
+    "numEquipo": 25,
+    "equipo": "SINCHI RUNA",
+    "tieneEntrenador": "SI",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Graduado"
+  },
+  {
+    "id": 208,
+    "nombre": "Marco Antonio Villarreal",
+    "rol": "MANAGER",
+    "telefono": "962511575",
+    "numEquipo": 25,
+    "equipo": "SINCHI RUNA",
+    "tieneEntrenador": "SI",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Graduado"
+  },
+  {
+    "id": 209,
+    "nombre": "Erik Vaca",
+    "rol": "MANAGER",
+    "telefono": "0984270873",
+    "numEquipo": 25,
+    "equipo": "WAKANDA TAKEMARU",
+    "tieneEntrenador": "Si",
+    "entrenador": "Alejandro Diaz",
+    "coordinador": "JOSUE VERA",
+    "sede": "Guayaquil",
+    "estado": "Activo"
+  },
+  {
+    "id": 210,
+    "nombre": "Luis Pruna",
+    "rol": "CAPITAN",
+    "telefono": "0988759534",
+    "numEquipo": 25,
+    "equipo": "WAKANDA TAKEMARU",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Guayaquil",
+    "estado": "Activo"
+  },
+  {
+    "id": 211,
+    "nombre": "Paola Vera",
+    "rol": "MANAGER",
+    "telefono": "0983573513",
+    "numEquipo": 25,
+    "equipo": "WAKANDA TAKEMARU",
+    "tieneEntrenador": "Si",
+    "entrenador": "Pamela Carrillo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Guayaquil",
+    "estado": "Activo"
+  },
+  {
+    "id": 212,
+    "nombre": "Shirley Velasquez",
+    "rol": "MANAGER",
+    "telefono": "0980422186",
+    "numEquipo": 25,
+    "equipo": "WAKANDA TAKEMARU",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "JOSUE VERA",
+    "sede": "Guayaquil",
+    "estado": "Activo"
+  },
+  {
+    "id": 213,
+    "nombre": "Jahaira Munoz",
+    "rol": "MANAGER",
+    "telefono": "0969610316",
+    "numEquipo": 26,
+    "equipo": "NINA RIKUKUNA",
+    "tieneEntrenador": "SI",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Guayaquil",
+    "estado": "Graduado"
+  },
+  {
+    "id": 214,
+    "nombre": "Danna Ochoa",
+    "rol": "MANAGER",
+    "telefono": "0992569679",
+    "numEquipo": 26,
+    "equipo": "NINA RIKUKUNA",
+    "tieneEntrenador": "SI",
+    "entrenador": "Mila Campuzano",
+    "coordinador": "JOSUE VERA",
+    "sede": "Guayaquil",
+    "estado": "Activo"
+  },
+  {
+    "id": 215,
+    "nombre": "Jose Maria Velategui",
+    "rol": "CAPITAN",
+    "telefono": "0987216770",
+    "numEquipo": 26,
+    "equipo": "NINA RIKUKUNA",
+    "tieneEntrenador": "SI",
+    "entrenador": "Mike Boada",
+    "coordinador": "JOSUE VERA",
+    "sede": "Guayaquil",
+    "estado": "Activo"
+  },
+  {
+    "id": 216,
+    "nombre": "Anita Esperanza Flores Tipismana",
+    "rol": "MANAGER",
+    "telefono": "+51998795068",
+    "numEquipo": 26,
+    "equipo": "PROMETHEUS IGNIS",
+    "tieneEntrenador": "SI",
+    "entrenador": "Josue Vera",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Activo"
+  },
+  {
+    "id": 217,
+    "nombre": "Brian Steve Sangay Salvatierra",
+    "rol": "MANAGER",
+    "telefono": "+51902807431",
+    "numEquipo": 26,
+    "equipo": "PROMETHEUS IGNIS",
+    "tieneEntrenador": "SI",
+    "entrenador": "Josue Vera",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Activo"
+  },
+  {
+    "id": 218,
+    "nombre": "Bryan Rodny Lopez Hanco",
+    "rol": "MANAGER",
+    "telefono": "+51970764599",
+    "numEquipo": 26,
+    "equipo": "PROMETHEUS IGNIS",
+    "tieneEntrenador": "SI",
+    "entrenador": "Josue Vera",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Activo"
+  },
+  {
+    "id": 219,
+    "nombre": "Camila Alegria Verastegui Duran",
+    "rol": "MANAGER",
+    "telefono": "+51930526967",
+    "numEquipo": 26,
+    "equipo": "PROMETHEUS IGNIS",
+    "tieneEntrenador": "SI",
+    "entrenador": "Josue Vera",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Activo"
+  },
+  {
+    "id": 220,
+    "nombre": "Maria Olarte Barrientos",
+    "rol": "MANAGER",
+    "telefono": "+51948162114",
+    "numEquipo": 26,
+    "equipo": "PROMETHEUS IGNIS",
+    "tieneEntrenador": "SI",
+    "entrenador": "Josue Vera",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Activo"
+  },
+  {
+    "id": 221,
+    "nombre": "Karina Zamora",
+    "rol": "MANAGER",
+    "telefono": "0993793890",
+    "numEquipo": 27,
+    "equipo": "AQA MAGMA",
+    "tieneEntrenador": "SI",
+    "entrenador": "Alejandro Diaz",
+    "coordinador": "JOSUE VERA",
+    "sede": "Guayaquil",
+    "estado": "Activo"
+  },
+  {
+    "id": 222,
+    "nombre": "Vicente Benitez",
+    "rol": "CAPITAN",
+    "telefono": "0993239903",
+    "numEquipo": 27,
+    "equipo": "AQA MAGMA",
+    "tieneEntrenador": "SI",
+    "entrenador": "Mike Boada",
+    "coordinador": "JOSUE VERA",
+    "sede": "Guayaquil",
+    "estado": "Activo"
+  },
+  {
+    "id": 223,
+    "nombre": "Gina Cardenas Lopez",
+    "rol": "MANAGER",
+    "telefono": "+51999699649",
+    "numEquipo": 27,
+    "equipo": "KAY THERON",
+    "tieneEntrenador": "SI",
+    "entrenador": "Ana Monroy",
+    "coordinador": "LEYLA KELLY PASQUEL ALFARO",
+    "sede": "Lima",
+    "estado": "Activo"
+  },
+  {
+    "id": 224,
+    "nombre": "Grezia Maria Jolly Vera",
+    "rol": "MANAGER",
+    "telefono": "+51920738765",
+    "numEquipo": 27,
+    "equipo": "KAY THERON",
+    "tieneEntrenador": "SI",
+    "entrenador": "Ana Monroy",
+    "coordinador": "LEYLA KELLY PASQUEL ALFARO",
+    "sede": "Lima",
+    "estado": "Activo"
+  },
+  {
+    "id": 225,
+    "nombre": "Gustavo Adolfo Fernandez Espinoza",
+    "rol": "MANAGER",
+    "telefono": "+51930326809",
+    "numEquipo": 27,
+    "equipo": "KAY THERON",
+    "tieneEntrenador": "SI",
+    "entrenador": "Ana Monroy",
+    "coordinador": "LEYLA KELLY PASQUEL ALFARO",
+    "sede": "Lima",
+    "estado": "Activo"
+  },
+  {
+    "id": 226,
+    "nombre": "Jose Israel Maquera Montoya",
+    "rol": "MANAGER",
+    "telefono": "+51904408130",
+    "numEquipo": 27,
+    "equipo": "KAY THERON",
+    "tieneEntrenador": "SI",
+    "entrenador": "Ana Monroy",
+    "coordinador": "LEYLA KELLY PASQUEL ALFARO",
+    "sede": "Lima",
+    "estado": "Activo"
+  },
+  {
+    "id": 227,
+    "nombre": "Laura Toapanta",
+    "rol": "CAPITANA",
+    "telefono": "0991802330",
+    "numEquipo": 28,
+    "equipo": "KRAXX PHOENIX",
+    "tieneEntrenador": "SI",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "JOSUE VERA",
+    "sede": "Guayaquil",
+    "estado": "Activo"
+  },
+  {
+    "id": 228,
+    "nombre": "Giovanna Palomino Marcos",
+    "rol": "CAPITAN",
+    "telefono": "+51922042189",
+    "numEquipo": 28,
+    "equipo": "UBUNTU",
+    "tieneEntrenador": "SI",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Activo"
+  },
+  {
+    "id": 229,
+    "nombre": "Liz Carol Trujillo Mallqui",
+    "rol": "MANAGER",
+    "telefono": "+51980496819",
+    "numEquipo": 28,
+    "equipo": "UBUNTU",
+    "tieneEntrenador": "SI",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Activo"
+  },
+  {
+    "id": 230,
+    "nombre": "Francisco Manuel Huaman Rios",
+    "rol": "MANAGER",
+    "telefono": "+51988595686",
+    "numEquipo": 28,
+    "equipo": "UBUNTU",
+    "tieneEntrenador": "SI",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Activo"
+  },
+  {
+    "id": 231,
+    "nombre": "Mabel Robbys",
+    "rol": "CAPITANA",
+    "telefono": "0986074127",
+    "numEquipo": 29,
+    "equipo": "YUKI NO RYU",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Guayaquil",
+    "estado": "Activo"
+  },
+  {
+    "id": 232,
+    "nombre": "Italo Alonso Roman Nomura",
+    "rol": "MANAGER",
+    "telefono": "+51997213218",
+    "numEquipo": 29,
+    "equipo": "QUANTUM PHOENIX",
+    "tieneEntrenador": "SI",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "LEYLA KELLY PASQUEL ALFARO",
+    "sede": "Lima",
+    "estado": "Activo"
+  },
+  {
+    "id": 233,
+    "nombre": "Tania Aurora Sanchez Castro",
+    "rol": "MANAGER",
+    "telefono": "+51981295423",
+    "numEquipo": 29,
+    "equipo": "QUANTUM PHOENIX",
+    "tieneEntrenador": "SI",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "LEYLA KELLY PASQUEL ALFARO",
+    "sede": "Lima",
+    "estado": "Activo"
+  },
+  {
+    "id": 234,
+    "nombre": "Alvaro Angarita",
+    "rol": "MANAGER",
+    "telefono": "0959114621",
+    "numEquipo": 30,
+    "equipo": "METAMORFOSIS",
+    "tieneEntrenador": "SI",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
+    "sede": "Guayaquil",
+    "estado": "Activo"
+  },
+  {
+    "id": 235,
+    "nombre": "Erik Vaca",
+    "rol": "MANAGER",
+    "telefono": "0984270873",
+    "numEquipo": 30,
+    "equipo": "METAMORFOSIS",
+    "tieneEntrenador": "SI",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
+    "sede": "Guayaquil",
+    "estado": "Activo"
+  },
+  {
+    "id": 236,
+    "nombre": "Karina Garcia",
+    "rol": "MANAGER",
+    "telefono": "0939935732",
+    "numEquipo": 30,
+    "equipo": "METAMORFOSIS",
+    "tieneEntrenador": "SI",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
+    "sede": "Guayaquil",
+    "estado": "Activo"
+  },
+  {
+    "id": 237,
+    "nombre": "Wilson Vallejo",
+    "rol": "CAPITAN",
+    "telefono": "0981767888",
+    "numEquipo": 30,
+    "equipo": "METAMORFOSIS",
+    "tieneEntrenador": "SI",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
+    "sede": "Guayaquil",
+    "estado": "Activo"
+  },
+  {
+    "id": 238,
+    "nombre": "Belen Garcia",
+    "rol": "CAPITANA",
+    "telefono": "0968306238",
+    "numEquipo": 31,
+    "equipo": "YUTAKA-KAIROZEN",
+    "tieneEntrenador": "SI",
+    "entrenador": "Linid Valencia",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
+    "sede": "Guayaquil",
+    "estado": "Activo"
+  },
+  {
+    "id": 239,
+    "nombre": "Diego Silva",
+    "rol": "MANAGER",
+    "telefono": "+1(609)6353345",
+    "numEquipo": 31,
+    "equipo": "YUTAKA-KAIROZEN",
+    "tieneEntrenador": "SI",
+    "entrenador": "Linid Valencia",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
+    "sede": "Guayaquil",
+    "estado": "Activo"
+  },
+  {
+    "id": 240,
+    "nombre": "Leo Angarita",
+    "rol": "MANAGER",
+    "telefono": "0998895959",
+    "numEquipo": 31,
+    "equipo": "YUTAKA-KAIROZEN",
+    "tieneEntrenador": "SI",
+    "entrenador": "Linid Valencia",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
+    "sede": "Guayaquil",
+    "estado": "Activo"
+  },
+  {
+    "id": 241,
+    "nombre": "Mariela Guerrero",
+    "rol": "MANAGER",
+    "telefono": "0993083068",
+    "numEquipo": 31,
+    "equipo": "YUTAKA-KAIROZEN",
+    "tieneEntrenador": "SI",
+    "entrenador": "Linid Valencia",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
+    "sede": "Guayaquil",
+    "estado": "Activo"
+  },
+  {
+    "id": 242,
+    "nombre": "Isabella Torres",
+    "rol": "CAPITANA",
+    "telefono": "0961901809",
+    "numEquipo": 32,
+    "equipo": "ALQUIMIA",
+    "tieneEntrenador": "SI",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
+    "sede": "Guayaquil",
+    "estado": "Activo"
+  },
+  {
+    "id": 243,
+    "nombre": "Ivonne Recaurte",
+    "rol": "MANAGER",
+    "telefono": "0998775445",
+    "numEquipo": 32,
+    "equipo": "ALQUIMIA",
+    "tieneEntrenador": "SI",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
+    "sede": "Guayaquil",
+    "estado": "Activo"
+  },
+  {
+    "id": 244,
+    "nombre": "Enrrique Franco",
+    "rol": "CAPITAN",
+    "telefono": "0980805649",
+    "numEquipo": 33,
+    "equipo": "ARTAM TSUNKI",
+    "tieneEntrenador": "SI",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
+    "sede": "Guayaquil",
+    "estado": "Activo"
+  },
+  {
+    "id": 245,
+    "nombre": "Evelyn Orellana",
+    "rol": "MANAGER",
+    "telefono": "0981969172",
+    "numEquipo": 33,
+    "equipo": "ARTAM TSUNKI",
+    "tieneEntrenador": "SI",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
+    "sede": "Guayaquil",
+    "estado": "Activo"
+  },
+  {
+    "id": 246,
+    "nombre": "Fernanda Ibaez",
+    "rol": "MANAGER",
+    "telefono": "0985800390",
+    "numEquipo": 33,
+    "equipo": "ARTAM TSUNKI",
+    "tieneEntrenador": "SI",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
+    "sede": "Guayaquil",
+    "estado": "Activo"
+  },
+  {
+    "id": 247,
+    "nombre": "Iliana Delgado",
+    "rol": "CAPITANA",
+    "telefono": "0994600397",
+    "numEquipo": 34,
+    "equipo": "FRACTAL SHINE",
+    "tieneEntrenador": "SI",
+    "entrenador": "Kerly Carrillo Garzon",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
+    "sede": "Guayaquil",
+    "estado": "Activo"
+  },
+  {
+    "id": 248,
+    "nombre": "Oscar Moran",
+    "rol": "MANAGER",
+    "telefono": "0962806824",
+    "numEquipo": 34,
+    "equipo": "FRACTAL SHINE",
+    "tieneEntrenador": "SI",
+    "entrenador": "Kerly Carrillo Garzon",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
+    "sede": "Guayaquil",
+    "estado": "Activo"
+  },
+  {
+    "id": 249,
+    "nombre": "Byron Figuero",
+    "rol": "MANAGER",
+    "telefono": "0991006617",
+    "numEquipo": 34,
+    "equipo": "FRACTAL SHINE",
+    "tieneEntrenador": "SI",
+    "entrenador": "Kerly Carrillo Garzon",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
+    "sede": "Guayaquil",
+    "estado": "Activo"
+  },
+  {
+    "id": 250,
+    "nombre": "Mateo Recalde",
+    "rol": "MANAGER",
+    "telefono": "0987765563",
+    "numEquipo": 34,
+    "equipo": "FRACTAL SHINE",
+    "tieneEntrenador": "SI",
+    "entrenador": "Kerly Carrillo Garzon",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
+    "sede": "Guayaquil",
+    "estado": "Activo"
+  },
+  {
+    "id": 251,
+    "nombre": "Pilar Rodriguez",
+    "rol": "MANAGER",
+    "telefono": "0981359517",
+    "numEquipo": 34,
+    "equipo": "FRACTAL SHINE",
+    "tieneEntrenador": "SI",
+    "entrenador": "Kerly Carrillo Garzon",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
+    "sede": "Guayaquil",
+    "estado": "Activo"
+  },
+  {
+    "id": 252,
+    "nombre": "Abigail Ordoez",
+    "rol": "MANAGER",
+    "telefono": "+5930984499954",
+    "numEquipo": 79,
+    "equipo": "Ayni Inti Sarpay",
+    "tieneEntrenador": "Si",
+    "entrenador": "Alejandro Diaz",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 253,
+    "nombre": "Margarita Lema",
+    "rol": "MANAGER",
+    "telefono": "+5930983061351",
+    "numEquipo": 79,
+    "equipo": "Ayni Inti Sarpay",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mike Boada",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 254,
+    "nombre": "Ruth Parreo",
+    "rol": "MANAGER",
+    "telefono": "+5930992310545",
+    "numEquipo": 79,
+    "equipo": "Ayni Inti Sarpay",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Gomez",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 255,
+    "nombre": "Alejandro Arteaga",
+    "rol": "MANAGER",
+    "telefono": "+5930995390495",
+    "numEquipo": 80,
+    "equipo": "Vuitanta",
+    "tieneEntrenador": "Si",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 256,
+    "nombre": "Angie Len",
+    "rol": "MANAGER",
+    "telefono": "+5930997473043",
+    "numEquipo": 80,
+    "equipo": "Vuitanta",
+    "tieneEntrenador": "Si",
+    "entrenador": "Alejandro Diaz",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 257,
+    "nombre": "Christian Bustamante",
+    "rol": "MANAGER",
+    "telefono": "+5930985860761",
+    "numEquipo": 80,
+    "equipo": "Vuitanta",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jose Torron",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 258,
+    "nombre": "Daniel Vera",
+    "rol": "MANAGER",
+    "telefono": "+5930998731046",
+    "numEquipo": 80,
+    "equipo": "Vuitanta",
+    "tieneEntrenador": "Si",
+    "entrenador": "Christian Tito",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 259,
+    "nombre": "Jennifer Villavicencio",
+    "rol": "MANAGER",
+    "telefono": "+5930979138817",
+    "numEquipo": 80,
+    "equipo": "Vuitanta",
+    "tieneEntrenador": "Si",
+    "entrenador": "Christian Tito",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 260,
+    "nombre": "Carlos Intriago",
+    "rol": "MANAGER",
+    "telefono": "+5930996841945",
+    "numEquipo": 81,
+    "equipo": "Dracarys",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jesus Adrian Acosta",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 261,
+    "nombre": "Evelyn Roman",
+    "rol": "MANAGER",
+    "telefono": "+5930987159621",
+    "numEquipo": 81,
+    "equipo": "Dracarys",
+    "tieneEntrenador": "Si",
+    "entrenador": "Alejandro Diaz",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 262,
+    "nombre": "Mafer Caldern",
+    "rol": "MANAGER",
+    "telefono": "+5930995297942",
+    "numEquipo": 81,
+    "equipo": "Dracarys",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Gomez",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 263,
+    "nombre": "Miriam Flores",
+    "rol": "MANAGER",
+    "telefono": "+5930988035696",
+    "numEquipo": 81,
+    "equipo": "Dracarys",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jose Torron",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 264,
+    "nombre": "Miroslava Roman",
+    "rol": "MANAGER",
+    "telefono": "+5930984425095",
+    "numEquipo": 81,
+    "equipo": "Dracarys",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mildred Munoz",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 265,
+    "nombre": "David Ruiz",
+    "rol": "MANAGER",
+    "telefono": "+5930991608776",
+    "numEquipo": 82,
+    "equipo": "Toruk Makto",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Gomez",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 266,
+    "nombre": "Gnesis Mndez",
+    "rol": "MANAGER",
+    "telefono": "+5930998307134",
+    "numEquipo": 82,
+    "equipo": "Toruk Makto",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jesus Adrian Acosta",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 267,
+    "nombre": "Mery Largo",
+    "rol": "MANAGER",
+    "telefono": "+5930995824801",
+    "numEquipo": 82,
+    "equipo": "Toruk Makto",
+    "tieneEntrenador": "Si",
+    "entrenador": "Alejandro Diaz",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 268,
+    "nombre": "Ronald Cargua",
+    "rol": "MANAGER",
+    "telefono": "+5930995791221",
+    "numEquipo": 82,
+    "equipo": "Toruk Makto",
+    "tieneEntrenador": "Si",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 269,
+    "nombre": "Sandy Monserrate",
+    "rol": "MANAGER",
+    "telefono": "+5930962043232",
+    "numEquipo": 82,
+    "equipo": "Toruk Makto",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mildred Munoz",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 270,
+    "nombre": "Sara Fernndez",
+    "rol": "MANAGER",
+    "telefono": "+5930998631853",
+    "numEquipo": 82,
+    "equipo": "Toruk Makto",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mike Boada",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 271,
+    "nombre": "Savie Barriga",
+    "rol": "MANAGER",
+    "telefono": "+5930986987448",
+    "numEquipo": 82,
+    "equipo": "Toruk Makto",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jesus Adrian Acosta",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 272,
+    "nombre": "Sebastin Ulloa",
+    "rol": "MANAGER",
+    "telefono": "+5930968952298",
+    "numEquipo": 82,
+    "equipo": "Toruk Makto",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mike Boada",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 273,
+    "nombre": "Stefany Herrera",
+    "rol": "MANAGER",
+    "telefono": "+5930995342526",
+    "numEquipo": 82,
+    "equipo": "Toruk Makto",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mildred Munoz",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 274,
+    "nombre": "Abigail Caldern",
+    "rol": "MANAGER",
+    "telefono": "+5930958918232",
+    "numEquipo": 83,
+    "equipo": "Tzucan",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mike Boada",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 275,
+    "nombre": "Alba Baez",
+    "rol": "MANAGER",
+    "telefono": "+5930963146246",
+    "numEquipo": 83,
+    "equipo": "Tzucan",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Gomez",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 276,
+    "nombre": "Andres Armas",
+    "rol": "MANAGER",
+    "telefono": "+5930984939196",
+    "numEquipo": 83,
+    "equipo": "Tzucan",
+    "tieneEntrenador": "Si",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 277,
+    "nombre": "Andres Banda",
+    "rol": "MANAGER",
+    "telefono": "+5930997019475",
+    "numEquipo": 83,
+    "equipo": "Tzucan",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 278,
+    "nombre": "Anthony Velastegui",
+    "rol": "MANAGER",
+    "telefono": "+5930985519571",
+    "numEquipo": 83,
+    "equipo": "Tzucan",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mike Boada",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 279,
+    "nombre": "Carlos Naveda",
+    "rol": "MANAGER",
+    "telefono": "+5930984606993",
+    "numEquipo": 83,
+    "equipo": "Tzucan",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mike Boada",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 280,
+    "nombre": "Diana Ramirez",
+    "rol": "MANAGER",
+    "telefono": "+5930998045560",
+    "numEquipo": 83,
+    "equipo": "Tzucan",
+    "tieneEntrenador": "Si",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 281,
+    "nombre": "Erick Tamayo",
+    "rol": "MANAGER",
+    "telefono": "+5930990373602",
+    "numEquipo": 83,
+    "equipo": "Tzucan",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Gomez",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 282,
+    "nombre": "Erika Pazmio",
+    "rol": "MANAGER",
+    "telefono": "+5930993238513",
+    "numEquipo": 83,
+    "equipo": "Tzucan",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mike Boada",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 283,
+    "nombre": "Evelyn Hernandez",
+    "rol": "MANAGER",
+    "telefono": "+5930992450002",
+    "numEquipo": 83,
+    "equipo": "Tzucan",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Gomez",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 284,
+    "nombre": "Franklin Herrera",
+    "rol": "MANAGER",
+    "telefono": "+5930962669609",
+    "numEquipo": 83,
+    "equipo": "Tzucan",
+    "tieneEntrenador": "Si",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 285,
+    "nombre": "Hugo Cordova",
+    "rol": "MANAGER",
+    "telefono": "+5930994825120",
+    "numEquipo": 83,
+    "equipo": "Tzucan",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mildred Munoz",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 286,
+    "nombre": "Jonathan Guaraca",
+    "rol": "MANAGER",
+    "telefono": "+5930992672029",
+    "numEquipo": 83,
+    "equipo": "Tzucan",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 287,
+    "nombre": "Xavier Calle",
+    "rol": "MANAGER",
+    "telefono": "+5930998553017",
+    "numEquipo": 83,
+    "equipo": "Tzucan",
+    "tieneEntrenador": "Si",
+    "entrenador": "Alejandro Diaz",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 288,
+    "nombre": "Alejandra Munoz",
+    "rol": "MANAGER",
+    "telefono": "+593958825825",
+    "numEquipo": 84,
+    "equipo": "Byakko Hanshi",
+    "tieneEntrenador": "Si",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 289,
+    "nombre": "Andres Wong",
+    "rol": "MANAGER",
+    "telefono": "+593983771118",
+    "numEquipo": 84,
+    "equipo": "Byakko Hanshi",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 290,
+    "nombre": "Belen Trujillo",
+    "rol": "MANAGER",
+    "telefono": "+593998526285",
+    "numEquipo": 84,
+    "equipo": "Byakko Hanshi",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 291,
+    "nombre": "Christian Quiroz M.",
+    "rol": "MANAGER",
+    "telefono": "+593987333702",
+    "numEquipo": 84,
+    "equipo": "Byakko Hanshi",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mildred Munoz",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 292,
+    "nombre": "Diana Villamar",
+    "rol": "MANAGER",
+    "telefono": "+593997252932",
+    "numEquipo": 84,
+    "equipo": "Byakko Hanshi",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 293,
+    "nombre": "Frank Caldern",
+    "rol": "MANAGER",
+    "telefono": "+593992740689",
+    "numEquipo": 84,
+    "equipo": "Byakko Hanshi",
+    "tieneEntrenador": "Si",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 294,
+    "nombre": "Gabriela Espin",
+    "rol": "MANAGER",
+    "telefono": "+593984573440",
+    "numEquipo": 84,
+    "equipo": "Byakko Hanshi",
+    "tieneEntrenador": "Si",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 295,
+    "nombre": "Grace Zambrano",
+    "rol": "MANAGER",
+    "telefono": "+593992800733",
+    "numEquipo": 84,
+    "equipo": "Byakko Hanshi",
+    "tieneEntrenador": "Si",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 296,
+    "nombre": "Jahel Salazar",
+    "rol": "MANAGER",
+    "telefono": "+593984339531",
+    "numEquipo": 84,
+    "equipo": "Byakko Hanshi",
+    "tieneEntrenador": "Si",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 297,
+    "nombre": "Jean Pierre Quiroz",
+    "rol": "MANAGER",
+    "telefono": "+593984551062",
+    "numEquipo": 84,
+    "equipo": "Byakko Hanshi",
+    "tieneEntrenador": "Si",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 298,
+    "nombre": "Liss Acosta",
+    "rol": "MANAGER",
+    "telefono": "+593958846495",
+    "numEquipo": 84,
+    "equipo": "Byakko Hanshi",
+    "tieneEntrenador": "Si",
+    "entrenador": "Christian Tito",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 299,
+    "nombre": "Magy Mendoza",
+    "rol": "MANAGER",
+    "telefono": "+593987372976",
+    "numEquipo": 84,
+    "equipo": "Byakko Hanshi",
+    "tieneEntrenador": "Si",
+    "entrenador": "Christian Tito",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 300,
+    "nombre": "Maishel Freire",
+    "rol": "MANAGER",
+    "telefono": "+593958604427",
+    "numEquipo": 84,
+    "equipo": "Byakko Hanshi",
+    "tieneEntrenador": "Si",
+    "entrenador": "Christian Tito",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 301,
+    "nombre": "Martin  Quiroz",
+    "rol": "MANAGER",
+    "telefono": "+593995606621",
+    "numEquipo": 84,
+    "equipo": "Byakko Hanshi",
+    "tieneEntrenador": "Si",
+    "entrenador": "Christian Tito",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 302,
+    "nombre": "Mau Rivadeneira",
+    "rol": "MANAGER",
+    "telefono": "+593984917757",
+    "numEquipo": 84,
+    "equipo": "Byakko Hanshi",
+    "tieneEntrenador": "Si",
+    "entrenador": "Alejandro Diaz",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 303,
+    "nombre": "Mikaella Correa",
+    "rol": "MANAGER",
+    "telefono": "+593994051010",
+    "numEquipo": 84,
+    "equipo": "Byakko Hanshi",
+    "tieneEntrenador": "Si",
+    "entrenador": "Alejandro Diaz",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 304,
+    "nombre": "Poleth Montalvo",
+    "rol": "MANAGER",
+    "telefono": "+593991687219",
+    "numEquipo": 84,
+    "equipo": "Byakko Hanshi",
+    "tieneEntrenador": "Si",
+    "entrenador": "Josue Vera",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 305,
+    "nombre": "William Sanchez",
+    "rol": "MANAGER",
+    "telefono": "+593986813400",
+    "numEquipo": 84,
+    "equipo": "Byakko Hanshi",
+    "tieneEntrenador": "Si",
+    "entrenador": "Josue Vera",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 306,
+    "nombre": "Fernanda Salazar",
+    "rol": "MANAGER",
+    "telefono": "593 99 518 9260",
+    "numEquipo": 85,
+    "equipo": "Ahaba Jai",
+    "tieneEntrenador": "Si",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 307,
+    "nombre": "Guillermo Tamayo",
+    "rol": "MANAGER",
+    "telefono": "593 96 905 4276",
+    "numEquipo": 85,
+    "equipo": "Ahaba Jai",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jose Torron",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 308,
+    "nombre": "Lilibeth Cubillo",
+    "rol": "MANAGER",
+    "telefono": "593 99 652 1133",
+    "numEquipo": 85,
+    "equipo": "Ahaba Jai",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jesus Adrian Acosta",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 309,
+    "nombre": "Margarita Pillajo",
+    "rol": "MANAGER",
+    "telefono": "+593 99 272 5687",
+    "numEquipo": 85,
+    "equipo": "Ahaba Jai",
+    "tieneEntrenador": "Si",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 310,
+    "nombre": "Victoria Cazorla",
+    "rol": "MANAGER",
+    "telefono": "+593 99 680 2001",
+    "numEquipo": 85,
+    "equipo": "Ahaba Jai",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 311,
+    "nombre": "Alejandra Tenemaza",
+    "rol": "MANAGER",
+    "telefono": "593 991070235",
+    "numEquipo": 86,
+    "equipo": "Sula Amay",
+    "tieneEntrenador": "Si",
+    "entrenador": "Maria Jose Roman",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 312,
+    "nombre": "Andres Valle",
+    "rol": "MANAGER",
+    "telefono": "593 963284609",
+    "numEquipo": 86,
+    "equipo": "Sula Amay",
+    "tieneEntrenador": "Si",
+    "entrenador": "Maria Jose Roman",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 313,
+    "nombre": "Daniel Tapia",
+    "rol": "MANAGER",
+    "telefono": "593 998507448",
+    "numEquipo": 86,
+    "equipo": "Sula Amay",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Gomez",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 314,
+    "nombre": "Darwin Cisneros",
+    "rol": "MANAGER",
+    "telefono": "593 996178727",
+    "numEquipo": 86,
+    "equipo": "Sula Amay",
+    "tieneEntrenador": "Si",
+    "entrenador": "Maria Jose Roman",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 315,
+    "nombre": "Fabiola Lara",
+    "rol": "MANAGER",
+    "telefono": "593 981714761",
+    "numEquipo": 86,
+    "equipo": "Sula Amay",
+    "tieneEntrenador": "Si",
+    "entrenador": "Maria Jose Roman",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 316,
+    "nombre": "Jonathan Herrera",
+    "rol": "MANAGER",
+    "telefono": "593 995515665",
+    "numEquipo": 86,
+    "equipo": "Sula Amay",
+    "tieneEntrenador": "Si",
+    "entrenador": "Diego David Bravo Figueroa",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 317,
+    "nombre": "Jose Maria Jimenez",
+    "rol": "MANAGER",
+    "telefono": "593 983449967",
+    "numEquipo": 86,
+    "equipo": "Sula Amay",
+    "tieneEntrenador": "Si",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 318,
+    "nombre": "Milton Chicaiza",
+    "rol": "MANAGER",
+    "telefono": "593 995037113",
+    "numEquipo": 86,
+    "equipo": "Sula Amay",
+    "tieneEntrenador": "Si",
+    "entrenador": "Diego David Bravo Figueroa",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 319,
+    "nombre": "Sandra Moreno",
+    "rol": "MANAGER",
+    "telefono": "593 994837809",
+    "numEquipo": 86,
+    "equipo": "Sula Amay",
+    "tieneEntrenador": "Si",
+    "entrenador": "Diego David Bravo Figueroa",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 320,
+    "nombre": "Adams Gonzalez",
+    "rol": "MANAGER",
+    "telefono": "593963928499",
+    "numEquipo": 87,
+    "equipo": "Grifus Invictus",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 321,
+    "nombre": "Dario Betancourt",
+    "rol": "MANAGER",
+    "telefono": "597996240797",
+    "numEquipo": 87,
+    "equipo": "Grifus Invictus",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Gomez",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 322,
+    "nombre": "Emanuel Llumiquinga",
+    "rol": "MANAGER",
+    "telefono": "593979964083",
+    "numEquipo": 87,
+    "equipo": "Grifus Invictus",
+    "tieneEntrenador": "Si",
+    "entrenador": "Diego David Bravo Figueroa",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 323,
+    "nombre": "Fabricio Medina",
+    "rol": "MANAGER",
+    "telefono": "593967975777",
+    "numEquipo": 87,
+    "equipo": "Grifus Invictus",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mildred Munoz",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 324,
+    "nombre": "Fernando Mediavilla",
+    "rol": "MANAGER",
+    "telefono": "593984435866",
+    "numEquipo": 87,
+    "equipo": "Grifus Invictus",
+    "tieneEntrenador": "Si",
+    "entrenador": "Diego David Bravo Figueroa",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 325,
+    "nombre": "Francisco Abad",
+    "rol": "MANAGER",
+    "telefono": "593999817089",
+    "numEquipo": 87,
+    "equipo": "Grifus Invictus",
+    "tieneEntrenador": "Si",
+    "entrenador": "Maria Jose Roman",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 326,
+    "nombre": "Michelle Vargas",
+    "rol": "MANAGER",
+    "telefono": "593962663140",
+    "numEquipo": 87,
+    "equipo": "Grifus Invictus",
+    "tieneEntrenador": "Si",
+    "entrenador": "Ana Monroy",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 327,
+    "nombre": "Romina Marconi",
+    "rol": "MANAGER",
+    "telefono": "593992487806",
+    "numEquipo": 87,
+    "equipo": "Grifus Invictus",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jesus Adrian Acosta",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 328,
+    "nombre": "Santiago Benitez",
+    "rol": "MANAGER",
+    "telefono": "593994347819",
+    "numEquipo": 87,
+    "equipo": "Grifus Invictus",
+    "tieneEntrenador": "Si",
+    "entrenador": "Ana Monroy",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 329,
+    "nombre": "Valeria Espinoza",
+    "rol": "MANAGER",
+    "telefono": "593962180647",
+    "numEquipo": 87,
+    "equipo": "Grifus Invictus",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jesus Adrian Acosta",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 330,
+    "nombre": "Vanessa Romero",
+    "rol": "MANAGER",
+    "telefono": "593998862385",
+    "numEquipo": 87,
+    "equipo": "Grifus Invictus",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mildred Munoz",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 331,
+    "nombre": "Ximena Calispa",
+    "rol": "MANAGER",
+    "telefono": "593978689304",
+    "numEquipo": 87,
+    "equipo": "Grifus Invictus",
+    "tieneEntrenador": "Si",
+    "entrenador": "Ana Monroy",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 332,
+    "nombre": "Yahaira Fierro",
+    "rol": "MANAGER",
+    "telefono": "593984872902",
+    "numEquipo": 87,
+    "equipo": "Grifus Invictus",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mike Boada",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 333,
+    "nombre": "Andres Mena",
+    "rol": "MANAGER",
+    "telefono": "593987662574",
+    "numEquipo": 88,
+    "equipo": "CATEPHRIA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Alejandro Diaz",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 334,
+    "nombre": "Carlos Ortz",
+    "rol": "MANAGER",
+    "telefono": "593999701679",
+    "numEquipo": 88,
+    "equipo": "CATEPHRIA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Isaac Gabriel Betancourt Patino",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 335,
+    "nombre": "Daniel Escobar",
+    "rol": "MANAGER",
+    "telefono": "593995266768",
+    "numEquipo": 88,
+    "equipo": "CATEPHRIA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Gomez",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 336,
+    "nombre": "Jennifer Villavicencio",
+    "rol": "MANAGER",
+    "telefono": "593979138817",
+    "numEquipo": 88,
+    "equipo": "CATEPHRIA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 337,
+    "nombre": "Juan Castillo",
+    "rol": "MANAGER",
+    "telefono": "593995275755",
+    "numEquipo": 88,
+    "equipo": "CATEPHRIA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Isaac Gabriel Betancourt Patino",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 338,
+    "nombre": "Juliana Quiroz",
+    "rol": "MANAGER",
+    "telefono": "593988008607",
+    "numEquipo": 88,
+    "equipo": "CATEPHRIA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mike Boada",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 339,
+    "nombre": "Leonila Castillo",
+    "rol": "MANAGER",
+    "telefono": "593999849832",
+    "numEquipo": 88,
+    "equipo": "CATEPHRIA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jose Torron",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 340,
+    "nombre": "Lorena Carrin",
+    "rol": "MANAGER",
+    "telefono": "593988234569",
+    "numEquipo": 88,
+    "equipo": "CATEPHRIA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mike Boada",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 341,
+    "nombre": "Mnica Mena",
+    "rol": "MANAGER",
+    "telefono": "593982910201",
+    "numEquipo": 88,
+    "equipo": "CATEPHRIA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Isaac Gabriel Betancourt Patino",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 342,
+    "nombre": "Yolanda Torres",
+    "rol": "MANAGER",
+    "telefono": "593985267774",
+    "numEquipo": 88,
+    "equipo": "CATEPHRIA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 343,
+    "nombre": "Evelyn Cuenca",
+    "rol": "MANAGER",
+    "telefono": "0958822877",
+    "numEquipo": 89,
+    "equipo": "SHAKTI EMUNAH",
+    "tieneEntrenador": "Si",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 344,
+    "nombre": "Mireya Adriano",
+    "rol": "MANAGER",
+    "telefono": "0980554584",
+    "numEquipo": 89,
+    "equipo": "SHAKTI EMUNAH",
+    "tieneEntrenador": "Si",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 345,
+    "nombre": "Cesar Rodriguez",
+    "rol": "MANAGER",
+    "telefono": "0978990144",
+    "numEquipo": 89,
+    "equipo": "SHAKTI EMUNAH",
+    "tieneEntrenador": "Si",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 346,
+    "nombre": "Diana Martinez",
+    "rol": "MANAGER",
+    "telefono": "0995986195",
+    "numEquipo": 89,
+    "equipo": "SHAKTI EMUNAH",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mildred Munoz",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 347,
+    "nombre": "Francisco Pacheco",
+    "rol": "MANAGER",
+    "telefono": "0961442340",
+    "numEquipo": 89,
+    "equipo": "SHAKTI EMUNAH",
+    "tieneEntrenador": "Si",
+    "entrenador": "Maria Jose Roman",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 348,
+    "nombre": "Pablo Ortiz",
+    "rol": "MANAGER",
+    "telefono": "0987515639",
+    "numEquipo": 89,
+    "equipo": "SHAKTI EMUNAH",
+    "tieneEntrenador": "Si",
+    "entrenador": "Alejandro Diaz",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 349,
+    "nombre": "Abigail Aillon",
+    "rol": "MANAGER",
+    "telefono": "0982327222",
+    "numEquipo": 90,
+    "equipo": "ACADIA SEMPER FI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Isaac Gabriel Betancourt Patino",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 350,
+    "nombre": "Alejandro Gomez",
+    "rol": "MANAGER",
+    "telefono": "0999761820",
+    "numEquipo": 90,
+    "equipo": "ACADIA SEMPER FI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 351,
+    "nombre": "Deisy Chacon",
+    "rol": "MANAGER",
+    "telefono": "0998777325",
+    "numEquipo": 90,
+    "equipo": "ACADIA SEMPER FI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 352,
+    "nombre": "Felipe Catillo",
+    "rol": "MANAGER",
+    "telefono": "0999031327",
+    "numEquipo": 90,
+    "equipo": "ACADIA SEMPER FI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jose Torron",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 353,
+    "nombre": "Gaby Sanchez",
+    "rol": "MANAGER",
+    "telefono": "0959013902",
+    "numEquipo": 90,
+    "equipo": "ACADIA SEMPER FI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 354,
+    "nombre": "Gaby Valarezo",
+    "rol": "MANAGER",
+    "telefono": "0983131161",
+    "numEquipo": 90,
+    "equipo": "ACADIA SEMPER FI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 355,
+    "nombre": "Javier Pazmio",
+    "rol": "MANAGER",
+    "telefono": "0994606173",
+    "numEquipo": 90,
+    "equipo": "ACADIA SEMPER FI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 356,
+    "nombre": "Jessy Salazar",
+    "rol": "MANAGER",
+    "telefono": "0992596999",
+    "numEquipo": 90,
+    "equipo": "ACADIA SEMPER FI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 357,
+    "nombre": "Jhonatan Rualez",
+    "rol": "MANAGER",
+    "telefono": "0999021921",
+    "numEquipo": 90,
+    "equipo": "ACADIA SEMPER FI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Isaac Gabriel Betancourt Patino",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 358,
+    "nombre": "Leon Armas",
+    "rol": "MANAGER",
+    "telefono": "0984939196",
+    "numEquipo": 90,
+    "equipo": "ACADIA SEMPER FI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Josue Vera",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 359,
+    "nombre": "Leonardo Espin",
+    "rol": "MANAGER",
+    "telefono": "0993664644",
+    "numEquipo": 90,
+    "equipo": "ACADIA SEMPER FI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 360,
+    "nombre": "Fabian Abad",
+    "rol": "MANAGER",
+    "telefono": "0998746653",
+    "numEquipo": 91,
+    "equipo": "HAMSA TADAKATSU",
+    "tieneEntrenador": "Si",
+    "entrenador": "Maria Jose Roman",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 361,
+    "nombre": "Fernando Apuango De La Cruz",
+    "rol": "MANAGER",
+    "telefono": "0986985620",
+    "numEquipo": 91,
+    "equipo": "HAMSA TADAKATSU",
+    "tieneEntrenador": "Si",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 362,
+    "nombre": "Horacio Mafla",
+    "rol": "MANAGER",
+    "telefono": "0987953073",
+    "numEquipo": 91,
+    "equipo": "HAMSA TADAKATSU",
+    "tieneEntrenador": "Si",
+    "entrenador": "Josue Vera",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 363,
+    "nombre": "Jorge Rodriguez",
+    "rol": "MANAGER",
+    "telefono": "0999101568",
+    "numEquipo": 91,
+    "equipo": "HAMSA TADAKATSU",
+    "tieneEntrenador": "Si",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 364,
+    "nombre": "Pablo Soria",
+    "rol": "MANAGER",
+    "telefono": "0997705135",
+    "numEquipo": 91,
+    "equipo": "HAMSA TADAKATSU",
+    "tieneEntrenador": "Si",
+    "entrenador": "Josue Vera",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 365,
+    "nombre": "Veronica Morales",
+    "rol": "MANAGER",
+    "telefono": "0985113033",
+    "numEquipo": 91,
+    "equipo": "HAMSA TADAKATSU",
+    "tieneEntrenador": "Si",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 366,
+    "nombre": "Karla Paredes",
+    "rol": "MANAGER",
+    "telefono": "0996920266",
+    "numEquipo": 92,
+    "equipo": "APIS TITANIUM",
+    "tieneEntrenador": "Si",
+    "entrenador": "Diego David Bravo Figueroa",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 367,
+    "nombre": "Margarita Buenao",
+    "rol": "MANAGER",
+    "telefono": "0984355230",
+    "numEquipo": 92,
+    "equipo": "APIS TITANIUM",
+    "tieneEntrenador": "Si",
+    "entrenador": "Diego David Bravo Figueroa",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 368,
+    "nombre": "Maritza Romero",
+    "rol": "Manager",
+    "telefono": "5930980184471",
+    "numEquipo": 1,
+    "equipo": "TRINA MUNAY KI",
+    "tieneEntrenador": "No",
+    "entrenador": "Jesus Adrian Acosta",
+    "coordinador": "MIGUEL TORRES",
+    "sede": "Cuenca",
+    "estado": "Desertor"
+  },
+  {
+    "id": 369,
+    "nombre": "Felipe Rhenals",
+    "rol": "Manager",
+    "telefono": "3104429169",
+    "numEquipo": 1,
+    "equipo": "HENKO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "",
+    "sede": "Medellin",
+    "estado": "Desertor"
+  },
+  {
+    "id": 370,
+    "nombre": "Jose Galindo",
+    "rol": "Capitan",
+    "telefono": "0992848576",
+    "numEquipo": 2,
+    "equipo": "INTI CAMARI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "MIGUEL TORRES",
+    "sede": "Cuenca",
+    "estado": "Desertor"
+  },
+  {
+    "id": 371,
+    "nombre": "Alejandro Calle",
+    "rol": "Manager",
+    "telefono": "3234282671",
+    "numEquipo": 2,
+    "equipo": "NICAN AXCAN",
+    "tieneEntrenador": "Si",
+    "entrenador": "Alejandro Diaz",
+    "coordinador": "",
+    "sede": "Medellin",
+    "estado": "Desertor"
+  },
+  {
+    "id": 372,
+    "nombre": "Ignacio Jimnez",
+    "rol": "Manager",
+    "telefono": "593 96 229 8765",
+    "numEquipo": 3,
+    "equipo": "Athalaya Kumi",
+    "tieneEntrenador": "Si",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "MIGUEL TORRES",
+    "sede": "Cuenca",
+    "estado": "Desertor"
+  },
+  {
+    "id": 373,
+    "nombre": "Mateo Pachacama",
+    "rol": "Manager",
+    "telefono": "593 98 412 3196",
+    "numEquipo": 3,
+    "equipo": "Athalaya Kumi",
+    "tieneEntrenador": "Si",
+    "entrenador": "Ana Cristina Sanchez",
+    "coordinador": "MIGUEL TORRES",
+    "sede": "Cuenca",
+    "estado": "Desertor"
+  },
+  {
+    "id": 374,
+    "nombre": "Dayanna Lopez",
+    "rol": "Manager",
+    "telefono": "0980177146",
+    "numEquipo": 4,
+    "equipo": "Alquimia",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jose Torron",
+    "coordinador": "JOSUE VERA",
+    "sede": "Cuenca",
+    "estado": "Desertor"
+  },
+  {
+    "id": 375,
+    "nombre": "Franklim Zeas",
+    "rol": "MANAGER",
+    "telefono": "0984077123",
+    "numEquipo": 6,
+    "equipo": "NUNA KAWSAY",
+    "tieneEntrenador": "Si",
+    "entrenador": "Ana Monroy",
+    "coordinador": "JOSUE VERA",
+    "sede": "Cuenca",
+    "estado": "Desertor"
+  },
+  {
+    "id": 376,
+    "nombre": "Edgar Kevin Garces",
+    "rol": "CAPITAN",
+    "telefono": "+573194169780",
+    "numEquipo": 6,
+    "equipo": "ZENSEIS",
+    "tieneEntrenador": "Si",
+    "entrenador": "Ana Monroy",
+    "coordinador": "",
+    "sede": "Medellin",
+    "estado": "Desertor"
+  },
+  {
+    "id": 377,
+    "nombre": "Ada Nez",
+    "rol": "Manager",
+    "telefono": "+51 985 031 721",
+    "numEquipo": 7,
+    "equipo": "Espartanos",
+    "tieneEntrenador": "No",
+    "entrenador": "Alejandro Diaz",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Desertor"
+  },
+  {
+    "id": 378,
+    "nombre": "Marco Mendez",
+    "rol": "Manager",
+    "telefono": "0983168859",
+    "numEquipo": 8,
+    "equipo": "METANOIA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "KERLY CARRILLO GARZON",
+    "sede": "Cuenca",
+    "estado": "Desertor"
+  },
+  {
+    "id": 379,
+    "nombre": "Carlos Ramirez",
+    "rol": "Manager",
+    "telefono": "+51 990 184 115",
+    "numEquipo": 8,
+    "equipo": "Pretorianos Infinitos",
+    "tieneEntrenador": "No",
+    "entrenador": "Ana Cristina Sanchez",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Desertor"
+  },
+  {
+    "id": 380,
+    "nombre": "Evelyn Flores",
+    "rol": "Manager",
+    "telefono": "+51 994 704 928",
+    "numEquipo": 8,
+    "equipo": "Pretorianos Infinitos",
+    "tieneEntrenador": "No",
+    "entrenador": "Mildred Munoz",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Desertor"
+  },
+  {
+    "id": 381,
+    "nombre": "Lusy Diaz",
+    "rol": "Manager",
+    "telefono": "+51 961 892 790",
+    "numEquipo": 8,
+    "equipo": "Pretorianos Infinitos",
+    "tieneEntrenador": "No",
+    "entrenador": "Mildred Munoz",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Desertor"
+  },
+  {
+    "id": 382,
+    "nombre": "Laura Vanessa Durango Araque",
+    "rol": "CAPITANA",
+    "telefono": "3113691829",
+    "numEquipo": 8,
+    "equipo": "INFINITYMO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Gomez",
+    "coordinador": "MAURICIO RAMIREZ SILVA",
+    "sede": "Medellin",
+    "estado": "Desertor"
+  },
+  {
+    "id": 383,
+    "nombre": "John Benitez",
+    "rol": "MANAGER",
+    "telefono": "+573246110466",
+    "numEquipo": 9,
+    "equipo": "AMAR",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "MAURICIO RAMIREZ SILVA",
+    "sede": "Medellin",
+    "estado": "Desertor"
+  },
+  {
+    "id": 384,
+    "nombre": "Brian Morales",
+    "rol": "CAPITAN",
+    "telefono": "+573233644192",
+    "numEquipo": 9,
+    "equipo": "AMAR",
+    "tieneEntrenador": "Si",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "MAURICIO RAMIREZ SILVA",
+    "sede": "Medellin",
+    "estado": "Desertor"
+  },
+  {
+    "id": 385,
+    "nombre": "Erika Flor Blanco Alvis",
+    "rol": "Capitana",
+    "telefono": "+51 962 365 323",
+    "numEquipo": 10,
+    "equipo": "David's Poderosos",
+    "tieneEntrenador": "Si",
+    "entrenador": "Ana Cristina Sanchez",
+    "coordinador": "",
+    "sede": "Sin Sede",
+    "estado": "Desertor"
+  },
+  {
+    "id": 386,
+    "nombre": "Martha Rea",
+    "rol": "MANAGER",
+    "telefono": "0982969608",
+    "numEquipo": 12,
+    "equipo": "ANSTASIS",
+    "tieneEntrenador": "Si",
+    "entrenador": "Kriscia Rodas",
+    "coordinador": "KERLY CARRILLO GARZON",
+    "sede": "Cuenca",
+    "estado": "Desertor"
+  },
+  {
+    "id": 387,
+    "nombre": "Diego Mora",
+    "rol": "MANAGER",
+    "telefono": "0987583826",
+    "numEquipo": 13,
+    "equipo": "SIC PARVIS MAGNA",
+    "tieneEntrenador": "SI",
+    "entrenador": "Mila Campuzano",
+    "coordinador": "KERLY CARRILLO GARZON / JUAN FERNANDO REINOSO",
+    "sede": "Cuenca",
+    "estado": "Desertor"
+  },
+  {
+    "id": 388,
+    "nombre": "Soraya Lara",
+    "rol": "CAPITANA",
+    "telefono": "593991631172",
+    "numEquipo": 14,
+    "equipo": "KAMINARI KUNTURI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mike Boada",
+    "coordinador": "",
+    "sede": "Cuenca",
+    "estado": "Desertor"
+  },
+  {
+    "id": 389,
+    "nombre": "Lucy Ostoa",
+    "rol": "CAPITANA",
+    "telefono": "949191577.0",
+    "numEquipo": 14,
+    "equipo": "LEONKUNA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Maria Jose Roman",
+    "coordinador": "",
+    "sede": "Cuenca",
+    "estado": "Desertor"
+  },
+  {
+    "id": 390,
+    "nombre": "Luis Alberto Hernndez Mendoza",
+    "rol": "CAPITANA",
+    "telefono": "+51 956 268830",
+    "numEquipo": 15,
+    "equipo": "DRAGONES CUNTICOS",
+    "tieneEntrenador": "Si",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "",
+    "sede": "Cuenca",
+    "estado": "Desertor"
+  },
+  {
+    "id": 391,
+    "nombre": "Paul Gamarra",
+    "rol": "CAPITANA",
+    "telefono": "+51 934 690932",
+    "numEquipo": 15,
+    "equipo": "DRAGONES CUNTICOS",
+    "tieneEntrenador": "Si",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "",
+    "sede": "Cuenca",
+    "estado": "Desertor"
+  },
+  {
+    "id": 392,
+    "nombre": "Anggie Espinoza",
+    "rol": "CAPITANA",
+    "telefono": "593982449947",
+    "numEquipo": 16,
+    "equipo": "Ara Ambiguus",
+    "tieneEntrenador": "Si",
+    "entrenador": "Ana Cristina Sanchez",
+    "coordinador": "",
+    "sede": "Cuenca",
+    "estado": "Desertor"
+  },
+  {
+    "id": 393,
+    "nombre": "Jose Gualchi",
+    "rol": "CAPITANA",
+    "telefono": "593984294753",
+    "numEquipo": 17,
+    "equipo": "HATUM BRAHMA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Ana Cristina Sanchez",
+    "coordinador": "",
+    "sede": "Cuenca",
+    "estado": "Desertor"
+  },
+  {
+    "id": 394,
+    "nombre": "Geraldine Vanessa Sotomayor",
+    "rol": "MANAGER",
+    "telefono": "+51 983 701 400",
+    "numEquipo": 17,
+    "equipo": "JAGUARES DE ORO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "",
+    "sede": "Cuenca",
+    "estado": "Desertor"
+  },
+  {
+    "id": 395,
+    "nombre": "Pilar De La Cruz Huaytalla",
+    "rol": "MANAGER",
+    "telefono": "+51 985 461 746",
+    "numEquipo": 17,
+    "equipo": "JAGUARES DE ORO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "",
+    "sede": "Cuenca",
+    "estado": "Desertor"
+  },
+  {
+    "id": 396,
+    "nombre": "Zara Castillo Herrera",
+    "rol": "MANAGER",
+    "telefono": "+51961491513",
+    "numEquipo": 18,
+    "equipo": "NGELES DE FUEGO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Alejandro Diaz",
+    "coordinador": "",
+    "sede": "Cuenca",
+    "estado": "Desertor"
+  },
+  {
+    "id": 397,
+    "nombre": "Paul Recalde",
+    "rol": "MANAGER",
+    "telefono": "593999766343",
+    "numEquipo": 18,
+    "equipo": "SUMAQ KAWSAYKUNA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "",
+    "sede": "Cuenca",
+    "estado": "Desertor"
+  },
+  {
+    "id": 398,
+    "nombre": "Carlos Alberto Castillo Tipismana",
+    "rol": "MANAGER",
+    "telefono": "+51982791484",
+    "numEquipo": 19,
+    "equipo": "VIKINGOS DE FUEGO",
+    "tieneEntrenador": "Si",
+    "entrenador": "David Sosa",
+    "coordinador": "",
+    "sede": "Cuenca",
+    "estado": "Desertor"
+  },
+  {
+    "id": 399,
+    "nombre": "Cristian Jonathan Arone Chachayma",
+    "rol": "MANAGER",
+    "telefono": "+51961496514",
+    "numEquipo": 19,
+    "equipo": "VIKINGOS DE FUEGO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "",
+    "sede": "Cuenca",
+    "estado": "Desertor"
+  },
+  {
+    "id": 400,
+    "nombre": "Maria Elena Romero Ramirez",
+    "rol": "MANAGER",
+    "telefono": "+51954884632",
+    "numEquipo": 19,
+    "equipo": "VIKINGOS DE FUEGO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Isaac Gabriel Betancourt Patino",
+    "coordinador": "",
+    "sede": "Lima",
+    "estado": "Desertor"
+  },
+  {
+    "id": 401,
+    "nombre": "Hector Canqui Valladares",
+    "rol": "MANAGER",
+    "telefono": "+51992798459",
+    "numEquipo": 19,
+    "equipo": "VIKINGOS DE FUEGO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "",
+    "sede": "Lima",
+    "estado": "Desertor"
+  },
+  {
+    "id": 402,
+    "nombre": "Anthony Leo Altamirano Llaccuas",
+    "rol": "MANAGER",
+    "telefono": "+51958110726",
+    "numEquipo": 19,
+    "equipo": "VIKINGOS DE FUEGO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "",
+    "sede": "Lima",
+    "estado": "Desertor"
+  },
+  {
+    "id": 403,
+    "nombre": "Argotti Emiliano",
+    "rol": "MANAGER",
+    "telefono": "0962784962",
+    "numEquipo": 20,
+    "equipo": "NANKURUNAISA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Alejandro Diaz",
+    "coordinador": "",
+    "sede": "Guayaquil",
+    "estado": "Desertor"
+  },
+  {
+    "id": 404,
+    "nombre": "Correa Mabel",
+    "rol": "MANAGER",
+    "telefono": "0978667245",
+    "numEquipo": 20,
+    "equipo": "NANKURUNAISA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "",
+    "sede": "Guayaquil",
+    "estado": "Desertor"
+  },
+  {
+    "id": 405,
+    "nombre": "Ordoez Diego",
+    "rol": "MANAGER",
+    "telefono": "0963058531",
+    "numEquipo": 20,
+    "equipo": "NANKURUNAISA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mildred Munoz",
+    "coordinador": "",
+    "sede": "Guayaquil",
+    "estado": "Desertor"
+  },
+  {
+    "id": 406,
+    "nombre": "Miriam Mendoza Pilco",
+    "rol": "MANAGER",
+    "telefono": "929809609",
+    "numEquipo": 20,
+    "equipo": "KUNTUR MARKA",
+    "tieneEntrenador": "Si",
+    "entrenador": "David Sosa",
+    "coordinador": "",
+    "sede": "Lima",
+    "estado": "Desertor"
+  },
+  {
+    "id": 407,
+    "nombre": "Katia De Paz",
+    "rol": "MANAGER",
+    "telefono": "968104053",
+    "numEquipo": 20,
+    "equipo": "KUNTUR MARKA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "",
+    "sede": "Lima",
+    "estado": "Desertor"
+  },
+  {
+    "id": 408,
+    "nombre": "Giovana Palomino Marcos",
+    "rol": "MANAGER",
+    "telefono": "993717944",
+    "numEquipo": 20,
+    "equipo": "KUNTUR MARKA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Diego David Bravo Figueroa",
+    "coordinador": "",
+    "sede": "Lima",
+    "estado": "Desertor"
+  },
+  {
+    "id": 409,
+    "nombre": "Rhania Untiveros Requejo",
+    "rol": "MANAGER",
+    "telefono": "948948750",
+    "numEquipo": 20,
+    "equipo": "KUNTUR MARKA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "",
+    "sede": "Lima",
+    "estado": "Desertor"
+  },
+  {
+    "id": 410,
+    "nombre": "Luz Mabel Chipana",
+    "rol": "MANAGER",
+    "telefono": "931283234",
+    "numEquipo": 20,
+    "equipo": "KUNTUR MARKA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "",
+    "sede": "Lima",
+    "estado": "Desertor"
+  },
+  {
+    "id": 411,
+    "nombre": "Camila Luca Len More",
+    "rol": "CAPITANA",
+    "telefono": "981701570",
+    "numEquipo": 21,
+    "equipo": "TEMPLARIOS DEL ALBA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Desertor"
+  },
+  {
+    "id": 412,
+    "nombre": "Jhen Ponce Espinoza",
+    "rol": "MANAGER",
+    "telefono": "970373769",
+    "numEquipo": 21,
+    "equipo": "TEMPLARIOS DEL ALBA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Desertor"
+  },
+  {
+    "id": 413,
+    "nombre": "Gabriela Carbo",
+    "rol": "MANAGER",
+    "telefono": "0959283977",
+    "numEquipo": 22,
+    "equipo": "TITANES KOTETSU",
+    "tieneEntrenador": "Si",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "",
+    "sede": "Guayaquil",
+    "estado": "Desertor"
+  },
+  {
+    "id": 414,
+    "nombre": "Karla Vera",
+    "rol": "MANAGER",
+    "telefono": "0987427733",
+    "numEquipo": 22,
+    "equipo": "TITANES KOTETSU",
+    "tieneEntrenador": "Si",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "",
+    "sede": "Guayaquil",
+    "estado": "Desertor"
+  },
+  {
+    "id": 415,
+    "nombre": "Jose Guillermos Curi",
+    "rol": "MANAGER",
+    "telefono": "922972827",
+    "numEquipo": 22,
+    "equipo": "LEGENDARIOS DEL SAMSARA",
+    "tieneEntrenador": "Si",
+    "entrenador": "David Sosa",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Desertor"
+  },
+  {
+    "id": 416,
+    "nombre": "Paul Gamarra",
+    "rol": "MANAGER",
+    "telefono": "934690932",
+    "numEquipo": 22,
+    "equipo": "LEGENDARIOS DEL SAMSARA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Josue Vera",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Desertor"
+  },
+  {
+    "id": 417,
+    "nombre": "Karla Jimenez",
+    "rol": "MANAGER",
+    "telefono": "0994709294",
+    "numEquipo": 23,
+    "equipo": "ESTOICOS INVICTUS",
+    "tieneEntrenador": "SI",
+    "entrenador": "Andres Gomez",
+    "coordinador": "",
+    "sede": "Guayaquil",
+    "estado": "Desertor"
+  },
+  {
+    "id": 418,
+    "nombre": "Enrique Franco",
+    "rol": "MANAGER",
+    "telefono": "0980805649",
+    "numEquipo": 24,
+    "equipo": "ALKHEMIA FINIX",
+    "tieneEntrenador": "Si",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "",
+    "sede": "Guayaquil",
+    "estado": "Desertor"
+  },
+  {
+    "id": 419,
+    "nombre": "Fernando Mediavilla",
+    "rol": "MANAGER",
+    "telefono": "+5930984435866",
+    "numEquipo": 81,
+    "equipo": "Dracarys",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mildred Munoz",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 420,
+    "nombre": "Joselyn Ushia",
+    "rol": "MANAGER",
+    "telefono": "+5930958648685",
+    "numEquipo": 81,
+    "equipo": "Dracarys",
+    "tieneEntrenador": "Si",
+    "entrenador": "Alejandro Diaz",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 421,
+    "nombre": "Bladimir Parra",
+    "rol": "MANAGER",
+    "telefono": "+5930995902993",
+    "numEquipo": 83,
+    "equipo": "Tzucan",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mike Boada",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 422,
+    "nombre": "Elena Llanos",
+    "rol": "MANAGER",
+    "telefono": "+593968525606",
+    "numEquipo": 84,
+    "equipo": "Byakko Hanshi",
+    "tieneEntrenador": "Si",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Cuenca",
+    "estado": "Desertor"
+  },
+  {
+    "id": 423,
+    "nombre": "Nicole Murgeytio",
+    "rol": "MANAGER",
+    "telefono": "+593987634771",
+    "numEquipo": 84,
+    "equipo": "Byakko Hanshi",
+    "tieneEntrenador": "Si",
+    "entrenador": "Alejandro Diaz",
+    "coordinador": "JOSUE VERA",
+    "sede": "Cuenca",
+    "estado": "Desertor"
+  },
+  {
+    "id": 424,
+    "nombre": "Ruben Cadena",
+    "rol": "MANAGER",
+    "telefono": "+593987512450",
+    "numEquipo": 84,
+    "equipo": "Byakko Hanshi",
+    "tieneEntrenador": "Si",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Cuenca",
+    "estado": "Desertor"
+  },
+  {
+    "id": 425,
+    "nombre": "Anderson Ortega",
+    "rol": "MANAGER",
+    "telefono": "+593997446147",
+    "numEquipo": 84,
+    "equipo": "Byakko Hanshi",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mike Boada",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 426,
+    "nombre": "Fernando Gonzlez",
+    "rol": "MANAGER",
+    "telefono": "593 99 148 8105",
+    "numEquipo": 85,
+    "equipo": "Ahaba Jai",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jose Torron",
+    "coordinador": "JOSUE VERA",
+    "sede": "Cuenca",
+    "estado": "Desertor"
+  },
+  {
+    "id": 427,
+    "nombre": "Michelle Cardenas",
+    "rol": "MANAGER",
+    "telefono": "=+593 99 935 7124",
+    "numEquipo": 85,
+    "equipo": "Ahaba Jai",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jose Torron",
+    "coordinador": "JOSUE VERA",
+    "sede": "Cuenca",
+    "estado": "Desertor"
+  },
+  {
+    "id": 428,
+    "nombre": "Fabricio Montero",
+    "rol": "MANAGER",
+    "telefono": "593992789103",
+    "numEquipo": 88,
+    "equipo": "CATEPHRIA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Josue Vera",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 429,
+    "nombre": "Kathy Mena",
+    "rol": "MANAGER",
+    "telefono": "593996029957",
+    "numEquipo": 88,
+    "equipo": "CATEPHRIA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Alejandro Diaz",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 430,
+    "nombre": "Cesar Montenegro",
+    "rol": "MANAGER",
+    "telefono": "0998366343",
+    "numEquipo": 89,
+    "equipo": "SHAKTI EMUNAH",
+    "tieneEntrenador": "Si",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 431,
+    "nombre": "Sofia Dueas",
+    "rol": "MANAGER",
+    "telefono": "0998071513",
+    "numEquipo": 89,
+    "equipo": "SHAKTI EMUNAH",
+    "tieneEntrenador": "Si",
+    "entrenador": "Diego David Bravo Figueroa",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 432,
+    "nombre": "William Paladines",
+    "rol": "MANAGER",
+    "telefono": "0980810907",
+    "numEquipo": 89,
+    "equipo": "SHAKTI EMUNAH",
+    "tieneEntrenador": "Si",
+    "entrenador": "Diego David Bravo Figueroa",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 433,
+    "nombre": "Carolina Santamaria",
+    "rol": "MANAGER",
+    "telefono": "0987459234",
+    "numEquipo": 90,
+    "equipo": "ACADIA SEMPER FI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 434,
+    "nombre": "Monica Chavez",
+    "rol": "MANAGER",
+    "telefono": "0986937742",
+    "numEquipo": 90,
+    "equipo": "ACADIA SEMPER FI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Josue Vera",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 435,
+    "nombre": "Plutarco Almeida",
+    "rol": "MANAGER",
+    "telefono": "0984458759",
+    "numEquipo": 90,
+    "equipo": "ACADIA SEMPER FI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jose Torron",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 436,
+    "nombre": "Ruben Cadena",
+    "rol": "MANAGER",
+    "telefono": "0987512450",
+    "numEquipo": 90,
+    "equipo": "ACADIA SEMPER FI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Isaac Gabriel Betancourt Patino",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 437,
+    "nombre": "Victor Gomez",
+    "rol": "MANAGER",
+    "telefono": "0991089099",
+    "numEquipo": 90,
+    "equipo": "ACADIA SEMPER FI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 438,
+    "nombre": "Paul Morales",
+    "rol": "MANAGER",
+    "telefono": "0963085663",
+    "numEquipo": 91,
+    "equipo": "HAMSA TADAKATSU",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jose Torron",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 439,
+    "nombre": "Cadena Martinez Kevin Joel",
+    "rol": "MANAGER",
+    "telefono": "98 739 7514",
+    "numEquipo": 93,
+    "equipo": "METATRON",
+    "tieneEntrenador": "Si",
+    "entrenador": "Maria Jose Roman",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 440,
+    "nombre": "Vera Geovanna",
+    "rol": "MANAGER",
+    "telefono": "0967239396",
+    "numEquipo": 95,
+    "equipo": "LYUN USHUAY RHUA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mike Boada",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 441,
+    "nombre": "David Valarezo",
+    "rol": "MANAGER",
+    "telefono": "0959944151",
+    "numEquipo": 96,
+    "equipo": "NINARI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Josue Vera",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 442,
+    "nombre": "Edmundo Carvajal",
+    "rol": "MANAGER",
+    "telefono": "0978668372",
+    "numEquipo": 96,
+    "equipo": "NINARI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Maria Jose Roman",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 443,
+    "nombre": "Darwin Alejandro Enriquez Pupiales",
+    "rol": "MANAGER",
+    "telefono": "0981333528",
+    "numEquipo": 98,
+    "equipo": "VALHALLA DRAKI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Maria Jose Roman",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 444,
+    "nombre": "Edison Javier Lutuala Valiente",
+    "rol": "MANAGER",
+    "telefono": "0962985900",
+    "numEquipo": 98,
+    "equipo": "VALHALLA DRAKI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 445,
+    "nombre": "Tannia Jacqueline Valverde Pando",
+    "rol": "MANAGER",
+    "telefono": "0987278887",
+    "numEquipo": 98,
+    "equipo": "VALHALLA DRAKI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 446,
+    "nombre": "Andres Macias",
+    "rol": "MANAGER",
+    "telefono": "0963482451",
+    "numEquipo": 99,
+    "equipo": "HENSU CHIKARA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Diego David Bravo Figueroa",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 447,
+    "nombre": "Fernando Gozalez",
+    "rol": "MANAGER",
+    "telefono": "0991488105",
+    "numEquipo": 99,
+    "equipo": "HENSU CHIKARA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Josue Vera",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 448,
+    "nombre": "Evelyn Quinaloa",
+    "rol": "MANAGER",
+    "telefono": "984104374",
+    "numEquipo": 101,
+    "equipo": "SUMAQ SHIN",
+    "tieneEntrenador": "Si",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 449,
+    "nombre": "Flor Mendoza",
+    "rol": "MANAGER",
+    "telefono": "979151395",
+    "numEquipo": 102,
+    "equipo": "RIKCHARI MUNAY",
+    "tieneEntrenador": "Si",
+    "entrenador": "Maria Jose Roman",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 450,
+    "nombre": "Juan Carlos Carguacundo",
+    "rol": "MANAGER",
+    "telefono": "998789582",
+    "numEquipo": 102,
+    "equipo": "RIKCHARI MUNAY",
+    "tieneEntrenador": "Si",
+    "entrenador": "David Sosa",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 451,
+    "nombre": "Pablo Cobos",
+    "rol": "CAPITAN",
+    "telefono": "998032222",
+    "numEquipo": 102,
+    "equipo": "RIKCHARI MUNAY",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mike Boada",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 452,
+    "nombre": "Diego Jacome",
+    "rol": "MANAGER",
+    "telefono": "987621305",
+    "numEquipo": 103,
+    "equipo": "MEMENTO MORI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Diego David Bravo Figueroa",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 453,
+    "nombre": "Ariana Estrada",
+    "rol": "MANAGER",
+    "telefono": "983598854",
+    "numEquipo": 103,
+    "equipo": "MEMENTO MORI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 454,
+    "nombre": "Karina Guaraca",
+    "rol": "MANAGER",
+    "telefono": "998294954",
+    "numEquipo": 103,
+    "equipo": "MEMENTO MORI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 455,
+    "nombre": "Castillo Reyes Leonila Gabriela",
+    "rol": "CAPITN",
+    "telefono": "+593999849832",
+    "numEquipo": 104,
+    "equipo": "RAGNAROK CHAKANA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Ana Monroy",
+    "coordinador": "ROBERTO RODRIGUEZ",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 456,
+    "nombre": "\\nSalazar Benitez \\tJean Pierre",
+    "rol": "MANAGER",
+    "telefono": "+593998195158",
+    "numEquipo": 104,
+    "equipo": "RAGNAROK CHAKANA",
+    "tieneEntrenador": "Si",
+    "entrenador": "David Sosa",
+    "coordinador": "ROBERTO RODRIGUEZ",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 457,
+    "nombre": "Jaqui Reyes Giovanny Javier",
+    "rol": "MANAGER",
+    "telefono": "+593958834058",
+    "numEquipo": 104,
+    "equipo": "RAGNAROK CHAKANA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Diego David Bravo Figueroa",
+    "coordinador": "ROBERTO RODRIGUEZ",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 458,
+    "nombre": "Benitez Nieto Tatiana Mishell",
+    "rol": "MANAGER",
+    "telefono": "+593999752777",
+    "numEquipo": 104,
+    "equipo": "RAGNAROK CHAKANA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "ROBERTO RODRIGUEZ",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 459,
+    "nombre": "Carcelen Carla",
+    "rol": "MANAGER",
+    "telefono": "981370601.0",
+    "numEquipo": 105,
+    "equipo": "KRALLARI IPSOFACTO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Pamela Carrillo",
+    "coordinador": "",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 460,
+    "nombre": "Carius Jonathan",
+    "rol": "MANAGER",
+    "telefono": "981744833.0",
+    "numEquipo": 105,
+    "equipo": "KRALLARI IPSOFACTO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Diego David Bravo Figueroa",
+    "coordinador": "",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 461,
+    "nombre": "Chaluisa Nathalia",
+    "rol": "MANAGER",
+    "telefono": "998110306.0",
+    "numEquipo": 105,
+    "equipo": "KRALLARI IPSOFACTO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Pamela Carrillo",
+    "coordinador": "",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 462,
+    "nombre": "Enriquez Alejandro",
+    "rol": "MANAGER",
+    "telefono": "981333528.0",
+    "numEquipo": 105,
+    "equipo": "KRALLARI IPSOFACTO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 463,
+    "nombre": "Morejon Cristina",
+    "rol": "MANAGER",
+    "telefono": "995321338.0",
+    "numEquipo": 105,
+    "equipo": "KRALLARI IPSOFACTO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 464,
+    "nombre": "Villamar Veronica",
+    "rol": "MANAGER",
+    "telefono": "993467965.0",
+    "numEquipo": 105,
+    "equipo": "KRALLARI IPSOFACTO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Diego David Bravo Figueroa",
+    "coordinador": "",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 465,
+    "nombre": "Paz Cristina",
+    "rol": "MANAGER",
+    "telefono": "984443805.0",
+    "numEquipo": 105,
+    "equipo": "KRALLARI IPSOFACTO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 466,
+    "nombre": "Benitez Santiago",
+    "rol": "MANAGER",
+    "telefono": "994347819.0",
+    "numEquipo": 105,
+    "equipo": "KRALLARI IPSOFACTO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Josue Vera",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 467,
+    "nombre": "Guerrero Moraima",
+    "rol": "MANAGER",
+    "telefono": "992935885.0",
+    "numEquipo": 105,
+    "equipo": "KRALLARI IPSOFACTO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Josue Vera",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 468,
+    "nombre": "Marco Clavijo",
+    "rol": "MANAGER",
+    "telefono": "0990342527",
+    "numEquipo": 106,
+    "equipo": "KAIZEN MUKETSU",
+    "tieneEntrenador": "SI",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "ALEJANDRO DIAZ",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 469,
+    "nombre": "Andres Leon Armas",
+    "rol": "CAPITAN",
+    "telefono": "984939196",
+    "numEquipo": 106,
+    "equipo": "KAIZEN MUKETSU",
+    "tieneEntrenador": "SI",
+    "entrenador": "Mike Boada",
+    "coordinador": "ALEJANDRO DIAZ",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 470,
+    "nombre": "Juan Cuzco",
+    "rol": "MANAGER",
+    "telefono": "990394123",
+    "numEquipo": 107,
+    "equipo": "ARUTAM REN",
+    "tieneEntrenador": "Si",
+    "entrenador": "Kriscia Rodas",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 471,
+    "nombre": "Mateo Pachacama",
+    "rol": "MANAGER",
+    "telefono": "984123196",
+    "numEquipo": 107,
+    "equipo": "ARUTAM REN",
+    "tieneEntrenador": "Si",
+    "entrenador": "Josue Vera",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 472,
+    "nombre": "Andrea Pozo",
+    "rol": "MANAGER",
+    "telefono": "984564752",
+    "numEquipo": 107,
+    "equipo": "ARUTAM REN",
+    "tieneEntrenador": "Si",
+    "entrenador": "Diego David Bravo Figueroa",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 473,
+    "nombre": "Alisson Barreros",
+    "rol": "MANAGER",
+    "telefono": "963136490",
+    "numEquipo": 107,
+    "equipo": "ARUTAM REN",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 474,
+    "nombre": "Martin Garcia",
+    "rol": "MANAGER",
+    "telefono": "999681812",
+    "numEquipo": 107,
+    "equipo": "ARUTAM REN",
+    "tieneEntrenador": "Si",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 475,
+    "nombre": "Jorge Gaunulema",
+    "rol": "MANAGER",
+    "telefono": "984092584",
+    "numEquipo": 107,
+    "equipo": "ARUTAM REN",
+    "tieneEntrenador": "Si",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 476,
+    "nombre": "Bryan Iza",
+    "rol": "MANAGER",
+    "telefono": "962992736",
+    "numEquipo": 107,
+    "equipo": "ARUTAM REN",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 477,
+    "nombre": "Gnesis Mndez",
+    "rol": "MANAGER",
+    "telefono": "0998307134",
+    "numEquipo": 108,
+    "equipo": "NIKA AKAPANA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "ROBERTO RODRIGUEZ",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 478,
+    "nombre": "Ximena Briones",
+    "rol": "MANAGER",
+    "telefono": "0987245276",
+    "numEquipo": 108,
+    "equipo": "NIKA AKAPANA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "ROBERTO RODRIGUEZ",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 479,
+    "nombre": "Octavio Murgueytio",
+    "rol": "MANAGER",
+    "telefono": "0987458601",
+    "numEquipo": 109,
+    "equipo": "NITYA LIKTHAM",
+    "tieneEntrenador": "Si",
+    "entrenador": "Diego David Bravo Figueroa",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 480,
+    "nombre": "Alex Anrrango",
+    "rol": "MANAGER",
+    "telefono": "0988626954",
+    "numEquipo": 109,
+    "equipo": "NITYA LIKTHAM",
+    "tieneEntrenador": "Si",
+    "entrenador": "Kriscia Rodas",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 481,
+    "nombre": "Maria Fernanda Bassantes",
+    "rol": "MANAGER",
+    "telefono": "0958720323",
+    "numEquipo": 109,
+    "equipo": "NITYA LIKTHAM",
+    "tieneEntrenador": "Si",
+    "entrenador": "Diego David Bravo Figueroa",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 482,
+    "nombre": "Isabela Torres",
+    "rol": "MANAGER",
+    "telefono": "0961901809",
+    "numEquipo": 30,
+    "equipo": "METAMORFOSIS",
+    "tieneEntrenador": "SI",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
+    "sede": "Guayaquil",
+    "estado": "Desertor"
+  },
+  {
+    "id": 483,
+    "nombre": "Valeria Cevallos",
+    "rol": "MANAGER",
+    "telefono": "999661970",
+    "numEquipo": 111,
+    "equipo": "SAN SARU",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 484,
+    "nombre": "Grecia Mendez",
+    "rol": "MANAGER",
+    "telefono": "0963214210",
+    "numEquipo": 112,
+    "equipo": "RAYNOR AETERNUM",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "ROBERTO RODRIGUEZ",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 485,
+    "nombre": "Bryan Caicedo",
+    "rol": "CAPITAN",
+    "telefono": "961164574",
+    "numEquipo": 113,
+    "equipo": "HIKARI KJAZAC",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 486,
+    "nombre": "Giss Trujillo",
+    "rol": "MANAGER",
+    "telefono": "991850773",
+    "numEquipo": 113,
+    "equipo": "HIKARI KJAZAC",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 487,
+    "nombre": "Bryan Pesantez",
+    "rol": "MANAGER",
+    "telefono": "+593 98 495 6356",
+    "numEquipo": 114,
+    "equipo": "KIA AMORIS",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "ALEJANDRO DIAZ",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 488,
+    "nombre": "Diego Albuja",
+    "rol": "MANAGER",
+    "telefono": "990462746",
+    "numEquipo": 115,
+    "equipo": "UBUNTU QUASAR",
+    "tieneEntrenador": "SI",
+    "entrenador": "Linid Valencia",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 489,
+    "nombre": "Mario Salazar",
+    "rol": "MANAGER",
+    "telefono": "0990365232",
+    "numEquipo": 92,
+    "equipo": "APIS TITANIUM",
+    "tieneEntrenador": "Si",
+    "entrenador": "Ana Monroy",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 490,
+    "nombre": "Jhon Benitez",
+    "rol": "MANAGER",
+    "telefono": "+573246110466",
+    "numEquipo": 12,
+    "equipo": "APOLO 12",
+    "tieneEntrenador": "SI",
+    "entrenador": "Andres Gomez",
+    "coordinador": "MAURICIO RAMIREZ SILVA",
+    "sede": "Medellin",
+    "estado": "Desertor"
+  },
+  {
+    "id": 491,
+    "nombre": "Oscar Rosero",
+    "rol": "MANAGER",
+    "telefono": "0992034860",
+    "numEquipo": 92,
+    "equipo": "APIS TITANIUM",
+    "tieneEntrenador": "Si",
+    "entrenador": "Maria Jose Roman",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 492,
+    "nombre": "Sara Castillo",
+    "rol": "MANAGER",
+    "telefono": "995082481.0",
+    "numEquipo": 92,
+    "equipo": "APIS TITANIUM",
+    "tieneEntrenador": "Si",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 493,
+    "nombre": "Abad Gonza Misael Sebastian",
+    "rol": "MANAGER",
+    "telefono": "95 872 2184",
+    "numEquipo": 93,
+    "equipo": "METATRON",
+    "tieneEntrenador": "Si",
+    "entrenador": "Diego David Bravo Figueroa",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 494,
+    "nombre": "Altuna Alvarez Gabriela Lucia",
+    "rol": "MANAGER",
+    "telefono": "99 013 8300",
+    "numEquipo": 93,
+    "equipo": "METATRON",
+    "tieneEntrenador": "Si",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 495,
+    "nombre": "Espinoza Ortiz Ivana Patricia",
+    "rol": "MANAGER",
+    "telefono": "98 062 3021",
+    "numEquipo": 93,
+    "equipo": "METATRON",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 496,
+    "nombre": "Gonza Gonzalez Jair Israel",
+    "rol": "MANAGER",
+    "telefono": "95 945 4765",
+    "numEquipo": 93,
+    "equipo": "METATRON",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mildred Munoz",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 497,
+    "nombre": "Guerrero Viteri Marcia Ximena",
+    "rol": "MANAGER",
+    "telefono": "95 891 2040",
+    "numEquipo": 93,
+    "equipo": "METATRON",
+    "tieneEntrenador": "Si",
+    "entrenador": "Diego David Bravo Figueroa",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 498,
+    "nombre": "Itas Mazn  Karen Sulay",
+    "rol": "MANAGER",
+    "telefono": "99 244 9643",
+    "numEquipo": 93,
+    "equipo": "METATRON",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 499,
+    "nombre": "Martinez Guerrero Marjorie Ximena",
+    "rol": "MANAGER",
+    "telefono": "99 971 7749",
+    "numEquipo": 93,
+    "equipo": "METATRON",
+    "tieneEntrenador": "Si",
+    "entrenador": "Ana Monroy",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 500,
+    "nombre": "Rubio Rosero Andrea Lizbeth",
+    "rol": "MANAGER",
+    "telefono": "99 881 5065",
+    "numEquipo": 93,
+    "equipo": "METATRON",
+    "tieneEntrenador": "Si",
+    "entrenador": "Alejandro Diaz",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 501,
+    "nombre": "Soria Paredes Margarita De Las Mercedes",
+    "rol": "MANAGER",
+    "telefono": "99 570 6657",
+    "numEquipo": 93,
+    "equipo": "METATRON",
+    "tieneEntrenador": "Si",
+    "entrenador": "Alejandro Diaz",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 502,
+    "nombre": "Varela Cano Susana Noemi",
+    "rol": "MANAGER",
+    "telefono": "98 809 1929",
+    "numEquipo": 93,
+    "equipo": "METATRON",
+    "tieneEntrenador": "Si",
+    "entrenador": "Maria Jose Roman",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 503,
+    "nombre": "Ismael Guzman",
+    "rol": "MANAGER",
+    "telefono": "0987942544",
+    "numEquipo": 94,
+    "equipo": "EAYN ALNASR",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 504,
+    "nombre": "Karina Mazon",
+    "rol": "MANAGER",
+    "telefono": "0984588057",
+    "numEquipo": 94,
+    "equipo": "EAYN ALNASR",
+    "tieneEntrenador": "Si",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 505,
+    "nombre": "Lizzie Zambrano",
+    "rol": "MANAGER",
+    "telefono": "0979244825",
+    "numEquipo": 94,
+    "equipo": "EAYN ALNASR",
+    "tieneEntrenador": "Si",
+    "entrenador": "Ana Monroy",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 506,
+    "nombre": "Poleth Montalvo",
+    "rol": "MANAGER",
+    "telefono": "0991687219",
+    "numEquipo": 94,
+    "equipo": "EAYN ALNASR",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 507,
+    "nombre": "Sandra Erazo",
+    "rol": "MANAGER",
+    "telefono": "0988314134",
+    "numEquipo": 94,
+    "equipo": "EAYN ALNASR",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 508,
+    "nombre": "Sandra Naula",
+    "rol": "MANAGER",
+    "telefono": "0983344715",
+    "numEquipo": 94,
+    "equipo": "EAYN ALNASR",
+    "tieneEntrenador": "Si",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 509,
+    "nombre": "Asanza Nadia",
+    "rol": "MANAGER",
+    "telefono": "0992087336",
+    "numEquipo": 95,
+    "equipo": "LYUN USHUAY RHUA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Josue Vera",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 510,
+    "nombre": "Pozo Camila",
+    "rol": "MANAGER",
+    "telefono": "0987139380",
+    "numEquipo": 95,
+    "equipo": "LYUN USHUAY RHUA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 511,
+    "nombre": "Suarez Marlene",
+    "rol": "MANAGER",
+    "telefono": "0992711047",
+    "numEquipo": 95,
+    "equipo": "LYUN USHUAY RHUA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 512,
+    "nombre": "Yesid Santander",
+    "rol": "MANAGER",
+    "telefono": "+57 3042071111",
+    "numEquipo": 13,
+    "equipo": "KRONOS DYNATUS",
+    "tieneEntrenador": "SI",
+    "entrenador": "Ana Monroy",
+    "coordinador": "MAURICIO RAMIREZ SILVA",
+    "sede": "Medellin",
+    "estado": "Desertor"
+  },
+  {
+    "id": 513,
+    "nombre": "Tamayo Dayana",
+    "rol": "MANAGER",
+    "telefono": "0961944443",
+    "numEquipo": 95,
+    "equipo": "LYUN USHUAY RHUA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 514,
+    "nombre": "Tamayo Jandery",
+    "rol": "MANAGER",
+    "telefono": "0969054277",
+    "numEquipo": 95,
+    "equipo": "LYUN USHUAY RHUA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mildred Munoz",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 515,
+    "nombre": "Tito Mateo",
+    "rol": "MANAGER",
+    "telefono": "0960291037",
+    "numEquipo": 95,
+    "equipo": "LYUN USHUAY RHUA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Josue Vera",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 516,
+    "nombre": "Vasquez Kevin",
+    "rol": "MANAGER",
+    "telefono": "0998479299",
+    "numEquipo": 95,
+    "equipo": "LYUN USHUAY RHUA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Ana Monroy",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 517,
+    "nombre": "Villamar Paz",
+    "rol": "MANAGER",
+    "telefono": "0960938705",
+    "numEquipo": 95,
+    "equipo": "LYUN USHUAY RHUA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 518,
+    "nombre": "Gerardo Mediavilla",
+    "rol": "MANAGER",
+    "telefono": "0995658053",
+    "numEquipo": 96,
+    "equipo": "NINARI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 519,
+    "nombre": "Martha Rea",
+    "rol": "MANAGER",
+    "telefono": "0987656778",
+    "numEquipo": 17,
+    "equipo": "JATARI",
+    "tieneEntrenador": "SI",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "JUAN FERNANDO REINOSO",
+    "sede": "Cuenca",
+    "estado": "Desertor"
+  },
+  {
+    "id": 520,
+    "nombre": "Angel Enrique Young",
+    "rol": "MANAGER",
+    "telefono": "+51999261944",
+    "numEquipo": 24,
+    "equipo": "KAIRU",
+    "tieneEntrenador": "Si",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Desertor"
+  },
+  {
+    "id": 521,
+    "nombre": "Andres Mauricio Vargas",
+    "rol": "MANAGER",
+    "telefono": "+573116042782",
+    "numEquipo": 14,
+    "equipo": "RAGNAROK",
+    "tieneEntrenador": "SI",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "MAURICIO RAMIREZ SILVA",
+    "sede": "Medellin",
+    "estado": "Desertor"
+  },
+  {
+    "id": 522,
+    "nombre": "Miguel Torres",
+    "rol": "MANAGER",
+    "telefono": "0991680131",
+    "numEquipo": 96,
+    "equipo": "NINARI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mike Boada",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 523,
+    "nombre": "Nancy Mendoza",
+    "rol": "MANAGER",
+    "telefono": "0996038966",
+    "numEquipo": 96,
+    "equipo": "NINARI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Alejandro Diaz",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 524,
+    "nombre": "Gina Crdenaz Lpez",
+    "rol": "MANAGER",
+    "telefono": "+51999699649",
+    "numEquipo": 24,
+    "equipo": "KAIRU",
+    "tieneEntrenador": "Si",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Desertor"
+  },
+  {
+    "id": 525,
+    "nombre": "Francisco Romero",
+    "rol": "MANAGER",
+    "telefono": "0984051438",
+    "numEquipo": 18,
+    "equipo": "VALHARYN",
+    "tieneEntrenador": "SI",
+    "entrenador": "Ana Monroy",
+    "coordinador": "KERLY CARRILLO GARZON",
+    "sede": "Cuenca",
+    "estado": "Desertor"
+  },
+  {
+    "id": 526,
+    "nombre": "Hugo Castillo",
+    "rol": "MANAGER",
+    "telefono": "0986389625",
+    "numEquipo": 18,
+    "equipo": "VALHARYN",
+    "tieneEntrenador": "SI",
+    "entrenador": "Ana Monroy",
+    "coordinador": "KERLY CARRILLO GARZON",
+    "sede": "Cuenca",
+    "estado": "Desertor"
+  },
+  {
+    "id": 527,
+    "nombre": "Adriana Ramirez",
+    "rol": "MANAGER",
+    "telefono": "+593 98 760 9978",
+    "numEquipo": 97,
+    "equipo": "BINDU MUHOPO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Diego David Bravo Figueroa",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 528,
+    "nombre": "Briggette Picoita",
+    "rol": "MANAGER",
+    "telefono": "+593 96 716 7148",
+    "numEquipo": 97,
+    "equipo": "BINDU MUHOPO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 529,
+    "nombre": "Jonathan Hernndez",
+    "rol": "MANAGER",
+    "telefono": "+593 99 853 5921",
+    "numEquipo": 97,
+    "equipo": "BINDU MUHOPO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Alejandro Diaz",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 530,
+    "nombre": "Karina Segura",
+    "rol": "MANAGER",
+    "telefono": "+593 99 797 2542",
+    "numEquipo": 97,
+    "equipo": "BINDU MUHOPO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Maria Jose Roman",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 531,
+    "nombre": "Lizardo Zarate",
+    "rol": "MANAGER",
+    "telefono": "+593 96 102 5273",
+    "numEquipo": 97,
+    "equipo": "BINDU MUHOPO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 532,
+    "nombre": "Mishell Moscoso",
+    "rol": "MANAGER",
+    "telefono": "+593 98 336 4157",
+    "numEquipo": 97,
+    "equipo": "BINDU MUHOPO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 533,
+    "nombre": "Santiago Alarcn",
+    "rol": "MANAGER",
+    "telefono": "+593 98 405 7534",
+    "numEquipo": 97,
+    "equipo": "BINDU MUHOPO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Alejandro Diaz",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 534,
+    "nombre": "Vielka Altuna",
+    "rol": "MANAGER",
+    "telefono": "+593 99 657 4352",
+    "numEquipo": 97,
+    "equipo": "BINDU MUHOPO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 535,
+    "nombre": "Willow Paladines",
+    "rol": "MANAGER",
+    "telefono": "+593 98 150 4191",
+    "numEquipo": 97,
+    "equipo": "BINDU MUHOPO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 536,
+    "nombre": "Helar Muguruza",
+    "rol": "MANAGER",
+    "telefono": "924476603",
+    "numEquipo": 25,
+    "equipo": "SINCHI RUNA",
+    "tieneEntrenador": "SI",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Desertor"
+  },
+  {
+    "id": 537,
+    "nombre": "Jhen Ponce",
+    "rol": "MANAGER",
+    "telefono": "970737769",
+    "numEquipo": 25,
+    "equipo": "SINCHI RUNA",
+    "tieneEntrenador": "SI",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Desertor"
+  },
+  {
+    "id": 538,
+    "nombre": "Geovana Elizabeth Tamayo Guachamin",
+    "rol": "MANAGER",
+    "telefono": "0997354933",
+    "numEquipo": 98,
+    "equipo": "VALHALLA DRAKI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 539,
+    "nombre": "Karina Valdiviezo",
+    "rol": "MANAGER",
+    "telefono": "0967241443",
+    "numEquipo": 18,
+    "equipo": "VALHARYN",
+    "tieneEntrenador": "SI",
+    "entrenador": "Ana Monroy",
+    "coordinador": "KERLY CARRILLO GARZON",
+    "sede": "Cuenca",
+    "estado": "Desertor"
+  },
+  {
+    "id": 540,
+    "nombre": "Maria Teresa Maeja Villalba",
+    "rol": "MANAGER",
+    "telefono": "0996656415",
+    "numEquipo": 98,
+    "equipo": "VALHALLA DRAKI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mila Campuzano",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 541,
+    "nombre": "Evelyn Moreno",
+    "rol": "MANAGER",
+    "telefono": "0967518179",
+    "numEquipo": 99,
+    "equipo": "HENSU CHIKARA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 542,
+    "nombre": "Isaac Betancourt",
+    "rol": "MANAGER",
+    "telefono": "0939009570",
+    "numEquipo": 99,
+    "equipo": "HENSU CHIKARA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mike Boada",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 543,
+    "nombre": "Kevin Crdova",
+    "rol": "MANAGER",
+    "telefono": "0987698037",
+    "numEquipo": 99,
+    "equipo": "HENSU CHIKARA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 544,
+    "nombre": "Nathaly  Velez",
+    "rol": "MANAGER",
+    "telefono": "0991233384",
+    "numEquipo": 99,
+    "equipo": "HENSU CHIKARA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 545,
+    "nombre": "Alex Orbe",
+    "rol": "MANAGER",
+    "telefono": "593 98 345 1934",
+    "numEquipo": 100,
+    "equipo": "DUNAMIS PATSAK",
+    "tieneEntrenador": "Si",
+    "entrenador": "David Sosa",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 546,
+    "nombre": "Andrea Contreras",
+    "rol": "MANAGER",
+    "telefono": "+593 99 840 5655",
+    "numEquipo": 100,
+    "equipo": "DUNAMIS PATSAK",
+    "tieneEntrenador": "Si",
+    "entrenador": "Isaac Gabriel Betancourt Patino",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 547,
+    "nombre": "Daniel Valdez",
+    "rol": "MANAGER",
+    "telefono": "+593 99 423 6151",
+    "numEquipo": 100,
+    "equipo": "DUNAMIS PATSAK",
+    "tieneEntrenador": "Si",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 548,
+    "nombre": "Darwin Delgado",
+    "rol": "MANAGER",
+    "telefono": "+593 99 009 3959",
+    "numEquipo": 100,
+    "equipo": "DUNAMIS PATSAK",
+    "tieneEntrenador": "Si",
+    "entrenador": "Isaac Gabriel Betancourt Patino",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 549,
+    "nombre": "David Rodriguez",
+    "rol": "MANAGER",
+    "telefono": "927788191",
+    "numEquipo": 25,
+    "equipo": "SINCHI RUNA",
+    "tieneEntrenador": "SI",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Desertor"
+  },
+  {
+    "id": 550,
+    "nombre": "Diego Bravo",
+    "rol": "CAPITAN",
+    "telefono": "593 99 397 8520",
+    "numEquipo": 100,
+    "equipo": "DUNAMIS PATSAK",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mike Boada",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 551,
+    "nombre": "Elizabeth Jarrin",
+    "rol": "MANAGER",
+    "telefono": "+593 98 729 9373",
+    "numEquipo": 100,
+    "equipo": "DUNAMIS PATSAK",
+    "tieneEntrenador": "Si",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 552,
+    "nombre": "Estefania Romero",
+    "rol": "MANAGER",
+    "telefono": "+593 98 322 5846",
+    "numEquipo": 100,
+    "equipo": "DUNAMIS PATSAK",
+    "tieneEntrenador": "Si",
+    "entrenador": "Josue Vera",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 553,
+    "nombre": "Isabel Cardenas",
+    "rol": "MANAGER",
+    "telefono": "+593 99 371 0023",
+    "numEquipo": 100,
+    "equipo": "DUNAMIS PATSAK",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 554,
+    "nombre": "Marcela Tituaa",
+    "rol": "MANAGER",
+    "telefono": "+593 99 733 7099",
+    "numEquipo": 100,
+    "equipo": "DUNAMIS PATSAK",
+    "tieneEntrenador": "Si",
+    "entrenador": "Maria Jose Roman",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 555,
+    "nombre": "Monica Casanova",
+    "rol": "MANAGER",
+    "telefono": "+593 98 755 7553",
+    "numEquipo": 100,
+    "equipo": "DUNAMIS PATSAK",
+    "tieneEntrenador": "Si",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 556,
+    "nombre": "Ricardo Esteves",
+    "rol": "MANAGER",
+    "telefono": "+593 99 986 7599",
+    "numEquipo": 100,
+    "equipo": "DUNAMIS PATSAK",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 557,
+    "nombre": "Sandra Hurtado",
+    "rol": "MANAGER",
+    "telefono": "+593 96 324 5579",
+    "numEquipo": 100,
+    "equipo": "DUNAMIS PATSAK",
+    "tieneEntrenador": "Si",
+    "entrenador": "David Sosa",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 558,
+    "nombre": "Sofia Vasco",
+    "rol": "MANAGER",
+    "telefono": "+593 98 784 4984",
+    "numEquipo": 100,
+    "equipo": "DUNAMIS PATSAK",
+    "tieneEntrenador": "Si",
+    "entrenador": "Maria Jose Roman",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 559,
+    "nombre": "Yoxibeth Garcia",
+    "rol": "MANAGER",
+    "telefono": "+593 96 976 7956",
+    "numEquipo": 100,
+    "equipo": "DUNAMIS PATSAK",
+    "tieneEntrenador": "Si",
+    "entrenador": "Maria Jose Roman",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 560,
+    "nombre": "Natalia Cajas",
+    "rol": "MANAGER",
+    "telefono": "+593 99 924 3226",
+    "numEquipo": 110,
+    "equipo": "BUSHI MASAI",
+    "tieneEntrenador": "SI",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "ALEJANDRO DIAZ",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 561,
+    "nombre": "Ena Carrera",
+    "rol": "MANAGER",
+    "telefono": "983581451",
+    "numEquipo": 101,
+    "equipo": "SUMAQ SHIN",
+    "tieneEntrenador": "Si",
+    "entrenador": "Josue Vera",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 562,
+    "nombre": "Margarita Soria",
+    "rol": "CAPITANA",
+    "telefono": "995706657",
+    "numEquipo": 101,
+    "equipo": "SUMAQ SHIN",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 563,
+    "nombre": "Piero Alessandro Portal Pasquel",
+    "rol": "CAPITN",
+    "telefono": "+51962559832",
+    "numEquipo": 26,
+    "equipo": "PROMETHEUS IGNIS",
+    "tieneEntrenador": "SI",
+    "entrenador": "Josue Vera",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Desertor"
+  },
+  {
+    "id": 564,
+    "nombre": "Edison Hatty",
+    "rol": "MANAGER",
+    "telefono": "996577231",
+    "numEquipo": 102,
+    "equipo": "RIKCHARI MUNAY",
+    "tieneEntrenador": "Si",
+    "entrenador": "Diego David Bravo Figueroa",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 565,
+    "nombre": "Dayana Zambrano",
+    "rol": "MANAGER",
+    "telefono": "939672110",
+    "numEquipo": 102,
+    "equipo": "RIKCHARI MUNAY",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 566,
+    "nombre": "Doris Pazmio",
+    "rol": "MANAGER",
+    "telefono": "992512392",
+    "numEquipo": 102,
+    "equipo": "RIKCHARI MUNAY",
+    "tieneEntrenador": "Si",
+    "entrenador": "Josue Vera",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 567,
+    "nombre": "Anahi Reyes",
+    "rol": "MANAGER",
+    "telefono": "995225784",
+    "numEquipo": 102,
+    "equipo": "RIKCHARI MUNAY",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 568,
+    "nombre": "Jonathan Zamora",
+    "rol": "MANAGER",
+    "telefono": "999450690",
+    "numEquipo": 115,
+    "equipo": "UBUNTU QUASAR",
+    "tieneEntrenador": "SI",
+    "entrenador": "Linid Valencia",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 569,
+    "nombre": "Jose Guillermo Curi Salvador",
+    "rol": "MANAGER",
+    "telefono": "+51922972827",
+    "numEquipo": 26,
+    "equipo": "PROMETHEUS IGNIS",
+    "tieneEntrenador": "SI",
+    "entrenador": "Josue Vera",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Desertor"
+  },
+  {
+    "id": 570,
+    "nombre": "Jolber Vargas Enriquez",
+    "rol": "MANAGER",
+    "telefono": "+51957072400",
+    "numEquipo": 26,
+    "equipo": "PROMETHEUS IGNIS",
+    "tieneEntrenador": "SI",
+    "entrenador": "Josue Vera",
+    "coordinador": "LINID VALENCIA",
+    "sede": "Lima",
+    "estado": "Desertor"
+  },
+  {
+    "id": 571,
+    "nombre": "Sandra Mendieta",
+    "rol": "MANAGER",
+    "telefono": "983508986",
+    "numEquipo": 115,
+    "equipo": "UBUNTU QUASAR",
+    "tieneEntrenador": "SI",
+    "entrenador": "Linid Valencia",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 572,
+    "nombre": "Natalia Cepeda",
+    "rol": "CAPITANA",
+    "telefono": "983090926",
+    "numEquipo": 103,
+    "equipo": "MEMENTO MORI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Ana Monroy",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 573,
+    "nombre": "Alexis Bazurto",
+    "rol": "MANAGER",
+    "telefono": "988993540",
+    "numEquipo": 103,
+    "equipo": "MEMENTO MORI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 574,
+    "nombre": "Daniel Vinueza",
+    "rol": "MANAGER",
+    "telefono": "992520266",
+    "numEquipo": 103,
+    "equipo": "MEMENTO MORI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 575,
+    "nombre": "Nicole Murgueytio",
+    "rol": "MANAGER",
+    "telefono": "987634771",
+    "numEquipo": 103,
+    "equipo": "MEMENTO MORI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 576,
+    "nombre": "Natt Arteaga",
+    "rol": "MANAGER",
+    "telefono": "983090926",
+    "numEquipo": 103,
+    "equipo": "MEMENTO MORI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 577,
+    "nombre": "Mauricio Rivadeneira",
+    "rol": "MANAGER",
+    "telefono": "984917757",
+    "numEquipo": 103,
+    "equipo": "MEMENTO MORI",
+    "tieneEntrenador": "Si",
+    "entrenador": "Pamela Carrillo",
+    "coordinador": "JOSUE VERA",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 578,
+    "nombre": "Vasco Basantes Johanna Paola",
+    "rol": "MANAGER",
+    "telefono": "+593995358735",
+    "numEquipo": 104,
+    "equipo": "RAGNAROK CHAKANA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "ROBERTO RODRIGUEZ",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 579,
+    "nombre": "Tituana Suquillo Maria Paulina",
+    "rol": "MANAGER",
+    "telefono": "+593961027772",
+    "numEquipo": 104,
+    "equipo": "RAGNAROK CHAKANA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Josue Vera",
+    "coordinador": "ROBERTO RODRIGUEZ",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 580,
+    "nombre": "Castillo Reyes Juan Fernando",
+    "rol": "MANAGER",
+    "telefono": "+593995275755",
+    "numEquipo": 104,
+    "equipo": "RAGNAROK CHAKANA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "ROBERTO RODRIGUEZ",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 581,
+    "nombre": "Merino Tarqui Margarita Noemi",
+    "rol": "MANAGER",
+    "telefono": "+593998303108",
+    "numEquipo": 104,
+    "equipo": "RAGNAROK CHAKANA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "ROBERTO RODRIGUEZ",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 582,
+    "nombre": "Lita Ayala Maria Augusta",
+    "rol": "MANAGER",
+    "telefono": "+593969268572",
+    "numEquipo": 104,
+    "equipo": "RAGNAROK CHAKANA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Pamela Carrillo",
+    "coordinador": "ROBERTO RODRIGUEZ",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 583,
+    "nombre": "Romero Jose Angel",
+    "rol": "CAPITAN",
+    "telefono": "978813781.0",
+    "numEquipo": 105,
+    "equipo": "KRALLARI IPSOFACTO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mike Boada",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 584,
+    "nombre": "Micolta Brianna",
+    "rol": "MANAGER",
+    "telefono": "983476990.0",
+    "numEquipo": 105,
+    "equipo": "KRALLARI IPSOFACTO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Diego David Bravo Figueroa",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 585,
+    "nombre": "Pereira Jennifer",
+    "rol": "MANAGER",
+    "telefono": "979312645.0",
+    "numEquipo": 105,
+    "equipo": "KRALLARI IPSOFACTO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 586,
+    "nombre": "Piarpuezan Camila Marcela",
+    "rol": "MANAGER",
+    "telefono": "993714455.0",
+    "numEquipo": 105,
+    "equipo": "KRALLARI IPSOFACTO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 587,
+    "nombre": "Hatty Christian",
+    "rol": "MANAGER",
+    "telefono": "978834609.0",
+    "numEquipo": 105,
+    "equipo": "KRALLARI IPSOFACTO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 588,
+    "nombre": "Navas Yamilex",
+    "rol": "MANAGER",
+    "telefono": "997918732.0",
+    "numEquipo": 105,
+    "equipo": "KRALLARI IPSOFACTO",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 589,
+    "nombre": "Laura Villagomez",
+    "rol": "MANAGER",
+    "telefono": "0984801468",
+    "numEquipo": 106,
+    "equipo": "KAIZEN MUKETSU",
+    "tieneEntrenador": "SI",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "ALEJANDRO DIAZ",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 590,
+    "nombre": "Stefany Quilumba",
+    "rol": "MANAGER",
+    "telefono": "0983282523",
+    "numEquipo": 106,
+    "equipo": "KAIZEN MUKETSU",
+    "tieneEntrenador": "SI",
+    "entrenador": "Josue Vera",
+    "coordinador": "ALEJANDRO DIAZ",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 591,
+    "nombre": "Juan Garzon",
+    "rol": "MANAGER",
+    "telefono": "0989324457",
+    "numEquipo": 106,
+    "equipo": "KAIZEN MUKETSU",
+    "tieneEntrenador": "SI",
+    "entrenador": "Kriscia Rodas",
+    "coordinador": "ALEJANDRO DIAZ",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 592,
+    "nombre": "Emerita Salas",
+    "rol": "MANAGER",
+    "telefono": "982376593",
+    "numEquipo": 115,
+    "equipo": "UBUNTU QUASAR",
+    "tieneEntrenador": "SI",
+    "entrenador": "Linid Valencia",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 593,
+    "nombre": "Victoria Andrade",
+    "rol": "CAPITAN",
+    "telefono": "984432469",
+    "numEquipo": 107,
+    "equipo": "ARUTAM REN",
+    "tieneEntrenador": "Si",
+    "entrenador": "Ana Monroy",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 594,
+    "nombre": "Karina Garcia",
+    "rol": "MANAGER",
+    "telefono": "984430689",
+    "numEquipo": 107,
+    "equipo": "ARUTAM REN",
+    "tieneEntrenador": "Si",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 595,
+    "nombre": "Paola Almeida",
+    "rol": "MANAGER",
+    "telefono": "980687383",
+    "numEquipo": 107,
+    "equipo": "ARUTAM REN",
+    "tieneEntrenador": "Si",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 596,
+    "nombre": "Sebastian Jacome",
+    "rol": "MANAGER",
+    "telefono": "984401998",
+    "numEquipo": 107,
+    "equipo": "ARUTAM REN",
+    "tieneEntrenador": "Si",
+    "entrenador": "Pamela Carrillo",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 597,
+    "nombre": "Alex Pico",
+    "rol": "MANAGER",
+    "telefono": "0995652114",
+    "numEquipo": 108,
+    "equipo": "NIKA AKAPANA",
+    "tieneEntrenador": "Si",
+    "entrenador": "David Sosa",
+    "coordinador": "ROBERTO RODRIGUEZ",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 598,
+    "nombre": "Jennifer Villavicincio",
+    "rol": "CAPITN",
+    "telefono": "0979138817",
+    "numEquipo": 108,
+    "equipo": "NIKA AKAPANA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Ana Monroy",
+    "coordinador": "ROBERTO RODRIGUEZ",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 599,
+    "nombre": "Andres Mosquera",
+    "rol": "MANAGER",
+    "telefono": "958936593",
+    "numEquipo": 117,
+    "equipo": "OHANA WARRIORS",
+    "tieneEntrenador": "SI",
+    "entrenador": "Mike Boada",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 600,
+    "nombre": "Karla Pastrano",
+    "rol": "MANAGER",
+    "telefono": "0994839083",
+    "numEquipo": 108,
+    "equipo": "NIKA AKAPANA",
+    "tieneEntrenador": "Si",
+    "entrenador": "Kriscia Rodas",
+    "coordinador": "ROBERTO RODRIGUEZ",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 601,
+    "nombre": "Lilibeth Cubillo",
+    "rol": "CAPITANA",
+    "telefono": "0996521133",
+    "numEquipo": 109,
+    "equipo": "NITYA LIKTHAM",
+    "tieneEntrenador": "Si",
+    "entrenador": "Ana Monroy",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 602,
+    "nombre": "Luis Sabay",
+    "rol": "MANAGER",
+    "telefono": "0963552245",
+    "numEquipo": 109,
+    "equipo": "NITYA LIKTHAM",
+    "tieneEntrenador": "Si",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 603,
+    "nombre": "Carlos Lara Burgos",
+    "rol": "MANAGER",
+    "telefono": "0962556731",
+    "numEquipo": 109,
+    "equipo": "NITYA LIKTHAM",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mike Boada",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 604,
+    "nombre": "Carolina Vintimilla",
+    "rol": "MANAGER",
+    "telefono": "+593 98 615 1899",
+    "numEquipo": 110,
+    "equipo": "BUSHI MASAI",
+    "tieneEntrenador": "SI",
+    "entrenador": "Diego David Bravo Figueroa",
+    "coordinador": "ALEJANDRO DIAZ",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 605,
+    "nombre": "Ruth Calvache",
+    "rol": "MANAGER",
+    "telefono": "+593 99 848 6533",
+    "numEquipo": 110,
+    "equipo": "BUSHI MASAI",
+    "tieneEntrenador": "SI",
+    "entrenador": "Josue Vera",
+    "coordinador": "ALEJANDRO DIAZ",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 606,
+    "nombre": "Williams Sanchez",
+    "rol": "CAPITAN",
+    "telefono": "+593 98 681 3400",
+    "numEquipo": 110,
+    "equipo": "BUSHI MASAI",
+    "tieneEntrenador": "SI",
+    "entrenador": "Josue Vera",
+    "coordinador": "ALEJANDRO DIAZ",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 607,
+    "nombre": "Edwin Calero",
+    "rol": "MANAGER",
+    "telefono": "969057507",
+    "numEquipo": 111,
+    "equipo": "SAN SARU",
+    "tieneEntrenador": "Si",
+    "entrenador": "Julio Narvaez",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 608,
+    "nombre": "Jonathan Carius",
+    "rol": "MANAGER",
+    "telefono": "981744833",
+    "numEquipo": 111,
+    "equipo": "SAN SARU",
+    "tieneEntrenador": "Si",
+    "entrenador": "Josue Vera",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 609,
+    "nombre": "Juan Moreno",
+    "rol": "MANAGER",
+    "telefono": "982343184",
+    "numEquipo": 111,
+    "equipo": "SAN SARU",
+    "tieneEntrenador": "Si",
+    "entrenador": "Diego David Bravo Figueroa",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 610,
+    "nombre": "Karol Villaruel",
+    "rol": "MANAGER",
+    "telefono": "999057277",
+    "numEquipo": 111,
+    "equipo": "SAN SARU",
+    "tieneEntrenador": "Si",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 611,
+    "nombre": "Maria Belen Llumiquinga",
+    "rol": "CAPITANA",
+    "telefono": "986535888",
+    "numEquipo": 111,
+    "equipo": "SAN SARU",
+    "tieneEntrenador": "Si",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 612,
+    "nombre": "Arianna Mendez",
+    "rol": "CAPITANA",
+    "telefono": "0964147060",
+    "numEquipo": 112,
+    "equipo": "RAYNOR AETERNUM",
+    "tieneEntrenador": "Si",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "ROBERTO RODRIGUEZ",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 613,
+    "nombre": "Eduardo Alfaro",
+    "rol": "MANAGER",
+    "telefono": "0958740157",
+    "numEquipo": 112,
+    "equipo": "RAYNOR AETERNUM",
+    "tieneEntrenador": "Si",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "ROBERTO RODRIGUEZ",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 614,
+    "nombre": "Ivan Tinillo",
+    "rol": "MANAGER",
+    "telefono": "0992869343",
+    "numEquipo": 112,
+    "equipo": "RAYNOR AETERNUM",
+    "tieneEntrenador": "Si",
+    "entrenador": "Kriscia Rodas",
+    "coordinador": "ROBERTO RODRIGUEZ",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 615,
+    "nombre": "Joshua Albuja",
+    "rol": "MANAGER",
+    "telefono": "985328921",
+    "numEquipo": 113,
+    "equipo": "HIKARI KJAZAC",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 616,
+    "nombre": "Kenneth Albuja",
+    "rol": "MANAGER",
+    "telefono": "985328833",
+    "numEquipo": 113,
+    "equipo": "HIKARI KJAZAC",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 617,
+    "nombre": "Luis Caicedo",
+    "rol": "MANAGER",
+    "telefono": "999911902",
+    "numEquipo": 113,
+    "equipo": "HIKARI KJAZAC",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 618,
+    "nombre": "Sara Vasco",
+    "rol": "MANAGER",
+    "telefono": "979101070",
+    "numEquipo": 113,
+    "equipo": "HIKARI KJAZAC",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 619,
+    "nombre": "Solange Escobar",
+    "rol": "MANAGER",
+    "telefono": "997488500",
+    "numEquipo": 113,
+    "equipo": "HIKARI KJAZAC",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 620,
+    "nombre": "Ximena Gallardo",
+    "rol": "MANAGER",
+    "telefono": "987302676",
+    "numEquipo": 113,
+    "equipo": "HIKARI KJAZAC",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 621,
+    "nombre": "Erick Bravo",
+    "rol": "MANAGER",
+    "telefono": "994745370",
+    "numEquipo": 113,
+    "equipo": "HIKARI KJAZAC",
+    "tieneEntrenador": "Si",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 622,
+    "nombre": "Guido Gamboa",
+    "rol": "MANAGER",
+    "telefono": "+593 98 118 1398",
+    "numEquipo": 114,
+    "equipo": "KIA AMORIS",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "ALEJANDRO DIAZ",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 623,
+    "nombre": "Monica Casanova",
+    "rol": "MANAGER",
+    "telefono": "+593 96 975 4134",
+    "numEquipo": 114,
+    "equipo": "KIA AMORIS",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "ALEJANDRO DIAZ",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 624,
+    "nombre": "Wilson Albuja",
+    "rol": "CAPITAN",
+    "telefono": "+593 98 755 7553",
+    "numEquipo": 114,
+    "equipo": "KIA AMORIS",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "ALEJANDRO DIAZ",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 625,
+    "nombre": "Dayana Martinez",
+    "rol": "MANAGER",
+    "telefono": "+593 98 532 8992",
+    "numEquipo": 114,
+    "equipo": "KIA AMORIS",
+    "tieneEntrenador": "Si",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "ALEJANDRO DIAZ",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 626,
+    "nombre": "Kristel Defas",
+    "rol": "MANAGER",
+    "telefono": "999057032",
+    "numEquipo": 115,
+    "equipo": "UBUNTU QUASAR",
+    "tieneEntrenador": "SI",
+    "entrenador": "Linid Valencia",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 627,
+    "nombre": "Nahya Bermeo",
+    "rol": "MANAGER",
+    "telefono": "998779049",
+    "numEquipo": 115,
+    "equipo": "UBUNTU QUASAR",
+    "tieneEntrenador": "SI",
+    "entrenador": "Linid Valencia",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 628,
+    "nombre": "Victor Sanchez",
+    "rol": "MANAGER",
+    "telefono": "963553071",
+    "numEquipo": 115,
+    "equipo": "UBUNTU QUASAR",
+    "tieneEntrenador": "SI",
+    "entrenador": "Linid Valencia",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 629,
+    "nombre": "Martn Quiroz",
+    "rol": "CAPITAN",
+    "telefono": "969032027",
+    "numEquipo": 115,
+    "equipo": "UBUNTU QUASAR",
+    "tieneEntrenador": "SI",
+    "entrenador": "Linid Valencia",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 630,
+    "nombre": "Paola Camacho",
+    "rol": "CAPITN",
+    "telefono": "0995606621",
+    "numEquipo": 116,
+    "equipo": "RENKIN-SHI",
+    "tieneEntrenador": "SI",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "ROBERTO RODRIGUEZ",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 631,
+    "nombre": "Adams Gonzalez",
+    "rol": "MANAGER",
+    "telefono": "0982407266",
+    "numEquipo": 116,
+    "equipo": "RENKIN-SHI",
+    "tieneEntrenador": "SI",
+    "entrenador": "Andres Idrobo",
+    "coordinador": "ROBERTO RODRIGUEZ",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 632,
+    "nombre": "Cristina Morejon",
+    "rol": "CAPITAN",
+    "telefono": "",
+    "numEquipo": 117,
+    "equipo": "OHANA WARRIORS",
+    "tieneEntrenador": "SI",
+    "entrenador": "Mike Boada",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 633,
+    "nombre": "Danna Guaman",
+    "rol": "MANAGER",
+    "telefono": "995321338",
+    "numEquipo": 117,
+    "equipo": "OHANA WARRIORS",
+    "tieneEntrenador": "SI",
+    "entrenador": "Mike Boada",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 634,
+    "nombre": "Jonathan Pillajo",
+    "rol": "MANAGER",
+    "telefono": "995849214",
+    "numEquipo": 117,
+    "equipo": "OHANA WARRIORS",
+    "tieneEntrenador": "SI",
+    "entrenador": "Mike Boada",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 635,
+    "nombre": "Lisbeth Congo",
+    "rol": "MANAGER",
+    "telefono": "998758461",
+    "numEquipo": 117,
+    "equipo": "OHANA WARRIORS",
+    "tieneEntrenador": "SI",
+    "entrenador": "Mike Boada",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 636,
+    "nombre": "Marcela Aguirre",
+    "rol": "MANAGER",
+    "telefono": "986919506",
+    "numEquipo": 117,
+    "equipo": "OHANA WARRIORS",
+    "tieneEntrenador": "SI",
+    "entrenador": "Mike Boada",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 637,
+    "nombre": "Santiago Benitez",
+    "rol": "MANAGER",
+    "telefono": "983854306",
+    "numEquipo": 117,
+    "equipo": "OHANA WARRIORS",
+    "tieneEntrenador": "SI",
+    "entrenador": "Mike Boada",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 638,
+    "nombre": "Thomas Garcia",
+    "rol": "MANAGER",
+    "telefono": "994347819",
+    "numEquipo": 117,
+    "equipo": "OHANA WARRIORS",
+    "tieneEntrenador": "SI",
+    "entrenador": "Mike Boada",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 639,
+    "nombre": "Carolina Vintimilla",
+    "rol": "MANAGER",
+    "telefono": "997336202",
+    "numEquipo": 117,
+    "equipo": "OHANA WARRIORS",
+    "tieneEntrenador": "SI",
+    "entrenador": "Mike Boada",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 640,
+    "nombre": "Carolina Quishpe",
+    "rol": "CAPITANA",
+    "telefono": "986151899",
+    "numEquipo": 118,
+    "equipo": "KAMAK MIRAI",
+    "tieneEntrenador": "SI",
+    "entrenador": "Linid Valencia",
+    "coordinador": "ALEJANDRO DIAZ",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 641,
+    "nombre": "Daniela Esposito",
+    "rol": "MANAGER",
+    "telefono": "983047100",
+    "numEquipo": 118,
+    "equipo": "KAMAK MIRAI",
+    "tieneEntrenador": "SI",
+    "entrenador": "Linid Valencia",
+    "coordinador": "ALEJANDRO DIAZ",
+    "sede": "Quito",
+    "estado": "Activo"
+  },
+  {
+    "id": 642,
+    "nombre": "David Salvador",
+    "rol": "MANAGER",
+    "telefono": "981188999",
+    "numEquipo": 118,
+    "equipo": "KAMAK MIRAI",
+    "tieneEntrenador": "SI",
+    "entrenador": "Linid Valencia",
+    "coordinador": "ALEJANDRO DIAZ",
+    "sede": "Quito",
+    "estado": "Activo"
+  },
+  {
+    "id": 643,
+    "nombre": "Gabriela Tapia",
+    "rol": "MANAGER",
+    "telefono": "984909501",
+    "numEquipo": 118,
+    "equipo": "KAMAK MIRAI",
+    "tieneEntrenador": "SI",
+    "entrenador": "Linid Valencia",
+    "coordinador": "ALEJANDRO DIAZ",
+    "sede": "Quito",
+    "estado": "Activo"
+  },
+  {
+    "id": 644,
+    "nombre": "Javier Salas",
+    "rol": "MANAGER",
+    "telefono": "969546635",
+    "numEquipo": 118,
+    "equipo": "KAMAK MIRAI",
+    "tieneEntrenador": "SI",
+    "entrenador": "Linid Valencia",
+    "coordinador": "ALEJANDRO DIAZ",
+    "sede": "Quito",
+    "estado": "Activo"
+  },
+  {
+    "id": 645,
+    "nombre": "Robert Pastrana",
+    "rol": "MANAGER",
+    "telefono": "984898787",
+    "numEquipo": 118,
+    "equipo": "KAMAK MIRAI",
+    "tieneEntrenador": "SI",
+    "entrenador": "Linid Valencia",
+    "coordinador": "ALEJANDRO DIAZ",
+    "sede": "Quito",
+    "estado": "Activo"
+  },
+  {
+    "id": 646,
+    "nombre": "Gabriela Altuna",
+    "rol": "MANAGER",
+    "telefono": "979351211",
+    "numEquipo": 118,
+    "equipo": "KAMAK MIRAI",
+    "tieneEntrenador": "SI",
+    "entrenador": "Linid Valencia",
+    "coordinador": "ALEJANDRO DIAZ",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 647,
+    "nombre": "Carolina Herrera",
+    "rol": "CAPITANA",
+    "telefono": "988618235",
+    "numEquipo": 119,
+    "equipo": "AURA IWIA",
+    "tieneEntrenador": "SI",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 648,
+    "nombre": "Christian Sosa",
+    "rol": "MANAGER",
+    "telefono": "996352930",
+    "numEquipo": 119,
+    "equipo": "AURA IWIA",
+    "tieneEntrenador": "SI",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 649,
+    "nombre": "Robert Espinoza",
+    "rol": "MANAGER",
+    "telefono": "962284570",
+    "numEquipo": 119,
+    "equipo": "AURA IWIA",
+    "tieneEntrenador": "SI",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 650,
+    "nombre": "Santiago Proao",
+    "rol": "MANAGER",
+    "telefono": "939118370",
+    "numEquipo": 119,
+    "equipo": "AURA IWIA",
+    "tieneEntrenador": "SI",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 651,
+    "nombre": "Vielka Altuna",
+    "rol": "MANAGER",
+    "telefono": "998336421",
+    "numEquipo": 119,
+    "equipo": "AURA IWIA",
+    "tieneEntrenador": "SI",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 652,
+    "nombre": "Jhonny Cuascota",
+    "rol": "MANAGER",
+    "telefono": "996574352",
+    "numEquipo": 119,
+    "equipo": "AURA IWIA",
+    "tieneEntrenador": "SI",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 653,
+    "nombre": "Nilda Nicol Nolasco Chipana",
+    "rol": "MANAGER",
+    "telefono": "992796887",
+    "numEquipo": 119,
+    "equipo": "AURA IWIA",
+    "tieneEntrenador": "SI",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 654,
+    "nombre": "Jampier Piero Policarpo Vera",
+    "rol": "MANAGER",
+    "telefono": "+51912413787",
+    "numEquipo": 27,
+    "equipo": "KAY THERON",
+    "tieneEntrenador": "SI",
+    "entrenador": "Ana Monroy",
+    "coordinador": "LEYLA KELLY PASQUEL ALFARO",
+    "sede": "Lima",
+    "estado": "Desertor"
+  },
+  {
+    "id": 655,
+    "nombre": "Jennifer Marmol",
+    "rol": "MANAGER",
+    "telefono": "",
+    "numEquipo": 27,
+    "equipo": "KAY THERON",
+    "tieneEntrenador": "SI",
+    "entrenador": "Ana Monroy",
+    "coordinador": "LEYLA KELLY PASQUEL ALFARO",
+    "sede": "Lima",
+    "estado": "Desertor"
+  },
+  {
+    "id": 656,
+    "nombre": "Lluli Miniguano",
+    "rol": "MANAGER",
+    "telefono": "984617373",
+    "numEquipo": 119,
+    "equipo": "AURA IWIA",
+    "tieneEntrenador": "SI",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 657,
+    "nombre": "Verito Muzo",
+    "rol": "MANAGER",
+    "telefono": "963416160",
+    "numEquipo": 119,
+    "equipo": "AURA IWIA",
+    "tieneEntrenador": "SI",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Graduado"
+  },
+  {
+    "id": 658,
+    "nombre": "Santiago Alarcn",
+    "rol": "MANAGER",
+    "telefono": "998367570",
+    "numEquipo": 119,
+    "equipo": "AURA IWIA",
+    "tieneEntrenador": "SI",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 659,
+    "nombre": "Sandra Freire",
+    "rol": "MANAGER",
+    "telefono": "0991318669",
+    "numEquipo": 34,
+    "equipo": "FRACTAL SHINE",
+    "tieneEntrenador": "SI",
+    "entrenador": "Kerly Carrillo Garzon",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
+    "sede": "Guayaquil",
+    "estado": "Activo"
+  },
+  {
+    "id": 660,
+    "nombre": "Andres Jurado",
+    "rol": "MANAGER",
+    "telefono": "0989167400",
+    "numEquipo": 34,
+    "equipo": "FRACTAL SHINE",
+    "tieneEntrenador": "SI",
+    "entrenador": "Kerly Carrillo Garzon",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
+    "sede": "Guayaquil",
+    "estado": "Activo"
+  },
+  {
+    "id": 661,
+    "nombre": "Veronica Morales",
+    "rol": "CAPITAN",
+    "telefono": "",
+    "numEquipo": 120,
+    "equipo": "MAHORI KAYA",
+    "tieneEntrenador": "SI",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Activo"
+  },
+  {
+    "id": 662,
+    "nombre": "Ximena Meja",
+    "rol": "MANAGER",
+    "telefono": "",
+    "numEquipo": 120,
+    "equipo": "MAHORI KAYA",
+    "tieneEntrenador": "SI",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Activo"
+  },
+  {
+    "id": 663,
+    "nombre": "Jessika Maldonado",
+    "rol": "MANAGER",
+    "telefono": "",
+    "numEquipo": 120,
+    "equipo": "MAHORI KAYA",
+    "tieneEntrenador": "SI",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Activo"
+  },
+  {
+    "id": 664,
+    "nombre": "Jorge Guanulema",
+    "rol": "MANAGER",
+    "telefono": "",
+    "numEquipo": 120,
+    "equipo": "MAHORI KAYA",
+    "tieneEntrenador": "SI",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 665,
+    "nombre": "Anny Alarcn",
+    "rol": "MANAGER",
+    "telefono": "",
+    "numEquipo": 120,
+    "equipo": "MAHORI KAYA",
+    "tieneEntrenador": "SI",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 666,
+    "nombre": "Freddy Angamarca",
+    "rol": "MANAGER",
+    "telefono": "",
+    "numEquipo": 120,
+    "equipo": "MAHORI KAYA",
+    "tieneEntrenador": "SI",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 667,
+    "nombre": "Jessica Pinango",
+    "rol": "MANAGER",
+    "telefono": "",
+    "numEquipo": 120,
+    "equipo": "MAHORI KAYA",
+    "tieneEntrenador": "SI",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Activo"
+  },
+  {
+    "id": 668,
+    "nombre": "Santiago Larrea",
+    "rol": "MANAGER",
+    "telefono": "",
+    "numEquipo": 120,
+    "equipo": "MAHORI KAYA",
+    "tieneEntrenador": "SI",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Activo"
+  },
+  {
+    "id": 669,
+    "nombre": "Sofia Vasco",
+    "rol": "MANAGER",
+    "telefono": "",
+    "numEquipo": 120,
+    "equipo": "MAHORI KAYA",
+    "tieneEntrenador": "SI",
+    "entrenador": "Lourdes Patino",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Activo"
+  },
+  {
+    "id": 670,
+    "nombre": "Bryan Anrrango",
+    "rol": "CAPITANA",
+    "telefono": "",
+    "numEquipo": 121,
+    "equipo": "ALFA MURI",
+    "tieneEntrenador": "SI",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
+    "sede": "Quito",
+    "estado": "Activo"
+  },
+  {
+    "id": 671,
+    "nombre": "Eduardo Carapaz",
+    "rol": "MANAGER",
+    "telefono": "",
+    "numEquipo": 121,
+    "equipo": "ALFA MURI",
+    "tieneEntrenador": "SI",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
+    "sede": "Quito",
+    "estado": "Activo"
+  },
+  {
+    "id": 672,
+    "nombre": "Lisseth Lucero",
+    "rol": "MANAGER",
+    "telefono": "",
+    "numEquipo": 121,
+    "equipo": "ALFA MURI",
+    "tieneEntrenador": "SI",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 673,
+    "nombre": "Brenda Farfan",
+    "rol": "MANAGER",
+    "telefono": "",
+    "numEquipo": 121,
+    "equipo": "ALFA MURI",
+    "tieneEntrenador": "SI",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 674,
+    "nombre": "Angel Malacatus",
+    "rol": "MANAGER",
+    "telefono": "",
+    "numEquipo": 121,
+    "equipo": "ALFA MURI",
+    "tieneEntrenador": "SI",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 675,
+    "nombre": "Edwin Calero",
+    "rol": "MANAGER",
+    "telefono": "",
+    "numEquipo": 121,
+    "equipo": "ALFA MURI",
+    "tieneEntrenador": "SI",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
+    "sede": "Quito",
+    "estado": "Desertor"
+  },
+  {
+    "id": 676,
+    "nombre": "Omar Guanoquiza",
+    "rol": "MANAGER",
+    "telefono": "",
+    "numEquipo": 121,
+    "equipo": "ALFA MURI",
+    "tieneEntrenador": "SI",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
+    "sede": "Quito",
+    "estado": "Activo"
+  },
+  {
+    "id": 677,
+    "nombre": "Gabriela Osio",
+    "rol": "MANAGER",
+    "telefono": "",
+    "numEquipo": 121,
+    "equipo": "ALFA MURI",
+    "tieneEntrenador": "SI",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
+    "sede": "Quito",
+    "estado": "Activo"
+  },
+  {
+    "id": 678,
+    "nombre": "Maria Elena Andrade",
+    "rol": "CAPITAN",
+    "telefono": "",
+    "numEquipo": 122,
+    "equipo": "KAIZEN MAINICHI",
+    "tieneEntrenador": "SI",
+    "entrenador": "Daniela Monroy Fabbri",
+    "coordinador": "LILI CUBILLO",
+    "sede": "Quito",
+    "estado": "Activo"
+  },
+  {
+    "id": 679,
+    "nombre": "Viviana Ruiz",
+    "rol": "MANAGER",
+    "telefono": "",
+    "numEquipo": 122,
+    "equipo": "KAIZEN MAINICHI",
+    "tieneEntrenador": "SI",
+    "entrenador": "Daniela Monroy Fabbri",
+    "coordinador": "LILI CUBILLO",
+    "sede": "Quito",
+    "estado": "Activo"
+  },
+  {
+    "id": 680,
+    "nombre": "Dayana Tamayo",
+    "rol": "MANAGER",
+    "telefono": "",
+    "numEquipo": 122,
+    "equipo": "KAIZEN MAINICHI",
+    "tieneEntrenador": "SI",
+    "entrenador": "Daniela Monroy Fabbri",
+    "coordinador": "LILI CUBILLO",
+    "sede": "Quito",
+    "estado": "Activo"
+  },
+  {
+    "id": 681,
+    "nombre": "Wilson Conza",
+    "rol": "CAPITANA",
+    "telefono": "0961944443",
+    "numEquipo": 123,
+    "equipo": "SHOSHIN ITAI",
+    "tieneEntrenador": "SI",
+    "entrenador": "Daniela Monroy Fabbri",
+    "coordinador": "JUDITH REGINA ROMERO ROSALES",
+    "sede": "Quito",
+    "estado": "Activo"
+  },
+  {
+    "id": 682,
+    "nombre": "Eduardo Leon",
+    "rol": "MANAGER",
+    "telefono": "0960652421",
+    "numEquipo": 123,
+    "equipo": "SHOSHIN ITAI",
+    "tieneEntrenador": "SI",
+    "entrenador": "Daniela Monroy Fabbri",
+    "coordinador": "JUDITH REGINA ROMERO ROSALES",
+    "sede": "Quito",
+    "estado": "Activo"
+  },
+  {
+    "id": 683,
+    "nombre": "EDUARDO LEON",
+    "rol": "MANAGER",
+    "telefono": "0983709989",
+    "numEquipo": 123,
+    "equipo": "SHOSHIN ITAI",
+    "tieneEntrenador": "SI",
+    "entrenador": "Daniela Monroy Fabbri",
+    "coordinador": "JUDITH REGINA ROMERO ROSALES",
+    "sede": "Quito",
+    "estado": "Activo"
+  },
+  {
+    "id": 684,
+    "nombre": "Ivan Tinillo",
+    "rol": "Capitan",
+    "telefono": "",
+    "numEquipo": 124,
+    "equipo": "KAIZEN MAINICHI",
+    "tieneEntrenador": "NO",
+    "entrenador": "",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Activo"
+  },
+  {
+    "id": 685,
+    "nombre": "Ivan Tinilo",
+    "rol": "Manager",
+    "telefono": "",
+    "numEquipo": 124,
+    "equipo": "KAIZEN MAINICHI",
+    "tieneEntrenador": "NO",
+    "entrenador": "",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Activo"
+  },
+  {
+    "id": 686,
+    "nombre": "Ivan Meja",
+    "rol": "Manager",
+    "telefono": "",
+    "numEquipo": 124,
+    "equipo": "KAIZEN MAINICHI",
+    "tieneEntrenador": "NO",
+    "entrenador": "",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Activo"
+  },
+  {
+    "id": 687,
+    "nombre": "Doris Balseca",
+    "rol": "Manager",
+    "telefono": "",
+    "numEquipo": 124,
+    "equipo": "KAIZEN MAINICHI",
+    "tieneEntrenador": "NO",
+    "entrenador": "",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Activo"
+  },
+  {
+    "id": 688,
+    "nombre": "Andrea Meja",
+    "rol": "Manager",
+    "telefono": "",
+    "numEquipo": 124,
+    "equipo": "KAIZEN MAINICHI",
+    "tieneEntrenador": "NO",
+    "entrenador": "",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
+    "sede": "Quito",
+    "estado": "Activo"
+  },
+  {
+    "id": 689,
+    "nombre": "VERONICA CLAVIJO",
+    "rol": "CAPITAN",
+    "telefono": "",
+    "numEquipo": 21,
+    "equipo": "LOTUS IKIGAI",
+    "tieneEntrenador": "SI",
+    "entrenador": "Juan Fernando Reinoso",
+    "coordinador": "HAYDIN FERNANDO MENDOZA CLAVIJO",
+    "sede": "Cuenca",
+    "estado": "Activo"
+  },
+  {
+    "id": 690,
+    "nombre": "SEBASTIAN RIVAS",
+    "rol": "MANAGER",
+    "telefono": "",
+    "numEquipo": 21,
+    "equipo": "LOTUS IKIGAI",
+    "tieneEntrenador": "SI",
+    "entrenador": "Juan Fernando Reinoso",
+    "coordinador": "HAYDIN FERNANDO MENDOZA CLAVIJO",
+    "sede": "Cuenca",
+    "estado": "Activo"
+  }
+];
+
+export const INITIAL_LLAMADOS = {
+  "JULIO2026": [
+    {
+      "entrenador": "Erika Gissell Gavilanez Gallardo",
+      "manager": "David Gonzalez",
+      "sede": "Medelln",
+      "equipo": 15.0,
+      "tarifa": 400.0
+    },
+    {
+      "entrenador": "Erika Gissell Gavilanez Gallardo",
+      "manager": "Gabriel Ordz",
+      "sede": "CDMX",
+      "equipo": 3.0,
+      "tarifa": 400.0
+    },
+    {
+      "entrenador": "Erika Gissell Gavilanez Gallardo",
+      "manager": "Karina Valdiviezo",
+      "sede": "Cuenca",
+      "equipo": 19.0,
+      "tarifa": 400.0
+    },
+    {
+      "entrenador": "Erika Gissell Gavilanez Gallardo",
+      "manager": "Marcelo Riera",
+      "sede": "Cuenca",
+      "equipo": 19.0,
+      "tarifa": 400.0
+    },
+    {
+      "entrenador": "Erika Gissell Gavilanez Gallardo",
+      "manager": "Isabella Torres",
+      "sede": "Guayaquil",
+      "equipo": 32.0,
+      "tarifa": 200.0
+    },
+    {
+      "entrenador": "Erika Gissell Gavilanez Gallardo",
+      "manager": "Ivonne Recaurte",
+      "sede": "Guayaquil",
+      "equipo": 33.0,
+      "tarifa": 200.0
+    },
+    {
+      "entrenador": "Josue Vera",
+      "manager": "Anita Esperanza Flores Tipismana",
+      "sede": "Lima",
+      "equipo": 26.0,
+      "tarifa": 44.44444444
+    },
+    {
+      "entrenador": "Josue Vera",
+      "manager": "Brian Steve Sangay Salvatierra",
+      "sede": "Lima",
+      "equipo": 26.0,
+      "tarifa": 44.44444444
+    },
+    {
+      "entrenador": "Josue Vera",
+      "manager": "Bryan Rodny Lopez Hanco",
+      "sede": "Lima",
+      "equipo": 26.0,
+      "tarifa": 44.44444444
+    },
+    {
+      "entrenador": "Josue Vera",
+      "manager": "Camila Alegria Verastegui Duran",
+      "sede": "Lima",
+      "equipo": 26.0,
+      "tarifa": 44.44444444
+    },
+    {
+      "entrenador": "Josue Vera",
+      "manager": "Fabio Alessandro Canqui Lloyd",
+      "sede": "Lima",
+      "equipo": 26.0,
+      "tarifa": 44.44444444
+    },
+    {
+      "entrenador": "Josue Vera",
+      "manager": "Jolber Vargas Enriquez",
+      "sede": "Lima",
+      "equipo": 26.0,
+      "tarifa": 44.44444444
+    },
+    {
+      "entrenador": "Josue Vera",
+      "manager": "Jose Guillermo Curi Salvador",
+      "sede": "Lima",
+      "equipo": 26.0,
+      "tarifa": 44.44444444
+    },
+    {
+      "entrenador": "Josue Vera",
+      "manager": "Maria Olarte Barrientos",
+      "sede": "Lima",
+      "equipo": 26.0,
+      "tarifa": 44.44444444
+    },
+    {
+      "entrenador": "Josue Vera",
+      "manager": "Piero Alessandro Portal Pasquel",
+      "sede": "Lima",
+      "equipo": 26.0,
+      "tarifa": 44.44444444
+    },
+    {
+      "entrenador": "Linid Valencia",
+      "manager": "Carolina Quishpe",
+      "sede": "Quito",
+      "equipo": 118.0,
+      "tarifa": 80.0
+    },
+    {
+      "entrenador": "Linid Valencia",
+      "manager": "Daniela Esposito",
+      "sede": "Quito",
+      "equipo": 118.0,
+      "tarifa": 80.0
+    },
+    {
+      "entrenador": "Linid Valencia",
+      "manager": "David Salvador",
+      "sede": "Quito",
+      "equipo": 118.0,
+      "tarifa": 80.0
+    },
+    {
+      "entrenador": "Linid Valencia",
+      "manager": "Gabriela Tapia",
+      "sede": "Quito",
+      "equipo": 118.0,
+      "tarifa": 80.0
+    },
+    {
+      "entrenador": "Linid Valencia",
+      "manager": "Javier Salas",
+      "sede": "Quito",
+      "equipo": 118.0,
+      "tarifa": 80.0
+    },
+    {
+      "entrenador": "Mauricio Ramirez Silva",
+      "manager": "Carolina Herrera",
+      "sede": "Quito",
+      "equipo": 119.0,
+      "tarifa": 40.0
+    },
+    {
+      "entrenador": "Mauricio Ramirez Silva",
+      "manager": "Christian Sosa",
+      "sede": "Quito",
+      "equipo": 119.0,
+      "tarifa": 40.0
+    },
+    {
+      "entrenador": "Mauricio Ramirez Silva",
+      "manager": "Enrrique Franco",
+      "sede": "Guayaquil",
+      "equipo": 33.0,
+      "tarifa": 133.3333333
+    },
+    {
+      "entrenador": "Mauricio Ramirez Silva",
+      "manager": "Evelyn Orellana",
+      "sede": "Guayaquil",
+      "equipo": 33.0,
+      "tarifa": 133.3333333
+    },
+    {
+      "entrenador": "Mauricio Ramirez Silva",
+      "manager": "Fernanda Ibaez",
+      "sede": "Guayaquil",
+      "equipo": 33.0,
+      "tarifa": 133.3333333
+    },
+    {
+      "entrenador": "Mauricio Ramirez Silva",
+      "manager": "Gabriela Altuna",
+      "sede": "Quito",
+      "equipo": 119.0,
+      "tarifa": 40.0
+    },
+    {
+      "entrenador": "Mauricio Ramirez Silva",
+      "manager": "Jennifer Marmol",
+      "sede": "Quito",
+      "equipo": 119.0,
+      "tarifa": 40.0
+    },
+    {
+      "entrenador": "Mauricio Ramirez Silva",
+      "manager": "Jhonny Cuascota",
+      "sede": "Quito",
+      "equipo": 119.0,
+      "tarifa": 40.0
+    },
+    {
+      "entrenador": "Mauricio Ramirez Silva",
+      "manager": "Lluli Miniguano",
+      "sede": "Quito",
+      "equipo": 119.0,
+      "tarifa": 40.0
+    },
+    {
+      "entrenador": "Mauricio Ramirez Silva",
+      "manager": "Robert Espinoza",
+      "sede": "Quito",
+      "equipo": 119.0,
+      "tarifa": 40.0
+    },
+    {
+      "entrenador": "Mauricio Ramirez Silva",
+      "manager": "Santiago Proao",
+      "sede": "Quito",
+      "equipo": 119.0,
+      "tarifa": 40.0
+    },
+    {
+      "entrenador": "Mauricio Ramirez Silva",
+      "manager": "Verito Muzo",
+      "sede": "Quito",
+      "equipo": 119.0,
+      "tarifa": 40.0
+    },
+    {
+      "entrenador": "Mauricio Ramirez Silva",
+      "manager": "Vielka Altuna",
+      "sede": "Quito",
+      "equipo": 119.0,
+      "tarifa": 40.0
+    },
+    {
+      "entrenador": "Linid Valencia",
+      "manager": "Nelson Jimenez",
+      "sede": "CDMX",
+      "equipo": 4.0,
+      "tarifa": 400.0
+    },
+    {
+      "entrenador": "Ana Monroy",
+      "manager": "Gina Cardenas Lopez",
+      "sede": "Lima",
+      "equipo": 27.0,
+      "tarifa": 66.66666667
+    },
+    {
+      "entrenador": "Ana Monroy",
+      "manager": "Jose Israel Maquera Montoya",
+      "sede": "Lima",
+      "equipo": 27.0,
+      "tarifa": 66.66666667
+    },
+    {
+      "entrenador": "Ana Monroy",
+      "manager": "Nilda Nicole Nolasco Chipana",
+      "sede": "Lima",
+      "equipo": 27.0,
+      "tarifa": 66.66666667
+    },
+    {
+      "entrenador": "Ana Monroy",
+      "manager": "Grezia Maria Jolly Vera",
+      "sede": "Lima",
+      "equipo": 27.0,
+      "tarifa": 66.66666667
+    },
+    {
+      "entrenador": "Ana Monroy",
+      "manager": "Gustavo Adolfo Fernandez Espinoza",
+      "sede": "Lima",
+      "equipo": 27.0,
+      "tarifa": 66.66666667
+    },
+    {
+      "entrenador": "Ana Monroy",
+      "manager": "Jampier Piero Policarpo Vera",
+      "sede": "Lima",
+      "equipo": 27.0,
+      "tarifa": 66.66666667
+    }
+  ],
+  "JUNIO2026": [
+    {
+      "entrenador": "Andres Idrobo",
+      "manager": "MARTN QUIROZ",
+      "sede": "Quito",
+      "equipo": 116.0,
+      "tarifa": 200.0
+    },
+    {
+      "entrenador": "Andres Idrobo",
+      "manager": "PAOLA CAMACHO",
+      "sede": "Quito",
+      "equipo": 116.0,
+      "tarifa": 200.0
+    },
+    {
+      "entrenador": "Jose Luis Sanchez Moreno",
+      "manager": "MARIANA CATRILLON",
+      "sede": "Medelln",
+      "equipo": 14.0,
+      "tarifa": 400.0
+    },
+    {
+      "entrenador": "Ana Monroy",
+      "manager": "KARINA VALDIVIEZO",
+      "sede": "Cuenca",
+      "equipo": 18.0,
+      "tarifa": 66.66666667
+    },
+    {
+      "entrenador": "Ana Monroy",
+      "manager": "HUGO CASTILLO",
+      "sede": "Cuenca",
+      "equipo": 18.0,
+      "tarifa": 66.66666667
+    },
+    {
+      "entrenador": "Ana Monroy",
+      "manager": "FRANCISCO ROMERO",
+      "sede": "Cuenca",
+      "equipo": 18.0,
+      "tarifa": 66.66666667
+    },
+    {
+      "entrenador": "Ana Monroy",
+      "manager": "CYNTHIA TIXI",
+      "sede": "Cuenca",
+      "equipo": 18.0,
+      "tarifa": 66.66666667
+    },
+    {
+      "entrenador": "Ana Monroy",
+      "manager": "ALEXANDER YUNGA",
+      "sede": "Cuenca",
+      "equipo": 18.0,
+      "tarifa": 66.66666667
+    },
+    {
+      "entrenador": "Ana Monroy",
+      "manager": "BLANCA ORELLANA",
+      "sede": "Cuenca",
+      "equipo": 18.0,
+      "tarifa": 66.66666667
+    }
+  ],
+  "MAYO2026": [
+    {
+      "entrenador": "Ana Monroy",
+      "manager": "ESTEFANIA CHAVARRIA",
+      "sede": "Medelln",
+      "equipo": 13.0,
+      "tarifa": 133.33333333333334
+    },
+    {
+      "entrenador": "Ana Monroy",
+      "manager": "VANESSA GIRALDO",
+      "sede": "Medelln",
+      "equipo": 13.0,
+      "tarifa": 133.33333333333334
+    },
+    {
+      "entrenador": "Ana Monroy",
+      "manager": "YESID SANTANDER",
+      "sede": "Medelln",
+      "equipo": 13.0,
+      "tarifa": 133.33333333333334
+    },
+    {
+      "entrenador": "David Sosa",
+      "manager": "Carmen Prez",
+      "sede": "Lima",
+      "equipo": "APOYO MESAS",
+      "tarifa": 175.0
+    },
+    {
+      "entrenador": "Diego David Bravo Figueroa",
+      "manager": "Luis Alberto Hernndez Mendoza",
+      "sede": "Lima",
+      "equipo": "APOYO MESAS",
+      "tarifa": 175.0
+    },
+    {
+      "entrenador": "Haydin Fernando Mendoza Clavijo",
+      "manager": "CRISTINA VINTIMILLA",
+      "sede": "Cuenca",
+      "equipo": 16.0,
+      "tarifa": 200.0
+    },
+    {
+      "entrenador": "Haydin Fernando Mendoza Clavijo",
+      "manager": "GERARD AVILA",
+      "sede": "Cuenca",
+      "equipo": 16.0,
+      "tarifa": 200.0
+    },
+    {
+      "entrenador": "Julio Narvaez",
+      "manager": "ERNESTO SEPLVEDA",
+      "sede": "CDMX",
+      "equipo": 2.0,
+      "tarifa": 200.0
+    },
+    {
+      "entrenador": "Julio Narvaez",
+      "manager": "MARTHA GUERRERO",
+      "sede": "CDMX",
+      "equipo": 2.0,
+      "tarifa": 200.0
+    },
+    {
+      "entrenador": "Julio Narvaez",
+      "manager": "JOSUE AVILES",
+      "sede": "Cuenca",
+      "equipo": 17.0,
+      "tarifa": 100.0
+    },
+    {
+      "entrenador": "Julio Narvaez",
+      "manager": "ESTEFANIA CASTILLO",
+      "sede": "Cuenca",
+      "equipo": 17.0,
+      "tarifa": 100.0
+    },
+    {
+      "entrenador": "Julio Narvaez",
+      "manager": "JUAN DIEGO JARA",
+      "sede": "Cuenca",
+      "equipo": 17.0,
+      "tarifa": 100.0
+    },
+    {
+      "entrenador": "Julio Narvaez",
+      "manager": "MARTHA REA",
+      "sede": "Cuenca",
+      "equipo": 17.0,
+      "tarifa": 100.0
+    },
+    {
+      "entrenador": "Linid Valencia",
+      "manager": "MARIEL GUERRERO",
+      "sede": "Guayaquil",
+      "equipo": 31.0,
+      "tarifa": 100.0
+    },
+    {
+      "entrenador": "Linid Valencia",
+      "manager": "LEO ANGARITA",
+      "sede": "Guayaquil",
+      "equipo": 31.0,
+      "tarifa": 100.0
+    },
+    {
+      "entrenador": "Linid Valencia",
+      "manager": "BELEN GARCIA",
+      "sede": "Guayaquil",
+      "equipo": 31.0,
+      "tarifa": 100.0
+    },
+    {
+      "entrenador": "Linid Valencia",
+      "manager": "DIEGO SILVA",
+      "sede": "Guayaquil",
+      "equipo": 31.0,
+      "tarifa": 100.0
+    },
+    {
+      "entrenador": "Linid Valencia",
+      "manager": "DIEGO ALBUJA",
+      "sede": "Quito",
+      "equipo": 115.0,
+      "tarifa": 50.0
+    },
+    {
+      "entrenador": "Linid Valencia",
+      "manager": "JONATHAN ZAMORA",
+      "sede": "Quito",
+      "equipo": 115.0,
+      "tarifa": 50.0
+    },
+    {
+      "entrenador": "Linid Valencia",
+      "manager": "SANDRA MENDIETA",
+      "sede": "Quito",
+      "equipo": 115.0,
+      "tarifa": 50.0
+    },
+    {
+      "entrenador": "Linid Valencia",
+      "manager": "KRISTEL DEFAS",
+      "sede": "Quito",
+      "equipo": 115.0,
+      "tarifa": 50.0
+    },
+    {
+      "entrenador": "Linid Valencia",
+      "manager": "EMERITA SALAS",
+      "sede": "Quito",
+      "equipo": 115.0,
+      "tarifa": 50.0
+    },
+    {
+      "entrenador": "Linid Valencia",
+      "manager": "NAHYA BERMEO",
+      "sede": "Quito",
+      "equipo": 115.0,
+      "tarifa": 50.0
+    },
+    {
+      "entrenador": "Linid Valencia",
+      "manager": "VICTOR SANCHEZ",
+      "sede": "Quito",
+      "equipo": 115.0,
+      "tarifa": 50.0
+    },
+    {
+      "entrenador": "Linid Valencia",
+      "manager": "DAYANA MARTINEZ",
+      "sede": "Quito",
+      "equipo": 115.0,
+      "tarifa": 50.0
+    },
+    {
+      "entrenador": "Lourdes Patino",
+      "manager": "DAVID RODRIGUEZ",
+      "sede": "Lima",
+      "equipo": 25.0,
+      "tarifa": 80.0
+    },
+    {
+      "entrenador": "Lourdes Patino",
+      "manager": "HELAR MUGURUZA",
+      "sede": "Lima",
+      "equipo": 25.0,
+      "tarifa": 80.0
+    },
+    {
+      "entrenador": "Lourdes Patino",
+      "manager": "JHEN PONCE",
+      "sede": "Lima",
+      "equipo": 25.0,
+      "tarifa": 80.0
+    },
+    {
+      "entrenador": "Lourdes Patino",
+      "manager": "MANUEL YAKIMA RIVERA",
+      "sede": "Lima",
+      "equipo": 25.0,
+      "tarifa": 80.0
+    },
+    {
+      "entrenador": "Lourdes Patino",
+      "manager": "MARCO ANTONIO VILLARREAL",
+      "sede": "Lima",
+      "equipo": 25.0,
+      "tarifa": 80.0
+    },
+    {
+      "entrenador": "Mauricio Ramirez Silva",
+      "manager": "BRYAN PESANTEZ",
+      "sede": "Quito",
+      "equipo": 114.0,
+      "tarifa": 80.0
+    },
+    {
+      "entrenador": "Mauricio Ramirez Silva",
+      "manager": "ERICK BRAVO",
+      "sede": "Quito",
+      "equipo": 114.0,
+      "tarifa": 80.0
+    },
+    {
+      "entrenador": "Mauricio Ramirez Silva",
+      "manager": "GUIDO GAMBOA",
+      "sede": "Quito",
+      "equipo": 114.0,
+      "tarifa": 80.0
+    },
+    {
+      "entrenador": "Mauricio Ramirez Silva",
+      "manager": "MONICA CASANOVA",
+      "sede": "Quito",
+      "equipo": 114.0,
+      "tarifa": 80.0
+    },
+    {
+      "entrenador": "Mauricio Ramirez Silva",
+      "manager": "WILSON ALBUJA",
+      "sede": "Quito",
+      "equipo": 114.0,
+      "tarifa": 80.0
+    }
+  ],
+  "ABRIL2026": [
+    {
+      "entrenador": "Alejandro Diaz",
+      "manager": "GIOVANNA PALOMINO MARCOS",
+      "sede": "Lima",
+      "equipo": 23.0,
+      "tarifa": 300.0
+    },
+    {
+      "entrenador": "Alejandro Diaz",
+      "manager": "JESSICA LPEZ LPEZ",
+      "sede": "Lima",
+      "equipo": 23.0,
+      "tarifa": 300.0
+    },
+    {
+      "entrenador": "Andres Gomez",
+      "manager": "Diego Camargo",
+      "sede": "Medelln",
+      "equipo": 1.0,
+      "tarifa": 300.0
+    },
+    {
+      "entrenador": "Andres Gomez",
+      "manager": "Miguel Patio",
+      "sede": "Medelln",
+      "equipo": 2.0,
+      "tarifa": 300.0
+    },
+    {
+      "entrenador": "Andres Gomez",
+      "manager": "Ledis Daza",
+      "sede": "Medelln",
+      "equipo": 3.0,
+      "tarifa": 300.0
+    },
+    {
+      "entrenador": "Andres Gomez",
+      "manager": "LAURA VANESSA DURANGO ARAQUE",
+      "sede": "Medelln",
+      "equipo": 8.0,
+      "tarifa": 300.0
+    },
+    {
+      "entrenador": "Andres Gomez",
+      "manager": "EQUIPO 12",
+      "sede": "Medelln",
+      "equipo": 12.0,
+      "tarifa": 400.0
+    },
+    {
+      "entrenador": "Andres Gomez",
+      "manager": "KARLA JIMENEZ",
+      "sede": "Guayaquil",
+      "equipo": 23.0,
+      "tarifa": 125.0
+    },
+    {
+      "entrenador": "Andres Idrobo",
+      "manager": "EQUIPO 113",
+      "sede": "Quito",
+      "equipo": 113.0,
+      "tarifa": 400.0
+    },
+    {
+      "entrenador": "Diego David Bravo Figueroa",
+      "manager": "GISSELLA HUAMAN CELESTINO",
+      "sede": "Lima",
+      "equipo": 23.0,
+      "tarifa": 325.0
+    },
+    {
+      "entrenador": "Erika Gissell Gavilanez Gallardo",
+      "manager": "EQUIPO 24",
+      "sede": "Lima",
+      "equipo": 24.0,
+      "tarifa": 400.0
+    },
+    {
+      "entrenador": "Haydin Fernando Mendoza Clavijo",
+      "manager": "EDUARDO ALFARO",
+      "sede": "Quito",
+      "equipo": 112.0,
+      "tarifa": 300.0
+    },
+    {
+      "entrenador": "Jose Luis Sanchez Moreno",
+      "manager": "EQUIPO 1",
+      "sede": "CDMX",
+      "equipo": 1.0,
+      "tarifa": 400.0
+    },
+    {
+      "entrenador": "Kriscia Rodas",
+      "manager": "IVAN TINILLO",
+      "sede": "Quito",
+      "equipo": 112.0,
+      "tarifa": 300.0
+    },
+    {
+      "entrenador": "Lourdes Patino",
+      "manager": "ARIANNA MENDEZ",
+      "sede": "Quito",
+      "equipo": 112.0,
+      "tarifa": 275.0
+    },
+    {
+      "entrenador": "Lourdes Patino",
+      "manager": "EQUIPO 30",
+      "sede": "Guayaquil",
+      "equipo": 30.0,
+      "tarifa": 400.0
+    }
+  ],
+  "MARZO2026": [
+    {
+      "entrenador": "Andres Idrobo",
+      "manager": "MABEL ROBBYS",
+      "sede": "Guayaquil",
+      "equipo": 29.0,
+      "tarifa": 225.0
+    },
+    {
+      "entrenador": "David Sosa",
+      "manager": "FERNANDO ABEL LPEZ LPEZ",
+      "sede": "Lima",
+      "equipo": 23.0,
+      "tarifa": 350.0
+    },
+    {
+      "entrenador": "Diego David Bravo Figueroa",
+      "manager": "CAROLINA VINTIMILLA",
+      "sede": "Quito",
+      "equipo": 110.0,
+      "tarifa": 25.0
+    },
+    {
+      "entrenador": "Diego David Bravo Figueroa",
+      "manager": "JUAN MORENO",
+      "sede": "Quito",
+      "equipo": 111.0,
+      "tarifa": 325.0
+    },
+    {
+      "entrenador": "Erika Gissell Gavilanez Gallardo",
+      "manager": "ANDREA MEDINA",
+      "sede": "Cuenca",
+      "equipo": 15.0,
+      "tarifa": 350.0
+    },
+    {
+      "entrenador": "Erika Gissell Gavilanez Gallardo",
+      "manager": "GARETH RAMOS PREZ",
+      "sede": "Lima",
+      "equipo": 23.0,
+      "tarifa": 300.0
+    },
+    {
+      "entrenador": "Haydin Fernando Mendoza Clavijo",
+      "manager": "DIEGO LEON",
+      "sede": "Cuenca",
+      "equipo": 15.0,
+      "tarifa": 250.0
+    },
+    {
+      "entrenador": "Haydin Fernando Mendoza Clavijo",
+      "manager": "VANEZA RAMREZ",
+      "sede": "Lima",
+      "equipo": 23.0,
+      "tarifa": 350.0
+    },
+    {
+      "entrenador": "Isaac Gabriel Betancourt Patino",
+      "manager": "DAVID EMERSON CONTRERAS LUCHINE",
+      "sede": "Lima",
+      "equipo": 23.0,
+      "tarifa": 325.0
+    },
+    {
+      "entrenador": "Jose Luis Sanchez Moreno",
+      "manager": "KAROL VILLARUEL",
+      "sede": "Quito",
+      "equipo": 111.0,
+      "tarifa": 275.0
+    },
+    {
+      "entrenador": "Jose Luis Sanchez Moreno",
+      "manager": "GRECIA MENDEZ",
+      "sede": "Quito",
+      "equipo": 112.0,
+      "tarifa": 200.0
+    },
+    {
+      "entrenador": "Josue Vera",
+      "manager": "JONATHAN CARIUS",
+      "sede": "Quito",
+      "equipo": 111.0,
+      "tarifa": 375.0
+    },
+    {
+      "entrenador": "Julio Narvaez",
+      "manager": "EDWIN CALERO",
+      "sede": "Quito",
+      "equipo": 111.0,
+      "tarifa": 350.0
+    }
+  ],
+  "FEBRERO2026": [
+    {
+      "entrenador": "Ana Monroy",
+      "manager": "CHARO YANETH APONTE PREZ",
+      "sede": "Lima",
+      "equipo": 22.0,
+      "tarifa": 300.0
+    },
+    {
+      "entrenador": "Ana Monroy",
+      "manager": "LILIBETH CUBILLO",
+      "sede": "Quito",
+      "equipo": 109.0,
+      "tarifa": 275.0
+    },
+    {
+      "entrenador": "Andres Idrobo",
+      "manager": "ROSMERY OCHOA FERRER",
+      "sede": "Lima",
+      "equipo": 22.0,
+      "tarifa": 325.0
+    },
+    {
+      "entrenador": "David Sosa",
+      "manager": "MICHELLE ZUNIGA",
+      "sede": "Cuenca",
+      "equipo": 14.0,
+      "tarifa": 275.0
+    },
+    {
+      "entrenador": "David Sosa",
+      "manager": "JOSE GUILLERMOS CURI",
+      "sede": "Lima",
+      "equipo": 22.0,
+      "tarifa": 75.0
+    },
+    {
+      "entrenador": "Diego David Bravo Figueroa",
+      "manager": "CAROLINA VINTIMILLA",
+      "sede": "Quito",
+      "equipo": 110.0,
+      "tarifa": 275.0
+    },
+    {
+      "entrenador": "Isaac Gabriel Betancourt Patino",
+      "manager": "RENATO MARQUEZ",
+      "sede": "Cuenca",
+      "equipo": 15.0,
+      "tarifa": 75.0
+    },
+    {
+      "entrenador": "Jose Luis Sanchez Moreno",
+      "manager": "PAUL PINOS",
+      "sede": "Cuenca",
+      "equipo": 14.0,
+      "tarifa": 350.0
+    },
+    {
+      "entrenador": "Josue Vera",
+      "manager": "RUTH CALVACHE",
+      "sede": "Quito",
+      "equipo": 110.0,
+      "tarifa": 225.0
+    },
+    {
+      "entrenador": "Josue Vera",
+      "manager": "WILLIAMS SANCHEZ",
+      "sede": "Quito",
+      "equipo": 110.0,
+      "tarifa": 175.0
+    },
+    {
+      "entrenador": "Julio Narvaez",
+      "manager": "VERONICA GALLEGO TABORDA",
+      "sede": "Medelln",
+      "equipo": 10.0,
+      "tarifa": 300.0
+    },
+    {
+      "entrenador": "Julio Narvaez",
+      "manager": "LUIS SABAY",
+      "sede": "Quito",
+      "equipo": 109.0,
+      "tarifa": 350.0
+    },
+    {
+      "entrenador": "Lourdes Patino",
+      "manager": "JUAN PABLO LEMA BERMUDEZ",
+      "sede": "Medelln",
+      "equipo": 10.0,
+      "tarifa": 325.0
+    },
+    {
+      "entrenador": "Lourdes Patino",
+      "manager": "FABIAN NAULA",
+      "sede": "Cuenca",
+      "equipo": 14.0,
+      "tarifa": 300.0
+    },
+    {
+      "entrenador": "Lourdes Patino",
+      "manager": "LAURA TOAPANTA",
+      "sede": "Guayaquil",
+      "equipo": 28.0,
+      "tarifa": 300.0
+    },
+    {
+      "entrenador": "Mauricio Ramirez Silva",
+      "manager": "GREZIA MAIA JOLLY VERA",
+      "sede": "Lima",
+      "equipo": 22.0,
+      "tarifa": 350.0
+    },
+    {
+      "entrenador": "Mauricio Ramirez Silva",
+      "manager": "VALERIA CEVALLOS",
+      "sede": "Quito",
+      "equipo": 111.0,
+      "tarifa": 150.0
+    }
+  ],
+  "ENERO2026": [
+    {
+      "entrenador": "Alejandro Diaz",
+      "manager": "JOSE ALONSO GALVEZ LOPEZ",
+      "sede": "Lima",
+      "equipo": 21.0,
+      "tarifa": 275.0
+    },
+    {
+      "entrenador": "Ana Monroy",
+      "manager": "JENNIFER VILLAVICINCIO",
+      "sede": "Quito",
+      "equipo": 108.0,
+      "tarifa": 200.0
+    },
+    {
+      "entrenador": "David Sosa",
+      "manager": "ALEX PICO",
+      "sede": "Quito",
+      "equipo": 108.0,
+      "tarifa": 300.0
+    },
+    {
+      "entrenador": "Erika Gissell Gavilanez Gallardo",
+      "manager": "PAUL OCHOA",
+      "sede": "Cuenca",
+      "equipo": 13.0,
+      "tarifa": 325.0
+    },
+    {
+      "entrenador": "Jose Luis Sanchez Moreno",
+      "manager": "MIRIAM ORDOEZ",
+      "sede": "Cuenca",
+      "equipo": 13.0,
+      "tarifa": 300.0
+    },
+    {
+      "entrenador": "Jose Luis Sanchez Moreno",
+      "manager": "NATALIA CAJAS",
+      "sede": "Quito",
+      "equipo": 110.0,
+      "tarifa": 150.0
+    },
+    {
+      "entrenador": "Julio Narvaez",
+      "manager": "PAOLA ALMEIDA",
+      "sede": "Quito",
+      "equipo": 107.0,
+      "tarifa": 275.0
+    },
+    {
+      "entrenador": "Kriscia Rodas",
+      "manager": "JUAN GARZON",
+      "sede": "Quito",
+      "equipo": 106.0,
+      "tarifa": 225.0
+    },
+    {
+      "entrenador": "Kriscia Rodas",
+      "manager": "KARLA PASTRANO",
+      "sede": "Quito",
+      "equipo": 108.0,
+      "tarifa": 225.0
+    },
+    {
+      "entrenador": "Mauricio Ramirez Silva",
+      "manager": "MILAGROS CASTAEDA ORBE",
+      "sede": "Lima",
+      "equipo": 21.0,
+      "tarifa": 225.0
+    },
+    {
+      "entrenador": "Mila Campuzano",
+      "manager": "ARISKERLA MONTANO MIRANDA",
+      "sede": "Lima",
+      "equipo": 21.0,
+      "tarifa": 325.0
+    }
+  ],
+  "DICIEMBRE2025": [
+    {
+      "entrenador": "Alejandro Diaz",
+      "manager": "KARINA ZAMORA",
+      "sede": "Guayaquil",
+      "equipo": 27.0,
+      "tarifa": 125.0
+    },
+    {
+      "entrenador": "Alejandro Diaz",
+      "manager": "CHRISTIAN ROBALINO",
+      "sede": "Cuenca",
+      "equipo": 12.0,
+      "tarifa": 300.0
+    },
+    {
+      "entrenador": "Ana Monroy",
+      "manager": "VICTORIA ANDRADE",
+      "sede": "Quito",
+      "equipo": 107.0,
+      "tarifa": 250.0
+    },
+    {
+      "entrenador": "Ana Monroy",
+      "manager": "JUAN FERNANDO REINOSO",
+      "sede": "Cuenca",
+      "equipo": 12.0,
+      "tarifa": 300.0
+    },
+    {
+      "entrenador": "Andres Idrobo",
+      "manager": "JOHN BENITEZ",
+      "sede": "Medelln",
+      "equipo": 9.0,
+      "tarifa": 225.0
+    },
+    {
+      "entrenador": "Andres Idrobo",
+      "manager": "MABE CATOTA",
+      "sede": "Cuenca",
+      "equipo": 13.0,
+      "tarifa": 250.0
+    },
+    {
+      "entrenador": "Diego David Bravo Figueroa",
+      "manager": "MARIA FERNANDA BASSANTES",
+      "sede": "Quito",
+      "equipo": 109.0,
+      "tarifa": 50.0
+    },
+    {
+      "entrenador": "Diego David Bravo Figueroa",
+      "manager": "ANDREA POZO",
+      "sede": "Quito",
+      "equipo": 107.0,
+      "tarifa": 75.0
+    },
+    {
+      "entrenador": "Diego David Bravo Figueroa",
+      "manager": "OCTAVIO MURGUEYTIO",
+      "sede": "Quito",
+      "equipo": 109.0,
+      "tarifa": 125.0
+    },
+    {
+      "entrenador": "Erika Gissell Gavilanez Gallardo",
+      "manager": "JHEN PONCE ESPINOZA",
+      "sede": "Lima",
+      "equipo": 21.0,
+      "tarifa": 125.0
+    },
+    {
+      "entrenador": "Erika Gissell Gavilanez Gallardo",
+      "manager": "JAHAIRA MUOZ",
+      "sede": "Guayaquil",
+      "equipo": 26.0,
+      "tarifa": 300.0
+    },
+    {
+      "entrenador": "Erika Gissell Gavilanez Gallardo",
+      "manager": "BELEN MUQUINCHO",
+      "sede": "Cuenca",
+      "equipo": 12.0,
+      "tarifa": 300.0
+    },
+    {
+      "entrenador": "Haydin Fernando Mendoza Clavijo",
+      "manager": "MARIA FERNANDA BASSANTES",
+      "sede": "Quito",
+      "equipo": 109.0,
+      "tarifa": 50.0
+    },
+    {
+      "entrenador": "Haydin Fernando Mendoza Clavijo",
+      "manager": "KARINA GARCIA",
+      "sede": "Quito",
+      "equipo": 107.0,
+      "tarifa": 300.0
+    },
+    {
+      "entrenador": "Jose Luis Sanchez Moreno",
+      "manager": "LAURA VILLAGOMEZ",
+      "sede": "Quito",
+      "equipo": 106.0,
+      "tarifa": 300.0
+    },
+    {
+      "entrenador": "Josue Vera",
+      "manager": "MATEO PACHACAMA",
+      "sede": "Quito",
+      "equipo": 107.0,
+      "tarifa": 275.0
+    },
+    {
+      "entrenador": "Josue Vera",
+      "manager": "PAUL GAMARRA",
+      "sede": "Lima",
+      "equipo": 22.0,
+      "tarifa": 275.0
+    },
+    {
+      "entrenador": "Josue Vera",
+      "manager": "STEFANY QUILUMBA",
+      "sede": "Quito",
+      "equipo": 106.0,
+      "tarifa": 300.0
+    },
+    {
+      "entrenador": "Julio Narvaez",
+      "manager": "MARTIN GARCIA",
+      "sede": "Quito",
+      "equipo": 107.0,
+      "tarifa": 125.0
+    },
+    {
+      "entrenador": "Julio Narvaez",
+      "manager": "XIMENA BRIONES",
+      "sede": "Quito",
+      "equipo": 108.0,
+      "tarifa": 125.0
+    },
+    {
+      "entrenador": "Kriscia Rodas",
+      "manager": "MARTHA REA",
+      "sede": "Cuenca",
+      "equipo": 12.0,
+      "tarifa": 75.0
+    },
+    {
+      "entrenador": "Kriscia Rodas",
+      "manager": "JUAN CUZCO",
+      "sede": "Quito",
+      "equipo": 107.0,
+      "tarifa": 100.0
+    },
+    {
+      "entrenador": "Kriscia Rodas",
+      "manager": "ALEX ANRRANGO",
+      "sede": "Quito",
+      "equipo": 109.0,
+      "tarifa": 125.0
+    },
+    {
+      "entrenador": "Lourdes Patino",
+      "manager": "ALEXANDRA TAPULLIMA",
+      "sede": "Lima",
+      "equipo": 20.0,
+      "tarifa": 25.0
+    },
+    {
+      "entrenador": "Lourdes Patino",
+      "manager": "CAMILA LUCA LEN MORE",
+      "sede": "Lima",
+      "equipo": 21.0,
+      "tarifa": 100.0
+    },
+    {
+      "entrenador": "Mauricio Ramirez Silva",
+      "manager": "BRYAN IZA",
+      "sede": "Quito",
+      "equipo": 107.0,
+      "tarifa": 125.0
+    },
+    {
+      "entrenador": "Mauricio Ramirez Silva",
+      "manager": "MARCO CLAVIJO",
+      "sede": "Quito",
+      "equipo": 106.0,
+      "tarifa": 225.0
+    },
+    {
+      "entrenador": "Mila Campuzano",
+      "manager": "DANNA OCHOA",
+      "sede": "Guayaquil",
+      "equipo": 26.0,
+      "tarifa": 275.0
+    },
+    {
+      "entrenador": "Pamela Carrillo",
+      "manager": "DAVID VALDIVIEZO",
+      "sede": "Cuenca",
+      "equipo": 14.0,
+      "tarifa": 125.0
+    },
+    {
+      "entrenador": "Pamela Carrillo",
+      "manager": "SEBASTIAN JACOME",
+      "sede": "Quito",
+      "equipo": 107.0,
+      "tarifa": 300.0
+    }
+  ],
+  "NOVIEMBRE2025": [
+    {
+      "entrenador": "Alejandro Diaz",
+      "manager": "DIEGO BARBIERI",
+      "sede": "Lima",
+      "equipo": 20.0,
+      "tarifa": 300.0
+    },
+    {
+      "entrenador": "Diego David Bravo Figueroa",
+      "manager": "JAQUI REYES GIOVANNY JAVIER",
+      "sede": "Quito",
+      "equipo": 104.0,
+      "tarifa": 75.0
+    },
+    {
+      "entrenador": "Diego David Bravo Figueroa",
+      "manager": "GIOVANA PALOMINO MARCOS",
+      "sede": "Lima",
+      "equipo": 20.0,
+      "tarifa": 125.0
+    },
+    {
+      "entrenador": "Diego David Bravo Figueroa",
+      "manager": "MICOLTA BRIANNA",
+      "sede": "Quito",
+      "equipo": 105.0,
+      "tarifa": 275.0
+    },
+    {
+      "entrenador": "Haydin Fernando Mendoza Clavijo",
+      "manager": "LUZ MABEL CHIPANA",
+      "sede": "Lima",
+      "equipo": 20.0,
+      "tarifa": 125.0
+    },
+    {
+      "entrenador": "Haydin Fernando Mendoza Clavijo",
+      "manager": "PEREIRA JENNIFER",
+      "sede": "Quito",
+      "equipo": 105.0,
+      "tarifa": 300.0
+    },
+    {
+      "entrenador": "Haydin Fernando Mendoza Clavijo",
+      "manager": "PIARPUEZAN CAMILA MARCELA",
+      "sede": "Quito",
+      "equipo": 105.0,
+      "tarifa": 300.0
+    },
+    {
+      "entrenador": "Josue Vera",
+      "manager": "TITUANA SUQUILLO MARIA PAULINA",
+      "sede": "Quito",
+      "equipo": 104.0,
+      "tarifa": 25.0
+    },
+    {
+      "entrenador": "Josue Vera",
+      "manager": "BENITEZ SANTIAGO",
+      "sede": "Quito",
+      "equipo": 105.0,
+      "tarifa": 275.0
+    },
+    {
+      "entrenador": "Josue Vera",
+      "manager": "GUERRERO MORAIMA",
+      "sede": "Quito",
+      "equipo": 105.0,
+      "tarifa": 275.0
+    },
+    {
+      "entrenador": "Julio Narvaez",
+      "manager": "PIERO ALESSANDRO PORTAL PASQUEL",
+      "sede": "Lima",
+      "equipo": 20.0,
+      "tarifa": 300.0
+    },
+    {
+      "entrenador": "Lourdes Patino",
+      "manager": "ALEXANDRA TAPULLIMA",
+      "sede": "Lima",
+      "equipo": 20.0,
+      "tarifa": 250.0
+    },
+    {
+      "entrenador": "Mauricio Ramirez Silva",
+      "manager": "HATTY CHRISTIAN",
+      "sede": "Quito",
+      "equipo": 105.0,
+      "tarifa": 275.0
+    },
+    {
+      "entrenador": "Mauricio Ramirez Silva",
+      "manager": "NAVAS YAMILEX",
+      "sede": "Quito",
+      "equipo": 105.0,
+      "tarifa": 275.0
+    },
+    {
+      "entrenador": "Pamela Carrillo",
+      "manager": "CHALUISA NATHALIA",
+      "sede": "Quito",
+      "equipo": 105.0,
+      "tarifa": 125.0
+    },
+    {
+      "entrenador": "Pamela Carrillo",
+      "manager": "CARCELEN CARLA",
+      "sede": "Quito",
+      "equipo": 105.0,
+      "tarifa": 150.0
+    }
+  ],
+  "OCTUBRE2025": [
+    {
+      "entrenador": "Alejandro Diaz",
+      "manager": "ERIK VACA",
+      "sede": "Guayaquil",
+      "equipo": 25.0,
+      "tarifa": 150.0
+    },
+    {
+      "entrenador": "Alejandro Diaz",
+      "manager": "EDWIN JIMBO",
+      "sede": "Cuenca",
+      "equipo": 11.0,
+      "tarifa": 300.0
+    },
+    {
+      "entrenador": "Ana Monroy",
+      "manager": "NATALIA CEPEDA",
+      "sede": "Quito",
+      "equipo": 103.0,
+      "tarifa": 75.0
+    },
+    {
+      "entrenador": "Ana Monroy",
+      "manager": "JUANJO CARRANZA",
+      "sede": "Cuenca",
+      "equipo": 11.0,
+      "tarifa": 300.0
+    },
+    {
+      "entrenador": "Ana Monroy",
+      "manager": "CASTILLO REYES LEONILA GABRIELA",
+      "sede": "Quito",
+      "equipo": 104.0,
+      "tarifa": 300.0
+    },
+    {
+      "entrenador": "Andres Idrobo",
+      "manager": "KATIA DE PAZ",
+      "sede": "Lima",
+      "equipo": 20.0,
+      "tarifa": 125.0
+    },
+    {
+      "entrenador": "Andres Idrobo",
+      "manager": "PAZ CRISTINA",
+      "sede": "Quito",
+      "equipo": 105.0,
+      "tarifa": 250.0
+    },
+    {
+      "entrenador": "Andres Idrobo",
+      "manager": "LUIS PRUNA",
+      "sede": "Guayaquil",
+      "equipo": 25.0,
+      "tarifa": 275.0
+    },
+    {
+      "entrenador": "Andres Idrobo",
+      "manager": "VASCO BASANTES JOHANNA PAOLA",
+      "sede": "Quito",
+      "equipo": 104.0,
+      "tarifa": 300.0
+    },
+    {
+      "entrenador": "David Sosa",
+      "manager": "CARLOS ALBERTO CASTILLO TIPISMANA",
+      "sede": "Lima",
+      "equipo": 19.0,
+      "tarifa": 75.0
+    },
+    {
+      "entrenador": "David Sosa",
+      "manager": "MIRIAM MENDOZA PILCO",
+      "sede": "Lima",
+      "equipo": 20.0,
+      "tarifa": 150.0
+    },
+    {
+      "entrenador": "David Sosa",
+      "manager": "JEAN PIERRE SALAZAR",
+      "sede": "Quito",
+      "equipo": 104.0,
+      "tarifa": 250.0
+    },
+    {
+      "entrenador": "Diego David Bravo Figueroa",
+      "manager": "CARIUS JONATHAN",
+      "sede": "Quito",
+      "equipo": 105.0,
+      "tarifa": 75.0
+    },
+    {
+      "entrenador": "Diego David Bravo Figueroa",
+      "manager": "JAQUI REYES GIOVANNY JAVIER",
+      "sede": "Quito",
+      "equipo": 104.0,
+      "tarifa": 125.0
+    },
+    {
+      "entrenador": "Erika Gissell Gavilanez Gallardo",
+      "manager": "RHANIA INTIVEROS REQUEJO",
+      "sede": "Lima",
+      "equipo": 20.0,
+      "tarifa": 125.0
+    },
+    {
+      "entrenador": "Erika Gissell Gavilanez Gallardo",
+      "manager": "MARIELA LOPEZ",
+      "sede": "Guayaquil",
+      "equipo": 25.0,
+      "tarifa": 275.0
+    },
+    {
+      "entrenador": "Haydin Fernando Mendoza Clavijo",
+      "manager": "ENRIQUEZ ALEJANDRO",
+      "sede": "Quito",
+      "equipo": 105.0,
+      "tarifa": 75.0
+    },
+    {
+      "entrenador": "Haydin Fernando Mendoza Clavijo",
+      "manager": "LEISI MEDINA IDROGO",
+      "sede": "Lima",
+      "equipo": 19.0,
+      "tarifa": 275.0
+    },
+    {
+      "entrenador": "Jose Luis Sanchez Moreno",
+      "manager": "ALISSON BARREROS",
+      "sede": "Quito",
+      "equipo": 107.0,
+      "tarifa": 100.0
+    },
+    {
+      "entrenador": "Jose Luis Sanchez Moreno",
+      "manager": "BENITEZ NIETO TATIANA MISHELL",
+      "sede": "Quito",
+      "equipo": 104.0,
+      "tarifa": 250.0
+    },
+    {
+      "entrenador": "Jose Luis Sanchez Moreno",
+      "manager": "PAULY CEDILLO",
+      "sede": "Cuenca",
+      "equipo": 11.0,
+      "tarifa": 300.0
+    },
+    {
+      "entrenador": "Josue Vera",
+      "manager": "TITUANA SUQUILLO MARIA PAULINA",
+      "sede": "Quito",
+      "equipo": 104.0,
+      "tarifa": 275.0
+    },
+    {
+      "entrenador": "Julio Narvaez",
+      "manager": "ANGELLA MARIA BOLLET GOMEZ",
+      "sede": "Lima",
+      "equipo": 19.0,
+      "tarifa": 300.0
+    },
+    {
+      "entrenador": "Julio Narvaez",
+      "manager": "CASTILLO REYES JUAN FERNANDO",
+      "sede": "Quito",
+      "equipo": 104.0,
+      "tarifa": 300.0
+    },
+    {
+      "entrenador": "Lourdes Patino",
+      "manager": "JORGE GAUNULEMA",
+      "sede": "Quito",
+      "equipo": 107.0,
+      "tarifa": 125.0
+    },
+    {
+      "entrenador": "Lourdes Patino",
+      "manager": "ANTHONY LEO ALTAMIRANO LLACCUAS",
+      "sede": "Lima",
+      "equipo": 19.0,
+      "tarifa": 150.0
+    },
+    {
+      "entrenador": "Lourdes Patino",
+      "manager": "Martha Londoo",
+      "sede": "Medelln",
+      "equipo": 7.0,
+      "tarifa": 250.0
+    },
+    {
+      "entrenador": "Lourdes Patino",
+      "manager": "MERINO TARQUI MARGARITA NOEMI",
+      "sede": "Quito",
+      "equipo": 104.0,
+      "tarifa": 300.0
+    },
+    {
+      "entrenador": "Mauricio Ramirez Silva",
+      "manager": "BRYAN IZA",
+      "sede": "Quito",
+      "equipo": 107.0,
+      "tarifa": 125.0
+    },
+    {
+      "entrenador": "Mauricio Ramirez Silva",
+      "manager": "HECTOR CANQUI VALLADARES",
+      "sede": "Lima",
+      "equipo": 19.0,
+      "tarifa": 50.0
+    },
+    {
+      "entrenador": "Mauricio Ramirez Silva",
+      "manager": "LIDIA CRSITINA MARTINEZ PUENTE",
+      "sede": "Lima",
+      "equipo": 18.0,
+      "tarifa": 75.0
+    },
+    {
+      "entrenador": "Mauricio Ramirez Silva",
+      "manager": "ANAHI REYES",
+      "sede": "Quito",
+      "equipo": 102.0,
+      "tarifa": 75.0
+    },
+    {
+      "entrenador": "Mauricio Ramirez Silva",
+      "manager": "NATT ARTEAGA",
+      "sede": "Quito",
+      "equipo": 103.0,
+      "tarifa": 100.0
+    },
+    {
+      "entrenador": "Mauricio Ramirez Silva",
+      "manager": "SHIRLEY VELASQUEZ",
+      "sede": "Guayaquil",
+      "equipo": 25.0,
+      "tarifa": 275.0
+    },
+    {
+      "entrenador": "Mila Campuzano",
+      "manager": "DIEGO MORA",
+      "sede": "Cuenca",
+      "equipo": 13.0,
+      "tarifa": 50.0
+    },
+    {
+      "entrenador": "Mila Campuzano",
+      "manager": "LUCAS ALBERTO SANCHEZ SILVA",
+      "sede": "Lima",
+      "equipo": 19.0,
+      "tarifa": 275.0
+    },
+    {
+      "entrenador": "Pamela Carrillo",
+      "manager": "PAOLA VERA",
+      "sede": "Guayaquil",
+      "equipo": 25.0,
+      "tarifa": 275.0
+    },
+    {
+      "entrenador": "Pamela Carrillo",
+      "manager": "LITA AYALA MARIA AUGUSTA",
+      "sede": "Quito",
+      "equipo": 104.0,
+      "tarifa": 300.0
+    }
+  ]
+};
+
+export const ENTRENADORES_LIST = [
+  "Alejandro Diaz",
+  "Alonso Solares",
+  "Ana Cristina Sanchez",
+  "Ana Monroy",
+  "Andres Gomez",
+  "Andres Idrobo",
+  "Carlos Brunis",
+  "Christian Tito",
+  "Cirilo Agustin Martinez",
+  "Daniela Monroy Fabbri",
+  "David Sosa",
+  "Diego David Bravo Figueroa",
+  "Erika Gissell Gavilanez Gallardo",
+  "Fer Aragon",
+  "Haydin Fernando Mendoza Clavijo",
+  "Isaac Gabriel Betancourt Patino",
+  "Jesus Adrian Acosta",
+  "Jose Luis Sanchez Moreno",
+  "Jose Torron",
+  "Josue Vera",
+  "Juan Angel",
+  "Juan Fernando Reinoso",
+  "Julio Narvaez",
+  "Kerly Carrillo Garzon",
+  "Kriscia Rodas",
+  "Leandro Brunis",
+  "Linid Valencia",
+  "Lourdes Patino",
+  "Maria Jose Roman",
+  "Mauricio Perez",
+  "Mauricio Ramirez Silva",
+  "Mike Boada",
+  "Mila Campuzano",
+  "Mildred Munoz",
+  "Pamela Carrillo",
+  "Paul Sosa"
+];
+
+export const COORDINADORES_LIST = [
+  "ALEJANDRO DIAZ",
+  "ALONSO SOLARES",
+  "DANIELA MONROY FABBRI",
+  "ERIKA GISSELL GAVILANEZ GALLARDO",
+  "HAYDIN FERNANDO MENDOZA CLAVIJO",
+  "ISAAC GABRIEL BETANCOURT PATINO",
+  "JONATHAN ALEXANDER LA ROSA NIETO",
+  "JOSUE VERA",
+  "JUAN FERNANDO REINOSO",
+  "KERLY CARRILLO GARZON",
+  "KERLY CARRILLO GARZON / JUAN FERNANDO REINOSO",
+  "LEYLA KELLY PASQUEL ALFARO",
+  "LILI CUBILLO",
+  "LINID VALENCIA",
+  "MAURICIO RAMIREZ SILVA",
+  "MIGUEL TORRES",
+  "JUDITH REGINA ROMERO ROSALES",
+  "ROBERTO RODRIGUEZ"
+];
+
+export const TRAINER_METADATA = {
+  "Jesus Adrian Acosta": {
+    "email": "chuyacostar88@gmail.com",
+    "programa": "MJ"
+  },
+  "Ana Elena Monroy": {
+    "email": "anamonroyt@gmail.com",
+    "programa": "MJ"
+  },
+  "Andres Gomez": {
+    "email": "andres.gomez@crearpsl.net",
+    "programa": "C2+MJ"
+  },
+  "Maria de Lourdes Patino Galarraga": {
+    "email": "marylourdespat@gmail.com",
+    "programa": "MJ"
+  },
+  "Alejandro Diaz": {
+    "email": "emalejodiaz@gmail.com",
+    "programa": "MJ"
+  },
+  "Mildred Munoz Vasquez": {
+    "email": "mildredmunozv@gmail.com",
+    "programa": "C2+MJ"
+  },
+  "Mike Boada": {
+    "email": "maboadar@gmail.com",
+    "programa": "MJ"
+  },
+  "Juan Angel": {
+    "email": "jarreolamorales@gmail.com",
+    "programa": "C2+MJ"
+  },
+  "Fer Aragon": {
+    "email": "fer.aragon@crearpsl.net",
+    "programa": "C1"
+  },
+  "Paul Sosa": {
+    "email": "paul.sosa@crearpsl.net",
+    "programa": "C2+MJ"
+  },
+  "Alonso Solares Salazar": {
+    "email": "solaresalonso@gmail.com",
+    "programa": "MJ"
+  },
+  "Andres Idrobo": {
+    "email": "e.andresid@gmail.com",
+    "programa": "MJ"
+  },
+  "Cirilo Agustin Martinez": {
+    "email": "ciriloagustin21@gmail.com",
+    "programa": "MJ"
+  },
+  "Leandro Brunis": {
+    "email": "leandro.brunis@crearpsl.net",
+    "programa": "C1"
+  },
+  "Carlos Brunis": {
+    "email": "carlos.brunis@crearpsl.net",
+    "programa": "QT+C1"
+  },
+    "Mila Campuzano": {
+    "fullName": "Emily Gabriela Campuzano Rodríguez",
+    "email": "emily.campuzano@crearpsl.net",
+    "programa": "MJ"
+  },
+  "Emily Gabriela Campuzano Rodríguez": {
+    "fullName": "Emily Gabriela Campuzano Rodríguez",
+    "email": "emily.campuzano@crearpsl.net",
+    "programa": "MJ"
+  },
+  "Emily Campuzano": {
+    "fullName": "Emily Gabriela Campuzano Rodríguez",
+    "email": "emily.campuzano@crearpsl.net",
+    "programa": "MJ"
+  },
+  "Mauricio Perez": {
+    "email": "mperez.ttw@gmail.com",
+    "programa": "C1"
+  }
+};
+
+export const normalizeTrainer = (name) => {
+  if (!name) return '';
+  const clean = name.trim();
+  const map = {
+  "Carlos Brunis": "Carlos Brunis",
+  "Leandro Brunis": "Leandro Brunis",
+  "Andrs Gmez": "Andres Gomez",
+  "Andrés Gómez": "Andres Gomez",
+  "Andres Gomez": "Andres Gomez",
+  "Andrs Idrobo": "Andres Idrobo",
+  "Andrés Idrobo": "Andres Idrobo",
+  "Andres Idrobo": "Andres Idrobo",
+  "Ana Elena Monroy": "Ana Monroy",
+  "Ana Monroy": "Ana Monroy",
+  "Alonso Solares Salazar": "Alonso Solares",
+  "Alonso Solares": "Alonso Solares",
+  "Chuy Acosta": "Jesus Adrian Acosta",
+  "Jesus Acosta": "Jesus Adrian Acosta",
+  "Jesus Adrian Acosta": "Jesus Adrian Acosta",
+  "Jesús Acosta": "Jesus Adrian Acosta",
+  "Jesús Adrián Acosta": "Jesus Adrian Acosta",
+  "Erika Gavilnez": "Erika Gissell Gavilanez Gallardo",
+  "Erika Gavilanez": "Erika Gissell Gavilanez Gallardo",
+  "Érika Gavilánez": "Erika Gissell Gavilanez Gallardo",
+  "Jos Snchez": "Jose Luis Sanchez Moreno",
+  "José Sánchez": "Jose Luis Sanchez Moreno",
+  "Jose Sanchez": "Jose Luis Sanchez Moreno",
+  "Josu Vera": "Josue Vera",
+  "Josue Vera": "Josue Vera",
+  "Josué Vera": "Josue Vera",
+  "Marcos Vera": "Josue Vera",
+  "Marcos Josue Vera": "Josue Vera",
+  "Julio Narvez": "Julio Narvaez",
+  "Julio Narvaez": "Julio Narvaez",
+  "Julio Narváez": "Julio Narvaez",
+  "Kerlie Carrillo": "Kerly Carrillo Garzon",
+  "Kerly Carrillo": "Kerly Carrillo Garzon",
+  "Kerly Carrillo Garzon": "Kerly Carrillo Garzon",
+  "Lourdes Patio": "Lourdes Patino",
+  "Lourdes Patino": "Lourdes Patino",
+  "Maria de Lourdes Patino Galarraga": "Lourdes Patino",
+  "María de Lourdes Patiño": "Lourdes Patino",
+  "Maurcio Ramirez": "Mauricio Ramirez Silva",
+  "Mauricio Ramrez": "Mauricio Ramirez Silva",
+  "Mauricio Ramirez": "Mauricio Ramirez Silva",
+  "Mauricio Ramírez": "Mauricio Ramirez Silva",
+  "Mildred Munoz Vasquez": "Mildred Munoz",
+  "Mildred Munoz": "Mildred Munoz",
+  "Mildred Muñoz": "Mildred Munoz",
+  "Isaac Betancourth": "Isaac Gabriel Betancourt Patino",
+  "Isaac Betancourt": "Isaac Gabriel Betancourt Patino",
+  "Juan Fer Reinoso": "Juan Fernando Reinoso",
+  "Juan Fernando Reinoso": "Juan Fernando Reinoso",
+  "Daniela Monroy": "Daniela Monroy Fabbri",
+  "Daniela Monroy Fabbri": "Daniela Monroy Fabbri",
+  "Fernando Mendoza": "Haydin Fernando Mendoza Clavijo",
+  "Haydin Fernando Mendoza Clavijo": "Haydin Fernando Mendoza Clavijo",
+  "Jonathan La Rosa": "Jonathan Alexander La Rosa Nieto",
+  "Jonathan Alexander La Rosa Nieto": "Jonathan Alexander La Rosa Nieto",
+  "Leyla Pasquel": "Leyla Kelly Pasquel Alfaro",
+  "Leyla Kelly Pasquel Alfaro": "Leyla Kelly Pasquel Alfaro",
+  "Regina Romero": "Judith Regina Romero Rosales",
+  "Judith Regina Romero Rosales": "Judith Regina Romero Rosales",
+  "Diego Bravo": "Diego David Bravo Figueroa",
+  "Diego David Bravo Figueroa": "Diego David Bravo Figueroa",
+  // CONTEXTO (28/08/2026): José indicó que a Fredy Sosa le gusta que le digan
+  // David Sosa, y a Edison Paul Sosa le gusta que le digan Paul Sosa. En los
+  // datos actuales de managersData.js ya se usa "David Sosa" y "Paul Sosa" en
+  // todos lados (no aparece ningún registro con el nombre legal) — se agregan
+  // estos alias solo de forma preventiva, por si una futura carga/importación
+  // llega con el nombre legal, para que no se cree un entrenador duplicado.
+  "Fredy Sosa": "David Sosa",
+  "David Sosa": "David Sosa",
+  "Edison Paul Sosa": "Paul Sosa",
+  "Paul Sosa": "Paul Sosa"
+};
+  return map[clean] || clean;
+};
+
+export const normalizeCoordinator = (name) => {
+  if (!name) return '';
+  const clean = name.trim();
+  const map = {
+  "ISAAC BETANCOURTH": "ISAAC GABRIEL BETANCOURT PATINO",
+  "ISAAC BETANCOURT": "ISAAC GABRIEL BETANCOURT PATINO",
+  "JOSU VERA": "JOSUE VERA",
+  "MARCOS VERA": "JOSUE VERA",
+  "MARCOS JOSUE VERA": "JOSUE VERA",
+  "JUAN FER REINOSO": "JUAN FERNANDO REINOSO",
+  "KERLY CARRILLO - JUANFER REINOSO": "KERLY CARRILLO GARZON / JUAN FERNANDO REINOSO",
+  "KERLY CARRILLO / JUANFER REINOSO": "KERLY CARRILLO GARZON / JUAN FERNANDO REINOSO",
+  "KERLY CARRILLO": "KERLY CARRILLO GARZON",
+  "KERLY CARRILLO GARZON": "KERLY CARRILLO GARZON",
+  "MAURICIO RAMIREZ": "MAURICIO RAMIREZ SILVA",
+  "MAURICIO RAMIREZ SILVA": "MAURICIO RAMIREZ SILVA",
+  "DANIELA MONROY": "DANIELA MONROY FABBRI",
+  "DANIELA MONROY FABBRI": "DANIELA MONROY FABBRI",
+  "FERNANDO MENDOZA": "HAYDIN FERNANDO MENDOZA CLAVIJO",
+  "HAYDIN FERNANDO MENDOZA CLAVIJO": "HAYDIN FERNANDO MENDOZA CLAVIJO",
+  "JOSE SANCHEZ": "JOSE LUIS SANCHEZ MORENO",
+  "JOSE LUIS SANCHEZ MORENO": "JOSE LUIS SANCHEZ MORENO",
+  "JONATHAN LA ROSA": "JONATHAN ALEXANDER LA ROSA NIETO",
+  "JONATHAN ALEXANDER LA ROSA NIETO": "JONATHAN ALEXANDER LA ROSA NIETO",
+  "LEYLA PASQUEL": "LEYLA KELLY PASQUEL ALFARO",
+  "LEYLA KELLY PASQUEL ALFARO": "LEYLA KELLY PASQUEL ALFARO",
+  "ERIKA GAVILANEZ": "ERIKA GISSELL GAVILANEZ GALLARDO",
+  "ERIKA GISSELL GAVILANEZ GALLARDO": "ERIKA GISSELL GAVILANEZ GALLARDO",
+  "REGINA ROMERO": "JUDITH REGINA ROMERO ROSALES",
+  "JUDITH REGINA ROMERO ROSALES": "JUDITH REGINA ROMERO ROSALES",
+  "DIEGO BRAVO": "DIEGO DAVID BRAVO FIGUEROA",
+  "DIEGO DAVID BRAVO FIGUEROA": "DIEGO DAVID BRAVO FIGUEROA"
+};
+  return map[clean] || clean;
+};
+
+```
+
+---
+
 ## Archivo: nodus_dom.json
 
 ```json
@@ -57313,7 +71141,7 @@ fetchAndDump();
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "python3 dump_code.py || python dump_code.py",
+    "prebuild": "(python3 dump_code.py || python dump_code.py || true)",
     "build": "vite build",
     "lint": "oxlint",
     "preview": "vite preview",
@@ -57323,7 +71151,8 @@ fetchAndDump();
     "backup": "node scripts/backupFirestore.js",
     "restore": "node scripts/restoreFirestore.js",
     "bot:sync": "node scripts/causa_sync_bot.mjs",
-    "bot:omni": "node scripts/causa_omni_auditor.mjs"
+    "bot:omni": "node scripts/causa_omni_auditor.mjs",
+    "audit:platform": "node scripts/platform_audit.mjs"
   },
   "dependencies": {
     "cors": "^2.8.6",
@@ -69593,26 +83422,51 @@ async function processMailDoc(docSnap) {
   const data = docSnap.data();
   if (data.delivery && data.delivery.state) return;
 
-  const isCorporate = ['@crearpsl.net', '@crearpsl.com'].some(d => data.to?.toLowerCase().endsWith(d));
-  
-  if (!isCorporate) {
+  // 'to' puede venir como string único o como array de strings (p.ej. tareas asignadas a varias
+  // personas). Normalizamos siempre a un array para no romper en .toLowerCase() sobre un array.
+  const rawRecipients = (Array.isArray(data.to) ? data.to : [data.to]).filter(Boolean);
+
+  if (rawRecipients.length === 0) {
+    console.warn(`⚠️ Documento de correo sin destinatario válido (doc ${docSnap.id})`);
+    await updateDoc(doc(db, 'mail', docSnap.id), {
+      'delivery.state': 'REJECTED',
+      reason: 'Documento de correo sin campo "to" válido'
+    });
+    return;
+  }
+
+  const validRecipients = [];
+  for (const rawTo of rawRecipients) {
+    const to = String(rawTo).toLowerCase().trim();
+    const isCorporate = ['@crearpsl.net', '@crearpsl.com'].some(d => to.endsWith(d));
+    if (isCorporate) {
+      validRecipients.push(rawTo);
+      continue;
+    }
     try {
-      const q = query(collection(db, "users"), where("emails", "array-contains", data.to?.toLowerCase().trim()));
+      const q = query(collection(db, "users"), where("emails", "array-contains", to));
       const snap = await getDocs(q);
       if (snap.empty) {
-        console.warn(`⚠️ Intento de envío a correo no registrado: ${data.to}`);
-        await updateDoc(doc(db, 'mail', docSnap.id), { 
-          'delivery.state': 'REJECTED', 
-          reason: 'Correo externo no pertenece a ningún usuario registrado' 
-        });
-        return;
+        console.warn(`⚠️ Intento de envío a correo no registrado: ${rawTo}`);
+      } else {
+        validRecipients.push(rawTo);
       }
     } catch (error) {
-      console.error("Error validando correo contra la base de datos:", error);
+      console.error("Error validando correo contra la base de datos:", error.message);
+      // No bloqueamos el envío por un error de validación (p.ej. Firestore momentáneamente inaccesible).
+      validRecipients.push(rawTo);
     }
   }
 
-  console.log(`📧 Procesando correo para: ${data.to}`);
+  if (validRecipients.length === 0) {
+    await updateDoc(doc(db, 'mail', docSnap.id), {
+      'delivery.state': 'REJECTED',
+      reason: 'Ningún destinatario pertenece a un usuario registrado'
+    });
+    return;
+  }
+
+  console.log(`📧 Procesando correo para: ${validRecipients.join(', ')}`);
 
   const rawHtml = data.message?.html || '<p>Tienes una notificación del sistema SO-AR.</p>';
   const cleanHtml = sanitizeHtml(rawHtml, {
@@ -69636,20 +83490,20 @@ async function processMailDoc(docSnap) {
 
   const mailOptions = {
     from: `"CREAR Poder Sin Límites" <${process.env.GMAIL_SERVER_EMAIL}>`,
-    to: data.to,
+    to: validRecipients,
     subject: data.message?.subject || 'Notificación SO-AR — CREAR Poder Sin Límites',
     html: cleanHtml
   };
 
   try {
     await transporter.sendMail(mailOptions);
-    console.log(`✅ Correo enviado con éxito a ${data.to}`);
+    console.log(`✅ Correo enviado con éxito a ${validRecipients.join(', ')}`);
     await updateDoc(doc(db, 'mail', docSnap.id), {
       'delivery.state': 'SUCCESS',
       'delivery.endTime': new Date().toISOString()
     });
   } catch (error) {
-    console.error(`❌ Error enviando a ${data.to}:`, error.message);
+    console.error(`❌ Error enviando a ${validRecipients.join(', ')}:`, error.message);
     await updateDoc(doc(db, 'mail', docSnap.id), {
       'delivery.state': 'ERROR',
       'delivery.error': error.message
@@ -69735,11 +83589,99 @@ async function checkInactivity() {
   }
 }
 
+// --- 5. RECORDATORIOS DE TAREAS VENCIDAS SIN ATENDER ---
+// Si una tarea asignada pasa su fecha límite y sigue sin completarse, se reenvía un correo de
+// recordatorio cada REMINDER_DEBOUNCE_HOURS hasta que la persona la marque como completada.
+const REMINDER_DEBOUNCE_HOURS = 24;
+
+async function checkOverdueTaskReminders() {
+  console.log("🔍 Iniciando chequeo de tareas vencidas sin atender...");
+  try {
+    const tasksSnap = await getDocs(collection(db, 'tasks'));
+    const now = new Date();
+
+    for (const docSnap of tasksSnap.docs) {
+      const data = docSnap.data();
+      const isDone = data.completed === true || data.status === 'Completada';
+      if (isDone) continue;
+      if (!data.deadline) continue;
+
+      const deadlineDate = new Date(data.deadline);
+      if (isNaN(deadlineDate.getTime())) continue;
+      if (deadlineDate >= now) continue; // aún no vence
+
+      const emails = Array.isArray(data.assignedToEmails) && data.assignedToEmails.length > 0
+        ? data.assignedToEmails
+        : (data.assignedToEmail ? [data.assignedToEmail] : []);
+      if (emails.length === 0) continue; // tarea sin asignación directa: nadie a quien recordar
+
+      const lastReminderDate = data.lastReminderAt?.toDate
+        ? data.lastReminderAt.toDate()
+        : (data.lastReminderAt ? new Date(data.lastReminderAt) : null);
+      const hoursSinceLastReminder = lastReminderDate ? (now - lastReminderDate) / (1000 * 60 * 60) : Infinity;
+      const hoursSinceLastReminderOrDeadline = lastReminderDate
+        ? hoursSinceLastReminder
+        : (now - deadlineDate) / (1000 * 60 * 60);
+
+      if (hoursSinceLastReminderOrDeadline < REMINDER_DEBOUNCE_HOURS) continue; // ya se recordó recientemente
+
+      const taskTitle = data.task || data.title || 'Tarea sin título';
+      console.log(`⏰ Tarea vencida sin completar: "${taskTitle}" (${docSnap.id}). Enviando recordatorio a: ${emails.join(', ')}`);
+
+      for (const email of emails) {
+        await addDoc(collection(db, 'mail'), {
+          to: [email],
+          message: {
+            subject: `⏰ RECORDATORIO: Tarea pendiente vencida — ${taskTitle}`,
+            html: `
+              <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
+                <div style="background-color: #ef4444; color: #fff; padding: 20px; text-align: center;">
+                  <h1 style="margin: 0; font-size: 22px;">⏰ Tarea Vencida Sin Completar</h1>
+                </div>
+                <div style="padding: 30px; background-color: #f9fafb;">
+                  <p style="font-size: 16px;">Hola,</p>
+                  <p style="font-size: 16px;">Tienes una tarea asignada en <strong>SO-AR</strong> que superó su fecha límite y aún no ha sido marcada como completada:</p>
+                  <p style="font-size: 16px;"><strong>Tarea:</strong> ${taskTitle}</p>
+                  <p style="font-size: 16px;"><strong>Fecha límite:</strong> ${formatDeadlineEsLocal(data.deadline)}</p>
+                  <p style="font-size: 16px;">Por favor ingresa a la plataforma y complétala o actualiza su estado a la brevedad. Recibirás recordatorios periódicos hasta que sea atendida.</p>
+                  <div style="text-align: center; margin: 30px 0;">
+                    <a href="https://centro-operativo-cpsl.web.app" style="background-color: #ef4444; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">Ingresar ahora a SO-AR</a>
+                  </div>
+                  <p style="font-size: 14px; color: #666; text-align: center; margin-top: 20px;">CREAR Poder Sin Límites - Sistema SO-AR</p>
+                </div>
+              </div>
+            `
+          },
+          createdAt: serverTimestamp()
+        });
+      }
+
+      await updateDoc(doc(db, 'tasks', docSnap.id), {
+        lastReminderAt: serverTimestamp()
+      });
+    }
+  } catch (error) {
+    console.error("❌ Error verificando tareas vencidas:", error.message);
+  }
+}
+
+function formatDeadlineEsLocal(iso) {
+  if (!iso) return 'Sin fecha límite definida';
+  try {
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return iso;
+    return d.toLocaleString('es-PE', { dateStyle: 'full', timeStyle: 'short' });
+  } catch (e) {
+    return iso;
+  }
+}
+
 // Ejecución
 if (isOneShot) {
   console.log("⚡ Ejecución en modo One-Shot (GitHub Actions / Tarea programada)...");
   await processPendingMails();
   await checkInactivity();
+  await checkOverdueTaskReminders();
   console.log("✅ Tarea de envío y verificación completada.");
   process.exit(0);
 } else {
@@ -69753,6 +83695,8 @@ if (isOneShot) {
   });
   checkInactivity();
   setInterval(checkInactivity, CHECK_INTERVAL_MS);
+  checkOverdueTaskReminders();
+  setInterval(checkOverdueTaskReminders, CHECK_INTERVAL_MS);
 }
 
 
@@ -70484,6 +84428,7 @@ import OfficialAgreements from './pages/OfficialAgreements'
 import TeamCalendar from './pages/TeamCalendar'
 import EmbudoConversionBoard from './pages/EmbudoConversionBoard'
 import NodusDataMap from './pages/NodusDataMap'
+import CalendarioMJ from './pages/CalendarioMJ'
 import AICopilot from './components/AICopilot'
 import PromptModal from './components/PromptModal'
 import BirthdayAlert from './components/BirthdayAlert'
@@ -70729,6 +84674,15 @@ function App() {
           <Route path="/nodus-data-map" element={
             <RoleRoute allowedRoles={['gerente', 'direccion', 'cfo', 'cco', 'ceo', 'director_maestria', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
               <NodusDataMap />
+            </RoleRoute>
+          } />
+
+          {/* Calendario de Maestría del Juego (29/08/2026): generador/editor del
+              calendario oficial por equipo (formato CREAR), pedido por José a
+              partir de 3 PDF de ejemplo reales. Ver notas en CalendarioMJ.jsx. */}
+          <Route path="/calendario-mj" element={
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria', 'coord_maestria', 'coordinador_mj']} requireSuperAdmin={false}>
+              <CalendarioMJ />
             </RoleRoute>
           } />
 
@@ -77521,7 +91475,7 @@ export default function UserAuditReport({ onClose }) {
 ## Archivo: src\components\UserProfileModal.jsx
 
 ```javascript
-﻿import { getWhatsAppUrl } from '../utils/phoneUtils';
+import { getWhatsAppUrl } from '../utils/phoneUtils';
 import { useState, useEffect } from 'react';
 import { 
   X, User, CheckCircle2, Clock, AlertTriangle, 
@@ -77578,8 +91532,22 @@ const ROLE_COLORS = {
   entrenador_llamadas: '#38bdf8'
 };
 
+// Formatea "YYYY-MM-DD" a "17 de marzo" — sin año, por privacidad (no se debe
+// exponer la edad de nadie). Si el valor no tiene ese formato, se muestra tal
+// cual en vez de asumir un formato distinto.
+const MESES_ES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+function formatBirthdayNoYear(cumpleanos) {
+  if (!cumpleanos) return '';
+  const m = String(cumpleanos).match(/^\d{4}-(\d{2})-(\d{2})$/);
+  if (!m) return cumpleanos;
+  const mesIdx = parseInt(m[1], 10) - 1;
+  const dia = parseInt(m[2], 10);
+  if (mesIdx < 0 || mesIdx > 11) return cumpleanos;
+  return `${dia} de ${MESES_ES[mesIdx]}`;
+}
+
 export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] }) {
-  const { currentUser, originalAdminUser, simulateUser, switchRole } = useAuth();
+  const { currentUser, originalAdminUser, simulateUser } = useAuth();
   const navigate = useNavigate();
   const { toggleTask } = useChecklist();
   const { showToast } = useUI();
@@ -77731,17 +91699,6 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
   });
 
   const pct = userTasks.length > 0 ? Math.round((completedTasks.length / userTasks.length) * 100) : 0;
-
-  // CONTEXTO (28/08/2026): pedido del usuario — que un colaborador con más de un rol
-  // (ej. los de config/permissions.js DUAL_ROLE_TRAINER_EMAILS) pueda cambiar su rol
-  // activo desde su propio perfil, no solo desde el selector pequeño del header de
-  // Home.jsx. Solo tiene sentido cuando esta persona ES quien está viendo su propio
-  // perfil (switchRole() cambia la sesión de quien mira, no la de otra persona) — se
-  // compara el correo normalizando @crearpsl.net/@crearpsl.com como en otras partes
-  // del código (ver ChecklistBoard.jsx).
-  const currentUserEmailCom = currentUser?.email?.replace('@crearpsl.net', '@crearpsl.com')?.toLowerCase();
-  const currentUserEmailNet = currentUser?.email?.replace('@crearpsl.com', '@crearpsl.net')?.toLowerCase();
-  const isOwnProfile = !!user?.email && (user.email.toLowerCase() === currentUserEmailCom || user.email.toLowerCase() === currentUserEmailNet);
 
   // Handler: Guardar Cumpleaños (escribe en la colección "users", no en "user_profiles",
   // para que quede consistente con userService.getAllCompanyUsers() y con el import
@@ -77950,34 +91907,6 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
                   })}
                 </div>
 
-                {isOwnProfile && currentUser?.roles && currentUser.roles.length > 1 && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.5rem' }}>
-                    <select
-                      value={currentUser.activeRole || currentUser.appRole}
-                      onChange={(e) => switchRole(e.target.value)}
-                      style={{
-                        padding: '0.3rem 0.6rem',
-                        borderRadius: '6px',
-                        background: 'rgba(255, 183, 3, 0.15)',
-                        border: '1px solid var(--crear-gold)',
-                        color: 'var(--text-heading)',
-                        fontSize: '0.8rem',
-                        fontWeight: 'bold',
-                        cursor: 'pointer',
-                        outline: 'none'
-                      }}
-                      title="Cambiar tu rol activo"
-                    >
-                      {currentUser.roles.map(r => (
-                        <option key={r} value={r} style={{ background: '#0d152d', color: '#ffffff' }}>
-                          🎭 {getRoleDisplayName(r) || r.toUpperCase()}
-                        </option>
-                      ))}
-                    </select>
-                    <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Tienes varios roles — este es el que ves activo ahora.</span>
-                  </div>
-                )}
-
                 <div style={{ display: 'flex', gap: '1.2rem', marginTop: '0.6rem', fontSize: '0.85rem', color: 'var(--text-muted)', flexWrap: 'wrap' }}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                     <Building2 size={15} color="var(--crear-gold)" /> Sede: <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>{getFlagForSede(user.sede)} <strong style={{ color: 'var(--text-heading)' }}>{normalizeSede(user.sede)}</strong></span>
@@ -78070,7 +91999,7 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
                     >
                       <Calendar size={14} color="var(--crear-gold)" />
                       {user?.cumpleanos ? (
-                        <span>Cumpleaños: <strong style={{ color: 'var(--text-heading)' }}>{user.cumpleanos}</strong></span>
+                        <span>Cumpleaños: <strong style={{ color: 'var(--text-heading)' }}>{formatBirthdayNoYear(user.cumpleanos)}</strong></span>
                       ) : currentUser?.isSuperAdmin ? (
                         <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Sin cumpleaños — clic para agregar</span>
                       ) : null}
@@ -78564,7 +92493,6 @@ export default function UserProfileModal({ isOpen, onClose, user, allTasks = [] 
     </>
   );
 }
-
 
 ```
 
@@ -79977,7 +93905,7 @@ export function useAuth() {
 ```javascript
 import { createContext, useContext, useState, useEffect } from 'react';
 import { db, auth } from '../services/firebase';
-import { collection, onSnapshot, doc, updateDoc, writeBatch, addDoc, query, where, orderBy, limit, getDocs, getDoc } from 'firebase/firestore';
+import { collection, onSnapshot, doc, updateDoc, setDoc, writeBatch, addDoc, query, where, orderBy, limit, getDocs, getDoc } from 'firebase/firestore';
 import { checklistData } from '../data/checklistData';
 import { usersData, normalizeRole } from '../data/usersData';
 import { isSuperAdminEmail, isGerenciaRole } from '../config/permissions';
@@ -79989,21 +93917,71 @@ import { useCycles } from './CyclesContext';
 
 const ChecklistContext = createContext();
 
+// Formatea una fecha límite ISO a texto legible en español, para los correos
+// de asignación de tarea (agregado 28/08/2026 a pedido de José, para que el
+// correo indique la fecha/hora límite y no solo que "se asignó una tarea").
+const formatDeadlineEs = (iso) => {
+  if (!iso) return 'Sin fecha límite definida';
+  try {
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return iso;
+    return d.toLocaleString('es-PE', { dateStyle: 'full', timeStyle: 'short' });
+  } catch (e) {
+    return iso;
+  }
+};
+
 export function ChecklistProvider({ children }) {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const { showToast, showPrompt } = useUI();
   const { currentUser } = useAuth();
-  // (28/08/2026) CORRECCIÓN: antes calculateAutomaticDeadline() se llamaba SIN el
-  // ciclo activo real, así que siempre usaba el único ciclo de ejemplo hardcodeado
-  // en src/data/cyclesData.js ("Equipo 30", fechas fijas) para TODOS los usuarios,
-  // sin importar su sede o equipo real. Eso hacía que los "Límite" mostrados en los
-  // checklists no correspondieran a las fechas reales del ciclo de cada sede — José
-  // lo reportó como "los horarios en los checklist no son coherentes con la tarea".
-  // Ahora se usa el ciclo real (currentCycle, calculado en CyclesContext.jsx a
-  // partir del calendario oficial en vivo) para que cada sede vea sus propias fechas.
+  // (28/08/2026, restaurado 29/08/2026) CORRECCIÓN: antes calculateAutomaticDeadline()
+  // se llamaba SIN el ciclo activo real, así que siempre usaba el único ciclo de
+  // ejemplo hardcodeado en src/data/cyclesData.js ("Equipo 30", fechas fijas) para
+  // TODOS los usuarios, sin importar su sede o equipo real. Eso hacía que los
+  // "Límite" mostrados en los checklists no correspondieran a las fechas reales del
+  // ciclo de cada sede — José lo reportó como "los horarios en los checklist no son
+  // coherentes con la tarea". Ahora se usa el ciclo real (currentCycle, calculado en
+  // CyclesContext.jsx a partir del calendario oficial en vivo) para que cada sede vea
+  // sus propias fechas.
   const cyclesCtx = useCycles();
   const currentCycle = cyclesCtx?.currentCycle || null;
+
+  // Escribe cambios en un documento de "tasks", creándolo primero si todavía no existe.
+  //
+  // CONTEXTO (29/08/2026): las tareas del catálogo base (checklistData.js) se muestran
+  // en pantalla y son clicables aunque nunca se haya creado su documento propio en
+  // Firestore — se fusionan del lado del cliente en el onSnapshot de arriba
+  // ("missingBaseTasks"), y solo quedan escritas de verdad si alguien corre
+  // initializeFirestore() o si esta función las crea al primer toque. updateDoc()
+  // exige que el documento YA exista; si no existe, las reglas de seguridad no pueden
+  // evaluar "resource" (es null) y Firestore lo rechaza como "permission-denied" —
+  // el mismo error que se ve como "revisa los permisos de Firestore", aunque la causa
+  // real no es un permiso mal configurado sino que el documento nunca se creó. Por eso
+  // se verifica primero si existe: si no, se crea con los datos base del catálogo (para
+  // que quede completo para cualquier otro que lo lea) + el cambio pedido; si ya existe,
+  // se actualiza normalmente sin tocar el resto de sus campos.
+  const writeTaskDoc = async (taskId, updates) => {
+    const taskRef = doc(db, 'tasks', taskId);
+    const snap = await getDoc(taskRef);
+    if (!snap.exists()) {
+      const baseTask = checklistData.find(t => t.id === taskId);
+      await setDoc(taskRef, {
+        ...(baseTask || {}),
+        id: taskId,
+        completed: false,
+        status: 'Pendiente',
+        priority: baseTask?.isCritical ? '🔴 ROJO' : '🟡 AMARILLO',
+        progressPercentage: 0,
+        deadline: baseTask ? calculateAutomaticDeadline(baseTask, currentCycle) : null,
+        created_at: new Date().toISOString(),
+        ...updates
+      });
+    } else {
+      await updateDoc(taskRef, updates);
+    }
+  };
 
   useEffect(() => {
     // Escuchar cambios en la colección "tasks" en tiempo real
@@ -80096,11 +94074,10 @@ export function ChecklistProvider({ children }) {
 
   const toggleTask = async (taskId, currentStatus) => {
     try {
-      const taskRef = doc(db, 'tasks', taskId);
       const userSede = currentUser?.sede?.trim() || 'Global';
-      
+
       // Update both legacy and map formats just in case it's a custom task
-      await updateDoc(taskRef, {
+      await writeTaskDoc(taskId, {
         completed: !currentStatus,
         status: !currentStatus ? 'Completada' : 'Pendiente',
         [`completions.${userSede}.completed`]: !currentStatus,
@@ -80114,8 +94091,7 @@ export function ChecklistProvider({ children }) {
 
   const updateTaskDetails = async (taskId, updates) => {
     try {
-      const taskRef = doc(db, 'tasks', taskId);
-      await updateDoc(taskRef, updates);
+      await writeTaskDoc(taskId, updates);
     } catch (error) {
       console.error("Error updating task details:", error);
       showToast("No se pudo actualizar la tarea.", "error");
@@ -80168,6 +94144,7 @@ export function ChecklistProvider({ children }) {
               html: `
                 <h2>Hola, se te ha asignado una nueva tarea en el SO-AR</h2>
                 <p><strong>Tarea:</strong> ${taskData.task || taskData.title}</p>
+                <p><strong>⏰ Fecha límite:</strong> ${formatDeadlineEs(taskData.deadline)}</p>
                 <p><strong>Sede:</strong> ${taskData.assignedSede || 'Global'}</p>
                 <p><strong>Prioridad:</strong> ${taskData.priority || 'Normal'}</p>
                 <p>Por favor, ingresa a la plataforma para revisarla y marcarla como completada cuando esté lista.</p>
@@ -80198,20 +94175,63 @@ export function ChecklistProvider({ children }) {
       const batch = writeBatch(db);
       batch.update(taskRef, updatedData);
 
-      // Calcular nuevos asignados (anti-spam)
+      // Calcular asignados: nuevos (recién agregados) vs los que ya estaban.
       const oldEmails = currentTask.assignedToEmails || (currentTask.assignedToEmail ? [currentTask.assignedToEmail] : []);
       const newEmails = updatedData.assignedToEmails || (updatedData.assignedToEmail ? [updatedData.assignedToEmail] : []);
-      
-      const newlyAddedEmails = newEmails.filter(email => !oldEmails.includes(email));
 
-      if (newlyAddedEmails.length > 0) {
-        newlyAddedEmails.forEach(email => {
+      const newlyAddedEmails = newEmails.filter(email => !oldEmails.includes(email));
+      const stillAssignedEmails = newEmails.filter(email => oldEmails.includes(email));
+
+      // "si o si notifique" (28/08/2026): antes, si editabas una tarea que
+      // YA tenía asignados (ej. le cambiabas la fecha límite o el título) sin
+      // agregar a nadie nuevo, esos asignados no se enteraban del cambio.
+      // Ahora, cualquier edición de un campo relevante (fecha límite, título,
+      // prioridad, sede) también notifica a quienes ya estaban asignados —
+      // no solo a los que se agregan de nuevo.
+      const relevantFieldChanged = ['deadline', 'task', 'title', 'priority', 'assignedSede'].some(
+        field => field in updatedData && updatedData[field] !== currentTask[field]
+      );
+
+      newlyAddedEmails.forEach(email => {
+        // 1. Notificación In-App
+        const notifRef = doc(collection(db, 'notifications'));
+        batch.set(notifRef, {
+          userId: email,
+          title: updatedData.task || currentTask.task,
+          message: `Se te ha asignado una tarea en la sede ${updatedData.assignedSede || currentTask.assignedSede || 'Global'}.`,
+          read: false,
+          taskId: taskId,
+          created_at: new Date().toISOString()
+        });
+
+        // 2. Notificación por Correo
+        const mailRef = doc(collection(db, 'mail'));
+        batch.set(mailRef, {
+          to: [email],
+          message: {
+            subject: `NUEVA TAREA ASIGNADA SO-AR: ${updatedData.task || currentTask.task}`,
+            html: `
+                <h2>Hola, se te ha asignado una tarea en el SO-AR</h2>
+                <p><strong>Tarea:</strong> ${updatedData.task || currentTask.task}</p>
+                <p><strong>⏰ Fecha límite:</strong> ${formatDeadlineEs(updatedData.deadline || currentTask.deadline)}</p>
+                <p><strong>Sede:</strong> ${updatedData.assignedSede || currentTask.assignedSede || 'Global'}</p>
+                <p><strong>Prioridad:</strong> ${updatedData.priority || currentTask.priority || 'Normal'}</p>
+                <p>Por favor, ingresa a la plataforma para revisarla.</p>
+                <br/>
+                <p><em>Equipo CREAR Poder Sin Límites</em></p>
+              `
+          }
+        });
+      });
+
+      if (relevantFieldChanged) {
+        stillAssignedEmails.forEach(email => {
           // 1. Notificación In-App
           const notifRef = doc(collection(db, 'notifications'));
           batch.set(notifRef, {
             userId: email,
             title: updatedData.task || currentTask.task,
-            message: `Se te ha asignado una tarea en la sede ${updatedData.assignedSede || currentTask.assignedSede || 'Global'}.`,
+            message: `Se actualizó una tarea que tenías asignada en la sede ${updatedData.assignedSede || currentTask.assignedSede || 'Global'}.`,
             read: false,
             taskId: taskId,
             created_at: new Date().toISOString()
@@ -80222,13 +94242,14 @@ export function ChecklistProvider({ children }) {
           batch.set(mailRef, {
             to: [email],
             message: {
-              subject: `NUEVA TAREA ASIGNADA SO-AR: ${updatedData.task || currentTask.task}`,
+              subject: `TAREA ACTUALIZADA SO-AR: ${updatedData.task || currentTask.task}`,
               html: `
-                <h2>Hola, se te ha asignado una tarea en el SO-AR</h2>
+                <h2>Hola, se actualizó una tarea que tienes asignada en el SO-AR</h2>
                 <p><strong>Tarea:</strong> ${updatedData.task || currentTask.task}</p>
+                <p><strong>⏰ Fecha límite:</strong> ${formatDeadlineEs(updatedData.deadline || currentTask.deadline)}</p>
                 <p><strong>Sede:</strong> ${updatedData.assignedSede || currentTask.assignedSede || 'Global'}</p>
                 <p><strong>Prioridad:</strong> ${updatedData.priority || currentTask.priority || 'Normal'}</p>
-                <p>Por favor, ingresa a la plataforma para revisarla.</p>
+                <p>Revisa los cambios en la plataforma.</p>
                 <br/>
                 <p><em>Equipo CREAR Poder Sin Límites</em></p>
               `
@@ -80248,8 +94269,7 @@ export function ChecklistProvider({ children }) {
 
   const submitEvidence = async (taskId, evidenceUrl) => {
     try {
-      const taskRef = doc(db, 'tasks', taskId);
-      await updateDoc(taskRef, {
+      await writeTaskDoc(taskId, {
         status: 'Pendiente de validación',
         evidence_url: evidenceUrl,
         date: new Date().toISOString()
@@ -80330,8 +94350,7 @@ export function ChecklistProvider({ children }) {
           // calculado con el ciclo de ejemplo hardcodeado (mismo bug que en el merge
           // de tareas faltantes), que quedaba INCORRECTO y CONGELADO para todas las
           // sedes para siempre. Al dejarlo sin guardar, cada usuario lo calcula al
-          // vuelo con SU ciclo real (ver Home.jsx/ChecklistBoard.jsx/HomeCampo.jsx/
-          // HomeOficina.jsx: `task.deadline || calculateAutomaticDeadline(task, currentCycle)`).
+          // vuelo con SU ciclo real.
           created_at: new Date().toISOString()
         });
       });
@@ -80371,8 +94390,7 @@ export function ChecklistProvider({ children }) {
       if (result.success) {
         // Actualizamos en Firestore para no volverla a sincronizar
         try {
-          const taskRef = doc(db, 'tasks', task.id);
-          await updateDoc(taskRef, { googleSynced: true });
+          await writeTaskDoc(task.id, { googleSynced: true });
           successCount++;
         } catch (e) {
           console.error("Error marcando tarea como sincronizada:", e);
@@ -126777,10 +140795,660 @@ function KPIMetric({ label, value, target, actual, isInverse = false }) {
 
 ---
 
+## Archivo: src\pages\CalendarioMJ.jsx
+
+```javascript
+import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { useUI } from '../context/UIContext';
+import { useCycles } from '../context/CyclesContext';
+import { db } from '../services/firebase';
+import {
+  collection, query, onSnapshot, doc, setDoc, deleteDoc, serverTimestamp
+} from 'firebase/firestore';
+import {
+  Calendar, Plus, ArrowLeft, Printer, Trash2, Edit3, Save, X, Copy, Lock, RefreshCw
+} from 'lucide-react';
+
+// Busca, en el calendario oficial ya cargado por CyclesContext (misma fuente
+// que usa toda la app para saber en qué etapa está cada equipo), el evento
+// "MAESTRIA DEL JUEGO" de una sede+equipo. Se usa SOLO para precargar la
+// fecha del Primer FDS (Creación) — el resto de fechas (Segundo/Tercer FDS,
+// Barco, Caminata sobre fuego, etc.) no vienen en esta fuente y siguen
+// siendo 100% manuales (confirmado con José: no hay fórmula fija de offsets).
+function findOfficialMJEvent(events, sede, equipoNumero) {
+  if (!sede?.trim() || !equipoNumero?.trim() || !events?.length) return null;
+  const sedeNorm = sede.trim().toLowerCase();
+  const equipoNorm = String(equipoNumero).trim();
+  const sedeAliases = [
+    ['lima', 'lim'], ['quito', 'uio'], ['guayaquil', 'gye'],
+    ['cuenca', 'cue'], ['medell', 'med'], ['mexico', 'mex'], ['méxico', 'mex'], ['cdmx', 'mex']
+  ];
+  return events.find(e => {
+    const nombre = e.nombre || e.name || '';
+    if (nombre !== 'MAESTRIA DEL JUEGO') return false;
+    const evSede = (e.sede || e.sedeTag || e.place || e.address || '').toLowerCase();
+    if (!evSede) return false;
+    const sedeMatches = evSede.includes(sedeNorm) || sedeNorm.includes(evSede) ||
+      sedeAliases.some(([a, b]) => (sedeNorm.includes(a) && evSede.includes(b)));
+    if (!sedeMatches) return false;
+    const evEquipo = String(e.equipo || '').trim();
+    return evEquipo === equipoNorm || evEquipo.includes(equipoNorm) || (equipoNorm && equipoNorm.includes(evEquipo));
+  }) || null;
+}
+
+function addDaysISO(isoDate, days) {
+  const d = new Date(isoDate + 'T00:00:00');
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
+// ============================================================================
+// CalendarioMJ.jsx (29/08/2026)
+// "Máquina" de calendarios de Maestría del Juego por equipo, pedida por José
+// a partir de 3 PDF de ejemplo reales (Equipo 27 "Kay Theron", Equipo 28
+// "Ubuntu", Equipo 29 "Quantum Phoenix" — Lima). Los 3 comparten EXACTAMENTE
+// la misma plantilla de actividades (Reunión, Entrega de FI, Entrega de
+// directorio, Entrenamiento, Pase de Antorcha, Barco, Vuelos, Caminata sobre
+// fuego, etc.) organizada en 3 bloques (PRIMER/SEGUNDO/TERCER FDS), pero las
+// FECHAS de cada actividad NO siguen un offset fijo entre equipos (confirmado
+// comparando los 3 PDF: p.ej. "Entrega de directorio" cae +7 días del viernes
+// del FDS en el Equipo 27, pero +14 días en el Equipo 28). José confirmó que
+// no hay una fórmula automática — las fechas se ingresan/ajustan por equipo.
+// Por eso esta herramienta NO calcula fechas solas: parte de la MISMA
+// plantilla de actividades ya probada (para no reescribirla cada vez) y deja
+// cada fecha/hora 100% editable, igual que le pidió José ("similar a las
+// cartas de bienvenida de los entrenadores": autogenerar + poder editar).
+// ============================================================================
+
+const COLLECTION_NAME = 'mj_calendars';
+
+// Roles que pueden VER el listado y exportar PDF.
+const VIEW_ROLES = [
+  'direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado',
+  'director_maestria', 'coord_maestria', 'coordinador_mj'
+];
+// Roles que pueden CREAR / EDITAR / ELIMINAR calendarios (no solo verlos).
+const EDIT_ROLES = [
+  'direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado',
+  'director_maestria', 'coord_maestria', 'coordinador_mj'
+];
+
+const canEdit = (currentUser) => {
+  if (!currentUser) return false;
+  if (currentUser.isSuperAdmin) return true;
+  return EDIT_ROLES.includes(currentUser.appRole);
+};
+
+// Plantilla de actividades — texto EXACTO tomado de los 3 PDF de ejemplo
+// (CALENDARIO_E27.pdf, CALENDARIO_E28.pdf, CALENDARIO_E29_1.pdf). "fecha" y
+// "hora" quedan vacías a propósito: no hay fórmula, se llenan por equipo.
+const DEFAULT_FDS = [
+  {
+    id: 'creacion',
+    titulo: 'PRIMER FDS: CREACIÓN.',
+    fechaInicio: '',
+    fechaFin: '',
+    horario: 'Viernes: 5 pm registro – 11 pm aprox.\n(asistencia obligatoria todo el fin de semana, sin negociación de tiempo)\nSábado: 8 am – 10 pm aprox.\nDomingo: 9 am – 9 pm aprox.'
+  },
+  {
+    id: 'relacion',
+    titulo: 'SEGUNDO FDS: RELACIÓN.',
+    fechaInicio: '',
+    fechaFin: '',
+    horario: 'Viernes: 6 pm registro – 11 pm aprox.\n(asistencia obligatoria todo el fin de semana, sin negociación de tiempo)\nSábado: 8 am – 10 pm aprox.\nDomingo: 9 am – 9 pm aprox.'
+  },
+  {
+    id: 'gratitud',
+    titulo: 'TERCER FDS: GRATITUD.',
+    fechaInicio: '',
+    fechaFin: '',
+    horario: 'Viernes: 6 pm registro – 11 pm aprox.\n(asistencia obligatoria todo el fin de semana, sin negociación de tiempo)\nSábado: 8 am – 10 pm aprox.\nDomingo: 8 am – 9 pm aprox.'
+  }
+];
+
+const DEFAULT_ACTIVITIES = [
+  { seccion: 'creacion', actividad: 'Reunión maestría de juego\nindicaciones sobre:\n(DIRECTORIO, CAMISETAS Y ESTANDARTE)\nVIA ZOOM', fecha: '', hora: '8:00 PM' },
+  { seccion: 'creacion', actividad: 'Entrega de futuros imposibles al correo:\nhttps://crearpslglobal.com/admin/login.php\nUsuario: invitadoFI\nContraseña: invitadofi', fecha: '', hora: 'Hasta 11:59 pm' },
+  { seccion: 'creacion', actividad: 'Entrega de directorio: físico y digital.', fecha: '', hora: 'Hasta las 2:00 pm, lo entrega un representante del equipo.' },
+  { seccion: 'creacion', actividad: 'Entrenamiento de confianza', fecha: '', hora: '11:00 am a 2:00 pm.' },
+  { seccion: 'creacion', actividad: 'Impacto Creación', fecha: '', hora: '3:00 pm a 5:00 pm' },
+  { seccion: 'creacion', actividad: 'Revisión de Futuros Imposibles', fecha: '', hora: '6:00 pm a 7:00 pm' },
+  { seccion: 'creacion', actividad: 'Línea de Elección y\nEntrega de souvenirs a\nparticipantes del Capítulo 1', fecha: '', hora: '8:00 pm a 10:30 pm aprox.' },
+  { seccion: 'creacion', actividad: 'Pase de Antorcha y\nCaminata de Equipos', fecha: '', hora: '6:00 PM' },
+  { seccion: 'creacion', actividad: 'Barco', fecha: '', hora: '6:00 PM' },
+  { seccion: 'creacion', actividad: 'Entrenamiento\nTanque', fecha: '', hora: '1:00 pm a 4:00 pm.' },
+  { seccion: 'creacion', actividad: 'Revisión de Futuros Imposibles', fecha: '', hora: '5:00 pm a 6:00 pm' },
+  { seccion: 'creacion', actividad: 'Vuelos', fecha: '', hora: '6:00 pm a 11:00 pm aprox.' },
+  { seccion: 'creacion', actividad: 'Caminata sobre fuego', fecha: '', hora: '6:00 pm a 11:00 pm aprox.', destacado: true },
+
+  { seccion: 'relacion', actividad: 'Línea de Elección', fecha: '', hora: '8:00 pm a 10:30 pm aprox.' },
+  { seccion: 'relacion', actividad: 'Pase de Antorcha y\nCaminata de Equipos', fecha: '', hora: '6:00 PM' },
+  { seccion: 'relacion', actividad: 'Barco', fecha: '', hora: '6:00 PM' },
+  { seccion: 'relacion', actividad: 'Entrenamiento\nRompimiento de Barreras', fecha: '', hora: '9:00 am a 12:00 pm' },
+  { seccion: 'relacion', actividad: 'Impacto Relación', fecha: '', hora: '' },
+  { seccion: 'relacion', actividad: 'Revisión de Futuros Imposibles', fecha: '', hora: '5:00 pm a 6:00 pm' },
+  { seccion: 'relacion', actividad: 'Vuelos', fecha: '', hora: '6:30 pm a 11:00 pm aprox.' },
+
+  { seccion: 'gratitud', actividad: '(Actividades del tercer FDS — completar según corresponda)', fecha: '', hora: '' }
+];
+
+// Texto fijo de la página "Fin de tu entrenamiento" — IDÉNTICO en los 3 PDF
+// de ejemplo, editable por si en el futuro cambian las reglas.
+const DEFAULT_INFO_TEXT = `Puntualidad y Asistencia:
+Los horarios de ingreso son puntuales. Si llegas tarde, no podrás continuar con tu equipo en los fines de semana marcados como obligatorios.
+Para los entrenamientos complementarios, también se requiere puntualidad. Si llegas tarde, no podrás participar en ese entrenamiento específico, pero podrás incorporarte a la siguiente actividad.
+Los Managers deben estar presentes 30 minutos antes de cada entrenamiento complementario. Si no estás en tiempo y forma en el grounding de un entrenamiento obligatorio o complementario, no podrás formar parte.
+Los Managers, Si fallas en dos llamadas con tu entrenador, estarás fuera del equipo.
+
+Restricciones y Vestimenta:
+No se permite la asistencia de niños en las actividades y entrenamientos, excepto en las graduaciones del Capítulo 1 y Capítulo 2.
+Es indispensable presentar tus carpetas de futuros imposibles con evidencias actualizadas para ingresar a los fines de semana.
+Para participar en actividades, debes vestir la camiseta de tu equipo de color y pantalón jean azul.
+Durante los vuelos, utiliza la camiseta negra de equipo y pantalón negro.
+La vestimenta para los fines de semana es la siguiente:
+    Viernes: Formal.
+    Sábado: Vestimenta de vuelos (camiseta negra y jean negro).
+    Domingo: Camiseta de color del equipo y jean azul.
+
+Invitación Especial:
+El cuarto fin de semana es una invitación exclusiva de la empresa Crear Poder sin Límites.
+
+¡Sigue comprometido/a con tu NUEVO ESTILO DE VIDA y éxito! Si tienes más preguntas o necesitas más información, no dudes en preguntar. 🙂`;
+
+const emptyForm = () => ({
+  sede: '',
+  equipoNumero: '',
+  equipoNombre: '',
+  fds: DEFAULT_FDS.map(f => ({ ...f })),
+  actividades: DEFAULT_ACTIVITIES.map(a => ({ ...a })),
+  infoText: DEFAULT_INFO_TEXT
+});
+
+const slugify = (s) => (s || '').toString().trim().toUpperCase()
+  .normalize('NFD').replace(/[̀-ͯ]/g, '')
+  .replace(/[^A-Z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+
+const FDS_LABELS = { creacion: 'PRIMER FDS: CREACIÓN', relacion: 'SEGUNDO FDS: RELACIÓN', gratitud: 'TERCER FDS: GRATITUD' };
+
+export default function CalendarioMJ() {
+  const { currentUser } = useAuth();
+  const { showToast } = useUI();
+  const { events } = useCycles();
+  const navigate = useNavigate();
+
+  const [calendars, setCalendars] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState(null); // null = lista; 'new' o docId = editor
+  const [form, setForm] = useState(emptyForm());
+  const [saving, setSaving] = useState(false);
+  const [previewId, setPreviewId] = useState(null);
+  const [autoFilledOnce, setAutoFilledOnce] = useState(false);
+
+  const userCanEdit = canEdit(currentUser);
+
+  // Precarga automática de la fecha del Primer FDS al escribir sede + equipo
+  // (solo una vez por sesión de edición, para no pelear con lo que el
+  // usuario ya haya escrito a mano después).
+  useEffect(() => {
+    if (editing !== 'new' || autoFilledOnce) return;
+    if (!form.sede.trim() || !form.equipoNumero.trim()) return;
+    const match = findOfficialMJEvent(events, form.sede, form.equipoNumero);
+    if (match) {
+      const start = (match.fecha_inicio || match.start || '').replace('Z', '').slice(0, 10);
+      if (start) {
+        const end = addDaysISO(start, 2);
+        setForm(f => ({ ...f, fds: f.fds.map((fb, i) => i === 0 ? { ...fb, fechaInicio: start, fechaFin: end } : fb) }));
+        showToast('Fecha del Primer FDS precargada desde el calendario oficial — verifica que sea correcta.', 'success');
+        setAutoFilledOnce(true);
+      }
+    }
+  }, [form.sede, form.equipoNumero, events, editing, autoFilledOnce, showToast]);
+
+  const buscarEnCalendarioOficial = () => {
+    const match = findOfficialMJEvent(events, form.sede, form.equipoNumero);
+    if (!match) {
+      showToast('No se encontró este equipo en el calendario oficial. Ingresa las fechas manualmente.', 'error');
+      return;
+    }
+    const start = (match.fecha_inicio || match.start || '').replace('Z', '').slice(0, 10);
+    if (!start) {
+      showToast('El equipo se encontró pero sin fecha de inicio registrada.', 'error');
+      return;
+    }
+    const end = addDaysISO(start, 2);
+    setForm(f => ({ ...f, fds: f.fds.map((fb, i) => i === 0 ? { ...fb, fechaInicio: start, fechaFin: end } : fb) }));
+    showToast('Fecha del Primer FDS actualizada desde el calendario oficial.', 'success');
+  };
+
+  useEffect(() => {
+    const q = query(collection(db, COLLECTION_NAME));
+    const unsub = onSnapshot(q, (snap) => {
+      const rows = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      rows.sort((a, b) => (a.sede || '').localeCompare(b.sede || '') || (Number(a.equipoNumero) || 0) - (Number(b.equipoNumero) || 0));
+      setCalendars(rows);
+      setLoading(false);
+    }, (err) => {
+      console.error('Error cargando calendarios MJ:', err);
+      setLoading(false);
+    });
+    return () => unsub();
+  }, []);
+
+  const visibleCalendars = useMemo(() => {
+    if (!currentUser) return [];
+    if (currentUser.isSuperAdmin || ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'consolidado', 'director_maestria'].includes(currentUser.appRole)) {
+      return calendars;
+    }
+    // Coordinador de Maestría: solo su sede
+    const userSede = (currentUser.sede || '').trim().toLowerCase();
+    return calendars.filter(c => (c.sede || '').trim().toLowerCase() === userSede);
+  }, [calendars, currentUser]);
+
+  const startNew = () => {
+    setForm(emptyForm());
+    setAutoFilledOnce(false);
+    setEditing('new');
+  };
+
+  const startEdit = (cal) => {
+    setForm({
+      sede: cal.sede || '',
+      equipoNumero: cal.equipoNumero || '',
+      equipoNombre: cal.equipoNombre || '',
+      fds: (cal.fds && cal.fds.length === 3) ? cal.fds.map(f => ({ ...f })) : DEFAULT_FDS.map(f => ({ ...f })),
+      actividades: (cal.actividades || []).map(a => ({ ...a })),
+      infoText: cal.infoText || DEFAULT_INFO_TEXT
+    });
+    setEditing(cal.id);
+  };
+
+  const startFromTemplate = (cal) => {
+    // "Duplicar" un calendario existente como base para un equipo nuevo —
+    // mismo patrón de actividades, fechas en blanco para no arrastrar las
+    // fechas del equipo anterior por error.
+    setForm({
+      sede: cal.sede || '',
+      equipoNumero: '',
+      equipoNombre: '',
+      fds: (cal.fds || DEFAULT_FDS).map(f => ({ ...f, fechaInicio: '', fechaFin: '' })),
+      actividades: (cal.actividades || DEFAULT_ACTIVITIES).map(a => ({ ...a, fecha: '' })),
+      infoText: cal.infoText || DEFAULT_INFO_TEXT
+    });
+    setAutoFilledOnce(false);
+    setEditing('new');
+  };
+
+  const cancelEdit = () => {
+    setEditing(null);
+    setForm(emptyForm());
+    setAutoFilledOnce(false);
+  };
+
+  const updateFdsField = (idx, field, value) => {
+    setForm(f => {
+      const fds = [...f.fds];
+      fds[idx] = { ...fds[idx], [field]: value };
+      return { ...f, fds };
+    });
+  };
+
+  const updateActividad = (idx, field, value) => {
+    setForm(f => {
+      const actividades = [...f.actividades];
+      actividades[idx] = { ...actividades[idx], [field]: value };
+      return { ...f, actividades };
+    });
+  };
+
+  const addActividad = (seccion) => {
+    setForm(f => ({ ...f, actividades: [...f.actividades, { seccion, actividad: '', fecha: '', hora: '' }] }));
+  };
+
+  const removeActividad = (idx) => {
+    setForm(f => ({ ...f, actividades: f.actividades.filter((_, i) => i !== idx) }));
+  };
+
+  const handleSave = async () => {
+    if (!form.sede.trim() || !form.equipoNumero.trim() || !form.equipoNombre.trim()) {
+      showToast('Completa sede, número de equipo y nombre de equipo antes de guardar.', 'error');
+      return;
+    }
+    setSaving(true);
+    try {
+      const docId = editing !== 'new' ? editing : `${slugify(form.sede)}-EQ-${slugify(form.equipoNumero)}`;
+      const payload = {
+        sede: form.sede.trim(),
+        equipoNumero: form.equipoNumero.trim(),
+        equipoNombre: form.equipoNombre.trim(),
+        fds: form.fds,
+        actividades: form.actividades,
+        infoText: form.infoText,
+        updatedAt: serverTimestamp(),
+        updatedBy: currentUser?.email || 'desconocido'
+      };
+      if (editing === 'new') {
+        payload.createdAt = serverTimestamp();
+        payload.createdBy = currentUser?.email || 'desconocido';
+      }
+      await setDoc(doc(db, COLLECTION_NAME, docId), payload, { merge: true });
+      showToast('Calendario guardado correctamente.', 'success');
+      setEditing(null);
+      setForm(emptyForm());
+    } catch (err) {
+      console.error('Error guardando calendario MJ:', err);
+      showToast('No se pudo guardar el calendario. Revisa los permisos de Firestore.', 'error');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (cal) => {
+    if (!window.confirm(`¿Eliminar el calendario del Equipo ${cal.equipoNumero} (${cal.equipoNombre})? Esta acción no se puede deshacer.`)) return;
+    try {
+      await deleteDoc(doc(db, COLLECTION_NAME, cal.id));
+      showToast('Calendario eliminado.', 'success');
+    } catch (err) {
+      console.error('Error eliminando calendario MJ:', err);
+      showToast('No se pudo eliminar. Revisa los permisos de Firestore.', 'error');
+    }
+  };
+
+  const previewCal = previewId ? calendars.find(c => c.id === previewId) : null;
+
+  // ---------------------------------------------------------------------
+  // Vista de impresión / exportación PDF
+  // ---------------------------------------------------------------------
+  if (previewCal) {
+    return <CalendarioPreview cal={previewCal} onClose={() => setPreviewId(null)} />;
+  }
+
+  return (
+    <div className="calendar-container p-4 md:p-8 max-w-6xl mx-auto min-h-screen" style={{ color: 'var(--text-main)' }}>
+      <style>{`@media print { .no-print { display: none !important; } }`}</style>
+
+      <div className="flex justify-between items-center mb-6 flex-wrap gap-4 no-print">
+        <div>
+          <h1 style={{ fontSize: '1.8rem', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+            <Calendar color="#1a75bc" size={30} />
+            Calendarios de Maestría del Juego
+          </h1>
+          <p style={{ fontSize: '0.85rem', opacity: 0.7, marginTop: '0.2rem' }}>
+            Genera, edita y exporta el calendario oficial de cada equipo (formato CREAR).
+          </p>
+        </div>
+        <div className="flex gap-3">
+          {userCanEdit && (
+            <button onClick={startNew} className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.6rem 1rem', borderRadius: '10px', background: '#1a75bc', color: 'white', border: 'none', fontWeight: 700 }}>
+              <Plus size={18} /> Nuevo calendario
+            </button>
+          )}
+          <button onClick={() => navigate('/home')} className="btn-secondary" style={{ padding: '0.6rem 1rem', borderRadius: '10px' }}>
+            <ArrowLeft size={16} style={{ display: 'inline', marginRight: '0.3rem' }} /> Volver
+          </button>
+        </div>
+      </div>
+
+      {!userCanEdit && (
+        <div className="no-print" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.7rem 1rem', borderRadius: '10px', background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.4)', marginBottom: '1.2rem', fontSize: '0.85rem' }}>
+          <Lock size={16} color="#d97706" /> Solo puedes ver y exportar. La edición está reservada a Coordinación de Maestría del Juego y gerencia/dirección.
+        </div>
+      )}
+
+      {editing ? (
+        <CalendarioEditor
+          form={form}
+          setForm={setForm}
+          updateFdsField={updateFdsField}
+          updateActividad={updateActividad}
+          addActividad={addActividad}
+          removeActividad={removeActividad}
+          onBuscarOficial={buscarEnCalendarioOficial}
+          onCancel={cancelEdit}
+          onSave={handleSave}
+          saving={saving}
+          isNew={editing === 'new'}
+        />
+      ) : (
+        <div className="no-print">
+          {loading ? (
+            <p>Cargando calendarios...</p>
+          ) : visibleCalendars.length === 0 ? (
+            <div style={{ padding: '2rem', textAlign: 'center', opacity: 0.7 }}>
+              Todavía no hay calendarios guardados{userCanEdit ? ' — crea el primero con "Nuevo calendario".' : '.'}
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
+              {visibleCalendars.map(cal => (
+                <div key={cal.id} className="glass-panel" style={{ border: '1px solid rgba(128,128,128,0.25)', borderRadius: '14px', padding: '1.1rem' }}>
+                  <div style={{ fontWeight: 800, fontSize: '1.05rem' }}>Equipo {cal.equipoNumero} — {cal.equipoNombre}</div>
+                  <div style={{ fontSize: '0.8rem', opacity: 0.7, marginBottom: '0.8rem' }}>{cal.sede}</div>
+                  <div className="flex gap-2 flex-wrap">
+                    <button onClick={() => setPreviewId(cal.id)} className="btn-secondary" style={{ padding: '0.4rem 0.7rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                      <Printer size={14} /> Ver / Exportar PDF
+                    </button>
+                    {userCanEdit && (
+                      <>
+                        <button onClick={() => startEdit(cal)} className="btn-secondary" style={{ padding: '0.4rem 0.7rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                          <Edit3 size={14} /> Editar
+                        </button>
+                        <button onClick={() => startFromTemplate(cal)} className="btn-secondary" style={{ padding: '0.4rem 0.7rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                          <Copy size={14} /> Usar como plantilla
+                        </button>
+                        <button onClick={() => handleDelete(cal)} style={{ padding: '0.4rem 0.7rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem', background: 'rgba(239,68,68,0.12)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '8px', cursor: 'pointer' }}>
+                          <Trash2 size={14} /> Eliminar
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ============================================================================
+// Editor
+// ============================================================================
+function CalendarioEditor({ form, setForm, updateFdsField, updateActividad, addActividad, removeActividad, onBuscarOficial, onCancel, onSave, saving, isNew }) {
+  const inputStyle = { width: '100%', padding: '0.5rem', borderRadius: '8px', border: '1px solid rgba(128,128,128,0.3)', background: 'transparent', color: 'inherit', fontSize: '0.85rem' };
+  const textareaStyle = { ...inputStyle, minHeight: '60px', fontFamily: 'inherit', resize: 'vertical' };
+
+  return (
+    <div className="no-print" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      <div className="glass-panel" style={{ border: '1px solid rgba(128,128,128,0.25)', borderRadius: '14px', padding: '1.2rem' }}>
+        <h3 style={{ fontWeight: 800, marginBottom: '0.8rem' }}>{isNew ? 'Nuevo calendario' : 'Editar calendario'}</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.8rem' }}>
+          <div>
+            <label style={{ fontSize: '0.75rem', opacity: 0.7 }}>Sede</label>
+            <input style={inputStyle} value={form.sede} onChange={e => setForm(f => ({ ...f, sede: e.target.value }))} placeholder="Lima" />
+          </div>
+          <div>
+            <label style={{ fontSize: '0.75rem', opacity: 0.7 }}>Número de equipo</label>
+            <input style={inputStyle} value={form.equipoNumero} onChange={e => setForm(f => ({ ...f, equipoNumero: e.target.value }))} placeholder="30" />
+          </div>
+          <div>
+            <label style={{ fontSize: '0.75rem', opacity: 0.7 }}>Nombre de equipo</label>
+            <input style={inputStyle} value={form.equipoNombre} onChange={e => setForm(f => ({ ...f, equipoNombre: e.target.value }))} placeholder="Ej. Kay Theron" />
+          </div>
+        </div>
+        {onBuscarOficial && (
+          <div style={{ marginTop: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+            <button onClick={onBuscarOficial} className="btn-secondary" style={{ padding: '0.4rem 0.7rem', fontSize: '0.78rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+              <RefreshCw size={14} /> Buscar fecha en el calendario oficial
+            </button>
+            <span style={{ fontSize: '0.72rem', opacity: 0.6 }}>
+              Con sede + número de equipo se precarga sola la fecha del Primer FDS desde el calendario oficial de la plataforma. El resto de fechas (Segundo/Tercer FDS y cada actividad) no vienen ahí y se ajustan a mano.
+            </span>
+          </div>
+        )}
+      </div>
+
+      {form.fds.map((fdsBlock, idx) => (
+        <div key={fdsBlock.id} className="glass-panel" style={{ border: '1px solid rgba(128,128,128,0.25)', borderRadius: '14px', padding: '1.2rem' }}>
+          <h4 style={{ fontWeight: 800, marginBottom: '0.6rem', color: '#1a75bc' }}>{FDS_LABELS[fdsBlock.id]}</h4>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '0.8rem', marginBottom: '0.8rem' }}>
+            <div>
+              <label style={{ fontSize: '0.75rem', opacity: 0.7 }}>Fecha inicio (viernes)</label>
+              <input type="date" style={inputStyle} value={fdsBlock.fechaInicio} onChange={e => updateFdsField(idx, 'fechaInicio', e.target.value)} />
+            </div>
+            <div>
+              <label style={{ fontSize: '0.75rem', opacity: 0.7 }}>Fecha fin (domingo)</label>
+              <input type="date" style={inputStyle} value={fdsBlock.fechaFin} onChange={e => updateFdsField(idx, 'fechaFin', e.target.value)} />
+            </div>
+          </div>
+          <label style={{ fontSize: '0.75rem', opacity: 0.7 }}>Horario (texto libre)</label>
+          <textarea style={textareaStyle} value={fdsBlock.horario} onChange={e => updateFdsField(idx, 'horario', e.target.value)} />
+
+          <div style={{ marginTop: '1rem' }}>
+            <div style={{ fontSize: '0.75rem', opacity: 0.7, marginBottom: '0.4rem' }}>Actividades de este bloque</div>
+            {form.actividades.map((act, aIdx) => act.seccion !== fdsBlock.id ? null : (
+              <div key={aIdx} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1.3fr auto', gap: '0.5rem', marginBottom: '0.5rem', alignItems: 'start' }}>
+                <textarea style={{ ...textareaStyle, minHeight: '40px' }} value={act.actividad} onChange={e => updateActividad(aIdx, 'actividad', e.target.value)} placeholder="Actividad" />
+                <input type="date" style={inputStyle} value={act.fecha} onChange={e => updateActividad(aIdx, 'fecha', e.target.value)} />
+                <input style={inputStyle} value={act.hora} onChange={e => updateActividad(aIdx, 'hora', e.target.value)} placeholder="Hora" />
+                <button onClick={() => removeActividad(aIdx)} title="Eliminar actividad" style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer' }}>
+                  <X size={18} />
+                </button>
+              </div>
+            ))}
+            <button onClick={() => addActividad(fdsBlock.id)} className="btn-secondary" style={{ padding: '0.3rem 0.6rem', fontSize: '0.78rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+              <Plus size={14} /> Agregar actividad
+            </button>
+          </div>
+        </div>
+      ))}
+
+      <div className="glass-panel" style={{ border: '1px solid rgba(128,128,128,0.25)', borderRadius: '14px', padding: '1.2rem' }}>
+        <h4 style={{ fontWeight: 800, marginBottom: '0.6rem' }}>Página "Fin de tu entrenamiento" (información importante)</h4>
+        <textarea style={{ ...textareaStyle, minHeight: '220px' }} value={form.infoText} onChange={e => setForm(f => ({ ...f, infoText: e.target.value }))} />
+      </div>
+
+      <div className="flex gap-3 justify-end">
+        <button onClick={onCancel} className="btn-secondary" style={{ padding: '0.6rem 1.2rem', borderRadius: '10px' }}>Cancelar</button>
+        <button onClick={onSave} disabled={saving} className="btn-primary" style={{ padding: '0.6rem 1.2rem', borderRadius: '10px', background: '#1a75bc', color: 'white', border: 'none', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          <Save size={16} /> {saving ? 'Guardando...' : 'Guardar calendario'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
+// Vista previa / impresión — replica el diseño de los PDF de ejemplo
+// ============================================================================
+function formatFecha(iso) {
+  if (!iso) return '';
+  const [y, m, d] = iso.split('-');
+  if (!y || !m || !d) return iso;
+  const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+  return `${parseInt(d, 10)}-${meses[parseInt(m, 10) - 1]}`;
+}
+
+function formatRangoFds(fdsBlock) {
+  if (!fdsBlock.fechaInicio || !fdsBlock.fechaFin) return '(fechas por definir)';
+  const [, mi, di] = fdsBlock.fechaInicio.split('-');
+  const [, mf, df] = fdsBlock.fechaFin.split('-');
+  const meses = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
+  if (mi === mf) {
+    return `DEL ${parseInt(di, 10)} AL ${parseInt(df, 10)} DE ${meses[parseInt(mi, 10) - 1]}`;
+  }
+  return `DEL ${parseInt(di, 10)} DE ${meses[parseInt(mi, 10) - 1]} AL ${parseInt(df, 10)} DE ${meses[parseInt(mf, 10) - 1]}`;
+}
+
+function CalendarioPreview({ cal, onClose }) {
+  const headerBg = '#1a75bc';
+  const rowAlt = '#eaf3fb';
+
+  return (
+    <div style={{ background: '#f3f4f6', minHeight: '100vh', padding: '1.5rem' }}>
+      <style>{`
+        @media print {
+          .no-print { display: none !important; }
+          body { background: white !important; }
+          .mj-page { box-shadow: none !important; margin: 0 !important; page-break-after: always; }
+        }
+        .mj-table td, .mj-table th { border: 1px solid #cbd5e1; padding: 6px 10px; font-size: 12px; vertical-align: top; white-space: pre-line; }
+      `}</style>
+
+      <div className="no-print flex gap-3 mb-4" style={{ maxWidth: '850px', margin: '0 auto 1rem' }}>
+        <button onClick={onClose} className="btn-secondary" style={{ padding: '0.5rem 1rem', borderRadius: '8px' }}>
+          <ArrowLeft size={16} style={{ display: 'inline', marginRight: '0.3rem' }} /> Volver al listado
+        </button>
+        <button onClick={() => window.print()} className="btn-primary" style={{ padding: '0.5rem 1rem', borderRadius: '8px', background: '#1a75bc', color: 'white', border: 'none', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          <Printer size={16} /> Exportar PDF
+        </button>
+      </div>
+
+      {/* Página 1: calendario */}
+      <div className="mj-page" style={{ background: 'white', maxWidth: '850px', margin: '0 auto 2rem', padding: '2rem', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+          <h1 style={{ color: headerBg, fontSize: '1.3rem', fontWeight: 900, margin: 0 }}>
+            CALENDARIO DE MAESTRÍA DEL JUEGO-{(cal.sede || '').toUpperCase()}<br />
+            EQUIPO {cal.equipoNumero} – {(cal.equipoNombre || '').toUpperCase()}
+          </h1>
+          <div style={{ fontWeight: 900, fontSize: '1.4rem', color: '#000' }}>CREAR<div style={{ fontSize: '0.55rem', fontWeight: 400 }}>Poder sin límites</div></div>
+        </div>
+
+        <table className="mj-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr style={{ background: headerBg, color: 'white' }}>
+              <th style={{ width: '45%' }}>ACTIVIDAD</th>
+              <th style={{ width: '25%' }}>FECHA</th>
+              <th style={{ width: '30%' }}>HORA</th>
+            </tr>
+          </thead>
+          <tbody>
+            {cal.fds.map((fdsBlock) => (
+              <React.Fragment key={fdsBlock.id}>
+                <tr style={{ background: '#2f6fa8', color: 'white', fontWeight: 700 }}>
+                  <td>{fdsBlock.titulo}</td>
+                  <td>{formatRangoFds(fdsBlock)}</td>
+                  <td style={{ whiteSpace: 'pre-line' }}>{fdsBlock.horario}</td>
+                </tr>
+                {cal.actividades.filter(a => a.seccion === fdsBlock.id).map((act, i) => (
+                  <tr key={i} style={{ background: act.destacado ? '#fef08a' : (i % 2 === 0 ? 'white' : rowAlt) }}>
+                    <td style={{ fontWeight: 600 }}>{act.actividad}</td>
+                    <td>{formatFecha(act.fecha) || '(sin fecha)'}</td>
+                    <td>{act.hora}</td>
+                  </tr>
+                ))}
+              </React.Fragment>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Página 2: fin de tu entrenamiento */}
+      <div className="mj-page" style={{ background: 'white', maxWidth: '850px', margin: '0 auto', padding: '2rem', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
+        <h1 style={{ color: headerBg, fontSize: '1.1rem', fontWeight: 900, marginBottom: '1rem' }}>
+          CALENDARIO DE MAESTRÍA DEL JUEGO-{(cal.sede || '').toUpperCase()}<br />
+          EQUIPO {cal.equipoNumero} – {(cal.equipoNombre || '').toUpperCase()}
+        </h1>
+        <div style={{ background: '#dbeafe', textAlign: 'center', fontWeight: 900, fontSize: '1.3rem', padding: '0.8rem', marginBottom: '1.5rem' }}>
+          FIN DE TU ENTRENAMIENTO
+        </div>
+        <div style={{ background: '#f1f5f9', border: '1px solid #cbd5e1', padding: '1.2rem', fontSize: '0.82rem', whiteSpace: 'pre-line', lineHeight: 1.6 }}>
+          {cal.infoText}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+```
+
+---
+
 ## Archivo: src\pages\CentroManagers.jsx
 
 ```javascript
-﻿import { getWhatsAppUrl } from '../utils/phoneUtils';
+import { getWhatsAppUrl } from '../utils/phoneUtils';
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -126819,8 +141487,6 @@ import {
   ShieldCheck, Lock, AlertTriangle, Target, ArrowUpDown, ArrowUp, ArrowDown
 } from 'lucide-react';
 import CMJDashboard from '../components/CMJDashboard';
-import UserProfileModal from '../components/UserProfileModal';
-import { getAllCompanyUsers } from '../services/userService';
 
 const SEDE_COLORS = {
   Quito: "#29abe2", Lima: "#ef4444", Guayaquil: "#f59e0b",
@@ -126881,28 +141547,6 @@ const isTrainerMatch = (mTrainer, targetTrainer) => {
 };
 
 export default function CentroManagers() {
-  const [directoryUsers, setDirectoryUsers] = useState([]);
-  const [selectedTrainerProfile, setSelectedTrainerProfile] = useState(null);
-
-  useEffect(() => {
-    getAllCompanyUsers().then(users => {
-      setDirectoryUsers(users);
-    }).catch(console.error);
-  }, []);
-
-  const handleTrainerClick = (trainerName) => {
-    if (!trainerName || trainerName === 'Sin Asignar') return;
-    const normSearch = trainerName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
-    const match = directoryUsers.find(u => {
-      const uName = (u.name || u.displayName || u.nombre || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
-      return uName === normSearch || uName.includes(normSearch) || normSearch.includes(uName);
-    });
-    if (match) {
-      setSelectedTrainerProfile(match);
-    } else {
-      setSelectedTrainerProfile({ name: trainerName, role: 'entrenador', roles: ['entrenador'], sede: 'Global' });
-    }
-  };
   const { currentUser } = useAuth();
   const { showToast } = useUI();
   const navigate = useNavigate();
@@ -126910,6 +141554,11 @@ export default function CentroManagers() {
 
   const queryParams = new URLSearchParams(location.search);
   const initialTab = queryParams.get('tab') || 'directorio';
+  // NOTA (28/08/2026): permite que el Buscador Global de Home.jsx traiga al
+  // usuario directo a un equipo/capitán/manager ya filtrado, vía
+  // /centro-managers?tab=grupales&q=<texto>&sede=<sede>
+  const initialSearchQuery = queryParams.get('q') || '';
+  const initialSedeQuery = queryParams.get('sede') || '';
 
   // Permisos avanzados
   const canViewAll = canViewAllManagers(currentUser);
@@ -127002,8 +141651,8 @@ export default function CentroManagers() {
 
   // UI State
   const [activeTab, setActiveTab] = useState(initialTab);
-  const [search, setSearch] = useState('');
-  const [filterSede, setFilterSede] = useState('');
+  const [search, setSearch] = useState(initialSearchQuery);
+  const [filterSede, setFilterSede] = useState(initialSedeQuery ? normalizeSede(initialSedeQuery) : '');
   const [statusFilter, setStatusFilter] = useState('Todos'); // 'Todos' | 'Activo' | 'Graduado' | 'Desertor'
 
   // Estadísticas por Entrenador (Tab: Entrenadores)
@@ -127029,10 +141678,6 @@ export default function CentroManagers() {
     if (email === 'andres.gomez@crearpsl.net') return 'Andres Gomez';
     if (email === 'leandro.brunis@crearpsl.net') return 'Leandro Brunis';
     if (email === 'carlos.brunis@crearpsl.net' || email === 'brunische66@gmail.com') return 'Carlos Brunis';
-    if (email === 'marylourdespat@gmail.com') return 'María De Lourdes Patiño Galarraga';
-    if (email === 'linid.valencia@crearpsl.net') return 'Linid Valencia';
-    if (email === 'marylourdespat@gmail.com') return 'Lourdes Patino';
-    if (email === 'marylourdespat@gmail.com') return 'Lourdes Patino';
 
     const userName = currentUser.name || currentUser.displayName || '';
     const cleanUser = userName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
@@ -127100,6 +141745,15 @@ export default function CentroManagers() {
   const [groupModal, setGroupModal] = useState(null);
   const [groupCallDate, setGroupCallDate] = useState(new Date().toISOString().split('T')[0]);
   const [groupCallAttendance, setGroupCallAttendance] = useState({}); // { managerId: boolean }
+
+  // CONTEXTO (28/08/2026): pedido de José — al hacer clic en el badge 🎓 de un
+  // entrenador (en la fila del Directorio o en la tarjeta de un Capitán) se debe
+  // abrir la "tarjeta" de esa persona con su resumen (equipos a cargo, efectividad
+  // de llamadas, activos/graduados/desertores) — el mismo cálculo que ya existía
+  // para la pestaña "Entrenadores", pero accesible desde cualquier vista sin tener
+  // que cambiar de pestaña. Solo guarda el NOMBRE del entrenador seleccionado; el
+  // resumen se recalcula al vuelo con getTrainerCardStats() más abajo.
+  const [trainerCardModal, setTrainerCardModal] = useState(null); // string | null (nombre del entrenador)
 
   const [currentPage, setCurrentPage] = useState(1);
   const PAGE_SIZE = 40;
@@ -127396,6 +142050,24 @@ export default function CentroManagers() {
     return list;
   }, [allTrainerNames, managers, search]);
 
+  // Mismo cálculo que trainersStats de arriba pero SIN el filtro de `search` y
+  // para un solo nombre — usado por el modal "tarjeta de la persona" que se abre
+  // al hacer clic en un badge 🎓 de entrenador desde cualquier vista.
+  const getTrainerCardStats = (trainerName) => {
+    if (!trainerName) return null;
+    const trainerManagers = managers.filter(m => isTrainerMatch(m.entrenador, trainerName));
+    const total = trainerManagers.length;
+    const activos = trainerManagers.filter(m => m.estado === 'Activo').length;
+    const graduados = trainerManagers.filter(m => m.estado === 'Graduado').length;
+    const desertores = trainerManagers.filter(m => m.estado === 'Desertor').length;
+    const equipos = [...new Set(trainerManagers.map(m => m.equipo).filter(Boolean))];
+    const sedes = [...new Set(trainerManagers.map(m => normalizeSede(m.sede)).filter(Boolean))];
+    const asistieron = trainerManagers.filter(m => m.llamadaAsistio === 'SI').length;
+    const noAsistieron = trainerManagers.filter(m => m.llamadaAsistio === 'NO').length;
+    const conLlamada = asistieron + noAsistieron;
+    const pctAsist = conLlamada > 0 ? Math.round((asistieron / conLlamada) * 100) : 0;
+    return { entrenador: trainerName, total, activos, graduados, desertores, equipos, sedes, asistieron, noAsistieron, conLlamada, pctAsist };
+  };
 
   const stats = useMemo(() => {
     const userSede = normalizeSede(currentUser?.sede);
@@ -128240,7 +142912,15 @@ export default function CentroManagers() {
                           {mTrainers.length > 0 && mTrainers[0] !== "" ? (
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem' }}>
                               {mTrainers.map(t => (
-                                <button key={t} onClick={() => handleTrainerClick(t)} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.2rem', background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', padding: '0.2rem 0.5rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}>🎓 {t}</button>
+                                <button
+                                  key={t}
+                                  type="button"
+                                  onClick={() => setTrainerCardModal(t)}
+                                  title={`Ver tarjeta de ${t}`}
+                                  style={{ display: 'inline-flex', alignItems: 'center', gap: '0.2rem', background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', padding: '0.2rem 0.5rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
+                                >
+                                  🎓 {t}
+                                </button>
                               ))}
                             </div>
                           ) : (
@@ -128464,9 +143144,15 @@ export default function CentroManagers() {
                             <span style={{ fontWeight: 600 }}>Coach(es):</span>
                             {t.entrenadoresArr.length > 0 ? (
                               t.entrenadoresArr.map(e => (
-                                <span key={e} style={{ background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', padding: '0.1rem 0.4rem', borderRadius: '4px', fontSize: '0.72rem', fontWeight: 700 }}>
+                                <button
+                                  key={e}
+                                  type="button"
+                                  onClick={() => setTrainerCardModal(e)}
+                                  title={`Ver tarjeta de ${e}`}
+                                  style={{ background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', padding: '0.1rem 0.4rem', borderRadius: '4px', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer' }}
+                                >
                                   🎓 {e}
-                                </span>
+                                </button>
                               ))
                             ) : (
                               <span style={{ color: '#94a3b8' }}>Sin Asignar</span>
@@ -128676,9 +143362,15 @@ export default function CentroManagers() {
                         <span style={{ color: textMuted, fontWeight: 600 }}>Entrenadores:</span>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem', marginTop: '0.3rem' }}>
                           {s.entrenadores.map(e => (
-                            <span key={e} style={{ background: '#eff6ff', color: '#1d4ed8', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.72rem', fontWeight: 600 }}>
+                            <button
+                              key={e}
+                              type="button"
+                              onClick={() => setTrainerCardModal(e)}
+                              title={`Ver tarjeta de ${e}`}
+                              style={{ background: '#eff6ff', color: '#1d4ed8', border: 'none', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer' }}
+                            >
                               🎓 {e}
-                            </span>
+                            </button>
                           ))}
                         </div>
                       </div>
@@ -129658,11 +144350,93 @@ export default function CentroManagers() {
         </div>
       )}
 
+      {/* TARJETA DE LA PERSONA (Entrenador) — se abre al hacer clic en cualquier
+          badge 🎓 de un entrenador (Directorio, Equipos o Sedes). Pedido de José
+          el 28/08/2026: "cuando de click aqui debe de abrir la tarjeta de la persona". */}
+      {trainerCardModal && (() => {
+        const tc = getTrainerCardStats(trainerCardModal);
+        return (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(3px)', zIndex: 1200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }} onClick={() => setTrainerCardModal(null)}>
+            <div onClick={e => e.stopPropagation()} style={{ background: bgCard, width: '100%', maxWidth: '440px', borderRadius: '12px', padding: '1.8rem', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.15)', border: `1px solid ${borderLight}`, borderTop: '4px solid #7c3aed' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                <h2 style={{ margin: 0, color: textDark, fontSize: '1.2rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  🎓 {trainerCardModal}
+                </h2>
+                <button onClick={() => setTrainerCardModal(null)} title="Cerrar" style={{ background: '#f1f5f9', border: 'none', borderRadius: '6px', padding: '0.3rem', cursor: 'pointer', color: textMuted }}>
+                  <X size={16} />
+                </button>
+              </div>
+
+              {tc && tc.total > 0 ? (
+                <>
+                  <div style={{ margin: '0.5rem 0 1rem 0' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: '0.3rem' }}>
+                      <span style={{ color: textMuted }}>Efectividad de Llamadas:</span>
+                      <strong style={{ color: tc.pctAsist >= 70 ? '#16a34a' : '#d97706' }}>{tc.pctAsist}%</strong>
+                    </div>
+                    <div style={{ background: '#f1f5f9', height: '8px', borderRadius: '4px', overflow: 'hidden' }}>
+                      <div style={{ width: `${tc.pctAsist}%`, height: '100%', background: tc.pctAsist >= 70 ? '#10b981' : '#f59e0b', borderRadius: '4px' }} />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem', margin: '1rem 0', textAlign: 'center' }}>
+                    <div style={{ background: '#f8fafc', padding: '0.5rem 0.3rem', borderRadius: '8px', border: `1px solid ${borderLight}` }}>
+                      <div style={{ fontSize: '1.05rem', fontWeight: 800, color: textDark }}>{tc.total}</div>
+                      <div style={{ fontSize: '0.65rem', color: textMuted }}>Managers</div>
+                    </div>
+                    <div style={{ background: '#eff6ff', padding: '0.5rem 0.3rem', borderRadius: '8px', border: '1px solid #bfdbfe' }}>
+                      <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#2563eb' }}>{tc.activos}</div>
+                      <div style={{ fontSize: '0.65rem', color: '#2563eb' }}>Activos</div>
+                    </div>
+                    <div style={{ background: '#f0fdf4', padding: '0.5rem 0.3rem', borderRadius: '8px', border: '1px solid #bbf7d0' }}>
+                      <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#16a34a' }}>{tc.graduados}</div>
+                      <div style={{ fontSize: '0.65rem', color: '#16a34a' }}>Graduados</div>
+                    </div>
+                    <div style={{ background: '#fef2f2', padding: '0.5rem 0.3rem', borderRadius: '8px', border: '1px solid #fecaca' }}>
+                      <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#dc2626' }}>{tc.desertores}</div>
+                      <div style={{ fontSize: '0.65rem', color: '#dc2626' }}>Desertores</div>
+                    </div>
+                  </div>
+
+                  {tc.sedes.length > 0 && (
+                    <p style={{ margin: '0 0 0.6rem 0', fontSize: '0.8rem', color: textMuted }}>
+                      Sede(s): <strong style={{ color: textDark }}>{tc.sedes.join(', ')}</strong>
+                    </p>
+                  )}
+
+                  {tc.equipos.length > 0 && (
+                    <div style={{ fontSize: '0.78rem', marginBottom: '1rem' }}>
+                      <span style={{ color: textMuted, fontWeight: 600 }}>Equipos a cargo:</span>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem', marginTop: '0.3rem' }}>
+                        {tc.equipos.map(eq => (
+                          <span key={eq} style={{ background: '#f1f5f9', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.72rem', color: '#334155', fontWeight: 500 }}>
+                            {eq}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <p style={{ fontSize: '0.85rem', color: textMuted, margin: '0.5rem 0 1rem 0' }}>
+                  No se encontraron managers/capitanes asignados actualmente a este entrenador en el Centro de Managers.
+                </p>
+              )}
+
+              <button
+                onClick={() => { setFilterEntrenador(trainerCardModal); setActiveTab('directorio'); setCurrentPage(1); setTrainerCardModal(null); }}
+                style={{ width: '100%', padding: '0.65rem', borderRadius: '8px', border: 'none', background: '#7c3aed', color: '#fff', fontWeight: 700, cursor: 'pointer' }}
+              >
+                Ver Directorio de {trainerCardModal}
+              </button>
+            </div>
+          </div>
+        );
+      })()}
+
     </div>
   );
 }
-
-
 
 ```
 
@@ -132803,11 +147577,13 @@ import { calculateAutomaticDeadline } from '../utils/soarDates';
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
 import VenueConfigModal from '../components/VenueConfigModal';
 import ViewModeSelector from '../components/ViewModeSelector';
-import GlobalSearch from '../components/GlobalSearch';
 import ThemeToggle from '../components/ThemeToggle';
 import { getVenueForTraining } from '../data/venuesData';
-import { ROLE_DISPLAY_NAMES } from '../data/usersData';
-import { canAssignTrainer } from '../config/permissions';
+import { ROLE_DISPLAY_NAMES, normalizeSede } from '../data/usersData';
+import { canAssignTrainer, canViewAllManagers, isDireccionRole, isGlobalQTCoordinator } from '../config/permissions';
+import { getAllCompanyUsers } from '../services/userService';
+import UserProfileModal from '../components/UserProfileModal';
+import { INITIAL_MANAGERS } from '../data/managersData';
 
 /**
  * Normaliza y verifica si un evento está asignado a un entrenador específico
@@ -132846,12 +147622,92 @@ const isTrainerMatchingUser = (evTrainer, user) => {
   return false;
 };
 
+// ============================================================================
+// BUSCADOR GLOBAL — Registro de módulos/páginas (28/08/2026)
+// ----------------------------------------------------------------------------
+// Refleja exactamente las mismas rutas y los mismos arrays de roles que ya
+// usan el menú "🛠️ Más Módulos y Herramientas" y la Barra Pro en este mismo
+// archivo (ver las secciones "MENÚ DESPLEGABLE DE MÁS MÓDULOS" y "BARRA PRO
+// COMPLETA" más abajo). Si se agrega, quita o re-permisiona un módulo ahí,
+// hay que actualizar también esta lista para que el buscador no muestre
+// accesos desactualizados o incorrectos.
+// ============================================================================
+const EXEC_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado'];
+const KPI_ROLES = ['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan'];
+const DIRECTORIO_QT_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'consolidado'];
+const CAMPUS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'consolidado'];
+const CENTRO_MANAGERS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'consolidado'];
+const MANUAL_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'consolidado'];
+const MANUAL_NODUS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'consolidado'];
+const REPORTES_VISIBLE = (u) => Boolean(
+  u?.isSuperAdmin || u?.isGerente ||
+  ['coord_c1', 'coord_maestria', 'capitan', 'qt', 'direccion', 'director_maestria', 'consolidado'].includes(u?.appRole)
+);
+
+const MODULE_REGISTRY = [
+  { id: 'gerencial', label: 'Causa OS Gerencial', emoji: '💼', route: '/gerente', roles: EXEC_ROLES },
+  { id: 'portafolio', label: 'Portafolio PMO (Planview)', emoji: '📈', route: '/portafolio', roles: EXEC_ROLES },
+  { id: 'estrategia', label: 'Estrategia OKRs (Cascade)', emoji: '🎯', route: '/estrategia', roles: EXEC_ROLES },
+  { id: 'auditoria-kpis', label: 'Auditoría de KPIs', emoji: '📉', route: '/auditoria-kpis', roles: EXEC_ROLES },
+  { id: 'acuerdos', label: 'Acuerdos Oficiales (Correo)', emoji: '✉️', route: '/acuerdos', roles: null },
+  { id: 'calendario-equipo', label: 'Agenda y Time Boxing', emoji: '🗓️', route: '/calendario-equipo', roles: null },
+  { id: 'learning', label: 'Inteligencia Colectiva (Learning)', emoji: '🧠', route: '/learning', roles: null },
+  { id: 'excelencia', label: 'Excelencia Operativa', emoji: '👑', route: '/excelencia', roles: null },
+  { id: 'mis-kpis', label: 'Mis KPIs', emoji: '📊', route: '/mis-kpis', roles: KPI_ROLES },
+  { id: 'directorio-qt', label: 'Directorio QT', emoji: '⚡', route: '/directorio-qt', roles: DIRECTORIO_QT_ROLES },
+  { id: 'superadmin', label: 'Centro de Mando', emoji: '🌐', route: '/superadmin', roles: EXEC_ROLES },
+  { id: 'calendario-global', label: 'Calendario Global Maestro', emoji: '📅', external: 'calendario-global', roles: null },
+  { id: 'campus', label: 'Campus Interactivo', emoji: '🎓', external: 'https://cpsl-campus-interactivo.vercel.app/ruta', roles: CAMPUS_ROLES },
+  { id: 'centro-managers', label: 'Centro de Managers', emoji: '🎯', route: '/centro-managers', roles: CENTRO_MANAGERS_ROLES },
+  { id: 'protocolo-emergencias', label: 'Protocolo de Emergencias', emoji: '🚨', route: '/protocolo-emergencias', roles: null },
+  { id: 'manual', label: 'Manual / Guía Causa OS / QT', emoji: '📘', route: '/manual', roles: MANUAL_ROLES },
+  { id: 'manual-nodus', label: 'Manual Práctico Nodus', emoji: '📗', route: '/manual-nodus', roles: MANUAL_NODUS_ROLES },
+  { id: 'checklist', label: 'Mi Checklist Operativo', emoji: '✅', route: (u) => `/checklist/${u?.appRole || 'capitan'}`, roles: null },
+  { id: 'metas', label: 'Mis Metas', emoji: '🏆', route: '/metas', roles: null },
+  { id: 'reportes', label: 'Enviar Reportes', emoji: '📤', route: '/reportes', roles: null, visible: REPORTES_VISIBLE },
+];
+
+const isModuleVisible = (mod, currentUser) => {
+  if (typeof mod.visible === 'function') return mod.visible(currentUser);
+  if (mod.roles === null) return true;
+  return (mod.roles || []).includes(currentUser?.appRole);
+};
+
+// ============================================================================
+// TAREAS QUE HAS ASIGNADO — cuenta regresiva (28/08/2026)
+// ----------------------------------------------------------------------------
+// Calcula el texto y color de la cuenta regresiva hasta la fecha límite de una
+// tarea, a partir de "now" (se le pasa el estado "time" que ya existe en Home
+// y se actualiza cada segundo, así que esto queda "vivo" sin agregar un
+// segundo intervalo). Los umbrales de color (3h / 24h / 72h) son una
+// RECOMENDACIÓN razonable, no algo que José haya especificado con números
+// exactos — se puede ajustar si prefiere otros cortes.
+// ============================================================================
+const getCountdownInfo = (deadlineIso, now) => {
+  if (!deadlineIso) return { label: 'Sin fecha límite', color: '#9ca3af', bg: 'rgba(156,163,175,0.12)', border: '#9ca3af', overdue: false };
+  const deadline = new Date(deadlineIso).getTime();
+  if (isNaN(deadline)) return { label: 'Fecha inválida', color: '#9ca3af', bg: 'rgba(156,163,175,0.12)', border: '#9ca3af', overdue: false };
+
+  const diffMs = deadline - now.getTime();
+  const absMs = Math.abs(diffMs);
+  const totalHours = Math.floor(absMs / 3600000);
+  const days = Math.floor(totalHours / 24);
+  const mins = Math.floor((absMs % 3600000) / 60000);
+  const timeStr = days > 0 ? `${days}d ${totalHours % 24}h` : (totalHours > 0 ? `${totalHours}h ${mins}m` : `${mins}m`);
+
+  if (diffMs <= 0) return { label: `⏰ VENCIDA hace ${timeStr}`, color: '#ffffff', bg: '#dc2626', border: '#7f1d1d', overdue: true };
+  if (diffMs < 3 * 3600000) return { label: `🔴 ${timeStr} restantes`, color: '#ffffff', bg: '#ef4444', border: '#b91c1c', overdue: false };
+  if (diffMs < 24 * 3600000) return { label: `🟠 ${timeStr} restantes`, color: '#ffffff', bg: '#f97316', border: '#c2410c', overdue: false };
+  if (diffMs < 72 * 3600000) return { label: `🟡 ${timeStr} restantes`, color: '#1a1300', bg: '#facc15', border: '#a16207', overdue: false };
+  return { label: `🟢 ${timeStr} restantes`, color: '#ffffff', bg: '#16a34a', border: '#166534', overdue: false };
+};
+
 export default function Home() {
   const { currentUser, logout, switchRole } = useAuth();
-  const { currentCycle, currentStage, events, loadingEvents, syncEventsToGoogle } = useCycles();
+  const { currentCycle, currentStage, events, loadingEvents } = useCycles();
   const { tasks: allTasks, loading: loadingTasks, syncTasksToGoogle, acceptCollaboration, rejectCollaboration } = useChecklist();
   const { showToast, viewMode, customModules } = useUI();
-  const { notifications, unreadCount, markAllAsRead, markAsRead } = useNotifications();
+  const { notifications, unreadCount, markAllAsRead } = useNotifications();
   const navigate = useNavigate();
 
   // Reloj local
@@ -132864,43 +147720,60 @@ export default function Home() {
   const [selectedTrainingFilter, setSelectedTrainingFilter] = useState('todos');
   const [searchQuery, setSearchQuery] = useState('');
   const [showTaskModal, setShowTaskModal] = useState(false);
+  const [taskBeingEdited, setTaskBeingEdited] = useState(null); // tarea a editar desde el panel "Tareas que has asignado"
+  const [tareasAsignadasFilter, setTareasAsignadasFilter] = useState('Activas'); // 'Activas' | 'Vencidas' | 'Cumplidas' | 'Todas'
   const [showVenueModal, setShowVenueModal] = useState(false);
-  const [syncingEvents, setSyncingEvents] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showToolsDropdown, setShowToolsDropdown] = useState(false);
   const toolsDropdownRef = useRef(null);
-  const notificationsRef = useRef(null);
 
-  // Cerrar dropdowns al hacer click fuera (incluye el panel de notificaciones,
-  // que antes no se cerraba solo — había que volver a clickear la campana)
+  // BUSCADOR GLOBAL (28/08/2026) — Personas + Páginas y módulos + Equipos/Capitanes
+  const [globalSearchTerm, setGlobalSearchTerm] = useState('');
+  const [showGlobalSearchResults, setShowGlobalSearchResults] = useState(false);
+  const globalSearchRef = useRef(null);
+  const [realUsersData, setRealUsersData] = useState([]);
+  const [usersLoading, setUsersLoading] = useState(true);
+  const [selectedSearchUser, setSelectedSearchUser] = useState(null);
+  const [showSearchUserModal, setShowSearchUserModal] = useState(false);
+
+  // Carga de personas para el buscador (misma fuente que Centro de Mando: getAllCompanyUsers())
+  useEffect(() => {
+    let isMounted = true;
+    async function fetchUsersForSearch() {
+      try {
+        const users = await getAllCompanyUsers();
+        if (isMounted) setRealUsersData(users);
+      } catch (err) {
+        console.error("Error cargando usuarios para el buscador global:", err);
+      } finally {
+        if (isMounted) setUsersLoading(false);
+      }
+    }
+    fetchUsersForSearch();
+    return () => { isMounted = false; };
+  }, []);
+
+  // Cerrar el buscador global al hacer click fuera
+  useEffect(() => {
+    function handleClickOutsideSearch(event) {
+      if (globalSearchRef.current && !globalSearchRef.current.contains(event.target)) {
+        setShowGlobalSearchResults(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutsideSearch);
+    return () => document.removeEventListener("mousedown", handleClickOutsideSearch);
+  }, []);
+
+  // Cerrar dropdown al hacer click fuera
   useEffect(() => {
     function handleClickOutside(event) {
       if (toolsDropdownRef.current && !toolsDropdownRef.current.contains(event.target)) {
         setShowToolsDropdown(false);
       }
-      if (notificationsRef.current && !notificationsRef.current.contains(event.target)) {
-        setShowNotifications(false);
-      }
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
-  // Texto relativo simple para el timestamp de cada notificación (created_at
-  // viene de Firestore como string ISO — ver NotificationContext.jsx).
-  const formatTimeAgo = (isoDate) => {
-    if (!isoDate) return '';
-    const diffMs = Date.now() - new Date(isoDate).getTime();
-    if (Number.isNaN(diffMs)) return '';
-    const minutes = Math.floor(diffMs / 60000);
-    if (minutes < 1) return 'ahora';
-    if (minutes < 60) return `hace ${minutes} min`;
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `hace ${hours} h`;
-    const days = Math.floor(hours / 24);
-    if (days < 7) return `hace ${days} d`;
-    return new Date(isoDate).toLocaleDateString('es', { day: '2-digit', month: 'short' });
-  };
 
   const handleAddEventToGoogle = async (ev, startDate, endDate) => {
     const token = sessionStorage.getItem('googleAccessToken');
@@ -132922,64 +147795,6 @@ export default function Home() {
       }
     } else {
       showToast(result.error || "Hubo un error al abrir el calendario.", "error");
-    }
-  };
-
-  // Sincronización masiva con Google Calendar (28/08/2026) — el equivalente,
-  // para el calendario, del botón "Sincronizar" que ya existe para las tareas
-  // (ChecklistBoard.jsx -> syncTasksToGoogle). Sincroniza los MISMOS eventos
-  // que se ven por defecto en "MI SEDE"/"MIS FECHAS" + "Próximos" — no lo que
-  // esté filtrado en pantalla en ese momento (igual que la sincronización de
-  // tareas, que sincroniza todas las pendientes, no solo las que se ven).
-  const handleSyncAllEventsToGoogle = async () => {
-    const token = sessionStorage.getItem('googleAccessToken');
-    if (!token) {
-      showToast("No se encontró sesión con permisos de Google. Por favor, cierra sesión y vuelve a entrar.", "error");
-      return;
-    }
-
-    const isEntrenador = ['entrenador', 'entrenador_llamadas'].includes(currentUser?.appRole);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const now = today.getTime();
-
-    const myUpcomingEvents = (events || []).filter(ev => {
-      if (isEntrenador) {
-        if (!isTrainerMatchingUser(ev.trainer || ev.entrenador, currentUser)) return false;
-      } else {
-        const userSede = currentUser?.sede || '';
-        if (userSede && !userSede.toLowerCase().includes('global')) {
-          const evSede = ev.sede || ev.sedeTag || '';
-          const matchesSede = evSede.toLowerCase().includes(userSede.toLowerCase()) || userSede.toLowerCase().includes(evSede.toLowerCase());
-          if (!matchesSede) return false;
-        }
-      }
-      const evDate = new Date(ev.fecha_inicio || ev.start || new Date());
-      evDate.setHours(0, 0, 0, 0);
-      return evDate.getTime() >= now;
-    });
-
-    if (myUpcomingEvents.length === 0) {
-      showToast("No tienes próximos eventos para sincronizar.", "info");
-      return;
-    }
-
-    setSyncingEvents(true);
-    const result = await syncEventsToGoogle(myUpcomingEvents, currentUser?.email);
-    setSyncingEvents(false);
-
-    if (!result.success && result.error === 'no_token') {
-      showToast("No se encontró sesión con permisos de Google. Por favor, cierra sesión y vuelve a entrar.", "error");
-      return;
-    }
-
-    const { syncedCount, skippedCount, totalCount, failed } = result;
-    if (syncedCount === 0 && skippedCount === totalCount) {
-      showToast("Tus próximos eventos ya estaban sincronizados con Google Calendar.", "info");
-    } else if (failed && failed.length > 0) {
-      showToast(`Sincronizados ${syncedCount} de ${totalCount} eventos. ${failed.length} fallaron — intenta de nuevo más tarde.`, "error");
-    } else {
-      showToast(`¡${syncedCount} evento(s) sincronizados con tu Google Calendar!${skippedCount > 0 ? ` (${skippedCount} ya estaban al día)` : ''}`, "success");
     }
   };
 
@@ -133031,6 +147846,131 @@ export default function Home() {
     return valB - valA;
   });
 
+  // ==========================================================================
+  // BUSCADOR GLOBAL — lógica de resultados (28/08/2026)
+  // --------------------------------------------------------------------------
+  // DATO FALTANTE / INFERENCIA (declarado explícitamente por REGLA ABSOLUTA):
+  // Causa OS no tenía, antes de este cambio, un módulo de "buscador global"
+  // documentado con reglas de visibilidad propias, así que el alcance de
+  // "Personas" y "Equipos/Capitanes" aquí se apoya en el mismo criterio ya
+  // usado en otras pantallas de la app (canViewAllManagers/isDireccionRole =
+  // ver TODO; el resto = solo su propia sede + registros marcados como
+  // Sede Global). Si esto no es lo que José quiere, hay que ajustarlo.
+  // "Páginas y módulos" sí es un HECHO: son exactamente las mismas rutas y
+  // los mismos arrays de roles que ya usa el menú "Más Módulos y Herramientas"
+  // de este archivo.
+  // ==========================================================================
+  const canSeeGlobalDirectory = Boolean(
+    currentUser?.isSuperAdmin ||
+    currentUser?.isDireccion ||
+    isDireccionRole(currentUser?.appRole) ||
+    canViewAllManagers(currentUser)
+  );
+  const currentUserSedeNorm = normalizeSede(currentUser?.sede);
+  const globalSearchQ = globalSearchTerm.trim().toLowerCase();
+  const globalSearchActive = globalSearchQ.length >= 2;
+
+  const globalSearchPeopleResults = !globalSearchActive ? [] : (realUsersData || [])
+    .filter(u => {
+      if (canSeeGlobalDirectory) return true;
+      const uSede = normalizeSede(u.sede);
+      return uSede === currentUserSedeNorm || uSede === 'Sede Global' || isGlobalQTCoordinator({ email: u.email });
+    })
+    .filter(u => {
+      const name = (u.name || u.displayName || '').toLowerCase();
+      const email = (u.email || '').toLowerCase();
+      const role = (ROLE_DISPLAY_NAMES[u.role] || u.role || '').toLowerCase();
+      const sede = (u.sede || '').toLowerCase();
+      return name.includes(globalSearchQ) || email.includes(globalSearchQ) || role.includes(globalSearchQ) || sede.includes(globalSearchQ);
+    })
+    .slice(0, 8);
+
+  const globalSearchModuleResults = !globalSearchActive ? [] : MODULE_REGISTRY
+    .filter(mod => isModuleVisible(mod, currentUser))
+    .filter(mod => mod.label.toLowerCase().includes(globalSearchQ))
+    .slice(0, 8);
+
+  const globalSearchTeamResults = (() => {
+    if (!globalSearchActive) return [];
+    const seenTeams = new Map();
+    const capitanHits = [];
+    INITIAL_MANAGERS.forEach(m => {
+      const mSede = normalizeSede(m.sede);
+      if (!canSeeGlobalDirectory && mSede !== currentUserSedeNorm && mSede !== 'Sede Global') return;
+
+      if (m.equipo) {
+        const key = `${mSede}_${m.equipo}`;
+        const teamStr = `${m.equipo} ${m.numEquipo || ''} ${mSede} ${m.entrenador || ''}`.toLowerCase();
+        if (!seenTeams.has(key) && teamStr.includes(globalSearchQ)) {
+          seenTeams.set(key, { type: 'equipo', key, equipo: m.equipo, sede: mSede });
+        }
+      }
+
+      const rol = (m.rol || '').toLowerCase();
+      if (rol.includes('capitan') && (m.nombre || '').toLowerCase().includes(globalSearchQ)) {
+        capitanHits.push({ type: 'capitan', key: `cap_${m.id}`, id: m.id, nombre: m.nombre, equipo: m.equipo, sede: mSede });
+      }
+    });
+    return [...Array.from(seenTeams.values()).slice(0, 5), ...capitanHits.slice(0, 5)];
+  })();
+
+  const handleSelectSearchPerson = (u) => {
+    setSelectedSearchUser(u);
+    setShowSearchUserModal(true);
+    setShowGlobalSearchResults(false);
+    setGlobalSearchTerm('');
+  };
+
+  const handleSelectSearchModule = (mod) => {
+    setShowGlobalSearchResults(false);
+    setGlobalSearchTerm('');
+    if (mod.external === 'calendario-global') {
+      window.open('/calendario_global.html?v=' + Date.now() + '&email=' + encodeURIComponent(currentUser?.email || '') + '&name=' + encodeURIComponent(currentUser?.displayName || currentUser?.name || ''), '_blank');
+    } else if (mod.external) {
+      window.open(mod.external, '_blank');
+    } else if (typeof mod.route === 'function') {
+      navigate(mod.route(currentUser));
+    } else if (mod.route) {
+      navigate(mod.route);
+    }
+  };
+
+  const handleSelectSearchTeam = (item) => {
+    setShowGlobalSearchResults(false);
+    setGlobalSearchTerm('');
+    if (item.type === 'equipo') {
+      navigate(`/centro-managers?tab=grupales&q=${encodeURIComponent(item.equipo)}&sede=${encodeURIComponent(item.sede)}`);
+    } else {
+      navigate(`/centro-managers?tab=directorio&q=${encodeURIComponent(item.nombre)}&sede=${encodeURIComponent(item.sede)}`);
+    }
+  };
+
+  // ==========================================================================
+  // TAREAS QUE HAS ASIGNADO A OTROS (28/08/2026)
+  // --------------------------------------------------------------------------
+  // "tasks" (allTasks) ya trae TODA la colección "tasks" de Firestore sin
+  // filtrar (ChecklistContext hace onSnapshot sobre la colección completa),
+  // así que no hace falta una consulta nueva: solo filtramos por
+  // createdBy === mi correo. INFERENCIA sobre el alcance pedido ("todos los
+  // usuarios pueden ver las tareas que han asignado a otros"): se interpretó
+  // como "cada usuario ve las tareas QUE ÉL MISMO asignó", no un tablero
+  // global de todas las asignaciones de todos — si José quería lo segundo,
+  // hay que ajustarlo.
+  const userDisplayNameByEmail = {};
+  (realUsersData || []).forEach(u => {
+    if (u.email) userDisplayNameByEmail[u.email.toLowerCase().trim()] = u.name || u.displayName || u.email;
+  });
+  const resolveAssigneeName = (email) => userDisplayNameByEmail[(email || '').toLowerCase().trim()] || email;
+
+  const tareasQueHeAsignado = (allTasks || [])
+    .filter(t => (t.createdBy || '').toLowerCase().trim() === userEmail && userEmail)
+    .slice()
+    .sort((a, b) => {
+      const da = a.deadline ? new Date(a.deadline).getTime() : Infinity;
+      const dbTime = b.deadline ? new Date(b.deadline).getTime() : Infinity;
+      return da - dbTime;
+    });
+
   return (
     <div style={{ maxWidth: viewMode === 'lite' ? '780px' : '960px', margin: '0 auto', padding: viewMode === 'lite' ? '1.5rem 1rem' : '2rem 1rem' }}>
       
@@ -133081,12 +148021,9 @@ export default function Home() {
             <h1 className="text-blue" style={{ margin: 0, fontSize: viewMode === 'lite' ? '2.5rem' : '3rem', fontWeight: '900', letterSpacing: '-1px', textShadow: '0 0 20px rgba(100, 255, 218, 0.3)' }}>
               Causa OS
             </h1>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
-              <h2 className="text-gold" style={{ margin: 0, fontSize: viewMode === 'lite' ? '1.5rem' : '1.8rem', fontWeight: '700', letterSpacing: '-0.5px' }}>
-                {time.getHours() < 12 ? 'Buenos días' : time.getHours() < 19 ? 'Buenas tardes' : 'Buenas noches'}, {currentUser?.displayName || currentUser?.name || 'Equipo'}
-              </h2>
-              <GlobalSearch />
-            </div>
+            <h2 className="text-gold" style={{ margin: 0, fontSize: viewMode === 'lite' ? '1.5rem' : '1.8rem', fontWeight: '700', letterSpacing: '-0.5px' }}>
+              {time.getHours() < 12 ? 'Buenos días' : time.getHours() < 19 ? 'Buenas tardes' : 'Buenas noches'}, {currentUser?.displayName || currentUser?.name || 'Equipo'}
+            </h2>
           </div>
           <p className="text-muted" style={{ margin: '0.8rem 0 0', textTransform: 'uppercase', fontSize: '0.85rem' }}>
             {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') ? 'MÚLTIPLES EQUIPOS (GLOBAL) • VISIÓN MÚLTIPLES SEDES' : (currentCycle ? `${currentCycle.name} • ETAPA: ${currentStage}` : 'CARGANDO CICLO...')}
@@ -133136,6 +148073,93 @@ export default function Home() {
             </div>
           </div>
 
+          {/* BUSCADOR GLOBAL (Personas + Páginas y módulos + Equipos/Capitanes) */}
+          <div ref={globalSearchRef} style={{ position: 'relative', width: '100%', maxWidth: '280px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-strong)', borderRadius: '8px', padding: '0.4rem 0.6rem' }}>
+              <Search size={15} className="text-muted" />
+              <input
+                type="text"
+                value={globalSearchTerm}
+                onChange={(e) => { setGlobalSearchTerm(e.target.value); setShowGlobalSearchResults(true); }}
+                onFocus={() => setShowGlobalSearchResults(true)}
+                placeholder="Buscar personas, páginas, equipos..."
+                style={{ flex: 1, minWidth: 0, background: 'transparent', border: 'none', outline: 'none', color: 'var(--text-main)', fontSize: '0.85rem' }}
+              />
+              {globalSearchTerm && (
+                <X size={14} className="text-muted" style={{ cursor: 'pointer', flexShrink: 0 }} onClick={() => { setGlobalSearchTerm(''); setShowGlobalSearchResults(false); }} />
+              )}
+            </div>
+
+            {showGlobalSearchResults && globalSearchActive && (
+              <div className="glass-panel" style={{ position: 'absolute', top: '110%', left: 0, right: 0, zIndex: 200, maxHeight: '420px', overflowY: 'auto', padding: '0.5rem', boxShadow: '0 10px 40px rgba(0,0,0,0.9)', border: '1px solid rgba(41, 171, 226, 0.3)', textAlign: 'left' }}>
+                {usersLoading && (
+                  <div className="text-muted" style={{ fontSize: '0.78rem', padding: '0.4rem' }}>Cargando personas...</div>
+                )}
+
+                {!usersLoading && globalSearchPeopleResults.length === 0 && globalSearchModuleResults.length === 0 && globalSearchTeamResults.length === 0 && (
+                  <div className="text-muted" style={{ fontSize: '0.8rem', padding: '0.5rem' }}>Sin resultados para "{globalSearchTerm}"</div>
+                )}
+
+                {globalSearchPeopleResults.length > 0 && (
+                  <div style={{ marginBottom: '0.5rem' }}>
+                    <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--crear-gold)', textTransform: 'uppercase', padding: '0.2rem 0.4rem' }}>Personas</div>
+                    {globalSearchPeopleResults.map((u, i) => (
+                      <button
+                        key={u.id || u.email || i}
+                        onClick={() => handleSelectSearchPerson(u)}
+                        style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', width: '100%', textAlign: 'left', padding: '0.45rem 0.5rem', background: 'transparent', border: 'none', borderRadius: '6px', cursor: 'pointer', color: 'var(--text-main)' }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(41,171,226,0.1)'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                      >
+                        <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>👤 {u.name || u.displayName || u.email}</span>
+                        <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{ROLE_DISPLAY_NAMES[u.role] || u.role || ''}{u.sede ? ` • ${u.sede}` : ''}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {globalSearchModuleResults.length > 0 && (
+                  <div style={{ marginBottom: '0.5rem' }}>
+                    <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--crear-cyan)', textTransform: 'uppercase', padding: '0.2rem 0.4rem' }}>Páginas y módulos</div>
+                    {globalSearchModuleResults.map(mod => (
+                      <button
+                        key={mod.id}
+                        onClick={() => handleSelectSearchModule(mod)}
+                        style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', width: '100%', textAlign: 'left', padding: '0.45rem 0.5rem', background: 'transparent', border: 'none', borderRadius: '6px', cursor: 'pointer', color: 'var(--text-main)', fontSize: '0.85rem' }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(41,171,226,0.1)'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                      >
+                        {mod.emoji} {mod.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {globalSearchTeamResults.length > 0 && (
+                  <div>
+                    <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#d97706', textTransform: 'uppercase', padding: '0.2rem 0.4rem' }}>Equipos y Capitanes (Centro de Managers)</div>
+                    {globalSearchTeamResults.map((item, i) => (
+                      <button
+                        key={item.key || i}
+                        onClick={() => handleSelectSearchTeam(item)}
+                        style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', width: '100%', textAlign: 'left', padding: '0.45rem 0.5rem', background: 'transparent', border: 'none', borderRadius: '6px', cursor: 'pointer', color: 'var(--text-main)' }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(217,119,6,0.1)'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                      >
+                        {item.type === 'equipo' ? (
+                          <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>👥 Equipo {item.equipo}</span>
+                        ) : (
+                          <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>🎖️ {item.nombre} (Capitán)</span>
+                        )}
+                        <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{item.sede}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
           <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
             <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <span style={{ fontSize: '0.9rem', fontWeight: 'bold', color: 'var(--text-main)' }}>{currentUser?.name || currentUser?.displayName || 'Usuario'}</span>
@@ -133181,141 +148205,30 @@ export default function Home() {
             )}
             
             {/* Notificaciones */}
-            <div style={{ position: 'relative' }} ref={notificationsRef}>
-              <button
-                type="button"
-                onClick={() => setShowNotifications(!showNotifications)}
-                title="Notificaciones"
-                className="btn-secondary hover-glow"
-                style={{
-                  width: '38px',
-                  height: '38px',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  position: 'relative',
-                  padding: 0,
-                  ...(showNotifications ? { borderColor: 'var(--crear-cyan)', boxShadow: '0 0 0 3px rgba(41, 171, 226, 0.15)' } : {})
-                }}
-              >
-                <Bell size={18} strokeWidth={2} />
+            <div style={{ position: 'relative' }}>
+              <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }} onClick={() => setShowNotifications(!showNotifications)}>
+                <Bell size={20} className="text-white" />
                 {unreadCount > 0 && (
-                  <span
-                    style={{
-                      position: 'absolute',
-                      top: '-3px',
-                      right: '-3px',
-                      background: 'linear-gradient(135deg, #ef4444, #dc2626)',
-                      color: '#fff',
-                      borderRadius: '50%',
-                      minWidth: '17px',
-                      height: '17px',
-                      padding: '0 3px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '0.62rem',
-                      fontWeight: 700,
-                      lineHeight: 1,
-                      border: '2px solid var(--bg-dark)',
-                      boxShadow: '0 2px 6px rgba(220, 38, 38, 0.5)',
-                      animation: 'notifPulse 2.2s ease-in-out infinite'
-                    }}
-                  >
-                    {unreadCount > 9 ? '9+' : unreadCount}
-                  </span>
-                )}
-              </button>
-
-              {showNotifications && (
-                <div
-                  className="glass-panel"
-                  style={{
-                    position: 'absolute',
-                    top: 'calc(100% + 10px)',
-                    right: 0,
-                    width: '340px',
-                    zIndex: 100,
-                    padding: 0,
-                    overflow: 'hidden',
-                    // NOTA (28/08/2026): .glass-panel en modo oscuro usa un fondo casi
-                    // transparente (rgba(255,255,255,0.03)) pensado para tarjetas grandes
-                    // sobre el fondo de la página — pero en un panel flotante ENCIMA de
-                    // otros botones y texto, esa transparencia dejaba ver todo lo de
-                    // atrás mezclado con el panel (confirmado con captura del usuario en
-                    // modo noche). Se fuerza un fondo sólido y coherente con el tema
-                    // (oscuro: azul marino sólido; claro: ya era blanco sólido por la
-                    // regla !important existente) para que el panel sea legible siempre.
-                    background: 'var(--bg-dark-alt)',
-                    boxShadow: '0 20px 50px -12px rgba(0,0,0,0.5), 0 0 0 1px var(--border-subtle)',
-                    animation: 'notifPanelIn 0.18s cubic-bezier(0.16, 1, 0.3, 1)'
-                  }}
-                >
-                  <div style={{
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                    padding: '0.9rem 1.1rem', borderBottom: '1px solid var(--border-subtle)'
-                  }}>
-                    <h4 style={{ margin: 0, color: 'var(--text-heading)', fontSize: '0.95rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <Bell size={15} style={{ color: 'var(--crear-gold)' }} /> Notificaciones
-                      {unreadCount > 0 && (
-                        <span style={{ fontSize: '0.68rem', fontWeight: 700, color: 'var(--crear-cyan)', background: 'rgba(41, 171, 226, 0.12)', borderRadius: '999px', padding: '1px 7px' }}>
-                          {unreadCount} sin leer
-                        </span>
-                      )}
-                    </h4>
-                    {unreadCount > 0 && (
-                      <button
-                        onClick={() => markAllAsRead()}
-                        style={{ background: 'transparent', border: 'none', color: 'var(--crear-cyan)', fontSize: '0.72rem', cursor: 'pointer', fontWeight: 600, padding: '2px 4px', borderRadius: '4px', transition: 'opacity 0.15s' }}
-                        onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
-                        onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
-                      >
-                        Marcar todo leído
-                      </button>
-                    )}
+                  <div style={{ position: 'absolute', top: '-4px', right: '-4px', background: 'var(--color-error)', color: 'white', borderRadius: '50%', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.68rem', fontWeight: 'bold' }}>
+                    {unreadCount}
                   </div>
-                  <div style={{ maxHeight: '360px', overflowY: 'auto' }}>
-                    {notifications?.length > 0 ? notifications.map((n, idx) => (
-                      <div
-                        key={n.id}
-                        onClick={() => !n.read && markAsRead && markAsRead(n.id)}
-                        style={{
-                          display: 'flex',
-                          gap: '0.6rem',
-                          padding: '0.85rem 1.1rem',
-                          cursor: n.read ? 'default' : 'pointer',
-                          background: n.read ? 'transparent' : 'rgba(41, 171, 226, 0.06)',
-                          borderBottom: idx < notifications.length - 1 ? '1px solid var(--border-subtle)' : 'none',
-                          transition: 'background 0.15s'
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.background = n.read ? 'var(--bg-card-hover)' : 'rgba(41, 171, 226, 0.12)'}
-                        onMouseLeave={(e) => e.currentTarget.style.background = n.read ? 'transparent' : 'rgba(41, 171, 226, 0.06)'}
-                      >
-                        <span style={{
-                          marginTop: '5px', width: '7px', height: '7px', borderRadius: '50%', flexShrink: 0,
-                          background: n.read ? 'transparent' : 'var(--crear-cyan)',
-                          boxShadow: n.read ? 'none' : '0 0 6px var(--crear-cyan)'
-                        }} />
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '0.5rem' }}>
-                            <strong style={{ color: n.read ? 'var(--text-muted)' : 'var(--text-heading)', fontSize: '0.83rem', fontWeight: 600 }}>
-                              {n.title || 'Alerta'}
-                            </strong>
-                            <span style={{ color: 'var(--text-muted)', fontSize: '0.68rem', flexShrink: 0 }}>
-                              {formatTimeAgo(n.created_at)}
-                            </span>
-                          </div>
-                          <p style={{ margin: '0.15rem 0 0', color: 'var(--text-muted)', fontSize: '0.78rem', lineHeight: '1.45' }}>
-                            {n.message}
-                          </p>
-                        </div>
+                )}
+              </div>
+              
+              {showNotifications && (
+                <div className="glass-panel" style={{ position: 'absolute', top: '125%', right: 0, width: '320px', zIndex: 100, padding: '1rem', boxShadow: '0 10px 40px rgba(0,0,0,0.8)', border: '1px solid rgba(41, 171, 226, 0.3)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.5rem' }}>
+                    <h4 style={{ margin: 0, color: 'var(--crear-gold)' }}>🔔 Notificaciones</h4>
+                    <button onClick={() => { markAllAsRead(); setShowNotifications(false); }} style={{ background: 'transparent', border: 'none', color: 'var(--crear-cyan)', fontSize: '0.75rem', cursor: 'pointer', fontWeight: 'bold' }}>Marcar leídas</button>
+                  </div>
+                  <div style={{ maxHeight: '350px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.8rem', paddingRight: '0.5rem' }}>
+                    {notifications?.length > 0 ? notifications.map(n => (
+                      <div key={n.id} style={{ fontSize: '0.8rem', padding: '0.75rem', background: n.read ? 'rgba(0,0,0,0.4)' : 'rgba(41, 171, 226, 0.15)', borderRadius: '8px', borderLeft: n.read ? 'none' : '3px solid var(--crear-cyan)' }}>
+                        <strong style={{ color: n.read ? 'var(--text-muted)' : '#ffffff', display: 'block', marginBottom: '0.2rem' }}>{n.title || 'Alerta'}</strong>
+                        <p style={{ margin: 0, color: 'var(--text-main)', lineHeight: '1.4' }}>{n.message}</p>
                       </div>
                     )) : (
-                      <div style={{ textAlign: 'center', padding: '2.2rem 1rem' }}>
-                        <Bell size={26} style={{ color: 'var(--text-muted)', opacity: 0.4, marginBottom: '0.5rem' }} />
-                        <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem', margin: 0 }}>No tienes notificaciones recientes.</p>
-                      </div>
+                      <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', margin: '1rem 0' }}>No tienes notificaciones recientes.</p>
                     )}
                   </div>
                 </div>
@@ -133381,9 +148294,6 @@ export default function Home() {
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '0.4rem',
-                // Mismo fondo sólido que el panel de notificaciones (28/08/2026): este
-                // dropdown tenía el mismo riesgo de transparencia excesiva en modo oscuro.
-                background: 'var(--bg-dark-alt)',
                 boxShadow: '0 10px 40px rgba(0,0,0,0.9)',
                 border: '1px solid rgba(41, 171, 226, 0.3)'
               }}>
@@ -133461,6 +148371,16 @@ export default function Home() {
                       👥
                     </button>
                   </div>
+                )}
+
+                {/* Calendario de Maestría del Juego (29/08/2026): mismo criterio de
+                    acceso que Centro de Managers, sin entrenadores/entrenador_llamadas
+                    (la edición es de CMJ/gerencia; los entrenadores no gestionan el
+                    calendario oficial del equipo). */}
+                {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'director_maestria', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+                  <button onClick={() => { setShowToolsDropdown(false); navigate('/calendario-mj'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#1a75bc', background: 'rgba(26, 117, 188, 0.1)' }}>
+                    📅 Calendario de Maestría del Juego
+                  </button>
                 )}
 
                 <button onClick={() => { setShowToolsDropdown(false); navigate('/protocolo-emergencias'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.4)', background: 'rgba(239, 68, 68, 0.1)', fontWeight: 'bold' }}>
@@ -133551,6 +148471,17 @@ export default function Home() {
           {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
             <button onClick={() => navigate('/centro-managers')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#000', fontWeight: 'bold', border: 'none' }}>
               👑 Centro Managers
+            </button>
+          )}
+
+          {/* Calendario de Maestría del Juego (31/08/2026): esta es la barra "Pro"
+              que realmente ve José (barra de botones siempre visible), distinta
+              del dropdown "Herramientas" donde se había agregado el acceso
+              antes — por eso no aparecía. Mismo criterio de roles que Centro
+              Managers, sin entrenadores (la edición es de CMJ/gerencia). */}
+          {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'director_maestria', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+            <button onClick={() => navigate('/calendario-mj')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #1a75bc, #29abe2)', color: 'white', border: 'none' }}>
+              📅 Calendario MJ
             </button>
           )}
         </div>
@@ -133769,19 +148700,8 @@ export default function Home() {
                   <CalendarIcon size={18} /> EVENTOS Y ENTRENAMIENTOS
                 </h3>
                 <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', flexWrap: 'wrap' }}>
-                  <button
-                    type="button"
-                    disabled={syncingEvents}
-                    onClick={handleSyncAllEventsToGoogle}
-                    style={{ background: 'rgba(66, 133, 244, 0.1)', border: '1px solid rgba(66, 133, 244, 0.4)', color: '#4285F4', padding: '0.25rem 0.6rem', borderRadius: '4px', fontSize: '0.78rem', cursor: syncingEvents ? 'wait' : 'pointer', opacity: syncingEvents ? 0.6 : 1, display: 'flex', alignItems: 'center', gap: '0.35rem', fontWeight: 'bold' }}
-                    title="Sincronizar tus próximos eventos con Google Calendar"
-                  >
-                    <CalendarPlus size={13} /> {syncingEvents ? 'Sincronizando…' : 'Sincronizar'}
-                  </button>
-                  {/* CONTEXTO (28/08/2026): la auditoría de roles pidió que solo Dirección/Gerencia
-                      vean "Hoteles Sede" — 'qt' estaba incluido aquí sin que la matriz lo pidiera. */}
-                  {(currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.isGerente || ['gerente', 'direccion', 'director_maestria', 'consolidado'].includes(currentUser?.appRole)) && (
-                    <button
+                  {(currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.isGerente || ['gerente', 'direccion', 'director_maestria', 'qt', 'consolidado'].includes(currentUser?.appRole)) && (
+                    <button 
                       type="button"
                       onClick={() => setShowVenueModal(true)}
                       className="btn-secondary"
@@ -134052,6 +148972,107 @@ export default function Home() {
             </div>
           )}
 
+          {/* PANEL: TAREAS QUE HAS ASIGNADO A OTROS (con cuenta regresiva) */}
+          {tareasQueHeAsignado.length > 0 && (() => {
+            // Clasificación para las pestañas de filtro (Activas/Vencidas/Cumplidas/Todas).
+            const clasificadas = tareasQueHeAsignado.map(task => {
+              const isDone = task.completed || task.status === 'Completada';
+              const isOverdue = !isDone && getCountdownInfo(task.deadline, time).overdue;
+              return { task, isDone, isOverdue };
+            });
+            const counts = {
+              Activas: clasificadas.filter(c => !c.isDone && !c.isOverdue).length,
+              Vencidas: clasificadas.filter(c => c.isOverdue).length,
+              Cumplidas: clasificadas.filter(c => c.isDone).length,
+              Todas: clasificadas.length
+            };
+            const visibles = clasificadas.filter(c => {
+              if (tareasAsignadasFilter === 'Activas') return !c.isDone && !c.isOverdue;
+              if (tareasAsignadasFilter === 'Vencidas') return c.isOverdue;
+              if (tareasAsignadasFilter === 'Cumplidas') return c.isDone;
+              return true; // Todas
+            });
+
+            return (
+            <div className="glass-panel" style={{ padding: '1.2rem', marginBottom: '2rem' }}>
+              <h3 className="text-blue" style={{ marginTop: 0, borderBottom: '1px solid rgba(0,212,255,0.2)', paddingBottom: '0.4rem', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                📋 TAREAS QUE HAS ASIGNADO ({tareasQueHeAsignado.length})
+              </h3>
+              <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginTop: '0.8rem' }}>
+                {['Activas', 'Vencidas', 'Cumplidas', 'Todas'].map(f => (
+                  <button
+                    key={f}
+                    onClick={() => setTareasAsignadasFilter(f)}
+                    style={{
+                      padding: '0.3rem 0.75rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700,
+                      border: `1px solid ${tareasAsignadasFilter === f ? 'var(--crear-cyan)' : 'var(--border-subtle)'}`,
+                      background: tareasAsignadasFilter === f ? 'rgba(41, 171, 226, 0.18)' : 'transparent',
+                      color: tareasAsignadasFilter === f ? 'var(--crear-cyan)' : 'var(--text-muted)',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {f} ({counts[f]})
+                  </button>
+                ))}
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.8rem', maxHeight: '360px', overflowY: 'auto' }}>
+                {visibles.length === 0 && (
+                  <p className="text-muted" style={{ fontSize: '0.82rem', padding: '0.5rem 0' }}>No hay tareas en "{tareasAsignadasFilter}".</p>
+                )}
+                {visibles.map(({ task, isDone }) => {
+                  const countdown = getCountdownInfo(task.deadline, time);
+                  const emails = task.assignedToEmails && task.assignedToEmails.length > 0
+                    ? task.assignedToEmails
+                    : (task.assignedToEmail ? [task.assignedToEmail] : []);
+                  const asignadosLabel = emails.length > 0 ? emails.map(resolveAssigneeName).join(', ') : 'Cualquiera en el rol';
+
+                  return (
+                    <div
+                      key={task.id}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap',
+                        padding: '0.65rem 0.8rem', borderRadius: '8px',
+                        background: isDone ? 'rgba(52, 168, 83, 0.08)' : 'rgba(255,255,255,0.03)',
+                        border: `1px solid ${isDone ? 'rgba(52, 168, 83, 0.25)' : 'var(--border-subtle)'}`
+                      }}
+                    >
+                      <div style={{ flex: 1, minWidth: '160px' }}>
+                        <span className="text-white" style={{ fontSize: '0.85rem', fontWeight: 600, display: 'block' }}>
+                          {isDone ? '✅ ' : ''}{task.task || task.title}
+                        </span>
+                        <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                          👤 Asignada a: {asignadosLabel}
+                        </span>
+                      </div>
+                      {!isDone && (
+                        <span style={{
+                          fontSize: '0.88rem', fontWeight: 800, padding: '0.42rem 0.9rem', borderRadius: '20px',
+                          color: countdown.color, background: countdown.bg, border: `2px solid ${countdown.border}`,
+                          whiteSpace: 'nowrap', letterSpacing: '0.02em',
+                          boxShadow: '0 1px 4px rgba(0,0,0,0.25)'
+                        }}>
+                          {countdown.label}
+                        </span>
+                      )}
+                      <button
+                        onClick={() => { setTaskBeingEdited(task); setShowTaskModal(true); }}
+                        title="Editar tarea"
+                        style={{
+                          background: 'rgba(41, 171, 226, 0.12)', border: '1px solid rgba(41, 171, 226, 0.4)',
+                          borderRadius: '6px', padding: '0.3rem 0.6rem', fontSize: '0.72rem', fontWeight: 700,
+                          color: 'var(--crear-cyan)', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0
+                        }}
+                      >
+                        ✏️ Editar
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            );
+          })()}
+
           {/* BOTONES INFERIORES */}
           {(viewMode === 'compact' || customModules.shortcuts !== false) && (
             <div style={{ display: 'flex', justifyContent: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
@@ -134076,10 +149097,19 @@ export default function Home() {
       )}
 
       {/* MODAL ASIGNAR TAREA */}
-      <TaskAssignmentModal isOpen={showTaskModal} onClose={() => setShowTaskModal(false)} />
+      <TaskAssignmentModal
+        isOpen={showTaskModal}
+        onClose={() => { setShowTaskModal(false); setTaskBeingEdited(null); }}
+        taskToEdit={taskBeingEdited}
+      />
 
       {/* MODAL CONFIGURACIÓN DE HOTELES Y SALONES */}
       <VenueConfigModal isOpen={showVenueModal} onClose={() => setShowVenueModal(false)} />
+
+      {/* MODAL DE PERFIL DE PERSONA (abierto desde el Buscador Global) */}
+      {showSearchUserModal && selectedSearchUser && (
+        <UserProfileModal isOpen={showSearchUserModal} onClose={() => setShowSearchUserModal(false)} user={selectedSearchUser} allTasks={allTasks} />
+      )}
     </div>
   );
 }
@@ -137815,7 +152845,7 @@ export default function StrategyBoard() {
 ## Archivo: src\pages\SuperAdminPanel.jsx
 
 ```javascript
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useChecklist } from '../context/ChecklistContext';
 import { useAuth } from '../context/AuthContext';
@@ -137968,7 +152998,9 @@ function PersonCard({ person, tasks, navigate, onSelectUser, onAssignTask, curre
         <div>
           <h4 style={{ margin: 0, fontSize: '0.95rem', color: 'var(--text-heading)' }}>{person.name}</h4>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '2px', flexWrap: 'wrap' }}>
-            {(person.roles && person.roles.length > 0 ? person.roles : [person.role]).map((r, i) => {                const rNorm = normalizeRole(r);                const rCol = ROLE_COLORS[rNorm] || '#6b7280';                const rLab = ROLE_LABELS[rNorm] || r;                return (                  <span key={r + i} style={{ fontSize: '0.78rem', color: rCol, fontWeight: 600 }}>                    {rLab}{i < (person.roles?.length || 1) - 1 ? ' • ' : ''}                  </span>                );              })}
+            <span style={{ fontSize: '0.78rem', color: roleColor, fontWeight: 600 }}>
+              {ROLE_LABELS[canonicalRole] || person.role}
+            </span>
             {person.sede && (
               <span style={{
                 fontSize: '0.72rem',
@@ -138197,18 +153229,7 @@ function SedeBlock({ sede, tasks, navigate, onSelectUser, onAssignTask, currentU
   });
 
   const sedePct = totalSedeTasks > 0 ? Math.round((totalSedeCompleted / totalSedeTasks) * 100) : 0;
-  const groupedMembers = members.reduce((acc, m) => {
-      const rolesToGroup = Array.isArray(m.roles) && m.roles.length > 0 ? m.roles : [m.role || 'otro'];
-      rolesToGroup.forEach(r => {
-        const k = normalizeRole(r);
-        if (!acc[k]) acc[k] = [];
-        // Evitar duplicados exactos si m.roles tiene roles que normalizan al mismo string
-        if (!acc[k].find(existing => existing.id === m.id || (existing.email && existing.email === m.email))) {
-          acc[k].push(m);
-        }
-      });
-      return acc;
-    }, {});
+  const groupedMembers = members.reduce((acc, m) => { const k = normalizeRole(m.role || 'otro'); if (!acc[k]) acc[k] = []; acc[k].push(m); return acc; }, {});
   return (
     <div className="glass-panel" style={{ padding: '1.5rem', border: '1px solid var(--border-subtle)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} onClick={() => setExpanded(!expanded)}>
@@ -138524,7 +153545,7 @@ function RoleView({ tasks, navigate, onSelectUser, onAssignTask, userConnections
   ];
 
   const listedRoleIds = new Set(roles.map(r => r.id));
-  const unlistedRoles = [...new Set((realUsersData || []).map(u => u.role).filter(r => r && !listedRoleIds.has(r) && !listedRoleIds.has(normalizeRole(r))))];
+  const unlistedRoles = [...new Set((realUsersData || []).map(u => u.role).filter(r => r && !listedRoleIds.has(r)))];
   const allDisplayRoles = [
     ...roles,
     ...unlistedRoles.map(r => ({ id: r, label: ROLE_LABELS[r] || r }))
@@ -138533,11 +153554,7 @@ function RoleView({ tasks, navigate, onSelectUser, onAssignTask, userConnections
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
       {allDisplayRoles.map(role => {
-        const members = (realUsersData || []).filter(u => {
-            const m1 = u.role === role.id || normalizeRole(u.role) === role.id;
-            const m2 = Array.isArray(u.roles) && u.roles.some(r => r === role.id || normalizeRole(r) === role.id);
-            return m1 || m2;
-          });
+        const members = (realUsersData || []).filter(u => u.role === role.id || normalizeRole(u.role) === role.id);
         if (members.length === 0) return null;
         const roleColor = ROLE_COLORS[role.id] || '#6b7280';
         return (
@@ -138684,16 +153701,7 @@ export default function SuperAdminPanel() {
     transition: 'all 0.2s',
   });
 
-  // CONTEXTO (28/08/2026): auditoría de roles encontró que este buscador ignoraba
-  // por completo la restricción "solo su sede" que sí aplica correctamente en la
-  // pestaña "Por Sede" (ver el filtro de ALL_SEDES más abajo) — un Gerente podía
-  // escribir el nombre de otra sede y ver personal que no le corresponde. Se usa
-  // la misma condición de rol global que ya protege esa pestaña.
-  const isGlobalViewRole = currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion' || currentUser?.appRole === 'director_maestria';
-  const searchableUsers = isGlobalViewRole
-    ? (realUsersData || [])
-    : (realUsersData || []).filter(u => normalizeSede(u.sede) === normalizeSede(currentUser?.sede));
-  const searchFilteredUsers = searchTerm.trim() ? searchableUsers.filter(u => {
+  const searchFilteredUsers = searchTerm.trim() ? (realUsersData || []).filter(u => {
     const term = searchTerm.toLowerCase().trim();
     const nameMatch = u.name?.toLowerCase().includes(term);
     const emailMatch = u.email?.toLowerCase().includes(term);
@@ -138870,9 +153878,6 @@ export default function SuperAdminPanel() {
     </div>
   );
 }
-
-
-
 
 ```
 
@@ -140868,7 +155873,7 @@ export async function enforceUserRolesAgent(firebaseUser, userDocId, currentRole
 ## Archivo: src\services\userService.js
 
 ```js
-// Servicio de Directorio y GestiÃ³n de Usuarios para ProducciÃ³n
+// Servicio de Directorio y Gestión de Usuarios para Producción
 import { db } from './firebase';
 import { doc, getDoc, setDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { usersData, normalizeRole } from '../data/usersData';
@@ -140934,28 +155939,28 @@ export async function getVerifiedUser(email) {
 }
 
 /**
- * Obtiene todos los usuarios de la compaÃ±Ã­a consultando los tres directorios oficiales de Firestore.
- * Esto reemplaza al archivo estÃ¡tico usersData.js
+ * Obtiene todos los usuarios de la compañía consultando los tres directorios oficiales de Firestore.
+ * Esto reemplaza al archivo estático usersData.js
  */
 export async function getAllCompanyUsers() {
   const allUsers = [];
 
-  // NOTA (26/08/2026): normalizamos (trim + minÃºsculas) todas las comparaciones de
-  // email para evitar duplicados por diferencias de mayÃºsculas/espacios entre
+  // NOTA (26/08/2026): normalizamos (trim + minúsculas) todas las comparaciones de
+  // email para evitar duplicados por diferencias de mayúsculas/espacios entre
   // "users", "qt_directory" y el registro local. No eliminamos registros sin email
-  // (docs "fantasma" de la colecciÃ³n "users") porque no hay forma segura de saber,
-  // sin ese dato, si corresponden o no a alguien ya listado â€” hacerlo arriesgarÃ­a
-  // ocultar a una persona real. Ver reporte de auditorÃ­a del 26/08/2026 para el
-  // detalle de por quÃ© pueden existir esos docs sin email.
+  // (docs "fantasma" de la colección "users") porque no hay forma segura de saber,
+  // sin ese dato, si corresponden o no a alguien ya listado — hacerlo arriesgaría
+  // ocultar a una persona real. Ver reporte de auditoría del 26/08/2026 para el
+  // detalle de por qué pueden existir esos docs sin email.
   const normEmail = (e) => (e || '').toString().trim().toLowerCase();
 
   // NOTA (27/08/2026): src/utils/userNormalizer.js (usado en el login, ver
-  // AuthContext.jsx) ya sabe que el correo de una persona puede venir en mÃ¡s de
-  // un nombre de campo â€” "email", "correo" (algunos docs viejos), "emails"[],
-  // "corporateEmail" o "personalEmail" â€” pero getAllCompanyUsers() no aplicaba
-  // esa misma lÃ³gica: solo miraba "email"/"emails". Eso significa que una
+  // AuthContext.jsx) ya sabe que el correo de una persona puede venir en más de
+  // un nombre de campo — "email", "correo" (algunos docs viejos), "emails"[],
+  // "corporateEmail" o "personalEmail" — pero getAllCompanyUsers() no aplicaba
+  // esa misma lógica: solo miraba "email"/"emails". Eso significa que una
   // persona con su correo guardado bajo "correo" o solo en "corporateEmail"
-  // aparecÃ­a en el Panel Super Admin SIN botÃ³n de Correo/Chat (y a veces como
+  // aparecía en el Panel Super Admin SIN botón de Correo/Chat (y a veces como
   // tarjeta duplicada, porque tampoco se detectaba como la misma persona al
   // fusionar). deriveEmail()/emailKeysOf() ahora reconocen esas variantes.
   const deriveEmail = (u) => normEmail(
@@ -140979,42 +155984,12 @@ export async function getAllCompanyUsers() {
 
   // Devuelve el registro con un campo "email" de nivel superior garantizado
   // (sin pisar uno que ya existiera), para que cualquier componente que solo
-  // lea person.email â€” como los botones de contacto del Panel Super Admin â€”
-  // lo encuentre sin importar en quÃ© campo llegÃ³ originalmente el dato.
-  const fixEncoding = (str) => {
-    if (!str || typeof str !== 'string' || !str.includes('Ã')) return str;
-    const map = {
-      'Ã¡': 'á', 'Ã©': 'é', 'Ã\xad': 'í', 'Ã³': 'ó', 'Ãº': 'ú', 'Ã±': 'ñ', 'Ã¼': 'ü',
-      'Ã ': 'Á', 'Ã‰': 'É', 'Ã\x8d': 'Í', 'Ã“': 'Ó', 'Ãš': 'Ú', 'Ã‘': 'Ñ', 'Ãœ': 'Ü'
-    };
-    let fixed = str;
-    for (let key in map) {
-      fixed = fixed.split(key).join(map[key]);
-    }
-    return fixed;
-  };
-
+  // lea person.email — como los botones de contacto del Panel Super Admin —
+  // lo encuentre sin importar en qué campo llegó originalmente el dato.
   const withCanonicalEmail = (raw) => {
-    if (raw.name) raw.name = fixEncoding(raw.name);
-    if (raw.nombre) raw.nombre = fixEncoding(raw.nombre);
-    if (raw.displayName) raw.displayName = fixEncoding(raw.displayName);
-
-    if (!raw.name) {
-      raw.name = raw.name || raw.nombre || raw.displayName || 'Sin Nombre';
-    }
     if (raw.email) return raw;
     const derived = deriveEmail(raw);
     return derived ? { ...raw, email: derived } : raw;
-  };
-
-  const findExistingIndexByName = (candidateName) => {
-    if (!candidateName) return -1;
-    const norm = candidateName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().replace(/\s+/g, ' ');
-    if (norm.length < 5) return -1;
-    return allUsers.findIndex(u => {
-      const uName = (u.name || u.nombre || u.displayName || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().replace(/\s+/g, ' ');
-      return uName === norm;
-    });
   };
 
   const findExistingIndex = (candidateKeys) => {
@@ -141029,19 +156004,18 @@ export async function getAllCompanyUsers() {
   };
 
   try {
-    // Los usuarios principales estÃ¡n en la colecciÃ³n "users".
-    // NOTA (27/08/2026): "users" puede tener mÃ¡s de un documento para la misma
+    // Los usuarios principales están en la colección "users".
+    // NOTA (27/08/2026): "users" puede tener más de un documento para la misma
     // persona (ej. un doc viejo con otro id y uno nuevo con el uid actual, ambos
-    // con el mismo correo) â€” eso causaba tarjetas duplicadas en el Panel Super
+    // con el mismo correo) — eso causaba tarjetas duplicadas en el Panel Super
     // Admin. Se fusionan por correo igual que ya se hace con qt_directory abajo,
-    // sin perder ningÃºn campo: el primer doc encontrado manda, y el duplicado
+    // sin perder ningún campo: el primer doc encontrado manda, y el duplicado
     // solo rellena los campos que al primero le falten.
     const usersSnap = await getDocs(collection(db, 'users'));
     usersSnap.forEach(docSnap => {
       const uData = docSnap.data();
       const candidateKeys = emailKeysOf(uData);
-      let existingIdx = candidateKeys.size > 0 ? findExistingIndex(candidateKeys) : -1;
-      if (existingIdx === -1) existingIdx = findExistingIndexByName(uData.name || uData.nombre || uData.displayName);
+      const existingIdx = candidateKeys.size > 0 ? findExistingIndex(candidateKeys) : -1;
       if (existingIdx !== -1) {
         allUsers[existingIdx] = withCanonicalEmail({ ...uData, ...allUsers[existingIdx] });
         return;
@@ -141051,21 +156025,24 @@ export async function getAllCompanyUsers() {
 
     // Agregar QT (y, cuando la persona ya existe como "users", rellenar sus campos
     // de contacto de QT en vez de descartarlos).
-    // NOTA (27/08/2026): antes, cuando una persona de qt_directory YA tenÃ­a un doc
-    // en "users" (findExistingIndex !== -1), este bloque simplemente no hacÃ­a nada
-    // con ella â€” el registro que quedaba listado era el de "users", que no trae
+    // NOTA (27/08/2026): antes, cuando una persona de qt_directory YA tenía un doc
+    // en "users" (findExistingIndex !== -1), este bloque simplemente no hacía nada
+    // con ella — el registro que quedaba listado era el de "users", que no trae
     // whatsapp/whatsappUrl/cleanPhone (esos campos solo los pobla qtSheetService.js
-    // sobre qt_directory). Eso dejaba sin botÃ³n de WhatsApp (y a veces sin correo,
-    // si "users" tampoco lo tenÃ­a) a QT que sÃ­ tienen esos datos en qt_directory.
-    // Ahora se rellenan esos campos en el registro existente, sin pisar ningÃºn dato
+    // sobre qt_directory). Eso dejaba sin botón de WhatsApp (y a veces sin correo,
+    // si "users" tampoco lo tenía) a QT que sí tienen esos datos en qt_directory.
+    // Ahora se rellenan esos campos en el registro existente, sin pisar ningún dato
     // que "users" ya tuviera.
     const qtSnap = await getDocs(collection(db, 'qt_directory'));
-    const CONTACT_FIELDS_FROM_QT = ['whatsapp', 'whatsappUrl', 'cleanPhone', 'phone', 'telefono', 'email', 'correo', 'corporateEmail', 'personalEmail'];
+    // (29/08/2026) Se agrega "cumpleanos" para la alerta de cumpleaños: el dato existe
+    // hoy en el directorio de QT (además del Directorio Global importado a "users"),
+    // así que se rellena igual que whatsapp/phone: solo si el registro existente
+    // todavía no tiene el campo, sin pisar un valor ya cargado.
+    const CONTACT_FIELDS_FROM_QT = ['whatsapp', 'whatsappUrl', 'cleanPhone', 'phone', 'telefono', 'email', 'correo', 'corporateEmail', 'personalEmail', 'cumpleanos'];
     qtSnap.forEach(docSnap => {
       const qtData = docSnap.data();
       const candidateKeys = emailKeysOf(qtData);
-      let existingIdx = candidateKeys.size > 0 ? findExistingIndex(candidateKeys) : -1;
-      if (existingIdx === -1) existingIdx = findExistingIndexByName(qtData.name || qtData.nombre || qtData.displayName);
+      const existingIdx = candidateKeys.size > 0 ? findExistingIndex(candidateKeys) : -1;
       if (existingIdx !== -1) {
         CONTACT_FIELDS_FROM_QT.forEach(f => {
           if (!allUsers[existingIdx][f] && qtData[f]) {
@@ -141088,22 +156065,16 @@ export async function getAllCompanyUsers() {
     console.error("Error fetching company users:", error);
   }
 
-  // Merge fallback con registro estÃ¡tico local para usuarios que aÃºn no estÃ¡n en Firestore
+  // Merge fallback con registro estático local para usuarios que aún no están en Firestore
   usersData.forEach(localUser => {
     const candidateKeys = emailKeysOf(localUser);
-    let existingIdx = candidateKeys.size > 0 ? findExistingIndex(candidateKeys) : -1;
-    if (existingIdx === -1) existingIdx = findExistingIndexByName(localUser.name);
-    if (existingIdx === -1) {
+    if (candidateKeys.size > 0 && findExistingIndex(candidateKeys) === -1) {
       allUsers.push(withCanonicalEmail({ ...localUser, id: localUser.id || localUser.email, source: 'local_registry' }));
     }
   });
 
   return allUsers;
 }
-
-
-
-
 
 ```
 

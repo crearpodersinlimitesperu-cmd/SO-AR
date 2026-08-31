@@ -1,4 +1,4 @@
-﻿import { getWhatsAppUrl } from '../utils/phoneUtils';
+import { getWhatsAppUrl } from '../utils/phoneUtils';
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -37,8 +37,6 @@ import {
   ShieldCheck, Lock, AlertTriangle, Target, ArrowUpDown, ArrowUp, ArrowDown
 } from 'lucide-react';
 import CMJDashboard from '../components/CMJDashboard';
-import UserProfileModal from '../components/UserProfileModal';
-import { getAllCompanyUsers } from '../services/userService';
 
 const SEDE_COLORS = {
   Quito: "#29abe2", Lima: "#ef4444", Guayaquil: "#f59e0b",
@@ -99,28 +97,6 @@ const isTrainerMatch = (mTrainer, targetTrainer) => {
 };
 
 export default function CentroManagers() {
-  const [directoryUsers, setDirectoryUsers] = useState([]);
-  const [selectedTrainerProfile, setSelectedTrainerProfile] = useState(null);
-
-  useEffect(() => {
-    getAllCompanyUsers().then(users => {
-      setDirectoryUsers(users);
-    }).catch(console.error);
-  }, []);
-
-  const handleTrainerClick = (trainerName) => {
-    if (!trainerName || trainerName === 'Sin Asignar') return;
-    const normSearch = trainerName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
-    const match = directoryUsers.find(u => {
-      const uName = (u.name || u.displayName || u.nombre || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
-      return uName === normSearch || uName.includes(normSearch) || normSearch.includes(uName);
-    });
-    if (match) {
-      setSelectedTrainerProfile(match);
-    } else {
-      setSelectedTrainerProfile({ name: trainerName, role: 'entrenador', roles: ['entrenador'], sede: 'Global' });
-    }
-  };
   const { currentUser } = useAuth();
   const { showToast } = useUI();
   const navigate = useNavigate();
@@ -128,6 +104,11 @@ export default function CentroManagers() {
 
   const queryParams = new URLSearchParams(location.search);
   const initialTab = queryParams.get('tab') || 'directorio';
+  // NOTA (28/08/2026): permite que el Buscador Global de Home.jsx traiga al
+  // usuario directo a un equipo/capitán/manager ya filtrado, vía
+  // /centro-managers?tab=grupales&q=<texto>&sede=<sede>
+  const initialSearchQuery = queryParams.get('q') || '';
+  const initialSedeQuery = queryParams.get('sede') || '';
 
   // Permisos avanzados
   const canViewAll = canViewAllManagers(currentUser);
@@ -220,8 +201,8 @@ export default function CentroManagers() {
 
   // UI State
   const [activeTab, setActiveTab] = useState(initialTab);
-  const [search, setSearch] = useState('');
-  const [filterSede, setFilterSede] = useState('');
+  const [search, setSearch] = useState(initialSearchQuery);
+  const [filterSede, setFilterSede] = useState(initialSedeQuery ? normalizeSede(initialSedeQuery) : '');
   const [statusFilter, setStatusFilter] = useState('Todos'); // 'Todos' | 'Activo' | 'Graduado' | 'Desertor'
 
   // Estadísticas por Entrenador (Tab: Entrenadores)
@@ -247,10 +228,6 @@ export default function CentroManagers() {
     if (email === 'andres.gomez@crearpsl.net') return 'Andres Gomez';
     if (email === 'leandro.brunis@crearpsl.net') return 'Leandro Brunis';
     if (email === 'carlos.brunis@crearpsl.net' || email === 'brunische66@gmail.com') return 'Carlos Brunis';
-    if (email === 'marylourdespat@gmail.com') return 'María De Lourdes Patiño Galarraga';
-    if (email === 'linid.valencia@crearpsl.net') return 'Linid Valencia';
-    if (email === 'marylourdespat@gmail.com') return 'Lourdes Patino';
-    if (email === 'marylourdespat@gmail.com') return 'Lourdes Patino';
 
     const userName = currentUser.name || currentUser.displayName || '';
     const cleanUser = userName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
@@ -318,6 +295,15 @@ export default function CentroManagers() {
   const [groupModal, setGroupModal] = useState(null);
   const [groupCallDate, setGroupCallDate] = useState(new Date().toISOString().split('T')[0]);
   const [groupCallAttendance, setGroupCallAttendance] = useState({}); // { managerId: boolean }
+
+  // CONTEXTO (28/08/2026): pedido de José — al hacer clic en el badge 🎓 de un
+  // entrenador (en la fila del Directorio o en la tarjeta de un Capitán) se debe
+  // abrir la "tarjeta" de esa persona con su resumen (equipos a cargo, efectividad
+  // de llamadas, activos/graduados/desertores) — el mismo cálculo que ya existía
+  // para la pestaña "Entrenadores", pero accesible desde cualquier vista sin tener
+  // que cambiar de pestaña. Solo guarda el NOMBRE del entrenador seleccionado; el
+  // resumen se recalcula al vuelo con getTrainerCardStats() más abajo.
+  const [trainerCardModal, setTrainerCardModal] = useState(null); // string | null (nombre del entrenador)
 
   const [currentPage, setCurrentPage] = useState(1);
   const PAGE_SIZE = 40;
@@ -614,6 +600,24 @@ export default function CentroManagers() {
     return list;
   }, [allTrainerNames, managers, search]);
 
+  // Mismo cálculo que trainersStats de arriba pero SIN el filtro de `search` y
+  // para un solo nombre — usado por el modal "tarjeta de la persona" que se abre
+  // al hacer clic en un badge 🎓 de entrenador desde cualquier vista.
+  const getTrainerCardStats = (trainerName) => {
+    if (!trainerName) return null;
+    const trainerManagers = managers.filter(m => isTrainerMatch(m.entrenador, trainerName));
+    const total = trainerManagers.length;
+    const activos = trainerManagers.filter(m => m.estado === 'Activo').length;
+    const graduados = trainerManagers.filter(m => m.estado === 'Graduado').length;
+    const desertores = trainerManagers.filter(m => m.estado === 'Desertor').length;
+    const equipos = [...new Set(trainerManagers.map(m => m.equipo).filter(Boolean))];
+    const sedes = [...new Set(trainerManagers.map(m => normalizeSede(m.sede)).filter(Boolean))];
+    const asistieron = trainerManagers.filter(m => m.llamadaAsistio === 'SI').length;
+    const noAsistieron = trainerManagers.filter(m => m.llamadaAsistio === 'NO').length;
+    const conLlamada = asistieron + noAsistieron;
+    const pctAsist = conLlamada > 0 ? Math.round((asistieron / conLlamada) * 100) : 0;
+    return { entrenador: trainerName, total, activos, graduados, desertores, equipos, sedes, asistieron, noAsistieron, conLlamada, pctAsist };
+  };
 
   const stats = useMemo(() => {
     const userSede = normalizeSede(currentUser?.sede);
@@ -1458,7 +1462,15 @@ export default function CentroManagers() {
                           {mTrainers.length > 0 && mTrainers[0] !== "" ? (
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem' }}>
                               {mTrainers.map(t => (
-                                <button key={t} onClick={() => handleTrainerClick(t)} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.2rem', background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', padding: '0.2rem 0.5rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}>🎓 {t}</button>
+                                <button
+                                  key={t}
+                                  type="button"
+                                  onClick={() => setTrainerCardModal(t)}
+                                  title={`Ver tarjeta de ${t}`}
+                                  style={{ display: 'inline-flex', alignItems: 'center', gap: '0.2rem', background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', padding: '0.2rem 0.5rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
+                                >
+                                  🎓 {t}
+                                </button>
                               ))}
                             </div>
                           ) : (
@@ -1682,9 +1694,15 @@ export default function CentroManagers() {
                             <span style={{ fontWeight: 600 }}>Coach(es):</span>
                             {t.entrenadoresArr.length > 0 ? (
                               t.entrenadoresArr.map(e => (
-                                <span key={e} style={{ background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', padding: '0.1rem 0.4rem', borderRadius: '4px', fontSize: '0.72rem', fontWeight: 700 }}>
+                                <button
+                                  key={e}
+                                  type="button"
+                                  onClick={() => setTrainerCardModal(e)}
+                                  title={`Ver tarjeta de ${e}`}
+                                  style={{ background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', padding: '0.1rem 0.4rem', borderRadius: '4px', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer' }}
+                                >
                                   🎓 {e}
-                                </span>
+                                </button>
                               ))
                             ) : (
                               <span style={{ color: '#94a3b8' }}>Sin Asignar</span>
@@ -1894,9 +1912,15 @@ export default function CentroManagers() {
                         <span style={{ color: textMuted, fontWeight: 600 }}>Entrenadores:</span>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem', marginTop: '0.3rem' }}>
                           {s.entrenadores.map(e => (
-                            <span key={e} style={{ background: '#eff6ff', color: '#1d4ed8', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.72rem', fontWeight: 600 }}>
+                            <button
+                              key={e}
+                              type="button"
+                              onClick={() => setTrainerCardModal(e)}
+                              title={`Ver tarjeta de ${e}`}
+                              style={{ background: '#eff6ff', color: '#1d4ed8', border: 'none', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.72rem', fontWeight: 600, cursor: 'pointer' }}
+                            >
                               🎓 {e}
-                            </span>
+                            </button>
                           ))}
                         </div>
                       </div>
@@ -2876,8 +2900,90 @@ export default function CentroManagers() {
         </div>
       )}
 
+      {/* TARJETA DE LA PERSONA (Entrenador) — se abre al hacer clic en cualquier
+          badge 🎓 de un entrenador (Directorio, Equipos o Sedes). Pedido de José
+          el 28/08/2026: "cuando de click aqui debe de abrir la tarjeta de la persona". */}
+      {trainerCardModal && (() => {
+        const tc = getTrainerCardStats(trainerCardModal);
+        return (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(3px)', zIndex: 1200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }} onClick={() => setTrainerCardModal(null)}>
+            <div onClick={e => e.stopPropagation()} style={{ background: bgCard, width: '100%', maxWidth: '440px', borderRadius: '12px', padding: '1.8rem', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.15)', border: `1px solid ${borderLight}`, borderTop: '4px solid #7c3aed' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                <h2 style={{ margin: 0, color: textDark, fontSize: '1.2rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  🎓 {trainerCardModal}
+                </h2>
+                <button onClick={() => setTrainerCardModal(null)} title="Cerrar" style={{ background: '#f1f5f9', border: 'none', borderRadius: '6px', padding: '0.3rem', cursor: 'pointer', color: textMuted }}>
+                  <X size={16} />
+                </button>
+              </div>
+
+              {tc && tc.total > 0 ? (
+                <>
+                  <div style={{ margin: '0.5rem 0 1rem 0' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', marginBottom: '0.3rem' }}>
+                      <span style={{ color: textMuted }}>Efectividad de Llamadas:</span>
+                      <strong style={{ color: tc.pctAsist >= 70 ? '#16a34a' : '#d97706' }}>{tc.pctAsist}%</strong>
+                    </div>
+                    <div style={{ background: '#f1f5f9', height: '8px', borderRadius: '4px', overflow: 'hidden' }}>
+                      <div style={{ width: `${tc.pctAsist}%`, height: '100%', background: tc.pctAsist >= 70 ? '#10b981' : '#f59e0b', borderRadius: '4px' }} />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem', margin: '1rem 0', textAlign: 'center' }}>
+                    <div style={{ background: '#f8fafc', padding: '0.5rem 0.3rem', borderRadius: '8px', border: `1px solid ${borderLight}` }}>
+                      <div style={{ fontSize: '1.05rem', fontWeight: 800, color: textDark }}>{tc.total}</div>
+                      <div style={{ fontSize: '0.65rem', color: textMuted }}>Managers</div>
+                    </div>
+                    <div style={{ background: '#eff6ff', padding: '0.5rem 0.3rem', borderRadius: '8px', border: '1px solid #bfdbfe' }}>
+                      <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#2563eb' }}>{tc.activos}</div>
+                      <div style={{ fontSize: '0.65rem', color: '#2563eb' }}>Activos</div>
+                    </div>
+                    <div style={{ background: '#f0fdf4', padding: '0.5rem 0.3rem', borderRadius: '8px', border: '1px solid #bbf7d0' }}>
+                      <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#16a34a' }}>{tc.graduados}</div>
+                      <div style={{ fontSize: '0.65rem', color: '#16a34a' }}>Graduados</div>
+                    </div>
+                    <div style={{ background: '#fef2f2', padding: '0.5rem 0.3rem', borderRadius: '8px', border: '1px solid #fecaca' }}>
+                      <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#dc2626' }}>{tc.desertores}</div>
+                      <div style={{ fontSize: '0.65rem', color: '#dc2626' }}>Desertores</div>
+                    </div>
+                  </div>
+
+                  {tc.sedes.length > 0 && (
+                    <p style={{ margin: '0 0 0.6rem 0', fontSize: '0.8rem', color: textMuted }}>
+                      Sede(s): <strong style={{ color: textDark }}>{tc.sedes.join(', ')}</strong>
+                    </p>
+                  )}
+
+                  {tc.equipos.length > 0 && (
+                    <div style={{ fontSize: '0.78rem', marginBottom: '1rem' }}>
+                      <span style={{ color: textMuted, fontWeight: 600 }}>Equipos a cargo:</span>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem', marginTop: '0.3rem' }}>
+                        {tc.equipos.map(eq => (
+                          <span key={eq} style={{ background: '#f1f5f9', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.72rem', color: '#334155', fontWeight: 500 }}>
+                            {eq}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <p style={{ fontSize: '0.85rem', color: textMuted, margin: '0.5rem 0 1rem 0' }}>
+                  No se encontraron managers/capitanes asignados actualmente a este entrenador en el Centro de Managers.
+                </p>
+              )}
+
+              <button
+                onClick={() => { setFilterEntrenador(trainerCardModal); setActiveTab('directorio'); setCurrentPage(1); setTrainerCardModal(null); }}
+                style={{ width: '100%', padding: '0.65rem', borderRadius: '8px', border: 'none', background: '#7c3aed', color: '#fff', fontWeight: 700, cursor: 'pointer' }}
+              >
+                Ver Directorio de {trainerCardModal}
+              </button>
+            </div>
+          </div>
+        );
+      })()}
+
     </div>
   );
 }
-
-

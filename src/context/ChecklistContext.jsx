@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { db, auth } from '../services/firebase';
-import { collection, onSnapshot, doc, updateDoc, writeBatch, addDoc, query, where, orderBy, limit, getDocs, getDoc } from 'firebase/firestore';
+import { collection, onSnapshot, doc, updateDoc, setDoc, writeBatch, addDoc, query, where, orderBy, limit, getDocs, getDoc } from 'firebase/firestore';
 import { checklistData } from '../data/checklistData';
 import { usersData, normalizeRole } from '../data/usersData';
 import { isSuperAdminEmail, isGerenciaRole } from '../config/permissions';
@@ -12,21 +12,71 @@ import { useCycles } from './CyclesContext';
 
 const ChecklistContext = createContext();
 
+// Formatea una fecha límite ISO a texto legible en español, para los correos
+// de asignación de tarea (agregado 28/08/2026 a pedido de José, para que el
+// correo indique la fecha/hora límite y no solo que "se asignó una tarea").
+const formatDeadlineEs = (iso) => {
+  if (!iso) return 'Sin fecha límite definida';
+  try {
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return iso;
+    return d.toLocaleString('es-PE', { dateStyle: 'full', timeStyle: 'short' });
+  } catch (e) {
+    return iso;
+  }
+};
+
 export function ChecklistProvider({ children }) {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const { showToast, showPrompt } = useUI();
   const { currentUser } = useAuth();
-  // (28/08/2026) CORRECCIÓN: antes calculateAutomaticDeadline() se llamaba SIN el
-  // ciclo activo real, así que siempre usaba el único ciclo de ejemplo hardcodeado
-  // en src/data/cyclesData.js ("Equipo 30", fechas fijas) para TODOS los usuarios,
-  // sin importar su sede o equipo real. Eso hacía que los "Límite" mostrados en los
-  // checklists no correspondieran a las fechas reales del ciclo de cada sede — José
-  // lo reportó como "los horarios en los checklist no son coherentes con la tarea".
-  // Ahora se usa el ciclo real (currentCycle, calculado en CyclesContext.jsx a
-  // partir del calendario oficial en vivo) para que cada sede vea sus propias fechas.
+  // (28/08/2026, restaurado 29/08/2026) CORRECCIÓN: antes calculateAutomaticDeadline()
+  // se llamaba SIN el ciclo activo real, así que siempre usaba el único ciclo de
+  // ejemplo hardcodeado en src/data/cyclesData.js ("Equipo 30", fechas fijas) para
+  // TODOS los usuarios, sin importar su sede o equipo real. Eso hacía que los
+  // "Límite" mostrados en los checklists no correspondieran a las fechas reales del
+  // ciclo de cada sede — José lo reportó como "los horarios en los checklist no son
+  // coherentes con la tarea". Ahora se usa el ciclo real (currentCycle, calculado en
+  // CyclesContext.jsx a partir del calendario oficial en vivo) para que cada sede vea
+  // sus propias fechas.
   const cyclesCtx = useCycles();
   const currentCycle = cyclesCtx?.currentCycle || null;
+
+  // Escribe cambios en un documento de "tasks", creándolo primero si todavía no existe.
+  //
+  // CONTEXTO (29/08/2026): las tareas del catálogo base (checklistData.js) se muestran
+  // en pantalla y son clicables aunque nunca se haya creado su documento propio en
+  // Firestore — se fusionan del lado del cliente en el onSnapshot de arriba
+  // ("missingBaseTasks"), y solo quedan escritas de verdad si alguien corre
+  // initializeFirestore() o si esta función las crea al primer toque. updateDoc()
+  // exige que el documento YA exista; si no existe, las reglas de seguridad no pueden
+  // evaluar "resource" (es null) y Firestore lo rechaza como "permission-denied" —
+  // el mismo error que se ve como "revisa los permisos de Firestore", aunque la causa
+  // real no es un permiso mal configurado sino que el documento nunca se creó. Por eso
+  // se verifica primero si existe: si no, se crea con los datos base del catálogo (para
+  // que quede completo para cualquier otro que lo lea) + el cambio pedido; si ya existe,
+  // se actualiza normalmente sin tocar el resto de sus campos.
+  const writeTaskDoc = async (taskId, updates) => {
+    const taskRef = doc(db, 'tasks', taskId);
+    const snap = await getDoc(taskRef);
+    if (!snap.exists()) {
+      const baseTask = checklistData.find(t => t.id === taskId);
+      await setDoc(taskRef, {
+        ...(baseTask || {}),
+        id: taskId,
+        completed: false,
+        status: 'Pendiente',
+        priority: baseTask?.isCritical ? '🔴 ROJO' : '🟡 AMARILLO',
+        progressPercentage: 0,
+        deadline: baseTask ? calculateAutomaticDeadline(baseTask, currentCycle) : null,
+        created_at: new Date().toISOString(),
+        ...updates
+      });
+    } else {
+      await updateDoc(taskRef, updates);
+    }
+  };
 
   useEffect(() => {
     // Escuchar cambios en la colección "tasks" en tiempo real
@@ -119,11 +169,10 @@ export function ChecklistProvider({ children }) {
 
   const toggleTask = async (taskId, currentStatus) => {
     try {
-      const taskRef = doc(db, 'tasks', taskId);
       const userSede = currentUser?.sede?.trim() || 'Global';
-      
+
       // Update both legacy and map formats just in case it's a custom task
-      await updateDoc(taskRef, {
+      await writeTaskDoc(taskId, {
         completed: !currentStatus,
         status: !currentStatus ? 'Completada' : 'Pendiente',
         [`completions.${userSede}.completed`]: !currentStatus,
@@ -137,8 +186,7 @@ export function ChecklistProvider({ children }) {
 
   const updateTaskDetails = async (taskId, updates) => {
     try {
-      const taskRef = doc(db, 'tasks', taskId);
-      await updateDoc(taskRef, updates);
+      await writeTaskDoc(taskId, updates);
     } catch (error) {
       console.error("Error updating task details:", error);
       showToast("No se pudo actualizar la tarea.", "error");
@@ -191,6 +239,7 @@ export function ChecklistProvider({ children }) {
               html: `
                 <h2>Hola, se te ha asignado una nueva tarea en el SO-AR</h2>
                 <p><strong>Tarea:</strong> ${taskData.task || taskData.title}</p>
+                <p><strong>⏰ Fecha límite:</strong> ${formatDeadlineEs(taskData.deadline)}</p>
                 <p><strong>Sede:</strong> ${taskData.assignedSede || 'Global'}</p>
                 <p><strong>Prioridad:</strong> ${taskData.priority || 'Normal'}</p>
                 <p>Por favor, ingresa a la plataforma para revisarla y marcarla como completada cuando esté lista.</p>
@@ -221,20 +270,63 @@ export function ChecklistProvider({ children }) {
       const batch = writeBatch(db);
       batch.update(taskRef, updatedData);
 
-      // Calcular nuevos asignados (anti-spam)
+      // Calcular asignados: nuevos (recién agregados) vs los que ya estaban.
       const oldEmails = currentTask.assignedToEmails || (currentTask.assignedToEmail ? [currentTask.assignedToEmail] : []);
       const newEmails = updatedData.assignedToEmails || (updatedData.assignedToEmail ? [updatedData.assignedToEmail] : []);
-      
-      const newlyAddedEmails = newEmails.filter(email => !oldEmails.includes(email));
 
-      if (newlyAddedEmails.length > 0) {
-        newlyAddedEmails.forEach(email => {
+      const newlyAddedEmails = newEmails.filter(email => !oldEmails.includes(email));
+      const stillAssignedEmails = newEmails.filter(email => oldEmails.includes(email));
+
+      // "si o si notifique" (28/08/2026): antes, si editabas una tarea que
+      // YA tenía asignados (ej. le cambiabas la fecha límite o el título) sin
+      // agregar a nadie nuevo, esos asignados no se enteraban del cambio.
+      // Ahora, cualquier edición de un campo relevante (fecha límite, título,
+      // prioridad, sede) también notifica a quienes ya estaban asignados —
+      // no solo a los que se agregan de nuevo.
+      const relevantFieldChanged = ['deadline', 'task', 'title', 'priority', 'assignedSede'].some(
+        field => field in updatedData && updatedData[field] !== currentTask[field]
+      );
+
+      newlyAddedEmails.forEach(email => {
+        // 1. Notificación In-App
+        const notifRef = doc(collection(db, 'notifications'));
+        batch.set(notifRef, {
+          userId: email,
+          title: updatedData.task || currentTask.task,
+          message: `Se te ha asignado una tarea en la sede ${updatedData.assignedSede || currentTask.assignedSede || 'Global'}.`,
+          read: false,
+          taskId: taskId,
+          created_at: new Date().toISOString()
+        });
+
+        // 2. Notificación por Correo
+        const mailRef = doc(collection(db, 'mail'));
+        batch.set(mailRef, {
+          to: [email],
+          message: {
+            subject: `NUEVA TAREA ASIGNADA SO-AR: ${updatedData.task || currentTask.task}`,
+            html: `
+                <h2>Hola, se te ha asignado una tarea en el SO-AR</h2>
+                <p><strong>Tarea:</strong> ${updatedData.task || currentTask.task}</p>
+                <p><strong>⏰ Fecha límite:</strong> ${formatDeadlineEs(updatedData.deadline || currentTask.deadline)}</p>
+                <p><strong>Sede:</strong> ${updatedData.assignedSede || currentTask.assignedSede || 'Global'}</p>
+                <p><strong>Prioridad:</strong> ${updatedData.priority || currentTask.priority || 'Normal'}</p>
+                <p>Por favor, ingresa a la plataforma para revisarla.</p>
+                <br/>
+                <p><em>Equipo CREAR Poder Sin Límites</em></p>
+              `
+          }
+        });
+      });
+
+      if (relevantFieldChanged) {
+        stillAssignedEmails.forEach(email => {
           // 1. Notificación In-App
           const notifRef = doc(collection(db, 'notifications'));
           batch.set(notifRef, {
             userId: email,
             title: updatedData.task || currentTask.task,
-            message: `Se te ha asignado una tarea en la sede ${updatedData.assignedSede || currentTask.assignedSede || 'Global'}.`,
+            message: `Se actualizó una tarea que tenías asignada en la sede ${updatedData.assignedSede || currentTask.assignedSede || 'Global'}.`,
             read: false,
             taskId: taskId,
             created_at: new Date().toISOString()
@@ -245,13 +337,14 @@ export function ChecklistProvider({ children }) {
           batch.set(mailRef, {
             to: [email],
             message: {
-              subject: `NUEVA TAREA ASIGNADA SO-AR: ${updatedData.task || currentTask.task}`,
+              subject: `TAREA ACTUALIZADA SO-AR: ${updatedData.task || currentTask.task}`,
               html: `
-                <h2>Hola, se te ha asignado una tarea en el SO-AR</h2>
+                <h2>Hola, se actualizó una tarea que tienes asignada en el SO-AR</h2>
                 <p><strong>Tarea:</strong> ${updatedData.task || currentTask.task}</p>
+                <p><strong>⏰ Fecha límite:</strong> ${formatDeadlineEs(updatedData.deadline || currentTask.deadline)}</p>
                 <p><strong>Sede:</strong> ${updatedData.assignedSede || currentTask.assignedSede || 'Global'}</p>
                 <p><strong>Prioridad:</strong> ${updatedData.priority || currentTask.priority || 'Normal'}</p>
-                <p>Por favor, ingresa a la plataforma para revisarla.</p>
+                <p>Revisa los cambios en la plataforma.</p>
                 <br/>
                 <p><em>Equipo CREAR Poder Sin Límites</em></p>
               `
@@ -271,8 +364,7 @@ export function ChecklistProvider({ children }) {
 
   const submitEvidence = async (taskId, evidenceUrl) => {
     try {
-      const taskRef = doc(db, 'tasks', taskId);
-      await updateDoc(taskRef, {
+      await writeTaskDoc(taskId, {
         status: 'Pendiente de validación',
         evidence_url: evidenceUrl,
         date: new Date().toISOString()
@@ -353,8 +445,7 @@ export function ChecklistProvider({ children }) {
           // calculado con el ciclo de ejemplo hardcodeado (mismo bug que en el merge
           // de tareas faltantes), que quedaba INCORRECTO y CONGELADO para todas las
           // sedes para siempre. Al dejarlo sin guardar, cada usuario lo calcula al
-          // vuelo con SU ciclo real (ver Home.jsx/ChecklistBoard.jsx/HomeCampo.jsx/
-          // HomeOficina.jsx: `task.deadline || calculateAutomaticDeadline(task, currentCycle)`).
+          // vuelo con SU ciclo real.
           created_at: new Date().toISOString()
         });
       });
@@ -394,8 +485,7 @@ export function ChecklistProvider({ children }) {
       if (result.success) {
         // Actualizamos en Firestore para no volverla a sincronizar
         try {
-          const taskRef = doc(db, 'tasks', task.id);
-          await updateDoc(taskRef, { googleSynced: true });
+          await writeTaskDoc(task.id, { googleSynced: true });
           successCount++;
         } catch (e) {
           console.error("Error marcando tarea como sincronizada:", e);

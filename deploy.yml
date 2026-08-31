@@ -1,0 +1,62 @@
+name: 🚀 Deploy to Firebase Hosting
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch: # Permite lanzar manualmente desde GitHub UI
+
+jobs:
+  build-and-deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Checkout código
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          # NOTA (28/08/2026): se quitó "cache: 'npm'" como hipótesis para el fallo
+          # del run 33206219486 (intentos 1 y 2). Esa hipótesis NO era la causa real
+          # — la causa real (confirmada leyendo el log real del run #136, con ayuda
+          # del usuario) fue que dump_code.py (usado por el script "prebuild" de
+          # package.json) no estaba en git por una regla *.py de .gitignore — ver
+          # el commit que restaura dump_code.py y agrega la excepción !dump_code.py.
+          # Se deja quitado el caché de todos modos (no perjudica, y evita esta
+          # categoría de duda a futuro), pero no es la corrección real de este fallo.
+
+      - name: 📦 Instalar dependencias
+        run: npm install --include=optional
+
+      - name: 🔨 Build de producción
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+          VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}
+          VITE_GROQ_API_KEY: ${{ secrets.VITE_GROQ_API_KEY }}
+          VITE_QT_SHEET_CSV_URL: ${{ secrets.VITE_QT_SHEET_CSV_URL }}
+          VITE_COPILOTO_WORKER_URL: ${{ secrets.VITE_COPILOTO_WORKER_URL }}
+        run: npm run build
+
+      - name: 🚀 Deploy to Firebase Hosting
+        env:
+          RAW_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: |
+          if [ -n "$RAW_TOKEN" ]; then
+            TOKEN="$RAW_TOKEN"
+            if [[ "$TOKEN" != 1//* ]]; then
+              TOKEN="1//$TOKEN"
+            fi
+            echo "Deploying to Firebase Hosting with formatted token..."
+            npx --yes firebase-tools@latest deploy --only hosting --token "$TOKEN" --project centro-operativo-cpsl --non-interactive
+          else
+            echo "FIREBASE_TOKEN not set, skipping hosting deploy."
+          fi

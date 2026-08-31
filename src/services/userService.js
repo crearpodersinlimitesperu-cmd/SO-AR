@@ -1,4 +1,4 @@
-// Servicio de Directorio y GestiÃ³n de Usuarios para ProducciÃ³n
+// Servicio de Directorio y Gestión de Usuarios para Producción
 import { db } from './firebase';
 import { doc, getDoc, setDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { usersData, normalizeRole } from '../data/usersData';
@@ -64,28 +64,28 @@ export async function getVerifiedUser(email) {
 }
 
 /**
- * Obtiene todos los usuarios de la compaÃ±Ã­a consultando los tres directorios oficiales de Firestore.
- * Esto reemplaza al archivo estÃ¡tico usersData.js
+ * Obtiene todos los usuarios de la compañía consultando los tres directorios oficiales de Firestore.
+ * Esto reemplaza al archivo estático usersData.js
  */
 export async function getAllCompanyUsers() {
   const allUsers = [];
 
-  // NOTA (26/08/2026): normalizamos (trim + minÃºsculas) todas las comparaciones de
-  // email para evitar duplicados por diferencias de mayÃºsculas/espacios entre
+  // NOTA (26/08/2026): normalizamos (trim + minúsculas) todas las comparaciones de
+  // email para evitar duplicados por diferencias de mayúsculas/espacios entre
   // "users", "qt_directory" y el registro local. No eliminamos registros sin email
-  // (docs "fantasma" de la colecciÃ³n "users") porque no hay forma segura de saber,
-  // sin ese dato, si corresponden o no a alguien ya listado â€” hacerlo arriesgarÃ­a
-  // ocultar a una persona real. Ver reporte de auditorÃ­a del 26/08/2026 para el
-  // detalle de por quÃ© pueden existir esos docs sin email.
+  // (docs "fantasma" de la colección "users") porque no hay forma segura de saber,
+  // sin ese dato, si corresponden o no a alguien ya listado — hacerlo arriesgaría
+  // ocultar a una persona real. Ver reporte de auditoría del 26/08/2026 para el
+  // detalle de por qué pueden existir esos docs sin email.
   const normEmail = (e) => (e || '').toString().trim().toLowerCase();
 
   // NOTA (27/08/2026): src/utils/userNormalizer.js (usado en el login, ver
-  // AuthContext.jsx) ya sabe que el correo de una persona puede venir en mÃ¡s de
-  // un nombre de campo â€” "email", "correo" (algunos docs viejos), "emails"[],
-  // "corporateEmail" o "personalEmail" â€” pero getAllCompanyUsers() no aplicaba
-  // esa misma lÃ³gica: solo miraba "email"/"emails". Eso significa que una
+  // AuthContext.jsx) ya sabe que el correo de una persona puede venir en más de
+  // un nombre de campo — "email", "correo" (algunos docs viejos), "emails"[],
+  // "corporateEmail" o "personalEmail" — pero getAllCompanyUsers() no aplicaba
+  // esa misma lógica: solo miraba "email"/"emails". Eso significa que una
   // persona con su correo guardado bajo "correo" o solo en "corporateEmail"
-  // aparecÃ­a en el Panel Super Admin SIN botÃ³n de Correo/Chat (y a veces como
+  // aparecía en el Panel Super Admin SIN botón de Correo/Chat (y a veces como
   // tarjeta duplicada, porque tampoco se detectaba como la misma persona al
   // fusionar). deriveEmail()/emailKeysOf() ahora reconocen esas variantes.
   const deriveEmail = (u) => normEmail(
@@ -109,42 +109,12 @@ export async function getAllCompanyUsers() {
 
   // Devuelve el registro con un campo "email" de nivel superior garantizado
   // (sin pisar uno que ya existiera), para que cualquier componente que solo
-  // lea person.email â€” como los botones de contacto del Panel Super Admin â€”
-  // lo encuentre sin importar en quÃ© campo llegÃ³ originalmente el dato.
-  const fixEncoding = (str) => {
-    if (!str || typeof str !== 'string' || !str.includes('Ã')) return str;
-    const map = {
-      'Ã¡': 'á', 'Ã©': 'é', 'Ã\xad': 'í', 'Ã³': 'ó', 'Ãº': 'ú', 'Ã±': 'ñ', 'Ã¼': 'ü',
-      'Ã ': 'Á', 'Ã‰': 'É', 'Ã\x8d': 'Í', 'Ã“': 'Ó', 'Ãš': 'Ú', 'Ã‘': 'Ñ', 'Ãœ': 'Ü'
-    };
-    let fixed = str;
-    for (let key in map) {
-      fixed = fixed.split(key).join(map[key]);
-    }
-    return fixed;
-  };
-
+  // lea person.email — como los botones de contacto del Panel Super Admin —
+  // lo encuentre sin importar en qué campo llegó originalmente el dato.
   const withCanonicalEmail = (raw) => {
-    if (raw.name) raw.name = fixEncoding(raw.name);
-    if (raw.nombre) raw.nombre = fixEncoding(raw.nombre);
-    if (raw.displayName) raw.displayName = fixEncoding(raw.displayName);
-
-    if (!raw.name) {
-      raw.name = raw.name || raw.nombre || raw.displayName || 'Sin Nombre';
-    }
     if (raw.email) return raw;
     const derived = deriveEmail(raw);
     return derived ? { ...raw, email: derived } : raw;
-  };
-
-  const findExistingIndexByName = (candidateName) => {
-    if (!candidateName) return -1;
-    const norm = candidateName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().replace(/\s+/g, ' ');
-    if (norm.length < 5) return -1;
-    return allUsers.findIndex(u => {
-      const uName = (u.name || u.nombre || u.displayName || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().replace(/\s+/g, ' ');
-      return uName === norm;
-    });
   };
 
   const findExistingIndex = (candidateKeys) => {
@@ -159,19 +129,18 @@ export async function getAllCompanyUsers() {
   };
 
   try {
-    // Los usuarios principales estÃ¡n en la colecciÃ³n "users".
-    // NOTA (27/08/2026): "users" puede tener mÃ¡s de un documento para la misma
+    // Los usuarios principales están en la colección "users".
+    // NOTA (27/08/2026): "users" puede tener más de un documento para la misma
     // persona (ej. un doc viejo con otro id y uno nuevo con el uid actual, ambos
-    // con el mismo correo) â€” eso causaba tarjetas duplicadas en el Panel Super
+    // con el mismo correo) — eso causaba tarjetas duplicadas en el Panel Super
     // Admin. Se fusionan por correo igual que ya se hace con qt_directory abajo,
-    // sin perder ningÃºn campo: el primer doc encontrado manda, y el duplicado
+    // sin perder ningún campo: el primer doc encontrado manda, y el duplicado
     // solo rellena los campos que al primero le falten.
     const usersSnap = await getDocs(collection(db, 'users'));
     usersSnap.forEach(docSnap => {
       const uData = docSnap.data();
       const candidateKeys = emailKeysOf(uData);
-      let existingIdx = candidateKeys.size > 0 ? findExistingIndex(candidateKeys) : -1;
-      if (existingIdx === -1) existingIdx = findExistingIndexByName(uData.name || uData.nombre || uData.displayName);
+      const existingIdx = candidateKeys.size > 0 ? findExistingIndex(candidateKeys) : -1;
       if (existingIdx !== -1) {
         allUsers[existingIdx] = withCanonicalEmail({ ...uData, ...allUsers[existingIdx] });
         return;
@@ -181,21 +150,24 @@ export async function getAllCompanyUsers() {
 
     // Agregar QT (y, cuando la persona ya existe como "users", rellenar sus campos
     // de contacto de QT en vez de descartarlos).
-    // NOTA (27/08/2026): antes, cuando una persona de qt_directory YA tenÃ­a un doc
-    // en "users" (findExistingIndex !== -1), este bloque simplemente no hacÃ­a nada
-    // con ella â€” el registro que quedaba listado era el de "users", que no trae
+    // NOTA (27/08/2026): antes, cuando una persona de qt_directory YA tenía un doc
+    // en "users" (findExistingIndex !== -1), este bloque simplemente no hacía nada
+    // con ella — el registro que quedaba listado era el de "users", que no trae
     // whatsapp/whatsappUrl/cleanPhone (esos campos solo los pobla qtSheetService.js
-    // sobre qt_directory). Eso dejaba sin botÃ³n de WhatsApp (y a veces sin correo,
-    // si "users" tampoco lo tenÃ­a) a QT que sÃ­ tienen esos datos en qt_directory.
-    // Ahora se rellenan esos campos en el registro existente, sin pisar ningÃºn dato
+    // sobre qt_directory). Eso dejaba sin botón de WhatsApp (y a veces sin correo,
+    // si "users" tampoco lo tenía) a QT que sí tienen esos datos en qt_directory.
+    // Ahora se rellenan esos campos en el registro existente, sin pisar ningún dato
     // que "users" ya tuviera.
     const qtSnap = await getDocs(collection(db, 'qt_directory'));
-    const CONTACT_FIELDS_FROM_QT = ['whatsapp', 'whatsappUrl', 'cleanPhone', 'phone', 'telefono', 'email', 'correo', 'corporateEmail', 'personalEmail'];
+    // (29/08/2026) Se agrega "cumpleanos" para la alerta de cumpleaños: el dato existe
+    // hoy en el directorio de QT (además del Directorio Global importado a "users"),
+    // así que se rellena igual que whatsapp/phone: solo si el registro existente
+    // todavía no tiene el campo, sin pisar un valor ya cargado.
+    const CONTACT_FIELDS_FROM_QT = ['whatsapp', 'whatsappUrl', 'cleanPhone', 'phone', 'telefono', 'email', 'correo', 'corporateEmail', 'personalEmail', 'cumpleanos'];
     qtSnap.forEach(docSnap => {
       const qtData = docSnap.data();
       const candidateKeys = emailKeysOf(qtData);
-      let existingIdx = candidateKeys.size > 0 ? findExistingIndex(candidateKeys) : -1;
-      if (existingIdx === -1) existingIdx = findExistingIndexByName(qtData.name || qtData.nombre || qtData.displayName);
+      const existingIdx = candidateKeys.size > 0 ? findExistingIndex(candidateKeys) : -1;
       if (existingIdx !== -1) {
         CONTACT_FIELDS_FROM_QT.forEach(f => {
           if (!allUsers[existingIdx][f] && qtData[f]) {
@@ -218,19 +190,13 @@ export async function getAllCompanyUsers() {
     console.error("Error fetching company users:", error);
   }
 
-  // Merge fallback con registro estÃ¡tico local para usuarios que aÃºn no estÃ¡n en Firestore
+  // Merge fallback con registro estático local para usuarios que aún no están en Firestore
   usersData.forEach(localUser => {
     const candidateKeys = emailKeysOf(localUser);
-    let existingIdx = candidateKeys.size > 0 ? findExistingIndex(candidateKeys) : -1;
-    if (existingIdx === -1) existingIdx = findExistingIndexByName(localUser.name);
-    if (existingIdx === -1) {
+    if (candidateKeys.size > 0 && findExistingIndex(candidateKeys) === -1) {
       allUsers.push(withCanonicalEmail({ ...localUser, id: localUser.id || localUser.email, source: 'local_registry' }));
     }
   });
 
   return allUsers;
 }
-
-
-
-

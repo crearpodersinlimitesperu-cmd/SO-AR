@@ -26,6 +26,7 @@ import OfficialAgreements from './pages/OfficialAgreements'
 import TeamCalendar from './pages/TeamCalendar'
 import EmbudoConversionBoard from './pages/EmbudoConversionBoard'
 import NodusDataMap from './pages/NodusDataMap'
+import CalendarioMJ from './pages/CalendarioMJ'
 import AICopilot from './components/AICopilot'
 import PromptModal from './components/PromptModal'
 import BirthdayAlert from './components/BirthdayAlert'
@@ -271,6 +272,15 @@ function App() {
           <Route path="/nodus-data-map" element={
             <RoleRoute allowedRoles={['gerente', 'direccion', 'cfo', 'cco', 'ceo', 'director_maestria', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
               <NodusDataMap />
+            </RoleRoute>
+          } />
+
+          {/* Calendario de Maestría del Juego (29/08/2026): generador/editor del
+              calendario oficial por equipo (formato CREAR), pedido por José a
+              partir de 3 PDF de ejemplo reales. Ver notas en CalendarioMJ.jsx. */}
+          <Route path="/calendario-mj" element={
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria', 'coord_maestria', 'coordinador_mj']} requireSuperAdmin={false}>
+              <CalendarioMJ />
             </RoleRoute>
           } />
 
