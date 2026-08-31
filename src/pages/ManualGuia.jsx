@@ -489,6 +489,9 @@ export default function ManualGuia() {
                   { title: 'Metricas de Retencion', desc: 'Monitor de asistencia a los 4 FDS de calibracion. Alerta al Director si un participante acumula 2 ausencias.' },
                   { title: 'Gestion de EAIs', desc: 'Supervisa los Equipos de Alto Impacto. Redistribuye participantes si un equipo esta en riesgo de desercion.' },
                   { title: 'Reportes a Direccion', desc: 'Entrega reporte semanal de avance al Director de Maestria y Gerente. Causa OS genera el resumen automaticamente.' },
+                  // 31/08/2026: nueva herramienta "Calendario de Maestria del
+                  // Juego" — antes no estaba documentada en este manual.
+                  { title: 'Calendario de Maestria del Juego', desc: 'Genera el calendario oficial de cada equipo: con sede + numero de equipo se precarga solo el Primer FDS desde el calendario oficial, y a partir de el se calculan solas 19 de las 20 actividades reales (Segundo/Tercer FDS, Reunion, Entrega de FI, Directorio, Entrenamiento de confianza, Pase de Antorcha, etc.). Todo sigue siendo editable — cada actividad se puede mover de bloque o de orden, y "Ordenar cronologicamente" las acomoda por fecha. Solo se exportan al PDF las actividades que ya tienen fecha.' },
                 ].map(item => (
                   <div key={item.title} style={{ padding: '0.8rem', background: 'rgba(139,92,246,0.06)', borderRadius: '8px', border: '1px solid rgba(139,92,246,0.2)' }}>
                     <strong style={{ color: '#8b5cf6', display: 'block', marginBottom: '0.2rem' }}>{item.title}</strong>
@@ -496,10 +499,14 @@ export default function ManualGuia() {
                   </div>
                 ))}
               </div>
-              <div style={{ marginTop: '1.25rem' }}>
+              <div style={{ marginTop: '1.25rem', display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
                 <button onClick={() => navigate('/centro-managers')} className="btn-primary"
                   style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.65rem 1.4rem', fontWeight: 700 }}>
                   Centro de Managers <ExternalLink size={14} />
+                </button>
+                <button onClick={() => navigate('/calendario-mj')} className="btn-secondary"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.65rem 1.4rem', fontWeight: 700 }}>
+                  <Calendar size={14} /> Calendario de Maestria del Juego <ExternalLink size={14} />
                 </button>
               </div>
             </div>
@@ -616,6 +623,7 @@ export default function ManualGuia() {
                 { icon: '📋', color: 'var(--crear-gold)', label: 'Mi Checklist', route: '/checklist/coordinador_c1c2', desc: 'Cumplimiento diario/semanal con evidencias.' },
                 { icon: '🎯', color: '#f97316', label: 'Mis Metas & KPIs', route: '/metas', desc: 'Avance de participantes y enrolamiento.' },
                 { icon: '👥', color: '#a855f7', label: 'Centro Managers', route: '/centro-managers', desc: 'Maestria, llamadas y retencion 100 dias.' },
+                { icon: '📅', color: '#8b5cf6', label: 'Calendario MJ', route: '/calendario-mj', desc: 'Genera y exporta el calendario de Maestria del Juego por equipo.' },
                 { icon: '📈', color: '#22c55e', label: 'Reportes', route: '/reportes', desc: 'Dashboards por sede, rol y ciclo.' },
                 { icon: '⚡', color: 'var(--crear-gold)', label: 'Directorio QT', route: '/directorio-qt', desc: 'Equipo Quantum en tiempo real.' },
                 { icon: '🚨', color: '#ef4444', label: 'Protocolo Crisis', route: '/protocolo-emergencias', desc: '7 pasos de actuacion en emergencias.' },

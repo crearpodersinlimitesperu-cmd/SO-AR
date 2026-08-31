@@ -8,7 +8,7 @@ import {
   collection, query, onSnapshot, doc, setDoc, deleteDoc, serverTimestamp
 } from 'firebase/firestore';
 import {
-  Calendar, Plus, ArrowLeft, Printer, Trash2, Edit3, Save, X, Copy, Lock, RefreshCw
+  Calendar, Plus, ArrowLeft, Printer, Trash2, Edit3, Save, X, Copy, Lock, RefreshCw, ChevronUp, ChevronDown
 } from 'lucide-react';
 
 // Busca, en el calendario oficial ya cargado por CyclesContext (misma fuente
@@ -47,13 +47,15 @@ function addDaysISO(isoDate, days) {
 
 // ---------------------------------------------------------------------
 // Precarga de fechas derivadas del Primer FDS (31/08/2026, a pedido de
-// José: "que precargue todas las fechas, sin errores").
+// José: "que precargue todas las fechas, sin errores"; ampliado el
+// 31/08/2026 tras revisar "Calendario Maestría Del Juego LIMA.xlsx",
+// que trae datos reales de 20 equipos 2024-2026, a pedido de José:
+// "revisa bien las reglas y patrones, igual que todo se cargue y que se
+// pueda editar").
 // ---------------------------------------------------------------------
-// CÁLCULO verificado comparando día por día los 3 PDF de ejemplo reales
-// (Equipo 27 "Kay Theron", Equipo 28 "Ubuntu", Equipo 29 "Quantum Phoenix"):
-// estos offsets, medidos en días desde el viernes del FDS que corresponde,
-// se repiten IDÉNTICOS en los 3 casos (100% de coincidencia, aunque la
-// muestra es chica — n=3, son los únicos 3 ejemplos reales que existen):
+// CÁLCULO base (n=3, 100% de coincidencia) verificado con los 3 PDF de
+// ejemplo (Equipo 27 "Kay Theron", Equipo 28 "Ubuntu", Equipo 29 "Quantum
+// Phoenix"), offsets en días desde el viernes del FDS correspondiente:
 //   - Segundo FDS = Primer FDS + 35 días
 //   - Tercer FDS  = Primer FDS + 70 días
 //   - índice 0  "Reunión maestría de juego" (creación)           = Primer FDS + 3
@@ -64,31 +66,52 @@ function addDaysISO(isoDate, days) {
 //   - índice 15 "Barco" (relación)                                = Tercer FDS - 7
 //   - índices 16-19 "Rompimiento de Barreras"/"Impacto Relación"/
 //     "Revisión FI"/"Vuelos" (relación)                           = Tercer FDS - 6
-// Los índices son la posición del elemento dentro de DEFAULT_ACTIVITIES
-// (misma posición con la que arranca todo calendario nuevo). Cada regla se
-// verificó reproduciendo, con esta fórmula, las fechas EXACTAS impresas en
-// los 3 PDF (ver /tmp/verify_dates.mjs de la sesión que lo construyó).
 //
-// DATO FALTANTE, a propósito NO se calcula:
-// - Índices 1,2,3,4,5,6,7 (resto de actividades del PRIMER FDS: Entrega de
-//   FI, Entrega de directorio, Entrenamiento de confianza + Impacto
-//   Creación + Revisión FI + Línea de Elección, y Pase de Antorcha dentro
-//   del primer FDS): en los mismos 3 PDF esos offsets SÍ cambian de equipo
-//   a equipo — ej. "Entrega de directorio" cae a los 7 días en el Equipo 27
-//   pero a los 14 en el Equipo 28 y 29. No hay fórmula fija ahí.
-// - Índice 12 "Caminata sobre fuego": se probó como Segundo FDS - 1 y
-//   coincidió en el Equipo 27, pero en el Equipo 29 esa misma actividad
-//   aparece en el bloque RELACIÓN, anclada al Tercer FDS - 1 (no al
-//   Segundo), y en el Equipo 28 no aparece ninguna propia en su tabla. Es
-//   decir: ni el offset ni el bloque al que pertenece son consistentes
-//   entre equipos — se descartó del cálculo automático por esa razón.
-// Auto-completar cualquiera de estas generaría fechas incorrectas para
-// algunos equipos, así que quedan en blanco para completarlas a mano — es
-// lo que hace posible cumplir "sin errores". El bloque TERCER FDS:
-// GRATITUD no tiene ninguna actividad de ejemplo en los 3 PDF (está vacío
-// en los 3), así que tampoco se calcula nada ahí.
+// CÁLCULO ampliado (n=20, equipos reales 2024-2026 del xlsx maestro),
+// para el resto de actividades del bloque PRIMER FDS:
+//   - índice 1 "Entrega de futuros imposibles"                    = Primer FDS + 6
+//   - índice 2 "Entrega de directorio"                             = Primer FDS + 14
+//   - índices 3,4,5,6 "Entrenamiento de confianza"/"Impacto
+//     Creación"/"Revisión FI"/"Línea de Elección"+souvenirs
+//     (actividades del mismo día, comprobado en el xlsx)           = Primer FDS + 15
+//   - índice 7 "Pase de Antorcha y Caminata" (creación)             = Primer FDS + 16
+// INFERENCIA: el xlsx muestra que estos offsets cambiaron de "época" —
+// equipos 2024-2025 usaban Reunión +4/+5 y FI +7; equipos 2026 (los que
+// se están agendando ahora) usan Reunión +3 y FI +6. Las fórmulas de
+// arriba son las de la época VIGENTE (2026), confirmadas con los equipos
+// 26 (parcialmente), 28 y 29 reales. índices 2,3,4,5,6,7 (+14/+15/+16)
+// coinciden en 15 de 20 equipos del xlsx (75-79%), ambas épocas por igual.
+//
+// DATO FALTANTE / excepciones conocidas, NO automatizadas a propósito:
+// - Equipos cuyo "Entrega de directorio"/"Entrenamiento de confianza"/
+//   "Pase de Antorcha" caen en diciembre-enero: en 2 de 2 casos del xlsx
+//   (equipos de esas fechas) esas 3 actividades se corrieron +14 días
+//   exactos (probablemente por las fiestas), mientras Reunión y FI NO se
+//   movieron. Solo 2 muestras — no es suficiente para automatizar un
+//   "si cae en diciembre, sumar 14" sin más casos que lo confirmen.
+// - El equipo agendado el 22/05/2026 (hoja "E27" del xlsx) tiene TODO el
+//   bloque de directorio/confianza/pase de antorcha comprimido una semana
+//   antes de lo normal (+7/+8/+9 en vez de +14/+15/+16) — igual que ya
+//   mostraba su PDF de ejemplo. Se desconoce la causa; es un caso aislado.
+// - El xlsx tiene un dato contradictorio para un equipo (pase de antorcha
+//   18 vs 31 de enero, según la hoja) — no se puede saber cuál es correcta
+//   sin que alguien del equipo lo confirme.
+// - Índice 12 "Caminata sobre fuego": offset y hasta el bloque (creación
+//   vs relación) cambian de equipo a equipo en los 3 PDF — se descartó.
+// Por todo esto, TODOS los campos de fecha siguen siendo inputs editables:
+// esta precarga es un punto de partida, no un valor fijo — si un equipo
+// cae en una de las excepciones de arriba, la fecha se corrige a mano.
+// El bloque TERCER FDS: GRATITUD no tiene actividades de ejemplo, así que
+// tampoco se calcula nada ahí.
 const RELIABLE_ACTIVITY_OFFSETS = {
   0: { from: 'fds1', days: 3 },
+  1: { from: 'fds1', days: 6 },
+  2: { from: 'fds1', days: 14 },
+  3: { from: 'fds1', days: 15 },
+  4: { from: 'fds1', days: 15 },
+  5: { from: 'fds1', days: 15 },
+  6: { from: 'fds1', days: 15 },
+  7: { from: 'fds1', days: 16 },
   8: { from: 'fds2', days: -7 },
   9: { from: 'fds2', days: -6 },
   10: { from: 'fds2', days: -6 },
@@ -103,12 +126,38 @@ const RELIABLE_ACTIVITY_OFFSETS = {
 };
 
 // Aplica la precarga completa a un form: a partir de la fecha de inicio del
-// Primer FDS, calcula Segundo/Tercer FDS y las 12 actividades listadas en
-// RELIABLE_ACTIVITY_OFFSETS. Solo llena campos VACÍOS — nunca pisa una
-// fecha que el usuario ya haya escrito o corregido a mano.
+// Primer FDS, calcula Segundo/Tercer FDS y las 19 actividades listadas en
+// RELIABLE_ACTIVITY_OFFSETS (de 20 actividades reales; solo queda fuera
+// "Caminata sobre fuego", ver arriba). Solo llena campos VACÍOS — nunca
+// pisa una fecha que el usuario ya haya escrito o corregido a mano, y cada
+// campo sigue siendo editable después de precargado.
+// Texto exacto del placeholder viejo (antes del 31/08/2026) del bloque
+// TERCER FDS: GRATITUD, usado abajo SOLO para reconocerlo en calendarios
+// YA guardados con ese texto anterior y corregirlo a "FIN DE TU
+// ENTRENAMIENTO" (a pedido de José) — nunca pisa un texto distinto que el
+// coordinador haya escrito a mano en ese campo.
+const OLD_GRATITUD_PLACEHOLDER = '(Actividades del tercer FDS — completar según corresponda)';
+
+// Normaliza texto/banderas de actividades que cambiaron de definición
+// después de que un calendario ya fue guardado (mismo criterio que usa
+// displayCal para las fechas: generalizar la corrección a lo ya guardado,
+// sin pisar nada que el usuario haya escrito distinto).
+function normalizeActivities(actividades) {
+  return actividades.map((a, i) => {
+    if (i === 12 && !a.fechaVariable) {
+      return { ...a, fechaVariable: true };
+    }
+    if (i === 20 && !a.esCierre && a.actividad === OLD_GRATITUD_PLACEHOLDER) {
+      return { ...a, actividad: 'FIN DE TU ENTRENAMIENTO', esCierre: true };
+    }
+    return a;
+  });
+}
+
 function applyReliableDates(f) {
+  const actividadesNormalizadas = normalizeActivities(f.actividades);
   const fds1Inicio = f.fds[0]?.fechaInicio;
-  if (!fds1Inicio) return f;
+  if (!fds1Inicio) return { ...f, actividades: actividadesNormalizadas };
   const fds2Inicio = addDaysISO(fds1Inicio, 35);
   const fds3Inicio = addDaysISO(fds1Inicio, 70);
   const anchors = { fds1: fds1Inicio, fds2: fds2Inicio, fds3: fds3Inicio };
@@ -123,7 +172,7 @@ function applyReliableDates(f) {
     return fb;
   });
 
-  const actividades = f.actividades.map((a, i) => {
+  const actividades = actividadesNormalizadas.map((a, i) => {
     if (a.fecha) return a; // no pisa lo que el usuario ya escribió
     const rule = RELIABLE_ACTIVITY_OFFSETS[i];
     if (!rule) return a;
@@ -141,16 +190,20 @@ function applyReliableDates(f) {
 // la misma plantilla de actividades (Reunión, Entrega de FI, Entrega de
 // directorio, Entrenamiento, Pase de Antorcha, Barco, Vuelos, Caminata sobre
 // fuego, etc.) organizada en 3 bloques (PRIMER/SEGUNDO/TERCER FDS).
-// A partir del Primer FDS, applyReliableDates() calcula automáticamente todo
-// lo que SÍ tiene un offset idéntico en los 3 PDF (Segundo/Tercer FDS y 12
-// actividades — ver el comentario junto a RELIABLE_ACTIVITY_OFFSETS más
-// arriba). El resto de actividades del Primer FDS NO se calculan porque,
-// comparando los mismos 3 PDF, sus offsets SÍ cambian de equipo a equipo
-// (p.ej. "Entrega de directorio" cae +7 días del viernes del FDS en el
-// Equipo 27, pero +14 en el Equipo 28) — José confirmó que ahí no hay
-// fórmula fija, así que esas quedan 100% editables para ajustar a mano,
-// igual que le pidió José ("similar a las cartas de bienvenida de los
-// entrenadores": autogenerar + poder editar).
+// A partir del Primer FDS, applyReliableDates() calcula automáticamente
+// 19 de las 20 actividades reales (ver el comentario junto a
+// RELIABLE_ACTIVITY_OFFSETS más arriba para el detalle completo). El bloque
+// base (Segundo/Tercer FDS + 12 actividades) se verificó 100% contra los 3
+// PDF. El 31/08/2026 se amplió con 7 actividades más (Entrega de FI,
+// Entrega de directorio, Entrenamiento de confianza + Impacto Creación +
+// Revisión FI + Línea de Elección, y Pase de Antorcha del primer FDS),
+// verificadas contra 20 equipos reales del archivo "Calendario Maestría
+// Del Juego LIMA.xlsx" (75-79% de coincidencia exacta; el resto son casos
+// atípicos conocidos y documentados junto a RELIABLE_ACTIVITY_OFFSETS).
+// Solo "Caminata sobre fuego" queda sin fórmula (su offset y hasta el
+// bloque al que pertenece cambian de equipo a equipo). TODAS las fechas
+// — calculadas o no — siguen siendo 100% editables para ajustar a mano,
+// tal como pidió José ("que todo se cargue y que se pueda editar").
 // ============================================================================
 
 const COLLECTION_NAME = 'mj_calendars';
@@ -200,7 +253,11 @@ const DEFAULT_FDS = [
 ];
 
 const DEFAULT_ACTIVITIES = [
-  { seccion: 'creacion', actividad: 'Reunión maestría de juego\nindicaciones sobre:\n(DIRECTORIO, CAMISETAS Y ESTANDARTE)\nVIA ZOOM', fecha: '', hora: '8:00 PM' },
+  // 31/08/2026: "VIA ZOOM" → "VIA MEET DE GOOGLE" a pedido de José. También
+  // coincide con el equipo más reciente del xlsx maestro (Equipo 29), cuyo
+  // texto real dice "VIA MEET" — el PDF de ejemplo más viejo (Equipo 28)
+  // todavía decía ZOOM, por eso quedó desactualizado en la plantilla.
+  { seccion: 'creacion', actividad: 'Reunión maestría de juego\nindicaciones sobre:\n(DIRECTORIO, CAMISETAS Y ESTANDARTE)\nVIA MEET DE GOOGLE', fecha: '', hora: '8:00 PM' },
   { seccion: 'creacion', actividad: 'Entrega de futuros imposibles al correo:\nhttps://crearpslglobal.com/admin/login.php\nUsuario: invitadoFI\nContraseña: invitadofi', fecha: '', hora: 'Hasta 11:59 pm' },
   { seccion: 'creacion', actividad: 'Entrega de directorio: físico y digital.', fecha: '', hora: 'Hasta las 2:00 pm, lo entrega un representante del equipo.' },
   { seccion: 'creacion', actividad: 'Entrenamiento de confianza', fecha: '', hora: '11:00 am a 2:00 pm.' },
@@ -212,7 +269,12 @@ const DEFAULT_ACTIVITIES = [
   { seccion: 'creacion', actividad: 'Entrenamiento\nTanque', fecha: '', hora: '1:00 pm a 4:00 pm.' },
   { seccion: 'creacion', actividad: 'Revisión de Futuros Imposibles', fecha: '', hora: '5:00 pm a 6:00 pm' },
   { seccion: 'creacion', actividad: 'Vuelos', fecha: '', hora: '6:00 pm a 11:00 pm aprox.' },
-  { seccion: 'creacion', actividad: 'Caminata sobre fuego', fecha: '', hora: '6:00 pm a 11:00 pm aprox.', destacado: true },
+  // fechaVariable: true — a pedido de José ("esta fecha se puede desplazar"):
+  // el offset Y el bloque (creación o relación) de esta actividad cambian de
+  // equipo a equipo (ver RELIABLE_ACTIVITY_OFFSETS), así que en vez de
+  // "(sin fecha)" se muestra un aviso que aclara que es esperado, no un dato
+  // faltante por error.
+  { seccion: 'creacion', actividad: 'Caminata sobre fuego', fecha: '', hora: '6:00 pm a 11:00 pm aprox.', destacado: true, fechaVariable: true },
 
   { seccion: 'relacion', actividad: 'Línea de Elección', fecha: '', hora: '8:00 pm a 10:30 pm aprox.' },
   { seccion: 'relacion', actividad: 'Pase de Antorcha y\nCaminata de Equipos', fecha: '', hora: '6:00 PM' },
@@ -222,7 +284,12 @@ const DEFAULT_ACTIVITIES = [
   { seccion: 'relacion', actividad: 'Revisión de Futuros Imposibles', fecha: '', hora: '5:00 pm a 6:00 pm' },
   { seccion: 'relacion', actividad: 'Vuelos', fecha: '', hora: '6:30 pm a 11:00 pm aprox.' },
 
-  { seccion: 'gratitud', actividad: '(Actividades del tercer FDS — completar según corresponda)', fecha: '', hora: '' }
+  // esCierre: true — a pedido de José ("aquí va fin del entrenamiento"):
+  // en los calendarios reales (PDF y xlsx maestro) el bloque TERCER FDS:
+  // GRATITUD no lista actividades propias — termina directo con el texto
+  // "FIN DE TU ENTRENAMIENTO". No es una actividad con fecha, así que se
+  // renderiza como banner de cierre, no como fila de tabla con "(sin fecha)".
+  { seccion: 'gratitud', actividad: 'FIN DE TU ENTRENAMIENTO', fecha: '', hora: '', esCierre: true }
 ];
 
 // Texto fijo de la página "Fin de tu entrenamiento" — IDÉNTICO en los 3 PDF
@@ -283,7 +350,7 @@ export default function CalendarioMJ() {
   // (solo una vez por sesión de edición, para no pelear con lo que el
   // usuario ya haya escrito a mano después). Encadena applyReliableDates()
   // para que, en el mismo paso, se calculen también Segundo/Tercer FDS y
-  // las 12 actividades con patrón verificado (ver comentario junto a
+  // las 19 actividades con patrón verificado (ver comentario junto a
   // RELIABLE_ACTIVITY_OFFSETS).
   useEffect(() => {
     if (editing !== 'new' || autoFilledOnce) return;
@@ -294,7 +361,7 @@ export default function CalendarioMJ() {
       if (start) {
         const end = addDaysISO(start, 2);
         setForm(f => applyReliableDates({ ...f, fds: f.fds.map((fb, i) => i === 0 ? { ...fb, fechaInicio: start, fechaFin: end } : fb) }));
-        showToast('Precargado: Primer FDS desde el calendario oficial, y Segundo/Tercer FDS + 12 actividades calculadas a partir de él. Quedan 9 actividades sin patrón fijo entre equipos (varían — comprobado) — complétalas a mano. Verifica todo antes de guardar.', 'success');
+        showToast('Precargado: Primer FDS desde el calendario oficial, y Segundo/Tercer FDS + 19 actividades calculadas a partir de él (verificado con 20 equipos reales). Solo "Caminata sobre fuego" queda sin patrón fijo. Revisa las fechas antes de guardar — hay casos atípicos conocidos (equipos de diciembre-enero, y equipos con calendario comprimido) que pueden necesitar corrección manual.', 'success');
         setAutoFilledOnce(true);
       }
     }
@@ -336,7 +403,7 @@ export default function CalendarioMJ() {
       return;
     }
     setForm(f => applyReliableDates(f));
-    showToast('Segundo/Tercer FDS y 12 actividades recalculadas a partir del Primer FDS. Quedan 9 actividades sin patrón fijo entre equipos — complétalas a mano.', 'success');
+    showToast('Segundo/Tercer FDS y 19 actividades recalculadas a partir del Primer FDS. Solo "Caminata sobre fuego" queda sin patrón fijo. Revisa por casos atípicos (equipos de diciembre-enero, o con calendario comprimido) antes de guardar.', 'success');
   };
 
   useEffect(() => {
@@ -370,14 +437,20 @@ export default function CalendarioMJ() {
   };
 
   const startEdit = (cal) => {
-    setForm({
+    // 31/08/2026: aplica applyReliableDates() también al abrir un calendario
+    // YA GUARDADO — así los que se crearon antes de que existiera el cálculo
+    // automático (ej. Equipo 30) se completan solos al editarlos, sin
+    // necesidad de tocar el botón "Precargar todas las fechas". Sigue sin
+    // pisar ninguna fecha que ya esté guardada (applyReliableDates solo
+    // llena campos vacíos).
+    setForm(applyReliableDates({
       sede: cal.sede || '',
       equipoNumero: cal.equipoNumero || '',
       equipoNombre: cal.equipoNombre || '',
       fds: (cal.fds && cal.fds.length === 3) ? cal.fds.map(f => ({ ...f })) : DEFAULT_FDS.map(f => ({ ...f })),
       actividades: (cal.actividades || []).map(a => ({ ...a })),
       infoText: cal.infoText || DEFAULT_INFO_TEXT
-    });
+    }));
     setEditing(cal.id);
   };
 
@@ -425,6 +498,57 @@ export default function CalendarioMJ() {
 
   const removeActividad = (idx) => {
     setForm(f => ({ ...f, actividades: f.actividades.filter((_, i) => i !== idx) }));
+  };
+
+  // 31/08/2026, a pedido de José ("esto debería poder moverse para ponerlo
+  // en otra fecha, u organizar cronológicamente el calendario"): algunas
+  // actividades (como "Caminata sobre fuego") caen a veces en el bloque
+  // Primer FDS y a veces en Segundo/Tercer FDS, según el equipo — antes no
+  // había forma de cambiarle el bloque, solo la fecha. Ahora se puede.
+  const moveActividadDeBloque = (idx, nuevaSeccion) => {
+    setForm(f => {
+      const actividades = [...f.actividades];
+      actividades[idx] = { ...actividades[idx], seccion: nuevaSeccion };
+      return { ...f, actividades };
+    });
+  };
+
+  // Reordena una actividad dentro de su MISMO bloque (arriba/abajo), sin
+  // afectar a las de otros bloques aunque no sean adyacentes en el arreglo.
+  const moveActividadOrden = (idx, dir) => {
+    setForm(f => {
+      const seccion = f.actividades[idx].seccion;
+      const grupo = f.actividades.map((a, i) => (a.seccion === seccion ? i : -1)).filter(i => i !== -1);
+      const pos = grupo.indexOf(idx);
+      const destino = pos + dir;
+      if (destino < 0 || destino >= grupo.length) return f;
+      const idxDestino = grupo[destino];
+      const actividades = [...f.actividades];
+      [actividades[idx], actividades[idxDestino]] = [actividades[idxDestino], actividades[idx]];
+      return { ...f, actividades };
+    });
+  };
+
+  // Ordena las actividades DENTRO de cada bloque por fecha ascendente (las
+  // que no tienen fecha quedan al final de su bloque, en su orden actual).
+  // No mueve nada entre bloques, solo el orden visual dentro de cada uno.
+  const ordenarCronologicamente = () => {
+    setForm(f => {
+      const porSeccion = {};
+      f.actividades.forEach(a => {
+        (porSeccion[a.seccion] = porSeccion[a.seccion] || []).push(a);
+      });
+      const seccionesConocidas = f.fds.map(fb => fb.id);
+      Object.keys(porSeccion).forEach(sec => {
+        const conFecha = porSeccion[sec].filter(a => a.fecha).sort((a, b) => a.fecha.localeCompare(b.fecha));
+        const sinFecha = porSeccion[sec].filter(a => !a.fecha);
+        porSeccion[sec] = [...conFecha, ...sinFecha];
+      });
+      const ordenadas = seccionesConocidas.flatMap(sec => porSeccion[sec] || []);
+      const extra = Object.keys(porSeccion).filter(sec => !seccionesConocidas.includes(sec)).flatMap(sec => porSeccion[sec]);
+      return { ...f, actividades: [...ordenadas, ...extra] };
+    });
+    showToast('Actividades ordenadas por fecha dentro de cada bloque (Primer/Segundo/Tercer FDS).', 'success');
   };
 
   const handleSave = async () => {
@@ -521,6 +645,9 @@ export default function CalendarioMJ() {
           updateActividad={updateActividad}
           addActividad={addActividad}
           removeActividad={removeActividad}
+          moveActividadDeBloque={moveActividadDeBloque}
+          moveActividadOrden={moveActividadOrden}
+          onOrdenarCronologicamente={ordenarCronologicamente}
           onBuscarOficial={buscarEnCalendarioOficial}
           onPrecargarTodo={precargarTodasLasFechas}
           onCancel={cancelEdit}
@@ -573,7 +700,7 @@ export default function CalendarioMJ() {
 // ============================================================================
 // Editor
 // ============================================================================
-function CalendarioEditor({ form, setForm, updateFdsField, updateActividad, addActividad, removeActividad, onBuscarOficial, onPrecargarTodo, onCancel, onSave, saving, isNew }) {
+function CalendarioEditor({ form, setForm, updateFdsField, updateActividad, addActividad, removeActividad, moveActividadDeBloque, moveActividadOrden, onOrdenarCronologicamente, onBuscarOficial, onPrecargarTodo, onCancel, onSave, saving, isNew }) {
   const inputStyle = { width: '100%', padding: '0.5rem', borderRadius: '8px', border: '1px solid rgba(128,128,128,0.3)', background: 'transparent', color: 'inherit', fontSize: '0.85rem' };
   const textareaStyle = { ...inputStyle, minHeight: '60px', fontFamily: 'inherit', resize: 'vertical' };
 
@@ -605,8 +732,13 @@ function CalendarioEditor({ form, setForm, updateFdsField, updateActividad, addA
                 <RefreshCw size={14} /> Precargar todas las fechas
               </button>
             )}
+            {onOrdenarCronologicamente && (
+              <button onClick={onOrdenarCronologicamente} className="btn-secondary" style={{ padding: '0.4rem 0.7rem', fontSize: '0.78rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                <RefreshCw size={14} /> Ordenar cronológicamente
+              </button>
+            )}
             <span style={{ fontSize: '0.72rem', opacity: 0.6 }}>
-              Con sede + número de equipo se precarga sola la fecha del Primer FDS desde el calendario oficial. A partir de ella se calculan solos el Segundo/Tercer FDS y 12 actividades (patrón verificado en los 3 calendarios reales de ejemplo). 9 actividades no siguen un patrón fijo entre equipos (varían — comprobado) y quedan para completar a mano, para no arriesgar una fecha incorrecta.
+              Con sede + número de equipo se precarga sola la fecha del Primer FDS desde el calendario oficial. A partir de ella se calculan solas el Segundo/Tercer FDS y 19 actividades (patrón verificado con 20 equipos reales 2024-2026). Solo "Caminata sobre fuego" no sigue un patrón fijo y queda para completar a mano. Todas las fechas siguen siendo editables: hay casos atípicos conocidos (equipos de diciembre-enero, o con calendario comprimido) que pueden necesitar corrección manual. Cada actividad se puede mover de bloque (▲▼ y el selector de FDS junto a su fecha) y "Ordenar cronológicamente" reordena por fecha dentro de cada bloque — revisa antes de guardar.
             </span>
           </div>
         )}
@@ -631,14 +763,47 @@ function CalendarioEditor({ form, setForm, updateFdsField, updateActividad, addA
           <div style={{ marginTop: '1rem' }}>
             <div style={{ fontSize: '0.75rem', opacity: 0.7, marginBottom: '0.4rem' }}>Actividades de este bloque</div>
             {form.actividades.map((act, aIdx) => act.seccion !== fdsBlock.id ? null : (
-              <div key={aIdx} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1.3fr auto', gap: '0.5rem', marginBottom: '0.5rem', alignItems: 'start' }}>
+              act.esCierre ? (
+                // 31/08/2026, a pedido de José ("esta es una franja no un
+                // evento"): "FIN DE TU ENTRENAMIENTO" no es una actividad con
+                // fecha/hora — es un banner de cierre del bloque. En el editor
+                // se muestra solo el texto (editable), sin los campos de
+                // fecha/hora/bloque/orden que sí aplican a un evento real.
+                <div key={aIdx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '8px', padding: '0.4rem 0.6rem' }}>
+                  <span style={{ fontSize: '0.7rem', opacity: 0.6, whiteSpace: 'nowrap' }}>Franja de cierre:</span>
+                  <input style={{ ...inputStyle, fontWeight: 700, flex: 1 }} value={act.actividad} onChange={e => updateActividad(aIdx, 'actividad', e.target.value)} placeholder="Texto de cierre" />
+                  <button onClick={() => removeActividad(aIdx)} title="Eliminar franja" style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer' }}>
+                    <X size={18} />
+                  </button>
+                </div>
+              ) : (
+              <div key={aIdx} style={{ display: 'grid', gridTemplateColumns: 'auto 2fr 1fr 1.3fr 1.2fr auto', gap: '0.5rem', marginBottom: '0.5rem', alignItems: 'start' }}>
+                <div style={{ display: 'flex', flexDirection: 'column' }} title="Mover dentro de este bloque">
+                  <button onClick={() => moveActividadOrden(aIdx, -1)} title="Subir" style={{ background: 'transparent', border: 'none', color: 'inherit', opacity: 0.6, cursor: 'pointer', lineHeight: 1 }}>
+                    <ChevronUp size={16} />
+                  </button>
+                  <button onClick={() => moveActividadOrden(aIdx, 1)} title="Bajar" style={{ background: 'transparent', border: 'none', color: 'inherit', opacity: 0.6, cursor: 'pointer', lineHeight: 1 }}>
+                    <ChevronDown size={16} />
+                  </button>
+                </div>
                 <textarea style={{ ...textareaStyle, minHeight: '40px' }} value={act.actividad} onChange={e => updateActividad(aIdx, 'actividad', e.target.value)} placeholder="Actividad" />
                 <input type="date" style={inputStyle} value={act.fecha} onChange={e => updateActividad(aIdx, 'fecha', e.target.value)} />
                 <input style={inputStyle} value={act.hora} onChange={e => updateActividad(aIdx, 'hora', e.target.value)} placeholder="Hora" />
+                <select
+                  style={{ ...inputStyle, fontSize: '0.75rem' }}
+                  value={act.seccion}
+                  onChange={e => moveActividadDeBloque(aIdx, e.target.value)}
+                  title="Mover esta actividad a otro bloque (fin de semana)"
+                >
+                  {form.fds.map(fb => (
+                    <option key={fb.id} value={fb.id}>{FDS_LABELS[fb.id]}</option>
+                  ))}
+                </select>
                 <button onClick={() => removeActividad(aIdx)} title="Eliminar actividad" style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer' }}>
                   <X size={18} />
                 </button>
               </div>
+              )
             ))}
             <button onClick={() => addActividad(fdsBlock.id)} className="btn-secondary" style={{ padding: '0.3rem 0.6rem', fontSize: '0.78rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
               <Plus size={14} /> Agregar actividad
@@ -665,6 +830,38 @@ function CalendarioEditor({ form, setForm, updateFdsField, updateActividad, addA
 // ============================================================================
 // Vista previa / impresión — replica el diseño de los PDF de ejemplo
 // ============================================================================
+// 31/08/2026, a pedido de José ("los links deben de funcionar"): el texto
+// de una actividad (ej. "Entrega de futuros imposibles al correo:
+// https://crearpslglobal.com/admin/login.php") se mostraba como texto
+// plano, no como link clickeable — ni en pantalla ni en el PDF exportado
+// (window.print()). Esta función detecta URLs dentro del texto y las
+// convierte en <a href> reales, conservando los saltos de línea. Chrome/Edge
+// preservan los <a href> como links funcionales al exportar a PDF con
+// "Guardar como PDF", así que esto también deja el link funcionando ahí.
+// split() usa una copia interna de la regex (no toca su lastIndex), pero
+// para el test() de cada parte usamos una regex NO global aparte — mezclar
+// .test() con una regex /g reutilizada arrastra estado (lastIndex) entre
+// llamadas y produce falsos negativos intermitentes.
+const URL_SPLIT_REGEX = /(https?:\/\/[^\s]+)/g;
+const URL_TEST_REGEX = /^https?:\/\/[^\s]+$/;
+function renderActividadTexto(texto) {
+  if (!texto) return texto;
+  const lineas = texto.split('\n');
+  return lineas.map((linea, li) => {
+    const partes = linea.split(URL_SPLIT_REGEX);
+    return (
+      <React.Fragment key={li}>
+        {li > 0 && <br />}
+        {partes.map((parte, pi) => (
+          URL_TEST_REGEX.test(parte)
+            ? <a key={pi} href={parte} target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'underline' }} onClick={e => e.stopPropagation()}>{parte}</a>
+            : <React.Fragment key={pi}>{parte}</React.Fragment>
+        ))}
+      </React.Fragment>
+    );
+  });
+}
+
 function formatFecha(iso) {
   if (!iso) return '';
   const [y, m, d] = iso.split('-');
@@ -687,6 +884,14 @@ function formatRangoFds(fdsBlock) {
 function CalendarioPreview({ cal, onClose }) {
   const headerBg = '#1a75bc';
   const rowAlt = '#eaf3fb';
+
+  // 31/08/2026: aplica applyReliableDates() también acá, en la vista previa
+  // / exportación PDF — así CUALQUIER calendario ya guardado en Firestore
+  // (incluso los creados antes de que existiera este cálculo, como el
+  // Equipo 30) muestra las fechas calculadas automáticamente, sin que nadie
+  // tenga que volver a abrirlo, editarlo y guardarlo. No pisa ninguna fecha
+  // que ya esté guardada — solo completa las que están vacías.
+  const displayCal = useMemo(() => applyReliableDates(cal), [cal]);
 
   return (
     <div style={{ background: '#f3f4f6', minHeight: '100vh', padding: '1.5rem' }}>
@@ -712,10 +917,14 @@ function CalendarioPreview({ cal, onClose }) {
       <div className="mj-page" style={{ background: 'white', maxWidth: '850px', margin: '0 auto 2rem', padding: '2rem', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
           <h1 style={{ color: headerBg, fontSize: '1.3rem', fontWeight: 900, margin: 0 }}>
-            CALENDARIO DE MAESTRÍA DEL JUEGO-{(cal.sede || '').toUpperCase()}<br />
-            EQUIPO {cal.equipoNumero} – {(cal.equipoNombre || '').toUpperCase()}
+            CALENDARIO DE MAESTRÍA DEL JUEGO-{(displayCal.sede || '').toUpperCase()}<br />
+            EQUIPO {displayCal.equipoNumero} – {(displayCal.equipoNombre || '').toUpperCase()}
           </h1>
-          <div style={{ fontWeight: 900, fontSize: '1.4rem', color: '#000' }}>CREAR<div style={{ fontSize: '0.55rem', fontWeight: 400 }}>Poder sin límites</div></div>
+          {/* 31/08/2026: logo real de CREAR (public/logo.png, el mismo que ya
+              usa Home.jsx) — antes esto era texto estilizado simulando un
+              logo, no el logo real de la marca. Agrandado el mismo día a
+              pedido de José ("el logo de CREAR debe de estar más grande"). */}
+          <img src="/logo.png" alt="CREAR Poder sin límites" style={{ height: '100px', width: 'auto', objectFit: 'contain', flexShrink: 0 }} />
         </div>
 
         <table className="mj-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -727,19 +936,32 @@ function CalendarioPreview({ cal, onClose }) {
             </tr>
           </thead>
           <tbody>
-            {cal.fds.map((fdsBlock) => (
+            {displayCal.fds.map((fdsBlock) => (
               <React.Fragment key={fdsBlock.id}>
                 <tr style={{ background: '#2f6fa8', color: 'white', fontWeight: 700 }}>
                   <td>{fdsBlock.titulo}</td>
                   <td>{formatRangoFds(fdsBlock)}</td>
                   <td style={{ whiteSpace: 'pre-line' }}>{fdsBlock.horario}</td>
                 </tr>
-                {cal.actividades.filter(a => a.seccion === fdsBlock.id).map((act, i) => (
-                  <tr key={i} style={{ background: act.destacado ? '#fef08a' : (i % 2 === 0 ? 'white' : rowAlt) }}>
-                    <td style={{ fontWeight: 600 }}>{act.actividad}</td>
-                    <td>{formatFecha(act.fecha) || '(sin fecha)'}</td>
-                    <td>{act.hora}</td>
-                  </tr>
+                {/* 31/08/2026, a pedido de José ("lo que no tenga fecha no se
+                    cargará en el PDF"): una actividad sin fecha todavía no
+                    está lista para mostrarse al equipo, así que se oculta del
+                    PDF/preview (no del editor, donde el coordinador SÍ debe
+                    seguir viéndola para completarla). La franja de cierre
+                    (esCierre) es la única excepción — no es un evento con
+                    fecha, así que siempre se muestra. */}
+                {displayCal.actividades.filter(a => a.seccion === fdsBlock.id && (a.esCierre || a.fecha)).map((act, i) => (
+                  act.esCierre ? (
+                    <tr key={i} style={{ background: '#2f6fa8', color: 'white' }}>
+                      <td colSpan={3} style={{ fontWeight: 700, textAlign: 'center', padding: '0.6rem' }}>{act.actividad}</td>
+                    </tr>
+                  ) : (
+                    <tr key={i} style={{ background: act.destacado ? '#fef08a' : (i % 2 === 0 ? 'white' : rowAlt) }}>
+                      <td style={{ fontWeight: 600 }}>{renderActividadTexto(act.actividad)}</td>
+                      <td>{formatFecha(act.fecha)}</td>
+                      <td>{act.hora}</td>
+                    </tr>
+                  )
                 ))}
               </React.Fragment>
             ))}
@@ -749,15 +971,18 @@ function CalendarioPreview({ cal, onClose }) {
 
       {/* Página 2: fin de tu entrenamiento */}
       <div className="mj-page" style={{ background: 'white', maxWidth: '850px', margin: '0 auto', padding: '2rem', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
-        <h1 style={{ color: headerBg, fontSize: '1.1rem', fontWeight: 900, marginBottom: '1rem' }}>
-          CALENDARIO DE MAESTRÍA DEL JUEGO-{(cal.sede || '').toUpperCase()}<br />
-          EQUIPO {cal.equipoNumero} – {(cal.equipoNombre || '').toUpperCase()}
-        </h1>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+          <h1 style={{ color: headerBg, fontSize: '1.1rem', fontWeight: 900, margin: 0 }}>
+            CALENDARIO DE MAESTRÍA DEL JUEGO-{(displayCal.sede || '').toUpperCase()}<br />
+            EQUIPO {displayCal.equipoNumero} – {(displayCal.equipoNombre || '').toUpperCase()}
+          </h1>
+          <img src="/logo.png" alt="CREAR Poder sin límites" style={{ height: '88px', width: 'auto', objectFit: 'contain', flexShrink: 0 }} />
+        </div>
         <div style={{ background: '#dbeafe', textAlign: 'center', fontWeight: 900, fontSize: '1.3rem', padding: '0.8rem', marginBottom: '1.5rem' }}>
           FIN DE TU ENTRENAMIENTO
         </div>
         <div style={{ background: '#f1f5f9', border: '1px solid #cbd5e1', padding: '1.2rem', fontSize: '0.82rem', whiteSpace: 'pre-line', lineHeight: 1.6 }}>
-          {cal.infoText}
+          {displayCal.infoText}
         </div>
       </div>
     </div>
