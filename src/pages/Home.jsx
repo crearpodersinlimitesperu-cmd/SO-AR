@@ -814,6 +814,16 @@ export default function Home() {
                   </div>
                 )}
 
+                {/* Calendario de Maestría del Juego (29/08/2026): mismo criterio de
+                    acceso que Centro de Managers, sin entrenadores/entrenador_llamadas
+                    (la edición es de CMJ/gerencia; los entrenadores no gestionan el
+                    calendario oficial del equipo). */}
+                {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'director_maestria', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+                  <button onClick={() => { setShowToolsDropdown(false); navigate('/calendario-mj'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#1a75bc', background: 'rgba(26, 117, 188, 0.1)' }}>
+                    📅 Calendario de Maestría del Juego
+                  </button>
+                )}
+
                 <button onClick={() => { setShowToolsDropdown(false); navigate('/protocolo-emergencias'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.4)', background: 'rgba(239, 68, 68, 0.1)', fontWeight: 'bold' }}>
                   🚨 Protocolo de Emergencias
                 </button>

@@ -111,6 +111,31 @@ service cloud.firestore {
         ]);
     }
 
+    // (29/08/2026) MJ_CALENDARS: el rol operativo del usuario (coord_maestria,
+    // director_maestria, etc.) no viaja en el token de autenticación ni se
+    // puede inferir de una lista fija de correos como isGerenteODireccion().
+    // La única forma correcta de verificarlo desde las reglas es leer el rol
+    // real guardado en users/{uid} — y esta es la única colección donde el ID
+    // de documento SÍ es el uid real de Firebase Auth (igual que ya se explica
+    // arriba para copilot_chats), porque AuthContext.jsx crea/actualiza esos
+    // documentos con doc(db, 'users', user.uid) usando el uid crudo de
+    // Firebase Auth, no el correo. get() para lectura de reglas no depende de
+    // la regla "allow read" de esa colección, así que esto funciona aunque
+    // "users" solo permita escritura a SuperAdmin.
+    function callerRole() {
+      return isAuthenticated() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role
+        in ['coord_maestria', 'director_maestria'];
+    }
+
+    // MJ_CALENDARS (29/08/2026): calendarios de Maestría del Juego por equipo
+    // (CalendarioMJ.jsx), pedido por José a partir de 3 PDF de ejemplo reales.
+    // Confirmado explícitamente por José antes de tocar firestore.rules.
+    match /mj_calendars/{calendarId} {
+      allow read: if isAuthenticated();
+      allow write: if isSuperAdmin() || isGerenteODireccion() || callerRole();
+    }
+
     // TASKS
     match /tasks/{taskId} {
       allow read: if isAuthenticated();
