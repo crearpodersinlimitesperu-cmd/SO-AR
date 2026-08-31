@@ -17,7 +17,7 @@ const db = getFirestore(app);
 
 async function extractDataFromPage(page, url, sectionName, startDate, endDate) {
   console.log(`\nNavegando a: ${sectionName} (${url})`);
-  await page.goto(url, { waitUntil: 'networkidle2' });
+  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
   await new Promise(r => setTimeout(r, 4000));
   
   if (startDate && endDate) {
@@ -83,12 +83,12 @@ async function extractDataFromPage(page, url, sectionName, startDate, endDate) {
 
 export async function runScraperWithDates(startDate = null, endDate = null, sede = null) {
   console.log("🚀 Iniciando Robot de Extracción NODUS (Modo Avanzado)...");
-  const browser = await puppeteer.launch({ headless: "new", args: ['--no-sandbox', '--disable-setuid-sandbox', '--start-maximized'] });
+  const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox', '--start-maximized'] });
   const page = await browser.newPage();
   
   try {
     console.log("🌐 Navegando al Login de Nodus...");
-    await page.goto('https://imo.crearpslglobal.com/dashboard', { waitUntil: 'networkidle2' });
+    await page.goto('https://imo.crearpslglobal.com/dashboard', { waitUntil: 'domcontentloaded', timeout: 60000 });
 
     const user = process.env.NODUS_USER;
     const pwd = process.env.NODUS_PASSWORD;
@@ -99,7 +99,7 @@ export async function runScraperWithDates(startDate = null, endDate = null, sede
     await page.type('input[name="password"]', pwd);
     await Promise.all([
       page.click('button[type="submit"]'),
-      page.waitForNavigation({ waitUntil: 'networkidle2' }),
+      page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 60000 }),
     ]);
     console.log("✅ Inicio de sesión exitoso.");
 
