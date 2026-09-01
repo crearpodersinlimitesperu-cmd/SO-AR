@@ -474,7 +474,71 @@ export const checklistData = [
   { id: 'cmjv2_f4_9', role: 'coord_maestria', cyclePhase: 'MJ', task: 'FDS4 Sábado 14:00: Almuerzo y Reconocimiento de Líderes — se otorgan los reconocimientos de Estandarte, SAI y el premio Antorcha al mánager con el mayor porcentaje de enrolamiento físico comprobable.', isCritical: true },
   { id: 'cmjv2_f4_10', role: 'coord_maestria', cyclePhase: 'MJ', task: 'FDS4 Domingo 09:00: Conexión con el Futuro — los participantes redactan sus visiones a 10, 5 y 1 año, las guardan en sobres de manila y reciben su Ticket Dorado.', isCritical: false },
   { id: 'cmjv2_f4_11', role: 'coord_maestria', cyclePhase: 'MJ', task: 'FDS4 Domingo 12:30: Almuerzo de Cierre y redacción de notitas.', isCritical: false },
-  { id: 'cmjv2_f4_12', role: 'coord_maestria', cyclePhase: 'MJ', task: 'FDS4 Domingo 18:00: Pase de Antorcha — el CMJ coordina el ingreso físico de la Maestría a la sala de Capítulo Uno para realizar el pase de antorcha oficial, unificando la energía de ambos salones.', isCritical: true }
+  { id: 'cmjv2_f4_12', role: 'coord_maestria', cyclePhase: 'MJ', task: 'FDS4 Domingo 18:00: Pase de Antorcha — el CMJ coordina el ingreso físico de la Maestría a la sala de Capítulo Uno para realizar el pase de antorcha oficial, unificando la energía de ambos salones.', isCritical: true },
+
+  // ============================================================================
+  // CMJ · TAREAS DURANTE EL CICLO DE CAPÍTULO 1 Y CAPÍTULO 2 (01/09/2026)
+  // Fuente: capturas de un tablero de tareas real de una Coordinadora de
+  // Maestría (columnas "Antes de Capítulo Uno", "Capítulo Uno" y "Antes de
+  // Cap Dos"), provistas por José. Hasta ahora coord_maestria solo tenía
+  // tareas en las fases C2/PRE-MJ/MJ/POST-MJ — esto agrega su trabajo durante
+  // las fases PRE-C1/C1/POST-C1, en paralelo a las tareas de coord_c1 que ya
+  // existen ahí (son responsables distintos operando en las mismas semanas,
+  // no se reemplaza nada existente).
+  // Generalizado a patrón: el tablero fuente traía varias instancias por
+  // equipo (ej. "CARPETA 125", "ALIADOS 127") repetidas para cada equipo que
+  // la coordinadora atiende — aquí se integra una sola vez por tarea
+  // genérica (sin número de equipo fijo), evitando duplicar la misma tarea
+  // una vez por cada equipo. cyclePhase 'PRE-C1' = columna "Antes de
+  // Capítulo Uno"; 'C1' = columna "Capítulo Uno"; 'POST-C1' = columna
+  // "Antes de Cap Dos" (ocurre después de C1, preparando C2).
+  // ============================================================================
+
+  // --- CMJ · Antes de Capítulo Uno ---
+  { id: 'cmj_prec1_1', role: 'coord_maestria', cyclePhase: 'PRE-C1', task: 'Actualizar el Drive de desertores.', isCritical: false },
+  { id: 'cmj_prec1_2', role: 'coord_maestria', cyclePhase: 'PRE-C1', task: 'Coordinar la reunión de MJ con el equipo.', isCritical: true },
+  { id: 'cmj_prec1_3', role: 'coord_maestria', cyclePhase: 'PRE-C1', task: 'Coordinar la reunión de graduación del equipo.', isCritical: true },
+  { id: 'cmj_prec1_4', role: 'coord_maestria', cyclePhase: 'PRE-C1', task: 'Dar la bienvenida a los entrenadores del cuarto FDS (El Viaje) y de Caída de Confianza.', isCritical: true },
+  { id: 'cmj_prec1_5', role: 'coord_maestria', cyclePhase: 'PRE-C1', task: 'Solicitar el entrenador para el cuarto FDS (El Viaje) y Caída de Confianza.', isCritical: true },
+  { id: 'cmj_prec1_6', role: 'coord_maestria', cyclePhase: 'PRE-C1', task: 'Revisar y actualizar la carpeta del equipo.', isCritical: false },
+  { id: 'cmj_prec1_7', role: 'coord_maestria', cyclePhase: 'PRE-C1', task: 'Enviar indicaciones sobre distintivos.', isCritical: false },
+  { id: 'cmj_prec1_8', role: 'coord_maestria', cyclePhase: 'PRE-C1', task: 'Enviar indicaciones de Futuros Imposibles (FI).', isCritical: true },
+  { id: 'cmj_prec1_9', role: 'coord_maestria', cyclePhase: 'PRE-C1', task: 'Coordinar y asistir al Grounding de Capítulo 1 con los equipos.', isCritical: true },
+  { id: 'cmj_prec1_10', role: 'coord_maestria', cyclePhase: 'PRE-C1', task: 'Solicitar las cartas del equipo y enviar el mensaje al IMO.', isCritical: false },
+  { id: 'cmj_prec1_11', role: 'coord_maestria', cyclePhase: 'PRE-C1', task: 'Dar seguimiento a los aliados del equipo.', isCritical: true },
+  { id: 'cmj_prec1_12', role: 'coord_maestria', cyclePhase: 'PRE-C1', task: 'Dar seguimiento a los entrenadores.', isCritical: false },
+  { id: 'cmj_prec1_13', role: 'coord_maestria', cyclePhase: 'PRE-C1', task: 'Actualizar el calendario de mánagers del equipo.', isCritical: false },
+  { id: 'cmj_prec1_14', role: 'coord_maestria', cyclePhase: 'PRE-C1', task: 'Definir y actualizar las fechas de llamadas con mánagers.', isCritical: false },
+  { id: 'cmj_prec1_15', role: 'coord_maestria', cyclePhase: 'PRE-C1', task: 'Mantener actualizado el sistema de llamadas.', isCritical: false },
+  { id: 'cmj_prec1_16', role: 'coord_maestria', cyclePhase: 'PRE-C1', task: 'Actualizar las tablas de enrolamiento y dar seguimiento a las llamadas pendientes.', isCritical: true },
+  { id: 'cmj_prec1_17', role: 'coord_maestria', cyclePhase: 'PRE-C1', task: 'Dar seguimiento a los rezagados del equipo.', isCritical: true },
+  { id: 'cmj_prec1_18', role: 'coord_maestria', cyclePhase: 'PRE-C1', task: 'Coordinar reunión con el Capitán del equipo.', isCritical: false },
+
+  // --- CMJ · Capítulo Uno ---
+  { id: 'cmj_c1_1', role: 'coord_maestria', cyclePhase: 'C1', task: 'Preparar el calendario de flyers.', isCritical: false },
+  { id: 'cmj_c1_2', role: 'coord_maestria', cyclePhase: 'C1', task: 'Preparar los baúles de Caída de Confianza, Noche de Confianza y Graduación.', isCritical: true },
+  { id: 'cmj_c1_3', role: 'coord_maestria', cyclePhase: 'C1', task: 'Preparar las cartas.', isCritical: false },
+  { id: 'cmj_c1_4', role: 'coord_maestria', cyclePhase: 'C1', task: 'Preparar los flyers de Noche de Confianza, Caída de Confianza y Graduación.', isCritical: false },
+  { id: 'cmj_c1_5', role: 'coord_maestria', cyclePhase: 'C1', task: 'Revisar las carpetas de los equipos.', isCritical: false },
+  { id: 'cmj_c1_6', role: 'coord_maestria', cyclePhase: 'C1', task: 'Dar seguimiento a los entrenadores de llamadas.', isCritical: false },
+  { id: 'cmj_c1_7', role: 'coord_maestria', cyclePhase: 'C1', task: 'Asignar anfitriones para la mesa de registro.', isCritical: true },
+  { id: 'cmj_c1_8', role: 'coord_maestria', cyclePhase: 'C1', task: 'Dar seguimiento y hacer llamadas a los aliados de Capítulo Uno.', isCritical: false },
+  { id: 'cmj_c1_9', role: 'coord_maestria', cyclePhase: 'C1', task: 'Enviar mensajes a los IMOs.', isCritical: false },
+
+  // --- CMJ · Antes de Capítulo Dos ---
+  { id: 'cmj_postc1_1', role: 'coord_maestria', cyclePhase: 'POST-C1', task: 'Solicitar los entrenadores de Tanque y Rompimiento de Barreras.', isCritical: true },
+  { id: 'cmj_postc1_2', role: 'coord_maestria', cyclePhase: 'POST-C1', task: 'Actualizar la tabla de enrolamiento de los equipos.', isCritical: true },
+  { id: 'cmj_postc1_3', role: 'coord_maestria', cyclePhase: 'POST-C1', task: 'Dar seguimiento a los aliados de cara a Capítulo Dos.', isCritical: true },
+  { id: 'cmj_postc1_4', role: 'coord_maestria', cyclePhase: 'POST-C1', task: 'Coordinar a los Líderes en Acción como apoyos de mesa.', isCritical: false },
+  { id: 'cmj_postc1_5', role: 'coord_maestria', cyclePhase: 'POST-C1', task: 'Dar seguimiento a los rezagados del equipo.', isCritical: true },
+  { id: 'cmj_postc1_6', role: 'coord_maestria', cyclePhase: 'POST-C1', task: 'Coordinar reunión con los mánagers del equipo.', isCritical: false },
+  { id: 'cmj_postc1_7', role: 'coord_maestria', cyclePhase: 'POST-C1', task: 'Dar la bienvenida a los entrenadores de Tanque y Rompimiento de Barreras.', isCritical: true },
+  { id: 'cmj_postc1_8', role: 'coord_maestria', cyclePhase: 'POST-C1', task: 'Jueves: coordinar y asistir al Grounding con los aliados del equipo, de cara a Capítulo Dos.', isCritical: true },
+  { id: 'cmj_postc1_9', role: 'coord_maestria', cyclePhase: 'POST-C1', task: 'Gestionar los diplomas.', isCritical: false },
+  { id: 'cmj_postc1_10', role: 'coord_maestria', cyclePhase: 'POST-C1', task: 'Llamar a los equipos pendientes.', isCritical: false },
+  { id: 'cmj_postc1_11', role: 'coord_maestria', cyclePhase: 'POST-C1', task: 'Gestionar los gafetes.', isCritical: false },
+  { id: 'cmj_postc1_12', role: 'coord_maestria', cyclePhase: 'POST-C1', task: 'Confirmar salones y audio.', isCritical: true },
+  { id: 'cmj_postc1_13', role: 'coord_maestria', cyclePhase: 'POST-C1', task: 'Mantener actualizados los Drives del equipo.', isCritical: false }
 ];
 
 export const getTasksByRole = (roleId) => checklistData.filter(t => t.role === roleId);
