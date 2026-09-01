@@ -22,6 +22,113 @@ const TABS = [
   { id: 'maestro',     label: 'Manual Maestro de Operaciones',    icon: <Milestone size={17} />,     color: '#14b8a6',           bg: 'rgba(20,184,166,0.12)' },
 ];
 
+// Datos de "MANUAL DE PROCESOS REPORTES CAP 1 Y CAP 2.docx" (integrado
+// 01/09/2026) — usados por la Seccion 7 del tab "Manual Maestro". El
+// documento fuente solo trae el proceso de Capitulo 1 (ver nota al final de
+// esa seccion); nada aqui fue inventado ni completado por inferencia.
+const REPORTES_CAP1 = [
+  {
+    dia: 'Jueves',
+    intro: 'Reporte de aliados asistentes al alineamiento de las oficinas.',
+    reportes: [
+      {
+        momento: 'Reporte de alineamiento',
+        horario: 'Despues del alineamiento — se envia al gerente de cada sede',
+        detalle: 'Despues de haber transcurrido el alineamiento de los "aliados" asistentes (incluyendo el Quantum Team QT) se envia el reporte con la cantidad de asistentes.',
+        modelo: ['REPORTE CAPITULO 1 SEDE EQUIPO X', '', 'X aliados', 'X QT', 'X Capitan']
+      }
+    ]
+  },
+  {
+    dia: 'Viernes',
+    intro: 'Es obligatorio enviar 4 reportes de asistencia a Gerencia y al chat general de la empresa.',
+    reportes: [
+      {
+        momento: '1. Inicio',
+        horario: '11:30 a.m.',
+        detalle: 'Despues de la mesa de Registro, una vez contabilizados los participantes sentados, y realizar el cuadre respectivo entre firmas, asistencia de plataforma y personas sentadas.',
+        modelo: ['REPORTE CAPITULO 1 SEDE EQUIPO X', 'VIERNES INICIO', '', 'X px', 'X aliados', 'X capitan', 'X Qt', 'X px por llegar', 'Entrenador X', 'Observaciones.']
+      },
+      {
+        momento: '2. Despues de las reglas',
+        horario: 'Al retorno del primer receso, cuando los participantes toman asiento',
+        detalle: 'Identifica a las personas que no entraron despues de la lectura de las reglas del entrenamiento emitidas por el entrenador.',
+        modelo: ['REPORTE CAPITULO 1 SEDE EQUIPO X', 'VIERNES DESPUES DE LAS REGLAS', '', 'X px', 'X aliados', 'X capitan', 'X Qt', 'Entrenador X', 'Desertores:', 'Observaciones:']
+      },
+      {
+        momento: '3. Despues de almuerzo',
+        horario: 'Al retorno del almuerzo',
+        detalle: '',
+        modelo: ['REPORTE CAPITULO 1 SEDE EQUIPO X', 'VIERNES DESPUES ALMUERZO', '', 'X px', 'X aliados', 'X capitan', 'X Qt', 'Entrenador X', 'Desertores:', 'Observaciones:']
+      },
+      {
+        momento: '4. Cierre',
+        horario: 'Al cierre del entrenamiento',
+        detalle: '',
+        modelo: ['REPORTE CAPITULO 1 SEDE EQUIPO X', 'VIERNES CIERRE', '', 'X px', 'X aliados', 'X capitan', 'X Qt', 'Entrenador X', 'Desertores:', 'Observaciones:']
+      }
+    ]
+  },
+  {
+    dia: 'Sabado',
+    intro: 'Es obligatorio enviar 3 reportes de asistencia a Gerencia y al chat general de la empresa.',
+    reportes: [
+      {
+        momento: '1. Inicio',
+        horario: '11:00 a.m.',
+        detalle: 'Despues de la mesa de Registro, una vez contabilizados los participantes sentados.',
+        modelo: ['REPORTE CAPITULO 1 SEDE EQUIPO X', 'SABADO INICIO', '', 'X px', 'X aliados', 'X capitan', 'X Qt', 'X px por llegar', 'Entrenador X', 'Desertores.', 'Observaciones.']
+      },
+      {
+        momento: '2. Despues de almuerzo',
+        horario: 'Al retorno del almuerzo',
+        detalle: '',
+        modelo: ['REPORTE CAPITULO 1 SEDE EQUIPO X', 'SABADO DESPUES ALMUERZO', '', 'X px', 'X aliados', 'X capitan', 'X Qt', 'Entrenador X', 'Desertores:', 'Observaciones:']
+      },
+      {
+        momento: '3. Cierre',
+        horario: 'Al cierre del entrenamiento',
+        detalle: 'Se anade la declaracion de los aliados para el pase del dia siguiente.',
+        modelo: ['REPORTE CAPITULO 1 SEDE EQUIPO X', 'SABADO CIERRE', '', 'X px', 'X aliados', 'X capitan', 'X Qt', 'Entrenador X', 'Desertores:', 'Declaracion:', 'Observaciones:']
+      }
+    ]
+  },
+  {
+    dia: 'Domingo',
+    intro: 'Es obligatorio enviar 4 reportes de asistencia y reporte de enrolamiento (pagos) a Gerencia y al chat general de la empresa.',
+    reportes: [
+      {
+        momento: '1. Inicio',
+        horario: '11:30 a.m.',
+        detalle: 'Despues de la mesa de Registro y enrolamiento (pagos), una vez contabilizados los participantes sentados. Si no se pueden contabilizar porque suelen estar en compartir o en catarsis, se envia un estimado tomando en cuenta los gafetes (escarapelas) faltantes por retirar.',
+        modelo: ['REPORTE CAPITULO 1 SEDE EQUIPO X', 'DOMINGO INICIO', '', 'X px', 'X aliados', 'X capitan', 'X Qt', 'X desertores', 'Entrenador X', 'Observaciones.'],
+        pagos: ['X C2 + MJ', 'X. C2']
+      },
+      {
+        momento: '2. Despues de la declaracion',
+        horario: 'Despues de la declaracion',
+        detalle: '',
+        modelo: ['REPORTE CAPITULO 1 SEDE EQUIPO X', 'DOMINGO DESPUES DE DECLARACION', '', 'X px', 'X aliados', 'X capitan', 'X Qt', 'X desertores', 'Observaciones.'],
+        pagos: ['X C2 + MJ', 'X. C2']
+      },
+      {
+        momento: '3. Despues de almuerzo',
+        horario: 'Al retorno del almuerzo',
+        detalle: '',
+        modelo: ['REPORTE CAPITULO 1 SEDE EQUIPO X', 'DOMINGO DESPUES DE ALMUERZO', '', 'X px', 'X aliados', 'X capitan', 'X Qt', 'X desertores', 'Entrenador X', 'Observaciones.'],
+        pagos: ['X C2 + MJ', 'X. C2']
+      },
+      {
+        momento: '4. Cierre',
+        horario: 'Al cierre del entrenamiento',
+        detalle: 'Se anade la declaracion de los aliados para el Capitulo 2.',
+        modelo: ['REPORTE CAPITULO 1 SEDE EQUIPO X', 'DOMINGO CIERRE', '', 'X px', 'X aliados', 'X capitan', 'X Qt', 'X desertores', 'Entrenador X', 'Observaciones.'],
+        pagos: ['X C2 + MJ', 'X. C2']
+      }
+    ]
+  }
+];
+
 function TabBtn({ tab, active, onClick }) {
   return (
     <button
@@ -851,6 +958,68 @@ export default function ManualGuia() {
               <li><strong>Gobernanza y Confidencialidad Extrema:</strong> bajo ninguna circunstancia se permite tomar fotos, videos o divulgar el nombre de los entrenadores de Maestria en chats generales o redes sociales. El secreto del proceso se protege con rigor de Nivel 3.</li>
               <li><strong>Evidencias de FI en FDS3:</strong> en el fin de semana de Gratitud, solo los participantes y managers con un avance verificado de sus FI mayor o igual a 80% o al 100% de cumplimiento de evidencias fisicas tienen derecho a compartir su testimonio en el arco final de graduacion.</li>
             </ul>
+          </div>
+
+          {/* Seccion 7 — integrado desde "MANUAL DE PROCESOS REPORTES CAP 1 Y
+              CAP 2.docx" (Jose, 01/09/2026). El documento fuente, pese al
+              nombre, SOLO desarrolla el proceso de Capitulo 1 (jueves a
+              domingo) — no contiene el proceso de Capitulo 2, asi que esa
+              parte queda pendiente de que gerencia la entregue; ver nota al
+              final de esta seccion. No reemplaza el 6.2 (formato general de
+              titulo de reporte), lo complementa con el detalle especifico de
+              CADA reporte de asistencia de Capitulo 1: cuando se envia y que
+              campos lleva. */}
+          <div className="glass-panel" style={{ padding: '2.25rem 2rem', borderRadius: '16px' }}>
+            <h3 style={{ margin: '0 0 1rem 0', color: '#14b8a6', fontSize: '1.15rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <FileText size={19} color="#14b8a6" /> Seccion 7 — Proceso Detallado de Reportes de Asistencia: Capitulo 1
+            </h3>
+
+            <p style={{ margin: '0 0 1.5rem 0', color: 'var(--text-main)', fontSize: '0.88rem', lineHeight: '1.6' }}>
+              Estandariza mecanica y contextualmente la elaboracion y envio de los reportes de cada entrenamiento de Capitulo 1. Sirve de apoyo a coordinadores nuevos, manteniendo el proceso sugerido por gerencia. Cada reporte del modelo de abajo se envia a los canales oficiales de la <strong>seccion 6.1</strong> (Crear Global) y, cuando el modelo lo indica, tambien al gerente de la sede.
+            </p>
+
+            {REPORTES_CAP1.map((diaBlock) => (
+              <div key={diaBlock.dia} style={{ marginBottom: '1.75rem' }}>
+                <p style={{ margin: '0 0 0.4rem 0', color: 'var(--crear-gold)', fontSize: '0.95rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.02em' }}>
+                  Dia {diaBlock.dia}
+                </p>
+                <p style={{ margin: '0 0 0.9rem 0', color: 'var(--text-muted)', fontSize: '0.85rem', lineHeight: '1.55' }}>
+                  {diaBlock.intro}
+                </p>
+                <div style={{ display: 'grid', gap: '0.9rem' }}>
+                  {diaBlock.reportes.map((rep, i) => (
+                    <div key={i} style={{ padding: '0.9rem 1rem', background: 'var(--bg-card)', borderRadius: '10px', border: '1px solid var(--border-subtle)' }}>
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.6rem', flexWrap: 'wrap', marginBottom: '0.35rem' }}>
+                        <strong style={{ color: 'var(--text-heading)', fontSize: '0.88rem' }}>{rep.momento}</strong>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: '#14b8a6', fontSize: '0.78rem', fontWeight: 700 }}>
+                          <Clock size={13} /> {rep.horario}
+                        </span>
+                      </div>
+                      {rep.detalle && (
+                        <p style={{ margin: '0 0 0.55rem 0', color: 'var(--text-muted)', fontSize: '0.82rem', lineHeight: '1.5' }}>
+                          {rep.detalle}
+                        </p>
+                      )}
+                      <div style={{ padding: '0.7rem 0.9rem', background: 'rgba(0,0,0,0.25)', borderRadius: '8px', border: '1px solid var(--border-subtle)', fontFamily: 'monospace', fontSize: '0.79rem', color: 'var(--text-main)', lineHeight: '1.6' }}>
+                        {rep.modelo.map((linea, li) => <div key={li}>{linea || ' '}</div>)}
+                        {rep.pagos && (
+                          <>
+                            <div style={{ marginTop: '0.4rem', color: 'var(--crear-gold)' }}>Reporte de pagos</div>
+                            {rep.pagos.map((linea, li) => <div key={li}>{linea}</div>)}
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+
+            <div style={{ padding: '1rem 1.2rem', background: 'rgba(239,68,68,0.08)', borderRadius: '10px', border: '1px solid rgba(239,68,68,0.3)' }}>
+              <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-main)', lineHeight: '1.6' }}>
+                ⚠️ <strong>Pendiente:</strong> el documento fuente de esta seccion se llama "Reportes Cap 1 y Cap 2", pero solo desarrolla el proceso de Capitulo 1. El proceso detallado de reportes de Capitulo 2 (dias, horarios y modelos) todavia no esta documentado aqui — se agregara cuando gerencia lo entregue.
+              </p>
+            </div>
           </div>
         </div>
       )}
