@@ -106,6 +106,7 @@ const MODULE_REGISTRY = [
   { id: 'checklist', label: 'Mi Checklist Operativo', emoji: '✅', route: (u) => `/checklist/${u?.appRole || 'capitan'}`, roles: null },
   { id: 'metas', label: 'Mis Metas', emoji: '🏆', route: '/metas', roles: null },
   { id: 'reportes', label: 'Enviar Reportes', emoji: '📤', route: '/reportes', roles: null, visible: REPORTES_VISIBLE },
+  { id: 'generador-flyer', label: 'Generador de Flyers Oficiales', emoji: '🎨', route: '/generador-flyer', roles: null },
 ];
 
 const isModuleVisible = (mod, currentUser) => {
@@ -712,6 +713,13 @@ export default function Home() {
             >
               🎯 Mis Metas
             </button>
+            <button
+              onClick={() => navigate('/generador-flyer')}
+              className="btn-secondary"
+              style={{ padding: '0.45rem 0.9rem', fontSize: '0.85rem', color: '#f59e0b', borderColor: 'rgba(245, 158, 11, 0.5)', background: 'rgba(245, 158, 11, 0.12)', fontWeight: 'bold' }}
+            >
+              🎨 Generador Flyers
+            </button>
           </div>
 
           {/* MENÚ DESPLEGABLE DE MÁS MÓDULOS */}
@@ -935,6 +943,10 @@ export default function Home() {
               📅 Calendario MJ
             </button>
           )}
+
+          <button onClick={() => navigate('/generador-flyer')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #ec4899)', color: 'white', fontWeight: 'bold', border: 'none', boxShadow: '0 0 15px rgba(245, 158, 11, 0.4)' }}>
+            🎨 Generador Flyers
+          </button>
         </div>
       )}
 

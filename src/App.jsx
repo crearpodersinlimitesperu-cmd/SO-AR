@@ -287,9 +287,9 @@ function App() {
 
           {/* Generador de Flyers Oficiales (02/09/2026): Generador HD 1080x1920 con fechas por sede */}
           <Route path="/generador-flyer" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria', 'coord_maestria', 'coordinador_mj', 'entrenador']} requireSuperAdmin={false}>
+            <PrivateRoute>
               <GeneradorFlyer />
-            </RoleRoute>
+            </PrivateRoute>
           } />
 
           <Route path="*" element={<Navigate to="/" replace />} />
