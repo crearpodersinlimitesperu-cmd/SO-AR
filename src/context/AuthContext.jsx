@@ -3,7 +3,7 @@ import { auth } from '../services/firebase';
 import { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'firebase/auth';
 import { collection, query, where, getDocs, doc, getDoc, setDoc, serverTimestamp, addDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
-import { normalizeRole, ROLE_DISPLAY_NAMES } from '../data/usersData';
+import { normalizeRole, ROLE_DISPLAY_NAMES, findUserByAnyEmail } from '../data/usersData';
 import { isSuperAdminEmail, isDireccionRole, isGerenciaRole, canSimulate, DUAL_ROLE_TRAINER_EMAILS } from '../config/permissions';
 import { useUI } from './UIContext';
 import { recordAuditEvent, fetchNetworkInfo } from '../services/auditService';
@@ -255,6 +255,20 @@ export function AuthProvider({ children }) {
         }
       }
 
+      // 🆕 (02/09/2026) Respaldo: catálogo estático usersToImport.js (findUserByAnyEmail).
+      // Antes de este fix, si el correo todavía no existía en Firestore (típicamente
+      // porque nadie corrió una importación manual para esa persona), el login caía
+      // directo al "colaborador" genérico, aunque esa persona ya estuviera correctamente
+      // registrada como entrenador/etc. en el código fuente. Caso real confirmado:
+      // Lourdes Patiño (marylourdespat@gmail.com) — ver managers_directory/liquidacion,
+      // reportado por José el 02/09/2026.
+      if (!foundUser) {
+        const staticUser = findUserByAnyEmail(normalizedEmail);
+        if (staticUser) {
+          foundUser = { ...staticUser };
+        }
+      }
+
       if (!foundUser) {
         foundUser = {
           id: user.uid,
@@ -347,6 +361,15 @@ export function AuthProvider({ children }) {
           }
         }
         
+        // 🆕 (02/09/2026) Mismo respaldo que en loginWithGoogle: catálogo estático
+        // antes de descartar al usuario por completo en esta ruta de sesión persistida.
+        if (!foundUser) {
+          const staticUser = findUserByAnyEmail(normalizedEmail);
+          if (staticUser) {
+            foundUser = { ...staticUser, uid: user.uid };
+          }
+        }
+
         if (!foundUser && isSuperAdminEmail(normalizedEmail)) {
           foundUser = {
             id: user.uid,

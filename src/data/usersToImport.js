@@ -539,12 +539,14 @@ export const USERS_TO_IMPORT = [
     ],
     "role": "gerente",
     "roles": [
-      "gerente"
+      "gerente",
+      "entrenador",
+      "entrenador_llamadas"
     ],
     "sede": "Quito",
     "emails": [
       "emily.campuzano@crearpsl.net",
-      "emily.campuzano@crearpsl.net"
+      "milacampuzano21@gmail.com"
     ],
     "email": "emily.campuzano@crearpsl.net"
   },
@@ -689,7 +691,8 @@ export const USERS_TO_IMPORT = [
     "name": "Alejandro Díaz",
     "role": "entrenador",
     "roles": [
-      "entrenador"
+      "entrenador",
+      "entrenador_llamadas"
     ],
     "sede": "Global",
     "emails": [
@@ -715,7 +718,8 @@ export const USERS_TO_IMPORT = [
     "name": "Ana Elena Monroy",
     "role": "entrenador",
     "roles": [
-      "entrenador"
+      "entrenador",
+      "entrenador_llamadas"
     ],
     "sede": "Global",
     "emails": [
@@ -754,7 +758,8 @@ export const USERS_TO_IMPORT = [
     "name": "Diego Bravo",
     "role": "entrenador",
     "roles": [
-      "entrenador"
+      "entrenador",
+      "entrenador_llamadas"
     ],
     "sede": "Global",
     "emails": [
@@ -767,7 +772,8 @@ export const USERS_TO_IMPORT = [
     "name": "Haydin Fernando Mendoza Clavijo",
     "role": "entrenador",
     "roles": [
-      "entrenador"
+      "entrenador",
+      "entrenador_llamadas"
     ],
     "sede": "Global",
     "emails": [
@@ -816,10 +822,11 @@ export const USERS_TO_IMPORT = [
   },
   {
     "id": "entrenador_maradelourdespatiopatiogalarraga",
-    "name": "María De Lourdes Patiño Patiño Galarraga",
+    "name": "María De Lourdes Patiño Galarraga",
     "role": "entrenador",
     "roles": [
-      "entrenador"
+      "entrenador",
+      "entrenador_llamadas"
     ],
     "sede": "Global",
     "emails": [
