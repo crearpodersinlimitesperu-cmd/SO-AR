@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
-import { collection, getDocs, updateDoc, doc } from 'firebase/firestore';
-import { db, getDocResilient } from '../services/firebase';
+import { collection, getDocs, getDoc, updateDoc, doc } from 'firebase/firestore';
+import { db, auth, getDocResilient } from '../services/firebase';
 import { CheckCircle2, AlertCircle, ArrowLeft, Users, Target } from 'lucide-react';
 import CountryFlag from '../components/CountryFlag';
 import { recordAuditEvent } from '../services/auditService';
@@ -109,28 +109,79 @@ export default function AuditoriaKPIs() {
     return allData;
   };
 
+  // (02/09/2026) FIX + pedido de José ("extraer datos en tiempo real de
+  // Nodus para saber cómo van los CC1Y2"): esto antes llamaba a
+  // 'http://localhost:3001/api/scrape-nodus', una dirección que solo existe
+  // en la máquina de quien lo desarrolló — en producción siempre fallaba con
+  // "Failed to fetch" (el error de tu captura). El robot de Nodus SÍ soporta
+  // scrapear en vivo con rango de fechas (runScraperWithDates en
+  // scripts/nodusScraper.js), pero corre con Puppeteer — necesita un
+  // navegador real, no puede correr en el Worker de Cloudflare ni en el
+  // navegador del usuario. Ahora se dispara vía GitHub Actions (mismo
+  // mecanismo que el botón "Extraer Nodus" de Super Admin, mismo endpoint
+  // del Worker, con startDate/endDate) y NO es instantáneo: tarda 1-3
+  // minutos en loguearse a Nodus y recorrer las páginas. Este flujo espera
+  // el resultado con sondeos (polling) al documento
+  // nodus_kpis_sincronizados/live_filtered en vez de bloquear con un solo
+  // fetch síncrono.
   const handleLiveFilter = async () => {
     if (!startDate || !endDate) {
       showToast("Por favor selecciona Desde y Hasta para filtrar en Nodus", "warning");
       return;
     }
-    
+
     setIsScrapingLive(true);
-    showToast("Conectando con Nodus para extraer datos en vivo...", "info");
-    
+    showToast("Disparando extracción en vivo de Nodus (tarda 1-3 minutos)...", "info");
+
     try {
-      const response = await fetch('http://localhost:3001/api/scrape-nodus', {
+      const firebaseUser = auth.currentUser;
+      if (!firebaseUser) throw new Error('No se detectó sesión activa. Cierra sesión e inicia nuevamente.');
+      const idToken = await firebaseUser.getIdToken(true);
+      const workerUrl = import.meta.env.VITE_COPILOTO_WORKER_URL || 'https://so-ar-copiloto.crearpsl-cpsl.workers.dev';
+
+      const dispatchStartedAt = Date.now();
+
+      const res = await fetch(`${workerUrl}/trigger-nodus-scraper`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
         body: JSON.stringify({ startDate, endDate })
       });
-      const data = await response.json();
-      const parsedData = parseNodusData(data);
-      setReports(parsedData);
-      showToast("Datos de Nodus actualizados.", "success");
+      const dispatchData = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(dispatchData.message || 'No se pudo disparar la extracción filtrada.');
+
+      showToast("Extracción disparada. Buscando el resultado cada 15 segundos (hasta 5 minutos)...", "info");
+
+      // Polling: hasta 5 minutos, cada 15s, contra el documento que
+      // nodusScraper.js escribe SOLO cuando corre con fechas (nunca pisa
+      // 'latest_snapshot'). Se compara con dispatchStartedAt para no mostrar
+      // por error el resultado de una corrida filtrada anterior.
+      const POLL_INTERVAL_MS = 15000;
+      const MAX_WAIT_MS = 5 * 60 * 1000;
+      const liveRef = doc(db, 'nodus_kpis_sincronizados', 'live_filtered');
+      let found = false;
+
+      while (Date.now() - dispatchStartedAt < MAX_WAIT_MS) {
+        await new Promise(r => setTimeout(r, POLL_INTERVAL_MS));
+        const snap = await getDoc(liveRef);
+        if (snap.exists()) {
+          const data = snap.data();
+          const dataTime = data.timestamp ? new Date(data.timestamp).getTime() : 0;
+          if (dataTime >= dispatchStartedAt) {
+            const parsedData = parseNodusData(data);
+            setReports(parsedData);
+            showToast("Datos de Nodus (filtrados por fecha) actualizados.", "success");
+            found = true;
+            break;
+          }
+        }
+      }
+
+      if (!found) {
+        showToast("La extracción está tardando más de 5 minutos o el resultado no llegó aún. Espera un momento y vuelve a apretar 'Filtrar' — cada clic dispara una nueva extracción.", "warning");
+      }
     } catch (err) {
       console.error(err);
-      showToast("Error al extraer datos de Nodus", "error");
+      showToast("Error al extraer datos de Nodus: " + err.message, "error");
     } finally {
       setIsScrapingLive(false);
     }

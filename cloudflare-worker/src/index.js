@@ -433,6 +433,19 @@ async function handleTriggerNodusScraper(request, env, origin) {
     return json({ error: 'unauthenticated', message: 'Falta el token de sesión.' }, 401, origin);
   }
 
+  // (02/09/2026) startDate/endDate opcionales — pedido de José para ver
+  // Nodus filtrado por rango de fechas (CC1Y2 por ciclo/sede) desde
+  // AuditoriaKPIs.jsx. Si no vienen, se dispara la corrida normal (igual que
+  // el botón "Extraer Nodus" de Super Admin).
+  let startDate = null, endDate = null;
+  try {
+    const body = await request.json();
+    if (body && typeof body.startDate === 'string' && body.startDate.trim()) startDate = body.startDate.trim();
+    if (body && typeof body.endDate === 'string' && body.endDate.trim()) endDate = body.endDate.trim();
+  } catch (e) {
+    // Body vacío o no-JSON — se trata como "sin fechas" (comportamiento igual al de antes).
+  }
+
   let uid, tokenEmail;
   try {
     const payload = await verifyFirebaseToken(idToken);
@@ -467,6 +480,10 @@ async function handleTriggerNodusScraper(request, env, origin) {
 
   try {
     const dispatchUrl = `https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/actions/workflows/${GITHUB_WORKFLOW_FILE}/dispatches`;
+    const dispatchBody = { ref: 'master' };
+    if (startDate || endDate) {
+      dispatchBody.inputs = { startDate: startDate || '', endDate: endDate || '' };
+    }
     const ghResp = await fetch(dispatchUrl, {
       method: 'POST',
       headers: {
@@ -475,7 +492,7 @@ async function handleTriggerNodusScraper(request, env, origin) {
         'Content-Type': 'application/json',
         'User-Agent': 'so-ar-copiloto-worker'
       },
-      body: JSON.stringify({ ref: 'master' })
+      body: JSON.stringify(dispatchBody)
     });
 
     if (ghResp.status !== 204) {
@@ -494,14 +511,20 @@ async function handleTriggerNodusScraper(request, env, origin) {
       email: userData.email || 'desconocido',
       role: userData.role || userData.appRole || 'desconocido',
       sede: userData.sede || 'Global',
-      action: 'TRIGGER_NODUS_SCRAPER',
+      action: startDate || endDate ? 'TRIGGER_NODUS_SCRAPER_FILTRADO' : 'TRIGGER_NODUS_SCRAPER',
+      details: startDate || endDate ? `Filtro: ${startDate || '(sin desde)'} a ${endDate || '(sin hasta)'}` : '',
       timestamp: new Date().toISOString()
     }, accessToken);
   } catch (err) {
     console.error('[triggerNodusScraper] Error guardando auditoría (no bloqueante):', err);
   }
 
-  return json({ ok: true, message: 'Extracción de Nodus disparada en GitHub Actions.' }, 200, origin);
+  return json({
+    ok: true,
+    message: startDate || endDate
+      ? 'Extracción filtrada de Nodus disparada en GitHub Actions. Tarda 1-3 minutos; el resultado queda en nodus_kpis_sincronizados/live_filtered.'
+      : 'Extracción de Nodus disparada en GitHub Actions.'
+  }, 200, origin);
 }
 
 async function construirContextoNodus(userData, accessToken) {

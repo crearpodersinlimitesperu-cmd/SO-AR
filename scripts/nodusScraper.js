@@ -133,13 +133,22 @@ export async function runScraperWithDates(startDate = null, endDate = null, sede
     console.log("\n📊 Extracción finalizada.");
 
     // Si es un scrapeo en vivo (tiene fechas explícitas), no sobreescribimos el 'latest_snapshot' global.
-    // Solo devolvemos la data para que la API responda.
     if (!startDate && !endDate) {
       console.log("Enviando a Firebase Firestore...");
       const docId = `nodus_snapshot_${new Date().getTime()}`;
       await setDoc(doc(db, 'nodus_kpis_sincronizados', docId), extractedData);
       await setDoc(doc(db, 'nodus_kpis_sincronizados', 'latest_snapshot'), extractedData);
       console.log(`✅ ¡Éxito! Datos guardados en la nube bajo el ID: ${docId}`);
+    } else {
+      // (02/09/2026) Scrapeo en vivo CON fechas — pedido de José para ver
+      // avance de CC1Y2/MJ por rango de fechas. Se guarda aparte, en un
+      // documento propio que SIEMPRE se sobreescribe con la última corrida
+      // filtrada, para que el frontend (que no puede correr Puppeteer) lo
+      // lea después de disparar la extracción vía GitHub Actions. Nunca toca
+      // 'latest_snapshot' (ese sigue siendo solo el snapshot diario sin filtro).
+      console.log("Enviando resultado filtrado a Firebase Firestore (live_filtered)...");
+      await setDoc(doc(db, 'nodus_kpis_sincronizados', 'live_filtered'), extractedData);
+      console.log("✅ ¡Éxito! Resultado filtrado guardado en 'live_filtered'.");
     }
 
     return extractedData;
@@ -155,5 +164,13 @@ export async function runScraperWithDates(startDate = null, endDate = null, sede
 // Ejecutar automáticamente si el script se llama directamente desde Node
 import { fileURLToPath } from 'url';
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  runScraperWithDates().then(() => process.exit(0)).catch(() => process.exit(1));
+  // (02/09/2026) NODUS_START_DATE/NODUS_END_DATE: variables de entorno que
+  // pone .github/workflows/nodus-daily.yml a partir de los inputs del
+  // workflow_dispatch, para poder disparar una extracción filtrada por
+  // fechas desde fuera (Worker de Cloudflare) sin afectar la corrida diaria
+  // (esas variables vienen vacías cuando el disparo es por cron o manual sin
+  // fechas, y aquí una cadena vacía se trata igual que "sin fecha").
+  const envStart = process.env.NODUS_START_DATE || null;
+  const envEnd = process.env.NODUS_END_DATE || null;
+  runScraperWithDates(envStart, envEnd).then(() => process.exit(0)).catch(() => process.exit(1));
 }
