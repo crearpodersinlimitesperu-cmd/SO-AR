@@ -425,6 +425,79 @@ export default function ManualGuia() {
                 </div>
               ))}
             </div>
+
+            <h3 style={{ margin: '2rem 0 0.35rem 0', color: '#0ea5e9', fontSize: '1.15rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <BarChart3 size={20} color="#0ea5e9" /> 6. Guia de Medicion de KPIs para Coordinadores en NODUS
+            </h3>
+            <p style={{ margin: '0 0 1rem 0', fontSize: '0.78rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+              Aporte de Direccion — integrado 02/09/2026, confirmado por Jose Sanchez. No proviene de un manual auditado. Guia dirigida exclusivamente a Gerencia de Sede (Nivel 8) y Direccion Global, para auditar el rendimiento de CC1Y2 y CMJ dentro de la plataforma NODUS.
+            </p>
+
+            <h4 style={{ margin: '0 0 0.75rem 0', color: 'var(--text-heading)', fontSize: '1rem' }}>A. Evaluacion del CC1Y2 (Coordinador Capitulo Uno y Dos) — Nivel 5</h4>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem', marginBottom: '1.75rem' }}>
+              <InfoCard color="#0ea5e9" title="Eficiencia y Velocidad de Registro">
+                Donde: modulos Mesa Registro y Participantes Sede. Que auditar: el 100% de los participantes fisicos en sala deben tener status en verde ("Registrado" y "Pagado") antes del primer break; correcta identificacion/asignacion del IMO (Enrolador) en cada perfil.
+              </InfoCard>
+              <InfoCard color="#0ea5e9" title="Conversion y Captura Financiera (Cierre de C1)">
+                Donde: modulo Reportes → Enrolamiento y modulo Cierre de Caja. Que auditar el domingo de C1: ratio de conversion de alumnos de C1 a C2/Maestria; cuadre al 100% entre los pagos de la mesa externa de conversion y el "Cierre de Caja" del sistema ese mismo domingo.
+              </InfoCard>
+              <InfoCard color="#0ea5e9" title="Mitigacion de Fugas (Retencion Operativa)">
+                Donde: modulo Reporte de Entrenadores (columna Desertor FDS). Que auditar: participantes que iniciaron el viernes vs. los que finalizaron el domingo — un numero alto de deserciones puede indicar fallas en la logistica invisible o apoyo operativo.
+              </InfoCard>
+            </div>
+
+            <h4 style={{ margin: '0 0 0.75rem 0', color: 'var(--text-heading)', fontSize: '1rem' }}>B. Evaluacion del CMJ (Coordinador de Maestria del Juego) — Nivel 6, fase de 90 dias</h4>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem', marginBottom: '1.75rem' }}>
+              <InfoCard color="#0ea5e9" title="Efectividad de la Auditoria Predictiva (miercoles de FI)">
+                Donde: modulos Seguimiento → Maestrias y Asignacion de Llamadas. Que auditar: que todos los miercoles queden registrados los avances de los Futuros Imposibles (FI); que las banderas rojas detectadas por el Quantum Team (QT) hayan sido abordadas y documentadas por el CMJ.
+              </InfoCard>
+              <InfoCard color="#0ea5e9" title="Reclutamiento y Retencion de Managers">
+                Donde: modulo Configuracion → Equipos y Maestrias (asignacion de staff). Que auditar: ratio de staff/participante — que el CMJ haya reclutado y sostenido la proporcion adecuada de Managers, y si hay equipos en NODUS sin Manager a mitad de los 90 dias.
+              </InfoCard>
+              <InfoCard color="#0ea5e9" title="Sostenimiento de la Comunidad y Graduacion">
+                Donde: modulo Certificados y Participantes Rezagados. Que auditar: porcentaje de alumnos que completan exitosamente los 90 dias respecto a los que iniciaron el MJ; nivel de alumnos enviados a "rezagados" por falta de apoyo.
+              </InfoCard>
+            </div>
+
+            <div style={{ padding: '1rem 1.2rem', background: 'var(--bg-card)', borderRadius: '10px', border: '1px solid var(--border-subtle)', marginBottom: '1rem' }}>
+              <strong style={{ color: '#0ea5e9', fontSize: '0.88rem', display: 'block', marginBottom: '0.25rem' }}>C. La "Sombra" del Quantum Team (QT — Nivel 4)</strong>
+              <p style={{ margin: 0, fontSize: '0.83rem', color: 'var(--text-muted)', lineHeight: '1.55' }}>
+                Aunque el QT responde operativamente al CMJ, la Gerencia debe verificar la efectividad de sus llamadas en el modulo Reportes → Reporte ERES y Actividad de Coordinadores. KPI principal: efectividad mayor a 60% en el feedback de resolucion de llamadas, con foco en Futuros Imposibles.
+              </p>
+            </div>
+
+            <div style={{ padding: '1rem 1.2rem', background: 'rgba(14,165,233,0.08)', borderRadius: '10px', border: '1px solid rgba(14,165,233,0.25)' }}>
+              <strong style={{ color: '#0ea5e9', fontSize: '0.88rem', display: 'block', marginBottom: '0.25rem' }}>Recomendacion para Gerentes (Nivel 8)</strong>
+              <p style={{ margin: 0, fontSize: '0.83rem', color: 'var(--text-muted)', lineHeight: '1.55' }}>
+                El Dashboard Principal da la vista macro, pero se debe exigir al CC1Y2 su bitacora fisica de control de fallas para cruzarla contra los datos financieros de NODUS, y al CMJ que mantenga la matriz de Futuros Imposibles actualizada sin retrasos semanales en la plataforma.
+              </p>
+            </div>
+
+            <h3 style={{ margin: '2rem 0 0.35rem 0', color: '#8b5cf6', fontSize: '1.15rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Sparkles size={20} color="#8b5cf6" /> 7. Filosofia de Rick Rubin ("El Acto de Crear") aplicada a CPSL
+            </h3>
+            <p style={{ margin: '0 0 1.1rem 0', fontSize: '0.78rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+              Aporte de Direccion — integrado 02/09/2026, confirmado por Jose Sanchez. No proviene de un manual auditado. Sintesis de 5 principios del libro "El acto de crear" de Rick Rubin, codificados para la cultura, operacion y liderazgo de CPSL, bajo el principio de que "el lider es la causa, no el efecto".
+            </p>
+            <div style={{ display: 'grid', gap: '0.75rem', marginBottom: '1.25rem' }}>
+              {[
+                { t: '1. El Arte como un "Estado del Ser"', d: 'El verdadero trabajo del artista no es acumular artefactos, es una manera de estar en el mundo — todo ser humano es creador porque sintoniza informacion, filtra la realidad y selecciona su experiencia. En CPSL: un Coordinador, Aliado o Manager no es un "ejecutor de eventos", es un creador de contexto. Si el staff opera cansado o en automatico, el salon refleja esa desconexion — se entrena a los lideres para Ser el contenedor de posibilidad donde la transformacion ocurre de forma inevitable.' },
+                { t: '2. La Disciplina Militar para Liberar la Magia en Sala', d: 'La disciplina y la libertad no son opuestas, son socias: la precision militar en lo practico abre las ventanas creativas con libertad infantil. En CPSL: la rigurosidad de Nodus (checklists, horarios innegociables, cierres financieros) es el andamiaje que libera el 100% de la energia cognitiva del staff para la fisionomia, la lectura intuitiva del participante y el coacheo profundo.' },
+                { t: '3. Rompimiento de "Normas" y Mente de Principiante', d: 'Las reglas son suposiciones, no leyes de la naturaleza, disenadas para el comportamiento promedio — si una regla limita, vale la pena intentar exactamente lo contrario. En CPSL: justifica las dinamicas de disrupcion de Capitulo Dos (Vestimenta Irrazonable) y la decision de permitir tenis negros a los entrenadores — priorizar la entrega del facilitador ("el verdadero instrumento") sobre convenciones externas obsoletas.' },
+                { t: '4. Mentalidad de Abundancia: Terminar para Volver a Empezar', d: 'Vivir en la escasez lleva al estancamiento y al perfeccionismo paralizante; cada proyecto es una estacion de un viaje que debe cerrarse para dar espacio al siguiente. En CPSL: es la esencia de la Maestria del Juego de 90 dias — el Fin de Semana 4 (El Viaje) y el Pase de Antorcha son la representacion fisica de cerrar el ciclo, celebrar el "juego ganado" y liberarlo en el contenedor de C1.' },
+                { t: '5. La Busqueda de la "Opcion C"', d: 'Si un colaborador prefiere la Opcion A y otro la Opcion B, no se elige ninguna: se trabaja con paciencia hasta que emerja una Opcion C superior — la sinergia del grupo importa mas que el talento individual. En CPSL: ante quiebres de personal o visiones encontradas con el Entrenador en sala, Causa OS prohibe soluciones a medias o negociaciones por comodidad — se opera desde la confrontacion asertiva hasta la solucion cuantica superior que cuide el contenedor del participante.' },
+              ].map(item => (
+                <div key={item.t} style={{ padding: '0.9rem 1.1rem', background: 'var(--bg-card)', borderRadius: '10px', border: '1px solid var(--border-subtle)' }}>
+                  <strong style={{ color: '#8b5cf6', fontSize: '0.88rem', display: 'block', marginBottom: '0.25rem' }}>{item.t}</strong>
+                  <p style={{ margin: 0, fontSize: '0.83rem', color: 'var(--text-muted)', lineHeight: '1.55' }}>{item.d}</p>
+                </div>
+              ))}
+            </div>
+            <div style={{ padding: '1rem 1.2rem', background: 'rgba(139,92,246,0.08)', borderRadius: '10px', border: '1px solid rgba(139,92,246,0.25)' }}>
+              <p style={{ margin: 0, fontSize: '0.88rem', color: 'var(--text-main)', lineHeight: '1.6', fontStyle: 'italic' }}>
+                "Nodus registra la realidad de los procesos. Causa OS, inspirada en Rubin, nos recuerda que el verdadero instrumento eres tu; y que la unica forma de elevar los resultados en Nodus es refinando la sensibilidad, la fisionomia y la impecabilidad del Ser que lidera la sala."
+              </p>
+            </div>
           </div>
         </div>
       )}

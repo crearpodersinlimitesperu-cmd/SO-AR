@@ -71122,6 +71122,1128 @@ export const normalizeCoordinator = (name) => {
 
 ---
 
+## Archivo: nodus_latest_snapshot.json
+
+```json
+{
+  "robot_token": "NODUS_ROBOT_CPSL_2026_SECRET",
+  "timestamp": "2026-09-02T02:15:18.572Z",
+  "fechasFiltro": {
+    "startDate": null,
+    "endDate": null
+  },
+  "fuente": "Robot de Nodus V2 (Reportes y Facturación)",
+  "secciones": {
+    "actividadCoordinadores": {
+      "tablas": [],
+      "kpis": [
+        {
+          "cardId": "Tarjeta_1",
+          "content": [
+            "Sede",
+            "LIMA CICLO 1",
+            "Desde",
+            "Hasta",
+            "Filtrar"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_2",
+          "content": [
+            "JOYCE LIMA CICLO 1",
+            "Últ. conexión: 01/09/2026 12:43",
+            "2739",
+            "Gestiones",
+            "2347",
+            "C1",
+            "392",
+            "C2",
+            "922",
+            "Asignados",
+            "Cobertura (participantes con al menos 1 gestión)",
+            "900/922 (98%)",
+            "Últ. gestión: 26/08/2026 17:37",
+            "Por Confirmar: 323",
+            "No Contesta: 705",
+            "Confirmado: 1264",
+            "Siguiente: 210",
+            "No le Interesa: 236",
+            "Ya Asistiá: 1"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_3",
+          "content": [
+            "LIMA CICLO 1"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_4",
+          "content": [
+            "DIANA LIMA CICLO 1",
+            "Últ. conexión: 01/09/2026 13:07",
+            "2086",
+            "Gestiones",
+            "1783",
+            "C1",
+            "303",
+            "C2",
+            "880",
+            "Asignados",
+            "Cobertura (participantes con al menos 1 gestión)",
+            "837/880 (95%)",
+            "Últ. gestión: 01/09/2026 11:13",
+            "No Contesta: 619",
+            "Confirmado: 1108",
+            "Por Confirmar: 53",
+            "No le Interesa: 165",
+            "Siguiente: 140",
+            "Ya Asistiá: 1"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_5",
+          "content": [
+            "LIMA CICLO 1"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_6",
+          "content": [
+            "LEYLA LIMA CICLO 1",
+            "Últ. conexión: 01/09/2026 13:17",
+            "627",
+            "Gestiones",
+            "600",
+            "C1",
+            "27",
+            "C2",
+            "96",
+            "Asignados",
+            "Cobertura (participantes con al menos 1 gestión)",
+            "211/96 (220%)",
+            "Últ. gestión: 15/04/2026 12:48",
+            "No Contesta: 225",
+            "Por Confirmar: 71",
+            "Confirmado: 260",
+            "Siguiente: 52",
+            "Devolución: 3",
+            "No le Interesa: 16"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_7",
+          "content": [
+            "LIMA CICLO 1"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_8",
+          "content": [
+            "LINID LIMA CICLO 1",
+            "Sin conexiones registradas",
+            "0",
+            "Gestiones",
+            "0",
+            "C1",
+            "0",
+            "C2",
+            "73",
+            "Asignados",
+            "Cobertura (participantes con al menos 1 gestión)",
+            "0/73 (0%)",
+            "Últ. gestión: —",
+            "Sin gestiones registradas en este filtro."
+          ]
+        },
+        {
+          "cardId": "Tarjeta_9",
+          "content": [
+            "LIMA CICLO 1"
+          ]
+        }
+      ]
+    },
+    "reporteEntrenadores": {
+      "tablas": [
+        {
+          "tableId": "Tabla_1",
+          "headers": [
+            "TIPO IMO",
+            "PARTICIPANTES EN JUEGO",
+            "DECLARACIÓN",
+            "TOTAL ENROLADOS",
+            "DESERTOR FDS"
+          ],
+          "rows": [
+            {
+              "TIPO IMO": "CAPITAN",
+              "PARTICIPANTES EN JUEGO": "2",
+              "DECLARACIÓN": "7",
+              "TOTAL ENROLADOS": "0",
+              "DESERTOR FDS": "0"
+            },
+            {
+              "TIPO IMO": "MANAGER",
+              "PARTICIPANTES EN JUEGO": "4",
+              "DECLARACIÓN": "10",
+              "TOTAL ENROLADOS": "0",
+              "DESERTOR FDS": "0"
+            },
+            {
+              "TIPO IMO": "PARTICIPANTE",
+              "PARTICIPANTES EN JUEGO": "36",
+              "DECLARACIÓN": "73",
+              "TOTAL ENROLADOS": "0",
+              "DESERTOR FDS": "21"
+            }
+          ]
+        },
+        {
+          "tableId": "Tabla_2",
+          "headers": [
+            "Tipo IMO",
+            "Participantes en Juego",
+            "Declaración",
+            "Total Enrolados",
+            "Desertor FDS"
+          ],
+          "rows": [
+            {
+              "Tipo IMO": "CAPITAN",
+              "Participantes en Juego": "1",
+              "Declaración": "5",
+              "Total Enrolados": "0",
+              "Desertor FDS": "0"
+            },
+            {
+              "Tipo IMO": "MANAGER",
+              "Participantes en Juego": "2",
+              "Declaración": "6",
+              "Total Enrolados": "0",
+              "Desertor FDS": "0"
+            },
+            {
+              "Tipo IMO": "PARTICIPANTE",
+              "Participantes en Juego": "10",
+              "Declaración": "26",
+              "Total Enrolados": "0",
+              "Desertor FDS": "10"
+            }
+          ]
+        },
+        {
+          "tableId": "Tabla_3",
+          "headers": [
+            "Identificación",
+            "Nombres y Apellidos",
+            "Declaración",
+            "N° Enrolados"
+          ],
+          "rows": [
+            {
+              "Identificación": "09678253",
+              "Nombres y Apellidos": "FRANCISCO MANUEL HUAMAN RIOS",
+              "Declaración": "3",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "46146483",
+              "Nombres y Apellidos": "Giovana Elizabeth Palomino Marcos",
+              "Declaración": "5",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "40801629",
+              "Nombres y Apellidos": "Liz Carol Trujillo Mallqui",
+              "Declaración": "3",
+              "N° Enrolados": "0"
+            }
+          ]
+        },
+        {
+          "tableId": "Tabla_4",
+          "headers": [
+            "Identificación",
+            "Nombres y Apellidos",
+            "Declaración",
+            "N° Enrolados"
+          ],
+          "rows": [
+            {
+              "Identificación": "70373184",
+              "Nombres y Apellidos": "ROSA MARIA STEPANY CALVO PORTAL",
+              "Declaración": "3",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "72232249",
+              "Nombres y Apellidos": "JASMYN RUBY CORNEJO NEYRA",
+              "Declaración": "2",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "07938881",
+              "Nombres y Apellidos": "ELIANA ROCIO JARA AMPUERO",
+              "Declaración": "2",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "77503706",
+              "Nombres y Apellidos": "LIDIA PAULINA  MUNAYLLA GALINDO",
+              "Declaración": "5",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "76357687",
+              "Nombres y Apellidos": "GILDA MAYTE NOLASCO CHIPANA",
+              "Declaración": "2",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "10202624",
+              "Nombres y Apellidos": "ERICA MAGALI PEREA NOGUNI",
+              "Declaración": "3",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "10882623",
+              "Nombres y Apellidos": "EDITH PRESENTACIoN CaNTARO",
+              "Declaración": "2",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "72613338",
+              "Nombres y Apellidos": "ANTHONY HANS REYES MORALES",
+              "Declaración": "3",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "46439508",
+              "Nombres y Apellidos": "VANESA ROZAS ILLA",
+              "Declaración": "1",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "09976870",
+              "Nombres y Apellidos": "LIDIA TORRES ORTIZ",
+              "Declaración": "3",
+              "N° Enrolados": "0"
+            }
+          ]
+        },
+        {
+          "tableId": "Tabla_5",
+          "headers": [
+            "Tipo IMO",
+            "Participantes en Juego",
+            "Declaración",
+            "Total Enrolados",
+            "Desertor FDS"
+          ],
+          "rows": [
+            {
+              "Tipo IMO": "CAPITAN",
+              "Participantes en Juego": "1",
+              "Declaración": "2",
+              "Total Enrolados": "0",
+              "Desertor FDS": "0"
+            },
+            {
+              "Tipo IMO": "MANAGER",
+              "Participantes en Juego": "2",
+              "Declaración": "4",
+              "Total Enrolados": "0",
+              "Desertor FDS": "0"
+            },
+            {
+              "Tipo IMO": "PARTICIPANTE",
+              "Participantes en Juego": "26",
+              "Declaración": "47",
+              "Total Enrolados": "0",
+              "Desertor FDS": "11"
+            }
+          ]
+        },
+        {
+          "tableId": "Tabla_6",
+          "headers": [
+            "Identificación",
+            "Nombres y Apellidos",
+            "Declaración",
+            "N° Enrolados"
+          ],
+          "rows": [
+            {
+              "Identificación": "46633278",
+              "Nombres y Apellidos": "RAYDA PEDRAZA",
+              "Declaración": "2",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "70319817",
+              "Nombres y Apellidos": "ITALO ALONSO  ROMaN NOMURA",
+              "Declaración": "2",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "41903564",
+              "Nombres y Apellidos": "TANIA AURORA  SaNCHEZ CASTRO",
+              "Declaración": "2",
+              "N° Enrolados": "0"
+            }
+          ]
+        },
+        {
+          "tableId": "Tabla_7",
+          "headers": [
+            "Identificación",
+            "Nombres y Apellidos",
+            "Declaración",
+            "N° Enrolados"
+          ],
+          "rows": [
+            {
+              "Identificación": "42863426",
+              "Nombres y Apellidos": "JOHELL QUEEM AIRE DAVALOS",
+              "Declaración": "0",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "71581627",
+              "Nombres y Apellidos": "REY JORGE ALFARO PEnA",
+              "Declaración": "5",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "45580544",
+              "Nombres y Apellidos": "LUZ JAQUELINE BAUTISTA BOLO",
+              "Declaración": "3",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "40981917",
+              "Nombres y Apellidos": "JANETH CASTAnEDA TUMBALOBOS",
+              "Declaración": "1",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "10531545",
+              "Nombres y Apellidos": "YENNY GISELA CASTILLO MALLMA",
+              "Declaración": "1",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "76035813",
+              "Nombres y Apellidos": "DAVID ANTHONY CELESTINO",
+              "Declaración": "2",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "47424663",
+              "Nombres y Apellidos": "GODELIA INOCENTA COLCA JULCA",
+              "Declaración": "2",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "43997438",
+              "Nombres y Apellidos": "DINA MARLENE CORNEJO AGUIRRE",
+              "Declaración": "1",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "76192150",
+              "Nombres y Apellidos": "SUMIKO DEL CARMEN BURGA ORTIZ",
+              "Declaración": "3",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "41186119",
+              "Nombres y Apellidos": "LUCIO ROMERLU FERRER MEJiA",
+              "Declaración": "1",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "73634875",
+              "Nombres y Apellidos": "JEYDY LUZ HANCCO MAMANI",
+              "Declaración": "3",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "41723354",
+              "Nombres y Apellidos": "ANGELICA HERRERA PALOMINO",
+              "Declaración": "2",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "43577711",
+              "Nombres y Apellidos": "RONALD ARTURO HUAPAYA CHUMPITAZI",
+              "Declaración": "0",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "72257245",
+              "Nombres y Apellidos": "JOHANN STEVE LINO GARAY",
+              "Declaración": "2",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "722572454",
+              "Nombres y Apellidos": "JOHANN STEVE LINO GARAY",
+              "Declaración": "0",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "73360442",
+              "Nombres y Apellidos": "DAICY LoPEZ HUAMANRAYME",
+              "Declaración": "4",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "77144510",
+              "Nombres y Apellidos": "ALDO LEONARDO MIRANDA HUAMAN",
+              "Declaración": "2",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "007041227",
+              "Nombres y Apellidos": "JESSICA MONTILLA CORRALES",
+              "Declaración": "3",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "74027502",
+              "Nombres y Apellidos": "ANA PAOLA  NunEZ ANTEZANA",
+              "Declaración": "2",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "44358075",
+              "Nombres y Apellidos": "JOSUE ROVER ONOFRE VICUnA",
+              "Declaración": "3",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "07334446",
+              "Nombres y Apellidos": "CIRILA PALOMINO PARIONA",
+              "Declaración": "1",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "46672970",
+              "Nombres y Apellidos": "LYLY DAIYU  PAREJA MADERA",
+              "Declaración": "3",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "45141505",
+              "Nombres y Apellidos": "RUTH MERY QUISPE QUISPE",
+              "Declaración": "1",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "10880166",
+              "Nombres y Apellidos": "JUDITH RAMIREZ JARA DE SANDOVAL",
+              "Declaración": "0",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "42708678",
+              "Nombres y Apellidos": "JAINOR TORRES ORTIZ",
+              "Declaración": "2",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "74749862",
+              "Nombres y Apellidos": "ELIZABETH LOURDES VILCA CONDORI",
+              "Declaración": "0",
+              "N° Enrolados": "0"
+            }
+          ]
+        },
+        {
+          "tableId": "Tabla_8",
+          "headers": [
+            "Tipo IMO",
+            "Participantes en Juego",
+            "Declaración",
+            "Total Enrolados",
+            "Desertor FDS"
+          ],
+          "rows": [
+            {
+              "Tipo IMO": "CAPITAN",
+              "Participantes en Juego": "0",
+              "Declaración": "0",
+              "Total Enrolados": "0",
+              "Desertor FDS": "0"
+            },
+            {
+              "Tipo IMO": "MANAGER",
+              "Participantes en Juego": "0",
+              "Declaración": "0",
+              "Total Enrolados": "0",
+              "Desertor FDS": "0"
+            },
+            {
+              "Tipo IMO": "PARTICIPANTE",
+              "Participantes en Juego": "0",
+              "Declaración": "0",
+              "Total Enrolados": "0",
+              "Desertor FDS": "0"
+            }
+          ]
+        },
+        {
+          "tableId": "Tabla_9",
+          "headers": [
+            "Tipo IMO",
+            "Participantes en Juego",
+            "Declaración",
+            "Total Enrolados",
+            "Desertor FDS"
+          ],
+          "rows": [
+            {
+              "Tipo IMO": "CAPITAN",
+              "Participantes en Juego": "0",
+              "Declaración": "0",
+              "Total Enrolados": "0",
+              "Desertor FDS": "0"
+            },
+            {
+              "Tipo IMO": "MANAGER",
+              "Participantes en Juego": "0",
+              "Declaración": "0",
+              "Total Enrolados": "0",
+              "Desertor FDS": "0"
+            },
+            {
+              "Tipo IMO": "PARTICIPANTE",
+              "Participantes en Juego": "0",
+              "Declaración": "0",
+              "Total Enrolados": "0",
+              "Desertor FDS": "0"
+            }
+          ]
+        }
+      ],
+      "kpis": [
+        {
+          "cardId": "Tarjeta_1",
+          "content": [
+            "Sede",
+            "Todas",
+            "LIMA CICLO 1",
+            "Buscar",
+            "Limpiar",
+            "Exportar Excel",
+            " Solo equipos en juego (activos hoy), cada uno en su etapa vigente — no se muestra histórico."
+          ]
+        },
+        {
+          "cardId": "Tarjeta_2",
+          "content": [
+            "Enrolamiento total — 4 equipo(s) en juego",
+            "TIPO IMO\tPARTICIPANTES EN JUEGO\tDECLARACIÓN\tTOTAL ENROLADOS\tDESERTOR FDS",
+            "CAPITAN\t2\t7\t0\t0",
+            "MANAGER\t4\t10\t0\t0",
+            "PARTICIPANTE\t36\t73\t0\t21",
+            "Total\t42\t90\t0\t21"
+          ]
+        }
+      ]
+    },
+    "reporteAsistencia": {
+      "tablas": [],
+      "kpis": [
+        {
+          "cardId": "Tarjeta_2",
+          "content": [
+            "Seleccione un equipo para ver el reporte de asistencia"
+          ]
+        }
+      ]
+    },
+    "facturacion": {
+      "tablas": [
+        {
+          "tableId": "Tabla_1",
+          "headers": [
+            "#",
+            "NOMBRES",
+            "IDENTIFICACIÓN",
+            "TELÉFONO",
+            "SEDE",
+            "EQUIPO",
+            "COORDINADOR",
+            "INVITADOR",
+            "FORMA PAGO",
+            "PAGO C1",
+            "PAGO C2",
+            "TOTAL",
+            "ASISTENCIA",
+            "C1",
+            "C2",
+            "M",
+            "ACCIONES"
+          ],
+          "rows": [
+            {
+              "#": "Ningún dato disponible en esta tabla"
+            }
+          ]
+        }
+      ],
+      "kpis": [
+        {
+          "cardId": "Tarjeta_1",
+          "content": [
+            "Filtrar por Sede",
+            "LIMA CICLO 1",
+            "Tu sede",
+            "Filtrar por Equipo",
+            "Todos los equipos",
+            "EQUIPO 1000",
+            "EQUIPO 14",
+            "EQUIPO 15",
+            "EQUIPO 16",
+            "EQUIPO 17",
+            "EQUIPO 18",
+            "EQUIPO 19",
+            "EQUIPO 20",
+            "EQUIPO 21",
+            "EQUIPO 22",
+            "EQUIPO 23",
+            "EQUIPO 24",
+            "EQUIPO 25",
+            "EQUIPO 26",
+            "EQUIPO 27",
+            "EQUIPO 28",
+            "EQUIPO 29",
+            "EQUIPO 30",
+            "EQUIPO 31",
+            "Filtrar por Pago",
+            "Todos",
+            "Capítulo 1 (completos)",
+            "Capítulo 2 (C2, C2+MJ, Abonos)",
+            "Pagos + comprobantes (ZIP)"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_2",
+          "content": [
+            "Participantes / Facturación (0)",
+            "Mostrar ",
+            "10",
+            "25",
+            "50",
+            "100",
+            " registros",
+            "Buscar:",
+            "#\tNOMBRES\tIDENTIFICACIÓN\tTELÉFONO\tSEDE\tEQUIPO\tCOORDINADOR\tINVITADOR\tFORMA PAGO\tPAGO C1\tPAGO C2\tTOTAL\tASISTENCIA\tC1\tC2\tM\tACCIONES",
+            "Ningún dato disponible en esta tabla",
+            "Mostrando registros del 0 al 0 de un total de 0 registros",
+            "Anterior",
+            "Siguiente"
+          ]
+        }
+      ]
+    },
+    "dashboardPrincipal": {
+      "tablas": [
+        {
+          "tableId": "Tabla_1",
+          "headers": [
+            "EQUIPO",
+            "SEDE",
+            "ENTRENADOR",
+            "ETAPA ACTUAL",
+            "PARTICIPANTES",
+            ""
+          ],
+          "rows": [
+            {
+              "EQUIPO": "EQUIPO 28",
+              "SEDE": "LIMA CICLO 1",
+              "ENTRENADOR": "MAURICIO PEREZ",
+              "ETAPA ACTUAL": "SFD",
+              "PARTICIPANTES": "24",
+              "Columna_5": "Ver Resultados"
+            },
+            {
+              "EQUIPO": "EQUIPO 29",
+              "SEDE": "LIMA CICLO 1",
+              "ENTRENADOR": "LEANDRO BRUNIS",
+              "ETAPA ACTUAL": "PFD",
+              "PARTICIPANTES": "36",
+              "Columna_5": "Ver Resultados"
+            }
+          ]
+        },
+        {
+          "tableId": "Tabla_2",
+          "headers": [
+            "ENTRENADOR",
+            "ESTADO",
+            "ASIGNACIONES"
+          ],
+          "rows": [
+            {
+              "ENTRENADOR": "FERNANDO ARAGON",
+              "ESTADO": "Activo",
+              "ASIGNACIONES": "1"
+            },
+            {
+              "ENTRENADOR": "LEANDRO BRUNIS",
+              "ESTADO": "Activo",
+              "ASIGNACIONES": "1"
+            },
+            {
+              "ENTRENADOR": "MAURICIO PEREZ",
+              "ESTADO": "Activo",
+              "ASIGNACIONES": "1"
+            }
+          ]
+        },
+        {
+          "tableId": "Tabla_3",
+          "headers": [
+            "EQUIPO",
+            "SEDE",
+            "ENTRENADOR",
+            "PARTICIPANTES"
+          ],
+          "rows": [
+            {
+              "EQUIPO": "EQUIPO 29",
+              "SEDE": "LIMA CICLO 1",
+              "ENTRENADOR": "LEANDRO BRUNIS",
+              "PARTICIPANTES": "224"
+            },
+            {
+              "EQUIPO": "EQUIPO 28",
+              "SEDE": "LIMA CICLO 1",
+              "ENTRENADOR": "MAURICIO PEREZ",
+              "PARTICIPANTES": "175"
+            },
+            {
+              "EQUIPO": "EQUIPO 30",
+              "SEDE": "LIMA CICLO 1",
+              "ENTRENADOR": "No asignado",
+              "PARTICIPANTES": "163"
+            },
+            {
+              "EQUIPO": "EQUIPO 31",
+              "SEDE": "LIMA CICLO 1",
+              "ENTRENADOR": "FERNANDO ARAGON",
+              "PARTICIPANTES": "0"
+            }
+          ]
+        },
+        {
+          "tableId": "Tabla_4",
+          "headers": [
+            "Mes",
+            "Participantes"
+          ],
+          "rows": [
+            {
+              "Mes": "Oct 25",
+              "Participantes": "0"
+            },
+            {
+              "Mes": "Nov 25",
+              "Participantes": "0"
+            },
+            {
+              "Mes": "Dic 25",
+              "Participantes": "0"
+            },
+            {
+              "Mes": "Ene 26",
+              "Participantes": "0"
+            },
+            {
+              "Mes": "Feb 26",
+              "Participantes": "0"
+            },
+            {
+              "Mes": "Mar 26",
+              "Participantes": "0"
+            },
+            {
+              "Mes": "Abr 26",
+              "Participantes": "0"
+            },
+            {
+              "Mes": "May 26",
+              "Participantes": "0"
+            },
+            {
+              "Mes": "Jun 26",
+              "Participantes": "0"
+            },
+            {
+              "Mes": "Jul 26",
+              "Participantes": "0"
+            },
+            {
+              "Mes": "Ago 26",
+              "Participantes": "3,572"
+            },
+            {
+              "Mes": "Sep 26",
+              "Participantes": "0"
+            }
+          ]
+        },
+        {
+          "tableId": "Tabla_5",
+          "headers": [
+            "Mes",
+            "Recaudado"
+          ],
+          "rows": [
+            {
+              "Mes": "Oct 25",
+              "Recaudado": "$ 307,000.00"
+            },
+            {
+              "Mes": "Nov 25",
+              "Recaudado": "$ 321,300.00"
+            },
+            {
+              "Mes": "Dic 25",
+              "Recaudado": "$ 274,095.00"
+            },
+            {
+              "Mes": "Ene 26",
+              "Recaudado": "$ 241,045.00"
+            },
+            {
+              "Mes": "Feb 26",
+              "Recaudado": "$ 383,370.00"
+            },
+            {
+              "Mes": "Mar 26",
+              "Recaudado": "$ 410,170.00"
+            },
+            {
+              "Mes": "Abr 26",
+              "Recaudado": "$ 258,350.00"
+            },
+            {
+              "Mes": "May 26",
+              "Recaudado": "$ 398,392.00"
+            },
+            {
+              "Mes": "Jun 26",
+              "Recaudado": "$ 199,468.00"
+            },
+            {
+              "Mes": "Jul 26",
+              "Recaudado": "$ 157,885.00"
+            },
+            {
+              "Mes": "Ago 26",
+              "Recaudado": "$ 250,450.00"
+            },
+            {
+              "Mes": "Sep 26",
+              "Recaudado": "$ 0.00"
+            }
+          ]
+        },
+        {
+          "tableId": "Tabla_6",
+          "headers": [
+            "Entrenamiento",
+            "Participantes"
+          ],
+          "rows": [
+            {
+              "Entrenamiento": "Capítulo 1",
+              "Participantes": "2,491"
+            },
+            {
+              "Entrenamiento": "Capítulo 2",
+              "Participantes": "888"
+            },
+            {
+              "Entrenamiento": "Maestría",
+              "Participantes": "733"
+            }
+          ]
+        },
+        {
+          "tableId": "Tabla_7",
+          "headers": [
+            "Entrenador",
+            "Asignaciones"
+          ],
+          "rows": [
+            {
+              "Entrenador": "FERNANDO ARAGON",
+              "Asignaciones": "1"
+            },
+            {
+              "Entrenador": "LEANDRO BRUNIS",
+              "Asignaciones": "1"
+            },
+            {
+              "Entrenador": "MAURICIO PEREZ",
+              "Asignaciones": "1"
+            }
+          ]
+        }
+      ],
+      "kpis": [
+        {
+          "cardId": "Tarjeta_1",
+          "content": [
+            "Alcance",
+            "LIMA CICLO 1",
+            "Tu sede",
+            "Período (pestaña Analítica)",
+            "Últimos 3 meses",
+            "Últimos 6 meses",
+            "Últimos 12 meses",
+            "Últimos 24 meses",
+            " Viendo indicadores de:"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_2",
+          "content": [
+            "Viendo indicadores de:"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_3",
+          "content": [
+            "Actividad del Fin de Semana",
+            "2 en curso",
+            "EQUIPO\tSEDE\tENTRENADOR\tETAPA ACTUAL\tPARTICIPANTES\t",
+            "EQUIPO 28\tLIMA CICLO 1\tMAURICIO PEREZ\tSFD\t24\tVer Resultados",
+            "EQUIPO 29\tLIMA CICLO 1\tLEANDRO BRUNIS\tPFD\t36\tVer Resultados"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_4",
+          "content": [
+            "Por Entrenamiento",
+            "Total participantes activos en el alcance: 3,572",
+            "Capítulo 1",
+            "2,491 (70%)",
+            "Capítulo 2",
+            "888 (25%)",
+            "Maestría",
+            "733 (21%)"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_5",
+          "content": [
+            "Por Entrenador — Carga de Trabajo",
+            "Ver Cronograma",
+            "ENTRENADOR\tESTADO\tASIGNACIONES",
+            "FERNANDO ARAGON\tActivo\t",
+            "1",
+            "",
+            "LEANDRO BRUNIS\tActivo\t",
+            "1",
+            "",
+            "MAURICIO PEREZ\tActivo\t",
+            "1"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_6",
+          "content": [
+            "Activo"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_7",
+          "content": [
+            "Activo"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_8",
+          "content": [
+            "Activo"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_9",
+          "content": [
+            "Por Equipo — Equipos en Actividad",
+            "Ver todos",
+            "EQUIPO\tSEDE\tENTRENADOR\tPARTICIPANTES",
+            "EQUIPO 29\tLIMA CICLO 1\tLEANDRO BRUNIS\t224",
+            "EQUIPO 28\tLIMA CICLO 1\tMAURICIO PEREZ\t175",
+            "EQUIPO 30\tLIMA CICLO 1\tNo asignado\t163",
+            "EQUIPO 31\tLIMA CICLO 1\tFERNANDO ARAGON\t0"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_11",
+          "content": [
+            "Indicadores Financieros",
+            "$ 4,871,683.12",
+            "Recaudado",
+            "$ 1,575.00",
+            "Pendiente",
+            "$ 0.00",
+            "Devoluciones",
+            "4,392",
+            "Facturas"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_14",
+          "content": [
+            "Comparativo — Progresión por Entrenamiento",
+            "          Ver tabla",
+            "        ",
+            "        ",
+            "          ",
+            "          ",
+            "            ",
+            "              EntrenamientoParticipantes",
+            "              ",
+            "                                Capítulo 12,491",
+            "                                Capítulo 2888",
+            "                                Maestría733"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_15",
+          "content": [
+            "Comparativo — Carga de Entrenadores (Top 10)",
+            "          Ver tabla",
+            "        ",
+            "        ",
+            "                    ",
+            "          ",
+            "            ",
+            "              EntrenadorAsignaciones",
+            "              ",
+            "                                FERNANDO ARAGON1",
+            "                                LEANDRO BRUNIS1",
+            "                                MAURICIO PEREZ1"
+          ]
+        }
+      ]
+    }
+  }
+}
+```
+
+---
+
 ## Archivo: old_users.js
 
 ```js
@@ -73209,6 +74331,24 @@ const ROLES_GERENCIA = [
   'director_maestria', 'socio', 'consolidado'
 ];
 
+// (02/09/2026) Debe mantenerse IGUAL que SUPER_ADMIN_EMAILS en
+// src/config/permissions.js — no se sincronizan solas, así que si cambia la
+// lista de Super Admins hay que actualizar AMBOS lugares. Se agregó aquí
+// porque el frontend (SuperAdminPanel.jsx / AuthContext.jsx) calcula
+// currentUser.isSuperAdmin por EMAIL contra esa lista, pero este Worker
+// verificaba SOLO el campo userData.isSuperAdmin leído de Firestore
+// (users/{uid}) — un campo que nunca se escribió ahí para José/Armando/Paul.
+// Resultado: el botón "Extraer Nodus" se mostraba (frontend) pero el
+// endpoint /trigger-nodus-scraper siempre rechazaba con "disponible solo
+// para Super Admin" (backend), incluso para los 3 Super Admins reales. Se
+// agrega la verificación por email para igualar el criterio, sin ampliar el
+// acceso a nadie que no estuviera ya en la lista.
+const SUPER_ADMIN_EMAILS_WORKER = [
+  'jose.sanchez@crearpsl.net',
+  'armando.pilacuan@gmail.com',
+  'paul.sosa@crearpsl.net'
+];
+
 function corsHeaders(origin) {
   return {
     'Access-Control-Allow-Origin': origin,
@@ -73324,9 +74464,12 @@ function esGerencia(userData) {
 
 // Mismo criterio que ya usaba el botón "Extraer Nodus" en el cliente
 // (SuperAdminPanel.jsx: currentUser?.isSuperAdmin) — no se amplía el acceso,
-// solo se verifica también en el servidor.
-function esSuperAdmin(userData) {
-  return !!userData.isSuperAdmin;
+// solo se verifica también en el servidor. Ese criterio del cliente es por
+// EMAIL (isSuperAdminEmail en src/config/permissions.js), no por un campo de
+// Firestore — por eso aquí se aceptan ambos: el campo userData.isSuperAdmin
+// (si algún día se empieza a escribir) O el email en SUPER_ADMIN_EMAILS_WORKER.
+function esSuperAdmin(userData, email) {
+  return !!userData.isSuperAdmin || SUPER_ADMIN_EMAILS_WORKER.includes(String(email || '').toLowerCase().trim());
 }
 
 function esCoordinador(userData) {
@@ -73571,10 +74714,24 @@ async function handleTriggerNodusScraper(request, env, origin) {
     return json({ error: 'unauthenticated', message: 'Falta el token de sesión.' }, 401, origin);
   }
 
-  let uid;
+  // (02/09/2026) startDate/endDate opcionales — pedido de José para ver
+  // Nodus filtrado por rango de fechas (CC1Y2 por ciclo/sede) desde
+  // AuditoriaKPIs.jsx. Si no vienen, se dispara la corrida normal (igual que
+  // el botón "Extraer Nodus" de Super Admin).
+  let startDate = null, endDate = null;
+  try {
+    const body = await request.json();
+    if (body && typeof body.startDate === 'string' && body.startDate.trim()) startDate = body.startDate.trim();
+    if (body && typeof body.endDate === 'string' && body.endDate.trim()) endDate = body.endDate.trim();
+  } catch (e) {
+    // Body vacío o no-JSON — se trata como "sin fechas" (comportamiento igual al de antes).
+  }
+
+  let uid, tokenEmail;
   try {
     const payload = await verifyFirebaseToken(idToken);
     uid = payload.sub;
+    tokenEmail = payload.email;
   } catch (err) {
     console.error('[triggerNodusScraper] Token inválido:', err);
     return json({ error: 'unauthenticated', message: 'Sesión inválida o expirada.' }, 401, origin);
@@ -73593,7 +74750,7 @@ async function handleTriggerNodusScraper(request, env, origin) {
     return json({ error: 'permission-denied', message: 'Tu usuario no está registrado en el sistema.' }, 403, origin);
   }
 
-  if (!esSuperAdmin(userData)) {
+  if (!esSuperAdmin(userData, tokenEmail)) {
     return json({ error: 'permission-denied', message: 'Disparar la extracción de Nodus está disponible solo para Super Admin.' }, 403, origin);
   }
 
@@ -73604,6 +74761,10 @@ async function handleTriggerNodusScraper(request, env, origin) {
 
   try {
     const dispatchUrl = `https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/actions/workflows/${GITHUB_WORKFLOW_FILE}/dispatches`;
+    const dispatchBody = { ref: 'master' };
+    if (startDate || endDate) {
+      dispatchBody.inputs = { startDate: startDate || '', endDate: endDate || '' };
+    }
     const ghResp = await fetch(dispatchUrl, {
       method: 'POST',
       headers: {
@@ -73612,7 +74773,7 @@ async function handleTriggerNodusScraper(request, env, origin) {
         'Content-Type': 'application/json',
         'User-Agent': 'so-ar-copiloto-worker'
       },
-      body: JSON.stringify({ ref: 'master' })
+      body: JSON.stringify(dispatchBody)
     });
 
     if (ghResp.status !== 204) {
@@ -73631,14 +74792,20 @@ async function handleTriggerNodusScraper(request, env, origin) {
       email: userData.email || 'desconocido',
       role: userData.role || userData.appRole || 'desconocido',
       sede: userData.sede || 'Global',
-      action: 'TRIGGER_NODUS_SCRAPER',
+      action: startDate || endDate ? 'TRIGGER_NODUS_SCRAPER_FILTRADO' : 'TRIGGER_NODUS_SCRAPER',
+      details: startDate || endDate ? `Filtro: ${startDate || '(sin desde)'} a ${endDate || '(sin hasta)'}` : '',
       timestamp: new Date().toISOString()
     }, accessToken);
   } catch (err) {
     console.error('[triggerNodusScraper] Error guardando auditoría (no bloqueante):', err);
   }
 
-  return json({ ok: true, message: 'Extracción de Nodus disparada en GitHub Actions.' }, 200, origin);
+  return json({
+    ok: true,
+    message: startDate || endDate
+      ? 'Extracción filtrada de Nodus disparada en GitHub Actions. Tarda 1-3 minutos; el resultado queda en nodus_kpis_sincronizados/live_filtered.'
+      : 'Extracción de Nodus disparada en GitHub Actions.'
+  }, 200, origin);
 }
 
 async function construirContextoNodus(userData, accessToken) {
@@ -74736,6 +75903,114 @@ El comportamiento y entrenamiento del staff de CPSL se rige bajo la manifestaci�
     *   *Estándar Ordinario:* Al completarse las metas comerciales del ciclo, el equipo celebra utilizando únicamente **pizza, globos y luces** en la sede [F-05, Parte 12.3, Enero 2026, v2.0, Vigente].
     *   *Prohibición de Mariachis:* Queda estrictamente prohibida la contratación o uso de mariachis para celebraciones de C1, C2 o fines de semana regulares de MJ. Esta celebración queda **reservada con exclusividad absoluta para Brillo Eterno** [F-05, Parte 12.3].
 
+### 3.4 Ecuación de Valor: Reducción de Esfuerzo y Sacrificio
+\`[APORTE DE DIRECCIÓN — integrado 02/09/2026, confirmado por José Sánchez]\`
+
+*Nota de origen:* a diferencia del resto de este documento, el contenido de esta sección 3.4 no proviene de un manual auditado (no tiene código F-0X); fue aportado directamente por José Sánchez (Dirección) el 02/09/2026 y se integra tal cual, sin inferencias ni interpretaciones adicionales.
+
+La reducción del esfuerzo y el sacrificio es el motor principal para elevar drásticamente el valor de cualquier propuesta, entrenamiento u operación. En los modelos de alto rendimiento y en la Ecuación de Valor, este factor actúa como un multiplicador en el denominador:
+
+**Valor = (Resultado Anhelado × Probabilidad de Logro) / (Retraso Temporal × Esfuerzo y Sacrificio)**
+
+Si se logra reducir el esfuerzo y el sacrificio percibidos (o reales) a cero, el valor de la oferta o del proceso se eleva de manera exponencial hacia el infinito. Para lograr esta disminución de fricción de manera efectiva, se aplican las siguientes estrategias operativas y ontológicas:
+
+**1. Distinguir entre "Esfuerzo" y "Sacrificio"**
+Para mitigar estos costos intangibles que desgastan al participante o cliente, primero hay que entender qué significan en su psicología:
+*   **El Esfuerzo:** son las acciones adicionales que la persona debe comenzar a hacer y que no desea o no hacía antes de iniciar el proceso (por ejemplo, despertarse temprano, realizar llamadas complejas o asistir a entrenamientos demandantes).
+*   **El Sacrificio:** son las acciones o hábitos que la persona debe dejar de hacer y que sí desea continuar haciendo (por ejemplo, comer alimentos no saludables o quedarse en su zona de confort).
+
+Ambos representan "costos colaterales" que restan valor percibido. El objetivo es diseñar sistemas que minimicen estas dos barreras de entrada.
+
+**2. Implementar Soluciones "Hechas para Ti" (Done-for-You / DFY)**
+La forma más contundente de reducir el esfuerzo del usuario es transicionar del modelo tradicional de "Hazlo tú mismo" (Do-It-Yourself) a esquemas de soluciones asistidas o "hechas para ti".
+*   Los servicios donde un experto o un sistema automatizado absorbe la mayor parte del trabajo físico y cognitivo tienen una percepción de valor infinitamente más alta.
+*   Esta es la razón por la cual la industria de los suplementos (que requiere el esfuerzo mínimo de tragar una pastilla) es significativamente mayor que la de los gimnasios tradicionales (que demanda meses de sudor, dieta y dolor constante).
+
+**3. Ingeniería de "Conversión de Obstáculos en Soluciones"**
+Para que una experiencia de transformación no resulte en un sacrificio abrumador, la propuesta de valor debe diseñarse mediante un desglose riguroso:
+1.  Mapear los obstáculos: identificar de forma milimétrica cada inconveniente, miedo o fricción física y logística que el participante enfrentará antes, durante y después de su entrenamiento o proceso.
+2.  Convertir obstáculos en herramientas: diseñar un vehículo de entrega específico para cada problema (ej. plantillas pre-construidas, guías dinámicas, acompañamiento presencial de un sombra o mánager).
+3.  Stack de Valor: agrupar estas soluciones en paquetes que neutralicen la resistencia cognitiva del participante, disminuyendo drásticamente su sensación de riesgo.
+
+**4. Multiplicar el Apalancamiento y Soluciones "Uno a Muchos"**
+La reducción del propio esfuerzo como líder se logra maximizando el apalancamiento (la diferencia entre los recursos que se invierten y el resultado que se obtiene).
+*   Enfocarse en actividades de alta palanca permite obtener retornos extraordinarios sin necesidad de duplicar el tiempo de trabajo.
+*   Estructurar soluciones de uno a muchos (como la creación de software, sistemas estandarizados o metodologías repetibles) requiere un esfuerzo de diseño inicial alto, pero reduce a cero el esfuerzo marginal de entrega futura. Esto permite simplificar problemas complejos convirtiéndolos en soluciones consistentes y garantizadas.
+
+**5. Desmantelar la Fricción Operativa ("Basura Cero")**
+A nivel de equipos y organizaciones de alto rendimiento, el esfuerzo innecesario se manifiesta como burocracia y fricción social.
+*   **Auditorías de "Basura Cero":** evaluar periódicamente los procesos internos para suprimir "basura operativa" (pasos duplicados, reportes redundantes o reuniones eternas que no agregan valor real al participante o al negocio). *No confundir con el estándar de "basura cero" del salón (ver 3.2, Conducta Observable de Excelencia), que se refiere a la limpieza física del espacio de entrenamiento — aquí el término aplica a procesos y burocracia interna, no a limpieza.*
+*   **Reducir la densidad jerárquica:** cuando los miembros de un equipo operan en un ambiente de seguridad y descentralización, dejan de gastar energía cognitiva en defender su estatus social o evitar el riesgo interpersonal, canalizando el 100% de su capacidad intelectual hacia la innovación y el servicio real.
+
+**6. Operar desde el "Poder" y no desde la "Fuerza"**
+Desde el punto de vista ontológico, el sacrificio agobiante en el liderazgo se disuelve cuando se aprende a distinguir entre la fuerza y el poder en el salón:
+*   La Fuerza genera resistencia y confrontación limitante; requiere un empuje manual constante que desemboca en agotamiento y drama.
+*   El Poder es fluir con eficacia y propósito. Es la capacidad de ser el creador de un contexto tan claro, impecable y de alta vibración que los resultados extraordinarios y el enrolamiento ocurran como una consecuencia natural, sin necesidad de coacción o manipulación.
+
+### 3.5 Gestión del Burnout: Escudo Individual y Escudo de Equipo
+\`[APORTE DE DIRECCIÓN — integrado 02/09/2026, confirmado por José Sánchez]\`
+
+*Nota de origen:* igual que la sección 3.4, este contenido no proviene de un manual auditado (no tiene código F-0X); fue aportado directamente por José Sánchez (Dirección) el 02/09/2026, en dos entregas que se integran aquí combinadas sin perder ningún punto de ninguna de las dos.
+
+**Diagnóstico: por qué colapsa el sistema.** El burnout se alimenta de dos variables críticas: la pérdida de control personal sobre las tareas (identificada como causa principal de agotamiento laboral) y la activación crónica del sistema de alerta biológica (eje HPA: hipotálamo-hipofisario-suprarrenal). Ante estrés psicológico constante (reuniones inútiles, sobrecarga de información, complacencia por culpa), la amígdala se mantiene en un estado de pánico ininterrumpido, inundando el cuerpo de cortisol — lo que a nivel físico suprime el sistema inmunológico para conservar energía y, a nivel cerebral, apaga y reduce físicamente la corteza prefrontal (el centro de lógica y toma de decisiones). Intentar "pensar en positivo" mientras se está quemado es biológicamente inútil: el cerebro opera en modo supervivencia animal, bloqueando la creatividad y la visión estratégica.
+
+**Los 3 tipos de burnout:**
+1.  **Agotamiento por Sobreesfuerzo (Overexertion Burnout):** asumir demasiados compromisos y responsabilidades por la incapacidad de decir "no".
+2.  **Agotamiento por Depleción / Drenaje (Depletion Burnout):** falta de descansos profundos y tiempo de recuperación activa; la batería biológica está vacía.
+3.  **Agotamiento por Desalineación (Misalignment Burnout):** invertir una enorme cantidad de energía en actividades que carecen de gozo, significado o coherencia con los valores reales de la persona.
+
+**Escudo Individual (protocolo táctico de prevención):**
+1.  **La Poda Estratégica y la Regla "Hell Yeah or No!":** ante cualquier nueva solicitud, proyecto o reunión, si la propuesta no genera un "¡claro que sí!" rotundo, la respuesta automática debe ser un "NO" definitivo. **Portafolio de Dos Listas:** Lista A = metas y aspiraciones reales a largo plazo; Lista B = compromisos y proyectos activos actuales — eliminar o delegar de la Lista B todo lo que no alimente directamente a la Lista A. **El No Elegante** (informar el enfoque por adelantado sin excusas debatibles), ejemplo textual: *"Jefe, he notado que mi trabajo de mayor valor requiere concentración total. Para entregarle mejores resultados, voy a bloquear de 9:00 a 11:00 am para trabajo profundo. Estaré en modo avión, pero disponible para urgencias inmediatamente después."*
+2.  **El Buffer del 50% (Amortiguador de Agenda):** nunca planificar el calendario al 100% de la capacidad. Si una tarea toma lógicamente 1 hora, bloquear 1.5 horas. Ese colchón absorbe los imprevistos inevitables de la realidad y elimina la urgencia constante del cerebro primitivo.
+3.  **Desequilibrio Corto y el Arte de "Alquilarse":** el equilibrio perfecto entre vida y trabajo es una quimera inalcanzable; lo que se necesita es dominar el contrapeso. Se puede inclinar la balanza temporalmente hacia un proyecto de alta exigencia, pero hay que regresar rápidamente al centro — los períodos prolongados de desequilibrio (trabajar más de 11 horas diarias de forma habitual) aumentan drásticamente las dolencias cardíacas y el colapso sistémico. Al entrar al entorno laboral, "alquilarse": entregar las manos, los conocimientos y la cabeza, pero no la identidad ni el corazón. No sobredimensionar la importancia de las valoraciones de terceros.
+4.  **Desconexión Activa:** el descanso real no es saltar de la pantalla de la oficina a la pantalla del teléfono (satura las mismas vías visuales y lógicas) ni el doomscrolling (ver malas noticias o redes sociales, que drena energía y daña el estado de ánimo). El descanso exige un cambio de modalidad: inmersión en la naturaleza, privación sensorial, ejercicio físico suave (libera BDNF, repara neuronas) o un ayuno de dopamina barata. Programar estas actividades de "carga activa" de forma innegociable en el calendario.
+5.  **El Reset Bioquímico — Respiración Vagal (4-7-8):** inhalar 4 segundos, retener el aire 7 segundos, exhalar prolongadamente por la boca durante 8 segundos; repetir el ciclo 4 veces. Alargar la exhalación estimula el nervio vago, envía una señal química de seguridad que desactiva la alarma de la amígdala y enciende la corteza prefrontal en menos de 2 minutos, devolviendo el flujo sanguíneo a la lógica.
+
+**Escudo de Equipo (diseño de sistemas antifrágiles):** cuando un equipo entra en burnout, la responsabilidad es del sistema del líder, no de la gente — un equipo quemado es síntoma de mala priorización, microgestión y falta de propósito.
+1.  **Priorizar y Ejecutar (Jocko Willink):** el burnout grupal ocurre cuando el líder intenta que el equipo ataque diez problemas simultáneamente; el resultado es que fallan en todos. Ante una crisis o sobrecarga, el líder da un paso atrás, evalúa la situación objetivamente y comunica en términos simples y concisos una sola prioridad. Se concentra el 100% de los recursos del equipo en esa prioridad; una vez resuelta o con inercia ganada, se repriorizar y se repite el proceso, sin permitir que el equipo sufra "fijación de objetivo" en asuntos secundarios.
+2.  **Rocas Trimestrales (Gino Wickman):** reducir la ansiedad colectiva dividiendo el año en bloques de 90 días ("Mundo de 90 Días"). Limitar las metas del trimestre (Rocas) a un rango estricto de 3 a 7 para el equipo directivo y de 1 a 3 para el resto del staff. Una vez pactadas las Rocas al inicio del trimestre, el líder levanta una "pared protectora": nadie (ni el cliente, ni el jefe, ni el visionario) puede "tirar granadas" o ideas nuevas por encima de esa barda para saturar al equipo — cualquier propuesta nueva se archiva en la Lista de Asuntos Pendientes para evaluarse el siguiente trimestre.
+3.  **ROWE — Eliminar la Microgestión (Results-Only Work Environment):** entorno de trabajo basado exclusivamente en resultados, que brinda tres pilares de satisfacción humana: Autonomía sobre el tiempo, Pertenencia con el equipo y Confianza absoluta de los líderes. Al delegar, el "Commander's Intent" (Intención del Comandante) define con total claridad el Qué (el estado final deseado y el propósito) y deja libre el Cómo (el método) — si el equipo entiende el "para qué" estratégico, gana autonomía, resuelve contingencias en el campo sin pedir permiso y deja de saturar la bandeja de entrada del líder.
+4.  **Motivación 3.0 (Daniel Pink):** *FedEx Days* — sustituir los retiros de "diversión forzada" por un día de autonomía total: 24 horas para que el equipo trabaje en el proyecto o proceso que desee, con la única condición de entregar un prototipo o idea innovadora al día siguiente. *Recompensas "Now-That":* eliminar los bonos condicionales ("si haces X, te doy Y", que destruyen la creatividad) y fomentar recompensas de igual a igual (peer-to-peer) — cualquier miembro del equipo puede otorgar un reconocimiento instantáneo a un compañero por un soporte excepcional, sin necesidad de autorización jerárquica.
+5.  **Conversaciones de Carrera (Kim Scott):** para prevenir el burnout de desalineación en el equipo principal, agendar tres conversaciones de carrera sistemáticas con cada directivo: *Life Story* (historia de vida — entender su pasado y qué lo motiva intrínsecamente), *Dreams* (sueños — clarificar cómo se ve el pico de su carrera profesional, sin limitarse a su puesto actual), *18-Month Plan* (plan de 18 meses — alinear sus tareas cotidianas para que construyan las habilidades exactas que necesita para alcanzar esos sueños).
+
+### 3.6 Guía de Medición de KPIs para Coordinadores en NODUS (Gerencia de Sede y Dirección Global)
+\`[APORTE DE DIRECCIÓN — integrado 02/09/2026, confirmado por José Sánchez]\`
+
+*Nota de origen:* al igual que 3.4 y 3.5, este contenido no proviene de un manual auditado con código F-0X; es la "Guía de Medición de KPIs para Coordinadores en NODUS — Edición 2026", aportada directamente por José Sánchez (Dirección) el 02/09/2026, dirigida exclusivamente a Gerencia de Sede (Nivel 8) y Dirección Global para auditar el rendimiento de CC1Y2 y CMJ dentro de la plataforma NODUS.
+
+**A. Evaluación del CC1Y2 (Coordinador Capítulo Uno y Dos) — el cerebro operativo del ciclo básico (Nivel 5):**
+1.  **Eficiencia y Velocidad de Registro** — dónde: módulos **Mesa Registro** y **Participantes Sede**. Qué auditar: el 100% de los participantes físicos en sala deben tener status en verde ("Registrado" y "Pagado") antes del primer break; correcta identificación/asignación del IMO (Enrolador) en cada perfil.
+2.  **Conversión y Captura Financiera (Cierre de C1)** — dónde: módulo **Reportes → Enrolamiento** y módulo **Cierre de Caja**. Qué auditar el domingo de C1: ratio de conversión de alumnos de C1 que pagaron y aseguraron su asiento para C2 y Maestría; cuadre al 100% entre los pagos en efectivo/tarjeta/links de la mesa externa de conversión y el "Cierre de Caja" del sistema ese mismo domingo.
+3.  **Mitigación de Fugas (Retención Operativa)** — dónde: módulo **Reporte de Entrenadores** (columna *Desertor FDS*). Qué auditar: participantes que iniciaron el viernes vs. los que finalizaron el domingo — un número alto de deserciones puede indicar fallas en la logística invisible o apoyo operativo.
+
+**B. Evaluación del CMJ (Coordinador de Maestría del Juego) — el guardián del ciclo avanzado y los Futuros Imposibles (Nivel 6), fase de 90 días:**
+1.  **Efectividad de la Auditoría Predictiva (miércoles de FI)** — dónde: módulo **Seguimiento → Maestrías** y **Asignación de Llamadas**. Qué auditar: que todos los miércoles por la tarde queden registrados en el sistema los avances de los Futuros Imposibles (FI) de los alumnos; que las banderas rojas detectadas por el Quantum Team (QT) en sus llamadas hayan sido abordadas y documentadas por el CMJ en el sistema.
+2.  **Reclutamiento y Retención de Managers** — dónde: módulo **Configuración → Equipos y Maestrías** (asignación de staff). Qué auditar: ratio de staff/participante — que el CMJ haya reclutado y sostenido la proporción adecuada de Managers, y si existen equipos en NODUS que se hayan quedado sin Manager a mitad de los 90 días.
+3.  **Sostenimiento de la Comunidad y Graduación** — dónde: módulo **Certificados** y **Participantes Rezagados**. Qué auditar: porcentaje de alumnos que completan exitosamente los 90 días respecto a los que iniciaron el MJ; nivel de alumnos enviados a "rezagados" por falta de apoyo.
+
+**C. La "Sombra" del Quantum Team (QT — Nivel 4):** aunque el QT responde operativamente al CMJ, la Gerencia debe verificar la efectividad de sus llamadas (esenciales para que el CMJ trabaje) en el módulo **Reportes → Reporte ERES y Actividad de Coordinadores**. KPI principal: efectividad **> 60%** en el feedback de resolución de llamadas, con foco en Futuros Imposibles.
+
+**Recomendación operativa para Gerentes (Nivel 8):** el *Dashboard Principal* da la vista macro, pero se debe exigir al CC1Y2 su bitácora física de control de fallas para cruzarla contra los datos financieros de NODUS, y al CMJ que mantenga la matriz de Futuros Imposibles actualizada sin retrasos semanales en la plataforma.
+
+*Nota técnica (no forma parte de la guía original, agregada al integrar):* a la fecha de esta integración, el robot automático de extracción de Nodus ('scripts/nodusScraper.js') solo visita las páginas '/actividadcoordinadores', '/reporteentrenadores', '/reporte', '/participantes' y '/dashboard' — no visita todavía Mesa Registro, Participantes Sede, Reportes→Enrolamiento, Cierre de Caja, Seguimiento→Maestrías, Asignación de Llamadas, Configuración→Equipos y Maestrías, Certificados ni Participantes Rezagados, y no se han confirmado las URLs reales de esos módulos dentro de NODUS.
+
+### 3.7 Filosofía de Rick Rubin ("El Acto de Crear") aplicada a CPSL
+\`[APORTE DE DIRECCIÓN — integrado 02/09/2026, confirmado por José Sánchez]\`
+
+*Nota de origen:* al igual que 3.4, 3.5 y 3.6, este contenido no proviene de un manual auditado con código F-0X; es una síntesis de los 5 principios más relevantes del libro "El acto de crear" de Rick Rubin, aportada y codificada directamente por José Sánchez (Dirección) el 02/09/2026 para la cultura, la operación y el liderazgo de CPSL, bajo el principio de que "el líder es la causa, no el efecto".
+
+**1. El Arte como un "Estado del Ser" (el "Quién Eres" ante el "Qué Haces").** Para Rubin, el verdadero trabajo del artista no es acumular artefactos físicos ni llenar estantes, sino una manera de estar en el mundo: todo ser humano es creador porque sintoniza información, filtra la realidad y selecciona su experiencia. Aplicación en CPSL: valida el entrenamiento intensivo de "entender el Quién Eres antes del Qué Haces". Un Coordinador, Aliado o Mánager no es un "ejecutor de eventos"; es un creador de contexto. Si el staff opera cansado, estresado o en automático, el salón refleja esa misma desconexión — se debe entrenar a los líderes no para "hacer el fin de semana", sino para Ser el contenedor de posibilidad donde la transformación del participante ocurra de forma inevitable.
+
+**2. La Disciplina Militar para Liberar la Magia en Sala (Estructura vs. Libertad).** Rubin sostiene que la disciplina y la libertad no son opuestas, son socias: diseñar hábitos diarios y abordar los aspectos prácticos con precisión militar es lo que permite abrir las ventanas creativas con libertad infantil ("poner la toma de decisiones en el trabajo, no en cuándo trabajar", para liberar ancho de banda mental). Aplicación en CPSL: la rigurosidad del sistema Nodus (checklists, horarios innegociables, cierres financieros) es el "andamiaje militar" indispensable de la sede. Cuando coordinadores y mánagers automatizan y dominan la logística de sala sin improvisaciones, liberan el 100% de su energía cognitiva para enfocarse en la fisionomía, la lectura intuitiva del participante y el coacheo profundo durante el fin de semana.
+
+**3. Rompimiento de "Normas" y la "Mente de Principiante".** Las reglas son suposiciones, no leyes de la naturaleza — están diseñadas para dirigir a comportamientos promedio, y la media no es nada a lo que aspirar. Para innovar hay que mantener el entusiasmo y la exuberancia infantil, desaprendiendo lo que las experiencias previas enseñaron; si una regla limita, vale la pena intentar exactamente lo contrario. Aplicación en CPSL: el conformismo destruye la transformación. Justifica dinámicas de disrupción en Capítulo Dos (ej. el sábado de Vestimenta Irrazonable, que expande la realidad del público). También justifica la regla ya optimizada de permitir a los entrenadores usar tenis negros en lugar de calzado formal de material: priorizar la comodidad y la entrega del facilitador ("el verdadero instrumento") sobre convenciones externas obsoletas — "el opuesto es verdad".
+
+**4. La Mentalidad de Abundancia: Terminar para Volver a Empezar.** Vivir en la escasez conduce al estancamiento y al perfeccionismo paralizante; quien cree que las ideas se van a secar las acumula y no avanza. El trabajo de una vida no es una sola obra: cada proyecto es una estación en un viaje o un capítulo del diario que debe cerrarse y liberarse para dar espacio al siguiente. Aplicación en CPSL: es la esencia de la Maestría del Juego de 90 días. El fin de semana 4 (El Viaje) y el ceremonial de Pase de Antorcha son la representación física de este principio — líderes y participantes deben aprender a desapegarse de su ciclo actual, celebrar el "juego ganado", documentar el capítulo y liberarlo en el contenedor de C1, para regenerar su energía y recibir el siguiente nivel de liderazgo.
+
+**5. La Búsqueda de la "Opción C" (la sinergia en la toma de decisiones).** En la cooperación creativa, si una persona cede por mero sacrificio ante la idea de otra, todos pierden. Si un colaborador prefiere la Opción A y otro la Opción B, no se elige ninguna de las dos: se sigue trabajando con paciencia hasta que emerja una Opción C que ambos consideren superior — la sinergia del grupo importa más que el talento individual. Aplicación en CPSL: ante quiebres de personal, conflictos entre Capitán y Coordinador, o visiones encontradas con el Entrenador en sala, la capa Causa OS debe prohibir soluciones a medias o negociaciones por "comodidad". No se busca un terreno intermedio tibio; se opera desde la confrontación asertiva para elevar el contexto hasta que aparezca la solución cuántica superior que cuide el contenedor del participante.
+
+**Síntesis (cita textual del aporte de Dirección):** *"Nodus registra la realidad de los procesos. Causa OS, inspirada en Rubin, nos recuerda que el verdadero instrumento eres tú; y que la única forma de elevar los resultados en Nodus es refinando la sensibilidad, la fisionomía y la impecabilidad del Ser que lidera la sala."*
+
 ---
 
 ## 4. MODELO OPERATIVO GLOBAL, ROLES Y GOBERNANZA
@@ -75172,6 +76447,26 @@ El enrolamiento realizado por un IMO debe ser **claro, voluntario y libre de man
 *   **Baúl:** Contenedor físico sellado y auditado que alberga el **100% de la papelería, materiales especiales y herramientas logísticas** necesarias para operar un fin de semana de entrenamiento.
 *   **Tanque:** Dinámica táctica y de rompimiento de barreras de Capítulo Dos que se realiza el sábado, montando el salón con las **sillas en arco o herradura** y en donde se trabaja la distinción de *Escucha Generosa*.
 *   **Vuelos:** Dinámica de alta exigencia física y técnica realizada el sábado por la noche en Capítulo Dos, en donde el equipo anfitrión opera de forma **totalmente silenciosa e invisible como ángeles de vuelo**.
+
+---
+
+### 11.6 Ecuación de Valor
+\`[APORTE DE DIRECCIÓN — integrado 02/09/2026, confirmado por José Sánchez]\` Fórmula: **Valor = (Resultado Anhelado × Probabilidad de Logro) / (Retraso Temporal × Esfuerzo y Sacrificio)**. Marco de referencia para diseñar propuestas, entrenamientos u operaciones de alto valor percibido, reduciendo el **Esfuerzo** (acciones nuevas que la persona debe empezar a hacer y no desea) y el **Sacrificio** (hábitos que la persona debe dejar de hacer y sí desea continuar) hasta acercarlos a cero. Ver sección 3.4 para el desarrollo completo y las 6 estrategias operativas asociadas (Done-for-You, conversión de obstáculos en herramientas + Stack de Valor, apalancamiento uno-a-muchos, "Basura Cero" operativa + descentralización, y Poder vs. Fuerza).
+
+---
+
+### 11.7 Burnout (Escudo Individual y de Equipo)
+\`[APORTE DE DIRECCIÓN — integrado 02/09/2026, confirmado por José Sánchez]\` Colapso biológico por activación crónica del eje HPA (hipotálamo-hipofisario-suprarrenal), no un problema de "actitud" o "falta de motivación". Se manifiesta en 3 tipos: por Sobreesfuerzo, por Depleción/Drenaje y por Desalineación. Ver sección 3.5 para el diagnóstico completo, el protocolo del Escudo Individual (Regla "Hell Yeah or No!", Buffer del 50%, Desequilibrio Corto, Desconexión Activa, Respiración Vagal 4-7-8) y el del Escudo de Equipo (Priorizar y Ejecutar de Jocko Willink, Rocas Trimestrales de Gino Wickman, ROWE, Motivación 3.0 de Daniel Pink, Conversaciones de Carrera de Kim Scott).
+
+---
+
+### 11.8 KPIs de Coordinadores en NODUS (Gerencia de Sede y Dirección Global)
+\`[APORTE DE DIRECCIÓN — integrado 02/09/2026, confirmado por José Sánchez]\` Guía de auditoría de rendimiento de CC1Y2 y CMJ dentro de la plataforma NODUS. CC1Y2: Eficiencia y Velocidad de Registro (Mesa Registro / Participantes Sede), Conversión y Captura Financiera (Reportes→Enrolamiento / Cierre de Caja), Mitigación de Fugas (Reporte de Entrenadores, columna Desertor FDS). CMJ: Efectividad de la Auditoría Predictiva de Futuros Imposibles (Seguimiento→Maestrías / Asignación de Llamadas), Reclutamiento y Retención de Managers (Configuración→Equipos y Maestrías), Sostenimiento de la Comunidad y Graduación (Certificados / Participantes Rezagados). QT: efectividad >60% en Reportes→Reporte ERES y Actividad de Coordinadores. Ver sección 3.6 para el detalle completo de cada KPI y qué auditar en cada uno.
+
+---
+
+### 11.9 Rick Rubin ("El Acto de Crear") aplicado a CPSL
+\`[APORTE DE DIRECCIÓN — integrado 02/09/2026, confirmado por José Sánchez]\` Los 5 principios: (1) el arte como Estado del Ser — el "Quién Eres" antes del "Qué Haces", el staff como creador de contexto, no ejecutor de eventos; (2) disciplina militar en la logística (Nodus, checklists) que libera ancho de banda cognitivo para la magia en sala; (3) romper "normas" y sostener mente de principiante — justifica dinámicas de disrupción (Vestimenta Irrazonable) y decisiones como permitir tenis negros a entrenadores; (4) mentalidad de abundancia — terminar para volver a empezar, base ontológica del Fin de Semana 4 (El Viaje) y el Pase de Antorcha; (5) búsqueda de la "Opción C" — nunca conformarse con la mitad de dos posturas encontradas, sostener la confrontación asertiva hasta la solución cuántica superior. Ver sección 3.7 para el desarrollo completo de cada principio y su aplicación operativa.
 
 ---
 
@@ -76217,6 +77512,114 @@ El comportamiento y entrenamiento del staff de CPSL se rige bajo la manifestaci�
 *   **Celebración de Hitos "Juego Ganado" \`[ESTÁNDAR VIGENTE]\`:**
     *   *Estándar Ordinario:* Al completarse las metas comerciales del ciclo, el equipo celebra utilizando únicamente **pizza, globos y luces** en la sede [F-05, Parte 12.3, Enero 2026, v2.0, Vigente].
     *   *Prohibición de Mariachis:* Queda estrictamente prohibida la contratación o uso de mariachis para celebraciones de C1, C2 o fines de semana regulares de MJ. Esta celebración queda **reservada con exclusividad absoluta para Brillo Eterno** [F-05, Parte 12.3].
+
+### 3.4 Ecuación de Valor: Reducción de Esfuerzo y Sacrificio
+\`[APORTE DE DIRECCIÓN — integrado 02/09/2026, confirmado por José Sánchez]\`
+
+*Nota de origen:* a diferencia del resto de este documento, el contenido de esta sección 3.4 no proviene de un manual auditado (no tiene código F-0X); fue aportado directamente por José Sánchez (Dirección) el 02/09/2026 y se integra tal cual, sin inferencias ni interpretaciones adicionales.
+
+La reducción del esfuerzo y el sacrificio es el motor principal para elevar drásticamente el valor de cualquier propuesta, entrenamiento u operación. En los modelos de alto rendimiento y en la Ecuación de Valor, este factor actúa como un multiplicador en el denominador:
+
+**Valor = (Resultado Anhelado × Probabilidad de Logro) / (Retraso Temporal × Esfuerzo y Sacrificio)**
+
+Si se logra reducir el esfuerzo y el sacrificio percibidos (o reales) a cero, el valor de la oferta o del proceso se eleva de manera exponencial hacia el infinito. Para lograr esta disminución de fricción de manera efectiva, se aplican las siguientes estrategias operativas y ontológicas:
+
+**1. Distinguir entre "Esfuerzo" y "Sacrificio"**
+Para mitigar estos costos intangibles que desgastan al participante o cliente, primero hay que entender qué significan en su psicología:
+*   **El Esfuerzo:** son las acciones adicionales que la persona debe comenzar a hacer y que no desea o no hacía antes de iniciar el proceso (por ejemplo, despertarse temprano, realizar llamadas complejas o asistir a entrenamientos demandantes).
+*   **El Sacrificio:** son las acciones o hábitos que la persona debe dejar de hacer y que sí desea continuar haciendo (por ejemplo, comer alimentos no saludables o quedarse en su zona de confort).
+
+Ambos representan "costos colaterales" que restan valor percibido. El objetivo es diseñar sistemas que minimicen estas dos barreras de entrada.
+
+**2. Implementar Soluciones "Hechas para Ti" (Done-for-You / DFY)**
+La forma más contundente de reducir el esfuerzo del usuario es transicionar del modelo tradicional de "Hazlo tú mismo" (Do-It-Yourself) a esquemas de soluciones asistidas o "hechas para ti".
+*   Los servicios donde un experto o un sistema automatizado absorbe la mayor parte del trabajo físico y cognitivo tienen una percepción de valor infinitamente más alta.
+*   Esta es la razón por la cual la industria de los suplementos (que requiere el esfuerzo mínimo de tragar una pastilla) es significativamente mayor que la de los gimnasios tradicionales (que demanda meses de sudor, dieta y dolor constante).
+
+**3. Ingeniería de "Conversión de Obstáculos en Soluciones"**
+Para que una experiencia de transformación no resulte en un sacrificio abrumador, la propuesta de valor debe diseñarse mediante un desglose riguroso:
+1.  Mapear los obstáculos: identificar de forma milimétrica cada inconveniente, miedo o fricción física y logística que el participante enfrentará antes, durante y después de su entrenamiento o proceso.
+2.  Convertir obstáculos en herramientas: diseñar un vehículo de entrega específico para cada problema (ej. plantillas pre-construidas, guías dinámicas, acompañamiento presencial de un sombra o mánager).
+3.  Stack de Valor: agrupar estas soluciones en paquetes que neutralicen la resistencia cognitiva del participante, disminuyendo drásticamente su sensación de riesgo.
+
+**4. Multiplicar el Apalancamiento y Soluciones "Uno a Muchos"**
+La reducción del propio esfuerzo como líder se logra maximizando el apalancamiento (la diferencia entre los recursos que se invierten y el resultado que se obtiene).
+*   Enfocarse en actividades de alta palanca permite obtener retornos extraordinarios sin necesidad de duplicar el tiempo de trabajo.
+*   Estructurar soluciones de uno a muchos (como la creación de software, sistemas estandarizados o metodologías repetibles) requiere un esfuerzo de diseño inicial alto, pero reduce a cero el esfuerzo marginal de entrega futura. Esto permite simplificar problemas complejos convirtiéndolos en soluciones consistentes y garantizadas.
+
+**5. Desmantelar la Fricción Operativa ("Basura Cero")**
+A nivel de equipos y organizaciones de alto rendimiento, el esfuerzo innecesario se manifiesta como burocracia y fricción social.
+*   **Auditorías de "Basura Cero":** evaluar periódicamente los procesos internos para suprimir "basura operativa" (pasos duplicados, reportes redundantes o reuniones eternas que no agregan valor real al participante o al negocio). *No confundir con el estándar de "basura cero" del salón (ver 3.2, Conducta Observable de Excelencia), que se refiere a la limpieza física del espacio de entrenamiento — aquí el término aplica a procesos y burocracia interna, no a limpieza.*
+*   **Reducir la densidad jerárquica:** cuando los miembros de un equipo operan en un ambiente de seguridad y descentralización, dejan de gastar energía cognitiva en defender su estatus social o evitar el riesgo interpersonal, canalizando el 100% de su capacidad intelectual hacia la innovación y el servicio real.
+
+**6. Operar desde el "Poder" y no desde la "Fuerza"**
+Desde el punto de vista ontológico, el sacrificio agobiante en el liderazgo se disuelve cuando se aprende a distinguir entre la fuerza y el poder en el salón:
+*   La Fuerza genera resistencia y confrontación limitante; requiere un empuje manual constante que desemboca en agotamiento y drama.
+*   El Poder es fluir con eficacia y propósito. Es la capacidad de ser el creador de un contexto tan claro, impecable y de alta vibración que los resultados extraordinarios y el enrolamiento ocurran como una consecuencia natural, sin necesidad de coacción o manipulación.
+
+### 3.5 Gestión del Burnout: Escudo Individual y Escudo de Equipo
+\`[APORTE DE DIRECCIÓN — integrado 02/09/2026, confirmado por José Sánchez]\`
+
+*Nota de origen:* igual que la sección 3.4, este contenido no proviene de un manual auditado (no tiene código F-0X); fue aportado directamente por José Sánchez (Dirección) el 02/09/2026, en dos entregas que se integran aquí combinadas sin perder ningún punto de ninguna de las dos.
+
+**Diagnóstico: por qué colapsa el sistema.** El burnout se alimenta de dos variables críticas: la pérdida de control personal sobre las tareas (identificada como causa principal de agotamiento laboral) y la activación crónica del sistema de alerta biológica (eje HPA: hipotálamo-hipofisario-suprarrenal). Ante estrés psicológico constante (reuniones inútiles, sobrecarga de información, complacencia por culpa), la amígdala se mantiene en un estado de pánico ininterrumpido, inundando el cuerpo de cortisol — lo que a nivel físico suprime el sistema inmunológico para conservar energía y, a nivel cerebral, apaga y reduce físicamente la corteza prefrontal (el centro de lógica y toma de decisiones). Intentar "pensar en positivo" mientras se está quemado es biológicamente inútil: el cerebro opera en modo supervivencia animal, bloqueando la creatividad y la visión estratégica.
+
+**Los 3 tipos de burnout:**
+1.  **Agotamiento por Sobreesfuerzo (Overexertion Burnout):** asumir demasiados compromisos y responsabilidades por la incapacidad de decir "no".
+2.  **Agotamiento por Depleción / Drenaje (Depletion Burnout):** falta de descansos profundos y tiempo de recuperación activa; la batería biológica está vacía.
+3.  **Agotamiento por Desalineación (Misalignment Burnout):** invertir una enorme cantidad de energía en actividades que carecen de gozo, significado o coherencia con los valores reales de la persona.
+
+**Escudo Individual (protocolo táctico de prevención):**
+1.  **La Poda Estratégica y la Regla "Hell Yeah or No!":** ante cualquier nueva solicitud, proyecto o reunión, si la propuesta no genera un "¡claro que sí!" rotundo, la respuesta automática debe ser un "NO" definitivo. **Portafolio de Dos Listas:** Lista A = metas y aspiraciones reales a largo plazo; Lista B = compromisos y proyectos activos actuales — eliminar o delegar de la Lista B todo lo que no alimente directamente a la Lista A. **El No Elegante** (informar el enfoque por adelantado sin excusas debatibles), ejemplo textual: *"Jefe, he notado que mi trabajo de mayor valor requiere concentración total. Para entregarle mejores resultados, voy a bloquear de 9:00 a 11:00 am para trabajo profundo. Estaré en modo avión, pero disponible para urgencias inmediatamente después."*
+2.  **El Buffer del 50% (Amortiguador de Agenda):** nunca planificar el calendario al 100% de la capacidad. Si una tarea toma lógicamente 1 hora, bloquear 1.5 horas. Ese colchón absorbe los imprevistos inevitables de la realidad y elimina la urgencia constante del cerebro primitivo.
+3.  **Desequilibrio Corto y el Arte de "Alquilarse":** el equilibrio perfecto entre vida y trabajo es una quimera inalcanzable; lo que se necesita es dominar el contrapeso. Se puede inclinar la balanza temporalmente hacia un proyecto de alta exigencia, pero hay que regresar rápidamente al centro — los períodos prolongados de desequilibrio (trabajar más de 11 horas diarias de forma habitual) aumentan drásticamente las dolencias cardíacas y el colapso sistémico. Al entrar al entorno laboral, "alquilarse": entregar las manos, los conocimientos y la cabeza, pero no la identidad ni el corazón. No sobredimensionar la importancia de las valoraciones de terceros.
+4.  **Desconexión Activa:** el descanso real no es saltar de la pantalla de la oficina a la pantalla del teléfono (satura las mismas vías visuales y lógicas) ni el doomscrolling (ver malas noticias o redes sociales, que drena energía y daña el estado de ánimo). El descanso exige un cambio de modalidad: inmersión en la naturaleza, privación sensorial, ejercicio físico suave (libera BDNF, repara neuronas) o un ayuno de dopamina barata. Programar estas actividades de "carga activa" de forma innegociable en el calendario.
+5.  **El Reset Bioquímico — Respiración Vagal (4-7-8):** inhalar 4 segundos, retener el aire 7 segundos, exhalar prolongadamente por la boca durante 8 segundos; repetir el ciclo 4 veces. Alargar la exhalación estimula el nervio vago, envía una señal química de seguridad que desactiva la alarma de la amígdala y enciende la corteza prefrontal en menos de 2 minutos, devolviendo el flujo sanguíneo a la lógica.
+
+**Escudo de Equipo (diseño de sistemas antifrágiles):** cuando un equipo entra en burnout, la responsabilidad es del sistema del líder, no de la gente — un equipo quemado es síntoma de mala priorización, microgestión y falta de propósito.
+1.  **Priorizar y Ejecutar (Jocko Willink):** el burnout grupal ocurre cuando el líder intenta que el equipo ataque diez problemas simultáneamente; el resultado es que fallan en todos. Ante una crisis o sobrecarga, el líder da un paso atrás, evalúa la situación objetivamente y comunica en términos simples y concisos una sola prioridad. Se concentra el 100% de los recursos del equipo en esa prioridad; una vez resuelta o con inercia ganada, se repriorizar y se repite el proceso, sin permitir que el equipo sufra "fijación de objetivo" en asuntos secundarios.
+2.  **Rocas Trimestrales (Gino Wickman):** reducir la ansiedad colectiva dividiendo el año en bloques de 90 días ("Mundo de 90 Días"). Limitar las metas del trimestre (Rocas) a un rango estricto de 3 a 7 para el equipo directivo y de 1 a 3 para el resto del staff. Una vez pactadas las Rocas al inicio del trimestre, el líder levanta una "pared protectora": nadie (ni el cliente, ni el jefe, ni el visionario) puede "tirar granadas" o ideas nuevas por encima de esa barda para saturar al equipo — cualquier propuesta nueva se archiva en la Lista de Asuntos Pendientes para evaluarse el siguiente trimestre.
+3.  **ROWE — Eliminar la Microgestión (Results-Only Work Environment):** entorno de trabajo basado exclusivamente en resultados, que brinda tres pilares de satisfacción humana: Autonomía sobre el tiempo, Pertenencia con el equipo y Confianza absoluta de los líderes. Al delegar, el "Commander's Intent" (Intención del Comandante) define con total claridad el Qué (el estado final deseado y el propósito) y deja libre el Cómo (el método) — si el equipo entiende el "para qué" estratégico, gana autonomía, resuelve contingencias en el campo sin pedir permiso y deja de saturar la bandeja de entrada del líder.
+4.  **Motivación 3.0 (Daniel Pink):** *FedEx Days* — sustituir los retiros de "diversión forzada" por un día de autonomía total: 24 horas para que el equipo trabaje en el proyecto o proceso que desee, con la única condición de entregar un prototipo o idea innovadora al día siguiente. *Recompensas "Now-That":* eliminar los bonos condicionales ("si haces X, te doy Y", que destruyen la creatividad) y fomentar recompensas de igual a igual (peer-to-peer) — cualquier miembro del equipo puede otorgar un reconocimiento instantáneo a un compañero por un soporte excepcional, sin necesidad de autorización jerárquica.
+5.  **Conversaciones de Carrera (Kim Scott):** para prevenir el burnout de desalineación en el equipo principal, agendar tres conversaciones de carrera sistemáticas con cada directivo: *Life Story* (historia de vida — entender su pasado y qué lo motiva intrínsecamente), *Dreams* (sueños — clarificar cómo se ve el pico de su carrera profesional, sin limitarse a su puesto actual), *18-Month Plan* (plan de 18 meses — alinear sus tareas cotidianas para que construyan las habilidades exactas que necesita para alcanzar esos sueños).
+
+### 3.6 Guía de Medición de KPIs para Coordinadores en NODUS (Gerencia de Sede y Dirección Global)
+\`[APORTE DE DIRECCIÓN — integrado 02/09/2026, confirmado por José Sánchez]\`
+
+*Nota de origen:* al igual que 3.4 y 3.5, este contenido no proviene de un manual auditado con código F-0X; es la "Guía de Medición de KPIs para Coordinadores en NODUS — Edición 2026", aportada directamente por José Sánchez (Dirección) el 02/09/2026, dirigida exclusivamente a Gerencia de Sede (Nivel 8) y Dirección Global para auditar el rendimiento de CC1Y2 y CMJ dentro de la plataforma NODUS.
+
+**A. Evaluación del CC1Y2 (Coordinador Capítulo Uno y Dos) — el cerebro operativo del ciclo básico (Nivel 5):**
+1.  **Eficiencia y Velocidad de Registro** — dónde: módulos **Mesa Registro** y **Participantes Sede**. Qué auditar: el 100% de los participantes físicos en sala deben tener status en verde ("Registrado" y "Pagado") antes del primer break; correcta identificación/asignación del IMO (Enrolador) en cada perfil.
+2.  **Conversión y Captura Financiera (Cierre de C1)** — dónde: módulo **Reportes → Enrolamiento** y módulo **Cierre de Caja**. Qué auditar el domingo de C1: ratio de conversión de alumnos de C1 que pagaron y aseguraron su asiento para C2 y Maestría; cuadre al 100% entre los pagos en efectivo/tarjeta/links de la mesa externa de conversión y el "Cierre de Caja" del sistema ese mismo domingo.
+3.  **Mitigación de Fugas (Retención Operativa)** — dónde: módulo **Reporte de Entrenadores** (columna *Desertor FDS*). Qué auditar: participantes que iniciaron el viernes vs. los que finalizaron el domingo — un número alto de deserciones puede indicar fallas en la logística invisible o apoyo operativo.
+
+**B. Evaluación del CMJ (Coordinador de Maestría del Juego) — el guardián del ciclo avanzado y los Futuros Imposibles (Nivel 6), fase de 90 días:**
+1.  **Efectividad de la Auditoría Predictiva (miércoles de FI)** — dónde: módulo **Seguimiento → Maestrías** y **Asignación de Llamadas**. Qué auditar: que todos los miércoles por la tarde queden registrados en el sistema los avances de los Futuros Imposibles (FI) de los alumnos; que las banderas rojas detectadas por el Quantum Team (QT) en sus llamadas hayan sido abordadas y documentadas por el CMJ en el sistema.
+2.  **Reclutamiento y Retención de Managers** — dónde: módulo **Configuración → Equipos y Maestrías** (asignación de staff). Qué auditar: ratio de staff/participante — que el CMJ haya reclutado y sostenido la proporción adecuada de Managers, y si existen equipos en NODUS que se hayan quedado sin Manager a mitad de los 90 días.
+3.  **Sostenimiento de la Comunidad y Graduación** — dónde: módulo **Certificados** y **Participantes Rezagados**. Qué auditar: porcentaje de alumnos que completan exitosamente los 90 días respecto a los que iniciaron el MJ; nivel de alumnos enviados a "rezagados" por falta de apoyo.
+
+**C. La "Sombra" del Quantum Team (QT — Nivel 4):** aunque el QT responde operativamente al CMJ, la Gerencia debe verificar la efectividad de sus llamadas (esenciales para que el CMJ trabaje) en el módulo **Reportes → Reporte ERES y Actividad de Coordinadores**. KPI principal: efectividad **> 60%** en el feedback de resolución de llamadas, con foco en Futuros Imposibles.
+
+**Recomendación operativa para Gerentes (Nivel 8):** el *Dashboard Principal* da la vista macro, pero se debe exigir al CC1Y2 su bitácora física de control de fallas para cruzarla contra los datos financieros de NODUS, y al CMJ que mantenga la matriz de Futuros Imposibles actualizada sin retrasos semanales en la plataforma.
+
+*Nota técnica (no forma parte de la guía original, agregada al integrar):* a la fecha de esta integración, el robot automático de extracción de Nodus ('scripts/nodusScraper.js') solo visita las páginas '/actividadcoordinadores', '/reporteentrenadores', '/reporte', '/participantes' y '/dashboard' — no visita todavía Mesa Registro, Participantes Sede, Reportes→Enrolamiento, Cierre de Caja, Seguimiento→Maestrías, Asignación de Llamadas, Configuración→Equipos y Maestrías, Certificados ni Participantes Rezagados, y no se han confirmado las URLs reales de esos módulos dentro de NODUS.
+
+### 3.7 Filosofía de Rick Rubin ("El Acto de Crear") aplicada a CPSL
+\`[APORTE DE DIRECCIÓN — integrado 02/09/2026, confirmado por José Sánchez]\`
+
+*Nota de origen:* al igual que 3.4, 3.5 y 3.6, este contenido no proviene de un manual auditado con código F-0X; es una síntesis de los 5 principios más relevantes del libro "El acto de crear" de Rick Rubin, aportada y codificada directamente por José Sánchez (Dirección) el 02/09/2026 para la cultura, la operación y el liderazgo de CPSL, bajo el principio de que "el líder es la causa, no el efecto".
+
+**1. El Arte como un "Estado del Ser" (el "Quién Eres" ante el "Qué Haces").** Para Rubin, el verdadero trabajo del artista no es acumular artefactos físicos ni llenar estantes, sino una manera de estar en el mundo: todo ser humano es creador porque sintoniza información, filtra la realidad y selecciona su experiencia. Aplicación en CPSL: valida el entrenamiento intensivo de "entender el Quién Eres antes del Qué Haces". Un Coordinador, Aliado o Mánager no es un "ejecutor de eventos"; es un creador de contexto. Si el staff opera cansado, estresado o en automático, el salón refleja esa misma desconexión — se debe entrenar a los líderes no para "hacer el fin de semana", sino para Ser el contenedor de posibilidad donde la transformación del participante ocurra de forma inevitable.
+
+**2. La Disciplina Militar para Liberar la Magia en Sala (Estructura vs. Libertad).** Rubin sostiene que la disciplina y la libertad no son opuestas, son socias: diseñar hábitos diarios y abordar los aspectos prácticos con precisión militar es lo que permite abrir las ventanas creativas con libertad infantil ("poner la toma de decisiones en el trabajo, no en cuándo trabajar", para liberar ancho de banda mental). Aplicación en CPSL: la rigurosidad del sistema Nodus (checklists, horarios innegociables, cierres financieros) es el "andamiaje militar" indispensable de la sede. Cuando coordinadores y mánagers automatizan y dominan la logística de sala sin improvisaciones, liberan el 100% de su energía cognitiva para enfocarse en la fisionomía, la lectura intuitiva del participante y el coacheo profundo durante el fin de semana.
+
+**3. Rompimiento de "Normas" y la "Mente de Principiante".** Las reglas son suposiciones, no leyes de la naturaleza — están diseñadas para dirigir a comportamientos promedio, y la media no es nada a lo que aspirar. Para innovar hay que mantener el entusiasmo y la exuberancia infantil, desaprendiendo lo que las experiencias previas enseñaron; si una regla limita, vale la pena intentar exactamente lo contrario. Aplicación en CPSL: el conformismo destruye la transformación. Justifica dinámicas de disrupción en Capítulo Dos (ej. el sábado de Vestimenta Irrazonable, que expande la realidad del público). También justifica la regla ya optimizada de permitir a los entrenadores usar tenis negros en lugar de calzado formal de material: priorizar la comodidad y la entrega del facilitador ("el verdadero instrumento") sobre convenciones externas obsoletas — "el opuesto es verdad".
+
+**4. La Mentalidad de Abundancia: Terminar para Volver a Empezar.** Vivir en la escasez conduce al estancamiento y al perfeccionismo paralizante; quien cree que las ideas se van a secar las acumula y no avanza. El trabajo de una vida no es una sola obra: cada proyecto es una estación en un viaje o un capítulo del diario que debe cerrarse y liberarse para dar espacio al siguiente. Aplicación en CPSL: es la esencia de la Maestría del Juego de 90 días. El fin de semana 4 (El Viaje) y el ceremonial de Pase de Antorcha son la representación física de este principio — líderes y participantes deben aprender a desapegarse de su ciclo actual, celebrar el "juego ganado", documentar el capítulo y liberarlo en el contenedor de C1, para regenerar su energía y recibir el siguiente nivel de liderazgo.
+
+**5. La Búsqueda de la "Opción C" (la sinergia en la toma de decisiones).** En la cooperación creativa, si una persona cede por mero sacrificio ante la idea de otra, todos pierden. Si un colaborador prefiere la Opción A y otro la Opción B, no se elige ninguna de las dos: se sigue trabajando con paciencia hasta que emerja una Opción C que ambos consideren superior — la sinergia del grupo importa más que el talento individual. Aplicación en CPSL: ante quiebres de personal, conflictos entre Capitán y Coordinador, o visiones encontradas con el Entrenador en sala, la capa Causa OS debe prohibir soluciones a medias o negociaciones por "comodidad". No se busca un terreno intermedio tibio; se opera desde la confrontación asertiva para elevar el contexto hasta que aparezca la solución cuántica superior que cuide el contenedor del participante.
+
+**Síntesis (cita textual del aporte de Dirección):** *"Nodus registra la realidad de los procesos. Causa OS, inspirada en Rubin, nos recuerda que el verdadero instrumento eres tú; y que la única forma de elevar los resultados en Nodus es refinando la sensibilidad, la fisionomía y la impecabilidad del Ser que lidera la sala."*
 
 ---
 
@@ -83956,7 +85359,7 @@ const db = getFirestore(app);
 
 async function extractDataFromPage(page, url, sectionName, startDate, endDate) {
   console.log(`\nNavegando a: ${sectionName} (${url})`);
-  await page.goto(url, { waitUntil: 'networkidle2' });
+  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
   await new Promise(r => setTimeout(r, 4000));
   
   if (startDate && endDate) {
@@ -83966,7 +85369,11 @@ async function extractDataFromPage(page, url, sectionName, startDate, endDate) {
         const dateInputs = document.querySelectorAll('input[type="date"]');
         if (dateInputs.length >= 2) {
           dateInputs[0].value = start;
+          dateInputs[0].dispatchEvent(new Event('input', { bubbles: true }));
+          dateInputs[0].dispatchEvent(new Event('change', { bubbles: true }));
           dateInputs[1].value = end;
+          dateInputs[1].dispatchEvent(new Event('input', { bubbles: true }));
+          dateInputs[1].dispatchEvent(new Event('change', { bubbles: true }));
           
           // Buscar botón de filtrar
           const buttons = Array.from(document.querySelectorAll('button'));
@@ -84022,12 +85429,12 @@ async function extractDataFromPage(page, url, sectionName, startDate, endDate) {
 
 export async function runScraperWithDates(startDate = null, endDate = null, sede = null) {
   console.log("🚀 Iniciando Robot de Extracción NODUS (Modo Avanzado)...");
-  const browser = await puppeteer.launch({ headless: "new", args: ['--no-sandbox', '--disable-setuid-sandbox', '--start-maximized'] });
+  const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox', '--start-maximized'] });
   const page = await browser.newPage();
   
   try {
     console.log("🌐 Navegando al Login de Nodus...");
-    await page.goto('https://imo.crearpslglobal.com/dashboard', { waitUntil: 'networkidle2' });
+    await page.goto('https://imo.crearpslglobal.com/dashboard', { waitUntil: 'domcontentloaded', timeout: 60000 });
 
     const user = process.env.NODUS_USER;
     const pwd = process.env.NODUS_PASSWORD;
@@ -84038,7 +85445,7 @@ export async function runScraperWithDates(startDate = null, endDate = null, sede
     await page.type('input[name="password"]', pwd);
     await Promise.all([
       page.click('button[type="submit"]'),
-      page.waitForNavigation({ waitUntil: 'networkidle2' }),
+      page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 60000 }),
     ]);
     console.log("✅ Inicio de sesión exitoso.");
 
@@ -84072,13 +85479,22 @@ export async function runScraperWithDates(startDate = null, endDate = null, sede
     console.log("\n📊 Extracción finalizada.");
 
     // Si es un scrapeo en vivo (tiene fechas explícitas), no sobreescribimos el 'latest_snapshot' global.
-    // Solo devolvemos la data para que la API responda.
     if (!startDate && !endDate) {
       console.log("Enviando a Firebase Firestore...");
       const docId = `nodus_snapshot_${new Date().getTime()}`;
       await setDoc(doc(db, 'nodus_kpis_sincronizados', docId), extractedData);
       await setDoc(doc(db, 'nodus_kpis_sincronizados', 'latest_snapshot'), extractedData);
       console.log(`✅ ¡Éxito! Datos guardados en la nube bajo el ID: ${docId}`);
+    } else {
+      // (02/09/2026) Scrapeo en vivo CON fechas — pedido de José para ver
+      // avance de CC1Y2/MJ por rango de fechas. Se guarda aparte, en un
+      // documento propio que SIEMPRE se sobreescribe con la última corrida
+      // filtrada, para que el frontend (que no puede correr Puppeteer) lo
+      // lea después de disparar la extracción vía GitHub Actions. Nunca toca
+      // 'latest_snapshot' (ese sigue siendo solo el snapshot diario sin filtro).
+      console.log("Enviando resultado filtrado a Firebase Firestore (live_filtered)...");
+      await setDoc(doc(db, 'nodus_kpis_sincronizados', 'live_filtered'), extractedData);
+      console.log("✅ ¡Éxito! Resultado filtrado guardado en 'live_filtered'.");
     }
 
     return extractedData;
@@ -84094,7 +85510,17 @@ export async function runScraperWithDates(startDate = null, endDate = null, sede
 // Ejecutar automáticamente si el script se llama directamente desde Node
 import { fileURLToPath } from 'url';
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  runScraperWithDates().then(() => process.exit(0)).catch(() => process.exit(1));
+  // (02/09/2026) NODUS_START_DATE/NODUS_END_DATE: variables de entorno que
+  // pone .github/workflows/nodus-daily.yml a partir de los inputs del
+  // workflow_dispatch, para poder disparar una extracción filtrada por
+  // fechas desde fuera (Worker de Cloudflare) sin afectar la corrida diaria
+  // (esas variables vienen vacías cuando el disparo es por cron o manual sin
+  // fechas, y aquí una cadena vacía se trata igual que "sin fecha").
+  const rawStart = process.env.NODUS_START_DATE?.trim();
+  const rawEnd = process.env.NODUS_END_DATE?.trim();
+  const envStart = (rawStart && rawStart !== 'null' && rawStart !== 'undefined') ? rawStart : null;
+  const envEnd = (rawEnd && rawEnd !== 'null' && rawEnd !== 'undefined') ? rawEnd : null;
+  runScraperWithDates(envStart, envEnd).then(() => process.exit(0)).catch(() => process.exit(1));
 }
 
 ```
@@ -90479,7 +91905,7 @@ import { Target, X, Zap, Calendar, Clock } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useChecklist } from '../context/ChecklistContext';
 import { getAssignableRoles } from '../config/permissions';
-import { usersData, normalizeRole, OPERATIONAL_SEDES, getRoleDisplayName } from '../data/usersData';
+import { usersData, normalizeRole, normalizeSede, OPERATIONAL_SEDES, getRoleDisplayName } from '../data/usersData';
 import { recordAuditEvent } from '../services/auditService';
 
 export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = null, taskToEdit = null }) {
@@ -90750,6 +92176,12 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                     <option value="">Cualquiera en este Rol (No específico)</option>
                     {usersData
                       .filter(u => normalizeRole(u.role) === newTask.role || u.role === newTask.role)
+                      // (02/09/2026) FIX: este filtro solo miraba el rol e ignoraba
+                      // "Sede Específica" por completo — seleccionar Lima seguía
+                      // mostrando colaboradores de todas las sedes. Ahora, si hay
+                      // una sede elegida, solo se listan los de esa sede (con
+                      // "Cualquier Sede / Global" no se filtra, se ve el rol completo).
+                      .filter(u => !newTask.assignedSede || normalizeSede(u.sede) === newTask.assignedSede)
                       .map(u => (
                         <option key={u.email} value={u.email}>{u.name} ({u.email})</option>
                       ))
@@ -93234,7 +94666,84 @@ export const DUAL_ROLE_TRAINER_EMAILS = [
   'carlos.brunis@crearpsl.net',     // Coordinador QT Global + Entrenador (Carlos Brunis)
   'linid.valencia@crearpsl.net',    // Coordinadora MJ + Entrenadora
   'brunische66@gmail.com',
+  'daniela.monroy@crearpsl.net',      // Entrenadora de llamadas
+  'erika.gavilanez@crearpsl.net',     // Coordinadora MJ + Entrenadora de llamadas
+  'mauricio.ramirez@crearpsl.net',    // Entrenador de llamadas
+  'emalejodiaz@gmail.com',            // Entrenador de llamadas
+  'anamonroyt@gmail.com',             // Entrenadora de llamadas
+  'dibrafi@gmail.com',                // Entrenador de llamadas
+  'fernandomendozaclavijo22@gmail.com', // Entrenador de llamadas
+  'marylourdespat@gmail.com',         // Entrenadora de llamadas
+  'direccion@bmbgbrokers.com',        // Entrenador de llamadas
+  'milacampuzano21@gmail.com',        // Entrenadora de llamadas
 ];
+
+/**
+ * Emails autorizados a ver la pestaña "Liquidación de Entrenadores" (pago de $400
+ * por equipo al llegar a 7 llamadas grupales registradas).
+ * REGLA ESTRICTA (pedido explícito de José, 02/09/2026):
+ * "esta info solo la debo de ver yo y Elizabeth Escobar" — únicamente estos dos
+ * correos, sin excepción automática para otros SuperAdmin ni Dirección.
+ */
+export const LIQUIDACION_ENTRENADORES_EMAILS = [
+  'jose.sanchez@crearpsl.net',        // José Sánchez
+  'contabilidad.global@crearpsl.net', // Elizabeth Escobar (CFO)
+];
+
+export const canViewLiquidacionEntrenadores = (currentUser) => {
+  if (!currentUser) return false;
+  const email = (currentUser.email || '').trim().toLowerCase();
+  return LIQUIDACION_ENTRENADORES_EMAILS.includes(email);
+};
+
+/**
+ * NOTAS DE SEGUIMIENTO (02/09/2026) — feedback que el entrenador de llamadas deja
+ * después de cada llamada (individual o grupal), pedido explícito de José: "puedan
+ * dejar notas individuales, grupales, por llamadas que deben de guardarse en un
+ * historial por persona y jamás perderse y usarse para notar quiebres y
+ * adelantarnos a los quiebres".
+ *
+ * ¿Puede el usuario actual CREAR una nota? Solo controla si se muestra el botón en
+ * la UI — la restricción real de escritura vive en firestore.rules
+ * (request.resource.data.autorEmail == su propio correo).
+ */
+export const canWriteNotaSeguimiento = (currentUser) => {
+  if (!currentUser) return false;
+  const role = currentUser.appRole || currentUser.role;
+  const roles = currentUser.roles || (role ? [role] : []);
+  return role === 'entrenador' || role === 'entrenador_llamadas' ||
+    roles.includes('entrenador') || roles.includes('entrenador_llamadas') ||
+    DUAL_ROLE_TRAINER_EMAILS.includes((currentUser.email || '').toLowerCase());
+};
+
+/**
+ * ¿Puede el usuario actual VER todas las notas de seguimiento (no solo las que
+ * escribió)? Pedido explícito de José: "quien la escribió y los CMJ y los
+ * gerentes y los directores". Debe coincidir con callerRole() (coord_maestria /
+ * director_maestria) + isGerenteODireccion() en firestore.rules — si esto
+ * cambia, actualizar AMBOS lugares.
+ */
+export const canViewAllNotasSeguimiento = (currentUser) => {
+  if (!currentUser) return false;
+  const role = currentUser.appRole || currentUser.role;
+  const roles = currentUser.roles || (role ? [role] : []);
+  return role === 'coord_maestria' || role === 'director_maestria' ||
+    roles.includes('coord_maestria') || roles.includes('director_maestria') ||
+    isGerenciaRole(role) || roles.some(isGerenciaRole);
+};
+
+/**
+ * ¿Puede el usuario actual RESPONDER a una nota de seguimiento? Pedido explícito
+ * de José: "los CMJ pueden responder a estas notas (opcional)" — solo CMJ, no
+ * toda la gerencia. Debe coincidir con callerRole() en firestore.rules.
+ */
+export const canReplyNotaSeguimiento = (currentUser) => {
+  if (!currentUser) return false;
+  const role = currentUser.appRole || currentUser.role;
+  const roles = currentUser.roles || (role ? [role] : []);
+  return role === 'coord_maestria' || role === 'director_maestria' ||
+    roles.includes('coord_maestria') || roles.includes('director_maestria');
+};
 
 /**
  * Devuelve la lista de roles a los que el usuario actual puede asignar tareas,
@@ -93470,7 +94979,7 @@ import { auth } from '../services/firebase';
 import { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'firebase/auth';
 import { collection, query, where, getDocs, doc, getDoc, setDoc, serverTimestamp, addDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
-import { normalizeRole, ROLE_DISPLAY_NAMES } from '../data/usersData';
+import { normalizeRole, ROLE_DISPLAY_NAMES, findUserByAnyEmail } from '../data/usersData';
 import { isSuperAdminEmail, isDireccionRole, isGerenciaRole, canSimulate, DUAL_ROLE_TRAINER_EMAILS } from '../config/permissions';
 import { useUI } from './UIContext';
 import { recordAuditEvent, fetchNetworkInfo } from '../services/auditService';
@@ -93692,7 +95201,7 @@ export function AuthProvider({ children }) {
       const rawEmail = user.email.trim().toLowerCase();
       
       // FORZAR USO DE .NET (Excepto para los correos autorizados explicitamente de gmail)
-      const allowedGmails = ['armando.pilacuan@gmail.com', 'gomeznueve@gmail.com'];
+      const allowedGmails = ['armando.pilacuan@gmail.com', 'gomeznueve@gmail.com', 'emalejodiaz@gmail.com', 'anamonroyt@gmail.com', 'dibrafi@gmail.com', 'fernandomendozaclavijo22@gmail.com', 'marylourdespat@gmail.com', 'direccion@bmbgbrokers.com', 'milacampuzano21@gmail.com'];
       if (!rawEmail.endsWith('@crearpsl.net') && !allowedGmails.includes(rawEmail)) {
         // Rechazar acceso
         await auth.signOut();
@@ -93719,6 +95228,20 @@ export function AuthProvider({ children }) {
           }
         } catch (err) {
           console.error("Error consultando staff_directory:", err);
+        }
+      }
+
+      // 🆕 (02/09/2026) Respaldo: catálogo estático usersToImport.js (findUserByAnyEmail).
+      // Antes de este fix, si el correo todavía no existía en Firestore (típicamente
+      // porque nadie corrió una importación manual para esa persona), el login caía
+      // directo al "colaborador" genérico, aunque esa persona ya estuviera correctamente
+      // registrada como entrenador/etc. en el código fuente. Caso real confirmado:
+      // Lourdes Patiño (marylourdespat@gmail.com) — ver managers_directory/liquidacion,
+      // reportado por José el 02/09/2026.
+      if (!foundUser) {
+        const staticUser = findUserByAnyEmail(normalizedEmail);
+        if (staticUser) {
+          foundUser = { ...staticUser };
         }
       }
 
@@ -93814,6 +95337,15 @@ export function AuthProvider({ children }) {
           }
         }
         
+        // 🆕 (02/09/2026) Mismo respaldo que en loginWithGoogle: catálogo estático
+        // antes de descartar al usuario por completo en esta ruta de sesión persistida.
+        if (!foundUser) {
+          const staticUser = findUserByAnyEmail(normalizedEmail);
+          if (staticUser) {
+            foundUser = { ...staticUser, uid: user.uid };
+          }
+        }
+
         if (!foundUser && isSuperAdminEmail(normalizedEmail)) {
           foundUser = {
             id: user.uid,
@@ -95729,7 +97261,71 @@ export const checklistData = [
   { id: 'cmjv2_f4_9', role: 'coord_maestria', cyclePhase: 'MJ', task: 'FDS4 Sábado 14:00: Almuerzo y Reconocimiento de Líderes — se otorgan los reconocimientos de Estandarte, SAI y el premio Antorcha al mánager con el mayor porcentaje de enrolamiento físico comprobable.', isCritical: true },
   { id: 'cmjv2_f4_10', role: 'coord_maestria', cyclePhase: 'MJ', task: 'FDS4 Domingo 09:00: Conexión con el Futuro — los participantes redactan sus visiones a 10, 5 y 1 año, las guardan en sobres de manila y reciben su Ticket Dorado.', isCritical: false },
   { id: 'cmjv2_f4_11', role: 'coord_maestria', cyclePhase: 'MJ', task: 'FDS4 Domingo 12:30: Almuerzo de Cierre y redacción de notitas.', isCritical: false },
-  { id: 'cmjv2_f4_12', role: 'coord_maestria', cyclePhase: 'MJ', task: 'FDS4 Domingo 18:00: Pase de Antorcha — el CMJ coordina el ingreso físico de la Maestría a la sala de Capítulo Uno para realizar el pase de antorcha oficial, unificando la energía de ambos salones.', isCritical: true }
+  { id: 'cmjv2_f4_12', role: 'coord_maestria', cyclePhase: 'MJ', task: 'FDS4 Domingo 18:00: Pase de Antorcha — el CMJ coordina el ingreso físico de la Maestría a la sala de Capítulo Uno para realizar el pase de antorcha oficial, unificando la energía de ambos salones.', isCritical: true },
+
+  // ============================================================================
+  // CMJ · TAREAS DURANTE EL CICLO DE CAPÍTULO 1 Y CAPÍTULO 2 (01/09/2026)
+  // Fuente: capturas de un tablero de tareas real de una Coordinadora de
+  // Maestría (columnas "Antes de Capítulo Uno", "Capítulo Uno" y "Antes de
+  // Cap Dos"), provistas por José. Hasta ahora coord_maestria solo tenía
+  // tareas en las fases C2/PRE-MJ/MJ/POST-MJ — esto agrega su trabajo durante
+  // las fases PRE-C1/C1/POST-C1, en paralelo a las tareas de coord_c1 que ya
+  // existen ahí (son responsables distintos operando en las mismas semanas,
+  // no se reemplaza nada existente).
+  // Generalizado a patrón: el tablero fuente traía varias instancias por
+  // equipo (ej. "CARPETA 125", "ALIADOS 127") repetidas para cada equipo que
+  // la coordinadora atiende — aquí se integra una sola vez por tarea
+  // genérica (sin número de equipo fijo), evitando duplicar la misma tarea
+  // una vez por cada equipo. cyclePhase 'PRE-C1' = columna "Antes de
+  // Capítulo Uno"; 'C1' = columna "Capítulo Uno"; 'POST-C1' = columna
+  // "Antes de Cap Dos" (ocurre después de C1, preparando C2).
+  // ============================================================================
+
+  // --- CMJ · Antes de Capítulo Uno ---
+  { id: 'cmj_prec1_1', role: 'coord_maestria', cyclePhase: 'PRE-C1', task: 'Actualizar el Drive de desertores.', isCritical: false },
+  { id: 'cmj_prec1_2', role: 'coord_maestria', cyclePhase: 'PRE-C1', task: 'Coordinar la reunión de MJ con el equipo.', isCritical: true },
+  { id: 'cmj_prec1_3', role: 'coord_maestria', cyclePhase: 'PRE-C1', task: 'Coordinar la reunión de graduación del equipo.', isCritical: true },
+  { id: 'cmj_prec1_4', role: 'coord_maestria', cyclePhase: 'PRE-C1', task: 'Dar la bienvenida a los entrenadores del cuarto FDS (El Viaje) y de Caída de Confianza.', isCritical: true },
+  { id: 'cmj_prec1_5', role: 'coord_maestria', cyclePhase: 'PRE-C1', task: 'Solicitar el entrenador para el cuarto FDS (El Viaje) y Caída de Confianza.', isCritical: true },
+  { id: 'cmj_prec1_6', role: 'coord_maestria', cyclePhase: 'PRE-C1', task: 'Revisar y actualizar la carpeta del equipo.', isCritical: false },
+  { id: 'cmj_prec1_7', role: 'coord_maestria', cyclePhase: 'PRE-C1', task: 'Enviar indicaciones sobre distintivos.', isCritical: false },
+  { id: 'cmj_prec1_8', role: 'coord_maestria', cyclePhase: 'PRE-C1', task: 'Enviar indicaciones de Futuros Imposibles (FI).', isCritical: true },
+  { id: 'cmj_prec1_9', role: 'coord_maestria', cyclePhase: 'PRE-C1', task: 'Coordinar y asistir al Grounding de Capítulo 1 con los equipos.', isCritical: true },
+  { id: 'cmj_prec1_10', role: 'coord_maestria', cyclePhase: 'PRE-C1', task: 'Solicitar las cartas del equipo y enviar el mensaje al IMO.', isCritical: false },
+  { id: 'cmj_prec1_11', role: 'coord_maestria', cyclePhase: 'PRE-C1', task: 'Dar seguimiento a los aliados del equipo.', isCritical: true },
+  { id: 'cmj_prec1_12', role: 'coord_maestria', cyclePhase: 'PRE-C1', task: 'Dar seguimiento a los entrenadores.', isCritical: false },
+  { id: 'cmj_prec1_13', role: 'coord_maestria', cyclePhase: 'PRE-C1', task: 'Actualizar el calendario de mánagers del equipo.', isCritical: false },
+  { id: 'cmj_prec1_14', role: 'coord_maestria', cyclePhase: 'PRE-C1', task: 'Definir y actualizar las fechas de llamadas con mánagers.', isCritical: false },
+  { id: 'cmj_prec1_15', role: 'coord_maestria', cyclePhase: 'PRE-C1', task: 'Mantener actualizado el sistema de llamadas.', isCritical: false },
+  { id: 'cmj_prec1_16', role: 'coord_maestria', cyclePhase: 'PRE-C1', task: 'Actualizar las tablas de enrolamiento y dar seguimiento a las llamadas pendientes.', isCritical: true },
+  { id: 'cmj_prec1_17', role: 'coord_maestria', cyclePhase: 'PRE-C1', task: 'Dar seguimiento a los rezagados del equipo.', isCritical: true },
+  { id: 'cmj_prec1_18', role: 'coord_maestria', cyclePhase: 'PRE-C1', task: 'Coordinar reunión con el Capitán del equipo.', isCritical: false },
+
+  // --- CMJ · Capítulo Uno ---
+  { id: 'cmj_c1_1', role: 'coord_maestria', cyclePhase: 'C1', task: 'Preparar el calendario de flyers.', isCritical: false },
+  { id: 'cmj_c1_2', role: 'coord_maestria', cyclePhase: 'C1', task: 'Preparar los baúles de Caída de Confianza, Noche de Confianza y Graduación.', isCritical: true },
+  { id: 'cmj_c1_3', role: 'coord_maestria', cyclePhase: 'C1', task: 'Preparar las cartas.', isCritical: false },
+  { id: 'cmj_c1_4', role: 'coord_maestria', cyclePhase: 'C1', task: 'Preparar los flyers de Noche de Confianza, Caída de Confianza y Graduación.', isCritical: false },
+  { id: 'cmj_c1_5', role: 'coord_maestria', cyclePhase: 'C1', task: 'Revisar las carpetas de los equipos.', isCritical: false },
+  { id: 'cmj_c1_6', role: 'coord_maestria', cyclePhase: 'C1', task: 'Dar seguimiento a los entrenadores de llamadas.', isCritical: false },
+  { id: 'cmj_c1_7', role: 'coord_maestria', cyclePhase: 'C1', task: 'Asignar anfitriones para la mesa de registro.', isCritical: true },
+  { id: 'cmj_c1_8', role: 'coord_maestria', cyclePhase: 'C1', task: 'Dar seguimiento y hacer llamadas a los aliados de Capítulo Uno.', isCritical: false },
+  { id: 'cmj_c1_9', role: 'coord_maestria', cyclePhase: 'C1', task: 'Enviar mensajes a los IMOs.', isCritical: false },
+
+  // --- CMJ · Antes de Capítulo Dos ---
+  { id: 'cmj_postc1_1', role: 'coord_maestria', cyclePhase: 'POST-C1', task: 'Solicitar los entrenadores de Tanque y Rompimiento de Barreras.', isCritical: true },
+  { id: 'cmj_postc1_2', role: 'coord_maestria', cyclePhase: 'POST-C1', task: 'Actualizar la tabla de enrolamiento de los equipos.', isCritical: true },
+  { id: 'cmj_postc1_3', role: 'coord_maestria', cyclePhase: 'POST-C1', task: 'Dar seguimiento a los aliados de cara a Capítulo Dos.', isCritical: true },
+  { id: 'cmj_postc1_4', role: 'coord_maestria', cyclePhase: 'POST-C1', task: 'Coordinar a los Líderes en Acción como apoyos de mesa.', isCritical: false },
+  { id: 'cmj_postc1_5', role: 'coord_maestria', cyclePhase: 'POST-C1', task: 'Dar seguimiento a los rezagados del equipo.', isCritical: true },
+  { id: 'cmj_postc1_6', role: 'coord_maestria', cyclePhase: 'POST-C1', task: 'Coordinar reunión con los mánagers del equipo.', isCritical: false },
+  { id: 'cmj_postc1_7', role: 'coord_maestria', cyclePhase: 'POST-C1', task: 'Dar la bienvenida a los entrenadores de Tanque y Rompimiento de Barreras.', isCritical: true },
+  { id: 'cmj_postc1_8', role: 'coord_maestria', cyclePhase: 'POST-C1', task: 'Jueves: coordinar y asistir al Grounding con los aliados del equipo, de cara a Capítulo Dos.', isCritical: true },
+  { id: 'cmj_postc1_9', role: 'coord_maestria', cyclePhase: 'POST-C1', task: 'Gestionar los diplomas.', isCritical: false },
+  { id: 'cmj_postc1_10', role: 'coord_maestria', cyclePhase: 'POST-C1', task: 'Llamar a los equipos pendientes.', isCritical: false },
+  { id: 'cmj_postc1_11', role: 'coord_maestria', cyclePhase: 'POST-C1', task: 'Gestionar los gafetes.', isCritical: false },
+  { id: 'cmj_postc1_12', role: 'coord_maestria', cyclePhase: 'POST-C1', task: 'Confirmar salones y audio.', isCritical: true },
+  { id: 'cmj_postc1_13', role: 'coord_maestria', cyclePhase: 'POST-C1', task: 'Mantener actualizados los Drives del equipo.', isCritical: false }
 ];
 
 export const getTasksByRole = (roleId) => checklistData.filter(t => t.role === roleId);
@@ -95937,7 +97533,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "SHAI UBUNTU",
     "tieneEntrenador": "Si",
     "entrenador": "Pamela Carrillo",
-    "coordinador": "KERLY CARRILLO / JUAN FERNANDO REINOSO",
+    "coordinador": "KERLY CARRILLO GARZON / JUAN FERNANDO REINOSO",
     "sede": "Cuenca",
     "estado": "Desertor"
   },
@@ -95950,7 +97546,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "SHAI UBUNTU",
     "tieneEntrenador": "SI",
     "entrenador": "David Sosa",
-    "coordinador": "KERLY CARRILLO / JUAN FERNANDO REINOSO",
+    "coordinador": "KERLY CARRILLO GARZON / JUAN FERNANDO REINOSO",
     "sede": "Cuenca",
     "estado": "Desertor"
   },
@@ -95962,7 +97558,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 15,
     "equipo": "LIDER-ATIK",
     "tieneEntrenador": "Si",
-    "entrenador": "Fernando Mendoza",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
     "coordinador": "JUAN FERNANDO REINOSO",
     "sede": "Cuenca",
     "estado": "Desertor"
@@ -95975,7 +97571,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 15,
     "equipo": "LIDER-ATIK",
     "tieneEntrenador": "Si",
-    "entrenador": "Isaac Betancourt",
+    "entrenador": "Isaac Gabriel Betancourt Patino",
     "coordinador": "JUAN FERNANDO REINOSO",
     "sede": "Cuenca",
     "estado": "Desertor"
@@ -96001,7 +97597,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 1,
     "equipo": "TRINA MUNAY KI",
     "tieneEntrenador": "No",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "MIGUEL TORRES",
     "sede": "Cuenca",
     "estado": "Graduado"
@@ -96066,7 +97662,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 1,
     "equipo": "MARDUK AETT",
     "tieneEntrenador": "SI",
-    "entrenador": "Jose Sanchez",
+    "entrenador": "Jose Luis Sanchez Moreno",
     "coordinador": "ALONSO SOLARES",
     "sede": "CDMX",
     "estado": "Activo"
@@ -96079,7 +97675,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 1,
     "equipo": "MARDUK AETT",
     "tieneEntrenador": "SI",
-    "entrenador": "Jose Sanchez",
+    "entrenador": "Jose Luis Sanchez Moreno",
     "coordinador": "ALONSO SOLARES",
     "sede": "CDMX",
     "estado": "Activo"
@@ -96092,7 +97688,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 1,
     "equipo": "MARDUK AETT",
     "tieneEntrenador": "SI",
-    "entrenador": "Jose Sanchez",
+    "entrenador": "Jose Luis Sanchez Moreno",
     "coordinador": "ALONSO SOLARES",
     "sede": "CDMX",
     "estado": "Activo"
@@ -96105,7 +97701,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 1,
     "equipo": "MARDUK AETT",
     "tieneEntrenador": "SI",
-    "entrenador": "Jose Sanchez",
+    "entrenador": "Jose Luis Sanchez Moreno",
     "coordinador": "ALONSO SOLARES",
     "sede": "CDMX",
     "estado": "Activo"
@@ -96170,7 +97766,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 2,
     "equipo": "NICAN AXCAN",
     "tieneEntrenador": "Si",
-    "entrenador": "Jose Sanchez",
+    "entrenador": "Jose Luis Sanchez Moreno",
     "coordinador": "",
     "sede": "Medellin",
     "estado": "Graduado"
@@ -96183,7 +97779,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 2,
     "equipo": "NICAN AXCAN",
     "tieneEntrenador": "Si",
-    "entrenador": "Fernando Mendoza",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
     "coordinador": "",
     "sede": "Medellin",
     "estado": "Graduado"
@@ -96274,8 +97870,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 3,
     "equipo": "TORA BUSHIDO",
     "tieneEntrenador": "SI",
-    "entrenador": "Erika Gavilanez",
-    "coordinador": "DANIELA MONROY",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "DANIELA MONROY FABBRI",
     "sede": "CDMX",
     "estado": "Activo"
   },
@@ -96327,7 +97923,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "QUIRON 33",
     "tieneEntrenador": "SI",
     "entrenador": "Linid Valencia",
-    "coordinador": "DANIELA MONROY",
+    "coordinador": "DANIELA MONROY FABBRI",
     "sede": "CDMX",
     "estado": "Activo"
   },
@@ -96365,7 +97961,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 5,
     "equipo": "NovaPakari",
     "tieneEntrenador": "Si",
-    "entrenador": "Diego Bravo",
+    "entrenador": "Diego David Bravo Figueroa",
     "coordinador": "JOSUE VERA",
     "sede": "Cuenca",
     "estado": "Graduado"
@@ -96443,7 +98039,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 7,
     "equipo": "KAIROSTHER",
     "tieneEntrenador": "si",
-    "entrenador": "Diego Bravo",
+    "entrenador": "Diego David Bravo Figueroa",
     "coordinador": "JOSUE VERA",
     "sede": "Cuenca",
     "estado": "Graduado"
@@ -96470,7 +98066,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "EXCELZUS",
     "tieneEntrenador": "Si",
     "entrenador": "Andres Gomez",
-    "coordinador": "MAURICIO RAMIREZ",
+    "coordinador": "MAURICIO RAMIREZ SILVA",
     "sede": "Medellin",
     "estado": "Graduado"
   },
@@ -96483,7 +98079,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "EXCELZUS",
     "tieneEntrenador": "Si",
     "entrenador": "Lourdes Patino",
-    "coordinador": "MAURICIO RAMIREZ",
+    "coordinador": "MAURICIO RAMIREZ SILVA",
     "sede": "Medellin",
     "estado": "Graduado"
   },
@@ -96496,7 +98092,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "METANOIA",
     "tieneEntrenador": "Si",
     "entrenador": "Andres Idrobo",
-    "coordinador": "KERLY CARRILLO",
+    "coordinador": "KERLY CARRILLO GARZON",
     "sede": "Cuenca",
     "estado": "Graduado"
   },
@@ -96509,7 +98105,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "METANOIA",
     "tieneEntrenador": "Si",
     "entrenador": "Mila Campuzano",
-    "coordinador": "KERLY CARRILLO",
+    "coordinador": "KERLY CARRILLO GARZON",
     "sede": "Cuenca",
     "estado": "Graduado"
   },
@@ -96587,7 +98183,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "ATARAXIA",
     "tieneEntrenador": "Si",
     "entrenador": "Andres Idrobo",
-    "coordinador": "KERLY CARRILLO",
+    "coordinador": "KERLY CARRILLO GARZON",
     "sede": "Cuenca",
     "estado": "Graduado"
   },
@@ -96599,8 +98195,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 9,
     "equipo": "ATARAXIA",
     "tieneEntrenador": "Si",
-    "entrenador": "Fernando Mendoza",
-    "coordinador": "KERLY CARRILLO",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "KERLY CARRILLO GARZON",
     "sede": "Cuenca",
     "estado": "Graduado"
   },
@@ -96625,7 +98221,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 9,
     "equipo": "Fenixkingo",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "",
     "sede": "Sin Sede",
     "estado": "Graduado"
@@ -96651,8 +98247,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 10,
     "equipo": "UKA KALLPA",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilanez",
-    "coordinador": "KERLY CARRILLO",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "KERLY CARRILLO GARZON",
     "sede": "Cuenca",
     "estado": "Graduado"
   },
@@ -96665,7 +98261,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "UKA KALLPA",
     "tieneEntrenador": "Si",
     "entrenador": "Mike Boada",
-    "coordinador": "KERLY CARRILLO",
+    "coordinador": "KERLY CARRILLO GARZON",
     "sede": "Cuenca",
     "estado": "Graduado"
   },
@@ -96678,7 +98274,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "KRATOS MAGNUS",
     "tieneEntrenador": "Si",
     "entrenador": "Lourdes Patino",
-    "coordinador": "MAURICIO RAMIREZ",
+    "coordinador": "MAURICIO RAMIREZ SILVA",
     "sede": "Medellin",
     "estado": "Graduado"
   },
@@ -96691,7 +98287,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "KRATOS MAGNUS",
     "tieneEntrenador": "Si",
     "entrenador": "Julio Narvaez",
-    "coordinador": "MAURICIO RAMIREZ",
+    "coordinador": "MAURICIO RAMIREZ SILVA",
     "sede": "Medellin",
     "estado": "Graduado"
   },
@@ -96743,7 +98339,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "ZNTI BRAMHADES",
     "tieneEntrenador": "Si",
     "entrenador": "Ana Monroy",
-    "coordinador": "KERLY CARRILLO",
+    "coordinador": "KERLY CARRILLO GARZON",
     "sede": "Cuenca",
     "estado": "Graduado"
   },
@@ -96756,7 +98352,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "ZNTI BRAMHADES",
     "tieneEntrenador": "Si",
     "entrenador": "Alejandro Diaz",
-    "coordinador": "KERLY CARRILLO",
+    "coordinador": "KERLY CARRILLO GARZON",
     "sede": "Cuenca",
     "estado": "Graduado"
   },
@@ -96768,8 +98364,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 11,
     "equipo": "ZNTI BRAMHADES",
     "tieneEntrenador": "Si",
-    "entrenador": "Jose Sanchez",
-    "coordinador": "KERLY CARRILLO",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "KERLY CARRILLO GARZON",
     "sede": "Cuenca",
     "estado": "Graduado"
   },
@@ -96807,7 +98403,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 11,
     "equipo": "Lobos",
     "tieneEntrenador": "Si",
-    "entrenador": "Isaac Betancourt",
+    "entrenador": "Isaac Gabriel Betancourt Patino",
     "coordinador": "",
     "sede": "Lima",
     "estado": "Graduado"
@@ -96821,7 +98417,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "ANSTASIS",
     "tieneEntrenador": "Si",
     "entrenador": "Alejandro Diaz",
-    "coordinador": "KERLY CARRILLO",
+    "coordinador": "KERLY CARRILLO GARZON",
     "sede": "Cuenca",
     "estado": "Graduado"
   },
@@ -96834,7 +98430,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "ANSTASIS",
     "tieneEntrenador": "SI",
     "entrenador": "Ana Monroy",
-    "coordinador": "KERLY CARRILLO",
+    "coordinador": "KERLY CARRILLO GARZON",
     "sede": "Cuenca",
     "estado": "Graduado"
   },
@@ -96846,8 +98442,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 12,
     "equipo": "ANSTASIS",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilanez",
-    "coordinador": "KERLY CARRILLO",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "KERLY CARRILLO GARZON",
     "sede": "Cuenca",
     "estado": "Graduado"
   },
@@ -96925,7 +98521,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "APOLO 12",
     "tieneEntrenador": "SI",
     "entrenador": "Andres Gomez",
-    "coordinador": "MAURICIO RAMIREZ",
+    "coordinador": "MAURICIO RAMIREZ SILVA",
     "sede": "Medellin",
     "estado": "Graduado"
   },
@@ -96938,7 +98534,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "APOLO 12",
     "tieneEntrenador": "SI",
     "entrenador": "Andres Gomez",
-    "coordinador": "MAURICIO RAMIREZ",
+    "coordinador": "MAURICIO RAMIREZ SILVA",
     "sede": "Medellin",
     "estado": "Graduado"
   },
@@ -96951,7 +98547,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "APOLO 12",
     "tieneEntrenador": "SI",
     "entrenador": "Andres Gomez",
-    "coordinador": "MAURICIO RAMIREZ",
+    "coordinador": "MAURICIO RAMIREZ SILVA",
     "sede": "Medellin",
     "estado": "Graduado"
   },
@@ -96964,7 +98560,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "SIC PARVIS MAGNA",
     "tieneEntrenador": "SI",
     "entrenador": "Andres Idrobo",
-    "coordinador": "KERLY CARRILLO / JUAN FERNANDO REINOSO",
+    "coordinador": "KERLY CARRILLO GARZON / JUAN FERNANDO REINOSO",
     "sede": "Cuenca",
     "estado": "Graduado"
   },
@@ -96976,8 +98572,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 13,
     "equipo": "SIC PARVIS MAGNA",
     "tieneEntrenador": "SI",
-    "entrenador": "Erika Gavilanez",
-    "coordinador": "KERLY CARRILLO / JUAN FERNANDO REINOSO",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "KERLY CARRILLO GARZON / JUAN FERNANDO REINOSO",
     "sede": "Cuenca",
     "estado": "Graduado"
   },
@@ -96989,8 +98585,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 13,
     "equipo": "SIC PARVIS MAGNA",
     "tieneEntrenador": "SI",
-    "entrenador": "Jose Sanchez",
-    "coordinador": "KERLY CARRILLO / JUAN FERNANDO REINOSO",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "KERLY CARRILLO GARZON / JUAN FERNANDO REINOSO",
     "sede": "Cuenca",
     "estado": "Graduado"
   },
@@ -97015,7 +98611,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 13,
     "equipo": "guilas De Fuego",
     "tieneEntrenador": "Si",
-    "entrenador": "Diego Bravo",
+    "entrenador": "Diego David Bravo Figueroa",
     "coordinador": "",
     "sede": "Sin Sede",
     "estado": "Graduado"
@@ -97055,7 +98651,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "KRONOS DYNATUS",
     "tieneEntrenador": "SI",
     "entrenador": "Ana Monroy",
-    "coordinador": "MAURICIO RAMIREZ",
+    "coordinador": "MAURICIO RAMIREZ SILVA",
     "sede": "Medellin",
     "estado": "Graduado"
   },
@@ -97068,7 +98664,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "KRONOS DYNATUS",
     "tieneEntrenador": "SI",
     "entrenador": "Ana Monroy",
-    "coordinador": "MAURICIO RAMIREZ",
+    "coordinador": "MAURICIO RAMIREZ SILVA",
     "sede": "Medellin",
     "estado": "Graduado"
   },
@@ -97171,7 +98767,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 14,
     "equipo": "LEONKUNA",
     "tieneEntrenador": "Si",
-    "entrenador": "Diego Bravo",
+    "entrenador": "Diego David Bravo Figueroa",
     "coordinador": "",
     "sede": "Sin Sede",
     "estado": "Graduado"
@@ -97197,7 +98793,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 14,
     "equipo": "LEONKUNA",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "",
     "sede": "Sin Sede",
     "estado": "Graduado"
@@ -97223,8 +98819,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 14,
     "equipo": "SHAI UBUNTU",
     "tieneEntrenador": "SI",
-    "entrenador": "Jose Sanchez",
-    "coordinador": "KERLY CARRILLO / JUAN FERNANDO REINOSO",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "KERLY CARRILLO GARZON / JUAN FERNANDO REINOSO",
     "sede": "Cuenca",
     "estado": "Graduado"
   },
@@ -97237,7 +98833,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "SHAI UBUNTU",
     "tieneEntrenador": "SI",
     "entrenador": "Lourdes Patino",
-    "coordinador": "KERLY CARRILLO / JUAN FERNANDO REINOSO",
+    "coordinador": "KERLY CARRILLO GARZON / JUAN FERNANDO REINOSO",
     "sede": "Cuenca",
     "estado": "Graduado"
   },
@@ -97249,8 +98845,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 14,
     "equipo": "RAGNAROK",
     "tieneEntrenador": "SI",
-    "entrenador": "Jose Sanchez",
-    "coordinador": "MAURICIO RAMIREZ",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "MAURICIO RAMIREZ SILVA",
     "sede": "Medellin",
     "estado": "Activo"
   },
@@ -97275,7 +98871,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 15,
     "equipo": "DRAGONES CUNTICOS",
     "tieneEntrenador": "Sí",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "",
     "sede": "Sin Sede",
     "estado": "Graduado"
@@ -97288,7 +98884,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 15,
     "equipo": "DRAGONES CUNTICOS",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramirez",
+    "entrenador": "Mauricio Ramirez Silva",
     "coordinador": "",
     "sede": "Sin Sede",
     "estado": "Graduado"
@@ -97314,7 +98910,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 15,
     "equipo": "DRAGONES CUNTICOS",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramirez",
+    "entrenador": "Mauricio Ramirez Silva",
     "coordinador": "",
     "sede": "Sin Sede",
     "estado": "Graduado"
@@ -97353,7 +98949,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 15,
     "equipo": "URUZ MERAKI",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "",
     "sede": "Sin Sede",
     "estado": "Graduado"
@@ -97392,7 +98988,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 15,
     "equipo": "LIDER-ATIK",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "JUAN FERNANDO REINOSO",
     "sede": "Cuenca",
     "estado": "Graduado"
@@ -97405,8 +99001,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 15,
     "equipo": "NEO DRAKARYS",
     "tieneEntrenador": "SI",
-    "entrenador": "Erika Gavilanez",
-    "coordinador": "MAURICIO RAMIREZ",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "MAURICIO RAMIREZ SILVA",
     "sede": "Medellin",
     "estado": "Activo"
   },
@@ -97483,8 +99079,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 16,
     "equipo": "ARTAM",
     "tieneEntrenador": "Si",
-    "entrenador": "Fernando Mendoza",
-    "coordinador": "KERLY CARRILLO",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "KERLY CARRILLO GARZON",
     "sede": "Cuenca",
     "estado": "Graduado"
   },
@@ -97496,8 +99092,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 16,
     "equipo": "ARTAM",
     "tieneEntrenador": "Si",
-    "entrenador": "Fernando Mendoza",
-    "coordinador": "KERLY CARRILLO",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "KERLY CARRILLO GARZON",
     "sede": "Cuenca",
     "estado": "Graduado"
   },
@@ -97510,7 +99106,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "CERBERUS",
     "tieneEntrenador": "SI",
     "entrenador": "Jesus Adrian Acosta",
-    "coordinador": "MAURICIO RAMIREZ",
+    "coordinador": "MAURICIO RAMIREZ SILVA",
     "sede": "Medellin",
     "estado": "Activo"
   },
@@ -97523,7 +99119,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "CERBERUS",
     "tieneEntrenador": "SI",
     "entrenador": "Jesus Adrian Acosta",
-    "coordinador": "MAURICIO RAMIREZ",
+    "coordinador": "MAURICIO RAMIREZ SILVA",
     "sede": "Medellin",
     "estado": "Activo"
   },
@@ -97548,7 +99144,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 17,
     "equipo": "HATUM BRAHMA",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "",
     "sede": "Sin Sede",
     "estado": "Graduado"
@@ -97613,7 +99209,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 17,
     "equipo": "JAGUARES DE ORO",
     "tieneEntrenador": "Si",
-    "entrenador": "Fernando Mendoza",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
     "coordinador": "",
     "sede": "Sin Sede",
     "estado": "Graduado"
@@ -97626,7 +99222,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 17,
     "equipo": "JAGUARES DE ORO",
     "tieneEntrenador": "Si",
-    "entrenador": "Diego Bravo",
+    "entrenador": "Diego David Bravo Figueroa",
     "coordinador": "",
     "sede": "Sin Sede",
     "estado": "Graduado"
@@ -97691,7 +99287,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 17,
     "equipo": "JAGUARES DE ORO",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "",
     "sede": "Sin Sede",
     "estado": "Graduado"
@@ -97743,7 +99339,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 18,
     "equipo": "NGELES DE FUEGO",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "",
     "sede": "Sin Sede",
     "estado": "Graduado"
@@ -97756,7 +99352,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 18,
     "equipo": "SUMAQ KAWSAYKUNA",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "",
     "sede": "Sin Sede",
     "estado": "Graduado"
@@ -97808,7 +99404,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 18,
     "equipo": "NGELES DE FUEGO",
     "tieneEntrenador": "Si",
-    "entrenador": "Diego Bravo",
+    "entrenador": "Diego David Bravo Figueroa",
     "coordinador": "",
     "sede": "Sin Sede",
     "estado": "Graduado"
@@ -97821,7 +99417,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 18,
     "equipo": "NGELES DE FUEGO",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramirez",
+    "entrenador": "Mauricio Ramirez Silva",
     "coordinador": "",
     "sede": "Sin Sede",
     "estado": "Graduado"
@@ -97874,7 +99470,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "VALHARYN",
     "tieneEntrenador": "SI",
     "entrenador": "Ana Monroy",
-    "coordinador": "KERLY CARRILLO",
+    "coordinador": "KERLY CARRILLO GARZON",
     "sede": "Cuenca",
     "estado": "Graduado"
   },
@@ -97887,7 +99483,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "VALHARYN",
     "tieneEntrenador": "SI",
     "entrenador": "Ana Monroy",
-    "coordinador": "KERLY CARRILLO",
+    "coordinador": "KERLY CARRILLO GARZON",
     "sede": "Cuenca",
     "estado": "Graduado"
   },
@@ -97900,7 +99496,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "VALHARYN",
     "tieneEntrenador": "SI",
     "entrenador": "Ana Monroy",
-    "coordinador": "KERLY CARRILLO",
+    "coordinador": "KERLY CARRILLO GARZON",
     "sede": "Cuenca",
     "estado": "Graduado"
   },
@@ -97912,7 +99508,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 19,
     "equipo": "VIKINGOS DE FUEGO",
     "tieneEntrenador": "Si",
-    "entrenador": "Fernando Mendoza",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Graduado"
@@ -97964,7 +99560,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 19,
     "equipo": "RYBAS IKIGAI",
     "tieneEntrenador": "Si",
-    "entrenador": "Fernando Mendoza",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
     "coordinador": "",
     "sede": "Sin Sede",
     "estado": "Graduado"
@@ -97977,7 +99573,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 19,
     "equipo": "RYBAS IKIGAI",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "",
     "sede": "Sin Sede",
     "estado": "Graduado"
@@ -98016,7 +99612,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 19,
     "equipo": "RYBAS IKIGAI",
     "tieneEntrenador": "Si",
-    "entrenador": "Fernando Mendoza",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
     "coordinador": "",
     "sede": "Sin Sede",
     "estado": "Graduado"
@@ -98081,7 +99677,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 19,
     "equipo": "KAIROS-CUM",
     "tieneEntrenador": "SI",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "JUAN FERNANDO REINOSO",
     "sede": "Cuenca",
     "estado": "Activo"
@@ -98094,7 +99690,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 19,
     "equipo": "KAIROS-CUM",
     "tieneEntrenador": "SI",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "JUAN FERNANDO REINOSO",
     "sede": "Cuenca",
     "estado": "Activo"
@@ -98172,8 +99768,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 20,
     "equipo": "KISMET WAYRA",
     "tieneEntrenador": "SI",
-    "entrenador": "Fernando Mendoza",
-    "coordinador": "KERLY CARRILLO",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "KERLY CARRILLO GARZON",
     "sede": "Cuenca",
     "estado": "Activo"
   },
@@ -98185,8 +99781,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 20,
     "equipo": "KISMET WAYRA",
     "tieneEntrenador": "SI",
-    "entrenador": "Fernando Mendoza",
-    "coordinador": "KERLY CARRILLO",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "KERLY CARRILLO GARZON",
     "sede": "Cuenca",
     "estado": "Activo"
   },
@@ -98198,8 +99794,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 20,
     "equipo": "KISMET WAYRA",
     "tieneEntrenador": "SI",
-    "entrenador": "Fernando Mendoza",
-    "coordinador": "KERLY CARRILLO",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "KERLY CARRILLO GARZON",
     "sede": "Cuenca",
     "estado": "Activo"
   },
@@ -98224,7 +99820,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 21,
     "equipo": "RAGNAROK",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "",
     "sede": "Guayaquil",
     "estado": "Graduado"
@@ -98263,7 +99859,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 21,
     "equipo": "TEMPLARIOS DEL ALBA",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramirez",
+    "entrenador": "Mauricio Ramirez Silva",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Graduado"
@@ -98276,7 +99872,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 22,
     "equipo": "TITANES KOTETSU",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "",
     "sede": "Guayaquil",
     "estado": "Graduado"
@@ -98302,7 +99898,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 22,
     "equipo": "LEGENDARIOS DEL SAMSARA",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramirez",
+    "entrenador": "Mauricio Ramirez Silva",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Graduado"
@@ -98406,7 +100002,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 23,
     "equipo": "SAMURAI KALLPA",
     "tieneEntrenador": "Si",
-    "entrenador": "Diego Bravo",
+    "entrenador": "Diego David Bravo Figueroa",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Graduado"
@@ -98419,7 +100015,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 23,
     "equipo": "SAMURAI KALLPA",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Graduado"
@@ -98432,7 +100028,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 23,
     "equipo": "SAMURAI KALLPA",
     "tieneEntrenador": "Si",
-    "entrenador": "Fernando Mendoza",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Graduado"
@@ -98445,7 +100041,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 23,
     "equipo": "SAMURAI KALLPA",
     "tieneEntrenador": "Si",
-    "entrenador": "Isaac Betancourt",
+    "entrenador": "Isaac Gabriel Betancourt Patino",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Graduado"
@@ -98471,7 +100067,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 24,
     "equipo": "KAIRU",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Graduado"
@@ -98484,7 +100080,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 24,
     "equipo": "KAIRU",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Graduado"
@@ -98497,7 +100093,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 24,
     "equipo": "KAIRU",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Graduado"
@@ -98510,7 +100106,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 24,
     "equipo": "KAIRU",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Graduado"
@@ -98523,7 +100119,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 24,
     "equipo": "KAIRU",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Graduado"
@@ -98536,7 +100132,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 24,
     "equipo": "KAIRU",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Graduado"
@@ -98549,7 +100145,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 24,
     "equipo": "KAIRU",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Graduado"
@@ -98562,7 +100158,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 24,
     "equipo": "KAIRU",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Graduado"
@@ -98575,7 +100171,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 24,
     "equipo": "KAIRU",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Graduado"
@@ -98588,7 +100184,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 24,
     "equipo": "KAIRU",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Graduado"
@@ -98601,7 +100197,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 25,
     "equipo": "WAKANDA TAKEMARU",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "",
     "sede": "Guayaquil",
     "estado": "Graduado"
@@ -98679,7 +100275,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 25,
     "equipo": "WAKANDA TAKEMARU",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramirez",
+    "entrenador": "Mauricio Ramirez Silva",
     "coordinador": "JOSUE VERA",
     "sede": "Guayaquil",
     "estado": "Activo"
@@ -98692,7 +100288,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 26,
     "equipo": "NINA RIKUKUNA",
     "tieneEntrenador": "SI",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "JOSUE VERA",
     "sede": "Guayaquil",
     "estado": "Graduado"
@@ -98823,7 +100419,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "KAY THERON",
     "tieneEntrenador": "SI",
     "entrenador": "Ana Monroy",
-    "coordinador": "LEYLA PASQUEL",
+    "coordinador": "LEYLA KELLY PASQUEL ALFARO",
     "sede": "Lima",
     "estado": "Activo"
   },
@@ -98836,7 +100432,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "KAY THERON",
     "tieneEntrenador": "SI",
     "entrenador": "Ana Monroy",
-    "coordinador": "LEYLA PASQUEL",
+    "coordinador": "LEYLA KELLY PASQUEL ALFARO",
     "sede": "Lima",
     "estado": "Activo"
   },
@@ -98849,7 +100445,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "KAY THERON",
     "tieneEntrenador": "SI",
     "entrenador": "Ana Monroy",
-    "coordinador": "LEYLA PASQUEL",
+    "coordinador": "LEYLA KELLY PASQUEL ALFARO",
     "sede": "Lima",
     "estado": "Activo"
   },
@@ -98862,7 +100458,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "KAY THERON",
     "tieneEntrenador": "SI",
     "entrenador": "Ana Monroy",
-    "coordinador": "LEYLA PASQUEL",
+    "coordinador": "LEYLA KELLY PASQUEL ALFARO",
     "sede": "Lima",
     "estado": "Activo"
   },
@@ -98887,7 +100483,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 28,
     "equipo": "UBUNTU",
     "tieneEntrenador": "SI",
-    "entrenador": "Fernando Mendoza",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Activo"
@@ -98900,7 +100496,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 28,
     "equipo": "UBUNTU",
     "tieneEntrenador": "SI",
-    "entrenador": "Fernando Mendoza",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Activo"
@@ -98913,7 +100509,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 28,
     "equipo": "UBUNTU",
     "tieneEntrenador": "SI",
-    "entrenador": "Fernando Mendoza",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Activo"
@@ -98940,7 +100536,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "QUANTUM PHOENIX",
     "tieneEntrenador": "SI",
     "entrenador": "Lourdes Patino",
-    "coordinador": "LEYLA PASQUEL",
+    "coordinador": "LEYLA KELLY PASQUEL ALFARO",
     "sede": "Lima",
     "estado": "Activo"
   },
@@ -98953,7 +100549,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "QUANTUM PHOENIX",
     "tieneEntrenador": "SI",
     "entrenador": "Lourdes Patino",
-    "coordinador": "LEYLA PASQUEL",
+    "coordinador": "LEYLA KELLY PASQUEL ALFARO",
     "sede": "Lima",
     "estado": "Activo"
   },
@@ -98966,7 +100562,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "METAMORFOSIS",
     "tieneEntrenador": "SI",
     "entrenador": "Lourdes Patino",
-    "coordinador": "JONATHAN LA ROSA",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
     "sede": "Guayaquil",
     "estado": "Activo"
   },
@@ -98979,7 +100575,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "METAMORFOSIS",
     "tieneEntrenador": "SI",
     "entrenador": "Lourdes Patino",
-    "coordinador": "JONATHAN LA ROSA",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
     "sede": "Guayaquil",
     "estado": "Activo"
   },
@@ -98992,7 +100588,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "METAMORFOSIS",
     "tieneEntrenador": "SI",
     "entrenador": "Lourdes Patino",
-    "coordinador": "JONATHAN LA ROSA",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
     "sede": "Guayaquil",
     "estado": "Activo"
   },
@@ -99005,7 +100601,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "METAMORFOSIS",
     "tieneEntrenador": "SI",
     "entrenador": "Lourdes Patino",
-    "coordinador": "JONATHAN LA ROSA",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
     "sede": "Guayaquil",
     "estado": "Activo"
   },
@@ -99018,7 +100614,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "YUTAKA-KAIROZEN",
     "tieneEntrenador": "SI",
     "entrenador": "Linid Valencia",
-    "coordinador": "JONATHAN LA ROSA",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
     "sede": "Guayaquil",
     "estado": "Activo"
   },
@@ -99031,7 +100627,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "YUTAKA-KAIROZEN",
     "tieneEntrenador": "SI",
     "entrenador": "Linid Valencia",
-    "coordinador": "JONATHAN LA ROSA",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
     "sede": "Guayaquil",
     "estado": "Activo"
   },
@@ -99044,7 +100640,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "YUTAKA-KAIROZEN",
     "tieneEntrenador": "SI",
     "entrenador": "Linid Valencia",
-    "coordinador": "JONATHAN LA ROSA",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
     "sede": "Guayaquil",
     "estado": "Activo"
   },
@@ -99057,7 +100653,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "YUTAKA-KAIROZEN",
     "tieneEntrenador": "SI",
     "entrenador": "Linid Valencia",
-    "coordinador": "JONATHAN LA ROSA",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
     "sede": "Guayaquil",
     "estado": "Activo"
   },
@@ -99069,8 +100665,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 32,
     "equipo": "ALQUIMIA",
     "tieneEntrenador": "SI",
-    "entrenador": "Erika Gavilanez",
-    "coordinador": "JONATHAN LA ROSA",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
     "sede": "Guayaquil",
     "estado": "Activo"
   },
@@ -99082,8 +100678,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 32,
     "equipo": "ALQUIMIA",
     "tieneEntrenador": "SI",
-    "entrenador": "Erika Gavilanez",
-    "coordinador": "JONATHAN LA ROSA",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
     "sede": "Guayaquil",
     "estado": "Activo"
   },
@@ -99095,8 +100691,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 33,
     "equipo": "ARTAM TSUNKI",
     "tieneEntrenador": "SI",
-    "entrenador": "Mauricio Ramirez",
-    "coordinador": "JONATHAN LA ROSA",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
     "sede": "Guayaquil",
     "estado": "Activo"
   },
@@ -99108,8 +100704,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 33,
     "equipo": "ARTAM TSUNKI",
     "tieneEntrenador": "SI",
-    "entrenador": "Mauricio Ramirez",
-    "coordinador": "JONATHAN LA ROSA",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
     "sede": "Guayaquil",
     "estado": "Activo"
   },
@@ -99121,8 +100717,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 33,
     "equipo": "ARTAM TSUNKI",
     "tieneEntrenador": "SI",
-    "entrenador": "Mauricio Ramirez",
-    "coordinador": "JONATHAN LA ROSA",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
     "sede": "Guayaquil",
     "estado": "Activo"
   },
@@ -99134,8 +100730,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 34,
     "equipo": "FRACTAL SHINE",
     "tieneEntrenador": "SI",
-    "entrenador": "Kerly Carrillo",
-    "coordinador": "JONATHAN LA ROSA",
+    "entrenador": "Kerly Carrillo Garzon",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
     "sede": "Guayaquil",
     "estado": "Activo"
   },
@@ -99147,8 +100743,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 34,
     "equipo": "FRACTAL SHINE",
     "tieneEntrenador": "SI",
-    "entrenador": "Kerly Carrillo",
-    "coordinador": "JONATHAN LA ROSA",
+    "entrenador": "Kerly Carrillo Garzon",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
     "sede": "Guayaquil",
     "estado": "Activo"
   },
@@ -99160,8 +100756,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 34,
     "equipo": "FRACTAL SHINE",
     "tieneEntrenador": "SI",
-    "entrenador": "Kerly Carrillo",
-    "coordinador": "JONATHAN LA ROSA",
+    "entrenador": "Kerly Carrillo Garzon",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
     "sede": "Guayaquil",
     "estado": "Activo"
   },
@@ -99173,8 +100769,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 34,
     "equipo": "FRACTAL SHINE",
     "tieneEntrenador": "SI",
-    "entrenador": "Kerly Carrillo",
-    "coordinador": "JONATHAN LA ROSA",
+    "entrenador": "Kerly Carrillo Garzon",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
     "sede": "Guayaquil",
     "estado": "Activo"
   },
@@ -99186,8 +100782,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 34,
     "equipo": "FRACTAL SHINE",
     "tieneEntrenador": "SI",
-    "entrenador": "Kerly Carrillo",
-    "coordinador": "JONATHAN LA ROSA",
+    "entrenador": "Kerly Carrillo Garzon",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
     "sede": "Guayaquil",
     "estado": "Activo"
   },
@@ -99511,7 +101107,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 83,
     "equipo": "Tzucan",
     "tieneEntrenador": "Si",
-    "entrenador": "Fernando Mendoza",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -99563,7 +101159,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 83,
     "equipo": "Tzucan",
     "tieneEntrenador": "Si",
-    "entrenador": "Fernando Mendoza",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -99615,7 +101211,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 83,
     "equipo": "Tzucan",
     "tieneEntrenador": "Si",
-    "entrenador": "Fernando Mendoza",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -99732,7 +101328,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 84,
     "equipo": "Byakko Hanshi",
     "tieneEntrenador": "Si",
-    "entrenador": "Fernando Mendoza",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -99745,7 +101341,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 84,
     "equipo": "Byakko Hanshi",
     "tieneEntrenador": "Si",
-    "entrenador": "Fernando Mendoza",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -100031,7 +101627,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 86,
     "equipo": "Sula Amay",
     "tieneEntrenador": "Si",
-    "entrenador": "Diego Bravo",
+    "entrenador": "Diego David Bravo Figueroa",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -100057,7 +101653,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 86,
     "equipo": "Sula Amay",
     "tieneEntrenador": "Si",
-    "entrenador": "Diego Bravo",
+    "entrenador": "Diego David Bravo Figueroa",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -100070,7 +101666,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 86,
     "equipo": "Sula Amay",
     "tieneEntrenador": "Si",
-    "entrenador": "Diego Bravo",
+    "entrenador": "Diego David Bravo Figueroa",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -100109,7 +101705,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 87,
     "equipo": "Grifus Invictus",
     "tieneEntrenador": "Si",
-    "entrenador": "Diego Bravo",
+    "entrenador": "Diego David Bravo Figueroa",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -100135,7 +101731,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 87,
     "equipo": "Grifus Invictus",
     "tieneEntrenador": "Si",
-    "entrenador": "Diego Bravo",
+    "entrenador": "Diego David Bravo Figueroa",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -100265,7 +101861,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 88,
     "equipo": "CATEPHRIA",
     "tieneEntrenador": "Si",
-    "entrenador": "Isaac Betancourt",
+    "entrenador": "Isaac Gabriel Betancourt Patino",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -100291,7 +101887,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 88,
     "equipo": "CATEPHRIA",
     "tieneEntrenador": "Si",
-    "entrenador": "Fernando Mendoza",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -100304,7 +101900,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 88,
     "equipo": "CATEPHRIA",
     "tieneEntrenador": "Si",
-    "entrenador": "Isaac Betancourt",
+    "entrenador": "Isaac Gabriel Betancourt Patino",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -100356,7 +101952,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 88,
     "equipo": "CATEPHRIA",
     "tieneEntrenador": "Si",
-    "entrenador": "Isaac Betancourt",
+    "entrenador": "Isaac Gabriel Betancourt Patino",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -100369,7 +101965,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 88,
     "equipo": "CATEPHRIA",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -100395,7 +101991,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 89,
     "equipo": "SHAKTI EMUNAH",
     "tieneEntrenador": "Si",
-    "entrenador": "Fernando Mendoza",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -100408,7 +102004,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 89,
     "equipo": "SHAKTI EMUNAH",
     "tieneEntrenador": "Si",
-    "entrenador": "Fernando Mendoza",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -100460,7 +102056,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 90,
     "equipo": "ACADIA SEMPER FI",
     "tieneEntrenador": "Si",
-    "entrenador": "Isaac Betancourt",
+    "entrenador": "Isaac Gabriel Betancourt Patino",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -100525,7 +102121,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 90,
     "equipo": "ACADIA SEMPER FI",
     "tieneEntrenador": "Si",
-    "entrenador": "Fernando Mendoza",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -100538,7 +102134,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 90,
     "equipo": "ACADIA SEMPER FI",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -100551,7 +102147,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 90,
     "equipo": "ACADIA SEMPER FI",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -100564,7 +102160,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 90,
     "equipo": "ACADIA SEMPER FI",
     "tieneEntrenador": "Si",
-    "entrenador": "Isaac Betancourt",
+    "entrenador": "Isaac Gabriel Betancourt Patino",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -100590,7 +102186,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 90,
     "equipo": "ACADIA SEMPER FI",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -100681,7 +102277,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 92,
     "equipo": "APIS TITANIUM",
     "tieneEntrenador": "Si",
-    "entrenador": "Diego Bravo",
+    "entrenador": "Diego David Bravo Figueroa",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -100694,7 +102290,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 92,
     "equipo": "APIS TITANIUM",
     "tieneEntrenador": "Si",
-    "entrenador": "Diego Bravo",
+    "entrenador": "Diego David Bravo Figueroa",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -100837,8 +102433,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 8,
     "equipo": "METANOIA",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramirez",
-    "coordinador": "KERLY CARRILLO",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "KERLY CARRILLO GARZON",
     "sede": "Cuenca",
     "estado": "Desertor"
   },
@@ -100890,7 +102486,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "INFINITYMO",
     "tieneEntrenador": "Si",
     "entrenador": "Andres Gomez",
-    "coordinador": "MAURICIO RAMIREZ",
+    "coordinador": "MAURICIO RAMIREZ SILVA",
     "sede": "Medellin",
     "estado": "Desertor"
   },
@@ -100903,7 +102499,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "AMAR",
     "tieneEntrenador": "Si",
     "entrenador": "Andres Idrobo",
-    "coordinador": "MAURICIO RAMIREZ",
+    "coordinador": "MAURICIO RAMIREZ SILVA",
     "sede": "Medellin",
     "estado": "Desertor"
   },
@@ -100916,7 +102512,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "AMAR",
     "tieneEntrenador": "Si",
     "entrenador": "Lourdes Patino",
-    "coordinador": "MAURICIO RAMIREZ",
+    "coordinador": "MAURICIO RAMIREZ SILVA",
     "sede": "Medellin",
     "estado": "Desertor"
   },
@@ -100942,7 +102538,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "ANSTASIS",
     "tieneEntrenador": "Si",
     "entrenador": "Kriscia Rodas",
-    "coordinador": "KERLY CARRILLO",
+    "coordinador": "KERLY CARRILLO GARZON",
     "sede": "Cuenca",
     "estado": "Desertor"
   },
@@ -100955,7 +102551,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "SIC PARVIS MAGNA",
     "tieneEntrenador": "SI",
     "entrenador": "Mila Campuzano",
-    "coordinador": "KERLY CARRILLO / JUAN FERNANDO REINOSO",
+    "coordinador": "KERLY CARRILLO GARZON / JUAN FERNANDO REINOSO",
     "sede": "Cuenca",
     "estado": "Desertor"
   },
@@ -101045,7 +102641,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 17,
     "equipo": "JAGUARES DE ORO",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramirez",
+    "entrenador": "Mauricio Ramirez Silva",
     "coordinador": "",
     "sede": "Cuenca",
     "estado": "Desertor"
@@ -101058,7 +102654,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 17,
     "equipo": "JAGUARES DE ORO",
     "tieneEntrenador": "Si",
-    "entrenador": "Fernando Mendoza",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
     "coordinador": "",
     "sede": "Cuenca",
     "estado": "Desertor"
@@ -101123,7 +102719,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 19,
     "equipo": "VIKINGOS DE FUEGO",
     "tieneEntrenador": "Si",
-    "entrenador": "Isaac Betancourt",
+    "entrenador": "Isaac Gabriel Betancourt Patino",
     "coordinador": "",
     "sede": "Lima",
     "estado": "Desertor"
@@ -101136,7 +102732,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 19,
     "equipo": "VIKINGOS DE FUEGO",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramirez",
+    "entrenador": "Mauricio Ramirez Silva",
     "coordinador": "",
     "sede": "Lima",
     "estado": "Desertor"
@@ -101175,7 +102771,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 20,
     "equipo": "NANKURUNAISA",
     "tieneEntrenador": "Si",
-    "entrenador": "Jose Sanchez",
+    "entrenador": "Jose Luis Sanchez Moreno",
     "coordinador": "",
     "sede": "Guayaquil",
     "estado": "Desertor"
@@ -101227,7 +102823,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 20,
     "equipo": "KUNTUR MARKA",
     "tieneEntrenador": "Si",
-    "entrenador": "Diego Bravo",
+    "entrenador": "Diego David Bravo Figueroa",
     "coordinador": "",
     "sede": "Lima",
     "estado": "Desertor"
@@ -101240,7 +102836,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 20,
     "equipo": "KUNTUR MARKA",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "",
     "sede": "Lima",
     "estado": "Desertor"
@@ -101253,7 +102849,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 20,
     "equipo": "KUNTUR MARKA",
     "tieneEntrenador": "Si",
-    "entrenador": "Fernando Mendoza",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
     "coordinador": "",
     "sede": "Lima",
     "estado": "Desertor"
@@ -101279,7 +102875,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 21,
     "equipo": "TEMPLARIOS DEL ALBA",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Desertor"
@@ -101305,7 +102901,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 22,
     "equipo": "TITANES KOTETSU",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "",
     "sede": "Guayaquil",
     "estado": "Desertor"
@@ -101357,7 +102953,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 24,
     "equipo": "ALKHEMIA FINIX",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "",
     "sede": "Guayaquil",
     "estado": "Desertor"
@@ -101409,7 +103005,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 84,
     "equipo": "Byakko Hanshi",
     "tieneEntrenador": "Si",
-    "entrenador": "Fernando Mendoza",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
     "coordinador": "JOSUE VERA",
     "sede": "Cuenca",
     "estado": "Desertor"
@@ -101435,7 +103031,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 84,
     "equipo": "Byakko Hanshi",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "JOSUE VERA",
     "sede": "Cuenca",
     "estado": "Desertor"
@@ -101526,7 +103122,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 89,
     "equipo": "SHAKTI EMUNAH",
     "tieneEntrenador": "Si",
-    "entrenador": "Diego Bravo",
+    "entrenador": "Diego David Bravo Figueroa",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
@@ -101539,7 +103135,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 89,
     "equipo": "SHAKTI EMUNAH",
     "tieneEntrenador": "Si",
-    "entrenador": "Diego Bravo",
+    "entrenador": "Diego David Bravo Figueroa",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
@@ -101552,7 +103148,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 90,
     "equipo": "ACADIA SEMPER FI",
     "tieneEntrenador": "Si",
-    "entrenador": "Fernando Mendoza",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
@@ -101591,7 +103187,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 90,
     "equipo": "ACADIA SEMPER FI",
     "tieneEntrenador": "Si",
-    "entrenador": "Isaac Betancourt",
+    "entrenador": "Isaac Gabriel Betancourt Patino",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
@@ -101604,7 +103200,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 90,
     "equipo": "ACADIA SEMPER FI",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
@@ -101708,7 +103304,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 98,
     "equipo": "VALHALLA DRAKI",
     "tieneEntrenador": "Si",
-    "entrenador": "Jose Sanchez",
+    "entrenador": "Jose Luis Sanchez Moreno",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
@@ -101721,7 +103317,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 99,
     "equipo": "HENSU CHIKARA",
     "tieneEntrenador": "Si",
-    "entrenador": "Diego Bravo",
+    "entrenador": "Diego David Bravo Figueroa",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
@@ -101799,7 +103395,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 103,
     "equipo": "MEMENTO MORI",
     "tieneEntrenador": "Si",
-    "entrenador": "Diego Bravo",
+    "entrenador": "Diego David Bravo Figueroa",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
@@ -101825,7 +103421,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 103,
     "equipo": "MEMENTO MORI",
     "tieneEntrenador": "Si",
-    "entrenador": "Jose Sanchez",
+    "entrenador": "Jose Luis Sanchez Moreno",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Desertor"
@@ -101864,7 +103460,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 104,
     "equipo": "RAGNAROK CHAKANA",
     "tieneEntrenador": "Si",
-    "entrenador": "Diego Bravo",
+    "entrenador": "Diego David Bravo Figueroa",
     "coordinador": "ROBERTO RODRIGUEZ",
     "sede": "Quito",
     "estado": "Desertor"
@@ -101877,7 +103473,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 104,
     "equipo": "RAGNAROK CHAKANA",
     "tieneEntrenador": "Si",
-    "entrenador": "Jose Sanchez",
+    "entrenador": "Jose Luis Sanchez Moreno",
     "coordinador": "ROBERTO RODRIGUEZ",
     "sede": "Quito",
     "estado": "Desertor"
@@ -101903,7 +103499,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 105,
     "equipo": "KRALLARI IPSOFACTO",
     "tieneEntrenador": "Si",
-    "entrenador": "Diego Bravo",
+    "entrenador": "Diego David Bravo Figueroa",
     "coordinador": "",
     "sede": "Quito",
     "estado": "Desertor"
@@ -101929,7 +103525,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 105,
     "equipo": "KRALLARI IPSOFACTO",
     "tieneEntrenador": "Si",
-    "entrenador": "Fernando Mendoza",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
     "coordinador": "",
     "sede": "Quito",
     "estado": "Desertor"
@@ -101942,7 +103538,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 105,
     "equipo": "KRALLARI IPSOFACTO",
     "tieneEntrenador": "Si",
-    "entrenador": "Jose Sanchez",
+    "entrenador": "Jose Luis Sanchez Moreno",
     "coordinador": "",
     "sede": "Quito",
     "estado": "Desertor"
@@ -101955,7 +103551,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 105,
     "equipo": "KRALLARI IPSOFACTO",
     "tieneEntrenador": "Si",
-    "entrenador": "Diego Bravo",
+    "entrenador": "Diego David Bravo Figueroa",
     "coordinador": "",
     "sede": "Quito",
     "estado": "Desertor"
@@ -101969,7 +103565,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "KRALLARI IPSOFACTO",
     "tieneEntrenador": "Si",
     "entrenador": "Andres Idrobo",
-    "coordinador": "ERIKA GAVILANEZ",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -101982,7 +103578,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "KRALLARI IPSOFACTO",
     "tieneEntrenador": "Si",
     "entrenador": "Josue Vera",
-    "coordinador": "ERIKA GAVILANEZ",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -101995,7 +103591,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "KRALLARI IPSOFACTO",
     "tieneEntrenador": "Si",
     "entrenador": "Josue Vera",
-    "coordinador": "ERIKA GAVILANEZ",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -102007,7 +103603,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 106,
     "equipo": "KAIZEN MUKETSU",
     "tieneEntrenador": "SI",
-    "entrenador": "Mauricio Ramirez",
+    "entrenador": "Mauricio Ramirez Silva",
     "coordinador": "ALEJANDRO DIAZ",
     "sede": "Quito",
     "estado": "Desertor"
@@ -102034,7 +103630,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "ARUTAM REN",
     "tieneEntrenador": "Si",
     "entrenador": "Kriscia Rodas",
-    "coordinador": "ISAAC BETANCOURT",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -102047,7 +103643,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "ARUTAM REN",
     "tieneEntrenador": "Si",
     "entrenador": "Josue Vera",
-    "coordinador": "ISAAC BETANCOURT",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -102059,8 +103655,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 107,
     "equipo": "ARUTAM REN",
     "tieneEntrenador": "Si",
-    "entrenador": "Diego Bravo",
-    "coordinador": "ISAAC BETANCOURT",
+    "entrenador": "Diego David Bravo Figueroa",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -102072,8 +103668,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 107,
     "equipo": "ARUTAM REN",
     "tieneEntrenador": "Si",
-    "entrenador": "Jose Sanchez",
-    "coordinador": "ISAAC BETANCOURT",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -102086,7 +103682,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "ARUTAM REN",
     "tieneEntrenador": "Si",
     "entrenador": "Julio Narvaez",
-    "coordinador": "ISAAC BETANCOURT",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -102099,7 +103695,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "ARUTAM REN",
     "tieneEntrenador": "Si",
     "entrenador": "Lourdes Patino",
-    "coordinador": "ISAAC BETANCOURT",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -102111,8 +103707,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 107,
     "equipo": "ARUTAM REN",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramirez",
-    "coordinador": "ISAAC BETANCOURT",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -102124,7 +103720,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 108,
     "equipo": "NIKA AKAPANA",
     "tieneEntrenador": "Si",
-    "entrenador": "Jose Sanchez",
+    "entrenador": "Jose Luis Sanchez Moreno",
     "coordinador": "ROBERTO RODRIGUEZ",
     "sede": "Quito",
     "estado": "Desertor"
@@ -102150,8 +103746,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 109,
     "equipo": "NITYA LIKTHAM",
     "tieneEntrenador": "Si",
-    "entrenador": "Diego Bravo",
-    "coordinador": "ISAAC BETANCOURT",
+    "entrenador": "Diego David Bravo Figueroa",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -102164,7 +103760,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "NITYA LIKTHAM",
     "tieneEntrenador": "Si",
     "entrenador": "Kriscia Rodas",
-    "coordinador": "ISAAC BETANCOURT",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -102176,8 +103772,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 109,
     "equipo": "NITYA LIKTHAM",
     "tieneEntrenador": "Si",
-    "entrenador": "Diego Bravo",
-    "coordinador": "ISAAC BETANCOURT",
+    "entrenador": "Diego David Bravo Figueroa",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -102190,7 +103786,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "METAMORFOSIS",
     "tieneEntrenador": "SI",
     "entrenador": "Lourdes Patino",
-    "coordinador": "JONATHAN LA ROSA",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
     "sede": "Guayaquil",
     "estado": "Desertor"
   },
@@ -102202,8 +103798,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 111,
     "equipo": "SAN SARU",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramirez",
-    "coordinador": "ISAAC BETANCOURT",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -102215,7 +103811,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 112,
     "equipo": "RAYNOR AETERNUM",
     "tieneEntrenador": "Si",
-    "entrenador": "Jose Sanchez",
+    "entrenador": "Jose Luis Sanchez Moreno",
     "coordinador": "ROBERTO RODRIGUEZ",
     "sede": "Quito",
     "estado": "Desertor"
@@ -102229,7 +103825,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "HIKARI KJAZAC",
     "tieneEntrenador": "Si",
     "entrenador": "Andres Idrobo",
-    "coordinador": "ERIKA GAVILANEZ",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -102242,7 +103838,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "HIKARI KJAZAC",
     "tieneEntrenador": "Si",
     "entrenador": "Andres Idrobo",
-    "coordinador": "ERIKA GAVILANEZ",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -102254,7 +103850,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 114,
     "equipo": "KIA AMORIS",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramirez",
+    "entrenador": "Mauricio Ramirez Silva",
     "coordinador": "ALEJANDRO DIAZ",
     "sede": "Quito",
     "estado": "Desertor"
@@ -102268,7 +103864,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "UBUNTU QUASAR",
     "tieneEntrenador": "SI",
     "entrenador": "Linid Valencia",
-    "coordinador": "ISAAC BETANCOURT",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -102294,7 +103890,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "APOLO 12",
     "tieneEntrenador": "SI",
     "entrenador": "Andres Gomez",
-    "coordinador": "MAURICIO RAMIREZ",
+    "coordinador": "MAURICIO RAMIREZ SILVA",
     "sede": "Medellin",
     "estado": "Desertor"
   },
@@ -102319,7 +103915,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 92,
     "equipo": "APIS TITANIUM",
     "tieneEntrenador": "Si",
-    "entrenador": "Fernando Mendoza",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -102332,7 +103928,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 93,
     "equipo": "METATRON",
     "tieneEntrenador": "Si",
-    "entrenador": "Diego Bravo",
+    "entrenador": "Diego David Bravo Figueroa",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -102345,7 +103941,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 93,
     "equipo": "METATRON",
     "tieneEntrenador": "Si",
-    "entrenador": "Fernando Mendoza",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -102358,7 +103954,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 93,
     "equipo": "METATRON",
     "tieneEntrenador": "Si",
-    "entrenador": "Jose Sanchez",
+    "entrenador": "Jose Luis Sanchez Moreno",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -102384,7 +103980,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 93,
     "equipo": "METATRON",
     "tieneEntrenador": "Si",
-    "entrenador": "Diego Bravo",
+    "entrenador": "Diego David Bravo Figueroa",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -102397,7 +103993,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 93,
     "equipo": "METATRON",
     "tieneEntrenador": "Si",
-    "entrenador": "Jose Sanchez",
+    "entrenador": "Jose Luis Sanchez Moreno",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -102501,7 +104097,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 94,
     "equipo": "EAYN ALNASR",
     "tieneEntrenador": "Si",
-    "entrenador": "Jose Sanchez",
+    "entrenador": "Jose Luis Sanchez Moreno",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -102527,7 +104123,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 94,
     "equipo": "EAYN ALNASR",
     "tieneEntrenador": "Si",
-    "entrenador": "Fernando Mendoza",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -102580,7 +104176,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "KRONOS DYNATUS",
     "tieneEntrenador": "SI",
     "entrenador": "Ana Monroy",
-    "coordinador": "MAURICIO RAMIREZ",
+    "coordinador": "MAURICIO RAMIREZ SILVA",
     "sede": "Medellin",
     "estado": "Desertor"
   },
@@ -102592,7 +104188,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 95,
     "equipo": "LYUN USHUAY RHUA",
     "tieneEntrenador": "Si",
-    "entrenador": "Fernando Mendoza",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -102657,7 +104253,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 96,
     "equipo": "NINARI",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramirez",
+    "entrenador": "Mauricio Ramirez Silva",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -102683,7 +104279,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 24,
     "equipo": "KAIRU",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Desertor"
@@ -102696,8 +104292,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 14,
     "equipo": "RAGNAROK",
     "tieneEntrenador": "SI",
-    "entrenador": "Jose Sanchez",
-    "coordinador": "MAURICIO RAMIREZ",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "MAURICIO RAMIREZ SILVA",
     "sede": "Medellin",
     "estado": "Desertor"
   },
@@ -102735,7 +104331,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 24,
     "equipo": "KAIRU",
     "tieneEntrenador": "Si",
-    "entrenador": "Erika Gavilanez",
+    "entrenador": "Erika Gissell Gavilanez Gallardo",
     "coordinador": "LINID VALENCIA",
     "sede": "Lima",
     "estado": "Desertor"
@@ -102749,7 +104345,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "VALHARYN",
     "tieneEntrenador": "SI",
     "entrenador": "Ana Monroy",
-    "coordinador": "KERLY CARRILLO",
+    "coordinador": "KERLY CARRILLO GARZON",
     "sede": "Cuenca",
     "estado": "Desertor"
   },
@@ -102762,7 +104358,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "VALHARYN",
     "tieneEntrenador": "SI",
     "entrenador": "Ana Monroy",
-    "coordinador": "KERLY CARRILLO",
+    "coordinador": "KERLY CARRILLO GARZON",
     "sede": "Cuenca",
     "estado": "Desertor"
   },
@@ -102774,7 +104370,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 97,
     "equipo": "BINDU MUHOPO",
     "tieneEntrenador": "Si",
-    "entrenador": "Diego Bravo",
+    "entrenador": "Diego David Bravo Figueroa",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -102787,7 +104383,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 97,
     "equipo": "BINDU MUHOPO",
     "tieneEntrenador": "Si",
-    "entrenador": "Jose Sanchez",
+    "entrenador": "Jose Luis Sanchez Moreno",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -102826,7 +104422,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 97,
     "equipo": "BINDU MUHOPO",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramirez",
+    "entrenador": "Mauricio Ramirez Silva",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -102878,7 +104474,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 97,
     "equipo": "BINDU MUHOPO",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramirez",
+    "entrenador": "Mauricio Ramirez Silva",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -102931,7 +104527,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "VALHARYN",
     "tieneEntrenador": "SI",
     "entrenador": "Ana Monroy",
-    "coordinador": "KERLY CARRILLO",
+    "coordinador": "KERLY CARRILLO GARZON",
     "sede": "Cuenca",
     "estado": "Desertor"
   },
@@ -102956,7 +104552,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 99,
     "equipo": "HENSU CHIKARA",
     "tieneEntrenador": "Si",
-    "entrenador": "Jose Sanchez",
+    "entrenador": "Jose Luis Sanchez Moreno",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -102982,7 +104578,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 99,
     "equipo": "HENSU CHIKARA",
     "tieneEntrenador": "Si",
-    "entrenador": "Fernando Mendoza",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -103021,7 +104617,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 100,
     "equipo": "DUNAMIS PATSAK",
     "tieneEntrenador": "Si",
-    "entrenador": "Isaac Betancourt",
+    "entrenador": "Isaac Gabriel Betancourt Patino",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -103034,7 +104630,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 100,
     "equipo": "DUNAMIS PATSAK",
     "tieneEntrenador": "Si",
-    "entrenador": "Fernando Mendoza",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -103047,7 +104643,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 100,
     "equipo": "DUNAMIS PATSAK",
     "tieneEntrenador": "Si",
-    "entrenador": "Isaac Betancourt",
+    "entrenador": "Isaac Gabriel Betancourt Patino",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -103112,7 +104708,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 100,
     "equipo": "DUNAMIS PATSAK",
     "tieneEntrenador": "Si",
-    "entrenador": "Jose Sanchez",
+    "entrenador": "Jose Luis Sanchez Moreno",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -103151,7 +104747,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 100,
     "equipo": "DUNAMIS PATSAK",
     "tieneEntrenador": "Si",
-    "entrenador": "Jose Sanchez",
+    "entrenador": "Jose Luis Sanchez Moreno",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -103203,7 +104799,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 110,
     "equipo": "BUSHI MASAI",
     "tieneEntrenador": "SI",
-    "entrenador": "Jose Sanchez",
+    "entrenador": "Jose Luis Sanchez Moreno",
     "coordinador": "ALEJANDRO DIAZ",
     "sede": "Quito",
     "estado": "Desertor"
@@ -103255,7 +104851,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 102,
     "equipo": "RIKCHARI MUNAY",
     "tieneEntrenador": "Si",
-    "entrenador": "Diego Bravo",
+    "entrenador": "Diego David Bravo Figueroa",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -103268,7 +104864,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 102,
     "equipo": "RIKCHARI MUNAY",
     "tieneEntrenador": "Si",
-    "entrenador": "Jose Sanchez",
+    "entrenador": "Jose Luis Sanchez Moreno",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -103294,7 +104890,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 102,
     "equipo": "RIKCHARI MUNAY",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramirez",
+    "entrenador": "Mauricio Ramirez Silva",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -103308,7 +104904,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "UBUNTU QUASAR",
     "tieneEntrenador": "SI",
     "entrenador": "Linid Valencia",
-    "coordinador": "ISAAC BETANCOURT",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -103347,7 +104943,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "UBUNTU QUASAR",
     "tieneEntrenador": "SI",
     "entrenador": "Linid Valencia",
-    "coordinador": "ISAAC BETANCOURT",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -103385,7 +104981,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 103,
     "equipo": "MEMENTO MORI",
     "tieneEntrenador": "Si",
-    "entrenador": "Fernando Mendoza",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -103411,7 +105007,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 103,
     "equipo": "MEMENTO MORI",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramirez",
+    "entrenador": "Mauricio Ramirez Silva",
     "coordinador": "JOSUE VERA",
     "sede": "Quito",
     "estado": "Graduado"
@@ -103503,7 +105099,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "KRALLARI IPSOFACTO",
     "tieneEntrenador": "Si",
     "entrenador": "Mike Boada",
-    "coordinador": "ERIKA GAVILANEZ",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -103515,8 +105111,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 105,
     "equipo": "KRALLARI IPSOFACTO",
     "tieneEntrenador": "Si",
-    "entrenador": "Diego Bravo",
-    "coordinador": "ERIKA GAVILANEZ",
+    "entrenador": "Diego David Bravo Figueroa",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -103528,8 +105124,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 105,
     "equipo": "KRALLARI IPSOFACTO",
     "tieneEntrenador": "Si",
-    "entrenador": "Fernando Mendoza",
-    "coordinador": "ERIKA GAVILANEZ",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -103541,8 +105137,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 105,
     "equipo": "KRALLARI IPSOFACTO",
     "tieneEntrenador": "Si",
-    "entrenador": "Fernando Mendoza",
-    "coordinador": "ERIKA GAVILANEZ",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -103554,8 +105150,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 105,
     "equipo": "KRALLARI IPSOFACTO",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramirez",
-    "coordinador": "ERIKA GAVILANEZ",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -103567,8 +105163,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 105,
     "equipo": "KRALLARI IPSOFACTO",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramirez",
-    "coordinador": "ERIKA GAVILANEZ",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -103580,7 +105176,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 106,
     "equipo": "KAIZEN MUKETSU",
     "tieneEntrenador": "SI",
-    "entrenador": "Jose Sanchez",
+    "entrenador": "Jose Luis Sanchez Moreno",
     "coordinador": "ALEJANDRO DIAZ",
     "sede": "Quito",
     "estado": "Graduado"
@@ -103620,7 +105216,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "UBUNTU QUASAR",
     "tieneEntrenador": "SI",
     "entrenador": "Linid Valencia",
-    "coordinador": "ISAAC BETANCOURT",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -103633,7 +105229,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "ARUTAM REN",
     "tieneEntrenador": "Si",
     "entrenador": "Ana Monroy",
-    "coordinador": "ISAAC BETANCOURT",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -103645,8 +105241,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 107,
     "equipo": "ARUTAM REN",
     "tieneEntrenador": "Si",
-    "entrenador": "Fernando Mendoza",
-    "coordinador": "ISAAC BETANCOURT",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -103659,7 +105255,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "ARUTAM REN",
     "tieneEntrenador": "Si",
     "entrenador": "Julio Narvaez",
-    "coordinador": "ISAAC BETANCOURT",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -103672,7 +105268,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "ARUTAM REN",
     "tieneEntrenador": "Si",
     "entrenador": "Pamela Carrillo",
-    "coordinador": "ISAAC BETANCOURT",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -103711,7 +105307,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "OHANA WARRIORS",
     "tieneEntrenador": "SI",
     "entrenador": "Mike Boada",
-    "coordinador": "ERIKA GAVILANEZ",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -103737,7 +105333,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "NITYA LIKTHAM",
     "tieneEntrenador": "Si",
     "entrenador": "Ana Monroy",
-    "coordinador": "ISAAC BETANCOURT",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -103750,7 +105346,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "NITYA LIKTHAM",
     "tieneEntrenador": "Si",
     "entrenador": "Julio Narvaez",
-    "coordinador": "ISAAC BETANCOURT",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -103763,7 +105359,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "NITYA LIKTHAM",
     "tieneEntrenador": "Si",
     "entrenador": "Mike Boada",
-    "coordinador": "ISAAC BETANCOURT",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -103775,7 +105371,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 110,
     "equipo": "BUSHI MASAI",
     "tieneEntrenador": "SI",
-    "entrenador": "Diego Bravo",
+    "entrenador": "Diego David Bravo Figueroa",
     "coordinador": "ALEJANDRO DIAZ",
     "sede": "Quito",
     "estado": "Graduado"
@@ -103815,7 +105411,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "SAN SARU",
     "tieneEntrenador": "Si",
     "entrenador": "Julio Narvaez",
-    "coordinador": "ISAAC BETANCOURT",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -103828,7 +105424,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "SAN SARU",
     "tieneEntrenador": "Si",
     "entrenador": "Josue Vera",
-    "coordinador": "ISAAC BETANCOURT",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -103840,8 +105436,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 111,
     "equipo": "SAN SARU",
     "tieneEntrenador": "Si",
-    "entrenador": "Diego Bravo",
-    "coordinador": "ISAAC BETANCOURT",
+    "entrenador": "Diego David Bravo Figueroa",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -103853,8 +105449,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 111,
     "equipo": "SAN SARU",
     "tieneEntrenador": "Si",
-    "entrenador": "Jose Sanchez",
-    "coordinador": "ISAAC BETANCOURT",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -103867,7 +105463,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "SAN SARU",
     "tieneEntrenador": "Si",
     "entrenador": "Lourdes Patino",
-    "coordinador": "ISAAC BETANCOURT",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -103892,7 +105488,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 112,
     "equipo": "RAYNOR AETERNUM",
     "tieneEntrenador": "Si",
-    "entrenador": "Fernando Mendoza",
+    "entrenador": "Haydin Fernando Mendoza Clavijo",
     "coordinador": "ROBERTO RODRIGUEZ",
     "sede": "Quito",
     "estado": "Graduado"
@@ -103919,7 +105515,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "HIKARI KJAZAC",
     "tieneEntrenador": "Si",
     "entrenador": "Andres Idrobo",
-    "coordinador": "ERIKA GAVILANEZ",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -103932,7 +105528,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "HIKARI KJAZAC",
     "tieneEntrenador": "Si",
     "entrenador": "Andres Idrobo",
-    "coordinador": "ERIKA GAVILANEZ",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -103945,7 +105541,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "HIKARI KJAZAC",
     "tieneEntrenador": "Si",
     "entrenador": "Andres Idrobo",
-    "coordinador": "ERIKA GAVILANEZ",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -103958,7 +105554,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "HIKARI KJAZAC",
     "tieneEntrenador": "Si",
     "entrenador": "Andres Idrobo",
-    "coordinador": "ERIKA GAVILANEZ",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -103971,7 +105567,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "HIKARI KJAZAC",
     "tieneEntrenador": "Si",
     "entrenador": "Andres Idrobo",
-    "coordinador": "ERIKA GAVILANEZ",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -103984,7 +105580,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "HIKARI KJAZAC",
     "tieneEntrenador": "Si",
     "entrenador": "Andres Idrobo",
-    "coordinador": "ERIKA GAVILANEZ",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -103997,7 +105593,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "HIKARI KJAZAC",
     "tieneEntrenador": "Si",
     "entrenador": "Andres Idrobo",
-    "coordinador": "ERIKA GAVILANEZ",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -104009,7 +105605,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 114,
     "equipo": "KIA AMORIS",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramirez",
+    "entrenador": "Mauricio Ramirez Silva",
     "coordinador": "ALEJANDRO DIAZ",
     "sede": "Quito",
     "estado": "Desertor"
@@ -104022,7 +105618,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 114,
     "equipo": "KIA AMORIS",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramirez",
+    "entrenador": "Mauricio Ramirez Silva",
     "coordinador": "ALEJANDRO DIAZ",
     "sede": "Quito",
     "estado": "Graduado"
@@ -104035,7 +105631,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 114,
     "equipo": "KIA AMORIS",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramirez",
+    "entrenador": "Mauricio Ramirez Silva",
     "coordinador": "ALEJANDRO DIAZ",
     "sede": "Quito",
     "estado": "Graduado"
@@ -104048,7 +105644,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 114,
     "equipo": "KIA AMORIS",
     "tieneEntrenador": "Si",
-    "entrenador": "Mauricio Ramirez",
+    "entrenador": "Mauricio Ramirez Silva",
     "coordinador": "ALEJANDRO DIAZ",
     "sede": "Quito",
     "estado": "Desertor"
@@ -104062,7 +105658,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "UBUNTU QUASAR",
     "tieneEntrenador": "SI",
     "entrenador": "Linid Valencia",
-    "coordinador": "ISAAC BETANCOURT",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -104075,7 +105671,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "UBUNTU QUASAR",
     "tieneEntrenador": "SI",
     "entrenador": "Linid Valencia",
-    "coordinador": "ISAAC BETANCOURT",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -104088,7 +105684,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "UBUNTU QUASAR",
     "tieneEntrenador": "SI",
     "entrenador": "Linid Valencia",
-    "coordinador": "ISAAC BETANCOURT",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -104101,7 +105697,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "UBUNTU QUASAR",
     "tieneEntrenador": "SI",
     "entrenador": "Linid Valencia",
-    "coordinador": "ISAAC BETANCOURT",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -104140,7 +105736,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "OHANA WARRIORS",
     "tieneEntrenador": "SI",
     "entrenador": "Mike Boada",
-    "coordinador": "ERIKA GAVILANEZ",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -104153,7 +105749,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "OHANA WARRIORS",
     "tieneEntrenador": "SI",
     "entrenador": "Mike Boada",
-    "coordinador": "ERIKA GAVILANEZ",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -104166,7 +105762,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "OHANA WARRIORS",
     "tieneEntrenador": "SI",
     "entrenador": "Mike Boada",
-    "coordinador": "ERIKA GAVILANEZ",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -104179,7 +105775,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "OHANA WARRIORS",
     "tieneEntrenador": "SI",
     "entrenador": "Mike Boada",
-    "coordinador": "ERIKA GAVILANEZ",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -104192,7 +105788,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "OHANA WARRIORS",
     "tieneEntrenador": "SI",
     "entrenador": "Mike Boada",
-    "coordinador": "ERIKA GAVILANEZ",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -104205,7 +105801,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "OHANA WARRIORS",
     "tieneEntrenador": "SI",
     "entrenador": "Mike Boada",
-    "coordinador": "ERIKA GAVILANEZ",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -104218,7 +105814,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "OHANA WARRIORS",
     "tieneEntrenador": "SI",
     "entrenador": "Mike Boada",
-    "coordinador": "ERIKA GAVILANEZ",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -104231,7 +105827,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "OHANA WARRIORS",
     "tieneEntrenador": "SI",
     "entrenador": "Mike Boada",
-    "coordinador": "ERIKA GAVILANEZ",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -104334,8 +105930,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 119,
     "equipo": "AURA IWIA",
     "tieneEntrenador": "SI",
-    "entrenador": "Mauricio Ramirez",
-    "coordinador": "ISAAC BETANCOURT",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -104347,8 +105943,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 119,
     "equipo": "AURA IWIA",
     "tieneEntrenador": "SI",
-    "entrenador": "Mauricio Ramirez",
-    "coordinador": "ISAAC BETANCOURT",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -104360,8 +105956,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 119,
     "equipo": "AURA IWIA",
     "tieneEntrenador": "SI",
-    "entrenador": "Mauricio Ramirez",
-    "coordinador": "ISAAC BETANCOURT",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -104373,8 +105969,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 119,
     "equipo": "AURA IWIA",
     "tieneEntrenador": "SI",
-    "entrenador": "Mauricio Ramirez",
-    "coordinador": "ISAAC BETANCOURT",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -104386,8 +105982,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 119,
     "equipo": "AURA IWIA",
     "tieneEntrenador": "SI",
-    "entrenador": "Mauricio Ramirez",
-    "coordinador": "ISAAC BETANCOURT",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -104399,8 +105995,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 119,
     "equipo": "AURA IWIA",
     "tieneEntrenador": "SI",
-    "entrenador": "Mauricio Ramirez",
-    "coordinador": "ISAAC BETANCOURT",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -104412,8 +106008,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 119,
     "equipo": "AURA IWIA",
     "tieneEntrenador": "SI",
-    "entrenador": "Mauricio Ramirez",
-    "coordinador": "ISAAC BETANCOURT",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -104426,7 +106022,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "KAY THERON",
     "tieneEntrenador": "SI",
     "entrenador": "Ana Monroy",
-    "coordinador": "LEYLA PASQUEL",
+    "coordinador": "LEYLA KELLY PASQUEL ALFARO",
     "sede": "Lima",
     "estado": "Desertor"
   },
@@ -104439,7 +106035,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "KAY THERON",
     "tieneEntrenador": "SI",
     "entrenador": "Ana Monroy",
-    "coordinador": "LEYLA PASQUEL",
+    "coordinador": "LEYLA KELLY PASQUEL ALFARO",
     "sede": "Lima",
     "estado": "Desertor"
   },
@@ -104451,8 +106047,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 119,
     "equipo": "AURA IWIA",
     "tieneEntrenador": "SI",
-    "entrenador": "Mauricio Ramirez",
-    "coordinador": "ISAAC BETANCOURT",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -104464,8 +106060,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 119,
     "equipo": "AURA IWIA",
     "tieneEntrenador": "SI",
-    "entrenador": "Mauricio Ramirez",
-    "coordinador": "ISAAC BETANCOURT",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Graduado"
   },
@@ -104477,8 +106073,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 119,
     "equipo": "AURA IWIA",
     "tieneEntrenador": "SI",
-    "entrenador": "Mauricio Ramirez",
-    "coordinador": "ISAAC BETANCOURT",
+    "entrenador": "Mauricio Ramirez Silva",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -104490,8 +106086,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 34,
     "equipo": "FRACTAL SHINE",
     "tieneEntrenador": "SI",
-    "entrenador": "Kerly Carrillo",
-    "coordinador": "JONATHAN LA ROSA",
+    "entrenador": "Kerly Carrillo Garzon",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
     "sede": "Guayaquil",
     "estado": "Activo"
   },
@@ -104503,8 +106099,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 34,
     "equipo": "FRACTAL SHINE",
     "tieneEntrenador": "SI",
-    "entrenador": "Kerly Carrillo",
-    "coordinador": "JONATHAN LA ROSA",
+    "entrenador": "Kerly Carrillo Garzon",
+    "coordinador": "JONATHAN ALEXANDER LA ROSA NIETO",
     "sede": "Guayaquil",
     "estado": "Activo"
   },
@@ -104517,7 +106113,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "MAHORI KAYA",
     "tieneEntrenador": "SI",
     "entrenador": "Lourdes Patino",
-    "coordinador": "ISAAC BETANCOURT",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Activo"
   },
@@ -104530,7 +106126,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "MAHORI KAYA",
     "tieneEntrenador": "SI",
     "entrenador": "Lourdes Patino",
-    "coordinador": "ISAAC BETANCOURT",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Activo"
   },
@@ -104543,7 +106139,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "MAHORI KAYA",
     "tieneEntrenador": "SI",
     "entrenador": "Lourdes Patino",
-    "coordinador": "ISAAC BETANCOURT",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Activo"
   },
@@ -104556,7 +106152,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "MAHORI KAYA",
     "tieneEntrenador": "SI",
     "entrenador": "Lourdes Patino",
-    "coordinador": "ISAAC BETANCOURT",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -104569,7 +106165,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "MAHORI KAYA",
     "tieneEntrenador": "SI",
     "entrenador": "Lourdes Patino",
-    "coordinador": "ISAAC BETANCOURT",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -104582,7 +106178,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "MAHORI KAYA",
     "tieneEntrenador": "SI",
     "entrenador": "Lourdes Patino",
-    "coordinador": "ISAAC BETANCOURT",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -104595,7 +106191,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "MAHORI KAYA",
     "tieneEntrenador": "SI",
     "entrenador": "Lourdes Patino",
-    "coordinador": "ISAAC BETANCOURT",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Activo"
   },
@@ -104608,7 +106204,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "MAHORI KAYA",
     "tieneEntrenador": "SI",
     "entrenador": "Lourdes Patino",
-    "coordinador": "ISAAC BETANCOURT",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Activo"
   },
@@ -104621,7 +106217,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "MAHORI KAYA",
     "tieneEntrenador": "SI",
     "entrenador": "Lourdes Patino",
-    "coordinador": "ISAAC BETANCOURT",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Activo"
   },
@@ -104633,8 +106229,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 121,
     "equipo": "ALFA MURI",
     "tieneEntrenador": "SI",
-    "entrenador": "Jose Sanchez",
-    "coordinador": "ERIKA GAVILANEZ",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
     "sede": "Quito",
     "estado": "Activo"
   },
@@ -104646,8 +106242,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 121,
     "equipo": "ALFA MURI",
     "tieneEntrenador": "SI",
-    "entrenador": "Jose Sanchez",
-    "coordinador": "ERIKA GAVILANEZ",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
     "sede": "Quito",
     "estado": "Activo"
   },
@@ -104659,8 +106255,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 121,
     "equipo": "ALFA MURI",
     "tieneEntrenador": "SI",
-    "entrenador": "Jose Sanchez",
-    "coordinador": "ERIKA GAVILANEZ",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -104672,8 +106268,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 121,
     "equipo": "ALFA MURI",
     "tieneEntrenador": "SI",
-    "entrenador": "Jose Sanchez",
-    "coordinador": "ERIKA GAVILANEZ",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -104685,8 +106281,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 121,
     "equipo": "ALFA MURI",
     "tieneEntrenador": "SI",
-    "entrenador": "Jose Sanchez",
-    "coordinador": "ERIKA GAVILANEZ",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -104698,8 +106294,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 121,
     "equipo": "ALFA MURI",
     "tieneEntrenador": "SI",
-    "entrenador": "Jose Sanchez",
-    "coordinador": "ERIKA GAVILANEZ",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
     "sede": "Quito",
     "estado": "Desertor"
   },
@@ -104711,8 +106307,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 121,
     "equipo": "ALFA MURI",
     "tieneEntrenador": "SI",
-    "entrenador": "Jose Sanchez",
-    "coordinador": "ERIKA GAVILANEZ",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
     "sede": "Quito",
     "estado": "Activo"
   },
@@ -104724,8 +106320,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 121,
     "equipo": "ALFA MURI",
     "tieneEntrenador": "SI",
-    "entrenador": "Jose Sanchez",
-    "coordinador": "ERIKA GAVILANEZ",
+    "entrenador": "Jose Luis Sanchez Moreno",
+    "coordinador": "ERIKA GISSELL GAVILANEZ GALLARDO",
     "sede": "Quito",
     "estado": "Activo"
   },
@@ -104737,7 +106333,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 122,
     "equipo": "KAIZEN MAINICHI",
     "tieneEntrenador": "SI",
-    "entrenador": "Daniela Monroy",
+    "entrenador": "Daniela Monroy Fabbri",
     "coordinador": "LILI CUBILLO",
     "sede": "Quito",
     "estado": "Activo"
@@ -104750,7 +106346,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 122,
     "equipo": "KAIZEN MAINICHI",
     "tieneEntrenador": "SI",
-    "entrenador": "Daniela Monroy",
+    "entrenador": "Daniela Monroy Fabbri",
     "coordinador": "LILI CUBILLO",
     "sede": "Quito",
     "estado": "Activo"
@@ -104763,7 +106359,7 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 122,
     "equipo": "KAIZEN MAINICHI",
     "tieneEntrenador": "SI",
-    "entrenador": "Daniela Monroy",
+    "entrenador": "Daniela Monroy Fabbri",
     "coordinador": "LILI CUBILLO",
     "sede": "Quito",
     "estado": "Activo"
@@ -104776,8 +106372,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 123,
     "equipo": "SHOSHIN ITAI",
     "tieneEntrenador": "SI",
-    "entrenador": "Daniela Monroy",
-    "coordinador": "REGINA ROMERO",
+    "entrenador": "Daniela Monroy Fabbri",
+    "coordinador": "JUDITH REGINA ROMERO ROSALES",
     "sede": "Quito",
     "estado": "Activo"
   },
@@ -104789,8 +106385,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 123,
     "equipo": "SHOSHIN ITAI",
     "tieneEntrenador": "SI",
-    "entrenador": "Daniela Monroy",
-    "coordinador": "REGINA ROMERO",
+    "entrenador": "Daniela Monroy Fabbri",
+    "coordinador": "JUDITH REGINA ROMERO ROSALES",
     "sede": "Quito",
     "estado": "Activo"
   },
@@ -104802,8 +106398,8 @@ export const INITIAL_MANAGERS = [
     "numEquipo": 123,
     "equipo": "SHOSHIN ITAI",
     "tieneEntrenador": "SI",
-    "entrenador": "Daniela Monroy",
-    "coordinador": "REGINA ROMERO",
+    "entrenador": "Daniela Monroy Fabbri",
+    "coordinador": "JUDITH REGINA ROMERO ROSALES",
     "sede": "Quito",
     "estado": "Activo"
   },
@@ -104816,7 +106412,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "KAIZEN MAINICHI",
     "tieneEntrenador": "NO",
     "entrenador": "",
-    "coordinador": "ISAAC BETANCOURT",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Activo"
   },
@@ -104829,7 +106425,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "KAIZEN MAINICHI",
     "tieneEntrenador": "NO",
     "entrenador": "",
-    "coordinador": "ISAAC BETANCOURT",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Activo"
   },
@@ -104842,7 +106438,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "KAIZEN MAINICHI",
     "tieneEntrenador": "NO",
     "entrenador": "",
-    "coordinador": "ISAAC BETANCOURT",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Activo"
   },
@@ -104855,7 +106451,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "KAIZEN MAINICHI",
     "tieneEntrenador": "NO",
     "entrenador": "",
-    "coordinador": "ISAAC BETANCOURT",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Activo"
   },
@@ -104868,7 +106464,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "KAIZEN MAINICHI",
     "tieneEntrenador": "NO",
     "entrenador": "",
-    "coordinador": "ISAAC BETANCOURT",
+    "coordinador": "ISAAC GABRIEL BETANCOURT PATINO",
     "sede": "Quito",
     "estado": "Activo"
   },
@@ -104881,7 +106477,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "LOTUS IKIGAI",
     "tieneEntrenador": "SI",
     "entrenador": "Juan Fernando Reinoso",
-    "coordinador": "FERNANDO MENDOZA",
+    "coordinador": "HAYDIN FERNANDO MENDOZA CLAVIJO",
     "sede": "Cuenca",
     "estado": "Activo"
   },
@@ -104894,7 +106490,7 @@ export const INITIAL_MANAGERS = [
     "equipo": "LOTUS IKIGAI",
     "tieneEntrenador": "SI",
     "entrenador": "Juan Fernando Reinoso",
-    "coordinador": "FERNANDO MENDOZA",
+    "coordinador": "HAYDIN FERNANDO MENDOZA CLAVIJO",
     "sede": "Cuenca",
     "estado": "Activo"
   }
@@ -104903,42 +106499,42 @@ export const INITIAL_MANAGERS = [
 export const INITIAL_LLAMADOS = {
   "JULIO2026": [
     {
-      "entrenador": "Erika Gavilanez",
+      "entrenador": "Erika Gissell Gavilanez Gallardo",
       "manager": "David Gonzalez",
       "sede": "Medelln",
       "equipo": 15.0,
       "tarifa": 400.0
     },
     {
-      "entrenador": "Erika Gavilanez",
+      "entrenador": "Erika Gissell Gavilanez Gallardo",
       "manager": "Gabriel Ordz",
       "sede": "CDMX",
       "equipo": 3.0,
       "tarifa": 400.0
     },
     {
-      "entrenador": "Erika Gavilanez",
+      "entrenador": "Erika Gissell Gavilanez Gallardo",
       "manager": "Karina Valdiviezo",
       "sede": "Cuenca",
       "equipo": 19.0,
       "tarifa": 400.0
     },
     {
-      "entrenador": "Erika Gavilanez",
+      "entrenador": "Erika Gissell Gavilanez Gallardo",
       "manager": "Marcelo Riera",
       "sede": "Cuenca",
       "equipo": 19.0,
       "tarifa": 400.0
     },
     {
-      "entrenador": "Erika Gavilanez",
+      "entrenador": "Erika Gissell Gavilanez Gallardo",
       "manager": "Isabella Torres",
       "sede": "Guayaquil",
       "equipo": 32.0,
       "tarifa": 200.0
     },
     {
-      "entrenador": "Erika Gavilanez",
+      "entrenador": "Erika Gissell Gavilanez Gallardo",
       "manager": "Ivonne Recaurte",
       "sede": "Guayaquil",
       "equipo": 33.0,
@@ -105043,91 +106639,91 @@ export const INITIAL_LLAMADOS = {
       "tarifa": 80.0
     },
     {
-      "entrenador": "Mauricio Ramirez",
+      "entrenador": "Mauricio Ramirez Silva",
       "manager": "Carolina Herrera",
       "sede": "Quito",
       "equipo": 119.0,
       "tarifa": 40.0
     },
     {
-      "entrenador": "Mauricio Ramirez",
+      "entrenador": "Mauricio Ramirez Silva",
       "manager": "Christian Sosa",
       "sede": "Quito",
       "equipo": 119.0,
       "tarifa": 40.0
     },
     {
-      "entrenador": "Mauricio Ramirez",
+      "entrenador": "Mauricio Ramirez Silva",
       "manager": "Enrrique Franco",
       "sede": "Guayaquil",
       "equipo": 33.0,
       "tarifa": 133.3333333
     },
     {
-      "entrenador": "Mauricio Ramirez",
+      "entrenador": "Mauricio Ramirez Silva",
       "manager": "Evelyn Orellana",
       "sede": "Guayaquil",
       "equipo": 33.0,
       "tarifa": 133.3333333
     },
     {
-      "entrenador": "Mauricio Ramirez",
+      "entrenador": "Mauricio Ramirez Silva",
       "manager": "Fernanda Ibaez",
       "sede": "Guayaquil",
       "equipo": 33.0,
       "tarifa": 133.3333333
     },
     {
-      "entrenador": "Mauricio Ramirez",
+      "entrenador": "Mauricio Ramirez Silva",
       "manager": "Gabriela Altuna",
       "sede": "Quito",
       "equipo": 119.0,
       "tarifa": 40.0
     },
     {
-      "entrenador": "Mauricio Ramirez",
+      "entrenador": "Mauricio Ramirez Silva",
       "manager": "Jennifer Marmol",
       "sede": "Quito",
       "equipo": 119.0,
       "tarifa": 40.0
     },
     {
-      "entrenador": "Mauricio Ramirez",
+      "entrenador": "Mauricio Ramirez Silva",
       "manager": "Jhonny Cuascota",
       "sede": "Quito",
       "equipo": 119.0,
       "tarifa": 40.0
     },
     {
-      "entrenador": "Mauricio Ramirez",
+      "entrenador": "Mauricio Ramirez Silva",
       "manager": "Lluli Miniguano",
       "sede": "Quito",
       "equipo": 119.0,
       "tarifa": 40.0
     },
     {
-      "entrenador": "Mauricio Ramirez",
+      "entrenador": "Mauricio Ramirez Silva",
       "manager": "Robert Espinoza",
       "sede": "Quito",
       "equipo": 119.0,
       "tarifa": 40.0
     },
     {
-      "entrenador": "Mauricio Ramirez",
+      "entrenador": "Mauricio Ramirez Silva",
       "manager": "Santiago Proao",
       "sede": "Quito",
       "equipo": 119.0,
       "tarifa": 40.0
     },
     {
-      "entrenador": "Mauricio Ramirez",
+      "entrenador": "Mauricio Ramirez Silva",
       "manager": "Verito Muzo",
       "sede": "Quito",
       "equipo": 119.0,
       "tarifa": 40.0
     },
     {
-      "entrenador": "Mauricio Ramirez",
+      "entrenador": "Mauricio Ramirez Silva",
       "manager": "Vielka Altuna",
       "sede": "Quito",
       "equipo": 119.0,
@@ -105199,7 +106795,7 @@ export const INITIAL_LLAMADOS = {
       "tarifa": 200.0
     },
     {
-      "entrenador": "Jose Sanchez",
+      "entrenador": "Jose Luis Sanchez Moreno",
       "manager": "MARIANA CATRILLON",
       "sede": "Medelln",
       "equipo": 14.0,
@@ -105278,21 +106874,21 @@ export const INITIAL_LLAMADOS = {
       "tarifa": 175.0
     },
     {
-      "entrenador": "Diego Bravo",
+      "entrenador": "Diego David Bravo Figueroa",
       "manager": "Luis Alberto Hernndez Mendoza",
       "sede": "Lima",
       "equipo": "APOYO MESAS",
       "tarifa": 175.0
     },
     {
-      "entrenador": "Fernando Mendoza",
+      "entrenador": "Haydin Fernando Mendoza Clavijo",
       "manager": "CRISTINA VINTIMILLA",
       "sede": "Cuenca",
       "equipo": 16.0,
       "tarifa": 200.0
     },
     {
-      "entrenador": "Fernando Mendoza",
+      "entrenador": "Haydin Fernando Mendoza Clavijo",
       "manager": "GERARD AVILA",
       "sede": "Cuenca",
       "equipo": 16.0,
@@ -105460,35 +107056,35 @@ export const INITIAL_LLAMADOS = {
       "tarifa": 80.0
     },
     {
-      "entrenador": "Mauricio Ramirez",
+      "entrenador": "Mauricio Ramirez Silva",
       "manager": "BRYAN PESANTEZ",
       "sede": "Quito",
       "equipo": 114.0,
       "tarifa": 80.0
     },
     {
-      "entrenador": "Mauricio Ramirez",
+      "entrenador": "Mauricio Ramirez Silva",
       "manager": "ERICK BRAVO",
       "sede": "Quito",
       "equipo": 114.0,
       "tarifa": 80.0
     },
     {
-      "entrenador": "Mauricio Ramirez",
+      "entrenador": "Mauricio Ramirez Silva",
       "manager": "GUIDO GAMBOA",
       "sede": "Quito",
       "equipo": 114.0,
       "tarifa": 80.0
     },
     {
-      "entrenador": "Mauricio Ramirez",
+      "entrenador": "Mauricio Ramirez Silva",
       "manager": "MONICA CASANOVA",
       "sede": "Quito",
       "equipo": 114.0,
       "tarifa": 80.0
     },
     {
-      "entrenador": "Mauricio Ramirez",
+      "entrenador": "Mauricio Ramirez Silva",
       "manager": "WILSON ALBUJA",
       "sede": "Quito",
       "equipo": 114.0,
@@ -105560,28 +107156,28 @@ export const INITIAL_LLAMADOS = {
       "tarifa": 400.0
     },
     {
-      "entrenador": "Diego Bravo",
+      "entrenador": "Diego David Bravo Figueroa",
       "manager": "GISSELLA HUAMAN CELESTINO",
       "sede": "Lima",
       "equipo": 23.0,
       "tarifa": 325.0
     },
     {
-      "entrenador": "Erika Gavilanez",
+      "entrenador": "Erika Gissell Gavilanez Gallardo",
       "manager": "EQUIPO 24",
       "sede": "Lima",
       "equipo": 24.0,
       "tarifa": 400.0
     },
     {
-      "entrenador": "Fernando Mendoza",
+      "entrenador": "Haydin Fernando Mendoza Clavijo",
       "manager": "EDUARDO ALFARO",
       "sede": "Quito",
       "equipo": 112.0,
       "tarifa": 300.0
     },
     {
-      "entrenador": "Jose Sanchez",
+      "entrenador": "Jose Luis Sanchez Moreno",
       "manager": "EQUIPO 1",
       "sede": "CDMX",
       "equipo": 1.0,
@@ -105625,63 +107221,63 @@ export const INITIAL_LLAMADOS = {
       "tarifa": 350.0
     },
     {
-      "entrenador": "Diego Bravo",
+      "entrenador": "Diego David Bravo Figueroa",
       "manager": "CAROLINA VINTIMILLA",
       "sede": "Quito",
       "equipo": 110.0,
       "tarifa": 25.0
     },
     {
-      "entrenador": "Diego Bravo",
+      "entrenador": "Diego David Bravo Figueroa",
       "manager": "JUAN MORENO",
       "sede": "Quito",
       "equipo": 111.0,
       "tarifa": 325.0
     },
     {
-      "entrenador": "Erika Gavilanez",
+      "entrenador": "Erika Gissell Gavilanez Gallardo",
       "manager": "ANDREA MEDINA",
       "sede": "Cuenca",
       "equipo": 15.0,
       "tarifa": 350.0
     },
     {
-      "entrenador": "Erika Gavilanez",
+      "entrenador": "Erika Gissell Gavilanez Gallardo",
       "manager": "GARETH RAMOS PREZ",
       "sede": "Lima",
       "equipo": 23.0,
       "tarifa": 300.0
     },
     {
-      "entrenador": "Fernando Mendoza",
+      "entrenador": "Haydin Fernando Mendoza Clavijo",
       "manager": "DIEGO LEON",
       "sede": "Cuenca",
       "equipo": 15.0,
       "tarifa": 250.0
     },
     {
-      "entrenador": "Fernando Mendoza",
+      "entrenador": "Haydin Fernando Mendoza Clavijo",
       "manager": "VANEZA RAMREZ",
       "sede": "Lima",
       "equipo": 23.0,
       "tarifa": 350.0
     },
     {
-      "entrenador": "Isaac Betancourt",
+      "entrenador": "Isaac Gabriel Betancourt Patino",
       "manager": "DAVID EMERSON CONTRERAS LUCHINE",
       "sede": "Lima",
       "equipo": 23.0,
       "tarifa": 325.0
     },
     {
-      "entrenador": "Jose Sanchez",
+      "entrenador": "Jose Luis Sanchez Moreno",
       "manager": "KAROL VILLARUEL",
       "sede": "Quito",
       "equipo": 111.0,
       "tarifa": 275.0
     },
     {
-      "entrenador": "Jose Sanchez",
+      "entrenador": "Jose Luis Sanchez Moreno",
       "manager": "GRECIA MENDEZ",
       "sede": "Quito",
       "equipo": 112.0,
@@ -105739,21 +107335,21 @@ export const INITIAL_LLAMADOS = {
       "tarifa": 75.0
     },
     {
-      "entrenador": "Diego Bravo",
+      "entrenador": "Diego David Bravo Figueroa",
       "manager": "CAROLINA VINTIMILLA",
       "sede": "Quito",
       "equipo": 110.0,
       "tarifa": 275.0
     },
     {
-      "entrenador": "Isaac Betancourt",
+      "entrenador": "Isaac Gabriel Betancourt Patino",
       "manager": "RENATO MARQUEZ",
       "sede": "Cuenca",
       "equipo": 15.0,
       "tarifa": 75.0
     },
     {
-      "entrenador": "Jose Sanchez",
+      "entrenador": "Jose Luis Sanchez Moreno",
       "manager": "PAUL PINOS",
       "sede": "Cuenca",
       "equipo": 14.0,
@@ -105809,14 +107405,14 @@ export const INITIAL_LLAMADOS = {
       "tarifa": 300.0
     },
     {
-      "entrenador": "Mauricio Ramirez",
+      "entrenador": "Mauricio Ramirez Silva",
       "manager": "GREZIA MAIA JOLLY VERA",
       "sede": "Lima",
       "equipo": 22.0,
       "tarifa": 350.0
     },
     {
-      "entrenador": "Mauricio Ramirez",
+      "entrenador": "Mauricio Ramirez Silva",
       "manager": "VALERIA CEVALLOS",
       "sede": "Quito",
       "equipo": 111.0,
@@ -105846,21 +107442,21 @@ export const INITIAL_LLAMADOS = {
       "tarifa": 300.0
     },
     {
-      "entrenador": "Erika Gavilanez",
+      "entrenador": "Erika Gissell Gavilanez Gallardo",
       "manager": "PAUL OCHOA",
       "sede": "Cuenca",
       "equipo": 13.0,
       "tarifa": 325.0
     },
     {
-      "entrenador": "Jose Sanchez",
+      "entrenador": "Jose Luis Sanchez Moreno",
       "manager": "MIRIAM ORDOEZ",
       "sede": "Cuenca",
       "equipo": 13.0,
       "tarifa": 300.0
     },
     {
-      "entrenador": "Jose Sanchez",
+      "entrenador": "Jose Luis Sanchez Moreno",
       "manager": "NATALIA CAJAS",
       "sede": "Quito",
       "equipo": 110.0,
@@ -105888,7 +107484,7 @@ export const INITIAL_LLAMADOS = {
       "tarifa": 225.0
     },
     {
-      "entrenador": "Mauricio Ramirez",
+      "entrenador": "Mauricio Ramirez Silva",
       "manager": "MILAGROS CASTAEDA ORBE",
       "sede": "Lima",
       "equipo": 21.0,
@@ -105946,63 +107542,63 @@ export const INITIAL_LLAMADOS = {
       "tarifa": 250.0
     },
     {
-      "entrenador": "Diego Bravo",
+      "entrenador": "Diego David Bravo Figueroa",
       "manager": "MARIA FERNANDA BASSANTES",
       "sede": "Quito",
       "equipo": 109.0,
       "tarifa": 50.0
     },
     {
-      "entrenador": "Diego Bravo",
+      "entrenador": "Diego David Bravo Figueroa",
       "manager": "ANDREA POZO",
       "sede": "Quito",
       "equipo": 107.0,
       "tarifa": 75.0
     },
     {
-      "entrenador": "Diego Bravo",
+      "entrenador": "Diego David Bravo Figueroa",
       "manager": "OCTAVIO MURGUEYTIO",
       "sede": "Quito",
       "equipo": 109.0,
       "tarifa": 125.0
     },
     {
-      "entrenador": "Erika Gavilanez",
+      "entrenador": "Erika Gissell Gavilanez Gallardo",
       "manager": "JHEN PONCE ESPINOZA",
       "sede": "Lima",
       "equipo": 21.0,
       "tarifa": 125.0
     },
     {
-      "entrenador": "Erika Gavilanez",
+      "entrenador": "Erika Gissell Gavilanez Gallardo",
       "manager": "JAHAIRA MUOZ",
       "sede": "Guayaquil",
       "equipo": 26.0,
       "tarifa": 300.0
     },
     {
-      "entrenador": "Erika Gavilanez",
+      "entrenador": "Erika Gissell Gavilanez Gallardo",
       "manager": "BELEN MUQUINCHO",
       "sede": "Cuenca",
       "equipo": 12.0,
       "tarifa": 300.0
     },
     {
-      "entrenador": "Fernando Mendoza",
+      "entrenador": "Haydin Fernando Mendoza Clavijo",
       "manager": "MARIA FERNANDA BASSANTES",
       "sede": "Quito",
       "equipo": 109.0,
       "tarifa": 50.0
     },
     {
-      "entrenador": "Fernando Mendoza",
+      "entrenador": "Haydin Fernando Mendoza Clavijo",
       "manager": "KARINA GARCIA",
       "sede": "Quito",
       "equipo": 107.0,
       "tarifa": 300.0
     },
     {
-      "entrenador": "Jose Sanchez",
+      "entrenador": "Jose Luis Sanchez Moreno",
       "manager": "LAURA VILLAGOMEZ",
       "sede": "Quito",
       "equipo": 106.0,
@@ -106079,14 +107675,14 @@ export const INITIAL_LLAMADOS = {
       "tarifa": 100.0
     },
     {
-      "entrenador": "Mauricio Ramirez",
+      "entrenador": "Mauricio Ramirez Silva",
       "manager": "BRYAN IZA",
       "sede": "Quito",
       "equipo": 107.0,
       "tarifa": 125.0
     },
     {
-      "entrenador": "Mauricio Ramirez",
+      "entrenador": "Mauricio Ramirez Silva",
       "manager": "MARCO CLAVIJO",
       "sede": "Quito",
       "equipo": 106.0,
@@ -106123,42 +107719,42 @@ export const INITIAL_LLAMADOS = {
       "tarifa": 300.0
     },
     {
-      "entrenador": "Diego Bravo",
+      "entrenador": "Diego David Bravo Figueroa",
       "manager": "JAQUI REYES GIOVANNY JAVIER",
       "sede": "Quito",
       "equipo": 104.0,
       "tarifa": 75.0
     },
     {
-      "entrenador": "Diego Bravo",
+      "entrenador": "Diego David Bravo Figueroa",
       "manager": "GIOVANA PALOMINO MARCOS",
       "sede": "Lima",
       "equipo": 20.0,
       "tarifa": 125.0
     },
     {
-      "entrenador": "Diego Bravo",
+      "entrenador": "Diego David Bravo Figueroa",
       "manager": "MICOLTA BRIANNA",
       "sede": "Quito",
       "equipo": 105.0,
       "tarifa": 275.0
     },
     {
-      "entrenador": "Fernando Mendoza",
+      "entrenador": "Haydin Fernando Mendoza Clavijo",
       "manager": "LUZ MABEL CHIPANA",
       "sede": "Lima",
       "equipo": 20.0,
       "tarifa": 125.0
     },
     {
-      "entrenador": "Fernando Mendoza",
+      "entrenador": "Haydin Fernando Mendoza Clavijo",
       "manager": "PEREIRA JENNIFER",
       "sede": "Quito",
       "equipo": 105.0,
       "tarifa": 300.0
     },
     {
-      "entrenador": "Fernando Mendoza",
+      "entrenador": "Haydin Fernando Mendoza Clavijo",
       "manager": "PIARPUEZAN CAMILA MARCELA",
       "sede": "Quito",
       "equipo": 105.0,
@@ -106200,14 +107796,14 @@ export const INITIAL_LLAMADOS = {
       "tarifa": 250.0
     },
     {
-      "entrenador": "Mauricio Ramirez",
+      "entrenador": "Mauricio Ramirez Silva",
       "manager": "HATTY CHRISTIAN",
       "sede": "Quito",
       "equipo": 105.0,
       "tarifa": 275.0
     },
     {
-      "entrenador": "Mauricio Ramirez",
+      "entrenador": "Mauricio Ramirez Silva",
       "manager": "NAVAS YAMILEX",
       "sede": "Quito",
       "equipo": 105.0,
@@ -106314,63 +107910,63 @@ export const INITIAL_LLAMADOS = {
       "tarifa": 250.0
     },
     {
-      "entrenador": "Diego Bravo",
+      "entrenador": "Diego David Bravo Figueroa",
       "manager": "CARIUS JONATHAN",
       "sede": "Quito",
       "equipo": 105.0,
       "tarifa": 75.0
     },
     {
-      "entrenador": "Diego Bravo",
+      "entrenador": "Diego David Bravo Figueroa",
       "manager": "JAQUI REYES GIOVANNY JAVIER",
       "sede": "Quito",
       "equipo": 104.0,
       "tarifa": 125.0
     },
     {
-      "entrenador": "Erika Gavilanez",
+      "entrenador": "Erika Gissell Gavilanez Gallardo",
       "manager": "RHANIA INTIVEROS REQUEJO",
       "sede": "Lima",
       "equipo": 20.0,
       "tarifa": 125.0
     },
     {
-      "entrenador": "Erika Gavilanez",
+      "entrenador": "Erika Gissell Gavilanez Gallardo",
       "manager": "MARIELA LOPEZ",
       "sede": "Guayaquil",
       "equipo": 25.0,
       "tarifa": 275.0
     },
     {
-      "entrenador": "Fernando Mendoza",
+      "entrenador": "Haydin Fernando Mendoza Clavijo",
       "manager": "ENRIQUEZ ALEJANDRO",
       "sede": "Quito",
       "equipo": 105.0,
       "tarifa": 75.0
     },
     {
-      "entrenador": "Fernando Mendoza",
+      "entrenador": "Haydin Fernando Mendoza Clavijo",
       "manager": "LEISI MEDINA IDROGO",
       "sede": "Lima",
       "equipo": 19.0,
       "tarifa": 275.0
     },
     {
-      "entrenador": "Jose Sanchez",
+      "entrenador": "Jose Luis Sanchez Moreno",
       "manager": "ALISSON BARREROS",
       "sede": "Quito",
       "equipo": 107.0,
       "tarifa": 100.0
     },
     {
-      "entrenador": "Jose Sanchez",
+      "entrenador": "Jose Luis Sanchez Moreno",
       "manager": "BENITEZ NIETO TATIANA MISHELL",
       "sede": "Quito",
       "equipo": 104.0,
       "tarifa": 250.0
     },
     {
-      "entrenador": "Jose Sanchez",
+      "entrenador": "Jose Luis Sanchez Moreno",
       "manager": "PAULY CEDILLO",
       "sede": "Cuenca",
       "equipo": 11.0,
@@ -106426,42 +108022,42 @@ export const INITIAL_LLAMADOS = {
       "tarifa": 300.0
     },
     {
-      "entrenador": "Mauricio Ramirez",
+      "entrenador": "Mauricio Ramirez Silva",
       "manager": "BRYAN IZA",
       "sede": "Quito",
       "equipo": 107.0,
       "tarifa": 125.0
     },
     {
-      "entrenador": "Mauricio Ramirez",
+      "entrenador": "Mauricio Ramirez Silva",
       "manager": "HECTOR CANQUI VALLADARES",
       "sede": "Lima",
       "equipo": 19.0,
       "tarifa": 50.0
     },
     {
-      "entrenador": "Mauricio Ramirez",
+      "entrenador": "Mauricio Ramirez Silva",
       "manager": "LIDIA CRSITINA MARTINEZ PUENTE",
       "sede": "Lima",
       "equipo": 18.0,
       "tarifa": 75.0
     },
     {
-      "entrenador": "Mauricio Ramirez",
+      "entrenador": "Mauricio Ramirez Silva",
       "manager": "ANAHI REYES",
       "sede": "Quito",
       "equipo": 102.0,
       "tarifa": 75.0
     },
     {
-      "entrenador": "Mauricio Ramirez",
+      "entrenador": "Mauricio Ramirez Silva",
       "manager": "NATT ARTEAGA",
       "sede": "Quito",
       "equipo": 103.0,
       "tarifa": 100.0
     },
     {
-      "entrenador": "Mauricio Ramirez",
+      "entrenador": "Mauricio Ramirez Silva",
       "manager": "SHIRLEY VELASQUEZ",
       "sede": "Guayaquil",
       "equipo": 25.0,
@@ -106508,28 +108104,28 @@ export const ENTRENADORES_LIST = [
   "Carlos Brunis",
   "Christian Tito",
   "Cirilo Agustin Martinez",
-  "Daniela Monroy",
+  "Daniela Monroy Fabbri",
   "David Sosa",
-  "Diego Bravo",
-  "Erika Gavilanez",
+  "Diego David Bravo Figueroa",
+  "Erika Gissell Gavilanez Gallardo",
   "Fer Aragon",
-  "Fernando Mendoza",
-  "Isaac Betancourt",
+  "Haydin Fernando Mendoza Clavijo",
+  "Isaac Gabriel Betancourt Patino",
   "Jesus Adrian Acosta",
-  "Jose Sanchez",
+  "Jose Luis Sanchez Moreno",
   "Jose Torron",
   "Josue Vera",
   "Juan Angel",
   "Juan Fernando Reinoso",
   "Julio Narvaez",
-  "Kerly Carrillo",
+  "Kerly Carrillo Garzon",
   "Kriscia Rodas",
   "Leandro Brunis",
   "Linid Valencia",
   "Lourdes Patino",
   "Maria Jose Roman",
   "Mauricio Perez",
-  "Mauricio Ramirez",
+  "Mauricio Ramirez Silva",
   "Mike Boada",
   "Mila Campuzano",
   "Mildred Munoz",
@@ -106540,21 +108136,21 @@ export const ENTRENADORES_LIST = [
 export const COORDINADORES_LIST = [
   "ALEJANDRO DIAZ",
   "ALONSO SOLARES",
-  "DANIELA MONROY",
-  "ERIKA GAVILANEZ",
-  "FERNANDO MENDOZA",
-  "ISAAC BETANCOURT",
-  "JONATHAN LA ROSA",
+  "DANIELA MONROY FABBRI",
+  "ERIKA GISSELL GAVILANEZ GALLARDO",
+  "HAYDIN FERNANDO MENDOZA CLAVIJO",
+  "ISAAC GABRIEL BETANCOURT PATINO",
+  "JONATHAN ALEXANDER LA ROSA NIETO",
   "JOSUE VERA",
   "JUAN FERNANDO REINOSO",
-  "KERLY CARRILLO",
-  "KERLY CARRILLO / JUAN FERNANDO REINOSO",
-  "LEYLA PASQUEL",
+  "KERLY CARRILLO GARZON",
+  "KERLY CARRILLO GARZON / JUAN FERNANDO REINOSO",
+  "LEYLA KELLY PASQUEL ALFARO",
   "LILI CUBILLO",
   "LINID VALENCIA",
-  "MAURICIO RAMIREZ",
+  "MAURICIO RAMIREZ SILVA",
   "MIGUEL TORRES",
-  "REGINA ROMERO",
+  "JUDITH REGINA ROMERO ROSALES",
   "ROBERTO RODRIGUEZ"
 ];
 
@@ -106661,34 +108257,35 @@ export const normalizeTrainer = (name) => {
   "Jesus Adrian Acosta": "Jesus Adrian Acosta",
   "Jesús Acosta": "Jesus Adrian Acosta",
   "Jesús Adrián Acosta": "Jesus Adrian Acosta",
-  "Erika Gavilnez": "Erika Gavilanez",
-  "Erika Gavilanez": "Erika Gavilanez",
-  "Érika Gavilánez": "Erika Gavilanez",
-  "Jos Snchez": "Jose Sanchez",
-  "José Sánchez": "Jose Sanchez",
-  "Jose Sanchez": "Jose Sanchez",
+  "Erika Gavilnez": "Erika Gissell Gavilanez Gallardo",
+  "Erika Gavilanez": "Erika Gissell Gavilanez Gallardo",
+  "Erika Gavilánez": "Erika Gissell Gavilanez Gallardo",
+  "Érika Gavilánez": "Erika Gissell Gavilanez Gallardo",
+  "Erika Gissell Gavilanez Gallardo": "Erika Gissell Gavilanez Gallardo",
+  "Jos Snchez": "Jose Luis Sanchez Moreno",
+  "José Sánchez": "Jose Luis Sanchez Moreno",
+  "Jose Sanchez": "Jose Luis Sanchez Moreno",
   "Josu Vera": "Josue Vera",
   "Josue Vera": "Josue Vera",
   "Josué Vera": "Josue Vera",
   "Marcos Vera": "Josue Vera",
   "Marcos Josue Vera": "Josue Vera",
-  "David Sosa": "Freddy Sosa",
-  "Freddy Sosa": "Freddy Sosa",
-  "Freddy David Sosa Carrera": "Freddy Sosa",
   "Julio Narvez": "Julio Narvaez",
   "Julio Narvaez": "Julio Narvaez",
   "Julio Narváez": "Julio Narvaez",
-  "Kerlie Carrillo": "Kerly Carrillo",
-  "Kerly Carrillo": "Kerly Carrillo",
-  "Kerly Carrillo Garzon": "Kerly Carrillo",
+  "Kerlie Carrillo": "Kerly Carrillo Garzon",
+  "Kerly Carrillo": "Kerly Carrillo Garzon",
+  "Kerly Carrillo Garzon": "Kerly Carrillo Garzon",
   "Lourdes Patio": "María De Lourdes Patiño Galarraga",
   "Lourdes Patino": "María De Lourdes Patiño Galarraga",
+  "Lourdes Patiño": "María De Lourdes Patiño Galarraga",
   "Maria de Lourdes Patino Galarraga": "María De Lourdes Patiño Galarraga",
   "María de Lourdes Patiño": "María De Lourdes Patiño Galarraga",
-  "Maurcio Ramirez": "Mauricio Ramirez",
-  "Mauricio Ramrez": "Mauricio Ramirez",
-  "Mauricio Ramirez": "Mauricio Ramirez",
-  "Mauricio Ramírez": "Mauricio Ramirez",
+  "María De Lourdes Patiño Galarraga": "María De Lourdes Patiño Galarraga",
+  "Maurcio Ramirez": "Mauricio Ramirez Silva",
+  "Mauricio Ramrez": "Mauricio Ramirez Silva",
+  "Mauricio Ramirez": "Mauricio Ramirez Silva",
+  "Mauricio Ramírez": "Mauricio Ramirez Silva",
   "Mila Campuzano": "Mila Campuzano",
   "Emily Campuzano": "Mila Campuzano",
   "Emily Gabriela Campuzano Rodríguez": "Mila Campuzano",
@@ -106697,25 +108294,85 @@ export const normalizeTrainer = (name) => {
   "Mildred Munoz Vasquez": "Mildred Munoz",
   "Mildred Munoz": "Mildred Munoz",
   "Mildred Muñoz": "Mildred Munoz",
-  "Isaac Betancourth": "Isaac Betancourt",
-  "Isaac Betancourt": "Isaac Betancourt",
+  "Isaac Betancourth": "Isaac Gabriel Betancourt Patino",
+  "Isaac Betancourt": "Isaac Gabriel Betancourt Patino",
   "Juan Fer Reinoso": "Juan Fernando Reinoso",
-  "Juan Fernando Reinoso": "Juan Fernando Reinoso"
+  "Juan Fernando Reinoso": "Juan Fernando Reinoso",
+  "Daniela Monroy": "Daniela Monroy Fabbri",
+  "Daniela Monroy Fabbri": "Daniela Monroy Fabbri",
+  "Fernando Mendoza": "Haydin Fernando Mendoza Clavijo",
+  "Haydin Fernando Mendoza Clavijo": "Haydin Fernando Mendoza Clavijo",
+  "Jonathan La Rosa": "Jonathan Alexander La Rosa Nieto",
+  "Jonathan Alexander La Rosa Nieto": "Jonathan Alexander La Rosa Nieto",
+  "Leyla Pasquel": "Leyla Kelly Pasquel Alfaro",
+  "Leyla Kelly Pasquel Alfaro": "Leyla Kelly Pasquel Alfaro",
+  "Regina Romero": "Judith Regina Romero Rosales",
+  "Judith Regina Romero Rosales": "Judith Regina Romero Rosales",
+  "Diego Bravo": "Diego David Bravo Figueroa",
+  "Diego David Bravo Figueroa": "Diego David Bravo Figueroa",
+  // CONTEXTO (28/08/2026): José indicó que a Fredy Sosa le gusta que le digan
+  // David Sosa, y a Edison Paul Sosa le gusta que le digan Paul Sosa. En los
+  // datos actuales de managersData.js ya se usa "David Sosa" y "Paul Sosa" en
+  // todos lados (no aparece ningún registro con el nombre legal) — se agregan
+  // estos alias solo de forma preventiva, por si una futura carga/importación
+  // llega con el nombre legal, para que no se cree un entrenador duplicado.
+  "Fredy Sosa": "David Sosa",
+  "David Sosa": "David Sosa",
+  "Edison Paul Sosa": "Paul Sosa",
+  "Paul Sosa": "Paul Sosa"
 };
-  return map[clean] || clean;
+  if (map[clean]) return map[clean];
+
+  // (02/09/2026) Fallback insensible a mayúsculas/acentos/espacios — antes de esto,
+  // normalizeTrainer solo hacía match EXACTO de string contra el mapa de arriba, así
+  // que cualquier variante de mayúsculas/acentos que no estuviera enumerada a mano
+  // (ej. "DANIELA MONROY" en vez de "Daniela Monroy", "Erika Gavilánez" con una
+  // combinación de acentos distinta a las ya listadas) se trataba como un
+  // entrenador DIFERENTE y aparecía duplicado en las tarjetas de equipo (reportado
+  // por José con varios ejemplos reales: Erika, Lourdes Patiño, Daniela Monroy).
+  // Este fallback compara la entrada contra cada clave del mapa ya normalizada
+  // (sin acentos, en minúsculas, espacios colapsados), sin tener que seguir
+  // enumerando cada combinación posible a mano.
+  const foldKey = (s) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+  const foldedClean = foldKey(clean);
+  for (const key in map) {
+    if (foldKey(key) === foldedClean) return map[key];
+  }
+  return clean;
 };
 
 export const normalizeCoordinator = (name) => {
   if (!name) return '';
   const clean = name.trim();
   const map = {
-  "ISAAC BETANCOURTH": "ISAAC BETANCOURT",
+  "ISAAC BETANCOURTH": "ISAAC GABRIEL BETANCOURT PATINO",
+  "ISAAC BETANCOURT": "ISAAC GABRIEL BETANCOURT PATINO",
   "JOSU VERA": "JOSUE VERA",
   "MARCOS VERA": "JOSUE VERA",
   "MARCOS JOSUE VERA": "JOSUE VERA",
   "JUAN FER REINOSO": "JUAN FERNANDO REINOSO",
-  "KERLY CARRILLO - JUANFER REINOSO": "KERLY CARRILLO / JUAN FERNANDO REINOSO",
-  "KERLY CARRILLO / JUANFER REINOSO": "KERLY CARRILLO / JUAN FERNANDO REINOSO"
+  "KERLY CARRILLO - JUANFER REINOSO": "KERLY CARRILLO GARZON / JUAN FERNANDO REINOSO",
+  "KERLY CARRILLO / JUANFER REINOSO": "KERLY CARRILLO GARZON / JUAN FERNANDO REINOSO",
+  "KERLY CARRILLO": "KERLY CARRILLO GARZON",
+  "KERLY CARRILLO GARZON": "KERLY CARRILLO GARZON",
+  "MAURICIO RAMIREZ": "MAURICIO RAMIREZ SILVA",
+  "MAURICIO RAMIREZ SILVA": "MAURICIO RAMIREZ SILVA",
+  "DANIELA MONROY": "DANIELA MONROY FABBRI",
+  "DANIELA MONROY FABBRI": "DANIELA MONROY FABBRI",
+  "FERNANDO MENDOZA": "HAYDIN FERNANDO MENDOZA CLAVIJO",
+  "HAYDIN FERNANDO MENDOZA CLAVIJO": "HAYDIN FERNANDO MENDOZA CLAVIJO",
+  "JOSE SANCHEZ": "JOSE LUIS SANCHEZ MORENO",
+  "JOSE LUIS SANCHEZ MORENO": "JOSE LUIS SANCHEZ MORENO",
+  "JONATHAN LA ROSA": "JONATHAN ALEXANDER LA ROSA NIETO",
+  "JONATHAN ALEXANDER LA ROSA NIETO": "JONATHAN ALEXANDER LA ROSA NIETO",
+  "LEYLA PASQUEL": "LEYLA KELLY PASQUEL ALFARO",
+  "LEYLA KELLY PASQUEL ALFARO": "LEYLA KELLY PASQUEL ALFARO",
+  "ERIKA GAVILANEZ": "ERIKA GISSELL GAVILANEZ GALLARDO",
+  "ERIKA GISSELL GAVILANEZ GALLARDO": "ERIKA GISSELL GAVILANEZ GALLARDO",
+  "REGINA ROMERO": "JUDITH REGINA ROMERO ROSALES",
+  "JUDITH REGINA ROMERO ROSALES": "JUDITH REGINA ROMERO ROSALES",
+  "DIEGO BRAVO": "DIEGO DAVID BRAVO FIGUEROA",
+  "DIEGO DAVID BRAVO FIGUEROA": "DIEGO DAVID BRAVO FIGUEROA"
 };
   return map[clean] || clean;
 };
@@ -113204,7 +114861,12 @@ export const normalizeSede = (sede) => {
   if (s === 'LIM' || s.toLowerCase().includes('lima')) return 'Lima';
   if (s === 'CUE' || s.toLowerCase().includes('cuenca')) return 'Cuenca';
   if (s === 'GYE' || s.toLowerCase().includes('guayaquil')) return 'Guayaquil';
-  if (s === 'MEX' || s.toLowerCase().includes('mex') || s.toLowerCase().includes('méxico')) return 'México';
+  // (02/09/2026) "CDMX" no contiene la subcadena "mex", así que antes de este fix
+  // normalizeSede("CDMX") devolvía "CDMX" sin normalizar — distinto de "México" (el
+  // valor real del filtro de sede en Centro de Managers) y por eso el filtro
+  // "México" mostraba 0 resultados aunque sí había managers con sede "CDMX".
+  // Reportado por José con captura real del bug.
+  if (s === 'MEX' || s.toUpperCase() === 'CDMX' || s.toLowerCase().includes('mex') || s.toLowerCase().includes('méxico') || s.toLowerCase().includes('cdmx')) return 'México';
   if (s === 'UIO-C1' || s === 'UIO-C2' || s === 'UIO' ||
       s.toLowerCase().includes('ciclo 1') || s.toLowerCase().includes('ciclo1') ||
       s.toLowerCase().includes('ciclo 2') || s.toLowerCase().includes('ciclo2') ||
@@ -113867,12 +115529,14 @@ export const USERS_TO_IMPORT = [
     ],
     "role": "gerente",
     "roles": [
-      "gerente"
+      "gerente",
+      "entrenador",
+      "entrenador_llamadas"
     ],
     "sede": "Quito",
     "emails": [
       "emily.campuzano@crearpsl.net",
-      "emily.campuzano@crearpsl.net"
+      "milacampuzano21@gmail.com"
     ],
     "email": "emily.campuzano@crearpsl.net"
   },
@@ -114017,7 +115681,8 @@ export const USERS_TO_IMPORT = [
     "name": "Alejandro Díaz",
     "role": "entrenador",
     "roles": [
-      "entrenador"
+      "entrenador",
+      "entrenador_llamadas"
     ],
     "sede": "Global",
     "emails": [
@@ -114043,7 +115708,8 @@ export const USERS_TO_IMPORT = [
     "name": "Ana Elena Monroy",
     "role": "entrenador",
     "roles": [
-      "entrenador"
+      "entrenador",
+      "entrenador_llamadas"
     ],
     "sede": "Global",
     "emails": [
@@ -114082,7 +115748,8 @@ export const USERS_TO_IMPORT = [
     "name": "Diego Bravo",
     "role": "entrenador",
     "roles": [
-      "entrenador"
+      "entrenador",
+      "entrenador_llamadas"
     ],
     "sede": "Global",
     "emails": [
@@ -114095,7 +115762,8 @@ export const USERS_TO_IMPORT = [
     "name": "Haydin Fernando Mendoza Clavijo",
     "role": "entrenador",
     "roles": [
-      "entrenador"
+      "entrenador",
+      "entrenador_llamadas"
     ],
     "sede": "Global",
     "emails": [
@@ -114144,10 +115812,11 @@ export const USERS_TO_IMPORT = [
   },
   {
     "id": "entrenador_maradelourdespatiopatiogalarraga",
-    "name": "María De Lourdes Patiño Patiño Galarraga",
+    "name": "María De Lourdes Patiño Galarraga",
     "role": "entrenador",
     "roles": [
-      "entrenador"
+      "entrenador",
+      "entrenador_llamadas"
     ],
     "sede": "Global",
     "emails": [
@@ -140204,8 +141873,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
-import { collection, getDocs, updateDoc, doc } from 'firebase/firestore';
-import { db, getDocResilient } from '../services/firebase';
+import { collection, getDocs, getDoc, updateDoc, doc } from 'firebase/firestore';
+import { db, auth, getDocResilient } from '../services/firebase';
 import { CheckCircle2, AlertCircle, ArrowLeft, Users, Target } from 'lucide-react';
 import CountryFlag from '../components/CountryFlag';
 import { recordAuditEvent } from '../services/auditService';
@@ -140220,6 +141889,7 @@ export default function AuditoriaKPIs() {
   
   const [loading, setLoading] = useState(true);
   const [reports, setReports] = useState([]);
+  const [resumenGeneral, setResumenGeneral] = useState(null);
   const [filterSede, setFilterSede] = useState(currentUser?.sede || 'Todas');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -140311,28 +141981,142 @@ export default function AuditoriaKPIs() {
     return allData;
   };
 
+  // (02/09/2026) NUEVO — pedido de José: "ver por ciclos de cada sede... es
+  // decir capitulo uno capitulo dos maestria del juego". Verificado contra el
+  // archivo real nodus_latest_snapshot.json (exportado por José con
+  // scripts/exportarNodusSnapshot.mjs el 02/09/2026): dentro de
+  // secciones.dashboardPrincipal.tablas hay una tabla con headers
+  // ['Entrenamiento','Participantes'] y 3 filas (Capítulo 1, Capítulo 2,
+  // Maestría) — es el ÚNICO desglose C1/C2/MJ que Nodus expone, y es un
+  // AGREGADO del alcance completo (no es por coordinador ni por equipo).
+  // También hay una tarjeta con content[0]==='Alcance' que indica qué sede ve
+  // el robot en esa corrida — en los datos reales revisados siempre aparece
+  // "LIMA CICLO 1", etiquetada por Nodus como "Tu sede". No está verificado
+  // si la cuenta del robot (NODUS_USER/NODUS_PASSWORD) puede ver otras sedes
+  // — por eso este resumen se muestra siempre junto con el "alcance" real
+  // devuelto por Nodus, nunca como si cubriera todas las sedes.
+  const parseResumenGeneral = (data) => {
+    if (!data || !data.secciones || !data.secciones.dashboardPrincipal) return null;
+
+    const dash = data.secciones.dashboardPrincipal;
+
+    let alcance = null;
+    const alcanceCard = (dash.kpis || []).find(k => k.content && k.content[0] === 'Alcance');
+    if (alcanceCard) alcance = alcanceCard.content[1] || null;
+
+    const tabla = (dash.tablas || []).find(t =>
+      t.headers && t.headers.includes('Entrenamiento') && t.headers.includes('Participantes')
+    );
+
+    if (!tabla) {
+      return alcance ? { alcance, capitulo1: null, capitulo2: null, maestria: null, total: null, timestamp: data.timestamp || null } : null;
+    }
+
+    const toNum = (v) => parseInt(String(v || '0').replace(/[^0-9]/g, ''), 10) || 0;
+    const porNombre = (nombre) => {
+      const fila = tabla.rows.find(r => (r['Entrenamiento'] || '').toUpperCase().includes(nombre));
+      return fila ? toNum(fila['Participantes']) : null;
+    };
+
+    const capitulo1 = porNombre('CAPÍTULO 1') ?? porNombre('CAPITULO 1');
+    const capitulo2 = porNombre('CAPÍTULO 2') ?? porNombre('CAPITULO 2');
+    const maestria = porNombre('MAESTR');
+
+    const valores = [capitulo1, capitulo2, maestria];
+    const total = valores.some(v => v != null) ? valores.reduce((acc, v) => acc + (v || 0), 0) : null;
+
+    return { alcance, capitulo1, capitulo2, maestria, total, timestamp: data.timestamp || null };
+  };
+
+  // Agrupa las tarjetas de coordinadores por el nombre de sede/ciclo tal cual
+  // lo devuelve Nodus (hoy: "LIMA CICLO 1"). Si en el futuro el robot alcanza
+  // más de una sede en una misma corrida, esto ya las separa automáticamente
+  // sin cambios adicionales.
+  const groupBySede = (list) => {
+    const map = new Map();
+    (list || []).forEach(r => {
+      const key = r.sede || 'Sin sede';
+      if (!map.has(key)) map.set(key, []);
+      map.get(key).push(r);
+    });
+    return map;
+  };
+
+  // (02/09/2026) FIX + pedido de José ("extraer datos en tiempo real de
+  // Nodus para saber cómo van los CC1Y2"): esto antes llamaba a
+  // 'http://localhost:3001/api/scrape-nodus', una dirección que solo existe
+  // en la máquina de quien lo desarrolló — en producción siempre fallaba con
+  // "Failed to fetch" (el error de tu captura). El robot de Nodus SÍ soporta
+  // scrapear en vivo con rango de fechas (runScraperWithDates en
+  // scripts/nodusScraper.js), pero corre con Puppeteer — necesita un
+  // navegador real, no puede correr en el Worker de Cloudflare ni en el
+  // navegador del usuario. Ahora se dispara vía GitHub Actions (mismo
+  // mecanismo que el botón "Extraer Nodus" de Super Admin, mismo endpoint
+  // del Worker, con startDate/endDate) y NO es instantáneo: tarda 1-3
+  // minutos en loguearse a Nodus y recorrer las páginas. Este flujo espera
+  // el resultado con sondeos (polling) al documento
+  // nodus_kpis_sincronizados/live_filtered en vez de bloquear con un solo
+  // fetch síncrono.
   const handleLiveFilter = async () => {
     if (!startDate || !endDate) {
       showToast("Por favor selecciona Desde y Hasta para filtrar en Nodus", "warning");
       return;
     }
-    
+
     setIsScrapingLive(true);
-    showToast("Conectando con Nodus para extraer datos en vivo...", "info");
-    
+    showToast("Disparando extracción en vivo de Nodus (tarda 1-3 minutos)...", "info");
+
     try {
-      const response = await fetch('http://localhost:3001/api/scrape-nodus', {
+      const firebaseUser = auth.currentUser;
+      if (!firebaseUser) throw new Error('No se detectó sesión activa. Cierra sesión e inicia nuevamente.');
+      const idToken = await firebaseUser.getIdToken(true);
+      const workerUrl = import.meta.env.VITE_COPILOTO_WORKER_URL || 'https://so-ar-copiloto.crearpsl-cpsl.workers.dev';
+
+      const dispatchStartedAt = Date.now();
+
+      const res = await fetch(`${workerUrl}/trigger-nodus-scraper`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
         body: JSON.stringify({ startDate, endDate })
       });
-      const data = await response.json();
-      const parsedData = parseNodusData(data);
-      setReports(parsedData);
-      showToast("Datos de Nodus actualizados.", "success");
+      const dispatchData = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(dispatchData.message || 'No se pudo disparar la extracción filtrada.');
+
+      showToast("Extracción disparada. Buscando el resultado cada 15 segundos (hasta 5 minutos)...", "info");
+
+      // Polling: hasta 5 minutos, cada 15s, contra el documento que
+      // nodusScraper.js escribe SOLO cuando corre con fechas (nunca pisa
+      // 'latest_snapshot'). Se compara con dispatchStartedAt para no mostrar
+      // por error el resultado de una corrida filtrada anterior.
+      const POLL_INTERVAL_MS = 15000;
+      const MAX_WAIT_MS = 5 * 60 * 1000;
+      const liveRef = doc(db, 'nodus_kpis_sincronizados', 'live_filtered');
+      let found = false;
+
+      while (Date.now() - dispatchStartedAt < MAX_WAIT_MS) {
+        await new Promise(r => setTimeout(r, POLL_INTERVAL_MS));
+        const snap = await getDoc(liveRef);
+        if (snap.exists()) {
+          const data = snap.data();
+          const dataTime = data.timestamp ? new Date(data.timestamp).getTime() : 0;
+          const matchesDates = data.fechasFiltro && data.fechasFiltro.startDate === startDate && data.fechasFiltro.endDate === endDate;
+          if ((dataTime >= (dispatchStartedAt - 60000) && matchesDates) || dataTime >= dispatchStartedAt) {
+            const parsedData = parseNodusData(data);
+            setReports(parsedData);
+            setResumenGeneral(parseResumenGeneral(data));
+            showToast("Datos de Nodus (filtrados por fecha) actualizados.", "success");
+            found = true;
+            break;
+          }
+        }
+      }
+
+      if (!found) {
+        showToast("La extracción está tardando más de 5 minutos o el resultado no llegó aún. Espera un momento y vuelve a apretar 'Filtrar' — cada clic dispara una nueva extracción.", "warning");
+      }
     } catch (err) {
       console.error(err);
-      showToast("Error al extraer datos de Nodus", "error");
+      showToast("Error al extraer datos de Nodus: " + err.message, "error");
     } finally {
       setIsScrapingLive(false);
     }
@@ -140373,9 +142157,13 @@ export default function AuditoriaKPIs() {
       const nodusSnap = await getDocResilient(nodusRef);
       
       let allData = [];
-      
+
       if (nodusSnap.exists()) {
-        allData = parseNodusData(nodusSnap.data());
+        const snapData = nodusSnap.data();
+        allData = parseNodusData(snapData);
+        setResumenGeneral(parseResumenGeneral(snapData));
+      } else {
+        setResumenGeneral(null);
       }
 
       // Filtrar por sede
@@ -140711,18 +142499,72 @@ export default function AuditoriaKPIs() {
           </div>
         </div>
 
+        {/* (02/09/2026) Resumen general Capítulo 1 / Capítulo 2 / Maestría —
+            pedido de José. Viene de secciones.dashboardPrincipal (tabla
+            Entrenamiento/Participantes), agregado del ALCANCE que el robot
+            de Nodus pudo ver en esa corrida (hoy: una sola sede+ciclo). */}
+        {resumenGeneral && (
+          <div style={{
+            display: 'flex', flexWrap: 'wrap', gap: '0.8rem', alignItems: 'center',
+            background: 'var(--bg-card-hover, #f8fafc)', border: '1px solid var(--border-subtle, #e2e8f0)',
+            borderRadius: '12px', padding: '1rem 1.25rem', marginBottom: '0.75rem'
+          }}>
+            <div style={{ fontWeight: 800, color: 'var(--text-heading, #0f172a)', fontSize: '0.9rem' }}>
+              Resumen general Nodus{resumenGeneral.alcance ? ` — Alcance: ${resumenGeneral.alcance}` : ''}
+            </div>
+            {resumenGeneral.capitulo1 != null && (
+              <span style={{ padding: '0.35rem 0.8rem', background: '#e0f2fe', color: '#0369a1', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 700 }}>
+                Capítulo 1: {resumenGeneral.capitulo1.toLocaleString('es-PE')}
+              </span>
+            )}
+            {resumenGeneral.capitulo2 != null && (
+              <span style={{ padding: '0.35rem 0.8rem', background: '#fef3c7', color: '#92400e', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 700 }}>
+                Capítulo 2: {resumenGeneral.capitulo2.toLocaleString('es-PE')}
+              </span>
+            )}
+            {resumenGeneral.maestria != null && (
+              <span style={{ padding: '0.35rem 0.8rem', background: '#dcfce7', color: '#166534', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 700 }}>
+                Maestría: {resumenGeneral.maestria.toLocaleString('es-PE')}
+              </span>
+            )}
+            {resumenGeneral.total != null && (
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted, #64748b)' }}>
+                Total en el alcance: {resumenGeneral.total.toLocaleString('es-PE')}
+              </span>
+            )}
+          </div>
+        )}
+        {resumenGeneral && resumenGeneral.alcance && (
+          <p style={{ margin: '0 0 1.5rem', fontSize: '0.78rem', color: 'var(--text-muted, #64748b)' }}>
+            ⚠️ Nota: esta corrida de Nodus solo cubre el alcance <strong>"{resumenGeneral.alcance}"</strong> (así lo llama el propio Nodus, "Tu sede"). No está verificado si la cuenta del robot puede ver otras sedes — no asumas que este resumen incluye todas las sedes.
+          </p>
+        )}
+
         {loading ? (
           <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--crear-gold, #f59e0b)', fontWeight: 600 }}>Cargando reportes de KPIs...</div>
         ) : reports.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted, #64748b)' }}>No hay reportes de KPIs en la sede seleccionada.</div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            {reports.map(rep => (
-              <div key={rep.id} style={{ 
-                background: rep.status === 'reviewed' ? 'rgba(16, 185, 129, 0.04)' : 'var(--bg-card, #ffffff)', 
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            {Array.from(groupBySede(reports)).map(([sedeLabel, repsInSede]) => (
+            <div key={sedeLabel}>
+              <h3 style={{
+                display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 0 1rem',
+                fontSize: '1rem', fontWeight: 800, color: 'var(--crear-gold, #f59e0b)',
+                borderBottom: '1px solid var(--border-subtle, #e2e8f0)', paddingBottom: '0.5rem'
+              }}>
+                <CountryFlag sede={sedeLabel} /> {sedeLabel}
+                <span style={{ fontWeight: 500, fontSize: '0.8rem', color: 'var(--text-muted, #64748b)' }}>
+                  ({repsInSede.length} {repsInSede.length === 1 ? 'coordinador' : 'coordinadores'})
+                </span>
+              </h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              {repsInSede.map(rep => (
+              <div key={rep.id} style={{
+                background: rep.status === 'reviewed' ? 'rgba(16, 185, 129, 0.04)' : 'var(--bg-card, #ffffff)',
                 border: '1px solid',
                 borderColor: rep.status === 'reviewed' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(245, 158, 11, 0.3)',
-                borderRadius: '12px', 
+                borderRadius: '12px',
                 padding: '1.5rem',
                 boxShadow: '0 2px 6px rgba(0,0,0,0.03)'
               }}>
@@ -140758,8 +142600,11 @@ export default function AuditoriaKPIs() {
                 </div>
 
                 {rep.role === 'coord_c1' ? renderC1Data(rep) : rep.role === 'coord_maestria' ? renderMaestriaData(rep) : renderQTData(rep)}
-                
+
               </div>
+              ))}
+              </div>
+            </div>
             ))}
           </div>
         )}
@@ -141801,16 +143646,20 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
-import { 
-  canAddManagers, 
-  canAssignTrainer, 
-  canChangeManagerStatus, 
-  canViewAllManagers, 
+import {
+  canAddManagers,
+  canAssignTrainer,
+  canChangeManagerStatus,
+  canViewAllManagers,
   canViewSede,
   isDireccionRole,
   isGlobalQTCoordinator,
   hasQTPrivileges,
-  DUAL_ROLE_TRAINER_EMAILS
+  DUAL_ROLE_TRAINER_EMAILS,
+  canViewLiquidacionEntrenadores,
+  canWriteNotaSeguimiento,
+  canViewAllNotasSeguimiento,
+  canReplyNotaSeguimiento
 } from '../config/permissions';
 import { 
   INITIAL_MANAGERS, 
@@ -141824,7 +143673,7 @@ import {
 import { OPERATIONAL_SEDES, normalizeRole, normalizeSede } from '../data/usersData';
 import { recordAuditEvent } from '../services/auditService';
 import { db } from '../services/firebase';
-import { collection, getDocs, doc, setDoc, updateDoc, deleteDoc, writeBatch, onSnapshot } from 'firebase/firestore';
+import { collection, getDocs, doc, addDoc, setDoc, updateDoc, deleteDoc, writeBatch, onSnapshot, serverTimestamp, query, where, arrayUnion } from 'firebase/firestore';
 import CountryFlag from '../components/CountryFlag';
 import { 
   Users, PhoneCall, CheckCircle, XCircle, Calendar, Plus, PlusCircle,
@@ -141914,6 +143763,15 @@ export default function CentroManagers() {
   const canChangeStatus = canChangeManagerStatus(currentUser);
   const userCanAdd = canAddManagers(currentUser);
   const userCanAssign = canAssignTrainer(currentUser);
+  // Pestaña de Liquidación de Entrenadores: solo José Sánchez y Elizabeth Escobar (02/09/2026)
+  const canViewLiquidacion = canViewLiquidacionEntrenadores(currentUser);
+  // Notas de Seguimiento post-llamada (02/09/2026): quién puede dejar una nota,
+  // quién puede ver el historial completo (no solo lo propio), y quién puede
+  // responder a una nota como CMJ. Ver comentarios de estas 3 funciones en
+  // permissions.js — deben coincidir con firestore.rules.
+  const userCanWriteNota = canWriteNotaSeguimiento(currentUser);
+  const userCanViewAllNotas = canViewAllNotasSeguimiento(currentUser);
+  const userCanReplyNota = canReplyNotaSeguimiento(currentUser);
   
   // Dual Role Toggle para QT y Corporativos que también son entrenadores
   const userRole = currentUser?.appRole || currentUser?.role;
@@ -141978,6 +143836,59 @@ export default function CentroManagers() {
 
     return () => unsubscribe();
   }, []);
+
+  // (02/09/2026) Historial de llamadas grupales — cada llamada registrada queda como
+  // un documento nuevo (nunca se sobrescribe), para poder contar cuántas lleva cada
+  // equipo. Es la base de la pestaña de Liquidación de Entrenadores.
+  const [llamadasHistorial, setLlamadasHistorial] = useState([]);
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, 'llamadas_grupales_historial'), (querySnapshot) => {
+      const rows = [];
+      querySnapshot.forEach((doc) => rows.push({ id: doc.id, ...doc.data() }));
+      setLlamadasHistorial(rows);
+    }, (error) => {
+      console.error("Error leyendo llamadas_grupales_historial:", error);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // (02/09/2026) Notas de Seguimiento post-llamada — feedback del entrenador de
+  // llamadas (individual o grupal), usado para detectar y anticiparse a quiebres.
+  // La consulta debe coincidir con firestore.rules (match /notas_seguimiento/):
+  // quien NO puede ver todas las notas (userCanViewAllNotas=false) solo puede
+  // escuchar SUS PROPIAS notas — un listener sin ese "where" fallaría con
+  // permission-denied porque Firestore no puede probar que TODOS los documentos
+  // de la colección completa cumplirían la regla para ese usuario.
+  const [notasSeguimiento, setNotasSeguimiento] = useState([]);
+  useEffect(() => {
+    if (!currentUser?.email) return;
+    const notasQuery = userCanViewAllNotas
+      ? collection(db, 'notas_seguimiento')
+      : query(collection(db, 'notas_seguimiento'), where('autorEmail', '==', currentUser.email));
+    const unsubscribe = onSnapshot(notasQuery, (querySnapshot) => {
+      const rows = [];
+      querySnapshot.forEach((doc) => rows.push({ id: doc.id, ...doc.data() }));
+      setNotasSeguimiento(rows);
+    }, (error) => {
+      console.error("Error leyendo notas_seguimiento:", error);
+    });
+    return () => unsubscribe();
+  }, [currentUser?.email, userCanViewAllNotas]);
+
+  // Registro de pagos ya liquidados a entrenadores (solo se carga si el usuario
+  // tiene permiso de ver la pestaña, para no pedir datos que no va a poder leer).
+  const [liquidacionesPagos, setLiquidacionesPagos] = useState({});
+  useEffect(() => {
+    if (!canViewLiquidacion) return;
+    const unsubscribe = onSnapshot(collection(db, 'liquidaciones_pagos'), (querySnapshot) => {
+      const map = {};
+      querySnapshot.forEach((doc) => { map[doc.id] = { id: doc.id, ...doc.data() }; });
+      setLiquidacionesPagos(map);
+    }, (error) => {
+      console.error("Error leyendo liquidaciones_pagos:", error);
+    });
+    return () => unsubscribe();
+  }, [canViewLiquidacion]);
 
   const [llamadosDataState, setLlamadosDataState] = useState(() => {
     try {
@@ -142093,6 +144004,23 @@ export default function CentroManagers() {
   const [groupModal, setGroupModal] = useState(null);
   const [groupCallDate, setGroupCallDate] = useState(new Date().toISOString().split('T')[0]);
   const [groupCallAttendance, setGroupCallAttendance] = useState({}); // { managerId: boolean }
+  // (02/09/2026) Nota de seguimiento OPCIONAL asociada a la llamada grupal que se
+  // está registrando ahora mismo en groupModal — ver handleSaveGroupCall.
+  const [groupCallNota, setGroupCallNota] = useState('');
+  const [groupCallEsQuiebre, setGroupCallEsQuiebre] = useState(false);
+  const [groupCallCategoriaQuiebre, setGroupCallCategoriaQuiebre] = useState('operativo');
+  const [groupCallEstadoQuiebre, setGroupCallEstadoQuiebre] = useState('riesgo_alto');
+
+  // (02/09/2026) Modal de Notas de Seguimiento por persona — se abre desde el botón
+  // 📝 de cada manager en el Directorio. Muestra el historial (notas individuales de
+  // esa persona + notas grupales de su equipo) y permite agregar una nota nueva
+  // (si userCanWriteNota) o responder como CMJ (si userCanReplyNota).
+  const [notaModal, setNotaModal] = useState(null); // manager object, o null si está cerrado
+  const [nuevaNotaTexto, setNuevaNotaTexto] = useState('');
+  const [nuevaNotaEsQuiebre, setNuevaNotaEsQuiebre] = useState(false);
+  const [nuevaNotaCategoria, setNuevaNotaCategoria] = useState('operativo');
+  const [nuevaNotaEstado, setNuevaNotaEstado] = useState('riesgo_alto');
+  const [respuestaTexto, setRespuestaTexto] = useState({}); // { notaId: texto }
 
   // CONTEXTO (28/08/2026): pedido de José — al hacer clic en el badge 🎓 de un
   // entrenador (en la fila del Directorio o en la tarjeta de un Capitán) se debe
@@ -142414,7 +144342,39 @@ export default function CentroManagers() {
     const noAsistieron = trainerManagers.filter(m => m.llamadaAsistio === 'NO').length;
     const conLlamada = asistieron + noAsistieron;
     const pctAsist = conLlamada > 0 ? Math.round((asistieron / conLlamada) * 100) : 0;
-    return { entrenador: trainerName, total, activos, graduados, desertores, equipos, sedes, asistieron, noAsistieron, conLlamada, pctAsist };
+    // (02/09/2026) Se agrega el listado completo (no solo el conteo) para poder
+    // mostrar en la tarjeta 🎓 el registro de llamadas individuales de cada
+    // manager de este entrenador — pedido explícito de José.
+    return { entrenador: trainerName, total, activos, graduados, desertores, equipos, sedes, asistieron, noAsistieron, conLlamada, pctAsist, managersList: trainerManagers };
+  };
+
+  // (02/09/2026) Editar una llamada GRUPAL ya registrada (fecha o cuántos
+  // asistieron) desde la tarjeta 🎓 del entrenador — pedido explícito de José:
+  // "que cuando ponen una nueva llamada individual o grupal se vea en la ficha
+  // y se pueda editar también". Restringido a quien ya puede administrar
+  // managers_directory/llamadas_grupales_historial (ver firestore.rules:
+  // canManageManagers() / isGerenteODireccion()) — un entrenador puede
+  // REGISTRAR una llamada grupal nueva, pero no reescribir una ya existente
+  // (esa cuenta alimenta el pago de $400 de Liquidación).
+  const [editingLlamadaGrupal, setEditingLlamadaGrupal] = useState(null); // { id, fecha, asistieron }
+  const handleGuardarEdicionLlamadaGrupal = async () => {
+    if (!editingLlamadaGrupal) return;
+    try {
+      await updateDoc(doc(db, 'llamadas_grupales_historial', editingLlamadaGrupal.id), {
+        fecha: editingLlamadaGrupal.fecha,
+        asistieron: Number(editingLlamadaGrupal.asistieron) || 0
+      });
+      recordAuditEvent({
+        action: 'EDITAR_LLAMADA_GRUPAL_HISTORIAL',
+        user: currentUser?.email || currentUser?.name || 'Usuario',
+        details: `Llamada grupal ${editingLlamadaGrupal.id} editada: fecha=${editingLlamadaGrupal.fecha}, asistieron=${editingLlamadaGrupal.asistieron}`
+      });
+      showToast('Llamada grupal actualizada', 'success');
+      setEditingLlamadaGrupal(null);
+    } catch (e) {
+      console.error(e);
+      showToast('Error al editar (revisa que tengas permiso de gerencia/CMJ)', 'error');
+    }
   };
 
   const stats = useMemo(() => {
@@ -142512,13 +144472,34 @@ export default function CentroManagers() {
     try {
       const targetManager = managers.find(m => m.id === id) || { id };
       const docRef = doc(db, 'managers_directory', id.toString());
-      await setDoc(docRef, { ...targetManager, llamadaFecha: fecha, llamadaAsistio: asistio }, { merge: true });
-      
+      // (02/09/2026) FIX: antes se escribía el manager completo con
+      // setDoc({...targetManager, llamadaFecha, llamadaAsistio}, {merge:true}).
+      // "managers" es una MEZCLA de INITIAL_MANAGERS (catálogo estático) +
+      // Firestore + valores normalizados (normalizeTrainer/Coordinator/Sede),
+      // así que casi siempre trae campos que no existen o no coinciden
+      // exactamente con el documento real en Firestore. Eso hacía que
+      // request.resource.data.diff(resource.data).affectedKeys() incluyera
+      // MUCHOS más campos que llamadaFecha/llamadaAsistio, violando el
+      // hasOnly(['llamadaFecha','llamadaAsistio']) de firestore.rules para
+      // cualquiera que no sea SuperAdmin/Gerencia/Coordinación de Maestría —
+      // es decir, fallaba (permission-denied) para entrenadores y
+      // entrenadores de llamadas, que son justo quienes deben poder guardar
+      // esto. Ahora se actualizan SOLO esos dos campos.
+      try {
+        await updateDoc(docRef, { llamadaFecha: fecha, llamadaAsistio: asistio });
+      } catch (updateErr) {
+        if (updateErr?.code === 'not-found') {
+          showToast('Este manager aún no tiene documento propio en la nube (solo está en el catálogo local). Pide a Gerencia/Coordinación de Maestría que lo sincronice primero.', 'error');
+          return;
+        }
+        throw updateErr;
+      }
+
       // La actualización de managers en tiempo real ya se maneja por onSnapshot, pero por optimización optimista lo mantenemos aquí
       setManagers(prev => prev.map(m => m.id === id ? { ...m, llamadaFecha: fecha, llamadaAsistio: asistio } : m));
-      
+
       const managerName = targetManager ? targetManager.nombre : id;
-      
+
       recordAuditEvent({
         action: 'ACTUALIZAR_LLAMADA_MANAGER',
         email: currentUser?.email || 'admin@crearpsl.net',
@@ -142550,16 +144531,68 @@ export default function CentroManagers() {
       groupModal.managers.forEach(m => {
         if (groupCallAttendance.hasOwnProperty(m.id)) {
           const docRef = doc(db, 'managers_directory', m.id.toString());
-          batch.set(docRef, {
-            ...m,
+          // (02/09/2026) FIX: mismo problema que handleUpdateLlamada — escribir
+          // el manager completo ({...m, ...}) con merge:true hace que el diff
+          // contra firestore.rules incluya campos fuera de
+          // hasOnly(['llamadaFecha','llamadaAsistio']) y falla para
+          // entrenadores/entrenadores de llamadas. batch.update() solo toca
+          // esos dos campos.
+          batch.update(docRef, {
             llamadaFecha: groupCallDate,
             llamadaAsistio: groupCallAttendance[m.id] ? 'SI' : 'NO'
-          }, { merge: true });
+          });
         }
       });
-      
+
       await batch.commit();
-      
+
+      // (02/09/2026) Historial de llamadas grupales — se AGREGA un registro nuevo por
+      // cada llamada (nunca sobrescribe), para poder contar cuántas lleva cada equipo.
+      // Es la base de la pestaña de Liquidación de Entrenadores ($400 al llegar a 7).
+      // Si esto falla, no bloquea el registro de asistencia (que ya se guardó arriba).
+      try {
+        const equipoKey = `${normalizeSede(groupModal.sede)}_${groupModal.equipo}`;
+        const asistieronCount = Object.values(groupCallAttendance).filter(Boolean).length;
+        await addDoc(collection(db, 'llamadas_grupales_historial'), {
+          equipoKey,
+          equipo: groupModal.equipo,
+          numEquipo: groupModal.numEquipo || '',
+          sede: normalizeSede(groupModal.sede),
+          entrenador: groupModal.entrenadorUnico || '',
+          fecha: groupCallDate,
+          totalIntegrantes: groupModal.managers.length,
+          asistieron: asistieronCount,
+          registradoPorEmail: currentUser?.email || '',
+          registradoPorNombre: currentUser?.name || '',
+          createdAt: serverTimestamp()
+        });
+      } catch (histErr) {
+        console.error('No se pudo guardar el historial de llamada grupal:', histErr);
+      }
+
+      // (02/09/2026) Nota de seguimiento OPCIONAL de esta llamada grupal — pedido
+      // explícito de José. No bloquea el registro de asistencia si falla.
+      if (groupCallNota.trim()) {
+        try {
+          const equipoKey = `${normalizeSede(groupModal.sede)}_${groupModal.equipo}`;
+          await guardarNotaSeguimiento({
+            tipo: 'grupal',
+            equipoKey,
+            equipo: groupModal.equipo,
+            numEquipo: groupModal.numEquipo || '',
+            sede: normalizeSede(groupModal.sede),
+            nota: groupCallNota.trim(),
+            esQuiebre: groupCallEsQuiebre,
+            categoriaQuiebre: groupCallEsQuiebre ? groupCallCategoriaQuiebre : null,
+            estadoQuiebre: groupCallEsQuiebre ? groupCallEstadoQuiebre : null,
+            fecha: groupCallDate
+          });
+        } catch (notaErr) {
+          console.error('No se pudo guardar la nota de seguimiento grupal:', notaErr);
+          showToast('Asistencia guardada, pero la nota de seguimiento no se pudo guardar', 'error');
+        }
+      }
+
       setManagers(prev => prev.map(m => {
         if (groupCallAttendance.hasOwnProperty(m.id)) {
           return {
@@ -142570,7 +144603,7 @@ export default function CentroManagers() {
         }
         return m;
       }));
-      
+
       recordAuditEvent({
         action: 'ACTUALIZAR_LLAMADA_GRUPAL',
         user: currentUser?.email || currentUser?.name || 'Usuario',
@@ -142579,9 +144612,188 @@ export default function CentroManagers() {
 
       showToast(`Llamada grupal registrada en la nube para el equipo ${groupModal.equipo}`, 'success');
       setGroupModal(null);
+      setGroupCallNota('');
+      setGroupCallEsQuiebre(false);
+      setGroupCallCategoriaQuiebre('operativo');
+      setGroupCallEstadoQuiebre('riesgo_alto');
     } catch (e) {
       console.error(e);
       showToast('Error al registrar llamada grupal en la nube', 'error');
+    }
+  };
+
+  // (02/09/2026) NOTAS DE SEGUIMIENTO — feedback del entrenador de llamadas después
+  // de cada llamada (individual o grupal), pedido explícito de José: "deben de
+  // guardarse en un historial por persona y jamás perderse y usarse para notar
+  // quiebres y adelantarnos a los quiebres". Definición operacional de "quiebre"
+  // confirmada por José (02/09/2026), tomada de la documentación ya existente de
+  // CREAR: desviación/falla que pone en riesgo un estándar, un compromiso, una meta
+  // o la experiencia del participante. categoriaQuiebre usa las 3 categorías ya
+  // documentadas (operativo / equipo / participante); estadoQuiebre usa los 4
+  // estados ya documentados (vencido / bloqueado / requiere_escalamiento /
+  // riesgo_alto) — ninguno de los dos se inventó, ambos vienen de esa definición.
+  // Nunca se sobrescribe (cada nota es un documento nuevo, igual que
+  // llamadas_grupales_historial) y nunca se borra (ver firestore.rules).
+  const guardarNotaSeguimiento = async ({ tipo, managerId, managerNombre, equipoKey, equipo, numEquipo, sede, nota, esQuiebre, categoriaQuiebre, estadoQuiebre, fecha }) => {
+    await addDoc(collection(db, 'notas_seguimiento'), {
+      tipo, // 'individual' | 'grupal'
+      managerId: managerId || null,
+      managerNombre: managerNombre || null,
+      equipoKey: equipoKey || null,
+      equipo: equipo || null,
+      numEquipo: numEquipo || null,
+      sede: sede || null,
+      nota,
+      esQuiebre: !!esQuiebre,
+      categoriaQuiebre: categoriaQuiebre || null, // 'operativo' | 'equipo' | 'participante' | null
+      estadoQuiebre: estadoQuiebre || null, // 'vencido' | 'bloqueado' | 'requiere_escalamiento' | 'riesgo_alto' | null
+      fecha,
+      autorEmail: currentUser?.email || '',
+      autorNombre: currentUser?.name || '',
+      respuestas: [],
+      createdAt: serverTimestamp()
+    });
+  };
+
+  const handleGuardarNotaIndividual = async () => {
+    if (!notaModal || !nuevaNotaTexto.trim()) return;
+    try {
+      const equipoKey = notaModal.equipo ? `${normalizeSede(notaModal.sede)}_${notaModal.equipo}` : null;
+      await guardarNotaSeguimiento({
+        tipo: 'individual',
+        managerId: notaModal.id,
+        managerNombre: notaModal.nombre,
+        equipoKey,
+        equipo: notaModal.equipo || null,
+        numEquipo: notaModal.numEquipo || null,
+        sede: normalizeSede(notaModal.sede),
+        nota: nuevaNotaTexto.trim(),
+        esQuiebre: nuevaNotaEsQuiebre,
+        categoriaQuiebre: nuevaNotaEsQuiebre ? nuevaNotaCategoria : null,
+        estadoQuiebre: nuevaNotaEsQuiebre ? nuevaNotaEstado : null,
+        fecha: new Date().toISOString().split('T')[0]
+      });
+      recordAuditEvent({
+        action: 'CREAR_NOTA_SEGUIMIENTO',
+        user: currentUser?.email || currentUser?.name || 'Usuario',
+        details: `Nota de seguimiento individual creada para ${notaModal.nombre}${nuevaNotaEsQuiebre ? ' (marcada como quiebre)' : ''}`
+      });
+      showToast('Nota de seguimiento guardada', 'success');
+      setNuevaNotaTexto('');
+      setNuevaNotaEsQuiebre(false);
+      setNuevaNotaCategoria('operativo');
+      setNuevaNotaEstado('riesgo_alto');
+    } catch (e) {
+      console.error(e);
+      showToast('Error al guardar la nota de seguimiento', 'error');
+    }
+  };
+
+  const handleResponderNota = async (notaId) => {
+    const texto = (respuestaTexto[notaId] || '').trim();
+    if (!texto) return;
+    try {
+      await updateDoc(doc(db, 'notas_seguimiento', notaId), {
+        respuestas: arrayUnion({
+          autorEmail: currentUser?.email || '',
+          autorNombre: currentUser?.name || '',
+          texto,
+          fecha: new Date().toISOString()
+        })
+      });
+      setRespuestaTexto(prev => ({ ...prev, [notaId]: '' }));
+      showToast('Respuesta guardada', 'success');
+    } catch (e) {
+      console.error(e);
+      showToast('Error al guardar la respuesta (revisa que tengas rol CMJ)', 'error');
+    }
+  };
+
+  // (02/09/2026) LIQUIDACIÓN DE ENTRENADORES — $400 USD por equipo, pago ÚNICO al
+  // llegar a 7 llamadas grupales registradas en llamadas_grupales_historial.
+  // Pedido explícito de José: "esta info solo la debo de ver yo y Elizabeth Escobar".
+  // NOTA: si un equipo tiene varios entrenadores asignados, por ahora se muestra el
+  // nombre combinado y se paga el monto completo una sola vez (no se divide) — José
+  // confirmó que casi siempre es un solo entrenador por equipo y no priorizó resolver
+  // el reparto todavía.
+  const liquidacionData = useMemo(() => {
+    if (!canViewLiquidacion) return { pendientes: [], pagados: [] };
+
+    const porEquipo = {};
+    llamadasHistorial.forEach(r => {
+      if (!r.equipoKey) return;
+      if (!porEquipo[r.equipoKey]) porEquipo[r.equipoKey] = [];
+      porEquipo[r.equipoKey].push(r);
+    });
+
+    const pendientes = [];
+    const pagados = [];
+
+    Object.entries(porEquipo).forEach(([equipoKey, registros]) => {
+      const count = registros.length;
+      if (count < 7) return; // Todavía no llega a la meta de 7 llamadas
+
+      const sorted = [...registros].sort((a, b) => (a.fecha || '').localeCompare(b.fecha || ''));
+      const septimo = sorted[6]; // La llamada #7 (índice 6) es la que dispara el pago
+      const ultimo = sorted[sorted.length - 1];
+      const pago = liquidacionesPagos[equipoKey];
+
+      const item = {
+        equipoKey,
+        equipo: ultimo.equipo,
+        numEquipo: ultimo.numEquipo,
+        sede: ultimo.sede,
+        entrenador: ultimo.entrenador || 'Sin Asignar',
+        totalLlamadas: count,
+        fechaAlcanzo7: septimo?.fecha || '',
+        montoUSD: 400
+      };
+
+      if (pago && pago.estado === 'pagado') {
+        pagados.push({ ...item, pagadoPorNombre: pago.pagadoPorNombre, pagadoPorEmail: pago.pagadoPorEmail, fechaPago: pago.fechaPago });
+      } else {
+        pendientes.push(item);
+      }
+    });
+
+    pendientes.sort((a, b) => (a.fechaAlcanzo7 || '').localeCompare(b.fechaAlcanzo7 || ''));
+    pagados.sort((a, b) => (b.fechaPago || '').localeCompare(a.fechaPago || ''));
+
+    return { pendientes, pagados };
+  }, [llamadasHistorial, liquidacionesPagos, canViewLiquidacion]);
+
+  const handleMarcarPagado = async (item) => {
+    if (!canViewLiquidacion) return;
+    try {
+      await setDoc(doc(db, 'liquidaciones_pagos', item.equipoKey), {
+        equipoKey: item.equipoKey,
+        equipo: item.equipo,
+        numEquipo: item.numEquipo || '',
+        sede: item.sede,
+        entrenador: item.entrenador,
+        montoUSD: item.montoUSD,
+        llamadasAlPagar: item.totalLlamadas,
+        fechaAlcanzo7: item.fechaAlcanzo7,
+        estado: 'pagado',
+        pagadoPorEmail: currentUser?.email || '',
+        pagadoPorNombre: currentUser?.name || '',
+        fechaPago: new Date().toISOString().split('T')[0],
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+
+      recordAuditEvent({
+        action: 'LIQUIDACION_ENTRENADOR_PAGADA',
+        email: currentUser?.email || '',
+        name: currentUser?.name || '',
+        role: currentUser?.appRole || '',
+        sede: item.sede,
+        details: `Liquidación marcada como pagada: ${item.equipo} (${item.sede}) - Entrenador: ${item.entrenador} - $${item.montoUSD} USD`
+      });
+
+      showToast(`Marcado como pagado: ${item.equipo}`, 'success');
+    } catch (e) {
+      console.error(e);
+      showToast('Error al marcar como pagado', 'error');
     }
   };
 
@@ -143043,6 +145255,9 @@ export default function CentroManagers() {
             ...(canViewAll ? [
               { id: 'dashboard', icon: Award, label: 'Sedes' },
               { id: 'entrenadores', icon: UserCheck, label: 'Entrenadores' }
+            ] : []),
+            ...(canViewLiquidacion ? [
+              { id: 'liquidacion', icon: DollarSign, label: `Liquidación (${liquidacionData.pendientes.length})` }
             ] : [])
           ].map(t => (
             <button key={t.id} onClick={() => setActiveTab(t.id)} style={{
@@ -143293,6 +145508,15 @@ export default function CentroManagers() {
                         </td>
                         <td style={{ padding: '1rem', textAlign: 'center' }}>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}>
+                            {(userCanWriteNota || userCanViewAllNotas) && (
+                              <button
+                                onClick={() => setNotaModal(m)}
+                                title="Notas de Seguimiento"
+                                style={{ background: '#fefce8', border: '1px solid #fde047', color: '#854d0e', padding: '0.4rem', borderRadius: '6px', cursor: 'pointer' }}
+                              >
+                                📝
+                              </button>
+                            )}
                             {userCanAdd && (
                               <button
                                 onClick={() => handleOpenEditIndividual(m)}
@@ -143837,6 +146061,96 @@ export default function CentroManagers() {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* LIQUIDACIÓN DE ENTRENADORES (02/09/2026) — solo José Sánchez y Elizabeth Escobar */}
+        {activeTab === 'liquidacion' && canViewLiquidacion && (
+          <div style={{ background: bgCard, borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', border: `1px solid ${borderLight}`, padding: '1.5rem' }}>
+            <div style={{ marginBottom: '1.5rem' }}>
+              <h2 style={{ margin: 0, fontSize: '1.2rem', color: textDark }}>💰 Liquidación de Entrenadores</h2>
+              <p style={{ margin: '0.3rem 0 0', fontSize: '0.85rem', color: textMuted }}>
+                $400 USD por equipo, pago único al llegar a 7 llamadas grupales registradas.
+                Acceso restringido a José Sánchez y Elizabeth Escobar.
+              </p>
+            </div>
+
+            <h3 style={{ fontSize: '1rem', color: textDark, marginBottom: '0.75rem' }}>
+              Pendientes de pago ({liquidacionData.pendientes.length})
+            </h3>
+            {liquidacionData.pendientes.length === 0 ? (
+              <p style={{ color: textMuted, fontSize: '0.9rem' }}>No hay equipos pendientes de liquidar por ahora.</p>
+            ) : (
+              <div style={{ overflowX: 'auto', marginBottom: '2rem' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                  <thead>
+                    <tr style={{ borderBottom: `2px solid ${borderLight}`, textAlign: 'left' }}>
+                      <th style={{ padding: '0.6rem' }}>Equipo</th>
+                      <th style={{ padding: '0.6rem' }}>Sede</th>
+                      <th style={{ padding: '0.6rem' }}>Entrenador</th>
+                      <th style={{ padding: '0.6rem' }}>Llamadas</th>
+                      <th style={{ padding: '0.6rem' }}>Llegó a 7 el</th>
+                      <th style={{ padding: '0.6rem' }}>Monto</th>
+                      <th style={{ padding: '0.6rem' }}></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {liquidacionData.pendientes.map(item => (
+                      <tr key={item.equipoKey} style={{ borderBottom: `1px solid ${borderLight}` }}>
+                        <td style={{ padding: '0.6rem', fontWeight: 600 }}>{item.equipo} {item.numEquipo ? `(#${item.numEquipo})` : ''}</td>
+                        <td style={{ padding: '0.6rem' }}><CountryFlag sede={item.sede} /> {item.sede}</td>
+                        <td style={{ padding: '0.6rem' }}>{item.entrenador}</td>
+                        <td style={{ padding: '0.6rem' }}>{item.totalLlamadas}</td>
+                        <td style={{ padding: '0.6rem' }}>{item.fechaAlcanzo7 || '—'}</td>
+                        <td style={{ padding: '0.6rem', fontWeight: 700, color: '#059669' }}>${item.montoUSD}</td>
+                        <td style={{ padding: '0.6rem' }}>
+                          <button
+                            onClick={() => handleMarcarPagado(item)}
+                            style={{ padding: '0.4rem 0.8rem', borderRadius: '6px', border: 'none', background: '#10b981', color: '#fff', fontWeight: 700, cursor: 'pointer', fontSize: '0.8rem' }}
+                          >
+                            Marcar como pagado
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            <h3 style={{ fontSize: '1rem', color: textDark, marginBottom: '0.75rem' }}>
+              Historial de pagos ({liquidacionData.pagados.length})
+            </h3>
+            {liquidacionData.pagados.length === 0 ? (
+              <p style={{ color: textMuted, fontSize: '0.9rem' }}>Todavía no se ha marcado ningún pago.</p>
+            ) : (
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                  <thead>
+                    <tr style={{ borderBottom: `2px solid ${borderLight}`, textAlign: 'left' }}>
+                      <th style={{ padding: '0.6rem' }}>Equipo</th>
+                      <th style={{ padding: '0.6rem' }}>Sede</th>
+                      <th style={{ padding: '0.6rem' }}>Entrenador</th>
+                      <th style={{ padding: '0.6rem' }}>Monto</th>
+                      <th style={{ padding: '0.6rem' }}>Pagado el</th>
+                      <th style={{ padding: '0.6rem' }}>Pagado por</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {liquidacionData.pagados.map(item => (
+                      <tr key={item.equipoKey} style={{ borderBottom: `1px solid ${borderLight}` }}>
+                        <td style={{ padding: '0.6rem', fontWeight: 600 }}>{item.equipo} {item.numEquipo ? `(#${item.numEquipo})` : ''}</td>
+                        <td style={{ padding: '0.6rem' }}>{item.sede}</td>
+                        <td style={{ padding: '0.6rem' }}>{item.entrenador}</td>
+                        <td style={{ padding: '0.6rem', fontWeight: 700, color: '#059669' }}>${item.montoUSD}</td>
+                        <td style={{ padding: '0.6rem' }}>{item.fechaPago || '—'}</td>
+                        <td style={{ padding: '0.6rem' }}>{item.pagadoPorNombre || item.pagadoPorEmail || '—'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         )}
 
@@ -144690,13 +147004,157 @@ export default function CentroManagers() {
               })}
             </div>
 
+            {/* (02/09/2026) Nota de seguimiento OPCIONAL de esta llamada grupal — pedido
+                explícito de José: notas grupales que queden en el historial del equipo. */}
+            <div style={{ marginBottom: '1.2rem', padding: '0.8rem', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '8px' }}>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.4rem' }}>
+                📝 Nota de seguimiento del equipo (opcional):
+              </label>
+              <textarea
+                value={groupCallNota}
+                onChange={e => setGroupCallNota(e.target.value)}
+                placeholder="Ej: el equipo llegó atrasado a 3 tareas del gate T-14, capitán sin evidencia..."
+                rows={3}
+                style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.85rem', fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box' }}
+              />
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.5rem', fontSize: '0.8rem', fontWeight: 600, color: '#92400e', cursor: 'pointer' }}>
+                <input type="checkbox" checked={groupCallEsQuiebre} onChange={e => setGroupCallEsQuiebre(e.target.checked)} style={{ width: '16px', height: '16px', accentColor: '#dc2626', cursor: 'pointer' }} />
+                🚨 Marcar como quiebre (incumplimiento de compromiso, meta o estándar)
+              </label>
+              {groupCallEsQuiebre && (
+                <div style={{ display: 'flex', gap: '0.6rem', marginTop: '0.5rem' }}>
+                  <select value={groupCallCategoriaQuiebre} onChange={e => setGroupCallCategoriaQuiebre(e.target.value)} style={{ flex: 1, padding: '0.4rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.8rem' }}>
+                    <option value="operativo">Quiebre operativo</option>
+                    <option value="equipo">Quiebre de equipo</option>
+                    <option value="participante">Quiebre de participante</option>
+                  </select>
+                  <select value={groupCallEstadoQuiebre} onChange={e => setGroupCallEstadoQuiebre(e.target.value)} style={{ flex: 1, padding: '0.4rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.8rem' }}>
+                    <option value="riesgo_alto">Riesgo Alto</option>
+                    <option value="vencido">Vencido</option>
+                    <option value="bloqueado">Bloqueado</option>
+                    <option value="requiere_escalamiento">Requiere Escalamiento</option>
+                  </select>
+                </div>
+              )}
+            </div>
+
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-              <button onClick={() => setGroupModal(null)} style={{ padding: '0.6rem 1.2rem', borderRadius: '6px', border: `1px solid ${borderLight}`, background: '#fff', color: textDark, fontWeight: 600, cursor: 'pointer' }}>Cancelar</button>
+              <button onClick={() => { setGroupModal(null); setGroupCallNota(''); setGroupCallEsQuiebre(false); }} style={{ padding: '0.6rem 1.2rem', borderRadius: '6px', border: `1px solid ${borderLight}`, background: '#fff', color: textDark, fontWeight: 600, cursor: 'pointer' }}>Cancelar</button>
               <button onClick={handleSaveGroupCall} style={{ padding: '0.6rem 1.4rem', borderRadius: '6px', border: 'none', background: '#10b981', color: '#fff', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 4px rgba(16,185,129,0.3)' }}>Guardar Asistencia</button>
             </div>
           </div>
         </div>
       )}
+
+      {/* (02/09/2026) NOTAS DE SEGUIMIENTO por persona — historial de notas
+          individuales de este manager + notas grupales de su equipo, con opción de
+          agregar una nota nueva (entrenador de llamadas) o responder (CMJ). Pedido
+          explícito de José. */}
+      {notaModal && (() => {
+        const equipoKeyManager = notaModal.equipo ? `${normalizeSede(notaModal.sede)}_${notaModal.equipo}` : null;
+        const notasDeEstaPersona = notasSeguimiento
+          .filter(n => (n.tipo === 'individual' && n.managerId === notaModal.id) || (n.tipo === 'grupal' && equipoKeyManager && n.equipoKey === equipoKeyManager))
+          .sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
+        const CATEGORIA_LABEL = { operativo: 'Quiebre operativo', equipo: 'Quiebre de equipo', participante: 'Quiebre de participante' };
+        const ESTADO_LABEL = { riesgo_alto: 'Riesgo Alto', vencido: 'Vencido', bloqueado: 'Bloqueado', requiere_escalamiento: 'Requiere Escalamiento' };
+        return (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(3px)', zIndex: 1200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }} onClick={() => setNotaModal(null)}>
+            <div onClick={e => e.stopPropagation()} style={{ background: bgCard, width: '100%', maxWidth: '560px', maxHeight: '85vh', overflowY: 'auto', borderRadius: '12px', padding: '1.8rem', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.15)', border: `1px solid ${borderLight}`, borderTop: '4px solid #ca8a04' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                <h2 style={{ margin: 0, color: textDark, fontSize: '1.15rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  📝 Notas de Seguimiento — {notaModal.nombre}
+                </h2>
+                <button onClick={() => setNotaModal(null)} title="Cerrar" style={{ background: '#f1f5f9', border: 'none', borderRadius: '6px', padding: '0.3rem', cursor: 'pointer', color: textMuted }}>
+                  <X size={16} />
+                </button>
+              </div>
+              <p style={{ margin: '0 0 1rem 0', fontSize: '0.8rem', color: textMuted }}>
+                {notaModal.equipo || 'Sin equipo'} {notaModal.numEquipo ? `(#${notaModal.numEquipo})` : ''} · {notaModal.sede}
+                {!userCanViewAllNotas && ' · Solo ves las notas que TÚ escribiste'}
+              </p>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem', marginBottom: '1.2rem' }}>
+                {notasDeEstaPersona.length === 0 && (
+                  <p style={{ fontSize: '0.85rem', color: textMuted, fontStyle: 'italic' }}>Todavía no hay notas registradas.</p>
+                )}
+                {notasDeEstaPersona.map(n => (
+                  <div key={n.id} style={{ padding: '0.7rem 0.9rem', borderRadius: '8px', background: n.esQuiebre ? '#fef2f2' : '#f8fafc', border: `1px solid ${n.esQuiebre ? '#fecaca' : borderLight}` }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
+                      <span style={{ fontSize: '0.75rem', fontWeight: 700, color: textDark }}>
+                        {n.tipo === 'grupal' ? `👥 ${n.equipo || 'Equipo'}` : '👤 Individual'} · {n.autorNombre || n.autorEmail}
+                      </span>
+                      <span style={{ fontSize: '0.72rem', color: textMuted }}>{n.fecha}</span>
+                    </div>
+                    {n.esQuiebre && (
+                      <span style={{ display: 'inline-block', marginBottom: '0.3rem', fontSize: '0.68rem', fontWeight: 800, color: '#dc2626', background: '#fee2e2', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>
+                        🚨 {CATEGORIA_LABEL[n.categoriaQuiebre] || 'Quiebre'} — {ESTADO_LABEL[n.estadoQuiebre] || n.estadoQuiebre}
+                      </span>
+                    )}
+                    <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.85rem', color: textDark, whiteSpace: 'pre-wrap' }}>{n.nota}</p>
+
+                    {(n.respuestas || []).map((r, idx) => (
+                      <div key={idx} style={{ marginTop: '0.5rem', marginLeft: '0.8rem', padding: '0.4rem 0.6rem', borderRadius: '6px', background: '#eff6ff', border: '1px solid #bfdbfe' }}>
+                        <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#1d4ed8' }}>💬 {r.autorNombre || r.autorEmail}</div>
+                        <p style={{ margin: '0.1rem 0 0 0', fontSize: '0.8rem', color: textDark, whiteSpace: 'pre-wrap' }}>{r.texto}</p>
+                      </div>
+                    ))}
+
+                    {userCanReplyNota && (
+                      <div style={{ display: 'flex', gap: '0.4rem', marginTop: '0.5rem' }}>
+                        <input
+                          type="text"
+                          value={respuestaTexto[n.id] || ''}
+                          onChange={e => setRespuestaTexto(prev => ({ ...prev, [n.id]: e.target.value }))}
+                          placeholder="Responder como CMJ..."
+                          style={{ flex: 1, padding: '0.4rem 0.6rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.8rem' }}
+                        />
+                        <button onClick={() => handleResponderNota(n.id)} style={{ padding: '0.4rem 0.7rem', borderRadius: '6px', border: 'none', background: '#2563eb', color: '#fff', fontWeight: 700, fontSize: '0.78rem', cursor: 'pointer' }}>Enviar</button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {userCanWriteNota && (
+                <div style={{ padding: '0.8rem', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '8px' }}>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.4rem' }}>
+                    Agregar nota nueva:
+                  </label>
+                  <textarea
+                    value={nuevaNotaTexto}
+                    onChange={e => setNuevaNotaTexto(e.target.value)}
+                    placeholder="Ej: no confirmó su compromiso de esta semana, sin evidencia..."
+                    rows={3}
+                    style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.85rem', fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box' }}
+                  />
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.5rem', fontSize: '0.8rem', fontWeight: 600, color: '#92400e', cursor: 'pointer' }}>
+                    <input type="checkbox" checked={nuevaNotaEsQuiebre} onChange={e => setNuevaNotaEsQuiebre(e.target.checked)} style={{ width: '16px', height: '16px', accentColor: '#dc2626', cursor: 'pointer' }} />
+                    🚨 Marcar como quiebre (incumplimiento de compromiso, meta o estándar)
+                  </label>
+                  {nuevaNotaEsQuiebre && (
+                    <div style={{ display: 'flex', gap: '0.6rem', marginTop: '0.5rem' }}>
+                      <select value={nuevaNotaCategoria} onChange={e => setNuevaNotaCategoria(e.target.value)} style={{ flex: 1, padding: '0.4rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.8rem' }}>
+                        <option value="operativo">Quiebre operativo</option>
+                        <option value="equipo">Quiebre de equipo</option>
+                        <option value="participante">Quiebre de participante</option>
+                      </select>
+                      <select value={nuevaNotaEstado} onChange={e => setNuevaNotaEstado(e.target.value)} style={{ flex: 1, padding: '0.4rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.8rem' }}>
+                        <option value="riesgo_alto">Riesgo Alto</option>
+                        <option value="vencido">Vencido</option>
+                        <option value="bloqueado">Bloqueado</option>
+                        <option value="requiere_escalamiento">Requiere Escalamiento</option>
+                      </select>
+                    </div>
+                  )}
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.6rem' }}>
+                    <button onClick={handleGuardarNotaIndividual} disabled={!nuevaNotaTexto.trim()} style={{ padding: '0.5rem 1rem', borderRadius: '6px', border: 'none', background: nuevaNotaTexto.trim() ? '#10b981' : '#94a3b8', color: '#fff', fontWeight: 700, fontSize: '0.85rem', cursor: nuevaNotaTexto.trim() ? 'pointer' : 'not-allowed' }}>Guardar Nota</button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* TARJETA DE LA PERSONA (Entrenador) — se abre al hacer clic en cualquier
           badge 🎓 de un entrenador (Directorio, Equipos o Sedes). Pedido de José
@@ -144764,6 +147222,67 @@ export default function CentroManagers() {
                       </div>
                     </div>
                   )}
+
+                  {/* (02/09/2026) Últimas llamadas INDIVIDUALES por manager — editable con
+                      los mismos controles fecha + SÍ/NO que ya existen en el Directorio.
+                      Pedido explícito de José. */}
+                  <div style={{ marginBottom: '1rem' }}>
+                    <span style={{ fontSize: '0.78rem', color: textMuted, fontWeight: 600 }}>📞 Últimas llamadas individuales:</span>
+                    <div style={{ maxHeight: '160px', overflowY: 'auto', marginTop: '0.4rem', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                      {tc.managersList.map(m => (
+                        <div key={m.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.4rem', padding: '0.4rem 0.5rem', background: '#f8fafc', borderRadius: '6px', border: `1px solid ${borderLight}` }}>
+                          <span style={{ fontSize: '0.78rem', color: textDark, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.nombre}</span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', flexShrink: 0 }}>
+                            <input type="date" value={m.llamadaFecha || ''} onChange={e => handleUpdateLlamada(m.id, e.target.value, m.llamadaAsistio || 'SI')} style={{ padding: '0.2rem', borderRadius: '4px', border: `1px solid ${borderLight}`, fontSize: '0.7rem', width: '110px' }} />
+                            <button onClick={() => handleUpdateLlamada(m.id, m.llamadaFecha || new Date().toISOString().split('T')[0], 'SI')} style={{ padding: '0.2rem 0.4rem', borderRadius: '4px', border: '1px solid #10b981', background: m.llamadaAsistio === 'SI' ? '#10b981' : '#fff', color: m.llamadaAsistio === 'SI' ? '#fff' : '#10b981', fontWeight: 700, fontSize: '0.68rem', cursor: 'pointer' }}>SÍ</button>
+                            <button onClick={() => handleUpdateLlamada(m.id, m.llamadaFecha || new Date().toISOString().split('T')[0], 'NO')} style={{ padding: '0.2rem 0.4rem', borderRadius: '4px', border: '1px solid #ef4444', background: m.llamadaAsistio === 'NO' ? '#ef4444' : '#fff', color: m.llamadaAsistio === 'NO' ? '#fff' : '#ef4444', fontWeight: 700, fontSize: '0.68rem', cursor: 'pointer' }}>NO</button>
+                          </div>
+                        </div>
+                      ))}
+                      {tc.managersList.length === 0 && <p style={{ fontSize: '0.75rem', color: textMuted, fontStyle: 'italic' }}>Sin managers registrados.</p>}
+                    </div>
+                  </div>
+
+                  {/* (02/09/2026) Llamadas GRUPALES registradas por este entrenador — solo
+                      lectura para todos; editable (fecha / cuántos asistieron) solo para
+                      quien ya administra managers_directory (CMJ/gerencia/dirección),
+                      igual que exige firestore.rules — esta cuenta alimenta Liquidación. */}
+                  {(() => {
+                    const llamadasDeEsteEntrenador = llamadasHistorial
+                      .filter(l => isTrainerMatch(l.entrenador, trainerCardModal))
+                      .sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
+                    if (llamadasDeEsteEntrenador.length === 0) return null;
+                    return (
+                      <div style={{ marginBottom: '1rem' }}>
+                        <span style={{ fontSize: '0.78rem', color: textMuted, fontWeight: 600 }}>👥 Llamadas grupales registradas ({llamadasDeEsteEntrenador.length}):</span>
+                        <div style={{ maxHeight: '180px', overflowY: 'auto', marginTop: '0.4rem', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                          {llamadasDeEsteEntrenador.map(l => (
+                            <div key={l.id} style={{ padding: '0.4rem 0.5rem', background: '#fafaf9', borderRadius: '6px', border: `1px solid ${borderLight}` }}>
+                              {editingLlamadaGrupal?.id === l.id ? (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                                  <input type="date" value={editingLlamadaGrupal.fecha} onChange={e => setEditingLlamadaGrupal({ ...editingLlamadaGrupal, fecha: e.target.value })} style={{ padding: '0.2rem', borderRadius: '4px', border: `1px solid ${borderLight}`, fontSize: '0.7rem' }} />
+                                  <input type="number" min="0" value={editingLlamadaGrupal.asistieron} onChange={e => setEditingLlamadaGrupal({ ...editingLlamadaGrupal, asistieron: e.target.value })} style={{ width: '55px', padding: '0.2rem', borderRadius: '4px', border: `1px solid ${borderLight}`, fontSize: '0.7rem' }} />
+                                  <button onClick={handleGuardarEdicionLlamadaGrupal} style={{ padding: '0.2rem 0.4rem', borderRadius: '4px', border: 'none', background: '#10b981', color: '#fff', fontWeight: 700, fontSize: '0.68rem', cursor: 'pointer' }}>Guardar</button>
+                                  <button onClick={() => setEditingLlamadaGrupal(null)} style={{ padding: '0.2rem 0.4rem', borderRadius: '4px', border: `1px solid ${borderLight}`, background: '#fff', fontSize: '0.68rem', cursor: 'pointer' }}>Cancelar</button>
+                                </div>
+                              ) : (
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.4rem' }}>
+                                  <span style={{ fontSize: '0.75rem', color: textDark }}>
+                                    {l.fecha} · {l.equipo} · {l.asistieron}/{l.totalIntegrantes}
+                                  </span>
+                                  {userCanViewAllNotas && (
+                                    <button onClick={() => setEditingLlamadaGrupal({ id: l.id, fecha: l.fecha || '', asistieron: l.asistieron ?? 0 })} title="Editar esta llamada grupal" style={{ background: 'none', border: 'none', color: '#7c3aed', cursor: 'pointer', padding: '0.1rem' }}>
+                                      <Edit3 size={13} />
+                                    </button>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </>
               ) : (
                 <p style={{ fontSize: '0.85rem', color: textMuted, margin: '0.5rem 0 1rem 0' }}>
@@ -148792,7 +151311,13 @@ export default function Home() {
             </button>
           )}
 
-          {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+          {/* (02/09/2026) Antes este botón mostraba "Directorio QT" también a coordinador_mj,
+              coord_maestria, entrenador y entrenador_llamadas — roles que la ruta real
+              /directorio-qt (App.jsx, RoleRoute allowedRoles) SIEMPRE rechazó, así que para
+              ellos era un botón que llevaba a un "ACCESO DENEGADO". Se corrigió para usar la
+              misma lista DIRECTORIO_QT_ROLES ya definida arriba (línea ~78), que sí coincide
+              con la ruta. Reportado por José: un entrenador (Julio César Narváez) lo veía. */}
+          {DIRECTORIO_QT_ROLES.includes(currentUser?.appRole) && (
             <button onClick={() => navigate('/directorio-qt')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: 'white', border: 'none' }}>
               ⚡ Directorio QT
             </button>
@@ -149769,6 +152294,113 @@ const TABS = [
   { id: 'maestro',     label: 'Manual Maestro de Operaciones',    icon: <Milestone size={17} />,     color: '#14b8a6',           bg: 'rgba(20,184,166,0.12)' },
 ];
 
+// Datos de "MANUAL DE PROCESOS REPORTES CAP 1 Y CAP 2.docx" (integrado
+// 01/09/2026) — usados por la Seccion 7 del tab "Manual Maestro". El
+// documento fuente solo trae el proceso de Capitulo 1 (ver nota al final de
+// esa seccion); nada aqui fue inventado ni completado por inferencia.
+const REPORTES_CAP1 = [
+  {
+    dia: 'Jueves',
+    intro: 'Reporte de aliados asistentes al alineamiento de las oficinas.',
+    reportes: [
+      {
+        momento: 'Reporte de alineamiento',
+        horario: 'Despues del alineamiento — se envia al gerente de cada sede',
+        detalle: 'Despues de haber transcurrido el alineamiento de los "aliados" asistentes (incluyendo el Quantum Team QT) se envia el reporte con la cantidad de asistentes.',
+        modelo: ['REPORTE CAPITULO 1 SEDE EQUIPO X', '', 'X aliados', 'X QT', 'X Capitan']
+      }
+    ]
+  },
+  {
+    dia: 'Viernes',
+    intro: 'Es obligatorio enviar 4 reportes de asistencia a Gerencia y al chat general de la empresa.',
+    reportes: [
+      {
+        momento: '1. Inicio',
+        horario: '11:30 a.m.',
+        detalle: 'Despues de la mesa de Registro, una vez contabilizados los participantes sentados, y realizar el cuadre respectivo entre firmas, asistencia de plataforma y personas sentadas.',
+        modelo: ['REPORTE CAPITULO 1 SEDE EQUIPO X', 'VIERNES INICIO', '', 'X px', 'X aliados', 'X capitan', 'X Qt', 'X px por llegar', 'Entrenador X', 'Observaciones.']
+      },
+      {
+        momento: '2. Despues de las reglas',
+        horario: 'Al retorno del primer receso, cuando los participantes toman asiento',
+        detalle: 'Identifica a las personas que no entraron despues de la lectura de las reglas del entrenamiento emitidas por el entrenador.',
+        modelo: ['REPORTE CAPITULO 1 SEDE EQUIPO X', 'VIERNES DESPUES DE LAS REGLAS', '', 'X px', 'X aliados', 'X capitan', 'X Qt', 'Entrenador X', 'Desertores:', 'Observaciones:']
+      },
+      {
+        momento: '3. Despues de almuerzo',
+        horario: 'Al retorno del almuerzo',
+        detalle: '',
+        modelo: ['REPORTE CAPITULO 1 SEDE EQUIPO X', 'VIERNES DESPUES ALMUERZO', '', 'X px', 'X aliados', 'X capitan', 'X Qt', 'Entrenador X', 'Desertores:', 'Observaciones:']
+      },
+      {
+        momento: '4. Cierre',
+        horario: 'Al cierre del entrenamiento',
+        detalle: '',
+        modelo: ['REPORTE CAPITULO 1 SEDE EQUIPO X', 'VIERNES CIERRE', '', 'X px', 'X aliados', 'X capitan', 'X Qt', 'Entrenador X', 'Desertores:', 'Observaciones:']
+      }
+    ]
+  },
+  {
+    dia: 'Sabado',
+    intro: 'Es obligatorio enviar 3 reportes de asistencia a Gerencia y al chat general de la empresa.',
+    reportes: [
+      {
+        momento: '1. Inicio',
+        horario: '11:00 a.m.',
+        detalle: 'Despues de la mesa de Registro, una vez contabilizados los participantes sentados.',
+        modelo: ['REPORTE CAPITULO 1 SEDE EQUIPO X', 'SABADO INICIO', '', 'X px', 'X aliados', 'X capitan', 'X Qt', 'X px por llegar', 'Entrenador X', 'Desertores.', 'Observaciones.']
+      },
+      {
+        momento: '2. Despues de almuerzo',
+        horario: 'Al retorno del almuerzo',
+        detalle: '',
+        modelo: ['REPORTE CAPITULO 1 SEDE EQUIPO X', 'SABADO DESPUES ALMUERZO', '', 'X px', 'X aliados', 'X capitan', 'X Qt', 'Entrenador X', 'Desertores:', 'Observaciones:']
+      },
+      {
+        momento: '3. Cierre',
+        horario: 'Al cierre del entrenamiento',
+        detalle: 'Se anade la declaracion de los aliados para el pase del dia siguiente.',
+        modelo: ['REPORTE CAPITULO 1 SEDE EQUIPO X', 'SABADO CIERRE', '', 'X px', 'X aliados', 'X capitan', 'X Qt', 'Entrenador X', 'Desertores:', 'Declaracion:', 'Observaciones:']
+      }
+    ]
+  },
+  {
+    dia: 'Domingo',
+    intro: 'Es obligatorio enviar 4 reportes de asistencia y reporte de enrolamiento (pagos) a Gerencia y al chat general de la empresa.',
+    reportes: [
+      {
+        momento: '1. Inicio',
+        horario: '11:30 a.m.',
+        detalle: 'Despues de la mesa de Registro y enrolamiento (pagos), una vez contabilizados los participantes sentados. Si no se pueden contabilizar porque suelen estar en compartir o en catarsis, se envia un estimado tomando en cuenta los gafetes (escarapelas) faltantes por retirar.',
+        modelo: ['REPORTE CAPITULO 1 SEDE EQUIPO X', 'DOMINGO INICIO', '', 'X px', 'X aliados', 'X capitan', 'X Qt', 'X desertores', 'Entrenador X', 'Observaciones.'],
+        pagos: ['X C2 + MJ', 'X. C2']
+      },
+      {
+        momento: '2. Despues de la declaracion',
+        horario: 'Despues de la declaracion',
+        detalle: '',
+        modelo: ['REPORTE CAPITULO 1 SEDE EQUIPO X', 'DOMINGO DESPUES DE DECLARACION', '', 'X px', 'X aliados', 'X capitan', 'X Qt', 'X desertores', 'Observaciones.'],
+        pagos: ['X C2 + MJ', 'X. C2']
+      },
+      {
+        momento: '3. Despues de almuerzo',
+        horario: 'Al retorno del almuerzo',
+        detalle: '',
+        modelo: ['REPORTE CAPITULO 1 SEDE EQUIPO X', 'DOMINGO DESPUES DE ALMUERZO', '', 'X px', 'X aliados', 'X capitan', 'X Qt', 'X desertores', 'Entrenador X', 'Observaciones.'],
+        pagos: ['X C2 + MJ', 'X. C2']
+      },
+      {
+        momento: '4. Cierre',
+        horario: 'Al cierre del entrenamiento',
+        detalle: 'Se anade la declaracion de los aliados para el Capitulo 2.',
+        modelo: ['REPORTE CAPITULO 1 SEDE EQUIPO X', 'DOMINGO CIERRE', '', 'X px', 'X aliados', 'X capitan', 'X Qt', 'X desertores', 'Entrenador X', 'Observaciones.'],
+        pagos: ['X C2 + MJ', 'X. C2']
+      }
+    ]
+  }
+];
+
 function TabBtn({ tab, active, onClick }) {
   return (
     <button
@@ -149968,6 +152600,175 @@ export default function ManualGuia() {
                   <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.5' }}>{item.desc}</p>
                 </div>
               ))}
+            </div>
+
+            <h3 style={{ margin: '2rem 0 0.35rem 0', color: '#22c55e', fontSize: '1.15rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <TrendingUp size={20} color="#22c55e" /> 4. Ecuacion de Valor — Reduccion de Esfuerzo y Sacrificio
+            </h3>
+            <p style={{ margin: '0 0 1rem 0', fontSize: '0.78rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+              Aporte de Direccion — integrado 02/09/2026, confirmado por Jose Sanchez. No proviene de un manual auditado.
+            </p>
+            <p style={{ margin: '0 0 1.1rem 0', lineHeight: '1.75', color: 'var(--text-main)', fontSize: '0.92rem' }}>
+              La reduccion del esfuerzo y el sacrificio es el motor principal para elevar drasticamente el valor de cualquier propuesta, entrenamiento u operacion.
+              En los modelos de alto rendimiento, este factor actua como un multiplicador en el denominador de la Ecuacion de Valor:
+            </p>
+            <div style={{ padding: '1rem 1.4rem', background: 'var(--bg-card)', borderRadius: '10px', border: '1px solid var(--border-subtle)', marginBottom: '1.1rem', textAlign: 'center', fontWeight: 800, color: '#22c55e', fontSize: '0.92rem' }}>
+              Valor = (Resultado Anhelado x Probabilidad de Logro) / (Retraso Temporal x Esfuerzo y Sacrificio)
+            </div>
+            <p style={{ margin: '0 0 1.1rem 0', lineHeight: '1.75', color: 'var(--text-main)', fontSize: '0.92rem' }}>
+              Si se logra reducir el esfuerzo y el sacrificio percibidos (o reales) a cero, el valor de la oferta o del proceso se eleva de manera exponencial.
+              Para lograrlo se aplican 6 estrategias operativas y ontologicas:
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+              <InfoCard color="#22c55e" title="1. Esfuerzo vs. Sacrificio">
+                Esfuerzo: acciones nuevas que la persona debe empezar a hacer y no desea (despertarse temprano, llamadas complejas, entrenamientos demandantes). Sacrificio: habitos que debe dejar y si desea seguir haciendo (comida no saludable, zona de confort). Ambos son "costos colaterales" que restan valor percibido.
+              </InfoCard>
+              <InfoCard color="#22c55e" title="2. Soluciones Hechas para Ti (DFY)">
+                Transicionar de "hazlo tu mismo" a soluciones asistidas: un experto o sistema absorbe la mayor parte del trabajo fisico y cognitivo. Por eso la industria de suplementos (esfuerzo minimo) supera a la de gimnasios tradicionales (meses de sudor y dieta).
+              </InfoCard>
+              <InfoCard color="#22c55e" title="3. Obstaculo a Herramienta + Stack de Valor">
+                Mapear cada obstaculo, miedo o friccion del participante; convertirlo en una herramienta especifica (plantillas, guias, acompanamiento de un sombra o manager); agrupar esas soluciones en un Stack de Valor que neutralice la resistencia cognitiva y el riesgo percibido.
+              </InfoCard>
+              <InfoCard color="#22c55e" title="4. Apalancamiento Uno a Muchos">
+                Enfocarse en actividades de alta palanca da retornos extraordinarios sin duplicar tiempo de trabajo. Software, sistemas estandarizados o metodologias repetibles piden un esfuerzo de diseno inicial alto pero reducen a cero el esfuerzo marginal de entrega futura.
+              </InfoCard>
+              <InfoCard color="#22c55e" title="5. Basura Cero (friccion operativa)">
+                Auditar periodicamente los procesos internos para suprimir pasos duplicados, reportes redundantes o reuniones sin valor real. No confundir con el estandar de "basura cero" del salon (limpieza fisica) — aqui se trata de burocracia y friccion social. Reducir la densidad jerarquica libera capacidad intelectual del equipo hacia la innovacion.
+              </InfoCard>
+              <InfoCard color="#22c55e" title="6. Poder vs. Fuerza">
+                La Fuerza genera resistencia y confrontacion, requiere empuje manual constante y desemboca en agotamiento. El Poder es fluir con eficacia y proposito: crear un contexto tan claro e impecable que los resultados extraordinarios ocurran como consecuencia natural, sin coaccion ni manipulacion.
+              </InfoCard>
+            </div>
+
+            <h3 style={{ margin: '0 0 0.35rem 0', color: '#ef4444', fontSize: '1.15rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Activity size={20} color="#ef4444" /> 5. Gestion del Burnout — Escudo Individual y de Equipo
+            </h3>
+            <p style={{ margin: '0 0 1rem 0', fontSize: '0.78rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+              Aporte de Direccion — integrado 02/09/2026, confirmado por Jose Sanchez. No proviene de un manual auditado.
+            </p>
+            <p style={{ margin: '0 0 1.1rem 0', lineHeight: '1.75', color: 'var(--text-main)', fontSize: '0.92rem' }}>
+              El burnout es un colapso biologico del sistema (activacion cronica del eje HPA: hipotalamo-hipofisario-suprarrenal), no un problema de "actitud" o "falta de motivacion".
+              El estres constante mantiene la amigdala en panico ininterrumpido, inunda el cuerpo de cortisol y apaga fisicamente la corteza prefrontal (el centro de logica y toma de decisiones) —
+              por eso "pensar en positivo" mientras se esta quemado es biologicamente inutil.
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+              <InfoCard color="#ef4444" title="Por Sobreesfuerzo">
+                Asumir demasiados compromisos y responsabilidades por la incapacidad de decir "no".
+              </InfoCard>
+              <InfoCard color="#ef4444" title="Por Depleccion / Drenaje">
+                Falta de descansos profundos y tiempo de recuperacion activa; la bateria biologica esta vacia.
+              </InfoCard>
+              <InfoCard color="#ef4444" title="Por Desalineacion">
+                Invertir una enorme cantidad de energia en actividades sin gozo, significado o coherencia con los valores reales de la persona.
+              </InfoCard>
+            </div>
+
+            <h4 style={{ margin: '0 0 0.75rem 0', color: 'var(--text-heading)', fontSize: '1rem' }}>Escudo Individual — protocolo tactico</h4>
+            <div style={{ display: 'grid', gap: '0.75rem', marginBottom: '1.75rem' }}>
+              {[
+                { t: 'La Poda Estrategica y "Hell Yeah or No!"', d: 'Ante cualquier solicitud, proyecto o reunion: si no genera un "claro que si" rotundo, la respuesta es un NO definitivo. Portafolio de Dos Listas: Lista A = metas reales a largo plazo, Lista B = compromisos actuales — eliminar o delegar de la Lista B todo lo que no alimente la Lista A. El No Elegante (guion): "Jefe, he notado que mi trabajo de mayor valor requiere concentracion total. Voy a bloquear de 9:00 a 11:00 am para trabajo profundo, en modo avion, disponible para urgencias inmediatamente despues."' },
+                { t: 'El Buffer del 50% (Amortiguador de Agenda)', d: 'Nunca planificar el calendario al 100% de la capacidad. Si una tarea toma logicamente 1 hora, bloquear 1.5 horas — ese colchon absorbe los imprevistos y elimina la urgencia constante del cerebro primitivo.' },
+                { t: 'Desequilibrio Corto y el Arte de "Alquilarse"', d: 'El equilibrio perfecto es una quimera; lo que se necesita es dominar el contrapeso. Se puede inclinar la balanza hacia un proyecto exigente, pero hay que regresar rapido al centro (mas de 11 horas diarias de forma habitual aumenta dolencias cardiacas y el colapso sistemico). Al entrar al entorno laboral, "alquilarse": entregar manos, conocimientos y cabeza, pero no la identidad ni el corazon.' },
+                { t: 'Desconexion Activa', d: 'El descanso real no es saltar de la pantalla de la oficina a la del telefono (satura las mismas vias) ni el doomscrolling. Requiere cambio de modalidad: naturaleza, privacion sensorial, ejercicio suave (libera BDNF) o ayuno de dopamina barata — programado de forma innegociable en el calendario.' },
+                { t: 'Reset Bioquimico — Respiracion Vagal (4-7-8)', d: 'Inhalar 4 segundos, retener 7, exhalar por la boca 8; repetir 4 veces. Alargar la exhalacion estimula el nervio vago y desactiva la alarma de la amigdala, encendiendo la corteza prefrontal en menos de 2 minutos.' },
+              ].map(item => (
+                <div key={item.t} style={{ padding: '0.9rem 1.1rem', background: 'var(--bg-card)', borderRadius: '10px', border: '1px solid var(--border-subtle)' }}>
+                  <strong style={{ color: '#ef4444', fontSize: '0.88rem', display: 'block', marginBottom: '0.25rem' }}>{item.t}</strong>
+                  <p style={{ margin: 0, fontSize: '0.83rem', color: 'var(--text-muted)', lineHeight: '1.55' }}>{item.d}</p>
+                </div>
+              ))}
+            </div>
+
+            <h4 style={{ margin: '0 0 0.5rem 0', color: 'var(--text-heading)', fontSize: '1rem' }}>Escudo de Equipo — diseno de sistemas antifragiles</h4>
+            <p style={{ margin: '0 0 0.75rem 0', fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.6' }}>
+              Cuando un equipo entra en burnout, la responsabilidad es del sistema del lider, no de la gente — un equipo quemado es sintoma de mala priorizacion, microgestion y falta de proposito.
+            </p>
+            <div style={{ display: 'grid', gap: '0.75rem' }}>
+              {[
+                { t: 'Priorizar y Ejecutar (Jocko Willink)', d: 'El burnout grupal ocurre cuando el lider hace que el equipo ataque diez problemas a la vez y falla en todos. Ante crisis o sobrecarga: paso atras, evaluacion objetiva y una sola prioridad comunicada con claridad. 100% de los recursos en esa prioridad; al resolverla, repriorizar y repetir — sin fijacion de objetivo en asuntos secundarios.' },
+                { t: 'Rocas Trimestrales (Gino Wickman)', d: 'Dividir el ano en bloques de 90 dias ("Mundo de 90 Dias"). Rocas del trimestre: 3 a 7 para el equipo directivo, 1 a 3 para el resto del staff. Una vez pactadas, el lider levanta una "pared protectora": nadie tira ideas nuevas por encima de esa barda para saturar al equipo — se archivan para el siguiente trimestre.' },
+                { t: 'ROWE — Eliminar la Microgestion', d: 'Entorno basado exclusivamente en resultados: Autonomia sobre el tiempo, Pertenencia con el equipo y Confianza absoluta de los lideres. Al delegar, el "Commander\'s Intent" define con claridad el Que (estado final y proposito) y deja libre el Como — el equipo gana autonomia y deja de saturar la bandeja de entrada del lider.' },
+                { t: 'Motivacion 3.0 (Daniel Pink)', d: 'FedEx Days: 24 horas de autonomia total para que el equipo trabaje en lo que desee, con la unica condicion de entregar un prototipo o idea innovadora al dia siguiente. Recompensas "Now-That": eliminar bonos condicionales y fomentar reconocimiento instantaneo entre pares (peer-to-peer), sin autorizacion jerarquica.' },
+                { t: 'Conversaciones de Carrera (Kim Scott)', d: 'Tres conversaciones sistematicas con cada directivo: Life Story (historia de vida y motivacion intrinseca), Dreams (como se ve el pico de su carrera, sin limitarse al puesto actual) y 18-Month Plan (alinear tareas cotidianas con las habilidades que necesita para llegar a esos suenos).' },
+              ].map(item => (
+                <div key={item.t} style={{ padding: '0.9rem 1.1rem', background: 'var(--bg-card)', borderRadius: '10px', border: '1px solid var(--border-subtle)' }}>
+                  <strong style={{ color: '#a855f7', fontSize: '0.88rem', display: 'block', marginBottom: '0.25rem' }}>{item.t}</strong>
+                  <p style={{ margin: 0, fontSize: '0.83rem', color: 'var(--text-muted)', lineHeight: '1.55' }}>{item.d}</p>
+                </div>
+              ))}
+            </div>
+
+            <h3 style={{ margin: '2rem 0 0.35rem 0', color: '#0ea5e9', fontSize: '1.15rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <BarChart3 size={20} color="#0ea5e9" /> 6. Guia de Medicion de KPIs para Coordinadores en NODUS
+            </h3>
+            <p style={{ margin: '0 0 1rem 0', fontSize: '0.78rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+              Aporte de Direccion — integrado 02/09/2026, confirmado por Jose Sanchez. No proviene de un manual auditado. Guia dirigida exclusivamente a Gerencia de Sede (Nivel 8) y Direccion Global, para auditar el rendimiento de CC1Y2 y CMJ dentro de la plataforma NODUS.
+            </p>
+
+            <h4 style={{ margin: '0 0 0.75rem 0', color: 'var(--text-heading)', fontSize: '1rem' }}>A. Evaluacion del CC1Y2 (Coordinador Capitulo Uno y Dos) — Nivel 5</h4>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem', marginBottom: '1.75rem' }}>
+              <InfoCard color="#0ea5e9" title="Eficiencia y Velocidad de Registro">
+                Donde: modulos Mesa Registro y Participantes Sede. Que auditar: el 100% de los participantes fisicos en sala deben tener status en verde ("Registrado" y "Pagado") antes del primer break; correcta identificacion/asignacion del IMO (Enrolador) en cada perfil.
+              </InfoCard>
+              <InfoCard color="#0ea5e9" title="Conversion y Captura Financiera (Cierre de C1)">
+                Donde: modulo Reportes → Enrolamiento y modulo Cierre de Caja. Que auditar el domingo de C1: ratio de conversion de alumnos de C1 a C2/Maestria; cuadre al 100% entre los pagos de la mesa externa de conversion y el "Cierre de Caja" del sistema ese mismo domingo.
+              </InfoCard>
+              <InfoCard color="#0ea5e9" title="Mitigacion de Fugas (Retencion Operativa)">
+                Donde: modulo Reporte de Entrenadores (columna Desertor FDS). Que auditar: participantes que iniciaron el viernes vs. los que finalizaron el domingo — un numero alto de deserciones puede indicar fallas en la logistica invisible o apoyo operativo.
+              </InfoCard>
+            </div>
+
+            <h4 style={{ margin: '0 0 0.75rem 0', color: 'var(--text-heading)', fontSize: '1rem' }}>B. Evaluacion del CMJ (Coordinador de Maestria del Juego) — Nivel 6, fase de 90 dias</h4>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem', marginBottom: '1.75rem' }}>
+              <InfoCard color="#0ea5e9" title="Efectividad de la Auditoria Predictiva (miercoles de FI)">
+                Donde: modulos Seguimiento → Maestrias y Asignacion de Llamadas. Que auditar: que todos los miercoles queden registrados los avances de los Futuros Imposibles (FI); que las banderas rojas detectadas por el Quantum Team (QT) hayan sido abordadas y documentadas por el CMJ.
+              </InfoCard>
+              <InfoCard color="#0ea5e9" title="Reclutamiento y Retencion de Managers">
+                Donde: modulo Configuracion → Equipos y Maestrias (asignacion de staff). Que auditar: ratio de staff/participante — que el CMJ haya reclutado y sostenido la proporcion adecuada de Managers, y si hay equipos en NODUS sin Manager a mitad de los 90 dias.
+              </InfoCard>
+              <InfoCard color="#0ea5e9" title="Sostenimiento de la Comunidad y Graduacion">
+                Donde: modulo Certificados y Participantes Rezagados. Que auditar: porcentaje de alumnos que completan exitosamente los 90 dias respecto a los que iniciaron el MJ; nivel de alumnos enviados a "rezagados" por falta de apoyo.
+              </InfoCard>
+            </div>
+
+            <div style={{ padding: '1rem 1.2rem', background: 'var(--bg-card)', borderRadius: '10px', border: '1px solid var(--border-subtle)', marginBottom: '1rem' }}>
+              <strong style={{ color: '#0ea5e9', fontSize: '0.88rem', display: 'block', marginBottom: '0.25rem' }}>C. La "Sombra" del Quantum Team (QT — Nivel 4)</strong>
+              <p style={{ margin: 0, fontSize: '0.83rem', color: 'var(--text-muted)', lineHeight: '1.55' }}>
+                Aunque el QT responde operativamente al CMJ, la Gerencia debe verificar la efectividad de sus llamadas en el modulo Reportes → Reporte ERES y Actividad de Coordinadores. KPI principal: efectividad mayor a 60% en el feedback de resolucion de llamadas, con foco en Futuros Imposibles.
+              </p>
+            </div>
+
+            <div style={{ padding: '1rem 1.2rem', background: 'rgba(14,165,233,0.08)', borderRadius: '10px', border: '1px solid rgba(14,165,233,0.25)' }}>
+              <strong style={{ color: '#0ea5e9', fontSize: '0.88rem', display: 'block', marginBottom: '0.25rem' }}>Recomendacion para Gerentes (Nivel 8)</strong>
+              <p style={{ margin: 0, fontSize: '0.83rem', color: 'var(--text-muted)', lineHeight: '1.55' }}>
+                El Dashboard Principal da la vista macro, pero se debe exigir al CC1Y2 su bitacora fisica de control de fallas para cruzarla contra los datos financieros de NODUS, y al CMJ que mantenga la matriz de Futuros Imposibles actualizada sin retrasos semanales en la plataforma.
+              </p>
+            </div>
+
+            <h3 style={{ margin: '2rem 0 0.35rem 0', color: '#8b5cf6', fontSize: '1.15rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Sparkles size={20} color="#8b5cf6" /> 7. Filosofia de Rick Rubin ("El Acto de Crear") aplicada a CPSL
+            </h3>
+            <p style={{ margin: '0 0 1.1rem 0', fontSize: '0.78rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+              Aporte de Direccion — integrado 02/09/2026, confirmado por Jose Sanchez. No proviene de un manual auditado. Sintesis de 5 principios del libro "El acto de crear" de Rick Rubin, codificados para la cultura, operacion y liderazgo de CPSL, bajo el principio de que "el lider es la causa, no el efecto".
+            </p>
+            <div style={{ display: 'grid', gap: '0.75rem', marginBottom: '1.25rem' }}>
+              {[
+                { t: '1. El Arte como un "Estado del Ser"', d: 'El verdadero trabajo del artista no es acumular artefactos, es una manera de estar en el mundo — todo ser humano es creador porque sintoniza informacion, filtra la realidad y selecciona su experiencia. En CPSL: un Coordinador, Aliado o Manager no es un "ejecutor de eventos", es un creador de contexto. Si el staff opera cansado o en automatico, el salon refleja esa desconexion — se entrena a los lideres para Ser el contenedor de posibilidad donde la transformacion ocurre de forma inevitable.' },
+                { t: '2. La Disciplina Militar para Liberar la Magia en Sala', d: 'La disciplina y la libertad no son opuestas, son socias: la precision militar en lo practico abre las ventanas creativas con libertad infantil. En CPSL: la rigurosidad de Nodus (checklists, horarios innegociables, cierres financieros) es el andamiaje que libera el 100% de la energia cognitiva del staff para la fisionomia, la lectura intuitiva del participante y el coacheo profundo.' },
+                { t: '3. Rompimiento de "Normas" y Mente de Principiante', d: 'Las reglas son suposiciones, no leyes de la naturaleza, disenadas para el comportamiento promedio — si una regla limita, vale la pena intentar exactamente lo contrario. En CPSL: justifica las dinamicas de disrupcion de Capitulo Dos (Vestimenta Irrazonable) y la decision de permitir tenis negros a los entrenadores — priorizar la entrega del facilitador ("el verdadero instrumento") sobre convenciones externas obsoletas.' },
+                { t: '4. Mentalidad de Abundancia: Terminar para Volver a Empezar', d: 'Vivir en la escasez lleva al estancamiento y al perfeccionismo paralizante; cada proyecto es una estacion de un viaje que debe cerrarse para dar espacio al siguiente. En CPSL: es la esencia de la Maestria del Juego de 90 dias — el Fin de Semana 4 (El Viaje) y el Pase de Antorcha son la representacion fisica de cerrar el ciclo, celebrar el "juego ganado" y liberarlo en el contenedor de C1.' },
+                { t: '5. La Busqueda de la "Opcion C"', d: 'Si un colaborador prefiere la Opcion A y otro la Opcion B, no se elige ninguna: se trabaja con paciencia hasta que emerja una Opcion C superior — la sinergia del grupo importa mas que el talento individual. En CPSL: ante quiebres de personal o visiones encontradas con el Entrenador en sala, Causa OS prohibe soluciones a medias o negociaciones por comodidad — se opera desde la confrontacion asertiva hasta la solucion cuantica superior que cuide el contenedor del participante.' },
+              ].map(item => (
+                <div key={item.t} style={{ padding: '0.9rem 1.1rem', background: 'var(--bg-card)', borderRadius: '10px', border: '1px solid var(--border-subtle)' }}>
+                  <strong style={{ color: '#8b5cf6', fontSize: '0.88rem', display: 'block', marginBottom: '0.25rem' }}>{item.t}</strong>
+                  <p style={{ margin: 0, fontSize: '0.83rem', color: 'var(--text-muted)', lineHeight: '1.55' }}>{item.d}</p>
+                </div>
+              ))}
+            </div>
+            <div style={{ padding: '1rem 1.2rem', background: 'rgba(139,92,246,0.08)', borderRadius: '10px', border: '1px solid rgba(139,92,246,0.25)' }}>
+              <p style={{ margin: 0, fontSize: '0.88rem', color: 'var(--text-main)', lineHeight: '1.6', fontStyle: 'italic' }}>
+                "Nodus registra la realidad de los procesos. Causa OS, inspirada en Rubin, nos recuerda que el verdadero instrumento eres tu; y que la unica forma de elevar los resultados en Nodus es refinando la sensibilidad, la fisionomia y la impecabilidad del Ser que lidera la sala."
+              </p>
             </div>
           </div>
         </div>
@@ -150236,6 +153037,9 @@ export default function ManualGuia() {
                   { title: 'Metricas de Retencion', desc: 'Monitor de asistencia a los 4 FDS de calibracion. Alerta al Director si un participante acumula 2 ausencias.' },
                   { title: 'Gestion de EAIs', desc: 'Supervisa los Equipos de Alto Impacto. Redistribuye participantes si un equipo esta en riesgo de desercion.' },
                   { title: 'Reportes a Direccion', desc: 'Entrega reporte semanal de avance al Director de Maestria y Gerente. Causa OS genera el resumen automaticamente.' },
+                  // 31/08/2026: nueva herramienta "Calendario de Maestria del
+                  // Juego" — antes no estaba documentada en este manual.
+                  { title: 'Calendario de Maestria del Juego', desc: 'Genera el calendario oficial de cada equipo: con sede + numero de equipo se precarga solo el Primer FDS desde el calendario oficial, y a partir de el se calculan solas 19 de las 20 actividades reales (Segundo/Tercer FDS, Reunion, Entrega de FI, Directorio, Entrenamiento de confianza, Pase de Antorcha, etc.). Todo sigue siendo editable — cada actividad se puede mover de bloque o de orden, y "Ordenar cronologicamente" las acomoda por fecha. Solo se exportan al PDF las actividades que ya tienen fecha.' },
                 ].map(item => (
                   <div key={item.title} style={{ padding: '0.8rem', background: 'rgba(139,92,246,0.06)', borderRadius: '8px', border: '1px solid rgba(139,92,246,0.2)' }}>
                     <strong style={{ color: '#8b5cf6', display: 'block', marginBottom: '0.2rem' }}>{item.title}</strong>
@@ -150243,10 +153047,14 @@ export default function ManualGuia() {
                   </div>
                 ))}
               </div>
-              <div style={{ marginTop: '1.25rem' }}>
+              <div style={{ marginTop: '1.25rem', display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
                 <button onClick={() => navigate('/centro-managers')} className="btn-primary"
                   style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.65rem 1.4rem', fontWeight: 700 }}>
                   Centro de Managers <ExternalLink size={14} />
+                </button>
+                <button onClick={() => navigate('/calendario-mj')} className="btn-secondary"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.65rem 1.4rem', fontWeight: 700 }}>
+                  <Calendar size={14} /> Calendario de Maestria del Juego <ExternalLink size={14} />
                 </button>
               </div>
             </div>
@@ -150363,6 +153171,7 @@ export default function ManualGuia() {
                 { icon: '📋', color: 'var(--crear-gold)', label: 'Mi Checklist', route: '/checklist/coordinador_c1c2', desc: 'Cumplimiento diario/semanal con evidencias.' },
                 { icon: '🎯', color: '#f97316', label: 'Mis Metas & KPIs', route: '/metas', desc: 'Avance de participantes y enrolamiento.' },
                 { icon: '👥', color: '#a855f7', label: 'Centro Managers', route: '/centro-managers', desc: 'Maestria, llamadas y retencion 100 dias.' },
+                { icon: '📅', color: '#8b5cf6', label: 'Calendario MJ', route: '/calendario-mj', desc: 'Genera y exporta el calendario de Maestria del Juego por equipo.' },
                 { icon: '📈', color: '#22c55e', label: 'Reportes', route: '/reportes', desc: 'Dashboards por sede, rol y ciclo.' },
                 { icon: '⚡', color: 'var(--crear-gold)', label: 'Directorio QT', route: '/directorio-qt', desc: 'Equipo Quantum en tiempo real.' },
                 { icon: '🚨', color: '#ef4444', label: 'Protocolo Crisis', route: '/protocolo-emergencias', desc: '7 pasos de actuacion en emergencias.' },
@@ -150590,6 +153399,68 @@ export default function ManualGuia() {
               <li><strong>Gobernanza y Confidencialidad Extrema:</strong> bajo ninguna circunstancia se permite tomar fotos, videos o divulgar el nombre de los entrenadores de Maestria en chats generales o redes sociales. El secreto del proceso se protege con rigor de Nivel 3.</li>
               <li><strong>Evidencias de FI en FDS3:</strong> en el fin de semana de Gratitud, solo los participantes y managers con un avance verificado de sus FI mayor o igual a 80% o al 100% de cumplimiento de evidencias fisicas tienen derecho a compartir su testimonio en el arco final de graduacion.</li>
             </ul>
+          </div>
+
+          {/* Seccion 7 — integrado desde "MANUAL DE PROCESOS REPORTES CAP 1 Y
+              CAP 2.docx" (Jose, 01/09/2026). El documento fuente, pese al
+              nombre, SOLO desarrolla el proceso de Capitulo 1 (jueves a
+              domingo) — no contiene el proceso de Capitulo 2, asi que esa
+              parte queda pendiente de que gerencia la entregue; ver nota al
+              final de esta seccion. No reemplaza el 6.2 (formato general de
+              titulo de reporte), lo complementa con el detalle especifico de
+              CADA reporte de asistencia de Capitulo 1: cuando se envia y que
+              campos lleva. */}
+          <div className="glass-panel" style={{ padding: '2.25rem 2rem', borderRadius: '16px' }}>
+            <h3 style={{ margin: '0 0 1rem 0', color: '#14b8a6', fontSize: '1.15rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <FileText size={19} color="#14b8a6" /> Seccion 7 — Proceso Detallado de Reportes de Asistencia: Capitulo 1
+            </h3>
+
+            <p style={{ margin: '0 0 1.5rem 0', color: 'var(--text-main)', fontSize: '0.88rem', lineHeight: '1.6' }}>
+              Estandariza mecanica y contextualmente la elaboracion y envio de los reportes de cada entrenamiento de Capitulo 1. Sirve de apoyo a coordinadores nuevos, manteniendo el proceso sugerido por gerencia. Cada reporte del modelo de abajo se envia a los canales oficiales de la <strong>seccion 6.1</strong> (Crear Global) y, cuando el modelo lo indica, tambien al gerente de la sede.
+            </p>
+
+            {REPORTES_CAP1.map((diaBlock) => (
+              <div key={diaBlock.dia} style={{ marginBottom: '1.75rem' }}>
+                <p style={{ margin: '0 0 0.4rem 0', color: 'var(--crear-gold)', fontSize: '0.95rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.02em' }}>
+                  Dia {diaBlock.dia}
+                </p>
+                <p style={{ margin: '0 0 0.9rem 0', color: 'var(--text-muted)', fontSize: '0.85rem', lineHeight: '1.55' }}>
+                  {diaBlock.intro}
+                </p>
+                <div style={{ display: 'grid', gap: '0.9rem' }}>
+                  {diaBlock.reportes.map((rep, i) => (
+                    <div key={i} style={{ padding: '0.9rem 1rem', background: 'var(--bg-card)', borderRadius: '10px', border: '1px solid var(--border-subtle)' }}>
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.6rem', flexWrap: 'wrap', marginBottom: '0.35rem' }}>
+                        <strong style={{ color: 'var(--text-heading)', fontSize: '0.88rem' }}>{rep.momento}</strong>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: '#14b8a6', fontSize: '0.78rem', fontWeight: 700 }}>
+                          <Clock size={13} /> {rep.horario}
+                        </span>
+                      </div>
+                      {rep.detalle && (
+                        <p style={{ margin: '0 0 0.55rem 0', color: 'var(--text-muted)', fontSize: '0.82rem', lineHeight: '1.5' }}>
+                          {rep.detalle}
+                        </p>
+                      )}
+                      <div style={{ padding: '0.7rem 0.9rem', background: 'rgba(0,0,0,0.25)', borderRadius: '8px', border: '1px solid var(--border-subtle)', fontFamily: 'monospace', fontSize: '0.79rem', color: 'var(--text-main)', lineHeight: '1.6' }}>
+                        {rep.modelo.map((linea, li) => <div key={li}>{linea || ' '}</div>)}
+                        {rep.pagos && (
+                          <>
+                            <div style={{ marginTop: '0.4rem', color: 'var(--crear-gold)' }}>Reporte de pagos</div>
+                            {rep.pagos.map((linea, li) => <div key={li}>{linea}</div>)}
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+
+            <div style={{ padding: '1rem 1.2rem', background: 'rgba(239,68,68,0.08)', borderRadius: '10px', border: '1px solid rgba(239,68,68,0.3)' }}>
+              <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-main)', lineHeight: '1.6' }}>
+                ⚠️ <strong>Pendiente:</strong> el documento fuente de esta seccion se llama "Reportes Cap 1 y Cap 2", pero solo desarrolla el proceso de Capitulo 1. El proceso detallado de reportes de Capitulo 2 (dias, horarios y modelos) todavia no esta documentado aqui — se agregara cuando gerencia lo entregue.
+              </p>
+            </div>
           </div>
         </div>
       )}
@@ -153617,6 +156488,11 @@ function AuditLogView() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterAction, setFilterAction] = useState('TODAS');
+  // (02/09/2026) Ordenamiento por columna, pedido explícito de José: por
+  // defecto se ve el último ingreso primero (más reciente arriba), y cada
+  // columna se puede ordenar haciendo clic en su encabezado.
+  const [sortField, setSortField] = useState('timestamp');
+  const [sortDirection, setSortDirection] = useState('desc');
 
   const fetchLogs = async () => {
     setLoading(true);
@@ -153639,6 +156515,52 @@ function AuditLogView() {
     if (filterAction === 'TODAS') return true;
     return log.action === filterAction;
   });
+
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDirection(prev => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortField(field);
+      // Fecha empieza en descendente (más reciente primero); el resto de
+      // columnas empieza en ascendente (A-Z), que es lo que se espera al
+      // ordenar texto por primera vez.
+      setSortDirection(field === 'timestamp' ? 'desc' : 'asc');
+    }
+  };
+
+  const getSortValue = (log, field) => {
+    switch (field) {
+      case 'timestamp': {
+        const t = new Date(log.timestamp);
+        return isNaN(t.getTime()) ? 0 : t.getTime();
+      }
+      case 'usuario':
+        return `${log.name || ''} ${log.email || ''}`.toLowerCase();
+      case 'rol':
+        return (ROLE_LABELS[log.role] || log.role || '').toLowerCase();
+      case 'accion':
+        return (log.action || '').toLowerCase();
+      case 'detalle':
+        return (log.details || '').toLowerCase();
+      case 'ubicacion':
+        return `${log.sede || ''} ${log.location || ''} ${log.ip || ''}`.toLowerCase();
+      case 'dispositivo':
+        return (log.userAgent || '').toLowerCase();
+      default:
+        return '';
+    }
+  };
+
+  const sortedLogs = [...filteredLogs].sort((a, b) => {
+    const va = getSortValue(a, sortField);
+    const vb = getSortValue(b, sortField);
+    if (va < vb) return sortDirection === 'asc' ? -1 : 1;
+    if (va > vb) return sortDirection === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  const thSortStyle = { padding: '0.8rem', color: 'var(--crear-cyan)', cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap' };
+  const sortArrow = (field) => (sortField === field ? (sortDirection === 'asc' ? ' ▲' : ' ▼') : '');
 
   return (
     <div className="glass-panel" style={{ padding: '2rem' }}>
@@ -153700,17 +156622,17 @@ function AuditLogView() {
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border-subtle)', background: 'rgba(255,255,255,0.02)' }}>
-                <th style={{ padding: '0.8rem', color: 'var(--crear-cyan)' }}>Fecha y Hora</th>
-                <th style={{ padding: '0.8rem', color: 'var(--crear-cyan)' }}>Usuario</th>
-                <th style={{ padding: '0.8rem', color: 'var(--crear-cyan)' }}>Rol</th>
-                <th style={{ padding: '0.8rem', color: 'var(--crear-cyan)' }}>Acción</th>
-                <th style={{ padding: '0.8rem', color: 'var(--crear-cyan)' }}>Detalle</th>
-                <th style={{ padding: '0.8rem', color: 'var(--crear-cyan)' }}>Ubicación e IP</th>
-                <th style={{ padding: '0.8rem', color: 'var(--crear-cyan)' }}>Dispositivo</th>
+                <th onClick={() => handleSort('timestamp')} style={thSortStyle} title="Ordenar por fecha y hora">Fecha y Hora{sortArrow('timestamp')}</th>
+                <th onClick={() => handleSort('usuario')} style={thSortStyle} title="Ordenar por usuario">Usuario{sortArrow('usuario')}</th>
+                <th onClick={() => handleSort('rol')} style={thSortStyle} title="Ordenar por rol">Rol{sortArrow('rol')}</th>
+                <th onClick={() => handleSort('accion')} style={thSortStyle} title="Ordenar por acción">Acción{sortArrow('accion')}</th>
+                <th onClick={() => handleSort('detalle')} style={thSortStyle} title="Ordenar por detalle">Detalle{sortArrow('detalle')}</th>
+                <th onClick={() => handleSort('ubicacion')} style={thSortStyle} title="Ordenar por ubicación">Ubicación e IP{sortArrow('ubicacion')}</th>
+                <th onClick={() => handleSort('dispositivo')} style={thSortStyle} title="Ordenar por dispositivo">Dispositivo{sortArrow('dispositivo')}</th>
               </tr>
             </thead>
             <tbody>
-              {filteredLogs.map(log => {
+              {sortedLogs.map(log => {
                 let dateStr = 'Desconocida';
                 try {
                   if (log.timestamp?.toDate) {

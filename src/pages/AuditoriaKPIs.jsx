@@ -18,6 +18,7 @@ export default function AuditoriaKPIs() {
   
   const [loading, setLoading] = useState(true);
   const [reports, setReports] = useState([]);
+  const [resumenGeneral, setResumenGeneral] = useState(null);
   const [filterSede, setFilterSede] = useState(currentUser?.sede || 'Todas');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -109,6 +110,67 @@ export default function AuditoriaKPIs() {
     return allData;
   };
 
+  // (02/09/2026) NUEVO — pedido de José: "ver por ciclos de cada sede... es
+  // decir capitulo uno capitulo dos maestria del juego". Verificado contra el
+  // archivo real nodus_latest_snapshot.json (exportado por José con
+  // scripts/exportarNodusSnapshot.mjs el 02/09/2026): dentro de
+  // secciones.dashboardPrincipal.tablas hay una tabla con headers
+  // ['Entrenamiento','Participantes'] y 3 filas (Capítulo 1, Capítulo 2,
+  // Maestría) — es el ÚNICO desglose C1/C2/MJ que Nodus expone, y es un
+  // AGREGADO del alcance completo (no es por coordinador ni por equipo).
+  // También hay una tarjeta con content[0]==='Alcance' que indica qué sede ve
+  // el robot en esa corrida — en los datos reales revisados siempre aparece
+  // "LIMA CICLO 1", etiquetada por Nodus como "Tu sede". No está verificado
+  // si la cuenta del robot (NODUS_USER/NODUS_PASSWORD) puede ver otras sedes
+  // — por eso este resumen se muestra siempre junto con el "alcance" real
+  // devuelto por Nodus, nunca como si cubriera todas las sedes.
+  const parseResumenGeneral = (data) => {
+    if (!data || !data.secciones || !data.secciones.dashboardPrincipal) return null;
+
+    const dash = data.secciones.dashboardPrincipal;
+
+    let alcance = null;
+    const alcanceCard = (dash.kpis || []).find(k => k.content && k.content[0] === 'Alcance');
+    if (alcanceCard) alcance = alcanceCard.content[1] || null;
+
+    const tabla = (dash.tablas || []).find(t =>
+      t.headers && t.headers.includes('Entrenamiento') && t.headers.includes('Participantes')
+    );
+
+    if (!tabla) {
+      return alcance ? { alcance, capitulo1: null, capitulo2: null, maestria: null, total: null, timestamp: data.timestamp || null } : null;
+    }
+
+    const toNum = (v) => parseInt(String(v || '0').replace(/[^0-9]/g, ''), 10) || 0;
+    const porNombre = (nombre) => {
+      const fila = tabla.rows.find(r => (r['Entrenamiento'] || '').toUpperCase().includes(nombre));
+      return fila ? toNum(fila['Participantes']) : null;
+    };
+
+    const capitulo1 = porNombre('CAPÍTULO 1') ?? porNombre('CAPITULO 1');
+    const capitulo2 = porNombre('CAPÍTULO 2') ?? porNombre('CAPITULO 2');
+    const maestria = porNombre('MAESTR');
+
+    const valores = [capitulo1, capitulo2, maestria];
+    const total = valores.some(v => v != null) ? valores.reduce((acc, v) => acc + (v || 0), 0) : null;
+
+    return { alcance, capitulo1, capitulo2, maestria, total, timestamp: data.timestamp || null };
+  };
+
+  // Agrupa las tarjetas de coordinadores por el nombre de sede/ciclo tal cual
+  // lo devuelve Nodus (hoy: "LIMA CICLO 1"). Si en el futuro el robot alcanza
+  // más de una sede en una misma corrida, esto ya las separa automáticamente
+  // sin cambios adicionales.
+  const groupBySede = (list) => {
+    const map = new Map();
+    (list || []).forEach(r => {
+      const key = r.sede || 'Sin sede';
+      if (!map.has(key)) map.set(key, []);
+      map.get(key).push(r);
+    });
+    return map;
+  };
+
   // (02/09/2026) FIX + pedido de José ("extraer datos en tiempo real de
   // Nodus para saber cómo van los CC1Y2"): esto antes llamaba a
   // 'http://localhost:3001/api/scrape-nodus', una dirección que solo existe
@@ -166,9 +228,11 @@ export default function AuditoriaKPIs() {
         if (snap.exists()) {
           const data = snap.data();
           const dataTime = data.timestamp ? new Date(data.timestamp).getTime() : 0;
-          if (dataTime >= dispatchStartedAt) {
+          const matchesDates = data.fechasFiltro && data.fechasFiltro.startDate === startDate && data.fechasFiltro.endDate === endDate;
+          if ((dataTime >= (dispatchStartedAt - 60000) && matchesDates) || dataTime >= dispatchStartedAt) {
             const parsedData = parseNodusData(data);
             setReports(parsedData);
+            setResumenGeneral(parseResumenGeneral(data));
             showToast("Datos de Nodus (filtrados por fecha) actualizados.", "success");
             found = true;
             break;
@@ -222,9 +286,13 @@ export default function AuditoriaKPIs() {
       const nodusSnap = await getDocResilient(nodusRef);
       
       let allData = [];
-      
+
       if (nodusSnap.exists()) {
-        allData = parseNodusData(nodusSnap.data());
+        const snapData = nodusSnap.data();
+        allData = parseNodusData(snapData);
+        setResumenGeneral(parseResumenGeneral(snapData));
+      } else {
+        setResumenGeneral(null);
       }
 
       // Filtrar por sede
@@ -560,18 +628,72 @@ export default function AuditoriaKPIs() {
           </div>
         </div>
 
+        {/* (02/09/2026) Resumen general Capítulo 1 / Capítulo 2 / Maestría —
+            pedido de José. Viene de secciones.dashboardPrincipal (tabla
+            Entrenamiento/Participantes), agregado del ALCANCE que el robot
+            de Nodus pudo ver en esa corrida (hoy: una sola sede+ciclo). */}
+        {resumenGeneral && (
+          <div style={{
+            display: 'flex', flexWrap: 'wrap', gap: '0.8rem', alignItems: 'center',
+            background: 'var(--bg-card-hover, #f8fafc)', border: '1px solid var(--border-subtle, #e2e8f0)',
+            borderRadius: '12px', padding: '1rem 1.25rem', marginBottom: '0.75rem'
+          }}>
+            <div style={{ fontWeight: 800, color: 'var(--text-heading, #0f172a)', fontSize: '0.9rem' }}>
+              Resumen general Nodus{resumenGeneral.alcance ? ` — Alcance: ${resumenGeneral.alcance}` : ''}
+            </div>
+            {resumenGeneral.capitulo1 != null && (
+              <span style={{ padding: '0.35rem 0.8rem', background: '#e0f2fe', color: '#0369a1', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 700 }}>
+                Capítulo 1: {resumenGeneral.capitulo1.toLocaleString('es-PE')}
+              </span>
+            )}
+            {resumenGeneral.capitulo2 != null && (
+              <span style={{ padding: '0.35rem 0.8rem', background: '#fef3c7', color: '#92400e', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 700 }}>
+                Capítulo 2: {resumenGeneral.capitulo2.toLocaleString('es-PE')}
+              </span>
+            )}
+            {resumenGeneral.maestria != null && (
+              <span style={{ padding: '0.35rem 0.8rem', background: '#dcfce7', color: '#166534', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 700 }}>
+                Maestría: {resumenGeneral.maestria.toLocaleString('es-PE')}
+              </span>
+            )}
+            {resumenGeneral.total != null && (
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted, #64748b)' }}>
+                Total en el alcance: {resumenGeneral.total.toLocaleString('es-PE')}
+              </span>
+            )}
+          </div>
+        )}
+        {resumenGeneral && resumenGeneral.alcance && (
+          <p style={{ margin: '0 0 1.5rem', fontSize: '0.78rem', color: 'var(--text-muted, #64748b)' }}>
+            ⚠️ Nota: esta corrida de Nodus solo cubre el alcance <strong>"{resumenGeneral.alcance}"</strong> (así lo llama el propio Nodus, "Tu sede"). No está verificado si la cuenta del robot puede ver otras sedes — no asumas que este resumen incluye todas las sedes.
+          </p>
+        )}
+
         {loading ? (
           <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--crear-gold, #f59e0b)', fontWeight: 600 }}>Cargando reportes de KPIs...</div>
         ) : reports.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted, #64748b)' }}>No hay reportes de KPIs en la sede seleccionada.</div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            {reports.map(rep => (
-              <div key={rep.id} style={{ 
-                background: rep.status === 'reviewed' ? 'rgba(16, 185, 129, 0.04)' : 'var(--bg-card, #ffffff)', 
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            {Array.from(groupBySede(reports)).map(([sedeLabel, repsInSede]) => (
+            <div key={sedeLabel}>
+              <h3 style={{
+                display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 0 1rem',
+                fontSize: '1rem', fontWeight: 800, color: 'var(--crear-gold, #f59e0b)',
+                borderBottom: '1px solid var(--border-subtle, #e2e8f0)', paddingBottom: '0.5rem'
+              }}>
+                <CountryFlag sede={sedeLabel} /> {sedeLabel}
+                <span style={{ fontWeight: 500, fontSize: '0.8rem', color: 'var(--text-muted, #64748b)' }}>
+                  ({repsInSede.length} {repsInSede.length === 1 ? 'coordinador' : 'coordinadores'})
+                </span>
+              </h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              {repsInSede.map(rep => (
+              <div key={rep.id} style={{
+                background: rep.status === 'reviewed' ? 'rgba(16, 185, 129, 0.04)' : 'var(--bg-card, #ffffff)',
                 border: '1px solid',
                 borderColor: rep.status === 'reviewed' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(245, 158, 11, 0.3)',
-                borderRadius: '12px', 
+                borderRadius: '12px',
                 padding: '1.5rem',
                 boxShadow: '0 2px 6px rgba(0,0,0,0.03)'
               }}>
@@ -607,8 +729,11 @@ export default function AuditoriaKPIs() {
                 </div>
 
                 {rep.role === 'coord_c1' ? renderC1Data(rep) : rep.role === 'coord_maestria' ? renderMaestriaData(rep) : renderQTData(rep)}
-                
+
               </div>
+              ))}
+              </div>
+            </div>
             ))}
           </div>
         )}

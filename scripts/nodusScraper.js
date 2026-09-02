@@ -27,7 +27,11 @@ async function extractDataFromPage(page, url, sectionName, startDate, endDate) {
         const dateInputs = document.querySelectorAll('input[type="date"]');
         if (dateInputs.length >= 2) {
           dateInputs[0].value = start;
+          dateInputs[0].dispatchEvent(new Event('input', { bubbles: true }));
+          dateInputs[0].dispatchEvent(new Event('change', { bubbles: true }));
           dateInputs[1].value = end;
+          dateInputs[1].dispatchEvent(new Event('input', { bubbles: true }));
+          dateInputs[1].dispatchEvent(new Event('change', { bubbles: true }));
           
           // Buscar botón de filtrar
           const buttons = Array.from(document.querySelectorAll('button'));
@@ -170,7 +174,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   // fechas desde fuera (Worker de Cloudflare) sin afectar la corrida diaria
   // (esas variables vienen vacías cuando el disparo es por cron o manual sin
   // fechas, y aquí una cadena vacía se trata igual que "sin fecha").
-  const envStart = process.env.NODUS_START_DATE || null;
-  const envEnd = process.env.NODUS_END_DATE || null;
+  const rawStart = process.env.NODUS_START_DATE?.trim();
+  const rawEnd = process.env.NODUS_END_DATE?.trim();
+  const envStart = (rawStart && rawStart !== 'null' && rawStart !== 'undefined') ? rawStart : null;
+  const envEnd = (rawEnd && rawEnd !== 'null' && rawEnd !== 'undefined') ? rawEnd : null;
   runScraperWithDates(envStart, envEnd).then(() => process.exit(0)).catch(() => process.exit(1));
 }

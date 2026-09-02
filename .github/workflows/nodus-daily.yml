@@ -4,7 +4,16 @@ on:
   schedule:
     # 17:00 UTC = 12:00 PM Lima (UTC-5)
     - cron: '0 17 * * *'
-  workflow_dispatch:  # Permite ejecución manual desde GitHub
+  workflow_dispatch:  # Permite ejecución manual desde GitHub o disparo con fechas
+    inputs:
+      startDate:
+        description: 'Fecha de inicio (YYYY-MM-DD)'
+        required: false
+        default: ''
+      endDate:
+        description: 'Fecha de fin (YYYY-MM-DD)'
+        required: false
+        default: ''
 
 jobs:
   sync-nodus:
@@ -35,6 +44,8 @@ jobs:
         env:
           NODUS_USER: ${{ secrets.NODUS_USER }}
           NODUS_PASSWORD: ${{ secrets.NODUS_PASSWORD }}
+          NODUS_START_DATE: ${{ github.event.inputs.startDate }}
+          NODUS_END_DATE: ${{ github.event.inputs.endDate }}
           VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
           VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
