@@ -72274,7 +72274,8 @@ export const normalizeCoordinator = (name) => {
     "restore": "node scripts/restoreFirestore.js",
     "bot:sync": "node scripts/causa_sync_bot.mjs",
     "bot:omni": "node scripts/causa_omni_auditor.mjs",
-    "audit:platform": "node scripts/platform_audit.mjs"
+    "audit:platform": "node scripts/platform_audit.mjs",
+    "flyer:generate": "node scripts/generar_flyer.mjs"
   },
   "dependencies": {
     "cors": "^2.8.6",
@@ -76534,6 +76535,95 @@ Para garantizar la retención global y salvaguardar el contenedor del salón de 
 *   **Cierre Bancario:** Debe verificarse el dinero físicamente en el banco antes del lunes a las 12:00 PM.
 *   **Alerta de Integridad:** Queda terminantemente prohibido inflar confirmados con acuerdos débiles (\`AC\`) ficticios. Todo desfase dispara una alerta por **Quiebre de Integridad Administrativa** al Gerente de Sede.
 
+
+
+---
+
+## 13. MANUAL DE USUARIO OFICIAL DE LA PLATAFORMA NODUS (EDICIÓN 2026)
+[APORTE DE DIRECCIÓN — integrado 02/09/2026, confirmado por José Sánchez, fuente: manual_nodus_soar_completo.pdf/html, extracción verificada íntegramente contra el HTML fuente]
+
+### 13.1 Qué es NODUS y Requisitos Técnicos
+NODUS es la plataforma operativa oficial (https://imo.crearpslglobal.com/) para el registro de participantes, cobros, cierre de caja y reportes de cada sede. Requisitos: navegador Google Chrome actualizado, conexión a internet estable (con respaldo de datos móviles), y usuario/contraseña personal asignado por el área administrativa (no se usan correos externos ni SSO de terceros).
+
+### 13.2 Acceso y Cierre de Sesión
+Inicio: abrir Chrome, ir a https://imo.crearpslglobal.com/, ingresar Usuario y Contraseña y pulsar el botón azul 'Ingresar'. Si aparece "Usuario o Contraseña Incorrecta", revisar Bloq Mayús; si persiste, el Gerente de Sede debe entrar a Configuración → Usuarios y colocar una contraseña temporal. Cierre: clic en el nombre de usuario (esquina superior derecha) → 'Cerrar Sesión', verificando el regreso a la pantalla de login. Por seguridad, la sesión debe cerrarse formalmente cada vez que se abandona el puesto de registro.
+
+### 13.3 Perfiles de Usuario Confirmados en el Manual Oficial
+El manual oficial define exactamente 4 perfiles (Capítulo 3), cada uno con menú limitado a sus funciones:
+1. **Operador de Mesa de Registro:** ve Mesa de Registro y Listado de Participantes. Busca por DNI, valida pago y marca asistencia.
+2. **Encargado de Caja / Contabilidad:** ve Mesa de Registro, Contabilidad, Cierre de Caja y Reportes de Pago. Recibe pagos, emite comprobantes y cuadra caja.
+3. **Coordinador de Evento:** ve Dashboard, Mesa de Registro, Participantes y Reportes de Asistencia. Supervisa afluencia de sala y gafetes.
+4. **Gerente de Sede / Administrador:** acceso total (Dashboard, Registro, Participantes, Contabilidad, Cierre de Caja, Reportes, Configuración y Usuarios). Abre/cierra eventos, audita, crea usuarios y configura sedes.
+Si a un colaborador le falta un módulo, debe pedir al Gerente de Sede que ajuste su perfil en Configuración → Usuarios.
+
+### 13.4 Dashboard Principal
+Panel central al iniciar sesión. Elementos: Barra Lateral Izquierda (acceso a Dashboard, Mesa Registro, Participantes, Contabilidad, Cierre de Caja, Reportes, Configuración), Contadores de Resumen (entrenadores, eventos activos, participantes registrados, sedes operando) en la parte superior, y Barra de Usuario/Sede en la esquina superior derecha. Indicadores en vivo durante días de evento: Inscritos Totales, Presentes en Sala, Pendientes de Llegada. Para volver al inicio: clic en 'Dashboard' o en el logotipo (esquina superior izquierda).
+
+### 13.5 Mesa de Registro — Procedimiento Estándar (3 Pasos)
+1. **Buscar al participante:** pedir DNI/Cédula/Pasaporte, escribirlo en la barra de búsqueda de Mesa de Registro y presionar Enter. Si no aparece, buscar solo por apellido.
+2. **Verificar estado de pago:** la fila muestra 'Completo' o 'Pendiente'. Si está pendiente, solicitar comprobante o derivar a caja. Si el participante insiste en que ya pagó, revisar 'ver detalles' por si el comprobante está en revisión de contabilidad.
+3. **Marcar en Sala y entregar gafete:** clic en 'Marcar en Sala' (el participante queda contabilizado como Sentado) y entregar gafete y material de bienvenida. Un marcado erróneo se corrige buscando de nuevo por DNI y desmarcando la casilla de asistencia.
+
+### 13.6 Mesa de Registro — Casos Especiales
+- **Walk-in (inscrito a última hora):** pedir comprobante → Participantes → Nuevo Participante → registrar nombres/DNI/teléfono/correo → Contabilidad → Registrar Pago → volver a Mesa de Registro y marcar asistencia con gafete provisional.
+- **Extranjero con pasaporte:** buscar por la serie alfanumérica del pasaporte tal como fue registrada; si no aparece, buscar por apellido materno o paterno.
+- **Traslado de sede autorizado:** el Gerente de Sede entra a Participantes, ubica al alumno y cambia el campo 'Sede Asignada' a la sede actual; al guardar, el alumno aparece en la Mesa de Registro local.
+
+### 13.7 Gestión de Participantes
+Registrar nuevo: Participantes → 'Nuevo Participante' → completar Tipo/Número de Documento, Nombres y Apellidos completos (tal como el documento, para certificados), Teléfono/WhatsApp, Correo, Sede y Entrenamiento → 'Guardar'. Editar: ubicar en la lista → ícono de lápiz / 'Editar' → corregir → 'Actualizar Datos'. Exportar: aplicar filtros de Sede y Evento → 'Exportar a Excel' (descarga .xlsx).
+
+### 13.8 Contabilidad — Formas de Pago y Registro
+Formas de pago admitidas: **Efectivo** (monto exacto, recibo numerado), **Transferencia Bancaria** (Número de Operación y Banco de origen, verificar acreditación antes de validar) y **Tarjeta / POS** (número de lote y voucher, grapar el voucher a la ficha). Procedimiento: Contabilidad → 'Registrar Pago' → buscar por DNI → tipo de pago (Total o Abono Parcial) → forma de pago → número de comprobante/operación → 'Guardar Pago' (el saldo se actualiza de inmediato en Mesa de Registro). Gastos menores (caja chica): Contabilidad → 'Registro de Gastos/Egresos' → concepto (Materiales de Sala, Refrigerios, Movilidad, Varios) → monto → número de boleta; el cierre nocturno resta automáticamente estos gastos.
+
+### 13.9 Cierre y Arqueo de Caja (3 Pasos)
+1. **Abrir el módulo:** clic en 'Cierre de Caja' → seleccionar fecha y sede. Si faltan pagos, revisar con el personal de mesa si quedó algo sin registrar en Contabilidad.
+2. **Contar el dinero físico:** comparar el 'Total Efectivo Esperado' (calculado por NODUS) contra el conteo real; escribir la cifra en 'Efectivo Real en Caja'. Si hay diferencia, documentar la justificación en 'Observaciones'.
+3. **Finalizar y bloquear:** botón 'Cerrar Caja Oficialmente' genera el acta y bloquea los registros del día. Solo el Gerente de Sede o el Administrador general pueden reabrir una caja cerrada.
+
+### 13.10 Reportes — El "Reporte de Entrenadores y Maestrías" (5 columnas)
+| Columna | Qué representa | Acción operativa |
+|---|---|---|
+| TIPO IMO / DNI | Rol (Capitán, Manager, Participante) o documento | Auditar por bloque o buscar a alguien |
+| PARTICIPANTES EN JUEGO | Personas activas en sala / nombre del participante | Verifica asistencia continua |
+| DECLARACIÓN | Meta de personas que el líder se comprometió a enrolar | Punto de comparación vs. resultado real |
+| TOTAL ENROLADOS | Personas nuevas registradas y pagadas | Métrica de cierre comercial (en 0 = sin cobros) |
+| DESERTOR FDS | Alumnos que abandonaron durante el fin de semana | Alerta de fuga, reportar a coordinación |
+Auditoría de brecha: **Enrolados** (pagaron) vs. **Sentados** (marcados físicamente en Mesa de Registro el viernes noche); la diferencia (No-Show) obliga a contactar a los ausentes y coordinar su ingreso en la cohorte inmediata.
+
+### 13.11 Equipos, Cohortes y Asignaciones
+Módulo 'Equipos y Maestrías': creación de cohortes (número de equipo, sede, fechas de inicio/graduación), asignación del entrenador oficial, y distribución de cada alumno nuevo a su cohorte para que sus asistencias/pagos sumen correctamente. Buena práctica del manual: asegurar que cada participante tenga cohorte asignada antes del viernes de registro, porque sin equipo asignado no aparece en el reporte de entrenadores de su sede.
+
+### 13.12 Configuración General
+Accesible principalmente a Gerentes de Sede y Administradores. Funciones: Gestión de Sedes (alta, direcciones, contacto), Usuarios y Contraseñas (creación, nombre de usuario, reseteo de claves), Programas y Precios (matrícula, promociones, calendario). Crear/modificar usuario: Configuración → Usuarios → 'Nuevo Usuario' → nombre completo, usuario, contraseña inicial, Rol de acceso (Mesa de Registro, Caja, Coordinación o Gerencia), Sede → 'Guardar Usuario'. Resetear contraseña: Configuración → Usuarios → ubicar al colaborador → 'Editar' → 'Nueva Contraseña' (clave temporal) → 'Guardar Cambios'.
+
+### 13.13 Guía de Operación de Fin de Semana
+- **Viernes:** 15:00-16:30 preparación técnica y login de prueba; 17:00-19:00 registro masivo en puerta (buscar DNI, verificar pago, 'Marcar en Sala', o derivar a caja); 19:30-20:30 cierre de puertas y conteo de gafetes sobrantes vs. lista de 'No Asistieron'; 21:00 Cierre de Caja oficial junto al Gerente.
+- **Sábado:** 08:30-09:30 reingreso controlado (solo con gafete validado); 10:30 pase de lista, el coordinador marca inasistencias para seguimiento; 20:00 auditar la columna Desertor FDS en el Reporte de Entrenadores.
+- **Domingo:** registrar nuevas matrículas del siguiente nivel en Contabilidad → Registrar Pago; al cierre, la coordinación consolida la lista final de graduados para emitir constancias.
+
+### 13.14 Errores Frecuentes en Pantalla
+"Usuario o contraseña incorrectos" → revisar Bloq Mayús; si persiste, el Gerente resetea la clave en Configuración → Usuarios. "Participante no encontrado en Mesa de Registro" → buscar por apellido en Participantes; si no existe, crear 'Nuevo Participante' y registrar el pago. "Pago pendiente pero con comprobante" → asentar el cobro en Contabilidad → Registrar Pago con el número de operación. "Diferencia en el Cierre de Caja" → contrastar recibos de mesa contra las transacciones de NODUS y corregir la clasificación antes del cierre final. "Participante duplicado" → identificar cuál registro tiene el pago asentado y pedir al Gerente que desactive el duplicado sin historial. "Página en blanco o cargando" → Ctrl+F5, o cambiar a la red móvil de respaldo.
+
+### 13.15 Preguntas Frecuentes (FAQ)
+No se recomienda compartir un mismo usuario entre dos operadores (rompe la trazabilidad de auditoría). Gafete extraviado: se busca en Mesa de Registro, se confirma asistencia previa y se entrega un reemplazo con observación en la ficha. Descarga de lista de asistentes: Participantes → filtrar Sede/Evento → 'Exportar a Excel'. Eliminar un pago erróneo: los operadores regulares no pueden hacerlo; debe solicitarse al Gerente de Sede o Administrador. 'Total Enrolados' en cero: significa que aún no hay cobros/matrículas formalmente enlazadas a ese equipo. NODUS es accesible desde celular/tablet vía navegador, aunque se recomienda laptop para el personal de mesa. Corte de Wi-Fi del local: usar la zona Wi-Fi compartida de un celular. Conteo en vivo de sentados: visible en el Dashboard o en la parte superior de Mesa de Registro.
+
+### 13.16 Glosario Operativo de NODUS
+Mesa de Registro: pantalla de puerta para buscar, verificar pago y marcar asistencia. Marcar en Sala: acción que confirma ingreso físico. Total Enrolados: personas con pago/matrícula oficial. Total Sentados: participantes físicamente en el salón. Declaración: meta numérica comprometida por un líder/equipo. Desertor FDS: quien se inscribió pero no volvió a sala durante el fin de semana. Arqueo de Caja: conteo físico de efectivo/vouchers contra lo reportado en NODUS. Sede: centro operativo del evento. Cohorte/Equipo: grupo de alumnos que cursan juntos (ej. Equipo 28 Lima). Comprobante/Operación: código bancario o número de recibo que respalda el ingreso. Gafete Oficial: identificación entregada solo tras validar el registro en NODUS.
+
+### 13.17 Listas de Cotejo por Puesto
+**Operador de Mesa de Registro:** usuario/contraseña funcionando; https://imo.crearpslglobal.com/ abierto en Chrome; búsqueda de prueba con un DNI; lista de respaldo en físico/Excel; saber a quién derivar los pagos pendientes; marcar en NODUS al entregar cada gafete; no dejar pasar a nadie 'Pendiente de Pago'; contar gafetes sobrantes al cierre y reportarlos a Coordinación.
+**Encargado de Caja y Cobranzas:** fondo de cambio inicial verificado; cada cobro registrado en Contabilidad con su comprobante; ningún recibo se entrega sin guardar el pago en NODUS antes; gastos de emergencia registrados con boleta física; Cierre de Caja abierto y conteo físico realizado al fin de turno; efectivo y reporte firmado entregados al Gerente de Sede.
+**Gerente de Sede / Supervisor:** todos los operadores con usuario activo; supervisión en vivo del Dashboard; revisión del Reporte de Entrenadores por desviaciones enrolados/sentados; auditoría y firma del Cierre de Caja del viernes; reportes de sábado y domingo consolidados.
+
+### 13.18 Flujos Operativos Paso a Paso
+**Flujo A — Registro de llegada:** (1) saludar y pedir DNI (si no lo trae, buscar por nombres/apellidos); (2) comprobar estado de pago — si está pagada, 'Marcar en Sala'; si debe saldo, derivar a caja, donde Contabilidad anota el voucher y confirma el pago; (3) entregar gafete rotulado con el check verde de asistencia visible.
+**Flujo B — Cuadre y cierre nocturno:** (1) cerrar la atención en mesa y abrir Cierre de Caja; (2) contar el dinero físico billete por billete, sumar vouchers de POS y escribir los montos reales (si no cuadra, revisar recibo por recibo); (3) firmar el acta digital con 'Cerrar Caja Oficialmente' y entregar el efectivo físico al Gerente de Sede.
+
+### 13.19 Ejercicios de Entrenamiento y Anexos
+Ejercicios recomendados antes de un evento real: búsqueda de un participante por DNI en menos de 10 segundos; registro completo de un participante nuevo; asentar un cobro en efectivo y verificar que el saldo cambie a 'Completo'; leer el Reporte de Entrenadores comparando 'Declaración' contra 'Total Enrolados'. Soporte: Gerencia de Sede (usuarios, claves, permisos, horario de oficina y fines de semana de evento) y Mesa de Ayuda de Sistemas (caídas del servidor o fallas de base de datos, guardia activa viernes-domingo). Control de versiones del manual: v1.0 (2025, primera versión de capacitación) → v2.0 Oficial (Septiembre 2026, edición integrada a Causa OS).
+
+### 13.20 Reconciliación con la Guía de KPIs para Coordinadores (sección 3.6)
+[DATO VERIFICADO vs. DATO NO CONFIRMADO — no se reconcilian por asunción, se documenta la diferencia entre las dos fuentes de Dirección]. El Manual Oficial de Usuario NODUS (Edición 2026, fuente de este capítulo 13) confirma como módulos reales de la plataforma: Dashboard, Mesa de Registro, Participantes, Contabilidad (Registrar Pago / Registro de Gastos), Cierre de Caja, Reportes (incluye el Reporte de Entrenadores y Maestrías), Equipos y Maestrías (cohortes), y Configuración (Sedes / Usuarios / Programas y Precios). La 'Guía de Medición de KPIs para Coordinadores en NODUS' (sección 3.6, aportada por Dirección) menciona además los módulos 'Seguimiento → Maestrías', 'Asignación de Llamadas', 'Configuración → Equipos y Maestrías', 'Certificados' y 'Participantes Rezagados'. De estos, **Equipos y Maestrías** y **Configuración** sí están confirmados por este manual oficial; **'Seguimiento → Maestrías', 'Asignación de Llamadas', 'Certificados' y 'Participantes Rezagados' NO aparecen mencionados en el Manual Oficial de Usuario NODUS Edición 2026** (ni en su índice de 18 capítulos ni en sus Anexos). Esto puede deberse a que (a) son pantallas reales que el manual oficial simplemente no documentó, (b) son nombres alternativos/coloquiales de módulos aquí sí listados, o (c) corresponden a una capa de seguimiento gestionada fuera de NODUS (p. ej. en Causa OS). Ningún dato de este documento resuelve cuál de las tres opciones es la correcta — DATO FALTANTE a confirmar directamente con Dirección o con una captura de pantalla de esos módulos dentro de NODUS.
 ---
 *Este documento constituye la hoja de ruta y manual de reingeniería de Crear Poder Sin Límites.*
 *Elaborado el 22 de Agosto de 2026. Clasificación: CONFIDENCIAL - EXCLUSIVO DIRECCIÓN REGIONAL.*
@@ -78014,6 +78104,95 @@ Para asegurar la transición exitosa de las sedes operativas internacionales hac
 *   **Responsable:** Director Regional de Operaciones de CPSL. | **Aprobador:** Dirección General.
 *   **Evidencias de Éxito:** 100% de las sedes operando de manera estandarizada bajo el ecosistema digital de la Plataforma Nodus, logrando una reducción del 15% en incidencias operativas globales.
 
+
+
+---
+
+## 13. MANUAL DE USUARIO OFICIAL DE LA PLATAFORMA NODUS (EDICIÓN 2026)
+[APORTE DE DIRECCIÓN — integrado 02/09/2026, confirmado por José Sánchez, fuente: manual_nodus_soar_completo.pdf/html, extracción verificada íntegramente contra el HTML fuente]
+
+### 13.1 Qué es NODUS y Requisitos Técnicos
+NODUS es la plataforma operativa oficial (https://imo.crearpslglobal.com/) para el registro de participantes, cobros, cierre de caja y reportes de cada sede. Requisitos: navegador Google Chrome actualizado, conexión a internet estable (con respaldo de datos móviles), y usuario/contraseña personal asignado por el área administrativa (no se usan correos externos ni SSO de terceros).
+
+### 13.2 Acceso y Cierre de Sesión
+Inicio: abrir Chrome, ir a https://imo.crearpslglobal.com/, ingresar Usuario y Contraseña y pulsar el botón azul 'Ingresar'. Si aparece "Usuario o Contraseña Incorrecta", revisar Bloq Mayús; si persiste, el Gerente de Sede debe entrar a Configuración → Usuarios y colocar una contraseña temporal. Cierre: clic en el nombre de usuario (esquina superior derecha) → 'Cerrar Sesión', verificando el regreso a la pantalla de login. Por seguridad, la sesión debe cerrarse formalmente cada vez que se abandona el puesto de registro.
+
+### 13.3 Perfiles de Usuario Confirmados en el Manual Oficial
+El manual oficial define exactamente 4 perfiles (Capítulo 3), cada uno con menú limitado a sus funciones:
+1. **Operador de Mesa de Registro:** ve Mesa de Registro y Listado de Participantes. Busca por DNI, valida pago y marca asistencia.
+2. **Encargado de Caja / Contabilidad:** ve Mesa de Registro, Contabilidad, Cierre de Caja y Reportes de Pago. Recibe pagos, emite comprobantes y cuadra caja.
+3. **Coordinador de Evento:** ve Dashboard, Mesa de Registro, Participantes y Reportes de Asistencia. Supervisa afluencia de sala y gafetes.
+4. **Gerente de Sede / Administrador:** acceso total (Dashboard, Registro, Participantes, Contabilidad, Cierre de Caja, Reportes, Configuración y Usuarios). Abre/cierra eventos, audita, crea usuarios y configura sedes.
+Si a un colaborador le falta un módulo, debe pedir al Gerente de Sede que ajuste su perfil en Configuración → Usuarios.
+
+### 13.4 Dashboard Principal
+Panel central al iniciar sesión. Elementos: Barra Lateral Izquierda (acceso a Dashboard, Mesa Registro, Participantes, Contabilidad, Cierre de Caja, Reportes, Configuración), Contadores de Resumen (entrenadores, eventos activos, participantes registrados, sedes operando) en la parte superior, y Barra de Usuario/Sede en la esquina superior derecha. Indicadores en vivo durante días de evento: Inscritos Totales, Presentes en Sala, Pendientes de Llegada. Para volver al inicio: clic en 'Dashboard' o en el logotipo (esquina superior izquierda).
+
+### 13.5 Mesa de Registro — Procedimiento Estándar (3 Pasos)
+1. **Buscar al participante:** pedir DNI/Cédula/Pasaporte, escribirlo en la barra de búsqueda de Mesa de Registro y presionar Enter. Si no aparece, buscar solo por apellido.
+2. **Verificar estado de pago:** la fila muestra 'Completo' o 'Pendiente'. Si está pendiente, solicitar comprobante o derivar a caja. Si el participante insiste en que ya pagó, revisar 'ver detalles' por si el comprobante está en revisión de contabilidad.
+3. **Marcar en Sala y entregar gafete:** clic en 'Marcar en Sala' (el participante queda contabilizado como Sentado) y entregar gafete y material de bienvenida. Un marcado erróneo se corrige buscando de nuevo por DNI y desmarcando la casilla de asistencia.
+
+### 13.6 Mesa de Registro — Casos Especiales
+- **Walk-in (inscrito a última hora):** pedir comprobante → Participantes → Nuevo Participante → registrar nombres/DNI/teléfono/correo → Contabilidad → Registrar Pago → volver a Mesa de Registro y marcar asistencia con gafete provisional.
+- **Extranjero con pasaporte:** buscar por la serie alfanumérica del pasaporte tal como fue registrada; si no aparece, buscar por apellido materno o paterno.
+- **Traslado de sede autorizado:** el Gerente de Sede entra a Participantes, ubica al alumno y cambia el campo 'Sede Asignada' a la sede actual; al guardar, el alumno aparece en la Mesa de Registro local.
+
+### 13.7 Gestión de Participantes
+Registrar nuevo: Participantes → 'Nuevo Participante' → completar Tipo/Número de Documento, Nombres y Apellidos completos (tal como el documento, para certificados), Teléfono/WhatsApp, Correo, Sede y Entrenamiento → 'Guardar'. Editar: ubicar en la lista → ícono de lápiz / 'Editar' → corregir → 'Actualizar Datos'. Exportar: aplicar filtros de Sede y Evento → 'Exportar a Excel' (descarga .xlsx).
+
+### 13.8 Contabilidad — Formas de Pago y Registro
+Formas de pago admitidas: **Efectivo** (monto exacto, recibo numerado), **Transferencia Bancaria** (Número de Operación y Banco de origen, verificar acreditación antes de validar) y **Tarjeta / POS** (número de lote y voucher, grapar el voucher a la ficha). Procedimiento: Contabilidad → 'Registrar Pago' → buscar por DNI → tipo de pago (Total o Abono Parcial) → forma de pago → número de comprobante/operación → 'Guardar Pago' (el saldo se actualiza de inmediato en Mesa de Registro). Gastos menores (caja chica): Contabilidad → 'Registro de Gastos/Egresos' → concepto (Materiales de Sala, Refrigerios, Movilidad, Varios) → monto → número de boleta; el cierre nocturno resta automáticamente estos gastos.
+
+### 13.9 Cierre y Arqueo de Caja (3 Pasos)
+1. **Abrir el módulo:** clic en 'Cierre de Caja' → seleccionar fecha y sede. Si faltan pagos, revisar con el personal de mesa si quedó algo sin registrar en Contabilidad.
+2. **Contar el dinero físico:** comparar el 'Total Efectivo Esperado' (calculado por NODUS) contra el conteo real; escribir la cifra en 'Efectivo Real en Caja'. Si hay diferencia, documentar la justificación en 'Observaciones'.
+3. **Finalizar y bloquear:** botón 'Cerrar Caja Oficialmente' genera el acta y bloquea los registros del día. Solo el Gerente de Sede o el Administrador general pueden reabrir una caja cerrada.
+
+### 13.10 Reportes — El "Reporte de Entrenadores y Maestrías" (5 columnas)
+| Columna | Qué representa | Acción operativa |
+|---|---|---|
+| TIPO IMO / DNI | Rol (Capitán, Manager, Participante) o documento | Auditar por bloque o buscar a alguien |
+| PARTICIPANTES EN JUEGO | Personas activas en sala / nombre del participante | Verifica asistencia continua |
+| DECLARACIÓN | Meta de personas que el líder se comprometió a enrolar | Punto de comparación vs. resultado real |
+| TOTAL ENROLADOS | Personas nuevas registradas y pagadas | Métrica de cierre comercial (en 0 = sin cobros) |
+| DESERTOR FDS | Alumnos que abandonaron durante el fin de semana | Alerta de fuga, reportar a coordinación |
+Auditoría de brecha: **Enrolados** (pagaron) vs. **Sentados** (marcados físicamente en Mesa de Registro el viernes noche); la diferencia (No-Show) obliga a contactar a los ausentes y coordinar su ingreso en la cohorte inmediata.
+
+### 13.11 Equipos, Cohortes y Asignaciones
+Módulo 'Equipos y Maestrías': creación de cohortes (número de equipo, sede, fechas de inicio/graduación), asignación del entrenador oficial, y distribución de cada alumno nuevo a su cohorte para que sus asistencias/pagos sumen correctamente. Buena práctica del manual: asegurar que cada participante tenga cohorte asignada antes del viernes de registro, porque sin equipo asignado no aparece en el reporte de entrenadores de su sede.
+
+### 13.12 Configuración General
+Accesible principalmente a Gerentes de Sede y Administradores. Funciones: Gestión de Sedes (alta, direcciones, contacto), Usuarios y Contraseñas (creación, nombre de usuario, reseteo de claves), Programas y Precios (matrícula, promociones, calendario). Crear/modificar usuario: Configuración → Usuarios → 'Nuevo Usuario' → nombre completo, usuario, contraseña inicial, Rol de acceso (Mesa de Registro, Caja, Coordinación o Gerencia), Sede → 'Guardar Usuario'. Resetear contraseña: Configuración → Usuarios → ubicar al colaborador → 'Editar' → 'Nueva Contraseña' (clave temporal) → 'Guardar Cambios'.
+
+### 13.13 Guía de Operación de Fin de Semana
+- **Viernes:** 15:00-16:30 preparación técnica y login de prueba; 17:00-19:00 registro masivo en puerta (buscar DNI, verificar pago, 'Marcar en Sala', o derivar a caja); 19:30-20:30 cierre de puertas y conteo de gafetes sobrantes vs. lista de 'No Asistieron'; 21:00 Cierre de Caja oficial junto al Gerente.
+- **Sábado:** 08:30-09:30 reingreso controlado (solo con gafete validado); 10:30 pase de lista, el coordinador marca inasistencias para seguimiento; 20:00 auditar la columna Desertor FDS en el Reporte de Entrenadores.
+- **Domingo:** registrar nuevas matrículas del siguiente nivel en Contabilidad → Registrar Pago; al cierre, la coordinación consolida la lista final de graduados para emitir constancias.
+
+### 13.14 Errores Frecuentes en Pantalla
+"Usuario o contraseña incorrectos" → revisar Bloq Mayús; si persiste, el Gerente resetea la clave en Configuración → Usuarios. "Participante no encontrado en Mesa de Registro" → buscar por apellido en Participantes; si no existe, crear 'Nuevo Participante' y registrar el pago. "Pago pendiente pero con comprobante" → asentar el cobro en Contabilidad → Registrar Pago con el número de operación. "Diferencia en el Cierre de Caja" → contrastar recibos de mesa contra las transacciones de NODUS y corregir la clasificación antes del cierre final. "Participante duplicado" → identificar cuál registro tiene el pago asentado y pedir al Gerente que desactive el duplicado sin historial. "Página en blanco o cargando" → Ctrl+F5, o cambiar a la red móvil de respaldo.
+
+### 13.15 Preguntas Frecuentes (FAQ)
+No se recomienda compartir un mismo usuario entre dos operadores (rompe la trazabilidad de auditoría). Gafete extraviado: se busca en Mesa de Registro, se confirma asistencia previa y se entrega un reemplazo con observación en la ficha. Descarga de lista de asistentes: Participantes → filtrar Sede/Evento → 'Exportar a Excel'. Eliminar un pago erróneo: los operadores regulares no pueden hacerlo; debe solicitarse al Gerente de Sede o Administrador. 'Total Enrolados' en cero: significa que aún no hay cobros/matrículas formalmente enlazadas a ese equipo. NODUS es accesible desde celular/tablet vía navegador, aunque se recomienda laptop para el personal de mesa. Corte de Wi-Fi del local: usar la zona Wi-Fi compartida de un celular. Conteo en vivo de sentados: visible en el Dashboard o en la parte superior de Mesa de Registro.
+
+### 13.16 Glosario Operativo de NODUS
+Mesa de Registro: pantalla de puerta para buscar, verificar pago y marcar asistencia. Marcar en Sala: acción que confirma ingreso físico. Total Enrolados: personas con pago/matrícula oficial. Total Sentados: participantes físicamente en el salón. Declaración: meta numérica comprometida por un líder/equipo. Desertor FDS: quien se inscribió pero no volvió a sala durante el fin de semana. Arqueo de Caja: conteo físico de efectivo/vouchers contra lo reportado en NODUS. Sede: centro operativo del evento. Cohorte/Equipo: grupo de alumnos que cursan juntos (ej. Equipo 28 Lima). Comprobante/Operación: código bancario o número de recibo que respalda el ingreso. Gafete Oficial: identificación entregada solo tras validar el registro en NODUS.
+
+### 13.17 Listas de Cotejo por Puesto
+**Operador de Mesa de Registro:** usuario/contraseña funcionando; https://imo.crearpslglobal.com/ abierto en Chrome; búsqueda de prueba con un DNI; lista de respaldo en físico/Excel; saber a quién derivar los pagos pendientes; marcar en NODUS al entregar cada gafete; no dejar pasar a nadie 'Pendiente de Pago'; contar gafetes sobrantes al cierre y reportarlos a Coordinación.
+**Encargado de Caja y Cobranzas:** fondo de cambio inicial verificado; cada cobro registrado en Contabilidad con su comprobante; ningún recibo se entrega sin guardar el pago en NODUS antes; gastos de emergencia registrados con boleta física; Cierre de Caja abierto y conteo físico realizado al fin de turno; efectivo y reporte firmado entregados al Gerente de Sede.
+**Gerente de Sede / Supervisor:** todos los operadores con usuario activo; supervisión en vivo del Dashboard; revisión del Reporte de Entrenadores por desviaciones enrolados/sentados; auditoría y firma del Cierre de Caja del viernes; reportes de sábado y domingo consolidados.
+
+### 13.18 Flujos Operativos Paso a Paso
+**Flujo A — Registro de llegada:** (1) saludar y pedir DNI (si no lo trae, buscar por nombres/apellidos); (2) comprobar estado de pago — si está pagada, 'Marcar en Sala'; si debe saldo, derivar a caja, donde Contabilidad anota el voucher y confirma el pago; (3) entregar gafete rotulado con el check verde de asistencia visible.
+**Flujo B — Cuadre y cierre nocturno:** (1) cerrar la atención en mesa y abrir Cierre de Caja; (2) contar el dinero físico billete por billete, sumar vouchers de POS y escribir los montos reales (si no cuadra, revisar recibo por recibo); (3) firmar el acta digital con 'Cerrar Caja Oficialmente' y entregar el efectivo físico al Gerente de Sede.
+
+### 13.19 Ejercicios de Entrenamiento y Anexos
+Ejercicios recomendados antes de un evento real: búsqueda de un participante por DNI en menos de 10 segundos; registro completo de un participante nuevo; asentar un cobro en efectivo y verificar que el saldo cambie a 'Completo'; leer el Reporte de Entrenadores comparando 'Declaración' contra 'Total Enrolados'. Soporte: Gerencia de Sede (usuarios, claves, permisos, horario de oficina y fines de semana de evento) y Mesa de Ayuda de Sistemas (caídas del servidor o fallas de base de datos, guardia activa viernes-domingo). Control de versiones del manual: v1.0 (2025, primera versión de capacitación) → v2.0 Oficial (Septiembre 2026, edición integrada a Causa OS).
+
+### 13.20 Reconciliación con la Guía de KPIs para Coordinadores (sección 3.6)
+[DATO VERIFICADO vs. DATO NO CONFIRMADO — no se reconcilian por asunción, se documenta la diferencia entre las dos fuentes de Dirección]. El Manual Oficial de Usuario NODUS (Edición 2026, fuente de este capítulo 13) confirma como módulos reales de la plataforma: Dashboard, Mesa de Registro, Participantes, Contabilidad (Registrar Pago / Registro de Gastos), Cierre de Caja, Reportes (incluye el Reporte de Entrenadores y Maestrías), Equipos y Maestrías (cohortes), y Configuración (Sedes / Usuarios / Programas y Precios). La 'Guía de Medición de KPIs para Coordinadores en NODUS' (sección 3.6, aportada por Dirección) menciona además los módulos 'Seguimiento → Maestrías', 'Asignación de Llamadas', 'Configuración → Equipos y Maestrías', 'Certificados' y 'Participantes Rezagados'. De estos, **Equipos y Maestrías** y **Configuración** sí están confirmados por este manual oficial; **'Seguimiento → Maestrías', 'Asignación de Llamadas', 'Certificados' y 'Participantes Rezagados' NO aparecen mencionados en el Manual Oficial de Usuario NODUS Edición 2026** (ni en su índice de 18 capítulos ni en sus Anexos). Esto puede deberse a que (a) son pantallas reales que el manual oficial simplemente no documentó, (b) son nombres alternativos/coloquiales de módulos aquí sí listados, o (c) corresponden a una capa de seguimiento gestionada fuera de NODUS (p. ej. en Causa OS). Ningún dato de este documento resuelve cuál de las tres opciones es la correcta — DATO FALTANTE a confirmar directamente con Dirección o con una captura de pantalla de esos módulos dentro de NODUS.
 ---
 *Este documento constituye la hoja de ruta y manual de reingeniería de Crear Poder Sin Límites.*
 *Elaborado el 22 de Agosto de 2026. Clasificación: CONFIDENCIAL - EXCLUSIVO DIRECCIÓN REGIONAL.*
@@ -81606,566 +81785,419 @@ Para asegurar la transición exitosa de las sedes operativas internacionales hac
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bienvenido Alejandro | CREAR Poder Sin Límites</title>
-    
-    <!-- Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;800;900&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Tailwind Config for Custom Brand Colors -->
+    <script src="quotes.js"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
+                        sans: ["Montserrat", "Inter", "sans-serif"],
                     },
                     colors: {
                         crear: {
-                            black: '#0a0a0a',
-                            dark: '#171717',
-                            gray: '#262626',
-                            light: '#e5e5e5',
-                            accent: '#38bdf8',
-                            primary: '#2563eb',
+                            black: "#0a0a0a",
+                            dark: "#171717",
+                            gray: "#262626",
+                            light: "#e5e5e5",
+                            accent: "#FFB703",
+                            primary: "#2563eb",
                         }
                     },
                     animation: {
-                        'float': 'float 6s ease-in-out infinite',
-                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        "float": "float 6s ease-in-out infinite",
+                        "pulse-slow": "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
                     }
                 }
             }
-        }
+        };
     </script>
-
     <style>
-        body {
-            background-color: #0a0a0a;
-            color: #e5e5e5;
-            overflow-x: hidden;
-        }
-        .glass {
-            background: rgba(23, 23, 23, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .reveal {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
-        }
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        .text-gradient {
-            background: linear-gradient(to right, #38bdf8, #818cf8, #c084fc);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+        body { background-color: #0a0a0a; color: #e5e5e5; overflow-x: hidden; font-family: "Montserrat", sans-serif; }
+        .glass { background: rgba(23, 23, 23, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.5, 0, 0, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+        .text-gradient { background: linear-gradient(to right, #FFB703, #f59e0b, #fbbf24); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #0a0a0a; }
         ::-webkit-scrollbar-thumb { background: #262626; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #38bdf8; }
+        ::-webkit-scrollbar-thumb:hover { background: #FFB703; }
     </style>
 </head>
 <body class="antialiased selection:bg-crear-accent selection:text-white">
-
-    <!-- Welcome Overlay for Autoplay -->
+    <!-- Welcome Overlay -->
     <div id="welcomeOverlay" class="fixed inset-0 z-[100] bg-[#050505] flex flex-col items-center justify-center transition-opacity duration-1000">
-        <img src="logo_crear_blanco.png" alt="CREAR" class="h-28 md:h-40 mb-10 drop-shadow-[0_0_25px_rgba(251,191,36,0.5)] animate-pulse">
-        <button id="openLetterBtn" class="px-10 py-5 bg-[#f59e0b] text-black font-black text-xl rounded-full hover:scale-110 transition-transform shadow-[0_0_30px_rgba(251,191,36,0.6)] flex items-center gap-3 opacity-50 cursor-not-allowed pointer-events-none transition-all duration-500">
+        <img src="logo_crear_blanco.png" onerror="this.src='https://crearpodersinlimitesperu-cmd.github.io/cartas-crear/logo_crear_blanco.png'" alt="CREAR Poder Sin Límites" class="h-28 md:h-40 mb-10 drop-shadow-[0_0_25px_rgba(251,191,36,0.5)] animate-pulse">
+        <button id="openLetterBtn" class="px-10 py-5 bg-crear-accent text-black font-black text-xl rounded-full hover:scale-110 transition-transform shadow-[0_0_30px_rgba(251,191,36,0.6)] flex items-center gap-3 opacity-50 cursor-not-allowed pointer-events-none transition-all duration-500">
             <i class="fa-solid fa-spinner fa-spin"></i> PREPARANDO EXPERIENCIA...
         </button>
         <p class="mt-6 text-gray-500 text-sm font-light">Enciende el volumen para la experiencia completa</p>
     </div>
-    
-
-    <nav class="fixed w-full z-50 glass transition-all duration-300 shadow-lg" id="navbar">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
-                <div class="flex-shrink-0 flex items-center gap-2 cursor-pointer" onclick="window.scrollTo(0,0)">
-                    <img src="logo_crear_blanco.png" alt="CREAR" class="h-10 object-contain" />
-                </div>
-                <div class="flex space-x-8 items-center">
-                    <span class="text-crear-accent font-semibold tracking-wider text-sm uppercase">Radar Operativo</span>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <section class="relative min-h-screen flex items-center justify-center pt-20 pb-12 overflow-hidden">
-        <div class="absolute inset-0 z-0">
-            <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/40 via-crear-black to-crear-black"></div>
-            <div class="absolute top-20 right-10 w-64 h-64 bg-crear-accent opacity-20 rounded-full blur-[100px] animate-float"></div>
-        </div>
-
-        <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center mt-12">
-            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-sm font-semibold text-crear-accent mb-6 reveal shadow-[0_0_15px_rgba(56,189,248,0.3)]">
-                <i class="fa-solid fa-calendar-day"></i>
-                11 de Agosto, 2026
-            </div>
-            
-            <h1 class="text-5xl md:text-7xl font-black tracking-tight mb-6 reveal text-white" style="transition-delay: 100ms;">
-                ¡Bienvenido a Lima,<br/> <span class="text-gradient">Alejandro!</span>
-            </h1>
-            
-            <p class="mt-4 text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto mb-8 font-light reveal" style="transition-delay: 200ms;">
-                El sello final: MJ Gratitud para el Equipo 28 💥
-            </p>
-
-            <div class="inline-block px-8 py-3 rounded-full border border-[#f59e0b]/50 bg-[#f59e0b]/10 mb-8 reveal shadow-[0_0_20px_rgba(251,191,36,0.2)] hover:scale-105 transition-transform" style="transition-delay: 250ms;">
-                <p class="text-[#f59e0b] font-black text-xl md:text-2xl italic tracking-wider">"¡Merecimiento Absoluto!"</p>
-            </div>
-
-            <!-- CUENTA REGRESIVA PREMIUM -->
-            <div class="reveal mb-12 flex flex-col md:flex-row gap-8 justify-center items-center" style="transition-delay: 275ms;">
-                <!-- Cuenta Regresiva Viaje -->
-                <div class="glass p-6 rounded-2xl border border-[#f59e0b]/20 shadow-[0_0_20px_rgba(251,191,36,0.2)] w-full max-w-sm">
-                    <h3 class="text-[#f59e0b] text-sm uppercase tracking-widest font-bold mb-4">✈️ Tiempo para tu Viaje</h3>
-                    <div id="countdown-flight" class="grid grid-cols-4 gap-2 text-center">
-                        <div><div class="text-3xl font-black text-white" id="fly-d">00</div><div class="text-[10px] text-gray-500 uppercase">Días</div></div>
-                        <div><div class="text-3xl font-black text-white" id="fly-h">00</div><div class="text-[10px] text-gray-500 uppercase">Hrs</div></div>
-                        <div><div class="text-3xl font-black text-white" id="fly-m">00</div><div class="text-[10px] text-gray-500 uppercase">Min</div></div>
-                        <div><div class="text-3xl font-black text-white" id="fly-s">00</div><div class="text-[10px] text-gray-500 uppercase">Seg</div></div>
+    <div id="content">
+        <!-- Navbar -->
+        <nav class="fixed w-full z-50 glass transition-all duration-300 shadow-lg" id="navbar">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-20">
+                    <div class="flex-shrink-0 flex items-center gap-2 cursor-pointer" onclick="window.scrollTo(0,0)">
+                        <img src="logo_crear_blanco.png" onerror="this.src='https://crearpodersinlimitesperu-cmd.github.io/cartas-crear/logo_crear_blanco.png'" alt="CREAR" class="h-10 object-contain" />
                     </div>
-                </div>
-                
-                <!-- Cuenta Regresiva Entrenamiento -->
-                <div class="glass p-6 rounded-2xl border border-[#f59e0b]/20 shadow-[0_0_20px_rgba(251,191,36,0.2)] w-full max-w-sm">
-                    <h3 class="text-[#f59e0b] text-sm uppercase tracking-widest font-bold mb-4">🔥 Inicio del C1 E30</h3>
-                    <div id="countdown-training" class="grid grid-cols-4 gap-2 text-center">
-                        <div><div class="text-3xl font-black text-white" id="trn-d">00</div><div class="text-[10px] text-gray-500 uppercase">Días</div></div>
-                        <div><div class="text-3xl font-black text-white" id="trn-h">00</div><div class="text-[10px] text-gray-500 uppercase">Hrs</div></div>
-                        <div><div class="text-3xl font-black text-white" id="trn-m">00</div><div class="text-[10px] text-gray-500 uppercase">Min</div></div>
-                        <div><div class="text-3xl font-black text-white" id="trn-s">00</div><div class="text-[10px] text-gray-500 uppercase">Seg</div></div>
+                    <div class="flex space-x-8 items-center">
+                        <span class="text-crear-accent font-semibold tracking-wider text-sm uppercase">Radar Operativo &middot; Lima</span>
                     </div>
                 </div>
             </div>
-            <div class="reveal mb-12 flex justify-center" style="transition-delay: 280ms;">
-                <a href="carta_invitacion_migraciones.html?nombre=Alejandronando+Aragon&doc=DNI+17.856.159&fechas=14+al+16+de+Agosto+2026&rol=Líder+Capítulo+Uno" target="_blank" class="glass border border-crear-accent/50 hover:bg-crear-accent/20 text-white px-6 py-3 rounded-full shadow-[0_0_20px_rgba(56,189,248,0.2)] transition-transform hover:scale-105 flex items-center gap-3 text-sm font-semibold tracking-wide uppercase">
-                    <i class="fa-solid fa-passport text-crear-accent"></i>
-                    Ver Carta para Migraciones
-                </a>
+        </nav>
+        <!-- Hero Section -->
+        <section class="relative min-h-screen flex items-center justify-center pt-20 pb-12 overflow-hidden">
+            <div class="absolute inset-0 z-0">
+                <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-yellow-900/40 via-crear-black to-crear-black"></div>
+                <div class="absolute top-20 right-10 w-64 h-64 bg-crear-accent opacity-20 rounded-full blur-[100px] animate-float"></div>
             </div>
-            
-            <p id="timezone-indicator" class="text-xs text-gray-500 mb-8 tracking-widest uppercase reveal" style="transition-delay: 285ms;">Calculando huso horario local...</p>
-
-            <div class="glass p-8 rounded-2xl text-left reveal border border-gray-800 hover:border-crear-accent transition-colors duration-500 shadow-2xl" style="transition-delay: 300ms;">
-                <p class="text-gray-300 text-lg leading-relaxed mb-4">
-                    <strong>Querido Alejandro,</strong><br/><br/>
-                    Qué alegría recibirte en Lima para la Maestría de Gratitud. Liderar esta sala es sostener el espacio para que los participantes se apropien de su transformación.
+            <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center mt-12">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-sm font-semibold text-crear-accent mb-6 reveal shadow-[0_0_15px_rgba(255,183,3,0.3)]">
+                    <i class="fa-solid fa-calendar-day"></i> 2 de septiembre de 2026
+                </div>
+                <h1 class="text-5xl md:text-7xl font-black tracking-tight mb-6 reveal text-white" style="transition-delay: 100ms;">
+                    ¡Bienvenido a casa,<br/> <span class="text-gradient">Alejandro!</span>
+                </h1>
+                <p class="mt-4 text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto mb-8 font-light reveal" style="transition-delay: 200ms;">
+                    Tu radar para la Maestría en Gratitud (Equipo 28) 💥
                 </p>
-                <p class="text-gray-300 text-lg leading-relaxed">
-                    Para que viajes ligero de equipaje y con la mente puesta únicamente en el equipo, aquí tienes tu logística operativa:
-                </p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Itinerary Sections -->
-    <section class="py-16 bg-crear-black relative z-10">
-        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-            
-            <!-- 1. Misión -->
-            <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-crear-accent transition-all duration-300 hover:shadow-[0_0_30px_rgba(56,189,248,0.15)] hover:-translate-y-1">
-                <div class="flex items-center gap-4 mb-6">
-                    <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-crear-accent text-2xl group-hover:scale-110 transition-transform shadow-inner">
-                        <i class="fa-solid fa-crosshairs"></i>
+                <!-- Dual Countdowns -->
+                <div class="reveal mb-12 flex flex-col md:flex-row gap-8 justify-center items-center" style="transition-delay: 275ms;">
+                    <div class="glass p-6 rounded-2xl border border-crear-accent/20 shadow-[0_0_20px_rgba(255,183,3,0.2)] w-full max-w-sm">
+                        <h3 class="text-crear-accent text-sm uppercase tracking-widest font-bold mb-4">✈️ Tiempo para tu Viaje</h3>
+                        <div id="countdown-flight" class="grid grid-cols-4 gap-2 text-center">
+                            <div><div class="text-3xl font-black text-white" id="fly-d">00</div><div class="text-[10px] text-gray-500 uppercase">Días</div></div>
+                            <div><div class="text-3xl font-black text-white" id="fly-h">00</div><div class="text-[10px] text-gray-500 uppercase">Hrs</div></div>
+                            <div><div class="text-3xl font-black text-white" id="fly-m">00</div><div class="text-[10px] text-gray-500 uppercase">Min</div></div>
+                            <div><div class="text-3xl font-black text-white" id="fly-s">00</div><div class="text-[10px] text-gray-500 uppercase">Seg</div></div>
+                        </div>
                     </div>
-                    <h2 class="text-2xl font-bold text-white tracking-tight">1. Tu Misión (MJ Gratitud - E28)</h2>
-                </div>
-                <div class="space-y-4 text-gray-300 ml-2 md:ml-18">
-                    <p class="text-lg"><strong>Fechas:</strong> Viernes 04 al Domingo 06 de Septiembre, 2026.</p>
-                    <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden">
-                        <div class="absolute top-0 left-0 w-1 h-full bg-crear-accent"></div>
-                        <h4 class="font-black text-white mb-3 text-crear-accent tracking-wide uppercase text-sm">Arranque (Viernes 14)</h4>
-                        <div class="space-y-2">
-                            <ul><li class="flex items-start gap-3"><i class="fa-regular fa-clock text-crear-accent mt-1"></i><span><strong>16:30 PM:</strong> Grounding.</span></li><li class="flex items-start gap-3"><i class="fa-regular fa-clock text-crear-accent mt-1"></i><span><strong>18:00 PM:</strong> Inicio oficial.</span></li></ul>
+                    <div class="glass p-6 rounded-2xl border border-crear-accent/20 shadow-[0_0_20px_rgba(255,183,3,0.2)] w-full max-w-sm">
+                        <h3 class="text-crear-accent text-sm uppercase tracking-widest font-bold mb-4">🔥 Inicio de Maestría en Gratitud</h3>
+                        <div id="countdown-training" class="grid grid-cols-4 gap-2 text-center">
+                            <div><div class="text-3xl font-black text-white" id="trn-d">00</div><div class="text-[10px] text-gray-500 uppercase">Días</div></div>
+                            <div><div class="text-3xl font-black text-white" id="trn-h">00</div><div class="text-[10px] text-gray-500 uppercase">Hrs</div></div>
+                            <div><div class="text-3xl font-black text-white" id="trn-m">00</div><div class="text-[10px] text-gray-500 uppercase">Min</div></div>
+                            <div><div class="text-3xl font-black text-white" id="trn-s">00</div><div class="text-[10px] text-gray-500 uppercase">Seg</div></div>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- 2. Vuelos -->
-            <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-purple-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(168,85,247,0.15)] hover:-translate-y-1">
-                <div class="flex items-center gap-4 mb-6">
-                    <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-purple-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
-                        <i class="fa-solid fa-plane"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold text-white tracking-tight">2. Vuelos Confirmados</h2>
-                </div>
-                <div class="space-y-4 text-gray-300 ml-2 md:ml-18">
-                    <div class="flex flex-wrap gap-3 items-center">
-                        <span class="text-gray-400 text-sm">Reservas:</span> 
-                        <span class="bg-gray-800 border border-gray-700 px-3 py-1 rounded-md font-mono text-white text-sm">AS58FE</span>
-                        <span class="text-gray-500 text-xs ml-2">(Boleto a nombre de: Alejandronando Aragon)</span>
-                    </div>
-                    
-                    <div class="grid md:grid-cols-2 gap-5 mt-5">
-                        <!-- Llegada -->
-                        <div class="bg-gradient-to-br from-gray-800/40 to-gray-900/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden">
-                            <div class="absolute top-0 left-0 w-full h-1 bg-purple-500"></div>
-                            <h4 class="font-black text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-plane-arrival text-purple-400"></i> Llegada (Jueves 13)</h4>
-                            <div class="space-y-2 text-sm">
-                                <p class="flex justify-between border-b border-gray-700/50 pb-2"><span class="text-gray-400">Vuelo</span> <span class="font-medium text-white">LATAM LA 2383 (Desde Quito)</span></p>
-                                <p class="flex justify-between border-b border-gray-700/50 pb-2 pt-1"><span class="text-gray-400">Salida</span> <span class="font-medium text-white">12:15 PM</span></p>
-                                <p class="flex justify-between pt-1"><span class="text-gray-400">Llegada a Lima</span> <span class="font-medium text-green-400">14:30 PM</span></p>
-                            </div>
-                        </div>
-                        
-                        <!-- Salida -->
-                        <div class="bg-gradient-to-br from-gray-800/40 to-gray-900/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden">
-                            <div class="absolute top-0 left-0 w-full h-1 bg-red-500"></div>
-                            <h4 class="font-black text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-plane-departure text-red-400"></i> Salida (Lunes 17 - Madrugada)</h4>
-                            <div class="space-y-2 text-sm">
-                                <p class="flex justify-between border-b border-gray-700/50 pb-2"><span class="text-gray-400">Vuelo</span> <span class="font-medium text-white">LATAM LA 2465 (A Buenos Aires)</span></p>
-                                <p class="flex justify-between border-b border-gray-700/50 pb-2 pt-1"><span class="text-gray-400">Salida de Lima</span> <span class="font-medium text-red-400">01:15 AM (Lunes)</span></p>
-                                <p class="flex justify-between pt-1"><span class="text-gray-400">Llegada</span> <span class="font-medium text-white">07:40 AM (Lunes)</span></p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-red-500/10 border border-red-500/30 p-4 rounded-xl mt-4 flex items-start gap-4">
-                        <i class="fa-solid fa-triangle-exclamation text-red-500 text-xl mt-1 animate-pulse-slow"></i>
-                        <div>
-                            <h4 class="font-bold text-red-400 text-sm tracking-wide mb-1">OJO AL DATO (OPERACIÓN DE SALIDA)</h4>
-                            <p class="text-sm text-gray-300">Tu vuelo a Buenos Aires despega el lunes 17 de agosto a la 01:15 AM. Esto significa que saliendo de la graduación del C1 el domingo por la noche, el transporte te trasladará directo al aeropuerto <strong>(pasaremos por ti a las 22:15 PM)</strong>. No requieres hotel para la noche del domingo.</p>
-                        </div>
+                <div class="reveal mb-12 flex justify-center" style="transition-delay: 280ms;"><a href="carta_invitacion_migraciones.html?nombre=ERNESTO%20ALEJANDRO%20DIAZ%20PABON&doc=PASAPORTE%20COLOMBIANA&fechas=Del%203%20al%207%20de%20septiembre%20de%202026&rol=Invitado+Especial+Internacional" target="_blank" class="glass border border-crear-accent/50 hover:bg-crear-accent/20 text-white px-6 py-3 rounded-full shadow-[0_0_20px_rgba(255,183,3,0.2)] transition-transform hover:scale-105 flex items-center gap-3 text-sm font-semibold tracking-wide uppercase"><i class="fa-solid fa-passport text-crear-accent"></i> Ver Carta para Migraciones</a></div>
+                <p id="timezone-indicator" class="text-xs text-gray-500 mb-8 tracking-widest uppercase reveal" style="transition-delay: 285ms;">Calculando huso horario local...</p>
+                <!-- Welcome Note -->
+                <div class="glass p-8 rounded-2xl text-left reveal border border-gray-800 hover:border-crear-accent transition-colors duration-500 shadow-2xl" style="transition-delay: 300ms;">
+                    <div class="text-gray-300 text-lg leading-relaxed space-y-4">
+                        <p><strong>Querido/a Alejandro,</strong></p>
+                        <p>Querido Alejandro, ¡qué alegría recibirte! Estamos completamente listos para expandir el juego y conectar desde la gratitud profunda con este equipo.</p><p>Nos da una tranquilidad enorme saber que tu impecable presencia y contención guiarán la sala en este fin de semana tan determinante. Para que viajes ligero de equipaje y con la mente puesta únicamente en el equipo, aquí tienes tu radar logístico exacto:</p>
                     </div>
                 </div>
             </div>
-
-            <!-- 3. Movilidad y Sedes -->
-            <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-blue-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] hover:-translate-y-1">
-                <div class="flex items-center gap-4 mb-6">
-                    <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-blue-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
-                        <i class="fa-solid fa-car"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold text-white tracking-tight">3. Movilidad y Sede</h2>
-                </div>
-                <div class="space-y-6 text-gray-300 ml-2 md:ml-18">
-                    <p class="text-lg"><strong>Tus traslados:</strong> Nosotros nos encargamos de moverte:</p>
-                    
-                    <div class="space-y-4">
-                        <div class="flex gap-4 items-start bg-gray-800/30 p-4 rounded-xl border border-gray-700/30">
-                            <div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 flex-shrink-0"><i class="fa-solid fa-suitcase"></i></div>
-                            <div>
-                                <div class="font-bold text-blue-400 mb-1">Jueves 13 (Llegada)</div>
-                                <div class="text-sm text-gray-300">Nuestro equipo de transporte te escribirá antes de que aterrices para coordinar tu recojo exacto, contemplando tus tiempos de migración y espera de maletas. De ahí, te llevaremos directo al hotel a descansar y aclimatarte.</div>
-                            </div>
+        </section>
+        <!-- Sections Container -->
+        <section class="py-16 bg-crear-black relative z-10">
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+                <!-- 1. Misión -->
+                <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-crear-accent transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,183,3,0.15)] hover:-translate-y-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-crear-accent text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                            <i class="fa-solid fa-fire"></i>
                         </div>
-                        <div class="flex gap-4 items-start bg-gray-800/30 p-4 rounded-xl border border-gray-700/30">
-                            <div class="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center text-red-400 flex-shrink-0"><i class="fa-solid fa-plane-departure"></i></div>
-                            <div>
-                                <div class="font-bold text-red-400 mb-1">Domingo 16 (Salida)</div>
-                                <div class="text-sm text-gray-300">Pasaremos por ti a la sede de la graduación a las <strong>22:15 PM</strong> en punto para trasladarte directamente al aeropuerto para tu vuelo internacional.</div>
-                            </div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">1. Tu Misión (Maestría en Gratitud - Equipo 28)</h2>
+                    </div>
+                    <div class="space-y-4 text-gray-300 ml-2 md:ml-18">
+                        <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden mb-4"><div class="absolute top-0 left-0 w-1 h-full bg-crear-accent"></div><h4 class="font-black text-white mb-3 text-crear-accent tracking-wide uppercase text-sm">Viernes - Arranque Oficial</h4><div class="space-y-2"><p class="flex items-start gap-3"><i class="fa-regular fa-clock text-crear-accent mt-1"></i> <span><strong>16:30 PM:</strong> Grounding Entrenadores con Coordinación (Directo en salón).</span></p><p class="flex items-start gap-3"><i class="fa-regular fa-clock text-crear-accent mt-1"></i> <span><strong>17:00 PM:</strong> Apertura de Mesa de Registro para Participantes.</span></p><p class="flex items-start gap-3"><i class="fa-regular fa-clock text-crear-accent mt-1"></i> <span><strong>18:00 PM:</strong> Apertura de puertas e inicio de sala.</span></p></div></div>
+                    </div>
+                </div>
+                <!-- 2. Vuelos -->
+                <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-purple-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(168,85,247,0.15)] hover:-translate-y-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-purple-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                            <i class="fa-solid fa-plane"></i>
                         </div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">2. Vuelos Confirmados</h2>
                     </div>
-
-                    <div class="bg-gradient-to-r from-blue-900/20 to-transparent p-5 rounded-xl border-l-4 border-blue-500 mt-6">
-                        <h4 class="font-black text-white mb-2 flex items-center gap-2"><i class="fa-solid fa-hotel text-blue-400"></i> Hotel y Sede: <a href="https://maps.app.goo.gl/C7K8aFz6s9aYwT6q6" target="_blank" class="text-blue-400 hover:text-blue-300 underline decoration-blue-400/30 underline-offset-2 transition-colors">Hotel Jose Antonio Deluxe</a></h4>
-                        <p class="text-sm text-gray-300">Miraflores. Duermes y entrenas en el mismo edificio para tu total comodidad (hospedaje reservado desde el jueves 13 hasta el domingo 16 de agosto - incluye Late Checkout).</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 4. Clima y Reglas -->
-            <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-amber-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(245,158,11,0.15)] hover:-translate-y-1">
-                <div class="flex items-center gap-4 mb-6">
-                    <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-amber-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
-                        <i class="fa-solid fa-cloud"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold text-white tracking-tight">4. Clima y Reglas de Oro</h2>
-                </div>
-                <div class="grid md:grid-cols-2 gap-5 text-gray-300 ml-2 md:ml-18">
-                    <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/50">
-                        <h4 class="font-bold text-amber-400 mb-3 flex items-center gap-2"><i class="fa-solid fa-temperature-empty"></i> El Clima (Lima)</h4>
-                        <p class="text-sm">Lima se encuentra en pleno invierno. Los días son fríos, grises y muy húmedos. <strong>Trae ropa cómoda y abrigadora</strong> para los días de sala y tus salidas.</p>
-                    </div>
-                    <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/50">
-                        <h4 class="font-bold text-green-400 mb-3 flex items-center gap-2"><i class="fa-solid fa-leaf"></i> Cuidado de la Sede</h4>
-                        <ul class="text-sm space-y-2">
-                            <li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-green-500 mt-1 text-xs"></i> <span><strong>11:00 PM:</strong> Hora límite e innegociable para desocupar el salón los 3 días de entrenamiento.</span></li>
-                            <li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-green-500 mt-1 text-xs"></i> <span>Cero comida adentro.</span></li>
-                            <li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-green-500 mt-1 text-xs"></i> <span>Manejo prudente de los decibeles en los impactos para la óptima convivencia con el hotel.</span></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 5. Honorarios -->
-            <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-emerald-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(16,185,129,0.15)] hover:-translate-y-1">
-                <div class="flex items-center gap-4 mb-6">
-                    <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-emerald-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
-                        <i class="fa-solid fa-file-invoice-dollar"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold text-white tracking-tight">5. Tus Honorarios</h2>
-                </div>
-                <div class="text-gray-300 ml-2 md:ml-18 bg-gray-800/30 p-5 rounded-xl border border-gray-700/50">
-                    <p class="text-lg">Mantenemos el acuerdo estándar.</p>
-                    <p class="mt-3 text-sm text-gray-400">Si tus datos bancarios de siempre (Banco, Cuenta, SWIFT) siguen siendo los mismos, el proceso administrativo se iniciará de forma automática al finalizar el fin de semana. Si requieres actualizar alguna información, por favor envíasela directamente a José Sánchez.</p>
-                </div>
-            </div>
-
-            <!-- 6. Escuadrón -->
-            <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-pink-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(236,72,153,0.15)] hover:-translate-y-1">
-                <div class="flex items-center gap-4 mb-6">
-                    <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-pink-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
-                        <i class="fa-solid fa-users"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold text-white tracking-tight">6. Tu Escuadrón de Soporte</h2>
-                </div>
-                <div class="text-gray-300 ml-2 md:ml-18">
-                    <div class="grid md:grid-cols-3 gap-4">
-                        <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/30 hover:border-pink-500/50 transition-colors">
-                            <h4 class="font-bold text-pink-400 mb-2 text-xs uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> Capitán</h4>
-                            <p class="text-white font-medium text-lg">Alejandronando Lopez Lopez</p>
-                            <p class="text-gray-400 text-sm mt-1"><a href="https://wa.me/51981237577" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 981 237 577</a></p>
+                    <div class="space-y-4 text-gray-300 ml-2 md:ml-18">
+                        <div class="flex flex-wrap gap-3 items-center">
+                            <span class="text-gray-400 text-sm">Reserva:</span>
+                            <span class="bg-gray-800 border border-gray-700 px-3 py-1 rounded-md font-mono text-white text-sm">AS58FE</span>
+                            <span class="text-gray-500 text-xs ml-2">(Boleto a nombre de: <strong>ERNESTO ALEJANDRO DIAZ PABON</strong>)</span>
                         </div>
-                        
-                        <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/30 hover:border-pink-500/50 transition-colors">
-                            <h4 class="font-bold text-crear-accent mb-2 text-xs uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-bolt"></i> Escuderas Principales</h4>
-                            <div class="space-y-3">
-                                <div>
-                                    <p class="text-white font-medium text-sm">Diana Moscoso</p>
-                                    <p class="text-gray-400 text-xs mt-0.5"><a href="https://wa.me/51912379744" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 912 379 744</a></p>
+                        <div class="grid md:grid-cols-2 gap-5 mt-5">
+                            <!-- Llegada -->
+                            <div class="bg-gradient-to-br from-gray-800/40 to-gray-900/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden">
+                                <div class="absolute top-0 left-0 w-full h-1 bg-purple-500"></div>
+                                <h4 class="font-black text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-plane-arrival text-purple-400"></i> Llegada (03/09/2026)</h4>
+                                <div class="space-y-2 text-sm">
+                                    <p class="flex justify-between border-b border-gray-700/50 pb-2"><span class="text-gray-400">Vuelo</span> <span class="font-medium text-white">Avianca AV51</span></p>
+                                    <p class="flex justify-between pt-1"><span class="text-gray-400">Llegada a Lima</span> <span class="font-medium text-green-400">20:50 PM</span></p>
+                                    <div class="pt-2"><a href="https://www.flightradar24.com/data/flights/av51" target="_blank" class="text-xs text-purple-400 hover:underline">Ver en FlightRadar &rarr;</a></div>
                                 </div>
-                                <div class="w-full h-px bg-gray-700/50"></div>
-                                <div>
-                                    <p class="text-white font-medium text-sm">Joyce Marín</p>
-                                    <p class="text-gray-400 text-xs mt-0.5"><a href="https://wa.me/51933599903" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 933 599 903</a></p>
+                            </div>
+                            <!-- Salida -->
+                            <div class="bg-gradient-to-br from-gray-800/40 to-gray-900/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden">
+                                <div class="absolute top-0 left-0 w-full h-1 bg-red-500"></div>
+                                <h4 class="font-black text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-plane-departure text-red-400"></i> Salida (07/09/2026)</h4>
+                                <div class="space-y-2 text-sm">
+                                    <p class="flex justify-between border-b border-gray-700/50 pb-2"><span class="text-gray-400">Vuelo</span> <span class="font-medium text-white">Avianca AV50</span></p>
+                                    <p class="flex justify-between pt-1"><span class="text-gray-400">Salida de Lima</span> <span class="font-medium text-red-400">11:45 AM</span></p>
+                                    <div class="pt-2"><a href="https://www.flightradar24.com/data/flights/av50" target="_blank" class="text-xs text-red-400 hover:underline">Ver en FlightRadar &rarr;</a></div>
                                 </div>
                             </div>
                         </div>
-
-                        <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/30 hover:border-pink-500/50 transition-colors">
-                            <h4 class="font-bold text-purple-400 mb-2 text-xs uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-briefcase"></i> Soporte Gerencial</h4>
-                            <p class="text-white font-medium text-lg">José Sánchez</p>
-                            <p class="text-gray-400 text-sm mt-1"><a href="https://wa.me/51919563284" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 919 563 284</a></p>
+                        <div class="mt-4 bg-gradient-to-r from-amber-500/10 to-transparent p-4 rounded-xl border border-amber-500/30 flex items-center gap-3"><i class="fa-regular fa-clock text-crear-accent text-xl"></i><div><p class="text-crear-accent font-bold text-sm">Recojo en Lobby para Salida: 08:15 AM</p><p class="text-xs text-gray-400">Calculado 3.5 horas antes de tu vuelo (11:45 AM) para margen de tráfico y abordaje.</p></div></div>
+                    </div>
+                </div>
+                <!-- 3. Movilidad y Sede -->
+                <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-blue-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] hover:-translate-y-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-blue-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                            <i class="fa-solid fa-car"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">3. Movilidad y Sede</h2>
+                    </div>
+                    <div class="space-y-6 text-gray-300 ml-2 md:ml-18">
+                        <p class="text-lg"><strong>Tus traslados:</strong> Nuestro equipo te contactará para coordinar tu recojo exacto en el aeropuerto Jorge Chávez.</p>
+                        <div class="space-y-4"><div class="flex gap-4 items-start bg-gray-800/30 p-4 rounded-xl border border-gray-700/30"><div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 flex-shrink-0"><i class="fa-solid fa-suitcase"></i></div><div><div class="font-bold text-blue-400 mb-1">Traslado Oficial</div><div class="text-sm text-gray-300">Nuestro equipo te contactará para coordinar tu recojo exacto en el aeropuerto Jorge Chávez.</div></div></div></div>
+                        <div class="mt-4 bg-gradient-to-r from-blue-500/10 to-transparent p-4 rounded-xl border border-blue-500/30 flex items-center gap-3"><i class="fa-solid fa-car text-blue-400 text-xl"></i><div><p class="text-blue-400 font-bold text-sm">Coordinación con Conductor</p><p class="text-xs text-gray-400">El conductor asignado te escribirá por WhatsApp 1 hora antes de tu arribo/salida para darte la placa del auto y coordinar el punto de encuentro exacto.</p></div></div>
+                        <div class="bg-gradient-to-r from-blue-900/20 to-transparent p-5 rounded-xl border-l-4 border-blue-500 mt-6">
+                            <h4 class="font-black text-white mb-2 flex items-center gap-2"><i class="fa-solid fa-hotel text-blue-400"></i> Hotel y Salón: Hotel Jose Antonio Deluxe (Miraflores)</h4>
+                            <p class="text-sm text-gray-300">Calle Bellavista 133, Miraflores, Lima, Perú</p>
+                            <a href="https://maps.google.com/?q=Hotel+Jose+Antonio+Deluxe+Miraflores+Lima" target="_blank" class="inline-flex items-center gap-2 mt-3 text-xs text-blue-400 hover:underline"><i class="fa-solid fa-map-location-dot"></i> Ver ubicación en Google Maps &rarr;</a>
                         </div>
                     </div>
                 </div>
-            </div>
-
-
-            <!-- Closing -->
-            <div class="text-center pt-16 pb-12 reveal">
-                <h3 class="text-2xl md:text-3xl font-black text-white mb-2 italic" id="random-quote"></h3>
-                <p class="text-lg text-crear-accent mb-10 font-semibold" id="random-author"></p>
-                <div class="inline-block glass px-10 py-5 rounded-2xl border border-crear-accent/40 shadow-[0_0_30px_rgba(56,189,248,0.25)] hover:scale-105 transition-transform duration-300">
-                    <p class="font-bold text-white text-lg">Un abrazo,</p>
-                    <p class="text-crear-accent font-black tracking-widest uppercase text-xl mt-1">El Equipo de CREAR PSL LIMA</p>
+                <!-- 4. Clima y Reglas -->
+                <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-amber-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(245,158,11,0.15)] hover:-translate-y-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-amber-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                            <i class="fa-solid fa-cloud"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">4. Clima y Reglas de Oro</h2>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-5 text-gray-300 ml-2 md:ml-18">
+                        <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/50">
+                            <h4 class="font-bold text-amber-400 mb-3 flex items-center gap-2"><i class="fa-solid fa-temperature-empty"></i> El Clima (Lima)</h4>
+                            <p class="text-2xl font-black text-white mb-2">15°C - 18°C</p>
+                            <p class="text-sm font-semibold text-amber-300/90 mb-1">Invierno Limeño</p>
+                            <p class="text-xs text-gray-400 mb-4">El clima está frío y húmedo (invierno), trae buen abrigo.</p>
+                            <div class="space-y-1"><p class="text-xs text-gray-400 flex items-start gap-2 mb-1.5"><i class="fa-solid fa-circle-check text-crear-accent text-[10px] mt-1"></i> Traer casaca o abrigo abrigador para traslados nocturnos.</p><p class="text-xs text-gray-400 flex items-start gap-2 mb-1.5"><i class="fa-solid fa-circle-check text-crear-accent text-[10px] mt-1"></i> Ropa cómoda para sala con clima controlado.</p><p class="text-xs text-gray-400 flex items-start gap-2 mb-1.5"><i class="fa-solid fa-circle-check text-crear-accent text-[10px] mt-1"></i> Calzado cómodo.</p></div>
+                        </div>
+                        <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/50">
+                            <h4 class="font-bold text-red-400 mb-3 flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> Reglas de Oro y Convivencia</h4>
+                            <ul class="text-sm space-y-2.5">
+                                <li class="flex items-start gap-2.5"><i class="fa-solid fa-circle-check text-green-500 mt-1 text-xs flex-shrink-0"></i> <span><strong>Hora Límite Innegociable:</strong> 11:00 PM es la hora límite innegociable de cierre.</span></li><li class="flex items-start gap-2.5"><i class="fa-solid fa-circle-check text-green-500 mt-1 text-xs flex-shrink-0"></i> <span><strong>Alimentación:</strong> Cero comida en salón. Solo hidratación permitida.</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!-- 5. Honorarios -->
+                <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-emerald-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(168,85,247,0.15)] hover:-translate-y-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-emerald-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                            <i class="fa-solid fa-file-invoice-dollar"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">5. Tus Honorarios</h2>
+                    </div>
+                    <div class="text-gray-300 ml-2 md:ml-18 bg-gray-800/30 p-5 rounded-xl border border-gray-700/50">
+                        <p class="text-lg">Mantenemos el acuerdo estándar de honorarios.</p>
+                        <p class="mt-3 text-sm text-gray-400">Si tus datos bancarios de siempre (Banco, Cuenta, SWIFT) siguen siendo los mismos, el proceso administrativo se iniciará de forma automática tras concluir los entrenamientos.</p>
+                        <div class="mt-5 grid md:grid-cols-2 gap-3 bg-gray-900/60 p-4 rounded-xl border border-gray-700/40 text-xs"><div><span class="text-gray-500 uppercase tracking-widest text-[10px]">Razón Social</span><p class="text-white font-semibold mt-0.5">CREAR PODER SIN LIMITES S.A.C.</p></div><div><span class="text-gray-500 uppercase tracking-widest text-[10px]">RUC / NIF</span><p class="text-white font-mono font-semibold mt-0.5">20608512491</p></div><div class="md:col-span-2"><span class="text-gray-500 uppercase tracking-widest text-[10px]">Dirección Fiscal</span><p class="text-gray-300 mt-0.5">Calle Bellavista 133, Miraflores, Lima, Perú</p></div></div>
+                        <div class="mt-5"><a href="https://wa.me/51919563284?text=Hola%20Jos%C3%A9%2C%20confirmo%20mis%20datos%20bancarios%20para%20honorarios%20de%20Alejandro%20D%C3%ADaz%20E28." target="_blank" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-green-500/10 border border-green-500/30 text-green-400 text-xs font-bold hover:bg-green-500/20 transition-colors"><i class="fa-brands fa-whatsapp text-green-400 text-base"></i> Enviar datos bancarios por WhatsApp</a></div>
+                    </div>
+                </div>
+                <!-- 6. Escuadrón -->
+                <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-pink-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(236,72,153,0.15)] hover:-translate-y-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-pink-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">6. Tu Escuadrón de Soporte</h2>
+                    </div>
+                    <div class="text-gray-300 ml-2 md:ml-18">
+                        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/30 hover:border-crear-accent/50 transition-colors"><h4 class="font-bold text-crear-accent mb-2 text-xs uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-bolt"></i> Capitana</h4><p class="text-white font-medium text-lg">Giovanna Palomino Marcos</p><p class="text-gray-400 text-sm mt-1"><a href="https://wa.me/51922042189" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 922 042 189</a></p></div><div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/30 hover:border-crear-accent/50 transition-colors"><h4 class="font-bold text-purple-400 mb-2 text-xs uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-briefcase"></i> Gerente de Sede</h4><p class="text-white font-medium text-lg">José Sánchez</p><p class="text-gray-400 text-sm mt-1"><a href="https://wa.me/51919563284" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 919 563 284</a></p></div><div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/30 hover:border-crear-accent/50 transition-colors"><h4 class="font-bold text-pink-400 mb-2 text-xs uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> Coordinación MJ</h4><p class="text-white font-medium text-lg">Linid Valencia</p><p class="text-gray-400 text-sm mt-1"><a href="https://wa.me/51912379686" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 912 379 686</a></p></div><div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/30 hover:border-crear-accent/50 transition-colors"><h4 class="font-bold text-pink-400 mb-2 text-xs uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> Coordinación MJ</h4><p class="text-white font-medium text-lg">Leyla Pasquel</p><p class="text-gray-400 text-sm mt-1"><a href="https://wa.me/51919502385" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 919 502 385</a></p></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Closing -->
+                <div class="text-center pt-16 pb-12 reveal">
+                    <h3 class="text-2xl md:text-3xl font-black text-white mb-2 italic" id="random-quote"></h3>
+                    <p class="text-lg text-crear-accent mb-10 font-semibold" id="random-author"></p>
+                    <h3 class="text-2xl md:text-3xl font-black text-white mb-4">
+                        Párate en tu poder absoluto, Alejandro.<br>
+                        <span class="text-crear-accent">Ven a detonar la sala del Equipo 28.</span> Nos vemos muy pronto.
+                    </h3>
+                    <div class="inline-block glass px-10 py-5 rounded-2xl border border-crear-accent/40 shadow-[0_0_30px_rgba(255,183,3,0.25)] hover:scale-105 transition-transform duration-300">
+                        <p class="font-bold text-white text-lg">Un abrazo,</p>
+                        <p class="text-crear-accent font-black tracking-widest uppercase text-xl mt-1">El Equipo de CREAR PSL LIMA</p>
+                    </div>
                 </div>
             </div>
-
-        </div>
-    </section>
-
-    <!-- FOOTER -->
-    <footer class="bg-[#050505] py-16 border-t border-gray-900 relative z-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div class="flex items-center justify-center gap-3 mb-10">
-                <img src="logo_crear_blanco.png" alt="CREAR" class="h-40 md:h-56 object-contain drop-shadow-[0_0_20px_rgba(251,191,36,0.6)] hover:drop-shadow-[0_0_35px_rgba(251,191,36,1)] hover:scale-105 transition-all duration-500" />
+        </section>
+        <!-- FOOTER -->
+        <footer class="bg-[#050505] py-16 border-t border-gray-900 relative z-10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <div class="flex items-center justify-center gap-3 mb-10">
+                    <img src="logo_crear_blanco.png" onerror="this.src='https://crearpodersinlimitesperu-cmd.github.io/cartas-crear/logo_crear_blanco.png'" alt="CREAR" class="h-40 md:h-56 object-contain drop-shadow-[0_0_20px_rgba(251,191,36,0.6)] hover:drop-shadow-[0_0_35px_rgba(251,191,36,1)] hover:scale-105 transition-all duration-500" />
+                </div>
+                <div class="text-gray-600 text-sm font-medium tracking-wide">
+                    &copy; 2026 CREAR Poder Sin Límites Sede Perú.<br/> Comunicación oficial vía Google Chat.
+                </div>
             </div>
-            <div class="text-gray-600 text-sm font-medium tracking-wide">
-                &copy; 2026 CREAR Poder Sin Límites Sede Perú.<br/> Comunicación oficial vía Google Chat.
-            </div>
-        </div>
-    </footer>
-
-    <!-- LOGIC SCRIPT -->
+        </footer>
+    </div>
+    <!-- Floating Music Button -->
+    <button id="musicToggleBtn" class="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full glass border border-gray-600 flex items-center justify-center text-white shadow-[0_0_15px_rgba(255,183,3,0.3)] hover:scale-110 transition-transform duration-300">
+        <i class="fa-solid fa-music"></i>
+    </button>
+    <div id="ytplayer" class="absolute -left-[9999px] top-0 w-[300px] h-[300px] opacity-0 pointer-events-none"></div>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Navbar background change on scroll
-            const navbar = document.getElementById('navbar');
-            window.addEventListener('scroll', () => {
-                if (window.scrollY > 20) {
-                    navbar.classList.add('bg-crear-black/95', 'shadow-lg');
-                    navbar.classList.remove('glass', 'shadow-lg');
+        var tag = document.createElement("script");
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName("script")[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        var player;
+        var isPlaying = false;
+        var playerReady = false;
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player("ytplayer", {
+                height: "300", width: "300", videoId: "FboYUBlvaL4",
+                playerVars: { "autoplay": 0, "controls": 0, "loop": 1, "playlist": "FboYUBlvaL4", "playsinline": 1, "rel": 0 },
+                events: { "onReady": onPlayerReady, "onStateChange": onPlayerStateChange }
+            });
+        }
+        function onPlayerStateChange(event) {
+            if (event.data === YT.PlayerState.PLAYING) {
+                isPlaying = true;
+                var icon = document.querySelector("#musicToggleBtn i");
+                if(icon) { icon.classList.remove("fa-music"); icon.classList.add("fa-pause", "text-crear-accent", "fa-beat-fade"); }
+            } else if (event.data === YT.PlayerState.PAUSED) {
+                isPlaying = false;
+                var icon = document.querySelector("#musicToggleBtn i");
+                if(icon) { icon.classList.remove("fa-pause", "text-crear-accent", "fa-beat-fade"); icon.classList.add("fa-music"); }
+            }
+        }
+        function toggleMusic() {
+            if (!playerReady || !player) return;
+            if (isPlaying) player.pauseVideo(); else player.playVideo();
+        }
+        function onPlayerReady(event) {
+            playerReady = true;
+            var openBtn = document.getElementById("openLetterBtn");
+            if(openBtn) {
+                openBtn.innerHTML = '<i class="fa-solid fa-envelope-open-text"></i> ABRIR CARTA';
+                openBtn.classList.remove("opacity-50", "cursor-not-allowed", "pointer-events-none");
+                openBtn.classList.add("animate-pulse");
+            }
+        }
+        setTimeout(function(){
+            var openBtn = document.getElementById("openLetterBtn");
+            if(openBtn && !playerReady) {
+                openBtn.innerHTML = '<i class="fa-solid fa-envelope-open-text"></i> ABRIR CARTA';
+                openBtn.classList.remove("opacity-50", "cursor-not-allowed", "pointer-events-none");
+                openBtn.classList.add("animate-pulse");
+            }
+        }, 2500);
+        document.addEventListener("DOMContentLoaded", function() {
+            var overlay = document.getElementById("welcomeOverlay");
+            var openBtn = document.getElementById("openLetterBtn");
+            var musicBtn = document.getElementById("musicToggleBtn");
+            if(openBtn && overlay) {
+                openBtn.addEventListener("click", function() {
+                    overlay.style.opacity = "0";
+                    setTimeout(function(){ overlay.remove(); }, 1000);
+                    if (playerReady && player && typeof player.playVideo === "function") {
+                        player.playVideo();
+                    }
+                });
+            }
+            if(musicBtn) {
+                musicBtn.addEventListener("click", function(e) {
+                    e.stopPropagation();
+                    toggleMusic();
+                });
+            }
+            var flightTimestamp = new Date("2026-09-04T01:50:00.000Z").getTime();
+            var trainingTimestamp = new Date("2026-09-16T23:00:00.000Z").getTime();
+            var timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            var indicator = document.getElementById("timezone-indicator");
+            if(indicator) indicator.innerText = "Mostrando cuenta regresiva detectando tu zona local: " + timeZone;
+            function updateCountdowns() {
+                var now = new Date().getTime();
+                var distanceTrn = trainingTimestamp - now;
+                if (distanceTrn > 0) {
+                    document.getElementById("trn-d").innerText = String(Math.floor(distanceTrn / (1000 * 60 * 60 * 24))).padStart(2, "0");
+                    document.getElementById("trn-h").innerText = String(Math.floor((distanceTrn % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, "0");
+                    document.getElementById("trn-m").innerText = String(Math.floor((distanceTrn % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
+                    document.getElementById("trn-s").innerText = String(Math.floor((distanceTrn % (1000 * 60)) / 1000)).padStart(2, "0");
                 } else {
-                    navbar.classList.remove('bg-crear-black/95', 'shadow-lg');
-                    navbar.classList.add('glass', 'shadow-lg');
+                    document.getElementById("countdown-training").innerHTML = "<div class='col-span-4 text-white font-bold tracking-widest uppercase'>¡El entrenamiento ha comenzado!</div>";
+                }
+                var distanceFly = flightTimestamp - now;
+                if (distanceFly > 0) {
+                    document.getElementById("fly-d").innerText = String(Math.floor(distanceFly / (1000 * 60 * 60 * 24))).padStart(2, "0");
+                    document.getElementById("fly-h").innerText = String(Math.floor((distanceFly % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, "0");
+                    document.getElementById("fly-m").innerText = String(Math.floor((distanceFly % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
+                    document.getElementById("fly-s").innerText = String(Math.floor((distanceFly % (1000 * 60)) / 1000)).padStart(2, "0");
+                } else {
+                    document.getElementById("countdown-flight").innerHTML = "<div class='col-span-4 text-white font-bold tracking-widest uppercase'>¡Buen viaje!</div>";
+                }
+            }
+            setInterval(updateCountdowns, 1000);
+            updateCountdowns();
+            var navbar = document.getElementById("navbar");
+            window.addEventListener("scroll", function() {
+                if (window.scrollY > 20) {
+                    navbar.classList.add("bg-crear-black/95", "shadow-lg");
+                    navbar.classList.remove("glass");
+                } else {
+                    navbar.classList.remove("bg-crear-black/95");
+                    navbar.classList.add("glass");
                 }
             });
-
-            // Intersection Observer for Scroll Reveals
-            const revealElements = document.querySelectorAll('.reveal');
-            const revealOptions = {
-                threshold: 0.1,
-                rootMargin: "0px 0px -50px 0px"
-            };
-
-            const revealOnScroll = new IntersectionObserver(function(entries, observer) {
-                entries.forEach(entry => {
+            var revealElements = document.querySelectorAll(".reveal");
+            var revealObserver = new IntersectionObserver(function(entries, observer) {
+                entries.forEach(function(entry) {
                     if (entry.isIntersecting) {
-                        entry.target.classList.add('active');
+                        entry.target.classList.add("active");
                         observer.unobserve(entry.target);
                     }
                 });
-            }, revealOptions);
-
-            revealElements.forEach(el => {
-                revealOnScroll.observe(el);
-            });
-            
-            // Trigger initial check
-            setTimeout(() => {
-                revealElements.forEach(el => {
-                    const rect = el.getBoundingClientRect();
+            }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
+            revealElements.forEach(function(el) { revealObserver.observe(el); });
+            setTimeout(function() {
+                revealElements.forEach(function(el) {
+                    var rect = el.getBoundingClientRect();
                     if (rect.top < window.innerHeight && rect.width > 0 && rect.height > 0) {
-                        el.classList.add('active');
+                        el.classList.add("active");
                     }
                 });
             }, 100);
+            var quoteEl = document.getElementById("random-quote");
+            var authorEl = document.getElementById("random-author");
+            if (quoteEl && authorEl) {
+                var quotesList = (typeof transformationQuotes !== "undefined" && Array.isArray(transformationQuotes) && transformationQuotes.length > 0)
+                    ? transformationQuotes
+                    : [
+                        { text: "Tú y yo poseemos dentro de nosotros mismos en cada momento de nuestras vidas, bajo todas las circunstancias, el poder de transformar la calidad de nuestras vidas.", author: "Werner Erhard" },
+                        { text: "El poder de la auto-transformación está en tus manos.", author: "Tony Robbins" },
+                        { text: "Cuando tomas una elección, cambias el futuro.", author: "Joe Dispenza" },
+                        { text: "La transformación no es un evento futuro. Es una actividad actual.", author: "Jillian Michaels" }
+                    ];
+                var rq = quotesList[Math.floor(Math.random() * quotesList.length)];
+                quoteEl.innerText = "\"" + (rq.text || rq.quote) + "\"";
+                authorEl.innerText = "— " + (rq.author || rq.autor);
+            }
         });
     </script>
-    <!-- Floating Music Button -->
-    <script src="quotes.js"></script>
-    <button id="musicToggleBtn" class="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full glass border border-gray-600 flex items-center justify-center text-white shadow-[0_0_15px_rgba(56,189,248,0.3)] hover:scale-110 transition-transform duration-300">
-        <i class="fa-solid fa-music"></i>
-    </button>
-    
-
-    <div id="ytplayer" class="absolute -left-[9999px] top-0 w-[300px] h-[300px] opacity-0 pointer-events-none"></div>
-      <script>
-          var tag = document.createElement('script');
-          tag.src = "https://www.youtube.com/iframe_api";
-          var firstScriptTag = document.getElementsByTagName('script')[0];
-          firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-  
-          var player;
-          var isPlaying = false;
-          var playerReady = false;
-  
-          function onYouTubeIframeAPIReady() {
-              player = new YT.Player('ytplayer', {
-                  height: '300',
-                  width: '300',
-                  videoId: 'FboYUBlvaL4',
-                  playerVars: {
-                      'autoplay': 0,
-                      'controls': 0,
-                      'loop': 1,
-                      'playlist': 'FboYUBlvaL4',
-                      'playsinline': 1,
-                      'rel': 0
-                  },
-                  events: {
-                      'onReady': onPlayerReady,
-                      'onStateChange': onPlayerStateChange
-                  }
-              });
-          }
-
-          function onPlayerStateChange(event) {
-              if (event.data === YT.PlayerState.PLAYING) {
-                  isPlaying = true;
-                  const icon = document.querySelector('#musicToggleBtn i');
-                  if(icon) {
-                      icon.classList.remove('fa-music');
-                      icon.classList.add('fa-pause', 'text-crear-accent', 'fa-beat-fade');
-                  }
-              } else if (event.data === YT.PlayerState.PAUSED) {
-                  isPlaying = false;
-                  const icon = document.querySelector('#musicToggleBtn i');
-                  if(icon) {
-                      icon.classList.remove('fa-pause', 'text-crear-accent', 'fa-beat-fade');
-                      icon.classList.add('fa-music');
-                  }
-              }
-          }
-  
-          function toggleMusic() {
-              if (!playerReady || !player) return;
-              if (isPlaying) {
-                  player.pauseVideo();
-              } else {
-                  player.playVideo();
-              }
-          }
-  
-          function onPlayerReady(event) {
-              playerReady = true;
-              const openBtn = document.getElementById('openLetterBtn');
-              if(openBtn) {
-                  openBtn.innerHTML = '<i class="fa-solid fa-envelope-open-text"></i> ABRIR CARTA';
-                  openBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
-                  openBtn.classList.add('animate-pulse');
-              }
-          }
-  
-          document.addEventListener('DOMContentLoaded', () => {
-              const overlay = document.getElementById('welcomeOverlay');
-              const openBtn = document.getElementById('openLetterBtn');
-              const musicBtn = document.getElementById('musicToggleBtn');
-  
-              if(openBtn && overlay) {
-                  openBtn.addEventListener('click', () => {
-                      overlay.style.opacity = '0';
-                      setTimeout(() => overlay.remove(), 1000);
-                      if (playerReady) {
-                          player.playVideo();
-                      }
-                  });
-              }
-  
-              if(musicBtn) {
-                  musicBtn.addEventListener('click', (e) => {
-                      e.stopPropagation();
-                      toggleMusic();
-                  });
-              }
-              
-              // Cuenta Regresiva (Logica Huso Horario)
-              const trainingDateLima = new Date("2026-09-04T16:30:00-05:00").getTime();
-              const flightDateLima = new Date("2026-09-03T20:50:00-05:00").getTime();
-              const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-              const indicator = document.getElementById('timezone-indicator');
-              if(indicator) indicator.innerText = `Mostrando cuenta regresiva detectando tu zona local: ${timeZone}`;
-              
-              function updateCountdowns() {
-                  const now = new Date().getTime();
-                  let distanceTrn = trainingDateLima - now;
-                  if (distanceTrn > 0) {
-                      document.getElementById("trn-d").innerText = String(Math.floor(distanceTrn / (1000 * 60 * 60 * 24))).padStart(2, '0');
-                      document.getElementById("trn-h").innerText = String(Math.floor((distanceTrn % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
-                      document.getElementById("trn-m").innerText = String(Math.floor((distanceTrn % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
-                      document.getElementById("trn-s").innerText = String(Math.floor((distanceTrn % (1000 * 60)) / 1000)).padStart(2, '0');
-                  } else {
-                      document.getElementById("countdown-training").innerHTML = "<div class='col-span-4 text-white font-bold tracking-widest uppercase'>¡El entrenamiento ha comenzado!</div>";
-                  }
-                  
-                  let distanceFly = flightDateLima - now;
-                  if (distanceFly > 0) {
-                      document.getElementById("fly-d").innerText = String(Math.floor(distanceFly / (1000 * 60 * 60 * 24))).padStart(2, '0');
-                      document.getElementById("fly-h").innerText = String(Math.floor((distanceFly % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
-                      document.getElementById("fly-m").innerText = String(Math.floor((distanceFly % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
-                      document.getElementById("fly-s").innerText = String(Math.floor((distanceFly % (1000 * 60)) / 1000)).padStart(2, '0');
-                  } else {
-                      document.getElementById("countdown-flight").innerHTML = "<div class='col-span-4 text-white font-bold tracking-widest uppercase'>¡Buen viaje!</div>";
-                  }
-              }
-              setInterval(updateCountdowns, 1000);
-              updateCountdowns();
-          });
-      </script>
 </body>
-
-
-
-
-
+</html>
 ```
 
 ---
@@ -82179,566 +82211,1699 @@ Para asegurar la transición exitosa de las sedes operativas internacionales hac
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bienvenido Andrés | CREAR Poder Sin Límites</title>
-    
-    <!-- Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;800;900&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Tailwind Config for Custom Brand Colors -->
+    <script src="quotes.js"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
+                        sans: ["Montserrat", "Inter", "sans-serif"],
                     },
                     colors: {
                         crear: {
-                            black: '#0a0a0a',
-                            dark: '#171717',
-                            gray: '#262626',
-                            light: '#e5e5e5',
-                            accent: '#38bdf8',
-                            primary: '#2563eb',
+                            black: "#0a0a0a",
+                            dark: "#171717",
+                            gray: "#262626",
+                            light: "#e5e5e5",
+                            accent: "#FFB703",
+                            primary: "#2563eb",
                         }
                     },
                     animation: {
-                        'float': 'float 6s ease-in-out infinite',
-                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        "float": "float 6s ease-in-out infinite",
+                        "pulse-slow": "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
                     }
                 }
             }
-        }
+        };
     </script>
-
     <style>
-        body {
-            background-color: #0a0a0a;
-            color: #e5e5e5;
-            overflow-x: hidden;
-        }
-        .glass {
-            background: rgba(23, 23, 23, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .reveal {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
-        }
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        .text-gradient {
-            background: linear-gradient(to right, #38bdf8, #818cf8, #c084fc);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+        body { background-color: #0a0a0a; color: #e5e5e5; overflow-x: hidden; font-family: "Montserrat", sans-serif; }
+        .glass { background: rgba(23, 23, 23, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.5, 0, 0, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+        .text-gradient { background: linear-gradient(to right, #FFB703, #f59e0b, #fbbf24); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #0a0a0a; }
         ::-webkit-scrollbar-thumb { background: #262626; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #38bdf8; }
+        ::-webkit-scrollbar-thumb:hover { background: #FFB703; }
     </style>
 </head>
 <body class="antialiased selection:bg-crear-accent selection:text-white">
-
-    <!-- Welcome Overlay for Autoplay -->
+    <!-- Welcome Overlay -->
     <div id="welcomeOverlay" class="fixed inset-0 z-[100] bg-[#050505] flex flex-col items-center justify-center transition-opacity duration-1000">
-        <img src="logo_crear_blanco.png" alt="CREAR" class="h-28 md:h-40 mb-10 drop-shadow-[0_0_25px_rgba(251,191,36,0.5)] animate-pulse">
-        <button id="openLetterBtn" class="px-10 py-5 bg-[#f59e0b] text-black font-black text-xl rounded-full hover:scale-110 transition-transform shadow-[0_0_30px_rgba(251,191,36,0.6)] flex items-center gap-3 opacity-50 cursor-not-allowed pointer-events-none transition-all duration-500">
+        <img src="logo_crear_blanco.png" onerror="this.src='https://crearpodersinlimitesperu-cmd.github.io/cartas-crear/logo_crear_blanco.png'" alt="CREAR Poder Sin Límites" class="h-28 md:h-40 mb-10 drop-shadow-[0_0_25px_rgba(251,191,36,0.5)] animate-pulse">
+        <button id="openLetterBtn" class="px-10 py-5 bg-crear-accent text-black font-black text-xl rounded-full hover:scale-110 transition-transform shadow-[0_0_30px_rgba(251,191,36,0.6)] flex items-center gap-3 opacity-50 cursor-not-allowed pointer-events-none transition-all duration-500">
             <i class="fa-solid fa-spinner fa-spin"></i> PREPARANDO EXPERIENCIA...
         </button>
         <p class="mt-6 text-gray-500 text-sm font-light">Enciende el volumen para la experiencia completa</p>
     </div>
-    
-
-    <nav class="fixed w-full z-50 glass transition-all duration-300 shadow-lg" id="navbar">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
-                <div class="flex-shrink-0 flex items-center gap-2 cursor-pointer" onclick="window.scrollTo(0,0)">
-                    <img src="logo_crear_blanco.png" alt="CREAR" class="h-10 object-contain" />
-                </div>
-                <div class="flex space-x-8 items-center">
-                    <span class="text-crear-accent font-semibold tracking-wider text-sm uppercase">Radar Operativo</span>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <section class="relative min-h-screen flex items-center justify-center pt-20 pb-12 overflow-hidden">
-        <div class="absolute inset-0 z-0">
-            <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/40 via-crear-black to-crear-black"></div>
-            <div class="absolute top-20 right-10 w-64 h-64 bg-crear-accent opacity-20 rounded-full blur-[100px] animate-float"></div>
-        </div>
-
-        <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center mt-12">
-            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-sm font-semibold text-crear-accent mb-6 reveal shadow-[0_0_15px_rgba(56,189,248,0.3)]">
-                <i class="fa-solid fa-calendar-day"></i>
-                11 de Agosto, 2026
-            </div>
-            
-            <h1 class="text-5xl md:text-7xl font-black tracking-tight mb-6 reveal text-white" style="transition-delay: 100ms;">
-                ¡Bienvenido a Lima,<br/> <span class="text-gradient">Andrés!</span>
-            </h1>
-            
-            <p class="mt-4 text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto mb-8 font-light reveal" style="transition-delay: 200ms;">
-                El arranque de la MJ Creación para el Equipo 30 💥
-            </p>
-
-            <div class="inline-block px-8 py-3 rounded-full border border-[#f59e0b]/50 bg-[#f59e0b]/10 mb-8 reveal shadow-[0_0_20px_rgba(251,191,36,0.2)] hover:scale-105 transition-transform" style="transition-delay: 250ms;">
-                <p class="text-[#f59e0b] font-black text-xl md:text-2xl italic tracking-wider">"¡A Crear en Excelencia!"</p>
-            </div>
-
-            <!-- CUENTA REGRESIVA PREMIUM -->
-            <div class="reveal mb-12 flex flex-col md:flex-row gap-8 justify-center items-center" style="transition-delay: 275ms;">
-                <!-- Cuenta Regresiva Viaje -->
-                <div class="glass p-6 rounded-2xl border border-[#f59e0b]/20 shadow-[0_0_20px_rgba(251,191,36,0.2)] w-full max-w-sm">
-                    <h3 class="text-[#f59e0b] text-sm uppercase tracking-widest font-bold mb-4">✈️ Tiempo para tu Viaje</h3>
-                    <div id="countdown-flight" class="grid grid-cols-4 gap-2 text-center">
-                        <div><div class="text-3xl font-black text-white" id="fly-d">00</div><div class="text-[10px] text-gray-500 uppercase">Días</div></div>
-                        <div><div class="text-3xl font-black text-white" id="fly-h">00</div><div class="text-[10px] text-gray-500 uppercase">Hrs</div></div>
-                        <div><div class="text-3xl font-black text-white" id="fly-m">00</div><div class="text-[10px] text-gray-500 uppercase">Min</div></div>
-                        <div><div class="text-3xl font-black text-white" id="fly-s">00</div><div class="text-[10px] text-gray-500 uppercase">Seg</div></div>
+    <div id="content">
+        <!-- Navbar -->
+        <nav class="fixed w-full z-50 glass transition-all duration-300 shadow-lg" id="navbar">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-20">
+                    <div class="flex-shrink-0 flex items-center gap-2 cursor-pointer" onclick="window.scrollTo(0,0)">
+                        <img src="logo_crear_blanco.png" onerror="this.src='https://crearpodersinlimitesperu-cmd.github.io/cartas-crear/logo_crear_blanco.png'" alt="CREAR" class="h-10 object-contain" />
                     </div>
-                </div>
-                
-                <!-- Cuenta Regresiva Entrenamiento -->
-                <div class="glass p-6 rounded-2xl border border-[#f59e0b]/20 shadow-[0_0_20px_rgba(251,191,36,0.2)] w-full max-w-sm">
-                    <h3 class="text-[#f59e0b] text-sm uppercase tracking-widest font-bold mb-4">🔥 Inicio del C1 E30</h3>
-                    <div id="countdown-training" class="grid grid-cols-4 gap-2 text-center">
-                        <div><div class="text-3xl font-black text-white" id="trn-d">00</div><div class="text-[10px] text-gray-500 uppercase">Días</div></div>
-                        <div><div class="text-3xl font-black text-white" id="trn-h">00</div><div class="text-[10px] text-gray-500 uppercase">Hrs</div></div>
-                        <div><div class="text-3xl font-black text-white" id="trn-m">00</div><div class="text-[10px] text-gray-500 uppercase">Min</div></div>
-                        <div><div class="text-3xl font-black text-white" id="trn-s">00</div><div class="text-[10px] text-gray-500 uppercase">Seg</div></div>
+                    <div class="flex space-x-8 items-center">
+                        <span class="text-crear-accent font-semibold tracking-wider text-sm uppercase">Radar Operativo &middot; Lima</span>
                     </div>
                 </div>
             </div>
-            <div class="reveal mb-12 flex justify-center" style="transition-delay: 280ms;">
-                <a href="carta_invitacion_migraciones.html?nombre=Andrésnando+Aragon&doc=DNI+17.856.159&fechas=14+al+16+de+Agosto+2026&rol=Líder+Capítulo+Uno" target="_blank" class="glass border border-crear-accent/50 hover:bg-crear-accent/20 text-white px-6 py-3 rounded-full shadow-[0_0_20px_rgba(56,189,248,0.2)] transition-transform hover:scale-105 flex items-center gap-3 text-sm font-semibold tracking-wide uppercase">
-                    <i class="fa-solid fa-passport text-crear-accent"></i>
-                    Ver Carta para Migraciones
-                </a>
+        </nav>
+        <!-- Hero Section -->
+        <section class="relative min-h-screen flex items-center justify-center pt-20 pb-12 overflow-hidden">
+            <div class="absolute inset-0 z-0">
+                <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-yellow-900/40 via-crear-black to-crear-black"></div>
+                <div class="absolute top-20 right-10 w-64 h-64 bg-crear-accent opacity-20 rounded-full blur-[100px] animate-float"></div>
             </div>
-            
-            <p id="timezone-indicator" class="text-xs text-gray-500 mb-8 tracking-widest uppercase reveal" style="transition-delay: 285ms;">Calculando huso horario local...</p>
-
-            <div class="glass p-8 rounded-2xl text-left reveal border border-gray-800 hover:border-crear-accent transition-colors duration-500 shadow-2xl" style="transition-delay: 300ms;">
-                <p class="text-gray-300 text-lg leading-relaxed mb-4">
-                    <strong>Querido Andrés,</strong><br/><br/>
-                    Qué alegría tan inmensa recibirte en Lima para este proceso de Creación. Tu liderazgo será vital para exigir resultados al equipo.
+            <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center mt-12">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-sm font-semibold text-crear-accent mb-6 reveal shadow-[0_0_15px_rgba(255,183,3,0.3)]">
+                    <i class="fa-solid fa-calendar-day"></i> 2 de septiembre de 2026
+                </div>
+                <h1 class="text-5xl md:text-7xl font-black tracking-tight mb-6 reveal text-white" style="transition-delay: 100ms;">
+                    ¡Bienvenido a casa,<br/> <span class="text-gradient">Andrés!</span>
+                </h1>
+                <p class="mt-4 text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto mb-8 font-light reveal" style="transition-delay: 200ms;">
+                    Tu radar para la Maestría en Creación (Equipo 30) 💥
                 </p>
-                <p class="text-gray-300 text-lg leading-relaxed">
-                    Para que viajes ligero de equipaje y con la mente puesta únicamente en el equipo, aquí tienes tu logística operativa:
-                </p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Itinerary Sections -->
-    <section class="py-16 bg-crear-black relative z-10">
-        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-            
-            <!-- 1. Misión -->
-            <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-crear-accent transition-all duration-300 hover:shadow-[0_0_30px_rgba(56,189,248,0.15)] hover:-translate-y-1">
-                <div class="flex items-center gap-4 mb-6">
-                    <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-crear-accent text-2xl group-hover:scale-110 transition-transform shadow-inner">
-                        <i class="fa-solid fa-crosshairs"></i>
+                <!-- Dual Countdowns -->
+                <div class="reveal mb-12 flex flex-col md:flex-row gap-8 justify-center items-center" style="transition-delay: 275ms;">
+                    <div class="glass p-6 rounded-2xl border border-crear-accent/20 shadow-[0_0_20px_rgba(255,183,3,0.2)] w-full max-w-sm">
+                        <h3 class="text-crear-accent text-sm uppercase tracking-widest font-bold mb-4">✈️ Tiempo para tu Viaje</h3>
+                        <div id="countdown-flight" class="grid grid-cols-4 gap-2 text-center">
+                            <div><div class="text-3xl font-black text-white" id="fly-d">00</div><div class="text-[10px] text-gray-500 uppercase">Días</div></div>
+                            <div><div class="text-3xl font-black text-white" id="fly-h">00</div><div class="text-[10px] text-gray-500 uppercase">Hrs</div></div>
+                            <div><div class="text-3xl font-black text-white" id="fly-m">00</div><div class="text-[10px] text-gray-500 uppercase">Min</div></div>
+                            <div><div class="text-3xl font-black text-white" id="fly-s">00</div><div class="text-[10px] text-gray-500 uppercase">Seg</div></div>
+                        </div>
                     </div>
-                    <h2 class="text-2xl font-bold text-white tracking-tight">1. Tu Misión (MJ Creación - E30)</h2>
-                </div>
-                <div class="space-y-4 text-gray-300 ml-2 md:ml-18">
-                    <p class="text-lg"><strong>Fechas:</strong> Viernes 04 al Domingo 06 de Septiembre, 2026.</p>
-                    <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden">
-                        <div class="absolute top-0 left-0 w-1 h-full bg-crear-accent"></div>
-                        <h4 class="font-black text-white mb-3 text-crear-accent tracking-wide uppercase text-sm">Arranque (Viernes 14)</h4>
-                        <div class="space-y-2">
-                            <ul><li class="flex items-start gap-3"><i class="fa-regular fa-clock text-crear-accent mt-1"></i><span><strong>16:30 PM:</strong> Grounding Entrenadores.</span></li><li class="flex items-start gap-3"><i class="fa-regular fa-clock text-crear-accent mt-1"></i><span><strong>18:00 PM:</strong> Inicio oficial.</span></li></ul>
+                    <div class="glass p-6 rounded-2xl border border-crear-accent/20 shadow-[0_0_20px_rgba(255,183,3,0.2)] w-full max-w-sm">
+                        <h3 class="text-crear-accent text-sm uppercase tracking-widest font-bold mb-4">🔥 Inicio de Maestría en Creación</h3>
+                        <div id="countdown-training" class="grid grid-cols-4 gap-2 text-center">
+                            <div><div class="text-3xl font-black text-white" id="trn-d">00</div><div class="text-[10px] text-gray-500 uppercase">Días</div></div>
+                            <div><div class="text-3xl font-black text-white" id="trn-h">00</div><div class="text-[10px] text-gray-500 uppercase">Hrs</div></div>
+                            <div><div class="text-3xl font-black text-white" id="trn-m">00</div><div class="text-[10px] text-gray-500 uppercase">Min</div></div>
+                            <div><div class="text-3xl font-black text-white" id="trn-s">00</div><div class="text-[10px] text-gray-500 uppercase">Seg</div></div>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- 2. Vuelos -->
-            <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-purple-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(168,85,247,0.15)] hover:-translate-y-1">
-                <div class="flex items-center gap-4 mb-6">
-                    <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-purple-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
-                        <i class="fa-solid fa-plane"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold text-white tracking-tight">2. Vuelos Confirmados</h2>
-                </div>
-                <div class="space-y-4 text-gray-300 ml-2 md:ml-18">
-                    <div class="flex flex-wrap gap-3 items-center">
-                        <span class="text-gray-400 text-sm">Reservas:</span> 
-                        <span class="bg-gray-800 border border-gray-700 px-3 py-1 rounded-md font-mono text-white text-sm">DJBJJD</span>
-                        <span class="text-gray-500 text-xs ml-2">(Boleto a nombre de: Andrésnando Aragon)</span>
-                    </div>
-                    
-                    <div class="grid md:grid-cols-2 gap-5 mt-5">
-                        <!-- Llegada -->
-                        <div class="bg-gradient-to-br from-gray-800/40 to-gray-900/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden">
-                            <div class="absolute top-0 left-0 w-full h-1 bg-purple-500"></div>
-                            <h4 class="font-black text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-plane-arrival text-purple-400"></i> Llegada (Jueves 13)</h4>
-                            <div class="space-y-2 text-sm">
-                                <p class="flex justify-between border-b border-gray-700/50 pb-2"><span class="text-gray-400">Vuelo</span> <span class="font-medium text-white">LATAM LA 2383 (Desde Quito)</span></p>
-                                <p class="flex justify-between border-b border-gray-700/50 pb-2 pt-1"><span class="text-gray-400">Salida</span> <span class="font-medium text-white">12:15 PM</span></p>
-                                <p class="flex justify-between pt-1"><span class="text-gray-400">Llegada a Lima</span> <span class="font-medium text-green-400">14:30 PM</span></p>
-                            </div>
-                        </div>
-                        
-                        <!-- Salida -->
-                        <div class="bg-gradient-to-br from-gray-800/40 to-gray-900/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden">
-                            <div class="absolute top-0 left-0 w-full h-1 bg-red-500"></div>
-                            <h4 class="font-black text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-plane-departure text-red-400"></i> Salida (Lunes 17 - Madrugada)</h4>
-                            <div class="space-y-2 text-sm">
-                                <p class="flex justify-between border-b border-gray-700/50 pb-2"><span class="text-gray-400">Vuelo</span> <span class="font-medium text-white">LATAM LA 2465 (A Buenos Aires)</span></p>
-                                <p class="flex justify-between border-b border-gray-700/50 pb-2 pt-1"><span class="text-gray-400">Salida de Lima</span> <span class="font-medium text-red-400">01:15 AM (Lunes)</span></p>
-                                <p class="flex justify-between pt-1"><span class="text-gray-400">Llegada</span> <span class="font-medium text-white">07:40 AM (Lunes)</span></p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-red-500/10 border border-red-500/30 p-4 rounded-xl mt-4 flex items-start gap-4">
-                        <i class="fa-solid fa-triangle-exclamation text-red-500 text-xl mt-1 animate-pulse-slow"></i>
-                        <div>
-                            <h4 class="font-bold text-red-400 text-sm tracking-wide mb-1">OJO AL DATO (OPERACIÓN DE SALIDA)</h4>
-                            <p class="text-sm text-gray-300">Tu vuelo a Buenos Aires despega el lunes 17 de agosto a la 01:15 AM. Esto significa que saliendo de la graduación del C1 el domingo por la noche, el transporte te trasladará directo al aeropuerto <strong>(pasaremos por ti a las 22:15 PM)</strong>. No requieres hotel para la noche del domingo.</p>
-                        </div>
+                <div class="reveal mb-12 flex justify-center" style="transition-delay: 280ms;"><a href="carta_invitacion_migraciones.html?nombre=ELMER%20IDROBO%20ANDRADE&doc=PASAPORTE%20COLOMBIANA&fechas=Del%204%20al%206%20de%20septiembre%20de%202026&rol=Invitado+Especial+Internacional" target="_blank" class="glass border border-crear-accent/50 hover:bg-crear-accent/20 text-white px-6 py-3 rounded-full shadow-[0_0_20px_rgba(255,183,3,0.2)] transition-transform hover:scale-105 flex items-center gap-3 text-sm font-semibold tracking-wide uppercase"><i class="fa-solid fa-passport text-crear-accent"></i> Ver Carta para Migraciones</a></div>
+                <p id="timezone-indicator" class="text-xs text-gray-500 mb-8 tracking-widest uppercase reveal" style="transition-delay: 285ms;">Calculando huso horario local...</p>
+                <!-- Welcome Note -->
+                <div class="glass p-8 rounded-2xl text-left reveal border border-gray-800 hover:border-crear-accent transition-colors duration-500 shadow-2xl" style="transition-delay: 300ms;">
+                    <div class="text-gray-300 text-lg leading-relaxed space-y-4">
+                        <p><strong>Querido/a Andrés,</strong></p>
+                        <p>Querido Andrés, ¡qué alegría recibirte! Estamos completamente listos para expandir el juego y materializar la visión de este equipo. Nos emociona profundamente tu llegada para detonar este fin de semana.</p><p>Nos da una tranquilidad enorme saber que tu impecable presencia y contención guiarán la sala en este fin de semana tan determinante. Para que viajes ligero de equipaje y con la mente puesta únicamente en el equipo, aquí tienes tu radar logístico exacto:</p>
                     </div>
                 </div>
             </div>
-
-            <!-- 3. Movilidad y Sedes -->
-            <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-blue-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] hover:-translate-y-1">
-                <div class="flex items-center gap-4 mb-6">
-                    <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-blue-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
-                        <i class="fa-solid fa-car"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold text-white tracking-tight">3. Movilidad y Sede</h2>
-                </div>
-                <div class="space-y-6 text-gray-300 ml-2 md:ml-18">
-                    <p class="text-lg"><strong>Tus traslados:</strong> Nosotros nos encargamos de moverte:</p>
-                    
-                    <div class="space-y-4">
-                        <div class="flex gap-4 items-start bg-gray-800/30 p-4 rounded-xl border border-gray-700/30">
-                            <div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 flex-shrink-0"><i class="fa-solid fa-suitcase"></i></div>
-                            <div>
-                                <div class="font-bold text-blue-400 mb-1">Jueves 13 (Llegada)</div>
-                                <div class="text-sm text-gray-300">Nuestro equipo de transporte te escribirá antes de que aterrices para coordinar tu recojo exacto, contemplando tus tiempos de migración y espera de maletas. De ahí, te llevaremos directo al hotel a descansar y aclimatarte.</div>
-                            </div>
+        </section>
+        <!-- Sections Container -->
+        <section class="py-16 bg-crear-black relative z-10">
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+                <!-- 1. Misión -->
+                <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-crear-accent transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,183,3,0.15)] hover:-translate-y-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-crear-accent text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                            <i class="fa-solid fa-fire"></i>
                         </div>
-                        <div class="flex gap-4 items-start bg-gray-800/30 p-4 rounded-xl border border-gray-700/30">
-                            <div class="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center text-red-400 flex-shrink-0"><i class="fa-solid fa-plane-departure"></i></div>
-                            <div>
-                                <div class="font-bold text-red-400 mb-1">Domingo 16 (Salida)</div>
-                                <div class="text-sm text-gray-300">Pasaremos por ti a la sede de la graduación a las <strong>22:15 PM</strong> en punto para trasladarte directamente al aeropuerto para tu vuelo internacional.</div>
-                            </div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">1. Tu Misión (Maestría en Creación - Equipo 30)</h2>
+                    </div>
+                    <div class="space-y-4 text-gray-300 ml-2 md:ml-18">
+                        <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden mb-4"><div class="absolute top-0 left-0 w-1 h-full bg-crear-accent"></div><h4 class="font-black text-white mb-3 text-crear-accent tracking-wide uppercase text-sm">Viernes - Arranque Oficial</h4><div class="space-y-2"><p class="flex items-start gap-3"><i class="fa-regular fa-clock text-crear-accent mt-1"></i> <span><strong>16:30 PM:</strong> Grounding Entrenadores con Coordinación (Directo en salón).</span></p><p class="flex items-start gap-3"><i class="fa-regular fa-clock text-crear-accent mt-1"></i> <span><strong>17:00 PM:</strong> Apertura de Mesa de Registro para Participantes.</span></p><p class="flex items-start gap-3"><i class="fa-regular fa-clock text-crear-accent mt-1"></i> <span><strong>18:00 PM:</strong> Apertura de puertas e inicio de sala.</span></p></div></div>
+                    </div>
+                </div>
+                <!-- 2. Vuelos -->
+                <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-purple-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(168,85,247,0.15)] hover:-translate-y-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-purple-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                            <i class="fa-solid fa-plane"></i>
                         </div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">2. Vuelos Confirmados</h2>
                     </div>
-
-                    <div class="bg-gradient-to-r from-blue-900/20 to-transparent p-5 rounded-xl border-l-4 border-blue-500 mt-6">
-                        <h4 class="font-black text-white mb-2 flex items-center gap-2"><i class="fa-solid fa-hotel text-blue-400"></i> Hotel y Sede: <a href="https://maps.app.goo.gl/C7K8aFz6s9aYwT6q6" target="_blank" class="text-blue-400 hover:text-blue-300 underline decoration-blue-400/30 underline-offset-2 transition-colors">Hotel Jose Antonio Deluxe</a></h4>
-                        <p class="text-sm text-gray-300">Miraflores. Duermes y entrenas en el mismo edificio para tu total comodidad (hospedaje reservado desde el jueves 13 hasta el domingo 16 de agosto - incluye Late Checkout).</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 4. Clima y Reglas -->
-            <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-amber-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(245,158,11,0.15)] hover:-translate-y-1">
-                <div class="flex items-center gap-4 mb-6">
-                    <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-amber-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
-                        <i class="fa-solid fa-cloud"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold text-white tracking-tight">4. Clima y Reglas de Oro</h2>
-                </div>
-                <div class="grid md:grid-cols-2 gap-5 text-gray-300 ml-2 md:ml-18">
-                    <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/50">
-                        <h4 class="font-bold text-amber-400 mb-3 flex items-center gap-2"><i class="fa-solid fa-temperature-empty"></i> El Clima (Lima)</h4>
-                        <p class="text-sm">Lima se encuentra en pleno invierno. Los días son fríos, grises y muy húmedos. <strong>Trae ropa cómoda y abrigadora</strong> para los días de sala y tus salidas.</p>
-                    </div>
-                    <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/50">
-                        <h4 class="font-bold text-green-400 mb-3 flex items-center gap-2"><i class="fa-solid fa-leaf"></i> Cuidado de la Sede</h4>
-                        <ul class="text-sm space-y-2">
-                            <li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-green-500 mt-1 text-xs"></i> <span><strong>11:00 PM:</strong> Hora límite e innegociable para desocupar el salón los 3 días de entrenamiento.</span></li>
-                            <li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-green-500 mt-1 text-xs"></i> <span>Cero comida adentro.</span></li>
-                            <li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-green-500 mt-1 text-xs"></i> <span>Manejo prudente de los decibeles en los impactos para la óptima convivencia con el hotel.</span></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 5. Honorarios -->
-            <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-emerald-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(16,185,129,0.15)] hover:-translate-y-1">
-                <div class="flex items-center gap-4 mb-6">
-                    <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-emerald-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
-                        <i class="fa-solid fa-file-invoice-dollar"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold text-white tracking-tight">5. Tus Honorarios</h2>
-                </div>
-                <div class="text-gray-300 ml-2 md:ml-18 bg-gray-800/30 p-5 rounded-xl border border-gray-700/50">
-                    <p class="text-lg">Mantenemos el acuerdo estándar.</p>
-                    <p class="mt-3 text-sm text-gray-400">Si tus datos bancarios de siempre (Banco, Cuenta, SWIFT) siguen siendo los mismos, el proceso administrativo se iniciará de forma automática al finalizar el fin de semana. Si requieres actualizar alguna información, por favor envíasela directamente a José Sánchez.</p>
-                </div>
-            </div>
-
-            <!-- 6. Escuadrón -->
-            <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-pink-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(236,72,153,0.15)] hover:-translate-y-1">
-                <div class="flex items-center gap-4 mb-6">
-                    <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-pink-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
-                        <i class="fa-solid fa-users"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold text-white tracking-tight">6. Tu Escuadrón de Soporte</h2>
-                </div>
-                <div class="text-gray-300 ml-2 md:ml-18">
-                    <div class="grid md:grid-cols-3 gap-4">
-                        <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/30 hover:border-pink-500/50 transition-colors">
-                            <h4 class="font-bold text-pink-400 mb-2 text-xs uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> Capitán</h4>
-                            <p class="text-white font-medium text-lg">Andrésnando Lopez Lopez</p>
-                            <p class="text-gray-400 text-sm mt-1"><a href="https://wa.me/51981237577" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 981 237 577</a></p>
+                    <div class="space-y-4 text-gray-300 ml-2 md:ml-18">
+                        <div class="flex flex-wrap gap-3 items-center">
+                            <span class="text-gray-400 text-sm">Reserva:</span>
+                            <span class="bg-gray-800 border border-gray-700 px-3 py-1 rounded-md font-mono text-white text-sm">DJBJJD</span>
+                            <span class="text-gray-500 text-xs ml-2">(Boleto a nombre de: <strong>ELMER IDROBO ANDRADE</strong>)</span>
                         </div>
-                        
-                        <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/30 hover:border-pink-500/50 transition-colors">
-                            <h4 class="font-bold text-crear-accent mb-2 text-xs uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-bolt"></i> Escuderas Principales</h4>
-                            <div class="space-y-3">
-                                <div>
-                                    <p class="text-white font-medium text-sm">Diana Moscoso</p>
-                                    <p class="text-gray-400 text-xs mt-0.5"><a href="https://wa.me/51912379744" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 912 379 744</a></p>
+                        <div class="grid md:grid-cols-2 gap-5 mt-5">
+                            <!-- Llegada -->
+                            <div class="bg-gradient-to-br from-gray-800/40 to-gray-900/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden">
+                                <div class="absolute top-0 left-0 w-full h-1 bg-purple-500"></div>
+                                <h4 class="font-black text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-plane-arrival text-purple-400"></i> Llegada (04/09/2026)</h4>
+                                <div class="space-y-2 text-sm">
+                                    <p class="flex justify-between border-b border-gray-700/50 pb-2"><span class="text-gray-400">Vuelo</span> <span class="font-medium text-white">LATAM LA 1430</span></p>
+                                    <p class="flex justify-between pt-1"><span class="text-gray-400">Llegada a Lima</span> <span class="font-medium text-green-400">10:55 AM</span></p>
+                                    <div class="pt-2"><a href="https://www.flightradar24.com/data/flights/la1430" target="_blank" class="text-xs text-purple-400 hover:underline">Ver en FlightRadar &rarr;</a></div>
                                 </div>
-                                <div class="w-full h-px bg-gray-700/50"></div>
-                                <div>
-                                    <p class="text-white font-medium text-sm">Joyce Marín</p>
-                                    <p class="text-gray-400 text-xs mt-0.5"><a href="https://wa.me/51933599903" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 933 599 903</a></p>
+                            </div>
+                            <!-- Salida -->
+                            <div class="bg-gradient-to-br from-gray-800/40 to-gray-900/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden">
+                                <div class="absolute top-0 left-0 w-full h-1 bg-red-500"></div>
+                                <h4 class="font-black text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-plane-departure text-red-400"></i> Salida (06/09/2026)</h4>
+                                <div class="space-y-2 text-sm">
+                                    <p class="flex justify-between border-b border-gray-700/50 pb-2"><span class="text-gray-400">Vuelo</span> <span class="font-medium text-white">LATAM LA 1449</span></p>
+                                    <p class="flex justify-between pt-1"><span class="text-gray-400">Salida de Lima</span> <span class="font-medium text-red-400">23:35 PM</span></p>
+                                    <div class="pt-2"><a href="https://www.flightradar24.com/data/flights/la1449" target="_blank" class="text-xs text-red-400 hover:underline">Ver en FlightRadar &rarr;</a></div>
                                 </div>
                             </div>
                         </div>
-
-                        <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/30 hover:border-pink-500/50 transition-colors">
-                            <h4 class="font-bold text-purple-400 mb-2 text-xs uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-briefcase"></i> Soporte Gerencial</h4>
-                            <p class="text-white font-medium text-lg">José Sánchez</p>
-                            <p class="text-gray-400 text-sm mt-1"><a href="https://wa.me/51919563284" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 919 563 284</a></p>
+                        <div class="mt-4 bg-gradient-to-r from-amber-500/10 to-transparent p-4 rounded-xl border border-amber-500/30 flex items-center gap-3"><i class="fa-regular fa-clock text-crear-accent text-xl"></i><div><p class="text-crear-accent font-bold text-sm">Recojo en Lobby para Salida: 08:05 PM</p><p class="text-xs text-gray-400">Calculado 3.5 horas antes de tu vuelo (23:35 PM) para margen de tráfico y abordaje.</p></div></div>
+                    </div>
+                </div>
+                <!-- 3. Movilidad y Sede -->
+                <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-blue-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] hover:-translate-y-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-blue-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                            <i class="fa-solid fa-car"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">3. Movilidad y Sede</h2>
+                    </div>
+                    <div class="space-y-6 text-gray-300 ml-2 md:ml-18">
+                        <p class="text-lg"><strong>Tus traslados:</strong> Nuestro equipo te contactará para coordinar tu recojo en el aeropuerto Jorge Chávez.</p>
+                        <div class="space-y-4"><div class="flex gap-4 items-start bg-gray-800/30 p-4 rounded-xl border border-gray-700/30"><div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 flex-shrink-0"><i class="fa-solid fa-suitcase"></i></div><div><div class="font-bold text-blue-400 mb-1">Traslado Oficial</div><div class="text-sm text-gray-300">Nuestro equipo te contactará para coordinar tu recojo en el aeropuerto Jorge Chávez.</div></div></div></div>
+                        <div class="mt-4 bg-gradient-to-r from-blue-500/10 to-transparent p-4 rounded-xl border border-blue-500/30 flex items-center gap-3"><i class="fa-solid fa-car text-blue-400 text-xl"></i><div><p class="text-blue-400 font-bold text-sm">Coordinación con Conductor</p><p class="text-xs text-gray-400">El conductor asignado te escribirá por WhatsApp 1 hora antes de tu arribo/salida para darte la placa del auto y coordinar el punto de encuentro exacto.</p></div></div>
+                        <div class="bg-gradient-to-r from-blue-900/20 to-transparent p-5 rounded-xl border-l-4 border-blue-500 mt-6">
+                            <h4 class="font-black text-white mb-2 flex items-center gap-2"><i class="fa-solid fa-hotel text-blue-400"></i> Hotel y Salón: Hotel Jose Antonio Deluxe (Miraflores)</h4>
+                            <p class="text-sm text-gray-300">Calle Bellavista 133, Miraflores, Lima, Perú</p>
+                            <p class="text-xs text-amber-400 mt-2 font-medium"><i class="fa-solid fa-circle-info"></i> Tu equipaje será resguardado en el hotel tras tu check-out del mediodía el domingo.</p>
+                            <a href="https://maps.google.com/?q=Hotel+Jose+Antonio+Deluxe+Miraflores+Lima" target="_blank" class="inline-flex items-center gap-2 mt-3 text-xs text-blue-400 hover:underline"><i class="fa-solid fa-map-location-dot"></i> Ver ubicación en Google Maps &rarr;</a>
                         </div>
                     </div>
                 </div>
-            </div>
-
-
-            <!-- Closing -->
-            <div class="text-center pt-16 pb-12 reveal">
-                <h3 class="text-2xl md:text-3xl font-black text-white mb-2 italic" id="random-quote"></h3>
-                <p class="text-lg text-crear-accent mb-10 font-semibold" id="random-author"></p>
-                <div class="inline-block glass px-10 py-5 rounded-2xl border border-crear-accent/40 shadow-[0_0_30px_rgba(56,189,248,0.25)] hover:scale-105 transition-transform duration-300">
-                    <p class="font-bold text-white text-lg">Un abrazo,</p>
-                    <p class="text-crear-accent font-black tracking-widest uppercase text-xl mt-1">El Equipo de CREAR PSL LIMA</p>
+                <!-- 4. Clima y Reglas -->
+                <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-amber-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(245,158,11,0.15)] hover:-translate-y-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-amber-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                            <i class="fa-solid fa-cloud"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">4. Clima y Reglas de Oro</h2>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-5 text-gray-300 ml-2 md:ml-18">
+                        <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/50">
+                            <h4 class="font-bold text-amber-400 mb-3 flex items-center gap-2"><i class="fa-solid fa-temperature-empty"></i> El Clima (Lima)</h4>
+                            <p class="text-2xl font-black text-white mb-2">15°C - 18°C</p>
+                            <p class="text-sm font-semibold text-amber-300/90 mb-1">Invierno Limeño</p>
+                            <p class="text-xs text-gray-400 mb-4">El clima está frío y húmedo (invierno), trae buen abrigo.</p>
+                            <div class="space-y-1"><p class="text-xs text-gray-400 flex items-start gap-2 mb-1.5"><i class="fa-solid fa-circle-check text-crear-accent text-[10px] mt-1"></i> Traer casaca o abrigo abrigador para traslados nocturnos.</p><p class="text-xs text-gray-400 flex items-start gap-2 mb-1.5"><i class="fa-solid fa-circle-check text-crear-accent text-[10px] mt-1"></i> Ropa cómoda para sala con clima controlado.</p><p class="text-xs text-gray-400 flex items-start gap-2 mb-1.5"><i class="fa-solid fa-circle-check text-crear-accent text-[10px] mt-1"></i> Calzado cómodo.</p></div>
+                        </div>
+                        <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/50">
+                            <h4 class="font-bold text-red-400 mb-3 flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> Reglas de Oro y Convivencia</h4>
+                            <ul class="text-sm space-y-2.5">
+                                <li class="flex items-start gap-2.5"><i class="fa-solid fa-circle-check text-green-500 mt-1 text-xs flex-shrink-0"></i> <span><strong>Hora Límite Innegociable:</strong> 11:00 PM es la hora límite innegociable de cierre.</span></li><li class="flex items-start gap-2.5"><i class="fa-solid fa-circle-check text-green-500 mt-1 text-xs flex-shrink-0"></i> <span><strong>Alimentación:</strong> Cero comida en salón. Solo hidratación permitida.</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!-- 5. Honorarios -->
+                <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-emerald-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(168,85,247,0.15)] hover:-translate-y-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-emerald-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                            <i class="fa-solid fa-file-invoice-dollar"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">5. Tus Honorarios</h2>
+                    </div>
+                    <div class="text-gray-300 ml-2 md:ml-18 bg-gray-800/30 p-5 rounded-xl border border-gray-700/50">
+                        <p class="text-lg">Mantenemos el acuerdo estándar. El abono se coordina con el equipo financiero de Lima.</p>
+                        <p class="mt-3 text-sm text-gray-400">Si tus datos bancarios de siempre (Banco, Cuenta, SWIFT) siguen siendo los mismos, el proceso administrativo se iniciará de forma automática tras concluir los entrenamientos.</p>
+                        <div class="mt-5 grid md:grid-cols-2 gap-3 bg-gray-900/60 p-4 rounded-xl border border-gray-700/40 text-xs"><div><span class="text-gray-500 uppercase tracking-widest text-[10px]">Razón Social</span><p class="text-white font-semibold mt-0.5">CREAR PODER SIN LIMITES S.A.C.</p></div><div><span class="text-gray-500 uppercase tracking-widest text-[10px]">RUC / NIF</span><p class="text-white font-mono font-semibold mt-0.5">20608512491</p></div><div class="md:col-span-2"><span class="text-gray-500 uppercase tracking-widest text-[10px]">Dirección Fiscal</span><p class="text-gray-300 mt-0.5">Calle Bellavista 133, Miraflores, Lima, Perú</p></div></div>
+                        <div class="mt-5"><a href="https://wa.me/51919563284?text=Hola%20Jos%C3%A9%2C%20confirmo%20mis%20datos%20bancarios%20para%20honorarios%20de%20Andr%C3%A9s%20Idrobo%20E30." target="_blank" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-green-500/10 border border-green-500/30 text-green-400 text-xs font-bold hover:bg-green-500/20 transition-colors"><i class="fa-brands fa-whatsapp text-green-400 text-base"></i> Enviar datos bancarios por WhatsApp</a></div>
+                    </div>
+                </div>
+                <!-- 6. Escuadrón -->
+                <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-pink-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(236,72,153,0.15)] hover:-translate-y-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-pink-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">6. Tu Escuadrón de Soporte</h2>
+                    </div>
+                    <div class="text-gray-300 ml-2 md:ml-18">
+                        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/30 hover:border-crear-accent/50 transition-colors"><h4 class="font-bold text-crear-accent mb-2 text-xs uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-bolt"></i> Capitán</h4><p class="text-white font-medium text-lg">Fernando Lopez Lopez</p><p class="text-gray-400 text-sm mt-1"><a href="https://wa.me/51981237577" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 981 237 577</a></p></div><div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/30 hover:border-crear-accent/50 transition-colors"><h4 class="font-bold text-purple-400 mb-2 text-xs uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-briefcase"></i> Gerente de Sede</h4><p class="text-white font-medium text-lg">José Sánchez</p><p class="text-gray-400 text-sm mt-1"><a href="https://wa.me/51919563284" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 919 563 284</a></p></div><div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/30 hover:border-crear-accent/50 transition-colors"><h4 class="font-bold text-pink-400 mb-2 text-xs uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> Coordinación MJ</h4><p class="text-white font-medium text-lg">Linid Valencia</p><p class="text-gray-400 text-sm mt-1"><a href="https://wa.me/51912379686" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 912 379 686</a></p></div><div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/30 hover:border-crear-accent/50 transition-colors"><h4 class="font-bold text-pink-400 mb-2 text-xs uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> Coordinación MJ</h4><p class="text-white font-medium text-lg">Leyla Pasquel</p><p class="text-gray-400 text-sm mt-1"><a href="https://wa.me/51919502385" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 919 502 385</a></p></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Closing -->
+                <div class="text-center pt-16 pb-12 reveal">
+                    <h3 class="text-2xl md:text-3xl font-black text-white mb-2 italic" id="random-quote"></h3>
+                    <p class="text-lg text-crear-accent mb-10 font-semibold" id="random-author"></p>
+                    <h3 class="text-2xl md:text-3xl font-black text-white mb-4">
+                        Párate en tu poder absoluto, Andrés.<br>
+                        <span class="text-crear-accent">Ven a detonar la sala del Equipo 30.</span> Nos vemos muy pronto.
+                    </h3>
+                    <div class="inline-block glass px-10 py-5 rounded-2xl border border-crear-accent/40 shadow-[0_0_30px_rgba(255,183,3,0.25)] hover:scale-105 transition-transform duration-300">
+                        <p class="font-bold text-white text-lg">Un abrazo,</p>
+                        <p class="text-crear-accent font-black tracking-widest uppercase text-xl mt-1">El Equipo de CREAR PSL LIMA</p>
+                    </div>
                 </div>
             </div>
-
-        </div>
-    </section>
-
-    <!-- FOOTER -->
-    <footer class="bg-[#050505] py-16 border-t border-gray-900 relative z-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div class="flex items-center justify-center gap-3 mb-10">
-                <img src="logo_crear_blanco.png" alt="CREAR" class="h-40 md:h-56 object-contain drop-shadow-[0_0_20px_rgba(251,191,36,0.6)] hover:drop-shadow-[0_0_35px_rgba(251,191,36,1)] hover:scale-105 transition-all duration-500" />
+        </section>
+        <!-- FOOTER -->
+        <footer class="bg-[#050505] py-16 border-t border-gray-900 relative z-10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <div class="flex items-center justify-center gap-3 mb-10">
+                    <img src="logo_crear_blanco.png" onerror="this.src='https://crearpodersinlimitesperu-cmd.github.io/cartas-crear/logo_crear_blanco.png'" alt="CREAR" class="h-40 md:h-56 object-contain drop-shadow-[0_0_20px_rgba(251,191,36,0.6)] hover:drop-shadow-[0_0_35px_rgba(251,191,36,1)] hover:scale-105 transition-all duration-500" />
+                </div>
+                <div class="text-gray-600 text-sm font-medium tracking-wide">
+                    &copy; 2026 CREAR Poder Sin Límites Sede Perú.<br/> Comunicación oficial vía Google Chat.
+                </div>
             </div>
-            <div class="text-gray-600 text-sm font-medium tracking-wide">
-                &copy; 2026 CREAR Poder Sin Límites Sede Perú.<br/> Comunicación oficial vía Google Chat.
-            </div>
-        </div>
-    </footer>
-
-    <!-- LOGIC SCRIPT -->
+        </footer>
+    </div>
+    <!-- Floating Music Button -->
+    <button id="musicToggleBtn" class="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full glass border border-gray-600 flex items-center justify-center text-white shadow-[0_0_15px_rgba(255,183,3,0.3)] hover:scale-110 transition-transform duration-300">
+        <i class="fa-solid fa-music"></i>
+    </button>
+    <div id="ytplayer" class="absolute -left-[9999px] top-0 w-[300px] h-[300px] opacity-0 pointer-events-none"></div>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Navbar background change on scroll
-            const navbar = document.getElementById('navbar');
-            window.addEventListener('scroll', () => {
-                if (window.scrollY > 20) {
-                    navbar.classList.add('bg-crear-black/95', 'shadow-lg');
-                    navbar.classList.remove('glass', 'shadow-lg');
+        var tag = document.createElement("script");
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName("script")[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        var player;
+        var isPlaying = false;
+        var playerReady = false;
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player("ytplayer", {
+                height: "300", width: "300", videoId: "FboYUBlvaL4",
+                playerVars: { "autoplay": 0, "controls": 0, "loop": 1, "playlist": "FboYUBlvaL4", "playsinline": 1, "rel": 0 },
+                events: { "onReady": onPlayerReady, "onStateChange": onPlayerStateChange }
+            });
+        }
+        function onPlayerStateChange(event) {
+            if (event.data === YT.PlayerState.PLAYING) {
+                isPlaying = true;
+                var icon = document.querySelector("#musicToggleBtn i");
+                if(icon) { icon.classList.remove("fa-music"); icon.classList.add("fa-pause", "text-crear-accent", "fa-beat-fade"); }
+            } else if (event.data === YT.PlayerState.PAUSED) {
+                isPlaying = false;
+                var icon = document.querySelector("#musicToggleBtn i");
+                if(icon) { icon.classList.remove("fa-pause", "text-crear-accent", "fa-beat-fade"); icon.classList.add("fa-music"); }
+            }
+        }
+        function toggleMusic() {
+            if (!playerReady || !player) return;
+            if (isPlaying) player.pauseVideo(); else player.playVideo();
+        }
+        function onPlayerReady(event) {
+            playerReady = true;
+            var openBtn = document.getElementById("openLetterBtn");
+            if(openBtn) {
+                openBtn.innerHTML = '<i class="fa-solid fa-envelope-open-text"></i> ABRIR CARTA';
+                openBtn.classList.remove("opacity-50", "cursor-not-allowed", "pointer-events-none");
+                openBtn.classList.add("animate-pulse");
+            }
+        }
+        setTimeout(function(){
+            var openBtn = document.getElementById("openLetterBtn");
+            if(openBtn && !playerReady) {
+                openBtn.innerHTML = '<i class="fa-solid fa-envelope-open-text"></i> ABRIR CARTA';
+                openBtn.classList.remove("opacity-50", "cursor-not-allowed", "pointer-events-none");
+                openBtn.classList.add("animate-pulse");
+            }
+        }, 2500);
+        document.addEventListener("DOMContentLoaded", function() {
+            var overlay = document.getElementById("welcomeOverlay");
+            var openBtn = document.getElementById("openLetterBtn");
+            var musicBtn = document.getElementById("musicToggleBtn");
+            if(openBtn && overlay) {
+                openBtn.addEventListener("click", function() {
+                    overlay.style.opacity = "0";
+                    setTimeout(function(){ overlay.remove(); }, 1000);
+                    if (playerReady && player && typeof player.playVideo === "function") {
+                        player.playVideo();
+                    }
+                });
+            }
+            if(musicBtn) {
+                musicBtn.addEventListener("click", function(e) {
+                    e.stopPropagation();
+                    toggleMusic();
+                });
+            }
+            var flightTimestamp = new Date("2026-09-04T15:55:00.000Z").getTime();
+            var trainingTimestamp = new Date("2026-09-16T23:00:00.000Z").getTime();
+            var timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            var indicator = document.getElementById("timezone-indicator");
+            if(indicator) indicator.innerText = "Mostrando cuenta regresiva detectando tu zona local: " + timeZone;
+            function updateCountdowns() {
+                var now = new Date().getTime();
+                var distanceTrn = trainingTimestamp - now;
+                if (distanceTrn > 0) {
+                    document.getElementById("trn-d").innerText = String(Math.floor(distanceTrn / (1000 * 60 * 60 * 24))).padStart(2, "0");
+                    document.getElementById("trn-h").innerText = String(Math.floor((distanceTrn % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, "0");
+                    document.getElementById("trn-m").innerText = String(Math.floor((distanceTrn % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
+                    document.getElementById("trn-s").innerText = String(Math.floor((distanceTrn % (1000 * 60)) / 1000)).padStart(2, "0");
                 } else {
-                    navbar.classList.remove('bg-crear-black/95', 'shadow-lg');
-                    navbar.classList.add('glass', 'shadow-lg');
+                    document.getElementById("countdown-training").innerHTML = "<div class='col-span-4 text-white font-bold tracking-widest uppercase'>¡El entrenamiento ha comenzado!</div>";
+                }
+                var distanceFly = flightTimestamp - now;
+                if (distanceFly > 0) {
+                    document.getElementById("fly-d").innerText = String(Math.floor(distanceFly / (1000 * 60 * 60 * 24))).padStart(2, "0");
+                    document.getElementById("fly-h").innerText = String(Math.floor((distanceFly % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, "0");
+                    document.getElementById("fly-m").innerText = String(Math.floor((distanceFly % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
+                    document.getElementById("fly-s").innerText = String(Math.floor((distanceFly % (1000 * 60)) / 1000)).padStart(2, "0");
+                } else {
+                    document.getElementById("countdown-flight").innerHTML = "<div class='col-span-4 text-white font-bold tracking-widest uppercase'>¡Buen viaje!</div>";
+                }
+            }
+            setInterval(updateCountdowns, 1000);
+            updateCountdowns();
+            var navbar = document.getElementById("navbar");
+            window.addEventListener("scroll", function() {
+                if (window.scrollY > 20) {
+                    navbar.classList.add("bg-crear-black/95", "shadow-lg");
+                    navbar.classList.remove("glass");
+                } else {
+                    navbar.classList.remove("bg-crear-black/95");
+                    navbar.classList.add("glass");
                 }
             });
-
-            // Intersection Observer for Scroll Reveals
-            const revealElements = document.querySelectorAll('.reveal');
-            const revealOptions = {
-                threshold: 0.1,
-                rootMargin: "0px 0px -50px 0px"
-            };
-
-            const revealOnScroll = new IntersectionObserver(function(entries, observer) {
-                entries.forEach(entry => {
+            var revealElements = document.querySelectorAll(".reveal");
+            var revealObserver = new IntersectionObserver(function(entries, observer) {
+                entries.forEach(function(entry) {
                     if (entry.isIntersecting) {
-                        entry.target.classList.add('active');
+                        entry.target.classList.add("active");
                         observer.unobserve(entry.target);
                     }
                 });
-            }, revealOptions);
-
-            revealElements.forEach(el => {
-                revealOnScroll.observe(el);
-            });
-            
-            // Trigger initial check
-            setTimeout(() => {
-                revealElements.forEach(el => {
-                    const rect = el.getBoundingClientRect();
+            }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
+            revealElements.forEach(function(el) { revealObserver.observe(el); });
+            setTimeout(function() {
+                revealElements.forEach(function(el) {
+                    var rect = el.getBoundingClientRect();
                     if (rect.top < window.innerHeight && rect.width > 0 && rect.height > 0) {
-                        el.classList.add('active');
+                        el.classList.add("active");
                     }
                 });
             }, 100);
+            var quoteEl = document.getElementById("random-quote");
+            var authorEl = document.getElementById("random-author");
+            if (quoteEl && authorEl) {
+                var quotesList = (typeof transformationQuotes !== "undefined" && Array.isArray(transformationQuotes) && transformationQuotes.length > 0)
+                    ? transformationQuotes
+                    : [
+                        { text: "Tú y yo poseemos dentro de nosotros mismos en cada momento de nuestras vidas, bajo todas las circunstancias, el poder de transformar la calidad de nuestras vidas.", author: "Werner Erhard" },
+                        { text: "El poder de la auto-transformación está en tus manos.", author: "Tony Robbins" },
+                        { text: "Cuando tomas una elección, cambias el futuro.", author: "Joe Dispenza" },
+                        { text: "La transformación no es un evento futuro. Es una actividad actual.", author: "Jillian Michaels" }
+                    ];
+                var rq = quotesList[Math.floor(Math.random() * quotesList.length)];
+                quoteEl.innerText = "\"" + (rq.text || rq.quote) + "\"";
+                authorEl.innerText = "— " + (rq.author || rq.autor);
+            }
         });
     </script>
-    <!-- Floating Music Button -->
+</body>
+</html>
+```
+
+---
+
+## Archivo: public\cartas\carta_alejandro_diaz_e28.html
+
+```html
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenido Alejandro | CREAR Poder Sin Límites</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="quotes.js"></script>
-    <button id="musicToggleBtn" class="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full glass border border-gray-600 flex items-center justify-center text-white shadow-[0_0_15px_rgba(56,189,248,0.3)] hover:scale-110 transition-transform duration-300">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ["Montserrat", "Inter", "sans-serif"],
+                    },
+                    colors: {
+                        crear: {
+                            black: "#0a0a0a",
+                            dark: "#171717",
+                            gray: "#262626",
+                            light: "#e5e5e5",
+                            accent: "#FFB703",
+                            primary: "#2563eb",
+                        }
+                    },
+                    animation: {
+                        "float": "float 6s ease-in-out infinite",
+                        "pulse-slow": "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        body { background-color: #0a0a0a; color: #e5e5e5; overflow-x: hidden; font-family: "Montserrat", sans-serif; }
+        .glass { background: rgba(23, 23, 23, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.5, 0, 0, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+        .text-gradient { background: linear-gradient(to right, #FFB703, #f59e0b, #fbbf24); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0a0a0a; }
+        ::-webkit-scrollbar-thumb { background: #262626; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #FFB703; }
+    </style>
+</head>
+<body class="antialiased selection:bg-crear-accent selection:text-white">
+    <!-- Welcome Overlay -->
+    <div id="welcomeOverlay" class="fixed inset-0 z-[100] bg-[#050505] flex flex-col items-center justify-center transition-opacity duration-1000">
+        <img src="logo_crear_blanco.png" onerror="this.src='https://crearpodersinlimitesperu-cmd.github.io/cartas-crear/logo_crear_blanco.png'" alt="CREAR Poder Sin Límites" class="h-28 md:h-40 mb-10 drop-shadow-[0_0_25px_rgba(251,191,36,0.5)] animate-pulse">
+        <button id="openLetterBtn" class="px-10 py-5 bg-crear-accent text-black font-black text-xl rounded-full hover:scale-110 transition-transform shadow-[0_0_30px_rgba(251,191,36,0.6)] flex items-center gap-3 opacity-50 cursor-not-allowed pointer-events-none transition-all duration-500">
+            <i class="fa-solid fa-spinner fa-spin"></i> PREPARANDO EXPERIENCIA...
+        </button>
+        <p class="mt-6 text-gray-500 text-sm font-light">Enciende el volumen para la experiencia completa</p>
+    </div>
+    <div id="content">
+        <!-- Navbar -->
+        <nav class="fixed w-full z-50 glass transition-all duration-300 shadow-lg" id="navbar">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-20">
+                    <div class="flex-shrink-0 flex items-center gap-2 cursor-pointer" onclick="window.scrollTo(0,0)">
+                        <img src="logo_crear_blanco.png" onerror="this.src='https://crearpodersinlimitesperu-cmd.github.io/cartas-crear/logo_crear_blanco.png'" alt="CREAR" class="h-10 object-contain" />
+                    </div>
+                    <div class="flex space-x-8 items-center">
+                        <span class="text-crear-accent font-semibold tracking-wider text-sm uppercase">Radar Operativo &middot; Lima</span>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <!-- Hero Section -->
+        <section class="relative min-h-screen flex items-center justify-center pt-20 pb-12 overflow-hidden">
+            <div class="absolute inset-0 z-0">
+                <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-yellow-900/40 via-crear-black to-crear-black"></div>
+                <div class="absolute top-20 right-10 w-64 h-64 bg-crear-accent opacity-20 rounded-full blur-[100px] animate-float"></div>
+            </div>
+            <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center mt-12">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-sm font-semibold text-crear-accent mb-6 reveal shadow-[0_0_15px_rgba(255,183,3,0.3)]">
+                    <i class="fa-solid fa-calendar-day"></i> 2 de septiembre de 2026
+                </div>
+                <h1 class="text-5xl md:text-7xl font-black tracking-tight mb-6 reveal text-white" style="transition-delay: 100ms;">
+                    ¡Bienvenido a casa,<br/> <span class="text-gradient">Alejandro!</span>
+                </h1>
+                <p class="mt-4 text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto mb-8 font-light reveal" style="transition-delay: 200ms;">
+                    Tu radar para la Maestría en Gratitud (Equipo 28) 💥
+                </p>
+                <!-- Dual Countdowns -->
+                <div class="reveal mb-12 flex flex-col md:flex-row gap-8 justify-center items-center" style="transition-delay: 275ms;">
+                    <div class="glass p-6 rounded-2xl border border-crear-accent/20 shadow-[0_0_20px_rgba(255,183,3,0.2)] w-full max-w-sm">
+                        <h3 class="text-crear-accent text-sm uppercase tracking-widest font-bold mb-4">✈️ Tiempo para tu Viaje</h3>
+                        <div id="countdown-flight" class="grid grid-cols-4 gap-2 text-center">
+                            <div><div class="text-3xl font-black text-white" id="fly-d">00</div><div class="text-[10px] text-gray-500 uppercase">Días</div></div>
+                            <div><div class="text-3xl font-black text-white" id="fly-h">00</div><div class="text-[10px] text-gray-500 uppercase">Hrs</div></div>
+                            <div><div class="text-3xl font-black text-white" id="fly-m">00</div><div class="text-[10px] text-gray-500 uppercase">Min</div></div>
+                            <div><div class="text-3xl font-black text-white" id="fly-s">00</div><div class="text-[10px] text-gray-500 uppercase">Seg</div></div>
+                        </div>
+                    </div>
+                    <div class="glass p-6 rounded-2xl border border-crear-accent/20 shadow-[0_0_20px_rgba(255,183,3,0.2)] w-full max-w-sm">
+                        <h3 class="text-crear-accent text-sm uppercase tracking-widest font-bold mb-4">🔥 Inicio de Maestría en Gratitud</h3>
+                        <div id="countdown-training" class="grid grid-cols-4 gap-2 text-center">
+                            <div><div class="text-3xl font-black text-white" id="trn-d">00</div><div class="text-[10px] text-gray-500 uppercase">Días</div></div>
+                            <div><div class="text-3xl font-black text-white" id="trn-h">00</div><div class="text-[10px] text-gray-500 uppercase">Hrs</div></div>
+                            <div><div class="text-3xl font-black text-white" id="trn-m">00</div><div class="text-[10px] text-gray-500 uppercase">Min</div></div>
+                            <div><div class="text-3xl font-black text-white" id="trn-s">00</div><div class="text-[10px] text-gray-500 uppercase">Seg</div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="reveal mb-12 flex justify-center" style="transition-delay: 280ms;"><a href="carta_invitacion_migraciones.html?nombre=ERNESTO%20ALEJANDRO%20DIAZ%20PABON&doc=PASAPORTE%20COLOMBIANA&fechas=Del%203%20al%207%20de%20septiembre%20de%202026&rol=Invitado+Especial+Internacional" target="_blank" class="glass border border-crear-accent/50 hover:bg-crear-accent/20 text-white px-6 py-3 rounded-full shadow-[0_0_20px_rgba(255,183,3,0.2)] transition-transform hover:scale-105 flex items-center gap-3 text-sm font-semibold tracking-wide uppercase"><i class="fa-solid fa-passport text-crear-accent"></i> Ver Carta para Migraciones</a></div>
+                <p id="timezone-indicator" class="text-xs text-gray-500 mb-8 tracking-widest uppercase reveal" style="transition-delay: 285ms;">Calculando huso horario local...</p>
+                <!-- Welcome Note -->
+                <div class="glass p-8 rounded-2xl text-left reveal border border-gray-800 hover:border-crear-accent transition-colors duration-500 shadow-2xl" style="transition-delay: 300ms;">
+                    <div class="text-gray-300 text-lg leading-relaxed space-y-4">
+                        <p><strong>Querido/a Alejandro,</strong></p>
+                        <p>Querido Alejandro, ¡qué alegría recibirte! Estamos completamente listos para expandir el juego y conectar desde la gratitud profunda con este equipo.</p><p>Nos da una tranquilidad enorme saber que tu impecable presencia y contención guiarán la sala en este fin de semana tan determinante. Para que viajes ligero de equipaje y con la mente puesta únicamente en el equipo, aquí tienes tu radar logístico exacto:</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Sections Container -->
+        <section class="py-16 bg-crear-black relative z-10">
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+                <!-- 1. Misión -->
+                <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-crear-accent transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,183,3,0.15)] hover:-translate-y-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-crear-accent text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                            <i class="fa-solid fa-fire"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">1. Tu Misión (Maestría en Gratitud - Equipo 28)</h2>
+                    </div>
+                    <div class="space-y-4 text-gray-300 ml-2 md:ml-18">
+                        <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden mb-4"><div class="absolute top-0 left-0 w-1 h-full bg-crear-accent"></div><h4 class="font-black text-white mb-3 text-crear-accent tracking-wide uppercase text-sm">Viernes - Arranque Oficial</h4><div class="space-y-2"><p class="flex items-start gap-3"><i class="fa-regular fa-clock text-crear-accent mt-1"></i> <span><strong>16:30 PM:</strong> Grounding Entrenadores con Coordinación (Directo en salón).</span></p><p class="flex items-start gap-3"><i class="fa-regular fa-clock text-crear-accent mt-1"></i> <span><strong>17:00 PM:</strong> Apertura de Mesa de Registro para Participantes.</span></p><p class="flex items-start gap-3"><i class="fa-regular fa-clock text-crear-accent mt-1"></i> <span><strong>18:00 PM:</strong> Apertura de puertas e inicio de sala.</span></p></div></div>
+                    </div>
+                </div>
+                <!-- 2. Vuelos -->
+                <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-purple-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(168,85,247,0.15)] hover:-translate-y-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-purple-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                            <i class="fa-solid fa-plane"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">2. Vuelos Confirmados</h2>
+                    </div>
+                    <div class="space-y-4 text-gray-300 ml-2 md:ml-18">
+                        <div class="flex flex-wrap gap-3 items-center">
+                            <span class="text-gray-400 text-sm">Reserva:</span>
+                            <span class="bg-gray-800 border border-gray-700 px-3 py-1 rounded-md font-mono text-white text-sm">AS58FE</span>
+                            <span class="text-gray-500 text-xs ml-2">(Boleto a nombre de: <strong>ERNESTO ALEJANDRO DIAZ PABON</strong>)</span>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-5 mt-5">
+                            <!-- Llegada -->
+                            <div class="bg-gradient-to-br from-gray-800/40 to-gray-900/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden">
+                                <div class="absolute top-0 left-0 w-full h-1 bg-purple-500"></div>
+                                <h4 class="font-black text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-plane-arrival text-purple-400"></i> Llegada (03/09/2026)</h4>
+                                <div class="space-y-2 text-sm">
+                                    <p class="flex justify-between border-b border-gray-700/50 pb-2"><span class="text-gray-400">Vuelo</span> <span class="font-medium text-white">Avianca AV51</span></p>
+                                    <p class="flex justify-between pt-1"><span class="text-gray-400">Llegada a Lima</span> <span class="font-medium text-green-400">20:50 PM</span></p>
+                                    <div class="pt-2"><a href="https://www.flightradar24.com/data/flights/av51" target="_blank" class="text-xs text-purple-400 hover:underline">Ver en FlightRadar &rarr;</a></div>
+                                </div>
+                            </div>
+                            <!-- Salida -->
+                            <div class="bg-gradient-to-br from-gray-800/40 to-gray-900/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden">
+                                <div class="absolute top-0 left-0 w-full h-1 bg-red-500"></div>
+                                <h4 class="font-black text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-plane-departure text-red-400"></i> Salida (07/09/2026)</h4>
+                                <div class="space-y-2 text-sm">
+                                    <p class="flex justify-between border-b border-gray-700/50 pb-2"><span class="text-gray-400">Vuelo</span> <span class="font-medium text-white">Avianca AV50</span></p>
+                                    <p class="flex justify-between pt-1"><span class="text-gray-400">Salida de Lima</span> <span class="font-medium text-red-400">11:45 AM</span></p>
+                                    <div class="pt-2"><a href="https://www.flightradar24.com/data/flights/av50" target="_blank" class="text-xs text-red-400 hover:underline">Ver en FlightRadar &rarr;</a></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 bg-gradient-to-r from-amber-500/10 to-transparent p-4 rounded-xl border border-amber-500/30 flex items-center gap-3"><i class="fa-regular fa-clock text-crear-accent text-xl"></i><div><p class="text-crear-accent font-bold text-sm">Recojo en Lobby para Salida: 08:15 AM</p><p class="text-xs text-gray-400">Calculado 3.5 horas antes de tu vuelo (11:45 AM) para margen de tráfico y abordaje.</p></div></div>
+                    </div>
+                </div>
+                <!-- 3. Movilidad y Sede -->
+                <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-blue-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] hover:-translate-y-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-blue-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                            <i class="fa-solid fa-car"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">3. Movilidad y Sede</h2>
+                    </div>
+                    <div class="space-y-6 text-gray-300 ml-2 md:ml-18">
+                        <p class="text-lg"><strong>Tus traslados:</strong> Nuestro equipo te contactará para coordinar tu recojo exacto en el aeropuerto Jorge Chávez.</p>
+                        <div class="space-y-4"><div class="flex gap-4 items-start bg-gray-800/30 p-4 rounded-xl border border-gray-700/30"><div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 flex-shrink-0"><i class="fa-solid fa-suitcase"></i></div><div><div class="font-bold text-blue-400 mb-1">Traslado Oficial</div><div class="text-sm text-gray-300">Nuestro equipo te contactará para coordinar tu recojo exacto en el aeropuerto Jorge Chávez.</div></div></div></div>
+                        <div class="mt-4 bg-gradient-to-r from-blue-500/10 to-transparent p-4 rounded-xl border border-blue-500/30 flex items-center gap-3"><i class="fa-solid fa-car text-blue-400 text-xl"></i><div><p class="text-blue-400 font-bold text-sm">Coordinación con Conductor</p><p class="text-xs text-gray-400">El conductor asignado te escribirá por WhatsApp 1 hora antes de tu arribo/salida para darte la placa del auto y coordinar el punto de encuentro exacto.</p></div></div>
+                        <div class="bg-gradient-to-r from-blue-900/20 to-transparent p-5 rounded-xl border-l-4 border-blue-500 mt-6">
+                            <h4 class="font-black text-white mb-2 flex items-center gap-2"><i class="fa-solid fa-hotel text-blue-400"></i> Hotel y Salón: Hotel Jose Antonio Deluxe (Miraflores)</h4>
+                            <p class="text-sm text-gray-300">Calle Bellavista 133, Miraflores, Lima, Perú</p>
+                            <a href="https://maps.google.com/?q=Hotel+Jose+Antonio+Deluxe+Miraflores+Lima" target="_blank" class="inline-flex items-center gap-2 mt-3 text-xs text-blue-400 hover:underline"><i class="fa-solid fa-map-location-dot"></i> Ver ubicación en Google Maps &rarr;</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- 4. Clima y Reglas -->
+                <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-amber-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(245,158,11,0.15)] hover:-translate-y-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-amber-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                            <i class="fa-solid fa-cloud"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">4. Clima y Reglas de Oro</h2>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-5 text-gray-300 ml-2 md:ml-18">
+                        <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/50">
+                            <h4 class="font-bold text-amber-400 mb-3 flex items-center gap-2"><i class="fa-solid fa-temperature-empty"></i> El Clima (Lima)</h4>
+                            <p class="text-2xl font-black text-white mb-2">15°C - 18°C</p>
+                            <p class="text-sm font-semibold text-amber-300/90 mb-1">Invierno Limeño</p>
+                            <p class="text-xs text-gray-400 mb-4">El clima está frío y húmedo (invierno), trae buen abrigo.</p>
+                            <div class="space-y-1"><p class="text-xs text-gray-400 flex items-start gap-2 mb-1.5"><i class="fa-solid fa-circle-check text-crear-accent text-[10px] mt-1"></i> Traer casaca o abrigo abrigador para traslados nocturnos.</p><p class="text-xs text-gray-400 flex items-start gap-2 mb-1.5"><i class="fa-solid fa-circle-check text-crear-accent text-[10px] mt-1"></i> Ropa cómoda para sala con clima controlado.</p><p class="text-xs text-gray-400 flex items-start gap-2 mb-1.5"><i class="fa-solid fa-circle-check text-crear-accent text-[10px] mt-1"></i> Calzado cómodo.</p></div>
+                        </div>
+                        <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/50">
+                            <h4 class="font-bold text-red-400 mb-3 flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> Reglas de Oro y Convivencia</h4>
+                            <ul class="text-sm space-y-2.5">
+                                <li class="flex items-start gap-2.5"><i class="fa-solid fa-circle-check text-green-500 mt-1 text-xs flex-shrink-0"></i> <span><strong>Hora Límite Innegociable:</strong> 11:00 PM es la hora límite innegociable de cierre.</span></li><li class="flex items-start gap-2.5"><i class="fa-solid fa-circle-check text-green-500 mt-1 text-xs flex-shrink-0"></i> <span><strong>Alimentación:</strong> Cero comida en salón. Solo hidratación permitida.</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!-- 5. Honorarios -->
+                <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-emerald-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(168,85,247,0.15)] hover:-translate-y-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-emerald-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                            <i class="fa-solid fa-file-invoice-dollar"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">5. Tus Honorarios</h2>
+                    </div>
+                    <div class="text-gray-300 ml-2 md:ml-18 bg-gray-800/30 p-5 rounded-xl border border-gray-700/50">
+                        <p class="text-lg">Mantenemos el acuerdo estándar de honorarios.</p>
+                        <p class="mt-3 text-sm text-gray-400">Si tus datos bancarios de siempre (Banco, Cuenta, SWIFT) siguen siendo los mismos, el proceso administrativo se iniciará de forma automática tras concluir los entrenamientos.</p>
+                        <div class="mt-5 grid md:grid-cols-2 gap-3 bg-gray-900/60 p-4 rounded-xl border border-gray-700/40 text-xs"><div><span class="text-gray-500 uppercase tracking-widest text-[10px]">Razón Social</span><p class="text-white font-semibold mt-0.5">CREAR PODER SIN LIMITES S.A.C.</p></div><div><span class="text-gray-500 uppercase tracking-widest text-[10px]">RUC / NIF</span><p class="text-white font-mono font-semibold mt-0.5">20608512491</p></div><div class="md:col-span-2"><span class="text-gray-500 uppercase tracking-widest text-[10px]">Dirección Fiscal</span><p class="text-gray-300 mt-0.5">Calle Bellavista 133, Miraflores, Lima, Perú</p></div></div>
+                        <div class="mt-5"><a href="https://wa.me/51919563284?text=Hola%20Jos%C3%A9%2C%20confirmo%20mis%20datos%20bancarios%20para%20honorarios%20de%20Alejandro%20D%C3%ADaz%20E28." target="_blank" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-green-500/10 border border-green-500/30 text-green-400 text-xs font-bold hover:bg-green-500/20 transition-colors"><i class="fa-brands fa-whatsapp text-green-400 text-base"></i> Enviar datos bancarios por WhatsApp</a></div>
+                    </div>
+                </div>
+                <!-- 6. Escuadrón -->
+                <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-pink-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(236,72,153,0.15)] hover:-translate-y-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-pink-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">6. Tu Escuadrón de Soporte</h2>
+                    </div>
+                    <div class="text-gray-300 ml-2 md:ml-18">
+                        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/30 hover:border-crear-accent/50 transition-colors"><h4 class="font-bold text-crear-accent mb-2 text-xs uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-bolt"></i> Capitana</h4><p class="text-white font-medium text-lg">Giovanna Palomino Marcos</p><p class="text-gray-400 text-sm mt-1"><a href="https://wa.me/51922042189" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 922 042 189</a></p></div><div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/30 hover:border-crear-accent/50 transition-colors"><h4 class="font-bold text-purple-400 mb-2 text-xs uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-briefcase"></i> Gerente de Sede</h4><p class="text-white font-medium text-lg">José Sánchez</p><p class="text-gray-400 text-sm mt-1"><a href="https://wa.me/51919563284" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 919 563 284</a></p></div><div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/30 hover:border-crear-accent/50 transition-colors"><h4 class="font-bold text-pink-400 mb-2 text-xs uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> Coordinación MJ</h4><p class="text-white font-medium text-lg">Linid Valencia</p><p class="text-gray-400 text-sm mt-1"><a href="https://wa.me/51912379686" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 912 379 686</a></p></div><div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/30 hover:border-crear-accent/50 transition-colors"><h4 class="font-bold text-pink-400 mb-2 text-xs uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> Coordinación MJ</h4><p class="text-white font-medium text-lg">Leyla Pasquel</p><p class="text-gray-400 text-sm mt-1"><a href="https://wa.me/51919502385" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 919 502 385</a></p></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Closing -->
+                <div class="text-center pt-16 pb-12 reveal">
+                    <h3 class="text-2xl md:text-3xl font-black text-white mb-2 italic" id="random-quote"></h3>
+                    <p class="text-lg text-crear-accent mb-10 font-semibold" id="random-author"></p>
+                    <h3 class="text-2xl md:text-3xl font-black text-white mb-4">
+                        Párate en tu poder absoluto, Alejandro.<br>
+                        <span class="text-crear-accent">Ven a detonar la sala del Equipo 28.</span> Nos vemos muy pronto.
+                    </h3>
+                    <div class="inline-block glass px-10 py-5 rounded-2xl border border-crear-accent/40 shadow-[0_0_30px_rgba(255,183,3,0.25)] hover:scale-105 transition-transform duration-300">
+                        <p class="font-bold text-white text-lg">Un abrazo,</p>
+                        <p class="text-crear-accent font-black tracking-widest uppercase text-xl mt-1">El Equipo de CREAR PSL LIMA</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- FOOTER -->
+        <footer class="bg-[#050505] py-16 border-t border-gray-900 relative z-10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <div class="flex items-center justify-center gap-3 mb-10">
+                    <img src="logo_crear_blanco.png" onerror="this.src='https://crearpodersinlimitesperu-cmd.github.io/cartas-crear/logo_crear_blanco.png'" alt="CREAR" class="h-40 md:h-56 object-contain drop-shadow-[0_0_20px_rgba(251,191,36,0.6)] hover:drop-shadow-[0_0_35px_rgba(251,191,36,1)] hover:scale-105 transition-all duration-500" />
+                </div>
+                <div class="text-gray-600 text-sm font-medium tracking-wide">
+                    &copy; 2026 CREAR Poder Sin Límites Sede Perú.<br/> Comunicación oficial vía Google Chat.
+                </div>
+            </div>
+        </footer>
+    </div>
+    <!-- Floating Music Button -->
+    <button id="musicToggleBtn" class="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full glass border border-gray-600 flex items-center justify-center text-white shadow-[0_0_15px_rgba(255,183,3,0.3)] hover:scale-110 transition-transform duration-300">
         <i class="fa-solid fa-music"></i>
     </button>
-    
-
     <div id="ytplayer" class="absolute -left-[9999px] top-0 w-[300px] h-[300px] opacity-0 pointer-events-none"></div>
-      <script>
-          var tag = document.createElement('script');
-          tag.src = "https://www.youtube.com/iframe_api";
-          var firstScriptTag = document.getElementsByTagName('script')[0];
-          firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-  
-          var player;
-          var isPlaying = false;
-          var playerReady = false;
-  
-          function onYouTubeIframeAPIReady() {
-              player = new YT.Player('ytplayer', {
-                  height: '300',
-                  width: '300',
-                  videoId: 'FboYUBlvaL4',
-                  playerVars: {
-                      'autoplay': 0,
-                      'controls': 0,
-                      'loop': 1,
-                      'playlist': 'FboYUBlvaL4',
-                      'playsinline': 1,
-                      'rel': 0
-                  },
-                  events: {
-                      'onReady': onPlayerReady,
-                      'onStateChange': onPlayerStateChange
-                  }
-              });
-          }
-
-          function onPlayerStateChange(event) {
-              if (event.data === YT.PlayerState.PLAYING) {
-                  isPlaying = true;
-                  const icon = document.querySelector('#musicToggleBtn i');
-                  if(icon) {
-                      icon.classList.remove('fa-music');
-                      icon.classList.add('fa-pause', 'text-crear-accent', 'fa-beat-fade');
-                  }
-              } else if (event.data === YT.PlayerState.PAUSED) {
-                  isPlaying = false;
-                  const icon = document.querySelector('#musicToggleBtn i');
-                  if(icon) {
-                      icon.classList.remove('fa-pause', 'text-crear-accent', 'fa-beat-fade');
-                      icon.classList.add('fa-music');
-                  }
-              }
-          }
-  
-          function toggleMusic() {
-              if (!playerReady || !player) return;
-              if (isPlaying) {
-                  player.pauseVideo();
-              } else {
-                  player.playVideo();
-              }
-          }
-  
-          function onPlayerReady(event) {
-              playerReady = true;
-              const openBtn = document.getElementById('openLetterBtn');
-              if(openBtn) {
-                  openBtn.innerHTML = '<i class="fa-solid fa-envelope-open-text"></i> ABRIR CARTA';
-                  openBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
-                  openBtn.classList.add('animate-pulse');
-              }
-          }
-  
-          document.addEventListener('DOMContentLoaded', () => {
-              const overlay = document.getElementById('welcomeOverlay');
-              const openBtn = document.getElementById('openLetterBtn');
-              const musicBtn = document.getElementById('musicToggleBtn');
-  
-              if(openBtn && overlay) {
-                  openBtn.addEventListener('click', () => {
-                      overlay.style.opacity = '0';
-                      setTimeout(() => overlay.remove(), 1000);
-                      if (playerReady) {
-                          player.playVideo();
-                      }
-                  });
-              }
-  
-              if(musicBtn) {
-                  musicBtn.addEventListener('click', (e) => {
-                      e.stopPropagation();
-                      toggleMusic();
-                  });
-              }
-              
-              // Cuenta Regresiva (Logica Huso Horario)
-              const trainingDateLima = new Date("2026-09-04T16:30:00-05:00").getTime();
-              const flightDateLima = new Date("2026-09-04T10:55:00-05:00").getTime();
-              const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-              const indicator = document.getElementById('timezone-indicator');
-              if(indicator) indicator.innerText = `Mostrando cuenta regresiva detectando tu zona local: ${timeZone}`;
-              
-              function updateCountdowns() {
-                  const now = new Date().getTime();
-                  let distanceTrn = trainingDateLima - now;
-                  if (distanceTrn > 0) {
-                      document.getElementById("trn-d").innerText = String(Math.floor(distanceTrn / (1000 * 60 * 60 * 24))).padStart(2, '0');
-                      document.getElementById("trn-h").innerText = String(Math.floor((distanceTrn % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
-                      document.getElementById("trn-m").innerText = String(Math.floor((distanceTrn % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
-                      document.getElementById("trn-s").innerText = String(Math.floor((distanceTrn % (1000 * 60)) / 1000)).padStart(2, '0');
-                  } else {
-                      document.getElementById("countdown-training").innerHTML = "<div class='col-span-4 text-white font-bold tracking-widest uppercase'>¡El entrenamiento ha comenzado!</div>";
-                  }
-                  
-                  let distanceFly = flightDateLima - now;
-                  if (distanceFly > 0) {
-                      document.getElementById("fly-d").innerText = String(Math.floor(distanceFly / (1000 * 60 * 60 * 24))).padStart(2, '0');
-                      document.getElementById("fly-h").innerText = String(Math.floor((distanceFly % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
-                      document.getElementById("fly-m").innerText = String(Math.floor((distanceFly % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
-                      document.getElementById("fly-s").innerText = String(Math.floor((distanceFly % (1000 * 60)) / 1000)).padStart(2, '0');
-                  } else {
-                      document.getElementById("countdown-flight").innerHTML = "<div class='col-span-4 text-white font-bold tracking-widest uppercase'>¡Buen viaje!</div>";
-                  }
-              }
-              setInterval(updateCountdowns, 1000);
-              updateCountdowns();
-          });
-      </script>
+    <script>
+        var tag = document.createElement("script");
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName("script")[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        var player;
+        var isPlaying = false;
+        var playerReady = false;
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player("ytplayer", {
+                height: "300", width: "300", videoId: "FboYUBlvaL4",
+                playerVars: { "autoplay": 0, "controls": 0, "loop": 1, "playlist": "FboYUBlvaL4", "playsinline": 1, "rel": 0 },
+                events: { "onReady": onPlayerReady, "onStateChange": onPlayerStateChange }
+            });
+        }
+        function onPlayerStateChange(event) {
+            if (event.data === YT.PlayerState.PLAYING) {
+                isPlaying = true;
+                var icon = document.querySelector("#musicToggleBtn i");
+                if(icon) { icon.classList.remove("fa-music"); icon.classList.add("fa-pause", "text-crear-accent", "fa-beat-fade"); }
+            } else if (event.data === YT.PlayerState.PAUSED) {
+                isPlaying = false;
+                var icon = document.querySelector("#musicToggleBtn i");
+                if(icon) { icon.classList.remove("fa-pause", "text-crear-accent", "fa-beat-fade"); icon.classList.add("fa-music"); }
+            }
+        }
+        function toggleMusic() {
+            if (!playerReady || !player) return;
+            if (isPlaying) player.pauseVideo(); else player.playVideo();
+        }
+        function onPlayerReady(event) {
+            playerReady = true;
+            var openBtn = document.getElementById("openLetterBtn");
+            if(openBtn) {
+                openBtn.innerHTML = '<i class="fa-solid fa-envelope-open-text"></i> ABRIR CARTA';
+                openBtn.classList.remove("opacity-50", "cursor-not-allowed", "pointer-events-none");
+                openBtn.classList.add("animate-pulse");
+            }
+        }
+        setTimeout(function(){
+            var openBtn = document.getElementById("openLetterBtn");
+            if(openBtn && !playerReady) {
+                openBtn.innerHTML = '<i class="fa-solid fa-envelope-open-text"></i> ABRIR CARTA';
+                openBtn.classList.remove("opacity-50", "cursor-not-allowed", "pointer-events-none");
+                openBtn.classList.add("animate-pulse");
+            }
+        }, 2500);
+        document.addEventListener("DOMContentLoaded", function() {
+            var overlay = document.getElementById("welcomeOverlay");
+            var openBtn = document.getElementById("openLetterBtn");
+            var musicBtn = document.getElementById("musicToggleBtn");
+            if(openBtn && overlay) {
+                openBtn.addEventListener("click", function() {
+                    overlay.style.opacity = "0";
+                    setTimeout(function(){ overlay.remove(); }, 1000);
+                    if (playerReady && player && typeof player.playVideo === "function") {
+                        player.playVideo();
+                    }
+                });
+            }
+            if(musicBtn) {
+                musicBtn.addEventListener("click", function(e) {
+                    e.stopPropagation();
+                    toggleMusic();
+                });
+            }
+            var flightTimestamp = new Date("2026-09-04T01:50:00.000Z").getTime();
+            var trainingTimestamp = new Date("2026-09-16T23:00:00.000Z").getTime();
+            var timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            var indicator = document.getElementById("timezone-indicator");
+            if(indicator) indicator.innerText = "Mostrando cuenta regresiva detectando tu zona local: " + timeZone;
+            function updateCountdowns() {
+                var now = new Date().getTime();
+                var distanceTrn = trainingTimestamp - now;
+                if (distanceTrn > 0) {
+                    document.getElementById("trn-d").innerText = String(Math.floor(distanceTrn / (1000 * 60 * 60 * 24))).padStart(2, "0");
+                    document.getElementById("trn-h").innerText = String(Math.floor((distanceTrn % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, "0");
+                    document.getElementById("trn-m").innerText = String(Math.floor((distanceTrn % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
+                    document.getElementById("trn-s").innerText = String(Math.floor((distanceTrn % (1000 * 60)) / 1000)).padStart(2, "0");
+                } else {
+                    document.getElementById("countdown-training").innerHTML = "<div class='col-span-4 text-white font-bold tracking-widest uppercase'>¡El entrenamiento ha comenzado!</div>";
+                }
+                var distanceFly = flightTimestamp - now;
+                if (distanceFly > 0) {
+                    document.getElementById("fly-d").innerText = String(Math.floor(distanceFly / (1000 * 60 * 60 * 24))).padStart(2, "0");
+                    document.getElementById("fly-h").innerText = String(Math.floor((distanceFly % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, "0");
+                    document.getElementById("fly-m").innerText = String(Math.floor((distanceFly % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
+                    document.getElementById("fly-s").innerText = String(Math.floor((distanceFly % (1000 * 60)) / 1000)).padStart(2, "0");
+                } else {
+                    document.getElementById("countdown-flight").innerHTML = "<div class='col-span-4 text-white font-bold tracking-widest uppercase'>¡Buen viaje!</div>";
+                }
+            }
+            setInterval(updateCountdowns, 1000);
+            updateCountdowns();
+            var navbar = document.getElementById("navbar");
+            window.addEventListener("scroll", function() {
+                if (window.scrollY > 20) {
+                    navbar.classList.add("bg-crear-black/95", "shadow-lg");
+                    navbar.classList.remove("glass");
+                } else {
+                    navbar.classList.remove("bg-crear-black/95");
+                    navbar.classList.add("glass");
+                }
+            });
+            var revealElements = document.querySelectorAll(".reveal");
+            var revealObserver = new IntersectionObserver(function(entries, observer) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("active");
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
+            revealElements.forEach(function(el) { revealObserver.observe(el); });
+            setTimeout(function() {
+                revealElements.forEach(function(el) {
+                    var rect = el.getBoundingClientRect();
+                    if (rect.top < window.innerHeight && rect.width > 0 && rect.height > 0) {
+                        el.classList.add("active");
+                    }
+                });
+            }, 100);
+            var quoteEl = document.getElementById("random-quote");
+            var authorEl = document.getElementById("random-author");
+            if (quoteEl && authorEl) {
+                var quotesList = (typeof transformationQuotes !== "undefined" && Array.isArray(transformationQuotes) && transformationQuotes.length > 0)
+                    ? transformationQuotes
+                    : [
+                        { text: "Tú y yo poseemos dentro de nosotros mismos en cada momento de nuestras vidas, bajo todas las circunstancias, el poder de transformar la calidad de nuestras vidas.", author: "Werner Erhard" },
+                        { text: "El poder de la auto-transformación está en tus manos.", author: "Tony Robbins" },
+                        { text: "Cuando tomas una elección, cambias el futuro.", author: "Joe Dispenza" },
+                        { text: "La transformación no es un evento futuro. Es una actividad actual.", author: "Jillian Michaels" }
+                    ];
+                var rq = quotesList[Math.floor(Math.random() * quotesList.length)];
+                quoteEl.innerText = "\"" + (rq.text || rq.quote) + "\"";
+                authorEl.innerText = "— " + (rq.author || rq.autor);
+            }
+        });
+    </script>
 </body>
+</html>
+```
 
+---
 
+## Archivo: public\cartas\carta_andres_idrobo_e30.html
 
+```html
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenido Andrés | CREAR Poder Sin Límites</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="quotes.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ["Montserrat", "Inter", "sans-serif"],
+                    },
+                    colors: {
+                        crear: {
+                            black: "#0a0a0a",
+                            dark: "#171717",
+                            gray: "#262626",
+                            light: "#e5e5e5",
+                            accent: "#FFB703",
+                            primary: "#2563eb",
+                        }
+                    },
+                    animation: {
+                        "float": "float 6s ease-in-out infinite",
+                        "pulse-slow": "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        body { background-color: #0a0a0a; color: #e5e5e5; overflow-x: hidden; font-family: "Montserrat", sans-serif; }
+        .glass { background: rgba(23, 23, 23, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.5, 0, 0, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+        .text-gradient { background: linear-gradient(to right, #FFB703, #f59e0b, #fbbf24); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0a0a0a; }
+        ::-webkit-scrollbar-thumb { background: #262626; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #FFB703; }
+    </style>
+</head>
+<body class="antialiased selection:bg-crear-accent selection:text-white">
+    <!-- Welcome Overlay -->
+    <div id="welcomeOverlay" class="fixed inset-0 z-[100] bg-[#050505] flex flex-col items-center justify-center transition-opacity duration-1000">
+        <img src="logo_crear_blanco.png" onerror="this.src='https://crearpodersinlimitesperu-cmd.github.io/cartas-crear/logo_crear_blanco.png'" alt="CREAR Poder Sin Límites" class="h-28 md:h-40 mb-10 drop-shadow-[0_0_25px_rgba(251,191,36,0.5)] animate-pulse">
+        <button id="openLetterBtn" class="px-10 py-5 bg-crear-accent text-black font-black text-xl rounded-full hover:scale-110 transition-transform shadow-[0_0_30px_rgba(251,191,36,0.6)] flex items-center gap-3 opacity-50 cursor-not-allowed pointer-events-none transition-all duration-500">
+            <i class="fa-solid fa-spinner fa-spin"></i> PREPARANDO EXPERIENCIA...
+        </button>
+        <p class="mt-6 text-gray-500 text-sm font-light">Enciende el volumen para la experiencia completa</p>
+    </div>
+    <div id="content">
+        <!-- Navbar -->
+        <nav class="fixed w-full z-50 glass transition-all duration-300 shadow-lg" id="navbar">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-20">
+                    <div class="flex-shrink-0 flex items-center gap-2 cursor-pointer" onclick="window.scrollTo(0,0)">
+                        <img src="logo_crear_blanco.png" onerror="this.src='https://crearpodersinlimitesperu-cmd.github.io/cartas-crear/logo_crear_blanco.png'" alt="CREAR" class="h-10 object-contain" />
+                    </div>
+                    <div class="flex space-x-8 items-center">
+                        <span class="text-crear-accent font-semibold tracking-wider text-sm uppercase">Radar Operativo &middot; Lima</span>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <!-- Hero Section -->
+        <section class="relative min-h-screen flex items-center justify-center pt-20 pb-12 overflow-hidden">
+            <div class="absolute inset-0 z-0">
+                <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-yellow-900/40 via-crear-black to-crear-black"></div>
+                <div class="absolute top-20 right-10 w-64 h-64 bg-crear-accent opacity-20 rounded-full blur-[100px] animate-float"></div>
+            </div>
+            <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center mt-12">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-sm font-semibold text-crear-accent mb-6 reveal shadow-[0_0_15px_rgba(255,183,3,0.3)]">
+                    <i class="fa-solid fa-calendar-day"></i> 2 de septiembre de 2026
+                </div>
+                <h1 class="text-5xl md:text-7xl font-black tracking-tight mb-6 reveal text-white" style="transition-delay: 100ms;">
+                    ¡Bienvenido a casa,<br/> <span class="text-gradient">Andrés!</span>
+                </h1>
+                <p class="mt-4 text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto mb-8 font-light reveal" style="transition-delay: 200ms;">
+                    Tu radar para la Maestría en Creación (Equipo 30) 💥
+                </p>
+                <!-- Dual Countdowns -->
+                <div class="reveal mb-12 flex flex-col md:flex-row gap-8 justify-center items-center" style="transition-delay: 275ms;">
+                    <div class="glass p-6 rounded-2xl border border-crear-accent/20 shadow-[0_0_20px_rgba(255,183,3,0.2)] w-full max-w-sm">
+                        <h3 class="text-crear-accent text-sm uppercase tracking-widest font-bold mb-4">✈️ Tiempo para tu Viaje</h3>
+                        <div id="countdown-flight" class="grid grid-cols-4 gap-2 text-center">
+                            <div><div class="text-3xl font-black text-white" id="fly-d">00</div><div class="text-[10px] text-gray-500 uppercase">Días</div></div>
+                            <div><div class="text-3xl font-black text-white" id="fly-h">00</div><div class="text-[10px] text-gray-500 uppercase">Hrs</div></div>
+                            <div><div class="text-3xl font-black text-white" id="fly-m">00</div><div class="text-[10px] text-gray-500 uppercase">Min</div></div>
+                            <div><div class="text-3xl font-black text-white" id="fly-s">00</div><div class="text-[10px] text-gray-500 uppercase">Seg</div></div>
+                        </div>
+                    </div>
+                    <div class="glass p-6 rounded-2xl border border-crear-accent/20 shadow-[0_0_20px_rgba(255,183,3,0.2)] w-full max-w-sm">
+                        <h3 class="text-crear-accent text-sm uppercase tracking-widest font-bold mb-4">🔥 Inicio de Maestría en Creación</h3>
+                        <div id="countdown-training" class="grid grid-cols-4 gap-2 text-center">
+                            <div><div class="text-3xl font-black text-white" id="trn-d">00</div><div class="text-[10px] text-gray-500 uppercase">Días</div></div>
+                            <div><div class="text-3xl font-black text-white" id="trn-h">00</div><div class="text-[10px] text-gray-500 uppercase">Hrs</div></div>
+                            <div><div class="text-3xl font-black text-white" id="trn-m">00</div><div class="text-[10px] text-gray-500 uppercase">Min</div></div>
+                            <div><div class="text-3xl font-black text-white" id="trn-s">00</div><div class="text-[10px] text-gray-500 uppercase">Seg</div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="reveal mb-12 flex justify-center" style="transition-delay: 280ms;"><a href="carta_invitacion_migraciones.html?nombre=ELMER%20IDROBO%20ANDRADE&doc=PASAPORTE%20COLOMBIANA&fechas=Del%204%20al%206%20de%20septiembre%20de%202026&rol=Invitado+Especial+Internacional" target="_blank" class="glass border border-crear-accent/50 hover:bg-crear-accent/20 text-white px-6 py-3 rounded-full shadow-[0_0_20px_rgba(255,183,3,0.2)] transition-transform hover:scale-105 flex items-center gap-3 text-sm font-semibold tracking-wide uppercase"><i class="fa-solid fa-passport text-crear-accent"></i> Ver Carta para Migraciones</a></div>
+                <p id="timezone-indicator" class="text-xs text-gray-500 mb-8 tracking-widest uppercase reveal" style="transition-delay: 285ms;">Calculando huso horario local...</p>
+                <!-- Welcome Note -->
+                <div class="glass p-8 rounded-2xl text-left reveal border border-gray-800 hover:border-crear-accent transition-colors duration-500 shadow-2xl" style="transition-delay: 300ms;">
+                    <div class="text-gray-300 text-lg leading-relaxed space-y-4">
+                        <p><strong>Querido/a Andrés,</strong></p>
+                        <p>Querido Andrés, ¡qué alegría recibirte! Estamos completamente listos para expandir el juego y materializar la visión de este equipo. Nos emociona profundamente tu llegada para detonar este fin de semana.</p><p>Nos da una tranquilidad enorme saber que tu impecable presencia y contención guiarán la sala en este fin de semana tan determinante. Para que viajes ligero de equipaje y con la mente puesta únicamente en el equipo, aquí tienes tu radar logístico exacto:</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Sections Container -->
+        <section class="py-16 bg-crear-black relative z-10">
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+                <!-- 1. Misión -->
+                <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-crear-accent transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,183,3,0.15)] hover:-translate-y-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-crear-accent text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                            <i class="fa-solid fa-fire"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">1. Tu Misión (Maestría en Creación - Equipo 30)</h2>
+                    </div>
+                    <div class="space-y-4 text-gray-300 ml-2 md:ml-18">
+                        <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden mb-4"><div class="absolute top-0 left-0 w-1 h-full bg-crear-accent"></div><h4 class="font-black text-white mb-3 text-crear-accent tracking-wide uppercase text-sm">Viernes - Arranque Oficial</h4><div class="space-y-2"><p class="flex items-start gap-3"><i class="fa-regular fa-clock text-crear-accent mt-1"></i> <span><strong>16:30 PM:</strong> Grounding Entrenadores con Coordinación (Directo en salón).</span></p><p class="flex items-start gap-3"><i class="fa-regular fa-clock text-crear-accent mt-1"></i> <span><strong>17:00 PM:</strong> Apertura de Mesa de Registro para Participantes.</span></p><p class="flex items-start gap-3"><i class="fa-regular fa-clock text-crear-accent mt-1"></i> <span><strong>18:00 PM:</strong> Apertura de puertas e inicio de sala.</span></p></div></div>
+                    </div>
+                </div>
+                <!-- 2. Vuelos -->
+                <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-purple-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(168,85,247,0.15)] hover:-translate-y-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-purple-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                            <i class="fa-solid fa-plane"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">2. Vuelos Confirmados</h2>
+                    </div>
+                    <div class="space-y-4 text-gray-300 ml-2 md:ml-18">
+                        <div class="flex flex-wrap gap-3 items-center">
+                            <span class="text-gray-400 text-sm">Reserva:</span>
+                            <span class="bg-gray-800 border border-gray-700 px-3 py-1 rounded-md font-mono text-white text-sm">DJBJJD</span>
+                            <span class="text-gray-500 text-xs ml-2">(Boleto a nombre de: <strong>ELMER IDROBO ANDRADE</strong>)</span>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-5 mt-5">
+                            <!-- Llegada -->
+                            <div class="bg-gradient-to-br from-gray-800/40 to-gray-900/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden">
+                                <div class="absolute top-0 left-0 w-full h-1 bg-purple-500"></div>
+                                <h4 class="font-black text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-plane-arrival text-purple-400"></i> Llegada (04/09/2026)</h4>
+                                <div class="space-y-2 text-sm">
+                                    <p class="flex justify-between border-b border-gray-700/50 pb-2"><span class="text-gray-400">Vuelo</span> <span class="font-medium text-white">LATAM LA 1430</span></p>
+                                    <p class="flex justify-between pt-1"><span class="text-gray-400">Llegada a Lima</span> <span class="font-medium text-green-400">10:55 AM</span></p>
+                                    <div class="pt-2"><a href="https://www.flightradar24.com/data/flights/la1430" target="_blank" class="text-xs text-purple-400 hover:underline">Ver en FlightRadar &rarr;</a></div>
+                                </div>
+                            </div>
+                            <!-- Salida -->
+                            <div class="bg-gradient-to-br from-gray-800/40 to-gray-900/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden">
+                                <div class="absolute top-0 left-0 w-full h-1 bg-red-500"></div>
+                                <h4 class="font-black text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-plane-departure text-red-400"></i> Salida (06/09/2026)</h4>
+                                <div class="space-y-2 text-sm">
+                                    <p class="flex justify-between border-b border-gray-700/50 pb-2"><span class="text-gray-400">Vuelo</span> <span class="font-medium text-white">LATAM LA 1449</span></p>
+                                    <p class="flex justify-between pt-1"><span class="text-gray-400">Salida de Lima</span> <span class="font-medium text-red-400">23:35 PM</span></p>
+                                    <div class="pt-2"><a href="https://www.flightradar24.com/data/flights/la1449" target="_blank" class="text-xs text-red-400 hover:underline">Ver en FlightRadar &rarr;</a></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 bg-gradient-to-r from-amber-500/10 to-transparent p-4 rounded-xl border border-amber-500/30 flex items-center gap-3"><i class="fa-regular fa-clock text-crear-accent text-xl"></i><div><p class="text-crear-accent font-bold text-sm">Recojo en Lobby para Salida: 08:05 PM</p><p class="text-xs text-gray-400">Calculado 3.5 horas antes de tu vuelo (23:35 PM) para margen de tráfico y abordaje.</p></div></div>
+                    </div>
+                </div>
+                <!-- 3. Movilidad y Sede -->
+                <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-blue-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] hover:-translate-y-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-blue-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                            <i class="fa-solid fa-car"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">3. Movilidad y Sede</h2>
+                    </div>
+                    <div class="space-y-6 text-gray-300 ml-2 md:ml-18">
+                        <p class="text-lg"><strong>Tus traslados:</strong> Nuestro equipo te contactará para coordinar tu recojo en el aeropuerto Jorge Chávez.</p>
+                        <div class="space-y-4"><div class="flex gap-4 items-start bg-gray-800/30 p-4 rounded-xl border border-gray-700/30"><div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 flex-shrink-0"><i class="fa-solid fa-suitcase"></i></div><div><div class="font-bold text-blue-400 mb-1">Traslado Oficial</div><div class="text-sm text-gray-300">Nuestro equipo te contactará para coordinar tu recojo en el aeropuerto Jorge Chávez.</div></div></div></div>
+                        <div class="mt-4 bg-gradient-to-r from-blue-500/10 to-transparent p-4 rounded-xl border border-blue-500/30 flex items-center gap-3"><i class="fa-solid fa-car text-blue-400 text-xl"></i><div><p class="text-blue-400 font-bold text-sm">Coordinación con Conductor</p><p class="text-xs text-gray-400">El conductor asignado te escribirá por WhatsApp 1 hora antes de tu arribo/salida para darte la placa del auto y coordinar el punto de encuentro exacto.</p></div></div>
+                        <div class="bg-gradient-to-r from-blue-900/20 to-transparent p-5 rounded-xl border-l-4 border-blue-500 mt-6">
+                            <h4 class="font-black text-white mb-2 flex items-center gap-2"><i class="fa-solid fa-hotel text-blue-400"></i> Hotel y Salón: Hotel Jose Antonio Deluxe (Miraflores)</h4>
+                            <p class="text-sm text-gray-300">Calle Bellavista 133, Miraflores, Lima, Perú</p>
+                            <p class="text-xs text-amber-400 mt-2 font-medium"><i class="fa-solid fa-circle-info"></i> Tu equipaje será resguardado en el hotel tras tu check-out del mediodía el domingo.</p>
+                            <a href="https://maps.google.com/?q=Hotel+Jose+Antonio+Deluxe+Miraflores+Lima" target="_blank" class="inline-flex items-center gap-2 mt-3 text-xs text-blue-400 hover:underline"><i class="fa-solid fa-map-location-dot"></i> Ver ubicación en Google Maps &rarr;</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- 4. Clima y Reglas -->
+                <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-amber-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(245,158,11,0.15)] hover:-translate-y-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-amber-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                            <i class="fa-solid fa-cloud"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">4. Clima y Reglas de Oro</h2>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-5 text-gray-300 ml-2 md:ml-18">
+                        <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/50">
+                            <h4 class="font-bold text-amber-400 mb-3 flex items-center gap-2"><i class="fa-solid fa-temperature-empty"></i> El Clima (Lima)</h4>
+                            <p class="text-2xl font-black text-white mb-2">15°C - 18°C</p>
+                            <p class="text-sm font-semibold text-amber-300/90 mb-1">Invierno Limeño</p>
+                            <p class="text-xs text-gray-400 mb-4">El clima está frío y húmedo (invierno), trae buen abrigo.</p>
+                            <div class="space-y-1"><p class="text-xs text-gray-400 flex items-start gap-2 mb-1.5"><i class="fa-solid fa-circle-check text-crear-accent text-[10px] mt-1"></i> Traer casaca o abrigo abrigador para traslados nocturnos.</p><p class="text-xs text-gray-400 flex items-start gap-2 mb-1.5"><i class="fa-solid fa-circle-check text-crear-accent text-[10px] mt-1"></i> Ropa cómoda para sala con clima controlado.</p><p class="text-xs text-gray-400 flex items-start gap-2 mb-1.5"><i class="fa-solid fa-circle-check text-crear-accent text-[10px] mt-1"></i> Calzado cómodo.</p></div>
+                        </div>
+                        <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/50">
+                            <h4 class="font-bold text-red-400 mb-3 flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> Reglas de Oro y Convivencia</h4>
+                            <ul class="text-sm space-y-2.5">
+                                <li class="flex items-start gap-2.5"><i class="fa-solid fa-circle-check text-green-500 mt-1 text-xs flex-shrink-0"></i> <span><strong>Hora Límite Innegociable:</strong> 11:00 PM es la hora límite innegociable de cierre.</span></li><li class="flex items-start gap-2.5"><i class="fa-solid fa-circle-check text-green-500 mt-1 text-xs flex-shrink-0"></i> <span><strong>Alimentación:</strong> Cero comida en salón. Solo hidratación permitida.</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!-- 5. Honorarios -->
+                <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-emerald-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(168,85,247,0.15)] hover:-translate-y-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-emerald-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                            <i class="fa-solid fa-file-invoice-dollar"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">5. Tus Honorarios</h2>
+                    </div>
+                    <div class="text-gray-300 ml-2 md:ml-18 bg-gray-800/30 p-5 rounded-xl border border-gray-700/50">
+                        <p class="text-lg">Mantenemos el acuerdo estándar. El abono se coordina con el equipo financiero de Lima.</p>
+                        <p class="mt-3 text-sm text-gray-400">Si tus datos bancarios de siempre (Banco, Cuenta, SWIFT) siguen siendo los mismos, el proceso administrativo se iniciará de forma automática tras concluir los entrenamientos.</p>
+                        <div class="mt-5 grid md:grid-cols-2 gap-3 bg-gray-900/60 p-4 rounded-xl border border-gray-700/40 text-xs"><div><span class="text-gray-500 uppercase tracking-widest text-[10px]">Razón Social</span><p class="text-white font-semibold mt-0.5">CREAR PODER SIN LIMITES S.A.C.</p></div><div><span class="text-gray-500 uppercase tracking-widest text-[10px]">RUC / NIF</span><p class="text-white font-mono font-semibold mt-0.5">20608512491</p></div><div class="md:col-span-2"><span class="text-gray-500 uppercase tracking-widest text-[10px]">Dirección Fiscal</span><p class="text-gray-300 mt-0.5">Calle Bellavista 133, Miraflores, Lima, Perú</p></div></div>
+                        <div class="mt-5"><a href="https://wa.me/51919563284?text=Hola%20Jos%C3%A9%2C%20confirmo%20mis%20datos%20bancarios%20para%20honorarios%20de%20Andr%C3%A9s%20Idrobo%20E30." target="_blank" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-green-500/10 border border-green-500/30 text-green-400 text-xs font-bold hover:bg-green-500/20 transition-colors"><i class="fa-brands fa-whatsapp text-green-400 text-base"></i> Enviar datos bancarios por WhatsApp</a></div>
+                    </div>
+                </div>
+                <!-- 6. Escuadrón -->
+                <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-pink-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(236,72,153,0.15)] hover:-translate-y-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-pink-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">6. Tu Escuadrón de Soporte</h2>
+                    </div>
+                    <div class="text-gray-300 ml-2 md:ml-18">
+                        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/30 hover:border-crear-accent/50 transition-colors"><h4 class="font-bold text-crear-accent mb-2 text-xs uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-bolt"></i> Capitán</h4><p class="text-white font-medium text-lg">Fernando Lopez Lopez</p><p class="text-gray-400 text-sm mt-1"><a href="https://wa.me/51981237577" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 981 237 577</a></p></div><div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/30 hover:border-crear-accent/50 transition-colors"><h4 class="font-bold text-purple-400 mb-2 text-xs uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-briefcase"></i> Gerente de Sede</h4><p class="text-white font-medium text-lg">José Sánchez</p><p class="text-gray-400 text-sm mt-1"><a href="https://wa.me/51919563284" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 919 563 284</a></p></div><div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/30 hover:border-crear-accent/50 transition-colors"><h4 class="font-bold text-pink-400 mb-2 text-xs uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> Coordinación MJ</h4><p class="text-white font-medium text-lg">Linid Valencia</p><p class="text-gray-400 text-sm mt-1"><a href="https://wa.me/51912379686" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 912 379 686</a></p></div><div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/30 hover:border-crear-accent/50 transition-colors"><h4 class="font-bold text-pink-400 mb-2 text-xs uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> Coordinación MJ</h4><p class="text-white font-medium text-lg">Leyla Pasquel</p><p class="text-gray-400 text-sm mt-1"><a href="https://wa.me/51919502385" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 919 502 385</a></p></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Closing -->
+                <div class="text-center pt-16 pb-12 reveal">
+                    <h3 class="text-2xl md:text-3xl font-black text-white mb-2 italic" id="random-quote"></h3>
+                    <p class="text-lg text-crear-accent mb-10 font-semibold" id="random-author"></p>
+                    <h3 class="text-2xl md:text-3xl font-black text-white mb-4">
+                        Párate en tu poder absoluto, Andrés.<br>
+                        <span class="text-crear-accent">Ven a detonar la sala del Equipo 30.</span> Nos vemos muy pronto.
+                    </h3>
+                    <div class="inline-block glass px-10 py-5 rounded-2xl border border-crear-accent/40 shadow-[0_0_30px_rgba(255,183,3,0.25)] hover:scale-105 transition-transform duration-300">
+                        <p class="font-bold text-white text-lg">Un abrazo,</p>
+                        <p class="text-crear-accent font-black tracking-widest uppercase text-xl mt-1">El Equipo de CREAR PSL LIMA</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- FOOTER -->
+        <footer class="bg-[#050505] py-16 border-t border-gray-900 relative z-10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <div class="flex items-center justify-center gap-3 mb-10">
+                    <img src="logo_crear_blanco.png" onerror="this.src='https://crearpodersinlimitesperu-cmd.github.io/cartas-crear/logo_crear_blanco.png'" alt="CREAR" class="h-40 md:h-56 object-contain drop-shadow-[0_0_20px_rgba(251,191,36,0.6)] hover:drop-shadow-[0_0_35px_rgba(251,191,36,1)] hover:scale-105 transition-all duration-500" />
+                </div>
+                <div class="text-gray-600 text-sm font-medium tracking-wide">
+                    &copy; 2026 CREAR Poder Sin Límites Sede Perú.<br/> Comunicación oficial vía Google Chat.
+                </div>
+            </div>
+        </footer>
+    </div>
+    <!-- Floating Music Button -->
+    <button id="musicToggleBtn" class="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full glass border border-gray-600 flex items-center justify-center text-white shadow-[0_0_15px_rgba(255,183,3,0.3)] hover:scale-110 transition-transform duration-300">
+        <i class="fa-solid fa-music"></i>
+    </button>
+    <div id="ytplayer" class="absolute -left-[9999px] top-0 w-[300px] h-[300px] opacity-0 pointer-events-none"></div>
+    <script>
+        var tag = document.createElement("script");
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName("script")[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        var player;
+        var isPlaying = false;
+        var playerReady = false;
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player("ytplayer", {
+                height: "300", width: "300", videoId: "FboYUBlvaL4",
+                playerVars: { "autoplay": 0, "controls": 0, "loop": 1, "playlist": "FboYUBlvaL4", "playsinline": 1, "rel": 0 },
+                events: { "onReady": onPlayerReady, "onStateChange": onPlayerStateChange }
+            });
+        }
+        function onPlayerStateChange(event) {
+            if (event.data === YT.PlayerState.PLAYING) {
+                isPlaying = true;
+                var icon = document.querySelector("#musicToggleBtn i");
+                if(icon) { icon.classList.remove("fa-music"); icon.classList.add("fa-pause", "text-crear-accent", "fa-beat-fade"); }
+            } else if (event.data === YT.PlayerState.PAUSED) {
+                isPlaying = false;
+                var icon = document.querySelector("#musicToggleBtn i");
+                if(icon) { icon.classList.remove("fa-pause", "text-crear-accent", "fa-beat-fade"); icon.classList.add("fa-music"); }
+            }
+        }
+        function toggleMusic() {
+            if (!playerReady || !player) return;
+            if (isPlaying) player.pauseVideo(); else player.playVideo();
+        }
+        function onPlayerReady(event) {
+            playerReady = true;
+            var openBtn = document.getElementById("openLetterBtn");
+            if(openBtn) {
+                openBtn.innerHTML = '<i class="fa-solid fa-envelope-open-text"></i> ABRIR CARTA';
+                openBtn.classList.remove("opacity-50", "cursor-not-allowed", "pointer-events-none");
+                openBtn.classList.add("animate-pulse");
+            }
+        }
+        setTimeout(function(){
+            var openBtn = document.getElementById("openLetterBtn");
+            if(openBtn && !playerReady) {
+                openBtn.innerHTML = '<i class="fa-solid fa-envelope-open-text"></i> ABRIR CARTA';
+                openBtn.classList.remove("opacity-50", "cursor-not-allowed", "pointer-events-none");
+                openBtn.classList.add("animate-pulse");
+            }
+        }, 2500);
+        document.addEventListener("DOMContentLoaded", function() {
+            var overlay = document.getElementById("welcomeOverlay");
+            var openBtn = document.getElementById("openLetterBtn");
+            var musicBtn = document.getElementById("musicToggleBtn");
+            if(openBtn && overlay) {
+                openBtn.addEventListener("click", function() {
+                    overlay.style.opacity = "0";
+                    setTimeout(function(){ overlay.remove(); }, 1000);
+                    if (playerReady && player && typeof player.playVideo === "function") {
+                        player.playVideo();
+                    }
+                });
+            }
+            if(musicBtn) {
+                musicBtn.addEventListener("click", function(e) {
+                    e.stopPropagation();
+                    toggleMusic();
+                });
+            }
+            var flightTimestamp = new Date("2026-09-04T15:55:00.000Z").getTime();
+            var trainingTimestamp = new Date("2026-09-16T23:00:00.000Z").getTime();
+            var timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            var indicator = document.getElementById("timezone-indicator");
+            if(indicator) indicator.innerText = "Mostrando cuenta regresiva detectando tu zona local: " + timeZone;
+            function updateCountdowns() {
+                var now = new Date().getTime();
+                var distanceTrn = trainingTimestamp - now;
+                if (distanceTrn > 0) {
+                    document.getElementById("trn-d").innerText = String(Math.floor(distanceTrn / (1000 * 60 * 60 * 24))).padStart(2, "0");
+                    document.getElementById("trn-h").innerText = String(Math.floor((distanceTrn % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, "0");
+                    document.getElementById("trn-m").innerText = String(Math.floor((distanceTrn % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
+                    document.getElementById("trn-s").innerText = String(Math.floor((distanceTrn % (1000 * 60)) / 1000)).padStart(2, "0");
+                } else {
+                    document.getElementById("countdown-training").innerHTML = "<div class='col-span-4 text-white font-bold tracking-widest uppercase'>¡El entrenamiento ha comenzado!</div>";
+                }
+                var distanceFly = flightTimestamp - now;
+                if (distanceFly > 0) {
+                    document.getElementById("fly-d").innerText = String(Math.floor(distanceFly / (1000 * 60 * 60 * 24))).padStart(2, "0");
+                    document.getElementById("fly-h").innerText = String(Math.floor((distanceFly % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, "0");
+                    document.getElementById("fly-m").innerText = String(Math.floor((distanceFly % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
+                    document.getElementById("fly-s").innerText = String(Math.floor((distanceFly % (1000 * 60)) / 1000)).padStart(2, "0");
+                } else {
+                    document.getElementById("countdown-flight").innerHTML = "<div class='col-span-4 text-white font-bold tracking-widest uppercase'>¡Buen viaje!</div>";
+                }
+            }
+            setInterval(updateCountdowns, 1000);
+            updateCountdowns();
+            var navbar = document.getElementById("navbar");
+            window.addEventListener("scroll", function() {
+                if (window.scrollY > 20) {
+                    navbar.classList.add("bg-crear-black/95", "shadow-lg");
+                    navbar.classList.remove("glass");
+                } else {
+                    navbar.classList.remove("bg-crear-black/95");
+                    navbar.classList.add("glass");
+                }
+            });
+            var revealElements = document.querySelectorAll(".reveal");
+            var revealObserver = new IntersectionObserver(function(entries, observer) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("active");
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
+            revealElements.forEach(function(el) { revealObserver.observe(el); });
+            setTimeout(function() {
+                revealElements.forEach(function(el) {
+                    var rect = el.getBoundingClientRect();
+                    if (rect.top < window.innerHeight && rect.width > 0 && rect.height > 0) {
+                        el.classList.add("active");
+                    }
+                });
+            }, 100);
+            var quoteEl = document.getElementById("random-quote");
+            var authorEl = document.getElementById("random-author");
+            if (quoteEl && authorEl) {
+                var quotesList = (typeof transformationQuotes !== "undefined" && Array.isArray(transformationQuotes) && transformationQuotes.length > 0)
+                    ? transformationQuotes
+                    : [
+                        { text: "Tú y yo poseemos dentro de nosotros mismos en cada momento de nuestras vidas, bajo todas las circunstancias, el poder de transformar la calidad de nuestras vidas.", author: "Werner Erhard" },
+                        { text: "El poder de la auto-transformación está en tus manos.", author: "Tony Robbins" },
+                        { text: "Cuando tomas una elección, cambias el futuro.", author: "Joe Dispenza" },
+                        { text: "La transformación no es un evento futuro. Es una actividad actual.", author: "Jillian Michaels" }
+                    ];
+                var rq = quotesList[Math.floor(Math.random() * quotesList.length)];
+                quoteEl.innerText = "\"" + (rq.text || rq.quote) + "\"";
+                authorEl.innerText = "— " + (rq.author || rq.autor);
+            }
+        });
+    </script>
+</body>
+</html>
+```
 
+---
 
+## Archivo: public\cartas\carta_lourdes_patino_e29.html
+
+```html
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenido Lourdes | CREAR Poder Sin Límites</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="quotes.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ["Montserrat", "Inter", "sans-serif"],
+                    },
+                    colors: {
+                        crear: {
+                            black: "#0a0a0a",
+                            dark: "#171717",
+                            gray: "#262626",
+                            light: "#e5e5e5",
+                            accent: "#FFB703",
+                            primary: "#2563eb",
+                        }
+                    },
+                    animation: {
+                        "float": "float 6s ease-in-out infinite",
+                        "pulse-slow": "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        body { background-color: #0a0a0a; color: #e5e5e5; overflow-x: hidden; font-family: "Montserrat", sans-serif; }
+        .glass { background: rgba(23, 23, 23, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.5, 0, 0, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+        .text-gradient { background: linear-gradient(to right, #FFB703, #f59e0b, #fbbf24); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0a0a0a; }
+        ::-webkit-scrollbar-thumb { background: #262626; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #FFB703; }
+    </style>
+</head>
+<body class="antialiased selection:bg-crear-accent selection:text-white">
+    <!-- Welcome Overlay -->
+    <div id="welcomeOverlay" class="fixed inset-0 z-[100] bg-[#050505] flex flex-col items-center justify-center transition-opacity duration-1000">
+        <img src="logo_crear_blanco.png" onerror="this.src='https://crearpodersinlimitesperu-cmd.github.io/cartas-crear/logo_crear_blanco.png'" alt="CREAR Poder Sin Límites" class="h-28 md:h-40 mb-10 drop-shadow-[0_0_25px_rgba(251,191,36,0.5)] animate-pulse">
+        <button id="openLetterBtn" class="px-10 py-5 bg-crear-accent text-black font-black text-xl rounded-full hover:scale-110 transition-transform shadow-[0_0_30px_rgba(251,191,36,0.6)] flex items-center gap-3 opacity-50 cursor-not-allowed pointer-events-none transition-all duration-500">
+            <i class="fa-solid fa-spinner fa-spin"></i> PREPARANDO EXPERIENCIA...
+        </button>
+        <p class="mt-6 text-gray-500 text-sm font-light">Enciende el volumen para la experiencia completa</p>
+    </div>
+    <div id="content">
+        <!-- Navbar -->
+        <nav class="fixed w-full z-50 glass transition-all duration-300 shadow-lg" id="navbar">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-20">
+                    <div class="flex-shrink-0 flex items-center gap-2 cursor-pointer" onclick="window.scrollTo(0,0)">
+                        <img src="logo_crear_blanco.png" onerror="this.src='https://crearpodersinlimitesperu-cmd.github.io/cartas-crear/logo_crear_blanco.png'" alt="CREAR" class="h-10 object-contain" />
+                    </div>
+                    <div class="flex space-x-8 items-center">
+                        <span class="text-crear-accent font-semibold tracking-wider text-sm uppercase">Radar Operativo &middot; Lima</span>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <!-- Hero Section -->
+        <section class="relative min-h-screen flex items-center justify-center pt-20 pb-12 overflow-hidden">
+            <div class="absolute inset-0 z-0">
+                <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-yellow-900/40 via-crear-black to-crear-black"></div>
+                <div class="absolute top-20 right-10 w-64 h-64 bg-crear-accent opacity-20 rounded-full blur-[100px] animate-float"></div>
+            </div>
+            <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center mt-12">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-sm font-semibold text-crear-accent mb-6 reveal shadow-[0_0_15px_rgba(255,183,3,0.3)]">
+                    <i class="fa-solid fa-calendar-day"></i> 2 de septiembre de 2026
+                </div>
+                <h1 class="text-5xl md:text-7xl font-black tracking-tight mb-6 reveal text-white" style="transition-delay: 100ms;">
+                    ¡Bienvenido a casa,<br/> <span class="text-gradient">Lourdes!</span>
+                </h1>
+                <p class="mt-4 text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto mb-8 font-light reveal" style="transition-delay: 200ms;">
+                    Tu radar para la Maestría en Relación (Equipo 29) 💥
+                </p>
+                <!-- Dual Countdowns -->
+                <div class="reveal mb-12 flex flex-col md:flex-row gap-8 justify-center items-center" style="transition-delay: 275ms;">
+                    <div class="glass p-6 rounded-2xl border border-crear-accent/20 shadow-[0_0_20px_rgba(255,183,3,0.2)] w-full max-w-sm">
+                        <h3 class="text-crear-accent text-sm uppercase tracking-widest font-bold mb-4">✈️ Tiempo para tu Viaje</h3>
+                        <div id="countdown-flight" class="grid grid-cols-4 gap-2 text-center">
+                            <div><div class="text-3xl font-black text-white" id="fly-d">00</div><div class="text-[10px] text-gray-500 uppercase">Días</div></div>
+                            <div><div class="text-3xl font-black text-white" id="fly-h">00</div><div class="text-[10px] text-gray-500 uppercase">Hrs</div></div>
+                            <div><div class="text-3xl font-black text-white" id="fly-m">00</div><div class="text-[10px] text-gray-500 uppercase">Min</div></div>
+                            <div><div class="text-3xl font-black text-white" id="fly-s">00</div><div class="text-[10px] text-gray-500 uppercase">Seg</div></div>
+                        </div>
+                    </div>
+                    <div class="glass p-6 rounded-2xl border border-crear-accent/20 shadow-[0_0_20px_rgba(255,183,3,0.2)] w-full max-w-sm">
+                        <h3 class="text-crear-accent text-sm uppercase tracking-widest font-bold mb-4">🔥 Inicio de Maestría en Relación</h3>
+                        <div id="countdown-training" class="grid grid-cols-4 gap-2 text-center">
+                            <div><div class="text-3xl font-black text-white" id="trn-d">00</div><div class="text-[10px] text-gray-500 uppercase">Días</div></div>
+                            <div><div class="text-3xl font-black text-white" id="trn-h">00</div><div class="text-[10px] text-gray-500 uppercase">Hrs</div></div>
+                            <div><div class="text-3xl font-black text-white" id="trn-m">00</div><div class="text-[10px] text-gray-500 uppercase">Min</div></div>
+                            <div><div class="text-3xl font-black text-white" id="trn-s">00</div><div class="text-[10px] text-gray-500 uppercase">Seg</div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="reveal mb-12 flex justify-center" style="transition-delay: 280ms;"><a href="carta_invitacion_migraciones.html?nombre=MARIA%20PATINO%20GALARRAGA&doc=PASAPORTE%20ECUATORIANA&fechas=Del%203%20al%207%20de%20septiembre%20de%202026&rol=Invitado+Especial+Internacional" target="_blank" class="glass border border-crear-accent/50 hover:bg-crear-accent/20 text-white px-6 py-3 rounded-full shadow-[0_0_20px_rgba(255,183,3,0.2)] transition-transform hover:scale-105 flex items-center gap-3 text-sm font-semibold tracking-wide uppercase"><i class="fa-solid fa-passport text-crear-accent"></i> Ver Carta para Migraciones</a></div>
+                <p id="timezone-indicator" class="text-xs text-gray-500 mb-8 tracking-widest uppercase reveal" style="transition-delay: 285ms;">Calculando huso horario local...</p>
+                <!-- Welcome Note -->
+                <div class="glass p-8 rounded-2xl text-left reveal border border-gray-800 hover:border-crear-accent transition-colors duration-500 shadow-2xl" style="transition-delay: 300ms;">
+                    <div class="text-gray-300 text-lg leading-relaxed space-y-4">
+                        <p><strong>Querido/a Lourdes,</strong></p>
+                        <p>Querida Lourdes, ¡qué alegría recibirte! Estamos completamente listos para expandir el juego y construir relaciones extraordinarias desde la ecología pura.</p><p>Nos da una tranquilidad enorme saber que tu impecable presencia y contención guiarán la sala en este fin de semana tan determinante. Para que viajes ligera de equipaje y con la mente puesta únicamente en el equipo, aquí tienes tu radar logístico exacto:</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Sections Container -->
+        <section class="py-16 bg-crear-black relative z-10">
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+                <!-- 1. Misión -->
+                <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-crear-accent transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,183,3,0.15)] hover:-translate-y-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-crear-accent text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                            <i class="fa-solid fa-fire"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">1. Tu Misión (Maestría en Relación - Equipo 29)</h2>
+                    </div>
+                    <div class="space-y-4 text-gray-300 ml-2 md:ml-18">
+                        <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden mb-4"><div class="absolute top-0 left-0 w-1 h-full bg-crear-accent"></div><h4 class="font-black text-white mb-3 text-crear-accent tracking-wide uppercase text-sm">Viernes - Arranque Oficial</h4><div class="space-y-2"><p class="flex items-start gap-3"><i class="fa-regular fa-clock text-crear-accent mt-1"></i> <span><strong>16:30 PM:</strong> Grounding Entrenadores con Coordinación (Directo en salón).</span></p><p class="flex items-start gap-3"><i class="fa-regular fa-clock text-crear-accent mt-1"></i> <span><strong>17:00 PM:</strong> Apertura de Mesa de Registro para Participantes.</span></p><p class="flex items-start gap-3"><i class="fa-regular fa-clock text-crear-accent mt-1"></i> <span><strong>18:00 PM:</strong> Apertura de puertas e inicio de sala.</span></p></div></div>
+                    </div>
+                </div>
+                <!-- 2. Vuelos -->
+                <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-purple-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(168,85,247,0.15)] hover:-translate-y-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-purple-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                            <i class="fa-solid fa-plane"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">2. Vuelos Confirmados</h2>
+                    </div>
+                    <div class="space-y-4 text-gray-300 ml-2 md:ml-18">
+                        <div class="flex flex-wrap gap-3 items-center">
+                            <span class="text-gray-400 text-sm">Reserva:</span>
+                            <span class="bg-gray-800 border border-gray-700 px-3 py-1 rounded-md font-mono text-white text-sm">JYUAGO</span>
+                            <span class="text-gray-500 text-xs ml-2">(Boleto a nombre de: <strong>MARIA PATINO GALARRAGA</strong>)</span>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-5 mt-5">
+                            <!-- Llegada -->
+                            <div class="bg-gradient-to-br from-gray-800/40 to-gray-900/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden">
+                                <div class="absolute top-0 left-0 w-full h-1 bg-purple-500"></div>
+                                <h4 class="font-black text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-plane-arrival text-purple-400"></i> Llegada (03/09/2026)</h4>
+                                <div class="space-y-2 text-sm">
+                                    <p class="flex justify-between border-b border-gray-700/50 pb-2"><span class="text-gray-400">Vuelo</span> <span class="font-medium text-white">LATAM LA 1437</span></p>
+                                    <p class="flex justify-between pt-1"><span class="text-gray-400">Llegada a Lima</span> <span class="font-medium text-green-400">10:10 AM</span></p>
+                                    <div class="pt-2"><a href="https://www.flightradar24.com/data/flights/la1437" target="_blank" class="text-xs text-purple-400 hover:underline">Ver en FlightRadar &rarr;</a></div>
+                                </div>
+                            </div>
+                            <!-- Salida -->
+                            <div class="bg-gradient-to-br from-gray-800/40 to-gray-900/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden">
+                                <div class="absolute top-0 left-0 w-full h-1 bg-red-500"></div>
+                                <h4 class="font-black text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-plane-departure text-red-400"></i> Salida (07/09/2026)</h4>
+                                <div class="space-y-2 text-sm">
+                                    <p class="flex justify-between border-b border-gray-700/50 pb-2"><span class="text-gray-400">Vuelo</span> <span class="font-medium text-white">LATAM LA 1429</span></p>
+                                    <p class="flex justify-between pt-1"><span class="text-gray-400">Salida de Lima</span> <span class="font-medium text-red-400">12:30 PM</span></p>
+                                    <div class="pt-2"><a href="https://www.flightradar24.com/data/flights/la1429" target="_blank" class="text-xs text-red-400 hover:underline">Ver en FlightRadar &rarr;</a></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 bg-gradient-to-r from-amber-500/10 to-transparent p-4 rounded-xl border border-amber-500/30 flex items-center gap-3"><i class="fa-regular fa-clock text-crear-accent text-xl"></i><div><p class="text-crear-accent font-bold text-sm">Recojo en Lobby para Salida: 09:00 AM</p><p class="text-xs text-gray-400">Calculado 3.5 horas antes de tu vuelo (12:30 PM) para margen de tráfico y abordaje.</p></div></div>
+                    </div>
+                </div>
+                <!-- 3. Movilidad y Sede -->
+                <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-blue-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] hover:-translate-y-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-blue-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                            <i class="fa-solid fa-car"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">3. Movilidad y Sede</h2>
+                    </div>
+                    <div class="space-y-6 text-gray-300 ml-2 md:ml-18">
+                        <p class="text-lg"><strong>Tus traslados:</strong> Nuestro equipo te contactará para coordinar tu recojo exacto en el aeropuerto Jorge Chávez.</p>
+                        <div class="space-y-4"><div class="flex gap-4 items-start bg-gray-800/30 p-4 rounded-xl border border-gray-700/30"><div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 flex-shrink-0"><i class="fa-solid fa-suitcase"></i></div><div><div class="font-bold text-blue-400 mb-1">Traslado Oficial</div><div class="text-sm text-gray-300">Nuestro equipo te contactará para coordinar tu recojo exacto en el aeropuerto Jorge Chávez.</div></div></div></div>
+                        <div class="mt-4 bg-gradient-to-r from-blue-500/10 to-transparent p-4 rounded-xl border border-blue-500/30 flex items-center gap-3"><i class="fa-solid fa-car text-blue-400 text-xl"></i><div><p class="text-blue-400 font-bold text-sm">Coordinación con Conductor</p><p class="text-xs text-gray-400">El conductor asignado te escribirá por WhatsApp 1 hora antes de tu arribo/salida para darte la placa del auto y coordinar el punto de encuentro exacto.</p></div></div>
+                        <div class="bg-gradient-to-r from-blue-900/20 to-transparent p-5 rounded-xl border-l-4 border-blue-500 mt-6">
+                            <h4 class="font-black text-white mb-2 flex items-center gap-2"><i class="fa-solid fa-hotel text-blue-400"></i> Hotel y Salón: Hotel Jose Antonio Deluxe (Miraflores)</h4>
+                            <p class="text-sm text-gray-300">Calle Bellavista 133, Miraflores, Lima, Perú</p>
+                            <a href="https://maps.google.com/?q=Hotel+Jose+Antonio+Deluxe+Miraflores+Lima" target="_blank" class="inline-flex items-center gap-2 mt-3 text-xs text-blue-400 hover:underline"><i class="fa-solid fa-map-location-dot"></i> Ver ubicación en Google Maps &rarr;</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- 4. Clima y Reglas -->
+                <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-amber-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(245,158,11,0.15)] hover:-translate-y-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-amber-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                            <i class="fa-solid fa-cloud"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">4. Clima y Reglas de Oro</h2>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-5 text-gray-300 ml-2 md:ml-18">
+                        <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/50">
+                            <h4 class="font-bold text-amber-400 mb-3 flex items-center gap-2"><i class="fa-solid fa-temperature-empty"></i> El Clima (Lima)</h4>
+                            <p class="text-2xl font-black text-white mb-2">15°C - 18°C</p>
+                            <p class="text-sm font-semibold text-amber-300/90 mb-1">Invierno Limeño</p>
+                            <p class="text-xs text-gray-400 mb-4">El clima está frío y húmedo (invierno), trae buen abrigo.</p>
+                            <div class="space-y-1"><p class="text-xs text-gray-400 flex items-start gap-2 mb-1.5"><i class="fa-solid fa-circle-check text-crear-accent text-[10px] mt-1"></i> Traer casaca o abrigo abrigador para traslados nocturnos.</p><p class="text-xs text-gray-400 flex items-start gap-2 mb-1.5"><i class="fa-solid fa-circle-check text-crear-accent text-[10px] mt-1"></i> Ropa cómoda para sala con clima controlado.</p><p class="text-xs text-gray-400 flex items-start gap-2 mb-1.5"><i class="fa-solid fa-circle-check text-crear-accent text-[10px] mt-1"></i> Calzado cómodo.</p></div>
+                        </div>
+                        <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/50">
+                            <h4 class="font-bold text-red-400 mb-3 flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> Reglas de Oro y Convivencia</h4>
+                            <ul class="text-sm space-y-2.5">
+                                <li class="flex items-start gap-2.5"><i class="fa-solid fa-circle-check text-green-500 mt-1 text-xs flex-shrink-0"></i> <span><strong>Hora Límite Innegociable:</strong> 11:00 PM es la hora límite innegociable de cierre.</span></li><li class="flex items-start gap-2.5"><i class="fa-solid fa-circle-check text-green-500 mt-1 text-xs flex-shrink-0"></i> <span><strong>Alimentación:</strong> Cero comida en salón. Solo hidratación permitida.</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!-- 5. Honorarios -->
+                <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-emerald-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(168,85,247,0.15)] hover:-translate-y-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-emerald-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                            <i class="fa-solid fa-file-invoice-dollar"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">5. Tus Honorarios</h2>
+                    </div>
+                    <div class="text-gray-300 ml-2 md:ml-18 bg-gray-800/30 p-5 rounded-xl border border-gray-700/50">
+                        <p class="text-lg">Mantenemos el acuerdo estándar de honorarios.</p>
+                        <p class="mt-3 text-sm text-gray-400">Si tus datos bancarios de siempre (Banco, Cuenta, SWIFT) siguen siendo los mismos, el proceso administrativo se iniciará de forma automática tras concluir los entrenamientos.</p>
+                        <div class="mt-5 grid md:grid-cols-2 gap-3 bg-gray-900/60 p-4 rounded-xl border border-gray-700/40 text-xs"><div><span class="text-gray-500 uppercase tracking-widest text-[10px]">Razón Social</span><p class="text-white font-semibold mt-0.5">CREAR PODER SIN LIMITES S.A.C.</p></div><div><span class="text-gray-500 uppercase tracking-widest text-[10px]">RUC / NIF</span><p class="text-white font-mono font-semibold mt-0.5">20608512491</p></div><div class="md:col-span-2"><span class="text-gray-500 uppercase tracking-widest text-[10px]">Dirección Fiscal</span><p class="text-gray-300 mt-0.5">Calle Bellavista 133, Miraflores, Lima, Perú</p></div></div>
+                        <div class="mt-5"><a href="https://wa.me/51919563284?text=Hola%20Jos%C3%A9%2C%20confirmo%20mis%20datos%20bancarios%20para%20honorarios%20de%20Lourdes%20Pati%C3%B1o%20E29." target="_blank" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-green-500/10 border border-green-500/30 text-green-400 text-xs font-bold hover:bg-green-500/20 transition-colors"><i class="fa-brands fa-whatsapp text-green-400 text-base"></i> Enviar datos bancarios por WhatsApp</a></div>
+                    </div>
+                </div>
+                <!-- 6. Escuadrón -->
+                <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-pink-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(236,72,153,0.15)] hover:-translate-y-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-pink-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">6. Tu Escuadrón de Soporte</h2>
+                    </div>
+                    <div class="text-gray-300 ml-2 md:ml-18">
+                        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/30 hover:border-crear-accent/50 transition-colors"><h4 class="font-bold text-blue-400 mb-2 text-xs uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-user-tie"></i> Manager</h4><p class="text-white font-medium text-lg">Italo Alonso Roman Nomura</p><p class="text-gray-400 text-sm mt-1"><a href="https://wa.me/51997213218" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 997 213 218</a></p></div><div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/30 hover:border-crear-accent/50 transition-colors"><h4 class="font-bold text-blue-400 mb-2 text-xs uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-user-tie"></i> Manager</h4><p class="text-white font-medium text-lg">Tania Aurora Sanchez Castro</p><p class="text-gray-400 text-sm mt-1"><a href="https://wa.me/51981295423" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 981 295 423</a></p></div><div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/30 hover:border-crear-accent/50 transition-colors"><h4 class="font-bold text-purple-400 mb-2 text-xs uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-briefcase"></i> Gerente de Sede</h4><p class="text-white font-medium text-lg">José Sánchez</p><p class="text-gray-400 text-sm mt-1"><a href="https://wa.me/51919563284" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 919 563 284</a></p></div><div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/30 hover:border-crear-accent/50 transition-colors"><h4 class="font-bold text-pink-400 mb-2 text-xs uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> Coordinación MJ</h4><p class="text-white font-medium text-lg">Linid Valencia</p><p class="text-gray-400 text-sm mt-1"><a href="https://wa.me/51912379686" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 912 379 686</a></p></div><div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/30 hover:border-crear-accent/50 transition-colors"><h4 class="font-bold text-pink-400 mb-2 text-xs uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> Coordinación MJ</h4><p class="text-white font-medium text-lg">Leyla Pasquel</p><p class="text-gray-400 text-sm mt-1"><a href="https://wa.me/51919502385" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 919 502 385</a></p></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Closing -->
+                <div class="text-center pt-16 pb-12 reveal">
+                    <h3 class="text-2xl md:text-3xl font-black text-white mb-2 italic" id="random-quote"></h3>
+                    <p class="text-lg text-crear-accent mb-10 font-semibold" id="random-author"></p>
+                    <h3 class="text-2xl md:text-3xl font-black text-white mb-4">
+                        Párate en tu poder absoluto, Lourdes.<br>
+                        <span class="text-crear-accent">Ven a detonar la sala del Equipo 29.</span> Nos vemos muy pronto.
+                    </h3>
+                    <div class="inline-block glass px-10 py-5 rounded-2xl border border-crear-accent/40 shadow-[0_0_30px_rgba(255,183,3,0.25)] hover:scale-105 transition-transform duration-300">
+                        <p class="font-bold text-white text-lg">Un abrazo,</p>
+                        <p class="text-crear-accent font-black tracking-widest uppercase text-xl mt-1">El Equipo de CREAR PSL LIMA</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- FOOTER -->
+        <footer class="bg-[#050505] py-16 border-t border-gray-900 relative z-10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <div class="flex items-center justify-center gap-3 mb-10">
+                    <img src="logo_crear_blanco.png" onerror="this.src='https://crearpodersinlimitesperu-cmd.github.io/cartas-crear/logo_crear_blanco.png'" alt="CREAR" class="h-40 md:h-56 object-contain drop-shadow-[0_0_20px_rgba(251,191,36,0.6)] hover:drop-shadow-[0_0_35px_rgba(251,191,36,1)] hover:scale-105 transition-all duration-500" />
+                </div>
+                <div class="text-gray-600 text-sm font-medium tracking-wide">
+                    &copy; 2026 CREAR Poder Sin Límites Sede Perú.<br/> Comunicación oficial vía Google Chat.
+                </div>
+            </div>
+        </footer>
+    </div>
+    <!-- Floating Music Button -->
+    <button id="musicToggleBtn" class="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full glass border border-gray-600 flex items-center justify-center text-white shadow-[0_0_15px_rgba(255,183,3,0.3)] hover:scale-110 transition-transform duration-300">
+        <i class="fa-solid fa-music"></i>
+    </button>
+    <div id="ytplayer" class="absolute -left-[9999px] top-0 w-[300px] h-[300px] opacity-0 pointer-events-none"></div>
+    <script>
+        var tag = document.createElement("script");
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName("script")[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        var player;
+        var isPlaying = false;
+        var playerReady = false;
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player("ytplayer", {
+                height: "300", width: "300", videoId: "FboYUBlvaL4",
+                playerVars: { "autoplay": 0, "controls": 0, "loop": 1, "playlist": "FboYUBlvaL4", "playsinline": 1, "rel": 0 },
+                events: { "onReady": onPlayerReady, "onStateChange": onPlayerStateChange }
+            });
+        }
+        function onPlayerStateChange(event) {
+            if (event.data === YT.PlayerState.PLAYING) {
+                isPlaying = true;
+                var icon = document.querySelector("#musicToggleBtn i");
+                if(icon) { icon.classList.remove("fa-music"); icon.classList.add("fa-pause", "text-crear-accent", "fa-beat-fade"); }
+            } else if (event.data === YT.PlayerState.PAUSED) {
+                isPlaying = false;
+                var icon = document.querySelector("#musicToggleBtn i");
+                if(icon) { icon.classList.remove("fa-pause", "text-crear-accent", "fa-beat-fade"); icon.classList.add("fa-music"); }
+            }
+        }
+        function toggleMusic() {
+            if (!playerReady || !player) return;
+            if (isPlaying) player.pauseVideo(); else player.playVideo();
+        }
+        function onPlayerReady(event) {
+            playerReady = true;
+            var openBtn = document.getElementById("openLetterBtn");
+            if(openBtn) {
+                openBtn.innerHTML = '<i class="fa-solid fa-envelope-open-text"></i> ABRIR CARTA';
+                openBtn.classList.remove("opacity-50", "cursor-not-allowed", "pointer-events-none");
+                openBtn.classList.add("animate-pulse");
+            }
+        }
+        setTimeout(function(){
+            var openBtn = document.getElementById("openLetterBtn");
+            if(openBtn && !playerReady) {
+                openBtn.innerHTML = '<i class="fa-solid fa-envelope-open-text"></i> ABRIR CARTA';
+                openBtn.classList.remove("opacity-50", "cursor-not-allowed", "pointer-events-none");
+                openBtn.classList.add("animate-pulse");
+            }
+        }, 2500);
+        document.addEventListener("DOMContentLoaded", function() {
+            var overlay = document.getElementById("welcomeOverlay");
+            var openBtn = document.getElementById("openLetterBtn");
+            var musicBtn = document.getElementById("musicToggleBtn");
+            if(openBtn && overlay) {
+                openBtn.addEventListener("click", function() {
+                    overlay.style.opacity = "0";
+                    setTimeout(function(){ overlay.remove(); }, 1000);
+                    if (playerReady && player && typeof player.playVideo === "function") {
+                        player.playVideo();
+                    }
+                });
+            }
+            if(musicBtn) {
+                musicBtn.addEventListener("click", function(e) {
+                    e.stopPropagation();
+                    toggleMusic();
+                });
+            }
+            var flightTimestamp = new Date("2026-09-03T15:10:00.000Z").getTime();
+            var trainingTimestamp = new Date("2026-09-16T23:00:00.000Z").getTime();
+            var timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            var indicator = document.getElementById("timezone-indicator");
+            if(indicator) indicator.innerText = "Mostrando cuenta regresiva detectando tu zona local: " + timeZone;
+            function updateCountdowns() {
+                var now = new Date().getTime();
+                var distanceTrn = trainingTimestamp - now;
+                if (distanceTrn > 0) {
+                    document.getElementById("trn-d").innerText = String(Math.floor(distanceTrn / (1000 * 60 * 60 * 24))).padStart(2, "0");
+                    document.getElementById("trn-h").innerText = String(Math.floor((distanceTrn % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, "0");
+                    document.getElementById("trn-m").innerText = String(Math.floor((distanceTrn % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
+                    document.getElementById("trn-s").innerText = String(Math.floor((distanceTrn % (1000 * 60)) / 1000)).padStart(2, "0");
+                } else {
+                    document.getElementById("countdown-training").innerHTML = "<div class='col-span-4 text-white font-bold tracking-widest uppercase'>¡El entrenamiento ha comenzado!</div>";
+                }
+                var distanceFly = flightTimestamp - now;
+                if (distanceFly > 0) {
+                    document.getElementById("fly-d").innerText = String(Math.floor(distanceFly / (1000 * 60 * 60 * 24))).padStart(2, "0");
+                    document.getElementById("fly-h").innerText = String(Math.floor((distanceFly % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, "0");
+                    document.getElementById("fly-m").innerText = String(Math.floor((distanceFly % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
+                    document.getElementById("fly-s").innerText = String(Math.floor((distanceFly % (1000 * 60)) / 1000)).padStart(2, "0");
+                } else {
+                    document.getElementById("countdown-flight").innerHTML = "<div class='col-span-4 text-white font-bold tracking-widest uppercase'>¡Buen viaje!</div>";
+                }
+            }
+            setInterval(updateCountdowns, 1000);
+            updateCountdowns();
+            var navbar = document.getElementById("navbar");
+            window.addEventListener("scroll", function() {
+                if (window.scrollY > 20) {
+                    navbar.classList.add("bg-crear-black/95", "shadow-lg");
+                    navbar.classList.remove("glass");
+                } else {
+                    navbar.classList.remove("bg-crear-black/95");
+                    navbar.classList.add("glass");
+                }
+            });
+            var revealElements = document.querySelectorAll(".reveal");
+            var revealObserver = new IntersectionObserver(function(entries, observer) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("active");
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
+            revealElements.forEach(function(el) { revealObserver.observe(el); });
+            setTimeout(function() {
+                revealElements.forEach(function(el) {
+                    var rect = el.getBoundingClientRect();
+                    if (rect.top < window.innerHeight && rect.width > 0 && rect.height > 0) {
+                        el.classList.add("active");
+                    }
+                });
+            }, 100);
+            var quoteEl = document.getElementById("random-quote");
+            var authorEl = document.getElementById("random-author");
+            if (quoteEl && authorEl) {
+                var quotesList = (typeof transformationQuotes !== "undefined" && Array.isArray(transformationQuotes) && transformationQuotes.length > 0)
+                    ? transformationQuotes
+                    : [
+                        { text: "Tú y yo poseemos dentro de nosotros mismos en cada momento de nuestras vidas, bajo todas las circunstancias, el poder de transformar la calidad de nuestras vidas.", author: "Werner Erhard" },
+                        { text: "El poder de la auto-transformación está en tus manos.", author: "Tony Robbins" },
+                        { text: "Cuando tomas una elección, cambias el futuro.", author: "Joe Dispenza" },
+                        { text: "La transformación no es un evento futuro. Es una actividad actual.", author: "Jillian Michaels" }
+                    ];
+                var rq = quotesList[Math.floor(Math.random() * quotesList.length)];
+                quoteEl.innerText = "\"" + (rq.text || rq.quote) + "\"";
+                authorEl.innerText = "— " + (rq.author || rq.autor);
+            }
+        });
+    </script>
+</body>
+</html>
 ```
 
 ---
@@ -83900,566 +85065,419 @@ Para asegurar la transición exitosa de las sedes operativas internacionales hac
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bienvenido Lourdes | CREAR Poder Sin Límites</title>
-    
-    <!-- Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;800;900&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Tailwind Config for Custom Brand Colors -->
+    <script src="quotes.js"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
+                        sans: ["Montserrat", "Inter", "sans-serif"],
                     },
                     colors: {
                         crear: {
-                            black: '#0a0a0a',
-                            dark: '#171717',
-                            gray: '#262626',
-                            light: '#e5e5e5',
-                            accent: '#38bdf8',
-                            primary: '#2563eb',
+                            black: "#0a0a0a",
+                            dark: "#171717",
+                            gray: "#262626",
+                            light: "#e5e5e5",
+                            accent: "#FFB703",
+                            primary: "#2563eb",
                         }
                     },
                     animation: {
-                        'float': 'float 6s ease-in-out infinite',
-                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        "float": "float 6s ease-in-out infinite",
+                        "pulse-slow": "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
                     }
                 }
             }
-        }
+        };
     </script>
-
     <style>
-        body {
-            background-color: #0a0a0a;
-            color: #e5e5e5;
-            overflow-x: hidden;
-        }
-        .glass {
-            background: rgba(23, 23, 23, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .reveal {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
-        }
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        .text-gradient {
-            background: linear-gradient(to right, #38bdf8, #818cf8, #c084fc);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+        body { background-color: #0a0a0a; color: #e5e5e5; overflow-x: hidden; font-family: "Montserrat", sans-serif; }
+        .glass { background: rgba(23, 23, 23, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.5, 0, 0, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+        .text-gradient { background: linear-gradient(to right, #FFB703, #f59e0b, #fbbf24); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #0a0a0a; }
         ::-webkit-scrollbar-thumb { background: #262626; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #38bdf8; }
+        ::-webkit-scrollbar-thumb:hover { background: #FFB703; }
     </style>
 </head>
 <body class="antialiased selection:bg-crear-accent selection:text-white">
-
-    <!-- Welcome Overlay for Autoplay -->
+    <!-- Welcome Overlay -->
     <div id="welcomeOverlay" class="fixed inset-0 z-[100] bg-[#050505] flex flex-col items-center justify-center transition-opacity duration-1000">
-        <img src="logo_crear_blanco.png" alt="CREAR" class="h-28 md:h-40 mb-10 drop-shadow-[0_0_25px_rgba(251,191,36,0.5)] animate-pulse">
-        <button id="openLetterBtn" class="px-10 py-5 bg-[#f59e0b] text-black font-black text-xl rounded-full hover:scale-110 transition-transform shadow-[0_0_30px_rgba(251,191,36,0.6)] flex items-center gap-3 opacity-50 cursor-not-allowed pointer-events-none transition-all duration-500">
+        <img src="logo_crear_blanco.png" onerror="this.src='https://crearpodersinlimitesperu-cmd.github.io/cartas-crear/logo_crear_blanco.png'" alt="CREAR Poder Sin Límites" class="h-28 md:h-40 mb-10 drop-shadow-[0_0_25px_rgba(251,191,36,0.5)] animate-pulse">
+        <button id="openLetterBtn" class="px-10 py-5 bg-crear-accent text-black font-black text-xl rounded-full hover:scale-110 transition-transform shadow-[0_0_30px_rgba(251,191,36,0.6)] flex items-center gap-3 opacity-50 cursor-not-allowed pointer-events-none transition-all duration-500">
             <i class="fa-solid fa-spinner fa-spin"></i> PREPARANDO EXPERIENCIA...
         </button>
         <p class="mt-6 text-gray-500 text-sm font-light">Enciende el volumen para la experiencia completa</p>
     </div>
-    
-
-    <nav class="fixed w-full z-50 glass transition-all duration-300 shadow-lg" id="navbar">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
-                <div class="flex-shrink-0 flex items-center gap-2 cursor-pointer" onclick="window.scrollTo(0,0)">
-                    <img src="logo_crear_blanco.png" alt="CREAR" class="h-10 object-contain" />
-                </div>
-                <div class="flex space-x-8 items-center">
-                    <span class="text-crear-accent font-semibold tracking-wider text-sm uppercase">Radar Operativo</span>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <section class="relative min-h-screen flex items-center justify-center pt-20 pb-12 overflow-hidden">
-        <div class="absolute inset-0 z-0">
-            <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/40 via-crear-black to-crear-black"></div>
-            <div class="absolute top-20 right-10 w-64 h-64 bg-crear-accent opacity-20 rounded-full blur-[100px] animate-float"></div>
-        </div>
-
-        <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center mt-12">
-            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-sm font-semibold text-crear-accent mb-6 reveal shadow-[0_0_15px_rgba(56,189,248,0.3)]">
-                <i class="fa-solid fa-calendar-day"></i>
-                11 de Agosto, 2026
-            </div>
-            
-            <h1 class="text-5xl md:text-7xl font-black tracking-tight mb-6 reveal text-white" style="transition-delay: 100ms;">
-                ¡Bienvenido a Lima,<br/> <span class="text-gradient">Lourdes!</span>
-            </h1>
-            
-            <p class="mt-4 text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto mb-8 font-light reveal" style="transition-delay: 200ms;">
-                MJ Relación para el Equipo 29 💥
-            </p>
-
-            <div class="inline-block px-8 py-3 rounded-full border border-[#f59e0b]/50 bg-[#f59e0b]/10 mb-8 reveal shadow-[0_0_20px_rgba(251,191,36,0.2)] hover:scale-105 transition-transform" style="transition-delay: 250ms;">
-                <p class="text-[#f59e0b] font-black text-xl md:text-2xl italic tracking-wider">"¡Conexión y Vulnerabilidad!"</p>
-            </div>
-
-            <!-- CUENTA REGRESIVA PREMIUM -->
-            <div class="reveal mb-12 flex flex-col md:flex-row gap-8 justify-center items-center" style="transition-delay: 275ms;">
-                <!-- Cuenta Regresiva Viaje -->
-                <div class="glass p-6 rounded-2xl border border-[#f59e0b]/20 shadow-[0_0_20px_rgba(251,191,36,0.2)] w-full max-w-sm">
-                    <h3 class="text-[#f59e0b] text-sm uppercase tracking-widest font-bold mb-4">✈️ Tiempo para tu Viaje</h3>
-                    <div id="countdown-flight" class="grid grid-cols-4 gap-2 text-center">
-                        <div><div class="text-3xl font-black text-white" id="fly-d">00</div><div class="text-[10px] text-gray-500 uppercase">Días</div></div>
-                        <div><div class="text-3xl font-black text-white" id="fly-h">00</div><div class="text-[10px] text-gray-500 uppercase">Hrs</div></div>
-                        <div><div class="text-3xl font-black text-white" id="fly-m">00</div><div class="text-[10px] text-gray-500 uppercase">Min</div></div>
-                        <div><div class="text-3xl font-black text-white" id="fly-s">00</div><div class="text-[10px] text-gray-500 uppercase">Seg</div></div>
+    <div id="content">
+        <!-- Navbar -->
+        <nav class="fixed w-full z-50 glass transition-all duration-300 shadow-lg" id="navbar">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-20">
+                    <div class="flex-shrink-0 flex items-center gap-2 cursor-pointer" onclick="window.scrollTo(0,0)">
+                        <img src="logo_crear_blanco.png" onerror="this.src='https://crearpodersinlimitesperu-cmd.github.io/cartas-crear/logo_crear_blanco.png'" alt="CREAR" class="h-10 object-contain" />
                     </div>
-                </div>
-                
-                <!-- Cuenta Regresiva Entrenamiento -->
-                <div class="glass p-6 rounded-2xl border border-[#f59e0b]/20 shadow-[0_0_20px_rgba(251,191,36,0.2)] w-full max-w-sm">
-                    <h3 class="text-[#f59e0b] text-sm uppercase tracking-widest font-bold mb-4">🔥 Inicio del C1 E30</h3>
-                    <div id="countdown-training" class="grid grid-cols-4 gap-2 text-center">
-                        <div><div class="text-3xl font-black text-white" id="trn-d">00</div><div class="text-[10px] text-gray-500 uppercase">Días</div></div>
-                        <div><div class="text-3xl font-black text-white" id="trn-h">00</div><div class="text-[10px] text-gray-500 uppercase">Hrs</div></div>
-                        <div><div class="text-3xl font-black text-white" id="trn-m">00</div><div class="text-[10px] text-gray-500 uppercase">Min</div></div>
-                        <div><div class="text-3xl font-black text-white" id="trn-s">00</div><div class="text-[10px] text-gray-500 uppercase">Seg</div></div>
+                    <div class="flex space-x-8 items-center">
+                        <span class="text-crear-accent font-semibold tracking-wider text-sm uppercase">Radar Operativo &middot; Lima</span>
                     </div>
                 </div>
             </div>
-            <div class="reveal mb-12 flex justify-center" style="transition-delay: 280ms;">
-                <a href="carta_invitacion_migraciones.html?nombre=Lourdesnando+Aragon&doc=DNI+17.856.159&fechas=14+al+16+de+Agosto+2026&rol=Líder+Capítulo+Uno" target="_blank" class="glass border border-crear-accent/50 hover:bg-crear-accent/20 text-white px-6 py-3 rounded-full shadow-[0_0_20px_rgba(56,189,248,0.2)] transition-transform hover:scale-105 flex items-center gap-3 text-sm font-semibold tracking-wide uppercase">
-                    <i class="fa-solid fa-passport text-crear-accent"></i>
-                    Ver Carta para Migraciones
-                </a>
+        </nav>
+        <!-- Hero Section -->
+        <section class="relative min-h-screen flex items-center justify-center pt-20 pb-12 overflow-hidden">
+            <div class="absolute inset-0 z-0">
+                <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-yellow-900/40 via-crear-black to-crear-black"></div>
+                <div class="absolute top-20 right-10 w-64 h-64 bg-crear-accent opacity-20 rounded-full blur-[100px] animate-float"></div>
             </div>
-            
-            <p id="timezone-indicator" class="text-xs text-gray-500 mb-8 tracking-widest uppercase reveal" style="transition-delay: 285ms;">Calculando huso horario local...</p>
-
-            <div class="glass p-8 rounded-2xl text-left reveal border border-gray-800 hover:border-crear-accent transition-colors duration-500 shadow-2xl" style="transition-delay: 300ms;">
-                <p class="text-gray-300 text-lg leading-relaxed mb-4">
-                    <strong>Querido Lourdes,</strong><br/><br/>
-                    Qué alegría recibirte en Lima para la Maestría de Relación. Este es el momento donde conectan desde el corazón.
+            <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center mt-12">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-sm font-semibold text-crear-accent mb-6 reveal shadow-[0_0_15px_rgba(255,183,3,0.3)]">
+                    <i class="fa-solid fa-calendar-day"></i> 2 de septiembre de 2026
+                </div>
+                <h1 class="text-5xl md:text-7xl font-black tracking-tight mb-6 reveal text-white" style="transition-delay: 100ms;">
+                    ¡Bienvenido a casa,<br/> <span class="text-gradient">Lourdes!</span>
+                </h1>
+                <p class="mt-4 text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto mb-8 font-light reveal" style="transition-delay: 200ms;">
+                    Tu radar para la Maestría en Relación (Equipo 29) 💥
                 </p>
-                <p class="text-gray-300 text-lg leading-relaxed">
-                    Para que viajes ligero de equipaje y con la mente puesta únicamente en el equipo, aquí tienes tu logística operativa:
-                </p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Itinerary Sections -->
-    <section class="py-16 bg-crear-black relative z-10">
-        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-            
-            <!-- 1. Misión -->
-            <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-crear-accent transition-all duration-300 hover:shadow-[0_0_30px_rgba(56,189,248,0.15)] hover:-translate-y-1">
-                <div class="flex items-center gap-4 mb-6">
-                    <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-crear-accent text-2xl group-hover:scale-110 transition-transform shadow-inner">
-                        <i class="fa-solid fa-crosshairs"></i>
+                <!-- Dual Countdowns -->
+                <div class="reveal mb-12 flex flex-col md:flex-row gap-8 justify-center items-center" style="transition-delay: 275ms;">
+                    <div class="glass p-6 rounded-2xl border border-crear-accent/20 shadow-[0_0_20px_rgba(255,183,3,0.2)] w-full max-w-sm">
+                        <h3 class="text-crear-accent text-sm uppercase tracking-widest font-bold mb-4">✈️ Tiempo para tu Viaje</h3>
+                        <div id="countdown-flight" class="grid grid-cols-4 gap-2 text-center">
+                            <div><div class="text-3xl font-black text-white" id="fly-d">00</div><div class="text-[10px] text-gray-500 uppercase">Días</div></div>
+                            <div><div class="text-3xl font-black text-white" id="fly-h">00</div><div class="text-[10px] text-gray-500 uppercase">Hrs</div></div>
+                            <div><div class="text-3xl font-black text-white" id="fly-m">00</div><div class="text-[10px] text-gray-500 uppercase">Min</div></div>
+                            <div><div class="text-3xl font-black text-white" id="fly-s">00</div><div class="text-[10px] text-gray-500 uppercase">Seg</div></div>
+                        </div>
                     </div>
-                    <h2 class="text-2xl font-bold text-white tracking-tight">1. Tu Misión (MJ Relación - E29)</h2>
-                </div>
-                <div class="space-y-4 text-gray-300 ml-2 md:ml-18">
-                    <p class="text-lg"><strong>Fechas:</strong> Viernes 04 al Domingo 06 de Septiembre, 2026.</p>
-                    <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden">
-                        <div class="absolute top-0 left-0 w-1 h-full bg-crear-accent"></div>
-                        <h4 class="font-black text-white mb-3 text-crear-accent tracking-wide uppercase text-sm">Arranque (Viernes 14)</h4>
-                        <div class="space-y-2">
-                            <ul><li class="flex items-start gap-3"><i class="fa-regular fa-clock text-crear-accent mt-1"></i><span><strong>16:30 PM:</strong> Grounding.</span></li><li class="flex items-start gap-3"><i class="fa-regular fa-clock text-crear-accent mt-1"></i><span><strong>18:00 PM:</strong> Inicio oficial.</span></li></ul>
+                    <div class="glass p-6 rounded-2xl border border-crear-accent/20 shadow-[0_0_20px_rgba(255,183,3,0.2)] w-full max-w-sm">
+                        <h3 class="text-crear-accent text-sm uppercase tracking-widest font-bold mb-4">🔥 Inicio de Maestría en Relación</h3>
+                        <div id="countdown-training" class="grid grid-cols-4 gap-2 text-center">
+                            <div><div class="text-3xl font-black text-white" id="trn-d">00</div><div class="text-[10px] text-gray-500 uppercase">Días</div></div>
+                            <div><div class="text-3xl font-black text-white" id="trn-h">00</div><div class="text-[10px] text-gray-500 uppercase">Hrs</div></div>
+                            <div><div class="text-3xl font-black text-white" id="trn-m">00</div><div class="text-[10px] text-gray-500 uppercase">Min</div></div>
+                            <div><div class="text-3xl font-black text-white" id="trn-s">00</div><div class="text-[10px] text-gray-500 uppercase">Seg</div></div>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- 2. Vuelos -->
-            <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-purple-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(168,85,247,0.15)] hover:-translate-y-1">
-                <div class="flex items-center gap-4 mb-6">
-                    <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-purple-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
-                        <i class="fa-solid fa-plane"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold text-white tracking-tight">2. Vuelos Confirmados</h2>
-                </div>
-                <div class="space-y-4 text-gray-300 ml-2 md:ml-18">
-                    <div class="flex flex-wrap gap-3 items-center">
-                        <span class="text-gray-400 text-sm">Reservas:</span> 
-                        <span class="bg-gray-800 border border-gray-700 px-3 py-1 rounded-md font-mono text-white text-sm">JYUAGO</span>
-                        <span class="text-gray-500 text-xs ml-2">(Boleto a nombre de: Lourdesnando Aragon)</span>
-                    </div>
-                    
-                    <div class="grid md:grid-cols-2 gap-5 mt-5">
-                        <!-- Llegada -->
-                        <div class="bg-gradient-to-br from-gray-800/40 to-gray-900/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden">
-                            <div class="absolute top-0 left-0 w-full h-1 bg-purple-500"></div>
-                            <h4 class="font-black text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-plane-arrival text-purple-400"></i> Llegada (Jueves 13)</h4>
-                            <div class="space-y-2 text-sm">
-                                <p class="flex justify-between border-b border-gray-700/50 pb-2"><span class="text-gray-400">Vuelo</span> <span class="font-medium text-white">LATAM LA 2383 (Desde Quito)</span></p>
-                                <p class="flex justify-between border-b border-gray-700/50 pb-2 pt-1"><span class="text-gray-400">Salida</span> <span class="font-medium text-white">12:15 PM</span></p>
-                                <p class="flex justify-between pt-1"><span class="text-gray-400">Llegada a Lima</span> <span class="font-medium text-green-400">14:30 PM</span></p>
-                            </div>
-                        </div>
-                        
-                        <!-- Salida -->
-                        <div class="bg-gradient-to-br from-gray-800/40 to-gray-900/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden">
-                            <div class="absolute top-0 left-0 w-full h-1 bg-red-500"></div>
-                            <h4 class="font-black text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-plane-departure text-red-400"></i> Salida (Lunes 17 - Madrugada)</h4>
-                            <div class="space-y-2 text-sm">
-                                <p class="flex justify-between border-b border-gray-700/50 pb-2"><span class="text-gray-400">Vuelo</span> <span class="font-medium text-white">LATAM LA 2465 (A Buenos Aires)</span></p>
-                                <p class="flex justify-between border-b border-gray-700/50 pb-2 pt-1"><span class="text-gray-400">Salida de Lima</span> <span class="font-medium text-red-400">01:15 AM (Lunes)</span></p>
-                                <p class="flex justify-between pt-1"><span class="text-gray-400">Llegada</span> <span class="font-medium text-white">07:40 AM (Lunes)</span></p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-red-500/10 border border-red-500/30 p-4 rounded-xl mt-4 flex items-start gap-4">
-                        <i class="fa-solid fa-triangle-exclamation text-red-500 text-xl mt-1 animate-pulse-slow"></i>
-                        <div>
-                            <h4 class="font-bold text-red-400 text-sm tracking-wide mb-1">OJO AL DATO (OPERACIÓN DE SALIDA)</h4>
-                            <p class="text-sm text-gray-300">Tu vuelo a Buenos Aires despega el lunes 17 de agosto a la 01:15 AM. Esto significa que saliendo de la graduación del C1 el domingo por la noche, el transporte te trasladará directo al aeropuerto <strong>(pasaremos por ti a las 22:15 PM)</strong>. No requieres hotel para la noche del domingo.</p>
-                        </div>
+                <div class="reveal mb-12 flex justify-center" style="transition-delay: 280ms;"><a href="carta_invitacion_migraciones.html?nombre=MARIA%20PATINO%20GALARRAGA&doc=PASAPORTE%20ECUATORIANA&fechas=Del%203%20al%207%20de%20septiembre%20de%202026&rol=Invitado+Especial+Internacional" target="_blank" class="glass border border-crear-accent/50 hover:bg-crear-accent/20 text-white px-6 py-3 rounded-full shadow-[0_0_20px_rgba(255,183,3,0.2)] transition-transform hover:scale-105 flex items-center gap-3 text-sm font-semibold tracking-wide uppercase"><i class="fa-solid fa-passport text-crear-accent"></i> Ver Carta para Migraciones</a></div>
+                <p id="timezone-indicator" class="text-xs text-gray-500 mb-8 tracking-widest uppercase reveal" style="transition-delay: 285ms;">Calculando huso horario local...</p>
+                <!-- Welcome Note -->
+                <div class="glass p-8 rounded-2xl text-left reveal border border-gray-800 hover:border-crear-accent transition-colors duration-500 shadow-2xl" style="transition-delay: 300ms;">
+                    <div class="text-gray-300 text-lg leading-relaxed space-y-4">
+                        <p><strong>Querido/a Lourdes,</strong></p>
+                        <p>Querida Lourdes, ¡qué alegría recibirte! Estamos completamente listos para expandir el juego y construir relaciones extraordinarias desde la ecología pura.</p><p>Nos da una tranquilidad enorme saber que tu impecable presencia y contención guiarán la sala en este fin de semana tan determinante. Para que viajes ligera de equipaje y con la mente puesta únicamente en el equipo, aquí tienes tu radar logístico exacto:</p>
                     </div>
                 </div>
             </div>
-
-            <!-- 3. Movilidad y Sedes -->
-            <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-blue-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] hover:-translate-y-1">
-                <div class="flex items-center gap-4 mb-6">
-                    <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-blue-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
-                        <i class="fa-solid fa-car"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold text-white tracking-tight">3. Movilidad y Sede</h2>
-                </div>
-                <div class="space-y-6 text-gray-300 ml-2 md:ml-18">
-                    <p class="text-lg"><strong>Tus traslados:</strong> Nosotros nos encargamos de moverte:</p>
-                    
-                    <div class="space-y-4">
-                        <div class="flex gap-4 items-start bg-gray-800/30 p-4 rounded-xl border border-gray-700/30">
-                            <div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 flex-shrink-0"><i class="fa-solid fa-suitcase"></i></div>
-                            <div>
-                                <div class="font-bold text-blue-400 mb-1">Jueves 13 (Llegada)</div>
-                                <div class="text-sm text-gray-300">Nuestro equipo de transporte te escribirá antes de que aterrices para coordinar tu recojo exacto, contemplando tus tiempos de migración y espera de maletas. De ahí, te llevaremos directo al hotel a descansar y aclimatarte.</div>
-                            </div>
+        </section>
+        <!-- Sections Container -->
+        <section class="py-16 bg-crear-black relative z-10">
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+                <!-- 1. Misión -->
+                <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-crear-accent transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,183,3,0.15)] hover:-translate-y-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-crear-accent text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                            <i class="fa-solid fa-fire"></i>
                         </div>
-                        <div class="flex gap-4 items-start bg-gray-800/30 p-4 rounded-xl border border-gray-700/30">
-                            <div class="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center text-red-400 flex-shrink-0"><i class="fa-solid fa-plane-departure"></i></div>
-                            <div>
-                                <div class="font-bold text-red-400 mb-1">Domingo 16 (Salida)</div>
-                                <div class="text-sm text-gray-300">Pasaremos por ti a la sede de la graduación a las <strong>22:15 PM</strong> en punto para trasladarte directamente al aeropuerto para tu vuelo internacional.</div>
-                            </div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">1. Tu Misión (Maestría en Relación - Equipo 29)</h2>
+                    </div>
+                    <div class="space-y-4 text-gray-300 ml-2 md:ml-18">
+                        <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden mb-4"><div class="absolute top-0 left-0 w-1 h-full bg-crear-accent"></div><h4 class="font-black text-white mb-3 text-crear-accent tracking-wide uppercase text-sm">Viernes - Arranque Oficial</h4><div class="space-y-2"><p class="flex items-start gap-3"><i class="fa-regular fa-clock text-crear-accent mt-1"></i> <span><strong>16:30 PM:</strong> Grounding Entrenadores con Coordinación (Directo en salón).</span></p><p class="flex items-start gap-3"><i class="fa-regular fa-clock text-crear-accent mt-1"></i> <span><strong>17:00 PM:</strong> Apertura de Mesa de Registro para Participantes.</span></p><p class="flex items-start gap-3"><i class="fa-regular fa-clock text-crear-accent mt-1"></i> <span><strong>18:00 PM:</strong> Apertura de puertas e inicio de sala.</span></p></div></div>
+                    </div>
+                </div>
+                <!-- 2. Vuelos -->
+                <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-purple-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(168,85,247,0.15)] hover:-translate-y-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-purple-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                            <i class="fa-solid fa-plane"></i>
                         </div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">2. Vuelos Confirmados</h2>
                     </div>
-
-                    <div class="bg-gradient-to-r from-blue-900/20 to-transparent p-5 rounded-xl border-l-4 border-blue-500 mt-6">
-                        <h4 class="font-black text-white mb-2 flex items-center gap-2"><i class="fa-solid fa-hotel text-blue-400"></i> Hotel y Sede: <a href="https://maps.app.goo.gl/C7K8aFz6s9aYwT6q6" target="_blank" class="text-blue-400 hover:text-blue-300 underline decoration-blue-400/30 underline-offset-2 transition-colors">Hotel Jose Antonio Deluxe</a></h4>
-                        <p class="text-sm text-gray-300">Miraflores. Duermes y entrenas en el mismo edificio para tu total comodidad (hospedaje reservado desde el jueves 13 hasta el domingo 16 de agosto - incluye Late Checkout).</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 4. Clima y Reglas -->
-            <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-amber-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(245,158,11,0.15)] hover:-translate-y-1">
-                <div class="flex items-center gap-4 mb-6">
-                    <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-amber-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
-                        <i class="fa-solid fa-cloud"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold text-white tracking-tight">4. Clima y Reglas de Oro</h2>
-                </div>
-                <div class="grid md:grid-cols-2 gap-5 text-gray-300 ml-2 md:ml-18">
-                    <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/50">
-                        <h4 class="font-bold text-amber-400 mb-3 flex items-center gap-2"><i class="fa-solid fa-temperature-empty"></i> El Clima (Lima)</h4>
-                        <p class="text-sm">Lima se encuentra en pleno invierno. Los días son fríos, grises y muy húmedos. <strong>Trae ropa cómoda y abrigadora</strong> para los días de sala y tus salidas.</p>
-                    </div>
-                    <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/50">
-                        <h4 class="font-bold text-green-400 mb-3 flex items-center gap-2"><i class="fa-solid fa-leaf"></i> Cuidado de la Sede</h4>
-                        <ul class="text-sm space-y-2">
-                            <li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-green-500 mt-1 text-xs"></i> <span><strong>11:00 PM:</strong> Hora límite e innegociable para desocupar el salón los 3 días de entrenamiento.</span></li>
-                            <li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-green-500 mt-1 text-xs"></i> <span>Cero comida adentro.</span></li>
-                            <li class="flex items-start gap-2"><i class="fa-solid fa-circle-check text-green-500 mt-1 text-xs"></i> <span>Manejo prudente de los decibeles en los impactos para la óptima convivencia con el hotel.</span></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 5. Honorarios -->
-            <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-emerald-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(16,185,129,0.15)] hover:-translate-y-1">
-                <div class="flex items-center gap-4 mb-6">
-                    <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-emerald-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
-                        <i class="fa-solid fa-file-invoice-dollar"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold text-white tracking-tight">5. Tus Honorarios</h2>
-                </div>
-                <div class="text-gray-300 ml-2 md:ml-18 bg-gray-800/30 p-5 rounded-xl border border-gray-700/50">
-                    <p class="text-lg">Mantenemos el acuerdo estándar.</p>
-                    <p class="mt-3 text-sm text-gray-400">Si tus datos bancarios de siempre (Banco, Cuenta, SWIFT) siguen siendo los mismos, el proceso administrativo se iniciará de forma automática al finalizar el fin de semana. Si requieres actualizar alguna información, por favor envíasela directamente a José Sánchez.</p>
-                </div>
-            </div>
-
-            <!-- 6. Escuadrón -->
-            <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-pink-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(236,72,153,0.15)] hover:-translate-y-1">
-                <div class="flex items-center gap-4 mb-6">
-                    <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-pink-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
-                        <i class="fa-solid fa-users"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold text-white tracking-tight">6. Tu Escuadrón de Soporte</h2>
-                </div>
-                <div class="text-gray-300 ml-2 md:ml-18">
-                    <div class="grid md:grid-cols-3 gap-4">
-                        <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/30 hover:border-pink-500/50 transition-colors">
-                            <h4 class="font-bold text-pink-400 mb-2 text-xs uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> Capitán</h4>
-                            <p class="text-white font-medium text-lg">Lourdesnando Lopez Lopez</p>
-                            <p class="text-gray-400 text-sm mt-1"><a href="https://wa.me/51981237577" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 981 237 577</a></p>
+                    <div class="space-y-4 text-gray-300 ml-2 md:ml-18">
+                        <div class="flex flex-wrap gap-3 items-center">
+                            <span class="text-gray-400 text-sm">Reserva:</span>
+                            <span class="bg-gray-800 border border-gray-700 px-3 py-1 rounded-md font-mono text-white text-sm">JYUAGO</span>
+                            <span class="text-gray-500 text-xs ml-2">(Boleto a nombre de: <strong>MARIA PATINO GALARRAGA</strong>)</span>
                         </div>
-                        
-                        <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/30 hover:border-pink-500/50 transition-colors">
-                            <h4 class="font-bold text-crear-accent mb-2 text-xs uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-bolt"></i> Escuderas Principales</h4>
-                            <div class="space-y-3">
-                                <div>
-                                    <p class="text-white font-medium text-sm">Diana Moscoso</p>
-                                    <p class="text-gray-400 text-xs mt-0.5"><a href="https://wa.me/51912379744" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 912 379 744</a></p>
+                        <div class="grid md:grid-cols-2 gap-5 mt-5">
+                            <!-- Llegada -->
+                            <div class="bg-gradient-to-br from-gray-800/40 to-gray-900/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden">
+                                <div class="absolute top-0 left-0 w-full h-1 bg-purple-500"></div>
+                                <h4 class="font-black text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-plane-arrival text-purple-400"></i> Llegada (03/09/2026)</h4>
+                                <div class="space-y-2 text-sm">
+                                    <p class="flex justify-between border-b border-gray-700/50 pb-2"><span class="text-gray-400">Vuelo</span> <span class="font-medium text-white">LATAM LA 1437</span></p>
+                                    <p class="flex justify-between pt-1"><span class="text-gray-400">Llegada a Lima</span> <span class="font-medium text-green-400">10:10 AM</span></p>
+                                    <div class="pt-2"><a href="https://www.flightradar24.com/data/flights/la1437" target="_blank" class="text-xs text-purple-400 hover:underline">Ver en FlightRadar &rarr;</a></div>
                                 </div>
-                                <div class="w-full h-px bg-gray-700/50"></div>
-                                <div>
-                                    <p class="text-white font-medium text-sm">Joyce Marín</p>
-                                    <p class="text-gray-400 text-xs mt-0.5"><a href="https://wa.me/51933599903" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 933 599 903</a></p>
+                            </div>
+                            <!-- Salida -->
+                            <div class="bg-gradient-to-br from-gray-800/40 to-gray-900/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden">
+                                <div class="absolute top-0 left-0 w-full h-1 bg-red-500"></div>
+                                <h4 class="font-black text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-plane-departure text-red-400"></i> Salida (07/09/2026)</h4>
+                                <div class="space-y-2 text-sm">
+                                    <p class="flex justify-between border-b border-gray-700/50 pb-2"><span class="text-gray-400">Vuelo</span> <span class="font-medium text-white">LATAM LA 1429</span></p>
+                                    <p class="flex justify-between pt-1"><span class="text-gray-400">Salida de Lima</span> <span class="font-medium text-red-400">12:30 PM</span></p>
+                                    <div class="pt-2"><a href="https://www.flightradar24.com/data/flights/la1429" target="_blank" class="text-xs text-red-400 hover:underline">Ver en FlightRadar &rarr;</a></div>
                                 </div>
                             </div>
                         </div>
-
-                        <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/30 hover:border-pink-500/50 transition-colors">
-                            <h4 class="font-bold text-purple-400 mb-2 text-xs uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-briefcase"></i> Soporte Gerencial</h4>
-                            <p class="text-white font-medium text-lg">José Sánchez</p>
-                            <p class="text-gray-400 text-sm mt-1"><a href="https://wa.me/51919563284" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 919 563 284</a></p>
+                        <div class="mt-4 bg-gradient-to-r from-amber-500/10 to-transparent p-4 rounded-xl border border-amber-500/30 flex items-center gap-3"><i class="fa-regular fa-clock text-crear-accent text-xl"></i><div><p class="text-crear-accent font-bold text-sm">Recojo en Lobby para Salida: 09:00 AM</p><p class="text-xs text-gray-400">Calculado 3.5 horas antes de tu vuelo (12:30 PM) para margen de tráfico y abordaje.</p></div></div>
+                    </div>
+                </div>
+                <!-- 3. Movilidad y Sede -->
+                <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-blue-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] hover:-translate-y-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-blue-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                            <i class="fa-solid fa-car"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">3. Movilidad y Sede</h2>
+                    </div>
+                    <div class="space-y-6 text-gray-300 ml-2 md:ml-18">
+                        <p class="text-lg"><strong>Tus traslados:</strong> Nuestro equipo te contactará para coordinar tu recojo exacto en el aeropuerto Jorge Chávez.</p>
+                        <div class="space-y-4"><div class="flex gap-4 items-start bg-gray-800/30 p-4 rounded-xl border border-gray-700/30"><div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 flex-shrink-0"><i class="fa-solid fa-suitcase"></i></div><div><div class="font-bold text-blue-400 mb-1">Traslado Oficial</div><div class="text-sm text-gray-300">Nuestro equipo te contactará para coordinar tu recojo exacto en el aeropuerto Jorge Chávez.</div></div></div></div>
+                        <div class="mt-4 bg-gradient-to-r from-blue-500/10 to-transparent p-4 rounded-xl border border-blue-500/30 flex items-center gap-3"><i class="fa-solid fa-car text-blue-400 text-xl"></i><div><p class="text-blue-400 font-bold text-sm">Coordinación con Conductor</p><p class="text-xs text-gray-400">El conductor asignado te escribirá por WhatsApp 1 hora antes de tu arribo/salida para darte la placa del auto y coordinar el punto de encuentro exacto.</p></div></div>
+                        <div class="bg-gradient-to-r from-blue-900/20 to-transparent p-5 rounded-xl border-l-4 border-blue-500 mt-6">
+                            <h4 class="font-black text-white mb-2 flex items-center gap-2"><i class="fa-solid fa-hotel text-blue-400"></i> Hotel y Salón: Hotel Jose Antonio Deluxe (Miraflores)</h4>
+                            <p class="text-sm text-gray-300">Calle Bellavista 133, Miraflores, Lima, Perú</p>
+                            <a href="https://maps.google.com/?q=Hotel+Jose+Antonio+Deluxe+Miraflores+Lima" target="_blank" class="inline-flex items-center gap-2 mt-3 text-xs text-blue-400 hover:underline"><i class="fa-solid fa-map-location-dot"></i> Ver ubicación en Google Maps &rarr;</a>
                         </div>
                     </div>
                 </div>
-            </div>
-
-
-            <!-- Closing -->
-            <div class="text-center pt-16 pb-12 reveal">
-                <h3 class="text-2xl md:text-3xl font-black text-white mb-2 italic" id="random-quote"></h3>
-                <p class="text-lg text-crear-accent mb-10 font-semibold" id="random-author"></p>
-                <div class="inline-block glass px-10 py-5 rounded-2xl border border-crear-accent/40 shadow-[0_0_30px_rgba(56,189,248,0.25)] hover:scale-105 transition-transform duration-300">
-                    <p class="font-bold text-white text-lg">Un abrazo,</p>
-                    <p class="text-crear-accent font-black tracking-widest uppercase text-xl mt-1">El Equipo de CREAR PSL LIMA</p>
+                <!-- 4. Clima y Reglas -->
+                <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-amber-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(245,158,11,0.15)] hover:-translate-y-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-amber-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                            <i class="fa-solid fa-cloud"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">4. Clima y Reglas de Oro</h2>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-5 text-gray-300 ml-2 md:ml-18">
+                        <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/50">
+                            <h4 class="font-bold text-amber-400 mb-3 flex items-center gap-2"><i class="fa-solid fa-temperature-empty"></i> El Clima (Lima)</h4>
+                            <p class="text-2xl font-black text-white mb-2">15°C - 18°C</p>
+                            <p class="text-sm font-semibold text-amber-300/90 mb-1">Invierno Limeño</p>
+                            <p class="text-xs text-gray-400 mb-4">El clima está frío y húmedo (invierno), trae buen abrigo.</p>
+                            <div class="space-y-1"><p class="text-xs text-gray-400 flex items-start gap-2 mb-1.5"><i class="fa-solid fa-circle-check text-crear-accent text-[10px] mt-1"></i> Traer casaca o abrigo abrigador para traslados nocturnos.</p><p class="text-xs text-gray-400 flex items-start gap-2 mb-1.5"><i class="fa-solid fa-circle-check text-crear-accent text-[10px] mt-1"></i> Ropa cómoda para sala con clima controlado.</p><p class="text-xs text-gray-400 flex items-start gap-2 mb-1.5"><i class="fa-solid fa-circle-check text-crear-accent text-[10px] mt-1"></i> Calzado cómodo.</p></div>
+                        </div>
+                        <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/50">
+                            <h4 class="font-bold text-red-400 mb-3 flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> Reglas de Oro y Convivencia</h4>
+                            <ul class="text-sm space-y-2.5">
+                                <li class="flex items-start gap-2.5"><i class="fa-solid fa-circle-check text-green-500 mt-1 text-xs flex-shrink-0"></i> <span><strong>Hora Límite Innegociable:</strong> 11:00 PM es la hora límite innegociable de cierre.</span></li><li class="flex items-start gap-2.5"><i class="fa-solid fa-circle-check text-green-500 mt-1 text-xs flex-shrink-0"></i> <span><strong>Alimentación:</strong> Cero comida en salón. Solo hidratación permitida.</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!-- 5. Honorarios -->
+                <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-emerald-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(168,85,247,0.15)] hover:-translate-y-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-emerald-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                            <i class="fa-solid fa-file-invoice-dollar"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">5. Tus Honorarios</h2>
+                    </div>
+                    <div class="text-gray-300 ml-2 md:ml-18 bg-gray-800/30 p-5 rounded-xl border border-gray-700/50">
+                        <p class="text-lg">Mantenemos el acuerdo estándar de honorarios.</p>
+                        <p class="mt-3 text-sm text-gray-400">Si tus datos bancarios de siempre (Banco, Cuenta, SWIFT) siguen siendo los mismos, el proceso administrativo se iniciará de forma automática tras concluir los entrenamientos.</p>
+                        <div class="mt-5 grid md:grid-cols-2 gap-3 bg-gray-900/60 p-4 rounded-xl border border-gray-700/40 text-xs"><div><span class="text-gray-500 uppercase tracking-widest text-[10px]">Razón Social</span><p class="text-white font-semibold mt-0.5">CREAR PODER SIN LIMITES S.A.C.</p></div><div><span class="text-gray-500 uppercase tracking-widest text-[10px]">RUC / NIF</span><p class="text-white font-mono font-semibold mt-0.5">20608512491</p></div><div class="md:col-span-2"><span class="text-gray-500 uppercase tracking-widest text-[10px]">Dirección Fiscal</span><p class="text-gray-300 mt-0.5">Calle Bellavista 133, Miraflores, Lima, Perú</p></div></div>
+                        <div class="mt-5"><a href="https://wa.me/51919563284?text=Hola%20Jos%C3%A9%2C%20confirmo%20mis%20datos%20bancarios%20para%20honorarios%20de%20Lourdes%20Pati%C3%B1o%20E29." target="_blank" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-green-500/10 border border-green-500/30 text-green-400 text-xs font-bold hover:bg-green-500/20 transition-colors"><i class="fa-brands fa-whatsapp text-green-400 text-base"></i> Enviar datos bancarios por WhatsApp</a></div>
+                    </div>
+                </div>
+                <!-- 6. Escuadrón -->
+                <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-pink-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(236,72,153,0.15)] hover:-translate-y-1">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-pink-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">6. Tu Escuadrón de Soporte</h2>
+                    </div>
+                    <div class="text-gray-300 ml-2 md:ml-18">
+                        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/30 hover:border-crear-accent/50 transition-colors"><h4 class="font-bold text-blue-400 mb-2 text-xs uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-user-tie"></i> Manager</h4><p class="text-white font-medium text-lg">Italo Alonso Roman Nomura</p><p class="text-gray-400 text-sm mt-1"><a href="https://wa.me/51997213218" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 997 213 218</a></p></div><div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/30 hover:border-crear-accent/50 transition-colors"><h4 class="font-bold text-blue-400 mb-2 text-xs uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-user-tie"></i> Manager</h4><p class="text-white font-medium text-lg">Tania Aurora Sanchez Castro</p><p class="text-gray-400 text-sm mt-1"><a href="https://wa.me/51981295423" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 981 295 423</a></p></div><div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/30 hover:border-crear-accent/50 transition-colors"><h4 class="font-bold text-purple-400 mb-2 text-xs uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-briefcase"></i> Gerente de Sede</h4><p class="text-white font-medium text-lg">José Sánchez</p><p class="text-gray-400 text-sm mt-1"><a href="https://wa.me/51919563284" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 919 563 284</a></p></div><div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/30 hover:border-crear-accent/50 transition-colors"><h4 class="font-bold text-pink-400 mb-2 text-xs uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> Coordinación MJ</h4><p class="text-white font-medium text-lg">Linid Valencia</p><p class="text-gray-400 text-sm mt-1"><a href="https://wa.me/51912379686" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 912 379 686</a></p></div><div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/30 hover:border-crear-accent/50 transition-colors"><h4 class="font-bold text-pink-400 mb-2 text-xs uppercase tracking-widest flex items-center gap-2"><i class="fa-solid fa-shield-halved"></i> Coordinación MJ</h4><p class="text-white font-medium text-lg">Leyla Pasquel</p><p class="text-gray-400 text-sm mt-1"><a href="https://wa.me/51919502385" target="_blank" class="hover:text-green-400 transition-colors inline-flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-green-500"></i>+51 919 502 385</a></p></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Closing -->
+                <div class="text-center pt-16 pb-12 reveal">
+                    <h3 class="text-2xl md:text-3xl font-black text-white mb-2 italic" id="random-quote"></h3>
+                    <p class="text-lg text-crear-accent mb-10 font-semibold" id="random-author"></p>
+                    <h3 class="text-2xl md:text-3xl font-black text-white mb-4">
+                        Párate en tu poder absoluto, Lourdes.<br>
+                        <span class="text-crear-accent">Ven a detonar la sala del Equipo 29.</span> Nos vemos muy pronto.
+                    </h3>
+                    <div class="inline-block glass px-10 py-5 rounded-2xl border border-crear-accent/40 shadow-[0_0_30px_rgba(255,183,3,0.25)] hover:scale-105 transition-transform duration-300">
+                        <p class="font-bold text-white text-lg">Un abrazo,</p>
+                        <p class="text-crear-accent font-black tracking-widest uppercase text-xl mt-1">El Equipo de CREAR PSL LIMA</p>
+                    </div>
                 </div>
             </div>
-
-        </div>
-    </section>
-
-    <!-- FOOTER -->
-    <footer class="bg-[#050505] py-16 border-t border-gray-900 relative z-10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div class="flex items-center justify-center gap-3 mb-10">
-                <img src="logo_crear_blanco.png" alt="CREAR" class="h-40 md:h-56 object-contain drop-shadow-[0_0_20px_rgba(251,191,36,0.6)] hover:drop-shadow-[0_0_35px_rgba(251,191,36,1)] hover:scale-105 transition-all duration-500" />
+        </section>
+        <!-- FOOTER -->
+        <footer class="bg-[#050505] py-16 border-t border-gray-900 relative z-10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <div class="flex items-center justify-center gap-3 mb-10">
+                    <img src="logo_crear_blanco.png" onerror="this.src='https://crearpodersinlimitesperu-cmd.github.io/cartas-crear/logo_crear_blanco.png'" alt="CREAR" class="h-40 md:h-56 object-contain drop-shadow-[0_0_20px_rgba(251,191,36,0.6)] hover:drop-shadow-[0_0_35px_rgba(251,191,36,1)] hover:scale-105 transition-all duration-500" />
+                </div>
+                <div class="text-gray-600 text-sm font-medium tracking-wide">
+                    &copy; 2026 CREAR Poder Sin Límites Sede Perú.<br/> Comunicación oficial vía Google Chat.
+                </div>
             </div>
-            <div class="text-gray-600 text-sm font-medium tracking-wide">
-                &copy; 2026 CREAR Poder Sin Límites Sede Perú.<br/> Comunicación oficial vía Google Chat.
-            </div>
-        </div>
-    </footer>
-
-    <!-- LOGIC SCRIPT -->
+        </footer>
+    </div>
+    <!-- Floating Music Button -->
+    <button id="musicToggleBtn" class="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full glass border border-gray-600 flex items-center justify-center text-white shadow-[0_0_15px_rgba(255,183,3,0.3)] hover:scale-110 transition-transform duration-300">
+        <i class="fa-solid fa-music"></i>
+    </button>
+    <div id="ytplayer" class="absolute -left-[9999px] top-0 w-[300px] h-[300px] opacity-0 pointer-events-none"></div>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Navbar background change on scroll
-            const navbar = document.getElementById('navbar');
-            window.addEventListener('scroll', () => {
-                if (window.scrollY > 20) {
-                    navbar.classList.add('bg-crear-black/95', 'shadow-lg');
-                    navbar.classList.remove('glass', 'shadow-lg');
+        var tag = document.createElement("script");
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName("script")[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        var player;
+        var isPlaying = false;
+        var playerReady = false;
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player("ytplayer", {
+                height: "300", width: "300", videoId: "FboYUBlvaL4",
+                playerVars: { "autoplay": 0, "controls": 0, "loop": 1, "playlist": "FboYUBlvaL4", "playsinline": 1, "rel": 0 },
+                events: { "onReady": onPlayerReady, "onStateChange": onPlayerStateChange }
+            });
+        }
+        function onPlayerStateChange(event) {
+            if (event.data === YT.PlayerState.PLAYING) {
+                isPlaying = true;
+                var icon = document.querySelector("#musicToggleBtn i");
+                if(icon) { icon.classList.remove("fa-music"); icon.classList.add("fa-pause", "text-crear-accent", "fa-beat-fade"); }
+            } else if (event.data === YT.PlayerState.PAUSED) {
+                isPlaying = false;
+                var icon = document.querySelector("#musicToggleBtn i");
+                if(icon) { icon.classList.remove("fa-pause", "text-crear-accent", "fa-beat-fade"); icon.classList.add("fa-music"); }
+            }
+        }
+        function toggleMusic() {
+            if (!playerReady || !player) return;
+            if (isPlaying) player.pauseVideo(); else player.playVideo();
+        }
+        function onPlayerReady(event) {
+            playerReady = true;
+            var openBtn = document.getElementById("openLetterBtn");
+            if(openBtn) {
+                openBtn.innerHTML = '<i class="fa-solid fa-envelope-open-text"></i> ABRIR CARTA';
+                openBtn.classList.remove("opacity-50", "cursor-not-allowed", "pointer-events-none");
+                openBtn.classList.add("animate-pulse");
+            }
+        }
+        setTimeout(function(){
+            var openBtn = document.getElementById("openLetterBtn");
+            if(openBtn && !playerReady) {
+                openBtn.innerHTML = '<i class="fa-solid fa-envelope-open-text"></i> ABRIR CARTA';
+                openBtn.classList.remove("opacity-50", "cursor-not-allowed", "pointer-events-none");
+                openBtn.classList.add("animate-pulse");
+            }
+        }, 2500);
+        document.addEventListener("DOMContentLoaded", function() {
+            var overlay = document.getElementById("welcomeOverlay");
+            var openBtn = document.getElementById("openLetterBtn");
+            var musicBtn = document.getElementById("musicToggleBtn");
+            if(openBtn && overlay) {
+                openBtn.addEventListener("click", function() {
+                    overlay.style.opacity = "0";
+                    setTimeout(function(){ overlay.remove(); }, 1000);
+                    if (playerReady && player && typeof player.playVideo === "function") {
+                        player.playVideo();
+                    }
+                });
+            }
+            if(musicBtn) {
+                musicBtn.addEventListener("click", function(e) {
+                    e.stopPropagation();
+                    toggleMusic();
+                });
+            }
+            var flightTimestamp = new Date("2026-09-03T15:10:00.000Z").getTime();
+            var trainingTimestamp = new Date("2026-09-16T23:00:00.000Z").getTime();
+            var timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            var indicator = document.getElementById("timezone-indicator");
+            if(indicator) indicator.innerText = "Mostrando cuenta regresiva detectando tu zona local: " + timeZone;
+            function updateCountdowns() {
+                var now = new Date().getTime();
+                var distanceTrn = trainingTimestamp - now;
+                if (distanceTrn > 0) {
+                    document.getElementById("trn-d").innerText = String(Math.floor(distanceTrn / (1000 * 60 * 60 * 24))).padStart(2, "0");
+                    document.getElementById("trn-h").innerText = String(Math.floor((distanceTrn % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, "0");
+                    document.getElementById("trn-m").innerText = String(Math.floor((distanceTrn % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
+                    document.getElementById("trn-s").innerText = String(Math.floor((distanceTrn % (1000 * 60)) / 1000)).padStart(2, "0");
                 } else {
-                    navbar.classList.remove('bg-crear-black/95', 'shadow-lg');
-                    navbar.classList.add('glass', 'shadow-lg');
+                    document.getElementById("countdown-training").innerHTML = "<div class='col-span-4 text-white font-bold tracking-widest uppercase'>¡El entrenamiento ha comenzado!</div>";
+                }
+                var distanceFly = flightTimestamp - now;
+                if (distanceFly > 0) {
+                    document.getElementById("fly-d").innerText = String(Math.floor(distanceFly / (1000 * 60 * 60 * 24))).padStart(2, "0");
+                    document.getElementById("fly-h").innerText = String(Math.floor((distanceFly % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, "0");
+                    document.getElementById("fly-m").innerText = String(Math.floor((distanceFly % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
+                    document.getElementById("fly-s").innerText = String(Math.floor((distanceFly % (1000 * 60)) / 1000)).padStart(2, "0");
+                } else {
+                    document.getElementById("countdown-flight").innerHTML = "<div class='col-span-4 text-white font-bold tracking-widest uppercase'>¡Buen viaje!</div>";
+                }
+            }
+            setInterval(updateCountdowns, 1000);
+            updateCountdowns();
+            var navbar = document.getElementById("navbar");
+            window.addEventListener("scroll", function() {
+                if (window.scrollY > 20) {
+                    navbar.classList.add("bg-crear-black/95", "shadow-lg");
+                    navbar.classList.remove("glass");
+                } else {
+                    navbar.classList.remove("bg-crear-black/95");
+                    navbar.classList.add("glass");
                 }
             });
-
-            // Intersection Observer for Scroll Reveals
-            const revealElements = document.querySelectorAll('.reveal');
-            const revealOptions = {
-                threshold: 0.1,
-                rootMargin: "0px 0px -50px 0px"
-            };
-
-            const revealOnScroll = new IntersectionObserver(function(entries, observer) {
-                entries.forEach(entry => {
+            var revealElements = document.querySelectorAll(".reveal");
+            var revealObserver = new IntersectionObserver(function(entries, observer) {
+                entries.forEach(function(entry) {
                     if (entry.isIntersecting) {
-                        entry.target.classList.add('active');
+                        entry.target.classList.add("active");
                         observer.unobserve(entry.target);
                     }
                 });
-            }, revealOptions);
-
-            revealElements.forEach(el => {
-                revealOnScroll.observe(el);
-            });
-            
-            // Trigger initial check
-            setTimeout(() => {
-                revealElements.forEach(el => {
-                    const rect = el.getBoundingClientRect();
+            }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
+            revealElements.forEach(function(el) { revealObserver.observe(el); });
+            setTimeout(function() {
+                revealElements.forEach(function(el) {
+                    var rect = el.getBoundingClientRect();
                     if (rect.top < window.innerHeight && rect.width > 0 && rect.height > 0) {
-                        el.classList.add('active');
+                        el.classList.add("active");
                     }
                 });
             }, 100);
+            var quoteEl = document.getElementById("random-quote");
+            var authorEl = document.getElementById("random-author");
+            if (quoteEl && authorEl) {
+                var quotesList = (typeof transformationQuotes !== "undefined" && Array.isArray(transformationQuotes) && transformationQuotes.length > 0)
+                    ? transformationQuotes
+                    : [
+                        { text: "Tú y yo poseemos dentro de nosotros mismos en cada momento de nuestras vidas, bajo todas las circunstancias, el poder de transformar la calidad de nuestras vidas.", author: "Werner Erhard" },
+                        { text: "El poder de la auto-transformación está en tus manos.", author: "Tony Robbins" },
+                        { text: "Cuando tomas una elección, cambias el futuro.", author: "Joe Dispenza" },
+                        { text: "La transformación no es un evento futuro. Es una actividad actual.", author: "Jillian Michaels" }
+                    ];
+                var rq = quotesList[Math.floor(Math.random() * quotesList.length)];
+                quoteEl.innerText = "\"" + (rq.text || rq.quote) + "\"";
+                authorEl.innerText = "— " + (rq.author || rq.autor);
+            }
         });
     </script>
-    <!-- Floating Music Button -->
-    <script src="quotes.js"></script>
-    <button id="musicToggleBtn" class="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full glass border border-gray-600 flex items-center justify-center text-white shadow-[0_0_15px_rgba(56,189,248,0.3)] hover:scale-110 transition-transform duration-300">
-        <i class="fa-solid fa-music"></i>
-    </button>
-    
-
-    <div id="ytplayer" class="absolute -left-[9999px] top-0 w-[300px] h-[300px] opacity-0 pointer-events-none"></div>
-      <script>
-          var tag = document.createElement('script');
-          tag.src = "https://www.youtube.com/iframe_api";
-          var firstScriptTag = document.getElementsByTagName('script')[0];
-          firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-  
-          var player;
-          var isPlaying = false;
-          var playerReady = false;
-  
-          function onYouTubeIframeAPIReady() {
-              player = new YT.Player('ytplayer', {
-                  height: '300',
-                  width: '300',
-                  videoId: 'FboYUBlvaL4',
-                  playerVars: {
-                      'autoplay': 0,
-                      'controls': 0,
-                      'loop': 1,
-                      'playlist': 'FboYUBlvaL4',
-                      'playsinline': 1,
-                      'rel': 0
-                  },
-                  events: {
-                      'onReady': onPlayerReady,
-                      'onStateChange': onPlayerStateChange
-                  }
-              });
-          }
-
-          function onPlayerStateChange(event) {
-              if (event.data === YT.PlayerState.PLAYING) {
-                  isPlaying = true;
-                  const icon = document.querySelector('#musicToggleBtn i');
-                  if(icon) {
-                      icon.classList.remove('fa-music');
-                      icon.classList.add('fa-pause', 'text-crear-accent', 'fa-beat-fade');
-                  }
-              } else if (event.data === YT.PlayerState.PAUSED) {
-                  isPlaying = false;
-                  const icon = document.querySelector('#musicToggleBtn i');
-                  if(icon) {
-                      icon.classList.remove('fa-pause', 'text-crear-accent', 'fa-beat-fade');
-                      icon.classList.add('fa-music');
-                  }
-              }
-          }
-  
-          function toggleMusic() {
-              if (!playerReady || !player) return;
-              if (isPlaying) {
-                  player.pauseVideo();
-              } else {
-                  player.playVideo();
-              }
-          }
-  
-          function onPlayerReady(event) {
-              playerReady = true;
-              const openBtn = document.getElementById('openLetterBtn');
-              if(openBtn) {
-                  openBtn.innerHTML = '<i class="fa-solid fa-envelope-open-text"></i> ABRIR CARTA';
-                  openBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
-                  openBtn.classList.add('animate-pulse');
-              }
-          }
-  
-          document.addEventListener('DOMContentLoaded', () => {
-              const overlay = document.getElementById('welcomeOverlay');
-              const openBtn = document.getElementById('openLetterBtn');
-              const musicBtn = document.getElementById('musicToggleBtn');
-  
-              if(openBtn && overlay) {
-                  openBtn.addEventListener('click', () => {
-                      overlay.style.opacity = '0';
-                      setTimeout(() => overlay.remove(), 1000);
-                      if (playerReady) {
-                          player.playVideo();
-                      }
-                  });
-              }
-  
-              if(musicBtn) {
-                  musicBtn.addEventListener('click', (e) => {
-                      e.stopPropagation();
-                      toggleMusic();
-                  });
-              }
-              
-              // Cuenta Regresiva (Logica Huso Horario)
-              const trainingDateLima = new Date("2026-09-04T16:30:00-05:00").getTime();
-              const flightDateLima = new Date("2026-09-03T10:10:00-05:00").getTime();
-              const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-              const indicator = document.getElementById('timezone-indicator');
-              if(indicator) indicator.innerText = `Mostrando cuenta regresiva detectando tu zona local: ${timeZone}`;
-              
-              function updateCountdowns() {
-                  const now = new Date().getTime();
-                  let distanceTrn = trainingDateLima - now;
-                  if (distanceTrn > 0) {
-                      document.getElementById("trn-d").innerText = String(Math.floor(distanceTrn / (1000 * 60 * 60 * 24))).padStart(2, '0');
-                      document.getElementById("trn-h").innerText = String(Math.floor((distanceTrn % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
-                      document.getElementById("trn-m").innerText = String(Math.floor((distanceTrn % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
-                      document.getElementById("trn-s").innerText = String(Math.floor((distanceTrn % (1000 * 60)) / 1000)).padStart(2, '0');
-                  } else {
-                      document.getElementById("countdown-training").innerHTML = "<div class='col-span-4 text-white font-bold tracking-widest uppercase'>¡El entrenamiento ha comenzado!</div>";
-                  }
-                  
-                  let distanceFly = flightDateLima - now;
-                  if (distanceFly > 0) {
-                      document.getElementById("fly-d").innerText = String(Math.floor(distanceFly / (1000 * 60 * 60 * 24))).padStart(2, '0');
-                      document.getElementById("fly-h").innerText = String(Math.floor((distanceFly % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
-                      document.getElementById("fly-m").innerText = String(Math.floor((distanceFly % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
-                      document.getElementById("fly-s").innerText = String(Math.floor((distanceFly % (1000 * 60)) / 1000)).padStart(2, '0');
-                  } else {
-                      document.getElementById("countdown-flight").innerHTML = "<div class='col-span-4 text-white font-bold tracking-widest uppercase'>¡Buen viaje!</div>";
-                  }
-              }
-              setInterval(updateCountdowns, 1000);
-              updateCountdowns();
-          });
-      </script>
 </body>
-
-
-
-
-
+</html>
 ```
 
 ---
@@ -85855,6 +86873,7 @@ import TeamCalendar from './pages/TeamCalendar'
 import EmbudoConversionBoard from './pages/EmbudoConversionBoard'
 import NodusDataMap from './pages/NodusDataMap'
 import CalendarioMJ from './pages/CalendarioMJ'
+import GeneradorFlyer from './pages/GeneradorFlyer'
 import AICopilot from './components/AICopilot'
 import PromptModal from './components/PromptModal'
 import BirthdayAlert from './components/BirthdayAlert'
@@ -86109,6 +87128,13 @@ function App() {
           <Route path="/calendario-mj" element={
             <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria', 'coord_maestria', 'coordinador_mj']} requireSuperAdmin={false}>
               <CalendarioMJ />
+            </RoleRoute>
+          } />
+
+          {/* Generador de Flyers Oficiales (02/09/2026): Generador HD 1080x1920 con fechas por sede */}
+          <Route path="/generador-flyer" element={
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria', 'coord_maestria', 'coordinador_mj', 'entrenador']} requireSuperAdmin={false}>
+              <GeneradorFlyer />
             </RoleRoute>
           } />
 
@@ -94659,7 +95685,7 @@ export const canViewSede = (currentUser) => {
  */
 export const DUAL_ROLE_TRAINER_EMAILS = [
   'jose.sanchez@crearpsl.net',      // SuperAdmin + Gerente Lima + Entrenador
-  'andres.gomez@crearpsl.net',     // Director Maestría + Entrenador C2+MJ
+  'andres.gomez@crearpsl.net',     // Director Maestría del Juego + Entrenador C2 + Entrenador Relación MJ + Entrenador de Llamadas (confirmado por José, 02/09/2026)
   'fer.aragon@crearpsl.net',        // Corporativo + Entrenador C1
   'paul.sosa@crearpsl.net',         // Corporativo + Entrenador C2+MJ
   'leandro.brunis@crearpsl.net',    // Dirección / Corporativo + Entrenador C1 (Leandro Brunis)
@@ -141928,16 +142954,35 @@ export default function AuditoriaKPIs() {
 
           const dynamicMetrics = [];
           const statusPills = [];
+          // (02/09/2026) FIX — verificado contra nodus_latest_snapshot.json real:
+          // 1) content[1] no siempre empieza con "Últ." (ej. Nodus manda literalmente
+          //    "Sin conexiones registradas" para coordinadores sin login reciente).
+          //    Antes esto se colaba como una métrica sin sentido ("Sin conexiones
+          //    registradas: 0"). Ahora content[1] se salta siempre, sea cual sea su texto.
+          // 2) La lista fija de palabras clave (Confirmado/Siguiente/En espera/Cierre)
+          //    dejaba fuera estados reales de Nodus como "Por Confirmar", "No Contesta",
+          //    "No le Interesa", "Ya Asistiá" y "Devolución", que caían como tarjetas de
+          //    métrica plana en vez de pill de estado. En los datos reales, Nodus separa
+          //    las "métricas duras" (Gestiones/C1/C2/Asignados/Cobertura) de los "estados
+          //    de gestión" (Confirmado, Por Confirmar, No Contesta, etc.) con el marcador
+          //    "Últ. gestión: ...". Todo par "Etiqueta: Valor" que aparece DESPUÉS de ese
+          //    marcador es, por construcción, un estado de gestión — sin necesitar una
+          //    lista de palabras clave que quede desactualizada si Nodus agrega estados.
+          let pastUltGestion = false;
           for(let i = 1; i < content.length; i++) {
             const str = content[i];
-            if (!str || typeof str !== 'string' || str.startsWith('Últ.')) continue;
-            
+            if (!str || typeof str !== 'string') continue;
+            if (i === 1 || str.startsWith('Últ.')) {
+              if (str.startsWith('Últ. gestión')) pastUltGestion = true;
+              continue;
+            }
+
             if (str.includes(':')) {
               const parts = str.split(':');
               const label = parts[0].trim();
-              const val = parts[1].trim();
-              
-              if (['Confirmado', 'Siguiente', 'En espera', 'Cierre'].some(keyword => label.includes(keyword))) {
+              const val = parts.slice(1).join(':').trim();
+
+              if (pastUltGestion) {
                 statusPills.push({ label, value: val });
               } else {
                 dynamicMetrics.push({ label, value: val });
@@ -142099,8 +143144,7 @@ export default function AuditoriaKPIs() {
         if (snap.exists()) {
           const data = snap.data();
           const dataTime = data.timestamp ? new Date(data.timestamp).getTime() : 0;
-          const matchesDates = data.fechasFiltro && data.fechasFiltro.startDate === startDate && data.fechasFiltro.endDate === endDate;
-          if ((dataTime >= (dispatchStartedAt - 60000) && matchesDates) || dataTime >= dispatchStartedAt) {
+          if (dataTime >= dispatchStartedAt) {
             const parsedData = parseNodusData(data);
             setReports(parsedData);
             setResumenGeneral(parseResumenGeneral(data));
@@ -149234,6 +150278,607 @@ export default function ExcellenceDashboard() {
 
 ---
 
+## Archivo: src\pages\GeneradorFlyer.jsx
+
+```javascript
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { useCycles } from '../context/CyclesContext';
+import { useUI } from '../context/UIContext';
+import {
+  Sparkles, Download, ArrowLeft, RefreshCw, Calendar, Check,
+  Copy, Image as ImageIcon, Sliders, Eye, Share2, Terminal
+} from 'lucide-react';
+
+// Sedes y banderas oficiales
+const SEDES_INICIALES = [
+  { id: 'lim', ciudad: 'LIMA', pais: 'Perú', codigo: 'PE', bandera: '🇵🇪', fechas: '04 - 06 SEPTIEMBRE', activo: true },
+  { id: 'uio', ciudad: 'QUITO', pais: 'Ecuador', codigo: 'EC', bandera: '🇪🇨', fechas: '11 - 13 SEPTIEMBRE', activo: true },
+  { id: 'mex', ciudad: 'MÉXICO', pais: 'México', codigo: 'MX', bandera: '🇲🇽', fechas: '18 - 20 SEPTIEMBRE', activo: true },
+  { id: 'gye', ciudad: 'GUAYAQUIL', pais: 'Ecuador', codigo: 'EC', bandera: '🇪🇨', fechas: '25 - 27 SEPTIEMBRE', activo: true },
+  { id: 'cue', ciudad: 'CUENCA', pais: 'Ecuador', codigo: 'EC', bandera: '🇪🇨', fechas: '02 - 04 OCTUBRE', activo: true },
+  { id: 'med', ciudad: 'MEDELLÍN', pais: 'Colombia', codigo: 'CO', bandera: '🇨🇴', fechas: '09 - 11 OCTUBRE', activo: true },
+];
+
+export default function GeneradorFlyer() {
+  const { currentUser } = useAuth();
+  const { events } = useCycles();
+  const { showToast } = useUI();
+  const navigate = useNavigate();
+
+  const [programa, setPrograma] = useState('MAESTRÍA EN CREACIÓN');
+  const [subtitulo, setSubtitulo] = useState('GIRA INTERNACIONAL');
+  const [sedes, setSedes] = useState(SEDES_INICIALES);
+  const [descargando, setDescargando] = useState(false);
+  const [showCliModal, setShowCliModal] = useState(false);
+
+  const canvasRef = useRef(null);
+
+  // Sincronizar fechas del calendario oficial de Causa OS
+  const sincronizarFechasCalendario = () => {
+    if (!events || events.length === 0) {
+      showToast?.('No hay eventos cargados aún en el calendario local', 'warning');
+      return;
+    }
+
+    const meses = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
+
+    const sedesActualizadas = sedes.map(s => {
+      // Buscar el próximo evento para esta sede
+      const ev = events.find(e => {
+        const evSede = (e.sede || '').toUpperCase();
+        const evNombre = (e.nombre || '').toUpperCase();
+        const fecha = new Date(e.fecha_inicio);
+        const hoy = new Date();
+        return evSede.includes(s.id.toUpperCase()) && fecha >= hoy;
+      });
+
+      if (ev && ev.fecha_inicio) {
+        const dInicio = new Date(ev.fecha_inicio);
+        const dFin = ev.fecha_fin ? new Date(ev.fecha_fin) : new Date(dInicio.getTime() + 2 * 86400000);
+        const diaI = String(dInicio.getDate()).padStart(2, '0');
+        const diaF = String(dFin.getDate()).padStart(2, '0');
+        const mesStr = meses[dInicio.getMonth()];
+        return {
+          ...s,
+          fechas: `${diaI} - ${diaF} ${mesStr}`
+        };
+      }
+      return s;
+    });
+
+    setSedes(sedesActualizadas);
+    showToast?.('Fechas sincronizadas con el calendario oficial', 'success');
+  };
+
+  const updateSedeFecha = (id, fechas) => {
+    setSedes(prev => prev.map(s => s.id === id ? { ...s, fechas } : s));
+  };
+
+  const toggleSedeActiva = (id) => {
+    setSedes(prev => prev.map(s => s.id === id ? { ...s, activo: !s.activo } : s));
+  };
+
+  // Función para dibujar y descargar el Flyer a 1080 x 1920
+  const descargarFlyerHD = async () => {
+    setDescargando(true);
+    showToast?.('Generando Flyer en Alta Resolución 1080x1920...', 'info');
+
+    try {
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext('2d');
+
+      // 1. Cargar fondo cósmico
+      const bgImg = new Image();
+      bgImg.crossOrigin = 'anonymous';
+      bgImg.src = '/flyer_earth_bg.png';
+      await new Promise((resolve, reject) => {
+        bgImg.onload = resolve;
+        bgImg.onerror = reject;
+      });
+
+      // 2. Cargar logo oficial blanco
+      const logoImg = new Image();
+      logoImg.crossOrigin = 'anonymous';
+      logoImg.src = '/logo_crear_blanco.png';
+      await new Promise((resolve, reject) => {
+        logoImg.onload = resolve;
+        logoImg.onerror = reject;
+      });
+
+      // Asegurar fuentes
+      await document.fonts.ready;
+
+      // Dibujar fondo
+      ctx.clearRect(0, 0, 1080, 1920);
+      ctx.drawImage(bgImg, 0, 0, 1080, 1920);
+
+      // Gradiente de oscurecimiento superior e inferior para legibilidad
+      const grad = ctx.createRadialGradient(540, 300, 50, 540, 960, 900);
+      grad.addColorStop(0, 'rgba(13, 27, 42, 0.45)');
+      grad.addColorStop(0.6, 'rgba(3, 7, 18, 0.78)');
+      grad.addColorStop(1, 'rgba(3, 7, 18, 0.95)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 1080, 1920);
+
+      // Top flags (círculos)
+      const flags = [
+        { code: 'EC', color1: '#FFDD00', color2: '#034EA2', color3: '#ED1C24' },
+        { code: 'PE', color1: '#D91023', color2: '#FFFFFF', color3: '#D91023' },
+        { code: 'CO', color1: '#FCD116', color2: '#003893', color3: '#CE1126' },
+        { code: 'MX', color1: '#006847', color2: '#FFFFFF', color3: '#CE1126' }
+      ];
+
+      const startX = 540 - ((flags.length * 52 + (flags.length - 1) * 20) / 2);
+      flags.forEach((f, idx) => {
+        const cx = startX + idx * 72 + 26;
+        const cy = 110;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy, 24, 0, Math.PI * 2);
+        ctx.clip();
+
+        if (f.code === 'PE' || f.code === 'MX') {
+          ctx.fillStyle = f.color1; ctx.fillRect(cx - 24, cy - 24, 16, 48);
+          ctx.fillStyle = f.color2; ctx.fillRect(cx - 8, cy - 24, 16, 48);
+          ctx.fillStyle = f.color3; ctx.fillRect(cx + 8, cy - 24, 16, 48);
+        } else {
+          ctx.fillStyle = f.color1; ctx.fillRect(cx - 24, cy - 24, 48, 24);
+          ctx.fillStyle = f.color2; ctx.fillRect(cx - 24, cy, 48, 12);
+          ctx.fillStyle = f.color3; ctx.fillRect(cx - 24, cy + 12, 48, 12);
+        }
+        ctx.restore();
+
+        // Borde dorado de la bandera
+        ctx.beginPath();
+        ctx.arc(cx, cy, 24, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(255, 215, 0, 0.6)';
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+      });
+
+      // Dibujar logo oficial
+      const logoW = 220;
+      const logoH = (logoImg.height / logoImg.width) * logoW;
+      ctx.drawImage(logoImg, 540 - (logoW / 2), 170, logoW, logoH);
+
+      // Marca
+      ctx.font = '800 20px Montserrat, sans-serif';
+      ctx.fillStyle = '#f59e0b';
+      ctx.textAlign = 'center';
+      ctx.letterSpacing = '6px';
+      ctx.fillText('CREAR PODER SIN LÍMITES', 540, 170 + logoH + 45);
+
+      // Programa
+      ctx.font = '900 52px Montserrat, sans-serif';
+      const gradTitle = ctx.createLinearGradient(300, 0, 780, 0);
+      gradTitle.addColorStop(0, '#ffffff');
+      gradTitle.addColorStop(0.5, '#fef08a');
+      gradTitle.addColorStop(1, '#eab308');
+      ctx.fillStyle = gradTitle;
+      ctx.letterSpacing = '3px';
+      ctx.fillText(programa.toUpperCase(), 540, 170 + logoH + 115);
+
+      // Subtítulo Pill
+      const subTxt = subtitulo.toUpperCase();
+      ctx.font = '700 16px Montserrat, sans-serif';
+      ctx.letterSpacing = '4px';
+      const subW = ctx.measureText(subTxt).width + 60;
+      const subY = 170 + logoH + 150;
+
+      ctx.beginPath();
+      ctx.roundRect(540 - (subW / 2), subY, subW, 38, 19);
+      ctx.fillStyle = 'rgba(255, 183, 3, 0.15)';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255, 183, 3, 0.5)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      ctx.fillStyle = '#fbbf24';
+      ctx.fillText(subTxt, 540, subY + 25);
+
+      // Lista de Sedes
+      const sedesActivas = sedes.filter(s => s.activo);
+      const startSedesY = 480;
+      const cardH = 92;
+      const gap = 20;
+
+      sedesActivas.forEach((s, idx) => {
+        const cy = startSedesY + idx * (cardH + gap);
+
+        // Card glassmorphic
+        ctx.save();
+        ctx.beginPath();
+        ctx.roundRect(75, cy, 930, cardH, 20);
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.72)';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255, 215, 0, 0.3)';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Bandera redonda
+        const flagX = 135;
+        const flagY = cy + cardH / 2;
+        ctx.beginPath();
+        ctx.arc(flagX, flagY, 22, 0, Math.PI * 2);
+        ctx.save();
+        ctx.clip();
+
+        if (s.codigo === 'PE') {
+          ctx.fillStyle = '#D91023'; ctx.fillRect(flagX - 22, flagY - 22, 14, 44);
+          ctx.fillStyle = '#FFFFFF'; ctx.fillRect(flagX - 8, flagY - 22, 16, 44);
+          ctx.fillStyle = '#D91023'; ctx.fillRect(flagX + 8, flagY - 22, 14, 44);
+        } else if (s.codigo === 'MX') {
+          ctx.fillStyle = '#006847'; ctx.fillRect(flagX - 22, flagY - 22, 14, 44);
+          ctx.fillStyle = '#FFFFFF'; ctx.fillRect(flagX - 8, flagY - 22, 16, 44);
+          ctx.fillStyle = '#CE1126'; ctx.fillRect(flagX + 8, flagY - 22, 14, 44);
+        } else {
+          ctx.fillStyle = '#FFDD00'; ctx.fillRect(flagX - 22, flagY - 22, 44, 22);
+          ctx.fillStyle = '#034EA2'; ctx.fillRect(flagX - 22, flagY, 44, 11);
+          ctx.fillStyle = '#ED1C24'; ctx.fillRect(flagX - 22, flagY + 11, 44, 11);
+        }
+        ctx.restore();
+
+        ctx.beginPath();
+        ctx.arc(flagX, flagY, 22, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(255, 215, 0, 0.5)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Nombre de ciudad y país
+        ctx.textAlign = 'left';
+        ctx.letterSpacing = '2px';
+        ctx.font = '900 32px Montserrat, sans-serif';
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(s.ciudad, 180, cy + 45);
+
+        ctx.font = '600 14px Montserrat, sans-serif';
+        ctx.fillStyle = '#94a3b8';
+        ctx.letterSpacing = '3px';
+        ctx.fillText(s.pais.toUpperCase(), 182, cy + 72);
+
+        // Badge de Fecha
+        const badgeW = 340;
+        const badgeH = 54;
+        const badgeX = 930 - badgeW;
+        const badgeY = cy + (cardH - badgeH) / 2;
+
+        ctx.beginPath();
+        ctx.roundRect(badgeX, badgeY, badgeW, badgeH, 14);
+        const bGrad = ctx.createLinearGradient(badgeX, badgeY, badgeX + badgeW, badgeY + badgeH);
+        bGrad.addColorStop(0, 'rgba(245, 158, 11, 0.2)');
+        bGrad.addColorStop(1, 'rgba(217, 119, 6, 0.35)');
+        ctx.fillStyle = bGrad;
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(245, 158, 11, 0.6)';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        ctx.textAlign = 'center';
+        ctx.font = '800 21px Montserrat, sans-serif';
+        ctx.fillStyle = '#fbbf24';
+        ctx.letterSpacing = '1px';
+        ctx.fillText(s.fechas.toUpperCase(), badgeX + badgeW / 2, badgeY + 35);
+
+        ctx.restore();
+      });
+
+      // Footer Hashtag
+      ctx.textAlign = 'center';
+      ctx.font = 'italic 900 42px Montserrat, sans-serif';
+      ctx.fillStyle = '#ffffff';
+      ctx.letterSpacing = '8px';
+      ctx.shadowColor = 'rgba(245, 158, 11, 0.6)';
+      ctx.shadowBlur = 25;
+      ctx.fillText('#SOYCREADOR', 540, 1780);
+      ctx.shadowBlur = 0;
+
+      // Contacto oficial
+      ctx.font = '700 16px Montserrat, sans-serif';
+      ctx.letterSpacing = '3px';
+      ctx.fillStyle = '#38bdf8';
+      ctx.fillText('CREARPSL.COM', 440, 1825);
+      ctx.fillStyle = '#f59e0b';
+      ctx.fillText('•', 540, 1825);
+      ctx.fillStyle = '#cbd5e1';
+      ctx.fillText('WHATSAPP: +51 981 237 577', 670, 1825);
+
+      // Exportar como PNG y descargar
+      const link = document.createElement('a');
+      link.download = `Flyer_${programa.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.png`;
+      link.href = canvas.toDataURL('image/png', 1.0);
+      link.click();
+
+      showToast?.('¡Flyer 1080x1920 descargado con éxito!', 'success');
+    } catch (err) {
+      console.error(err);
+      showToast?.('Error al generar la imagen: ' + err.message, 'error');
+    } finally {
+      setDescargando(false);
+    }
+  };
+
+  return (
+    <div className="p-4 md:p-8 max-w-7xl mx-auto min-h-screen text-white">
+      {/* HEADER */}
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+        <div>
+          <button
+            onClick={() => navigate('/home')}
+            className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-2 text-sm font-semibold"
+          >
+            <ArrowLeft size={16} /> Volver a Causa OS
+          </button>
+          <h1 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-crear-gold via-yellow-400 to-amber-500 flex items-center gap-3">
+            <Sparkles className="text-yellow-400" size={32} />
+            Bot Generador de Flyers Oficiales
+          </h1>
+          <p className="text-gray-400 text-sm mt-1">
+            CREAR PODER SIN LÍMITES &bull; Generación automatizada 1080x1920 con fechas actualizadas por sede
+          </p>
+        </div>
+
+        <div className="flex flex-wrap gap-3">
+          <button
+            onClick={sincronizarFechasCalendario}
+            className="btn-secondary flex items-center gap-2 border-yellow-500/30 hover:border-yellow-400 text-yellow-400"
+          >
+            <RefreshCw size={16} /> Sincronizar Calendario
+          </button>
+          <button
+            onClick={() => setShowCliModal(true)}
+            className="btn-secondary flex items-center gap-2 text-cyan-400 border-cyan-500/30 hover:border-cyan-400"
+          >
+            <Terminal size={16} /> Bot Puppeteer CLI
+          </button>
+          <button
+            onClick={descargarFlyerHD}
+            disabled={descargando}
+            className="btn-primary flex items-center gap-2 bg-gradient-to-r from-yellow-500 to-amber-600 text-black font-extrabold px-5 py-2.5 rounded-xl hover:scale-105 transition-all shadow-[0_0_20px_rgba(245,158,11,0.4)] disabled:opacity-50"
+          >
+            <Download size={18} /> {descargando ? 'Generando PNG...' : 'Descargar Flyer HD (1080x1920)'}
+          </button>
+        </div>
+      </div>
+
+      {/* CANVAS OCULTO PARA EXPORTACIÓN EN ALTA DEFINICIÓN */}
+      <canvas
+        ref={canvasRef}
+        width={1080}
+        height={1920}
+        style={{ display: 'none' }}
+      />
+
+      {/* GRID PRINCIPAL: CONFIGURACIÓN A LA IZQUIERDA / PREVIEW A LA DERECHA */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        {/* PANEL DE CONFIGURACIÓN */}
+        <div className="lg:col-span-6 space-y-6">
+          
+          {/* Tarjeta Programa */}
+          <div className="glass-panel p-6 rounded-2xl border border-gray-800 space-y-4">
+            <h3 className="text-lg font-bold text-crear-gold flex items-center gap-2">
+              <Sliders size={20} /> Parámetros del Flyer
+            </h3>
+
+            <div>
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-2">
+                Programa / Entrenamiento
+              </label>
+              <select
+                value={programa}
+                onChange={(e) => setPrograma(e.target.value)}
+                className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white font-bold focus:border-crear-gold focus:outline-none"
+              >
+                <option value="MAESTRÍA EN CREACIÓN">MAESTRÍA EN CREACIÓN</option>
+                <option value="CREACIÓN 1">CREACIÓN 1</option>
+                <option value="CREACIÓN 2">CREACIÓN 2</option>
+                <option value="EL VIAJE">EL VIAJE</option>
+                <option value="GIRA INTERNACIONAL">GIRA INTERNACIONAL</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-2">
+                Subtítulo / Etiqueta Superior
+              </label>
+              <input
+                type="text"
+                value={subtitulo}
+                onChange={(e) => setSubtitulo(e.target.value)}
+                placeholder="GIRA INTERNACIONAL 2026"
+                className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white font-semibold focus:border-crear-gold focus:outline-none"
+              />
+            </div>
+          </div>
+
+          {/* Tarjeta Sedes y Fechas */}
+          <div className="glass-panel p-6 rounded-2xl border border-gray-800 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-bold text-crear-gold flex items-center gap-2">
+                <Calendar size={20} /> Sedes y Fechas Oficiales
+              </h3>
+              <span className="text-xs text-gray-400">{sedes.filter(s => s.activo).length} activas</span>
+            </div>
+
+            <div className="space-y-3">
+              {sedes.map(s => (
+                <div
+                  key={s.id}
+                  className={`flex items-center gap-3 p-3.5 rounded-xl border transition-all ${
+                    s.activo ? 'bg-gray-900/80 border-gray-700' : 'bg-gray-950/40 border-gray-900 opacity-50'
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={s.activo}
+                    onChange={() => toggleSedeActiva(s.id)}
+                    className="accent-yellow-500 w-5 h-5 cursor-pointer rounded"
+                  />
+                  <span className="text-2xl">{s.bandera}</span>
+                  <div className="w-28 flex-shrink-0">
+                    <p className="font-extrabold text-sm text-white">{s.ciudad}</p>
+                    <p className="text-[10px] text-gray-400 uppercase font-semibold">{s.pais}</p>
+                  </div>
+                  <input
+                    type="text"
+                    value={s.fechas}
+                    disabled={!s.activo}
+                    onChange={(e) => updateSedeFecha(s.id, e.target.value)}
+                    className="flex-1 bg-black/60 border border-gray-700 rounded-lg px-3 py-2 text-xs font-bold text-yellow-400 uppercase focus:border-yellow-400 focus:outline-none"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
+        </div>
+
+        {/* PREVIEW EN TIEMPO REAL */}
+        <div className="lg:col-span-6 flex flex-col items-center">
+          <div className="w-full flex justify-between items-center mb-3 max-w-sm">
+            <span className="text-xs font-bold text-gray-400 uppercase flex items-center gap-1.5">
+              <Eye size={14} className="text-yellow-400" /> Previsualización en Vivo (9:16)
+            </span>
+            <span className="text-[10px] px-2.5 py-1 bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 rounded-full font-bold">
+              1080 x 1920
+            </span>
+          </div>
+
+          {/* MOCKUP VERTICAL ESTILO FLYER */}
+          <div
+            className="w-full max-w-sm rounded-3xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.9)] border-2 border-yellow-500/30 relative flex flex-col justify-between"
+            style={{
+              aspectRatio: '9/16',
+              backgroundImage: "url('/flyer_earth_bg.png')",
+              backgroundSize: 'cover',
+              backgroundPosition: 'center bottom',
+              backgroundColor: '#030712'
+            }}
+          >
+            {/* Overlay gradiente */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_15%,_rgba(13,27,42,0.45)_0%,_rgba(3,7,18,0.8)_60%,_rgba(3,7,18,0.95)_100%)] pointer-events-none" />
+
+            {/* Contenido */}
+            <div className="relative z-10 p-5 flex flex-col h-full justify-between">
+              
+              {/* Top flags */}
+              <div>
+                <div className="flex justify-center gap-2 mb-3">
+                  <span className="text-lg">🇪🇨</span>
+                  <span className="text-lg">🇵🇪</span>
+                  <span className="text-lg">🇨🇴</span>
+                  <span className="text-lg">🇲🇽</span>
+                </div>
+
+                <div className="text-center mb-2">
+                  <img src="/logo_crear_blanco.png" alt="CREAR" className="h-10 mx-auto object-contain drop-shadow-[0_0_12px_rgba(255,183,3,0.4)]" />
+                </div>
+
+                <div className="text-center">
+                  <p className="text-[9px] font-black tracking-[0.25em] text-yellow-500 uppercase mb-1">
+                    CREAR PODER SIN LÍMITES
+                  </p>
+                  <h2 className="text-lg font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-yellow-200 to-yellow-500 uppercase leading-tight">
+                    {programa}
+                  </h2>
+                  <span className="inline-block mt-1 px-3 py-0.5 rounded-full text-[9px] font-bold tracking-widest uppercase bg-yellow-500/15 border border-yellow-500/40 text-yellow-300">
+                    {subtitulo}
+                  </span>
+                </div>
+              </div>
+
+              {/* Lista Sedes */}
+              <div className="space-y-2 my-auto">
+                {sedes.filter(s => s.activo).map(s => (
+                  <div
+                    key={s.id}
+                    className="flex items-center justify-between px-3 py-2 rounded-xl bg-slate-900/70 border border-yellow-500/25 shadow-lg backdrop-blur-md"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-base">{s.bandera}</span>
+                      <div>
+                        <p className="text-xs font-black text-white leading-none">{s.ciudad}</p>
+                        <p className="text-[8px] font-semibold text-gray-400 uppercase mt-0.5">{s.pais}</p>
+                      </div>
+                    </div>
+                    <div className="px-2.5 py-1 rounded-lg bg-gradient-to-r from-yellow-500/20 to-amber-600/30 border border-yellow-500/50">
+                      <span className="text-[10px] font-black text-yellow-400 whitespace-nowrap">
+                        {s.fechas}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Footer */}
+              <div className="text-center mt-3">
+                <p className="text-lg font-black italic tracking-widest text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.7)]">
+                  #SOYCREADOR
+                </p>
+                <p className="text-[8px] font-bold text-gray-300 tracking-wider mt-0.5">
+                  <span className="text-cyan-400">CREARPSL.COM</span> &bull; WHATSAPP: +51 981 237 577
+                </p>
+              </div>
+
+            </div>
+          </div>
+
+          <button
+            onClick={descargarFlyerHD}
+            disabled={descargando}
+            className="mt-5 w-full max-w-sm py-3 px-4 bg-gradient-to-r from-yellow-500 to-amber-600 text-black font-black rounded-xl hover:scale-105 transition-all shadow-[0_0_20px_rgba(245,158,11,0.4)] flex items-center justify-center gap-2"
+          >
+            <Download size={18} /> Descargar en 1080x1920 (PNG)
+          </button>
+        </div>
+
+      </div>
+
+      {/* MODAL CLI PUPPETEER BOT */}
+      {showCliModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="glass-panel p-6 rounded-2xl max-w-lg w-full border border-yellow-500/30 space-y-4">
+            <h3 className="text-xl font-bold text-yellow-400 flex items-center gap-2">
+              <Terminal size={22} /> Bot Autónomo de Flyers (Puppeteer)
+            </h3>
+            <p className="text-sm text-gray-300">
+              También puedes generar el flyer automáticamente desde la terminal o integrarlo en tus pipelines y bots de Telegram/WhatsApp usando el script de Node.js:
+            </p>
+            <div className="bg-black/90 p-4 rounded-xl font-mono text-xs text-green-400 border border-gray-800 select-all overflow-x-auto">
+              node scripts/generar_flyer.mjs --programa="MAESTRÍA EN CREACIÓN"
+            </div>
+            <div className="flex justify-end gap-3 pt-2">
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText('node scripts/generar_flyer.mjs --programa="MAESTRÍA EN CREACIÓN"');
+                  showToast?.('Comando copiado al portapapeles', 'info');
+                }}
+                className="btn-secondary text-xs flex items-center gap-1.5"
+              >
+                <Copy size={14} /> Copiar Comando
+              </button>
+              <button
+                onClick={() => setShowCliModal(false)}
+                className="btn-primary bg-yellow-500 text-black font-bold text-xs"
+              >
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+    </div>
+  );
+}
+
+```
+
+---
+
 ## Archivo: src\pages\GerenteDashboard.jsx
 
 ```javascript
@@ -151197,6 +152842,10 @@ export default function Home() {
 
                 <button onClick={() => { setShowToolsDropdown(false); navigate('/excelencia'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(255, 183, 3, 0.15)', color: 'var(--crear-gold)' }}>
                   👑 Excelencia Operativa
+                </button>
+
+                <button onClick={() => { setShowToolsDropdown(false); navigate('/generador-flyer'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(234, 179, 8, 0.15)', color: '#facc15', fontWeight: 'bold' }}>
+                  🎨 Generador de Flyers Oficiales
                 </button>
 
                 {['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan'].includes(currentUser?.appRole) && (
@@ -153501,80 +155150,169 @@ import {
   MousePointer2, ExternalLink
 } from 'lucide-react';
 
+// Fuente: Manual Oficial de Usuario NODUS - Edición 2026 (manual_nodus_soar_completo.pdf/html),
+// integrado y verificado 02/09/2026. Los pasos siguen literalmente los módulos, botones y
+// campos descritos en el manual oficial (Capítulos 3 a 18); no se inventan rutas de navegación.
 const NODUS_KNOWLEDGE_BASE = [
   {
     id: 'n1',
     role: 'directores',
-    title: 'Aprobar Presupuestos y Gastos',
-    description: 'Ruta exacta para aprobar las solicitudes de gastos semanales de las sedes.',
+    title: 'Configurar Sedes, Usuarios y Programas (Módulo Configuración)',
+    description: 'El módulo de Configuración es accesible principalmente para Gerentes de Sede y Administradores: gestión de sedes, usuarios/contraseñas y programas/precios.',
     steps: [
-      'Ingresa a imo.crearpslglobal.com/auth/login e inicia sesión.',
-      'En el menú lateral izquierdo, haz clic en el módulo "Finanzas".',
-      'Selecciona el submenú "Aprobaciones".',
-      'Usa el filtro superior derecho para seleccionar la Sede (ej: "Lima").',
-      'Haz clic en el botón azul "Ver Detalles" junto al gasto.',
-      'En la ventana emergente, verifica el monto y haz clic en el botón verde "Aprobar" en la esquina inferior derecha.'
+      'Haz clic en "Configuración" en el menú lateral izquierdo.',
+      'Para crear un usuario: entra a "Usuarios" y presiona "Nuevo Usuario".',
+      'Escribe el Nombre Completo, el Nombre de Usuario y una Contraseña inicial.',
+      'Selecciona su Rol de acceso (Mesa de Registro, Caja, Coordinación o Gerencia) y su Sede.',
+      'Haz clic en "Guardar Usuario" y comparte las credenciales de forma segura.',
+      'Gestión de Sedes y Programas y Precios (matrícula, promociones, calendario) están en las otras pestañas del mismo módulo.'
     ],
-    tags: ['finanzas', 'gastos', 'aprobar', 'presupuesto']
+    tags: ['configuracion', 'usuarios', 'sedes', 'precios', 'director']
   },
   {
     id: 'n2',
-    role: 'gerentes',
-    title: 'Visualizar Asistencias y Alertas (Tablero Principal)',
-    description: 'Dónde encontrar el resumen de asistencia y deserciones del fin de semana.',
+    role: 'directores',
+    title: 'Resetear una Contraseña Olvidada',
+    description: 'Procedimiento oficial cuando un colaborador no puede ingresar a su cuenta de NODUS.',
     steps: [
-      'Ingresa a imo.crearpslglobal.com/auth/login.',
-      'Al entrar, estarás en el "Dashboard Principal".',
-      'Desplázate hacia abajo hasta la sección "Alertas de Deserción".',
-      'Haz clic en la pestaña "Asistencia C1" o "Asistencia C2" según el ciclo activo.',
-      'El sistema mostrará en rojo los participantes que no han registrado su Check-In.'
+      'El Gerente de Sede ingresa a "Configuración" → "Usuarios".',
+      'Busca el nombre del colaborador en la lista y presiona "Editar".',
+      'En la casilla "Nueva Contraseña", escribe una clave temporal clara (ej: Nodus2026*).',
+      'Haz clic en "Guardar Cambios" y pide al usuario que pruebe su ingreso de inmediato.'
     ],
-    tags: ['asistencia', 'alertas', 'desercion', 'dashboard']
+    tags: ['contraseña', 'usuarios', 'soporte', 'reset']
   },
   {
     id: 'n3',
-    role: 'gerentes',
-    title: 'Cargar Matrículas y Tickets Verdes',
-    description: 'Procedimiento para registrar el pago de un participante y liberar su Ticket Verde.',
+    role: 'directores',
+    title: 'Auditar el Reporte de Entrenadores y la Brecha Enrolados vs. Sentados',
+    description: 'Cómo cruzar el Reporte de Entrenadores contra la Mesa de Registro para detectar no-shows.',
     steps: [
-      'En el menú lateral izquierdo, selecciona "Participantes".',
-      'Usa la barra de búsqueda superior para ingresar el DNI o Nombre del participante.',
-      'Haz clic en el icono de "Lápiz" (Editar) junto al nombre.',
-      'Ve a la pestaña "Pagos y Finanzas".',
-      'En la sección de pagos, haz clic en "+ Añadir Transacción".',
-      'Ingresa el monto, método de pago y haz clic en "Guardar".',
-      'Automáticamente, la etiqueta superior cambiará a "Ticket Verde Habilitado".'
+      'Ve al módulo "Reportes" en el menú lateral.',
+      'Abre el "Reporte de Entrenadores y Maestrías": columnas TIPO IMO/DNI, PARTICIPANTES EN JUEGO, DECLARACIÓN, TOTAL ENROLADOS y DESERTOR FDS.',
+      '"Enrolados" muestra cuántos pagaron su inscripción en el sistema.',
+      '"Sentados" muestra cuántos fueron efectivamente marcados con "Marcar en Sala" el viernes por la noche.',
+      'Si hay brecha (ej: 15 enrolados pero 8 sentados), coordinación debe contactar a los 7 ausentes y coordinar su ingreso en la cohorte inmediata.'
     ],
-    tags: ['pagos', 'matricula', 'ticket verde', 'finanzas']
+    tags: ['reportes', 'auditoria', 'entrenadores', 'brecha', 'no-show']
   },
   {
     id: 'n4',
-    role: 'coordinadores',
-    title: 'Registrar Check-In en Puerta (Día del Evento)',
-    description: 'La forma más rápida de escanear o marcar asistencia en sala.',
+    role: 'gerentes',
+    title: 'Leer el Dashboard Principal e Indicadores en Vivo',
+    description: 'Dónde ver el resumen operativo y los contadores en tiempo real durante días de evento.',
     steps: [
-      'En tu dispositivo móvil o tablet, ingresa a imo.crearpslglobal.com.',
-      'En el menú principal, toca el ícono de "Escáner / Check-In".',
-      'Selecciona el ciclo activo (Ej: "Lima - C1 - Fin de Semana 1").',
-      'Aparecerá la lista completa. Puedes buscar por nombre o marcar la casilla "Presente" del lado derecho.',
-      'Si el recuadro está bloqueado en rojo, significa que no tiene Ticket Verde (Debe ir a mesa de finanzas).'
+      'Al iniciar sesión, el sistema muestra el "Dashboard" con Contadores de Resumen en la parte superior (entrenadores, eventos activos, participantes registrados, sedes operando).',
+      'Durante el evento, el Dashboard actualiza en vivo: "Inscritos Totales", "Presentes en Sala" y "Pendientes de Llegada".',
+      'La Barra Lateral Izquierda da acceso a Dashboard, Mesa Registro, Participantes, Contabilidad, Cierre de Caja, Reportes y Configuración.',
+      'Para volver al inicio desde cualquier módulo, haz clic en "Dashboard" o en el logotipo (esquina superior izquierda).'
     ],
-    tags: ['check-in', 'asistencia', 'puerta', 'sala']
+    tags: ['dashboard', 'indicadores', 'tiempo real', 'gerente']
   },
   {
     id: 'n5',
-    role: 'cmj',
-    title: 'Control de Retos y Seguimiento (Managers)',
-    description: 'Dónde registrar las llamadas y el seguimiento de los entrenos asignados.',
+    role: 'gerentes',
+    title: 'Realizar el Cierre y Arqueo Diario de Caja',
+    description: 'Procedimiento oficial de 3 pasos para cuadrar el dinero físico contra las transacciones registradas.',
     steps: [
-      'En el menú lateral, haz clic en "Mi Equipo" o "Mis Asignados".',
-      'Verás una lista con tus participantes a cargo.',
-      'Haz clic en el nombre del participante.',
-      'Selecciona la pestaña "Bitácora de Seguimiento".',
-      'Haz clic en "+ Nuevo Registro".',
-      'Escribe un breve resumen de la llamada (Ej: "Llamada de retos completada. Brecha: 20%") y pulsa "Guardar".'
+      'Haz clic en "Cierre de Caja" en el menú lateral. Selecciona la fecha de hoy y la sede.',
+      'Compara el "Total Efectivo Esperado" (calculado por NODUS) contra el conteo físico real y escríbelo en "Efectivo Real en Caja".',
+      'Si hay sobrante o faltante, documenta la justificación en el campo "Observaciones".',
+      'Presiona "Cerrar Caja Oficialmente" para generar el acta; los registros del día quedan bloqueados.',
+      'Solo el Gerente de Sede o el Administrador general pueden reabrir una caja ya cerrada.'
     ],
-    tags: ['retos', 'seguimiento', 'llamadas', 'bitacora']
+    tags: ['cierre de caja', 'arqueo', 'contabilidad', 'gerente']
+  },
+  {
+    id: 'n6',
+    role: 'gerentes',
+    title: 'Autorizar un Traslado de Sede de un Participante',
+    description: 'Caso especial de Mesa de Registro que solo puede resolver el Gerente de Sede.',
+    steps: [
+      'Cuando un participante estaba registrado para otra sede pero pide cursar en la sede actual, entra a "Participantes".',
+      'Busca al alumno en el listado general.',
+      'Modifica el campo "Sede Asignada" seleccionando la sede actual.',
+      'Al guardar, el alumno aparecerá automáticamente en la Mesa de Registro local.'
+    ],
+    tags: ['traslado', 'sede', 'participantes', 'gerente']
+  },
+  {
+    id: 'n7',
+    role: 'coordinadores',
+    title: 'Registrar a un Participante en la Mesa de Registro (3 Pasos)',
+    description: 'El procedimiento más usado durante los días de evento, en el vestíbulo o puerta de entrada.',
+    steps: [
+      'Pide su DNI/Cédula/Pasaporte, escríbelo en la barra de búsqueda de Mesa de Registro y presiona Enter (si no aparece, busca solo por apellido).',
+      'Verifica el estado: si figura "Completo" continúa; si está "Pendiente", solicita comprobante o deriva a la caja.',
+      'Haz clic en "Marcar en Sala": el participante queda contabilizado como Sentado. Entrégale su gafete oficial y material de bienvenida.',
+      'Si marcaste por error, vuelve a buscar por DNI y desmarca la casilla de asistencia.'
+    ],
+    tags: ['mesa de registro', 'check-in', 'asistencia', 'gafete', 'coordinador']
+  },
+  {
+    id: 'n8',
+    role: 'coordinadores',
+    title: 'Resolver Casos Especiales en Mesa de Registro',
+    description: 'Protocolos oficiales para walk-ins, participantes extranjeros y traslados de sede.',
+    steps: [
+      'Walk-in (inscrito el mismo día): pide comprobante → "Participantes" → "Nuevo Participante" → registra nombres/DNI/teléfono/correo → "Contabilidad" → "Registrar Pago" → vuelve a Mesa de Registro y márcalo con gafete provisional.',
+      'Extranjero con pasaporte: escribe la serie alfanumérica del pasaporte tal como fue registrada; si no aparece, busca por apellido materno o paterno.',
+      'Traslado de sede: debe resolverlo el Gerente de Sede desde "Participantes", cambiando el campo "Sede Asignada".'
+    ],
+    tags: ['casos especiales', 'walk-in', 'pasaporte', 'traslado', 'coordinador']
+  },
+  {
+    id: 'n9',
+    role: 'coordinadores',
+    title: 'Registrar un Nuevo Participante y Asentar su Pago',
+    description: 'Alta completa de un participante en el módulo Participantes y su cobro en Contabilidad.',
+    steps: [
+      'En el menú lateral, entra a "Participantes" y presiona "Nuevo Participante".',
+      'Completa Tipo y Número de Documento, Nombres y Apellidos completos (tal como el documento, para certificados), Teléfono/WhatsApp, Correo, Sede y Entrenamiento.',
+      'Haz clic en "Guardar": el registro se genera de inmediato.',
+      'Para cobrar: "Contabilidad" → "Registrar Pago" → busca por DNI → elige tipo de pago (Total o Abono Parcial) y forma de pago (Efectivo, Transferencia o Tarjeta) → escribe el número de comprobante/operación → "Guardar Pago".'
+    ],
+    tags: ['participantes', 'nuevo participante', 'pago', 'contabilidad', 'coordinador']
+  },
+  {
+    id: 'n10',
+    role: 'cmj',
+    title: 'Leer el Reporte de Entrenadores y Maestrías (5 Columnas)',
+    description: 'El reporte más consultado por Centro de Managers para evaluar rendimiento por bloque/equipo.',
+    steps: [
+      'Ve a "Reportes" → "Reporte de Entrenadores y Maestrías".',
+      'TIPO IMO/DNI: rol (Capitán, Manager, Participante) o documento — permite auditar por bloque o buscar a alguien.',
+      'PARTICIPANTES EN JUEGO: personas activas en sala o nombre del participante.',
+      'DECLARACIÓN: la meta numérica que el líder se comprometió a enrolar.',
+      'TOTAL ENROLADOS: personas nuevas registradas y pagadas (en 0 = sin cobros registrados aún).',
+      'DESERTOR FDS: alumnos que abandonaron durante el fin de semana — alerta de fuga a reportar de inmediato a coordinación.'
+    ],
+    tags: ['reporte de entrenadores', 'kpi', 'cmj', 'declaracion', 'desertor']
+  },
+  {
+    id: 'n11',
+    role: 'cmj',
+    title: 'Gestionar Equipos, Cohortes y Asignación de Entrenadores',
+    description: 'Módulo "Equipos y Maestrías" para estructurar las cohortes de cada sede (ej: Equipos 27, 28, 29 de Lima).',
+    steps: [
+      'Creación de cohortes: define número de equipo, sede y fechas de inicio y graduación.',
+      'Asignación de entrenadores: asocia al entrenador oficial responsable del proceso.',
+      'Distribución de alumnos: asigna a cada participante nuevo a su cohorte y equipo.',
+      'Buena práctica del manual: asegúrate de que cada participante tenga cohorte asignada antes del viernes de registro — sin equipo asignado, no aparece en el reporte de entrenadores de su sede.'
+    ],
+    tags: ['equipos', 'cohortes', 'asignacion', 'cmj', 'entrenadores']
+  },
+  {
+    id: 'n12',
+    role: 'cmj',
+    title: 'Auditar la Brecha entre Enrolados y Sentados',
+    description: 'Función clave de Centro de Managers para detectar no-shows cruzando Reportes contra Mesa de Registro.',
+    steps: [
+      '"Enrolados": personas que han pagado su inscripción en el sistema (columna TOTAL ENROLADOS del Reporte de Entrenadores).',
+      '"Sentados": personas efectivamente marcadas con "Marcar en Sala" el viernes por la noche.',
+      'Si un equipo reporta 15 enrolados pero solo 8 sentados, comunícate con los 7 ausentes para conocer el motivo y coordinar su ingreso en la cohorte inmediata.'
+    ],
+    tags: ['brecha', 'no-show', 'auditoria', 'cmj', 'seguimiento']
   }
 ];
 

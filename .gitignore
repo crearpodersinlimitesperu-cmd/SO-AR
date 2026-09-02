@@ -38,6 +38,18 @@ ACCESOS.md
 *_temp.csv
 centro-operativo-cpsl-*.json
 
+# (02/09/2026) Exportes/reportes generados por scripts de una sola vez —
+# contienen datos de coordinadores/managers (nombres, sedes, teléfonos) y NO
+# deben vivir en el historial de git. Añadido después de que "git add -A"
+# los subiera por accidente en el commit 4863a8e — José, ver aviso en chat.
+nodus_latest_snapshot.json
+nodus_*.json
+llamadas_historicas_propuesta.csv
+reconciliacion_managers_propuesta.csv
+reconciliacion_managers_no_encontrados.csv
+*_propuesta.csv
+*_no_encontrados.csv
+
 # wrangler files
 .wrangler
 .dev.vars*

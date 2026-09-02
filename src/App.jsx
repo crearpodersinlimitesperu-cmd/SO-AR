@@ -27,6 +27,7 @@ import TeamCalendar from './pages/TeamCalendar'
 import EmbudoConversionBoard from './pages/EmbudoConversionBoard'
 import NodusDataMap from './pages/NodusDataMap'
 import CalendarioMJ from './pages/CalendarioMJ'
+import GeneradorFlyer from './pages/GeneradorFlyer'
 import AICopilot from './components/AICopilot'
 import PromptModal from './components/PromptModal'
 import BirthdayAlert from './components/BirthdayAlert'
@@ -281,6 +282,13 @@ function App() {
           <Route path="/calendario-mj" element={
             <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria', 'coord_maestria', 'coordinador_mj']} requireSuperAdmin={false}>
               <CalendarioMJ />
+            </RoleRoute>
+          } />
+
+          {/* Generador de Flyers Oficiales (02/09/2026): Generador HD 1080x1920 con fechas por sede */}
+          <Route path="/generador-flyer" element={
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria', 'coord_maestria', 'coordinador_mj', 'entrenador']} requireSuperAdmin={false}>
+              <GeneradorFlyer />
             </RoleRoute>
           } />
 

@@ -773,6 +773,10 @@ export default function Home() {
                   👑 Excelencia Operativa
                 </button>
 
+                <button onClick={() => { setShowToolsDropdown(false); navigate('/generador-flyer'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(234, 179, 8, 0.15)', color: '#facc15', fontWeight: 'bold' }}>
+                  🎨 Generador de Flyers Oficiales
+                </button>
+
                 {['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan'].includes(currentUser?.appRole) && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/mis-kpis'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                     📊 Mis KPIs
