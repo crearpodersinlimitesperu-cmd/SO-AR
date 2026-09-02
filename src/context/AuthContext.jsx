@@ -225,7 +225,7 @@ export function AuthProvider({ children }) {
       const rawEmail = user.email.trim().toLowerCase();
       
       // FORZAR USO DE .NET (Excepto para los correos autorizados explicitamente de gmail)
-      const allowedGmails = ['armando.pilacuan@gmail.com', 'gomeznueve@gmail.com'];
+      const allowedGmails = ['armando.pilacuan@gmail.com', 'gomeznueve@gmail.com', 'emalejodiaz@gmail.com', 'anamonroyt@gmail.com', 'dibrafi@gmail.com', 'fernandomendozaclavijo22@gmail.com', 'marylourdespat@gmail.com', 'direccion@bmbgbrokers.com', 'milacampuzano21@gmail.com'];
       if (!rawEmail.endsWith('@crearpsl.net') && !allowedGmails.includes(rawEmail)) {
         // Rechazar acceso
         await auth.signOut();

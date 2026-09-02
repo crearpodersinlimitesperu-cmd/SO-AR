@@ -197,6 +197,16 @@ export const DUAL_ROLE_TRAINER_EMAILS = [
   'carlos.brunis@crearpsl.net',     // Coordinador QT Global + Entrenador (Carlos Brunis)
   'linid.valencia@crearpsl.net',    // Coordinadora MJ + Entrenadora
   'brunische66@gmail.com',
+  'daniela.monroy@crearpsl.net',      // Entrenadora de llamadas
+  'erika.gavilanez@crearpsl.net',     // Coordinadora MJ + Entrenadora de llamadas
+  'mauricio.ramirez@crearpsl.net',    // Entrenador de llamadas
+  'emalejodiaz@gmail.com',            // Entrenador de llamadas
+  'anamonroyt@gmail.com',             // Entrenadora de llamadas
+  'dibrafi@gmail.com',                // Entrenador de llamadas
+  'fernandomendozaclavijo22@gmail.com', // Entrenador de llamadas
+  'marylourdespat@gmail.com',         // Entrenadora de llamadas
+  'direccion@bmbgbrokers.com',        // Entrenador de llamadas
+  'milacampuzano21@gmail.com',        // Entrenadora de llamadas
 ];
 
 /**
