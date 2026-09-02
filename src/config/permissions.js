@@ -190,7 +190,7 @@ export const canViewSede = (currentUser) => {
  */
 export const DUAL_ROLE_TRAINER_EMAILS = [
   'jose.sanchez@crearpsl.net',      // SuperAdmin + Gerente Lima + Entrenador
-  'andres.gomez@crearpsl.net',     // Director Maestría + Entrenador C2+MJ
+  'andres.gomez@crearpsl.net',     // Director Maestría del Juego + Entrenador C2 + Entrenador Relación MJ + Entrenador de Llamadas (confirmado por José, 02/09/2026)
   'fer.aragon@crearpsl.net',        // Corporativo + Entrenador C1
   'paul.sosa@crearpsl.net',         // Corporativo + Entrenador C2+MJ
   'leandro.brunis@crearpsl.net',    // Dirección / Corporativo + Entrenador C1 (Leandro Brunis)

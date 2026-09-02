@@ -1245,6 +1245,95 @@ Para asegurar la transición exitosa de las sedes operativas internacionales hac
 *   **Responsable:** Director Regional de Operaciones de CPSL. | **Aprobador:** Dirección General.
 *   **Evidencias de Éxito:** 100% de las sedes operando de manera estandarizada bajo el ecosistema digital de la Plataforma Nodus, logrando una reducción del 15% en incidencias operativas globales.
 
+
+
+---
+
+## 13. MANUAL DE USUARIO OFICIAL DE LA PLATAFORMA NODUS (EDICIÓN 2026)
+[APORTE DE DIRECCIÓN — integrado 02/09/2026, confirmado por José Sánchez, fuente: manual_nodus_soar_completo.pdf/html, extracción verificada íntegramente contra el HTML fuente]
+
+### 13.1 Qué es NODUS y Requisitos Técnicos
+NODUS es la plataforma operativa oficial (https://imo.crearpslglobal.com/) para el registro de participantes, cobros, cierre de caja y reportes de cada sede. Requisitos: navegador Google Chrome actualizado, conexión a internet estable (con respaldo de datos móviles), y usuario/contraseña personal asignado por el área administrativa (no se usan correos externos ni SSO de terceros).
+
+### 13.2 Acceso y Cierre de Sesión
+Inicio: abrir Chrome, ir a https://imo.crearpslglobal.com/, ingresar Usuario y Contraseña y pulsar el botón azul 'Ingresar'. Si aparece "Usuario o Contraseña Incorrecta", revisar Bloq Mayús; si persiste, el Gerente de Sede debe entrar a Configuración → Usuarios y colocar una contraseña temporal. Cierre: clic en el nombre de usuario (esquina superior derecha) → 'Cerrar Sesión', verificando el regreso a la pantalla de login. Por seguridad, la sesión debe cerrarse formalmente cada vez que se abandona el puesto de registro.
+
+### 13.3 Perfiles de Usuario Confirmados en el Manual Oficial
+El manual oficial define exactamente 4 perfiles (Capítulo 3), cada uno con menú limitado a sus funciones:
+1. **Operador de Mesa de Registro:** ve Mesa de Registro y Listado de Participantes. Busca por DNI, valida pago y marca asistencia.
+2. **Encargado de Caja / Contabilidad:** ve Mesa de Registro, Contabilidad, Cierre de Caja y Reportes de Pago. Recibe pagos, emite comprobantes y cuadra caja.
+3. **Coordinador de Evento:** ve Dashboard, Mesa de Registro, Participantes y Reportes de Asistencia. Supervisa afluencia de sala y gafetes.
+4. **Gerente de Sede / Administrador:** acceso total (Dashboard, Registro, Participantes, Contabilidad, Cierre de Caja, Reportes, Configuración y Usuarios). Abre/cierra eventos, audita, crea usuarios y configura sedes.
+Si a un colaborador le falta un módulo, debe pedir al Gerente de Sede que ajuste su perfil en Configuración → Usuarios.
+
+### 13.4 Dashboard Principal
+Panel central al iniciar sesión. Elementos: Barra Lateral Izquierda (acceso a Dashboard, Mesa Registro, Participantes, Contabilidad, Cierre de Caja, Reportes, Configuración), Contadores de Resumen (entrenadores, eventos activos, participantes registrados, sedes operando) en la parte superior, y Barra de Usuario/Sede en la esquina superior derecha. Indicadores en vivo durante días de evento: Inscritos Totales, Presentes en Sala, Pendientes de Llegada. Para volver al inicio: clic en 'Dashboard' o en el logotipo (esquina superior izquierda).
+
+### 13.5 Mesa de Registro — Procedimiento Estándar (3 Pasos)
+1. **Buscar al participante:** pedir DNI/Cédula/Pasaporte, escribirlo en la barra de búsqueda de Mesa de Registro y presionar Enter. Si no aparece, buscar solo por apellido.
+2. **Verificar estado de pago:** la fila muestra 'Completo' o 'Pendiente'. Si está pendiente, solicitar comprobante o derivar a caja. Si el participante insiste en que ya pagó, revisar 'ver detalles' por si el comprobante está en revisión de contabilidad.
+3. **Marcar en Sala y entregar gafete:** clic en 'Marcar en Sala' (el participante queda contabilizado como Sentado) y entregar gafete y material de bienvenida. Un marcado erróneo se corrige buscando de nuevo por DNI y desmarcando la casilla de asistencia.
+
+### 13.6 Mesa de Registro — Casos Especiales
+- **Walk-in (inscrito a última hora):** pedir comprobante → Participantes → Nuevo Participante → registrar nombres/DNI/teléfono/correo → Contabilidad → Registrar Pago → volver a Mesa de Registro y marcar asistencia con gafete provisional.
+- **Extranjero con pasaporte:** buscar por la serie alfanumérica del pasaporte tal como fue registrada; si no aparece, buscar por apellido materno o paterno.
+- **Traslado de sede autorizado:** el Gerente de Sede entra a Participantes, ubica al alumno y cambia el campo 'Sede Asignada' a la sede actual; al guardar, el alumno aparece en la Mesa de Registro local.
+
+### 13.7 Gestión de Participantes
+Registrar nuevo: Participantes → 'Nuevo Participante' → completar Tipo/Número de Documento, Nombres y Apellidos completos (tal como el documento, para certificados), Teléfono/WhatsApp, Correo, Sede y Entrenamiento → 'Guardar'. Editar: ubicar en la lista → ícono de lápiz / 'Editar' → corregir → 'Actualizar Datos'. Exportar: aplicar filtros de Sede y Evento → 'Exportar a Excel' (descarga .xlsx).
+
+### 13.8 Contabilidad — Formas de Pago y Registro
+Formas de pago admitidas: **Efectivo** (monto exacto, recibo numerado), **Transferencia Bancaria** (Número de Operación y Banco de origen, verificar acreditación antes de validar) y **Tarjeta / POS** (número de lote y voucher, grapar el voucher a la ficha). Procedimiento: Contabilidad → 'Registrar Pago' → buscar por DNI → tipo de pago (Total o Abono Parcial) → forma de pago → número de comprobante/operación → 'Guardar Pago' (el saldo se actualiza de inmediato en Mesa de Registro). Gastos menores (caja chica): Contabilidad → 'Registro de Gastos/Egresos' → concepto (Materiales de Sala, Refrigerios, Movilidad, Varios) → monto → número de boleta; el cierre nocturno resta automáticamente estos gastos.
+
+### 13.9 Cierre y Arqueo de Caja (3 Pasos)
+1. **Abrir el módulo:** clic en 'Cierre de Caja' → seleccionar fecha y sede. Si faltan pagos, revisar con el personal de mesa si quedó algo sin registrar en Contabilidad.
+2. **Contar el dinero físico:** comparar el 'Total Efectivo Esperado' (calculado por NODUS) contra el conteo real; escribir la cifra en 'Efectivo Real en Caja'. Si hay diferencia, documentar la justificación en 'Observaciones'.
+3. **Finalizar y bloquear:** botón 'Cerrar Caja Oficialmente' genera el acta y bloquea los registros del día. Solo el Gerente de Sede o el Administrador general pueden reabrir una caja cerrada.
+
+### 13.10 Reportes — El "Reporte de Entrenadores y Maestrías" (5 columnas)
+| Columna | Qué representa | Acción operativa |
+|---|---|---|
+| TIPO IMO / DNI | Rol (Capitán, Manager, Participante) o documento | Auditar por bloque o buscar a alguien |
+| PARTICIPANTES EN JUEGO | Personas activas en sala / nombre del participante | Verifica asistencia continua |
+| DECLARACIÓN | Meta de personas que el líder se comprometió a enrolar | Punto de comparación vs. resultado real |
+| TOTAL ENROLADOS | Personas nuevas registradas y pagadas | Métrica de cierre comercial (en 0 = sin cobros) |
+| DESERTOR FDS | Alumnos que abandonaron durante el fin de semana | Alerta de fuga, reportar a coordinación |
+Auditoría de brecha: **Enrolados** (pagaron) vs. **Sentados** (marcados físicamente en Mesa de Registro el viernes noche); la diferencia (No-Show) obliga a contactar a los ausentes y coordinar su ingreso en la cohorte inmediata.
+
+### 13.11 Equipos, Cohortes y Asignaciones
+Módulo 'Equipos y Maestrías': creación de cohortes (número de equipo, sede, fechas de inicio/graduación), asignación del entrenador oficial, y distribución de cada alumno nuevo a su cohorte para que sus asistencias/pagos sumen correctamente. Buena práctica del manual: asegurar que cada participante tenga cohorte asignada antes del viernes de registro, porque sin equipo asignado no aparece en el reporte de entrenadores de su sede.
+
+### 13.12 Configuración General
+Accesible principalmente a Gerentes de Sede y Administradores. Funciones: Gestión de Sedes (alta, direcciones, contacto), Usuarios y Contraseñas (creación, nombre de usuario, reseteo de claves), Programas y Precios (matrícula, promociones, calendario). Crear/modificar usuario: Configuración → Usuarios → 'Nuevo Usuario' → nombre completo, usuario, contraseña inicial, Rol de acceso (Mesa de Registro, Caja, Coordinación o Gerencia), Sede → 'Guardar Usuario'. Resetear contraseña: Configuración → Usuarios → ubicar al colaborador → 'Editar' → 'Nueva Contraseña' (clave temporal) → 'Guardar Cambios'.
+
+### 13.13 Guía de Operación de Fin de Semana
+- **Viernes:** 15:00-16:30 preparación técnica y login de prueba; 17:00-19:00 registro masivo en puerta (buscar DNI, verificar pago, 'Marcar en Sala', o derivar a caja); 19:30-20:30 cierre de puertas y conteo de gafetes sobrantes vs. lista de 'No Asistieron'; 21:00 Cierre de Caja oficial junto al Gerente.
+- **Sábado:** 08:30-09:30 reingreso controlado (solo con gafete validado); 10:30 pase de lista, el coordinador marca inasistencias para seguimiento; 20:00 auditar la columna Desertor FDS en el Reporte de Entrenadores.
+- **Domingo:** registrar nuevas matrículas del siguiente nivel en Contabilidad → Registrar Pago; al cierre, la coordinación consolida la lista final de graduados para emitir constancias.
+
+### 13.14 Errores Frecuentes en Pantalla
+"Usuario o contraseña incorrectos" → revisar Bloq Mayús; si persiste, el Gerente resetea la clave en Configuración → Usuarios. "Participante no encontrado en Mesa de Registro" → buscar por apellido en Participantes; si no existe, crear 'Nuevo Participante' y registrar el pago. "Pago pendiente pero con comprobante" → asentar el cobro en Contabilidad → Registrar Pago con el número de operación. "Diferencia en el Cierre de Caja" → contrastar recibos de mesa contra las transacciones de NODUS y corregir la clasificación antes del cierre final. "Participante duplicado" → identificar cuál registro tiene el pago asentado y pedir al Gerente que desactive el duplicado sin historial. "Página en blanco o cargando" → Ctrl+F5, o cambiar a la red móvil de respaldo.
+
+### 13.15 Preguntas Frecuentes (FAQ)
+No se recomienda compartir un mismo usuario entre dos operadores (rompe la trazabilidad de auditoría). Gafete extraviado: se busca en Mesa de Registro, se confirma asistencia previa y se entrega un reemplazo con observación en la ficha. Descarga de lista de asistentes: Participantes → filtrar Sede/Evento → 'Exportar a Excel'. Eliminar un pago erróneo: los operadores regulares no pueden hacerlo; debe solicitarse al Gerente de Sede o Administrador. 'Total Enrolados' en cero: significa que aún no hay cobros/matrículas formalmente enlazadas a ese equipo. NODUS es accesible desde celular/tablet vía navegador, aunque se recomienda laptop para el personal de mesa. Corte de Wi-Fi del local: usar la zona Wi-Fi compartida de un celular. Conteo en vivo de sentados: visible en el Dashboard o en la parte superior de Mesa de Registro.
+
+### 13.16 Glosario Operativo de NODUS
+Mesa de Registro: pantalla de puerta para buscar, verificar pago y marcar asistencia. Marcar en Sala: acción que confirma ingreso físico. Total Enrolados: personas con pago/matrícula oficial. Total Sentados: participantes físicamente en el salón. Declaración: meta numérica comprometida por un líder/equipo. Desertor FDS: quien se inscribió pero no volvió a sala durante el fin de semana. Arqueo de Caja: conteo físico de efectivo/vouchers contra lo reportado en NODUS. Sede: centro operativo del evento. Cohorte/Equipo: grupo de alumnos que cursan juntos (ej. Equipo 28 Lima). Comprobante/Operación: código bancario o número de recibo que respalda el ingreso. Gafete Oficial: identificación entregada solo tras validar el registro en NODUS.
+
+### 13.17 Listas de Cotejo por Puesto
+**Operador de Mesa de Registro:** usuario/contraseña funcionando; https://imo.crearpslglobal.com/ abierto en Chrome; búsqueda de prueba con un DNI; lista de respaldo en físico/Excel; saber a quién derivar los pagos pendientes; marcar en NODUS al entregar cada gafete; no dejar pasar a nadie 'Pendiente de Pago'; contar gafetes sobrantes al cierre y reportarlos a Coordinación.
+**Encargado de Caja y Cobranzas:** fondo de cambio inicial verificado; cada cobro registrado en Contabilidad con su comprobante; ningún recibo se entrega sin guardar el pago en NODUS antes; gastos de emergencia registrados con boleta física; Cierre de Caja abierto y conteo físico realizado al fin de turno; efectivo y reporte firmado entregados al Gerente de Sede.
+**Gerente de Sede / Supervisor:** todos los operadores con usuario activo; supervisión en vivo del Dashboard; revisión del Reporte de Entrenadores por desviaciones enrolados/sentados; auditoría y firma del Cierre de Caja del viernes; reportes de sábado y domingo consolidados.
+
+### 13.18 Flujos Operativos Paso a Paso
+**Flujo A — Registro de llegada:** (1) saludar y pedir DNI (si no lo trae, buscar por nombres/apellidos); (2) comprobar estado de pago — si está pagada, 'Marcar en Sala'; si debe saldo, derivar a caja, donde Contabilidad anota el voucher y confirma el pago; (3) entregar gafete rotulado con el check verde de asistencia visible.
+**Flujo B — Cuadre y cierre nocturno:** (1) cerrar la atención en mesa y abrir Cierre de Caja; (2) contar el dinero físico billete por billete, sumar vouchers de POS y escribir los montos reales (si no cuadra, revisar recibo por recibo); (3) firmar el acta digital con 'Cerrar Caja Oficialmente' y entregar el efectivo físico al Gerente de Sede.
+
+### 13.19 Ejercicios de Entrenamiento y Anexos
+Ejercicios recomendados antes de un evento real: búsqueda de un participante por DNI en menos de 10 segundos; registro completo de un participante nuevo; asentar un cobro en efectivo y verificar que el saldo cambie a 'Completo'; leer el Reporte de Entrenadores comparando 'Declaración' contra 'Total Enrolados'. Soporte: Gerencia de Sede (usuarios, claves, permisos, horario de oficina y fines de semana de evento) y Mesa de Ayuda de Sistemas (caídas del servidor o fallas de base de datos, guardia activa viernes-domingo). Control de versiones del manual: v1.0 (2025, primera versión de capacitación) → v2.0 Oficial (Septiembre 2026, edición integrada a Causa OS).
+
+### 13.20 Reconciliación con la Guía de KPIs para Coordinadores (sección 3.6)
+[DATO VERIFICADO vs. DATO NO CONFIRMADO — no se reconcilian por asunción, se documenta la diferencia entre las dos fuentes de Dirección]. El Manual Oficial de Usuario NODUS (Edición 2026, fuente de este capítulo 13) confirma como módulos reales de la plataforma: Dashboard, Mesa de Registro, Participantes, Contabilidad (Registrar Pago / Registro de Gastos), Cierre de Caja, Reportes (incluye el Reporte de Entrenadores y Maestrías), Equipos y Maestrías (cohortes), y Configuración (Sedes / Usuarios / Programas y Precios). La 'Guía de Medición de KPIs para Coordinadores en NODUS' (sección 3.6, aportada por Dirección) menciona además los módulos 'Seguimiento → Maestrías', 'Asignación de Llamadas', 'Configuración → Equipos y Maestrías', 'Certificados' y 'Participantes Rezagados'. De estos, **Equipos y Maestrías** y **Configuración** sí están confirmados por este manual oficial; **'Seguimiento → Maestrías', 'Asignación de Llamadas', 'Certificados' y 'Participantes Rezagados' NO aparecen mencionados en el Manual Oficial de Usuario NODUS Edición 2026** (ni en su índice de 18 capítulos ni en sus Anexos). Esto puede deberse a que (a) son pantallas reales que el manual oficial simplemente no documentó, (b) son nombres alternativos/coloquiales de módulos aquí sí listados, o (c) corresponden a una capa de seguimiento gestionada fuera de NODUS (p. ej. en Causa OS). Ningún dato de este documento resuelve cuál de las tres opciones es la correcta — DATO FALTANTE a confirmar directamente con Dirección o con una captura de pantalla de esos módulos dentro de NODUS.
 ---
 *Este documento constituye la hoja de ruta y manual de reingeniería de Crear Poder Sin Límites.*
 *Elaborado el 22 de Agosto de 2026. Clasificación: CONFIDENCIAL - EXCLUSIVO DIRECCIÓN REGIONAL.*

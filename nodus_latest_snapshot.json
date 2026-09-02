@@ -1,0 +1,1115 @@
+{
+  "robot_token": "NODUS_ROBOT_CPSL_2026_SECRET",
+  "timestamp": "2026-09-02T02:15:18.572Z",
+  "fechasFiltro": {
+    "startDate": null,
+    "endDate": null
+  },
+  "fuente": "Robot de Nodus V2 (Reportes y Facturación)",
+  "secciones": {
+    "actividadCoordinadores": {
+      "tablas": [],
+      "kpis": [
+        {
+          "cardId": "Tarjeta_1",
+          "content": [
+            "Sede",
+            "LIMA CICLO 1",
+            "Desde",
+            "Hasta",
+            "Filtrar"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_2",
+          "content": [
+            "JOYCE LIMA CICLO 1",
+            "Últ. conexión: 01/09/2026 12:43",
+            "2739",
+            "Gestiones",
+            "2347",
+            "C1",
+            "392",
+            "C2",
+            "922",
+            "Asignados",
+            "Cobertura (participantes con al menos 1 gestión)",
+            "900/922 (98%)",
+            "Últ. gestión: 26/08/2026 17:37",
+            "Por Confirmar: 323",
+            "No Contesta: 705",
+            "Confirmado: 1264",
+            "Siguiente: 210",
+            "No le Interesa: 236",
+            "Ya Asistiá: 1"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_3",
+          "content": [
+            "LIMA CICLO 1"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_4",
+          "content": [
+            "DIANA LIMA CICLO 1",
+            "Últ. conexión: 01/09/2026 13:07",
+            "2086",
+            "Gestiones",
+            "1783",
+            "C1",
+            "303",
+            "C2",
+            "880",
+            "Asignados",
+            "Cobertura (participantes con al menos 1 gestión)",
+            "837/880 (95%)",
+            "Últ. gestión: 01/09/2026 11:13",
+            "No Contesta: 619",
+            "Confirmado: 1108",
+            "Por Confirmar: 53",
+            "No le Interesa: 165",
+            "Siguiente: 140",
+            "Ya Asistiá: 1"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_5",
+          "content": [
+            "LIMA CICLO 1"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_6",
+          "content": [
+            "LEYLA LIMA CICLO 1",
+            "Últ. conexión: 01/09/2026 13:17",
+            "627",
+            "Gestiones",
+            "600",
+            "C1",
+            "27",
+            "C2",
+            "96",
+            "Asignados",
+            "Cobertura (participantes con al menos 1 gestión)",
+            "211/96 (220%)",
+            "Últ. gestión: 15/04/2026 12:48",
+            "No Contesta: 225",
+            "Por Confirmar: 71",
+            "Confirmado: 260",
+            "Siguiente: 52",
+            "Devolución: 3",
+            "No le Interesa: 16"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_7",
+          "content": [
+            "LIMA CICLO 1"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_8",
+          "content": [
+            "LINID LIMA CICLO 1",
+            "Sin conexiones registradas",
+            "0",
+            "Gestiones",
+            "0",
+            "C1",
+            "0",
+            "C2",
+            "73",
+            "Asignados",
+            "Cobertura (participantes con al menos 1 gestión)",
+            "0/73 (0%)",
+            "Últ. gestión: —",
+            "Sin gestiones registradas en este filtro."
+          ]
+        },
+        {
+          "cardId": "Tarjeta_9",
+          "content": [
+            "LIMA CICLO 1"
+          ]
+        }
+      ]
+    },
+    "reporteEntrenadores": {
+      "tablas": [
+        {
+          "tableId": "Tabla_1",
+          "headers": [
+            "TIPO IMO",
+            "PARTICIPANTES EN JUEGO",
+            "DECLARACIÓN",
+            "TOTAL ENROLADOS",
+            "DESERTOR FDS"
+          ],
+          "rows": [
+            {
+              "TIPO IMO": "CAPITAN",
+              "PARTICIPANTES EN JUEGO": "2",
+              "DECLARACIÓN": "7",
+              "TOTAL ENROLADOS": "0",
+              "DESERTOR FDS": "0"
+            },
+            {
+              "TIPO IMO": "MANAGER",
+              "PARTICIPANTES EN JUEGO": "4",
+              "DECLARACIÓN": "10",
+              "TOTAL ENROLADOS": "0",
+              "DESERTOR FDS": "0"
+            },
+            {
+              "TIPO IMO": "PARTICIPANTE",
+              "PARTICIPANTES EN JUEGO": "36",
+              "DECLARACIÓN": "73",
+              "TOTAL ENROLADOS": "0",
+              "DESERTOR FDS": "21"
+            }
+          ]
+        },
+        {
+          "tableId": "Tabla_2",
+          "headers": [
+            "Tipo IMO",
+            "Participantes en Juego",
+            "Declaración",
+            "Total Enrolados",
+            "Desertor FDS"
+          ],
+          "rows": [
+            {
+              "Tipo IMO": "CAPITAN",
+              "Participantes en Juego": "1",
+              "Declaración": "5",
+              "Total Enrolados": "0",
+              "Desertor FDS": "0"
+            },
+            {
+              "Tipo IMO": "MANAGER",
+              "Participantes en Juego": "2",
+              "Declaración": "6",
+              "Total Enrolados": "0",
+              "Desertor FDS": "0"
+            },
+            {
+              "Tipo IMO": "PARTICIPANTE",
+              "Participantes en Juego": "10",
+              "Declaración": "26",
+              "Total Enrolados": "0",
+              "Desertor FDS": "10"
+            }
+          ]
+        },
+        {
+          "tableId": "Tabla_3",
+          "headers": [
+            "Identificación",
+            "Nombres y Apellidos",
+            "Declaración",
+            "N° Enrolados"
+          ],
+          "rows": [
+            {
+              "Identificación": "09678253",
+              "Nombres y Apellidos": "FRANCISCO MANUEL HUAMAN RIOS",
+              "Declaración": "3",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "46146483",
+              "Nombres y Apellidos": "Giovana Elizabeth Palomino Marcos",
+              "Declaración": "5",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "40801629",
+              "Nombres y Apellidos": "Liz Carol Trujillo Mallqui",
+              "Declaración": "3",
+              "N° Enrolados": "0"
+            }
+          ]
+        },
+        {
+          "tableId": "Tabla_4",
+          "headers": [
+            "Identificación",
+            "Nombres y Apellidos",
+            "Declaración",
+            "N° Enrolados"
+          ],
+          "rows": [
+            {
+              "Identificación": "70373184",
+              "Nombres y Apellidos": "ROSA MARIA STEPANY CALVO PORTAL",
+              "Declaración": "3",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "72232249",
+              "Nombres y Apellidos": "JASMYN RUBY CORNEJO NEYRA",
+              "Declaración": "2",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "07938881",
+              "Nombres y Apellidos": "ELIANA ROCIO JARA AMPUERO",
+              "Declaración": "2",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "77503706",
+              "Nombres y Apellidos": "LIDIA PAULINA  MUNAYLLA GALINDO",
+              "Declaración": "5",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "76357687",
+              "Nombres y Apellidos": "GILDA MAYTE NOLASCO CHIPANA",
+              "Declaración": "2",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "10202624",
+              "Nombres y Apellidos": "ERICA MAGALI PEREA NOGUNI",
+              "Declaración": "3",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "10882623",
+              "Nombres y Apellidos": "EDITH PRESENTACIoN CaNTARO",
+              "Declaración": "2",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "72613338",
+              "Nombres y Apellidos": "ANTHONY HANS REYES MORALES",
+              "Declaración": "3",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "46439508",
+              "Nombres y Apellidos": "VANESA ROZAS ILLA",
+              "Declaración": "1",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "09976870",
+              "Nombres y Apellidos": "LIDIA TORRES ORTIZ",
+              "Declaración": "3",
+              "N° Enrolados": "0"
+            }
+          ]
+        },
+        {
+          "tableId": "Tabla_5",
+          "headers": [
+            "Tipo IMO",
+            "Participantes en Juego",
+            "Declaración",
+            "Total Enrolados",
+            "Desertor FDS"
+          ],
+          "rows": [
+            {
+              "Tipo IMO": "CAPITAN",
+              "Participantes en Juego": "1",
+              "Declaración": "2",
+              "Total Enrolados": "0",
+              "Desertor FDS": "0"
+            },
+            {
+              "Tipo IMO": "MANAGER",
+              "Participantes en Juego": "2",
+              "Declaración": "4",
+              "Total Enrolados": "0",
+              "Desertor FDS": "0"
+            },
+            {
+              "Tipo IMO": "PARTICIPANTE",
+              "Participantes en Juego": "26",
+              "Declaración": "47",
+              "Total Enrolados": "0",
+              "Desertor FDS": "11"
+            }
+          ]
+        },
+        {
+          "tableId": "Tabla_6",
+          "headers": [
+            "Identificación",
+            "Nombres y Apellidos",
+            "Declaración",
+            "N° Enrolados"
+          ],
+          "rows": [
+            {
+              "Identificación": "46633278",
+              "Nombres y Apellidos": "RAYDA PEDRAZA",
+              "Declaración": "2",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "70319817",
+              "Nombres y Apellidos": "ITALO ALONSO  ROMaN NOMURA",
+              "Declaración": "2",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "41903564",
+              "Nombres y Apellidos": "TANIA AURORA  SaNCHEZ CASTRO",
+              "Declaración": "2",
+              "N° Enrolados": "0"
+            }
+          ]
+        },
+        {
+          "tableId": "Tabla_7",
+          "headers": [
+            "Identificación",
+            "Nombres y Apellidos",
+            "Declaración",
+            "N° Enrolados"
+          ],
+          "rows": [
+            {
+              "Identificación": "42863426",
+              "Nombres y Apellidos": "JOHELL QUEEM AIRE DAVALOS",
+              "Declaración": "0",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "71581627",
+              "Nombres y Apellidos": "REY JORGE ALFARO PEnA",
+              "Declaración": "5",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "45580544",
+              "Nombres y Apellidos": "LUZ JAQUELINE BAUTISTA BOLO",
+              "Declaración": "3",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "40981917",
+              "Nombres y Apellidos": "JANETH CASTAnEDA TUMBALOBOS",
+              "Declaración": "1",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "10531545",
+              "Nombres y Apellidos": "YENNY GISELA CASTILLO MALLMA",
+              "Declaración": "1",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "76035813",
+              "Nombres y Apellidos": "DAVID ANTHONY CELESTINO",
+              "Declaración": "2",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "47424663",
+              "Nombres y Apellidos": "GODELIA INOCENTA COLCA JULCA",
+              "Declaración": "2",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "43997438",
+              "Nombres y Apellidos": "DINA MARLENE CORNEJO AGUIRRE",
+              "Declaración": "1",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "76192150",
+              "Nombres y Apellidos": "SUMIKO DEL CARMEN BURGA ORTIZ",
+              "Declaración": "3",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "41186119",
+              "Nombres y Apellidos": "LUCIO ROMERLU FERRER MEJiA",
+              "Declaración": "1",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "73634875",
+              "Nombres y Apellidos": "JEYDY LUZ HANCCO MAMANI",
+              "Declaración": "3",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "41723354",
+              "Nombres y Apellidos": "ANGELICA HERRERA PALOMINO",
+              "Declaración": "2",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "43577711",
+              "Nombres y Apellidos": "RONALD ARTURO HUAPAYA CHUMPITAZI",
+              "Declaración": "0",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "72257245",
+              "Nombres y Apellidos": "JOHANN STEVE LINO GARAY",
+              "Declaración": "2",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "722572454",
+              "Nombres y Apellidos": "JOHANN STEVE LINO GARAY",
+              "Declaración": "0",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "73360442",
+              "Nombres y Apellidos": "DAICY LoPEZ HUAMANRAYME",
+              "Declaración": "4",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "77144510",
+              "Nombres y Apellidos": "ALDO LEONARDO MIRANDA HUAMAN",
+              "Declaración": "2",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "007041227",
+              "Nombres y Apellidos": "JESSICA MONTILLA CORRALES",
+              "Declaración": "3",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "74027502",
+              "Nombres y Apellidos": "ANA PAOLA  NunEZ ANTEZANA",
+              "Declaración": "2",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "44358075",
+              "Nombres y Apellidos": "JOSUE ROVER ONOFRE VICUnA",
+              "Declaración": "3",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "07334446",
+              "Nombres y Apellidos": "CIRILA PALOMINO PARIONA",
+              "Declaración": "1",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "46672970",
+              "Nombres y Apellidos": "LYLY DAIYU  PAREJA MADERA",
+              "Declaración": "3",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "45141505",
+              "Nombres y Apellidos": "RUTH MERY QUISPE QUISPE",
+              "Declaración": "1",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "10880166",
+              "Nombres y Apellidos": "JUDITH RAMIREZ JARA DE SANDOVAL",
+              "Declaración": "0",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "42708678",
+              "Nombres y Apellidos": "JAINOR TORRES ORTIZ",
+              "Declaración": "2",
+              "N° Enrolados": "0"
+            },
+            {
+              "Identificación": "74749862",
+              "Nombres y Apellidos": "ELIZABETH LOURDES VILCA CONDORI",
+              "Declaración": "0",
+              "N° Enrolados": "0"
+            }
+          ]
+        },
+        {
+          "tableId": "Tabla_8",
+          "headers": [
+            "Tipo IMO",
+            "Participantes en Juego",
+            "Declaración",
+            "Total Enrolados",
+            "Desertor FDS"
+          ],
+          "rows": [
+            {
+              "Tipo IMO": "CAPITAN",
+              "Participantes en Juego": "0",
+              "Declaración": "0",
+              "Total Enrolados": "0",
+              "Desertor FDS": "0"
+            },
+            {
+              "Tipo IMO": "MANAGER",
+              "Participantes en Juego": "0",
+              "Declaración": "0",
+              "Total Enrolados": "0",
+              "Desertor FDS": "0"
+            },
+            {
+              "Tipo IMO": "PARTICIPANTE",
+              "Participantes en Juego": "0",
+              "Declaración": "0",
+              "Total Enrolados": "0",
+              "Desertor FDS": "0"
+            }
+          ]
+        },
+        {
+          "tableId": "Tabla_9",
+          "headers": [
+            "Tipo IMO",
+            "Participantes en Juego",
+            "Declaración",
+            "Total Enrolados",
+            "Desertor FDS"
+          ],
+          "rows": [
+            {
+              "Tipo IMO": "CAPITAN",
+              "Participantes en Juego": "0",
+              "Declaración": "0",
+              "Total Enrolados": "0",
+              "Desertor FDS": "0"
+            },
+            {
+              "Tipo IMO": "MANAGER",
+              "Participantes en Juego": "0",
+              "Declaración": "0",
+              "Total Enrolados": "0",
+              "Desertor FDS": "0"
+            },
+            {
+              "Tipo IMO": "PARTICIPANTE",
+              "Participantes en Juego": "0",
+              "Declaración": "0",
+              "Total Enrolados": "0",
+              "Desertor FDS": "0"
+            }
+          ]
+        }
+      ],
+      "kpis": [
+        {
+          "cardId": "Tarjeta_1",
+          "content": [
+            "Sede",
+            "Todas",
+            "LIMA CICLO 1",
+            "Buscar",
+            "Limpiar",
+            "Exportar Excel",
+            " Solo equipos en juego (activos hoy), cada uno en su etapa vigente — no se muestra histórico."
+          ]
+        },
+        {
+          "cardId": "Tarjeta_2",
+          "content": [
+            "Enrolamiento total — 4 equipo(s) en juego",
+            "TIPO IMO\tPARTICIPANTES EN JUEGO\tDECLARACIÓN\tTOTAL ENROLADOS\tDESERTOR FDS",
+            "CAPITAN\t2\t7\t0\t0",
+            "MANAGER\t4\t10\t0\t0",
+            "PARTICIPANTE\t36\t73\t0\t21",
+            "Total\t42\t90\t0\t21"
+          ]
+        }
+      ]
+    },
+    "reporteAsistencia": {
+      "tablas": [],
+      "kpis": [
+        {
+          "cardId": "Tarjeta_2",
+          "content": [
+            "Seleccione un equipo para ver el reporte de asistencia"
+          ]
+        }
+      ]
+    },
+    "facturacion": {
+      "tablas": [
+        {
+          "tableId": "Tabla_1",
+          "headers": [
+            "#",
+            "NOMBRES",
+            "IDENTIFICACIÓN",
+            "TELÉFONO",
+            "SEDE",
+            "EQUIPO",
+            "COORDINADOR",
+            "INVITADOR",
+            "FORMA PAGO",
+            "PAGO C1",
+            "PAGO C2",
+            "TOTAL",
+            "ASISTENCIA",
+            "C1",
+            "C2",
+            "M",
+            "ACCIONES"
+          ],
+          "rows": [
+            {
+              "#": "Ningún dato disponible en esta tabla"
+            }
+          ]
+        }
+      ],
+      "kpis": [
+        {
+          "cardId": "Tarjeta_1",
+          "content": [
+            "Filtrar por Sede",
+            "LIMA CICLO 1",
+            "Tu sede",
+            "Filtrar por Equipo",
+            "Todos los equipos",
+            "EQUIPO 1000",
+            "EQUIPO 14",
+            "EQUIPO 15",
+            "EQUIPO 16",
+            "EQUIPO 17",
+            "EQUIPO 18",
+            "EQUIPO 19",
+            "EQUIPO 20",
+            "EQUIPO 21",
+            "EQUIPO 22",
+            "EQUIPO 23",
+            "EQUIPO 24",
+            "EQUIPO 25",
+            "EQUIPO 26",
+            "EQUIPO 27",
+            "EQUIPO 28",
+            "EQUIPO 29",
+            "EQUIPO 30",
+            "EQUIPO 31",
+            "Filtrar por Pago",
+            "Todos",
+            "Capítulo 1 (completos)",
+            "Capítulo 2 (C2, C2+MJ, Abonos)",
+            "Pagos + comprobantes (ZIP)"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_2",
+          "content": [
+            "Participantes / Facturación (0)",
+            "Mostrar ",
+            "10",
+            "25",
+            "50",
+            "100",
+            " registros",
+            "Buscar:",
+            "#\tNOMBRES\tIDENTIFICACIÓN\tTELÉFONO\tSEDE\tEQUIPO\tCOORDINADOR\tINVITADOR\tFORMA PAGO\tPAGO C1\tPAGO C2\tTOTAL\tASISTENCIA\tC1\tC2\tM\tACCIONES",
+            "Ningún dato disponible en esta tabla",
+            "Mostrando registros del 0 al 0 de un total de 0 registros",
+            "Anterior",
+            "Siguiente"
+          ]
+        }
+      ]
+    },
+    "dashboardPrincipal": {
+      "tablas": [
+        {
+          "tableId": "Tabla_1",
+          "headers": [
+            "EQUIPO",
+            "SEDE",
+            "ENTRENADOR",
+            "ETAPA ACTUAL",
+            "PARTICIPANTES",
+            ""
+          ],
+          "rows": [
+            {
+              "EQUIPO": "EQUIPO 28",
+              "SEDE": "LIMA CICLO 1",
+              "ENTRENADOR": "MAURICIO PEREZ",
+              "ETAPA ACTUAL": "SFD",
+              "PARTICIPANTES": "24",
+              "Columna_5": "Ver Resultados"
+            },
+            {
+              "EQUIPO": "EQUIPO 29",
+              "SEDE": "LIMA CICLO 1",
+              "ENTRENADOR": "LEANDRO BRUNIS",
+              "ETAPA ACTUAL": "PFD",
+              "PARTICIPANTES": "36",
+              "Columna_5": "Ver Resultados"
+            }
+          ]
+        },
+        {
+          "tableId": "Tabla_2",
+          "headers": [
+            "ENTRENADOR",
+            "ESTADO",
+            "ASIGNACIONES"
+          ],
+          "rows": [
+            {
+              "ENTRENADOR": "FERNANDO ARAGON",
+              "ESTADO": "Activo",
+              "ASIGNACIONES": "1"
+            },
+            {
+              "ENTRENADOR": "LEANDRO BRUNIS",
+              "ESTADO": "Activo",
+              "ASIGNACIONES": "1"
+            },
+            {
+              "ENTRENADOR": "MAURICIO PEREZ",
+              "ESTADO": "Activo",
+              "ASIGNACIONES": "1"
+            }
+          ]
+        },
+        {
+          "tableId": "Tabla_3",
+          "headers": [
+            "EQUIPO",
+            "SEDE",
+            "ENTRENADOR",
+            "PARTICIPANTES"
+          ],
+          "rows": [
+            {
+              "EQUIPO": "EQUIPO 29",
+              "SEDE": "LIMA CICLO 1",
+              "ENTRENADOR": "LEANDRO BRUNIS",
+              "PARTICIPANTES": "224"
+            },
+            {
+              "EQUIPO": "EQUIPO 28",
+              "SEDE": "LIMA CICLO 1",
+              "ENTRENADOR": "MAURICIO PEREZ",
+              "PARTICIPANTES": "175"
+            },
+            {
+              "EQUIPO": "EQUIPO 30",
+              "SEDE": "LIMA CICLO 1",
+              "ENTRENADOR": "No asignado",
+              "PARTICIPANTES": "163"
+            },
+            {
+              "EQUIPO": "EQUIPO 31",
+              "SEDE": "LIMA CICLO 1",
+              "ENTRENADOR": "FERNANDO ARAGON",
+              "PARTICIPANTES": "0"
+            }
+          ]
+        },
+        {
+          "tableId": "Tabla_4",
+          "headers": [
+            "Mes",
+            "Participantes"
+          ],
+          "rows": [
+            {
+              "Mes": "Oct 25",
+              "Participantes": "0"
+            },
+            {
+              "Mes": "Nov 25",
+              "Participantes": "0"
+            },
+            {
+              "Mes": "Dic 25",
+              "Participantes": "0"
+            },
+            {
+              "Mes": "Ene 26",
+              "Participantes": "0"
+            },
+            {
+              "Mes": "Feb 26",
+              "Participantes": "0"
+            },
+            {
+              "Mes": "Mar 26",
+              "Participantes": "0"
+            },
+            {
+              "Mes": "Abr 26",
+              "Participantes": "0"
+            },
+            {
+              "Mes": "May 26",
+              "Participantes": "0"
+            },
+            {
+              "Mes": "Jun 26",
+              "Participantes": "0"
+            },
+            {
+              "Mes": "Jul 26",
+              "Participantes": "0"
+            },
+            {
+              "Mes": "Ago 26",
+              "Participantes": "3,572"
+            },
+            {
+              "Mes": "Sep 26",
+              "Participantes": "0"
+            }
+          ]
+        },
+        {
+          "tableId": "Tabla_5",
+          "headers": [
+            "Mes",
+            "Recaudado"
+          ],
+          "rows": [
+            {
+              "Mes": "Oct 25",
+              "Recaudado": "$ 307,000.00"
+            },
+            {
+              "Mes": "Nov 25",
+              "Recaudado": "$ 321,300.00"
+            },
+            {
+              "Mes": "Dic 25",
+              "Recaudado": "$ 274,095.00"
+            },
+            {
+              "Mes": "Ene 26",
+              "Recaudado": "$ 241,045.00"
+            },
+            {
+              "Mes": "Feb 26",
+              "Recaudado": "$ 383,370.00"
+            },
+            {
+              "Mes": "Mar 26",
+              "Recaudado": "$ 410,170.00"
+            },
+            {
+              "Mes": "Abr 26",
+              "Recaudado": "$ 258,350.00"
+            },
+            {
+              "Mes": "May 26",
+              "Recaudado": "$ 398,392.00"
+            },
+            {
+              "Mes": "Jun 26",
+              "Recaudado": "$ 199,468.00"
+            },
+            {
+              "Mes": "Jul 26",
+              "Recaudado": "$ 157,885.00"
+            },
+            {
+              "Mes": "Ago 26",
+              "Recaudado": "$ 250,450.00"
+            },
+            {
+              "Mes": "Sep 26",
+              "Recaudado": "$ 0.00"
+            }
+          ]
+        },
+        {
+          "tableId": "Tabla_6",
+          "headers": [
+            "Entrenamiento",
+            "Participantes"
+          ],
+          "rows": [
+            {
+              "Entrenamiento": "Capítulo 1",
+              "Participantes": "2,491"
+            },
+            {
+              "Entrenamiento": "Capítulo 2",
+              "Participantes": "888"
+            },
+            {
+              "Entrenamiento": "Maestría",
+              "Participantes": "733"
+            }
+          ]
+        },
+        {
+          "tableId": "Tabla_7",
+          "headers": [
+            "Entrenador",
+            "Asignaciones"
+          ],
+          "rows": [
+            {
+              "Entrenador": "FERNANDO ARAGON",
+              "Asignaciones": "1"
+            },
+            {
+              "Entrenador": "LEANDRO BRUNIS",
+              "Asignaciones": "1"
+            },
+            {
+              "Entrenador": "MAURICIO PEREZ",
+              "Asignaciones": "1"
+            }
+          ]
+        }
+      ],
+      "kpis": [
+        {
+          "cardId": "Tarjeta_1",
+          "content": [
+            "Alcance",
+            "LIMA CICLO 1",
+            "Tu sede",
+            "Período (pestaña Analítica)",
+            "Últimos 3 meses",
+            "Últimos 6 meses",
+            "Últimos 12 meses",
+            "Últimos 24 meses",
+            " Viendo indicadores de:"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_2",
+          "content": [
+            "Viendo indicadores de:"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_3",
+          "content": [
+            "Actividad del Fin de Semana",
+            "2 en curso",
+            "EQUIPO\tSEDE\tENTRENADOR\tETAPA ACTUAL\tPARTICIPANTES\t",
+            "EQUIPO 28\tLIMA CICLO 1\tMAURICIO PEREZ\tSFD\t24\tVer Resultados",
+            "EQUIPO 29\tLIMA CICLO 1\tLEANDRO BRUNIS\tPFD\t36\tVer Resultados"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_4",
+          "content": [
+            "Por Entrenamiento",
+            "Total participantes activos en el alcance: 3,572",
+            "Capítulo 1",
+            "2,491 (70%)",
+            "Capítulo 2",
+            "888 (25%)",
+            "Maestría",
+            "733 (21%)"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_5",
+          "content": [
+            "Por Entrenador — Carga de Trabajo",
+            "Ver Cronograma",
+            "ENTRENADOR\tESTADO\tASIGNACIONES",
+            "FERNANDO ARAGON\tActivo\t",
+            "1",
+            "",
+            "LEANDRO BRUNIS\tActivo\t",
+            "1",
+            "",
+            "MAURICIO PEREZ\tActivo\t",
+            "1"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_6",
+          "content": [
+            "Activo"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_7",
+          "content": [
+            "Activo"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_8",
+          "content": [
+            "Activo"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_9",
+          "content": [
+            "Por Equipo — Equipos en Actividad",
+            "Ver todos",
+            "EQUIPO\tSEDE\tENTRENADOR\tPARTICIPANTES",
+            "EQUIPO 29\tLIMA CICLO 1\tLEANDRO BRUNIS\t224",
+            "EQUIPO 28\tLIMA CICLO 1\tMAURICIO PEREZ\t175",
+            "EQUIPO 30\tLIMA CICLO 1\tNo asignado\t163",
+            "EQUIPO 31\tLIMA CICLO 1\tFERNANDO ARAGON\t0"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_11",
+          "content": [
+            "Indicadores Financieros",
+            "$ 4,871,683.12",
+            "Recaudado",
+            "$ 1,575.00",
+            "Pendiente",
+            "$ 0.00",
+            "Devoluciones",
+            "4,392",
+            "Facturas"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_14",
+          "content": [
+            "Comparativo — Progresión por Entrenamiento",
+            "          Ver tabla",
+            "        ",
+            "        ",
+            "          ",
+            "          ",
+            "            ",
+            "              EntrenamientoParticipantes",
+            "              ",
+            "                                Capítulo 12,491",
+            "                                Capítulo 2888",
+            "                                Maestría733"
+          ]
+        },
+        {
+          "cardId": "Tarjeta_15",
+          "content": [
+            "Comparativo — Carga de Entrenadores (Top 10)",
+            "          Ver tabla",
+            "        ",
+            "        ",
+            "                    ",
+            "          ",
+            "            ",
+            "              EntrenadorAsignaciones",
+            "              ",
+            "                                FERNANDO ARAGON1",
+            "                                LEANDRO BRUNIS1",
+            "                                MAURICIO PEREZ1"
+          ]
+        }
+      ]
+    }
+  }
+}

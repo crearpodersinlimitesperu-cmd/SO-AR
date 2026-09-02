@@ -8,80 +8,169 @@ import {
   MousePointer2, ExternalLink
 } from 'lucide-react';
 
+// Fuente: Manual Oficial de Usuario NODUS - Edición 2026 (manual_nodus_soar_completo.pdf/html),
+// integrado y verificado 02/09/2026. Los pasos siguen literalmente los módulos, botones y
+// campos descritos en el manual oficial (Capítulos 3 a 18); no se inventan rutas de navegación.
 const NODUS_KNOWLEDGE_BASE = [
   {
     id: 'n1',
     role: 'directores',
-    title: 'Aprobar Presupuestos y Gastos',
-    description: 'Ruta exacta para aprobar las solicitudes de gastos semanales de las sedes.',
+    title: 'Configurar Sedes, Usuarios y Programas (Módulo Configuración)',
+    description: 'El módulo de Configuración es accesible principalmente para Gerentes de Sede y Administradores: gestión de sedes, usuarios/contraseñas y programas/precios.',
     steps: [
-      'Ingresa a imo.crearpslglobal.com/auth/login e inicia sesión.',
-      'En el menú lateral izquierdo, haz clic en el módulo "Finanzas".',
-      'Selecciona el submenú "Aprobaciones".',
-      'Usa el filtro superior derecho para seleccionar la Sede (ej: "Lima").',
-      'Haz clic en el botón azul "Ver Detalles" junto al gasto.',
-      'En la ventana emergente, verifica el monto y haz clic en el botón verde "Aprobar" en la esquina inferior derecha.'
+      'Haz clic en "Configuración" en el menú lateral izquierdo.',
+      'Para crear un usuario: entra a "Usuarios" y presiona "Nuevo Usuario".',
+      'Escribe el Nombre Completo, el Nombre de Usuario y una Contraseña inicial.',
+      'Selecciona su Rol de acceso (Mesa de Registro, Caja, Coordinación o Gerencia) y su Sede.',
+      'Haz clic en "Guardar Usuario" y comparte las credenciales de forma segura.',
+      'Gestión de Sedes y Programas y Precios (matrícula, promociones, calendario) están en las otras pestañas del mismo módulo.'
     ],
-    tags: ['finanzas', 'gastos', 'aprobar', 'presupuesto']
+    tags: ['configuracion', 'usuarios', 'sedes', 'precios', 'director']
   },
   {
     id: 'n2',
-    role: 'gerentes',
-    title: 'Visualizar Asistencias y Alertas (Tablero Principal)',
-    description: 'Dónde encontrar el resumen de asistencia y deserciones del fin de semana.',
+    role: 'directores',
+    title: 'Resetear una Contraseña Olvidada',
+    description: 'Procedimiento oficial cuando un colaborador no puede ingresar a su cuenta de NODUS.',
     steps: [
-      'Ingresa a imo.crearpslglobal.com/auth/login.',
-      'Al entrar, estarás en el "Dashboard Principal".',
-      'Desplázate hacia abajo hasta la sección "Alertas de Deserción".',
-      'Haz clic en la pestaña "Asistencia C1" o "Asistencia C2" según el ciclo activo.',
-      'El sistema mostrará en rojo los participantes que no han registrado su Check-In.'
+      'El Gerente de Sede ingresa a "Configuración" → "Usuarios".',
+      'Busca el nombre del colaborador en la lista y presiona "Editar".',
+      'En la casilla "Nueva Contraseña", escribe una clave temporal clara (ej: Nodus2026*).',
+      'Haz clic en "Guardar Cambios" y pide al usuario que pruebe su ingreso de inmediato.'
     ],
-    tags: ['asistencia', 'alertas', 'desercion', 'dashboard']
+    tags: ['contraseña', 'usuarios', 'soporte', 'reset']
   },
   {
     id: 'n3',
-    role: 'gerentes',
-    title: 'Cargar Matrículas y Tickets Verdes',
-    description: 'Procedimiento para registrar el pago de un participante y liberar su Ticket Verde.',
+    role: 'directores',
+    title: 'Auditar el Reporte de Entrenadores y la Brecha Enrolados vs. Sentados',
+    description: 'Cómo cruzar el Reporte de Entrenadores contra la Mesa de Registro para detectar no-shows.',
     steps: [
-      'En el menú lateral izquierdo, selecciona "Participantes".',
-      'Usa la barra de búsqueda superior para ingresar el DNI o Nombre del participante.',
-      'Haz clic en el icono de "Lápiz" (Editar) junto al nombre.',
-      'Ve a la pestaña "Pagos y Finanzas".',
-      'En la sección de pagos, haz clic en "+ Añadir Transacción".',
-      'Ingresa el monto, método de pago y haz clic en "Guardar".',
-      'Automáticamente, la etiqueta superior cambiará a "Ticket Verde Habilitado".'
+      'Ve al módulo "Reportes" en el menú lateral.',
+      'Abre el "Reporte de Entrenadores y Maestrías": columnas TIPO IMO/DNI, PARTICIPANTES EN JUEGO, DECLARACIÓN, TOTAL ENROLADOS y DESERTOR FDS.',
+      '"Enrolados" muestra cuántos pagaron su inscripción en el sistema.',
+      '"Sentados" muestra cuántos fueron efectivamente marcados con "Marcar en Sala" el viernes por la noche.',
+      'Si hay brecha (ej: 15 enrolados pero 8 sentados), coordinación debe contactar a los 7 ausentes y coordinar su ingreso en la cohorte inmediata.'
     ],
-    tags: ['pagos', 'matricula', 'ticket verde', 'finanzas']
+    tags: ['reportes', 'auditoria', 'entrenadores', 'brecha', 'no-show']
   },
   {
     id: 'n4',
-    role: 'coordinadores',
-    title: 'Registrar Check-In en Puerta (Día del Evento)',
-    description: 'La forma más rápida de escanear o marcar asistencia en sala.',
+    role: 'gerentes',
+    title: 'Leer el Dashboard Principal e Indicadores en Vivo',
+    description: 'Dónde ver el resumen operativo y los contadores en tiempo real durante días de evento.',
     steps: [
-      'En tu dispositivo móvil o tablet, ingresa a imo.crearpslglobal.com.',
-      'En el menú principal, toca el ícono de "Escáner / Check-In".',
-      'Selecciona el ciclo activo (Ej: "Lima - C1 - Fin de Semana 1").',
-      'Aparecerá la lista completa. Puedes buscar por nombre o marcar la casilla "Presente" del lado derecho.',
-      'Si el recuadro está bloqueado en rojo, significa que no tiene Ticket Verde (Debe ir a mesa de finanzas).'
+      'Al iniciar sesión, el sistema muestra el "Dashboard" con Contadores de Resumen en la parte superior (entrenadores, eventos activos, participantes registrados, sedes operando).',
+      'Durante el evento, el Dashboard actualiza en vivo: "Inscritos Totales", "Presentes en Sala" y "Pendientes de Llegada".',
+      'La Barra Lateral Izquierda da acceso a Dashboard, Mesa Registro, Participantes, Contabilidad, Cierre de Caja, Reportes y Configuración.',
+      'Para volver al inicio desde cualquier módulo, haz clic en "Dashboard" o en el logotipo (esquina superior izquierda).'
     ],
-    tags: ['check-in', 'asistencia', 'puerta', 'sala']
+    tags: ['dashboard', 'indicadores', 'tiempo real', 'gerente']
   },
   {
     id: 'n5',
-    role: 'cmj',
-    title: 'Control de Retos y Seguimiento (Managers)',
-    description: 'Dónde registrar las llamadas y el seguimiento de los entrenos asignados.',
+    role: 'gerentes',
+    title: 'Realizar el Cierre y Arqueo Diario de Caja',
+    description: 'Procedimiento oficial de 3 pasos para cuadrar el dinero físico contra las transacciones registradas.',
     steps: [
-      'En el menú lateral, haz clic en "Mi Equipo" o "Mis Asignados".',
-      'Verás una lista con tus participantes a cargo.',
-      'Haz clic en el nombre del participante.',
-      'Selecciona la pestaña "Bitácora de Seguimiento".',
-      'Haz clic en "+ Nuevo Registro".',
-      'Escribe un breve resumen de la llamada (Ej: "Llamada de retos completada. Brecha: 20%") y pulsa "Guardar".'
+      'Haz clic en "Cierre de Caja" en el menú lateral. Selecciona la fecha de hoy y la sede.',
+      'Compara el "Total Efectivo Esperado" (calculado por NODUS) contra el conteo físico real y escríbelo en "Efectivo Real en Caja".',
+      'Si hay sobrante o faltante, documenta la justificación en el campo "Observaciones".',
+      'Presiona "Cerrar Caja Oficialmente" para generar el acta; los registros del día quedan bloqueados.',
+      'Solo el Gerente de Sede o el Administrador general pueden reabrir una caja ya cerrada.'
     ],
-    tags: ['retos', 'seguimiento', 'llamadas', 'bitacora']
+    tags: ['cierre de caja', 'arqueo', 'contabilidad', 'gerente']
+  },
+  {
+    id: 'n6',
+    role: 'gerentes',
+    title: 'Autorizar un Traslado de Sede de un Participante',
+    description: 'Caso especial de Mesa de Registro que solo puede resolver el Gerente de Sede.',
+    steps: [
+      'Cuando un participante estaba registrado para otra sede pero pide cursar en la sede actual, entra a "Participantes".',
+      'Busca al alumno en el listado general.',
+      'Modifica el campo "Sede Asignada" seleccionando la sede actual.',
+      'Al guardar, el alumno aparecerá automáticamente en la Mesa de Registro local.'
+    ],
+    tags: ['traslado', 'sede', 'participantes', 'gerente']
+  },
+  {
+    id: 'n7',
+    role: 'coordinadores',
+    title: 'Registrar a un Participante en la Mesa de Registro (3 Pasos)',
+    description: 'El procedimiento más usado durante los días de evento, en el vestíbulo o puerta de entrada.',
+    steps: [
+      'Pide su DNI/Cédula/Pasaporte, escríbelo en la barra de búsqueda de Mesa de Registro y presiona Enter (si no aparece, busca solo por apellido).',
+      'Verifica el estado: si figura "Completo" continúa; si está "Pendiente", solicita comprobante o deriva a la caja.',
+      'Haz clic en "Marcar en Sala": el participante queda contabilizado como Sentado. Entrégale su gafete oficial y material de bienvenida.',
+      'Si marcaste por error, vuelve a buscar por DNI y desmarca la casilla de asistencia.'
+    ],
+    tags: ['mesa de registro', 'check-in', 'asistencia', 'gafete', 'coordinador']
+  },
+  {
+    id: 'n8',
+    role: 'coordinadores',
+    title: 'Resolver Casos Especiales en Mesa de Registro',
+    description: 'Protocolos oficiales para walk-ins, participantes extranjeros y traslados de sede.',
+    steps: [
+      'Walk-in (inscrito el mismo día): pide comprobante → "Participantes" → "Nuevo Participante" → registra nombres/DNI/teléfono/correo → "Contabilidad" → "Registrar Pago" → vuelve a Mesa de Registro y márcalo con gafete provisional.',
+      'Extranjero con pasaporte: escribe la serie alfanumérica del pasaporte tal como fue registrada; si no aparece, busca por apellido materno o paterno.',
+      'Traslado de sede: debe resolverlo el Gerente de Sede desde "Participantes", cambiando el campo "Sede Asignada".'
+    ],
+    tags: ['casos especiales', 'walk-in', 'pasaporte', 'traslado', 'coordinador']
+  },
+  {
+    id: 'n9',
+    role: 'coordinadores',
+    title: 'Registrar un Nuevo Participante y Asentar su Pago',
+    description: 'Alta completa de un participante en el módulo Participantes y su cobro en Contabilidad.',
+    steps: [
+      'En el menú lateral, entra a "Participantes" y presiona "Nuevo Participante".',
+      'Completa Tipo y Número de Documento, Nombres y Apellidos completos (tal como el documento, para certificados), Teléfono/WhatsApp, Correo, Sede y Entrenamiento.',
+      'Haz clic en "Guardar": el registro se genera de inmediato.',
+      'Para cobrar: "Contabilidad" → "Registrar Pago" → busca por DNI → elige tipo de pago (Total o Abono Parcial) y forma de pago (Efectivo, Transferencia o Tarjeta) → escribe el número de comprobante/operación → "Guardar Pago".'
+    ],
+    tags: ['participantes', 'nuevo participante', 'pago', 'contabilidad', 'coordinador']
+  },
+  {
+    id: 'n10',
+    role: 'cmj',
+    title: 'Leer el Reporte de Entrenadores y Maestrías (5 Columnas)',
+    description: 'El reporte más consultado por Centro de Managers para evaluar rendimiento por bloque/equipo.',
+    steps: [
+      'Ve a "Reportes" → "Reporte de Entrenadores y Maestrías".',
+      'TIPO IMO/DNI: rol (Capitán, Manager, Participante) o documento — permite auditar por bloque o buscar a alguien.',
+      'PARTICIPANTES EN JUEGO: personas activas en sala o nombre del participante.',
+      'DECLARACIÓN: la meta numérica que el líder se comprometió a enrolar.',
+      'TOTAL ENROLADOS: personas nuevas registradas y pagadas (en 0 = sin cobros registrados aún).',
+      'DESERTOR FDS: alumnos que abandonaron durante el fin de semana — alerta de fuga a reportar de inmediato a coordinación.'
+    ],
+    tags: ['reporte de entrenadores', 'kpi', 'cmj', 'declaracion', 'desertor']
+  },
+  {
+    id: 'n11',
+    role: 'cmj',
+    title: 'Gestionar Equipos, Cohortes y Asignación de Entrenadores',
+    description: 'Módulo "Equipos y Maestrías" para estructurar las cohortes de cada sede (ej: Equipos 27, 28, 29 de Lima).',
+    steps: [
+      'Creación de cohortes: define número de equipo, sede y fechas de inicio y graduación.',
+      'Asignación de entrenadores: asocia al entrenador oficial responsable del proceso.',
+      'Distribución de alumnos: asigna a cada participante nuevo a su cohorte y equipo.',
+      'Buena práctica del manual: asegúrate de que cada participante tenga cohorte asignada antes del viernes de registro — sin equipo asignado, no aparece en el reporte de entrenadores de su sede.'
+    ],
+    tags: ['equipos', 'cohortes', 'asignacion', 'cmj', 'entrenadores']
+  },
+  {
+    id: 'n12',
+    role: 'cmj',
+    title: 'Auditar la Brecha entre Enrolados y Sentados',
+    description: 'Función clave de Centro de Managers para detectar no-shows cruzando Reportes contra Mesa de Registro.',
+    steps: [
+      '"Enrolados": personas que han pagado su inscripción en el sistema (columna TOTAL ENROLADOS del Reporte de Entrenadores).',
+      '"Sentados": personas efectivamente marcadas con "Marcar en Sala" el viernes por la noche.',
+      'Si un equipo reporta 15 enrolados pero solo 8 sentados, comunícate con los 7 ausentes para conocer el motivo y coordinar su ingreso en la cohorte inmediata.'
+    ],
+    tags: ['brecha', 'no-show', 'auditoria', 'cmj', 'seguimiento']
   }
 ];
 

@@ -57,16 +57,35 @@ export default function AuditoriaKPIs() {
 
           const dynamicMetrics = [];
           const statusPills = [];
+          // (02/09/2026) FIX — verificado contra nodus_latest_snapshot.json real:
+          // 1) content[1] no siempre empieza con "Últ." (ej. Nodus manda literalmente
+          //    "Sin conexiones registradas" para coordinadores sin login reciente).
+          //    Antes esto se colaba como una métrica sin sentido ("Sin conexiones
+          //    registradas: 0"). Ahora content[1] se salta siempre, sea cual sea su texto.
+          // 2) La lista fija de palabras clave (Confirmado/Siguiente/En espera/Cierre)
+          //    dejaba fuera estados reales de Nodus como "Por Confirmar", "No Contesta",
+          //    "No le Interesa", "Ya Asistiá" y "Devolución", que caían como tarjetas de
+          //    métrica plana en vez de pill de estado. En los datos reales, Nodus separa
+          //    las "métricas duras" (Gestiones/C1/C2/Asignados/Cobertura) de los "estados
+          //    de gestión" (Confirmado, Por Confirmar, No Contesta, etc.) con el marcador
+          //    "Últ. gestión: ...". Todo par "Etiqueta: Valor" que aparece DESPUÉS de ese
+          //    marcador es, por construcción, un estado de gestión — sin necesitar una
+          //    lista de palabras clave que quede desactualizada si Nodus agrega estados.
+          let pastUltGestion = false;
           for(let i = 1; i < content.length; i++) {
             const str = content[i];
-            if (!str || typeof str !== 'string' || str.startsWith('Últ.')) continue;
-            
+            if (!str || typeof str !== 'string') continue;
+            if (i === 1 || str.startsWith('Últ.')) {
+              if (str.startsWith('Últ. gestión')) pastUltGestion = true;
+              continue;
+            }
+
             if (str.includes(':')) {
               const parts = str.split(':');
               const label = parts[0].trim();
-              const val = parts[1].trim();
-              
-              if (['Confirmado', 'Siguiente', 'En espera', 'Cierre'].some(keyword => label.includes(keyword))) {
+              const val = parts.slice(1).join(':').trim();
+
+              if (pastUltGestion) {
                 statusPills.push({ label, value: val });
               } else {
                 dynamicMetrics.push({ label, value: val });
@@ -228,8 +247,7 @@ export default function AuditoriaKPIs() {
         if (snap.exists()) {
           const data = snap.data();
           const dataTime = data.timestamp ? new Date(data.timestamp).getTime() : 0;
-          const matchesDates = data.fechasFiltro && data.fechasFiltro.startDate === startDate && data.fechasFiltro.endDate === endDate;
-          if ((dataTime >= (dispatchStartedAt - 60000) && matchesDates) || dataTime >= dispatchStartedAt) {
+          if (dataTime >= dispatchStartedAt) {
             const parsedData = parseNodusData(data);
             setReports(parsedData);
             setResumenGeneral(parseResumenGeneral(data));
