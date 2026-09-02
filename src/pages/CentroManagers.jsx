@@ -13,7 +13,10 @@ import {
   isGlobalQTCoordinator,
   hasQTPrivileges,
   DUAL_ROLE_TRAINER_EMAILS,
-  canViewLiquidacionEntrenadores
+  canViewLiquidacionEntrenadores,
+  canWriteNotaSeguimiento,
+  canViewAllNotasSeguimiento,
+  canReplyNotaSeguimiento
 } from '../config/permissions';
 import { 
   INITIAL_MANAGERS, 
@@ -27,7 +30,7 @@ import {
 import { OPERATIONAL_SEDES, normalizeRole, normalizeSede } from '../data/usersData';
 import { recordAuditEvent } from '../services/auditService';
 import { db } from '../services/firebase';
-import { collection, getDocs, doc, addDoc, setDoc, updateDoc, deleteDoc, writeBatch, onSnapshot, serverTimestamp } from 'firebase/firestore';
+import { collection, getDocs, doc, addDoc, setDoc, updateDoc, deleteDoc, writeBatch, onSnapshot, serverTimestamp, query, where, arrayUnion } from 'firebase/firestore';
 import CountryFlag from '../components/CountryFlag';
 import { 
   Users, PhoneCall, CheckCircle, XCircle, Calendar, Plus, PlusCircle,
@@ -119,6 +122,13 @@ export default function CentroManagers() {
   const userCanAssign = canAssignTrainer(currentUser);
   // Pestaña de Liquidación de Entrenadores: solo José Sánchez y Elizabeth Escobar (02/09/2026)
   const canViewLiquidacion = canViewLiquidacionEntrenadores(currentUser);
+  // Notas de Seguimiento post-llamada (02/09/2026): quién puede dejar una nota,
+  // quién puede ver el historial completo (no solo lo propio), y quién puede
+  // responder a una nota como CMJ. Ver comentarios de estas 3 funciones en
+  // permissions.js — deben coincidir con firestore.rules.
+  const userCanWriteNota = canWriteNotaSeguimiento(currentUser);
+  const userCanViewAllNotas = canViewAllNotasSeguimiento(currentUser);
+  const userCanReplyNota = canReplyNotaSeguimiento(currentUser);
   
   // Dual Role Toggle para QT y Corporativos que también son entrenadores
   const userRole = currentUser?.appRole || currentUser?.role;
@@ -198,6 +208,29 @@ export default function CentroManagers() {
     });
     return () => unsubscribe();
   }, []);
+
+  // (02/09/2026) Notas de Seguimiento post-llamada — feedback del entrenador de
+  // llamadas (individual o grupal), usado para detectar y anticiparse a quiebres.
+  // La consulta debe coincidir con firestore.rules (match /notas_seguimiento/):
+  // quien NO puede ver todas las notas (userCanViewAllNotas=false) solo puede
+  // escuchar SUS PROPIAS notas — un listener sin ese "where" fallaría con
+  // permission-denied porque Firestore no puede probar que TODOS los documentos
+  // de la colección completa cumplirían la regla para ese usuario.
+  const [notasSeguimiento, setNotasSeguimiento] = useState([]);
+  useEffect(() => {
+    if (!currentUser?.email) return;
+    const notasQuery = userCanViewAllNotas
+      ? collection(db, 'notas_seguimiento')
+      : query(collection(db, 'notas_seguimiento'), where('autorEmail', '==', currentUser.email));
+    const unsubscribe = onSnapshot(notasQuery, (querySnapshot) => {
+      const rows = [];
+      querySnapshot.forEach((doc) => rows.push({ id: doc.id, ...doc.data() }));
+      setNotasSeguimiento(rows);
+    }, (error) => {
+      console.error("Error leyendo notas_seguimiento:", error);
+    });
+    return () => unsubscribe();
+  }, [currentUser?.email, userCanViewAllNotas]);
 
   // Registro de pagos ya liquidados a entrenadores (solo se carga si el usuario
   // tiene permiso de ver la pestaña, para no pedir datos que no va a poder leer).
@@ -328,6 +361,23 @@ export default function CentroManagers() {
   const [groupModal, setGroupModal] = useState(null);
   const [groupCallDate, setGroupCallDate] = useState(new Date().toISOString().split('T')[0]);
   const [groupCallAttendance, setGroupCallAttendance] = useState({}); // { managerId: boolean }
+  // (02/09/2026) Nota de seguimiento OPCIONAL asociada a la llamada grupal que se
+  // está registrando ahora mismo en groupModal — ver handleSaveGroupCall.
+  const [groupCallNota, setGroupCallNota] = useState('');
+  const [groupCallEsQuiebre, setGroupCallEsQuiebre] = useState(false);
+  const [groupCallCategoriaQuiebre, setGroupCallCategoriaQuiebre] = useState('operativo');
+  const [groupCallEstadoQuiebre, setGroupCallEstadoQuiebre] = useState('riesgo_alto');
+
+  // (02/09/2026) Modal de Notas de Seguimiento por persona — se abre desde el botón
+  // 📝 de cada manager en el Directorio. Muestra el historial (notas individuales de
+  // esa persona + notas grupales de su equipo) y permite agregar una nota nueva
+  // (si userCanWriteNota) o responder como CMJ (si userCanReplyNota).
+  const [notaModal, setNotaModal] = useState(null); // manager object, o null si está cerrado
+  const [nuevaNotaTexto, setNuevaNotaTexto] = useState('');
+  const [nuevaNotaEsQuiebre, setNuevaNotaEsQuiebre] = useState(false);
+  const [nuevaNotaCategoria, setNuevaNotaCategoria] = useState('operativo');
+  const [nuevaNotaEstado, setNuevaNotaEstado] = useState('riesgo_alto');
+  const [respuestaTexto, setRespuestaTexto] = useState({}); // { notaId: texto }
 
   // CONTEXTO (28/08/2026): pedido de José — al hacer clic en el badge 🎓 de un
   // entrenador (en la fila del Directorio o en la tarjeta de un Capitán) se debe
@@ -819,6 +869,29 @@ export default function CentroManagers() {
         console.error('No se pudo guardar el historial de llamada grupal:', histErr);
       }
 
+      // (02/09/2026) Nota de seguimiento OPCIONAL de esta llamada grupal — pedido
+      // explícito de José. No bloquea el registro de asistencia si falla.
+      if (groupCallNota.trim()) {
+        try {
+          const equipoKey = `${normalizeSede(groupModal.sede)}_${groupModal.equipo}`;
+          await guardarNotaSeguimiento({
+            tipo: 'grupal',
+            equipoKey,
+            equipo: groupModal.equipo,
+            numEquipo: groupModal.numEquipo || '',
+            sede: normalizeSede(groupModal.sede),
+            nota: groupCallNota.trim(),
+            esQuiebre: groupCallEsQuiebre,
+            categoriaQuiebre: groupCallEsQuiebre ? groupCallCategoriaQuiebre : null,
+            estadoQuiebre: groupCallEsQuiebre ? groupCallEstadoQuiebre : null,
+            fecha: groupCallDate
+          });
+        } catch (notaErr) {
+          console.error('No se pudo guardar la nota de seguimiento grupal:', notaErr);
+          showToast('Asistencia guardada, pero la nota de seguimiento no se pudo guardar', 'error');
+        }
+      }
+
       setManagers(prev => prev.map(m => {
         if (groupCallAttendance.hasOwnProperty(m.id)) {
           return {
@@ -838,9 +911,100 @@ export default function CentroManagers() {
 
       showToast(`Llamada grupal registrada en la nube para el equipo ${groupModal.equipo}`, 'success');
       setGroupModal(null);
+      setGroupCallNota('');
+      setGroupCallEsQuiebre(false);
+      setGroupCallCategoriaQuiebre('operativo');
+      setGroupCallEstadoQuiebre('riesgo_alto');
     } catch (e) {
       console.error(e);
       showToast('Error al registrar llamada grupal en la nube', 'error');
+    }
+  };
+
+  // (02/09/2026) NOTAS DE SEGUIMIENTO — feedback del entrenador de llamadas después
+  // de cada llamada (individual o grupal), pedido explícito de José: "deben de
+  // guardarse en un historial por persona y jamás perderse y usarse para notar
+  // quiebres y adelantarnos a los quiebres". Definición operacional de "quiebre"
+  // confirmada por José (02/09/2026), tomada de la documentación ya existente de
+  // CREAR: desviación/falla que pone en riesgo un estándar, un compromiso, una meta
+  // o la experiencia del participante. categoriaQuiebre usa las 3 categorías ya
+  // documentadas (operativo / equipo / participante); estadoQuiebre usa los 4
+  // estados ya documentados (vencido / bloqueado / requiere_escalamiento /
+  // riesgo_alto) — ninguno de los dos se inventó, ambos vienen de esa definición.
+  // Nunca se sobrescribe (cada nota es un documento nuevo, igual que
+  // llamadas_grupales_historial) y nunca se borra (ver firestore.rules).
+  const guardarNotaSeguimiento = async ({ tipo, managerId, managerNombre, equipoKey, equipo, numEquipo, sede, nota, esQuiebre, categoriaQuiebre, estadoQuiebre, fecha }) => {
+    await addDoc(collection(db, 'notas_seguimiento'), {
+      tipo, // 'individual' | 'grupal'
+      managerId: managerId || null,
+      managerNombre: managerNombre || null,
+      equipoKey: equipoKey || null,
+      equipo: equipo || null,
+      numEquipo: numEquipo || null,
+      sede: sede || null,
+      nota,
+      esQuiebre: !!esQuiebre,
+      categoriaQuiebre: categoriaQuiebre || null, // 'operativo' | 'equipo' | 'participante' | null
+      estadoQuiebre: estadoQuiebre || null, // 'vencido' | 'bloqueado' | 'requiere_escalamiento' | 'riesgo_alto' | null
+      fecha,
+      autorEmail: currentUser?.email || '',
+      autorNombre: currentUser?.name || '',
+      respuestas: [],
+      createdAt: serverTimestamp()
+    });
+  };
+
+  const handleGuardarNotaIndividual = async () => {
+    if (!notaModal || !nuevaNotaTexto.trim()) return;
+    try {
+      const equipoKey = notaModal.equipo ? `${normalizeSede(notaModal.sede)}_${notaModal.equipo}` : null;
+      await guardarNotaSeguimiento({
+        tipo: 'individual',
+        managerId: notaModal.id,
+        managerNombre: notaModal.nombre,
+        equipoKey,
+        equipo: notaModal.equipo || null,
+        numEquipo: notaModal.numEquipo || null,
+        sede: normalizeSede(notaModal.sede),
+        nota: nuevaNotaTexto.trim(),
+        esQuiebre: nuevaNotaEsQuiebre,
+        categoriaQuiebre: nuevaNotaEsQuiebre ? nuevaNotaCategoria : null,
+        estadoQuiebre: nuevaNotaEsQuiebre ? nuevaNotaEstado : null,
+        fecha: new Date().toISOString().split('T')[0]
+      });
+      recordAuditEvent({
+        action: 'CREAR_NOTA_SEGUIMIENTO',
+        user: currentUser?.email || currentUser?.name || 'Usuario',
+        details: `Nota de seguimiento individual creada para ${notaModal.nombre}${nuevaNotaEsQuiebre ? ' (marcada como quiebre)' : ''}`
+      });
+      showToast('Nota de seguimiento guardada', 'success');
+      setNuevaNotaTexto('');
+      setNuevaNotaEsQuiebre(false);
+      setNuevaNotaCategoria('operativo');
+      setNuevaNotaEstado('riesgo_alto');
+    } catch (e) {
+      console.error(e);
+      showToast('Error al guardar la nota de seguimiento', 'error');
+    }
+  };
+
+  const handleResponderNota = async (notaId) => {
+    const texto = (respuestaTexto[notaId] || '').trim();
+    if (!texto) return;
+    try {
+      await updateDoc(doc(db, 'notas_seguimiento', notaId), {
+        respuestas: arrayUnion({
+          autorEmail: currentUser?.email || '',
+          autorNombre: currentUser?.name || '',
+          texto,
+          fecha: new Date().toISOString()
+        })
+      });
+      setRespuestaTexto(prev => ({ ...prev, [notaId]: '' }));
+      showToast('Respuesta guardada', 'success');
+    } catch (e) {
+      console.error(e);
+      showToast('Error al guardar la respuesta (revisa que tengas rol CMJ)', 'error');
     }
   };
 
@@ -1643,6 +1807,15 @@ export default function CentroManagers() {
                         </td>
                         <td style={{ padding: '1rem', textAlign: 'center' }}>
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}>
+                            {(userCanWriteNota || userCanViewAllNotas) && (
+                              <button
+                                onClick={() => setNotaModal(m)}
+                                title="Notas de Seguimiento"
+                                style={{ background: '#fefce8', border: '1px solid #fde047', color: '#854d0e', padding: '0.4rem', borderRadius: '6px', cursor: 'pointer' }}
+                              >
+                                📝
+                              </button>
+                            )}
                             {userCanAdd && (
                               <button
                                 onClick={() => handleOpenEditIndividual(m)}
@@ -3130,13 +3303,157 @@ export default function CentroManagers() {
               })}
             </div>
 
+            {/* (02/09/2026) Nota de seguimiento OPCIONAL de esta llamada grupal — pedido
+                explícito de José: notas grupales que queden en el historial del equipo. */}
+            <div style={{ marginBottom: '1.2rem', padding: '0.8rem', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '8px' }}>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.4rem' }}>
+                📝 Nota de seguimiento del equipo (opcional):
+              </label>
+              <textarea
+                value={groupCallNota}
+                onChange={e => setGroupCallNota(e.target.value)}
+                placeholder="Ej: el equipo llegó atrasado a 3 tareas del gate T-14, capitán sin evidencia..."
+                rows={3}
+                style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.85rem', fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box' }}
+              />
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.5rem', fontSize: '0.8rem', fontWeight: 600, color: '#92400e', cursor: 'pointer' }}>
+                <input type="checkbox" checked={groupCallEsQuiebre} onChange={e => setGroupCallEsQuiebre(e.target.checked)} style={{ width: '16px', height: '16px', accentColor: '#dc2626', cursor: 'pointer' }} />
+                🚨 Marcar como quiebre (incumplimiento de compromiso, meta o estándar)
+              </label>
+              {groupCallEsQuiebre && (
+                <div style={{ display: 'flex', gap: '0.6rem', marginTop: '0.5rem' }}>
+                  <select value={groupCallCategoriaQuiebre} onChange={e => setGroupCallCategoriaQuiebre(e.target.value)} style={{ flex: 1, padding: '0.4rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.8rem' }}>
+                    <option value="operativo">Quiebre operativo</option>
+                    <option value="equipo">Quiebre de equipo</option>
+                    <option value="participante">Quiebre de participante</option>
+                  </select>
+                  <select value={groupCallEstadoQuiebre} onChange={e => setGroupCallEstadoQuiebre(e.target.value)} style={{ flex: 1, padding: '0.4rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.8rem' }}>
+                    <option value="riesgo_alto">Riesgo Alto</option>
+                    <option value="vencido">Vencido</option>
+                    <option value="bloqueado">Bloqueado</option>
+                    <option value="requiere_escalamiento">Requiere Escalamiento</option>
+                  </select>
+                </div>
+              )}
+            </div>
+
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
-              <button onClick={() => setGroupModal(null)} style={{ padding: '0.6rem 1.2rem', borderRadius: '6px', border: `1px solid ${borderLight}`, background: '#fff', color: textDark, fontWeight: 600, cursor: 'pointer' }}>Cancelar</button>
+              <button onClick={() => { setGroupModal(null); setGroupCallNota(''); setGroupCallEsQuiebre(false); }} style={{ padding: '0.6rem 1.2rem', borderRadius: '6px', border: `1px solid ${borderLight}`, background: '#fff', color: textDark, fontWeight: 600, cursor: 'pointer' }}>Cancelar</button>
               <button onClick={handleSaveGroupCall} style={{ padding: '0.6rem 1.4rem', borderRadius: '6px', border: 'none', background: '#10b981', color: '#fff', fontWeight: 700, cursor: 'pointer', boxShadow: '0 2px 4px rgba(16,185,129,0.3)' }}>Guardar Asistencia</button>
             </div>
           </div>
         </div>
       )}
+
+      {/* (02/09/2026) NOTAS DE SEGUIMIENTO por persona — historial de notas
+          individuales de este manager + notas grupales de su equipo, con opción de
+          agregar una nota nueva (entrenador de llamadas) o responder (CMJ). Pedido
+          explícito de José. */}
+      {notaModal && (() => {
+        const equipoKeyManager = notaModal.equipo ? `${normalizeSede(notaModal.sede)}_${notaModal.equipo}` : null;
+        const notasDeEstaPersona = notasSeguimiento
+          .filter(n => (n.tipo === 'individual' && n.managerId === notaModal.id) || (n.tipo === 'grupal' && equipoKeyManager && n.equipoKey === equipoKeyManager))
+          .sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
+        const CATEGORIA_LABEL = { operativo: 'Quiebre operativo', equipo: 'Quiebre de equipo', participante: 'Quiebre de participante' };
+        const ESTADO_LABEL = { riesgo_alto: 'Riesgo Alto', vencido: 'Vencido', bloqueado: 'Bloqueado', requiere_escalamiento: 'Requiere Escalamiento' };
+        return (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(3px)', zIndex: 1200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }} onClick={() => setNotaModal(null)}>
+            <div onClick={e => e.stopPropagation()} style={{ background: bgCard, width: '100%', maxWidth: '560px', maxHeight: '85vh', overflowY: 'auto', borderRadius: '12px', padding: '1.8rem', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.15)', border: `1px solid ${borderLight}`, borderTop: '4px solid #ca8a04' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                <h2 style={{ margin: 0, color: textDark, fontSize: '1.15rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  📝 Notas de Seguimiento — {notaModal.nombre}
+                </h2>
+                <button onClick={() => setNotaModal(null)} title="Cerrar" style={{ background: '#f1f5f9', border: 'none', borderRadius: '6px', padding: '0.3rem', cursor: 'pointer', color: textMuted }}>
+                  <X size={16} />
+                </button>
+              </div>
+              <p style={{ margin: '0 0 1rem 0', fontSize: '0.8rem', color: textMuted }}>
+                {notaModal.equipo || 'Sin equipo'} {notaModal.numEquipo ? `(#${notaModal.numEquipo})` : ''} · {notaModal.sede}
+                {!userCanViewAllNotas && ' · Solo ves las notas que TÚ escribiste'}
+              </p>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem', marginBottom: '1.2rem' }}>
+                {notasDeEstaPersona.length === 0 && (
+                  <p style={{ fontSize: '0.85rem', color: textMuted, fontStyle: 'italic' }}>Todavía no hay notas registradas.</p>
+                )}
+                {notasDeEstaPersona.map(n => (
+                  <div key={n.id} style={{ padding: '0.7rem 0.9rem', borderRadius: '8px', background: n.esQuiebre ? '#fef2f2' : '#f8fafc', border: `1px solid ${n.esQuiebre ? '#fecaca' : borderLight}` }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
+                      <span style={{ fontSize: '0.75rem', fontWeight: 700, color: textDark }}>
+                        {n.tipo === 'grupal' ? `👥 ${n.equipo || 'Equipo'}` : '👤 Individual'} · {n.autorNombre || n.autorEmail}
+                      </span>
+                      <span style={{ fontSize: '0.72rem', color: textMuted }}>{n.fecha}</span>
+                    </div>
+                    {n.esQuiebre && (
+                      <span style={{ display: 'inline-block', marginBottom: '0.3rem', fontSize: '0.68rem', fontWeight: 800, color: '#dc2626', background: '#fee2e2', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>
+                        🚨 {CATEGORIA_LABEL[n.categoriaQuiebre] || 'Quiebre'} — {ESTADO_LABEL[n.estadoQuiebre] || n.estadoQuiebre}
+                      </span>
+                    )}
+                    <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.85rem', color: textDark, whiteSpace: 'pre-wrap' }}>{n.nota}</p>
+
+                    {(n.respuestas || []).map((r, idx) => (
+                      <div key={idx} style={{ marginTop: '0.5rem', marginLeft: '0.8rem', padding: '0.4rem 0.6rem', borderRadius: '6px', background: '#eff6ff', border: '1px solid #bfdbfe' }}>
+                        <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#1d4ed8' }}>💬 {r.autorNombre || r.autorEmail}</div>
+                        <p style={{ margin: '0.1rem 0 0 0', fontSize: '0.8rem', color: textDark, whiteSpace: 'pre-wrap' }}>{r.texto}</p>
+                      </div>
+                    ))}
+
+                    {userCanReplyNota && (
+                      <div style={{ display: 'flex', gap: '0.4rem', marginTop: '0.5rem' }}>
+                        <input
+                          type="text"
+                          value={respuestaTexto[n.id] || ''}
+                          onChange={e => setRespuestaTexto(prev => ({ ...prev, [n.id]: e.target.value }))}
+                          placeholder="Responder como CMJ..."
+                          style={{ flex: 1, padding: '0.4rem 0.6rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.8rem' }}
+                        />
+                        <button onClick={() => handleResponderNota(n.id)} style={{ padding: '0.4rem 0.7rem', borderRadius: '6px', border: 'none', background: '#2563eb', color: '#fff', fontWeight: 700, fontSize: '0.78rem', cursor: 'pointer' }}>Enviar</button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {userCanWriteNota && (
+                <div style={{ padding: '0.8rem', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '8px' }}>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: textDark, marginBottom: '0.4rem' }}>
+                    Agregar nota nueva:
+                  </label>
+                  <textarea
+                    value={nuevaNotaTexto}
+                    onChange={e => setNuevaNotaTexto(e.target.value)}
+                    placeholder="Ej: no confirmó su compromiso de esta semana, sin evidencia..."
+                    rows={3}
+                    style={{ width: '100%', padding: '0.6rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.85rem', fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box' }}
+                  />
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.5rem', fontSize: '0.8rem', fontWeight: 600, color: '#92400e', cursor: 'pointer' }}>
+                    <input type="checkbox" checked={nuevaNotaEsQuiebre} onChange={e => setNuevaNotaEsQuiebre(e.target.checked)} style={{ width: '16px', height: '16px', accentColor: '#dc2626', cursor: 'pointer' }} />
+                    🚨 Marcar como quiebre (incumplimiento de compromiso, meta o estándar)
+                  </label>
+                  {nuevaNotaEsQuiebre && (
+                    <div style={{ display: 'flex', gap: '0.6rem', marginTop: '0.5rem' }}>
+                      <select value={nuevaNotaCategoria} onChange={e => setNuevaNotaCategoria(e.target.value)} style={{ flex: 1, padding: '0.4rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.8rem' }}>
+                        <option value="operativo">Quiebre operativo</option>
+                        <option value="equipo">Quiebre de equipo</option>
+                        <option value="participante">Quiebre de participante</option>
+                      </select>
+                      <select value={nuevaNotaEstado} onChange={e => setNuevaNotaEstado(e.target.value)} style={{ flex: 1, padding: '0.4rem', borderRadius: '6px', border: `1px solid ${borderLight}`, fontSize: '0.8rem' }}>
+                        <option value="riesgo_alto">Riesgo Alto</option>
+                        <option value="vencido">Vencido</option>
+                        <option value="bloqueado">Bloqueado</option>
+                        <option value="requiere_escalamiento">Requiere Escalamiento</option>
+                      </select>
+                    </div>
+                  )}
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.6rem' }}>
+                    <button onClick={handleGuardarNotaIndividual} disabled={!nuevaNotaTexto.trim()} style={{ padding: '0.5rem 1rem', borderRadius: '6px', border: 'none', background: nuevaNotaTexto.trim() ? '#10b981' : '#94a3b8', color: '#fff', fontWeight: 700, fontSize: '0.85rem', cursor: nuevaNotaTexto.trim() ? 'pointer' : 'not-allowed' }}>Guardar Nota</button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* TARJETA DE LA PERSONA (Entrenador) — se abre al hacer clic en cualquier
           badge 🎓 de un entrenador (Directorio, Equipos o Sedes). Pedido de José

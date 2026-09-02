@@ -228,6 +228,55 @@ export const canViewLiquidacionEntrenadores = (currentUser) => {
 };
 
 /**
+ * NOTAS DE SEGUIMIENTO (02/09/2026) — feedback que el entrenador de llamadas deja
+ * después de cada llamada (individual o grupal), pedido explícito de José: "puedan
+ * dejar notas individuales, grupales, por llamadas que deben de guardarse en un
+ * historial por persona y jamás perderse y usarse para notar quiebres y
+ * adelantarnos a los quiebres".
+ *
+ * ¿Puede el usuario actual CREAR una nota? Solo controla si se muestra el botón en
+ * la UI — la restricción real de escritura vive en firestore.rules
+ * (request.resource.data.autorEmail == su propio correo).
+ */
+export const canWriteNotaSeguimiento = (currentUser) => {
+  if (!currentUser) return false;
+  const role = currentUser.appRole || currentUser.role;
+  const roles = currentUser.roles || (role ? [role] : []);
+  return role === 'entrenador' || role === 'entrenador_llamadas' ||
+    roles.includes('entrenador') || roles.includes('entrenador_llamadas') ||
+    DUAL_ROLE_TRAINER_EMAILS.includes((currentUser.email || '').toLowerCase());
+};
+
+/**
+ * ¿Puede el usuario actual VER todas las notas de seguimiento (no solo las que
+ * escribió)? Pedido explícito de José: "quien la escribió y los CMJ y los
+ * gerentes y los directores". Debe coincidir con callerRole() (coord_maestria /
+ * director_maestria) + isGerenteODireccion() en firestore.rules — si esto
+ * cambia, actualizar AMBOS lugares.
+ */
+export const canViewAllNotasSeguimiento = (currentUser) => {
+  if (!currentUser) return false;
+  const role = currentUser.appRole || currentUser.role;
+  const roles = currentUser.roles || (role ? [role] : []);
+  return role === 'coord_maestria' || role === 'director_maestria' ||
+    roles.includes('coord_maestria') || roles.includes('director_maestria') ||
+    isGerenciaRole(role) || roles.some(isGerenciaRole);
+};
+
+/**
+ * ¿Puede el usuario actual RESPONDER a una nota de seguimiento? Pedido explícito
+ * de José: "los CMJ pueden responder a estas notas (opcional)" — solo CMJ, no
+ * toda la gerencia. Debe coincidir con callerRole() en firestore.rules.
+ */
+export const canReplyNotaSeguimiento = (currentUser) => {
+  if (!currentUser) return false;
+  const role = currentUser.appRole || currentUser.role;
+  const roles = currentUser.roles || (role ? [role] : []);
+  return role === 'coord_maestria' || role === 'director_maestria' ||
+    roles.includes('coord_maestria') || roles.includes('director_maestria');
+};
+
+/**
  * Devuelve la lista de roles a los que el usuario actual puede asignar tareas,
  * basado en la jerarquía del organigrama de CREAR PSL.
  * @param {Object} currentUser - Objeto del usuario logueado

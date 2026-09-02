@@ -283,6 +283,24 @@ service cloud.firestore {
       ];
     }
 
+    // (02/09/2026) NOTAS DE SEGUIMIENTO — feedback que el entrenador de llamadas deja
+    // después de cada llamada (individual o grupal), para detectar y anticiparse a
+    // quiebres. Pedido explícito de José: "deben de guardarse en un historial por
+    // persona y jamás perderse" — por eso NO hay "allow delete" (ninguna nota se
+    // puede borrar) y "allow update" solo permite AGREGAR una respuesta del CMJ,
+    // nunca modificar la nota original (diff().affectedKeys().hasOnly(['respuestas'])).
+    // Visibilidad (pedido explícito de José): quien la escribió + CMJ/Dirección de
+    // Maestría (callerRole()) + Gerencia/Dirección (isGerenteODireccion()) + SuperAdmin.
+    // Confirmado explícitamente por José antes de tocar firestore.rules.
+    match /notas_seguimiento/{document} {
+      allow read: if isSuperAdmin() || isGerenteODireccion() || callerRole() ||
+                    (isAuthenticated() && resource.data.autorEmail == email());
+      allow create: if isAuthenticated() && request.resource.data.autorEmail == email();
+      allow update: if (isSuperAdmin() || callerRole()) &&
+                    request.resource.data.diff(resource.data).affectedKeys().hasOnly(['respuestas']);
+      // Sin "allow delete": ninguna nota de seguimiento se puede eliminar (histórico permanente).
+    }
+
     match /excellence_standards/{document} {
       allow read, write: if isAuthenticated();
     }
