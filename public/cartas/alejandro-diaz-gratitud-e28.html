@@ -184,6 +184,24 @@
                         <p class="text-lg"><strong>Tus traslados:</strong> Nuestro equipo te contactará para coordinar tu recojo exacto en el aeropuerto Jorge Chávez.</p>
                         <div class="space-y-4"><div class="flex gap-4 items-start bg-gray-800/30 p-4 rounded-xl border border-gray-700/30"><div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 flex-shrink-0"><i class="fa-solid fa-suitcase"></i></div><div><div class="font-bold text-blue-400 mb-1">Traslado Oficial</div><div class="text-sm text-gray-300">Nuestro equipo te contactará para coordinar tu recojo exacto en el aeropuerto Jorge Chávez.</div></div></div></div>
                         <div class="mt-4 bg-gradient-to-r from-blue-500/10 to-transparent p-4 rounded-xl border border-blue-500/30 flex items-center gap-3"><i class="fa-solid fa-car text-blue-400 text-xl"></i><div><p class="text-blue-400 font-bold text-sm">Coordinación con Conductor</p><p class="text-xs text-gray-400">El conductor asignado te escribirá por WhatsApp 1 hora antes de tu arribo/salida para darte la placa del auto y coordinar el punto de encuentro exacto.</p></div></div>
+                        
+                        <!-- Tarjeta Oficial de Recojo para Retorno al Aeropuerto -->
+                        <div class="bg-gradient-to-r from-amber-500/15 via-amber-500/5 to-transparent p-5 rounded-2xl border-2 border-amber-500/50 shadow-[0_0_25px_rgba(245,158,11,0.2)]">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-amber-500/20 text-crear-accent flex items-center justify-center text-2xl flex-shrink-0">
+                                    <i class="fa-solid fa-bell-concierge"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex flex-wrap items-center gap-2 mb-1">
+                                        <span class="text-xs uppercase font-extrabold tracking-widest text-crear-accent bg-amber-500/20 px-2.5 py-0.5 rounded-full border border-amber-500/30">Horario de Retorno Confirmado</span>
+                                    </div>
+                                    <h4 class="text-white font-black text-lg">Recojo en Lobby del Hotel: <span class="text-crear-accent">08:15 AM</span></h4>
+                                    <p class="text-sm text-gray-300 mt-1"><strong>Fecha:</strong> Lunes 07 de Septiembre de 2026</p>
+                                    <p class="text-xs text-gray-400 mt-1">Calculado con rigor a <strong>3.5 horas de antelación</strong> a tu vuelo Avianca AV50 (11:45 AM) para garantizar margen óptimo de traslado y filtros en el Aeropuerto Jorge Chávez.</p>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="bg-gradient-to-r from-blue-900/20 to-transparent p-5 rounded-xl border-l-4 border-blue-500 mt-6">
                             <h4 class="font-black text-white mb-2 flex items-center gap-2"><i class="fa-solid fa-hotel text-blue-400"></i> Hotel y Salón: Hotel Jose Antonio Deluxe (Miraflores)</h4>
                             <p class="text-sm text-gray-300">Calle Bellavista 133, Miraflores, Lima, Perú</p>
@@ -230,6 +248,26 @@
                         <div class="mt-5"><a href="https://wa.me/51919563284?text=Hola%20Jos%C3%A9%2C%20confirmo%20mis%20datos%20bancarios%20para%20honorarios%20de%20Alejandro%20D%C3%ADaz%20E28." target="_blank" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-green-500/10 border border-green-500/30 text-green-400 text-xs font-bold hover:bg-green-500/20 transition-colors"><i class="fa-brands fa-whatsapp text-green-400 text-base"></i> Enviar datos bancarios por WhatsApp</a></div>
                     </div>
                 </div>
+                
+                <!-- Espacio Oficial del Fin de Semana (Google Chat) -->
+                <div class="glass p-6 rounded-2xl border border-emerald-500/40 bg-emerald-500/10 mb-8 flex flex-col md:flex-row items-center justify-between gap-4 reveal">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-2xl flex-shrink-0 shadow-inner">
+                            <i class="fa-solid fa-comments"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="text-white font-bold text-lg">Espacio Oficial del Fin de Semana (Google Chat)</h3>
+                                <span class="px-2 py-0.5 rounded text-[10px] bg-emerald-500/30 text-emerald-300 font-bold uppercase tracking-wider">Sala Lima</span>
+                            </div>
+                            <p class="text-xs text-gray-300 mt-1">Únete a este espacio oficial en Google Chat durante el evento para toda la coordinación en sala y soporte en tiempo real.</p>
+                        </div>
+                    </div>
+                    <a href="https://chat.google.com/room/AAQAj8M5Q-8?cls=7" target="_blank" class="px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold rounded-xl text-xs flex items-center gap-2 transition-all hover:scale-105 shadow-[0_0_20px_rgba(16,185,129,0.4)] whitespace-nowrap uppercase tracking-wider">
+                        <i class="fa-brands fa-google"></i> Unirse al Chat del FDS <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+
                 <!-- 6. Escuadrón -->
                 <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-pink-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(236,72,153,0.15)] hover:-translate-y-1">
                     <div class="flex items-center gap-4 mb-6">
@@ -343,7 +381,7 @@
                 });
             }
             var flightTimestamp = new Date("2026-09-04T01:50:00.000Z").getTime();
-            var trainingTimestamp = new Date("2026-09-16T23:00:00.000Z").getTime();
+            var trainingTimestamp = new Date("2026-09-04T23:00:00.000Z").getTime();
             var timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
             var indicator = document.getElementById("timezone-indicator");
             if(indicator) indicator.innerText = "Mostrando cuenta regresiva detectando tu zona local: " + timeZone;
