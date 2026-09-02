@@ -329,6 +329,102 @@ export default function ManualGuia() {
                 </div>
               ))}
             </div>
+
+            <h3 style={{ margin: '2rem 0 0.35rem 0', color: '#22c55e', fontSize: '1.15rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <TrendingUp size={20} color="#22c55e" /> 4. Ecuacion de Valor — Reduccion de Esfuerzo y Sacrificio
+            </h3>
+            <p style={{ margin: '0 0 1rem 0', fontSize: '0.78rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+              Aporte de Direccion — integrado 02/09/2026, confirmado por Jose Sanchez. No proviene de un manual auditado.
+            </p>
+            <p style={{ margin: '0 0 1.1rem 0', lineHeight: '1.75', color: 'var(--text-main)', fontSize: '0.92rem' }}>
+              La reduccion del esfuerzo y el sacrificio es el motor principal para elevar drasticamente el valor de cualquier propuesta, entrenamiento u operacion.
+              En los modelos de alto rendimiento, este factor actua como un multiplicador en el denominador de la Ecuacion de Valor:
+            </p>
+            <div style={{ padding: '1rem 1.4rem', background: 'var(--bg-card)', borderRadius: '10px', border: '1px solid var(--border-subtle)', marginBottom: '1.1rem', textAlign: 'center', fontWeight: 800, color: '#22c55e', fontSize: '0.92rem' }}>
+              Valor = (Resultado Anhelado x Probabilidad de Logro) / (Retraso Temporal x Esfuerzo y Sacrificio)
+            </div>
+            <p style={{ margin: '0 0 1.1rem 0', lineHeight: '1.75', color: 'var(--text-main)', fontSize: '0.92rem' }}>
+              Si se logra reducir el esfuerzo y el sacrificio percibidos (o reales) a cero, el valor de la oferta o del proceso se eleva de manera exponencial.
+              Para lograrlo se aplican 6 estrategias operativas y ontologicas:
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+              <InfoCard color="#22c55e" title="1. Esfuerzo vs. Sacrificio">
+                Esfuerzo: acciones nuevas que la persona debe empezar a hacer y no desea (despertarse temprano, llamadas complejas, entrenamientos demandantes). Sacrificio: habitos que debe dejar y si desea seguir haciendo (comida no saludable, zona de confort). Ambos son "costos colaterales" que restan valor percibido.
+              </InfoCard>
+              <InfoCard color="#22c55e" title="2. Soluciones Hechas para Ti (DFY)">
+                Transicionar de "hazlo tu mismo" a soluciones asistidas: un experto o sistema absorbe la mayor parte del trabajo fisico y cognitivo. Por eso la industria de suplementos (esfuerzo minimo) supera a la de gimnasios tradicionales (meses de sudor y dieta).
+              </InfoCard>
+              <InfoCard color="#22c55e" title="3. Obstaculo a Herramienta + Stack de Valor">
+                Mapear cada obstaculo, miedo o friccion del participante; convertirlo en una herramienta especifica (plantillas, guias, acompanamiento de un sombra o manager); agrupar esas soluciones en un Stack de Valor que neutralice la resistencia cognitiva y el riesgo percibido.
+              </InfoCard>
+              <InfoCard color="#22c55e" title="4. Apalancamiento Uno a Muchos">
+                Enfocarse en actividades de alta palanca da retornos extraordinarios sin duplicar tiempo de trabajo. Software, sistemas estandarizados o metodologias repetibles piden un esfuerzo de diseno inicial alto pero reducen a cero el esfuerzo marginal de entrega futura.
+              </InfoCard>
+              <InfoCard color="#22c55e" title="5. Basura Cero (friccion operativa)">
+                Auditar periodicamente los procesos internos para suprimir pasos duplicados, reportes redundantes o reuniones sin valor real. No confundir con el estandar de "basura cero" del salon (limpieza fisica) — aqui se trata de burocracia y friccion social. Reducir la densidad jerarquica libera capacidad intelectual del equipo hacia la innovacion.
+              </InfoCard>
+              <InfoCard color="#22c55e" title="6. Poder vs. Fuerza">
+                La Fuerza genera resistencia y confrontacion, requiere empuje manual constante y desemboca en agotamiento. El Poder es fluir con eficacia y proposito: crear un contexto tan claro e impecable que los resultados extraordinarios ocurran como consecuencia natural, sin coaccion ni manipulacion.
+              </InfoCard>
+            </div>
+
+            <h3 style={{ margin: '0 0 0.35rem 0', color: '#ef4444', fontSize: '1.15rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Activity size={20} color="#ef4444" /> 5. Gestion del Burnout — Escudo Individual y de Equipo
+            </h3>
+            <p style={{ margin: '0 0 1rem 0', fontSize: '0.78rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
+              Aporte de Direccion — integrado 02/09/2026, confirmado por Jose Sanchez. No proviene de un manual auditado.
+            </p>
+            <p style={{ margin: '0 0 1.1rem 0', lineHeight: '1.75', color: 'var(--text-main)', fontSize: '0.92rem' }}>
+              El burnout es un colapso biologico del sistema (activacion cronica del eje HPA: hipotalamo-hipofisario-suprarrenal), no un problema de "actitud" o "falta de motivacion".
+              El estres constante mantiene la amigdala en panico ininterrumpido, inunda el cuerpo de cortisol y apaga fisicamente la corteza prefrontal (el centro de logica y toma de decisiones) —
+              por eso "pensar en positivo" mientras se esta quemado es biologicamente inutil.
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+              <InfoCard color="#ef4444" title="Por Sobreesfuerzo">
+                Asumir demasiados compromisos y responsabilidades por la incapacidad de decir "no".
+              </InfoCard>
+              <InfoCard color="#ef4444" title="Por Depleccion / Drenaje">
+                Falta de descansos profundos y tiempo de recuperacion activa; la bateria biologica esta vacia.
+              </InfoCard>
+              <InfoCard color="#ef4444" title="Por Desalineacion">
+                Invertir una enorme cantidad de energia en actividades sin gozo, significado o coherencia con los valores reales de la persona.
+              </InfoCard>
+            </div>
+
+            <h4 style={{ margin: '0 0 0.75rem 0', color: 'var(--text-heading)', fontSize: '1rem' }}>Escudo Individual — protocolo tactico</h4>
+            <div style={{ display: 'grid', gap: '0.75rem', marginBottom: '1.75rem' }}>
+              {[
+                { t: 'La Poda Estrategica y "Hell Yeah or No!"', d: 'Ante cualquier solicitud, proyecto o reunion: si no genera un "claro que si" rotundo, la respuesta es un NO definitivo. Portafolio de Dos Listas: Lista A = metas reales a largo plazo, Lista B = compromisos actuales — eliminar o delegar de la Lista B todo lo que no alimente la Lista A. El No Elegante (guion): "Jefe, he notado que mi trabajo de mayor valor requiere concentracion total. Voy a bloquear de 9:00 a 11:00 am para trabajo profundo, en modo avion, disponible para urgencias inmediatamente despues."' },
+                { t: 'El Buffer del 50% (Amortiguador de Agenda)', d: 'Nunca planificar el calendario al 100% de la capacidad. Si una tarea toma logicamente 1 hora, bloquear 1.5 horas — ese colchon absorbe los imprevistos y elimina la urgencia constante del cerebro primitivo.' },
+                { t: 'Desequilibrio Corto y el Arte de "Alquilarse"', d: 'El equilibrio perfecto es una quimera; lo que se necesita es dominar el contrapeso. Se puede inclinar la balanza hacia un proyecto exigente, pero hay que regresar rapido al centro (mas de 11 horas diarias de forma habitual aumenta dolencias cardiacas y el colapso sistemico). Al entrar al entorno laboral, "alquilarse": entregar manos, conocimientos y cabeza, pero no la identidad ni el corazon.' },
+                { t: 'Desconexion Activa', d: 'El descanso real no es saltar de la pantalla de la oficina a la del telefono (satura las mismas vias) ni el doomscrolling. Requiere cambio de modalidad: naturaleza, privacion sensorial, ejercicio suave (libera BDNF) o ayuno de dopamina barata — programado de forma innegociable en el calendario.' },
+                { t: 'Reset Bioquimico — Respiracion Vagal (4-7-8)', d: 'Inhalar 4 segundos, retener 7, exhalar por la boca 8; repetir 4 veces. Alargar la exhalacion estimula el nervio vago y desactiva la alarma de la amigdala, encendiendo la corteza prefrontal en menos de 2 minutos.' },
+              ].map(item => (
+                <div key={item.t} style={{ padding: '0.9rem 1.1rem', background: 'var(--bg-card)', borderRadius: '10px', border: '1px solid var(--border-subtle)' }}>
+                  <strong style={{ color: '#ef4444', fontSize: '0.88rem', display: 'block', marginBottom: '0.25rem' }}>{item.t}</strong>
+                  <p style={{ margin: 0, fontSize: '0.83rem', color: 'var(--text-muted)', lineHeight: '1.55' }}>{item.d}</p>
+                </div>
+              ))}
+            </div>
+
+            <h4 style={{ margin: '0 0 0.5rem 0', color: 'var(--text-heading)', fontSize: '1rem' }}>Escudo de Equipo — diseno de sistemas antifragiles</h4>
+            <p style={{ margin: '0 0 0.75rem 0', fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.6' }}>
+              Cuando un equipo entra en burnout, la responsabilidad es del sistema del lider, no de la gente — un equipo quemado es sintoma de mala priorizacion, microgestion y falta de proposito.
+            </p>
+            <div style={{ display: 'grid', gap: '0.75rem' }}>
+              {[
+                { t: 'Priorizar y Ejecutar (Jocko Willink)', d: 'El burnout grupal ocurre cuando el lider hace que el equipo ataque diez problemas a la vez y falla en todos. Ante crisis o sobrecarga: paso atras, evaluacion objetiva y una sola prioridad comunicada con claridad. 100% de los recursos en esa prioridad; al resolverla, repriorizar y repetir — sin fijacion de objetivo en asuntos secundarios.' },
+                { t: 'Rocas Trimestrales (Gino Wickman)', d: 'Dividir el ano en bloques de 90 dias ("Mundo de 90 Dias"). Rocas del trimestre: 3 a 7 para el equipo directivo, 1 a 3 para el resto del staff. Una vez pactadas, el lider levanta una "pared protectora": nadie tira ideas nuevas por encima de esa barda para saturar al equipo — se archivan para el siguiente trimestre.' },
+                { t: 'ROWE — Eliminar la Microgestion', d: 'Entorno basado exclusivamente en resultados: Autonomia sobre el tiempo, Pertenencia con el equipo y Confianza absoluta de los lideres. Al delegar, el "Commander\'s Intent" define con claridad el Que (estado final y proposito) y deja libre el Como — el equipo gana autonomia y deja de saturar la bandeja de entrada del lider.' },
+                { t: 'Motivacion 3.0 (Daniel Pink)', d: 'FedEx Days: 24 horas de autonomia total para que el equipo trabaje en lo que desee, con la unica condicion de entregar un prototipo o idea innovadora al dia siguiente. Recompensas "Now-That": eliminar bonos condicionales y fomentar reconocimiento instantaneo entre pares (peer-to-peer), sin autorizacion jerarquica.' },
+                { t: 'Conversaciones de Carrera (Kim Scott)', d: 'Tres conversaciones sistematicas con cada directivo: Life Story (historia de vida y motivacion intrinseca), Dreams (como se ve el pico de su carrera, sin limitarse al puesto actual) y 18-Month Plan (alinear tareas cotidianas con las habilidades que necesita para llegar a esos suenos).' },
+              ].map(item => (
+                <div key={item.t} style={{ padding: '0.9rem 1.1rem', background: 'var(--bg-card)', borderRadius: '10px', border: '1px solid var(--border-subtle)' }}>
+                  <strong style={{ color: '#a855f7', fontSize: '0.88rem', display: 'block', marginBottom: '0.25rem' }}>{item.t}</strong>
+                  <p style={{ margin: 0, fontSize: '0.83rem', color: 'var(--text-muted)', lineHeight: '1.55' }}>{item.d}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}

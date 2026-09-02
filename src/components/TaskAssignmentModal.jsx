@@ -3,7 +3,7 @@ import { Target, X, Zap, Calendar, Clock } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useChecklist } from '../context/ChecklistContext';
 import { getAssignableRoles } from '../config/permissions';
-import { usersData, normalizeRole, OPERATIONAL_SEDES, getRoleDisplayName } from '../data/usersData';
+import { usersData, normalizeRole, normalizeSede, OPERATIONAL_SEDES, getRoleDisplayName } from '../data/usersData';
 import { recordAuditEvent } from '../services/auditService';
 
 export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = null, taskToEdit = null }) {
@@ -274,6 +274,12 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                     <option value="">Cualquiera en este Rol (No específico)</option>
                     {usersData
                       .filter(u => normalizeRole(u.role) === newTask.role || u.role === newTask.role)
+                      // (02/09/2026) FIX: este filtro solo miraba el rol e ignoraba
+                      // "Sede Específica" por completo — seleccionar Lima seguía
+                      // mostrando colaboradores de todas las sedes. Ahora, si hay
+                      // una sede elegida, solo se listan los de esa sede (con
+                      // "Cualquier Sede / Global" no se filtra, se ve el rol completo).
+                      .filter(u => !newTask.assignedSede || normalizeSede(u.sede) === newTask.assignedSede)
                       .map(u => (
                         <option key={u.email} value={u.email}>{u.name} ({u.email})</option>
                       ))

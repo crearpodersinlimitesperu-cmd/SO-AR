@@ -699,7 +699,39 @@ export default function CentroManagers() {
     const noAsistieron = trainerManagers.filter(m => m.llamadaAsistio === 'NO').length;
     const conLlamada = asistieron + noAsistieron;
     const pctAsist = conLlamada > 0 ? Math.round((asistieron / conLlamada) * 100) : 0;
-    return { entrenador: trainerName, total, activos, graduados, desertores, equipos, sedes, asistieron, noAsistieron, conLlamada, pctAsist };
+    // (02/09/2026) Se agrega el listado completo (no solo el conteo) para poder
+    // mostrar en la tarjeta 🎓 el registro de llamadas individuales de cada
+    // manager de este entrenador — pedido explícito de José.
+    return { entrenador: trainerName, total, activos, graduados, desertores, equipos, sedes, asistieron, noAsistieron, conLlamada, pctAsist, managersList: trainerManagers };
+  };
+
+  // (02/09/2026) Editar una llamada GRUPAL ya registrada (fecha o cuántos
+  // asistieron) desde la tarjeta 🎓 del entrenador — pedido explícito de José:
+  // "que cuando ponen una nueva llamada individual o grupal se vea en la ficha
+  // y se pueda editar también". Restringido a quien ya puede administrar
+  // managers_directory/llamadas_grupales_historial (ver firestore.rules:
+  // canManageManagers() / isGerenteODireccion()) — un entrenador puede
+  // REGISTRAR una llamada grupal nueva, pero no reescribir una ya existente
+  // (esa cuenta alimenta el pago de $400 de Liquidación).
+  const [editingLlamadaGrupal, setEditingLlamadaGrupal] = useState(null); // { id, fecha, asistieron }
+  const handleGuardarEdicionLlamadaGrupal = async () => {
+    if (!editingLlamadaGrupal) return;
+    try {
+      await updateDoc(doc(db, 'llamadas_grupales_historial', editingLlamadaGrupal.id), {
+        fecha: editingLlamadaGrupal.fecha,
+        asistieron: Number(editingLlamadaGrupal.asistieron) || 0
+      });
+      recordAuditEvent({
+        action: 'EDITAR_LLAMADA_GRUPAL_HISTORIAL',
+        user: currentUser?.email || currentUser?.name || 'Usuario',
+        details: `Llamada grupal ${editingLlamadaGrupal.id} editada: fecha=${editingLlamadaGrupal.fecha}, asistieron=${editingLlamadaGrupal.asistieron}`
+      });
+      showToast('Llamada grupal actualizada', 'success');
+      setEditingLlamadaGrupal(null);
+    } catch (e) {
+      console.error(e);
+      showToast('Error al editar (revisa que tengas permiso de gerencia/CMJ)', 'error');
+    }
   };
 
   const stats = useMemo(() => {
@@ -797,13 +829,34 @@ export default function CentroManagers() {
     try {
       const targetManager = managers.find(m => m.id === id) || { id };
       const docRef = doc(db, 'managers_directory', id.toString());
-      await setDoc(docRef, { ...targetManager, llamadaFecha: fecha, llamadaAsistio: asistio }, { merge: true });
-      
+      // (02/09/2026) FIX: antes se escribía el manager completo con
+      // setDoc({...targetManager, llamadaFecha, llamadaAsistio}, {merge:true}).
+      // "managers" es una MEZCLA de INITIAL_MANAGERS (catálogo estático) +
+      // Firestore + valores normalizados (normalizeTrainer/Coordinator/Sede),
+      // así que casi siempre trae campos que no existen o no coinciden
+      // exactamente con el documento real en Firestore. Eso hacía que
+      // request.resource.data.diff(resource.data).affectedKeys() incluyera
+      // MUCHOS más campos que llamadaFecha/llamadaAsistio, violando el
+      // hasOnly(['llamadaFecha','llamadaAsistio']) de firestore.rules para
+      // cualquiera que no sea SuperAdmin/Gerencia/Coordinación de Maestría —
+      // es decir, fallaba (permission-denied) para entrenadores y
+      // entrenadores de llamadas, que son justo quienes deben poder guardar
+      // esto. Ahora se actualizan SOLO esos dos campos.
+      try {
+        await updateDoc(docRef, { llamadaFecha: fecha, llamadaAsistio: asistio });
+      } catch (updateErr) {
+        if (updateErr?.code === 'not-found') {
+          showToast('Este manager aún no tiene documento propio en la nube (solo está en el catálogo local). Pide a Gerencia/Coordinación de Maestría que lo sincronice primero.', 'error');
+          return;
+        }
+        throw updateErr;
+      }
+
       // La actualización de managers en tiempo real ya se maneja por onSnapshot, pero por optimización optimista lo mantenemos aquí
       setManagers(prev => prev.map(m => m.id === id ? { ...m, llamadaFecha: fecha, llamadaAsistio: asistio } : m));
-      
+
       const managerName = targetManager ? targetManager.nombre : id;
-      
+
       recordAuditEvent({
         action: 'ACTUALIZAR_LLAMADA_MANAGER',
         email: currentUser?.email || 'admin@crearpsl.net',
@@ -835,14 +888,19 @@ export default function CentroManagers() {
       groupModal.managers.forEach(m => {
         if (groupCallAttendance.hasOwnProperty(m.id)) {
           const docRef = doc(db, 'managers_directory', m.id.toString());
-          batch.set(docRef, {
-            ...m,
+          // (02/09/2026) FIX: mismo problema que handleUpdateLlamada — escribir
+          // el manager completo ({...m, ...}) con merge:true hace que el diff
+          // contra firestore.rules incluya campos fuera de
+          // hasOnly(['llamadaFecha','llamadaAsistio']) y falla para
+          // entrenadores/entrenadores de llamadas. batch.update() solo toca
+          // esos dos campos.
+          batch.update(docRef, {
             llamadaFecha: groupCallDate,
             llamadaAsistio: groupCallAttendance[m.id] ? 'SI' : 'NO'
-          }, { merge: true });
+          });
         }
       });
-      
+
       await batch.commit();
 
       // (02/09/2026) Historial de llamadas grupales — se AGREGA un registro nuevo por
@@ -3521,6 +3579,67 @@ export default function CentroManagers() {
                       </div>
                     </div>
                   )}
+
+                  {/* (02/09/2026) Últimas llamadas INDIVIDUALES por manager — editable con
+                      los mismos controles fecha + SÍ/NO que ya existen en el Directorio.
+                      Pedido explícito de José. */}
+                  <div style={{ marginBottom: '1rem' }}>
+                    <span style={{ fontSize: '0.78rem', color: textMuted, fontWeight: 600 }}>📞 Últimas llamadas individuales:</span>
+                    <div style={{ maxHeight: '160px', overflowY: 'auto', marginTop: '0.4rem', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                      {tc.managersList.map(m => (
+                        <div key={m.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.4rem', padding: '0.4rem 0.5rem', background: '#f8fafc', borderRadius: '6px', border: `1px solid ${borderLight}` }}>
+                          <span style={{ fontSize: '0.78rem', color: textDark, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.nombre}</span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', flexShrink: 0 }}>
+                            <input type="date" value={m.llamadaFecha || ''} onChange={e => handleUpdateLlamada(m.id, e.target.value, m.llamadaAsistio || 'SI')} style={{ padding: '0.2rem', borderRadius: '4px', border: `1px solid ${borderLight}`, fontSize: '0.7rem', width: '110px' }} />
+                            <button onClick={() => handleUpdateLlamada(m.id, m.llamadaFecha || new Date().toISOString().split('T')[0], 'SI')} style={{ padding: '0.2rem 0.4rem', borderRadius: '4px', border: '1px solid #10b981', background: m.llamadaAsistio === 'SI' ? '#10b981' : '#fff', color: m.llamadaAsistio === 'SI' ? '#fff' : '#10b981', fontWeight: 700, fontSize: '0.68rem', cursor: 'pointer' }}>SÍ</button>
+                            <button onClick={() => handleUpdateLlamada(m.id, m.llamadaFecha || new Date().toISOString().split('T')[0], 'NO')} style={{ padding: '0.2rem 0.4rem', borderRadius: '4px', border: '1px solid #ef4444', background: m.llamadaAsistio === 'NO' ? '#ef4444' : '#fff', color: m.llamadaAsistio === 'NO' ? '#fff' : '#ef4444', fontWeight: 700, fontSize: '0.68rem', cursor: 'pointer' }}>NO</button>
+                          </div>
+                        </div>
+                      ))}
+                      {tc.managersList.length === 0 && <p style={{ fontSize: '0.75rem', color: textMuted, fontStyle: 'italic' }}>Sin managers registrados.</p>}
+                    </div>
+                  </div>
+
+                  {/* (02/09/2026) Llamadas GRUPALES registradas por este entrenador — solo
+                      lectura para todos; editable (fecha / cuántos asistieron) solo para
+                      quien ya administra managers_directory (CMJ/gerencia/dirección),
+                      igual que exige firestore.rules — esta cuenta alimenta Liquidación. */}
+                  {(() => {
+                    const llamadasDeEsteEntrenador = llamadasHistorial
+                      .filter(l => isTrainerMatch(l.entrenador, trainerCardModal))
+                      .sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
+                    if (llamadasDeEsteEntrenador.length === 0) return null;
+                    return (
+                      <div style={{ marginBottom: '1rem' }}>
+                        <span style={{ fontSize: '0.78rem', color: textMuted, fontWeight: 600 }}>👥 Llamadas grupales registradas ({llamadasDeEsteEntrenador.length}):</span>
+                        <div style={{ maxHeight: '180px', overflowY: 'auto', marginTop: '0.4rem', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                          {llamadasDeEsteEntrenador.map(l => (
+                            <div key={l.id} style={{ padding: '0.4rem 0.5rem', background: '#fafaf9', borderRadius: '6px', border: `1px solid ${borderLight}` }}>
+                              {editingLlamadaGrupal?.id === l.id ? (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                                  <input type="date" value={editingLlamadaGrupal.fecha} onChange={e => setEditingLlamadaGrupal({ ...editingLlamadaGrupal, fecha: e.target.value })} style={{ padding: '0.2rem', borderRadius: '4px', border: `1px solid ${borderLight}`, fontSize: '0.7rem' }} />
+                                  <input type="number" min="0" value={editingLlamadaGrupal.asistieron} onChange={e => setEditingLlamadaGrupal({ ...editingLlamadaGrupal, asistieron: e.target.value })} style={{ width: '55px', padding: '0.2rem', borderRadius: '4px', border: `1px solid ${borderLight}`, fontSize: '0.7rem' }} />
+                                  <button onClick={handleGuardarEdicionLlamadaGrupal} style={{ padding: '0.2rem 0.4rem', borderRadius: '4px', border: 'none', background: '#10b981', color: '#fff', fontWeight: 700, fontSize: '0.68rem', cursor: 'pointer' }}>Guardar</button>
+                                  <button onClick={() => setEditingLlamadaGrupal(null)} style={{ padding: '0.2rem 0.4rem', borderRadius: '4px', border: `1px solid ${borderLight}`, background: '#fff', fontSize: '0.68rem', cursor: 'pointer' }}>Cancelar</button>
+                                </div>
+                              ) : (
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.4rem' }}>
+                                  <span style={{ fontSize: '0.75rem', color: textDark }}>
+                                    {l.fecha} · {l.equipo} · {l.asistieron}/{l.totalIntegrantes}
+                                  </span>
+                                  {userCanViewAllNotas && (
+                                    <button onClick={() => setEditingLlamadaGrupal({ id: l.id, fecha: l.fecha || '', asistieron: l.asistieron ?? 0 })} title="Editar esta llamada grupal" style={{ background: 'none', border: 'none', color: '#7c3aed', cursor: 'pointer', padding: '0.1rem' }}>
+                                      <Edit3 size={13} />
+                                    </button>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </>
               ) : (
                 <p style={{ fontSize: '0.85rem', color: textMuted, margin: '0.5rem 0 1rem 0' }}>

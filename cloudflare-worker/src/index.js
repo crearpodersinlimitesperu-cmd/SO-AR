@@ -50,6 +50,24 @@ const ROLES_GERENCIA = [
   'director_maestria', 'socio', 'consolidado'
 ];
 
+// (02/09/2026) Debe mantenerse IGUAL que SUPER_ADMIN_EMAILS en
+// src/config/permissions.js — no se sincronizan solas, así que si cambia la
+// lista de Super Admins hay que actualizar AMBOS lugares. Se agregó aquí
+// porque el frontend (SuperAdminPanel.jsx / AuthContext.jsx) calcula
+// currentUser.isSuperAdmin por EMAIL contra esa lista, pero este Worker
+// verificaba SOLO el campo userData.isSuperAdmin leído de Firestore
+// (users/{uid}) — un campo que nunca se escribió ahí para José/Armando/Paul.
+// Resultado: el botón "Extraer Nodus" se mostraba (frontend) pero el
+// endpoint /trigger-nodus-scraper siempre rechazaba con "disponible solo
+// para Super Admin" (backend), incluso para los 3 Super Admins reales. Se
+// agrega la verificación por email para igualar el criterio, sin ampliar el
+// acceso a nadie que no estuviera ya en la lista.
+const SUPER_ADMIN_EMAILS_WORKER = [
+  'jose.sanchez@crearpsl.net',
+  'armando.pilacuan@gmail.com',
+  'paul.sosa@crearpsl.net'
+];
+
 function corsHeaders(origin) {
   return {
     'Access-Control-Allow-Origin': origin,
@@ -165,9 +183,12 @@ function esGerencia(userData) {
 
 // Mismo criterio que ya usaba el botón "Extraer Nodus" en el cliente
 // (SuperAdminPanel.jsx: currentUser?.isSuperAdmin) — no se amplía el acceso,
-// solo se verifica también en el servidor.
-function esSuperAdmin(userData) {
-  return !!userData.isSuperAdmin;
+// solo se verifica también en el servidor. Ese criterio del cliente es por
+// EMAIL (isSuperAdminEmail en src/config/permissions.js), no por un campo de
+// Firestore — por eso aquí se aceptan ambos: el campo userData.isSuperAdmin
+// (si algún día se empieza a escribir) O el email en SUPER_ADMIN_EMAILS_WORKER.
+function esSuperAdmin(userData, email) {
+  return !!userData.isSuperAdmin || SUPER_ADMIN_EMAILS_WORKER.includes(String(email || '').toLowerCase().trim());
 }
 
 function esCoordinador(userData) {
@@ -412,10 +433,11 @@ async function handleTriggerNodusScraper(request, env, origin) {
     return json({ error: 'unauthenticated', message: 'Falta el token de sesión.' }, 401, origin);
   }
 
-  let uid;
+  let uid, tokenEmail;
   try {
     const payload = await verifyFirebaseToken(idToken);
     uid = payload.sub;
+    tokenEmail = payload.email;
   } catch (err) {
     console.error('[triggerNodusScraper] Token inválido:', err);
     return json({ error: 'unauthenticated', message: 'Sesión inválida o expirada.' }, 401, origin);
@@ -434,7 +456,7 @@ async function handleTriggerNodusScraper(request, env, origin) {
     return json({ error: 'permission-denied', message: 'Tu usuario no está registrado en el sistema.' }, 403, origin);
   }
 
-  if (!esSuperAdmin(userData)) {
+  if (!esSuperAdmin(userData, tokenEmail)) {
     return json({ error: 'permission-denied', message: 'Disparar la extracción de Nodus está disponible solo para Super Admin.' }, 403, origin);
   }
 

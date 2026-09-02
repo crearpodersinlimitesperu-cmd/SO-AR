@@ -422,6 +422,11 @@ function AuditLogView() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterAction, setFilterAction] = useState('TODAS');
+  // (02/09/2026) Ordenamiento por columna, pedido explícito de José: por
+  // defecto se ve el último ingreso primero (más reciente arriba), y cada
+  // columna se puede ordenar haciendo clic en su encabezado.
+  const [sortField, setSortField] = useState('timestamp');
+  const [sortDirection, setSortDirection] = useState('desc');
 
   const fetchLogs = async () => {
     setLoading(true);
@@ -444,6 +449,52 @@ function AuditLogView() {
     if (filterAction === 'TODAS') return true;
     return log.action === filterAction;
   });
+
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDirection(prev => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortField(field);
+      // Fecha empieza en descendente (más reciente primero); el resto de
+      // columnas empieza en ascendente (A-Z), que es lo que se espera al
+      // ordenar texto por primera vez.
+      setSortDirection(field === 'timestamp' ? 'desc' : 'asc');
+    }
+  };
+
+  const getSortValue = (log, field) => {
+    switch (field) {
+      case 'timestamp': {
+        const t = new Date(log.timestamp);
+        return isNaN(t.getTime()) ? 0 : t.getTime();
+      }
+      case 'usuario':
+        return `${log.name || ''} ${log.email || ''}`.toLowerCase();
+      case 'rol':
+        return (ROLE_LABELS[log.role] || log.role || '').toLowerCase();
+      case 'accion':
+        return (log.action || '').toLowerCase();
+      case 'detalle':
+        return (log.details || '').toLowerCase();
+      case 'ubicacion':
+        return `${log.sede || ''} ${log.location || ''} ${log.ip || ''}`.toLowerCase();
+      case 'dispositivo':
+        return (log.userAgent || '').toLowerCase();
+      default:
+        return '';
+    }
+  };
+
+  const sortedLogs = [...filteredLogs].sort((a, b) => {
+    const va = getSortValue(a, sortField);
+    const vb = getSortValue(b, sortField);
+    if (va < vb) return sortDirection === 'asc' ? -1 : 1;
+    if (va > vb) return sortDirection === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  const thSortStyle = { padding: '0.8rem', color: 'var(--crear-cyan)', cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap' };
+  const sortArrow = (field) => (sortField === field ? (sortDirection === 'asc' ? ' ▲' : ' ▼') : '');
 
   return (
     <div className="glass-panel" style={{ padding: '2rem' }}>
@@ -505,17 +556,17 @@ function AuditLogView() {
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border-subtle)', background: 'rgba(255,255,255,0.02)' }}>
-                <th style={{ padding: '0.8rem', color: 'var(--crear-cyan)' }}>Fecha y Hora</th>
-                <th style={{ padding: '0.8rem', color: 'var(--crear-cyan)' }}>Usuario</th>
-                <th style={{ padding: '0.8rem', color: 'var(--crear-cyan)' }}>Rol</th>
-                <th style={{ padding: '0.8rem', color: 'var(--crear-cyan)' }}>Acción</th>
-                <th style={{ padding: '0.8rem', color: 'var(--crear-cyan)' }}>Detalle</th>
-                <th style={{ padding: '0.8rem', color: 'var(--crear-cyan)' }}>Ubicación e IP</th>
-                <th style={{ padding: '0.8rem', color: 'var(--crear-cyan)' }}>Dispositivo</th>
+                <th onClick={() => handleSort('timestamp')} style={thSortStyle} title="Ordenar por fecha y hora">Fecha y Hora{sortArrow('timestamp')}</th>
+                <th onClick={() => handleSort('usuario')} style={thSortStyle} title="Ordenar por usuario">Usuario{sortArrow('usuario')}</th>
+                <th onClick={() => handleSort('rol')} style={thSortStyle} title="Ordenar por rol">Rol{sortArrow('rol')}</th>
+                <th onClick={() => handleSort('accion')} style={thSortStyle} title="Ordenar por acción">Acción{sortArrow('accion')}</th>
+                <th onClick={() => handleSort('detalle')} style={thSortStyle} title="Ordenar por detalle">Detalle{sortArrow('detalle')}</th>
+                <th onClick={() => handleSort('ubicacion')} style={thSortStyle} title="Ordenar por ubicación">Ubicación e IP{sortArrow('ubicacion')}</th>
+                <th onClick={() => handleSort('dispositivo')} style={thSortStyle} title="Ordenar por dispositivo">Dispositivo{sortArrow('dispositivo')}</th>
               </tr>
             </thead>
             <tbody>
-              {filteredLogs.map(log => {
+              {sortedLogs.map(log => {
                 let dateStr = 'Desconocida';
                 try {
                   if (log.timestamp?.toDate) {
