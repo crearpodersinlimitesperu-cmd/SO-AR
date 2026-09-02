@@ -3,16 +3,17 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
-import { 
-  canAddManagers, 
-  canAssignTrainer, 
-  canChangeManagerStatus, 
-  canViewAllManagers, 
+import {
+  canAddManagers,
+  canAssignTrainer,
+  canChangeManagerStatus,
+  canViewAllManagers,
   canViewSede,
   isDireccionRole,
   isGlobalQTCoordinator,
   hasQTPrivileges,
-  DUAL_ROLE_TRAINER_EMAILS
+  DUAL_ROLE_TRAINER_EMAILS,
+  canViewLiquidacionEntrenadores
 } from '../config/permissions';
 import { 
   INITIAL_MANAGERS, 
@@ -26,7 +27,7 @@ import {
 import { OPERATIONAL_SEDES, normalizeRole, normalizeSede } from '../data/usersData';
 import { recordAuditEvent } from '../services/auditService';
 import { db } from '../services/firebase';
-import { collection, getDocs, doc, setDoc, updateDoc, deleteDoc, writeBatch, onSnapshot } from 'firebase/firestore';
+import { collection, getDocs, doc, addDoc, setDoc, updateDoc, deleteDoc, writeBatch, onSnapshot, serverTimestamp } from 'firebase/firestore';
 import CountryFlag from '../components/CountryFlag';
 import { 
   Users, PhoneCall, CheckCircle, XCircle, Calendar, Plus, PlusCircle,
@@ -116,6 +117,8 @@ export default function CentroManagers() {
   const canChangeStatus = canChangeManagerStatus(currentUser);
   const userCanAdd = canAddManagers(currentUser);
   const userCanAssign = canAssignTrainer(currentUser);
+  // Pestaña de Liquidación de Entrenadores: solo José Sánchez y Elizabeth Escobar (02/09/2026)
+  const canViewLiquidacion = canViewLiquidacionEntrenadores(currentUser);
   
   // Dual Role Toggle para QT y Corporativos que también son entrenadores
   const userRole = currentUser?.appRole || currentUser?.role;
@@ -180,6 +183,36 @@ export default function CentroManagers() {
 
     return () => unsubscribe();
   }, []);
+
+  // (02/09/2026) Historial de llamadas grupales — cada llamada registrada queda como
+  // un documento nuevo (nunca se sobrescribe), para poder contar cuántas lleva cada
+  // equipo. Es la base de la pestaña de Liquidación de Entrenadores.
+  const [llamadasHistorial, setLlamadasHistorial] = useState([]);
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, 'llamadas_grupales_historial'), (querySnapshot) => {
+      const rows = [];
+      querySnapshot.forEach((doc) => rows.push({ id: doc.id, ...doc.data() }));
+      setLlamadasHistorial(rows);
+    }, (error) => {
+      console.error("Error leyendo llamadas_grupales_historial:", error);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // Registro de pagos ya liquidados a entrenadores (solo se carga si el usuario
+  // tiene permiso de ver la pestaña, para no pedir datos que no va a poder leer).
+  const [liquidacionesPagos, setLiquidacionesPagos] = useState({});
+  useEffect(() => {
+    if (!canViewLiquidacion) return;
+    const unsubscribe = onSnapshot(collection(db, 'liquidaciones_pagos'), (querySnapshot) => {
+      const map = {};
+      querySnapshot.forEach((doc) => { map[doc.id] = { id: doc.id, ...doc.data() }; });
+      setLiquidacionesPagos(map);
+    }, (error) => {
+      console.error("Error leyendo liquidaciones_pagos:", error);
+    });
+    return () => unsubscribe();
+  }, [canViewLiquidacion]);
 
   const [llamadosDataState, setLlamadosDataState] = useState(() => {
     try {
@@ -761,7 +794,31 @@ export default function CentroManagers() {
       });
       
       await batch.commit();
-      
+
+      // (02/09/2026) Historial de llamadas grupales — se AGREGA un registro nuevo por
+      // cada llamada (nunca sobrescribe), para poder contar cuántas lleva cada equipo.
+      // Es la base de la pestaña de Liquidación de Entrenadores ($400 al llegar a 7).
+      // Si esto falla, no bloquea el registro de asistencia (que ya se guardó arriba).
+      try {
+        const equipoKey = `${normalizeSede(groupModal.sede)}_${groupModal.equipo}`;
+        const asistieronCount = Object.values(groupCallAttendance).filter(Boolean).length;
+        await addDoc(collection(db, 'llamadas_grupales_historial'), {
+          equipoKey,
+          equipo: groupModal.equipo,
+          numEquipo: groupModal.numEquipo || '',
+          sede: normalizeSede(groupModal.sede),
+          entrenador: groupModal.entrenadorUnico || '',
+          fecha: groupCallDate,
+          totalIntegrantes: groupModal.managers.length,
+          asistieron: asistieronCount,
+          registradoPorEmail: currentUser?.email || '',
+          registradoPorNombre: currentUser?.name || '',
+          createdAt: serverTimestamp()
+        });
+      } catch (histErr) {
+        console.error('No se pudo guardar el historial de llamada grupal:', histErr);
+      }
+
       setManagers(prev => prev.map(m => {
         if (groupCallAttendance.hasOwnProperty(m.id)) {
           return {
@@ -772,7 +829,7 @@ export default function CentroManagers() {
         }
         return m;
       }));
-      
+
       recordAuditEvent({
         action: 'ACTUALIZAR_LLAMADA_GRUPAL',
         user: currentUser?.email || currentUser?.name || 'Usuario',
@@ -784,6 +841,94 @@ export default function CentroManagers() {
     } catch (e) {
       console.error(e);
       showToast('Error al registrar llamada grupal en la nube', 'error');
+    }
+  };
+
+  // (02/09/2026) LIQUIDACIÓN DE ENTRENADORES — $400 USD por equipo, pago ÚNICO al
+  // llegar a 7 llamadas grupales registradas en llamadas_grupales_historial.
+  // Pedido explícito de José: "esta info solo la debo de ver yo y Elizabeth Escobar".
+  // NOTA: si un equipo tiene varios entrenadores asignados, por ahora se muestra el
+  // nombre combinado y se paga el monto completo una sola vez (no se divide) — José
+  // confirmó que casi siempre es un solo entrenador por equipo y no priorizó resolver
+  // el reparto todavía.
+  const liquidacionData = useMemo(() => {
+    if (!canViewLiquidacion) return { pendientes: [], pagados: [] };
+
+    const porEquipo = {};
+    llamadasHistorial.forEach(r => {
+      if (!r.equipoKey) return;
+      if (!porEquipo[r.equipoKey]) porEquipo[r.equipoKey] = [];
+      porEquipo[r.equipoKey].push(r);
+    });
+
+    const pendientes = [];
+    const pagados = [];
+
+    Object.entries(porEquipo).forEach(([equipoKey, registros]) => {
+      const count = registros.length;
+      if (count < 7) return; // Todavía no llega a la meta de 7 llamadas
+
+      const sorted = [...registros].sort((a, b) => (a.fecha || '').localeCompare(b.fecha || ''));
+      const septimo = sorted[6]; // La llamada #7 (índice 6) es la que dispara el pago
+      const ultimo = sorted[sorted.length - 1];
+      const pago = liquidacionesPagos[equipoKey];
+
+      const item = {
+        equipoKey,
+        equipo: ultimo.equipo,
+        numEquipo: ultimo.numEquipo,
+        sede: ultimo.sede,
+        entrenador: ultimo.entrenador || 'Sin Asignar',
+        totalLlamadas: count,
+        fechaAlcanzo7: septimo?.fecha || '',
+        montoUSD: 400
+      };
+
+      if (pago && pago.estado === 'pagado') {
+        pagados.push({ ...item, pagadoPorNombre: pago.pagadoPorNombre, pagadoPorEmail: pago.pagadoPorEmail, fechaPago: pago.fechaPago });
+      } else {
+        pendientes.push(item);
+      }
+    });
+
+    pendientes.sort((a, b) => (a.fechaAlcanzo7 || '').localeCompare(b.fechaAlcanzo7 || ''));
+    pagados.sort((a, b) => (b.fechaPago || '').localeCompare(a.fechaPago || ''));
+
+    return { pendientes, pagados };
+  }, [llamadasHistorial, liquidacionesPagos, canViewLiquidacion]);
+
+  const handleMarcarPagado = async (item) => {
+    if (!canViewLiquidacion) return;
+    try {
+      await setDoc(doc(db, 'liquidaciones_pagos', item.equipoKey), {
+        equipoKey: item.equipoKey,
+        equipo: item.equipo,
+        numEquipo: item.numEquipo || '',
+        sede: item.sede,
+        entrenador: item.entrenador,
+        montoUSD: item.montoUSD,
+        llamadasAlPagar: item.totalLlamadas,
+        fechaAlcanzo7: item.fechaAlcanzo7,
+        estado: 'pagado',
+        pagadoPorEmail: currentUser?.email || '',
+        pagadoPorNombre: currentUser?.name || '',
+        fechaPago: new Date().toISOString().split('T')[0],
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+
+      recordAuditEvent({
+        action: 'LIQUIDACION_ENTRENADOR_PAGADA',
+        email: currentUser?.email || '',
+        name: currentUser?.name || '',
+        role: currentUser?.appRole || '',
+        sede: item.sede,
+        details: `Liquidación marcada como pagada: ${item.equipo} (${item.sede}) - Entrenador: ${item.entrenador} - $${item.montoUSD} USD`
+      });
+
+      showToast(`Marcado como pagado: ${item.equipo}`, 'success');
+    } catch (e) {
+      console.error(e);
+      showToast('Error al marcar como pagado', 'error');
     }
   };
 
@@ -1245,6 +1390,9 @@ export default function CentroManagers() {
             ...(canViewAll ? [
               { id: 'dashboard', icon: Award, label: 'Sedes' },
               { id: 'entrenadores', icon: UserCheck, label: 'Entrenadores' }
+            ] : []),
+            ...(canViewLiquidacion ? [
+              { id: 'liquidacion', icon: DollarSign, label: `Liquidación (${liquidacionData.pendientes.length})` }
             ] : [])
           ].map(t => (
             <button key={t.id} onClick={() => setActiveTab(t.id)} style={{
@@ -2039,6 +2187,96 @@ export default function CentroManagers() {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* LIQUIDACIÓN DE ENTRENADORES (02/09/2026) — solo José Sánchez y Elizabeth Escobar */}
+        {activeTab === 'liquidacion' && canViewLiquidacion && (
+          <div style={{ background: bgCard, borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', border: `1px solid ${borderLight}`, padding: '1.5rem' }}>
+            <div style={{ marginBottom: '1.5rem' }}>
+              <h2 style={{ margin: 0, fontSize: '1.2rem', color: textDark }}>💰 Liquidación de Entrenadores</h2>
+              <p style={{ margin: '0.3rem 0 0', fontSize: '0.85rem', color: textMuted }}>
+                $400 USD por equipo, pago único al llegar a 7 llamadas grupales registradas.
+                Acceso restringido a José Sánchez y Elizabeth Escobar.
+              </p>
+            </div>
+
+            <h3 style={{ fontSize: '1rem', color: textDark, marginBottom: '0.75rem' }}>
+              Pendientes de pago ({liquidacionData.pendientes.length})
+            </h3>
+            {liquidacionData.pendientes.length === 0 ? (
+              <p style={{ color: textMuted, fontSize: '0.9rem' }}>No hay equipos pendientes de liquidar por ahora.</p>
+            ) : (
+              <div style={{ overflowX: 'auto', marginBottom: '2rem' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                  <thead>
+                    <tr style={{ borderBottom: `2px solid ${borderLight}`, textAlign: 'left' }}>
+                      <th style={{ padding: '0.6rem' }}>Equipo</th>
+                      <th style={{ padding: '0.6rem' }}>Sede</th>
+                      <th style={{ padding: '0.6rem' }}>Entrenador</th>
+                      <th style={{ padding: '0.6rem' }}>Llamadas</th>
+                      <th style={{ padding: '0.6rem' }}>Llegó a 7 el</th>
+                      <th style={{ padding: '0.6rem' }}>Monto</th>
+                      <th style={{ padding: '0.6rem' }}></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {liquidacionData.pendientes.map(item => (
+                      <tr key={item.equipoKey} style={{ borderBottom: `1px solid ${borderLight}` }}>
+                        <td style={{ padding: '0.6rem', fontWeight: 600 }}>{item.equipo} {item.numEquipo ? `(#${item.numEquipo})` : ''}</td>
+                        <td style={{ padding: '0.6rem' }}><CountryFlag sede={item.sede} /> {item.sede}</td>
+                        <td style={{ padding: '0.6rem' }}>{item.entrenador}</td>
+                        <td style={{ padding: '0.6rem' }}>{item.totalLlamadas}</td>
+                        <td style={{ padding: '0.6rem' }}>{item.fechaAlcanzo7 || '—'}</td>
+                        <td style={{ padding: '0.6rem', fontWeight: 700, color: '#059669' }}>${item.montoUSD}</td>
+                        <td style={{ padding: '0.6rem' }}>
+                          <button
+                            onClick={() => handleMarcarPagado(item)}
+                            style={{ padding: '0.4rem 0.8rem', borderRadius: '6px', border: 'none', background: '#10b981', color: '#fff', fontWeight: 700, cursor: 'pointer', fontSize: '0.8rem' }}
+                          >
+                            Marcar como pagado
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            <h3 style={{ fontSize: '1rem', color: textDark, marginBottom: '0.75rem' }}>
+              Historial de pagos ({liquidacionData.pagados.length})
+            </h3>
+            {liquidacionData.pagados.length === 0 ? (
+              <p style={{ color: textMuted, fontSize: '0.9rem' }}>Todavía no se ha marcado ningún pago.</p>
+            ) : (
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                  <thead>
+                    <tr style={{ borderBottom: `2px solid ${borderLight}`, textAlign: 'left' }}>
+                      <th style={{ padding: '0.6rem' }}>Equipo</th>
+                      <th style={{ padding: '0.6rem' }}>Sede</th>
+                      <th style={{ padding: '0.6rem' }}>Entrenador</th>
+                      <th style={{ padding: '0.6rem' }}>Monto</th>
+                      <th style={{ padding: '0.6rem' }}>Pagado el</th>
+                      <th style={{ padding: '0.6rem' }}>Pagado por</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {liquidacionData.pagados.map(item => (
+                      <tr key={item.equipoKey} style={{ borderBottom: `1px solid ${borderLight}` }}>
+                        <td style={{ padding: '0.6rem', fontWeight: 600 }}>{item.equipo} {item.numEquipo ? `(#${item.numEquipo})` : ''}</td>
+                        <td style={{ padding: '0.6rem' }}>{item.sede}</td>
+                        <td style={{ padding: '0.6rem' }}>{item.entrenador}</td>
+                        <td style={{ padding: '0.6rem', fontWeight: 700, color: '#059669' }}>${item.montoUSD}</td>
+                        <td style={{ padding: '0.6rem' }}>{item.fechaPago || '—'}</td>
+                        <td style={{ padding: '0.6rem' }}>{item.pagadoPorNombre || item.pagadoPorEmail || '—'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         )}
 

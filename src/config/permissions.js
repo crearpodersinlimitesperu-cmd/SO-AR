@@ -210,6 +210,24 @@ export const DUAL_ROLE_TRAINER_EMAILS = [
 ];
 
 /**
+ * Emails autorizados a ver la pestaña "Liquidación de Entrenadores" (pago de $400
+ * por equipo al llegar a 7 llamadas grupales registradas).
+ * REGLA ESTRICTA (pedido explícito de José, 02/09/2026):
+ * "esta info solo la debo de ver yo y Elizabeth Escobar" — únicamente estos dos
+ * correos, sin excepción automática para otros SuperAdmin ni Dirección.
+ */
+export const LIQUIDACION_ENTRENADORES_EMAILS = [
+  'jose.sanchez@crearpsl.net',        // José Sánchez
+  'contabilidad.global@crearpsl.net', // Elizabeth Escobar (CFO)
+];
+
+export const canViewLiquidacionEntrenadores = (currentUser) => {
+  if (!currentUser) return false;
+  const email = (currentUser.email || '').trim().toLowerCase();
+  return LIQUIDACION_ENTRENADORES_EMAILS.includes(email);
+};
+
+/**
  * Devuelve la lista de roles a los que el usuario actual puede asignar tareas,
  * basado en la jerarquía del organigrama de CREAR PSL.
  * @param {Object} currentUser - Objeto del usuario logueado

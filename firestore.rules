@@ -22,12 +22,18 @@ rules_version = '2';
 //     ciclos y reportes fallando en silencio para roles no-superadmin).
 //
 // Qu├® NO cambia (a prop├│sito, para no romper nada que no revis├® a fondo):
-//  Las colecciones staff_directory, managers_directory, excellence_standards,
+//  Las colecciones staff_directory, excellence_standards,
 //  kpi_reports, learning_logs, qt_directory, success_patterns, sync_history y
 //  user_stats se dejan EXACTAMENTE como est├ín hoy (cualquier autenticado lee y
 //  escribe) porque no alcanc├® a auditar el detalle de cada una y prefiero no
 //  inventar una restricci├│n que bloquee algo que no vi. Quedan marcadas abajo
 //  con un TODO para una siguiente pasada.
+//
+// ACTUALIZACIÓN 02/09/2026 (confirmada explícitamente por José): managers_directory
+// SALIÓ de la lista de arriba — ya no se deja abierta a cualquier autenticado. Ver
+// canManageManagers() y el match /managers_directory/ más abajo para el detalle.
+// Se agregaron además llamadas_grupales_historial y liquidaciones_pagos (pestaña de
+// Liquidación de Entrenadores), esta última restringida solo a José y Elizabeth.
 //
 // Lista de gerencia/direcci├│n (funci├│n isGerenteODireccion): se extrajo del
 // ├║ltimo snapshot de src/data/usersToImport.js en GitHub (anterior a la
@@ -126,6 +132,19 @@ service cloud.firestore {
       return isAuthenticated() &&
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role
         in ['coord_maestria', 'director_maestria'];
+    }
+
+    // (02/09/2026) MANAGERS_DIRECTORY: mismo patrón que callerRole() (users/{uid}.data.role)
+    // para permitir que Coordinación/Dirección de Maestría gestionen el directorio de
+    // managers sin abrir la escritura a cualquier autenticado. Antes de este cambio,
+    // "allow read, write: if isAuthenticated()" permitía a CUALQUIER usuario logueado
+    // (incluyendo los entrenadores de correo personal agregados el 02/09/2026) crear,
+    // borrar o modificar cualquier campo de cualquier manager. Confirmado explícitamente
+    // por José antes de tocar firestore.rules.
+    function canManageManagers() {
+      return isAuthenticated() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role
+        in ['coord_maestria', 'director_maestria', 'coordinador_mj'];
     }
 
     // MJ_CALENDARS (29/08/2026): calendarios de Maestría del Juego por equipo
@@ -233,9 +252,37 @@ service cloud.firestore {
     match /staff_directory/{document} {
       allow read, write: if isAuthenticated();
     }
+
+    // (02/09/2026) Ya NO forma parte del bloque "TODO" de arriba — se restringió
+    // explícitamente el 02/09/2026 (confirmado por José). Ver canManageManagers().
     match /managers_directory/{document} {
-      allow read, write: if isAuthenticated();
+      allow read: if isAuthenticated();
+      allow create, delete: if isSuperAdmin() || isGerenteODireccion() || canManageManagers();
+      allow update: if isSuperAdmin() || isGerenteODireccion() || canManageManagers() ||
+                    (isAuthenticated() &&
+                     request.resource.data.diff(resource.data).affectedKeys()
+                       .hasOnly(['llamadaFecha', 'llamadaAsistio']));
     }
+
+    // (02/09/2026) Historial de llamadas grupales (nunca se sobrescribe, cada llamada
+    // es un documento nuevo) — base de la pestaña de Liquidación de Entrenadores.
+    match /llamadas_grupales_historial/{document} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated(); // cualquier entrenador registra su propia llamada, igual que hoy
+      allow update, delete: if isSuperAdmin() || isGerenteODireccion() || canManageManagers();
+    }
+
+    // (02/09/2026) Liquidación de Entrenadores ($400 por equipo al llegar a 7 llamadas).
+    // REGLA ESTRICTA (pedido explícito de José): "esta info solo la debo de ver yo y
+    // Elizabeth Escobar" — debe coincidir con LIQUIDACION_ENTRENADORES_EMAILS en
+    // src/config/permissions.js; si cambia esa lista hay que actualizar AMBOS lugares.
+    match /liquidaciones_pagos/{document} {
+      allow read, write: if isAuthenticated() && email() in [
+        'jose.sanchez@crearpsl.net',
+        'contabilidad.global@crearpsl.net'
+      ];
+    }
+
     match /excellence_standards/{document} {
       allow read, write: if isAuthenticated();
     }

@@ -69,7 +69,12 @@ export const normalizeSede = (sede) => {
   if (s === 'LIM' || s.toLowerCase().includes('lima')) return 'Lima';
   if (s === 'CUE' || s.toLowerCase().includes('cuenca')) return 'Cuenca';
   if (s === 'GYE' || s.toLowerCase().includes('guayaquil')) return 'Guayaquil';
-  if (s === 'MEX' || s.toLowerCase().includes('mex') || s.toLowerCase().includes('méxico')) return 'México';
+  // (02/09/2026) "CDMX" no contiene la subcadena "mex", así que antes de este fix
+  // normalizeSede("CDMX") devolvía "CDMX" sin normalizar — distinto de "México" (el
+  // valor real del filtro de sede en Centro de Managers) y por eso el filtro
+  // "México" mostraba 0 resultados aunque sí había managers con sede "CDMX".
+  // Reportado por José con captura real del bug.
+  if (s === 'MEX' || s.toUpperCase() === 'CDMX' || s.toLowerCase().includes('mex') || s.toLowerCase().includes('méxico') || s.toLowerCase().includes('cdmx')) return 'México';
   if (s === 'UIO-C1' || s === 'UIO-C2' || s === 'UIO' ||
       s.toLowerCase().includes('ciclo 1') || s.toLowerCase().includes('ciclo1') ||
       s.toLowerCase().includes('ciclo 2') || s.toLowerCase().includes('ciclo2') ||

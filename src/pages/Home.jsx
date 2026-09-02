@@ -885,7 +885,13 @@ export default function Home() {
             </button>
           )}
 
-          {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+          {/* (02/09/2026) Antes este botón mostraba "Directorio QT" también a coordinador_mj,
+              coord_maestria, entrenador y entrenador_llamadas — roles que la ruta real
+              /directorio-qt (App.jsx, RoleRoute allowedRoles) SIEMPRE rechazó, así que para
+              ellos era un botón que llevaba a un "ACCESO DENEGADO". Se corrigió para usar la
+              misma lista DIRECTORIO_QT_ROLES ya definida arriba (línea ~78), que sí coincide
+              con la ruta. Reportado por José: un entrenador (Julio César Narváez) lo veía. */}
+          {DIRECTORIO_QT_ROLES.includes(currentUser?.appRole) && (
             <button onClick={() => navigate('/directorio-qt')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: 'white', border: 'none' }}>
               ⚡ Directorio QT
             </button>

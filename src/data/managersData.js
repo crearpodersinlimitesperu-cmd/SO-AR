@@ -10735,7 +10735,9 @@ export const normalizeTrainer = (name) => {
   "Jesús Adrián Acosta": "Jesus Adrian Acosta",
   "Erika Gavilnez": "Erika Gissell Gavilanez Gallardo",
   "Erika Gavilanez": "Erika Gissell Gavilanez Gallardo",
+  "Erika Gavilánez": "Erika Gissell Gavilanez Gallardo",
   "Érika Gavilánez": "Erika Gissell Gavilanez Gallardo",
+  "Erika Gissell Gavilanez Gallardo": "Erika Gissell Gavilanez Gallardo",
   "Jos Snchez": "Jose Luis Sanchez Moreno",
   "José Sánchez": "Jose Luis Sanchez Moreno",
   "Jose Sanchez": "Jose Luis Sanchez Moreno",
@@ -10752,8 +10754,10 @@ export const normalizeTrainer = (name) => {
   "Kerly Carrillo Garzon": "Kerly Carrillo Garzon",
   "Lourdes Patio": "María De Lourdes Patiño Galarraga",
   "Lourdes Patino": "María De Lourdes Patiño Galarraga",
+  "Lourdes Patiño": "María De Lourdes Patiño Galarraga",
   "Maria de Lourdes Patino Galarraga": "María De Lourdes Patiño Galarraga",
   "María de Lourdes Patiño": "María De Lourdes Patiño Galarraga",
+  "María De Lourdes Patiño Galarraga": "María De Lourdes Patiño Galarraga",
   "Maurcio Ramirez": "Mauricio Ramirez Silva",
   "Mauricio Ramrez": "Mauricio Ramirez Silva",
   "Mauricio Ramirez": "Mauricio Ramirez Silva",
@@ -10793,7 +10797,24 @@ export const normalizeTrainer = (name) => {
   "Edison Paul Sosa": "Paul Sosa",
   "Paul Sosa": "Paul Sosa"
 };
-  return map[clean] || clean;
+  if (map[clean]) return map[clean];
+
+  // (02/09/2026) Fallback insensible a mayúsculas/acentos/espacios — antes de esto,
+  // normalizeTrainer solo hacía match EXACTO de string contra el mapa de arriba, así
+  // que cualquier variante de mayúsculas/acentos que no estuviera enumerada a mano
+  // (ej. "DANIELA MONROY" en vez de "Daniela Monroy", "Erika Gavilánez" con una
+  // combinación de acentos distinta a las ya listadas) se trataba como un
+  // entrenador DIFERENTE y aparecía duplicado en las tarjetas de equipo (reportado
+  // por José con varios ejemplos reales: Erika, Lourdes Patiño, Daniela Monroy).
+  // Este fallback compara la entrada contra cada clave del mapa ya normalizada
+  // (sin acentos, en minúsculas, espacios colapsados), sin tener que seguir
+  // enumerando cada combinación posible a mano.
+  const foldKey = (s) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+  const foldedClean = foldKey(clean);
+  for (const key in map) {
+    if (foldKey(key) === foldedClean) return map[key];
+  }
+  return clean;
 };
 
 export const normalizeCoordinator = (name) => {
