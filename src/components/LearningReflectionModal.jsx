@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Sparkles } from 'lucide-react';
 import { LearningService } from '../services/LearningService';
 import { useAuth } from '../context/AuthContext';
@@ -17,6 +17,21 @@ export default function LearningReflectionModal({ isOpen, onClose, task, onCompl
     difficulty: 3
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  useEffect(() => {
+    if (isOpen) {
+      setStep(1);
+      setReflection({
+        whatWorked: '',
+        whatFailed: '',
+        insights: '',
+        recommendation: '',
+        timeSpent: '',
+        difficulty: 3
+      });
+      setIsSubmitting(false);
+    }
+  }, [isOpen]);
+
 
   if (!isOpen || !task) return null;
 

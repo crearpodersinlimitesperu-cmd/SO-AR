@@ -120,7 +120,7 @@ export const ROLE_DISPLAY_NAMES = {
   coordinador_mj: 'Coordinador Maestría del Juego (MJ)',
   gerente: 'Gerente de Sede',
   capitan: 'Capitán de Sede',
-  qt: 'Coordinador QT Global / QT',
+  qt: 'Quantum Team (QT)',
   director_maestria: 'Director Maestría del Juego (MJ)',
   manager: 'Manager',
   cfo: 'CFO (Chief Financial Officer)',

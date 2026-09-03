@@ -443,7 +443,7 @@ const MODULE_REGISTRY = [
   { id: 'estrategia', label: 'Estrategia OKRs (Cascade)', emoji: '🎯', route: '/estrategia', roles: EXEC_ROLES },
   { id: 'auditoria-kpis', label: 'Auditoría de KPIs', emoji: '📉', route: '/auditoria-kpis', roles: EXEC_ROLES },
   { id: 'acuerdos', label: 'Acuerdos Oficiales (Correo)', emoji: '✉️', route: '/acuerdos', roles: null },
-  { id: 'calendario-equipo', label: 'Agenda y Time Boxing', emoji: '🗓️', route: '/calendario-equipo', roles: null },
+  { id: 'calendario-equipo', label: 'Agenda y Time Boxing', emoji: '🗓️', route: '/calendario-equipo', roles: EXEC_ROLES },
   { id: 'learning', label: 'Inteligencia Colectiva (Learning)', emoji: '🧠', route: '/learning', roles: null },
   { id: 'excelencia', label: 'Excelencia Operativa', emoji: '👑', route: '/excelencia', roles: null },
   { id: 'mis-kpis', label: 'Mis KPIs', emoji: '📊', route: '/mis-kpis', roles: KPI_ROLES },
@@ -1216,7 +1216,7 @@ export default function Home() {
             >
               🎯 Mis Metas
             </button>
-            {(currentUser?.isSuperAdmin || currentUser?.appRole === 'gerente' || currentUser?.isDireccion || currentUser?.appRole === 'director_maestria') && (
+            {(currentUser?.isSuperAdmin || currentUser?.appRole === 'gerente' || currentUser?.isDireccion || currentUser?.appRole === 'director_maestria' || ['coordinador', 'coord_c1', 'coord_c2', 'coordinador_c1c2'].includes(currentUser?.appRole)) && (
               <button onClick={() => navigate('/generador-flyer')} className="btn-secondary" title="Generador de Flyers Oficiales para Capítulos Uno" style={{ padding: '0.45rem 0.9rem', fontSize: '0.85rem', color: '#f59e0b', borderColor: 'rgba(245, 158, 11, 0.5)', background: 'rgba(245, 158, 11, 0.12)', fontWeight: 'bold' }}>
                 🎨 Flyers C1 Globales
               </button>
@@ -1272,9 +1272,11 @@ export default function Home() {
                 <button onClick={() => { setShowToolsDropdown(false); navigate('/acuerdos'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#a855f7', background: 'rgba(168, 85, 247, 0.1)' }}>
                   ✉️ Acuerdos Oficiales (Correo)
                 </button>
+                {(currentUser?.isSuperAdmin || currentUser?.appRole === 'gerente' || currentUser?.isDireccion || currentUser?.appRole === 'director_maestria' || ['coordinador', 'coord_c1', 'coord_c2', 'coordinador_c1c2'].includes(currentUser?.appRole)) && (
                 <button onClick={() => { setShowToolsDropdown(false); navigate('/calendario-equipo'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#f97316', background: 'rgba(249, 115, 22, 0.1)' }}>
                   🗓️ Agenda y Time Boxing
                 </button>
+              )}
 
                 <button onClick={() => { setShowToolsDropdown(false); navigate('/learning'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(41, 171, 226, 0.1)', color: 'var(--crear-cyan)' }}>
                   🧠 Inteligencia Colectiva (Learning)
@@ -1458,7 +1460,7 @@ export default function Home() {
             </button>
           )}
 
-          {(currentUser?.isSuperAdmin || currentUser?.appRole === 'gerente' || currentUser?.isDireccion || currentUser?.appRole === 'director_maestria') && (
+          {(currentUser?.isSuperAdmin || currentUser?.appRole === 'gerente' || currentUser?.isDireccion || currentUser?.appRole === 'director_maestria' || ['coordinador', 'coord_c1', 'coord_c2', 'coordinador_c1c2'].includes(currentUser?.appRole)) && (
             <button onClick={() => navigate('/generador-flyer')} className="btn-primary" title="Generador de Flyers Oficiales para Capítulos Uno" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #ec4899)', color: 'white', fontWeight: 'bold', border: 'none', boxShadow: '0 0 15px rgba(245, 158, 11, 0.4)' }}>
               🎨 Flyers C1 Globales
             </button>
@@ -1701,7 +1703,7 @@ export default function Home() {
                     >
                       {['entrenador', 'entrenador_llamadas'].includes(currentUser?.appRole) ? 'MIS FECHAS' : 'MI SEDE'}
                     </button>
-                    {(!['entrenador', 'entrenador_llamadas'].includes(currentUser?.appRole) && (currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.isGerente || ['gerente', 'direccion', 'director_maestria', 'qt', 'cfo'].includes(currentUser?.appRole) || currentUser?.sede?.toLowerCase().includes('global'))) && (
+                    {(!['entrenador', 'entrenador_llamadas'].includes(currentUser?.appRole) && (currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.isGerente || ['gerente', 'direccion', 'director_maestria', 'cfo'].includes(currentUser?.appRole) || currentUser?.sede?.toLowerCase().includes('global'))) && (
                       <button 
                         onClick={() => setActiveEventTab('globales')}
                         style={{ background: 'none', border: 'none', color: activeEventTab === 'globales' ? 'var(--crear-gold)' : 'var(--text-muted)', fontWeight: activeEventTab === 'globales' ? 'bold' : 'normal', cursor: 'pointer', fontSize: '0.85rem' }}
@@ -1829,7 +1831,33 @@ export default function Home() {
                       return timeFilter === 'pasados' ? dateB - dateA : dateA - dateB; // Past events descending, future ascending
                     });
 
-                    if (displayEvents.length === 0) {
+                    
+                      // --- QT Filter Logic ---
+                      if (currentUser?.appRole === "qt" || (currentUser?.roles || []).includes("qt")) {
+                         const qtNow = new Date().getTime();
+                         let c1Count = 0;
+                         let c2Count = 0;
+                         let creacionCount = 0;
+                         displayEvents = displayEvents.filter(ev => {
+                            const dateMs = new Date(ev.fecha_inicio || ev.start || 0).getTime();
+                            if (dateMs < qtNow) return false;
+                            const name = (ev.nombre || ev.name || "").toUpperCase();
+                            if (name.includes("CAPITULO UNO") || name.includes("C1") || name.includes("CAPÍTULO UNO")) {
+                               c1Count++;
+                               return c1Count <= 2;
+                            }
+                            if (name.includes("CAPITULO DOS") || name.includes("C2") || name.includes("CAPÍTULO DOS")) {
+                               c2Count++;
+                               return c2Count <= 2;
+                            }
+                            if (name.includes("CREACION") || name.includes("CREACIÓN")) {
+                               creacionCount++;
+                               return creacionCount <= 2;
+                            }
+                            return true;
+                         });
+                      }
+                      if (displayEvents.length === 0) {
                       return (
                         <div style={{ padding: '1.5rem 1rem', textAlign: 'center' }}>
                           <p className="text-muted" style={{ margin: 0, fontSize: '0.85rem' }}>No hay eventos registrados en este filtro.</p>
