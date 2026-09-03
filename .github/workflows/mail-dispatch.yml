@@ -38,6 +38,22 @@ jobs:
         env:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
 
+      # (03/09/2026) DIAGNÓSTICO — José: el run #224 falló con
+      # "SyntaxError: Unexpected end of JSON input" al leer este archivo,
+      # lo que indica que quedó vacío (o solo con un salto de línea) — es
+      # decir, el Secret GOOGLE_SERVICE_ACCOUNT_JSON llegó vacío a este job.
+      # Este paso NO imprime el contenido del secreto (eso violaría la
+      # regla de nunca exponer credenciales) — solo confirma, con datos
+      # objetivos (tamaño en bytes y si el JSON es válido), si el archivo
+      # quedó bien escrito ANTES de intentar usarlo. Si vuelve a fallar
+      # aquí, confirma que el Secret está vacío/ausente en este repositorio
+      # — no es un bug del código.
+      - name: 🩺 Verificar que la llave se escribió correctamente
+        run: |
+          echo "Tamaño del archivo (bytes):"
+          wc -c < centro-operativo-cpsl-65ad52160f45.json
+          node -e "JSON.parse(require('fs').readFileSync('centro-operativo-cpsl-65ad52160f45.json','utf8')); console.log('✅ JSON válido — la llave se escribió correctamente.')"
+
       - name: 🚀 Run Mailer Daemon (One-Shot)
         env:
           GMAIL_SERVER_EMAIL: ${{ secrets.GMAIL_USER }}
