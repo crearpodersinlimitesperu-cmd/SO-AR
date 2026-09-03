@@ -1,25 +1,62 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useCycles } from '../context/CyclesContext';
 import { useUI } from '../context/UIContext';
 import {
   Sparkles, Download, ArrowLeft, RefreshCw, Plus, Trash2,
-  Copy, Image as ImageIcon, Sliders, Eye, Terminal, Check
+  Copy, Image as ImageIcon, Sliders, Eye, Terminal, Check,
+  Calendar, Zap, CheckCircle2
 } from 'lucide-react';
 
-// Sedes exactas y oficiales al flyer original de difusión
-const SEDES_ORIGINALES = [
-  { id: 'mex', ciudad: 'México', fechas: '18, 19 y 20 de septiembre', activo: true },
-  { id: 'lim', ciudad: 'Lima', fechas: '18, 19 y 20 de septiembre', activo: true },
-  { id: 'uio', ciudad: 'Quito', fechas: '25, 26 y 27 de septiembre', activo: true },
-  { id: 'gye', ciudad: 'Guayaquil', fechas: '9, 10 y 11 de octubre', activo: true },
-  { id: 'cue', ciudad: 'Cuenca', fechas: '16, 17 y 18 de octubre', activo: true },
-  { id: 'med', ciudad: 'Medellín', fechas: '16, 17 y 18 de octubre', activo: true }
+// Preset 1: Próximas Fechas de Enrolamiento (Octubre para sedes que ya cerraron Septiembre)
+const SEDES_ENROLAMIENTO_PROXIMO = [
+  { id: 'mex', ciudad: 'México', fechas: '18, 19 y 20 de septiembre', activo: true, equipo: 'Equipo 8' },
+  { id: 'lim', ciudad: 'Lima', fechas: '18, 19 y 20 de septiembre', activo: true, equipo: 'Equipo 31' },
+  { id: 'uio', ciudad: 'Quito', fechas: '25, 26 y 27 de septiembre', activo: true, equipo: 'Equipo 128' },
+  { id: 'gye', ciudad: 'Guayaquil', fechas: '9, 10 y 11 de octubre', activo: true, equipo: 'Equipo 38' },
+  { id: 'cue', ciudad: 'Cuenca', fechas: '16, 17 y 18 de octubre', activo: true, equipo: 'Equipo 24' },
+  { id: 'med', ciudad: 'Medellín', fechas: '16, 17 y 18 de octubre', activo: true, equipo: 'Equipo 20' }
 ];
+
+// Preset 2: Ciclo Inmediato (Septiembre en todas las sedes)
+const SEDES_CICLO_INMEDIATO = [
+  { id: 'gye', ciudad: 'Guayaquil', fechas: '4, 5 y 6 de septiembre', activo: true, equipo: 'Equipo 37' },
+  { id: 'cue', ciudad: 'Cuenca', fechas: '11, 12 y 13 de septiembre', activo: true, equipo: 'Equipo 23' },
+  { id: 'med', ciudad: 'Medellín', fechas: '11, 12 y 13 de septiembre', activo: true, equipo: 'Equipo 19' },
+  { id: 'mex', ciudad: 'México', fechas: '18, 19 y 20 de septiembre', activo: true, equipo: 'Equipo 8' },
+  { id: 'lim', ciudad: 'Lima', fechas: '18, 19 y 20 de septiembre', activo: true, equipo: 'Equipo 31' },
+  { id: 'uio', ciudad: 'Quito', fechas: '25, 26 y 27 de septiembre', activo: true, equipo: 'Equipo 128' }
+];
+
+const MESES = [
+  'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+  'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+];
+
+function formatEventDates(startStr, endStr) {
+  if (!startStr) return '';
+  const dStart = new Date(startStr.replace('Z', ''));
+  const dEnd = endStr ? new Date(endStr.replace('Z', '')) : dStart;
+
+  const dayStart = dStart.getDate();
+  const dayEnd = dEnd.getDate();
+  const mStart = dStart.getMonth();
+  const mEnd = dEnd.getMonth();
+
+  if (mStart === mEnd) {
+    if (dayEnd - dayStart === 2) {
+      return `${dayStart}, ${dayStart + 1} y ${dayEnd} de ${MESES[mStart]}`;
+    }
+    return `${dayStart} al ${dayEnd} de ${MESES[mStart]}`;
+  }
+  return `${dayStart} de ${MESES[mStart]} al ${dayEnd} de ${MESES[mEnd]}`;
+}
 
 export default function GeneradorFlyer() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { events } = useCycles();
   const { showToast } = useUI();
   const canvasRef = useRef(null);
 
@@ -28,9 +65,74 @@ export default function GeneradorFlyer() {
   const [outline, setOutline] = useState('UNO');
   const [eyebrow, setEyebrow] = useState('FECHAS');
   const [hashtag, setHashtag] = useState('#SOYCREADOR');
-  const [sedes, setSedes] = useState(SEDES_ORIGINALES);
+  const [sedes, setSedes] = useState(SEDES_ENROLAMIENTO_PROXIMO);
   const [descargando, setDescargando] = useState(false);
+  const [presetActivo, setPresetActivo] = useState('enrolamiento');
   const [showCliModal, setShowCliModal] = useState(false);
+
+  // Sincronizar automáticamente con eventos del calendario de Causa OS
+  const sincronizarConCalendario = () => {
+    if (!events || !events.length) {
+      showToast?.('Cargando eventos del calendario... intenta de nuevo en unos segundos.', 'info');
+      return;
+    }
+
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const sedesConfig = [
+      { id: 'mex', ciudad: 'México', patterns: ['MEX', 'CDMX', 'MÉXICO', 'MEXICO'] },
+      { id: 'lim', ciudad: 'Lima', patterns: ['LIM', 'LIMA'] },
+      { id: 'uio', ciudad: 'Quito', patterns: ['UIO', 'QUITO'] },
+      { id: 'gye', ciudad: 'Guayaquil', patterns: ['GYE', 'GUAYAQUIL'] },
+      { id: 'cue', ciudad: 'Cuenca', patterns: ['CUE', 'CUENCA'] },
+      { id: 'med', ciudad: 'Medellín', patterns: ['MED', 'MEDELL'] }
+    ];
+
+    const nuevasSedes = sedesConfig.map(sc => {
+      // Filtrar eventos de Capítulo 1 futuros para esta sede
+      const c1Events = events.filter(e => {
+        const evName = (e.nombre || e.name || '').toUpperCase();
+        const evSede = (e.sede || e.place || e.sedeTag || '').toUpperCase();
+        const start = (e.fecha_inicio || e.start || '').slice(0, 10);
+
+        const isC1 = evName.includes('CAPITULO UNO') || evName.includes('CAPÍTULO UNO') || evName.startsWith('C1 ');
+        const isSede = sc.patterns.some(p => evSede.includes(p));
+        return isC1 && isSede && start >= todayStr;
+      });
+
+      c1Events.sort((a, b) => new Date(a.fecha_inicio || a.start) - new Date(b.fecha_inicio || b.start));
+
+      if (c1Events.length > 0) {
+        const nextEv = c1Events[0];
+        const fechaFormateada = formatEventDates(nextEv.fecha_inicio || nextEv.start, nextEv.fecha_fin || nextEv.end);
+        return {
+          id: sc.id,
+          ciudad: sc.ciudad,
+          fechas: fechaFormateada || 'Próximamente',
+          activo: true,
+          equipo: nextEv.equipo ? `Equipo ${nextEv.equipo}` : ''
+        };
+      }
+
+      // Si no hay evento futuro, mantener el valor actual o próximo ciclo
+      const actual = sedes.find(s => s.id === sc.id);
+      return actual || { id: sc.id, ciudad: sc.ciudad, fechas: 'Próximamente', activo: true };
+    });
+
+    setSedes(nuevasSedes);
+    setPresetActivo('calendario');
+    showToast?.('¡Fechas sincronizadas con los próximos Capítulos 1 de Causa OS!', 'success');
+  };
+
+  const aplicarPreset = (tipo) => {
+    setPresetActivo(tipo);
+    if (tipo === 'enrolamiento') {
+      setSedes(SEDES_ENROLAMIENTO_PROXIMO);
+      showToast?.('Fechas configuradas para Enrolamiento Próximo (Octubre para sedes que cerraron Septiembre)', 'info');
+    } else if (tipo === 'inmediato') {
+      setSedes(SEDES_CICLO_INMEDIATO);
+      showToast?.('Fechas configuradas para Ciclo Inmediato de Septiembre', 'info');
+    }
+  };
 
   // Sincronizar contorno cuando cambia el programa si tiene patrón "CAPÍTULO X"
   const handleProgramaChange = (val) => {
@@ -61,15 +163,6 @@ export default function GeneradorFlyer() {
     setSedes(prev => [...prev, { id: newId, ciudad: 'Nueva Sede', fechas: 'Próximamente', activo: true }]);
   };
 
-  const restaurarOriginal = () => {
-    setPrograma('CAPÍTULO UNO');
-    setOutline('UNO');
-    setEyebrow('FECHAS');
-    setHashtag('#SOYCREADOR');
-    setSedes(SEDES_ORIGINALES);
-    showToast?.('Configuración restaurada al flyer original oficial', 'info');
-  };
-
   // Helper para cargar imagen
   const loadImage = (src) => {
     return new Promise((resolve, reject) => {
@@ -81,31 +174,12 @@ export default function GeneradorFlyer() {
     });
   };
 
-  // Descarga en Alta Resolución 1080x1920
+  // Descarga en Alta Resolución 1080x1920 (PNG Oficial)
   const descargarFlyerHD = async () => {
     setDescargando(true);
-    showToast?.('Generando Flyer HD 1080x1920 con fidelidad cinematográfica...', 'info');
+    showToast?.('Generando Flyer Oficial HD (1080x1920) sin alterar el diseño original...', 'info');
 
     try {
-      // Si los datos coinciden con el oficial por defecto, podemos descargar directamente el renderizado oficial
-      const esPorDefecto =
-        programa === 'CAPÍTULO UNO' &&
-        outline === 'UNO' &&
-        eyebrow === 'FECHAS' &&
-        hashtag === '#SOYCREADOR' &&
-        JSON.stringify(sedes) === JSON.stringify(SEDES_ORIGINALES);
-
-      if (esPorDefecto) {
-        const link = document.createElement('a');
-        link.download = `Flyer_Oficial_CPSL_Capitulo_Uno_1080x1920.png`;
-        link.href = '/flyer_generado.png';
-        link.click();
-        showToast?.('¡Flyer Oficial descargado en máxima fidelidad!', 'success');
-        setDescargando(false);
-        return;
-      }
-
-      // Si fue editado por el usuario, renderizamos en Canvas a 1080x1920
       const canvas = canvasRef.current;
       canvas.width = 1080;
       canvas.height = 1920;
@@ -229,11 +303,11 @@ export default function GeneradorFlyer() {
       canvas.toBlob((blob) => {
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
-        link.download = `Flyer_CPSL_${programa.replace(/\s+/g, '_')}_1080x1920.png`;
+        link.download = `Flyer_Oficial_CPSL_${programa.replace(/\s+/g, '_')}_1080x1920.png`;
         link.href = url;
         link.click();
         URL.revokeObjectURL(url);
-        showToast?.('¡Flyer HD generado y descargado con éxito!', 'success');
+        showToast?.('¡Flyer Oficial descargado con éxito en 1080x1920!', 'success');
         setDescargando(false);
       }, 'image/png');
 
@@ -265,31 +339,64 @@ export default function GeneradorFlyer() {
               <span className="text-[10px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-yellow-500/10 text-yellow-400 border border-yellow-500/30">
                 Oficial CREAR Poder sin Límites
               </span>
-              <span className="text-xs text-gray-400 font-semibold">&bull; Fidelidad 100% Cinemática</span>
+              <span className="text-xs text-gray-400 font-semibold">&bull; Capítulos Uno de Cada Sede</span>
             </div>
             <h1 className="text-2xl font-black text-white mt-1 flex items-center gap-2">
               <Sparkles className="text-yellow-400" size={24} />
-              Generador Oficial de Flyers HD
+              Generador de Flyers Oficiales HD
             </h1>
             <p className="text-xs text-gray-400">
-              Genera y descarga el flyer oficial con fondo satelital orbital, tipografía original y fechas actualizadas.
+              Modifica únicamente las fechas de los Capítulos Uno más próximos para que la gente pueda enrolarse.
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
           <button
-            onClick={restaurarOriginal}
-            className="btn-secondary text-xs flex items-center gap-1.5 py-2 px-3"
-            title="Restaurar a los valores del flyer oficial original"
+            onClick={sincronizarConCalendario}
+            className="px-3.5 py-2 rounded-xl bg-yellow-500/15 hover:bg-yellow-500/25 text-yellow-400 font-bold text-xs border border-yellow-500/40 flex items-center gap-1.5 transition-all shadow-[0_0_15px_rgba(234,179,8,0.2)]"
+            title="Obtener fechas de los próximos Capítulos 1 directamente del calendario oficial de Causa OS"
           >
-            <RefreshCw size={14} /> Restaurar Original
+            <Zap size={14} className="text-yellow-400 fill-yellow-400" /> Sincronizar Calendario Causa OS
           </button>
           <button
             onClick={() => setShowCliModal(true)}
-            className="px-3 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-yellow-400 font-bold text-xs border border-yellow-500/30 flex items-center gap-1.5 transition-all"
+            className="px-3 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white font-semibold text-xs border border-gray-700 flex items-center gap-1.5 transition-all"
           >
             <Terminal size={14} /> Bot CLI
+          </button>
+        </div>
+      </div>
+
+      {/* SELECTOR RÁPIDO DE PRESETS DE ENROLAMIENTO */}
+      <div className="glass-panel p-4 rounded-2xl border border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="flex items-center gap-2 text-xs text-gray-300">
+          <Calendar size={16} className="text-yellow-400" />
+          <span className="font-bold">Estrategia de Enrolamiento:</span>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            onClick={() => aplicarPreset('enrolamiento')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+              presetActivo === 'enrolamiento'
+                ? 'bg-yellow-500 text-black shadow-[0_0_12px_rgba(234,179,8,0.4)]'
+                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+            }`}
+          >
+            {presetActivo === 'enrolamiento' && <CheckCircle2 size={13} />}
+            Próximo Enrolamiento (Oficial)
+          </button>
+
+          <button
+            onClick={() => aplicarPreset('inmediato')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+              presetActivo === 'inmediato'
+                ? 'bg-yellow-500 text-black shadow-[0_0_12px_rgba(234,179,8,0.4)]'
+                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+            }`}
+          >
+            {presetActivo === 'inmediato' && <CheckCircle2 size={13} />}
+            Ciclo Inmediato (Septiembre)
           </button>
         </div>
       </div>
@@ -300,39 +407,80 @@ export default function GeneradorFlyer() {
         {/* COLUMNA IZQUIERDA: CONTROLES */}
         <div className="lg:col-span-6 space-y-5">
           
-          {/* Tarjeta de Títulos */}
+          {/* Tarjeta de Fechas por Sede */}
+          <div className="glass-panel p-5 rounded-2xl border border-gray-800 space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-black text-yellow-400 uppercase tracking-wider flex items-center gap-2">
+                  <Calendar size={16} /> Fechas de Capítulos Uno por Sede
+                </h3>
+                <p className="text-[11px] text-gray-400 mt-0.5">
+                  Edita la fecha de cualquier sede. El diseño mantiene la tipografía y posición original sin cajas.
+                </p>
+              </div>
+              <button
+                onClick={addSede}
+                className="px-2.5 py-1.5 rounded-lg bg-yellow-500/15 text-yellow-400 hover:bg-yellow-500/25 border border-yellow-500/30 text-xs font-bold flex items-center gap-1 transition-all"
+              >
+                <Plus size={14} /> Agregar Sede
+              </button>
+            </div>
+
+            <div className="space-y-2.5 max-h-[420px] overflow-y-auto pr-1">
+              {sedes.map((s) => (
+                <div
+                  key={s.id}
+                  className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${
+                    s.activo ? 'bg-gray-900/80 border-gray-700' : 'bg-gray-950/40 border-gray-900 opacity-50'
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={s.activo}
+                    onChange={() => toggleSedeActiva(s.id)}
+                    className="accent-yellow-500 w-4 h-4 cursor-pointer rounded"
+                    title={s.activo ? 'Desactivar de flyer' : 'Activar en flyer'}
+                  />
+                  <div className="w-28 flex-shrink-0">
+                    <input
+                      type="text"
+                      value={s.ciudad}
+                      disabled={!s.activo}
+                      onChange={(e) => updateSede(s.id, 'ciudad', e.target.value)}
+                      placeholder="Ciudad"
+                      className="w-full bg-black/60 border border-gray-700 rounded-lg px-2.5 py-1.5 text-xs font-bold text-yellow-400 focus:border-yellow-400 focus:outline-none"
+                    />
+                    {s.equipo && (
+                      <span className="block text-[9px] text-gray-400 mt-0.5 pl-0.5">
+                        {s.equipo}
+                      </span>
+                    )}
+                  </div>
+                  <input
+                    type="text"
+                    value={s.fechas}
+                    disabled={!s.activo}
+                    onChange={(e) => updateSede(s.id, 'fechas', e.target.value)}
+                    placeholder="Fechas (ej: 18, 19 y 20 de septiembre)"
+                    className="flex-1 bg-black/60 border border-gray-700 rounded-lg px-3 py-1.5 text-xs font-medium text-white focus:border-yellow-400 focus:outline-none"
+                  />
+                  <button
+                    onClick={() => removeSede(s.id)}
+                    className="text-gray-500 hover:text-red-400 p-1 transition-all"
+                    title="Eliminar sede"
+                  >
+                    <Trash2 size={15} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Tarjeta de Títulos y Jerarquía Visual */}
           <div className="glass-panel p-5 rounded-2xl border border-gray-800 space-y-4">
             <h3 className="text-sm font-black text-yellow-400 uppercase tracking-wider flex items-center gap-2">
-              <Sliders size={16} /> Título y Jerarquía Visual
+              <Sliders size={16} /> Título y Marca de Agua
             </h3>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-[11px] font-bold text-gray-300 uppercase mb-1">
-                  Subtítulo Superior
-                </label>
-                <input
-                  type="text"
-                  value={eyebrow}
-                  onChange={(e) => setEyebrow(e.target.value)}
-                  placeholder="FECHAS"
-                  className="w-full bg-black/60 border border-gray-700 rounded-xl px-3.5 py-2 text-xs font-semibold text-white focus:border-yellow-400 focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold text-gray-300 uppercase mb-1">
-                  Hashtag Inferior
-                </label>
-                <input
-                  type="text"
-                  value={hashtag}
-                  onChange={(e) => setHashtag(e.target.value)}
-                  placeholder="#SOYCREADOR"
-                  className="w-full bg-black/60 border border-gray-700 rounded-xl px-3.5 py-2 text-xs font-semibold text-white focus:border-yellow-400 focus:outline-none"
-                />
-              </div>
-            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
@@ -361,68 +509,33 @@ export default function GeneradorFlyer() {
                 />
               </div>
             </div>
-          </div>
 
-          {/* Tarjeta de Fechas por Sede */}
-          <div className="glass-panel p-5 rounded-2xl border border-gray-800 space-y-4">
-            <div className="flex items-center justify-between">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <h3 className="text-sm font-black text-yellow-400 uppercase tracking-wider flex items-center gap-2">
-                  <Calendar size={16} /> Sedes y Fechas Oficiales
-                </h3>
-                <p className="text-[11px] text-gray-400 mt-0.5">
-                  Activa, edita o agrega sedes. Se alinean automáticamente con la tipografía oficial.
-                </p>
+                <label className="block text-[11px] font-bold text-gray-300 uppercase mb-1">
+                  Subtítulo Superior
+                </label>
+                <input
+                  type="text"
+                  value={eyebrow}
+                  onChange={(e) => setEyebrow(e.target.value)}
+                  placeholder="FECHAS"
+                  className="w-full bg-black/60 border border-gray-700 rounded-xl px-3.5 py-2 text-xs font-semibold text-white focus:border-yellow-400 focus:outline-none"
+                />
               </div>
-              <button
-                onClick={addSede}
-                className="px-2.5 py-1.5 rounded-lg bg-yellow-500/15 text-yellow-400 hover:bg-yellow-500/25 border border-yellow-500/30 text-xs font-bold flex items-center gap-1 transition-all"
-              >
-                <Plus size={14} /> Agregar
-              </button>
-            </div>
 
-            <div className="space-y-2.5 max-h-[380px] overflow-y-auto pr-1">
-              {sedes.map((s) => (
-                <div
-                  key={s.id}
-                  className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${
-                    s.activo ? 'bg-gray-900/80 border-gray-700' : 'bg-gray-950/40 border-gray-900 opacity-50'
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={s.activo}
-                    onChange={() => toggleSedeActiva(s.id)}
-                    className="accent-yellow-500 w-4 h-4 cursor-pointer rounded"
-                  />
-                  <div className="w-28 flex-shrink-0">
-                    <input
-                      type="text"
-                      value={s.ciudad}
-                      disabled={!s.activo}
-                      onChange={(e) => updateSede(s.id, 'ciudad', e.target.value)}
-                      placeholder="Ciudad"
-                      className="w-full bg-black/60 border border-gray-700 rounded-lg px-2.5 py-1.5 text-xs font-bold text-yellow-400 focus:border-yellow-400 focus:outline-none"
-                    />
-                  </div>
-                  <input
-                    type="text"
-                    value={s.fechas}
-                    disabled={!s.activo}
-                    onChange={(e) => updateSede(s.id, 'fechas', e.target.value)}
-                    placeholder="Fechas (ej: 18, 19 y 20 de septiembre)"
-                    className="flex-1 bg-black/60 border border-gray-700 rounded-lg px-3 py-1.5 text-xs font-medium text-white focus:border-yellow-400 focus:outline-none"
-                  />
-                  <button
-                    onClick={() => removeSede(s.id)}
-                    className="text-gray-500 hover:text-red-400 p-1 transition-all"
-                    title="Eliminar sede"
-                  >
-                    <Trash2 size={15} />
-                  </button>
-                </div>
-              ))}
+              <div>
+                <label className="block text-[11px] font-bold text-gray-300 uppercase mb-1">
+                  Hashtag Inferior
+                </label>
+                <input
+                  type="text"
+                  value={hashtag}
+                  onChange={(e) => setHashtag(e.target.value)}
+                  placeholder="#SOYCREADOR"
+                  className="w-full bg-black/60 border border-gray-700 rounded-xl px-3.5 py-2 text-xs font-semibold text-white focus:border-yellow-400 focus:outline-none"
+                />
+              </div>
             </div>
           </div>
 
@@ -432,14 +545,14 @@ export default function GeneradorFlyer() {
         <div className="lg:col-span-6 flex flex-col items-center">
           <div className="w-full flex justify-between items-center mb-3 max-w-[360px]">
             <span className="text-xs font-bold text-gray-300 uppercase flex items-center gap-1.5">
-              <Eye size={14} className="text-yellow-400" /> Previsualización Oficial (9:16)
+              <Eye size={14} className="text-yellow-400" /> Previsualización Fiel (9:16)
             </span>
             <span className="text-[10px] px-2.5 py-1 bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 rounded-full font-bold">
               1080 x 1920 HD
             </span>
           </div>
 
-          {/* MOCKUP VERTICAL CINEMÁTICO 100% FIEL */}
+          {/* MOCKUP VERTICAL CINEMÁTICO 100% FIEL (SIN CAJAS NI BORDES) */}
           <div
             className="w-full max-w-[360px] h-[640px] rounded-3xl overflow-hidden shadow-[0_25px_70px_rgba(0,0,0,0.95)] border border-white/10 relative flex flex-col justify-between select-none"
             style={{
@@ -533,9 +646,9 @@ export default function GeneradorFlyer() {
           <button
             onClick={descargarFlyerHD}
             disabled={descargando}
-            className="mt-5 w-full max-w-[360px] py-3 px-4 bg-gradient-to-r from-yellow-500 to-amber-600 text-black font-black rounded-xl hover:scale-105 active:scale-95 transition-all shadow-[0_0_25px_rgba(245,158,11,0.45)] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+            className="mt-5 w-full max-w-[360px] py-3.5 px-4 bg-gradient-to-r from-yellow-500 to-amber-600 text-black font-black rounded-xl hover:scale-105 active:scale-95 transition-all shadow-[0_0_25px_rgba(245,158,11,0.45)] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 text-sm"
           >
-            <Download size={18} /> {descargando ? 'Generando 1080x1920...' : 'Descargar en 1080x1920 (PNG)'}
+            <Download size={18} /> {descargando ? 'Generando 1080x1920...' : 'Descargar Flyer Oficial en 1080x1920 (PNG)'}
           </button>
         </div>
 
@@ -549,7 +662,7 @@ export default function GeneradorFlyer() {
               <Terminal size={22} /> Bot Autónomo de Flyers (Puppeteer)
             </h3>
             <p className="text-sm text-gray-300">
-              También puedes generar el flyer automáticamente con fidelidad 100% desde la terminal o integrarlo en pipelines de Telegram/WhatsApp usando el script de Node.js:
+              También puedes generar el flyer automáticamente con fidelidad 100% desde la terminal o integrarlo en pipelines automáticos de mensajería usando el script de Node.js:
             </p>
             <div className="bg-black/90 p-4 rounded-xl font-mono text-xs text-green-400 border border-gray-800 select-all overflow-x-auto">
               node scripts/generar_flyer.mjs --programa="CAPÍTULO UNO"
