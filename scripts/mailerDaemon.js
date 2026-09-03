@@ -1,25 +1,48 @@
 import dotenv from 'dotenv';
 import nodemailer from 'nodemailer';
 import sanitizeHtml from 'sanitize-html';
-import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, onSnapshot, doc, updateDoc, query, where, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
+import { initializeApp, cert } from 'firebase-admin/app';
+import { getFirestore, FieldValue } from 'firebase-admin/firestore';
+import { readFileSync, existsSync } from 'fs';
 
 dotenv.config();
 
-// --- 1. CONFIGURACIÓN DE FIREBASE CLIENT ---
-// NOTA: Para ejecutar esto necesitas "npm install nodemailer firebase dotenv"
-// Reemplaza esto con los datos de tu src/services/firebase.js
-const firebaseConfig = {
-  apiKey: process.env.VITE_FIREBASE_API_KEY,
-  authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.VITE_FIREBASE_APP_ID
-};
+// --- 1. CONFIGURACIÓN DE FIREBASE ADMIN ---
+// (03/09/2026) FIX — José: "me preocupa no estar usando las notificaciones por
+// correo". Causa confirmada corriendo esto en local: "Missing or insufficient
+// permissions" en las 3 colecciones que usa (mail, user_profiles, tasks).
+// Este script usaba el SDK de CLIENTE de Firebase (firebase/firestore) sin
+// nunca iniciar sesión (ningún signIn en todo el archivo) — así que
+// request.auth siempre era null. Desde el endurecimiento de firestore.rules
+// del 26/08/2026 (que exige isAuthenticated() en esas 3 colecciones), cada
+// corrida de este daemon fallaba en silencio. Último envío exitoso real,
+// confirmado leyendo Firestore: 18/08/2026 — coincide con la fecha.
+//
+// Fix: usar firebase-admin (como todos los scripts de diagnóstico de este
+// repo), que se autentica con una Service Account y NO pasa por
+// firestore.rules — es el patrón correcto para un proceso de fondo de
+// confianza como este, y es EXACTAMENTE el mismo patrón que ya usa
+// .github/workflows/managers-llamados-sync.yml (Secret GOOGLE_SERVICE_ACCOUNT_JSON
+// → archivo centro-operativo-cpsl-65ad52160f45.json en el runner → borrado al
+// final). mail-dispatch.yml se actualizó para escribir ese mismo archivo.
+//
+// Localmente (fuera de GitHub Actions) sigue funcionando igual que los demás
+// scripts de este repo: coloca el archivo de credenciales de servicio
+// "centro-operativo-cpsl-65ad52160f45.json" en la raíz del proyecto y corre
+// el script — NUNCA lo corras en un entorno que no sea tuyo ni lo subas a git
+// (ya está en .gitignore).
+const CREDENTIALS_PATH = './centro-operativo-cpsl-65ad52160f45.json';
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+if (!existsSync(CREDENTIALS_PATH)) {
+  console.error(`❌ No se encontró el archivo de credenciales de servicio (${CREDENTIALS_PATH}).`);
+  console.error('   Este script ahora usa firebase-admin y necesita ese archivo (local) o');
+  console.error('   correr dentro del GitHub Action, que lo genera desde el Secret GOOGLE_SERVICE_ACCOUNT_JSON.');
+  process.exit(1);
+}
+
+const serviceAccount = JSON.parse(readFileSync(CREDENTIALS_PATH, 'utf8'));
+initializeApp({ credential: cert(serviceAccount) });
+const db = getFirestore();
 
 // --- 2. CONFIGURACIÓN DE GMAIL (NODEMAILER) ---
 if (!process.env.GMAIL_SERVER_EMAIL || !process.env.GMAIL_SERVER_APP_PASSWORD) {
@@ -47,7 +70,7 @@ async function processMailDoc(docSnap) {
 
   if (rawRecipients.length === 0) {
     console.warn(`⚠️ Documento de correo sin destinatario válido (doc ${docSnap.id})`);
-    await updateDoc(doc(db, 'mail', docSnap.id), {
+    await db.collection('mail').doc(docSnap.id).update({
       'delivery.state': 'REJECTED',
       reason: 'Documento de correo sin campo "to" válido'
     });
@@ -63,8 +86,7 @@ async function processMailDoc(docSnap) {
       continue;
     }
     try {
-      const q = query(collection(db, "users"), where("emails", "array-contains", to));
-      const snap = await getDocs(q);
+      const snap = await db.collection('users').where('emails', 'array-contains', to).get();
       if (snap.empty) {
         console.warn(`⚠️ Intento de envío a correo no registrado: ${rawTo}`);
       } else {
@@ -78,7 +100,7 @@ async function processMailDoc(docSnap) {
   }
 
   if (validRecipients.length === 0) {
-    await updateDoc(doc(db, 'mail', docSnap.id), {
+    await db.collection('mail').doc(docSnap.id).update({
       'delivery.state': 'REJECTED',
       reason: 'Ningún destinatario pertenece a un usuario registrado'
     });
@@ -117,13 +139,13 @@ async function processMailDoc(docSnap) {
   try {
     await transporter.sendMail(mailOptions);
     console.log(`✅ Correo enviado con éxito a ${validRecipients.join(', ')}`);
-    await updateDoc(doc(db, 'mail', docSnap.id), {
+    await db.collection('mail').doc(docSnap.id).update({
       'delivery.state': 'SUCCESS',
       'delivery.endTime': new Date().toISOString()
     });
   } catch (error) {
     console.error(`❌ Error enviando a ${validRecipients.join(', ')}:`, error.message);
-    await updateDoc(doc(db, 'mail', docSnap.id), {
+    await db.collection('mail').doc(docSnap.id).update({
       'delivery.state': 'ERROR',
       'delivery.error': error.message
     });
@@ -133,7 +155,7 @@ async function processMailDoc(docSnap) {
 async function processPendingMails() {
   console.log("📬 Buscando correos pendientes en Firestore...");
   try {
-    const snap = await getDocs(collection(db, 'mail'));
+    const snap = await db.collection('mail').get();
     let pendingCount = 0;
     for (const docSnap of snap.docs) {
       const d = docSnap.data();
@@ -155,9 +177,9 @@ const CHECK_INTERVAL_MS = 60 * 60 * 1000;
 async function checkInactivity() {
   console.log("🔍 Iniciando chequeo de inactividad de usuarios...");
   try {
-    const profilesSnap = await getDocs(collection(db, 'user_profiles'));
+    const profilesSnap = await db.collection('user_profiles').get();
     const now = new Date();
-    
+
     for (const docSnap of profilesSnap.docs) {
       const data = docSnap.data();
       const email = data.email || docSnap.id;
@@ -169,11 +191,11 @@ async function checkInactivity() {
 
       if (hoursSinceLogin > INACTIVITY_LIMIT_HOURS) {
         const lastAlertDate = data.lastInactivityAlertAt?.toDate ? data.lastInactivityAlertAt.toDate() : (data.lastInactivityAlertAt ? new Date(data.lastInactivityAlertAt) : new Date(0));
-        
+
         if (lastAlertDate < lastLoginDate) {
           console.log(`⚠️ Usuario ${email} inactivo por más de ${INACTIVITY_LIMIT_HOURS} horas. Programando alerta.`);
-          
-          await addDoc(collection(db, 'mail'), {
+
+          await db.collection('mail').add({
             to: email,
             message: {
               subject: '⚠️ Aviso de Inactividad en SO-AR — CREAR Poder Sin Límites',
@@ -194,11 +216,11 @@ async function checkInactivity() {
                 </div>
               `
             },
-            createdAt: serverTimestamp()
+            createdAt: FieldValue.serverTimestamp()
           });
 
-          await updateDoc(doc(db, 'user_profiles', email), {
-            lastInactivityAlertAt: serverTimestamp()
+          await db.collection('user_profiles').doc(email).update({
+            lastInactivityAlertAt: FieldValue.serverTimestamp()
           });
         }
       }
@@ -216,7 +238,7 @@ const REMINDER_DEBOUNCE_HOURS = 24;
 async function checkOverdueTaskReminders() {
   console.log("🔍 Iniciando chequeo de tareas vencidas sin atender...");
   try {
-    const tasksSnap = await getDocs(collection(db, 'tasks'));
+    const tasksSnap = await db.collection('tasks').get();
     const now = new Date();
 
     for (const docSnap of tasksSnap.docs) {
@@ -248,7 +270,7 @@ async function checkOverdueTaskReminders() {
       console.log(`⏰ Tarea vencida sin completar: "${taskTitle}" (${docSnap.id}). Enviando recordatorio a: ${emails.join(', ')}`);
 
       for (const email of emails) {
-        await addDoc(collection(db, 'mail'), {
+        await db.collection('mail').add({
           to: [email],
           message: {
             subject: `⏰ RECORDATORIO: Tarea pendiente vencida — ${taskTitle}`,
@@ -271,12 +293,12 @@ async function checkOverdueTaskReminders() {
               </div>
             `
           },
-          createdAt: serverTimestamp()
+          createdAt: FieldValue.serverTimestamp()
         });
       }
 
-      await updateDoc(doc(db, 'tasks', docSnap.id), {
-        lastReminderAt: serverTimestamp()
+      await db.collection('tasks').doc(docSnap.id).update({
+        lastReminderAt: FieldValue.serverTimestamp()
       });
     }
   } catch (error) {
@@ -305,7 +327,7 @@ if (isOneShot) {
   process.exit(0);
 } else {
   console.log("🚀 Mailer Daemon Iniciado en modo persistente. Escuchando en tiempo real...");
-  onSnapshot(collection(db, 'mail'), (snapshot) => {
+  db.collection('mail').onSnapshot((snapshot) => {
     snapshot.docChanges().forEach((change) => {
       if (change.type === 'added') {
         processMailDoc(change.doc);
@@ -317,4 +339,3 @@ if (isOneShot) {
   checkOverdueTaskReminders();
   setInterval(checkOverdueTaskReminders, CHECK_INTERVAL_MS);
 }
-
