@@ -89,7 +89,8 @@
                 <!-- Dual Countdowns -->
                 <div class="reveal mb-12 flex flex-col md:flex-row gap-8 justify-center items-center" style="transition-delay: 275ms;">
                     <div class="glass p-6 rounded-2xl border border-crear-accent/20 shadow-[0_0_20px_rgba(255,183,3,0.2)] w-full max-w-sm">
-                        <h3 class="text-crear-accent text-sm uppercase tracking-widest font-bold mb-4">✈️ Tiempo para tu Viaje</h3>
+                        <h3 class="text-crear-accent text-sm uppercase tracking-widest font-bold mb-1">✈️ Tiempo para tu Viaje</h3>
+                        <p class="text-xs text-gray-400 mb-3">Despegue desde Quito (LA 1437): <strong class="text-white font-mono">Jue 03/09 · 07:55 AM</strong></p>
                         <div id="countdown-flight" class="grid grid-cols-4 gap-2 text-center">
                             <div><div class="text-3xl font-black text-white" id="fly-d">00</div><div class="text-[10px] text-gray-500 uppercase">Días</div></div>
                             <div><div class="text-3xl font-black text-white" id="fly-h">00</div><div class="text-[10px] text-gray-500 uppercase">Hrs</div></div>
@@ -133,43 +134,98 @@
                         <div class="bg-gray-800/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden mb-4"><div class="absolute top-0 left-0 w-1 h-full bg-crear-accent"></div><h4 class="font-black text-white mb-3 text-crear-accent tracking-wide uppercase text-sm">Viernes - Arranque Oficial</h4><div class="space-y-2"><p class="flex items-start gap-3"><i class="fa-regular fa-clock text-crear-accent mt-1"></i> <span><strong>16:30 PM:</strong> Grounding Entrenadores con Coordinación (Directo en salón).</span></p><p class="flex items-start gap-3"><i class="fa-regular fa-clock text-crear-accent mt-1"></i> <span><strong>17:00 PM:</strong> Apertura de Mesa de Registro para Participantes.</span></p><p class="flex items-start gap-3"><i class="fa-regular fa-clock text-crear-accent mt-1"></i> <span><strong>18:00 PM:</strong> Apertura de puertas e inicio de sala.</span></p></div></div>
                     </div>
                 </div>
-                <!-- 2. Vuelos -->
+                                <!-- 2. Vuelos -->
                 <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-purple-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(168,85,247,0.15)] hover:-translate-y-1">
                     <div class="flex items-center gap-4 mb-6">
                         <div class="w-14 h-14 rounded-xl bg-gray-800/80 flex items-center justify-center text-purple-500 text-2xl group-hover:scale-110 transition-transform shadow-inner">
                             <i class="fa-solid fa-plane"></i>
                         </div>
-                        <h2 class="text-2xl font-bold text-white tracking-tight">2. Vuelos Confirmados</h2>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">2. Itinerario de Vuelos Confirmado</h2>
                     </div>
                     <div class="space-y-4 text-gray-300 ml-2 md:ml-18">
                         <div class="flex flex-wrap gap-3 items-center">
-                            <span class="text-gray-400 text-sm">Reserva:</span>
+                            <span class="text-gray-400 text-sm">Reserva LATAM:</span>
                             <span class="bg-gray-800 border border-gray-700 px-3 py-1 rounded-md font-mono text-white text-sm">JYUAGO</span>
-                            <span class="text-gray-500 text-xs ml-2">(Boleto a nombre de: <strong>MARIA PATINO GALARRAGA</strong>)</span>
+                            <span class="text-gray-500 text-xs ml-2">(Boleto electrónico a nombre de: <strong>MARIA PATINO GALARRAGA</strong>)</span>
+                        </div>
+                        <!-- Check-in Oficial LATAM -->
+                        <div class="mt-3 flex flex-wrap gap-3 items-center bg-indigo-950/30 border border-indigo-500/40 p-3.5 rounded-xl">
+                            <a href="https://www.latamairlines.com/pe/es/check-in" target="_blank" class="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-red-600 hover:from-indigo-500 hover:to-red-500 text-white text-xs md:text-sm font-bold px-4 py-2.5 rounded-lg shadow-lg hover:shadow-indigo-500/30 transition-all">
+                                <i class="fa-solid fa-ticket"></i>
+                                <span>Hacer Check-in en LATAM (Código: JYUAGO) &rarr;</span>
+                            </a>
+                            <span class="text-xs text-gray-300">Disponible 48h antes de cada vuelo con tu código <strong>JYUAGO</strong> y apellido <strong>PATINO</strong>.</span>
                         </div>
                         <div class="grid md:grid-cols-2 gap-5 mt-5">
-                            <!-- Llegada -->
+                            <!-- Ida: Quito -> Lima (Directo) -->
                             <div class="bg-gradient-to-br from-gray-800/40 to-gray-900/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden">
                                 <div class="absolute top-0 left-0 w-full h-1 bg-purple-500"></div>
-                                <h4 class="font-black text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-plane-arrival text-purple-400"></i> Llegada (03/09/2026)</h4>
-                                <div class="space-y-2 text-sm">
-                                    <p class="flex justify-between border-b border-gray-700/50 pb-2"><span class="text-gray-400">Vuelo</span> <span class="font-medium text-white">LATAM LA 1437</span></p>
-                                    <p class="flex justify-between pt-1"><span class="text-gray-400">Llegada a Lima</span> <span class="font-medium text-green-400">10:10 AM</span></p>
-                                    <div class="pt-2 flex items-center justify-between"><a href="https://www.flightradar24.com/data/flights/la1437" target="_blank" class="text-xs text-purple-400 hover:underline">Ver en FlightRadar &rarr;</a><a href="https://www.latamairlines.com/pe/es/check-in" target="_blank" class="text-xs text-indigo-400 hover:underline flex items-center gap-1 font-semibold"><i class="fa-solid fa-ticket"></i> Check-in LATAM Online</a></div>
+                                <div class="flex items-center justify-between mb-3">
+                                    <h4 class="font-black text-white flex items-center gap-2"><i class="fa-solid fa-plane-arrival text-purple-400"></i> Ida: Quito &rarr; Lima (Directo)</h4>
+                                    <span class="text-xs bg-purple-500/20 text-purple-300 font-bold px-2 py-0.5 rounded border border-purple-500/30">Jue 03/09/2026</span>
+                                </div>
+                                <div class="space-y-2.5 text-xs">
+                                    <div class="p-2.5 bg-gray-900/60 rounded-lg border border-gray-800">
+                                        <div class="flex justify-between items-center mb-1">
+                                            <span class="font-bold text-crear-accent">Vuelo Directo: LATAM LA 1437</span>
+                                            <span class="text-gray-400">2h 15m</span>
+                                        </div>
+                                        <div class="flex justify-between text-gray-300">
+                                            <span>🛫 Salida Quito (UIO): <strong class="text-white">07:55 AM</strong></span>
+                                            <span>🛬 Llegada Lima (LIM): <strong class="text-green-400 font-bold">10:10 AM</strong></span>
+                                        </div>
+                                        <div class="mt-2 text-gray-400 text-[11px] flex justify-between">
+                                            <span>Asiento: <strong class="text-crear-accent">13A</strong></span>
+                                            <span>Cabina: <strong>Economy Light</strong></span>
+                                        </div>
+                                    </div>
+                                    <div class="pt-2 flex items-center justify-between border-t border-gray-700/50">
+                                        <a href="https://www.flightradar24.com/data/flights/la1437" target="_blank" class="text-xs text-purple-400 hover:underline">Rastrear en FlightRadar &rarr;</a>
+                                        <a href="https://www.latamairlines.com/pe/es/check-in" target="_blank" class="text-xs text-indigo-400 hover:underline flex items-center gap-1 font-semibold"><i class="fa-solid fa-ticket"></i> Check-in LATAM</a>
+                                    </div>
                                 </div>
                             </div>
-                            <!-- Salida -->
+                            <!-- Retorno: Lima -> Guayaquil -> Quito -->
                             <div class="bg-gradient-to-br from-gray-800/40 to-gray-900/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden">
                                 <div class="absolute top-0 left-0 w-full h-1 bg-red-500"></div>
-                                <h4 class="font-black text-white mb-4 flex items-center gap-2"><i class="fa-solid fa-plane-departure text-red-400"></i> Salida (07/09/2026)</h4>
-                                <div class="space-y-2 text-sm">
-                                    <p class="flex justify-between border-b border-gray-700/50 pb-2"><span class="text-gray-400">Vuelo</span> <span class="font-medium text-white">LATAM LA 1429</span></p>
-                                    <p class="flex justify-between pt-1"><span class="text-gray-400">Salida de Lima</span> <span class="font-medium text-red-400">12:30 PM</span></p>
-                                    <div class="pt-2 flex items-center justify-between"><a href="https://www.flightradar24.com/data/flights/la1429" target="_blank" class="text-xs text-red-400 hover:underline">Ver en FlightRadar &rarr;</a><a href="https://www.latamairlines.com/pe/es/check-in" target="_blank" class="text-xs text-indigo-400 hover:underline flex items-center gap-1 font-semibold"><i class="fa-solid fa-ticket"></i> Check-in LATAM Online</a></div>
+                                <div class="flex items-center justify-between mb-3">
+                                    <h4 class="font-black text-white flex items-center gap-2"><i class="fa-solid fa-plane-departure text-red-400"></i> Retorno: Lima &rarr; Quito</h4>
+                                    <span class="text-xs bg-red-500/20 text-red-300 font-bold px-2 py-0.5 rounded border border-red-500/30">Lun 07/09/2026</span>
+                                </div>
+                                <div class="space-y-2.5 text-xs">
+                                    <div class="p-2.5 bg-gray-900/60 rounded-lg border border-gray-800">
+                                        <div class="flex justify-between items-center mb-1">
+                                            <span class="font-bold text-crear-accent">Tramo 1: LATAM LA 1429</span>
+                                            <span class="text-gray-400">2h 15m</span>
+                                        </div>
+                                        <div class="flex justify-between text-gray-300">
+                                            <span>🛫 Salida Lima (LIM): <strong class="text-red-400 font-bold">12:30 PM</strong></span>
+                                            <span>🛬 Llegada GYE: <strong>14:45 PM</strong></span>
+                                        </div>
+                                        <div class="mt-1 text-gray-400 text-[11px]">Asiento: <strong class="text-crear-accent">14A</strong></div>
+                                    </div>
+                                    <div class="text-[11px] text-gray-400 text-center flex items-center justify-center gap-1.5 py-0.5">
+                                        <i class="fa-solid fa-arrows-spin text-red-400"></i> Escala en Guayaquil (JJ Olmedo): <strong>1h 28m</strong>
+                                    </div>
+                                    <div class="p-2.5 bg-gray-900/60 rounded-lg border border-gray-800">
+                                        <div class="flex justify-between items-center mb-1">
+                                            <span class="font-bold text-crear-accent">Tramo 2: LATAM LA 1414</span>
+                                            <span class="text-gray-400">0h 52m</span>
+                                        </div>
+                                        <div class="flex justify-between text-gray-300">
+                                            <span>🛫 Salida GYE: <strong>16:13 PM</strong></span>
+                                            <span>🛬 Llegada Quito (UIO): <strong class="text-white font-bold">17:05 PM</strong></span>
+                                        </div>
+                                        <div class="mt-1 text-gray-400 text-[11px]">Asiento: <strong class="text-crear-accent">12A</strong></div>
+                                    </div>
+                                    <div class="pt-2 flex items-center justify-between border-t border-gray-700/50">
+                                        <a href="https://www.flightradar24.com/data/flights/la1429" target="_blank" class="text-xs text-red-400 hover:underline">Rastrear en FlightRadar &rarr;</a>
+                                        <a href="https://www.latamairlines.com/pe/es/check-in" target="_blank" class="text-xs text-indigo-400 hover:underline flex items-center gap-1 font-semibold"><i class="fa-solid fa-ticket"></i> Check-in LATAM</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="mt-4 bg-gradient-to-r from-amber-500/10 to-transparent p-4 rounded-xl border border-amber-500/30 flex items-center gap-3"><i class="fa-regular fa-clock text-crear-accent text-xl"></i><div><p class="text-crear-accent font-bold text-sm">Recojo en Lobby para Salida: 09:00 AM</p><p class="text-xs text-gray-400">Calculado 3.5 horas antes de tu vuelo (12:30 PM) para margen de tráfico y abordaje.</p></div></div>
+                        <div class="mt-4 bg-gradient-to-r from-amber-500/10 to-transparent p-4 rounded-xl border border-amber-500/30 flex items-center gap-3"><i class="fa-regular fa-clock text-crear-accent text-xl"></i><div><p class="text-crear-accent font-bold text-sm">Recojo en Lobby para Salida: 07:50 AM</p><p class="text-xs text-gray-400">Horario oficial solicitado y coordinado para tu traslado puntual hacia el Aeropuerto Jorge Chávez para tu vuelo LATAM LA 1429 (12:30 PM).</p></div></div>
                     </div>
                 </div>
                 <!-- 3. Movilidad y Sede -->
@@ -195,9 +251,9 @@
                                     <div class="flex flex-wrap items-center gap-2 mb-1">
                                         <span class="text-xs uppercase font-extrabold tracking-widest text-crear-accent bg-amber-500/20 px-2.5 py-0.5 rounded-full border border-amber-500/30">Horario de Retorno Confirmado</span>
                                     </div>
-                                    <h4 class="text-white font-black text-lg">Recojo en Lobby del Hotel: <span class="text-crear-accent">09:00 AM</span></h4>
+                                    <h4 class="text-white font-black text-lg">Recojo en Lobby del Hotel: <span class="text-crear-accent">07:50 AM</span></h4>
                                     <p class="text-sm text-gray-300 mt-1"><strong>Fecha:</strong> Lunes 07 de Septiembre de 2026</p>
-                                    <p class="text-xs text-gray-400 mt-1">Calculado con rigor a <strong>3.5 horas de antelación</strong> a tu vuelo LATAM LA 1429 (12:30 PM) para garantizar margen óptimo de traslado y filtros en el Aeropuerto Jorge Chávez.</p>
+                                    <p class="text-xs text-gray-400 mt-1">Horario oficial solicitado y coordinado para tu traslado puntual hacia el Aeropuerto Jorge Chávez para tu vuelo LATAM LA 1429 (12:30 PM).</p>
                                 </div>
                             </div>
                         </div>
@@ -380,7 +436,7 @@
                     toggleMusic();
                 });
             }
-            var flightTimestamp = new Date("2026-09-03T15:10:00.000Z").getTime();
+            var flightTimestamp = new Date("2026-09-03T12:55:00.000Z").getTime();
             var trainingTimestamp = new Date("2026-09-04T23:00:00.000Z").getTime();
             var timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
             var indicator = document.getElementById("timezone-indicator");
