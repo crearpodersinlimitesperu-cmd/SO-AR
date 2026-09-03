@@ -1,430 +1,392 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useCycles } from '../context/CyclesContext';
 import { useUI } from '../context/UIContext';
 import {
-  Sparkles, Download, ArrowLeft, RefreshCw, Calendar, Check,
-  Copy, Image as ImageIcon, Sliders, Eye, Share2, Terminal
+  Sparkles, Download, ArrowLeft, RefreshCw, Plus, Trash2,
+  Copy, Image as ImageIcon, Sliders, Eye, Terminal, Check
 } from 'lucide-react';
 
-// Sedes y banderas oficiales
-const SEDES_INICIALES = [
-  { id: 'lim', ciudad: 'LIMA', pais: 'Perú', codigo: 'PE', bandera: '🇵🇪', fechas: '04 - 06 SEPTIEMBRE', activo: true },
-  { id: 'uio', ciudad: 'QUITO', pais: 'Ecuador', codigo: 'EC', bandera: '🇪🇨', fechas: '11 - 13 SEPTIEMBRE', activo: true },
-  { id: 'mex', ciudad: 'MÉXICO', pais: 'México', codigo: 'MX', bandera: '🇲🇽', fechas: '18 - 20 SEPTIEMBRE', activo: true },
-  { id: 'gye', ciudad: 'GUAYAQUIL', pais: 'Ecuador', codigo: 'EC', bandera: '🇪🇨', fechas: '25 - 27 SEPTIEMBRE', activo: true },
-  { id: 'cue', ciudad: 'CUENCA', pais: 'Ecuador', codigo: 'EC', bandera: '🇪🇨', fechas: '02 - 04 OCTUBRE', activo: true },
-  { id: 'med', ciudad: 'MEDELLÍN', pais: 'Colombia', codigo: 'CO', bandera: '🇨🇴', fechas: '09 - 11 OCTUBRE', activo: true },
+// Sedes exactas y oficiales al flyer original de difusión
+const SEDES_ORIGINALES = [
+  { id: 'mex', ciudad: 'México', fechas: '18, 19 y 20 de septiembre', activo: true },
+  { id: 'lim', ciudad: 'Lima', fechas: '18, 19 y 20 de septiembre', activo: true },
+  { id: 'uio', ciudad: 'Quito', fechas: '25, 26 y 27 de septiembre', activo: true },
+  { id: 'gye', ciudad: 'Guayaquil', fechas: '9, 10 y 11 de octubre', activo: true },
+  { id: 'cue', ciudad: 'Cuenca', fechas: '16, 17 y 18 de octubre', activo: true },
+  { id: 'med', ciudad: 'Medellín', fechas: '16, 17 y 18 de octubre', activo: true }
 ];
 
 export default function GeneradorFlyer() {
-  const { currentUser } = useAuth();
-  const { events } = useCycles();
-  const { showToast } = useUI();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { showToast } = useUI();
+  const canvasRef = useRef(null);
 
-  const [programa, setPrograma] = useState('MAESTRÍA EN CREACIÓN');
-  const [subtitulo, setSubtitulo] = useState('GIRA INTERNACIONAL');
-  const [sedes, setSedes] = useState(SEDES_INICIALES);
+  // Estados del flyer
+  const [programa, setPrograma] = useState('CAPÍTULO UNO');
+  const [outline, setOutline] = useState('UNO');
+  const [eyebrow, setEyebrow] = useState('FECHAS');
+  const [hashtag, setHashtag] = useState('#SOYCREADOR');
+  const [sedes, setSedes] = useState(SEDES_ORIGINALES);
   const [descargando, setDescargando] = useState(false);
   const [showCliModal, setShowCliModal] = useState(false);
 
-  const canvasRef = useRef(null);
-
-  // Sincronizar fechas del calendario oficial de Causa OS
-  const sincronizarFechasCalendario = () => {
-    if (!events || events.length === 0) {
-      showToast?.('No hay eventos cargados aún en el calendario local', 'warning');
-      return;
+  // Sincronizar contorno cuando cambia el programa si tiene patrón "CAPÍTULO X"
+  const handleProgramaChange = (val) => {
+    setPrograma(val);
+    const upper = val.toUpperCase().trim();
+    if (upper.startsWith('CAPÍTULO')) {
+      const rest = upper.replace(/^CAPÍTULO\s*/, '').trim();
+      if (rest) setOutline(rest);
+    } else if (upper.includes('MAESTRÍA')) {
+      setOutline('MJ');
     }
-
-    const meses = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
-
-    const sedesActualizadas = sedes.map(s => {
-      // Buscar el próximo evento para esta sede
-      const ev = events.find(e => {
-        const evSede = (e.sede || '').toUpperCase();
-        const evNombre = (e.nombre || '').toUpperCase();
-        const fecha = new Date(e.fecha_inicio);
-        const hoy = new Date();
-        return evSede.includes(s.id.toUpperCase()) && fecha >= hoy;
-      });
-
-      if (ev && ev.fecha_inicio) {
-        const dInicio = new Date(ev.fecha_inicio);
-        const dFin = ev.fecha_fin ? new Date(ev.fecha_fin) : new Date(dInicio.getTime() + 2 * 86400000);
-        const diaI = String(dInicio.getDate()).padStart(2, '0');
-        const diaF = String(dFin.getDate()).padStart(2, '0');
-        const mesStr = meses[dInicio.getMonth()];
-        return {
-          ...s,
-          fechas: `${diaI} - ${diaF} ${mesStr}`
-        };
-      }
-      return s;
-    });
-
-    setSedes(sedesActualizadas);
-    showToast?.('Fechas sincronizadas con el calendario oficial', 'success');
-  };
-
-  const updateSedeFecha = (id, fechas) => {
-    setSedes(prev => prev.map(s => s.id === id ? { ...s, fechas } : s));
   };
 
   const toggleSedeActiva = (id) => {
     setSedes(prev => prev.map(s => s.id === id ? { ...s, activo: !s.activo } : s));
   };
 
-  // Función para dibujar y descargar el Flyer a 1080 x 1920
+  const updateSede = (id, field, value) => {
+    setSedes(prev => prev.map(s => s.id === id ? { ...s, [field]: value } : s));
+  };
+
+  const removeSede = (id) => {
+    setSedes(prev => prev.filter(s => s.id !== id));
+  };
+
+  const addSede = () => {
+    const newId = 'sede_' + Date.now();
+    setSedes(prev => [...prev, { id: newId, ciudad: 'Nueva Sede', fechas: 'Próximamente', activo: true }]);
+  };
+
+  const restaurarOriginal = () => {
+    setPrograma('CAPÍTULO UNO');
+    setOutline('UNO');
+    setEyebrow('FECHAS');
+    setHashtag('#SOYCREADOR');
+    setSedes(SEDES_ORIGINALES);
+    showToast?.('Configuración restaurada al flyer original oficial', 'info');
+  };
+
+  // Helper para cargar imagen
+  const loadImage = (src) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error('No se pudo cargar: ' + src));
+      img.src = src;
+    });
+  };
+
+  // Descarga en Alta Resolución 1080x1920
   const descargarFlyerHD = async () => {
     setDescargando(true);
-    showToast?.('Generando Flyer en Alta Resolución 1080x1920...', 'info');
+    showToast?.('Generando Flyer HD 1080x1920 con fidelidad cinematográfica...', 'info');
 
     try {
+      // Si los datos coinciden con el oficial por defecto, podemos descargar directamente el renderizado oficial
+      const esPorDefecto =
+        programa === 'CAPÍTULO UNO' &&
+        outline === 'UNO' &&
+        eyebrow === 'FECHAS' &&
+        hashtag === '#SOYCREADOR' &&
+        JSON.stringify(sedes) === JSON.stringify(SEDES_ORIGINALES);
+
+      if (esPorDefecto) {
+        const link = document.createElement('a');
+        link.download = `Flyer_Oficial_CPSL_Capitulo_Uno_1080x1920.png`;
+        link.href = '/flyer_generado.png';
+        link.click();
+        showToast?.('¡Flyer Oficial descargado en máxima fidelidad!', 'success');
+        setDescargando(false);
+        return;
+      }
+
+      // Si fue editado por el usuario, renderizamos en Canvas a 1080x1920
       const canvas = canvasRef.current;
+      canvas.width = 1080;
+      canvas.height = 1920;
       const ctx = canvas.getContext('2d');
 
-      // 1. Cargar fondo cósmico
-      const bgImg = new Image();
-      bgImg.crossOrigin = 'anonymous';
-      bgImg.src = '/flyer_earth_bg.png';
-      await new Promise((resolve, reject) => {
-        bgImg.onload = resolve;
-        bgImg.onerror = reject;
-      });
+      const [bgImg, logoImg, flagsImg] = await Promise.all([
+        loadImage('/flyer_earth_bg_1080.png'),
+        loadImage('/logo_crear_blanco.png'),
+        loadImage('/flags_badges_hd.png')
+      ]);
 
-      // 2. Cargar logo oficial blanco
-      const logoImg = new Image();
-      logoImg.crossOrigin = 'anonymous';
-      logoImg.src = '/logo_crear_blanco.png';
-      await new Promise((resolve, reject) => {
-        logoImg.onload = resolve;
-        logoImg.onerror = reject;
-      });
-
-      // Asegurar fuentes
       await document.fonts.ready;
 
-      // Dibujar fondo
+      // 1. Fondo csmico
       ctx.clearRect(0, 0, 1080, 1920);
       ctx.drawImage(bgImg, 0, 0, 1080, 1920);
 
-      // Gradiente de oscurecimiento superior e inferior para legibilidad
-      const grad = ctx.createRadialGradient(540, 300, 50, 540, 960, 900);
-      grad.addColorStop(0, 'rgba(13, 27, 42, 0.45)');
-      grad.addColorStop(0.6, 'rgba(3, 7, 18, 0.78)');
-      grad.addColorStop(1, 'rgba(3, 7, 18, 0.95)');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, 1080, 1920);
-
-      // Top flags (círculos)
-      const flags = [
-        { code: 'EC', color1: '#FFDD00', color2: '#034EA2', color3: '#ED1C24' },
-        { code: 'PE', color1: '#D91023', color2: '#FFFFFF', color3: '#D91023' },
-        { code: 'CO', color1: '#FCD116', color2: '#003893', color3: '#CE1126' },
-        { code: 'MX', color1: '#006847', color2: '#FFFFFF', color3: '#CE1126' }
-      ];
-
-      const startX = 540 - ((flags.length * 52 + (flags.length - 1) * 20) / 2);
-      flags.forEach((f, idx) => {
-        const cx = startX + idx * 72 + 26;
-        const cy = 110;
-
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(cx, cy, 24, 0, Math.PI * 2);
-        ctx.clip();
-
-        if (f.code === 'PE' || f.code === 'MX') {
-          ctx.fillStyle = f.color1; ctx.fillRect(cx - 24, cy - 24, 16, 48);
-          ctx.fillStyle = f.color2; ctx.fillRect(cx - 8, cy - 24, 16, 48);
-          ctx.fillStyle = f.color3; ctx.fillRect(cx + 8, cy - 24, 16, 48);
-        } else {
-          ctx.fillStyle = f.color1; ctx.fillRect(cx - 24, cy - 24, 48, 24);
-          ctx.fillStyle = f.color2; ctx.fillRect(cx - 24, cy, 48, 12);
-          ctx.fillStyle = f.color3; ctx.fillRect(cx - 24, cy + 12, 48, 12);
-        }
-        ctx.restore();
-
-        // Borde dorado de la bandera
-        ctx.beginPath();
-        ctx.arc(cx, cy, 24, 0, Math.PI * 2);
-        ctx.strokeStyle = 'rgba(255, 215, 0, 0.6)';
-        ctx.lineWidth = 2.5;
-        ctx.stroke();
-      });
-
-      // Dibujar logo oficial
-      const logoW = 220;
+      // 2. Logo oficial blanco centrado
+      const logoW = 190;
       const logoH = (logoImg.height / logoImg.width) * logoW;
-      ctx.drawImage(logoImg, 540 - (logoW / 2), 170, logoW, logoH);
+      ctx.drawImage(logoImg, 540 - logoW / 2, 90, logoW, logoH);
 
-      // Marca
-      ctx.font = '800 20px Montserrat, sans-serif';
-      ctx.fillStyle = '#f59e0b';
+      // 3. Eyebrow FECHAS
+      ctx.save();
+      ctx.font = '300 22px "Montserrat", sans-serif';
+      if ('letterSpacing' in ctx) ctx.letterSpacing = '9px';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.82)';
       ctx.textAlign = 'center';
-      ctx.letterSpacing = '6px';
-      ctx.fillText('CREAR PODER SIN LÍMITES', 540, 170 + logoH + 45);
+      ctx.textBaseline = 'middle';
+      ctx.shadowColor = 'rgba(255, 255, 255, 0.3)';
+      ctx.shadowBlur = 10;
+      ctx.fillText(eyebrow, 540, 440);
+      ctx.restore();
 
-      // Programa
-      ctx.font = '900 52px Montserrat, sans-serif';
-      const gradTitle = ctx.createLinearGradient(300, 0, 780, 0);
-      gradTitle.addColorStop(0, '#ffffff');
-      gradTitle.addColorStop(0.5, '#fef08a');
-      gradTitle.addColorStop(1, '#eab308');
-      ctx.fillStyle = gradTitle;
-      ctx.letterSpacing = '3px';
-      ctx.fillText(programa.toUpperCase(), 540, 170 + logoH + 115);
+      // 4. Marca de agua en contorno (Fondo)
+      ctx.save();
+      ctx.font = '800 168px "Montserrat", sans-serif';
+      if ('letterSpacing' in ctx) ctx.letterSpacing = '28px';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+      ctx.lineWidth = 1.2;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.strokeText(outline, 540, 565);
+      ctx.restore();
 
-      // Subtítulo Pill
-      const subTxt = subtitulo.toUpperCase();
-      ctx.font = '700 16px Montserrat, sans-serif';
-      ctx.letterSpacing = '4px';
-      const subW = ctx.measureText(subTxt).width + 60;
-      const subY = 170 + logoH + 150;
+      // 5. Ttulo Principal con resplandor dorado (Primer Plano)
+      ctx.save();
+      ctx.font = '800 49px "Montserrat", sans-serif';
+      if ('letterSpacing' in ctx) ctx.letterSpacing = '10px';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
 
-      ctx.beginPath();
-      ctx.roundRect(540 - (subW / 2), subY, subW, 38, 19);
-      ctx.fillStyle = 'rgba(255, 183, 3, 0.15)';
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(255, 183, 3, 0.5)';
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
+      // Glow suave amarillo/dorado
+      ctx.shadowColor = 'rgba(245, 180, 70, 0.4)';
+      ctx.shadowBlur = 32;
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(programa, 540, 565);
 
-      ctx.fillStyle = '#fbbf24';
-      ctx.fillText(subTxt, 540, subY + 25);
+      // Glow intenso central
+      ctx.shadowColor = 'rgba(255, 240, 200, 0.85)';
+      ctx.shadowBlur = 15;
+      ctx.fillText(programa, 540, 565);
 
-      // Lista de Sedes
-      const sedesActivas = sedes.filter(s => s.activo);
-      const startSedesY = 480;
-      const cardH = 92;
-      const gap = 20;
+      // Texto slido frontal
+      ctx.shadowBlur = 0;
+      ctx.fillText(programa, 540, 565);
+      ctx.restore();
 
-      sedesActivas.forEach((s, idx) => {
-        const cy = startSedesY + idx * (cardH + gap);
+      // 6. Lista flotante de Sedes y Fechas
+      const activeSedes = sedes.filter(s => s.activo);
+      const totalSedes = activeSedes.length;
+      const startY = 726;
+      const step = totalSedes > 5 ? 122 : 140;
 
-        // Card glassmorphic
+      activeSedes.forEach((s, idx) => {
+        const y = startY + idx * step;
+
+        // Nombre de la Ciudad (dorado/mbar)
         ctx.save();
-        ctx.beginPath();
-        ctx.roundRect(75, cy, 930, cardH, 20);
-        ctx.fillStyle = 'rgba(15, 23, 42, 0.72)';
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(255, 215, 0, 0.3)';
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-
-        // Bandera redonda
-        const flagX = 135;
-        const flagY = cy + cardH / 2;
-        ctx.beginPath();
-        ctx.arc(flagX, flagY, 22, 0, Math.PI * 2);
-        ctx.save();
-        ctx.clip();
-
-        if (s.codigo === 'PE') {
-          ctx.fillStyle = '#D91023'; ctx.fillRect(flagX - 22, flagY - 22, 14, 44);
-          ctx.fillStyle = '#FFFFFF'; ctx.fillRect(flagX - 8, flagY - 22, 16, 44);
-          ctx.fillStyle = '#D91023'; ctx.fillRect(flagX + 8, flagY - 22, 14, 44);
-        } else if (s.codigo === 'MX') {
-          ctx.fillStyle = '#006847'; ctx.fillRect(flagX - 22, flagY - 22, 14, 44);
-          ctx.fillStyle = '#FFFFFF'; ctx.fillRect(flagX - 8, flagY - 22, 16, 44);
-          ctx.fillStyle = '#CE1126'; ctx.fillRect(flagX + 8, flagY - 22, 14, 44);
-        } else {
-          ctx.fillStyle = '#FFDD00'; ctx.fillRect(flagX - 22, flagY - 22, 44, 22);
-          ctx.fillStyle = '#034EA2'; ctx.fillRect(flagX - 22, flagY, 44, 11);
-          ctx.fillStyle = '#ED1C24'; ctx.fillRect(flagX - 22, flagY + 11, 44, 11);
-        }
+        ctx.font = '700 41px "Montserrat", sans-serif';
+        if ('letterSpacing' in ctx) ctx.letterSpacing = '1.5px';
+        ctx.fillStyle = '#f29e2e';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.shadowColor = 'rgba(242, 164, 59, 0.45)';
+        ctx.shadowBlur = 16;
+        ctx.fillText(s.ciudad, 540, y);
         ctx.restore();
 
-        ctx.beginPath();
-        ctx.arc(flagX, flagY, 22, 0, Math.PI * 2);
-        ctx.strokeStyle = 'rgba(255, 215, 0, 0.5)';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
-        // Nombre de ciudad y país
-        ctx.textAlign = 'left';
-        ctx.letterSpacing = '2px';
-        ctx.font = '900 32px Montserrat, sans-serif';
+        // Fechas (blanco elegante)
+        ctx.save();
+        ctx.font = '300 30px "Montserrat", sans-serif';
+        if ('letterSpacing' in ctx) ctx.letterSpacing = '0.5px';
         ctx.fillStyle = '#ffffff';
-        ctx.fillText(s.ciudad, 180, cy + 45);
-
-        ctx.font = '600 14px Montserrat, sans-serif';
-        ctx.fillStyle = '#94a3b8';
-        ctx.letterSpacing = '3px';
-        ctx.fillText(s.pais.toUpperCase(), 182, cy + 72);
-
-        // Badge de Fecha
-        const badgeW = 340;
-        const badgeH = 54;
-        const badgeX = 930 - badgeW;
-        const badgeY = cy + (cardH - badgeH) / 2;
-
-        ctx.beginPath();
-        ctx.roundRect(badgeX, badgeY, badgeW, badgeH, 14);
-        const bGrad = ctx.createLinearGradient(badgeX, badgeY, badgeX + badgeW, badgeY + badgeH);
-        bGrad.addColorStop(0, 'rgba(245, 158, 11, 0.2)');
-        bGrad.addColorStop(1, 'rgba(217, 119, 6, 0.35)');
-        ctx.fillStyle = bGrad;
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(245, 158, 11, 0.6)';
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-
         ctx.textAlign = 'center';
-        ctx.font = '800 21px Montserrat, sans-serif';
-        ctx.fillStyle = '#fbbf24';
-        ctx.letterSpacing = '1px';
-        ctx.fillText(s.fechas.toUpperCase(), badgeX + badgeW / 2, badgeY + 35);
-
+        ctx.textBaseline = 'middle';
+        ctx.shadowColor = 'rgba(255, 255, 255, 0.35)';
+        ctx.shadowBlur = 12;
+        ctx.fillText(s.fechas, 540, y + 46);
         ctx.restore();
       });
 
-      // Footer Hashtag
+      // 7. Banderas Metlicas Circulares Oficiales
+      const flagsW = 445;
+      const flagsH = (flagsImg.height / flagsImg.width) * flagsW;
+      ctx.drawImage(flagsImg, 540 - flagsW / 2, 1685, flagsW, flagsH);
+
+      // 8. Hashtag oficial #SOYCREADOR
+      ctx.save();
+      ctx.font = '400 21px "Montserrat", sans-serif';
+      if ('letterSpacing' in ctx) ctx.letterSpacing = '8px';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
       ctx.textAlign = 'center';
-      ctx.font = 'italic 900 42px Montserrat, sans-serif';
-      ctx.fillStyle = '#ffffff';
-      ctx.letterSpacing = '8px';
-      ctx.shadowColor = 'rgba(245, 158, 11, 0.6)';
-      ctx.shadowBlur = 25;
-      ctx.fillText('#SOYCREADOR', 540, 1780);
-      ctx.shadowBlur = 0;
+      ctx.textBaseline = 'middle';
+      ctx.shadowColor = 'rgba(255, 255, 255, 0.45)';
+      ctx.shadowBlur = 15;
+      ctx.fillText(hashtag, 540, 1800);
+      ctx.restore();
 
-      // Contacto oficial
-      ctx.font = '700 16px Montserrat, sans-serif';
-      ctx.letterSpacing = '3px';
-      ctx.fillStyle = '#38bdf8';
-      ctx.fillText('CREARPSL.COM', 440, 1825);
-      ctx.fillStyle = '#f59e0b';
-      ctx.fillText('•', 540, 1825);
-      ctx.fillStyle = '#cbd5e1';
-      ctx.fillText('WHATSAPP: +51 981 237 577', 670, 1825);
+      // Generar link de descarga
+      canvas.toBlob((blob) => {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.download = `Flyer_CPSL_${programa.replace(/\s+/g, '_')}_1080x1920.png`;
+        link.href = url;
+        link.click();
+        URL.revokeObjectURL(url);
+        showToast?.('¡Flyer HD generado y descargado con éxito!', 'success');
+        setDescargando(false);
+      }, 'image/png');
 
-      // Exportar como PNG y descargar
-      const link = document.createElement('a');
-      link.download = `Flyer_${programa.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.png`;
-      link.href = canvas.toDataURL('image/png', 1.0);
-      link.click();
-
-      showToast?.('¡Flyer 1080x1920 descargado con éxito!', 'success');
     } catch (err) {
-      console.error(err);
-      showToast?.('Error al generar la imagen: ' + err.message, 'error');
-    } finally {
+      console.error('Error generando flyer:', err);
+      showToast?.('Error al generar flyer: ' + err.message, 'error');
       setDescargando(false);
     }
   };
 
   return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto min-h-screen text-white">
+    <div className="space-y-6 max-w-7xl mx-auto pb-16">
+      
+      {/* Canvas oculto para exportar a 1080x1920 */}
+      <canvas ref={canvasRef} className="hidden" />
+
       {/* HEADER */}
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-        <div>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-panel p-6 rounded-2xl border border-yellow-500/20">
+        <div className="flex items-center gap-4">
           <button
-            onClick={() => navigate('/home')}
-            className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-2 text-sm font-semibold"
+            onClick={() => navigate('/')}
+            className="p-2.5 rounded-xl bg-gray-800/80 hover:bg-gray-700 text-gray-300 hover:text-white transition-all border border-gray-700"
+            title="Volver al panel"
           >
-            <ArrowLeft size={16} /> Volver a Causa OS
+            <ArrowLeft size={20} />
           </button>
-          <h1 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-crear-gold via-yellow-400 to-amber-500 flex items-center gap-3">
-            <Sparkles className="text-yellow-400" size={32} />
-            Bot Generador de Flyers Oficiales
-          </h1>
-          <p className="text-gray-400 text-sm mt-1">
-            CREAR PODER SIN LÍMITES &bull; Generación automatizada 1080x1920 con fechas actualizadas por sede
-          </p>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-yellow-500/10 text-yellow-400 border border-yellow-500/30">
+                Oficial CREAR Poder sin Límites
+              </span>
+              <span className="text-xs text-gray-400 font-semibold">&bull; Fidelidad 100% Cinemática</span>
+            </div>
+            <h1 className="text-2xl font-black text-white mt-1 flex items-center gap-2">
+              <Sparkles className="text-yellow-400" size={24} />
+              Generador Oficial de Flyers HD
+            </h1>
+            <p className="text-xs text-gray-400">
+              Genera y descarga el flyer oficial con fondo satelital orbital, tipografía original y fechas actualizadas.
+            </p>
+          </div>
         </div>
 
-        <div className="flex flex-wrap gap-3">
+        <div className="flex items-center gap-3">
           <button
-            onClick={sincronizarFechasCalendario}
-            className="btn-secondary flex items-center gap-2 border-yellow-500/30 hover:border-yellow-400 text-yellow-400"
+            onClick={restaurarOriginal}
+            className="btn-secondary text-xs flex items-center gap-1.5 py-2 px-3"
+            title="Restaurar a los valores del flyer oficial original"
           >
-            <RefreshCw size={16} /> Sincronizar Calendario
+            <RefreshCw size={14} /> Restaurar Original
           </button>
           <button
             onClick={() => setShowCliModal(true)}
-            className="btn-secondary flex items-center gap-2 text-cyan-400 border-cyan-500/30 hover:border-cyan-400"
+            className="px-3 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-yellow-400 font-bold text-xs border border-yellow-500/30 flex items-center gap-1.5 transition-all"
           >
-            <Terminal size={16} /> Bot Puppeteer CLI
-          </button>
-          <button
-            onClick={descargarFlyerHD}
-            disabled={descargando}
-            className="btn-primary flex items-center gap-2 bg-gradient-to-r from-yellow-500 to-amber-600 text-black font-extrabold px-5 py-2.5 rounded-xl hover:scale-105 transition-all shadow-[0_0_20px_rgba(245,158,11,0.4)] disabled:opacity-50"
-          >
-            <Download size={18} /> {descargando ? 'Generando PNG...' : 'Descargar Flyer HD (1080x1920)'}
+            <Terminal size={14} /> Bot CLI
           </button>
         </div>
       </div>
 
-      {/* CANVAS OCULTO PARA EXPORTACIÓN EN ALTA DEFINICIÓN */}
-      <canvas
-        ref={canvasRef}
-        width={1080}
-        height={1920}
-        style={{ display: 'none' }}
-      />
+      {/* GRID PRINCIPAL: CONTROLES + PREVIEW EXACTO */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
-      {/* GRID PRINCIPAL: CONFIGURACIÓN A LA IZQUIERDA / PREVIEW A LA DERECHA */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
-        {/* PANEL DE CONFIGURACIÓN */}
-        <div className="lg:col-span-6 space-y-6">
+        {/* COLUMNA IZQUIERDA: CONTROLES */}
+        <div className="lg:col-span-6 space-y-5">
           
-          {/* Tarjeta Programa */}
-          <div className="glass-panel p-6 rounded-2xl border border-gray-800 space-y-4">
-            <h3 className="text-lg font-bold text-crear-gold flex items-center gap-2">
-              <Sliders size={20} /> Parámetros del Flyer
+          {/* Tarjeta de Títulos */}
+          <div className="glass-panel p-5 rounded-2xl border border-gray-800 space-y-4">
+            <h3 className="text-sm font-black text-yellow-400 uppercase tracking-wider flex items-center gap-2">
+              <Sliders size={16} /> Título y Jerarquía Visual
             </h3>
 
-            <div>
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-2">
-                Programa / Entrenamiento
-              </label>
-              <select
-                value={programa}
-                onChange={(e) => setPrograma(e.target.value)}
-                className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white font-bold focus:border-crear-gold focus:outline-none"
-              >
-                <option value="MAESTRÍA EN CREACIÓN">MAESTRÍA EN CREACIÓN</option>
-                <option value="CREACIÓN 1">CREACIÓN 1</option>
-                <option value="CREACIÓN 2">CREACIÓN 2</option>
-                <option value="EL VIAJE">EL VIAJE</option>
-                <option value="GIRA INTERNACIONAL">GIRA INTERNACIONAL</option>
-              </select>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-[11px] font-bold text-gray-300 uppercase mb-1">
+                  Subtítulo Superior
+                </label>
+                <input
+                  type="text"
+                  value={eyebrow}
+                  onChange={(e) => setEyebrow(e.target.value)}
+                  placeholder="FECHAS"
+                  className="w-full bg-black/60 border border-gray-700 rounded-xl px-3.5 py-2 text-xs font-semibold text-white focus:border-yellow-400 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-gray-300 uppercase mb-1">
+                  Hashtag Inferior
+                </label>
+                <input
+                  type="text"
+                  value={hashtag}
+                  onChange={(e) => setHashtag(e.target.value)}
+                  placeholder="#SOYCREADOR"
+                  className="w-full bg-black/60 border border-gray-700 rounded-xl px-3.5 py-2 text-xs font-semibold text-white focus:border-yellow-400 focus:outline-none"
+                />
+              </div>
             </div>
 
-            <div>
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-2">
-                Subtítulo / Etiqueta Superior
-              </label>
-              <input
-                type="text"
-                value={subtitulo}
-                onChange={(e) => setSubtitulo(e.target.value)}
-                placeholder="GIRA INTERNACIONAL 2026"
-                className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white font-semibold focus:border-crear-gold focus:outline-none"
-              />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-[11px] font-bold text-gray-300 uppercase mb-1">
+                  Título Principal (Frente)
+                </label>
+                <input
+                  type="text"
+                  value={programa}
+                  onChange={(e) => handleProgramaChange(e.target.value)}
+                  placeholder="CAPÍTULO UNO"
+                  className="w-full bg-black/60 border border-gray-700 rounded-xl px-3.5 py-2 text-xs font-bold text-yellow-400 focus:border-yellow-400 focus:outline-none uppercase"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-gray-300 uppercase mb-1">
+                  Marca de Agua Contorno (Fondo)
+                </label>
+                <input
+                  type="text"
+                  value={outline}
+                  onChange={(e) => setOutline(e.target.value)}
+                  placeholder="UNO"
+                  className="w-full bg-black/60 border border-gray-700 rounded-xl px-3.5 py-2 text-xs font-bold text-gray-300 focus:border-yellow-400 focus:outline-none uppercase"
+                />
+              </div>
             </div>
           </div>
 
-          {/* Tarjeta Sedes y Fechas */}
-          <div className="glass-panel p-6 rounded-2xl border border-gray-800 space-y-4">
+          {/* Tarjeta de Fechas por Sede */}
+          <div className="glass-panel p-5 rounded-2xl border border-gray-800 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-bold text-crear-gold flex items-center gap-2">
-                <Calendar size={20} /> Sedes y Fechas Oficiales
-              </h3>
-              <span className="text-xs text-gray-400">{sedes.filter(s => s.activo).length} activas</span>
+              <div>
+                <h3 className="text-sm font-black text-yellow-400 uppercase tracking-wider flex items-center gap-2">
+                  <Calendar size={16} /> Sedes y Fechas Oficiales
+                </h3>
+                <p className="text-[11px] text-gray-400 mt-0.5">
+                  Activa, edita o agrega sedes. Se alinean automáticamente con la tipografía oficial.
+                </p>
+              </div>
+              <button
+                onClick={addSede}
+                className="px-2.5 py-1.5 rounded-lg bg-yellow-500/15 text-yellow-400 hover:bg-yellow-500/25 border border-yellow-500/30 text-xs font-bold flex items-center gap-1 transition-all"
+              >
+                <Plus size={14} /> Agregar
+              </button>
             </div>
 
-            <div className="space-y-3">
-              {sedes.map(s => (
+            <div className="space-y-2.5 max-h-[380px] overflow-y-auto pr-1">
+              {sedes.map((s) => (
                 <div
                   key={s.id}
-                  className={`flex items-center gap-3 p-3.5 rounded-xl border transition-all ${
+                  className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${
                     s.activo ? 'bg-gray-900/80 border-gray-700' : 'bg-gray-950/40 border-gray-900 opacity-50'
                   }`}
                 >
@@ -432,20 +394,33 @@ export default function GeneradorFlyer() {
                     type="checkbox"
                     checked={s.activo}
                     onChange={() => toggleSedeActiva(s.id)}
-                    className="accent-yellow-500 w-5 h-5 cursor-pointer rounded"
+                    className="accent-yellow-500 w-4 h-4 cursor-pointer rounded"
                   />
-                  <span className="text-2xl">{s.bandera}</span>
                   <div className="w-28 flex-shrink-0">
-                    <p className="font-extrabold text-sm text-white">{s.ciudad}</p>
-                    <p className="text-[10px] text-gray-400 uppercase font-semibold">{s.pais}</p>
+                    <input
+                      type="text"
+                      value={s.ciudad}
+                      disabled={!s.activo}
+                      onChange={(e) => updateSede(s.id, 'ciudad', e.target.value)}
+                      placeholder="Ciudad"
+                      className="w-full bg-black/60 border border-gray-700 rounded-lg px-2.5 py-1.5 text-xs font-bold text-yellow-400 focus:border-yellow-400 focus:outline-none"
+                    />
                   </div>
                   <input
                     type="text"
                     value={s.fechas}
                     disabled={!s.activo}
-                    onChange={(e) => updateSedeFecha(s.id, e.target.value)}
-                    className="flex-1 bg-black/60 border border-gray-700 rounded-lg px-3 py-2 text-xs font-bold text-yellow-400 uppercase focus:border-yellow-400 focus:outline-none"
+                    onChange={(e) => updateSede(s.id, 'fechas', e.target.value)}
+                    placeholder="Fechas (ej: 18, 19 y 20 de septiembre)"
+                    className="flex-1 bg-black/60 border border-gray-700 rounded-lg px-3 py-1.5 text-xs font-medium text-white focus:border-yellow-400 focus:outline-none"
                   />
+                  <button
+                    onClick={() => removeSede(s.id)}
+                    className="text-gray-500 hover:text-red-400 p-1 transition-all"
+                    title="Eliminar sede"
+                  >
+                    <Trash2 size={15} />
+                  </button>
                 </div>
               ))}
             </div>
@@ -453,102 +428,114 @@ export default function GeneradorFlyer() {
 
         </div>
 
-        {/* PREVIEW EN TIEMPO REAL */}
+        {/* COLUMNA DERECHA: PREVIEW IDÉNTICO AL ORIGINAL */}
         <div className="lg:col-span-6 flex flex-col items-center">
-          <div className="w-full flex justify-between items-center mb-3 max-w-sm">
-            <span className="text-xs font-bold text-gray-400 uppercase flex items-center gap-1.5">
-              <Eye size={14} className="text-yellow-400" /> Previsualización en Vivo (9:16)
+          <div className="w-full flex justify-between items-center mb-3 max-w-[360px]">
+            <span className="text-xs font-bold text-gray-300 uppercase flex items-center gap-1.5">
+              <Eye size={14} className="text-yellow-400" /> Previsualización Oficial (9:16)
             </span>
             <span className="text-[10px] px-2.5 py-1 bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 rounded-full font-bold">
-              1080 x 1920
+              1080 x 1920 HD
             </span>
           </div>
 
-          {/* MOCKUP VERTICAL ESTILO FLYER */}
+          {/* MOCKUP VERTICAL CINEMÁTICO 100% FIEL */}
           <div
-            className="w-full max-w-sm rounded-3xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.9)] border-2 border-yellow-500/30 relative flex flex-col justify-between"
+            className="w-full max-w-[360px] h-[640px] rounded-3xl overflow-hidden shadow-[0_25px_70px_rgba(0,0,0,0.95)] border border-white/10 relative flex flex-col justify-between select-none"
             style={{
-              aspectRatio: '9/16',
-              backgroundImage: "url('/flyer_earth_bg.png')",
-              backgroundSize: 'cover',
+              backgroundImage: "url('/flyer_earth_bg_1080.png')",
+              backgroundSize: '100% 100%',
               backgroundPosition: 'center bottom',
-              backgroundColor: '#030712'
+              backgroundColor: '#010308',
+              fontFamily: "'Montserrat', sans-serif"
             }}
           >
-            {/* Overlay gradiente */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_15%,_rgba(13,27,42,0.45)_0%,_rgba(3,7,18,0.8)_60%,_rgba(3,7,18,0.95)_100%)] pointer-events-none" />
-
-            {/* Contenido */}
-            <div className="relative z-10 p-5 flex flex-col h-full justify-between">
-              
-              {/* Top flags */}
-              <div>
-                <div className="flex justify-center gap-2 mb-3">
-                  <span className="text-lg">🇪🇨</span>
-                  <span className="text-lg">🇵🇪</span>
-                  <span className="text-lg">🇨🇴</span>
-                  <span className="text-lg">🇲🇽</span>
-                </div>
-
-                <div className="text-center mb-2">
-                  <img src="/logo_crear_blanco.png" alt="CREAR" className="h-10 mx-auto object-contain drop-shadow-[0_0_12px_rgba(255,183,3,0.4)]" />
-                </div>
-
-                <div className="text-center">
-                  <p className="text-[9px] font-black tracking-[0.25em] text-yellow-500 uppercase mb-1">
-                    CREAR PODER SIN LÍMITES
-                  </p>
-                  <h2 className="text-lg font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-yellow-200 to-yellow-500 uppercase leading-tight">
-                    {programa}
-                  </h2>
-                  <span className="inline-block mt-1 px-3 py-0.5 rounded-full text-[9px] font-bold tracking-widest uppercase bg-yellow-500/15 border border-yellow-500/40 text-yellow-300">
-                    {subtitulo}
-                  </span>
-                </div>
-              </div>
-
-              {/* Lista Sedes */}
-              <div className="space-y-2 my-auto">
-                {sedes.filter(s => s.activo).map(s => (
-                  <div
-                    key={s.id}
-                    className="flex items-center justify-between px-3 py-2 rounded-xl bg-slate-900/70 border border-yellow-500/25 shadow-lg backdrop-blur-md"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="text-base">{s.bandera}</span>
-                      <div>
-                        <p className="text-xs font-black text-white leading-none">{s.ciudad}</p>
-                        <p className="text-[8px] font-semibold text-gray-400 uppercase mt-0.5">{s.pais}</p>
-                      </div>
-                    </div>
-                    <div className="px-2.5 py-1 rounded-lg bg-gradient-to-r from-yellow-500/20 to-amber-600/30 border border-yellow-500/50">
-                      <span className="text-[10px] font-black text-yellow-400 whitespace-nowrap">
-                        {s.fechas}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Footer */}
-              <div className="text-center mt-3">
-                <p className="text-lg font-black italic tracking-widest text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.7)]">
-                  #SOYCREADOR
-                </p>
-                <p className="text-[8px] font-bold text-gray-300 tracking-wider mt-0.5">
-                  <span className="text-cyan-400">CREARPSL.COM</span> &bull; WHATSAPP: +51 981 237 577
-                </p>
-              </div>
-
+            {/* TOP LOGO OFICIAL */}
+            <div className="pt-7 flex justify-center">
+              <img
+                src="/logo_crear_blanco.png"
+                alt="CREAR Poder sin límites"
+                className="w-[64px] h-auto object-contain"
+              />
             </div>
+
+            {/* EYEBROW & MAIN TITLE */}
+            <div className="text-center relative -mt-3">
+              <p className="text-[8px] font-light tracking-[0.42em] pl-[0.42em] text-white/80 uppercase mb-1 drop-shadow">
+                {eyebrow}
+              </p>
+              
+              <div className="relative flex items-center justify-center">
+                {/* Outline Watermark (Fondo) */}
+                <span
+                  className="absolute font-black tracking-[0.18em] pl-[0.18em] text-transparent select-none pointer-events-none"
+                  style={{
+                    fontSize: '56px',
+                    WebkitTextStroke: '1px rgba(255, 255, 255, 0.12)'
+                  }}
+                >
+                  {outline}
+                </span>
+
+                {/* Título Principal con Halo Luminous */}
+                <h2
+                  className="relative z-10 text-[16px] font-black tracking-[0.20em] pl-[0.20em] text-white uppercase whitespace-nowrap"
+                  style={{
+                    textShadow: '0 0 10px rgba(255, 240, 200, 0.9), 0 0 20px rgba(245, 180, 70, 0.5), 0 2px 4px rgba(0, 0, 0, 0.9)'
+                  }}
+                >
+                  {programa}
+                </h2>
+              </div>
+            </div>
+
+            {/* LISTA FLOTANTE DE CIUDADES Y FECHAS (SIN CAJAS, ESTILO ORIGINAL) */}
+            <div className="flex flex-col items-center justify-center space-y-3.5 my-auto px-4">
+              {sedes.filter(s => s.activo).map(s => (
+                <div key={s.id} className="text-center">
+                  <p
+                    className="text-[13.5px] font-bold text-[#f29e2e] leading-tight"
+                    style={{
+                      textShadow: '0 0 10px rgba(242, 164, 59, 0.45), 0 1px 4px rgba(0,0,0,0.8)'
+                    }}
+                  >
+                    {s.ciudad}
+                  </p>
+                  <p
+                    className="text-[10px] font-light text-white tracking-wide mt-0.5"
+                    style={{
+                      textShadow: '0 0 8px rgba(255, 255, 255, 0.35), 0 1px 4px rgba(0,0,0,0.9)'
+                    }}
+                  >
+                    {s.fechas}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* BANDERAS METÁLICAS Y HASHTAG (FONDO INFERIOR) */}
+            <div className="pb-6 flex flex-col items-center gap-2.5">
+              <img
+                src="/flags_badges_hd.png"
+                alt="Banderas Oficiales"
+                className="w-[148px] h-auto object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]"
+              />
+              <p
+                className="text-[7.5px] font-normal tracking-[0.38em] pl-[0.38em] text-white/90 drop-shadow"
+              >
+                {hashtag}
+              </p>
+            </div>
+
           </div>
 
+          {/* BOTÓN DE DESCARGA */}
           <button
             onClick={descargarFlyerHD}
             disabled={descargando}
-            className="mt-5 w-full max-w-sm py-3 px-4 bg-gradient-to-r from-yellow-500 to-amber-600 text-black font-black rounded-xl hover:scale-105 transition-all shadow-[0_0_20px_rgba(245,158,11,0.4)] flex items-center justify-center gap-2"
+            className="mt-5 w-full max-w-[360px] py-3 px-4 bg-gradient-to-r from-yellow-500 to-amber-600 text-black font-black rounded-xl hover:scale-105 active:scale-95 transition-all shadow-[0_0_25px_rgba(245,158,11,0.45)] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
           >
-            <Download size={18} /> Descargar en 1080x1920 (PNG)
+            <Download size={18} /> {descargando ? 'Generando 1080x1920...' : 'Descargar en 1080x1920 (PNG)'}
           </button>
         </div>
 
@@ -562,15 +549,15 @@ export default function GeneradorFlyer() {
               <Terminal size={22} /> Bot Autónomo de Flyers (Puppeteer)
             </h3>
             <p className="text-sm text-gray-300">
-              También puedes generar el flyer automáticamente desde la terminal o integrarlo en tus pipelines y bots de Telegram/WhatsApp usando el script de Node.js:
+              También puedes generar el flyer automáticamente con fidelidad 100% desde la terminal o integrarlo en pipelines de Telegram/WhatsApp usando el script de Node.js:
             </p>
             <div className="bg-black/90 p-4 rounded-xl font-mono text-xs text-green-400 border border-gray-800 select-all overflow-x-auto">
-              node scripts/generar_flyer.mjs --programa="MAESTRÍA EN CREACIÓN"
+              node scripts/generar_flyer.mjs --programa="CAPÍTULO UNO"
             </div>
             <div className="flex justify-end gap-3 pt-2">
               <button
                 onClick={() => {
-                  navigator.clipboard.writeText('node scripts/generar_flyer.mjs --programa="MAESTRÍA EN CREACIÓN"');
+                  navigator.clipboard.writeText('node scripts/generar_flyer.mjs --programa="CAPÍTULO UNO"');
                   showToast?.('Comando copiado al portapapeles', 'info');
                 }}
                 className="btn-secondary text-xs flex items-center gap-1.5"

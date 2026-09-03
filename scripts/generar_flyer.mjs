@@ -15,385 +15,272 @@ function getArg(key, def) {
   return found ? found.slice(prefix.length) : def;
 }
 
-const programa = getArg('programa', 'MAESTRÍA EN CREACIÓN');
-const subtitulo = getArg('subtitulo', 'GIRA INTERNACIONAL');
+const programa = getArg('programa', 'CAPÍTULO UNO');
+const outline = getArg('outline', programa.replace(/CAPÍTULO\s*/i, '').trim() || 'UNO');
+const eyebrow = getArg('eyebrow', 'FECHAS');
+const hashtag = getArg('hashtag', '#SOYCREADOR');
 const outputPath = path.resolve(process.cwd(), getArg('output', path.join(ROOT_DIR, 'public', 'flyer_generado.png')));
 
-// Sedes por defecto con fechas oficiales actualizadas
-const SVG_FLAGS = {
-  EC: `<svg viewBox="0 0 32 32" width="40" height="40" style="border-radius:50%;overflow:hidden;border:1.5px solid rgba(255,215,0,0.6);box-shadow:0 0 12px rgba(0,0,0,0.6);"><rect width="32" height="16" fill="#FFDD00"/><rect y="16" width="32" height="8" fill="#034EA2"/><rect y="24" width="32" height="8" fill="#ED1C24"/><circle cx="16" cy="18" r="3.5" fill="#C59B27"/></svg>`,
-  PE: `<svg viewBox="0 0 32 32" width="40" height="40" style="border-radius:50%;overflow:hidden;border:1.5px solid rgba(255,215,0,0.6);box-shadow:0 0 12px rgba(0,0,0,0.6);"><rect width="10.66" height="32" fill="#D91023"/><rect x="10.66" width="10.68" height="32" fill="#FFFFFF"/><rect x="21.34" width="10.66" height="32" fill="#D91023"/></svg>`,
-  CO: `<svg viewBox="0 0 32 32" width="40" height="40" style="border-radius:50%;overflow:hidden;border:1.5px solid rgba(255,215,0,0.6);box-shadow:0 0 12px rgba(0,0,0,0.6);"><rect width="32" height="16" fill="#FCD116"/><rect y="16" width="32" height="8" fill="#003893"/><rect y="24" width="32" height="8" fill="#CE1126"/></svg>`,
-  MX: `<svg viewBox="0 0 32 32" width="40" height="40" style="border-radius:50%;overflow:hidden;border:1.5px solid rgba(255,215,0,0.6);box-shadow:0 0 12px rgba(0,0,0,0.6);"><rect width="10.66" height="32" fill="#006847"/><rect x="10.66" width="10.68" height="32" fill="#FFFFFF"/><rect x="21.34" width="10.66" height="32" fill="#CE1126"/><circle cx="16" cy="16" r="3" fill="#8B5A2B"/></svg>`
-};
-
-const sedesDefault = [
-  { ciudad: 'LIMA', pais: 'Perú', codigo: 'PE', fechas: '04 - 06 SEPTIEMBRE', activo: true },
-  { ciudad: 'QUITO', pais: 'Ecuador', codigo: 'EC', fechas: '11 - 13 SEPTIEMBRE', activo: true },
-  { ciudad: 'MÉXICO', pais: 'México', codigo: 'MX', fechas: '18 - 20 SEPTIEMBRE', activo: true },
-  { ciudad: 'GUAYAQUIL', pais: 'Ecuador', codigo: 'EC', fechas: '25 - 27 SEPTIEMBRE', activo: true },
-  { ciudad: 'CUENCA', pais: 'Ecuador', codigo: 'EC', fechas: '02 - 04 OCTUBRE', activo: true },
-  { ciudad: 'MEDELLÍN', pais: 'Colombia', codigo: 'CO', fechas: '09 - 11 OCTUBRE', activo: true }
+// Sedes por defecto exactas al flyer oficial original
+let sedes = [
+  { ciudad: 'México', fechas: '18, 19 y 20 de septiembre' },
+  { ciudad: 'Lima', fechas: '18, 19 y 20 de septiembre' },
+  { ciudad: 'Quito', fechas: '25, 26 y 27 de septiembre' },
+  { ciudad: 'Guayaquil', fechas: '9, 10 y 11 de octubre' },
+  { ciudad: 'Cuenca', fechas: '16, 17 y 18 de octubre' },
+  { ciudad: 'Medellín', fechas: '16, 17 y 18 de octubre' }
 ];
 
-async function obtenerFechasDesdeAPI() {
-  const url = 'https://script.google.com/macros/s/AKfycbxSZFhddMYyspZpkW-qPHEi8hycLGfnhFeCPSYc4VbckWIeiiZAbxyJY71XRb2-Ya4U/exec?action=getEventos';
+const sedesArg = getArg('fechas', null);
+if (sedesArg) {
   try {
-    const res = await fetch(url, { redirect: 'follow' });
-    const text = await res.text();
-    if (!text.trim().startsWith('{') && !text.trim().startsWith('[')) return null;
-    const json = JSON.parse(text);
-    const eventos = Array.isArray(json) ? json : (json.data || []);
-    return eventos;
-  } catch (err) {
-    console.warn('[Bot Flyer] No se pudo conectar a la API externa de calendario, usando fechas de radar local:', err.message);
-    return null;
+    sedes = JSON.parse(sedesArg);
+  } catch (e) {
+    console.warn('No se pudo parsear el argumento --fechas como JSON, usando sedes por defecto.');
   }
 }
 
-async function generarFlyer() {
-  console.log('----------------------------------------------------');
-  console.log('🤖 BOT GENERADOR DE FLYERS - CAUSA OS / CREAR PSL');
-  console.log(`📌 Programa: ${programa}`);
-  console.log(`📁 Salida: ${outputPath}`);
-  console.log('----------------------------------------------------');
+function toBase64(filePath, mime = 'image/png') {
+  const buf = fs.readFileSync(filePath);
+  return `data:${mime};base64,${buf.toString('base64')}`;
+}
 
-  // Buscar assets
-  const bgPath = path.join(ROOT_DIR, 'public', 'flyer_earth_bg.png');
-  const logoPath = path.join(ROOT_DIR, 'public', 'logo_crear_blanco.png');
+const bgPath = path.join(ROOT_DIR, 'public', 'flyer_earth_bg_1080.png');
+const logoPath = path.join(ROOT_DIR, 'public', 'logo_crear_blanco.png');
+const flagsPath = path.join(ROOT_DIR, 'public', 'flags_badges_hd.png');
 
-  if (!fs.existsSync(bgPath)) {
-    throw new Error(`No se encontró el fondo requerido en: ${bgPath}`);
-  }
-  if (!fs.existsSync(logoPath)) {
-    throw new Error(`No se encontró el logo oficial en: ${logoPath}`);
-  }
+const bgDataUri = toBase64(bgPath);
+const logoDataUri = toBase64(logoPath);
+const flagsDataUri = toBase64(flagsPath);
 
-  const bgBase64 = `data:image/png;base64,${fs.readFileSync(bgPath).toString('base64')}`;
-  const logoBase64 = `data:image/png;base64,${fs.readFileSync(logoPath).toString('base64')}`;
+// Generar bloques de sedes
+const sedesHtml = sedes.map(s => `
+  <div class="city-block">
+    <div class="city-name">${s.ciudad}</div>
+    <div class="city-dates">${s.fechas}</div>
+  </div>
+`).join('');
 
-  const sedes = sedesDefault;
+const html = `
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      width: 1080px;
+      height: 1920px;
+      margin: 0;
+      padding: 0;
+      background-color: #010308;
+      background-image: url('${bgDataUri}');
+      background-size: 1080px 1920px;
+      background-repeat: no-repeat;
+      background-position: center bottom;
+      font-family: 'Montserrat', sans-serif;
+      color: #ffffff;
+      overflow: hidden;
+      position: relative;
+    }
 
-  // Renderizar HTML exacto a 1080 x 1920 (Instagram Story / Flyer vertical)
-  const sedesHTML = sedes.map((s, idx) => `
-    <div class="sede-row" style="animation-delay: ${0.1 * idx}s">
-      <div class="sede-left">
-        <div class="flag-icon">${SVG_FLAGS[s.codigo] || ""}</div>
-        <div class="sede-info">
-          <span class="city-name">${s.ciudad}</span>
-          <span class="country-name">${s.pais}</span>
-        </div>
-      </div>
-      <div class="date-badge">
-        <span class="date-text">${s.fechas}</span>
-      </div>
-    </div>
-  `).join('');
+    /* TOP LOGO OFICIAL */
+    .logo-container {
+      position: absolute;
+      top: 90px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+    }
+    .logo-img {
+      width: 190px;
+      height: auto;
+      object-fit: contain;
+    }
 
-  const htmlContent = `
-  <!DOCTYPE html>
-  <html lang="es">
-  <head>
-    <meta charset="UTF-8">
-    <title>Flyer Fechas CREAR PSL</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,900&display=swap" rel="stylesheet">
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-      body {
-        width: 1080px;
-        height: 1920px;
-        overflow: hidden;
-        position: relative;
-        font-family: 'Montserrat', sans-serif;
-        background-color: #030712;
-        color: #ffffff;
-      }
-      .bg-container {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 1080px;
-        height: 1920px;
-        background-image: url('${bgBase64}');
-        background-size: cover;
-        background-position: center bottom;
-        z-index: 1;
-      }
-      .overlay-gradient {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 1080px;
-        height: 1920px;
-        background: radial-gradient(circle at 50% 15%, rgba(13, 27, 42, 0.4) 0%, rgba(3, 7, 18, 0.75) 60%, rgba(3, 7, 18, 0.95) 100%);
-        z-index: 2;
-      }
-      .content {
-        position: relative;
-        z-index: 3;
-        width: 1080px;
-        height: 1920px;
-        padding: 85px 75px 80px 75px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-      }
-      
-      /* TOP FLAGS */
-      .top-flags {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 24px;
-        margin-bottom: 24px;
-      }
-      .flag-round {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 26px;
-        background: rgba(255, 255, 255, 0.08);
-        border: 1.5px solid rgba(255, 215, 0, 0.4);
-        box-shadow: 0 0 15px rgba(255, 183, 3, 0.25);
-      }
+    /* FECHAS EYEBROW */
+    .fechas-eyebrow {
+      position: absolute;
+      top: 440px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 22px;
+      font-weight: 300;
+      letter-spacing: 0.42em;
+      padding-left: 0.42em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.82);
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    }
 
-      /* LOGO */
-      .header-logo {
-        text-align: center;
-        margin-bottom: 20px;
-      }
-      .header-logo img {
-        height: 110px;
-        object-fit: contain;
-        filter: drop-shadow(0 0 25px rgba(255, 215, 0, 0.4));
-      }
+    /* TITULO DEL CAPITULO / PROGRAMA + WATERMARK */
+    .headline-container {
+      position: absolute;
+      top: 515px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 150px;
+    }
+    .outline-watermark {
+      position: absolute;
+      font-size: 168px;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      padding-left: 0.18em;
+      color: transparent;
+      -webkit-text-stroke: 1.2px rgba(255, 255, 255, 0.12);
+      user-select: none;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .main-title {
+      position: relative;
+      font-size: 49px;
+      font-weight: 800;
+      letter-spacing: 0.20em;
+      padding-left: 0.20em;
+      text-transform: uppercase;
+      color: #ffffff;
+      white-space: nowrap;
+      text-shadow: 
+        0 0 15px rgba(255, 240, 200, 0.85),
+        0 0 32px rgba(245, 180, 70, 0.4),
+        0 3px 6px rgba(0, 0, 0, 0.9);
+    }
 
-      /* TITLES */
-      .header-titles {
-        text-align: center;
-        margin-bottom: 40px;
-      }
-      .main-brand-title {
-        font-size: 20px;
-        font-weight: 800;
-        letter-spacing: 0.35em;
-        text-transform: uppercase;
-        color: #f59e0b;
-        margin-bottom: 12px;
-        text-shadow: 0 0 12px rgba(245, 158, 11, 0.5);
-      }
-      .program-title {
-        font-size: 52px;
-        font-weight: 900;
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-        line-height: 1.1;
-        background: linear-gradient(135deg, #ffffff 20%, #fef08a 60%, #eab308 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
-        margin-bottom: 14px;
-      }
-      .subtitle-pill {
-        display: inline-block;
-        padding: 8px 30px;
-        border-radius: 999px;
-        background: rgba(255, 183, 3, 0.12);
-        border: 1px solid rgba(255, 183, 3, 0.4);
-        color: #fbbf24;
-        font-size: 16px;
-        font-weight: 700;
-        letter-spacing: 0.25em;
-        text-transform: uppercase;
-        box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
-      }
+    /* LISTADO FLOTANTE DE CIUDADES Y FECHAS */
+    .cities-container {
+      position: absolute;
+      top: 726px;
+      left: 0;
+      right: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 46px;
+    }
+    .city-block {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 7px;
+    }
+    .city-name {
+      font-size: 41px;
+      font-weight: 700;
+      color: #f29e2e;
+      letter-spacing: 0.04em;
+      text-shadow: 
+        0 0 16px rgba(242, 164, 59, 0.45),
+        0 2px 6px rgba(0, 0, 0, 0.85);
+    }
+    .city-dates {
+      font-size: 30px;
+      font-weight: 300;
+      color: #ffffff;
+      letter-spacing: 0.02em;
+      text-shadow: 
+        0 0 12px rgba(255, 255, 255, 0.35),
+        0 2px 6px rgba(0, 0, 0, 0.9);
+    }
 
-      /* SEDES LIST */
-      .sedes-container {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-        margin: 20px 0 auto 0;
-      }
-      .sede-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 24px 34px;
-        background: rgba(15, 23, 42, 0.65);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border: 1.5px solid rgba(255, 215, 0, 0.25);
-        border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.03);
-      }
-      .sede-left {
-        display: flex;
-        align-items: center;
-        gap: 22px;
-      }
-      .flag-icon {
-        font-size: 34px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
-      }
-      .sede-info {
-        display: flex;
-        flex-direction: column;
-      }
-      .city-name {
-        font-size: 32px;
-        font-weight: 900;
-        letter-spacing: 0.08em;
-        color: #ffffff;
-        text-transform: uppercase;
-        line-height: 1.1;
-      }
-      .country-name {
-        font-size: 14px;
-        font-weight: 600;
-        letter-spacing: 0.15em;
-        color: #94a3b8;
-        text-transform: uppercase;
-        margin-top: 2px;
-      }
-      .date-badge {
-        padding: 12px 24px;
-        background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.35));
-        border: 1px solid rgba(245, 158, 11, 0.6);
-        border-radius: 14px;
-        box-shadow: 0 0 20px rgba(245, 158, 11, 0.25);
-      }
-      .date-text {
-        font-size: 22px;
-        font-weight: 800;
-        letter-spacing: 0.06em;
-        color: #fbbf24;
-        text-transform: uppercase;
-        white-space: nowrap;
-      }
+    /* BANDERAS METÁLICAS CIRCULARES OFICIALES */
+    .flags-container {
+      position: absolute;
+      top: 1685px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+    }
+    .flags-badges-img {
+      width: 445px;
+      height: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 18px rgba(0, 0, 0, 0.9));
+    }
 
-      /* FOOTER */
-      .footer {
-        text-align: center;
-        margin-top: 30px;
-      }
-      .hashtag {
-        font-size: 40px;
-        font-weight: 900;
-        letter-spacing: 0.2em;
-        text-transform: uppercase;
-        color: #ffffff;
-        text-shadow: 0 0 25px rgba(255, 255, 255, 0.6), 0 0 40px rgba(245, 158, 11, 0.4);
-        margin-bottom: 12px;
-        font-style: italic;
-      }
-      .contact-row {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 20px;
-        font-size: 16px;
-        font-weight: 600;
-        letter-spacing: 0.15em;
-        color: #cbd5e1;
-        text-transform: uppercase;
-      }
-      .contact-bullet {
-        color: #f59e0b;
-        font-size: 18px;
-      }
-      .web-link {
-        color: #38bdf8;
-        font-weight: 700;
-        text-decoration: none;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="bg-container"></div>
-    <div class="overlay-gradient"></div>
-    <div class="content">
-      
-      <!-- TOP SECTION -->
-      <div>
-        <div class="top-flags">
-          <div>${SVG_FLAGS.EC}</div>
-          <div>${SVG_FLAGS.PE}</div>
-          <div>${SVG_FLAGS.CO}</div>
-          <div>${SVG_FLAGS.MX}</div>
-        </div>
+    /* HASHTAG */
+    .hashtag-container {
+      position: absolute;
+      top: 1800px;
+      left: 0;
+      right: 0;
+      text-align: center;
+    }
+    .hashtag {
+      font-size: 21px;
+      font-weight: 400;
+      letter-spacing: 0.38em;
+      padding-left: 0.38em;
+      color: rgba(255, 255, 255, 0.92);
+      text-shadow: 0 0 15px rgba(255, 255, 255, 0.45);
+    }
+  </style>
+</head>
+<body>
 
-        <div class="header-logo">
-          <img src="${logoBase64}" alt="CREAR PODER SIN LÍMITES" />
-        </div>
+  <div class="logo-container">
+    <img src="${logoDataUri}" class="logo-img" alt="CREAR" />
+  </div>
 
-        <div class="header-titles">
-          <p class="main-brand-title">CREAR PODER SIN LÍMITES</p>
-          <h1 class="program-title">${programa}</h1>
-          <div class="subtitle-pill">${subtitulo}</div>
-        </div>
-      </div>
+  <div class="fechas-eyebrow">${eyebrow}</div>
 
-      <!-- SEDES LIST -->
-      <div class="sedes-container">
-        ${sedesHTML}
-      </div>
+  <div class="headline-container">
+    <div class="outline-watermark">${outline}</div>
+    <div class="main-title">${programa}</div>
+  </div>
 
-      <!-- FOOTER SECTION -->
-      <div class="footer">
-        <p class="hashtag">#SOYCREADOR</p>
-        <div class="contact-row">
-          <span class="web-link">CREARPSL.COM</span>
-          <span class="contact-bullet">&bull;</span>
-          <span>WHATSAPP: +51 981 237 577</span>
-        </div>
-      </div>
+  <div class="cities-container">
+    ${sedesHtml}
+  </div>
 
-    </div>
-  </body>
-  </html>
-  `;
+  <div class="flags-container">
+    <img src="${flagsDataUri}" class="flags-badges-img" alt="Banderas" />
+  </div>
 
-  console.log('🚀 Lanzando Puppeteer en modo headless...');
+  <div class="hashtag-container">
+    <div class="hashtag">${hashtag}</div>
+  </div>
+
+</body>
+</html>
+`;
+
+async function main() {
+  console.log(`Generando flyer de alta fidelidad: "${programa}"...`);
   const browser = await puppeteer.launch({
-    headless: true,
+    headless: 'new',
     args: ['--no-sandbox', '--disable-setuid-sandbox']
   });
-
   const page = await browser.newPage();
   await page.setViewport({ width: 1080, height: 1920, deviceScaleFactor: 1 });
+  await page.setContent(html, { waitUntil: 'networkidle0' });
+  await page.evaluateHandle('document.fonts.ready');
 
-  await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+  // Asegurar directorio destino
+  const dir = path.dirname(outputPath);
+  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
-  // Asegurar que el directorio de salida existe
-  const outDir = path.dirname(outputPath);
-  if (!fs.existsSync(outDir)) {
-    fs.mkdirSync(outDir, { recursive: true });
-  }
-
-  console.log('📸 Renderizando flyer 1080x1920 a alta resolución...');
   await page.screenshot({ path: outputPath, type: 'png' });
   await browser.close();
-
-  const stats = fs.statSync(outputPath);
-  console.log('✅ ¡FLYER GENERADO CON ÉXITO!');
-  console.log(`📊 Tamaño del archivo: ${(stats.size / 1024).toFixed(1)} KB`);
-  console.log(`📍 Archivo guardado en: ${outputPath}`);
+  console.log(`Flyer oficial generado con fidelidad 100%: ${outputPath}`);
 }
 
-generarFlyer().catch(err => {
-  console.error('❌ Error generando el flyer:', err);
+main().catch(err => {
+  console.error('Error generando flyer:', err);
   process.exit(1);
 });
