@@ -258,7 +258,11 @@ const DEFAULT_ACTIVITIES = [
   // texto real dice "VIA MEET" — el PDF de ejemplo más viejo (Equipo 28)
   // todavía decía ZOOM, por eso quedó desactualizado en la plantilla.
   { seccion: 'creacion', actividad: 'Reunión maestría de juego\nindicaciones sobre:\n(DIRECTORIO, CAMISETAS Y ESTANDARTE)\nVIA MEET DE GOOGLE', fecha: '', hora: '8:00 PM' },
-  { seccion: 'creacion', actividad: 'Entrega de futuros imposibles al correo:\nhttps://crearpslglobal.com/admin/login.php\nUsuario: invitadoFI\nContraseña: invitadofi', fecha: '', hora: 'Hasta 11:59 pm' },
+  // (03/09/2026) FIX — José: enlace y credenciales de entrega de futuros imposibles
+  // actualizados al portal IMO vigente (el resto del repo ya usaba imo.crearpslglobal.com
+  // — src/pages/ManualNodus.jsx, scripts/nodusScraper.js, etc. — solo esta plantilla del
+  // calendario había quedado con la URL y usuario/contraseña genéricos viejos).
+  { seccion: 'creacion', actividad: 'Entrega de futuros imposibles al correo:\nhttps://imo.crearpslglobal.com\nUsuario: invitadofiper\nContraseña: invitadofiper', fecha: '', hora: 'Hasta 11:59 pm' },
   { seccion: 'creacion', actividad: 'Entrega de directorio: físico y digital.', fecha: '', hora: 'Hasta las 2:00 pm, lo entrega un representante del equipo.' },
   { seccion: 'creacion', actividad: 'Entrenamiento de confianza', fecha: '', hora: '11:00 am a 2:00 pm.' },
   { seccion: 'creacion', actividad: 'Impacto Creación', fecha: '', hora: '3:00 pm a 5:00 pm' },

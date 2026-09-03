@@ -1,0 +1,142 @@
+{
+  "updatedAt": "2026-09-03T20:21:23.790Z",
+  "flights": {
+    "LA1437": {
+      "flightNumber": "LA 1437",
+      "flightCode": "LA1437",
+      "airline": "LATAM Airlines",
+      "callsign": "LAN1437",
+      "reservationCode": "DJBJJD",
+      "passengers": [
+        "Elmer Andrés Idrovo Andrade",
+        "María de Lourdes Patiño"
+      ],
+      "route": {
+        "origin": "UIO",
+        "originCity": "Quito",
+        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-04",
+        "scheduledDeparture": "2026-09-04T07:55:00-05:00",
+        "scheduledArrival": "2026-09-04T10:10:00-05:00",
+        "estimatedDeparture": "2026-09-04T07:55:00-05:00",
+        "estimatedArrival": "2026-09-04T10:10:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "A tiempo",
+      "statusDescription": "Vuelo confirmado y a tiempo para despegue directo UIO → LIM",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "10:35 AM",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1437",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1449": {
+      "flightNumber": "LA 1449",
+      "flightCode": "LA1449",
+      "airline": "LATAM Airlines",
+      "callsign": "LAN1449",
+      "reservationCode": "DJBJJD",
+      "passengers": [
+        "Elmer Andrés Idrovo Andrade"
+      ],
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": false,
+        "stops": 1,
+        "stopover": "Guayaquil (GYE) - Escala de 4h 00m",
+        "flightDuration": "7h 02m (con escala)"
+      },
+      "schedule": {
+        "departureDate": "2026-09-06",
+        "scheduledDeparture": "2026-09-06T23:35:00-05:00",
+        "scheduledArrival": "2026-09-07T06:37:00-05:00",
+        "estimatedDeparture": "2026-09-06T23:35:00-05:00",
+        "estimatedArrival": "2026-09-07T06:37:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Programado · A tiempo",
+      "statusDescription": "Vuelo de retorno programado",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Por confirmar",
+      "baggageClaim": null,
+      "logistics": {
+        "pickupLocation": "Lobby del Hotel Jose Antonio Deluxe",
+        "driverPickupEstimated": "8:30 PM (20:30 hrs)",
+        "destination": "Aeropuerto Jorge Chávez",
+        "driverNote": "Recojo 3h antes para vuelo internacional nocturno."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1449",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "AV108": {
+      "flightNumber": "AV 108",
+      "flightCode": "AV108",
+      "airline": "Avianca",
+      "callsign": "AVA108",
+      "reservationCode": "AVCONF",
+      "passengers": [
+        "Alejandro Díaz Pabón"
+      ],
+      "route": {
+        "origin": "BOG",
+        "originCity": "Bogotá",
+        "originAirport": "Aeropuerto Internacional El Dorado",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "3h 05m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-04",
+        "scheduledDeparture": "2026-09-04T06:15:00-05:00",
+        "scheduledArrival": "2026-09-04T09:20:00-05:00",
+        "estimatedDeparture": "2026-09-04T06:15:00-05:00",
+        "estimatedArrival": "2026-09-04T09:20:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "A tiempo",
+      "statusDescription": "Vuelo confirmado y a tiempo",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Por confirmar",
+      "baggageClaim": "Por confirmar",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe",
+        "driverPickupEstimated": "09:45 AM",
+        "driverNote": "Conductor esperará en llegadas internacionales."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/av108",
+      "checkInUrl": "https://www.avianca.com"
+    }
+  }
+}

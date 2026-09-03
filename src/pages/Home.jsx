@@ -1290,6 +1290,17 @@ export default function Home() {
                   🎨 Generador de Flyers Oficiales
                 </button>
 
+                <a 
+                  href="/cartas/carta_andres_idrobo_e30.html" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  onClick={() => setShowToolsDropdown(false)} 
+                  className="btn-secondary" 
+                  style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem', textDecoration: 'none' }}
+                >
+                  ✈️ Monitor de Vuelos y Cartas
+                </a>
+
                 {['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan'].includes(currentUser?.appRole) && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/mis-kpis'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                     📊 Mis KPIs

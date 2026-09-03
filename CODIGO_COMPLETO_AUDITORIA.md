@@ -111484,6 +111484,355 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
 
 ---
 
+## Archivo: public\flight-tracker.js
+
+```js
+/**
+ * CREAR PODER SIN LIMITES - Live Flight Tracker Module
+ * Sincronizador automatico de vuelos en tiempo real para cartas y Centro Operativo.
+ */
+
+(function() {
+    window.FlightTracker = {
+        data: null,
+        currentFlight: null,
+        intervalId: null,
+
+        async fetchStatus(flightCode) {
+            const urls = [
+                'vuelos_tracker.json?_t=' + Date.now(),
+                '../vuelos_tracker.json?_t=' + Date.now(),
+                'https://cartas.crearpsl.net/vuelos_tracker.json?_t=' + Date.now(),
+                'https://centro-operativo-cpsl.web.app/vuelos_tracker.json?_t=' + Date.now()
+            ];
+
+            for (const url of urls) {
+                try {
+                    const res = await fetch(url, { cache: 'no-store' });
+                    if (res.ok) {
+                        const json = await res.json();
+                        if (json && json.flights) {
+                            this.data = json;
+                            return json.flights[flightCode] || null;
+                        }
+                    }
+                } catch (e) {
+                    // Try next URL fallback
+                }
+            }
+            return null;
+        },
+
+        calculateProgress(depTimeStr, arrTimeStr) {
+            const now = Date.now();
+            const dep = new Date(depTimeStr).getTime();
+            const arr = new Date(arrTimeStr).getTime();
+
+            if (now < dep) {
+                const diffMs = dep - now;
+                const hours = Math.floor(diffMs / 3600000);
+                const mins = Math.floor((diffMs % 3600000) / 60000);
+                return {
+                    state: 'PRE_FLIGHT',
+                    percent: 0,
+                    text: hours > 0 ? ('Despegue en ' + hours + 'h ' + mins + 'm') : ('Despegue en ' + mins + ' min')
+                };
+            } else if (now >= arr) {
+                return {
+                    state: 'COMPLETED',
+                    percent: 100,
+                    text: 'Vuelo completado / Aterrizado'
+                };
+            } else {
+                const total = arr - dep;
+                const current = now - dep;
+                const pct = Math.min(99, Math.max(1, Math.round((current / total) * 100)));
+                const remMs = arr - now;
+                const remMins = Math.floor(remMs / 60000);
+                return {
+                    state: 'IN_FLIGHT',
+                    percent: pct,
+                    text: 'En vuelo (' + pct + '%) · Arribo en ' + remMins + ' min'
+                };
+            }
+        },
+
+        formatTime12h(isoStr) {
+            if (!isoStr) return '';
+            try {
+                const d = new Date(isoStr);
+                let hours = d.getHours();
+                const minutes = d.getMinutes().toString().padStart(2, '0');
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours ? hours : 12;
+                return hours.toString().padStart(2, '0') + ':' + minutes + ' ' + ampm;
+            } catch (e) {
+                return isoStr;
+            }
+        },
+
+        render(flight) {
+            if (!flight) return;
+            this.currentFlight = flight;
+
+            const prog = this.calculateProgress(
+                flight.schedule.estimatedDeparture || flight.schedule.scheduledDeparture,
+                flight.schedule.estimatedArrival || flight.schedule.scheduledArrival
+            );
+
+            // Badge element
+            const badgeEl = document.getElementById('flight-live-badge');
+            if (badgeEl) {
+                if (flight.status === 'DELAYED' || flight.delayMinutes > 0) {
+                    badgeEl.className = 'bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold px-2.5 py-1 rounded-full text-[11px] flex items-center gap-1.5 shadow-[0_0_12px_rgba(245,158,11,0.3)] animate-pulse';
+                    badgeEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-amber-400"></i> Demorado (+' + flight.delayMinutes + ' min)';
+                } else if (prog.state === 'IN_FLIGHT' || flight.status === 'AIRBORNE') {
+                    badgeEl.className = 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold px-2.5 py-1 rounded-full text-[11px] flex items-center gap-1.5 shadow-[0_0_12px_rgba(6,182,212,0.3)]';
+                    badgeEl.innerHTML = '<i class="fa-solid fa-plane text-cyan-400 animate-pulse"></i> En vuelo · En ruta';
+                } else if (prog.state === 'COMPLETED' || flight.status === 'LANDED') {
+                    badgeEl.className = 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold px-2.5 py-1 rounded-full text-[11px] flex items-center gap-1.5 shadow-[0_0_12px_rgba(16,185,129,0.3)]';
+                    badgeEl.innerHTML = '<i class="fa-solid fa-check-circle text-emerald-400"></i> Aterrizado en Lima';
+                } else {
+                    badgeEl.className = 'bg-green-500/20 text-green-400 border border-green-500/30 font-bold px-2.5 py-1 rounded-full text-[11px] flex items-center gap-1.5';
+                    badgeEl.innerHTML = '<i class="fa-solid fa-circle text-[7px] text-green-400 animate-pulse"></i> A tiempo · Directo';
+                }
+            }
+
+            // Times
+            const depEl = document.getElementById('flight-live-dep');
+            if (depEl) {
+                depEl.textContent = this.formatTime12h(flight.schedule.estimatedDeparture || flight.schedule.scheduledDeparture);
+            }
+            const arrEl = document.getElementById('flight-live-arr');
+            if (arrEl) {
+                arrEl.textContent = this.formatTime12h(flight.schedule.estimatedArrival || flight.schedule.scheduledArrival);
+                if (flight.delayMinutes > 0) {
+                    arrEl.className = 'text-amber-400 text-base font-black';
+                } else {
+                    arrEl.className = 'text-green-400 text-base font-black';
+                }
+            }
+
+            // Progress bar
+            const barEl = document.getElementById('flight-live-bar');
+            if (barEl) {
+                barEl.style.width = prog.percent + '%';
+                if (flight.delayMinutes > 0) {
+                    barEl.className = 'h-full bg-gradient-to-r from-amber-500 to-yellow-400 rounded-full transition-all duration-700';
+                } else {
+                    barEl.className = 'h-full bg-gradient-to-r from-purple-500 via-indigo-500 to-cyan-400 rounded-full transition-all duration-700';
+                }
+            }
+
+            // Progress label
+            const labelEl = document.getElementById('flight-live-label');
+            if (labelEl) {
+                labelEl.textContent = prog.text;
+            }
+
+            // Logistics pickup recalculation
+            const pickupEl = document.getElementById('flight-live-pickup');
+            if (pickupEl && flight.logistics) {
+                pickupEl.textContent = flight.logistics.driverPickupEstimated || '10:35 AM';
+            }
+
+            // Last sync timestamp
+            const syncEl = document.getElementById('flight-live-sync');
+            if (syncEl) {
+                const d = new Date();
+                const syncTime = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                syncEl.textContent = 'Actualizado ' + syncTime;
+            }
+        },
+
+        async init(flightCode = 'LA1437') {
+            const flight = await this.fetchStatus(flightCode);
+            if (flight) {
+                this.render(flight);
+            }
+            if (this.intervalId) clearInterval(this.intervalId);
+            this.intervalId = setInterval(async () => {
+                const updated = await this.fetchStatus(flightCode);
+                if (updated) this.render(updated);
+            }, 60000);
+        },
+
+        async refresh(flightCode = 'LA1437') {
+            const btn = document.getElementById('btn-refresh-flight');
+            if (btn) {
+                const icon = btn.querySelector('i');
+                if (icon) icon.classList.add('fa-spin');
+                btn.disabled = true;
+            }
+            const flight = await this.fetchStatus(flightCode);
+            if (flight) {
+                this.render(flight);
+            }
+            setTimeout(() => {
+                if (btn) {
+                    const icon = btn.querySelector('i');
+                    if (icon) icon.classList.remove('fa-spin');
+                    btn.disabled = false;
+                }
+            }, 600);
+        }
+    };
+})();
+
+```
+
+---
+
+## Archivo: public\vuelos_tracker.json
+
+```json
+{
+  "updatedAt": "2026-09-03T20:21:23.790Z",
+  "flights": {
+    "LA1437": {
+      "flightNumber": "LA 1437",
+      "flightCode": "LA1437",
+      "airline": "LATAM Airlines",
+      "callsign": "LAN1437",
+      "reservationCode": "DJBJJD",
+      "passengers": [
+        "Elmer Andrés Idrovo Andrade",
+        "María de Lourdes Patiño"
+      ],
+      "route": {
+        "origin": "UIO",
+        "originCity": "Quito",
+        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-04",
+        "scheduledDeparture": "2026-09-04T07:55:00-05:00",
+        "scheduledArrival": "2026-09-04T10:10:00-05:00",
+        "estimatedDeparture": "2026-09-04T07:55:00-05:00",
+        "estimatedArrival": "2026-09-04T10:10:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "A tiempo",
+      "statusDescription": "Vuelo confirmado y a tiempo para despegue directo UIO → LIM",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "10:35 AM",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1437",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1449": {
+      "flightNumber": "LA 1449",
+      "flightCode": "LA1449",
+      "airline": "LATAM Airlines",
+      "callsign": "LAN1449",
+      "reservationCode": "DJBJJD",
+      "passengers": [
+        "Elmer Andrés Idrovo Andrade"
+      ],
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": false,
+        "stops": 1,
+        "stopover": "Guayaquil (GYE) - Escala de 4h 00m",
+        "flightDuration": "7h 02m (con escala)"
+      },
+      "schedule": {
+        "departureDate": "2026-09-06",
+        "scheduledDeparture": "2026-09-06T23:35:00-05:00",
+        "scheduledArrival": "2026-09-07T06:37:00-05:00",
+        "estimatedDeparture": "2026-09-06T23:35:00-05:00",
+        "estimatedArrival": "2026-09-07T06:37:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Programado · A tiempo",
+      "statusDescription": "Vuelo de retorno programado",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Por confirmar",
+      "baggageClaim": null,
+      "logistics": {
+        "pickupLocation": "Lobby del Hotel Jose Antonio Deluxe",
+        "driverPickupEstimated": "8:30 PM (20:30 hrs)",
+        "destination": "Aeropuerto Jorge Chávez",
+        "driverNote": "Recojo 3h antes para vuelo internacional nocturno."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1449",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "AV108": {
+      "flightNumber": "AV 108",
+      "flightCode": "AV108",
+      "airline": "Avianca",
+      "callsign": "AVA108",
+      "reservationCode": "AVCONF",
+      "passengers": [
+        "Alejandro Díaz Pabón"
+      ],
+      "route": {
+        "origin": "BOG",
+        "originCity": "Bogotá",
+        "originAirport": "Aeropuerto Internacional El Dorado",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "3h 05m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-04",
+        "scheduledDeparture": "2026-09-04T06:15:00-05:00",
+        "scheduledArrival": "2026-09-04T09:20:00-05:00",
+        "estimatedDeparture": "2026-09-04T06:15:00-05:00",
+        "estimatedArrival": "2026-09-04T09:20:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "A tiempo",
+      "statusDescription": "Vuelo confirmado y a tiempo",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Por confirmar",
+      "baggageClaim": "Por confirmar",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe",
+        "driverPickupEstimated": "09:45 AM",
+        "driverNote": "Conductor esperará en llegadas internacionales."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/av108",
+      "checkInUrl": "https://www.avianca.com"
+    }
+  }
+}
+```
+
+---
+
 ## Archivo: public\cartas\alejandro-diaz-gratitud-e28.html
 
 ```html
@@ -113232,45 +113581,78 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                             <span class="text-xs text-gray-300">Disponible 48h antes de cada vuelo con tu código <strong>DJBJJD</strong> y apellido <strong>IDROBO</strong>.</span>
                         </div>
                         <div class="grid md:grid-cols-2 gap-5 mt-5">
-                            <!-- Ida: Quito -> Lima (Directo LA 1437) -->
-                            <div class="bg-gradient-to-br from-gray-800/40 to-gray-900/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden">
-                                <div class="absolute top-0 left-0 w-full h-1 bg-purple-500"></div>
+                                                        <!-- Ida: Quito -> Lima (Directo LA 1437 con Actualizador Automático en Tiempo Real) -->
+                            <div class="bg-gradient-to-br from-gray-800/40 to-gray-900/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden" id="flight-card-la1437">
+                                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 via-indigo-500 to-cyan-400"></div>
                                 <div class="flex items-center justify-between mb-3">
                                     <h4 class="font-black text-white flex items-center gap-2"><i class="fa-solid fa-plane-arrival text-purple-400"></i> Ida: Quito &rarr; Lima (Directo)</h4>
                                     <span class="text-xs bg-purple-500/20 text-purple-300 font-bold px-2 py-0.5 rounded border border-purple-500/30">Vie 04/09/2026</span>
                                 </div>
-                                <div class="space-y-2.5 text-xs">
-                                    <div class="p-3 bg-gray-900/60 rounded-lg border border-gray-800">
-                                        <div class="flex justify-between items-center mb-2">
-                                            <span class="font-bold text-crear-accent text-sm">LATAM LA 1437</span>
-                                            <span class="bg-green-500/20 text-green-400 font-bold px-2 py-0.5 rounded text-[10px] border border-green-500/30 flex items-center gap-1">
-                                                <i class="fa-solid fa-circle text-[6px] text-green-400 animate-pulse"></i> A tiempo · Directo
-                                            </span>
+                                <div class="space-y-3 text-xs">
+                                    <div class="p-3.5 bg-gray-900/70 rounded-xl border border-gray-800">
+                                        <!-- Header de estado en tiempo real -->
+                                        <div class="flex justify-between items-center mb-3">
+                                            <div class="flex items-center gap-2">
+                                                <span class="font-bold text-crear-accent text-sm tracking-wide">LATAM LA 1437</span>
+                                                <span class="text-[10px] text-gray-400 bg-gray-800 px-1.5 py-0.5 rounded font-mono">UIO &rarr; LIM</span>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <span id="flight-live-badge" class="bg-green-500/20 text-green-400 border border-green-500/30 font-bold px-2.5 py-1 rounded-full text-[11px] flex items-center gap-1.5">
+                                                    <i class="fa-solid fa-circle text-[7px] text-green-400 animate-pulse"></i> A tiempo · Directo
+                                                </span>
+                                            </div>
                                         </div>
-                                        <div class="grid grid-cols-3 items-center text-center text-gray-300 mb-2 py-1">
+
+                                        <!-- Horarios de Salida y Llegada -->
+                                        <div class="grid grid-cols-3 items-center text-center text-gray-300 mb-3 py-1">
                                             <div class="text-left">
                                                 <span class="text-gray-400 text-[11px] block">🛫 Salida Quito (UIO):</span>
-                                                <strong class="text-white text-base font-black">07:55 AM</strong>
+                                                <strong id="flight-live-dep" class="text-white text-base font-black">07:55 AM</strong>
+                                                <span class="text-[10px] text-gray-500 block">Aerop. Mariscal Sucre</span>
                                             </div>
                                             <div class="text-center px-1">
-                                                <i class="fa-solid fa-plane text-purple-400"></i>
-                                                <div class="text-[10px] text-gray-400 font-medium">2h 15m directo</div>
+                                                <i class="fa-solid fa-plane text-purple-400 text-sm"></i>
+                                                <div class="text-[10px] text-gray-400 font-semibold mt-0.5">2h 15m directo</div>
                                             </div>
                                             <div class="text-right">
                                                 <span class="text-gray-400 text-[11px] block">🛬 Llegada Lima (LIM):</span>
-                                                <strong class="text-green-400 text-base font-black">10:10 AM</strong>
+                                                <strong id="flight-live-arr" class="text-green-400 text-base font-black">10:10 AM</strong>
+                                                <span class="text-[10px] text-gray-500 block">Aerop. Jorge Chávez</span>
                                             </div>
                                         </div>
-                                        <div class="text-[11px] text-gray-400 bg-black/40 p-2 rounded-md border border-gray-800 flex items-center justify-between">
-                                            <span>Hora estimada en Lima: <strong class="text-white">10:10 AM</strong></span>
-                                            <span class="text-purple-300 font-medium">Vuelo directo sin escalas</span>
+
+                                        <!-- Barra de Progreso en Vivo -->
+                                        <div class="space-y-1 mb-3 pt-1 border-t border-gray-800/80">
+                                            <div class="flex justify-between items-center text-[10px] text-gray-400">
+                                                <span>Progreso en ruta:</span>
+                                                <span id="flight-live-label" class="font-mono text-cyan-300">Monitoreando estado...</span>
+                                            </div>
+                                            <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden p-0.5 border border-gray-700/40">
+                                                <div id="flight-live-bar" class="h-full bg-gradient-to-r from-purple-500 via-indigo-500 to-cyan-400 rounded-full transition-all duration-700" style="width: 0%"></div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Resumen de sincronización y logística calculada -->
+                                        <div class="text-[11px] bg-black/40 p-2.5 rounded-lg border border-gray-800 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-gray-300">
+                                            <div class="flex items-center gap-1.5">
+                                                <i class="fa-solid fa-car text-blue-400"></i>
+                                                <span>Recojo estimado para chofer: <strong id="flight-live-pickup" class="text-white font-bold">10:35 AM</strong></span>
+                                            </div>
+                                            <div class="flex items-center gap-2 text-[10px] text-gray-400">
+                                                <span id="flight-live-sync">Sincronizado</span>
+                                                <button id="btn-refresh-flight" onclick="FlightTracker.refresh('LA1437')" class="text-crear-accent hover:text-white bg-gray-800 hover:bg-gray-700 px-2 py-0.5 rounded border border-gray-700 flex items-center gap-1 transition-all" title="Verificar estado del vuelo ahora">
+                                                    <i class="fa-solid fa-arrows-rotate"></i> Actualizar
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
+
+                                    <!-- Enlaces rápidos oficiales -->
                                     <div class="pt-2 flex items-center justify-between border-t border-gray-700/50">
-                                        <a href="https://www.flightradar24.com/data/flights/la1437" target="_blank" class="text-xs text-purple-400 hover:underline flex items-center gap-1">
-                                            <i class="fa-solid fa-satellite-dish"></i> Rastrear en FlightRadar &rarr;
+                                        <a href="https://www.flightradar24.com/data/flights/la1437" target="_blank" class="text-xs text-purple-400 hover:text-purple-300 hover:underline flex items-center gap-1 font-semibold">
+                                            <i class="fa-solid fa-satellite-dish"></i> Rastrear en Radar 3D &rarr;
                                         </a>
-                                        <a href="https://www.latamairlines.com/pe/es/check-in" target="_blank" class="text-xs text-indigo-400 hover:underline flex items-center gap-1 font-semibold">
+                                        <a href="https://www.latamairlines.com/pe/es/check-in" target="_blank" class="text-xs text-indigo-400 hover:text-indigo-300 hover:underline flex items-center gap-1 font-semibold">
                                             <i class="fa-solid fa-ticket"></i> Check-in LATAM
                                         </a>
                                     </div>
@@ -113621,6 +114003,15 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                 var rq = quotesList[Math.floor(Math.random() * quotesList.length)];
                 quoteEl.innerText = "\"" + (rq.text || rq.quote) + "\"";
                 authorEl.innerText = "— " + (rq.author || rq.autor);
+            }
+        });
+    </script>
+    <!-- CREAR PODER SIN LIMITES - Actualizador Automático de Vuelos -->
+    <script src="flight-tracker.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            if (window.FlightTracker) {
+                window.FlightTracker.init("LA1437");
             }
         });
     </script>
@@ -114016,31 +114407,86 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                             <span class="text-xs text-gray-300">Disponible 48h antes de cada vuelo con tu código <strong>JYUAGO</strong> y apellido <strong>PATINO</strong>.</span>
                         </div>
                         <div class="grid md:grid-cols-2 gap-5 mt-5">
-                            <!-- Ida: Quito -> Lima (Directo) -->
-                            <div class="bg-gradient-to-br from-gray-800/40 to-gray-900/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden">
-                                <div class="absolute top-0 left-0 w-full h-1 bg-purple-500"></div>
+                                                        <!-- Ida: Quito -> Lima (Directo LA 1437 con Actualizador Automático en Tiempo Real) -->
+                            <div class="bg-gradient-to-br from-gray-800/40 to-gray-900/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden" id="flight-card-la1437">
+                                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 via-indigo-500 to-cyan-400"></div>
                                 <div class="flex items-center justify-between mb-3">
                                     <h4 class="font-black text-white flex items-center gap-2"><i class="fa-solid fa-plane-arrival text-purple-400"></i> Ida: Quito &rarr; Lima (Directo)</h4>
-                                    <span class="text-xs bg-purple-500/20 text-purple-300 font-bold px-2 py-0.5 rounded border border-purple-500/30">Jue 03/09/2026</span>
+                                    <span class="text-xs bg-purple-500/20 text-purple-300 font-bold px-2 py-0.5 rounded border border-purple-500/30">Vie 04/09/2026</span>
                                 </div>
-                                <div class="space-y-2.5 text-xs">
-                                    <div class="p-2.5 bg-gray-900/60 rounded-lg border border-gray-800">
-                                        <div class="flex justify-between items-center mb-1">
-                                            <span class="font-bold text-crear-accent">Vuelo Directo: LATAM LA 1437</span>
-                                            <span class="text-gray-400">2h 15m</span>
+                                <div class="space-y-3 text-xs">
+                                    <div class="p-3.5 bg-gray-900/70 rounded-xl border border-gray-800">
+                                        <!-- Header de estado en tiempo real -->
+                                        <div class="flex justify-between items-center mb-3">
+                                            <div class="flex items-center gap-2">
+                                                <span class="font-bold text-crear-accent text-sm tracking-wide">LATAM LA 1437</span>
+                                                <span class="text-[10px] text-gray-400 bg-gray-800 px-1.5 py-0.5 rounded font-mono">UIO &rarr; LIM</span>
+                                            </div>
+                                            <div class="flex items-center gap-2">
+                                                <span id="flight-live-badge" class="bg-green-500/20 text-green-400 border border-green-500/30 font-bold px-2.5 py-1 rounded-full text-[11px] flex items-center gap-1.5">
+                                                    <i class="fa-solid fa-circle text-[7px] text-green-400 animate-pulse"></i> A tiempo · Directo
+                                                </span>
+                                            </div>
                                         </div>
-                                        <div class="flex justify-between text-gray-300">
-                                            <span>🛫 Salida Quito (UIO): <strong class="text-white">07:55 AM</strong></span>
-                                            <span>🛬 Llegada Lima (LIM): <strong class="text-green-400 font-bold">10:10 AM</strong></span>
+
+                                        <!-- Horarios de Salida y Llegada -->
+                                        <div class="grid grid-cols-3 items-center text-center text-gray-300 mb-3 py-1">
+                                            <div class="text-left">
+                                                <span class="text-gray-400 text-[11px] block">🛫 Salida Quito (UIO):</span>
+                                                <strong id="flight-live-dep" class="text-white text-base font-black">07:55 AM</strong>
+                                                <span class="text-[10px] text-gray-500 block">Aerop. Mariscal Sucre</span>
+                                            </div>
+                                            <div class="text-center px-1">
+                                                <i class="fa-solid fa-plane text-purple-400 text-sm"></i>
+                                                <div class="text-[10px] text-gray-400 font-semibold mt-0.5">2h 15m directo</div>
+                                            </div>
+                                            <div class="text-right">
+                                                <span class="text-gray-400 text-[11px] block">🛬 Llegada Lima (LIM):</span>
+                                                <strong id="flight-live-arr" class="text-green-400 text-base font-black">10:10 AM</strong>
+                                                <span class="text-[10px] text-gray-500 block">Aerop. Jorge Chávez</span>
+                                            </div>
                                         </div>
-                                        <div class="mt-2 text-gray-400 text-[11px] flex justify-between">
+
+                                        <!-- Detalles de Asiento y Cabina -->
+                                        <div class="mt-2 text-gray-400 text-[11px] flex justify-between bg-black/30 p-2 rounded border border-gray-800/60 mb-3">
                                             <span>Asiento: <strong class="text-crear-accent">13A</strong></span>
                                             <span>Cabina: <strong>Economy Light</strong></span>
                                         </div>
+
+                                        <!-- Barra de Progreso en Vivo -->
+                                        <div class="space-y-1 mb-3 pt-1 border-t border-gray-800/80">
+                                            <div class="flex justify-between items-center text-[10px] text-gray-400">
+                                                <span>Progreso en ruta:</span>
+                                                <span id="flight-live-label" class="font-mono text-cyan-300">Monitoreando estado...</span>
+                                            </div>
+                                            <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden p-0.5 border border-gray-700/40">
+                                                <div id="flight-live-bar" class="h-full bg-gradient-to-r from-purple-500 via-indigo-500 to-cyan-400 rounded-full transition-all duration-700" style="width: 0%"></div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Resumen de sincronización y logística calculada -->
+                                        <div class="text-[11px] bg-black/40 p-2.5 rounded-lg border border-gray-800 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-gray-300">
+                                            <div class="flex items-center gap-1.5">
+                                                <i class="fa-solid fa-car text-blue-400"></i>
+                                                <span>Recojo estimado para chofer: <strong id="flight-live-pickup" class="text-white font-bold">10:35 AM</strong></span>
+                                            </div>
+                                            <div class="flex items-center gap-2 text-[10px] text-gray-400">
+                                                <span id="flight-live-sync">Sincronizado</span>
+                                                <button id="btn-refresh-flight" onclick="FlightTracker.refresh('LA1437')" class="text-crear-accent hover:text-white bg-gray-800 hover:bg-gray-700 px-2 py-0.5 rounded border border-gray-700 flex items-center gap-1 transition-all" title="Verificar estado del vuelo ahora">
+                                                    <i class="fa-solid fa-arrows-rotate"></i> Actualizar
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
+
+                                    <!-- Enlaces rápidos oficiales -->
                                     <div class="pt-2 flex items-center justify-between border-t border-gray-700/50">
-                                        <a href="https://www.flightradar24.com/data/flights/la1437" target="_blank" class="text-xs text-purple-400 hover:underline">Rastrear en FlightRadar &rarr;</a>
-                                        <a href="https://www.latamairlines.com/pe/es/check-in" target="_blank" class="text-xs text-indigo-400 hover:underline flex items-center gap-1 font-semibold"><i class="fa-solid fa-ticket"></i> Check-in LATAM</a>
+                                        <a href="https://www.flightradar24.com/data/flights/la1437" target="_blank" class="text-xs text-purple-400 hover:text-purple-300 hover:underline flex items-center gap-1 font-semibold">
+                                            <i class="fa-solid fa-satellite-dish"></i> Rastrear en Radar 3D &rarr;
+                                        </a>
+                                        <a href="https://www.latamairlines.com/pe/es/check-in" target="_blank" class="text-xs text-indigo-400 hover:text-indigo-300 hover:underline flex items-center gap-1 font-semibold">
+                                            <i class="fa-solid fa-ticket"></i> Check-in LATAM
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -114365,6 +114811,15 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                 var rq = quotesList[Math.floor(Math.random() * quotesList.length)];
                 quoteEl.innerText = "\"" + (rq.text || rq.quote) + "\"";
                 authorEl.innerText = "— " + (rq.author || rq.autor);
+            }
+        });
+    </script>
+    <!-- CREAR PODER SIN LIMITES - Actualizador Automático de Vuelos -->
+    <script src="flight-tracker.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            if (window.FlightTracker) {
+                window.FlightTracker.init("LA1437");
             }
         });
     </script>
@@ -114944,6 +115399,206 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
 
 
 
+
+```
+
+---
+
+## Archivo: public\cartas\flight-tracker.js
+
+```js
+/**
+ * CREAR PODER SIN LIMITES - Live Flight Tracker Module
+ * Sincronizador automatico de vuelos en tiempo real para cartas y Centro Operativo.
+ */
+
+(function() {
+    window.FlightTracker = {
+        data: null,
+        currentFlight: null,
+        intervalId: null,
+
+        async fetchStatus(flightCode) {
+            const urls = [
+                'vuelos_tracker.json?_t=' + Date.now(),
+                '../vuelos_tracker.json?_t=' + Date.now(),
+                'https://cartas.crearpsl.net/vuelos_tracker.json?_t=' + Date.now(),
+                'https://centro-operativo-cpsl.web.app/vuelos_tracker.json?_t=' + Date.now()
+            ];
+
+            for (const url of urls) {
+                try {
+                    const res = await fetch(url, { cache: 'no-store' });
+                    if (res.ok) {
+                        const json = await res.json();
+                        if (json && json.flights) {
+                            this.data = json;
+                            return json.flights[flightCode] || null;
+                        }
+                    }
+                } catch (e) {
+                    // Try next URL fallback
+                }
+            }
+            return null;
+        },
+
+        calculateProgress(depTimeStr, arrTimeStr) {
+            const now = Date.now();
+            const dep = new Date(depTimeStr).getTime();
+            const arr = new Date(arrTimeStr).getTime();
+
+            if (now < dep) {
+                const diffMs = dep - now;
+                const hours = Math.floor(diffMs / 3600000);
+                const mins = Math.floor((diffMs % 3600000) / 60000);
+                return {
+                    state: 'PRE_FLIGHT',
+                    percent: 0,
+                    text: hours > 0 ? ('Despegue en ' + hours + 'h ' + mins + 'm') : ('Despegue en ' + mins + ' min')
+                };
+            } else if (now >= arr) {
+                return {
+                    state: 'COMPLETED',
+                    percent: 100,
+                    text: 'Vuelo completado / Aterrizado'
+                };
+            } else {
+                const total = arr - dep;
+                const current = now - dep;
+                const pct = Math.min(99, Math.max(1, Math.round((current / total) * 100)));
+                const remMs = arr - now;
+                const remMins = Math.floor(remMs / 60000);
+                return {
+                    state: 'IN_FLIGHT',
+                    percent: pct,
+                    text: 'En vuelo (' + pct + '%) · Arribo en ' + remMins + ' min'
+                };
+            }
+        },
+
+        formatTime12h(isoStr) {
+            if (!isoStr) return '';
+            try {
+                const d = new Date(isoStr);
+                let hours = d.getHours();
+                const minutes = d.getMinutes().toString().padStart(2, '0');
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours ? hours : 12;
+                return hours.toString().padStart(2, '0') + ':' + minutes + ' ' + ampm;
+            } catch (e) {
+                return isoStr;
+            }
+        },
+
+        render(flight) {
+            if (!flight) return;
+            this.currentFlight = flight;
+
+            const prog = this.calculateProgress(
+                flight.schedule.estimatedDeparture || flight.schedule.scheduledDeparture,
+                flight.schedule.estimatedArrival || flight.schedule.scheduledArrival
+            );
+
+            // Badge element
+            const badgeEl = document.getElementById('flight-live-badge');
+            if (badgeEl) {
+                if (flight.status === 'DELAYED' || flight.delayMinutes > 0) {
+                    badgeEl.className = 'bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold px-2.5 py-1 rounded-full text-[11px] flex items-center gap-1.5 shadow-[0_0_12px_rgba(245,158,11,0.3)] animate-pulse';
+                    badgeEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-amber-400"></i> Demorado (+' + flight.delayMinutes + ' min)';
+                } else if (prog.state === 'IN_FLIGHT' || flight.status === 'AIRBORNE') {
+                    badgeEl.className = 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold px-2.5 py-1 rounded-full text-[11px] flex items-center gap-1.5 shadow-[0_0_12px_rgba(6,182,212,0.3)]';
+                    badgeEl.innerHTML = '<i class="fa-solid fa-plane text-cyan-400 animate-pulse"></i> En vuelo · En ruta';
+                } else if (prog.state === 'COMPLETED' || flight.status === 'LANDED') {
+                    badgeEl.className = 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold px-2.5 py-1 rounded-full text-[11px] flex items-center gap-1.5 shadow-[0_0_12px_rgba(16,185,129,0.3)]';
+                    badgeEl.innerHTML = '<i class="fa-solid fa-check-circle text-emerald-400"></i> Aterrizado en Lima';
+                } else {
+                    badgeEl.className = 'bg-green-500/20 text-green-400 border border-green-500/30 font-bold px-2.5 py-1 rounded-full text-[11px] flex items-center gap-1.5';
+                    badgeEl.innerHTML = '<i class="fa-solid fa-circle text-[7px] text-green-400 animate-pulse"></i> A tiempo · Directo';
+                }
+            }
+
+            // Times
+            const depEl = document.getElementById('flight-live-dep');
+            if (depEl) {
+                depEl.textContent = this.formatTime12h(flight.schedule.estimatedDeparture || flight.schedule.scheduledDeparture);
+            }
+            const arrEl = document.getElementById('flight-live-arr');
+            if (arrEl) {
+                arrEl.textContent = this.formatTime12h(flight.schedule.estimatedArrival || flight.schedule.scheduledArrival);
+                if (flight.delayMinutes > 0) {
+                    arrEl.className = 'text-amber-400 text-base font-black';
+                } else {
+                    arrEl.className = 'text-green-400 text-base font-black';
+                }
+            }
+
+            // Progress bar
+            const barEl = document.getElementById('flight-live-bar');
+            if (barEl) {
+                barEl.style.width = prog.percent + '%';
+                if (flight.delayMinutes > 0) {
+                    barEl.className = 'h-full bg-gradient-to-r from-amber-500 to-yellow-400 rounded-full transition-all duration-700';
+                } else {
+                    barEl.className = 'h-full bg-gradient-to-r from-purple-500 via-indigo-500 to-cyan-400 rounded-full transition-all duration-700';
+                }
+            }
+
+            // Progress label
+            const labelEl = document.getElementById('flight-live-label');
+            if (labelEl) {
+                labelEl.textContent = prog.text;
+            }
+
+            // Logistics pickup recalculation
+            const pickupEl = document.getElementById('flight-live-pickup');
+            if (pickupEl && flight.logistics) {
+                pickupEl.textContent = flight.logistics.driverPickupEstimated || '10:35 AM';
+            }
+
+            // Last sync timestamp
+            const syncEl = document.getElementById('flight-live-sync');
+            if (syncEl) {
+                const d = new Date();
+                const syncTime = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                syncEl.textContent = 'Actualizado ' + syncTime;
+            }
+        },
+
+        async init(flightCode = 'LA1437') {
+            const flight = await this.fetchStatus(flightCode);
+            if (flight) {
+                this.render(flight);
+            }
+            if (this.intervalId) clearInterval(this.intervalId);
+            this.intervalId = setInterval(async () => {
+                const updated = await this.fetchStatus(flightCode);
+                if (updated) this.render(updated);
+            }, 60000);
+        },
+
+        async refresh(flightCode = 'LA1437') {
+            const btn = document.getElementById('btn-refresh-flight');
+            if (btn) {
+                const icon = btn.querySelector('i');
+                if (icon) icon.classList.add('fa-spin');
+                btn.disabled = true;
+            }
+            const flight = await this.fetchStatus(flightCode);
+            if (flight) {
+                this.render(flight);
+            }
+            setTimeout(() => {
+                if (btn) {
+                    const icon = btn.querySelector('i');
+                    if (icon) icon.classList.remove('fa-spin');
+                    btn.disabled = false;
+                }
+            }, 600);
+        }
+    };
+})();
 
 ```
 
@@ -116042,6 +116697,155 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
 
 ---
 
+## Archivo: public\cartas\vuelos_tracker.json
+
+```json
+{
+  "updatedAt": "2026-09-03T20:21:23.790Z",
+  "flights": {
+    "LA1437": {
+      "flightNumber": "LA 1437",
+      "flightCode": "LA1437",
+      "airline": "LATAM Airlines",
+      "callsign": "LAN1437",
+      "reservationCode": "DJBJJD",
+      "passengers": [
+        "Elmer Andrés Idrovo Andrade",
+        "María de Lourdes Patiño"
+      ],
+      "route": {
+        "origin": "UIO",
+        "originCity": "Quito",
+        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-04",
+        "scheduledDeparture": "2026-09-04T07:55:00-05:00",
+        "scheduledArrival": "2026-09-04T10:10:00-05:00",
+        "estimatedDeparture": "2026-09-04T07:55:00-05:00",
+        "estimatedArrival": "2026-09-04T10:10:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "A tiempo",
+      "statusDescription": "Vuelo confirmado y a tiempo para despegue directo UIO → LIM",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "10:35 AM",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1437",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1449": {
+      "flightNumber": "LA 1449",
+      "flightCode": "LA1449",
+      "airline": "LATAM Airlines",
+      "callsign": "LAN1449",
+      "reservationCode": "DJBJJD",
+      "passengers": [
+        "Elmer Andrés Idrovo Andrade"
+      ],
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": false,
+        "stops": 1,
+        "stopover": "Guayaquil (GYE) - Escala de 4h 00m",
+        "flightDuration": "7h 02m (con escala)"
+      },
+      "schedule": {
+        "departureDate": "2026-09-06",
+        "scheduledDeparture": "2026-09-06T23:35:00-05:00",
+        "scheduledArrival": "2026-09-07T06:37:00-05:00",
+        "estimatedDeparture": "2026-09-06T23:35:00-05:00",
+        "estimatedArrival": "2026-09-07T06:37:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Programado · A tiempo",
+      "statusDescription": "Vuelo de retorno programado",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Por confirmar",
+      "baggageClaim": null,
+      "logistics": {
+        "pickupLocation": "Lobby del Hotel Jose Antonio Deluxe",
+        "driverPickupEstimated": "8:30 PM (20:30 hrs)",
+        "destination": "Aeropuerto Jorge Chávez",
+        "driverNote": "Recojo 3h antes para vuelo internacional nocturno."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1449",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "AV108": {
+      "flightNumber": "AV 108",
+      "flightCode": "AV108",
+      "airline": "Avianca",
+      "callsign": "AVA108",
+      "reservationCode": "AVCONF",
+      "passengers": [
+        "Alejandro Díaz Pabón"
+      ],
+      "route": {
+        "origin": "BOG",
+        "originCity": "Bogotá",
+        "originAirport": "Aeropuerto Internacional El Dorado",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "3h 05m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-04",
+        "scheduledDeparture": "2026-09-04T06:15:00-05:00",
+        "scheduledArrival": "2026-09-04T09:20:00-05:00",
+        "estimatedDeparture": "2026-09-04T06:15:00-05:00",
+        "estimatedArrival": "2026-09-04T09:20:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "A tiempo",
+      "statusDescription": "Vuelo confirmado y a tiempo",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Por confirmar",
+      "baggageClaim": "Por confirmar",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe",
+        "driverPickupEstimated": "09:45 AM",
+        "driverNote": "Conductor esperará en llegadas internacionales."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/av108",
+      "checkInUrl": "https://www.avianca.com"
+    }
+  }
+}
+```
+
+---
+
 ## Archivo: scratch\fix_search.js
 
 ```js
@@ -116363,25 +117167,48 @@ async function createSuperAdmin() {
 import dotenv from 'dotenv';
 import nodemailer from 'nodemailer';
 import sanitizeHtml from 'sanitize-html';
-import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, onSnapshot, doc, updateDoc, query, where, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
+import { initializeApp, cert } from 'firebase-admin/app';
+import { getFirestore, FieldValue } from 'firebase-admin/firestore';
+import { readFileSync, existsSync } from 'fs';
 
 dotenv.config();
 
-// --- 1. CONFIGURACIÓN DE FIREBASE CLIENT ---
-// NOTA: Para ejecutar esto necesitas "npm install nodemailer firebase dotenv"
-// Reemplaza esto con los datos de tu src/services/firebase.js
-const firebaseConfig = {
-  apiKey: process.env.VITE_FIREBASE_API_KEY,
-  authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.VITE_FIREBASE_APP_ID
-};
+// --- 1. CONFIGURACIÓN DE FIREBASE ADMIN ---
+// (03/09/2026) FIX — José: "me preocupa no estar usando las notificaciones por
+// correo". Causa confirmada corriendo esto en local: "Missing or insufficient
+// permissions" en las 3 colecciones que usa (mail, user_profiles, tasks).
+// Este script usaba el SDK de CLIENTE de Firebase (firebase/firestore) sin
+// nunca iniciar sesión (ningún signIn en todo el archivo) — así que
+// request.auth siempre era null. Desde el endurecimiento de firestore.rules
+// del 26/08/2026 (que exige isAuthenticated() en esas 3 colecciones), cada
+// corrida de este daemon fallaba en silencio. Último envío exitoso real,
+// confirmado leyendo Firestore: 18/08/2026 — coincide con la fecha.
+//
+// Fix: usar firebase-admin (como todos los scripts de diagnóstico de este
+// repo), que se autentica con una Service Account y NO pasa por
+// firestore.rules — es el patrón correcto para un proceso de fondo de
+// confianza como este, y es EXACTAMENTE el mismo patrón que ya usa
+// .github/workflows/managers-llamados-sync.yml (Secret GOOGLE_SERVICE_ACCOUNT_JSON
+// → archivo centro-operativo-cpsl-65ad52160f45.json en el runner → borrado al
+// final). mail-dispatch.yml se actualizó para escribir ese mismo archivo.
+//
+// Localmente (fuera de GitHub Actions) sigue funcionando igual que los demás
+// scripts de este repo: coloca el archivo de credenciales de servicio
+// "centro-operativo-cpsl-65ad52160f45.json" en la raíz del proyecto y corre
+// el script — NUNCA lo corras en un entorno que no sea tuyo ni lo subas a git
+// (ya está en .gitignore).
+const CREDENTIALS_PATH = './centro-operativo-cpsl-65ad52160f45.json';
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+if (!existsSync(CREDENTIALS_PATH)) {
+  console.error(`❌ No se encontró el archivo de credenciales de servicio (${CREDENTIALS_PATH}).`);
+  console.error('   Este script ahora usa firebase-admin y necesita ese archivo (local) o');
+  console.error('   correr dentro del GitHub Action, que lo genera desde el Secret GOOGLE_SERVICE_ACCOUNT_JSON.');
+  process.exit(1);
+}
+
+const serviceAccount = JSON.parse(readFileSync(CREDENTIALS_PATH, 'utf8'));
+initializeApp({ credential: cert(serviceAccount) });
+const db = getFirestore();
 
 // --- 2. CONFIGURACIÓN DE GMAIL (NODEMAILER) ---
 if (!process.env.GMAIL_SERVER_EMAIL || !process.env.GMAIL_SERVER_APP_PASSWORD) {
@@ -116409,7 +117236,7 @@ async function processMailDoc(docSnap) {
 
   if (rawRecipients.length === 0) {
     console.warn(`⚠️ Documento de correo sin destinatario válido (doc ${docSnap.id})`);
-    await updateDoc(doc(db, 'mail', docSnap.id), {
+    await db.collection('mail').doc(docSnap.id).update({
       'delivery.state': 'REJECTED',
       reason: 'Documento de correo sin campo "to" válido'
     });
@@ -116425,8 +117252,7 @@ async function processMailDoc(docSnap) {
       continue;
     }
     try {
-      const q = query(collection(db, "users"), where("emails", "array-contains", to));
-      const snap = await getDocs(q);
+      const snap = await db.collection('users').where('emails', 'array-contains', to).get();
       if (snap.empty) {
         console.warn(`⚠️ Intento de envío a correo no registrado: ${rawTo}`);
       } else {
@@ -116440,7 +117266,7 @@ async function processMailDoc(docSnap) {
   }
 
   if (validRecipients.length === 0) {
-    await updateDoc(doc(db, 'mail', docSnap.id), {
+    await db.collection('mail').doc(docSnap.id).update({
       'delivery.state': 'REJECTED',
       reason: 'Ningún destinatario pertenece a un usuario registrado'
     });
@@ -116479,13 +117305,13 @@ async function processMailDoc(docSnap) {
   try {
     await transporter.sendMail(mailOptions);
     console.log(`✅ Correo enviado con éxito a ${validRecipients.join(', ')}`);
-    await updateDoc(doc(db, 'mail', docSnap.id), {
+    await db.collection('mail').doc(docSnap.id).update({
       'delivery.state': 'SUCCESS',
       'delivery.endTime': new Date().toISOString()
     });
   } catch (error) {
     console.error(`❌ Error enviando a ${validRecipients.join(', ')}:`, error.message);
-    await updateDoc(doc(db, 'mail', docSnap.id), {
+    await db.collection('mail').doc(docSnap.id).update({
       'delivery.state': 'ERROR',
       'delivery.error': error.message
     });
@@ -116495,7 +117321,7 @@ async function processMailDoc(docSnap) {
 async function processPendingMails() {
   console.log("📬 Buscando correos pendientes en Firestore...");
   try {
-    const snap = await getDocs(collection(db, 'mail'));
+    const snap = await db.collection('mail').get();
     let pendingCount = 0;
     for (const docSnap of snap.docs) {
       const d = docSnap.data();
@@ -116517,9 +117343,9 @@ const CHECK_INTERVAL_MS = 60 * 60 * 1000;
 async function checkInactivity() {
   console.log("🔍 Iniciando chequeo de inactividad de usuarios...");
   try {
-    const profilesSnap = await getDocs(collection(db, 'user_profiles'));
+    const profilesSnap = await db.collection('user_profiles').get();
     const now = new Date();
-    
+
     for (const docSnap of profilesSnap.docs) {
       const data = docSnap.data();
       const email = data.email || docSnap.id;
@@ -116531,11 +117357,11 @@ async function checkInactivity() {
 
       if (hoursSinceLogin > INACTIVITY_LIMIT_HOURS) {
         const lastAlertDate = data.lastInactivityAlertAt?.toDate ? data.lastInactivityAlertAt.toDate() : (data.lastInactivityAlertAt ? new Date(data.lastInactivityAlertAt) : new Date(0));
-        
+
         if (lastAlertDate < lastLoginDate) {
           console.log(`⚠️ Usuario ${email} inactivo por más de ${INACTIVITY_LIMIT_HOURS} horas. Programando alerta.`);
-          
-          await addDoc(collection(db, 'mail'), {
+
+          await db.collection('mail').add({
             to: email,
             message: {
               subject: '⚠️ Aviso de Inactividad en SO-AR — CREAR Poder Sin Límites',
@@ -116556,11 +117382,11 @@ async function checkInactivity() {
                 </div>
               `
             },
-            createdAt: serverTimestamp()
+            createdAt: FieldValue.serverTimestamp()
           });
 
-          await updateDoc(doc(db, 'user_profiles', email), {
-            lastInactivityAlertAt: serverTimestamp()
+          await db.collection('user_profiles').doc(email).update({
+            lastInactivityAlertAt: FieldValue.serverTimestamp()
           });
         }
       }
@@ -116578,7 +117404,7 @@ const REMINDER_DEBOUNCE_HOURS = 24;
 async function checkOverdueTaskReminders() {
   console.log("🔍 Iniciando chequeo de tareas vencidas sin atender...");
   try {
-    const tasksSnap = await getDocs(collection(db, 'tasks'));
+    const tasksSnap = await db.collection('tasks').get();
     const now = new Date();
 
     for (const docSnap of tasksSnap.docs) {
@@ -116610,7 +117436,7 @@ async function checkOverdueTaskReminders() {
       console.log(`⏰ Tarea vencida sin completar: "${taskTitle}" (${docSnap.id}). Enviando recordatorio a: ${emails.join(', ')}`);
 
       for (const email of emails) {
-        await addDoc(collection(db, 'mail'), {
+        await db.collection('mail').add({
           to: [email],
           message: {
             subject: `⏰ RECORDATORIO: Tarea pendiente vencida — ${taskTitle}`,
@@ -116633,12 +117459,12 @@ async function checkOverdueTaskReminders() {
               </div>
             `
           },
-          createdAt: serverTimestamp()
+          createdAt: FieldValue.serverTimestamp()
         });
       }
 
-      await updateDoc(doc(db, 'tasks', docSnap.id), {
-        lastReminderAt: serverTimestamp()
+      await db.collection('tasks').doc(docSnap.id).update({
+        lastReminderAt: FieldValue.serverTimestamp()
       });
     }
   } catch (error) {
@@ -116667,7 +117493,7 @@ if (isOneShot) {
   process.exit(0);
 } else {
   console.log("🚀 Mailer Daemon Iniciado en modo persistente. Escuchando en tiempo real...");
-  onSnapshot(collection(db, 'mail'), (snapshot) => {
+  db.collection('mail').onSnapshot((snapshot) => {
     snapshot.docChanges().forEach((change) => {
       if (change.type === 'added') {
         processMailDoc(change.doc);
@@ -116679,7 +117505,6 @@ if (isOneShot) {
   checkOverdueTaskReminders();
   setInterval(checkOverdueTaskReminders, CHECK_INTERVAL_MS);
 }
-
 
 ```
 
@@ -174551,7 +175376,11 @@ const DEFAULT_ACTIVITIES = [
   // texto real dice "VIA MEET" — el PDF de ejemplo más viejo (Equipo 28)
   // todavía decía ZOOM, por eso quedó desactualizado en la plantilla.
   { seccion: 'creacion', actividad: 'Reunión maestría de juego\nindicaciones sobre:\n(DIRECTORIO, CAMISETAS Y ESTANDARTE)\nVIA MEET DE GOOGLE', fecha: '', hora: '8:00 PM' },
-  { seccion: 'creacion', actividad: 'Entrega de futuros imposibles al correo:\nhttps://crearpslglobal.com/admin/login.php\nUsuario: invitadoFI\nContraseña: invitadofi', fecha: '', hora: 'Hasta 11:59 pm' },
+  // (03/09/2026) FIX — José: enlace y credenciales de entrega de futuros imposibles
+  // actualizados al portal IMO vigente (el resto del repo ya usaba imo.crearpslglobal.com
+  // — src/pages/ManualNodus.jsx, scripts/nodusScraper.js, etc. — solo esta plantilla del
+  // calendario había quedado con la URL y usuario/contraseña genéricos viejos).
+  { seccion: 'creacion', actividad: 'Entrega de futuros imposibles al correo:\nhttps://imo.crearpslglobal.com\nUsuario: invitadofiper\nContraseña: invitadofiper', fecha: '', hora: 'Hasta 11:59 pm' },
   { seccion: 'creacion', actividad: 'Entrega de directorio: físico y digital.', fecha: '', hora: 'Hasta las 2:00 pm, lo entrega un representante del equipo.' },
   { seccion: 'creacion', actividad: 'Entrenamiento de confianza', fecha: '', hora: '11:00 am a 2:00 pm.' },
   { seccion: 'creacion', actividad: 'Impacto Creación', fecha: '', hora: '3:00 pm a 5:00 pm' },
@@ -184076,6 +184905,17 @@ export default function Home() {
                 <button onClick={() => { setShowToolsDropdown(false); navigate('/generador-flyer'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(234, 179, 8, 0.15)', color: '#facc15', fontWeight: 'bold' }}>
                   🎨 Generador de Flyers Oficiales
                 </button>
+
+                <a 
+                  href="/cartas/carta_andres_idrobo_e30.html" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  onClick={() => setShowToolsDropdown(false)} 
+                  className="btn-secondary" 
+                  style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem', textDecoration: 'none' }}
+                >
+                  ✈️ Monitor de Vuelos y Cartas
+                </a>
 
                 {['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan'].includes(currentUser?.appRole) && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/mis-kpis'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
