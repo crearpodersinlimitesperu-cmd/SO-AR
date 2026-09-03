@@ -99,7 +99,8 @@
                         </div>
                     </div>
                     <div class="glass p-6 rounded-2xl border border-crear-accent/20 shadow-[0_0_20px_rgba(255,183,3,0.2)] w-full max-w-sm">
-                        <h3 class="text-crear-accent text-sm uppercase tracking-widest font-bold mb-4">🔥 Inicio de Maestría en Creación</h3>
+                        <h3 class="text-crear-accent text-sm uppercase tracking-widest font-bold mb-1">🔥 Reunión con Coordinación</h3>
+                        <p class="text-xs text-gray-400 mb-3">Grounding y Alineación (Salón): <strong class="text-white font-mono">Vie 04/09 · 04:30 PM</strong></p>
                         <div id="countdown-training" class="grid grid-cols-4 gap-2 text-center">
                             <div><div class="text-3xl font-black text-white" id="trn-d">00</div><div class="text-[10px] text-gray-500 uppercase">Días</div></div>
                             <div><div class="text-3xl font-black text-white" id="trn-h">00</div><div class="text-[10px] text-gray-500 uppercase">Hrs</div></div>
@@ -510,7 +511,7 @@
                 });
             }
             var flightTimestamp = new Date("2026-09-04T12:55:00.000Z").getTime();
-            var trainingTimestamp = new Date("2026-09-04T23:00:00.000Z").getTime();
+            var trainingTimestamp = new Date("2026-09-04T21:30:00.000Z").getTime(); // 16:30 hrs (4:30 PM UTC-5) Reunion con Coordinacion
             var timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
             var indicator = document.getElementById("timezone-indicator");
             if(indicator) indicator.innerText = "Mostrando cuenta regresiva detectando tu zona local: " + timeZone;
@@ -523,7 +524,7 @@
                     document.getElementById("trn-m").innerText = String(Math.floor((distanceTrn % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
                     document.getElementById("trn-s").innerText = String(Math.floor((distanceTrn % (1000 * 60)) / 1000)).padStart(2, "0");
                 } else {
-                    document.getElementById("countdown-training").innerHTML = "<div class='col-span-4 text-white font-bold tracking-widest uppercase'>¡El entrenamiento ha comenzado!</div>";
+                    document.getElementById("countdown-training").innerHTML = "<div class='col-span-4 text-white font-bold tracking-widest uppercase'>¡Reunión con Coordinación en curso!</div>";
                 }
                 var distanceFly = flightTimestamp - now;
                 if (distanceFly > 0) {

@@ -492,7 +492,7 @@
                 });
             }
             var flightTimestamp = new Date("2026-09-03T12:55:00.000Z").getTime();
-            var trainingTimestamp = new Date("2026-09-04T23:00:00.000Z").getTime();
+            var trainingTimestamp = new Date("2026-09-04T21:30:00.000Z").getTime(); // 16:30 hrs (4:30 PM UTC-5) Reunion con Coordinacion
             var timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
             var indicator = document.getElementById("timezone-indicator");
             if(indicator) indicator.innerText = "Mostrando cuenta regresiva detectando tu zona local: " + timeZone;
@@ -505,7 +505,7 @@
                     document.getElementById("trn-m").innerText = String(Math.floor((distanceTrn % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, "0");
                     document.getElementById("trn-s").innerText = String(Math.floor((distanceTrn % (1000 * 60)) / 1000)).padStart(2, "0");
                 } else {
-                    document.getElementById("countdown-training").innerHTML = "<div class='col-span-4 text-white font-bold tracking-widest uppercase'>¡El entrenamiento ha comenzado!</div>";
+                    document.getElementById("countdown-training").innerHTML = "<div class='col-span-4 text-white font-bold tracking-widest uppercase'>¡Reunión con Coordinación en curso!</div>";
                 }
                 var distanceFly = flightTimestamp - now;
                 if (distanceFly > 0) {
