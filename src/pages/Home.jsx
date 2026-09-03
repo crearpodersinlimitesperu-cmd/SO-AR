@@ -954,7 +954,21 @@ export default function Home() {
             </div>
 
             {showGlobalSearchResults && globalSearchActive && (
-              <div className="glass-panel dropdown-panel" style={{ position: 'absolute', top: '110%', left: 0, right: 0, zIndex: 200, maxHeight: '420px', overflowY: 'auto', padding: '0.5rem', boxShadow: '0 10px 40px rgba(0,0,0,0.9)', border: '1px solid rgba(41, 171, 226, 0.3)', textAlign: 'left' }}>
+              <div className="glass-panel dropdown-panel" style={{
+                position: 'absolute',
+                top: '110%',
+                left: 0,
+                right: 0,
+                zIndex: 9999,
+                maxHeight: '420px',
+                overflowY: 'auto',
+                padding: '0.6rem',
+                background: '#0c1527',
+                borderRadius: '14px',
+                boxShadow: '0 20px 50px rgba(0,0,0,0.95), 0 0 25px rgba(41, 171, 226, 0.2)',
+                border: '1px solid rgba(41, 171, 226, 0.4)',
+                textAlign: 'left'
+              }}>
                 {usersLoading && (
                   <div className="text-muted" style={{ fontSize: '0.78rem', padding: '0.4rem' }}>Cargando personas...</div>
                 )}
@@ -1111,19 +1125,55 @@ export default function Home() {
               </div>
 
               {showNotifications && (
-                <div className="glass-panel dropdown-panel" style={{ position: 'absolute', top: '125%', right: 0, width: '320px', zIndex: 100, padding: '1rem', boxShadow: '0 10px 40px rgba(0,0,0,0.8)', border: '1px solid rgba(41, 171, 226, 0.3)' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.5rem' }}>
-                    <h4 style={{ margin: 0, color: 'var(--crear-gold)' }}>🔔 Notificaciones</h4>
-                    <button onClick={() => { markAllAsRead(); setShowNotifications(false); }} style={{ background: 'transparent', border: 'none', color: 'var(--crear-cyan)', fontSize: '0.75rem', cursor: 'pointer', fontWeight: 'bold' }}>Marcar leídas</button>
+                <div className="glass-panel dropdown-panel" style={{
+                  position: 'absolute',
+                  top: '125%',
+                  right: 0,
+                  width: '360px',
+                  zIndex: 9999,
+                  padding: '1rem',
+                  background: '#0c1527',
+                  borderRadius: '14px',
+                  boxShadow: '0 20px 50px rgba(0,0,0,0.95), 0 0 25px rgba(41, 171, 226, 0.2)',
+                  border: '1px solid rgba(41, 171, 226, 0.4)'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.6rem' }}>
+                    <h4 style={{ margin: 0, color: 'var(--crear-gold)', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.95rem' }}>
+                      <span>🔔</span> Notificaciones
+                    </h4>
+                    <button
+                      onClick={() => { markAllAsRead(); setShowNotifications(false); }}
+                      style={{ background: 'rgba(41,171,226,0.15)', border: '1px solid rgba(41,171,226,0.3)', color: 'var(--crear-cyan)', fontSize: '0.72rem', padding: '3px 10px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
+                    >
+                      Marcar leídas
+                    </button>
                   </div>
-                  <div style={{ maxHeight: '350px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.8rem', paddingRight: '0.5rem' }}>
+                  <div style={{ maxHeight: '350px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.6rem', paddingRight: '0.4rem' }}>
                     {notifications?.length > 0 ? notifications.map(n => (
-                      <div key={n.id} style={{ fontSize: '0.8rem', padding: '0.75rem', background: n.read ? 'rgba(0,0,0,0.4)' : 'rgba(41, 171, 226, 0.15)', borderRadius: '8px', borderLeft: n.read ? 'none' : '3px solid var(--crear-cyan)' }}>
-                        <strong style={{ color: n.read ? 'var(--text-muted)' : '#ffffff', display: 'block', marginBottom: '0.2rem' }}>{n.title || 'Alerta'}</strong>
-                        <p style={{ margin: 0, color: 'var(--text-main)', lineHeight: '1.4' }}>{n.message}</p>
+                      <div key={n.id} style={{
+                        fontSize: '0.8rem',
+                        padding: '0.75rem',
+                        background: n.read ? 'rgba(255, 255, 255, 0.03)' : 'rgba(41, 171, 226, 0.12)',
+                        borderRadius: '8px',
+                        border: '1px solid rgba(255, 255, 255, 0.08)',
+                        borderLeft: n.read ? '1px solid rgba(255, 255, 255, 0.08)' : '3px solid var(--crear-cyan)'
+                      }}>
+                        <strong style={{ color: n.read ? 'var(--text-muted)' : '#ffffff', display: 'block', marginBottom: '0.2rem', fontSize: '0.84rem' }}>
+                          {n.title || 'Alerta'}
+                        </strong>
+                        <p style={{ margin: 0, color: 'var(--text-main)', lineHeight: '1.4', fontSize: '0.78rem' }}>
+                          {n.message}
+                        </p>
+                        {n.created_at && (
+                          <span style={{ display: 'block', fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: '4px' }}>
+                            {new Date(n.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        )}
                       </div>
                     )) : (
-                      <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', margin: '1rem 0' }}>No tienes notificaciones recientes.</p>
+                      <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', margin: '1.5rem 0' }}>
+                        No tienes notificaciones recientes.
+                      </p>
                     )}
                   </div>
                 </div>
@@ -1190,14 +1240,16 @@ export default function Home() {
                 position: 'absolute',
                 top: '120%',
                 right: 0,
-                width: '260px',
-                zIndex: 100,
-                padding: '0.6rem',
+                width: '270px',
+                zIndex: 9999,
+                padding: '0.75rem',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '0.4rem',
-                boxShadow: '0 10px 40px rgba(0,0,0,0.9)',
-                border: '1px solid rgba(41, 171, 226, 0.3)'
+                background: '#0c1527',
+                borderRadius: '14px',
+                boxShadow: '0 20px 50px rgba(0,0,0,0.95), 0 0 25px rgba(41, 171, 226, 0.2)',
+                border: '1px solid rgba(41, 171, 226, 0.4)'
               }}>
                 {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
                   <>

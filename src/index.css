@@ -39,7 +39,7 @@
   --bg-dark-alt: #112240;
   --bg-card: rgba(255, 255, 255, 0.03);
   --bg-card-hover: rgba(255, 255, 255, 0.06);
-  --bg-glass-heavy: rgba(13, 21, 45, 0.75);
+  --bg-glass-heavy: #0c1527;
   
   --border-subtle: rgba(255, 255, 255, 0.08);
   --border-strong: rgba(255, 255, 255, 0.2);
@@ -217,6 +217,34 @@ h1, h2, h3, h4, h5, h6 {
   background: var(--bg-glass-heavy) !important;
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(41, 171, 226, 0.4) !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.95), 0 0 25px rgba(41, 171, 226, 0.15) !important;
+  z-index: 9999 !important;
+}
+
+/* =========================================================================
+   SCROLLBAR UNIVERSAL MODERNO (Elimina barra blanca por defecto de Windows)
+   ========================================================================= */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(41, 171, 226, 0.45);
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(41, 171, 226, 0.85);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(41, 171, 226, 0.45) rgba(0, 0, 0, 0.2);
 }
 
 .causa-logo {
