@@ -894,7 +894,19 @@ function CalendarioPreview({ cal, onClose }) {
   const displayCal = useMemo(() => applyReliableDates(cal), [cal]);
 
   return (
-    <div style={{ background: '#f3f4f6', minHeight: '100vh', padding: '1.5rem' }}>
+    // (03/09/2026) FIX — José: "el calendario no se ve a la altura al exportarlo,
+    // se ve así" (captura: filas de actividad casi ilegibles, texto gris muy
+    // pálido). Causa confirmada leyendo src/index.css: en modo oscuro, "body"
+    // hereda "color: var(--text-main)" = #f8f9fa (casi blanco) globalmente. Esta
+    // vista SIEMPRE se dibuja sobre fondo blanco/celeste claro (es la vista de
+    // exportación a PDF), pero sus filas de actividad (línea ~959) nunca
+    // definían su propio "color" — heredaban el #f8f9fa del modo oscuro global
+    // de la app, casi invisible sobre fondo blanco. Las filas de encabezado de
+    // cada FDS sí se ven bien porque esas SÍ traen su propio "color: 'white'"
+    // sobre fondo azul oscuro. Fix: fijar aquí un color oscuro de base para
+    // toda la vista previa/exportación, independiente del tema de la app — las
+    // filas que ya tienen su propio "color" (blanco sobre azul) no cambian.
+    <div style={{ background: '#f3f4f6', minHeight: '100vh', padding: '1.5rem', color: '#1e293b' }}>
       <style>{`
         @media print {
           .no-print { display: none !important; }
