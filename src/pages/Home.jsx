@@ -442,10 +442,10 @@ const MODULE_REGISTRY = [
   { id: 'portafolio', label: 'Portafolio PMO (Planview)', emoji: '📈', route: '/portafolio', roles: EXEC_ROLES },
   { id: 'estrategia', label: 'Estrategia OKRs (Cascade)', emoji: '🎯', route: '/estrategia', roles: EXEC_ROLES },
   { id: 'auditoria-kpis', label: 'Auditoría de KPIs', emoji: '📉', route: '/auditoria-kpis', roles: EXEC_ROLES },
-  { id: 'acuerdos', label: 'Acuerdos Oficiales (Correo)', emoji: '✉️', route: '/acuerdos', roles: null },
+  { id: 'acuerdos', label: 'Acuerdos Oficiales (Correo)', emoji: '✉️', route: '/acuerdos', roles: EXEC_ROLES },
   { id: 'calendario-equipo', label: 'Agenda y Time Boxing', emoji: '🗓️', route: '/calendario-equipo', roles: EXEC_ROLES },
-  { id: 'learning', label: 'Inteligencia Colectiva (Learning)', emoji: '🧠', route: '/learning', roles: null },
-  { id: 'excelencia', label: 'Excelencia Operativa', emoji: '👑', route: '/excelencia', roles: null },
+  { id: 'learning', label: 'Inteligencia Colectiva (Learning)', emoji: '🧠', route: '/learning', roles: EXEC_ROLES },
+  { id: 'excelencia', label: 'Excelencia Operativa', emoji: '👑', route: '/excelencia', roles: EXEC_ROLES },
   { id: 'mis-kpis', label: 'Mis KPIs', emoji: '📊', route: '/mis-kpis', roles: KPI_ROLES },
   { id: 'directorio-qt', label: 'Directorio QT', emoji: '⚡', route: '/directorio-qt', roles: DIRECTORIO_QT_ROLES },
   { id: 'superadmin', label: 'Centro de Mando', emoji: '🌐', route: '/superadmin', roles: EXEC_ROLES },
@@ -458,7 +458,7 @@ const MODULE_REGISTRY = [
   { id: 'checklist', label: 'Mi Checklist Operativo', emoji: '✅', route: (u) => `/checklist/${u?.appRole || 'capitan'}`, roles: null },
   { id: 'metas', label: 'Mis Metas', emoji: '🏆', route: '/metas', roles: null },
   { id: 'reportes', label: 'Enviar Reportes', emoji: '📤', route: '/reportes', roles: null, visible: REPORTES_VISIBLE },
-  { id: 'generador-flyer', label: 'Generador de Flyers Oficiales', emoji: '🎨', route: '/generador-flyer', roles: null },
+  { id: 'generador-flyer', label: 'Generador de Flyers Oficiales', emoji: '🎨', route: '/generador-flyer', roles: [...EXEC_ROLES, 'coordinador', 'coord_c1', 'coord_c2', 'coordinador_c1c2'] },
 ];
 
 const isModuleVisible = (mod, currentUser) => {
@@ -1269,28 +1269,37 @@ export default function Home() {
                   </>
                 )}
 
-                <button onClick={() => { setShowToolsDropdown(false); navigate('/acuerdos'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#a855f7', background: 'rgba(168, 85, 247, 0.1)' }}>
+                {(currentUser?.appRole !== 'qt') && (
+<button onClick={() => { setShowToolsDropdown(false); navigate('/acuerdos'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#a855f7', background: 'rgba(168, 85, 247, 0.1)' }}>
                   ✉️ Acuerdos Oficiales (Correo)
                 </button>
+)}
                 {(currentUser?.isSuperAdmin || currentUser?.appRole === 'gerente' || currentUser?.isDireccion || currentUser?.appRole === 'director_maestria' || ['coordinador', 'coord_c1', 'coord_c2', 'coordinador_c1c2'].includes(currentUser?.appRole)) && (
                 <button onClick={() => { setShowToolsDropdown(false); navigate('/calendario-equipo'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#f97316', background: 'rgba(249, 115, 22, 0.1)' }}>
                   🗓️ Agenda y Time Boxing
                 </button>
               )}
 
-                <button onClick={() => { setShowToolsDropdown(false); navigate('/learning'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(41, 171, 226, 0.1)', color: 'var(--crear-cyan)' }}>
+                {(currentUser?.appRole !== 'qt') && (
+<button onClick={() => { setShowToolsDropdown(false); navigate('/learning'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(41, 171, 226, 0.1)', color: 'var(--crear-cyan)' }}>
                   🧠 Inteligencia Colectiva (Learning)
                 </button>
+)}
 
-                <button onClick={() => { setShowToolsDropdown(false); navigate('/excelencia'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(255, 183, 3, 0.15)', color: 'var(--crear-gold)' }}>
+                {(currentUser?.appRole !== 'qt') && (
+<button onClick={() => { setShowToolsDropdown(false); navigate('/excelencia'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(255, 183, 3, 0.15)', color: 'var(--crear-gold)' }}>
                   👑 Excelencia Operativa
                 </button>
+)}
 
-                <button onClick={() => { setShowToolsDropdown(false); navigate('/generador-flyer'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(234, 179, 8, 0.15)', color: '#facc15', fontWeight: 'bold' }}>
+                {(currentUser?.isSuperAdmin || currentUser?.appRole === 'gerente' || currentUser?.isDireccion || currentUser?.appRole === 'director_maestria' || ['coordinador', 'coord_c1', 'coord_c2', 'coordinador_c1c2'].includes(currentUser?.appRole)) && (
+<button onClick={() => { setShowToolsDropdown(false); navigate('/generador-flyer'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(234, 179, 8, 0.15)', color: '#facc15', fontWeight: 'bold' }}>
                   🎨 Generador de Flyers Oficiales
                 </button>
+)}
 
-                <a 
+                {(currentUser?.appRole !== 'qt') && (
+<a 
                   href="/cartas/carta_andres_idrobo_e30.html" 
                   target="_blank" 
                   rel="noopener noreferrer" 
@@ -1300,6 +1309,7 @@ export default function Home() {
                 >
                   ✈️ Monitor de Vuelos y Cartas
                 </a>
+)}
 
                 {['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan'].includes(currentUser?.appRole) && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/mis-kpis'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
@@ -1782,7 +1792,8 @@ export default function Home() {
                         const userSede = currentUser?.sede || '';
                         if (!userSede || userSede.toLowerCase().includes('global')) return true;
                         const evSede = ev.sede || ev.sedeTag || '';
-                        return evSede.toLowerCase().includes(userSede.toLowerCase()) || userSede.toLowerCase().includes(evSede.toLowerCase());
+                        if (!evSede) return false;
+                          return evSede.toLowerCase().includes(userSede.toLowerCase()) || userSede.toLowerCase().includes(evSede.toLowerCase());
                       }
                       return true;
                     });
@@ -1854,7 +1865,7 @@ export default function Home() {
                                creacionCount++;
                                return creacionCount <= 2;
                             }
-                            return true;
+                            return false; // QTs ONLY see C1, C2, and Creacion
                          });
                       }
                       if (displayEvents.length === 0) {
