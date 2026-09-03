@@ -81888,7 +81888,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                         </div>
                     </div>
                 </div>
-                <div class="reveal mb-12 flex justify-center" style="transition-delay: 280ms;"><a href="carta_invitacion_migraciones.html?nombre=ERNESTO%20ALEJANDRO%20DIAZ%20PABON&doc=PASAPORTE%20COLOMBIANA&fechas=Del%203%20al%207%20de%20septiembre%20de%202026&rol=Invitado+Especial+Internacional" target="_blank" class="glass border border-crear-accent/50 hover:bg-crear-accent/20 text-white px-6 py-3 rounded-full shadow-[0_0_20px_rgba(255,183,3,0.2)] transition-transform hover:scale-105 flex items-center gap-3 text-sm font-semibold tracking-wide uppercase"><i class="fa-solid fa-passport text-crear-accent"></i> Ver Carta para Migraciones</a></div>
+                <div class="reveal mb-12 flex justify-center" style="transition-delay: 280ms;"><a href="carta_invitacion_migraciones.html?nombre=ERNESTO%20ALEJANDRO%20DIAZ%20PABON&nacionalidad=ECUATORIANA&doc=PASAPORTE%20ECUATORIANO%20N%C2%B0%20A4152916%20(C.I.%201727274928)&fechas=Del%203%20al%207%20de%20Septiembre%20de%202026&rol=Invitado+Especial+Internacional" target="_blank" class="glass border border-crear-accent/50 hover:bg-crear-accent/20 text-white px-6 py-3 rounded-full shadow-[0_0_20px_rgba(255,183,3,0.2)] transition-transform hover:scale-105 flex items-center gap-3 text-sm font-semibold tracking-wide uppercase"><i class="fa-solid fa-passport text-crear-accent"></i> Ver Carta para Migraciones</a></div>
                 <p id="timezone-indicator" class="text-xs text-gray-500 mb-8 tracking-widest uppercase reveal" style="transition-delay: 285ms;">Calculando huso horario local...</p>
                 <!-- Welcome Note -->
                 <div class="glass p-8 rounded-2xl text-left reveal border border-gray-800 hover:border-crear-accent transition-colors duration-500 shadow-2xl" style="transition-delay: 300ms;">
@@ -81928,6 +81928,14 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                             <span class="bg-gray-800 border border-gray-700 px-3 py-1 rounded-md font-mono text-white text-sm">AS58FE</span>
                             <span class="text-gray-500 text-xs ml-2">(Boleto a nombre de: <strong>ERNESTO ALEJANDRO DIAZ PABON</strong>)</span>
                         </div>
+                        <!-- Check-in Oficial Avianca -->
+                        <div class="mt-3 flex flex-wrap gap-3 items-center bg-red-950/30 border border-red-500/40 p-3.5 rounded-xl">
+                            <a href="https://www.avianca.com/es/es/check-in/" target="_blank" class="inline-flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white text-xs md:text-sm font-bold px-4 py-2.5 rounded-lg shadow-lg hover:shadow-red-500/30 transition-all">
+                                <i class="fa-solid fa-ticket"></i>
+                                <span>Hacer Check-in en Avianca (Código: AS58FE) &rarr;</span>
+                            </a>
+                            <span class="text-xs text-gray-300">Disponible 48h antes de cada vuelo con tu código <strong>AS58FE</strong> y apellido <strong>DIAZ</strong>.</span>
+                        </div>
                         <div class="grid md:grid-cols-2 gap-5 mt-5">
                             <!-- Llegada -->
                             <div class="bg-gradient-to-br from-gray-800/40 to-gray-900/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden">
@@ -81936,7 +81944,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                                 <div class="space-y-2 text-sm">
                                     <p class="flex justify-between border-b border-gray-700/50 pb-2"><span class="text-gray-400">Vuelo</span> <span class="font-medium text-white">Avianca AV51</span></p>
                                     <p class="flex justify-between pt-1"><span class="text-gray-400">Llegada a Lima</span> <span class="font-medium text-green-400">20:50 PM</span></p>
-                                    <div class="pt-2"><a href="https://www.flightradar24.com/data/flights/av51" target="_blank" class="text-xs text-purple-400 hover:underline">Ver en FlightRadar &rarr;</a></div>
+                                    <div class="pt-2 flex items-center justify-between"><a href="https://www.flightradar24.com/data/flights/av51" target="_blank" class="text-xs text-purple-400 hover:underline">Ver en FlightRadar &rarr;</a><a href="https://www.avianca.com/es/es/check-in/" target="_blank" class="text-xs text-red-400 hover:underline flex items-center gap-1 font-semibold"><i class="fa-solid fa-ticket"></i> Check-in Avianca Online</a></div>
                                 </div>
                             </div>
                             <!-- Salida -->
@@ -81946,7 +81954,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                                 <div class="space-y-2 text-sm">
                                     <p class="flex justify-between border-b border-gray-700/50 pb-2"><span class="text-gray-400">Vuelo</span> <span class="font-medium text-white">Avianca AV50</span></p>
                                     <p class="flex justify-between pt-1"><span class="text-gray-400">Salida de Lima</span> <span class="font-medium text-red-400">11:45 AM</span></p>
-                                    <div class="pt-2"><a href="https://www.flightradar24.com/data/flights/av50" target="_blank" class="text-xs text-red-400 hover:underline">Ver en FlightRadar &rarr;</a></div>
+                                    <div class="pt-2 flex items-center justify-between"><a href="https://www.flightradar24.com/data/flights/av50" target="_blank" class="text-xs text-red-400 hover:underline">Ver en FlightRadar &rarr;</a><a href="https://www.avianca.com/es/es/check-in/" target="_blank" class="text-xs text-red-400 hover:underline flex items-center gap-1 font-semibold"><i class="fa-solid fa-ticket"></i> Check-in Avianca Online</a></div>
                                 </div>
                             </div>
                         </div>
@@ -81965,6 +81973,24 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                         <p class="text-lg"><strong>Tus traslados:</strong> Nuestro equipo te contactará para coordinar tu recojo exacto en el aeropuerto Jorge Chávez.</p>
                         <div class="space-y-4"><div class="flex gap-4 items-start bg-gray-800/30 p-4 rounded-xl border border-gray-700/30"><div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 flex-shrink-0"><i class="fa-solid fa-suitcase"></i></div><div><div class="font-bold text-blue-400 mb-1">Traslado Oficial</div><div class="text-sm text-gray-300">Nuestro equipo te contactará para coordinar tu recojo exacto en el aeropuerto Jorge Chávez.</div></div></div></div>
                         <div class="mt-4 bg-gradient-to-r from-blue-500/10 to-transparent p-4 rounded-xl border border-blue-500/30 flex items-center gap-3"><i class="fa-solid fa-car text-blue-400 text-xl"></i><div><p class="text-blue-400 font-bold text-sm">Coordinación con Conductor</p><p class="text-xs text-gray-400">El conductor asignado te escribirá por WhatsApp 1 hora antes de tu arribo/salida para darte la placa del auto y coordinar el punto de encuentro exacto.</p></div></div>
+                        
+                        <!-- Tarjeta Oficial de Recojo para Retorno al Aeropuerto -->
+                        <div class="bg-gradient-to-r from-amber-500/15 via-amber-500/5 to-transparent p-5 rounded-2xl border-2 border-amber-500/50 shadow-[0_0_25px_rgba(245,158,11,0.2)]">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-amber-500/20 text-crear-accent flex items-center justify-center text-2xl flex-shrink-0">
+                                    <i class="fa-solid fa-bell-concierge"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex flex-wrap items-center gap-2 mb-1">
+                                        <span class="text-xs uppercase font-extrabold tracking-widest text-crear-accent bg-amber-500/20 px-2.5 py-0.5 rounded-full border border-amber-500/30">Horario de Retorno Confirmado</span>
+                                    </div>
+                                    <h4 class="text-white font-black text-lg">Recojo en Lobby del Hotel: <span class="text-crear-accent">08:15 AM</span></h4>
+                                    <p class="text-sm text-gray-300 mt-1"><strong>Fecha:</strong> Lunes 07 de Septiembre de 2026</p>
+                                    <p class="text-xs text-gray-400 mt-1">Calculado con rigor a <strong>3.5 horas de antelación</strong> a tu vuelo Avianca AV50 (11:45 AM) para garantizar margen óptimo de traslado y filtros en el Aeropuerto Jorge Chávez.</p>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="bg-gradient-to-r from-blue-900/20 to-transparent p-5 rounded-xl border-l-4 border-blue-500 mt-6">
                             <h4 class="font-black text-white mb-2 flex items-center gap-2"><i class="fa-solid fa-hotel text-blue-400"></i> Hotel y Salón: Hotel Jose Antonio Deluxe (Miraflores)</h4>
                             <p class="text-sm text-gray-300">Calle Bellavista 133, Miraflores, Lima, Perú</p>
@@ -82011,6 +82037,26 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                         <div class="mt-5"><a href="https://wa.me/51919563284?text=Hola%20Jos%C3%A9%2C%20confirmo%20mis%20datos%20bancarios%20para%20honorarios%20de%20Alejandro%20D%C3%ADaz%20E28." target="_blank" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-green-500/10 border border-green-500/30 text-green-400 text-xs font-bold hover:bg-green-500/20 transition-colors"><i class="fa-brands fa-whatsapp text-green-400 text-base"></i> Enviar datos bancarios por WhatsApp</a></div>
                     </div>
                 </div>
+                
+                <!-- Espacio Oficial del Fin de Semana (Google Chat) -->
+                <div class="glass p-6 rounded-2xl border border-emerald-500/40 bg-emerald-500/10 mb-8 flex flex-col md:flex-row items-center justify-between gap-4 reveal">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-2xl flex-shrink-0 shadow-inner">
+                            <i class="fa-solid fa-comments"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="text-white font-bold text-lg">Espacio Oficial del Fin de Semana (Google Chat)</h3>
+                                <span class="px-2 py-0.5 rounded text-[10px] bg-emerald-500/30 text-emerald-300 font-bold uppercase tracking-wider">Sala Lima</span>
+                            </div>
+                            <p class="text-xs text-gray-300 mt-1">Únete a este espacio oficial en Google Chat durante el evento para toda la coordinación en sala y soporte en tiempo real.</p>
+                        </div>
+                    </div>
+                    <a href="https://chat.google.com/room/AAQAj8M5Q-8?cls=7" target="_blank" class="px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold rounded-xl text-xs flex items-center gap-2 transition-all hover:scale-105 shadow-[0_0_20px_rgba(16,185,129,0.4)] whitespace-nowrap uppercase tracking-wider">
+                        <i class="fa-brands fa-google"></i> Unirse al Chat del FDS <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+
                 <!-- 6. Escuadrón -->
                 <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-pink-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(236,72,153,0.15)] hover:-translate-y-1">
                     <div class="flex items-center gap-4 mb-6">
@@ -82124,7 +82170,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                 });
             }
             var flightTimestamp = new Date("2026-09-04T01:50:00.000Z").getTime();
-            var trainingTimestamp = new Date("2026-09-16T23:00:00.000Z").getTime();
+            var trainingTimestamp = new Date("2026-09-04T23:00:00.000Z").getTime();
             var timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
             var indicator = document.getElementById("timezone-indicator");
             if(indicator) indicator.innerText = "Mostrando cuenta regresiva detectando tu zona local: " + timeZone;
@@ -82314,7 +82360,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                         </div>
                     </div>
                 </div>
-                <div class="reveal mb-12 flex justify-center" style="transition-delay: 280ms;"><a href="carta_invitacion_migraciones.html?nombre=ELMER%20IDROBO%20ANDRADE&doc=PASAPORTE%20COLOMBIANA&fechas=Del%204%20al%206%20de%20septiembre%20de%202026&rol=Invitado+Especial+Internacional" target="_blank" class="glass border border-crear-accent/50 hover:bg-crear-accent/20 text-white px-6 py-3 rounded-full shadow-[0_0_20px_rgba(255,183,3,0.2)] transition-transform hover:scale-105 flex items-center gap-3 text-sm font-semibold tracking-wide uppercase"><i class="fa-solid fa-passport text-crear-accent"></i> Ver Carta para Migraciones</a></div>
+                <div class="reveal mb-12 flex justify-center" style="transition-delay: 280ms;"><a href="carta_invitacion_migraciones.html?nombre=ELMER%20ANDRES%20IDROBO%20ANDRADE&nacionalidad=ECUATORIANA&doc=PASAPORTE%20ECUATORIANO%20N%C2%B0%20A9919241%20(C.I.%201712332350)&fechas=Del%204%20al%206%20de%20Septiembre%20de%202026&rol=Invitado+Especial+Internacional" target="_blank" class="glass border border-crear-accent/50 hover:bg-crear-accent/20 text-white px-6 py-3 rounded-full shadow-[0_0_20px_rgba(255,183,3,0.2)] transition-transform hover:scale-105 flex items-center gap-3 text-sm font-semibold tracking-wide uppercase"><i class="fa-solid fa-passport text-crear-accent"></i> Ver Carta para Migraciones</a></div>
                 <p id="timezone-indicator" class="text-xs text-gray-500 mb-8 tracking-widest uppercase reveal" style="transition-delay: 285ms;">Calculando huso horario local...</p>
                 <!-- Welcome Note -->
                 <div class="glass p-8 rounded-2xl text-left reveal border border-gray-800 hover:border-crear-accent transition-colors duration-500 shadow-2xl" style="transition-delay: 300ms;">
@@ -82354,6 +82400,14 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                             <span class="bg-gray-800 border border-gray-700 px-3 py-1 rounded-md font-mono text-white text-sm">DJBJJD</span>
                             <span class="text-gray-500 text-xs ml-2">(Boleto a nombre de: <strong>ELMER IDROBO ANDRADE</strong>)</span>
                         </div>
+                        <!-- Check-in Oficial LATAM -->
+                        <div class="mt-3 flex flex-wrap gap-3 items-center bg-indigo-950/30 border border-indigo-500/40 p-3.5 rounded-xl">
+                            <a href="https://www.latamairlines.com/pe/es/check-in" target="_blank" class="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-red-600 hover:from-indigo-500 hover:to-red-500 text-white text-xs md:text-sm font-bold px-4 py-2.5 rounded-lg shadow-lg hover:shadow-indigo-500/30 transition-all">
+                                <i class="fa-solid fa-ticket"></i>
+                                <span>Hacer Check-in en LATAM (Código: DJBJJD) &rarr;</span>
+                            </a>
+                            <span class="text-xs text-gray-300">Disponible 48h antes con tu código <strong>DJBJJD</strong> y apellido <strong>IDROBO</strong>.</span>
+                        </div>
                         <div class="grid md:grid-cols-2 gap-5 mt-5">
                             <!-- Llegada -->
                             <div class="bg-gradient-to-br from-gray-800/40 to-gray-900/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden">
@@ -82362,7 +82416,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                                 <div class="space-y-2 text-sm">
                                     <p class="flex justify-between border-b border-gray-700/50 pb-2"><span class="text-gray-400">Vuelo</span> <span class="font-medium text-white">LATAM LA 1430</span></p>
                                     <p class="flex justify-between pt-1"><span class="text-gray-400">Llegada a Lima</span> <span class="font-medium text-green-400">10:55 AM</span></p>
-                                    <div class="pt-2"><a href="https://www.flightradar24.com/data/flights/la1430" target="_blank" class="text-xs text-purple-400 hover:underline">Ver en FlightRadar &rarr;</a></div>
+                                    <div class="pt-2 flex items-center justify-between"><a href="https://www.flightradar24.com/data/flights/la1430" target="_blank" class="text-xs text-purple-400 hover:underline">Ver en FlightRadar &rarr;</a><a href="https://www.latamairlines.com/pe/es/check-in" target="_blank" class="text-xs text-indigo-400 hover:underline flex items-center gap-1 font-semibold"><i class="fa-solid fa-ticket"></i> Check-in LATAM Online</a></div>
                                 </div>
                             </div>
                             <!-- Salida -->
@@ -82372,7 +82426,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                                 <div class="space-y-2 text-sm">
                                     <p class="flex justify-between border-b border-gray-700/50 pb-2"><span class="text-gray-400">Vuelo</span> <span class="font-medium text-white">LATAM LA 1449</span></p>
                                     <p class="flex justify-between pt-1"><span class="text-gray-400">Salida de Lima</span> <span class="font-medium text-red-400">23:35 PM</span></p>
-                                    <div class="pt-2"><a href="https://www.flightradar24.com/data/flights/la1449" target="_blank" class="text-xs text-red-400 hover:underline">Ver en FlightRadar &rarr;</a></div>
+                                    <div class="pt-2 flex items-center justify-between"><a href="https://www.flightradar24.com/data/flights/la1449" target="_blank" class="text-xs text-red-400 hover:underline">Ver en FlightRadar &rarr;</a><a href="https://www.latamairlines.com/pe/es/check-in" target="_blank" class="text-xs text-indigo-400 hover:underline flex items-center gap-1 font-semibold"><i class="fa-solid fa-ticket"></i> Check-in LATAM Online</a></div>
                                 </div>
                             </div>
                         </div>
@@ -82391,6 +82445,28 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                         <p class="text-lg"><strong>Tus traslados:</strong> Nuestro equipo te contactará para coordinar tu recojo en el aeropuerto Jorge Chávez.</p>
                         <div class="space-y-4"><div class="flex gap-4 items-start bg-gray-800/30 p-4 rounded-xl border border-gray-700/30"><div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 flex-shrink-0"><i class="fa-solid fa-suitcase"></i></div><div><div class="font-bold text-blue-400 mb-1">Traslado Oficial</div><div class="text-sm text-gray-300">Nuestro equipo te contactará para coordinar tu recojo en el aeropuerto Jorge Chávez.</div></div></div></div>
                         <div class="mt-4 bg-gradient-to-r from-blue-500/10 to-transparent p-4 rounded-xl border border-blue-500/30 flex items-center gap-3"><i class="fa-solid fa-car text-blue-400 text-xl"></i><div><p class="text-blue-400 font-bold text-sm">Coordinación con Conductor</p><p class="text-xs text-gray-400">El conductor asignado te escribirá por WhatsApp 1 hora antes de tu arribo/salida para darte la placa del auto y coordinar el punto de encuentro exacto.</p></div></div>
+                        
+                        <!-- Tarjeta Oficial de Recojo para Retorno al Aeropuerto -->
+                        <div class="bg-gradient-to-r from-amber-500/15 via-amber-500/5 to-transparent p-5 rounded-2xl border-2 border-amber-500/50 shadow-[0_0_25px_rgba(245,158,11,0.2)]">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-amber-500/20 text-crear-accent flex items-center justify-center text-2xl flex-shrink-0">
+                                    <i class="fa-solid fa-bell-concierge"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex flex-wrap items-center gap-2 mb-1">
+                                        <span class="text-xs uppercase font-extrabold tracking-widest text-crear-accent bg-amber-500/20 px-2.5 py-0.5 rounded-full border border-amber-500/30">Horario de Retorno Confirmado</span>
+                                    </div>
+                                    <h4 class="text-white font-black text-lg">Recojo en Lobby del Hotel: <span class="text-crear-accent">08:05 PM (20:05 PM)</span></h4>
+                                    <p class="text-sm text-gray-300 mt-1"><strong>Fecha:</strong> Domingo 06 de Septiembre de 2026</p>
+                                    <p class="text-xs text-gray-400 mt-1">Calculado con rigor a <strong>3.5 horas de antelación</strong> a tu vuelo LATAM LA 1449 (23:35 PM) para garantizar margen óptimo de traslado y filtros en el Aeropuerto Jorge Chávez.</p>
+                                    <div class="mt-3 bg-gray-900/60 p-3 rounded-xl border border-gray-700/50 text-xs text-amber-300 flex items-center gap-2">
+                                        <i class="fa-solid fa-suitcase text-crear-accent text-sm"></i>
+                                        <span><strong>Gestión de equipaje:</strong> Tu equipaje será resguardado con seguridad en custodia del hotel tras realizar tu check-out del mediodía el domingo.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="bg-gradient-to-r from-blue-900/20 to-transparent p-5 rounded-xl border-l-4 border-blue-500 mt-6">
                             <h4 class="font-black text-white mb-2 flex items-center gap-2"><i class="fa-solid fa-hotel text-blue-400"></i> Hotel y Salón: Hotel Jose Antonio Deluxe (Miraflores)</h4>
                             <p class="text-sm text-gray-300">Calle Bellavista 133, Miraflores, Lima, Perú</p>
@@ -82438,6 +82514,26 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                         <div class="mt-5"><a href="https://wa.me/51919563284?text=Hola%20Jos%C3%A9%2C%20confirmo%20mis%20datos%20bancarios%20para%20honorarios%20de%20Andr%C3%A9s%20Idrobo%20E30." target="_blank" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-green-500/10 border border-green-500/30 text-green-400 text-xs font-bold hover:bg-green-500/20 transition-colors"><i class="fa-brands fa-whatsapp text-green-400 text-base"></i> Enviar datos bancarios por WhatsApp</a></div>
                     </div>
                 </div>
+                
+                <!-- Espacio Oficial del Fin de Semana (Google Chat) -->
+                <div class="glass p-6 rounded-2xl border border-emerald-500/40 bg-emerald-500/10 mb-8 flex flex-col md:flex-row items-center justify-between gap-4 reveal">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-2xl flex-shrink-0 shadow-inner">
+                            <i class="fa-solid fa-comments"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="text-white font-bold text-lg">Espacio Oficial del Fin de Semana (Google Chat)</h3>
+                                <span class="px-2 py-0.5 rounded text-[10px] bg-emerald-500/30 text-emerald-300 font-bold uppercase tracking-wider">Sala Lima</span>
+                            </div>
+                            <p class="text-xs text-gray-300 mt-1">Únete a este espacio oficial en Google Chat durante el evento para toda la coordinación en sala y soporte en tiempo real.</p>
+                        </div>
+                    </div>
+                    <a href="https://chat.google.com/room/AAQAj8M5Q-8?cls=7" target="_blank" class="px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold rounded-xl text-xs flex items-center gap-2 transition-all hover:scale-105 shadow-[0_0_20px_rgba(16,185,129,0.4)] whitespace-nowrap uppercase tracking-wider">
+                        <i class="fa-brands fa-google"></i> Unirse al Chat del FDS <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+
                 <!-- 6. Escuadrón -->
                 <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-pink-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(236,72,153,0.15)] hover:-translate-y-1">
                     <div class="flex items-center gap-4 mb-6">
@@ -82551,7 +82647,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                 });
             }
             var flightTimestamp = new Date("2026-09-04T15:55:00.000Z").getTime();
-            var trainingTimestamp = new Date("2026-09-16T23:00:00.000Z").getTime();
+            var trainingTimestamp = new Date("2026-09-04T23:00:00.000Z").getTime();
             var timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
             var indicator = document.getElementById("timezone-indicator");
             if(indicator) indicator.innerText = "Mostrando cuenta regresiva detectando tu zona local: " + timeZone;
@@ -82741,7 +82837,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                         </div>
                     </div>
                 </div>
-                <div class="reveal mb-12 flex justify-center" style="transition-delay: 280ms;"><a href="carta_invitacion_migraciones.html?nombre=ERNESTO%20ALEJANDRO%20DIAZ%20PABON&doc=PASAPORTE%20COLOMBIANA&fechas=Del%203%20al%207%20de%20septiembre%20de%202026&rol=Invitado+Especial+Internacional" target="_blank" class="glass border border-crear-accent/50 hover:bg-crear-accent/20 text-white px-6 py-3 rounded-full shadow-[0_0_20px_rgba(255,183,3,0.2)] transition-transform hover:scale-105 flex items-center gap-3 text-sm font-semibold tracking-wide uppercase"><i class="fa-solid fa-passport text-crear-accent"></i> Ver Carta para Migraciones</a></div>
+                <div class="reveal mb-12 flex justify-center" style="transition-delay: 280ms;"><a href="carta_invitacion_migraciones.html?nombre=ERNESTO%20ALEJANDRO%20DIAZ%20PABON&nacionalidad=ECUATORIANA&doc=PASAPORTE%20ECUATORIANO%20N%C2%B0%20A4152916%20(C.I.%201727274928)&fechas=Del%203%20al%207%20de%20Septiembre%20de%202026&rol=Invitado+Especial+Internacional" target="_blank" class="glass border border-crear-accent/50 hover:bg-crear-accent/20 text-white px-6 py-3 rounded-full shadow-[0_0_20px_rgba(255,183,3,0.2)] transition-transform hover:scale-105 flex items-center gap-3 text-sm font-semibold tracking-wide uppercase"><i class="fa-solid fa-passport text-crear-accent"></i> Ver Carta para Migraciones</a></div>
                 <p id="timezone-indicator" class="text-xs text-gray-500 mb-8 tracking-widest uppercase reveal" style="transition-delay: 285ms;">Calculando huso horario local...</p>
                 <!-- Welcome Note -->
                 <div class="glass p-8 rounded-2xl text-left reveal border border-gray-800 hover:border-crear-accent transition-colors duration-500 shadow-2xl" style="transition-delay: 300ms;">
@@ -82781,6 +82877,14 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                             <span class="bg-gray-800 border border-gray-700 px-3 py-1 rounded-md font-mono text-white text-sm">AS58FE</span>
                             <span class="text-gray-500 text-xs ml-2">(Boleto a nombre de: <strong>ERNESTO ALEJANDRO DIAZ PABON</strong>)</span>
                         </div>
+                        <!-- Check-in Oficial Avianca -->
+                        <div class="mt-3 flex flex-wrap gap-3 items-center bg-red-950/30 border border-red-500/40 p-3.5 rounded-xl">
+                            <a href="https://www.avianca.com/es/es/check-in/" target="_blank" class="inline-flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white text-xs md:text-sm font-bold px-4 py-2.5 rounded-lg shadow-lg hover:shadow-red-500/30 transition-all">
+                                <i class="fa-solid fa-ticket"></i>
+                                <span>Hacer Check-in en Avianca (Código: AS58FE) &rarr;</span>
+                            </a>
+                            <span class="text-xs text-gray-300">Disponible 48h antes de cada vuelo con tu código <strong>AS58FE</strong> y apellido <strong>DIAZ</strong>.</span>
+                        </div>
                         <div class="grid md:grid-cols-2 gap-5 mt-5">
                             <!-- Llegada -->
                             <div class="bg-gradient-to-br from-gray-800/40 to-gray-900/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden">
@@ -82789,7 +82893,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                                 <div class="space-y-2 text-sm">
                                     <p class="flex justify-between border-b border-gray-700/50 pb-2"><span class="text-gray-400">Vuelo</span> <span class="font-medium text-white">Avianca AV51</span></p>
                                     <p class="flex justify-between pt-1"><span class="text-gray-400">Llegada a Lima</span> <span class="font-medium text-green-400">20:50 PM</span></p>
-                                    <div class="pt-2"><a href="https://www.flightradar24.com/data/flights/av51" target="_blank" class="text-xs text-purple-400 hover:underline">Ver en FlightRadar &rarr;</a></div>
+                                    <div class="pt-2 flex items-center justify-between"><a href="https://www.flightradar24.com/data/flights/av51" target="_blank" class="text-xs text-purple-400 hover:underline">Ver en FlightRadar &rarr;</a><a href="https://www.avianca.com/es/es/check-in/" target="_blank" class="text-xs text-red-400 hover:underline flex items-center gap-1 font-semibold"><i class="fa-solid fa-ticket"></i> Check-in Avianca Online</a></div>
                                 </div>
                             </div>
                             <!-- Salida -->
@@ -82799,7 +82903,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                                 <div class="space-y-2 text-sm">
                                     <p class="flex justify-between border-b border-gray-700/50 pb-2"><span class="text-gray-400">Vuelo</span> <span class="font-medium text-white">Avianca AV50</span></p>
                                     <p class="flex justify-between pt-1"><span class="text-gray-400">Salida de Lima</span> <span class="font-medium text-red-400">11:45 AM</span></p>
-                                    <div class="pt-2"><a href="https://www.flightradar24.com/data/flights/av50" target="_blank" class="text-xs text-red-400 hover:underline">Ver en FlightRadar &rarr;</a></div>
+                                    <div class="pt-2 flex items-center justify-between"><a href="https://www.flightradar24.com/data/flights/av50" target="_blank" class="text-xs text-red-400 hover:underline">Ver en FlightRadar &rarr;</a><a href="https://www.avianca.com/es/es/check-in/" target="_blank" class="text-xs text-red-400 hover:underline flex items-center gap-1 font-semibold"><i class="fa-solid fa-ticket"></i> Check-in Avianca Online</a></div>
                                 </div>
                             </div>
                         </div>
@@ -82818,6 +82922,24 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                         <p class="text-lg"><strong>Tus traslados:</strong> Nuestro equipo te contactará para coordinar tu recojo exacto en el aeropuerto Jorge Chávez.</p>
                         <div class="space-y-4"><div class="flex gap-4 items-start bg-gray-800/30 p-4 rounded-xl border border-gray-700/30"><div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 flex-shrink-0"><i class="fa-solid fa-suitcase"></i></div><div><div class="font-bold text-blue-400 mb-1">Traslado Oficial</div><div class="text-sm text-gray-300">Nuestro equipo te contactará para coordinar tu recojo exacto en el aeropuerto Jorge Chávez.</div></div></div></div>
                         <div class="mt-4 bg-gradient-to-r from-blue-500/10 to-transparent p-4 rounded-xl border border-blue-500/30 flex items-center gap-3"><i class="fa-solid fa-car text-blue-400 text-xl"></i><div><p class="text-blue-400 font-bold text-sm">Coordinación con Conductor</p><p class="text-xs text-gray-400">El conductor asignado te escribirá por WhatsApp 1 hora antes de tu arribo/salida para darte la placa del auto y coordinar el punto de encuentro exacto.</p></div></div>
+                        
+                        <!-- Tarjeta Oficial de Recojo para Retorno al Aeropuerto -->
+                        <div class="bg-gradient-to-r from-amber-500/15 via-amber-500/5 to-transparent p-5 rounded-2xl border-2 border-amber-500/50 shadow-[0_0_25px_rgba(245,158,11,0.2)]">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-amber-500/20 text-crear-accent flex items-center justify-center text-2xl flex-shrink-0">
+                                    <i class="fa-solid fa-bell-concierge"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex flex-wrap items-center gap-2 mb-1">
+                                        <span class="text-xs uppercase font-extrabold tracking-widest text-crear-accent bg-amber-500/20 px-2.5 py-0.5 rounded-full border border-amber-500/30">Horario de Retorno Confirmado</span>
+                                    </div>
+                                    <h4 class="text-white font-black text-lg">Recojo en Lobby del Hotel: <span class="text-crear-accent">08:15 AM</span></h4>
+                                    <p class="text-sm text-gray-300 mt-1"><strong>Fecha:</strong> Lunes 07 de Septiembre de 2026</p>
+                                    <p class="text-xs text-gray-400 mt-1">Calculado con rigor a <strong>3.5 horas de antelación</strong> a tu vuelo Avianca AV50 (11:45 AM) para garantizar margen óptimo de traslado y filtros en el Aeropuerto Jorge Chávez.</p>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="bg-gradient-to-r from-blue-900/20 to-transparent p-5 rounded-xl border-l-4 border-blue-500 mt-6">
                             <h4 class="font-black text-white mb-2 flex items-center gap-2"><i class="fa-solid fa-hotel text-blue-400"></i> Hotel y Salón: Hotel Jose Antonio Deluxe (Miraflores)</h4>
                             <p class="text-sm text-gray-300">Calle Bellavista 133, Miraflores, Lima, Perú</p>
@@ -82864,6 +82986,26 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                         <div class="mt-5"><a href="https://wa.me/51919563284?text=Hola%20Jos%C3%A9%2C%20confirmo%20mis%20datos%20bancarios%20para%20honorarios%20de%20Alejandro%20D%C3%ADaz%20E28." target="_blank" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-green-500/10 border border-green-500/30 text-green-400 text-xs font-bold hover:bg-green-500/20 transition-colors"><i class="fa-brands fa-whatsapp text-green-400 text-base"></i> Enviar datos bancarios por WhatsApp</a></div>
                     </div>
                 </div>
+                
+                <!-- Espacio Oficial del Fin de Semana (Google Chat) -->
+                <div class="glass p-6 rounded-2xl border border-emerald-500/40 bg-emerald-500/10 mb-8 flex flex-col md:flex-row items-center justify-between gap-4 reveal">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-2xl flex-shrink-0 shadow-inner">
+                            <i class="fa-solid fa-comments"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="text-white font-bold text-lg">Espacio Oficial del Fin de Semana (Google Chat)</h3>
+                                <span class="px-2 py-0.5 rounded text-[10px] bg-emerald-500/30 text-emerald-300 font-bold uppercase tracking-wider">Sala Lima</span>
+                            </div>
+                            <p class="text-xs text-gray-300 mt-1">Únete a este espacio oficial en Google Chat durante el evento para toda la coordinación en sala y soporte en tiempo real.</p>
+                        </div>
+                    </div>
+                    <a href="https://chat.google.com/room/AAQAj8M5Q-8?cls=7" target="_blank" class="px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold rounded-xl text-xs flex items-center gap-2 transition-all hover:scale-105 shadow-[0_0_20px_rgba(16,185,129,0.4)] whitespace-nowrap uppercase tracking-wider">
+                        <i class="fa-brands fa-google"></i> Unirse al Chat del FDS <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+
                 <!-- 6. Escuadrón -->
                 <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-pink-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(236,72,153,0.15)] hover:-translate-y-1">
                     <div class="flex items-center gap-4 mb-6">
@@ -82977,7 +83119,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                 });
             }
             var flightTimestamp = new Date("2026-09-04T01:50:00.000Z").getTime();
-            var trainingTimestamp = new Date("2026-09-16T23:00:00.000Z").getTime();
+            var trainingTimestamp = new Date("2026-09-04T23:00:00.000Z").getTime();
             var timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
             var indicator = document.getElementById("timezone-indicator");
             if(indicator) indicator.innerText = "Mostrando cuenta regresiva detectando tu zona local: " + timeZone;
@@ -83167,7 +83309,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                         </div>
                     </div>
                 </div>
-                <div class="reveal mb-12 flex justify-center" style="transition-delay: 280ms;"><a href="carta_invitacion_migraciones.html?nombre=ELMER%20IDROBO%20ANDRADE&doc=PASAPORTE%20COLOMBIANA&fechas=Del%204%20al%206%20de%20septiembre%20de%202026&rol=Invitado+Especial+Internacional" target="_blank" class="glass border border-crear-accent/50 hover:bg-crear-accent/20 text-white px-6 py-3 rounded-full shadow-[0_0_20px_rgba(255,183,3,0.2)] transition-transform hover:scale-105 flex items-center gap-3 text-sm font-semibold tracking-wide uppercase"><i class="fa-solid fa-passport text-crear-accent"></i> Ver Carta para Migraciones</a></div>
+                <div class="reveal mb-12 flex justify-center" style="transition-delay: 280ms;"><a href="carta_invitacion_migraciones.html?nombre=ELMER%20ANDRES%20IDROBO%20ANDRADE&nacionalidad=ECUATORIANA&doc=PASAPORTE%20ECUATORIANO%20N%C2%B0%20A9919241%20(C.I.%201712332350)&fechas=Del%204%20al%206%20de%20Septiembre%20de%202026&rol=Invitado+Especial+Internacional" target="_blank" class="glass border border-crear-accent/50 hover:bg-crear-accent/20 text-white px-6 py-3 rounded-full shadow-[0_0_20px_rgba(255,183,3,0.2)] transition-transform hover:scale-105 flex items-center gap-3 text-sm font-semibold tracking-wide uppercase"><i class="fa-solid fa-passport text-crear-accent"></i> Ver Carta para Migraciones</a></div>
                 <p id="timezone-indicator" class="text-xs text-gray-500 mb-8 tracking-widest uppercase reveal" style="transition-delay: 285ms;">Calculando huso horario local...</p>
                 <!-- Welcome Note -->
                 <div class="glass p-8 rounded-2xl text-left reveal border border-gray-800 hover:border-crear-accent transition-colors duration-500 shadow-2xl" style="transition-delay: 300ms;">
@@ -83207,6 +83349,14 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                             <span class="bg-gray-800 border border-gray-700 px-3 py-1 rounded-md font-mono text-white text-sm">DJBJJD</span>
                             <span class="text-gray-500 text-xs ml-2">(Boleto a nombre de: <strong>ELMER IDROBO ANDRADE</strong>)</span>
                         </div>
+                        <!-- Check-in Oficial LATAM -->
+                        <div class="mt-3 flex flex-wrap gap-3 items-center bg-indigo-950/30 border border-indigo-500/40 p-3.5 rounded-xl">
+                            <a href="https://www.latamairlines.com/pe/es/check-in" target="_blank" class="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-red-600 hover:from-indigo-500 hover:to-red-500 text-white text-xs md:text-sm font-bold px-4 py-2.5 rounded-lg shadow-lg hover:shadow-indigo-500/30 transition-all">
+                                <i class="fa-solid fa-ticket"></i>
+                                <span>Hacer Check-in en LATAM (Código: DJBJJD) &rarr;</span>
+                            </a>
+                            <span class="text-xs text-gray-300">Disponible 48h antes con tu código <strong>DJBJJD</strong> y apellido <strong>IDROBO</strong>.</span>
+                        </div>
                         <div class="grid md:grid-cols-2 gap-5 mt-5">
                             <!-- Llegada -->
                             <div class="bg-gradient-to-br from-gray-800/40 to-gray-900/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden">
@@ -83215,7 +83365,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                                 <div class="space-y-2 text-sm">
                                     <p class="flex justify-between border-b border-gray-700/50 pb-2"><span class="text-gray-400">Vuelo</span> <span class="font-medium text-white">LATAM LA 1430</span></p>
                                     <p class="flex justify-between pt-1"><span class="text-gray-400">Llegada a Lima</span> <span class="font-medium text-green-400">10:55 AM</span></p>
-                                    <div class="pt-2"><a href="https://www.flightradar24.com/data/flights/la1430" target="_blank" class="text-xs text-purple-400 hover:underline">Ver en FlightRadar &rarr;</a></div>
+                                    <div class="pt-2 flex items-center justify-between"><a href="https://www.flightradar24.com/data/flights/la1430" target="_blank" class="text-xs text-purple-400 hover:underline">Ver en FlightRadar &rarr;</a><a href="https://www.latamairlines.com/pe/es/check-in" target="_blank" class="text-xs text-indigo-400 hover:underline flex items-center gap-1 font-semibold"><i class="fa-solid fa-ticket"></i> Check-in LATAM Online</a></div>
                                 </div>
                             </div>
                             <!-- Salida -->
@@ -83225,7 +83375,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                                 <div class="space-y-2 text-sm">
                                     <p class="flex justify-between border-b border-gray-700/50 pb-2"><span class="text-gray-400">Vuelo</span> <span class="font-medium text-white">LATAM LA 1449</span></p>
                                     <p class="flex justify-between pt-1"><span class="text-gray-400">Salida de Lima</span> <span class="font-medium text-red-400">23:35 PM</span></p>
-                                    <div class="pt-2"><a href="https://www.flightradar24.com/data/flights/la1449" target="_blank" class="text-xs text-red-400 hover:underline">Ver en FlightRadar &rarr;</a></div>
+                                    <div class="pt-2 flex items-center justify-between"><a href="https://www.flightradar24.com/data/flights/la1449" target="_blank" class="text-xs text-red-400 hover:underline">Ver en FlightRadar &rarr;</a><a href="https://www.latamairlines.com/pe/es/check-in" target="_blank" class="text-xs text-indigo-400 hover:underline flex items-center gap-1 font-semibold"><i class="fa-solid fa-ticket"></i> Check-in LATAM Online</a></div>
                                 </div>
                             </div>
                         </div>
@@ -83244,6 +83394,28 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                         <p class="text-lg"><strong>Tus traslados:</strong> Nuestro equipo te contactará para coordinar tu recojo en el aeropuerto Jorge Chávez.</p>
                         <div class="space-y-4"><div class="flex gap-4 items-start bg-gray-800/30 p-4 rounded-xl border border-gray-700/30"><div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 flex-shrink-0"><i class="fa-solid fa-suitcase"></i></div><div><div class="font-bold text-blue-400 mb-1">Traslado Oficial</div><div class="text-sm text-gray-300">Nuestro equipo te contactará para coordinar tu recojo en el aeropuerto Jorge Chávez.</div></div></div></div>
                         <div class="mt-4 bg-gradient-to-r from-blue-500/10 to-transparent p-4 rounded-xl border border-blue-500/30 flex items-center gap-3"><i class="fa-solid fa-car text-blue-400 text-xl"></i><div><p class="text-blue-400 font-bold text-sm">Coordinación con Conductor</p><p class="text-xs text-gray-400">El conductor asignado te escribirá por WhatsApp 1 hora antes de tu arribo/salida para darte la placa del auto y coordinar el punto de encuentro exacto.</p></div></div>
+                        
+                        <!-- Tarjeta Oficial de Recojo para Retorno al Aeropuerto -->
+                        <div class="bg-gradient-to-r from-amber-500/15 via-amber-500/5 to-transparent p-5 rounded-2xl border-2 border-amber-500/50 shadow-[0_0_25px_rgba(245,158,11,0.2)]">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-amber-500/20 text-crear-accent flex items-center justify-center text-2xl flex-shrink-0">
+                                    <i class="fa-solid fa-bell-concierge"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex flex-wrap items-center gap-2 mb-1">
+                                        <span class="text-xs uppercase font-extrabold tracking-widest text-crear-accent bg-amber-500/20 px-2.5 py-0.5 rounded-full border border-amber-500/30">Horario de Retorno Confirmado</span>
+                                    </div>
+                                    <h4 class="text-white font-black text-lg">Recojo en Lobby del Hotel: <span class="text-crear-accent">08:05 PM (20:05 PM)</span></h4>
+                                    <p class="text-sm text-gray-300 mt-1"><strong>Fecha:</strong> Domingo 06 de Septiembre de 2026</p>
+                                    <p class="text-xs text-gray-400 mt-1">Calculado con rigor a <strong>3.5 horas de antelación</strong> a tu vuelo LATAM LA 1449 (23:35 PM) para garantizar margen óptimo de traslado y filtros en el Aeropuerto Jorge Chávez.</p>
+                                    <div class="mt-3 bg-gray-900/60 p-3 rounded-xl border border-gray-700/50 text-xs text-amber-300 flex items-center gap-2">
+                                        <i class="fa-solid fa-suitcase text-crear-accent text-sm"></i>
+                                        <span><strong>Gestión de equipaje:</strong> Tu equipaje será resguardado con seguridad en custodia del hotel tras realizar tu check-out del mediodía el domingo.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="bg-gradient-to-r from-blue-900/20 to-transparent p-5 rounded-xl border-l-4 border-blue-500 mt-6">
                             <h4 class="font-black text-white mb-2 flex items-center gap-2"><i class="fa-solid fa-hotel text-blue-400"></i> Hotel y Salón: Hotel Jose Antonio Deluxe (Miraflores)</h4>
                             <p class="text-sm text-gray-300">Calle Bellavista 133, Miraflores, Lima, Perú</p>
@@ -83291,6 +83463,26 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                         <div class="mt-5"><a href="https://wa.me/51919563284?text=Hola%20Jos%C3%A9%2C%20confirmo%20mis%20datos%20bancarios%20para%20honorarios%20de%20Andr%C3%A9s%20Idrobo%20E30." target="_blank" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-green-500/10 border border-green-500/30 text-green-400 text-xs font-bold hover:bg-green-500/20 transition-colors"><i class="fa-brands fa-whatsapp text-green-400 text-base"></i> Enviar datos bancarios por WhatsApp</a></div>
                     </div>
                 </div>
+                
+                <!-- Espacio Oficial del Fin de Semana (Google Chat) -->
+                <div class="glass p-6 rounded-2xl border border-emerald-500/40 bg-emerald-500/10 mb-8 flex flex-col md:flex-row items-center justify-between gap-4 reveal">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-2xl flex-shrink-0 shadow-inner">
+                            <i class="fa-solid fa-comments"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="text-white font-bold text-lg">Espacio Oficial del Fin de Semana (Google Chat)</h3>
+                                <span class="px-2 py-0.5 rounded text-[10px] bg-emerald-500/30 text-emerald-300 font-bold uppercase tracking-wider">Sala Lima</span>
+                            </div>
+                            <p class="text-xs text-gray-300 mt-1">Únete a este espacio oficial en Google Chat durante el evento para toda la coordinación en sala y soporte en tiempo real.</p>
+                        </div>
+                    </div>
+                    <a href="https://chat.google.com/room/AAQAj8M5Q-8?cls=7" target="_blank" class="px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold rounded-xl text-xs flex items-center gap-2 transition-all hover:scale-105 shadow-[0_0_20px_rgba(16,185,129,0.4)] whitespace-nowrap uppercase tracking-wider">
+                        <i class="fa-brands fa-google"></i> Unirse al Chat del FDS <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+
                 <!-- 6. Escuadrón -->
                 <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-pink-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(236,72,153,0.15)] hover:-translate-y-1">
                     <div class="flex items-center gap-4 mb-6">
@@ -83404,7 +83596,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                 });
             }
             var flightTimestamp = new Date("2026-09-04T15:55:00.000Z").getTime();
-            var trainingTimestamp = new Date("2026-09-16T23:00:00.000Z").getTime();
+            var trainingTimestamp = new Date("2026-09-04T23:00:00.000Z").getTime();
             var timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
             var indicator = document.getElementById("timezone-indicator");
             if(indicator) indicator.innerText = "Mostrando cuenta regresiva detectando tu zona local: " + timeZone;
@@ -83478,6 +83670,230 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
     </script>
 </body>
 </html>
+```
+
+---
+
+## Archivo: public\cartas\carta_invitacion_migraciones.html
+
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carta de Invitación Oficial - CREAR Poder Sin Límites</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        crearBlue: '#002060',
+                        crearGold: '#FFB703',
+                        crearDark: '#0f172a'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; color: black !important; padding: 0 !important; }
+            .print-container { box-shadow: none !important; border: none !important; width: 100% !important; max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
+            @page { margin: 15mm 20mm; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen py-8 px-4 font-sans text-gray-800 antialiased">
+
+    <div class="print-container max-w-4xl mx-auto bg-white p-8 md:p-14 rounded-xl shadow-lg border border-gray-200">
+        
+        <!-- Header -->
+        <header class="flex justify-between items-center border-b-2 border-gray-100 pb-6 mb-8">
+            <div class="flex items-center gap-4">
+                <img src="https://raw.githubusercontent.com/crearpsl/assets/main/logo_crear.png" alt="Logo CREAR Poder Sin Límites" class="h-16 w-auto object-contain" onerror="this.onerror=null; this.src='logo_crear.png';">
+            </div>
+            <div class="text-right">
+                <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Fecha de Emisión</p>
+                <p class="text-sm font-bold text-gray-700" id="current-date">Lima, Perú</p>
+            </div>
+        </header>
+
+        <!-- Body -->
+        <main class="text-gray-700 leading-relaxed space-y-6 text-justify">
+            <h1 class="text-xl font-bold uppercase tracking-wide text-gray-900 mb-8">Carta de Invitación Oficial</h1>
+            
+            <p class="font-semibold text-gray-900">A las Autoridades de la Superintendencia Nacional de Migraciones de la República del Perú:</p>
+            
+            <p>A quien corresponda,</p>
+
+            <p>
+                Por medio de la presente carta formal, la empresa <strong>CREACIÓN CUÁNTICA E.I.R.L.</strong> (con RUC activo <strong>20612592811</strong> y domicilio fiscal en Lima, Perú), comercialmente conocida como <strong>CREAR Poder Sin Límites</strong>, dedicada al rubro de consultoría, desarrollo personal y formación de liderazgo, emite una invitación oficial a favor del ciudadano extranjero:
+            </p>
+
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-5 my-6 mx-2 md:mx-6 shadow-sm">
+                <p class="mb-2"><span class="text-gray-500 uppercase text-xs font-bold tracking-wider">Nombre Completo:</span><br> <span class="text-lg font-bold text-gray-900" id="field-name">[Nombre]</span></p>
+                <p class="mb-2"><span class="text-gray-500 uppercase text-xs font-bold tracking-wider">Nacionalidad:</span><br> <span class="text-lg font-bold text-crearBlue" id="field-nacionalidad">ECUATORIANA</span></p>
+                <p class="mb-2"><span class="text-gray-500 uppercase text-xs font-bold tracking-wider">Documento de Identidad / Pasaporte:</span><br> <span class="text-lg font-bold text-gray-900 font-mono" id="field-doc">[Documento]</span></p>
+                <p class="mb-2"><span class="text-gray-500 uppercase text-xs font-bold tracking-wider">Calidad de Participación:</span><br> <span class="text-base font-bold text-crearBlue" id="field-role">Invitado Especial Internacional (Invitado Internacional Ad-Honorem)</span></p>
+                <p><span class="text-gray-500 uppercase text-xs font-bold tracking-wider">Hospedaje Reservado:</span><br> <span class="text-base font-bold text-gray-900" id="field-hotel">Hotel José Antonio Deluxe (Calle Bellavista 133, Miraflores, Lima)</span></p>
+            </div>
+
+            <p>
+                El motivo de su viaje y estadía en nuestro país obedece a su asistencia como <strong>invitado especial y participante observador</strong> en nuestro evento corporativo denominado <strong>"Entrenamiento de Liderazgo Transformacional"</strong>, el cual se llevará a cabo durante los días <strong id="field-dates">Del 3 al 7 de Septiembre de 2026</strong> en la ciudad de Lima. Cabe resaltar que su visita tiene fines netamente de intercambio vivencial y no contempla ninguna relación laboral, subordinación ni remuneración económica dentro del territorio nacional.
+            </p>
+
+            <p>
+                Dejamos constancia legal y financiera de que <strong>todos los gastos derivados de su estadía en el territorio peruano</strong> —incluyendo hospedaje, transporte interno, alimentación y cualquier viático necesario— <strong>serán asumidos en su totalidad por nuestra organización</strong>. El ciudadano invitado no representará carga económica alguna para el Estado Peruano.
+            </p>
+
+            <p>
+                Extendemos esta carta para que le sean brindadas las facilidades del caso en su ingreso al país, garantizando que su visita es en calidad de invitado no remunerado y que retornará a su país de origen una vez finalizado su itinerario de vuelo programado.
+            </p>
+
+            <p>
+                Agradeciendo de antemano su gentil atención y colaboración, quedamos a su entera disposición para cualquier consulta o verificación.
+            </p>
+
+            <p class="mt-8">Atentamente,</p>
+
+            <!-- Signature -->
+            <div class="mt-16 mb-4 flex flex-col items-center text-center">
+                <div class="relative w-80 flex flex-col items-center justify-end">
+                    <img src="firma_jose_sanchez.png" alt="Firma José Sánchez" class="h-32 w-auto object-contain -mb-6" style="mix-blend-mode: multiply;">
+                    <div class="w-full border-b-2 border-gray-400 mb-3"></div>
+                </div>
+                <p class="font-bold text-gray-900 uppercase tracking-wide text-lg mt-2">José Sánchez</p>
+                <p class="text-sm text-gray-800 font-semibold">Gerente Administrativo / Apoderado</p>
+                <p class="text-sm text-gray-600">CREACIÓN CUÁNTICA E.I.R.L.</p>
+                <p class="text-sm text-gray-500 mt-1">Lima, Perú | jose.sanchez@crearpsl.com | +51919563284</p>
+            </div>
+        </main>
+
+        <!-- No Print Controls -->
+        <div class="no-print mt-12 pt-6 border-t border-gray-200 flex flex-col md:flex-row gap-4 justify-center items-center">
+            <button onclick="window.print()" class="bg-crearGold hover:bg-yellow-500 text-crearDark font-bold py-3 px-8 rounded-full shadow-lg transition-transform hover:scale-105 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z" clip-rule="evenodd" /></svg>
+                Imprimir o PDF
+            </button>
+            <p class="text-xs text-gray-400 text-center max-w-sm">Nota: Esta zona de botones y el fondo gris no aparecerán en la impresión. Datos validados automáticamente desde el registro consular oficial.</p>
+        </div>
+    </div>
+
+    <script>
+        const TRAINERS_MASTER = {
+            'ERNESTO ALEJANDRO DIAZ PABON': {
+                name: 'ERNESTO ALEJANDRO DIAZ PABON',
+                nacionalidad: 'ECUATORIANA',
+                doc: 'PASAPORTE ECUATORIANO Nº A4152916 (C.I. 1727274928)',
+                fechas: 'Del 3 al 7 de Septiembre de 2026',
+                rol: 'Invitado Especial Internacional (Invitado Internacional Ad-Honorem)',
+                hotel: 'Hotel José Antonio Deluxe (Calle Bellavista 133, Miraflores, Lima)'
+            },
+            'ELMER ANDRES IDROBO ANDRADE': {
+                name: 'ELMER ANDRES IDROBO ANDRADE',
+                nacionalidad: 'ECUATORIANA',
+                doc: 'PASAPORTE ECUATORIANO Nº A9919241 (C.I. 1712332350)',
+                fechas: 'Del 4 al 6 de Septiembre de 2026',
+                rol: 'Invitado Especial Internacional (Invitado Internacional Ad-Honorem)',
+                hotel: 'Hotel José Antonio Deluxe (Calle Bellavista 133, Miraflores, Lima)'
+            },
+            'MARIA DE LOURDES PATIÑO GALARRAGA': {
+                name: 'MARIA DE LOURDES PATIÑO GALARRAGA',
+                nacionalidad: 'ECUATORIANA',
+                doc: 'PASAPORTE ECUATORIANO Nº B0857192 (C.I. 1712863404)',
+                fechas: 'Del 3 al 7 de Septiembre de 2026',
+                rol: 'Invitada Especial Internacional (Invitada Internacional Ad-Honorem)',
+                hotel: 'Hotel José Antonio Deluxe (Calle Bellavista 133, Miraflores, Lima)'
+            },
+            'CARLOS ANDRES GOMEZ GOMEZ': {
+                name: 'CARLOS ANDRES GOMEZ GOMEZ',
+                nacionalidad: 'COLOMBIANA',
+                doc: 'PASAPORTE COLOMBIANO Nº BG726399 (C.C. 3482169)',
+                fechas: 'Del 26 al 31 de Agosto de 2026',
+                rol: 'Invitado Especial Internacional (Invitado Internacional Ad-Honorem)',
+                hotel: 'Hotel José Antonio Deluxe (Calle Bellavista 133, Miraflores, Lima)'
+            },
+            'FERNANDO ARAGON': {
+                name: 'FERNANDO ARAGON',
+                nacionalidad: 'ARGENTINA',
+                doc: 'DNI MERCOSUR Nº 17.856.159 (Trámite 00518899392)',
+                fechas: 'Del 14 al 16 de Agosto de 2026',
+                rol: 'Líder Capítulo Uno (Invitado Internacional Ad-Honorem)',
+                hotel: 'Hotel José Antonio Deluxe (Calle Bellavista 133, Miraflores, Lima)'
+            },
+            'DIEGO DAVID BRAVO FIGUEROA': {
+                name: 'DIEGO DAVID BRAVO FIGUEROA',
+                nacionalidad: 'ECUATORIANA',
+                doc: 'PASAPORTE ECUATORIANO Nº A9025643 (C.I. 1713803847)',
+                fechas: 'Del 14 al 16 de Agosto de 2026',
+                rol: 'Líder El Viaje (Invitado Internacional Ad-Honorem)',
+                hotel: 'Hotel José Antonio Deluxe (Calle Bellavista 133, Miraflores, Lima)'
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('current-date').textContent = new Date().toLocaleDateString('es-PE', options);
+
+            const params = new URLSearchParams(window.location.search);
+            const rawNombre = (params.get('nombre') || '').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+
+            let master = null;
+            if (rawNombre.includes('ALEJANDRO') || rawNombre.includes('DIAZ PABON')) {
+                master = TRAINERS_MASTER['ERNESTO ALEJANDRO DIAZ PABON'];
+            } else if (rawNombre.includes('IDROBO') || (rawNombre.includes('ELMER') && rawNombre.includes('ANDRES'))) {
+                master = TRAINERS_MASTER['ELMER ANDRES IDROBO ANDRADE'];
+            } else if (rawNombre.includes('LOURDES') || rawNombre.includes('PATINO') || rawNombre.includes('PATIÑO')) {
+                master = TRAINERS_MASTER['MARIA DE LOURDES PATIÑO GALARRAGA'];
+            } else if (rawNombre.includes('GOMEZ') && rawNombre.includes('ANDRES')) {
+                master = TRAINERS_MASTER['CARLOS ANDRES GOMEZ GOMEZ'];
+            } else if (rawNombre.includes('ARAGON') || rawNombre.includes('FERNANDO')) {
+                master = TRAINERS_MASTER['FERNANDO ARAGON'];
+            } else if (rawNombre.includes('BRAVO') || rawNombre.includes('DIEGO')) {
+                master = TRAINERS_MASTER['DIEGO DAVID BRAVO FIGUEROA'];
+            }
+
+            if (master) {
+                document.getElementById('field-name').textContent = master.name;
+                document.getElementById('field-nacionalidad').textContent = master.nacionalidad;
+                document.getElementById('field-doc').textContent = master.doc;
+                if (master.fechas) document.getElementById('field-dates').textContent = master.fechas;
+                if (master.rol) document.getElementById('field-role').textContent = master.rol;
+                if (master.hotel) document.getElementById('field-hotel').textContent = master.hotel;
+            } else {
+                const nombreParam = params.get('nombre') ? params.get('nombre').toUpperCase() : '[NOMBRE COMPLETO]';
+                document.getElementById('field-name').textContent = nombreParam;
+                
+                let nac = params.get('nacionalidad') ? params.get('nacionalidad').toUpperCase() : 'ECUATORIANA';
+                document.getElementById('field-nacionalidad').textContent = nac;
+
+                let doc = params.get('doc') ? params.get('doc').toUpperCase() : '[DOCUMENTO / PASAPORTE]';
+                document.getElementById('field-doc').textContent = doc;
+
+                if (params.get('fechas')) document.getElementById('field-dates').textContent = params.get('fechas');
+                if (params.get('rol')) document.getElementById('field-role').textContent = params.get('rol') + ' (Invitado Internacional Ad-Honorem)';
+                if (params.get('hotel')) document.getElementById('field-hotel').textContent = params.get('hotel');
+            }
+
+            // Fallback safety to never allow 'COLOMBIANA' for Alejandro or Elmer Idrobo
+            const displayedName = document.getElementById('field-name').textContent.toUpperCase();
+            if (displayedName.includes('DIAZ PABON') || displayedName.includes('ALEJANDRO') || displayedName.includes('IDROBO')) {
+                document.getElementById('field-nacionalidad').textContent = 'ECUATORIANA';
+                if (displayedName.includes('ALEJANDRO') || displayedName.includes('DIAZ PABON')) {
+                    document.getElementById('field-doc').textContent = 'PASAPORTE ECUATORIANO Nº A4152916 (C.I. 1727274928)';
+                } else if (displayedName.includes('IDROBO')) {
+                    document.getElementById('field-doc').textContent = 'PASAPORTE ECUATORIANO Nº A9919241 (C.I. 1712332350)';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+
 ```
 
 ---
@@ -83594,7 +84010,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                         </div>
                     </div>
                 </div>
-                <div class="reveal mb-12 flex justify-center" style="transition-delay: 280ms;"><a href="carta_invitacion_migraciones.html?nombre=MARIA%20PATINO%20GALARRAGA&doc=PASAPORTE%20ECUATORIANA&fechas=Del%203%20al%207%20de%20septiembre%20de%202026&rol=Invitado+Especial+Internacional" target="_blank" class="glass border border-crear-accent/50 hover:bg-crear-accent/20 text-white px-6 py-3 rounded-full shadow-[0_0_20px_rgba(255,183,3,0.2)] transition-transform hover:scale-105 flex items-center gap-3 text-sm font-semibold tracking-wide uppercase"><i class="fa-solid fa-passport text-crear-accent"></i> Ver Carta para Migraciones</a></div>
+                <div class="reveal mb-12 flex justify-center" style="transition-delay: 280ms;"><a href="carta_invitacion_migraciones.html?nombre=MARIA%20DE%20LOURDES%20PATI%C3%91O%20GALARRAGA&nacionalidad=ECUATORIANA&doc=PASAPORTE%20ECUATORIANO%20N%C2%B0%20B0857192%20(C.I.%201712863404)&fechas=Del%203%20al%207%20de%20Septiembre%20de%202026&rol=Invitada+Especial+Internacional" target="_blank" class="glass border border-crear-accent/50 hover:bg-crear-accent/20 text-white px-6 py-3 rounded-full shadow-[0_0_20px_rgba(255,183,3,0.2)] transition-transform hover:scale-105 flex items-center gap-3 text-sm font-semibold tracking-wide uppercase"><i class="fa-solid fa-passport text-crear-accent"></i> Ver Carta para Migraciones</a></div>
                 <p id="timezone-indicator" class="text-xs text-gray-500 mb-8 tracking-widest uppercase reveal" style="transition-delay: 285ms;">Calculando huso horario local...</p>
                 <!-- Welcome Note -->
                 <div class="glass p-8 rounded-2xl text-left reveal border border-gray-800 hover:border-crear-accent transition-colors duration-500 shadow-2xl" style="transition-delay: 300ms;">
@@ -83642,7 +84058,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                                 <div class="space-y-2 text-sm">
                                     <p class="flex justify-between border-b border-gray-700/50 pb-2"><span class="text-gray-400">Vuelo</span> <span class="font-medium text-white">LATAM LA 1437</span></p>
                                     <p class="flex justify-between pt-1"><span class="text-gray-400">Llegada a Lima</span> <span class="font-medium text-green-400">10:10 AM</span></p>
-                                    <div class="pt-2"><a href="https://www.flightradar24.com/data/flights/la1437" target="_blank" class="text-xs text-purple-400 hover:underline">Ver en FlightRadar &rarr;</a></div>
+                                    <div class="pt-2 flex items-center justify-between"><a href="https://www.flightradar24.com/data/flights/la1437" target="_blank" class="text-xs text-purple-400 hover:underline">Ver en FlightRadar &rarr;</a><a href="https://www.latamairlines.com/pe/es/check-in" target="_blank" class="text-xs text-indigo-400 hover:underline flex items-center gap-1 font-semibold"><i class="fa-solid fa-ticket"></i> Check-in LATAM Online</a></div>
                                 </div>
                             </div>
                             <!-- Salida -->
@@ -83652,7 +84068,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                                 <div class="space-y-2 text-sm">
                                     <p class="flex justify-between border-b border-gray-700/50 pb-2"><span class="text-gray-400">Vuelo</span> <span class="font-medium text-white">LATAM LA 1429</span></p>
                                     <p class="flex justify-between pt-1"><span class="text-gray-400">Salida de Lima</span> <span class="font-medium text-red-400">12:30 PM</span></p>
-                                    <div class="pt-2"><a href="https://www.flightradar24.com/data/flights/la1429" target="_blank" class="text-xs text-red-400 hover:underline">Ver en FlightRadar &rarr;</a></div>
+                                    <div class="pt-2 flex items-center justify-between"><a href="https://www.flightradar24.com/data/flights/la1429" target="_blank" class="text-xs text-red-400 hover:underline">Ver en FlightRadar &rarr;</a><a href="https://www.latamairlines.com/pe/es/check-in" target="_blank" class="text-xs text-indigo-400 hover:underline flex items-center gap-1 font-semibold"><i class="fa-solid fa-ticket"></i> Check-in LATAM Online</a></div>
                                 </div>
                             </div>
                         </div>
@@ -83671,6 +84087,24 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                         <p class="text-lg"><strong>Tus traslados:</strong> Nuestro equipo te contactará para coordinar tu recojo exacto en el aeropuerto Jorge Chávez.</p>
                         <div class="space-y-4"><div class="flex gap-4 items-start bg-gray-800/30 p-4 rounded-xl border border-gray-700/30"><div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 flex-shrink-0"><i class="fa-solid fa-suitcase"></i></div><div><div class="font-bold text-blue-400 mb-1">Traslado Oficial</div><div class="text-sm text-gray-300">Nuestro equipo te contactará para coordinar tu recojo exacto en el aeropuerto Jorge Chávez.</div></div></div></div>
                         <div class="mt-4 bg-gradient-to-r from-blue-500/10 to-transparent p-4 rounded-xl border border-blue-500/30 flex items-center gap-3"><i class="fa-solid fa-car text-blue-400 text-xl"></i><div><p class="text-blue-400 font-bold text-sm">Coordinación con Conductor</p><p class="text-xs text-gray-400">El conductor asignado te escribirá por WhatsApp 1 hora antes de tu arribo/salida para darte la placa del auto y coordinar el punto de encuentro exacto.</p></div></div>
+                        
+                        <!-- Tarjeta Oficial de Recojo para Retorno al Aeropuerto -->
+                        <div class="bg-gradient-to-r from-amber-500/15 via-amber-500/5 to-transparent p-5 rounded-2xl border-2 border-amber-500/50 shadow-[0_0_25px_rgba(245,158,11,0.2)]">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-amber-500/20 text-crear-accent flex items-center justify-center text-2xl flex-shrink-0">
+                                    <i class="fa-solid fa-bell-concierge"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex flex-wrap items-center gap-2 mb-1">
+                                        <span class="text-xs uppercase font-extrabold tracking-widest text-crear-accent bg-amber-500/20 px-2.5 py-0.5 rounded-full border border-amber-500/30">Horario de Retorno Confirmado</span>
+                                    </div>
+                                    <h4 class="text-white font-black text-lg">Recojo en Lobby del Hotel: <span class="text-crear-accent">09:00 AM</span></h4>
+                                    <p class="text-sm text-gray-300 mt-1"><strong>Fecha:</strong> Lunes 07 de Septiembre de 2026</p>
+                                    <p class="text-xs text-gray-400 mt-1">Calculado con rigor a <strong>3.5 horas de antelación</strong> a tu vuelo LATAM LA 1429 (12:30 PM) para garantizar margen óptimo de traslado y filtros en el Aeropuerto Jorge Chávez.</p>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="bg-gradient-to-r from-blue-900/20 to-transparent p-5 rounded-xl border-l-4 border-blue-500 mt-6">
                             <h4 class="font-black text-white mb-2 flex items-center gap-2"><i class="fa-solid fa-hotel text-blue-400"></i> Hotel y Salón: Hotel Jose Antonio Deluxe (Miraflores)</h4>
                             <p class="text-sm text-gray-300">Calle Bellavista 133, Miraflores, Lima, Perú</p>
@@ -83717,6 +84151,26 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                         <div class="mt-5"><a href="https://wa.me/51919563284?text=Hola%20Jos%C3%A9%2C%20confirmo%20mis%20datos%20bancarios%20para%20honorarios%20de%20Lourdes%20Pati%C3%B1o%20E29." target="_blank" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-green-500/10 border border-green-500/30 text-green-400 text-xs font-bold hover:bg-green-500/20 transition-colors"><i class="fa-brands fa-whatsapp text-green-400 text-base"></i> Enviar datos bancarios por WhatsApp</a></div>
                     </div>
                 </div>
+                
+                <!-- Espacio Oficial del Fin de Semana (Google Chat) -->
+                <div class="glass p-6 rounded-2xl border border-emerald-500/40 bg-emerald-500/10 mb-8 flex flex-col md:flex-row items-center justify-between gap-4 reveal">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-2xl flex-shrink-0 shadow-inner">
+                            <i class="fa-solid fa-comments"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="text-white font-bold text-lg">Espacio Oficial del Fin de Semana (Google Chat)</h3>
+                                <span class="px-2 py-0.5 rounded text-[10px] bg-emerald-500/30 text-emerald-300 font-bold uppercase tracking-wider">Sala Lima</span>
+                            </div>
+                            <p class="text-xs text-gray-300 mt-1">Únete a este espacio oficial en Google Chat durante el evento para toda la coordinación en sala y soporte en tiempo real.</p>
+                        </div>
+                    </div>
+                    <a href="https://chat.google.com/room/AAQAj8M5Q-8?cls=7" target="_blank" class="px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold rounded-xl text-xs flex items-center gap-2 transition-all hover:scale-105 shadow-[0_0_20px_rgba(16,185,129,0.4)] whitespace-nowrap uppercase tracking-wider">
+                        <i class="fa-brands fa-google"></i> Unirse al Chat del FDS <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+
                 <!-- 6. Escuadrón -->
                 <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-pink-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(236,72,153,0.15)] hover:-translate-y-1">
                     <div class="flex items-center gap-4 mb-6">
@@ -83830,7 +84284,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                 });
             }
             var flightTimestamp = new Date("2026-09-03T15:10:00.000Z").getTime();
-            var trainingTimestamp = new Date("2026-09-16T23:00:00.000Z").getTime();
+            var trainingTimestamp = new Date("2026-09-04T23:00:00.000Z").getTime();
             var timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
             var indicator = document.getElementById("timezone-indicator");
             if(indicator) indicator.innerText = "Mostrando cuenta regresiva detectando tu zona local: " + timeZone;
@@ -85168,7 +85622,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                         </div>
                     </div>
                 </div>
-                <div class="reveal mb-12 flex justify-center" style="transition-delay: 280ms;"><a href="carta_invitacion_migraciones.html?nombre=MARIA%20PATINO%20GALARRAGA&doc=PASAPORTE%20ECUATORIANA&fechas=Del%203%20al%207%20de%20septiembre%20de%202026&rol=Invitado+Especial+Internacional" target="_blank" class="glass border border-crear-accent/50 hover:bg-crear-accent/20 text-white px-6 py-3 rounded-full shadow-[0_0_20px_rgba(255,183,3,0.2)] transition-transform hover:scale-105 flex items-center gap-3 text-sm font-semibold tracking-wide uppercase"><i class="fa-solid fa-passport text-crear-accent"></i> Ver Carta para Migraciones</a></div>
+                <div class="reveal mb-12 flex justify-center" style="transition-delay: 280ms;"><a href="carta_invitacion_migraciones.html?nombre=MARIA%20DE%20LOURDES%20PATI%C3%91O%20GALARRAGA&nacionalidad=ECUATORIANA&doc=PASAPORTE%20ECUATORIANO%20N%C2%B0%20B0857192%20(C.I.%201712863404)&fechas=Del%203%20al%207%20de%20Septiembre%20de%202026&rol=Invitada+Especial+Internacional" target="_blank" class="glass border border-crear-accent/50 hover:bg-crear-accent/20 text-white px-6 py-3 rounded-full shadow-[0_0_20px_rgba(255,183,3,0.2)] transition-transform hover:scale-105 flex items-center gap-3 text-sm font-semibold tracking-wide uppercase"><i class="fa-solid fa-passport text-crear-accent"></i> Ver Carta para Migraciones</a></div>
                 <p id="timezone-indicator" class="text-xs text-gray-500 mb-8 tracking-widest uppercase reveal" style="transition-delay: 285ms;">Calculando huso horario local...</p>
                 <!-- Welcome Note -->
                 <div class="glass p-8 rounded-2xl text-left reveal border border-gray-800 hover:border-crear-accent transition-colors duration-500 shadow-2xl" style="transition-delay: 300ms;">
@@ -85216,7 +85670,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                                 <div class="space-y-2 text-sm">
                                     <p class="flex justify-between border-b border-gray-700/50 pb-2"><span class="text-gray-400">Vuelo</span> <span class="font-medium text-white">LATAM LA 1437</span></p>
                                     <p class="flex justify-between pt-1"><span class="text-gray-400">Llegada a Lima</span> <span class="font-medium text-green-400">10:10 AM</span></p>
-                                    <div class="pt-2"><a href="https://www.flightradar24.com/data/flights/la1437" target="_blank" class="text-xs text-purple-400 hover:underline">Ver en FlightRadar &rarr;</a></div>
+                                    <div class="pt-2 flex items-center justify-between"><a href="https://www.flightradar24.com/data/flights/la1437" target="_blank" class="text-xs text-purple-400 hover:underline">Ver en FlightRadar &rarr;</a><a href="https://www.latamairlines.com/pe/es/check-in" target="_blank" class="text-xs text-indigo-400 hover:underline flex items-center gap-1 font-semibold"><i class="fa-solid fa-ticket"></i> Check-in LATAM Online</a></div>
                                 </div>
                             </div>
                             <!-- Salida -->
@@ -85226,7 +85680,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                                 <div class="space-y-2 text-sm">
                                     <p class="flex justify-between border-b border-gray-700/50 pb-2"><span class="text-gray-400">Vuelo</span> <span class="font-medium text-white">LATAM LA 1429</span></p>
                                     <p class="flex justify-between pt-1"><span class="text-gray-400">Salida de Lima</span> <span class="font-medium text-red-400">12:30 PM</span></p>
-                                    <div class="pt-2"><a href="https://www.flightradar24.com/data/flights/la1429" target="_blank" class="text-xs text-red-400 hover:underline">Ver en FlightRadar &rarr;</a></div>
+                                    <div class="pt-2 flex items-center justify-between"><a href="https://www.flightradar24.com/data/flights/la1429" target="_blank" class="text-xs text-red-400 hover:underline">Ver en FlightRadar &rarr;</a><a href="https://www.latamairlines.com/pe/es/check-in" target="_blank" class="text-xs text-indigo-400 hover:underline flex items-center gap-1 font-semibold"><i class="fa-solid fa-ticket"></i> Check-in LATAM Online</a></div>
                                 </div>
                             </div>
                         </div>
@@ -85245,6 +85699,24 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                         <p class="text-lg"><strong>Tus traslados:</strong> Nuestro equipo te contactará para coordinar tu recojo exacto en el aeropuerto Jorge Chávez.</p>
                         <div class="space-y-4"><div class="flex gap-4 items-start bg-gray-800/30 p-4 rounded-xl border border-gray-700/30"><div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 flex-shrink-0"><i class="fa-solid fa-suitcase"></i></div><div><div class="font-bold text-blue-400 mb-1">Traslado Oficial</div><div class="text-sm text-gray-300">Nuestro equipo te contactará para coordinar tu recojo exacto en el aeropuerto Jorge Chávez.</div></div></div></div>
                         <div class="mt-4 bg-gradient-to-r from-blue-500/10 to-transparent p-4 rounded-xl border border-blue-500/30 flex items-center gap-3"><i class="fa-solid fa-car text-blue-400 text-xl"></i><div><p class="text-blue-400 font-bold text-sm">Coordinación con Conductor</p><p class="text-xs text-gray-400">El conductor asignado te escribirá por WhatsApp 1 hora antes de tu arribo/salida para darte la placa del auto y coordinar el punto de encuentro exacto.</p></div></div>
+                        
+                        <!-- Tarjeta Oficial de Recojo para Retorno al Aeropuerto -->
+                        <div class="bg-gradient-to-r from-amber-500/15 via-amber-500/5 to-transparent p-5 rounded-2xl border-2 border-amber-500/50 shadow-[0_0_25px_rgba(245,158,11,0.2)]">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-amber-500/20 text-crear-accent flex items-center justify-center text-2xl flex-shrink-0">
+                                    <i class="fa-solid fa-bell-concierge"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex flex-wrap items-center gap-2 mb-1">
+                                        <span class="text-xs uppercase font-extrabold tracking-widest text-crear-accent bg-amber-500/20 px-2.5 py-0.5 rounded-full border border-amber-500/30">Horario de Retorno Confirmado</span>
+                                    </div>
+                                    <h4 class="text-white font-black text-lg">Recojo en Lobby del Hotel: <span class="text-crear-accent">09:00 AM</span></h4>
+                                    <p class="text-sm text-gray-300 mt-1"><strong>Fecha:</strong> Lunes 07 de Septiembre de 2026</p>
+                                    <p class="text-xs text-gray-400 mt-1">Calculado con rigor a <strong>3.5 horas de antelación</strong> a tu vuelo LATAM LA 1429 (12:30 PM) para garantizar margen óptimo de traslado y filtros en el Aeropuerto Jorge Chávez.</p>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="bg-gradient-to-r from-blue-900/20 to-transparent p-5 rounded-xl border-l-4 border-blue-500 mt-6">
                             <h4 class="font-black text-white mb-2 flex items-center gap-2"><i class="fa-solid fa-hotel text-blue-400"></i> Hotel y Salón: Hotel Jose Antonio Deluxe (Miraflores)</h4>
                             <p class="text-sm text-gray-300">Calle Bellavista 133, Miraflores, Lima, Perú</p>
@@ -85291,6 +85763,26 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                         <div class="mt-5"><a href="https://wa.me/51919563284?text=Hola%20Jos%C3%A9%2C%20confirmo%20mis%20datos%20bancarios%20para%20honorarios%20de%20Lourdes%20Pati%C3%B1o%20E29." target="_blank" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-green-500/10 border border-green-500/30 text-green-400 text-xs font-bold hover:bg-green-500/20 transition-colors"><i class="fa-brands fa-whatsapp text-green-400 text-base"></i> Enviar datos bancarios por WhatsApp</a></div>
                     </div>
                 </div>
+                
+                <!-- Espacio Oficial del Fin de Semana (Google Chat) -->
+                <div class="glass p-6 rounded-2xl border border-emerald-500/40 bg-emerald-500/10 mb-8 flex flex-col md:flex-row items-center justify-between gap-4 reveal">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-2xl flex-shrink-0 shadow-inner">
+                            <i class="fa-solid fa-comments"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="text-white font-bold text-lg">Espacio Oficial del Fin de Semana (Google Chat)</h3>
+                                <span class="px-2 py-0.5 rounded text-[10px] bg-emerald-500/30 text-emerald-300 font-bold uppercase tracking-wider">Sala Lima</span>
+                            </div>
+                            <p class="text-xs text-gray-300 mt-1">Únete a este espacio oficial en Google Chat durante el evento para toda la coordinación en sala y soporte en tiempo real.</p>
+                        </div>
+                    </div>
+                    <a href="https://chat.google.com/room/AAQAj8M5Q-8?cls=7" target="_blank" class="px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold rounded-xl text-xs flex items-center gap-2 transition-all hover:scale-105 shadow-[0_0_20px_rgba(16,185,129,0.4)] whitespace-nowrap uppercase tracking-wider">
+                        <i class="fa-brands fa-google"></i> Unirse al Chat del FDS <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+
                 <!-- 6. Escuadrón -->
                 <div class="glass p-8 rounded-2xl border border-gray-800 reveal group hover:border-pink-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(236,72,153,0.15)] hover:-translate-y-1">
                     <div class="flex items-center gap-4 mb-6">
@@ -85404,7 +85896,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
                 });
             }
             var flightTimestamp = new Date("2026-09-03T15:10:00.000Z").getTime();
-            var trainingTimestamp = new Date("2026-09-16T23:00:00.000Z").getTime();
+            var trainingTimestamp = new Date("2026-09-04T23:00:00.000Z").getTime();
             var timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
             var indicator = document.getElementById("timezone-indicator");
             if(indicator) indicator.innerText = "Mostrando cuenta regresiva detectando tu zona local: " + timeZone;
@@ -87133,9 +87625,9 @@ function App() {
 
           {/* Generador de Flyers Oficiales (02/09/2026): Generador HD 1080x1920 con fechas por sede */}
           <Route path="/generador-flyer" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria', 'coord_maestria', 'coordinador_mj', 'entrenador']} requireSuperAdmin={false}>
+            <PrivateRoute>
               <GeneradorFlyer />
-            </RoleRoute>
+            </PrivateRoute>
           } />
 
           <Route path="*" element={<Navigate to="/" replace />} />
@@ -152177,6 +152669,7 @@ const MODULE_REGISTRY = [
   { id: 'checklist', label: 'Mi Checklist Operativo', emoji: '✅', route: (u) => `/checklist/${u?.appRole || 'capitan'}`, roles: null },
   { id: 'metas', label: 'Mis Metas', emoji: '🏆', route: '/metas', roles: null },
   { id: 'reportes', label: 'Enviar Reportes', emoji: '📤', route: '/reportes', roles: null, visible: REPORTES_VISIBLE },
+  { id: 'generador-flyer', label: 'Generador de Flyers Oficiales', emoji: '🎨', route: '/generador-flyer', roles: null },
 ];
 
 const isModuleVisible = (mod, currentUser) => {
@@ -152783,6 +153276,13 @@ export default function Home() {
             >
               🎯 Mis Metas
             </button>
+            <button
+              onClick={() => navigate('/generador-flyer')}
+              className="btn-secondary"
+              style={{ padding: '0.45rem 0.9rem', fontSize: '0.85rem', color: '#f59e0b', borderColor: 'rgba(245, 158, 11, 0.5)', background: 'rgba(245, 158, 11, 0.12)', fontWeight: 'bold' }}
+            >
+              🎨 Generador Flyers
+            </button>
           </div>
 
           {/* MENÚ DESPLEGABLE DE MÁS MÓDULOS */}
@@ -153006,6 +153506,10 @@ export default function Home() {
               📅 Calendario MJ
             </button>
           )}
+
+          <button onClick={() => navigate('/generador-flyer')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #ec4899)', color: 'white', fontWeight: 'bold', border: 'none', boxShadow: '0 0 15px rgba(245, 158, 11, 0.4)' }}>
+            🎨 Generador Flyers
+          </button>
         </div>
       )}
 
