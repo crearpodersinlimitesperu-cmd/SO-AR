@@ -443,7 +443,7 @@ const MODULE_REGISTRY = [
   { id: 'estrategia', label: 'Estrategia OKRs (Cascade)', emoji: '🎯', route: '/estrategia', roles: EXEC_ROLES },
   { id: 'auditoria-kpis', label: 'Auditoría de KPIs', emoji: '📉', route: '/auditoria-kpis', roles: EXEC_ROLES },
   { id: 'acuerdos', label: 'Acuerdos Oficiales (Correo)', emoji: '✉️', route: '/acuerdos', roles: EXEC_ROLES },
-  { id: 'calendario-equipo', label: 'Agenda y Time Boxing', emoji: '🗓️', route: '/calendario-equipo', roles: EXEC_ROLES },
+  { id: 'calendario-equipo', label: 'Agenda y Time Boxing', emoji: '🗓️', route: '/calendario-equipo', roles: null },
   { id: 'learning', label: 'Inteligencia Colectiva (Learning)', emoji: '🧠', route: '/learning', roles: EXEC_ROLES },
   { id: 'excelencia', label: 'Excelencia Operativa', emoji: '👑', route: '/excelencia', roles: EXEC_ROLES },
   { id: 'mis-kpis', label: 'Mis KPIs', emoji: '📊', route: '/mis-kpis', roles: KPI_ROLES },
@@ -1274,11 +1274,9 @@ export default function Home() {
                   ✉️ Acuerdos Oficiales (Correo)
                 </button>
 )}
-                {(currentUser?.isSuperAdmin || currentUser?.appRole === 'gerente' || currentUser?.isDireccion || currentUser?.appRole === 'director_maestria' || ['coordinador', 'coord_c1', 'coord_c2', 'coordinador_c1c2'].includes(currentUser?.appRole)) && (
                 <button onClick={() => { setShowToolsDropdown(false); navigate('/calendario-equipo'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#f97316', background: 'rgba(249, 115, 22, 0.1)' }}>
                   🗓️ Agenda y Time Boxing
                 </button>
-              )}
 
                 {(currentUser?.appRole !== 'qt') && (
 <button onClick={() => { setShowToolsDropdown(false); navigate('/learning'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(41, 171, 226, 0.1)', color: 'var(--crear-cyan)' }}>
