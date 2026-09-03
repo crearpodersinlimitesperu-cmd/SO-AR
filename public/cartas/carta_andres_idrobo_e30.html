@@ -78,7 +78,7 @@
             </div>
             <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center mt-12">
                 <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-sm font-semibold text-crear-accent mb-6 reveal shadow-[0_0_15px_rgba(255,183,3,0.3)]">
-                    <i class="fa-solid fa-calendar-day"></i> 2 de septiembre de 2026
+                    <i class="fa-solid fa-calendar-day"></i> 3 de septiembre de 2026
                 </div>
                 <h1 class="text-5xl md:text-7xl font-black tracking-tight mb-6 reveal text-white" style="transition-delay: 100ms;">
                     ¡Bienvenido a casa,<br/> <span class="text-gradient">Andrés!</span>
@@ -90,7 +90,7 @@
                 <div class="reveal mb-12 flex flex-col md:flex-row gap-8 justify-center items-center" style="transition-delay: 275ms;">
                     <div class="glass p-6 rounded-2xl border border-crear-accent/20 shadow-[0_0_20px_rgba(255,183,3,0.2)] w-full max-w-sm">
                         <h3 class="text-crear-accent text-sm uppercase tracking-widest font-bold mb-1">✈️ Tiempo para tu Viaje</h3>
-                        <p class="text-xs text-gray-400 mb-3">Despegue desde Quito (LA 1351): <strong class="text-white font-mono">Vie 04/09 · 06:00 AM</strong></p>
+                        <p class="text-xs text-gray-400 mb-3">Despegue directo desde Quito (LA 1437): <strong class="text-white font-mono">Vie 04/09 · 07:55 AM</strong></p>
                         <div id="countdown-flight" class="grid grid-cols-4 gap-2 text-center">
                             <div><div class="text-3xl font-black text-white" id="fly-d">00</div><div class="text-[10px] text-gray-500 uppercase">Días</div></div>
                             <div><div class="text-3xl font-black text-white" id="fly-h">00</div><div class="text-[10px] text-gray-500 uppercase">Hrs</div></div>
@@ -157,40 +157,47 @@
                             <span class="text-xs text-gray-300">Disponible 48h antes de cada vuelo con tu código <strong>DJBJJD</strong> y apellido <strong>IDROBO</strong>.</span>
                         </div>
                         <div class="grid md:grid-cols-2 gap-5 mt-5">
-                            <!-- Ida: Quito -> Guayaquil -> Lima -->
+                            <!-- Ida: Quito -> Lima (Directo LA 1437) -->
                             <div class="bg-gradient-to-br from-gray-800/40 to-gray-900/40 p-5 rounded-xl border border-gray-700/50 relative overflow-hidden">
                                 <div class="absolute top-0 left-0 w-full h-1 bg-purple-500"></div>
                                 <div class="flex items-center justify-between mb-3">
-                                    <h4 class="font-black text-white flex items-center gap-2"><i class="fa-solid fa-plane-arrival text-purple-400"></i> Ida: Quito &rarr; Lima</h4>
+                                    <h4 class="font-black text-white flex items-center gap-2"><i class="fa-solid fa-plane-arrival text-purple-400"></i> Ida: Quito &rarr; Lima (Directo)</h4>
                                     <span class="text-xs bg-purple-500/20 text-purple-300 font-bold px-2 py-0.5 rounded border border-purple-500/30">Vie 04/09/2026</span>
                                 </div>
                                 <div class="space-y-2.5 text-xs">
-                                    <div class="p-2.5 bg-gray-900/60 rounded-lg border border-gray-800">
-                                        <div class="flex justify-between items-center mb-1">
-                                            <span class="font-bold text-crear-accent">Tramo 1: LATAM LA 1351</span>
-                                            <span class="text-gray-400">0h 53m</span>
+                                    <div class="p-3 bg-gray-900/60 rounded-lg border border-gray-800">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <span class="font-bold text-crear-accent text-sm">LATAM LA 1437</span>
+                                            <span class="bg-green-500/20 text-green-400 font-bold px-2 py-0.5 rounded text-[10px] border border-green-500/30 flex items-center gap-1">
+                                                <i class="fa-solid fa-circle text-[6px] text-green-400 animate-pulse"></i> A tiempo · Directo
+                                            </span>
                                         </div>
-                                        <div class="flex justify-between text-gray-300">
-                                            <span>🛫 Salida Quito (UIO): <strong class="text-white">06:00 AM</strong></span>
-                                            <span>🛬 Llegada GYE: <strong>06:53 AM</strong></span>
+                                        <div class="grid grid-cols-3 items-center text-center text-gray-300 mb-2 py-1">
+                                            <div class="text-left">
+                                                <span class="text-gray-400 text-[11px] block">🛫 Salida Quito (UIO):</span>
+                                                <strong class="text-white text-base font-black">07:55 AM</strong>
+                                            </div>
+                                            <div class="text-center px-1">
+                                                <i class="fa-solid fa-plane text-purple-400"></i>
+                                                <div class="text-[10px] text-gray-400 font-medium">2h 15m directo</div>
+                                            </div>
+                                            <div class="text-right">
+                                                <span class="text-gray-400 text-[11px] block">🛬 Llegada Lima (LIM):</span>
+                                                <strong class="text-green-400 text-base font-black">10:10 AM</strong>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="text-[11px] text-gray-400 text-center flex items-center justify-center gap-1.5 py-0.5">
-                                        <i class="fa-solid fa-arrows-spin text-purple-400"></i> Escala en Guayaquil (JJ Olmedo): <strong>2h 07m</strong>
-                                    </div>
-                                    <div class="p-2.5 bg-gray-900/60 rounded-lg border border-gray-800">
-                                        <div class="flex justify-between items-center mb-1">
-                                            <span class="font-bold text-crear-accent">Tramo 2: LATAM LA 1430</span>
-                                            <span class="text-gray-400">1h 55m</span>
-                                        </div>
-                                        <div class="flex justify-between text-gray-300">
-                                            <span>🛫 Salida GYE: <strong>09:00 AM</strong></span>
-                                            <span>🛬 Llegada Lima (LIM): <strong class="text-green-400 font-bold">10:55 AM</strong></span>
+                                        <div class="text-[11px] text-gray-400 bg-black/40 p-2 rounded-md border border-gray-800 flex items-center justify-between">
+                                            <span>Hora estimada en Lima: <strong class="text-white">10:10 AM</strong></span>
+                                            <span class="text-purple-300 font-medium">Vuelo directo sin escalas</span>
                                         </div>
                                     </div>
                                     <div class="pt-2 flex items-center justify-between border-t border-gray-700/50">
-                                        <a href="https://www.flightradar24.com/data/flights/la1430" target="_blank" class="text-xs text-purple-400 hover:underline">Rastrear en FlightRadar &rarr;</a>
-                                        <a href="https://www.latamairlines.com/pe/es/check-in" target="_blank" class="text-xs text-indigo-400 hover:underline flex items-center gap-1 font-semibold"><i class="fa-solid fa-ticket"></i> Check-in LATAM</a>
+                                        <a href="https://www.flightradar24.com/data/flights/la1437" target="_blank" class="text-xs text-purple-400 hover:underline flex items-center gap-1">
+                                            <i class="fa-solid fa-satellite-dish"></i> Rastrear en FlightRadar &rarr;
+                                        </a>
+                                        <a href="https://www.latamairlines.com/pe/es/check-in" target="_blank" class="text-xs text-indigo-400 hover:underline flex items-center gap-1 font-semibold">
+                                            <i class="fa-solid fa-ticket"></i> Check-in LATAM
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -244,8 +251,29 @@
                         <h2 class="text-2xl font-bold text-white tracking-tight">3. Movilidad y Sede</h2>
                     </div>
                     <div class="space-y-6 text-gray-300 ml-2 md:ml-18">
-                        <p class="text-lg"><strong>Tus traslados:</strong> Nuestro equipo te contactará para coordinar tu recojo en el aeropuerto Jorge Chávez.</p>
-                        <div class="space-y-4"><div class="flex gap-4 items-start bg-gray-800/30 p-4 rounded-xl border border-gray-700/30"><div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 flex-shrink-0"><i class="fa-solid fa-suitcase"></i></div><div><div class="font-bold text-blue-400 mb-1">Traslado Oficial</div><div class="text-sm text-gray-300">Nuestro equipo te contactará para coordinar tu recojo en el aeropuerto Jorge Chávez.</div></div></div></div>
+                        <p class="text-lg"><strong>Tus traslados:</strong> Traslados oficiales coordinados y confirmados para tu llegada y salida en Lima.</p>
+                        <div class="space-y-4">
+                            <!-- Recojo Llegada -->
+                            <div class="flex gap-4 items-start bg-gray-800/30 p-4 rounded-xl border border-gray-700/30">
+                                <div class="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 flex-shrink-0">
+                                    <i class="fa-solid fa-plane-arrival"></i>
+                                </div>
+                                <div>
+                                    <div class="font-bold text-purple-400 mb-1">Recojo Llegada a Lima: 10:10 AM (Vie 04/09)</div>
+                                    <div class="text-sm text-gray-300">Conductor asignado te esperará en llegadas internacionales del Aeropuerto Jorge Chávez a tu arribo del vuelo directo LATAM LA 1437 para tu traslado cómodo y directo al Hotel Jose Antonio Deluxe (Miraflores).</div>
+                                </div>
+                            </div>
+                            <!-- Traslado Salida -->
+                            <div class="flex gap-4 items-start bg-gray-800/30 p-4 rounded-xl border border-gray-700/30">
+                                <div class="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 flex-shrink-0">
+                                    <i class="fa-solid fa-suitcase"></i>
+                                </div>
+                                <div>
+                                    <div class="font-bold text-blue-400 mb-1">Traslado Oficial de Retorno (Dom 06/09)</div>
+                                    <div class="text-sm text-gray-300">Recojo confirmado en lobby del hotel a las <strong>8:30 PM (20:30 hrs)</strong> para tu vuelo de retorno nocturno LATAM LA 1449 (23:35 PM).</div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="mt-4 bg-gradient-to-r from-blue-500/10 to-transparent p-4 rounded-xl border border-blue-500/30 flex items-center gap-3"><i class="fa-solid fa-car text-blue-400 text-xl"></i><div><p class="text-blue-400 font-bold text-sm">Coordinación con Conductor</p><p class="text-xs text-gray-400">El conductor asignado te escribirá por WhatsApp 1 hora antes de tu arribo/salida para darte la placa del auto y coordinar el punto de encuentro exacto.</p></div></div>
                         
                         <!-- Tarjeta Oficial de Recojo para Retorno al Aeropuerto -->
@@ -448,7 +476,7 @@
                     toggleMusic();
                 });
             }
-            var flightTimestamp = new Date("2026-09-04T11:00:00.000Z").getTime();
+            var flightTimestamp = new Date("2026-09-04T12:55:00.000Z").getTime();
             var trainingTimestamp = new Date("2026-09-04T23:00:00.000Z").getTime();
             var timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
             var indicator = document.getElementById("timezone-indicator");

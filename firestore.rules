@@ -216,15 +216,39 @@ service cloud.firestore {
       allow update, delete: if isSuperAdmin();
     }
 
-    // USERS (colecci├│n legacy, solo SuperAdmin escribe)
+    // USERS
+    // (03/09/2026) FIX — confirmado con diagnosticarCalendarioMJ_v2.mjs contra Firestore
+    // real: con "allow write: if isSuperAdmin()" (regla anterior), AuthContext.jsx NUNCA
+    // podía escribir users/{uid real de Firebase Auth} para ningún usuario que no fuera
+    // superadmin (su propio setDoc en cada login fallaba silenciosamente — ver el
+    // try/catch "Cannot update /users since only superadmin can" en AuthContext.jsx).
+    // Resultado verificado: mj_calendars tenía 0 documentos guardados en TODA la
+    // plataforma — nadie con rol coord_maestria/director_maestria podía guardar NADA en
+    // mj_calendars, notas_seguimiento ni managers_directory (las 3 colecciones que
+    // dependen de callerRole()/canManageManagers(), que a su vez leen users/{uid real}).
+    // Caso real confirmado: Linid Valencia y Leyla Pasquel, CMJ Lima — José, "reparar
+    // para todos".
+    // Fix: cada usuario autenticado puede crear y actualizar SOLO su propio documento
+    // (request.auth.uid == userId) — pero una vez creado, NO puede cambiar sus propios
+    // campos role/roles/isSuperAdmin por su cuenta (eso sigue exigiendo SuperAdmin).
+    // RIESGO CONOCIDO, aceptado explícitamente por José: en la escritura de CREACIÓN
+    // (primer login) no hay forma simple, desde las reglas, de impedir que alguien
+    // manipule el cliente para auto-asignarse un role de mayor privilegio la primera vez
+    // — igual que "goals" y otras colecciones de esta misma plataforma ya confían en el
+    // rol que calcula el cliente. isSuperAdmin() e isGerenteODireccion() NO se ven
+    // afectados por esto (son listas de correo fijas, no leen este campo "role").
     match /users/{userId} {
       allow read: if isAuthenticated();
-      allow write: if isSuperAdmin();
+      allow create: if isSuperAdmin() || (isAuthenticated() && request.auth.uid == userId);
+      allow update: if isSuperAdmin() ||
+        (isAuthenticated() && request.auth.uid == userId &&
+         !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'roles', 'isSuperAdmin']));
+      allow delete: if isSuperAdmin();
 
-      // Historial de chats del Copiloto IA (AICopilot.jsx): esta es la ├ÜNICA ruta de toda
+      // Historial de chats del Copiloto IA (AICopilot.jsx): esta es la ÚNICA ruta de toda
       // la app donde currentUser.uid corresponde de verdad al uid real de Firebase Auth
-      // (viene del objeto crudo de Firebase, no se sobreescribe en buildUserObject), as├¡
-      // que aqu├¡ s├¡ se puede comparar contra request.auth.uid con seguridad.
+      // (viene del objeto crudo de Firebase, no se sobreescribe en buildUserObject), así
+      // que aquí sí se puede comparar contra request.auth.uid con seguridad.
       match /copilot_chats/{chatId} {
         allow read, write: if isAuthenticated() && request.auth.uid == userId;
       }
