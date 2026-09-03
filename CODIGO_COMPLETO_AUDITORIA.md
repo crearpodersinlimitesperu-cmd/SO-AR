@@ -116847,6 +116847,15 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
 
 ---
 
+## Archivo: scratch\check_manual.js
+
+```js
+﻿const fs = require("fs"); let code = fs.readFileSync("src/components/HelpModal.jsx", "utf8"); let startIndex = code.indexOf("activeTab === \"manual\""); console.log(code.substring(startIndex, startIndex + 3000));
+
+```
+
+---
+
 ## Archivo: scratch\fix_search.js
 
 ```js
@@ -122859,16 +122868,29 @@ export default function HelpModal({ isOpen, onClose }) {
                 <li><strong>Privacidad de Pares:</strong> Los gerentes y directores solo pueden ver las tareas de sus subordinados directos o aquellas en las que colaboran.</li>
               </ul>
 
-              <h4 style={{ color: 'var(--text-heading)' }}>3. Auditoría de KPIs (Nuevo)</h4>
-              <p>La sección de KPIs ha sido reconstruida en tres pestañas (tabs) enfocadas para analizar mejor la salud operativa de cada Sede.</p>
-              <ul style={{ paddingLeft: '1.5rem', marginBottom: '1.5rem' }}>
-                <li><strong>Tab CMJ:</strong> Consolidado automático (desde Drive) que suma la retención, deserción y enrolamiento total de <em>todos</em> los Coordinadores de la Maestría de la sede seleccionada.</li>
-                <li><strong>Tab Entrenadores Maestría:</strong> Métricas operativas de avance, gráficas y cierres enfocadas en el desempeño del Entrenador por sede.</li>
-                <li><strong>Tab Auditoría de KPIs:</strong> Espacio exclusivo para revisar y auditar los formularios semanales cargados manualmente por el Quantum Team (QT y Coordinadores).</li>
-              </ul>
+              {(currentUser?.appRole === 'gerente' || currentUser?.isDireccion || currentUser?.appRole === 'director_maestria') && (
+                <>
+                  <h4 style={{ color: 'var(--text-heading)' }}>3. Auditoría de KPIs y Dashboard</h4>
+                  <p>La sección de KPIs ha sido reconstruida y mejorada para gerentes y directores.</p>
+                  <ul style={{ paddingLeft: '1.5rem', marginBottom: '1.5rem' }}>
+                    <li><strong>Tab CMJ:</strong> Consolidado automático (desde Drive) que suma la retención, deserción y enrolamiento total de <em>todos</em> los Coordinadores de la Maestría de la sede seleccionada.</li>
+                    <li><strong>Tab Entrenadores Maestría:</strong> Métricas operativas de avance, gráficas y cierres enfocadas en el desempeño del Entrenador por sede.</li>
+                    <li><strong>Tab Auditoría de KPIs:</strong> Espacio exclusivo para revisar y auditar los formularios semanales cargados manualmente por el Quantum Team (QT y Coordinadores).</li>
+                    <li><strong>Horarios de Entrenamiento (Nuevo):</strong> Consulta rápidamente la disponibilidad y código de vestimenta de cada capítulo en tu Dashboard principal.</li>
+                    <li><strong>Flyers Globales:</strong> Acceso a recursos de diseño para Capítulo 1 en la pantalla de inicio.</li>
+                  </ul>
+                </>
+              )}
+
+              {!(currentUser?.appRole === 'gerente' || currentUser?.isDireccion || currentUser?.appRole === 'director_maestria') && (
+                <>
+                  <h4 style={{ color: 'var(--text-heading)' }}>3. Envío de KPIs y Formularios</h4>
+                  <p>Si eres parte del Quantum Team (QT) o Coordinador, deberás enviar tus KPIs semanales mediante los formularios en la sección correspondiente. Asegúrate de reportar fielmente las métricas de tu sala o maestría.</p>
+                </>
+              )}
 
               <h4 style={{ color: 'var(--text-heading)' }}>4. Tareas Compartidas y Colaboradores</h4>
-              <p>Si necesitas ayuda de otra persona o sede, abre una tarea y selecciona <strong>"Añadir Colaborador"</strong>. La tarea aparecerá en el perfil de ambos.</p>
+              <p>Si necesitas ayuda de otra persona o sede, abre una tarea y selecciona <strong>"Añadir Colaborador"</strong>. La tarea aparecerá en el perfil de ambos. Todos los correos de alertas de tareas atrasadas ahora se envían de forma automática al detectar inactividad.</p>
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
