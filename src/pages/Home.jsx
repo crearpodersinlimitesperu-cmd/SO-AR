@@ -4,7 +4,6 @@ import { useAuth } from '../context/AuthContext';
 import { useCycles } from '../context/CyclesContext';
 import { useChecklist } from '../context/ChecklistContext';
 import { useUI } from '../context/UIContext';
-import { useTheme } from '../context/ThemeContext';
 import { useNotifications } from '../context/NotificationContext';
 import { 
   LogOut, Clock, Calendar as CalendarIcon, MapPin, CheckCircle2, 
@@ -86,357 +85,6 @@ const REPORTES_VISIBLE = (u) => Boolean(
   ['coord_c1', 'coord_maestria', 'capitan', 'qt', 'direccion', 'director_maestria', 'consolidado'].includes(u?.appRole)
 );
 
-// ============================================================================
-// REGISTRO DE OPCIONES Y ACCIONES DE CAUSA OS (02/09/2026)
-// ----------------------------------------------------------------------------
-// Permite buscar directamente herramientas, botones clave, accesos rápidos,
-// cartas de entrenadores, vuelos, configuraciones y acciones del sistema.
-// ============================================================================
-const CAUSA_OPTIONS_REGISTRY = [
-  {
-    id: 'opt-flyer',
-    title: 'Generador de Flyers Oficiales',
-    category: 'Herramienta HD',
-    badge: 'Flyer 1080x1920',
-    emoji: '🎨',
-    desc: 'Diseño y descarga de afiches oficiales para Instagram, WhatsApp y redes por sede',
-    keywords: ['flyer', 'flyers', 'generador', 'afiche', 'diseño', 'diseno', 'poster', 'descargar flyer', 'hd', '1080x1920', 'tierra', 'bot flyer', 'imagen'],
-    route: '/generador-flyer',
-    roles: null
-  },
-  {
-    id: 'opt-new-task',
-    title: 'Crear Nueva Tarea (+ TAREA)',
-    category: 'Acción Rápida',
-    badge: '+ Tarea',
-    emoji: '➕',
-    desc: 'Abrir ventana para crear, asignar y fechar una nueva tarea o compromiso',
-    keywords: ['crear tarea', 'nueva tarea', 'tarea', 'task', 'asignar tarea', 'pendiente', 'agregar tarea', '+ tarea'],
-    action: 'new_task',
-    roles: null
-  },
-  {
-    id: 'opt-cartas-hub',
-    title: 'Cartas de Entrenadores e Itinerarios de Vuelo',
-    category: 'Operaciones Lima',
-    badge: 'Vuelos y Migraciones',
-    emoji: '✈️',
-    desc: 'Cartas de compromiso, itinerarios confirmados, escalas técnicas, boletos y migración',
-    keywords: ['cartas', 'carta', 'entrenadores', 'itinerario', 'vuelos', 'pasajes', 'boletos', 'migraciones', 'recojo hotel', 'checkin', 'avianca', 'latam'],
-    external: 'https://cartas.crearpsl.net',
-    roles: null
-  },
-  {
-    id: 'opt-carta-alejo',
-    title: 'Carta Alejandro Díaz (Equipo 28 - Gratitud)',
-    category: 'Carta Oficial',
-    badge: 'Avianca AS58FE',
-    emoji: '📄',
-    desc: 'Vuelos AV108 / AV51, escala en Bogotá, carta de migración y recojo 07:05 AM',
-    keywords: ['alejo', 'alejandro diaz', 'equipo 28', 'gratitud', 'as58fe', 'avianca', 'carta alejo'],
-    external: 'https://cartas.crearpsl.net/carta_alejandro_diaz_e28.html',
-    roles: null
-  },
-  {
-    id: 'opt-carta-lourdes',
-    title: 'Carta Lourdes Patiño (Equipo 29 - Relación)',
-    category: 'Carta Oficial',
-    badge: 'LATAM JYUAGO',
-    emoji: '📄',
-    desc: 'Vuelo directo LA 1437, retorno con escala en Guayaquil, carta migración y recojo 07:50 AM',
-    keywords: ['lourdes', 'lourdes patino', 'equipo 29', 'relacion', 'jyuago', 'latam', 'carta lourdes'],
-    external: 'https://cartas.crearpsl.net/carta_lourdes_patino_e29.html',
-    roles: null
-  },
-  {
-    id: 'opt-carta-andres',
-    title: 'Carta Andrés Idrobo (Equipo 30 - Creación)',
-    category: 'Carta Oficial',
-    badge: 'LATAM DJBJJD',
-    emoji: '📄',
-    desc: 'Vuelos con escala en Guayaquil LA 1351 / LA 1430, carta migración y recojo 8:30 PM',
-    keywords: ['andres', 'andres idrobo', 'equipo 30', 'creacion', 'djbjjd', 'latam', 'carta andres'],
-    external: 'https://cartas.crearpsl.net/carta_andres_idrobo_e30.html',
-    roles: null
-  },
-  {
-    id: 'opt-calendario-mj',
-    title: 'Calendario de Maestría del Juego (MJ)',
-    category: 'Cronograma',
-    badge: 'E28 / E29 / E30',
-    emoji: '📅',
-    desc: 'Editor y visor oficial del cronograma de Maestría del Juego para todas las sedes',
-    keywords: ['calendario mj', 'maestria del juego', 'cronograma mj', 'fechas maestria', 'e28', 'e29', 'e30', 'equipos'],
-    route: '/calendario-mj',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria', 'coord_maestria', 'coordinador_mj']
-  },
-  {
-    id: 'opt-calendario-global',
-    title: 'Calendario Global Maestro',
-    category: 'Agenda General',
-    badge: 'Todas las Sedes',
-    emoji: '📅',
-    desc: 'Cronograma global consolidado de eventos, talleres y hitos para Lima, Quito, GYE y Cuenca',
-    keywords: ['calendario global', 'calendario maestro', 'fechas globales', 'eventos', 'cronograma', 'google calendar'],
-    external: 'calendario-global',
-    roles: null
-  },
-  {
-    id: 'opt-agenda-equipo',
-    title: 'Agenda y Time Boxing del Equipo',
-    category: 'Productividad',
-    badge: 'Horarios',
-    emoji: '🗓️',
-    desc: 'Planificación semanal por bloques de tiempo y alineación del equipo',
-    keywords: ['agenda', 'time boxing', 'horario', 'planificacion', 'bloques', 'semana'],
-    route: '/calendario-equipo',
-    roles: null
-  },
-  {
-    id: 'opt-checklist',
-    title: 'Mi Checklist Operativo',
-    category: 'Operaciones',
-    badge: 'Ciclo Activo',
-    emoji: '✅',
-    desc: 'Listado de compromisos y tareas críticas del ciclo según tu rol',
-    keywords: ['checklist', 'mis tareas', 'operativo', 'c1', 'c2', 'pendientes', 'actividades'],
-    route: (u) => `/checklist/${u?.appRole || 'capitan'}`,
-    roles: null
-  },
-  {
-    id: 'opt-metas',
-    title: 'Mis Metas y Puntuación',
-    category: 'Rendimiento',
-    badge: 'Score',
-    emoji: '🏆',
-    desc: 'Panel de metas personales y del equipo, cumplimiento de objetivos y avance',
-    keywords: ['metas', 'mis metas', 'score', 'objetivos', 'puntaje', 'avance', 'resultados'],
-    route: '/metas',
-    roles: null
-  },
-  {
-    id: 'opt-kpis',
-    title: 'Mis KPIs y Métricas',
-    category: 'Indicadores',
-    badge: 'Métricas',
-    emoji: '📊',
-    desc: 'Indicadores clave de rendimiento: deserción, confirmados, reentrenados y futuros imposibles',
-    keywords: ['kpi', 'kpis', 'mis kpis', 'metricas', 'indicadores', 'desercion', 'confirmados', 'reentrenados', 'enrolamiento'],
-    route: '/mis-kpis',
-    roles: ['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan']
-  },
-  {
-    id: 'opt-reportes',
-    title: 'Enviar Reportes Operativos',
-    category: 'Formularios',
-    badge: 'Envío',
-    emoji: '📤',
-    desc: 'Envío de reportes periódicos a gerencia y coordinadores',
-    keywords: ['reporte', 'reportes', 'enviar reportes', 'formulario', 'informe'],
-    route: '/reportes',
-    roles: null,
-    visible: REPORTES_VISIBLE
-  },
-  {
-    id: 'opt-centro-managers',
-    title: 'Centro de Managers',
-    category: 'Gestión de Equipos',
-    badge: 'PX y Aliados',
-    emoji: '🎯',
-    desc: 'Gestión de llamadas, seguimiento a participantes PX, aliados y coordinadores',
-    keywords: ['centro managers', 'managers', 'llamadas', 'px', 'aliados', 'seguimiento equipos'],
-    route: '/centro-managers',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'consolidado']
-  },
-  {
-    id: 'opt-directorio-qt',
-    title: 'Directorio Quantum Team (QT)',
-    category: 'Contactos',
-    badge: 'WhatsApp y Teléfonos',
-    emoji: '⚡',
-    desc: 'Teléfonos, WhatsApp directos y correos de todo el equipo de coordinación y staff',
-    keywords: ['directorio', 'directorio qt', 'telefonos', 'whatsapp', 'contactos staff', 'coordinadores'],
-    route: '/directorio-qt',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'consolidado']
-  },
-  {
-    id: 'opt-gerencial',
-    title: 'Causa OS Gerencial',
-    category: 'Ejecutivo',
-    badge: 'Gerencia',
-    emoji: '💼',
-    desc: 'Panel de control de alta dirección y toma de decisiones estratégicas',
-    keywords: ['gerente', 'gerencial', 'comite', 'direccion', 'dashboard gerencial'],
-    route: '/gerente',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado']
-  },
-  {
-    id: 'opt-estrategia',
-    title: 'Estrategia OKRs (Cascade)',
-    category: 'Estrategia',
-    badge: 'OKRs',
-    emoji: '🎯',
-    desc: 'Mapa estratégico y seguimiento de objetivos clave y resultados',
-    keywords: ['estrategia', 'okrs', 'cascade', 'objetivos', 'iniciativas'],
-    route: '/estrategia',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado']
-  },
-  {
-    id: 'opt-portafolio',
-    title: 'Portafolio PMO (Planview)',
-    category: 'Proyectos',
-    badge: 'PMO',
-    emoji: '📈',
-    desc: 'Supervisión de iniciativas, proyectos corporativos y cronogramas de entrega',
-    keywords: ['portafolio', 'pmo', 'proyectos', 'planview', 'gantt'],
-    route: '/portafolio',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado']
-  },
-  {
-    id: 'opt-auditoria-kpis',
-    title: 'Auditoría de KPIs',
-    category: 'Auditoría',
-    badge: 'Control',
-    emoji: '📉',
-    desc: 'Detección de anomalías, inconsistencias y validación cruzada de números',
-    keywords: ['auditoria', 'auditoria kpis', 'control', 'revision metricas', 'inconsistencias'],
-    route: '/auditoria-kpis',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado']
-  },
-  {
-    id: 'opt-acuerdos',
-    title: 'Acuerdos Oficiales (Correo)',
-    category: 'Compromisos',
-    badge: 'Minutas',
-    emoji: '✉️',
-    desc: 'Redacción y consulta de actas de reunión y acuerdos formales del equipo',
-    keywords: ['acuerdos', 'minutas', 'actas', 'correo', 'compromisos'],
-    route: '/acuerdos',
-    roles: null
-  },
-  {
-    id: 'opt-learning',
-    title: 'Inteligencia Colectiva (Learning)',
-    category: 'Conocimiento',
-    badge: 'Learning',
-    emoji: '🧠',
-    desc: 'Repositorio de lecciones aprendidas, mejoras operativas e ideas del equipo',
-    keywords: ['learning', 'aprendizaje', 'lecciones aprendidas', 'inteligencia colectiva', 'ideas'],
-    route: '/learning',
-    roles: null
-  },
-  {
-    id: 'opt-excelencia',
-    title: 'Excelencia Operativa',
-    category: 'Calidad',
-    badge: 'Estándares',
-    emoji: '👑',
-    desc: 'Reconocimientos, estándares de ejecución y manual de buenas prácticas',
-    keywords: ['excelencia', 'excelencia operativa', 'calidad', 'estandares', 'reconocimientos'],
-    route: '/excelencia',
-    roles: null
-  },
-  {
-    id: 'opt-superadmin',
-    title: 'Centro de Mando (Super Admin)',
-    category: 'Administración',
-    badge: 'Sistema',
-    emoji: '🌐',
-    desc: 'Gestión integral de usuarios, asignación de roles, permisos y configuración del sistema',
-    keywords: ['superadmin', 'centro de mando', 'administracion', 'usuarios', 'roles', 'permisos'],
-    route: '/superadmin',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado']
-  },
-  {
-    id: 'opt-sedes',
-    title: 'Configuración de Sedes y Salones',
-    category: 'Configuración',
-    badge: 'Locales',
-    emoji: '🏢',
-    desc: 'Configurar aforos, salones, hoteles y direcciones de cada sede (Lima, Quito, GYE, Cuenca)',
-    keywords: ['sede', 'sedes', 'configurar sedes', 'salones', 'hoteles', 'aforo', 'locales'],
-    action: 'venue_modal',
-    roles: null
-  },
-  {
-    id: 'opt-emergencias',
-    title: 'Protocolo de Emergencias',
-    category: 'Seguridad',
-    badge: 'SOS',
-    emoji: '🚨',
-    desc: 'Flujo de actuación ante emergencias médicas, logísticas o de seguridad',
-    keywords: ['emergencia', 'emergencias', 'protocolo emergencias', 'sos', 'urgencias', 'medico'],
-    route: '/protocolo-emergencias',
-    roles: null
-  },
-  {
-    id: 'opt-manual',
-    title: 'Manual / Guía Causa OS / QT',
-    category: 'Ayuda',
-    badge: 'Manual',
-    emoji: '📘',
-    desc: 'Documentación paso a paso de todas las funciones de Causa OS',
-    keywords: ['manual', 'guia', 'manual causa', 'instructivo', 'como funciona', 'ayuda'],
-    route: '/manual',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'consolidado']
-  },
-  {
-    id: 'opt-manual-nodus',
-    title: 'Manual Práctico Nodus',
-    category: 'Documentación',
-    badge: 'Nodus',
-    emoji: '📗',
-    desc: 'Guía práctica para el uso correcto de la plataforma externa Nodus',
-    keywords: ['manual nodus', 'nodus', 'guia nodus', 'plataforma nodus', 'imo'],
-    route: '/manual-nodus',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'consolidado']
-  },
-  {
-    id: 'opt-campus',
-    title: 'Campus Interactivo CREAR',
-    category: 'Academia',
-    badge: 'Formación',
-    emoji: '🎓',
-    desc: 'Plataforma interactiva de entrenamiento, videos y recursos de capacitación',
-    keywords: ['campus', 'campus interactivo', 'academia', 'cursos', 'videos', 'capacitacion'],
-    external: 'https://cpsl-campus-interactivo.vercel.app/ruta',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'consolidado']
-  },
-  {
-    id: 'opt-tema',
-    title: 'Cambiar Modo de Tema (Claro / Oscuro / Auto)',
-    category: 'Apariencia',
-    badge: 'Tema',
-    emoji: '🌓',
-    desc: 'Alternar entre Modo Oscuro (noche), Modo Claro (día) o Automático según la hora',
-    keywords: ['tema', 'modo oscuro', 'modo claro', 'dark mode', 'light mode', 'apariencia', 'colores', 'dia', 'noche', 'auto'],
-    action: 'toggle_theme',
-    roles: null
-  },
-  {
-    id: 'opt-vista',
-    title: 'Cambiar Vista de Pantalla (Lite / Compacto / Pro)',
-    category: 'Interfaz',
-    badge: 'Vista',
-    emoji: '👁️',
-    desc: 'Cambiar la densidad de información en el inicio: Modo Pro, Compacto o Lite',
-    keywords: ['vista', 'cambiar vista', 'modo pro', 'compacto', 'lite', 'densidad', 'interfaz'],
-    action: 'change_view',
-    roles: null
-  },
-  {
-    id: 'opt-logout',
-    title: 'Cerrar Sesión (Salir de Causa OS)',
-    category: 'Cuenta',
-    badge: 'Salir',
-    emoji: '🚪',
-    desc: 'Desconectar tu cuenta y salir de la plataforma',
-    keywords: ['salir', 'cerrar sesion', 'logout', 'desconectar'],
-    action: 'logout',
-    roles: null
-  }
-];
-
 const MODULE_REGISTRY = [
   { id: 'gerencial', label: 'Causa OS Gerencial', emoji: '💼', route: '/gerente', roles: EXEC_ROLES },
   { id: 'portafolio', label: 'Portafolio PMO (Planview)', emoji: '📈', route: '/portafolio', roles: EXEC_ROLES },
@@ -458,7 +106,6 @@ const MODULE_REGISTRY = [
   { id: 'checklist', label: 'Mi Checklist Operativo', emoji: '✅', route: (u) => `/checklist/${u?.appRole || 'capitan'}`, roles: null },
   { id: 'metas', label: 'Mis Metas', emoji: '🏆', route: '/metas', roles: null },
   { id: 'reportes', label: 'Enviar Reportes', emoji: '📤', route: '/reportes', roles: null, visible: REPORTES_VISIBLE },
-  { id: 'generador-flyer', label: 'Generador de Flyers Oficiales', emoji: '🎨', route: '/generador-flyer', roles: null },
 ];
 
 const isModuleVisible = (mod, currentUser) => {
@@ -500,8 +147,7 @@ export default function Home() {
   const { currentUser, logout, switchRole } = useAuth();
   const { currentCycle, currentStage, events, loadingEvents } = useCycles();
   const { tasks: allTasks, loading: loadingTasks, syncTasksToGoogle, acceptCollaboration, rejectCollaboration } = useChecklist();
-  const { showToast, viewMode, setViewMode, customModules } = useUI();
-  const { themeMode, setThemeMode } = useTheme();
+  const { showToast, viewMode, customModules } = useUI();
   const { notifications, unreadCount, markAllAsRead } = useNotifications();
   const navigate = useNavigate();
 
@@ -521,6 +167,7 @@ export default function Home() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showToolsDropdown, setShowToolsDropdown] = useState(false);
   const toolsDropdownRef = useRef(null);
+  const notificationsRef = useRef(null); // (03/09/2026) fix: faltaba cerrar este panel al hacer click fuera
 
   // BUSCADOR GLOBAL (28/08/2026) — Personas + Páginas y módulos + Equipos/Capitanes
   const [globalSearchTerm, setGlobalSearchTerm] = useState('');
@@ -560,10 +207,19 @@ export default function Home() {
   }, []);
 
   // Cerrar dropdown al hacer click fuera
+  // (03/09/2026) FIX — el panel de Notificaciones no tenía este cierre por
+  // click-afuera, y ambos dropdowns (Notificaciones y Más Módulos) podían
+  // quedar abiertos al mismo tiempo sin excluirse entre sí. En modo oscuro
+  // los dos usan un fondo casi transparente (glass-panel), así que al
+  // superponerse el texto de ambos se mezclaba y se veía ilegible (ver
+  // captura de José). Ahora también se cierran mutuamente al abrir el otro.
   useEffect(() => {
     function handleClickOutside(event) {
       if (toolsDropdownRef.current && !toolsDropdownRef.current.contains(event.target)) {
         setShowToolsDropdown(false);
+      }
+      if (notificationsRef.current && !notificationsRef.current.contains(event.target)) {
+        setShowNotifications(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -662,38 +318,8 @@ export default function Home() {
     canViewAllManagers(currentUser)
   );
   const currentUserSedeNorm = normalizeSede(currentUser?.sede);
-  const normalizeSearchText = (str) =>
-    (str || '')
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .trim();
-
   const globalSearchQ = globalSearchTerm.trim().toLowerCase();
   const globalSearchActive = globalSearchQ.length >= 2;
-
-  const searchTokens = !globalSearchActive
-    ? []
-    : normalizeSearchText(globalSearchTerm).split(/\s+/).filter(Boolean);
-
-  const matchesAllTokens = (searchableText) => {
-    if (searchTokens.length === 0) return false;
-    const target = normalizeSearchText(searchableText);
-    return searchTokens.every(t => target.includes(t));
-  };
-
-  const globalSearchOptionResults = !globalSearchActive ? [] : CAUSA_OPTIONS_REGISTRY
-    .filter(opt => {
-      if (opt.roles && !opt.roles.includes(currentUser?.appRole) && !currentUser?.isSuperAdmin) {
-        return false;
-      }
-      if (typeof opt.visible === 'function' && !opt.visible(currentUser)) {
-        return false;
-      }
-      const fullSearchable = `${opt.title} ${opt.category || ''} ${opt.badge || ''} ${opt.desc || ''} ${(opt.keywords || []).join(' ')}`;
-      return matchesAllTokens(fullSearchable);
-    })
-    .slice(0, 8);
 
   const globalSearchPeopleResults = !globalSearchActive ? [] : (realUsersData || [])
     .filter(u => {
@@ -738,34 +364,6 @@ export default function Home() {
     });
     return [...Array.from(seenTeams.values()).slice(0, 5), ...capitanHits.slice(0, 5)];
   })();
-
-  const handleSelectSearchOption = (opt) => {
-    setShowGlobalSearchResults(false);
-    setGlobalSearchTerm('');
-    if (opt.action === 'new_task') {
-      setShowTaskModal(true);
-    } else if (opt.action === 'venue_modal') {
-      setShowVenueModal(true);
-    } else if (opt.action === 'toggle_theme') {
-      const nextTheme = themeMode === 'dark' ? 'light' : (themeMode === 'light' ? 'auto' : 'dark');
-      setThemeMode?.(nextTheme);
-      showToast?.(`Tema cambiado a: ${nextTheme === 'light' ? 'Día (Claro)' : nextTheme === 'dark' ? 'Noche (Oscuro)' : 'Automático'}`, 'info');
-    } else if (opt.action === 'change_view') {
-      const nextView = viewMode === 'pro' ? 'compact' : (viewMode === 'compact' ? 'lite' : 'pro');
-      setViewMode?.(nextView);
-      showToast?.(`Vista cambiada a: ${nextView.toUpperCase()}`, 'info');
-    } else if (opt.action === 'logout') {
-      logout();
-    } else if (opt.external === 'calendario-global') {
-      window.open('/calendario_global.html?v=' + Date.now() + '&email=' + encodeURIComponent(currentUser?.email || '') + '&name=' + encodeURIComponent(currentUser?.displayName || currentUser?.name || ''), '_blank');
-    } else if (opt.external) {
-      window.open(opt.external, '_blank');
-    } else if (typeof opt.route === 'function') {
-      navigate(opt.route(currentUser));
-    } else if (opt.route) {
-      navigate(opt.route);
-    }
-  };
 
   const handleSelectSearchPerson = (u) => {
     setSelectedSearchUser(u);
@@ -926,16 +524,16 @@ export default function Home() {
             </div>
           </div>
 
-          {/* BUSCADOR GLOBAL (Opciones de Causa + Personas + Páginas y módulos + Equipos/Capitanes) */}
-          <div ref={globalSearchRef} style={{ position: 'relative', width: '100%', maxWidth: '360px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(255,255,255,0.06)', border: '1px solid var(--border-strong)', borderRadius: '8px', padding: '0.45rem 0.75rem', boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.2)' }}>
-              <Search size={15} className="text-muted" style={{ color: 'var(--crear-cyan)' }} />
+          {/* BUSCADOR GLOBAL (Personas + Páginas y módulos + Equipos/Capitanes) */}
+          <div ref={globalSearchRef} style={{ position: 'relative', width: '100%', maxWidth: '280px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-strong)', borderRadius: '8px', padding: '0.4rem 0.6rem' }}>
+              <Search size={15} className="text-muted" />
               <input
                 type="text"
                 value={globalSearchTerm}
                 onChange={(e) => { setGlobalSearchTerm(e.target.value); setShowGlobalSearchResults(true); }}
                 onFocus={() => setShowGlobalSearchResults(true)}
-                placeholder="Buscar opciones de Causa, páginas, personas, equipos..."
+                placeholder="Buscar personas, páginas, equipos..."
                 style={{ flex: 1, minWidth: 0, background: 'transparent', border: 'none', outline: 'none', color: 'var(--text-main)', fontSize: '0.85rem' }}
               />
               {globalSearchTerm && (
@@ -944,45 +542,13 @@ export default function Home() {
             </div>
 
             {showGlobalSearchResults && globalSearchActive && (
-              <div className="glass-panel" style={{ position: 'absolute', top: '110%', left: 0, right: 0, zIndex: 200, maxHeight: '420px', overflowY: 'auto', padding: '0.5rem', boxShadow: '0 10px 40px rgba(0,0,0,0.9)', border: '1px solid rgba(41, 171, 226, 0.3)', textAlign: 'left' }}>
+              <div className="glass-panel dropdown-panel" style={{ position: 'absolute', top: '110%', left: 0, right: 0, zIndex: 200, maxHeight: '420px', overflowY: 'auto', padding: '0.5rem', boxShadow: '0 10px 40px rgba(0,0,0,0.9)', border: '1px solid rgba(41, 171, 226, 0.3)', textAlign: 'left' }}>
                 {usersLoading && (
                   <div className="text-muted" style={{ fontSize: '0.78rem', padding: '0.4rem' }}>Cargando personas...</div>
                 )}
 
-                {!usersLoading && globalSearchOptionResults.length === 0 && globalSearchPeopleResults.length === 0 && globalSearchModuleResults.length === 0 && globalSearchTeamResults.length === 0 && (
+                {!usersLoading && globalSearchPeopleResults.length === 0 && globalSearchModuleResults.length === 0 && globalSearchTeamResults.length === 0 && (
                   <div className="text-muted" style={{ fontSize: '0.8rem', padding: '0.5rem' }}>Sin resultados para "{globalSearchTerm}"</div>
-                )}
-
-                {/* ⚡ SECCIÓN DESTACADA: OPCIONES Y ACCIONES DE CAUSA */}
-                {globalSearchOptionResults.length > 0 && (
-                  <div style={{ marginBottom: '0.6rem', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '0.4rem' }}>
-                    <div style={{ fontSize: '0.72rem', fontWeight: 800, color: 'var(--crear-cyan)', textTransform: 'uppercase', padding: '0.2rem 0.4rem', letterSpacing: '0.5px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <span>⚡ Opciones y Acciones de Causa</span>
-                      <span style={{ fontSize: '0.65rem', background: 'rgba(41,171,226,0.18)', color: 'var(--crear-cyan)', padding: '1px 6px', borderRadius: '10px' }}>{globalSearchOptionResults.length}</span>
-                    </div>
-                    {globalSearchOptionResults.map(opt => (
-                      <button
-                        key={opt.id}
-                        onClick={() => handleSelectSearchOption(opt)}
-                        style={{ display: 'flex', alignItems: 'flex-start', gap: '0.55rem', width: '100%', textAlign: 'left', padding: '0.45rem 0.5rem', background: 'transparent', border: 'none', borderRadius: '6px', cursor: 'pointer', color: 'var(--text-main)', transition: 'background 0.15s ease' }}
-                        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(41,171,226,0.15)'}
-                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                      >
-                        <span style={{ fontSize: '1.2rem', lineHeight: 1, marginTop: '2px', flexShrink: 0 }}>{opt.emoji}</span>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-                            <span style={{ fontSize: '0.84rem', fontWeight: 700, color: 'var(--text-main)' }}>{opt.title}</span>
-                            {opt.badge && (
-                              <span style={{ fontSize: '0.63rem', padding: '1px 5px', borderRadius: '4px', background: 'rgba(41,171,226,0.2)', color: 'var(--crear-cyan)', fontWeight: 600 }}>{opt.badge}</span>
-                            )}
-                          </div>
-                          {opt.desc && (
-                            <div style={{ fontSize: '0.71rem', color: 'var(--text-muted)', marginTop: '2px', lineHeight: 1.3 }}>{opt.desc}</div>
-                          )}
-                        </div>
-                      </button>
-                    ))}
-                  </div>
                 )}
 
                 {globalSearchPeopleResults.length > 0 && (
@@ -1090,8 +656,8 @@ export default function Home() {
             )}
             
             {/* Notificaciones */}
-            <div style={{ position: 'relative' }}>
-              <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }} onClick={() => setShowNotifications(!showNotifications)}>
+            <div style={{ position: 'relative' }} ref={notificationsRef}>
+              <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }} onClick={() => { setShowNotifications(!showNotifications); setShowToolsDropdown(false); }}>
                 <Bell size={20} className="text-white" />
                 {unreadCount > 0 && (
                   <div style={{ position: 'absolute', top: '-4px', right: '-4px', background: 'var(--color-error)', color: 'white', borderRadius: '50%', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.68rem', fontWeight: 'bold' }}>
@@ -1099,9 +665,9 @@ export default function Home() {
                   </div>
                 )}
               </div>
-              
+
               {showNotifications && (
-                <div className="glass-panel" style={{ position: 'absolute', top: '125%', right: 0, width: '320px', zIndex: 100, padding: '1rem', boxShadow: '0 10px 40px rgba(0,0,0,0.8)', border: '1px solid rgba(41, 171, 226, 0.3)' }}>
+                <div className="glass-panel dropdown-panel" style={{ position: 'absolute', top: '125%', right: 0, width: '320px', zIndex: 100, padding: '1rem', boxShadow: '0 10px 40px rgba(0,0,0,0.8)', border: '1px solid rgba(41, 171, 226, 0.3)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.5rem' }}>
                     <h4 style={{ margin: 0, color: 'var(--crear-gold)' }}>🔔 Notificaciones</h4>
                     <button onClick={() => { markAllAsRead(); setShowNotifications(false); }} style={{ background: 'transparent', border: 'none', color: 'var(--crear-cyan)', fontSize: '0.75rem', cursor: 'pointer', fontWeight: 'bold' }}>Marcar leídas</button>
@@ -1156,19 +722,12 @@ export default function Home() {
             >
               🎯 Mis Metas
             </button>
-            <button
-              onClick={() => navigate('/generador-flyer')}
-              className="btn-secondary"
-              style={{ padding: '0.45rem 0.9rem', fontSize: '0.85rem', color: '#f59e0b', borderColor: 'rgba(245, 158, 11, 0.5)', background: 'rgba(245, 158, 11, 0.12)', fontWeight: 'bold' }}
-            >
-              🎨 Generador Flyers
-            </button>
           </div>
 
           {/* MENÚ DESPLEGABLE DE MÁS MÓDULOS */}
           <div style={{ position: 'relative' }} ref={toolsDropdownRef}>
             <button
-              onClick={() => setShowToolsDropdown(!showToolsDropdown)}
+              onClick={() => { setShowToolsDropdown(!showToolsDropdown); setShowNotifications(false); }}
               className="btn-secondary hover-glow"
               style={{ padding: '0.45rem 1rem', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(41, 171, 226, 0.1)', borderColor: 'rgba(41, 171, 226, 0.4)', color: 'var(--crear-cyan)', fontWeight: 'bold' }}
             >
@@ -1176,7 +735,7 @@ export default function Home() {
             </button>
 
             {showToolsDropdown && (
-              <div className="glass-panel" style={{
+              <div className="glass-panel dropdown-panel" style={{
                 position: 'absolute',
                 top: '120%',
                 right: 0,
@@ -1222,10 +781,6 @@ export default function Home() {
 
                 <button onClick={() => { setShowToolsDropdown(false); navigate('/excelencia'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(255, 183, 3, 0.15)', color: 'var(--crear-gold)' }}>
                   👑 Excelencia Operativa
-                </button>
-
-                <button onClick={() => { setShowToolsDropdown(false); navigate('/generador-flyer'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(234, 179, 8, 0.15)', color: '#facc15', fontWeight: 'bold' }}>
-                  🎨 Generador de Flyers Oficiales
                 </button>
 
                 {['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan'].includes(currentUser?.appRole) && (
@@ -1386,10 +941,6 @@ export default function Home() {
               📅 Calendario MJ
             </button>
           )}
-
-          <button onClick={() => navigate('/generador-flyer')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #ec4899)', color: 'white', fontWeight: 'bold', border: 'none', boxShadow: '0 0 15px rgba(245, 158, 11, 0.4)' }}>
-            🎨 Generador Flyers
-          </button>
         </div>
       )}
 

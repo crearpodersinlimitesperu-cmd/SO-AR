@@ -203,6 +203,22 @@ h1, h2, h3, h4, h5, h6 {
   transition: all 0.3s ease;
 }
 
+/* (03/09/2026) Paneles flotantes (dropdowns de Notificaciones, Más Módulos,
+   menús, etc.) que se superponen sobre contenido de la página necesitan un
+   fondo mucho más sólido que las tarjetas normales: en modo oscuro --bg-card
+   es casi transparente (rgba(255,255,255,0.03)), así que si dos dropdowns
+   quedan abiertos a la vez (o uno se abre sobre contenido con mucho texto)
+   el resultado se ve ilegible, con el texto de ambos mezclado. --bg-glass-heavy
+   ya existía en el sistema de temas para esto pero no se estaba usando en
+   ningún dropdown real. Esta clase se agrega junto a "glass-panel" (no la
+   reemplaza) en los paneles flotantes que se posicionan con position:absolute
+   sobre el resto de la interfaz. */
+.dropdown-panel {
+  background: var(--bg-glass-heavy) !important;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
 .causa-logo {
   filter: drop-shadow(0 4px 15px rgba(255, 69, 0, 0.4));
   transition: all 0.3s ease;
