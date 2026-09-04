@@ -49,30 +49,54 @@ jobs:
           VITE_COPILOTO_WORKER_URL: ${{ secrets.VITE_COPILOTO_WORKER_URL }}
         run: npm run build
 
+      # (04/09/2026) FIX — José confirmó (con el log real del run 33899830258,
+      # pegado a mano porque Claude no puede leer logs crudos de Actions) que
+      # el deploy llevaba tiempo fallando en silencio:
+      #   "Authentication Error: Your credentials are no longer valid."
+      # El secret FIREBASE_TOKEN usaba el flujo --token de firebase-tools, que
+      # Firebase ya marcó como obsoleto y que vence sin aviso. Se reemplaza por
+      # autenticación con cuenta de servicio (GOOGLE_APPLICATION_CREDENTIALS),
+      # reutilizando el mismo Secret GOOGLE_SERVICE_ACCOUNT_JSON que ya usa
+      # mail-dispatch.yml — mismo patrón: escribir la llave, verificarla,
+      # usarla, borrarla siempre al final.
+      # PENDIENTE DE CONFIRMAR: esa cuenta de servicio se creó para
+      # Firestore/Admin SDK — no está confirmado que tenga permiso IAM de
+      # Firebase Hosting. Si este paso falla con un error de permisos (no de
+      # autenticación), hay que agregarle el rol "Firebase Hosting Admin" en
+      # Google Cloud Console → IAM.
+      - name: 🔑 Escribir la llave de la Service Account
+        run: echo "$GOOGLE_SERVICE_ACCOUNT_JSON" > centro-operativo-cpsl-65ad52160f45.json
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+
+      - name: 🩺 Verificar que la llave se escribió correctamente
+        run: |
+          echo "Tamaño del archivo (bytes):"
+          wc -c < centro-operativo-cpsl-65ad52160f45.json
+          node -e "JSON.parse(require('fs').readFileSync('centro-operativo-cpsl-65ad52160f45.json','utf8')); console.log('✅ JSON válido — la llave se escribió correctamente.')"
+
       - name: 🚀 Deploy to Firebase Hosting
         env:
-          RAW_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/centro-operativo-cpsl-65ad52160f45.json
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if [ -n "$RAW_TOKEN" ]; then
-            TOKEN="$RAW_TOKEN"
-            if [[ "$TOKEN" != 1//* ]]; then
-              TOKEN="1//$TOKEN"
-            fi
-            echo "Deploying to Firebase Hosting with formatted token..."
-            npx --yes firebase-tools@latest deploy --only hosting --token "$TOKEN" --project centro-operativo-cpsl --non-interactive 2>&1 | tee /tmp/deploy_output.log
-            DEPLOY_EXIT=${PIPESTATUS[0]}
-          else
-            echo "FIREBASE_TOKEN not set, skipping hosting deploy." | tee /tmp/deploy_output.log
-            DEPLOY_EXIT=1
-          fi
+          npx --yes firebase-tools@latest deploy --only hosting --project centro-operativo-cpsl --non-interactive 2>&1 | tee /tmp/deploy_output.log
+          DEPLOY_EXIT=${PIPESTATUS[0]}
 
-          # DIAGNÓSTICO (29/08/2026): los logs crudos de este workflow no son legibles
-          # desde el entorno de Claude que mantiene este repo (bloqueados por política de
-          # red). Si el deploy falla, se reporta la salida real a un GitHub Issue vía
-          # scripts/report_deploy_failure.py — mismo patrón que platform_audit.mjs.
+          # (04/09/2026) FIX — antes este paso terminaba SIEMPRE con "exit 0",
+          # sin importar si el deploy real había fallado, así que GitHub
+          # mostraba ✅ verde aunque no se hubiera subido nada a producción
+          # (así pasó con FIREBASE_TOKEN vencido: semanas de "éxito" falso).
+          # Ahora, si falla, se reporta la salida real a un GitHub Issue vía
+          # scripts/report_deploy_failure.py (ya existía pero nunca se llamaba)
+          # y el job termina con el código de salida real, para que se vea ❌.
           if [ "$DEPLOY_EXIT" -ne 0 ]; then
-            echo "⚠️ Despliegue CI omitido (el token de GitHub Actions debe renovarse). La producción está desplegada directamente desde el entorno local."
+            echo "❌ El despliegue a Firebase Hosting falló de verdad — ver el Issue de diagnóstico creado en este repo."
+            python3 scripts/report_deploy_failure.py /tmp/deploy_output.log || true
           fi
 
-          exit 0
+          exit "$DEPLOY_EXIT"
+
+      - name: 🗑️ Borrar la llave del runner
+        if: always()
+        run: rm -f centro-operativo-cpsl-65ad52160f45.json
