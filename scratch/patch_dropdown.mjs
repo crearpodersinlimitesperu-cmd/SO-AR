@@ -1,0 +1,15 @@
+import fs from 'fs';
+
+let code = fs.readFileSync('src/pages/Home.jsx', 'utf8');
+
+const regex = /<button onClick=\{\(\) => \{ setShowToolsDropdown\(false\); navigate\('\/acuerdos'\); \}\}.*?<\/a>/gs;
+const match = code.match(regex);
+if (match) {
+  const block = match[0];
+  const newBlock = {(currentUser?.appRole !== 'qt') && (\n                    <>\n\\n                    </>\n                  )};
+  code = code.replace(block, newBlock);
+  fs.writeFileSync('src/pages/Home.jsx', code, 'utf8');
+  console.log("Success");
+} else {
+  console.log("Not found");
+}

@@ -1137,7 +1137,191 @@ Para asegurar la transición exitosa de las sedes operativas internacionales hac
 *   **Evidencias de Éxito:** 100% de las sedes operando de manera estandarizada bajo el ecosistema digital de la Plataforma Nodus, logrando una reducción del 15% en incidencias operativas globales.
 
 ---
-*Este documento constituye la hoja de ruta y manual de reingeniería de Crear Poder Sin Límites.*
-*Elaborado el 22 de Agosto de 2026. Clasificación: CONFIDENCIAL - EXCLUSIVO DIRECCIÓN REGIONAL.*
+
+## 14. MANUAL DE INTEGRACIÓN SISTÉMICA: GOBERNANZA OPERATIVA NODUS + CAUSA OS (V1.0 - SEPTIEMBRE 2026)
+
+### 14.1 El Manifiesto Nodus + Causa OS (Principios de Gobernanza)
+- **Fórmula Simbiótica:** Nodus (Datos y Trazabilidad) + Causa OS (Análisis y Acción) = Decisiones Verificables.
+- **Principio Rector:** Directo al punto. El líder es la causa, no el efecto.
+- **Nodus (Ecosistema de Datos):** Único sistema de registro, organización y trazabilidad operativa de CPSL. Concentra la información real de participantes, líderes, transacciones, compromisos, asistencia y evidencias.
+  * *Regla de Oro de Datos Nodus:* Nodus no completa datos vacíos con suposiciones. Si un participante no registra actividad o pago, el sistema muestra exclusivamente "sin actividad registrada" o "sin Ticket Verde registrado". Nodus jamás concluye de forma autónoma "el participante abandonó" o "no está comprometido".
+- **Causa OS (Sistema de Dirección):** Capa de dirección, control y mejora estratégica que identifica qué está ocurriendo, cuál puede ser la causa, qué decisión conviene tomar y cómo ejecutar cambios de forma segura sin alterar la evidencia histórica.
+  * *Regla de Oro Causa OS:* Toma la telemetría de Nodus, descarta interpretaciones subjetivas y propone planes de acción con responsables, plazos y criterios medibles, requiriendo siempre validación humana para acciones sensibles (permisos, pagos, contratos o comunicaciones masivas).
+
+### 14.2 Estructura Organizacional: Los 9 Niveles de Excelencia 2026
+- **Descontinuación de Subdirector:** El rol de 'Subdirector' queda DESCONTINUADO DE FORMA DEFINITIVA. Sus funciones comerciales y de supervisión son absorbidas en su totalidad por el Gerente de Sede.
+- **Estructura Directiva Global de CREAR PODER SIN LÍMITES:**
+  * **CEO Global:** Fer Aragon (visión corporativa y expansión multinacional).
+  * **CCO Global (Operaciones y Sala):** Paul Sosa (operaciones globales, dinámicas de sala, El Viaje y cultura).
+  * **Jefa Financiera Global (CFO):** Nancy Elizabeth Escobar Pérez / Elizabeth Escobar (auditoría contable, conciliación y control fiscal global).
+- **Los 9 Niveles de Excelencia:**
+  1. **Aliado (Nivel 1 - Logística Invisible y Espejo de Responsabilidad):** Dueño de la logística invisible. Proporción obligatoria: 1 aliado por cada 6 participantes. Foco: Ser Relación viernes y sábado, y Llamado a la Acción Extraordinario el domingo. Son graduados de Maestría seleccionados por la oficina, NUNCA por el Capitán.
+  2. **Mánager en Maestría (Nivel 2 - Líder de Acompañamiento):** Acompañamiento profundo de 90 días a máximo 6 participantes. No se traduce como 'gerente'. Declaración formal el domingo de C2.
+  3. **Capitán (Nivel 3 - Termómetro Energético):** Termómetro energético del salón. Supervisa guía telefónica y compromisos L/M/V. Nota: los aliados son seleccionados por la oficina, nunca por el Capitán.
+  4. **Quantum Team / QT (Nivel 4 - Operaciones Especiales y Sombras):** Mánagers graduados con mínimo 60% de efectividad comercial. Entrenan llamadas de Futuros Imposibles. 1 QT Senior por sede reporta a CMJ y Gerente.
+  5. **Coordinador C1 y C2 / CC1Y2 (Nivel 5 - Soporte Básico Unificado):** Rol unificado. Montaje de sala, baúles, mesa de registro y contabilidad local. Domingo C1 enfocado en capturar pagos de conversión.
+  6. **Coordinador de Maestría del Juego / CMJ (Nivel 6 - Soporte Avanzado):** Guardián de los 90 días, recluta mánagers y audita predictivamente los Futuros Imposibles (FI) en Nodus los miércoles antes de las 19:00 PM.
+  7. **Entrenador / Coach (Nivel 7 - Autoridad Contextual):** Voz de la transformación en salón y máxima autoridad contextual.
+  8. **Gerente de Sede (Nivel 8 - Dirección y Supervisión Local):** Rentabilidad, presupuesto, supervisión de Nodus, absorbe funciones del extinto subdirector, aprueba convenios de pago con firma física.
+  9. **Equipo de Oficina (Nivel 9 - Back-Office):** Asistente contable, facturación y soporte administrativo.
+
+### 14.3 Protocolo de Impecabilidad Visual (Códigos de Vestimenta 2026)
+- **Entrenador / Coach:** Estándar de Elegancia Negra Total (camiseta, camisa o saco de etiqueta negra sin estampados). **Zapatillas deportivas (tenis) de color negro absoluto TOTALMENTE PERMITIDAS** para priorizar la comodidad física y sostener la energía en sala durante jornadas prolongadas.
+- **Aliados:** Viernes: camisa/blusa negra de botones lisa, jean azul índigo liso, calzado cómodo limpio, abrigo negro. Sábado: polo azul índigo o negro de sede y jean negro. Domingo: polo de color del equipo (C2) o azul de sede (C1) y jean azul o negro.
+- **Capitanes:** Formal etiqueta negra jueves y viernes. Sábado: polo negro. Domingo: polo azul sede.
+- **Quantum Team (QT):** Viernes: camisa blanca y jean azul. Sábado: polo plomo/gris QT y jean negro. Domingo: polo azul QT y jean negro.
+- **Mánagers:** Viernes: traje sastre formal negro. Sábado: polo negro de equipo. Domingo: polo azul o de equipo.
+- **Oficina:** Jueves y viernes etiqueta negra formal. Sáb/Dom polos oficiales y pantalón negro. Diario formal sobrio.
+
+### 14.4 SOP Operativo del CMJ, Fines de Semana y "El Viaje" (FDS 4)
+- **Ritmo Semanal:** Lunes contable en Nodus; Martes seguimiento FI; Miércoles deadline de oro 19:00 PM en Nodus para cargar revisión de FI (dispara alerta roja si se omite) y Grounding virtual 19:00 a 20:00 PM.
+- **Jueves:** 15:00 PM montaje sala con altura mínima de 4.5m (para Caída de Confianza); 16:30 grounding mánagers; 17:00 auditoría física de FI; 18:00 grounding presencial Aliados C1 (cero tolerancia, puertas cerradas).
+- **Viernes:** 15:30 verificación sala; 16:00 grounding mánagers; 16:30 grounding entrenador/CMJ; 18:00 apertura; 19:00 cierre absoluto de compuertas logísticas. Noche de Confianza C1 a las 22:00 PM con tinas, agua templada con resistencias eléctricas, cremas y frutas.
+- **Sábado y Domingo:** Apertura 08:00 AM, reportes de asistencia 11:00 AM, abonos 15:00 PM. Domingo FDS 1: firma de FI; FDS 2: relación; FDS 3: graduación, medallas y diplomas. 21:00 PM cierre POS. Celebración Juego Ganado únicamente con pizza, globos y luces (mariachis prohibidos).
+- **Fin de Semana 4: "El Viaje" (Paul Sosa):** Viernes 18:15 PM auditoría baúl (24 velas eléctricas, teteras, resistencias, 5 tinas, 5 jarras, cremas); 18:30 grounding ángeles de vuelo; 19:40 retiro celulares en baúl con llave y vendados al salón. Sábado 07:00 traslado a hostería, desayuno mánagers con Coach 07:30, inicio 09:20, almuerzo 14:00 (premios Estandarte, SAI y Antorcha al mánager con mayor enrolamiento). Domingo 09:00 visiones a 10, 5 y 1 año con Ticket Dorado; 18:00 Pase de Antorcha ingresando a sala de C1 con sigilo.
+
+### 14.5 Catálogo de 14 KPIs Reales en Nodus
+- **KPI-C1-001 Asistencia de Apertura (Día 1 C1):** Meta 95%. Escaneo QR en Mesa. Deadline: Viernes 11:30 AM.
+- **KPI-C1-002 Retención del Fin de Semana (C1):** Meta > 90%. Marcación Check-out. Deadline: Domingo 19:00 PM.
+- **KPI-C1-003 Conversión C1 a C2 (PP%):** Meta 50% (52% reto). Registro Pagos Nodus. Deadline: Domingo 21:00 PM.
+- **KPI-C2-001 Asistencia de Arranque C2:** Meta 95%. Escaneo QR y Gafete. Deadline: Jueves 15:30 PM.
+- **KPI-C2-002 Declaración en Breakthrough:** Meta 90%. Conteo Físico. Deadline: Jueves 21:30 PM.
+- **KPI-C2-003 Tasa de Palabras Rotas:** Meta < 5%. Cruce Declarantes vs Caja. Deadline: Viernes 14:01 PM.
+- **KPI-C2-004 Conversión C2 a MJ (PP%):** Meta 70% (93% reto). Registro Pagos Nodus. Deadline: Domingo 19:00 PM.
+- **KPI-MJ-001 Graduados Invitados 'El Viaje':** Meta 90%. Actas Acreditación. Deadline: Domingo FDS 3 21:00 PM.
+- **KPI-MJ-002 Sentados por FDS:** Meta 70 Lima / 55 Medellín. Escaneo QR. Deadline: Viernes 19:00 PM.
+- **KPI-MJ-003 Tasa de Deserción Inter-FDS:** Meta < 5%. Check-in Consolidado. Deadline: Sábado 11:30 AM.
+- **KPI-MJ-004 Efectividad Enrolamiento Mánagers:** Meta 90%. Cruce Invitados vs Asistencia. Deadline: Sábado 11:30 AM.
+- **KPI-MJ-005 Avance de Futuros Imposibles (FI):** Meta 100%. Módulo FI Nodus. Deadline: Martes 15:00 PM.
+- **KPI-MJ-006 Firma 28 Entrenamientos Sustentables:** Meta 100%. Carga Documentos Nodus. Deadline: Domingo FDS 1 21:00 PM.
+- **KPI-MJ-007 Conversión de Graduados a Aliados:** Meta > 40%. Registro Staff Nodus. Deadline: Domingo FDS 3 21:00 PM.
+
+### 14.6 Triggers Técnicos Autónomos Backend Nodus
+1. **Trigger de Palabra Rota (Viernes C2 14:01 PM):** Si declaró Breakthrough el jueves y no tiene Ticket Verde conciliado en caja a las 14:00 PM, se activa Status_Palabra_Rota, se bloquea el código QR de acceso y se alerta a Causa OS para retención de gafete.
+2. **Trigger Alerta de Deserción de Mánagers (Miércoles pre-MJ 19:00 PM):** Si el campo de revisión de FI de los mánagers está vacío a las 19:00 PM, alerta roja al Gerente por riesgo de deserción > 40%.
+3. **Trigger de Impecabilidad Contable (Lunes 12:00 PM):** Valida conciliación completa de caja FDS (Nodus vs fichas físicas vs depósitos). Si no está cerrada, escala alerta disciplinaria de Nivel 2.
+
+### 14.7 Las 10 Palancas de Experiencia del Cliente (PX) y Filosofía Rick Rubin
+1. Seguridad psicológica en sala. 2. Participante como héroe (StoryBrand). 3. Reducción de esfuerzo de registro (Hormozi). 4. Alerta preventiva de integridad viernes 12:00 PM. 5. Impecabilidad del contenedor físico basura cero (Rubin). 6. Sostenimiento del Sistema Buddy. 7. Coaching ético sin manipulación. 8. Simplificación de tareas FI. 9. Llamadas de mánagers sin drama basadas en datos Nodus. 10. Ceremonial del Pase de Antorcha.
+Filosofía Rick Rubin: El Arte como Estado del Ser; Disciplina militar para liberar la magia cuántica; Mente de principiante (flexibilidad como autorizar zapatillas negras para el Coach); Mentalidad de abundancia; y La búsqueda de la Opción C frente a quiebres.
+
+---
+
+## 15. MANUAL DE ENROLAMIENTO NARRATIVO: BRANDSCRIPT Y GUIONES DE COMUNICACIÓN PARA MAESTRÍA DEL JUEGO (MJ)
+### EDICIÓN V1.0 — CREAR PODER SIN LÍMITES 2026
+
+Este manual constituye la herramienta definitiva para que la Gerencia de Sede, los Capitanes, Aliados y Mánagers unifiquen su narrativa comercial bajo el **StoryBrand Framework (SB7)** y el **Neuromarketing Ético**. Su propósito es estructurar mensajes de alto impacto y guiones telefónicos que reduzcan el esfuerzo y sacrificio percibidos por los graduados de Capítulo Dos (C2), guiándolos hacia un compromiso voluntario y de alta integridad con la **Maestría del Juego (MJ)** de 90 días.
+
+### 15.1 El Marco Ontológico: El Viaje del Héroe en la Maestría
+En la cultura de alto rendimiento de **Crear Poder Sin Límites (CPSL)**, no operamos desde la venta tradicional ni desde el empuje comercial invasivo. Operamos desde la **creación de contexto**:
+- **El Participante es el Héroe:** El graduado de Capítulo Dos (C2) es el único protagonista de su propia película. Él es quien debe enfrentar a sus «dragones cotidianos» (la inercia, la zona de confort, el escepticismo de su entorno).
+- **La Organización es el Guía:** Los Mánagers y Aliados encarnan el arquetipo del Mentor (el Guía), proveyendo empatía, autoridad ética, un plan simplificado y un llamado irrazonable a la acción.
+- **El Combustible es la Elección Voluntaria:** El enrolamiento es un acto de amor y estiramiento. Todo acuerdo financiero o de asistencia debe nacer de la libre elección del participante, erradicando cualquier forma de coacción, manipulación o culpa.
+
+### 15.2 El Brandscript Oficial de Maestría del Juego (SB7-MJ)
+1. **Un Personaje (El Héroe):** Graduado de Capítulo Dos (C2). Un líder que ha despertado su poder en sala y busca materializarlo en la fisionomía de su vida diaria.
+2. **Tiene un Problema (El Efecto Lunes):**
+   - *Externo:* Volver a un entorno que no comprende su transformación.
+   - *Interno:* Miedo al auto-sabotaje y a quedarse solo.
+   - *Filosófico:* Es inaceptable regresar a vivir una vida promedio tras haber conocido su grandeza.
+3. **Encuentra un Guía:** El equipo de Mánagers y la Plataforma Nodus. Un mentor empático (que ya recorrió los 90 días) y con autoridad técnica (respaldado por la telemetría de Nodus).
+4. **Que le da un Plan de 3 Pasos:**
+   - *Paso 1:* Declara tu Futuro Imposible (FI).
+   - *Paso 2:* Entrena en Integridad (28 Entrenamientos Sustentables).
+   - *Paso 3:* Conquista «El Viaje» y gradúate en Gratitud.
+5. **Y lo llama a la Acción:**
+   - *CTA Directo:* Registrarse en Nodus en la mesa de conversión del domingo.
+   - *CTA Transicional:* Agendar sesión de calibración de FI de 15 minutos.
+6. **Que evita el Fracaso:** Evitar el marchitamiento de la palabra. Caer de vuelta en la anestesia de la víctima («la arena»), perdiendo el impulso de su Breakthrough de jueves.
+7. **Y termina en Éxito:** Convertirse en un Líder IMO. Vivir en coherencia, manifestando abundancia física, emocional y financiera como una consecuencia natural de su Ser.
+
+### 15.3 Guiones de Llamadas Telefónicas para Mánagers
+*Premisa de Neuromarketing Ético: «Calmar al Perro Guardián» (Reptil) en los primeros 15 segundos mediante la simpatía y el respeto a su tiempo.*
+
+#### Escenario A: El graduado de C2 indeciso o con miedo al «efecto lunes»
+- **Paso 1: Apertura y Conexión (Calmar al Reptil):**
+  > «Hola [Nombre del Participante], te saluda [Nombre del Mánager], tu mánager de soporte. Qué gusto saludarte. Te llamo brevemente, ¿estás en un espacio cómodo de 3 minutos para conversar?»
+- **Paso 2: Validación de Fisionomía:**
+  > «Aún vibra en mí el espacio del domingo de Capítulo Dos. Quiero reconocer la fisonomía y la entrega que mostraste en tu Breakthrough. Vi a un creador absoluto en la sala. ¿Cómo se ha sentido apagar el micrófono y regresar a la rutina estos dos días?»
+- **Paso 3: Identificación del Problema Interno (StoryBrand):**
+  > [Escuchar activamente sin interrumpir]. «Es completamente natural, [Nombre]. La inercia del día a día es fuerte y volver al 'mundo real' sin una estructura puede sentirse como tratar de nadar contracorriente en la arena. Sabes que tienes el potencial, pero sostener la autodisciplina solo es sumamente retador.»
+- **Paso 4: Presentación del Plan de 3 Pasos:**
+  > «Por eso creamos la Maestría del Juego de 90 días. No es más teoría; es la pista de entrenamiento física para consolidar tu resultado. El plan es muy sencillo: primero, declaramos un Futuro Imposible en salud, finanzas o relaciones; segundo, entrenamos diariamente en integridad con el soporte de tu mánager y la Plataforma Nodus; y tercero, nos graduamos juntos en Gratitud. Tú pones la visión, nosotros la estructura de bajo riesgo.»
+- **Paso 5: Llamado a la Acción Directo (CTA):**
+  > «[Nombre], tu palabra de jueves sigue viva. ¿Eliges sostener tu estiramiento y dar el paso a tu Maestría este fin de semana, o vas a permitir que la inercia del lunes tome las decisiones por ti?»
+
+#### Escenario B: Tratamiento ético ante la objeción «No tengo dinero»
+*Rigor de Causa OS: No debatir el dinero como un problema absoluto; elevar el valor percibido usando la Ecuación de Valor (Hormozi) para reencuadrar la inversión en el Ser.*
+- **Enfoque Ontológico:**
+  - *Hecho objetivo:* El dinero es una variable de prioridades.
+  - *Acción incorrecta (Manipulación Prohibida):* «Si no entras, es porque no te amas» o «Consíguete una tarjeta prestada si de verdad te importa tu familia». (Genera rechazo y destruye la seguridad psicológica).
+  - *Acción correcta (Coaching Ético):* Separar el hecho de la interpretación y explorar soluciones de bajo riesgo.
+- **Diálogo de Aplicación:**
+  > **Participante:** «De verdad quiero hacer la Maestría, pero el dinero es mi límite en este momento. No tengo cómo cubrir la inversión.»
+  >
+  > **Mánager (Guía):** «Reconozco tu honestidad, [Nombre]. El dinero es un factor real. Si dejamos la inversión a un lado por un instante... en tu corazón, ¿la Maestría representa un 'sí' rotundo para tu vida, o tienes alguna duda sobre el valor que este entrenamiento aportará a tus metas?»
+  >
+  > **Participante:** «No, el entrenamiento sé que es increíble y me sirve, es solo que físicamente no tengo el dinero hoy.»
+  >
+  > **Mánager (Causa OS):** «Perfecto. Gracias por aclarar que la fisionomía del entrenamiento es un 'sí' para ti. En la cultura de Crear, operamos desde la Causa: si tú eres el creador de tu realidad, el dinero es una circunstancia a diseñar, no un límite inamovible. Si la Plataforma Nodus nos permite estructurar un plan de abono de bajo riesgo y pasos progresivos que se adapte a tus flujos actuales, ¿qué opciones ves viables para generar tu primer aporte de reserva antes de que cerremos el registro este viernes?»
+  >
+  > **Participante:** «Podría dar una parte este viernes y el saldo en dos cuotas los fines de semana de módulo.»
+  >
+  > **Mánager:** «Excelente. Eso es un creador en acción. Vamos a registrar ese plan de pago en Nodus bajo aprobación de la Gerencia para activar tu 'Ticket Verde' de inmediato. Bienvenido al juego de los 90 días.»
+
+### 15.4 Plantillas de Mensajes de WhatsApp de Alto Impacto
+#### Mensaje 1: Bienvenida e Invitación Inmediata (Post-Graduación C2)
+*Diseñado bajo el principio de «Unidad» de Cialdini para pertenencia instantánea:*
+```text
+¡Felicidades, Creador! 🦅✨
+
+Aún resuena en la sede la fisionomía y la fuerza de tu palabra declarada este fin de semana en Capítulo Dos. Has salido de "la arena" y hoy tienes en tus manos la posibilidad de diseñar tu propio destino.
+
+El lunes ha llegado, y con él, la oportunidad de elegir: ¿volver a la inercia cotidiana o entrenar para consolidar tu Breakthrough?
+
+El equipo de Mánagers y la comunidad de Maestría del Juego ya está lista para recibirte en el contenedor de los 90 días. Tu espacio de estiramiento está guardado.
+
+Paso 1: Ingresa a tu App Nodus 📱
+Paso 2: Agenda tu sesión de calibración de Futuro Imposible (FI) de 15 minutos aquí: [Enlace_Calendly]
+Paso 3: Sostiene tu palabra.
+
+Sostener la fisionomía del Ser es el juego de los grandes. Nos vemos en la cancha. 
+
+Atentamente,
+El Equipo de Mánagers y Capitanes de [Sede]
+CREAR PODER SIN LÍMITES 2026.
+```
+
+#### Mensaje 2: Recordatorio Preventivo de Integridad (Viernes de C2 — 12:00 PM)
+*Neuromarketing Ético: Sustituye el estrés de la penalización de «Palabra Rota» por un llamado preventivo al orden y cuidado de su palabra antes del trigger de las 14:00 PM:*
+```text
+Hola, [Nombre] 👋
+
+Te saludamos desde la oficina de la sede. Hoy es viernes de Capítulo Dos, un día clave para cuidar el contenedor de integridad que declaraste el jueves por la noche.
+
+Para asegurar que tu ingreso al bloque de confrontación de las 15:00 PM sea fluido y libre de distracciones logísticas:
+
+📌 Tu estado actual en Nodus requiere conciliación de caja.
+⏰ El cierre automático de registros contables de la plataforma se ejecutará a las 14:00 PM.
+
+Queremos cuidar tu experiencia y tu palabra. Por favor, acércate a la mesa externa de registro antes de la hora límite o envíanos tu comprobante digital por esta vía para validar tu "Ticket Verde" en el sistema.
+
+Si tienes algún quiebre técnico o financiero de última hora, avísanos de inmediato para diseñar juntos una solución de bajo riesgo con el Gerente de Sede antes de que el sistema aplique el bloqueo automático.
+
+¡Sostener tu palabra es tu mayor poder! Nos vemos en sala. 🛡️
+CREAR PODER SIN LÍMITES
+```
+
+### 15.5 Checklist de Impecabilidad del Enrolador Narrativo
+1. **Cero Simpatía al Drama:** ¿Estoy escuchando la justificación del participante con lástima, o lo estoy sosteniendo en su grandeza y capacidad de resolver? (La simpatía debilita al participante; la compasión y el rigor lo empoderan).
+2. **Datos vs. Interpretaciones:** ¿La objeción del participante es un hecho duro comprobable (ej. «no tengo saldo disponible en esta tarjeta») o es una interpretación basada en el miedo (ej. «es que nunca voy a poder pagar eso»)?
+3. **Respeto Absoluto a la Autonomía:** ¿Estoy permitiendo que la decisión final y el plan de abono nazcan de la elección voluntaria del participante, o lo estoy presionando usando argumentos de culpa o escasez falsa?
+4. **Fisionomía de Voz y Corporalidad:** Aunque la conversación sea telefónica o por chat, ¿mi postura física refleja la fisionomía de un líder cuántico (espalda erguida, sonrisa telefónica, tono firme y amoroso)?
+5. **Trazabilidad en Nodus:** ¿He registrado de manera limpia y sin suposiciones cada acuerdo de pago, fecha límite y avance de Futuro Imposible en la plataforma para que la Gerencia de Sede cuente con datos de control impecables?
+
+---
+*Este documento constituye la hoja de ruta y manual de reingeniería de CREAR PODER SIN LÍMITES.*
+*Edición Oficial Integrada: Septiembre 2026. Clasificación: CONFIDENCIAL - EXCLUSIVO DIRECCIÓN REGIONAL Y SALA.*
 
 `;
+

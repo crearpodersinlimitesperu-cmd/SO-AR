@@ -1,0 +1,1 @@
+﻿const fs = require('fs'); let code = fs.readFileSync('src/pages/Home.jsx', 'utf8'); const a = code.split('🎨 Generador Flyers'); if(a.length === 3) { code = a[0] + '🎨 Flyers C1 Globales' + a[1] + '🎨 Flyers C1 Globales' + a[2]; } fs.writeFileSync('src/pages/Home.jsx', code, 'utf8');

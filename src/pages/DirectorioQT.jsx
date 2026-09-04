@@ -118,20 +118,22 @@ export default function DirectorioQT() {
     
     return members.filter(m => {
       // 0. Reglas de Jerarquía Corporativa
-      const userSede = currentUser?.sede || '';
+      const userSede = normalizeQTSede(currentUser?.sede || '');
       const isGlobalUser = userSede.toLowerCase().includes('global');
       
-      if (!isSuper && !isQTGlobal) {
+      if (!isSuper && !isQTGlobal && !isGerente) {
         if (isGlobalUser) {
           // Global users see everything
-        } else if (isGerente) {
-          if (m.sede !== userSede && m.sede !== 'Global') return false;
+        } else if (['coord_c1', 'coord_c2', 'coordinador_c1c2'].includes(userRole)) {
+          // Coordinador C1/C2: solo su sede (+ Coordinador Global) según Matriz
+          const isTargetQTGlobal = m.sede === 'Global' || m.email?.toLowerCase().includes('brunis') || m.email?.toLowerCase().includes('cardenas');
+          if (m.sede !== userSede && !isTargetQTGlobal) return false;
         } else if (hasQT) {
           // Un QT normal ve solo su sede y al Coordinador Global
           const isTargetQTGlobal = m.sede === 'Global' || m.email?.toLowerCase().includes('brunis') || m.email?.toLowerCase().includes('cardenas');
           if (m.sede !== userSede && !isTargetQTGlobal) return false;
         } else {
-          // Cualquier otro rol (manager, capitan, etc.) ve su sede
+          // Cualquier otro rol ve su sede
           if (m.sede !== userSede) return false;
         }
       }

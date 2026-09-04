@@ -106333,10 +106333,80 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
 ### 13.20 Reconciliación con la Guía de KPIs para Coordinadores (sección 3.6)
 [DATO VERIFICADO vs. DATO NO CONFIRMADO — no se reconcilian por asunción, se documenta la diferencia entre las dos fuentes de Dirección]. El Manual Oficial de Usuario NODUS (Edición 2026, fuente de este capítulo 13) confirma como módulos reales de la plataforma: Dashboard, Mesa de Registro, Participantes, Contabilidad (Registrar Pago / Registro de Gastos), Cierre de Caja, Reportes (incluye el Reporte de Entrenadores y Maestrías), Equipos y Maestrías (cohortes), y Configuración (Sedes / Usuarios / Programas y Precios). La 'Guía de Medición de KPIs para Coordinadores en NODUS' (sección 3.6, aportada por Dirección) menciona además los módulos 'Seguimiento → Maestrías', 'Asignación de Llamadas', 'Configuración → Equipos y Maestrías', 'Certificados' y 'Participantes Rezagados'. De estos, **Equipos y Maestrías** y **Configuración** sí están confirmados por este manual oficial; **'Seguimiento → Maestrías', 'Asignación de Llamadas', 'Certificados' y 'Participantes Rezagados' NO aparecen mencionados en el Manual Oficial de Usuario NODUS Edición 2026** (ni en su índice de 18 capítulos ni en sus Anexos). Esto puede deberse a que (a) son pantallas reales que el manual oficial simplemente no documentó, (b) son nombres alternativos/coloquiales de módulos aquí sí listados, o (c) corresponden a una capa de seguimiento gestionada fuera de NODUS (p. ej. en Causa OS). Ningún dato de este documento resuelve cuál de las tres opciones es la correcta — DATO FALTANTE a confirmar directamente con Dirección o con una captura de pantalla de esos módulos dentro de NODUS.
 ---
+
+## 14. MANUAL DE INTEGRACIÓN SISTÉMICA: GOBERNANZA OPERATIVA NODUS + CAUSA OS (V1.0 - SEPTIEMBRE 2026)
+
+### 14.1 El Manifiesto Nodus + Causa OS (Principios de Gobernanza)
+- **Fórmula Simbiótica:** Nodus (Datos y Trazabilidad) + Causa OS (Análisis y Acción) = Decisiones Verificables.
+- **Principio Rector:** Directo al punto. El líder es la causa, no el efecto.
+- **Nodus (Ecosistema de Datos):** Único sistema de registro, organización y trazabilidad operativa de CPSL. Concentra la información real de participantes, líderes, transacciones, compromisos, asistencia y evidencias.
+  * *Regla de Oro de Datos Nodus:* Nodus no completa datos vacíos con suposiciones. Si un participante no registra actividad o pago, el sistema muestra exclusivamente "sin actividad registrada" o "sin Ticket Verde registrado". Nodus jamás concluye de forma autónoma "el participante abandonó" o "no está comprometido".
+- **Causa OS (Sistema de Dirección):** Capa de dirección, control y mejora estratégica que identifica qué está ocurriendo, cuál puede ser la causa, qué decisión conviene tomar y cómo ejecutar cambios de forma segura sin alterar la evidencia histórica.
+  * *Regla de Oro Causa OS:* Toma la telemetría de Nodus, descarta interpretaciones subjetivas y propone planes de acción con responsables, plazos y criterios medibles, requiriendo siempre validación humana para acciones sensibles (permisos, pagos, contratos o comunicaciones masivas).
+
+### 14.2 Estructura Organizacional: Los 9 Niveles de Excelencia 2026
+- **Descontinuación de Subdirector:** El rol de 'Subdirector' queda DESCONTINUADO DE FORMA DEFINITIVA. Sus funciones comerciales y de supervisión son absorbidas en su totalidad por el Gerente de Sede.
+- **Estructura Directiva Global de CREAR PODER SIN LÍMITES:**
+  * **CEO Global:** Fer Aragon (visión corporativa y expansión multinacional).
+  * **CCO Global (Operaciones y Sala):** Paul Sosa (operaciones globales, dinámicas de sala, El Viaje y cultura).
+  * **Jefa Financiera Global (CFO):** Nancy Elizabeth Escobar Pérez / Elizabeth Escobar (auditoría contable, conciliación y control fiscal global).
+- **Los 9 Niveles de Excelencia:**
+  1. **Aliado (Nivel 1 - Logística Invisible y Espejo de Responsabilidad):** Dueño de la logística invisible. Proporción obligatoria: 1 aliado por cada 6 participantes. Foco: Ser Relación viernes y sábado, y Llamado a la Acción Extraordinario el domingo. Son graduados de Maestría seleccionados por la oficina, NUNCA por el Capitán.
+  2. **Mánager en Maestría (Nivel 2 - Líder de Acompañamiento):** Acompañamiento profundo de 90 días a máximo 6 participantes. No se traduce como 'gerente'. Declaración formal el domingo de C2.
+  3. **Capitán (Nivel 3 - Termómetro Energético):** Termómetro energético del salón. Supervisa guía telefónica y compromisos L/M/V. Nota: los aliados son seleccionados por la oficina, nunca por el Capitán.
+  4. **Quantum Team / QT (Nivel 4 - Operaciones Especiales y Sombras):** Mánagers graduados con mínimo 60% de efectividad comercial. Entrenan llamadas de Futuros Imposibles. 1 QT Senior por sede reporta a CMJ y Gerente.
+  5. **Coordinador C1 y C2 / CC1Y2 (Nivel 5 - Soporte Básico Unificado):** Rol unificado. Montaje de sala, baúles, mesa de registro y contabilidad local. Domingo C1 enfocado en capturar pagos de conversión.
+  6. **Coordinador de Maestría del Juego / CMJ (Nivel 6 - Soporte Avanzado):** Guardián de los 90 días, recluta mánagers y audita predictivamente los Futuros Imposibles (FI) en Nodus los miércoles antes de las 19:00 PM.
+  7. **Entrenador / Coach (Nivel 7 - Autoridad Contextual):** Voz de la transformación en salón y máxima autoridad contextual.
+  8. **Gerente de Sede (Nivel 8 - Dirección y Supervisión Local):** Rentabilidad, presupuesto, supervisión de Nodus, absorbe funciones del extinto subdirector, aprueba convenios de pago con firma física.
+  9. **Equipo de Oficina (Nivel 9 - Back-Office):** Asistente contable, facturación y soporte administrativo.
+
+### 14.3 Protocolo de Impecabilidad Visual (Códigos de Vestimenta 2026)
+- **Entrenador / Coach:** Estándar de Elegancia Negra Total (camiseta, camisa o saco de etiqueta negra sin estampados). **Zapatillas deportivas (tenis) de color negro absoluto TOTALMENTE PERMITIDAS** para priorizar la comodidad física y sostener la energía en sala durante jornadas prolongadas.
+- **Aliados:** Viernes: camisa/blusa negra de botones lisa, jean azul índigo liso, calzado cómodo limpio, abrigo negro. Sábado: polo azul índigo o negro de sede y jean negro. Domingo: polo de color del equipo (C2) o azul de sede (C1) y jean azul o negro.
+- **Capitanes:** Formal etiqueta negra jueves y viernes. Sábado: polo negro. Domingo: polo azul sede.
+- **Quantum Team (QT):** Viernes: camisa blanca y jean azul. Sábado: polo plomo/gris QT y jean negro. Domingo: polo azul QT y jean negro.
+- **Mánagers:** Viernes: traje sastre formal negro. Sábado: polo negro de equipo. Domingo: polo azul o de equipo.
+- **Oficina:** Jueves y viernes etiqueta negra formal. Sáb/Dom polos oficiales y pantalón negro. Diario formal sobrio.
+
+### 14.4 SOP Operativo del CMJ, Fines de Semana y "El Viaje" (FDS 4)
+- **Ritmo Semanal:** Lunes contable en Nodus; Martes seguimiento FI; Miércoles deadline de oro 19:00 PM en Nodus para cargar revisión de FI (dispara alerta roja si se omite) y Grounding virtual 19:00 a 20:00 PM.
+- **Jueves:** 15:00 PM montaje sala con altura mínima de 4.5m (para Caída de Confianza); 16:30 grounding mánagers; 17:00 auditoría física de FI; 18:00 grounding presencial Aliados C1 (cero tolerancia, puertas cerradas).
+- **Viernes:** 15:30 verificación sala; 16:00 grounding mánagers; 16:30 grounding entrenador/CMJ; 18:00 apertura; 19:00 cierre absoluto de compuertas logísticas. Noche de Confianza C1 a las 22:00 PM con tinas, agua templada con resistencias eléctricas, cremas y frutas.
+- **Sábado y Domingo:** Apertura 08:00 AM, reportes de asistencia 11:00 AM, abonos 15:00 PM. Domingo FDS 1: firma de FI; FDS 2: relación; FDS 3: graduación, medallas y diplomas. 21:00 PM cierre POS. Celebración Juego Ganado únicamente con pizza, globos y luces (mariachis prohibidos).
+- **Fin de Semana 4: "El Viaje" (Paul Sosa):** Viernes 18:15 PM auditoría baúl (24 velas eléctricas, teteras, resistencias, 5 tinas, 5 jarras, cremas); 18:30 grounding ángeles de vuelo; 19:40 retiro celulares en baúl con llave y vendados al salón. Sábado 07:00 traslado a hostería, desayuno mánagers con Coach 07:30, inicio 09:20, almuerzo 14:00 (premios Estandarte, SAI y Antorcha al mánager con mayor enrolamiento). Domingo 09:00 visiones a 10, 5 y 1 año con Ticket Dorado; 18:00 Pase de Antorcha ingresando a sala de C1 con sigilo.
+
+### 14.5 Catálogo de 14 KPIs Reales en Nodus
+- **KPI-C1-001 Asistencia de Apertura (Día 1 C1):** Meta 95%. Escaneo QR en Mesa. Deadline: Viernes 11:30 AM.
+- **KPI-C1-002 Retención del Fin de Semana (C1):** Meta > 90%. Marcación Check-out. Deadline: Domingo 19:00 PM.
+- **KPI-C1-003 Conversión C1 a C2 (PP%):** Meta 50% (52% reto). Registro Pagos Nodus. Deadline: Domingo 21:00 PM.
+- **KPI-C2-001 Asistencia de Arranque C2:** Meta 95%. Escaneo QR y Gafete. Deadline: Jueves 15:30 PM.
+- **KPI-C2-002 Declaración en Breakthrough:** Meta 90%. Conteo Físico. Deadline: Jueves 21:30 PM.
+- **KPI-C2-003 Tasa de Palabras Rotas:** Meta < 5%. Cruce Declarantes vs Caja. Deadline: Viernes 14:01 PM.
+- **KPI-C2-004 Conversión C2 a MJ (PP%):** Meta 70% (93% reto). Registro Pagos Nodus. Deadline: Domingo 19:00 PM.
+- **KPI-MJ-001 Graduados Invitados 'El Viaje':** Meta 90%. Actas Acreditación. Deadline: Domingo FDS 3 21:00 PM.
+- **KPI-MJ-002 Sentados por FDS:** Meta 70 Lima / 55 Medellín. Escaneo QR. Deadline: Viernes 19:00 PM.
+- **KPI-MJ-003 Tasa de Deserción Inter-FDS:** Meta < 5%. Check-in Consolidado. Deadline: Sábado 11:30 AM.
+- **KPI-MJ-004 Efectividad Enrolamiento Mánagers:** Meta 90%. Cruce Invitados vs Asistencia. Deadline: Sábado 11:30 AM.
+- **KPI-MJ-005 Avance de Futuros Imposibles (FI):** Meta 100%. Módulo FI Nodus. Deadline: Martes 15:00 PM.
+- **KPI-MJ-006 Firma 28 Entrenamientos Sustentables:** Meta 100%. Carga Documentos Nodus. Deadline: Domingo FDS 1 21:00 PM.
+- **KPI-MJ-007 Conversión de Graduados a Aliados:** Meta > 40%. Registro Staff Nodus. Deadline: Domingo FDS 3 21:00 PM.
+
+### 14.6 Triggers Técnicos Autónomos Backend Nodus
+1. **Trigger de Palabra Rota (Viernes C2 14:01 PM):** Si declaró Breakthrough el jueves y no tiene Ticket Verde conciliado en caja a las 14:00 PM, se activa Status_Palabra_Rota, se bloquea el código QR de acceso y se alerta a Causa OS para retención de gafete.
+2. **Trigger Alerta de Deserción de Mánagers (Miércoles pre-MJ 19:00 PM):** Si el campo de revisión de FI de los mánagers está vacío a las 19:00 PM, alerta roja al Gerente por riesgo de deserción > 40%.
+3. **Trigger de Impecabilidad Contable (Lunes 12:00 PM):** Valida conciliación completa de caja FDS (Nodus vs fichas físicas vs depósitos). Si no está cerrada, escala alerta disciplinaria de Nivel 2.
+
+### 14.7 Las 10 Palancas de Experiencia del Cliente (PX) y Filosofía Rick Rubin
+1. Seguridad psicológica en sala. 2. Participante como héroe (StoryBrand). 3. Reducción de esfuerzo de registro (Hormozi). 4. Alerta preventiva de integridad viernes 12:00 PM. 5. Impecabilidad del contenedor físico basura cero (Rubin). 6. Sostenimiento del Sistema Buddy. 7. Coaching ético sin manipulación. 8. Simplificación de tareas FI. 9. Llamadas de mánagers sin drama basadas en datos Nodus. 10. Ceremonial del Pase de Antorcha.
+Filosofía Rick Rubin: El Arte como Estado del Ser; Disciplina militar para liberar la magia cuántica; Mente de principiante (flexibilidad como autorizar zapatillas negras para el Coach); Mentalidad de abundancia; y La búsqueda de la Opción C frente a quiebres.
+
+---
 *Este documento constituye la hoja de ruta y manual de reingeniería de Crear Poder Sin Límites.*
-*Elaborado el 22 de Agosto de 2026. Clasificación: CONFIDENCIAL - EXCLUSIVO DIRECCIÓN REGIONAL.*
+*Edición Oficial Integrada: Septiembre 2026. Clasificación: CONFIDENCIAL - EXCLUSIVO DIRECCIÓN REGIONAL Y SALA.*
 
 `;
+
 
 ```
 
@@ -116920,6 +116990,248 @@ fs.writeFileSync('src/pages/Home.jsx', code, 'utf8');
 
 ---
 
+## Archivo: scratch\sheet_0.json
+
+```json
+[
+  [
+    "",
+    "DIRECTIVOS ",
+    "GERENTES ",
+    "CORDIANDORES DE C1Y2",
+    "CORDINADORES DE MJ",
+    "ENTRENADORES",
+    "QUANTUM TEAM",
+    "CAPITANES",
+    "ALIADOS",
+    "MANAGERS"
+  ],
+  [
+    "💼 Causa OS Gerencial",
+    "X",
+    "SOLO SU SEDE",
+    "SOLO SU DASH BORD",
+    "SOLO SU DASH BORD",
+    "SOLO SU DASH BORD",
+    "SOLO SU DASH BORD",
+    "SOLO SU DASH BORD",
+    "SOLO SU DASH BORD",
+    "SOLO SU DASH BORD"
+  ],
+  [
+    "📈 Portafolio PMO",
+    "X",
+    "SOLO SU SEDE",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-"
+  ],
+  [
+    "🎯 OKRs (Cascade)",
+    "X",
+    "SOLO SU SEDE",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-"
+  ],
+  [
+    "📉 Auditoría KPIs",
+    "X",
+    "SOLO SU SEDE",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-"
+  ],
+  [
+    "📘 Manual QT",
+    "X",
+    "X",
+    "X",
+    "-",
+    "-",
+    "X",
+    "-"
+  ],
+  [
+    "⚡ Directorio QT",
+    "X",
+    "X",
+    "SOLO SU SEDE",
+    "-",
+    "-",
+    "X",
+    "-"
+  ],
+  [
+    "🌐 Centro de Mando",
+    "X",
+    "SOLO SU SEDE",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-"
+  ],
+  [
+    "📅 Calendario Global",
+    "X",
+    "X",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-"
+  ],
+  [
+    "🎓 Campus Interactivo",
+    "X",
+    "X",
+    "X",
+    "X",
+    "X",
+    "X",
+    "X",
+    "X",
+    "X"
+  ],
+  [
+    "🎯 Centro Managers",
+    "X",
+    "SOLO SU SEDE",
+    "-",
+    "SOLO SU SEDE",
+    "SOLO LOS ASIGANDOS A EL",
+    "-",
+    "-"
+  ],
+  [
+    "Hoteles Sede",
+    "X",
+    "SOLO SU SEDE",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-"
+  ],
+  [
+    "Asignar Meta",
+    "X",
+    "SOLO SU SEDE",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-"
+  ],
+  [
+    "👥 Directorio de Equipo",
+    "X",
+    "X",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-"
+  ],
+  [
+    "Sistema de Cartas",
+    "-",
+    "X",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-"
+  ],
+  [
+    "copilot ",
+    "x",
+    "x"
+  ],
+  [
+    "manual nodus",
+    "x",
+    "x",
+    "x",
+    "x"
+  ],
+  [
+    "EVENTOS Y ENTRENAMIENTOS",
+    "x",
+    "x",
+    "solo los de su sede",
+    "solo los de su sede",
+    "solo los que el dara",
+    "solos de sus sede solo c1 y c2 actul y promoxmo sin entrenador",
+    "solo los de su equipo",
+    "solo los de su equipo",
+    "solo los de sus equipo"
+  ],
+  [
+    "BOTON DE COMUNICACION EFECTIVO",
+    "GOOGLE CHAT",
+    "GOOGLE CHAT",
+    "GOOGLE CHAT",
+    "GOOGLE CHAT",
+    "GOOGLE CHAT",
+    "WHATSAPP",
+    "WHATSAPP",
+    "WHATSAPP",
+    "WHATSAPP"
+  ],
+  [
+    "🎨 Flyers C1 Globales",
+    "",
+    "x",
+    "x",
+    "x"
+  ],
+  [
+    "📅 Calendario MJ",
+    "-",
+    "-",
+    "-",
+    "x",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-"
+  ],
+  [
+    "🗓️ Agenda y Time Boxing",
+    " ",
+    "x",
+    "x",
+    "x",
+    "-",
+    "-",
+    "-",
+    "-",
+    "-"
+  ]
+]
+```
+
+---
+
 ## Archivo: scratch\test_import.js
 
 ```js
@@ -118321,6 +118633,7 @@ import EmbudoConversionBoard from './pages/EmbudoConversionBoard'
 import NodusDataMap from './pages/NodusDataMap'
 import CalendarioMJ from './pages/CalendarioMJ'
 import GeneradorFlyer from './pages/GeneradorFlyer'
+import MonitorVuelosCartas from './pages/MonitorVuelosCartas'
 import AICopilot from './components/AICopilot'
 import PromptModal from './components/PromptModal'
 import BirthdayAlert from './components/BirthdayAlert'
@@ -118444,7 +118757,7 @@ function App() {
           } />
 
           <Route path="/manual-nodus" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'director_maestria', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'director_maestria', 'superadmin', 'consolidado', 'qt', 'capitan', 'entrenador', 'entrenador_llamadas', 'manager', 'aliado', 'oficina']} requireSuperAdmin={false}>
               <ManualNodus />
             </RoleRoute>
           } />
@@ -118555,7 +118868,7 @@ function App() {
           } />
 
           <Route path="/calendario-equipo" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'director_maestria']} requireSuperAdmin={false}>
               <TeamCalendar />
             </RoleRoute>
           } />
@@ -118580,10 +118893,19 @@ function App() {
 
           {/* Generador de Flyers Oficiales (02/09/2026): Generador HD 1080x1920 con fechas por sede */}
           <Route path="/generador-flyer" element={
-            <PrivateRoute>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria', 'coord_c1', 'coord_c2', 'coordinador_c1c2']} requireSuperAdmin={false}>
               <GeneradorFlyer />
-            </PrivateRoute>
+            </RoleRoute>
           } />
+
+          {/* Monitor de Vuelos y Cartas Oficiales */}
+          <Route path="/monitor-vuelos" element={
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
+              <MonitorVuelosCartas />
+            </RoleRoute>
+          } />
+          <Route path="/vuelos" element={<Navigate to="/monitor-vuelos" replace />} />
+          <Route path="/cartas" element={<Navigate to="/monitor-vuelos" replace />} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
@@ -120306,10 +120628,194 @@ Para asegurar la transición exitosa de las sedes operativas internacionales hac
 *   **Evidencias de Éxito:** 100% de las sedes operando de manera estandarizada bajo el ecosistema digital de la Plataforma Nodus, logrando una reducción del 15% en incidencias operativas globales.
 
 ---
-*Este documento constituye la hoja de ruta y manual de reingeniería de Crear Poder Sin Límites.*
-*Elaborado el 22 de Agosto de 2026. Clasificación: CONFIDENCIAL - EXCLUSIVO DIRECCIÓN REGIONAL.*
+
+## 14. MANUAL DE INTEGRACIÓN SISTÉMICA: GOBERNANZA OPERATIVA NODUS + CAUSA OS (V1.0 - SEPTIEMBRE 2026)
+
+### 14.1 El Manifiesto Nodus + Causa OS (Principios de Gobernanza)
+- **Fórmula Simbiótica:** Nodus (Datos y Trazabilidad) + Causa OS (Análisis y Acción) = Decisiones Verificables.
+- **Principio Rector:** Directo al punto. El líder es la causa, no el efecto.
+- **Nodus (Ecosistema de Datos):** Único sistema de registro, organización y trazabilidad operativa de CPSL. Concentra la información real de participantes, líderes, transacciones, compromisos, asistencia y evidencias.
+  * *Regla de Oro de Datos Nodus:* Nodus no completa datos vacíos con suposiciones. Si un participante no registra actividad o pago, el sistema muestra exclusivamente "sin actividad registrada" o "sin Ticket Verde registrado". Nodus jamás concluye de forma autónoma "el participante abandonó" o "no está comprometido".
+- **Causa OS (Sistema de Dirección):** Capa de dirección, control y mejora estratégica que identifica qué está ocurriendo, cuál puede ser la causa, qué decisión conviene tomar y cómo ejecutar cambios de forma segura sin alterar la evidencia histórica.
+  * *Regla de Oro Causa OS:* Toma la telemetría de Nodus, descarta interpretaciones subjetivas y propone planes de acción con responsables, plazos y criterios medibles, requiriendo siempre validación humana para acciones sensibles (permisos, pagos, contratos o comunicaciones masivas).
+
+### 14.2 Estructura Organizacional: Los 9 Niveles de Excelencia 2026
+- **Descontinuación de Subdirector:** El rol de 'Subdirector' queda DESCONTINUADO DE FORMA DEFINITIVA. Sus funciones comerciales y de supervisión son absorbidas en su totalidad por el Gerente de Sede.
+- **Estructura Directiva Global de CREAR PODER SIN LÍMITES:**
+  * **CEO Global:** Fer Aragon (visión corporativa y expansión multinacional).
+  * **CCO Global (Operaciones y Sala):** Paul Sosa (operaciones globales, dinámicas de sala, El Viaje y cultura).
+  * **Jefa Financiera Global (CFO):** Nancy Elizabeth Escobar Pérez / Elizabeth Escobar (auditoría contable, conciliación y control fiscal global).
+- **Los 9 Niveles de Excelencia:**
+  1. **Aliado (Nivel 1 - Logística Invisible y Espejo de Responsabilidad):** Dueño de la logística invisible. Proporción obligatoria: 1 aliado por cada 6 participantes. Foco: Ser Relación viernes y sábado, y Llamado a la Acción Extraordinario el domingo. Son graduados de Maestría seleccionados por la oficina, NUNCA por el Capitán.
+  2. **Mánager en Maestría (Nivel 2 - Líder de Acompañamiento):** Acompañamiento profundo de 90 días a máximo 6 participantes. No se traduce como 'gerente'. Declaración formal el domingo de C2.
+  3. **Capitán (Nivel 3 - Termómetro Energético):** Termómetro energético del salón. Supervisa guía telefónica y compromisos L/M/V. Nota: los aliados son seleccionados por la oficina, nunca por el Capitán.
+  4. **Quantum Team / QT (Nivel 4 - Operaciones Especiales y Sombras):** Mánagers graduados con mínimo 60% de efectividad comercial. Entrenan llamadas de Futuros Imposibles. 1 QT Senior por sede reporta a CMJ y Gerente.
+  5. **Coordinador C1 y C2 / CC1Y2 (Nivel 5 - Soporte Básico Unificado):** Rol unificado. Montaje de sala, baúles, mesa de registro y contabilidad local. Domingo C1 enfocado en capturar pagos de conversión.
+  6. **Coordinador de Maestría del Juego / CMJ (Nivel 6 - Soporte Avanzado):** Guardián de los 90 días, recluta mánagers y audita predictivamente los Futuros Imposibles (FI) en Nodus los miércoles antes de las 19:00 PM.
+  7. **Entrenador / Coach (Nivel 7 - Autoridad Contextual):** Voz de la transformación en salón y máxima autoridad contextual.
+  8. **Gerente de Sede (Nivel 8 - Dirección y Supervisión Local):** Rentabilidad, presupuesto, supervisión de Nodus, absorbe funciones del extinto subdirector, aprueba convenios de pago con firma física.
+  9. **Equipo de Oficina (Nivel 9 - Back-Office):** Asistente contable, facturación y soporte administrativo.
+
+### 14.3 Protocolo de Impecabilidad Visual (Códigos de Vestimenta 2026)
+- **Entrenador / Coach:** Estándar de Elegancia Negra Total (camiseta, camisa o saco de etiqueta negra sin estampados). **Zapatillas deportivas (tenis) de color negro absoluto TOTALMENTE PERMITIDAS** para priorizar la comodidad física y sostener la energía en sala durante jornadas prolongadas.
+- **Aliados:** Viernes: camisa/blusa negra de botones lisa, jean azul índigo liso, calzado cómodo limpio, abrigo negro. Sábado: polo azul índigo o negro de sede y jean negro. Domingo: polo de color del equipo (C2) o azul de sede (C1) y jean azul o negro.
+- **Capitanes:** Formal etiqueta negra jueves y viernes. Sábado: polo negro. Domingo: polo azul sede.
+- **Quantum Team (QT):** Viernes: camisa blanca y jean azul. Sábado: polo plomo/gris QT y jean negro. Domingo: polo azul QT y jean negro.
+- **Mánagers:** Viernes: traje sastre formal negro. Sábado: polo negro de equipo. Domingo: polo azul o de equipo.
+- **Oficina:** Jueves y viernes etiqueta negra formal. Sáb/Dom polos oficiales y pantalón negro. Diario formal sobrio.
+
+### 14.4 SOP Operativo del CMJ, Fines de Semana y "El Viaje" (FDS 4)
+- **Ritmo Semanal:** Lunes contable en Nodus; Martes seguimiento FI; Miércoles deadline de oro 19:00 PM en Nodus para cargar revisión de FI (dispara alerta roja si se omite) y Grounding virtual 19:00 a 20:00 PM.
+- **Jueves:** 15:00 PM montaje sala con altura mínima de 4.5m (para Caída de Confianza); 16:30 grounding mánagers; 17:00 auditoría física de FI; 18:00 grounding presencial Aliados C1 (cero tolerancia, puertas cerradas).
+- **Viernes:** 15:30 verificación sala; 16:00 grounding mánagers; 16:30 grounding entrenador/CMJ; 18:00 apertura; 19:00 cierre absoluto de compuertas logísticas. Noche de Confianza C1 a las 22:00 PM con tinas, agua templada con resistencias eléctricas, cremas y frutas.
+- **Sábado y Domingo:** Apertura 08:00 AM, reportes de asistencia 11:00 AM, abonos 15:00 PM. Domingo FDS 1: firma de FI; FDS 2: relación; FDS 3: graduación, medallas y diplomas. 21:00 PM cierre POS. Celebración Juego Ganado únicamente con pizza, globos y luces (mariachis prohibidos).
+- **Fin de Semana 4: "El Viaje" (Paul Sosa):** Viernes 18:15 PM auditoría baúl (24 velas eléctricas, teteras, resistencias, 5 tinas, 5 jarras, cremas); 18:30 grounding ángeles de vuelo; 19:40 retiro celulares en baúl con llave y vendados al salón. Sábado 07:00 traslado a hostería, desayuno mánagers con Coach 07:30, inicio 09:20, almuerzo 14:00 (premios Estandarte, SAI y Antorcha al mánager con mayor enrolamiento). Domingo 09:00 visiones a 10, 5 y 1 año con Ticket Dorado; 18:00 Pase de Antorcha ingresando a sala de C1 con sigilo.
+
+### 14.5 Catálogo de 14 KPIs Reales en Nodus
+- **KPI-C1-001 Asistencia de Apertura (Día 1 C1):** Meta 95%. Escaneo QR en Mesa. Deadline: Viernes 11:30 AM.
+- **KPI-C1-002 Retención del Fin de Semana (C1):** Meta > 90%. Marcación Check-out. Deadline: Domingo 19:00 PM.
+- **KPI-C1-003 Conversión C1 a C2 (PP%):** Meta 50% (52% reto). Registro Pagos Nodus. Deadline: Domingo 21:00 PM.
+- **KPI-C2-001 Asistencia de Arranque C2:** Meta 95%. Escaneo QR y Gafete. Deadline: Jueves 15:30 PM.
+- **KPI-C2-002 Declaración en Breakthrough:** Meta 90%. Conteo Físico. Deadline: Jueves 21:30 PM.
+- **KPI-C2-003 Tasa de Palabras Rotas:** Meta < 5%. Cruce Declarantes vs Caja. Deadline: Viernes 14:01 PM.
+- **KPI-C2-004 Conversión C2 a MJ (PP%):** Meta 70% (93% reto). Registro Pagos Nodus. Deadline: Domingo 19:00 PM.
+- **KPI-MJ-001 Graduados Invitados 'El Viaje':** Meta 90%. Actas Acreditación. Deadline: Domingo FDS 3 21:00 PM.
+- **KPI-MJ-002 Sentados por FDS:** Meta 70 Lima / 55 Medellín. Escaneo QR. Deadline: Viernes 19:00 PM.
+- **KPI-MJ-003 Tasa de Deserción Inter-FDS:** Meta < 5%. Check-in Consolidado. Deadline: Sábado 11:30 AM.
+- **KPI-MJ-004 Efectividad Enrolamiento Mánagers:** Meta 90%. Cruce Invitados vs Asistencia. Deadline: Sábado 11:30 AM.
+- **KPI-MJ-005 Avance de Futuros Imposibles (FI):** Meta 100%. Módulo FI Nodus. Deadline: Martes 15:00 PM.
+- **KPI-MJ-006 Firma 28 Entrenamientos Sustentables:** Meta 100%. Carga Documentos Nodus. Deadline: Domingo FDS 1 21:00 PM.
+- **KPI-MJ-007 Conversión de Graduados a Aliados:** Meta > 40%. Registro Staff Nodus. Deadline: Domingo FDS 3 21:00 PM.
+
+### 14.6 Triggers Técnicos Autónomos Backend Nodus
+1. **Trigger de Palabra Rota (Viernes C2 14:01 PM):** Si declaró Breakthrough el jueves y no tiene Ticket Verde conciliado en caja a las 14:00 PM, se activa Status_Palabra_Rota, se bloquea el código QR de acceso y se alerta a Causa OS para retención de gafete.
+2. **Trigger Alerta de Deserción de Mánagers (Miércoles pre-MJ 19:00 PM):** Si el campo de revisión de FI de los mánagers está vacío a las 19:00 PM, alerta roja al Gerente por riesgo de deserción > 40%.
+3. **Trigger de Impecabilidad Contable (Lunes 12:00 PM):** Valida conciliación completa de caja FDS (Nodus vs fichas físicas vs depósitos). Si no está cerrada, escala alerta disciplinaria de Nivel 2.
+
+### 14.7 Las 10 Palancas de Experiencia del Cliente (PX) y Filosofía Rick Rubin
+1. Seguridad psicológica en sala. 2. Participante como héroe (StoryBrand). 3. Reducción de esfuerzo de registro (Hormozi). 4. Alerta preventiva de integridad viernes 12:00 PM. 5. Impecabilidad del contenedor físico basura cero (Rubin). 6. Sostenimiento del Sistema Buddy. 7. Coaching ético sin manipulación. 8. Simplificación de tareas FI. 9. Llamadas de mánagers sin drama basadas en datos Nodus. 10. Ceremonial del Pase de Antorcha.
+Filosofía Rick Rubin: El Arte como Estado del Ser; Disciplina militar para liberar la magia cuántica; Mente de principiante (flexibilidad como autorizar zapatillas negras para el Coach); Mentalidad de abundancia; y La búsqueda de la Opción C frente a quiebres.
+
+---
+
+## 15. MANUAL DE ENROLAMIENTO NARRATIVO: BRANDSCRIPT Y GUIONES DE COMUNICACIÓN PARA MAESTRÍA DEL JUEGO (MJ)
+### EDICIÓN V1.0 — CREAR PODER SIN LÍMITES 2026
+
+Este manual constituye la herramienta definitiva para que la Gerencia de Sede, los Capitanes, Aliados y Mánagers unifiquen su narrativa comercial bajo el **StoryBrand Framework (SB7)** y el **Neuromarketing Ético**. Su propósito es estructurar mensajes de alto impacto y guiones telefónicos que reduzcan el esfuerzo y sacrificio percibidos por los graduados de Capítulo Dos (C2), guiándolos hacia un compromiso voluntario y de alta integridad con la **Maestría del Juego (MJ)** de 90 días.
+
+### 15.1 El Marco Ontológico: El Viaje del Héroe en la Maestría
+En la cultura de alto rendimiento de **Crear Poder Sin Límites (CPSL)**, no operamos desde la venta tradicional ni desde el empuje comercial invasivo. Operamos desde la **creación de contexto**:
+- **El Participante es el Héroe:** El graduado de Capítulo Dos (C2) es el único protagonista de su propia película. Él es quien debe enfrentar a sus «dragones cotidianos» (la inercia, la zona de confort, el escepticismo de su entorno).
+- **La Organización es el Guía:** Los Mánagers y Aliados encarnan el arquetipo del Mentor (el Guía), proveyendo empatía, autoridad ética, un plan simplificado y un llamado irrazonable a la acción.
+- **El Combustible es la Elección Voluntaria:** El enrolamiento es un acto de amor y estiramiento. Todo acuerdo financiero o de asistencia debe nacer de la libre elección del participante, erradicando cualquier forma de coacción, manipulación o culpa.
+
+### 15.2 El Brandscript Oficial de Maestría del Juego (SB7-MJ)
+1. **Un Personaje (El Héroe):** Graduado de Capítulo Dos (C2). Un líder que ha despertado su poder en sala y busca materializarlo en la fisionomía de su vida diaria.
+2. **Tiene un Problema (El Efecto Lunes):**
+   - *Externo:* Volver a un entorno que no comprende su transformación.
+   - *Interno:* Miedo al auto-sabotaje y a quedarse solo.
+   - *Filosófico:* Es inaceptable regresar a vivir una vida promedio tras haber conocido su grandeza.
+3. **Encuentra un Guía:** El equipo de Mánagers y la Plataforma Nodus. Un mentor empático (que ya recorrió los 90 días) y con autoridad técnica (respaldado por la telemetría de Nodus).
+4. **Que le da un Plan de 3 Pasos:**
+   - *Paso 1:* Declara tu Futuro Imposible (FI).
+   - *Paso 2:* Entrena en Integridad (28 Entrenamientos Sustentables).
+   - *Paso 3:* Conquista «El Viaje» y gradúate en Gratitud.
+5. **Y lo llama a la Acción:**
+   - *CTA Directo:* Registrarse en Nodus en la mesa de conversión del domingo.
+   - *CTA Transicional:* Agendar sesión de calibración de FI de 15 minutos.
+6. **Que evita el Fracaso:** Evitar el marchitamiento de la palabra. Caer de vuelta en la anestesia de la víctima («la arena»), perdiendo el impulso de su Breakthrough de jueves.
+7. **Y termina en Éxito:** Convertirse en un Líder IMO. Vivir en coherencia, manifestando abundancia física, emocional y financiera como una consecuencia natural de su Ser.
+
+### 15.3 Guiones de Llamadas Telefónicas para Mánagers
+*Premisa de Neuromarketing Ético: «Calmar al Perro Guardián» (Reptil) en los primeros 15 segundos mediante la simpatía y el respeto a su tiempo.*
+
+#### Escenario A: El graduado de C2 indeciso o con miedo al «efecto lunes»
+- **Paso 1: Apertura y Conexión (Calmar al Reptil):**
+  > «Hola [Nombre del Participante], te saluda [Nombre del Mánager], tu mánager de soporte. Qué gusto saludarte. Te llamo brevemente, ¿estás en un espacio cómodo de 3 minutos para conversar?»
+- **Paso 2: Validación de Fisionomía:**
+  > «Aún vibra en mí el espacio del domingo de Capítulo Dos. Quiero reconocer la fisonomía y la entrega que mostraste en tu Breakthrough. Vi a un creador absoluto en la sala. ¿Cómo se ha sentido apagar el micrófono y regresar a la rutina estos dos días?»
+- **Paso 3: Identificación del Problema Interno (StoryBrand):**
+  > [Escuchar activamente sin interrumpir]. «Es completamente natural, [Nombre]. La inercia del día a día es fuerte y volver al 'mundo real' sin una estructura puede sentirse como tratar de nadar contracorriente en la arena. Sabes que tienes el potencial, pero sostener la autodisciplina solo es sumamente retador.»
+- **Paso 4: Presentación del Plan de 3 Pasos:**
+  > «Por eso creamos la Maestría del Juego de 90 días. No es más teoría; es la pista de entrenamiento física para consolidar tu resultado. El plan es muy sencillo: primero, declaramos un Futuro Imposible en salud, finanzas o relaciones; segundo, entrenamos diariamente en integridad con el soporte de tu mánager y la Plataforma Nodus; y tercero, nos graduamos juntos en Gratitud. Tú pones la visión, nosotros la estructura de bajo riesgo.»
+- **Paso 5: Llamado a la Acción Directo (CTA):**
+  > «[Nombre], tu palabra de jueves sigue viva. ¿Eliges sostener tu estiramiento y dar el paso a tu Maestría este fin de semana, o vas a permitir que la inercia del lunes tome las decisiones por ti?»
+
+#### Escenario B: Tratamiento ético ante la objeción «No tengo dinero»
+*Rigor de Causa OS: No debatir el dinero como un problema absoluto; elevar el valor percibido usando la Ecuación de Valor (Hormozi) para reencuadrar la inversión en el Ser.*
+- **Enfoque Ontológico:**
+  - *Hecho objetivo:* El dinero es una variable de prioridades.
+  - *Acción incorrecta (Manipulación Prohibida):* «Si no entras, es porque no te amas» o «Consíguete una tarjeta prestada si de verdad te importa tu familia». (Genera rechazo y destruye la seguridad psicológica).
+  - *Acción correcta (Coaching Ético):* Separar el hecho de la interpretación y explorar soluciones de bajo riesgo.
+- **Diálogo de Aplicación:**
+  > **Participante:** «De verdad quiero hacer la Maestría, pero el dinero es mi límite en este momento. No tengo cómo cubrir la inversión.»
+  >
+  > **Mánager (Guía):** «Reconozco tu honestidad, [Nombre]. El dinero es un factor real. Si dejamos la inversión a un lado por un instante... en tu corazón, ¿la Maestría representa un 'sí' rotundo para tu vida, o tienes alguna duda sobre el valor que este entrenamiento aportará a tus metas?»
+  >
+  > **Participante:** «No, el entrenamiento sé que es increíble y me sirve, es solo que físicamente no tengo el dinero hoy.»
+  >
+  > **Mánager (Causa OS):** «Perfecto. Gracias por aclarar que la fisionomía del entrenamiento es un 'sí' para ti. En la cultura de Crear, operamos desde la Causa: si tú eres el creador de tu realidad, el dinero es una circunstancia a diseñar, no un límite inamovible. Si la Plataforma Nodus nos permite estructurar un plan de abono de bajo riesgo y pasos progresivos que se adapte a tus flujos actuales, ¿qué opciones ves viables para generar tu primer aporte de reserva antes de que cerremos el registro este viernes?»
+  >
+  > **Participante:** «Podría dar una parte este viernes y el saldo en dos cuotas los fines de semana de módulo.»
+  >
+  > **Mánager:** «Excelente. Eso es un creador en acción. Vamos a registrar ese plan de pago en Nodus bajo aprobación de la Gerencia para activar tu 'Ticket Verde' de inmediato. Bienvenido al juego de los 90 días.»
+
+### 15.4 Plantillas de Mensajes de WhatsApp de Alto Impacto
+#### Mensaje 1: Bienvenida e Invitación Inmediata (Post-Graduación C2)
+*Diseñado bajo el principio de «Unidad» de Cialdini para pertenencia instantánea:*
+```text
+¡Felicidades, Creador! 🦅✨
+
+Aún resuena en la sede la fisionomía y la fuerza de tu palabra declarada este fin de semana en Capítulo Dos. Has salido de "la arena" y hoy tienes en tus manos la posibilidad de diseñar tu propio destino.
+
+El lunes ha llegado, y con él, la oportunidad de elegir: ¿volver a la inercia cotidiana o entrenar para consolidar tu Breakthrough?
+
+El equipo de Mánagers y la comunidad de Maestría del Juego ya está lista para recibirte en el contenedor de los 90 días. Tu espacio de estiramiento está guardado.
+
+Paso 1: Ingresa a tu App Nodus 📱
+Paso 2: Agenda tu sesión de calibración de Futuro Imposible (FI) de 15 minutos aquí: [Enlace_Calendly]
+Paso 3: Sostiene tu palabra.
+
+Sostener la fisionomía del Ser es el juego de los grandes. Nos vemos en la cancha. 
+
+Atentamente,
+El Equipo de Mánagers y Capitanes de [Sede]
+CREAR PODER SIN LÍMITES 2026.
+```
+
+#### Mensaje 2: Recordatorio Preventivo de Integridad (Viernes de C2 — 12:00 PM)
+*Neuromarketing Ético: Sustituye el estrés de la penalización de «Palabra Rota» por un llamado preventivo al orden y cuidado de su palabra antes del trigger de las 14:00 PM:*
+```text
+Hola, [Nombre] 👋
+
+Te saludamos desde la oficina de la sede. Hoy es viernes de Capítulo Dos, un día clave para cuidar el contenedor de integridad que declaraste el jueves por la noche.
+
+Para asegurar que tu ingreso al bloque de confrontación de las 15:00 PM sea fluido y libre de distracciones logísticas:
+
+📌 Tu estado actual en Nodus requiere conciliación de caja.
+⏰ El cierre automático de registros contables de la plataforma se ejecutará a las 14:00 PM.
+
+Queremos cuidar tu experiencia y tu palabra. Por favor, acércate a la mesa externa de registro antes de la hora límite o envíanos tu comprobante digital por esta vía para validar tu "Ticket Verde" en el sistema.
+
+Si tienes algún quiebre técnico o financiero de última hora, avísanos de inmediato para diseñar juntos una solución de bajo riesgo con el Gerente de Sede antes de que el sistema aplique el bloqueo automático.
+
+¡Sostener tu palabra es tu mayor poder! Nos vemos en sala. 🛡️
+CREAR PODER SIN LÍMITES
+```
+
+### 15.5 Checklist de Impecabilidad del Enrolador Narrativo
+1. **Cero Simpatía al Drama:** ¿Estoy escuchando la justificación del participante con lástima, o lo estoy sosteniendo en su grandeza y capacidad de resolver? (La simpatía debilita al participante; la compasión y el rigor lo empoderan).
+2. **Datos vs. Interpretaciones:** ¿La objeción del participante es un hecho duro comprobable (ej. «no tengo saldo disponible en esta tarjeta») o es una interpretación basada en el miedo (ej. «es que nunca voy a poder pagar eso»)?
+3. **Respeto Absoluto a la Autonomía:** ¿Estoy permitiendo que la decisión final y el plan de abono nazcan de la elección voluntaria del participante, o lo estoy presionando usando argumentos de culpa o escasez falsa?
+4. **Fisionomía de Voz y Corporalidad:** Aunque la conversación sea telefónica o por chat, ¿mi postura física refleja la fisionomía de un líder cuántico (espalda erguida, sonrisa telefónica, tono firme y amoroso)?
+5. **Trazabilidad en Nodus:** ¿He registrado de manera limpia y sin suposiciones cada acuerdo de pago, fecha límite y avance de Futuro Imposible en la plataforma para que la Gerencia de Sede cuente con datos de control impecables?
+
+---
+*Este documento constituye la hoja de ruta y manual de reingeniería de CREAR PODER SIN LÍMITES.*
+*Edición Oficial Integrada: Septiembre 2026. Clasificación: CONFIDENCIAL - EXCLUSIVO DIRECCIÓN REGIONAL Y SALA.*
 
 `;
+
 
 ```
 
@@ -121948,6 +122454,114 @@ export default function DriveDashboard({ globalFilterSede }) {
 
 ---
 
+## Archivo: src\components\EffectiveCommunicationButton.jsx
+
+```javascript
+import React from 'react';
+import { MessageSquare, PhoneCall, ExternalLink } from 'lucide-react';
+import { getEffectiveCommunicationChannel } from '../config/permissions';
+
+/**
+ * Botón de Comunicación Efectiva Oficial
+ * Implementa la Fila 18 de la Matriz Oficial de Roles Causa OS:
+ * - Directivos, Gerentes, Coords C1/C2, Coords MJ, Entrenadores: GOOGLE CHAT
+ * - Quantum Team, Capitanes, Aliados, Managers: WHATSAPP
+ */
+export default function EffectiveCommunicationButton({ currentUser, style = {} }) {
+  if (!currentUser) return null;
+
+  const channel = getEffectiveCommunicationChannel(currentUser);
+  const isGoogleChat = channel === 'GOOGLE_CHAT';
+
+  const handleClick = () => {
+    if (isGoogleChat) {
+      window.open('https://mail.google.com/chat/u/0/', '_blank', 'noopener,noreferrer');
+    } else {
+      window.open('https://web.whatsapp.com/', '_blank', 'noopener,noreferrer');
+    }
+  };
+
+  if (isGoogleChat) {
+    return (
+      <button
+        type="button"
+        onClick={handleClick}
+        className="btn-secondary"
+        title="Canal Oficial de Comunicación: Google Chat Corporativo (@crearpsl.net)"
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '0.45rem',
+          padding: '0.42rem 0.85rem',
+          fontSize: '0.82rem',
+          fontWeight: 700,
+          background: 'rgba(0, 172, 193, 0.12)',
+          color: '#26c6da',
+          border: '1px solid rgba(38, 198, 218, 0.4)',
+          borderRadius: '8px',
+          cursor: 'pointer',
+          transition: 'all 0.2s ease',
+          boxShadow: '0 2px 8px rgba(0, 172, 193, 0.15)',
+          ...style
+        }}
+        onMouseOver={(e) => {
+          e.currentTarget.style.background = 'rgba(0, 172, 193, 0.22)';
+          e.currentTarget.style.boxShadow = '0 0 12px rgba(38, 198, 218, 0.4)';
+        }}
+        onMouseOut={(e) => {
+          e.currentTarget.style.background = 'rgba(0, 172, 193, 0.12)';
+          e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 172, 193, 0.15)';
+        }}
+      >
+        <MessageSquare size={15} color="#26c6da" />
+        <span>Google Chat</span>
+        <ExternalLink size={12} style={{ opacity: 0.7 }} />
+      </button>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={handleClick}
+      className="btn-secondary"
+      title="Canal Oficial de Comunicación: WhatsApp de Coordinación de Equipo"
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '0.45rem',
+        padding: '0.42rem 0.85rem',
+        fontSize: '0.82rem',
+        fontWeight: 700,
+        background: 'rgba(37, 211, 102, 0.12)',
+        color: '#25D366',
+        border: '1px solid rgba(37, 211, 102, 0.4)',
+        borderRadius: '8px',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease',
+        boxShadow: '0 2px 8px rgba(37, 211, 102, 0.15)',
+        ...style
+      }}
+      onMouseOver={(e) => {
+        e.currentTarget.style.background = 'rgba(37, 211, 102, 0.22)';
+        e.currentTarget.style.boxShadow = '0 0 12px rgba(37, 211, 102, 0.4)';
+      }}
+      onMouseOut={(e) => {
+        e.currentTarget.style.background = 'rgba(37, 211, 102, 0.12)';
+        e.currentTarget.style.boxShadow = '0 2px 8px rgba(37, 211, 102, 0.15)';
+      }}
+    >
+      <PhoneCall size={15} color="#25D366" />
+      <span>WhatsApp</span>
+      <ExternalLink size={12} style={{ opacity: 0.7 }} />
+    </button>
+  );
+}
+
+```
+
+---
+
 ## Archivo: src\components\ErrorBoundary.jsx
 
 ```javascript
@@ -122856,6 +123470,23 @@ export default function HelpModal({ isOpen, onClose }) {
                 </div>
               )}
 
+              {/* ENLACE DIRECTO MANUAL NODUS & GOBERNANZA SISTÉMICA 2026 */}
+              <div style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid #10b981', padding: '1.2rem', margin: '1rem 0', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.8rem' }}>
+                <div>
+                  <h4 style={{ color: '#10b981', margin: '0 0 0.3rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <BookOpen size={20} /> Centro de Gobernanza Nodus + Causa OS (2026)
+                  </h4>
+                  <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-main)' }}>Manifiesto simbiótico, los 9 niveles de excelencia, códigos de vestimenta, 14 KPIs oficiales y los 18 capítulos paso a paso de Nodus.</p>
+                </div>
+                <button 
+                  onClick={() => { onClose(); navigate('/manual-nodus'); }}
+                  className="btn-primary" 
+                  style={{ background: '#10b981', borderColor: '#10b981', color: '#fff', padding: '0.5rem 1.2rem', fontSize: '0.85rem', cursor: 'pointer', borderRadius: '6px', fontWeight: 800 }}
+                >
+                  📗 Abrir Manual Nodus ↗
+                </button>
+              </div>
+
               {/* RECURSO OFICIAL: PROTOCOLO DE EMERGENCIAS CREAR GLOBAL */}
               <div style={{ background: 'rgba(239, 68, 68, 0.12)', border: '1px solid #ef4444', padding: '1.2rem', margin: '1rem 0', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.8rem' }}>
                 <div>
@@ -122904,7 +123535,7 @@ export default function HelpModal({ isOpen, onClose }) {
                     <li><strong>Tab CMJ:</strong> Consolidado automático (desde Drive) que suma la retención, deserción y enrolamiento total de <em>todos</em> los Coordinadores de la Maestría de la sede seleccionada.</li>
                     <li><strong>Tab Entrenadores Maestría:</strong> Métricas operativas de avance, gráficas y cierres enfocadas en el desempeño del Entrenador por sede.</li>
                     <li><strong>Tab Auditoría de KPIs:</strong> Espacio exclusivo para revisar y auditar los formularios semanales cargados manualmente por el Quantum Team (QT y Coordinadores).</li>
-                    <li><strong>Horarios de Entrenamiento (Nuevo):</strong> Consulta rápidamente la disponibilidad y código de vestimenta de cada capítulo en tu Dashboard principal.</li>
+                    <li><strong>Horarios de Entrenamiento y Vestimenta:</strong> Consulta el cronograma oficial de sala (Jueves a Domingo) y código de vestimenta haciendo clic en el botón <strong>⏰ Horarios y Vestimenta</strong> en la barra superior de Inicio, en el Dashboard Gerencial o en el Manual Nodus.</li>
                     <li><strong>Flyers Globales:</strong> Acceso a recursos de diseño para Capítulo 1 en la pantalla de inicio.</li>
                   </ul>
                 </>
@@ -122992,6 +123623,420 @@ export default function HelpModal({ isOpen, onClose }) {
         onClose={() => setShowTour(false)}
         user={currentUser}
       />
+    </div>
+  );
+}
+
+```
+
+---
+
+## Archivo: src\components\HorariosEntrenamientoModal.jsx
+
+```javascript
+import React, { useState } from 'react';
+import { X, Clock, Shirt, Sparkles, CheckCircle2, ShieldCheck, Calendar, Info, Briefcase, Building, UserCheck } from 'lucide-react';
+
+export default function HorariosEntrenamientoModal({ isOpen, onClose }) {
+  const [activeTab, setActiveTab] = useState('todos_equipo'); // 'todos_equipo' | 'oficina' | 'gerentes' | 'coordinadores' | 'sala_c1' | 'sala_c2' | 'sala_mj'
+
+  if (!isOpen) return null;
+
+  return (
+    <div 
+      className="modal-backdrop" 
+      onClick={onClose}
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.85)',
+        backdropFilter: 'blur(8px)',
+        zIndex: 99999,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '1rem',
+        animation: 'fadeIn 0.2s ease-out'
+      }}
+    >
+      <div 
+        className="glass-panel" 
+        onClick={e => e.stopPropagation()}
+        style={{
+          width: '100%',
+          maxWidth: '1100px',
+          maxHeight: '92vh',
+          overflowY: 'auto',
+          background: 'var(--bg-card, #0f172a)',
+          borderRadius: '16px',
+          border: '1px solid rgba(41, 171, 226, 0.3)',
+          boxShadow: '0 25px 60px rgba(0,0,0,0.8), 0 0 30px rgba(41, 171, 226, 0.15)',
+          padding: '2rem',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '1.4rem',
+          color: 'var(--text-main, #f8fafc)'
+        }}
+      >
+        {/* HEADER */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '1rem' }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.3rem' }}>
+              <Clock size={28} color="var(--crear-cyan, #29abe2)" />
+              <h2 style={{ margin: 0, fontSize: '1.45rem', fontWeight: 800, color: 'var(--text-heading, #fff)', letterSpacing: '-0.5px' }}>
+                Horarios y Turnos Operativos del Equipo
+              </h2>
+            </div>
+            <p style={{ margin: 0, fontSize: '0.88rem', color: 'var(--text-muted, #94a3b8)' }}>
+              Protocolo de jornadas, turnos, atención y fisionomía para <strong>Equipo de Oficina, Gerentes de Sede y Coordinadores</strong> — <strong>CREAR PODER SIN LÍMITES</strong>.
+            </p>
+          </div>
+          <button 
+            onClick={onClose}
+            className="btn-icon"
+            style={{
+              background: 'rgba(255,255,255,0.06)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: '50%',
+              width: '36px',
+              height: '36px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              color: 'var(--text-muted, #94a3b8)',
+              transition: 'all 0.2s'
+            }}
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        {/* TABS DE FILTRO */}
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          {[
+            { id: 'todos_equipo', label: '👥 Resumen de Todo el Equipo' },
+            { id: 'oficina', label: '🏢 Equipo de Oficina (Soporte)' },
+            { id: 'gerentes', label: '👔 Gerentes de Sede (Nivel 8)' },
+            { id: 'coordinadores', label: '🎯 Coordinadores (CC1Y2 & CMJ)' },
+            { id: 'sala_c1', label: '🟣 Sala C1' },
+            { id: 'sala_c2', label: '🔵 Sala C2' },
+            { id: 'sala_mj', label: '🟡 Sala Maestría' }
+          ].map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              style={{
+                padding: '0.45rem 0.9rem',
+                borderRadius: '8px',
+                fontSize: '0.82rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                border: activeTab === tab.id ? '1px solid var(--crear-cyan, #29abe2)' : '1px solid rgba(255,255,255,0.1)',
+                background: activeTab === tab.id ? 'rgba(41, 171, 226, 0.15)' : 'rgba(255,255,255,0.03)',
+                color: activeTab === tab.id ? 'var(--crear-cyan, #29abe2)' : 'var(--text-muted, #94a3b8)'
+              }}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* CONTENEDOR DE SECCIONES */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.25rem' }}>
+          
+          {/* SECCIÓN 1: EQUIPO DE OFICINA */}
+          {(activeTab === 'todos_equipo' || activeTab === 'oficina') && (
+            <div 
+              className="glass-panel" 
+              style={{ 
+                padding: '1.25rem', 
+                borderTop: '4px solid #0ea5e9', 
+                borderRadius: '12px',
+                background: 'rgba(14, 165, 233, 0.04)' 
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
+                <h3 style={{ color: '#38bdf8', margin: 0, fontSize: '1.15rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <Building size={18} /> Equipo de Oficina
+                </h3>
+                <span style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: '12px', background: 'rgba(14, 165, 233, 0.2)', color: '#38bdf8', fontWeight: 'bold' }}>
+                  Soporte Back-Office
+                </span>
+              </div>
+              <table style={{ width: '100%', fontSize: '0.82rem', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.72rem' }}>
+                    <th style={{ padding: '0.4rem 0' }}>DÍA</th>
+                    <th style={{ padding: '0.4rem 0' }}>TURNO / ACTIVIDAD</th>
+                    <th style={{ padding: '0.4rem 0', textAlign: 'right' }}>HORARIO</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Lunes a Jueves</td>
+                    <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>Atención, cobranzas, facturación y soporte</td>
+                    <td style={{ padding: '0.5rem 0', textAlign: 'right', color: 'var(--crear-cyan)', fontWeight: 'bold' }}>09:00 - 18:00</td>
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Jueves</td>
+                    <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>Llegada de oficina, terminales Nodus y caja</td>
+                    <td style={{ padding: '0.5rem 0', textAlign: 'right' }}>15:00 - 20:00</td>
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(14, 165, 233, 0.08)' }}>
+                    <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Viernes</td>
+                    <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>
+                      Apertura mesas registro (07:45 Llegada)<br/>
+                      Reporte nocturno de caja y asistencia
+                    </td>
+                    <td style={{ padding: '0.5rem 0', textAlign: 'right', color: '#38bdf8', fontWeight: 'bold' }}>07:45 - 23:30</td>
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Sábado</td>
+                    <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>Entrega Ticket Naranja y soporte sala</td>
+                    <td style={{ padding: '0.5rem 0', textAlign: 'right' }}>08:00 - 22:30</td>
+                  </tr>
+                  <tr>
+                    <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Domingo</td>
+                    <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>
+                      Mesas de enrolamiento C2<br/>
+                      <strong style={{ color: '#ef4444' }}>Cierre Contable POS (21:00)</strong>
+                    </td>
+                    <td style={{ padding: '0.5rem 0', textAlign: 'right', color: '#ef4444', fontWeight: 'bold' }}>08:00 - 22:00</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* SECCIÓN 2: GERENTES DE SEDE */}
+          {(activeTab === 'todos_equipo' || activeTab === 'gerentes') && (
+            <div 
+              className="glass-panel" 
+              style={{ 
+                padding: '1.25rem', 
+                borderTop: '4px solid #f59e0b', 
+                borderRadius: '12px',
+                background: 'rgba(245, 158, 11, 0.04)' 
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
+                <h3 style={{ color: '#fbbf24', margin: 0, fontSize: '1.15rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <ShieldCheck size={18} /> Gerentes de Sede
+                </h3>
+                <span style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: '12px', background: 'rgba(245, 158, 11, 0.2)', color: '#fbbf24', fontWeight: 'bold' }}>
+                  Nivel 8 (Gobernanza)
+                </span>
+              </div>
+              <table style={{ width: '100%', fontSize: '0.82rem', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.72rem' }}>
+                    <th style={{ padding: '0.4rem 0' }}>DÍA</th>
+                    <th style={{ padding: '0.4rem 0' }}>SUPERVISIÓN / DEADLINE</th>
+                    <th style={{ padding: '0.4rem 0', textAlign: 'right' }}>HORARIO</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Lunes</td>
+                    <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>
+                      Cierre de Caja FDS en Nodus<br/>
+                      <span style={{ color: '#ef4444', fontWeight: 'bold' }}>Trigger Impecabilidad Contable</span>
+                    </td>
+                    <td style={{ padding: '0.5rem 0', textAlign: 'right', color: '#fbbf24', fontWeight: 'bold' }}>08:30 - 12:00 (Deadline)</td>
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Martes</td>
+                    <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>Auditoría salones, hotel y honorarios coach</td>
+                    <td style={{ padding: '0.5rem 0', textAlign: 'right' }}>09:00 - 13:00</td>
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Miércoles</td>
+                    <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>
+                      <strong style={{ color: '#ef4444' }}>Deadline Alerta Deserción:</strong> validación de carga de FI en Nodus
+                    </td>
+                    <td style={{ padding: '0.5rem 0', textAlign: 'right', color: '#ef4444', fontWeight: 'bold' }}>Hasta 19:00 PM</td>
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Jueves</td>
+                    <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>Supervisión de montaje (techo mín 4.5m y audio)</td>
+                    <td style={{ padding: '0.5rem 0', textAlign: 'right' }}>14:30 - 20:30</td>
+                  </tr>
+                  <tr>
+                    <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Viernes a Domingo</td>
+                    <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>
+                      Viernes 14:01 Trigger Palabra Rota C2<br/>
+                      Domingo liderazgo de mesas enrolamiento
+                    </td>
+                    <td style={{ padding: '0.5rem 0', textAlign: 'right', color: 'var(--crear-cyan)', fontWeight: 'bold' }}>08:00 - Cierre</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* SECCIÓN 3: COORDINADORES (CC1Y2 Y CMJ) */}
+          {(activeTab === 'todos_equipo' || activeTab === 'coordinadores') && (
+            <div 
+              className="glass-panel" 
+              style={{ 
+                padding: '1.25rem', 
+                borderTop: '4px solid #8b5cf6', 
+                borderRadius: '12px',
+                background: 'rgba(139, 92, 246, 0.04)' 
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
+                <h3 style={{ color: '#a78bfa', margin: 0, fontSize: '1.15rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <UserCheck size={18} /> Coordinadores
+                </h3>
+                <span style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: '12px', background: 'rgba(139, 92, 246, 0.2)', color: '#c4b5fd', fontWeight: 'bold' }}>
+                  CC1Y2 & CMJ (Nivel 5 y 6)
+                </span>
+              </div>
+              <table style={{ width: '100%', fontSize: '0.82rem', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.72rem' }}>
+                    <th style={{ padding: '0.4rem 0' }}>DÍA</th>
+                    <th style={{ padding: '0.4rem 0' }}>GROUNDINGS & SALAS</th>
+                    <th style={{ padding: '0.4rem 0', textAlign: 'right' }}>HORARIO</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Miércoles</td>
+                    <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>
+                      CMJ: Deadline carga de FI (19:00)<br/>
+                      CC1Y2: Grounding virtual aliados (20:00)
+                    </td>
+                    <td style={{ padding: '0.5rem 0', textAlign: 'right', color: '#c4b5fd', fontWeight: 'bold' }}>19:00 - 21:00</td>
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Jueves</td>
+                    <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>
+                      15:00 Montaje de sala herradura<br/>
+                      18:00 Grounding presencial aliados C1
+                    </td>
+                    <td style={{ padding: '0.5rem 0', textAlign: 'right' }}>15:00 - 20:00</td>
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Viernes</td>
+                    <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>
+                      08:00 Grounding aliados C1<br/>
+                      22:00 Noche de Confianza con tinas
+                    </td>
+                    <td style={{ padding: '0.5rem 0', textAlign: 'right', color: 'var(--crear-cyan)', fontWeight: 'bold' }}>07:45 - 23:30</td>
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Sábado</td>
+                    <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>Seguridad Caída de Confianza (4 apoyos)</td>
+                    <td style={{ padding: '0.5rem 0', textAlign: 'right' }}>07:45 - 22:30</td>
+                  </tr>
+                  <tr>
+                    <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Domingo</td>
+                    <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>
+                      Control mesa enrolamiento C2 (Ticket Rojo)<br/>
+                      18:00 Pase de Antorcha de Maestría
+                    </td>
+                    <td style={{ padding: '0.5rem 0', textAlign: 'right', color: '#f59e0b', fontWeight: 'bold' }}>08:00 - 21:30</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* SECCIONES DE SALA (C1, C2, MJ) */}
+          {(activeTab === 'sala_c1') && (
+            <div className="glass-panel" style={{ padding: '1.25rem', borderTop: '4px solid #8b5cf6', borderRadius: '12px' }}>
+              <h3 style={{ color: '#a78bfa', margin: '0 0 0.8rem 0' }}>🟣 Horarios de Sala: Capítulo UNO (C1)</h3>
+              <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: 0 }}>
+                • Jueves: 4:30 PM - Cierre (Negro)<br/>
+                • Viernes: 7:30 AM - 3:00 PM y 5:00 PM - Cierre (Noche de Confianza, Negro formal)<br/>
+                • Sábado: 8:00 AM - 4:00 PM y 3:00 PM - Cierre (Polo negro)<br/>
+                • Domingo: 8:00 AM - Cierre (Graduación)
+              </p>
+            </div>
+          )}
+
+          {(activeTab === 'sala_c2') && (
+            <div className="glass-panel" style={{ padding: '1.25rem', borderTop: '4px solid #29abe2', borderRadius: '12px' }}>
+              <h3 style={{ color: 'var(--crear-cyan)', margin: '0 0 0.8rem 0' }}>🔵 Horarios de Sala: Capítulo DOS (C2)</h3>
+              <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: 0 }}>
+                • Jueves: 10:30 AM - 4:00 PM y 4:00 PM - Cierre (Negro formal)<br/>
+                • Viernes: 7:15 AM - 4:00 PM y 4:00 PM - Cierre (14:01 PM Palabra Rota)<br/>
+                • Sábado: 7:30 AM - 3:00 PM y 3:00 PM - Cierre (Polo negro)<br/>
+                • Domingo: Inicio - Cierre y 3:00 PM - Cierre
+              </p>
+            </div>
+          )}
+
+          {(activeTab === 'sala_mj') && (
+            <div className="glass-panel" style={{ padding: '1.25rem', borderTop: '4px solid #f59e0b', borderRadius: '12px' }}>
+              <h3 style={{ color: '#f59e0b', margin: '0 0 0.8rem 0' }}>🟡 Horarios de Sala: Maestría del Juego (MJ)</h3>
+              <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', margin: 0 }}>
+                • Viernes: 3:00 PM - 9:00 PM (Alineamiento, Negro formal)<br/>
+                • Sábado: 8:30 AM - 12:00 PM y 4:00 PM - 9:00 PM<br/>
+                • Domingo: 8:30 AM - 12:00 PM y 4:00 PM - Cierre (FDS 4 El Viaje con Paul Sosa y Pase de Antorcha a las 18:00 PM)
+              </p>
+            </div>
+          )}
+
+        </div>
+
+        {/* NOTA DE VESTIMENTA OFICIAL Y SNEAKERS */}
+        <div 
+          style={{ 
+            background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(41, 171, 226, 0.05))', 
+            border: '1px solid rgba(245, 158, 11, 0.35)', 
+            borderRadius: '12px', 
+            padding: '1.2rem',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.5rem'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', color: '#f59e0b', fontWeight: 800, fontSize: '0.92rem' }}>
+            <Shirt size={18} />
+            <span>CÓDIGO DE VESTIMENTA & AUTORIZACIÓN 2026 — CREAR PODER SIN LÍMITES</span>
+          </div>
+          <div style={{ fontSize: '0.84rem', lineHeight: '1.5', color: 'var(--text-main)' }}>
+            <p style={{ margin: '0 0 0.3rem 0' }}>
+              • <strong>Equipo de Oficina:</strong> Jueves y viernes de entrenamiento visten de etiqueta negra formal. Sábados y domingos utilizan polos oficiales combinados con pantalón negro y calzado sobrio.
+            </p>
+            <p style={{ margin: '0 0 0.3rem 0' }}>
+              • <strong>Gerentes y Coordinadores:</strong> Etiqueta negra formal en aperturas, Noches de Confianza y groundings iniciales. Polos oficiales el fin de semana.
+            </p>
+            <p style={{ margin: 0, color: 'var(--crear-cyan)', fontWeight: 600 }}>
+              👟 <strong>Entrenador / Coach:</strong> Autorización formal de utilizar <strong>zapatillas deportivas negras limpias</strong> en tarima y salón para cuidar su postura y rendimiento en jornadas de más de 10 horas.
+            </p>
+          </div>
+        </div>
+
+        {/* FOOTER */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '0.8rem' }}>
+          <button 
+            onClick={onClose}
+            className="btn-primary"
+            style={{
+              padding: '0.55rem 1.6rem',
+              fontSize: '0.9rem',
+              fontWeight: 700,
+              borderRadius: '8px',
+              background: 'linear-gradient(135deg, #0ea5e9, #0284c7)',
+              color: '#fff',
+              border: 'none',
+              cursor: 'pointer'
+            }}
+          >
+            Entendido / Cerrar
+          </button>
+        </div>
+
+      </div>
     </div>
   );
 }
@@ -127012,7 +128057,7 @@ export default function ViewModeSelector() {
 ## Archivo: src\config\permissions.js
 
 ```js
-﻿// Configuración centralizada de permisos y roles administrativos
+// Configuración centralizada de permisos y roles administrativos
 // Este archivo es la ÚNICA fuente de verdad para emails con privilegios elevados.
 // Cualquier cambio de SuperAdmin se hace AQUÍ, no disperso en el código.
 
@@ -127372,7 +128417,8 @@ export const getAssignableRoles = (currentUser) => {
 
 /**
  * MATRIZ OFICIAL DE PERMISOS Y VISTAS POR ROL (CREAR PODER SIN LÍMITES)
- * Fuente: Matriz Oficial de Acceso y Visibilidad Causa OS
+ * Fuente: Matriz Oficial de Acceso y Visibilidad Causa OS (roles Causa OS en Google Sheets)
+ * ID: 1gt7kJblS5sULWDAZ_Gg1aQMIJTmkOIK2snaM-nnNdfI
  */
 export const OFFICIAL_PERMISSION_MATRIX = {
   'causa_os': {
@@ -127416,6 +128462,10 @@ export const OFFICIAL_PERMISSION_MATRIX = {
   },
   'calendario_global': {
     directivos: 'GLOBAL',
+    gerente: 'GLOBAL'
+  },
+  'campus_interactivo': {
+    directivos: 'GLOBAL',
     gerente: 'GLOBAL',
     coord_c1: 'GLOBAL',
     coord_maestria: 'GLOBAL',
@@ -127424,12 +128474,6 @@ export const OFFICIAL_PERMISSION_MATRIX = {
     capitan: 'GLOBAL',
     aliado: 'GLOBAL',
     manager: 'GLOBAL'
-  },
-  'campus_interactivo': {
-    directivos: 'GLOBAL',
-    gerente: 'GLOBAL',
-    coord_c1: 'GLOBAL',
-    coord_maestria: 'GLOBAL'
   },
   'centro_managers': {
     directivos: 'GLOBAL',
@@ -127450,19 +128494,57 @@ export const OFFICIAL_PERMISSION_MATRIX = {
     gerente: 'GLOBAL'
   },
   'sistema_cartas': {
-    gerente: 'GLOBAL',
-    directivos: 'GLOBAL'
+    directivos: 'GLOBAL',
+    gerente: 'GLOBAL'
   },
   'copilot': {
     directivos: 'GLOBAL',
+    gerente: 'GLOBAL'
+  },
+  'manual_nodus': {
+    directivos: 'GLOBAL',
     gerente: 'GLOBAL',
-    coord_c1: 'DASHBOARD',
-    coord_maestria: 'DASHBOARD',
-    entrenador: 'DASHBOARD',
-    qt: 'DASHBOARD',
-    capitan: 'DASHBOARD',
-    aliado: 'DASHBOARD',
-    manager: 'DASHBOARD'
+    coord_c1: 'GLOBAL',
+    coord_maestria: 'GLOBAL'
+  },
+  'eventos_entrenamientos': {
+    directivos: 'GLOBAL',
+    gerente: 'SEDE',
+    coord_c1: 'SEDE_C1C2',
+    coord_maestria: 'SEDE_MJ',
+    entrenador: 'ASIGNADOS',
+    qt: 'SEDE_C1C2_PROXIMOS_SIN_TRAINER',
+    capitan: 'EQUIPO',
+    aliado: 'EQUIPO',
+    manager: 'EQUIPO'
+  },
+  'comunicacion_efectiva': {
+    directivos: 'GOOGLE_CHAT',
+    gerente: 'GOOGLE_CHAT',
+    coord_c1: 'GOOGLE_CHAT',
+    coord_maestria: 'GOOGLE_CHAT',
+    entrenador: 'GOOGLE_CHAT',
+    qt: 'WHATSAPP',
+    capitan: 'WHATSAPP',
+    aliado: 'WHATSAPP',
+    manager: 'WHATSAPP'
+  },
+  'flyers_c1': {
+    directivos: 'GLOBAL',
+    gerente: 'GLOBAL',
+    coord_c1: 'GLOBAL',
+    coord_maestria: 'GLOBAL'
+  },
+  'calendario_mj': {
+    directivos: 'GLOBAL',
+    gerente: 'SEDE',
+    coord_maestria: 'GLOBAL'
+  },
+  'agenda_timeboxing': {
+    directivos: 'GLOBAL',
+    gerente: 'GLOBAL',
+    coord_c1: 'GLOBAL',
+    coord_maestria: 'GLOBAL'
   }
 };
 
@@ -127470,7 +128552,7 @@ export const OFFICIAL_PERMISSION_MATRIX = {
  * Valida el nivel de acceso de un usuario para un módulo específico según la Matriz Oficial
  * @param {Object} currentUser 
  * @param {string} moduleKey 
- * @returns {{ hasAccess: boolean, scope: 'GLOBAL' | 'SEDE' | 'DASHBOARD' | 'ASIGNADOS' | 'NONE' }}
+ * @returns {{ hasAccess: boolean, scope: 'GLOBAL' | 'SEDE' | 'DASHBOARD' | 'ASIGNADOS' | 'NONE' | string }}
  */
 export const checkModuleAccess = (currentUser, moduleKey) => {
   if (!currentUser) return { hasAccess: false, scope: 'NONE' };
@@ -127507,6 +128589,52 @@ export const checkModuleAccess = (currentUser, moduleKey) => {
   }
 
   return { hasAccess: false, scope: 'NONE' };
+};
+
+/**
+ * Canal Oficial de Comunicación según Matriz
+ * @param {Object} currentUser
+ * @returns {'GOOGLE_CHAT' | 'WHATSAPP'}
+ */
+export const getEffectiveCommunicationChannel = (currentUser) => {
+  const access = checkModuleAccess(currentUser, 'comunicacion_efectiva');
+  return access.scope === 'WHATSAPP' ? 'WHATSAPP' : 'GOOGLE_CHAT';
+};
+
+export const canAccessAgendaTimeBoxing = (currentUser) => {
+  return checkModuleAccess(currentUser, 'agenda_timeboxing').hasAccess;
+};
+
+export const canAccessFlyersC1 = (currentUser) => {
+  return checkModuleAccess(currentUser, 'flyers_c1').hasAccess;
+};
+
+export const canAccessCalendarioMJ = (currentUser) => {
+  return checkModuleAccess(currentUser, 'calendario_mj').hasAccess;
+};
+
+export const canAccessMonitorVuelos = (currentUser) => {
+  return checkModuleAccess(currentUser, 'sistema_cartas').hasAccess;
+};
+
+export const canAccessHotelesSede = (currentUser) => {
+  return checkModuleAccess(currentUser, 'hoteles_sede').hasAccess;
+};
+
+export const canAccessManualQT = (currentUser) => {
+  return checkModuleAccess(currentUser, 'manual_qt').hasAccess;
+};
+
+export const canAccessDirectorioQT = (currentUser) => {
+  return checkModuleAccess(currentUser, 'directorio_qt').hasAccess;
+};
+
+export const canAccessManualNodus = (currentUser) => {
+  return checkModuleAccess(currentUser, 'manual_nodus').hasAccess;
+};
+
+export const canAccessCampusInteractivo = (currentUser) => {
+  return checkModuleAccess(currentUser, 'campus_interactivo').hasAccess;
 };
 
 
@@ -140921,6 +142049,588 @@ export const normalizeCoordinator = (name) => {
 };
   return map[clean] || clean;
 };
+
+```
+
+---
+
+## Archivo: src\data\nodusIntegratedKnowledge.js
+
+```js
+/**
+ * Base de Conocimiento Integrada: Gobernanza Causa OS + Plataforma NODUS (Edición Oficial 2026)
+ * 
+ * Fuentes Maestras:
+ * 1. "Manual de Integración Sistémica: Gobernanza Operativa Nodus + Causa OS (v1.0)" (03/09/2026)
+ * 2. "Manual Oficial de Usuario Nodus (SO-AR) - Edición 2026" (manual_nodus_soar_completo.pdf, 52 págs, 18 caps)
+ * 
+ * Marca Corporativa: CREAR PODER SIN LÍMITES
+ * Portal Oficial Nodus: https://imo.crearpslglobal.com/
+ */
+
+// ============================================================================
+// 1. EL MANIFIESTO NODUS + CAUSA OS: PRINCIPIOS DE GOBERNANZA
+// ============================================================================
+export const MANIFIESTO_GOBERNANZA = {
+  titulo: "El Manifiesto Nodus + Causa OS: Principios de Gobernanza",
+  subtitulo: "Sistema de Dirección, Control y Mejora Continua — CREAR PODER SIN LÍMITES 2026",
+  formula: "Nodus (Datos y Trazabilidad) + Causa OS (Análisis y Acción) = Decisiones Verificables",
+  principioRector: "Directo al punto. El líder es la causa, no el efecto.",
+  capas: [
+    {
+      nombre: "Nodus (Ecosistema de Datos)",
+      rol: "Único sistema de registro, organización y trazabilidad operativa de Crear Poder Sin Límites. Concentra la información real de participantes, líderes, transacciones, compromisos, asistencia y evidencias.",
+      reglaDeOro: "Nodus no completa datos vacíos con suposiciones. Si un participante no registra actividad o pago, el sistema muestra de forma exclusiva 'sin actividad registrada' o 'sin Ticket Verde registrado'. Nodus jamás concluye de forma autónoma 'el participante abandonó' o 'no está comprometido'."
+    },
+    {
+      nombre: "Causa OS (Sistema de Dirección)",
+      rol: "Capa de dirección, control y mejora estratégica que identifica qué está ocurriendo, cuál puede ser la causa, qué decisión conviene tomar y cómo ejecutar cambios de forma segura sin alterar la evidencia histórica.",
+      reglaDeOro: "Causa OS toma la telemetría de Nodus, descarta las interpretaciones subjetivas de los coordinadores y propone planes de acción con responsables, plazos y criterios de éxito medibles, requiriendo siempre validación humana para acciones sensibles (permisos, pagos, contratos o comunicaciones masivas)."
+    }
+  ]
+};
+
+// ============================================================================
+// 2. ESTRUCTURA ORGANIZACIONAL: LOS 9 NIVELES DE EXCELENCIA 2026
+// ============================================================================
+export const ESTRUCTURA_DIRECTIVA_GLOBAL = {
+  empresa: "CREAR PODER SIN LÍMITES",
+  directiva: [
+    { cargo: "CEO Global", titular: "Fer Aragon", alcance: "Visión corporativa y expansión multinacional." },
+    { cargo: "CCO Global (Operaciones y Sala)", titular: "Paul Sosa", alcance: "Operaciones globales, dinámicas de sala, El Viaje y cultura." },
+    { cargo: "Jefa Financiera Global (CFO)", titular: "Nancy Elizabeth Escobar Pérez (Elizabeth Escobar)", alcance: "Auditoría contable, conciliación y control fiscal global." }
+  ],
+  reglaSubdirector: "El rol de 'Subdirector' queda DESCONTINUADO DE FORMA DEFINITIVA. Sus funciones comerciales y de supervisión son absorbidas en su totalidad por el Gerente de Sede."
+};
+
+export const NIVELES_EXCELENCIA = [
+  {
+    nivel: 9,
+    rol: "Equipo de Oficina (Soporte Back-Office)",
+    jerarquia: "Nivel 9 (Back-Office)",
+    descripcion: "Personal administrativo de soporte (Asistente Contable, Facturación, etc.) que empodera al contexto blindando la retaguardia de la sede.",
+    requisitos: "Personal administrativo formal de planta."
+  },
+  {
+    nivel: 8,
+    rol: "Gerente de Sede",
+    jerarquia: "Nivel 8 (Dirección y Supervisión Local)",
+    descripcion: "Ancla comercial, administrativa y estratégica de la sede local. Administra el presupuesto, coordina a los aliados en mesa, supervisa el backend de Nodus y aprueba (con firma física) cambios de cupos o convenios de pago.",
+    requisitos: "Liderazgo gerencial y responsabilidad fiscal directa."
+  },
+  {
+    nivel: 7,
+    rol: "Entrenador / Coach",
+    jerarquia: "Nivel 7 (Autoridad Contextual de Sala)",
+    descripcion: "Voz de la transformación en el salón y la máxima autoridad contextual del entrenamiento. Impecabilidad innegociable.",
+    requisitos: "Certificación oficial CPSL de facilitador de sala."
+  },
+  {
+    nivel: 6,
+    rol: "Coordinador de Maestría del Juego (CMJ)",
+    jerarquia: "Nivel 6 (Soporte Avanzado)",
+    descripcion: "Guardián del cierre, el acompañamiento continuo y la confidencialidad de los 90 días del ciclo avanzado. Recluta mánagers y realiza la auditoría predictiva uno a uno de los Futuros Imposibles (FI) los miércoles en Nodus.",
+    requisitos: "Graduado de Maestría con dominio de Nodus y coaching de equipos."
+  },
+  {
+    nivel: 5,
+    rol: "Coordinador de C1 y C2 (CC1Y2)",
+    jerarquia: "Nivel 5 (Soporte Básico Unificado)",
+    descripcion: "Cerebro operativo del ciclo básico. Es responsable del montaje de sala, control de baúles, sistemas de mesas de registro y la contabilidad local. El domingo de C1, su prioridad absoluta es capturar los pagos de conversión. Es un único rol unificado, apoyado en una bitácora física en un cuaderno.",
+    requisitos: "Gestión logística, contabilidad de caja y dominio de mesa Nodus."
+  },
+  {
+    nivel: 4,
+    rol: "Quantum Team (QT)",
+    jerarquia: "Nivel 4 (Operaciones Especiales y Sombras)",
+    descripcion: "Fuerza de operaciones especiales de la sede. Entrenan llamadas comerciales de futuros imposibles y guían los drills de sala. Existe 1 QT Senior por sede que reporta directamente al CMJ y al Gerente.",
+    requisitos: "Mánager graduado con mínimo 60% de efectividad comercial."
+  },
+  {
+    nivel: 3,
+    rol: "Capitán",
+    jerarquia: "Nivel 3 (Termómetro Energético)",
+    descripcion: "Termómetro energético del salón. Lidera, inspira y alinea al staff de aliados, y supervisa la guía de seguimiento telefónico y compromisos de lunes, miércoles y viernes.",
+    requisitos: "Graduado de Maestría. Nota: los aliados son seleccionados por la oficina, nunca por el Capitán."
+  },
+  {
+    nivel: 2,
+    rol: "Mánager en Maestría",
+    jerarquia: "Nivel 2 (Líder de Acompañamiento en Entrenamiento)",
+    descripcion: "Líder en entrenamiento profundo enfocado en enrolamiento, relación, gratitud y resultados de su equipo de máximo 6 participantes en sus retos diarios de 90 días. No se traduce como 'gerente'. Su declaración formal se realiza el domingo de C2.",
+    requisitos: "Graduado del ciclo avanzado seleccionado en el domingo de C2."
+  },
+  {
+    nivel: 1,
+    rol: "Aliado",
+    jerarquia: "Nivel 1 (Logística Invisible y Espejo de Responsabilidad)",
+    descripcion: "Dueño de la logística invisible y espejo de responsabilidad en sala. Mantiene una proporción obligatoria de 1 aliado por cada 6 participantes. Su foco es 'Ser Relación' viernes y sábado, y liderar el 'Llamado a la Acción Extraordinario' el domingo. Son graduados de MJ seleccionados por la oficina, nunca por el Capitán.",
+    requisitos: "Graduado de Maestría con evaluación aprobada de la oficina."
+  }
+];
+
+// ============================================================================
+// 3. PROTOCOLO DE IMPECABILIDAD VISUAL (CÓDIGOS DE VESTIMENTA 2026)
+// ============================================================================
+export const VESTIMENTA_2026 = {
+  aliados: {
+    rol: "Aliados (Staff de Sala C1 y C2)",
+    viernes: "Camisa o blusa negra de botones (manga corta o larga), impecable, planchada y sin estampado ni detalles de color. Pantalón de jean (mezclilla) azul índigo o azul oscuro (completamente liso, sin rotos, parches o desgastes). Zapatos o zapatillas deportivas (tenis) cómodos y limpios (prohibidas sandalias o crocs). Abrigo estrictamente negro.",
+    sabado: "Polo azul índigo/oscuro o negro de la sede (según nivel C1 o C2) y jean negro.",
+    domingo: "Polo de color del equipo (C2) o polo azul de la sede (C1) y jean negro o azul índigo."
+  },
+  entrenador: {
+    rol: "Entrenador / Coach (Facilitador de Sala)",
+    norma: "Estándar de Elegancia Negra Total. Viste de color negro total impecable, formal y sin estampados ni detalles de colores (camiseta, camisa o saco de etiqueta negra).",
+    calzadoPermitido: "Zapatillas deportivas (tenis) de color negro absoluto TOTALMENTE PERMITIDAS. Para priorizar la comodidad física y sostener la energía en sala durante jornadas prolongadas, no se exige obligatoriamente zapato de vestir; es válido el uso de zapatillas negras impecables y en estado de excelencia."
+  },
+  capitanes: {
+    rol: "Capitán",
+    juevesViernes: "Vestimenta formal negra de etiqueta el jueves y viernes de apertura.",
+    sabado: "Polo negro oficial.",
+    domingo: "Polo azul oficial de la sede."
+  },
+  qt: {
+    rol: "Quantum Team (QT)",
+    viernes: "Camisa blanca y jean azul oscuro.",
+    sabado: "Polo plomo (gris) oficial de QT y jean negro.",
+    domingo: "Polo azul oficial de QT y jean negro."
+  },
+  managers: {
+    rol: "Mánagers de Maestría",
+    viernes: "Traje sastre formal negro el viernes (apertura de la Noche de Confianza).",
+    sabado: "Polo negro de equipo.",
+    domingo: "Polo azul o del color representativo de su equipo."
+  },
+  oficina: {
+    rol: "Equipo de Oficina y Soporte",
+    eventos: "Jueves y viernes de entrenamiento visten de etiqueta negra formal. Sábados y domingos utilizan polos oficiales combinadas con pantalón negro y calzado sobrio.",
+    diario: "Formal elegante con colores sobrios (negro, azul, gris o blanco)."
+  }
+};
+
+// ============================================================================
+// 4. SOP DEL COORDINADOR DE MAESTRÍA DEL JUEGO (CMJ) Y RITMO OPERATIVO
+// ============================================================================
+export const SOP_OPERATIVO_SEMANAL = {
+  semanal: [
+    { dia: "Lunes (Control Contable)", detalle: "Cierre de caja del FDS anterior en Nodus (conciliación de fichas físicas vs. depósitos) y envío del reporte de asistencia a Contabilidad a primera hora." },
+    { dia: "Martes (Seguimiento FI)", detalle: "Llamadas breves de alineación con mánagers para auditar el avance de las evidencias de sus participantes." },
+    { dia: "Miércoles (Grounding Virtual - 19:00 PM)", detalle: "Deadline de Oro: Cargar en Nodus la revisión de los FI de todos los mánagers antes de las 19:00 PM (si se omite, se dispara alerta roja al Gerente). De 19:00 a 20:00 PM: Grounding virtual (CMJ, Capitán y Mánagers) para evaluar fisionomía y conversión." },
+    { dia: "Jueves de Graduación y Montaje", detalle: "15:00 PM: Montaje y limpieza basura cero, audio, altura de sala mínimo 4.5m (para la Caída de Confianza). 16:30 PM: Grounding con Mánagers. 17:00 PM: Auditoría Física de FI (presencial 100%). 18:00 PM: Grounding presencial Aliados C1 (Cero Tolerancia, puertas cerradas)." },
+    { dia: "Viernes de Maestría (FDS 1, 2 y 3)", detalle: "15:30 PM: Inspección física de sala y desempacar baúl. 16:00 PM: Grounding con mánagers. 16:30 PM: Grounding privado Entrenador/CMJ y mesa de enrolamiento en Nodus. 17:00 PM: Grounding Entrenador con mánagers y registro QR en pasillo. 18:00 PM: Apertura del salón. 19:00 PM: Cierre absoluto de compuertas logísticas." },
+    { dia: "Noche de Confianza (Viernes C1 — 22:00 PM)", detalle: "Convocatoria a Capitán, aliados y graduados de Maestría. Montaje del Baúl de Noche de Confianza: tinajas con agua templada mediante resistencias eléctricas, cremas corporales, frutas/galletas, globos y serpentinas." },
+    { dia: "Sábado de Maestría", detalle: "08:00 AM: Apertura de mesas. 09:00 AM: Reingreso. 11:00 AM: Reporte de asistencia. 15:00 PM: Reporte de abonos y enrolamiento en Nodus. 21:00 PM: Reporte de cierre de sábado." },
+    { dia: "Domingo de Maestría (Hitos y Cierre)", detalle: "FDS 1 (Creación): Firma e ingreso en Nodus de los FI. FDS 2 (Relación): Cierre de mesas y tejido grupal. FDS 3 (Gratitud): Graduación, medallas y diplomas. 21:00 PM: Cierre Contable de terminales POS. Celebración de 'Juego Ganado' únicamente con pizza, globos y luces (mariachis prohibidos)." }
+  ],
+  fds4ElViaje: {
+    nombre: "Fin de Semana 4: 'El Viaje' (Liderado por Paul Sosa)",
+    viernes: "18:15 PM: El Entrenador (Paul Sosa) audita el baúl (24 velas eléctricas, teteras, resistencias, 5 tinas, 5 jarras y cremas). 18:30 PM: Grounding con apoyos graduados ('ángeles de vuelo'). 19:40 PM: Retiro obligatorio de celulares (resguardados en baúl con llave) antes de entrar vendados al salón para limpieza y declaración de legado.",
+    sabado: "07:00 AM: Traslado a la hostería. 07:30 AM: Desayuno de mánagers con el Coach. 09:20 AM: Inicio en salón de hostería y vuelos de Maestría. 14:00 PM: Almuerzo de premiación (Estandarte, SAI y el premio Antorcha al mánager con mayor enrolamiento físico comprobable).",
+    domingo: "09:00 AM: Redacción de visiones a 10, 5 y 1 año en sobres de manila con su Ticket Dorado. 18:00 PM: Ceremonial del Pase de Antorcha: ingreso de la Maestría en la sala de C1 en excelencia, luces bajas y sigilo."
+  }
+};
+
+// ============================================================================
+// 5. CATÁLOGO DE KPIS REALES EN NODUS Y TRIGGERS TÉCNICOS AUTÓNOMOS
+// ============================================================================
+export const CATALOGO_KPIS_NODUS = [
+  { id: "KPI-C1-001", nombre: "Asistencia de Apertura (Día 1 C1)", meta: "95%", formula: "(Asistentes_Día1 / Confirmados) * 100", frecuencia: "Ciclo", origen: "Escaneo QR en Mesa", deadline: "Viernes 11:30 AM" },
+  { id: "KPI-C1-002", nombre: "Retención del Fin de Semana (C1)", meta: "> 90%", formula: "((Asistentes_Día1 - Desertores) / Asistentes_Día1) * 100", frecuencia: "Diario", origen: "Marcación Check-out", deadline: "Domingo 19:00 PM" },
+  { id: "KPI-C1-003", nombre: "Conversión C1 a C2 (PP%)", meta: "50% (52% reto)", formula: "(Pagos_C2 / Graduados_C1) * 100", frecuencia: "Cierre", origen: "Registro de Pagos Nodus", deadline: "Domingo 21:00 PM" },
+  { id: "KPI-C2-001", nombre: "Asistencia de Arranque C2", meta: "95%", formula: "(Asistentes_C2 / Pagados_C2) * 100", frecuencia: "Ciclo", origen: "Escaneo QR y Gafete", deadline: "Jueves 15:30 PM" },
+  { id: "KPI-C2-002", nombre: "Declaración en Breakthrough", meta: "90%", formula: "(Declarantes_Jueves / Asistentes_C2) * 100", frecuencia: "Ciclo", origen: "Conteo Físico en Salón", deadline: "Jueves 21:30 PM" },
+  { id: "KPI-C2-003", nombre: "Tasa de Palabras Rotas", meta: "< 5%", formula: "(No_Pagan_Viernes14hs / Declarantes_Jueves) * 100", frecuencia: "Ciclo", origen: "Cruce Declarantes vs Caja", deadline: "Viernes 14:01 PM" },
+  { id: "KPI-C2-004", nombre: "Conversión C2 a MJ (PP%)", meta: "70% (93% reto)", formula: "(Pagos_MJ / Graduados_C2) * 100", frecuencia: "Cierre", origen: "Registro Transaccional Nodus", deadline: "Domingo 19:00 PM" },
+  { id: "KPI-MJ-001", nombre: "Graduados Invitados 'El Viaje'", meta: "90%", formula: "Graduados_PX + Graduados_Managers + Capitán", frecuencia: "Ciclo", origen: "Actas de Acreditación", deadline: "Domingo FDS 3 21:00 PM" },
+  { id: "KPI-MJ-002", nombre: "Sentados por FDS (Creación/Relación/Gratitud)", meta: "70 Lima / 55 Medellín", formula: "Conteo real de check-in digital por FDS", frecuencia: "FDS", origen: "Escaneo QR y Firmas", deadline: "Viernes 19:00 PM" },
+  { id: "KPI-MJ-003", nombre: "Tasa de Deserción Inter-FDS", meta: "< 5%", formula: "((Sentados_FDS_N - Sentados_FDS_N+1) / Sentados_FDS_N) * 100", frecuencia: "FDS", origen: "Check-in Consolidado", deadline: "Sábado 11:30 AM" },
+  { id: "KPI-MJ-004", nombre: "Efectividad Enrolamiento Mánagers", meta: "90%", formula: "(Enrolados_Sentados / Enrolamientos_Registrados) * 100", frecuencia: "FDS", origen: "Cruce Invitados vs Asistencia", deadline: "Sábado 11:30 AM" },
+  { id: "KPI-MJ-005", nombre: "Avance de Futuros Imposibles (FI)", meta: "100%", formula: "(FI_Estatus_Aprobado_80_o_100 / FI_Totales) * 100", frecuencia: "Semanal", origen: "Módulo FI Nodus", deadline: "Martes 15:00 PM" },
+  { id: "KPI-MJ-006", nombre: "Firma de 28 Entrenamientos Sustentables", meta: "100%", formula: "(Compromisos_Firmados / Sentados_FDS1) * 100", frecuencia: "Ciclo", origen: "Carga de Documentos Nodus", deadline: "Domingo FDS 1 21:00 PM" },
+  { id: "KPI-MJ-007", nombre: "Conversión de Graduados a Aliados", meta: "> 40%", formula: "(Inscritos_como_Aliados / Total_Graduados) * 100", frecuencia: "Cierre", origen: "Registro de Staff Nodus", deadline: "Domingo FDS 3 21:00 PM" }
+];
+
+export const TRIGGERS_BACKEND = [
+  {
+    nombre: "Trigger de Palabra Rota (Viernes de C2 — 14:01 PM)",
+    momento: "Viernes a las 14:01 PM",
+    condicion: "IF (Status_Breakthrough_Jueves == TRUE) AND (Status_Ticket_Verde_Viernes14 == FALSE)",
+    accion: "Set Status_Palabra_Rota = TRUE; Set Access_QR_App = FALSE; Enviar alerta a Causa OS para bloqueo de gafete.",
+    explicacion: "A las 14:01 PM el sistema cruza la base de datos de declarantes del jueves noche con los registros de caja del viernes a las 14:00 PM. Ante cualquier inconsistencia o falta de abono conciliado, se bloquea el código QR de acceso de la tarde (15:00 PM)."
+  },
+  {
+    nombre: "Trigger de Alerta de Deserción de Mánagers (Miércoles pre-MJ — 19:00 PM)",
+    momento: "Miércoles a las 19:00 PM",
+    condicion: "IF (Sede_Semana_MJ == TRUE) AND (Status_Revision_Futuro_Imposible_Managers == NULL) AND (Current_Time >= 19:00)",
+    accion: "Trigger Alert_Rojo_Causa_OS('Sede_ID', 'Riesgo de deserción de mánagers > 40%. Campo de revisión de FI vacío.')",
+    explicacion: "Si el Coordinador de Maestría no ha cargado la revisión individualizada de los FI de todos los mánagers antes de las 19:00 PM, el sistema detecta falta de alineación profunda y alerta al Gerente de Sede para intervenir de inmediato."
+  },
+  {
+    nombre: "Trigger de Impecabilidad Contable (Lunes — 12:00 PM)",
+    momento: "Lunes al mediodía (12:00 PM)",
+    condicion: "IF (Current_Time >= Lunes_1200) AND (Status_Cierre_Caja_FDS == FALSE)",
+    accion: "Trigger System_Escalation_Nivel_2('Gerente_Sede', 'Quiebre de Impecabilidad Administrativa y Conciliación')",
+    explicacion: "Al cumplirse el mediodía del lunes, el backend valida que la conciliación de caja esté completa (ingresos Nodus vs. fichas físicas escaneadas y depósitos contables). Si hay retraso, escala una alerta disciplinaria de Nivel 2."
+  }
+];
+
+// ============================================================================
+// 6. LAS 10 PALANCAS DE LA EXPERIENCIA DEL CLIENTE (PX)
+// ============================================================================
+export const PALANCAS_PX = [
+  { num: 1, titulo: "Sostener la Seguridad Psicológica (Edmondson y Coyle)", detalle: "Contenedor de sala seguro donde el participante pueda expresarse sin temor a ser juzgado, ridiculizado o descalificado por el staff o el entrenador." },
+  { num: 2, titulo: "El Participante es el Héroe (StoryBrand Framework)", detalle: "El participante es el protagonista y héroe de la historia; el staff actúa como el guía que entrega el mapa y el llamado a la acción." },
+  { num: 3, titulo: "Reducción del Esfuerzo de Registro (Ecuación de Hormozi)", detalle: "Automatizar la entrada mediante manillas QR y abrir registro anticipado para erradicar filas y cuellos de botella que minan la energía." },
+  { num: 4, titulo: "Alertas Preventivas de Integridad (Causa OS)", detalle: "Recordatorio preventivo el viernes a las 12:00 PM antes del deadline de Palabra Rota de las 14:01 PM para reducir fricción y dar tiempo de solucionar estados de cuenta." },
+  { num: 5, titulo: "Impecabilidad Absoluta del Contenedor Físico (Rick Rubin)", detalle: "Auditar temperatura, acústica, luces y política de basura cero. Disponer los baúles con sigilo y excelencia antes del ingreso." },
+  { num: 6, titulo: "Sostenimiento del Sistema Buddy (Socio de Riesgo)", detalle: "Monitoreo diario de las parejas asignadas en C2. El acompañamiento y confrontación asertiva elevan la retención del fin de semana." },
+  { num: 7, titulo: "Transición a 'Coaching Ético y Enrolamiento'", detalle: "Desterrar cualquier rastro de presión o manipulación. Preguntas de contexto para desarmar la resistencia. El compromiso nace de la elección voluntaria." },
+  { num: 8, titulo: "Simplificación de Tareas y Evidencias", detalle: "Formatos pre-diseñados en Nodus para registrar el avance de Futuros Imposibles y los 28 Entrenamientos Sustentables sin fricción administrativa." },
+  { num: 9, titulo: "Llamadas de Mánagers Libres de Drama", detalle: "Llamadas basadas exclusivamente en datos reales de Nodus, eliminando juicios a la identidad del participante y confrontando hechos y compromisos." },
+  { num: 10, titulo: "El Ceremonial del Pase de Antorcha", detalle: "Ingreso de la Maestría graduada el domingo de Gratitud al salón de C1 coordinado en excelencia, luces bajas y sigilo impecable." }
+];
+
+// ============================================================================
+// 7. FILOSOFÍA DE CREACIÓN DE RICK RUBIN EN CPSL
+// ============================================================================
+export const FILOSOFIA_RUBIN = [
+  { pilar: "El Arte como un Estado del Ser (El 'Quién Eres' ante el 'Qué Haces')", descripcion: "El trabajo del líder de sala es una manera de estar en el mundo. El staff no es un ejecutor de eventos; son creadores de contexto. Si el Ser del líder está alineado e impecable, el salón y los datos de Nodus reflejan ese orden." },
+  { pilar: "Disciplina Militar para Liberar la Magia", descripcion: "La automatización y precisión en los checklists de Nodus liberan el ancho de banda mental para que el Entrenador y el staff actúen con la intuición, frescura y libertad cuántica requerida en sala." },
+  { pilar: "Desaprender las Normas (Mente de Principiante)", descripcion: "Las reglas son suposiciones, no leyes absolutas. Mantener la flexibilidad y la mente de aprendiz (como permitir zapatillas deportivas negras impecables para el Entrenador) prioriza el instrumento de transformación sobre convenciones rígidas." },
+  { pilar: "Mentalidad de Abundancia (Terminar para Volver a Empezar)", descripcion: "Cada ciclo de 90 días representa un capítulo que debe ser cerrado y liberado en 'El Viaje' y el 'Pase de Antorcha', permitiendo vaciarse y regenerar energía para servir como nuevo Aliado." },
+  { pilar: "La Búsqueda de la 'Opción C'", descripcion: "Frente a quiebres operativos o de equipo, no negociamos por tibieza o sacrificio mutuo; operamos desde la confrontación asertiva hasta hacer emerger la opción cuántica superior que cuide el contenedor." }
+];
+
+// ============================================================================
+// 8. GUÍA TÉCNICA OPERATIVA NODUS: 18 CAPÍTULOS PASO A PASO
+// ============================================================================
+export const NODUS_CAPITULOS_PASO_A_PASO = [
+  {
+    capitulo: 1,
+    modulo: "Acceso y Arquitectura",
+    titulo: "Introducción a la Plataforma NODUS",
+    descripcion: "Plataforma oficial en https://imo.crearpslglobal.com/. Concentra la trazabilidad y datos sin suposiciones.",
+    pasos: [
+      "Ingresa en tu navegador al portal oficial https://imo.crearpslglobal.com/.",
+      "Comprueba la conectividad de red antes de iniciar cualquier jornada de registro.",
+      "Recuerda la división de responsabilidades: Nodus gestiona la evidencia real de los participantes; Causa OS realiza el análisis directivo y plan de acción."
+    ],
+    tags: ["nodus", "portal", "arquitectura", "ingreso"]
+  },
+  {
+    capitulo: 2,
+    modulo: "Acceso y Seguridad",
+    titulo: "Inicio de Sesión y Gestión de Contraseñas",
+    descripcion: "Procedimiento oficial de acceso con credenciales directas y política de reseteo.",
+    pasos: [
+      "En la pantalla de login, escribe tu 'Nombre de Usuario' y 'Contraseña personal'.",
+      "Presiona el botón azul 'Iniciar Sesión'.",
+      "Si olvidaste tu contraseña o está bloqueada, el Gerente de Sede o el Administrador ingresa a 'Configuración' → 'Usuarios' → selecciona el usuario → 'Editar' → escribe una clave temporal en 'Nueva Contraseña' → 'Guardar Cambios'."
+    ],
+    tags: ["login", "seguridad", "password", "reset", "usuarios"]
+  },
+  {
+    capitulo: 3,
+    modulo: "Perfiles de Usuario",
+    titulo: "Perfiles y Menús por Puesto de Trabajo",
+    descripcion: "Restricción de vistas según el rol operativo asignado en la sede.",
+    pasos: [
+      "Perfil Mesa de Registro: Dashboard + Mesa de Registro + Participantes.",
+      "Perfil Encargado de Caja: Dashboard + Contabilidad + Cierre de Caja.",
+      "Perfil Coordinador C1/C2: Mesa de Registro + Participantes + Contabilidad + Reportes básicos.",
+      "Perfil CMJ: Equipos y Maestrías + Reporte de Entrenadores + Seguimiento de Cohortes.",
+      "Perfil Gerente de Sede / Administrador: Acceso total a todos los módulos, edición de cupos y reapertura de cajas."
+    ],
+    tags: ["perfiles", "roles", "permisos", "menú"]
+  },
+  {
+    capitulo: 4,
+    modulo: "Dashboard Principal",
+    titulo: "Dashboard Principal y Navegación en Vivo",
+    descripcion: "Lectura del termómetro de operación en tiempo real durante eventos.",
+    pasos: [
+      "Observa los Contadores Superiores: 'Inscritos Totales', 'Presentes en Sala' y 'Pendientes de Llegada'.",
+      "Filtra por tu Sede si cuentas con visibilidad multisede.",
+      "Haz clic en el logotipo superior o en 'Dashboard' para retornar al inicio desde cualquier pantalla."
+    ],
+    tags: ["dashboard", "navegacion", "tiempo real", "indicadores"]
+  },
+  {
+    capitulo: 5,
+    modulo: "Mesa de Registro",
+    titulo: "Módulo de Mesa de Registro en Vivo (Check-in)",
+    descripcion: "Procedimiento estándar para registrar el ingreso presencial de los participantes el viernes.",
+    pasos: [
+      "Solicita el DNI, Cédula o Pasaporte físico al participante.",
+      "Escribe el número en el buscador de Mesa de Registro y presiona Enter (o busca por apellido si hay discrepancias).",
+      "Verifica el estado de cuenta: si figura 'Completo' (o Ticket Verde), procede. Si figura 'Pendiente', deriva a Caja.",
+      "Haz clic en el botón 'Marcar en Sala': el participante pasa de inmediato a estado 'Sentado' y se incrementa el contador en vivo.",
+      "Entrega el gafete oficial y material de bienvenida. Si marcaste por error, busca el DNI y desmarca la casilla."
+    ],
+    tags: ["check-in", "mesa de registro", "gafete", "marcar en sala", "asistencia"]
+  },
+  {
+    capitulo: 6,
+    modulo: "Gestión de Participantes",
+    titulo: "Altas, Edición y Traslados de Sede",
+    descripcion: "Administración integral de la base de datos de participantes.",
+    pasos: [
+      "Para un nuevo participante: ve a 'Participantes' → presiona 'Nuevo Participante'.",
+      "Llena los campos obligatorios: Tipo y Número de Documento, Nombres y Apellidos (idénticos al documento para diplomas), Celular/WhatsApp, Correo, Sede y Entrenamiento.",
+      "Haz clic en 'Guardar'. Para cobrarle de inmediato, dirígete a 'Contabilidad' → 'Registrar Pago'.",
+      "Para traslados de sede: solo el Gerente de Sede edita el participante y cambia el campo 'Sede Asignada'. Aparecerá automáticamente en la mesa de la nueva sede."
+    ],
+    tags: ["participantes", "nuevo participante", "traslado", "documento"]
+  },
+  {
+    capitulo: 7,
+    modulo: "Contabilidad y Cobros",
+    titulo: "Contabilidad, Registro de Pagos y Formas de Cobro",
+    descripcion: "Asentar pagos totales, abonos parciales y liquidaciones.",
+    pasos: [
+      "Ingresa a 'Contabilidad' en el menú lateral y presiona 'Registrar Pago'.",
+      "Busca al participante por DNI o apellido.",
+      "Selecciona el Tipo de Pago: 'Total' o 'Abono Parcial'.",
+      "Selecciona la Forma de Cobro: 'Efectivo', 'Transferencia' o 'Tarjeta / POS'.",
+      "Ingresa obligatoriamente el Número de Comprobante / Operación bancaria y el monto exacto.",
+      "Haz clic en 'Guardar Pago'. El estado de pago en Mesa de Registro se actualizará automáticamente a verde."
+    ],
+    tags: ["contabilidad", "pagos", "cobros", "transferencia", "pos", "ticket verde"]
+  },
+  {
+    capitulo: 8,
+    modulo: "Cierre de Caja",
+    titulo: "Cierre y Arqueo Diario de Caja (3 Pasos Oficiales)",
+    descripcion: "Cuadre físico vs. sistema al finalizar la jornada de registro del viernes por la noche.",
+    pasos: [
+      "Paso 1: Ve a 'Cierre de Caja' en el menú lateral. Selecciona la fecha y la sede correspondiente.",
+      "Paso 2: Compara el 'Total Efectivo Esperado' que calcula Nodus contra el dinero físico contado en billetes y monedas. Escribe la cifra real en 'Efectivo Real en Caja'.",
+      "Paso 3: Si existe sobrante o faltante, documenta la justificación detallada en 'Observaciones'.",
+      "Paso 4: Presiona 'Cerrar Caja Oficialmente'. Se genera el acta de cierre y las transacciones del día quedan bloqueadas.",
+      "Importante: Una caja cerrada solo puede ser reabierta por el Gerente de Sede o el Administrador General."
+    ],
+    tags: ["cierre de caja", "arqueo", "efectivo", "bloqueo", "cuadre"]
+  },
+  {
+    capitulo: 9,
+    modulo: "Reportes y Auditoría",
+    titulo: "Reporte de Entrenadores y Auditoría de Brecha Enrolados vs. Sentados",
+    descripcion: "Control de rendimiento de sala y detección de no-shows.",
+    pasos: [
+      "Ingresa al módulo 'Reportes' → 'Reporte de Entrenadores y Maestrías'.",
+      "Interpreta las 5 columnas maestras: TIPO IMO/DNI (rol o documento), PARTICIPANTES EN JUEGO (asistentes activos), DECLARACIÓN (meta comprometida), TOTAL ENROLADOS (inscritos y pagados) y DESERTOR FDS (fugas durante el fin de semana).",
+      "Audita la 'Brecha Enrolados vs Sentados': si hay 15 enrolados y 8 sentados, coordinación debe contactar de inmediato a los 7 ausentes para reprogramarlos a la siguiente cohorte."
+    ],
+    tags: ["reportes", "brecha", "no-show", "entrenadores", "auditoria"]
+  },
+  {
+    capitulo: 10,
+    modulo: "Equipos y Cohortes",
+    titulo: "Gestión de Equipos, Cohortes y Asignaciones",
+    descripcion: "Estructuración de cohortes de Maestría por sede (ej: Equipos 27, 28, 29 de Lima).",
+    pasos: [
+      "Entra a 'Equipos y Maestrías' en el menú lateral.",
+      "Define el número de equipo, sede local y fechas oficiales de inicio y graduación.",
+      "Asocia al Entrenador titular asignado al ciclo.",
+      "Distribuye a los participantes a su cohorte antes del viernes de registro para asegurar su visibilidad en los reportes de sala."
+    ],
+    tags: ["equipos", "cohortes", "maestria", "asignacion"]
+  },
+  {
+    capitulo: 11,
+    modulo: "Configuración del Sistema",
+    titulo: "Configuración de Sedes, Precios y Usuarios",
+    descripcion: "Parámetros globales reservados para Gerentes de Sede y Administradores.",
+    pasos: [
+      "Accede al módulo 'Configuración' en el menú lateral izquierdo.",
+      "Pestaña 'Sedes': verificación de directores y direcciones físicas.",
+      "Pestaña 'Programas y Precios': configuración de matrículas, promociones por fecha y convenios.",
+      "Pestaña 'Usuarios': creación de colaboradores con rol y sede asignados."
+    ],
+    tags: ["configuracion", "sedes", "precios", "usuarios", "admin"]
+  },
+  {
+    capitulo: 12,
+    modulo: "Operación de Fin de Semana",
+    titulo: "Cronograma Operativo de Fin de Semana (J/V/S/D)",
+    descripcion: "Horarios clave de atención, reportes y cierres en la plataforma.",
+    pasos: [
+      "Jueves: 15:00 PM montaje de equipos y prueba de red en mesas. 18:00 PM cierre de pre-registros.",
+      "Viernes: 15:00 PM apertura de mesas de registro. 18:00 PM inicio de sala. 19:00 PM corte de check-in y envío del primer reporte de Sentados. 22:00 PM cierre de caja de la jornada.",
+      "Sábado: 08:00 AM check-in de reingreso. 11:00 AM reporte de retención. 15:00 PM reporte de enrolamiento y abonos.",
+      "Domingo: 18:00 PM inicio de captura de conversiones C1 a C2 o C2 a MJ. 21:00 PM cierre contable definitivo de terminales POS."
+    ],
+    tags: ["cronograma", "fin de semana", "viernes", "domingo", "horarios"]
+  },
+  {
+    capitulo: 13,
+    modulo: "Solución de Errores",
+    titulo: "Solución a Errores Frecuentes en Pantalla",
+    descripcion: "Protocolos ante incidentes técnicos en las mesas de registro.",
+    pasos: [
+      "DNI no encontrado: verifica si tiene guiones o espacios; intenta buscar únicamente por apellido paterno.",
+      "Error de conexión / pantalla en blanco: presiona Ctrl + F5 para limpiar la caché del navegador; valida la conexión Wi-Fi de la sede.",
+      "Registro duplicado: no crees un nuevo usuario; contacta al Gerente para fusionar las fichas en el módulo Participantes.",
+      "Botón de pago deshabilitado: verifica que el monto sea mayor a 0 y que hayas seleccionado una forma de cobro válida."
+    ],
+    tags: ["errores", "soporte", "pantalla", "solucion", "incidencias"]
+  },
+  {
+    capitulo: 14,
+    modulo: "Preguntas Frecuentes",
+    titulo: "Banco de Preguntas Frecuentes (FAQ)",
+    descripcion: "Respuestas directas a las dudas más comunes del personal de sala.",
+    pasos: [
+      "¿Qué hago si llega un alumno sin registrar (walk-in)? Regístralo en 'Participantes' → asienta el cobro en 'Contabilidad' → márcalo en 'Mesa de Registro' con gafete provisional.",
+      "¿Puedo recibir pagos en moneda extranjera? Sí, registra la conversión oficial al tipo de cambio autorizado por la Jefatura Financiera en 'Observaciones'.",
+      "¿Cómo elimino un pago registrado por error? Solo el Gerente de Sede o Administrador puede anular recibos desde 'Contabilidad'."
+    ],
+    tags: ["faq", "preguntas frecuentes", "walk-in", "dudas"]
+  },
+  {
+    capitulo: 15,
+    modulo: "Glosario",
+    titulo: "Glosario de Términos Operativos de Nodus",
+    descripcion: "Definiciones oficiales de la terminología del sistema.",
+    pasos: [
+      "Ticket Verde: Estado de cuenta 100% saldado o convenio de pago autorizado con firma del Gerente.",
+      "Sentado: Participante marcado físicamente en sala con botón 'Marcar en Sala'.",
+      "No-Show: Persona inscrita y pagada que no se presenta al entrenamiento el viernes.",
+      "Palabra Rota: Participante de C2 que declaró Breakthrough el jueves pero no abonó su Ticket Verde antes del viernes a las 14:00 PM."
+    ],
+    tags: ["glosario", "terminologia", "ticket verde", "sentado", "palabra rota"]
+  },
+  {
+    capitulo: 16,
+    modulo: "Listas de Cotejo",
+    titulo: "Listas de Cotejo (Checklists) por Puesto de Trabajo",
+    descripcion: "Verificaciones obligatorias antes, durante y después del evento.",
+    pasos: [
+      "Mesa de Registro: Computadora cargada, lector QR funcionando, lista impresa de contingencia, gafetes ordenados por apellido, bolígrafos oficiales.",
+      "Encargado de Caja: Fondo fijo de caja chico verificado, terminales POS cargadas y con papel térmico, talonario de recibos de contingencia.",
+      "Coordinador: Cronómetro de sala sincronizado, baúl auditado al 100%, botiquín de primeros auxilios revisado, refrigerios de staff listos.",
+      "Gerente de Sede: Supervisión de caja inicial, auditoría de cupos Nodus, reunión de alineación con entrenadores y directiva."
+    ],
+    tags: ["checklist", "puestos", "mesa", "caja", "coordinador", "gerente"]
+  },
+  {
+    capitulo: 17,
+    modulo: "Flujos Operativos",
+    titulo: "Flujos Operativos Paso a Paso",
+    descripcion: "Diagramas de flujo para atención fluida de participantes.",
+    pasos: [
+      "Flujo de Llegada: Recepción con calidez → Búsqueda en Nodus → Validación de Ticket Verde → Entrega de Gafete → Marcación en Sala → Ingreso.",
+      "Flujo de Saldo Pendiente: Recepción → Búsqueda → Derivación a Caja → Cobro o Convenio con Gerente → Retorno a Mesa → Marcación en Sala.",
+      "Flujo de Salida / Check-out: Marcación de retiro al término de cada bloque para control estricto de retención."
+    ],
+    tags: ["flujos", "atencion", "proceso", "paso a paso"]
+  },
+  {
+    capitulo: 18,
+    modulo: "Evaluación y Práctica",
+    titulo: "Ejercicios de Entrenamiento y Evaluación del Personal",
+    descripcion: "Simulaciones prácticas para certificar a los nuevos operadores de mesa y caja.",
+    pasos: [
+      "Simulación 1: Registro rápido de 10 participantes continuos en menos de 3 minutos.",
+      "Simulación 2: Resolución de walk-in con pago mixto (efectivo y transferencia) y emisión de comprobante.",
+      "Simulación 3: Ejecución de un Arqueo de Caja con un faltante justificado en observaciones.",
+      "Criterio de Aprobación: 100% de precisión en captura de datos y conciliación perfecta de caja."
+    ],
+    tags: ["evaluacion", "entrenamiento", "simulacion", "capacitacion"]
+  }
+];
+
+// ============================================================================
+// 9. CHECKLISTS POR PUESTO DE TRABAJO (CAPÍTULO 16 DETALLADO)
+// ============================================================================
+export const CHECKLISTS_POR_PUESTO = [
+  {
+    puesto: "Mesa de Registro",
+    color: "var(--crear-blue)",
+    antes: [
+      "Conexión eléctrica y de internet estable comprobada.",
+      "Lector de código de barras o escáner QR conectado y probado.",
+      "Gafetes clasificados alfabéticamente por apellido.",
+      "Material de bienvenida y carpetas listas para entrega.",
+      "Lista impresa de contingencia por si ocurre un corte eléctrico."
+    ],
+    durante: [
+      "Pedir documento de identidad físico sin excepción.",
+      "Comprobar estado 'Completo' / Ticket Verde en pantalla.",
+      "Hacer clic en 'Marcar en Sala' para contabilizar al participante.",
+      "Entregar gafete y dar bienvenida cálida y empoderadora.",
+      "Reportar a coordinación a las 18:45 PM la lista de ausentes."
+    ],
+    despues: [
+      "Contar gafetes sobrantes y cotejar contra los no-shows de Nodus.",
+      "Generar reporte de asistencia inicial (11:30 AM en C1 / 19:00 PM en MJ).",
+      "Dejar las mesas de registro limpias bajo política 'basura cero'."
+    ]
+  },
+  {
+    puesto: "Encargado de Caja",
+    color: "#10b981",
+    antes: [
+      "Verificar y contar el dinero del fondo fijo de caja chica inicial.",
+      "Cargar y probar las terminales POS (tarjetas de crédito/débito).",
+      "Verificar rollos de papel térmico para los comprobantes.",
+      "Disponer talonarios de recibos físicos de contingencia numerados."
+    ],
+    durante: [
+      "Ingresar cada cobro en Nodus de inmediato con su código de transacción.",
+      "Identificar claramente si es pago Total o Abono Parcial.",
+      "Custodiar el dinero en efectivo en el baúl o caja de seguridad con llave.",
+      "Atender derivaciones de alumnos con saldo pendiente con serenidad y agilidad."
+    ],
+    despues: [
+      "Ejecutar el Arqueo Diario de Caja en Nodus (conteo físico vs. sistema).",
+      "Documentar cualquier diferencia en el campo 'Observaciones'.",
+      "Presionar 'Cerrar Caja Oficialmente'.",
+      "Entregar el dinero y el reporte físico firmado al Gerente de Sede."
+    ]
+  },
+  {
+    puesto: "Coordinador de Sala (CC1Y2 / CMJ)",
+    color: "var(--crear-gold)",
+    antes: [
+      "Inspeccionar el salón: limpieza basura cero, audio, micrófonos y sillas.",
+      "Verificar la altura de sala (mínimo 4.5m para Caída de Confianza).",
+      "Auditar los baúles oficiales según el ciclo (cremas, velas, resistencias, tinas).",
+      "Realizar el grounding presencial con aliados y mánagers a puerta cerrada."
+    ],
+    durante: [
+      "Sostener el contenedor de alta vibración y sigilo.",
+      "Monitorear los reportes de sala y supervisar el cronómetro de tiempos.",
+      "Ejecutar el cierre absoluto de compuertas logísticas a las 19:00 PM.",
+      "Liderar la atención de cualquier incidente siguiendo el Protocolo de Emergencias."
+    ],
+    despues: [
+      "Revisión de sala basura cero.",
+      "Cierre de reportes del día en Nodus.",
+      "Reunión de debriefing con el Entrenador y el Capitán."
+    ]
+  },
+  {
+    puesto: "Gerente de Sede",
+    color: "#a855f7",
+    antes: [
+      "Alinear al equipo de registro, caja y logística en reunión previa.",
+      "Verificar las metas de inscritos y presupuesto de la sede en Causa OS.",
+      "Aprobar previamente los convenios de pago formales con firma física."
+    ],
+    durante: [
+      "Supervisar el flujo en pasillo erradicando cuellos de botella.",
+      "Resolver casos especiales: traslados de sede, walk-ins o discrepancias mayores.",
+      "Monitorear en vivo los tableros de conversión y retención."
+    ],
+    despues: [
+      "Recibir y firmar el Acta Oficial de Cierre de Caja del día.",
+      "Realizar la conciliación bancaria (fichas vs. depósitos) el lunes antes de las 12:00 PM.",
+      "Enviar el informe consolidado a la Dirección Regional y Jefatura Financiera."
+    ]
+  }
+];
 
 ```
 
@@ -180539,20 +182249,22 @@ export default function DirectorioQT() {
     
     return members.filter(m => {
       // 0. Reglas de Jerarquía Corporativa
-      const userSede = currentUser?.sede || '';
+      const userSede = normalizeQTSede(currentUser?.sede || '');
       const isGlobalUser = userSede.toLowerCase().includes('global');
       
-      if (!isSuper && !isQTGlobal) {
+      if (!isSuper && !isQTGlobal && !isGerente) {
         if (isGlobalUser) {
           // Global users see everything
-        } else if (isGerente) {
-          if (m.sede !== userSede && m.sede !== 'Global') return false;
+        } else if (['coord_c1', 'coord_c2', 'coordinador_c1c2'].includes(userRole)) {
+          // Coordinador C1/C2: solo su sede (+ Coordinador Global) según Matriz
+          const isTargetQTGlobal = m.sede === 'Global' || m.email?.toLowerCase().includes('brunis') || m.email?.toLowerCase().includes('cardenas');
+          if (m.sede !== userSede && !isTargetQTGlobal) return false;
         } else if (hasQT) {
           // Un QT normal ve solo su sede y al Coordinador Global
           const isTargetQTGlobal = m.sede === 'Global' || m.email?.toLowerCase().includes('brunis') || m.email?.toLowerCase().includes('cardenas');
           if (m.sede !== userSede && !isTargetQTGlobal) return false;
         } else {
-          // Cualquier otro rol (manager, capitan, etc.) ve su sede
+          // Cualquier otro rol ve su sede
           if (m.sede !== userSede) return false;
         }
       }
@@ -180972,7 +182684,8 @@ import { db, auth } from '../services/firebase';
 import { 
   TrendingUp, Users, ArrowLeft, RefreshCw, CheckCircle2, 
   AlertCircle, ChevronRight, Filter, ShieldCheck, DollarSign, 
-  PhoneCall, Award, Compass, Zap, Layers, BarChart3, Database
+  PhoneCall, Award, Compass, Zap, Layers, BarChart3, Database,
+  Copy, Check, BookOpen
 } from 'lucide-react';
 import { OPERATIONAL_SEDES } from '../data/usersData';
 
@@ -180986,7 +182699,14 @@ export default function EmbudoConversionBoard() {
   const [selectedEquipo, setSelectedEquipo] = useState('EQUIPO 30');
   const [equiposDisponibles, setEquiposDisponibles] = useState(['EQUIPO 30', 'EQUIPO 29', 'EQUIPO 28', 'EQUIPO 27', 'EQUIPO 17', 'TODOS']);
   const [lastUpdated, setLastUpdated] = useState(null);
-  const [activeTab, setActiveTab] = useState('embudo'); // 'embudo' | 'tabla_sql' | 'coordinacion' | 'integridad'
+  const [activeTab, setActiveTab] = useState('embudo'); // 'embudo' | 'tabla_sql' | 'coordinacion' | 'integridad' | 'brandscript'
+  const [copiedKey, setCopiedKey] = useState(null);
+
+  const copyText = (text, key) => {
+    navigator.clipboard.writeText(text);
+    setCopiedKey(key);
+    setTimeout(() => setCopiedKey(null), 2500);
+  };
 
   // Colores corporativos CPSL
   const bgLight = "#0b132b";
@@ -181186,12 +182906,13 @@ export default function EmbudoConversionBoard() {
       </div>
 
       {/* PESTAÑAS DE NAVEGACIÓN */}
-      <div style={{ display: 'flex', gap: '0.5rem', borderBottom: `1px solid ${borderCard}`, marginBottom: '1.5rem' }}>
+      <div style={{ display: 'flex', gap: '0.5rem', borderBottom: `1px solid ${borderCard}`, marginBottom: '1.5rem', overflowX: 'auto', paddingBottom: '0.2rem' }}>
         {[
           { id: 'embudo', label: '⚡ Flujo Visual del Embudo', icon: TrendingUp },
           { id: 'tabla_sql', label: '🗄️ Vista Relacional SQL (En Vivo)', icon: Database },
           { id: 'coordinacion', label: '📞 Blitz de Coordinación', icon: PhoneCall },
-          { id: 'integridad', label: '🛡️ Integridad y Caja', icon: ShieldCheck }
+          { id: 'integridad', label: '🛡️ Integridad y Caja', icon: ShieldCheck },
+          { id: 'brandscript', label: '📜 BrandScript & Guiones MJ', icon: BookOpen }
         ].map(tab => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -181592,6 +183313,223 @@ export default function EmbudoConversionBoard() {
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* PESTAÑA DE BRANDSCRIPT Y GUIONES MJ */}
+      {activeTab === 'brandscript' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          
+          {/* Header del Manual */}
+          <div style={{ background: bgCard, padding: '1.5rem', borderRadius: '12px', border: `1px solid ${borderCard}`, borderLeft: `5px solid ${gold}` }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+              <div>
+                <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: gold, background: '#78350f33', padding: '0.2rem 0.6rem', borderRadius: '4px', textTransform: 'uppercase' }}>
+                  Manual Oficial de Enrolamiento Narrativo — Edición V1.0 (2026)
+                </span>
+                <h3 style={{ margin: '0.5rem 0 0.2rem', fontSize: '1.3rem', color: textLight }}>
+                  BrandScript SB7 & Guiones de Conversión para Maestría del Juego (MJ)
+                </h3>
+                <p style={{ margin: 0, color: textMuted, fontSize: '0.85rem' }}>
+                  Alineación de Mánagers y Capitanes bajo el StoryBrand Framework y Neuromarketing Ético. Cero manipulación, 100% libre elección y fisionomía de Creador.
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <a
+                  href="https://cpsl-campus-interactivo.vercel.app/guiones-mj"
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.4rem',
+                    background: '#10b98122',
+                    color: '#34d399',
+                    border: '1px solid #10b981',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '8px',
+                    fontSize: '0.85rem',
+                    fontWeight: 'bold',
+                    textDecoration: 'none'
+                  }}
+                >
+                  🚀 Abrir Simulador Interactivo Completo
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* MATRIZ SB7-MJ */}
+          <div style={{ background: bgCard, padding: '1.5rem', borderRadius: '12px', border: `1px solid ${borderCard}` }}>
+            <h4 style={{ margin: '0 0 1rem 0', color: gold, fontSize: '1.1rem' }}>
+              🗺️ Matriz del BrandScript Oficial (SB7-MJ)
+            </h4>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
+              {[
+                { title: '1. El Personaje (El Héroe)', desc: 'Graduado de C2: un líder que despertó su poder en sala y busca materializarlo en su vida cotidiana.', border: '#3b82f6' },
+                { title: '2. Tiene un Problema (El Efecto Lunes)', desc: 'Externo (entorno inercial), Interno (miedo al auto-sabotaje y soledad), Filosófico (inaceptable volver a vivir promedio).', border: '#ef4444' },
+                { title: '3. Encuentra un Guía', desc: 'El Mánager + Nodus: mentor empático que ya recorrió los 90 días, con autoridad técnica en telemetría.', border: '#8b5cf6' },
+                { title: '4. Que le da un Plan de 3 Pasos', desc: '1) Declara tu Futuro Imposible (FI), 2) Entrena en Integridad (28 entrenamientos), 3) Conquista El Viaje y gradúate en Gratitud.', border: '#10b981' },
+                { title: '5. Y lo llama a la Acción', desc: 'CTA Directo: registro dominical en Nodus. CTA Transicional: sesión de calibración de FI de 15 minutos.', border: gold },
+                { title: '6. Que evita el Fracaso', desc: 'Evitar el marchitamiento de la palabra y caer de vuelta en «la arena» de la víctima perdiendo su Breakthrough.', border: '#ec4899' },
+                { title: '7. Y termina en Éxito', desc: 'Convertirse en un Líder IMO: coherencia, abundancia integral física, emocional y financiera.', border: '#eab308' },
+              ].map((item, idx) => (
+                <div key={idx} style={{ background: bgSurface, padding: '1rem', borderRadius: '8px', borderLeft: `4px solid ${item.border}` }}>
+                  <strong style={{ color: item.border, display: 'block', fontSize: '0.9rem', marginBottom: '0.3rem' }}>{item.title}</strong>
+                  <p style={{ margin: 0, fontSize: '0.85rem', color: textMuted, lineHeight: '1.5' }}>{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* GUIONES TELEFÓNICOS CON COPIA 1-CLICK */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '1.5rem' }}>
+            
+            {/* Escenario A */}
+            <div style={{ background: bgCard, padding: '1.5rem', borderRadius: '12px', border: `1px solid ${borderCard}` }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <h4 style={{ margin: 0, color: '#38bdf8', fontSize: '1rem' }}>
+                  📞 Escenario A: Indeciso / Miedo al Efecto Lunes
+                </h4>
+                <button
+                  onClick={() => copyText(`"Hola [Nombre], te saluda [Mánager], tu mánager de soporte. Qué gusto saludarte. Te llamo brevemente, ¿estás en un espacio cómodo de 3 minutos para conversar? Aún vibra en mí el espacio del domingo de Capítulo Dos. Quiero reconocer la fisonomía y la entrega que mostraste en tu Breakthrough. Vi a un creador absoluto en la sala. ¿Cómo se ha sentido apagar el micrófono y regresar a la rutina estos dos días?... Por eso creamos la Maestría del Juego de 90 días. Tu palabra de jueves sigue viva. ¿Eliges sostener tu estiramiento y dar el paso a tu Maestría este fin de semana, o vas a permitir que la inercia del lunes tome las decisiones por ti?"`, 'escA')}
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', background: bgSurface, border: `1px solid ${borderCard}`, color: textLight, padding: '0.3rem 0.6rem', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer' }}
+                >
+                  {copiedKey === 'escA' ? <Check size={14} color="#10b981" /> : <Copy size={14} />}
+                  {copiedKey === 'escA' ? '¡Copiado!' : 'Copiar Guión'}
+                </button>
+              </div>
+              <div style={{ background: bgSurface, padding: '1rem', borderRadius: '8px', fontSize: '0.85rem', color: textLight, lineHeight: '1.6', fontStyle: 'italic' }}>
+                «Aún vibra en mí el espacio del domingo de Capítulo Dos. Reconozco la fisonomía de creador absoluto que mostraste... El plan es muy sencillo: primero declaramos tu FI, segundo entrenamos en integridad con Nodus, y tercero nos graduamos en Gratitud. ¿Eliges sostener tu estiramiento o vas a permitir que la inercia del lunes decida por ti?»
+              </div>
+            </div>
+
+            {/* Escenario B */}
+            <div style={{ background: bgCard, padding: '1.5rem', borderRadius: '12px', border: `1px solid ${borderCard}` }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <h4 style={{ margin: 0, color: '#34d399', fontSize: '1rem' }}>
+                  💰 Escenario B: Objeción «No tengo dinero»
+                </h4>
+                <button
+                  onClick={() => copyText(`"Reconozco tu honestidad, [Nombre]. Si dejamos la inversión a un lado por un instante... en tu corazón, ¿la Maestría representa un 'sí' rotundo para tu vida, o tienes alguna duda sobre el valor que este entrenamiento aportará a tus metas?... Perfecto. En la cultura de Crear, operamos desde la Causa: el dinero es una circunstancia a diseñar, no un límite inamovible. Si la Plataforma Nodus nos permite estructurar un plan de abono de bajo riesgo y pasos progresivos que se adapte a tus flujos actuales, ¿qué opciones ves viables para generar tu primer aporte de reserva antes de que cerremos el registro este viernes?"`, 'escB')}
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', background: bgSurface, border: `1px solid ${borderCard}`, color: textLight, padding: '0.3rem 0.6rem', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer' }}
+                >
+                  {copiedKey === 'escB' ? <Check size={14} color="#10b981" /> : <Copy size={14} />}
+                  {copiedKey === 'escB' ? '¡Copiado!' : 'Copiar Guión'}
+                </button>
+              </div>
+              <div style={{ background: bgSurface, padding: '1rem', borderRadius: '8px', fontSize: '0.85rem', color: textLight, lineHeight: '1.6', fontStyle: 'italic' }}>
+                «En la cultura de Crear, operamos desde la Causa: si tú eres el creador de tu realidad, el dinero es una circunstancia a diseñar, no un límite inamovible. Si estructuramos un plan de abono de bajo riesgo en Nodus, ¿qué opciones ves viables para tu aporte de reserva este viernes?»
+              </div>
+            </div>
+
+          </div>
+
+          {/* PLANTILLAS DE WHATSAPP OFICIALES */}
+          <div style={{ background: bgCard, padding: '1.5rem', borderRadius: '12px', border: `1px solid ${borderCard}` }}>
+            <h4 style={{ margin: '0 0 1rem 0', color: gold, fontSize: '1.1rem' }}>
+              💬 Plantillas Oficiales de WhatsApp (1-Clic para Copiar)
+            </h4>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '1rem' }}>
+              
+              {/* WhatsApp 1 */}
+              <div style={{ background: bgSurface, padding: '1.2rem', borderRadius: '8px', borderLeft: '3px solid #10b981' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                  <strong style={{ color: '#34d399', fontSize: '0.9rem' }}>Plantilla 1: Bienvenida Post-Graduación C2</strong>
+                  <button
+                    onClick={() => copyText(`¡Felicidades, Creador! 🦅✨
+
+Aún resuena en la sede la fisionomía y la fuerza de tu palabra declarada este fin de semana en Capítulo Dos. Has salido de "la arena" y hoy tienes en tus manos la posibilidad de diseñar tu propio destino.
+
+El lunes ha llegado, y con él, la oportunidad de elegir: ¿volver a la inercia cotidiana o entrenar para consolidar tu Breakthrough?
+
+El equipo de Mánagers y la comunidad de Maestría del Juego ya está lista para recibirte en el contenedor de los 90 días. Tu espacio de estiramiento está guardado.
+
+Paso 1: Ingresa a tu App Nodus 📱
+Paso 2: Agenda tu sesión de calibración de Futuro Imposible (FI) de 15 minutos aquí: [Enlace_Calendly]
+Paso 3: Sostiene tu palabra.
+
+Sostener la fisionomía del Ser es el juego de los grandes. Nos vemos en la cancha.
+
+Atentamente,
+El Equipo de Mánagers y Capitanes de ${selectedSede}
+CREAR PODER SIN LÍMITES 2026.`, 'waPostC2')}
+                    style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', background: '#0b132b', border: `1px solid ${borderCard}`, color: textLight, padding: '0.3rem 0.6rem', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer' }}
+                  >
+                    {copiedKey === 'waPostC2' ? <Check size={14} color="#10b981" /> : <Copy size={14} />}
+                    {copiedKey === 'waPostC2' ? '¡Copiado!' : 'Copiar Texto'}
+                  </button>
+                </div>
+                <div style={{ fontSize: '0.8rem', color: textMuted, whiteSpace: 'pre-line', lineHeight: '1.5' }}>
+                  Principio de «Unidad» de Cialdini. Diseñado para reactivar la emoción del domingo e impulsar el agendamiento del FI de 15 min.
+                </div>
+              </div>
+
+              {/* WhatsApp 2 */}
+              <div style={{ background: bgSurface, padding: '1.2rem', borderRadius: '8px', borderLeft: '3px solid #f59e0b' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                  <strong style={{ color: gold, fontSize: '0.9rem' }}>Plantilla 2: Recordatorio Preventivo (Viernes 12:00 PM)</strong>
+                  <button
+                    onClick={() => copyText(`Hola [Nombre] 👋
+
+Te saludamos desde la oficina de la sede ${selectedSede}. Hoy es viernes de Capítulo Dos, un día clave para cuidar el contenedor de integridad que declaraste el jueves por la noche.
+
+Para asegurar que tu ingreso al bloque de confrontación de las 15:00 PM sea fluido y libre de distracciones logísticas:
+
+📌 Tu estado actual en Nodus requiere conciliación de caja.
+⏰ El cierre automático de registros contables de la plataforma se ejecutará a las 14:00 PM.
+
+Queremos cuidar tu experiencia y tu palabra. Por favor, acércate a la mesa externa de registro antes de la hora límite o envíanos tu comprobante digital por esta vía para validar tu "Ticket Verde" en el sistema.
+
+Si tienes algún quiebre técnico o financiero de última hora, avísanos de inmediato para diseñar juntos una solución de bajo riesgo con el Gerente de Sede antes de que el sistema aplique el bloqueo automático.
+
+¡Sostener tu palabra es tu mayor poder! Nos vemos en sala. 🛡️
+CREAR PODER SIN LÍMITES`, 'waPrev12')}
+                    style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', background: '#0b132b', border: `1px solid ${borderCard}`, color: textLight, padding: '0.3rem 0.6rem', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer' }}
+                  >
+                    {copiedKey === 'waPrev12' ? <Check size={14} color="#10b981" /> : <Copy size={14} />}
+                    {copiedKey === 'waPrev12' ? '¡Copiado!' : 'Copiar Texto'}
+                  </button>
+                </div>
+                <div style={{ fontSize: '0.8rem', color: textMuted, whiteSpace: 'pre-line', lineHeight: '1.5' }}>
+                  Neuromarketing Preventivo. Sustituye la fricción de la penalización de «Palabra Rota» anticipándose al cierre contable de las 14:00 PM.
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          {/* CHECKLIST DE IMPECABILIDAD */}
+          <div style={{ background: bgCard, padding: '1.5rem', borderRadius: '12px', border: `1px solid ${borderCard}` }}>
+            <h4 style={{ margin: '0 0 0.8rem 0', color: '#a855f7', fontSize: '1.1rem' }}>
+              🛡️ Checklist de Impecabilidad del Enrolador Narrativo
+            </h4>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '0.75rem' }}>
+              <div style={{ background: bgSurface, padding: '0.8rem', borderRadius: '6px', fontSize: '0.82rem' }}>
+                <strong style={{ color: '#ec4899', display: 'block' }}>1. Cero Simpatía al Drama</strong>
+                <span style={{ color: textMuted }}>No comprar justificaciones con lástima; sostenerlo en su grandeza de creador.</span>
+              </div>
+              <div style={{ background: bgSurface, padding: '0.8rem', borderRadius: '6px', fontSize: '0.82rem' }}>
+                <strong style={{ color: '#38bdf8', display: 'block' }}>2. Datos vs. Interpretaciones</strong>
+                <span style={{ color: textMuted }}>Separar los hechos objetivos de las historias basadas en el miedo.</span>
+              </div>
+              <div style={{ background: bgSurface, padding: '0.8rem', borderRadius: '6px', fontSize: '0.82rem' }}>
+                <strong style={{ color: '#10b981', display: 'block' }}>3. Respeto a la Autonomía</strong>
+                <span style={{ color: textMuted }}>Elección voluntaria. Erradicación total de culpa y escasez falsa.</span>
+              </div>
+              <div style={{ background: bgSurface, padding: '0.8rem', borderRadius: '6px', fontSize: '0.82rem' }}>
+                <strong style={{ color: gold, display: 'block' }}>4. Fisionomía de Voz</strong>
+                <span style={{ color: textMuted }}>Postura erguida, tono firme y amoroso; la vibración se transmite.</span>
+              </div>
+              <div style={{ background: bgSurface, padding: '0.8rem', borderRadius: '6px', fontSize: '0.82rem' }}>
+                <strong style={{ color: '#a855f7', display: 'block' }}>5. Trazabilidad en Nodus</strong>
+                <span style={{ color: textMuted }}>Registro limpio de acuerdos de pago y fechas límite para la Gerencia.</span>
+              </div>
+            </div>
+          </div>
+
         </div>
       )}
 
@@ -182965,97 +184903,204 @@ export default function GerenteDashboard() {
         </div>
 
       </div>
-    </div>
-  );
-}
-      {/* SECCION DE HORARIOS */}
-      <div style={{ marginTop: "2rem", marginBottom: "2rem" }}>
-        <h2 style={{ fontSize: "1.4rem", color: "var(--text-heading)", borderBottom: "1px solid rgba(255,255,255,0.1)", paddingBottom: "0.5rem", marginBottom: "1rem" }}>
-          <Clock size={22} style={{ verticalAlign: "middle", marginRight: "0.5rem" }} />
-          Horarios de Entrenamientos (Lima)
-        </h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "1.5rem" }}>
+
+      {/* SECCIÓN DE HORARIOS OPERATIVOS DEL EQUIPO (OFICINA, GERENCIA Y COORDINACIÓN) */}
+      <div style={{ marginTop: "2.5rem", marginBottom: "2rem" }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', borderBottom: "1px solid rgba(255,255,255,0.1)", paddingBottom: "0.6rem", marginBottom: "1.2rem" }}>
+          <h2 style={{ fontSize: "1.35rem", color: "var(--text-heading)", margin: 0, display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <Clock size={22} color="var(--crear-cyan)" />
+            Horarios Operativos y Turnos: Oficina, Gerentes y Coordinadores
+          </h2>
+          <button
+            onClick={() => navigate('/calendario-equipo')}
+            className="btn-secondary"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.45rem 0.9rem', fontSize: '0.82rem', fontWeight: 600, color: 'var(--crear-cyan)' }}
+          >
+            Ver Calendario Interactivo & Time Boxing <ArrowRight size={14} />
+          </button>
+        </div>
+
+        {/* TARJETAS DE TURNOS POR ROL */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "1.5rem", marginBottom: "2rem" }}>
+          
+          {/* OFICINA */}
+          <div className="glass-panel" style={{ padding: "1.4rem", borderTop: "4px solid #0ea5e9", borderRadius: "10px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.8rem" }}>
+              <h3 style={{ color: "#38bdf8", margin: 0, fontSize: "1.1rem" }}>🏢 Equipo de Oficina</h3>
+              <span style={{ fontSize: "0.75rem", padding: "2px 8px", borderRadius: "12px", background: "rgba(14, 165, 233, 0.15)", color: "#38bdf8", fontWeight: "bold" }}>Soporte & Mesas</span>
+            </div>
+            <div style={{ fontSize: "0.82rem", color: "var(--text-muted)", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+              <div><strong>Lunes a Jueves (Semanal):</strong> 09:00 - 18:00 (Atención, cobranzas, facturación y regularización).</div>
+              <div><strong>Jueves (Montaje):</strong> 15:00 - 20:00 (Terminales Nodus, caja y cierre bajo llave).</div>
+              <div><strong>Viernes (Apertura):</strong> 07:45 - 23:30 (Mesas registro QR, cartas y soporte Noche de Confianza).</div>
+              <div><strong>Sábado (Operativo):</strong> 08:00 - 22:30 (Ticket Naranja y soporte de sala).</div>
+              <div><strong>Domingo (Fiscal):</strong> 08:00 - 22:00 (<span style={{ color: "#ef4444", fontWeight: "bold" }}>21:00 Cierre Contable POS obligatorio</span> y envío de fichas firmadas).</div>
+            </div>
+          </div>
+
+          {/* GERENCIA */}
+          <div className="glass-panel" style={{ padding: "1.4rem", borderTop: "4px solid #f59e0b", borderRadius: "10px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.8rem" }}>
+              <h3 style={{ color: "#fbbf24", margin: 0, fontSize: "1.1rem" }}>👔 Gerentes de Sede</h3>
+              <span style={{ fontSize: "0.75rem", padding: "2px 8px", borderRadius: "12px", background: "rgba(245, 158, 11, 0.15)", color: "#fbbf24", fontWeight: "bold" }}>Gobernanza Nivel 8</span>
+            </div>
+            <div style={{ fontSize: "0.82rem", color: "var(--text-muted)", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+              <div><strong>Lunes:</strong> 08:30 - 12:00 (Cierre de Caja Nodus) • <span style={{ color: "#ef4444", fontWeight: "bold" }}>12:00 Trigger Impecabilidad Contable</span>.</div>
+              <div><strong>Martes:</strong> 09:00 - 13:00 (Auditoría salones, hotel y coach) • 15:00 (QT Sync).</div>
+              <div><strong>Miércoles:</strong> <span style={{ color: "#ef4444", fontWeight: "bold" }}>19:00 Trigger Alerta Deserción</span> (verificación de FI en Nodus).</div>
+              <div><strong>Jueves:</strong> 14:30 - 20:30 (Supervisión presencial: techo 4.5m, audio y sala).</div>
+              <div><strong>Viernes a Domingo:</strong> 14:01 Trigger Palabra Rota • Domingo liderazgo Mesas de Enrolamiento (50% / 70%).</div>
+            </div>
+          </div>
+
+          {/* COORDINADORES */}
+          <div className="glass-panel" style={{ padding: "1.4rem", borderTop: "4px solid #8b5cf6", borderRadius: "10px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.8rem" }}>
+              <h3 style={{ color: "#a78bfa", margin: 0, fontSize: "1.1rem" }}>🎯 Coordinadores (CC1Y2 & CMJ)</h3>
+              <span style={{ fontSize: "0.75rem", padding: "2px 8px", borderRadius: "12px", background: "rgba(139, 92, 246, 0.15)", color: "#a78bfa", fontWeight: "bold" }}>Nivel 5 & 6</span>
+            </div>
+            <div style={{ fontSize: "0.82rem", color: "var(--text-muted)", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+              <div><strong>Miércoles:</strong> 19:00 Deadline carga FI (CMJ) • 20:00 Grounding virtual aliados C2 (CC1Y2).</div>
+              <div><strong>Jueves:</strong> 15:00 Montaje de sala • 18:00 Grounding presencial C1 (Puertas cerradas).</div>
+              <div><strong>Viernes:</strong> 08:00 Grounding C1 • 11:30 Reporte asistencia • 22:00 Noche de Confianza con tinas.</div>
+              <div><strong>Sábado:</strong> Caída de Confianza con escalera 2m, colchoneta y 4 apoyos certificados.</div>
+              <div><strong>Domingo:</strong> Control Mesa C2 Nodus (Ticket Rojo) • 18:00 Pase de Antorcha Maestría.</div>
+            </div>
+          </div>
+
+        </div>
+
+        {/* SUB-SECCIÓN: HORARIOS DE ENTRENAMIENTOS EN SALA (PARTICIPANTES) */}
+        <h3 style={{ fontSize: "1.15rem", color: "var(--text-heading)", marginBottom: "0.8rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          ⏰ Horarios de Sala de Participantes & Vestimenta (C1 / C2 / MJ)
+        </h3>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "1.5rem" }}>
           {/* CAPITULO UNO */}
-          <div className="glass-panel" style={{ padding: "1.2rem", borderTop: "4px solid #8b5cf6" }}>
-            <h3 style={{ color: "#8b5cf6", marginTop: 0, marginBottom: "1rem" }}>Capitulo UNO</h3>
+          <div className="glass-panel" style={{ padding: "1.4rem", borderTop: "4px solid #8b5cf6", borderRadius: "10px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+              <h3 style={{ color: "#8b5cf6", margin: 0, fontSize: "1.1rem" }}>Capítulo UNO (C1)</h3>
+              <span style={{ fontSize: "0.75rem", padding: "2px 8px", borderRadius: "12px", background: "rgba(139, 92, 246, 0.15)", color: "#a78bfa", fontWeight: "bold" }}>Descubrimiento</span>
+            </div>
             <table style={{ width: "100%", fontSize: "0.85rem", borderCollapse: "collapse" }}>
+              <thead>
+                <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.1)", textAlign: "left", color: "var(--text-muted)", fontSize: "0.75rem" }}>
+                  <th style={{ padding: "0.4rem 0" }}>DÍA</th>
+                  <th style={{ padding: "0.4rem 0" }}>HORARIO</th>
+                  <th style={{ padding: "0.4rem 0", textAlign: "right" }}>VESTIMENTA</th>
+                </tr>
+              </thead>
               <tbody>
                 <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                  <td style={{ padding: "0.5rem 0", fontWeight: "bold" }}>Jueves</td>
-                  <td style={{ padding: "0.5rem 0", color: "var(--text-muted)" }}>4:30 PM - Cierre</td>
-                  <td style={{ padding: "0.5rem 0", textAlign: "right" }}>Negro</td>
+                  <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Jueves</td>
+                  <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>4:30 PM - Cierre</td>
+                  <td style={{ padding: "0.6rem 0", textAlign: "right", color: "var(--text-main)" }}>Negro</td>
                 </tr>
                 <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                  <td style={{ padding: "0.5rem 0", fontWeight: "bold" }}>Viernes</td>
-                  <td style={{ padding: "0.5rem 0", color: "var(--text-muted)" }}>7:30 AM - 3 PM<br/>5 PM - Cierre</td>
-                  <td style={{ padding: "0.5rem 0", textAlign: "right" }}>Negro formal</td>
+                  <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Viernes</td>
+                  <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>7:30 AM - 3:00 PM<br/><span style={{ color: "var(--crear-cyan)" }}>5:00 PM - Cierre (Noche Confianza)</span></td>
+                  <td style={{ padding: "0.6rem 0", textAlign: "right", color: "#f59e0b", fontWeight: "600" }}>Negro formal</td>
                 </tr>
                 <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                  <td style={{ padding: "0.5rem 0", fontWeight: "bold" }}>Sabado</td>
-                  <td style={{ padding: "0.5rem 0", color: "var(--text-muted)" }}>8 AM - 4 PM<br/>3 PM - Cierre</td>
-                  <td style={{ padding: "0.5rem 0", textAlign: "right" }}>Polo/pantalon negro</td>
+                  <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Sábado</td>
+                  <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>8:00 AM - 4:00 PM<br/>3:00 PM - Cierre</td>
+                  <td style={{ padding: "0.6rem 0", textAlign: "right", color: "var(--text-main)" }}>Polo / pantalón negro</td>
                 </tr>
                 <tr>
-                  <td style={{ padding: "0.5rem 0", fontWeight: "bold" }}>Domingo</td>
-                  <td style={{ padding: "0.5rem 0", color: "var(--text-muted)" }}>8 AM - Cierre</td>
-                  <td style={{ padding: "0.5rem 0", textAlign: "right" }}>Polo/pantalon negro</td>
+                  <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Domingo</td>
+                  <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>8:00 AM - Cierre (Graduación)</td>
+                  <td style={{ padding: "0.6rem 0", textAlign: "right", color: "var(--text-main)" }}>Polo / pantalón negro</td>
                 </tr>
               </tbody>
             </table>
           </div>
+
           {/* CAPITULO DOS */}
-          <div className="glass-panel" style={{ padding: "1.2rem", borderTop: "4px solid #29abe2" }}>
-            <h3 style={{ color: "#29abe2", marginTop: 0, marginBottom: "1rem" }}>Capitulo DOS</h3>
+          <div className="glass-panel" style={{ padding: "1.4rem", borderTop: "4px solid #29abe2", borderRadius: "10px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+              <h3 style={{ color: "#29abe2", margin: 0, fontSize: "1.1rem" }}>Capítulo DOS (C2)</h3>
+              <span style={{ fontSize: "0.75rem", padding: "2px 8px", borderRadius: "12px", background: "rgba(41, 171, 226, 0.15)", color: "#38bdf8", fontWeight: "bold" }}>Avanzado</span>
+            </div>
             <table style={{ width: "100%", fontSize: "0.85rem", borderCollapse: "collapse" }}>
+              <thead>
+                <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.1)", textAlign: "left", color: "var(--text-muted)", fontSize: "0.75rem" }}>
+                  <th style={{ padding: "0.4rem 0" }}>DÍA</th>
+                  <th style={{ padding: "0.4rem 0" }}>HORARIO</th>
+                  <th style={{ padding: "0.4rem 0", textAlign: "right" }}>VESTIMENTA</th>
+                </tr>
+              </thead>
               <tbody>
                 <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                  <td style={{ padding: "0.5rem 0", fontWeight: "bold" }}>Jueves</td>
-                  <td style={{ padding: "0.5rem 0", color: "var(--text-muted)" }}>10:30 AM - 4 PM<br/>4 PM - Cierre</td>
-                  <td style={{ padding: "0.5rem 0", textAlign: "right" }}>Negro formal</td>
+                  <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Jueves</td>
+                  <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>10:30 AM - 4:00 PM<br/>4:00 PM - Cierre</td>
+                  <td style={{ padding: "0.6rem 0", textAlign: "right", color: "#f59e0b", fontWeight: "600" }}>Negro formal</td>
                 </tr>
                 <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                  <td style={{ padding: "0.5rem 0", fontWeight: "bold" }}>Viernes</td>
-                  <td style={{ padding: "0.5rem 0", color: "var(--text-muted)" }}>7:15 AM - 4 PM<br/>4 PM - Cierre</td>
-                  <td style={{ padding: "0.5rem 0", textAlign: "right" }}>Polo/pantalon negro</td>
+                  <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Viernes</td>
+                  <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>7:15 AM - 4:00 PM<br/>4:00 PM - Cierre</td>
+                  <td style={{ padding: "0.6rem 0", textAlign: "right", color: "var(--text-main)" }}>Polo / pantalón negro</td>
                 </tr>
                 <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                  <td style={{ padding: "0.5rem 0", fontWeight: "bold" }}>Sabado</td>
-                  <td style={{ padding: "0.5rem 0", color: "var(--text-muted)" }}>7:30 AM - 3 PM<br/>3 PM - Cierre</td>
-                  <td style={{ padding: "0.5rem 0", textAlign: "right" }}>Polo/pantalon negro</td>
+                  <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Sábado</td>
+                  <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>7:30 AM - 3:00 PM<br/>3:00 PM - Cierre</td>
+                  <td style={{ padding: "0.6rem 0", textAlign: "right", color: "var(--text-main)" }}>Polo / pantalón negro</td>
                 </tr>
                 <tr>
-                  <td style={{ padding: "0.5rem 0", fontWeight: "bold" }}>Domingo</td>
-                  <td style={{ padding: "0.5rem 0", color: "var(--text-muted)" }}>Inicio - Cierre<br/>3 PM - Cierre</td>
-                  <td style={{ padding: "0.5rem 0", textAlign: "right" }}>Polo/pantalon negro</td>
+                  <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Domingo</td>
+                  <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>Inicio - Cierre<br/>3:00 PM - Cierre</td>
+                  <td style={{ padding: "0.6rem 0", textAlign: "right", color: "var(--text-main)" }}>Polo / pantalón negro</td>
                 </tr>
               </tbody>
             </table>
           </div>
+
           {/* MAESTRIA */}
-          <div className="glass-panel" style={{ padding: "1.2rem", borderTop: "4px solid #f59e0b" }}>
-            <h3 style={{ color: "#f59e0b", marginTop: 0, marginBottom: "1rem" }}>Maestria del Juego</h3>
+          <div className="glass-panel" style={{ padding: "1.4rem", borderTop: "4px solid #f59e0b", borderRadius: "10px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+              <h3 style={{ color: "#f59e0b", margin: 0, fontSize: "1.1rem" }}>Maestría del Juego (MJ)</h3>
+              <span style={{ fontSize: "0.75rem", padding: "2px 8px", borderRadius: "12px", background: "rgba(245, 158, 11, 0.15)", color: "#fbbf24", fontWeight: "bold" }}>Liderazgo Cuántico</span>
+            </div>
             <table style={{ width: "100%", fontSize: "0.85rem", borderCollapse: "collapse" }}>
+              <thead>
+                <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.1)", textAlign: "left", color: "var(--text-muted)", fontSize: "0.75rem" }}>
+                  <th style={{ padding: "0.4rem 0" }}>DÍA</th>
+                  <th style={{ padding: "0.4rem 0" }}>HORARIO</th>
+                  <th style={{ padding: "0.4rem 0", textAlign: "right" }}>VESTIMENTA</th>
+                </tr>
+              </thead>
               <tbody>
                 <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                  <td style={{ padding: "0.5rem 0", fontWeight: "bold" }}>Viernes</td>
-                  <td style={{ padding: "0.5rem 0", color: "var(--text-muted)" }}>3:00 PM - 9 PM</td>
-                  <td style={{ padding: "0.5rem 0", textAlign: "right" }}>Negro formal</td>
+                  <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Viernes</td>
+                  <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>3:00 PM - 9:00 PM</td>
+                  <td style={{ padding: "0.6rem 0", textAlign: "right", color: "#f59e0b", fontWeight: "600" }}>Negro formal</td>
                 </tr>
                 <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                  <td style={{ padding: "0.5rem 0", fontWeight: "bold" }}>Sabado</td>
-                  <td style={{ padding: "0.5rem 0", color: "var(--text-muted)" }}>8:30 AM - 12 PM<br/>4 PM - 9 PM</td>
-                  <td style={{ padding: "0.5rem 0", textAlign: "right" }}>Camiseta/pantalon negro</td>
+                  <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Sábado</td>
+                  <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>8:30 AM - 12:00 PM<br/>4:00 PM - 9:00 PM</td>
+                  <td style={{ padding: "0.6rem 0", textAlign: "right", color: "var(--text-main)" }}>Camiseta / pantalón negro</td>
                 </tr>
                 <tr>
-                  <td style={{ padding: "0.5rem 0", fontWeight: "bold" }}>Domingo</td>
-                  <td style={{ padding: "0.5rem 0", color: "var(--text-muted)" }}>8:30 AM - 12 PM<br/>4 PM - Cierre</td>
-                  <td style={{ padding: "0.5rem 0", textAlign: "right" }}>Camiseta/pantalon negro</td>
+                  <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Domingo</td>
+                  <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>8:30 AM - 12:00 PM<br/>4:00 PM - Cierre</td>
+                  <td style={{ padding: "0.6rem 0", textAlign: "right", color: "var(--text-main)" }}>Camiseta / pantalón negro</td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
+
+        {/* NOTA DE VESTIMENTA OFICIAL 2026 */}
+        <div style={{ marginTop: '1rem', padding: '0.8rem 1.2rem', background: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '0.8rem', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+          <span style={{ fontSize: '1.2rem' }}>👟</span>
+          <span><strong>Actualización Vestimenta 2026:</strong> Para preservar la energía física y dinamismo en sala durante sesiones prolongadas, el <strong>Entrenador / Coach</strong> tiene autorización formal para el uso de <strong>zapatillas deportivas negras</strong>. Todo el resto del staff y directiva mantiene el código de etiqueta negra rigurosa.</span>
+        </div>
       </div>
+
+      <TaskAssignmentModal isOpen={showTaskForm} onClose={() => setShowTaskForm(false)} />
+      <VenueConfigModal isOpen={showVenueModal} onClose={() => setShowVenueModal(false)} />
+    </div>
+  );
+}
 
 ```
 
@@ -183816,9 +185861,16 @@ import ViewModeSelector from '../components/ViewModeSelector';
 import ThemeToggle from '../components/ThemeToggle';
 import { getVenueForTraining } from '../data/venuesData';
 import { ROLE_DISPLAY_NAMES, normalizeSede } from '../data/usersData';
-import { canAssignTrainer, canViewAllManagers, isDireccionRole, isGlobalQTCoordinator } from '../config/permissions';
+import { 
+  canAssignTrainer, canViewAllManagers, isDireccionRole, isGlobalQTCoordinator,
+  canAccessAgendaTimeBoxing, canAccessFlyersC1, canAccessCalendarioMJ, 
+  canAccessMonitorVuelos, canAccessHotelesSede, canAccessManualQT, 
+  canAccessDirectorioQT, canAccessManualNodus, canAccessCampusInteractivo 
+} from '../config/permissions';
+import EffectiveCommunicationButton from '../components/EffectiveCommunicationButton';
 import { getAllCompanyUsers } from '../services/userService';
 import UserProfileModal from '../components/UserProfileModal';
+import HorariosEntrenamientoModal from '../components/HorariosEntrenamientoModal';
 import { INITIAL_MANAGERS } from '../data/managersData';
 
 /**
@@ -183943,6 +185995,17 @@ const CAUSA_OPTIONS_REGISTRY = [
     roles: null
   },
   {
+    id: 'opt-monitor-vuelos',
+    title: '✈️ Monitor de Vuelos y Cartas Oficiales',
+    category: 'Logística de Entrenadores',
+    badge: 'Radar en Vivo',
+    emoji: '✈️',
+    desc: 'Control de vuelos en vivo (LATAM/Avianca), logística de choferes, recojo en aeropuerto y repositorio de cartas oficiales',
+    keywords: ['vuelos', 'vuelo', 'cartas', 'carta', 'monitor de vuelos', 'radar', 'itinerario', 'chofer', 'hotel', 'andres idrobo', 'lourdes patino', 'alejandro diaz', 'migraciones', 'latam', 'avianca'],
+    route: '/monitor-vuelos',
+    roles: null
+  },
+  {
     id: 'opt-carta-andres',
     title: 'Carta Andrés Idrobo (Equipo 30 - Creación)',
     category: 'Carta Oficial',
@@ -183950,7 +186013,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     emoji: '📄',
     desc: 'Vuelos con escala en Guayaquil LA 1351 / LA 1430, carta migración y recojo 8:30 PM',
     keywords: ['andres', 'andres idrobo', 'equipo 30', 'creacion', 'djbjjd', 'latam', 'carta andres'],
-    external: 'https://cartas.crearpsl.net/carta_andres_idrobo_e30.html',
+    external: '/cartas/carta_andres_idrobo_e30.html',
     roles: null
   },
   {
@@ -183979,13 +186042,25 @@ const CAUSA_OPTIONS_REGISTRY = [
     id: 'opt-agenda-equipo',
     title: 'Agenda y Time Boxing del Equipo',
     category: 'Productividad',
-    badge: 'Horarios',
+    badge: 'Time Boxing',
     emoji: '🗓️',
     desc: 'Planificación semanal por bloques de tiempo y alineación del equipo',
-    keywords: ['agenda', 'time boxing', 'horario', 'planificacion', 'bloques', 'semana'],
+    keywords: ['agenda', 'time boxing', 'bloques', 'semana', 'calendario equipo'],
     route: '/calendario-equipo',
     roles: null
   },
+  {
+    id: 'opt-horarios-entrenamientos',
+    title: 'Horarios de Entrenamientos y Código de Vestimenta',
+    category: 'Operaciones',
+    badge: 'C1 / C2 / MJ',
+    emoji: '⏰',
+    desc: 'Horarios oficiales de sala (Jueves a Domingo), aperturas, recesos, noches de confianza y código de vestimenta oficial',
+    keywords: ['horarios', 'horario', 'vestimenta', 'ropa', 'turnos', 'c1', 'c2', 'maestria', 'horas', 'cronograma', 'lima', 'jueves', 'viernes', 'sabado', 'domingo'],
+    action: 'open_horarios_modal',
+    roles: null
+  },
+
   {
     id: 'opt-checklist',
     title: 'Mi Checklist Operativo',
@@ -184176,14 +186251,14 @@ const CAUSA_OPTIONS_REGISTRY = [
   },
   {
     id: 'opt-manual-nodus',
-    title: 'Manual Práctico Nodus',
-    category: 'Documentación',
-    badge: 'Nodus',
+    title: 'Gobernanza y Manual Nodus (Edición 2026)',
+    category: 'Gobernanza',
+    badge: '18 Caps + 9 Niveles',
     emoji: '📗',
-    desc: 'Guía práctica para el uso correcto de la plataforma externa Nodus',
-    keywords: ['manual nodus', 'nodus', 'guia nodus', 'plataforma nodus', 'imo'],
+    desc: 'Gobernanza simbiótica Nodus + Causa OS, 9 niveles, vestimenta 2026, 14 KPIs y manual paso a paso de Nodus',
+    keywords: ['manual nodus', 'nodus', 'gobernanza', 'guia nodus', 'plataforma nodus', 'imo', 'kpis', 'triggers', 'vestimenta', 'el viaje', 'paul sosa', 'fer aragon', 'elizabeth escobar'],
     route: '/manual-nodus',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'consolidado']
+    roles: null
   },
   {
     id: 'opt-campus',
@@ -184312,6 +186387,7 @@ export default function Home() {
   const [taskBeingEdited, setTaskBeingEdited] = useState(null); // tarea a editar desde el panel "Tareas que has asignado"
   const [tareasAsignadasFilter, setTareasAsignadasFilter] = useState('Activas'); // 'Activas' | 'Vencidas' | 'Cumplidas' | 'Todas'
   const [showVenueModal, setShowVenueModal] = useState(false);
+  const [showHorariosModal, setShowHorariosModal] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showToolsDropdown, setShowToolsDropdown] = useState(false);
   const toolsDropdownRef = useRef(null);
@@ -184546,7 +186622,9 @@ export default function Home() {
   const handleSelectSearchOption = (opt) => {
     setShowGlobalSearchResults(false);
     setGlobalSearchTerm('');
-    if (opt.action === 'new_task') {
+    if (opt.action === 'open_horarios_modal') {
+      setShowHorariosModal(true);
+    } else if (opt.action === 'new_task') {
       setShowTaskModal(true);
     } else if (opt.action === 'venue_modal') {
       setShowVenueModal(true);
@@ -184984,6 +187062,9 @@ export default function Home() {
               <span>TAREA</span>
             </button>
 
+            {/* BOTÓN DE COMUNICACIÓN EFECTIVA OFICIAL SEGÚN MATRIZ */}
+            <EffectiveCommunicationButton currentUser={currentUser} />
+
             {/* BOTÓN SALIR */}
             <button onClick={handleLogout} className="btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.82rem', display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
               <LogOut size={15} /> Salir
@@ -185010,7 +187091,17 @@ export default function Home() {
             >
               🎯 Mis Metas
             </button>
-            {(currentUser?.isSuperAdmin || currentUser?.appRole === 'gerente' || currentUser?.isDireccion || currentUser?.appRole === 'director_maestria' || ['coordinador', 'coord_c1', 'coord_c2', 'coordinador_c1c2'].includes(currentUser?.appRole)) && (
+            {canAccessAgendaTimeBoxing(currentUser) && (
+              <button
+                onClick={() => setShowHorariosModal(true)}
+                className="btn-secondary"
+                title="Horarios oficiales de entrenamiento y código de vestimenta"
+                style={{ padding: '0.45rem 0.9rem', fontSize: '0.85rem', color: 'var(--crear-cyan)', borderColor: 'rgba(41, 171, 226, 0.5)', background: 'rgba(41, 171, 226, 0.12)', fontWeight: 'bold' }}
+              >
+                ⏰ Horarios y Vestimenta
+              </button>
+            )}
+            {canAccessFlyersC1(currentUser) && (
               <button onClick={() => navigate('/generador-flyer')} className="btn-secondary" title="Generador de Flyers Oficiales para Capítulos Uno" style={{ padding: '0.45rem 0.9rem', fontSize: '0.85rem', color: '#f59e0b', borderColor: 'rgba(245, 158, 11, 0.5)', background: 'rgba(245, 158, 11, 0.12)', fontWeight: 'bold' }}>
                 🎨 Flyers C1 Globales
               </button>
@@ -185043,7 +187134,7 @@ export default function Home() {
                 boxShadow: '0 20px 50px rgba(0,0,0,0.95), 0 0 25px rgba(41, 171, 226, 0.2)',
                 border: '1px solid rgba(41, 171, 226, 0.4)'
               }}>
-                {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+                {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado'].includes(currentUser?.appRole) ? (
                   <>
                     <button onClick={() => { setShowToolsDropdown(false); navigate('/gerente'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                       💼 Causa OS Gerencial
@@ -185061,47 +187152,56 @@ export default function Home() {
                       🗺️ Nodus Data Map
                     </button>
                   </>
+                ) : (
+                  <button onClick={() => { setShowToolsDropdown(false); navigate(`/checklist/${currentUser?.appRole || 'capitan'}`); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
+                    💼 Mi Dashboard / Checklist
+                  </button>
                 )}
 
                 {(currentUser?.appRole !== 'qt') && (
-<button onClick={() => { setShowToolsDropdown(false); navigate('/acuerdos'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#a855f7', background: 'rgba(168, 85, 247, 0.1)' }}>
-                  ✉️ Acuerdos Oficiales (Correo)
-                </button>
-)}
-                <button onClick={() => { setShowToolsDropdown(false); navigate('/calendario-equipo'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#f97316', background: 'rgba(249, 115, 22, 0.1)' }}>
-                  🗓️ Agenda y Time Boxing
-                </button>
+                  <button onClick={() => { setShowToolsDropdown(false); navigate('/acuerdos'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#a855f7', background: 'rgba(168, 85, 247, 0.1)' }}>
+                    ✉️ Acuerdos Oficiales (Correo)
+                  </button>
+                )}
+
+                {canAccessAgendaTimeBoxing(currentUser) && (
+                  <>
+                    <button onClick={() => { setShowToolsDropdown(false); navigate('/calendario-equipo'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#f97316', background: 'rgba(249, 115, 22, 0.1)' }}>
+                      🗓️ Agenda y Time Boxing
+                    </button>
+                    <button onClick={() => { setShowToolsDropdown(false); setShowHorariosModal(true); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: 'var(--crear-cyan)', background: 'rgba(41, 171, 226, 0.1)' }}>
+                      ⏰ Horarios de Entrenamientos
+                    </button>
+                  </>
+                )}
 
                 {(currentUser?.appRole !== 'qt') && (
-<button onClick={() => { setShowToolsDropdown(false); navigate('/learning'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(41, 171, 226, 0.1)', color: 'var(--crear-cyan)' }}>
-                  🧠 Inteligencia Colectiva (Learning)
-                </button>
-)}
+                  <button onClick={() => { setShowToolsDropdown(false); navigate('/learning'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(41, 171, 226, 0.1)', color: 'var(--crear-cyan)' }}>
+                    🧠 Inteligencia Colectiva (Learning)
+                  </button>
+                )}
 
                 {(currentUser?.appRole !== 'qt') && (
-<button onClick={() => { setShowToolsDropdown(false); navigate('/excelencia'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(255, 183, 3, 0.15)', color: 'var(--crear-gold)' }}>
-                  👑 Excelencia Operativa
-                </button>
-)}
+                  <button onClick={() => { setShowToolsDropdown(false); navigate('/excelencia'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(255, 183, 3, 0.15)', color: 'var(--crear-gold)' }}>
+                    👑 Excelencia Operativa
+                  </button>
+                )}
 
-                {(currentUser?.isSuperAdmin || currentUser?.appRole === 'gerente' || currentUser?.isDireccion || currentUser?.appRole === 'director_maestria' || ['coordinador', 'coord_c1', 'coord_c2', 'coordinador_c1c2'].includes(currentUser?.appRole)) && (
-<button onClick={() => { setShowToolsDropdown(false); navigate('/generador-flyer'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(234, 179, 8, 0.15)', color: '#facc15', fontWeight: 'bold' }}>
-                  🎨 Generador de Flyers Oficiales
-                </button>
-)}
+                {canAccessFlyersC1(currentUser) && (
+                  <button onClick={() => { setShowToolsDropdown(false); navigate('/generador-flyer'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(234, 179, 8, 0.15)', color: '#facc15', fontWeight: 'bold' }}>
+                    🎨 Generador de Flyers Oficiales
+                  </button>
+                )}
 
-                {(currentUser?.appRole !== 'qt') && (
-<a 
-                  href="/cartas/carta_andres_idrobo_e30.html" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  onClick={() => setShowToolsDropdown(false)} 
-                  className="btn-secondary" 
-                  style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem', textDecoration: 'none' }}
-                >
-                  ✈️ Monitor de Vuelos y Cartas
-                </a>
-)}
+                {canAccessMonitorVuelos(currentUser) && (
+                  <button 
+                    onClick={() => { setShowToolsDropdown(false); navigate('/monitor-vuelos'); }} 
+                    className="btn-secondary" 
+                    style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem', border: '1px solid rgba(56, 189, 248, 0.3)', cursor: 'pointer' }}
+                  >
+                    ✈️ Monitor de Vuelos y Cartas
+                  </button>
+                )}
 
                 {['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan'].includes(currentUser?.appRole) && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/mis-kpis'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
@@ -185109,7 +187209,7 @@ export default function Home() {
                   </button>
                 )}
 
-                {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+                {canAccessDirectorioQT(currentUser) && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/directorio-qt'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                     ⚡ Directorio QT
                   </button>
@@ -185127,11 +187227,10 @@ export default function Home() {
                   </button>
                 )}
 
-                {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
-                  <button onClick={() => { setShowToolsDropdown(false); window.open('https://cpsl-campus-interactivo.vercel.app/ruta', '_blank'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
-                    🎓 Campus Interactivo ↗
-                  </button>
-                )}
+                {/* Campus Interactivo: Para TODOS los roles según Matriz */}
+                <button onClick={() => { setShowToolsDropdown(false); window.open('https://cpsl-campus-interactivo.vercel.app/ruta', '_blank'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#10b981', background: 'rgba(16, 185, 129, 0.1)' }}>
+                  🎓 Campus Interactivo ↗
+                </button>
 
                 {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
                   <div style={{ display: 'flex', gap: '0.2rem', padding: '0.2rem' }}>
@@ -185144,11 +187243,7 @@ export default function Home() {
                   </div>
                 )}
 
-                {/* Calendario de Maestría del Juego (29/08/2026): mismo criterio de
-                    acceso que Centro de Managers, sin entrenadores/entrenador_llamadas
-                    (la edición es de CMJ/gerencia; los entrenadores no gestionan el
-                    calendario oficial del equipo). */}
-                {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'director_maestria', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+                {canAccessCalendarioMJ(currentUser) && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/calendario-mj'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#1a75bc', background: 'rgba(26, 117, 188, 0.1)' }}>
                     📅 Calendario de Maestría del Juego
                   </button>
@@ -185158,13 +187253,13 @@ export default function Home() {
                   🚨 Protocolo de Emergencias
                 </button>
 
-                {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+                {canAccessManualQT(currentUser) && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/manual'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                     📘 Manual / Guía Causa OS / QT
                   </button>
                 )}
 
-                {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+                {canAccessManualNodus(currentUser) && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/manual-nodus'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.4)', background: 'rgba(16, 185, 129, 0.1)', fontWeight: 'bold' }}>
                     📗 Manual Práctico Nodus
                   </button>
@@ -185178,9 +187273,18 @@ export default function Home() {
       {/* BARRA PRO COMPLETA (SI ESTÁ EN MODO PRO) */}
       {viewMode === 'pro' && customModules.advancedTools !== false && (
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '1.5rem', padding: '0.75rem', background: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.06)' }}>
-          {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+          {canAccessAgendaTimeBoxing(currentUser) && (
+            <button onClick={() => setShowHorariosModal(true)} className="btn-primary" title="Horarios oficiales de entrenamiento y código de vestimenta" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #06b6d4, #0284c7)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+              ⏰ Horarios y Vestimenta
+            </button>
+          )}
+          {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado'].includes(currentUser?.appRole) ? (
             <button onClick={() => navigate('/gerente')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'var(--crear-gold)', color: 'black' }}>
               💼 SO-AR Gerencial
+            </button>
+          ) : (
+            <button onClick={() => navigate(`/checklist/${currentUser?.appRole || 'capitan'}`)} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'var(--crear-gold)', color: 'black' }}>
+              💼 Mi Dashboard
             </button>
           )}
           {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
@@ -185203,25 +187307,19 @@ export default function Home() {
             </button>
           )}
 
-          {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+          {canAccessManualQT(currentUser) && (
             <button onClick={() => navigate('/manual')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #0284c7, #2563eb)', color: 'white', border: 'none' }}>
               📘 Manual QT
             </button>
           )}
 
-          {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+          {canAccessManualNodus(currentUser) && (
             <button onClick={() => navigate('/manual-nodus')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #047857)', color: 'white', border: 'none' }}>
               📗 Manual Nodus
             </button>
           )}
 
-          {/* (02/09/2026) Antes este botón mostraba "Directorio QT" también a coordinador_mj,
-              coord_maestria, entrenador y entrenador_llamadas — roles que la ruta real
-              /directorio-qt (App.jsx, RoleRoute allowedRoles) SIEMPRE rechazó, así que para
-              ellos era un botón que llevaba a un "ACCESO DENEGADO". Se corrigió para usar la
-              misma lista DIRECTORIO_QT_ROLES ya definida arriba (línea ~78), que sí coincide
-              con la ruta. Reportado por José: un entrenador (Julio César Narváez) lo veía. */}
-          {DIRECTORIO_QT_ROLES.includes(currentUser?.appRole) && (
+          {canAccessDirectorioQT(currentUser) && (
             <button onClick={() => navigate('/directorio-qt')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: 'white', border: 'none' }}>
               ⚡ Directorio QT
             </button>
@@ -185239,11 +187337,10 @@ export default function Home() {
             </button>
           )}
 
-          {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
-            <button onClick={() => window.open('https://cpsl-campus-interactivo.vercel.app/ruta', '_blank')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #059669)', color: 'white', border: 'none' }}>
-              🎓 Campus Interactivo
-            </button>
-          )}
+          {/* Campus Interactivo: abierto a TODOS los 9 roles */}
+          <button onClick={() => window.open('https://cpsl-campus-interactivo.vercel.app/ruta', '_blank')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #059669)', color: 'white', border: 'none' }}>
+            🎓 Campus Interactivo
+          </button>
 
           {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
             <button onClick={() => navigate('/centro-managers')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#000', fontWeight: 'bold', border: 'none' }}>
@@ -185251,20 +187348,21 @@ export default function Home() {
             </button>
           )}
 
-          {/* Calendario de Maestría del Juego (31/08/2026): esta es la barra "Pro"
-              que realmente ve José (barra de botones siempre visible), distinta
-              del dropdown "Herramientas" donde se había agregado el acceso
-              antes — por eso no aparecía. Mismo criterio de roles que Centro
-              Managers, sin entrenadores (la edición es de CMJ/gerencia). */}
-          {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'director_maestria', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+          {canAccessCalendarioMJ(currentUser) && (
             <button onClick={() => navigate('/calendario-mj')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #1a75bc, #29abe2)', color: 'white', border: 'none' }}>
               📅 Calendario MJ
             </button>
           )}
 
-          {(currentUser?.isSuperAdmin || currentUser?.appRole === 'gerente' || currentUser?.isDireccion || currentUser?.appRole === 'director_maestria' || ['coordinador', 'coord_c1', 'coord_c2', 'coordinador_c1c2'].includes(currentUser?.appRole)) && (
+          {canAccessFlyersC1(currentUser) && (
             <button onClick={() => navigate('/generador-flyer')} className="btn-primary" title="Generador de Flyers Oficiales para Capítulos Uno" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #ec4899)', color: 'white', fontWeight: 'bold', border: 'none', boxShadow: '0 0 15px rgba(245, 158, 11, 0.4)' }}>
               🎨 Flyers C1 Globales
+            </button>
+          )}
+
+          {canAccessMonitorVuelos(currentUser) && (
+            <button onClick={() => navigate('/monitor-vuelos')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #38bdf8, #0284c7)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+              ✈️ Monitor de Vuelos
             </button>
           )}
         </div>
@@ -185483,7 +187581,7 @@ export default function Home() {
                   <CalendarIcon size={18} /> EVENTOS Y ENTRENAMIENTOS
                 </h3>
                 <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', flexWrap: 'wrap' }}>
-                  {(currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.isGerente || ['gerente', 'direccion', 'director_maestria', 'qt', 'consolidado'].includes(currentUser?.appRole)) && (
+                  {canAccessHotelesSede(currentUser) && (
                     <button 
                       type="button"
                       onClick={() => setShowVenueModal(true)}
@@ -185577,16 +187675,74 @@ export default function Home() {
               ) : (
                 <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                   {(() => {
-                    const isEntrenador = ['entrenador', 'entrenador_llamadas'].includes(currentUser?.appRole);
+                    const role = currentUser?.appRole || '';
+                    const isSuperOrDir = currentUser?.isSuperAdmin || currentUser?.isDireccion || ['direccion', 'cfo', 'ceo', 'cco', 'superadmin', 'consolidado'].includes(role);
+                    const isGerente = role === 'gerente' || currentUser?.isGerente;
+                    const isCoordC1C2 = ['coord_c1', 'coord_c2', 'coordinador_c1c2'].includes(role);
+                    const isCoordMJ = ['coord_maestria', 'coordinador_mj', 'director_maestria'].includes(role);
+                    const isEntrenador = ['entrenador', 'entrenador_llamadas'].includes(role);
+                    const isQT = role === 'qt' || (currentUser?.roles || []).includes('qt');
+                    const isEquipoRole = ['capitan', 'aliado', 'manager'].includes(role);
+
                     let displayEvents = (events || []).filter(ev => {
-                      if (activeEventTab === 'locales') {
-                        if (isEntrenador) return isTrainerMatchingUser(ev.trainer || ev.entrenador, currentUser);
+                      // 1. Entrenadores: solo los eventos que él/ella dictará
+                      if (isEntrenador) {
+                        return isTrainerMatchingUser(ev.trainer || ev.entrenador, currentUser);
+                      }
+
+                      // 2. Coordinadores C1/C2: solo los de su sede y solo C1/C2
+                      if (isCoordC1C2) {
+                        const userSede = currentUser?.sede || '';
+                        const evSede = ev.sede || ev.sedeTag || '';
+                        if (userSede && !userSede.toLowerCase().includes('global')) {
+                          if (!evSede || (!evSede.toLowerCase().includes(userSede.toLowerCase()) && !userSede.toLowerCase().includes(evSede.toLowerCase()))) {
+                            return false;
+                          }
+                        }
+                        const name = (ev.nombre || ev.name || '').toUpperCase();
+                        return name.includes('CAPITULO UNO') || name.includes('C1') || name.includes('CAPÍTULO UNO') || name.includes('CAPITULO DOS') || name.includes('C2') || name.includes('CAPÍTULO DOS');
+                      }
+
+                      // 3. Coordinadores MJ: solo los de su sede y solo MJ
+                      if (isCoordMJ) {
+                        const userSede = currentUser?.sede || '';
+                        const evSede = ev.sede || ev.sedeTag || '';
+                        if (userSede && !userSede.toLowerCase().includes('global')) {
+                          if (!evSede || (!evSede.toLowerCase().includes(userSede.toLowerCase()) && !userSede.toLowerCase().includes(evSede.toLowerCase()))) {
+                            return false;
+                          }
+                        }
+                        const name = (ev.nombre || ev.name || '').toUpperCase();
+                        return name.includes('MAESTRIA') || name.includes('MJ') || name.includes('MAESTRÍA');
+                      }
+
+                      // 4. Capitanes, Aliados y Managers: solo los de su equipo
+                      if (isEquipoRole) {
+                        const userTeam = (currentUser?.equipo || currentUser?.equipoAsignado || '').toLowerCase().trim();
+                        if (userTeam) {
+                          const name = (ev.nombre || ev.name || '').toLowerCase();
+                          const desc = (ev.descripcion || ev.desc || '').toLowerCase();
+                          return name.includes(userTeam) || desc.includes(userTeam);
+                        }
+                        const userSede = currentUser?.sede || '';
+                        const evSede = ev.sede || ev.sedeTag || '';
+                        if (userSede && !userSede.toLowerCase().includes('global')) {
+                          if (!evSede || (!evSede.toLowerCase().includes(userSede.toLowerCase()) && !userSede.toLowerCase().includes(evSede.toLowerCase()))) {
+                            return false;
+                          }
+                        }
+                        return true;
+                      }
+
+                      // 5. Filtro tab locales vs globales para Gerentes y Directivos
+                      if (activeEventTab === 'locales' || (isGerente && !isSuperOrDir)) {
                         const userSede = currentUser?.sede || '';
                         if (!userSede || userSede.toLowerCase().includes('global')) return true;
                         const evSede = ev.sede || ev.sedeTag || '';
                         if (!evSede) return false;
-                          return evSede.toLowerCase().includes(userSede.toLowerCase()) || userSede.toLowerCase().includes(evSede.toLowerCase());
+                        return evSede.toLowerCase().includes(userSede.toLowerCase()) || userSede.toLowerCase().includes(evSede.toLowerCase());
                       }
+
                       return true;
                     });
 
@@ -185634,33 +187790,35 @@ export default function Home() {
                       return timeFilter === 'pasados' ? dateB - dateA : dateA - dateB; // Past events descending, future ascending
                     });
 
-                    
-                      // --- QT Filter Logic ---
-                      if (currentUser?.appRole === "qt" || (currentUser?.roles || []).includes("qt")) {
-                         const qtNow = new Date().getTime();
-                         let c1Count = 0;
-                         let c2Count = 0;
-                         let creacionCount = 0;
-                         displayEvents = displayEvents.filter(ev => {
-                            const dateMs = new Date(ev.fecha_inicio || ev.start || 0).getTime();
-                            if (dateMs < qtNow) return false;
-                            const name = (ev.nombre || ev.name || "").toUpperCase();
-                            if (name.includes("CAPITULO UNO") || name.includes("C1") || name.includes("CAPÍTULO UNO")) {
-                               c1Count++;
-                               return c1Count <= 2;
-                            }
-                            if (name.includes("CAPITULO DOS") || name.includes("C2") || name.includes("CAPÍTULO DOS")) {
-                               c2Count++;
-                               return c2Count <= 2;
-                            }
-                            if (name.includes("CREACION") || name.includes("CREACIÓN")) {
-                               creacionCount++;
-                               return creacionCount <= 2;
-                            }
-                            return false; // QTs ONLY see C1, C2, and Creacion
-                         });
-                      }
-                      if (displayEvents.length === 0) {
+                    // --- QT Filter Logic: solo de su sede, solo C1 y C2 actual y próximo ---
+                    if (isQT) {
+                      const qtNow = new Date().getTime();
+                      const userSede = currentUser?.sede || '';
+                      let c1Count = 0;
+                      let c2Count = 0;
+                      displayEvents = displayEvents.filter(ev => {
+                        if (userSede && !userSede.toLowerCase().includes('global')) {
+                          const evSede = ev.sede || ev.sedeTag || '';
+                          if (!evSede || (!evSede.toLowerCase().includes(userSede.toLowerCase()) && !userSede.toLowerCase().includes(evSede.toLowerCase()))) {
+                            return false;
+                          }
+                        }
+                        const dateMs = new Date(ev.fecha_inicio || ev.start || 0).getTime();
+                        if (dateMs < qtNow) return false;
+                        const name = (ev.nombre || ev.name || '').toUpperCase();
+                        if (name.includes('CAPITULO UNO') || name.includes('C1') || name.includes('CAPÍTULO UNO')) {
+                          c1Count++;
+                          return c1Count <= 2;
+                        }
+                        if (name.includes('CAPITULO DOS') || name.includes('C2') || name.includes('CAPÍTULO DOS')) {
+                          c2Count++;
+                          return c2Count <= 2;
+                        }
+                        return false; // QTs SOLO ven C1 y C2 de su sede (actual y próximo)
+                      });
+                    }
+
+                    if (displayEvents.length === 0) {
                       return (
                         <div style={{ padding: '1.5rem 1rem', textAlign: 'center' }}>
                           <p className="text-muted" style={{ margin: 0, fontSize: '0.85rem' }}>No hay eventos registrados en este filtro.</p>
@@ -185685,7 +187843,7 @@ export default function Home() {
                                 <span style={{ fontSize: '0.75rem', color: 'var(--crear-cyan)', display: 'block', marginTop: '0.1rem' }}>
                                   🏨 {hotelVenue}
                                 </span>
-                                {(!['qt', 'capitan', 'manager'].includes(currentUser?.appRole)) && (
+                                {(!['qt', 'capitan', 'manager', 'aliado'].includes(currentUser?.appRole)) && (
                                   <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginTop: '0.1rem' }}>
                                     🎙️ Trainer: {ev.trainer || ev.entrenador || 'Por confirmar'}
                                   </span>
@@ -185920,6 +188078,9 @@ export default function Home() {
       {showSearchUserModal && selectedSearchUser && (
         <UserProfileModal isOpen={showSearchUserModal} onClose={() => setShowSearchUserModal(false)} user={selectedSearchUser} allTasks={allTasks} />
       )}
+
+      {/* MODAL HORARIOS DE ENTRENAMIENTOS Y CÓDIGO DE VESTIMENTA */}
+      <HorariosEntrenamientoModal isOpen={showHorariosModal} onClose={() => setShowHorariosModal(false)} />
     </div>
   );
 }
@@ -186452,21 +188613,21 @@ export default function ManualGuia() {
               CREAR PODER SIN LIMITES GLOBAL • DOCUMENTO MAESTRO v2.0
             </span>
             <h1 style={{ margin: 0, fontSize: '1.8rem', color: 'var(--text-heading)', fontWeight: 900, letterSpacing: '-0.5px', lineHeight: 1.2 }}>
-              Manual Institucional & Guia Operativa — Causa OS
+              Manual Institucional & Guía Operativa — Causa OS
             </h1>
           </div>
         </div>
         <p style={{ fontSize: '1rem', lineHeight: '1.65', color: 'var(--text-main)', margin: '0 0 1.25rem 0', maxWidth: '860px' }}>
-          En <strong>CREAR PODER SIN LIMITES</strong> no gestionamos eventos; forjamos lideres y equipos de alto rendimiento
-          que pasan de la teoria a la accion masiva bajo presion. Este documento unifica el brochure corporativo,
-          la hoja de ruta operativa y la guia completa de la plataforma digital <strong>Causa OS</strong>.
+          En <strong>CREAR PODER SIN LÍMITES</strong> no gestionamos eventos; forjamos líderes y equipos de alto rendimiento
+          que pasan de la teoría a la acción masiva bajo presión. Este documento unifica el brochure corporativo,
+          la hoja de ruta operativa y la guía completa de la plataforma digital <strong>Causa OS</strong>.
         </p>
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
           <div style={{ padding: '0.6rem 1.1rem', background: 'var(--crear-gold-light)', borderLeft: '3px solid var(--crear-gold)', borderRadius: '0 8px 8px 0', fontSize: '0.92rem', fontStyle: 'italic', color: 'var(--text-main)', fontWeight: 600 }}>
             "El conocimiento te muestra el camino. El entrenamiento rompe tus barreras."
           </div>
           <div style={{ padding: '0.6rem 1.1rem', background: 'rgba(16,185,129,0.1)', borderLeft: '3px solid #10b981', borderRadius: '0 8px 8px 0', fontSize: '0.88rem', color: 'var(--text-muted)' }}>
-            Actualizado: Agosto 2026 — 7 Sedes Operativas — Plataforma Causa OS activa
+            Actualizado: Agosto 2026 — 6 Sedes Operativas + Dirección Global — Plataforma Causa OS activa
           </div>
         </div>
       </div>
@@ -186482,19 +188643,19 @@ export default function ManualGuia() {
       {activeTab === 'brochure' && (
         <div style={{ display: 'grid', gap: '2rem' }}>
           <div className="glass-panel" style={{ padding: '2.25rem 2rem', borderRadius: '16px' }}>
-            <SectionHeader icon={<Target />} sup="PARTE I - PROPUESTA DE VALOR" title="1. Nuestro Estandar de Alto Rendimiento" />
+            <SectionHeader icon={<Target />} sup="PARTE I - PROPUESTA DE VALOR" title="1. Nuestro Estándar de Alto Rendimiento" />
             <p style={{ margin: '0 0 1.5rem 0', lineHeight: '1.75', color: 'var(--text-main)', fontSize: '1rem' }}>
-              En <strong>CREAR PODER SIN LIMITES Global</strong> no gestionamos eventos; forjamos lideres y equipos de alto rendimiento.
-              Nuestra metodologia exige pasar de la teoria a la accion masiva, reconfigurando la toma de decisiones bajo presion
+              En <strong>CREAR PODER SIN LÍMITES</strong> no gestionamos eventos; forjamos líderes y equipos de alto rendimiento.
+              Nuestra metodología exige pasar de la teoría a la acción masiva, reconfigurando la toma de decisiones bajo presión
               e instalando un sentido de <strong>responsabilidad absoluta</strong> en cada participante y miembro del Staff.
-              El resultado no es aprendizaje pasivo: es transformacion medible y auditada.
+              El resultado no es aprendizaje pasivo: es transformación medible y auditada.
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
               {[
-                { icon: 'FIRE', label: 'Accion Masiva', desc: 'Cada dinamica esta disenada para generar un quiebre real, no reflexiones superficiales.' },
-                { icon: 'CHART', label: 'Resultados Medibles', desc: 'Metas auditables: Px sentados, retencion al 100 dias y avance por sede en tiempo real.' },
-                { icon: 'GLOBE', label: '7 Sedes Internacionales', desc: 'Quito, Guayaquil, Cuenca, Lima, Medellin, Mexico y Sede Global con estandares unificados.' },
-                { icon: 'ZAP', label: 'Causa OS Digital', desc: 'Plataforma propia de monitoreo, checklists y gestion operativa para todo el staff.' },
+                { icon: 'FIRE', label: 'Acción Masiva', desc: 'Cada dinámica está diseñada para generar un quiebre real, no reflexiones superficiales.' },
+                { icon: 'CHART', label: 'Resultados Medibles', desc: 'Metas auditables: Px sentados, retención a los 100 días y avance por sede en tiempo real.' },
+                { icon: 'GLOBE', label: '6 Sedes Internacionales + Dirección Global', desc: 'Lima, Quito, Guayaquil, Cuenca, Medellín y México, con estándares unificados y respaldo de la Dirección Global.' },
+                { icon: 'ZAP', label: 'Causa OS Digital', desc: 'Plataforma propia de monitoreo, checklists y gestión operativa para todo el staff.' },
               ].map((item, i) => (
                 <div key={item.label} style={{ padding: '1.1rem', background: 'var(--bg-card)', borderRadius: '10px', border: '1px solid var(--border-subtle)' }}>
                   <strong style={{ color: 'var(--crear-gold)', fontSize: '0.95rem', display: 'block', marginBottom: '0.3rem' }}>{item.label}</strong>
@@ -186508,9 +188669,9 @@ export default function ManualGuia() {
             </h3>
             <div style={{ display: 'grid', gap: '1rem', marginBottom: '2rem' }}>
               {[
-                { title: 'Capitulo Uno (C1)', phase: 'FASE 1', color: 'var(--crear-blue)', bg: 'rgba(0,210,255,0.08)', desc: 'Inmersion, erradicacion de excusas y alineamiento de mentalidad. El participante opera con mente en pagina en blanco y asume responsabilidad radical sobre sus resultados, sin justificaciones.' },
-                { title: 'Capitulo Dos (C2)', phase: 'FASE 2', color: 'var(--crear-gold)', bg: 'rgba(245,158,11,0.08)', desc: 'Ejecucion bajo presion, trabajo en equipo y rompimiento de barreras limitantes. Se instala autoconfianza inquebrantable y se erradica el individualismo mediante dinamicas de alto impacto.' },
-                { title: 'Maestria del Juego (MJ) — Ciclo de 100 Dias', phase: 'FASE 3', color: '#a855f7', bg: 'rgba(168,85,247,0.08)', desc: '100 dias de ejecucion sostenida de Futuros Imposibles (FI), auditada mediante 4 Fines de Semana de Calibracion: 1FDS Creacion (Vision y EAI), 2FDS Relacion (Dinamica y Clima), 3FDS Gratitud (Servicio y Avance), 4FDS El Viaje (Consolidacion y Legado).' },
+                { title: 'Capítulo Uno (C1)', phase: 'FASE 1', color: 'var(--crear-blue)', bg: 'rgba(0,210,255,0.08)', desc: 'Inmersión, erradicación de excusas y alineamiento de mentalidad. El participante opera con mente en página en blanco y asume responsabilidad radical sobre sus resultados, sin justificaciones.' },
+                { title: 'Capítulo Dos (C2)', phase: 'FASE 2', color: 'var(--crear-gold)', bg: 'rgba(245,158,11,0.08)', desc: 'Ejecución bajo presión, trabajo en equipo y rompimiento de barreras limitantes. Se instala autoconfianza inquebrantable y se erradica el individualismo mediante dinámicas de alto impacto.' },
+                { title: 'Maestría del Juego (MJ) — Ciclo de 100 Días', phase: 'FASE 3', color: '#a855f7', bg: 'rgba(168,85,247,0.08)', desc: '100 días de ejecución sostenida de Futuros Imposibles (FI), auditada mediante 4 Fines de Semana de Calibración: 1FDS Creación (Visión y EAI), 2FDS Relación (Dinámica y Clima), 3FDS Gratitud (Servicio y Avance), 4FDS El Viaje (Consolidación y Legado).' },
               ].map(item => (
                 <div key={item.title} style={{ padding: '1.2rem', background: item.bg, borderRadius: '12px', borderLeft: `4px solid ${item.color}`, border: `1px solid var(--border-subtle)` }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem', flexWrap: 'wrap', gap: '0.4rem' }}>
@@ -186523,13 +188684,13 @@ export default function ManualGuia() {
             </div>
 
             <h3 style={{ margin: '0 0 1rem 0', color: '#ef4444', fontSize: '1.15rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Zap size={20} color="#ef4444" /> 3. Simuladores de Presion (Entrenamientos Complementarios)
+              <Zap size={20} color="#ef4444" /> 3. Simuladores de Presión (Entrenamientos Complementarios)
             </h3>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '1rem' }}>
               {[
-                { color: 'var(--crear-gold)', title: 'Caida de Confianza / FI', desc: 'Circulo de Limpieza, caida en silencio y auditoria de metas en vivo.' },
-                { color: 'var(--crear-blue)', title: 'Tanque', desc: 'Navegacion a ciegas por walkie-talkie y codigos sonoros; auditoria de ego y liderazgo.' },
-                { color: '#ef4444', title: 'Rompimiento de Barreras', desc: '"El Monje y el Florero" e impacto fisico destructivo sobre la limitacion instalada.' },
+                { color: 'var(--crear-gold)', title: 'Caída de Confianza / FI', desc: 'Círculo de Limpieza, caída en silencio y auditoría de metas en vivo.' },
+                { color: 'var(--crear-blue)', title: 'Tanque', desc: 'Navegación a ciegas por walkie-talkie y códigos sonoros; auditoría de ego y liderazgo.' },
+                { color: '#ef4444', title: 'Rompimiento de Barreras', desc: '"El Monje y el Florero" e impacto físico destructivo sobre la limitación instalada.' },
                 { color: '#a855f7', title: 'Caminata de Equipos', desc: 'Valla de honor, contacto visual profundo y traspaso formal de legado entre generaciones.' },
               ].map(item => (
                 <div key={item.title} style={{ padding: '1rem', background: 'var(--bg-card)', borderRadius: '10px', border: '1px solid var(--border-subtle)' }}>
@@ -186540,7 +188701,7 @@ export default function ManualGuia() {
             </div>
 
             <h3 style={{ margin: '2rem 0 0.35rem 0', color: '#22c55e', fontSize: '1.15rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <TrendingUp size={20} color="#22c55e" /> 4. Ecuacion de Valor — Reduccion de Esfuerzo y Sacrificio
+              <TrendingUp size={20} color="#22c55e" /> 4. Ecuación de Valor — Reducción de Esfuerzo y Sacrificio
             </h3>
             <p style={{ margin: '0 0 1rem 0', fontSize: '0.78rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
               Aporte de Direccion — integrado 02/09/2026, confirmado por Jose Sanchez. No proviene de un manual auditado.
@@ -186736,7 +188897,7 @@ export default function ManualGuia() {
                 </thead>
                 <tbody>
                   {[
-                    { rol: 'Direccion Global', color: '#ec4899', resps: 'Gobierno estrategico de las 7 sedes. Audita en tiempo real accesos, KPIs y movimientos. Visibilidad total del sistema y puede simular cualquier rol para auditoria.', route: '/superadmin', btn: 'Panel Super Admin' },
+                    { rol: 'Dirección Global', color: '#ec4899', resps: 'Gobierno estratégico de las sedes operativas. Audita en tiempo real accesos, KPIs y movimientos. Visibilidad total del sistema y puede simular cualquier rol para auditoría.', route: '/superadmin', btn: 'Panel Super Admin' },
                     { rol: 'Gerente de Sede', color: 'var(--crear-gold)', resps: 'Dirige la planeacion estrategica de su ciudad. Audita el cumplimiento de metas de enrolamiento, la salud financiera y los checklists globales. Primera autoridad en contingencias.', route: '/gerente', btn: 'Dashboard Gerencia' },
                     { rol: 'Coordinador C1 y C2', color: 'var(--crear-blue)', resps: 'Custodio de la logistica de Capitulos 1 y 2. Maneja registro, trazabilidad de datos, preparacion de sala y asegura el Grounding del equipo de apoyo.', route: '/checklist/coordinador_c1c2', btn: 'Checklist C1/C2' },
                     { rol: 'Director de Maestria', color: '#a855f7', resps: 'Lidera la ejecucion de los 100 dias de Maestria. Supervisa entrenadores, valida metas, gestiona EAIs y minimiza la desercion.', route: '/centro-managers', btn: 'Centro Managers' },
@@ -187035,7 +189196,7 @@ export default function ManualGuia() {
                 {[
                   { title: 'Auditoria en Tiempo Real', desc: 'Revisa el log de accesos, conexiones y movimientos. Cada login, cambio de rol y accion critica queda registrada con IP, dispositivo y timestamp.' },
                   { title: 'Simulacion de Roles', desc: 'Entra a la plataforma con la vista de cualquier colaborador para auditar su experiencia, resolver dudas o verificar que sus modulos funcionen correctamente.' },
-                  { title: 'Consistencia Internacional', desc: 'Asegura que las 7 sedes operen bajo los mismos estandares de marca y rigor metodologico en cada ciclo.' },
+                  { title: 'Consistencia Internacional', desc: 'Asegura que todas las sedes operativas operen bajo los mismos estándares de marca y rigor metodológico en cada ciclo.' },
                   { title: 'Contacto Directo', desc: 'Desde el Panel Super Admin puedes contactar a cualquier persona del equipo global via Gmail, Google Chat o WhatsApp con un solo clic.' },
                 ].map(item => (
                   <div key={item.title} style={{ padding: '1rem', background: 'var(--bg-card-hover)', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
@@ -187432,388 +189593,968 @@ import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { 
-  ArrowLeft, Database, Search, ShieldCheck, Users, 
+  ArrowLeft, Search, ShieldCheck, Users, 
   BarChart3, Settings, TrendingUp, CheckCircle, Zap,
-  FolderSync, UserCheck, Key, FileText, Anchor, Activity, Server,
-  MousePointer2, ExternalLink
+  FileText, Anchor, Activity, Server,
+  MousePointer2, ExternalLink, Sparkles, AlertTriangle,
+  Clock, Flame, Award, HelpCircle, Layers, CheckSquare,
+  BookOpen, ChevronRight, Copy, Check
 } from 'lucide-react';
-
-// Fuente: Manual Oficial de Usuario NODUS - Edición 2026 (manual_nodus_soar_completo.pdf/html),
-// integrado y verificado 02/09/2026. Los pasos siguen literalmente los módulos, botones y
-// campos descritos en el manual oficial (Capítulos 3 a 18); no se inventan rutas de navegación.
-const NODUS_KNOWLEDGE_BASE = [
-  {
-    id: 'n1',
-    role: 'directores',
-    title: 'Configurar Sedes, Usuarios y Programas (Módulo Configuración)',
-    description: 'El módulo de Configuración es accesible principalmente para Gerentes de Sede y Administradores: gestión de sedes, usuarios/contraseñas y programas/precios.',
-    steps: [
-      'Haz clic en "Configuración" en el menú lateral izquierdo.',
-      'Para crear un usuario: entra a "Usuarios" y presiona "Nuevo Usuario".',
-      'Escribe el Nombre Completo, el Nombre de Usuario y una Contraseña inicial.',
-      'Selecciona su Rol de acceso (Mesa de Registro, Caja, Coordinación o Gerencia) y su Sede.',
-      'Haz clic en "Guardar Usuario" y comparte las credenciales de forma segura.',
-      'Gestión de Sedes y Programas y Precios (matrícula, promociones, calendario) están en las otras pestañas del mismo módulo.'
-    ],
-    tags: ['configuracion', 'usuarios', 'sedes', 'precios', 'director']
-  },
-  {
-    id: 'n2',
-    role: 'directores',
-    title: 'Resetear una Contraseña Olvidada',
-    description: 'Procedimiento oficial cuando un colaborador no puede ingresar a su cuenta de NODUS.',
-    steps: [
-      'El Gerente de Sede ingresa a "Configuración" → "Usuarios".',
-      'Busca el nombre del colaborador en la lista y presiona "Editar".',
-      'En la casilla "Nueva Contraseña", escribe una clave temporal clara (ej: Nodus2026*).',
-      'Haz clic en "Guardar Cambios" y pide al usuario que pruebe su ingreso de inmediato.'
-    ],
-    tags: ['contraseña', 'usuarios', 'soporte', 'reset']
-  },
-  {
-    id: 'n3',
-    role: 'directores',
-    title: 'Auditar el Reporte de Entrenadores y la Brecha Enrolados vs. Sentados',
-    description: 'Cómo cruzar el Reporte de Entrenadores contra la Mesa de Registro para detectar no-shows.',
-    steps: [
-      'Ve al módulo "Reportes" en el menú lateral.',
-      'Abre el "Reporte de Entrenadores y Maestrías": columnas TIPO IMO/DNI, PARTICIPANTES EN JUEGO, DECLARACIÓN, TOTAL ENROLADOS y DESERTOR FDS.',
-      '"Enrolados" muestra cuántos pagaron su inscripción en el sistema.',
-      '"Sentados" muestra cuántos fueron efectivamente marcados con "Marcar en Sala" el viernes por la noche.',
-      'Si hay brecha (ej: 15 enrolados pero 8 sentados), coordinación debe contactar a los 7 ausentes y coordinar su ingreso en la cohorte inmediata.'
-    ],
-    tags: ['reportes', 'auditoria', 'entrenadores', 'brecha', 'no-show']
-  },
-  {
-    id: 'n4',
-    role: 'gerentes',
-    title: 'Leer el Dashboard Principal e Indicadores en Vivo',
-    description: 'Dónde ver el resumen operativo y los contadores en tiempo real durante días de evento.',
-    steps: [
-      'Al iniciar sesión, el sistema muestra el "Dashboard" con Contadores de Resumen en la parte superior (entrenadores, eventos activos, participantes registrados, sedes operando).',
-      'Durante el evento, el Dashboard actualiza en vivo: "Inscritos Totales", "Presentes en Sala" y "Pendientes de Llegada".',
-      'La Barra Lateral Izquierda da acceso a Dashboard, Mesa Registro, Participantes, Contabilidad, Cierre de Caja, Reportes y Configuración.',
-      'Para volver al inicio desde cualquier módulo, haz clic en "Dashboard" o en el logotipo (esquina superior izquierda).'
-    ],
-    tags: ['dashboard', 'indicadores', 'tiempo real', 'gerente']
-  },
-  {
-    id: 'n5',
-    role: 'gerentes',
-    title: 'Realizar el Cierre y Arqueo Diario de Caja',
-    description: 'Procedimiento oficial de 3 pasos para cuadrar el dinero físico contra las transacciones registradas.',
-    steps: [
-      'Haz clic en "Cierre de Caja" en el menú lateral. Selecciona la fecha de hoy y la sede.',
-      'Compara el "Total Efectivo Esperado" (calculado por NODUS) contra el conteo físico real y escríbelo en "Efectivo Real en Caja".',
-      'Si hay sobrante o faltante, documenta la justificación en el campo "Observaciones".',
-      'Presiona "Cerrar Caja Oficialmente" para generar el acta; los registros del día quedan bloqueados.',
-      'Solo el Gerente de Sede o el Administrador general pueden reabrir una caja ya cerrada.'
-    ],
-    tags: ['cierre de caja', 'arqueo', 'contabilidad', 'gerente']
-  },
-  {
-    id: 'n6',
-    role: 'gerentes',
-    title: 'Autorizar un Traslado de Sede de un Participante',
-    description: 'Caso especial de Mesa de Registro que solo puede resolver el Gerente de Sede.',
-    steps: [
-      'Cuando un participante estaba registrado para otra sede pero pide cursar en la sede actual, entra a "Participantes".',
-      'Busca al alumno en el listado general.',
-      'Modifica el campo "Sede Asignada" seleccionando la sede actual.',
-      'Al guardar, el alumno aparecerá automáticamente en la Mesa de Registro local.'
-    ],
-    tags: ['traslado', 'sede', 'participantes', 'gerente']
-  },
-  {
-    id: 'n7',
-    role: 'coordinadores',
-    title: 'Registrar a un Participante en la Mesa de Registro (3 Pasos)',
-    description: 'El procedimiento más usado durante los días de evento, en el vestíbulo o puerta de entrada.',
-    steps: [
-      'Pide su DNI/Cédula/Pasaporte, escríbelo en la barra de búsqueda de Mesa de Registro y presiona Enter (si no aparece, busca solo por apellido).',
-      'Verifica el estado: si figura "Completo" continúa; si está "Pendiente", solicita comprobante o deriva a la caja.',
-      'Haz clic en "Marcar en Sala": el participante queda contabilizado como Sentado. Entrégale su gafete oficial y material de bienvenida.',
-      'Si marcaste por error, vuelve a buscar por DNI y desmarca la casilla de asistencia.'
-    ],
-    tags: ['mesa de registro', 'check-in', 'asistencia', 'gafete', 'coordinador']
-  },
-  {
-    id: 'n8',
-    role: 'coordinadores',
-    title: 'Resolver Casos Especiales en Mesa de Registro',
-    description: 'Protocolos oficiales para walk-ins, participantes extranjeros y traslados de sede.',
-    steps: [
-      'Walk-in (inscrito el mismo día): pide comprobante → "Participantes" → "Nuevo Participante" → registra nombres/DNI/teléfono/correo → "Contabilidad" → "Registrar Pago" → vuelve a Mesa de Registro y márcalo con gafete provisional.',
-      'Extranjero con pasaporte: escribe la serie alfanumérica del pasaporte tal como fue registrada; si no aparece, busca por apellido materno o paterno.',
-      'Traslado de sede: debe resolverlo el Gerente de Sede desde "Participantes", cambiando el campo "Sede Asignada".'
-    ],
-    tags: ['casos especiales', 'walk-in', 'pasaporte', 'traslado', 'coordinador']
-  },
-  {
-    id: 'n9',
-    role: 'coordinadores',
-    title: 'Registrar un Nuevo Participante y Asentar su Pago',
-    description: 'Alta completa de un participante en el módulo Participantes y su cobro en Contabilidad.',
-    steps: [
-      'En el menú lateral, entra a "Participantes" y presiona "Nuevo Participante".',
-      'Completa Tipo y Número de Documento, Nombres y Apellidos completos (tal como el documento, para certificados), Teléfono/WhatsApp, Correo, Sede y Entrenamiento.',
-      'Haz clic en "Guardar": el registro se genera de inmediato.',
-      'Para cobrar: "Contabilidad" → "Registrar Pago" → busca por DNI → elige tipo de pago (Total o Abono Parcial) y forma de pago (Efectivo, Transferencia o Tarjeta) → escribe el número de comprobante/operación → "Guardar Pago".'
-    ],
-    tags: ['participantes', 'nuevo participante', 'pago', 'contabilidad', 'coordinador']
-  },
-  {
-    id: 'n10',
-    role: 'cmj',
-    title: 'Leer el Reporte de Entrenadores y Maestrías (5 Columnas)',
-    description: 'El reporte más consultado por Centro de Managers para evaluar rendimiento por bloque/equipo.',
-    steps: [
-      'Ve a "Reportes" → "Reporte de Entrenadores y Maestrías".',
-      'TIPO IMO/DNI: rol (Capitán, Manager, Participante) o documento — permite auditar por bloque o buscar a alguien.',
-      'PARTICIPANTES EN JUEGO: personas activas en sala o nombre del participante.',
-      'DECLARACIÓN: la meta numérica que el líder se comprometió a enrolar.',
-      'TOTAL ENROLADOS: personas nuevas registradas y pagadas (en 0 = sin cobros registrados aún).',
-      'DESERTOR FDS: alumnos que abandonaron durante el fin de semana — alerta de fuga a reportar de inmediato a coordinación.'
-    ],
-    tags: ['reporte de entrenadores', 'kpi', 'cmj', 'declaracion', 'desertor']
-  },
-  {
-    id: 'n11',
-    role: 'cmj',
-    title: 'Gestionar Equipos, Cohortes y Asignación de Entrenadores',
-    description: 'Módulo "Equipos y Maestrías" para estructurar las cohortes de cada sede (ej: Equipos 27, 28, 29 de Lima).',
-    steps: [
-      'Creación de cohortes: define número de equipo, sede y fechas de inicio y graduación.',
-      'Asignación de entrenadores: asocia al entrenador oficial responsable del proceso.',
-      'Distribución de alumnos: asigna a cada participante nuevo a su cohorte y equipo.',
-      'Buena práctica del manual: asegúrate de que cada participante tenga cohorte asignada antes del viernes de registro — sin equipo asignado, no aparece en el reporte de entrenadores de su sede.'
-    ],
-    tags: ['equipos', 'cohortes', 'asignacion', 'cmj', 'entrenadores']
-  },
-  {
-    id: 'n12',
-    role: 'cmj',
-    title: 'Auditar la Brecha entre Enrolados y Sentados',
-    description: 'Función clave de Centro de Managers para detectar no-shows cruzando Reportes contra Mesa de Registro.',
-    steps: [
-      '"Enrolados": personas que han pagado su inscripción en el sistema (columna TOTAL ENROLADOS del Reporte de Entrenadores).',
-      '"Sentados": personas efectivamente marcadas con "Marcar en Sala" el viernes por la noche.',
-      'Si un equipo reporta 15 enrolados pero solo 8 sentados, comunícate con los 7 ausentes para conocer el motivo y coordinar su ingreso en la cohorte inmediata.'
-    ],
-    tags: ['brecha', 'no-show', 'auditoria', 'cmj', 'seguimiento']
-  }
-];
+import {
+  MANIFIESTO_GOBERNANZA,
+  ESTRUCTURA_DIRECTIVA_GLOBAL,
+  NIVELES_EXCELENCIA,
+  VESTIMENTA_2026,
+  SOP_OPERATIVO_SEMANAL,
+  CATALOGO_KPIS_NODUS,
+  TRIGGERS_BACKEND,
+  PALANCAS_PX,
+  FILOSOFIA_RUBIN,
+  NODUS_CAPITULOS_PASO_A_PASO,
+  CHECKLISTS_POR_PUESTO
+} from '../data/nodusIntegratedKnowledge';
 
 export default function ManualNodus() {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
-  const [activeTab, setActiveTab] = useState('directores'); 
+  
+  const [activeTab, setActiveTab] = useState('gobernanza');
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedPuesto, setSelectedPuesto] = useState('Mesa de Registro');
+  const [copiedId, setCopiedId] = useState(null);
 
-  // Auto-seleccionar tab segun rol
-  React.useEffect(() => {
-    if (currentUser?.appRole) {
-      if (currentUser.appRole === 'gerente') setActiveTab('gerentes');
-      else if (['coord_c1', 'coord_c2', 'coordinador_c1c2'].includes(currentUser.appRole)) setActiveTab('coordinadores');
-      else if (['coord_maestria', 'coordinador_mj'].includes(currentUser.appRole)) setActiveTab('cmj');
-      else setActiveTab('directores');
-    }
-  }, [currentUser]);
+  const copyToClipboard = (text, id) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
 
-  const filteredKnowledge = useMemo(() => {
-    return NODUS_KNOWLEDGE_BASE.filter(item => {
-      const matchTab = item.role === activeTab;
-      const matchSearch = searchTerm === '' || 
-        item.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-        item.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.tags.some(t => t.toLowerCase().includes(searchTerm.toLowerCase()));
-      return matchTab && matchSearch;
-    });
-  }, [activeTab, searchTerm]);
+  // Filtro de búsqueda unificado
+  const normalizedSearch = searchTerm.toLowerCase().trim();
+
+  // Búsqueda en Capítulos de Nodus
+  const filteredCapitulos = useMemo(() => {
+    if (!normalizedSearch) return NODUS_CAPITULOS_PASO_A_PASO;
+    return NODUS_CAPITULOS_PASO_A_PASO.filter(cap => 
+      cap.titulo.toLowerCase().includes(normalizedSearch) ||
+      cap.modulo.toLowerCase().includes(normalizedSearch) ||
+      cap.descripcion.toLowerCase().includes(normalizedSearch) ||
+      cap.pasos.some(p => p.toLowerCase().includes(normalizedSearch)) ||
+      cap.tags.some(t => t.toLowerCase().includes(normalizedSearch))
+    );
+  }, [normalizedSearch]);
+
+  // Búsqueda en KPIs
+  const filteredKPIs = useMemo(() => {
+    if (!normalizedSearch) return CATALOGO_KPIS_NODUS;
+    return CATALOGO_KPIS_NODUS.filter(kpi => 
+      kpi.id.toLowerCase().includes(normalizedSearch) ||
+      kpi.nombre.toLowerCase().includes(normalizedSearch) ||
+      kpi.formula.toLowerCase().includes(normalizedSearch) ||
+      kpi.origen.toLowerCase().includes(normalizedSearch)
+    );
+  }, [normalizedSearch]);
+
+  // Búsqueda en Triggers
+  const filteredTriggers = useMemo(() => {
+    if (!normalizedSearch) return TRIGGERS_BACKEND;
+    return TRIGGERS_BACKEND.filter(tr => 
+      tr.nombre.toLowerCase().includes(normalizedSearch) ||
+      tr.condicion.toLowerCase().includes(normalizedSearch) ||
+      tr.accion.toLowerCase().includes(normalizedSearch) ||
+      tr.explicacion.toLowerCase().includes(normalizedSearch)
+    );
+  }, [normalizedSearch]);
+
+  // Búsqueda en Niveles
+  const filteredNiveles = useMemo(() => {
+    if (!normalizedSearch) return NIVELES_EXCELENCIA;
+    return NIVELES_EXCELENCIA.filter(niv => 
+      niv.rol.toLowerCase().includes(normalizedSearch) ||
+      niv.jerarquia.toLowerCase().includes(normalizedSearch) ||
+      niv.descripcion.toLowerCase().includes(normalizedSearch)
+    );
+  }, [normalizedSearch]);
 
   return (
-    <div style={{ maxWidth: '1080px', margin: '0 auto', padding: '2rem 1rem' }}>
+    <div className="container" style={{ paddingTop: '2rem', paddingBottom: '5rem', minHeight: '100vh' }}>
       
-      {/* Boton Volver */}
-      <button 
-        onClick={() => navigate('/')} 
-        className="btn-secondary" 
-        style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1.2rem', fontWeight: 600 }}
-      >
-        <ArrowLeft size={16} /> Volver al Centro Operativo
-      </button>
+      {/* BOTÓN REGRESAR */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+        <button 
+          onClick={() => navigate('/')} 
+          className="btn-secondary"
+          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem' }}
+        >
+          <ArrowLeft size={18} /> Volver al Tablero Principal
+        </button>
 
-      {/* Hero Banner Transformacional Nodus */}
-      <div className="glass-panel" style={{ 
-        padding: '2.5rem 2rem', 
-        marginBottom: '2rem', 
-        position: 'relative', 
-        overflow: 'hidden',
-        border: '2px solid var(--crear-blue)',
-        borderRadius: '16px'
-      }}>
-        <div style={{ position: 'absolute', top: '-20px', right: '-20px', opacity: 0.08, pointerEvents: 'none' }}>
-          <Database size={220} color="var(--crear-blue)" />
-        </div>
+        <a 
+          href="https://imo.crearpslglobal.com/auth/login" 
+          target="_blank" 
+          rel="noreferrer"
+          className="btn-primary"
+          style={{ 
+            display: 'inline-flex', 
+            alignItems: 'center', 
+            gap: '0.6rem', 
+            padding: '0.6rem 1.2rem', 
+            fontSize: '0.95rem',
+            background: 'linear-gradient(135deg, #10b981, #047857)',
+            border: 'none',
+            boxShadow: '0 4px 15px rgba(16, 185, 129, 0.3)'
+          }}
+        >
+          <ExternalLink size={18} /> Abrir Plataforma Nodus (imo.crearpslglobal.com)
+        </a>
+      </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-          <div style={{ 
-            width: '52px', height: '52px', borderRadius: '12px', 
-            background: 'rgba(0, 210, 255, 0.15)', border: '1px solid var(--crear-blue)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center'
+      {/* HEADER PRINCIPAL */}
+      <div className="glass-panel" style={{ padding: '2.5rem', borderRadius: '16px', marginBottom: '2rem', borderTop: '4px solid var(--crear-gold)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
+          <span style={{ 
+            background: 'rgba(212, 175, 55, 0.15)', 
+            color: 'var(--crear-gold)', 
+            padding: '0.35rem 0.85rem', 
+            borderRadius: '20px', 
+            fontSize: '0.85rem', 
+            fontWeight: 'bold',
+            border: '1px solid rgba(212, 175, 55, 0.4)'
           }}>
-            <Server size={30} className="text-blue" />
-          </div>
-          <div>
-            <span style={{ 
-              background: 'var(--crear-blue)', color: '#fff', fontSize: '0.75rem', fontWeight: 800,
-              padding: '0.3rem 0.8rem', borderRadius: '20px', textTransform: 'uppercase', letterSpacing: '1px'
-            }}>
-              Sistema Central
-            </span>
-            <h1 style={{ margin: '0.5rem 0 0 0', fontSize: '2.2rem', color: '#fff', fontWeight: 800 }}>
-              Manual Interactivo NODUS
-            </h1>
-          </div>
+            CREAR PODER SIN LÍMITES • EDICIÓN OFICIAL 2026
+          </span>
+          <span style={{ 
+            background: 'rgba(16, 185, 129, 0.15)', 
+            color: '#10b981', 
+            padding: '0.35rem 0.85rem', 
+            borderRadius: '20px', 
+            fontSize: '0.85rem', 
+            fontWeight: 'bold' 
+          }}>
+            GOBERNANZA SISTÉMICA V1.0 + 18 CAPÍTULOS NODUS
+          </span>
         </div>
-        
-        <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '1.1rem', maxWidth: '800px', lineHeight: 1.6 }}>
-          Explora paso a paso cómo realizar cada operación crítica en la plataforma Nodus. 
-          Encuentra rápidamente dónde hacer clic y qué módulos utilizar.
+
+        <h1 style={{ margin: '0 0 1rem 0', color: '#fff', fontSize: '2.3rem', fontWeight: 800 }}>
+          Centro de Operaciones y Gobernanza Nodus + Causa OS
+        </h1>
+        <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: '1.15rem', maxWidth: '900px', lineHeight: 1.6, margin: 0 }}>
+          Manual unificado de directrices, flujos y gobernanza para la operación de sala y plataforma en toda Latinoamérica.
+          Trazabilidad matemática en Nodus y dirección estratégica en Causa OS.
         </p>
 
-        <div style={{ marginTop: '2rem', display: 'flex', gap: '1rem', alignItems: 'center', background: 'rgba(0,0,0,0.4)', padding: '1rem', borderRadius: '12px' }}>
-            <Search className="text-gray" size={24} />
-            <input 
-              type="text" 
-              placeholder="Ej: cargar pago, ticket verde, asistencia, aprobar..." 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              style={{
-                flex: 1,
-                background: 'transparent',
-                border: 'none',
-                color: '#fff',
-                fontSize: '1.1rem',
-                outline: 'none'
-              }}
-            />
-            {searchTerm && (
-              <button 
-                onClick={() => setSearchTerm('')}
-                style={{ background: 'transparent', border: 'none', color: 'var(--crear-gold)', cursor: 'pointer', fontWeight: 'bold' }}
-              >
-                Limpiar
-              </button>
-            )}
+        {/* BUSCADOR UNIVERSAL */}
+        <div style={{ 
+          marginTop: '2rem', 
+          display: 'flex', 
+          gap: '1rem', 
+          alignItems: 'center', 
+          background: 'rgba(0,0,0,0.5)', 
+          padding: '0.9rem 1.3rem', 
+          borderRadius: '12px',
+          border: '1px solid rgba(255,255,255,0.1)'
+        }}>
+          <Search className="text-gold" size={24} />
+          <input 
+            type="text" 
+            placeholder="Buscar por procedimiento, rol, KPI, trigger (ej: palabra rota, zapatillas, arqueo, 4.5m, Paul Sosa)..." 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{
+              flex: 1,
+              background: 'transparent',
+              border: 'none',
+              color: '#fff',
+              fontSize: '1.05rem',
+              outline: 'none'
+            }}
+          />
+          {searchTerm && (
+            <button 
+              onClick={() => setSearchTerm('')}
+              style={{ background: 'transparent', border: 'none', color: 'var(--crear-gold)', cursor: 'pointer', fontWeight: 'bold' }}
+            >
+              Limpiar
+            </button>
+          )}
         </div>
       </div>
 
-      {/* TABS DE ROLES */}
-      <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', overflowX: 'auto', paddingBottom: '1rem' }}>
+      {/* PESTAÑAS PRINCIPALES */}
+      <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '2rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
         {[
-          { id: 'directores', label: 'Directores & Finanzas', icon: ShieldCheck },
-          { id: 'gerentes', label: 'Gerentes de Sede', icon: BarChart3 },
-          { id: 'coordinadores', label: 'Coordinadores C1/C2', icon: Zap },
-          { id: 'cmj', label: 'Centro de Managers (CMJ)', icon: Users }
-        ].map(tab => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            style={{
-              padding: '1rem 1.5rem',
-              borderRadius: '12px',
-              border: activeTab === tab.id ? '2px solid var(--crear-gold)' : '1px solid rgba(255,255,255,0.1)',
-              background: activeTab === tab.id ? 'rgba(212, 175, 55, 0.1)' : 'rgba(0,0,0,0.3)',
-              color: activeTab === tab.id ? 'var(--crear-gold)' : '#fff',
-              display: 'flex', alignItems: 'center', gap: '0.75rem',
-              fontWeight: 600, fontSize: '1rem',
-              cursor: 'pointer', transition: 'all 0.3s ease',
-              whiteSpace: 'nowrap'
-            }}
-          >
-            <tab.icon size={20} />
-            {tab.label}
-          </button>
-        ))}
+          { id: 'gobernanza', label: '🏛️ Gobernanza & Manifiesto', desc: 'Principios y Filosofía' },
+          { id: 'estructura', label: '👥 9 Niveles & Vestimenta 2026', desc: 'Jerarquía y Dress Code' },
+          { id: 'sop', label: '⏱️ SOP Semanal & El Viaje', desc: 'Cronograma y Sala' },
+          { id: 'kpis', label: '📊 14 KPIs & Triggers', desc: 'Metas y Automatizaciones' },
+          { id: 'operativo', label: '💻 Manual Nodus (18 Caps)', desc: 'Paso a paso en plataforma' },
+          { id: 'checklists', label: '📋 Checklists & Flujos', desc: 'Listas de cotejo por puesto' }
+        ].map(tab => {
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              style={{
+                padding: '0.9rem 1.4rem',
+                borderRadius: '12px',
+                border: isActive ? '2px solid var(--crear-gold)' : '1px solid rgba(255,255,255,0.08)',
+                background: isActive ? 'rgba(212, 175, 55, 0.12)' : 'rgba(0,0,0,0.3)',
+                color: isActive ? 'var(--crear-gold)' : '#fff',
+                textAlign: 'left',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              <div style={{ fontWeight: 'bold', fontSize: '1rem' }}>{tab.label}</div>
+              <div style={{ fontSize: '0.78rem', color: isActive ? 'var(--crear-gold)' : 'rgba(255,255,255,0.5)', marginTop: '0.2rem' }}>{tab.desc}</div>
+            </button>
+          );
+        })}
       </div>
 
-      {/* RESULTADOS DEL KNOWLEDGE BASE */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-        {filteredKnowledge.length === 0 ? (
-          <div className="glass-panel" style={{ padding: '3rem', textAlign: 'center', borderRadius: '16px' }}>
-            <Search size={48} className="text-gray" style={{ margin: '0 auto 1rem auto', opacity: 0.5 }} />
-            <h3 style={{ color: '#fff', fontSize: '1.4rem' }}>No se encontraron guías</h3>
-            <p className="text-gray">Intenta buscar con otros términos o revisa el tab de otro rol.</p>
+      {/* CONTENIDO DE CADA PESTAÑA */}
+
+      {/* TAB 1: GOBERNANZA & MANIFIESTO */}
+      {activeTab === 'gobernanza' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          
+          {/* Manifiesto y Capas */}
+          <div className="glass-panel" style={{ padding: '2rem', borderRadius: '16px', borderLeft: '4px solid var(--crear-gold)' }}>
+            <h2 style={{ color: 'var(--crear-gold)', margin: '0 0 0.5rem 0', fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Sparkles size={22} /> {MANIFIESTO_GOBERNANZA.titulo}
+            </h2>
+            <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '1rem', marginBottom: '1.5rem' }}>
+              {MANIFIESTO_GOBERNANZA.subtitulo} • <em>"{MANIFIESTO_GOBERNANZA.principioRector}"</em>
+            </p>
+
+            <div style={{ background: 'rgba(212, 175, 55, 0.08)', padding: '1rem 1.5rem', borderRadius: '10px', border: '1px solid rgba(212, 175, 55, 0.2)', marginBottom: '1.5rem', fontWeight: 600, color: 'var(--crear-gold)' }}>
+              Fórmula Simbiótica: {MANIFIESTO_GOBERNANZA.formula}
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
+              {MANIFIESTO_GOBERNANZA.capas.map((capa, idx) => (
+                <div key={idx} style={{ background: 'rgba(0,0,0,0.3)', padding: '1.5rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                  <h3 style={{ color: idx === 0 ? '#10b981' : 'var(--crear-blue)', margin: '0 0 0.75rem 0', fontSize: '1.2rem' }}>
+                    {capa.nombre}
+                  </h3>
+                  <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '1rem' }}>
+                    {capa.rol}
+                  </p>
+                  <div style={{ background: 'rgba(255,255,255,0.03)', padding: '0.85rem', borderRadius: '8px', borderLeft: '3px solid var(--crear-gold)' }}>
+                    <strong style={{ color: 'var(--crear-gold)', fontSize: '0.85rem', display: 'block', marginBottom: '0.3rem' }}>REGLA DE ORO:</strong>
+                    <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.88rem', lineHeight: 1.5 }}>{capa.reglaDeOro}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-        ) : (
-          filteredKnowledge.map(guide => (
-            <div key={guide.id} className="glass-panel hover-scale" style={{ 
-              padding: '2rem', 
-              borderRadius: '16px',
-              borderLeft: '4px solid var(--crear-blue)',
-              position: 'relative'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
-                <div>
-                  <h2 style={{ margin: '0 0 0.5rem 0', color: 'var(--crear-blue)', fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    {guide.title}
-                  </h2>
-                  <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '1.05rem', margin: 0 }}>
-                    {guide.description}
+
+          {/* 10 Palancas de PX */}
+          <div className="glass-panel" style={{ padding: '2rem', borderRadius: '16px', borderLeft: '4px solid var(--crear-blue)' }}>
+            <h2 style={{ color: 'var(--crear-blue)', margin: '0 0 0.5rem 0', fontSize: '1.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Layers size={22} /> Las 10 Palancas de la Experiencia del Cliente (PX)
+            </h2>
+            <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', marginBottom: '1.5rem' }}>
+              Protocolos de servicio de alto impacto para sostener la energía y el contenedor emocional.
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
+              {PALANCAS_PX.map(p => (
+                <div key={p.num} style={{ background: 'rgba(0,0,0,0.25)', padding: '1.2rem', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.5rem' }}>
+                    <span style={{ background: 'var(--crear-blue)', color: '#000', width: '24px', height: '24px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 'bold' }}>
+                      {p.num}
+                    </span>
+                    <strong style={{ color: '#fff', fontSize: '0.95rem' }}>{p.titulo}</strong>
+                  </div>
+                  <p style={{ margin: 0, color: 'rgba(255,255,255,0.75)', fontSize: '0.88rem', lineHeight: 1.5 }}>
+                    {p.detalle}
                   </p>
                 </div>
-                <a 
-                  href="https://imo.crearpslglobal.com/auth/login" 
-                  target="_blank" 
-                  rel="noreferrer"
-                  className="btn-primary"
-                  style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', fontSize: '0.9rem' }}
-                >
-                  <ExternalLink size={16} /> Abrir Nodus
-                </a>
+              ))}
+            </div>
+          </div>
+
+          {/* Filosofía Rick Rubin */}
+          <div className="glass-panel" style={{ padding: '2rem', borderRadius: '16px', borderLeft: '4px solid #a855f7' }}>
+            <h2 style={{ color: '#a855f7', margin: '0 0 0.5rem 0', fontSize: '1.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Flame size={22} /> Filosofía de Creación de Rick Rubin en CPSL
+            </h2>
+            <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', marginBottom: '1.5rem' }}>
+              Principios de producción creativa y rigor militar aplicados al liderazgo transformacional.
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {FILOSOFIA_RUBIN.map((item, idx) => (
+                <div key={idx} style={{ background: 'rgba(0,0,0,0.25)', padding: '1.2rem', borderRadius: '10px', border: '1px solid rgba(168, 85, 247, 0.15)' }}>
+                  <h4 style={{ color: 'var(--crear-gold)', margin: '0 0 0.4rem 0', fontSize: '1.05rem' }}>
+                    {item.pilar}
+                  </h4>
+                  <p style={{ margin: 0, color: 'rgba(255,255,255,0.85)', fontSize: '0.92rem', lineHeight: 1.6 }}>
+                    {item.descripcion}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+        </div>
+      )}
+
+      {/* TAB 2: ESTRUCTURA 9 NIVELES & VESTIMENTA */}
+      {activeTab === 'estructura' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          
+          {/* Estructura Directiva Global y Aviso de Subdirector */}
+          <div className="glass-panel" style={{ padding: '2rem', borderRadius: '16px', borderLeft: '4px solid var(--crear-gold)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
+              <div>
+                <h2 style={{ color: 'var(--crear-gold)', margin: 0, fontSize: '1.5rem' }}>
+                  Estructura Directiva Global — {ESTRUCTURA_DIRECTIVA_GLOBAL.empresa}
+                </h2>
+                <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', margin: '0.3rem 0 0 0' }}>
+                  Liderazgo corporativo y toma de decisiones a nivel regional.
+                </p>
               </div>
 
               <div style={{ 
-                background: 'rgba(0,0,0,0.3)', 
-                padding: '1.5rem', 
-                borderRadius: '12px',
-                border: '1px solid rgba(255,255,255,0.05)'
+                background: 'rgba(239, 68, 68, 0.15)', 
+                border: '1px solid rgba(239, 68, 68, 0.4)', 
+                padding: '0.75rem 1.25rem', 
+                borderRadius: '10px',
+                maxWidth: '480px'
               }}>
-                <h4 style={{ color: '#fff', margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <MousePointer2 size={18} className="text-gold" /> Pasos Exactos de Navegación:
-                </h4>
-                <ol style={{ margin: 0, paddingLeft: '1.5rem', color: 'rgba(255,255,255,0.9)', lineHeight: 1.8, fontSize: '1.05rem' }}>
-                  {guide.steps.map((step, idx) => {
-                    const parts = step.split(/(".*?")/);
-                    return (
-                      <li key={idx} style={{ marginBottom: '0.5rem' }}>
-                        {parts.map((part, i) => {
-                          if (part.startsWith('"') && part.endsWith('"')) {
-                            return <strong key={i} style={{ color: 'var(--crear-gold)' }}>{part}</strong>;
-                          }
-                          return part;
-                        })}
-                      </li>
-                    );
-                  })}
-                </ol>
-              </div>
-
-              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1.5rem' }}>
-                {guide.tags.map(t => (
-                  <span key={t} style={{ 
-                    background: 'rgba(255,255,255,0.1)', color: '#fff', 
-                    padding: '0.2rem 0.8rem', borderRadius: '12px', fontSize: '0.8rem' 
-                  }}>
-                    #{t}
-                  </span>
-                ))}
+                <div style={{ color: '#ef4444', fontWeight: 'bold', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.2rem' }}>
+                  <AlertTriangle size={16} /> RESOLUCIÓN ESTRUCTURAL 2026:
+                </div>
+                <div style={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.85rem', lineHeight: 1.4 }}>
+                  {ESTRUCTURA_DIRECTIVA_GLOBAL.reglaSubdirector}
+                </div>
               </div>
             </div>
-          ))
-        )}
-      </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
+              {ESTRUCTURA_DIRECTIVA_GLOBAL.directiva.map((dir, idx) => (
+                <div key={idx} style={{ background: 'rgba(0,0,0,0.3)', padding: '1.25rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  <div style={{ color: 'var(--crear-gold)', fontWeight: 'bold', fontSize: '1.1rem' }}>{dir.titular}</div>
+                  <div style={{ color: 'var(--crear-blue)', fontWeight: 600, fontSize: '0.9rem', marginBottom: '0.4rem' }}>{dir.cargo}</div>
+                  <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.85rem' }}>{dir.alcance}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Los 9 Niveles de Excelencia */}
+          <div className="glass-panel" style={{ padding: '2rem', borderRadius: '16px', borderLeft: '4px solid #10b981' }}>
+            <h2 style={{ color: '#10b981', margin: '0 0 0.5rem 0', fontSize: '1.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Users size={22} /> Los 9 Niveles de Excelencia Organizacional (2026)
+            </h2>
+            <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', marginBottom: '1.5rem' }}>
+              Jerarquía operativa unificada de sala, seguimiento y soporte administrativo.
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {filteredNiveles.map(niv => (
+                <div key={niv.nivel} style={{ 
+                  background: 'rgba(0,0,0,0.3)', 
+                  padding: '1.25rem 1.5rem', 
+                  borderRadius: '12px', 
+                  border: '1px solid rgba(255,255,255,0.06)',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '1.2rem'
+                }}>
+                  <div style={{ 
+                    background: niv.nivel >= 7 ? 'var(--crear-gold)' : niv.nivel >= 5 ? 'var(--crear-blue)' : '#10b981', 
+                    color: '#000', 
+                    fontWeight: 800, 
+                    fontSize: '1.1rem',
+                    minWidth: '38px',
+                    height: '38px',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    {niv.nivel}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '0.3rem' }}>
+                      <h3 style={{ margin: 0, color: '#fff', fontSize: '1.15rem' }}>{niv.rol}</h3>
+                      <span style={{ background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.8)', padding: '0.2rem 0.6rem', borderRadius: '6px', fontSize: '0.75rem' }}>
+                        {niv.jerarquia}
+                      </span>
+                    </div>
+                    <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.92rem', lineHeight: 1.5, margin: '0 0 0.5rem 0' }}>
+                      {niv.descripcion}
+                    </p>
+                    <div style={{ fontSize: '0.82rem', color: 'var(--crear-gold)' }}>
+                      <strong>Requisitos / Selección:</strong> {niv.requisitos}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Códigos de Vestimenta 2026 */}
+          <div className="glass-panel" style={{ padding: '2rem', borderRadius: '16px', borderLeft: '4px solid var(--crear-gold)' }}>
+            <h2 style={{ color: 'var(--crear-gold)', margin: '0 0 0.5rem 0', fontSize: '1.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <ShieldCheck size={22} /> Protocolo de Impecabilidad Visual (Códigos de Vestimenta 2026)
+            </h2>
+            <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', marginBottom: '1.5rem' }}>
+              Especificación oficial por día y por función. La pulcritud externa manifiesta el orden interno.
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
+              
+              {/* Entrenador */}
+              <div style={{ background: 'rgba(0,0,0,0.4)', padding: '1.5rem', borderRadius: '12px', border: '1px solid rgba(212, 175, 55, 0.3)' }}>
+                <div style={{ color: 'var(--crear-gold)', fontWeight: 'bold', fontSize: '1.15rem', marginBottom: '0.5rem' }}>
+                  {VESTIMENTA_2026.entrenador.rol}
+                </div>
+                <p style={{ color: '#fff', fontSize: '0.9rem', lineHeight: 1.5, marginBottom: '1rem' }}>
+                  {VESTIMENTA_2026.entrenador.norma}
+                </p>
+                <div style={{ background: 'rgba(16, 185, 129, 0.1)', padding: '0.85rem', borderRadius: '8px', borderLeft: '3px solid #10b981' }}>
+                  <strong style={{ color: '#10b981', fontSize: '0.82rem', display: 'block', marginBottom: '0.2rem' }}>
+                    AUTORIZACIÓN DE CALZADO (CUIDADO DE ENERGÍA):
+                  </strong>
+                  <span style={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.85rem', lineHeight: 1.4 }}>
+                    {VESTIMENTA_2026.entrenador.calzadoPermitido}
+                  </span>
+                </div>
+              </div>
+
+              {/* Aliados */}
+              <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1.5rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div style={{ color: 'var(--crear-blue)', fontWeight: 'bold', fontSize: '1.15rem', marginBottom: '0.5rem' }}>
+                  {VESTIMENTA_2026.aliados.rol}
+                </div>
+                <div style={{ fontSize: '0.88rem', color: 'rgba(255,255,255,0.85)', lineHeight: 1.5 }}>
+                  <div style={{ marginBottom: '0.5rem' }}><strong style={{ color: 'var(--crear-gold)' }}>Viernes:</strong> {VESTIMENTA_2026.aliados.viernes}</div>
+                  <div style={{ marginBottom: '0.5rem' }}><strong style={{ color: 'var(--crear-gold)' }}>Sábado:</strong> {VESTIMENTA_2026.aliados.sabado}</div>
+                  <div><strong style={{ color: 'var(--crear-gold)' }}>Domingo:</strong> {VESTIMENTA_2026.aliados.domingo}</div>
+                </div>
+              </div>
+
+              {/* Capitanes */}
+              <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1.5rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div style={{ color: '#a855f7', fontWeight: 'bold', fontSize: '1.15rem', marginBottom: '0.5rem' }}>
+                  {VESTIMENTA_2026.capitanes.rol}
+                </div>
+                <div style={{ fontSize: '0.88rem', color: 'rgba(255,255,255,0.85)', lineHeight: 1.5 }}>
+                  <div style={{ marginBottom: '0.5rem' }}><strong style={{ color: 'var(--crear-gold)' }}>Jueves/Viernes:</strong> {VESTIMENTA_2026.capitanes.juevesViernes}</div>
+                  <div style={{ marginBottom: '0.5rem' }}><strong style={{ color: 'var(--crear-gold)' }}>Sábado:</strong> {VESTIMENTA_2026.capitanes.sabado}</div>
+                  <div><strong style={{ color: 'var(--crear-gold)' }}>Domingo:</strong> {VESTIMENTA_2026.capitanes.domingo}</div>
+                </div>
+              </div>
+
+              {/* Quantum Team (QT) */}
+              <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1.5rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div style={{ color: '#0ea5e9', fontWeight: 'bold', fontSize: '1.15rem', marginBottom: '0.5rem' }}>
+                  {VESTIMENTA_2026.qt.rol}
+                </div>
+                <div style={{ fontSize: '0.88rem', color: 'rgba(255,255,255,0.85)', lineHeight: 1.5 }}>
+                  <div style={{ marginBottom: '0.5rem' }}><strong style={{ color: 'var(--crear-gold)' }}>Viernes:</strong> {VESTIMENTA_2026.qt.viernes}</div>
+                  <div style={{ marginBottom: '0.5rem' }}><strong style={{ color: 'var(--crear-gold)' }}>Sábado:</strong> {VESTIMENTA_2026.qt.sabado}</div>
+                  <div><strong style={{ color: 'var(--crear-gold)' }}>Domingo:</strong> {VESTIMENTA_2026.qt.domingo}</div>
+                </div>
+              </div>
+
+              {/* Mánagers */}
+              <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1.5rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div style={{ color: '#10b981', fontWeight: 'bold', fontSize: '1.15rem', marginBottom: '0.5rem' }}>
+                  {VESTIMENTA_2026.managers.rol}
+                </div>
+                <div style={{ fontSize: '0.88rem', color: 'rgba(255,255,255,0.85)', lineHeight: 1.5 }}>
+                  <div style={{ marginBottom: '0.5rem' }}><strong style={{ color: 'var(--crear-gold)' }}>Viernes:</strong> {VESTIMENTA_2026.managers.viernes}</div>
+                  <div style={{ marginBottom: '0.5rem' }}><strong style={{ color: 'var(--crear-gold)' }}>Sábado:</strong> {VESTIMENTA_2026.managers.sabado}</div>
+                  <div><strong style={{ color: 'var(--crear-gold)' }}>Domingo:</strong> {VESTIMENTA_2026.managers.domingo}</div>
+                </div>
+              </div>
+
+              {/* Oficina y Soporte */}
+              <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1.5rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div style={{ color: '#f59e0b', fontWeight: 'bold', fontSize: '1.15rem', marginBottom: '0.5rem' }}>
+                  {VESTIMENTA_2026.oficina.rol}
+                </div>
+                <div style={{ fontSize: '0.88rem', color: 'rgba(255,255,255,0.85)', lineHeight: 1.5 }}>
+                  <div style={{ marginBottom: '0.5rem' }}><strong style={{ color: 'var(--crear-gold)' }}>Eventos:</strong> {VESTIMENTA_2026.oficina.eventos}</div>
+                  <div><strong style={{ color: 'var(--crear-gold)' }}>Diario:</strong> {VESTIMENTA_2026.oficina.diario}</div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          {/* MATRIZ DE HORARIOS DE SALA Y VESTIMENTAS POR DÍA */}
+          <div className="glass-panel" style={{ padding: '2rem', borderRadius: '16px', borderLeft: '4px solid var(--crear-cyan)' }}>
+            <h2 style={{ color: 'var(--crear-cyan)', margin: '0 0 0.5rem 0', fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Clock size={24} /> Matriz Oficial de Horarios de Sala y Código de Vestimenta
+            </h2>
+            <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', marginBottom: '1.5rem' }}>
+              Horarios innegociables de ingreso, recesos, noches de quiebre y vestimenta obligatoria por día para cada nivel de la experiencia CPSL.
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(310px, 1fr))', gap: '1.5rem' }}>
+              
+              {/* C1 */}
+              <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1.4rem', borderRadius: '12px', borderTop: '4px solid #8b5cf6' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
+                  <h3 style={{ color: '#a78bfa', margin: 0, fontSize: '1.15rem' }}>Capítulo UNO (C1)</h3>
+                  <span style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: '12px', background: 'rgba(139, 92, 246, 0.2)', color: '#c4b5fd', fontWeight: 'bold' }}>Descubrimiento</span>
+                </div>
+                <table style={{ width: '100%', fontSize: '0.85rem', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', textAlign: 'left', color: 'rgba(255,255,255,0.5)', fontSize: '0.75rem' }}>
+                      <th style={{ padding: '0.4rem 0' }}>DÍA</th>
+                      <th style={{ padding: '0.4rem 0' }}>HORARIO</th>
+                      <th style={{ padding: '0.4rem 0', textAlign: 'right' }}>VESTIMENTA</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                      <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Jueves</td>
+                      <td style={{ padding: '0.5rem 0', color: 'rgba(255,255,255,0.7)' }}>4:30 PM - Cierre</td>
+                      <td style={{ padding: '0.5rem 0', textAlign: 'right' }}>Negro</td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                      <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Viernes</td>
+                      <td style={{ padding: '0.5rem 0', color: 'rgba(255,255,255,0.7)' }}>7:30 AM - 3 PM<br/><span style={{ color: '#a78bfa' }}>5 PM - Cierre (Noche Confianza)</span></td>
+                      <td style={{ padding: '0.5rem 0', textAlign: 'right', color: '#f59e0b', fontWeight: 'bold' }}>Negro formal</td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                      <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Sábado</td>
+                      <td style={{ padding: '0.5rem 0', color: 'rgba(255,255,255,0.7)' }}>8:00 AM - 4 PM<br/>3:00 PM - Cierre</td>
+                      <td style={{ padding: '0.5rem 0', textAlign: 'right' }}>Polo / pantalón negro</td>
+                    </tr>
+                    <tr>
+                      <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Domingo</td>
+                      <td style={{ padding: '0.5rem 0', color: 'rgba(255,255,255,0.7)' }}>8:00 AM - Cierre (Graduación)</td>
+                      <td style={{ padding: '0.5rem 0', textAlign: 'right' }}>Polo / pantalón negro</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              {/* C2 */}
+              <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1.4rem', borderRadius: '12px', borderTop: '4px solid #29abe2' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
+                  <h3 style={{ color: 'var(--crear-cyan)', margin: 0, fontSize: '1.15rem' }}>Capítulo DOS (C2)</h3>
+                  <span style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: '12px', background: 'rgba(41, 171, 226, 0.2)', color: '#7dd3fc', fontWeight: 'bold' }}>Avanzado</span>
+                </div>
+                <table style={{ width: '100%', fontSize: '0.85rem', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', textAlign: 'left', color: 'rgba(255,255,255,0.5)', fontSize: '0.75rem' }}>
+                      <th style={{ padding: '0.4rem 0' }}>DÍA</th>
+                      <th style={{ padding: '0.4rem 0' }}>HORARIO</th>
+                      <th style={{ padding: '0.4rem 0', textAlign: 'right' }}>VESTIMENTA</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                      <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Jueves</td>
+                      <td style={{ padding: '0.5rem 0', color: 'rgba(255,255,255,0.7)' }}>10:30 AM - 4 PM<br/>4:00 PM - Cierre</td>
+                      <td style={{ padding: '0.5rem 0', textAlign: 'right', color: '#f59e0b', fontWeight: 'bold' }}>Negro formal</td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                      <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Viernes</td>
+                      <td style={{ padding: '0.5rem 0', color: 'rgba(255,255,255,0.7)' }}>7:15 AM - 4 PM<br/>4:00 PM - Cierre</td>
+                      <td style={{ padding: '0.5rem 0', textAlign: 'right' }}>Polo / pantalón negro</td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                      <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Sábado</td>
+                      <td style={{ padding: '0.5rem 0', color: 'rgba(255,255,255,0.7)' }}>7:30 AM - 3 PM<br/>3:00 PM - Cierre</td>
+                      <td style={{ padding: '0.5rem 0', textAlign: 'right' }}>Polo / pantalón negro</td>
+                    </tr>
+                    <tr>
+                      <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Domingo</td>
+                      <td style={{ padding: '0.5rem 0', color: 'rgba(255,255,255,0.7)' }}>Inicio - Cierre<br/>3:00 PM - Cierre</td>
+                      <td style={{ padding: '0.5rem 0', textAlign: 'right' }}>Polo / pantalón negro</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              {/* MJ */}
+              <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1.4rem', borderRadius: '12px', borderTop: '4px solid #f59e0b' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
+                  <h3 style={{ color: '#f59e0b', margin: 0, fontSize: '1.15rem' }}>Maestría del Juego</h3>
+                  <span style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: '12px', background: 'rgba(245, 158, 11, 0.2)', color: '#fde68a', fontWeight: 'bold' }}>Liderazgo</span>
+                </div>
+                <table style={{ width: '100%', fontSize: '0.85rem', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', textAlign: 'left', color: 'rgba(255,255,255,0.5)', fontSize: '0.75rem' }}>
+                      <th style={{ padding: '0.4rem 0' }}>DÍA</th>
+                      <th style={{ padding: '0.4rem 0' }}>HORARIO</th>
+                      <th style={{ padding: '0.4rem 0', textAlign: 'right' }}>VESTIMENTA</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                      <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Viernes</td>
+                      <td style={{ padding: '0.5rem 0', color: 'rgba(255,255,255,0.7)' }}>3:00 PM - 9:00 PM (Alineamiento)</td>
+                      <td style={{ padding: '0.5rem 0', textAlign: 'right', color: '#f59e0b', fontWeight: 'bold' }}>Negro formal</td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                      <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Sábado</td>
+                      <td style={{ padding: '0.5rem 0', color: 'rgba(255,255,255,0.7)' }}>8:30 AM - 12 PM<br/>4:00 PM - 9:00 PM</td>
+                      <td style={{ padding: '0.5rem 0', textAlign: 'right' }}>Camiseta / pantalón negro</td>
+                    </tr>
+                    <tr>
+                      <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Domingo</td>
+                      <td style={{ padding: '0.5rem 0', color: 'rgba(255,255,255,0.7)' }}>8:30 AM - 12 PM<br/>4:00 PM - Cierre (FDS 4 El Viaje)</td>
+                      <td style={{ padding: '0.5rem 0', textAlign: 'right' }}>Camiseta / pantalón negro</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      )}
+
+      {/* TAB 3: SOP OPERATIVO SEMANAL & EL VIAJE */}
+      {activeTab === 'sop' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          
+          {/* Ritmo Semanal */}
+          <div className="glass-panel" style={{ padding: '2rem', borderRadius: '16px', borderLeft: '4px solid var(--crear-blue)' }}>
+            <h2 style={{ color: 'var(--crear-blue)', margin: '0 0 0.5rem 0', fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Clock size={22} /> Ritmo Operativo Semanal del Coordinador de Maestría (CMJ)
+            </h2>
+            <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', marginBottom: '1.5rem' }}>
+              Cronograma de control de evidencias, groundings y montajes logísticos.
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {SOP_OPERATIVO_SEMANAL.semanal.map((paso, idx) => (
+                <div key={idx} style={{ 
+                  background: 'rgba(0,0,0,0.3)', 
+                  padding: '1.25rem', 
+                  borderRadius: '12px', 
+                  borderLeft: paso.dia.includes('Miércoles') ? '4px solid #ef4444' : '4px solid var(--crear-gold)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.4rem'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }}>
+                    <strong style={{ color: paso.dia.includes('Miércoles') ? '#ef4444' : 'var(--crear-gold)', fontSize: '1.05rem' }}>
+                      {paso.dia}
+                    </strong>
+                    {paso.dia.includes('Miércoles') && (
+                      <span style={{ background: 'rgba(239, 68, 68, 0.2)', color: '#ef4444', fontSize: '0.75rem', padding: '0.2rem 0.6rem', borderRadius: '6px', fontWeight: 'bold' }}>
+                        DEADLINE DE ORO (19:00 PM)
+                      </span>
+                    )}
+                    {paso.dia.includes('Jueves') && (
+                      <span style={{ background: 'rgba(16, 185, 129, 0.2)', color: '#10b981', fontSize: '0.75rem', padding: '0.2rem 0.6rem', borderRadius: '6px', fontWeight: 'bold' }}>
+                        ALTURA SALA MÍN. 4.5M
+                      </span>
+                    )}
+                  </div>
+                  <p style={{ margin: 0, color: 'rgba(255,255,255,0.85)', fontSize: '0.92rem', lineHeight: 1.5 }}>
+                    {paso.detalle}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Fin de Semana 4: El Viaje */}
+          <div className="glass-panel" style={{ padding: '2rem', borderRadius: '16px', borderLeft: '4px solid var(--crear-gold)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+              <Flame size={24} className="text-gold" />
+              <h2 style={{ color: 'var(--crear-gold)', margin: 0, fontSize: '1.5rem' }}>
+                {SOP_OPERATIVO_SEMANAL.fds4ElViaje.nombre}
+              </h2>
+            </div>
+            <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', marginBottom: '1.5rem' }}>
+              Cierre cumbre de los 90 días de Maestría: hostería campestre, retiro de celulares, visiones de vida y Pase de Antorcha.
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.25rem' }}>
+              <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1.5rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <h3 style={{ color: '#0ea5e9', margin: '0 0 0.5rem 0', fontSize: '1.15rem' }}>Viernes — Auditoría y Sigilo</h3>
+                <p style={{ margin: 0, color: 'rgba(255,255,255,0.85)', fontSize: '0.9rem', lineHeight: 1.6 }}>
+                  {SOP_OPERATIVO_SEMANAL.fds4ElViaje.viernes}
+                </p>
+              </div>
+
+              <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1.5rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <h3 style={{ color: '#10b981', margin: '0 0 0.5rem 0', fontSize: '1.15rem' }}>Sábado — Hostería y Vuelos</h3>
+                <p style={{ margin: 0, color: 'rgba(255,255,255,0.85)', fontSize: '0.9rem', lineHeight: 1.6 }}>
+                  {SOP_OPERATIVO_SEMANAL.fds4ElViaje.sabado}
+                </p>
+              </div>
+
+              <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1.5rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <h3 style={{ color: 'var(--crear-gold)', margin: '0 0 0.5rem 0', fontSize: '1.15rem' }}>Domingo — Visiones y Antorcha</h3>
+                <p style={{ margin: 0, color: 'rgba(255,255,255,0.85)', fontSize: '0.9rem', lineHeight: 1.6 }}>
+                  {SOP_OPERATIVO_SEMANAL.fds4ElViaje.domingo}
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      )}
+
+      {/* TAB 4: 14 KPIS & TRIGGERS */}
+      {activeTab === 'kpis' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          
+          {/* Triggers de Backend Nodus */}
+          <div className="glass-panel" style={{ padding: '2rem', borderRadius: '16px', borderLeft: '4px solid #ef4444' }}>
+            <h2 style={{ color: '#ef4444', margin: '0 0 0.5rem 0', fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Server size={22} /> Triggers Técnicos Autónomos en Backend de Nodus
+            </h2>
+            <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', marginBottom: '1.5rem' }}>
+              Automatizaciones que se disparan en el servidor para proteger la integridad del contenedor y las finanzas.
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              {filteredTriggers.map((tr, idx) => (
+                <div key={idx} style={{ background: 'rgba(0,0,0,0.35)', padding: '1.5rem', borderRadius: '12px', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.75rem' }}>
+                    <h3 style={{ margin: 0, color: '#fff', fontSize: '1.15rem' }}>{tr.nombre}</h3>
+                    <span style={{ background: 'rgba(239, 68, 68, 0.2)', color: '#ef4444', padding: '0.2rem 0.6rem', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 'bold' }}>
+                      {tr.momento}
+                    </span>
+                  </div>
+
+                  <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.92rem', lineHeight: 1.5, marginBottom: '1rem' }}>
+                    {tr.explicacion}
+                  </p>
+
+                  <div style={{ background: '#0a0a0a', padding: '1rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)', fontFamily: 'Consolas, monospace', fontSize: '0.85rem' }}>
+                    <div style={{ color: '#10b981', marginBottom: '0.3rem' }}>// LÓGICA DE CONDICIÓN:</div>
+                    <div style={{ color: '#0ea5e9', marginBottom: '0.6rem' }}>{tr.condicion}</div>
+                    <div style={{ color: 'var(--crear-gold)', marginBottom: '0.3rem' }}>// ACCIÓN DISPARADA:</div>
+                    <div style={{ color: '#f87171' }}>{tr.accion}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Catálogo de 14 KPIs */}
+          <div className="glass-panel" style={{ padding: '2rem', borderRadius: '16px', borderLeft: '4px solid #10b981' }}>
+            <h2 style={{ color: '#10b981', margin: '0 0 0.5rem 0', fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <BarChart3 size={22} /> Catálogo Oficial de los 14 KPIs Reales en Nodus
+            </h2>
+            <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', marginBottom: '1.5rem' }}>
+              Metas matemáticas oficiales 2026, fórmulas de cálculo, origen de datos y deadlines de registro en sistema.
+            </p>
+
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
+                <thead>
+                  <tr style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--crear-gold)', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                    <th style={{ padding: '0.85rem' }}>Código</th>
+                    <th style={{ padding: '0.85rem' }}>Nombre del KPI</th>
+                    <th style={{ padding: '0.85rem' }}>Meta Oficial</th>
+                    <th style={{ padding: '0.85rem' }}>Fórmula Matemática</th>
+                    <th style={{ padding: '0.85rem' }}>Origen</th>
+                    <th style={{ padding: '0.85rem' }}>Deadline</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredKPIs.map(kpi => (
+                    <tr key={kpi.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                      <td style={{ padding: '0.85rem', fontWeight: 'bold', color: 'var(--crear-blue)' }}>{kpi.id}</td>
+                      <td style={{ padding: '0.85rem', color: '#fff', fontWeight: 600 }}>{kpi.nombre}</td>
+                      <td style={{ padding: '0.85rem', color: '#10b981', fontWeight: 'bold' }}>{kpi.meta}</td>
+                      <td style={{ padding: '0.85rem', color: 'rgba(255,255,255,0.75)', fontFamily: 'Consolas, monospace', fontSize: '0.82rem' }}>{kpi.formula}</td>
+                      <td style={{ padding: '0.85rem', color: 'rgba(255,255,255,0.65)' }}>{kpi.origen}</td>
+                      <td style={{ padding: '0.85rem', color: 'var(--crear-gold)', fontWeight: 600 }}>{kpi.deadline}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      )}
+
+      {/* TAB 5: MANUAL NODUS (18 CAPÍTULOS) */}
+      {activeTab === 'operativo' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          
+          <div className="glass-panel" style={{ padding: '1.5rem', borderRadius: '12px', borderLeft: '4px solid var(--crear-gold)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+              <div>
+                <h2 style={{ margin: 0, color: '#fff', fontSize: '1.3rem' }}>
+                  Manual Técnico de Operaciones NODUS (18 Capítulos)
+                </h2>
+                <p style={{ margin: '0.3rem 0 0 0', color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem' }}>
+                  Flujos literales paso a paso sobre los botones y menús reales de <a href="https://imo.crearpslglobal.com/" target="_blank" rel="noreferrer" style={{ color: 'var(--crear-gold)' }}>imo.crearpslglobal.com</a>.
+                </p>
+              </div>
+              <div style={{ fontSize: '0.85rem', color: 'var(--crear-gold)', fontWeight: 'bold' }}>
+                Mostrando {filteredCapitulos.length} de 18 capítulos
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            {filteredCapitulos.map(cap => (
+              <div key={cap.capitulo} className="glass-panel hover-scale" style={{ 
+                padding: '1.75rem', 
+                borderRadius: '14px',
+                borderLeft: '4px solid var(--crear-blue)'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem' }}>
+                  <div>
+                    <span style={{ background: 'rgba(0, 210, 255, 0.12)', color: 'var(--crear-blue)', padding: '0.2rem 0.6rem', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 'bold' }}>
+                      CAPÍTULO {cap.capitulo} • {cap.modulo.toUpperCase()}
+                    </span>
+                    <h3 style={{ margin: '0.4rem 0 0.3rem 0', color: '#fff', fontSize: '1.25rem' }}>
+                      {cap.titulo}
+                    </h3>
+                    <p style={{ margin: 0, color: 'rgba(255,255,255,0.7)', fontSize: '0.92rem' }}>
+                      {cap.descripcion}
+                    </p>
+                  </div>
+
+                  <a 
+                    href="https://imo.crearpslglobal.com/auth/login" 
+                    target="_blank" 
+                    rel="noreferrer"
+                    className="btn-secondary"
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.4rem 0.8rem', fontSize: '0.82rem' }}
+                  >
+                    <ExternalLink size={14} /> Ir a este módulo
+                  </a>
+                </div>
+
+                <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1.25rem', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  <div style={{ color: 'var(--crear-gold)', fontWeight: 'bold', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.75rem' }}>
+                    <MousePointer2 size={16} /> Pasos Exactos de Navegación:
+                  </div>
+                  <ol style={{ margin: 0, paddingLeft: '1.25rem', color: 'rgba(255,255,255,0.9)', lineHeight: 1.7, fontSize: '0.92rem' }}>
+                    {cap.pasos.map((paso, idx) => (
+                      <li key={idx} style={{ marginBottom: '0.35rem' }}>{paso}</li>
+                    ))}
+                  </ol>
+                </div>
+
+                <div style={{ display: 'flex', gap: '0.4rem', marginTop: '1rem', flexWrap: 'wrap' }}>
+                  {cap.tags.map(t => (
+                    <span key={t} style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.7)', padding: '0.15rem 0.55rem', borderRadius: '10px', fontSize: '0.75rem' }}>
+                      #{t}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      )}
+
+      {/* TAB 6: CHECKLISTS & FLUJOS */}
+      {activeTab === 'checklists' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          
+          <div className="glass-panel" style={{ padding: '2rem', borderRadius: '16px', borderLeft: '4px solid var(--crear-gold)' }}>
+            <h2 style={{ color: 'var(--crear-gold)', margin: '0 0 0.5rem 0', fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <CheckSquare size={22} /> Listas de Cotejo por Puesto de Trabajo (Capítulo 16)
+            </h2>
+            <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', marginBottom: '1.5rem' }}>
+              Tareas innegociables antes, durante y después del evento para cada colaborador.
+            </p>
+
+            {/* Selector de Puesto */}
+            <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+              {CHECKLISTS_POR_PUESTO.map(p => (
+                <button
+                  key={p.puesto}
+                  onClick={() => setSelectedPuesto(p.puesto)}
+                  style={{
+                    padding: '0.6rem 1.2rem',
+                    borderRadius: '10px',
+                    border: selectedPuesto === p.puesto ? `2px solid ${p.color}` : '1px solid rgba(255,255,255,0.1)',
+                    background: selectedPuesto === p.puesto ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.3)',
+                    color: selectedPuesto === p.puesto ? '#fff' : 'rgba(255,255,255,0.7)',
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                >
+                  {p.puesto}
+                </button>
+              ))}
+            </div>
+
+            {/* Contenido del puesto seleccionado */}
+            {(() => {
+              const p = CHECKLISTS_POR_PUESTO.find(item => item.puesto === selectedPuesto) || CHECKLISTS_POR_PUESTO[0];
+              return (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem' }}>
+                  
+                  <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1.5rem', borderRadius: '12px', borderLeft: '4px solid #0ea5e9' }}>
+                    <h3 style={{ color: '#0ea5e9', margin: '0 0 0.75rem 0', fontSize: '1.15rem' }}>Antes del Evento (Preparación)</h3>
+                    <ul style={{ margin: 0, paddingLeft: '1.2rem', color: 'rgba(255,255,255,0.85)', lineHeight: 1.6, fontSize: '0.9rem' }}>
+                      {p.antes.map((tarea, i) => <li key={i} style={{ marginBottom: '0.4rem' }}>{tarea}</li>)}
+                    </ul>
+                  </div>
+
+                  <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1.5rem', borderRadius: '12px', borderLeft: '4px solid #10b981' }}>
+                    <h3 style={{ color: '#10b981', margin: '0 0 0.75rem 0', fontSize: '1.15rem' }}>Durante el Evento (Ejecución)</h3>
+                    <ul style={{ margin: 0, paddingLeft: '1.2rem', color: 'rgba(255,255,255,0.85)', lineHeight: 1.6, fontSize: '0.9rem' }}>
+                      {p.durante.map((tarea, i) => <li key={i} style={{ marginBottom: '0.4rem' }}>{tarea}</li>)}
+                    </ul>
+                  </div>
+
+                  <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1.5rem', borderRadius: '12px', borderLeft: '4px solid var(--crear-gold)' }}>
+                    <h3 style={{ color: 'var(--crear-gold)', margin: '0 0 0.75rem 0', fontSize: '1.15rem' }}>Después del Evento (Cierre)</h3>
+                    <ul style={{ margin: 0, paddingLeft: '1.2rem', color: 'rgba(255,255,255,0.85)', lineHeight: 1.6, fontSize: '0.9rem' }}>
+                      {p.despues.map((tarea, i) => <li key={i} style={{ marginBottom: '0.4rem' }}>{tarea}</li>)}
+                    </ul>
+                  </div>
+
+                </div>
+              );
+            })()}
+          </div>
+
+          {/* Flujos Operativos y Ejercicios */}
+          <div className="glass-panel" style={{ padding: '2rem', borderRadius: '16px', borderLeft: '4px solid var(--crear-blue)' }}>
+            <h2 style={{ color: 'var(--crear-blue)', margin: '0 0 0.5rem 0', fontSize: '1.4rem' }}>
+              Flujos Operativos de Entrada y Contingencia
+            </h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.25rem', marginTop: '1rem' }}>
+              <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1.25rem', borderRadius: '10px' }}>
+                <strong style={{ color: '#10b981', display: 'block', marginBottom: '0.4rem' }}>1. Flujo de Llegada Ordinaria</strong>
+                <p style={{ margin: 0, color: 'rgba(255,255,255,0.8)', fontSize: '0.88rem', lineHeight: 1.5 }}>
+                  Participante presenta DNI → Búsqueda en Nodus → Estado 'Completo' comprobado → Entrega de Gafete → Clic en 'Marcar en Sala' → Ingreso a Salón.
+                </p>
+              </div>
+
+              <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1.25rem', borderRadius: '10px' }}>
+                <strong style={{ color: '#ef4444', display: 'block', marginBottom: '0.4rem' }}>2. Flujo de Saldo Pendiente</strong>
+                <p style={{ margin: 0, color: 'rgba(255,255,255,0.8)', fontSize: '0.88rem', lineHeight: 1.5 }}>
+                  Búsqueda en Nodus → Estado 'Pendiente' → Derivación inmediata a Caja → Pago total o abono → Registro de comprobante → Retorno a mesa → Marcación en sala.
+                </p>
+              </div>
+
+              <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1.25rem', borderRadius: '10px' }}>
+                <strong style={{ color: 'var(--crear-gold)', display: 'block', marginBottom: '0.4rem' }}>3. Flujo Alumno Nuevo (Walk-In)</strong>
+                <p style={{ margin: 0, color: 'rgba(255,255,255,0.8)', fontSize: '0.88rem', lineHeight: 1.5 }}>
+                  DNI no registrado → 'Participantes' → 'Nuevo Participante' → Registro de datos completos → Asentar cobro en 'Contabilidad' → Gafete provisional → 'Marcar en Sala'.
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      )}
 
     </div>
   );
@@ -188126,6 +190867,1109 @@ export default function MisKPIs() {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+```
+
+---
+
+## Archivo: src\pages\MonitorVuelosCartas.jsx
+
+```javascript
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { useUI } from '../context/UIContext';
+import {
+  Plane,
+  FileText,
+  Clock,
+  MapPin,
+  ExternalLink,
+  Copy,
+  Search,
+  Building,
+  Phone,
+  ArrowLeft,
+  RefreshCw,
+  CheckCircle,
+  AlertTriangle,
+  User,
+  Share2,
+  X,
+  Compass,
+  Car
+} from 'lucide-react';
+
+const FALLBACK_TRACKER = {
+  updatedAt: "2026-09-03T20:21:23.790Z",
+  flights: {
+    LA1437: {
+      flightNumber: "LA 1437",
+      flightCode: "LA1437",
+      airline: "LATAM Airlines",
+      callsign: "LAN1437",
+      reservationCode: "DJBJJD",
+      passengers: [
+        "Elmer Andrés Idrovo Andrade",
+        "María de Lourdes Patiño"
+      ],
+      route: {
+        origin: "UIO",
+        originCity: "Quito",
+        originAirport: "Aeropuerto Internacional Mariscal Sucre",
+        destination: "LIM",
+        destinationCity: "Lima",
+        destinationAirport: "Aeropuerto Internacional Jorge Chávez",
+        isDirect: true,
+        stops: 0,
+        flightDuration: "2h 15m"
+      },
+      schedule: {
+        departureDate: "2026-09-04",
+        scheduledDeparture: "2026-09-04T07:55:00-05:00",
+        scheduledArrival: "2026-09-04T10:10:00-05:00",
+        estimatedDeparture: "2026-09-04T07:55:00-05:00",
+        estimatedArrival: "2026-09-04T10:10:00-05:00",
+        actualDeparture: null,
+        actualArrival: null
+      },
+      status: "ON_TIME",
+      statusLabel: "A tiempo",
+      statusDescription: "Vuelo confirmado y a tiempo para despegue directo UIO → LIM",
+      delayMinutes: 0,
+      terminal: "T1",
+      gate: "Confirmándose en aeropuerto",
+      baggageClaim: "Por confirmar en arribo",
+      logistics: {
+        pickupLocation: "Puerta de Llegadas Internacionales (Aeropuerto Jorge Chávez)",
+        destination: "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        driverPickupEstimated: "10:35 AM",
+        driverNote: "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      radarUrl: "https://www.flightradar24.com/data/flights/la1437",
+      checkInUrl: "https://www.latamairlines.com/pe/es/check-in",
+      relatedLetters: [
+        { name: "Carta Andrés Idrovo", url: "/cartas/carta_andres_idrobo_e30.html" },
+        { name: "Carta Lourdes Patiño", url: "/cartas/carta_lourdes_patino_e29.html" }
+      ]
+    },
+    LA1449: {
+      flightNumber: "LA 1449",
+      flightCode: "LA1449",
+      airline: "LATAM Airlines",
+      callsign: "LAN1449",
+      reservationCode: "DJBJJD",
+      passengers: [
+        "Elmer Andrés Idrovo Andrade"
+      ],
+      route: {
+        origin: "LIM",
+        originCity: "Lima",
+        originAirport: "Aeropuerto Internacional Jorge Chávez",
+        destination: "UIO",
+        destinationCity: "Quito",
+        destinationAirport: "Aeropuerto Internacional Mariscal Sucre",
+        isDirect: false,
+        stops: 1,
+        stopover: "Guayaquil (GYE) - Escala de 4h 00m",
+        flightDuration: "7h 02m (con escala)"
+      },
+      schedule: {
+        departureDate: "2026-09-06",
+        scheduledDeparture: "2026-09-06T23:35:00-05:00",
+        scheduledArrival: "2026-09-07T06:37:00-05:00",
+        estimatedDeparture: "2026-09-06T23:35:00-05:00",
+        estimatedArrival: "2026-09-07T06:37:00-05:00",
+        actualDeparture: null,
+        actualArrival: null
+      },
+      status: "ON_TIME",
+      statusLabel: "Programado · A tiempo",
+      statusDescription: "Vuelo de retorno programado",
+      delayMinutes: 0,
+      terminal: "T1",
+      gate: "Por confirmar",
+      baggageClaim: null,
+      logistics: {
+        pickupLocation: "Lobby del Hotel Jose Antonio Deluxe",
+        driverPickupEstimated: "8:30 PM (20:30 hrs)",
+        destination: "Aeropuerto Jorge Chávez",
+        driverNote: "Recojo 3h antes para vuelo internacional nocturno."
+      },
+      radarUrl: "https://www.flightradar24.com/data/flights/la1449",
+      checkInUrl: "https://www.latamairlines.com/pe/es/check-in",
+      relatedLetters: [
+        { name: "Carta Andrés Idrovo (Retorno)", url: "/cartas/carta_andres_idrobo_e30.html" }
+      ]
+    },
+    AV108: {
+      flightNumber: "AV 108",
+      flightCode: "AV108",
+      airline: "Avianca",
+      callsign: "AVA108",
+      reservationCode: "AVCONF",
+      passengers: [
+        "Alejandro Díaz Pabón"
+      ],
+      route: {
+        origin: "BOG",
+        originCity: "Bogotá",
+        originAirport: "Aeropuerto Internacional El Dorado",
+        destination: "LIM",
+        destinationCity: "Lima",
+        destinationAirport: "Aeropuerto Internacional Jorge Chávez",
+        isDirect: true,
+        stops: 0,
+        flightDuration: "3h 05m"
+      },
+      schedule: {
+        departureDate: "2026-09-04",
+        scheduledDeparture: "2026-09-04T06:15:00-05:00",
+        scheduledArrival: "2026-09-04T09:20:00-05:00",
+        estimatedDeparture: "2026-09-04T06:15:00-05:00",
+        estimatedArrival: "2026-09-04T09:20:00-05:00",
+        actualDeparture: null,
+        actualArrival: null
+      },
+      status: "ON_TIME",
+      statusLabel: "A tiempo",
+      statusDescription: "Vuelo confirmado y a tiempo",
+      delayMinutes: 0,
+      terminal: "T1",
+      gate: "Por confirmar",
+      baggageClaim: "Por confirmar",
+      logistics: {
+        pickupLocation: "Puerta de Llegadas Internacionales (Aeropuerto Jorge Chávez)",
+        destination: "Hotel Jose Antonio Deluxe",
+        driverPickupEstimated: "09:45 AM",
+        driverNote: "Conductor esperará en llegadas internacionales con cartel oficial CPSL."
+      },
+      radarUrl: "https://www.flightradar24.com/data/flights/av108",
+      checkInUrl: "https://www.avianca.com",
+      relatedLetters: [
+        { name: "Carta Alejandro Díaz", url: "/cartas/carta_alejandro_diaz_e28.html" }
+      ]
+    }
+  }
+};
+
+const OFICIAL_LETTERS = [
+  {
+    id: 'carta-andres-idrovo',
+    entrenador: 'Elmer Andrés Idrovo Andrade',
+    rol: 'Entrenador Principal',
+    equipo: 'Equipo 30 - Creación',
+    sede: 'Lima',
+    url: '/cartas/carta_andres_idrobo_e30.html',
+    badge: 'LATAM DJBJJD',
+    fecha: 'Septiembre 2026',
+    descripcion: 'Carta oficial de invitación, itinerario de vuelos UIO ➔ LIM (LA 1437) y LIM ➔ UIO (LA 1449), hotel y logística de chofer.',
+    vuelos: ['LA 1437', 'LA 1449']
+  },
+  {
+    id: 'carta-lourdes-patino',
+    entrenador: 'María de Lourdes Patiño',
+    rol: 'Entrenadora de Sala',
+    equipo: 'Equipo 29 - Relación',
+    sede: 'Lima',
+    url: '/cartas/carta_lourdes_patino_e29.html',
+    badge: 'LATAM DJBJJD',
+    fecha: 'Septiembre 2026',
+    descripcion: 'Carta oficial de invitación, itinerario de vuelo internacional UIO ➔ LIM (LA 1437), hospedaje y viáticos de coordinación.',
+    vuelos: ['LA 1437']
+  },
+  {
+    id: 'carta-alejandro-diaz',
+    entrenador: 'Alejandro Díaz Pabón',
+    rol: 'Entrenador Senior',
+    equipo: 'Equipo 28 - Gratitud',
+    sede: 'Lima',
+    url: '/cartas/carta_alejandro_diaz_e28.html',
+    badge: 'Avianca AVCONF',
+    fecha: 'Septiembre 2026',
+    descripcion: 'Carta de facilitación e itinerario de vuelo BOG ➔ LIM (AV 108), transporte en Lima y agenda del fin de semana.',
+    vuelos: ['AV 108']
+  },
+  {
+    id: 'carta-julio-narvaez',
+    entrenador: 'Julio Narváez',
+    rol: 'Entrenador / Facilitador',
+    equipo: 'Equipo 28 - El Viaje',
+    sede: 'Lima',
+    url: '/cartas/julio-narvaez-elviaje-e28.html',
+    badge: 'Maestría del Juego',
+    fecha: 'Septiembre 2026',
+    descripcion: 'Carta de confirmación logística y requerimientos de sala para Maestría del Juego El Viaje.',
+    vuelos: []
+  },
+  {
+    id: 'carta-fernando-aragon',
+    entrenador: 'Fernando Aragón',
+    rol: 'Coach de Transformación',
+    equipo: 'CC1 - Transformación',
+    sede: 'Lima',
+    url: '/cartas/fernando-aragon-c1.html',
+    badge: 'CC1 Oficial',
+    fecha: 'Agosto - Septiembre 2026',
+    descripcion: 'Carta oficial de asignación y cronograma de intervención ontológica para CC1.',
+    vuelos: []
+  },
+  {
+    id: 'carta-migraciones-oficial',
+    entrenador: 'Superintendencia Nacional de Migraciones (Perú)',
+    rol: 'Respaldo Institucional Oficial',
+    equipo: 'CREAR PODER SIN LÍMITES S.A.C.',
+    sede: 'Aeropuerto Internacional Jorge Chávez',
+    url: '/cartas/carta_invitacion_migraciones.html',
+    badge: 'Documento Legal Migratorio',
+    fecha: 'Oficial 2026',
+    descripcion: 'Carta de respaldo institucional, personería jurídica y acreditación oficial de conferencistas extranjeros.',
+    vuelos: ['LA 1437', 'AV 108', 'LA 1449']
+  }
+];
+
+export default function MonitorVuelosCartas() {
+  const navigate = useNavigate();
+  const { showToast } = useUI();
+  const [activeTab, setActiveTab] = useState('radar'); // 'radar' | 'cartas' | 'logistica'
+  const [trackerData, setTrackerData] = useState(FALLBACK_TRACKER);
+  const [loading, setLoading] = useState(false);
+  const [previewLetter, setPreviewLetter] = useState(null);
+  const [searchFilter, setSearchFilter] = useState('');
+  const [routeFilter, setRouteFilter] = useState('ALL');
+
+  const fetchTrackerData = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/vuelos_tracker.json?t=' + Date.now());
+      if (res.ok) {
+        const data = await res.json();
+        setTrackerData(data);
+        showToast('Radar de vuelos sincronizado en tiempo real', 'success');
+      } else {
+        const res2 = await fetch('/cartas/vuelos_tracker.json?t=' + Date.now());
+        if (res2.ok) {
+          const data2 = await res2.json();
+          setTrackerData(data2);
+          showToast('Radar de vuelos sincronizado', 'success');
+        }
+      }
+    } catch (e) {
+      console.warn('Usando datos de respaldo para tracker de vuelos:', e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTrackerData();
+  }, []);
+
+  const copyToClipboard = (text, label = 'Información') => {
+    navigator.clipboard.writeText(text);
+    showToast(`${label} copiado al portapapeles`, 'success');
+  };
+
+  const copyDriverBriefing = (flight) => {
+    const text = `✈️ *CREAR PODER SIN LÍMITES - BRIEFING DE RECOJO DE ENTRENADOR*\n\n` +
+      `📌 *Vuelo:* ${flight.flightNumber} (${flight.airline})\n` +
+      `👤 *Pasajero(s):* ${flight.passengers.join(', ')}\n` +
+      `🛫 *Ruta:* ${flight.route.originCity} (${flight.route.origin}) ➔ ${flight.route.destinationCity} (${flight.route.destination})\n` +
+      `⏰ *Llegada Estimada:* ${new Date(flight.schedule.estimatedArrival).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}\n` +
+      `📍 *Punto de Recojo:* ${flight.logistics.pickupLocation}\n` +
+      `🏨 *Destino:* ${flight.logistics.destination}\n` +
+      `🚗 *Hora Chofer:* ${flight.logistics.driverPickupEstimated}\n` +
+      `ℹ️ *Nota:* ${flight.logistics.driverNote}\n` +
+      `🔗 *Radar en vivo:* ${flight.radarUrl}`;
+    copyToClipboard(text, 'Briefing de WhatsApp para chofer');
+  };
+
+  const flightsList = Object.values(trackerData?.flights || {});
+
+  const filteredFlights = flightsList.filter(f => {
+    if (routeFilter === 'UIO-LIM') return f.route.origin === 'UIO';
+    if (routeFilter === 'LIM-UIO') return f.route.origin === 'LIM';
+    if (routeFilter === 'BOG-LIM') return f.route.origin === 'BOG';
+    return true;
+  });
+
+  const filteredLetters = OFICIAL_LETTERS.filter(l => {
+    const matchSearch = l.entrenador.toLowerCase().includes(searchFilter.toLowerCase()) ||
+      l.equipo.toLowerCase().includes(searchFilter.toLowerCase()) ||
+      l.sede.toLowerCase().includes(searchFilter.toLowerCase());
+    return matchSearch;
+  });
+
+  return (
+    <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '1.5rem', minHeight: '90vh' }}>
+      
+      {/* HEADER DE PÁGINA */}
+      <div style={{ marginBottom: '2rem' }}>
+        <button
+          onClick={() => navigate('/home')}
+          className="btn-secondary"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            padding: '0.4rem 0.8rem',
+            fontSize: '0.85rem',
+            marginBottom: '1rem',
+            cursor: 'pointer'
+          }}
+        >
+          <ArrowLeft size={16} /> Volver al Inicio
+        </button>
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.3rem' }}>
+              <span style={{
+                background: 'rgba(255, 183, 3, 0.15)',
+                color: 'var(--crear-gold)',
+                padding: '4px 12px',
+                borderRadius: '20px',
+                fontSize: '0.8rem',
+                fontWeight: 'bold',
+                letterSpacing: '0.05em'
+              }}>
+                CREAR PODER SIN LÍMITES
+              </span>
+              <span style={{
+                background: 'rgba(56, 189, 248, 0.15)',
+                color: '#38bdf8',
+                padding: '4px 12px',
+                borderRadius: '20px',
+                fontSize: '0.8rem',
+                fontWeight: 'bold'
+              }}>
+                LOGÍSTICA DE ENTRENADORES 2026
+              </span>
+            </div>
+            <h1 style={{ fontSize: '2.4rem', margin: '0.2rem 0', fontWeight: 800, color: '#fff' }}>
+              ✈️ Monitor de Vuelos y Cartas Oficiales
+            </h1>
+            <p className="text-muted" style={{ margin: 0, fontSize: '1rem' }}>
+              Centro operativo de arribos de conferencistas internacionales, logística de transporte y repositorio oficial de cartas de facilitación.
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <button
+              onClick={fetchTrackerData}
+              disabled={loading}
+              className="btn-secondary"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                padding: '0.6rem 1rem',
+                fontSize: '0.85rem',
+                cursor: loading ? 'not-allowed' : 'pointer'
+              }}
+            >
+              <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
+              {loading ? 'Actualizando...' : 'Actualizar Radar'}
+            </button>
+          </div>
+        </div>
+
+        {/* NAVEGACIÓN POR PESTAÑAS */}
+        <div style={{
+          display: 'flex',
+          gap: '10px',
+          background: 'rgba(255, 255, 255, 0.03)',
+          padding: '6px',
+          borderRadius: '16px',
+          border: '1px solid rgba(255,255,255,0.08)',
+          marginTop: '1.5rem'
+        }}>
+          <button
+            onClick={() => setActiveTab('radar')}
+            style={{
+              flex: 1,
+              padding: '12px 18px',
+              borderRadius: '12px',
+              border: 'none',
+              background: activeTab === 'radar' ? 'linear-gradient(135deg, rgba(56,189,248,0.2) 0%, rgba(56,189,248,0.05) 100%)' : 'transparent',
+              color: activeTab === 'radar' ? '#38bdf8' : 'var(--text-muted)',
+              fontWeight: 700,
+              fontSize: '0.95rem',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              borderBottom: activeTab === 'radar' ? '2px solid #38bdf8' : '2px solid transparent',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <Plane size={18} />
+            <span>Radar de Vuelos en Vivo</span>
+            <span style={{
+              background: '#38bdf8',
+              color: '#000',
+              padding: '2px 8px',
+              borderRadius: '10px',
+              fontSize: '0.75rem',
+              fontWeight: 800
+            }}>
+              {flightsList.length}
+            </span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('cartas')}
+            style={{
+              flex: 1,
+              padding: '12px 18px',
+              borderRadius: '12px',
+              border: 'none',
+              background: activeTab === 'cartas' ? 'linear-gradient(135deg, rgba(255,183,3,0.2) 0%, rgba(255,183,3,0.05) 100%)' : 'transparent',
+              color: activeTab === 'cartas' ? 'var(--crear-gold)' : 'var(--text-muted)',
+              fontWeight: 700,
+              fontSize: '0.95rem',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              borderBottom: activeTab === 'cartas' ? '2px solid var(--crear-gold)' : '2px solid transparent',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <FileText size={18} />
+            <span>Repositorio de Cartas y Migraciones</span>
+            <span style={{
+              background: 'var(--crear-gold)',
+              color: '#000',
+              padding: '2px 8px',
+              borderRadius: '10px',
+              fontSize: '0.75rem',
+              fontWeight: 800
+            }}>
+              {OFICIAL_LETTERS.length}
+            </span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('logistica')}
+            style={{
+              flex: 1,
+              padding: '12px 18px',
+              borderRadius: '12px',
+              border: 'none',
+              background: activeTab === 'logistica' ? 'linear-gradient(135deg, rgba(16,185,129,0.2) 0%, rgba(16,185,129,0.05) 100%)' : 'transparent',
+              color: activeTab === 'logistica' ? '#34d399' : 'var(--text-muted)',
+              fontWeight: 700,
+              fontSize: '0.95rem',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              borderBottom: activeTab === 'logistica' ? '2px solid #34d399' : '2px solid transparent',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <Car size={18} />
+            <span>Hotel & Choferes de Sede</span>
+          </button>
+        </div>
+      </div>
+
+      {/* ========================================================= */}
+      {/* PESTAÑA 1: RADAR DE VUELOS EN TIEMPO REAL                 */}
+      {/* ========================================================= */}
+      {activeTab === 'radar' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          
+          {/* Barra de Filtros de Ruta */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              {[
+                { id: 'ALL', label: 'Todos los Vuelos' },
+                { id: 'UIO-LIM', label: 'Quito ➔ Lima (UIO → LIM)' },
+                { id: 'LIM-UIO', label: 'Lima ➔ Quito (LIM → UIO)' },
+                { id: 'BOG-LIM', label: 'Bogotá ➔ Lima (BOG → LIM)' }
+              ].map(r => (
+                <button
+                  key={r.id}
+                  onClick={() => setRouteFilter(r.id)}
+                  style={{
+                    padding: '6px 14px',
+                    borderRadius: '8px',
+                    border: '1px solid',
+                    borderColor: routeFilter === r.id ? '#38bdf8' : 'rgba(255,255,255,0.1)',
+                    background: routeFilter === r.id ? 'rgba(56,189,248,0.2)' : 'rgba(0,0,0,0.3)',
+                    color: routeFilter === r.id ? '#38bdf8' : 'var(--text-muted)',
+                    fontSize: '0.82rem',
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                >
+                  {r.label}
+                </button>
+              ))}
+            </div>
+
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+              Última sincronización: <span style={{ color: '#fff' }}>{new Date(trackerData?.updatedAt || Date.now()).toLocaleTimeString()}</span>
+            </div>
+          </div>
+
+          {/* Tarjetas de Vuelos */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '1.5rem' }}>
+            {filteredFlights.map((flight, idx) => {
+              const depTime = new Date(flight.schedule.scheduledDeparture).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+              const arrTime = new Date(flight.schedule.estimatedArrival).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+              return (
+                <div
+                  key={idx}
+                  className="glass-panel"
+                  style={{
+                    padding: '1.8rem',
+                    borderTop: '4px solid #38bdf8',
+                    background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.05) 0%, rgba(7, 13, 31, 0.95) 100%)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '1.2rem',
+                    position: 'relative'
+                  }}
+                >
+                  {/* Encabezado Vuelo */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.2rem' }}>
+                        <span style={{ fontSize: '1.4rem', fontWeight: 900, color: '#fff' }}>
+                          {flight.flightNumber}
+                        </span>
+                        <span style={{
+                          background: 'rgba(255,255,255,0.1)',
+                          padding: '2px 8px',
+                          borderRadius: '6px',
+                          fontSize: '0.75rem',
+                          color: '#e2e8f0',
+                          fontWeight: 700
+                        }}>
+                          {flight.airline}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                        Reserva: <strong style={{ color: 'var(--crear-gold)' }}>{flight.reservationCode}</strong> • Callsign: {flight.callsign}
+                      </div>
+                    </div>
+
+                    <span style={{
+                      background: flight.status === 'ON_TIME' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                      color: flight.status === 'ON_TIME' ? '#34d399' : '#f87171',
+                      border: `1px solid ${flight.status === 'ON_TIME' ? 'rgba(16, 185, 129, 0.4)' : 'rgba(239, 68, 68, 0.4)'}`,
+                      padding: '4px 10px',
+                      borderRadius: '12px',
+                      fontSize: '0.75rem',
+                      fontWeight: 800
+                    }}>
+                      ● {flight.statusLabel}
+                    </span>
+                  </div>
+
+                  {/* Pasajeros / Entrenadores */}
+                  <div style={{
+                    background: 'rgba(0,0,0,0.3)',
+                    padding: '0.8rem 1rem',
+                    borderRadius: '10px',
+                    border: '1px solid rgba(255,255,255,0.06)'
+                  }}>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>
+                      Entrenador(es) a Bordo:
+                    </div>
+                    {flight.passengers.map((p, pIdx) => (
+                      <div key={pIdx} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.95rem', fontWeight: 700, color: '#fff' }}>
+                        <User size={15} color="var(--crear-gold)" />
+                        <span>{p}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Ruta y Tiempos */}
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '1rem',
+                    background: 'rgba(255,255,255,0.02)',
+                    borderRadius: '12px',
+                    border: '1px solid rgba(255,255,255,0.06)'
+                  }}>
+                    <div style={{ textAlign: 'center', flex: 1 }}>
+                      <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#38bdf8' }}>{flight.route.origin}</div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{flight.route.originCity}</div>
+                      <div style={{ fontSize: '0.85rem', fontWeight: 700, marginTop: '4px', color: '#fff' }}>{depTime}</div>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, padding: '0 10px' }}>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{flight.route.flightDuration}</span>
+                      <div style={{
+                        width: '100%',
+                        height: '2px',
+                        background: 'linear-gradient(90deg, #38bdf8 0%, var(--crear-gold) 100%)',
+                        position: 'relative',
+                        margin: '6px 0'
+                      }}>
+                        <Plane size={14} style={{ position: 'absolute', top: '-6px', left: '45%', color: 'var(--crear-gold)' }} />
+                      </div>
+                      <span style={{ fontSize: '0.7rem', color: flight.route.isDirect ? '#10b981' : '#fbbf24', fontWeight: 600 }}>
+                        {flight.route.isDirect ? 'Directo' : flight.route.stopover || '1 Escala'}
+                      </span>
+                    </div>
+
+                    <div style={{ textAlign: 'center', flex: 1 }}>
+                      <div style={{ fontSize: '1.6rem', fontWeight: 900, color: 'var(--crear-gold)' }}>{flight.route.destination}</div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{flight.route.destinationCity}</div>
+                      <div style={{ fontSize: '0.85rem', fontWeight: 700, marginTop: '4px', color: '#fff' }}>{arrTime}</div>
+                    </div>
+                  </div>
+
+                  {/* Información Logística de Chofer */}
+                  <div style={{ fontSize: '0.82rem', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#e2e8f0' }}>
+                      <MapPin size={14} color="#38bdf8" />
+                      <span><strong>Recojo:</strong> {flight.logistics.pickupLocation}</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#e2e8f0' }}>
+                      <Building size={14} color="var(--crear-gold)" />
+                      <span><strong>Destino:</strong> {flight.logistics.destination}</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#34d399' }}>
+                      <Clock size={14} />
+                      <span><strong>Hora Estimada Chofer:</strong> {flight.logistics.driverPickupEstimated}</span>
+                    </div>
+                  </div>
+
+                  {/* Acciones y Enlaces */}
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '8px',
+                    borderTop: '1px solid rgba(255,255,255,0.08)',
+                    paddingTop: '1rem'
+                  }}>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <a
+                        href={flight.radarUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn-secondary"
+                        style={{
+                          flex: 1,
+                          fontSize: '0.78rem',
+                          padding: '8px 12px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px',
+                          textDecoration: 'none',
+                          color: '#38bdf8',
+                          borderColor: 'rgba(56, 189, 248, 0.4)'
+                        }}
+                      >
+                        <Compass size={14} />
+                        FlightRadar24
+                      </a>
+
+                      <button
+                        onClick={() => copyDriverBriefing(flight)}
+                        className="btn-secondary"
+                        style={{
+                          flex: 1,
+                          fontSize: '0.78rem',
+                          padding: '8px 12px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px'
+                        }}
+                      >
+                        <Share2 size={14} />
+                        WhatsApp Chofer
+                      </button>
+                    </div>
+
+                    {/* Cartas relacionadas directas */}
+                    {flight.relatedLetters && flight.relatedLetters.length > 0 && (
+                      <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '4px' }}>
+                        {flight.relatedLetters.map((rl, rlIdx) => (
+                          <button
+                            key={rlIdx}
+                            onClick={() => setPreviewLetter(rl)}
+                            style={{
+                              background: 'rgba(255, 183, 3, 0.12)',
+                              color: 'var(--crear-gold)',
+                              border: '1px solid rgba(255, 183, 3, 0.3)',
+                              borderRadius: '6px',
+                              padding: '5px 10px',
+                              fontSize: '0.75rem',
+                              fontWeight: 600,
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '4px'
+                            }}
+                          >
+                            <FileText size={12} />
+                            {rl.name}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================= */}
+      {/* PESTAÑA 2: REPOSITORIO DE CARTAS Y MIGRACIONES            */}
+      {/* ========================================================= */}
+      {activeTab === 'cartas' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          
+          {/* Buscador de Cartas */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+            <div style={{ position: 'relative', minWidth: '300px', flex: 1, maxWidth: '500px' }}>
+              <Search size={16} style={{ position: 'absolute', left: '12px', top: '12px', color: 'var(--text-muted)' }} />
+              <input
+                type="text"
+                placeholder="Buscar por entrenador, equipo o documento..."
+                value={searchFilter}
+                onChange={(e) => setSearchFilter(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px 10px 36px',
+                  borderRadius: '10px',
+                  background: 'rgba(255,255,255,0.04)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  color: '#fff',
+                  fontSize: '0.9rem'
+                }}
+              />
+            </div>
+
+            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+              Mostrando <strong style={{ color: 'var(--crear-gold)' }}>{filteredLetters.length}</strong> documentos oficiales
+            </div>
+          </div>
+
+          {/* Grid de Cartas */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '1.2rem' }}>
+            {filteredLetters.map(letter => (
+              <div
+                key={letter.id}
+                className="glass-panel"
+                style={{
+                  padding: '1.5rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  gap: '1rem',
+                  borderLeft: '4px solid var(--crear-gold)',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px', marginBottom: '0.5rem' }}>
+                    <span style={{
+                      background: 'rgba(255, 183, 3, 0.15)',
+                      color: 'var(--crear-gold)',
+                      padding: '2px 8px',
+                      borderRadius: '6px',
+                      fontSize: '0.75rem',
+                      fontWeight: 700
+                    }}>
+                      {letter.badge}
+                    </span>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                      {letter.fecha}
+                    </span>
+                  </div>
+
+                  <h3 style={{ margin: '0.2rem 0', fontSize: '1.2rem', color: '#fff' }}>
+                    {letter.entrenador}
+                  </h3>
+
+                  <div style={{ fontSize: '0.85rem', color: '#38bdf8', fontWeight: 600, marginBottom: '0.5rem' }}>
+                    {letter.rol} • <span style={{ color: 'var(--text-muted)' }}>{letter.equipo}</span>
+                  </div>
+
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0, lineHeight: '1.5' }}>
+                    {letter.descripcion}
+                  </p>
+                </div>
+
+                <div style={{
+                  display: 'flex',
+                  gap: '8px',
+                  borderTop: '1px solid rgba(255,255,255,0.06)',
+                  paddingTop: '0.8rem'
+                }}>
+                  <button
+                    onClick={() => setPreviewLetter(letter)}
+                    className="btn-primary"
+                    style={{
+                      flex: 1,
+                      fontSize: '0.8rem',
+                      padding: '8px 14px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px'
+                    }}
+                  >
+                    <FileText size={14} />
+                    Ver Previa
+                  </button>
+
+                  <a
+                    href={letter.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-secondary"
+                    style={{
+                      fontSize: '0.8rem',
+                      padding: '8px 12px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '4px',
+                      textDecoration: 'none'
+                    }}
+                  >
+                    <ExternalLink size={14} />
+                  </a>
+
+                  <button
+                    onClick={() => copyToClipboard(window.location.origin + letter.url, 'Enlace de la carta')}
+                    className="btn-secondary"
+                    style={{
+                      fontSize: '0.8rem',
+                      padding: '8px 12px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                    title="Copiar enlace"
+                  >
+                    <Copy size={14} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================= */}
+      {/* PESTAÑA 3: LOGÍSTICA DE HOTEL Y CHOFERES                  */}
+      {/* ========================================================= */}
+      {activeTab === 'logistica' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          
+          {/* Tarjeta del Hotel Oficial */}
+          <div className="glass-panel" style={{ padding: '2rem', borderLeft: '4px solid #10b981' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.2rem' }}>
+              <div>
+                <span style={{
+                  background: 'rgba(16, 185, 129, 0.15)',
+                  color: '#34d399',
+                  padding: '4px 10px',
+                  borderRadius: '12px',
+                  fontSize: '0.75rem',
+                  fontWeight: 800
+                }}>
+                  SEDE OFICIAL DE HOSPEDAJE 2026
+                </span>
+                <h2 style={{ fontSize: '1.8rem', margin: '0.4rem 0 0', color: '#fff' }}>
+                  Hotel Jose Antonio Deluxe
+                </h2>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '4px' }}>
+                  <MapPin size={16} color="var(--crear-gold)" />
+                  <span>Calle Bellavista 133, Miraflores, Lima 15074, Perú</span>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <a
+                  href="https://maps.google.com/?q=Hotel+Jose+Antonio+Deluxe+Miraflores+Lima"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-secondary"
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', textDecoration: 'none' }}
+                >
+                  <MapPin size={15} /> Ver en Google Maps
+                </a>
+              </div>
+            </div>
+
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+              gap: '1rem',
+              background: 'rgba(0,0,0,0.3)',
+              padding: '1.2rem',
+              borderRadius: '12px',
+              border: '1px solid rgba(255,255,255,0.06)'
+            }}>
+              <div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Check-in / Check-out</div>
+                <div style={{ fontSize: '1rem', fontWeight: 700, color: '#fff', marginTop: '2px' }}>Check-in: 15:00 | Check-out: 12:00</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>*Coordinado Early Check-in según arribo de vuelo</div>
+              </div>
+
+              <div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Teléfono Recepción</div>
+                <div style={{ fontSize: '1rem', fontWeight: 700, color: '#fff', marginTop: '2px' }}>(+51 1) 712-4400</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Atención 24 Horas</div>
+              </div>
+
+              <div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Servicios Incluidos</div>
+                <div style={{ fontSize: '1rem', fontWeight: 700, color: '#34d399', marginTop: '2px' }}>Desayuno Buffet & WiFi Alta Velocidad</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Room Service disponible</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Protocolo de Operación Chofer y Recojo */}
+          <div className="glass-panel" style={{ padding: '2rem' }}>
+            <h3 style={{ fontSize: '1.4rem', margin: '0 0 1rem', color: '#fff' }}>
+              Protocolo Oficial de Traslado y Bienvenida
+            </h3>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
+              <div style={{ background: 'rgba(255,255,255,0.02)', padding: '1.2rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--crear-gold)', fontWeight: 700, marginBottom: '0.5rem' }}>
+                  <CheckCircle size={18} />
+                  <span>1. Contacto Previo (1h antes)</span>
+                </div>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0, lineHeight: '1.5' }}>
+                  El chofer asignado contacta al entrenador vía WhatsApp indicando modelo de vehículo, color, número de placa oficial y foto del conductor.
+                </p>
+              </div>
+
+              <div style={{ background: 'rgba(255,255,255,0.02)', padding: '1.2rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#38bdf8', fontWeight: 700, marginBottom: '0.5rem' }}>
+                  <MapPin size={18} />
+                  <span>2. Punto de Espera en Aeropuerto</span>
+                </div>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0, lineHeight: '1.5' }}>
+                  Ubicación exacta: <strong>Puerta de Llegadas Internacionales</strong> del Aeropuerto Internacional Jorge Chávez con cartel oficial con la marca <strong>CREAR PODER SIN LÍMITES</strong>.
+                </p>
+              </div>
+
+              <div style={{ background: 'rgba(255,255,255,0.02)', padding: '1.2rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#34d399', fontWeight: 700, marginBottom: '0.5rem' }}>
+                  <Building size={18} />
+                  <span>3. Traslado y Check-in</span>
+                </div>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0, lineHeight: '1.5' }}>
+                  Traslado directo hacia el Hotel Jose Antonio Deluxe en Miraflores. El equipo de Gerencia de Sede confirma arribo y entrega de llaves.
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      )}
+
+      {/* ========================================================= */}
+      {/* MODAL DE PREVISUALIZACIÓN DE CARTAS                       */}
+      {/* ========================================================= */}
+      {previewLetter && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.85)',
+          backdropFilter: 'blur(8px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000,
+          padding: '1rem'
+        }}>
+          <div className="glass-panel" style={{
+            width: '100%',
+            maxWidth: '1000px',
+            height: '92vh',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+            border: '1px solid rgba(255,183,3,0.4)',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.8)'
+          }}>
+            {/* Header Modal */}
+            <div style={{
+              padding: '1rem 1.5rem',
+              borderBottom: '1px solid rgba(255,255,255,0.1)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              background: 'rgba(0,0,0,0.5)'
+            }}>
+              <div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--crear-gold)', fontWeight: 800, textTransform: 'uppercase' }}>
+                  DOCUMENTO OFICIAL CPSL
+                </div>
+                <h3 style={{ margin: '0.2rem 0 0', fontSize: '1.2rem', color: '#fff' }}>
+                  {previewLetter.entrenador || previewLetter.name}
+                </h3>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <a
+                  href={previewLetter.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-secondary"
+                  style={{ fontSize: '0.8rem', padding: '6px 12px', display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none' }}
+                >
+                  <ExternalLink size={14} /> Abrir en Pestaña Nueva
+                </a>
+                <button
+                  onClick={() => setPreviewLetter(null)}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'var(--text-muted)',
+                    cursor: 'pointer',
+                    padding: '4px'
+                  }}
+                >
+                  <X size={22} />
+                </button>
+              </div>
+            </div>
+
+            {/* Iframe View */}
+            <div style={{ flex: 1, background: '#fff' }}>
+              <iframe
+                src={previewLetter.url}
+                title={previewLetter.entrenador || previewLetter.name}
+                style={{ width: '100%', height: '100%', border: 'none' }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
@@ -191182,120 +195026,1763 @@ export default function SuperAdminPanel() {
 ## Archivo: src\pages\TeamCalendar.jsx
 
 ```javascript
-import React, { useState } from 'react';
-import { Calendar as CalendarIcon, Clock, Users, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { 
+  Calendar as CalendarIcon, Clock, Users, ChevronLeft, ChevronRight, 
+  Plus, ArrowLeft, Filter, CheckCircle2, Sparkles, Shirt, X, 
+  Layers, MapPin, Tag, AlertCircle, Info, Briefcase, Building, 
+  UserCheck, Shield, FileText, CheckSquare, Award
+} from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useCycles } from '../context/CyclesContext';
+import { useUI } from '../context/UIContext';
 import { useNavigate } from 'react-router-dom';
+import { OPERATIONAL_SEDES, normalizeSede } from '../data/usersData';
+
+const MONTH_NAMES = [
+  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+];
+
+const WEEKDAYS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+
+// ROLES OPERATIVOS DEL EQUIPO
+const OPERATIONAL_ROLES = {
+  todos: { id: 'todos', label: '🌐 Todo el Equipo', color: '#29abe2', desc: 'Vista unificada de Oficina, Gerencia y Coordinación' },
+  oficina: { id: 'oficina', label: '🏢 Equipo de Oficina', color: '#0ea5e9', desc: 'Soporte Back-Office, Caja, Mesas de Registro y Atención' },
+  gerente: { id: 'gerente', label: '👔 Gerentes de Sede', color: '#f59e0b', desc: 'Dirección Comercial, Presupuesto, Supervisión Nodus y Montaje' },
+  coordinador: { id: 'coordinador', label: '🎯 Coordinadores (CC1Y2 & CMJ)', color: '#8b5cf6', desc: 'Montaje de Sala, Groundings, Salón y Enrolamiento' }
+};
+
+const BLOCK_TYPES = {
+  Foco: { label: 'Foco / Administrativo', color: '#0ea5e9', bg: 'rgba(14, 165, 233, 0.15)', border: 'rgba(14, 165, 233, 0.4)' },
+  Reunion: { label: 'Reunión / Grounding', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.15)', border: 'rgba(245, 158, 11, 0.4)' },
+  MesaCaja: { label: 'Mesa, Registro & Caja', color: '#10b981', bg: 'rgba(16, 185, 129, 0.15)', border: 'rgba(16, 185, 129, 0.4)' },
+  Montaje: { label: 'Montaje & Sala', color: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.15)', border: 'rgba(139, 92, 246, 0.4)' },
+  Deadline: { label: 'Deadline & Trigger Nodus', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.15)', border: 'rgba(239, 68, 68, 0.4)' }
+};
+
+// CRONOGRAMA MAESTRO POR ROL (HORARIOS REALES OFICINA, GERENTES Y COORDINADORES)
+const MASTER_TEAM_SCHEDULES = [
+  // LUNES
+  {
+    id: 'sch-l1',
+    dayOfWeek: 1,
+    roleCategory: 'gerente',
+    title: 'Cierre de Caja FDS & Conciliación Bancaria Nodus',
+    time: '08:30 - 12:00',
+    type: 'Deadline',
+    owner: 'Gerente de Sede',
+    sede: 'Todas',
+    notes: 'Conciliar depósitos bancarios vs. fichas físicas escaneadas en Nodus. Innegociable antes de las 12:00 PM.'
+  },
+  {
+    id: 'sch-l2',
+    dayOfWeek: 1,
+    roleCategory: 'gerente',
+    title: 'DEADLINE: Trigger Impecabilidad Contable (Escalamiento N2)',
+    time: '12:00 - 12:30',
+    type: 'Deadline',
+    owner: 'Gerente de Sede',
+    sede: 'Todas',
+    notes: 'El sistema valida cierre contable al 100%. Si hay atraso se genera reporte disciplinario Nivel 2.'
+  },
+  {
+    id: 'sch-l3',
+    dayOfWeek: 1,
+    roleCategory: 'oficina',
+    title: 'Atención al Cliente, Facturación y Conciliación de Pagos',
+    time: '09:00 - 13:30',
+    type: 'Foco',
+    owner: 'Equipo de Oficina (Soporte Back-Office)',
+    sede: 'Todas',
+    notes: 'Atención telefónica a participantes y graduados, emisión de comprobantes y validación de abonos.'
+  },
+  {
+    id: 'sch-l4',
+    dayOfWeek: 1,
+    roleCategory: 'coordinador',
+    title: 'Auditoría de Retención Inter-FDS y Reporte Semanal Nodus',
+    time: '09:00 - 11:00',
+    type: 'Foco',
+    owner: 'Coordinador de Maestría (CMJ)',
+    sede: 'Todas',
+    notes: 'Evaluación de asistencia de mánagers y sentados por FDS en Nodus.'
+  },
+  {
+    id: 'sch-l5',
+    dayOfWeek: 1,
+    roleCategory: 'oficina',
+    title: 'Break de Almuerzo de Oficina',
+    time: '13:30 - 14:30',
+    type: 'Foco',
+    owner: 'Equipo de Oficina',
+    sede: 'Todas',
+    notes: 'Desconexión activa del personal administrativo.'
+  },
+  {
+    id: 'sch-l6',
+    dayOfWeek: 1,
+    roleCategory: 'oficina',
+    title: 'Actualización de Expedientes & Llamadas de Soporte',
+    time: '14:30 - 18:00',
+    type: 'Foco',
+    owner: 'Equipo de Oficina',
+    sede: 'Todas',
+    notes: 'Archivo digital de fichas de inscripción, regularización de cartas y llamadas de bienvenida.'
+  },
+  {
+    id: 'sch-l7',
+    dayOfWeek: 1,
+    roleCategory: 'gerente',
+    title: 'Auditoría de Rezagados & Metas del Nuevo Ciclo C1/C2',
+    time: '15:00 - 18:30',
+    type: 'Foco',
+    owner: 'Gerente de Sede',
+    sede: 'Todas',
+    notes: 'Revisión con equipo comercial de deserciones y fijación de metas para la semana.'
+  },
+
+  // MARTES
+  {
+    id: 'sch-m1',
+    dayOfWeek: 2,
+    roleCategory: 'gerente',
+    title: 'Auditoría de Salones, Contratos y Transporte del Entrenador',
+    time: '09:00 - 13:00',
+    type: 'Foco',
+    owner: 'Gerente de Sede',
+    sede: 'Todas',
+    notes: 'Verificar contrato de salón, vuelos, hotel y honorarios programados del coach.'
+  },
+  {
+    id: 'sch-m2',
+    dayOfWeek: 2,
+    roleCategory: 'coordinador',
+    title: 'Alineación 1 a 1 con Mánagers: Avance de Evidencias FI',
+    time: '10:00 - 13:00',
+    type: 'Reunion',
+    owner: 'Coordinador de Maestría (CMJ)',
+    sede: 'Todas',
+    notes: 'Llamadas de seguimiento y auditoría previa a la carga del miércoles.'
+  },
+  {
+    id: 'sch-m3',
+    dayOfWeek: 2,
+    roleCategory: 'oficina',
+    title: 'Jornada Continua de Soporte, Cobranzas y Atención Nodus',
+    time: '09:00 - 18:00 (Receso 13:30-14:30)',
+    type: 'Foco',
+    owner: 'Equipo de Oficina',
+    sede: 'Todas',
+    notes: 'Gestión de cobros pendientes y atención en sede.'
+  },
+  {
+    id: 'sch-m4',
+    dayOfWeek: 2,
+    roleCategory: 'gerente',
+    title: 'Sincronización Comercial y Llamadas con Quantum Team (QT)',
+    time: '15:00 - 18:00',
+    type: 'Reunion',
+    owner: 'Gerente de Sede & QT',
+    sede: 'Todas',
+    notes: 'Alineación de drills de llamadas y efectividad comercial mínima 60%.'
+  },
+
+  // MIÉRCOLES
+  {
+    id: 'sch-x1',
+    dayOfWeek: 3,
+    roleCategory: 'oficina',
+    title: 'Preparación de Materiales de Registro, Boletos & Gafetes',
+    time: '09:00 - 13:30',
+    type: 'Foco',
+    owner: 'Equipo de Oficina',
+    sede: 'Todas',
+    notes: 'Impresión en excelencia de tickets (Azul, Naranja, Rojo) y armado de carpetas de sala.'
+  },
+  {
+    id: 'sch-x2',
+    dayOfWeek: 3,
+    roleCategory: 'coordinador',
+    title: 'Auditoría & Carga en Nodus de Futuros Imposibles (FI)',
+    time: '14:00 - 19:00',
+    type: 'Deadline',
+    owner: 'Coordinador de Maestría (CMJ)',
+    sede: 'Todas',
+    notes: 'Cargar la revisión individualizada del 100% de los mánagers antes de las 19:00 PM.'
+  },
+  {
+    id: 'sch-x3',
+    dayOfWeek: 3,
+    roleCategory: 'gerente',
+    title: 'DEADLINE DE ORO: Trigger Alerta de Deserción de Mánagers (19:00 PM)',
+    time: '19:00 - 19:15',
+    type: 'Deadline',
+    owner: 'Gerente de Sede & CMJ',
+    sede: 'Todas',
+    notes: 'El sistema valida que el campo de revisión de FI no esté vacío. Si falta, emite Alerta Roja a Gerencia.'
+  },
+  {
+    id: 'sch-x4',
+    dayOfWeek: 3,
+    roleCategory: 'coordinador',
+    title: 'Grounding Virtual de Maestría con Mánagers y Capitán',
+    time: '19:00 - 20:00',
+    type: 'Reunion',
+    owner: 'Coordinador de Maestría (CMJ)',
+    sede: 'Todas',
+    notes: 'Alineación de fisionomía, acuerdos y compromisos para el fin de semana.'
+  },
+  {
+    id: 'sch-x5',
+    dayOfWeek: 3,
+    roleCategory: 'coordinador',
+    title: 'Grounding Virtual Obligatorio de Aliados C2 (Teams/Zoom)',
+    time: '20:00 - 21:00 (Hora Exacta)',
+    type: 'Reunion',
+    owner: 'Coordinador C1/C2 (CC1Y2) & Capitán',
+    sede: 'Todas',
+    notes: 'Duración exacta 60 min. Asignación de parejas Sistema Buddy. Inasistencia = suspensión automática.'
+  },
+
+  // JUEVES
+  {
+    id: 'sch-j1',
+    dayOfWeek: 4,
+    roleCategory: 'oficina',
+    title: 'Despacho de Insumos, Papelería y Baúles hacia Salón',
+    time: '09:00 - 13:00',
+    type: 'Foco',
+    owner: 'Equipo de Oficina',
+    sede: 'Todas',
+    notes: 'Alistamiento de baúl de Noche de Confianza, sellos, tickets, POS y cargadores.'
+  },
+  {
+    id: 'sch-j2',
+    dayOfWeek: 4,
+    roleCategory: 'gerente',
+    title: 'Supervisión Presencial de Montaje, Audio y Altura Mínima',
+    time: '14:30 - 20:30',
+    type: 'Montaje',
+    owner: 'Gerente de Sede',
+    sede: 'Todas',
+    notes: 'Inspeccionar altura de techo mínimo 4.5m (seguridad Caída de Confianza), audio y sillas en herradura.'
+  },
+  {
+    id: 'sch-j3',
+    dayOfWeek: 4,
+    roleCategory: 'coordinador',
+    title: 'Llegada a Sede & Montaje Físico de Sala (Basura Cero)',
+    time: '15:00 - 18:00',
+    type: 'Montaje',
+    owner: 'Coordinador C1/C2 (CC1Y2) & Soporte',
+    sede: 'Todas',
+    notes: 'Montaje en herradura, pruebas de micrófonos inalámbricos y climatización del salón.'
+  },
+  {
+    id: 'sch-j4',
+    dayOfWeek: 4,
+    roleCategory: 'oficina',
+    title: 'Llegada de Oficina a Sede: Enlace de Terminales Nodus y Caja',
+    time: '15:00 - 20:00',
+    type: 'MesaCaja',
+    owner: 'Equipo de Oficina (Soporte Técnico)',
+    sede: 'Todas',
+    notes: 'Conexión de red, terminales POS, impresoras térmicas y fondo fijo de caja chica.'
+  },
+  {
+    id: 'sch-j5',
+    dayOfWeek: 4,
+    roleCategory: 'coordinador',
+    title: 'Grounding con Mánagers y Auditoría Física de FI',
+    time: '16:30 - 18:00',
+    type: 'Reunion',
+    owner: 'Coordinador de Maestría (CMJ)',
+    sede: 'Todas',
+    notes: 'Auditoría física de evidencias 100% presencial con los participantes que se gradúan.'
+  },
+  {
+    id: 'sch-j6',
+    dayOfWeek: 4,
+    roleCategory: 'coordinador',
+    title: 'Grounding Presencial de Aliados C1 (Puertas Cerradas en Punto)',
+    time: '18:00 - 20:00 (Hora Exacta)',
+    type: 'Reunion',
+    owner: 'CC1Y2, Capitán & CMJ',
+    sede: 'Todas',
+    notes: 'Cero Tolerancia. Asignación de roles sin repetición del ciclo anterior. Publicación de parejas Sombra.'
+  },
+  {
+    id: 'sch-j7',
+    dayOfWeek: 4,
+    roleCategory: 'oficina',
+    title: 'Cierre de Sede Bajo Llave en Excelencia',
+    time: '20:00 - Cierre',
+    type: 'Foco',
+    owner: 'Equipo de Oficina & Coordinación',
+    sede: 'Todas',
+    notes: 'Salón ordenado, inventario resguardado y retiro temprano del equipo para descanso.'
+  },
+
+  // VIERNES
+  {
+    id: 'sch-v1',
+    dayOfWeek: 5,
+    roleCategory: 'oficina',
+    title: 'Llegada de Oficina a Sede (30 min antes): Encendido de Nodus y Caja',
+    time: '07:45 - 08:30',
+    type: 'MesaCaja',
+    owner: 'Equipo de Oficina',
+    sede: 'Todas',
+    notes: 'Encender terminales de Nodus, alistar gavetas de caja, gafetes y papelería legal.'
+  },
+  {
+    id: 'sch-v2',
+    dayOfWeek: 5,
+    roleCategory: 'coordinador',
+    title: 'Llegada de Coordinación & Grounding de Aliados C1',
+    time: '08:00 - 09:00',
+    type: 'Reunion',
+    owner: 'Coordinador C1/C2 (CC1Y2) & Capitán',
+    sede: 'Todas',
+    notes: 'Alineación de staff en sala, revisión de vestimenta formal negra y ensayo de drills.'
+  },
+  {
+    id: 'sch-v3',
+    dayOfWeek: 5,
+    roleCategory: 'oficina',
+    title: 'Apertura de Mesas de Registro: Escaneo QR Nodus y Cartas de Exoneración',
+    time: '09:00 - 11:30',
+    type: 'MesaCaja',
+    owner: 'Equipo de Oficina & Mesa de Registro',
+    sede: 'Todas',
+    notes: 'Escaneo digital QR obligatorio, firma de carta de exoneración, entrega de Ticket Azul y custodia de celulares.'
+  },
+  {
+    id: 'sch-v4',
+    dayOfWeek: 5,
+    roleCategory: 'gerente',
+    title: 'Auditoría del Reporte Definitivo de Asistencia (Meta 95%)',
+    time: '11:30 - 12:00',
+    type: 'Deadline',
+    owner: 'Gerente de Sede & CC1Y2',
+    sede: 'Todas',
+    notes: 'Envío de asistencia oficial a Contabilidad y Gerencia. Cierre absoluto de puertas para C1.'
+  },
+  {
+    id: 'sch-v5',
+    dayOfWeek: 5,
+    roleCategory: 'oficina',
+    title: 'Carga de Grupos de Creación en Plataforma Nodus',
+    time: '13:30 - 14:00',
+    type: 'Foco',
+    owner: 'Equipo de Oficina / CC1Y2',
+    sede: 'Todas',
+    notes: 'Digitar los grupos formados en sala dentro del sistema para trazabilidad del ciclo.'
+  },
+  {
+    id: 'sch-v6',
+    dayOfWeek: 5,
+    roleCategory: 'gerente',
+    title: 'DEADLINE TRIGGER: Palabra Rota C2 (14:01 PM - Bloqueo de Acceso QR)',
+    time: '14:01 - 14:30',
+    type: 'Deadline',
+    owner: 'Gerente de Sede',
+    sede: 'Todas',
+    notes: 'Cruce automático de declarantes del jueves vs. caja. Bloqueo de QR a no pagantes de C2.'
+  },
+  {
+    id: 'sch-v7',
+    dayOfWeek: 5,
+    roleCategory: 'oficina',
+    title: 'Break de Almuerzo & Llamadas de Soporte y Recuperación',
+    time: '15:00 - 17:00',
+    type: 'Foco',
+    owner: 'Equipo de Oficina',
+    sede: 'Todas',
+    notes: 'Reimpresión de gafetes y llamadas de rescate a participantes inasistentes.'
+  },
+  {
+    id: 'sch-v8',
+    dayOfWeek: 5,
+    roleCategory: 'coordinador',
+    title: 'Inspección de Baúl, Grounding Entrenador & Apertura Maestría (MJ)',
+    time: '15:30 - 18:00',
+    type: 'Montaje',
+    owner: 'Coordinador de Maestría (CMJ)',
+    sede: 'Todas',
+    notes: 'Grounding privado Coach/CMJ, registro QR en pasillo y apertura de sala a las 18:00 PM.'
+  },
+  {
+    id: 'sch-v9',
+    dayOfWeek: 5,
+    roleCategory: 'oficina',
+    title: 'Soporte al Montaje del Baúl de Noche de Confianza',
+    time: '21:30 - 22:30',
+    type: 'MesaCaja',
+    owner: 'Equipo de Oficina & Staff Graduado',
+    sede: 'Todas',
+    notes: 'Preparación de tinajas con agua tibia con resistencias eléctricas, cremas corporales y frutas.'
+  },
+  {
+    id: 'sch-v10',
+    dayOfWeek: 5,
+    roleCategory: 'coordinador',
+    title: 'Ejecución de la Noche de Confianza (Viernes C1)',
+    time: '22:00 - 23:30',
+    type: 'Montaje',
+    owner: 'CC1Y2, CMJ & Capitán',
+    sede: 'Todas',
+    notes: 'Contenedor de alta vibración y gratitud con graduados de Maestría. Vestimenta: Negro formal.'
+  },
+  {
+    id: 'sch-v11',
+    dayOfWeek: 5,
+    roleCategory: 'oficina',
+    title: 'Cierre de Jornada y Reporte Nocturno de Caja y Asistencia en Nodus',
+    time: '23:30 - Cierre',
+    type: 'Deadline',
+    owner: 'Equipo de Oficina & CC1Y2',
+    sede: 'Todas',
+    notes: 'Resguardo de insumos, conciliación de caja del día y cierre de sede.'
+  },
+
+  // SÁBADO
+  {
+    id: 'sch-s1',
+    dayOfWeek: 6,
+    roleCategory: 'oficina',
+    title: 'Llegada de Oficina y Apertura de Mesas: Entrega de Ticket Naranja',
+    time: '08:00 - 11:00',
+    type: 'MesaCaja',
+    owner: 'Equipo de Oficina',
+    sede: 'Todas',
+    notes: 'Control en puerta, entrega de Ticket Naranja. Cierre absoluto a las 11:00 AM.'
+  },
+  {
+    id: 'sch-s2',
+    dayOfWeek: 6,
+    roleCategory: 'coordinador',
+    title: 'Llegada de Coordinación, Grounding y Revisión de Vestimenta',
+    time: '07:45 - 08:30',
+    type: 'Reunion',
+    owner: 'Coordinador C1/C2 (CC1Y2)',
+    sede: 'Todas',
+    notes: 'Ajuste de fisionomía. Polo negro y jean negro. Nota: Coach usa zapatillas deportivas negras.'
+  },
+  {
+    id: 'sch-s3',
+    dayOfWeek: 6,
+    roleCategory: 'coordinador',
+    title: 'Apertura de Mesas y Jornada de Sala de Maestría (FDS 1, 2, 3)',
+    time: '08:00 - 12:00',
+    type: 'Montaje',
+    owner: 'Coordinador de Maestría (CMJ)',
+    sede: 'Todas',
+    notes: 'Reingreso 09:00 AM, reporte de asistencia 11:00 AM y control de dinámica de visión.'
+  },
+  {
+    id: 'sch-s4',
+    dayOfWeek: 6,
+    roleCategory: 'gerente',
+    title: 'Monitoreo de Indicadores y Supervisión de Dinámicas de Seguridad',
+    time: '09:00 - 14:00',
+    type: 'Foco',
+    owner: 'Gerente de Sede',
+    sede: 'Todas',
+    notes: 'Supervisar protocolos de seguridad y reportes intermedios de retención.'
+  },
+  {
+    id: 'sch-s5',
+    dayOfWeek: 6,
+    roleCategory: 'coordinador',
+    title: 'Montaje de Salón Alterno & Protocolo de Seguridad: Caída de Confianza',
+    time: '14:00 - 18:00',
+    type: 'Montaje',
+    owner: 'CC1Y2 & Gerente',
+    sede: 'Todas',
+    notes: 'Escalera certificada de 2m, colchoneta de alta densidad y mínimo 4 apoyos certificados para cuna de brazos.'
+  },
+  {
+    id: 'sch-s6',
+    dayOfWeek: 6,
+    roleCategory: 'coordinador',
+    title: 'Jornada Vespertina de Maestría & Reporte de Abonos en Nodus',
+    time: '16:00 - 21:00',
+    type: 'Foco',
+    owner: 'Coordinador de Maestría (CMJ)',
+    sede: 'Todas',
+    notes: 'Seguimiento de abonos de ciclo y reporte de cierre a las 21:00 PM.'
+  },
+  {
+    id: 'sch-s7',
+    dayOfWeek: 6,
+    roleCategory: 'coordinador',
+    title: 'Grounding Nocturno: Conteo de Declarantes de Intención',
+    time: '22:00 - 22:30',
+    type: 'Reunion',
+    owner: 'CC1Y2 & Capitán',
+    sede: 'Todas',
+    notes: 'Alineación de terminales POS para la cobranza del domingo y reporte final a Gerencia.'
+  },
+
+  // DOMINGO
+  {
+    id: 'sch-d1',
+    dayOfWeek: 0,
+    roleCategory: 'oficina',
+    title: 'Llegada de Oficina y Montaje de 3 Mesas Operativas',
+    time: '08:00 - 09:00',
+    type: 'MesaCaja',
+    owner: 'Equipo de Oficina & CC1Y2',
+    sede: 'Todas',
+    notes: 'Montar Mesa de Registro C1, Mesa de Creación (liderada por CMJ) y Mesa de Enrolamiento C2.'
+  },
+  {
+    id: 'sch-d2',
+    dayOfWeek: 0,
+    roleCategory: 'gerente',
+    title: 'Liderazgo & Supervisión de Mesas de Enrolamiento (Metas 50% y 70%)',
+    time: '09:00 - 15:00',
+    type: 'Deadline',
+    owner: 'Gerente de Sede',
+    sede: 'Todas',
+    notes: 'Monitorear conversión en vivo C1➔C2 (meta 50%) y C2➔MJ (meta 70%). Firmar convenios de pago excepcionales.'
+  },
+  {
+    id: 'sch-d3',
+    dayOfWeek: 0,
+    roleCategory: 'coordinador',
+    title: 'Control Directo de la Mesa de Enrolamiento C2 en Nodus',
+    time: '09:00 - 15:00',
+    type: 'MesaCaja',
+    owner: 'Coordinador C1/C2 (CC1Y2)',
+    sede: 'Todas',
+    notes: 'Prioridad absoluta: cobro transaccional en Nodus (TRANSF, TC, LINK, EFECTIVO, USDT, PAYPHONE) y entrega de Ticket Rojo.'
+  },
+  {
+    id: 'sch-d4',
+    dayOfWeek: 0,
+    roleCategory: 'coordinador',
+    title: 'Charla del Avión en Salón & Entrega de Ticket Rojo',
+    time: '10:30 - 12:00',
+    type: 'Montaje',
+    owner: 'CC1Y2 & Staff de Sala',
+    sede: 'Todas',
+    notes: 'Emisión de tickets rojos oficiales para el Capítulo Dos.'
+  },
+  {
+    id: 'sch-d5',
+    dayOfWeek: 0,
+    roleCategory: 'coordinador',
+    title: 'Captura y Registro en Nodus de Aliados Declarados para C2',
+    time: '15:30 - 16:30',
+    type: 'Foco',
+    owner: 'Coordinador C1/C2 (CC1Y2)',
+    sede: 'Todas',
+    notes: 'Ingreso inmediato al sistema de los nuevos aliados para el siguiente ciclo avanzado.'
+  },
+  {
+    id: 'sch-d6',
+    dayOfWeek: 0,
+    roleCategory: 'coordinador',
+    title: 'Ceremonial del Pase de Antorcha (Maestría ➔ C1)',
+    time: '18:00 - 19:30',
+    type: 'Montaje',
+    owner: 'Coordinador de Maestría (CMJ) & Coach Paul Sosa',
+    sede: 'Todas',
+    notes: 'Ingreso ceremonial de la Maestría con velas, estandartes y antorcha a la sala de graduación de C1.'
+  },
+  {
+    id: 'sch-d7',
+    dayOfWeek: 0,
+    roleCategory: 'oficina',
+    title: 'CIERRE CONTABLE OBLIGATORIO: Cierre de POS y Entrega Física',
+    time: '21:00 - 22:00',
+    type: 'Deadline',
+    owner: 'Equipo de Oficina, CC1Y2 & Gerente',
+    sede: 'Todas',
+    notes: 'Cierre de terminales POS. Escanear al 100% las fichas físicas firmadas y enviar PDF consolidado a Elizabeth Escobar.'
+  }
+];
 
 export default function TeamCalendar() {
   const { currentUser } = useAuth();
+  const { events } = useCycles();
+  const { showToast } = useUI();
   const navigate = useNavigate();
 
-  const timeBlocks = [
-    { id: 1, title: 'Deep Work: Revisión Portafolio', time: '09:00 - 11:00', type: 'Foco', owner: 'Gerente Lima' },
-    { id: 2, title: 'Sincronización Operativa', time: '11:30 - 12:30', type: 'Reunión', owner: 'Equipo QT' },
-    { id: 3, title: 'Revisión de Presupuestos', time: '15:00 - 16:30', type: 'Bloqueo', owner: 'Finanzas' },
-  ];
+  // Filtro de Rol: 'todos', 'oficina', 'gerente', 'coordinador'
+  const [selectedRole, setSelectedRole] = useState('todos');
+  const [activeTab, setActiveTab] = useState('calendario'); // 'calendario' | 'turnos_rol' | 'horarios_sala'
+  const [selectedType, setSelectedType] = useState('todos');
+  const [selectedSede, setSelectedSede] = useState(() => normalizeSede(currentUser?.sede) || 'Todas');
+  
+  const today = useMemo(() => new Date(), []);
+  const [viewDate, setViewDate] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1));
+  const [selectedDate, setSelectedDate] = useState(() => new Date());
+
+  // Bloques personalizados guardados localmente combinados con la matriz maestra
+  const [customBlocks, setCustomBlocks] = useState(() => {
+    try {
+      const saved = localStorage.getItem('cpsl_timeboxing_blocks_v2');
+      return saved ? JSON.parse(saved) : MASTER_TEAM_SCHEDULES;
+    } catch (e) {
+      return MASTER_TEAM_SCHEDULES;
+    }
+  });
+
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newBlock, setNewBlock] = useState({
+    title: '',
+    time: '09:00 - 11:00',
+    type: 'Foco',
+    roleCategory: 'oficina',
+    owner: currentUser?.displayName || currentUser?.name || 'Equipo de Oficina',
+    sede: currentUser?.sede || 'Lima',
+    notes: ''
+  });
+
+  const handleSaveBlock = (e) => {
+    e.preventDefault();
+    if (!newBlock.title.trim()) {
+      showToast?.('Ingresa un título para el bloque', 'error');
+      return;
+    }
+    const block = {
+      ...newBlock,
+      id: `sch-${Date.now()}`,
+      dayOfWeek: selectedDate.getDay(),
+      specificDate: selectedDate.toISOString().slice(0, 10)
+    };
+    const updated = [block, ...customBlocks];
+    setCustomBlocks(updated);
+    try {
+      localStorage.setItem('cpsl_timeboxing_blocks_v2', JSON.stringify(updated));
+    } catch (err) {}
+    setShowAddModal(false);
+    setNewBlock({
+      title: '',
+      time: '09:00 - 11:00',
+      type: 'Foco',
+      roleCategory: 'oficina',
+      owner: currentUser?.displayName || currentUser?.name || 'Equipo',
+      sede: currentUser?.sede || 'Lima',
+      notes: ''
+    });
+    showToast?.('¡Bloque operativo agendado correctamente!', 'success');
+  };
+
+  const handlePrevMonth = () => {
+    setViewDate(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
+  };
+
+  const handleNextMonth = () => {
+    setViewDate(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
+  };
+
+  const handleGoToday = () => {
+    const now = new Date();
+    setViewDate(new Date(now.getFullYear(), now.getMonth(), 1));
+    setSelectedDate(now);
+  };
+
+  // Construcción de la cuadrícula de 7 días
+  const calendarCells = useMemo(() => {
+    const year = viewDate.getFullYear();
+    const month = viewDate.getMonth();
+
+    const firstDayIndex = new Date(year, month, 1).getDay(); // 0 Dom, 1 Lun
+    const mondayFirstIndex = (firstDayIndex + 6) % 7;
+
+    const daysInCurrentMonth = new Date(year, month + 1, 0).getDate();
+    const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+    const cells = [];
+
+    // Días del mes previo
+    for (let i = mondayFirstIndex - 1; i >= 0; i--) {
+      const dayNum = daysInPrevMonth - i;
+      const date = new Date(year, month - 1, dayNum);
+      cells.push({
+        date,
+        dayNum,
+        isCurrentMonth: false,
+        isToday: date.toDateString() === today.toDateString()
+      });
+    }
+
+    // Días del mes actual
+    for (let dayNum = 1; dayNum <= daysInCurrentMonth; dayNum++) {
+      const date = new Date(year, month, dayNum);
+      cells.push({
+        date,
+        dayNum,
+        isCurrentMonth: true,
+        isToday: date.toDateString() === today.toDateString()
+      });
+    }
+
+    // Completar última semana
+    const remaining = (7 - (cells.length % 7)) % 7;
+    for (let dayNum = 1; dayNum <= remaining; dayNum++) {
+      const date = new Date(year, month + 1, dayNum);
+      cells.push({
+        date,
+        dayNum,
+        isCurrentMonth: false,
+        isToday: date.toDateString() === today.toDateString()
+      });
+    }
+
+    return cells;
+  }, [viewDate, today]);
+
+  // Eventos de Cycles en el día seleccionado
+  const selectedDayEvents = useMemo(() => {
+    if (!events || events.length === 0) return [];
+    const dateStr = selectedDate.toISOString().slice(0, 10);
+    return events.filter(e => {
+      const evStart = (e.fechaInicio || e.startDate || e.date || '').slice(0, 10);
+      const evEnd = (e.fechaFin || e.endDate || evStart).slice(0, 10);
+      return dateStr >= evStart && dateStr <= evEnd;
+    });
+  }, [events, selectedDate]);
+
+  // Bloques del día seleccionado filtrados por ROL, SEDE y TIPO
+  const selectedDayBlocks = useMemo(() => {
+    const dayOfWeek = selectedDate.getDay();
+    const dateStr = selectedDate.toISOString().slice(0, 10);
+
+    return customBlocks.filter(b => {
+      // Filtro por Rol
+      if (selectedRole !== 'todos' && b.roleCategory && b.roleCategory !== selectedRole) {
+        return false;
+      }
+      // Filtro por Sede
+      if (selectedSede !== 'Todas' && b.sede !== 'Todas' && b.sede !== selectedSede) {
+        return false;
+      }
+      // Filtro por Tipo de Bloque
+      if (selectedType !== 'todos' && b.type !== selectedType) {
+        return false;
+      }
+      // Fecha específica o día recurrente
+      if (b.specificDate) {
+        return b.specificDate === dateStr;
+      }
+      return b.dayOfWeek === dayOfWeek;
+    });
+  }, [customBlocks, selectedDate, selectedRole, selectedType, selectedSede]);
 
   return (
-    <div className="calendar-container p-4 md:p-8 max-w-7xl mx-auto min-h-screen">
-      <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
+    <div style={{ maxWidth: '1440px', margin: '0 auto', padding: '1.5rem 2rem 5rem', color: 'var(--text-main)' }}>
+      
+      {/* HEADER SUPERIOR */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1.5rem', marginBottom: '1.8rem' }}>
         <div>
-          <h1 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-red-500 flex items-center gap-3">
-            <CalendarIcon className="text-orange-400" size={32} />
-            Time Boxing & Disponibilidad
+          <button 
+            onClick={() => navigate('/home')}
+            style={{ 
+              display: 'inline-flex', 
+              alignItems: 'center', 
+              gap: '0.4rem', 
+              background: 'none', 
+              border: 'none', 
+              color: 'var(--crear-cyan)', 
+              cursor: 'pointer', 
+              fontSize: '0.85rem', 
+              fontWeight: 600,
+              padding: 0,
+              marginBottom: '0.6rem'
+            }}
+          >
+            <ArrowLeft size={16} /> Volver a Causa OS
+          </button>
+          
+          <h1 style={{ 
+            fontSize: '2.1rem', 
+            fontWeight: 900, 
+            letterSpacing: '-1px', 
+            margin: 0, 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '0.8rem',
+            color: 'var(--text-heading)' 
+          }}>
+            <CalendarIcon size={32} color="var(--crear-cyan)" />
+            Horarios & Agenda Operativa del Equipo
           </h1>
-          <p className="text-gray-400 text-sm mt-1 uppercase tracking-wider font-bold">
-            Gestión del Tiempo del Equipo SO-AR
+          <p style={{ margin: '0.4rem 0 0', fontSize: '0.92rem', color: 'var(--text-muted)' }}>
+            <strong>CREAR PODER SIN LÍMITES</strong> • Jornadas, turnos y deadlines para <strong>Equipo de Oficina, Gerentes de Sede y Coordinadores</strong>.
           </p>
         </div>
-        <div className="flex gap-4">
-          <button className="btn-primary flex items-center gap-2 bg-gradient-to-r from-orange-500 to-red-600 border-none text-white font-bold px-4 py-2 rounded-xl hover:from-orange-400 hover:to-red-500 transition-all shadow-lg shadow-orange-500/25">
-            <Plus size={20} /> Agendar Bloque
+
+        {/* ACCIONES SUPERIORES */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
+          <button 
+            onClick={() => setShowAddModal(true)} 
+            className="btn-primary"
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '0.5rem', 
+              padding: '0.6rem 1.2rem', 
+              fontSize: '0.9rem', 
+              fontWeight: 700,
+              background: 'linear-gradient(135deg, #0ea5e9, #0284c7)',
+              boxShadow: '0 4px 15px rgba(14, 165, 233, 0.3)',
+              borderRadius: '10px'
+            }}
+          >
+            <Plus size={18} /> Agendar Turno / Bloque
           </button>
-          <button onClick={() => navigate('/home')} className="btn-secondary">
-            Volver al Home
+
+          <button 
+            onClick={() => navigate('/calendario-mj')}
+            className="btn-secondary"
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '0.4rem', 
+              padding: '0.6rem 1.1rem', 
+              fontSize: '0.9rem', 
+              fontWeight: 600,
+              borderRadius: '10px',
+              color: 'var(--crear-gold)'
+            }}
+          >
+            <Sparkles size={16} /> Calendario Maestría (MJ)
           </button>
         </div>
       </div>
 
-      <div className="glass-panel p-6 border border-gray-800 rounded-2xl shadow-xl flex flex-col md:flex-row gap-8">
-        
-        {/* Left Side: Mini Calendar and Users */}
-        <div className="w-full md:w-1/3 border-r border-gray-800/50 pr-0 md:pr-8">
-          <div className="mb-8">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-bold text-white">Agosto 2026</h3>
-              <div className="flex gap-2">
-                <button className="p-1 rounded bg-gray-800 text-gray-400 hover:text-white"><ChevronLeft size={20}/></button>
-                <button className="p-1 rounded bg-gray-800 text-gray-400 hover:text-white"><ChevronRight size={20}/></button>
+      {/* SELECTOR DE ROL DESTACADO (OFICINA, GERENTES, COORDINADORES) */}
+      <div 
+        className="glass-panel" 
+        style={{ 
+          padding: '1rem 1.2rem', 
+          borderRadius: '14px', 
+          marginBottom: '1.5rem', 
+          border: '1px solid rgba(41, 171, 226, 0.25)',
+          background: 'rgba(255, 255, 255, 0.02)'
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
+          <div>
+            <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--crear-cyan)' }}>
+              Filtro Activo por Rol Operativo:
+            </span>
+            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+              {OPERATIONAL_ROLES[selectedRole]?.desc}
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+            {Object.entries(OPERATIONAL_ROLES).map(([key, r]) => {
+              const isSelected = selectedRole === key;
+              return (
+                <button
+                  key={key}
+                  onClick={() => setSelectedRole(key)}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    borderRadius: '10px',
+                    fontSize: '0.86rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                    border: isSelected ? `2px solid ${r.color}` : '1px solid rgba(255,255,255,0.1)',
+                    background: isSelected ? `${r.color}25` : 'rgba(255,255,255,0.03)',
+                    color: isSelected ? '#fff' : 'var(--text-muted)',
+                    boxShadow: isSelected ? `0 0 15px ${r.color}30` : 'none'
+                  }}
+                >
+                  {r.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* PESTAÑAS PRINCIPALES */}
+      <div style={{ display: 'flex', gap: '0.6rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.8rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+        <button
+          onClick={() => setActiveTab('calendario')}
+          style={{
+            padding: '0.6rem 1.2rem',
+            borderRadius: '10px',
+            fontSize: '0.9rem',
+            fontWeight: 700,
+            cursor: 'pointer',
+            transition: 'all 0.2s',
+            border: activeTab === 'calendario' ? '1px solid var(--crear-cyan)' : '1px solid rgba(255,255,255,0.08)',
+            background: activeTab === 'calendario' ? 'rgba(41, 171, 226, 0.15)' : 'rgba(255,255,255,0.03)',
+            color: activeTab === 'calendario' ? 'var(--crear-cyan)' : 'var(--text-muted)'
+          }}
+        >
+          🗓️ Calendario Interactivo & Agenda Diaria
+        </button>
+
+        <button
+          onClick={() => setActiveTab('turnos_rol')}
+          style={{
+            padding: '0.6rem 1.2rem',
+            borderRadius: '10px',
+            fontSize: '0.9rem',
+            fontWeight: 700,
+            cursor: 'pointer',
+            transition: 'all 0.2s',
+            border: activeTab === 'turnos_rol' ? '1px solid #f59e0b' : '1px solid rgba(255,255,255,0.08)',
+            background: activeTab === 'turnos_rol' ? 'rgba(245, 158, 11, 0.15)' : 'rgba(255,255,255,0.03)',
+            color: activeTab === 'turnos_rol' ? '#fbbf24' : 'var(--text-muted)'
+          }}
+        >
+          📋 Matriz Semanal de Horarios (Oficina, Gerencia & Coordinación)
+        </button>
+
+        <button
+          onClick={() => setActiveTab('horarios_sala')}
+          style={{
+            padding: '0.6rem 1.2rem',
+            borderRadius: '10px',
+            fontSize: '0.9rem',
+            fontWeight: 700,
+            cursor: 'pointer',
+            transition: 'all 0.2s',
+            border: activeTab === 'horarios_sala' ? '1px solid #8b5cf6' : '1px solid rgba(255,255,255,0.08)',
+            background: activeTab === 'horarios_sala' ? 'rgba(139, 92, 246, 0.15)' : 'rgba(255,255,255,0.03)',
+            color: activeTab === 'horarios_sala' ? '#c4b5fd' : 'var(--text-muted)'
+          }}
+        >
+          ⏰ Horarios Oficiales de Sala (C1 / C2 / MJ & Vestimenta)
+        </button>
+      </div>
+
+      {/* TAB 1: CALENDARIO INTERACTIVO & TIMELINE */}
+      {activeTab === 'calendario' && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(340px, 460px) 1fr', gap: '2rem', alignItems: 'start' }}>
+          
+          {/* COLUMNA IZQUIERDA: CALENDARIO MENSUAL */}
+          <div className="glass-panel" style={{ padding: '1.5rem', borderRadius: '16px', border: '1px solid var(--border-strong)' }}>
+            
+            {/* CABECERA DEL MES CON CONTROLES */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.2rem' }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-heading)' }}>
+                  {MONTH_NAMES[viewDate.getMonth()]} {viewDate.getFullYear()}
+                </h3>
+                <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                  Selecciona un día para ver turnos y tareas
+                </span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <button 
+                  onClick={handleGoToday} 
+                  className="btn-secondary"
+                  style={{ padding: '0.35rem 0.75rem', fontSize: '0.75rem', fontWeight: 600, borderRadius: '6px' }}
+                >
+                  Hoy
+                </button>
+                <button 
+                  onClick={handlePrevMonth}
+                  className="btn-secondary"
+                  style={{ padding: '0.4rem', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  title="Mes anterior"
+                >
+                  <ChevronLeft size={16} />
+                </button>
+                <button 
+                  onClick={handleNextMonth}
+                  className="btn-secondary"
+                  style={{ padding: '0.4rem', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  title="Mes siguiente"
+                >
+                  <ChevronRight size={16} />
+                </button>
               </div>
             </div>
-            {/* Dummy Calendar Grid */}
-            <div className="grid grid-cols-7 gap-2 text-center text-sm mb-2">
-              <div className="text-gray-500 font-bold">L</div><div className="text-gray-500 font-bold">M</div><div className="text-gray-500 font-bold">X</div><div className="text-gray-500 font-bold">J</div><div className="text-gray-500 font-bold">V</div><div className="text-gray-500 font-bold">S</div><div className="text-gray-500 font-bold">D</div>
-            </div>
-            <div className="grid grid-cols-7 gap-2 text-center text-sm">
-              {[...Array(31)].map((_, i) => (
-                <div key={i} className={`p-2 rounded-full cursor-pointer font-bold ${i === 21 ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/50' : 'text-gray-300 hover:bg-gray-800'}`}>
-                  {i + 1}
+
+            {/* DÍAS DE LA SEMANA */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', textAlign: 'center', marginBottom: '0.5rem', fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>
+              {WEEKDAYS.map((w, idx) => (
+                <div key={idx} style={{ padding: '0.4rem 0', color: idx >= 3 ? 'var(--crear-cyan)' : 'inherit' }}>
+                  {w}
                 </div>
               ))}
             </div>
-          </div>
 
-          <div>
-            <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
-              <Users size={16}/> Calendarios Compartidos
-            </h3>
-            <div className="space-y-3">
-              <div className="flex items-center gap-3 p-2 rounded-lg bg-white/5 border border-white/10">
-                <div className="w-3 h-3 rounded-full bg-cyan-400"></div>
-                <span className="text-sm font-medium text-white">Mi Agenda (Time Boxing)</span>
-              </div>
-              <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer">
-                <div className="w-3 h-3 rounded-full bg-orange-400"></div>
-                <span className="text-sm font-medium text-gray-400">Agenda Dirección</span>
-              </div>
-              <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer">
-                <div className="w-3 h-3 rounded-full bg-purple-400"></div>
-                <span className="text-sm font-medium text-gray-400">Equipo Quantum</span>
-              </div>
+            {/* GRILLA DE DÍAS (7 COLUMNAS) */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '6px', textAlign: 'center' }}>
+              {calendarCells.map((cell, idx) => {
+                const isSelected = cell.date.toDateString() === selectedDate.toDateString();
+                const isEventDay = cell.date.getDay() >= 4 || cell.date.getDay() === 0; // Jueves a Domingo
+
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => setSelectedDate(cell.date)}
+                    style={{
+                      aspectRatio: '1',
+                      width: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: '10px',
+                      border: isSelected 
+                        ? '2px solid var(--crear-cyan)' 
+                        : (cell.isToday ? '1px dashed var(--crear-gold)' : '1px solid rgba(255,255,255,0.04)'),
+                      background: isSelected 
+                        ? 'rgba(41, 171, 226, 0.25)' 
+                        : (cell.isToday ? 'rgba(255, 193, 7, 0.1)' : (cell.isCurrentMonth ? (isEventDay ? 'rgba(139, 92, 246, 0.05)' : 'rgba(255,255,255,0.02)') : 'transparent')),
+                      color: isSelected 
+                        ? '#fff' 
+                        : (cell.isToday ? 'var(--crear-gold)' : (cell.isCurrentMonth ? (isEventDay ? '#c4b5fd' : 'var(--text-main)') : 'rgba(255,255,255,0.2)')),
+                      fontWeight: isSelected || cell.isToday ? 800 : 500,
+                      fontSize: '0.88rem',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
+                      position: 'relative'
+                    }}
+                  >
+                    <span>{cell.dayNum}</span>
+                    {cell.isToday && (
+                      <span style={{ position: 'absolute', bottom: '3px', width: '4px', height: '4px', borderRadius: '50%', background: 'var(--crear-gold)' }}></span>
+                    )}
+                  </button>
+                );
+              })}
             </div>
-          </div>
-        </div>
 
-        {/* Right Side: Timeline */}
-        <div className="w-full md:w-2/3">
-          <h2 className="text-xl font-bold text-white mb-6">Agenda de Hoy - 22 de Agosto</h2>
-          <div className="relative border-l-2 border-gray-800 ml-4 space-y-8">
+            {/* FILTROS ADICIONALES */}
+            <div style={{ marginTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '1rem' }}>
+              <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '0.6rem', textTransform: 'uppercase' }}>
+                Filtrar por Sede y Tipo de Tarea:
+              </div>
+              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.8rem' }}>
+                <select
+                  value={selectedSede}
+                  onChange={(e) => setSelectedSede(e.target.value)}
+                  style={{
+                    padding: '0.35rem 0.6rem',
+                    borderRadius: '8px',
+                    fontSize: '0.78rem',
+                    background: 'rgba(255,255,255,0.06)',
+                    color: 'var(--text-main)',
+                    border: '1px solid var(--border-strong)',
+                    outline: 'none'
+                  }}
+                >
+                  <option value="Todas">🌐 Todas las Sedes</option>
+                  {OPERATIONAL_SEDES.map(s => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+
+                <select
+                  value={selectedType}
+                  onChange={(e) => setSelectedType(e.target.value)}
+                  style={{
+                    padding: '0.35rem 0.6rem',
+                    borderRadius: '8px',
+                    fontSize: '0.78rem',
+                    background: 'rgba(255,255,255,0.06)',
+                    color: 'var(--text-main)',
+                    border: '1px solid var(--border-strong)',
+                    outline: 'none'
+                  }}
+                >
+                  <option value="todos">🎯 Todos los Tipos</option>
+                  {Object.entries(BLOCK_TYPES).map(([k, v]) => (
+                    <option key={k} value={k}>{v.label}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Botón rápido a Matriz de Turnos */}
+              <button
+                onClick={() => setActiveTab('turnos_rol')}
+                style={{
+                  width: '100%',
+                  padding: '0.55rem',
+                  borderRadius: '8px',
+                  background: 'rgba(245, 158, 11, 0.1)',
+                  border: '1px solid rgba(245, 158, 11, 0.3)',
+                  color: '#fbbf24',
+                  fontSize: '0.82rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.4rem'
+                }}
+              >
+                <Briefcase size={14} /> Ver Matriz Completa de Turnos del Equipo
+              </button>
+            </div>
+
+          </div>
+
+          {/* COLUMNA DERECHA: TIMELINE DE TURNOS DEL DÍA SELECCIONADO */}
+          <div className="glass-panel" style={{ padding: '1.8rem', borderRadius: '16px', border: '1px solid var(--border-strong)' }}>
             
-            {timeBlocks.map((block, idx) => (
-              <div key={block.id} className="relative pl-6">
-                <div className={`absolute -left-[9px] top-1 w-4 h-4 rounded-full border-2 border-[#0b1622] ${block.type === 'Foco' ? 'bg-cyan-500' : block.type === 'Reunión' ? 'bg-orange-500' : 'bg-red-500'}`}></div>
-                
-                <div className="glass-panel p-4 border border-gray-800 rounded-xl hover:-translate-y-1 transition-transform">
-                  <div className="flex justify-between items-start mb-2">
-                    <h4 className="text-lg font-bold text-white leading-tight">{block.title}</h4>
-                    <span className="text-xs font-bold px-2 py-1 rounded bg-gray-800 text-gray-300 border border-gray-700">
-                      {block.type}
-                    </span>
+            {/* ENCABEZADO DEL DÍA */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.8rem' }}>
+              <div>
+                <span style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--crear-cyan)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  {WEEKDAYS[(selectedDate.getDay() + 6) % 7]}, {selectedDate.toLocaleDateString([], { day: 'numeric', month: 'long', year: 'numeric' })}
+                </span>
+                <h2 style={{ margin: '0.2rem 0 0', fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-heading)' }}>
+                  Agenda y Turnos: {OPERATIONAL_ROLES[selectedRole]?.label}
+                </h2>
+              </div>
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="btn-secondary"
+                style={{ padding: '0.45rem 0.9rem', fontSize: '0.82rem', fontWeight: 700, borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+              >
+                <Plus size={15} /> Añadir Bloque
+              </button>
+            </div>
+
+            {/* EVENTOS OFICIALES DE SALA */}
+            {selectedDayEvents.length > 0 && (
+              <div style={{ marginBottom: '1.5rem' }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--crear-gold)', textTransform: 'uppercase', marginBottom: '0.6rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <Sparkles size={14} /> Eventos Oficiales de Ciclo (Firestore)
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                  {selectedDayEvents.map((ev, i) => (
+                    <div 
+                      key={i} 
+                      style={{ 
+                        padding: '0.8rem 1rem', 
+                        borderRadius: '10px', 
+                        background: 'linear-gradient(135deg, rgba(255, 193, 7, 0.1), rgba(245, 158, 11, 0.05))',
+                        border: '1px solid rgba(255, 193, 7, 0.3)',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                      }}
+                    >
+                      <div>
+                        <strong style={{ color: 'var(--crear-gold)', fontSize: '0.95rem' }}>{ev.nombre || ev.name}</strong>
+                        <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                          Sede: {ev.sede || ev.sedeTag || 'Todas'} {ev.trainer ? `• Entrenador: ${ev.trainer}` : ''}
+                        </div>
+                      </div>
+                      <span style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: '12px', background: 'rgba(255, 193, 7, 0.2)', color: 'var(--crear-gold)', fontWeight: 'bold' }}>
+                        Oficial
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* LISTA DE BLOQUES DEL DÍA */}
+            <div>
+              <div style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.8rem' }}>
+                Turnos, Responsabilidades y Deadlines ({selectedDayBlocks.length})
+              </div>
+
+              {selectedDayBlocks.length === 0 ? (
+                <div style={{ padding: '3rem 1rem', textAlign: 'center', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px dashed rgba(255,255,255,0.1)' }}>
+                  <Clock size={36} color="var(--text-muted)" style={{ margin: '0 auto 0.8rem', opacity: 0.5 }} />
+                  <p style={{ margin: 0, fontSize: '0.95rem', color: 'var(--text-muted)' }}>
+                    No hay bloques programados para este rol en este día.
+                  </p>
+                  <button
+                    onClick={() => setShowAddModal(true)}
+                    className="btn-primary"
+                    style={{ marginTop: '1rem', padding: '0.45rem 1rem', fontSize: '0.85rem' }}
+                  >
+                    + Agendar un Turno / Bloque
+                  </button>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                  {selectedDayBlocks.map((block) => {
+                    const typeCfg = BLOCK_TYPES[block.type] || BLOCK_TYPES.Foco;
+                    const roleCfg = OPERATIONAL_ROLES[block.roleCategory] || OPERATIONAL_ROLES.oficina;
+
+                    return (
+                      <div 
+                        key={block.id}
+                        className="glass-panel"
+                        style={{
+                          padding: '1.1rem 1.3rem',
+                          borderRadius: '12px',
+                          borderLeft: `5px solid ${typeCfg.color}`,
+                          background: 'rgba(255,255,255,0.02)',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '0.5rem',
+                          transition: 'transform 0.15s ease'
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
+                          <div>
+                            <span 
+                              style={{ 
+                                display: 'inline-block',
+                                fontSize: '0.68rem', 
+                                padding: '1px 7px', 
+                                borderRadius: '10px', 
+                                background: `${roleCfg.color}25`, 
+                                color: roleCfg.color,
+                                border: `1px solid ${roleCfg.color}50`,
+                                fontWeight: 800,
+                                textTransform: 'uppercase',
+                                marginBottom: '0.3rem'
+                              }}
+                            >
+                              {roleCfg.label}
+                            </span>
+                            <h4 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-heading)' }}>
+                              {block.title}
+                            </h4>
+                          </div>
+
+                          <span 
+                            style={{ 
+                              fontSize: '0.72rem', 
+                              padding: '2px 8px', 
+                              borderRadius: '12px', 
+                              background: typeCfg.bg, 
+                              color: typeCfg.color, 
+                              border: `1px solid ${typeCfg.border}`,
+                              fontWeight: 700,
+                              whiteSpace: 'nowrap'
+                            }}
+                          >
+                            {typeCfg.label}
+                          </span>
+                        </div>
+
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem', fontSize: '0.82rem', color: 'var(--text-muted)', flexWrap: 'wrap' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: 'var(--crear-cyan)', fontWeight: 700 }}>
+                            <Clock size={14} /> {block.time}
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                            <Users size={14} /> {block.owner}
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                            <MapPin size={14} /> {block.sede}
+                          </div>
+                        </div>
+
+                        {block.notes && (
+                          <div style={{ fontSize: '0.82rem', color: 'rgba(255,255,255,0.75)', borderTop: '1px dashed rgba(255,255,255,0.08)', paddingTop: '0.4rem', marginTop: '0.2rem', lineHeight: '1.4' }}>
+                            {block.notes}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+          </div>
+
+        </div>
+      )}
+
+      {/* TAB 2: MATRIZ SEMANAL DE HORARIOS (OFICINA, GERENCIA, COORDINACIÓN) */}
+      {activeTab === 'turnos_rol' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          
+          <div className="glass-panel" style={{ padding: '1.8rem', borderRadius: '16px', borderLeft: '5px solid #f59e0b' }}>
+            <h2 style={{ margin: '0 0 0.5rem', fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-heading)', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <Briefcase size={26} color="#f59e0b" />
+              Estructura Semanal de Horarios y Turnos Operativos
+            </h2>
+            <p style={{ margin: 0, fontSize: '0.92rem', color: 'var(--text-muted)' }}>
+              Protocolo innegociable de turnos, jornadas y deadlines para el <strong>Equipo de Oficina</strong>, los <strong>Gerentes de Sede</strong> y los <strong>Coordinadores (CC1Y2 y CMJ)</strong>.
+            </p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '1.5rem' }}>
+            
+            {/* COLUMNA 1: EQUIPO DE OFICINA */}
+            <div className="glass-panel" style={{ padding: '1.6rem', borderRadius: '14px', borderTop: '4px solid #0ea5e9' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.2rem' }}>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: '#38bdf8' }}>
+                    🏢 Equipo de Oficina
+                  </h3>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Soporte Back-Office, Caja y Mesas</span>
+                </div>
+                <span style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: '12px', background: 'rgba(14, 165, 233, 0.2)', color: '#38bdf8', fontWeight: 'bold' }}>
+                  Nivel 9
+                </span>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', fontSize: '0.85rem' }}>
+                <div style={{ padding: '0.8rem', borderRadius: '8px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                  <strong style={{ color: 'var(--crear-cyan)' }}>Lunes a Jueves (Semana Regular):</strong>
+                  <div style={{ margin: '0.3rem 0 0', color: 'var(--text-muted)' }}>
+                    • <strong>09:00 AM - 13:30 PM:</strong> Turno Mañana. Atención telefónica/presencial, facturación y conciliación bancaria de cobros Nodus.<br/>
+                    • <strong>13:30 PM - 14:30 PM:</strong> Receso de Almuerzo.<br/>
+                    • <strong>14:30 PM - 18:00 PM:</strong> Turno Tarde. Carga de fichas de inscripción, digitalización y llamadas a confirmados.
                   </div>
-                  <div className="flex items-center gap-4 text-sm text-gray-400">
-                    <div className="flex items-center gap-1 font-bold text-cyan-400">
-                      <Clock size={14} /> {block.time}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Users size={14} /> {block.owner}
-                    </div>
+                </div>
+
+                <div style={{ padding: '0.8rem', borderRadius: '8px', background: 'rgba(14, 165, 233, 0.08)', border: '1px solid rgba(14, 165, 233, 0.25)' }}>
+                  <strong style={{ color: '#38bdf8' }}>Jueves de Montaje:</strong>
+                  <div style={{ margin: '0.3rem 0 0', color: 'var(--text-muted)' }}>
+                    • <strong>15:00 PM - 20:00 PM:</strong> Llegada de oficina y soporte técnico. Enlace de terminales Nodus, conexión de red, validación de caja y cierre de sede con llave.
+                  </div>
+                </div>
+
+                <div style={{ padding: '0.8rem', borderRadius: '8px', background: 'rgba(14, 165, 233, 0.08)', border: '1px solid rgba(14, 165, 233, 0.25)' }}>
+                  <strong style={{ color: '#38bdf8' }}>Viernes de Apertura y C1:</strong>
+                  <div style={{ margin: '0.3rem 0 0', color: 'var(--text-muted)' }}>
+                    • <strong>07:45 AM:</strong> Llegada de oficina (30 min antes). Apertura de mesas de registro y caja.<br/>
+                    • <strong>09:00 AM - 11:30 AM:</strong> Escaneo QR digital Nodus y firmas de Cartas de Exoneración.<br/>
+                    • <strong>15:00 PM - 17:00 PM:</strong> Break de comida y llamadas de rescate.<br/>
+                    • <strong>21:30 PM - 23:30 PM:</strong> Soporte de baúl de Noche de Confianza, reporte nocturno de caja y cierre.
+                  </div>
+                </div>
+
+                <div style={{ padding: '0.8rem', borderRadius: '8px', background: 'rgba(14, 165, 233, 0.08)', border: '1px solid rgba(14, 165, 233, 0.25)' }}>
+                  <strong style={{ color: '#38bdf8' }}>Sábado y Domingo de Enrolamiento:</strong>
+                  <div style={{ margin: '0.3rem 0 0', color: 'var(--text-muted)' }}>
+                    • <strong>Sábado:</strong> 08:00 AM - 13:00 PM y 15:00 PM - 22:30 PM.<br/>
+                    • <strong>Domingo:</strong> 08:00 AM Apertura de 3 mesas.<br/>
+                    • <strong>21:00 PM:</strong> <span style={{ color: '#ef4444', fontWeight: 'bold' }}>Cierre Contable POS obligatorio:</span> escaneo 100% de fichas físicas y envío del PDF consolidado a Elizabeth Escobar.
                   </div>
                 </div>
               </div>
-            ))}
+            </div>
+
+            {/* COLUMNA 2: GERENTES DE SEDE */}
+            <div className="glass-panel" style={{ padding: '1.6rem', borderRadius: '14px', borderTop: '4px solid #f59e0b' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.2rem' }}>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: '#fbbf24' }}>
+                    👔 Gerentes de Sede
+                  </h3>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Dirección, Presupuesto y Supervisión</span>
+                </div>
+                <span style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: '12px', background: 'rgba(245, 158, 11, 0.2)', color: '#fbbf24', fontWeight: 'bold' }}>
+                  Nivel 8
+                </span>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', fontSize: '0.85rem' }}>
+                <div style={{ padding: '0.8rem', borderRadius: '8px', background: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.25)' }}>
+                  <strong style={{ color: '#fbbf24' }}>Lunes de Conciliación & Cierre de Oro:</strong>
+                  <div style={{ margin: '0.3rem 0 0', color: 'var(--text-muted)' }}>
+                    • <strong>08:30 AM - 12:00 PM:</strong> Cierre de caja del FDS en Nodus (conciliación de fichas físicas vs. depósitos bancarios).<br/>
+                    • <strong>12:00 PM:</strong> <span style={{ color: '#ef4444', fontWeight: 'bold' }}>DEADLINE TRIGGER:</span> Impecabilidad Contable (escalamiento N2 ante omisión).<br/>
+                    • <strong>15:00 PM - 18:30 PM:</strong> Revisión de resultados y fijación de metas del nuevo ciclo.
+                  </div>
+                </div>
+
+                <div style={{ padding: '0.8rem', borderRadius: '8px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                  <strong style={{ color: 'var(--crear-cyan)' }}>Martes y Miércoles:</strong>
+                  <div style={{ margin: '0.3rem 0 0', color: 'var(--text-muted)' }}>
+                    • <strong>Martes 09:00 AM:</strong> Auditoría de salones, hotel, vuelos y honorarios de entrenadores confirmados y pagados.<br/>
+                    • <strong>Martes 15:00 PM:</strong> Sincronización comercial de llamadas con el Quantum Team (QT).<br/>
+                    • <strong>Miércoles 19:00 PM:</strong> <span style={{ color: '#ef4444', fontWeight: 'bold' }}>DEADLINE TRIGGER:</span> Auditoría de carga de FI en Nodus por el CMJ (alerta de deserción).
+                  </div>
+                </div>
+
+                <div style={{ padding: '0.8rem', borderRadius: '8px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                  <strong style={{ color: 'var(--crear-cyan)' }}>Jueves de Montaje y Fisionomía:</strong>
+                  <div style={{ margin: '0.3rem 0 0', color: 'var(--text-muted)' }}>
+                    • <strong>14:30 PM - 20:30 PM:</strong> Supervisión en sede del montaje en herradura, altura de techo mínimo 4.5m (seguridad Caída de Confianza), audio y alineación con coordinadores.
+                  </div>
+                </div>
+
+                <div style={{ padding: '0.8rem', borderRadius: '8px', background: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.25)' }}>
+                  <strong style={{ color: '#fbbf24' }}>Viernes a Domingo (Gobernanza):</strong>
+                  <div style={{ margin: '0.3rem 0 0', color: 'var(--text-muted)' }}>
+                    • <strong>Viernes 11:30 AM:</strong> Validación de asistencia oficial (meta 95%).<br/>
+                    • <strong>Viernes 14:01 PM:</strong> <span style={{ color: '#ef4444', fontWeight: 'bold' }}>TRIGGER PALABRA ROTA (C2):</span> Bloqueo QR a deudores.<br/>
+                    • <strong>Sábado:</strong> Supervisión de seguridad física en Caída de Confianza.<br/>
+                    • <strong>Domingo 09:00 AM - 21:00 PM:</strong> Liderazgo en Mesas de Enrolamiento (metas 50% C1➔C2, 70% C2➔MJ) y firma de convenios de pago.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* COLUMNA 3: COORDINADORES (CC1Y2 Y CMJ) */}
+            <div className="glass-panel" style={{ padding: '1.6rem', borderRadius: '14px', borderTop: '4px solid #8b5cf6' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.2rem' }}>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: '#c4b5fd' }}>
+                    🎯 Coordinadores
+                  </h3>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>CC1Y2 & CMJ (Maestría)</span>
+                </div>
+                <span style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: '12px', background: 'rgba(139, 92, 246, 0.2)', color: '#c4b5fd', fontWeight: 'bold' }}>
+                  Nivel 5 & 6
+                </span>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', fontSize: '0.85rem' }}>
+                <div style={{ padding: '0.8rem', borderRadius: '8px', background: 'rgba(139, 92, 246, 0.08)', border: '1px solid rgba(139, 92, 246, 0.25)' }}>
+                  <strong style={{ color: '#c4b5fd' }}>Coordinador C1 y C2 (CC1Y2):</strong>
+                  <div style={{ margin: '0.3rem 0 0', color: 'var(--text-muted)' }}>
+                    • <strong>Miércoles 20:00 PM (Hora Exacta):</strong> Grounding virtual de aliados por Zoom/Teams (60 min). Suspensión a inasistentes.<br/>
+                    • <strong>Jueves 15:00 PM:</strong> Montaje en herradura, audio y limpieza.<br/>
+                    • <strong>Jueves 18:00 PM:</strong> Grounding presencial de aliados C1 (Cero Tolerancia, puertas cerradas).<br/>
+                    • <strong>Viernes 07:45 AM:</strong> Llegada y terminales Nodus. 11:30 AM reporte de asistencia. 22:00 PM Noche de Confianza con tinas templadas.<br/>
+                    • <strong>Sábado:</strong> Apertura, Ticket Naranja y seguridad en Caída de Confianza.<br/>
+                    • <strong>Domingo 09:00 AM:</strong> Control directo de Mesa de Enrolamiento C2 en Nodus. 10:30 AM Charla del Avión y Ticket Rojo.
+                  </div>
+                </div>
+
+                <div style={{ padding: '0.8rem', borderRadius: '8px', background: 'rgba(139, 92, 246, 0.08)', border: '1px solid rgba(139, 92, 246, 0.25)' }}>
+                  <strong style={{ color: '#c4b5fd' }}>Coordinador de Maestría (CMJ):</strong>
+                  <div style={{ margin: '0.3rem 0 0', color: 'var(--text-muted)' }}>
+                    • <strong>Lunes 09:00 AM:</strong> Reporte de retención inter-FDS en Nodus.<br/>
+                    • <strong>Martes:</strong> Llamadas 1 a 1 de auditoría de evidencias FI con mánagers.<br/>
+                    • <strong>Miércoles antes 19:00 PM:</strong> <span style={{ color: '#ef4444', fontWeight: 'bold' }}>DEADLINE DE ORO:</span> Cargar en Nodus la revisión de FI de todos los mánagers.<br/>
+                    • <strong>Jueves 17:00 PM:</strong> Auditoría presencial de FI con graduados.<br/>
+                    • <strong>Viernes 15:30 PM:</strong> Grounding Coach/CMJ y apertura de Maestría 18:00 PM.<br/>
+                    • <strong>Domingo 18:00 PM:</strong> Pase de Antorcha de Maestría al salón C1. 21:00 PM Cierre contable y celebración sin mariachis.
+                  </div>
+                </div>
+              </div>
+            </div>
 
           </div>
+
         </div>
-      </div>
+      )}
+
+      {/* TAB 3: HORARIOS OFICIALES DE SALA & VESTIMENTA */}
+      {activeTab === 'horarios_sala' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          
+          <div className="glass-panel" style={{ padding: '1.8rem', borderRadius: '16px', borderLeft: '4px solid var(--crear-cyan)' }}>
+            <h2 style={{ margin: '0 0 0.5rem', fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-heading)', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <Clock size={24} color="var(--crear-cyan)" />
+              Horarios Oficiales de Entrenamientos en Sala y Código de Vestimenta
+            </h2>
+            <p style={{ margin: 0, fontSize: '0.92rem', color: 'var(--text-muted)' }}>
+              Cronograma de actividades en salón para participantes y contraste contra los turnos de apertura del equipo de oficina, gerencia y coordinación.
+            </p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.5rem' }}>
+            
+            {/* C1 */}
+            <div className="glass-panel" style={{ padding: '1.4rem', borderTop: '4px solid #8b5cf6', borderRadius: '12px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <h3 style={{ color: '#a78bfa', margin: 0, fontSize: '1.2rem' }}>Capítulo UNO (C1)</h3>
+                <span style={{ fontSize: '0.75rem', padding: '2px 8px', borderRadius: '12px', background: 'rgba(139, 92, 246, 0.2)', color: '#c4b5fd', fontWeight: 'bold' }}>Descubrimiento</span>
+              </div>
+              <table style={{ width: '100%', fontSize: '0.85rem', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.75rem' }}>
+                    <th style={{ padding: '0.4rem 0' }}>DÍA</th>
+                    <th style={{ padding: '0.4rem 0' }}>HORARIO</th>
+                    <th style={{ padding: '0.4rem 0', textAlign: 'right' }}>VESTIMENTA</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <td style={{ padding: '0.6rem 0', fontWeight: 'bold' }}>Jueves</td>
+                    <td style={{ padding: '0.6rem 0', color: 'var(--text-muted)' }}>4:30 PM - Cierre</td>
+                    <td style={{ padding: '0.6rem 0', textAlign: 'right' }}>Negro</td>
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(139, 92, 246, 0.08)' }}>
+                    <td style={{ padding: '0.6rem 0', fontWeight: 'bold' }}>Viernes</td>
+                    <td style={{ padding: '0.6rem 0', color: 'var(--text-muted)' }}>
+                      7:30 AM - 3:00 PM<br/>
+                      <strong style={{ color: '#a78bfa' }}>5:00 PM - Cierre</strong>
+                      <div style={{ fontSize: '0.72rem', color: '#c4b5fd' }}>🌊 Noche de Confianza</div>
+                    </td>
+                    <td style={{ padding: '0.6rem 0', textAlign: 'right', color: '#f59e0b', fontWeight: 'bold' }}>Negro formal</td>
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <td style={{ padding: '0.6rem 0', fontWeight: 'bold' }}>Sábado</td>
+                    <td style={{ padding: '0.6rem 0', color: 'var(--text-muted)' }}>8:00 AM - 4:00 PM<br/>3:00 PM - Cierre</td>
+                    <td style={{ padding: '0.6rem 0', textAlign: 'right' }}>Polo / pantalón negro</td>
+                  </tr>
+                  <tr>
+                    <td style={{ padding: '0.6rem 0', fontWeight: 'bold' }}>Domingo</td>
+                    <td style={{ padding: '0.6rem 0', color: 'var(--text-muted)' }}>8:00 AM - Cierre (Graduación)</td>
+                    <td style={{ padding: '0.6rem 0', textAlign: 'right' }}>Polo / pantalón negro</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            {/* C2 */}
+            <div className="glass-panel" style={{ padding: '1.4rem', borderTop: '4px solid #29abe2', borderRadius: '12px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <h3 style={{ color: 'var(--crear-cyan)', margin: 0, fontSize: '1.2rem' }}>Capítulo DOS (C2)</h3>
+                <span style={{ fontSize: '0.75rem', padding: '2px 8px', borderRadius: '12px', background: 'rgba(41, 171, 226, 0.2)', color: '#7dd3fc', fontWeight: 'bold' }}>Avanzado</span>
+              </div>
+              <table style={{ width: '100%', fontSize: '0.85rem', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.75rem' }}>
+                    <th style={{ padding: '0.4rem 0' }}>DÍA</th>
+                    <th style={{ padding: '0.4rem 0' }}>HORARIO</th>
+                    <th style={{ padding: '0.4rem 0', textAlign: 'right' }}>VESTIMENTA</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <td style={{ padding: '0.6rem 0', fontWeight: 'bold' }}>Jueves</td>
+                    <td style={{ padding: '0.6rem 0', color: 'var(--text-muted)' }}>10:30 AM - 4:00 PM<br/>4:00 PM - Cierre</td>
+                    <td style={{ padding: '0.6rem 0', textAlign: 'right', color: '#f59e0b', fontWeight: 'bold' }}>Negro formal</td>
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <td style={{ padding: '0.6rem 0', fontWeight: 'bold' }}>Viernes</td>
+                    <td style={{ padding: '0.6rem 0', color: 'var(--text-muted)' }}>
+                      7:15 AM - 4:00 PM<br/>
+                      4:00 PM - Cierre
+                      <div style={{ fontSize: '0.72rem', color: '#ef4444' }}>⚠️ 14:01 PM Palabra Rota</div>
+                    </td>
+                    <td style={{ padding: '0.6rem 0', textAlign: 'right' }}>Polo / pantalón negro</td>
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <td style={{ padding: '0.6rem 0', fontWeight: 'bold' }}>Sábado</td>
+                    <td style={{ padding: '0.6rem 0', color: 'var(--text-muted)' }}>7:30 AM - 3:00 PM<br/>3:00 PM - Cierre</td>
+                    <td style={{ padding: '0.6rem 0', textAlign: 'right' }}>Polo / pantalón negro</td>
+                  </tr>
+                  <tr>
+                    <td style={{ padding: '0.6rem 0', fontWeight: 'bold' }}>Domingo</td>
+                    <td style={{ padding: '0.6rem 0', color: 'var(--text-muted)' }}>Inicio - Cierre<br/>3:00 PM - Cierre</td>
+                    <td style={{ padding: '0.6rem 0', textAlign: 'right' }}>Polo / pantalón negro</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            {/* MJ */}
+            <div className="glass-panel" style={{ padding: '1.4rem', borderTop: '4px solid #f59e0b', borderRadius: '12px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <h3 style={{ color: '#f59e0b', margin: 0, fontSize: '1.2rem' }}>Maestría del Juego</h3>
+                <span style={{ fontSize: '0.75rem', padding: '2px 8px', borderRadius: '12px', background: 'rgba(245, 158, 11, 0.2)', color: '#fde68a', fontWeight: 'bold' }}>Liderazgo</span>
+              </div>
+              <table style={{ width: '100%', fontSize: '0.85rem', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.75rem' }}>
+                    <th style={{ padding: '0.4rem 0' }}>DÍA</th>
+                    <th style={{ padding: '0.4rem 0' }}>HORARIO</th>
+                    <th style={{ padding: '0.4rem 0', textAlign: 'right' }}>VESTIMENTA</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <td style={{ padding: '0.6rem 0', fontWeight: 'bold' }}>Viernes</td>
+                    <td style={{ padding: '0.6rem 0', color: 'var(--text-muted)' }}>3:00 PM - 9:00 PM (Alineamiento)</td>
+                    <td style={{ padding: '0.6rem 0', textAlign: 'right', color: '#f59e0b', fontWeight: 'bold' }}>Negro formal</td>
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <td style={{ padding: '0.6rem 0', fontWeight: 'bold' }}>Sábado</td>
+                    <td style={{ padding: '0.6rem 0', color: 'var(--text-muted)' }}>8:30 AM - 12:00 PM<br/>4:00 PM - 9:00 PM</td>
+                    <td style={{ padding: '0.6rem 0', textAlign: 'right' }}>Camiseta / pantalón negro</td>
+                  </tr>
+                  <tr>
+                    <td style={{ padding: '0.6rem 0', fontWeight: 'bold' }}>Domingo</td>
+                    <td style={{ padding: '0.6rem 0', color: 'var(--text-muted)' }}>
+                      8:30 AM - 12:00 PM<br/>4:00 PM - Cierre
+                      <div style={{ fontSize: '0.72rem', color: 'var(--crear-gold)' }}>🚀 FDS 4 El Viaje (Paul Sosa)</div>
+                    </td>
+                    <td style={{ padding: '0.6rem 0', textAlign: 'right' }}>Camiseta / pantalón negro</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+
+          {/* NOTA DE VESTIMENTA OFICIAL 2026 */}
+          <div style={{ padding: '1.2rem', background: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '0.8rem', fontSize: '0.88rem', color: 'var(--text-muted)' }}>
+            <span style={{ fontSize: '1.5rem' }}>👟</span>
+            <div>
+              <strong style={{ color: 'var(--crear-gold)' }}>Directiva de Vestimenta 2026:</strong> El <strong>Entrenador / Coach</strong> tiene autorización formal para el uso de <strong>zapatillas deportivas negras limpias</strong> en tarima y sala para preservar su salud física y resistencia. El equipo de oficina, gerencia y coordinación viste de etiqueta negra formal en aperturas y polos corporativos oficiales el fin de semana.
+            </div>
+          </div>
+
+        </div>
+      )}
+
+      {/* MODAL PARA AGENDAR BLOQUE / TURNO */}
+      {showAddModal && (
+        <div 
+          className="modal-backdrop"
+          onClick={() => setShowAddModal(false)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.85)',
+            backdropFilter: 'blur(6px)',
+            zIndex: 99999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '1rem'
+          }}
+        >
+          <div 
+            className="glass-panel"
+            onClick={e => e.stopPropagation()}
+            style={{
+              width: '100%',
+              maxWidth: '520px',
+              borderRadius: '16px',
+              padding: '1.8rem',
+              background: 'var(--bg-glass-heavy, #0c1527)',
+              border: '1px solid rgba(41, 171, 226, 0.4)',
+              boxShadow: '0 25px 60px rgba(0,0,0,0.9)'
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.2rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.8rem' }}>
+              <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-heading)' }}>
+                Agendar Turno / Bloque Operativo
+              </h3>
+              <button 
+                onClick={() => setShowAddModal(false)}
+                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveBlock} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '0.3rem' }}>
+                  Rol Asignado
+                </label>
+                <select
+                  value={newBlock.roleCategory}
+                  onChange={e => setNewBlock({ ...newBlock, roleCategory: e.target.value })}
+                  style={{ width: '100%', padding: '0.6rem 0.8rem', borderRadius: '8px', border: '1px solid var(--border-strong)', background: 'rgba(255,255,255,0.05)', color: 'var(--text-main)', fontSize: '0.88rem' }}
+                >
+                  <option value="oficina">🏢 Equipo de Oficina (Soporte, Caja y Mesas)</option>
+                  <option value="gerente">👔 Gerentes de Sede (Gobernanza y Finanzas)</option>
+                  <option value="coordinador">🎯 Coordinadores (CC1Y2 & CMJ)</option>
+                </select>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '0.3rem' }}>
+                  Título del Bloque / Turno
+                </label>
+                <input 
+                  type="text" 
+                  value={newBlock.title}
+                  onChange={e => setNewBlock({ ...newBlock, title: e.target.value })}
+                  placeholder="Ej. Conciliación de Pagos y Cierre POS"
+                  required
+                  style={{ width: '100%', padding: '0.6rem 0.8rem', borderRadius: '8px', border: '1px solid var(--border-strong)', background: 'rgba(255,255,255,0.05)', color: 'var(--text-main)', fontSize: '0.88rem' }}
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '0.3rem' }}>
+                    Rango Horario
+                  </label>
+                  <input 
+                    type="text" 
+                    value={newBlock.time}
+                    onChange={e => setNewBlock({ ...newBlock, time: e.target.value })}
+                    placeholder="09:00 - 13:30"
+                    required
+                    style={{ width: '100%', padding: '0.6rem 0.8rem', borderRadius: '8px', border: '1px solid var(--border-strong)', background: 'rgba(255,255,255,0.05)', color: 'var(--text-main)', fontSize: '0.88rem' }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '0.3rem' }}>
+                    Tipo de Tarea
+                  </label>
+                  <select
+                    value={newBlock.type}
+                    onChange={e => setNewBlock({ ...newBlock, type: e.target.value })}
+                    style={{ width: '100%', padding: '0.6rem 0.8rem', borderRadius: '8px', border: '1px solid var(--border-strong)', background: 'rgba(255,255,255,0.05)', color: 'var(--text-main)', fontSize: '0.88rem' }}
+                  >
+                    {Object.entries(BLOCK_TYPES).map(([k, v]) => (
+                      <option key={k} value={k}>{v.label}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '0.3rem' }}>
+                    Responsable / Titular
+                  </label>
+                  <input 
+                    type="text" 
+                    value={newBlock.owner}
+                    onChange={e => setNewBlock({ ...newBlock, owner: e.target.value })}
+                    required
+                    style={{ width: '100%', padding: '0.6rem 0.8rem', borderRadius: '8px', border: '1px solid var(--border-strong)', background: 'rgba(255,255,255,0.05)', color: 'var(--text-main)', fontSize: '0.88rem' }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '0.3rem' }}>
+                    Sede
+                  </label>
+                  <select
+                    value={newBlock.sede}
+                    onChange={e => setNewBlock({ ...newBlock, sede: e.target.value })}
+                    style={{ width: '100%', padding: '0.6rem 0.8rem', borderRadius: '8px', border: '1px solid var(--border-strong)', background: 'rgba(255,255,255,0.05)', color: 'var(--text-main)', fontSize: '0.88rem' }}
+                  >
+                    <option value="Todas">Todas las Sedes</option>
+                    {OPERATIONAL_SEDES.map(s => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '0.3rem' }}>
+                  Detalles / Protocolo Nodus
+                </label>
+                <textarea 
+                  value={newBlock.notes}
+                  onChange={e => setNewBlock({ ...newBlock, notes: e.target.value })}
+                  rows={2}
+                  placeholder="Detalles sobre entregables, terminales, escaneo o deadlines..."
+                  style={{ width: '100%', padding: '0.6rem 0.8rem', borderRadius: '8px', border: '1px solid var(--border-strong)', background: 'rgba(255,255,255,0.05)', color: 'var(--text-main)', fontSize: '0.88rem', resize: 'vertical' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.8rem', marginTop: '0.5rem' }}>
+                <button 
+                  type="button"
+                  onClick={() => setShowAddModal(false)}
+                  className="btn-secondary"
+                  style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}
+                >
+                  Cancelar
+                </button>
+                <button 
+                  type="submit"
+                  className="btn-primary"
+                  style={{ padding: '0.5rem 1.4rem', fontSize: '0.85rem', fontWeight: 700 }}
+                >
+                  Guardar Turno
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
@@ -192729,12 +198216,17 @@ export const LearningService = {
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { db } from './firebase';
 
-const CACHE_KEY = 'cpsl_qt_members_cache_v3';
-const CACHE_TIME_KEY = 'cpsl_qt_members_cache_time_v3';
+export const QT_SHEET_CSV_URL = import.meta.env.VITE_QT_SHEET_CSV_URL || 'https://docs.google.com/spreadsheets/d/10sz7KNvZ31GOgGDhzH0P3gbISGLW8HPBsSAZwOw5L8U/export?format=csv&gid=0';
+export const QT_SHEET_EDIT_URL = import.meta.env.VITE_QT_SHEET_EDIT_URL || 'https://docs.google.com/spreadsheets/d/10sz7KNvZ31GOgGDhzH0P3gbISGLW8HPBsSAZwOw5L8U/edit?gid=0#gid=0';
+
+const CACHE_KEY = 'cpsl_qt_members_cache_v4';
+const CACHE_TIME_KEY = 'cpsl_qt_members_cache_time_v4';
 const CACHE_TTL_MS = 1000 * 60 * 15; // 15 minutos de caché automático
 
 export function clearQTCache() {
   try {
+    localStorage.removeItem('cpsl_qt_members_cache_v3');
+    localStorage.removeItem('cpsl_qt_members_cache_time_v3');
     localStorage.removeItem(CACHE_KEY);
     localStorage.removeItem(CACHE_TIME_KEY);
   } catch (e) {
@@ -193023,7 +198515,7 @@ export function mapRowsToQTMembers(rows) {
 }
 
 /**
- * Obtiene los miembros de QT desde Firestore (Migrado desde Google Sheets por seguridad)
+ * Obtiene los miembros de QT en tiempo real desde Google Sheets oficial (con fallback a Firestore)
  */
 export async function getQTMembers({ forceRefresh = false } = {}) {
   // 1. Revisar caché local si no es forzado
@@ -193050,7 +198542,37 @@ export async function getQTMembers({ forceRefresh = false } = {}) {
     }
   }
 
-  // 2. Fetch en vivo desde Firestore
+  // 2. Fetch en vivo desde Google Sheets (fuente en tiempo real de nuevas altas)
+  try {
+    const response = await fetch(QT_SHEET_CSV_URL, {
+      method: 'GET',
+      cache: 'no-cache'
+    });
+
+    if (response.ok) {
+      const csvText = await response.text();
+      const rows = parseCSV(csvText);
+      const members = mapRowsToQTMembers(rows);
+
+      if (members && members.length > 0) {
+        try {
+          localStorage.setItem(CACHE_KEY, JSON.stringify(members));
+          localStorage.setItem(CACHE_TIME_KEY, Date.now().toString());
+        } catch (e) {}
+
+        return {
+          data: members,
+          fromCache: false,
+          lastUpdated: new Date().toISOString(),
+          total: members.length
+        };
+      }
+    }
+  } catch (sheetError) {
+    console.warn("Error al sincronizar con Google Sheets, intentando Firestore:", sheetError);
+  }
+
+  // 3. Fallback en vivo desde Firestore
   try {
     const qtRef = collection(db, 'qt_directory');
     const q = query(qtRef, orderBy('index', 'asc'));
@@ -193075,7 +198597,7 @@ export async function getQTMembers({ forceRefresh = false } = {}) {
     console.error("Error al conectar con Firestore (qt_directory):", error);
   }
 
-  // 3. Fallback de caché antiguo si falló la red
+  // 4. Fallback de caché antiguo si falló la red
   try {
     const cached = localStorage.getItem(CACHE_KEY);
     const cacheTime = localStorage.getItem(CACHE_TIME_KEY);

@@ -446,94 +446,201 @@ export default function GerenteDashboard() {
         </div>
 
       </div>
-    </div>
-  );
-}
-      {/* SECCION DE HORARIOS */}
-      <div style={{ marginTop: "2rem", marginBottom: "2rem" }}>
-        <h2 style={{ fontSize: "1.4rem", color: "var(--text-heading)", borderBottom: "1px solid rgba(255,255,255,0.1)", paddingBottom: "0.5rem", marginBottom: "1rem" }}>
-          <Clock size={22} style={{ verticalAlign: "middle", marginRight: "0.5rem" }} />
-          Horarios de Entrenamientos (Lima)
-        </h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "1.5rem" }}>
+
+      {/* SECCIÓN DE HORARIOS OPERATIVOS DEL EQUIPO (OFICINA, GERENCIA Y COORDINACIÓN) */}
+      <div style={{ marginTop: "2.5rem", marginBottom: "2rem" }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', borderBottom: "1px solid rgba(255,255,255,0.1)", paddingBottom: "0.6rem", marginBottom: "1.2rem" }}>
+          <h2 style={{ fontSize: "1.35rem", color: "var(--text-heading)", margin: 0, display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <Clock size={22} color="var(--crear-cyan)" />
+            Horarios Operativos y Turnos: Oficina, Gerentes y Coordinadores
+          </h2>
+          <button
+            onClick={() => navigate('/calendario-equipo')}
+            className="btn-secondary"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.45rem 0.9rem', fontSize: '0.82rem', fontWeight: 600, color: 'var(--crear-cyan)' }}
+          >
+            Ver Calendario Interactivo & Time Boxing <ArrowRight size={14} />
+          </button>
+        </div>
+
+        {/* TARJETAS DE TURNOS POR ROL */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "1.5rem", marginBottom: "2rem" }}>
+          
+          {/* OFICINA */}
+          <div className="glass-panel" style={{ padding: "1.4rem", borderTop: "4px solid #0ea5e9", borderRadius: "10px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.8rem" }}>
+              <h3 style={{ color: "#38bdf8", margin: 0, fontSize: "1.1rem" }}>🏢 Equipo de Oficina</h3>
+              <span style={{ fontSize: "0.75rem", padding: "2px 8px", borderRadius: "12px", background: "rgba(14, 165, 233, 0.15)", color: "#38bdf8", fontWeight: "bold" }}>Soporte & Mesas</span>
+            </div>
+            <div style={{ fontSize: "0.82rem", color: "var(--text-muted)", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+              <div><strong>Lunes a Jueves (Semanal):</strong> 09:00 - 18:00 (Atención, cobranzas, facturación y regularización).</div>
+              <div><strong>Jueves (Montaje):</strong> 15:00 - 20:00 (Terminales Nodus, caja y cierre bajo llave).</div>
+              <div><strong>Viernes (Apertura):</strong> 07:45 - 23:30 (Mesas registro QR, cartas y soporte Noche de Confianza).</div>
+              <div><strong>Sábado (Operativo):</strong> 08:00 - 22:30 (Ticket Naranja y soporte de sala).</div>
+              <div><strong>Domingo (Fiscal):</strong> 08:00 - 22:00 (<span style={{ color: "#ef4444", fontWeight: "bold" }}>21:00 Cierre Contable POS obligatorio</span> y envío de fichas firmadas).</div>
+            </div>
+          </div>
+
+          {/* GERENCIA */}
+          <div className="glass-panel" style={{ padding: "1.4rem", borderTop: "4px solid #f59e0b", borderRadius: "10px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.8rem" }}>
+              <h3 style={{ color: "#fbbf24", margin: 0, fontSize: "1.1rem" }}>👔 Gerentes de Sede</h3>
+              <span style={{ fontSize: "0.75rem", padding: "2px 8px", borderRadius: "12px", background: "rgba(245, 158, 11, 0.15)", color: "#fbbf24", fontWeight: "bold" }}>Gobernanza Nivel 8</span>
+            </div>
+            <div style={{ fontSize: "0.82rem", color: "var(--text-muted)", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+              <div><strong>Lunes:</strong> 08:30 - 12:00 (Cierre de Caja Nodus) • <span style={{ color: "#ef4444", fontWeight: "bold" }}>12:00 Trigger Impecabilidad Contable</span>.</div>
+              <div><strong>Martes:</strong> 09:00 - 13:00 (Auditoría salones, hotel y coach) • 15:00 (QT Sync).</div>
+              <div><strong>Miércoles:</strong> <span style={{ color: "#ef4444", fontWeight: "bold" }}>19:00 Trigger Alerta Deserción</span> (verificación de FI en Nodus).</div>
+              <div><strong>Jueves:</strong> 14:30 - 20:30 (Supervisión presencial: techo 4.5m, audio y sala).</div>
+              <div><strong>Viernes a Domingo:</strong> 14:01 Trigger Palabra Rota • Domingo liderazgo Mesas de Enrolamiento (50% / 70%).</div>
+            </div>
+          </div>
+
+          {/* COORDINADORES */}
+          <div className="glass-panel" style={{ padding: "1.4rem", borderTop: "4px solid #8b5cf6", borderRadius: "10px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.8rem" }}>
+              <h3 style={{ color: "#a78bfa", margin: 0, fontSize: "1.1rem" }}>🎯 Coordinadores (CC1Y2 & CMJ)</h3>
+              <span style={{ fontSize: "0.75rem", padding: "2px 8px", borderRadius: "12px", background: "rgba(139, 92, 246, 0.15)", color: "#a78bfa", fontWeight: "bold" }}>Nivel 5 & 6</span>
+            </div>
+            <div style={{ fontSize: "0.82rem", color: "var(--text-muted)", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+              <div><strong>Miércoles:</strong> 19:00 Deadline carga FI (CMJ) • 20:00 Grounding virtual aliados C2 (CC1Y2).</div>
+              <div><strong>Jueves:</strong> 15:00 Montaje de sala • 18:00 Grounding presencial C1 (Puertas cerradas).</div>
+              <div><strong>Viernes:</strong> 08:00 Grounding C1 • 11:30 Reporte asistencia • 22:00 Noche de Confianza con tinas.</div>
+              <div><strong>Sábado:</strong> Caída de Confianza con escalera 2m, colchoneta y 4 apoyos certificados.</div>
+              <div><strong>Domingo:</strong> Control Mesa C2 Nodus (Ticket Rojo) • 18:00 Pase de Antorcha Maestría.</div>
+            </div>
+          </div>
+
+        </div>
+
+        {/* SUB-SECCIÓN: HORARIOS DE ENTRENAMIENTOS EN SALA (PARTICIPANTES) */}
+        <h3 style={{ fontSize: "1.15rem", color: "var(--text-heading)", marginBottom: "0.8rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          ⏰ Horarios de Sala de Participantes & Vestimenta (C1 / C2 / MJ)
+        </h3>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "1.5rem" }}>
           {/* CAPITULO UNO */}
-          <div className="glass-panel" style={{ padding: "1.2rem", borderTop: "4px solid #8b5cf6" }}>
-            <h3 style={{ color: "#8b5cf6", marginTop: 0, marginBottom: "1rem" }}>Capitulo UNO</h3>
+          <div className="glass-panel" style={{ padding: "1.4rem", borderTop: "4px solid #8b5cf6", borderRadius: "10px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+              <h3 style={{ color: "#8b5cf6", margin: 0, fontSize: "1.1rem" }}>Capítulo UNO (C1)</h3>
+              <span style={{ fontSize: "0.75rem", padding: "2px 8px", borderRadius: "12px", background: "rgba(139, 92, 246, 0.15)", color: "#a78bfa", fontWeight: "bold" }}>Descubrimiento</span>
+            </div>
             <table style={{ width: "100%", fontSize: "0.85rem", borderCollapse: "collapse" }}>
+              <thead>
+                <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.1)", textAlign: "left", color: "var(--text-muted)", fontSize: "0.75rem" }}>
+                  <th style={{ padding: "0.4rem 0" }}>DÍA</th>
+                  <th style={{ padding: "0.4rem 0" }}>HORARIO</th>
+                  <th style={{ padding: "0.4rem 0", textAlign: "right" }}>VESTIMENTA</th>
+                </tr>
+              </thead>
               <tbody>
                 <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                  <td style={{ padding: "0.5rem 0", fontWeight: "bold" }}>Jueves</td>
-                  <td style={{ padding: "0.5rem 0", color: "var(--text-muted)" }}>4:30 PM - Cierre</td>
-                  <td style={{ padding: "0.5rem 0", textAlign: "right" }}>Negro</td>
+                  <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Jueves</td>
+                  <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>4:30 PM - Cierre</td>
+                  <td style={{ padding: "0.6rem 0", textAlign: "right", color: "var(--text-main)" }}>Negro</td>
                 </tr>
                 <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                  <td style={{ padding: "0.5rem 0", fontWeight: "bold" }}>Viernes</td>
-                  <td style={{ padding: "0.5rem 0", color: "var(--text-muted)" }}>7:30 AM - 3 PM<br/>5 PM - Cierre</td>
-                  <td style={{ padding: "0.5rem 0", textAlign: "right" }}>Negro formal</td>
+                  <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Viernes</td>
+                  <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>7:30 AM - 3:00 PM<br/><span style={{ color: "var(--crear-cyan)" }}>5:00 PM - Cierre (Noche Confianza)</span></td>
+                  <td style={{ padding: "0.6rem 0", textAlign: "right", color: "#f59e0b", fontWeight: "600" }}>Negro formal</td>
                 </tr>
                 <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                  <td style={{ padding: "0.5rem 0", fontWeight: "bold" }}>Sabado</td>
-                  <td style={{ padding: "0.5rem 0", color: "var(--text-muted)" }}>8 AM - 4 PM<br/>3 PM - Cierre</td>
-                  <td style={{ padding: "0.5rem 0", textAlign: "right" }}>Polo/pantalon negro</td>
+                  <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Sábado</td>
+                  <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>8:00 AM - 4:00 PM<br/>3:00 PM - Cierre</td>
+                  <td style={{ padding: "0.6rem 0", textAlign: "right", color: "var(--text-main)" }}>Polo / pantalón negro</td>
                 </tr>
                 <tr>
-                  <td style={{ padding: "0.5rem 0", fontWeight: "bold" }}>Domingo</td>
-                  <td style={{ padding: "0.5rem 0", color: "var(--text-muted)" }}>8 AM - Cierre</td>
-                  <td style={{ padding: "0.5rem 0", textAlign: "right" }}>Polo/pantalon negro</td>
+                  <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Domingo</td>
+                  <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>8:00 AM - Cierre (Graduación)</td>
+                  <td style={{ padding: "0.6rem 0", textAlign: "right", color: "var(--text-main)" }}>Polo / pantalón negro</td>
                 </tr>
               </tbody>
             </table>
           </div>
+
           {/* CAPITULO DOS */}
-          <div className="glass-panel" style={{ padding: "1.2rem", borderTop: "4px solid #29abe2" }}>
-            <h3 style={{ color: "#29abe2", marginTop: 0, marginBottom: "1rem" }}>Capitulo DOS</h3>
+          <div className="glass-panel" style={{ padding: "1.4rem", borderTop: "4px solid #29abe2", borderRadius: "10px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+              <h3 style={{ color: "#29abe2", margin: 0, fontSize: "1.1rem" }}>Capítulo DOS (C2)</h3>
+              <span style={{ fontSize: "0.75rem", padding: "2px 8px", borderRadius: "12px", background: "rgba(41, 171, 226, 0.15)", color: "#38bdf8", fontWeight: "bold" }}>Avanzado</span>
+            </div>
             <table style={{ width: "100%", fontSize: "0.85rem", borderCollapse: "collapse" }}>
+              <thead>
+                <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.1)", textAlign: "left", color: "var(--text-muted)", fontSize: "0.75rem" }}>
+                  <th style={{ padding: "0.4rem 0" }}>DÍA</th>
+                  <th style={{ padding: "0.4rem 0" }}>HORARIO</th>
+                  <th style={{ padding: "0.4rem 0", textAlign: "right" }}>VESTIMENTA</th>
+                </tr>
+              </thead>
               <tbody>
                 <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                  <td style={{ padding: "0.5rem 0", fontWeight: "bold" }}>Jueves</td>
-                  <td style={{ padding: "0.5rem 0", color: "var(--text-muted)" }}>10:30 AM - 4 PM<br/>4 PM - Cierre</td>
-                  <td style={{ padding: "0.5rem 0", textAlign: "right" }}>Negro formal</td>
+                  <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Jueves</td>
+                  <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>10:30 AM - 4:00 PM<br/>4:00 PM - Cierre</td>
+                  <td style={{ padding: "0.6rem 0", textAlign: "right", color: "#f59e0b", fontWeight: "600" }}>Negro formal</td>
                 </tr>
                 <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                  <td style={{ padding: "0.5rem 0", fontWeight: "bold" }}>Viernes</td>
-                  <td style={{ padding: "0.5rem 0", color: "var(--text-muted)" }}>7:15 AM - 4 PM<br/>4 PM - Cierre</td>
-                  <td style={{ padding: "0.5rem 0", textAlign: "right" }}>Polo/pantalon negro</td>
+                  <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Viernes</td>
+                  <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>7:15 AM - 4:00 PM<br/>4:00 PM - Cierre</td>
+                  <td style={{ padding: "0.6rem 0", textAlign: "right", color: "var(--text-main)" }}>Polo / pantalón negro</td>
                 </tr>
                 <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                  <td style={{ padding: "0.5rem 0", fontWeight: "bold" }}>Sabado</td>
-                  <td style={{ padding: "0.5rem 0", color: "var(--text-muted)" }}>7:30 AM - 3 PM<br/>3 PM - Cierre</td>
-                  <td style={{ padding: "0.5rem 0", textAlign: "right" }}>Polo/pantalon negro</td>
+                  <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Sábado</td>
+                  <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>7:30 AM - 3:00 PM<br/>3:00 PM - Cierre</td>
+                  <td style={{ padding: "0.6rem 0", textAlign: "right", color: "var(--text-main)" }}>Polo / pantalón negro</td>
                 </tr>
                 <tr>
-                  <td style={{ padding: "0.5rem 0", fontWeight: "bold" }}>Domingo</td>
-                  <td style={{ padding: "0.5rem 0", color: "var(--text-muted)" }}>Inicio - Cierre<br/>3 PM - Cierre</td>
-                  <td style={{ padding: "0.5rem 0", textAlign: "right" }}>Polo/pantalon negro</td>
+                  <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Domingo</td>
+                  <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>Inicio - Cierre<br/>3:00 PM - Cierre</td>
+                  <td style={{ padding: "0.6rem 0", textAlign: "right", color: "var(--text-main)" }}>Polo / pantalón negro</td>
                 </tr>
               </tbody>
             </table>
           </div>
+
           {/* MAESTRIA */}
-          <div className="glass-panel" style={{ padding: "1.2rem", borderTop: "4px solid #f59e0b" }}>
-            <h3 style={{ color: "#f59e0b", marginTop: 0, marginBottom: "1rem" }}>Maestria del Juego</h3>
+          <div className="glass-panel" style={{ padding: "1.4rem", borderTop: "4px solid #f59e0b", borderRadius: "10px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+              <h3 style={{ color: "#f59e0b", margin: 0, fontSize: "1.1rem" }}>Maestría del Juego (MJ)</h3>
+              <span style={{ fontSize: "0.75rem", padding: "2px 8px", borderRadius: "12px", background: "rgba(245, 158, 11, 0.15)", color: "#fbbf24", fontWeight: "bold" }}>Liderazgo Cuántico</span>
+            </div>
             <table style={{ width: "100%", fontSize: "0.85rem", borderCollapse: "collapse" }}>
+              <thead>
+                <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.1)", textAlign: "left", color: "var(--text-muted)", fontSize: "0.75rem" }}>
+                  <th style={{ padding: "0.4rem 0" }}>DÍA</th>
+                  <th style={{ padding: "0.4rem 0" }}>HORARIO</th>
+                  <th style={{ padding: "0.4rem 0", textAlign: "right" }}>VESTIMENTA</th>
+                </tr>
+              </thead>
               <tbody>
                 <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                  <td style={{ padding: "0.5rem 0", fontWeight: "bold" }}>Viernes</td>
-                  <td style={{ padding: "0.5rem 0", color: "var(--text-muted)" }}>3:00 PM - 9 PM</td>
-                  <td style={{ padding: "0.5rem 0", textAlign: "right" }}>Negro formal</td>
+                  <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Viernes</td>
+                  <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>3:00 PM - 9:00 PM</td>
+                  <td style={{ padding: "0.6rem 0", textAlign: "right", color: "#f59e0b", fontWeight: "600" }}>Negro formal</td>
                 </tr>
                 <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                  <td style={{ padding: "0.5rem 0", fontWeight: "bold" }}>Sabado</td>
-                  <td style={{ padding: "0.5rem 0", color: "var(--text-muted)" }}>8:30 AM - 12 PM<br/>4 PM - 9 PM</td>
-                  <td style={{ padding: "0.5rem 0", textAlign: "right" }}>Camiseta/pantalon negro</td>
+                  <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Sábado</td>
+                  <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>8:30 AM - 12:00 PM<br/>4:00 PM - 9:00 PM</td>
+                  <td style={{ padding: "0.6rem 0", textAlign: "right", color: "var(--text-main)" }}>Camiseta / pantalón negro</td>
                 </tr>
                 <tr>
-                  <td style={{ padding: "0.5rem 0", fontWeight: "bold" }}>Domingo</td>
-                  <td style={{ padding: "0.5rem 0", color: "var(--text-muted)" }}>8:30 AM - 12 PM<br/>4 PM - Cierre</td>
-                  <td style={{ padding: "0.5rem 0", textAlign: "right" }}>Camiseta/pantalon negro</td>
+                  <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Domingo</td>
+                  <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>8:30 AM - 12:00 PM<br/>4:00 PM - Cierre</td>
+                  <td style={{ padding: "0.6rem 0", textAlign: "right", color: "var(--text-main)" }}>Camiseta / pantalón negro</td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
+
+        {/* NOTA DE VESTIMENTA OFICIAL 2026 */}
+        <div style={{ marginTop: '1rem', padding: '0.8rem 1.2rem', background: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '0.8rem', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+          <span style={{ fontSize: '1.2rem' }}>👟</span>
+          <span><strong>Actualización Vestimenta 2026:</strong> Para preservar la energía física y dinamismo en sala durante sesiones prolongadas, el <strong>Entrenador / Coach</strong> tiene autorización formal para el uso de <strong>zapatillas deportivas negras</strong>. Todo el resto del staff y directiva mantiene el código de etiqueta negra rigurosa.</span>
+        </div>
       </div>
+
+      <TaskAssignmentModal isOpen={showTaskForm} onClose={() => setShowTaskForm(false)} />
+      <VenueConfigModal isOpen={showVenueModal} onClose={() => setShowVenueModal(false)} />
+    </div>
+  );
+}

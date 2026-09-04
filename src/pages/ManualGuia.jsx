@@ -243,21 +243,21 @@ export default function ManualGuia() {
               CREAR PODER SIN LIMITES GLOBAL • DOCUMENTO MAESTRO v2.0
             </span>
             <h1 style={{ margin: 0, fontSize: '1.8rem', color: 'var(--text-heading)', fontWeight: 900, letterSpacing: '-0.5px', lineHeight: 1.2 }}>
-              Manual Institucional & Guia Operativa — Causa OS
+              Manual Institucional & Guía Operativa — Causa OS
             </h1>
           </div>
         </div>
         <p style={{ fontSize: '1rem', lineHeight: '1.65', color: 'var(--text-main)', margin: '0 0 1.25rem 0', maxWidth: '860px' }}>
-          En <strong>CREAR PODER SIN LIMITES</strong> no gestionamos eventos; forjamos lideres y equipos de alto rendimiento
-          que pasan de la teoria a la accion masiva bajo presion. Este documento unifica el brochure corporativo,
-          la hoja de ruta operativa y la guia completa de la plataforma digital <strong>Causa OS</strong>.
+          En <strong>CREAR PODER SIN LÍMITES</strong> no gestionamos eventos; forjamos líderes y equipos de alto rendimiento
+          que pasan de la teoría a la acción masiva bajo presión. Este documento unifica el brochure corporativo,
+          la hoja de ruta operativa y la guía completa de la plataforma digital <strong>Causa OS</strong>.
         </p>
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
           <div style={{ padding: '0.6rem 1.1rem', background: 'var(--crear-gold-light)', borderLeft: '3px solid var(--crear-gold)', borderRadius: '0 8px 8px 0', fontSize: '0.92rem', fontStyle: 'italic', color: 'var(--text-main)', fontWeight: 600 }}>
             "El conocimiento te muestra el camino. El entrenamiento rompe tus barreras."
           </div>
           <div style={{ padding: '0.6rem 1.1rem', background: 'rgba(16,185,129,0.1)', borderLeft: '3px solid #10b981', borderRadius: '0 8px 8px 0', fontSize: '0.88rem', color: 'var(--text-muted)' }}>
-            Actualizado: Agosto 2026 — 7 Sedes Operativas — Plataforma Causa OS activa
+            Actualizado: Agosto 2026 — 6 Sedes Operativas + Dirección Global — Plataforma Causa OS activa
           </div>
         </div>
       </div>
@@ -273,19 +273,19 @@ export default function ManualGuia() {
       {activeTab === 'brochure' && (
         <div style={{ display: 'grid', gap: '2rem' }}>
           <div className="glass-panel" style={{ padding: '2.25rem 2rem', borderRadius: '16px' }}>
-            <SectionHeader icon={<Target />} sup="PARTE I - PROPUESTA DE VALOR" title="1. Nuestro Estandar de Alto Rendimiento" />
+            <SectionHeader icon={<Target />} sup="PARTE I - PROPUESTA DE VALOR" title="1. Nuestro Estándar de Alto Rendimiento" />
             <p style={{ margin: '0 0 1.5rem 0', lineHeight: '1.75', color: 'var(--text-main)', fontSize: '1rem' }}>
-              En <strong>CREAR PODER SIN LIMITES Global</strong> no gestionamos eventos; forjamos lideres y equipos de alto rendimiento.
-              Nuestra metodologia exige pasar de la teoria a la accion masiva, reconfigurando la toma de decisiones bajo presion
+              En <strong>CREAR PODER SIN LÍMITES</strong> no gestionamos eventos; forjamos líderes y equipos de alto rendimiento.
+              Nuestra metodología exige pasar de la teoría a la acción masiva, reconfigurando la toma de decisiones bajo presión
               e instalando un sentido de <strong>responsabilidad absoluta</strong> en cada participante y miembro del Staff.
-              El resultado no es aprendizaje pasivo: es transformacion medible y auditada.
+              El resultado no es aprendizaje pasivo: es transformación medible y auditada.
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
               {[
-                { icon: 'FIRE', label: 'Accion Masiva', desc: 'Cada dinamica esta disenada para generar un quiebre real, no reflexiones superficiales.' },
-                { icon: 'CHART', label: 'Resultados Medibles', desc: 'Metas auditables: Px sentados, retencion al 100 dias y avance por sede en tiempo real.' },
-                { icon: 'GLOBE', label: '7 Sedes Internacionales', desc: 'Quito, Guayaquil, Cuenca, Lima, Medellin, Mexico y Sede Global con estandares unificados.' },
-                { icon: 'ZAP', label: 'Causa OS Digital', desc: 'Plataforma propia de monitoreo, checklists y gestion operativa para todo el staff.' },
+                { icon: 'FIRE', label: 'Acción Masiva', desc: 'Cada dinámica está diseñada para generar un quiebre real, no reflexiones superficiales.' },
+                { icon: 'CHART', label: 'Resultados Medibles', desc: 'Metas auditables: Px sentados, retención a los 100 días y avance por sede en tiempo real.' },
+                { icon: 'GLOBE', label: '6 Sedes Internacionales + Dirección Global', desc: 'Lima, Quito, Guayaquil, Cuenca, Medellín y México, con estándares unificados y respaldo de la Dirección Global.' },
+                { icon: 'ZAP', label: 'Causa OS Digital', desc: 'Plataforma propia de monitoreo, checklists y gestión operativa para todo el staff.' },
               ].map((item, i) => (
                 <div key={item.label} style={{ padding: '1.1rem', background: 'var(--bg-card)', borderRadius: '10px', border: '1px solid var(--border-subtle)' }}>
                   <strong style={{ color: 'var(--crear-gold)', fontSize: '0.95rem', display: 'block', marginBottom: '0.3rem' }}>{item.label}</strong>
@@ -299,9 +299,9 @@ export default function ManualGuia() {
             </h3>
             <div style={{ display: 'grid', gap: '1rem', marginBottom: '2rem' }}>
               {[
-                { title: 'Capitulo Uno (C1)', phase: 'FASE 1', color: 'var(--crear-blue)', bg: 'rgba(0,210,255,0.08)', desc: 'Inmersion, erradicacion de excusas y alineamiento de mentalidad. El participante opera con mente en pagina en blanco y asume responsabilidad radical sobre sus resultados, sin justificaciones.' },
-                { title: 'Capitulo Dos (C2)', phase: 'FASE 2', color: 'var(--crear-gold)', bg: 'rgba(245,158,11,0.08)', desc: 'Ejecucion bajo presion, trabajo en equipo y rompimiento de barreras limitantes. Se instala autoconfianza inquebrantable y se erradica el individualismo mediante dinamicas de alto impacto.' },
-                { title: 'Maestria del Juego (MJ) — Ciclo de 100 Dias', phase: 'FASE 3', color: '#a855f7', bg: 'rgba(168,85,247,0.08)', desc: '100 dias de ejecucion sostenida de Futuros Imposibles (FI), auditada mediante 4 Fines de Semana de Calibracion: 1FDS Creacion (Vision y EAI), 2FDS Relacion (Dinamica y Clima), 3FDS Gratitud (Servicio y Avance), 4FDS El Viaje (Consolidacion y Legado).' },
+                { title: 'Capítulo Uno (C1)', phase: 'FASE 1', color: 'var(--crear-blue)', bg: 'rgba(0,210,255,0.08)', desc: 'Inmersión, erradicación de excusas y alineamiento de mentalidad. El participante opera con mente en página en blanco y asume responsabilidad radical sobre sus resultados, sin justificaciones.' },
+                { title: 'Capítulo Dos (C2)', phase: 'FASE 2', color: 'var(--crear-gold)', bg: 'rgba(245,158,11,0.08)', desc: 'Ejecución bajo presión, trabajo en equipo y rompimiento de barreras limitantes. Se instala autoconfianza inquebrantable y se erradica el individualismo mediante dinámicas de alto impacto.' },
+                { title: 'Maestría del Juego (MJ) — Ciclo de 100 Días', phase: 'FASE 3', color: '#a855f7', bg: 'rgba(168,85,247,0.08)', desc: '100 días de ejecución sostenida de Futuros Imposibles (FI), auditada mediante 4 Fines de Semana de Calibración: 1FDS Creación (Visión y EAI), 2FDS Relación (Dinámica y Clima), 3FDS Gratitud (Servicio y Avance), 4FDS El Viaje (Consolidación y Legado).' },
               ].map(item => (
                 <div key={item.title} style={{ padding: '1.2rem', background: item.bg, borderRadius: '12px', borderLeft: `4px solid ${item.color}`, border: `1px solid var(--border-subtle)` }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem', flexWrap: 'wrap', gap: '0.4rem' }}>
@@ -314,13 +314,13 @@ export default function ManualGuia() {
             </div>
 
             <h3 style={{ margin: '0 0 1rem 0', color: '#ef4444', fontSize: '1.15rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Zap size={20} color="#ef4444" /> 3. Simuladores de Presion (Entrenamientos Complementarios)
+              <Zap size={20} color="#ef4444" /> 3. Simuladores de Presión (Entrenamientos Complementarios)
             </h3>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '1rem' }}>
               {[
-                { color: 'var(--crear-gold)', title: 'Caida de Confianza / FI', desc: 'Circulo de Limpieza, caida en silencio y auditoria de metas en vivo.' },
-                { color: 'var(--crear-blue)', title: 'Tanque', desc: 'Navegacion a ciegas por walkie-talkie y codigos sonoros; auditoria de ego y liderazgo.' },
-                { color: '#ef4444', title: 'Rompimiento de Barreras', desc: '"El Monje y el Florero" e impacto fisico destructivo sobre la limitacion instalada.' },
+                { color: 'var(--crear-gold)', title: 'Caída de Confianza / FI', desc: 'Círculo de Limpieza, caída en silencio y auditoría de metas en vivo.' },
+                { color: 'var(--crear-blue)', title: 'Tanque', desc: 'Navegación a ciegas por walkie-talkie y códigos sonoros; auditoría de ego y liderazgo.' },
+                { color: '#ef4444', title: 'Rompimiento de Barreras', desc: '"El Monje y el Florero" e impacto físico destructivo sobre la limitación instalada.' },
                 { color: '#a855f7', title: 'Caminata de Equipos', desc: 'Valla de honor, contacto visual profundo y traspaso formal de legado entre generaciones.' },
               ].map(item => (
                 <div key={item.title} style={{ padding: '1rem', background: 'var(--bg-card)', borderRadius: '10px', border: '1px solid var(--border-subtle)' }}>
@@ -331,7 +331,7 @@ export default function ManualGuia() {
             </div>
 
             <h3 style={{ margin: '2rem 0 0.35rem 0', color: '#22c55e', fontSize: '1.15rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <TrendingUp size={20} color="#22c55e" /> 4. Ecuacion de Valor — Reduccion de Esfuerzo y Sacrificio
+              <TrendingUp size={20} color="#22c55e" /> 4. Ecuación de Valor — Reducción de Esfuerzo y Sacrificio
             </h3>
             <p style={{ margin: '0 0 1rem 0', fontSize: '0.78rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>
               Aporte de Direccion — integrado 02/09/2026, confirmado por Jose Sanchez. No proviene de un manual auditado.
@@ -527,7 +527,7 @@ export default function ManualGuia() {
                 </thead>
                 <tbody>
                   {[
-                    { rol: 'Direccion Global', color: '#ec4899', resps: 'Gobierno estrategico de las 7 sedes. Audita en tiempo real accesos, KPIs y movimientos. Visibilidad total del sistema y puede simular cualquier rol para auditoria.', route: '/superadmin', btn: 'Panel Super Admin' },
+                    { rol: 'Dirección Global', color: '#ec4899', resps: 'Gobierno estratégico de las sedes operativas. Audita en tiempo real accesos, KPIs y movimientos. Visibilidad total del sistema y puede simular cualquier rol para auditoría.', route: '/superadmin', btn: 'Panel Super Admin' },
                     { rol: 'Gerente de Sede', color: 'var(--crear-gold)', resps: 'Dirige la planeacion estrategica de su ciudad. Audita el cumplimiento de metas de enrolamiento, la salud financiera y los checklists globales. Primera autoridad en contingencias.', route: '/gerente', btn: 'Dashboard Gerencia' },
                     { rol: 'Coordinador C1 y C2', color: 'var(--crear-blue)', resps: 'Custodio de la logistica de Capitulos 1 y 2. Maneja registro, trazabilidad de datos, preparacion de sala y asegura el Grounding del equipo de apoyo.', route: '/checklist/coordinador_c1c2', btn: 'Checklist C1/C2' },
                     { rol: 'Director de Maestria', color: '#a855f7', resps: 'Lidera la ejecucion de los 100 dias de Maestria. Supervisa entrenadores, valida metas, gestiona EAIs y minimiza la desercion.', route: '/centro-managers', btn: 'Centro Managers' },
@@ -826,7 +826,7 @@ export default function ManualGuia() {
                 {[
                   { title: 'Auditoria en Tiempo Real', desc: 'Revisa el log de accesos, conexiones y movimientos. Cada login, cambio de rol y accion critica queda registrada con IP, dispositivo y timestamp.' },
                   { title: 'Simulacion de Roles', desc: 'Entra a la plataforma con la vista de cualquier colaborador para auditar su experiencia, resolver dudas o verificar que sus modulos funcionen correctamente.' },
-                  { title: 'Consistencia Internacional', desc: 'Asegura que las 7 sedes operen bajo los mismos estandares de marca y rigor metodologico en cada ciclo.' },
+                  { title: 'Consistencia Internacional', desc: 'Asegura que todas las sedes operativas operen bajo los mismos estándares de marca y rigor metodológico en cada ciclo.' },
                   { title: 'Contacto Directo', desc: 'Desde el Panel Super Admin puedes contactar a cualquier persona del equipo global via Gmail, Google Chat o WhatsApp con un solo clic.' },
                 ].map(item => (
                   <div key={item.title} style={{ padding: '1rem', background: 'var(--bg-card-hover)', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>

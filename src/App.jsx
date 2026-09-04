@@ -28,6 +28,7 @@ import EmbudoConversionBoard from './pages/EmbudoConversionBoard'
 import NodusDataMap from './pages/NodusDataMap'
 import CalendarioMJ from './pages/CalendarioMJ'
 import GeneradorFlyer from './pages/GeneradorFlyer'
+import MonitorVuelosCartas from './pages/MonitorVuelosCartas'
 import AICopilot from './components/AICopilot'
 import PromptModal from './components/PromptModal'
 import BirthdayAlert from './components/BirthdayAlert'
@@ -151,7 +152,7 @@ function App() {
           } />
 
           <Route path="/manual-nodus" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'director_maestria', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'director_maestria', 'superadmin', 'consolidado', 'qt', 'capitan', 'entrenador', 'entrenador_llamadas', 'manager', 'aliado', 'oficina']} requireSuperAdmin={false}>
               <ManualNodus />
             </RoleRoute>
           } />
@@ -262,7 +263,7 @@ function App() {
           } />
 
           <Route path="/calendario-equipo" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'director_maestria']} requireSuperAdmin={false}>
               <TeamCalendar />
             </RoleRoute>
           } />
@@ -287,10 +288,19 @@ function App() {
 
           {/* Generador de Flyers Oficiales (02/09/2026): Generador HD 1080x1920 con fechas por sede */}
           <Route path="/generador-flyer" element={
-            <PrivateRoute>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria', 'coord_c1', 'coord_c2', 'coordinador_c1c2']} requireSuperAdmin={false}>
               <GeneradorFlyer />
-            </PrivateRoute>
+            </RoleRoute>
           } />
+
+          {/* Monitor de Vuelos y Cartas Oficiales */}
+          <Route path="/monitor-vuelos" element={
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
+              <MonitorVuelosCartas />
+            </RoleRoute>
+          } />
+          <Route path="/vuelos" element={<Navigate to="/monitor-vuelos" replace />} />
+          <Route path="/cartas" element={<Navigate to="/monitor-vuelos" replace />} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

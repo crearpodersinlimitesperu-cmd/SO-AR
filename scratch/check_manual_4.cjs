@@ -1,0 +1,1 @@
+﻿const fs = require("fs"); let code = fs.readFileSync("src/components/HelpModal.jsx", "utf8"); let startIndex = code.indexOf("activeTab === 'manual'"); console.log(code.substring(startIndex, startIndex + 3000));

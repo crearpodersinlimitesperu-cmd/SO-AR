@@ -1,4 +1,4 @@
-﻿// Configuración centralizada de permisos y roles administrativos
+// Configuración centralizada de permisos y roles administrativos
 // Este archivo es la ÚNICA fuente de verdad para emails con privilegios elevados.
 // Cualquier cambio de SuperAdmin se hace AQUÍ, no disperso en el código.
 
@@ -358,7 +358,8 @@ export const getAssignableRoles = (currentUser) => {
 
 /**
  * MATRIZ OFICIAL DE PERMISOS Y VISTAS POR ROL (CREAR PODER SIN LÍMITES)
- * Fuente: Matriz Oficial de Acceso y Visibilidad Causa OS
+ * Fuente: Matriz Oficial de Acceso y Visibilidad Causa OS (roles Causa OS en Google Sheets)
+ * ID: 1gt7kJblS5sULWDAZ_Gg1aQMIJTmkOIK2snaM-nnNdfI
  */
 export const OFFICIAL_PERMISSION_MATRIX = {
   'causa_os': {
@@ -402,6 +403,10 @@ export const OFFICIAL_PERMISSION_MATRIX = {
   },
   'calendario_global': {
     directivos: 'GLOBAL',
+    gerente: 'GLOBAL'
+  },
+  'campus_interactivo': {
+    directivos: 'GLOBAL',
     gerente: 'GLOBAL',
     coord_c1: 'GLOBAL',
     coord_maestria: 'GLOBAL',
@@ -410,12 +415,6 @@ export const OFFICIAL_PERMISSION_MATRIX = {
     capitan: 'GLOBAL',
     aliado: 'GLOBAL',
     manager: 'GLOBAL'
-  },
-  'campus_interactivo': {
-    directivos: 'GLOBAL',
-    gerente: 'GLOBAL',
-    coord_c1: 'GLOBAL',
-    coord_maestria: 'GLOBAL'
   },
   'centro_managers': {
     directivos: 'GLOBAL',
@@ -436,19 +435,57 @@ export const OFFICIAL_PERMISSION_MATRIX = {
     gerente: 'GLOBAL'
   },
   'sistema_cartas': {
-    gerente: 'GLOBAL',
-    directivos: 'GLOBAL'
+    directivos: 'GLOBAL',
+    gerente: 'GLOBAL'
   },
   'copilot': {
     directivos: 'GLOBAL',
+    gerente: 'GLOBAL'
+  },
+  'manual_nodus': {
+    directivos: 'GLOBAL',
     gerente: 'GLOBAL',
-    coord_c1: 'DASHBOARD',
-    coord_maestria: 'DASHBOARD',
-    entrenador: 'DASHBOARD',
-    qt: 'DASHBOARD',
-    capitan: 'DASHBOARD',
-    aliado: 'DASHBOARD',
-    manager: 'DASHBOARD'
+    coord_c1: 'GLOBAL',
+    coord_maestria: 'GLOBAL'
+  },
+  'eventos_entrenamientos': {
+    directivos: 'GLOBAL',
+    gerente: 'SEDE',
+    coord_c1: 'SEDE_C1C2',
+    coord_maestria: 'SEDE_MJ',
+    entrenador: 'ASIGNADOS',
+    qt: 'SEDE_C1C2_PROXIMOS_SIN_TRAINER',
+    capitan: 'EQUIPO',
+    aliado: 'EQUIPO',
+    manager: 'EQUIPO'
+  },
+  'comunicacion_efectiva': {
+    directivos: 'GOOGLE_CHAT',
+    gerente: 'GOOGLE_CHAT',
+    coord_c1: 'GOOGLE_CHAT',
+    coord_maestria: 'GOOGLE_CHAT',
+    entrenador: 'GOOGLE_CHAT',
+    qt: 'WHATSAPP',
+    capitan: 'WHATSAPP',
+    aliado: 'WHATSAPP',
+    manager: 'WHATSAPP'
+  },
+  'flyers_c1': {
+    directivos: 'GLOBAL',
+    gerente: 'GLOBAL',
+    coord_c1: 'GLOBAL',
+    coord_maestria: 'GLOBAL'
+  },
+  'calendario_mj': {
+    directivos: 'GLOBAL',
+    gerente: 'SEDE',
+    coord_maestria: 'GLOBAL'
+  },
+  'agenda_timeboxing': {
+    directivos: 'GLOBAL',
+    gerente: 'GLOBAL',
+    coord_c1: 'GLOBAL',
+    coord_maestria: 'GLOBAL'
   }
 };
 
@@ -456,7 +493,7 @@ export const OFFICIAL_PERMISSION_MATRIX = {
  * Valida el nivel de acceso de un usuario para un módulo específico según la Matriz Oficial
  * @param {Object} currentUser 
  * @param {string} moduleKey 
- * @returns {{ hasAccess: boolean, scope: 'GLOBAL' | 'SEDE' | 'DASHBOARD' | 'ASIGNADOS' | 'NONE' }}
+ * @returns {{ hasAccess: boolean, scope: 'GLOBAL' | 'SEDE' | 'DASHBOARD' | 'ASIGNADOS' | 'NONE' | string }}
  */
 export const checkModuleAccess = (currentUser, moduleKey) => {
   if (!currentUser) return { hasAccess: false, scope: 'NONE' };
@@ -493,6 +530,52 @@ export const checkModuleAccess = (currentUser, moduleKey) => {
   }
 
   return { hasAccess: false, scope: 'NONE' };
+};
+
+/**
+ * Canal Oficial de Comunicación según Matriz
+ * @param {Object} currentUser
+ * @returns {'GOOGLE_CHAT' | 'WHATSAPP'}
+ */
+export const getEffectiveCommunicationChannel = (currentUser) => {
+  const access = checkModuleAccess(currentUser, 'comunicacion_efectiva');
+  return access.scope === 'WHATSAPP' ? 'WHATSAPP' : 'GOOGLE_CHAT';
+};
+
+export const canAccessAgendaTimeBoxing = (currentUser) => {
+  return checkModuleAccess(currentUser, 'agenda_timeboxing').hasAccess;
+};
+
+export const canAccessFlyersC1 = (currentUser) => {
+  return checkModuleAccess(currentUser, 'flyers_c1').hasAccess;
+};
+
+export const canAccessCalendarioMJ = (currentUser) => {
+  return checkModuleAccess(currentUser, 'calendario_mj').hasAccess;
+};
+
+export const canAccessMonitorVuelos = (currentUser) => {
+  return checkModuleAccess(currentUser, 'sistema_cartas').hasAccess;
+};
+
+export const canAccessHotelesSede = (currentUser) => {
+  return checkModuleAccess(currentUser, 'hoteles_sede').hasAccess;
+};
+
+export const canAccessManualQT = (currentUser) => {
+  return checkModuleAccess(currentUser, 'manual_qt').hasAccess;
+};
+
+export const canAccessDirectorioQT = (currentUser) => {
+  return checkModuleAccess(currentUser, 'directorio_qt').hasAccess;
+};
+
+export const canAccessManualNodus = (currentUser) => {
+  return checkModuleAccess(currentUser, 'manual_nodus').hasAccess;
+};
+
+export const canAccessCampusInteractivo = (currentUser) => {
+  return checkModuleAccess(currentUser, 'campus_interactivo').hasAccess;
 };
 
 

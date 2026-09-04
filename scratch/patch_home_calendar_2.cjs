@@ -1,0 +1,1 @@
+﻿const fs = require("fs"); let code = fs.readFileSync("src/pages/Home.jsx", "utf8"); code = code.replace("roles: null },\n    {\n      id: 'learning'", "roles: EXEC_ROLES },\n    {\n      id: 'learning'"); fs.writeFileSync("src/pages/Home.jsx", code, "utf8"); console.log("Done");

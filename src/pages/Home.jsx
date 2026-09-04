@@ -22,9 +22,16 @@ import ViewModeSelector from '../components/ViewModeSelector';
 import ThemeToggle from '../components/ThemeToggle';
 import { getVenueForTraining } from '../data/venuesData';
 import { ROLE_DISPLAY_NAMES, normalizeSede } from '../data/usersData';
-import { canAssignTrainer, canViewAllManagers, isDireccionRole, isGlobalQTCoordinator } from '../config/permissions';
+import { 
+  canAssignTrainer, canViewAllManagers, isDireccionRole, isGlobalQTCoordinator,
+  canAccessAgendaTimeBoxing, canAccessFlyersC1, canAccessCalendarioMJ, 
+  canAccessMonitorVuelos, canAccessHotelesSede, canAccessManualQT, 
+  canAccessDirectorioQT, canAccessManualNodus, canAccessCampusInteractivo 
+} from '../config/permissions';
+import EffectiveCommunicationButton from '../components/EffectiveCommunicationButton';
 import { getAllCompanyUsers } from '../services/userService';
 import UserProfileModal from '../components/UserProfileModal';
+import HorariosEntrenamientoModal from '../components/HorariosEntrenamientoModal';
 import { INITIAL_MANAGERS } from '../data/managersData';
 
 /**
@@ -149,6 +156,17 @@ const CAUSA_OPTIONS_REGISTRY = [
     roles: null
   },
   {
+    id: 'opt-monitor-vuelos',
+    title: '✈️ Monitor de Vuelos y Cartas Oficiales',
+    category: 'Logística de Entrenadores',
+    badge: 'Radar en Vivo',
+    emoji: '✈️',
+    desc: 'Control de vuelos en vivo (LATAM/Avianca), logística de choferes, recojo en aeropuerto y repositorio de cartas oficiales',
+    keywords: ['vuelos', 'vuelo', 'cartas', 'carta', 'monitor de vuelos', 'radar', 'itinerario', 'chofer', 'hotel', 'andres idrobo', 'lourdes patino', 'alejandro diaz', 'migraciones', 'latam', 'avianca'],
+    route: '/monitor-vuelos',
+    roles: null
+  },
+  {
     id: 'opt-carta-andres',
     title: 'Carta Andrés Idrobo (Equipo 30 - Creación)',
     category: 'Carta Oficial',
@@ -156,7 +174,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     emoji: '📄',
     desc: 'Vuelos con escala en Guayaquil LA 1351 / LA 1430, carta migración y recojo 8:30 PM',
     keywords: ['andres', 'andres idrobo', 'equipo 30', 'creacion', 'djbjjd', 'latam', 'carta andres'],
-    external: 'https://cartas.crearpsl.net/carta_andres_idrobo_e30.html',
+    external: '/cartas/carta_andres_idrobo_e30.html',
     roles: null
   },
   {
@@ -185,13 +203,25 @@ const CAUSA_OPTIONS_REGISTRY = [
     id: 'opt-agenda-equipo',
     title: 'Agenda y Time Boxing del Equipo',
     category: 'Productividad',
-    badge: 'Horarios',
+    badge: 'Time Boxing',
     emoji: '🗓️',
     desc: 'Planificación semanal por bloques de tiempo y alineación del equipo',
-    keywords: ['agenda', 'time boxing', 'horario', 'planificacion', 'bloques', 'semana'],
+    keywords: ['agenda', 'time boxing', 'bloques', 'semana', 'calendario equipo'],
     route: '/calendario-equipo',
     roles: null
   },
+  {
+    id: 'opt-horarios-entrenamientos',
+    title: 'Horarios de Entrenamientos y Código de Vestimenta',
+    category: 'Operaciones',
+    badge: 'C1 / C2 / MJ',
+    emoji: '⏰',
+    desc: 'Horarios oficiales de sala (Jueves a Domingo), aperturas, recesos, noches de confianza y código de vestimenta oficial',
+    keywords: ['horarios', 'horario', 'vestimenta', 'ropa', 'turnos', 'c1', 'c2', 'maestria', 'horas', 'cronograma', 'lima', 'jueves', 'viernes', 'sabado', 'domingo'],
+    action: 'open_horarios_modal',
+    roles: null
+  },
+
   {
     id: 'opt-checklist',
     title: 'Mi Checklist Operativo',
@@ -382,14 +412,14 @@ const CAUSA_OPTIONS_REGISTRY = [
   },
   {
     id: 'opt-manual-nodus',
-    title: 'Manual Práctico Nodus',
-    category: 'Documentación',
-    badge: 'Nodus',
+    title: 'Gobernanza y Manual Nodus (Edición 2026)',
+    category: 'Gobernanza',
+    badge: '18 Caps + 9 Niveles',
     emoji: '📗',
-    desc: 'Guía práctica para el uso correcto de la plataforma externa Nodus',
-    keywords: ['manual nodus', 'nodus', 'guia nodus', 'plataforma nodus', 'imo'],
+    desc: 'Gobernanza simbiótica Nodus + Causa OS, 9 niveles, vestimenta 2026, 14 KPIs y manual paso a paso de Nodus',
+    keywords: ['manual nodus', 'nodus', 'gobernanza', 'guia nodus', 'plataforma nodus', 'imo', 'kpis', 'triggers', 'vestimenta', 'el viaje', 'paul sosa', 'fer aragon', 'elizabeth escobar'],
     route: '/manual-nodus',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'consolidado']
+    roles: null
   },
   {
     id: 'opt-campus',
@@ -518,6 +548,7 @@ export default function Home() {
   const [taskBeingEdited, setTaskBeingEdited] = useState(null); // tarea a editar desde el panel "Tareas que has asignado"
   const [tareasAsignadasFilter, setTareasAsignadasFilter] = useState('Activas'); // 'Activas' | 'Vencidas' | 'Cumplidas' | 'Todas'
   const [showVenueModal, setShowVenueModal] = useState(false);
+  const [showHorariosModal, setShowHorariosModal] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showToolsDropdown, setShowToolsDropdown] = useState(false);
   const toolsDropdownRef = useRef(null);
@@ -752,7 +783,9 @@ export default function Home() {
   const handleSelectSearchOption = (opt) => {
     setShowGlobalSearchResults(false);
     setGlobalSearchTerm('');
-    if (opt.action === 'new_task') {
+    if (opt.action === 'open_horarios_modal') {
+      setShowHorariosModal(true);
+    } else if (opt.action === 'new_task') {
       setShowTaskModal(true);
     } else if (opt.action === 'venue_modal') {
       setShowVenueModal(true);
@@ -1190,6 +1223,9 @@ export default function Home() {
               <span>TAREA</span>
             </button>
 
+            {/* BOTÓN DE COMUNICACIÓN EFECTIVA OFICIAL SEGÚN MATRIZ */}
+            <EffectiveCommunicationButton currentUser={currentUser} />
+
             {/* BOTÓN SALIR */}
             <button onClick={handleLogout} className="btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.82rem', display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
               <LogOut size={15} /> Salir
@@ -1216,7 +1252,17 @@ export default function Home() {
             >
               🎯 Mis Metas
             </button>
-            {(currentUser?.isSuperAdmin || currentUser?.appRole === 'gerente' || currentUser?.isDireccion || currentUser?.appRole === 'director_maestria' || ['coordinador', 'coord_c1', 'coord_c2', 'coordinador_c1c2'].includes(currentUser?.appRole)) && (
+            {canAccessAgendaTimeBoxing(currentUser) && (
+              <button
+                onClick={() => setShowHorariosModal(true)}
+                className="btn-secondary"
+                title="Horarios oficiales de entrenamiento y código de vestimenta"
+                style={{ padding: '0.45rem 0.9rem', fontSize: '0.85rem', color: 'var(--crear-cyan)', borderColor: 'rgba(41, 171, 226, 0.5)', background: 'rgba(41, 171, 226, 0.12)', fontWeight: 'bold' }}
+              >
+                ⏰ Horarios y Vestimenta
+              </button>
+            )}
+            {canAccessFlyersC1(currentUser) && (
               <button onClick={() => navigate('/generador-flyer')} className="btn-secondary" title="Generador de Flyers Oficiales para Capítulos Uno" style={{ padding: '0.45rem 0.9rem', fontSize: '0.85rem', color: '#f59e0b', borderColor: 'rgba(245, 158, 11, 0.5)', background: 'rgba(245, 158, 11, 0.12)', fontWeight: 'bold' }}>
                 🎨 Flyers C1 Globales
               </button>
@@ -1249,7 +1295,7 @@ export default function Home() {
                 boxShadow: '0 20px 50px rgba(0,0,0,0.95), 0 0 25px rgba(41, 171, 226, 0.2)',
                 border: '1px solid rgba(41, 171, 226, 0.4)'
               }}>
-                {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+                {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado'].includes(currentUser?.appRole) ? (
                   <>
                     <button onClick={() => { setShowToolsDropdown(false); navigate('/gerente'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                       💼 Causa OS Gerencial
@@ -1267,47 +1313,56 @@ export default function Home() {
                       🗺️ Nodus Data Map
                     </button>
                   </>
+                ) : (
+                  <button onClick={() => { setShowToolsDropdown(false); navigate(`/checklist/${currentUser?.appRole || 'capitan'}`); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
+                    💼 Mi Dashboard / Checklist
+                  </button>
                 )}
 
                 {(currentUser?.appRole !== 'qt') && (
-<button onClick={() => { setShowToolsDropdown(false); navigate('/acuerdos'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#a855f7', background: 'rgba(168, 85, 247, 0.1)' }}>
-                  ✉️ Acuerdos Oficiales (Correo)
-                </button>
-)}
-                <button onClick={() => { setShowToolsDropdown(false); navigate('/calendario-equipo'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#f97316', background: 'rgba(249, 115, 22, 0.1)' }}>
-                  🗓️ Agenda y Time Boxing
-                </button>
+                  <button onClick={() => { setShowToolsDropdown(false); navigate('/acuerdos'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#a855f7', background: 'rgba(168, 85, 247, 0.1)' }}>
+                    ✉️ Acuerdos Oficiales (Correo)
+                  </button>
+                )}
+
+                {canAccessAgendaTimeBoxing(currentUser) && (
+                  <>
+                    <button onClick={() => { setShowToolsDropdown(false); navigate('/calendario-equipo'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#f97316', background: 'rgba(249, 115, 22, 0.1)' }}>
+                      🗓️ Agenda y Time Boxing
+                    </button>
+                    <button onClick={() => { setShowToolsDropdown(false); setShowHorariosModal(true); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: 'var(--crear-cyan)', background: 'rgba(41, 171, 226, 0.1)' }}>
+                      ⏰ Horarios de Entrenamientos
+                    </button>
+                  </>
+                )}
 
                 {(currentUser?.appRole !== 'qt') && (
-<button onClick={() => { setShowToolsDropdown(false); navigate('/learning'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(41, 171, 226, 0.1)', color: 'var(--crear-cyan)' }}>
-                  🧠 Inteligencia Colectiva (Learning)
-                </button>
-)}
+                  <button onClick={() => { setShowToolsDropdown(false); navigate('/learning'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(41, 171, 226, 0.1)', color: 'var(--crear-cyan)' }}>
+                    🧠 Inteligencia Colectiva (Learning)
+                  </button>
+                )}
 
                 {(currentUser?.appRole !== 'qt') && (
-<button onClick={() => { setShowToolsDropdown(false); navigate('/excelencia'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(255, 183, 3, 0.15)', color: 'var(--crear-gold)' }}>
-                  👑 Excelencia Operativa
-                </button>
-)}
+                  <button onClick={() => { setShowToolsDropdown(false); navigate('/excelencia'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(255, 183, 3, 0.15)', color: 'var(--crear-gold)' }}>
+                    👑 Excelencia Operativa
+                  </button>
+                )}
 
-                {(currentUser?.isSuperAdmin || currentUser?.appRole === 'gerente' || currentUser?.isDireccion || currentUser?.appRole === 'director_maestria' || ['coordinador', 'coord_c1', 'coord_c2', 'coordinador_c1c2'].includes(currentUser?.appRole)) && (
-<button onClick={() => { setShowToolsDropdown(false); navigate('/generador-flyer'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(234, 179, 8, 0.15)', color: '#facc15', fontWeight: 'bold' }}>
-                  🎨 Generador de Flyers Oficiales
-                </button>
-)}
+                {canAccessFlyersC1(currentUser) && (
+                  <button onClick={() => { setShowToolsDropdown(false); navigate('/generador-flyer'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(234, 179, 8, 0.15)', color: '#facc15', fontWeight: 'bold' }}>
+                    🎨 Generador de Flyers Oficiales
+                  </button>
+                )}
 
-                {(currentUser?.appRole !== 'qt') && (
-<a 
-                  href="/cartas/carta_andres_idrobo_e30.html" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  onClick={() => setShowToolsDropdown(false)} 
-                  className="btn-secondary" 
-                  style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem', textDecoration: 'none' }}
-                >
-                  ✈️ Monitor de Vuelos y Cartas
-                </a>
-)}
+                {canAccessMonitorVuelos(currentUser) && (
+                  <button 
+                    onClick={() => { setShowToolsDropdown(false); navigate('/monitor-vuelos'); }} 
+                    className="btn-secondary" 
+                    style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem', border: '1px solid rgba(56, 189, 248, 0.3)', cursor: 'pointer' }}
+                  >
+                    ✈️ Monitor de Vuelos y Cartas
+                  </button>
+                )}
 
                 {['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan'].includes(currentUser?.appRole) && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/mis-kpis'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
@@ -1315,7 +1370,7 @@ export default function Home() {
                   </button>
                 )}
 
-                {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+                {canAccessDirectorioQT(currentUser) && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/directorio-qt'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                     ⚡ Directorio QT
                   </button>
@@ -1333,11 +1388,10 @@ export default function Home() {
                   </button>
                 )}
 
-                {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
-                  <button onClick={() => { setShowToolsDropdown(false); window.open('https://cpsl-campus-interactivo.vercel.app/ruta', '_blank'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
-                    🎓 Campus Interactivo ↗
-                  </button>
-                )}
+                {/* Campus Interactivo: Para TODOS los roles según Matriz */}
+                <button onClick={() => { setShowToolsDropdown(false); window.open('https://cpsl-campus-interactivo.vercel.app/ruta', '_blank'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#10b981', background: 'rgba(16, 185, 129, 0.1)' }}>
+                  🎓 Campus Interactivo ↗
+                </button>
 
                 {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
                   <div style={{ display: 'flex', gap: '0.2rem', padding: '0.2rem' }}>
@@ -1350,11 +1404,7 @@ export default function Home() {
                   </div>
                 )}
 
-                {/* Calendario de Maestría del Juego (29/08/2026): mismo criterio de
-                    acceso que Centro de Managers, sin entrenadores/entrenador_llamadas
-                    (la edición es de CMJ/gerencia; los entrenadores no gestionan el
-                    calendario oficial del equipo). */}
-                {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'director_maestria', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+                {canAccessCalendarioMJ(currentUser) && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/calendario-mj'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#1a75bc', background: 'rgba(26, 117, 188, 0.1)' }}>
                     📅 Calendario de Maestría del Juego
                   </button>
@@ -1364,13 +1414,13 @@ export default function Home() {
                   🚨 Protocolo de Emergencias
                 </button>
 
-                {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+                {canAccessManualQT(currentUser) && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/manual'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                     📘 Manual / Guía Causa OS / QT
                   </button>
                 )}
 
-                {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+                {canAccessManualNodus(currentUser) && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/manual-nodus'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.4)', background: 'rgba(16, 185, 129, 0.1)', fontWeight: 'bold' }}>
                     📗 Manual Práctico Nodus
                   </button>
@@ -1384,9 +1434,18 @@ export default function Home() {
       {/* BARRA PRO COMPLETA (SI ESTÁ EN MODO PRO) */}
       {viewMode === 'pro' && customModules.advancedTools !== false && (
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '1.5rem', padding: '0.75rem', background: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.06)' }}>
-          {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+          {canAccessAgendaTimeBoxing(currentUser) && (
+            <button onClick={() => setShowHorariosModal(true)} className="btn-primary" title="Horarios oficiales de entrenamiento y código de vestimenta" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #06b6d4, #0284c7)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+              ⏰ Horarios y Vestimenta
+            </button>
+          )}
+          {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado'].includes(currentUser?.appRole) ? (
             <button onClick={() => navigate('/gerente')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'var(--crear-gold)', color: 'black' }}>
               💼 SO-AR Gerencial
+            </button>
+          ) : (
+            <button onClick={() => navigate(`/checklist/${currentUser?.appRole || 'capitan'}`)} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'var(--crear-gold)', color: 'black' }}>
+              💼 Mi Dashboard
             </button>
           )}
           {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
@@ -1409,25 +1468,19 @@ export default function Home() {
             </button>
           )}
 
-          {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+          {canAccessManualQT(currentUser) && (
             <button onClick={() => navigate('/manual')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #0284c7, #2563eb)', color: 'white', border: 'none' }}>
               📘 Manual QT
             </button>
           )}
 
-          {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+          {canAccessManualNodus(currentUser) && (
             <button onClick={() => navigate('/manual-nodus')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #047857)', color: 'white', border: 'none' }}>
               📗 Manual Nodus
             </button>
           )}
 
-          {/* (02/09/2026) Antes este botón mostraba "Directorio QT" también a coordinador_mj,
-              coord_maestria, entrenador y entrenador_llamadas — roles que la ruta real
-              /directorio-qt (App.jsx, RoleRoute allowedRoles) SIEMPRE rechazó, así que para
-              ellos era un botón que llevaba a un "ACCESO DENEGADO". Se corrigió para usar la
-              misma lista DIRECTORIO_QT_ROLES ya definida arriba (línea ~78), que sí coincide
-              con la ruta. Reportado por José: un entrenador (Julio César Narváez) lo veía. */}
-          {DIRECTORIO_QT_ROLES.includes(currentUser?.appRole) && (
+          {canAccessDirectorioQT(currentUser) && (
             <button onClick={() => navigate('/directorio-qt')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: 'white', border: 'none' }}>
               ⚡ Directorio QT
             </button>
@@ -1445,11 +1498,10 @@ export default function Home() {
             </button>
           )}
 
-          {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
-            <button onClick={() => window.open('https://cpsl-campus-interactivo.vercel.app/ruta', '_blank')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #059669)', color: 'white', border: 'none' }}>
-              🎓 Campus Interactivo
-            </button>
-          )}
+          {/* Campus Interactivo: abierto a TODOS los 9 roles */}
+          <button onClick={() => window.open('https://cpsl-campus-interactivo.vercel.app/ruta', '_blank')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #059669)', color: 'white', border: 'none' }}>
+            🎓 Campus Interactivo
+          </button>
 
           {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
             <button onClick={() => navigate('/centro-managers')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#000', fontWeight: 'bold', border: 'none' }}>
@@ -1457,20 +1509,21 @@ export default function Home() {
             </button>
           )}
 
-          {/* Calendario de Maestría del Juego (31/08/2026): esta es la barra "Pro"
-              que realmente ve José (barra de botones siempre visible), distinta
-              del dropdown "Herramientas" donde se había agregado el acceso
-              antes — por eso no aparecía. Mismo criterio de roles que Centro
-              Managers, sin entrenadores (la edición es de CMJ/gerencia). */}
-          {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'director_maestria', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+          {canAccessCalendarioMJ(currentUser) && (
             <button onClick={() => navigate('/calendario-mj')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #1a75bc, #29abe2)', color: 'white', border: 'none' }}>
               📅 Calendario MJ
             </button>
           )}
 
-          {(currentUser?.isSuperAdmin || currentUser?.appRole === 'gerente' || currentUser?.isDireccion || currentUser?.appRole === 'director_maestria' || ['coordinador', 'coord_c1', 'coord_c2', 'coordinador_c1c2'].includes(currentUser?.appRole)) && (
+          {canAccessFlyersC1(currentUser) && (
             <button onClick={() => navigate('/generador-flyer')} className="btn-primary" title="Generador de Flyers Oficiales para Capítulos Uno" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #ec4899)', color: 'white', fontWeight: 'bold', border: 'none', boxShadow: '0 0 15px rgba(245, 158, 11, 0.4)' }}>
               🎨 Flyers C1 Globales
+            </button>
+          )}
+
+          {canAccessMonitorVuelos(currentUser) && (
+            <button onClick={() => navigate('/monitor-vuelos')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #38bdf8, #0284c7)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+              ✈️ Monitor de Vuelos
             </button>
           )}
         </div>
@@ -1689,7 +1742,7 @@ export default function Home() {
                   <CalendarIcon size={18} /> EVENTOS Y ENTRENAMIENTOS
                 </h3>
                 <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', flexWrap: 'wrap' }}>
-                  {(currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.isGerente || ['gerente', 'direccion', 'director_maestria', 'qt', 'consolidado'].includes(currentUser?.appRole)) && (
+                  {canAccessHotelesSede(currentUser) && (
                     <button 
                       type="button"
                       onClick={() => setShowVenueModal(true)}
@@ -1783,16 +1836,74 @@ export default function Home() {
               ) : (
                 <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                   {(() => {
-                    const isEntrenador = ['entrenador', 'entrenador_llamadas'].includes(currentUser?.appRole);
+                    const role = currentUser?.appRole || '';
+                    const isSuperOrDir = currentUser?.isSuperAdmin || currentUser?.isDireccion || ['direccion', 'cfo', 'ceo', 'cco', 'superadmin', 'consolidado'].includes(role);
+                    const isGerente = role === 'gerente' || currentUser?.isGerente;
+                    const isCoordC1C2 = ['coord_c1', 'coord_c2', 'coordinador_c1c2'].includes(role);
+                    const isCoordMJ = ['coord_maestria', 'coordinador_mj', 'director_maestria'].includes(role);
+                    const isEntrenador = ['entrenador', 'entrenador_llamadas'].includes(role);
+                    const isQT = role === 'qt' || (currentUser?.roles || []).includes('qt');
+                    const isEquipoRole = ['capitan', 'aliado', 'manager'].includes(role);
+
                     let displayEvents = (events || []).filter(ev => {
-                      if (activeEventTab === 'locales') {
-                        if (isEntrenador) return isTrainerMatchingUser(ev.trainer || ev.entrenador, currentUser);
+                      // 1. Entrenadores: solo los eventos que él/ella dictará
+                      if (isEntrenador) {
+                        return isTrainerMatchingUser(ev.trainer || ev.entrenador, currentUser);
+                      }
+
+                      // 2. Coordinadores C1/C2: solo los de su sede y solo C1/C2
+                      if (isCoordC1C2) {
+                        const userSede = currentUser?.sede || '';
+                        const evSede = ev.sede || ev.sedeTag || '';
+                        if (userSede && !userSede.toLowerCase().includes('global')) {
+                          if (!evSede || (!evSede.toLowerCase().includes(userSede.toLowerCase()) && !userSede.toLowerCase().includes(evSede.toLowerCase()))) {
+                            return false;
+                          }
+                        }
+                        const name = (ev.nombre || ev.name || '').toUpperCase();
+                        return name.includes('CAPITULO UNO') || name.includes('C1') || name.includes('CAPÍTULO UNO') || name.includes('CAPITULO DOS') || name.includes('C2') || name.includes('CAPÍTULO DOS');
+                      }
+
+                      // 3. Coordinadores MJ: solo los de su sede y solo MJ
+                      if (isCoordMJ) {
+                        const userSede = currentUser?.sede || '';
+                        const evSede = ev.sede || ev.sedeTag || '';
+                        if (userSede && !userSede.toLowerCase().includes('global')) {
+                          if (!evSede || (!evSede.toLowerCase().includes(userSede.toLowerCase()) && !userSede.toLowerCase().includes(evSede.toLowerCase()))) {
+                            return false;
+                          }
+                        }
+                        const name = (ev.nombre || ev.name || '').toUpperCase();
+                        return name.includes('MAESTRIA') || name.includes('MJ') || name.includes('MAESTRÍA');
+                      }
+
+                      // 4. Capitanes, Aliados y Managers: solo los de su equipo
+                      if (isEquipoRole) {
+                        const userTeam = (currentUser?.equipo || currentUser?.equipoAsignado || '').toLowerCase().trim();
+                        if (userTeam) {
+                          const name = (ev.nombre || ev.name || '').toLowerCase();
+                          const desc = (ev.descripcion || ev.desc || '').toLowerCase();
+                          return name.includes(userTeam) || desc.includes(userTeam);
+                        }
+                        const userSede = currentUser?.sede || '';
+                        const evSede = ev.sede || ev.sedeTag || '';
+                        if (userSede && !userSede.toLowerCase().includes('global')) {
+                          if (!evSede || (!evSede.toLowerCase().includes(userSede.toLowerCase()) && !userSede.toLowerCase().includes(evSede.toLowerCase()))) {
+                            return false;
+                          }
+                        }
+                        return true;
+                      }
+
+                      // 5. Filtro tab locales vs globales para Gerentes y Directivos
+                      if (activeEventTab === 'locales' || (isGerente && !isSuperOrDir)) {
                         const userSede = currentUser?.sede || '';
                         if (!userSede || userSede.toLowerCase().includes('global')) return true;
                         const evSede = ev.sede || ev.sedeTag || '';
                         if (!evSede) return false;
-                          return evSede.toLowerCase().includes(userSede.toLowerCase()) || userSede.toLowerCase().includes(evSede.toLowerCase());
+                        return evSede.toLowerCase().includes(userSede.toLowerCase()) || userSede.toLowerCase().includes(evSede.toLowerCase());
                       }
+
                       return true;
                     });
 
@@ -1840,33 +1951,35 @@ export default function Home() {
                       return timeFilter === 'pasados' ? dateB - dateA : dateA - dateB; // Past events descending, future ascending
                     });
 
-                    
-                      // --- QT Filter Logic ---
-                      if (currentUser?.appRole === "qt" || (currentUser?.roles || []).includes("qt")) {
-                         const qtNow = new Date().getTime();
-                         let c1Count = 0;
-                         let c2Count = 0;
-                         let creacionCount = 0;
-                         displayEvents = displayEvents.filter(ev => {
-                            const dateMs = new Date(ev.fecha_inicio || ev.start || 0).getTime();
-                            if (dateMs < qtNow) return false;
-                            const name = (ev.nombre || ev.name || "").toUpperCase();
-                            if (name.includes("CAPITULO UNO") || name.includes("C1") || name.includes("CAPÍTULO UNO")) {
-                               c1Count++;
-                               return c1Count <= 2;
-                            }
-                            if (name.includes("CAPITULO DOS") || name.includes("C2") || name.includes("CAPÍTULO DOS")) {
-                               c2Count++;
-                               return c2Count <= 2;
-                            }
-                            if (name.includes("CREACION") || name.includes("CREACIÓN")) {
-                               creacionCount++;
-                               return creacionCount <= 2;
-                            }
-                            return false; // QTs ONLY see C1, C2, and Creacion
-                         });
-                      }
-                      if (displayEvents.length === 0) {
+                    // --- QT Filter Logic: solo de su sede, solo C1 y C2 actual y próximo ---
+                    if (isQT) {
+                      const qtNow = new Date().getTime();
+                      const userSede = currentUser?.sede || '';
+                      let c1Count = 0;
+                      let c2Count = 0;
+                      displayEvents = displayEvents.filter(ev => {
+                        if (userSede && !userSede.toLowerCase().includes('global')) {
+                          const evSede = ev.sede || ev.sedeTag || '';
+                          if (!evSede || (!evSede.toLowerCase().includes(userSede.toLowerCase()) && !userSede.toLowerCase().includes(evSede.toLowerCase()))) {
+                            return false;
+                          }
+                        }
+                        const dateMs = new Date(ev.fecha_inicio || ev.start || 0).getTime();
+                        if (dateMs < qtNow) return false;
+                        const name = (ev.nombre || ev.name || '').toUpperCase();
+                        if (name.includes('CAPITULO UNO') || name.includes('C1') || name.includes('CAPÍTULO UNO')) {
+                          c1Count++;
+                          return c1Count <= 2;
+                        }
+                        if (name.includes('CAPITULO DOS') || name.includes('C2') || name.includes('CAPÍTULO DOS')) {
+                          c2Count++;
+                          return c2Count <= 2;
+                        }
+                        return false; // QTs SOLO ven C1 y C2 de su sede (actual y próximo)
+                      });
+                    }
+
+                    if (displayEvents.length === 0) {
                       return (
                         <div style={{ padding: '1.5rem 1rem', textAlign: 'center' }}>
                           <p className="text-muted" style={{ margin: 0, fontSize: '0.85rem' }}>No hay eventos registrados en este filtro.</p>
@@ -1891,7 +2004,7 @@ export default function Home() {
                                 <span style={{ fontSize: '0.75rem', color: 'var(--crear-cyan)', display: 'block', marginTop: '0.1rem' }}>
                                   🏨 {hotelVenue}
                                 </span>
-                                {(!['qt', 'capitan', 'manager'].includes(currentUser?.appRole)) && (
+                                {(!['qt', 'capitan', 'manager', 'aliado'].includes(currentUser?.appRole)) && (
                                   <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginTop: '0.1rem' }}>
                                     🎙️ Trainer: {ev.trainer || ev.entrenador || 'Por confirmar'}
                                   </span>
@@ -2126,6 +2239,9 @@ export default function Home() {
       {showSearchUserModal && selectedSearchUser && (
         <UserProfileModal isOpen={showSearchUserModal} onClose={() => setShowSearchUserModal(false)} user={selectedSearchUser} allTasks={allTasks} />
       )}
+
+      {/* MODAL HORARIOS DE ENTRENAMIENTOS Y CÓDIGO DE VESTIMENTA */}
+      <HorariosEntrenamientoModal isOpen={showHorariosModal} onClose={() => setShowHorariosModal(false)} />
     </div>
   );
 }

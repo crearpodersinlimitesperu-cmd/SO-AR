@@ -1,0 +1,1 @@
+﻿const fs = require("fs"); let code = fs.readFileSync("src/components/HelpModal.jsx", "utf8"); let startIndex = code.indexOf("Bienvenido a Causa OS"); console.log(code.substring(startIndex, startIndex + 3000));

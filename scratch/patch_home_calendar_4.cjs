@@ -1,0 +1,1 @@
+﻿const fs = require("fs"); let code = fs.readFileSync("src/pages/Home.jsx", "utf8"); code = code.replace("route: '/calendario-equipo', roles: null", "route: '/calendario-equipo', roles: EXEC_ROLES"); fs.writeFileSync("src/pages/Home.jsx", code, "utf8"); console.log("Done");

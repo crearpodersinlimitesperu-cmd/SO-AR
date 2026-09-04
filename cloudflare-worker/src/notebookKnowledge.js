@@ -1556,7 +1556,77 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
 ### 13.20 Reconciliación con la Guía de KPIs para Coordinadores (sección 3.6)
 [DATO VERIFICADO vs. DATO NO CONFIRMADO — no se reconcilian por asunción, se documenta la diferencia entre las dos fuentes de Dirección]. El Manual Oficial de Usuario NODUS (Edición 2026, fuente de este capítulo 13) confirma como módulos reales de la plataforma: Dashboard, Mesa de Registro, Participantes, Contabilidad (Registrar Pago / Registro de Gastos), Cierre de Caja, Reportes (incluye el Reporte de Entrenadores y Maestrías), Equipos y Maestrías (cohortes), y Configuración (Sedes / Usuarios / Programas y Precios). La 'Guía de Medición de KPIs para Coordinadores en NODUS' (sección 3.6, aportada por Dirección) menciona además los módulos 'Seguimiento → Maestrías', 'Asignación de Llamadas', 'Configuración → Equipos y Maestrías', 'Certificados' y 'Participantes Rezagados'. De estos, **Equipos y Maestrías** y **Configuración** sí están confirmados por este manual oficial; **'Seguimiento → Maestrías', 'Asignación de Llamadas', 'Certificados' y 'Participantes Rezagados' NO aparecen mencionados en el Manual Oficial de Usuario NODUS Edición 2026** (ni en su índice de 18 capítulos ni en sus Anexos). Esto puede deberse a que (a) son pantallas reales que el manual oficial simplemente no documentó, (b) son nombres alternativos/coloquiales de módulos aquí sí listados, o (c) corresponden a una capa de seguimiento gestionada fuera de NODUS (p. ej. en Causa OS). Ningún dato de este documento resuelve cuál de las tres opciones es la correcta — DATO FALTANTE a confirmar directamente con Dirección o con una captura de pantalla de esos módulos dentro de NODUS.
 ---
+
+## 14. MANUAL DE INTEGRACIÓN SISTÉMICA: GOBERNANZA OPERATIVA NODUS + CAUSA OS (V1.0 - SEPTIEMBRE 2026)
+
+### 14.1 El Manifiesto Nodus + Causa OS (Principios de Gobernanza)
+- **Fórmula Simbiótica:** Nodus (Datos y Trazabilidad) + Causa OS (Análisis y Acción) = Decisiones Verificables.
+- **Principio Rector:** Directo al punto. El líder es la causa, no el efecto.
+- **Nodus (Ecosistema de Datos):** Único sistema de registro, organización y trazabilidad operativa de CPSL. Concentra la información real de participantes, líderes, transacciones, compromisos, asistencia y evidencias.
+  * *Regla de Oro de Datos Nodus:* Nodus no completa datos vacíos con suposiciones. Si un participante no registra actividad o pago, el sistema muestra exclusivamente "sin actividad registrada" o "sin Ticket Verde registrado". Nodus jamás concluye de forma autónoma "el participante abandonó" o "no está comprometido".
+- **Causa OS (Sistema de Dirección):** Capa de dirección, control y mejora estratégica que identifica qué está ocurriendo, cuál puede ser la causa, qué decisión conviene tomar y cómo ejecutar cambios de forma segura sin alterar la evidencia histórica.
+  * *Regla de Oro Causa OS:* Toma la telemetría de Nodus, descarta interpretaciones subjetivas y propone planes de acción con responsables, plazos y criterios medibles, requiriendo siempre validación humana para acciones sensibles (permisos, pagos, contratos o comunicaciones masivas).
+
+### 14.2 Estructura Organizacional: Los 9 Niveles de Excelencia 2026
+- **Descontinuación de Subdirector:** El rol de 'Subdirector' queda DESCONTINUADO DE FORMA DEFINITIVA. Sus funciones comerciales y de supervisión son absorbidas en su totalidad por el Gerente de Sede.
+- **Estructura Directiva Global de CREAR PODER SIN LÍMITES:**
+  * **CEO Global:** Fer Aragon (visión corporativa y expansión multinacional).
+  * **CCO Global (Operaciones y Sala):** Paul Sosa (operaciones globales, dinámicas de sala, El Viaje y cultura).
+  * **Jefa Financiera Global (CFO):** Nancy Elizabeth Escobar Pérez / Elizabeth Escobar (auditoría contable, conciliación y control fiscal global).
+- **Los 9 Niveles de Excelencia:**
+  1. **Aliado (Nivel 1 - Logística Invisible y Espejo de Responsabilidad):** Dueño de la logística invisible. Proporción obligatoria: 1 aliado por cada 6 participantes. Foco: Ser Relación viernes y sábado, y Llamado a la Acción Extraordinario el domingo. Son graduados de Maestría seleccionados por la oficina, NUNCA por el Capitán.
+  2. **Mánager en Maestría (Nivel 2 - Líder de Acompañamiento):** Acompañamiento profundo de 90 días a máximo 6 participantes. No se traduce como 'gerente'. Declaración formal el domingo de C2.
+  3. **Capitán (Nivel 3 - Termómetro Energético):** Termómetro energético del salón. Supervisa guía telefónica y compromisos L/M/V. Nota: los aliados son seleccionados por la oficina, nunca por el Capitán.
+  4. **Quantum Team / QT (Nivel 4 - Operaciones Especiales y Sombras):** Mánagers graduados con mínimo 60% de efectividad comercial. Entrenan llamadas de Futuros Imposibles. 1 QT Senior por sede reporta a CMJ y Gerente.
+  5. **Coordinador C1 y C2 / CC1Y2 (Nivel 5 - Soporte Básico Unificado):** Rol unificado. Montaje de sala, baúles, mesa de registro y contabilidad local. Domingo C1 enfocado en capturar pagos de conversión.
+  6. **Coordinador de Maestría del Juego / CMJ (Nivel 6 - Soporte Avanzado):** Guardián de los 90 días, recluta mánagers y audita predictivamente los Futuros Imposibles (FI) en Nodus los miércoles antes de las 19:00 PM.
+  7. **Entrenador / Coach (Nivel 7 - Autoridad Contextual):** Voz de la transformación en salón y máxima autoridad contextual.
+  8. **Gerente de Sede (Nivel 8 - Dirección y Supervisión Local):** Rentabilidad, presupuesto, supervisión de Nodus, absorbe funciones del extinto subdirector, aprueba convenios de pago con firma física.
+  9. **Equipo de Oficina (Nivel 9 - Back-Office):** Asistente contable, facturación y soporte administrativo.
+
+### 14.3 Protocolo de Impecabilidad Visual (Códigos de Vestimenta 2026)
+- **Entrenador / Coach:** Estándar de Elegancia Negra Total (camiseta, camisa o saco de etiqueta negra sin estampados). **Zapatillas deportivas (tenis) de color negro absoluto TOTALMENTE PERMITIDAS** para priorizar la comodidad física y sostener la energía en sala durante jornadas prolongadas.
+- **Aliados:** Viernes: camisa/blusa negra de botones lisa, jean azul índigo liso, calzado cómodo limpio, abrigo negro. Sábado: polo azul índigo o negro de sede y jean negro. Domingo: polo de color del equipo (C2) o azul de sede (C1) y jean azul o negro.
+- **Capitanes:** Formal etiqueta negra jueves y viernes. Sábado: polo negro. Domingo: polo azul sede.
+- **Quantum Team (QT):** Viernes: camisa blanca y jean azul. Sábado: polo plomo/gris QT y jean negro. Domingo: polo azul QT y jean negro.
+- **Mánagers:** Viernes: traje sastre formal negro. Sábado: polo negro de equipo. Domingo: polo azul o de equipo.
+- **Oficina:** Jueves y viernes etiqueta negra formal. Sáb/Dom polos oficiales y pantalón negro. Diario formal sobrio.
+
+### 14.4 SOP Operativo del CMJ, Fines de Semana y "El Viaje" (FDS 4)
+- **Ritmo Semanal:** Lunes contable en Nodus; Martes seguimiento FI; Miércoles deadline de oro 19:00 PM en Nodus para cargar revisión de FI (dispara alerta roja si se omite) y Grounding virtual 19:00 a 20:00 PM.
+- **Jueves:** 15:00 PM montaje sala con altura mínima de 4.5m (para Caída de Confianza); 16:30 grounding mánagers; 17:00 auditoría física de FI; 18:00 grounding presencial Aliados C1 (cero tolerancia, puertas cerradas).
+- **Viernes:** 15:30 verificación sala; 16:00 grounding mánagers; 16:30 grounding entrenador/CMJ; 18:00 apertura; 19:00 cierre absoluto de compuertas logísticas. Noche de Confianza C1 a las 22:00 PM con tinas, agua templada con resistencias eléctricas, cremas y frutas.
+- **Sábado y Domingo:** Apertura 08:00 AM, reportes de asistencia 11:00 AM, abonos 15:00 PM. Domingo FDS 1: firma de FI; FDS 2: relación; FDS 3: graduación, medallas y diplomas. 21:00 PM cierre POS. Celebración Juego Ganado únicamente con pizza, globos y luces (mariachis prohibidos).
+- **Fin de Semana 4: "El Viaje" (Paul Sosa):** Viernes 18:15 PM auditoría baúl (24 velas eléctricas, teteras, resistencias, 5 tinas, 5 jarras, cremas); 18:30 grounding ángeles de vuelo; 19:40 retiro celulares en baúl con llave y vendados al salón. Sábado 07:00 traslado a hostería, desayuno mánagers con Coach 07:30, inicio 09:20, almuerzo 14:00 (premios Estandarte, SAI y Antorcha al mánager con mayor enrolamiento). Domingo 09:00 visiones a 10, 5 y 1 año con Ticket Dorado; 18:00 Pase de Antorcha ingresando a sala de C1 con sigilo.
+
+### 14.5 Catálogo de 14 KPIs Reales en Nodus
+- **KPI-C1-001 Asistencia de Apertura (Día 1 C1):** Meta 95%. Escaneo QR en Mesa. Deadline: Viernes 11:30 AM.
+- **KPI-C1-002 Retención del Fin de Semana (C1):** Meta > 90%. Marcación Check-out. Deadline: Domingo 19:00 PM.
+- **KPI-C1-003 Conversión C1 a C2 (PP%):** Meta 50% (52% reto). Registro Pagos Nodus. Deadline: Domingo 21:00 PM.
+- **KPI-C2-001 Asistencia de Arranque C2:** Meta 95%. Escaneo QR y Gafete. Deadline: Jueves 15:30 PM.
+- **KPI-C2-002 Declaración en Breakthrough:** Meta 90%. Conteo Físico. Deadline: Jueves 21:30 PM.
+- **KPI-C2-003 Tasa de Palabras Rotas:** Meta < 5%. Cruce Declarantes vs Caja. Deadline: Viernes 14:01 PM.
+- **KPI-C2-004 Conversión C2 a MJ (PP%):** Meta 70% (93% reto). Registro Pagos Nodus. Deadline: Domingo 19:00 PM.
+- **KPI-MJ-001 Graduados Invitados 'El Viaje':** Meta 90%. Actas Acreditación. Deadline: Domingo FDS 3 21:00 PM.
+- **KPI-MJ-002 Sentados por FDS:** Meta 70 Lima / 55 Medellín. Escaneo QR. Deadline: Viernes 19:00 PM.
+- **KPI-MJ-003 Tasa de Deserción Inter-FDS:** Meta < 5%. Check-in Consolidado. Deadline: Sábado 11:30 AM.
+- **KPI-MJ-004 Efectividad Enrolamiento Mánagers:** Meta 90%. Cruce Invitados vs Asistencia. Deadline: Sábado 11:30 AM.
+- **KPI-MJ-005 Avance de Futuros Imposibles (FI):** Meta 100%. Módulo FI Nodus. Deadline: Martes 15:00 PM.
+- **KPI-MJ-006 Firma 28 Entrenamientos Sustentables:** Meta 100%. Carga Documentos Nodus. Deadline: Domingo FDS 1 21:00 PM.
+- **KPI-MJ-007 Conversión de Graduados a Aliados:** Meta > 40%. Registro Staff Nodus. Deadline: Domingo FDS 3 21:00 PM.
+
+### 14.6 Triggers Técnicos Autónomos Backend Nodus
+1. **Trigger de Palabra Rota (Viernes C2 14:01 PM):** Si declaró Breakthrough el jueves y no tiene Ticket Verde conciliado en caja a las 14:00 PM, se activa Status_Palabra_Rota, se bloquea el código QR de acceso y se alerta a Causa OS para retención de gafete.
+2. **Trigger Alerta de Deserción de Mánagers (Miércoles pre-MJ 19:00 PM):** Si el campo de revisión de FI de los mánagers está vacío a las 19:00 PM, alerta roja al Gerente por riesgo de deserción > 40%.
+3. **Trigger de Impecabilidad Contable (Lunes 12:00 PM):** Valida conciliación completa de caja FDS (Nodus vs fichas físicas vs depósitos). Si no está cerrada, escala alerta disciplinaria de Nivel 2.
+
+### 14.7 Las 10 Palancas de Experiencia del Cliente (PX) y Filosofía Rick Rubin
+1. Seguridad psicológica en sala. 2. Participante como héroe (StoryBrand). 3. Reducción de esfuerzo de registro (Hormozi). 4. Alerta preventiva de integridad viernes 12:00 PM. 5. Impecabilidad del contenedor físico basura cero (Rubin). 6. Sostenimiento del Sistema Buddy. 7. Coaching ético sin manipulación. 8. Simplificación de tareas FI. 9. Llamadas de mánagers sin drama basadas en datos Nodus. 10. Ceremonial del Pase de Antorcha.
+Filosofía Rick Rubin: El Arte como Estado del Ser; Disciplina militar para liberar la magia cuántica; Mente de principiante (flexibilidad como autorizar zapatillas negras para el Coach); Mentalidad de abundancia; y La búsqueda de la Opción C frente a quiebres.
+
+---
 *Este documento constituye la hoja de ruta y manual de reingeniería de Crear Poder Sin Límites.*
-*Elaborado el 22 de Agosto de 2026. Clasificación: CONFIDENCIAL - EXCLUSIVO DIRECCIÓN REGIONAL.*
+*Edición Oficial Integrada: Septiembre 2026. Clasificación: CONFIDENCIAL - EXCLUSIVO DIRECCIÓN REGIONAL Y SALA.*
 
 `;
+

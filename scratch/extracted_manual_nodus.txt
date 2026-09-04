@@ -1,0 +1,1485 @@
+=== PAGE 1 ===
+CREAR PODER SIN LÍMITES
+MANUAL OFICIAL DE
+USUARIO
+PLATAFORMA NODUS
+Guía Técnica y Operativa Paso a Paso para el Personal de
+Sede y Registro
+SISTEMA: Plataforma Web NODUS (Gestión Operativa
+de Eventos)
+PORTAL OFICIAL: https://imo.crearpslglobal.com/
+EMPRESA: CREAR PODER SIN LÍMITES
+EDICIÓN: Edición 2026 — Manual Integral de
+Operaciones
+PÚBLICO: Personal de Mesa de Registro, Operadores
+de Sistema, Encargados de Caja,
+Coordinadores de Sede y Gerentes.
+MÉTODO DE ACCESO: Credenciales Directas (Nombre de Usuario y
+Contraseña Personal).
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 1 de 52
+
+=== PAGE 2 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 2MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+GUÍA EXCLUSIVA DE LA PLATAFORMA NODUS
+Este manual está enfocado exclusivamente en las funciones, pantallas,
+botones y procedimientos reales del software NODUS. Está diseñado
+para capacitar de forma sencilla y directa a cualquier colaborador que
+deba operar el sistema en sedes o eventos.
+CREAR PODER SIN LÍMITES © 2026. Manual de uso interno para el personal autorizado.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 2 de 52
+
+=== PAGE 3 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 3MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+ÍNDICE GENERAL Y NAVEGACIÓN
+RÁPIDA
+Utiliza este índice para localizar de inmediato el módulo o procedimiento que
+necesitas ejecutar en NODUS:
+CONVENCIONES VISUALES UTILIZADAS EN ESTE MANUAL
+Símbolo Tipo de Mensaje Instrucción Operativa
+💡 CONSEJO
+PRÁCTICO
+Recomendación rápida para agilizar tu
+trabajo o evitar demoras en el sistema.
+⚠ PRECAUCIÓN Verifica los datos antes de hacer clic para
+evitar errores de digitación.
+❌ ERROR COMÚN Acción que genera bloqueos o
+descuadres en el sistema; no debe
+realizarse.
+✅ COMPROBACIÓN Punto de control para confirmar que el
+registro se guardó correctamente.
+Estructura del Manual por Capítulos
+CAPÍTULO 1: INTRODUCCIÓN A LA PLATAFORMA NODUS Pág. 4
+CAPÍTULO 2: ACCESO Y SEGURIDAD (USUARIO Y CONTRASEÑA) Pág. 7
+CAPÍTULO 3: PERFILES Y MENÚS DE USUARIO EN NODUS Pág. 10
+CAPÍTULO 4: EL DASHBOARD PRINCIPAL Y NAVEGACIÓN Pág. 14
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 3 de 52
+
+=== PAGE 4 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 4MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+CAPÍTULO 5: MÓDULO DE MESA DE REGISTRO EN VIVO Pág. 18
+CAPÍTULO 6: GESTIÓN DE PARTICIPANTES (ALTAS Y LISTADOS) Pág. 24
+CAPÍTULO 7: CONTABILIDAD, PAGOS Y FORMAS DE COBRO Pág. 29
+CAPÍTULO 8: CIERRE Y ARQUEO DIARIO DE CAJA Pág. 34
+CAPÍTULO 9: MÓDULO DE REPORTES Y RENDIMIENTO Pág. 38
+CAPÍTULO 10: EQUIPOS, COHORTES Y ASIGNACIONES Pág. 43
+CAPÍTULO 11: CONFIGURACIÓN GENERAL DEL SISTEMA Pág. 47
+CAPÍTULO 12: GUÍA DE OPERACIÓN EL FIN DE SEMANA Pág. 50
+CAPÍTULO 13: SOLUCIÓN A ERRORES FRECUENTES EN PANTALLA Pág. 54
+CAPÍTULO 14: BANCO DE PREGUNTAS FRECUENTES (FAQ) Pág. 58
+CAPÍTULO 15: GLOSARIO DE TÉRMINOS Y CAMPOS DE NODUS Pág. 61
+CAPÍTULO 16: LISTAS DE COTEJO POR PUESTO DE TRABAJO Pág. 63
+CAPÍTULO 17: FLUJOS OPERATIVOS PASO A PASO Pág. 65
+CAPÍTULO 18: EJERCICIOS DE ENTRENAMIENTO Y EVALUACIÓN Pág. 68
+ANEXOS: CONTACTOS DE SOPORTE Y CONTROL DE CAMBIOS Pág. 71
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 4 de 52
+
+=== PAGE 5 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 5MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+CAPÍTULO 1: INTRODUCCIÓN A LA
+PLATAFORMA NODUS
+1.1 ¿Qué es NODUS?
+NODUS es el sistema de gestión operativa y control administrativo desarrollado
+específicamente para las actividades de CREAR PODER SIN LÍMITES. Su portal
+web se encuentra en la dirección central:
+https://imo.crearpslglobal.com/.
+El propósito de NODUS es centralizar en una sola plataforma todo lo que
+ocurre antes, durante y después de los eventos de la empresa:
+Registro de Participantes: Guarda los datos personales, documentos de
+identidad, teléfonos y correos de cada asistente.
+Mesa de Registro en Puerta: Permite buscar participantes por su DNI o
+nombre al momento de ingresar al salón, validar si su pago está completo y
+marcarlos como "En Sala".
+Cobranzas y Caja: Lleva el control de pagos en efectivo, transferencias
+bancarias o tarjetas, permitiendo realizar el arqueo de caja con precisión.
+Reportes Operativos: Presenta métricas de participantes activos,
+declaraciones y deserción durante el fin de semana.
+1.2 ¿Por qué es fundamental usar NODUS en cada
+sede?
+Anteriormente, el uso de hojas impresas o planillas de cálculo sueltas generaba
+extravío de comprobantes, demoras en las filas de registro y discrepancias en
+los cierres de caja. Con NODUS:
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 5 de 52
+
+=== PAGE 6 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 6MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+1. Cada pago tiene respaldo: El sistema asocia cada comprobante o recibo al
+DNI exacto del participante.
+2. Rapidez en puerta: El personal de registro solo escribe el DNI y en 3
+segundos confirma si el participante puede ingresar y recibir su gafete.
+3. Transparencia para la Gerencia: El Gerente y el equipo administrativo
+pueden monitorear desde su panel cuántas personas han ingresado y
+cuánto dinero ha entrado a caja en tiempo real.
+1.3 Requisitos Técnicos para Utilizar NODUS
+NODUS es un sistema web ligero que no requiere instalaciones complicadas.
+Para trabajar sin interrupciones, el equipo debe verificar lo siguiente:
+Elemento
+Técnico
+Requisito
+Obligatorio
+Observación Práctica
+Navegador
+Web
+Google Chrome
+(actualizado)
+Es el navegador optimizado para el
+sistema. También funciona en Edge y
+Firefox.
+Conexión a
+Internet
+Banda ancha o datos
+móviles (mínimo 5
+Mbps)
+En eventos masivos, se recomienda
+tener una conexión por cable o
+módem portátil 4G de respaldo.
+Equipo de
+Cómputo
+Laptop o
+Computadora de
+Escritorio
+Obligatorio para Mesa de Registro y
+Caja. Se aconseja teclado numérico
+para digitar DNIs rápidamente.
+Credenciales Usuario y Contraseña
+entregados por la
+oficina
+Cada operador debe tener su propio
+usuario personal asignado.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 6 de 52
+
+=== PAGE 7 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 7MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+🧭  SI TE SIENTES PERDIDO EN ESTE CAPÍTULO:
+Recuerda: NODUS es simplemente el cuaderno digital donde
+registramos a las personas que asisten y los pagos que realizan en
+CREAR PODER SIN LÍMITES. Si sabes ingresar a una página web y escribir
+en un buscador, podrás dominar NODUS fácilmente.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 7 de 52
+
+=== PAGE 8 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 8MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+CAPÍTULO 2: ACCESO Y SEGURIDAD EN
+NODUS
+2.1 Procedimiento de Inicio de Sesión Oficial
+Para ingresar a NODUS, cada usuario utiliza su Nombre de Usuario y su
+Contraseña personal asignada por el área administrativa. No se requieren
+correos externos ni servicios de terceros.
+Figura 2.1: Pantalla de Acceso a NODUS (Usuario y Contraseña).
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 8 de 52
+
+=== PAGE 9 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 9MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+1 Abrir la Dirección Web de NODUS
+QUÉ VERÁS EN TU PANTALLA:
+El formulario de acceso central con el logotipo de la empresa y dos
+campos de texto: Usuario y Contraseña.
+QUÉ DEBES HACER:
+Abre Google Chrome y escribe en la barra de direcciones:
+https://imo.crearpslglobal.com/ y presiona Enter.
+QUÉ PASA SI LA PÁGINA NO CARGA:
+Comprueba tu conexión a internet. Si tienes conexión, presiona Ctrl +
+F5 para refrescar la página.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 9 de 52
+
+=== PAGE 10 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 10MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+2 Ingresar tu Nombre de Usuario y Contraseña
+QUÉ VERÁS:
+El cursor titilando en la primera casilla de texto.
+QUÉ DEBES HACER:
+Escribe tu nombre de usuario asignado (ejemplo: jsanchez) en el
+primer campo. Luego haz clic en el segundo campo e ingresa tu
+contraseña. Finalmente haz clic en el botón azul
+INGRESAR
+.
+QUÉ PASA SI SALE "USUARIO O CONTRASEÑA INCORRECTA":
+Revisa que no tengas activada la tecla de mayúsculas (Bloq Mayús). Si
+continúas sin poder entrar, pide al Gerente o Administrador de tu sede
+que verifique tu contraseña en el módulo de usuarios.
+2.2 Cierre Seguro de Sesión al Concluir el Turno
+Por seguridad de los datos de la empresa y de los participantes, cuando
+termines tu turno o te levantes de la computadora de registro, debes cerrar
+sesión formalmente:
+1. Dirige el cursor a la esquina superior derecha donde aparece tu nombre de
+usuario.
+2. Haz clic sobre tu nombre o en el ícono de salida.
+3. Selecciona "Cerrar Sesión".
+4. Verifica que la pantalla vuelva al formulario de inicio de sesión de la Figura
+2.1.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 10 de 52
+
+=== PAGE 11 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 11MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+CAPÍTULO 3: PERFILES Y MENÚS DE
+USUARIO EN NODUS
+3.1 Tipos de Usuarios en la Plataforma
+En NODUS, cada colaborador tiene asignado un perfil según las tareas que
+realiza en su sede. De este modo, la pantalla de cada persona muestra
+exactamente las opciones que necesita para trabajar:
+Perfil en
+NODUS
+Módulos Visibles en el
+Menú
+Responsabilidad Principal
+Operador de
+Mesa de
+Registro
+Mesa de Registro, Listado
+de Participantes.
+Buscar a los participantes por
+DNI al llegar a la sede, validar
+si están pagados y marcarlos
+como asistentes en sala.
+Encargado de
+Caja /
+Contabilidad
+Mesa de Registro,
+Contabilidad, Cierre de
+Caja, Reportes de Pago.
+Recibir pagos pendientes,
+emitir comprobantes, registrar
+transferencias bancarias y
+cuadrar la caja al final del día.
+Coordinador de
+Evento
+Dashboard, Mesa de
+Registro, Participantes,
+Reportes de Asistencia.
+Supervisar la afluencia de sala,
+coordinar entrega de gafetes y
+monitorear la lista de
+asistentes.
+Gerente de Sede
+/ Administrador
+Acceso total (Dashboard,
+Registro, Participantes,
+Contabilidad, Cierre de
+Caja, Reportes,
+Configuración y Usuarios).
+Apertura y cierre de eventos,
+auditoría contable, creación de
+usuarios, configuración de
+sedes y supervisión global.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 11 de 52
+
+=== PAGE 12 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 12MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+⚠  IMPORTANTE SOBRE TUS PERMISOS
+Si al entrar a NODUS no ves un botón o módulo que necesitas para trabajar
+(por ejemplo, el módulo de Cierre de Caja), significa que tu usuario tiene un
+perfil limitado. Solicita a tu Gerente de Sede que ajuste los permisos de tu
+cuenta en la sección de Configuración → Usuarios.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 12 de 52
+
+=== PAGE 13 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 13MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+CAPÍTULO 4: EL DASHBOARD PRINCIPAL
+Y NAVEGACIÓN
+4.1 Descripción del Dashboard
+El Dashboard es el panel central de control de NODUS. Al iniciar sesión con tu
+usuario y contraseña, el sistema te muestra un resumen visual de la operación
+actual:
+Figura 4.1: Vista del Dashboard Principal de la plataforma NODUS.
+4.2 Elementos de la Pantalla Principal
+Elemento en
+Pantalla
+Ubicación Función Operativa
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 13 de 52
+
+=== PAGE 14 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 14MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+Barra Lateral
+Izquierda
+(Menú)
+Costado
+izquierdo
+Contiene los accesos a todos los módulos:
+Dashboard, Mesa Registro, Participantes,
+Contabilidad, Cierre de Caja, Reportes y
+Configuración.
+Contadores de
+Resumen
+Parte superior
+central
+Tarjetas numéricas que muestran
+rápidamente la cantidad de entrenadores,
+eventos activos, participantes registrados y
+sedes operando.
+Barra de
+Usuario y Sede
+Esquina
+superior
+derecha
+Muestra el nombre del usuario conectado
+(ejemplo: jsanchez) y el botón para cerrar
+sesión.
+4.3 Lectura de Indicadores en Tiempo Real
+Durante los días de evento, el Dashboard actualiza automáticamente los
+contadores de asistencia conforme el personal de mesa marca a los asistentes:
+Inscritos Totales: Suma general de personas registradas en la base de datos
+para la cohorte.
+Presentes en Sala: Personas que ya cruzaron la puerta física y recibieron su
+material.
+Pendientes de Llegada: Alumnos que aún no se presentan en el vestíbulo,
+permitiendo al equipo de logística realizar llamadas de confirmación si el
+inicio de sala está próximo.
+💡  NAVEGACIÓN RÁPIDA
+Para volver al inicio desde cualquier parte de NODUS, simplemente haz clic
+sobre la opción "Dashboard" o en el logotipo de la empresa en la esquina
+superior izquierda.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 14 de 52
+
+=== PAGE 15 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 15MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+CAPÍTULO 5: MÓDULO DE MESA DE
+REGISTRO EN VIVO
+5.1 Propósito de la Mesa de Registro
+La Mesa de Registro es la herramienta de mayor uso durante los días de
+evento. Se utiliza en el vestíbulo o puerta de entrada para recibir a los
+participantes, verificar que estén al día en sus pagos y marcarlos formalmente
+como asistentes en sala.
+Figura 5.1: Pantalla Operativa de la Mesa de Registro en NODUS.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 15 de 52
+
+=== PAGE 16 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 16MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+5.2 Paso a Paso para Registrar a un Participante en
+Puerta
+1 Buscar al Participante en el Sistema
+QUÉ VERÁS EN TU PANTALLA:
+La tabla general de la Mesa de Registro con la barra de búsqueda en la
+parte superior.
+QUÉ DEBES HACER:
+Pídele su documento de identidad (DNI, Cédula o Pasaporte) al
+participante. Escribe el número en la casilla de búsqueda y presiona
+Enter.
+QUÉ PASA SI NO APARECE CON EL NÚMERO:
+Borra el número y escribe únicamente su primer apellido en la casilla de
+búsqueda para ubicarlo manualmente.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 16 de 52
+
+=== PAGE 17 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 17MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+2 Verificar el Estado de Pago
+QUÉ VERÁS:
+En la fila del participante se indica el monto pagado y el estado:
+"Completo" o "Pendiente".
+QUÉ DEBES HACER:
+Si el estado está en
+COMPLETO
+, continúa al Paso 3. Si tiene saldo pendiente, solicítale su comprobante
+de pago o envíalo a la mesa de cobranza con el encargado de caja.
+QUÉ PASA SI EL PARTICIPANTE DICE QUE YA PAGÓ PERO SALE
+PENDIENTE:
+Haz clic en la opción de ver detalles para comprobar si su comprobante
+está en revisión por contabilidad antes de denegarle el acceso.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 17 de 52
+
+=== PAGE 18 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 18MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+3 Marcar en Sala y Entregar Gafete
+QUÉ VERÁS:
+El botón o casilla de verificación de
+"ASISTENCIA / EN SALA"
+.
+QUÉ DEBES HACER:
+Haz clic en
+"MARCAR EN SALA"
+. El estado cambiará inmediatamente y el participante quedará
+contabilizado como Sentado. Entrégale su gafete oficial y material de
+bienvenida.
+QUÉ PASA SI MARCASTE POR ERROR A OTRO PARTICIPANTE:
+Vuelve a buscar el registro por DNI, haz clic en el registro y desmarca la
+casilla de asistencia para corregir el conteo.
+5.3 Casos Especiales en la Mesa de Registro
+Durante la atención en puerta se presentan situaciones no estándar que deben
+resolverse con calma siguiendo estos protocolos:
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 18 de 52
+
+=== PAGE 19 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 19MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+A Caso 1: Participante Inscrito a Última Hora (Walk-in)
+SITUACIÓN:
+Una persona llega a la mesa afirmando que se inscribió hoy mismo por
+la tarde y no figura en la lista precargada.
+PROTOCOLO EN NODUS:
+1. Pídele su comprobante de pago o transferencia.
+2. Dirígete a Participantes → Nuevo Participante.
+3. Registra sus nombres, DNI, teléfono y correo.
+4. Pasa a Contabilidad → Registrar Pago y anota el cobro.
+5. Regresa a la Mesa de Registro y márcalo como asistente entregándole
+un gafete provisional.
+B Caso 2: Participante Extranjero con Pasaporte
+SITUACIÓN:
+El participante no cuenta con DNI nacional y presenta pasaporte o
+cédula de otro país.
+PROTOCOLO EN NODUS:
+En la casilla de búsqueda, escribe la serie alfanumérica de su pasaporte
+tal como fue registrada en su ficha original. Si no aparece, búscalo por
+su apellido materno o paterno.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 19 de 52
+
+=== PAGE 20 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 20MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+C Caso 3: Traslado de Sede Autorizado
+SITUACIÓN:
+El participante estaba originalmente registrado para otra sede pero
+solicitó cursar el entrenamiento en la sede actual.
+PROTOCOLO EN NODUS:
+El Gerente de Sede debe ingresar a Participantes, buscar al alumno en el
+listado general y modificar el campo
+SEDE ASIGNADA
+seleccionando la sede actual. Una vez guardado, el alumno aparecerá en
+la Mesa de Registro local.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 20 de 52
+
+=== PAGE 21 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 21MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+CAPÍTULO 6: GESTIÓN DE
+PARTICIPANTES (ALTAS Y LISTADOS)
+6.1 Módulo General de Participantes
+En el módulo de Participantes se administra la base de datos completa de las
+personas inscritas en los programas de la sede.
+Figura 6.1: Lista General y Administración de Participantes en NODUS.
+6.2 Cómo Registrar a un Nuevo Participante
+1. Haz clic en el menú lateral en "Participantes".
+2. Presiona el botón superior "Nuevo Participante".
+3. Completa los campos obligatorios del formulario:
+Tipo y Número de Documento (DNI/Cédula): Campo esencial para
+identificar al alumno.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 21 de 52
+
+=== PAGE 22 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 22MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+Nombres y Apellidos Completos: Escribir tal como figura en su
+documento para la emisión de certificados.
+Teléfono / WhatsApp: Con código de área para enviar recordatorios y
+enlaces.
+Correo Electrónico: Para confirmaciones y recibos.
+Sede y Entrenamiento: Seleccionar la sede (ej. Lima) y el evento
+correspondiente.
+4. Haz clic en el botón "Guardar". El sistema generará el registro del
+participante inmediatamente.
+6.3 Edición y Actualización de Fichas de Alumnos
+Si un participante cambia de número telefónico o se detecta una falta de
+ortografía en sus apellidos:
+1. Busca al participante en la lista general.
+2. Haz clic en el ícono de lápiz o botón "Editar" al costado derecho de su fila.
+3. Corrige los datos necesarios en el formulario.
+4. Haz clic en "Actualizar Datos" para que los cambios se reflejen en los
+reportes y certificados.
+6.4 Exportación de Listas a Excel
+Para imprimir listas de respaldo o realizar controles físicos en puerta:
+Aplica los filtros de Sede y Evento en la parte superior de la tabla.
+Haz clic en el botón "Exportar a Excel".
+El archivo se descargará en tu computadora en formato .xlsx listo para
+imprimir.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 22 de 52
+
+=== PAGE 23 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 23MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+CAPÍTULO 7: CONTABILIDAD, PAGOS Y
+FORMAS DE COBRO
+7.1 Descripción del Módulo Contable
+El módulo de Contabilidad de NODUS permite asentar todos los ingresos
+económicos percibidos por inscripciones, abonos parciales y liquidaciones en
+sala.
+Figura 7.1: Interfaz de Gestión de Pagos y Contabilidad en NODUS.
+7.2 Formas de Pago Admitidas en el Sistema
+Forma de Pago Campo Obligatorio en
+NODUS
+Acción de Respaldo
+Efectivo Monto exacto recibido
+en moneda local.
+Guardar el dinero en el sobre/caja
+física y emitir recibo numerado.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 23 de 52
+
+=== PAGE 24 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 24MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+Transferencia
+Bancaria
+Número de Operación
+bancaria y Banco de
+origen.
+Verificar que la transferencia esté
+acreditada en la cuenta oficial
+antes de validar.
+Tarjeta (POS /
+Terminal)
+Número de lote y
+referencia del voucher.
+Grapar el voucher del POS a la
+ficha del participante.
+7.3 Procedimiento para Asentar un Pago
+1. Ingresa al menú lateral en "Contabilidad" → "Registrar Pago".
+2. Busca al participante ingresando su número de documento (DNI).
+3. Selecciona el tipo de pago (Total o Abono Parcial).
+4. Elige la forma de pago (Efectivo, Transferencia o Tarjeta).
+5. Escribe el número de comprobante o número de operación bancaria.
+6. Presiona "Guardar Pago". El saldo del participante se actualizará
+inmediatamente en la Mesa de Registro.
+7.4 Registro de Gastos y Egresos Menores de Sala (Caja
+Chica)
+Durante los eventos surgen gastos menores de emergencia (compra de botellas
+de agua, café, rotuladores adicionales para pizarras o fotocopias de último
+minuto). Para que la caja cuadre perfectamente, estos desembolsos deben
+registrarse en NODUS:
+Dirígete a Contabilidad → Registro de Gastos / Egresos.
+Selecciona el concepto del gasto (Materiales de Sala, Refrigerios, Movilidad
+o Varios).
+Ingresa el monto exacto retirado de la caja física de efectivo.
+Escribe el número de boleta o comprobante de compra física.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 24 de 52
+
+=== PAGE 25 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 25MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+Guarda el comprobante físico dentro del sobre de caja. Al realizar el cierre
+nocturno, el sistema restará automáticamente estos gastos del efectivo total.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 25 de 52
+
+=== PAGE 26 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 26MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+CAPÍTULO 8: CIERRE Y ARQUEO DIARIO
+DE CAJA
+8.1 Importancia del Cierre de Caja
+Al finalizar cada jornada de registro (especialmente el viernes en la noche tras el
+ingreso a sala), el personal de caja y la coordinación deben realizar el Cierre de
+Caja en NODUS para cuadrar el dinero físico contra las transacciones
+registradas.
+Figura 8.1: Pantalla de Arqueo y Cierre de Caja en NODUS.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 26 de 52
+
+=== PAGE 27 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 27MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+8.2 Pasos para Realizar el Cuadre y Arqueo
+1 Abrir el Módulo Cierre de Caja
+QUÉ VERÁS:
+El resumen diario con el desglose de ingresos por Efectivo,
+Transferencias y Tarjetas del día seleccionado.
+QUÉ DEBES HACER:
+Haz clic en
+"CIERRE DE CAJA"
+en el menú lateral. Selecciona la fecha de hoy y la sede correspondiente.
+QUÉ PASA SI FALTAN PAGOS:
+Revisa con el personal de mesa si quedó algún pago recibido sin
+registrar en el módulo de Contabilidad.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 27 de 52
+
+=== PAGE 28 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 28MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+2 Contar el Dinero Físico (Planilla de Arqueo)
+QUÉ VERÁS:
+La casilla de "Total Efectivo Esperado" calculada por NODUS.
+QUÉ DEBES HACER:
+Cuenta todos los billetes y monedas recolectados en la mesa. Puedes
+desglosar el conteo por denominaciones en la planilla física de apoyo
+antes de escribir la cifra final en el campo "Efectivo Real en Caja".
+QUÉ PASA SI HAY DIFERENCIA:
+Si hay sobrante o faltante, el sistema lo indicará. Escribe en el campo
+"Observaciones" la justificación de la diferencia antes de cerrar.
+3 Finalizar y Bloquear Caja del Día
+QUÉ VERÁS:
+El botón de confirmación
+"CERRAR CAJA OFICIALMENTE"
+.
+QUÉ DEBES HACER:
+Presiona el botón para generar el acta de cierre. Una vez cerrada la caja,
+los registros de ese día quedan bloqueados para evitar alteraciones.
+QUÉ PASA SI NECESITAS REABRIR:
+Solo el Gerente de Sede o el Administrador general tienen permiso para
+desbloquear una caja cerrada.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 28 de 52
+
+=== PAGE 29 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 29MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+CAPÍTULO 9: MÓDULO DE REPORTES Y
+RENDIMIENTO
+9.1 Tipos de Reportes en NODUS
+El módulo de Reportes permite consultar la información consolidada de
+asistencia, cobros y desempeño de los equipos en entrenamiento.
+Figura 9.1: Centro de Reportes y Estadísticas de NODUS.
+9.2 El "Reporte de Entrenadores" Explicado
+Uno de los reportes más consultados en la plataforma es el Reporte de
+Entrenadores y Maestrías:
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 29 de 52
+
+=== PAGE 30 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 30MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+Figura 9.2: Tabla del Reporte de Entrenadores en NODUS.
+Columna del
+Reporte
+¿Qué representa en la
+realidad?
+Acción Operativa
+TIPO IMO / DNI Identificador del rol (Capitán,
+Manager, Participante) o el
+número de documento de
+identidad del alumno.
+Permite auditar el
+rendimiento por bloque o
+buscar a una persona
+específica.
+PARTICIPANTES
+EN JUEGO
+Cantidad de personas activas en
+sala o nombre completo del
+participante.
+Verifica cuántos alumnos
+siguen asistiendo al
+proceso.
+DECLARACIÓN La meta numérica de personas
+que el líder o participante se
+comprometió a enrolar.
+Sirve como punto de
+comparación contra el
+resultado real.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 30 de 52
+
+=== PAGE 31 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 31MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+TOTAL
+ENROLADOS
+Número real de personas
+nuevas registradas y pagadas
+en el sistema.
+Métrica de cierre
+comercial. Si está en 0, no
+se han registrado cobros
+asociados.
+DESERTOR FDS Cantidad de alumnos que
+abandonaron el entrenamiento
+durante el fin de semana.
+Alerta de fuga de
+participantes. Debe
+reportarse a coordinación
+de inmediato.
+9.3 Cómo Auditar la Brecha entre Enrolados y Sentados
+Una de las funciones más valiosas para la Gerencia es cruzar los datos del
+Reporte de Entrenadores con la Mesa de Registro:
+Enrolados: Muestra cuántas personas han pagado su inscripción en el
+sistema.
+Sentados: Muestra cuántas personas fueron efectivamente marcadas con el
+botón "Marcar en Sala" el viernes por la noche.
+La Brecha (No-Show): Si un equipo reporta 15 enrolados pero en sala solo
+hay 8 sentados, la coordinación debe comunicarse con los 7 participantes
+ausentes para conocer el motivo de su inasistencia y coordinar su ingreso en
+la cohorte inmediata.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 31 de 52
+
+=== PAGE 32 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 32MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+CAPÍTULO 10: EQUIPOS, COHORTES Y
+ASIGNACIONES
+10.1 Gestión de Equipos en NODUS
+En el módulo de Equipos y Maestrías se estructuran las cohortes de cada sede
+(por ejemplo: Equipos 27, 28 y 29 de Lima):
+Creación de Cohortes: Define el número de equipo, sede a la que
+pertenece y fechas de inicio y graduación.
+Asignación de Entrenadores: Asocia al entrenador oficial responsable de
+dictar el proceso.
+Distribución de Alumnos: Asigna a cada participante nuevo a su cohorte y
+equipo para que sus asistencias y pagos sumen a la estadística correcta.
+💡  BUENA PRÁCTICA
+Asegúrate de que cada participante esté asignado a su cohorte antes del
+viernes de registro. Si un alumno no tiene equipo asignado, no aparecerá en
+el reporte de entrenadores de su sede.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 32 de 52
+
+=== PAGE 33 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 33MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+CAPÍTULO 11: CONFIGURACIÓN GENERAL
+DEL SISTEMA
+11.1 Módulo de Configuración
+El módulo de Configuración de NODUS es accesible principalmente para
+Gerentes de Sede y Administradores del sistema:
+Figura 11.1: Panel de Configuración General y Usuarios en NODUS.
+11.2 Funciones Principales de Configuración
+Gestión de Sedes: Alta de sedes físicas (Lima, etc.), direcciones y datos de
+contacto de la sede.
+Usuarios y Contraseñas: Creación de nuevos usuarios para el personal de
+mesa y caja, asignación de nombres de usuario (ejemplo: jsanchez) y
+reseteo de claves olvidadas.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 33 de 52
+
+=== PAGE 34 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 34MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+Programas y Precios: Configuración de los valores de matrícula,
+promociones y calendarios de eventos.
+11.3 Cómo Crear o Modificar un Usuario en NODUS
+1. Haz clic en "Configuración" → "Usuarios".
+2. Presiona el botón "Nuevo Usuario".
+3. Escribe el Nombre Completo del colaborador, su Nombre de Usuario y una
+Contraseña inicial.
+4. Selecciona su Rol de acceso (Mesa de Registro, Caja, Coordinación o
+Gerencia).
+5. Asigna la Sede en la que trabajará.
+6. Haz clic en "Guardar Usuario". Comparte las credenciales con el
+colaborador de forma segura.
+11.4 Procedimiento para Resetear una Contraseña
+Olvidada
+Si un colaborador no puede ingresar a su cuenta:
+1. El Gerente de Sede ingresa a Configuración → Usuarios.
+2. Busca el nombre del colaborador en la lista y presiona el botón "Editar".
+3. En la casilla "Nueva Contraseña", escribe una clave temporal clara (por
+ejemplo: Nodus2026*).
+4. Haz clic en "Guardar Cambios" y solicita al usuario que pruebe su ingreso
+de inmediato.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 34 de 52
+
+=== PAGE 35 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 35MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+CAPÍTULO 12: GUÍA DE OPERACIÓN EL
+FIN DE SEMANA
+12.1 Flujo del Viernes (Día de Apertura y Registro)
+El viernes es el día más activo en la plataforma. Sigue este orden de trabajo
+estricto:
+Horario
+Típico
+Acción en Sala Acción Obligatoria en NODUS
+15:00 -
+16:30
+Llegada del equipo,
+encendido de laptops,
+prueba de conexión Wi-Fi y
+cables de corriente.
+Iniciar sesión en NODUS con usuario y
+contraseña. Abrir el módulo Mesa de
+Registro. Realizar una búsqueda de
+prueba.
+17:00 -
+19:00
+Llegada masiva de
+participantes al vestíbulo.
+Buscar a cada participante por su DNI.
+Verificar estado de pago. Si está
+completo, hacer clic en "Marcar en
+Sala" y entregar gafete. Si tiene saldo,
+derivar a la caja de NODUS.
+19:30 -
+20:30
+Cierre de puertas y
+arranque del
+entrenamiento en salón.
+Contar los gafetes sobrantes físicos y
+compararlos contra la lista de "No
+Asistieron" en NODUS.
+21:00 Finalización de atención en
+vestíbulo.
+El encargado de caja ingresa a Cierre
+de Caja, cuenta el efectivo, cuadra los
+vouchers de tarjeta y realiza el cierre
+oficial en el sistema junto al Gerente.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 35 de 52
+
+=== PAGE 36 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 36MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+12.2 Flujo del Sábado (Monitoreo de Continuidad y
+Deserciones)
+Horario Acción Operativa Registro en NODUS
+08:30 -
+09:30
+Reingreso de
+participantes en
+puerta matutina.
+Verificar que no ingrese nadie sin gafete
+oficial previamente validado.
+10:30 Pase de lista matutina
+con el equipo de
+logística en sala.
+Si un alumno no se presentó, el coordinador
+marca la observación de inasistencia en su
+ficha para que el equipo de soporte realice
+llamada de seguimiento.
+20:00 Cierre de la jornada
+del sábado.
+Auditar en el Reporte de Entrenadores la
+columna Desertor FDS para registrar
+oficialmente el total de deserciones del día.
+12.3 Flujo del Domingo (Cierre del Evento y Próximas
+Inscripciones)
+Registro de Nuevas Matrículas: El domingo en la tarde, muchos
+participantes deciden inscribirse en el siguiente nivel formativo. El personal
+de caja debe tener abierto NODUS en Contabilidad → Registrar Pago para
+asentar cobros con su comprobante de inmediato.
+Consolidación de Graduados: Al concluir la ceremonia final, la
+coordinación genera la lista final de asistentes para la emisión de
+constancias digitales.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 36 de 52
+
+=== PAGE 37 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 37MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+CAPÍTULO 13: SOLUCIÓN A ERRORES
+FRECUENTES EN PANTALLA
+13.1 Tabla de Errores Operativos y Soluciones
+Inmediatas
+Situación o Error en
+Pantalla
+¿Por qué sucede? Solución Paso a Paso
+"Usuario o
+contraseña
+incorrectos"
+Error al digitar las
+mayúsculas o contraseña
+cambiada
+recientemente.
+1. Revisa que Bloq Mayús
+esté apagado.
+2. Escribe cuidadosamente tu
+usuario y clave.
+3. Si persiste, el Gerente debe
+entrar a Configuración →
+Usuarios y colocar una nueva
+contraseña temporal.
+"Participante no
+encontrado en Mesa
+de Registro"
+El DNI fue digitado con
+un dígito de más/menos
+o el alumno se inscribió
+a última hora.
+1. Búscalo por su apellido en
+el módulo general de
+Participantes.
+2. Si no existe en la base de
+datos, presiona "Nuevo
+Participante", llena sus
+datos completos y luego
+regístrale el pago.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 37 de 52
+
+=== PAGE 38 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 38MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+"El participante
+figura con pago
+pendiente pero
+muestra
+comprobante"
+El pago no fue asentado
+previamente en el
+módulo de Contabilidad.
+1. Verifica los datos del
+comprobante bancario.
+2. Abre el módulo de
+Contabilidad → Registrar
+Pago.
+3. Asienta el cobro con el
+número de operación
+bancaria y regresa a la Mesa
+de Registro para marcarlo
+como asistente.
+"Diferencia en el
+Cierre de Caja
+(Faltante o
+Sobrante)"
+Hubo un error al dar
+cambio o un pago con
+tarjeta fue registrado
+erróneamente como
+efectivo.
+1. Revisa uno por uno los
+recibos de la mesa contra el
+listado de transacciones de
+NODUS.
+2. Si detectas el pago mal
+clasificado, corrígelo antes de
+emitir el cierre final.
+"Participante
+registrado dos veces
+(Duplicado)"
+Fue inscrito primero con
+DNI y luego otra
+persona lo dio de alta
+con pasaporte o carné.
+1. Identifica cuál de los dos
+registros tiene el pago
+asentado.
+2. Solicita al Gerente que
+unifique o desactive el
+registro duplicado que no
+tiene historial financiero.
+"La página se queda
+cargando o en
+blanco"
+Corte momentáneo de
+internet o memoria
+caché saturada.
+1. Presiona Ctrl + F5 en el
+teclado para forzar la
+recarga.
+2. Si no responde, cambia la
+laptop a la red del módem
+móvil de respaldo.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 38 de 52
+
+=== PAGE 39 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 39MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+CAPÍTULO 14: BANCO DE PREGUNTAS
+FRECUENTES (FAQ)
+14.1 Preguntas Frecuentes de la Operación en NODUS
+P1: ¿Pueden dos personas usar el mismo usuario al mismo tiempo en dos
+computadoras de registro?
+R: No se recomienda. Cada operador de mesa debe tener su propio usuario
+para saber con exactitud quién registró a cada participante en caso de cualquier
+auditoría.
+P2: ¿Qué hago si un participante extravía su gafete durante el fin de
+semana?
+R: Búscalo en la Mesa de Registro, confirma que ya estaba marcado como
+asistente y entrégale un gafete de reemplazo marcando la observación en su
+ficha.
+P3: ¿Cómo descargo la lista completa de asistentes para el Entrenador?
+R: Ve a Participantes, filtra por tu Sede y el Evento activo, y haz clic en el botón
+superior "Exportar a Excel".
+P4: ¿Se puede eliminar un pago registrado por error en Contabilidad?
+R: Por seguridad contable, los operadores regulares no pueden eliminar pagos.
+Debes notificar al Gerente de Sede o al Administrador para que anule el
+registro erróneo.
+P5: ¿Por qué en el Reporte de Entrenadores la columna "Total Enrolados"
+sale en cero?
+R: Sale en cero si aún no se han registrado cobros o matrículas formalmente
+enlazadas a los alumnos de ese equipo en la base de datos de la plataforma.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 39 de 52
+
+=== PAGE 40 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 40MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+P6: ¿Puedo acceder a NODUS desde mi teléfono celular o tablet?
+R: Sí. La plataforma se adapta a navegadores móviles ingresando a la misma
+dirección web, aunque para el personal de mesa se recomienda laptop por
+comodidad de tipeo.
+P7: ¿Qué ocurre si se corta la energía eléctrica en la mesa de registro?
+R: Las laptops cuentan con batería propia. Si se corta el Wi-Fi del local, activa la
+zona Wi-Fi compartida de tu celular en la laptop para continuar registrando.
+P8: ¿Dónde veo cuántas personas están sentadas en el salón en este
+momento?
+R: En el Dashboard principal o en la parte superior de la Mesa de Registro,
+donde aparece el contador dinámico de "Marcados en Sala".
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 40 de 52
+
+=== PAGE 41 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 41MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+CAPÍTULO 15: GLOSARIO DE TÉRMINOS Y
+CAMPOS DE NODUS
+15.1 Glosario Operativo de la Plataforma
+Término / Campo
+en NODUS
+Definición en Lenguaje Sencillo
+Mesa de Registro Pantalla de trabajo en puerta para buscar alumnos, revisar
+su pago y registrar su asistencia en sala.
+Marcar en Sala Acción de hacer clic en el sistema para confirmar que el
+participante ya ingresó físicamente al salón.
+Total Enrolados Cantidad de personas nuevas que ya han realizado su
+pago o matrícula oficial en el sistema.
+Total Sentados Cantidad de participantes que están físicamente sentados
+en el salón recibiendo el entrenamiento.
+Declaración La meta numérica de personas que un líder o equipo se
+comprometió a incorporar al programa.
+Desertor FDS Persona que se inscribió pero no regresó a sala durante el
+fin de semana del entrenamiento.
+Arqueo de Caja El conteo físico de dinero en efectivo y vouchers para
+comprobar que coincidan con lo reportado en NODUS.
+Sede La ciudad o centro operativo donde se realiza el evento
+(ejemplo: Sede Lima).
+Cohorte / Equipo Grupo específico de alumnos que inician y cursan el
+programa juntos (ejemplo: Equipo 28 Lima).
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 41 de 52
+
+=== PAGE 42 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 42MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+Comprobante /
+Operación
+El código bancario o número de recibo físico que respalda
+que el dinero ingresó a la empresa.
+Gafete Oficial Identificación física con nombre y código que solo se
+entrega tras validar el registro en NODUS.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 42 de 52
+
+=== PAGE 43 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 43MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+CAPÍTULO 16: LISTAS DE COTEJO POR
+PUESTO DE TRABAJO
+Utiliza estas listas de verificación antes de iniciar tus labores en la sede con
+NODUS:
+LISTA DE COTEJO: OPERADOR DE MESA DE REGISTRO
+Tengo mi usuario y contraseña personales funcionando.
+Tengo abierta la página https://imo.crearpslglobal.com/ en
+Google Chrome.
+He probado la búsqueda ingresando un DNI de prueba.
+Tengo a mano la lista de participantes en físico o Excel como respaldo.
+Sé a quién enviar a los participantes que tengan saldo de pago
+pendiente.
+Marco a cada participante en NODUS inmediatamente al entregarle su
+gafete.
+No permito el paso a nadie que figure en estado "Pendiente de Pago".
+Al cerrar puertas, cuento los gafetes físicos sobrantes y los reporto a
+Coordinación.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 43 de 52
+
+=== PAGE 44 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 44MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+LISTA DE COTEJO: ENCARGADO DE CAJA Y COBRANZAS
+Verifico que la caja física comience con el fondo de cambio asignado.
+Registro cada cobro en el módulo de Contabilidad anotando número de
+operación o voucher.
+No entrego ningún recibo ni confirmo en puerta sin antes haber
+guardado el pago en NODUS.
+Registro los gastos de emergencia de sala en la sección de egresos con
+boleta física.
+Al finalizar el turno, abro el módulo Cierre de Caja y realizo el conteo
+físico del dinero.
+Entrego el efectivo y el reporte firmado al Gerente de Sede.
+LISTA DE COTEJO: GERENTE DE SEDE / SUPERVISOR
+Confirmo que todos los operadores de mesa tengan su usuario creado y
+activo.
+Superviso en tiempo real desde el Dashboard el ritmo de ingresos a
+sala.
+Reviso el Reporte de Entrenadores para detectar desviaciones entre
+enrolados y sentados.
+Audito y firmo el Cierre de Caja oficial al concluir la jornada del viernes.
+Compruebo que los reportes de sábado y domingo queden
+consolidados en la plataforma.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 44 de 52
+
+=== PAGE 45 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 45MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+CAPÍTULO 17: FLUJOS OPERATIVOS PASO
+A PASO
+Flujo A: Registro de Llegada de un Participante
+1 Bienvenida y Solicitud de DNI
+QUÉ VERÁS:
+La pantalla de Mesa de Registro en tu laptop.
+QUÉ DEBES HACER:
+Saluda cordialmente al participante y pídele su número de DNI o
+documento de identidad.
+QUÉ PASA SI NO TRAJO DOCUMENTO:
+Pídele sus nombres y apellidos completos y búscalo por apellido.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 45 de 52
+
+=== PAGE 46 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 46MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+2 Comprobar Estado de Pago
+QUÉ VERÁS:
+La ficha del participante indicando si su matrícula está pagada o si tiene
+saldo pendiente.
+QUÉ DEBES HACER:
+Si está pagada, haz clic en "Marcar en Sala". Si debe saldo, derívalo a la
+caja contigua.
+QUÉ PASA SI MUESTRA VOUCHER:
+El encargado de caja ingresa a Contabilidad, anota el voucher y confirma
+el pago.
+3 Entrega de Gafete e Ingreso
+QUÉ VERÁS:
+El participante figura con el check verde de asistencia.
+QUÉ DEBES HACER:
+Entrégale su gafete rotulado con su nombre y dale la bienvenida a sala.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 46 de 52
+
+=== PAGE 47 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 47MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+Flujo B: Cuadre y Cierre Nocturno de Caja
+1 Cierre de la Atención en Mesa
+QUÉ VERÁS:
+No hay más participantes en fila; las puertas del salón se han cerrado.
+QUÉ DEBES HACER:
+Abre el módulo de Cierre de Caja en NODUS.
+2 Conteo y Validación
+QUÉ VERÁS:
+Las sumas calculadas automáticamente por NODUS para efectivo y
+tarjetas.
+QUÉ DEBES HACER:
+Cuenta el dinero físico billete por billete y suma los vouchers de POS.
+Escribe los montos reales.
+QUÉ PASA SI NO CUADRA:
+Revisa recibo por recibo para verificar si se digitó un monto erróneo.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 47 de 52
+
+=== PAGE 48 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 48MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+3 Firma del Acta Digital de Cierre
+QUÉ VERÁS:
+El botón "Cerrar Caja Oficialmente".
+QUÉ DEBES HACER:
+Haz clic en cerrar caja y entrega el dinero físico al Gerente de Sede.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 48 de 52
+
+=== PAGE 49 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 49MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+CAPÍTULO 18: EJERCICIOS DE
+ENTRENAMIENTO Y EVALUACIÓN
+18.1 Banco de Simulacros para el Personal de Sede
+Antes de atender un evento real, todo operador de NODUS debe practicar
+estos ejercicios en el sistema:
+E1 Ejercicio 1: Búsqueda Rápida de Asistente
+Objetivo: Localizar en la Mesa de Registro a un participante utilizando
+únicamente su número de DNI en menos de 10 segundos.
+E2 Ejercicio 2: Registro de un Participante Nuevo
+Objetivo: Ingresar al módulo de Participantes, hacer clic en "Nuevo
+Participante" y guardar una ficha completa con DNI, nombres, teléfono y
+sede.
+E3 Ejercicio 3: Asentar un Cobro en Contabilidad
+Objetivo: Registrar un pago en efectivo, guardarlo en el sistema y
+verificar que el saldo cambie a "Completo" en la Mesa de Registro.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 49 de 52
+
+=== PAGE 50 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 50MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+E4 Ejercicio 4: Lectura de Reporte de Entrenadores
+Objetivo: Abrir el Reporte de Entrenadores, identificar la columna
+"Declaración" y compararla contra la columna "Total Enrolados".
+18.2 Cuestionario de Autoevaluación Final con
+Respuestas
+Pregunta de
+Control
+Respuesta Correcta Explicación
+Operativa
+¿Cómo se
+inicia sesión
+en NODUS?
+Ingresando tu Nombre de Usuario y
+Contraseña personal en
+https://imo.crearpslglobal.com/.
+No se utilizan
+correos de terceros
+ni plataformas
+externas; cada
+usuario tiene clave
+directa.
+¿Qué debes
+hacer antes de
+marcar a un
+participante
+como
+asistente en
+sala?
+Verificar que su estado de pago figure
+como "Completo" en la Mesa de Registro.
+Si tiene saldo
+pendiente, debe
+pasar por caja antes
+de recibir su gafete
+de acceso.
+¿Quién debe
+realizar el
+Cierre de Caja
+al final del
+día?
+El encargado de caja en conjunto con el
+Gerente de Sede o supervisor asignado.
+El arqueo requiere la
+presencia del
+responsable del
+dinero y la firma
+gerencial en el
+sistema.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 50 de 52
+
+=== PAGE 51 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 51MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+¿Qué significa
+la columna
+"Desertor
+FDS"?
+Participantes que iniciaron el
+entrenamiento pero no asistieron a
+jornadas posteriores.
+Permite calcular el
+ratio de retención y
+realizar
+acompañamiento
+oportuno.
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 51 de 52
+
+=== PAGE 52 ===
+CREAR PODER SIN LÍMITES | PLATAFORMA NODUS (SO-AR)
+EDICIÓN
+OFICIAL
+2026
+Página 52MANUAL INTEGRAL DE OPERACIONES Y ADOPCIÓN TECNOLÓGICA
+ANEXOS: CONTACTOS DE SOPORTE Y
+CONTROL DE CAMBIOS
+Anexo 1: Canales de Soporte de la Plataforma NODUS
+Canal de
+Contacto
+Propósito Horario de Atención
+Gerencia de
+Sede
+Creación de usuarios, reseteo de
+claves olvidadas, permisos en
+módulos.
+Horario de oficina y fines
+de semana de evento.
+Mesa de Ayuda
+de Sistemas
+Soporte técnico ante caídas del
+servidor web de NODUS o fallas
+en la base de datos.
+Guardia activa durante
+viernes, sábado y
+domingo de evento.
+Anexo 2: Historial de Versiones del Manual
+Versión Fecha Alcance y Modificaciones
+v1.0 2025 Primera versión de capacitación para operadores de
+registro.
+v2.0
+(Oficial)
+Septiembre
+2026
+Manual Oficial y Exclusivo de NODUS: Flujo 100%
+enfocado en usuario y contraseña, módulos de
+mesa de registro, contabilidad, cierre de caja,
+reportes y configuración.
+CREAR PODER SIN LÍMITES © 2026
+Manual Oficial de Usuario — Plataforma NODUS
+CREAR PODER SIN LÍMITES • PLATAFORMA NODUS MANUAL DE OPERACIONES 2026
+MANUAL DE USUARIO NODUS Página 52 de 52
+

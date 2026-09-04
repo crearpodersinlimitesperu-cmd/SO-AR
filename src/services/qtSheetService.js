@@ -4,12 +4,17 @@
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { db } from './firebase';
 
-const CACHE_KEY = 'cpsl_qt_members_cache_v3';
-const CACHE_TIME_KEY = 'cpsl_qt_members_cache_time_v3';
+export const QT_SHEET_CSV_URL = import.meta.env.VITE_QT_SHEET_CSV_URL || 'https://docs.google.com/spreadsheets/d/10sz7KNvZ31GOgGDhzH0P3gbISGLW8HPBsSAZwOw5L8U/export?format=csv&gid=0';
+export const QT_SHEET_EDIT_URL = import.meta.env.VITE_QT_SHEET_EDIT_URL || 'https://docs.google.com/spreadsheets/d/10sz7KNvZ31GOgGDhzH0P3gbISGLW8HPBsSAZwOw5L8U/edit?gid=0#gid=0';
+
+const CACHE_KEY = 'cpsl_qt_members_cache_v4';
+const CACHE_TIME_KEY = 'cpsl_qt_members_cache_time_v4';
 const CACHE_TTL_MS = 1000 * 60 * 15; // 15 minutos de caché automático
 
 export function clearQTCache() {
   try {
+    localStorage.removeItem('cpsl_qt_members_cache_v3');
+    localStorage.removeItem('cpsl_qt_members_cache_time_v3');
     localStorage.removeItem(CACHE_KEY);
     localStorage.removeItem(CACHE_TIME_KEY);
   } catch (e) {
@@ -298,7 +303,7 @@ export function mapRowsToQTMembers(rows) {
 }
 
 /**
- * Obtiene los miembros de QT desde Firestore (Migrado desde Google Sheets por seguridad)
+ * Obtiene los miembros de QT en tiempo real desde Google Sheets oficial (con fallback a Firestore)
  */
 export async function getQTMembers({ forceRefresh = false } = {}) {
   // 1. Revisar caché local si no es forzado
@@ -325,7 +330,37 @@ export async function getQTMembers({ forceRefresh = false } = {}) {
     }
   }
 
-  // 2. Fetch en vivo desde Firestore
+  // 2. Fetch en vivo desde Google Sheets (fuente en tiempo real de nuevas altas)
+  try {
+    const response = await fetch(QT_SHEET_CSV_URL, {
+      method: 'GET',
+      cache: 'no-cache'
+    });
+
+    if (response.ok) {
+      const csvText = await response.text();
+      const rows = parseCSV(csvText);
+      const members = mapRowsToQTMembers(rows);
+
+      if (members && members.length > 0) {
+        try {
+          localStorage.setItem(CACHE_KEY, JSON.stringify(members));
+          localStorage.setItem(CACHE_TIME_KEY, Date.now().toString());
+        } catch (e) {}
+
+        return {
+          data: members,
+          fromCache: false,
+          lastUpdated: new Date().toISOString(),
+          total: members.length
+        };
+      }
+    }
+  } catch (sheetError) {
+    console.warn("Error al sincronizar con Google Sheets, intentando Firestore:", sheetError);
+  }
+
+  // 3. Fallback en vivo desde Firestore
   try {
     const qtRef = collection(db, 'qt_directory');
     const q = query(qtRef, orderBy('index', 'asc'));
@@ -350,7 +385,7 @@ export async function getQTMembers({ forceRefresh = false } = {}) {
     console.error("Error al conectar con Firestore (qt_directory):", error);
   }
 
-  // 3. Fallback de caché antiguo si falló la red
+  // 4. Fallback de caché antiguo si falló la red
   try {
     const cached = localStorage.getItem(CACHE_KEY);
     const cacheTime = localStorage.getItem(CACHE_TIME_KEY);

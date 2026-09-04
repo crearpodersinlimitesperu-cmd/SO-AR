@@ -1,0 +1,1 @@
+﻿const fs = require("fs"); let code = fs.readFileSync("src/pages/Home.jsx", "utf8"); let start = code.indexOf("<button onClick={() => { setShowToolsDropdown(false); navigate('/calendario-equipo'); }}"); console.log(code.substring(start-100, start+300));

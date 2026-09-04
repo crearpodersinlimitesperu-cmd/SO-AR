@@ -1,0 +1,1 @@
+﻿const fs = require("fs"); let code = fs.readFileSync("src/components/HelpModal.jsx", "utf8"); let startIndex = code.indexOf("Tab Auditor"); console.log(code.substring(startIndex-200, startIndex + 2500));

@@ -244,6 +244,23 @@ export default function HelpModal({ isOpen, onClose }) {
                 </div>
               )}
 
+              {/* ENLACE DIRECTO MANUAL NODUS & GOBERNANZA SISTÉMICA 2026 */}
+              <div style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid #10b981', padding: '1.2rem', margin: '1rem 0', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.8rem' }}>
+                <div>
+                  <h4 style={{ color: '#10b981', margin: '0 0 0.3rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <BookOpen size={20} /> Centro de Gobernanza Nodus + Causa OS (2026)
+                  </h4>
+                  <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-main)' }}>Manifiesto simbiótico, los 9 niveles de excelencia, códigos de vestimenta, 14 KPIs oficiales y los 18 capítulos paso a paso de Nodus.</p>
+                </div>
+                <button 
+                  onClick={() => { onClose(); navigate('/manual-nodus'); }}
+                  className="btn-primary" 
+                  style={{ background: '#10b981', borderColor: '#10b981', color: '#fff', padding: '0.5rem 1.2rem', fontSize: '0.85rem', cursor: 'pointer', borderRadius: '6px', fontWeight: 800 }}
+                >
+                  📗 Abrir Manual Nodus ↗
+                </button>
+              </div>
+
               {/* RECURSO OFICIAL: PROTOCOLO DE EMERGENCIAS CREAR GLOBAL */}
               <div style={{ background: 'rgba(239, 68, 68, 0.12)', border: '1px solid #ef4444', padding: '1.2rem', margin: '1rem 0', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.8rem' }}>
                 <div>
@@ -292,7 +309,7 @@ export default function HelpModal({ isOpen, onClose }) {
                     <li><strong>Tab CMJ:</strong> Consolidado automático (desde Drive) que suma la retención, deserción y enrolamiento total de <em>todos</em> los Coordinadores de la Maestría de la sede seleccionada.</li>
                     <li><strong>Tab Entrenadores Maestría:</strong> Métricas operativas de avance, gráficas y cierres enfocadas en el desempeño del Entrenador por sede.</li>
                     <li><strong>Tab Auditoría de KPIs:</strong> Espacio exclusivo para revisar y auditar los formularios semanales cargados manualmente por el Quantum Team (QT y Coordinadores).</li>
-                    <li><strong>Horarios de Entrenamiento (Nuevo):</strong> Consulta rápidamente la disponibilidad y código de vestimenta de cada capítulo en tu Dashboard principal.</li>
+                    <li><strong>Horarios de Entrenamiento y Vestimenta:</strong> Consulta el cronograma oficial de sala (Jueves a Domingo) y código de vestimenta haciendo clic en el botón <strong>⏰ Horarios y Vestimenta</strong> en la barra superior de Inicio, en el Dashboard Gerencial o en el Manual Nodus.</li>
                     <li><strong>Flyers Globales:</strong> Acceso a recursos de diseño para Capítulo 1 en la pantalla de inicio.</li>
                   </ul>
                 </>
