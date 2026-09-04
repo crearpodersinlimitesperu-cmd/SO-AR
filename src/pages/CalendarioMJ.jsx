@@ -228,27 +228,32 @@ const canEdit = (currentUser) => {
 // Plantilla de actividades — texto EXACTO tomado de los 3 PDF de ejemplo
 // (CALENDARIO_E27.pdf, CALENDARIO_E28.pdf, CALENDARIO_E29_1.pdf). "fecha" y
 // "hora" quedan vacías a propósito: no hay fórmula, se llenan por equipo.
+// (04/09/2026) FIX — José: los 3 viernes (Creación, Relación y Gratitud)
+// inician con la MISMA estructura de horario: 5 pm mesa de registro, 6 pm
+// inicia el entrenamiento. Antes Relación y Gratitud decían "6 pm registro"
+// (sin distinguir mesa de registro vs. inicio del entrenamiento) y Creación
+// decía "5 pm registro" sin mencionar la hora de inicio del entrenamiento.
 const DEFAULT_FDS = [
   {
     id: 'creacion',
     titulo: 'PRIMER FDS: CREACIÓN.',
     fechaInicio: '',
     fechaFin: '',
-    horario: 'Viernes: 5 pm registro – 11 pm aprox.\n(asistencia obligatoria todo el fin de semana, sin negociación de tiempo)\nSábado: 8 am – 10 pm aprox.\nDomingo: 9 am – 9 pm aprox.'
+    horario: 'Viernes: 5 pm mesa de registro. 6 pm inicia el entrenamiento – 11 pm aprox.\n(asistencia obligatoria todo el fin de semana, sin negociación de tiempo)\nSábado: 8 am – 10 pm aprox.\nDomingo: 9 am – 9 pm aprox.'
   },
   {
     id: 'relacion',
     titulo: 'SEGUNDO FDS: RELACIÓN.',
     fechaInicio: '',
     fechaFin: '',
-    horario: 'Viernes: 6 pm registro – 11 pm aprox.\n(asistencia obligatoria todo el fin de semana, sin negociación de tiempo)\nSábado: 8 am – 10 pm aprox.\nDomingo: 9 am – 9 pm aprox.'
+    horario: 'Viernes: 5 pm mesa de registro. 6 pm inicia el entrenamiento – 11 pm aprox.\n(asistencia obligatoria todo el fin de semana, sin negociación de tiempo)\nSábado: 8 am – 10 pm aprox.\nDomingo: 9 am – 9 pm aprox.'
   },
   {
     id: 'gratitud',
     titulo: 'TERCER FDS: GRATITUD.',
     fechaInicio: '',
     fechaFin: '',
-    horario: 'Viernes: 6 pm registro – 11 pm aprox.\n(asistencia obligatoria todo el fin de semana, sin negociación de tiempo)\nSábado: 8 am – 10 pm aprox.\nDomingo: 8 am – 9 pm aprox.'
+    horario: 'Viernes: 5 pm mesa de registro. 6 pm inicia el entrenamiento – 11 pm aprox.\n(asistencia obligatoria todo el fin de semana, sin negociación de tiempo)\nSábado: 8 am – 10 pm aprox.\nDomingo: 8 am – 9 pm aprox.'
   }
 ];
 
