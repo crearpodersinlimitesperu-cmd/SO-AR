@@ -7,7 +7,7 @@ import { useUI } from '../context/UIContext';
 import { useTheme } from '../context/ThemeContext';
 import { useNotifications } from '../context/NotificationContext';
 import { 
-  LogOut, Clock, Calendar as CalendarIcon, MapPin, CheckCircle2, 
+  FileText, LogOut, Clock, Calendar as CalendarIcon, MapPin, CheckCircle2, 
   AlertCircle, Circle, RefreshCw, CalendarPlus, Bell, Users, AtSign, 
   BookOpen, Lightbulb, Search, X, Filter, ChevronDown, Sparkles,
   Zap, LayoutGrid, Sliders, CheckSquare, ArrowRight, ArrowUpRight, ShieldCheck,
