@@ -1,6 +1,6 @@
 {
   "version": "2.8.0",
-  "createdAt": "2026-09-04T22:36:25.165Z",
+  "createdAt": "2026-09-04T22:44:35.131Z",
   "projectId": "centro-operativo-cpsl",
   "collections": {
     "users": [
@@ -557,12 +557,11 @@
         "name": "Joao Alfonso Trujillo",
         "role": "coord_c1",
         "sede": "Cuenca",
-        "emails": [
-          "alfonso.trujillo@crearpsl.net",
-          "alfonso.trujillo@crearpls.com"
-        ],
         "updatedAt": "2026-08-18T02:54:34.141Z",
-        "source": "bootstrapSync"
+        "source": "bootstrapSync",
+        "emails": [
+          "alfonso.trujillo@crearpsl.net"
+        ]
       },
       {
         "_id": "andres_gomez",
@@ -849,12 +848,13 @@
         "name": "Emely Juliett León Chavez",
         "role": "gerente",
         "sede": "Cuenca",
-        "emails": [
-          "emely.leon@crearpsl.net",
-          "emely.leon@crearpls.com"
-        ],
         "updatedAt": "2026-08-18T02:54:36.008Z",
-        "source": "bootstrapSync"
+        "source": "bootstrapSync",
+        "emails": [
+          "emely.leon@crearpsl.net"
+        ],
+        "corporateEmail": "emely.leon@crearpsl.net",
+        "email": "emely.leon@crearpsl.net"
       },
       {
         "_id": "emily_campuzano",
@@ -888,12 +888,11 @@
         "name": "Evelyn Paulina Cedillo",
         "role": "coord_c1",
         "sede": "Cuenca",
-        "emails": [
-          "evelyn.cedillo@crearpls.com",
-          "evelyn.cedillo@crearpsl.net"
-        ],
         "updatedAt": "2026-08-18T02:54:32.775Z",
-        "source": "bootstrapSync"
+        "source": "bootstrapSync",
+        "emails": [
+          "evelyn.cedillo@crearpsl.net"
+        ]
       },
       {
         "_id": "facturacion_cartera",
@@ -1091,17 +1090,16 @@
       },
       {
         "_id": "jose_sanchez_crearpsl",
-        "emails": [
-          "jose.sanchez@crearpsl.net",
-          "jose.sanchez@crearpls.com"
-        ],
         "role": "direccion",
         "sede": "Sede Global",
         "name": "José Sánchez",
         "isSuperAdmin": true,
         "id": "jose_sanchez_crearpsl",
         "source": "bootstrapSync",
-        "updatedAt": "2026-08-18T02:55:17.606Z"
+        "updatedAt": "2026-08-18T02:55:17.606Z",
+        "emails": [
+          "jose.sanchez@crearpsl.net"
+        ]
       },
       {
         "_id": "josue_vera",
@@ -1136,12 +1134,11 @@
         "name": "Juan Fernando Reinoso",
         "role": "coord_maestria",
         "sede": "Cuenca",
-        "emails": [
-          "juan.reinoso@crearpsl.net",
-          "juan.reinoso@crearpls.com"
-        ],
         "updatedAt": "2026-08-18T02:54:35.424Z",
-        "source": "bootstrapSync"
+        "source": "bootstrapSync",
+        "emails": [
+          "juan.reinoso@crearpsl.net"
+        ]
       },
       {
         "_id": "judith_romero",
@@ -1209,12 +1206,11 @@
         "name": "Kerly Carrillo Garzon",
         "role": "coord_maestria",
         "sede": "Cuenca",
-        "emails": [
-          "kerly.carrillo@crearpls.com",
-          "kerly.carrillo@crearpsl.net"
-        ],
         "updatedAt": "2026-08-18T02:54:34.841Z",
-        "source": "bootstrapSync"
+        "source": "bootstrapSync",
+        "emails": [
+          "kerly.carrillo@crearpsl.net"
+        ]
       },
       {
         "_id": "ketherine_aguirre",
@@ -2182,12 +2178,11 @@
         "name": "Viviana Maribel Catota Yugsi",
         "role": "coord_c1",
         "sede": "Cuenca",
-        "emails": [
-          "viviana.catota@crearpls.com",
-          "viviana.catota@crearpsl.net"
-        ],
         "updatedAt": "2026-08-18T02:54:33.592Z",
-        "source": "bootstrapSync"
+        "source": "bootstrapSync",
+        "emails": [
+          "viviana.catota@crearpsl.net"
+        ]
       },
       {
         "_id": "yHI9J5y060z1VOXStS0c",
@@ -3472,16 +3467,16 @@
         "deadline": "2026-09-04T21:00:00.000Z",
         "isCritical": true,
         "createdBy": "fer.aragon@crearpsl.net",
+        "comments": "hasta hoy o hasta el 10 ?",
         "assignedToEmails": [
-          "emely.leon@crearpls.com",
+          "emely.leon@crearpsl.net",
           "josue.vera@crearpsl.net",
           "jose.sanchez@crearpsl.net",
           "yurany.gonzalez@crearpsl.net",
           "nora.zamora@crearpsl.net",
           "emily.campuzano@crearpsl.net",
           "freddy.sosa@crearpsl.net"
-        ],
-        "comments": "hasta hoy o hasta el 10 ?"
+        ]
       },
       {
         "_id": "custom_1788536663709",
@@ -13391,10 +13386,10 @@
         "_id": "pWM2Wf9pVzZTpVkEBLbz",
         "taskId": "custom_1788533780163",
         "created_at": "2026-09-04T14:56:20.163Z",
-        "userId": "emely.leon@crearpls.com",
         "read": false,
         "title": "ACTUALIZAR PRESUPUESTO AGOSTO",
-        "message": "Se te ha asignado una nueva tarea urgente en la sede Global."
+        "message": "Se te ha asignado una nueva tarea urgente en la sede Global.",
+        "userId": "emely.leon@crearpsl.net"
       },
       {
         "_id": "pd5Hj5ZGPznswZ81jdqe",
@@ -14452,6 +14447,17 @@
           "endTime": "2026-09-03T21:03:51.869Z",
           "state": "SUCCESS"
         }
+      },
+      {
+        "_id": "uHXsetdoDgsNBPma93pJ",
+        "to": [
+          "emely.leon@crearpsl.net"
+        ],
+        "message": {
+          "subject": "NUEVA TAREA ASIGNADA CAUSA OS: ACTUALIZAR PRESUPUESTO AGOSTO",
+          "html": "<h2>Hola, se te ha asignado una nueva tarea en Causa OS</h2><p><strong>Tarea:</strong> ACTUALIZAR PRESUPUESTO AGOSTO</p><p><strong>Fecha limite:</strong> viernes, 4 de setiembre de 2026, 6:00 p. m.</p><p><strong>Sede:</strong> Global</p><p><strong>Prioridad:</strong> ROJO</p><p>Por favor, ingresa a la plataforma para revisarla y marcarla como completada cuando este lista.</p><br/><p><em>Equipo CREAR PODER SIN LIMITES</em></p>"
+        },
+        "created_at": "2026-09-04T22:43:21.608Z"
       },
       {
         "_id": "v9Ve7y1AZzrSrKhyvnWq",
@@ -27044,7 +27050,7 @@
     "reports": 0,
     "user_profiles": 20,
     "notifications": 48,
-    "mail": 69,
+    "mail": 70,
     "qt_directory": 43,
     "managers_directory": 704,
     "staff_directory": 0,
