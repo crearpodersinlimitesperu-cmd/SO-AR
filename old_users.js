@@ -193,10 +193,9 @@ export const USERS_TO_IMPORT = [
   ],
   "sede": "Global",
   "emails": [
-    "coodinacion.administrativa@crearpsl.net",
-    "coodinacion.administrativa@crearpsl.net"
+    "coordinacion.administrativa@crearpsl.net"
   ],
-  "email": "coodinacion.administrativa@crearpsl.net"
+  "email": "coordinacion.administrativa@crearpsl.net"
 },
 {
   "id": "staff_franciscosebastinjcomeescobar",

@@ -148,7 +148,8 @@ async function processMailDoc(docSnap) {
   for (const rawTo of rawRecipients) {
     let to = String(rawTo).toLowerCase().trim()
       .replace('@crearpls.com', '@crearpsl.net')
-      .replace(/ketherine\.aguirre@/g, 'katherine.aguirre@');
+      .replace(/ketherine\.aguirre@/g, 'katherine.aguirre@')
+      .replace(/coodinacion\.administrativa@/g, 'coordinacion.administrativa@');
     const isCorporate = ['@crearpsl.net', '@crearpsl.com'].some(d => to.endsWith(d));
     if (isCorporate) {
       validRecipients.push(to);
