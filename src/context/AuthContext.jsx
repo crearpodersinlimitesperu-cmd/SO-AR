@@ -465,7 +465,8 @@ export function AuthProvider({ children }) {
             setLoading(false);
           }
           try {
-            const sessionLogKey = `audit_login_${normalizedEmail}`;
+            const todayStr = new Date().toISOString().slice(0, 10);
+            const sessionLogKey = `audit_login_${normalizedEmail}_${todayStr}`;
             if (!sessionStorage.getItem(sessionLogKey)) {
               await recordAuditEvent({
                 email: foundUser.email || normalizedEmail,
@@ -473,7 +474,7 @@ export function AuthProvider({ children }) {
                 role: foundUser.role || 'Desconocido',
                 sede: foundUser.sede || 'Desconocida',
                 action: 'LOGIN',
-                details: 'Inicio de sesión / Reconexión'
+                details: 'Inicio de sesión / Actividad diaria'
               });
               sessionStorage.setItem(sessionLogKey, 'true');
             }

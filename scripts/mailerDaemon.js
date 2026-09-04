@@ -257,9 +257,18 @@ async function checkInactivity() {
 
     for (const docSnap of profilesSnap.docs) {
       const data = docSnap.data();
-      const email = data.email || docSnap.id;
+      const email = (data.email || docSnap.id || '').toLowerCase().trim();
 
-      if (!data.lastLoginAt) continue;
+      if (!email || !data.lastLoginAt) continue;
+
+      // Si el id del doc no es el email, verificar si existe un documento canónico (id == email).
+      // Si existe el canónico, ignorar este documento no canónico para evitar alertas fantasmas.
+      if (docSnap.id !== email) {
+        const canonicalDoc = await db.collection('user_profiles').doc(email).get();
+        if (canonicalDoc.exists) {
+          continue;
+        }
+      }
 
       const lastLoginDate = data.lastLoginAt.toDate ? data.lastLoginAt.toDate() : new Date(data.lastLoginAt);
       const hoursSinceLogin = (now - lastLoginDate) / (1000 * 60 * 60);
@@ -294,9 +303,19 @@ async function checkInactivity() {
             createdAt: FieldValue.serverTimestamp()
           });
 
-          await db.collection('user_profiles').doc(email).update({
+          // Actualizar el documento exacto que disparó la alerta
+          await docSnap.ref.update({
             lastInactivityAlertAt: FieldValue.serverTimestamp()
           });
+
+          // Si el ID del documento era diferente al correo, actualizar también el canónico
+          if (email !== docSnap.id) {
+            try {
+              await db.collection('user_profiles').doc(email).set({
+                lastInactivityAlertAt: FieldValue.serverTimestamp()
+              }, { merge: true });
+            } catch (_) {}
+          }
         }
       }
     }
