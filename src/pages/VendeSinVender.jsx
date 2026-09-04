@@ -51,6 +51,7 @@ export default function VendeSinVender() {
     { id: 'cap4', num: 'CAP 4', title: 'El Mapa de Ruta en 3 Pasos', subtitle: 'Del Sueño al Ticket Verde de Integridad', icon: <Target size={18} /> },
     { id: 'cap5', num: 'CAP 5', title: 'El Rescate de los Olvidados', subtitle: 'Protocolo de Rezagados de C1', icon: <ShieldAlert size={18} /> },
     { id: 'cap6', num: 'CAP 6', title: 'La Bitácora del Guerrero Cuántico', subtitle: 'Causa vs. Espectador en la Arena', icon: <Zap size={18} /> },
+    { id: 'orientacion', num: 'CAP 7', title: 'Construir desde la Nada', subtitle: 'Esqueleto de la Orientación y Visión Colectiva', icon: <Compass size={18} /> },
     { id: 'epilogo', num: 'FINAL', title: 'Epílogo & Manifiesto IMO', subtitle: 'La Promesa del Líder Transformacional', icon: <Award size={18} /> },
   ];
 
@@ -1050,7 +1051,164 @@ export default function VendeSinVender() {
                 <button onClick={() => setActiveChapter('cap5')} className="btn-secondary" style={{ padding: '8px 18px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.2)', background: 'transparent', color: '#fff', cursor: 'pointer' }}>
                   ← Capítulo 5
                 </button>
-                <button onClick={() => setActiveChapter('epilogo')} className="btn-primary" style={{ padding: '8px 24px', borderRadius: '20px', background: 'var(--crear-gold, #ffb703)', color: '#000', fontWeight: 800, border: 'none', cursor: 'pointer' }}>
+                <button onClick={() => setActiveChapter('orientacion')} className="btn-primary" style={{ padding: '8px 24px', borderRadius: '20px', background: 'var(--crear-gold, #ffb703)', color: '#000', fontWeight: 800, border: 'none', cursor: 'pointer' }}>
+                  Capítulo 7: Construir desde la Nada →
+                </button>
+              </div>
+            </div>
+          )}
+
+
+          {/* ============================================================== */}
+          {/* CAPÍTULO 7: CONSTRUIR DESDE LA NADA (ESQUELETO DE ORIENTACIÓN) */}
+          {/* ============================================================== */}
+          {activeChapter === 'orientacion' && (
+            <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '1.8rem' }}>
+              <div>
+                <span style={{ color: '#f472b6', fontSize: '0.85rem', fontWeight: 800, textTransform: 'uppercase' }}>
+                  CAPÍTULO 7 • CAUSA OS MASTER PROTOCOL
+                </span>
+                <h2 style={{ fontSize: '2.2rem', margin: '0.3rem 0', fontWeight: 800, color: '#fff' }}>
+                  CONSTRUIR DESDE LA NADA: LA VISIÓN COLECTIVA
+                </h2>
+                <p style={{ color: 'var(--text-muted)', fontSize: '1.05rem', margin: 0, lineHeight: 1.6 }}>
+                  Punto cero de creación. La orientación rompe el contexto viejo para inventar quiénes somos y forjar un equipo cuántico donde no existen jugadores en la banca.
+                </p>
+              </div>
+
+              {/* CITA DESTACADA */}
+              <div className="glass-panel" style={{ padding: '1.5rem', borderLeft: '4px solid #ec4899', background: 'rgba(236,72,153,0.08)' }}>
+                <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#fff', fontStyle: 'italic', marginBottom: '0.5rem' }}>
+                  «Construir no está mal… pero está jodido si vienes de creerte libre siendo quien crees que eres.»
+                </div>
+                <div style={{ fontSize: '0.92rem', color: 'var(--text-muted)' }}>
+                  Hoy no venimos a mejorar tu identidad antigua. Venimos a <strong>inventar quiénes somos</strong> desde una hoja en blanco.
+                </div>
+              </div>
+
+              {/* 6 FRASES ANCLA */}
+              <div className="glass-panel" style={{ padding: '1.5rem' }}>
+                <h3 style={{ fontSize: '1.2rem', margin: '0 0 1rem', color: '#fff' }}>
+                  ⚓ Las 6 Frases Ancla del Entrenador Cuántico
+                </h3>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
+                  {[
+                    { t: 'Construir desde la nada.', d: 'Punto cero de creación ontológica' },
+                    { t: 'Esto no es un club vacacional. Esto es la Legión Extranjera.', d: 'Estándar innegociable de compromiso' },
+                    { t: 'No hay jugadores en la banca.', d: 'Protagonismo radical o espectador en la arena' },
+                    { t: 'Pelele: práctica constante.', d: 'Neuroplasticidad y repetición desprovista de drama' },
+                    { t: 'Yo soy porque nosotros somos.', d: 'Filosofía Ubuntu y entrelazamiento cuántico' },
+                    { t: '¿Para qué vives?', d: 'La pregunta existencial que enciende la causa' }
+                  ].map((f, i) => (
+                    <div
+                      key={i}
+                      onClick={() => handleCopy(f.t, `anchor_${i}`)}
+                      style={{
+                        background: 'rgba(255,255,255,0.03)',
+                        border: copiedQuote === `anchor_${i}` ? '1px solid #10b981' : '1px solid rgba(255,255,255,0.08)',
+                        borderRadius: '12px',
+                        padding: '1rem',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <div style={{ fontSize: '0.75rem', color: '#f472b6', textTransform: 'uppercase', fontWeight: 800 }}>{f.d}</div>
+                      <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#fff', fontStyle: 'italic', margin: '0.3rem 0' }}>«{f.t}»</div>
+                      <span style={{ fontSize: '0.75rem', color: copiedQuote === `anchor_${i}` ? '#10b981' : 'var(--text-muted)' }}>
+                        {copiedQuote === `anchor_${i}` ? '✓ Copiado' : '📋 Clic para copiar'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* 8 PILARES DEL ESQUELETO */}
+              <div className="glass-panel" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+                <h3 style={{ fontSize: '1.2rem', margin: 0, color: 'var(--crear-gold)' }}>
+                  🧭 Los 8 Pasos de la Orientación en Sala
+                </h3>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
+                  <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1.2rem', borderRadius: '12px', borderLeft: '3px solid #ec4899' }}>
+                    <div style={{ color: '#f472b6', fontWeight: 800, fontSize: '0.85rem' }}>PASO 1: APERTURA</div>
+                    <div style={{ color: '#fff', fontWeight: 700, margin: '0.3rem 0' }}>Romper el contexto viejo</div>
+                    <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.5 }}>
+                      La nada como tabla rasa. Si montas una visión desde quien crees que eres, nace limitada por tu pasado.
+                    </p>
+                  </div>
+
+                  <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1.2rem', borderRadius: '12px', borderLeft: '3px solid #38bdf8' }}>
+                    <div style={{ color: '#38bdf8', fontWeight: 800, fontSize: '0.85rem' }}>PASO 2: INCERTIDUMBRE</div>
+                    <div style={{ color: '#fff', fontWeight: 700, margin: '0.3rem 0' }}>Certeza en lo desconocido</div>
+                    <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.5 }}>
+                      En el «no sé que no sé» desaparece el miedo y la expectativa. Estás en la nave: no hay mapa, hay creación.
+                    </p>
+                  </div>
+
+                  <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1.2rem', borderRadius: '12px', borderLeft: '3px solid #fbbf24' }}>
+                    <div style={{ color: '#fbbf24', fontWeight: 800, fontSize: '0.85rem' }}>PASO 3: VISIÓN COLECTIVA</div>
+                    <div style={{ color: '#fff', fontWeight: 700, margin: '0.3rem 0' }}>De lo individual a la causa común</div>
+                    <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.5 }}>
+                      Como los Niños Héroes o Miguel Hidalgo: dejaron su identidad ordinaria y se construyeron desde la nada por una patria.
+                    </p>
+                  </div>
+
+                  <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1.2rem', borderRadius: '12px', borderLeft: '3px solid #10b981' }}>
+                    <div style={{ color: '#10b981', fontWeight: 800, fontSize: '0.85rem' }}>PASO 4: UBUNTU Y FÍSICA CUÁNTICA</div>
+                    <div style={{ color: '#fff', fontWeight: 700, margin: '0.3rem 0' }}>«Yo soy porque nosotros somos»</div>
+                    <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.5 }}>
+                      Partículas entrelazadas conectadas por instinto. Columnas colectivas sostienen el edificio de la transformación.
+                    </p>
+                  </div>
+
+                  <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1.2rem', borderRadius: '12px', borderLeft: '3px solid #a78bfa' }}>
+                    <div style={{ color: '#a78bfa', fontWeight: 800, fontSize: '0.85rem' }}>PASO 5: PELELE</div>
+                    <div style={{ color: '#fff', fontWeight: 700, margin: '0.3rem 0' }}>Práctica constante (James Clear)</div>
+                    <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.5 }}>
+                      Patear la pelota una y otra vez. La repetición sin drama forja sinapsis. En la sala se viene a entrenar la vida, no a teorizar.
+                    </p>
+                  </div>
+
+                  <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1.2rem', borderRadius: '12px', borderLeft: '3px solid #f87171' }}>
+                    <div style={{ color: '#f87171', fontWeight: 800, fontSize: '0.85rem' }}>PASO 6: ENROLAMIENTO</div>
+                    <div style={{ color: '#fff', fontWeight: 700, margin: '0.3rem 0' }}>Elegir soldados, no espectadores</div>
+                    <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.5 }}>
+                      «No hay jugadores en la banca». Si dudas, no vuelvas tras el receso. Si regresas, es a Grandes Ligas.
+                    </p>
+                  </div>
+
+                  <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1.2rem', borderRadius: '12px', borderLeft: '3px solid #34d399' }}>
+                    <div style={{ color: '#34d399', fontWeight: 800, fontSize: '0.85rem' }}>PASO 7: CONSTRUCCIÓN</div>
+                    <div style={{ color: '#fff', fontWeight: 700, margin: '0.3rem 0' }}>¿Quiénes elegimos ser como equipo?</div>
+                    <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.5 }}>
+                      Compromiso en acción: «Bienvenido a la cancha donde se meten los goles llamada [Tu Visión]».
+                    </p>
+                  </div>
+
+                  <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1.2rem', borderRadius: '12px', borderLeft: '3px solid var(--crear-gold)' }}>
+                    <div style={{ color: 'var(--crear-gold)', fontWeight: 800, fontSize: '0.85rem' }}>PASO 8: CIERRE</div>
+                    <div style={{ color: '#fff', fontWeight: 700, margin: '0.3rem 0' }}>¿Para qué vives?</div>
+                    <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.5 }}>
+                      La plataforma de visión aterriza el sábado antes del llamado a la acción. La orientación prepara el terreno para todo lo que viene.
+                    </p>
+                  </div>
+                </div>
+
+                {/* GUION DEL ENTRENADOR INTERACTIVO */}
+                <div style={{ background: '#040714', border: '1px solid rgba(236,72,153,0.3)', padding: '1.2rem', borderRadius: '12px', marginTop: '1rem' }}>
+                  <div style={{ color: '#f472b6', fontWeight: 800, fontSize: '0.85rem', marginBottom: '0.4rem' }}>
+                    🎙️ GUION DEL ENTRENADOR EN SALA
+                  </div>
+                  <div style={{ color: '#fff', fontStyle: 'italic', fontSize: '1rem', lineHeight: 1.6 }}>
+                    «Mi nombre es [tu nombre]. Les pido permiso de ser su entrenador este fin de semana. Aunque no me elijan, yo soy el entrenador. A partir de ahora, lo que queda es alinear la letra con la música.»
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1.5rem' }}>
+                <button onClick={() => setActiveChapter('cap6')} className="btn-secondary" style={{ padding: '8px 18px' }}>
+                  ← Capítulo 6
+                </button>
+                <button onClick={() => setActiveChapter('epilogo')} className="btn-primary" style={{ padding: '8px 24px' }}>
                   Epílogo: El Manifiesto IMO →
                 </button>
               </div>
