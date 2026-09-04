@@ -29,6 +29,7 @@ import NodusDataMap from './pages/NodusDataMap'
 import CalendarioMJ from './pages/CalendarioMJ'
 import GeneradorFlyer from './pages/GeneradorFlyer'
 import MonitorVuelosCartas from './pages/MonitorVuelosCartas'
+import VendeSinVender from './pages/VendeSinVender'
 import AICopilot from './components/AICopilot'
 import PromptModal from './components/PromptModal'
 import BirthdayAlert from './components/BirthdayAlert'
@@ -301,6 +302,14 @@ function App() {
           } />
           <Route path="/vuelos" element={<Navigate to="/monitor-vuelos" replace />} />
           <Route path="/cartas" element={<Navigate to="/monitor-vuelos" replace />} />
+
+          {/* Best-Seller Causa OS: Vende Sin Vender */}
+          <Route path="/vende-sin-vender" element={
+            <PrivateRoute>
+              <VendeSinVender />
+            </PrivateRoute>
+          } />
+          <Route path="/causa-vende" element={<Navigate to="/vende-sin-vender" replace />} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

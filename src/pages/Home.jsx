@@ -422,6 +422,17 @@ const CAUSA_OPTIONS_REGISTRY = [
     roles: null
   },
   {
+    id: 'opt-vende-sin-vender',
+    title: '📖 Vende Sin Vender (Best-Seller Causa OS)',
+    category: 'Formación y Liderazgo',
+    badge: 'Best-Seller 2026',
+    emoji: '📖',
+    desc: 'El Arte de Enrolar y Despertar Gigantes: Neuromarketing Ético, Alex Hormozi y Causa OS con 8 gráficas narrativas interactivas',
+    keywords: ['vende sin vender', 'libro', 'best seller', 'hormozi', 'yoda', 'perro guardian', 'ecuacion de valor', 'ticket verde', 'rezagados', 'enrolamiento', 'storybrand'],
+    route: '/vende-sin-vender',
+    roles: null
+  },
+  {
     id: 'opt-campus',
     title: 'Campus Interactivo CREAR',
     category: 'Academia',
@@ -1425,6 +1436,10 @@ export default function Home() {
                     📗 Manual Práctico Nodus
                   </button>
                 )}
+
+                <button onClick={() => { setShowToolsDropdown(false); navigate('/vende-sin-vender'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: 'var(--crear-gold)', borderColor: 'rgba(255, 183, 3, 0.4)', background: 'rgba(255, 183, 3, 0.1)', fontWeight: 'bold' }}>
+                  📖 Vende Sin Vender (Causa OS)
+                </button>
               </div>
             )}
           </div>
