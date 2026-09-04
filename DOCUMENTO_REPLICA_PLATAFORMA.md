@@ -116901,6 +116901,25 @@ fs.writeFileSync('src/pages/Home.jsx', code, 'utf8');
 
 ---
 
+## Archivo: scratch\qt.json
+
+```json
+{
+  "name": "Gina Cardenas Lopez",
+  "email": "cardenaslopezgina@gmail.com",
+  "phone": "+51999999999",
+  "sede": "Lima",
+  "experience": "Lider Senior",
+  "instagram": "@ginacardenas",
+  "bio": "Comprometida a servir desde la participación total",
+  "dni": "00000000",
+  "talla": "M",
+  "isLeader": true
+}
+```
+
+---
+
 ## Archivo: scratch\test_import.js
 
 ```js
@@ -180530,7 +180549,7 @@ export default function DirectorioQT() {
           if (m.sede !== userSede && m.sede !== 'Global') return false;
         } else if (hasQT) {
           // Un QT normal ve solo su sede y al Coordinador Global
-          const isTargetQTGlobal = m.sede === 'Global' || m.email?.toLowerCase().includes('brunis');
+          const isTargetQTGlobal = m.sede === 'Global' || m.email?.toLowerCase().includes('brunis') || m.email?.toLowerCase().includes('cardenas');
           if (m.sede !== userSede && !isTargetQTGlobal) return false;
         } else {
           // Cualquier otro rol (manager, capitan, etc.) ve su sede
@@ -184218,7 +184237,7 @@ const MODULE_REGISTRY = [
   { id: 'estrategia', label: 'Estrategia OKRs (Cascade)', emoji: '🎯', route: '/estrategia', roles: EXEC_ROLES },
   { id: 'auditoria-kpis', label: 'Auditoría de KPIs', emoji: '📉', route: '/auditoria-kpis', roles: EXEC_ROLES },
   { id: 'acuerdos', label: 'Acuerdos Oficiales (Correo)', emoji: '✉️', route: '/acuerdos', roles: EXEC_ROLES },
-  { id: 'calendario-equipo', label: 'Agenda y Time Boxing', emoji: '🗓️', route: '/calendario-equipo', roles: EXEC_ROLES },
+  { id: 'calendario-equipo', label: 'Agenda y Time Boxing', emoji: '🗓️', route: '/calendario-equipo', roles: null },
   { id: 'learning', label: 'Inteligencia Colectiva (Learning)', emoji: '🧠', route: '/learning', roles: EXEC_ROLES },
   { id: 'excelencia', label: 'Excelencia Operativa', emoji: '👑', route: '/excelencia', roles: EXEC_ROLES },
   { id: 'mis-kpis', label: 'Mis KPIs', emoji: '📊', route: '/mis-kpis', roles: KPI_ROLES },
@@ -185049,11 +185068,9 @@ export default function Home() {
                   ✉️ Acuerdos Oficiales (Correo)
                 </button>
 )}
-                {(currentUser?.isSuperAdmin || currentUser?.appRole === 'gerente' || currentUser?.isDireccion || currentUser?.appRole === 'director_maestria' || ['coordinador', 'coord_c1', 'coord_c2', 'coordinador_c1c2'].includes(currentUser?.appRole)) && (
                 <button onClick={() => { setShowToolsDropdown(false); navigate('/calendario-equipo'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#f97316', background: 'rgba(249, 115, 22, 0.1)' }}>
                   🗓️ Agenda y Time Boxing
                 </button>
-              )}
 
                 {(currentUser?.appRole !== 'qt') && (
 <button onClick={() => { setShowToolsDropdown(false); navigate('/learning'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(41, 171, 226, 0.1)', color: 'var(--crear-cyan)' }}>
@@ -191642,6 +191659,37 @@ export default function HomeOficina() {
   );
 }
 
+```
+
+---
+
+## Archivo: src\scripts\migrateQT.js
+
+```js
+import { doc, setDoc } from 'firebase/firestore';
+import { db } from '../services/firebase.js';
+
+const migrateGina = async () => {
+   const qtRef = doc(db, 'qt_directory', 'cardenaslopezgina@gmail.com');
+   await setDoc(qtRef, {
+      index: 100, // put her at the end for now
+      name: "Gina Cardenas Lopez",
+      email: "cardenaslopezgina@gmail.com",
+      phone: "+51999999999",
+      sede: "Lima",
+      experience: "Lider Senior",
+      instagram: "@ginacardenas",
+      bio: "Comprometida a servir desde la participación total",
+      dni: "00000000",
+      talla: "M",
+      isLeader: true,
+      lastUpdated: new Date().toISOString()
+   });
+   console.log("Migrated Gina");
+   process.exit(0);
+};
+
+migrateGina();
 ```
 
 ---

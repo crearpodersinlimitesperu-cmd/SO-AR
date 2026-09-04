@@ -128,7 +128,7 @@ export default function DirectorioQT() {
           if (m.sede !== userSede && m.sede !== 'Global') return false;
         } else if (hasQT) {
           // Un QT normal ve solo su sede y al Coordinador Global
-          const isTargetQTGlobal = m.sede === 'Global' || m.email?.toLowerCase().includes('brunis');
+          const isTargetQTGlobal = m.sede === 'Global' || m.email?.toLowerCase().includes('brunis') || m.email?.toLowerCase().includes('cardenas');
           if (m.sede !== userSede && !isTargetQTGlobal) return false;
         } else {
           // Cualquier otro rol (manager, capitan, etc.) ve su sede
