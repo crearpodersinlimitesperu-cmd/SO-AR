@@ -33,6 +33,7 @@ import VendeSinVender from './pages/VendeSinVender'
 import AICopilot from './components/AICopilot'
 import PromptModal from './components/PromptModal'
 import BirthdayAlert from './components/BirthdayAlert'
+import ApdaycPaymentAlert from './components/ApdaycPaymentAlert'
 import HelpModal from './components/HelpModal'
 import ThemeToggle from './components/ThemeToggle'
 
@@ -134,6 +135,7 @@ function App() {
       )}
       <PromptModal />
       {currentUser && <BirthdayAlert />}
+      {currentUser && <ApdaycPaymentAlert />}
       <main style={{ flex: 1 }}>
         <Routes>
           <Route path="/login" element={<Login />} />
