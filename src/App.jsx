@@ -31,6 +31,7 @@ import GeneradorFlyer from './pages/GeneradorFlyer'
 import MonitorVuelosCartas from './pages/MonitorVuelosCartas'
 import VendeSinVender from './pages/VendeSinVender'
 import MasterclassDistinciones from './pages/MasterclassDistinciones'
+import DashboardKpisLima from './pages/DashboardKpisLima'
 import AICopilot from './components/AICopilot'
 import PromptModal from './components/PromptModal'
 import BirthdayAlert from './components/BirthdayAlert'
@@ -321,6 +322,12 @@ function App() {
           } />
           <Route path="/vuelos" element={<Navigate to="/monitor-vuelos" replace />} />
           <Route path="/cartas" element={<Navigate to="/monitor-vuelos" replace />} />
+
+          <Route path="/kpis-lima" element={
+            <PrivateRoute>
+              <DashboardKpisLima />
+            </PrivateRoute>
+          } />
 
           {/* Best-Seller Causa OS: Vende Sin Vender */}
           <Route path="/vende-sin-vender" element={

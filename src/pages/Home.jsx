@@ -135,6 +135,17 @@ const CAUSA_OPTIONS_REGISTRY = [
   },
 
   {
+    id: 'opt-kpis-lima',
+    title: '📊 Dashboard Directivo (Sede Lima)',
+    category: 'Analítica de Sede',
+    badge: 'Nuevo • Lima',
+    emoji: '📈',
+    desc: 'Análisis de efectividad, enrolamiento y calidad de datos operacionales de equipos y coordinadoras de la Sede Lima.',
+    keywords: ['kpi', 'dashboard', 'lima', 'coordinadoras', 'equipos', 'efectividad', 'desertores', 'analisis', 'datos', 'directivo'],
+    route: '/kpis-lima',
+    roles: null
+  },
+  {
     id: 'opt-flyer',
     title: 'Generador de Flyers Oficiales',
     category: 'Herramienta HD',
