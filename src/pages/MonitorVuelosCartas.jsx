@@ -310,9 +310,20 @@ export default function MonitorVuelosCartas() {
   const flightsList = Object.values(trackerData?.flights || {});
 
   const filteredFlights = flightsList.filter(f => {
-    if (routeFilter === 'UIO-LIM') return f.route.origin === 'UIO';
-    if (routeFilter === 'LIM-UIO') return f.route.origin === 'LIM';
-    if (routeFilter === 'BOG-LIM') return f.route.origin === 'BOG';
+    if (routeFilter === 'UIO-LIM' && !(f.route.origin === 'UIO' && f.route.destination === 'LIM')) return false;
+    if (routeFilter === 'LIM-UIO' && !(f.route.origin === 'LIM' && f.route.destination === 'UIO')) return false;
+    if (routeFilter === 'LIM-GYE' && !(f.route.origin === 'LIM' && f.route.destination === 'GYE')) return false;
+    if (routeFilter === 'BOG-LIM' && !(f.route.origin === 'BOG' && f.route.destination === 'LIM')) return false;
+
+    if (searchFilter.trim()) {
+      const q = searchFilter.toLowerCase().trim();
+      const matchPax = f.passengers?.some(p => p.toLowerCase().includes(q));
+      const matchFlight = f.flightNumber?.toLowerCase().includes(q) || f.flightCode?.toLowerCase().includes(q);
+      const matchCity = f.route?.originCity?.toLowerCase().includes(q) || f.route?.destinationCity?.toLowerCase().includes(q) || f.route?.origin?.toLowerCase().includes(q) || f.route?.destination?.toLowerCase().includes(q);
+      const matchAirline = f.airline?.toLowerCase().includes(q);
+      const matchPnr = f.reservationCode?.toLowerCase().includes(q);
+      return matchPax || matchFlight || matchCity || matchAirline || matchPnr;
+    }
     return true;
   });
 
@@ -507,37 +518,96 @@ export default function MonitorVuelosCartas() {
       {activeTab === 'radar' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           
-          {/* Barra de Filtros de Ruta */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-              {[
-                { id: 'ALL', label: 'Todos los Vuelos' },
-                { id: 'UIO-LIM', label: 'Quito ➔ Lima (UIO → LIM)' },
-                { id: 'LIM-UIO', label: 'Lima ➔ Quito (LIM → UIO)' },
-                { id: 'BOG-LIM', label: 'Bogotá ➔ Lima (BOG → LIM)' }
-              ].map(r => (
-                <button
-                  key={r.id}
-                  onClick={() => setRouteFilter(r.id)}
-                  style={{
-                    padding: '6px 14px',
-                    borderRadius: '8px',
-                    border: '1px solid',
-                    borderColor: routeFilter === r.id ? '#38bdf8' : 'rgba(255,255,255,0.1)',
-                    background: routeFilter === r.id ? 'rgba(56,189,248,0.2)' : 'rgba(0,0,0,0.3)',
-                    color: routeFilter === r.id ? '#38bdf8' : 'var(--text-muted)',
-                    fontSize: '0.82rem',
-                    fontWeight: 600,
-                    cursor: 'pointer'
-                  }}
-                >
-                  {r.label}
-                </button>
-              ))}
+          {/* Barra de Filtros y Búsqueda de Vuelos */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                {[
+                  { id: 'ALL', label: `Todos los Vuelos (${flightsList.length})` },
+                  { id: 'UIO-LIM', label: 'Quito ➔ Lima (UIO → LIM)' },
+                  { id: 'LIM-UIO', label: 'Lima ➔ Quito (LIM → UIO)' },
+                  { id: 'LIM-GYE', label: 'Lima ➔ Guayaquil (LIM → GYE)' },
+                  { id: 'BOG-LIM', label: 'Bogotá ➔ Lima (BOG → LIM)' }
+                ].map(r => (
+                  <button
+                    key={r.id}
+                    onClick={() => setRouteFilter(r.id)}
+                    style={{
+                      padding: '6px 14px',
+                      borderRadius: '8px',
+                      border: '1px solid',
+                      borderColor: routeFilter === r.id ? '#38bdf8' : 'rgba(255,255,255,0.1)',
+                      background: routeFilter === r.id ? 'rgba(56,189,248,0.2)' : 'rgba(0,0,0,0.3)',
+                      color: routeFilter === r.id ? '#38bdf8' : 'var(--text-muted)',
+                      fontSize: '0.82rem',
+                      fontWeight: 600,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {r.label}
+                  </button>
+                ))}
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{
+                  background: 'rgba(52, 211, 153, 0.15)',
+                  color: '#34d399',
+                  padding: '3px 10px',
+                  borderRadius: '12px',
+                  fontSize: '0.75rem',
+                  fontWeight: 'bold',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px'
+                }}>
+                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#34d399', display: 'inline-block' }}></span>
+                  Drive Sync (7x/día)
+                </span>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                  Sincronizado: <span style={{ color: '#fff' }}>{new Date(trackerData?.updatedAt || Date.now()).toLocaleTimeString()}</span>
+                </div>
+              </div>
             </div>
 
-            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-              Última sincronización: <span style={{ color: '#fff' }}>{new Date(trackerData?.updatedAt || Date.now()).toLocaleTimeString()}</span>
+            {/* Input de Búsqueda de Pasajero/Vuelo */}
+            <div style={{ position: 'relative', width: '100%' }}>
+              <Search size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+              <input
+                type="text"
+                value={searchFilter}
+                onChange={(e) => setSearchFilter(e.target.value)}
+                placeholder="Buscar por entrenador (ej. Elmer Idrobo, María Patiño, Fernando Aragón, Diego Bravo, Carlos Brunis...), vuelo o PNR..."
+                style={{
+                  width: '100%',
+                  padding: '10px 16px 10px 42px',
+                  background: 'rgba(255,255,255,0.04)',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  borderRadius: '10px',
+                  color: '#fff',
+                  fontSize: '0.9rem',
+                  outline: 'none',
+                  boxSizing: 'border-box'
+                }}
+              />
+              {searchFilter && (
+                <button
+                  onClick={() => setSearchFilter('')}
+                  style={{
+                    position: 'absolute',
+                    right: '12px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'var(--text-muted)',
+                    cursor: 'pointer',
+                    fontSize: '0.85rem'
+                  }}
+                >
+                  ✕
+                </button>
+              )}
             </div>
           </div>
 

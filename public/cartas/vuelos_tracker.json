@@ -1,15 +1,21 @@
 {
-  "updatedAt": "2026-09-03T20:21:23.790Z",
+  "updatedAt": "2026-09-04T00:10:45.566280Z",
+  "totalFlights": 53,
+  "source": "Google Drive Sync (7x/dia) - Carpetas Oficiales Vuelos CPSL",
   "flights": {
     "LA1437": {
       "flightNumber": "LA 1437",
       "flightCode": "LA1437",
       "airline": "LATAM Airlines",
-      "callsign": "LAN1437",
-      "reservationCode": "DJBJJD",
+      "callsign": "LA1437",
+      "reservationCode": "JYUAGO",
       "passengers": [
-        "Elmer Andrés Idrovo Andrade",
-        "María de Lourdes Patiño"
+        "MARIA PATINO GALARRAGA",
+        "JULIO NARVAEZ MORA",
+        "FERNANDO ARAGON",
+        "DIEGO BRAVO FIGUEROA",
+        "EDISON SOSA CARRERA",
+        "ERNESTO DIAZ PABON"
       ],
       "route": {
         "origin": "UIO",
@@ -23,38 +29,459 @@
         "flightDuration": "2h 15m"
       },
       "schedule": {
-        "departureDate": "2026-09-04",
-        "scheduledDeparture": "2026-09-04T07:55:00-05:00",
-        "scheduledArrival": "2026-09-04T10:10:00-05:00",
-        "estimatedDeparture": "2026-09-04T07:55:00-05:00",
-        "estimatedArrival": "2026-09-04T10:10:00-05:00",
+        "departureDate": "2026-09-03",
+        "scheduledDeparture": "2026-09-03T07:55:00-05:00",
+        "scheduledArrival": "2026-09-03T10:10:00-05:00",
+        "estimatedDeparture": "2026-09-03T07:55:00-05:00",
+        "estimatedArrival": "2026-09-03T10:10:00-05:00",
         "actualDeparture": null,
         "actualArrival": null
       },
       "status": "ON_TIME",
-      "statusLabel": "A tiempo",
-      "statusDescription": "Vuelo confirmado y a tiempo para despegue directo UIO → LIM",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo con 6 entrenadores (MARIA PATINO GALARRAGA, JULIO NARVAEZ MORA, FERNANDO ARAGON, DIEGO BRAVO FIGUEROA, EDISON SOSA CARRERA, ERNESTO DIAZ PABON) en ruta UIO → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
       "baggageClaim": "Por confirmar en arribo",
       "logistics": {
-        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Jorge Chávez)",
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
         "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
-        "driverPickupEstimated": "10:35 AM",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
         "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
       },
       "radarUrl": "https://www.flightradar24.com/data/flights/la1437",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1429": {
+      "flightNumber": "LA 1429",
+      "flightCode": "LA1429",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1429",
+      "reservationCode": "JYUAGO",
+      "passengers": [
+        "MARIA PATINO GALARRAGA",
+        "JULIO NARVAEZ MORA",
+        "JERRY NOLE CONTRERAS",
+        "DIEGO BRAVO FIGUEROA"
+      ],
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "GYE",
+        "destinationCity": "Guayaquil",
+        "destinationAirport": "Aeropuerto Internacional José Joaquín de Olmedo",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-07",
+        "scheduledDeparture": "2026-09-07T12:30:00-05:00",
+        "scheduledArrival": "2026-09-07T14:45:00-05:00",
+        "estimatedDeparture": "2026-09-07T12:30:00-05:00",
+        "estimatedArrival": "2026-09-07T14:45:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo con 4 entrenadores (MARIA PATINO GALARRAGA, JULIO NARVAEZ MORA, JERRY NOLE CONTRERAS, DIEGO BRAVO FIGUEROA) en ruta LIM → GYE",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional José Joaquín de Olmedo)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1429",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1414": {
+      "flightNumber": "LA 1414",
+      "flightCode": "LA1414",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1414",
+      "reservationCode": "JYUAGO",
+      "passengers": [
+        "MARIA PATINO GALARRAGA",
+        "JULIO NARVAEZ MORA",
+        "DIEGO BRAVO FIGUEROA"
+      ],
+      "route": {
+        "origin": "GYE",
+        "originCity": "Guayaquil",
+        "originAirport": "Aeropuerto Internacional José Joaquín de Olmedo",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-07",
+        "scheduledDeparture": "2026-09-07T16:13:00-05:00",
+        "scheduledArrival": "2026-09-07T17:05:00-05:00",
+        "estimatedDeparture": "2026-09-07T16:13:00-05:00",
+        "estimatedArrival": "2026-09-07T17:05:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo con 3 entrenadores (MARIA PATINO GALARRAGA, JULIO NARVAEZ MORA, DIEGO BRAVO FIGUEROA) en ruta GYE → UIO",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Mariscal Sucre)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1414",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1351": {
+      "flightNumber": "LA 1351",
+      "flightCode": "LA1351",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1351",
+      "reservationCode": "DJBJJD",
+      "passengers": [
+        "ELMER IDROBO ANDRADE"
+      ],
+      "route": {
+        "origin": "UIO",
+        "originCity": "Quito",
+        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "destination": "GYE",
+        "destinationCity": "Guayaquil",
+        "destinationAirport": "Aeropuerto Internacional José Joaquín de Olmedo",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-04",
+        "scheduledDeparture": "2026-09-04T06:00:00-05:00",
+        "scheduledArrival": "2026-09-04T06:53:00-05:00",
+        "estimatedDeparture": "2026-09-04T06:00:00-05:00",
+        "estimatedArrival": "2026-09-04T06:53:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo de entrenador ELMER IDROBO ANDRADE confirmado ruta UIO → GYE",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional José Joaquín de Olmedo)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1351",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1430": {
+      "flightNumber": "LA 1430",
+      "flightCode": "LA1430",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1430",
+      "reservationCode": "DJBJJD",
+      "passengers": [
+        "ELMER IDROBO ANDRADE",
+        "HAYDIN MENDOZA CLAVIJO"
+      ],
+      "route": {
+        "origin": "GYE",
+        "originCity": "Guayaquil",
+        "originAirport": "Aeropuerto Internacional José Joaquín de Olmedo",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-04",
+        "scheduledDeparture": "2026-09-04T09:00:00-05:00",
+        "scheduledArrival": "2026-09-04T10:55:00-05:00",
+        "estimatedDeparture": "2026-09-04T09:00:00-05:00",
+        "estimatedArrival": "2026-09-04T10:55:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo con 2 entrenadores (ELMER IDROBO ANDRADE, HAYDIN MENDOZA CLAVIJO) en ruta GYE → LIM",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1430",
       "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
     },
     "LA1449": {
       "flightNumber": "LA 1449",
       "flightCode": "LA1449",
       "airline": "LATAM Airlines",
-      "callsign": "LAN1449",
+      "callsign": "LA1449",
       "reservationCode": "DJBJJD",
       "passengers": [
-        "Elmer Andrés Idrovo Andrade"
+        "ELMER IDROBO ANDRADE",
+        "HAYDIN MENDOZA CLAVIJO"
+      ],
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "GYE",
+        "destinationCity": "Guayaquil",
+        "destinationAirport": "Aeropuerto Internacional José Joaquín de Olmedo",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-06",
+        "scheduledDeparture": "2026-09-06T23:35:00-05:00",
+        "scheduledArrival": "2026-09-07T01:45:00-05:00",
+        "estimatedDeparture": "2026-09-06T23:35:00-05:00",
+        "estimatedArrival": "2026-09-07T01:45:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo con 2 entrenadores (ELMER IDROBO ANDRADE, HAYDIN MENDOZA CLAVIJO) en ruta LIM → GYE",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional José Joaquín de Olmedo)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1449",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1369": {
+      "flightNumber": "LA 1369",
+      "flightCode": "LA1369",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1369",
+      "reservationCode": "DJBJJD",
+      "passengers": [
+        "ELMER IDROBO ANDRADE"
+      ],
+      "route": {
+        "origin": "GYE",
+        "originCity": "Guayaquil",
+        "originAirport": "Aeropuerto Internacional José Joaquín de Olmedo",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-07",
+        "scheduledDeparture": "2026-09-07T05:45:00-05:00",
+        "scheduledArrival": "2026-09-07T06:37:00-05:00",
+        "estimatedDeparture": "2026-09-07T05:45:00-05:00",
+        "estimatedArrival": "2026-09-07T06:37:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo de entrenador ELMER IDROBO ANDRADE confirmado ruta GYE → UIO",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Mariscal Sucre)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1369",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA2393": {
+      "flightNumber": "LA 2393",
+      "flightCode": "LA2393",
+      "airline": "LATAM Airlines",
+      "callsign": "LA2393",
+      "reservationCode": "NDJUIB",
+      "passengers": [
+        "CARLOS GOMEZ GOMEZ",
+        "MILDRED MUNOZ VASQUEZ"
+      ],
+      "route": {
+        "origin": "MDE",
+        "originCity": "Medellín",
+        "originAirport": "Aeropuerto Internacional José María Córdova",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-08-26",
+        "scheduledDeparture": "2026-08-26T18:15:00-05:00",
+        "scheduledArrival": "2026-08-26T21:25:00-05:00",
+        "estimatedDeparture": "2026-08-26T18:15:00-05:00",
+        "estimatedArrival": "2026-08-26T21:25:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo con 2 entrenadores (CARLOS GOMEZ GOMEZ, MILDRED MUNOZ VASQUEZ) en ruta MDE → LIM",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la2393",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA2392": {
+      "flightNumber": "LA 2392",
+      "flightCode": "LA2392",
+      "airline": "LATAM Airlines",
+      "callsign": "LA2392",
+      "reservationCode": "NDJUIB",
+      "passengers": [
+        "CARLOS GOMEZ GOMEZ",
+        "MILDRED MUNOZ VASQUEZ"
+      ],
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "MDE",
+        "destinationCity": "Medellín",
+        "destinationAirport": "Aeropuerto Internacional José María Córdova",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-08-31",
+        "scheduledDeparture": "2026-08-31T13:10:00-05:00",
+        "scheduledArrival": "2026-08-31T16:20:00-05:00",
+        "estimatedDeparture": "2026-08-31T13:10:00-05:00",
+        "estimatedArrival": "2026-08-31T16:20:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo con 2 entrenadores (CARLOS GOMEZ GOMEZ, MILDRED MUNOZ VASQUEZ) en ruta LIM → MDE",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional José María Córdova)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la2392",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA2383": {
+      "flightNumber": "LA 2383",
+      "flightCode": "LA2383",
+      "airline": "LATAM Airlines",
+      "callsign": "LA2383",
+      "reservationCode": "EXONMW",
+      "passengers": [
+        "FERNANDO ARAGON",
+        "LEANDRO BRUNIS AVILES",
+        "CARLOS BRUNIS VILLACIS",
+        "ERNESTO DIAZ PABON",
+        "DIEGO BRAVO FIGUEROA",
+        "JULIO NARVAEZ MORA",
+        "ELMER IDROBO ANDRADE",
+        "JOSE SANCHEZ MORENO"
+      ],
+      "route": {
+        "origin": "UIO",
+        "originCity": "Quito",
+        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-08-13",
+        "scheduledDeparture": "2026-08-13T12:15:00-05:00",
+        "scheduledArrival": "2026-08-13T14:30:00-05:00",
+        "estimatedDeparture": "2026-08-13T12:15:00-05:00",
+        "estimatedArrival": "2026-08-13T14:30:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo con 8 entrenadores (FERNANDO ARAGON, LEANDRO BRUNIS AVILES, CARLOS BRUNIS VILLACIS, ERNESTO DIAZ PABON, DIEGO BRAVO FIGUEROA, JULIO NARVAEZ MORA, ELMER IDROBO ANDRADE, JOSE SANCHEZ MORENO) en ruta UIO → LIM",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la2383",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA2465": {
+      "flightNumber": "LA 2465",
+      "flightCode": "LA2465",
+      "airline": "LATAM Airlines",
+      "callsign": "LA2465",
+      "reservationCode": "USWLVZ",
+      "passengers": [
+        "FERNANDO ARAGON"
       ],
       "route": {
         "origin": "LIM",
@@ -63,44 +490,385 @@
         "destination": "UIO",
         "destinationCity": "Quito",
         "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
-        "isDirect": false,
-        "stops": 1,
-        "stopover": "Guayaquil (GYE) - Escala de 4h 00m",
-        "flightDuration": "7h 02m (con escala)"
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
       },
       "schedule": {
-        "departureDate": "2026-09-06",
-        "scheduledDeparture": "2026-09-06T23:35:00-05:00",
-        "scheduledArrival": "2026-09-07T06:37:00-05:00",
-        "estimatedDeparture": "2026-09-06T23:35:00-05:00",
-        "estimatedArrival": "2026-09-07T06:37:00-05:00",
+        "departureDate": "2026-08-17",
+        "scheduledDeparture": "2026-08-17T01:15:00-05:00",
+        "scheduledArrival": "2026-08-17T07:40:00-05:00",
+        "estimatedDeparture": "2026-08-17T01:15:00-05:00",
+        "estimatedArrival": "2026-08-17T07:40:00-05:00",
         "actualDeparture": null,
         "actualArrival": null
       },
       "status": "ON_TIME",
-      "statusLabel": "Programado · A tiempo",
-      "statusDescription": "Vuelo de retorno programado",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo de entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
       "delayMinutes": 0,
       "terminal": "T1",
-      "gate": "Por confirmar",
-      "baggageClaim": null,
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
       "logistics": {
-        "pickupLocation": "Lobby del Hotel Jose Antonio Deluxe",
-        "driverPickupEstimated": "8:30 PM (20:30 hrs)",
-        "destination": "Aeropuerto Jorge Chávez",
-        "driverNote": "Recojo 3h antes para vuelo internacional nocturno."
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Mariscal Sucre)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
       },
-      "radarUrl": "https://www.flightradar24.com/data/flights/la1449",
+      "radarUrl": "https://www.flightradar24.com/data/flights/la2465",
       "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
     },
-    "AV108": {
-      "flightNumber": "AV 108",
-      "flightCode": "AV108",
-      "airline": "Avianca",
-      "callsign": "AVA108",
-      "reservationCode": "AVCONF",
+    "LA2382": {
+      "flightNumber": "LA 2382",
+      "flightCode": "LA2382",
+      "airline": "LATAM Airlines",
+      "callsign": "LA2382",
+      "reservationCode": "YJRVPI",
       "passengers": [
-        "Alejandro Díaz Pabón"
+        "DIEGO BRAVO FIGUEROA",
+        "MARIA PATINO GALARRAGA",
+        "ERNESTO DIAZ PABON",
+        "EDISON SOSA CARRERA",
+        "LEANDRO BRUNIS AVILES",
+        "ELMER IDROBO ANDRADE",
+        "CARLOS BRUNIS VILLACIS",
+        "FERNANDO ARAGON",
+        "MONICA CASTILLO ARMENDARIZ",
+        "JULIO NARVAEZ MORA"
+      ],
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-08-17",
+        "scheduledDeparture": "2026-08-17T08:45:00-05:00",
+        "scheduledArrival": "2026-08-17T11:05:00-05:00",
+        "estimatedDeparture": "2026-08-17T08:45:00-05:00",
+        "estimatedArrival": "2026-08-17T11:05:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo con 10 entrenadores (DIEGO BRAVO FIGUEROA, MARIA PATINO GALARRAGA, ERNESTO DIAZ PABON, EDISON SOSA CARRERA, LEANDRO BRUNIS AVILES, ELMER IDROBO ANDRADE, CARLOS BRUNIS VILLACIS, FERNANDO ARAGON, MONICA CASTILLO ARMENDARIZ, JULIO NARVAEZ MORA) en ruta LIM → UIO",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Mariscal Sucre)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la2382",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA2389": {
+      "flightNumber": "LA 2389",
+      "flightCode": "LA2389",
+      "airline": "LATAM Airlines",
+      "callsign": "LA2389",
+      "reservationCode": "QULMWE",
+      "passengers": [
+        "JERRY NOLE CONTRERAS",
+        "MICHAEL BOADA RUBIANO",
+        "ERNESTO DIAZ PABON",
+        "ELMER IDROBO ANDRADE",
+        "EDISON SOSA CARRERA"
+      ],
+      "route": {
+        "origin": "UIO",
+        "originCity": "Quito",
+        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-07-10",
+        "scheduledDeparture": "2026-07-10T20:05:00-05:00",
+        "scheduledArrival": "2026-07-10T22:20:00-05:00",
+        "estimatedDeparture": "2026-07-10T20:05:00-05:00",
+        "estimatedArrival": "2026-07-10T22:20:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo con 5 entrenadores (JERRY NOLE CONTRERAS, MICHAEL BOADA RUBIANO, ERNESTO DIAZ PABON, ELMER IDROBO ANDRADE, EDISON SOSA CARRERA) en ruta UIO → LIM",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la2389",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1366": {
+      "flightNumber": "LA 1366",
+      "flightCode": "LA1366",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1366",
+      "reservationCode": "QULMWE",
+      "passengers": [
+        "JERRY NOLE CONTRERAS"
+      ],
+      "route": {
+        "origin": "GYE",
+        "originCity": "Guayaquil",
+        "originAirport": "Aeropuerto Internacional José Joaquín de Olmedo",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-07-15",
+        "scheduledDeparture": "2026-07-15T17:28:00-05:00",
+        "scheduledArrival": "2026-07-15T18:20:00-05:00",
+        "estimatedDeparture": "2026-07-15T17:28:00-05:00",
+        "estimatedArrival": "2026-07-15T18:20:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo de entrenador JERRY NOLE CONTRERAS confirmado ruta GYE → UIO",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Mariscal Sucre)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1366",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA2386": {
+      "flightNumber": "LA 2386",
+      "flightCode": "LA2386",
+      "airline": "LATAM Airlines",
+      "callsign": "LA2386",
+      "reservationCode": "KDHKYA",
+      "passengers": [
+        "MICHAEL BOADA RUBIANO"
+      ],
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "BOG",
+        "destinationCity": "Bogotá",
+        "destinationAirport": "Aeropuerto Internacional El Dorado",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-08-03",
+        "scheduledDeparture": "2026-08-03T13:00:00-05:00",
+        "scheduledArrival": "2026-08-03T16:15:00-05:00",
+        "estimatedDeparture": "2026-08-03T13:00:00-05:00",
+        "estimatedArrival": "2026-08-03T16:15:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo de entrenador MICHAEL BOADA RUBIANO confirmado ruta LIM → BOG",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional El Dorado)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la2386",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1436": {
+      "flightNumber": "LA 1436",
+      "flightCode": "LA1436",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1436",
+      "reservationCode": "MXVURS",
+      "passengers": [
+        "CARLOS BRUNIS VILLACIS",
+        "LEANDRO BRUNIS AVILES",
+        "EDISON SOSA CARRERA",
+        "JULIO NARVAEZ MORA",
+        "FERNANDO ARAGON"
+      ],
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-06-01",
+        "scheduledDeparture": "2026-06-01T12:15:00-05:00",
+        "scheduledArrival": "2026-06-01T14:37:00-05:00",
+        "estimatedDeparture": "2026-06-01T12:15:00-05:00",
+        "estimatedArrival": "2026-06-01T14:37:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo con 5 entrenadores (CARLOS BRUNIS VILLACIS, LEANDRO BRUNIS AVILES, EDISON SOSA CARRERA, JULIO NARVAEZ MORA, FERNANDO ARAGON) en ruta LIM → UIO",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Mariscal Sucre)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1436",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA2471": {
+      "flightNumber": "LA 2471",
+      "flightCode": "LA2471",
+      "airline": "LATAM Airlines",
+      "callsign": "LA2471",
+      "reservationCode": "QPXRHG",
+      "passengers": [
+        "DANIELA RAMOS TORRES",
+        "CIRILO AGUSTIN MARTINEZ",
+        "ALONSO SOLARES SALAZAR",
+        "JUAN ARREOLA MORALES",
+        "JESUS ACOSTA RODRIGUEZ",
+        "CHRISTIAN LERNER ROSALES"
+      ],
+      "route": {
+        "origin": "MEX",
+        "originCity": "Ciudad de México",
+        "originAirport": "Aeropuerto Internacional Benito Juárez",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-05-28",
+        "scheduledDeparture": "2026-05-28T15:10:00-05:00",
+        "scheduledArrival": "2026-05-28T22:05:00-05:00",
+        "estimatedDeparture": "2026-05-28T15:10:00-05:00",
+        "estimatedArrival": "2026-05-28T22:05:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo con 6 entrenadores (DANIELA RAMOS TORRES, CIRILO AGUSTIN MARTINEZ, ALONSO SOLARES SALAZAR, JUAN ARREOLA MORALES, JESUS ACOSTA RODRIGUEZ, CHRISTIAN LERNER ROSALES) en ruta MEX → LIM",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la2471",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA2472": {
+      "flightNumber": "LA 2472",
+      "flightCode": "LA2472",
+      "airline": "LATAM Airlines",
+      "callsign": "LA2472",
+      "reservationCode": "QPXRHG",
+      "passengers": [
+        "DANIELA RAMOS TORRES",
+        "CIRILO AGUSTIN MARTINEZ",
+        "ALONSO SOLARES SALAZAR",
+        "JUAN ARREOLA MORALES",
+        "JESUS ACOSTA RODRIGUEZ",
+        "CHRISTIAN LERNER ROSALES"
+      ],
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "MEX",
+        "destinationCity": "Ciudad de México",
+        "destinationAirport": "Aeropuerto Internacional Benito Juárez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-06-04",
+        "scheduledDeparture": "2026-06-04T08:45:00-05:00",
+        "scheduledArrival": "2026-06-04T13:50:00-05:00",
+        "estimatedDeparture": "2026-06-04T08:45:00-05:00",
+        "estimatedArrival": "2026-06-04T13:50:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo con 6 entrenadores (DANIELA RAMOS TORRES, CIRILO AGUSTIN MARTINEZ, ALONSO SOLARES SALAZAR, JUAN ARREOLA MORALES, JESUS ACOSTA RODRIGUEZ, CHRISTIAN LERNER ROSALES) en ruta LIM → MEX",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Benito Juárez)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la2472",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA4906": {
+      "flightNumber": "LA 4906",
+      "flightCode": "LA4906",
+      "airline": "LATAM Airlines",
+      "callsign": "LA4906",
+      "reservationCode": "ITNLJS",
+      "passengers": [
+        "MICHAEL BOADA RUBIANO"
       ],
       "route": {
         "origin": "BOG",
@@ -111,32 +879,1571 @@
         "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
         "isDirect": true,
         "stops": 0,
-        "flightDuration": "3h 05m"
+        "flightDuration": "2h 15m"
       },
       "schedule": {
-        "departureDate": "2026-09-04",
-        "scheduledDeparture": "2026-09-04T06:15:00-05:00",
-        "scheduledArrival": "2026-09-04T09:20:00-05:00",
-        "estimatedDeparture": "2026-09-04T06:15:00-05:00",
-        "estimatedArrival": "2026-09-04T09:20:00-05:00",
+        "departureDate": "2026-03-12",
+        "scheduledDeparture": "2026-03-12T12:00:00-05:00",
+        "scheduledArrival": "2026-03-12T15:05:00-05:00",
+        "estimatedDeparture": "2026-03-12T12:00:00-05:00",
+        "estimatedArrival": "2026-03-12T15:05:00-05:00",
         "actualDeparture": null,
         "actualArrival": null
       },
       "status": "ON_TIME",
-      "statusLabel": "A tiempo",
-      "statusDescription": "Vuelo confirmado y a tiempo",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo de entrenador MICHAEL BOADA RUBIANO confirmado ruta BOG → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
-      "gate": "Por confirmar",
-      "baggageClaim": "Por confirmar",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
       "logistics": {
-        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Jorge Chávez)",
-        "destination": "Hotel Jose Antonio Deluxe",
-        "driverPickupEstimated": "09:45 AM",
-        "driverNote": "Conductor esperará en llegadas internacionales."
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
       },
-      "radarUrl": "https://www.flightradar24.com/data/flights/av108",
-      "checkInUrl": "https://www.avianca.com"
+      "radarUrl": "https://www.flightradar24.com/data/flights/la4906",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA2380": {
+      "flightNumber": "LA 2380",
+      "flightCode": "LA2380",
+      "airline": "LATAM Airlines",
+      "callsign": "LA2380",
+      "reservationCode": "LFKXSN",
+      "passengers": [
+        "FERNANDO ARAGON"
+      ],
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-03-30",
+        "scheduledDeparture": "2026-03-30T09:30:00-05:00",
+        "scheduledArrival": "2026-03-30T16:00:00-05:00",
+        "estimatedDeparture": "2026-03-30T09:30:00-05:00",
+        "estimatedArrival": "2026-03-30T16:00:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo de entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Mariscal Sucre)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la2380",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1358": {
+      "flightNumber": "LA 1358",
+      "flightCode": "LA1358",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1358",
+      "reservationCode": "LSJIQW",
+      "passengers": [
+        "FERNANDO ARAGON"
+      ],
+      "route": {
+        "origin": "GYE",
+        "originCity": "Guayaquil",
+        "originAirport": "Aeropuerto Internacional José Joaquín de Olmedo",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-03-24",
+        "scheduledDeparture": "2026-03-24T14:10:00-05:00",
+        "scheduledArrival": "2026-03-24T14:54:00-05:00",
+        "estimatedDeparture": "2026-03-24T14:10:00-05:00",
+        "estimatedArrival": "2026-03-24T14:54:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo de entrenador FERNANDO ARAGON confirmado ruta GYE → LIM",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1358",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1448": {
+      "flightNumber": "LA 1448",
+      "flightCode": "LA1448",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1448",
+      "reservationCode": "LSJIQW",
+      "passengers": [
+        "FERNANDO ARAGON"
+      ],
+      "route": {
+        "origin": "GYE",
+        "originCity": "Guayaquil",
+        "originAirport": "Aeropuerto Internacional José Joaquín de Olmedo",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-03-24",
+        "scheduledDeparture": "2026-03-24T20:40:00-05:00",
+        "scheduledArrival": "2026-03-24T22:35:00-05:00",
+        "estimatedDeparture": "2026-03-24T20:40:00-05:00",
+        "estimatedArrival": "2026-03-24T22:35:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo de entrenador FERNANDO ARAGON confirmado ruta GYE → LIM",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1448",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA2376": {
+      "flightNumber": "LA 2376",
+      "flightCode": "LA2376",
+      "airline": "LATAM Airlines",
+      "callsign": "LA2376",
+      "reservationCode": "LIDPQA",
+      "passengers": [
+        "FERNANDO ARAGON"
+      ],
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-03-19",
+        "scheduledDeparture": "2026-03-19T04:05:00-05:00",
+        "scheduledArrival": "2026-03-19T06:45:00-05:00",
+        "estimatedDeparture": "2026-03-19T04:05:00-05:00",
+        "estimatedArrival": "2026-03-19T06:45:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo de entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Mariscal Sucre)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la2376",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1401": {
+      "flightNumber": "LA 1401",
+      "flightCode": "LA1401",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1401",
+      "reservationCode": "LIDPQA",
+      "passengers": [
+        "FERNANDO ARAGON"
+      ],
+      "route": {
+        "origin": "UIO",
+        "originCity": "Quito",
+        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-03-19",
+        "scheduledDeparture": "2026-03-19T12:07:00-05:00",
+        "scheduledArrival": "2026-03-19T13:03:00-05:00",
+        "estimatedDeparture": "2026-03-19T12:07:00-05:00",
+        "estimatedArrival": "2026-03-19T13:03:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo de entrenador FERNANDO ARAGON confirmado ruta UIO → LIM",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1401",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA2464": {
+      "flightNumber": "LA 2464",
+      "flightCode": "LA2464",
+      "airline": "LATAM Airlines",
+      "callsign": "LA2464",
+      "reservationCode": "UEZUFN",
+      "passengers": [
+        "FERNANDO ARAGON"
+      ],
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-02-19",
+        "scheduledDeparture": "2026-02-19T08:05:00-05:00",
+        "scheduledArrival": "2026-02-19T10:40:00-05:00",
+        "estimatedDeparture": "2026-02-19T08:05:00-05:00",
+        "estimatedArrival": "2026-02-19T10:40:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo de entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Mariscal Sucre)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la2464",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA2445": {
+      "flightNumber": "LA 2445",
+      "flightCode": "LA2445",
+      "airline": "LATAM Airlines",
+      "callsign": "LA2445",
+      "reservationCode": "UEZUFN",
+      "passengers": [
+        "FERNANDO ARAGON"
+      ],
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-02-25",
+        "scheduledDeparture": "2026-02-25T01:30:00-05:00",
+        "scheduledArrival": "2026-02-25T07:55:00-05:00",
+        "estimatedDeparture": "2026-02-25T01:30:00-05:00",
+        "estimatedArrival": "2026-02-25T07:55:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo de entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Mariscal Sucre)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la2445",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA2375": {
+      "flightNumber": "LA 2375",
+      "flightCode": "LA2375",
+      "airline": "LATAM Airlines",
+      "callsign": "LA2375",
+      "reservationCode": "YBWCSD",
+      "passengers": [
+        "FERNANDO ARAGON"
+      ],
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2025-12-16",
+        "scheduledDeparture": "2025-12-16T20:25:00-05:00",
+        "scheduledArrival": "2025-12-17T02:50:00-05:00",
+        "estimatedDeparture": "2025-12-16T20:25:00-05:00",
+        "estimatedArrival": "2025-12-17T02:50:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo de entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Mariscal Sucre)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la2375",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA2395": {
+      "flightNumber": "LA 2395",
+      "flightCode": "LA2395",
+      "airline": "LATAM Airlines",
+      "callsign": "LA2395",
+      "reservationCode": "NEXJKO",
+      "passengers": [
+        "ERNESTO DIAZ PABON"
+      ],
+      "route": {
+        "origin": "UIO",
+        "originCity": "Quito",
+        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2025-11-26",
+        "scheduledDeparture": "2025-11-26T15:20:00-05:00",
+        "scheduledArrival": "2025-11-26T17:35:00-05:00",
+        "estimatedDeparture": "2025-11-26T15:20:00-05:00",
+        "estimatedArrival": "2025-11-26T17:35:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo de entrenador ERNESTO DIAZ PABON confirmado ruta UIO → LIM",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la2395",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1427": {
+      "flightNumber": "LA 1427",
+      "flightCode": "LA1427",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1427",
+      "reservationCode": "LLUYBT",
+      "passengers": [
+        "ERNESTO DIAZ PABON",
+        "EDISON SOSA CARRERA",
+        "MARIA PATINO GALARRAGA"
+      ],
+      "route": {
+        "origin": "UIO",
+        "originCity": "Quito",
+        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2025-11-13",
+        "scheduledDeparture": "2025-11-13T20:05:00-05:00",
+        "scheduledArrival": "2025-11-13T22:20:00-05:00",
+        "estimatedDeparture": "2025-11-13T20:05:00-05:00",
+        "estimatedArrival": "2025-11-13T22:20:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo con 3 entrenadores (ERNESTO DIAZ PABON, EDISON SOSA CARRERA, MARIA PATINO GALARRAGA) en ruta UIO → LIM",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1427",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1426": {
+      "flightNumber": "LA 1426",
+      "flightCode": "LA1426",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1426",
+      "reservationCode": "SBKGTP",
+      "passengers": [
+        "EDISON SOSA CARRERA",
+        "ELMER IDROBO ANDRADE",
+        "LEANDRO BRUNIS AVILES",
+        "JESSENIA ARIAS VILLALTA",
+        "ERNESTO DIAZ PABON",
+        "LINID VALENCIA HINCAPIE"
+      ],
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2025-11-05",
+        "scheduledDeparture": "2025-11-05T23:40:00-05:00",
+        "scheduledArrival": "2025-11-06T02:04:00-05:00",
+        "estimatedDeparture": "2025-11-05T23:40:00-05:00",
+        "estimatedArrival": "2025-11-06T02:04:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo con 6 entrenadores (EDISON SOSA CARRERA, ELMER IDROBO ANDRADE, LEANDRO BRUNIS AVILES, JESSENIA ARIAS VILLALTA, ERNESTO DIAZ PABON, LINID VALENCIA HINCAPIE) en ruta LIM → UIO",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Mariscal Sucre)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1426",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA2394": {
+      "flightNumber": "LA 2394",
+      "flightCode": "LA2394",
+      "airline": "LATAM Airlines",
+      "callsign": "LA2394",
+      "reservationCode": "HDGONJ",
+      "passengers": [
+        "JOSE SANCHEZ MORENO"
+      ],
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2025-11-09",
+        "scheduledDeparture": "2025-11-09T12:00:00-05:00",
+        "scheduledArrival": "2025-11-09T14:19:00-05:00",
+        "estimatedDeparture": "2025-11-09T12:00:00-05:00",
+        "estimatedArrival": "2025-11-09T14:19:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo de entrenador JOSE SANCHEZ MORENO confirmado ruta LIM → UIO",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Mariscal Sucre)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la2394",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA7554": {
+      "flightNumber": "LA 7554",
+      "flightCode": "LA7554",
+      "airline": "LATAM Airlines",
+      "callsign": "LA7554",
+      "reservationCode": "WNWWJJ",
+      "passengers": [
+        "JESUS ACOSTA RODRIGUEZ"
+      ],
+      "route": {
+        "origin": "MEX",
+        "originCity": "Ciudad de México",
+        "originAirport": "Aeropuerto Internacional Benito Juárez",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2025-10-09",
+        "scheduledDeparture": "2025-10-09T06:10:00-05:00",
+        "scheduledArrival": "2025-10-09T09:50:00-05:00",
+        "estimatedDeparture": "2025-10-09T06:10:00-05:00",
+        "estimatedArrival": "2025-10-09T09:50:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo de entrenador JESUS ACOSTA RODRIGUEZ confirmado ruta MEX → LIM",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la7554",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA7598": {
+      "flightNumber": "LA 7598",
+      "flightCode": "LA7598",
+      "airline": "LATAM Airlines",
+      "callsign": "LA7598",
+      "reservationCode": "WNWWJJ",
+      "passengers": [
+        "JESUS ACOSTA RODRIGUEZ"
+      ],
+      "route": {
+        "origin": "MEX",
+        "originCity": "Ciudad de México",
+        "originAirport": "Aeropuerto Internacional Benito Juárez",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2025-10-13",
+        "scheduledDeparture": "2025-10-13T21:30:00-05:00",
+        "scheduledArrival": "2025-10-13T23:23:00-05:00",
+        "estimatedDeparture": "2025-10-13T21:30:00-05:00",
+        "estimatedArrival": "2025-10-13T23:23:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo de entrenador JESUS ACOSTA RODRIGUEZ confirmado ruta MEX → LIM",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la7598",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA2412": {
+      "flightNumber": "LA 2412",
+      "flightCode": "LA2412",
+      "airline": "LATAM Airlines",
+      "callsign": "LA2412",
+      "reservationCode": "QSFVBS",
+      "passengers": [
+        "MILDRED MUNOZ VASQUEZ"
+      ],
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "MDE",
+        "destinationCity": "Medellín",
+        "destinationAirport": "Aeropuerto Internacional José María Córdova",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2025-08-31",
+        "scheduledDeparture": "2025-08-31T23:40:00-05:00",
+        "scheduledArrival": "2025-09-01T02:50:00-05:00",
+        "estimatedDeparture": "2025-08-31T23:40:00-05:00",
+        "estimatedArrival": "2025-09-01T02:50:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo de entrenador MILDRED MUNOZ VASQUEZ confirmado ruta LIM → MDE",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional José María Córdova)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la2412",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA2381": {
+      "flightNumber": "LA 2381",
+      "flightCode": "LA2381",
+      "airline": "LATAM Airlines",
+      "callsign": "LA2381",
+      "reservationCode": "EXUBMT",
+      "passengers": [
+        "FERNANDO ARAGON"
+      ],
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2025-08-14",
+        "scheduledDeparture": "2025-08-14T17:05:00-05:00",
+        "scheduledArrival": "2025-08-14T19:55:00-05:00",
+        "estimatedDeparture": "2025-08-14T17:05:00-05:00",
+        "estimatedArrival": "2025-08-14T19:55:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo de entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Mariscal Sucre)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la2381",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA2388": {
+      "flightNumber": "LA 2388",
+      "flightCode": "LA2388",
+      "airline": "LATAM Airlines",
+      "callsign": "LA2388",
+      "reservationCode": "USYMMM",
+      "passengers": [
+        "MARIA PATINO GALARRAGA"
+      ],
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2025-06-30",
+        "scheduledDeparture": "2025-06-30T12:00:00-05:00",
+        "scheduledArrival": "2025-06-30T14:24:00-05:00",
+        "estimatedDeparture": "2025-06-30T12:00:00-05:00",
+        "estimatedArrival": "2025-06-30T14:24:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo de entrenador MARIA PATINO GALARRAGA confirmado ruta LIM → UIO",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Mariscal Sucre)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la2388",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA2387": {
+      "flightNumber": "LA 2387",
+      "flightCode": "LA2387",
+      "airline": "LATAM Airlines",
+      "callsign": "LA2387",
+      "reservationCode": "CREAR26",
+      "passengers": [
+        "MICHAEL BOADA RUBIANO"
+      ],
+      "route": {
+        "origin": "BOG",
+        "originCity": "Bogotá",
+        "originAirport": "Aeropuerto Internacional El Dorado",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2025-07-31",
+        "scheduledDeparture": "2025-07-31T17:15:00-05:00",
+        "scheduledArrival": "2025-07-31T20:15:00-05:00",
+        "estimatedDeparture": "2025-07-31T17:15:00-05:00",
+        "estimatedArrival": "2025-07-31T20:15:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo de entrenador MICHAEL BOADA RUBIANO confirmado ruta BOG → LIM",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la2387",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA4905": {
+      "flightNumber": "LA 4905",
+      "flightCode": "LA4905",
+      "airline": "LATAM Airlines",
+      "callsign": "LA4905",
+      "reservationCode": "CREAR26",
+      "passengers": [
+        "MICHAEL BOADA RUBIANO"
+      ],
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "BOG",
+        "destinationCity": "Bogotá",
+        "destinationAirport": "Aeropuerto Internacional El Dorado",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2025-08-04",
+        "scheduledDeparture": "2025-08-04T16:00:00-05:00",
+        "scheduledArrival": "2025-08-04T19:09:00-05:00",
+        "estimatedDeparture": "2025-08-04T16:00:00-05:00",
+        "estimatedArrival": "2025-08-04T19:09:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo de entrenador MICHAEL BOADA RUBIANO confirmado ruta LIM → BOG",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional El Dorado)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la4905",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA2369": {
+      "flightNumber": "LA 2369",
+      "flightCode": "LA2369",
+      "airline": "LATAM Airlines",
+      "callsign": "LA2369",
+      "reservationCode": "KZNOJE",
+      "passengers": [
+        "FERNANDO ARAGON"
+      ],
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2025-06-09",
+        "scheduledDeparture": "2025-06-09T12:15:00-05:00",
+        "scheduledArrival": "2025-06-09T18:35:00-05:00",
+        "estimatedDeparture": "2025-06-09T12:15:00-05:00",
+        "estimatedArrival": "2025-06-09T18:35:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo de entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Mariscal Sucre)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la2369",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1450": {
+      "flightNumber": "LA 1450",
+      "flightCode": "LA1450",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1450",
+      "reservationCode": "YRHPHQ",
+      "passengers": [
+        "ERNESTO DIAZ PABON",
+        "LINID VALENCIA HINCAPIE",
+        "ELMER IDROBO ANDRADE"
+      ],
+      "route": {
+        "origin": "UIO",
+        "originCity": "Quito",
+        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2025-05-22",
+        "scheduledDeparture": "2025-05-22T12:15:00-05:00",
+        "scheduledArrival": "2025-05-22T14:30:00-05:00",
+        "estimatedDeparture": "2025-05-22T12:15:00-05:00",
+        "estimatedArrival": "2025-05-22T14:30:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo con 3 entrenadores (ERNESTO DIAZ PABON, LINID VALENCIA HINCAPIE, ELMER IDROBO ANDRADE) en ruta UIO → LIM",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1450",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1375": {
+      "flightNumber": "LA 1375",
+      "flightCode": "LA1375",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1375",
+      "reservationCode": "CREAR26",
+      "passengers": [
+        "Entrenador Oficial"
+      ],
+      "route": {
+        "origin": "UIO",
+        "originCity": "Quito",
+        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-03",
+        "scheduledDeparture": "2026-09-03T05:22:00-05:00",
+        "scheduledArrival": "2026-09-03T10:30:00-05:00",
+        "estimatedDeparture": "2026-09-03T05:22:00-05:00",
+        "estimatedArrival": "2026-09-03T10:30:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta UIO → LIM",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1375",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1386": {
+      "flightNumber": "LA 1386",
+      "flightCode": "LA1386",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1386",
+      "reservationCode": "CREAR26",
+      "passengers": [
+        "Entrenador Oficial"
+      ],
+      "route": {
+        "origin": "UIO",
+        "originCity": "Quito",
+        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-03",
+        "scheduledDeparture": "2026-09-03T06:56:00-05:00",
+        "scheduledArrival": "2026-09-03T10:30:00-05:00",
+        "estimatedDeparture": "2026-09-03T06:56:00-05:00",
+        "estimatedArrival": "2026-09-03T10:30:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta UIO → LIM",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1386",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1441": {
+      "flightNumber": "LA 1441",
+      "flightCode": "LA1441",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1441",
+      "reservationCode": "CREAR26",
+      "passengers": [
+        "Entrenador Oficial"
+      ],
+      "route": {
+        "origin": "BOG",
+        "originCity": "Bogotá",
+        "originAirport": "Aeropuerto Internacional El Dorado",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-03",
+        "scheduledDeparture": "2026-09-03T10:00:00-05:00",
+        "scheduledArrival": "2026-09-03T11:40:00-05:00",
+        "estimatedDeparture": "2026-09-03T10:00:00-05:00",
+        "estimatedArrival": "2026-09-03T11:40:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta BOG → LIM",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1441",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1442": {
+      "flightNumber": "LA 1442",
+      "flightCode": "LA1442",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1442",
+      "reservationCode": "CREAR26",
+      "passengers": [
+        "Entrenador Oficial"
+      ],
+      "route": {
+        "origin": "UIO",
+        "originCity": "Quito",
+        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-03",
+        "scheduledDeparture": "2026-09-03T18:40:00-05:00",
+        "scheduledArrival": "2026-09-03T20:20:00-05:00",
+        "estimatedDeparture": "2026-09-03T18:40:00-05:00",
+        "estimatedArrival": "2026-09-03T20:20:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta UIO → LIM",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1442",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1440": {
+      "flightNumber": "LA 1440",
+      "flightCode": "LA1440",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1440",
+      "reservationCode": "CREAR26",
+      "passengers": [
+        "Entrenador Oficial"
+      ],
+      "route": {
+        "origin": "UIO",
+        "originCity": "Quito",
+        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-03",
+        "scheduledDeparture": "2026-09-03T07:10:00-05:00",
+        "scheduledArrival": "2026-09-03T08:40:00-05:00",
+        "estimatedDeparture": "2026-09-03T07:10:00-05:00",
+        "estimatedArrival": "2026-09-03T08:40:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta UIO → LIM",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1440",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1373": {
+      "flightNumber": "LA 1373",
+      "flightCode": "LA1373",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1373",
+      "reservationCode": "CREAR26",
+      "passengers": [
+        "Entrenador Oficial"
+      ],
+      "route": {
+        "origin": "UIO",
+        "originCity": "Quito",
+        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-03",
+        "scheduledDeparture": "2026-09-03T16:15:00-05:00",
+        "scheduledArrival": "2026-09-03T10:30:00-05:00",
+        "estimatedDeparture": "2026-09-03T16:15:00-05:00",
+        "estimatedArrival": "2026-09-03T10:30:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta UIO → LIM",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1373",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1379": {
+      "flightNumber": "LA 1379",
+      "flightCode": "LA1379",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1379",
+      "reservationCode": "CREAR26",
+      "passengers": [
+        "Entrenador Oficial"
+      ],
+      "route": {
+        "origin": "UIO",
+        "originCity": "Quito",
+        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-03",
+        "scheduledDeparture": "2026-09-03T20:30:00-05:00",
+        "scheduledArrival": "2026-09-03T10:30:00-05:00",
+        "estimatedDeparture": "2026-09-03T20:30:00-05:00",
+        "estimatedArrival": "2026-09-03T10:30:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta UIO → LIM",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1379",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1356": {
+      "flightNumber": "LA 1356",
+      "flightCode": "LA1356",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1356",
+      "reservationCode": "CREAR26",
+      "passengers": [
+        "Entrenador Oficial"
+      ],
+      "route": {
+        "origin": "UIO",
+        "originCity": "Quito",
+        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-03",
+        "scheduledDeparture": "2026-09-03T22:03:00-05:00",
+        "scheduledArrival": "2026-09-03T10:30:00-05:00",
+        "estimatedDeparture": "2026-09-03T22:03:00-05:00",
+        "estimatedArrival": "2026-09-03T10:30:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta UIO → LIM",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1356",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1377": {
+      "flightNumber": "LA 1377",
+      "flightCode": "LA1377",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1377",
+      "reservationCode": "CREAR26",
+      "passengers": [
+        "Entrenador Oficial"
+      ],
+      "route": {
+        "origin": "UIO",
+        "originCity": "Quito",
+        "originAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-03",
+        "scheduledDeparture": "2026-09-03T20:47:00-05:00",
+        "scheduledArrival": "2026-09-03T10:30:00-05:00",
+        "estimatedDeparture": "2026-09-03T20:47:00-05:00",
+        "estimatedArrival": "2026-09-03T10:30:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta UIO → LIM",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1377",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1378": {
+      "flightNumber": "LA 1378",
+      "flightCode": "LA1378",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1378",
+      "reservationCode": "CREAR26",
+      "passengers": [
+        "Entrenador Oficial"
+      ],
+      "route": {
+        "origin": "GYE",
+        "originCity": "Guayaquil",
+        "originAirport": "Aeropuerto Internacional José Joaquín de Olmedo",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-03",
+        "scheduledDeparture": "2026-09-03T09:10:00-05:00",
+        "scheduledArrival": "2026-09-03T10:30:00-05:00",
+        "estimatedDeparture": "2026-09-03T09:10:00-05:00",
+        "estimatedArrival": "2026-09-03T10:30:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta GYE → LIM",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1378",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA4025": {
+      "flightNumber": "LA 4025",
+      "flightCode": "LA4025",
+      "airline": "LATAM Airlines",
+      "callsign": "LA4025",
+      "reservationCode": "CREAR26",
+      "passengers": [
+        "Entrenador Oficial"
+      ],
+      "route": {
+        "origin": "MDE",
+        "originCity": "Medellín",
+        "originAirport": "Aeropuerto Internacional José María Córdova",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-03",
+        "scheduledDeparture": "2026-09-03T18:40:00-05:00",
+        "scheduledArrival": "2026-09-03T10:30:00-05:00",
+        "estimatedDeparture": "2026-09-03T18:40:00-05:00",
+        "estimatedArrival": "2026-09-03T10:30:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta MDE → LIM",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la4025",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA1443": {
+      "flightNumber": "LA 1443",
+      "flightCode": "LA1443",
+      "airline": "LATAM Airlines",
+      "callsign": "LA1443",
+      "reservationCode": "CREAR26",
+      "passengers": [
+        "Entrenador Oficial"
+      ],
+      "route": {
+        "origin": "BOG",
+        "originCity": "Bogotá",
+        "originAirport": "Aeropuerto Internacional El Dorado",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-03",
+        "scheduledDeparture": "2026-09-03T21:15:00-05:00",
+        "scheduledArrival": "2026-09-03T23:00:00-05:00",
+        "estimatedDeparture": "2026-09-03T21:15:00-05:00",
+        "estimatedArrival": "2026-09-03T23:00:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta BOG → LIM",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la1443",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "LA4024": {
+      "flightNumber": "LA 4024",
+      "flightCode": "LA4024",
+      "airline": "LATAM Airlines",
+      "callsign": "LA4024",
+      "reservationCode": "CREAR26",
+      "passengers": [
+        "Entrenador Oficial"
+      ],
+      "route": {
+        "origin": "BOG",
+        "originCity": "Bogotá",
+        "originAirport": "Aeropuerto Internacional El Dorado",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-03",
+        "scheduledDeparture": "2026-09-03T12:25:00-05:00",
+        "scheduledArrival": "2026-09-03T10:30:00-05:00",
+        "estimatedDeparture": "2026-09-03T12:25:00-05:00",
+        "estimatedArrival": "2026-09-03T10:30:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta BOG → LIM",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/la4024",
+      "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
     }
   }
 }
