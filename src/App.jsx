@@ -230,7 +230,7 @@ function App() {
           } />
 
           <Route path="/auditoria-kpis" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'coord_c1', 'coord_c2', 'coordinador_c1c2']} requireSuperAdmin={false}>
               <AuditoriaKPIs />
             </RoleRoute>
           } />
