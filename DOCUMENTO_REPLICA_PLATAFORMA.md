@@ -77534,7 +77534,7 @@ export const normalizeCoordinator = (name) => {
       "productividadDetalle": "470/2086 (23%)",
       "asistieron": 350,
       "tasaEfectividad": 53,
-      "ultConexion": "04/09/2026 16:32",
+      "ultConexion": "04/09/2026 18:36",
       "ultGestion": "01/09/2026 11:13",
       "estados": {
         "confirmado": 1108,
@@ -92809,7 +92809,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51993709784",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -93004,7 +93004,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51930526967",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
@@ -93064,7 +93064,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "—",
           "llamada1": "No le Interesa",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -93094,7 +93094,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51929406665",
           "llamada1": "No le Interesa",
           "llamada2": "No le Interesa",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -93184,7 +93184,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51993709784",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -93379,7 +93379,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51930526967",
           "llamada1": "Por Confirmar",
           "llamada2": "Siguiente",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
@@ -93439,7 +93439,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "—",
           "llamada1": "—",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -93469,7 +93469,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51929406665",
           "llamada1": "No Contesta",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -98497,7 +98497,7 @@ export const normalizeCoordinator = (name) => {
             "COORDINADORES": "4",
             "INGRESOS (FIN DE SEMANA)": "S/. 3,535.00",
             "PROM. ENROLADOS": "0.1",
-            "EN CERO": "37"
+            "EN CERO": "50"
           },
           {
             "SEDE": "MEDELLIN",
@@ -98603,6 +98603,14 @@ export const normalizeCoordinator = (name) => {
             "ENTRENADOR": "LOURDES PATINO",
             "ETAPA ACTUAL": "PFD",
             "PARTICIPANTES": "36",
+            "col_5": "Ver Resultados"
+          },
+          {
+            "EQUIPO": "EQUIPO 30",
+            "SEDE": "LIMA CICLO 1",
+            "ENTRENADOR": "ANDRES IDROBO",
+            "ETAPA ACTUAL": "PFD",
+            "PARTICIPANTES": "4",
             "col_5": "Ver Resultados"
           },
           {
@@ -99137,7 +99145,7 @@ export const normalizeCoordinator = (name) => {
           },
           {
             "Entrenamiento": "Maestría",
-            "Participantes": "3,278"
+            "Participantes": "3,279"
           }
         ]
       },
@@ -99192,9 +99200,9 @@ export const normalizeCoordinator = (name) => {
     ],
     "cards": [
       "Alcance\n🌐 Global (todas las sedes)\nCuenca Ciclo 1\nGUAYAQUIL CICLO 1\nLIMA CICLO 1\nMEDELLIN\nMÉXICO CICLO 1\nQUITO CICLO 2\nPeríodo (pestaña Analítica)\nÚltimos 3 meses\nÚltimos 6 meses\nÚltimos 12 meses\nÚltimos 24 meses\n Viendo indicadores de TODAS las sedes",
-      "Actividad de Todas las Sedes\nSEDE\tPARTICIPANTES\tEQUIPOS ACTIVOS\tENTRENADORES\tCOORDINADORES\tINGRESOS (FIN DE SEMANA)\tPROM. ENROLADOS\tEN CERO\nCuenca Ciclo 1\t3,529\t3\t7\t6\t$ 0.00\t1.8\t10\nGUAYAQUIL CICLO 1\t2,180\t4\t6\t4\t$ 0.00\t2.5\t11\nLIMA CICLO 1\t3,594\t3\t6\t4\tS/. 3,535.00\t0.1\t37\nMEDELLIN\t126\t4\t4\t0\t$ 0.00\t2.0\t7\nMÉXICO CICLO 1\t623\t3\t2\t1\t$ 0.00\t0.0\t44\nQUITO CICLO 2\t4,751\t6\t6\t7\t$ 510.00\t1.3\t95",
-      "Actividad del Fin de Semana\n20 en curso\nEQUIPO\tSEDE\tENTRENADOR\tETAPA ACTUAL\tPARTICIPANTES\t\nEQUIPO 20\tCuenca Ciclo 1\tANDRES IDROBO\tTFD\t38\tVer Resultados\nEQUIPO 21\tCuenca Ciclo 1\tALONSO SOLARES\tSFD\t46\tVer Resultados\nEQUIPO 22\tCuenca Ciclo 1\tMIKE BOADA\tPFD\t39\tVer Resultados\nEQUIPO 34\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\tTFD\t30\tVer Resultados\nEQUIPO 35\tGUAYAQUIL CICLO 1\tALONSO SOLARES\tSFD\t30\tVer Resultados\nEQUIPO 36\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\tPFD\t25\tVer Resultados\nEQUIPO 28\tLIMA CICLO 1\tALEJANDRO DIAZ\tTFD\t13\tVer Resultados\nEQUIPO 29\tLIMA CICLO 1\tLOURDES PATINO\tPFD\t36\tVer Resultados\nEQUIPO 16\tMEDELLIN\tFERNANDO ARAGON\tTFD\t16\tVer Resultados\nEQUIPO 17\tMEDELLIN\tLEANDRO BRUNIS\tSFD\t30\tVer Resultados\nEQUIPO 18\tMEDELLIN\tFERNANDO ARAGON\tPFD\t38\tVer Resultados\nEQUIPO 5\tMÉXICO CICLO 1\tNo asignado\tTFD\t23\tVer Resultados\nEQUIPO 6\tMÉXICO CICLO 1\tMAURICIO PEREZ\tSFD\t11\tVer Resultados\nEQUIPO 7\tMÉXICO CICLO 1\tMAURICIO PEREZ\tPFD\t15\tVer Resultados\nEQUIPO 120\tQUITO CICLO 2\tFERNANDO ARAGON\tTFD\t33\tVer Resultados\nEQUIPO 121\tQUITO CICLO 2\tCIRILO MARTINEZ\tTFD\t53\tVer Resultados\nEQUIPO 122\tQUITO CICLO 2\tLEANDRO BRUNIS\tSFD\t38\tVer Resultados\nEQUIPO 123\tQUITO CICLO 2\tCHUY ACOSTA\tSFD\t42\tVer Resultados\nEQUIPO 124\tQUITO CICLO 2\tLEANDRO BRUNIS\tPFD\t21\tVer Resultados\nEQUIPO 125\tQUITO CICLO 2\tANA MONROY\tPFD\t76\tVer Resultados",
-      "Por Entrenamiento\nTotal participantes activos en el alcance: 14,803\nCapítulo 1\n11,060 (75%)\nCapítulo 2\n4,039 (27%)\nMaestría\n3,278 (22%)",
+      "Actividad de Todas las Sedes\nSEDE\tPARTICIPANTES\tEQUIPOS ACTIVOS\tENTRENADORES\tCOORDINADORES\tINGRESOS (FIN DE SEMANA)\tPROM. ENROLADOS\tEN CERO\nCuenca Ciclo 1\t3,529\t3\t7\t6\t$ 0.00\t1.8\t10\nGUAYAQUIL CICLO 1\t2,180\t4\t6\t4\t$ 0.00\t2.5\t11\nLIMA CICLO 1\t3,594\t3\t6\t4\tS/. 3,535.00\t0.1\t50\nMEDELLIN\t126\t4\t4\t0\t$ 0.00\t2.0\t7\nMÉXICO CICLO 1\t623\t3\t2\t1\t$ 0.00\t0.0\t44\nQUITO CICLO 2\t4,751\t6\t6\t7\t$ 510.00\t1.3\t95",
+      "Actividad del Fin de Semana\n21 en curso\nEQUIPO\tSEDE\tENTRENADOR\tETAPA ACTUAL\tPARTICIPANTES\t\nEQUIPO 20\tCuenca Ciclo 1\tANDRES IDROBO\tTFD\t38\tVer Resultados\nEQUIPO 21\tCuenca Ciclo 1\tALONSO SOLARES\tSFD\t46\tVer Resultados\nEQUIPO 22\tCuenca Ciclo 1\tMIKE BOADA\tPFD\t39\tVer Resultados\nEQUIPO 34\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\tTFD\t30\tVer Resultados\nEQUIPO 35\tGUAYAQUIL CICLO 1\tALONSO SOLARES\tSFD\t30\tVer Resultados\nEQUIPO 36\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\tPFD\t25\tVer Resultados\nEQUIPO 28\tLIMA CICLO 1\tALEJANDRO DIAZ\tTFD\t13\tVer Resultados\nEQUIPO 29\tLIMA CICLO 1\tLOURDES PATINO\tPFD\t36\tVer Resultados\nEQUIPO 30\tLIMA CICLO 1\tANDRES IDROBO\tPFD\t4\tVer Resultados\nEQUIPO 16\tMEDELLIN\tFERNANDO ARAGON\tTFD\t16\tVer Resultados\nEQUIPO 17\tMEDELLIN\tLEANDRO BRUNIS\tSFD\t30\tVer Resultados\nEQUIPO 18\tMEDELLIN\tFERNANDO ARAGON\tPFD\t38\tVer Resultados\nEQUIPO 5\tMÉXICO CICLO 1\tNo asignado\tTFD\t23\tVer Resultados\nEQUIPO 6\tMÉXICO CICLO 1\tMAURICIO PEREZ\tSFD\t11\tVer Resultados\nEQUIPO 7\tMÉXICO CICLO 1\tMAURICIO PEREZ\tPFD\t15\tVer Resultados\nEQUIPO 120\tQUITO CICLO 2\tFERNANDO ARAGON\tTFD\t33\tVer Resultados\nEQUIPO 121\tQUITO CICLO 2\tCIRILO MARTINEZ\tTFD\t53\tVer Resultados\nEQUIPO 122\tQUITO CICLO 2\tLEANDRO BRUNIS\tSFD\t38\tVer Resultados\nEQUIPO 123\tQUITO CICLO 2\tCHUY ACOSTA\tSFD\t42\tVer Resultados\nEQUIPO 124\tQUITO CICLO 2\tLEANDRO BRUNIS\tPFD\t21\tVer Resultados\nEQUIPO 125\tQUITO CICLO 2\tANA MONROY\tPFD\t76\tVer Resultados",
+      "Por Entrenamiento\nTotal participantes activos en el alcance: 14,803\nCapítulo 1\n11,060 (75%)\nCapítulo 2\n4,039 (27%)\nMaestría\n3,279 (22%)",
       "Por Entrenador — Carga de Trabajo\nVer Cronograma\nENTRENADOR\tESTADO\tASIGNACIONES\nFERNANDO ARAGON\tActivo\t\n5\n\nLEANDRO BRUNIS\tActivo\t\n4\n\nMAURICIO PEREZ\tActivo\t\n4\n\nALONSO SOLARES\tActivo\t\n2\n\nANDRES IDROBO\tActivo\t\n2\n\nALEJANDRO DIAZ\tActivo\t\n1\n\nANA MONROY\tActivo\t\n1\n\nCHUY ACOSTA\tActivo\t\n1\n\nCIRILO MARTINEZ\tActivo\t\n1\n\nJUAN ANGEL AREOLA\tActivo\t\n1\n\nLOURDES PATINO\tActivo\t\n1\n\nMIKE BOADA\tActivo\t\n1\n\nANDRES GOMEZ\tActivo\tDisponible\nJOSE TORRON\tActivo\tDisponible\nMILDRED MUNOZ\tActivo\tDisponible\nPAUL SOSA\tActivo\tDisponible\nXAVIER VALAREZO\tActivo\tDisponible",
       "Por Equipo — Equipos en Actividad\nVer todos\nEQUIPO\tSEDE\tENTRENADOR\tPARTICIPANTES\nEQUIPO 123\tQUITO CICLO 2\tCHUY ACOSTA\t424\nEQUIPO 121\tQUITO CICLO 2\tCIRILO MARTINEZ\t364\nEQUIPO 125\tQUITO CICLO 2\tANA MONROY\t348\nEQUIPO 21\tCuenca Ciclo 1\tALONSO SOLARES\t314\nEQUIPO 20\tCuenca Ciclo 1\tANDRES IDROBO\t270\nEQUIPO 124\tQUITO CICLO 2\tLEANDRO BRUNIS\t259\nEQUIPO 18\tMEDELLIN\tFERNANDO ARAGON\t259\nEQUIPO 37\tGUAYAQUIL CICLO 1\tLEANDRO BRUNIS\t257\nEQUIPO 22\tCuenca Ciclo 1\tMIKE BOADA\t253\nEQUIPO 122\tQUITO CICLO 2\tLEANDRO BRUNIS\t240\nEQUIPO 120\tQUITO CICLO 2\tFERNANDO ARAGON\t228\nEQUIPO 29\tLIMA CICLO 1\tLOURDES PATINO\t224\nEQUIPO 36\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\t189\nEQUIPO 28\tLIMA CICLO 1\tALEJANDRO DIAZ\t175\nEQUIPO 35\tGUAYAQUIL CICLO 1\tALONSO SOLARES\t166\nEQUIPO 30\tLIMA CICLO 1\tANDRES IDROBO\t163\nEQUIPO 17\tMEDELLIN\tLEANDRO BRUNIS\t152\nEQUIPO 34\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\t138\nEQUIPO 16\tMEDELLIN\tFERNANDO ARAGON\t123\nEQUIPO 19\tMEDELLIN\tFERNANDO ARAGON\t120\nEQUIPO 7\tMÉXICO CICLO 1\tMAURICIO PEREZ\t87\nEQUIPO 6\tMÉXICO CICLO 1\tMAURICIO PEREZ\t71\nEQUIPO 5\tMÉXICO CICLO 1\tNo asignado\t67",
       "Registros Recientes\nVer todos\nARIANNA LEON LORENZETTI\nLIMA CICLO 1 · +51 913 499 148\n04/09\nJHAN CARLO AREVALO ASUNCION\nLIMA CICLO 1 · +51 ‪+51 959 727 950\n04/09\nLESLIE DESIREE BRITO GAMEZ\nLIMA CICLO 1 · +51 978449650\n04/09\nBEKER SALVADOR\nLIMA CICLO 1 · +51 901777856\n04/09\nISABEL HUAMAN SOLIS\nLIMA CICLO 1 · +51 947554964\n04/09\nGISELL DENIS SARMI\nLIMA CICLO 1 · +51 951105814\n04/09\nDAVID TINTAYA\nLIMA CICLO 1 · +51 ‪944 399 566‬\n04/09\nEDINSON MUNOZ VILLACORTA\nLIMA CICLO 1 · +51 955029157\n04/09\nJORGE EDIN MUNOZ SERRANO\nLIMA CICLO 1 · +51 922428978\n04/09\nANA LIZ OTAZU MENDOZA\nLIMA CICLO 1 · +51 910550571\n04/09",
@@ -99203,7 +99211,7 @@ export const normalizeCoordinator = (name) => {
       "Evolutivo — Ingresos Recaudados\n          Ver tabla\n        \n        \n          \n          \n            \n              MesRecaudado\n              \n                                Oct 25$ 2,021,240.01\n                                Nov 25$ 6,151,243.98\n                                Dic 25$ 5,975,511.00\n                                Ene 26$ 1,359,466.97\n                                Feb 26$ 4,204,589.50\n                                Mar 26$ 777,242.00\n                                Abr 26$ 563,945.25\n                                May 26$ 790,147.98\n                                Jun 26$ 523,481.00\n                                Jul 26$ 2,514,286.10\n                                Ago 26$ 111,160,084.65\n                                Sep 26$ 14,850.00",
       "Comparativo — Participantes por Sede\n          Ver tabla\n        \n        \n          \n          \n            \n              SedeParticipantes\n              \n                                QUITO CICLO 24,751\n                                LIMA CICLO 13,594\n                                Cuenca Ciclo 13,529\n                                GUAYAQUIL CICLO 12,180\n                                MÉXICO CICLO 1623\n                                MEDELLIN126",
       "Comparativo — Ingresos por Sede\n          Ver tabla\n        \n        \n          \n          \n            \n              SedeRecaudado\n              \n                                MEDELLIN$ 98,510,360.00\n                                QUITO CICLO 2$ 33,332,753.58\n                                Cuenca Ciclo 1$ 19,446,147.26\n                                MÉXICO CICLO 1$ 9,056,416.15\n                                LIMA CICLO 1S/. 4,882,793.12\n                                GUAYAQUIL CICLO 1$ 933,667.18",
-      "Comparativo — Progresión por Entrenamiento\n          Ver tabla\n        \n        \n          \n          \n            \n              EntrenamientoParticipantes\n              \n                                Capítulo 111,060\n                                Capítulo 24,039\n                                Maestría3,278",
+      "Comparativo — Progresión por Entrenamiento\n          Ver tabla\n        \n        \n          \n          \n            \n              EntrenamientoParticipantes\n              \n                                Capítulo 111,060\n                                Capítulo 24,039\n                                Maestría3,279",
       "Comparativo — Carga de Entrenadores (Top 10)\n          Ver tabla\n        \n        \n                    \n          \n            \n              EntrenadorAsignaciones\n              \n                                FERNANDO ARAGON5\n                                LEANDRO BRUNIS4\n                                MAURICIO PEREZ4\n                                ALONSO SOLARES2\n                                ANDRES IDROBO2\n                                ALEJANDRO DIAZ1\n                                ANA MONROY1\n                                CHUY ACOSTA1\n                                CIRILO MARTINEZ1\n                                JUAN ANGEL AREOLA1"
     ]
   }
@@ -126145,7 +126153,7 @@ export const normalizeCoordinator = (name) => {
 ```json
 {
   "robot_token": "NODUS_ROBOT_CPSL_2026_SECRET",
-  "timestamp": "2026-09-04T23:28:45.944Z",
+  "timestamp": "2026-09-04T23:39:59.647Z",
   "fuente": "Sistema Autónomo Multi-Agente Nodus CPSL 2026",
   "usuarioExtraccion": "jsanchez (Super Administrador Global)",
   "totales": {
@@ -129607,7 +129615,7 @@ export const normalizeCoordinator = (name) => {
       "productividadDetalle": "470/2086 (23%)",
       "asistieron": 350,
       "tasaEfectividad": 53,
-      "ultConexion": "04/09/2026 16:32",
+      "ultConexion": "04/09/2026 18:36",
       "ultGestion": "01/09/2026 11:13",
       "estados": {
         "confirmado": 1108,
@@ -144795,7 +144803,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51993709784",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -144990,7 +144998,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51930526967",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
@@ -145050,7 +145058,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "—",
           "llamada1": "No le Interesa",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -145080,7 +145088,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51929406665",
           "llamada1": "No le Interesa",
           "llamada2": "No le Interesa",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -145170,7 +145178,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51993709784",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -145365,7 +145373,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51930526967",
           "llamada1": "Por Confirmar",
           "llamada2": "Siguiente",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
@@ -145425,7 +145433,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "—",
           "llamada1": "—",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -145455,7 +145463,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51929406665",
           "llamada1": "No Contesta",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -153488,8 +153496,8 @@ export const normalizeCoordinator = (name) => {
           ]
         },
         {
-          "header": "DIANA LIMA CICLO 1\nÚlt. conexión: 04/09/2026 16:32",
-          "fullText": "DIANA LIMA CICLO 1\nÚlt. conexión: 04/09/2026 16:32\n2086\nGestiones\n1783\nC1\n303\nC2\n880\nAsignados\nCobertura (participantes con al menos 1 gestión)\n837/880 (95%)\nProductividad (llamadas que terminaron en asistencia real)\n470/2086 (23%)\nÚlt. gestión: 01/09/2026 11:13\nNo Contesta: 619\nConfirmado: 1108\nPor Confirmar: 53\nNo le Interesa: 165\nSiguiente: 140\nYa Asistiá: 1\nCapítulo 1 — detalle por equipo (personas únicas según su última gestión):\nEQUIPO\tLLAMADAS\tCONFIRMADO\tNO CONTESTA\tNO LE INTERESA\tSIGUIENTE\tPOR CONFIRMAR\tDEVOLUCIÓN\tYA ASISTIÁ\tCAMBIO CUPO\tASISTIERON\nEQUIPO 30\t132\t52\t10\t1\t9\t3\t\t\t\t39\nEQUIPO 28\t172\t38\t33\t3\t1\t\t\t\t\t42\nEQUIPO 27\t214\t74\t23\t4\t3\t\t\t\t\t66\nEQUIPO 29\t229\t73\t14\t4\t6\t\t\t\t\t52\nEQUIPO 26\t329\t62\t51\t4\t\t\t\t\t\t50\nEQUIPO 25\t297\t28\t2\t80\t1\t\t\t\t\t27\nEQUIPO 24\t40\t1\t\t17\t\t\t\t\t\t1\nEQUIPO 23\t42\t2\t\t9\t\t\t\t\t\t2\nEQUIPO 22\t150\t45\t\t5\t\t\t\t\t\t35\nEQUIPO 21\t151\t40\t2\t1\t1\t\t\t\t\t36\nEQUIPO 20\t23\t\t\t2\t\t\t\t\t\t\nEQUIPO 19\t2\t\t\t\t\t\t\t\t\t\nEQUIPO 18\t2\t\t\t\t\t\t\t\t\t\nCapítulo 2 — detalle por equipo (personas únicas según su última gestión):\nEQUIPO\tLLAMADAS\tCONFIRMADO\tNO CONTESTA\tNO LE INTERESA\tSIGUIENTE\tPOR CONFIRMAR\tDEVOLUCIÓN\tYA ASISTIÁ\tCAMBIO CUPO\tASISTIERON\nEQUIPO 30\t54\t14\t\t\t4\t\t\t\t\t14\nEQUIPO 28\t52\t20\t\t1\t2\t\t\t\t\t22\nEQUIPO 27\t68\t24\t\t4\t\t\t\t\t\t27\nEQUIPO 29\t43\t17\t\t\t4\t1\t\t\t\t20\nEQUIPO 26\t38\t8\t1\t7\t1\t\t\t\t\t15\nEQUIPO 25\t45\t12\t\t7\t\t\t\t\t\t19\nEQUIPO 24\t2\t\t\t2\t\t\t\t\t\t2\nEQUIPO 23\t1\t\t\t1\t\t\t\t\t\t1",
+          "header": "DIANA LIMA CICLO 1\nÚlt. conexión: 04/09/2026 18:36",
+          "fullText": "DIANA LIMA CICLO 1\nÚlt. conexión: 04/09/2026 18:36\n2086\nGestiones\n1783\nC1\n303\nC2\n880\nAsignados\nCobertura (participantes con al menos 1 gestión)\n837/880 (95%)\nProductividad (llamadas que terminaron en asistencia real)\n470/2086 (23%)\nÚlt. gestión: 01/09/2026 11:13\nNo Contesta: 619\nConfirmado: 1108\nPor Confirmar: 53\nNo le Interesa: 165\nSiguiente: 140\nYa Asistiá: 1\nCapítulo 1 — detalle por equipo (personas únicas según su última gestión):\nEQUIPO\tLLAMADAS\tCONFIRMADO\tNO CONTESTA\tNO LE INTERESA\tSIGUIENTE\tPOR CONFIRMAR\tDEVOLUCIÓN\tYA ASISTIÁ\tCAMBIO CUPO\tASISTIERON\nEQUIPO 30\t132\t52\t10\t1\t9\t3\t\t\t\t39\nEQUIPO 28\t172\t38\t33\t3\t1\t\t\t\t\t42\nEQUIPO 27\t214\t74\t23\t4\t3\t\t\t\t\t66\nEQUIPO 29\t229\t73\t14\t4\t6\t\t\t\t\t52\nEQUIPO 26\t329\t62\t51\t4\t\t\t\t\t\t50\nEQUIPO 25\t297\t28\t2\t80\t1\t\t\t\t\t27\nEQUIPO 24\t40\t1\t\t17\t\t\t\t\t\t1\nEQUIPO 23\t42\t2\t\t9\t\t\t\t\t\t2\nEQUIPO 22\t150\t45\t\t5\t\t\t\t\t\t35\nEQUIPO 21\t151\t40\t2\t1\t1\t\t\t\t\t36\nEQUIPO 20\t23\t\t\t2\t\t\t\t\t\t\nEQUIPO 19\t2\t\t\t\t\t\t\t\t\t\nEQUIPO 18\t2\t\t\t\t\t\t\t\t\t\nCapítulo 2 — detalle por equipo (personas únicas según su última gestión):\nEQUIPO\tLLAMADAS\tCONFIRMADO\tNO CONTESTA\tNO LE INTERESA\tSIGUIENTE\tPOR CONFIRMAR\tDEVOLUCIÓN\tYA ASISTIÁ\tCAMBIO CUPO\tASISTIERON\nEQUIPO 30\t54\t14\t\t\t4\t\t\t\t\t14\nEQUIPO 28\t52\t20\t\t1\t2\t\t\t\t\t22\nEQUIPO 27\t68\t24\t\t4\t\t\t\t\t\t27\nEQUIPO 29\t43\t17\t\t\t4\t1\t\t\t\t20\nEQUIPO 26\t38\t8\t1\t7\t1\t\t\t\t\t15\nEQUIPO 25\t45\t12\t\t7\t\t\t\t\t\t19\nEQUIPO 24\t2\t\t\t2\t\t\t\t\t\t2\nEQUIPO 23\t1\t\t\t1\t\t\t\t\t\t1",
           "equipos": [
             {
               "equipo": "EQUIPO 30",
@@ -157225,7 +157233,7 @@ export const normalizeCoordinator = (name) => {
               "COORDINADORES": "4",
               "INGRESOS (FIN DE SEMANA)": "S/. 3,535.00",
               "PROM. ENROLADOS": "0.1",
-              "EN CERO": "37"
+              "EN CERO": "50"
             },
             {
               "SEDE": "MEDELLIN",
@@ -157331,6 +157339,14 @@ export const normalizeCoordinator = (name) => {
               "ENTRENADOR": "LOURDES PATINO",
               "ETAPA ACTUAL": "PFD",
               "PARTICIPANTES": "36",
+              "col_5": "Ver Resultados"
+            },
+            {
+              "EQUIPO": "EQUIPO 30",
+              "SEDE": "LIMA CICLO 1",
+              "ENTRENADOR": "ANDRES IDROBO",
+              "ETAPA ACTUAL": "PFD",
+              "PARTICIPANTES": "4",
               "col_5": "Ver Resultados"
             },
             {
@@ -157865,7 +157881,7 @@ export const normalizeCoordinator = (name) => {
             },
             {
               "Entrenamiento": "Maestría",
-              "Participantes": "3,278"
+              "Participantes": "3,279"
             }
           ]
         },
@@ -157920,9 +157936,9 @@ export const normalizeCoordinator = (name) => {
       ],
       "cards": [
         "Alcance\n🌐 Global (todas las sedes)\nCuenca Ciclo 1\nGUAYAQUIL CICLO 1\nLIMA CICLO 1\nMEDELLIN\nMÉXICO CICLO 1\nQUITO CICLO 2\nPeríodo (pestaña Analítica)\nÚltimos 3 meses\nÚltimos 6 meses\nÚltimos 12 meses\nÚltimos 24 meses\n Viendo indicadores de TODAS las sedes",
-        "Actividad de Todas las Sedes\nSEDE\tPARTICIPANTES\tEQUIPOS ACTIVOS\tENTRENADORES\tCOORDINADORES\tINGRESOS (FIN DE SEMANA)\tPROM. ENROLADOS\tEN CERO\nCuenca Ciclo 1\t3,529\t3\t7\t6\t$ 0.00\t1.8\t10\nGUAYAQUIL CICLO 1\t2,180\t4\t6\t4\t$ 0.00\t2.5\t11\nLIMA CICLO 1\t3,594\t3\t6\t4\tS/. 3,535.00\t0.1\t37\nMEDELLIN\t126\t4\t4\t0\t$ 0.00\t2.0\t7\nMÉXICO CICLO 1\t623\t3\t2\t1\t$ 0.00\t0.0\t44\nQUITO CICLO 2\t4,751\t6\t6\t7\t$ 510.00\t1.3\t95",
-        "Actividad del Fin de Semana\n20 en curso\nEQUIPO\tSEDE\tENTRENADOR\tETAPA ACTUAL\tPARTICIPANTES\t\nEQUIPO 20\tCuenca Ciclo 1\tANDRES IDROBO\tTFD\t38\tVer Resultados\nEQUIPO 21\tCuenca Ciclo 1\tALONSO SOLARES\tSFD\t46\tVer Resultados\nEQUIPO 22\tCuenca Ciclo 1\tMIKE BOADA\tPFD\t39\tVer Resultados\nEQUIPO 34\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\tTFD\t30\tVer Resultados\nEQUIPO 35\tGUAYAQUIL CICLO 1\tALONSO SOLARES\tSFD\t30\tVer Resultados\nEQUIPO 36\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\tPFD\t25\tVer Resultados\nEQUIPO 28\tLIMA CICLO 1\tALEJANDRO DIAZ\tTFD\t13\tVer Resultados\nEQUIPO 29\tLIMA CICLO 1\tLOURDES PATINO\tPFD\t36\tVer Resultados\nEQUIPO 16\tMEDELLIN\tFERNANDO ARAGON\tTFD\t16\tVer Resultados\nEQUIPO 17\tMEDELLIN\tLEANDRO BRUNIS\tSFD\t30\tVer Resultados\nEQUIPO 18\tMEDELLIN\tFERNANDO ARAGON\tPFD\t38\tVer Resultados\nEQUIPO 5\tMÉXICO CICLO 1\tNo asignado\tTFD\t23\tVer Resultados\nEQUIPO 6\tMÉXICO CICLO 1\tMAURICIO PEREZ\tSFD\t11\tVer Resultados\nEQUIPO 7\tMÉXICO CICLO 1\tMAURICIO PEREZ\tPFD\t15\tVer Resultados\nEQUIPO 120\tQUITO CICLO 2\tFERNANDO ARAGON\tTFD\t33\tVer Resultados\nEQUIPO 121\tQUITO CICLO 2\tCIRILO MARTINEZ\tTFD\t53\tVer Resultados\nEQUIPO 122\tQUITO CICLO 2\tLEANDRO BRUNIS\tSFD\t38\tVer Resultados\nEQUIPO 123\tQUITO CICLO 2\tCHUY ACOSTA\tSFD\t42\tVer Resultados\nEQUIPO 124\tQUITO CICLO 2\tLEANDRO BRUNIS\tPFD\t21\tVer Resultados\nEQUIPO 125\tQUITO CICLO 2\tANA MONROY\tPFD\t76\tVer Resultados",
-        "Por Entrenamiento\nTotal participantes activos en el alcance: 14,803\nCapítulo 1\n11,060 (75%)\nCapítulo 2\n4,039 (27%)\nMaestría\n3,278 (22%)",
+        "Actividad de Todas las Sedes\nSEDE\tPARTICIPANTES\tEQUIPOS ACTIVOS\tENTRENADORES\tCOORDINADORES\tINGRESOS (FIN DE SEMANA)\tPROM. ENROLADOS\tEN CERO\nCuenca Ciclo 1\t3,529\t3\t7\t6\t$ 0.00\t1.8\t10\nGUAYAQUIL CICLO 1\t2,180\t4\t6\t4\t$ 0.00\t2.5\t11\nLIMA CICLO 1\t3,594\t3\t6\t4\tS/. 3,535.00\t0.1\t50\nMEDELLIN\t126\t4\t4\t0\t$ 0.00\t2.0\t7\nMÉXICO CICLO 1\t623\t3\t2\t1\t$ 0.00\t0.0\t44\nQUITO CICLO 2\t4,751\t6\t6\t7\t$ 510.00\t1.3\t95",
+        "Actividad del Fin de Semana\n21 en curso\nEQUIPO\tSEDE\tENTRENADOR\tETAPA ACTUAL\tPARTICIPANTES\t\nEQUIPO 20\tCuenca Ciclo 1\tANDRES IDROBO\tTFD\t38\tVer Resultados\nEQUIPO 21\tCuenca Ciclo 1\tALONSO SOLARES\tSFD\t46\tVer Resultados\nEQUIPO 22\tCuenca Ciclo 1\tMIKE BOADA\tPFD\t39\tVer Resultados\nEQUIPO 34\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\tTFD\t30\tVer Resultados\nEQUIPO 35\tGUAYAQUIL CICLO 1\tALONSO SOLARES\tSFD\t30\tVer Resultados\nEQUIPO 36\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\tPFD\t25\tVer Resultados\nEQUIPO 28\tLIMA CICLO 1\tALEJANDRO DIAZ\tTFD\t13\tVer Resultados\nEQUIPO 29\tLIMA CICLO 1\tLOURDES PATINO\tPFD\t36\tVer Resultados\nEQUIPO 30\tLIMA CICLO 1\tANDRES IDROBO\tPFD\t4\tVer Resultados\nEQUIPO 16\tMEDELLIN\tFERNANDO ARAGON\tTFD\t16\tVer Resultados\nEQUIPO 17\tMEDELLIN\tLEANDRO BRUNIS\tSFD\t30\tVer Resultados\nEQUIPO 18\tMEDELLIN\tFERNANDO ARAGON\tPFD\t38\tVer Resultados\nEQUIPO 5\tMÉXICO CICLO 1\tNo asignado\tTFD\t23\tVer Resultados\nEQUIPO 6\tMÉXICO CICLO 1\tMAURICIO PEREZ\tSFD\t11\tVer Resultados\nEQUIPO 7\tMÉXICO CICLO 1\tMAURICIO PEREZ\tPFD\t15\tVer Resultados\nEQUIPO 120\tQUITO CICLO 2\tFERNANDO ARAGON\tTFD\t33\tVer Resultados\nEQUIPO 121\tQUITO CICLO 2\tCIRILO MARTINEZ\tTFD\t53\tVer Resultados\nEQUIPO 122\tQUITO CICLO 2\tLEANDRO BRUNIS\tSFD\t38\tVer Resultados\nEQUIPO 123\tQUITO CICLO 2\tCHUY ACOSTA\tSFD\t42\tVer Resultados\nEQUIPO 124\tQUITO CICLO 2\tLEANDRO BRUNIS\tPFD\t21\tVer Resultados\nEQUIPO 125\tQUITO CICLO 2\tANA MONROY\tPFD\t76\tVer Resultados",
+        "Por Entrenamiento\nTotal participantes activos en el alcance: 14,803\nCapítulo 1\n11,060 (75%)\nCapítulo 2\n4,039 (27%)\nMaestría\n3,279 (22%)",
         "Por Entrenador — Carga de Trabajo\nVer Cronograma\nENTRENADOR\tESTADO\tASIGNACIONES\nFERNANDO ARAGON\tActivo\t\n5\n\nLEANDRO BRUNIS\tActivo\t\n4\n\nMAURICIO PEREZ\tActivo\t\n4\n\nALONSO SOLARES\tActivo\t\n2\n\nANDRES IDROBO\tActivo\t\n2\n\nALEJANDRO DIAZ\tActivo\t\n1\n\nANA MONROY\tActivo\t\n1\n\nCHUY ACOSTA\tActivo\t\n1\n\nCIRILO MARTINEZ\tActivo\t\n1\n\nJUAN ANGEL AREOLA\tActivo\t\n1\n\nLOURDES PATINO\tActivo\t\n1\n\nMIKE BOADA\tActivo\t\n1\n\nANDRES GOMEZ\tActivo\tDisponible\nJOSE TORRON\tActivo\tDisponible\nMILDRED MUNOZ\tActivo\tDisponible\nPAUL SOSA\tActivo\tDisponible\nXAVIER VALAREZO\tActivo\tDisponible",
         "Por Equipo — Equipos en Actividad\nVer todos\nEQUIPO\tSEDE\tENTRENADOR\tPARTICIPANTES\nEQUIPO 123\tQUITO CICLO 2\tCHUY ACOSTA\t424\nEQUIPO 121\tQUITO CICLO 2\tCIRILO MARTINEZ\t364\nEQUIPO 125\tQUITO CICLO 2\tANA MONROY\t348\nEQUIPO 21\tCuenca Ciclo 1\tALONSO SOLARES\t314\nEQUIPO 20\tCuenca Ciclo 1\tANDRES IDROBO\t270\nEQUIPO 124\tQUITO CICLO 2\tLEANDRO BRUNIS\t259\nEQUIPO 18\tMEDELLIN\tFERNANDO ARAGON\t259\nEQUIPO 37\tGUAYAQUIL CICLO 1\tLEANDRO BRUNIS\t257\nEQUIPO 22\tCuenca Ciclo 1\tMIKE BOADA\t253\nEQUIPO 122\tQUITO CICLO 2\tLEANDRO BRUNIS\t240\nEQUIPO 120\tQUITO CICLO 2\tFERNANDO ARAGON\t228\nEQUIPO 29\tLIMA CICLO 1\tLOURDES PATINO\t224\nEQUIPO 36\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\t189\nEQUIPO 28\tLIMA CICLO 1\tALEJANDRO DIAZ\t175\nEQUIPO 35\tGUAYAQUIL CICLO 1\tALONSO SOLARES\t166\nEQUIPO 30\tLIMA CICLO 1\tANDRES IDROBO\t163\nEQUIPO 17\tMEDELLIN\tLEANDRO BRUNIS\t152\nEQUIPO 34\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\t138\nEQUIPO 16\tMEDELLIN\tFERNANDO ARAGON\t123\nEQUIPO 19\tMEDELLIN\tFERNANDO ARAGON\t120\nEQUIPO 7\tMÉXICO CICLO 1\tMAURICIO PEREZ\t87\nEQUIPO 6\tMÉXICO CICLO 1\tMAURICIO PEREZ\t71\nEQUIPO 5\tMÉXICO CICLO 1\tNo asignado\t67",
         "Registros Recientes\nVer todos\nARIANNA LEON LORENZETTI\nLIMA CICLO 1 · +51 913 499 148\n04/09\nJHAN CARLO AREVALO ASUNCION\nLIMA CICLO 1 · +51 ‪+51 959 727 950\n04/09\nLESLIE DESIREE BRITO GAMEZ\nLIMA CICLO 1 · +51 978449650\n04/09\nBEKER SALVADOR\nLIMA CICLO 1 · +51 901777856\n04/09\nISABEL HUAMAN SOLIS\nLIMA CICLO 1 · +51 947554964\n04/09\nGISELL DENIS SARMI\nLIMA CICLO 1 · +51 951105814\n04/09\nDAVID TINTAYA\nLIMA CICLO 1 · +51 ‪944 399 566‬\n04/09\nEDINSON MUNOZ VILLACORTA\nLIMA CICLO 1 · +51 955029157\n04/09\nJORGE EDIN MUNOZ SERRANO\nLIMA CICLO 1 · +51 922428978\n04/09\nANA LIZ OTAZU MENDOZA\nLIMA CICLO 1 · +51 910550571\n04/09",
@@ -157931,7 +157947,7 @@ export const normalizeCoordinator = (name) => {
         "Evolutivo — Ingresos Recaudados\n          Ver tabla\n        \n        \n          \n          \n            \n              MesRecaudado\n              \n                                Oct 25$ 2,021,240.01\n                                Nov 25$ 6,151,243.98\n                                Dic 25$ 5,975,511.00\n                                Ene 26$ 1,359,466.97\n                                Feb 26$ 4,204,589.50\n                                Mar 26$ 777,242.00\n                                Abr 26$ 563,945.25\n                                May 26$ 790,147.98\n                                Jun 26$ 523,481.00\n                                Jul 26$ 2,514,286.10\n                                Ago 26$ 111,160,084.65\n                                Sep 26$ 14,850.00",
         "Comparativo — Participantes por Sede\n          Ver tabla\n        \n        \n          \n          \n            \n              SedeParticipantes\n              \n                                QUITO CICLO 24,751\n                                LIMA CICLO 13,594\n                                Cuenca Ciclo 13,529\n                                GUAYAQUIL CICLO 12,180\n                                MÉXICO CICLO 1623\n                                MEDELLIN126",
         "Comparativo — Ingresos por Sede\n          Ver tabla\n        \n        \n          \n          \n            \n              SedeRecaudado\n              \n                                MEDELLIN$ 98,510,360.00\n                                QUITO CICLO 2$ 33,332,753.58\n                                Cuenca Ciclo 1$ 19,446,147.26\n                                MÉXICO CICLO 1$ 9,056,416.15\n                                LIMA CICLO 1S/. 4,882,793.12\n                                GUAYAQUIL CICLO 1$ 933,667.18",
-        "Comparativo — Progresión por Entrenamiento\n          Ver tabla\n        \n        \n          \n          \n            \n              EntrenamientoParticipantes\n              \n                                Capítulo 111,060\n                                Capítulo 24,039\n                                Maestría3,278",
+        "Comparativo — Progresión por Entrenamiento\n          Ver tabla\n        \n        \n          \n          \n            \n              EntrenamientoParticipantes\n              \n                                Capítulo 111,060\n                                Capítulo 24,039\n                                Maestría3,279",
         "Comparativo — Carga de Entrenadores (Top 10)\n          Ver tabla\n        \n        \n                    \n          \n            \n              EntrenadorAsignaciones\n              \n                                FERNANDO ARAGON5\n                                LEANDRO BRUNIS4\n                                MAURICIO PEREZ4\n                                ALONSO SOLARES2\n                                ANDRES IDROBO2\n                                ALEJANDRO DIAZ1\n                                ANA MONROY1\n                                CHUY ACOSTA1\n                                CIRILO MARTINEZ1\n                                JUAN ANGEL AREOLA1"
       ]
     },
@@ -168976,7 +168992,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51993709784",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -169171,7 +169187,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51930526967",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "—",
             "desertor": "—",
             "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
@@ -169231,7 +169247,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "—",
             "llamada1": "No le Interesa",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "—",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -169261,7 +169277,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51929406665",
             "llamada1": "No le Interesa",
             "llamada2": "No le Interesa",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "—",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -169351,7 +169367,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51993709784",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -169546,7 +169562,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51930526967",
             "llamada1": "Por Confirmar",
             "llamada2": "Siguiente",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
@@ -169606,7 +169622,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "—",
             "llamada1": "—",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -169636,7 +169652,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51929406665",
             "llamada1": "No Contesta",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -207044,7 +207060,7 @@ function App() {
           } />
 
           <Route path="/auditoria-kpis" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'coord_c1', 'coord_c2', 'coordinador_c1c2']} requireSuperAdmin={false}>
               <AuditoriaKPIs />
             </RoleRoute>
           } />
@@ -214194,6 +214210,614 @@ export default function NewExcellenceModal({ isOpen, onClose, task, onComplete }
 
 ---
 
+## Archivo: src\components\NodusCoordinadoresC1C2Dashboard.css
+
+```css
+﻿/* =========================================================================
+   ESTILOS EJECUTIVOS: NODUS COORDINADORES C1 & C2 DASHBOARD
+   CREAR PODER SIN LÍMITES - CAUSA OS
+   ========================================================================= */
+
+.nodus-dashboard-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  font-family: var(--font-body, 'Inter', sans-serif);
+  color: #f8fafc;
+  box-sizing: border-box;
+}
+
+.nodus-dashboard-container *,
+.nodus-dashboard-container *::before,
+.nodus-dashboard-container *::after {
+  box-sizing: border-box;
+}
+
+/* 1. Header Banner */
+.nodus-header-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  padding: 1.25rem 1.75rem;
+  background: linear-gradient(135deg, rgba(17, 34, 64, 0.95) 0%, rgba(10, 25, 47, 0.98) 100%);
+  border: 1px solid rgba(255, 193, 7, 0.35);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(16px);
+}
+
+.nodus-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.nodus-header-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(255, 193, 7, 0.12);
+  border: 1px solid rgba(255, 193, 7, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffc107;
+  flex-shrink: 0;
+}
+
+.nodus-header-title {
+  font-family: var(--font-heading, 'Montserrat', sans-serif);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.nodus-badge-live {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  background: rgba(255, 193, 7, 0.18);
+  color: #ffc107;
+  border: 1px solid rgba(255, 193, 7, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.nodus-header-subtitle {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin: 0.25rem 0 0 0;
+}
+
+.nodus-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.nodus-sync-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.85rem;
+  background: rgba(10, 25, 47, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  font-size: 0.78rem;
+  color: #cbd5e1;
+}
+
+.nodus-pulse-dot {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+}
+
+.nodus-btn-refresh {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.48rem 0.9rem;
+  background: rgba(255, 193, 7, 0.15);
+  border: 1px solid rgba(255, 193, 7, 0.4);
+  color: #ffc107;
+  border-radius: 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nodus-btn-refresh:hover:not(:disabled) {
+  background: rgba(255, 193, 7, 0.25);
+  border-color: #ffc107;
+  transform: translateY(-1px);
+}
+
+.nodus-btn-refresh:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 2. Scorecards Grid */
+.nodus-scorecards-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1rem;
+  width: 100%;
+}
+
+@media (max-width: 1280px) {
+  .nodus-scorecards-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .nodus-scorecards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .nodus-scorecards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.nodus-card {
+  background: rgba(17, 34, 64, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 1.1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  transition: all 0.25s ease;
+  backdrop-filter: blur(10px);
+}
+
+.nodus-card:hover {
+  border-color: rgba(255, 193, 7, 0.35);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.45);
+}
+
+.nodus-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #94a3b8;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 0.4rem;
+}
+
+.nodus-card-value {
+  font-family: var(--font-heading, 'Montserrat', sans-serif);
+  font-size: 1.7rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.2;
+}
+
+.nodus-card-value.highlight-emerald {
+  color: #10b981;
+}
+
+.nodus-card-footer {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin-top: 0.4rem;
+}
+
+.nodus-progress-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+
+.nodus-progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease-in-out;
+}
+
+/* 3. Barra de Filtros */
+.nodus-filters-bar {
+  background: rgba(17, 34, 64, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+}
+
+.nodus-filters-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  width: 100%;
+}
+
+.nodus-search-box {
+  flex: 1;
+  min-width: 250px;
+  position: relative;
+}
+
+.nodus-search-icon {
+  position: absolute;
+  left: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+.nodus-search-input {
+  width: 100%;
+  padding: 0.55rem 0.85rem 0.55rem 2.4rem;
+  background: rgba(10, 25, 47, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 0.82rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.nodus-search-input:focus {
+  border-color: #ffc107;
+  box-shadow: 0 0 10px rgba(255, 193, 7, 0.2);
+}
+
+.nodus-search-input::placeholder {
+  color: #64748b;
+}
+
+.nodus-select-group {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.nodus-select-item {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: rgba(10, 25, 47, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 0.45rem 0.75rem;
+}
+
+.nodus-select {
+  background: transparent;
+  border: none;
+  color: #e2e8f0;
+  font-size: 0.8rem;
+  outline: none;
+  cursor: pointer;
+}
+
+.nodus-select option {
+  background: #0a192f;
+  color: #ffffff;
+}
+
+/* 4. Sección de Gráficos */
+.nodus-charts-section {
+  background: rgba(17, 34, 64, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+
+.nodus-charts-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.nodus-chart-tabs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.nodus-chart-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: transparent;
+  color: #94a3b8;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.nodus-chart-tab-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.nodus-chart-tab-btn.active-tab {
+  background: rgba(255, 193, 7, 0.15);
+  color: #ffc107;
+  border-color: rgba(255, 193, 7, 0.4);
+  box-shadow: 0 2px 8px rgba(255, 193, 7, 0.15);
+}
+
+.nodus-chart-viewport {
+  width: 100%;
+  height: 380px;
+  min-height: 380px;
+  position: relative;
+}
+
+.nodus-pie-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: 100%;
+  height: 100%;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.nodus-pie-chart-box {
+  width: 55%;
+  height: 350px;
+}
+
+.nodus-pie-legend-box {
+  width: 40%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+@media (max-width: 768px) {
+  .nodus-pie-chart-box,
+  .nodus-pie-legend-box {
+    width: 100%;
+  }
+}
+
+.nodus-legend-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0.85rem;
+  background: rgba(10, 25, 47, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  font-size: 0.8rem;
+}
+
+/* 5. Tabla de Coordinadores */
+.nodus-table-container {
+  background: rgba(17, 34, 64, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+
+.nodus-table-header {
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(10, 25, 47, 0.6);
+}
+
+.nodus-table-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-heading, 'Montserrat', sans-serif);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.nodus-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.nodus-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.82rem;
+}
+
+.nodus-th {
+  background: rgba(10, 25, 47, 0.95);
+  color: #94a3b8;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.nodus-td {
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  vertical-align: middle;
+}
+
+.nodus-tr:hover {
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.nodus-tr.expanded-row {
+  background: rgba(255, 193, 7, 0.03);
+}
+
+/* Badges y Elementos de Celda */
+.nodus-coord-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(255, 193, 7, 0.15);
+  border: 1px solid rgba(255, 193, 7, 0.4);
+  color: #ffc107;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+.nodus-badge-c1c2 {
+  font-size: 0.68rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 6px;
+  background: rgba(139, 92, 246, 0.2);
+  color: #a78bfa;
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  font-weight: 600;
+}
+
+.nodus-badge-confirmados {
+  display: inline-block;
+  padding: 0.25rem 0.65rem;
+  border-radius: 8px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #10b981;
+  font-weight: 800;
+}
+
+.nodus-badge-asistieron {
+  display: inline-block;
+  padding: 0.25rem 0.65rem;
+  border-radius: 8px;
+  background: rgba(14, 165, 233, 0.15);
+  border: 1px solid rgba(14, 165, 233, 0.35);
+  color: #38bdf8;
+  font-weight: 800;
+}
+
+.nodus-btn-expand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.38rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  background: rgba(10, 25, 47, 0.9);
+  color: #ffc107;
+  border: 1px solid rgba(255, 193, 7, 0.35);
+  transition: all 0.2s ease;
+}
+
+.nodus-btn-expand:hover {
+  background: rgba(255, 193, 7, 0.2);
+  border-color: #ffc107;
+}
+
+.nodus-btn-expand.expanded {
+  background: #ffc107;
+  color: #0a192f;
+  border-color: #ffc107;
+}
+
+/* Sub-tabla anidada de equipos */
+.nodus-nested-panel {
+  background: rgba(10, 25, 47, 0.95);
+  border: 1px solid rgba(255, 193, 7, 0.25);
+  border-radius: 12px;
+  padding: 1rem;
+  margin: 0.5rem 0;
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.nodus-nested-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.nodus-nested-title {
+  color: #ffc107;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.nodus-nested-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+}
+
+.nodus-nested-th {
+  color: #94a3b8;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.nodus-nested-td {
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+```
+
+---
+
 ## Archivo: src\components\NodusCoordinadoresC1C2Dashboard.jsx
 
 ```javascript
@@ -214210,6 +214834,7 @@ import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip,
   Legend, CartesianGrid, Cell, PieChart, Pie, ComposedChart, Line
 } from 'recharts';
+import './NodusCoordinadoresC1C2Dashboard.css';
 
 const COLORS = {
   confirmado: '#10b981', // Emerald
@@ -214466,273 +215091,246 @@ export default function NodusCoordinadoresC1C2Dashboard() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center p-16 space-y-4 bg-slate-900/60 rounded-2xl border border-slate-800 text-slate-300">
-        <RefreshCw className="w-10 h-10 text-amber-500 animate-spin" />
-        <p className="text-base font-semibold">Cargando datos ejecutivos de Coordinadores C1 & C2...</p>
-        <p className="text-xs text-slate-500">Conectando con el enjambre de agentes autónomos Nodus</p>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', gap: '1rem', background: 'rgba(17, 34, 64, 0.7)', borderRadius: '16px', border: '1px solid rgba(255, 255, 255, 0.08)', color: '#94a3b8' }}>
+        <RefreshCw size={36} color="#ffc107" style={{ animation: 'spin 1s linear infinite' }} />
+        <p style={{ fontSize: '1rem', fontWeight: 600, color: '#f8fafc', margin: 0 }}>Cargando datos ejecutivos de Coordinadores C1 & C2...</p>
+        <p style={{ fontSize: '0.78rem', color: '#64748b', margin: 0 }}>Conectando con el enjambre de agentes autónomos Nodus</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* HEADER SUPERIOR: ESTADO EN VIVO & SINCRONIZACIÓN */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-5 bg-gradient-to-r from-slate-900 via-slate-900/95 to-slate-800 border border-amber-500/30 rounded-2xl shadow-xl backdrop-blur-md">
-        <div className="space-y-1">
-          <div className="flex items-center gap-3">
-            <span className="p-2.5 bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-xl shadow-inner">
-              <Award className="w-6 h-6" />
-            </span>
-            <div>
-              <h2 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
-                Panel de Coordinadores C1 & C2
-                <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-medium">
-                  Nodus Live Global
-                </span>
-              </h2>
-              <p className="text-xs text-slate-400">
-                Auditoría horaria multi-agente de gestiones, llamadas, confirmaciones y cobertura en tiempo real
-              </p>
-            </div>
+    <div className="nodus-dashboard-container">
+      {/* 1. HEADER SUPERIOR: ESTADO EN VIVO & SINCRONIZACIÓN */}
+      <div className="nodus-header-banner">
+        <div className="nodus-header-left">
+          <div className="nodus-header-icon">
+            <Award size={26} color="#ffc107" />
+          </div>
+          <div>
+            <h2 className="nodus-header-title">
+              Panel de Coordinadores C1 & C2
+              <span className="nodus-badge-live">Nodus Live Global</span>
+            </h2>
+            <p className="nodus-header-subtitle">
+              Auditoría horaria multi-agente de gestiones, llamadas, confirmaciones y cobertura en tiempo real
+            </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3 self-start lg:self-center">
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-800/80 border border-slate-700 rounded-xl text-xs text-slate-300">
-            <span className="relative flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-            </span>
-            <span>Sincronizado: <strong className="text-emerald-400">{timeSinceSync}</strong></span>
+        <div className="nodus-header-right">
+          <div className="nodus-sync-indicator">
+            <span className="nodus-pulse-dot" />
+            <span>Sincronizado: <strong style={{ color: '#10b981' }}>{timeSinceSync}</strong></span>
           </div>
 
           <button
             onClick={handleManualRefresh}
             disabled={refreshing}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 rounded-xl text-xs font-semibold transition-all active:scale-95 disabled:opacity-50"
+            className="nodus-btn-refresh"
             title="Refrescar datos en vivo"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+            <RefreshCw size={14} style={{ animation: refreshing ? 'spin 1s linear infinite' : 'none' }} />
             <span>{refreshing ? 'Actualizando...' : 'Refrescar'}</span>
           </button>
         </div>
       </div>
 
-      {/* SCORECARDS EJECUTIVAS DE ALTO IMPACTO */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3.5">
-        <div className="p-4 bg-slate-900/80 border border-slate-800 hover:border-amber-500/40 rounded-2xl shadow-sm transition-all">
-          <div className="flex items-center justify-between text-slate-400 mb-1">
-            <span className="text-xs font-medium">Coordinadores</span>
-            <Users className="w-4 h-4 text-amber-400" />
+      {/* 2. SCORECARDS EJECUTIVAS */}
+      <div className="nodus-scorecards-grid">
+        <div className="nodus-card">
+          <div className="nodus-card-header">
+            <span>Coordinadores</span>
+            <Users size={16} color="#ffc107" />
           </div>
-          <div className="text-2xl font-black text-white">{aggregatedStats.coordinadoresCount}</div>
-          <div className="text-[11px] text-slate-400 mt-1">En {selectedSede === 'TODAS' ? '6 Sedes' : selectedSede}</div>
+          <div className="nodus-card-value">{aggregatedStats.coordinadoresCount}</div>
+          <div className="nodus-card-footer">En {selectedSede === 'TODAS' ? '6 Sedes' : selectedSede}</div>
         </div>
 
-        <div className="p-4 bg-slate-900/80 border border-slate-800 hover:border-sky-500/40 rounded-2xl shadow-sm transition-all">
-          <div className="flex items-center justify-between text-slate-400 mb-1">
-            <span className="text-xs font-medium">Gestiones Totales</span>
-            <PhoneCall className="w-4 h-4 text-sky-400" />
+        <div className="nodus-card">
+          <div className="nodus-card-header">
+            <span>Gestiones Totales</span>
+            <PhoneCall size={16} color="#0ea5e9" />
           </div>
-          <div className="text-2xl font-black text-white">{aggregatedStats.totalGestiones.toLocaleString()}</div>
-          <div className="text-[11px] text-sky-400/80 mt-1">Llamadas realizadas</div>
+          <div className="nodus-card-value" style={{ color: '#38bdf8' }}>{aggregatedStats.totalGestiones.toLocaleString()}</div>
+          <div className="nodus-card-footer" style={{ color: '#38bdf8' }}>Llamadas realizadas</div>
         </div>
 
-        <div className="p-4 bg-slate-900/80 border border-slate-800 hover:border-violet-500/40 rounded-2xl shadow-sm transition-all">
-          <div className="flex items-center justify-between text-slate-400 mb-1">
-            <span className="text-xs font-medium">Asignados</span>
-            <Building2 className="w-4 h-4 text-violet-400" />
+        <div className="nodus-card">
+          <div className="nodus-card-header">
+            <span>Asignados</span>
+            <Building2 size={16} color="#a855f7" />
           </div>
-          <div className="text-2xl font-black text-white">{aggregatedStats.totalAsignados.toLocaleString()}</div>
-          <div className="text-[11px] text-slate-400 mt-1">Participantes meta</div>
+          <div className="nodus-card-value">{aggregatedStats.totalAsignados.toLocaleString()}</div>
+          <div className="nodus-card-footer">Participantes meta</div>
         </div>
 
-        <div className="p-4 bg-slate-900/80 border border-slate-800 hover:border-emerald-500/40 rounded-2xl shadow-sm transition-all">
-          <div className="flex items-center justify-between text-slate-400 mb-1">
-            <span className="text-xs font-medium">Confirmados</span>
-            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+        <div className="nodus-card">
+          <div className="nodus-card-header">
+            <span>Confirmados</span>
+            <CheckCircle2 size={16} color="#10b981" />
           </div>
-          <div className="text-2xl font-black text-emerald-400">{aggregatedStats.totalConfirmados.toLocaleString()}</div>
-          <div className="text-[11px] text-emerald-400/80 mt-1">{aggregatedStats.tasaEfectividad}% efectividad</div>
+          <div className="nodus-card-value highlight-emerald">{aggregatedStats.totalConfirmados.toLocaleString()}</div>
+          <div className="nodus-card-footer" style={{ color: '#10b981' }}>{aggregatedStats.tasaEfectividad}% efectividad</div>
         </div>
 
-        <div className="p-4 bg-slate-900/80 border border-slate-800 hover:border-amber-500/40 rounded-2xl shadow-sm transition-all">
-          <div className="flex items-center justify-between text-slate-400 mb-1">
-            <span className="text-xs font-medium">Cobertura Media</span>
-            <TrendingUp className="w-4 h-4 text-amber-400" />
+        <div className="nodus-card">
+          <div className="nodus-card-header">
+            <span>Cobertura Media</span>
+            <TrendingUp size={16} color="#ffc107" />
           </div>
-          <div className="text-2xl font-black text-white">{aggregatedStats.coberturaProm}%</div>
-          <div className="w-full bg-slate-800 h-1.5 rounded-full mt-2 overflow-hidden">
-            <div className="bg-amber-500 h-full rounded-full transition-all" style={{ width: `${aggregatedStats.coberturaProm}%` }} />
+          <div className="nodus-card-value">{aggregatedStats.coberturaProm}%</div>
+          <div className="nodus-progress-bar">
+            <div className="nodus-progress-fill" style={{ width: `${aggregatedStats.coberturaProm}%`, background: '#ffc107' }} />
           </div>
         </div>
 
-        <div className="p-4 bg-slate-900/80 border border-slate-800 hover:border-teal-500/40 rounded-2xl shadow-sm transition-all">
-          <div className="flex items-center justify-between text-slate-400 mb-1">
-            <span className="text-xs font-medium">Productividad Media</span>
-            <UserCheck className="w-4 h-4 text-teal-400" />
+        <div className="nodus-card">
+          <div className="nodus-card-header">
+            <span>Productividad Media</span>
+            <UserCheck size={16} color="#14b8a6" />
           </div>
-          <div className="text-2xl font-black text-white">{aggregatedStats.productividadProm}%</div>
-          <div className="w-full bg-slate-800 h-1.5 rounded-full mt-2 overflow-hidden">
-            <div className="bg-teal-500 h-full rounded-full transition-all" style={{ width: `${aggregatedStats.productividadProm}%` }} />
+          <div className="nodus-card-value">{aggregatedStats.productividadProm}%</div>
+          <div className="nodus-progress-bar">
+            <div className="nodus-progress-fill" style={{ width: `${aggregatedStats.productividadProm}%`, background: '#14b8a6' }} />
           </div>
         </div>
       </div>
 
-      {/* BARRA DE FILTROS MULTIDIMENSIONALES */}
-      <div className="p-4 bg-slate-900/90 border border-slate-800 rounded-2xl shadow-md space-y-3">
-        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
-          {/* Input de Búsqueda */}
-          <div className="relative flex-1">
-            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+      {/* 3. BARRA DE FILTROS MULTIDIMENSIONALES */}
+      <div className="nodus-filters-bar">
+        <div className="nodus-filters-row">
+          <div className="nodus-search-box">
+            <Search size={15} className="nodus-search-icon" />
             <input
               type="text"
               placeholder="Buscar colaborador, sede o equipo..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-slate-800/80 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-400 focus:outline-none focus:border-amber-500 transition-colors"
+              className="nodus-search-input"
             />
           </div>
 
-          {/* Selectores de Filtros */}
-          <div className="flex flex-wrap items-center gap-2">
-            {/* Sede */}
-            <div className="flex items-center gap-1.5 bg-slate-800/80 px-2.5 py-1.5 rounded-xl border border-slate-700">
-              <MapPin className="w-3.5 h-3.5 text-amber-400" />
+          <div className="nodus-select-group">
+            <div className="nodus-select-item">
+              <MapPin size={14} color="#ffc107" />
               <select
                 value={selectedSede}
                 onChange={(e) => {
                   setSelectedSede(e.target.value);
                   setSelectedEquipo('TODOS');
                 }}
-                className="bg-transparent text-xs text-slate-200 focus:outline-none cursor-pointer"
+                className="nodus-select"
               >
-                <option value="TODAS" className="bg-slate-900">Todas las Sedes</option>
+                <option value="TODAS">Todas las Sedes</option>
                 {sedesList.map(s => (
-                  <option key={s} value={s} className="bg-slate-900">{s}</option>
+                  <option key={s} value={s}>{s}</option>
                 ))}
               </select>
             </div>
 
-            {/* Equipo */}
-            <div className="flex items-center gap-1.5 bg-slate-800/80 px-2.5 py-1.5 rounded-xl border border-slate-700">
-              <Layers className="w-3.5 h-3.5 text-sky-400" />
+            <div className="nodus-select-item">
+              <Layers size={14} color="#38bdf8" />
               <select
                 value={selectedEquipo}
                 onChange={(e) => setSelectedEquipo(e.target.value)}
-                className="bg-transparent text-xs text-slate-200 focus:outline-none cursor-pointer max-w-[130px] truncate"
+                className="nodus-select"
+                style={{ maxWidth: '140px' }}
               >
-                <option value="TODOS" className="bg-slate-900">Todos Equipos</option>
+                <option value="TODOS">Todos Equipos</option>
                 {equiposList.map(eq => (
-                  <option key={eq} value={eq} className="bg-slate-900">{eq}</option>
+                  <option key={eq} value={eq}>{eq}</option>
                 ))}
               </select>
             </div>
 
-            {/* Entrenamiento */}
-            <div className="flex items-center gap-1.5 bg-slate-800/80 px-2.5 py-1.5 rounded-xl border border-slate-700">
-              <Award className="w-3.5 h-3.5 text-violet-400" />
+            <div className="nodus-select-item">
+              <Award size={14} color="#a855f7" />
               <select
                 value={selectedEntrenamiento}
                 onChange={(e) => setSelectedEntrenamiento(e.target.value)}
-                className="bg-transparent text-xs text-slate-200 focus:outline-none cursor-pointer"
+                className="nodus-select"
               >
-                <option value="TODOS" className="bg-slate-900">C1 y C2</option>
-                <option value="C1" className="bg-slate-900">Solo Capítulo 1</option>
-                <option value="C2" className="bg-slate-900">Solo Capítulo 2</option>
+                <option value="TODOS">C1 y C2</option>
+                <option value="C1">Solo Capítulo 1</option>
+                <option value="C2">Solo Capítulo 2</option>
               </select>
             </div>
 
-            {/* Ciclo */}
-            <div className="flex items-center gap-1.5 bg-slate-800/80 px-2.5 py-1.5 rounded-xl border border-slate-700">
-              <Calendar className="w-3.5 h-3.5 text-emerald-400" />
+            <div className="nodus-select-item">
+              <Calendar size={14} color="#10b981" />
               <select
                 value={selectedCiclo}
                 onChange={(e) => setSelectedCiclo(e.target.value)}
-                className="bg-transparent text-xs text-slate-200 focus:outline-none cursor-pointer"
+                className="nodus-select"
               >
-                <option value="TODOS" className="bg-slate-900">Todos Ciclos</option>
-                <option value="Ciclo 1" className="bg-slate-900">Ciclo 1</option>
-                <option value="Ciclo 2" className="bg-slate-900">Ciclo 2</option>
+                <option value="TODOS">Todos Ciclos</option>
+                <option value="Ciclo 1">Ciclo 1</option>
+                <option value="Ciclo 2">Ciclo 2</option>
               </select>
             </div>
 
-            {/* Ordenamiento */}
-            <div className="flex items-center gap-1.5 bg-slate-800/80 px-2.5 py-1.5 rounded-xl border border-slate-700">
-              <ArrowUpDown className="w-3.5 h-3.5 text-amber-400" />
+            <div className="nodus-select-item">
+              <ArrowUpDown size={14} color="#ffc107" />
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="bg-transparent text-xs text-slate-200 focus:outline-none cursor-pointer"
+                className="nodus-select"
               >
-                <option value="gestiones" className="bg-slate-900">Más Gestiones</option>
-                <option value="confirmados" className="bg-slate-900">Más Confirmados</option>
-                <option value="cobertura" className="bg-slate-900">Mayor Cobertura %</option>
-                <option value="productividad" className="bg-slate-900">Mayor Productividad %</option>
-                <option value="nombre" className="bg-slate-900">Alfabético</option>
+                <option value="gestiones">Más Gestiones</option>
+                <option value="confirmados">Más Confirmados</option>
+                <option value="cobertura">Mayor Cobertura %</option>
+                <option value="productividad">Mayor Productividad %</option>
+                <option value="nombre">Alfabético</option>
               </select>
             </div>
           </div>
         </div>
       </div>
 
-      {/* SECCIÓN DE GRÁFICOS DE ALTO RENDIMIENTO */}
-      <div className="p-5 bg-slate-900/90 border border-slate-800 rounded-2xl shadow-xl space-y-4">
-        {/* Selector de Pestaña de Gráfico */}
-        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-          <div className="flex items-center gap-2">
+      {/* 4. SECCIÓN DE GRÁFICOS */}
+      <div className="nodus-charts-section">
+        <div className="nodus-charts-header">
+          <div className="nodus-chart-tabs">
             <button
               onClick={() => setActiveChartTab('coordinadores')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-                activeChartTab === 'coordinadores'
-                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-              }`}
+              className={`nodus-chart-tab-btn ${activeChartTab === 'coordinadores' ? 'active-tab' : ''}`}
             >
-              <BarChart2 className="w-4 h-4" />
+              <BarChart2 size={16} />
               <span>Rendimiento por Colaborador</span>
             </button>
 
             <button
               onClick={() => setActiveChartTab('sedes')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-                activeChartTab === 'sedes'
-                  ? 'bg-sky-500/20 text-sky-300 border border-sky-500/40 shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-              }`}
+              className={`nodus-chart-tab-btn ${activeChartTab === 'sedes' ? 'active-tab' : ''}`}
             >
-              <Building2 className="w-4 h-4" />
+              <Building2 size={16} />
               <span>Comparativo de Sedes</span>
             </button>
 
             <button
               onClick={() => setActiveChartTab('estados')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-                activeChartTab === 'estados'
-                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-              }`}
+              className={`nodus-chart-tab-btn ${activeChartTab === 'estados' ? 'active-tab' : ''}`}
             >
-              <PieChartIcon className="w-4 h-4" />
+              <PieChartIcon size={16} />
               <span>Distribución de Contacto</span>
             </button>
           </div>
 
-          <div className="text-xs text-slate-500 hidden sm:block">
+          <div style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
             Mostrando {filteredCoordinadores.length} coordinadores
           </div>
         </div>
 
-        {/* CONTENEDOR DE GRÁFICO SEGÚN TAB ACTIVA */}
-        <div className="h-[340px] w-full pt-2">
+        <div className="nodus-chart-viewport">
           {activeChartTab === 'coordinadores' && (
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height={380}>
               <BarChart data={chartCoordinadoresData} margin={{ top: 10, right: 20, left: 0, bottom: 25 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.5} />
                 <XAxis dataKey="name" stroke="#94a3b8" fontSize={11} angle={-25} textAnchor="end" height={50} />
                 <YAxis stroke="#94a3b8" fontSize={11} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', color: '#fff', fontSize: '12px' }}
+                  contentStyle={{ backgroundColor: '#0a192f', borderColor: '#334155', borderRadius: '12px', color: '#fff', fontSize: '12px' }}
                   itemStyle={{ padding: '2px 0' }}
                 />
                 <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '8px' }} />
@@ -214745,13 +215343,13 @@ export default function NodusCoordinadoresC1C2Dashboard() {
           )}
 
           {activeChartTab === 'sedes' && (
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height={380}>
               <ComposedChart data={chartSedesData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.5} />
                 <XAxis dataKey="sede" stroke="#94a3b8" fontSize={12} />
                 <YAxis stroke="#94a3b8" fontSize={11} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', color: '#fff', fontSize: '12px' }}
+                  contentStyle={{ backgroundColor: '#0a192f', borderColor: '#334155', borderRadius: '12px', color: '#fff', fontSize: '12px' }}
                 />
                 <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '8px' }} />
                 <Bar dataKey="gestiones" name="Gestiones Realizadas" fill="#3b82f6" radius={[6, 6, 0, 0]} />
@@ -214762,9 +215360,9 @@ export default function NodusCoordinadoresC1C2Dashboard() {
           )}
 
           {activeChartTab === 'estados' && (
-            <div className="flex flex-col sm:flex-row items-center justify-around h-full">
-              <div className="h-[280px] w-full sm:w-[60%]">
-                <ResponsiveContainer width="100%" height="100%">
+            <div className="nodus-pie-wrapper">
+              <div className="nodus-pie-chart-box">
+                <ResponsiveContainer width="100%" height={340}>
                   <PieChart>
                     <Pie
                       data={chartEstadosData}
@@ -214782,20 +215380,20 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                       ))}
                     </Pie>
                     <Tooltip
-                      contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', color: '#fff', fontSize: '12px' }}
+                      contentStyle={{ backgroundColor: '#0a192f', borderColor: '#334155', borderRadius: '12px', color: '#fff', fontSize: '12px' }}
                     />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-1 gap-2.5 w-full sm:w-[35%] px-4">
+              <div className="nodus-pie-legend-box">
                 {chartEstadosData.map((e, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-2 rounded-xl bg-slate-800/60 border border-slate-700 text-xs">
-                    <div className="flex items-center gap-2">
-                      <span className="w-3 h-3 rounded-full" style={{ backgroundColor: e.color }} />
-                      <span className="text-slate-300 font-medium">{e.name}</span>
+                  <div key={idx} className="nodus-legend-item">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: e.color }} />
+                      <span style={{ color: '#cbd5e1', fontWeight: 500 }}>{e.name}</span>
                     </div>
-                    <span className="font-bold text-white">{e.value.toLocaleString()}</span>
+                    <span style={{ fontWeight: 800, color: '#ffffff' }}>{e.value.toLocaleString()}</span>
                   </div>
                 ))}
               </div>
@@ -214804,41 +215402,39 @@ export default function NodusCoordinadoresC1C2Dashboard() {
         </div>
       </div>
 
-      {/* TABLA PRINCIPAL DE COORDINADORES CON DESGLOSE POR EQUIPO */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
-        <div className="p-4 border-b border-slate-800 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Users className="w-4 h-4 text-amber-400" />
-            <h3 className="text-sm font-bold text-white">
-              Detalle Puntual por Colaborador y Equipos Asignados
-            </h3>
+      {/* 5. TABLA PRINCIPAL DE COORDINADORES CON DESGLOSE POR EQUIPO */}
+      <div className="nodus-table-container">
+        <div className="nodus-table-header">
+          <div className="nodus-table-title">
+            <Users size={18} color="#ffc107" />
+            <span>Detalle Puntual por Colaborador y Equipos Asignados</span>
           </div>
-          <span className="text-xs text-slate-400">
+          <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
             {filteredCoordinadores.length} coordinadores encontrados
           </span>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs border-collapse">
-            <thead className="bg-slate-800/80 text-slate-400 uppercase tracking-wider text-[11px] font-semibold border-b border-slate-700">
+        <div className="nodus-table-scroll">
+          <table className="nodus-table">
+            <thead>
               <tr>
-                <th className="py-3 px-4">Colaborador / Coordinador</th>
-                <th className="py-3 px-3">Sede & Ciclo</th>
-                <th className="py-3 px-3 text-right">Gestiones</th>
-                <th className="py-3 px-3 text-right">C1 / C2</th>
-                <th className="py-3 px-3 text-right">Asignados</th>
-                <th className="py-3 px-3 text-center">Cobertura</th>
-                <th className="py-3 px-3 text-center">Productividad</th>
-                <th className="py-3 px-3 text-right">Confirmados</th>
-                <th className="py-3 px-3 text-right">Asistieron</th>
-                <th className="py-3 px-3 text-center">Última Gestión</th>
-                <th className="py-3 px-3 text-center">Acciones</th>
+                <th className="nodus-th">Colaborador / Coordinador</th>
+                <th className="nodus-th">Sede & Ciclo</th>
+                <th className="nodus-th" style={{ textAlign: 'right' }}>Gestiones</th>
+                <th className="nodus-th" style={{ textAlign: 'right' }}>C1 / C2</th>
+                <th className="nodus-th" style={{ textAlign: 'right' }}>Asignados</th>
+                <th className="nodus-th" style={{ textAlign: 'center' }}>Cobertura</th>
+                <th className="nodus-th" style={{ textAlign: 'center' }}>Productividad</th>
+                <th className="nodus-th" style={{ textAlign: 'right' }}>Confirmados</th>
+                <th className="nodus-th" style={{ textAlign: 'right' }}>Asistieron</th>
+                <th className="nodus-th" style={{ textAlign: 'center' }}>Última Gestión</th>
+                <th className="nodus-th" style={{ textAlign: 'center' }}>Acciones</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800 text-slate-200">
+            <tbody>
               {filteredCoordinadores.length === 0 ? (
                 <tr>
-                  <td colSpan={11} className="py-10 text-center text-slate-500">
+                  <td colSpan={11} style={{ padding: '3rem 1rem', textAlign: 'center', color: '#64748b' }}>
                     No se encontraron coordinadores con los filtros seleccionados.
                   </td>
                 </tr>
@@ -214849,23 +215445,21 @@ export default function NodusCoordinadoresC1C2Dashboard() {
 
                   return (
                     <React.Fragment key={coord.id}>
-                      <tr className={`hover:bg-slate-800/50 transition-colors ${isExpanded ? 'bg-slate-800/40' : ''}`}>
-                        {/* Nombre y datos oficiales */}
-                        <td className="py-3.5 px-4">
-                          <div className="flex items-center gap-2.5">
-                            <div className="w-8 h-8 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-xs uppercase shadow-sm">
+                      <tr className={`nodus-tr ${isExpanded ? 'expanded-row' : ''}`}>
+                        {/* Colaborador */}
+                        <td className="nodus-td">
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                            <div className="nodus-coord-avatar">
                               {coord.nombre.slice(0, 2)}
                             </div>
                             <div>
-                              <div className="font-semibold text-white flex items-center gap-1.5">
+                              <div style={{ fontWeight: 700, color: '#ffffff', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                                 {coord.nombre}
                                 {coord.c2 > 0 && (
-                                  <span className="text-[10px] px-1.5 py-0.2 rounded bg-violet-500/20 text-violet-300 border border-violet-500/30">
-                                    C1+C2
-                                  </span>
+                                  <span className="nodus-badge-c1c2">C1+C2</span>
                                 )}
                               </div>
-                              <div className="text-[11px] text-slate-400 font-mono truncate max-w-[170px]">
+                              <div style={{ fontSize: '0.75rem', color: '#94a3b8', fontFamily: 'monospace' }}>
                                 {coord.email}
                               </div>
                             </div>
@@ -214873,159 +215467,157 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                         </td>
 
                         {/* Sede & Ciclo */}
-                        <td className="py-3.5 px-3">
-                          <div className="flex flex-col gap-0.5">
-                            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-200">
-                              <MapPin className="w-3 h-3 text-amber-400" />
+                        <td className="nodus-td">
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: '#f1f5f9', fontWeight: 600 }}>
+                              <MapPin size={13} color="#ffc107" />
                               {coord.sede}
                             </span>
-                            <span className="text-[10px] text-slate-400">
+                            <span style={{ fontSize: '0.72rem', color: '#64748b' }}>
                               {coord.ciclo}
                             </span>
                           </div>
                         </td>
 
                         {/* Gestiones */}
-                        <td className="py-3.5 px-3 text-right font-black text-sky-400 text-sm">
+                        <td className="nodus-td" style={{ textAlign: 'right', fontWeight: 800, color: '#38bdf8', fontSize: '0.95rem' }}>
                           {coord.gestiones.toLocaleString()}
                         </td>
 
                         {/* C1 / C2 */}
-                        <td className="py-3.5 px-3 text-right">
-                          <div className="text-[11px]">
-                            <span className="text-amber-400 font-semibold">{coord.c1}</span>
-                            <span className="text-slate-500 mx-1">/</span>
-                            <span className="text-violet-400 font-semibold">{coord.c2}</span>
-                          </div>
+                        <td className="nodus-td" style={{ textAlign: 'right' }}>
+                          <span style={{ color: '#ffc107', fontWeight: 700 }}>{coord.c1}</span>
+                          <span style={{ color: '#64748b', margin: '0 0.3rem' }}>/</span>
+                          <span style={{ color: '#a78bfa', fontWeight: 700 }}>{coord.c2}</span>
                         </td>
 
                         {/* Asignados */}
-                        <td className="py-3.5 px-3 text-right text-slate-300 font-medium">
+                        <td className="nodus-td" style={{ textAlign: 'right', color: '#cbd5e1', fontWeight: 600 }}>
                           {coord.asignados.toLocaleString()}
                         </td>
 
-                        {/* Cobertura % */}
-                        <td className="py-3.5 px-3">
-                          <div className="flex flex-col items-center gap-1">
-                            <span className="font-bold text-amber-400">{coord.coberturaPct}%</span>
-                            <div className="w-16 bg-slate-800 h-1.5 rounded-full overflow-hidden">
-                              <div className="bg-amber-500 h-full rounded-full" style={{ width: `${coord.coberturaPct}%` }} />
+                        {/* Cobertura */}
+                        <td className="nodus-td" style={{ textAlign: 'center' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
+                            <span style={{ fontWeight: 800, color: '#ffc107' }}>{coord.coberturaPct}%</span>
+                            <div style={{ width: '60px', height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
+                              <div style={{ width: `${coord.coberturaPct}%`, height: '100%', background: '#ffc107', borderRadius: '2px' }} />
                             </div>
-                            <span className="text-[9px] text-slate-500">{coord.coberturaDetalle?.split(' ')[0]}</span>
+                            <span style={{ fontSize: '0.68rem', color: '#64748b' }}>{coord.coberturaDetalle?.split(' ')[0]}</span>
                           </div>
                         </td>
 
-                        {/* Productividad % */}
-                        <td className="py-3.5 px-3">
-                          <div className="flex flex-col items-center gap-1">
-                            <span className="font-bold text-teal-400">{coord.productividadPct}%</span>
-                            <div className="w-16 bg-slate-800 h-1.5 rounded-full overflow-hidden">
-                              <div className="bg-teal-500 h-full rounded-full" style={{ width: `${coord.productividadPct}%` }} />
+                        {/* Productividad */}
+                        <td className="nodus-td" style={{ textAlign: 'center' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
+                            <span style={{ fontWeight: 800, color: '#14b8a6' }}>{coord.productividadPct}%</span>
+                            <div style={{ width: '60px', height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
+                              <div style={{ width: `${coord.productividadPct}%`, height: '100%', background: '#14b8a6', borderRadius: '2px' }} />
                             </div>
-                            <span className="text-[9px] text-slate-500">{coord.productividadDetalle?.split(' ')[0]}</span>
+                            <span style={{ fontSize: '0.68rem', color: '#64748b' }}>{coord.productividadDetalle?.split(' ')[0]}</span>
                           </div>
                         </td>
 
                         {/* Confirmados */}
-                        <td className="py-3.5 px-3 text-right">
-                          <span className="px-2 py-0.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold">
+                        <td className="nodus-td" style={{ textAlign: 'right' }}>
+                          <span className="nodus-badge-confirmados">
                             {coord.estados?.confirmado || 0}
                           </span>
                         </td>
 
                         {/* Asistieron */}
-                        <td className="py-3.5 px-3 text-right">
-                          <span className="px-2 py-0.5 rounded-lg bg-sky-500/10 border border-sky-500/30 text-sky-400 font-bold">
+                        <td className="nodus-td" style={{ textAlign: 'right' }}>
+                          <span className="nodus-badge-asistieron">
                             {coord.asistieron || 0}
                           </span>
                         </td>
 
                         {/* Última Gestión */}
-                        <td className="py-3.5 px-3 text-center text-[10px] text-slate-400 font-mono">
+                        <td className="nodus-td" style={{ textAlign: 'center', fontSize: '0.72rem', color: '#94a3b8', fontFamily: 'monospace' }}>
                           {coord.ultGestion || coord.ultConexion || 'N/D'}
                         </td>
 
                         {/* Acciones */}
-                        <td className="py-3.5 px-3 text-center">
+                        <td className="nodus-td" style={{ textAlign: 'center' }}>
                           {hasEquipos ? (
                             <button
                               onClick={() => toggleRow(coord.id)}
-                              className={`flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-semibold transition-all ${
-                                isExpanded
-                                  ? 'bg-amber-500 text-slate-950 font-bold shadow-md'
-                                  : 'bg-slate-800 hover:bg-slate-700 text-amber-400 border border-amber-500/30'
-                              }`}
+                              className={`nodus-btn-expand ${isExpanded ? 'expanded' : ''}`}
                             >
                               <span>Equipos ({coord.equipos.length})</span>
-                              {isExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                              {isExpanded ? <ChevronDown size={13} /> : <ChevronRight size={13} />}
                             </button>
                           ) : (
-                            <span className="text-[10px] text-slate-500 italic">Sin tabla</span>
+                            <span style={{ fontSize: '0.72rem', color: '#64748b', fontStyle: 'italic' }}>Sin equipos</span>
                           )}
                         </td>
                       </tr>
 
-                      {/* FILA EXPANDIBLE: DESGLOSE DE EQUIPOS DE ESTE COORDINADOR */}
+                      {/* SUBTABLA ANIDADA */}
                       {isExpanded && hasEquipos && (
-                        <tr className="bg-slate-950/80">
-                          <td colSpan={11} className="p-4 pl-12">
-                            <div className="bg-slate-900 border border-amber-500/20 rounded-xl p-3 shadow-inner">
-                              <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-800">
-                                <h4 className="text-xs font-bold text-amber-400 flex items-center gap-2">
-                                  <Layers className="w-3.5 h-3.5" />
-                                  Desglose por Equipo — {coord.nombre} ({coord.sede})
+                        <tr>
+                          <td colSpan={11} style={{ padding: '0.75rem 1.5rem', background: 'rgba(10, 25, 47, 0.98)' }}>
+                            <div className="nodus-nested-panel">
+                              <div className="nodus-nested-header">
+                                <h4 className="nodus-nested-title">
+                                  <Layers size={14} />
+                                  <span>Desglose por Equipo — {coord.nombre} ({coord.sede})</span>
                                 </h4>
-                                <span className="text-[10px] text-slate-400">
+                                <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
                                   {coord.equipos.length} equipos gestionados
                                 </span>
                               </div>
 
-                              <div className="overflow-x-auto">
-                                <table className="w-full text-left text-[11px]">
-                                  <thead className="text-slate-400 border-b border-slate-800 text-[10px] uppercase">
+                              <div style={{ overflowX: 'auto' }}>
+                                <table className="nodus-nested-table">
+                                  <thead>
                                     <tr>
-                                      <th className="py-1.5 px-3">Equipo</th>
-                                      <th className="py-1.5 px-3 text-right">Llamadas</th>
-                                      <th className="py-1.5 px-3 text-right">Confirmado</th>
-                                      <th className="py-1.5 px-3 text-right">No Contesta</th>
-                                      <th className="py-1.5 px-3 text-right">Por Confirmar</th>
-                                      <th className="py-1.5 px-3 text-right">Siguiente</th>
-                                      <th className="py-1.5 px-3 text-right">Asistieron</th>
-                                      <th className="py-1.5 px-3 text-center">Tasa Asistencia</th>
+                                      <th className="nodus-nested-th">Equipo</th>
+                                      <th className="nodus-nested-th" style={{ textAlign: 'right' }}>Llamadas</th>
+                                      <th className="nodus-nested-th" style={{ textAlign: 'right' }}>Confirmado</th>
+                                      <th className="nodus-nested-th" style={{ textAlign: 'right' }}>No Contesta</th>
+                                      <th className="nodus-nested-th" style={{ textAlign: 'right' }}>Por Confirmar</th>
+                                      <th className="nodus-nested-th" style={{ textAlign: 'right' }}>Siguiente</th>
+                                      <th className="nodus-nested-th" style={{ textAlign: 'right' }}>Asistieron</th>
+                                      <th className="nodus-nested-th" style={{ textAlign: 'center' }}>Tasa Asistencia</th>
                                     </tr>
                                   </thead>
-                                  <tbody className="divide-y divide-slate-800/60 text-slate-300">
+                                  <tbody>
                                     {coord.equipos.map((eq, eqIdx) => {
                                       const tasaAsist = eq.confirmado > 0 ? Math.round((eq.asistieron / eq.confirmado) * 100) : 0;
                                       return (
-                                        <tr key={eqIdx} className="hover:bg-slate-800/40">
-                                          <td className="py-1.5 px-3 font-semibold text-white">
+                                        <tr key={eqIdx} style={{ transition: 'background 0.15s ease' }}>
+                                          <td className="nodus-nested-td" style={{ fontWeight: 700, color: '#ffffff' }}>
                                             {eq.equipo}
                                           </td>
-                                          <td className="py-1.5 px-3 text-right font-medium text-sky-400">
+                                          <td className="nodus-nested-td" style={{ textAlign: 'right', color: '#38bdf8', fontWeight: 600 }}>
                                             {eq.llamadas}
                                           </td>
-                                          <td className="py-1.5 px-3 text-right font-bold text-emerald-400">
+                                          <td className="nodus-nested-td" style={{ textAlign: 'right', color: '#10b981', fontWeight: 700 }}>
                                             {eq.confirmado}
                                           </td>
-                                          <td className="py-1.5 px-3 text-right text-slate-400">
+                                          <td className="nodus-nested-td" style={{ textAlign: 'right', color: '#94a3b8' }}>
                                             {eq.noContesta}
                                           </td>
-                                          <td className="py-1.5 px-3 text-right text-amber-400">
+                                          <td className="nodus-nested-td" style={{ textAlign: 'right', color: '#fbbf24' }}>
                                             {eq.porConfirmar}
                                           </td>
-                                          <td className="py-1.5 px-3 text-right text-blue-400">
+                                          <td className="nodus-nested-td" style={{ textAlign: 'right', color: '#60a5fa' }}>
                                             {eq.siguiente}
                                           </td>
-                                          <td className="py-1.5 px-3 text-right font-bold text-sky-300">
+                                          <td className="nodus-nested-td" style={{ textAlign: 'right', color: '#38bdf8', fontWeight: 700 }}>
                                             {eq.asistieron}
                                           </td>
-                                          <td className="py-1.5 px-3 text-center">
-                                            <span className={`px-1.5 py-0.2 rounded font-semibold text-[10px] ${
-                                              tasaAsist >= 80 ? 'bg-emerald-500/20 text-emerald-300' :
-                                              tasaAsist >= 50 ? 'bg-amber-500/20 text-amber-300' :
-                                              'bg-slate-800 text-slate-400'
-                                            }`}>
+                                          <td className="nodus-nested-td" style={{ textAlign: 'center' }}>
+                                            <span style={{
+                                              padding: '0.15rem 0.5rem',
+                                              borderRadius: '6px',
+                                              fontSize: '0.72rem',
+                                              fontWeight: 700,
+                                              background: tasaAsist >= 80 ? 'rgba(16, 185, 129, 0.2)' : tasaAsist >= 50 ? 'rgba(245, 158, 11, 0.2)' : 'rgba(255, 255, 255, 0.08)',
+                                              color: tasaAsist >= 80 ? '#10b981' : tasaAsist >= 50 ? '#f59e0b' : '#94a3b8',
+                                              border: `1px solid ${tasaAsist >= 80 ? 'rgba(16, 185, 129, 0.4)' : tasaAsist >= 50 ? 'rgba(245, 158, 11, 0.4)' : 'rgba(255, 255, 255, 0.1)'}`
+                                            }}>
                                               {tasaAsist}%
                                             </span>
                                           </td>

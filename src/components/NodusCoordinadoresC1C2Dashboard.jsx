@@ -11,6 +11,7 @@ import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip,
   Legend, CartesianGrid, Cell, PieChart, Pie, ComposedChart, Line
 } from 'recharts';
+import './NodusCoordinadoresC1C2Dashboard.css';
 
 const COLORS = {
   confirmado: '#10b981', // Emerald
@@ -267,273 +268,246 @@ export default function NodusCoordinadoresC1C2Dashboard() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center p-16 space-y-4 bg-slate-900/60 rounded-2xl border border-slate-800 text-slate-300">
-        <RefreshCw className="w-10 h-10 text-amber-500 animate-spin" />
-        <p className="text-base font-semibold">Cargando datos ejecutivos de Coordinadores C1 & C2...</p>
-        <p className="text-xs text-slate-500">Conectando con el enjambre de agentes autónomos Nodus</p>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', gap: '1rem', background: 'rgba(17, 34, 64, 0.7)', borderRadius: '16px', border: '1px solid rgba(255, 255, 255, 0.08)', color: '#94a3b8' }}>
+        <RefreshCw size={36} color="#ffc107" style={{ animation: 'spin 1s linear infinite' }} />
+        <p style={{ fontSize: '1rem', fontWeight: 600, color: '#f8fafc', margin: 0 }}>Cargando datos ejecutivos de Coordinadores C1 & C2...</p>
+        <p style={{ fontSize: '0.78rem', color: '#64748b', margin: 0 }}>Conectando con el enjambre de agentes autónomos Nodus</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* HEADER SUPERIOR: ESTADO EN VIVO & SINCRONIZACIÓN */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-5 bg-gradient-to-r from-slate-900 via-slate-900/95 to-slate-800 border border-amber-500/30 rounded-2xl shadow-xl backdrop-blur-md">
-        <div className="space-y-1">
-          <div className="flex items-center gap-3">
-            <span className="p-2.5 bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-xl shadow-inner">
-              <Award className="w-6 h-6" />
-            </span>
-            <div>
-              <h2 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
-                Panel de Coordinadores C1 & C2
-                <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-medium">
-                  Nodus Live Global
-                </span>
-              </h2>
-              <p className="text-xs text-slate-400">
-                Auditoría horaria multi-agente de gestiones, llamadas, confirmaciones y cobertura en tiempo real
-              </p>
-            </div>
+    <div className="nodus-dashboard-container">
+      {/* 1. HEADER SUPERIOR: ESTADO EN VIVO & SINCRONIZACIÓN */}
+      <div className="nodus-header-banner">
+        <div className="nodus-header-left">
+          <div className="nodus-header-icon">
+            <Award size={26} color="#ffc107" />
+          </div>
+          <div>
+            <h2 className="nodus-header-title">
+              Panel de Coordinadores C1 & C2
+              <span className="nodus-badge-live">Nodus Live Global</span>
+            </h2>
+            <p className="nodus-header-subtitle">
+              Auditoría horaria multi-agente de gestiones, llamadas, confirmaciones y cobertura en tiempo real
+            </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3 self-start lg:self-center">
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-800/80 border border-slate-700 rounded-xl text-xs text-slate-300">
-            <span className="relative flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-            </span>
-            <span>Sincronizado: <strong className="text-emerald-400">{timeSinceSync}</strong></span>
+        <div className="nodus-header-right">
+          <div className="nodus-sync-indicator">
+            <span className="nodus-pulse-dot" />
+            <span>Sincronizado: <strong style={{ color: '#10b981' }}>{timeSinceSync}</strong></span>
           </div>
 
           <button
             onClick={handleManualRefresh}
             disabled={refreshing}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 rounded-xl text-xs font-semibold transition-all active:scale-95 disabled:opacity-50"
+            className="nodus-btn-refresh"
             title="Refrescar datos en vivo"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+            <RefreshCw size={14} style={{ animation: refreshing ? 'spin 1s linear infinite' : 'none' }} />
             <span>{refreshing ? 'Actualizando...' : 'Refrescar'}</span>
           </button>
         </div>
       </div>
 
-      {/* SCORECARDS EJECUTIVAS DE ALTO IMPACTO */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3.5">
-        <div className="p-4 bg-slate-900/80 border border-slate-800 hover:border-amber-500/40 rounded-2xl shadow-sm transition-all">
-          <div className="flex items-center justify-between text-slate-400 mb-1">
-            <span className="text-xs font-medium">Coordinadores</span>
-            <Users className="w-4 h-4 text-amber-400" />
+      {/* 2. SCORECARDS EJECUTIVAS */}
+      <div className="nodus-scorecards-grid">
+        <div className="nodus-card">
+          <div className="nodus-card-header">
+            <span>Coordinadores</span>
+            <Users size={16} color="#ffc107" />
           </div>
-          <div className="text-2xl font-black text-white">{aggregatedStats.coordinadoresCount}</div>
-          <div className="text-[11px] text-slate-400 mt-1">En {selectedSede === 'TODAS' ? '6 Sedes' : selectedSede}</div>
+          <div className="nodus-card-value">{aggregatedStats.coordinadoresCount}</div>
+          <div className="nodus-card-footer">En {selectedSede === 'TODAS' ? '6 Sedes' : selectedSede}</div>
         </div>
 
-        <div className="p-4 bg-slate-900/80 border border-slate-800 hover:border-sky-500/40 rounded-2xl shadow-sm transition-all">
-          <div className="flex items-center justify-between text-slate-400 mb-1">
-            <span className="text-xs font-medium">Gestiones Totales</span>
-            <PhoneCall className="w-4 h-4 text-sky-400" />
+        <div className="nodus-card">
+          <div className="nodus-card-header">
+            <span>Gestiones Totales</span>
+            <PhoneCall size={16} color="#0ea5e9" />
           </div>
-          <div className="text-2xl font-black text-white">{aggregatedStats.totalGestiones.toLocaleString()}</div>
-          <div className="text-[11px] text-sky-400/80 mt-1">Llamadas realizadas</div>
+          <div className="nodus-card-value" style={{ color: '#38bdf8' }}>{aggregatedStats.totalGestiones.toLocaleString()}</div>
+          <div className="nodus-card-footer" style={{ color: '#38bdf8' }}>Llamadas realizadas</div>
         </div>
 
-        <div className="p-4 bg-slate-900/80 border border-slate-800 hover:border-violet-500/40 rounded-2xl shadow-sm transition-all">
-          <div className="flex items-center justify-between text-slate-400 mb-1">
-            <span className="text-xs font-medium">Asignados</span>
-            <Building2 className="w-4 h-4 text-violet-400" />
+        <div className="nodus-card">
+          <div className="nodus-card-header">
+            <span>Asignados</span>
+            <Building2 size={16} color="#a855f7" />
           </div>
-          <div className="text-2xl font-black text-white">{aggregatedStats.totalAsignados.toLocaleString()}</div>
-          <div className="text-[11px] text-slate-400 mt-1">Participantes meta</div>
+          <div className="nodus-card-value">{aggregatedStats.totalAsignados.toLocaleString()}</div>
+          <div className="nodus-card-footer">Participantes meta</div>
         </div>
 
-        <div className="p-4 bg-slate-900/80 border border-slate-800 hover:border-emerald-500/40 rounded-2xl shadow-sm transition-all">
-          <div className="flex items-center justify-between text-slate-400 mb-1">
-            <span className="text-xs font-medium">Confirmados</span>
-            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+        <div className="nodus-card">
+          <div className="nodus-card-header">
+            <span>Confirmados</span>
+            <CheckCircle2 size={16} color="#10b981" />
           </div>
-          <div className="text-2xl font-black text-emerald-400">{aggregatedStats.totalConfirmados.toLocaleString()}</div>
-          <div className="text-[11px] text-emerald-400/80 mt-1">{aggregatedStats.tasaEfectividad}% efectividad</div>
+          <div className="nodus-card-value highlight-emerald">{aggregatedStats.totalConfirmados.toLocaleString()}</div>
+          <div className="nodus-card-footer" style={{ color: '#10b981' }}>{aggregatedStats.tasaEfectividad}% efectividad</div>
         </div>
 
-        <div className="p-4 bg-slate-900/80 border border-slate-800 hover:border-amber-500/40 rounded-2xl shadow-sm transition-all">
-          <div className="flex items-center justify-between text-slate-400 mb-1">
-            <span className="text-xs font-medium">Cobertura Media</span>
-            <TrendingUp className="w-4 h-4 text-amber-400" />
+        <div className="nodus-card">
+          <div className="nodus-card-header">
+            <span>Cobertura Media</span>
+            <TrendingUp size={16} color="#ffc107" />
           </div>
-          <div className="text-2xl font-black text-white">{aggregatedStats.coberturaProm}%</div>
-          <div className="w-full bg-slate-800 h-1.5 rounded-full mt-2 overflow-hidden">
-            <div className="bg-amber-500 h-full rounded-full transition-all" style={{ width: `${aggregatedStats.coberturaProm}%` }} />
+          <div className="nodus-card-value">{aggregatedStats.coberturaProm}%</div>
+          <div className="nodus-progress-bar">
+            <div className="nodus-progress-fill" style={{ width: `${aggregatedStats.coberturaProm}%`, background: '#ffc107' }} />
           </div>
         </div>
 
-        <div className="p-4 bg-slate-900/80 border border-slate-800 hover:border-teal-500/40 rounded-2xl shadow-sm transition-all">
-          <div className="flex items-center justify-between text-slate-400 mb-1">
-            <span className="text-xs font-medium">Productividad Media</span>
-            <UserCheck className="w-4 h-4 text-teal-400" />
+        <div className="nodus-card">
+          <div className="nodus-card-header">
+            <span>Productividad Media</span>
+            <UserCheck size={16} color="#14b8a6" />
           </div>
-          <div className="text-2xl font-black text-white">{aggregatedStats.productividadProm}%</div>
-          <div className="w-full bg-slate-800 h-1.5 rounded-full mt-2 overflow-hidden">
-            <div className="bg-teal-500 h-full rounded-full transition-all" style={{ width: `${aggregatedStats.productividadProm}%` }} />
+          <div className="nodus-card-value">{aggregatedStats.productividadProm}%</div>
+          <div className="nodus-progress-bar">
+            <div className="nodus-progress-fill" style={{ width: `${aggregatedStats.productividadProm}%`, background: '#14b8a6' }} />
           </div>
         </div>
       </div>
 
-      {/* BARRA DE FILTROS MULTIDIMENSIONALES */}
-      <div className="p-4 bg-slate-900/90 border border-slate-800 rounded-2xl shadow-md space-y-3">
-        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
-          {/* Input de Búsqueda */}
-          <div className="relative flex-1">
-            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+      {/* 3. BARRA DE FILTROS MULTIDIMENSIONALES */}
+      <div className="nodus-filters-bar">
+        <div className="nodus-filters-row">
+          <div className="nodus-search-box">
+            <Search size={15} className="nodus-search-icon" />
             <input
               type="text"
               placeholder="Buscar colaborador, sede o equipo..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-slate-800/80 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-400 focus:outline-none focus:border-amber-500 transition-colors"
+              className="nodus-search-input"
             />
           </div>
 
-          {/* Selectores de Filtros */}
-          <div className="flex flex-wrap items-center gap-2">
-            {/* Sede */}
-            <div className="flex items-center gap-1.5 bg-slate-800/80 px-2.5 py-1.5 rounded-xl border border-slate-700">
-              <MapPin className="w-3.5 h-3.5 text-amber-400" />
+          <div className="nodus-select-group">
+            <div className="nodus-select-item">
+              <MapPin size={14} color="#ffc107" />
               <select
                 value={selectedSede}
                 onChange={(e) => {
                   setSelectedSede(e.target.value);
                   setSelectedEquipo('TODOS');
                 }}
-                className="bg-transparent text-xs text-slate-200 focus:outline-none cursor-pointer"
+                className="nodus-select"
               >
-                <option value="TODAS" className="bg-slate-900">Todas las Sedes</option>
+                <option value="TODAS">Todas las Sedes</option>
                 {sedesList.map(s => (
-                  <option key={s} value={s} className="bg-slate-900">{s}</option>
+                  <option key={s} value={s}>{s}</option>
                 ))}
               </select>
             </div>
 
-            {/* Equipo */}
-            <div className="flex items-center gap-1.5 bg-slate-800/80 px-2.5 py-1.5 rounded-xl border border-slate-700">
-              <Layers className="w-3.5 h-3.5 text-sky-400" />
+            <div className="nodus-select-item">
+              <Layers size={14} color="#38bdf8" />
               <select
                 value={selectedEquipo}
                 onChange={(e) => setSelectedEquipo(e.target.value)}
-                className="bg-transparent text-xs text-slate-200 focus:outline-none cursor-pointer max-w-[130px] truncate"
+                className="nodus-select"
+                style={{ maxWidth: '140px' }}
               >
-                <option value="TODOS" className="bg-slate-900">Todos Equipos</option>
+                <option value="TODOS">Todos Equipos</option>
                 {equiposList.map(eq => (
-                  <option key={eq} value={eq} className="bg-slate-900">{eq}</option>
+                  <option key={eq} value={eq}>{eq}</option>
                 ))}
               </select>
             </div>
 
-            {/* Entrenamiento */}
-            <div className="flex items-center gap-1.5 bg-slate-800/80 px-2.5 py-1.5 rounded-xl border border-slate-700">
-              <Award className="w-3.5 h-3.5 text-violet-400" />
+            <div className="nodus-select-item">
+              <Award size={14} color="#a855f7" />
               <select
                 value={selectedEntrenamiento}
                 onChange={(e) => setSelectedEntrenamiento(e.target.value)}
-                className="bg-transparent text-xs text-slate-200 focus:outline-none cursor-pointer"
+                className="nodus-select"
               >
-                <option value="TODOS" className="bg-slate-900">C1 y C2</option>
-                <option value="C1" className="bg-slate-900">Solo Capítulo 1</option>
-                <option value="C2" className="bg-slate-900">Solo Capítulo 2</option>
+                <option value="TODOS">C1 y C2</option>
+                <option value="C1">Solo Capítulo 1</option>
+                <option value="C2">Solo Capítulo 2</option>
               </select>
             </div>
 
-            {/* Ciclo */}
-            <div className="flex items-center gap-1.5 bg-slate-800/80 px-2.5 py-1.5 rounded-xl border border-slate-700">
-              <Calendar className="w-3.5 h-3.5 text-emerald-400" />
+            <div className="nodus-select-item">
+              <Calendar size={14} color="#10b981" />
               <select
                 value={selectedCiclo}
                 onChange={(e) => setSelectedCiclo(e.target.value)}
-                className="bg-transparent text-xs text-slate-200 focus:outline-none cursor-pointer"
+                className="nodus-select"
               >
-                <option value="TODOS" className="bg-slate-900">Todos Ciclos</option>
-                <option value="Ciclo 1" className="bg-slate-900">Ciclo 1</option>
-                <option value="Ciclo 2" className="bg-slate-900">Ciclo 2</option>
+                <option value="TODOS">Todos Ciclos</option>
+                <option value="Ciclo 1">Ciclo 1</option>
+                <option value="Ciclo 2">Ciclo 2</option>
               </select>
             </div>
 
-            {/* Ordenamiento */}
-            <div className="flex items-center gap-1.5 bg-slate-800/80 px-2.5 py-1.5 rounded-xl border border-slate-700">
-              <ArrowUpDown className="w-3.5 h-3.5 text-amber-400" />
+            <div className="nodus-select-item">
+              <ArrowUpDown size={14} color="#ffc107" />
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="bg-transparent text-xs text-slate-200 focus:outline-none cursor-pointer"
+                className="nodus-select"
               >
-                <option value="gestiones" className="bg-slate-900">Más Gestiones</option>
-                <option value="confirmados" className="bg-slate-900">Más Confirmados</option>
-                <option value="cobertura" className="bg-slate-900">Mayor Cobertura %</option>
-                <option value="productividad" className="bg-slate-900">Mayor Productividad %</option>
-                <option value="nombre" className="bg-slate-900">Alfabético</option>
+                <option value="gestiones">Más Gestiones</option>
+                <option value="confirmados">Más Confirmados</option>
+                <option value="cobertura">Mayor Cobertura %</option>
+                <option value="productividad">Mayor Productividad %</option>
+                <option value="nombre">Alfabético</option>
               </select>
             </div>
           </div>
         </div>
       </div>
 
-      {/* SECCIÓN DE GRÁFICOS DE ALTO RENDIMIENTO */}
-      <div className="p-5 bg-slate-900/90 border border-slate-800 rounded-2xl shadow-xl space-y-4">
-        {/* Selector de Pestaña de Gráfico */}
-        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-          <div className="flex items-center gap-2">
+      {/* 4. SECCIÓN DE GRÁFICOS */}
+      <div className="nodus-charts-section">
+        <div className="nodus-charts-header">
+          <div className="nodus-chart-tabs">
             <button
               onClick={() => setActiveChartTab('coordinadores')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-                activeChartTab === 'coordinadores'
-                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-              }`}
+              className={`nodus-chart-tab-btn ${activeChartTab === 'coordinadores' ? 'active-tab' : ''}`}
             >
-              <BarChart2 className="w-4 h-4" />
+              <BarChart2 size={16} />
               <span>Rendimiento por Colaborador</span>
             </button>
 
             <button
               onClick={() => setActiveChartTab('sedes')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-                activeChartTab === 'sedes'
-                  ? 'bg-sky-500/20 text-sky-300 border border-sky-500/40 shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-              }`}
+              className={`nodus-chart-tab-btn ${activeChartTab === 'sedes' ? 'active-tab' : ''}`}
             >
-              <Building2 className="w-4 h-4" />
+              <Building2 size={16} />
               <span>Comparativo de Sedes</span>
             </button>
 
             <button
               onClick={() => setActiveChartTab('estados')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-                activeChartTab === 'estados'
-                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-              }`}
+              className={`nodus-chart-tab-btn ${activeChartTab === 'estados' ? 'active-tab' : ''}`}
             >
-              <PieChartIcon className="w-4 h-4" />
+              <PieChartIcon size={16} />
               <span>Distribución de Contacto</span>
             </button>
           </div>
 
-          <div className="text-xs text-slate-500 hidden sm:block">
+          <div style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
             Mostrando {filteredCoordinadores.length} coordinadores
           </div>
         </div>
 
-        {/* CONTENEDOR DE GRÁFICO SEGÚN TAB ACTIVA */}
-        <div className="h-[340px] w-full pt-2">
+        <div className="nodus-chart-viewport">
           {activeChartTab === 'coordinadores' && (
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height={380}>
               <BarChart data={chartCoordinadoresData} margin={{ top: 10, right: 20, left: 0, bottom: 25 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.5} />
                 <XAxis dataKey="name" stroke="#94a3b8" fontSize={11} angle={-25} textAnchor="end" height={50} />
                 <YAxis stroke="#94a3b8" fontSize={11} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', color: '#fff', fontSize: '12px' }}
+                  contentStyle={{ backgroundColor: '#0a192f', borderColor: '#334155', borderRadius: '12px', color: '#fff', fontSize: '12px' }}
                   itemStyle={{ padding: '2px 0' }}
                 />
                 <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '8px' }} />
@@ -546,13 +520,13 @@ export default function NodusCoordinadoresC1C2Dashboard() {
           )}
 
           {activeChartTab === 'sedes' && (
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height={380}>
               <ComposedChart data={chartSedesData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.5} />
                 <XAxis dataKey="sede" stroke="#94a3b8" fontSize={12} />
                 <YAxis stroke="#94a3b8" fontSize={11} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', color: '#fff', fontSize: '12px' }}
+                  contentStyle={{ backgroundColor: '#0a192f', borderColor: '#334155', borderRadius: '12px', color: '#fff', fontSize: '12px' }}
                 />
                 <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '8px' }} />
                 <Bar dataKey="gestiones" name="Gestiones Realizadas" fill="#3b82f6" radius={[6, 6, 0, 0]} />
@@ -563,9 +537,9 @@ export default function NodusCoordinadoresC1C2Dashboard() {
           )}
 
           {activeChartTab === 'estados' && (
-            <div className="flex flex-col sm:flex-row items-center justify-around h-full">
-              <div className="h-[280px] w-full sm:w-[60%]">
-                <ResponsiveContainer width="100%" height="100%">
+            <div className="nodus-pie-wrapper">
+              <div className="nodus-pie-chart-box">
+                <ResponsiveContainer width="100%" height={340}>
                   <PieChart>
                     <Pie
                       data={chartEstadosData}
@@ -583,20 +557,20 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                       ))}
                     </Pie>
                     <Tooltip
-                      contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', color: '#fff', fontSize: '12px' }}
+                      contentStyle={{ backgroundColor: '#0a192f', borderColor: '#334155', borderRadius: '12px', color: '#fff', fontSize: '12px' }}
                     />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-1 gap-2.5 w-full sm:w-[35%] px-4">
+              <div className="nodus-pie-legend-box">
                 {chartEstadosData.map((e, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-2 rounded-xl bg-slate-800/60 border border-slate-700 text-xs">
-                    <div className="flex items-center gap-2">
-                      <span className="w-3 h-3 rounded-full" style={{ backgroundColor: e.color }} />
-                      <span className="text-slate-300 font-medium">{e.name}</span>
+                  <div key={idx} className="nodus-legend-item">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: e.color }} />
+                      <span style={{ color: '#cbd5e1', fontWeight: 500 }}>{e.name}</span>
                     </div>
-                    <span className="font-bold text-white">{e.value.toLocaleString()}</span>
+                    <span style={{ fontWeight: 800, color: '#ffffff' }}>{e.value.toLocaleString()}</span>
                   </div>
                 ))}
               </div>
@@ -605,41 +579,39 @@ export default function NodusCoordinadoresC1C2Dashboard() {
         </div>
       </div>
 
-      {/* TABLA PRINCIPAL DE COORDINADORES CON DESGLOSE POR EQUIPO */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-2xl shadow-xl overflow-hidden">
-        <div className="p-4 border-b border-slate-800 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Users className="w-4 h-4 text-amber-400" />
-            <h3 className="text-sm font-bold text-white">
-              Detalle Puntual por Colaborador y Equipos Asignados
-            </h3>
+      {/* 5. TABLA PRINCIPAL DE COORDINADORES CON DESGLOSE POR EQUIPO */}
+      <div className="nodus-table-container">
+        <div className="nodus-table-header">
+          <div className="nodus-table-title">
+            <Users size={18} color="#ffc107" />
+            <span>Detalle Puntual por Colaborador y Equipos Asignados</span>
           </div>
-          <span className="text-xs text-slate-400">
+          <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
             {filteredCoordinadores.length} coordinadores encontrados
           </span>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs border-collapse">
-            <thead className="bg-slate-800/80 text-slate-400 uppercase tracking-wider text-[11px] font-semibold border-b border-slate-700">
+        <div className="nodus-table-scroll">
+          <table className="nodus-table">
+            <thead>
               <tr>
-                <th className="py-3 px-4">Colaborador / Coordinador</th>
-                <th className="py-3 px-3">Sede & Ciclo</th>
-                <th className="py-3 px-3 text-right">Gestiones</th>
-                <th className="py-3 px-3 text-right">C1 / C2</th>
-                <th className="py-3 px-3 text-right">Asignados</th>
-                <th className="py-3 px-3 text-center">Cobertura</th>
-                <th className="py-3 px-3 text-center">Productividad</th>
-                <th className="py-3 px-3 text-right">Confirmados</th>
-                <th className="py-3 px-3 text-right">Asistieron</th>
-                <th className="py-3 px-3 text-center">Última Gestión</th>
-                <th className="py-3 px-3 text-center">Acciones</th>
+                <th className="nodus-th">Colaborador / Coordinador</th>
+                <th className="nodus-th">Sede & Ciclo</th>
+                <th className="nodus-th" style={{ textAlign: 'right' }}>Gestiones</th>
+                <th className="nodus-th" style={{ textAlign: 'right' }}>C1 / C2</th>
+                <th className="nodus-th" style={{ textAlign: 'right' }}>Asignados</th>
+                <th className="nodus-th" style={{ textAlign: 'center' }}>Cobertura</th>
+                <th className="nodus-th" style={{ textAlign: 'center' }}>Productividad</th>
+                <th className="nodus-th" style={{ textAlign: 'right' }}>Confirmados</th>
+                <th className="nodus-th" style={{ textAlign: 'right' }}>Asistieron</th>
+                <th className="nodus-th" style={{ textAlign: 'center' }}>Última Gestión</th>
+                <th className="nodus-th" style={{ textAlign: 'center' }}>Acciones</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800 text-slate-200">
+            <tbody>
               {filteredCoordinadores.length === 0 ? (
                 <tr>
-                  <td colSpan={11} className="py-10 text-center text-slate-500">
+                  <td colSpan={11} style={{ padding: '3rem 1rem', textAlign: 'center', color: '#64748b' }}>
                     No se encontraron coordinadores con los filtros seleccionados.
                   </td>
                 </tr>
@@ -650,23 +622,21 @@ export default function NodusCoordinadoresC1C2Dashboard() {
 
                   return (
                     <React.Fragment key={coord.id}>
-                      <tr className={`hover:bg-slate-800/50 transition-colors ${isExpanded ? 'bg-slate-800/40' : ''}`}>
-                        {/* Nombre y datos oficiales */}
-                        <td className="py-3.5 px-4">
-                          <div className="flex items-center gap-2.5">
-                            <div className="w-8 h-8 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-xs uppercase shadow-sm">
+                      <tr className={`nodus-tr ${isExpanded ? 'expanded-row' : ''}`}>
+                        {/* Colaborador */}
+                        <td className="nodus-td">
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                            <div className="nodus-coord-avatar">
                               {coord.nombre.slice(0, 2)}
                             </div>
                             <div>
-                              <div className="font-semibold text-white flex items-center gap-1.5">
+                              <div style={{ fontWeight: 700, color: '#ffffff', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                                 {coord.nombre}
                                 {coord.c2 > 0 && (
-                                  <span className="text-[10px] px-1.5 py-0.2 rounded bg-violet-500/20 text-violet-300 border border-violet-500/30">
-                                    C1+C2
-                                  </span>
+                                  <span className="nodus-badge-c1c2">C1+C2</span>
                                 )}
                               </div>
-                              <div className="text-[11px] text-slate-400 font-mono truncate max-w-[170px]">
+                              <div style={{ fontSize: '0.75rem', color: '#94a3b8', fontFamily: 'monospace' }}>
                                 {coord.email}
                               </div>
                             </div>
@@ -674,159 +644,157 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                         </td>
 
                         {/* Sede & Ciclo */}
-                        <td className="py-3.5 px-3">
-                          <div className="flex flex-col gap-0.5">
-                            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-200">
-                              <MapPin className="w-3 h-3 text-amber-400" />
+                        <td className="nodus-td">
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: '#f1f5f9', fontWeight: 600 }}>
+                              <MapPin size={13} color="#ffc107" />
                               {coord.sede}
                             </span>
-                            <span className="text-[10px] text-slate-400">
+                            <span style={{ fontSize: '0.72rem', color: '#64748b' }}>
                               {coord.ciclo}
                             </span>
                           </div>
                         </td>
 
                         {/* Gestiones */}
-                        <td className="py-3.5 px-3 text-right font-black text-sky-400 text-sm">
+                        <td className="nodus-td" style={{ textAlign: 'right', fontWeight: 800, color: '#38bdf8', fontSize: '0.95rem' }}>
                           {coord.gestiones.toLocaleString()}
                         </td>
 
                         {/* C1 / C2 */}
-                        <td className="py-3.5 px-3 text-right">
-                          <div className="text-[11px]">
-                            <span className="text-amber-400 font-semibold">{coord.c1}</span>
-                            <span className="text-slate-500 mx-1">/</span>
-                            <span className="text-violet-400 font-semibold">{coord.c2}</span>
-                          </div>
+                        <td className="nodus-td" style={{ textAlign: 'right' }}>
+                          <span style={{ color: '#ffc107', fontWeight: 700 }}>{coord.c1}</span>
+                          <span style={{ color: '#64748b', margin: '0 0.3rem' }}>/</span>
+                          <span style={{ color: '#a78bfa', fontWeight: 700 }}>{coord.c2}</span>
                         </td>
 
                         {/* Asignados */}
-                        <td className="py-3.5 px-3 text-right text-slate-300 font-medium">
+                        <td className="nodus-td" style={{ textAlign: 'right', color: '#cbd5e1', fontWeight: 600 }}>
                           {coord.asignados.toLocaleString()}
                         </td>
 
-                        {/* Cobertura % */}
-                        <td className="py-3.5 px-3">
-                          <div className="flex flex-col items-center gap-1">
-                            <span className="font-bold text-amber-400">{coord.coberturaPct}%</span>
-                            <div className="w-16 bg-slate-800 h-1.5 rounded-full overflow-hidden">
-                              <div className="bg-amber-500 h-full rounded-full" style={{ width: `${coord.coberturaPct}%` }} />
+                        {/* Cobertura */}
+                        <td className="nodus-td" style={{ textAlign: 'center' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
+                            <span style={{ fontWeight: 800, color: '#ffc107' }}>{coord.coberturaPct}%</span>
+                            <div style={{ width: '60px', height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
+                              <div style={{ width: `${coord.coberturaPct}%`, height: '100%', background: '#ffc107', borderRadius: '2px' }} />
                             </div>
-                            <span className="text-[9px] text-slate-500">{coord.coberturaDetalle?.split(' ')[0]}</span>
+                            <span style={{ fontSize: '0.68rem', color: '#64748b' }}>{coord.coberturaDetalle?.split(' ')[0]}</span>
                           </div>
                         </td>
 
-                        {/* Productividad % */}
-                        <td className="py-3.5 px-3">
-                          <div className="flex flex-col items-center gap-1">
-                            <span className="font-bold text-teal-400">{coord.productividadPct}%</span>
-                            <div className="w-16 bg-slate-800 h-1.5 rounded-full overflow-hidden">
-                              <div className="bg-teal-500 h-full rounded-full" style={{ width: `${coord.productividadPct}%` }} />
+                        {/* Productividad */}
+                        <td className="nodus-td" style={{ textAlign: 'center' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
+                            <span style={{ fontWeight: 800, color: '#14b8a6' }}>{coord.productividadPct}%</span>
+                            <div style={{ width: '60px', height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
+                              <div style={{ width: `${coord.productividadPct}%`, height: '100%', background: '#14b8a6', borderRadius: '2px' }} />
                             </div>
-                            <span className="text-[9px] text-slate-500">{coord.productividadDetalle?.split(' ')[0]}</span>
+                            <span style={{ fontSize: '0.68rem', color: '#64748b' }}>{coord.productividadDetalle?.split(' ')[0]}</span>
                           </div>
                         </td>
 
                         {/* Confirmados */}
-                        <td className="py-3.5 px-3 text-right">
-                          <span className="px-2 py-0.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold">
+                        <td className="nodus-td" style={{ textAlign: 'right' }}>
+                          <span className="nodus-badge-confirmados">
                             {coord.estados?.confirmado || 0}
                           </span>
                         </td>
 
                         {/* Asistieron */}
-                        <td className="py-3.5 px-3 text-right">
-                          <span className="px-2 py-0.5 rounded-lg bg-sky-500/10 border border-sky-500/30 text-sky-400 font-bold">
+                        <td className="nodus-td" style={{ textAlign: 'right' }}>
+                          <span className="nodus-badge-asistieron">
                             {coord.asistieron || 0}
                           </span>
                         </td>
 
                         {/* Última Gestión */}
-                        <td className="py-3.5 px-3 text-center text-[10px] text-slate-400 font-mono">
+                        <td className="nodus-td" style={{ textAlign: 'center', fontSize: '0.72rem', color: '#94a3b8', fontFamily: 'monospace' }}>
                           {coord.ultGestion || coord.ultConexion || 'N/D'}
                         </td>
 
                         {/* Acciones */}
-                        <td className="py-3.5 px-3 text-center">
+                        <td className="nodus-td" style={{ textAlign: 'center' }}>
                           {hasEquipos ? (
                             <button
                               onClick={() => toggleRow(coord.id)}
-                              className={`flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-semibold transition-all ${
-                                isExpanded
-                                  ? 'bg-amber-500 text-slate-950 font-bold shadow-md'
-                                  : 'bg-slate-800 hover:bg-slate-700 text-amber-400 border border-amber-500/30'
-                              }`}
+                              className={`nodus-btn-expand ${isExpanded ? 'expanded' : ''}`}
                             >
                               <span>Equipos ({coord.equipos.length})</span>
-                              {isExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                              {isExpanded ? <ChevronDown size={13} /> : <ChevronRight size={13} />}
                             </button>
                           ) : (
-                            <span className="text-[10px] text-slate-500 italic">Sin tabla</span>
+                            <span style={{ fontSize: '0.72rem', color: '#64748b', fontStyle: 'italic' }}>Sin equipos</span>
                           )}
                         </td>
                       </tr>
 
-                      {/* FILA EXPANDIBLE: DESGLOSE DE EQUIPOS DE ESTE COORDINADOR */}
+                      {/* SUBTABLA ANIDADA */}
                       {isExpanded && hasEquipos && (
-                        <tr className="bg-slate-950/80">
-                          <td colSpan={11} className="p-4 pl-12">
-                            <div className="bg-slate-900 border border-amber-500/20 rounded-xl p-3 shadow-inner">
-                              <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-800">
-                                <h4 className="text-xs font-bold text-amber-400 flex items-center gap-2">
-                                  <Layers className="w-3.5 h-3.5" />
-                                  Desglose por Equipo — {coord.nombre} ({coord.sede})
+                        <tr>
+                          <td colSpan={11} style={{ padding: '0.75rem 1.5rem', background: 'rgba(10, 25, 47, 0.98)' }}>
+                            <div className="nodus-nested-panel">
+                              <div className="nodus-nested-header">
+                                <h4 className="nodus-nested-title">
+                                  <Layers size={14} />
+                                  <span>Desglose por Equipo — {coord.nombre} ({coord.sede})</span>
                                 </h4>
-                                <span className="text-[10px] text-slate-400">
+                                <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
                                   {coord.equipos.length} equipos gestionados
                                 </span>
                               </div>
 
-                              <div className="overflow-x-auto">
-                                <table className="w-full text-left text-[11px]">
-                                  <thead className="text-slate-400 border-b border-slate-800 text-[10px] uppercase">
+                              <div style={{ overflowX: 'auto' }}>
+                                <table className="nodus-nested-table">
+                                  <thead>
                                     <tr>
-                                      <th className="py-1.5 px-3">Equipo</th>
-                                      <th className="py-1.5 px-3 text-right">Llamadas</th>
-                                      <th className="py-1.5 px-3 text-right">Confirmado</th>
-                                      <th className="py-1.5 px-3 text-right">No Contesta</th>
-                                      <th className="py-1.5 px-3 text-right">Por Confirmar</th>
-                                      <th className="py-1.5 px-3 text-right">Siguiente</th>
-                                      <th className="py-1.5 px-3 text-right">Asistieron</th>
-                                      <th className="py-1.5 px-3 text-center">Tasa Asistencia</th>
+                                      <th className="nodus-nested-th">Equipo</th>
+                                      <th className="nodus-nested-th" style={{ textAlign: 'right' }}>Llamadas</th>
+                                      <th className="nodus-nested-th" style={{ textAlign: 'right' }}>Confirmado</th>
+                                      <th className="nodus-nested-th" style={{ textAlign: 'right' }}>No Contesta</th>
+                                      <th className="nodus-nested-th" style={{ textAlign: 'right' }}>Por Confirmar</th>
+                                      <th className="nodus-nested-th" style={{ textAlign: 'right' }}>Siguiente</th>
+                                      <th className="nodus-nested-th" style={{ textAlign: 'right' }}>Asistieron</th>
+                                      <th className="nodus-nested-th" style={{ textAlign: 'center' }}>Tasa Asistencia</th>
                                     </tr>
                                   </thead>
-                                  <tbody className="divide-y divide-slate-800/60 text-slate-300">
+                                  <tbody>
                                     {coord.equipos.map((eq, eqIdx) => {
                                       const tasaAsist = eq.confirmado > 0 ? Math.round((eq.asistieron / eq.confirmado) * 100) : 0;
                                       return (
-                                        <tr key={eqIdx} className="hover:bg-slate-800/40">
-                                          <td className="py-1.5 px-3 font-semibold text-white">
+                                        <tr key={eqIdx} style={{ transition: 'background 0.15s ease' }}>
+                                          <td className="nodus-nested-td" style={{ fontWeight: 700, color: '#ffffff' }}>
                                             {eq.equipo}
                                           </td>
-                                          <td className="py-1.5 px-3 text-right font-medium text-sky-400">
+                                          <td className="nodus-nested-td" style={{ textAlign: 'right', color: '#38bdf8', fontWeight: 600 }}>
                                             {eq.llamadas}
                                           </td>
-                                          <td className="py-1.5 px-3 text-right font-bold text-emerald-400">
+                                          <td className="nodus-nested-td" style={{ textAlign: 'right', color: '#10b981', fontWeight: 700 }}>
                                             {eq.confirmado}
                                           </td>
-                                          <td className="py-1.5 px-3 text-right text-slate-400">
+                                          <td className="nodus-nested-td" style={{ textAlign: 'right', color: '#94a3b8' }}>
                                             {eq.noContesta}
                                           </td>
-                                          <td className="py-1.5 px-3 text-right text-amber-400">
+                                          <td className="nodus-nested-td" style={{ textAlign: 'right', color: '#fbbf24' }}>
                                             {eq.porConfirmar}
                                           </td>
-                                          <td className="py-1.5 px-3 text-right text-blue-400">
+                                          <td className="nodus-nested-td" style={{ textAlign: 'right', color: '#60a5fa' }}>
                                             {eq.siguiente}
                                           </td>
-                                          <td className="py-1.5 px-3 text-right font-bold text-sky-300">
+                                          <td className="nodus-nested-td" style={{ textAlign: 'right', color: '#38bdf8', fontWeight: 700 }}>
                                             {eq.asistieron}
                                           </td>
-                                          <td className="py-1.5 px-3 text-center">
-                                            <span className={`px-1.5 py-0.2 rounded font-semibold text-[10px] ${
-                                              tasaAsist >= 80 ? 'bg-emerald-500/20 text-emerald-300' :
-                                              tasaAsist >= 50 ? 'bg-amber-500/20 text-amber-300' :
-                                              'bg-slate-800 text-slate-400'
-                                            }`}>
+                                          <td className="nodus-nested-td" style={{ textAlign: 'center' }}>
+                                            <span style={{
+                                              padding: '0.15rem 0.5rem',
+                                              borderRadius: '6px',
+                                              fontSize: '0.72rem',
+                                              fontWeight: 700,
+                                              background: tasaAsist >= 80 ? 'rgba(16, 185, 129, 0.2)' : tasaAsist >= 50 ? 'rgba(245, 158, 11, 0.2)' : 'rgba(255, 255, 255, 0.08)',
+                                              color: tasaAsist >= 80 ? '#10b981' : tasaAsist >= 50 ? '#f59e0b' : '#94a3b8',
+                                              border: `1px solid ${tasaAsist >= 80 ? 'rgba(16, 185, 129, 0.4)' : tasaAsist >= 50 ? 'rgba(245, 158, 11, 0.4)' : 'rgba(255, 255, 255, 0.1)'}`
+                                            }}>
                                               {tasaAsist}%
                                             </span>
                                           </td>

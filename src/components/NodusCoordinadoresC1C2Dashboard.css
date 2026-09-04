@@ -1,0 +1,600 @@
+﻿/* =========================================================================
+   ESTILOS EJECUTIVOS: NODUS COORDINADORES C1 & C2 DASHBOARD
+   CREAR PODER SIN LÍMITES - CAUSA OS
+   ========================================================================= */
+
+.nodus-dashboard-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  font-family: var(--font-body, 'Inter', sans-serif);
+  color: #f8fafc;
+  box-sizing: border-box;
+}
+
+.nodus-dashboard-container *,
+.nodus-dashboard-container *::before,
+.nodus-dashboard-container *::after {
+  box-sizing: border-box;
+}
+
+/* 1. Header Banner */
+.nodus-header-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  padding: 1.25rem 1.75rem;
+  background: linear-gradient(135deg, rgba(17, 34, 64, 0.95) 0%, rgba(10, 25, 47, 0.98) 100%);
+  border: 1px solid rgba(255, 193, 7, 0.35);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(16px);
+}
+
+.nodus-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.nodus-header-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(255, 193, 7, 0.12);
+  border: 1px solid rgba(255, 193, 7, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffc107;
+  flex-shrink: 0;
+}
+
+.nodus-header-title {
+  font-family: var(--font-heading, 'Montserrat', sans-serif);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.nodus-badge-live {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  background: rgba(255, 193, 7, 0.18);
+  color: #ffc107;
+  border: 1px solid rgba(255, 193, 7, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.nodus-header-subtitle {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin: 0.25rem 0 0 0;
+}
+
+.nodus-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.nodus-sync-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.85rem;
+  background: rgba(10, 25, 47, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  font-size: 0.78rem;
+  color: #cbd5e1;
+}
+
+.nodus-pulse-dot {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+}
+
+.nodus-btn-refresh {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.48rem 0.9rem;
+  background: rgba(255, 193, 7, 0.15);
+  border: 1px solid rgba(255, 193, 7, 0.4);
+  color: #ffc107;
+  border-radius: 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nodus-btn-refresh:hover:not(:disabled) {
+  background: rgba(255, 193, 7, 0.25);
+  border-color: #ffc107;
+  transform: translateY(-1px);
+}
+
+.nodus-btn-refresh:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 2. Scorecards Grid */
+.nodus-scorecards-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1rem;
+  width: 100%;
+}
+
+@media (max-width: 1280px) {
+  .nodus-scorecards-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .nodus-scorecards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .nodus-scorecards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.nodus-card {
+  background: rgba(17, 34, 64, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 1.1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  transition: all 0.25s ease;
+  backdrop-filter: blur(10px);
+}
+
+.nodus-card:hover {
+  border-color: rgba(255, 193, 7, 0.35);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.45);
+}
+
+.nodus-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #94a3b8;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 0.4rem;
+}
+
+.nodus-card-value {
+  font-family: var(--font-heading, 'Montserrat', sans-serif);
+  font-size: 1.7rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.2;
+}
+
+.nodus-card-value.highlight-emerald {
+  color: #10b981;
+}
+
+.nodus-card-footer {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin-top: 0.4rem;
+}
+
+.nodus-progress-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+
+.nodus-progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease-in-out;
+}
+
+/* 3. Barra de Filtros */
+.nodus-filters-bar {
+  background: rgba(17, 34, 64, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+}
+
+.nodus-filters-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  width: 100%;
+}
+
+.nodus-search-box {
+  flex: 1;
+  min-width: 250px;
+  position: relative;
+}
+
+.nodus-search-icon {
+  position: absolute;
+  left: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+.nodus-search-input {
+  width: 100%;
+  padding: 0.55rem 0.85rem 0.55rem 2.4rem;
+  background: rgba(10, 25, 47, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 0.82rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.nodus-search-input:focus {
+  border-color: #ffc107;
+  box-shadow: 0 0 10px rgba(255, 193, 7, 0.2);
+}
+
+.nodus-search-input::placeholder {
+  color: #64748b;
+}
+
+.nodus-select-group {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.nodus-select-item {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: rgba(10, 25, 47, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 0.45rem 0.75rem;
+}
+
+.nodus-select {
+  background: transparent;
+  border: none;
+  color: #e2e8f0;
+  font-size: 0.8rem;
+  outline: none;
+  cursor: pointer;
+}
+
+.nodus-select option {
+  background: #0a192f;
+  color: #ffffff;
+}
+
+/* 4. Sección de Gráficos */
+.nodus-charts-section {
+  background: rgba(17, 34, 64, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+
+.nodus-charts-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.nodus-chart-tabs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.nodus-chart-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: transparent;
+  color: #94a3b8;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.nodus-chart-tab-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.nodus-chart-tab-btn.active-tab {
+  background: rgba(255, 193, 7, 0.15);
+  color: #ffc107;
+  border-color: rgba(255, 193, 7, 0.4);
+  box-shadow: 0 2px 8px rgba(255, 193, 7, 0.15);
+}
+
+.nodus-chart-viewport {
+  width: 100%;
+  height: 380px;
+  min-height: 380px;
+  position: relative;
+}
+
+.nodus-pie-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: 100%;
+  height: 100%;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.nodus-pie-chart-box {
+  width: 55%;
+  height: 350px;
+}
+
+.nodus-pie-legend-box {
+  width: 40%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+@media (max-width: 768px) {
+  .nodus-pie-chart-box,
+  .nodus-pie-legend-box {
+    width: 100%;
+  }
+}
+
+.nodus-legend-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0.85rem;
+  background: rgba(10, 25, 47, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  font-size: 0.8rem;
+}
+
+/* 5. Tabla de Coordinadores */
+.nodus-table-container {
+  background: rgba(17, 34, 64, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+
+.nodus-table-header {
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(10, 25, 47, 0.6);
+}
+
+.nodus-table-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-heading, 'Montserrat', sans-serif);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.nodus-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.nodus-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.82rem;
+}
+
+.nodus-th {
+  background: rgba(10, 25, 47, 0.95);
+  color: #94a3b8;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.nodus-td {
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  vertical-align: middle;
+}
+
+.nodus-tr:hover {
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.nodus-tr.expanded-row {
+  background: rgba(255, 193, 7, 0.03);
+}
+
+/* Badges y Elementos de Celda */
+.nodus-coord-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(255, 193, 7, 0.15);
+  border: 1px solid rgba(255, 193, 7, 0.4);
+  color: #ffc107;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+.nodus-badge-c1c2 {
+  font-size: 0.68rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 6px;
+  background: rgba(139, 92, 246, 0.2);
+  color: #a78bfa;
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  font-weight: 600;
+}
+
+.nodus-badge-confirmados {
+  display: inline-block;
+  padding: 0.25rem 0.65rem;
+  border-radius: 8px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #10b981;
+  font-weight: 800;
+}
+
+.nodus-badge-asistieron {
+  display: inline-block;
+  padding: 0.25rem 0.65rem;
+  border-radius: 8px;
+  background: rgba(14, 165, 233, 0.15);
+  border: 1px solid rgba(14, 165, 233, 0.35);
+  color: #38bdf8;
+  font-weight: 800;
+}
+
+.nodus-btn-expand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.38rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  background: rgba(10, 25, 47, 0.9);
+  color: #ffc107;
+  border: 1px solid rgba(255, 193, 7, 0.35);
+  transition: all 0.2s ease;
+}
+
+.nodus-btn-expand:hover {
+  background: rgba(255, 193, 7, 0.2);
+  border-color: #ffc107;
+}
+
+.nodus-btn-expand.expanded {
+  background: #ffc107;
+  color: #0a192f;
+  border-color: #ffc107;
+}
+
+/* Sub-tabla anidada de equipos */
+.nodus-nested-panel {
+  background: rgba(10, 25, 47, 0.95);
+  border: 1px solid rgba(255, 193, 7, 0.25);
+  border-radius: 12px;
+  padding: 1rem;
+  margin: 0.5rem 0;
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.nodus-nested-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.nodus-nested-title {
+  color: #ffc107;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.nodus-nested-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+}
+
+.nodus-nested-th {
+  color: #94a3b8;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.nodus-nested-td {
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
