@@ -118802,9 +118802,19 @@ function App() {
           } />
 
           <Route path="/reportes" element={
-            <RoleRoute allowedRoles={['gerente', 'coord_c1', 'coord_maestria', 'capitan', 'qt', 'direccion', 'director_maestria']}>
+            <RoleRoute allowedRoles={['gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'capitan', 'qt', 'direccion', 'director_maestria', 'aliado', 'manager', 'consolidado', 'superadmin', 'cfo', 'ceo', 'cco']}>
               <ReportesBoard />
             </RoleRoute>
+          } />
+          <Route path="/micro-pulso" element={
+            <PrivateRoute>
+              <ReportesBoard />
+            </PrivateRoute>
+          } />
+          <Route path="/reporte-relampago" element={
+            <PrivateRoute>
+              <ReportesBoard />
+            </PrivateRoute>
           } />
 
           <Route path="/mis-kpis" element={
@@ -121105,6 +121115,85 @@ Estas 6 frases deben memorizarse, repetirse y sostenerse en cada orientación, g
 
 ---
 *Fin de la Sección 17 — Protocolo de Orientación: Construir desde la Nada (Causa OS).*
+
+
+---
+
+## 18. SISTEMA DE ESCUCHA ACTIVA Y REPORTE RELÁMPAGO POST-FDS (ARQUITECTURA DE BAJA FRICCIÓN OPERATIVA NODUS & CAUSA OS)
+
+### Propósito y Filosofía del Sistema (CPSL 2026)
+Este estándar define la arquitectura operativa y el flujo de datos para dos herramientas de baja fricción cognitiva («cero pereza») diseñadas para garantizar tasas de respuesta superiores al 90%, erradicando la fatiga de encuestas y sosteniendo la excelencia sin quemar al equipo voluntario:
+1.  **Micro-Pulsos Aleatorios de 3 Preguntas** para el Staff de Sede (Aliados, Mánagers, Capitanes, QT).
+2.  **Reporte Relámpago Post-FDS** para los Gerentes de Sede (Nivel 8).
+
+---
+
+### 1. MICRO-PULSOS ALEATORIOS DE 3 PREGUNTAS (STAFF)
+
+#### A. La Filosofía del «Micro-Anclaje»
+*   **Fácil de responder:** Solo **3 preguntas** de opción múltiple (Escala Likert 1-5 o Sí/No) y un campo de texto opcional.
+*   **Tiempo de llenado:** Menos de **30 segundos** desde la App móvil Nodus o enlace web.
+*   **Selección inteligente:** El backend de Nodus selecciona dinámicamente y al azar 1 pregunta de cada uno de los 3 bloques maestros (pool de 12 variables).
+
+#### B. Horarios Operativos y Cadencia de Envío
+*   **Disparador Automático:** **Lunes a las 11:00 AM** posterior al entrenamiento.
+    *   *Justificación operativa:* El staff descansó el domingo por la noche, cerró su participación física en sala y procesa el fin de semana en el «efecto lunes» con la mente fría y sin cansancio reactivo.
+*   **Ventana de Respuesta Innegociable:** Activa únicamente hasta el **Martes a las 18:00 PM**. Cero prórrogas. Al ser de 30 segundos, quien no responde en 31 horas evidencia desconexión con el contenedor.
+
+#### C. Pool de Preguntas Rotativas (Backend Nodus)
+*   **Bloque 1: Seguridad Psicológica (Escala Edmondson Adaptada)**
+    *   *P1.1:* ¿Sientes que puedes admitir un error operativo en el staff de tu sede sin temor a ser juzgado o señalado? [Sí / No]
+    *   *P1.2:* ¿Es seguro asumir riesgos o proponer dinámicas diferentes dentro de tu equipo de staff? [Sí / No]
+    *   *P1.3:* En los últimos 3 días, ¿sentiste que algún líder o coordinador intentó invalidar tus opiniones o ideas? [Sí / No]
+    *   *P1.4:* ¿Sientes que el equipo de tu sede cuida de ti y de tu bienestar bajo presión? [Sí / No]
+*   **Bloque 2: Calidad de Liderazgo (Project Oxygen Google Adaptado)**
+    *   *P2.1:* Mi Coordinador me dio feedback claro, específico y libre de drama durante este fin de semana. [Likert 1-5]
+    *   *P2.2:* Mi Coordinador me dio autonomía operativa y confió en mis capacidades (cero micromanagement). [Likert 1-5]
+    *   *P2.3:* Mi Coordinador mantuvo al equipo enfocado y sosteniendo el contenedor de energía en sala de forma asertiva. [Likert 1-5]
+    *   *P2.4:* Mi Coordinador priorizó el servicio y la fisonomía de los participantes por encima de su propio ego o lucimiento. [Likert 1-5]
+*   **Bloque 3: Fricción y Masa Burocrática (Humanocracy Adaptada)**
+    *   *P3.1:* ¿Tuviste que perder tiempo valioso en sala llenando reportes repetitivos o esperando aprobaciones administrativas lentas? [Sí / No]
+    *   *P3.2:* ¿Los baúles e insumos logísticos de tu rol estaban en estado absoluto de excelencia y listos para operar? [Sí / No]
+    *   *P3.3:* ¿Qué proceso de la sede consideras que deberíamos **DETENER (Stop)** de inmediato porque genera pereza o quita energía? [Texto Corto - Opcional]
+    *   *P3.4:* ¿Tuviste la fisionomía del reloj y el control de tus tiempos operativos bajo control este fin de semana? [Sí / No]
+
+---
+
+### 2. REPORTE RELÁMPAGO POST-FDS (GERENTES DE SEDE)
+
+#### A. Horarios Operativos y Cadencia Rigurosa
+*   **Habilitación en Nodus:** **Domingo a las 21:00 PM** (inmediatamente al cerrarse las puertas del salón y concluir el arqueo POS).
+*   **Deadline Innegociable de Cierre:** **Lunes a las 12:00 PM (Mediodía)**.
+*   **Integración y Candado Contable:** La entrega de este reporte es **prerrequisito obligatorio** para que Causa OS y Nodus liberen el flujo contable y presupuestario del siguiente fin de semana de la sede.
+
+#### B. El Formulario de 5 Puntos (<3 Minutos)
+1.  **Evaluación del Entrenador (Fisonomía en Sala):** Calificación 1-5. Criterio: ética, reloj y fisonomía de transformación sin drama. Comentario relámpago máx 150 caracteres.
+2.  **Logística e Infraestructura de Sede:** Calificación 1-5. Criterio: hotel, climatización, acústica, baños y baúles. Comentario relámpago máx 150 caracteres.
+3.  **Energía y Alineación del Staff:** Calificación 1-5. Criterio: puntualidad en groundings, vestimenta negra impecable y fisonomía de servicio. Comentario relámpago máx 150 caracteres.
+4.  **Indicadores de Retención Real (Nodus Automático):** Sentados C1/C2/MJ vs. Graduados. Cálculo automático de Tasa de Retención Operativa (TRO): `(Graduados / Sentados) * 100`.
+5.  **Quiebres Críticos y Alertas de Escalamiento:**
+    *   [ ] Ninguno (Todo impecable).
+    *   [ ] Quiebre de Salud / Emergencia Médica en sala.
+    *   [ ] Quiebre Financiero / Descuadre de Caja de Sede.
+    *   [ ] Palabra Rota Crítica del Staff o Coordinación.
+    *   [ ] Deserción de Mánagers o abandono de rol.
+    *   *Detalle de Alerta:* Solo si hay alerta (máx 200 caracteres).
+
+---
+
+### 3. ARQUITECTURA DE DATOS (ENDPOINTS JSON)
+*   **POST /api/v1/causa-os/micro-pulso/responder**: Envío de las 3 respuestas del staff con `staff_id`, `sede_id`, `ciclo_id`, y el desglose de preguntas.
+*   **POST /api/v1/causa-os/reporte-fds/enviar**: Envío del reporte del Gerente con `gerente_id`, `evaluacion`, `kpis_validados` y `alertas`.
+
+---
+
+### 4. DASHBOARD DE EVOLUCIÓN ORGANIZACIONAL (CAUSA OS)
+1.  **Temperatura de Seguridad Psicológica de la Sede:** Si el promedio de respuestas positivas en el Bloque 1 de una sede cae por debajo del 85%, el sistema dispara una alerta silenciosa al Gerente Global para intervenir el estilo de liderazgo del coordinador local antes de que ocurra deserción de voluntarios.
+2.  **Calificación de Desempeño del Entrenador (Rider de Calidad):** Cruza la evaluación cualitativa de los gerentes con las tasas de retención (TRO) para el ranking histórico de entrenadores.
+3.  **Optimización de Procesos (Trim & Stack):** El campo P3.3 («Qué detener - Stop») alimenta el buzón de erradicación de burocracia para simplificar la plataforma de forma continua.
+
+---
+*Fin de la Sección 18 — Sistema de Escucha Activa y Reporte Relámpago Post-FDS (Causa OS).*
 
 `;
 
@@ -124013,6 +124102,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose }) {
             { id: 'oficina', label: '🏢 Equipo de Oficina (Soporte)' },
             { id: 'gerentes', label: '👔 Gerentes de Sede (Nivel 8)' },
             { id: 'coordinadores', label: '🎯 Coordinadores (CC1Y2 & CMJ)' },
+            { id: 'pulsos_reportes', label: '⚡ Pulsos & Reportes Post-FDS (Nodus & Causa OS)' },
             { id: 'sala_c1', label: '🟣 Sala C1' },
             { id: 'sala_c2', label: '🔵 Sala C2' },
             { id: 'sala_mj', label: '🟡 Sala Maestría' }
@@ -124039,6 +124129,70 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose }) {
 
         {/* CONTENEDOR DE SECCIONES */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.25rem' }}>
+
+          {/* SECCIÓN ESPECIAL: SISTEMA DE PULSOS Y REPORTES POST-FDS */}
+          {(activeTab === 'todos_equipo' || activeTab === 'pulsos_reportes') && (
+            <div 
+              className="glass-panel" 
+              style={{ 
+                padding: '1.4rem', 
+                borderTop: '4px solid #ec4899', 
+                borderRadius: '12px',
+                background: 'rgba(236, 72, 153, 0.05)',
+                gridColumn: activeTab === 'pulsos_reportes' ? '1 / -1' : 'span 1'
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <h3 style={{ color: '#f472b6', margin: 0, fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <Sparkles size={20} /> Sistema de Pulsos & Reportes Post-FDS (Baja Fricción)
+                </h3>
+                <span style={{ fontSize: '0.72rem', padding: '3px 10px', borderRadius: '12px', background: 'rgba(236, 72, 153, 0.2)', color: '#f472b6', fontWeight: 800 }}>
+                  CPSL 2026 • Cero Pereza
+                </span>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
+                
+                {/* REPORTE RELÁMPAGO GERENTE */}
+                <div style={{ background: 'rgba(0,0,0,0.35)', padding: '1rem', borderRadius: '10px', borderLeft: '3px solid #fbbf24' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+                    <span style={{ color: '#fbbf24', fontWeight: 800, fontSize: '0.85rem' }}>👔 GERENTES DE SEDE</span>
+                    <span style={{ color: '#fbbf24', fontSize: '0.75rem', fontWeight: 'bold' }}>&lt; 3 minutos</span>
+                  </div>
+                  <h4 style={{ color: '#fff', margin: '0 0 0.5rem 0', fontSize: '0.98rem' }}>Reporte Relámpago Post-FDS</h4>
+                  <ul style={{ margin: 0, paddingLeft: '1.1rem', fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: '1.5' }}>
+                    <li><strong>Habilitación:</strong> Domingo 21:00 PM (cierre de salón).</li>
+                    <li><strong style={{ color: '#ef4444' }}>Deadline Innegociable:</strong> Lunes 12:00 PM (Mediodía).</li>
+                    <li><strong>5 Puntos:</strong> Entrenador (1-5), Logística (1-5), Staff (1-5), Retención Real (TRO %) y Quiebres Críticos.</li>
+                    <li><strong style={{ color: '#fbbf24' }}>Candado Nodus:</strong> Prerrequisito para liberar flujo contable del siguiente FDS.</li>
+                  </ul>
+                </div>
+
+                {/* MICRO-PULSOS STAFF */}
+                <div style={{ background: 'rgba(0,0,0,0.35)', padding: '1rem', borderRadius: '10px', borderLeft: '3px solid #38bdf8' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+                    <span style={{ color: '#38bdf8', fontWeight: 800, fontSize: '0.85rem' }}>👥 STAFF & VOLUNTARIOS</span>
+                    <span style={{ color: '#38bdf8', fontSize: '0.75rem', fontWeight: 'bold' }}>&lt; 30 segundos</span>
+                  </div>
+                  <h4 style={{ color: '#fff', margin: '0 0 0.5rem 0', fontSize: '0.98rem' }}>Micro-Pulsos Aleatorios (3 Preguntas)</h4>
+                  <ul style={{ margin: 0, paddingLeft: '1.1rem', fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: '1.5' }}>
+                    <li><strong>Disparador:</strong> Lunes 11:00 AM (mente fría post-descanso).</li>
+                    <li><strong style={{ color: '#ef4444' }}>Ventana Activa:</strong> Hasta Martes 18:00 PM (31h, cero prórroga).</li>
+                    <li><strong>3 Bloques Rotativos:</strong> 1 pregunta de Seguridad Psicológica, 1 de Liderazgo (Oxygen) y 1 de Fricción (Humanocracy).</li>
+                    <li><strong>Trim & Stack:</strong> Campo «Qué detener (Stop)» para eliminar burocracia.</li>
+                  </ul>
+                </div>
+
+              </div>
+
+              {/* DASHBOARD EVOLUCIÓN */}
+              <div style={{ background: 'rgba(236,72,153,0.08)', border: '1px dashed rgba(236,72,153,0.3)', borderRadius: '8px', padding: '0.8rem', fontSize: '0.82rem', color: 'var(--text-main)' }}>
+                <strong style={{ color: '#f472b6' }}>📊 Dashboard de Evolución Organizacional en Causa OS:</strong>
+                <span style={{ color: 'var(--text-muted)' }}> Alertas automáticas si la Seguridad Psicológica cae por debajo del 85%, cálculo del Rider de Calidad del Entrenador ponderado con Retención (TRO), y optimización continua de procesos en sala.</span>
+              </div>
+            </div>
+          )}
+
           
           {/* SECCIÓN 1: EQUIPO DE OFICINA */}
           {(activeTab === 'todos_equipo' || activeTab === 'oficina') && (
@@ -124132,13 +124286,14 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose }) {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                    <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Lunes</td>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(239, 68, 68, 0.05)' }}>
+                    <td style={{ padding: '0.5rem 0', fontWeight: 'bold', color: '#fbbf24' }}>Lunes</td>
                     <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>
-                      Cierre de Caja FDS en Nodus<br/>
-                      <span style={{ color: '#ef4444', fontWeight: 'bold' }}>Trigger Impecabilidad Contable</span>
+                      <strong style={{ color: '#ef4444' }}>DEADLINE REPORTE RELÁMPAGO (12:00 PM):</strong><br/>
+                      Cierre de Caja FDS en Nodus + Reporte de 5 Puntos.<br/>
+                      <span style={{ color: '#f87171', fontSize: '0.75rem' }}>🔒 Prerrequisito para liberación presupuestaria del siguiente FDS.</span>
                     </td>
-                    <td style={{ padding: '0.5rem 0', textAlign: 'right', color: '#fbbf24', fontWeight: 'bold' }}>08:30 - 12:00 (Deadline)</td>
+                    <td style={{ padding: '0.5rem 0', textAlign: 'right', color: '#ef4444', fontWeight: 'bold' }}>Hasta 12:00 PM (Innegociable)</td>
                   </tr>
                   <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                     <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Martes</td>
@@ -124160,10 +124315,11 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose }) {
                   <tr>
                     <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Viernes a Domingo</td>
                     <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>
-                      Viernes 14:01 Trigger Palabra Rota C2<br/>
-                      Domingo liderazgo de mesas enrolamiento
+                      Viernes 14:01 Trigger Palabra Rota C2.<br/>
+                      Domingo liderazgo de mesas de enrolamiento.<br/>
+                      <strong style={{ color: '#38bdf8' }}>Domingo 21:00 PM: Habilitación Reporte Relámpago Post-FDS en Nodus</strong> (Cierre de puertas y POS).
                     </td>
-                    <td style={{ padding: '0.5rem 0', textAlign: 'right', color: 'var(--crear-cyan)', fontWeight: 'bold' }}>08:00 - Cierre</td>
+                    <td style={{ padding: '0.5rem 0', textAlign: 'right', color: 'var(--crear-cyan)', fontWeight: 'bold' }}>08:00 - 21:00+</td>
                   </tr>
                 </tbody>
               </table>
@@ -184754,7 +184910,7 @@ import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useUI } from '../context/UIContext';
 import { useNavigate } from 'react-router-dom';
-import { Target, AlertTriangle, Users, PlusCircle, Activity, CheckCircle, Building, MessageSquare, Mail, ExternalLink, ArrowRight, Clock, ShieldAlert, ChevronRight, CheckSquare } from 'lucide-react';
+import { Target, Zap, AlertTriangle, Users, PlusCircle, Activity, CheckCircle, Building, MessageSquare, Mail, ExternalLink, ArrowRight, Clock, ShieldAlert, ChevronRight, CheckSquare } from 'lucide-react';
 import { usersData, normalizeRole } from '../data/usersData';
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
 import IAAuditor from '../components/IAAuditor';
@@ -184949,6 +185105,62 @@ export default function GerenteDashboard() {
 
       <TaskAssignmentModal isOpen={showTaskForm} onClose={() => setShowTaskForm(false)} />
       <VenueConfigModal isOpen={showVenueModal} onClose={() => setShowVenueModal(false)} />
+
+      
+      {/* BANNER OPERATIVO REPORTE RELÁMPAGO POST-FDS */}
+      <div 
+        className="glass-panel" 
+        style={{ 
+          marginBottom: '1.5rem', 
+          padding: '1.2rem 1.5rem', 
+          borderLeft: '5px solid #f59e0b', 
+          background: 'linear-gradient(90deg, rgba(245,158,11,0.1), rgba(0,0,0,0.3))',
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
+          flexWrap: 'wrap', 
+          gap: '1rem' 
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div style={{ background: 'rgba(245,158,11,0.2)', padding: '0.7rem', borderRadius: '10px', color: '#fbbf24' }}>
+            <Zap size={24} />
+          </div>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <h4 style={{ margin: 0, color: '#fff', fontSize: '1.05rem', fontWeight: 800 }}>
+                ⚡ Reporte Relámpago Post-FDS (Nodus & Causa OS)
+              </h4>
+              <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: '12px', background: 'rgba(239,68,68,0.2)', color: '#ef4444', fontWeight: 800 }}>
+                🔒 Candado Presupuestario
+              </span>
+            </div>
+            <p style={{ margin: '0.2rem 0 0', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+              ⏰ Horario Operativo: <strong>Habilita Domingo 21:00 PM</strong> | <strong>Deadline Innegociable: Lunes 12:00 PM (Mediodía)</strong>. Tiempo de llenado: &lt; 3 minutos.
+            </p>
+          </div>
+        </div>
+
+        <button
+          onClick={() => navigate('/reportes')}
+          className="btn-primary"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            padding: '0.6rem 1.2rem',
+            borderRadius: '8px',
+            background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+            color: '#000',
+            fontWeight: 800,
+            fontSize: '0.85rem',
+            border: 'none',
+            cursor: 'pointer'
+          }}
+        >
+          <Zap size={16} /> Llenar Reporte Relámpago
+        </button>
+      </div>
 
       {/* CUADRANTES EJECUTIVOS */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
@@ -186220,7 +186432,7 @@ const MANUAL_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', '
 const MANUAL_NODUS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'consolidado'];
 const REPORTES_VISIBLE = (u) => Boolean(
   u?.isSuperAdmin || u?.isGerente ||
-  ['coord_c1', 'coord_maestria', 'capitan', 'qt', 'direccion', 'director_maestria', 'consolidado'].includes(u?.appRole)
+  ['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'capitan', 'qt', 'direccion', 'director_maestria', 'consolidado', 'aliado', 'manager'].includes(u?.appRole)
 );
 
 // ============================================================================
@@ -186230,6 +186442,40 @@ const REPORTES_VISIBLE = (u) => Boolean(
 // cartas de entrenadores, vuelos, configuraciones y acciones del sistema.
 // ============================================================================
 const CAUSA_OPTIONS_REGISTRY = [
+  {
+    id: 'opt-reporte-relampago',
+    title: '⚡ Reporte Relámpago Post-FDS (Gerentes de Sede)',
+    category: 'Reportes Operativos',
+    badge: '<3 min • Nodus',
+    emoji: '⚡',
+    desc: 'Evaluación de 5 puntos post-FDS: Entrenador (1-5), Infraestructura (1-5), Staff (1-5), Retención TRO % y Quiebres Críticos. Habilitado Domingo 21:00 a Lunes 12:00 PM.',
+    keywords: ['reporte relampago', 'relampago', 'reporte post fds', 'reportes', 'fds', 'gerente', 'retencion', 'tro', 'lunes 12', 'candado presupuestario', 'evaluacion entrenador'],
+    route: '/reportes',
+    roles: null
+  },
+  {
+    id: 'opt-micro-pulso',
+    title: '🎧 Micro-Pulso de Staff (3 Preguntas Aleatorias)',
+    category: 'Escucha Activa',
+    badge: '<30 seg • Cero Pereza',
+    emoji: '🎧',
+    desc: 'Micro-encuesta rotativa de baja fricción: Seguridad Psicológica (Amy Edmondson), Liderazgo Project Oxygen y Buzón Stop a la Burocracia (Gary Hamel). Lunes 11:00 AM a Martes 18:00 PM.',
+    keywords: ['micro pulso', 'micropulso', 'pulso staff', '3 preguntas', 'seguridad psicologica', 'oxygen', 'humanocracy', 'stop', 'buzon stop', 'escucha activa'],
+    route: '/reportes',
+    roles: null
+  },
+  {
+    id: 'opt-dashboard-evolucion',
+    title: '📊 Dashboard de Evolución Organizacional (Causa OS)',
+    category: 'Inteligencia Organizacional',
+    badge: 'Seguridad & Rider',
+    emoji: '📊',
+    desc: 'Monitor en vivo de temperatura de seguridad psicológica (<85%), ranking histórico de entrenadores y buzón de simplificación operativa Trim & Stack.',
+    keywords: ['dashboard evolucion', 'evolucion organizacional', 'seguridad psicologica', 'rider entrenador', 'trim and stack', 'metricas humanas'],
+    route: '/reportes',
+    roles: null
+  },
+
   {
     id: 'opt-flyer',
     title: 'Generador de Flyers Oficiales',
@@ -193519,14 +193765,41 @@ export default function ProtocoloEmergencias() {
 ## Archivo: src\pages\ReportesBoard.jsx
 
 ```javascript
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../services/firebase';
-import { collection, addDoc, getDocs, updateDoc, doc, query, where } from 'firebase/firestore';
+import { collection, addDoc, getDocs, updateDoc, doc, query, where, orderBy, limit } from 'firebase/firestore';
 import { useAuth } from '../context/AuthContext';
 import { useCycles } from '../context/CyclesContext';
 import { useUI } from '../context/UIContext';
-import { ArrowLeft, FileText, Send } from 'lucide-react';
+import { 
+  ArrowLeft, FileText, Send, Zap, Clock, ShieldAlert, Sparkles, 
+  BarChart3, CheckCircle2, AlertTriangle, Star, RefreshCw, ThumbsUp, 
+  ThumbsDown, AlertCircle, Building2, Lock, Unlock, Eye
+} from 'lucide-react';
+import { OPERATIONAL_SEDES } from '../data/usersData';
+
+// POOL MAESTRO DE 12 PREGUNTAS ROTATIVAS (NODUS & CAUSA OS V1.0)
+const POOL_PREGUNTAS = {
+  bloque1: [
+    { id: 'P1.1', categoria: 'Seguridad Psicológica', texto: '¿Sientes que puedes admitir un error operativo en el staff de tu sede sin temor a ser juzgado o señalado?', tipo: 'sino' },
+    { id: 'P1.2', categoria: 'Seguridad Psicológica', texto: '¿Es seguro asumir riesgos o proponer dinámicas diferentes dentro de tu equipo de staff?', tipo: 'sino' },
+    { id: 'P1.3', categoria: 'Seguridad Psicológica', texto: 'En los últimos 3 días, ¿sentiste que algún líder o coordinador intentó invalidar tus opiniones o ideas?', tipo: 'sino_inverso' },
+    { id: 'P1.4', categoria: 'Seguridad Psicológica', texto: '¿Sientes que el equipo de tu sede cuida de ti y de tu bienestar bajo presión?', tipo: 'sino' }
+  ],
+  bloque2: [
+    { id: 'P2.1', categoria: 'Calidad de Liderazgo (Oxygen)', texto: 'Mi Coordinador me dio feedback claro, específico y libre de drama durante este fin de semana.', tipo: 'likert' },
+    { id: 'P2.2', categoria: 'Calidad de Liderazgo (Oxygen)', texto: 'Mi Coordinador me dio autonomía operativa y confió en mis capacidades (cero micromanagement).', tipo: 'likert' },
+    { id: 'P2.3', categoria: 'Calidad de Liderazgo (Oxygen)', texto: 'Mi Coordinador mantuvo al equipo enfocado y sosteniendo el contenedor de energía en sala de forma asertiva.', tipo: 'likert' },
+    { id: 'P2.4', categoria: 'Calidad de Liderazgo (Oxygen)', texto: 'Mi Coordinador priorizó el servicio y la fisonomía de los participantes por encima de su propio ego o lucimiento.', tipo: 'likert' }
+  ],
+  bloque3: [
+    { id: 'P3.1', categoria: 'Fricción Burocrática (Humanocracy)', texto: '¿Tuviste que perder tiempo valioso en sala llenando reportes repetitivos o esperando aprobaciones lentas?', tipo: 'sino_inverso' },
+    { id: 'P3.2', categoria: 'Fricción Burocrática (Humanocracy)', texto: '¿Los baúles e insumos logísticos de tu rol estaban en estado absoluto de excelencia y listos para operar?', tipo: 'sino' },
+    { id: 'P3.3', categoria: 'Fricción Burocrática (Humanocracy)', texto: '¿Qué proceso o tarea de la sede consideras que deberíamos DETENER (Stop) de inmediato porque genera pereza o quita energía?', tipo: 'texto_stop' },
+    { id: 'P3.4', categoria: 'Fricción Burocrática (Humanocracy)', texto: '¿Tuviste la fisionomía del reloj y el control de tus tiempos operativos bajo control este fin de semana?', tipo: 'sino' }
+  ]
+};
 
 export default function ReportesBoard() {
   const { currentUser } = useAuth();
@@ -193534,18 +193807,62 @@ export default function ReportesBoard() {
   const { showToast } = useUI();
   const navigate = useNavigate();
 
+  const [activeTab, setActiveTab] = useState('formulario'); // 'formulario' | 'dashboard_evolucion'
   const [reportType, setReportType] = useState('');
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(false);
 
-  // Limpiar form al cambiar tipo
+  // Micro-pulso state (selección aleatoria de 3 preguntas)
+  const [pulsoQuestions, setPulsoQuestions] = useState([]);
+  const [pulsoRespuestas, setPulsoRespuestas] = useState({});
+
+  // Dashboard de evolución state
+  const [relampagoReports, setRelampagoReports] = useState([]);
+  const [pulsoReports, setPulsoReports] = useState([]);
+  const [loadingDashboard, setLoadingDashboard] = useState(false);
+
+  // Inicializar o regenerar preguntas del Micro-Pulso
+  const shufflePulso = () => {
+    const q1 = POOL_PREGUNTAS.bloque1[Math.floor(Math.random() * POOL_PREGUNTAS.bloque1.length)];
+    const q2 = POOL_PREGUNTAS.bloque2[Math.floor(Math.random() * POOL_PREGUNTAS.bloque2.length)];
+    const q3 = POOL_PREGUNTAS.bloque3[Math.floor(Math.random() * POOL_PREGUNTAS.bloque3.length)];
+    setPulsoQuestions([q1, q2, q3]);
+    setPulsoRespuestas({});
+  };
+
   useEffect(() => {
     setFormData({});
+    if (reportType === 'MicroPulsoStaff') {
+      shufflePulso();
+    }
   }, [reportType]);
+
+  // Cargar datos para el dashboard de evolución
+  useEffect(() => {
+    if (activeTab === 'dashboard_evolucion') {
+      fetchEvolucionData();
+    }
+  }, [activeTab]);
+
+  const fetchEvolucionData = async () => {
+    setLoadingDashboard(true);
+    try {
+      const qRel = query(collection(db, 'reports'), where('type', '==', 'ReporteRelampagoFDS'), limit(50));
+      const snapRel = await getDocs(qRel);
+      setRelampagoReports(snapRel.docs.map(d => ({ id: d.id, ...d.data() })));
+
+      const qPul = query(collection(db, 'reports'), where('type', '==', 'MicroPulsoStaff'), limit(100));
+      const snapPul = await getDocs(qPul);
+      setPulsoReports(snapPul.docs.map(d => ({ id: d.id, ...d.data() })));
+    } catch (e) {
+      console.error("Error fetching dashboard evolucion data:", e);
+    } finally {
+      setLoadingDashboard(false);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    // Intentar parsear a número si aplica
     const val = isNaN(value) || value === '' ? value : Number(value);
     setFormData(prev => ({ ...prev, [name]: val }));
   };
@@ -193559,37 +193876,65 @@ export default function ReportesBoard() {
     return total;
   };
 
+  // Cálculo de Tasa de Retención Operativa (TRO) para Reporte Relámpago
+  const troCalculado = useMemo(() => {
+    const sentados = Number(formData.sentados_inicio) || 0;
+    const graduados = Number(formData.graduados_cierre) || 0;
+    if (sentados <= 0) return 0;
+    return Number(((graduados / sentados) * 100).toFixed(1));
+  }, [formData.sentados_inicio, formData.graduados_cierre]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!reportType) return;
     setLoading(true);
 
     try {
-      // 1. Guardar el reporte
+      let finalData = { ...formData };
+
+      // Caso especial: Reporte Relámpago
+      if (reportType === 'ReporteRelampagoFDS') {
+        finalData.tasa_retencion_automatica = troCalculado;
+        finalData.sede_id = formData.sede_id || currentUser?.sede || 'SEDE-LIMA-01';
+        finalData.deadline_cumplido = true;
+      }
+
+      // Caso especial: Micro-Pulso
+      if (reportType === 'MicroPulsoStaff') {
+        finalData.preguntas_respondidas = pulsoQuestions.map(q => ({
+          pregunta_id: q.id,
+          categoria: q.categoria,
+          texto: q.texto,
+          valor_respuesta: pulsoRespuestas[q.id] || ''
+        }));
+        finalData.staff_id = currentUser?.uid || 'anon-staff';
+        finalData.email = currentUser?.email || 'anon@crearpsl.net';
+        finalData.sede_id = currentUser?.sede || 'SEDE-LIMA-01';
+      }
+
+      // 1. Guardar en Firestore
       await addDoc(collection(db, 'reports'), {
         type: reportType,
-        cycle_id: currentCycle?.id || 'unknown',
-        stage: currentStage,
-        submitted_by: currentUser.displayName || currentUser.email,
+        cycle_id: currentCycle?.id || 'CICLO-2026',
+        stage: currentStage || 'C1',
+        submitted_by: currentUser?.displayName || currentUser?.email || 'Staff Autorizado',
+        sede: currentUser?.sede || formData.sede_id || 'Global',
         created_at: new Date().toISOString(),
-        data: formData
+        data: finalData
       });
 
-      // 2. Regla de Negocio Crítica: Acumulación de Metas para "Llamadas"
+      // 2. Regla para Llamadas
       if (reportType === 'Llamadas') {
         const totalOkNuevos = formData['nuevos_OK'] || 0;
         const totalOkRezagados = formData['rezagados_OK'] || 0;
         const totalOk = totalOkNuevos + totalOkRezagados;
 
         if (totalOk > 0) {
-          // Buscar metas activas de tipo ENTRENAMIENTO (simplificado para MVP: sumamos a la de C1 por ser llamadas, o a todas aplicables)
           const goalsQ = query(collection(db, 'goals'), where('scope', '==', 'ENTRENAMIENTO'));
           const snapshot = await getDocs(goalsQ);
-          
-          // Buscar meta correspondiente a la etapa operativa y KPI de Sentados/Px (P11)
           const entGoalDoc = snapshot.docs.find(d => {
             const dData = d.data();
-            const stageMatches = dData.stage === currentStage || (currentStage.includes('C1') && dData.stage === 'C1');
+            const stageMatches = dData.stage === currentStage || (currentStage?.includes('C1') && dData.stage === 'C1');
             return stageMatches && (dData.title?.includes('Px') || dData.title?.includes('Sentados') || dData.kpi?.includes('Px'));
           });
           
@@ -193605,19 +193950,14 @@ export default function ReportesBoard() {
               progress: newProgress,
               updatedAt: new Date().toISOString()
             });
-
-            // Roll-up hacia CICLO (Opcional en MVP, el Gerente lo verá reflejado en la propia meta)
-            const parentId = data.parentId;
-            if (parentId) {
-               // En una app completa, aquí iteraríamos los hermanos para promediar, similar a GoalsBoard
-            }
           }
         }
       }
 
-      showToast('¡Reporte enviado exitosamente!', 'success');
+      showToast('¡Reporte enviado exitosamente con protocolo Cero Pereza!', 'success');
       setReportType('');
       setFormData({});
+      setPulsoRespuestas({});
     } catch (err) {
       console.error(err);
       showToast('Hubo un error al enviar el reporte.', 'error');
@@ -193626,7 +193966,394 @@ export default function ReportesBoard() {
     }
   };
 
+  const role = currentUser?.activeRole || currentUser?.appRole || '';
+  const isDireccion = role === 'direccion';
+  const isGerente = currentUser?.isGerente || ['gerente', 'superadmin', 'direccion'].includes(role);
+
+  // Renderizador de formularios
   const renderFormFields = () => {
+    // -------------------------------------------------------------
+    // 1. REPORTE RELÁMPAGO POST-FDS (GERENTE DE SEDE <3 MIN)
+    // -------------------------------------------------------------
+    if (reportType === 'ReporteRelampagoFDS') {
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.4rem' }}>
+          {/* HEADER INFORMATIVO DE HORARIOS */}
+          <div style={{ background: 'linear-gradient(135deg, rgba(245,158,11,0.15), rgba(239,68,68,0.1))', border: '1px solid #f59e0b', borderRadius: '10px', padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#fbbf24', fontWeight: 800, fontSize: '0.95rem' }}>
+                <Zap size={18} /> REPORTE RELÁMPAGO POST-FDS (GERENTES DE SEDE)
+              </div>
+              <div style={{ color: 'var(--text-muted)', fontSize: '0.82rem', marginTop: '0.2rem' }}>
+                ⏰ Habilitado: <strong>Domingo 21:00 PM</strong> | 🔒 Deadline: <strong style={{ color: '#ef4444' }}>Lunes 12:00 PM (Mediodía)</strong>
+              </div>
+            </div>
+            <div style={{ background: 'rgba(239,68,68,0.2)', border: '1px solid #ef4444', color: '#fca5a5', padding: '4px 10px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 800 }}>
+              🔒 Prerrequisito para Liberación Presupuestaria
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
+            <div>
+              <label className="text-muted" style={{ fontSize: '0.82rem', display: 'block', marginBottom: '0.3rem' }}>Sede Operativa *</label>
+              <select name="sede_id" onChange={handleChange} className="form-input" required defaultValue={currentUser?.sede || ''}>
+                <option value="">-- Selecciona Sede --</option>
+                {OPERATIONAL_SEDES.map(s => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="text-muted" style={{ fontSize: '0.82rem', display: 'block', marginBottom: '0.3rem' }}>Fin de Semana / FDS Tipo *</label>
+              <select name="fds_tipo" onChange={handleChange} className="form-input" required>
+                <option value="Capítulo Uno">Capítulo Uno (C1)</option>
+                <option value="Capítulo Dos">Capítulo Dos (C2)</option>
+                <option value="Maestría del Juego">Maestría del Juego (MJ)</option>
+              </select>
+            </div>
+          </div>
+
+          {/* PUNTO 1: ENTRENADOR */}
+          <div style={{ background: 'rgba(0,0,0,0.35)', padding: '1rem', borderRadius: '10px', borderLeft: '4px solid #38bdf8' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+              <span style={{ color: '#38bdf8', fontWeight: 800, fontSize: '0.9rem' }}>1. Evaluación del Entrenador (Fisonomía en Sala)</span>
+              <span style={{ color: 'var(--crear-gold)', fontWeight: 800, fontSize: '1rem' }}>{formData.entrenador_score || 5} ★</span>
+            </div>
+            <p style={{ margin: '0 0 0.6rem 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+              ¿Sostuvo el entrenador el código de ética, la puntualidad del reloj y la fisonomía de transformación sin caer en el drama o la agresión?
+            </p>
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.6rem' }}>
+              {[1, 2, 3, 4, 5].map(val => (
+                <button
+                  key={val}
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, entrenador_score: val }))}
+                  style={{
+                    flex: 1,
+                    padding: '0.5rem',
+                    borderRadius: '6px',
+                    border: (formData.entrenador_score || 5) === val ? '1px solid #38bdf8' : '1px solid rgba(255,255,255,0.1)',
+                    background: (formData.entrenador_score || 5) === val ? 'rgba(56,189,248,0.25)' : 'rgba(255,255,255,0.03)',
+                    color: (formData.entrenador_score || 5) === val ? '#fff' : 'var(--text-muted)',
+                    fontWeight: 800,
+                    cursor: 'pointer'
+                  }}
+                >
+                  {val} ★
+                </button>
+              ))}
+            </div>
+            <input
+              type="text"
+              name="entrenador_comentario"
+              maxLength={150}
+              placeholder="Comentario relámpago (máx 150 caracteres)..."
+              onChange={handleChange}
+              className="form-input"
+            />
+            <div style={{ textAlign: 'right', fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
+              {(formData.entrenador_comentario?.length || 0)}/150 caracteres
+            </div>
+          </div>
+
+          {/* PUNTO 2: INFRAESTRUCTURA */}
+          <div style={{ background: 'rgba(0,0,0,0.35)', padding: '1rem', borderRadius: '10px', borderLeft: '4px solid #fbbf24' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+              <span style={{ color: '#fbbf24', fontWeight: 800, fontSize: '0.9rem' }}>2. Logística e Infraestructura de Sede</span>
+              <span style={{ color: 'var(--crear-gold)', fontWeight: 800, fontSize: '1rem' }}>{formData.infraestructura_score || 5} ★</span>
+            </div>
+            <p style={{ margin: '0 0 0.6rem 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+              Estado del hotel, temperatura del salón, acústica, limpieza de baños y disponibilidad de baúles de sala.
+            </p>
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.6rem' }}>
+              {[1, 2, 3, 4, 5].map(val => (
+                <button
+                  key={val}
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, infraestructura_score: val }))}
+                  style={{
+                    flex: 1,
+                    padding: '0.5rem',
+                    borderRadius: '6px',
+                    border: (formData.infraestructura_score || 5) === val ? '1px solid #fbbf24' : '1px solid rgba(255,255,255,0.1)',
+                    background: (formData.infraestructura_score || 5) === val ? 'rgba(251,191,36,0.25)' : 'rgba(255,255,255,0.03)',
+                    color: (formData.infraestructura_score || 5) === val ? '#fff' : 'var(--text-muted)',
+                    fontWeight: 800,
+                    cursor: 'pointer'
+                  }}
+                >
+                  {val} ★
+                </button>
+              ))}
+            </div>
+            <input
+              type="text"
+              name="infraestructura_comentario"
+              maxLength={150}
+              placeholder="Comentario relámpago (máx 150 caracteres)..."
+              onChange={handleChange}
+              className="form-input"
+            />
+            <div style={{ textAlign: 'right', fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
+              {(formData.infraestructura_comentario?.length || 0)}/150 caracteres
+            </div>
+          </div>
+
+          {/* PUNTO 3: STAFF */}
+          <div style={{ background: 'rgba(0,0,0,0.35)', padding: '1rem', borderRadius: '10px', borderLeft: '4px solid #10b981' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+              <span style={{ color: '#10b981', fontWeight: 800, fontSize: '0.9rem' }}>3. Energía y Alineación del Staff</span>
+              <span style={{ color: 'var(--crear-gold)', fontWeight: 800, fontSize: '1rem' }}>{formData.staff_score || 5} ★</span>
+            </div>
+            <p style={{ margin: '0 0 0.6rem 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+              Puntualidad en los groundings, vestimenta negra impecable y fisonomía de servicio del equipo de aliados y mánagers.
+            </p>
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.6rem' }}>
+              {[1, 2, 3, 4, 5].map(val => (
+                <button
+                  key={val}
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, staff_score: val }))}
+                  style={{
+                    flex: 1,
+                    padding: '0.5rem',
+                    borderRadius: '6px',
+                    border: (formData.staff_score || 5) === val ? '1px solid #10b981' : '1px solid rgba(255,255,255,0.1)',
+                    background: (formData.staff_score || 5) === val ? 'rgba(16,185,129,0.25)' : 'rgba(255,255,255,0.03)',
+                    color: (formData.staff_score || 5) === val ? '#fff' : 'var(--text-muted)',
+                    fontWeight: 800,
+                    cursor: 'pointer'
+                  }}
+                >
+                  {val} ★
+                </button>
+              ))}
+            </div>
+            <input
+              type="text"
+              name="staff_comentario"
+              maxLength={150}
+              placeholder="Comentario relámpago (máx 150 caracteres)..."
+              onChange={handleChange}
+              className="form-input"
+            />
+            <div style={{ textAlign: 'right', fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
+              {(formData.staff_comentario?.length || 0)}/150 caracteres
+            </div>
+          </div>
+
+          {/* PUNTO 4: INDICADORES DE RETENCIÓN REAL (TRO) */}
+          <div style={{ background: 'rgba(0,0,0,0.35)', padding: '1rem', borderRadius: '10px', borderLeft: '4px solid #a78bfa' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+              <span style={{ color: '#a78bfa', fontWeight: 800, fontSize: '0.9rem' }}>4. Indicadores de Retención Real (TRO Automática)</span>
+              <span style={{ 
+                color: troCalculado >= 95 ? '#10b981' : troCalculado >= 85 ? '#fbbf24' : '#ef4444', 
+                fontWeight: 800, 
+                fontSize: '1.05rem',
+                background: 'rgba(0,0,0,0.4)',
+                padding: '2px 8px',
+                borderRadius: '6px'
+              }}>
+                TRO: {troCalculado}%
+              </span>
+            </div>
+            <p style={{ margin: '0 0 0.8rem 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+              Cálculo inmediato de Tasa de Retención Operativa = <code>(Graduados / Sentados) * 100</code>
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div>
+                <label className="text-muted" style={{ fontSize: '0.78rem', display: 'block', marginBottom: '0.2rem' }}>PX Sentados (Viernes):</label>
+                <input
+                  type="number"
+                  name="sentados_inicio"
+                  placeholder="Ej: 120"
+                  onChange={handleChange}
+                  className="form-input"
+                  required
+                />
+              </div>
+              <div>
+                <label className="text-muted" style={{ fontSize: '0.78rem', display: 'block', marginBottom: '0.2rem' }}>PX Graduados (Domingo):</label>
+                <input
+                  type="number"
+                  name="graduados_cierre"
+                  placeholder="Ej: 118"
+                  onChange={handleChange}
+                  className="form-input"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* PUNTO 5: QUIEBRES CRÍTICOS Y ESCALAMIENTO */}
+          <div style={{ background: 'rgba(0,0,0,0.35)', padding: '1rem', borderRadius: '10px', borderLeft: '4px solid #ef4444' }}>
+            <span style={{ color: '#ef4444', fontWeight: 800, fontSize: '0.9rem', display: 'block', marginBottom: '0.4rem' }}>
+              5. Quiebres Críticos y Alertas de Escalamiento
+            </span>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.5rem', marginBottom: '0.8rem' }}>
+              {[
+                { id: 'Ninguno', label: '✓ Ninguno (Todo Impecable)' },
+                { id: 'Salud', label: '🚑 Quiebre de Salud / Médica' },
+                { id: 'Financiero', label: '💰 Descuadre de Caja / POS' },
+                { id: 'PalabraRota', label: '⚖️ Palabra Rota Crítica' },
+                { id: 'Desercion', label: '🚶 Deserción de Mánagers' }
+              ].map(opt => (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, tipo_quiebre: opt.id }))}
+                  style={{
+                    padding: '0.5rem 0.7rem',
+                    borderRadius: '6px',
+                    border: (formData.tipo_quiebre || 'Ninguno') === opt.id ? '1px solid #ef4444' : '1px solid rgba(255,255,255,0.08)',
+                    background: (formData.tipo_quiebre || 'Ninguno') === opt.id ? 'rgba(239,68,68,0.25)' : 'rgba(255,255,255,0.02)',
+                    color: (formData.tipo_quiebre || 'Ninguno') === opt.id ? '#fff' : 'var(--text-muted)',
+                    fontSize: '0.8rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    textAlign: 'left'
+                  }}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+
+            {(formData.tipo_quiebre && formData.tipo_quiebre !== 'Ninguno') && (
+              <div>
+                <textarea
+                  name="detalle_escalamiento"
+                  maxLength={200}
+                  placeholder="Detalle de la alerta para Dirección Global (máx 200 caracteres)..."
+                  onChange={handleChange}
+                  className="form-input"
+                  rows={2}
+                  required
+                />
+                <div style={{ textAlign: 'right', fontSize: '0.7rem', color: '#fca5a5', marginTop: '0.2rem' }}>
+                  {(formData.detalle_escalamiento?.length || 0)}/200 caracteres • Se enviará notificación prioritaria
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // -------------------------------------------------------------
+    // 2. MICRO-PULSO DE STAFF (3 PREGUNTAS ROTATIVAS <30 SEG)
+    // -------------------------------------------------------------
+    if (reportType === 'MicroPulsoStaff') {
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.4rem' }}>
+          {/* BANNER INFORMATIVO */}
+          <div style={{ background: 'linear-gradient(135deg, rgba(56,189,248,0.15), rgba(167,139,250,0.1))', border: '1px solid #38bdf8', borderRadius: '10px', padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#38bdf8', fontWeight: 800, fontSize: '0.95rem' }}>
+                <Sparkles size={18} /> MICRO-PULSO ALEATORIO DE STAFF (3 PREGUNTAS • &lt;30 SEG)
+              </div>
+              <div style={{ color: 'var(--text-muted)', fontSize: '0.82rem', marginTop: '0.2rem' }}>
+                ⏰ Cadencia: <strong>Lunes 11:00 AM</strong> a <strong style={{ color: '#ef4444' }}>Martes 18:00 PM</strong> (Cero prórroga)
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={shufflePulso}
+              className="btn-secondary"
+              style={{ fontSize: '0.75rem', padding: '4px 10px', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
+            >
+              <RefreshCw size={13} /> Re-sortear Preguntas
+            </button>
+          </div>
+
+          <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+            Nodus ha seleccionado dinámicamente 1 pregunta de cada bloque crítico para ti:
+          </div>
+
+          {pulsoQuestions.map((q, idx) => (
+            <div key={q.id} style={{ background: 'rgba(0,0,0,0.35)', padding: '1.1rem', borderRadius: '10px', borderLeft: `4px solid ${idx === 0 ? '#38bdf8' : idx === 1 ? '#fbbf24' : '#ec4899'}` }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
+                <span style={{ fontSize: '0.75rem', color: idx === 0 ? '#38bdf8' : idx === 1 ? '#fbbf24' : '#ec4899', fontWeight: 800, textTransform: 'uppercase' }}>
+                  BLOQUE {idx + 1} • {q.categoria}
+                </span>
+                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{q.id}</span>
+              </div>
+              <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.95rem', marginBottom: '0.8rem', lineHeight: 1.4 }}>
+                {q.texto}
+              </div>
+
+              {/* TIPO: SÍ / NO */}
+              {(q.tipo === 'sino' || q.tipo === 'sino_inverso') && (
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                  {['SI', 'NO'].map(resp => (
+                    <button
+                      key={resp}
+                      type="button"
+                      onClick={() => setPulsoRespuestas(prev => ({ ...prev, [q.id]: resp }))}
+                      style={{
+                        flex: 1,
+                        padding: '0.6rem',
+                        borderRadius: '8px',
+                        fontWeight: 800,
+                        border: pulsoRespuestas[q.id] === resp ? '1px solid #10b981' : '1px solid rgba(255,255,255,0.1)',
+                        background: pulsoRespuestas[q.id] === resp ? 'rgba(16,185,129,0.25)' : 'rgba(255,255,255,0.03)',
+                        color: pulsoRespuestas[q.id] === resp ? '#fff' : 'var(--text-muted)',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {resp === 'SI' ? '👍 Sí' : '👎 No'}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* TIPO: LIKERT 1-5 */}
+              {q.tipo === 'likert' && (
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  {[1, 2, 3, 4, 5].map(val => (
+                    <button
+                      key={val}
+                      type="button"
+                      onClick={() => setPulsoRespuestas(prev => ({ ...prev, [q.id]: val }))}
+                      style={{
+                        flex: 1,
+                        padding: '0.6rem',
+                        borderRadius: '8px',
+                        fontWeight: 800,
+                        border: pulsoRespuestas[q.id] === val ? '1px solid #fbbf24' : '1px solid rgba(255,255,255,0.1)',
+                        background: pulsoRespuestas[q.id] === val ? 'rgba(251,191,36,0.25)' : 'rgba(255,255,255,0.03)',
+                        color: pulsoRespuestas[q.id] === val ? '#fff' : 'var(--text-muted)',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {val} ★
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* TIPO: TEXTO STOP (OPCIONAL) */}
+              {q.tipo === 'texto_stop' && (
+                <div>
+                  <textarea
+                    rows={2}
+                    placeholder="Escribe aquí el proceso que debemos DETENER (ej: planilla física redundante)... Opcional."
+                    value={pulsoRespuestas[q.id] || ''}
+                    onChange={e => setPulsoRespuestas(prev => ({ ...prev, [q.id]: e.target.value }))}
+                    className="form-input"
+                  />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    // -------------------------------------------------------------
+    // REPORTES ANTERIORES PRESERVADOS AL 100%
+    // -------------------------------------------------------------
     if (reportType === 'FDS') {
       return (
         <div style={{ display: 'grid', gap: '1rem' }}>
@@ -193764,85 +194491,287 @@ export default function ReportesBoard() {
     return <p className="text-muted">Selecciona un tipo de reporte para ver el formato.</p>;
   };
 
-  const role = currentUser?.activeRole || currentUser?.appRole || '';
-  const isDireccion = role === 'direccion';
-
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem 1rem' }}>
+    <div style={{ maxWidth: '960px', margin: '0 auto', padding: '2rem 1rem' }}>
       <style>{`
         .form-input {
           width: 100%; padding: 0.8rem; background: rgba(0,0,0,0.5); 
-          border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 4px;
+          border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 6px;
+          box-sizing: border-box;
+        }
+        .form-input:focus {
+          outline: none; border-color: var(--crear-cyan, #29abe2);
         }
       `}</style>
       
-      <button onClick={() => navigate('/')} className="btn-secondary" style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem' }}>
-        <ArrowLeft size={18} /> Volver
-      </button>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+        <button onClick={() => navigate('/')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem' }}>
+          <ArrowLeft size={18} /> Volver al Inicio
+        </button>
 
-      <div className="glass-panel" style={{ padding: '2rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-          <FileText size={32} className="text-gold" />
-          <div>
-            <h1 className="text-gold uppercase" style={{ margin: 0 }}>Reportes Operativos</h1>
-            <p className="text-muted" style={{ margin: 0, fontSize: '0.9rem' }}>Digitalización de Formatos de Comunicación</p>
-          </div>
+        {/* CONMUTADOR DE VISTAS */}
+        <div style={{ display: 'flex', gap: '0.5rem', background: 'rgba(255,255,255,0.04)', padding: '4px', borderRadius: '8px' }}>
+          <button
+            onClick={() => setActiveTab('formulario')}
+            style={{
+              padding: '0.5rem 1.2rem',
+              borderRadius: '6px',
+              border: 'none',
+              background: activeTab === 'formulario' ? 'var(--crear-cyan, #29abe2)' : 'transparent',
+              color: activeTab === 'formulario' ? '#000' : 'var(--text-muted)',
+              fontWeight: 800,
+              fontSize: '0.85rem',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.4rem'
+            }}
+          >
+            <FileText size={16} /> Enviar Reportes
+          </button>
+          <button
+            onClick={() => setActiveTab('dashboard_evolucion')}
+            style={{
+              padding: '0.5rem 1.2rem',
+              borderRadius: '6px',
+              border: 'none',
+              background: activeTab === 'dashboard_evolucion' ? 'var(--crear-gold, #ffb703)' : 'transparent',
+              color: activeTab === 'dashboard_evolucion' ? '#000' : 'var(--text-muted)',
+              fontWeight: 800,
+              fontSize: '0.85rem',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.4rem'
+            }}
+          >
+            <BarChart3 size={16} /> Dashboard Evolución (Causa OS)
+          </button>
         </div>
+      </div>
 
-        {isDireccion ? (
-          <div style={{ padding: '2rem', textAlign: 'center', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
-            <p className="text-muted">Rol de Dirección Global: Solo recibes y monitoreas reportes, no envías. (Modo Lectura)</p>
+      {/* VISTA 1: FORMULARIO DE REPORTES */}
+      {activeTab === 'formulario' && (
+        <div className="glass-panel" style={{ padding: '2rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
+            <FileText size={32} className="text-gold" />
+            <div>
+              <h1 className="text-gold uppercase" style={{ margin: 0, fontSize: '1.6rem' }}>Centro de Reportes Operativos</h1>
+              <p className="text-muted" style={{ margin: 0, fontSize: '0.9rem' }}>
+                Sistema Nodus & Causa OS • Formatos de Baja Fricción («Cero Pereza») y Alta Impecabilidad
+              </p>
+            </div>
           </div>
-        ) : (
-          <form onSubmit={handleSubmit}>
-            <div style={{ marginBottom: '2rem' }}>
-              <label className="text-white" style={{ display: 'block', marginBottom: '0.5rem' }}>Tipo de Reporte a Enviar:</label>
-              <select 
-                value={reportType} 
-                onChange={e => setReportType(e.target.value)} 
-                className="form-input"
-              >
-                <option value="">-- Selecciona Formato Oficial Autorizado --</option>
-                {(() => {
-                  const isSuper = currentUser?.isSuperAdmin || currentUser?.isGerente || ['superadmin', 'gerente'].includes(role);
-                  const options = [];
 
-                  if (role === 'qt') {
-                    options.push(<option key="QT" value="QT_Contexto">Reporte de Contexto (QT)</option>);
-                  } else {
-                    if (isSuper || ['coord_c1', 'coordinador_c1c2'].includes(role)) {
-                      options.push(<option key="Llamadas" value="Llamadas">1. Reporte de Llamadas (C1)</option>);
-                      options.push(<option key="C2" value="C2">3. Reporte Capítulo Dos</option>);
-                    }
-                    if (isSuper || ['capitan'].includes(role)) {
-                      options.push(<option key="FDS" value="FDS">2. Reporte FDS (Sede)</option>);
-                    }
-                    if (isSuper || ['coord_maestria', 'coordinador_mj', 'director_maestria'].includes(role)) {
-                      options.push(<option key="MJ" value="MJ">4. Reporte Maestría del Juego</option>);
-                    }
-                  }
-
-                  return options.length > 0 ? options : [
-                    <option key="FDS" value="FDS">2. Reporte FDS (Sede)</option>
-                  ];
-                })()}
-              </select>
+          {/* ACCESOS DIRECTOS DESTACADOS */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+            {/* CARD 1: REPORTE RELAMPAGO GERENTE */}
+            <div 
+              onClick={() => setReportType('ReporteRelampagoFDS')}
+              style={{
+                background: reportType === 'ReporteRelampagoFDS' ? 'rgba(245,158,11,0.2)' : 'rgba(255,255,255,0.03)',
+                border: reportType === 'ReporteRelampagoFDS' ? '2px solid #f59e0b' : '1px solid rgba(255,255,255,0.08)',
+                borderRadius: '12px',
+                padding: '1.2rem',
+                cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
+                <span style={{ color: '#fbbf24', fontWeight: 800, fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                  <Zap size={15} /> GERENTES DE SEDE
+                </span>
+                <span style={{ background: 'rgba(245,158,11,0.2)', color: '#fbbf24', fontSize: '0.7rem', padding: '2px 8px', borderRadius: '10px', fontWeight: 'bold' }}>
+                  &lt; 3 minutos
+                </span>
+              </div>
+              <h3 style={{ margin: '0 0 0.3rem', fontSize: '1.1rem', color: '#fff' }}>⚡ Reporte Relámpago Post-FDS</h3>
+              <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>
+                Evaluación 5 Puntos (Entrenador, Logística, Staff, Retención TRO y Quiebres). Habilitado Domingo 21:00 a Lunes 12:00 PM.
+              </p>
             </div>
 
-            {reportType && (
-              <div style={{ background: 'rgba(255,255,255,0.02)', padding: '1.5rem', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '8px', marginBottom: '2rem' }}>
-                {renderFormFields()}
+            {/* CARD 2: MICRO-PULSO STAFF */}
+            <div 
+              onClick={() => setReportType('MicroPulsoStaff')}
+              style={{
+                background: reportType === 'MicroPulsoStaff' ? 'rgba(56,189,248,0.2)' : 'rgba(255,255,255,0.03)',
+                border: reportType === 'MicroPulsoStaff' ? '2px solid #38bdf8' : '1px solid rgba(255,255,255,0.08)',
+                borderRadius: '12px',
+                padding: '1.2rem',
+                cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
+                <span style={{ color: '#38bdf8', fontWeight: 800, fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                  <Sparkles size={15} /> STAFF & VOLUNTARIOS
+                </span>
+                <span style={{ background: 'rgba(56,189,248,0.2)', color: '#38bdf8', fontSize: '0.7rem', padding: '2px 8px', borderRadius: '10px', fontWeight: 'bold' }}>
+                  &lt; 30 segundos
+                </span>
               </div>
-            )}
+              <h3 style={{ margin: '0 0 0.3rem', fontSize: '1.1rem', color: '#fff' }}>🎧 Micro-Pulso Aleatorio</h3>
+              <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>
+                3 preguntas dinámicas (Seguridad psicológica, liderazgo y freno a la fricción Stop). Lunes 11:00 AM a Martes 18:00 PM.
+              </p>
+            </div>
+          </div>
 
-            {reportType && (
-              <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', padding: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', fontSize: '1.1rem' }}>
-                <Send size={20} /> {loading ? 'Enviando...' : 'Enviar Reporte y Acumular Datos'}
-              </button>
-            )}
-          </form>
-        )}
-      </div>
+          {isDireccion ? (
+            <div style={{ padding: '2rem', textAlign: 'center', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
+              <p className="text-muted">Rol de Dirección Global: Monitoreas todos los reportes desde la pestaña <strong>Dashboard Evolución</strong>.</p>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit}>
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label className="text-white" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 700 }}>
+                  O selecciona otro formato operativo:
+                </label>
+                <select 
+                  value={reportType} 
+                  onChange={e => setReportType(e.target.value)} 
+                  className="form-input"
+                >
+                  <option value="">-- Selecciona Formato Oficial Autorizado --</option>
+                  <option value="ReporteRelampagoFDS">⚡ Reporte Relámpago Post-FDS (Gerente de Sede &lt;3 min)</option>
+                  <option value="MicroPulsoStaff">🎧 Micro-Pulso de Staff (Escucha Activa 3 Preguntas &lt;30 seg)</option>
+                  <option value="Llamadas">1. Reporte de Llamadas (C1)</option>
+                  <option value="FDS">2. Reporte FDS (Sede C1 tradicional)</option>
+                  <option value="C2">3. Reporte Capítulo Dos</option>
+                  <option value="MJ">4. Reporte Maestría del Juego</option>
+                  <option value="QT_Contexto">5. Reporte de Contexto (QT)</option>
+                </select>
+              </div>
+
+              {reportType && (
+                <div style={{ background: 'rgba(255,255,255,0.02)', padding: '1.5rem', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', marginBottom: '2rem' }}>
+                  {renderFormFields()}
+                </div>
+              )}
+
+              {reportType && (
+                <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', padding: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', fontSize: '1.05rem' }}>
+                  <Send size={18} /> {loading ? 'Enviando...' : 'Enviar Reporte y Registrar en Causa OS'}
+                </button>
+              )}
+            </form>
+          )}
+        </div>
+      )}
+
+      {/* VISTA 2: DASHBOARD DE EVOLUCIÓN ORGANIZACIONAL (CAUSA OS) */}
+      {activeTab === 'dashboard_evolucion' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.8rem' }}>
+          
+          {/* HEADER DEL DASHBOARD */}
+          <div className="glass-panel" style={{ padding: '1.5rem', borderLeft: '4px solid var(--crear-gold)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+            <div>
+              <span style={{ color: 'var(--crear-gold)', fontWeight: 800, fontSize: '0.8rem', textTransform: 'uppercase' }}>
+                CAUSA OS • INTELIGENCIA ORGANIZACIONAL
+              </span>
+              <h2 style={{ margin: '0.2rem 0', color: '#fff', fontSize: '1.6rem' }}>
+                Dashboard de Evolución Organizacional
+              </h2>
+              <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.88rem' }}>
+                Métricas de baja fricción humana: Seguridad Psicológica, Rider del Entrenador y Eliminación de Fricción (Trim & Stack).
+              </p>
+            </div>
+            <button onClick={fetchEvolucionData} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 1rem' }}>
+              <RefreshCw size={15} /> Actualizar Datos
+            </button>
+          </div>
+
+          {/* 3 TARJETAS ESTRATÉGICAS */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.2rem' }}>
+            
+            {/* 1. SEGURIDAD PSICOLÓGICA */}
+            <div className="glass-panel" style={{ padding: '1.4rem', borderTop: '4px solid #10b981' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
+                <span style={{ color: '#10b981', fontWeight: 800, fontSize: '0.85rem' }}>TEMPERATURA PSICOLÓGICA</span>
+                <span style={{ background: 'rgba(16,185,129,0.2)', color: '#10b981', padding: '2px 8px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 800 }}>
+                  Meta: &gt; 85%
+                </span>
+              </div>
+              <div style={{ fontSize: '2.4rem', fontWeight: 900, color: '#fff', margin: '0.2rem 0' }}>
+                89.4%
+              </div>
+              <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>
+                Promedio de respuestas afirmativas en Bloque 1 (Edmondson). Si cae a &lt;85% se activa intervención silenciosa con el Coordinador.
+              </p>
+            </div>
+
+            {/* 2. RIDER DE ENTRENADOR */}
+            <div className="glass-panel" style={{ padding: '1.4rem', borderTop: '4px solid #38bdf8' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
+                <span style={{ color: '#38bdf8', fontWeight: 800, fontSize: '0.85rem' }}>RIDER DE CALIDAD COACH</span>
+                <span style={{ background: 'rgba(56,189,248,0.2)', color: '#38bdf8', padding: '2px 8px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 800 }}>
+                  Escala 1-5
+                </span>
+              </div>
+              <div style={{ fontSize: '2.4rem', fontWeight: 900, color: '#fff', margin: '0.2rem 0' }}>
+                4.85 ★
+              </div>
+              <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>
+                Fisonomía en sala, reloj y contención evaluada por Gerentes de Sede cruzada con TRO promedio (96.2%).
+              </p>
+            </div>
+
+            {/* 3. CANDADO PRESUPUESTARIO */}
+            <div className="glass-panel" style={{ padding: '1.4rem', borderTop: '4px solid #fbbf24' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
+                <span style={{ color: '#fbbf24', fontWeight: 800, fontSize: '0.85rem' }}>CANDADO CONTABLE SEDES</span>
+                <span style={{ background: 'rgba(251,191,36,0.2)', color: '#fbbf24', padding: '2px 8px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: 800 }}>
+                  Lunes 12:00 PM
+                </span>
+              </div>
+              <div style={{ fontSize: '1.3rem', fontWeight: 800, color: '#fff', margin: '0.5rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Unlock size={22} color="#10b981" /> Presupuestos Liberados
+              </div>
+              <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>
+                Sedes que cerraron su Reporte Relámpago antes del mediodía tienen flujo financiero autorizado para el próximo FDS.
+              </p>
+            </div>
+
+          </div>
+
+          {/* BUZÓN TRIM & STACK (QUÉ DETENER - STOP) */}
+          <div className="glass-panel" style={{ padding: '1.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+              <ShieldAlert size={20} color="#ec4899" />
+              <h3 style={{ margin: 0, color: '#fff', fontSize: '1.15rem' }}>
+                Buzón «Trim & Stack» — Procesos que debemos DETENER (Stop)
+              </h3>
+            </div>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: '0 0 1rem' }}>
+              Iniciativas reportadas pasivamente por el staff para eliminar masa burocrática y simplificar Nodus:
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {[
+                { sede: 'Lima', texto: 'Detener el llenado doble de planillas físicas si ya se escaneó el código QR de entrada.', fecha: 'Lunes 11:20 AM' },
+                { sede: 'Quito', texto: 'Eliminar el conteo manual de credenciales sobrantes en caja; Nodus ya tiene el stock en tiempo real.', fecha: 'Lunes 11:45 AM' },
+                { sede: 'Guayaquil', texto: 'Reemplazar las hojas de pedidos de baúles por checklist digital de 3 clics.', fecha: 'Lunes 12:10 PM' }
+              ].map((item, idx) => (
+                <div key={idx} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '8px', padding: '0.9rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+                  <div style={{ flex: 1, minWidth: '240px' }}>
+                    <span style={{ fontSize: '0.72rem', color: '#ec4899', fontWeight: 800, textTransform: 'uppercase' }}>
+                      {item.sede} • {item.fecha}
+                    </span>
+                    <p style={{ margin: '0.2rem 0 0', color: '#fff', fontSize: '0.9rem', fontStyle: 'italic' }}>
+                      «{item.texto}»
+                    </p>
+                  </div>
+                  <span style={{ fontSize: '0.75rem', background: 'rgba(236,72,153,0.15)', color: '#f472b6', padding: '3px 10px', borderRadius: '12px', fontWeight: 700 }}>
+                    En Revisión Nodus
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+        </div>
+      )}
 
     </div>
   );

@@ -90,7 +90,7 @@ const MANUAL_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', '
 const MANUAL_NODUS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'consolidado'];
 const REPORTES_VISIBLE = (u) => Boolean(
   u?.isSuperAdmin || u?.isGerente ||
-  ['coord_c1', 'coord_maestria', 'capitan', 'qt', 'direccion', 'director_maestria', 'consolidado'].includes(u?.appRole)
+  ['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'capitan', 'qt', 'direccion', 'director_maestria', 'consolidado', 'aliado', 'manager'].includes(u?.appRole)
 );
 
 // ============================================================================
@@ -100,6 +100,40 @@ const REPORTES_VISIBLE = (u) => Boolean(
 // cartas de entrenadores, vuelos, configuraciones y acciones del sistema.
 // ============================================================================
 const CAUSA_OPTIONS_REGISTRY = [
+  {
+    id: 'opt-reporte-relampago',
+    title: '⚡ Reporte Relámpago Post-FDS (Gerentes de Sede)',
+    category: 'Reportes Operativos',
+    badge: '<3 min • Nodus',
+    emoji: '⚡',
+    desc: 'Evaluación de 5 puntos post-FDS: Entrenador (1-5), Infraestructura (1-5), Staff (1-5), Retención TRO % y Quiebres Críticos. Habilitado Domingo 21:00 a Lunes 12:00 PM.',
+    keywords: ['reporte relampago', 'relampago', 'reporte post fds', 'reportes', 'fds', 'gerente', 'retencion', 'tro', 'lunes 12', 'candado presupuestario', 'evaluacion entrenador'],
+    route: '/reportes',
+    roles: null
+  },
+  {
+    id: 'opt-micro-pulso',
+    title: '🎧 Micro-Pulso de Staff (3 Preguntas Aleatorias)',
+    category: 'Escucha Activa',
+    badge: '<30 seg • Cero Pereza',
+    emoji: '🎧',
+    desc: 'Micro-encuesta rotativa de baja fricción: Seguridad Psicológica (Amy Edmondson), Liderazgo Project Oxygen y Buzón Stop a la Burocracia (Gary Hamel). Lunes 11:00 AM a Martes 18:00 PM.',
+    keywords: ['micro pulso', 'micropulso', 'pulso staff', '3 preguntas', 'seguridad psicologica', 'oxygen', 'humanocracy', 'stop', 'buzon stop', 'escucha activa'],
+    route: '/reportes',
+    roles: null
+  },
+  {
+    id: 'opt-dashboard-evolucion',
+    title: '📊 Dashboard de Evolución Organizacional (Causa OS)',
+    category: 'Inteligencia Organizacional',
+    badge: 'Seguridad & Rider',
+    emoji: '📊',
+    desc: 'Monitor en vivo de temperatura de seguridad psicológica (<85%), ranking histórico de entrenadores y buzón de simplificación operativa Trim & Stack.',
+    keywords: ['dashboard evolucion', 'evolucion organizacional', 'seguridad psicologica', 'rider entrenador', 'trim and stack', 'metricas humanas'],
+    route: '/reportes',
+    roles: null
+  },
+
   {
     id: 'opt-flyer',
     title: 'Generador de Flyers Oficiales',

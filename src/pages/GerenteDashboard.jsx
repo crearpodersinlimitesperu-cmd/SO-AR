@@ -6,7 +6,7 @@ import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useUI } from '../context/UIContext';
 import { useNavigate } from 'react-router-dom';
-import { Target, AlertTriangle, Users, PlusCircle, Activity, CheckCircle, Building, MessageSquare, Mail, ExternalLink, ArrowRight, Clock, ShieldAlert, ChevronRight, CheckSquare } from 'lucide-react';
+import { Target, Zap, AlertTriangle, Users, PlusCircle, Activity, CheckCircle, Building, MessageSquare, Mail, ExternalLink, ArrowRight, Clock, ShieldAlert, ChevronRight, CheckSquare } from 'lucide-react';
 import { usersData, normalizeRole } from '../data/usersData';
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
 import IAAuditor from '../components/IAAuditor';
@@ -201,6 +201,62 @@ export default function GerenteDashboard() {
 
       <TaskAssignmentModal isOpen={showTaskForm} onClose={() => setShowTaskForm(false)} />
       <VenueConfigModal isOpen={showVenueModal} onClose={() => setShowVenueModal(false)} />
+
+      
+      {/* BANNER OPERATIVO REPORTE RELÁMPAGO POST-FDS */}
+      <div 
+        className="glass-panel" 
+        style={{ 
+          marginBottom: '1.5rem', 
+          padding: '1.2rem 1.5rem', 
+          borderLeft: '5px solid #f59e0b', 
+          background: 'linear-gradient(90deg, rgba(245,158,11,0.1), rgba(0,0,0,0.3))',
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
+          flexWrap: 'wrap', 
+          gap: '1rem' 
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div style={{ background: 'rgba(245,158,11,0.2)', padding: '0.7rem', borderRadius: '10px', color: '#fbbf24' }}>
+            <Zap size={24} />
+          </div>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <h4 style={{ margin: 0, color: '#fff', fontSize: '1.05rem', fontWeight: 800 }}>
+                ⚡ Reporte Relámpago Post-FDS (Nodus & Causa OS)
+              </h4>
+              <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: '12px', background: 'rgba(239,68,68,0.2)', color: '#ef4444', fontWeight: 800 }}>
+                🔒 Candado Presupuestario
+              </span>
+            </div>
+            <p style={{ margin: '0.2rem 0 0', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+              ⏰ Horario Operativo: <strong>Habilita Domingo 21:00 PM</strong> | <strong>Deadline Innegociable: Lunes 12:00 PM (Mediodía)</strong>. Tiempo de llenado: &lt; 3 minutos.
+            </p>
+          </div>
+        </div>
+
+        <button
+          onClick={() => navigate('/reportes')}
+          className="btn-primary"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            padding: '0.6rem 1.2rem',
+            borderRadius: '8px',
+            background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+            color: '#000',
+            fontWeight: 800,
+            fontSize: '0.85rem',
+            border: 'none',
+            cursor: 'pointer'
+          }}
+        >
+          <Zap size={16} /> Llenar Reporte Relámpago
+        </button>
+      </div>
 
       {/* CUADRANTES EJECUTIVOS */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>

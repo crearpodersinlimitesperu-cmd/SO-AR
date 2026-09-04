@@ -86,6 +86,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose }) {
             { id: 'oficina', label: '🏢 Equipo de Oficina (Soporte)' },
             { id: 'gerentes', label: '👔 Gerentes de Sede (Nivel 8)' },
             { id: 'coordinadores', label: '🎯 Coordinadores (CC1Y2 & CMJ)' },
+            { id: 'pulsos_reportes', label: '⚡ Pulsos & Reportes Post-FDS (Nodus & Causa OS)' },
             { id: 'sala_c1', label: '🟣 Sala C1' },
             { id: 'sala_c2', label: '🔵 Sala C2' },
             { id: 'sala_mj', label: '🟡 Sala Maestría' }
@@ -112,6 +113,70 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose }) {
 
         {/* CONTENEDOR DE SECCIONES */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.25rem' }}>
+
+          {/* SECCIÓN ESPECIAL: SISTEMA DE PULSOS Y REPORTES POST-FDS */}
+          {(activeTab === 'todos_equipo' || activeTab === 'pulsos_reportes') && (
+            <div 
+              className="glass-panel" 
+              style={{ 
+                padding: '1.4rem', 
+                borderTop: '4px solid #ec4899', 
+                borderRadius: '12px',
+                background: 'rgba(236, 72, 153, 0.05)',
+                gridColumn: activeTab === 'pulsos_reportes' ? '1 / -1' : 'span 1'
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <h3 style={{ color: '#f472b6', margin: 0, fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <Sparkles size={20} /> Sistema de Pulsos & Reportes Post-FDS (Baja Fricción)
+                </h3>
+                <span style={{ fontSize: '0.72rem', padding: '3px 10px', borderRadius: '12px', background: 'rgba(236, 72, 153, 0.2)', color: '#f472b6', fontWeight: 800 }}>
+                  CPSL 2026 • Cero Pereza
+                </span>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
+                
+                {/* REPORTE RELÁMPAGO GERENTE */}
+                <div style={{ background: 'rgba(0,0,0,0.35)', padding: '1rem', borderRadius: '10px', borderLeft: '3px solid #fbbf24' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+                    <span style={{ color: '#fbbf24', fontWeight: 800, fontSize: '0.85rem' }}>👔 GERENTES DE SEDE</span>
+                    <span style={{ color: '#fbbf24', fontSize: '0.75rem', fontWeight: 'bold' }}>&lt; 3 minutos</span>
+                  </div>
+                  <h4 style={{ color: '#fff', margin: '0 0 0.5rem 0', fontSize: '0.98rem' }}>Reporte Relámpago Post-FDS</h4>
+                  <ul style={{ margin: 0, paddingLeft: '1.1rem', fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: '1.5' }}>
+                    <li><strong>Habilitación:</strong> Domingo 21:00 PM (cierre de salón).</li>
+                    <li><strong style={{ color: '#ef4444' }}>Deadline Innegociable:</strong> Lunes 12:00 PM (Mediodía).</li>
+                    <li><strong>5 Puntos:</strong> Entrenador (1-5), Logística (1-5), Staff (1-5), Retención Real (TRO %) y Quiebres Críticos.</li>
+                    <li><strong style={{ color: '#fbbf24' }}>Candado Nodus:</strong> Prerrequisito para liberar flujo contable del siguiente FDS.</li>
+                  </ul>
+                </div>
+
+                {/* MICRO-PULSOS STAFF */}
+                <div style={{ background: 'rgba(0,0,0,0.35)', padding: '1rem', borderRadius: '10px', borderLeft: '3px solid #38bdf8' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+                    <span style={{ color: '#38bdf8', fontWeight: 800, fontSize: '0.85rem' }}>👥 STAFF & VOLUNTARIOS</span>
+                    <span style={{ color: '#38bdf8', fontSize: '0.75rem', fontWeight: 'bold' }}>&lt; 30 segundos</span>
+                  </div>
+                  <h4 style={{ color: '#fff', margin: '0 0 0.5rem 0', fontSize: '0.98rem' }}>Micro-Pulsos Aleatorios (3 Preguntas)</h4>
+                  <ul style={{ margin: 0, paddingLeft: '1.1rem', fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: '1.5' }}>
+                    <li><strong>Disparador:</strong> Lunes 11:00 AM (mente fría post-descanso).</li>
+                    <li><strong style={{ color: '#ef4444' }}>Ventana Activa:</strong> Hasta Martes 18:00 PM (31h, cero prórroga).</li>
+                    <li><strong>3 Bloques Rotativos:</strong> 1 pregunta de Seguridad Psicológica, 1 de Liderazgo (Oxygen) y 1 de Fricción (Humanocracy).</li>
+                    <li><strong>Trim & Stack:</strong> Campo «Qué detener (Stop)» para eliminar burocracia.</li>
+                  </ul>
+                </div>
+
+              </div>
+
+              {/* DASHBOARD EVOLUCIÓN */}
+              <div style={{ background: 'rgba(236,72,153,0.08)', border: '1px dashed rgba(236,72,153,0.3)', borderRadius: '8px', padding: '0.8rem', fontSize: '0.82rem', color: 'var(--text-main)' }}>
+                <strong style={{ color: '#f472b6' }}>📊 Dashboard de Evolución Organizacional en Causa OS:</strong>
+                <span style={{ color: 'var(--text-muted)' }}> Alertas automáticas si la Seguridad Psicológica cae por debajo del 85%, cálculo del Rider de Calidad del Entrenador ponderado con Retención (TRO), y optimización continua de procesos en sala.</span>
+              </div>
+            </div>
+          )}
+
           
           {/* SECCIÓN 1: EQUIPO DE OFICINA */}
           {(activeTab === 'todos_equipo' || activeTab === 'oficina') && (
@@ -205,13 +270,14 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose }) {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                    <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Lunes</td>
+                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(239, 68, 68, 0.05)' }}>
+                    <td style={{ padding: '0.5rem 0', fontWeight: 'bold', color: '#fbbf24' }}>Lunes</td>
                     <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>
-                      Cierre de Caja FDS en Nodus<br/>
-                      <span style={{ color: '#ef4444', fontWeight: 'bold' }}>Trigger Impecabilidad Contable</span>
+                      <strong style={{ color: '#ef4444' }}>DEADLINE REPORTE RELÁMPAGO (12:00 PM):</strong><br/>
+                      Cierre de Caja FDS en Nodus + Reporte de 5 Puntos.<br/>
+                      <span style={{ color: '#f87171', fontSize: '0.75rem' }}>🔒 Prerrequisito para liberación presupuestaria del siguiente FDS.</span>
                     </td>
-                    <td style={{ padding: '0.5rem 0', textAlign: 'right', color: '#fbbf24', fontWeight: 'bold' }}>08:30 - 12:00 (Deadline)</td>
+                    <td style={{ padding: '0.5rem 0', textAlign: 'right', color: '#ef4444', fontWeight: 'bold' }}>Hasta 12:00 PM (Innegociable)</td>
                   </tr>
                   <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                     <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Martes</td>
@@ -233,10 +299,11 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose }) {
                   <tr>
                     <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Viernes a Domingo</td>
                     <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>
-                      Viernes 14:01 Trigger Palabra Rota C2<br/>
-                      Domingo liderazgo de mesas enrolamiento
+                      Viernes 14:01 Trigger Palabra Rota C2.<br/>
+                      Domingo liderazgo de mesas de enrolamiento.<br/>
+                      <strong style={{ color: '#38bdf8' }}>Domingo 21:00 PM: Habilitación Reporte Relámpago Post-FDS en Nodus</strong> (Cierre de puertas y POS).
                     </td>
-                    <td style={{ padding: '0.5rem 0', textAlign: 'right', color: 'var(--crear-cyan)', fontWeight: 'bold' }}>08:00 - Cierre</td>
+                    <td style={{ padding: '0.5rem 0', textAlign: 'right', color: 'var(--crear-cyan)', fontWeight: 'bold' }}>08:00 - 21:00+</td>
                   </tr>
                 </tbody>
               </table>

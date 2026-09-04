@@ -1606,4 +1606,83 @@ Estas 6 frases deben memorizarse, repetirse y sostenerse en cada orientación, g
 ---
 *Fin de la Sección 17 — Protocolo de Orientación: Construir desde la Nada (Causa OS).*
 
+
+---
+
+## 18. SISTEMA DE ESCUCHA ACTIVA Y REPORTE RELÁMPAGO POST-FDS (ARQUITECTURA DE BAJA FRICCIÓN OPERATIVA NODUS & CAUSA OS)
+
+### Propósito y Filosofía del Sistema (CPSL 2026)
+Este estándar define la arquitectura operativa y el flujo de datos para dos herramientas de baja fricción cognitiva («cero pereza») diseñadas para garantizar tasas de respuesta superiores al 90%, erradicando la fatiga de encuestas y sosteniendo la excelencia sin quemar al equipo voluntario:
+1.  **Micro-Pulsos Aleatorios de 3 Preguntas** para el Staff de Sede (Aliados, Mánagers, Capitanes, QT).
+2.  **Reporte Relámpago Post-FDS** para los Gerentes de Sede (Nivel 8).
+
+---
+
+### 1. MICRO-PULSOS ALEATORIOS DE 3 PREGUNTAS (STAFF)
+
+#### A. La Filosofía del «Micro-Anclaje»
+*   **Fácil de responder:** Solo **3 preguntas** de opción múltiple (Escala Likert 1-5 o Sí/No) y un campo de texto opcional.
+*   **Tiempo de llenado:** Menos de **30 segundos** desde la App móvil Nodus o enlace web.
+*   **Selección inteligente:** El backend de Nodus selecciona dinámicamente y al azar 1 pregunta de cada uno de los 3 bloques maestros (pool de 12 variables).
+
+#### B. Horarios Operativos y Cadencia de Envío
+*   **Disparador Automático:** **Lunes a las 11:00 AM** posterior al entrenamiento.
+    *   *Justificación operativa:* El staff descansó el domingo por la noche, cerró su participación física en sala y procesa el fin de semana en el «efecto lunes» con la mente fría y sin cansancio reactivo.
+*   **Ventana de Respuesta Innegociable:** Activa únicamente hasta el **Martes a las 18:00 PM**. Cero prórrogas. Al ser de 30 segundos, quien no responde en 31 horas evidencia desconexión con el contenedor.
+
+#### C. Pool de Preguntas Rotativas (Backend Nodus)
+*   **Bloque 1: Seguridad Psicológica (Escala Edmondson Adaptada)**
+    *   *P1.1:* ¿Sientes que puedes admitir un error operativo en el staff de tu sede sin temor a ser juzgado o señalado? [Sí / No]
+    *   *P1.2:* ¿Es seguro asumir riesgos o proponer dinámicas diferentes dentro de tu equipo de staff? [Sí / No]
+    *   *P1.3:* En los últimos 3 días, ¿sentiste que algún líder o coordinador intentó invalidar tus opiniones o ideas? [Sí / No]
+    *   *P1.4:* ¿Sientes que el equipo de tu sede cuida de ti y de tu bienestar bajo presión? [Sí / No]
+*   **Bloque 2: Calidad de Liderazgo (Project Oxygen Google Adaptado)**
+    *   *P2.1:* Mi Coordinador me dio feedback claro, específico y libre de drama durante este fin de semana. [Likert 1-5]
+    *   *P2.2:* Mi Coordinador me dio autonomía operativa y confió en mis capacidades (cero micromanagement). [Likert 1-5]
+    *   *P2.3:* Mi Coordinador mantuvo al equipo enfocado y sosteniendo el contenedor de energía en sala de forma asertiva. [Likert 1-5]
+    *   *P2.4:* Mi Coordinador priorizó el servicio y la fisonomía de los participantes por encima de su propio ego o lucimiento. [Likert 1-5]
+*   **Bloque 3: Fricción y Masa Burocrática (Humanocracy Adaptada)**
+    *   *P3.1:* ¿Tuviste que perder tiempo valioso en sala llenando reportes repetitivos o esperando aprobaciones administrativas lentas? [Sí / No]
+    *   *P3.2:* ¿Los baúles e insumos logísticos de tu rol estaban en estado absoluto de excelencia y listos para operar? [Sí / No]
+    *   *P3.3:* ¿Qué proceso de la sede consideras que deberíamos **DETENER (Stop)** de inmediato porque genera pereza o quita energía? [Texto Corto - Opcional]
+    *   *P3.4:* ¿Tuviste la fisionomía del reloj y el control de tus tiempos operativos bajo control este fin de semana? [Sí / No]
+
+---
+
+### 2. REPORTE RELÁMPAGO POST-FDS (GERENTES DE SEDE)
+
+#### A. Horarios Operativos y Cadencia Rigurosa
+*   **Habilitación en Nodus:** **Domingo a las 21:00 PM** (inmediatamente al cerrarse las puertas del salón y concluir el arqueo POS).
+*   **Deadline Innegociable de Cierre:** **Lunes a las 12:00 PM (Mediodía)**.
+*   **Integración y Candado Contable:** La entrega de este reporte es **prerrequisito obligatorio** para que Causa OS y Nodus liberen el flujo contable y presupuestario del siguiente fin de semana de la sede.
+
+#### B. El Formulario de 5 Puntos (<3 Minutos)
+1.  **Evaluación del Entrenador (Fisonomía en Sala):** Calificación 1-5. Criterio: ética, reloj y fisonomía de transformación sin drama. Comentario relámpago máx 150 caracteres.
+2.  **Logística e Infraestructura de Sede:** Calificación 1-5. Criterio: hotel, climatización, acústica, baños y baúles. Comentario relámpago máx 150 caracteres.
+3.  **Energía y Alineación del Staff:** Calificación 1-5. Criterio: puntualidad en groundings, vestimenta negra impecable y fisonomía de servicio. Comentario relámpago máx 150 caracteres.
+4.  **Indicadores de Retención Real (Nodus Automático):** Sentados C1/C2/MJ vs. Graduados. Cálculo automático de Tasa de Retención Operativa (TRO): `(Graduados / Sentados) * 100`.
+5.  **Quiebres Críticos y Alertas de Escalamiento:**
+    *   [ ] Ninguno (Todo impecable).
+    *   [ ] Quiebre de Salud / Emergencia Médica en sala.
+    *   [ ] Quiebre Financiero / Descuadre de Caja de Sede.
+    *   [ ] Palabra Rota Crítica del Staff o Coordinación.
+    *   [ ] Deserción de Mánagers o abandono de rol.
+    *   *Detalle de Alerta:* Solo si hay alerta (máx 200 caracteres).
+
+---
+
+### 3. ARQUITECTURA DE DATOS (ENDPOINTS JSON)
+*   **POST /api/v1/causa-os/micro-pulso/responder**: Envío de las 3 respuestas del staff con `staff_id`, `sede_id`, `ciclo_id`, y el desglose de preguntas.
+*   **POST /api/v1/causa-os/reporte-fds/enviar**: Envío del reporte del Gerente con `gerente_id`, `evaluacion`, `kpis_validados` y `alertas`.
+
+---
+
+### 4. DASHBOARD DE EVOLUCIÓN ORGANIZACIONAL (CAUSA OS)
+1.  **Temperatura de Seguridad Psicológica de la Sede:** Si el promedio de respuestas positivas en el Bloque 1 de una sede cae por debajo del 85%, el sistema dispara una alerta silenciosa al Gerente Global para intervenir el estilo de liderazgo del coordinador local antes de que ocurra deserción de voluntarios.
+2.  **Calificación de Desempeño del Entrenador (Rider de Calidad):** Cruza la evaluación cualitativa de los gerentes con las tasas de retención (TRO) para el ranking histórico de entrenadores.
+3.  **Optimización de Procesos (Trim & Stack):** El campo P3.3 («Qué detener - Stop») alimenta el buzón de erradicación de burocracia para simplificar la plataforma de forma continua.
+
+---
+*Fin de la Sección 18 — Sistema de Escucha Activa y Reporte Relámpago Post-FDS (Causa OS).*
+
 `;

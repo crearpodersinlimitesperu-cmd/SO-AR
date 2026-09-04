@@ -197,9 +197,19 @@ function App() {
           } />
 
           <Route path="/reportes" element={
-            <RoleRoute allowedRoles={['gerente', 'coord_c1', 'coord_maestria', 'capitan', 'qt', 'direccion', 'director_maestria']}>
+            <RoleRoute allowedRoles={['gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'capitan', 'qt', 'direccion', 'director_maestria', 'aliado', 'manager', 'consolidado', 'superadmin', 'cfo', 'ceo', 'cco']}>
               <ReportesBoard />
             </RoleRoute>
+          } />
+          <Route path="/micro-pulso" element={
+            <PrivateRoute>
+              <ReportesBoard />
+            </PrivateRoute>
+          } />
+          <Route path="/reporte-relampago" element={
+            <PrivateRoute>
+              <ReportesBoard />
+            </PrivateRoute>
           } />
 
           <Route path="/mis-kpis" element={
