@@ -4,12 +4,13 @@ import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
 import { collection, getDocs, getDoc, updateDoc, doc } from 'firebase/firestore';
 import { db, auth, getDocResilient } from '../services/firebase';
-import { CheckCircle2, AlertCircle, ArrowLeft, Users, Target } from 'lucide-react';
+import { CheckCircle2, AlertCircle, ArrowLeft, Users, Target, PhoneCall } from 'lucide-react';
 import CountryFlag from '../components/CountryFlag';
 import { recordAuditEvent } from '../services/auditService';
 import { OPERATIONAL_SEDES } from '../data/usersData';
 import DriveDashboard from '../components/DriveDashboard';
 import CMJDashboard from '../components/CMJDashboard';
+import NodusCoordinadoresC1C2Dashboard from '../components/NodusCoordinadoresC1C2Dashboard';
 
 export default function AuditoriaKPIs() {
   const { currentUser } = useAuth();
@@ -23,7 +24,7 @@ export default function AuditoriaKPIs() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [isScrapingLive, setIsScrapingLive] = useState(false);
-  const [activeTab, setActiveTab] = useState('cmj'); // 'cmj' or 'entrenadores'
+  const [activeTab, setActiveTab] = useState('coordinadores_nodus'); // 'coordinadores_nodus', 'cmj', 'entrenadores', 'auditoria'
   const sedesDisponibles = ['Todas', ...OPERATIONAL_SEDES];
 
   useEffect(() => {
@@ -495,7 +496,19 @@ export default function AuditoriaKPIs() {
       </div>
 
         {/* Dashboards Integrados Tabs */}
-        <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '1rem' }}>
+        <div style={{ display: 'flex', gap: '0.8rem', marginBottom: '1.5rem', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '1rem', flexWrap: 'wrap' }}>
+          <button
+            onClick={() => setActiveTab('coordinadores_nodus')}
+            style={{
+              padding: '0.6rem 1.2rem', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 'bold',
+              background: activeTab === 'coordinadores_nodus' ? 'rgba(212, 175, 55, 0.15)' : 'transparent',
+              color: activeTab === 'coordinadores_nodus' ? 'var(--crear-gold)' : 'var(--text-muted)',
+              borderBottom: activeTab === 'coordinadores_nodus' ? '2px solid var(--crear-gold)' : '2px solid transparent'
+            }}
+          >
+            <PhoneCall size={16} style={{ display: 'inline-block', verticalAlign: 'text-bottom', marginRight: '6px' }} />
+            Coordinadores C1 & C2 (Nodus Live)
+          </button>
           <button
             onClick={() => setActiveTab('cmj')}
             style={{
@@ -535,87 +548,89 @@ export default function AuditoriaKPIs() {
         </div>
 
         {/* Dashboards Content */}
+        {activeTab === 'coordinadores_nodus' && <NodusCoordinadoresC1C2Dashboard />}
         {activeTab === 'cmj' && <CMJDashboard globalFilterSede={filterSede} />}
         {activeTab === 'entrenadores' && <DriveDashboard globalFilterSede={filterSede} />}
   
-      {/* Barra de Filtros Estilo Nodus */}
-      <div style={{ 
-        background: 'var(--bg-card, #ffffff)', 
-        padding: '1rem', 
-        borderRadius: '12px', 
-        border: '1px solid var(--border-subtle, #e2e8f0)', 
-        marginBottom: '1.5rem',
-        display: 'flex',
-        flexWrap: 'wrap',
-        gap: '1.5rem',
-        alignItems: 'flex-end',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
-      }}>
-        <div style={{ flex: '1 1 200px', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-          <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)' }}>Sede</label>
-          <div style={{ position: 'relative' }}>
-            <span style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#10b981' }}>📍</span>
-            <select 
-              value={filterSede} 
-              onChange={(e) => setFilterSede(e.target.value)}
-              style={{ width: '100%', padding: '0.6rem 1rem 0.6rem 2.2rem', borderRadius: '8px', background: 'var(--bg-dark-alt, #f8fafc)', color: 'var(--text-main, #0f172a)', border: '1px solid var(--border-subtle, #cbd5e1)', fontWeight: 600 }}
-            >
-              <option value="Todas">Todas las Sedes</option>
-              {sedesDisponibles.filter(s => s !== 'Todas').map(s => <option key={s} value={s}>{s}</option>)}
-              <option value="Global">Global</option>
-            </select>
-          </div>
-        </div>
-
-        <div style={{ flex: '1 1 150px', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-          <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)' }}>Desde</label>
-          <input 
-            type="date" 
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            style={{ padding: '0.6rem 1rem', borderRadius: '8px', background: 'var(--bg-dark-alt, #f8fafc)', color: 'var(--text-main, #0f172a)', border: '1px solid var(--border-subtle, #cbd5e1)', fontWeight: 500 }}
-          />
-        </div>
-
-        <div style={{ flex: '1 1 150px', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-          <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)' }}>Hasta</label>
-          <input 
-            type="date" 
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            style={{ padding: '0.6rem 1rem', borderRadius: '8px', background: 'var(--bg-dark-alt, #f8fafc)', color: 'var(--text-main, #0f172a)', border: '1px solid var(--border-subtle, #cbd5e1)', fontWeight: 500 }}
-          />
-        </div>
-
-        <div style={{ flex: '0 1 auto' }}>
-          <button 
-            onClick={handleLiveFilter}
-            disabled={isScrapingLive}
-            style={{ 
-              padding: '0.6rem 2rem', 
-              borderRadius: '8px', 
-              background: '#ffffff', 
-              color: '#0ea5e9', 
-              border: '1px solid #0ea5e9', 
-              fontWeight: 700,
-              cursor: isScrapingLive ? 'wait' : 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              opacity: isScrapingLive ? 0.7 : 1
-            }}
-          >
-            {isScrapingLive ? (
-              <>⏳ Filtrando...</>
-            ) : (
-              <>▽ Filtrar</>
-            )}
-          </button>
-        </div>
-      </div>
-
+      {/* Sección Legacy Auditoría de KPIs (solo cuando la tab está activa) */}
       {activeTab === 'auditoria' && (
-        <div className="glass-panel" style={{ padding: '2rem', borderRadius: '16px', background: 'var(--bg-card, #ffffff)', border: '1px solid var(--border-subtle, #e2e8f0)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+        <>
+          <div style={{ 
+            background: 'var(--bg-card, #ffffff)', 
+            padding: '1rem', 
+            borderRadius: '12px', 
+            border: '1px solid var(--border-subtle, #e2e8f0)', 
+            marginBottom: '1.5rem',
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '1.5rem',
+            alignItems: 'flex-end',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+          }}>
+            <div style={{ flex: '1 1 200px', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)' }}>Sede</label>
+              <div style={{ position: 'relative' }}>
+                <span style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#10b981' }}>📍</span>
+                <select 
+                  value={filterSede} 
+                  onChange={(e) => setFilterSede(e.target.value)}
+                  style={{ width: '100%', padding: '0.6rem 1rem 0.6rem 2.2rem', borderRadius: '8px', background: 'var(--bg-dark-alt, #f8fafc)', color: 'var(--text-main, #0f172a)', border: '1px solid var(--border-subtle, #cbd5e1)', fontWeight: 600 }}
+                >
+                  <option value="Todas">Todas las Sedes</option>
+                  {sedesDisponibles.filter(s => s !== 'Todas').map(s => <option key={s} value={s}>{s}</option>)}
+                  <option value="Global">Global</option>
+                </select>
+              </div>
+            </div>
+
+            <div style={{ flex: '1 1 150px', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)' }}>Desde</label>
+              <input 
+                type="date" 
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                style={{ padding: '0.6rem 1rem', borderRadius: '8px', background: 'var(--bg-dark-alt, #f8fafc)', color: 'var(--text-main, #0f172a)', border: '1px solid var(--border-subtle, #cbd5e1)', fontWeight: 500 }}
+              />
+            </div>
+
+            <div style={{ flex: '1 1 150px', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)' }}>Hasta</label>
+              <input 
+                type="date" 
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                style={{ padding: '0.6rem 1rem', borderRadius: '8px', background: 'var(--bg-dark-alt, #f8fafc)', color: 'var(--text-main, #0f172a)', border: '1px solid var(--border-subtle, #cbd5e1)', fontWeight: 500 }}
+              />
+            </div>
+
+            <div style={{ flex: '0 1 auto' }}>
+              <button 
+                onClick={handleLiveFilter}
+                disabled={isScrapingLive}
+                style={{ 
+                  padding: '0.6rem 2rem', 
+                  borderRadius: '8px', 
+                  background: '#ffffff', 
+                  color: '#0ea5e9', 
+                  border: '1px solid #0ea5e9', 
+                  fontWeight: 700,
+                  cursor: isScrapingLive ? 'wait' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  opacity: isScrapingLive ? 0.7 : 1
+                }}
+              >
+                {isScrapingLive ? (
+                  <>⏳ Filtrando...</>
+                ) : (
+                  <>▽ Filtrar</>
+                )}
+              </button>
+            </div>
+          </div>
+
+          <div className="glass-panel" style={{ padding: '2rem', borderRadius: '16px', background: 'var(--bg-card, #ffffff)', border: '1px solid var(--border-subtle, #e2e8f0)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
         
         {/* GLOBAL DEBUG BLOCK A NIVEL PÁGINA */}
         <div style={{ display: 'none', background: '#1a1a1a', padding: '15px', marginBottom: '20px', borderRadius: '8px', border: '2px solid #00ff00' }}>
@@ -756,6 +771,7 @@ export default function AuditoriaKPIs() {
           </div>
         )}
       </div>
+      </>
       )}
     </div>
   );

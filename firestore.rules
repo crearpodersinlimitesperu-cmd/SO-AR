@@ -259,9 +259,18 @@ service cloud.firestore {
       allow create: if isAuthenticated();
     }
 
-    // NODUS: se mantiene el mecanismo de token del robot (no requiere sesi├│n porque
-    // es un script, no una persona), pero ahora la lectura s├¡ exige sesi├│n iniciada.
+    // NODUS: mecanismo seguro de token del robot para sincronización horaria autónoma
     match /nodus_kpis_sincronizados/{document=**} {
+      allow read: if isAuthenticated();
+      allow write: if request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET";
+    }
+
+    match /nodus_coordinadores_c1c2/{document=**} {
+      allow read: if isAuthenticated();
+      allow write: if request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET";
+    }
+
+    match /nodus_kpis_history/{document=**} {
       allow read: if isAuthenticated();
       allow write: if request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET";
     }

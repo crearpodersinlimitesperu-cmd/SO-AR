@@ -17,7 +17,9 @@
     "bot:sync": "node scripts/causa_sync_bot.mjs",
     "bot:omni": "node scripts/causa_omni_auditor.mjs",
     "audit:platform": "node scripts/platform_audit.mjs",
-    "flyer:generate": "node scripts/generar_flyer.mjs"
+    "flyer:generate": "node scripts/generar_flyer.mjs",
+    "sync:nodus": "node scripts/nodusMultiAgentSync.mjs",
+    "daemon:nodus": "node scripts/nodusDaemon.mjs"
   },
   "dependencies": {
     "cors": "^2.8.6",
