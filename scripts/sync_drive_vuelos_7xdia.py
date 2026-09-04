@@ -109,7 +109,7 @@ def sync_from_drive():
                 supportsAllDrives=True,
                 includeItemsFromAllDrives=True,
                 corpora='allDrives',
-                fields='nextPageToken, files(id, name, mimeType, size, modifiedTime, webViewLink)',
+                fields='nextPageToken, files(id, name, mimeType, size, modifiedTime, webViewLink, shortcutDetails)',
                 pageSize=100,
                 pageToken=page_token
             ).execute()
@@ -120,6 +120,16 @@ def sync_from_drive():
                     f['folder_label'] = folder_name
                     f['folder_path'] = path
                     files.append(f)
+                elif f.get('mimeType') == 'application/vnd.google-apps.shortcut':
+                    target_id = f.get('shortcutDetails', {}).get('targetId')
+                    target_mime = f.get('shortcutDetails', {}).get('targetMimeType')
+                    if target_mime == 'application/vnd.google-apps.folder':
+                        files.extend(list_folder(target_id, folder_name, path + " / " + f['name'] + " (Shortcut)"))
+                    elif target_mime == 'application/pdf':
+                        f['id'] = target_id
+                        f['folder_label'] = folder_name
+                        f['folder_path'] = path + " (Shortcut)"
+                        files.append(f)
             page_token = res.get('nextPageToken')
             if not page_token:
                 break
@@ -311,17 +321,17 @@ def sync_from_drive():
             os.makedirs(os.path.dirname(p), exist_ok=True)
             with open(p, 'w', encoding='utf-8') as f:
                 json.dump(output_tracker, f, indent=2, ensure_ascii=False)
-            print(f"✅ Sincronizado en: {p}")
+            print(f"Sincronizado en: {p}")
         except Exception as e:
-            print(f"⚠️ Error escribiendo {p}: {e}")
+            print(f"Error escribiendo {p}: {e}")
 
-    print(f"🎉 Sincronización exitosa: {len(all_flights)} vuelos compilados.")
+    print(f"Sincronizacion exitosa: {len(all_flights)} vuelos compilados.")
     return len(all_flights)
 
 def run_loop():
     print("=" * 65)
-    print("🚀 DAEMON INICIADO: SINCRONIZADOR DE VUELOS CREAR PODER SIN LÍMITES")
-    print("Frecuencia: 7 veces al día (Intervalo: cada ~3.4 horas)")
+    print("DAEMON INICIADO: SINCRONIZADOR DE VUELOS CREAR PODER SIN LIMITES")
+    print("Frecuencia: 7 veces al dia (Intervalo: cada ~3.4 horas)")
     print("=" * 65)
 
     # 7 runs per day: 24h / 7 = 3.428 hours = ~12342 seconds
@@ -331,10 +341,10 @@ def run_loop():
         try:
             sync_from_drive()
         except Exception as e:
-            print(f"❌ Error durante sincronización: {e}")
+            print(f"Error durante sincronizacion: {e}")
 
         next_run = datetime.fromtimestamp(time.time() + INTERVAL_SECONDS).strftime('%Y-%m-%d %H:%M:%S')
-        print(f"💤 Próxima sincronización programada para: {next_run}")
+        print(f"Proxima sincronizacion programada para: {next_run}")
         time.sleep(INTERVAL_SECONDS)
 
 if __name__ == "__main__":
