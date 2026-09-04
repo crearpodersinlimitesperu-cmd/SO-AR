@@ -60,6 +60,73 @@ const transporter = nodemailer.createTransport({
 
 const isOneShot = process.argv.includes('--one-shot');
 
+// --- 2.1 GENERACIÓN DE INVITACIÓN DE CALENDARIO (.ics) — (04/09/2026) ---
+// José pidió que los correos de tarea asignada incluyan el mismo tipo de
+// botón "Añadir al calendario" que Gmail muestra automáticamente en correos
+// de aerolíneas/reservas. ACLARACIÓN dada a José: esa tarjeta especial de
+// Gmail requiere que Google apruebe al remitente en su programa de "Schema.org
+// Markup for Gmail" — un proceso externo que no se puede activar desde código.
+// Lo que SÍ es 100% controlable desde aquí, y logra el mismo resultado
+// práctico (botón de "Añadir al calendario" en Gmail/Outlook), es adjuntar un
+// archivo .ics estándar (RFC 5545) al correo — el mecanismo que usan las
+// invitaciones de reuniones. No requiere ninguna librería nueva: se arma el
+// texto del archivo a mano, que es sencillo para un solo evento.
+//
+// Se usa METHOD:PUBLISH (no REQUEST) porque esto es una fecha límite propia
+// del destinatario, no una reunión que requiera confirmar asistencia (no hay
+// ORGANIZER/ATTENDEE ni RSVP). Duración por defecto: 30 minutos a partir de
+// la fecha límite de la tarea — un recordatorio puntual, no un bloque de
+// trabajo (RECOMENDACIÓN de José aceptada implícitamente; si se prefiere otra
+// duración, es un solo número que cambiar aquí: DEFAULT_EVENT_DURATION_MIN).
+const DEFAULT_EVENT_DURATION_MIN = 30;
+
+function toIcsUtcDate(isoOrDate) {
+  const d = isoOrDate instanceof Date ? isoOrDate : new Date(isoOrDate);
+  if (isNaN(d.getTime())) return null;
+  return d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+}
+
+// Escapa texto para campos de una sola línea del formato ICS (RFC 5545 §3.3.11).
+function escapeIcsText(text) {
+  return String(text || '')
+    .replace(/\\/g, '\\\\')
+    .replace(/;/g, '\\;')
+    .replace(/,/g, '\\,')
+    .replace(/\n/g, '\\n');
+}
+
+function buildIcsAttachment(calendarEvent) {
+  if (!calendarEvent || !calendarEvent.deadline) return null;
+  const dtStart = toIcsUtcDate(calendarEvent.deadline);
+  if (!dtStart) return null;
+  const dtEnd = toIcsUtcDate(new Date(new Date(calendarEvent.deadline).getTime() + DEFAULT_EVENT_DURATION_MIN * 60000));
+  const dtStamp = toIcsUtcDate(new Date());
+  const uid = `${calendarEvent.taskId || 'so-ar'}-${Date.now()}@crearpsl.net`;
+
+  const lines = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//SO-AR//Causa OS//ES',
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH',
+    'BEGIN:VEVENT',
+    `UID:${uid}`,
+    `DTSTAMP:${dtStamp}`,
+    `DTSTART:${dtStart}`,
+    `DTEND:${dtEnd}`,
+    `SUMMARY:${escapeIcsText(calendarEvent.title)}`,
+    `DESCRIPTION:${escapeIcsText(calendarEvent.description || 'Tarea de SO-AR — CREAR Poder Sin Límites.')}`,
+    'STATUS:CONFIRMED',
+    'END:VEVENT',
+    'END:VCALENDAR'
+  ];
+  return {
+    filename: 'tarea-so-ar.ics',
+    content: lines.join('\r\n'),
+    contentType: 'text/calendar; charset=utf-8; method=PUBLISH'
+  };
+}
+
 async function processMailDoc(docSnap) {
   const data = docSnap.data();
   if (data.delivery && data.delivery.state) return;
@@ -135,6 +202,14 @@ async function processMailDoc(docSnap) {
     subject: data.message?.subject || 'Notificación SO-AR — CREAR Poder Sin Límites',
     html: cleanHtml
   };
+
+  // nodemailer arma el adjunto .ics correctamente por sí solo a partir de
+  // "icalEvent" (no hace falta también agregarlo a mano en "attachments" —
+  // eso duplicaría el archivo en el correo).
+  const icsAttachment = buildIcsAttachment(data.calendarEvent);
+  if (icsAttachment) {
+    mailOptions.icalEvent = { method: 'PUBLISH', filename: icsAttachment.filename, content: icsAttachment.content };
+  }
 
   try {
     await transporter.sendMail(mailOptions);

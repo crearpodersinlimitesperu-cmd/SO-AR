@@ -10,7 +10,7 @@ const getEventSyncId = (ev) =>
 const CyclesContext = createContext();
 
 export function CyclesProvider({ children }) {
-  const { currentUser } = useAuth();
+  const { currentUser, reauthenticateGoogle } = useAuth();
   const [currentCycle, setCurrentCycle] = useState(null);
   const [currentStage, setCurrentStage] = useState('CARGANDO...');
   const [events, setEvents] = useState([]);
@@ -229,7 +229,12 @@ export function CyclesProvider({ children }) {
   // que moverlo a una colección de Firestore — no se hizo así todavía porque
   // no se pidió explícitamente.
   const syncEventsToGoogle = async (eventsToSync, ownerEmail) => {
-    const token = sessionStorage.getItem('googleAccessToken');
+    let token = sessionStorage.getItem('googleAccessToken');
+    if (!token) {
+      // (04/09/2026) Antes fallaba directo con "no_token" — ahora intenta
+      // primero un popup corto de reautenticación con Google.
+      token = await reauthenticateGoogle();
+    }
     if (!token) {
       return { success: false, error: 'no_token' };
     }

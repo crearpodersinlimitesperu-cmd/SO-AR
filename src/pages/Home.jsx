@@ -605,7 +605,7 @@ const getCountdownInfo = (deadlineIso, now) => {
 };
 
 export default function Home() {
-  const { currentUser, logout, switchRole } = useAuth();
+  const { currentUser, logout, switchRole, reauthenticateGoogle } = useAuth();
   const { currentCycle, currentStage, events, loadingEvents } = useCycles();
   const { tasks: allTasks, loading: loadingTasks, syncTasksToGoogle, acceptCollaboration, rejectCollaboration } = useChecklist();
   const { showToast, viewMode, setViewMode, customModules } = useUI();
@@ -690,7 +690,13 @@ export default function Home() {
   }, []);
 
   const handleAddEventToGoogle = async (ev, startDate, endDate) => {
-    const token = sessionStorage.getItem('googleAccessToken');
+    let token = sessionStorage.getItem('googleAccessToken');
+    if (!token) {
+      // (04/09/2026) Antes se seguía sin token (createGoogleEvent caía al
+      // enlace manual de Google Calendar) — ahora intenta primero un popup
+      // corto de reautenticación para poder usar la API directamente.
+      token = await reauthenticateGoogle();
+    }
     const hotelLocation = getVenueForTraining(ev.sede || ev.sedeTag || currentUser?.sede, ev.nombre || ev.name, ev.lugar, ev.direccion);
     
     const result = await createGoogleEvent({

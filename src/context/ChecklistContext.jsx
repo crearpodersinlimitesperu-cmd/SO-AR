@@ -30,7 +30,7 @@ export function ChecklistProvider({ children }) {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const { showToast, showPrompt } = useUI();
-  const { currentUser } = useAuth();
+  const { currentUser, reauthenticateGoogle } = useAuth();
   // (28/08/2026, restaurado 29/08/2026) CORRECCIÓN: antes calculateAutomaticDeadline()
   // se llamaba SIN el ciclo activo real, así que siempre usaba el único ciclo de
   // ejemplo hardcodeado en src/data/cyclesData.js ("Equipo 30", fechas fijas) para
@@ -246,6 +246,16 @@ export function ChecklistProvider({ children }) {
                 <br/>
                 <p><em>Equipo CREAR Poder Sin Límites</em></p>
               `
+            },
+            // (04/09/2026) José pidió que estos correos incluyan el botón de
+            // "Añadir al calendario" de Gmail/Outlook — mailerDaemon.js arma
+            // el adjunto .ics a partir de este campo (si no hay "deadline",
+            // simplemente no adjunta nada, no rompe el envío del correo).
+            calendarEvent: {
+              taskId: customId,
+              title: taskData.task || taskData.title,
+              deadline: taskData.deadline || null,
+              description: `Tarea SO-AR — Sede: ${taskData.assignedSede || 'Global'}. Prioridad: ${taskData.priority || 'Normal'}.`
             }
           });
         });
@@ -315,6 +325,12 @@ export function ChecklistProvider({ children }) {
                 <br/>
                 <p><em>Equipo CREAR Poder Sin Límites</em></p>
               `
+          },
+          calendarEvent: {
+            taskId: taskId,
+            title: updatedData.task || currentTask.task,
+            deadline: updatedData.deadline || currentTask.deadline || null,
+            description: `Tarea SO-AR — Sede: ${updatedData.assignedSede || currentTask.assignedSede || 'Global'}. Prioridad: ${updatedData.priority || currentTask.priority || 'Normal'}.`
           }
         });
       });
@@ -348,6 +364,12 @@ export function ChecklistProvider({ children }) {
                 <br/>
                 <p><em>Equipo CREAR Poder Sin Límites</em></p>
               `
+            },
+            calendarEvent: {
+              taskId: taskId,
+              title: updatedData.task || currentTask.task,
+              deadline: updatedData.deadline || currentTask.deadline || null,
+              description: `Tarea SO-AR — Sede: ${updatedData.assignedSede || currentTask.assignedSede || 'Global'}. Prioridad: ${updatedData.priority || currentTask.priority || 'Normal'}.`
             }
           });
         });
@@ -460,9 +482,14 @@ export function ChecklistProvider({ children }) {
   };
 
   const syncTasksToGoogle = async (roleId) => {
-    const token = sessionStorage.getItem('googleAccessToken');
+    let token = sessionStorage.getItem('googleAccessToken');
     if (!token) {
-      showToast("No se encontró sesión con permisos de Google. Por favor, cierra sesión y vuelve a entrar.", "error");
+      // (04/09/2026) Antes esto obligaba a cerrar sesión completa — ahora se
+      // intenta primero un popup corto de reautenticación con Google.
+      token = await reauthenticateGoogle();
+    }
+    if (!token) {
+      showToast("No se pudo conectar con Google. Intenta el popup de nuevo o cierra sesión y vuelve a entrar.", "error");
       return;
     }
 

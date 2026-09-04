@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { auth } from '../services/firebase';
-import { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'firebase/auth';
+import { signInWithPopup, reauthenticateWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'firebase/auth';
 import { collection, query, where, getDocs, doc, getDoc, setDoc, serverTimestamp, addDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { normalizeRole, ROLE_DISPLAY_NAMES, findUserByAnyEmail } from '../data/usersData';
@@ -207,14 +207,42 @@ export function AuthProvider({ children }) {
     };
   };
 
+  // (04/09/2026) José reportó el error "No se encontró sesión con permisos
+  // de Google. Por favor, cierra sesión y vuelve a entrar." — el token de
+  // acceso de Google (sessionStorage.googleAccessToken) dura ~1 hora y no
+  // hay forma de refrescarlo automáticamente, así que cualquier intento de
+  // usar Calendar/Tasks después de esa hora fallaba y obligaba a cerrar
+  // sesión completa. Esta función hace lo mismo que loginWithGoogle pero con
+  // reauthenticateWithPopup (un popup corto, sin perder la sesión de la app
+  // ni recargar la página) — los 3 lugares que leen googleAccessToken la
+  // llaman como respaldo automático cuando no encuentran el token.
+  const reauthenticateGoogle = async () => {
+    if (!auth.currentUser) return null;
+    const provider = new GoogleAuthProvider();
+    provider.addScope('https://www.googleapis.com/auth/calendar.events');
+    provider.addScope('https://www.googleapis.com/auth/tasks');
+    try {
+      const result = await reauthenticateWithPopup(auth.currentUser, provider);
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      if (credential && credential.accessToken) {
+        sessionStorage.setItem('googleAccessToken', credential.accessToken);
+        return credential.accessToken;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error reautenticando con Google:', error);
+      return null;
+    }
+  };
+
   const loginWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
     provider.addScope('https://www.googleapis.com/auth/calendar.events');
     provider.addScope('https://www.googleapis.com/auth/tasks');
-    
+
     try {
       const result = await signInWithPopup(auth, provider);
-      
+
       // Extract Google Access Token for API calls
       const credential = GoogleAuthProvider.credentialFromResult(result);
       if (credential && credential.accessToken) {
@@ -470,7 +498,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ currentUser, originalAdminUser, loginWithGoogle, logout, loading, switchRole, simulateUser, stopSimulation }}>
+    <AuthContext.Provider value={{ currentUser, originalAdminUser, loginWithGoogle, reauthenticateGoogle, logout, loading, switchRole, simulateUser, stopSimulation }}>
       {!loading && children}
     </AuthContext.Provider>
   );
