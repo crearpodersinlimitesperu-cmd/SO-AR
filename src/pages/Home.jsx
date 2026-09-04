@@ -920,25 +920,41 @@ export default function Home() {
   };
 
   // ==========================================================================
-  // TAREAS QUE HAS ASIGNADO A OTROS (28/08/2026)
+  // TAREAS QUE HAS ASIGNADO A OTROS + TAREAS QUE TE ASIGNARON A TI (28/08/2026,
+  // ampliado 04/09/2026 a pedido de José: "podrían ir también las que me
+  // asignan")
   // --------------------------------------------------------------------------
   // "tasks" (allTasks) ya trae TODA la colección "tasks" de Firestore sin
   // filtrar (ChecklistContext hace onSnapshot sobre la colección completa),
-  // así que no hace falta una consulta nueva: solo filtramos por
-  // createdBy === mi correo. INFERENCIA sobre el alcance pedido ("todos los
-  // usuarios pueden ver las tareas que han asignado a otros"): se interpretó
-  // como "cada usuario ve las tareas QUE ÉL MISMO asignó", no un tablero
-  // global de todas las asignaciones de todos — si José quería lo segundo,
-  // hay que ajustarlo.
+  // así que no hace falta una consulta nueva. Se combinan dos grupos:
+  //   1. Tareas donde createdBy === mi correo (las que YO asigné a otros).
+  //   2. Tareas donde YO aparezco en assignedToEmails/assignedToEmail/
+  //      collaborators (las que ME asignaron a mí), EXCLUYENDO las que yo
+  //      mismo creé (para no duplicar una tarea que me autoasigné).
+  // Cada tarea queda marcada con __direction ('asignada_por_mi' |
+  // 'asignada_a_mi') para poder distinguirlas visualmente y para que el
+  // botón "Editar" solo aparezca en las que yo creé (regla confirmada por
+  // José: solo el creador de la tarea puede editarla).
   const userDisplayNameByEmail = {};
   (realUsersData || []).forEach(u => {
     if (u.email) userDisplayNameByEmail[u.email.toLowerCase().trim()] = u.name || u.displayName || u.email;
   });
   const resolveAssigneeName = (email) => userDisplayNameByEmail[(email || '').toLowerCase().trim()] || email;
 
-  const tareasQueHeAsignado = (allTasks || [])
-    .filter(t => (t.createdBy || '').toLowerCase().trim() === userEmail && userEmail)
-    .slice()
+  const tareasQueHeAsignado = [
+    ...(allTasks || [])
+      .filter(t => (t.createdBy || '').toLowerCase().trim() === userEmail && userEmail)
+      .map(t => ({ ...t, __direction: 'asignada_por_mi' })),
+    ...(allTasks || [])
+      .filter(t => {
+        const yaEsCreador = (t.createdBy || '').toLowerCase().trim() === userEmail;
+        if (yaEsCreador || !userEmail) return false; // evita duplicar autoasignadas
+        return (t.assignedToEmails && t.assignedToEmails.some(e => e.toLowerCase().trim() === userEmail)) ||
+               (t.assignedToEmail && t.assignedToEmail.toLowerCase().trim() === userEmail) ||
+               (t.collaborators && t.collaborators.map(c => c.toLowerCase().trim()).includes(userEmail));
+      })
+      .map(t => ({ ...t, __direction: 'asignada_a_mi' }))
+  ]
     .sort((a, b) => {
       const da = a.deadline ? new Date(a.deadline).getTime() : Infinity;
       const dbTime = b.deadline ? new Date(b.deadline).getTime() : Infinity;
@@ -2211,7 +2227,7 @@ export default function Home() {
             return (
             <div className="glass-panel" style={{ padding: '1.2rem', marginBottom: '2rem' }}>
               <h3 className="text-blue" style={{ marginTop: 0, borderBottom: '1px solid rgba(0,212,255,0.2)', paddingBottom: '0.4rem', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                📋 TAREAS QUE HAS ASIGNADO ({tareasQueHeAsignado.length})
+                📋 MIS TAREAS ASIGNADAS ({tareasQueHeAsignado.length})
               </h3>
               <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginTop: '0.8rem' }}>
                 {['Activas', 'Vencidas', 'Cumplidas', 'Todas'].map(f => (
@@ -2240,6 +2256,7 @@ export default function Home() {
                     ? task.assignedToEmails
                     : (task.assignedToEmail ? [task.assignedToEmail] : []);
                   const asignadosLabel = emails.length > 0 ? emails.map(resolveAssigneeName).join(', ') : 'Cualquiera en el rol';
+                  const esCreador = task.__direction === 'asignada_por_mi';
 
                   return (
                     <div
@@ -2254,9 +2271,18 @@ export default function Home() {
                       <div style={{ flex: 1, minWidth: '160px' }}>
                         <span className="text-white" style={{ fontSize: '0.85rem', fontWeight: 600, display: 'block' }}>
                           {isDone ? '✅ ' : ''}{task.task || task.title}
+                          <span style={{
+                            marginLeft: '0.5rem', fontSize: '0.65rem', fontWeight: 700, padding: '0.1rem 0.45rem',
+                            borderRadius: '10px', verticalAlign: 'middle',
+                            background: esCreador ? 'rgba(41, 171, 226, 0.15)' : 'rgba(255, 193, 7, 0.15)',
+                            color: esCreador ? 'var(--crear-cyan)' : '#ffc107',
+                            border: `1px solid ${esCreador ? 'rgba(41, 171, 226, 0.4)' : 'rgba(255, 193, 7, 0.4)'}`
+                          }}>
+                            {esCreador ? '→ TÚ ASIGNASTE' : '← TE ASIGNARON'}
+                          </span>
                         </span>
                         <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                          👤 Asignada a: {asignadosLabel}
+                          {esCreador ? `👤 Asignada a: ${asignadosLabel}` : `👤 Asignada por: ${resolveAssigneeName(task.createdBy)}`}
                         </span>
                       </div>
                       {!isDone && (
@@ -2269,17 +2295,19 @@ export default function Home() {
                           {countdown.label}
                         </span>
                       )}
-                      <button
-                        onClick={() => { setTaskBeingEdited(task); setShowTaskModal(true); }}
-                        title="Editar tarea"
-                        style={{
-                          background: 'rgba(41, 171, 226, 0.12)', border: '1px solid rgba(41, 171, 226, 0.4)',
-                          borderRadius: '6px', padding: '0.3rem 0.6rem', fontSize: '0.72rem', fontWeight: 700,
-                          color: 'var(--crear-cyan)', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0
-                        }}
-                      >
-                        ✏️ Editar
-                      </button>
+                      {esCreador && (
+                        <button
+                          onClick={() => { setTaskBeingEdited(task); setShowTaskModal(true); }}
+                          title="Editar tarea"
+                          style={{
+                            background: 'rgba(41, 171, 226, 0.12)', border: '1px solid rgba(41, 171, 226, 0.4)',
+                            borderRadius: '6px', padding: '0.3rem 0.6rem', fontSize: '0.72rem', fontWeight: 700,
+                            color: 'var(--crear-cyan)', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0
+                          }}
+                        >
+                          ✏️ Editar
+                        </button>
+                      )}
                     </div>
                   );
                 })}
