@@ -8,8 +8,7 @@ export const USERS_TO_IMPORT = [
     ],
     "sede": "Cuenca",
     "emails": [
-      "evelyn.cedillo@crearpsl.net",
-      "evelyn.cedillo@crearpls.com"
+      "evelyn.cedillo@crearpsl.net"
     ],
     "email": "evelyn.cedillo@crearpsl.net"
   },
@@ -22,10 +21,9 @@ export const USERS_TO_IMPORT = [
     ],
     "sede": "Cuenca",
     "emails": [
-      "viviana.catota@crearpls.com",
       "viviana.catota@crearpsl.net"
     ],
-    "email": "viviana.catota@crearpls.com"
+    "email": "viviana.catota@crearpsl.net"
   },
   {
     "id": "staff_joaoalfonsotrujillo",
@@ -36,8 +34,7 @@ export const USERS_TO_IMPORT = [
     ],
     "sede": "Cuenca",
     "emails": [
-      "alfonso.trujillo@crearpsl.net",
-      "alfonso.trujillo@crearpls.com"
+      "alfonso.trujillo@crearpsl.net"
     ],
     "email": "alfonso.trujillo@crearpsl.net"
   },
@@ -50,8 +47,7 @@ export const USERS_TO_IMPORT = [
     ],
     "sede": "Cuenca",
     "emails": [
-      "kerly.carrillo@crearpsl.net",
-      "kerly.carrillo@crearpls.com"
+      "kerly.carrillo@crearpsl.net"
     ],
     "email": "kerly.carrillo@crearpsl.net"
   },
@@ -64,10 +60,9 @@ export const USERS_TO_IMPORT = [
     ],
     "sede": "Cuenca",
     "emails": [
-      "juan.reinoso@crearpls.com",
       "juan.reinoso@crearpsl.net"
     ],
-    "email": "juan.reinoso@crearpls.com"
+    "email": "juan.reinoso@crearpsl.net"
   },
   {
     "id": "staff_emelyjuliettlenchavez",
@@ -78,10 +73,9 @@ export const USERS_TO_IMPORT = [
     ],
     "sede": "Cuenca",
     "emails": [
-      "emely.leon@crearpls.com",
       "emely.leon@crearpsl.net"
     ],
-    "email": "emely.leon@crearpls.com"
+    "email": "emely.leon@crearpsl.net"
   },
   {
     "id": "staff_alexispatricioternsnchez",

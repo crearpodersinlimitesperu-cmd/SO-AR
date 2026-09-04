@@ -136,8 +136,7 @@ export const canAssignTrainer = (currentUser) => {
   // Fer y Paul autorizados exclusivamente
   const allowedEmails = [
     'fer.aragon@crearpsl.net',
-    'fer.aragon@crearpls.com',
-    'paul.sosa@crearpsl.net',
+    'fer.aragon@crearpsl.com',
     'paul.sosa@crearpsl.net'
   ];
   if (allowedEmails.includes(email)) return true;

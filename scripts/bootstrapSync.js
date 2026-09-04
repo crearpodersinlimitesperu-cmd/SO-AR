@@ -97,7 +97,7 @@ async function createSuperAdmin() {
     name: 'José Sánchez',
     role: 'direccion',
     sede: 'Sede Global',
-    emails: [email, 'jose.sanchez@crearpls.com'],
+    emails: [email],
     isSuperAdmin: true,
     updatedAt: new Date().toISOString(),
     source: 'bootstrapSync'

@@ -200,9 +200,19 @@ export function ChecklistProvider({ children }) {
       const customId = `custom_${Date.now()}`;
       const taskRef = doc(db, 'tasks', customId);
       
+      // Sanitizar correos para prevenir errores de dominio (ej: crearpls.com -> crearpsl.net)
+      const sanitizeEmail = (e) => (typeof e === 'string' ? e.trim().toLowerCase().replace('@crearpls.com', '@crearpsl.net') : '');
+      const cleanData = { ...taskData };
+      if (Array.isArray(cleanData.assignedToEmails)) {
+        cleanData.assignedToEmails = [...new Set(cleanData.assignedToEmails.map(sanitizeEmail).filter(Boolean))];
+      }
+      if (cleanData.assignedToEmail) {
+        cleanData.assignedToEmail = sanitizeEmail(cleanData.assignedToEmail);
+      }
+
       batch.set(taskRef, {
         id: customId,
-        ...taskData,
+        ...cleanData,
         completed: false,
         status: 'Pendiente',
         created_at: new Date().toISOString()
@@ -210,21 +220,22 @@ export function ChecklistProvider({ children }) {
 
       // Asegurarse de tener un arreglo unificado de correos (legacy o nuevo)
       const emailsToNotify = [];
-      if (taskData.assignedToEmails && Array.isArray(taskData.assignedToEmails)) {
-        emailsToNotify.push(...taskData.assignedToEmails);
-      } else if (taskData.assignedToEmail) {
-        emailsToNotify.push(taskData.assignedToEmail);
+      if (cleanData.assignedToEmails && Array.isArray(cleanData.assignedToEmails)) {
+        emailsToNotify.push(...cleanData.assignedToEmails);
+      } else if (cleanData.assignedToEmail) {
+        emailsToNotify.push(cleanData.assignedToEmail);
       }
 
       // Si la tarea tiene asignaciones directas a uno o más usuarios
       if (emailsToNotify.length > 0) {
         emailsToNotify.forEach(email => {
+          const cleanEmail = sanitizeEmail(email);
           // 1. Notificación In-App
           const notifRef = doc(collection(db, 'notifications'));
           batch.set(notifRef, {
-            userId: email,
-            title: taskData.task || taskData.title,
-            message: `Se te ha asignado una nueva tarea urgente en la sede ${taskData.assignedSede || 'Global'}.`,
+            userId: cleanEmail,
+            title: cleanData.task || cleanData.title,
+            message: `Se te ha asignado una nueva tarea urgente en la sede ${cleanData.assignedSede || 'Global'}.`,
             read: false,
             taskId: customId,
             created_at: new Date().toISOString()
@@ -233,18 +244,18 @@ export function ChecklistProvider({ children }) {
           // 2. Notificación por Correo (Vía Firebase Trigger Email Extension)
           const mailRef = doc(collection(db, 'mail'));
           batch.set(mailRef, {
-            to: [email],
+            to: [cleanEmail],
             message: {
-              subject: `NUEVA TAREA ASIGNADA SO-AR: ${taskData.task || taskData.title}`,
+              subject: `NUEVA TAREA ASIGNADA CAUSA OS: ${cleanData.task || cleanData.title}`,
               html: `
-                <h2>Hola, se te ha asignado una nueva tarea en el SO-AR</h2>
-                <p><strong>Tarea:</strong> ${taskData.task || taskData.title}</p>
-                <p><strong>⏰ Fecha límite:</strong> ${formatDeadlineEs(taskData.deadline)}</p>
-                <p><strong>Sede:</strong> ${taskData.assignedSede || 'Global'}</p>
-                <p><strong>Prioridad:</strong> ${taskData.priority || 'Normal'}</p>
+                <h2>Hola, se te ha asignado una nueva tarea en Causa OS</h2>
+                <p><strong>Tarea:</strong> ${cleanData.task || cleanData.title}</p>
+                <p><strong>⏰ Fecha límite:</strong> ${formatDeadlineEs(cleanData.deadline)}</p>
+                <p><strong>Sede:</strong> ${cleanData.assignedSede || 'Global'}</p>
+                <p><strong>Prioridad:</strong> ${cleanData.priority || 'Normal'}</p>
                 <p>Por favor, ingresa a la plataforma para revisarla y marcarla como completada cuando esté lista.</p>
                 <br/>
-                <p><em>Equipo CREAR Poder Sin Límites</em></p>
+                <p><em>Equipo CREAR PODER SIN LÍMITES</em></p>
               `
             },
             // (04/09/2026) José pidió que estos correos incluyan el botón de
@@ -253,9 +264,9 @@ export function ChecklistProvider({ children }) {
             // simplemente no adjunta nada, no rompe el envío del correo).
             calendarEvent: {
               taskId: customId,
-              title: taskData.task || taskData.title,
-              deadline: taskData.deadline || null,
-              description: `Tarea SO-AR — Sede: ${taskData.assignedSede || 'Global'}. Prioridad: ${taskData.priority || 'Normal'}.`
+              title: cleanData.task || cleanData.title,
+              deadline: cleanData.deadline || null,
+              description: `Tarea Causa OS — Sede: ${cleanData.assignedSede || 'Global'}. Prioridad: ${cleanData.priority || 'Normal'}.`
             }
           });
         });
@@ -277,12 +288,21 @@ export function ChecklistProvider({ children }) {
       if (!taskSnap.exists()) return false;
       const currentTask = taskSnap.data();
 
+      const sanitizeEmail = (e) => (typeof e === 'string' ? e.trim().toLowerCase().replace('@crearpls.com', '@crearpsl.net') : '');
+      const cleanUpdatedData = { ...updatedData };
+      if (Array.isArray(cleanUpdatedData.assignedToEmails)) {
+        cleanUpdatedData.assignedToEmails = [...new Set(cleanUpdatedData.assignedToEmails.map(sanitizeEmail).filter(Boolean))];
+      }
+      if (cleanUpdatedData.assignedToEmail) {
+        cleanUpdatedData.assignedToEmail = sanitizeEmail(cleanUpdatedData.assignedToEmail);
+      }
+
       const batch = writeBatch(db);
-      batch.update(taskRef, updatedData);
+      batch.update(taskRef, cleanUpdatedData);
 
       // Calcular asignados: nuevos (recién agregados) vs los que ya estaban.
-      const oldEmails = currentTask.assignedToEmails || (currentTask.assignedToEmail ? [currentTask.assignedToEmail] : []);
-      const newEmails = updatedData.assignedToEmails || (updatedData.assignedToEmail ? [updatedData.assignedToEmail] : []);
+      const oldEmails = (currentTask.assignedToEmails || (currentTask.assignedToEmail ? [currentTask.assignedToEmail] : [])).map(sanitizeEmail).filter(Boolean);
+      const newEmails = (cleanUpdatedData.assignedToEmails || (cleanUpdatedData.assignedToEmail ? [cleanUpdatedData.assignedToEmail] : [])).map(sanitizeEmail).filter(Boolean);
 
       const newlyAddedEmails = newEmails.filter(email => !oldEmails.includes(email));
       const stillAssignedEmails = newEmails.filter(email => oldEmails.includes(email));
@@ -294,16 +314,17 @@ export function ChecklistProvider({ children }) {
       // prioridad, sede) también notifica a quienes ya estaban asignados —
       // no solo a los que se agregan de nuevo.
       const relevantFieldChanged = ['deadline', 'task', 'title', 'priority', 'assignedSede'].some(
-        field => field in updatedData && updatedData[field] !== currentTask[field]
+        field => field in cleanUpdatedData && cleanUpdatedData[field] !== currentTask[field]
       );
 
       newlyAddedEmails.forEach(email => {
+        const cleanEmail = sanitizeEmail(email);
         // 1. Notificación In-App
         const notifRef = doc(collection(db, 'notifications'));
         batch.set(notifRef, {
-          userId: email,
-          title: updatedData.task || currentTask.task,
-          message: `Se te ha asignado una tarea en la sede ${updatedData.assignedSede || currentTask.assignedSede || 'Global'}.`,
+          userId: cleanEmail,
+          title: cleanUpdatedData.task || currentTask.task,
+          message: `Se te ha asignado una tarea en la sede ${cleanUpdatedData.assignedSede || currentTask.assignedSede || 'Global'}.`,
           read: false,
           taskId: taskId,
           created_at: new Date().toISOString()
@@ -312,37 +333,38 @@ export function ChecklistProvider({ children }) {
         // 2. Notificación por Correo
         const mailRef = doc(collection(db, 'mail'));
         batch.set(mailRef, {
-          to: [email],
+          to: [cleanEmail],
           message: {
-            subject: `NUEVA TAREA ASIGNADA SO-AR: ${updatedData.task || currentTask.task}`,
+            subject: `NUEVA TAREA ASIGNADA CAUSA OS: ${cleanUpdatedData.task || currentTask.task}`,
             html: `
-                <h2>Hola, se te ha asignado una tarea en el SO-AR</h2>
-                <p><strong>Tarea:</strong> ${updatedData.task || currentTask.task}</p>
-                <p><strong>⏰ Fecha límite:</strong> ${formatDeadlineEs(updatedData.deadline || currentTask.deadline)}</p>
-                <p><strong>Sede:</strong> ${updatedData.assignedSede || currentTask.assignedSede || 'Global'}</p>
-                <p><strong>Prioridad:</strong> ${updatedData.priority || currentTask.priority || 'Normal'}</p>
+                <h2>Hola, se te ha asignado una tarea en Causa OS</h2>
+                <p><strong>Tarea:</strong> ${cleanUpdatedData.task || currentTask.task}</p>
+                <p><strong>⏰ Fecha límite:</strong> ${formatDeadlineEs(cleanUpdatedData.deadline || currentTask.deadline)}</p>
+                <p><strong>Sede:</strong> ${cleanUpdatedData.assignedSede || currentTask.assignedSede || 'Global'}</p>
+                <p><strong>Prioridad:</strong> ${cleanUpdatedData.priority || currentTask.priority || 'Normal'}</p>
                 <p>Por favor, ingresa a la plataforma para revisarla.</p>
                 <br/>
-                <p><em>Equipo CREAR Poder Sin Límites</em></p>
+                <p><em>Equipo CREAR PODER SIN LÍMITES</em></p>
               `
           },
           calendarEvent: {
             taskId: taskId,
-            title: updatedData.task || currentTask.task,
-            deadline: updatedData.deadline || currentTask.deadline || null,
-            description: `Tarea SO-AR — Sede: ${updatedData.assignedSede || currentTask.assignedSede || 'Global'}. Prioridad: ${updatedData.priority || currentTask.priority || 'Normal'}.`
+            title: cleanUpdatedData.task || currentTask.task,
+            deadline: cleanUpdatedData.deadline || currentTask.deadline || null,
+            description: `Tarea Causa OS — Sede: ${cleanUpdatedData.assignedSede || currentTask.assignedSede || 'Global'}. Prioridad: ${cleanUpdatedData.priority || currentTask.priority || 'Normal'}.`
           }
         });
       });
 
       if (relevantFieldChanged) {
         stillAssignedEmails.forEach(email => {
+          const cleanEmail = sanitizeEmail(email);
           // 1. Notificación In-App
           const notifRef = doc(collection(db, 'notifications'));
           batch.set(notifRef, {
-            userId: email,
-            title: updatedData.task || currentTask.task,
-            message: `Se actualizó una tarea que tenías asignada en la sede ${updatedData.assignedSede || currentTask.assignedSede || 'Global'}.`,
+            userId: cleanEmail,
+            title: cleanUpdatedData.task || currentTask.task,
+            message: `Se actualizó una tarea que tenías asignada en la sede ${cleanUpdatedData.assignedSede || currentTask.assignedSede || 'Global'}.`,
             read: false,
             taskId: taskId,
             created_at: new Date().toISOString()
@@ -351,25 +373,25 @@ export function ChecklistProvider({ children }) {
           // 2. Notificación por Correo
           const mailRef = doc(collection(db, 'mail'));
           batch.set(mailRef, {
-            to: [email],
+            to: [cleanEmail],
             message: {
-              subject: `TAREA ACTUALIZADA SO-AR: ${updatedData.task || currentTask.task}`,
+              subject: `TAREA ACTUALIZADA CAUSA OS: ${cleanUpdatedData.task || currentTask.task}`,
               html: `
-                <h2>Hola, se actualizó una tarea que tienes asignada en el SO-AR</h2>
-                <p><strong>Tarea:</strong> ${updatedData.task || currentTask.task}</p>
-                <p><strong>⏰ Fecha límite:</strong> ${formatDeadlineEs(updatedData.deadline || currentTask.deadline)}</p>
-                <p><strong>Sede:</strong> ${updatedData.assignedSede || currentTask.assignedSede || 'Global'}</p>
-                <p><strong>Prioridad:</strong> ${updatedData.priority || currentTask.priority || 'Normal'}</p>
+                <h2>Hola, se actualizó una tarea que tienes asignada en Causa OS</h2>
+                <p><strong>Tarea:</strong> ${cleanUpdatedData.task || currentTask.task}</p>
+                <p><strong>⏰ Fecha límite:</strong> ${formatDeadlineEs(cleanUpdatedData.deadline || currentTask.deadline)}</p>
+                <p><strong>Sede:</strong> ${cleanUpdatedData.assignedSede || currentTask.assignedSede || 'Global'}</p>
+                <p><strong>Prioridad:</strong> ${cleanUpdatedData.priority || currentTask.priority || 'Normal'}</p>
                 <p>Revisa los cambios en la plataforma.</p>
                 <br/>
-                <p><em>Equipo CREAR Poder Sin Límites</em></p>
+                <p><em>Equipo CREAR PODER SIN LÍMITES</em></p>
               `
             },
             calendarEvent: {
               taskId: taskId,
-              title: updatedData.task || currentTask.task,
-              deadline: updatedData.deadline || currentTask.deadline || null,
-              description: `Tarea SO-AR — Sede: ${updatedData.assignedSede || currentTask.assignedSede || 'Global'}. Prioridad: ${updatedData.priority || currentTask.priority || 'Normal'}.`
+              title: cleanUpdatedData.task || currentTask.task,
+              deadline: cleanUpdatedData.deadline || currentTask.deadline || null,
+              description: `Tarea Causa OS — Sede: ${cleanUpdatedData.assignedSede || currentTask.assignedSede || 'Global'}. Prioridad: ${cleanUpdatedData.priority || currentTask.priority || 'Normal'}.`
             }
           });
         });

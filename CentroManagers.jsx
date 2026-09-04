@@ -217,7 +217,7 @@ export default function CentroManagers() {
     const email = (currentUser.email || '').toLowerCase().trim();
     
     // Mapeo explícito para entrenadores duales cuyo nombre en Google no coincida exactamente con ENTRENADORES_LIST
-    if (email === 'fer.aragon@crearpsl.net' || email === 'fer.aragon@crearpls.com') return 'Fer Aragon';
+    if (email === 'fer.aragon@crearpsl.net' || email === 'fer.aragon@crearpsl.com') return 'Fer Aragon';
     if (email === 'paul.sosa@crearpsl.net') return 'Paul Sosa';
     if (email === 'jose.sanchez@crearpsl.net') return 'Jose Sanchez';
     if (email === 'andres.gomez@crearpsl.net') return 'Andres Gomez';

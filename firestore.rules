@@ -71,7 +71,6 @@ service cloud.firestore {
     // cfo/cco/ceo/director_maestria/socio). VERIFICAR Y CORREGIR antes de desplegar.
     function isGerenteODireccion() {
       return isSuperAdmin() || (isAuthenticated() && email() in [
-        'emely.leon@crearpls.com',
         'emely.leon@crearpsl.net',
         'fer.aragon@crearpsl.net',
         'andres.gomez@crearpsl.net',
