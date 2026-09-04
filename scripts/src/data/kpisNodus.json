@@ -1,0 +1,19 @@
+{
+  "ultimaActualizacion": "2026-09-04T14:35:25.865Z",
+  "resumen": {
+    "totalAsignados": 1401,
+    "totalSentados": 697,
+    "efectividadGlobal": 45.5,
+    "alertas": 12
+  },
+  "equipos": [
+    {
+      "nombre": "EQUIPO LIMA A",
+      "efectividad": 48.2
+    },
+    {
+      "nombre": "EQUIPO LIMA B",
+      "efectividad": 42.1
+    }
+  ]
+}

@@ -111120,6 +111120,1995 @@ export default defineConfig({
     "modifiedTime": "2026-05-20T01:47:08.000Z",
     "webViewLink": "https://drive.google.com/file/d/1-pb95NVdOobjYSqA5B8TwxFIEE575PAH/view?usp=drivesdk",
     "text": "LATAM-AIRLINES ECUADOR S.A. (PE)\nAv. Santa Cruz 381 Piso 6, Miraflores, Lima, Perú. RUC 20516070316\nTiquete de transporte aéreo\nEste documento contiene el detalle y condiciones del servicio que adquiriste.\nNo es necesario que lo lleves el día de tu viaje.\nInformación de tu viaje\nCódigo de Reserva\nMXVURS\nNº de orden\nLA5446386OLRW\nCiudad y Fecha de emisión\nLima, Perú 19/05/26\nNombre Pasajero\nTipo de pasajero\nDocumento de Identificación\nCARLOS BRUNIS VILLACIS\nAdulto\nA8885265\nInformación tributaria\nRazón social\nCREACION CUANTICA EIRL\nRUC\n20612592811\nCiudad\nMiraflores\nItinerario\nN° de vuelo\nOrigen\nDestino\nSalida\nFecha\nHorario\nLlegada\nFecha\nHorario\nCabina\nTarifa\nAsiento\nLA 2383\nQuito \n(Mariscal \nSucre \nIntl.)\nLima (J \nChavez \nIntl.)\n29/05/26\n12:15\n29/05/26\n14:30\nEconomy\nLight\nLA 1436\nLima (J \nChavez \nIntl.)\nQuito \n(Mariscal \nSucre \nIntl.)\n01/06/26\n12:15\n01/06/26\n14:37\nEconomy\nLight\n\nDesglose de tu pago\nForma de pago\nNúmero de ticket\nConcepto\nMonto\n5442287527668\nVuelo\nTasas y/o impuestos(1)\nUSD 496.00\nUSD 221.63\n5444471753828\nCargo por servicio\nTasas y/o impuestos(1)\nUSD 11.80\nUSD 2.12\nTotal pagado\nUSD 731.55\nTipo\nMonto\n \nTarjeta de crédito / débito\nXXXXXXXXXXXX1055\nUSD 731.55\n(1)QB: USD 69.19\n(1)DY: USD 15.00\n(1)QI: USD 5.00\n(1)PEA: USD 2.12\n(1)WT: USD 3.00\n(1)EC: USD 74.40\n(1)ED: USD 24.80\n(1)HW: USD 30.24\nAerolíneas en este viaje\nN° de vuelo\nAerolínea operadora / Código de reserva aerolínea\nAerolínea que factura\nLA 2383\nLATAM AIRLINES PERU / MXVURS\nLATAM-AIRLINES ECUADOR S.A. (PE)\nLA 1436\nLATAM AIRLINES GROUP / MXVURS\nLATAM-AIRLINES ECUADOR S.A. (PE)\nInformación local\nAntes de viajar, revisa las \n para los distintos países debido al brote de COVID-19.\nrestricciones de entrada\nRecuerda revisar la hora de \n, esta será indicada en tu boarding pass. Si no pudiste hacer Check-in en el sitio y/o \npresentación en aeropuerto\nnecesitas facturar equipaje en el aeropuerto, debes presentarte con la debida anticipación.\nPara contrataciones a través del catálogo electrónico del Convenio Marco de Emisión de Boletos Electrónicos para Transporte Aéreo \nNacional de Pasajeros, las consultas y/o solicitudes de atención serán únicamente a través de la Central de Atenciones, sólo aplica la \ninformación referida a vuelos dentro de Perú.\nTérminos y condiciones del equipaje\nEquipaje permitido de acuerdo a tu tarifa\nLa tarifa Economy Light permite:\nPor cada pasajero:\nEn cabina: 1 bolso o mochila pequeña con una dimensión máxima de 45 x 35 x 20 cm (alto, largo y ancho).\nEn cabina: 1 pieza (bolso o maleta) que no supere los 12 kilos, con una dimensión máxima de 55 x 35 x 25cm.\nTen en cuenta que si tu equipaje de mano no cumple con estos requisitos será retenido y enviado a la bodega de avión, inclusive en la \nsala de embarque, pudiendo estar sujeto a cobro de acuerdo a los términos y condiciones de equipaje. \n.\nRevisa los términos y condiciones\nUn \n (cartera, laptop o bolso de bebé), el cual deberá ser ubicado bajo el asiento delantero, excepto en primera \nbolso o mochila pequeña\nfila y en filas de emergencia.\nLos \n (0-2 años) no tienen incluido el equipaje de bodega.\npasajeros infantes\n\nElementos de valor\nEn el transporte de equipaje, LATAM no asume responsabilidad \nmás allá de los límites establecidos por ley, por la pérdida daño \no retardo de objetos frágiles y/o de alto valor, tanto comercial \ncomo personal (ej: joyas, artículos electrónicos, etc.). Recuerda \nque estos elementos se deben transportar en el equipaje de \nmano.\nElementos no permitidos\nNOTIFICACIÓN SOBRE MERCANCÍAS PELIGROSAS: El transporte \nde ciertas mercancías peligrosas, como los aerosoles, fuegos \nartificiales y líquidos inflamables, a bordo de la aeronave está \nprohibido. Si no comprende estas restricciones, infórmate a \ntravés de nuestros canales de venta o directamente en nuestro \nsitio web:\nElementos prohibidos tanto en equipaje de bodega como de \nmano (mercancías peligrosas): nuestra página web.\nProhibidos en el equipaje de mano: nuestra página web.\nCondiciones de tu pasaje según las tarifas pagadas\nSi quieres cambiar o devolver tu pasaje con vuelos internacionales o dentro de Chile, Perú, Colombia, Ecuador o Brasil y tiene más de \nuna tarifa, considera que aplicarán las condiciones de cada una de ellas.\nA continuación te mostramos las regulaciones asociadas a tu viaje. Si tienes dudas ingresa a nuestro sitio web o llama a nuestro \nContact Center.\nEstadía mínima\nrequerida\nEstadía máxima\npermitida\nAnticipación de compra\nLa tarifa Economy\nLight:\n0 días\nLa tarifa Economy\nLight:\n6 meses\nLa tarifa Economy Light:\nLa compra debe realizarse en el momento mismo de la reserva y no puede\npagarse más adelante.\nRestricciones del viaje\nLa tarifa Economy Light:\nNo tienes restricciones de fechas para viajar.\nCambios\nRevisa las principales condiciones para hacer cambios de acuerdo a tu itinerario.\nSi volaste alguno de los tramos del viaje y quieres realizar un cambio, te ofreceremos las tarifas de vuelos disponibles al momento que \nrealizaste la compra de los pasajes. En este caso, también el nuevo viaje debe cumplir siempre con todas las condiciones de las tarifas.\nSi la tarifa original permite cambios y al momento de hacer el cambio esta ya no está disponible o no cumple con las regulaciones \noriginales, podrás acceder a una nueva tarifa pagando la diferencia. Si tu tarifa original permite cambios, en caso de querer realizar \ncambios el valor de la nueva tarifa deberá ser igual o superior al valor de la tarifa original.\nCambios conforme al Código de Consumo, ver Información General\nLa tarifa Economy Light:\nSe permiten cambios antes del vuelo con una multa de 145 USD\nDevoluciones\nRevisa a continuación las principales condiciones para hacer devoluciones de acuerdo a tu itinerario.\n\nAunque tu pasaje no permita devolución tienes derecho al reembolso de las tasas de embarque e impuestos si no realizas el viaje en la \nfecha programada. Para tarifas Basic o Light, lo haremos de manera automática a tu LATAM Wallet, si es que la tienes creada. En caso \ncontrario o si tienes otra tarifa, puedes solicitarla entrando a Mis viajes, sección Devolución de pasajes.\nEn caso que aplique, podrás solicitar la devolución de tus pasajes en la sección Mis Viajes de nuestro sitio. Para pasajes canjeados con \nmillas debes llamar a nuestro Contact Center.\nSi tu vuelo es internacional y eliges una tarifa que permite un porcentaje o la totalidad de devolución, ten en cuenta que sólo podrás \nsolicitar el reembolso antes del horario de salida del primer vuelo de tu itinerario.\nEl porcentaje de la devolución corresponde al valor de la tarifa neta sin impuestos ni tasas de embarque.\nEl cargo por servicio que se cobra en las ventas realizadas mediante Oficinas LATAM o Contact Center, en las cuales nuestros clientes \nreciben atención personalizada no es reembolsable en caso de devolución del pasaje.\nLos servicios adicionales (equipajes, asientos, embarque premium u otros) no serán reembolsados si no se hace uso del pasaje o si se \nsolicita un cambio o devolución voluntaria (excepto las tarifas que permiten devolución).\nCARGO DE EMISION POR CANJE: Para canjes LATAM Pass se cobrará un cargo por aproximación al vuelo por cada segmento y pasajero \ncuando la anticipación de compra sea menor a 90 días en vuelos nacionales y 120 días para vuelos internacionales. Tienes derecho a \ndevolución de éste cargo cuando se produzca una cancelación de tu itinerario por causas atribuibles a la Aerolínea o se esté aplicando Ley \nde Retracto, consulte las condiciones del programa.\nCancelaciones y retrasos significativos (DOM >= 3h/INTER >= 6h) en vuelos desde o hacia los Estados Unidos\nSi tu viaje cancelado o reprogramado tiene origen o destino en los Estados Unidos, podrás elegir una de las siguientes opciones:\nViajar en el vuelo protector\nReprogramar tu vuelo sin costo (manteniendo la misma cabina y origen/destino).\nDejar abierto el pasaje sin fecha fija para viajar, por hasta 12 meses de la fecha de tu primer vuelo original comprado.\nDevolución total de tus vuelos y adicionales (ej. asientos, equipaje) no usados, con tasas.\nAl rechazar o no elegir ninguna de las opciones anteriores antes de la hora de salida de tu nuevo vuelo, se procesará automáticamente la \ndevolución total de tu pasaje y adicionales no usados, en cumplimiento de la regulación de reembolsos del Departamento de Transporte de \nlos Estados Unidos.Plazo para la emisión de devoluciones:\n7 días hábiles para compras realizadas con tarjeta de crédito.\n20 días hábiles para otros métodos de pago.\nCondiciones para Cambios y Devoluciones según tu tarifa\nTarifa Basic\nCambios\n Se permiten cambios \nantes de la hora del vuelo, más la diferencia de precio (en caso que aplique). \nRutas nacionales\ncon cargo adicional \nDespués de la hora del vuelo, no se pueden realizar cambios.\n Se permiten cambios con \n antes y después de la hora del vuelo, más la diferencia de precio (en caso \nRutas internacionales\ncargo adicional\nque aplique).\nDevoluciones\n Solo podrás solicitar la devolución de las tasas de embarque.\nRutas nacionales e internacionales\nTarifa Light\nCambios\n Se permiten cambios \n antes de la hora del vuelo, más la diferencia de precio (en \nRutas nacionales (excepto en Brasil)\ncon cargo adicional\ncaso que aplique). Después de la hora del vuelo, no se pueden realizar cambios.\n Se permiten cambios \n antes y después de la hora del vuelo, más la diferencia de precio (en \nRutas nacionales en Brasil\ncon cargo adicional\ncaso que aplique).\n Se permiten cambios \n antes y después de la hora del vuelo, más la diferencia de precio (en caso \nRutas internacionales\ncon cargo adicional\nque aplique).\nDevoluciones\n Solo podrás solicitar la devolución de las tasas de embarque.\nRutas nacionales e internacionales\nTarifa Standard\nCambios\n Se permiten cambios \n antes y después de la hora del vuelo, más la diferencia de \nRutas nacionales e internacionales\ncon cargo adicional\nprecio (en caso que aplique).\nDevoluciones\n Solo podrás solicitar la devolución de las tasas de embarque.\nRutas nacionales e internacionales\n\nTarifa Full\nCambios\n Se permiten cambios \n antes de la hora del vuelo, más la diferencia de precio (en \nRutas nacionales (excepto en Brasil)\nsin cargo adicional\ncaso que aplique). Después de la hora del vuelo, los cambios tienen un cargo adicional.\n Se permiten cambios \n antes y después de la hora del vuelo, más la \nRutas nacionales en Brasil y rutas internacionales\nsin cargo adicional\ndiferencia de precio (en caso que aplique).\nDevoluciones\nRutas nacionales\n- Devolución del \n antes de la hora del vuelo.\n100% del pasaje\n- Si pasó la hora del vuelo y no utilizaste tu pasaje, podrás solicitar la devolución de un \n más las tasas de embarque.\n30% de tu pasaje\nRutas internacionales\n- Devolución del \n antes de la hora del primer vuelo.\n100% del pasaje\n- Si pasó la hora del vuelo y no utilizaste tu pasaje, solo podrás solicitar la devolución de las tasas de embarque.\nTarifa Premium Economy\nCambios\n Se permiten cambios \n antes y después de la hora del vuelo, más la diferencia de \nRutas nacionales e internacionales\nsin cargo adicional\nprecio (en caso que aplique).\nDevoluciones\n Devolución del \n antes y después de la hora del vuelo.\nRutas nacionales\n100% del pasaje\nRutas internacionales\n- Devolución del \n antes de la hora del primer vuelo.\n100% del pasaje\n- Si pasó la hora del vuelo y no utilizaste tu pasaje, solo podrás solicitar la devolución de las tasas de embarque.\nTarifa Premium Business Standard\nCambios\n Se permiten cambios \n antes y después de la hora del vuelo, más la diferencia de precio (en caso \nRutas internacionales\ncon cargo adicional\nque aplique).\nDevoluciones\n Solo podrás solicitar la devolución de las tasas de embarque.\nRutas internacionales\nTarifa Premium Business Full\nCambios\n Se permiten cambios \n antes y después de la hora del vuelo, más la diferencia de precio (en caso \nRutas internacionales\nsin cargo adicional\nque aplique).\nDevoluciones\n Devolución del \n antes y después de la hora del vuelo.\nRutas nacionales\n100% del pasaje\nRutas internacionales\n- Devolución del \n antes de la hora del primer vuelo.\n100% del pasaje\n- Si pasó la hora del vuelo y no utilizaste tu pasaje, solo podrás solicitar la devolución de las tasas de embarque.\nTarifa Delta Comfort\nCambios\n Se permiten cambios \n antes de la hora del vuelo, más la diferencia de precio (en \nRutas nacionales (excepto en Brasil)\nsin cargo adicional\ncaso que aplique). Después de la hora del vuelo, los cambios tienen un cargo adicional.\n Se permiten cambios \n antes y después de la hora del vuelo, más la \nRutas nacionales en Brasil y rutas internacionales\nsin cargo adicional\ndiferencia de precio (en caso que aplique).\nDevoluciones\nRutas nacionales\n- Devolución del \n antes de la hora del vuelo.\n100% del pasaje\n- Si pasó la hora del vuelo y no utilizaste tu pasaje, podrás solicitar la devolución de un \n más las tasas de embarque.\n30% de tu pasaje\nRutas internacionales\n- Devolución del \n antes de la hora del primer vuelo.\n100% del pasaje\n- Si pasó la hora del vuelo y no utilizaste tu pasaje, solo podrás solicitar la devolución de las tasas de embarque.\nLa tarifa Economy Light:\nNo se permiten devoluciones.\n\nCondiciones adicionales\nCARGO POR EMISIÓN DE CANJE\nSe cobrará un cargo por emisión de canje por cada orden emitida. Tienes derecho a devolución de éste cargo cuando se produzca una \ncancelación de tu itinerario por causas atribuibles a la Aerolínea\nInformación general\nInfórmate en nuestro sitio web o en los siguientes links para mayor información sobre:\nVIGENCIA DEL PASAJE: Si tu tarifa no permite cambios ni devoluciones, sólo aplican las fechas de salida y llegada correspondientes al \nitinerario de tu viaje. Si tu tarifa permite cambios y/o devoluciones, la vigencia de tu pasaje es de 12 meses a contar de la fecha de \nemisión. Sin embargo, una vez iniciado el viaje, tu pasaje vence al cumplirse la estadía máxima o la última fecha de viaje que tu tarifa \npermite.\nCHECK-IN: Para información de check in consulta en siguiente \n. Si tienes un vuelo operado por otra aerolínea, recuerda que debes \nlink\nchequearte con anticipación en el sitio web de la línea aérea que opera tu vuelo.\nNECESIDADES ESPECIALES: Si tienes alguna necesidad médica o requerimiento especial llama a nuestro Contact Center para que \npodamos ayudarte. Si tienes dudas visita la sección Información para tu viaje, dentro de \n.\nnuestro sitio\nMENORES DE 2 AÑOS SIN DERECHO A ASIENTO:Solo pueden transportar libre de costo uno de estos artículos como: un coche plegable \no un moisés portátil, o una silla de auto certificada para vuelos el que puede ser transportado en la bodega del avión o en cabina sujeto a \ndisponibilidad de espacio. Política solo aplicable para vuelos LATAM Airlines Group, consulta por las regulaciones que aplican para \nmenores de dos años con la aerolínea que opera tu vuelo.\nUSO DEL PASAJE: Los vuelos o tramos que componen el itinerario deberán volarse en el orden consecutivo indicado. El Transportista, \nsujeto a las condiciones previstas en la legislación aplicable, podrá negar el embarque a un pasajero que no cumpla con el orden del \nitinerario antes referido o si el pasajero no ha volado alguno de los tramos indicados en su pasaje. Si no se vuela alguno de los tramos \nindicados en el itinerario, éste se cancelará en su totalidad, sin previo aviso, no procediendo ningún tipo de reembolso salvo que las \ncondiciones de la tarifa de tu pasaje lo permitan. A modo de ejemplo y sin que esta condición se limite a este caso en específico, si el \npasajero no vuela el primer tramo que se especifica en el itinerario (entendiéndose como ida), este no podrá volar ningún otro \n(entendiéndose como vuelo de escala o de vuelta). El pasaje que compraste es intransferible.\nPOSTULACIÓN A UPGRADE: Recuerda que para postular a Upgrade de cabina con tramos tienes que haber comprado tu ticket con \ntarifa Light, Plus, Delta Comfort, Standard, Classic o Full. Ten en cuenta que si tu tarifa es Light solo podrás postular al Upgrade de \ncabina con tramos para vuelos nacionales, dentro de Sudamérica y el Caribe, excepto vuelos regionales desde Brasil. Los niños o infantes \nque viajan con tarifas con descuento, no podrán optar al beneficio de Upgrade LATAM Pass. Para conocer las condiciones de tu pasaje \nrevisa el detalle de la tarifa que compraste.\nLÍMITES DE RESPONSABILIDAD: Los pasajeros que se embarcan en un viaje que involucre un destino final o una escala en un país que \nno sea el país de salida, se les informa que las disposiciones de un tratado internacional (el Convenio de Varsovia, el Convenio de \nMontreal de 1999 u otro tratado), así como el contrato propio de la aerolínea o sus disposiciones tarifarias, pueden ser aplicables a todo \nsu viaje, incluida cualquier parte en su totalidad dentro de los países de salida y destino. El tratado aplicable rige y podría limitar la \nresponsabilidad de las aerolíneas a los pasajeros por muerte o lesiones personales, destrucción o pérdida o daño del equipaje, y por la \ndemora de los pasajeros y el equipaje. Por lo general, se puede obtener protección adicional comprando un seguro de una compañía \nprivada o de la aerolínea directamente. Dicho seguro no se ve afectado por ninguna limitación de la responsabilidad de la aerolínea en \nvirtud de un tratado internacional. Para más información consulte a su aerolínea o representante de la compañía de seguros.(*)\nCanje con Millas LATAM Pass: puedes adquirir una parte o la totalidad de tu pasaje utilizando tus Millas LATAM Pass; considera que \npara estos casos, el pasaje no acumulará nuevas Millas LATAM Pass.\n(*) Sólo aplica para vuelos desde y hacia a Estados Unidos.\nInfórmate en nuestro sitio web o en los siguientes links para mayor información sobre:\nVIGENCIA DEL PASAJE: Si tu tarifa no permite cambios ni devoluciones, sólo aplican las fechas de salida y llegada correspondientes al \nitinerario de tu viaje. Si tu tarifa permite cambios y/o devoluciones, la vigencia de tu pasaje es de 12 meses a contar de la fecha de \nemisión. Sin embargo, una vez iniciado el viaje, tu pasaje vence al cumplirse la estadía máxima o la última fecha de viaje que tu tarifa \npermite.\nCHECK-IN: Para información de check in consulta en siguiente \n. Si tienes un vuelo operado por otra aerolínea, recuerda que debes \nlink\nchequearte con anticipación en el sitio web de la línea aérea que opera tu vuelo.\nNECESIDADES ESPECIALES: Si tienes alguna necesidad médica o requerimiento especial llama a nuestro Contact Center para que \npodamos ayudarte. Si tienes dudas visita la sección Información para tu viaje, dentro de \n.\nnuestro sitio\n\nMENORES DE 2 AÑOS SIN DERECHO A ASIENTO:Solo pueden transportar libre de costo uno de estos artículos como: un coche plegable \no un moisés portátil, o una silla de auto certificada para vuelos el que puede ser transportado en la bodega del avión o en cabina sujeto a \ndisponibilidad de espacio. Política solo aplicable para vuelos LATAM Airlines Group, consulta por las regulaciones que aplican para \nmenores de dos años con la aerolínea que opera tu vuelo.\nUSO DEL PASAJE: Los vuelos o tramos que componen el itinerario deberán volarse en el orden consecutivo indicado. El Transportista, \nsujeto a las condiciones previstas en la legislación aplicable, podrá negar el embarque a un pasajero que no cumpla con el orden del \nitinerario antes referido o si el pasajero no ha volado alguno de los tramos indicados en su pasaje. Si no se vuela alguno de los tramos \nindicados en el itinerario, éste se cancelará en su totalidad, sin previo aviso, no procediendo ningún tipo de reembolso salvo que las \ncondiciones de la tarifa de tu pasaje lo permitan. A modo de ejemplo y sin que esta condición se limite a este caso en específico, si el \npasajero no vuela el primer tramo que se especifica en el itinerario (entendiéndose como ida), este no podrá volar ningún otro \n(entendiéndose como vuelo de escala o de vuelta). El pasaje que compraste es intransferible.\nPOSTULACIÓN A UPGRADE: Recuerda que para postular a Upgrade de cabina con tramos tienes que haber comprado tu ticket con \ntarifa Light, Plus, Delta Comfort, Standard, Classic o Full. Ten en cuenta que si tu tarifa es Light solo podrás postular al Upgrade de \ncabina con tramos para vuelos nacionales, dentro de Sudamérica y el Caribe, excepto vuelos regionales desde Brasil. Los niños o infantes \nque viajan con tarifas con descuento, no podrán optar al beneficio de Upgrade LATAM Pass. Para conocer las condiciones de tu pasaje \nrevisa el detalle de la tarifa que compraste.\nLÍMITES DE RESPONSABILIDAD: Los pasajeros que se embarcan en un viaje que involucre un destino final o una escala en un país que \nno sea el país de salida, se les informa que las disposiciones de un tratado internacional (el Convenio de Varsovia, el Convenio de \nMontreal de 1999 u otro tratado), así como el contrato propio de la aerolínea o sus disposiciones tarifarias, pueden ser aplicables a todo \nsu viaje, incluida cualquier parte en su totalidad dentro de los países de salida y destino. El tratado aplicable rige y podría limitar la \nresponsabilidad de las aerolíneas a los pasajeros por muerte o lesiones personales, destrucción o pérdida o daño del equipaje, y por la \ndemora de los pasajeros y el equipaje. Por lo general, se puede obtener protección adicional comprando un seguro de una compañía \nprivada o de la aerolínea directamente. Dicho seguro no se ve afectado por ninguna limitación de la responsabilidad de la aerolínea en \nvirtud de un tratado internacional. Para más información consulte a su aerolínea o representante de la compañía de seguros.(*)\n(*) Sólo aplica para vuelos desde y hacia a Estados Unidos.\nPara cualquier duda posterior, por favor comunícate con nuestro Contact Center (número 01 213 8200) o visita nuestra página web.\nLATAM-AIRLINES ECUADOR S.A. (PE)\nAv. Santa Cruz 381 Piso 6, Miraflores, Lima, Perú. RUC 20516070316\n© 2025 LATAM Airlines\n\n"
+  },
+  {
+    "id": "1N56etp76H2ny_sBvM2UadY5hNDAcuSzy",
+    "name": "Factura-20612838951-E001-5611.pdf",
+    "path": "",
+    "size": "7254",
+    "modifiedTime": "2026-09-03T21:37:33.326Z",
+    "webViewLink": "https://drive.google.com/file/d/1N56etp76H2ny_sBvM2UadY5hNDAcuSzy/view?usp=drivesdk",
+    "text": "20612838951\nRUC\nFACTURA ELECTRÓNICA\nE001 5611\n:\n-\nTAXI GREEN LIMA 992401467\nTAXI PREMIUM GREEN LIMA. S.A.C.\nJR. GENERAL CORDOVA 1737\nLINCE - LIMA - LIMA\nFecha de Emisión\nSeñor (es)\nTipo de Moneda\n03/09/2026\nCREACION CUANTICA E.I.R.L.\nRUC\n20612592811\nCAL. BERLIN 965 302 URB. SANTA CRUZ\nSOLES\nLugar de entrega\n:\n:\n:\n:\n:\nFormato de Pago\nAl Contado\n:\nCantidad\nUnidad Medida\nCódigo\nDescripción\nValor Unitario\n1.00\nUNIDAD\n025784\nTRASLADO DEL PERSONAL\n510.00\nSON:  QUINIENTOS DIEZ Y 00/100  SOLES\nEsta es una representación impresa de la factura electrónica E001 - 5611, generada en el Sistema de SUNAT.\n-\n510.00\nSub Total Ventas :\n0.00\nDescuentos :\n510.00\nValor Venta  :\n0.00\nIGV :\nImporte Total :\n510.00\nPuede verificarla utilizando su clave SOL.\n\n"
+  },
+  {
+    "id": "135ghN5XsM4-LfqlSUf-SpAhMXzwuoDEq",
+    "name": "PDF-DOC-E001-2420616057414.pdf",
+    "path": "",
+    "size": "3928",
+    "modifiedTime": "2026-09-03T21:37:14.210Z",
+    "webViewLink": "https://drive.google.com/file/d/135ghN5XsM4-LfqlSUf-SpAhMXzwuoDEq/view?usp=drivesdk",
+    "text": " \n \n \nLOGISTICA GOLDEN LIONS S.A.C.  \nJR. VISTA ALEGRE 791 CND. LOS HUERTOS DE SURCO DPTO. 702  \nSANTIAGO DE SURCO - LIMA - LIMA \nFACTURA ELECTRONICA\nRUC: 20616057414 \nE001-24 \nFecha de Emisión\n: 01/09/2026\nSeñor(es)\n: CREACION CUANTICA E.I.R.L.  \nRUC \n: 20612592811  \nEstablecimiento del Emisor \n:\nJR. VISTA ALEGRE 791 CND. LOS\nHUERTOS DE SURCO DPTO. 702\nLIMA-LIMA-SANTIAGO DE SURCO \nTipo de Moneda\n: SOLES \nObservación\n:  \nForma de pago: Contado\nCantidad\nUnidad Medida\nDescripción\nValor Unitario\nICBPER\n1.00\nUNIDAD\nALMACENAMIENTO DE MATERIALES DE APOYO\n296.61099\n0.00\nValor de Venta de Operaciones Gratuitas : S/ 0.00 \n \n \nSON: TRESCIENTOS CINCUENTA Y 00/100 SOLES\n \n \nSub Total Ventas :\nS/ 296.61 \nAnticipos :\nS/ 0.00 \nDescuentos :\nS/ 0.00 \nValor Venta :\nS/ 296.61 \nISC :\nS/ 0.00 \nIGV :\nS/ 53.39 \nICBPER :\nS/ 0.00 \nOtros Cargos :\nS/ 0.00 \nOtros Tributos :\nS/ 0.00 \nMonto de redondeo :\nS/ 0.00 \nImporte Total :\nS/ 350.00 \nEsta es una representación impresa de la factura electrónica, generada en el Sistema de SUNAT. Puede\nverificarla utilizando su clave SOL.\n\n"
+  },
+  {
+    "id": "1E13tW-uUBM105_O_EosAXEjQk30IeXar",
+    "name": "20524520070-01-FA19-1104.pdf",
+    "path": "",
+    "size": "13758",
+    "modifiedTime": "2026-09-03T18:41:19.072Z",
+    "webViewLink": "https://drive.google.com/file/d/1E13tW-uUBM105_O_EosAXEjQk30IeXar/view?usp=drivesdk",
+    "text": "Representación Impresa de la Factura de Venta Electrónica\nPuede consultar este documento en www.fegs.com.pe\nSEÑOR(ES)\n: CREACION CUANTICA E.I.R.L. \nRUC\n: 20612592811\nDOMICILIO FISCAL\n: CAL.BERLIN NRO. 965 INT. 302 LIMA - LIMA - MIRAFLORES\nFECHA DE EMISION\n: 01.09.2026\nGUIA DE REMISION\n: \nFORMA DE PAGO\n: CREDITO\nR.U.C. 20524520070\nFactura de Venta Electrónica\nN° FA19-1104\nWORX S.A.C.\nOficina Principal\nAV. REPUBLICA DE PANAMA 3030\nSAN ISIDRO - LIMA 27\nAlmacen\nCantidad\nUnidad\nDescripción\nPrecio Unitario\nValor Venta\n1.000 \nUND\nWORX OFICINA 502 - SETIEMBRE\n700.00 \n700.00 \n1.000 \nUND\nWORX OFICINA 506 - SETIEMBRE\n399.00 \n399.00 \nCuota\nMoneda\nMonto\nFecha\nCredito\nUSD\n       1,167.14 \nCuota001\nUSD\n       1,167.14 \n08.09.2026\nSON : MIL DOSCIENTOS NOVENTA Y SEIS CON\n82/100 US DOLARES\nSUBTOTAL\nUSD\n1,099.00 \nDESCUENTO\nUSD\n0.00 \nOP. GRAVADAS USD\n1,099.00 \nI.G.V\nUSD\n197.82 \nR.CONSUMO\nUSD\n0.00 \nIMPORTE TOTAL USD\n1,296.82 \n\n"
+  },
+  {
+    "id": "1KqoJzyRkzGBzi4NYLUeZ8G_iTkxJ7jSK",
+    "name": "E001-1148 CREACION CUANTICA.pdf",
+    "path": "",
+    "size": "9663",
+    "modifiedTime": "2026-09-01T18:11:48.806Z",
+    "webViewLink": "https://drive.google.com/file/d/1KqoJzyRkzGBzi4NYLUeZ8G_iTkxJ7jSK/view?usp=drivesdk",
+    "text": " \n \n \nECHEVARRIA OSORIO ALEXANDRA VANESSA  \nJR. THOMAS COCHRANE 3353 URB. CONDEVILLA DEL SEÑOR ALT.\nCDRA 33 AV. JOSE GRANDA  \nSAN MARTIN DE PORRES - LIMA - LIMA \nFACTURA ELECTRONICA\nRUC: 10412743879 \nE001-1148 \nFecha de Emisión\n: 31/08/2026\nSeñor(es)\n: CREACION CUANTICA E.I.R.L.  \nRUC \n: 20612592811  \nDirección del Cliente \n: CAL. BERLIN 965 URB. SANTA CRUZ\nINT. 302 LIMA-LIMA-MIRAFLORES \nTipo de Moneda\n: SOLES \nObservación\n:  \nForma de pago: Contado\nCantidad\nUnidad Medida\nDescripción\nValor Unitario\nICBPER\n1.00\nUNIDAD\nSERVICIO LOGISTICO DEL 27 AL 30 AGOSTO\n1800.00\n0.00\n1.00\nUNIDAD\nALQUILER DE 03 MICROFONOS DE MANO DEL 27 AL 30\nAGOSTO\n500.00\n0.00\nValor de Venta de Operaciones Gratuitas : S/ 0.00 \n \n \nSON: DOS MIL SETECIENTOS CATORCE Y 00/100 SOLES\n \n \nSub Total Ventas :\nS/ 2,300.00 \nAnticipos :\nS/ 0.00 \nDescuentos :\nS/ 0.00 \nValor Venta :\nS/ 2,300.00 \nISC :\nS/ 0.00 \nIGV :\nS/ 414.00 \nICBPER :\nS/ 0.00 \nOtros Cargos :\nS/ 0.00 \nOtros Tributos :\nS/ 0.00 \nMonto de redondeo :\nS/ 0.00 \nImporte Total :\nS/ 2,714.00 \nInformación de la detracción\nLeyenda:\nOperación sujeta al Sistema de Pago de Obligaciones Tributarias con el Gobierno Central\nBien o Servicio:\n019  Arrendamiento de bienes muebles e inmuebles\nMedio de pago:\n003  Transferencia de fondos\nNro. Cta. Banco de la Nación:\n00030088972\nPorcentaje de detracción:\n10.00\nMonto detracción:\nS/ 271.00\nEsta es una representación impresa de la factura electrónica, generada en el Sistema de SUNAT. Puede\nverificarla utilizando su clave SOL.\n\n"
+  },
+  {
+    "id": "1OASWwvK_jMkeheTm0kAjL3sXlyqgjkzB",
+    "name": "F001-2179 CREACION CUANTICA E.I.R.L..pdf",
+    "path": "",
+    "size": "57902",
+    "modifiedTime": "2026-09-01T17:50:25.936Z",
+    "webViewLink": "https://drive.google.com/file/d/1OASWwvK_jMkeheTm0kAjL3sXlyqgjkzB/view?usp=drivesdk",
+    "text": "CORPORACION AQUA ANANDA S.A.C.\nJR. CHAVIN NRO. 16 HUERTA LA VIRREYNA\nBreña, Lima, Lima\nTelf: 9929961912 / 951201327 - Email: ventas@anandaperu.com\nhttps://aquananda.com.pe/\nR.U.C. 20610414495\nFACTURA ELECTRÓNICA\nF001 - 002179\nRazón Social: CREACION CUANTICA E.I.R.L.\nR.U.C.: 20612592811\nDirección: CAL. BERLIN NRO. 965 SANTA CRUZ INT. 302 LIMA - LIMA - MIRAFLORES Miraflores - Lima - Lima\nFECHA DE EMISIÓN\nFORMA DE\nPAGO\nTIPO\nMONEDA\nNÚMERO DE\nGUÍA\nORDEN DE\nCOMPRA\nNÚMERO DE\nPLACA\n31-08-2026 08:42:51\nAM\nYAPE\nSoles\nCANT.\nDESCRIPCIÓN\nPRECIO\nUNID/MED\nAFECT.IGV\nIMPORTE\n7\nAQUA ANANDA AGUA DE MESA OZONIZADA\nOSMOTIZADA Y ALCALINA RECARGA DE BIDON\nCON CAÑO DE 20 LT\nS/ 19.90\nUNIDADES\nGravado\nS/ 139.30\nSON CIENTO TREINTA Y NUEVE CON 30/100 SOLES\nConsulte su documento electrónico en:\nhttps://facturalaya.com/sys/consultas/index/8446\nHASH: lldYlJiYFcjgdmi27Zn51THUTdo=\nVENDEDOR: CORPORACION AQUA ANANDA S.A.C.\nAdministrador (cod: 10814)\nRepresentación Impresa de Factura Electrónica\nRESUMEN:\nGravada:\nS/ 118.05\nIGV (18.00%):\nS/ 21.25\nDescuento Total:\nS/ 0.00\nTotal:\nS/ 139.30\nBANCO\nTITULAR\nTIPO CTA\nMONEDA\nCTA CTE\nCCI\nCTA CTE BCP\nSOLES\nCORPORACION AQUA\nANANDA SAC\nCuenta\nCorriente\nSoles\n1939621923039\n00219300962192303916\nEmitido por: facturalaya.com\n\n"
+  },
+  {
+    "id": "1l9MPsMdAhYF9dYMgbGeBQFjmOuJSbN5B",
+    "name": "RHE15604817649E00142.pdf",
+    "path": "",
+    "size": "2200",
+    "modifiedTime": "2026-08-28T18:37:45.237Z",
+    "webViewLink": "https://drive.google.com/file/d/1l9MPsMdAhYF9dYMgbGeBQFjmOuJSbN5B/view?usp=drivesdk",
+    "text": "DEL ARTÍCULO 33 DE LA LEY DEL IMPUESTO A LA RENTA\nRecibí de:\nIdentificado con\nObservación\nInciso\nLa suma de:\nTotal por honorarios:\nRetención (\nR.U.C.\nRECIBO POR HONORARIOS ELECTRONICO\nNro:\n15604817649\n-\nE001\n42\nGARCIA LLOVERA YUSMELY DESIREE\nOTR. 12 DE OCTUBRE ZONA 1 MZA. A-4 INT. C LOTE. 3 ASC. ASOC RURAL IND\nY AGROP LA LIMA - LIMA - CHORRILLOS\n-\nTELÉFONO:\nnúmero\nPor concepto de\nde\ndel\nTotal Neto Recibido:\nCREACION CUANTICA E.I.R.L.\nRUC\n20612592811\n CIENTO CUARENTA Y 00/100 SOLES\nSERVICIO EN OFICINA 1 DÍA\n-\nA\n26\nAgosto\n2026\n140.00\n(0.00)\n140.00\nSOLES\n%) IR:\n8\nFecha de emisión\nDomiciliado en\nCAL. BERLIN NRO. 965 INT. 302 URB. SANTA CRUZ LIMA - LIMA - MIRAFLORES\nAL CONTADO\nForma de Pago:\n\n"
+  },
+  {
+    "id": "1Do0rrWhy9J7QKOUXtWY_P9dC-0nFe1nF",
+    "name": "20100910129-01-F301-47706.pdf",
+    "path": "",
+    "size": "77871",
+    "modifiedTime": "2026-08-27T17:53:31.103Z",
+    "webViewLink": "https://drive.google.com/file/d/1Do0rrWhy9J7QKOUXtWY_P9dC-0nFe1nF/view?usp=drivesdk",
+    "text": "R.U.C. 20100910129\nFACTURA ELECTRÓNICA\nF301-47706\nFECHA DE EMISIÓN\n:\n26/08/2026\nRAZÓN SOCIAL\n:\n:\nO.COMPRA\nCREACION CUANTICA E.I.R.L.\nRUC\n:\n20612592811\nCLIENTE\n:\nEvento\nDIRECCIÓN\n:\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\nIN\n:\n27/08/2026\nOUT: 30/08/2026\nRVA :\n32411258\nHBA :\nMONEDA\n:\nSOLES\nHORA EMISIÓN:\n08:58:44\nSEDE PRINCIPAL:\n AV. 28 DE JULIO 398-MIRAFLORES-LIMA-LIMA\nLIMA 18 - PERU FAX: 445-4027\nSEDE LIMA: CAL.COLON 325-MIRAFLORES-LIMA-LIMA\nTELFS:445-5225 / 445-5135 / 445-6397\nCALLE BELLAVISTA 113-137 - MIRAFLORES-LIMA-LIMA\nSEDE LIMA:\nTELF: 6415050\nAV.PARDO 1080 - URB.ARTESANAL-CUSCO-CUSCO\nSEDE CUSCO:\nTELF:084-239030\nCOMUNIDAD CAMPESINA CHIMU - PUNO -PUNO\nTELF: 051-640000\nSEDE PUNO: CARRETERA DESAGUADERO KM.6.500 PUNO FDO.\nCARTIR PERU S R L\nDESCRIPCIÓN\nCANTIDAD\nPRECIO\nUNITARIO\nTOTAL\nSalas\n1\n8,050.85\n8,050.85\nPAX:\nUSUARIO:  Mauricio Polack Delax\nSON : NUEVE MIL QUINIENTOS  CON 00/100 SOLES\nMÉTODO PAGO SUNAT:\nMONTO NETO PENDIENTE DE PAGO:\n0.00\nContado\nOP. EXONERADA\nOP. INAFECTA\nOP. GRAVADA\nT.DSCTO.\nI.S.C\nI.G.V\nPROPINA\nPAID OUT\nR.CONS.10%\nIMPORTE TOTAL\n0.00\n8,050.85\n0.00\n0.00\n1,449.15\n0.00\n0.00\n0.00\n9,500.00\nAUTORIZADO MEDIANTE RESOLUCIÓN NRO. 034-005-0005038/SUNAT\nREPRESENTACIÓN IMPRESA DE LA FACTURA DE VENTA\nCONSULTE SU DOCUMENTO EN HTTP://WWW.HOTELESJOSEANTONIO.COM\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRÁ UN CAMBIO EN EL\nNÚMERO DE ESTE COMPROBANTE.\n0.00\n0.00\nOP.EXPORTACIÓN\n% Detracción:\n950\n10\nBienes y/o servicios sujetos a detracción:\nMoneda:\nMonto Detracción:\nSOLES\nARRENDAMIENTO DE BIENES MUEBLES\nOperaciones sujetas al pago de obligaciones tributarias con el Gobierno Central, depositar en nuestra Cta. Cte. Banco de la Nación\n00-000-779911\n-1-\n\n"
+  },
+  {
+    "id": "1LFVl_9uDElk_teDlOj2pDrnneF7X0Rgj",
+    "name": "factura alojamiento crear 32423560.pdf",
+    "path": "",
+    "size": "324561",
+    "modifiedTime": "2026-08-26T19:19:13.284Z",
+    "webViewLink": "https://drive.google.com/file/d/1LFVl_9uDElk_teDlOj2pDrnneF7X0Rgj/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32423560\nmiércoles, 26 Agosto, 2026\nREFERENCIA\nF301\n00047687\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n07/09/2026\nSALIDA\n26/08/2026\nFacturado a : \nUSUARIO\nAndrés Gómez , Andrés Idrobo , Lourdes Patiño  , Alejandro Díaz\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nAlojamiento\n1,054.69\n1,054.69\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nKPCqM3aPHSu95aLF3JPmJWr+id8=\nUN MIL TRESCIENTOS CINCUENTA Y 00/100 DOLARES AMERICANOS\nTotal  Propina\nUS $\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n1,350.00\n0.00\n0.00\n105.47\n189.84\n0.00\n0.00\n1,054.69\nTotal  Exportacion\n0.00\nCuentas corrientes  \nTotal  Descuento\nDolares\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1RMkOEgecEpFNycUCVS4mNRqZO111UhoJ",
+    "name": "ERNESTO ALEJANDRO DIAZ PABON, 03SEP 1415 QUITO.pdf",
+    "path": "",
+    "size": "128546",
+    "modifiedTime": "2026-08-20T17:11:30.243Z",
+    "webViewLink": "https://drive.google.com/file/d/1RMkOEgecEpFNycUCVS4mNRqZO111UhoJ/view?usp=drivesdk",
+    "text": "Issuing office:\nAVIANCAONLINE, AVENIDA EL DORADO # 59 - 15, SAN\nSALVADOR\nTelephone: TBA\nDate: 20Aug2026\nPassenger: Diaz Pabon Ernesto Alejandro (ADT)\nBooking ref: AS58FE\nTicket number: 202 2491623851\nPassenger Unique ID:\nELECTRONIC TICKET RECEIPT\nAt check-in, you must show a photo ID.\nFlight\nTo\nDeparture\nArrival\nLast check-in\nFrom\nQUITO MARISCAL SUCRE INTL\nBOGOTA EL DORADO INTL\nTerminal: 1\nAV108\n14:15\n03Sep2026\n15:50\n03Sep2026\nFare: LIGHT\nOperated by: AVIANCA\nMarketed by: AVIANCA\nNVB (2): 03Sep2026\nNVA (3): 03Sep2026\nBooking status (1): OK\nBaggage (4): 0PC\nDuration: 01:35\nBOGOTA EL DORADO INTL\nTerminal: 1\nLIMA JORGE CHAVEZ INTL\nAV51\n17:45\n03Sep2026\n20:50\n03Sep2026\nFare: LIGHT\nOperated by: AVIANCA\nMarketed by: AVIANCA\nNVB (2): 03Sep2026\nNVA (3): 03Sep2026\nBooking status (1): OK\nBaggage (4): 0PC\nDuration: 03:05\nLIMA JORGE CHAVEZ INTL\nBOGOTA EL DORADO INTL\nTerminal: 1\nAV50\n11:45\n07Sep2026\n15:00\n07Sep2026\nFare: LIGHT\nOperated by: AVIANCA\nMarketed by: AVIANCA\nNVB (2): 07Sep2026\nNVA (3): 07Sep2026\nBooking status (1): OK\nBaggage (4): 0PC\nDuration: 03:15\nBOGOTA EL DORADO INTL\nTerminal: 1\nQUITO MARISCAL SUCRE INTL\nAV8373\n16:00\n07Sep2026\n17:40\n07Sep2026\nFare: LIGHT\nOperated by: AVIANCA ECUADOR S.A.\nMarketed by: AVIANCA\nNVB (2): 07Sep2026\nNVA (3): 07Sep2026\nBooking status (1): OK\nBaggage (4): 0PC\nDuration: 01:40\n(1) OK = Confirmed (2) NVB = Not valid before (3) NVA = Not valid after (4) Each passenger can check in a specific amount of baggage at\nno extra cost as indicated above in the column baggage.\nELECTRONIC TICKET REMARKS\nBAGGAGE INFORMATION\nPlease visit https://www.avianca.com/en/my-booking/prepare-your-trip/baggage\nCarry-on and additional bag fees will be higher at airport counter and gate,\nwe recommend you purchase them in advance.\nIf your ticket fare is basic, remember that your fare does not include a carry-on bag.\nPAYMENT DETAILS\nFARE DETAILS\nFare Calculation: UIO AV X/BOG AV LIM110.00AV X/BOG AV\nUIO131.00NUC241.00END ROE1.00\nFare:\nUSD 241.00\n\nCC VI XXXXXXXXXXXX1055\nXXXX 567952\nForm of payment:\nEndorsements: /C1-4 NON REFUNDABLE/ CHANGES\nRESTRICTED/ RESTRICTIONS APPLY\nTaxes:\nUSD 36.15EC\nUSD 12.10ED\nUSD 69.19QB\nUSD 5.00QI\nUSD 3.00WT\nUSD 15.00DY\nUSD 30.24HW\nTotal Amount:\nUSD 411.68 \nRECEIPT REMARKS\nInternational connections via Lima are subject to payment of the Unified Airport Use Fee (Tarifa Unificada de Uso de Aeropuerto (TUUA))\nthrough the channels enabled by Lima Airport Partners. For more information:\nInformation about the Unified Airport Usage Fee at Lima International Airport – Help Center avianca\nThe carriage of certain hazardous materials, like aerosols, fireworks, and flammable liquids, aboard the aircraft is forbidden. If you do not\nunderstand these restrictions, further information may be obtained from your airline.\nLEGAL AND PASSENGER NOTICES\nCARRIAGE AND OTHER SERVICES PROVIDED BY THE CARRIER ARE SUBJECT TO CONDITIONS OF CARRIAGE, WHICH ARE HEREBY INCORPORATED BY\nREFERENCE. THESE CONDITIONS MAY BE OBTAINED FROM THE ISSUING CARRIER. THE ITINERARY/RECEIPT CONSTITUTES THE PASSENGER TICKET FOR THE\nPURPOSES OFARTICLE 3 OF THE WARSAW CONVENTION, EXCEPT WHERE THE CARRIER DELIVERS TO THE PASSENGER ANOTHER DOCUMENT COMPLYING WITH\nTHE REQUIREMENTS OF ARTICLE 3.PASSENGERS ON A JOURNEY INVOLVING AN ULTIMATE DESTINATION OR A STOP IN A COUNTRY OTHER THAN THE COUNTRY\nOF DEPARTURE ARE ADVISED THAT INTERNATIONAL TREATIES KNOWN AS THE MONTREAL CONVENTION, OR ITS PREDECESSOR, THE WARSAW CONVENTION,\nINCLUDING ITS AMENDMENTS (THE WARSAW CONVENTION SYSTEM), MAY APPLY TO THE ENTIRE JOURNEY, INCLUDING ANY PORTION THEREOF WITHIN A\nCOUNTRY. FOR SUCH PASSENGERS, THE APPLICABLE TREATY, INCLUDING SPECIAL CONTRACTS OF CARRIAGE EMBODIED IN ANY APPLICABLE TARIFFS,\nGOVERNS AND MAY LIMIT THE LIABILITY OF THE CARRIER. THESE CONVENTIONS GOVERN AND MAY LIMIT THE LIABILITYOF AIR CARRIERS FOR DEATH OR\nBODILY INJURY OR LOSS OF OR DAMAGE TO BAGGAGE, AND FOR DELAY. THE CARRIAGE OF CERTAIN HAZARDOUS MATERIALS, LIKE AEROSOLS, FIREWORKS,\nAND FLAMMABLE LIQUIDS, ABOARD THE AIRCRAFT IS FORBIDDEN. IF YOU DO NOT UNDERSTAND THESE RESTRICTIONS, FURTHER INFORMATION MAY BE\nOBTAINED FROM YOUR AIRLINE. DATA PROTECTION NOTICE: YOUR PERSONAL DATA WILL BE PROCESSED IN ACCORDANCE WITH THE APPLICABLE CARRIER'S\nPRIVACY POLICY AND, IF YOUR BOOKING IS MADE VIA A RESERVATION SYSTEM PROVIDER ( GDS ), WITH ITS PRIVACY POLICY. THESE ARE AVAILABLE AT http://\nwww.iatatravelcenter.com/privacy OR FROM THE CARRIER OR GDS DIRECTLY. YOU SHOULD READ THIS DOCUMENTATION, WHICH APPLIES TO YOUR BOOKING AND\nSPECIFIES, FOR EXAMPLE, HOW YOUR PERSONAL DATA IS COLLECTED, STORED, USED, DISCLOSED AND TRANSFERRED.(APPLICABLE FOR INTERLINE CARRIAGE\nNIT: 0614-291139-002-9\nELECTRONIC TICKET\n\n"
+  },
+  {
+    "id": "1_QRyd56avtKs_-Gg0Losm4TkN8Jo6Ta-",
+    "name": "10431196391_F005_21.pdf",
+    "path": "",
+    "size": "33821",
+    "modifiedTime": "2026-08-19T17:13:45.066Z",
+    "webViewLink": "https://drive.google.com/file/d/1_QRyd56avtKs_-Gg0Losm4TkN8Jo6Ta-/view?usp=drivesdk",
+    "text": "Chino Raul\nMAMANI QUISPE EVA MERCEDES\n-\nLima - Lima - Santa Anita\n960811009\ncondoricahuayaraul@gmail.com\nR.U.C. 10431196391\nFACTURA DE VENTA\nELECTRÓNICA\nN° F005 - 21\n CREACION CUANTICA E.I.R.L.\nCliente:\n 2026-08-15 16:13:52\nF. Emisión:\n20612592811\nRUC : \n Efectivo\nMétodo de Pago:\n CAL.BERLIN NRO. 965 INT. 302 URB. SANTA CRUZ\nDirección:\n Contado\nTipo de Pago:\n S/ Soles\nMoneda:\nItem\nDescripción\nUnidad\nCantidad\nP. Unitario\nDESC.\nSub\nTotal\n1\nALMENDRA \"BLUE DAMON\" CAJA X 22.68KG\nKGM\n2.0\n34.0\n0.0000\n68.0\n2\nPISTACHOS \"PRIMEX FARMS\" CAJA X 10KG\nKGM\n4.0\n48.0\n0.0000\n192.0\n3\nCANELA LONG STICK CASSIA\nKGM\n12.5\n24.0\n0.0000\n300.0\nOP. Gravada\n474.58\nOP. Inafectas\n0.00\nOP. Exoneradas\n0.00\nSumatoria IGV (18.00 %)\n85.42\nImporte Total\n560.00\nSON QUINIENTOS SESENTA CON 0/100 SOLES\nPago: efectivo | Pago con: S/ 0.00 | Vuelto: S/ 0.00\n Principal\nVendedor:\n condoricahuayaraul@gmail.com\nCorreo vendedor:\nTienda Física\nRepresentación impresa del Comprobante Electrónico\nPuede ser consultado en https://kallpafactura.pe/consulta\nGRACIAS POR SU COMPRA\n\n"
+  },
+  {
+    "id": "1Dmdxe-Z_PoGGOY45L0BVhW4kanxQOXnm",
+    "name": "10431196391_F005_22.pdf",
+    "path": "",
+    "size": "33314",
+    "modifiedTime": "2026-08-19T17:09:05.133Z",
+    "webViewLink": "https://drive.google.com/file/d/1Dmdxe-Z_PoGGOY45L0BVhW4kanxQOXnm/view?usp=drivesdk",
+    "text": "Chino Raul\nMAMANI QUISPE EVA MERCEDES\n-\nLima - Lima - Santa Anita\n960811009\ncondoricahuayaraul@gmail.com\nR.U.C. 10431196391\nFACTURA DE VENTA\nELECTRÓNICA\nN° F005 - 22\n CREACION CUANTICA E.I.R.L.\nCliente:\n 2026-08-15 18:16:13\nF. Emisión:\n20612592811\nRUC : \n Efectivo\nMétodo de Pago:\n CAL.BERLIN NRO. 965 INT. 302 URB. SANTA CRUZ\nDirección:\n Contado\nTipo de Pago:\n S/ Soles\nMoneda:\nItem\nDescripción\nUnidad\nCantidad\nP. Unitario\nDESC.\nSub\nTotal\n1\nPISTACHOS \"PRIMEX FARMS\" CAJA X 10KG\nKGM\n0.5\n48.0\n0.0000\n24.0\nOP. Gravada\n20.34\nOP. Inafectas\n0.00\nOP. Exoneradas\n0.00\nSumatoria IGV (18.00 %)\n3.66\nImporte Total\n24.00\nSON VEINTE Y CUATRO CON 0/100 SOLES\nPago: efectivo | Pago con: S/ 24.00 | Vuelto: S/ 0.00\n Principal\nVendedor:\n condoricahuayaraul@gmail.com\nCorreo vendedor:\nTienda Física\nRepresentación impresa del Comprobante Electrónico\nPuede ser consultado en https://kallpafactura.pe/consulta\nGRACIAS POR SU COMPRA\n\n"
+  },
+  {
+    "id": "1vpN5CgYUsU9g4Y9RMMCq3mGTxT8_Xydb",
+    "name": "20100538203-01-F375-00106032.pdf",
+    "path": "",
+    "size": "207365",
+    "modifiedTime": "2026-08-15T23:54:29.805Z",
+    "webViewLink": "https://drive.google.com/file/d/1vpN5CgYUsU9g4Y9RMMCq3mGTxT8_Xydb/view?usp=drivesdk",
+    "text": "R.U.C.: 20100538203\nFACTURA ELECTRONICA\nNº F375- 00106032\nSEÑORES\n: CREACION CUANTICA E.I.R.L.\nR.U.C.:\n: 20612592811\nDIRECCION\n: CAL.BERLIN NRO. 965 INT. 302 URB. SANTA CRUZ - LIMA, LIMA, MIRAFLORES\nGRUPO\n: -\nE-MAIL\n: -\nFECHA DE EMISIÓN\n: 2026-08-15\nFECHA DE VENCIMIENTO\n: 2026-08-16\nCONDICIÓN DE PAGO\n: Contado\nMONEDA\n: SOLES\nCODIGO DE USUARIO\n: 248509\nOFIC. DE RECAUDACIÓN\n: AGECOFER - MIRAFLORES\nCÓDIGO\nDESCRIPCIÓN\nUND\nCANT\nPRECIO\nUNITARIO\nDSCTO.\nVALOR DE\nVENTA\n00679379\nESPECTACULOS MUSICALES - ESPECTACULOS MUSICALES / MUSICA GRABADA - HOTEL\nJOSE ANTONIO - PLANILLA N° -1721384 - CAL. BELLAVISTA 133 - LIMA, LIMA, MIRAFLORES\nUN\n1\n2,030.0000\n0.00\n2,030.00 \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \nSON: DOS MIL TREINTA CON 00/100 SOLES\nOBSERVACIONES:\nENTRENAMIENTO DE LIDERAZGO 14-15-16-27-28-29-30 AGO / EQUIPO DE SONIDO\nDescuento Global\n0.00  \nTOTAL GRAVADO\n0.00  \nTOTAL INAFECTO\n2,030.00  \nTOTAL EXONERADO\n0.00  \nTOTAL IGV 18%\n0.00  \nTOTAL S/\n2,030.00  \nDERECHO DE AUTOR INAFECTO A I.G.V., SEGÚN D.S. 055-99-EF ART. 2 INC. A\nEstimado usuario, le informamos que puede verificar los documentos valorados que nuestra sociedad emite, a través de nuestro módulo de consultas de facturación electrónica:\nhttp://apdayc.ecomprobantes.pe/Apdayc/formularios/frmAutentificacionEstandar.aspx\nLes recordamos que las únicas cuentas autorizadas por APDAYC para pagos son:\nBBVA\nCuenta Cte. 0011 0368 01 00002525\nCCI: 011 368 000100002525 82\nBCP\nCuenta Cte. 191 0046905 0 86\nCCI: 00219100004690508658\nScotiabank\nCuenta Cte. 000 4501799\nCCI: 009 04300000450179913\nInterbank\nCuenta Cte. 200 3000831059\nCCI: 003 200 003000831059 38\n \nRepresentación impresa de la Factura Electrónica\nPodrá ser consultado en: http://apdayc.ecomprobantes.pe/Apdayc/formularios/frmInicio.aspx \n \n\n"
+  },
+  {
+    "id": "1bwMOm1KsbXGSPmWF0OgeaWlOyhS9pLSe",
+    "name": "20260815110200_AutorizacionBaileJuridico.pdf",
+    "path": "",
+    "size": "550111",
+    "modifiedTime": "2026-08-15T23:54:14.367Z",
+    "webViewLink": "https://drive.google.com/file/d/1bwMOm1KsbXGSPmWF0OgeaWlOyhS9pLSe/view?usp=drivesdk",
+    "text": " \nASOCIACION PERUANA DE AUTORES Y COMPOSITORES \nDECRETO LEGISLATIVO 822 LEY SOBRE EL DERECHO DE AUTOR \nCONTRATO DE LICENCIAMIENTO PARA LA COMUNICACIÓN PÚBLICA DE OBRAS MUSICALES \n(BAILES Y ESPECTACULOS) \n \nAUTORIZACIÓN PARA LA COMUNICACIÓN PÚBLICA  DE OBRAS MUSICALES \n \nPor el presente documento y de conformidad con el Art. 37 del D.L  N°822, ley sobre Derecho \nde Autor, la ASOCIACIÓN PERUANA DE AUTORES Y COMPOSITORES en adelante APDAYC, \nAUTORIZA a: CREACION CUANTICA E.I.R.L. con RUC y/o DNI: 20612592811, debidamente \nrepresentado por los Sres.    con DNI: 20612592811, domiciliado en CAL.BERLIN NRO. 965 \nINT. 302 URB. SANTA CRUZ-LIMA, LIMA, MIRAFLORES, Distrito LIMA, LIMA, MIRAFLORES, en \nadelante el usuario, al uso de las obras musicales nacionales e internacionales que APDAYC \nrepresenta y administra, para la realización de ENTRENAMIENTO DE LIDERAZGO 14-15-16-27-\n28-29-30 AGO contando con la participación artística de: EQUIPO DE SONIDO, a realizarse \nel(los) día(s) 14/08/2026 al 30/08/2026 en el local HOTEL JOSE ANTONIO sitio en CAL. \nBELLAVISTA   133-LIMA, LIMA, MIRAFLORES, Distrito MIRAFLORES para tales efectos EL \nUSUARIO cumple con cancelar a APDAYC la suma de: 2030.00  (DOS MIL TREINTA) nuevos \nsoles (S/. 2030.00) correspondiente al pago del derecho de autor. \nAsimismo se compromete a la devolución de las Planillas de Ejecución Musical debidamente \nllenadas y firmadas por el(los) interprete(s) y por los organizadores y/o al registro del evento \nen medios magnéticos, con el exclusivo propósito de verificar el uso del repertorio musical, en \natención a lo dispuesto en el artículo 116 del D.L N° 822, Ley Sobre Derecho de Autor. \n \nAUMP Nª679379 \nAUTORIZACION EMITIDA CON EL COMPROBANTE: \nFA F375-106032 \n \nREPRESENTANTE APDAYC \nCargo \nAPDAYC \n\n* Las solicitudes de devolución de dinero por no uso de licencias o por pagos en exceso, debidamente sustentadas, deben \npresentarse dentro de los plazos establecidos en el Tarifario – Anexo 0, disponible en www.apdayc.org.pe \n* Para iniciar el trámite, escriba a apdayc@apdayc.org.pe o a la oficina de origen adjuntando los datos de la licencia, \ncomprobantes de pago y sustento correspondiente. \n \n\n"
+  },
+  {
+    "id": "1DtB6SS1uxyWXhp2rM_3Cap2I6WMkq65N",
+    "name": "F001-2135 CREACION CUANTICA E.I.R.L.pdf",
+    "path": "",
+    "size": "57792",
+    "modifiedTime": "2026-08-15T23:49:24.711Z",
+    "webViewLink": "https://drive.google.com/file/d/1DtB6SS1uxyWXhp2rM_3Cap2I6WMkq65N/view?usp=drivesdk",
+    "text": "CORPORACION AQUA ANANDA S.A.C.\nJR. CHAVIN NRO. 16 HUERTA LA VIRREYNA\nBreña, Lima, Lima\nTelf: 9929961912 / 951201327 - Email: ventas@anandaperu.com\nhttps://aquananda.com.pe/\nR.U.C. 20610414495\nFACTURA ELECTRÓNICA\nF001 - 002135\nRazón Social: CREACION CUANTICA E.I.R.L.\nR.U.C.: 20612592811\nDirección: CAL. BERLIN NRO. 965 SANTA CRUZ INT. 302 LIMA - LIMA - MIRAFLORES Miraflores - Lima - Lima\nFECHA DE EMISIÓN\nFORMA DE\nPAGO\nTIPO\nMONEDA\nNÚMERO DE\nGUÍA\nORDEN DE\nCOMPRA\nNÚMERO DE\nPLACA\n14-08-2026 04:34:35\nPM\nYAPE\nSoles\nCANT.\nDESCRIPCIÓN\nPRECIO\nUNID/MED\nAFECT.IGV\nIMPORTE\n5\nAQUA ANANDA AGUA DE MESA OZONIZADA\nOSMOTIZADA Y ALCALINA RECARGA DE BIDON\nCON CAÑO DE 20 LT\nS/ 19.90\nUNIDADES\nGravado\nS/ 99.50\nSON NOVENTA Y NUEVE CON 50/100 SOLES\nConsulte su documento electrónico en:\nhttps://facturalaya.com/sys/consultas/index/8446\nHASH: ssPddYGzVNabMY/goZlAG0syrFE=\nVENDEDOR: CORPORACION AQUA ANANDA S.A.C.\nAdministrador (cod: 10814)\nRepresentación Impresa de Factura Electrónica\nRESUMEN:\nGravada:\nS/ 84.32\nIGV (18.00%):\nS/ 15.18\nDescuento Total:\nS/ 0.00\nTotal:\nS/ 99.50\nBANCO\nTITULAR\nTIPO CTA\nMONEDA\nCTA CTE\nCCI\nCTA CTE BCP\nSOLES\nCORPORACION AQUA\nANANDA SAC\nCuenta\nCorriente\nSoles\n1939621923039\n00219300962192303916\nEmitido por: facturalaya.com\n\n"
+  },
+  {
+    "id": "1rAxTNihiOFoVGd7QqPZDsgBfLfeCIzT-",
+    "name": "F005-00022006.pdf",
+    "path": "",
+    "size": "189745",
+    "modifiedTime": "2026-08-15T23:40:05.628Z",
+    "webViewLink": "https://drive.google.com/file/d/1rAxTNihiOFoVGd7QqPZDsgBfLfeCIzT-/view?usp=drivesdk",
+    "text": " \nInversiones PIMI SAC\nDomicilio fiscal: Pasaje Martir Olaya 141\nMiraflores - Lima - Lima - Peru\nrecaudacion@delpilarhotels.com\nTelf: (511) 712-0712 / Fax: (511) 712-0714\n-\n \nR.U.C Nº 20508159863\nFACTURA \nELECTRÓNICA\nF005-00022006\nRazón social\n: CREACION CUANTICA E.I.R.L.\nR.U.C\n: 20612592811\nDirección\n: CAL.BERLIN NRO. 965 INT. 302 URB.\nSANTA CRUZ\nUbigeo\n: LIMA - LIMA - LIMA\nUrbanización\n: Lima\n \n \nMoneda\n: Soles\nFecha emisión\n: 14/08/2026 12:53:26\nFecha vencimiento\n: 14/08/2026\nForma de pago\n: Contado\nDias credito\n: -\nOrden de compra\n: -\nCliente\n: 03185-CREACION CUANTICA E.I.R.L.\nReserva\n: 053447\nGrupo\n: CREAR PODER SIN LIMITES CAIDA DE\nCONFIANZA\nCheck in\n: 19/09/2026\nCheck out\n: 19/09/2026\nCantidad noches\n: 0\nHabitaciones\n: -\nTipo de cambio : 3.750\n \n \nObservaciones:\nInformación de la Detracción\nTipo Operación:\nBien o Servicio:\nMedio de pago:\n1001 Operación Sujeta a Detracción\n019 Arrendamiento de bienes muebles\n001 Depósito en cuenta\nNro. Cta. Banco de la Nación:\nPorcentaje de detracción:\nMonto detraccion:\n-\n10.00\nS/. 175.00\nLeyendas\nLeyenda: 2006    Operaci?n sujeta a detracci?n\nRepresentación Impresa de la factura electrónica, consulte su comprobante en www.infofactperu.pe/consulta \nUsuario: Stephanie \nCódigo Hash:  IeXczWONRXaM6hWV6K6PBBdA2uIbstXOk32n5VBmPTU=\n \npowered by Infomatica\n \nÍtem\n \nCódigo\n \nDescripción\n \nUnd.\n \nCantidad\n \nV. Unitario\n \nP. Unitario\n \nDescuento\n \nValor Venta\n1\n210000\nEVENTOS - SALONES\nNIU\n1.000\n1 367.18750\n1 613.28125\n0.00000\n1 367.19\nSON:MIL SETECIENTOS CINCUENTA CON 00/100 SOLES\n \nAnticipo\nS/\n0.00\n \n \nOp. Gravada\nS/\n1 367.19\n \n \nI.G.V 18.00%\nS/\n246.09\n \n \nOp. Inafecta\nS/\n0.00\n \n \nOp. Exonerada\nS/\n0.00\n \n \nOp. Exportación\nS/\n0.00\n \n \nOp. Gratuita\nS/\n0.00\n \n \nICBPER\nS/\n0.00\n \n \nServicio\nS/\n136.72\n \nImporte Total\nS/\n1 750.00\nOperacion sujeta al spot de detraccion 10%  para alquileres y 12%  para alimentos cta cte 00005137934 - Banco de la Nacion\nABONAR A LAS SIGUIENTES CUENTAS CORRIENTES\nCuenta Corriente bcp Dolares: 191-1516166-117\nCuenta Corriente bcp soles: 191-1514483-007\n\n"
+  },
+  {
+    "id": "1fDk1MgNjmgGb2PClKyqSTteWAn51G_j-",
+    "name": "Factura-20612838951-E001-5412.pdf",
+    "path": "",
+    "size": "7252",
+    "modifiedTime": "2026-08-14T16:58:08.528Z",
+    "webViewLink": "https://drive.google.com/file/d/1fDk1MgNjmgGb2PClKyqSTteWAn51G_j-/view?usp=drivesdk",
+    "text": "20612838951\nRUC\nFACTURA ELECTRÓNICA\nE001 5412\n:\n-\nTAXI GREEN LIMA 992401467\nTAXI PREMIUM GREEN LIMA. S.A.C.\nJR. GENERAL CORDOVA 1737\nLINCE - LIMA - LIMA\nFecha de Emisión\nSeñor (es)\nTipo de Moneda\n13/08/2026\nCREACION CUANTICA E.I.R.L.\nRUC\n20612592811\nCAL. BERLIN 965 302 URB. SANTA CRUZ\nSOLES\nLugar de entrega\n:\n:\n:\n:\n:\nFormato de Pago\nAl Contado\n:\nCantidad\nUnidad Medida\nCódigo\nDescripción\nValor Unitario\n1.00\nUNIDAD\n025453\nTRASLADO DEL PERSONAL\n510.00\nSON:  QUINIENTOS DIEZ Y 00/100  SOLES\nEsta es una representación impresa de la factura electrónica E001 - 5412, generada en el Sistema de SUNAT.\n-\n510.00\nSub Total Ventas :\n0.00\nDescuentos :\n510.00\nValor Venta  :\n0.00\nIGV :\nImporte Total :\n510.00\nPuede verificarla utilizando su clave SOL.\n\n"
+  },
+  {
+    "id": "1k4yJEuJuDiBMJ91zGF2rPpo-hlkADLqj",
+    "name": "S002-229237212_08_20260808.pdf",
+    "path": "",
+    "size": "267037",
+    "modifiedTime": "2026-08-12T14:17:21.558Z",
+    "webViewLink": "https://drive.google.com/file/d/1k4yJEuJuDiBMJ91zGF2rPpo-hlkADLqj/view?usp=drivesdk",
+    "text": "Página 1 de 3\n+\n+\n-\n+\n+\nEntel Perú S.A.\nRUC: 20106897914\nAv. República de Colombia 791\nPiso 14 - San Isidro - Lima\n¡Hola! Te enviamos tu recibo del mes\n0\n60\n120\n180\n240\n300\n360\nRequest ID: 34004 | Ciclo: 08 | Custcode: 5.7023\nCREACION CUANTICA E.I.R.L.\nAv Sergio Bernales Nro 272\nLima - Lima - Lima\nRecibo Nº\nEmisión\n:\n:\nS002-229237212\n08/Ago/2026\nInicio del Periodo\nFin del Periodo\n:\n:\n09/Ago/2026\n08/Sep/2026\nNº de Cuenta\nNº Doc (RUC)\n:\n:\n1.21765711\n20612592811\nTotal a pagar\nVencimiento\nS/ 280.21\n21/Ago/2026\nPlan\nProrrateo\nCargos\nAdicionales\nDescuentos o\nP. Adelantado\nEquipos\nSaldo\nAnterior\nS/ 496.10\nS/ 0.00\nS/ 0.00\n-S/ 215.89\nS/ 0.00\nS/ 0.00\nEn las siguientes páginas\npodrás encontrar el detalle de cada concepto\nFacturación de los últimos 6 meses\nMar\nAbr\nMay\nJun\nJul\nAgo\nDesglose tributario\nSubtotal de Conceptos Facturados (sin IGV)\nIGV del Subtotal (18%)\nTotal (Incl. IGV)\nMontos ya gravados con IGV\nExentos IGV\nSaldo anterior\nTotal a pagar\n237.47\n42.74\n280.21\n0.00\n0.00\n0.00\n280.21\nDocumento válido para efectos tributarios según Res. de Sup. No. 007-99/SUNAT. Documento\nno afecto al régimen de retención del IGV por ser agente de retención, según Res. de Sup. No.\n037-2002/SUNAT. Los saldos de hasta S/0.09 que no cancele por falta de moneda de curso legal\n(S/0.05 y S/0.01), se registrarán y se mantendrán como pendientes de pago hasta su cancelación\nefectiva.\nRecuerda que puedes cambiar de operadora sin perder tu número. El trámite de portabilidad es\nrápido y gratuito. Migra tus líneas de otro operador hacia Entel y disfruta de los beneficios que\ntenemos para ti.\n\nPágina 2 de 3\nMira aquí el detalle\ntu recibo\nResumen\nNúmero\nPlan Tarifario\nPlan\nProrrateo\nCargos\nAdicionales (*)\nDescuentos o\nP. Adelantado\nEquipos (*)\nSaldo\nAnterior\nMonto S/\n(Incl. IGV)\n908652308\nEmpresa PRO 2.0 74.9\n74.90\n0.00\n0.00\n-37.45\n0.00\n0.00\n37.45\n933599925\nEmprende Ilimitado 49.90\n49.90\n0.00\n0.00\n-34.93\n0.00\n0.00\n14.97\n933599903\nEmpresa PRO 2.0 59.9\n59.90\n0.00\n0.00\n-29.95\n0.00\n0.00\n29.95\n908931343\nEmpresa PRO 2.0 36.9\n36.90\n0.00\n0.00\n0.00\n0.00\n0.00\n36.90\n933599864\nEmpresa PRO 2.0 59.9\n59.90\n0.00\n0.00\n-29.95\n0.00\n0.00\n29.95\n912379686\nEmpresa PRO 2.0 44.9\n44.90\n0.00\n0.00\n-11.23\n0.00\n0.00\n33.67\n912379744\nEmpresa PRO 2.0 44.9\n44.90\n0.00\n0.00\n0.00\n0.00\n0.00\n44.90\n933599883\nEmprende Ilimitado 49.90\n49.90\n0.00\n0.00\n-34.93\n0.00\n0.00\n14.97\n919502385\nEmpresa PRO 2.0 74.9\n74.90\n0.00\n0.00\n-37.45\n0.00\n0.00\n37.45\nCuenta\nCliente\n0.00\n0.00\n0.00\n0.00\n0.00\n0.00\n0.00\nTotal\n496.10\n0.00\n0.00\n-215.89\n0.00\n0.00\n280.21\n(*) Puede incluir conceptos exentos o ya gravados con IGV\nDetalle\nConceptos detallados\nPeríodo\nUnidad\nMonto S/ (Incl. IGV)\n908652308 (Empresa PRO 2.0 74.9)\n37.45\nPlan\n09-ago al 08-sep\n31 días\n74.90\nDescuentos\n-37.45\nMA01 - Descuento por fidelizacion 50% x 12m (5/12)\n09-ago al 08-sep\n31 días\n-37.45\n933599925 (Emprende Ilimitado 49.90)\n14.97\nPlan\n09-ago al 08-sep\n31 días\n49.90\nDescuentos\n-34.93\nMA01 - Descuentos por fidelizacion 70% x 18m (12/18)\n09-ago al 08-sep\n31 días\n-34.93\n933599903 (Empresa PRO 2.0 59.9)\n29.95\nPlan\n09-ago al 08-sep\n31 días\n59.90\nDescuentos\n-29.95\nMA01 - Descuento por fidelizacion 50% x 12m (12/12)\n09-ago al 08-sep\n31 días\n-29.95\n933599864 (Empresa PRO 2.0 59.9)\n29.95\nPlan\n09-ago al 08-sep\n31 días\n59.90\nDescuentos\n-29.95\nMA01 - Descuento por fidelizacion 50% x 12m (12/12)\n09-ago al 08-sep\n31 días\n-29.95\n912379686 (Empresa PRO 2.0 44.9)\n33.67\nPlan\n09-ago al 08-sep\n31 días\n44.90\nDescuentos\n-11.23\nMA01 - Descuentos por fidelizacion 25% x 18m (13/18)\n09-ago al 08-sep\n31 días\n-11.23\n933599883 (Emprende Ilimitado 49.90)\n14.97\nPlan\n09-ago al 08-sep\n31 días\n49.90\nDescuentos\n-34.93\nMA01 - Descuentos por fidelizacion 70% x 18m (12/18)\n09-ago al 08-sep\n31 días\n-34.93\n919502385 (Empresa PRO 2.0 74.9)\n37.45\nPlan\n09-ago al 08-sep\n31 días\n74.90\nDescuentos\n-37.45\nMA01 - Descuento por fidelizacion 50% x 12m (5/12)\n09-ago al 08-sep\n31 días\n-37.45\nCuenta Cliente\n0.00\nSaldos Anteriores\n0.00\nRecibo(s) anterior(es)\n280.21\n\nPágina 3 de 3\nMira aquí el detalle\ntu recibo\nConceptos detallados\nPeríodo\nUnidad\nMonto S/ (Incl. IGV)\nAbonos / Cargos varios al 08/08/2026\n-280.21\nConceptos facturables\n.\nCargo Fijo (incluye prorrateo): Monto de Renta Mensual y consumo proporcional por los servicios de\nVoz, Mensajería y Datos, según Plan Tarifario Contratado.\nOtros Servicios Contratados: Monto fijo mensual por los servicios de:\n- Paquetes Contratados: Paquetes de datos, mensajería y LDI. Servicios de Blackberry, Localizador,\nEntel Backup y otros servicios de Valor Agregado: licencias, aplicativos de negocio, gestión de\ndispositivos móviles y otros.\n- Garantía: Servicio de reposición de equipos.\n- Arrendamiento: Alquiler de equipos.\nConsumos Adicionales: Monto facturado no comprendido dentro del cargo fijo mensual del plan\ntarifario contratado, por los servicios de Voz, Mensajería, Datos, Roaming Internacional, LDI, Redes\nSatelitales, Destinos Rurales.\nDatos locales y móviles: Servicio de internet brindado a través de equipos móviles, USB Módems,\nRouters, etc.\nDatos Roaming: Servicio de datos que Entel brinda en otros países.\nOtros Cargos y Abonos: Cargos y abonos no recurrentes.\nPromociones y Descuentos: Descuentos generados por promociones especiales.\nRecargo por Intereses: Cobro de intereses legales generados por la no cancelación de la totalidad del\nrecibo a la fecha de vencimiento.\nOtros Cargos y Abonos (ya gravados con IGV): Cargo de documentos emitidos por compra o\nfinanciamiento de equipos y/o Boletas/Facturas adicionales, ya gravados con IGV. Incluye Facturación\npor encargo de Otros Operadores según normativa vigente.\nGlosario\n.\nOn Net: Comunicación de un teléfono móvil Entel a otro teléfono móvil Entel.\nOff Net: Comunicación de un teléfono móvil Entel a cualquier teléfono fijo o móvil de otro operador.\nLDI: Larga Distancia Internacional.\nRedes Satelitales: Telefonía móvil a números satelitales.\nDestinos Rurales: Telefonía móvil a Destinos Rurales.\nRoaming Internacional: Servicio de Voz y Datos que Entel brinda en otros países.\nDescarga de Contenidos: Cargo por envío de mensajes y descargas.\nMB: Megabytes (1 MB = 1024 KB)\n- El límite de crédito asignado para consumo adicional de servicios será informado por mensaje de texto\nuna vez iniciada la utilización del referido límite. Para contratación de otros servicios, será evaluado\ncrediticiamente en la venta.\n- El pago no oportuno devengará en intereses legales. Entel puede proceder a la suspensión del Servicio a\npartir del día siguiente del último día de pago.\n- Si tu línea es suspendida por falta de pago, se aplicará un cargo por reconexión del servicio.\n- Reconexión del servicio máximo dentro de 24 horas de efectuado el pago correspondiente.\n- Conoce los lugares de pago en www.entel.pe\nMÓVILES: 123 (desde tu Entel) y 611-7777 (desde un teléfono fijo) Llamadas gratis: 0-800-0-9000 (Lima y\nprovincias).\nINTERNET Y SERVICIOS DE VALOR AGREGADO: 123 (desde tu Entel) y 611-7777 (desde un teléfono fijo).\nOSIPTEL: Fono Ayuda: 0-801-12121 Para detalle de llamadas a fijos o móviles consultar gratuitamente Mi\nEntel\" en www.entel.pe\n\n"
+  },
+  {
+    "id": "1N-CU8Yu7TdoW_8LoaGkdDR1ITziQoipL",
+    "name": "PDF-DOC-E001-1620616057414.pdf",
+    "path": "",
+    "size": "3929",
+    "modifiedTime": "2026-08-12T01:58:21.582Z",
+    "webViewLink": "https://drive.google.com/file/d/1N-CU8Yu7TdoW_8LoaGkdDR1ITziQoipL/view?usp=drivesdk",
+    "text": " \n \n \nLOGISTICA GOLDEN LIONS S.A.C.  \nJR. VISTA ALEGRE 791 CND. LOS HUERTOS DE SURCO DPTO. 702  \nSANTIAGO DE SURCO - LIMA - LIMA \nFACTURA ELECTRONICA\nRUC: 20616057414 \nE001-16 \nFecha de Emisión\n: 10/08/2026\nSeñor(es)\n: CREACION CUANTICA E.I.R.L.  \nRUC \n: 20612592811  \nEstablecimiento del Emisor \n:\nJR. VISTA ALEGRE 791 CND. LOS\nHUERTOS DE SURCO DPTO. 702\nLIMA-LIMA-SANTIAGO DE SURCO \nTipo de Moneda\n: SOLES \nObservación\n:  \nForma de pago: Contado\nCantidad\nUnidad Medida\nDescripción\nValor Unitario\nICBPER\n1.00\nUNIDAD\nALMACENAMIENTO DE MATERIALES DE APOYO\n296.61099\n0.00\nValor de Venta de Operaciones Gratuitas : S/ 0.00 \n \n \nSON: TRESCIENTOS CINCUENTA Y 00/100 SOLES\n \n \nSub Total Ventas :\nS/ 296.61 \nAnticipos :\nS/ 0.00 \nDescuentos :\nS/ 0.00 \nValor Venta :\nS/ 296.61 \nISC :\nS/ 0.00 \nIGV :\nS/ 53.39 \nICBPER :\nS/ 0.00 \nOtros Cargos :\nS/ 0.00 \nOtros Tributos :\nS/ 0.00 \nMonto de redondeo :\nS/ 0.00 \nImporte Total :\nS/ 350.00 \nEsta es una representación impresa de la factura electrónica, generada en el Sistema de SUNAT. Puede\nverificarla utilizando su clave SOL.\n\n"
+  },
+  {
+    "id": "1Ttep1Im4AgKMa-NYx0dmgGxBMpZ1WZol",
+    "name": "S002-225704842_08_20260708.pdf",
+    "path": "",
+    "size": "267040",
+    "modifiedTime": "2026-08-11T19:07:57.267Z",
+    "webViewLink": "https://drive.google.com/file/d/1Ttep1Im4AgKMa-NYx0dmgGxBMpZ1WZol/view?usp=drivesdk",
+    "text": "Página 1 de 3\n+\n+\n-\n+\n+\nEntel Perú S.A.\nRUC: 20106897914\nAv. República de Colombia 791\nPiso 14 - San Isidro - Lima\n¡Hola! Te enviamos tu recibo del mes\n0\n60\n120\n180\n240\n300\n360\nRequest ID: 31746 | Ciclo: 08 | Custcode: 5.7023\nCREACION CUANTICA E.I.R.L.\nAv Sergio Bernales Nro 272\nLima - Lima - Lima\nRecibo Nº\nEmisión\n:\n:\nS002-225704842\n08/Jul/2026\nInicio del Periodo\nFin del Periodo\n:\n:\n09/Jul/2026\n08/Ago/2026\nNº de Cuenta\nNº Doc (RUC)\n:\n:\n1.21765711\n20612592811\nTotal a pagar\nVencimiento\nS/ 280.21\n21/Jul/2026\nPlan\nProrrateo\nCargos\nAdicionales\nDescuentos o\nP. Adelantado\nEquipos\nSaldo\nAnterior\nS/ 496.10\nS/ 0.00\nS/ 0.00\n-S/ 215.89\nS/ 0.00\nS/ 0.00\nEn las siguientes páginas\npodrás encontrar el detalle de cada concepto\nFacturación de los últimos 6 meses\nFeb\nMar\nAbr\nMay\nJun\nJul\nDesglose tributario\nSubtotal de Conceptos Facturados (sin IGV)\nIGV del Subtotal (18%)\nTotal (Incl. IGV)\nMontos ya gravados con IGV\nExentos IGV\nSaldo anterior\nTotal a pagar\n237.47\n42.74\n280.21\n0.00\n0.00\n0.00\n280.21\nDocumento válido para efectos tributarios según Res. de Sup. No. 007-99/SUNAT. Documento\nno afecto al régimen de retención del IGV por ser agente de retención, según Res. de Sup. No.\n037-2002/SUNAT. Los saldos de hasta S/0.09 que no cancele por falta de moneda de curso legal\n(S/0.05 y S/0.01), se registrarán y se mantendrán como pendientes de pago hasta su cancelación\nefectiva.\nRecuerda que puedes cambiar de operadora sin perder tu número. El trámite de portabilidad es\nrápido y gratuito. Migra tus líneas de otro operador hacia Entel y disfruta de los beneficios que\ntenemos para ti.\n\nPágina 2 de 3\nMira aquí el detalle\ntu recibo\nResumen\nNúmero\nPlan Tarifario\nPlan\nProrrateo\nCargos\nAdicionales (*)\nDescuentos o\nP. Adelantado\nEquipos (*)\nSaldo\nAnterior\nMonto S/\n(Incl. IGV)\n908652308\nEmpresa PRO 2.0 74.9\n74.90\n0.00\n0.00\n-37.45\n0.00\n0.00\n37.45\n933599925\nEmprende Ilimitado 49.90\n49.90\n0.00\n0.00\n-34.93\n0.00\n0.00\n14.97\n933599903\nEmpresa PRO 2.0 59.9\n59.90\n0.00\n0.00\n-29.95\n0.00\n0.00\n29.95\n908931343\nEmpresa PRO 2.0 36.9\n36.90\n0.00\n0.00\n0.00\n0.00\n0.00\n36.90\n933599864\nEmpresa PRO 2.0 59.9\n59.90\n0.00\n0.00\n-29.95\n0.00\n0.00\n29.95\n912379686\nEmpresa PRO 2.0 44.9\n44.90\n0.00\n0.00\n-11.23\n0.00\n0.00\n33.67\n912379744\nEmpresa PRO 2.0 44.9\n44.90\n0.00\n0.00\n0.00\n0.00\n0.00\n44.90\n933599883\nEmprende Ilimitado 49.90\n49.90\n0.00\n0.00\n-34.93\n0.00\n0.00\n14.97\n919502385\nEmpresa PRO 2.0 74.9\n74.90\n0.00\n0.00\n-37.45\n0.00\n0.00\n37.45\nCuenta\nCliente\n0.00\n0.00\n0.00\n0.00\n0.00\n0.00\n0.00\nTotal\n496.10\n0.00\n0.00\n-215.89\n0.00\n0.00\n280.21\n(*) Puede incluir conceptos exentos o ya gravados con IGV\nDetalle\nConceptos detallados\nPeríodo\nUnidad\nMonto S/ (Incl. IGV)\n908652308 (Empresa PRO 2.0 74.9)\n37.45\nPlan\n09-jul al 08-ago\n31 días\n74.90\nDescuentos\n-37.45\nMA01 - Descuento por fidelizacion 50% x 12m (4/12)\n09-jul al 08-ago\n31 días\n-37.45\n933599925 (Emprende Ilimitado 49.90)\n14.97\nPlan\n09-jul al 08-ago\n31 días\n49.90\nDescuentos\n-34.93\nMA01 - Descuentos por fidelizacion 70% x 18m (11/18)\n09-jul al 08-ago\n31 días\n-34.93\n933599903 (Empresa PRO 2.0 59.9)\n29.95\nPlan\n09-jul al 08-ago\n31 días\n59.90\nDescuentos\n-29.95\nMA01 - Descuento por fidelizacion 50% x 12m (11/12)\n09-jul al 08-ago\n31 días\n-29.95\n933599864 (Empresa PRO 2.0 59.9)\n29.95\nPlan\n09-jul al 08-ago\n31 días\n59.90\nDescuentos\n-29.95\nMA01 - Descuento por fidelizacion 50% x 12m (11/12)\n09-jul al 08-ago\n31 días\n-29.95\n912379686 (Empresa PRO 2.0 44.9)\n33.67\nPlan\n09-jul al 08-ago\n31 días\n44.90\nDescuentos\n-11.23\nMA01 - Descuentos por fidelizacion 25% x 18m (18/18)\n09-jul al 08-ago\n31 días\n-11.23\n933599883 (Emprende Ilimitado 49.90)\n14.97\nPlan\n09-jul al 08-ago\n31 días\n49.90\nDescuentos\n-34.93\nMA01 - Descuentos por fidelizacion 70% x 18m (11/18)\n09-jul al 08-ago\n31 días\n-34.93\n919502385 (Empresa PRO 2.0 74.9)\n37.45\nPlan\n09-jul al 08-ago\n31 días\n74.90\nDescuentos\n-37.45\nMA01 - Descuento por fidelizacion 50% x 12m (4/12)\n09-jul al 08-ago\n31 días\n-37.45\nCuenta Cliente\n0.00\nSaldos Anteriores\n0.00\nRecibo(s) anterior(es)\n280.21\n\nPágina 3 de 3\nMira aquí el detalle\ntu recibo\nConceptos detallados\nPeríodo\nUnidad\nMonto S/ (Incl. IGV)\nAbonos / Cargos varios al 08/07/2026\n-280.21\nConceptos facturables\n.\nCargo Fijo (incluye prorrateo): Monto de Renta Mensual y consumo proporcional por los servicios de\nVoz, Mensajería y Datos, según Plan Tarifario Contratado.\nOtros Servicios Contratados: Monto fijo mensual por los servicios de:\n- Paquetes Contratados: Paquetes de datos, mensajería y LDI. Servicios de Blackberry, Localizador,\nEntel Backup y otros servicios de Valor Agregado: licencias, aplicativos de negocio, gestión de\ndispositivos móviles y otros.\n- Garantía: Servicio de reposición de equipos.\n- Arrendamiento: Alquiler de equipos.\nConsumos Adicionales: Monto facturado no comprendido dentro del cargo fijo mensual del plan\ntarifario contratado, por los servicios de Voz, Mensajería, Datos, Roaming Internacional, LDI, Redes\nSatelitales, Destinos Rurales.\nDatos locales y móviles: Servicio de internet brindado a través de equipos móviles, USB Módems,\nRouters, etc.\nDatos Roaming: Servicio de datos que Entel brinda en otros países.\nOtros Cargos y Abonos: Cargos y abonos no recurrentes.\nPromociones y Descuentos: Descuentos generados por promociones especiales.\nRecargo por Intereses: Cobro de intereses legales generados por la no cancelación de la totalidad del\nrecibo a la fecha de vencimiento.\nOtros Cargos y Abonos (ya gravados con IGV): Cargo de documentos emitidos por compra o\nfinanciamiento de equipos y/o Boletas/Facturas adicionales, ya gravados con IGV. Incluye Facturación\npor encargo de Otros Operadores según normativa vigente.\nGlosario\n.\nOn Net: Comunicación de un teléfono móvil Entel a otro teléfono móvil Entel.\nOff Net: Comunicación de un teléfono móvil Entel a cualquier teléfono fijo o móvil de otro operador.\nLDI: Larga Distancia Internacional.\nRedes Satelitales: Telefonía móvil a números satelitales.\nDestinos Rurales: Telefonía móvil a Destinos Rurales.\nRoaming Internacional: Servicio de Voz y Datos que Entel brinda en otros países.\nDescarga de Contenidos: Cargo por envío de mensajes y descargas.\nMB: Megabytes (1 MB = 1024 KB)\n- El límite de crédito asignado para consumo adicional de servicios será informado por mensaje de texto\nuna vez iniciada la utilización del referido límite. Para contratación de otros servicios, será evaluado\ncrediticiamente en la venta.\n- El pago no oportuno devengará en intereses legales. Entel puede proceder a la suspensión del Servicio a\npartir del día siguiente del último día de pago.\n- Si tu línea es suspendida por falta de pago, se aplicará un cargo por reconexión del servicio.\n- Reconexión del servicio máximo dentro de 24 horas de efectuado el pago correspondiente.\n- Conoce los lugares de pago en www.entel.pe\nMÓVILES: 123 (desde tu Entel) y 611-7777 (desde un teléfono fijo) Llamadas gratis: 0-800-0-9000 (Lima y\nprovincias).\nINTERNET Y SERVICIOS DE VALOR AGREGADO: 123 (desde tu Entel) y 611-7777 (desde un teléfono fijo).\nOSIPTEL: Fono Ayuda: 0-801-12121 Para detalle de llamadas a fijos o móviles consultar gratuitamente Mi\nEntel\" en www.entel.pe\n\n"
+  },
+  {
+    "id": "1b4NwJcl5GIC8EsTlY07V25DfKSVLPDhd",
+    "name": "F005-00021940.pdf",
+    "path": "",
+    "size": "194915",
+    "modifiedTime": "2026-08-10T20:22:08.452Z",
+    "webViewLink": "https://drive.google.com/file/d/1b4NwJcl5GIC8EsTlY07V25DfKSVLPDhd/view?usp=drivesdk",
+    "text": " \nInversiones PIMI SAC\nDomicilio fiscal: Pasaje Martir Olaya 141\nMiraflores - Lima - Lima - Peru\nrecaudacion@delpilarhotels.com\nTelf: (511) 712-0712 / Fax: (511) 712-0714\n-\n \nR.U.C Nº 20508159863\nFACTURA \nELECTRÓNICA\nF005-00021940\nRazón social\n: CREACION CUANTICA E.I.R.L.\nR.U.C\n: 20612592811\nDirección\n: CAL.BERLIN NRO. 965 INT. 302 URB.\nSANTA CRUZ\nUbigeo\n: LIMA - LIMA - LIMA\nUrbanización\n: Lima\n \n \nMoneda\n: Soles\nFecha emisión\n: 07/08/2026 21:08:47\nFecha vencimiento\n: 07/08/2026\nForma de pago\n: Contado\nDias credito\n: -\nOrden de compra\n: -\nCliente\n: 03185-CREACION CUANTICA E.I.R.L.\nReserva\n: 053377\nGrupo\n: CREAR PODER SIN LIMITES CAIDA DE\nCONFIANZA\nCheck in\n: 15/08/2026\nCheck out\n: 15/08/2026\nCantidad noches\n: 0\nHabitaciones\n: -\nTipo de cambio : 3.750\n \n \nObservaciones:\nInformación de la Detracción\nTipo Operación:\nBien o Servicio:\nMedio de pago:\n1001 Operación Sujeta a Detracción\n019 Arrendamiento de bienes muebles\n001 Depósito en cuenta\nNro. Cta. Banco de la Nación:\nPorcentaje de detracción:\nMonto detraccion:\n-\n10.00\nS/. 350.00\nLeyendas\nLeyenda: 2006    Operaci?n sujeta a detracci?n\nRepresentación Impresa de la factura electrónica, consulte su comprobante en www.infofactperu.pe/consulta \nUsuario: JANINA \nCódigo Hash:  2yATWvFF+DE6QEWP+CTydWiYhBGvJK9u6ltQA7CDG08=\n \npowered by Infomatica\n \nÍtem\n \nCódigo\n \nDescripción\n \nUnd.\n \nCantidad\n \nV. Unitario\n \nP. Unitario\n \nDescuento\n \nValor Venta\n1\n210000\nEVENTOS - SALONES\nNIU\n1.000\n2 734.37500\n3 226.56250\n0.00000\n2 734.38\nSON:TRES MIL QUINIENTOS CON 00/100 SOLES\n \nAnticipo\nS/\n0.00\n \n \nOp. Gravada\nS/\n2 734.38\n \n \nI.G.V 18.00%\nS/\n492.19\n \n \nOp. Inafecta\nS/\n0.00\n \n \nOp. Exonerada\nS/\n0.00\n \n \nOp. Exportación\nS/\n0.00\n \n \nOp. Gratuita\nS/\n0.00\n \n \nICBPER\nS/\n0.00\n \n \nServicio\nS/\n273.44\n \nImporte Total\nS/\n3 500.00\nOperacion sujeta al spot de detraccion 10%  para alquileres y 12%  para alimentos cta cte 00005137934 - Banco de la Nacion\nABONAR A LAS SIGUIENTES CUENTAS CORRIENTES\nCuenta Corriente bcp Dolares: 191-1516166-117\nCuenta Corriente bcp soles: 191-1514483-007\n\n"
+  },
+  {
+    "id": "1IAqHk7ZXIgk8RmyWddU6et73kyCwur2b",
+    "name": "DIP-FACT-Recibo_Ciclico_2026080005_S1AA-0053398870.pdf",
+    "path": "",
+    "size": "131529",
+    "modifiedTime": "2026-08-10T20:19:10.314Z",
+    "webViewLink": "https://drive.google.com/file/d/1IAqHk7ZXIgk8RmyWddU6et73kyCwur2b/view?usp=drivesdk",
+    "text": "Integratel Perú S.A.A.   |   R.U.C. 20100017491   |   Jr. Domingo Martínez Luján N° 1130   |   Lima – Lima - Surquillo\nPágina 1/3\nEmpresas Fija\nRecibo Agosto\nN° recibo: S1AA-0053398870\nCREACION CUANTICA EIRL\nRUC: 20612592811 \nCALLE BERLIN 965 Piso 3 URBANIZACION RESIDENCIAL JOSE BALTA,\nMIRAFLORES, 01, LIMA\nCuenta financiera: 753621842 \nID SUSCRIPTOR: 196980437\nID Cliente: 131054354\nAnexo: 1\nTotal a pagar del mes\nS/109.90\nÚltimo día de pago: 18/08\nN° Fijo / Cód. pago: 753621842\nDeuda anterior: S/0.00\n \nPaga a tiempo tu recibo y mantente siempre conectado.\nNo esperes hasta el último día de pago.\nCiclo de facturación - Agosto 2026\n05/08\n18/08\nFecha de\nEmisión\nÚltimo día\nde pago\n¡LLAMA AL 0 800 11311!\nSi tienes un negocio y deseas comprar o portar una línea\nmóvil, adquirir un servicio de internet, TV o telefonía fija.\nCanal exclusivo para Clientes con RUC 20\nResumen de Recibo - NºS1AA-0053398870\nCargos Mensuales\nS/ 109.89\nSubtotal\nS/93.13\nIGV (18%)\nS/16.76\nTotal Afecto\nS/109.89\nRedondeo\nS/ 0.01\nTotal Facturado\nS/109.90\nDevoluciones\nS/ 0.00\nDébitos\nS/ 0.00\nTotal a pagar\nS/ 109.90\n\nEmpresas Fija\nIntegratel Perú S.A.A.   |   R.U.C. 20100017491   |   Jr. Domingo Martínez Luján N° 1130   |   Lima – Lima - Surquillo\nPágina 2/3\nDetalle del recibo - N° S1AA-0053398870 - 196980437\nCargos Mensuales\nPrecio de vta.\nIGV S/109.89\nMovistar Internet 600 Mbps (06Ago al 05Sep)\n93.13\n16.76\n109.89\nRedondeo\nPrecio de vta.\nIGV\nS/0.01\nRedondeo del mes Actual\n-0.04\n0.00\n-0.04\nRedondeo del mes Anterior\n0.05\n0.00\n0.05\n\nConceptos facturables\nCargos fijos mensuales\nCargo mensual facturado al cliente por el plan contratado\npara los servicios de voz y datos. Cargo fijo proporcional\ndel plan desde la fecha de inicio del servicio hasta el\nsiguiente cierre de facturación\nCargos por llamadas adicionales\nCargos por tráfico de voz, datos, mensajes de texto que\nno se encuentran comprendidos dentro del cargo fijo\nmensual.\nLarga distancia: cargo adicional por llamada de larga\ndistancia nacional o internacional\nKB internet y multimedia: navegación en internet y\ntráfico por descarga de aplicativos\nKB transmisión de datos: envío y recepción de datos.\nRoaming internacional: cargo por llamadas efectuadas y\nrecibidas en el extranjero\nDetalle de documentos afectos al IGV\nCargo por Reconexión: cargo facturado si el cliente\ncancela un recibo después de habérsele cortado por\ndeuda.\nCargo por Reconexión de corte APC (a pedido de cliente):\ncargo facturado al efectuarse la reactivación del servicio\nde la línea luego de cumplirse el plazo de suspensión.\nCargo por llamadas a operadoras rurales: llamadas\nrealizadas a teléfonos fijos rurales como Gilat to Home,\nValtron, Claro Rural, Integratel Rural o a teléfonos satelitales\ncomo Tesam.\nRenta fraccionaria por cambio de plan: cargo facturado si\ndurante el ciclo de la facturación el cliente cambió a un\nplan tarifario de cargo fijo mayor al que tenía.\nLugares de pago\nBancos y agentes\nBBVA Continental\nBanco Pichincha\nBCP\nBanco de la Nación\nBanBif\nInterbank\nScotiabank\nOtros\nAgente Multibanco KASNET\nMultibanco\nFullcarga\nRed Digital\nMetro\nWong\nWestern Union\nAlgunos lugares de pago presenciales pueden aplicar cobro de comisión de acuerdo a sus tarifarios vigentes.\nPuede realizar su pago de forma rápida y segura en el App Mi Movistar, YAPE o App o Web de su banco.\nRecuerda que también puede afiliar su recibo\nMovistar al débito automático, más info :\nhttp://smvst.com/DAT\nMayor información sobre lugares de pago en www.movistar.com.pe\n¿Qué es el recibo digital?\nEs un servicio gratuito que ofrece Integratel, con el que podrá recibir mensualmente su recibo en formato PDF al\ncorreo electrónico que usted indique. El envío del recibo digital va en reemplazo de su recibo físico.\n\n"
+  },
+  {
+    "id": "1BOLbZspgCozjeK7hbOrum7HlP3N99KF2",
+    "name": "FACTURA ALOJAMIENTO FERNANDO ARAGON.pdf",
+    "path": "",
+    "size": "322908",
+    "modifiedTime": "2026-08-07T19:59:16.502Z",
+    "webViewLink": "https://drive.google.com/file/d/1BOLbZspgCozjeK7hbOrum7HlP3N99KF2/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32422898\nviernes, 7 Agosto, 2026\nREFERENCIA\nF301\n00047027\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nNataly Aynaya\n17/08/2026\nSALIDA\n13/08/2026\nFacturado a : \nUSUARIO\nFernando Aragón (C1E30)\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nAlojamiento\n281.25\n281.25\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nhZbuu4wjzYOPtBE82jCT2pdX4NM=\nTRESCIENTOS SESENTA Y 00/100 DOLARES AMERICANOS\nTotal  Propina\nUS $\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n360.00\n0.00\n0.00\n28.12\n50.63\n0.00\n0.00\n281.25\nTotal  Exportacion\n0.00\nCuentas corrientes  \nTotal  Descuento\nDolares\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1rUDJ2ZU1hTW9dK0PeuSgCTIMKEvx0xOw",
+    "name": "FACTURA DE EVENTO 13.08.pdf",
+    "path": "",
+    "size": "324998",
+    "modifiedTime": "2026-08-07T19:58:49.315Z",
+    "webViewLink": "https://drive.google.com/file/d/1rUDJ2ZU1hTW9dK0PeuSgCTIMKEvx0xOw/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32411240\nviernes, 7 Agosto, 2026\nREFERENCIA\nF301\n00047028\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nNataly Aynaya\n16/08/2026\nSALIDA\n13/08/2026\nFacturado a : \nUSUARIO\nEvento\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nSalas\n13,983.05\n13,983.05\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\n0/OyPn4BM8m4x7MvrBwr+x99KH0=\nDIEZ Y SEIS MIL QUINIENTOS Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n16,500.00\n0.00\n0.00\n0.00\n2,516.95\n0.00\n0.00\n13,983.05\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "18bCkOyF5E058IKpwwkENhCHaz2SLamRV",
+    "name": "PDF-DOC-E001-15320255547799.pdf",
+    "path": "",
+    "size": "4592",
+    "modifiedTime": "2026-08-06T19:34:42.980Z",
+    "webViewLink": "https://drive.google.com/file/d/18bCkOyF5E058IKpwwkENhCHaz2SLamRV/view?usp=drivesdk",
+    "text": " \n \n \nHOSTAL SOL Y LUNA S.A.C.  \nCAL. 13 3RA ETAPA CIENEGUILLA MZA. 13 LOTE. 1 ESQUINA CON\nCALLE 13 Y 15 PAS.TELEFONICA  \nCIENEGUILLA - LIMA - LIMA \nFACTURA ELECTRONICA\nRUC: 20255547799 \nE001-153 \nFecha de Emisión\n: 06/08/2026\nSeñor(es)\n: CREACION CUANTICA E.I.R.L.  \nRUC \n: 20612592811  \nEstablecimiento del Emisor \n:\nCAL. 13 3RA ETAPA CIENEGUILLA -\nMZA. 13 LOTE. 1 ESQUINA CON\nCALLE 13 Y 15 PAS.TELEFONICA\nLIMA-LIMA-CIENEGUILLA \nTipo de Moneda\n: SOLES \nObservación\n:  \nForma de pago: Contado\nCantidad\nUnidad Medida\nDescripción\nValor Unitario\nICBPER\n1.00\nUNIDAD\nADELANTO DEL SERVICIO DE ALOJAMIENTO EN\nHABITACIONES MULTIPLES Y SERVICIO DE\nALIMENTACION LOS DIAS 15 Y 16 DE AGOSTO DE 2026\n3389.8305084746\n0.00\nValor de Venta de Operaciones Gratuitas : S/ 0.00 \n \n \nSON: CUATRO MIL Y 00/100 SOLES\n \n \nSub Total Ventas :\nS/ 3,389.83 \nAnticipos :\nS/ 0.00 \nDescuentos :\nS/ 0.00 \nValor Venta :\nS/ 3,389.83 \nISC :\nS/ 0.00 \nIGV :\nS/ 610.17 \nICBPER :\nS/ 0.00 \nOtros Cargos :\nS/ 0.00 \nOtros Tributos :\nS/ 0.00 \nMonto de redondeo :\nS/ 0.00 \nImporte Total :\nS/ 4,000.00 \nInformación de la detracción\nLeyenda:\nOperación sujeta al Sistema de Pago de Obligaciones Tributarias con el Gobierno Central\nBien o Servicio:\n022  Otros servicios empresariales\nMedio de pago:\n001  Depósito en cuenta\nNro. Cta. Banco de la Nación:\n00066029379\nPorcentaje de detracción:\n12.00\nMonto detracción:\nS/ 480.00\nEsta es una representación impresa de la factura electrónica, generada en el Sistema de SUNAT. Puede\nverificarla utilizando su clave SOL.\n\n"
+  },
+  {
+    "id": "1iSfCxl229jqCm7_yuLB2jP7Huls5VwKN",
+    "name": "E001-1143 CREACION CUANTICA.pdf",
+    "path": "",
+    "size": "9628",
+    "modifiedTime": "2026-08-04T20:08:58.420Z",
+    "webViewLink": "https://drive.google.com/file/d/1iSfCxl229jqCm7_yuLB2jP7Huls5VwKN/view?usp=drivesdk",
+    "text": " \n \n \nECHEVARRIA OSORIO ALEXANDRA VANESSA  \nJR. THOMAS COCHRANE 3353 URB. CONDEVILLA DEL SEÑOR ALT.\nCDRA 33 AV. JOSE GRANDA  \nSAN MARTIN DE PORRES - LIMA - LIMA \nFACTURA ELECTRONICA\nRUC: 10412743879 \nE001-1143 \nFecha de Emisión\n: 03/08/2026\nSeñor(es)\n: CREACION CUANTICA E.I.R.L.  \nRUC \n: 20612592811  \nDirección del Cliente \n: CAL. BERLIN 965 URB. SANTA CRUZ\nINT. 302 LIMA-LIMA-MIRAFLORES \nTipo de Moneda\n: SOLES \nObservación\n:  \nForma de pago: Contado\nCantidad\nUnidad Medida\nDescripción\nValor Unitario\nICBPER\n1.00\nUNIDAD\nSERVICIO LOGISTICO DEL 30 JULIO AL 02 AGOSTO\n1540.00\n0.00\n1.00\nUNIDAD\nSERVICIO DE ALMACENAJE\n400.00\n0.00\nValor de Venta de Operaciones Gratuitas : S/ 0.00 \n \n \nSON: DOS MIL DOSCIENTOS OCHENTA Y NUEVE Y 20/100 SOLES\n \n \nSub Total Ventas :\nS/ 1,940.00 \nAnticipos :\nS/ 0.00 \nDescuentos :\nS/ 0.00 \nValor Venta :\nS/ 1,940.00 \nISC :\nS/ 0.00 \nIGV :\nS/ 349.20 \nICBPER :\nS/ 0.00 \nOtros Cargos :\nS/ 0.00 \nOtros Tributos :\nS/ 0.00 \nMonto de redondeo :\nS/ 0.00 \nImporte Total :\nS/ 2,289.20 \nInformación de la detracción\nLeyenda:\nOperación sujeta al Sistema de Pago de Obligaciones Tributarias con el Gobierno Central\nBien o Servicio:\n019  Arrendamiento de bienes muebles e inmuebles\nMedio de pago:\n003  Transferencia de fondos\nNro. Cta. Banco de la Nación:\n00030088972\nPorcentaje de detracción:\n10.00\nMonto detracción:\nS/ 229.00\nEsta es una representación impresa de la factura electrónica, generada en el Sistema de SUNAT. Puede\nverificarla utilizando su clave SOL.\n\n"
+  },
+  {
+    "id": "136GU4rYPXUMdfAp7pB8IpA5oEaSMmJy1",
+    "name": "factura 2do pago evento creación cuantica 32411271.pdf",
+    "path": "",
+    "size": "324911",
+    "modifiedTime": "2026-07-30T18:26:25.064Z",
+    "webViewLink": "https://drive.google.com/file/d/136GU4rYPXUMdfAp7pB8IpA5oEaSMmJy1/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32411271\njueves, 30 Julio, 2026\nREFERENCIA\nF301\n00046861\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n02/08/2026\nSALIDA\n31/07/2026\nFacturado a : \nUSUARIO\nEvento\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nSalas\n13,983.05\n13,983.05\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nJobXAZx+WHLQz2AzYWqagrAqMbA=\nDIEZ Y SEIS MIL QUINIENTOS Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n16,500.00\n0.00\n0.00\n0.00\n2,516.95\n0.00\n0.00\n13,983.05\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1MT_DsLurMZSqoGCZ13LDxl1Wz5fG1H2T",
+    "name": "factura 1er pago evento creación cuantica 32411271.pdf",
+    "path": "",
+    "size": "323735",
+    "modifiedTime": "2026-07-30T18:26:24.621Z",
+    "webViewLink": "https://drive.google.com/file/d/1MT_DsLurMZSqoGCZ13LDxl1Wz5fG1H2T/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32411271\njueves, 30 Julio, 2026\nREFERENCIA\nF301\n00046860\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n02/08/2026\nSALIDA\n31/07/2026\nFacturado a : \nUSUARIO\nEvento\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nSalas\n13,983.05\n13,983.05\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\n/wgYpc6YJj4oZPOS/MRAx2xX8Xs=\nDIEZ Y SEIS MIL QUINIENTOS Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n16,500.00\n0.00\n0.00\n0.00\n2,516.95\n0.00\n0.00\n13,983.05\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1YD9Sd7Unue1D6rIu36AOvfAsiED6IF_7",
+    "name": "FACTURA ALOJAMIENTO BOADA-DIAZ-PATIÑO.pdf",
+    "path": "",
+    "size": "324718",
+    "modifiedTime": "2026-07-30T14:17:04.146Z",
+    "webViewLink": "https://drive.google.com/file/d/1YD9Sd7Unue1D6rIu36AOvfAsiED6IF_7/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32422178\njueves, 30 Julio, 2026\nREFERENCIA\nF301\n00046855\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n03/08/2026\nSALIDA\n22/07/2026\nFacturado a : \nUSUARIO\nMICHAEL BOADA-ERNESTO DIAZ-MARIA LOURDES PATIÑO\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nAlojamiento\n843.75\n843.75\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nWEiY45Ubqb7fFsIOPWUSbCKRJwk=\nUN MIL OCHENTA Y 00/100 DOLARES AMERICANOS\nTotal  Propina\nUS $\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n1,080.00\n0.00\n0.00\n84.37\n151.88\n0.00\n0.00\n843.75\nTotal  Exportacion\n0.00\nCuentas corrientes  \nTotal  Descuento\nDolares\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1HR0sN0Qcw3YTWDm5sUHOM0lhk8IpPuAM",
+    "name": "factura alojamiento Mildred Muñoz.pdf",
+    "path": "",
+    "size": "322667",
+    "modifiedTime": "2026-07-30T14:17:02.063Z",
+    "webViewLink": "https://drive.google.com/file/d/1HR0sN0Qcw3YTWDm5sUHOM0lhk8IpPuAM/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32422178\nlunes, 27 Julio, 2026\nREFERENCIA\nF301\n00046798\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nAna Vasquez\n27/07/2026\nSALIDA\n22/07/2026\nFacturado a : \nUSUARIO\nMUÑOZ VASQUEZ , MILDRED\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nPASAPORTE\nBE596036\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nAlojamiento\n351.56\n351.56\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nCUATROCIENTOS CINCUENTA Y 00/100 DOLARES AMERICANOS\nTotal  Propina\nUS $\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n450.00\n0.00\n0.00\n35.16\n63.28\n0.00\n0.00\n351.56\nTotal  Exportacion\n0.00\nCuentas corrientes  \nTotal  Descuento\nDolares\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1RjNU-cdXaDS4J3rSTGyl-csU35jwaC-J",
+    "name": "FACTURA 2DO PAGRO EVENTO CREAR - 32411257.pdf",
+    "path": "",
+    "size": "324958",
+    "modifiedTime": "2026-07-23T16:12:30.753Z",
+    "webViewLink": "https://drive.google.com/file/d/1RjNU-cdXaDS4J3rSTGyl-csU35jwaC-J/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32411257\njueves, 23 Julio, 2026\nREFERENCIA\nF301\n00046703\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n26/07/2026\nSALIDA\n23/07/2026\nFacturado a : \nUSUARIO\nEvento\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nSalas\n8,050.85\n8,050.85\nNIU\nCapítulo Dos (C2E29)\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\n7QhZ7lWaSCSOMwvn9PW5614fTkg=\nNUEVE MIL QUINIENTOS Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n9,500.00\n0.00\n0.00\n0.00\n1,449.15\n0.00\n0.00\n8,050.85\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "10kPcO1HAo6TsiXvq8U6ljtKMonSNoyco",
+    "name": "DOC-20260710-WA0009_260716_230738.pdf",
+    "path": "",
+    "size": "2111",
+    "modifiedTime": "2026-07-17T19:45:03.229Z",
+    "webViewLink": "https://drive.google.com/file/d/10kPcO1HAo6TsiXvq8U6ljtKMonSNoyco/view?usp=drivesdk",
+    "text": "DEL ARTÍCULO 33 DE LA LEY DEL IMPUESTO A LA RENTA\nRecibí de:\nIdentificado con\nObservación\nInciso\nLa suma de:\nTotal por honorarios:\nRetención (\nR.U.C.\nRECIBO POR HONORARIOS ELECTRONICO\nNro:\n10090449210\n-\nE001\n170\nCONDEZO RODRIGUEZ ROBERTO\nCAL. CASTILLA LA VIEJA NRO. 275 URB. PORTADA DEL SOL LIMA LIMA LA\nMOLINA\nTELÉFONO:\nnúmero\nPor concepto de\nde\ndel\nTotal Neto Recibido:\nCREACION CUANTICA E.I.R.L.\nRUC\n20612592811\n CUATROCIENTOS Y 00/100 DOLARES DE NORTE AMERICA\nASESORÍA LEGAL EN GESTION DE CALIDAD MIGRATORIA\n-\nA\n10\nJulio\n2026\n400.00\n(34.78)\n434.78\nDOLARES DE NORTE AMERICA\n%) IR:\n8\nFecha de emisión\nDomiciliado en\nCAL. BERLIN NRO. 965 INT. 302 URB. SANTA CRUZ LIMA LIMA MIRAFLORES\nAL CONTADO\nForma de Pago:\n\n"
+  },
+  {
+    "id": "1YCrsj5mmmPlTesdNH6F1KM69_N3gi41K",
+    "name": "Propuesta de honorarios - Adecuación a la ley de Datos Personales 09.07.26.pdf",
+    "path": "",
+    "size": "2287279",
+    "modifiedTime": "2026-07-13T19:35:51.328Z",
+    "webViewLink": "https://drive.google.com/file/d/1YCrsj5mmmPlTesdNH6F1KM69_N3gi41K/view?usp=drivesdk",
+    "text": "PROTECCIÓN DE\nDATOS PERSONALES\nPROPUESTA COMERCIAL\nImplementación según Ley N° 29733\n\nMitigación de Riesgos\nAsegurar el cumplimiento estricto de la normativa\nperuana ante la ANPD, evitando sanciones que\npueden impactar la sostenibilidad financiera y\nreputacional de la empresa.\nObjetivos del Proyecto\nCultura de Privacidad\nEstablecer procesos operativos que fortalezcan la\nconfianza de los clientes, garantizando que su\ninformación más sensible sea tratada bajo los más\naltos estándares de ética.\n\nAnálisis de Brechas\nEvaluamos el estado actual de la captura de datos en todos los puntos de contacto:\nMapeo de flujos de información en landing pages y web.\nIdentificación de datos sensibles en sesiones de coaching.\nEvaluación de contratos con coaches independientes.\nDiagnóstico y Assessment\n\nModelo Legal\nDiseño de políticas, cláusulas\nde \nconsentimiento \npara\nclientes, \ny \nacuerdos \nde\nconfidencialidad (NDAs), en\ngeneral.\nAlcance de la Implementación\nOperatividad\nProtocolos de seguridad para\ngrabaciones de sesiones y\nflujos \nautomatizados \nde\nDerechos ARCO.\nBancos de Datos\nIdentificación \ne \ninscripción\noficial ante la ANPD de\nbancos \nde \nClientes,\nProspectos y Colaboradores.\n\nPlan de Trabajo (5 semanas)\nDiagnóstico y Kick\noff\nRevisión \nprocesos,\nentrevistas \nclave,\nidentificación \nde\nbrechas críticas y de\nbases de datos.\nDiseño documental\nDesarrollo \nde\npolíticas, avisos,\nconsentimientos \ny\nmodelo básico\nde gestión de bases\nde datos.\nImplementación\nDefinición de flujos\nARCO,\nprocedimientos,\ncontroles y registro de\nbase \nde \ndatos\nactualizadas para el\ncumplimiento.\nCapacitación y Cierre\nTalleres, \nvalidación\nfinal y entrega de\ndocumentación final.\n1\n2\n3\n4\nSemana 1\nSemana 2\nSemana 3 - 4\nSemana 5\n\nDiagnóstico y Kick-Off\nInventario \nde \nFlujos \nde \nDatos: \nEntrevistas \ncon\nresponsable(s) de las áreas de Marketing, Operaciones y\nAdministración para mapear el ciclo de vida del dato\n(almacenamiento, uso, transferencia y supresión).\nAnálisis de Brechas (Gap Analysis): Confrontación del\nestado actual de la empresa frente a las obligaciones de la Ley\nN° 29733 y el D.S. 003 2013 JUS.\nIdentificación de Medidas de Seguridad: Evaluación\npreliminar de las medidas técnicas (servidores, flujos en la\nnube) y organizativas actuales.\nDiseño documental y de Privacidad\nEstructuración de Bancos de Datos: Determinación y\ndelimitación de los bancos de datos que serán inscritos,\ndefiniendo sus finalidades, tipos de datos (personales y\nsensibles) y tiempos de conservación.\nMatriz de Riesgos y Controles: Diseño de las políticas\ninternas que gobernarán el tratamiento de datos y la\nasignación de responsabilidades de seguridad.\nDiseño Documental: Identificación de las necesidades\ndocumentarias y definición de estructura de documentos\n(procedimientos, manuales, etc.).\n1\nPlan de Trabajo Detallado\n2\n\nImplementación\nRedacción de Documentos: Elaboración de los documentos\nsegún diseño documental de la fase 2.\nDespliegue Operativo: Diseño de los flujos para que el cliente\npueda ejercer sus derechos ARCO de manera ágil y diseño del\nprotocolo de incidentes (fugas de información). Detalle para la\nimplementación por el equipo de TI o a través de plataformas\nde soporte.\nCapacitación y Cierre\nValidación e Inscripción: Preparación para la inscripción de\nbancos de datos en el SIPDP y soporte para la inscripción.\nTransferencia de Conocimiento: Taller de sensibilización\nobligatorio para el personal con el fin de mitigar el riesgo de\nmultas por error humano.\n3\nPlan de Trabajo Detallado\n4\n\nEntregables\nMateriales de capacitación y guías prácticas y taller de sensibilización al equipo.\nCapacitación\n4\nDefinición de roles y responsabilidades, matriz de riesgos asociados a datos personales e indicadores básicos de cumplimiento (KPIs).\nGobierno\n3\nIdentificación del entorno de almacenamiento, documentación de ubicación geográfica de los datos, identificación de terceros y lineamientos de\nseguridad.\nAlmacenamiento y\nSeguridad\n3\nManual de gestión de datos personales, procedimiento de atención de Derechos ARCO, procedimiento de gestión de incidentes de seguridad y\nprocedimiento de acceso y control.\nProcedimientos\n3\nInventario del banco de datos personales, clasificación de datos, Asistencia en inscripción en el Registro Nacional (SIPDP).\nGestión ANPD\n3\nPolítica de Protección de Datos Personales, Avisos de privacidad, Términos y condiciones web, Formatos de consentimiento, acuerdos de\nconfidencialidad.\nDocumentación legal\n2\nIdentificación de la base de datos personal y mapa de flujo de datos (captura, almacenamiento, acceso y transferencia).\nMapa de Datos\n1\nInforme de brechas de cumplimiento (legal, operativo y seguridad básica).\nAssessment\n1\nDOCUMENTACIÓN Y PROCESOS\nCATEGORÍA\nFASE\n\nVisión integral\nNuestra propuesta incluye una visión híbrida (operativa y tecnológica) que entiende el dinamismo digital\ny evita la burocracia documental estática.\nPropuesta de integración diseñada para con formularios digitales y CRM.\nOrientación para la automatización de flujos de consentimiento.\nPreparación para el uso ético de IA en coaching.\nFoco en la protección del core del negocio\nValor Diferencial\n\nEl servicio tendrá un valor total de S/ 11,000.00 (once mil con 00/100 soles) + IGV.\nDicho monto se pagará de la siguiente manera:\n50% a la aceptación de la propuesta: S/ 5,500.00 + IGV\n50% a la culminación del servicio: S/ 5,500.00 + IGV\nHonorarios\n\nCalle Sevilla 156 Urb. Barboncito - Miraflores.\nestudio@nakamura.pe\n(+51) 920 660 831\n(+51 1) 271 8931\n\n"
+  },
+  {
+    "id": "1dWoA69UjKc0hi5-ooCBolBzT7bga4__b",
+    "name": "FACTURA2.pdf",
+    "path": "",
+    "size": "326714",
+    "modifiedTime": "2026-07-13T18:15:11.312Z",
+    "webViewLink": "https://drive.google.com/file/d/1dWoA69UjKc0hi5-ooCBolBzT7bga4__b/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32411238\nsábado, 11 Julio, 2026\nREFERENCIA\nF301\n00046285\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nAna Vasquez\n12/07/2026\nSALIDA\n09/07/2026\nFacturado a : \nUSUARIO\nEvento\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nAlquileres\n11,440.68\n11,440.68\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nXf26jaUevK/+AtjGcE/5GrlMYYg=\nTRECE MIL QUINIENTOS Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n13,500.00\n0.00\n0.00\n0.00\n2,059.32\n0.00\n0.00\n11,440.68\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1r34zJnbc2RYm_YBtSmEau96UTt8QE-sJ",
+    "name": "FACTURA.pdf",
+    "path": "",
+    "size": "327124",
+    "modifiedTime": "2026-07-11T16:48:46.359Z",
+    "webViewLink": "https://drive.google.com/file/d/1r34zJnbc2RYm_YBtSmEau96UTt8QE-sJ/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32411238\nmiércoles, 8 Julio, 2026\nREFERENCIA\nF301\n00046198\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nAna Vasquez\n12/07/2026\nSALIDA\n09/07/2026\nFacturado a : \nUSUARIO\nEvento\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nSalas\n16,525.42\n16,525.42\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nyLmL7hi4l0iXymC+tan2Gx9kdds=\nDIEZ Y NUEVE MIL QUINIENTOS Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n19,500.00\n0.00\n0.00\n0.00\n2,974.58\n0.00\n0.00\n16,525.42\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "10ZnpTfK7k3CKuW39E4crsAWVuTKG6vJD",
+    "name": "F005-00021718.pdf",
+    "path": "",
+    "size": "191256",
+    "modifiedTime": "2026-07-10T23:07:48.279Z",
+    "webViewLink": "https://drive.google.com/file/d/10ZnpTfK7k3CKuW39E4crsAWVuTKG6vJD/view?usp=drivesdk",
+    "text": " \nInversiones PIMI SAC\nDomicilio fiscal: Pasaje Martir Olaya 141\nMiraflores - Lima - Lima - Peru\nrecaudacion@delpilarhotels.com\nTelf: (511) 712-0712 / Fax: (511) 712-0714\n-\n \nR.U.C Nº 20508159863\nFACTURA \nELECTRÓNICA\nF005-00021718\nRazón social\n: CREACION CUANTICA E.I.R.L.\nR.U.C\n: 20612592811\nDirección\n: CAL.BERLIN NRO. 965 INT. 302 URB.\nSANTA CRUZ\nUbigeo\n: LIMA - LIMA - LIMA\nUrbanización\n: Lima\n \n \nMoneda\n: Soles\nFecha emisión\n: 09/07/2026 13:49:04\nFecha vencimiento\n: 09/07/2026\nForma de pago\n: Contado\nDias credito\n: -\nOrden de compra\n: -\nCliente\n: 03185-CREACION CUANTICA E.I.R.L.\nReserva\n: 052786\nGrupo\n: Crear Poder sin Limites Caida de Confianza\nCheck in\n: 11/07/2026\nCheck out\n: 11/07/2026\nCantidad noches\n: 0\nHabitaciones\n: -\nTipo de cambio : 3.750\n \n \nObservaciones:\nInformación de la Detracción\nTipo Operación:\nBien o Servicio:\nMedio de pago:\n1001 Operación Sujeta a Detracción\n019 Arrendamiento de bienes muebles\n001 Depósito en cuenta\nNro. Cta. Banco de la Nación:\nPorcentaje de detracción:\nMonto detraccion:\n-\n10.00\nS/. 175.00\nLeyendas\nLeyenda: 2006    Operaci?n sujeta a detracci?n\nRepresentación Impresa de la factura electrónica, consulte su comprobante en www.infofactperu.pe/consulta \nUsuario: Stephanie \nCódigo Hash:  XxuEIVrROgo2ndgnoYGtDP1n/iHerILQO7LwIFFmCJc=\n \npowered by Infomatica\n \nÍtem\n \nCódigo\n \nDescripción\n \nUnd.\n \nCantidad\n \nV. Unitario\n \nP. Unitario\n \nDescuento\n \nValor Venta\n1\n210000\nEVENTOS - SALONES\nNIU\n1.000\n1 367.18750\n1 613.28125\n0.00000\n1 367.19\nSON:MIL SETECIENTOS CINCUENTA CON 00/100 SOLES\n \nAnticipo\nS/\n0.00\n \n \nOp. Gravada\nS/\n1 367.19\n \n \nI.G.V 18.00%\nS/\n246.09\n \n \nOp. Inafecta\nS/\n0.00\n \n \nOp. Exonerada\nS/\n0.00\n \n \nOp. Exportación\nS/\n0.00\n \n \nOp. Gratuita\nS/\n0.00\n \n \nICBPER\nS/\n0.00\n \n \nServicio\nS/\n136.72\n \nImporte Total\nS/\n1 750.00\nOperacion sujeta al spot de detraccion 10%  para alquileres y 12%  para alimentos cta cte 00005137934 - Banco de la Nacion\n.\nABONAR A LAS SIGUIENTES CUENTAS CORRIENTES\n.\n.\n.\nCuenta Corriente bcp Dolares: 191-1516166-117\nCuenta Corriente bcp soles: 191-1514483-007\n.\n.\n.\n\n"
+  },
+  {
+    "id": "1GrEh8JXmBADwXnRWb_kOO2aReH95luhX",
+    "name": "Liquidación de gastos - Creacion Cuantica 07.07.26.pdf",
+    "path": "",
+    "size": "146390",
+    "modifiedTime": "2026-07-09T17:11:27.677Z",
+    "webViewLink": "https://drive.google.com/file/d/1GrEh8JXmBADwXnRWb_kOO2aReH95luhX/view?usp=drivesdk",
+    "text": " \n \n                                                                                                 \n \nwww.nakamura.pe  \n                                         Calle Sevilla 156, Miraflores. Lima 18 – Perú. Teléfono: (51 1) 421-0549. E-mail: estudio@nakamura.pe \n \n \n \nLima, 07 de julio de 2026. \n \nSeñores \nCreación Cuántica E.I.R.L. \n \nPresente.- \n \n \nAsunto: Liquidación de gastos  \n \n \nMediante el presente, le remitimos la liquidación de gastos del monto de S/ 100.00 (cien \ncon 00/100 soles), entregado el 02 de julio de 2026. A continuación, procederemos a \ndetallarlo: \n \nI. \nGastos con sustento: \n \nN° \nActo realizado \nMonto de gastos \nen soles \nFecha \n1 \nFCT N° F001-11975 \nCarta notarial entregada en Surco por la Notaria Luque \nRazuri.  \nS/ 50.00 \n02-07-26 \n \nTOTAL \nS/ 50.00 \n \n \n \nII. \nSaldo a favor: \n \nMonto entregado                  S/ 100.00  - \nGasto Total                          S/    50.00 \n \nSaldo a favor                      S/  50.00 \n \n \n \n \nPor lo tanto, existe un saldo de S/ 50.00 (cincuenta con 00/100 soles) a favor de Creación \nCuantica E.I.R.L. \n \nAtentamente, \n \n \n \n \n \nMayumi Reategui Nakashima \nAsistente de Gerencia \n\n"
+  },
+  {
+    "id": "1TA8-QuuG2_OmKIzXg3F0dXaelIw0o2yu",
+    "name": "FCT Notaria Luque Razuri - Creacion Cuantica 02.07.26.pdf",
+    "path": "",
+    "size": "162037",
+    "modifiedTime": "2026-07-09T17:11:23.289Z",
+    "webViewLink": "https://drive.google.com/file/d/1TA8-QuuG2_OmKIzXg3F0dXaelIw0o2yu/view?usp=drivesdk",
+    "text": "LUQUE RAZURI CARLOS MARfIN\nR.U.C.:10086166572\nAV PEIIT THOUSRS 4695 i,ltIFAfLORES -PROVINCIA BE\nIMA\nESTTMAOO CUEN TESUS DOCUf'rENTO5 (TEsTI¡ONrO,S,\n' \nI lcAUlACtONtS ÉTC )\nE9fAN A SU OISPOSIC'¡ÓN PARA RECOGERTOS POR 60\noíAs DESPUES\nDE PRESTADO EL SERVICIO UJE6O SE PROCEDE A LA\nELIMINACIóN\nGRACIAS POR 5U PREFERENCIA\nfeléfono r0l.' ¿,13¡1091\nFACTURA ELECTRÓNICA\nN1 rO0l-11975\nCl¡ente I CREACION CIJANTICA E.l.R.L\nR.U.C. | 20612592811\nD ección : CALLE BERLIN 965 INT 302 URB\nSANTA CRUZ [,IIRAF LORE5\nFecha: 02/07/2026 Hor¿ : 14r14\nMoneda I SOLES\nFoma de Pago I Contado - Deposito en cuenta\nCANI \nPRODUCTO\n- .. CARTA NOTARIAI 855] SUR\nr.ou co\nVenta Gaavada \n: S/\nP \nIMPORI E\nUNIÍ. \nT.\n50,00 50.00\n42.31\n7.63\n50,00\nfotal l.c,v \n| 5l\nTotal &e( o de Ventd . S,f\nSON: CINCUENTA Y 00/100 SOLES\n.g*fFrgtsffi\n\n"
+  },
+  {
+    "id": "1gZSpEY_lHj7ps0yZknJhUwNIqA9PFe_I",
+    "name": "FACTURA EARLY CHECK IN ELMER IDROBO.pdf",
+    "path": "",
+    "size": "326083",
+    "modifiedTime": "2026-06-30T19:04:59.129Z",
+    "webViewLink": "https://drive.google.com/file/d/1gZSpEY_lHj7ps0yZknJhUwNIqA9PFe_I/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32420792\nlunes, 29 Junio, 2026\nREFERENCIA\nF301\n00045929\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n26/06/2026\nSALIDA\n26/06/2026\nFacturado a : \nUSUARIO\nIDROBO ANDRADE , ELMER ANDRES\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nAlojamiento\n35.16\n35.16\nNIU\nEARLY CHECK IN\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nXnlBqfDStomIVNst/4Vg5+Fi6YI=\nCUARENTA Y CINCO Y 00/100 DOLARES AMERICANOS\nTotal  Propina\nUS $\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n45.00\n0.00\n0.00\n3.51\n6.33\n0.00\n0.00\n35.16\nTotal  Exportacion\n0.00\nCuentas corrientes  \nTotal  Descuento\nDolares\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1G7GqKPB_mDwIIXn6_DLwtKTzQ-b0hYPJ",
+    "name": "godaddy.pdf",
+    "path": "",
+    "size": "124981",
+    "modifiedTime": "2026-06-24T17:00:13.858Z",
+    "webViewLink": "https://drive.google.com/file/d/1G7GqKPB_mDwIIXn6_DLwtKTzQ-b0hYPJ/view?usp=drivesdk",
+    "text": "COMUNÍCATE CON NOSOTROS (01) 709-7939\nRecibo\n№ 4120637894\nFECHA:\n24/6/2026\nNÚMERO DE CLIENTE:\n730076479\nFACTURAR A:\nCREACION CUANTICA EIRL\nberlin 965,\ndep 302,\nLIMA, LIMA 15048,\nPeru\nCREACION CUANTICA EIRL\n+51.919563284\nID fiscal: 20612592811\nPAGO:\nVisa •••• 1055\nS/ 50.67\nSaldo anterior\nS/ 50.67\nPago recibido\n(S/ 50.67)\nSaldo adeudado (PEN)\nS/ 0.00\nPlazo\nProducto\nCantidad\n1 año\n.NET Registro de dominio\nS/ 49.99\ncrearpsl.net 1\n\nSubtotal\nS/ 49.99\nImpuestos\nS/ 0.00\nTarifas\nS/ 0.68\nTotal (PEN)\nS/ 50.67\nREFERENCIA\nImpuestos\nS/ 0.00\nGoDaddy.com, LLC\n100 S Mill Ave, Suite 1600,\nTempe, Arizona 85281,\nUnited States\nVAT: 20613597329\nS/ 0.00\nTarifas\nS/ 0.68\n1.\nICANN\nS/ 0.68\ncrearpsl.net\nS/ 0.68\nTérminos universales del servicio\n\n"
+  },
+  {
+    "id": "1QvWfObUt6UQWZZoQI9LUMjOmhoD_IXqL",
+    "name": "F005-00021566.pdf",
+    "path": "",
+    "size": "189909",
+    "modifiedTime": "2026-06-15T20:00:30.934Z",
+    "webViewLink": "https://drive.google.com/file/d/1QvWfObUt6UQWZZoQI9LUMjOmhoD_IXqL/view?usp=drivesdk",
+    "text": " \nInversiones PIMI SAC\nDomicilio fiscal: Pasaje Martir Olaya 141\nMiraflores - Lima - Lima - Peru\nrecaudacion@delpilarhotels.com\nTelf: (511) 712-0712 / Fax: (511) 712-0714\n-\n \nR.U.C Nº 20508159863\nFACTURA \nELECTRÓNICA\nF005-00021566\nRazón social\n: CREACION CUANTICA E.I.R.L.\nR.U.C\n: 20612592811\nDirección\n: CAL.BERLIN NRO. 965 INT. 302 URB.\nSANTA CRUZ\nUbigeo\n: LIMA - LIMA - LIMA\nUrbanización\n: Lima\n \n \nMoneda\n: Soles\nFecha emisión\n: 15/06/2026 12:16:33\nFecha vencimiento\n: 15/06/2026\nForma de pago\n: Contado\nDias credito\n: -\nOrden de compra\n: -\nCliente\n: 03185-CREACION CUANTICA E.I.R.L.\nReserva\n: 052786\nGrupo\n: Crear Poder sin Limites Caida de Confianza\nCheck in\n: 11/07/2026\nCheck out\n: 11/07/2026\nCantidad noches\n: 0\nHabitaciones\n: -\nTipo de cambio : 3.750\n \n \nObservaciones:\nInformación de la Detracción\nTipo Operación:\nBien o Servicio:\nMedio de pago:\n1001 Operación Sujeta a Detracción\n019 Arrendamiento de bienes muebles\n001 Depósito en cuenta\nNro. Cta. Banco de la Nación:\nPorcentaje de detracción:\nMonto detraccion:\n-\n10.00\nS/. 175.00\nLeyendas\nLeyenda: 2006    Operaci?n sujeta a detracci?n\nRepresentación Impresa de la factura electrónica, consulte su comprobante en www.infofactperu.pe/consulta \nUsuario: DENISE \nCódigo Hash:  6RAWOHUp1SPXoQekZgqqwU2yR4PAxtFilQZ3U/McVbY=\n \npowered by Infomatica\n \nÍtem\n \nCódigo\n \nDescripción\n \nUnd.\n \nCantidad\n \nV. Unitario\n \nP. Unitario\n \nDescuento\n \nValor Venta\n1\n210000\nEVENTOS - SALONES\nNIU\n1.000\n1 367.18750\n1 613.28125\n0.00000\n1 367.19\nSON:MIL SETECIENTOS CINCUENTA CON 00/100 SOLES\n \nAnticipo\nS/\n0.00\n \n \nOp. Gravada\nS/\n1 367.19\n \n \nI.G.V 18.00%\nS/\n246.09\n \n \nOp. Inafecta\nS/\n0.00\n \n \nOp. Exonerada\nS/\n0.00\n \n \nOp. Exportación\nS/\n0.00\n \n \nOp. Gratuita\nS/\n0.00\n \n \nICBPER\nS/\n0.00\n \n \nServicio\nS/\n136.72\n \nImporte Total\nS/\n1 750.00\nOperacion sujeta al spot de detraccion 10%  para alquileres y 12%  para alimentos cta cte 00005137934 - Banco de la Nacion\nABONAR A LAS SIGUIENTES CUENTAS CORRIENTES\nCuenta Corriente bcp Dolares: 191-1516166-117\nCuenta Corriente bcp soles: 191-1514483-007\n\n"
+  },
+  {
+    "id": "10-tyWYJkbW5OyPewBuCaL7grMX6RV6Pw",
+    "name": "FACTURA EVENTO CREACION CUANTICA 18AL21JUN2026.pdf",
+    "path": "",
+    "size": "327766",
+    "modifiedTime": "2026-06-11T15:45:52.012Z",
+    "webViewLink": "https://drive.google.com/file/d/10-tyWYJkbW5OyPewBuCaL7grMX6RV6Pw/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32411256\njueves, 11 Junio, 2026\nREFERENCIA\nF301\n00045404\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n21/06/2026\nSALIDA\n18/06/2026\nFacturado a : \nUSUARIO\nCapítulo Dos (C2E28)\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nSalas\n16,525.42\n16,525.42\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nOGHBEczU27fppvYTp6QabVVb6fw=\nDIEZ Y NUEVE MIL QUINIENTOS Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n19,500.00\n0.00\n0.00\n0.00\n2,974.58\n0.00\n0.00\n16,525.42\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1i2zJf3s7T80sUyUBJgebhmJpZyGtSVhC",
+    "name": "309140.pdf",
+    "path": "",
+    "size": "62572",
+    "modifiedTime": "2026-05-26T17:41:11.755Z",
+    "webViewLink": "https://drive.google.com/file/d/1i2zJf3s7T80sUyUBJgebhmJpZyGtSVhC/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL. BERLIN NRO. 965 INT. 302 URB. SANTA CRUZ - LIMA LIMA MIRAFLORES\n 309140\nmartes, 26 Mayo, 2026\nREFERENCIA\nF101\n00029132\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20303368877\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nNataly Tica\nUSUARIO\nDolares\nMONEDA\n01/06/2026\nSALIDA\n28/05/2026\nAdquiriente : \nFIGTUR S.A.\nAV. GUARDIA CIVIL # 727 URB. CORPAC SAN BORJA LIMA - LIMA\nTelefono : (51) (1) 3195300\nFORMA DE PAGO CONTADO\n Cant        Unidad      Nombre                                                                                                                                                                   Precio                  \n 1\nAlojamiento\n 320.00\n 320.00\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nCuentas corrientes  \nBCP SOLES   191-0216592-0-97\nBCP DOLARES 191-0216816-1-69\njWeQNM9ZZSAKxATPI47Y/tVxhyk=\nCUATROCIENTOS NUEVE Y 60/100 DOLARES AMERICANOS\nTotal  Propina\nUS $\n 18\n 10\nREPRESENTACION IMPRESA DEL COMPROBANTE\nCONSULTE SU DOCUMENTO EN https://portal.shiol.net/Consultar/20303368877\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE \nCOMPROBANTE\nPage 1 of 1\nSON\n%\n%\n 409.60\n 0.00\n 0.00\n 32.00\n 57.60\n 0.00\n 0.00\n 320.00\nTotal  Exportacion\n 0.00\n\n"
+  },
+  {
+    "id": "12zF9egHLP6XBHicY5b0qIH-B8HUXn9Y9",
+    "name": "20303368877-01-F105-9864.pdf",
+    "path": "",
+    "size": "116926",
+    "modifiedTime": "2026-05-26T14:48:39.206Z",
+    "webViewLink": "https://drive.google.com/file/d/12zF9egHLP6XBHicY5b0qIH-B8HUXn9Y9/view?usp=drivesdk",
+    "text": "Cant\nUnidad\nNombre\nPrecio\nSub total\n1.0\nNIU\nSalas\n26,382.81\n26,382.81\nRUC: 20303368877\nFACTURA ELECTRÓNICA\nN° F105-00009864\nFIGTUR S.A.\nFECHA DE EMISION\nlunes,25 mayo, 2026\nlunes,25 mayo, 2026\nFECHA DE VCMTO\nAV. GUARDIA CIVIL # 727 URB. CORPAC SAN BORJA LIMA - LIMA\nTelefono : (51) (1) 3195300\nAdquiriente :\nCREACION CUANTICA E.I.R.L.\nCAL. BERLIN NRO. 965 INT. 302 URB. SANTA CRUZ - LIMA LIMA MIRAFLORES\nRUC N°: 20612592811\nRESERVA\n309010\nHAB\nLLEGADA\n2026-05-28\nSALIDA 2026-05-31\nMONEDA\nSOLES\nREFERENCIA\nUSUARIO\nNestor Perez\nFORMA DE PAGO\nO.COMPRA\nCONTADO\nPASAPORTE\nTotal Oper.Gratuitas\n0.00\nS/\nTotal Descuentos\n0.00\nTotal Exportacion\nTotal Gravado\n26,382.81\nTotal Inafecto\n0.00\nTotal Exonerado\n0.00\nTotal IGV  (%)\n18.00\n4,748.91\nTotal R.Consumo (%) 10.00\n2,638.28\nTotal Paid. Out\n0.00\nTotal Propina\n0.00\nTotal ICBPER\n0.00\nTotal Venta\nS/\n33,770.00\nBCP SOLES   191-0216592-0-97\nBCP DOLARES 191-0216816-1-69\nOPERACIÓN SUJETA AL SPOT CON EL GOBIERNO CENTRAL 10.0  (%)  CTA. CTE. B. N. N° \n00000632414\nSON\nTREINTA Y TRES MIL SETECIENTOS SETENTA CON 00/100 SOLES\nczwpUusxpHa3pD7smYfacx5fF58=\nRepresentación impresa del Comprobante Electrónico puede ser consultada en \nhttps://portal.shiol.net/Consultar/20303368877\n\n"
+  },
+  {
+    "id": "1bD4LhMyvaOXOJu9LUp5gaYRfs1V67-5_",
+    "name": "E001-1122 CREACION CUANTICA.pdf",
+    "path": "",
+    "size": "4786",
+    "modifiedTime": "2026-05-25T20:43:53.643Z",
+    "webViewLink": "https://drive.google.com/file/d/1bD4LhMyvaOXOJu9LUp5gaYRfs1V67-5_/view?usp=drivesdk",
+    "text": " \n \nDELIALI \nECHEVARRIA OSORIO ALEXANDRA VANESSA  \nJR. THOMAS COCHRANE 3353 URB. CONDEVILLA DEL SEÑOR ALT.\nCDRA 33 AV. JOSE GRANDA  \nSAN MARTIN DE PORRES - LIMA - LIMA \nFACTURA ELECTRONICA\nRUC: 10412743879 \nE001-1122 \nFecha de Emisión\n: 25/05/2026\nSeñor(es)\n: CREACION CUANTICA E.I.R.L.  \nRUC \n: 20612592811  \nDirección del Cliente \n: CAL. BERLIN 965 URB. SANTA CRUZ\nINT. 302 LIMA-LIMA-MIRAFLORES \nTipo de Moneda\n: SOLES \nObservación\n:  \nForma de pago: Contado\nCantidad\nUnidad Medida\nDescripción\nValor Unitario\nICBPER\n1.00\nUNIDAD\nSERVICIO LOGISTICO 22 AL 24 MAYO\n790.00\n0.00\n1.00\nUNIDAD\nALQUILER DE DOS CONSOLAS POR TRES DIAS\n300.00\n0.00\n1.00\nUNIDAD\nALQUILER DE 03 MICROFONOS DE MANO POR TRES\nDIAS\n450.00\n0.00\nValor de Venta de Operaciones Gratuitas : S/ 0.00 \n \n \nSON: UN MIL OCHOCIENTOS DIECISIETE Y 20/100 SOLES\n \n \nSub Total Ventas :\nS/ 1,540.00 \nAnticipos :\nS/ 0.00 \nDescuentos :\nS/ 0.00 \nValor Venta :\nS/ 1,540.00 \nISC :\nS/ 0.00 \nIGV :\nS/ 277.20 \nICBPER :\nS/ 0.00 \nOtros Cargos :\nS/ 0.00 \nOtros Tributos :\nS/ 0.00 \nMonto de redondeo :\nS/ 0.00 \nImporte Total :\nS/ 1,817.20 \nInformación de la detracción\nLeyenda:\nOperación sujeta al Sistema de Pago de Obligaciones Tributarias con el Gobierno Central\nBien o Servicio:\n019  Arrendamiento de bienes muebles e inmuebles\nMedio de pago:\n003  Transferencia de fondos\nNro. Cta. Banco de la Nación:\n00030088972\nPorcentaje de detracción:\n10.00\nMonto detracción:\nS/ 182.00\nEsta es una representación impresa de la factura electrónica, generada en el Sistema de SUNAT. Puede\nverificarla utilizando su clave SOL.\n\n"
+  },
+  {
+    "id": "1N6EmdXv2t_Vf03qPd4T6e_mTZ5-m2P00",
+    "name": "10431196391_F005_11.pdf",
+    "path": "",
+    "size": "33197",
+    "modifiedTime": "2026-05-25T20:38:32.948Z",
+    "webViewLink": "https://drive.google.com/file/d/1N6EmdXv2t_Vf03qPd4T6e_mTZ5-m2P00/view?usp=drivesdk",
+    "text": "Chino Raul\nMAMANI QUISPE EVA MERCEDES\n-\nLima - Lima - Santa Anita\n960811009\ncondoricahuayaraul@gmail.com\nR.U.C. 10431196391\nFACTURA DE VENTA\nELECTRÓNICA\nN° F005 - 11\n CREACION CUANTICA E.I.R.L.\nCliente:\n 2026-05-23 16:37:48\nF. Emisión:\n20612592811\nRUC : \n efectivo\nMétodo de Pago:\n CAL.BERLIN NRO. 965 INT. 302 URB. SANTA CRUZ\nDirección:\n Contado\nTipo de Pago:\n S/ Soles\nMoneda:\nItem\nDescripción\nUnidad\nCantidad\nP. Unitario\nSub Total\n1\nALMENDRA \"HARRIS WOOLF\" CAJA X 22.68KG\nNIU\n16.0\n36.50\n584.00\nOP. Gravada\n494.92\nOP. Inafectas\n0.00\nOP. Exoneradas\n0.00\nSumatoria IGV (18.00 %)\n89.08\nImporte Total\n584.00\nSON QUINIENTOS OCHENTA CUATRO CON 0/100 SOLES\n Principal\nVendedor:\n condoricahuayaraul@gmail.com\nCorreo vendedor:\nTienda Física\nRepresentación impresa del Comprobante Electrónico\nPuede ser consultado en https://kallpafactura.pe/consulta\nGRACIAS POR SU COMPRA\n\n"
+  },
+  {
+    "id": "1NVVqBRjAS2rTnH4fnpUOVaA5_ogNdpsF",
+    "name": "F005-00021412.pdf",
+    "path": "",
+    "size": "195104",
+    "modifiedTime": "2026-05-25T15:21:34.273Z",
+    "webViewLink": "https://drive.google.com/file/d/1NVVqBRjAS2rTnH4fnpUOVaA5_ogNdpsF/view?usp=drivesdk",
+    "text": " \nInversiones PIMI SAC\nDomicilio fiscal: Pasaje Martir Olaya 141\nMiraflores - Lima - Lima - Peru\nrecaudacion@delpilarhotels.com\nTelf: (511) 712-0712 / Fax: (511) 712-0714\n-\n \nR.U.C Nº 20508159863\nFACTURA \nELECTRÓNICA\nF005-00021412\nRazón social\n: CREACION CUANTICA E.I.R.L.\nR.U.C\n: 20612592811\nDirección\n: CAL.BERLIN NRO. 965 INT. 302 URB.\nSANTA CRUZ\nUbigeo\n: LIMA - LIMA - LIMA\nUrbanización\n: Lima\n \n \nMoneda\n: Soles\nFecha emisión\n: 25/05/2026 09:43:23\nFecha vencimiento\n: 25/05/2026\nForma de pago\n: Contado\nDias credito\n: -\nOrden de compra\n: -\nCliente\n: 03185-CREACION CUANTICA E.I.R.L.\nReserva\n: 052358\nGrupo\n: CAIDA DE CONFIANZA CREAR PODER\nSIN LIMITES\nCheck in\n: 30/05/2026\nCheck out\n: 30/05/2026\nCantidad noches\n: 0\nHabitaciones\n: -\nTipo de cambio : 3.750\n \n \nObservaciones:\nInformación de la Detracción\nTipo Operación:\nBien o Servicio:\nMedio de pago:\n1001 Operación Sujeta a Detracción\n019 Arrendamiento de bienes muebles\n001 Depósito en cuenta\nNro. Cta. Banco de la Nación:\nPorcentaje de detracción:\nMonto detraccion:\n-\n10.00\nS/. 175.00\nLeyendas\nLeyenda: 2006    Operaci?n sujeta a detracci?n\nRepresentación Impresa de la factura electrónica, consulte su comprobante en www.infofactperu.pe/consulta \nUsuario: DENISE \nCódigo Hash:  wZ8g4Tea5BVwjRdYYXk1KpdqcgGtqvU6CnuLGpfbl4E=\n \npowered by Infomatica\n \nÍtem\n \nCódigo\n \nDescripción\n \nUnd.\n \nCantidad\n \nV. Unitario\n \nP. Unitario\n \nDescuento\n \nValor Venta\n1\n210000\nEVENTOS - SALONES\nNIU\n1.000\n1 367.18750\n1 613.28125\n0.00000\n1 367.19\nSON:MIL SETECIENTOS CINCUENTA CON 00/100 SOLES\n \nAnticipo\nS/\n0.00\n \n \nOp. Gravada\nS/\n1 367.19\n \n \nI.G.V 18.00%\nS/\n246.09\n \n \nOp. Inafecta\nS/\n0.00\n \n \nOp. Exonerada\nS/\n0.00\n \n \nOp. Exportación\nS/\n0.00\n \n \nOp. Gratuita\nS/\n0.00\n \n \nICBPER\nS/\n0.00\n \n \nServicio\nS/\n136.72\n \nImporte Total\nS/\n1 750.00\nOperacion sujeta al spot de detraccion 10%  para alquileres y 12%  para alimentos cta cte 00005137934 - Banco de la Nacion\nABONAR A LAS SIGUIENTES CUENTAS CORRIENTES\nCuenta Corriente bcp Dolares: 191-1516166-117\nCuenta Corriente bcp soles: 191-1514483-007\n\n"
+  },
+  {
+    "id": "1wmRuMQyPlDemM-n9Z4hCqD2Zvfn4vNQj",
+    "name": "f301 44850 CREACION CUANTICA.pdf",
+    "path": "",
+    "size": "329053",
+    "modifiedTime": "2026-05-21T22:24:55.714Z",
+    "webViewLink": "https://drive.google.com/file/d/1wmRuMQyPlDemM-n9Z4hCqD2Zvfn4vNQj/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32411265\njueves, 21 Mayo, 2026\nREFERENCIA\nF301\n00044850\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMauricio Polack De\n24/05/2026\nSALIDA\n22/05/2026\nFacturado a : \nUSUARIO\nEvento\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nSalas\n11,440.68\n11,440.68\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nv7wDX7jzgQyUmSRoP29hofrcX4s=\nTRECE MIL QUINIENTOS Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n13,500.00\n0.00\n0.00\n0.00\n2,059.32\n0.00\n0.00\n11,440.68\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1hDdg6KKw5qdeVR4SpC2AdsbDveEDP_SD",
+    "name": "FACTURA ALOJAMIENTO EVENTO CREAR 32419455.pdf",
+    "path": "",
+    "size": "327659",
+    "modifiedTime": "2026-05-21T01:35:34.103Z",
+    "webViewLink": "https://drive.google.com/file/d/1hDdg6KKw5qdeVR4SpC2AdsbDveEDP_SD/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32419455\nmiércoles, 20 Mayo, 2026\nREFERENCIA\nF301\n00044819\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n25/05/2026\nSALIDA\n21/05/2026\nFacturado a : \nUSUARIO\nHOSPEDAJE\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nAlojamiento\n843.75\n843.75\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nj9h0T2U8kpXj+AGvO/UrXTZNnyA=\nUN MIL OCHENTA Y 00/100 DOLARES AMERICANOS\nTotal  Propina\nUS $\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n1,080.00\n0.00\n0.00\n84.37\n151.88\n0.00\n0.00\n843.75\nTotal  Exportacion\n0.00\nCuentas corrientes  \nTotal  Descuento\nDolares\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1BCdOjDemLX6EwjELPzALMptObVkMoAKY",
+    "name": "FACTURA ADELANTO EVENTO CREAR 22AL245MAY2026.pdf",
+    "path": "",
+    "size": "328128",
+    "modifiedTime": "2026-05-21T01:34:51.976Z",
+    "webViewLink": "https://drive.google.com/file/d/1BCdOjDemLX6EwjELPzALMptObVkMoAKY/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32411265\nmiércoles, 20 Mayo, 2026\nREFERENCIA\nF301\n00044818\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n24/05/2026\nSALIDA\n22/05/2026\nFacturado a : \nUSUARIO\nMaestría del Juego (E27, E26, E25)\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nSalas\n16,525.42\n16,525.42\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nh+3LOQnEKugteYCtfZ9h0Y/ZR04=\nDIEZ Y NUEVE MIL QUINIENTOS Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n19,500.00\n0.00\n0.00\n0.00\n2,974.58\n0.00\n0.00\n16,525.42\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1AvFW6T4AedgZLlZlRT9zwv3KicX4JlsG",
+    "name": "F301-44704.pdf",
+    "path": "",
+    "size": "418136",
+    "modifiedTime": "2026-05-18T16:44:40.378Z",
+    "webViewLink": "https://drive.google.com/file/d/1AvFW6T4AedgZLlZlRT9zwv3KicX4JlsG/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32411255\nviernes, 15 Mayo, 2026\nREFERENCIA\nF301\n00044704\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nAlison Del Castillo\n17/05/2026\nSALIDA\n14/05/2026\nFacturado a : \nUSUARIO\nEvento\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nSalas\n8,050.85\n8,050.85\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\noqHrHn/7TC5zAL6M9/uTYXGI5vI=\nNUEVE MIL QUINIENTOS Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n9,500.00\n0.00\n0.00\n0.00\n1,449.15\n0.00\n0.00\n8,050.85\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1EGepGi40Lq0wQi-dCeOI3XGDsu1PJz7Y",
+    "name": "CONSTANCIA AUTO DETRACCION FT.005-21269 - CREACION CUÁNTICA.pdf",
+    "path": "",
+    "size": "106243",
+    "modifiedTime": "2026-05-12T19:01:36.815Z",
+    "webViewLink": "https://drive.google.com/file/d/1EGepGi40Lq0wQi-dCeOI3XGDsu1PJz7Y/view?usp=drivesdk",
+    "text": "\n"
+  },
+  {
+    "id": "1jStTUPEUzREoxZ7G4GfRNGGBIYJAeRIE",
+    "name": "FACTURA CREACION.pdf",
+    "path": "",
+    "size": "329745",
+    "modifiedTime": "2026-05-12T19:01:11.378Z",
+    "webViewLink": "https://drive.google.com/file/d/1jStTUPEUzREoxZ7G4GfRNGGBIYJAeRIE/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32411255\nmartes, 12 Mayo, 2026\nREFERENCIA\nF301\n00044598\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nAna Vasquez\n17/05/2026\nSALIDA\n14/05/2026\nFacturado a : \nUSUARIO\nEvento\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nAlquileres\n16,525.42\n16,525.42\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\n9t3t5cFnrYKB1xbATr2p89Pe2hM=\nDIEZ Y NUEVE MIL QUINIENTOS Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n19,500.00\n0.00\n0.00\n0.00\n2,974.58\n0.00\n0.00\n16,525.42\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1fjE00uMYTj9JJQqss7guQCUyGovBCV7W",
+    "name": "DIP-FACT-Recibo_Ciclico_2026050005_S1AA-0051351680.pdf",
+    "path": "",
+    "size": "131530",
+    "modifiedTime": "2026-05-12T16:58:54.801Z",
+    "webViewLink": "https://drive.google.com/file/d/1fjE00uMYTj9JJQqss7guQCUyGovBCV7W/view?usp=drivesdk",
+    "text": "Integratel Perú S.A.A.   |   R.U.C. 20100017491   |   Jr. Domingo Martínez Luján N° 1130   |   Lima – Lima - Surquillo\nPágina 1/3\nEmpresas Fija\nRecibo Mayo\nN° recibo: S1AA-0051351680\nCREACION CUANTICA EIRL\nRUC: 20612592811 \nCALLE BERLIN 965 Piso 3 URBANIZACION RESIDENCIAL JOSE BALTA,\nMIRAFLORES, 01, LIMA\nCuenta financiera: 753621842 \nID SUSCRIPTOR: 196980437\nID Cliente: 131054354\nAnexo: 1\nTotal a pagar del mes\nS/109.90\nÚltimo día de pago: 21/05\nN° Fijo / Cód. pago: 753621842\nDeuda anterior: S/0.00\n \nPaga a tiempo tu recibo y mantente siempre conectado.\nNo esperes hasta el último día de pago.\nCiclo de facturación - Mayo 2026\n05/05\n21/05\nFecha de\nEmisión\nÚltimo día\nde pago\n¡LLAMA AL 0 800 11311!\nSi tienes un negocio y deseas comprar o portar una línea\nmóvil, adquirir un servicio de internet, TV o telefonía fija.\nCanal exclusivo para Clientes con RUC 20\nResumen de Recibo - NºS1AA-0051351680\nCargos Mensuales\nS/ 109.89\nSubtotal\nS/93.13\nIGV (18%)\nS/16.76\nTotal Afecto\nS/109.89\nRedondeo\nS/ 0.01\nTotal Facturado\nS/109.90\nDevoluciones\nS/ 0.00\nDébitos\nS/ 0.00\nTotal a pagar\nS/ 109.90\n\nEmpresas Fija\nIntegratel Perú S.A.A.   |   R.U.C. 20100017491   |   Jr. Domingo Martínez Luján N° 1130   |   Lima – Lima - Surquillo\nPágina 2/3\nDetalle del recibo - N° S1AA-0051351680 - 196980437\nCargos Mensuales\nPrecio de vta.\nIGV S/109.89\nMovistar Internet 600 Mbps (06May al 05Jun)\n93.13\n16.76\n109.89\nRedondeo\nPrecio de vta.\nIGV\nS/0.01\nRedondeo del mes Actual\n-0.07\n0.00\n-0.07\nRedondeo del mes Anterior\n0.08\n0.00\n0.08\n\nConceptos facturables\nCargos fijos mensuales\nCargo mensual facturado al cliente por el plan contratado\npara los servicios de voz y datos. Cargo fijo proporcional\ndel plan desde la fecha de inicio del servicio hasta el\nsiguiente cierre de facturación\nCargos por llamadas adicionales\nCargos por tráfico de voz, datos, mensajes de texto que\nno se encuentran comprendidos dentro del cargo fijo\nmensual.\nLarga distancia: cargo adicional por llamada de larga\ndistancia nacional o internacional\nKB internet y multimedia: navegación en internet y\ntráfico por descarga de aplicativos\nKB transmisión de datos: envío y recepción de datos.\nRoaming internacional: cargo por llamadas efectuadas y\nrecibidas en el extranjero\nDetalle de documentos afectos al IGV\nCargo por Reconexión: cargo facturado si el cliente\ncancela un recibo después de habérsele cortado por\ndeuda.\nCargo por Reconexión de corte APC (a pedido de cliente):\ncargo facturado al efectuarse la reactivación del servicio\nde la línea luego de cumplirse el plazo de suspensión.\nCargo por llamadas a operadoras rurales: llamadas\nrealizadas a teléfonos fijos rurales como Gilat to Home,\nValtron, Claro Rural, Integratel Rural o a teléfonos satelitales\ncomo Tesam.\nRenta fraccionaria por cambio de plan: cargo facturado si\ndurante el ciclo de la facturación el cliente cambió a un\nplan tarifario de cargo fijo mayor al que tenía.\nLugares de pago\nBancos y agentes\nBBVA Continental\nBanco Pichincha\nBCP\nBanco de la Nación\nBanBif\nInterbank\nScotiabank\nOtros\nAgente Multibanco KASNET\nMultibanco\nFullcarga\nRed Digital\nMetro\nWong\nWestern Union\nAlgunos lugares de pago presenciales pueden aplicar cobro de comisión de acuerdo a sus tarifarios vigentes.\nPuede realizar su pago de forma rápida y segura en el App Mi Movistar, YAPE o App o Web de su banco.\nRecuerda que también puede afiliar su recibo\nMovistar al débito automático, más info :\nhttp://smvst.com/DAT\nMayor información sobre lugares de pago en www.movistar.com.pe\n¿Qué es el recibo digital?\nEs un servicio gratuito que ofrece Integratel, con el que podrá recibir mensualmente su recibo en formato PDF al\ncorreo electrónico que usted indique. El envío del recibo digital va en reemplazo de su recibo físico.\n\n"
+  },
+  {
+    "id": "1O86xFVQquGDq_fcC7elGGQIzJtVTRZAN",
+    "name": "S002-218749278_08_20260508.pdf",
+    "path": "",
+    "size": "267334",
+    "modifiedTime": "2026-05-12T16:58:17.234Z",
+    "webViewLink": "https://drive.google.com/file/d/1O86xFVQquGDq_fcC7elGGQIzJtVTRZAN/view?usp=drivesdk",
+    "text": "Página 1 de 3\n-\n+\n-\n+\n+\nEntel Perú S.A.\nRUC: 20106897914\nAv. República de Colombia 791\nPiso 14 - San Isidro - Lima\n¡Hola! Te enviamos tu recibo del mes\n0\n60\n120\n180\n240\n300\n360\nRequest ID: 28270 | Ciclo: 08 | Custcode: 5.7023\nCREACION CUANTICA E.I.R.L.\nAv Sergio Bernales Nro 272\nLima - Lima - Lima\nRecibo Nº\nEmisión\n:\n:\nS002-218749278\n08/May/2026\nInicio del Periodo\nFin del Periodo\n:\n:\n09/May/2026\n08/Jun/2026\nNº de Cuenta\nNº Doc (RUC)\n:\n:\n1.21765711\n20612592811\nTotal a pagar\nVencimiento\nS/ 279.21\n21/May/2026\nPlan\nProrrateo\nCargos\nAdicionales\nDescuentos o\nP. Adelantado\nEquipos\nSaldo\nAnterior\nS/ 496.10\n-S/ 2.00\nS/ 0.00\n-S/ 214.89\nS/ 0.00\nS/ 0.00\nEn las siguientes páginas\npodrás encontrar el detalle de cada concepto\nFacturación de los últimos 6 meses\nDic\nEne\nFeb\nMar\nAbr\nMay\nDesglose tributario\nSubtotal de Conceptos Facturados (sin IGV)\nIGV del Subtotal (18%)\nTotal (Incl. IGV)\nMontos ya gravados con IGV\nExentos IGV\nSaldo anterior\nTotal a pagar\n236.62\n42.59\n279.21\n0.00\n0.00\n0.00\n279.21\nDocumento válido para efectos tributarios según Res. de Sup. No. 007-99/SUNAT. Documento\nno afecto al régimen de retención del IGV por ser agente de retención, según Res. de Sup. No.\n037-2002/SUNAT. Los saldos de hasta S/0.09 que no cancele por falta de moneda de curso legal\n(S/0.05 y S/0.01), se registrarán y se mantendrán como pendientes de pago hasta su cancelación\nefectiva.\nRecuerda que puedes cambiar de operadora sin perder tu número. El trámite de portabilidad es\nrápido y gratuito. Migra tus líneas de otro operador hacia Entel y disfruta de los beneficios que\ntenemos para ti.\n\nPágina 2 de 3\nMira aquí el detalle\ntu recibo\nResumen\nNúmero\nPlan Tarifario\nPlan\nProrrateo\nCargos\nAdicionales (*)\nDescuentos o\nP. Adelantado\nEquipos (*)\nSaldo\nAnterior\nMonto S/\n(Incl. IGV)\n908652308\nEmpresa PRO 2.0 74.9\n74.90\n0.00\n0.00\n-37.45\n0.00\n0.00\n37.45\n933599925\nEmprende Ilimitado 49.90\n49.90\n0.00\n0.00\n-34.93\n0.00\n0.00\n14.97\n933599903\nEmpresa PRO 2.0 59.9\n59.90\n0.00\n0.00\n-29.95\n0.00\n0.00\n29.95\n908931343\nEmpresa PRO 2.0 36.9\n36.90\n0.00\n0.00\n0.00\n0.00\n0.00\n36.90\n933599864\nEmpresa PRO 2.0 59.9\n59.90\n-2.00\n0.00\n-28.95\n0.00\n0.00\n28.95\n912379686\nEmpresa PRO 2.0 44.9\n44.90\n0.00\n0.00\n-11.23\n0.00\n0.00\n33.67\n912379744\nEmpresa PRO 2.0 44.9\n44.90\n0.00\n0.00\n0.00\n0.00\n0.00\n44.90\n933599883\nEmprende Ilimitado 49.90\n49.90\n0.00\n0.00\n-34.93\n0.00\n0.00\n14.97\n919502385\nEmpresa PRO 2.0 74.9\n74.90\n0.00\n0.00\n-37.45\n0.00\n0.00\n37.45\nCuenta\nCliente\n0.00\n0.00\n0.00\n0.00\n0.00\n0.00\n0.00\nTotal\n496.10\n-2.00\n0.00\n-214.89\n0.00\n0.00\n279.21\n(*) Puede incluir conceptos exentos o ya gravados con IGV\nDetalle\nConceptos detallados\nPeríodo\nUnidad\nMonto S/ (Incl. IGV)\n908652308 (Empresa PRO 2.0 74.9)\n37.45\nPlan\n09-may al 08-jun\n31 días\n74.90\nDescuentos\n-37.45\nMA01 - Descuento por fidelizacion 50% x 12m (2/12)\n09-may al 08-jun\n31 días\n-37.45\n933599925 (Emprende Ilimitado 49.90)\n14.97\nPlan\n09-may al 08-jun\n31 días\n49.90\nDescuentos\n-34.93\nMA01 - Descuentos por fidelizacion 70% x 18m (9/18)\n09-may al 08-jun\n31 días\n-34.93\n933599903 (Empresa PRO 2.0 59.9)\n29.95\nPlan\n09-may al 08-jun\n31 días\n59.90\nDescuentos\n-29.95\nMA01 - Descuento por fidelizacion 50% x 12m (9/12)\n09-may al 08-jun\n31 días\n-29.95\n933599864 (Empresa PRO 2.0 59.9)\n28.95\nPlan\n09-may al 08-jun\n31 días\n59.90\nProrrateo\n-2.00\nDevolución prorrateo (Empresa PRO 2.0 59.9)\n09-abr al 09-may\n1 día\n-2.00\nDescuentos\n-28.95\nMA01 - Descuento por fidelizacion 50% x 12m (9/12)\n09-may al 08-jun\n31 días\n-29.95\nCargo MA01 - Descuento por fidelizacion 50% x 12m (9/12)\n09-abr al 08-may\n30 días\n1.00\n912379686 (Empresa PRO 2.0 44.9)\n33.67\nPlan\n09-may al 08-jun\n31 días\n44.90\nDescuentos\n-11.23\nMA01 - Descuentos por fidelizacion 25% x 18m (16/18)\n09-may al 08-jun\n31 días\n-11.23\n933599883 (Emprende Ilimitado 49.90)\n14.97\nPlan\n09-may al 08-jun\n31 días\n49.90\nDescuentos\n-34.93\nMA01 - Descuentos por fidelizacion 70% x 18m (9/18)\n09-may al 08-jun\n31 días\n-34.93\n919502385 (Empresa PRO 2.0 74.9)\n37.45\nPlan\n09-may al 08-jun\n31 días\n74.90\nDescuentos\n-37.45\nMA01 - Descuento por fidelizacion 50% x 12m (2/12)\n09-may al 08-jun\n31 días\n-37.45\nCuenta Cliente\n0.00\n\nPágina 3 de 3\nMira aquí el detalle\ntu recibo\nConceptos detallados\nPeríodo\nUnidad\nMonto S/ (Incl. IGV)\nSaldos Anteriores\n0.00\nRecibo(s) anterior(es)\n352.69\nAbonos / Cargos varios al 08/05/2026\n-352.69\nConceptos facturables\n.\nCargo Fijo (incluye prorrateo): Monto de Renta Mensual y consumo proporcional por los servicios de\nVoz, Mensajería y Datos, según Plan Tarifario Contratado.\nOtros Servicios Contratados: Monto fijo mensual por los servicios de:\n- Paquetes Contratados: Paquetes de datos, mensajería y LDI. Servicios de Blackberry, Localizador,\nEntel Backup y otros servicios de Valor Agregado: licencias, aplicativos de negocio, gestión de\ndispositivos móviles y otros.\n- Garantía: Servicio de reposición de equipos.\n- Arrendamiento: Alquiler de equipos.\nConsumos Adicionales: Monto facturado no comprendido dentro del cargo fijo mensual del plan\ntarifario contratado, por los servicios de Voz, Mensajería, Datos, Roaming Internacional, LDI, Redes\nSatelitales, Destinos Rurales.\nDatos locales y móviles: Servicio de internet brindado a través de equipos móviles, USB Módems,\nRouters, etc.\nDatos Roaming: Servicio de datos que Entel brinda en otros países.\nOtros Cargos y Abonos: Cargos y abonos no recurrentes.\nPromociones y Descuentos: Descuentos generados por promociones especiales.\nRecargo por Intereses: Cobro de intereses legales generados por la no cancelación de la totalidad del\nrecibo a la fecha de vencimiento.\nOtros Cargos y Abonos (ya gravados con IGV): Cargo de documentos emitidos por compra o\nfinanciamiento de equipos y/o Boletas/Facturas adicionales, ya gravados con IGV. Incluye Facturación\npor encargo de Otros Operadores según normativa vigente.\nGlosario\n.\nOn Net: Comunicación de un teléfono móvil Entel a otro teléfono móvil Entel.\nOff Net: Comunicación de un teléfono móvil Entel a cualquier teléfono fijo o móvil de otro operador.\nLDI: Larga Distancia Internacional.\nRedes Satelitales: Telefonía móvil a números satelitales.\nDestinos Rurales: Telefonía móvil a Destinos Rurales.\nRoaming Internacional: Servicio de Voz y Datos que Entel brinda en otros países.\nDescarga de Contenidos: Cargo por envío de mensajes y descargas.\nMB: Megabytes (1 MB = 1024 KB)\n- El límite de crédito asignado para consumo adicional de servicios será informado por mensaje de texto\nuna vez iniciada la utilización del referido límite. Para contratación de otros servicios, será evaluado\ncrediticiamente en la venta.\n- El pago no oportuno devengará en intereses legales. Entel puede proceder a la suspensión del Servicio a\npartir del día siguiente del último día de pago.\n- Si tu línea es suspendida por falta de pago, se aplicará un cargo por reconexión del servicio.\n- Reconexión del servicio máximo dentro de 24 horas de efectuado el pago correspondiente.\n- Conoce los lugares de pago en www.entel.pe\nMÓVILES: 123 (desde tu Entel) y 611-7777 (desde un teléfono fijo) Llamadas gratis: 0-800-0-9000 (Lima y\nprovincias).\nINTERNET Y SERVICIOS DE VALOR AGREGADO: 123 (desde tu Entel) y 611-7777 (desde un teléfono fijo).\nOSIPTEL: Fono Ayuda: 0-801-12121 Para detalle de llamadas a fijos o móviles consultar gratuitamente Mi\nEntel\" en www.entel.pe\n\n"
+  },
+  {
+    "id": "1b04cPYI4E1DuEPirmu4h3gntaI--uori",
+    "name": "Ficha del Participante.pdf",
+    "path": "",
+    "size": "71723",
+    "modifiedTime": "2026-05-06T19:58:48.489Z",
+    "webViewLink": "https://drive.google.com/file/d/1b04cPYI4E1DuEPirmu4h3gntaI--uori/view?usp=drivesdk",
+    "text": "LIMACICLO_I2026-06-052026-06-07\nNombre Completo: RIVAS JESSICA\nNombre por el que prefieren que lo llamen: JESSICA\nEdad: 42\nTeléfono Móvil: 984108216\nCI. No: 40504887\nCorreo Electrónico: j.rivas.chamana@gmail.com\nNombres completos de la persona que te invito a Crear: BELLIDO SEGOVIA CARMEN\nLUZ\n¿Tiene algún antecedente personal de enfermedades psiquiátricas o está bajo un\ntratamiento actualmente?\nCual: NO\n¿Toma algún tipo de medicamento que altere su conducta habitual?\nCual: NO\nDECLARO QUE:\nSoy mayor de 18 años.\nHe leído este documento cuidadosamente\nRespondí todas las preguntas honestamente\nAsumo tota responsabilidad por mi participación en el entrenamiento\nFECHA DE ENTRENAMIENTO: LIMA, 2026-06-05\nPOR MEDIO DE LA PRESENTE, COMO DUEÑO Y EN CONOCIMIENTO DE LOS\nDATOS E INFORMACIÓN PERSONAL QUE CONSIGNO EN EL FORMULARIO,\nAUTORIZO Y DOY MI CONSENTIMIENTO PARA EL TRATAMIENTO DE DATOS SEGÚN\nLA LEGISLACIÒN VIGENTE.\nHE TOMADO CONOCIMIENTO DE QUE EL PAGO NO TIENE DEVOLUCIÓN, ES\nINTRANSFERIBLE Y LA PROMOCIÓN SERÁ ÚNICAMENTE PARA ASISTIR EN LA\nFECHA ARRIBA MENCIONADA.\nDE LO CONTRARIO HABRÁ QUE LIQUIDAR EL COSTO REAL DEL ENTRENAMIENTO\nPARA ASISTIR, SIEMPRE Y CUANDO EXISTAN LUGARES DISPONIBLES.\nNOMBRE DEL PARTICIPANTE: RIVAS JESSICA\nFIRMA DEL PARTICIPANTE: ____________________________\nFECHA: 2026-05-06\ndmoscoso\n\n"
+  },
+  {
+    "id": "17wSy6L5LYFA6b9wAyAgA1omIXyi3dV3z",
+    "name": "E001-1115 CREACION CUANTICA.pdf",
+    "path": "",
+    "size": "9218",
+    "modifiedTime": "2026-05-05T16:11:57.689Z",
+    "webViewLink": "https://drive.google.com/file/d/17wSy6L5LYFA6b9wAyAgA1omIXyi3dV3z/view?usp=drivesdk",
+    "text": " \n \nDELIALI \nECHEVARRIA OSORIO ALEXANDRA VANESSA  \nJR. THOMAS COCHRANE 3353 URB. CONDEVILLA DEL SEÑOR ALT.\nCDRA 33 AV. JOSE GRANDA  \nSAN MARTIN DE PORRES - LIMA - LIMA \nFACTURA ELECTRONICA\nRUC: 10412743879 \nE001-1115 \nFecha de Emisión\n: 04/05/2026\nSeñor(es)\n: CREACION CUANTICA E.I.R.L.  \nRUC \n: 20612592811  \nDirección del Cliente \n: CAL. BERLIN 965 URB. SANTA CRUZ\nINT. 302 LIMA-LIMA-MIRAFLORES \nTipo de Moneda\n: SOLES \nObservación\n:  \nForma de pago: Contado\nCantidad\nUnidad Medida\nDescripción\nValor Unitario\nICBPER\n1.00\nUNIDAD\nSERVICIO DE LOGISTICA DEL 1 AL 3 MAYO\n800.00\n0.00\n1.00\nUNIDAD\nALQUILER DE MICROFONO 3 DIAS\n300.00\n0.00\n1.00\nUNIDAD\nALQUILER DE SONIDO 2 Y 3 MAYO EN CIENEGUILLA\n900.00\n0.00\n1.00\nUNIDAD\nALQUILER DE SONIDO 1 MAYO HOTEL SAN BLASS\n300.00\n0.00\n1.00\nUNIDAD\nALQUILER DE SONIDO 2 Y 3 MAYO\n900.00\n0.00\nValor de Venta de Operaciones Gratuitas : S/ 0.00 \n \n \nSON: TRES MIL SETECIENTOS SETENTA Y SEIS Y 00/100 SOLES\n \n \nSub Total Ventas :\nS/ 3,200.00 \nAnticipos :\nS/ 0.00 \nDescuentos :\nS/ 0.00 \nValor Venta :\nS/ 3,200.00 \nISC :\nS/ 0.00 \nIGV :\nS/ 576.00 \nICBPER :\nS/ 0.00 \nOtros Cargos :\nS/ 0.00 \nOtros Tributos :\nS/ 0.00 \nMonto de redondeo :\nS/ 0.00 \nImporte Total :\nS/ 3,776.00 \nInformación de la detracción\nLeyenda:\nOperación sujeta al Sistema de Pago de Obligaciones Tributarias con el Gobierno Central\nBien o Servicio:\n019  Arrendamiento de bienes muebles e inmuebles\nMedio de pago:\n003  Transferencia de fondos\nNro. Cta. Banco de la Nación:\n00030088972\nPorcentaje de detracción:\n10.00\nMonto detracción:\nS/ 378.00\nEsta es una representación impresa de la factura electrónica, generada en el Sistema de SUNAT. Puede\nverificarla utilizando su clave SOL.\n\n"
+  },
+  {
+    "id": "1YHVSpHh0ayA-vvARIid_Ep2ddI_bL0xR",
+    "name": "CUENTAS BANCARIAS WORX COWORKING.pdf",
+    "path": "",
+    "size": "124076",
+    "modifiedTime": "2026-05-05T15:53:32.772Z",
+    "webViewLink": "https://drive.google.com/file/d/1YHVSpHh0ayA-vvARIid_Ep2ddI_bL0xR/view?usp=drivesdk",
+    "text": " \n \n \n \nWORX S.A.C \n \nRUC: 20524520070 \n \n \nCUENTAS CORRIENTES BBVA \nTIPO DE MONEDA \nCUENTA CORRIENTE \n0011-0586-0100043472-58 \nSOLES \nCUENTA CORRIENTE \nINTERBANCARIA \n011-586-000100043472-58 \nSOLES \nCUENTA CORRIENTE \n0011-0586-0100043464-55 \nDOLARES \nCUENTA CORRIENTE \nINTERBANCARIA \n011-586-000100043464-55 \nDOLARES \n \n \n \nCUENTA DETRACCIÓN BANCO DE LA NACIÓN (10%): 0008017387 \n \n \n \nPara transferir desde el extranjero: \n \nCódigo Swift: \nBanco continental: BCONPEPL \nDirección del banco: REPUBLICA DE PANAMA 3055 SAN ISIDRO LIMA PERU  \n\n"
+  },
+  {
+    "id": "1XAY_QMJ0bAvkDDVTXcLZsywZ-pkxIsG2",
+    "name": "FACTURA SALDO EVENTO CREAR 30ABRIL AL 03MAYO.pdf",
+    "path": "",
+    "size": "327649",
+    "modifiedTime": "2026-05-04T19:04:18.707Z",
+    "webViewLink": "https://drive.google.com/file/d/1XAY_QMJ0bAvkDDVTXcLZsywZ-pkxIsG2/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32411236\nlunes, 4 Mayo, 2026\nREFERENCIA\nF301\n00044403\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n03/05/2026\nSALIDA\n30/04/2026\nFacturado a : \nUSUARIO\nEvento\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nSalas\n11,440.68\n11,440.68\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nbI6bC6KYO6xXwrSE6vJGVA6tork=\nTRECE MIL QUINIENTOS Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n13,500.00\n0.00\n0.00\n0.00\n2,059.32\n0.00\n0.00\n11,440.68\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1eCdfe_uhJcwNUs3pDAXTgw8U2qBb5Dcp",
+    "name": "20601007119-01-F003-00014888.pdf",
+    "path": "",
+    "size": "37695",
+    "modifiedTime": "2026-04-29T15:15:06.156Z",
+    "webViewLink": "https://drive.google.com/file/d/1eCdfe_uhJcwNUs3pDAXTgw8U2qBb5Dcp/view?usp=drivesdk",
+    "text": "MALECON BALTA OPERATOR S.A.C\nAV. JAVIER PRADO OESTE NRO. 769 - SAN ISIDRO - LIMA - LIMA\nR.U.C. 20601007119\nFACTURA ELECTRÓNICA\nF003 N° 00014888\nRAZÓN SOCIAL:\nFECHA DE EMISIÓN:\nCREACION CUANTICA E.I.R.L.\nFECHA DE VENCIMIENTO:\n25/04/2026\nDIRECCIÓN:\nCAL.BERLIN NRO. 965 INT. 302 URB. SANTA CRUZ LIMA - LIMA - MIRAFLORES\nMONEDA:\n25/04/2026\n20612592811\nSOLES\nLLEGADA:\n02/05/2026\nSALIDA:\n02/05/2026\nRUC:\nA NOMBRE:\nPASAPORTE:\nFORMA DE PAGO:\nCONTADO\nDESCRIPCIÓN\nCANTIDAD\nPRECIO UNITARIO\nTOTAL\n2,500.00\n1\n2,500.00\nEVENTOS\nEVENTO 02 DE MAYO\nOBSERVACIONES:\nSON : TRES MIL DOSCIENTOS  CON 00/100 SOLES\nBanco de Crédito del Perú\nDOLARES\nBanco\nSOLES\n191-9747180-1-72\nCCI\nBanco de Crédito del Perú\nNúmero de Cuenta\n191-9673128-0-61\n00219100974718017256\nMoneda\n00219100967312806154\nAUTORIZADO MEDIANTE RESOLUCIÓN NRO.034-005-0005038/SUNAT\nREPRESENTACIÓN IMPRESA DE LA FACTURA ELECTRÓNICA\nPUEDE CONSULTAR ESTE COMPROBANTE EN:https://prod.ebis.pe/CecWeb/Consulta.jsf?e=20601007119\nEXISTE LA POSIBILIDAD DE QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRÁ UN CAMBIO EN EL\nNÚMERO DE COMPROBANTE.\nMÉTODO PAGO SUNAT:\nCONTADO\nMONTO NETO PENDIENTE DE PAGO:\n0.00\n  OP.\nGRAVADA\n0.00\n2,500.00\n  OP.\nINAFECTA\n0.00\n0.00\nOP.\nEXPORTACIÓN\n450.00\n0.00\nI.G.V\n0.00\nI.S.C\nT.DSCTO.\n IMPORTE\nTOTAL\nR.CONS.10%\nPAID OUT\n250.00\n0.00\n3,200.00\n0.00\nPROPINA\n  OP.\nEXONERADAS\nBCPLPEPL\nSWITF\nBCPLPEPL\n037 DEMÁS SERVICIOS GRAVADOS CON EL IGV\nBIENES O SERVICIO:\nDEPÓSITO EN CUENTA\nMEDIO PAGO:\n00-046-326121\nNUMERO DE CUENTA:\nPORCENTAJE DETRACCION:\n12 %\n384.00\nMONTO DE DETRACCION:\nOperación sujeta al Sistema de Pago de Obligaciones Tributarias con el Gobierno Central\n-1-\n\n"
+  },
+  {
+    "id": "17TBl_E7W9elPF4tPprBIBVktB7xrVQ6w",
+    "name": "FACTURA EVENTO CREACION CUANTICA.pdf",
+    "path": "",
+    "size": "328391",
+    "modifiedTime": "2026-04-16T21:11:37.108Z",
+    "webViewLink": "https://drive.google.com/file/d/17TBl_E7W9elPF4tPprBIBVktB7xrVQ6w/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32411264\njueves, 16 Abril, 2026\nREFERENCIA\nF301\n00043922\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nNataly Aynaya\n19/04/2026\nSALIDA\n17/04/2026\nFacturado a : \nUSUARIO\nEvento\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nSalas\n13,983.05\n13,983.05\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nORlu88MUomgkDF9kogTF+V3fhOg=\nDIEZ Y SEIS MIL QUINIENTOS Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n16,500.00\n0.00\n0.00\n0.00\n2,516.95\n0.00\n0.00\n13,983.05\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1N3MGdwVdza8xAWf7CgukyT4GbyowRXeF",
+    "name": "FACTURA ADELANTO EVENTO CREACIÓN CUANTICA 17AL19ABR2026.pdf",
+    "path": "",
+    "size": "327352",
+    "modifiedTime": "2026-04-16T15:25:40.309Z",
+    "webViewLink": "https://drive.google.com/file/d/1N3MGdwVdza8xAWf7CgukyT4GbyowRXeF/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32411264\nmiércoles, 15 Abril, 2026\nREFERENCIA\nF301\n00043903\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n19/04/2026\nSALIDA\n17/04/2026\nFacturado a : \nUSUARIO\nMaestría del Juego\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nSalas\n13,983.05\n13,983.05\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\n/OqUU+77jphsSabNF31cPR+JC44=\nDIEZ Y SEIS MIL QUINIENTOS Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n16,500.00\n0.00\n0.00\n0.00\n2,516.95\n0.00\n0.00\n13,983.05\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1SfVgP9FXMy9ByuXCDQ279Ccbp1gL1Fke",
+    "name": "FACTURA PREPAGO ALOJAMIENTO CREACION CUANTICA.pdf",
+    "path": "",
+    "size": "326724",
+    "modifiedTime": "2026-04-16T14:00:51.912Z",
+    "webViewLink": "https://drive.google.com/file/d/1SfVgP9FXMy9ByuXCDQ279Ccbp1gL1Fke/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32418256\nmiércoles, 15 Abril, 2026\nREFERENCIA\nF301\n00043910\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n20/04/2026\nSALIDA\n16/04/2026\nFacturado a : \nUSUARIO\nMaría Lourdes Patiño & Michael Boada\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nAlojamiento\n562.50\n562.50\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nB1nNU0wiO5FNR2aH9jnnclAqtjU=\nSETECIENTOS VEINTE Y 00/100 DOLARES AMERICANOS\nTotal  Propina\nUS $\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n720.00\n0.00\n0.00\n56.25\n101.25\n0.00\n0.00\n562.50\nTotal  Exportacion\n0.00\nCuentas corrientes  \nTotal  Descuento\nDolares\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1O8uMuezdeGbpS3QoD5KYTCzZK66VIfkz",
+    "name": "DIP-FACT-Recibo_Ciclico_2026040005_S1AA-0050671484.pdf",
+    "path": "",
+    "size": "131547",
+    "modifiedTime": "2026-04-13T16:52:38.340Z",
+    "webViewLink": "https://drive.google.com/file/d/1O8uMuezdeGbpS3QoD5KYTCzZK66VIfkz/view?usp=drivesdk",
+    "text": "Integratel Perú S.A.A.   |   R.U.C. 20100017491   |   Jr. Domingo Martínez Luján N° 1130   |   Lima – Lima - Surquillo\nPágina 1/3\nEmpresas Fija\nRecibo Abril\nN° recibo: S1AA-0050671484\nCREACION CUANTICA EIRL\nRUC: 20612592811 \nCALLE BERLIN 965 Piso 3 URBANIZACION RESIDENCIAL JOSE BALTA,\nMIRAFLORES, 01, LIMA\nCuenta financiera: 753621842 \nID SUSCRIPTOR: 196980437\nID Cliente: 131054354\nAnexo: 1\nTotal a pagar del mes\nS/109.90\nÚltimo día de pago: 21/04\nN° Fijo / Cód. pago: 753621842\nDeuda anterior: S/0.00\n \nPaga a tiempo tu recibo y mantente siempre conectado.\nNo esperes hasta el último día de pago.\nCiclo de facturación - Abril 2026\n05/04\n21/04\nFecha de\nEmisión\nÚltimo día\nde pago\n¡LLAMA AL 0 800 11311!\nSi tienes un negocio y deseas comprar o portar una línea\nmóvil, adquirir un servicio de internet, TV o telefonía fija.\nCanal exclusivo para Clientes con RUC 20\nResumen de Recibo - NºS1AA-0050671484\nCargos Mensuales\nS/ 109.89\nSubtotal\nS/93.13\nIGV (18%)\nS/16.76\nTotal Afecto\nS/109.89\nRedondeo\nS/ 0.01\nTotal Facturado\nS/109.90\nDevoluciones\nS/ 0.00\nDébitos\nS/ 0.00\nTotal a pagar\nS/ 109.90\n\nEmpresas Fija\nIntegratel Perú S.A.A.   |   R.U.C. 20100017491   |   Jr. Domingo Martínez Luján N° 1130   |   Lima – Lima - Surquillo\nPágina 2/3\nDetalle del recibo - N° S1AA-0050671484 - 196980437\nCargos Mensuales\nPrecio de vta.\nIGV S/109.89\nMovistar Internet 600 Mbps (06Abr al 05May)\n93.13\n16.76\n109.89\nRedondeo\nPrecio de vta.\nIGV\nS/0.01\nRedondeo del mes Actual\n-0.08\n0.00\n-0.08\nRedondeo del mes Anterior\n0.09\n0.00\n0.09\n\nConceptos facturables\nCargos fijos mensuales\nCargo mensual facturado al cliente por el plan contratado\npara los servicios de voz y datos. Cargo fijo proporcional\ndel plan desde la fecha de inicio del servicio hasta el\nsiguiente cierre de facturación\nCargos por llamadas adicionales\nCargos por tráfico de voz, datos, mensajes de texto que\nno se encuentran comprendidos dentro del cargo fijo\nmensual.\nLarga distancia: cargo adicional por llamada de larga\ndistancia nacional o internacional\nKB internet y multimedia: navegación en internet y\ntráfico por descarga de aplicativos\nKB transmisión de datos: envío y recepción de datos.\nRoaming internacional: cargo por llamadas efectuadas y\nrecibidas en el extranjero\nDetalle de documentos afectos al IGV\nCargo por Reconexión: cargo facturado si el cliente\ncancela un recibo después de habérsele cortado por\ndeuda.\nCargo por Reconexión de corte APC (a pedido de cliente):\ncargo facturado al efectuarse la reactivación del servicio\nde la línea luego de cumplirse el plazo de suspensión.\nCargo por llamadas a operadoras rurales: llamadas\nrealizadas a teléfonos fijos rurales como Gilat to Home,\nValtron, Claro Rural, Integratel Rural o a teléfonos satelitales\ncomo Tesam.\nRenta fraccionaria por cambio de plan: cargo facturado si\ndurante el ciclo de la facturación el cliente cambió a un\nplan tarifario de cargo fijo mayor al que tenía.\nLugares de pago\nBancos y agentes\nBBVA Continental\nBanco Pichincha\nBCP\nBanco de la Nación\nBanBif\nInterbank\nScotiabank\nOtros\nAgente Multibanco KASNET\nMultibanco\nFullcarga\nRed Digital\nMetro\nWong\nWestern Union\nAlgunos lugares de pago presenciales pueden aplicar cobro de comisión de acuerdo a sus tarifarios vigentes.\nPuede realizar su pago de forma rápida y segura en el App Mi Movistar, YAPE o App o Web de su banco.\nRecuerda que también puede afiliar su recibo\nMovistar al débito automático, más info :\nhttp://smvst.com/DAT\nMayor información sobre lugares de pago en www.movistar.com.pe\n¿Qué es el recibo digital?\nEs un servicio gratuito que ofrece Integratel, con el que podrá recibir mensualmente su recibo en formato PDF al\ncorreo electrónico que usted indique. El envío del recibo digital va en reemplazo de su recibo físico.\n\n"
+  },
+  {
+    "id": "1VFs40M0cPRZCSub1nuOAHYNdI4y33tHQ",
+    "name": "S002-216177668_08_20260408.pdf",
+    "path": "",
+    "size": "267447",
+    "modifiedTime": "2026-04-13T16:48:06.155Z",
+    "webViewLink": "https://drive.google.com/file/d/1VFs40M0cPRZCSub1nuOAHYNdI4y33tHQ/view?usp=drivesdk",
+    "text": "Página 1 de 3\n+\n+\n-\n+\n+\nEntel Perú S.A.\nRUC: 20106897914\nAv. República de Colombia 791\nPiso 14 - San Isidro - Lima\n¡Hola! Te enviamos tu recibo del mes\n0\n60\n120\n180\n240\n300\n360\nRequest ID: 26852 | Ciclo: 08 | Custcode: 5.7023\nCREACION CUANTICA E.I.R.L.\nAv Sergio Bernales Nro 272\nLima - Lima - Lima\nRecibo Nº\nEmisión\n:\n:\nS002-216177668\n08/Abr/2026\nInicio del Periodo\nFin del Periodo\n:\n:\n09/Abr/2026\n08/May/2026\nNº de Cuenta\nNº Doc (RUC)\n:\n:\n1.21765711\n20612592811\nTotal a pagar\nVencimiento\nS/ 352.69\n21/Abr/2026\nPlan\nProrrateo\nCargos\nAdicionales\nDescuentos o\nP. Adelantado\nEquipos\nSaldo\nAnterior\nS/ 496.10\nS/ 144.98\nS/ 0.00\n-S/ 288.39\nS/ 0.00\nS/ 0.00\nEn las siguientes páginas\npodrás encontrar el detalle de cada concepto\nFacturación de los últimos 6 meses\nNov\nDic\nEne\nFeb\nMar\nAbr\nDesglose tributario\nSubtotal de Conceptos Facturados (sin IGV)\nIGV del Subtotal (18%)\nTotal (Incl. IGV)\nMontos ya gravados con IGV\nExentos IGV\nSaldo anterior\nTotal a pagar\n298.89\n53.80\n352.69\n0.00\n0.00\n0.00\n352.69\nDocumento válido para efectos tributarios según Res. de Sup. No. 007-99/SUNAT. Documento\nno afecto al régimen de retención del IGV por ser agente de retención, según Res. de Sup. No.\n037-2002/SUNAT. Los saldos de hasta S/0.09 que no cancele por falta de moneda de curso legal\n(S/0.05 y S/0.01), se registrarán y se mantendrán como pendientes de pago hasta su cancelación\nefectiva.\nRecuerda que puedes cambiar de operadora sin perder tu número. El trámite de portabilidad es\nrápido y gratuito. Migra tus líneas de otro operador hacia Entel y disfruta de los beneficios que\ntenemos para ti.\n\nPágina 2 de 3\nMira aquí el detalle\ntu recibo\nResumen\nNúmero\nPlan Tarifario\nPlan\nProrrateo\nCargos\nAdicionales (*)\nDescuentos o\nP. Adelantado\nEquipos (*)\nSaldo\nAnterior\nMonto S/\n(Incl. IGV)\n908652308\nEmpresa PRO 2.0 74.9\n74.90\n72.49\n0.00\n-73.70\n0.00\n0.00\n73.69\n933599925\nEmprende Ilimitado 49.90\n49.90\n0.00\n0.00\n-34.93\n0.00\n0.00\n14.97\n933599903\nEmpresa PRO 2.0 59.9\n59.90\n0.00\n0.00\n-29.95\n0.00\n0.00\n29.95\n908931343\nEmpresa PRO 2.0 36.9\n36.90\n0.00\n0.00\n0.00\n0.00\n0.00\n36.90\n933599864\nEmpresa PRO 2.0 59.9\n59.90\n0.00\n0.00\n-29.95\n0.00\n0.00\n29.95\n912379686\nEmpresa PRO 2.0 44.9\n44.90\n0.00\n0.00\n-11.23\n0.00\n0.00\n33.67\n912379744\nEmpresa PRO 2.0 44.9\n44.90\n0.00\n0.00\n0.00\n0.00\n0.00\n44.90\n933599883\nEmprende Ilimitado 49.90\n49.90\n0.00\n0.00\n-34.93\n0.00\n0.00\n14.97\n919502385\nEmpresa PRO 2.0 74.9\n74.90\n72.49\n0.00\n-73.70\n0.00\n0.00\n73.69\nCuenta\nCliente\n0.00\n0.00\n0.00\n0.00\n0.00\n0.00\n0.00\nTotal\n496.10\n144.98\n0.00\n-288.39\n0.00\n0.00\n352.69\n(*) Puede incluir conceptos exentos o ya gravados con IGV\nDetalle\nConceptos detallados\nPeríodo\nUnidad\nMonto S/ (Incl. IGV)\n908652308 (Empresa PRO 2.0 74.9)\n73.69\nPlan\n09-abr al 08-may\n30 días\n74.90\nProrrateo\n72.49\nCargo prorrateo (Empresa PRO 2.0 74.9)\n10-mar al 09-abr\n30 días\n72.49\nDescuentos\n-73.70\nMA01 - Descuento por fidelizacion 50% x 12m (1/12)\n10-mar al 08-may\n60 días\n-73.70\n933599925 (Emprende Ilimitado 49.90)\n14.97\nPlan\n09-abr al 08-may\n30 días\n49.90\nDescuentos\n-34.93\nMA01 - Descuentos por fidelizacion 70% x 18m (8/18)\n09-abr al 08-may\n30 días\n-34.93\n933599903 (Empresa PRO 2.0 59.9)\n29.95\nPlan\n09-abr al 08-may\n30 días\n59.90\nDescuentos\n-29.95\nMA01 - Descuento por fidelizacion 50% x 12m (8/12)\n09-abr al 08-may\n30 días\n-29.95\n933599864 (Empresa PRO 2.0 59.9)\n29.95\nPlan\n09-abr al 08-may\n30 días\n59.90\nDescuentos\n-29.95\nMA01 - Descuento por fidelizacion 50% x 12m (8/12)\n09-abr al 08-may\n30 días\n-29.95\n912379686 (Empresa PRO 2.0 44.9)\n33.67\nPlan\n09-abr al 08-may\n30 días\n44.90\nDescuentos\n-11.23\nMA01 - Descuentos por fidelizacion 25% x 18m (15/18)\n09-abr al 08-may\n30 días\n-11.23\n933599883 (Emprende Ilimitado 49.90)\n14.97\nPlan\n09-abr al 08-may\n30 días\n49.90\nDescuentos\n-34.93\nMA01 - Descuentos por fidelizacion 70% x 18m (8/18)\n09-abr al 08-may\n30 días\n-34.93\n919502385 (Empresa PRO 2.0 74.9)\n73.69\nPlan\n09-abr al 08-may\n30 días\n74.90\nProrrateo\n72.49\nCargo prorrateo (Empresa PRO 2.0 74.9)\n10-mar al 09-abr\n30 días\n72.49\nDescuentos\n-73.70\nMA01 - Descuento por fidelizacion 50% x 12m (1/12)\n10-mar al 08-may\n60 días\n-73.70\n\nPágina 3 de 3\nMira aquí el detalle\ntu recibo\nConceptos detallados\nPeríodo\nUnidad\nMonto S/ (Incl. IGV)\nCuenta Cliente\n0.00\nSaldos Anteriores\n0.00\nRecibo(s) anterior(es)\n205.31\nAbonos / Cargos varios al 08/04/2026\n-205.31\nConceptos facturables\n.\nCargo Fijo (incluye prorrateo): Monto de Renta Mensual y consumo proporcional por los servicios de\nVoz, Mensajería y Datos, según Plan Tarifario Contratado.\nOtros Servicios Contratados: Monto fijo mensual por los servicios de:\n- Paquetes Contratados: Paquetes de datos, mensajería y LDI. Servicios de Blackberry, Localizador,\nEntel Backup y otros servicios de Valor Agregado: licencias, aplicativos de negocio, gestión de\ndispositivos móviles y otros.\n- Garantía: Servicio de reposición de equipos.\n- Arrendamiento: Alquiler de equipos.\nConsumos Adicionales: Monto facturado no comprendido dentro del cargo fijo mensual del plan\ntarifario contratado, por los servicios de Voz, Mensajería, Datos, Roaming Internacional, LDI, Redes\nSatelitales, Destinos Rurales.\nDatos locales y móviles: Servicio de internet brindado a través de equipos móviles, USB Módems,\nRouters, etc.\nDatos Roaming: Servicio de datos que Entel brinda en otros países.\nOtros Cargos y Abonos: Cargos y abonos no recurrentes.\nPromociones y Descuentos: Descuentos generados por promociones especiales.\nRecargo por Intereses: Cobro de intereses legales generados por la no cancelación de la totalidad del\nrecibo a la fecha de vencimiento.\nOtros Cargos y Abonos (ya gravados con IGV): Cargo de documentos emitidos por compra o\nfinanciamiento de equipos y/o Boletas/Facturas adicionales, ya gravados con IGV. Incluye Facturación\npor encargo de Otros Operadores según normativa vigente.\nGlosario\n.\nOn Net: Comunicación de un teléfono móvil Entel a otro teléfono móvil Entel.\nOff Net: Comunicación de un teléfono móvil Entel a cualquier teléfono fijo o móvil de otro operador.\nLDI: Larga Distancia Internacional.\nRedes Satelitales: Telefonía móvil a números satelitales.\nDestinos Rurales: Telefonía móvil a Destinos Rurales.\nRoaming Internacional: Servicio de Voz y Datos que Entel brinda en otros países.\nDescarga de Contenidos: Cargo por envío de mensajes y descargas.\nMB: Megabytes (1 MB = 1024 KB)\n- El límite de crédito asignado para consumo adicional de servicios será informado por mensaje de texto\nuna vez iniciada la utilización del referido límite. Para contratación de otros servicios, será evaluado\ncrediticiamente en la venta.\n- El pago no oportuno devengará en intereses legales. Entel puede proceder a la suspensión del Servicio a\npartir del día siguiente del último día de pago.\n- Si tu línea es suspendida por falta de pago, se aplicará un cargo por reconexión del servicio.\n- Reconexión del servicio máximo dentro de 24 horas de efectuado el pago correspondiente.\n- Conoce los lugares de pago en www.entel.pe\nMÓVILES: 123 (desde tu Entel) y 611-7777 (desde un teléfono fijo) Llamadas gratis: 0-800-0-9000 (Lima y\nprovincias).\nINTERNET Y SERVICIOS DE VALOR AGREGADO: 123 (desde tu Entel) y 611-7777 (desde un teléfono fijo).\nOSIPTEL: Fono Ayuda: 0-801-12121 Para detalle de llamadas a fijos o móviles consultar gratuitamente Mi\nEntel\" en www.entel.pe\n\n"
+  },
+  {
+    "id": "1pqQNHX7DO3fRykbnv1fQ2sFfRA1Pt0bq",
+    "name": "FACTURA 3.pdf",
+    "path": "",
+    "size": "328354",
+    "modifiedTime": "2026-04-08T22:02:18.327Z",
+    "webViewLink": "https://drive.google.com/file/d/1pqQNHX7DO3fRykbnv1fQ2sFfRA1Pt0bq/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32411254\nmiércoles, 8 Abril, 2026\nREFERENCIA\nF301\n00043753\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nAna Vasquez\n12/04/2026\nSALIDA\n09/04/2026\nFacturado a : \nUSUARIO\nCapacitación\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nSalas\n5,508.47\n5,508.47\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\ndUcUmlo3gjpj4rbXaRKhVPRmVsU=\nSEIS MIL QUINIENTOS Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n6,500.00\n0.00\n0.00\n0.00\n991.53\n0.00\n0.00\n5,508.47\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1K0yMeGNZlg-7rZLS-J7Ce22iSWIBmrEg",
+    "name": "factura creación cuantica 09 al 12 abril 2026.pdf",
+    "path": "",
+    "size": "327886",
+    "modifiedTime": "2026-04-06T17:59:43.808Z",
+    "webViewLink": "https://drive.google.com/file/d/1K0yMeGNZlg-7rZLS-J7Ce22iSWIBmrEg/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32411254\nlunes, 6 Abril, 2026\nREFERENCIA\nF301\n00043685\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n12/04/2026\nSALIDA\n09/04/2026\nFacturado a : \nUSUARIO\nSalones Capítulo Dos C2 E26\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nSalas\n16,525.42\n16,525.42\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nlYx1Dd1s0IBmsiOTbppYsGYguEU=\nDIEZ Y NUEVE MIL QUINIENTOS Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n19,500.00\n0.00\n0.00\n0.00\n2,974.58\n0.00\n0.00\n16,525.42\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1H7OPNJObh4NodScBCX4BEzHp7HkKXfC8",
+    "name": "Reclamación 20264E1BC702.pdf",
+    "path": "",
+    "size": "8580",
+    "modifiedTime": "2026-03-27T19:17:06.274Z",
+    "webViewLink": "https://drive.google.com/file/d/1H7OPNJObh4NodScBCX4BEzHp7HkKXfC8/view?usp=drivesdk",
+    "text": "Libro de reclamaciones de Creación Cuántica\nCódigo de indentificación del libro de reclamaciones: 0771c38e-d3c2-468d-a7c2-4b441dfa9f02\nEstado de reclamación a la fecha: 27/03/2026, 14:16:55\nReclamación 20264E1BC702\nFecha de reclamación: 27/03/2026\nCódigo de identificación: 20264E1BC702\nNúmero correlativo: 2\nProveedor\nNombre: Creación Cuántica\nRUC: 20612592811\nDomicilio fiscal: Dalias 136, Miraflores, Lima, Departamento de Lima, Perú\nEstablecimiento\nNombre: Miraflores\nDirección: Dalias 136, Miraflores, Lima, Departamento de Lima, Perú\nConsumidor\nNombre completo: Gerald Christian Rodriguez Anaya\nDNI: 76919462\nCorreo electrónico: grodanayauk@gmail.com\nBien contratado\nTipo: Servicio\nDescripción: Capítulo Uno de CREAR poder sin límites\nMonto reclamado: Soles (S/) 900.00\nReclamación\nTipo: Reclamo\nDescripción: Realicé el pago para un servicio de capacitación que aún no ha iniciado. Al solicitar la cancelación, se me indicó que no es\nposible la devolución, ofreciendo únicamente reprogramación. Considero que esto vulnera mis derechos como consumidor.\nSolicitud del consumidor: Solicito la devolución del monto pagado (S/900), debido a que el servicio no ha sido brindado y deseo\ncancelar mi participación.\nRespuesta\nSin respuesta a la fecha.\n\nEl libro de reclamaciones virtual de Creación Cuántica es un servicio proporcionado por Reclamo Virtual en cumplimiento de la Ley\nN° 29571, Código de Protección y Defensa del Consumidor.\nLa formulación del reclamo no impide acudir a otras vías de solución de controversias ni es requisito previo para interponer una\ndenuncia ante el INDECOPI.\nEl proveedor debe dar respuesta al reclamo o queja en un plazo no mayor a quince (15) días hábiles, el cual es improrrogable.\nDirección del libro de reclamaciones: https://app.reclamovirtual.pe/reclamar/2205e150-ddd1-468a-afa4-ed634b8af4d7/miraflores\nDirección del reclamo: https://app.reclamovirtual.pe/reclamacion/20264E1BC702\n\n"
+  },
+  {
+    "id": "1Bl4MhAQpwU0DUlPJsk7Nvzz3_8tpG3Bl",
+    "name": "factura saldo evento Crear 26al29mar2026.pdf",
+    "path": "",
+    "size": "326834",
+    "modifiedTime": "2026-03-26T17:34:55.281Z",
+    "webViewLink": "https://drive.google.com/file/d/1Bl4MhAQpwU0DUlPJsk7Nvzz3_8tpG3Bl/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32411235\njueves, 26 Marzo, 2026\nREFERENCIA\nF301\n00043362\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n29/03/2026\nSALIDA\n26/03/2026\nFacturado a : \nUSUARIO\nEvento\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nSalas\n11,440.68\n11,440.68\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nu9IxtwWev8wcsPDZlevXctC9a6s=\nTRECE MIL QUINIENTOS Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n13,500.00\n0.00\n0.00\n0.00\n2,059.32\n0.00\n0.00\n11,440.68\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1szsIGB2nU9gqB3VEsvut-qWaLWQ_NaEp",
+    "name": "FACTURA CREA.pdf",
+    "path": "",
+    "size": "419905",
+    "modifiedTime": "2026-03-25T17:38:29.284Z",
+    "webViewLink": "https://drive.google.com/file/d/1szsIGB2nU9gqB3VEsvut-qWaLWQ_NaEp/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32411235\nmiércoles, 25 Marzo, 2026\nREFERENCIA\nF301\n00043319\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nAna Vasquez\n29/03/2026\nSALIDA\n26/03/2026\nFacturado a : \nUSUARIO\nEvento\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nSalas\n16,525.42\n16,525.42\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\no5+1x47ckiL0zkMK1oidG+2boRA=\nDIEZ Y NUEVE MIL QUINIENTOS Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n19,500.00\n0.00\n0.00\n0.00\n2,974.58\n0.00\n0.00\n16,525.42\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1Vur4_vlYr2ehip2NT_VLGBIQW5knlAl5",
+    "name": "FACTURA ALOJAMIENTO CREACION CUANTICA.pdf",
+    "path": "",
+    "size": "326710",
+    "modifiedTime": "2026-03-19T21:19:51.255Z",
+    "webViewLink": "https://drive.google.com/file/d/1Vur4_vlYr2ehip2NT_VLGBIQW5knlAl5/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32417440\njueves, 19 Marzo, 2026\nREFERENCIA\nF301\n00043156\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nNataly Aynaya\n30/03/2026\nSALIDA\n24/03/2026\nFacturado a : \nUSUARIO\nFernando Aragón\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nAlojamiento\n421.88\n421.88\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\npt4U+XJ1NTcrLOzXAGb3g81t698=\nQUINIENTOS CUARENTA Y 00/100 DOLARES AMERICANOS\nTotal  Propina\nUS $\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n540.00\n0.00\n0.00\n42.18\n75.94\n0.00\n0.00\n421.88\nTotal  Exportacion\n0.00\nCuentas corrientes  \nTotal  Descuento\nDolares\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1pb6IYMxo-zi4I4LDwEulZR-CiYl0fD3N",
+    "name": "F001-1510 CREACION CUANTICA E.I.R.L..pdf",
+    "path": "",
+    "size": "58094",
+    "modifiedTime": "2026-03-06T00:16:10.424Z",
+    "webViewLink": "https://drive.google.com/file/d/1pb6IYMxo-zi4I4LDwEulZR-CiYl0fD3N/view?usp=drivesdk",
+    "text": "CORPORACION AQUA ANANDA S.A.C.\nJR. CHAVIN NRO. 16 HUERTA LA VIRREYNA\nBreña, Lima, Lima\nTelf: 9929961912 / 951201327 - Email: ventas@anandaperu.com\nhttps://aquananda.com.pe/\nR.U.C. 20610414495\nFACTURA ELECTRÓNICA\nF001 - 001510\nRazón Social: CREACION CUANTICA E.I.R.L.\nR.U.C.: 20612592811\nDirección: CAL. BERLIN NRO. 965 SANTA CRUZ INT. 302 LIMA - LIMA - MIRAFLORES Miraflores - Lima - Lima\nFECHA DE EMISIÓN\nFORMA DE\nPAGO\nTIPO\nMONEDA\nNÚMERO DE\nGUÍA\nORDEN DE\nCOMPRA\nNÚMERO DE\nPLACA\n05-03-2026 03:30:13\nPM\nYAPE\nSoles\nCANT.\nDESCRIPCIÓN\nPRECIO\nUNID/MED\nAFECT.IGV\nIMPORTE\n8\nAQUA ANANDA AGUA DE MESA OZONIZADA\nOSMOTIZADA Y ALCALINA RECARGA DE BIDON\nCON CAÑO DE 20 LT\nS/ 19.90\nUNIDADES\nGravado\nS/ 159.20\nSON CIENTO CINCUENTA Y NUEVE CON 20/100 SOLES\nConsulte su documento electrónico en:\nhttps://facturalaya.com/sys/consultas/index/8446\nHASH: W/pto2CH/1E/wTGK+XZJUhu/v2U=\nVENDEDOR: CORPORACION AQUA ANANDA S.A.C.\nAdministrador (cod: 10814)\nRepresentación Impresa de Factura Electrónica\nRESUMEN:\nGravada:\nS/ 134.92\nIGV (18.00%):\nS/ 24.28\nDescuento Total:\nS/ 0.00\nTotal:\nS/ 159.20\nBANCO\nTITULAR\nTIPO CTA\nMONEDA\nCTA CTE\nCCI\nCTA CTE BCP\nSOLES\nCORPORACION AQUA\nANANDA SAC\nCuenta\nCorriente\nSoles\n1939621923039\n00219300962192303916\nEmitido por: facturalaya.com\n\n"
+  },
+  {
+    "id": "1LcMRDq98HA8GcRtFYCuzOqFe9hMnPs6y",
+    "name": "factura saldo evento creación cuantica 05 al 08 mar 2026.pdf",
+    "path": "",
+    "size": "328181",
+    "modifiedTime": "2026-03-06T00:07:51.261Z",
+    "webViewLink": "https://drive.google.com/file/d/1LcMRDq98HA8GcRtFYCuzOqFe9hMnPs6y/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32411252\njueves, 5 Marzo, 2026\nREFERENCIA\nF301\n00042844\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n08/03/2026\nSALIDA\n05/03/2026\nFacturado a : \nUSUARIO\nBriefing\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nSalas\n8,050.85\n8,050.85\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nom9HRtp/fGvdbRfiqFclbEjrScc=\nNUEVE MIL QUINIENTOS Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n9,500.00\n0.00\n0.00\n0.00\n1,449.15\n0.00\n0.00\n8,050.85\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1d96gGQE6ATNM_abcGgfP2QEu5c94FUH-",
+    "name": "PDF-DOC-E001-13820255547799.pdf",
+    "path": "",
+    "size": "4636",
+    "modifiedTime": "2026-03-05T04:43:04.304Z",
+    "webViewLink": "https://drive.google.com/file/d/1d96gGQE6ATNM_abcGgfP2QEu5c94FUH-/view?usp=drivesdk",
+    "text": " \n \n \nHOSTAL SOL Y LUNA S.A.C.  \nCAL. 13 3RA ETAPA CIENEGUILLA MZA. 13 LOTE. 1 ESQUINA CON\nCALLE 13 Y 15 PAS.TELEFONICA  \nCIENEGUILLA - LIMA - LIMA \nFACTURA ELECTRONICA\nRUC: 20255547799 \nE001-138 \nFecha de Emisión\n: 11/02/2026\nSeñor(es)\n: CREACION CUANTICA E.I.R.L.  \nRUC \n: 20612592811  \nEstablecimiento del Emisor \n:\nCAL. 13 3RA ETAPA CIENEGUILLA -\nMZA. 13 LOTE. 1 ESQUINA CON\nCALLE 13 Y 15 PAS.TELEFONICA\nLIMA-LIMA-CIENEGUILLA \nTipo de Moneda\n: SOLES \nObservación\n: OPERACION SUJETA A\nDETRACCION DEL 12% \nForma de pago: Contado\nCantidad\nUnidad Medida\nDescripción\nValor Unitario\nICBPER\n1.00\nUNIDAD\nSERVICIO DE ALOJAMIENTO EN HABITACIONES\nMULTIPLES Y SERVICIO DE ALIMENTACION LOS DIAS\n20, 21 Y 22 DE FEBRERO DE 2026 - 1RA FACTURA\n5932.2033898305\n0.00\nValor de Venta de Operaciones Gratuitas : S/ 0.00 \n \n \nSON: SIETE MIL Y 00/100 SOLES\n \n \nSub Total Ventas :\nS/ 5,932.20 \nAnticipos :\nS/ 0.00 \nDescuentos :\nS/ 0.00 \nValor Venta :\nS/ 5,932.20 \nISC :\nS/ 0.00 \nIGV :\nS/ 1,067.80 \nICBPER :\nS/ 0.00 \nOtros Cargos :\nS/ 0.00 \nOtros Tributos :\nS/ 0.00 \nMonto de redondeo :\nS/ 0.00 \nImporte Total :\nS/ 7,000.00 \nInformación de la detracción\nLeyenda:\nOperación sujeta al Sistema de Pago de Obligaciones Tributarias con el Gobierno Central\nBien o Servicio:\n022  Otros servicios empresariales\nMedio de pago:\n001  Depósito en cuenta\nNro. Cta. Banco de la Nación:\n00066029379\nPorcentaje de detracción:\n12.00\nMonto detracción:\nS/ 840.00\nEsta es una representación impresa de la factura electrónica, generada en el Sistema de SUNAT. Puede\nverificarla utilizando su clave SOL.\n\n"
+  },
+  {
+    "id": "1LulK55ARFqWFq0sS3Bn0WtXVudPIYPil",
+    "name": "E001-1100 CREACION CUANTICA.pdf",
+    "path": "",
+    "size": "4887",
+    "modifiedTime": "2026-03-05T04:42:22.880Z",
+    "webViewLink": "https://drive.google.com/file/d/1LulK55ARFqWFq0sS3Bn0WtXVudPIYPil/view?usp=drivesdk",
+    "text": " \n \nDELIALI \nECHEVARRIA OSORIO ALEXANDRA VANESSA  \nJR. THOMAS COCHRANE 3353 URB. CONDEVILLA DEL SEÑOR ALT.\nCDRA 33 AV. JOSE GRANDA  \nSAN MARTIN DE PORRES - LIMA - LIMA \nFACTURA ELECTRONICA\nRUC: 10412743879 \nE001-1100 \nFecha de Emisión\n: 09/02/2026\nSeñor(es)\n: CREACION CUANTICA E.I.R.L.  \nRUC \n: 20612592811  \nDirección del Cliente \n: CAL. BERLIN 965 URB. SANTA CRUZ\nINT. 302 LIMA-LIMA-MIRAFLORES \nTipo de Moneda\n: SOLES \nObservación\n:  \nForma de pago: Contado\nCantidad\nUnidad Medida\nDescripción\nValor Unitario\nICBPER\n1.00\nUNIDAD\nSERVICIOS LOGISTICOS 6 FEB. AL 8 FEB.\n790.00\n0.00\n1.00\nUNIDAD\nALQUILER DE 02 CONSOLAS DEL 06 FEB. AL 08 FEB.\n300.00\n0.00\n1.00\nUNIDAD\nALQUILER DE 03 MICROFONOS DE MANO DEL 06 FEB.\nAL 08 FEB.\n450.00\n0.00\n1.00\nUNIDAD\nSERVICIO ALMACENAJE DEL 04 ENE AL 04 FEB.\n400.00\n0.00\nValor de Venta de Operaciones Gratuitas : S/ 0.00 \n \n \nSON: DOS MIL DOSCIENTOS OCHENTA Y NUEVE Y 20/100 SOLES\n \n \nSub Total Ventas :\nS/ 1,940.00 \nAnticipos :\nS/ 0.00 \nDescuentos :\nS/ 0.00 \nValor Venta :\nS/ 1,940.00 \nISC :\nS/ 0.00 \nIGV :\nS/ 349.20 \nICBPER :\nS/ 0.00 \nOtros Cargos :\nS/ 0.00 \nOtros Tributos :\nS/ 0.00 \nMonto de redondeo :\nS/ 0.00 \nImporte Total :\nS/ 2,289.20 \nInformación de la detracción\nLeyenda:\nOperación sujeta al Sistema de Pago de Obligaciones Tributarias con el Gobierno Central\nBien o Servicio:\n019  Arrendamiento de bienes muebles e inmuebles\nMedio de pago:\n003  Transferencia de fondos\nNro. Cta. Banco de la Nación:\n00030088972\nPorcentaje de detracción:\n10.00\nMonto detracción:\nS/ 229.00\nEsta es una representación impresa de la factura electrónica, generada en el Sistema de SUNAT. Puede\nverificarla utilizando su clave SOL.\n\n"
+  },
+  {
+    "id": "1RTZepsqbWW8IQKajb-yXk2lJ-ZlT-zkO",
+    "name": "E001-1099 CREACION CUANTICA.pdf",
+    "path": "",
+    "size": "4788",
+    "modifiedTime": "2026-03-05T04:42:11.974Z",
+    "webViewLink": "https://drive.google.com/file/d/1RTZepsqbWW8IQKajb-yXk2lJ-ZlT-zkO/view?usp=drivesdk",
+    "text": " \n \nDELIALI \nECHEVARRIA OSORIO ALEXANDRA VANESSA  \nJR. THOMAS COCHRANE 3353 URB. CONDEVILLA DEL SEÑOR ALT.\nCDRA 33 AV. JOSE GRANDA  \nSAN MARTIN DE PORRES - LIMA - LIMA \nFACTURA ELECTRONICA\nRUC: 10412743879 \nE001-1099 \nFecha de Emisión\n: 02/02/2026\nSeñor(es)\n: CREACION CUANTICA E.I.R.L.  \nRUC \n: 20612592811  \nDirección del Cliente \n: CAL. BERLIN 965 URB. SANTA CRUZ\nINT. 302 LIMA-LIMA-MIRAFLORES \nTipo de Moneda\n: SOLES \nObservación\n:  \nForma de pago: Contado\nCantidad\nUnidad Medida\nDescripción\nValor Unitario\nICBPER\n1.00\nUNIDAD\nSERVICIOS LOGISTICOS DEL 29 ENE AL 01 FEB.\n1050.00\n0.00\n1.00\nUNIDAD\nALQUILER DE 02 MICROFONOS DE MANO SHURE DEL\n29 ENE AL 01 FEB\n400.00\n0.00\n1.00\nUNIDAD\nALQUILER DE SONIDO 31 ENE.\n450.00\n0.00\nValor de Venta de Operaciones Gratuitas : S/ 0.00 \n \n \nSON: DOS MIL DOSCIENTOS CUARENTA Y DOS Y 00/100 SOLES\n \n \nSub Total Ventas :\nS/ 1,900.00 \nAnticipos :\nS/ 0.00 \nDescuentos :\nS/ 0.00 \nValor Venta :\nS/ 1,900.00 \nISC :\nS/ 0.00 \nIGV :\nS/ 342.00 \nICBPER :\nS/ 0.00 \nOtros Cargos :\nS/ 0.00 \nOtros Tributos :\nS/ 0.00 \nMonto de redondeo :\nS/ 0.00 \nImporte Total :\nS/ 2,242.00 \nInformación de la detracción\nLeyenda:\nOperación sujeta al Sistema de Pago de Obligaciones Tributarias con el Gobierno Central\nBien o Servicio:\n019  Arrendamiento de bienes muebles e inmuebles\nMedio de pago:\n003  Transferencia de fondos\nNro. Cta. Banco de la Nación:\n00030088972\nPorcentaje de detracción:\n10.00\nMonto detracción:\nS/ 224.00\nEsta es una representación impresa de la factura electrónica, generada en el Sistema de SUNAT. Puede\nverificarla utilizando su clave SOL.\n\n"
+  },
+  {
+    "id": "1aArEU-RwI8pSmjnHDyD-YwpMSPXca2hs",
+    "name": "F001-1447 CREACION CUANTICA E.I.R.L..pdf",
+    "path": "",
+    "size": "57828",
+    "modifiedTime": "2026-03-05T04:41:36.576Z",
+    "webViewLink": "https://drive.google.com/file/d/1aArEU-RwI8pSmjnHDyD-YwpMSPXca2hs/view?usp=drivesdk",
+    "text": "CORPORACION AQUA ANANDA S.A.C.\nJR. CHAVIN NRO. 16 HUERTA LA VIRREYNA\nBreña, Lima, Lima\nTelf: 9929961912 / 951201327 - Email: ventas@anandaperu.com\nhttps://aquananda.com.pe/\nR.U.C. 20610414495\nFACTURA ELECTRÓNICA\nF001 - 001447\nRazón Social: CREACION CUANTICA E.I.R.L.\nR.U.C.: 20612592811\nDirección: CAL. BERLIN NRO. 965 SANTA CRUZ INT. 302 LIMA - LIMA - MIRAFLORES Miraflores - Lima - Lima\nFECHA DE EMISIÓN\nFORMA DE\nPAGO\nTIPO\nMONEDA\nNÚMERO DE\nGUÍA\nORDEN DE\nCOMPRA\nNÚMERO DE\nPLACA\n20-02-2026 04:15:20\nPM\nYAPE\nSoles\nCANT.\nDESCRIPCIÓN\nPRECIO\nUNID/MED\nAFECT.IGV\nIMPORTE\n7\nAQUA ANANDA AGUA DE MESA OZONIZADA\nOSMOTIZADA Y ALCALINA RECARGA DE BIDON\nCON CAÑO DE 20 LT\nS/ 19.90\nUNIDADES\nGravado\nS/ 139.30\nSON CIENTO TREINTA Y NUEVE CON 30/100 SOLES\nConsulte su documento electrónico en:\nhttps://facturalaya.com/sys/consultas/index/8446\nHASH: uPgtv5sthoieXo/FTKNLSCDmapI=\nVENDEDOR: CORPORACION AQUA ANANDA S.A.C.\nAdministrador (cod: 10814)\nRepresentación Impresa de Factura Electrónica\nRESUMEN:\nGravada:\nS/ 118.05\nIGV (18.00%):\nS/ 21.25\nDescuento Total:\nS/ 0.00\nTotal:\nS/ 139.30\nBANCO\nTITULAR\nTIPO CTA\nMONEDA\nCTA CTE\nCCI\nCTA CTE BCP\nSOLES\nCORPORACION AQUA\nANANDA SAC\nCuenta\nCorriente\nSoles\n1939621923039\n00219300962192303916\nEmitido por: facturalaya.com\n\n"
+  },
+  {
+    "id": "10BBqUz3WdUN9q3l6Xa_lAeNuzn9s_pA5",
+    "name": "Factura-20612838951-E001-3941.pdf",
+    "path": "",
+    "size": "7240",
+    "modifiedTime": "2026-03-05T04:41:09.075Z",
+    "webViewLink": "https://drive.google.com/file/d/10BBqUz3WdUN9q3l6Xa_lAeNuzn9s_pA5/view?usp=drivesdk",
+    "text": "20612838951\nRUC\nFACTURA ELECTRÓNICA\nE001 3941\n:\n-\nTAXI GREEN LIMA 992401467\nTAXI PREMIUM GREEN LIMA. S.A.C.\nJR. GENERAL CORDOVA 1737\nLINCE - LIMA - LIMA\nFecha de Emisión\nSeñor (es)\nTipo de Moneda\n20/02/2026\nCREACION CUANTICA E.I.R.L.\nRUC\n20612592811\nCAL. BERLIN 965 302 URB. SANTA CRUZ\nSOLES\nLugar de entrega\n:\n:\n:\n:\n:\nFormato de Pago\nAl Contado\n:\nCantidad\nUnidad Medida\nCódigo\nDescripción\nValor Unitario\n1.00\nUNIDAD\n09568\nTRASLADO DEL PERSONAL\n340.00\nSON:  TRESCIENTOS CUARENTA Y 00/100  SOLES\nEsta es una representación impresa de la factura electrónica E001 - 3941, generada en el Sistema de SUNAT.\n-\n340.00\nSub Total Ventas :\n0.00\nDescuentos :\n340.00\nValor Venta  :\n0.00\nIGV :\nImporte Total :\n340.00\nPuede verificarla utilizando su clave SOL.\n\n"
+  },
+  {
+    "id": "1oI0NDPo3NRNgk9pVeSVTnUTbA8JXZ-1o",
+    "name": "PDF-DOC-E001-14020255547799.pdf",
+    "path": "",
+    "size": "4638",
+    "modifiedTime": "2026-03-05T04:40:55.766Z",
+    "webViewLink": "https://drive.google.com/file/d/1oI0NDPo3NRNgk9pVeSVTnUTbA8JXZ-1o/view?usp=drivesdk",
+    "text": " \n \n \nHOSTAL SOL Y LUNA S.A.C.  \nCAL. 13 3RA ETAPA CIENEGUILLA MZA. 13 LOTE. 1 ESQUINA CON\nCALLE 13 Y 15 PAS.TELEFONICA  \nCIENEGUILLA - LIMA - LIMA \nFACTURA ELECTRONICA\nRUC: 20255547799 \nE001-140 \nFecha de Emisión\n: 22/02/2026\nSeñor(es)\n: CREACION CUANTICA E.I.R.L.  \nRUC \n: 20612592811  \nEstablecimiento del Emisor \n:\nCAL. 13 3RA ETAPA CIENEGUILLA -\nMZA. 13 LOTE. 1 ESQUINA CON\nCALLE 13 Y 15 PAS.TELEFONICA\nLIMA-LIMA-CIENEGUILLA \nTipo de Moneda\n: SOLES \nObservación\n: OPERACION SUJETA A\nDETRACCION DEL 12% \nForma de pago: Contado\nCantidad\nUnidad Medida\nDescripción\nValor Unitario\nICBPER\n1.00\nUNIDAD\nSERVICIO DE ALOJAMIENTO EN HABITACIONES\nMULTIPLES Y SERVICIO DE ALIMENTACIÓN LOS DIAS\n20, 21 Y 22 DE FEBRERO - 2DA FACTURA\n4500.00\n0.00\nValor de Venta de Operaciones Gratuitas : S/ 0.00 \n \n \nSON: CINCO MIL TRESCIENTOS DIEZ Y 00/100 SOLES\n \n \nSub Total Ventas :\nS/ 4,500.00 \nAnticipos :\nS/ 0.00 \nDescuentos :\nS/ 0.00 \nValor Venta :\nS/ 4,500.00 \nISC :\nS/ 0.00 \nIGV :\nS/ 810.00 \nICBPER :\nS/ 0.00 \nOtros Cargos :\nS/ 0.00 \nOtros Tributos :\nS/ 0.00 \nMonto de redondeo :\nS/ 0.00 \nImporte Total :\nS/ 5,310.00 \nInformación de la detracción\nLeyenda:\nOperación sujeta al Sistema de Pago de Obligaciones Tributarias con el Gobierno Central\nBien o Servicio:\n022  Otros servicios empresariales\nMedio de pago:\n001  Depósito en cuenta\nNro. Cta. Banco de la Nación:\n00066029379\nPorcentaje de detracción:\n12.00\nMonto detracción:\nS/ 637.00\nEsta es una representación impresa de la factura electrónica, generada en el Sistema de SUNAT. Puede\nverificarla utilizando su clave SOL.\n\n"
+  },
+  {
+    "id": "1vtj5-vFQU45JuAD2XFBasa78Vgi1q_z_",
+    "name": "RHE10440011158E00156.pdf",
+    "path": "",
+    "size": "2189",
+    "modifiedTime": "2026-03-05T04:40:00.425Z",
+    "webViewLink": "https://drive.google.com/file/d/1vtj5-vFQU45JuAD2XFBasa78Vgi1q_z_/view?usp=drivesdk",
+    "text": "DEL ARTÍCULO 33 DE LA LEY DEL IMPUESTO A LA RENTA\nRecibí de:\nIdentificado con\nObservación\nInciso\nLa suma de:\nTotal por honorarios:\nRetención (\nR.U.C.\nRECIBO POR HONORARIOS ELECTRONICO\nNro:\n10440011158\n-\nE001\n56\nCHIROQUE GOMEZ JOHAN DAVID\nAV. D. ORUE NRO. 261 DPTO. 303 EDIF 9-A LIMA - LIMA - SURQUILLO\n4219794\nTELÉFONO:\nnúmero\nPor concepto de\nde\ndel\nTotal Neto Recibido:\nCREACION CUANTICA E.I.R.L.\nRUC\n20612592811\n QUINIENTOS DIEZ Y 00/100 SOLES\nPOR SERVICIOS PRESTADOS DE MENSAJERIA Y TRAMITE DOCUMENTARIO\n-\nA\n23\nFebrero\n2026\n510.00\n(0.00)\n510.00\nSOLES\n%) IR:\n8\nFecha de emisión\nDomiciliado en\nCAL. BERLIN NRO. 965 INT. 302 URB. SANTA CRUZ LIMA - LIMA - MIRAFLORES\nAL CONTADO\nForma de Pago:\n\n"
+  },
+  {
+    "id": "1dOVhxu483_1mGUeYcAc_BlPKI5QQRw0k",
+    "name": "RHE10098751209E001201.pdf",
+    "path": "",
+    "size": "2223",
+    "modifiedTime": "2026-03-05T04:39:32.744Z",
+    "webViewLink": "https://drive.google.com/file/d/1dOVhxu483_1mGUeYcAc_BlPKI5QQRw0k/view?usp=drivesdk",
+    "text": "DEL ARTÍCULO 33 DE LA LEY DEL IMPUESTO A LA RENTA\nRecibí de:\nIdentificado con\nObservación\nInciso\nLa suma de:\nTotal por honorarios:\nRetención (\nR.U.C.\nRECIBO POR HONORARIOS ELECTRONICO\nNro:\n10098751209\n-\nE001\n201\nPASQUEL ALFARO LEYLA KELLY\nANDROMEDA MZA. B DPTO. 404 LOTE. 1 URB. MATELLINI LIMA - LIMA -\nCHORRILLOS\n-\nTELÉFONO:\nnúmero\nPor concepto de\nde\ndel\nTotal Neto Recibido:\nCREACION CUANTICA E.I.R.L.\nRUC\n20612592811\n CIENTO CINCUENTA Y CINCO Y 50/100 DÓLARES DE NORTE AMÉRICA\nENTRENAMIENTO DE LLAMADAS\n-\nA\n24\nFebrero\n2026\n155.50\n(0.00)\n155.50\nDï¿½LARES DE NORTE\nAMï¿½RICA\n%) IR:\n8\nFecha de emisión\nDomiciliado en\nCAL. BERLIN NRO. 965 INT. 302 URB. SANTA CRUZ LIMA - LIMA - MIRAFLORES\nAL CONTADO\nForma de Pago:\n\n"
+  },
+  {
+    "id": "10IQD3k7AhwXBX8GZeQ9BEFb3DHSqg9w2",
+    "name": "10482121468-R01-E001-99.pdf",
+    "path": "",
+    "size": "2163",
+    "modifiedTime": "2026-03-05T04:39:27.575Z",
+    "webViewLink": "https://drive.google.com/file/d/10IQD3k7AhwXBX8GZeQ9BEFb3DHSqg9w2/view?usp=drivesdk",
+    "text": "DEL ARTÍCULO 33 DE LA LEY DEL IMPUESTO A LA RENTA\nRecibí de:\nIdentificado con\nObservación\nInciso\nLa suma de:\nTotal por honorarios:\nRetención (\nR.U.C.\nRECIBO POR HONORARIOS ELECTRONICO\nNro:\n10482121468\n-\nE001\n99\nORIHUELA VELA ANEL\nJR. QUIPAN NRO. 163 URB. TAHUANTINSUYO LIMA LIMA INDEPENDENCIA\nTELÉFONO:\nnúmero\nPor concepto de\nde\ndel\nTotal Neto Recibido:\nCREACION CUANTICA E.I.R.L.\nRUC\n20612592811\n CIENTO CINCUENTA Y CUATRO Y 00/100 DOLARES DE NORTE AMERICA\nLLAMADASC1E25\n-\nA\n23\nFebrero\n2026\n154.00\n(0.00)\n154.00\nDOLARES DE NORTE AMERICA\n%) IR:\n8\nFecha de emisión\nDomiciliado en\nCAL. BERLIN NRO. 965 INT. 302 URB. SANTA CRUZ LIMA LIMA MIRAFLORES\nAL CONTADO\nForma de Pago:\n\n"
+  },
+  {
+    "id": "1nEMlIg-k6yli7DXWt7zYynWWTevSA90y",
+    "name": "CUENTA DE COBRO LIMA (2).pdf",
+    "path": "",
+    "size": "36494",
+    "modifiedTime": "2026-03-05T04:38:36.786Z",
+    "webViewLink": "https://drive.google.com/file/d/1nEMlIg-k6yli7DXWt7zYynWWTevSA90y/view?usp=drivesdk",
+    "text": "CUENTA DE COBRO 005 \nLIMA MARZO  3/2026 \n \n \n \nCREACION CUÁNTICA E.I.R.L \nRUC: 20612592811 \n \n \n \n \nDEBE A: \n \nANDRÉS GÓMEZ GÓMEZ \nCEDULA: 3482169 (COLOMBIA) \n \n \nLA SUMA DE 500 DLS (QUINIENTOS DÓLARES AMERICANOS) \n \nPOR CONCEPTO DE HONORARIOS COMO COORDINADOR DE MAESTRÍA DEL JUEGO  \nMES DE FEBRERO \n \n \nCarlos Andrés Gómez Gómez  \nCuenta de ahorros 60910719702 BANCOLOMBIA \nCODIGO SWIFT: COLOCOBM \nBANCOLOMBIA \ncalle 61 sur 39 70 \nNumero de pasaporte: BG726399 \nCorreo electrónico: gomeznueve@gmail.com \nCelular: 3506005938 \n \n \n \n \n \n\n"
+  },
+  {
+    "id": "11A2-m6tKCdbaeN0_geC1Z1yQK1hCgNDG",
+    "name": "CUENTA DE COBRO LIMA (3).pdf",
+    "path": "",
+    "size": "36494",
+    "modifiedTime": "2026-03-05T04:38:33.306Z",
+    "webViewLink": "https://drive.google.com/file/d/11A2-m6tKCdbaeN0_geC1Z1yQK1hCgNDG/view?usp=drivesdk",
+    "text": "CUENTA DE COBRO 005 \nLIMA MARZO  3/2026 \n \n \n \nCREACION CUÁNTICA E.I.R.L \nRUC: 20612592811 \n \n \n \n \nDEBE A: \n \nANDRÉS GÓMEZ GÓMEZ \nCEDULA: 3482169 (COLOMBIA) \n \n \nLA SUMA DE 500 DLS (QUINIENTOS DÓLARES AMERICANOS) \n \nPOR CONCEPTO DE HONORARIOS COMO COORDINADOR DE MAESTRÍA DEL JUEGO  \nMES DE FEBRERO \n \n \nCarlos Andrés Gómez Gómez  \nCuenta de ahorros 60910719702 BANCOLOMBIA \nCODIGO SWIFT: COLOCOBM \nBANCOLOMBIA \ncalle 61 sur 39 70 \nNumero de pasaporte: BG726399 \nCorreo electrónico: gomeznueve@gmail.com \nCelular: 3506005938 \n \n \n \n \n \n\n"
+  },
+  {
+    "id": "1-dci5oZOawMHQLIazBsjt0-_lpjJHbd4",
+    "name": "PDF-DOC-E001-38120545450705.pdf",
+    "path": "",
+    "size": "3917",
+    "modifiedTime": "2026-03-05T04:37:03.105Z",
+    "webViewLink": "https://drive.google.com/file/d/1-dci5oZOawMHQLIazBsjt0-_lpjJHbd4/view?usp=drivesdk",
+    "text": " \n \n \nGOLDEN LIONS A. N. E.I.R.L.  \nJR. VISTA ALEGRE 791 CND. DINASTIA II DPTO. 702  \nSANTIAGO DE SURCO - LIMA - LIMA \nFACTURA ELECTRONICA\nRUC: 20545450705 \nE001-381 \nFecha de Emisión\n: 03/03/2026\nSeñor(es)\n: CREACION CUANTICA E.I.R.L.  \nRUC \n: 20612592811  \nEstablecimiento del Emisor \n:\nJR. VISTA ALEGRE 791 CND.\nDINASTIA II DPTO. 702 LIMA-LIMA-\nSANTIAGO DE SURCO \nTipo de Moneda\n: SOLES \nObservación\n:  \nForma de pago: Contado\nCantidad\nUnidad Medida\nDescripción\nValor Unitario\nICBPER\n1.00\nUNIDAD\nALMACENAMIENTO DE MATERIALES\n296.616\n0.00\nValor de Venta de Operaciones Gratuitas : S/ 0.00 \n \n \nSON: TRESCIENTOS CINCUENTA Y 01/100 SOLES\n \n \nSub Total Ventas :\nS/ 296.62 \nAnticipos :\nS/ 0.00 \nDescuentos :\nS/ 0.00 \nValor Venta :\nS/ 296.62 \nISC :\nS/ 0.00 \nIGV :\nS/ 53.39 \nICBPER :\nS/ 0.00 \nOtros Cargos :\nS/ 0.00 \nOtros Tributos :\nS/ 0.00 \nMonto de redondeo :\nS/ 0.00 \nImporte Total :\nS/ 350.01 \nEsta es una representación impresa de la factura electrónica, generada en el Sistema de SUNAT. Puede\nverificarla utilizando su clave SOL.\n\n"
+  },
+  {
+    "id": "19XtOL7T0K9MvP6zoYSiGnCXYrI6nV-Ac",
+    "name": "RHE15605934606E00113.pdf",
+    "path": "",
+    "size": "2141",
+    "modifiedTime": "2026-03-05T04:36:48.485Z",
+    "webViewLink": "https://drive.google.com/file/d/19XtOL7T0K9MvP6zoYSiGnCXYrI6nV-Ac/view?usp=drivesdk",
+    "text": "DEL ARTÍCULO 33 DE LA LEY DEL IMPUESTO A LA RENTA\nRecibí de:\nIdentificado con\nObservación\nInciso\nLa suma de:\nTotal por honorarios:\nRetención (\nR.U.C.\nRECIBO POR HONORARIOS ELECTRONICO\nNro:\n15605934606\n-\nE001\n13\nRODRIGUEZ LA RIVA DAVID JESUS\nAV. JOSE PARDO NRO. 570 DPTO. 507 LIMA - LIMA - MIRAFLORES\n-\nTELÉFONO:\nnúmero\nPor concepto de\nde\ndel\nTotal Neto Recibido:\nCREACION CUANTICA E.I.R.L.\nRUC\n20612592811\n CIENTO CUARENTA Y 00/100 SOLES\nCONSULTORIA\n-\nA\n02\nMarzo\n2026\n140.00\n(0.00)\n140.00\nSOLES\n%) IR:\n8\nFecha de emisión\nDomiciliado en\nCAL. BERLIN NRO. 965 INT. 302 URB. SANTA CRUZ LIMA - LIMA - MIRAFLORES\nAL CONTADO\nForma de Pago:\n\n"
+  },
+  {
+    "id": "1zIbsxcx2-6Vo2EYiKyhDnJpVuTFrCft_",
+    "name": "20100538203-01-F375-00101117.pdf",
+    "path": "",
+    "size": "207665",
+    "modifiedTime": "2026-03-05T04:36:39.647Z",
+    "webViewLink": "https://drive.google.com/file/d/1zIbsxcx2-6Vo2EYiKyhDnJpVuTFrCft_/view?usp=drivesdk",
+    "text": "R.U.C.: 20100538203\nFACTURA ELECTRONICA\nNº F375- 00101117\nSEÑORES\n: CREACION CUANTICA E.I.R.L.\nR.U.C.:\n: 20612592811\nDIRECCION\n: CAL.BERLIN NRO. 965 INT. 302 URB. SANTA CRUZ - LIMA, LIMA, MIRAFLORES\nGRUPO\n: -\nE-MAIL\n: -\nFECHA DE EMISIÓN\n: 2026-03-04\nFECHA DE VENCIMIENTO\n: 2026-03-05\nCONDICIÓN DE PAGO\n: Contado\nMONEDA\n: SOLES\nCODIGO DE USUARIO\n: 248509\nOFIC. DE RECAUDACIÓN\n: AGECOFER - MIRAFLORES\nCÓDIGO\nDESCRIPCIÓN\nUND\nCANT\nPRECIO\nUNITARIO\nDSCTO.\nVALOR DE\nVENTA\n00631958\nESPECTACULOS MUSICALES - ESPECTACULOS MUSICALES / MUSICA GRABADA - HOTEL\nJOSE ANTONIO - SALA DELUXE - PLANILLA N° -1688775 - CAL. BELLAVISTA 133 - LIMA,\nLIMA, MIRAFLORES\nUN\n1\n2,900.0000\n0.00\n2,900.00 \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \nSON: DOS MIL NOVECIENTOS CON 00/100 SOLES\nOBSERVACIONES:\n5,6,7,8, 13,14,15, 27,28, 29 DE MARZO DEL 2026 - ESPECTÁCULO / ENTRENAMIENTO (CAPÍTULO DOS E25) - EQUIPO DE SONIDO\nDescuento Global\n0.00  \nTOTAL GRAVADO\n0.00  \nTOTAL INAFECTO\n2,900.00  \nTOTAL EXONERADO\n0.00  \nTOTAL IGV 18%\n0.00  \nTOTAL S/\n2,900.00  \nDERECHO DE AUTOR INAFECTO A I.G.V., SEGÚN D.S. 055-99-EF ART. 2 INC. A\nEstimado usuario, le informamos que puede verificar los documentos valorados que nuestra sociedad emite, a través de nuestro módulo de consultas de facturación electrónica:\nhttp://apdayc.ecomprobantes.pe/Apdayc/formularios/frmAutentificacionEstandar.aspx\nLes recordamos que las únicas cuentas autorizadas por APDAYC para pagos son:\nBBVA\nCuenta Cte. 0011 0368 01 00002525\nCCI: 011 368 000100002525 82\nBCP\nCuenta Cte. 191 0046905 0 86\nCCI: 00219100004690508658\nScotiabank\nCuenta Cte. 000 4501799\nCCI: 009 04300000450179913\nInterbank\nCuenta Cte. 200 3000831059\nCCI: 003 200 003000831059 38\n \nRepresentación impresa de la Factura Electrónica\nPodrá ser consultado en: http://apdayc.ecomprobantes.pe/Apdayc/formularios/frmInicio.aspx \n \n\n"
+  },
+  {
+    "id": "1_JrEjs3RxcA7Z1848O_e300wGzzXwjBC",
+    "name": "E001-1102 CREACION CUANTICA.pdf",
+    "path": "",
+    "size": "4839",
+    "modifiedTime": "2026-03-03T16:38:32.615Z",
+    "webViewLink": "https://drive.google.com/file/d/1_JrEjs3RxcA7Z1848O_e300wGzzXwjBC/view?usp=drivesdk",
+    "text": " \n \nDELIALI \nECHEVARRIA OSORIO ALEXANDRA VANESSA  \nJR. THOMAS COCHRANE 3353 URB. CONDEVILLA DEL SEÑOR ALT.\nCDRA 33 AV. JOSE GRANDA  \nSAN MARTIN DE PORRES - LIMA - LIMA \nFACTURA ELECTRONICA\nRUC: 10412743879 \nE001-1102 \nFecha de Emisión\n: 23/02/2026\nSeñor(es)\n: CREACION CUANTICA E.I.R.L.  \nRUC \n: 20612592811  \nDirección del Cliente \n: CAL. BERLIN 965 URB. SANTA CRUZ\nINT. 302 LIMA-LIMA-MIRAFLORES \nTipo de Moneda\n: SOLES \nObservación\n:  \nForma de pago: Contado\nCantidad\nUnidad Medida\nDescripción\nValor Unitario\nICBPER\n1.00\nUNIDAD\nSERVICIO LOGISTICOS 19 AL 22 FEB.\n1050.00\n0.00\n1.00\nUNIDAD\nALQUILER DE 02 MICROFONOS DE MANO 20 AL 22 FEB.\n300.00\n0.00\n1.00\nUNIDAD\nALQUILER SONIDO CIENEGUILLA 20 AL 22 FEB.\n1300.00\n0.00\n1.00\nUNIDAD\nALQUILER SONIDO MIRAFLORES 21 Y 22 FEB.\n900.00\n0.00\nValor de Venta de Operaciones Gratuitas : S/ 0.00 \n \n \nSON: CUATRO MIL CIENTO OCHENTA Y NUEVE Y 00/100 SOLES\n \n \nSub Total Ventas :\nS/ 3,550.00 \nAnticipos :\nS/ 0.00 \nDescuentos :\nS/ 0.00 \nValor Venta :\nS/ 3,550.00 \nISC :\nS/ 0.00 \nIGV :\nS/ 639.00 \nICBPER :\nS/ 0.00 \nOtros Cargos :\nS/ 0.00 \nOtros Tributos :\nS/ 0.00 \nMonto de redondeo :\nS/ 0.00 \nImporte Total :\nS/ 4,189.00 \nInformación de la detracción\nLeyenda:\nOperación sujeta al Sistema de Pago de Obligaciones Tributarias con el Gobierno Central\nBien o Servicio:\n019  Arrendamiento de bienes muebles e inmuebles\nMedio de pago:\n003  Transferencia de fondos\nNro. Cta. Banco de la Nación:\n00030088972\nPorcentaje de detracción:\n10.00\nMonto detracción:\nS/ 419.00\nEsta es una representación impresa de la factura electrónica, generada en el Sistema de SUNAT. Puede\nverificarla utilizando su clave SOL.\n\n"
+  },
+  {
+    "id": "1xCKLTd7wLVYYyV_tyrf23SfXQG0JOoZ1",
+    "name": "f1323c6a-78ce-0669-0b38-a931401f0567.pdf",
+    "path": "",
+    "size": "111737",
+    "modifiedTime": "2026-02-26T18:33:43.764Z",
+    "webViewLink": "https://drive.google.com/file/d/1xCKLTd7wLVYYyV_tyrf23SfXQG0JOoZ1/view?usp=drivesdk",
+    "text": "N° FTKY-4255\nR.U.C. N° 20609112736\nFACTURA ELECTRÓNICA\nCONCESIONARIA VUELA COMPAÑIA DE AVIACIÓN, S.A.P.I. DE C.V.\nSUCURSAL PERU\nCALLE LAS BEGONIAS 475 BLOK A, DEPTO.602, LIMA LIMA, SAN ISIDRO\n:\nDirección\nSeñor(es)\n:\n:\n20612592811\nBERLIN 965 Lima Lima Miraflores\nFecha Emisión\n:\nCREACIÓN CUÁNTICA E.I.R.L.\nINFORMACIÓN DEL CLIENTE\nR.U.C\n26/02/2026\nPaymetID\nClave de Reservacion\nFecha de Reserva\n:\n:\nCÓDIGO\nDESCRIPCIÓN DEL PRODUCTO\nCANTIDAD\nDESCUENTO\nV. UNITARIO\nPRECIO UNITARIO\nVALOR VENTA\n:\n251576668\nQCS2MC\n26/02/2026\n001\nServicio Aereo Gravado\n1.00\n266.11\n314.01\n266.11\n002\nServicio Aereo Inafecto\n1.00\n0.01\n0.01\n0.01\n004\nOtros Cargos HW\n1.00\n30.24\n30.24\n30.24\nOp. Inafecta\nImporte total de la venta\nOp. Exonerada\nOp. Gratuita\nOp. Gravada\n30.25\n0.00\n0.00\nUS$\nUS$\n344.26\n266.11\nUS$\nUS$\nUS$\nIGV(18%)\nUS$\n47.90\n***SON: TRESCIENTOS CUARENTA  Y CUATRO CON 26/100 DÓLARES AMERICANOS\nDescuentos\nUS$\n0.00\n\n"
+  },
+  {
+    "id": "1yfuvysY9y38TdXbPml_hflGTE75MRCDp",
+    "name": "Travel Reservation March 12 for ANA ELENA MONROY THOMPSON.pdf",
+    "path": "",
+    "size": "31385",
+    "modifiedTime": "2026-02-26T18:21:45.661Z",
+    "webViewLink": "https://drive.google.com/file/d/1yfuvysY9y38TdXbPml_hflGTE75MRCDp/view?usp=drivesdk",
+    "text": "Distance (in\nMiles):\nDistance (in\nMiles):\n12 MAR 2026 \n 12 MAR 2026 TRIP TO LIMA, PERU\nPREPARED FOR\nANA ELENA MONROY THOMPSON \nRESERVATION CODE   UEVOQS\nDEPARTURE: THURSDAY 12 MAR Please verify flight times prior to\ndeparture\nAEROMEXICO \nAM 0111\nDuration:\n3hr(s) 20min(s)\nCabin:\nEconomy / L\nStatus:\nConfirmed\nTIJ\nTIJUANA\nMEX\nCIUDAD DE MEXICO\nAircraft:\nAir\n1429\nMeals:\nRefreshment,\nComplimentary Alcoholic\nBeverages\nDeparting At:\n01:50\nTerminal:\nNot Available\nArriving At:\n06:10\nTerminal:\nTERMINAL 2\nPassenger Name:\nSeats:\neTicket Receipt(s):\n» Ana Elena Monroy Thompson\nCheck-In Required\n1392163238774 \nDEPARTURE: THURSDAY 12 MAR Please verify flight times prior to\ndeparture\nAEROMEXICO \nAM 0046\nDuration:\n6hr(s) 0min(s)\nCabin:\nEconomy / L\nStatus:\nConfirmed\nMEX\nCIUDAD DE MEXICO\nLIM\nLIMA, PERU\nAircraft:\nBOEING 737 MAX\n2629\nMeals:\nHot Meal, Complimentary\nAlcoholic Beverages\nDeparting At:\n10:50\nTerminal:\nTERMINAL 2\nArriving At:\n17:50\nTerminal:\nNot Available\nPassenger Name:\nSeats:\neTicket Receipt(s):\n» Ana Elena Monroy Thompson\nCheck-In Required\n1392163238774 \n\n"
+  },
+  {
+    "id": "1PVBn1AmDl4XGhI9JIzfY46Fwyjg2xLEK",
+    "name": "QCS2MC.pdf",
+    "path": "",
+    "size": "89685",
+    "modifiedTime": "2026-02-26T18:09:28.293Z",
+    "webViewLink": "https://drive.google.com/file/d/1PVBn1AmDl4XGhI9JIzfY46Fwyjg2xLEK/view?usp=drivesdk",
+    "text": "Tú Itinerario\nCodigo de Reservacion : QCS2MC\nVuelo de salida: Lunes, 16 marzo, 2026\nLIM\nTIJ\nLima\n1 Escala\nTIJ\n06:04 AM\n15:50 PM\n \nY4 3919 Operado por Volaris México\nY4 182 Operado por Volaris México\n \nTipo de Reservación\n1 objeto personal de mano\n \n \n1 maleta documentada de 15 kg\n \nPuntos altitude\nAdelanta tu vuelo\nPasajeros\nEquipaje\nAsientos\nServicios adicionales\nANA ELENA MONROY\nTHOMPSON\nLIM - MEX\n1 Objeto personal de mano\n \nDebe caber debajo del asiento frente a\nti (ej. bolsa de mano, portafolio o\nportalaptop).\n1 Maleta documentada de\n15kg\nNo asignado\nAdelanta tu vuelo en el\nAeropuerto\nMEX - TIJ\n1 Objeto personal de mano\n \nDebe caber debajo del asiento frente a\nti (ej. bolsa de mano, portafolio o\nportalaptop).\n1 Maleta documentada de\n15kg\nNo asignado\nAdelanta tu vuelo en el\nAeropuerto\nTarifa básica\nDebe caber debajo del asiento frente a ti (por\nejemplo, bolsa de mano, portafolio o porta laptop).\nSin equipaje de mano\nCómpralo durante tu reservación y evita gastos\ninesperados en el aeropuerto.\nDimensiones máximas (Largo+ancho+alto) 158 cm\nSin equipaje de mano\nSin equipaje de mano\n\n"
+  },
+  {
+    "id": "1Mi68YRxUZiRtOiMTxar4rvPTns-WQ3nl",
+    "name": "EstadoCuentaenerom.pdf",
+    "path": "",
+    "size": "100075",
+    "modifiedTime": "2026-02-26T17:29:52.374Z",
+    "webViewLink": "https://drive.google.com/file/d/1Mi68YRxUZiRtOiMTxar4rvPTns-WQ3nl/view?usp=drivesdk",
+    "text": "Empresas de\nGeneración\nDistribución \n(Luz del Sur)\nEmpresas de \nTransmisión\nPrecio de \nla energía\nNo incluye IGV\n¿Sabías qué?\nEl precio de la energía que pagas (soles/kWh) es fijado por el OSINERGMIN y se distribuye entre las empresas que la generan y la llevan a tu casa \no negocio.\nLUZ DEL SUR S.A.A.\nAV. CANAVAL Y MOREYRA 380 SAN ISIDRO - LIMA\nRUC: 20331898008\nNº DE SUMINISTRO\nDATOS DEL SUMINISTRO\nTarifa\nBT5B Residencial\nConexión\nSubterránea C2.1\nSector Típico\n1 (SE0133)\nPotencia Contratada\n7.00 KW\nNivel Tensión\n220 V\n \nMedidor\nTRIFÁSICO  Electrónico 3 hilos\nD.N.I. 08780972\n1684209\nSOTO AZPILCUETA JORGE PELAYO\nBERLIN 965 DPTO 302\nMIRAFLORES - LIMA\n0006875\n186.80\nFecha de Emisión: 08-Ene-2026\nFecha de Vencimiento: 23-Ene-2026\nj\u0011U\u0015`e\u0001d\u0002\u0001\u0001\u0001\u0002WQ=k\n16842095 01000000018680\nCargo Fijo\nMant. y Reposición de Conexión\nAlumbrado Público\nSUBTOTAL\n   IGV\nElectrificación Rural (Ley N° 28749)\nTOTAL DEL MES\nAjuste redondeo mes anterior\nAjuste redondeo mes actual\n2.18\n1.65\n10.75\n156.10\n28.10\n2.59\n186.79\n0.08\n-0.07\n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \nMES FACTURADO ENERO 2026\n \n \n \n \n \n \n \n \n \n \n \n \n \n235.20\nkWh\n0\n121\n242\n363\n484\n605\nEne\nFeb\nMar\nAbr\nMay\nJun\nJul\nAgo\nSep\nOct\nNov\nDic\nEne\n \nkWh\nRuta 04-240-2855  Medidor Nro. 6867013 S - 0742\nRecibo Nro. S104-651505 N-BV-18713\nImporte 2 últimos meses facturados\nNov-25 S/ 266.79 - Dic-25 S/ 206.11\nÚltima\nlectura\n07/Ene/26\nLectura\nanterior\n06/Dic/25\nDiferencia\nde lecturas\nFactor de\nmedición\nEnergía a\nfacturar\n(kWh)\nPrecio\nkWh\n(S/)\n49285.30 - 49050.10 =\n235.20\nX\n1.0000\n=\n235.20\nX\n0.6017\nConsumo de energía\n141.52\n1\n63%\n9%\n28%\nTarifa BT5B del 04/Ene/2026 para LIMA SUR.\n2026\n \n \n \n \n \n \n \n \n \n \n \n \n \n \n0\n121\n242\n363\n484\n605\nMENSAJES PARA EL CLIENTE\nü Estimado cliente, le recordamos que nos puede contactar al\n617-5000 \n(Fonoluz) \no \nen \nla \nweb \nwww.luzdelsur.pe\nPuede consultar el estado de sus requerimientos en la\nplataforma \ndispuesta \npor \nOsinergmin\nhttps://www.luzdelsur.pe/es/PortalRequerimientos\nü El total a pagar incluye: Recargo por FOSE (Ley 27510) S/\n3.65\n\n"
+  },
+  {
+    "id": "1Fh3zBGvxyB1LxxpPuo3kSfNbHKvQwvIz",
+    "name": "factura evento creacion cuantica 19al22feb2026.pdf",
+    "path": "",
+    "size": "328489",
+    "modifiedTime": "2026-02-13T19:00:45.532Z",
+    "webViewLink": "https://drive.google.com/file/d/1Fh3zBGvxyB1LxxpPuo3kSfNbHKvQwvIz/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32411232\nviernes, 13 Febrero, 2026\nREFERENCIA\nF301\n00042484\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n22/02/2026\nSALIDA\n19/02/2026\nFacturado a : \nUSUARIO\nEvento\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nSalas\n16,525.42\n16,525.42\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nkHH4HbDehudIhO2220LT/1kvXJ0=\nDIEZ Y NUEVE MIL QUINIENTOS Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n19,500.00\n0.00\n0.00\n0.00\n2,974.58\n0.00\n0.00\n16,525.42\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1-RkFUmB7XA2mjlgf-V0GcosIpGRXY0KS",
+    "name": "DIP-FACT-Recibo_Ciclico_2026020005_S1AA-0049258536.pdf",
+    "path": "",
+    "size": "137275",
+    "modifiedTime": "2026-02-09T23:39:52.766Z",
+    "webViewLink": "https://drive.google.com/file/d/1-RkFUmB7XA2mjlgf-V0GcosIpGRXY0KS/view?usp=drivesdk",
+    "text": "Integratel Perú S.A.A.   |   R.U.C. 20100017491   |   Jr. Domingo Martínez Luján N° 1130   |   Lima – Lima - Surquillo\nPágina 1/3\nEmpresas Fija\nRecibo Febrero\nN° recibo: S1AA-0049258536\nCREACION CUANTICA EIRL\nRUC: 20612592811 \nCALLE BERLIN 965 Piso 3 URBANIZACION RESIDENCIAL JOSE BALTA,\nMIRAFLORES, 01, LIMA\nCuenta financiera: 753621842 \nID SUSCRIPTOR: 196980437\nID Cliente: 131054354\nAnexo: 1\nTotal a pagar del mes\nS/109.90\nÚltimo día de pago: 21/02\nN° Fijo / Cód. pago: 753621842\nDeuda anterior: S/0.00\n \nPaga a tiempo tu recibo y mantente siempre conectado.\nNo esperes hasta el último día de pago.\nCiclo de facturación - Febrero 2026\n05/02\n21/02\nFecha de\nEmisión\nÚltimo día\nde pago\n¡LLAMA AL 0 800 11311!\nSi tienes un negocio y deseas comprar o portar una línea\nmóvil, adquirir un servicio de internet, TV o telefonía fija.\nCanal exclusivo para Clientes con RUC 20\nResumen de Recibo - NºS1AA-0049258536\nCargos Mensuales\nS/ 109.89\nSubtotal\nS/93.13\nIGV (18%)\nS/16.76\nTotal Afecto\nS/109.89\nDescuentos y Bonificaciones Inafectos\nS/ 0.00\nRedondeo\nS/ 0.01\nTotal Facturado\nS/109.90\nDevoluciones\nS/ 0.00\nDébitos\nS/ 0.00\nTotal a pagar\nS/ 109.90\n\nEmpresas Fija\nIntegratel Perú S.A.A.   |   R.U.C. 20100017491   |   Jr. Domingo Martínez Luján N° 1130   |   Lima – Lima - Surquillo\nPágina 2/3\nDetalle del recibo - N° S1AA-0049258536 - 196980437\nCargos Mensuales\nPrecio de vta.\nIGV S/109.89\nMovistar Internet 600 Mbps (06Feb al 05Mar)\n93.13\n16.76\n109.89\nDescuentos y Bonificaciones Inafectos\nPrecio de vta.\nIGV\nS/0.00\nBonificacion Prom Internet 1 GB x 12m 600 Mbps (06Feb \nal 05Mar) (VR S/127.03)\n0.00\n0.00\n0.00\nRedondeo\nPrecio de vta.\nIGV\nS/0.01\nRedondeo del mes Anterior\n0.01\n0.00\n0.01\n\nConceptos facturables\nCargos fijos mensuales\nCargo mensual facturado al cliente por el plan contratado\npara los servicios de voz y datos. Cargo fijo proporcional\ndel plan desde la fecha de inicio del servicio hasta el\nsiguiente cierre de facturación\nCargos por llamadas adicionales\nCargos por tráfico de voz, datos, mensajes de texto que\nno se encuentran comprendidos dentro del cargo fijo\nmensual.\nLarga distancia: cargo adicional por llamada de larga\ndistancia nacional o internacional\nKB internet y multimedia: navegación en internet y\ntráfico por descarga de aplicativos\nKB transmisión de datos: envío y recepción de datos.\nRoaming internacional: cargo por llamadas efectuadas y\nrecibidas en el extranjero\nDetalle de documentos afectos al IGV\nCargo por Reconexión: cargo facturado si el cliente\ncancela un recibo después de habérsele cortado por\ndeuda.\nCargo por Reconexión de corte APC (a pedido de cliente):\ncargo facturado al efectuarse la reactivación del servicio\nde la línea luego de cumplirse el plazo de suspensión.\nCargo por llamadas a operadoras rurales: llamadas\nrealizadas a teléfonos fijos rurales como Gilat to Home,\nValtron, Claro Rural, Integratel Rural o a teléfonos satelitales\ncomo Tesam.\nRenta fraccionaria por cambio de plan: cargo facturado si\ndurante el ciclo de la facturación el cliente cambió a un\nplan tarifario de cargo fijo mayor al que tenía.\nLugares de pago\nBancos y agentes\nBBVA Continental\nBanco Pichincha\nBCP\nBanco de la Nación\nBanBif\nInterbank\nScotiabank\nOtros\nAgente Multibanco KASNET\nMultibanco\nFullcarga\nRed Digital\nMetro\nWong\nWestern Union\nAlgunos lugares de pago presenciales pueden aplicar cobro de comisión de acuerdo a sus tarifarios vigentes.\nPuede realizar su pago de forma rápida y segura en el App Mi Movistar, YAPE o App o Web de su banco.\nRecuerda que también puede afiliar su recibo\nMovistar al débito automático, más info :\nhttp://smvst.com/DAT\nMayor información sobre lugares de pago en www.movistar.com.pe\n¿Qué es el recibo digital?\nEs un servicio gratuito que ofrece Integratel, con el que podrá recibir mensualmente su recibo en formato PDF al\ncorreo electrónico que usted indique. El envío del recibo digital va en reemplazo de su recibo físico.\n\n"
+  },
+  {
+    "id": "1cqb7-Mj3JiBc9bC9C-FOLhSDfbc9vJXn",
+    "name": "factura alojamiento 32415347.pdf",
+    "path": "",
+    "size": "327722",
+    "modifiedTime": "2026-02-06T01:50:56.645Z",
+    "webViewLink": "https://drive.google.com/file/d/1cqb7-Mj3JiBc9bC9C-FOLhSDfbc9vJXn/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32415347\nmartes, 3 Febrero, 2026\nREFERENCIA\nF301\n00042324\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n07/02/2026\nSALIDA\n04/02/2026\nFacturado a : \nUSUARIO\nNancy Escobar & Karol Villaruel\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nAlojamiento\n234.38\n234.38\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nL+AC/1aPz1olNlMrqiY8W4hpi+Q=\nTRESCIENTOS Y 00/100 DOLARES AMERICANOS\nTotal  Propina\nUS $\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n300.00\n0.00\n0.00\n23.43\n42.19\n0.00\n0.00\n234.38\nTotal  Exportacion\n0.00\nCuentas corrientes  \nTotal  Descuento\nDolares\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1DJ8IiUUKQJxVaWIToTNxBEANQsF4GC-h",
+    "name": "factura saldo evento creacion cuantica 06 al 08 feb 2026.pdf",
+    "path": "",
+    "size": "328894",
+    "modifiedTime": "2026-02-06T00:56:59.936Z",
+    "webViewLink": "https://drive.google.com/file/d/1DJ8IiUUKQJxVaWIToTNxBEANQsF4GC-h/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32411262\njueves, 5 Febrero, 2026\nREFERENCIA\nF301\n00042351\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n08/02/2026\nSALIDA\n06/02/2026\nFacturado a : \nUSUARIO\nEvento Maestría del Juego\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nSalas\n13,983.05\n13,983.05\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nhcTq7tRm3BtFDjox0jvKeRBPYBE=\nDIEZ Y SEIS MIL QUINIENTOS Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n16,500.00\n0.00\n0.00\n0.00\n2,516.95\n0.00\n0.00\n13,983.05\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "143s0LVnt-bdBL_GrDIyTWDWXWa3XQaU6",
+    "name": "factura 50% evento creación cuantica 06 al 08 febrero 2026.pdf",
+    "path": "",
+    "size": "328722",
+    "modifiedTime": "2026-02-05T16:57:46.007Z",
+    "webViewLink": "https://drive.google.com/file/d/143s0LVnt-bdBL_GrDIyTWDWXWa3XQaU6/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32411262\nmartes, 3 Febrero, 2026\nREFERENCIA\nF301\n00042327\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n08/02/2026\nSALIDA\n06/02/2026\nFacturado a : \nUSUARIO\nEvento\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nSalas\n13,983.05\n13,983.05\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nPKLlcqTBu+FHjsJD5u2nO6tk7as=\nDIEZ Y SEIS MIL QUINIENTOS Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n16,500.00\n0.00\n0.00\n0.00\n2,516.95\n0.00\n0.00\n13,983.05\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1o3p0UscxmB7az4OZ5p0qPwiRRp9t4PDd",
+    "name": "XEXX010101000_SM4N6R_249340991_I_MXN_MX.pdf",
+    "path": "",
+    "size": "176257",
+    "modifiedTime": "2026-01-25T00:48:06.583Z",
+    "webViewLink": "https://drive.google.com/file/d/1o3p0UscxmB7az4OZ5p0qPwiRRp9t4PDd/view?usp=drivesdk",
+    "text": "CONCESIONARIA VUELA COMPAÑIA DE AVIACION\nRFC: \nCVA041027H80\nRégimen Fiscal: \n601 General de Ley Personas Morales\nTipo de comprobante:\nFolio Fiscal:\nFactura:\nFecha y Hora Emisión:\nLugar de Expedición:\nFecha y Hora de Certificación:\nMétodo de Pago:\nPNR:\nFecha de Compra:\nExportación:\nI-Ingreso\nd9bd629b-5ac2-479b-b570-\n7ff147a1962b\nSerie F Folio 249340991\n24/01/2026 06:46:33 p. m.\n01210\n24/01/2026 06:46:36 p. m.\nPUE - Pago en una sola exhibición\nSM4N6R\n24/01/2026\n01 - No aplica\nCliente\nNombre: \nCREACION CUANTICA EIRL\nRFC: \nXEXX010101000\nNúmero de Registro Fiscal: \n20612592811\nDomicilio: \nPerú\nUso CFDI: \nS01 - Sin efectos fiscales\nRégimen Fiscal: \n616 - Sin obligaciones fiscales\nNo\nIdentifica\nción\nCantidad\nUnidad\nClave\nUnidad\nDescripción\nTipo imp.\nObjeto Imp.\nBase\nTasa/Couta\nMonto imp.\nDescuento\nValor\nUnitario\nImporte\n78111502\n1\nSER\nE48\nSM4N6R - Viajes en aviones\n comerciales\nTraslado\n02 - Sí objeto\n de impuesto.\n$1,112.50\nTasa IVA\n 0.160000\n$178.00\n$1,112.50\n$1,112.50\n78111502\n1\nSER\nE48\nSM4N6R - Viajes en aviones\n comerciales\nTraslado\n02 - Sí objeto\n de impuesto.\n$4,215.50\nTasa IVA\n 0.000000\n$0.00\n$4,215.50\n$4,215.50\n01010101\n1\nSER\nE48\nSM4N6R - No existe en el\n catálogo\n01 - No objeto\n de impuesto.\n$0.00\n$1,183.00\n$1,183.00\n01010101\n1\nSER\nE48\nSM4N6R - No existe en el\n catálogo\n01 - No objeto\n de impuesto.\n$0.00\n$1,178.00\n$1,178.00\nComplemento Aerolíneas\nImporte\nTUA\n$1,183.00\nDY\n$262.00\nHW\n$529.00\nPE1\n$155.00\nS1\n$232.00\nImporte con letra: \nSIETE MIL OCHOCIENTOS SESENTA  Y\n SIETE PESOS CON 00/100 MXN\nMoneda: \nMXN\nTipo de Cambio: \n1\nForma de Pago: \n04 - Tarjeta de crédito\nDesglose impuestos trasladados: \n Tasa (0.160000) $178.00\n Tasa (0.000000) $0.00\nTotal Cargos: \n$1,178.00\nSubTotal\nDescuento\nImpuestos Federales\nTrasladados\nTotal\n$7,689.00\n$0.00\n$178.00\n$7,867.00\n\nNÚMERO DE SERIE DEL CERTIFICADO DEL SAT:\n00001000000719545303\nNÚMERO DE SERIE DEL CERTIFICADO DEL CSD DEL EMISOR:\n00001000000706119180\nSELLO DIGITAL DEL SAT:\nfn5xrZVsUc4mh9otOfNIyyO7C6X4K82jwsoRDgp3Wlhyenxewv09QnQ19ecWPrptl98Pj/IVpY4tM9cq/B4P/H6ogMNAt1LVyXw2k5EaowdF3B\nf6IGhDRjh/r9oNdsygy/wWcdXU+LMVhWQ/RSzE2wyhOl7zD/y1Iw0phKJTcMOSkxpBt4Xs97RrvVSqQsM4BfHqy7qmgmoeCxk0iFthEUdXWfzu\nJKhVbpFbF4A2qoMLrMGCwqDXjERxvX264CmHoyIhbtXGcWPrnEoouZLBo5Ph++NVO+lp81Id/rMGAewFCuQS/5+502I3SBwen8L6a+mUvjDhM3\niNoJV/TOTZNg==\nSELLO DIGITAL DEL CFDI:\nnca19koaeraFdoHEn7iKVtV0RKFbvw1ksG1GroamRYUlGzmIcI1pcwswWwyOYIkUP2Po0Kpqd+gMYFTiMG7efb/7dbf1fR/bo+tt/qoswWLYxQ\nfSkuCa5+4qS+AYH5t+MhlYGxpl49D3UUmRs85fv0uG9BdQBDisFrIKeyoa/wdQLbZ6TxX08Bx0AJ2HOfpZIdVueVhpJdj6s46NH9pMnBlS7a5h\nS0+QUiwsU0oSh46KuYfu9rjdkIm6Ya9zpywYhpSoMZ0k1NF1QDqLTLtZaU9KgV//0y6rkMnCCbMAZVcJYYchIB8ifdAh4UbimgKWDf7mK0rKli\nKWi982rKqR2g==\nCADENA ORIGINAL DEL COMPLEMENTO DE CERTIFICACIÓN DIGITAL DEL SAT:\n||1.1|d9bd629b-5ac2-479b-b570-7ff147a1962b|2026-01-24T18:46:36|LSO1306189R5|nca19koaeraFdoHEn7iKVtV0RKFbvw1ksG\n1GroamRYUlGzmIcI1pcwswWwyOYIkUP2Po0Kpqd+gMYFTiMG7efb/7dbf1fR/bo+tt/qoswWLYxQfSkuCa5+4qS+AYH5t+MhlYGxpl49D3UUmR\ns85fv0uG9BdQBDisFrIKeyoa/wdQLbZ6TxX08Bx0AJ2HOfpZIdVueVhpJdj6s46NH9pMnBlS7a5hS0+QUiwsU0oSh46KuYfu9rjdkIm6Ya9zpy\nwYhpSoMZ0k1NF1QDqLTLtZaU9KgV//0y6rkMnCCbMAZVcJYYchIB8ifdAh4UbimgKWDf7mK0rKliKWi982rKqR2g==|0000100000071954530\n3||\nRFC proveedor de certificado:\nLSO1306189R5\nEste documento es una representación impresa de un CFDI.\n\n"
+  },
+  {
+    "id": "1B617-beOpDN7m7thRjFa76hU2ptB7nYE",
+    "name": "XEXX010101000_QB5IQI_248680832_I_MXN_MX.pdf",
+    "path": "",
+    "size": "176297",
+    "modifiedTime": "2026-01-15T20:40:07.353Z",
+    "webViewLink": "https://drive.google.com/file/d/1B617-beOpDN7m7thRjFa76hU2ptB7nYE/view?usp=drivesdk",
+    "text": "CONCESIONARIA VUELA COMPAÑIA DE AVIACION\nRFC: \nCVA041027H80\nRégimen Fiscal: \n601 General de Ley Personas Morales\nTipo de comprobante:\nFolio Fiscal:\nFactura:\nFecha y Hora Emisión:\nLugar de Expedición:\nFecha y Hora de Certificación:\nMétodo de Pago:\nPNR:\nFecha de Compra:\nExportación:\nI-Ingreso\nf9e39389-e66a-4db7-ab1f-\n2c073581bf8c\nSerie F Folio 248680832\n15/01/2026 02:36:05 p. m.\n01210\n15/01/2026 02:36:14 p. m.\nPUE - Pago en una sola exhibición\nQB5IQI\n15/01/2026\n01 - No aplica\nCliente\nNombre: \nCREACION CUANTICA EIRL\nRFC: \nXEXX010101000\nNúmero de Registro Fiscal: \n20612592811\nDomicilio: \nPerú\nUso CFDI: \nS01 - Sin efectos fiscales\nRégimen Fiscal: \n616 - Sin obligaciones fiscales\nNo\nIdentifica\nción\nCantidad\nUnidad\nClave\nUnidad\nDescripción\nTipo imp.\nObjeto Imp.\nBase\nTasa/Couta\nMonto imp.\nDescuento\nValor\nUnitario\nImporte\n78111502\n1\nSER\nE48\nQB5IQI - Viajes en aviones\n comerciales\nTraslado\n02 - Sí objeto\n de impuesto.\n$1,987.50\nTasa IVA\n 0.160000\n$318.00\n$1,987.50\n$1,987.50\n78111502\n1\nSER\nE48\nQB5IQI - Viajes en aviones\n comerciales\nTraslado\n02 - Sí objeto\n de impuesto.\n$6,728.50\nTasa IVA\n 0.000000\n$0.00\n$6,728.50\n$6,728.50\n01010101\n1\nSER\nE48\nQB5IQI - No existe en el\n catálogo\n01 - No objeto\n de impuesto.\n$0.00\n$568.00\n$568.00\n01010101\n1\nSER\nE48\nQB5IQI - No existe en el\n catálogo\n01 - No objeto\n de impuesto.\n$0.00\n$1,182.00\n$1,182.00\nComplemento Aerolíneas\nImporte\nTUA\n$568.00\nDY\n$268.00\nHW\n$540.00\nPE1\n$142.00\nS1\n$232.00\nImporte con letra: \nDIEZ MIL SETECIENTOS OCHENTA  Y\n CUATRO PESOS CON 00/100 MXN\nMoneda: \nMXN\nTipo de Cambio: \n1\nForma de Pago: \n04 - Tarjeta de crédito\nDesglose impuestos trasladados: \n Tasa (0.160000) $318.00\n Tasa (0.000000) $0.00\nTotal Cargos: \n$1,182.00\nSubTotal\nDescuento\nImpuestos Federales\nTrasladados\nTotal\n$10,466.00\n$0.00\n$318.00\n$10,784.00\n\nNÚMERO DE SERIE DEL CERTIFICADO DEL SAT:\n00001000000719545303\nNÚMERO DE SERIE DEL CERTIFICADO DEL CSD DEL EMISOR:\n00001000000706119180\nSELLO DIGITAL DEL SAT:\nBsNzxWxHhzIn1K4z/eSdb7+V4qXE2c65PqGV3etVgCHHpVS2JBTu+Uat4MXKmSa1RJcshA3oxV+52stTfgUhmurLBklTNJuVDQU8D6P3BlavkQ\n6s3sBmJCG/u0FBi2WdW6HVukqHTy5D0INqdy4En1RrxUJllNk+r1cjWMDfNx8l33ZsVWRxZKFdmHDSxkAerQx5jhDJGnY6RLsWF5D/AdiM6VUV\nae8XuSbMWGhC4JMS2M95jHVOtIsy+SzQCXJUtbu979TkP9HGlAqE7PNrk2IOwA5IhydbB3V12eUpBzHzPVZh0iqSSnfx0xXJsVbC8X/Rbl9tZF\nq6WIfUJH/DQQ==\nSELLO DIGITAL DEL CFDI:\nDls8+ixAaO8lzSLo0JCwippFGCPoE5sEQTRcOH0mwBjx+ffeV2XbH/I3Mk7GLY1tGF1nbIQaZ9OBbtzeBAMHDUQLwqJzA2Fwzs1ea2X0AFI+JF\nIi1G2D+xeQAt2RePZWCkSYDiGX+4W6Gyw9GLRhkFuRgm9ojtI7bprusb6QwwPWHKGC9fJ7UJsBsZrVWBpk026+dBGEDFGursbeFHC4hkFQIAlm\nAqDbPucvJToUhFEjb5CjKW77DY1FZFTn8F1+bChe8EJsurmkmgdHFwZ/tfuDG7x3v0f63yLaqnhrWDhQay96PHMRqBUTIsiJqWxYO3rykB6beW\nZ6xgPpTuTDog==\nCADENA ORIGINAL DEL COMPLEMENTO DE CERTIFICACIÓN DIGITAL DEL SAT:\n||1.1|f9e39389-e66a-4db7-ab1f-2c073581bf8c|2026-01-15T14:36:14|LSO1306189R5|Dls8+ixAaO8lzSLo0JCwippFGCPoE5sEQT\nRcOH0mwBjx+ffeV2XbH/I3Mk7GLY1tGF1nbIQaZ9OBbtzeBAMHDUQLwqJzA2Fwzs1ea2X0AFI+JFIi1G2D+xeQAt2RePZWCkSYDiGX+4W6Gyw9\nGLRhkFuRgm9ojtI7bprusb6QwwPWHKGC9fJ7UJsBsZrVWBpk026+dBGEDFGursbeFHC4hkFQIAlmAqDbPucvJToUhFEjb5CjKW77DY1FZFTn8F\n1+bChe8EJsurmkmgdHFwZ/tfuDG7x3v0f63yLaqnhrWDhQay96PHMRqBUTIsiJqWxYO3rykB6beWZ6xgPpTuTDog==|0000100000071954530\n3||\nRFC proveedor de certificado:\nLSO1306189R5\nEste documento es una representación impresa de un CFDI.\n\n"
+  },
+  {
+    "id": "1fg_uxjWpEWeuLlLm5Fvep1kKOgYURLbt",
+    "name": "NOTA DE CREDITO CREACION CUANTICA DIF DE DOBLE A SIMPLE.pdf",
+    "path": "",
+    "size": "328047",
+    "modifiedTime": "2026-01-15T18:01:55.535Z",
+    "webViewLink": "https://drive.google.com/file/d/1fg_uxjWpEWeuLlLm5Fvep1kKOgYURLbt/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32414494\njueves, 15 Enero, 2026\nREFERENCIA\nF301\n00000539\nRESERVA\nNOTA DE CREDITO ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n20/01/2026\nSALIDA\n15/01/2026\nFacturado a : \nUSUARIO\nSr. Leandro Brunis Aviles\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nDocumento que \nDescuento por item\nMotivo\n00041965\nSerie y  Número\nF301\n12/01/2026\nFecha\n01 Factura\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nAlojamiento\n46.88\n46.88\nNIU\nDIFERENCIA DE DOBLE A SIMPLE\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nYe1E5sNwHinuYyTph7QwMRrgHOc=\nSESENTA Y 00/100 DOLARES AMERICANOS\nTotal  Propina\nUS $\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n60.00\n0.00\n0.00\n4.68\n8.44\n0.00\n0.00\n46.88\nTotal  Exportacion\n0.00\nCuentas corrientes  \nTotal  Descuento\nDolares\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "110ceKGu154sp2ZFoczmKKkd00uNz9Sb4",
+    "name": "DIP-FACT-Recibo_Ciclico_2026010005_S1AA-0048776371.pdf",
+    "path": "",
+    "size": "137338",
+    "modifiedTime": "2026-01-13T22:40:25.721Z",
+    "webViewLink": "https://drive.google.com/file/d/110ceKGu154sp2ZFoczmKKkd00uNz9Sb4/view?usp=drivesdk",
+    "text": "Integratel Perú S.A.A.   |   R.U.C. 20100017491   |   Jr. Domingo Martínez Luján N° 1130   |   Lima – Lima - Surquillo\nPágina 1/3\nEmpresas Fija\nRecibo Enero\nN° recibo: S1AA-0048776371\nCREACION CUANTICA EIRL\nRUC: 20612592811 \nCALLE BERLIN 965 Piso 3 URBANIZACION RESIDENCIAL JOSE BALTA,\nMIRAFLORES, 01, LIMA\nCuenta financiera: 753621842 \nID SUSCRIPTOR: 196980437\nID Cliente: 131054354\nAnexo: 1\nTotal a pagar del mes\nS/109.90\nÚltimo día de pago: 21/01\nN° Fijo / Cód. pago: 753621842\nDeuda anterior: S/0.00\n \nPaga a tiempo tu recibo y mantente siempre conectado.\nNo esperes hasta el último día de pago.\nCiclo de facturación - Enero 2026\n05/01\n21/01\nFecha de\nEmisión\nÚltimo día\nde pago\n¡LLAMA AL 0 800 11311!\nSi tienes un negocio y deseas comprar o portar una línea\nmóvil, adquirir un servicio de internet, TV o telefonía fija.\nCanal exclusivo para Clientes con RUC 20\nResumen de Recibo - NºS1AA-0048776371\nCargos Mensuales\nS/ 109.89\nSubtotal\nS/93.13\nIGV (18%)\nS/16.76\nTotal Afecto\nS/109.89\nDescuentos y Bonificaciones Inafectos\nS/ 0.00\nRedondeo\nS/ 0.01\nTotal Facturado\nS/109.90\nDevoluciones\nS/ 0.00\nDébitos\nS/ 0.00\nTotal a pagar\nS/ 109.90\n\nEmpresas Fija\nIntegratel Perú S.A.A.   |   R.U.C. 20100017491   |   Jr. Domingo Martínez Luján N° 1130   |   Lima – Lima - Surquillo\nPágina 2/3\nDetalle del recibo - N° S1AA-0048776371 - 196980437\nCargos Mensuales\nPrecio de vta.\nIGV S/109.89\nMovistar Internet 600 Mbps (06Ene al 05Feb)\n93.13\n16.76\n109.89\nDescuentos y Bonificaciones Inafectos\nPrecio de vta.\nIGV\nS/0.00\nBonificacion Prom Internet 1 GB x 12m 600 Mbps (06Ene \nal 05Feb) (VR S/127.03)\n0.00\n0.00\n0.00\nRedondeo\nPrecio de vta.\nIGV\nS/0.01\nRedondeo del mes Actual\n-0.01\n0.00\n-0.01\nRedondeo del mes Anterior\n0.02\n0.00\n0.02\n\nConceptos facturables\nCargos fijos mensuales\nCargo mensual facturado al cliente por el plan contratado\npara los servicios de voz y datos. Cargo fijo proporcional\ndel plan desde la fecha de inicio del servicio hasta el\nsiguiente cierre de facturación\nCargos por llamadas adicionales\nCargos por tráfico de voz, datos, mensajes de texto que\nno se encuentran comprendidos dentro del cargo fijo\nmensual.\nLarga distancia: cargo adicional por llamada de larga\ndistancia nacional o internacional\nKB internet y multimedia: navegación en internet y\ntráfico por descarga de aplicativos\nKB transmisión de datos: envío y recepción de datos.\nRoaming internacional: cargo por llamadas efectuadas y\nrecibidas en el extranjero\nDetalle de documentos afectos al IGV\nCargo por Reconexión: cargo facturado si el cliente\ncancela un recibo después de habérsele cortado por\ndeuda.\nCargo por Reconexión de corte APC (a pedido de cliente):\ncargo facturado al efectuarse la reactivación del servicio\nde la línea luego de cumplirse el plazo de suspensión.\nCargo por llamadas a operadoras rurales: llamadas\nrealizadas a teléfonos fijos rurales como Gilat to Home,\nValtron, Claro Rural, Integratel Rural o a teléfonos satelitales\ncomo Tesam.\nRenta fraccionaria por cambio de plan: cargo facturado si\ndurante el ciclo de la facturación el cliente cambió a un\nplan tarifario de cargo fijo mayor al que tenía.\nLugares de pago\nBancos y agentes\nBBVA Continental\nBanco Pichincha\nBCP\nBanco de la Nación\nBanBif\nInterbank\nScotiabank\nOtros\nAgente Multibanco KASNET\nMultibanco\nFullcarga\nRed Digital\nMetro\nWong\nWestern Union\nAlgunos lugares de pago presenciales pueden aplicar cobro de comisión de acuerdo a sus tarifarios vigentes.\nPuede realizar su pago de forma rápida y segura en el App Mi Movistar, YAPE o App o Web de su banco.\nRecuerda que también puede afiliar su recibo\nMovistar al débito automático, más info :\nhttp://smvst.com/DAT\nMayor información sobre lugares de pago en www.movistar.com.pe\n¿Qué es el recibo digital?\nEs un servicio gratuito que ofrece Integratel, con el que podrá recibir mensualmente su recibo en formato PDF al\ncorreo electrónico que usted indique. El envío del recibo digital va en reemplazo de su recibo físico.\n\n"
+  },
+  {
+    "id": "174lKFPMKn3Gcf4AFu2M2-lkrjO8bYD61",
+    "name": "FACTURA SALDO EVENTO CREACION CUANTICA 15 AL 18 ENE 2026.pdf",
+    "path": "",
+    "size": "326631",
+    "modifiedTime": "2026-01-13T22:39:59.252Z",
+    "webViewLink": "https://drive.google.com/file/d/174lKFPMKn3Gcf4AFu2M2-lkrjO8bYD61/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32411230\nlunes, 12 Enero, 2026\nREFERENCIA\nF301\n00041961\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n18/01/2026\nSALIDA\n15/01/2026\nFacturado a : \nUSUARIO\nEvento\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nSalas\n6,355.93\n6,355.93\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\n/VD2otjxhHEyHH8jGMtYrrAeuN4=\nSIETE MIL QUINIENTOS Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n7,500.00\n0.00\n0.00\n0.00\n1,144.07\n0.00\n0.00\n6,355.93\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1ai1x683LCyvmDT7D0EsTSznzkNrahjjn",
+    "name": "FACTURA CREACIÓN CUANTICA ALOJAMIENTO.pdf",
+    "path": "",
+    "size": "327510",
+    "modifiedTime": "2026-01-13T22:37:59.037Z",
+    "webViewLink": "https://drive.google.com/file/d/1ai1x683LCyvmDT7D0EsTSznzkNrahjjn/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32414494\nlunes, 12 Enero, 2026\nREFERENCIA\nF301\n00041965\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMauricio Polack De\n20/01/2026\nSALIDA\n15/01/2026\nFacturado a : \nUSUARIO\nSr. Leandro Brunis Aviles y Sr. Johnny Cevallos Padilla.\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nAlojamiento\n390.63\n390.63\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\narsvvdXXKyISz0Xwo/KO9nnQOPM=\nQUINIENTOS Y 00/100 DOLARES AMERICANOS\nTotal  Propina\nUS $\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n500.00\n0.00\n0.00\n39.07\n70.31\n0.00\n0.00\n390.62\nTotal  Exportacion\n0.00\nCuentas corrientes  \nTotal  Descuento\nDolares\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1GXERBRkqw7Zgg2T8KxXcLER50VsJUHuA",
+    "name": "S002-206060938_08_20260108.pdf",
+    "path": "",
+    "size": "265390",
+    "modifiedTime": "2026-01-13T22:22:53.305Z",
+    "webViewLink": "https://drive.google.com/file/d/1GXERBRkqw7Zgg2T8KxXcLER50VsJUHuA/view?usp=drivesdk",
+    "text": "Página 1 de 3\n+\n+\n-\n+\n+\nEntel Perú S.A.\nRUC: 20106897914\nAv. República de Colombia 791\nPiso 14 - San Isidro - Lima\n¡Hola! Te enviamos tu recibo del mes\n0\n50\n100\n150\n200\n250\nRequest ID: 21527 | Ciclo: 08 | Custcode: 5.7023\nCREACION CUANTICA E.I.R.L.\nAv Sergio Bernales Nro 272\nLima - Lima - Lima\nRecibo Nº\nEmisión\n:\n:\nS002-206060938\n08/Ene/2026\nInicio del Periodo\nFin del Periodo\n:\n:\n09/Ene/2026\n08/Feb/2026\nNº de Cuenta\nNº Doc (RUC)\n:\n:\n1.21765711\n20612592811\nTotal a pagar\nVencimiento\nS/ 205.31\n21/Ene/2026\nPlan\nProrrateo\nCargos\nAdicionales\nDescuentos o\nP. Adelantado\nEquipos\nSaldo\nAnterior\nS/ 346.30\nS/ 0.00\nS/ 0.00\n-S/ 140.99\nS/ 0.00\nS/ 0.00\nEn las siguientes páginas\npodrás encontrar el detalle de cada concepto\nFacturación de los últimos 6 meses\nAgo\nSep\nOct\nNov\nDic\nEne\nDesglose tributario\nSubtotal de Conceptos Facturados (sin IGV)\nIGV del Subtotal (18%)\nTotal (Incl. IGV)\nMontos ya gravados con IGV\nExentos IGV\nSaldo anterior\nTotal a pagar\n173.99\n31.32\n205.31\n0.00\n0.00\n0.00\n205.31\nDocumento válido para efectos tributarios según Res. de Sup. No. 007-99/SUNAT. Documento\nno afecto al régimen de retención del IGV por ser agente de retención, según Res. de Sup. No.\n037-2002/SUNAT. Los saldos de hasta S/0.09 que no cancele por falta de moneda de curso legal\n(S/0.05 y S/0.01), se registrarán y se mantendrán como pendientes de pago hasta su cancelación\nefectiva.\nRecuerda que puedes cambiar de operadora sin perder tu número. El trámite de portabilidad es\nrápido y gratuito. Migra tus líneas de otro operador hacia Entel y disfruta de los beneficios que\ntenemos para ti.\n\nPágina 2 de 3\nMira aquí el detalle\ntu recibo\nResumen\nNúmero\nPlan Tarifario\nPlan\nProrrateo\nCargos\nAdicionales (*)\nDescuentos o\nP. Adelantado\nEquipos (*)\nSaldo\nAnterior\nMonto S/\n(Incl. IGV)\n933599925\nEmprende Ilimitado 49.90\n49.90\n0.00\n0.00\n-34.93\n0.00\n0.00\n14.97\n933599903\nEmpresa PRO 2.0 59.9\n59.90\n0.00\n0.00\n-29.95\n0.00\n0.00\n29.95\n908931343\nEmpresa PRO 2.0 36.9\n36.90\n0.00\n0.00\n0.00\n0.00\n0.00\n36.90\n933599864\nEmpresa PRO 2.0 59.9\n59.90\n0.00\n0.00\n-29.95\n0.00\n0.00\n29.95\n912379686\nEmpresa PRO 2.0 44.9\n44.90\n0.00\n0.00\n-11.23\n0.00\n0.00\n33.67\n912379744\nEmpresa PRO 2.0 44.9\n44.90\n0.00\n0.00\n0.00\n0.00\n0.00\n44.90\n933599883\nEmprende Ilimitado 49.90\n49.90\n0.00\n0.00\n-34.93\n0.00\n0.00\n14.97\nCuenta\nCliente\n0.00\n0.00\n0.00\n0.00\n0.00\n0.00\n0.00\nTotal\n346.30\n0.00\n0.00\n-140.99\n0.00\n0.00\n205.31\n(*) Puede incluir conceptos exentos o ya gravados con IGV\nDetalle\nConceptos detallados\nPeríodo\nUnidad\nMonto S/ (Incl. IGV)\n933599925 (Emprende Ilimitado 49.90)\n14.97\nPlan\n09-ene al 08-feb\n31 días\n49.90\nDescuentos\n-34.93\nMA01 - Descuentos por fidelizacion 70% x 18m (5/18)\n09-ene al 08-feb\n31 días\n-34.93\n933599903 (Empresa PRO 2.0 59.9)\n29.95\nPlan\n09-ene al 08-feb\n31 días\n59.90\nDescuentos\n-29.95\nMA01 - Descuento por fidelizacion 50% x 12m (5/12)\n09-ene al 08-feb\n31 días\n-29.95\n933599864 (Empresa PRO 2.0 59.9)\n29.95\nPlan\n09-ene al 08-feb\n31 días\n59.90\nDescuentos\n-29.95\nMA01 - Descuento por fidelizacion 50% x 12m (5/12)\n09-ene al 08-feb\n31 días\n-29.95\n912379686 (Empresa PRO 2.0 44.9)\n33.67\nPlan\n09-ene al 08-feb\n31 días\n44.90\nDescuentos\n-11.23\nMA01 - Descuentos por fidelizacion 25% x 18m (12/18)\n09-ene al 08-feb\n31 días\n-11.23\n933599883 (Emprende Ilimitado 49.90)\n14.97\nPlan\n09-ene al 08-feb\n31 días\n49.90\nDescuentos\n-34.93\nMA01 - Descuentos por fidelizacion 70% x 18m (5/18)\n09-ene al 08-feb\n31 días\n-34.93\nCuenta Cliente\n0.00\nSaldos Anteriores\n0.00\nRecibo(s) anterior(es)\n205.31\nAbonos / Cargos varios al 08/01/2026\n-205.31\n\nPágina 3 de 3\nMira aquí el detalle\ntu recibo\nConceptos facturables\n.\nCargo Fijo (incluye prorrateo): Monto de Renta Mensual y consumo proporcional por los servicios de\nVoz, Mensajería y Datos, según Plan Tarifario Contratado.\nOtros Servicios Contratados: Monto fijo mensual por los servicios de:\n- Paquetes Contratados: Paquetes de datos, mensajería y LDI. Servicios de Blackberry, Localizador,\nEntel Backup y otros servicios de Valor Agregado: licencias, aplicativos de negocio, gestión de\ndispositivos móviles y otros.\n- Garantía: Servicio de reposición de equipos.\n- Arrendamiento: Alquiler de equipos.\nConsumos Adicionales: Monto facturado no comprendido dentro del cargo fijo mensual del plan\ntarifario contratado, por los servicios de Voz, Mensajería, Datos, Roaming Internacional, LDI, Redes\nSatelitales, Destinos Rurales.\nDatos locales y móviles: Servicio de internet brindado a través de equipos móviles, USB Módems,\nRouters, etc.\nDatos Roaming: Servicio de datos que Entel brinda en otros países.\nOtros Cargos y Abonos: Cargos y abonos no recurrentes.\nPromociones y Descuentos: Descuentos generados por promociones especiales.\nRecargo por Intereses: Cobro de intereses legales generados por la no cancelación de la totalidad del\nrecibo a la fecha de vencimiento.\nOtros Cargos y Abonos (ya gravados con IGV): Cargo de documentos emitidos por compra o\nfinanciamiento de equipos y/o Boletas/Facturas adicionales, ya gravados con IGV. Incluye Facturación\npor encargo de Otros Operadores según normativa vigente.\nGlosario\n.\nOn Net: Comunicación de un teléfono móvil Entel a otro teléfono móvil Entel.\nOff Net: Comunicación de un teléfono móvil Entel a cualquier teléfono fijo o móvil de otro operador.\nLDI: Larga Distancia Internacional.\nRedes Satelitales: Telefonía móvil a números satelitales.\nDestinos Rurales: Telefonía móvil a Destinos Rurales.\nRoaming Internacional: Servicio de Voz y Datos que Entel brinda en otros países.\nDescarga de Contenidos: Cargo por envío de mensajes y descargas.\nMB: Megabytes (1 MB = 1024 KB)\n- El límite de crédito asignado para consumo adicional de servicios será informado por mensaje de texto\nuna vez iniciada la utilización del referido límite. Para contratación de otros servicios, será evaluado\ncrediticiamente en la venta.\n- El pago no oportuno devengará en intereses legales. Entel puede proceder a la suspensión del Servicio a\npartir del día siguiente del último día de pago.\n- Si tu línea es suspendida por falta de pago, se aplicará un cargo por reconexión del servicio.\n- Reconexión del servicio máximo dentro de 24 horas de efectuado el pago correspondiente.\n- Conoce los lugares de pago en www.entel.pe\nMÓVILES: 123 (desde tu Entel) y 611-7777 (desde un teléfono fijo) Llamadas gratis: 0-800-0-9000 (Lima y\nprovincias).\nINTERNET Y SERVICIOS DE VALOR AGREGADO: 123 (desde tu Entel) y 611-7777 (desde un teléfono fijo).\nOSIPTEL: Fono Ayuda: 0-801-12121 Para detalle de llamadas a fijos o móviles consultar gratuitamente Mi\nEntel\" en www.entel.pe\n\n"
+  },
+  {
+    "id": "15JMHlmkkKAqEplAGoRseWjJWOjbSfB5d",
+    "name": "factura adelanto evento creacion cuantica 15 al 18 ene 2026.pdf",
+    "path": "",
+    "size": "330115",
+    "modifiedTime": "2026-01-12T16:58:10.896Z",
+    "webViewLink": "https://drive.google.com/file/d/15JMHlmkkKAqEplAGoRseWjJWOjbSfB5d/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32411230\nmiércoles, 7 Enero, 2026\nREFERENCIA\nF301\n00041884\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n18/01/2026\nSALIDA\n15/01/2026\nFacturado a : \nUSUARIO\nEvento Capítulo Uno - Equipo 24 (C1 E24)\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nSalas\n16,525.42\n16,525.42\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nzUtfURb2wPqKbZWukGWvdTalOcM=\nDIEZ Y NUEVE MIL QUINIENTOS Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n19,500.00\n0.00\n0.00\n0.00\n2,974.58\n0.00\n0.00\n16,525.42\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1eLhWYFYL6QsmlqYDirOLiOdzsKRSUOfa",
+    "name": "FACTURA ALOJAMIENTO FERNANDO ARAGON  15 AL 16 DIC 2025.pdf",
+    "path": "",
+    "size": "323920",
+    "modifiedTime": "2025-12-17T14:19:17.028Z",
+    "webViewLink": "https://drive.google.com/file/d/1eLhWYFYL6QsmlqYDirOLiOdzsKRSUOfa/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32413368\nlunes, 15 Diciembre, 2025\nREFERENCIA\nF301\n00041449\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n16/12/2025\nSALIDA\n15/12/2025\nFacturado a : \nUSUARIO\nSr. Fernando Aragón\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nAlojamiento\n137.50\n137.50\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nwo5btREjQijm76fQctcBa0DGJZw=\nCIENTO SETENTA Y SEIS Y 00/100 DOLARES AMERICANOS\nTotal  Propina\nUS $\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n176.00\n0.00\n0.00\n13.75\n24.75\n0.00\n0.00\n137.50\nTotal  Exportacion\n0.00\nCuentas corrientes  \nTotal  Descuento\nDolares\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1A44rV0_k1CJrU62ea6nCqGjp675UVyW2",
+    "name": "FACTURA SALDO EVENTO CREACION CUANTICA 11 AL 14 DIC 2025.pdf",
+    "path": "",
+    "size": "327105",
+    "modifiedTime": "2025-12-12T16:56:35.529Z",
+    "webViewLink": "https://drive.google.com/file/d/1A44rV0_k1CJrU62ea6nCqGjp675UVyW2/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n3245866\nmiércoles, 10 Diciembre, 2025\nREFERENCIA\nF301\n00041343\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n14/12/2025\nSALIDA\n11/12/2025\nFacturado a : \nUSUARIO\nEvento\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nSalas\n9,322.03\n9,322.03\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\n/4iejZLxfHt7KCcudVb19UdPPc0=\nONCE MIL Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n11,000.00\n0.00\n0.00\n0.00\n1,677.97\n0.00\n0.00\n9,322.03\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1GRh2Gf2VZeS0_sIZBA1rBWPerxiG934g",
+    "name": "DIP-FACT-Recibo_Ciclico_2025120005_S1AA-0047791250.pdf",
+    "path": "",
+    "size": "137354",
+    "modifiedTime": "2025-12-11T20:41:21.615Z",
+    "webViewLink": "https://drive.google.com/file/d/1GRh2Gf2VZeS0_sIZBA1rBWPerxiG934g/view?usp=drivesdk",
+    "text": "Integratel Perú S.A.A.   |   R.U.C. 20100017491   |   Jr. Domingo Martínez Luján N° 1130   |   Lima – Lima - Surquillo\nPágina 1/3\nEmpresas Fija\nRecibo Diciembre\nN° recibo: S1AA-0047791250\nCREACION CUANTICA EIRL\nRUC: 20612592811 \nCALLE BERLIN 965 Piso 3 URBANIZACION RESIDENCIAL JOSE BALTA,\nMIRAFLORES, 01, LIMA\nCuenta financiera: 753621842 \nID SUSCRIPTOR: 196980437\nID Cliente: 131054354\nAnexo: 1\nTotal a pagar del mes\nS/109.90\nÚltimo día de pago: 21/12\nN° Fijo / Cód. pago: 753621842\nDeuda anterior: S/0.00\n \nPaga a tiempo tu recibo y mantente siempre conectado.\nNo esperes hasta el último día de pago.\nCiclo de facturación - Diciembre 2025\n05/12\n21/12\nFecha de\nEmisión\nÚltimo día\nde pago\n¡LLAMA AL 0 800 11311!\nSi tienes un negocio y deseas comprar o portar una línea\nmóvil, adquirir un servicio de internet, TV o telefonía fija.\nCanal exclusivo para Clientes con RUC 20\nResumen de Recibo - NºS1AA-0047791250\nCargos Mensuales\nS/ 109.89\nSubtotal\nS/93.13\nIGV (18%)\nS/16.76\nTotal Afecto\nS/109.89\nDescuentos y Bonificaciones Inafectos\nS/ 0.00\nRedondeo\nS/ 0.01\nTotal Facturado\nS/109.90\nDevoluciones\nS/ 0.00\nDébitos\nS/ 0.00\nTotal a pagar\nS/ 109.90\n\nEmpresas Fija\nIntegratel Perú S.A.A.   |   R.U.C. 20100017491   |   Jr. Domingo Martínez Luján N° 1130   |   Lima – Lima - Surquillo\nPágina 2/3\nDetalle del recibo - N° S1AA-0047791250 - 196980437\nCargos Mensuales\nPrecio de vta.\nIGV S/109.89\nMovistar Internet 600 Mbps (06Dic al 05Ene)\n93.13\n16.76\n109.89\nDescuentos y Bonificaciones Inafectos\nPrecio de vta.\nIGV\nS/0.00\nBonificacion Prom Internet 1 GB x 12m 600 Mbps (06Dic \nal 05Ene) (VR S/127.03)\n0.00\n0.00\n0.00\nRedondeo\nPrecio de vta.\nIGV\nS/0.01\nRedondeo del mes Actual\n-0.02\n0.00\n-0.02\nRedondeo del mes Anterior\n0.03\n0.00\n0.03\n\nConceptos facturables\nCargos fijos mensuales\nCargo mensual facturado al cliente por el plan contratado\npara los servicios de voz y datos. Cargo fijo proporcional\ndel plan desde la fecha de inicio del servicio hasta el\nsiguiente cierre de facturación\nCargos por llamadas adicionales\nCargos por tráfico de voz, datos, mensajes de texto que\nno se encuentran comprendidos dentro del cargo fijo\nmensual.\nLarga distancia: cargo adicional por llamada de larga\ndistancia nacional o internacional\nKB internet y multimedia: navegación en internet y\ntráfico por descarga de aplicativos\nKB transmisión de datos: envío y recepción de datos.\nRoaming internacional: cargo por llamadas efectuadas y\nrecibidas en el extranjero\nDetalle de documentos afectos al IGV\nCargo por Reconexión: cargo facturado si el cliente\ncancela un recibo después de habérsele cortado por\ndeuda.\nCargo por Reconexión de corte APC (a pedido de cliente):\ncargo facturado al efectuarse la reactivación del servicio\nde la línea luego de cumplirse el plazo de suspensión.\nCargo por llamadas a operadoras rurales: llamadas\nrealizadas a teléfonos fijos rurales como Gilat to Home,\nValtron, Claro Rural, Integratel Rural o a teléfonos satelitales\ncomo Tesam.\nRenta fraccionaria por cambio de plan: cargo facturado si\ndurante el ciclo de la facturación el cliente cambió a un\nplan tarifario de cargo fijo mayor al que tenía.\nLugares de pago\nBancos y agentes\nBBVA Continental\nBanco Pichincha\nBCP\nBanco de la Nación\nBanBif\nInterbank\nScotiabank\nOtros\nAgente Multibanco KASNET\nMultibanco\nFullcarga\nRed Digital\nMetro\nWong\nWestern Union\nAlgunos lugares de pago presenciales pueden aplicar cobro de comisión de acuerdo a sus tarifarios vigentes.\nPuede realizar su pago de forma rápida y segura en el App Mi Movistar, YAPE o App o Web de su banco.\nRecuerda que también puede afiliar su recibo\nMovistar al débito automático, más info :\nhttp://smvst.com/DAT\nMayor información sobre lugares de pago en www.movistar.com.pe\n¿Qué es el recibo digital?\nEs un servicio gratuito que ofrece Integratel, con el que podrá recibir mensualmente su recibo en formato PDF al\ncorreo electrónico que usted indique. El envío del recibo digital va en reemplazo de su recibo físico.\n\n"
+  },
+  {
+    "id": "1qc2EiCZT8YeQuThlQCc9cC-Rocig8l51",
+    "name": "factura alojamiento Michael Boada.pdf",
+    "path": "",
+    "size": "326009",
+    "modifiedTime": "2025-12-09T16:58:14.958Z",
+    "webViewLink": "https://drive.google.com/file/d/1qc2EiCZT8YeQuThlQCc9cC-Rocig8l51/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32412831\nviernes, 5 Diciembre, 2025\nREFERENCIA\nF301\n00041278\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n22/12/2025\nSALIDA\n18/12/2025\nFacturado a : \nUSUARIO\nMichael Boada Rubiano\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nAlojamiento\n275.00\n275.00\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\n7UVofL0qTTgVJF+dFg/NHviQfR8=\nTRESCIENTOS CINCUENTA Y DOS Y 00/100 DOLARES AMERICANOS\nTotal  Propina\nUS $\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n352.00\n0.00\n0.00\n27.50\n49.50\n0.00\n0.00\n275.00\nTotal  Exportacion\n0.00\nCuentas corrientes  \nTotal  Descuento\nDolares\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "18WGo6u-06mHdiqetn1PPHCJfac-ELUd6",
+    "name": "factura alojamiento Alonso Solares.pdf",
+    "path": "",
+    "size": "326010",
+    "modifiedTime": "2025-12-09T16:58:11.204Z",
+    "webViewLink": "https://drive.google.com/file/d/18WGo6u-06mHdiqetn1PPHCJfac-ELUd6/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32412830\nviernes, 5 Diciembre, 2025\nREFERENCIA\nF301\n00041277\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n22/12/2025\nSALIDA\n17/12/2025\nFacturado a : \nUSUARIO\nAlonso Solares Salazar\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nAlojamiento\n343.75\n343.75\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nt/6CyWPUJxbdsvC4ijCYuy7U4tE=\nCUATROCIENTOS CUARENTA Y 00/100 DOLARES AMERICANOS\nTotal  Propina\nUS $\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n440.00\n0.00\n0.00\n34.37\n61.88\n0.00\n0.00\n343.75\nTotal  Exportacion\n0.00\nCuentas corrientes  \nTotal  Descuento\nDolares\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1sNM3d__xb4say_ekne87-v7_qNa-jBU8",
+    "name": "factura alojamiento Juan Arreola.pdf",
+    "path": "",
+    "size": "326097",
+    "modifiedTime": "2025-12-09T16:58:08.053Z",
+    "webViewLink": "https://drive.google.com/file/d/1sNM3d__xb4say_ekne87-v7_qNa-jBU8/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32412829\nviernes, 5 Diciembre, 2025\nREFERENCIA\nF301\n00041276\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n22/12/2025\nSALIDA\n10/12/2025\nFacturado a : \nUSUARIO\nJuan Arreola Morales\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nAlojamiento\n618.75\n618.75\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nQjF2BFrQmfiD0LPK6aTCLvVTFOI=\nSETECIENTOS NOVENTA Y DOS Y 00/100 DOLARES AMERICANOS\nTotal  Propina\nUS $\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n792.00\n0.00\n0.00\n61.87\n111.38\n0.00\n0.00\n618.75\nTotal  Exportacion\n0.00\nCuentas corrientes  \nTotal  Descuento\nDolares\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1WQugO4gxa_6T9sUDiUIFeTQhqzKjsgPA",
+    "name": "factura saldo creación cuantica 27al30nov2025.pdf",
+    "path": "",
+    "size": "327972",
+    "modifiedTime": "2025-11-27T16:40:13.094Z",
+    "webViewLink": "https://drive.google.com/file/d/1WQugO4gxa_6T9sUDiUIFeTQhqzKjsgPA/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n3241731\njueves, 27 Noviembre, 2025\nREFERENCIA\nF301\n00041032\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n30/11/2025\nSALIDA\n27/11/2025\nFacturado a : \nUSUARIO\nEvento\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nSalas\n8,898.31\n8,898.31\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\n++1oOPByn4zWBL04goGcxMthxY0=\nDIEZ MIL QUINIENTOS Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n10,500.00\n0.00\n0.00\n0.00\n1,601.69\n0.00\n0.00\n8,898.31\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1rDFEcUwGq3-jWeaEEpNBt6HKFdusmMSt",
+    "name": "Reclamación 2025CF0A1B05.pdf",
+    "path": "",
+    "size": "8450",
+    "modifiedTime": "2025-11-25T02:12:23.916Z",
+    "webViewLink": "https://drive.google.com/file/d/1rDFEcUwGq3-jWeaEEpNBt6HKFdusmMSt/view?usp=drivesdk",
+    "text": "Libro de reclamaciones de Creación Cuántica\nCódigo de indentificación del libro de reclamaciones: 0771c38e-d3c2-468d-a7c2-4b441dfa9f02\nEstado de reclamación a la fecha: 24/11/2025, 21:12:14\nReclamación 2025CF0A1B05\nFecha de reclamación: 14/11/2025\nCódigo de identificación: 2025CF0A1B05\nNúmero correlativo: 1\nProveedor\nNombre: Creación Cuántica\nRUC: 20612592811\nDomicilio fiscal: Dalias 136, Miraflores, Lima, Departamento de Lima, Perú\nEstablecimiento\nNombre: Miraflores\nDirección: Dalias 136, Miraflores, Lima, Departamento de Lima, Perú\nConsumidor\nNombre completo: Jose Alex Hernandez Gomez\nDNI: 22093362\nCorreo electrónico: yiyohernandez76@gmail.com\nTeléfono: 956697104\nBien contratado\nTipo: Servicio\nDescripción: MAESTRIA DEL JUEGO\nMonto reclamado: Soles (S/) 3530.00\nReclamación\nTipo: Reclamo\nDescripción: Obligacion de tener que traer a mas de 2 personas para los eventos de enrolamiento\nSolicitud del consumidor: Solicito la reclamacion pir la falta de etica en los terminos del entrebamiento\nRespuesta\nSin respuesta a la fecha.\n\nEl libro de reclamaciones virtual de Creación Cuántica es un servicio proporcionado por Reclamo Virtual en cumplimiento de la Ley\nN° 29571, Código de Protección y Defensa del Consumidor.\nLa formulación del reclamo no impide acudir a otras vías de solución de controversias ni es requisito previo para interponer una\ndenuncia ante el INDECOPI.\nEl proveedor debe dar respuesta al reclamo o queja en un plazo no mayor a quince (15) días hábiles, el cual es improrrogable.\nDirección del libro de reclamaciones: https://reclamovirtual.pe/reclamar/2205e150-ddd1-468a-afa4-ed634b8af4d7/miraflores\nDirección del reclamo: https://reclamovirtual.pe/reclamacion/2025CF0A1B05\n\n"
+  },
+  {
+    "id": "1N6DgcdHDKgr4ySuwt-zyuKCzKM6hiB8l",
+    "name": "F005-00019749.pdf",
+    "path": "",
+    "size": "191528",
+    "modifiedTime": "2025-11-24T23:42:59.185Z",
+    "webViewLink": "https://drive.google.com/file/d/1N6DgcdHDKgr4ySuwt-zyuKCzKM6hiB8l/view?usp=drivesdk",
+    "text": " \nInversiones PIMI SAC\nDomicilio fiscal: Pasaje Martir Olaya 141\nMiraflores - Lima - Lima - Peru\nrecaudacion@delpilarhotels.com\nTelf: (511) 712-0712 / Fax: (511) 712-0714\n-\n \nR.U.C Nº 20508159863\nFACTURA \nELECTRÓNICA\nF005-00019749\nRazón social\n: CREACION CUANTICA E.I.R.L.\nR.U.C\n: 20612592811\nDirección\n: CAL.LAS DALIAS NRO. 136 URB.\nARMENDARIZ (DPTO 604 - PISO 6) LIMA -\nLIMA - MIRAFLORES\nUbigeo\n: LIMABAMBA - RODRIGUEZ DE\nMENDOZA - AMAZONAS\nUrbanización\n: Lima\n \n \nMoneda\n: Soles\nFecha emisión\n: 24/11/2025 10:55:12\nFecha vencimiento\n: 24/11/2025\nForma de pago\n: Contado\nDias credito\n: -\nOrden de compra\n: -\nCliente\n: 03185-CREACION CUANTICA E.I.R.L.\nReserva\n: 049066\nGrupo\n: CAIDA DE CONFIANZA\nCheck in\n: 29/11/2025\nCheck out\n: 29/11/2025\nCantidad noches\n: 0\nHabitaciones\n: -\nTipo de cambio : 3.750\n \n \nObservaciones:\nInformación de la Detracción\nTipo Operación:\nBien o Servicio:\nMedio de pago:\n1001 Operación Sujeta a Detracción\n019 Arrendamiento de bienes muebles\n001 Depósito en cuenta\nNro. Cta. Banco de la Nación:\nPorcentaje de detracción:\nMonto detraccion:\n-\n10.00\nS/. 175.00\nLeyendas\nLeyenda: 2006    Operaci?n sujeta a detracci?n\nRepresentación Impresa de la factura electrónica, consulte su comprobante en www.infofactperu.pe/consulta \nUsuario: FERNANDO \nCódigo Hash:  B7RCM4mgjGvMFt6k6gHdWjPEDUJJqcsqsPl+/R3IXJY=\n \npowered by Infomatica\n \nÍtem\n \nCódigo\n \nDescripción\n \nUnd.\n \nCantidad\n \nV. Unitario\n \nP. Unitario\n \nDescuento\n \nValor Venta\n1\n210000\nEVENTOS - SALONES\nNIU\n1.000\n1 367.18750\n1 613.28125\n0.00000\n1 367.19\nSON:MIL SETECIENTOS CINCUENTA CON 00/100 SOLES\n \nAnticipo\nS/\n0.00\n \n \nOp. Gravada\nS/\n1 367.19\n \n \nI.G.V 18%\nS/\n246.09\n \n \nOp. Inafecta\nS/\n0.00\n \n \nOp. Exonerada\nS/\n0.00\n \n \nOp. Exportación\nS/\n0.00\n \n \nOp. Gratuita\nS/\n0.00\n \n \nICBPER\nS/\n0.00\n \n \nServicio\nS/\n136.72\n \nImporte Total\nS/\n1 750.00\nOperacion sujeta al spot de detraccion 10%  para alquileres y 12%  para alimentos cta cte 00005137934 - Banco de la Nacion\n.\nABONAR A LAS SIGUIENTES CUENTAS CORRIENTES\n.\n.\n.\nCuenta Corriente bcp Dolares: 191-1516166-117\nCuenta Corriente bcp soles: 191-1514483-007\n.\n.\n.\n\n"
+  },
+  {
+    "id": "1fz50RQlv-pGQFPOjLBfUx5GAZFLN1L-u",
+    "name": "FACTURA ALOJAMIENTO FERNANDO ARAGON 27NOV AL 01DIC 2025.pdf",
+    "path": "",
+    "size": "328004",
+    "modifiedTime": "2025-11-24T23:42:28.247Z",
+    "webViewLink": "https://drive.google.com/file/d/1fz50RQlv-pGQFPOjLBfUx5GAZFLN1L-u/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32412554\nlunes, 24 Noviembre, 2025\nREFERENCIA\nF301\n00040952\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n01/12/2025\nSALIDA\n27/11/2025\nFacturado a : \nUSUARIO\nFernando Aragon\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nAlojamiento\n442.19\n442.19\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nGisfylHqzS8S2n5Iwn0noZHEUKE=\nQUINIENTOS SESENTA Y SEIS Y 00/100 DOLARES AMERICANOS\nTotal  Propina\nUS $\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n566.00\n0.00\n0.00\n44.22\n79.59\n0.00\n0.00\n442.19\nTotal  Exportacion\n0.00\nCuentas corrientes  \nTotal  Descuento\nDolares\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1b7-wv-ejNnPntDEG52c0hfqDylrr3HT0",
+    "name": "factura creacion cuantica 27 al 30 nov 2025.pdf",
+    "path": "",
+    "size": "328111",
+    "modifiedTime": "2025-11-24T23:41:57.151Z",
+    "webViewLink": "https://drive.google.com/file/d/1b7-wv-ejNnPntDEG52c0hfqDylrr3HT0/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n3241731\nlunes, 24 Noviembre, 2025\nREFERENCIA\nF301\n00040954\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n30/11/2025\nSALIDA\n27/11/2025\nFacturado a : \nUSUARIO\nEvento\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nSalas\n16,525.42\n16,525.42\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\naXTdoOiddCJDEpSFEjxj9dc0kD0=\nDIEZ Y NUEVE MIL QUINIENTOS Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n19,500.00\n0.00\n0.00\n0.00\n2,974.58\n0.00\n0.00\n16,525.42\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1o8MCeb1HrY2uIb8cssDbGafkSdLhsjc7",
+    "name": "RHE10090449210E001141_251121_152704.pdf",
+    "path": "",
+    "size": "1938",
+    "modifiedTime": "2025-11-21T20:27:26.591Z",
+    "webViewLink": "https://drive.google.com/file/d/1o8MCeb1HrY2uIb8cssDbGafkSdLhsjc7/view?usp=drivesdk",
+    "text": "DEL ARTÍCULO 33 DE LA LEY DEL IMPUESTO A LA RENTA\nRecibí de:\nIdentificado con\nObservación\nInciso\nLa suma de:\nTotal por honorarios:\nRetención (\nR.U.C.\nRECIBO POR HONORARIOS ELECTRONICO\nNro:\n10090449210\n-\nE001\n141\nCONDEZO RODRIGUEZ ROBERTO\nCAL. CASTILLA LA VIEJA NRO. 275 URB. PORTADA DEL SOL LIMA LIMA LA\nMOLINA\nTELÉFONO:\nnúmero\nPor concepto de\nde\ndel\nTotal Neto Recibido:\nCREACION CUANTICA E.I.R.L.\nRUC\n20612592811\n QUINIENTOS CINCUENTA Y 00/100 DOLARES DE NORTE AMERICA\nASESORÍA JURÍDICA Y REVOCATORIA DE PODERES DE GERENCIA\n-\nA\n21\nNoviembre\n2025\n550.00\n(47.83)\n597.83\nDOLARES DE NORTE AMERICA\n%) IR:\n8\nFecha de emisión\nDomiciliado en\nCAL. BERLIN NRO. 965 INT. 302 URB. SANTA CRUZ LIMA LIMA MIRAFLORES\nAL CONTADO\nForma de Pago:\n\n"
+  },
+  {
+    "id": "13nlJBvOkSSggOMA7hiaosJ9_GKJlUvws",
+    "name": "FACTURA 1 (2).pdf",
+    "path": "",
+    "size": "327996",
+    "modifiedTime": "2025-11-15T17:54:12.005Z",
+    "webViewLink": "https://drive.google.com/file/d/13nlJBvOkSSggOMA7hiaosJ9_GKJlUvws/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n3245874\nmartes, 11 Noviembre, 2025\nREFERENCIA\nF301\n00040614\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nAna Vasquez\n16/11/2025\nSALIDA\n14/11/2025\nFacturado a : \nUSUARIO\nEvento\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nSalas\n11,016.95\n11,016.95\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\npyAQp/JgVPDcOV7PJgslVnvAl9c=\nTRECE MIL Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n13,000.00\n0.00\n0.00\n0.00\n1,983.05\n0.00\n0.00\n11,016.95\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "11Rfa1EX2NIQjoDl5z5c7sM0nlasmeSoJ",
+    "name": "factura evento creación cuantica 14al16nov2025.pdf",
+    "path": "",
+    "size": "328931",
+    "modifiedTime": "2025-11-15T17:53:02.335Z",
+    "webViewLink": "https://drive.google.com/file/d/11Rfa1EX2NIQjoDl5z5c7sM0nlasmeSoJ/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n3245874\njueves, 13 Noviembre, 2025\nREFERENCIA\nF301\n00040642\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n16/11/2025\nSALIDA\n14/11/2025\nFacturado a : \nUSUARIO\nEvento\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nSalas\n11,016.95\n11,016.95\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\n5ZU6hmcRkpjUv94+DD+cFpWkpUc=\nTRECE MIL Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n13,000.00\n0.00\n0.00\n0.00\n1,983.05\n0.00\n0.00\n11,016.95\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1L2qBDZIeNa89kYvaU5TYP6wBem0btk_F",
+    "name": "20512108751-01-FF01-12657.pdf",
+    "path": "",
+    "size": "116803",
+    "modifiedTime": "2025-11-14T17:01:22.462Z",
+    "webViewLink": "https://drive.google.com/file/d/1L2qBDZIeNa89kYvaU5TYP6wBem0btk_F/view?usp=drivesdk",
+    "text": "KeyFacil™\nComprobante emitido a través de www.keyfacil.com\nCONSTRUCTOR CENTER LATIN\nBROTHER\nPRINCIPAL » AV. TOMAS MARSANO NRO. 906 - LIMA\nLIMA SURQUILLO\nARTICULOS DE LIMPIEZA Y FERRETERIA EN\nGENERAL: FIERRO, CEMENTO, CONCRETO,\nPEGAMENTOS AGREGADOS , ENCHAPES,\nGRANALLAS, MARMOLINA, CEMENTO\nBLANCO,PEGAMENTO CHEMA,TREBOL,CELIMA,\nLADRILLOS, REFRECTARIOS, TEJAS\n,PASTELEROS,TRIPLAY , HERRAMIENTAS, ETC.\nCorreo : Mariachuquirunaplasencia@gmail.com\nCelulares : 998 740 965 / 925 889 599\n/925398496 /973455570 /964936280.\nPAGINA WEB PARA COMPRAS:\nWWW.CONSTRUCTORCENTER.COM\nRUC 20512108751\nFACTURA\nELECTRÓNICA\nFF01-0012657\nDOCUMENTO\nRUC 20612592811\nFECHA EMISIÓN\n13/11/2025\nCLIENTE\nCREACION CUANTICA E.I.R.L.\nFECHA VENCIMIENTO -\nDIRECCIÓN\nAV. SERGIO BERNALES NRO. 272 - LIMA LIMA LIMA\nMONEDA\nSOLES\nNº\nUNIDAD\nCÓDIGO\nDESCRIPCIÓN\nCANT.\nP. UNIT.\nTOTAL\n1\nUNIDADES\n20211028153245\nFIERRO DE 3/8 ACEROS AREQUIPA\n44.00\n33.00\n1452.00\n2\nUNIDADES\n20241122115224\nBOLSA DE ARENA\n6.00\n4.50\n27.00\n3\nUNIDADES\n20210108072407\nESCOBA PVC\n2.00\n12.00\n24.00\n4\nUNIDADES\n20201230111012\nMARTILLO\n2.00\n25.00\n50.00\n5\nUNIDADES\n20210102162057\nALICATE UNIVERSAL\n1.00\n19.00\n19.00\n6\nUNIDADES\n20210102105812\nLADRILLO PANDERETA\n40.00\n1.00\n40.00\n7\nUNIDADES\n20210210162550\nBOLSA PVC 180 LITROS\n10.00\n0.80\n8.00\n \n \n \n \n \n \n \nSON MIL SEISCIENTOS VEINTE Y 00/100 SOLES\nGRAVADO\nS/\n1,372.88\nI.G.V. 18%\nS/\n247.12\nTOTAL\nS/\n1,620.00\nUSUARIO\nADMINISTRADORA - 13/11/2025 06:15 PM\nCONDICIÓN DE PAGO\nCONTADO\nCUENTAS BANCARIAS\nCta.Ahorros BCP: 19491462961027. Maria Chuquiruna. PAGO YAPE:998740965 \nCta.Ahorros BBVA:001105080200307056. Maria Chuquiruna. PAGO PLIN:998740965\nRESPUESTA SUNAT\nLa Factura numero FF01-12657, ha sido aceptada\nAutorizado mediante resolución Nº 034-005-0010431/SUNAT\nRepresentación impresa de la FACTURA ELECTRÓNICA\nPara consultar el comprobante visita www.keyfacil.com\nResumen 3THHuQaj+2/ZLOblVOXmn2DDrIY=\n¡GRACIAS POR SU PREFERENCIA, REGRESE PRONTO!\n\n"
+  },
+  {
+    "id": "1Sd3Ay-F9wJu42t5vXUikIYd6CdBcGLEp",
+    "name": "S002-199521719_08_20251108.pdf",
+    "path": "",
+    "size": "265399",
+    "modifiedTime": "2025-11-13T11:52:41.650Z",
+    "webViewLink": "https://drive.google.com/file/d/1Sd3Ay-F9wJu42t5vXUikIYd6CdBcGLEp/view?usp=drivesdk",
+    "text": "Página 1 de 3\n+\n+\n-\n+\n+\nEntel Perú S.A.\nRUC: 20106897914\nAv. República de Colombia 791\nPiso 14 - San Isidro - Lima\n¡Hola! Te enviamos tu recibo del mes\n0\n50\n100\n150\n200\n250\nRequest ID: 17812 | Ciclo: 08 | Custcode: 5.7023\nCREACION CUANTICA E.I.R.L.\nAv Sergio Bernales Nro 272\nLima - Lima - Lima\nRecibo Nº\nEmisión\n:\n:\nS002-199521719\n08/Nov/2025\nInicio del Periodo\nFin del Periodo\n:\n:\n09/Nov/2025\n08/Dic/2025\nNº de Cuenta\nNº Doc (RUC)\n:\n:\n1.21765711\n20612592811\nTotal a pagar\nVencimiento\nS/ 205.31\n21/Nov/2025\nPlan\nProrrateo\nCargos\nAdicionales\nDescuentos o\nP. Adelantado\nEquipos\nSaldo\nAnterior\nS/ 346.30\nS/ 0.00\nS/ 0.00\n-S/ 140.99\nS/ 0.00\nS/ 0.00\nEn las siguientes páginas\npodrás encontrar el detalle de cada concepto\nFacturación de los últimos 6 meses\nJun\nJul\nAgo\nSep\nOct\nNov\nDesglose tributario\nSubtotal de Conceptos Facturados (sin IGV)\nIGV del Subtotal (18%)\nTotal (Incl. IGV)\nMontos ya gravados con IGV\nExentos IGV\nSaldo anterior\nTotal a pagar\n173.99\n31.32\n205.31\n0.00\n0.00\n0.00\n205.31\nDocumento válido para efectos tributarios según Res. de Sup. No. 007-99/SUNAT. Documento\nno afecto al régimen de retención del IGV por ser agente de retención, según Res. de Sup. No.\n037-2002/SUNAT. Los saldos de hasta S/0.09 que no cancele por falta de moneda de curso legal\n(S/0.05 y S/0.01), se registrarán y se mantendrán como pendientes de pago hasta su cancelación\nefectiva.\nRecuerda que puedes cambiar de operadora sin perder tu número. El trámite de portabilidad es\nrápido y gratuito. Migra tus líneas de otro operador hacia Entel y disfruta de los beneficios que\ntenemos para ti.\n\nPágina 2 de 3\nMira aquí el detalle\ntu recibo\nResumen\nNúmero\nPlan Tarifario\nPlan\nProrrateo\nCargos\nAdicionales (*)\nDescuentos o\nP. Adelantado\nEquipos (*)\nSaldo\nAnterior\nMonto S/\n(Incl. IGV)\n933599925\nEmprende Ilimitado 49.90\n49.90\n0.00\n0.00\n-34.93\n0.00\n0.00\n14.97\n933599903\nEmpresa PRO 2.0 59.9\n59.90\n0.00\n0.00\n-29.95\n0.00\n0.00\n29.95\n908931343\nEmpresa PRO 2.0 36.9\n36.90\n0.00\n0.00\n0.00\n0.00\n0.00\n36.90\n933599864\nEmpresa PRO 2.0 59.9\n59.90\n0.00\n0.00\n-29.95\n0.00\n0.00\n29.95\n912379686\nEmpresa PRO 2.0 44.9\n44.90\n0.00\n0.00\n-11.23\n0.00\n0.00\n33.67\n912379744\nEmpresa PRO 2.0 44.9\n44.90\n0.00\n0.00\n0.00\n0.00\n0.00\n44.90\n933599883\nEmprende Ilimitado 49.90\n49.90\n0.00\n0.00\n-34.93\n0.00\n0.00\n14.97\nCuenta\nCliente\n0.00\n0.00\n0.00\n0.00\n0.00\n0.00\n0.00\nTotal\n346.30\n0.00\n0.00\n-140.99\n0.00\n0.00\n205.31\n(*) Puede incluir conceptos exentos o ya gravados con IGV\nDetalle\nConceptos detallados\nPeríodo\nUnidad\nMonto S/ (Incl. IGV)\n933599925 (Emprende Ilimitado 49.90)\n14.97\nPlan\n09-nov al 08-dic\n30 días\n49.90\nDescuentos\n-34.93\nMA01 - Descuentos por fidelizacion 70% x 18m (3/18)\n09-nov al 08-dic\n30 días\n-34.93\n933599903 (Empresa PRO 2.0 59.9)\n29.95\nPlan\n09-nov al 08-dic\n30 días\n59.90\nDescuentos\n-29.95\nMA01 - Descuento por fidelizacion 50% x 12m (3/12)\n09-nov al 08-dic\n30 días\n-29.95\n933599864 (Empresa PRO 2.0 59.9)\n29.95\nPlan\n09-nov al 08-dic\n30 días\n59.90\nDescuentos\n-29.95\nMA01 - Descuento por fidelizacion 50% x 12m (3/12)\n09-nov al 08-dic\n30 días\n-29.95\n912379686 (Empresa PRO 2.0 44.9)\n33.67\nPlan\n09-nov al 08-dic\n30 días\n44.90\nDescuentos\n-11.23\nMA01 - Descuentos por fidelizacion 25% x 18m (10/18)\n09-nov al 08-dic\n30 días\n-11.23\n933599883 (Emprende Ilimitado 49.90)\n14.97\nPlan\n09-nov al 08-dic\n30 días\n49.90\nDescuentos\n-34.93\nMA01 - Descuentos por fidelizacion 70% x 18m (3/18)\n09-nov al 08-dic\n30 días\n-34.93\nCuenta Cliente\n0.00\nSaldos Anteriores\n0.00\nRecibo(s) anterior(es)\n205.31\nAbonos / Cargos varios al 08/11/2025\n-205.31\n\nPágina 3 de 3\nMira aquí el detalle\ntu recibo\nConceptos facturables\n.\nCargo Fijo (incluye prorrateo): Monto de Renta Mensual y consumo proporcional por los servicios de\nVoz, Mensajería y Datos, según Plan Tarifario Contratado.\nOtros Servicios Contratados: Monto fijo mensual por los servicios de:\n- Paquetes Contratados: Paquetes de datos, mensajería y LDI. Servicios de Blackberry, Localizador,\nEntel Backup y otros servicios de Valor Agregado: licencias, aplicativos de negocio, gestión de\ndispositivos móviles y otros.\n- Garantía: Servicio de reposición de equipos.\n- Arrendamiento: Alquiler de equipos.\nConsumos Adicionales: Monto facturado no comprendido dentro del cargo fijo mensual del plan\ntarifario contratado, por los servicios de Voz, Mensajería, Datos, Roaming Internacional, LDI, Redes\nSatelitales, Destinos Rurales.\nDatos locales y móviles: Servicio de internet brindado a través de equipos móviles, USB Módems,\nRouters, etc.\nDatos Roaming: Servicio de datos que Entel brinda en otros países.\nOtros Cargos y Abonos: Cargos y abonos no recurrentes.\nPromociones y Descuentos: Descuentos generados por promociones especiales.\nRecargo por Intereses: Cobro de intereses legales generados por la no cancelación de la totalidad del\nrecibo a la fecha de vencimiento.\nOtros Cargos y Abonos (ya gravados con IGV): Cargo de documentos emitidos por compra o\nfinanciamiento de equipos y/o Boletas/Facturas adicionales, ya gravados con IGV. Incluye Facturación\npor encargo de Otros Operadores según normativa vigente.\nGlosario\n.\nOn Net: Comunicación de un teléfono móvil Entel a otro teléfono móvil Entel.\nOff Net: Comunicación de un teléfono móvil Entel a cualquier teléfono fijo o móvil de otro operador.\nLDI: Larga Distancia Internacional.\nRedes Satelitales: Telefonía móvil a números satelitales.\nDestinos Rurales: Telefonía móvil a Destinos Rurales.\nRoaming Internacional: Servicio de Voz y Datos que Entel brinda en otros países.\nDescarga de Contenidos: Cargo por envío de mensajes y descargas.\nMB: Megabytes (1 MB = 1024 KB)\n- El límite de crédito asignado para consumo adicional de servicios será informado por mensaje de texto\nuna vez iniciada la utilización del referido límite. Para contratación de otros servicios, será evaluado\ncrediticiamente en la venta.\n- El pago no oportuno devengará en intereses legales. Entel puede proceder a la suspensión del Servicio a\npartir del día siguiente del último día de pago.\n- Si tu línea es suspendida por falta de pago, se aplicará un cargo por reconexión del servicio.\n- Reconexión del servicio máximo dentro de 24 horas de efectuado el pago correspondiente.\n- Conoce los lugares de pago en www.entel.pe\nMÓVILES: 123 (desde tu Entel) y 611-7777 (desde un teléfono fijo) Llamadas gratis: 0-800-0-9000 (Lima y\nprovincias).\nINTERNET Y SERVICIOS DE VALOR AGREGADO: 123 (desde tu Entel) y 611-7777 (desde un teléfono fijo).\nOSIPTEL: Fono Ayuda: 0-801-12121 Para detalle de llamadas a fijos o móviles consultar gratuitamente Mi\nEntel\" en www.entel.pe\n\n"
+  },
+  {
+    "id": "1aSVY8izzOxKgdoeean2HBGJQq-Xye31V",
+    "name": "DIP-FACT-Recibo_Ciclico_2025110005_S1AA-0047028978.pdf",
+    "path": "",
+    "size": "137358",
+    "modifiedTime": "2025-11-13T11:51:59.946Z",
+    "webViewLink": "https://drive.google.com/file/d/1aSVY8izzOxKgdoeean2HBGJQq-Xye31V/view?usp=drivesdk",
+    "text": "Integratel Perú S.A.A.   |   R.U.C. 20100017491   |   Jr. Domingo Martínez Luján N° 1130   |   Lima – Lima - Surquillo\nPágina 1/3\nEmpresas Fija\nRecibo Noviembre\nN° recibo: S1AA-0047028978\nCREACION CUANTICA EIRL\nRUC: 20612592811 \nCALLE BERLIN 965 Piso 3 URBANIZACION RESIDENCIAL JOSE BALTA,\nMIRAFLORES, 01, LIMA\nCuenta financiera: 753621842 \nID SUSCRIPTOR: 196980437\nID Cliente: 131054354\nAnexo: 1\nTotal a pagar del mes\nS/109.90\nÚltimo día de pago: 21/11\nN° Fijo / Cód. pago: 753621842\nDeuda anterior: S/0.00\n \nPaga a tiempo tu recibo y mantente siempre conectado.\nNo esperes hasta el último día de pago.\nCiclo de facturación - Noviembre 2025\n05/11\n21/11\nFecha de\nEmisión\nÚltimo día\nde pago\n¡LLAMA AL 0 800 11311!\nSi tienes un negocio y deseas comprar o portar una línea\nmóvil, adquirir un servicio de internet, TV o telefonía fija.\nCanal exclusivo para Clientes con RUC 20\nResumen de Recibo - NºS1AA-0047028978\nCargos Mensuales\nS/ 109.89\nSubtotal\nS/93.13\nIGV (18%)\nS/16.76\nTotal Afecto\nS/109.89\nDescuentos y Bonificaciones Inafectos\nS/ 0.00\nRedondeo\nS/ 0.01\nTotal Facturado\nS/109.90\nDevoluciones\nS/ 0.00\nDébitos\nS/ 0.00\nTotal a pagar\nS/ 109.90\n\nEmpresas Fija\nIntegratel Perú S.A.A.   |   R.U.C. 20100017491   |   Jr. Domingo Martínez Luján N° 1130   |   Lima – Lima - Surquillo\nPágina 2/3\nDetalle del recibo - N° S1AA-0047028978 - 196980437\nCargos Mensuales\nPrecio de vta.\nIGV S/109.89\nMovistar Internet 600 Mbps (06Nov al 05Dic)\n93.13\n16.76\n109.89\nDescuentos y Bonificaciones Inafectos\nPrecio de vta.\nIGV\nS/0.00\nBonificacion Prom Internet 1 GB x 12m 600 Mbps (06Nov \nal 05Dic) (VR S/127.03)\n0.00\n0.00\n0.00\nRedondeo\nPrecio de vta.\nIGV\nS/0.01\nRedondeo del mes Actual\n-0.03\n0.00\n-0.03\nRedondeo del mes Anterior\n0.04\n0.00\n0.04\n\nConceptos facturables\nCargos fijos mensuales\nCargo mensual facturado al cliente por el plan contratado\npara los servicios de voz y datos. Cargo fijo proporcional\ndel plan desde la fecha de inicio del servicio hasta el\nsiguiente cierre de facturación\nCargos por llamadas adicionales\nCargos por tráfico de voz, datos, mensajes de texto que\nno se encuentran comprendidos dentro del cargo fijo\nmensual.\nLarga distancia: cargo adicional por llamada de larga\ndistancia nacional o internacional\nKB internet y multimedia: navegación en internet y\ntráfico por descarga de aplicativos\nKB transmisión de datos: envío y recepción de datos.\nRoaming internacional: cargo por llamadas efectuadas y\nrecibidas en el extranjero\nDetalle de documentos afectos al IGV\nCargo por Reconexión: cargo facturado si el cliente\ncancela un recibo después de habérsele cortado por\ndeuda.\nCargo por Reconexión de corte APC (a pedido de cliente):\ncargo facturado al efectuarse la reactivación del servicio\nde la línea luego de cumplirse el plazo de suspensión.\nCargo por llamadas a operadoras rurales: llamadas\nrealizadas a teléfonos fijos rurales como Gilat to Home,\nValtron, Claro Rural, Integratel Rural o a teléfonos satelitales\ncomo Tesam.\nRenta fraccionaria por cambio de plan: cargo facturado si\ndurante el ciclo de la facturación el cliente cambió a un\nplan tarifario de cargo fijo mayor al que tenía.\nLugares de pago\nBancos y agentes\nBBVA Continental\nBanco Pichincha\nBCP\nBanco de la Nación\nBanBif\nInterbank\nScotiabank\nOtros\nAgente Multibanco KASNET\nMultibanco\nFullcarga\nRed Digital\nMetro\nWong\nWestern Union\nAlgunos lugares de pago presenciales pueden aplicar cobro de comisión de acuerdo a sus tarifarios vigentes.\nPuede realizar su pago de forma rápida y segura en el App Mi Movistar, YAPE o App o Web de su banco.\nRecuerda que también puede afiliar su recibo\nMovistar al débito automático, más info :\nhttp://smvst.com/DAT\nMayor información sobre lugares de pago en www.movistar.com.pe\n¿Qué es el recibo digital?\nEs un servicio gratuito que ofrece Integratel, con el que podrá recibir mensualmente su recibo en formato PDF al\ncorreo electrónico que usted indique. El envío del recibo digital va en reemplazo de su recibo físico.\n\n"
+  },
+  {
+    "id": "1tEjCUnuivT1gy493bvtlCFwl3TRxa_nY",
+    "name": "factura alojamiento Creación Cuántica 12 al 17nov202.pdf",
+    "path": "",
+    "size": "327624",
+    "modifiedTime": "2025-11-13T11:51:22.843Z",
+    "webViewLink": "https://drive.google.com/file/d/1tEjCUnuivT1gy493bvtlCFwl3TRxa_nY/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32412043\nmiércoles, 12 Noviembre, 2025\nREFERENCIA\nF301\n00040618\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n17/11/2025\nSALIDA\n12/11/2025\nFacturado a : \nUSUARIO\nAlonso Solares / Ernesto Diaz / Ekmer Idrobo\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nAlojamiento\n825.00\n825.00\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nrprRAjAA1YujXR4TtL88LEzwp10=\nUN MIL CINCUENTA Y SEIS Y 00/100 DOLARES AMERICANOS\nTotal  Propina\nUS $\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n1,056.00\n0.00\n0.00\n82.50\n148.50\n0.00\n0.00\n825.00\nTotal  Exportacion\n0.00\nCuentas corrientes  \nTotal  Descuento\nDolares\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1VQkpyJjafILOvcClwrspRc56jdW65Wvy",
+    "name": "FACTURA 1.pdf",
+    "path": "",
+    "size": "327996",
+    "modifiedTime": "2025-11-13T11:49:06.589Z",
+    "webViewLink": "https://drive.google.com/file/d/1VQkpyJjafILOvcClwrspRc56jdW65Wvy/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n3245874\nmartes, 11 Noviembre, 2025\nREFERENCIA\nF301\n00040614\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nAna Vasquez\n16/11/2025\nSALIDA\n14/11/2025\nFacturado a : \nUSUARIO\nEvento\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nSalas\n11,016.95\n11,016.95\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\npyAQp/JgVPDcOV7PJgslVnvAl9c=\nTRECE MIL Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n13,000.00\n0.00\n0.00\n0.00\n1,983.05\n0.00\n0.00\n11,016.95\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "18svpWBzEmUe4zeRm0CvZ4wjxVHJiikzu",
+    "name": "FACTURA 2.pdf",
+    "path": "",
+    "size": "327397",
+    "modifiedTime": "2025-11-13T11:48:18.019Z",
+    "webViewLink": "https://drive.google.com/file/d/18svpWBzEmUe4zeRm0CvZ4wjxVHJiikzu/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n3245874\nlunes, 10 Noviembre, 2025\nREFERENCIA\nF301\n00040585\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n16/11/2025\nSALIDA\n14/11/2025\nFacturado a : \nUSUARIO\nEvento\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nSalas\n16,949.15\n16,949.15\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nWiY5b7V6M/zl5Ren7jmXnU3lLmM=\nVEINTE MIL Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n20,000.00\n0.00\n0.00\n0.00\n3,050.85\n0.00\n0.00\n16,949.15\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "19fWRAdlsKprffFn5PrZr7fjUgaYK78qU",
+    "name": "20524520070-01-FA19-231.pdf",
+    "path": "",
+    "size": "14702",
+    "modifiedTime": "2025-11-04T14:44:56.071Z",
+    "webViewLink": "https://drive.google.com/file/d/19fWRAdlsKprffFn5PrZr7fjUgaYK78qU/view?usp=drivesdk",
+    "text": "Representación Impresa de la Factura de Venta Electrónica\nPuede consultar este documento en www.fegs.com.pe\nSEÑOR(ES)\n: CREACION CUANTICA E.I.R.L. \nRUC\n: 20612592811\nDOMICILIO FISCAL\n: CAL.BERLIN NRO. 965 INT. 302 LIMA - LIMA - MIRAFLORES\nFECHA DE EMISION\n: 03.11.2025\nGUIA DE REMISION\n: \nFORMA DE PAGO\n: CREDITO\nR.U.C. 20524520070\nFactura de Venta Electrónica\nN° FA19-231\nWORX S.A.C.\nOficina Principal\nAV. REPUBLICA DE PANAMA 3030\nSAN ISIDRO - LIMA 27\nAlmacen\nCantidad\nUnidad\nDescripción\nPrecio Unitario\nValor Venta\n1.000 \nUND\nWORX OFICINA 903 - NOVIEMBRE\n700.00 \n700.00 \n1.000 \nUND\nWORX OFICINA 904 - NOVIEMBRE\n399.00 \n399.00 \n1.000 \nUND\nWORX ESTACIONAMIENTO\n100.00 \n100.00 \nCuota\nMoneda\nMonto\nFecha\nCredito\nUSD\n       1,273.34 \nCuota001\nUSD\n       1,273.34 \n10.11.2025\nSON : MIL CUATROCIENTOS CATORCE CON 82/100\nUS DOLARES\nSUBTOTAL\nUSD\n1,199.00 \nDESCUENTO\nUSD\n0.00 \nOP. GRAVADAS USD\n1,199.00 \nI.G.V\nUSD\n215.82 \nR.CONSUMO\nUSD\n0.00 \nIMPORTE TOTAL USD\n1,414.82 \n\n"
+  },
+  {
+    "id": "1EVZMyJrchI_SwGX04ajeYEi7429vpvug",
+    "name": "FACTURA DAÑOS EN SILLA.pdf",
+    "path": "",
+    "size": "325008",
+    "modifiedTime": "2025-11-03T16:27:04.228Z",
+    "webViewLink": "https://drive.google.com/file/d/1EVZMyJrchI_SwGX04ajeYEi7429vpvug/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n3241730\ndomingo, 26 Octubre, 2025\nREFERENCIA\nF301\n00040242\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nAlison Del Castillo\n26/10/2025\nSALIDA\n23/10/2025\nFacturado a : \nUSUARIO\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nDiversos\n191.10\n191.10\nNIU\nSILLA\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\njQ8eV2h4FqOPUHd/k9PMMkUeLac=\nDOSCIENTOS VEINTICINCO Y 50/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n225.50\n0.00\n0.00\n0.00\n34.40\n0.00\n0.00\n191.10\nTotal  Exportacion\n0.00\nCuentas corrientes  \nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1GguS2yT_5-sj96aGYosaXWRLMXVv-FAv",
+    "name": "FACTURA DAÑOS EN ALFOMBRA.pdf",
+    "path": "",
+    "size": "325547",
+    "modifiedTime": "2025-11-03T16:26:53.889Z",
+    "webViewLink": "https://drive.google.com/file/d/1GguS2yT_5-sj96aGYosaXWRLMXVv-FAv/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n3241730\nlunes, 3 Noviembre, 2025\nREFERENCIA\nF301\n00040422\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n26/10/2025\nSALIDA\n23/10/2025\nFacturado a : \nUSUARIO\nDAÑOS EN SALA\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nDiversos\n1,271.19\n1,271.19\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nT2rW/cKDN+tepg6OZ8aJQj1Uneo=\nUN MIL QUINIENTOS Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n1,500.00\n0.00\n0.00\n0.00\n228.81\n0.00\n0.00\n1,271.19\nTotal  Exportacion\n0.00\nCuentas corrientes  \nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1yT_T6-BA3sLg02rQ5ZHZaGu71d0yk5kW",
+    "name": "PDF-DOC-E001-162320334777163.pdf",
+    "path": "",
+    "size": "4540",
+    "modifiedTime": "2025-11-03T16:26:53.063Z",
+    "webViewLink": "https://drive.google.com/file/d/1yT_T6-BA3sLg02rQ5ZHZaGu71d0yk5kW/view?usp=drivesdk",
+    "text": " \n \nLAS OBSIDIANAS \nCONCESIONES ANHERSA S.A.  \nCAL. LAS OBSIDIANAS 1383  \nLA VICTORIA - LIMA - LIMA \nFACTURA ELECTRONICA\nRUC: 20334777163 \nE001-1623 \nFecha de Emisión\n: 03/11/2025\nSeñor(es)\n: CREACION CUANTICA E.I.R.L.  \nRUC \n: 20612592811  \nDirección del Cliente \n: CAL. BERLIN 965 URB. SANTA CRUZ\nINT. 302 LIMA-LIMA-MIRAFLORES \nTipo de Moneda\n: SOLES \nObservación\n:  \nForma de pago: Contado\nCantidad\nUnidad Medida\nDescripción\nValor Unitario\nICBPER\n1.00\nUNIDAD\nSALDO SERVICIO DE ALOJAMIENTO Y ALIMENTOS\nEVENTO DEL 24 AL 26 DE COTUBRE DEL 2025\n12236.363636\n0.00\nValor de Venta de Operaciones Gratuitas : S/ 0.00 \n \n \nSON: TRECE MIL CUATROCIENTOS SESENTA Y 00/100 SOLES\n \n \nSub Total Ventas :\nS/ 12,236.36 \nAnticipos :\nS/ 0.00 \nDescuentos :\nS/ 0.00 \nValor Venta :\nS/ 12,236.36 \nISC :\nS/ 0.00 \nIGV :\nS/ 1,223.64 \nICBPER :\nS/ 0.00 \nOtros Cargos :\nS/ 0.00 \nOtros Tributos :\nS/ 0.00 \nMonto de redondeo :\nS/ 0.00 \nImporte Total :\nS/ 13,460.00 \nInformación de la detracción\nLeyenda:\nOperación sujeta al Sistema de Pago de Obligaciones Tributarias con el Gobierno Central\nBien o Servicio:\n037  Demás servicios gravados con el IGV\nMedio de pago:\n001  Depósito en cuenta\nNro. Cta. Banco de la Nación:\n00005194563\nPorcentaje de detracción:\n12.00\nMonto detracción:\nS/ 1615.00\nEsta es una representación impresa de la factura electrónica, generada en el Sistema de SUNAT. Puede\nverificarla utilizando su clave SOL.\n\n"
+  },
+  {
+    "id": "1byRFJSoOZ9NXIbylPvmHDo3Jsw5FNvsa",
+    "name": "20303368877-01-F105-9215.pdf",
+    "path": "",
+    "size": "117242",
+    "modifiedTime": "2025-11-02T23:55:26.504Z",
+    "webViewLink": "https://drive.google.com/file/d/1byRFJSoOZ9NXIbylPvmHDo3Jsw5FNvsa/view?usp=drivesdk",
+    "text": "Cant\nUnidad\nNombre\nPrecio\nSub total\n1.0\nNIU\nAlojamiento\n425.00\n425.00\nRUC: 20303368877\nFACTURA ELECTRÓNICA\nN° F105-00009215\nFIGTUR S.A.\nFECHA DE EMISION\nmiércoles,29 octubre, 2025\nmiércoles,29 octubre, 2025\nFECHA DE VCMTO\nAV. GUARDIA CIVIL # 727 URB. CORPAC SAN BORJA LIMA - LIMA\nTelefono : (51) (1) 3195300\nAdquiriente :\nCREACION CUANTICA E.I.R.L.\nCAL. BERLIN NRO. 965 INT. 302 URB. SANTA CRUZ - LIMA LIMA MIRAFLORES\nRUC N°: 20612592811\nRESERVA\n302208\nHAB\nLLEGADA\n2025-11-05\nSALIDA 2025-11-10\nMONEDA\nDOLARES AMERICANOS\nREFERENCIA\nMUÑOZ VASQUEZ  , MILDRED\nUSUARIO\nNestor Perez\nFORMA DE PAGO\nO.COMPRA\nCONTADO\nPASAPORTE\nTotal Oper.Gratuitas\n0.00\nUS$\nTotal Descuentos\n0.00\nTotal Exportacion\nTotal Gravado\n425.00\nTotal Inafecto\n0.00\nTotal Exonerado\n0.00\nTotal IGV  (%)\n18.00\n76.50\nTotal R.Consumo (%) 10.00\n42.50\nTotal Paid. Out\n0.00\nTotal Propina\n0.00\nTotal ICBPER\n0.00\nTotal Venta\nUS$\n544.00\nBCP SOLES   191-0216592-0-97\nBCP DOLARES 191-0216816-1-69\nSON\nQUINIENTOS CUARENTA Y CUATRO CON 00/100 DOLARES AMERICANOS\nMVb7ag2FDTe2uIUjTq//KcNNnqI=\nRepresentación impresa del Comprobante Electrónico puede ser consultada en \nhttps://portal.shiol.net/Consultar/20303368877\n\n"
+  },
+  {
+    "id": "1GMn3ytwUFH2v47uJeayxg2li3esRwArs",
+    "name": "FACTURA SALDO EVENTO CREACION CUANTICA 23 AL 26OCT2025.pdf",
+    "path": "",
+    "size": "328680",
+    "modifiedTime": "2025-10-22T17:02:09.279Z",
+    "webViewLink": "https://drive.google.com/file/d/1GMn3ytwUFH2v47uJeayxg2li3esRwArs/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n3241730\nmiércoles, 22 Octubre, 2025\nREFERENCIA\nF301\n00040105\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n26/10/2025\nSALIDA\n23/10/2025\nFacturado a : \nUSUARIO\nEvento\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nSalas\n11,440.68\n11,440.68\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\np9njQeTRRRisWowPjGmJ4VsF4kU=\nTRECE MIL QUINIENTOS Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n13,500.00\n0.00\n0.00\n0.00\n2,059.32\n0.00\n0.00\n11,440.68\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1Q3AK3Ez7CeRvaV84kBgbW4A4lZLnTElY",
+    "name": "20601007119-01-F003-00009804.pdf",
+    "path": "",
+    "size": "37632",
+    "modifiedTime": "2025-10-21T20:17:46.492Z",
+    "webViewLink": "https://drive.google.com/file/d/1Q3AK3Ez7CeRvaV84kBgbW4A4lZLnTElY/view?usp=drivesdk",
+    "text": "MALECON BALTA OPERATOR S.A.C\nAV. JAVIER PRADO OESTE NRO. 769 - SAN ISIDRO - LIMA - LIMA\nR.U.C. 20601007119\nFACTURA ELECTRÓNICA\nF003 N° 00009804\nRAZÓN SOCIAL:\nFECHA DE EMISIÓN:\nCREACION CUANTICA E.I.R.L.\nFECHA DE VENCIMIENTO:\n16/10/2025\nDIRECCIÓN:\nCAL.BERLIN NRO. 965 INT. 302 URB. SANTA CRUZ LIMA - LIMA - MIRAFLORES\nMONEDA:\n16/10/2025\n20612592811\nSOLES\nLLEGADA:\n25/10/2025\nSALIDA:\n25/10/2025\nRUC:\nA NOMBRE:\nPASAPORTE:\nFORMA DE PAGO:\nCONTADO\nDESCRIPCIÓN\nCANTIDAD\nPRECIO UNITARIO\nTOTAL\n2,343.75\n1\n2,343.75\nEVENTOS\nSON : TRES MIL CON 00/100 SOLES\nBanco de Crédito del Perú\nDOLARES\nBanco\nSOLES\n191-9747180-1-72\nCCI\nBanco de Crédito del Perú\nNúmero de Cuenta\n191-9673128-0-61\n00219100974718017256\nMoneda\n00219100967312806154\nAUTORIZADO MEDIANTE RESOLUCIÓN NRO.034-005-0005038/SUNAT\nREPRESENTACIÓN IMPRESA DE LA FACTURA ELECTRÓNICA\nPUEDE CONSULTAR ESTE COMPROBANTE EN:https://prod.ebis.pe/CecWeb/Consulta.jsf?e=20601007119\nEXISTE LA POSIBILIDAD DE QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRÁ UN CAMBIO EN EL\nNÚMERO DE COMPROBANTE.\nMÉTODO PAGO SUNAT:\nCONTADO\nMONTO NETO PENDIENTE DE PAGO:\n0.00\n  OP.\nGRAVADA\n0.00\n2,343.75\n  OP.\nINAFECTA\n0.00\n0.00\nOP.\nEXPORTACIÓN\n421.88\n0.00\nI.G.V\n0.00\nI.S.C\nT.DSCTO.\n IMPORTE\nTOTAL\nR.CONS.10%\nPAID OUT\n234.37\n0.00\n3,000.00\n0.00\nPROPINA\n  OP.\nEXONERADAS\nBCPLPEPL\nSWITF\nBCPLPEPL\n037 DEMÁS SERVICIOS GRAVADOS CON EL IGV\nBIENES O SERVICIO:\nDEPÓSITO EN CUENTA\nMEDIO PAGO:\n00-046-326121\nNUMERO DE CUENTA:\nPORCENTAJE DETRACCION:\n12 %\n360.00\nMONTO DE DETRACCION:\nOperación sujeta al Sistema de Pago de Obligaciones Tributarias con el Gobierno Central\n-1-\n\n"
+  },
+  {
+    "id": "16TvKgoqJyVkx7lF1-V_Qzy9Oiz1W8Ee7",
+    "name": "factura alojamiento jose antonio torron.pdf",
+    "path": "",
+    "size": "326503",
+    "modifiedTime": "2025-10-16T21:00:18.941Z",
+    "webViewLink": "https://drive.google.com/file/d/16TvKgoqJyVkx7lF1-V_Qzy9Oiz1W8Ee7/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n32410757\njueves, 16 Octubre, 2025\nREFERENCIA\nF301\n00039938\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n27/10/2025\nSALIDA\n23/10/2025\nFacturado a : \nUSUARIO\nJosé Antonioo Torron Ramirez\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nAlojamiento\n275.00\n275.00\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\n37T6pnbWjZpDRC67OPl0aK1oFYE=\nTRESCIENTOS CINCUENTA Y DOS Y 00/100 DOLARES AMERICANOS\nTotal  Propina\nUS $\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n352.00\n0.00\n0.00\n27.50\n49.50\n0.00\n0.00\n275.00\nTotal  Exportacion\n0.00\nCuentas corrientes  \nTotal  Descuento\nDolares\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "15G6SJWnfDTYSehmb7k21FoN9eAT_Wn_t",
+    "name": "INV325784119_A21734284_10142025.pdf",
+    "path": "",
+    "size": "770055",
+    "modifiedTime": "2025-10-15T17:22:05.587Z",
+    "webViewLink": "https://drive.google.com/file/d/15G6SJWnfDTYSehmb7k21FoN9eAT_Wn_t/view?usp=drivesdk",
+    "text": "Factura\nZoom Communications, Inc.\n55 Almaden Blvd, 6th Floor\nSan Jose, CA 95113\nFecha de la factura:\nNúm. de factura:\nCondiciones de pago:\nFecha de vencimiento:\nNúmero de cuenta:\nMoneda:\nForma de pago:\nInformación de la cuenta:\nDirección del solicitante:\nDirección de facturación:\n14/10/2025\nINV325784119\nPagadero al momento de la recepción\n14/10/2025\n7043318804\nUSD\nVisa ************2634\nCREAR PODER SIN LIMITES PERU\nDalias 136,\nMiraflores, Provincia de Lima 15074\nPeru\ncrearpodersinlimitesperu@gmail.com\nDalias 136,\nMiraflores, Provincia de Lima 15074\nPeru\ncrearpodersinlimitesperu@gmail.com\nRUC de Zoom: 20614207583\nNúmero de orden de compra:\nNúmero de IVA/identificación fiscal del cliente:\nZoom W-9\nDetalles del cargo\nDescripción del cargo\nPeríodo de suscripción\nSubtotal\nImpuestos, tasas y\nrecargos\nTotal\nNombre del cargo: Zoom\nWorkplace Pro Annual\nCantidad: 1\nPrecio unitario: 159,90\n14/10/2025 - 13/10/2026\n159,90 USD\n28,78 USD\n188,68 USD\nSubtotal\n159,90 USD\nTotal (incluidos impuestos, tasas y recargos)\n188,68 USD\nSaldo de la factura\n0,00 USD\nDetalles de impuestos, tasas y cargos\n\nNombre del cargo\nNombre del\nimpuesto, tasa o\nrecargo\nJurisdicción\nMonto del cargo\nMonto del impuesto, tasa\no recargo\nZoom Workplace Pro Annual\nValue Added Tax\n(VAT) 18.000 %\nFederal\n159,90 USD\n28,78 USD\nTotal de impuestos, tasas y recargos\n28,78 USD\nTransacciones\nTotal de la factura\n188,68 USD\nFecha de la\ntransacción\nNúmero de transacción\nTipo de transacción\nDescripción\nImporte aplicado\n14/10/2025\nP-383154915\nPayment\n- 188,68 USD\nSaldo de la factura\n0,00 USD\n¿Necesita ayuda para entender su factura?\nHaga clic aquí\nZoom One cambia su marca a Zoom Workplace. Este nuevo nombre no afecta sus servicios.\nTenga en cuenta que ZoomIQ for Sales ahora se llama Zoom Revenue Accelerator. Sus servicios seguirán siendo los\nmismos y este cambio de nombre no modifica el precio de su suscripción actual.\nEste plan incluye productos con períodos de suscripción mensuales o anuales. El período de suscripción para\ncada plan y el cargo total, 159,90 USD (más los impuestos y las tasas reglamentarias aplicables), por período de\nsuscripción para ese producto se indican más arriba en la sección Detalles del cargo. A menos que las cancele,\nsus suscripciones se renovarán automáticamente cada período de suscripción, y cada período de suscripción\nposterior, a los precios indicados anteriormente (más los impuestos y las tasas reglamentarias aplicables en el\nmomento de la renovación) y se cargará su método de pago registrado en zoom.us/billing. Puede cancelar la\nrenovación automática en cualquier momento, pero debe hacerlo antes del último día de su período de\nsuscripción actual para evitar que se le cobre el siguiente período de suscripción. No podrá cancelar su ''plan\nbásico'' (Zoom Meetings, Zoom Phone o Zoom Rooms) sin cancelar primero todas las demás suscripciones de\nsu plan. Si cancela, no recibirá un reembolso por el resto del periodo de suscripción vigente en ese momento.\nPara cancelarla, vaya a zoom.us/billing y haga clic en Cancelar suscripción. Siga haciendo clic en los avisos que\naparecen y, a continuación, haga clic para confirmar la cancelación. En el caso de que Zoom cambie sus\nprecios, se lo notificará y es posible que se le cobre el nuevo precio para la siguiente suscripción.\n\n\n"
+  },
+  {
+    "id": "18RbsolZIJcwX09Kyyj0F4vPSDK_gQamA",
+    "name": "S002-195484742_08_20251008.pdf",
+    "path": "",
+    "size": "265391",
+    "modifiedTime": "2025-10-14T14:56:35.378Z",
+    "webViewLink": "https://drive.google.com/file/d/18RbsolZIJcwX09Kyyj0F4vPSDK_gQamA/view?usp=drivesdk",
+    "text": "Página 1 de 3\n+\n+\n-\n+\n+\nEntel Perú S.A.\nRUC: 20106897914\nAv. República de Colombia 791\nPiso 14 - San Isidro - Lima\n¡Hola! Te enviamos tu recibo del mes\n0\n50\n100\n150\n200\n250\nRequest ID: 12523 | Ciclo: 08 | Custcode: 5.7023\nCREACION CUANTICA E.I.R.L.\nAv Sergio Bernales Nro 272\nLima - Lima - Lima\nRecibo Nº\nEmisión\n:\n:\nS002-195484742\n08/Oct/2025\nInicio del Periodo\nFin del Periodo\n:\n:\n09/Oct/2025\n08/Nov/2025\nNº de Cuenta\nNº Doc (RUC)\n:\n:\n1.21765711\n20612592811\nTotal a pagar\nVencimiento\nS/ 205.31\n21/Oct/2025\nPlan\nProrrateo\nCargos\nAdicionales\nDescuentos o\nP. Adelantado\nEquipos\nSaldo\nAnterior\nS/ 346.30\nS/ 0.00\nS/ 0.00\n-S/ 140.99\nS/ 0.00\nS/ 0.00\nEn las siguientes páginas\npodrás encontrar el detalle de cada concepto\nFacturación de los últimos 6 meses\nMay\nJun\nJul\nAgo\nSep\nOct\nDesglose tributario\nSubtotal de Conceptos Facturados (sin IGV)\nIGV del Subtotal (18%)\nTotal (Incl. IGV)\nMontos ya gravados con IGV\nExentos IGV\nSaldo anterior\nTotal a pagar\n173.99\n31.32\n205.31\n0.00\n0.00\n0.00\n205.31\nDocumento válido para efectos tributarios según Res. de Sup. No. 007-99/SUNAT. Documento\nno afecto al régimen de retención del IGV por ser agente de retención, según Res. de Sup. No.\n037-2002/SUNAT. Los saldos de hasta S/0.09 que no cancele por falta de moneda de curso legal\n(S/0.05 y S/0.01), se registrarán y se mantendrán como pendientes de pago hasta su cancelación\nefectiva.\nRecuerda que puedes cambiar de operadora sin perder tu número. El trámite de portabilidad es\nrápido y gratuito. Migra tus líneas de otro operador hacia Entel y disfruta de los beneficios que\ntenemos para ti.\n\nPágina 2 de 3\nMira aquí el detalle\ntu recibo\nResumen\nNúmero\nPlan Tarifario\nPlan\nProrrateo\nCargos\nAdicionales (*)\nDescuentos o\nP. Adelantado\nEquipos (*)\nSaldo\nAnterior\nMonto S/\n(Incl. IGV)\n933599925\nEmprende Ilimitado 49.90\n49.90\n0.00\n0.00\n-34.93\n0.00\n0.00\n14.97\n933599903\nEmpresa PRO 2.0 59.9\n59.90\n0.00\n0.00\n-29.95\n0.00\n0.00\n29.95\n908931343\nEmpresa PRO 2.0 36.9\n36.90\n0.00\n0.00\n0.00\n0.00\n0.00\n36.90\n933599864\nEmpresa PRO 2.0 59.9\n59.90\n0.00\n0.00\n-29.95\n0.00\n0.00\n29.95\n912379686\nEmpresa PRO 2.0 44.9\n44.90\n0.00\n0.00\n-11.23\n0.00\n0.00\n33.67\n912379744\nEmpresa PRO 2.0 44.9\n44.90\n0.00\n0.00\n0.00\n0.00\n0.00\n44.90\n933599883\nEmprende Ilimitado 49.90\n49.90\n0.00\n0.00\n-34.93\n0.00\n0.00\n14.97\nCuenta\nCliente\n0.00\n0.00\n0.00\n0.00\n0.00\n0.00\n0.00\nTotal\n346.30\n0.00\n0.00\n-140.99\n0.00\n0.00\n205.31\n(*) Puede incluir conceptos exentos o ya gravados con IGV\nDetalle\nConceptos detallados\nPeríodo\nUnidad\nMonto S/ (Incl. IGV)\n933599925 (Emprende Ilimitado 49.90)\n14.97\nPlan\n09-oct al 08-nov\n31 días\n49.90\nDescuentos\n-34.93\nMA01 - Descuentos por fidelizacion 70% x 18m (2/18)\n09-oct al 08-nov\n31 días\n-34.93\n933599903 (Empresa PRO 2.0 59.9)\n29.95\nPlan\n09-oct al 08-nov\n31 días\n59.90\nDescuentos\n-29.95\nMA01 - Descuento por fidelizacion 50% x 12m (2/12)\n09-oct al 08-nov\n31 días\n-29.95\n933599864 (Empresa PRO 2.0 59.9)\n29.95\nPlan\n09-oct al 08-nov\n31 días\n59.90\nDescuentos\n-29.95\nMA01 - Descuento por fidelizacion 50% x 12m (2/12)\n09-oct al 08-nov\n31 días\n-29.95\n912379686 (Empresa PRO 2.0 44.9)\n33.67\nPlan\n09-oct al 08-nov\n31 días\n44.90\nDescuentos\n-11.23\nMA01 - Descuentos por fidelizacion 25% x 18m (9/18)\n09-oct al 08-nov\n31 días\n-11.23\n933599883 (Emprende Ilimitado 49.90)\n14.97\nPlan\n09-oct al 08-nov\n31 días\n49.90\nDescuentos\n-34.93\nMA01 - Descuentos por fidelizacion 70% x 18m (2/18)\n09-oct al 08-nov\n31 días\n-34.93\nCuenta Cliente\n0.00\nSaldos Anteriores\n0.00\nRecibo(s) anterior(es)\n242.99\nAbonos / Cargos varios al 08/10/2025\n-242.99\n\nPágina 3 de 3\nMira aquí el detalle\ntu recibo\nConceptos facturables\n.\nCargo Fijo (incluye prorrateo): Monto de Renta Mensual y consumo proporcional por los servicios de\nVoz, Mensajería y Datos, según Plan Tarifario Contratado.\nOtros Servicios Contratados: Monto fijo mensual por los servicios de:\n- Paquetes Contratados: Paquetes de datos, mensajería y LDI. Servicios de Blackberry, Localizador,\nEntel Backup y otros servicios de Valor Agregado: licencias, aplicativos de negocio, gestión de\ndispositivos móviles y otros.\n- Garantía: Servicio de reposición de equipos.\n- Arrendamiento: Alquiler de equipos.\nConsumos Adicionales: Monto facturado no comprendido dentro del cargo fijo mensual del plan\ntarifario contratado, por los servicios de Voz, Mensajería, Datos, Roaming Internacional, LDI, Redes\nSatelitales, Destinos Rurales.\nDatos locales y móviles: Servicio de internet brindado a través de equipos móviles, USB Módems,\nRouters, etc.\nDatos Roaming: Servicio de datos que Entel brinda en otros países.\nOtros Cargos y Abonos: Cargos y abonos no recurrentes.\nPromociones y Descuentos: Descuentos generados por promociones especiales.\nRecargo por Intereses: Cobro de intereses legales generados por la no cancelación de la totalidad del\nrecibo a la fecha de vencimiento.\nOtros Cargos y Abonos (ya gravados con IGV): Cargo de documentos emitidos por compra o\nfinanciamiento de equipos y/o Boletas/Facturas adicionales, ya gravados con IGV. Incluye Facturación\npor encargo de Otros Operadores según normativa vigente.\nGlosario\n.\nOn Net: Comunicación de un teléfono móvil Entel a otro teléfono móvil Entel.\nOff Net: Comunicación de un teléfono móvil Entel a cualquier teléfono fijo o móvil de otro operador.\nLDI: Larga Distancia Internacional.\nRedes Satelitales: Telefonía móvil a números satelitales.\nDestinos Rurales: Telefonía móvil a Destinos Rurales.\nRoaming Internacional: Servicio de Voz y Datos que Entel brinda en otros países.\nDescarga de Contenidos: Cargo por envío de mensajes y descargas.\nMB: Megabytes (1 MB = 1024 KB)\n- El límite de crédito asignado para consumo adicional de servicios será informado por mensaje de texto\nuna vez iniciada la utilización del referido límite. Para contratación de otros servicios, será evaluado\ncrediticiamente en la venta.\n- El pago no oportuno devengará en intereses legales. Entel puede proceder a la suspensión del Servicio a\npartir del día siguiente del último día de pago.\n- Si tu línea es suspendida por falta de pago, se aplicará un cargo por reconexión del servicio.\n- Reconexión del servicio máximo dentro de 24 horas de efectuado el pago correspondiente.\n- Conoce los lugares de pago en www.entel.pe\nMÓVILES: 123 (desde tu Entel) y 611-7777 (desde un teléfono fijo) Llamadas gratis: 0-800-0-9000 (Lima y\nprovincias).\nINTERNET Y SERVICIOS DE VALOR AGREGADO: 123 (desde tu Entel) y 611-7777 (desde un teléfono fijo).\nOSIPTEL: Fono Ayuda: 0-801-12121 Para detalle de llamadas a fijos o móviles consultar gratuitamente Mi\nEntel\" en www.entel.pe\n\n"
+  },
+  {
+    "id": "1DR2Dm4KKYKgeT3UQ98CK4riX2LEyo-DM",
+    "name": "DIP-FACT-Recibo_Ciclico_2025100005_S1AA-0046350006.pdf",
+    "path": "",
+    "size": "137347",
+    "modifiedTime": "2025-10-10T18:32:04.222Z",
+    "webViewLink": "https://drive.google.com/file/d/1DR2Dm4KKYKgeT3UQ98CK4riX2LEyo-DM/view?usp=drivesdk",
+    "text": "Integratel Perú S.A.A.   |   R.U.C. 20100017491   |   Jr. Domingo Martínez Luján N° 1130   |   Lima – Lima - Surquillo\nPágina 1/3\nEmpresas Fija\nRecibo Octubre\nN° recibo: S1AA-0046350006\nCREACION CUANTICA EIRL\nRUC: 20612592811 \nCALLE BERLIN 965 Piso 3 URBANIZACION RESIDENCIAL JOSE BALTA,\nMIRAFLORES, 01, LIMA\nCuenta financiera: 753621842 \nID SUSCRIPTOR: 196980437\nID Cliente: 131054354\nAnexo: 1\nTotal a pagar del mes\nS/109.90\nÚltimo día de pago: 21/10\nN° Fijo / Cód. pago: 753621842\nDeuda anterior: S/0.00\n \nPaga a tiempo tu recibo y mantente siempre conectado.\nNo esperes hasta el último día de pago.\nCiclo de facturación - Octubre 2025\n05/10\n21/10\nFecha de\nEmisión\nÚltimo día\nde pago\n¡LLAMA AL 0 800 11311!\nSi tienes un negocio y deseas comprar o portar una línea\nmóvil, adquirir un servicio de internet, TV o telefonía fija.\nCanal exclusivo para Clientes con RUC 20\nResumen de Recibo - NºS1AA-0046350006\nCargos Mensuales\nS/ 109.89\nSubtotal\nS/93.13\nIGV (18%)\nS/16.76\nTotal Afecto\nS/109.89\nDescuentos y Bonificaciones Inafectos\nS/ 0.00\nRedondeo\nS/ 0.01\nTotal Facturado\nS/109.90\nDevoluciones\nS/ 0.00\nDébitos\nS/ 0.00\nTotal a pagar\nS/ 109.90\n\nEmpresas Fija\nIntegratel Perú S.A.A.   |   R.U.C. 20100017491   |   Jr. Domingo Martínez Luján N° 1130   |   Lima – Lima - Surquillo\nPágina 2/3\nDetalle del recibo - N° S1AA-0046350006 - 196980437\nCargos Mensuales\nPrecio de vta.\nIGV S/109.89\nMovistar Internet 600 Mbps (06Oct al 05Nov)\n93.13\n16.76\n109.89\nDescuentos y Bonificaciones Inafectos\nPrecio de vta.\nIGV\nS/0.00\nBonificacion Prom Internet 1 GB x 12m 600 Mbps (06Oct \nal 05Nov) (VR S/127.03)\n0.00\n0.00\n0.00\nRedondeo\nPrecio de vta.\nIGV\nS/0.01\nRedondeo del mes Actual\n-0.04\n0.00\n-0.04\nRedondeo del mes Anterior\n0.05\n0.00\n0.05\n\nConceptos facturables\nCargos fijos mensuales\nCargo mensual facturado al cliente por el plan contratado\npara los servicios de voz y datos. Cargo fijo proporcional\ndel plan desde la fecha de inicio del servicio hasta el\nsiguiente cierre de facturación\nCargos por llamadas adicionales\nCargos por tráfico de voz, datos, mensajes de texto que\nno se encuentran comprendidos dentro del cargo fijo\nmensual.\nLarga distancia: cargo adicional por llamada de larga\ndistancia nacional o internacional\nKB internet y multimedia: navegación en internet y\ntráfico por descarga de aplicativos\nKB transmisión de datos: envío y recepción de datos.\nRoaming internacional: cargo por llamadas efectuadas y\nrecibidas en el extranjero\nDetalle de documentos afectos al IGV\nCargo por Reconexión: cargo facturado si el cliente\ncancela un recibo después de habérsele cortado por\ndeuda.\nCargo por Reconexión de corte APC (a pedido de cliente):\ncargo facturado al efectuarse la reactivación del servicio\nde la línea luego de cumplirse el plazo de suspensión.\nCargo por llamadas a operadoras rurales: llamadas\nrealizadas a teléfonos fijos rurales como Gilat to Home,\nValtron, Claro Rural, Integratel Rural o a teléfonos satelitales\ncomo Tesam.\nRenta fraccionaria por cambio de plan: cargo facturado si\ndurante el ciclo de la facturación el cliente cambió a un\nplan tarifario de cargo fijo mayor al que tenía.\nLugares de pago\nBancos y agentes\nBBVA Continental\nBanco Pichincha\nBCP\nBanco de la Nación\nBanBif\nInterbank\nScotiabank\nOtros\nAgente Multibanco KASNET\nMultibanco\nFullcarga\nRed Digital\nMetro\nWong\nWestern Union\nAlgunos lugares de pago presenciales pueden aplicar cobro de comisión de acuerdo a sus tarifarios vigentes.\nPuede realizar su pago de forma rápida y segura en el App Mi Movistar, YAPE o App o Web de su banco.\nRecuerda que también puede afiliar su recibo\nMovistar al débito automático, más info :\nhttp://smvst.com/DAT\nMayor información sobre lugares de pago en www.movistar.com.pe\n¿Qué es el recibo digital?\nEs un servicio gratuito que ofrece Integratel, con el que podrá recibir mensualmente su recibo en formato PDF al\ncorreo electrónico que usted indique. El envío del recibo digital va en reemplazo de su recibo físico.\n\n"
+  },
+  {
+    "id": "13MGE8i0-TMhZcGbWKXHxBnRD-dmRjFVA",
+    "name": "20379719440-01-F004-00009796.pdf",
+    "path": "",
+    "size": "37075",
+    "modifiedTime": "2025-10-10T15:48:01.484Z",
+    "webViewLink": "https://drive.google.com/file/d/13MGE8i0-TMhZcGbWKXHxBnRD-dmRjFVA/view?usp=drivesdk",
+    "text": "Cantidad\nUnidad\nCódigo\nCódigo SUNAT\nDescripción\nValor unitario\nImporte\n1.000\nNIU\n90111500\nALOJAMIENTO\nS/ 920.00\nS/ 920.00\n \n \n \n \nCargo al item\n \n+ S/ 92.00\n \nDatos del documento\nTipo de documento: FACTURA ELECTRONICA\nSerie y correlativo: F004-00009796\nFecha:  10-10-2025\nHora:  09:09:33\nDatos del emisor\nAdquiriente / Usuario\nRUC: 20379719440 \nNombre: 100PRE FELIZ SOCIEDAD ANONIMA CERRADA \nDirección: JR. PARURO NRO. 878 (ALT. CALLE CAPON), LIMA, LIMA, \nDEPARTAMENTO LIMA \nSucursal:  SUCURSAL \nTelefono: \nIdentificación: RUC - REGISTRO UNICO DE CONTRIBUYENTES \nNúmero de identificación: 20612592811 \nNombre: CREACION CUANTICA E.I.R.L. \nDirección: CAL.BERLIN NRO. 965 INT. 302 URB. SANTA CRUZ LIMA - LIMA - \nMIRAFLORES,,,,PERÚ \nRepresentación impresa de una FACTURA DE VENTA ELECTRÓNICA \nPuede descargar su comprobante desde el sitio: \nhttps://factura.thefactoryhka.com.pe/consultadocumentos\nPowered\nby\nPág. 1\nInformación adicional\nFormas de Pago: DEPOSITO S/\nCheckIn: 10-10-2025\nCheckOut: 13-10-2025\nReserva: 7088/2025\nHuésped: DIAZ PABON,ERNESTO ALEJANDRO\nNoches: 3\n Monto en letra: UN MIL CIENTO SETENTA Y SIETE Y 60/100   \nSOLES \nForma de Pago: Contado\n \n \nTotal impuestos\nTotal IGV 18%: S/ 165.60 \n \nTotales del documento\nTotal Cargos: S/ 92.00 \nTotal Gravadas: S/ 920.00 \nImporte total de la venta: S/ 1,085.60 \nImporte total a pagar: S/ 1,177.60 \n\n"
+  },
+  {
+    "id": "1hcNjkV4dnJKL09O8HaNM2nZOKgPEnR_f",
+    "name": "F400-00019622 - CREACION CUANTICA.pdf",
+    "path": "",
+    "size": "216024",
+    "modifiedTime": "2025-10-10T15:47:48.272Z",
+    "webViewLink": "https://drive.google.com/file/d/1hcNjkV4dnJKL09O8HaNM2nZOKgPEnR_f/view?usp=drivesdk",
+    "text": " \n100PRE FELIZ SAC\n100Pre Feliz S.A.C.\nPrincipal: Jr. Paruro N° 878 - Lima - Lima - Lima\nSuc.: Av. República de Panamá N° 6461\nMiraflores - Lima - Lima\nTeléfono: 660-2028 / 660-2018\n \nR.U.C Nº 20379719440\nFACTURA \nELECTRÓNICA\nF400-00019622\nRazón social\n: CREACION CUANTICA E.I.R.L.\nR.U.C\n: 20612592811\nDirección\n: CAL.BERLIN NRO. 965 INT. 302\nUbigeo\n: MIRAFLORES - LIMA - LIMA\nUrbanización\n: SANTA CRUZ\n \n \nMoneda\n: Soles\nFecha emisión\n: 09/10/2025 21:43:03\nFecha vencimiento\n: 09/10/2025\nForma de pago\n: Contado\nDias credito\n: -\nOrden de compra\n: 0\nCliente\n: 03556-CREACION CUANTICA E.I.R.L.\nReserva\n: 058603\nGrupo\n: JESUS ACOSTA - ANA ELENA MONROY\nCheck in\n: 09/10/2025\nCheck out\n: 13/10/2025\nCantidad noches\n: 4\nHabitaciones\n: 406; 407\nTipo de cambio : 3.700\n \n \nObservaciones:\nRepresentación Impresa de la factura electrónica, consulte su comprobante en www.infofactperu.pe/consulta \nUsuario: STEFANNY \nCódigo Hash:  bedPXSn9Ta3NKdIN7RAWaybf0SwOURdMn9DA1JZNyJ4=\n \npowered by Infomatica\n \nÍtem\n \nCódigo\n \nDescripción\n \nUnd.\n \nCantidad\n \nV. Unitario\n \nP. Unitario\n \nDescuento\n \nValor Venta\n1\n110000\nSERVICIO ALOJAMIENTO\nNIU\n1.000\n1 720.00000\n2 029.60000\n0.00000\n1 720.00\nSON:DOS MIL DOSCIENTOS UNO CON 60/100 SOLES\n \nAnticipo\nS/\n0.00\n \n \nOp. Gravada\nS/\n1 720.00\n \n \nI.G.V 18%\nS/\n309.60\n \n \nOp. Inafecta\nS/\n0.00\n \n \nOp. Exonerada\nS/\n0.00\n \n \nOp. Exportación\nS/\n0.00\n \n \nOp. Gratuita\nS/\n0.00\n \n \nICBPER\nS/\n0.00\n \n \nServicio\nS/\n172.00\n \nImporte Total\nS/\n2 201.60\nABONAR A LAS SIGUIENTES CUENTAS CORRIENTES\n.\n.\n.\n.\nBCP: CTA CTE SOLES 193-2476000-0-00 CCI SOLES 002-193-002476000000-10\nCTA CTE DOLARES 193-2460272-1-41 CCI DOLARES 002-193-002460272141-17\n.\n.\n.\n\n"
+  },
+  {
+    "id": "19-NEuIjNhOEIyqG8t-sWKA2AVwMYpM8a",
+    "name": "20379719440-01-F004-00009782.pdf",
+    "path": "",
+    "size": "37288",
+    "modifiedTime": "2025-10-10T15:43:45.171Z",
+    "webViewLink": "https://drive.google.com/file/d/19-NEuIjNhOEIyqG8t-sWKA2AVwMYpM8a/view?usp=drivesdk",
+    "text": "Cantidad\nUnidad\nCódigo\nCódigo SUNAT\nDescripción\nValor unitario\nImporte\n1.000\nNIU\n90111500\nALQUILER DE SALA DE EVENTOS\nS/ 19,921.88\nS/ 19,921.88\n \n \n \n \nCargo al item\n \n+ S/ 1,992.19\n \nDatos del documento\nTipo de documento: FACTURA ELECTRONICA\nSerie y correlativo: F004-00009782\nFecha:  09-10-2025\nHora:  18:41:51\nFecha Vencimiento: 22-10-2025\nDatos del emisor\nAdquiriente / Usuario\nRUC: 20379719440 \nNombre: 100PRE FELIZ SOCIEDAD ANONIMA CERRADA \nDirección: JR. PARURO NRO. 878 (ALT. CALLE CAPON), LIMA, LIMA, \nDEPARTAMENTO LIMA \nSucursal:  SUCURSAL \nTelefono: \nIdentificación: RUC - REGISTRO UNICO DE CONTRIBUYENTES \nNúmero de identificación: 20612592811 \nNombre: CREACION CUANTICA E.I.R.L. \nDirección: CAL.BERLIN NRO. 965 INT. 302 URB. SANTA CRUZ LIMA - LIMA - \nMIRAFLORES,,,,PERÚ \nRepresentación impresa de una FACTURA DE VENTA ELECTRÓNICA \nPuede descargar su comprobante desde el sitio: \nhttps://factura.thefactoryhka.com.pe/consultadocumentos\nPowered\nby\nPág. 1\nInformación adicional\nOBSERVACIONES: SALA DE EVENTOS 10 AL 12 DE OCTUBRE \n2025\n Monto en letra: VEINTICINCO MIL QUINIENTOS Y 00/100   \nSOLES \nOPERACION SUJETA A DETRACCION \nForma de Pago: Credito\n  \nInformación de las cuotas\nCuota001 \nFecha de Vencimiento:  2025-10-22 \nMonto:  S/ 22,950.00 \nDETRACCIONES\nCódigo del Bien Sujeto a Detracción:  19 \nNúmero de Cuenta Banco de la Nación:  00005155274 \nMonto de la Detracción:  2550.00 \nPorcentaje Detracción:  10.00 \n \nTotal impuestos\nTotal IGV 18%: S/ 3,585.94 \n \nTotales del documento\nTotal Cargos: S/ 1,992.19 \nTotal Gravadas: S/ 19,921.88 \nImporte total de la venta: S/ 23,507.81 \nImporte total a pagar: S/ 25,500.00 \n\n"
+  },
+  {
+    "id": "1Y96TObr5wyqiE4Vcm09J-Q1sZyb6y36T",
+    "name": "F004-00009782.pdf",
+    "path": "",
+    "size": "59295",
+    "modifiedTime": "2025-10-10T15:35:37.288Z",
+    "webViewLink": "https://drive.google.com/file/d/1Y96TObr5wyqiE4Vcm09J-Q1sZyb6y36T/view?usp=drivesdk",
+    "text": "Datos de Cabecera:\nNúmero de Operación: 7692033825\nFecha y hora de Pago: 10/10/2025 10:34:43\nRuc del Proveedor: 20379719440\nRazón Social del Proveedor: 100PRE FELIZ SOCIEDAD ANONIMA CERRADA\n\nDatos de detalle:\nNúmero de Constancia: 285723859\nUsuario Sol: MENERGOR\nN° Cuenta de Detracciones (Banco de la Nación): 00005155274\nTipo Documento del Adquiriente: 06-REG. UNICO DE CONTRIBUYENTES\nNúmero Documento del Adquiriente: 20612592811\nNombre/Razón Social del Adquiriente: CREACION CUANTICA E.I.R.L.\nCódigo Operación: 01\nNombre Operación: Venta de bienes o prestación de servicios\nCódigo Bien o servicio: 019\nNombre Bien o servicio: Arrendamiento de bienes\nMonto depósito: S/ 2,550.00\nPeriodo Tributario: 202510\nTipo de Comprobante: 01-FACTURA\nNúmero de Comprobante: F004 00009782\n\n\n"
+  },
+  {
+    "id": "1WDbRU2I0TOl9Oy8TJU32CzMa2biIrLJJ",
+    "name": "EMD_1759794786482.pdf",
+    "path": "",
+    "size": "112923",
+    "modifiedTime": "2025-10-07T16:42:49.774Z",
+    "webViewLink": "https://drive.google.com/file/d/1WDbRU2I0TOl9Oy8TJU32CzMa2biIrLJJ/view?usp=drivesdk",
+    "text": " \nRECIBO DE PRODUCTOS Y SERVICIOS POR  JOSEANTONIO TORRONRAMIREZ\n \n \nId de Orden\nBJ5DIZ\n \n \n \nFecha de emisión\n7º Octubre 2025  \n \n \n \nNúmero de Documento\n        230 0053 338 408      \n \nPASSENGER DETAILS\nName\nFrequent Flyer #\n \nStar Alliance Status\n JOSEANTONIO TORRONRAMIREZ\n \nDETALLES DEL PRODUCTO O SERVICIO - Información del Documento Misceláneo Electrónico\n \nEn conexión con: 2302151862644\nProducto / Servicio \n   \nFecha   \n  \n   \nDOCUMENT\nAMENDMENT FEE (1)\n                              \n  \n  \nENDOSOS / RESTRICCIONES:  \nLas siguientes condiciones aplican para certificado de viaje:\nVálido para boletos operados por Copa Airlines\nNo es válido para impuestos\nVálido 1 año después de la emisión\nNo reembolsable\nNo transferible\nValorado en moneda local al tipo de cambio de la fecha de emisión.\nDETALLES DEL PASAJERO      \n \nMoneda   \nCantidad    \nImporte del impuesto(Impuesto al Valor Agregado)   \n                                                                \n                       USD\n                                                                 \n                        150.00\n                                                                 \n                        USD 27.00\n            FORMA DE PAGO:\n Tarjeta de crédito        \nVIXXXXXXXXXXXX2634\nUSD 177.00\nFecha de caducidad: \n0829 \nCódigo de autorización: \n906518 \n \n \n \n \n \n \n \n \n \n\n            \n   ¿Necesita ayuda?\n    Para obtener información sobre reservas, cargos, estado de su vuelo\n    y más, visite Copa.com Copa.com\n     Síganos en las Redes Sociales:\n  \n  \n  \n   \n \nEste correo electrónico ha sido enviado automáticamente a CREARPODERSINLIMITESPERU@GMAIL.COM para proporcionarle información sobre su viaje.\nPor favor no responda a este correo electrónico con el botón 'Responder'. Para obtener ayuda, póngase en contacto con nuestro  Centro de Reservas.\nRevise nuestra política de privacid\n \n \n \n \n\n"
+  },
+  {
+    "id": "1WPHDnzQYNp9urS1oBk4HKY6q5NjdVMs4",
+    "name": "ETKT_1759794801698.pdf",
+    "path": "",
+    "size": "148585",
+    "modifiedTime": "2025-10-07T16:42:28.519Z",
+    "webViewLink": "https://drive.google.com/file/d/1WPHDnzQYNp9urS1oBk4HKY6q5NjdVMs4/view?usp=drivesdk",
+    "text": " \n \nBOLETO ELECTRÓNICO POR  JOSEANTONIO TORRONRAMIREZ\n06 octubre 2025                           \n      Id de Orden\n    BJ5DIZ\n \n       \n        \n \nGracias por preferir a Copa Airlines para realizar su viaje. Encuentre a continuación los detalles de su\nreserva e itinerario.\n \nDETALLES DEL PASAJERO\n \nNombre\n# de Viajero Frecuente Nivel Star Alliance\nNúmero de Boleto\nJOSEANTONIO TORRONRAMIREZ\n2302152271148\n \nITINERARIO DE VUELO:\nSANTO DOMINGO (SDQ) - PANAMA CITY (PTY) - Número de Vuelo- CM299 - Economy Class\n \n Salida\n Jueves     Octubre 23,2025   \n02:10 PM\nSANTO DOMINGO (SDQ)\nLlegada\n  Jueves     Octubre 23,2025   \n03:42 PM\nPANAMA CITY (PTY)\nDetalles del vuelo\nDuración del vuelo:02h32m\nAeronave:738\nVuelo operado por:\n \nAsientos Reservados: Si-  Reservar o Cambiar de\nasientos.      \n Tiempo de escala en  : 03h24m\nPANAMA CITY (PTY) - LIMA (LIM) - Número de Vuelo- CM489 - Economy Class\n \n Salida\n Jueves     Octubre 23,2025   \n07:06 PM\nPANAMA CITY (PTY)\nLlegada\n  Jueves     Octubre 23,2025   \n10:45 PM\nLIMA (LIM)\nDetalles del vuelo\nDuración del vuelo:03h39m\nAeronave:7M8\nVuelo operado por:\n \nAsientos Reservados: Si-  Reservar o Cambiar de\nasientos.      \n  \nLIMA (LIM) - PANAMA CITY (PTY) - Número de Vuelo- CM338 - Economy Class\n \n Salida\n Lunes    Octubre 27,2025   \n02:15 AM\nLIMA (LIM)\nLlegada\n Lunes    Octubre 27,2025   \n05:52 AM\nPANAMA CITY (PTY)\nDetalles del vuelo\nDuración del vuelo:03h37m\nAeronave:738\nVuelo operado por:\n \nAsientos Reservados: Si-  Reservar o Cambiar de\nasientos.      \n Tiempo de escala en  : 01h36m\nPANAMA CITY (PTY) - SANTO DOMINGO (SDQ) - Número de Vuelo- CM463 - Economy Class\n \n \n \n \nAdministrar su \nReserva \n\n \n Salida\n Lunes    Octubre 27,2025   \n07:28 AM\nPANAMA CITY (PTY)\nLlegada\n Lunes    Octubre 27,2025   \n10:58 AM\nSANTO DOMINGO (SDQ)\nDetalles del vuelo\nDuración del vuelo:02h30m\nAeronave:738\nVuelo operado por:\n \nAsientos Reservados: Si-  Reservar o Cambiar de\nasientos.      \n  \n \n \nCARGOS DE TRANSPORTE AÉREO\n \nDescripción\ntarifa\nTicket Fare .JOSEANTONIO TORRONRAMIREZ\n \n513.00USD\nDO \n \n29.50\nL8 \n \n10.00\nTY \n \n7.00\nDO \n \n62.80\nAA \n \n20.00\nUX \n \n30.00\nAH \n \n2.50\nDY \n \n15.00\nHW \n \n30.86\nVB \n \n39.34\nTotal \n \n201.44USD\n \nPara ver más sobre los detalles de la tarifa familiar, haga clic aquí Copa.com  \n \n \n  FORMA DE PAGO:\n Tarjeta de crédito         \nVIXXXXXXXXXXXX2634\n201.44USD\nFecha de caducidad:\n0829 \nCódigo de Autorización:\n906518 \n          \n    \nSe cobrará una tarifa administrativa no reembolsable por persona y se agregará al precio total del boleto al comprar sus boletos\nen nuestras oficinas de ventas, aeropuertos y centros de reserva. En algunos países, los impuestos locales pueden aplicar a la\ntarifa. Para obtener más información sobre esta tarifa administrativa, haga clic en  aqui\n \n \n   \n \n \n \n \n \n\nEs responsabilidad del pasajero asegurarse de obtener y cumplir con los requisitos de viaje  establecidos por las autoridades del\nlugar de origen, tránsito y destino. Antes de embarcar, Copa Airlines verificará que el pasajero cuente con los requisitos\nmigratorios o sanitarios necesarios para el lugar de origen y de destino. Todo pasajero que proporcione información falsa o\nengañosa sobre dichos requisitos será responsable de los gastos incurridos o multas impuestas a la aerolínea por este motivo.\n \nIn compliance with Dominican Republic entry regulations imposed by the government, all passengers must complete the\nElectronic Ticket form. Click aquí  to complete.   \n \nFavor de revisar la política de equipaje para obtener información sobre su equipaje permitido.\n \nLa ley federal en los Estados Unidos prohíbe el transporte de materiales peligrosos a bordo de las aeronaves en su equipaje o en\nsu persona. Una violación puede resultar en cinco años de prisión y sanciones. Los materiales peligrosos incluyen explosivos,\ngases comprimidos, líquidos y sólidos inflamables, oxidantes, venenos, corrosivos y materiales radiactivos. Ejemplos: pinturas,\nlíquido para encendedores, fuegos artificiales. Hay excepciones especiales para pequeñas cantidades (hasta 70 onzas en total)\nde medicamentos y de artículos de baño transportados en el equipaje y ciertos artículos para fumar transportados por la\npersona. Para mayor información visite copaair.com.\n \n \n  \n    ¿Necesita ayuda?\n     Para obtener información sobre reservas, cargos, estado de su vuelo\n     y más, visite Copa.com\n      Síganos en las Redes Sociales: \n    \n  \n  \n   \n     Este correo electrónico ha sido enviado automáticamente a CREARPODERSINLIMITESPERU@GMAIL.COM  para proporcionarle información sobre su viaje.\n     Por favor no responda a este correo electrónico con el botón 'Responder'. Para obtener ayuda, póngase en contacto con nuestro Centro de Reservas.\n    Revise nuestra política de privacidad.\n \n \n \n \n\n"
+  },
+  {
+    "id": "1PFvpeq3gSWVOL7T1lCbB_1ooBd4vEuJ9",
+    "name": "ETKT_1759794776379.pdf",
+    "path": "",
+    "size": "148454",
+    "modifiedTime": "2025-10-07T16:40:42.494Z",
+    "webViewLink": "https://drive.google.com/file/d/1PFvpeq3gSWVOL7T1lCbB_1ooBd4vEuJ9/view?usp=drivesdk",
+    "text": " \n \nBOLETO ELECTRÓNICO POR  JOSEANTONIO TORRONRAMIREZ\n06 octubre 2025                           \n      Id de Orden\n    BJ5DIZ\n \n       \n        \n \nGracias por preferir a Copa Airlines para realizar su viaje. Encuentre a continuación los detalles de su\nreserva e itinerario.\n \nDETALLES DEL PASAJERO\n \nNombre\n# de Viajero Frecuente Nivel Star Alliance\nNúmero de Boleto\nJOSEANTONIO TORRONRAMIREZ\n2302152271148\n \nITINERARIO DE VUELO:\nSANTO DOMINGO(SDQ) - PANAMA CITY(PTY) - Número de Vuelo- CM0299 - Economy Class\n \n Salida\n Jueves     Octubre 23, 2025   \n2:10 PM\nSANTO DOMINGO(SDQ)\nLlegada\n  Jueves     Octubre 23, 2025   \n3:42 PM\nPANAMA CITY(PTY)\nDetalles del vuelo\nDuración del vuelo:2h 32m\nAeronave:738\nVuelo operado por:\n \nAsientos Reservados: Si-  Reservar o Cambiar de\nasientos.      \n Tiempo de escala en  : 3h 24m\nPANAMA CITY(PTY) - LIMA(LIM) - Número de Vuelo- CM0489 - Economy Class\n \n Salida\n Jueves     Octubre 23, 2025   \n7:06 PM\nPANAMA CITY(PTY)\nLlegada\n  Jueves     Octubre 23, 2025   \n10:45 PM\nLIMA(LIM)\nDetalles del vuelo\nDuración del vuelo:3h 39m\nAeronave:7M8\nVuelo operado por:\n \nAsientos Reservados: Si-  Reservar o Cambiar de\nasientos.      \n  \nLIMA(LIM) - PANAMA CITY(PTY) - Número de Vuelo- CM0338 - Economy Class\n \n Salida\n Lunes    Octubre 27, 2025   \n2:15 AM\nLIMA(LIM)\nLlegada\n Lunes    Octubre 27, 2025   \n5:52 AM\nPANAMA CITY(PTY)\nDetalles del vuelo\nDuración del vuelo:3h 37m\nAeronave:738\nVuelo operado por:\n \nAsientos Reservados: Si-  Reservar o Cambiar de\nasientos.      \n Tiempo de escala en  : 1h 36m\nPANAMA CITY(PTY) - SANTO DOMINGO(SDQ) - Número de Vuelo- CM0463 - Economy Class\n \n \n \n \nAdministrar su \nReserva \n\n \n Salida\n Lunes    Octubre 27, 2025   \n7:28 AM\nPANAMA CITY(PTY)\nLlegada\n Lunes    Octubre 27, 2025   \n10:58 AM\nSANTO DOMINGO(SDQ)\nDetalles del vuelo\nDuración del vuelo:2h 30m\nAeronave:738\nVuelo operado por:\n \nAsientos Reservados: Si-  Reservar o Cambiar de\nasientos.      \n  \n \n \nCARGOS DE TRANSPORTE AÉREO\n \nDescripción\ntarifa\nTicket Fare JOSEANTONIO TORRONRAMIREZ\n \n513.00 USD\nDO \n \n29.50\nL8 \n \n10.00\nTY \n \n7.00\nDO \n \n62.80\nAA \n \n20.00\nUX \n \n30.00\nAH \n \n2.50\nDY \n \n15.00\nHW \n \n30.86\nVB \n \n39.34\nTotal \n \n201.44 USD\n \nPara ver más sobre los detalles de la tarifa familiar, haga clic aquí Copa.com  \n \n \n  FORMA DE PAGO:\n Tarjeta de crédito         \nVIXXXXXXXXXXXX2634\nUSD 201.44\nFecha de caducidad:\n0829 \nCódigo de Autorización:\n906518 \n          \n    \nSe cobrará una tarifa administrativa no reembolsable por persona y se agregará al precio total del boleto al comprar sus boletos\nen nuestras oficinas de ventas, aeropuertos y centros de reserva. En algunos países, los impuestos locales pueden aplicar a la\ntarifa. Para obtener más información sobre esta tarifa administrativa, haga clic en  aqui\n \n \n   \n \n \n \n \n \n\nEs responsabilidad del pasajero asegurarse de obtener y cumplir con los requisitos de viaje  establecidos por las autoridades del\nlugar de origen, tránsito y destino. Antes de embarcar, Copa Airlines verificará que el pasajero cuente con los requisitos\nmigratorios o sanitarios necesarios para el lugar de origen y de destino. Todo pasajero que proporcione información falsa o\nengañosa sobre dichos requisitos será responsable de los gastos incurridos o multas impuestas a la aerolínea por este motivo.\n \nIn compliance with Dominican Republic entry regulations imposed by the government, all passengers must complete the\nElectronic Ticket form. Click aquí  to complete.   \n \nFavor de revisar la política de equipaje para obtener información sobre su equipaje permitido.\n \nLa ley federal en los Estados Unidos prohíbe el transporte de materiales peligrosos a bordo de las aeronaves en su equipaje o en\nsu persona. Una violación puede resultar en cinco años de prisión y sanciones. Los materiales peligrosos incluyen explosivos,\ngases comprimidos, líquidos y sólidos inflamables, oxidantes, venenos, corrosivos y materiales radiactivos. Ejemplos: pinturas,\nlíquido para encendedores, fuegos artificiales. Hay excepciones especiales para pequeñas cantidades (hasta 70 onzas en total)\nde medicamentos y de artículos de baño transportados en el equipaje y ciertos artículos para fumar transportados por la\npersona. Para mayor información visite copaair.com.\n \n \n  \n    ¿Necesita ayuda?\n     Para obtener información sobre reservas, cargos, estado de su vuelo\n     y más, visite Copa.com\n      Síganos en las Redes Sociales: \n    \n  \n  \n   \n     Este correo electrónico ha sido enviado automáticamente a CREARPODERSINLIMITESPERU@GMAIL.COM  para proporcionarle información sobre su viaje.\n     Por favor no responda a este correo electrónico con el botón 'Responder'. Para obtener ayuda, póngase en contacto con nuestro Centro de Reservas.\n    Revise nuestra política de privacidad.\n \n \n \n \n\n"
+  },
+  {
+    "id": "17gmmGTgVgiezo5N-oXqDOABBVtdBXTE2",
+    "name": "bef19d4f-902b-404a-8aba-bbfb9c730442.pdf",
+    "path": "",
+    "size": "14703",
+    "modifiedTime": "2025-10-01T23:23:26.979Z",
+    "webViewLink": "https://drive.google.com/file/d/17gmmGTgVgiezo5N-oXqDOABBVtdBXTE2/view?usp=drivesdk",
+    "text": "Representación Impresa de la Factura de Venta Electrónica\nPuede consultar este documento en www.fegs.com.pe\nSEÑOR(ES)\n: CREACION CUANTICA E.I.R.L. \nRUC\n: 20612592811\nDOMICILIO FISCAL\n: CAL.BERLIN NRO. 965 INT. 302 LIMA - LIMA - MIRAFLORES\nFECHA DE EMISION\n: 01.10.2025\nGUIA DE REMISION\n: \nFORMA DE PAGO\n: CREDITO\nR.U.C. 20524520070\nFactura de Venta Electrónica\nN° FA19-134\nWORX S.A.C.\nOficina Principal\nAV. REPUBLICA DE PANAMA 3030\nSAN ISIDRO - LIMA 27\nAlmacen\nCantidad\nUnidad\nDescripción\nPrecio Unitario\nValor Venta\n1.000 \nUND\nWORX OFICINA 903 - OCTUBRE\n700.00 \n700.00 \n1.000 \nUND\nWORX OFICINA 904 - OCTUBRE\n399.00 \n399.00 \n1.000 \nUND\nWORX ESTACIONAMIENTO\n100.00 \n100.00 \nCuota\nMoneda\nMonto\nFecha\nCredito\nUSD\n       1,273.34 \nCuota001\nUSD\n       1,273.34 \n08.10.2025\nSON : MIL CUATROCIENTOS CATORCE CON 82/100\nUS DOLARES\nSUBTOTAL\nUSD\n1,199.00 \nDESCUENTO\nUSD\n0.00 \nOP. GRAVADAS USD\n1,199.00 \nI.G.V\nUSD\n215.82 \nR.CONSUMO\nUSD\n0.00 \nIMPORTE TOTAL USD\n1,414.82 \n\n"
+  },
+  {
+    "id": "1zsjYaTviN8ItbR6UdbhMbvIPm9lUakht",
+    "name": "f-2753.pdf",
+    "path": "",
+    "size": "62260",
+    "modifiedTime": "2025-10-01T18:49:05.413Z",
+    "webViewLink": "https://drive.google.com/file/d/1zsjYaTviN8ItbR6UdbhMbvIPm9lUakht/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL. BERLIN NRO. 965 INT. 302 URB. SANTA CRUZ - LIMA LIMA MIRAFLORES\n255922\nlunes, 29 Setiembre, 2025\nREFERENCIA\nFL01\n00002753\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20612799670\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nKATHERIN\n06/10/2025\nSALIDA\n01/10/2025\nAdquiriente : \nUSUARIO\nMUÑOZ  , MILDRED\nFORMA DE PAGO CONTADO\nPAX\n 0\nAV, DEL EJERCITO NRO. 1147 INT. 1 URB. ORRANTIA \nDEL MAR LIMA - LIMA - MAGDALENA DEL MAR\nTel: + (51-1) 2070860 \ne-mail: reservas.suites@hotelesinkari.com \nrecepcion.suites@hotelesinkari.com \nwww.hotelesinkari.com\nGRUPO LYNCH S.A.C.\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n 1.00\nAlojamiento\n 290.62\n 290.62\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nF0ZFFmA9bvSdZ4L/VaUlKjshvME=\nTRESCIENTOS CUARENTA Y OCHO Y 74/100 DOLARES AMERICANOS\nTotal  Propina\nUS $\n 10\n 10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN https://portal.shiol.net/Consultar/20612832847\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n 348.74\n 0.00\n 0.00\n 29.06\n 29.06\n 0.00\n 0.00\n 290.62\nTotal  Exportacion\n 0.00\nTotal  Descuento\nDolares\n 0.00\n 0.00\nTotal  ICBPER\n 0.00\n\n"
+  },
+  {
+    "id": "1S14uBZinUlJxnD9s3rpfUkeMXtDzPP-g",
+    "name": "Invoice-RECLA-0171.pdf",
+    "path": "",
+    "size": "37127",
+    "modifiedTime": "2025-09-24T19:44:09.140Z",
+    "webViewLink": "https://drive.google.com/file/d/1S14uBZinUlJxnD9s3rpfUkeMXtDzPP-g/view?usp=drivesdk",
+    "text": " \nPágina 1 de 1\nFactura\nNúmero de factura\nRECLA-0171\nFecha de emisión\n24 de septiembre de 2025\nFecha de vencimiento 24 de septiembre de 2025\nTryfta Digital UG (haftungsbeschränkt)\nMies-van-der-Rohe-Straße 6\nc/o Design Offices Highlight Towers\n80807 München\nAlemania\ncontacto@reclamovirtual.pe\nDE VAT DE456579946\nFacturar a\nCreación Cuántica\nDalias 136\nMiraflores\nLima\nPerú\ncrearpodersinlimitesperu@gmail.com\nPE RUC 20612592811\nPEN349.00 con fecha de vencimiento del 24 de septiembre de 2025\nPagar en línea\nConsultas de facturación: contacto@reclamovirtual.pe\nDescripción\nCant.\nPrecio unitario\nImporte\nReclamo Virtual: Libro de Reclamaciones Virtual (Plan avanzado)\n24 sept 2025 – 24 sept 2026\n1\nPEN349.00\nPEN349.00\nSubtotal\nPEN349.00\nEl impuesto se pagará por aplicación de la inversión\ndel sujeto pasivo.\nTotal\nPEN349.00\nImporte por pagar\nPEN349.00\nGracias por usar el servicio de libro de reclamaciones virtual para empresas en el Perú de Reclamo Virtual.\n \n\n"
+  },
+  {
+    "id": "1vxHOco1fWY5Q0VR38-WOzBpgTe9DI55y",
+    "name": "PDF-DOC-E001-46110778214097[1].pdf",
+    "path": "",
+    "size": "13241",
+    "modifiedTime": "2025-09-23T19:26:56.450Z",
+    "webViewLink": "https://drive.google.com/file/d/1vxHOco1fWY5Q0VR38-WOzBpgTe9DI55y/view?usp=drivesdk",
+    "text": " \n \n \nHUAMAN COVEÑAS RUBY  \nAV. BOLIVIA 148 CERCADO DE LIMA INT. 3185 C.C. CENTRO LIMA  \nLIMA - LIMA - LIMA \nFACTURA ELECTRONICA\nRUC: 10778214097 \nE001-461 \nFecha de Emisión\n: 13/08/2025\nSeñor(es)\n: CREACION CUANTICA E.I.R.L.  \nRUC \n: 20612592811  \nDirección del Cliente \n: CAL. BERLIN 965 URB. SANTA CRUZ\nINT. 302 LIMA-LIMA-MIRAFLORES \nTipo de Moneda\n: SOLES \nObservación\n:  \nForma de pago: Contado\nCantidad\nUnidad Medida\nDescripción\nValor Unitario\nICBPER\n8.00\nUNIDAD\n0.90X0.60 BANNER\n15.00\n0.00\n1.00\nUNIDAD\nDIPLOMAS A4 COUCHE 250GR (300UND)\n450.00\n0.00\nValor de Venta de Operaciones Gratuitas : S/ 0.00 \n \n \nSON: SEISCIENTOS SETENTA Y DOS Y 60/100 SOLES\n \n \nSub Total Ventas :\nS/ 570.00 \nAnticipos :\nS/ 0.00 \nDescuentos :\nS/ 0.00 \nValor Venta :\nS/ 570.00 \nISC :\nS/ 0.00 \nIGV :\nS/ 102.60 \nICBPER :\nS/ 0.00 \nOtros Cargos :\nS/ 0.00 \nOtros Tributos :\nS/ 0.00 \nMonto de redondeo :\nS/ 0.00 \nImporte Total :\nS/ 672.60 \nEsta es una representación impresa de la factura electrónica, generada en el Sistema de SUNAT. Puede\nverificarla utilizando su clave SOL.\n\n \n \n \nHUAMAN COVEÑAS RUBY  \nAV. BOLIVIA 148 CERCADO DE LIMA INT. 3185 C.C. CENTRO LIMA  \nLIMA - LIMA - LIMA \nFACTURA ELECTRONICA\nRUC: 10778214097 \nE001-474 \nFecha de Emisión\n: 18/09/2025\nSeñor(es)\n: CREACION CUANTICA E.I.R.L.  \nRUC \n: 20612592811  \nDirección del Cliente \n: CAL. BERLIN 965 URB. SANTA CRUZ\nINT. 302 LIMA-LIMA-MIRAFLORES \nTipo de Moneda\n: SOLES \nObservación\n:  \nForma de pago: Contado\nCantidad\nUnidad Medida\nDescripción\nValor Unitario\nICBPER\n1.00\nUNIDAD\nDIPLOMAS A4 COUCHE 250GR (500UND) FULL COLOR\n450.00\n0.00\nValor de Venta de Operaciones Gratuitas : S/ 0.00 \n \n \nSON: QUINIENTOS TREINTA Y UNO Y 00/100 SOLES\n \n \nSub Total Ventas :\nS/ 450.00 \nAnticipos :\nS/ 0.00 \nDescuentos :\nS/ 0.00 \nValor Venta :\nS/ 450.00 \nISC :\nS/ 0.00 \nIGV :\nS/ 81.00 \nICBPER :\nS/ 0.00 \nOtros Cargos :\nS/ 0.00 \nOtros Tributos :\nS/ 0.00 \nMonto de redondeo :\nS/ 0.00 \nImporte Total :\nS/ 531.00 \nEsta es una representación impresa de la factura electrónica, generada en el Sistema de SUNAT. Puede\nverificarla utilizando su clave SOL.\n\n \n \n \nHUAMAN COVEÑAS RUBY  \nAV. BOLIVIA 148 CERCADO DE LIMA INT. 3185 C.C. CENTRO LIMA  \nLIMA - LIMA - LIMA \nFACTURA ELECTRONICA\nRUC: 10778214097 \nE001-476 \nFecha de Emisión\n: 20/09/2025\nSeñor(es)\n: CREACION CUANTICA E.I.R.L.  \nRUC \n: 20612592811  \nDirección del Cliente \n: CAL. BERLIN 965 URB. SANTA CRUZ\nINT. 302 LIMA-LIMA-MIRAFLORES \nTipo de Moneda\n: SOLES \nObservación\n:  \nForma de pago: Contado\nCantidad\nUnidad Medida\nDescripción\nValor Unitario\nICBPER\n1.00\nUNIDAD\nA4 COUCHE 259GR FULL COLOR DIPLOMAS\n450.00\n0.00\nValor de Venta de Operaciones Gratuitas : S/ 0.00 \n \n \nSON: QUINIENTOS TREINTA Y UNO Y 00/100 SOLES\n \n \nSub Total Ventas :\nS/ 450.00 \nAnticipos :\nS/ 0.00 \nDescuentos :\nS/ 0.00 \nValor Venta :\nS/ 450.00 \nISC :\nS/ 0.00 \nIGV :\nS/ 81.00 \nICBPER :\nS/ 0.00 \nOtros Cargos :\nS/ 0.00 \nOtros Tributos :\nS/ 0.00 \nMonto de redondeo :\nS/ 0.00 \nImporte Total :\nS/ 531.00 \nEsta es una representación impresa de la factura electrónica, generada en el Sistema de SUNAT. Puede\nverificarla utilizando su clave SOL.\n\n"
+  },
+  {
+    "id": "1KpopPPAePXCXq6hTyu4n3s47SG1B8D2C",
+    "name": "DIP-FACT-Recibo_Ciclico_2025080005_S1AA-0044939897.pdf",
+    "path": "",
+    "size": "139381",
+    "modifiedTime": "2025-09-20T16:23:09.505Z",
+    "webViewLink": "https://drive.google.com/file/d/1KpopPPAePXCXq6hTyu4n3s47SG1B8D2C/view?usp=drivesdk",
+    "text": "Telefónica del Perú S.A.A.   |   R.U.C. 20100017491   |   Jr. Domingo Martínez Luján N° 1130   |   Lima – Lima - Surquillo\nPágina 1/3\nEmpresas Fija\nRecibo Agosto\nN° recibo: S1AA-0044939897\nCREACION CUANTICA EIRL\nRUC: 20612592811 \nCALLE BERLIN 965 Piso 3 URBANIZACION RESIDENCIAL JOSE BALTA,\nMIRAFLORES, 01, LIMA\nCuenta financiera: 753621842 \nID SUSCRIPTOR: 196980437\nID Cliente: 131054354\nAnexo: 1\nTotal a pagar del mes\nS/109.90\nÚltimo día de pago: 21/08\nN° Fijo / Cód. pago: 753621842\nDeuda anterior: S/0.00\nEvolutivo Mensual\nAbr\nMay\nJun\nJul\nAgo\n \n89.80\n-0.09\n109.81\n109.82\n109.83\nCiclo de facturación - Agosto 2025\n05/08\n21/08\nFecha de\nEmisión\nÚltimo día\nde pago\n¡LLAMA AL 0 800 11311!\nSi tienes un negocio y deseas comprar o portar una línea\nmóvil, adquirir un servicio de internet, TV o telefonía fija.\nCanal exclusivo para Clientes con RUC 20\nResumen de Recibo - NºS1AA-0044939897\nCargos Mensuales\nS/ 109.89\nSubtotal\nS/93.13\nIGV (18%)\nS/16.76\nTotal Afecto\nS/109.89\nDescuentos y Bonificaciones Inafectos\nS/ 0.00\nRedondeo\nS/ 0.01\nTotal Facturado\nS/109.90\nDevoluciones\nS/ 0.00\nDébitos\nS/ 0.00\nTotal a pagar\nS/ 109.90\n\nEmpresas Fija\nTelefónica del Perú S.A.A.   |   R.U.C. 20100017491   |   Jr. Domingo Martínez Luján N° 1130   |   Lima – Lima - Surquillo\nPágina 2/3\nDetalle del recibo - N° S1AA-0044939897 - 196980437\nCargos Mensuales\nPrecio de vta.\nIGV S/109.89\nMovistar Internet 600 Mbps (06Ago al 05Sep)\n93.13\n16.76\n109.89\nDescuentos y Bonificaciones Inafectos\nPrecio de vta.\nIGV\nS/0.00\nBonificacion Prom Internet 1 GB x 12m 600 Mbps (06Ago \nal 05Sep) (VR S/127.03)\n0.00\n0.00\n0.00\nRedondeo\nPrecio de vta.\nIGV\nS/0.01\nRedondeo del mes Actual\n-0.06\n0.00\n-0.06\nRedondeo del mes Anterior\n0.07\n0.00\n0.07\n\nConceptos facturables\nCargos fijos mensuales\nCargo mensual facturado al cliente por el plan contratado\npara los servicios de voz y datos. Cargo fijo proporcional\ndel plan desde la fecha de inicio del servicio hasta el\nsiguiente cierre de facturación\nCargos por llamadas adicionales\nCargos por tráfico de voz, datos, mensajes de texto que\nno se encuentran comprendidos dentro del cargo fijo\nmensual.\nLarga distancia: cargo adicional por llamada de larga\ndistancia nacional o internacional\nKB internet y multimedia: navegación en internet y\ntráfico por descarga de aplicativos\nKB transmisión de datos: envío y recepción de datos.\nRoaming internacional: cargo por llamadas efectuadas y\nrecibidas en el extranjero\nDetalle de documentos afectos al IGV\nCargo por Reconexión: cargo facturado si el cliente\ncancela un recibo después de habérsele cortado por\ndeuda.\nCargo por Reconexión de corte APC (a pedido de cliente):\ncargo facturado al efectuarse la reactivación del servicio\nde la línea luego de cumplirse el plazo de suspensión.\nCargo por llamadas a operadoras rurales: llamadas\nrealizadas a teléfonos fijos rurales como Gilat to Home,\nValtron, Claro Rural, TDP Rural o a teléfonos satelitales\ncomo Tesam.\nRenta fraccionaria por cambio de plan: cargo facturado si\ndurante el ciclo de la facturación el cliente cambió a un\nplan tarifario de cargo fijo mayor al que tenía.\nLugares de pago\nBancos y agentes\nBBVA Continental\nBanco Pichincha\nBCP\nBanco de la Nación\nBanBif\nInterbank\nScotiabank\nOtros\nAgente Multibanco KASNET\nMultibanco\nFullcarga\nRed Digital\nMetro\nWong\nWestern Union\nAlgunos lugares de pago presenciales pueden aplicar cobro de comisión de acuerdo a sus tarifarios vigentes.\nPuede realizar su pago de forma rápida y segura en el App Mi Movistar, YAPE o App o Web de su banco.\nRecuerda que también puede afiliar su recibo\nMovistar al débito automático, más info :\nhttp://smvst.com/DAT\nMayor información sobre lugares de pago en www.movistar.com.pe\n¿Qué es el recibo digital?\nEs un servicio gratuito que ofrece Telefónica, con el que podrá recibir mensualmente su recibo en formato PDF al\ncorreo electrónico que usted indique. El envío del recibo digital va en reemplazo de su recibo físico.\n\n"
+  },
+  {
+    "id": "1jl0WeGVjtROwSlVv57XSaGv1gCIuyIzL",
+    "name": "factura saldo evento creación cuantica 18 al 21 sep2025.pdf",
+    "path": "",
+    "size": "327840",
+    "modifiedTime": "2025-09-17T20:16:05.907Z",
+    "webViewLink": "https://drive.google.com/file/d/1jl0WeGVjtROwSlVv57XSaGv1gCIuyIzL/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n3241725\nmiércoles, 17 Setiembre, 2025\nREFERENCIA\nF301\n00039261\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n21/09/2025\nSALIDA\n18/09/2025\nFacturado a : \nUSUARIO\nEvento\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nSalas\n5,084.75\n5,084.75\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\n86r6njFLLNWIqZL/T+JeW6O5Y/A=\nSEIS MIL Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n6,000.00\n0.00\n0.00\n0.00\n915.25\n0.00\n0.00\n5,084.75\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1JKouukRfJaInzk8FhUQmBDUn2g3_GtS1",
+    "name": "factura de daños en sala evento creación cuantica 05 al 07 sep 2025.pdf",
+    "path": "",
+    "size": "326188",
+    "modifiedTime": "2025-09-17T18:47:26.597Z",
+    "webViewLink": "https://drive.google.com/file/d/1JKouukRfJaInzk8FhUQmBDUn2g3_GtS1/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n3245873\nmiércoles, 17 Setiembre, 2025\nREFERENCIA\nF301\n00039255\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n07/09/2025\nSALIDA\n05/09/2025\nFacturado a : \nUSUARIO\nDAÑOS EN SALA\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nDiversos\n847.46\n847.46\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\n8GQVYoJRvBXfSwhmwguDEod7YTo=\nUN MIL Y 00/100 DOLARES AMERICANOS\nTotal  Propina\nUS $\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n1,000.00\n0.00\n0.00\n0.00\n152.54\n0.00\n0.00\n847.46\nTotal  Exportacion\n0.00\nCuentas corrientes  \nTotal  Descuento\nDolares\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "141_cTD2e2Gw9QmMKAwouL_C6f-o6U-cV",
+    "name": "20601007119-01-F003-00008877.pdf",
+    "path": "",
+    "size": "37377",
+    "modifiedTime": "2025-09-17T14:28:37.804Z",
+    "webViewLink": "https://drive.google.com/file/d/141_cTD2e2Gw9QmMKAwouL_C6f-o6U-cV/view?usp=drivesdk",
+    "text": "MALECON BALTA OPERATOR S.A.C\nAV. JAVIER PRADO OESTE NRO. 769 - SAN ISIDRO - LIMA - LIMA\nR.U.C. 20601007119\nFACTURA ELECTRÓNICA\nF003 N° 00008877\nRAZÓN SOCIAL:\nFECHA DE EMISIÓN:\nCREACION CUANTICA E.I.R.L.\nFECHA DE VENCIMIENTO:\n2025-09-16\nDIRECCIÓN:\nCAL.BERLIN NRO. 965 INT. 302 URB. SANTA CRUZ LIMA - LIMA - MIRAFLORES\nMONEDA:\n2025-09-16\n20612592811\nSOLES\nLLEGADA:\n2025-09-20 00:\nSALIDA:\n2025-09-20 00:\nRUC:\nA NOMBRE:\nPASAPORTE:\nFORMA DE PAGO:\nCONTADO\nDESCRIPCIÓN\nCANTIDAD\nPRECIO UNITARIO\nTOTAL\n2,343.75\n1\n2,343.75\nEVENTOS\nHA4273\nOBSERVACIONES:\nSON : TRES MIL CON 00/100 SOLES\nBanco de Crédito del Perú\nDOLARES\nBanco\nSOLES\n191-9747180-1-72\nCCI\nBanco de Crédito del Perú\nNúmero de Cuenta\n191-9673128-0-61\n00219100974718017256\nMoneda\n00219100967312806154\nAUTORIZADO MEDIANTE RESOLUCIÓN NRO.034-005-0005038/SUNAT\nREPRESENTACIÓN IMPRESA DE LA FACTURA ELECTRÓNICA\nPUEDE CONSULTAR ESTE COMPROBANTE EN:https://prod.ebis.pe/CecWeb/Consulta.jsf?e=20601007119\nEXISTE LA POSIBILIDAD DE QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRÁ UN CAMBIO EN EL\nNÚMERO DE COMPROBANTE.\nMÉTODO PAGO SUNAT:\nCONTADO\nMONTO NETO PENDIENTE DE PAGO:\n0.00\n  OP.\nGRAVADA\n0.00\n2,343.75\n  OP.\nINAFECTA\n0.00\n0.00\nOP.\nEXPORTACIÓN\n421.88\n0.00\nI.G.V\n0.00\nI.S.C\nT.DSCTO.\n IMPORTE\nTOTAL\nR.CONS.10%\nPAID OUT\n234.37\n0.00\n3,000.00\n0.00\nPROPINA\n  OP.\nEXONERADAS\nBCPLPEPL\nSWITF\nBCPLPEPL\n-1-\n\n"
+  },
+  {
+    "id": "11YPBNJYDuk4NHsNOfDfIMjQU7BaWl_-l",
+    "name": "FACTURA CREACION CUANTICA EIRL 3241725.pdf",
+    "path": "",
+    "size": "326566",
+    "modifiedTime": "2025-09-16T18:00:24.905Z",
+    "webViewLink": "https://drive.google.com/file/d/11YPBNJYDuk4NHsNOfDfIMjQU7BaWl_-l/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n3241725\nviernes, 12 Setiembre, 2025\nREFERENCIA\nF301\n00039095\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n21/09/2025\nSALIDA\n18/09/2025\nFacturado a : \nUSUARIO\nEvento\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nSalas\n25,423.73\n25,423.73\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\ntYYUPYHNY9BJ1E5Wtj9/nRyg9gM=\nTREINTA MIL Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n30,000.00\n0.00\n0.00\n0.00\n4,576.27\n0.00\n0.00\n25,423.73\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1-1XZgHnKMWA9HVJR05_5NnGeFlFC1_t4",
+    "name": "S002-193089255_08_20250908.pdf",
+    "path": "",
+    "size": "265878",
+    "modifiedTime": "2025-09-11T20:31:23.676Z",
+    "webViewLink": "https://drive.google.com/file/d/1-1XZgHnKMWA9HVJR05_5NnGeFlFC1_t4/view?usp=drivesdk",
+    "text": "Página 1 de 3\n+\n+\n-\n+\n+\nEntel Perú S.A.\nRUC: 20106897914\nAv. República de Colombia 791\nPiso 14 - San Isidro - Lima\n¡Hola! Te enviamos tu recibo del mes\n0\n50\n100\n150\n200\n250\nRequest ID: 6093 | Ciclo: 08 | Custcode: 5.7023\nCREACION CUANTICA E.I.R.L.\nAv Sergio Bernales Nro 272\nLima - Lima - Lima\nRecibo Nº\nEmisión\n:\n:\nS002-193089255\n08/Sep/2025\nInicio del Periodo\nFin del Periodo\n:\n:\n09/Sep/2025\n08/Oct/2025\nNº de Cuenta\nNº Doc (RUC)\n:\n:\n1.21765711\n20612592811\nTotal a pagar\nVencimiento\nS/ 242.99\n21/Sep/2025\nPlan\nProrrateo\nCargos\nAdicionales\nDescuentos o\nP. Adelantado\nEquipos\nSaldo\nAnterior\nS/ 346.30\nS/ 92.10\nS/ 0.00\n-S/ 195.41\nS/ 0.00\nS/ 0.00\nEn las siguientes páginas\npodrás encontrar el detalle de cada concepto\nFacturación de los últimos 6 meses\nAbr\nMay\nJun\nJul\nAgo\nSep\nDesglose tributario\nSubtotal de Conceptos Facturados (sin IGV)\nIGV del Subtotal (18%)\nTotal (Incl. IGV)\nMontos ya gravados con IGV\nExentos IGV\nSaldo anterior\nTotal a pagar\n205.92\n37.07\n242.99\n0.00\n0.00\n0.00\n242.99\nDocumento válido para efectos tributarios según Res. de Sup. No. 007-99/SUNAT. Documento\nno afecto al régimen de retención del IGV por ser agente de retención, según Res. de Sup. No.\n037-2002/SUNAT. Los saldos de hasta S/0.09 que no cancele por falta de moneda de curso legal\n(S/0.05 y S/0.01), se registrarán y se mantendrán como pendientes de pago hasta su cancelación\nefectiva.\nRecuerda que puedes cambiar de operadora sin perder tu número. El trámite de portabilidad es\nrápido y gratuito. Migra tus líneas de otro operador hacia Entel y disfruta de los beneficios que\ntenemos para ti.\n\nPágina 2 de 3\nMira aquí el detalle\ntu recibo\nResumen\nNúmero\nPlan Tarifario\nPlan\nProrrateo\nCargos\nAdicionales (*)\nDescuentos o\nP. Adelantado\nEquipos (*)\nSaldo\nAnterior\nMonto S/\n(Incl. IGV)\n933599925\nEmprende Ilimitado 49.90\n49.90\n20.93\n0.00\n-49.58\n0.00\n0.00\n21.25\n933599903\nEmpresa PRO 2.0 59.9\n59.90\n25.12\n0.00\n-42.51\n0.00\n0.00\n42.51\n908931343\nEmpresa PRO 2.0 36.9\n36.90\n0.00\n0.00\n0.00\n0.00\n0.00\n36.90\n933599864\nEmpresa PRO 2.0 59.9\n59.90\n25.12\n0.00\n-42.51\n0.00\n0.00\n42.51\n912379686\nEmpresa PRO 2.0 44.9\n44.90\n0.00\n0.00\n-11.23\n0.00\n0.00\n33.67\n912379744\nEmpresa PRO 2.0 44.9\n44.90\n0.00\n0.00\n0.00\n0.00\n0.00\n44.90\n933599883\nEmprende Ilimitado 49.90\n49.90\n20.93\n0.00\n-49.58\n0.00\n0.00\n21.25\nCuenta\nCliente\n0.00\n0.00\n0.00\n0.00\n0.00\n0.00\n0.00\nTotal\n346.30\n92.10\n0.00\n-195.41\n0.00\n0.00\n242.99\n(*) Puede incluir conceptos exentos o ya gravados con IGV\nDetalle\nConceptos detallados\nPeríodo\nUnidad\nMonto S/ (Incl. IGV)\n933599925 (Emprende Ilimitado 49.90)\n21.25\nPlan\n09-sep al 08-oct\n30 días\n49.90\nProrrateo\n20.93\nCargo prorrateo (Emprende Ilimitado 49.90)\n27-ago al 08-sep\n13 días\n20.93\nDescuentos\n-49.58\nMA01 - Descuentos por fidelizacion 70% x 18m (1/18)\n27-ago al 08-oct\n43 días\n-49.58\n933599903 (Empresa PRO 2.0 59.9)\n42.51\nPlan\n09-sep al 08-oct\n30 días\n59.90\nProrrateo\n25.12\nCargo prorrateo (Empresa PRO 2.0 59.9)\n27-ago al 08-sep\n13 días\n25.12\nDescuentos\n-42.51\nMA01 - Descuento por fidelizacion 50% x 12m (1/12)\n27-ago al 08-oct\n43 días\n-42.51\n933599864 (Empresa PRO 2.0 59.9)\n42.51\nPlan\n09-sep al 08-oct\n30 días\n59.90\nProrrateo\n25.12\nCargo prorrateo (Empresa PRO 2.0 59.9)\n27-ago al 08-sep\n13 días\n25.12\nDescuentos\n-42.51\nMA01 - Descuento por fidelizacion 50% x 12m (1/12)\n27-ago al 08-oct\n43 días\n-42.51\n912379686 (Empresa PRO 2.0 44.9)\n33.67\nPlan\n09-sep al 08-oct\n30 días\n44.90\nDescuentos\n-11.23\nMA01 - Descuentos por fidelizacion 25% x 18m (8/18)\n09-sep al 08-oct\n30 días\n-11.23\n933599883 (Emprende Ilimitado 49.90)\n21.25\nPlan\n09-sep al 08-oct\n30 días\n49.90\nProrrateo\n20.93\nCargo prorrateo (Emprende Ilimitado 49.90)\n27-ago al 08-sep\n13 días\n20.93\nDescuentos\n-49.58\nMA01 - Descuentos por fidelizacion 70% x 18m (1/18)\n27-ago al 08-oct\n43 días\n-49.58\nCuenta Cliente\n0.00\nSaldos Anteriores\n0.00\nRecibo(s) anterior(es)\n115.47\nAbonos / Cargos varios al 08/09/2025\n-115.47\n\nPágina 3 de 3\nMira aquí el detalle\ntu recibo\nConceptos facturables\n.\nCargo Fijo (incluye prorrateo): Monto de Renta Mensual y consumo proporcional por los servicios de\nVoz, Mensajería y Datos, según Plan Tarifario Contratado.\nOtros Servicios Contratados: Monto fijo mensual por los servicios de:\n- Paquetes Contratados: Paquetes de datos, mensajería y LDI. Servicios de Blackberry, Localizador,\nEntel Backup y otros servicios de Valor Agregado: licencias, aplicativos de negocio, gestión de\ndispositivos móviles y otros.\n- Garantía: Servicio de reposición de equipos.\n- Arrendamiento: Alquiler de equipos.\nConsumos Adicionales: Monto facturado no comprendido dentro del cargo fijo mensual del plan\ntarifario contratado, por los servicios de Voz, Mensajería, Datos, Roaming Internacional, LDI, Redes\nSatelitales, Destinos Rurales.\nDatos locales y móviles: Servicio de internet brindado a través de equipos móviles, USB Módems,\nRouters, etc.\nDatos Roaming: Servicio de datos que Entel brinda en otros países.\nOtros Cargos y Abonos: Cargos y abonos no recurrentes.\nPromociones y Descuentos: Descuentos generados por promociones especiales.\nRecargo por Intereses: Cobro de intereses legales generados por la no cancelación de la totalidad del\nrecibo a la fecha de vencimiento.\nOtros Cargos y Abonos (ya gravados con IGV): Cargo de documentos emitidos por compra o\nfinanciamiento de equipos y/o Boletas/Facturas adicionales, ya gravados con IGV. Incluye Facturación\npor encargo de Otros Operadores según normativa vigente.\nGlosario\n.\nOn Net: Comunicación de un teléfono móvil Entel a otro teléfono móvil Entel.\nOff Net: Comunicación de un teléfono móvil Entel a cualquier teléfono fijo o móvil de otro operador.\nLDI: Larga Distancia Internacional.\nRedes Satelitales: Telefonía móvil a números satelitales.\nDestinos Rurales: Telefonía móvil a Destinos Rurales.\nRoaming Internacional: Servicio de Voz y Datos que Entel brinda en otros países.\nDescarga de Contenidos: Cargo por envío de mensajes y descargas.\nMB: Megabytes (1 MB = 1024 KB)\n- El límite de crédito asignado para consumo adicional de servicios será informado por mensaje de texto\nuna vez iniciada la utilización del referido límite. Para contratación de otros servicios, será evaluado\ncrediticiamente en la venta.\n- El pago no oportuno devengará en intereses legales. Entel puede proceder a la suspensión del Servicio a\npartir del día siguiente del último día de pago.\n- Si tu línea es suspendida por falta de pago, se aplicará un cargo por reconexión del servicio.\n- Reconexión del servicio máximo dentro de 24 horas de efectuado el pago correspondiente.\n- Conoce los lugares de pago en www.entel.pe\nMÓVILES: 123 (desde tu Entel) y 611-7777 (desde un teléfono fijo) Llamadas gratis: 0-800-0-9000 (Lima y\nprovincias).\nINTERNET Y SERVICIOS DE VALOR AGREGADO: 123 (desde tu Entel) y 611-7777 (desde un teléfono fijo).\nOSIPTEL: Fono Ayuda: 0-801-12121 Para detalle de llamadas a fijos o móviles consultar gratuitamente Mi\nEntel\" en www.entel.pe\n\n"
+  },
+  {
+    "id": "1PF0KyhB3tw0cZKz5SkHOuDnK-6_WhZMy",
+    "name": "DIP-FACT-Recibo_Ciclico_2025090005_S1AA-0045338417.pdf",
+    "path": "",
+    "size": "139459",
+    "modifiedTime": "2025-09-10T20:15:44.802Z",
+    "webViewLink": "https://drive.google.com/file/d/1PF0KyhB3tw0cZKz5SkHOuDnK-6_WhZMy/view?usp=drivesdk",
+    "text": "Integratel Perú S.A.A.   |   R.U.C. 20100017491   |   Jr. Domingo Martínez Luján N° 1130   |   Lima – Lima - Surquillo\nPágina 1/3\nEmpresas Fija\nRecibo Septiembre\nN° recibo: S1AA-0045338417\nCREACION CUANTICA EIRL\nRUC: 20612592811 \nCALLE BERLIN 965 Piso 3 URBANIZACION RESIDENCIAL JOSE BALTA,\nMIRAFLORES, 01, LIMA\nCuenta financiera: 753621842 \nID SUSCRIPTOR: 196980437\nID Cliente: 131054354\nAnexo: 1\nTotal a pagar del mes\nS/109.90\nÚltimo día de pago: 21/09\nN° Fijo / Cód. pago: 753621842\nDeuda anterior: S/0.00\nEvolutivo Mensual\nAbr\nMay\nJun\nJul\nAgo\nSep\n \n89.80\n-0.09\n109.81\n109.82\n109.83\n109.84\nCiclo de facturación - Septiembre 2025\n05/09\n21/09\nFecha de\nEmisión\nÚltimo día\nde pago\n¡LLAMA AL 0 800 11311!\nSi tienes un negocio y deseas comprar o portar una línea\nmóvil, adquirir un servicio de internet, TV o telefonía fija.\nCanal exclusivo para Clientes con RUC 20\nResumen de Recibo - NºS1AA-0045338417\nCargos Mensuales\nS/ 109.89\nSubtotal\nS/93.13\nIGV (18%)\nS/16.76\nTotal Afecto\nS/109.89\nDescuentos y Bonificaciones Inafectos\nS/ 0.00\nRedondeo\nS/ 0.01\nTotal Facturado\nS/109.90\nDevoluciones\nS/ 0.00\nDébitos\nS/ 0.00\nTotal a pagar\nS/ 109.90\n\nEmpresas Fija\nIntegratel Perú S.A.A.   |   R.U.C. 20100017491   |   Jr. Domingo Martínez Luján N° 1130   |   Lima – Lima - Surquillo\nPágina 2/3\nDetalle del recibo - N° S1AA-0045338417 - 196980437\nCargos Mensuales\nPrecio de vta.\nIGV S/109.89\nMovistar Internet 600 Mbps (06Sep al 05Oct)\n93.13\n16.76\n109.89\nDescuentos y Bonificaciones Inafectos\nPrecio de vta.\nIGV\nS/0.00\nBonificacion Prom Internet 1 GB x 12m 600 Mbps (06Sep \nal 05Oct) (VR S/127.03)\n0.00\n0.00\n0.00\nRedondeo\nPrecio de vta.\nIGV\nS/0.01\nRedondeo del mes Actual\n-0.05\n0.00\n-0.05\nRedondeo del mes Anterior\n0.06\n0.00\n0.06\n\nConceptos facturables\nCargos fijos mensuales\nCargo mensual facturado al cliente por el plan contratado\npara los servicios de voz y datos. Cargo fijo proporcional\ndel plan desde la fecha de inicio del servicio hasta el\nsiguiente cierre de facturación\nCargos por llamadas adicionales\nCargos por tráfico de voz, datos, mensajes de texto que\nno se encuentran comprendidos dentro del cargo fijo\nmensual.\nLarga distancia: cargo adicional por llamada de larga\ndistancia nacional o internacional\nKB internet y multimedia: navegación en internet y\ntráfico por descarga de aplicativos\nKB transmisión de datos: envío y recepción de datos.\nRoaming internacional: cargo por llamadas efectuadas y\nrecibidas en el extranjero\nDetalle de documentos afectos al IGV\nCargo por Reconexión: cargo facturado si el cliente\ncancela un recibo después de habérsele cortado por\ndeuda.\nCargo por Reconexión de corte APC (a pedido de cliente):\ncargo facturado al efectuarse la reactivación del servicio\nde la línea luego de cumplirse el plazo de suspensión.\nCargo por llamadas a operadoras rurales: llamadas\nrealizadas a teléfonos fijos rurales como Gilat to Home,\nValtron, Claro Rural, Integratel Rural o a teléfonos satelitales\ncomo Tesam.\nRenta fraccionaria por cambio de plan: cargo facturado si\ndurante el ciclo de la facturación el cliente cambió a un\nplan tarifario de cargo fijo mayor al que tenía.\nLugares de pago\nBancos y agentes\nBBVA Continental\nBanco Pichincha\nBCP\nBanco de la Nación\nBanBif\nInterbank\nScotiabank\nOtros\nAgente Multibanco KASNET\nMultibanco\nFullcarga\nRed Digital\nMetro\nWong\nWestern Union\nAlgunos lugares de pago presenciales pueden aplicar cobro de comisión de acuerdo a sus tarifarios vigentes.\nPuede realizar su pago de forma rápida y segura en el App Mi Movistar, YAPE o App o Web de su banco.\nRecuerda que también puede afiliar su recibo\nMovistar al débito automático, más info :\nhttp://smvst.com/DAT\nMayor información sobre lugares de pago en www.movistar.com.pe\n¿Qué es el recibo digital?\nEs un servicio gratuito que ofrece Integratel, con el que podrá recibir mensualmente su recibo en formato PDF al\ncorreo electrónico que usted indique. El envío del recibo digital va en reemplazo de su recibo físico.\n\n"
+  },
+  {
+    "id": "1pMrYytBQBeCTbO5vqPZqwkAT4VOBSSVg",
+    "name": "20524520070-01-FA19-71.pdf",
+    "path": "",
+    "size": "14667",
+    "modifiedTime": "2025-09-10T14:23:24.325Z",
+    "webViewLink": "https://drive.google.com/file/d/1pMrYytBQBeCTbO5vqPZqwkAT4VOBSSVg/view?usp=drivesdk",
+    "text": "Representación Impresa de la Factura de Venta Electrónica\nPuede consultar este documento en www.fegs.com.pe\nSEÑOR(ES)\n: CREACION CUANTICA E.I.R.L. \nRUC\n: 20612592811\nDOMICILIO FISCAL\n: CAL.BERLIN NRO. 965 INT. 302 LIMA - LIMA - MIRAFLORES\nFECHA DE EMISION\n: 09.09.2025\nGUIA DE REMISION\n: \nFORMA DE PAGO\n: CREDITO\nR.U.C. 20524520070\nFactura de Venta Electrónica\nN° FA19-71\nWORX S.A.C.\nOficina Principal\nAV. REPUBLICA DE PANAMA 3030\nSAN ISIDRO - LIMA 27\nAlmacen\nCantidad\nUnidad\nDescripción\nPrecio Unitario\nValor Venta\n1.000 \nUND\nWORX OFICINA 903 (DEL 09/09 AL 30/09)\n490.00 \n490.00 \n1.000 \nUND\nWORX OFICINA 904 (DEL 09/09/ AL 30/09)\n279.30 \n279.30 \n1.000 \nUND\nWORX ESTACIONAMIENTO (DEL 09/09/ AL\n30/0\n70.00 \n70.00 \nCuota\nMoneda\nMonto\nFecha\nCredito\nUSD\n         891.33 \nCuota001\nUSD\n         891.33 \n16.09.2025\nSON : NOVECIENTOS NOVENTA CON 37/100 US\nDOLARES\nSUBTOTAL\nUSD\n839.30 \nDESCUENTO\nUSD\n0.00 \nOP. GRAVADAS USD\n839.30 \nI.G.V\nUSD\n151.07 \nR.CONSUMO\nUSD\n0.00 \nIMPORTE TOTAL USD\n990.37 \n\n"
+  },
+  {
+    "id": "1eKzeDmZQTaScVbGkFkVeX64B97C2Z8s1",
+    "name": "20524520070-01-FA19-69.pdf",
+    "path": "",
+    "size": "12564",
+    "modifiedTime": "2025-09-10T14:23:13.205Z",
+    "webViewLink": "https://drive.google.com/file/d/1eKzeDmZQTaScVbGkFkVeX64B97C2Z8s1/view?usp=drivesdk",
+    "text": "Representación Impresa de la Factura de Venta Electrónica\nPuede consultar este documento en www.fegs.com.pe\nSEÑOR(ES)\n: CREACION CUANTICA E.I.R.L. \nRUC\n: 20612592811\nDOMICILIO FISCAL\n: CAL.BERLIN NRO. 965 INT. 302 LIMA - LIMA - MIRAFLORES\nFECHA DE EMISION\n: 09.09.2025\nGUIA DE REMISION\n: \nFORMA DE PAGO\n: CREDITO\nR.U.C. 20524520070\nFactura de Venta Electrónica\nN° FA19-69\nWORX S.A.C.\nOficina Principal\nAV. REPUBLICA DE PANAMA 3030\nSAN ISIDRO - LIMA 27\nAlmacen\nCantidad\nUnidad\nDescripción\nPrecio Unitario\nValor Venta\n1.000 \nUND\nDEPOSITO EN GARANTIA OFICINA 903\n700.00 \n700.00 \nCuota\nMoneda\nMonto\nFecha\nCredito\nUSD\n         743.40 \nCuota001\nUSD\n         743.40 \n16.09.2025\nSON : OCHOCIENTOS VEINTISEIS US DOLARES\nSUBTOTAL\nUSD\n700.00 \nDESCUENTO\nUSD\n0.00 \nOP. GRAVADAS USD\n700.00 \nI.G.V\nUSD\n126.00 \nR.CONSUMO\nUSD\n0.00 \nIMPORTE TOTAL USD\n826.00 \n\n"
+  },
+  {
+    "id": "1u93CpKbGCLlLpAveyKsZnYUG3H9grVsE",
+    "name": "F005-00018937.pdf",
+    "path": "",
+    "size": "193196",
+    "modifiedTime": "2025-09-08T23:46:21.857Z",
+    "webViewLink": "https://drive.google.com/file/d/1u93CpKbGCLlLpAveyKsZnYUG3H9grVsE/view?usp=drivesdk",
+    "text": " \nInversiones PIMI SAC\nDomicilio fiscal: Pasaje Martir Olaya 141\nMiraflores - Lima - Lima - Peru\nrecaudacion@delpilarhotels.com\nTelf: (511) 712-0712 / Fax: (511) 712-0714\n-\n \nR.U.C Nº 20508159863\nFACTURA \nELECTRÓNICA\nF005-00018937\nRazón social\n: CREACION CUANTICA E.I.R.L.\nR.U.C\n: 20612592811\nDirección\n: CAL.LAS DALIAS NRO. 136 URB.\nARMENDARIZ (DPTO 604 - PISO 6) LIMA -\nLIMA - MIRAFLORES\nUbigeo\n: LIMA - LIMA - LIMA\nUrbanización\n: Lima\n \n \nMoneda\n: Soles\nFecha emisión\n: 08/09/2025 16:20:40\nFecha vencimiento\n: 09/09/2025\nForma de pago\n: Credito\nDias credito\n: 1 Días\nOrden de compra\n: -\nCliente\n: 03185-CREACION CUANTICA E.I.R.L.\nReserva\n: 049066\nGrupo\n: CAIDA DE CONFIANZA\nCheck in\n: 29/11/2025\nCheck out\n: 29/11/2025\nCantidad noches\n: 0\nHabitaciones\n: -\nTipo de cambio : 3.650\n \n \nObservaciones:\nCuotas\nInformación de la Detracción\nTipo Operación:\nBien o Servicio:\nMedio de pago:\n1001 Operación Sujeta a Detracción\n019 Arrendamiento de bienes muebles\n001 Depósito en cuenta\nNro. Cta. Banco de la Nación:\nPorcentaje de detracción:\nMonto detraccion:\n-\n10.00\nS/. 175.00\nLeyendas\nLeyenda: 2006    Operaci?n sujeta a detracci?n\nRepresentación Impresa de la factura electrónica, consulte su comprobante en www.infofactperu.pe/consulta \nUsuario: DENISE \nCódigo Hash:  Wfao2V4aFpBqIUN8ZUnrSh+AoP1c/jSzaw/2t/Y8jqI=\n \npowered by Infomatica\n \nÍtem\n \nCódigo\n \nDescripción\n \nUnd.\n \nCantidad\n \nV. Unitario\n \nP. Unitario\n \nDescuento\n \nValor Venta\n1\n210000\nEVENTOS - SALONES\nNIU\n1.000\n1 367.18750\n1 613.28125\n0.00000\n1 367.19\nSON:MIL SETECIENTOS CINCUENTA CON 00/100 SOLES\n \nAnticipo\nS/\n0.00\n \n \nOp. Gravada\nS/\n1 367.19\n \n \nI.G.V 18%\nS/\n246.09\n \n \nOp. Inafecta\nS/\n0.00\n \n \nOp. Exonerada\nS/\n0.00\n \n \nOp. Exportación\nS/\n0.00\n \n \nOp. Gratuita\nS/\n0.00\n \n \nICBPER\nS/\n0.00\n \n \nServicio\nS/\n136.72\n \nImporte Total\nS/\n1 750.00\nOperacion sujeta al spot de detraccion 10%  para alquileres y 12%  para alimentos cta cte 00005137934 - Banco de la Nacion\nNro. Cuota\nFecha de Vencimiento\nTipo de Moneda\nMonto de Cuota\n1\n2025-09-09\nSoles\n1 575.00\n.\nABONAR A LAS SIGUIENTES CUENTAS CORRIENTES\n.\n.\n.\nCuenta Corriente bcp Dolares: 191-1516166-117\nCuenta Corriente bcp soles: 191-1514483-007\n.\n.\n.\n\n"
+  },
+  {
+    "id": "1aVi6XMiX-SRyEg6vxlzKMmFh-s3QOl1a",
+    "name": "ETKT_1757099386069.pdf",
+    "path": "",
+    "size": "148473",
+    "modifiedTime": "2025-09-05T19:16:32.854Z",
+    "webViewLink": "https://drive.google.com/file/d/1aVi6XMiX-SRyEg6vxlzKMmFh-s3QOl1a/view?usp=drivesdk",
+    "text": " \n \nBOLETO ELECTRÓNICO POR  JOSEANTONIO TORRONRAMIREZ\n05 septiembre 2025                         \n      Id de Orden\n    BJ5DIZ\n \n       \n        \n \nGracias por preferir a Copa Airlines para realizar su viaje. Encuentre a continuación los detalles de su\nreserva e itinerario.\n \nDETALLES DEL PASAJERO\n \nNombre\n# de Viajero Frecuente Nivel Star Alliance\nNúmero de Boleto\nJOSEANTONIO TORRONRAMIREZ\n2302151862644\n \nITINERARIO DE VUELO:\nSANTO DOMINGO(SDQ) - PANAMA CITY(PTY) - Número de Vuelo- CM0299 - Economy Class\n \n Salida\n Jueves     Noviembre 27, 2025   \n2:15 PM\nSANTO DOMINGO(SDQ)\nLlegada\n  Jueves     Noviembre 27, 2025   \n3:50 PM\nPANAMA CITY(PTY)\nDetalles del vuelo\nDuración del vuelo:2h 35m\nAeronave:738\nVuelo operado por:\n \nAsientos Reservados: Si-  Reservar o Cambiar de\nasientos.      \n Tiempo de escala en  : 3h 15m\nPANAMA CITY(PTY) - LIMA(LIM) - Número de Vuelo- CM0489 - Economy Class\n \n Salida\n Jueves     Noviembre 27, 2025   \n7:05 PM\nPANAMA CITY(PTY)\nLlegada\n  Jueves     Noviembre 27, 2025   \n10:45 PM\nLIMA(LIM)\nDetalles del vuelo\nDuración del vuelo:3h 40m\nAeronave:7M8\nVuelo operado por:\n \nAsientos Reservados: Si-  Reservar o Cambiar de\nasientos.      \n  \nLIMA(LIM) - PANAMA CITY(PTY) - Número de Vuelo- CM0338 - Economy Class\n \n Salida\n Lunes    Diciembre 1, 2025  \n2:15 AM\nLIMA(LIM)\nLlegada\n Lunes    Diciembre 1, 2025  \n5:53 AM\nPANAMA CITY(PTY)\nDetalles del vuelo\nDuración del vuelo:3h 38m\nAeronave:73G\nVuelo operado por:\n \nAsientos Reservados: Si-  Reservar o Cambiar de\nasientos.      \n Tiempo de escala en  : 3h 49m\nPANAMA CITY(PTY) - SANTO DOMINGO(SDQ) - Número de Vuelo- CM0298 - Economy Class\n \n \n \n \nAdministrar su \nReserva \n\n \n Salida\n Lunes    Diciembre 1, 2025  \n9:42 AM\nPANAMA CITY(PTY)\nLlegada\n Lunes    Diciembre 1, 2025  \n1:12 PM\nSANTO DOMINGO(SDQ)\nDetalles del vuelo\nDuración del vuelo:2h 30m\nAeronave:73G\nVuelo operado por:\n \nAsientos Reservados: Si-  Reservar o Cambiar de\nasientos.      \n  \n \n \nCARGOS DE TRANSPORTE AÉREO\n \nDescripción\ntarifa\nTicket Fare JOSEANTONIO TORRONRAMIREZ\n \n349.00 USD\nTY \n \n0.36\nDO \n \n1.80\nVB \n \n2.20\nAA \n \n20.00\nUX \n \n30.00\nAH \n \n2.50\nDY \n \n15.00\nHW \n \n30.86\nTY \n \n6.64\nDO \n \n61.00\nVB \n \n39.34\nTotal \n \n14.36 USD\n \nPara ver más sobre los detalles de la tarifa familiar, haga clic aquí Copa.com  \n \n \n  FORMA DE PAGO:\n Tarjeta de crédito         \nVIXXXXXXXXXXXX2634\nUSD 14.36\nFecha de caducidad:\n0829 \nCódigo de Autorización:\n964617 \n          \n    \nSe cobrará una tarifa administrativa no reembolsable por persona y se agregará al precio total del boleto al comprar sus boletos\nen nuestras oficinas de ventas, aeropuertos y centros de reserva. En algunos países, los impuestos locales pueden aplicar a la\ntarifa. Para obtener más información sobre esta tarifa administrativa, haga clic en  aqui\n \n \n   \n \n \n \n \n\n \nEs responsabilidad del pasajero asegurarse de obtener y cumplir con los requisitos de viaje  establecidos por las autoridades del\nlugar de origen, tránsito y destino. Antes de embarcar, Copa Airlines verificará que el pasajero cuente con los requisitos\nmigratorios o sanitarios necesarios para el lugar de origen y de destino. Todo pasajero que proporcione información falsa o\nengañosa sobre dichos requisitos será responsable de los gastos incurridos o multas impuestas a la aerolínea por este motivo.\n \nIn compliance with Dominican Republic entry regulations imposed by the government, all passengers must complete the\nElectronic Ticket form. Click aquí  to complete.   \n \nFavor de revisar la política de equipaje para obtener información sobre su equipaje permitido.\n \nLa ley federal en los Estados Unidos prohíbe el transporte de materiales peligrosos a bordo de las aeronaves en su equipaje o en\nsu persona. Una violación puede resultar en cinco años de prisión y sanciones. Los materiales peligrosos incluyen explosivos,\ngases comprimidos, líquidos y sólidos inflamables, oxidantes, venenos, corrosivos y materiales radiactivos. Ejemplos: pinturas,\nlíquido para encendedores, fuegos artificiales. Hay excepciones especiales para pequeñas cantidades (hasta 70 onzas en total)\nde medicamentos y de artículos de baño transportados en el equipaje y ciertos artículos para fumar transportados por la\npersona. Para mayor información visite copaair.com.\n \n \n  \n    ¿Necesita ayuda?\n     Para obtener información sobre reservas, cargos, estado de su vuelo\n     y más, visite Copa.com\n      Síganos en las Redes Sociales: \n    \n  \n  \n   \n     Este correo electrónico ha sido enviado automáticamente a crearpodersinlimitesperu@gmail.com  para proporcionarle información sobre su viaje.\n     Por favor no responda a este correo electrónico con el botón 'Responder'. Para obtener ayuda, póngase en contacto con nuestro Centro de Reservas.\n    Revise nuestra política de privacidad.\n \n \n \n \n\n"
+  },
+  {
+    "id": "196qZpMjDLvJ9UVHduHxAGkNPDwJqiK8i",
+    "name": "EMD_1757099387968.pdf",
+    "path": "",
+    "size": "112907",
+    "modifiedTime": "2025-09-05T19:15:30.814Z",
+    "webViewLink": "https://drive.google.com/file/d/196qZpMjDLvJ9UVHduHxAGkNPDwJqiK8i/view?usp=drivesdk",
+    "text": " \nRECIBO DE PRODUCTOS Y SERVICIOS POR  JOSEANTONIO TORRONRAMIREZ\n \n \nId de Orden\nBJ5DIZ\n \n \n \nFecha de emisión\n5º Septiembre 2025  \n \n \n \nNúmero de Documento\n        230 0052 073 640      \n \nPASSENGER DETAILS\nName\nFrequent Flyer #\n \nStar Alliance Status\n JOSEANTONIO TORRONRAMIREZ\n \nDETALLES DEL PRODUCTO O SERVICIO - Información del Documento Misceláneo Electrónico\n \nEn conexión con: 2302151732190\nProducto / Servicio \n   \nFecha   \n  \n   \nDOCUMENT\nAMENDMENT FEE (1)\n                              \n  \n  \nENDOSOS / RESTRICCIONES:  \nLas siguientes condiciones aplican para certificado de viaje:\nVálido para boletos operados por Copa Airlines\nNo es válido para impuestos\nVálido 1 año después de la emisión\nNo reembolsable\nNo transferible\nValorado en moneda local al tipo de cambio de la fecha de emisión.\nDETALLES DEL PASAJERO      \n \nMoneda   \nCantidad    \nImporte del impuesto(Impuesto al Valor Agregado)   \n                                                                \n                       USD\n                                                                 \n                        150.00\n                                                                 \n                         0.0\n            FORMA DE PAGO:\n Tarjeta de crédito        \nVIXXXXXXXXXXXX2634\nUSD 150.00\nFecha de caducidad: \n0829 \nCódigo de autorización: \n964617 \n \n \n \n \n \n \n \n \n \n\n            \n   ¿Necesita ayuda?\n    Para obtener información sobre reservas, cargos, estado de su vuelo\n    y más, visite Copa.com Copa.com\n     Síganos en las Redes Sociales:\n  \n  \n  \n   \n \nEste correo electrónico ha sido enviado automáticamente a crearpodersinlimitesperu@gmail.com para proporcionarle información sobre su viaje.\nPor favor no responda a este correo electrónico con el botón 'Responder'. Para obtener ayuda, póngase en contacto con nuestro  Centro de Reservas.\nRevise nuestra política de privacid\n \n \n \n \n\n"
+  },
+  {
+    "id": "1gk2p7BzjmsdsUuypw6CRLJ_buoPoqoqP",
+    "name": "FACTURA ALOJAMIENTO 3248877.pdf",
+    "path": "",
+    "size": "326034",
+    "modifiedTime": "2025-09-03T18:29:35.755Z",
+    "webViewLink": "https://drive.google.com/file/d/1gk2p7BzjmsdsUuypw6CRLJ_buoPoqoqP/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n3248877\nmiércoles, 3 Setiembre, 2025\nREFERENCIA\nF301\n00038877\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n08/09/2025\nSALIDA\n04/09/2025\nFacturado a : \nUSUARIO\nArreola / Muñoz / Diaz\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nAlojamiento\n825.00\n825.00\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\n3BFeAwcoM6JyqhlChLf16TyOuSI=\nUN MIL CINCUENTA Y SEIS Y 00/100 DOLARES AMERICANOS\nTotal  Propina\nUS $\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n1,056.00\n0.00\n0.00\n82.50\n148.50\n0.00\n0.00\n825.00\nTotal  Exportacion\n0.00\nCuentas corrientes  \nTotal  Descuento\nDolares\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1gczL0fEl2XXmO4X8VNWImWYUYt03wDs_",
+    "name": "FACTURA SALDO EVENTO CREACION CUANTICA DEL 05 AL 07 DE SEPTIEMBRE.pdf",
+    "path": "",
+    "size": "326924",
+    "modifiedTime": "2025-09-03T17:54:20.371Z",
+    "webViewLink": "https://drive.google.com/file/d/1gczL0fEl2XXmO4X8VNWImWYUYt03wDs_/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n3245873\nmartes, 2 Setiembre, 2025\nREFERENCIA\nF301\n00038854\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n07/09/2025\nSALIDA\n05/09/2025\nFacturado a : \nUSUARIO\nEvento\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nSalas\n10,593.22\n10,593.22\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\ng54UFJi1CYhMv762aP83Xef1PUw=\nDOCE MIL QUINIENTOS Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n12,500.00\n0.00\n0.00\n0.00\n1,906.78\n0.00\n0.00\n10,593.22\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1GKb60qjpvB_AD_8qVBAEwAwPgbQ6BOlB",
+    "name": "ad08907041960512500673126.pdf",
+    "path": "",
+    "size": "31117",
+    "modifiedTime": "2025-09-03T17:22:31.382Z",
+    "webViewLink": "https://drive.google.com/file/d/1GKb60qjpvB_AD_8qVBAEwAwPgbQ6BOlB/view?usp=drivesdk",
+    "text": "No. ALCO673126\nN.I.T.: 890.704.196-6\nBILLETE DE TRANSPORTE AEREO ELECTRONICO\nFecha de Emisión\n27/08/2025\nHora: 16:11\nCodigo Orden/Reserva:\nQSFVBS\nMedio de Pago:\nTarjeta Crédito\nForma de Pago:\nContado\nAerovías de Integración Regional S.A.\nAV EL DORADO 103 08 EN 1 HG\nBogotá, D.c.\nwww.latam.com\nNombre y/o Razón Social Del Adquirente:\nCREACION CUANTICA\nNúmero De Identificación y/o NIT:\n20612592811\nE-Mail:\nMILDREDMUNOZV@GMAIL.COM\nItem\nN° Tiquete\nDescripción\nU.M\nCant.\nPrecio Unitario\nNombre Pasajero\nValor Total\n% IVA\nN° Documento\n1\n1ST 23KG\nUnidad\n19.00\n$ 303,400.00\n0354456526149\n1.00\n$ 303,400.00\nMILDRED MS MUNOZ\n2\n1ST 23KG\nUnidad\nnull\n$ 234,600.00\n0354456526154\n1.00\n$ 234,600.00\nMILDRED MS MUNOZ\n Tarifa\nTotal Ítems: 2\n IVA\n Otras Tasas e Impuestos\n Valor Total\nGenerado por: Signature South Consulting Colombia S A S.\nNIT: 900.508.908\nSoftware: Gosocket\n$ 538,000.00\n$ 57,650.00\n$ 42,300.00\n$637,950.00\nCUDE: 4819748747ead1d2e20b30bbf371c503981f53e272e583df60bda6ea988ddc1c49426b144e1283b62979d30895457cba\n Base gravable\n$ 303,400.00\nResponsable de IVA\nAgente Retenedor sobre el Impuesto a las ventas\nIVA\nACTIVIDAD ECONÓMICA 5112 TARIFA 4,14/1000\nSomos Grandes Contribuyentes según RES.\n012220 de Diciembre 2022\nAUTORETENEDORES EN EL SERVICIO DE\nTRANSPORTE AÉREO NACIONAL SEGÚN\nDECRETO 399 DEL 26*02/1987 ART 2\n\n"
+  },
+  {
+    "id": "1I31bNNm-gTgjHmYhlG3ExAPVUONfpwQm",
+    "name": "Factura Lima .pdf",
+    "path": "",
+    "size": "21764",
+    "modifiedTime": "2025-09-03T17:03:20.061Z",
+    "webViewLink": "https://drive.google.com/file/d/1I31bNNm-gTgjHmYhlG3ExAPVUONfpwQm/view?usp=drivesdk",
+    "text": "Factura  \nCreación Cuántica E.I.R.L \nRUC: 20612592811 \nDirección Fiscal: Berlin 965 DEP. 302 - Lima - Miraflores  \nPago de llamada Managers  \nNombre \nDescripción \nCantidad \nAna Elena Monroy Thompson \nPago llamadas managers \n$300 USD \n\n"
+  },
+  {
+    "id": "1Og2wBUsIEBUIibTFr1FJbTAY_-hPeNT_",
+    "name": "factura evento creación cuantica 05 al 07 septiembre 2025.pdf",
+    "path": "",
+    "size": "326975",
+    "modifiedTime": "2025-08-27T21:48:13.591Z",
+    "webViewLink": "https://drive.google.com/file/d/1Og2wBUsIEBUIibTFr1FJbTAY_-hPeNT_/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n3245873\nmiércoles, 27 Agosto, 2025\nREFERENCIA\nF301\n00038679\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n07/09/2025\nSALIDA\n05/09/2025\nFacturado a : \nUSUARIO\nMaestría del juego\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nSalas\n17,372.88\n17,372.88\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nE1uAjd4pD2nIRn+Di4j4DNg57TM=\nVEINTE MIL QUINIENTOS Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n20,500.00\n0.00\n0.00\n0.00\n3,127.12\n0.00\n0.00\n17,372.88\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1kNCPSieJtlQoGYOBi-TofQC_9XQUKKYI",
+    "name": "ETKT_1756307629900.pdf",
+    "path": "",
+    "size": "148360",
+    "modifiedTime": "2025-08-27T15:20:14.175Z",
+    "webViewLink": "https://drive.google.com/file/d/1kNCPSieJtlQoGYOBi-TofQC_9XQUKKYI/view?usp=drivesdk",
+    "text": " \n \nBOLETO ELECTRÓNICO POR  JOSEANTONIO TORRONRAMIREZ\n27 agosto 2025                     \n      Id de Orden\n    BJ5DIZ\n \n       \n        \n \nGracias por preferir a Copa Airlines para realizar su viaje. Encuentre a continuación los detalles de su\nreserva e itinerario.\n \nDETALLES DEL PASAJERO\n \nNombre\n# de Viajero Frecuente Nivel Star Alliance\nNúmero de Boleto\nJOSEANTONIO TORRONRAMIREZ\n2302151732190\n \nITINERARIO DE VUELO:\nSANTO DOMINGO(SDQ) - PANAMA CITY(PTY) - Número de Vuelo- CM 129 - Economy Class\n \n Salida\n Jueves      Septiembre 18, 2025  \n11:56 AM\nSANTO DOMINGO(SDQ)\nLlegada\n  Jueves      Septiembre 18, 2025  \n1:29 PM\nPANAMA CITY(PTY)\nDetalles del vuelo\nDuración del vuelo:2h 33m\nAeronave:7M9\nVuelo operado por:\n \nAsientos Reservados: Si-  Reservar o Cambiar de\nasientos.      \n Tiempo de escala en  : 2h 11m\nPANAMA CITY(PTY) - LIMA(LIM) - Número de Vuelo- CM 493 - Economy Class\n \n Salida\n Jueves      Septiembre 18, 2025  \n3:40 PM\nPANAMA CITY(PTY)\nLlegada\n  Jueves      Septiembre 18, 2025  \n7:15 PM\nLIMA(LIM)\nDetalles del vuelo\nDuración del vuelo:3h 35m\nAeronave:738\nVuelo operado por:\n \nAsientos Reservados: Si-  Reservar o Cambiar de\nasientos.      \n  \nLIMA(LIM) - PANAMA CITY(PTY) - Número de Vuelo- CM 338 - Economy Class\n \n Salida\n Lunes     Septiembre 22, 2025  \n2:15 AM\nLIMA(LIM)\nLlegada\n Lunes     Septiembre 22, 2025  \n5:53 AM\nPANAMA CITY(PTY)\nDetalles del vuelo\nDuración del vuelo:3h 38m\nAeronave:738\nVuelo operado por:\n \nAsientos Reservados: Si-  Reservar o Cambiar de\nasientos.      \n Tiempo de escala en  : 1h 33m\nPANAMA CITY(PTY) - SANTO DOMINGO(SDQ) - Número de Vuelo- CM 463 - Economy Class\n \n \n \n \nAdministrar su \nReserva \n\n \n Salida\n Lunes     Septiembre 22, 2025  \n7:26 AM\nPANAMA CITY(PTY)\nLlegada\n Lunes     Septiembre 22, 2025  \n10:58 AM\nSANTO DOMINGO(SDQ)\nDetalles del vuelo\nDuración del vuelo:2h 32m\nAeronave:7M8\nVuelo operado por:\n \nAsientos Reservados: Si-  Reservar o Cambiar de\nasientos.      \n  \n \n \nCARGOS DE TRANSPORTE AÉREO\n \nDescripción\ntarifa\nTicket Fare JOSEANTONIO TORRONRAMIREZ\n \n339.00 USD\nAA \n \n20.00\nDO \n \n61.00\nL8 \n \n10.00\nTY \n \n6.64\nUX \n \n30.00\nVB \n \n39.34\nAH \n \n2.50\nDY \n \n15.00\nHW \n \n30.86\nTotal \n \n554.34 USD\n \nPara ver más sobre los detalles de la tarifa familiar, haga clic aquí Copa.com  \n \n \n  FORMA DE PAGO:\n Tarjeta de crédito         \nVIXXXXXXXXXXXX2634\nUSD 554.34\nFecha de caducidad:\n0829 \nCódigo de Autorización:\n950537 \n          \n    \nSe cobrará una tarifa administrativa no reembolsable por persona y se agregará al precio total del boleto al comprar sus boletos\nen nuestras oficinas de ventas, aeropuertos y centros de reserva. En algunos países, los impuestos locales pueden aplicar a la\ntarifa. Para obtener más información sobre esta tarifa administrativa, haga clic en  aqui\n \n \n   \n \nEs responsabilidad del pasajero asegurarse de obtener y cumplir con los requisitos de viaje  establecidos por las autoridades del\nlugar de origen, tránsito y destino. Antes de embarcar, Copa Airlines verificará que el pasajero cuente con los requisitos\n \n \n \n \n\nmigratorios o sanitarios necesarios para el lugar de origen y de destino. Todo pasajero que proporcione información falsa o\nengañosa sobre dichos requisitos será responsable de los gastos incurridos o multas impuestas a la aerolínea por este motivo.\n \nIn compliance with Dominican Republic entry regulations imposed by the government, all passengers must complete the\nElectronic Ticket form. Click aquí  to complete.   \n \nFavor de revisar la política de equipaje para obtener información sobre su equipaje permitido.\n \nLa ley federal en los Estados Unidos prohíbe el transporte de materiales peligrosos a bordo de las aeronaves en su equipaje o en\nsu persona. Una violación puede resultar en cinco años de prisión y sanciones. Los materiales peligrosos incluyen explosivos,\ngases comprimidos, líquidos y sólidos inflamables, oxidantes, venenos, corrosivos y materiales radiactivos. Ejemplos: pinturas,\nlíquido para encendedores, fuegos artificiales. Hay excepciones especiales para pequeñas cantidades (hasta 70 onzas en total)\nde medicamentos y de artículos de baño transportados en el equipaje y ciertos artículos para fumar transportados por la\npersona. Para mayor información visite copaair.com.\n \n \n  \n    ¿Necesita ayuda?\n     Para obtener información sobre reservas, cargos, estado de su vuelo\n     y más, visite Copa.com\n      Síganos en las Redes Sociales: \n    \n  \n  \n   \n     Este correo electrónico ha sido enviado automáticamente a crearpodersinlimitesperu@gmail.com  para proporcionarle información sobre su viaje.\n     Por favor no responda a este correo electrónico con el botón 'Responder'. Para obtener ayuda, póngase en contacto con nuestro Centro de Reservas.\n    Revise nuestra política de privacidad.\n \n \n \n \n\n"
+  },
+  {
+    "id": "1OshkBHsGDjx0slDLthFY53iD8bIQ5ome",
+    "name": "FACTURA EVENTO CREACION CUANTICA 28 AL 31 AGO2025.pdf",
+    "path": "",
+    "size": "328162",
+    "modifiedTime": "2025-08-27T12:44:05.144Z",
+    "webViewLink": "https://drive.google.com/file/d/1OshkBHsGDjx0slDLthFY53iD8bIQ5ome/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n3245865\nviernes, 22 Agosto, 2025\nREFERENCIA\nF301\n00038560\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n31/08/2025\nSALIDA\n28/08/2025\nFacturado a : \nUSUARIO\nEvento\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nSalas\n24,576.27\n24,576.27\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\n0/dy4rx4rbBFndX2IrzgNmGATyM=\nVEINTINUEVE MIL Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n29,000.00\n0.00\n0.00\n0.00\n4,423.73\n0.00\n0.00\n24,576.27\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1wtH-NTOnUKFJ7uXAtkGVlK_Q4F6O9EOK",
+    "name": "factura creación cuantica alojamiento Mildred Muñoz.pdf",
+    "path": "",
+    "size": "326263",
+    "modifiedTime": "2025-08-27T12:42:28.711Z",
+    "webViewLink": "https://drive.google.com/file/d/1wtH-NTOnUKFJ7uXAtkGVlK_Q4F6O9EOK/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n3248396\nlunes, 25 Agosto, 2025\nREFERENCIA\nF301\n00038639\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n31/08/2025\nSALIDA\n27/08/2025\nFacturado a : \nUSUARIO\nMildred Muñoz\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nAlojamiento\n275.00\n275.00\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\neMzGSppEWgJ4KTJhZDEzxT8nbeg=\nTRESCIENTOS CINCUENTA Y DOS Y 00/100 DOLARES AMERICANOS\nTotal  Propina\nUS $\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n352.00\n0.00\n0.00\n27.50\n49.50\n0.00\n0.00\n275.00\nTotal  Exportacion\n0.00\nCuentas corrientes  \nTotal  Descuento\nDolares\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1KKIOFt8jlOCg3wtRk_tt3PqxzlPtm6rC",
+    "name": "factura lima AM.pdf",
+    "path": "",
+    "size": "21773",
+    "modifiedTime": "2025-08-15T22:13:24.253Z",
+    "webViewLink": "https://drive.google.com/file/d/1KKIOFt8jlOCg3wtRk_tt3PqxzlPtm6rC/view?usp=drivesdk",
+    "text": "Factura  \nCreación Cuántica E.I.R.L  \nRUC: 20612592811 \nDirección Fiscal: Berlin 965 DEP. 302 - Lima - Miraflores  \nPago de Llamadas de managers  \nNombre \nDescripción \nCantidas \nAna Elena Monroy Thompson \nPago llamadas managers \n$250 USD \n\n"
+  },
+  {
+    "id": "1vRTnynIMgjMeNk__OEuxWI2_AgWooNrW",
+    "name": "20512108751-01-FF01-12302.pdf",
+    "path": "",
+    "size": "117316",
+    "modifiedTime": "2025-08-15T13:37:00.465Z",
+    "webViewLink": "https://drive.google.com/file/d/1vRTnynIMgjMeNk__OEuxWI2_AgWooNrW/view?usp=drivesdk",
+    "text": "KeyFacil™\nComprobante emitido a través de www.keyfacil.com\nCONSTRUCTOR CENTER LATIN\nBROTHER\nPRINCIPAL » AV. TOMAS MARSANO NRO. 906 - LIMA\nLIMA SURQUILLO\nARTICULOS DE LIMPIEZA Y FERRETERIA EN\nGENERAL: FIERRO, CEMENTO, CONCRETO,\nPEGAMENTOS AGREGADOS , ENCHAPES,\nGRANALLAS, MARMOLINA, CEMENTO\nBLANCO,PEGAMENTO CHEMA,TREBOL,CELIMA,\nLADRILLOS, REFRECTARIOS, TEJAS\n,PASTELEROS,TRIPLAY , HERRAMIENTAS, ETC.\nCorreo : Mariachuquirunaplasencia@gmail.com\nCelulares : 998 740 965 / 925 889 599\n/925398496 /973455570 /964936280.\nPAGINA WEB PARA COMPRAS:\nWWW.CONSTRUCTORCENTER.COM\nRUC 20512108751\nFACTURA\nELECTRÓNICA\nFF01-0012302\nDOCUMENTO\nRUC 20612592811\nFECHA EMISIÓN\n14/08/2025\nCLIENTE\nCREACION CUANTICA E.I.R.L.\nFECHA VENCIMIENTO -\nDIRECCIÓN\nAV. SERGIO BERNALES NRO. 272 - LIMA LIMA LIMA\nMONEDA\nSOLES\nNº\nUNIDAD\nCÓDIGO\nDESCRIPCIÓN\nCANT.\nP. UNIT.\nTOTAL\n1\nUNIDADES\n20211028153245\nFIERRO DE 3/8 ACEROS AREQUIPA\n38.00\n33.00\n1254.00\n2\nUNIDADES\n20210811111131\nCARRETILLA\n2.00\n230.00\n460.00\n3\nUNIDADES\n20210515101140\nPALAS\n2.00\n38.00\n76.00\n4\nUNIDADES\n20241122115224\nARENA FINA\n5.00\n4.50\n22.50\n5\nUNIDADES\n20210102161924\nLENTES\n6.00\n6.00\n36.00\n6\nUNIDADES\n20210102113220\nGUANTES DE SEGURIDAD\n6.00\n7.00\n42.00\n7\nUNIDADES\n20210108072407\nESCOBA ECONOMICA\n2.00\n12.00\n24.00\n \n \n \n \n \n \n \nSON MIL NOVECIENTOS CATORCE Y 50/100 SOLES\nGRAVADO\nS/\n1,622.46\nI.G.V. 18%\nS/\n292.04\nTOTAL\nS/\n1,914.50\nUSUARIO\nADMINISTRADORA - 14/08/2025 01:23 PM\nCONDICIÓN DE PAGO\nCONTADO\nCUENTAS BANCARIAS\nCta.Ahorros BCP: 19491462961027. Maria Chuquiruna. PAGO YAPE:998740965 \nCta.Ahorros BBVA:001105080200307056. Maria Chuquiruna. PAGO PLIN:998740965\nRESPUESTA SUNAT\nLa Factura numero FF01-12302, ha sido aceptada\nAutorizado mediante resolución Nº 034-005-0010431/SUNAT\nRepresentación impresa de la FACTURA ELECTRÓNICA\nPara consultar el comprobante visita www.keyfacil.com\nResumen QwM+syfQ/NAZOWAn53HEMak07jc=\n¡GRACIAS POR SU PREFERENCIA, REGRESE PRONTO!\n\n"
+  },
+  {
+    "id": "15Li1AnHntDdfA_TXAxm1y9sLuQc_z3fK",
+    "name": "20601007119-01-F003-00007970.pdf",
+    "path": "",
+    "size": "37642",
+    "modifiedTime": "2025-08-14T14:38:00.996Z",
+    "webViewLink": "https://drive.google.com/file/d/15Li1AnHntDdfA_TXAxm1y9sLuQc_z3fK/view?usp=drivesdk",
+    "text": "MALECON BALTA OPERATOR S.A.C\nAV. JAVIER PRADO OESTE NRO. 769 - SAN ISIDRO - LIMA - LIMA\nR.U.C. 20601007119\nFACTURA ELECTRÓNICA\nF003 N° 00007970\nRAZÓN SOCIAL:\nFECHA DE EMISIÓN:\nCREACION CUANTICA E.I.R.L.\nFECHA DE VENCIMIENTO:\n13/08/2025\nDIRECCIÓN:\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6)  - MIRAFLORES - LIMA - LIMA\nMONEDA:\n13/08/2025\n20612592811\nSOLES\nLLEGADA:\n16/08/2025\nSALIDA:\n16/08/2025\nRUC:\nA NOMBRE:\nPASAPORTE:\nFORMA DE PAGO:\nCONTADO\nDESCRIPCIÓN\nCANTIDAD\nPRECIO UNITARIO\nTOTAL\n2,343.75\n1\n2,343.75\nEVENTOS\nSON : TRES MIL CON 00/100 SOLES\nBanco de Crédito del Perú\nDOLARES\nBanco\nSOLES\n191-9747180-1-72\nCCI\nBanco de Crédito del Perú\nNúmero de Cuenta\n191-9673128-0-61\n00219100974718017256\nMoneda\n00219100967312806154\nAUTORIZADO MEDIANTE RESOLUCIÓN NRO.034-005-0005038/SUNAT\nREPRESENTACIÓN IMPRESA DE LA FACTURA ELECTRÓNICA\nPUEDE CONSULTAR ESTE COMPROBANTE EN:https://prod.ebis.pe/CecWeb/Consulta.jsf?e=20601007119\nEXISTE LA POSIBILIDAD DE QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRÁ UN CAMBIO EN EL\nNÚMERO DE COMPROBANTE.\nMÉTODO PAGO SUNAT:\nCONTADO\nMONTO NETO PENDIENTE DE PAGO:\n0.00\n  OP.\nGRAVADA\n0.00\n2,343.75\n  OP.\nINAFECTA\n0.00\n0.00\nOP.\nEXPORTACIÓN\n421.88\n0.00\nI.G.V\n0.00\nI.S.C\nT.DSCTO.\n IMPORTE\nTOTAL\nR.CONS.10%\nPAID OUT\n234.37\n0.00\n3,000.00\n0.00\nPROPINA\n  OP.\nEXONERADAS\nBCPLPEPL\nSWITF\nBCPLPEPL\n037 DEMÁS SERVICIOS GRAVADOS CON EL IGV\nBIENES O SERVICIO:\nDEPÓSITO EN CUENTA\nMEDIO PAGO:\n00-046-326121\nNUMERO DE CUENTA:\nPORCENTAJE DETRACCION:\n12 %\n360.00\nMONTO DE DETRACCION:\nOperación sujeta al Sistema de Pago de Obligaciones Tributarias con el Gobierno Central\n-1-\n\n"
+  },
+  {
+    "id": "1P4BOeNjdQvQ3irnTRk7a0eDXyjp17EPb",
+    "name": "S002-189940047_08_20250808.pdf",
+    "path": "",
+    "size": "262357",
+    "modifiedTime": "2025-08-12T16:38:07.248Z",
+    "webViewLink": "https://drive.google.com/file/d/1P4BOeNjdQvQ3irnTRk7a0eDXyjp17EPb/view?usp=drivesdk",
+    "text": "Página 1 de 2\n+\n+\n-\n+\n+\nEntel Perú S.A.\nRUC: 20106897914\nAv. República de Colombia 791\nPiso 14 - San Isidro - Lima\n¡Hola! Te enviamos tu recibo del mes\n0\n30\n60\n90\n120\n150\nRequest ID: 3432 | Ciclo: 08 | Custcode: 5.7023\nCREACION CUANTICA E.I.R.L.\nMonica Pamela Carrillo\nAv Sergio Bernales Nro 272\nLima - Lima - Lima\nRecibo Nº\nEmisión\n:\n:\nS002-189940047\n08/Ago/2025\nInicio del Periodo\nFin del Periodo\n:\n:\n09/Ago/2025\n08/Sep/2025\nNº de Cuenta\nNº Doc (RUC)\n:\n:\n1.21765711\n20612592811\nTotal a pagar\nVencimiento\nS/ 115.47\n21/Ago/2025\nPlan\nProrrateo\nCargos\nAdicionales\nDescuentos o\nP. Adelantado\nEquipos\nSaldo\nAnterior\nS/ 126.70\nS/ 0.00\nS/ 0.00\n-S/ 11.23\nS/ 0.00\nS/ 0.00\nEn las siguientes páginas\npodrás encontrar el detalle de cada concepto\nFacturación de los últimos 6 meses\nMar\nAbr\nMay\nJun\nJul\nAgo\nDesglose tributario\nSubtotal de Conceptos Facturados (sin IGV)\nIGV del Subtotal (18%)\nTotal (Incl. IGV)\nMontos ya gravados con IGV\nExentos IGV\nSaldo anterior\nTotal a pagar\n97.86\n17.61\n115.47\n0.00\n0.00\n0.00\n115.47\nDocumento válido para efectos tributarios según Res. de Sup. No. 007-99/SUNAT. Documento\nno afecto al régimen de retención del IGV por ser agente de retención, según Res. de Sup. No.\n037-2002/SUNAT. Los saldos de hasta S/0.09 que no cancele por falta de moneda de curso legal\n(S/0.05 y S/0.01), se registrarán y se mantendrán como pendientes de pago hasta su cancelación\nefectiva.\nRecuerda que puedes cambiar de operadora sin perder tu número. El trámite de portabilidad es\nrápido y gratuito. Migra tus líneas de otro operador hacia Entel y disfruta de los beneficios que\ntenemos para ti.\n\nPágina 2 de 2\nMira aquí el detalle\ntu recibo\nResumen\nNúmero\nPlan Tarifario\nPlan\nProrrateo\nCargos\nAdicionales (*)\nDescuentos o\nP. Adelantado\nEquipos (*)\nSaldo\nAnterior\nMonto S/\n(Incl. IGV)\n908931343\nEmpresa PRO 2.0 36.9\n36.90\n0.00\n0.00\n0.00\n0.00\n0.00\n36.90\n912379686\nEmpresa PRO 2.0 44.9\n44.90\n0.00\n0.00\n-11.23\n0.00\n0.00\n33.67\n912379744\nEmpresa PRO 2.0 44.9\n44.90\n0.00\n0.00\n0.00\n0.00\n0.00\n44.90\nCuenta\nCliente\n0.00\n0.00\n0.00\n0.00\n0.00\n0.00\n0.00\nTotal\n126.70\n0.00\n0.00\n-11.23\n0.00\n0.00\n115.47\n(*) Puede incluir conceptos exentos o ya gravados con IGV\nDetalle\nConceptos detallados\nPeríodo\nUnidad\nMonto S/ (Incl. IGV)\n912379686 (Empresa PRO 2.0 44.9)\n33.67\nPlan\n09-ago al 08-sep\n31 días\n44.90\nDescuentos\n-11.23\nMA01 - Descuentos por fidelizacion 25% x 18m (7/18)\n09-ago al 08-sep\n31 días\n-11.23\nCuenta Cliente\n0.00\nSaldos Anteriores\n0.00\nRecibo(s) anterior(es)\n115.48\nAbonos / Cargos varios al 08/08/2025\n-115.48\nConceptos facturables\n.\nCargo Fijo (incluye prorrateo): Monto de Renta Mensual y consumo proporcional por los servicios de\nVoz, Mensajería y Datos, según Plan Tarifario Contratado.\nOtros Servicios Contratados: Monto fijo mensual por los servicios de:\n- Paquetes Contratados: Paquetes de datos, mensajería y LDI. Servicios de Blackberry, Localizador,\nEntel Backup y otros servicios de Valor Agregado: licencias, aplicativos de negocio, gestión de\ndispositivos móviles y otros.\n- Garantía: Servicio de reposición de equipos.\n- Arrendamiento: Alquiler de equipos.\nConsumos Adicionales: Monto facturado no comprendido dentro del cargo fijo mensual del plan\ntarifario contratado, por los servicios de Voz, Mensajería, Datos, Roaming Internacional, LDI, Redes\nSatelitales, Destinos Rurales.\nDatos locales y móviles: Servicio de internet brindado a través de equipos móviles, USB Módems,\nRouters, etc.\nDatos Roaming: Servicio de datos que Entel brinda en otros países.\nOtros Cargos y Abonos: Cargos y abonos no recurrentes.\nPromociones y Descuentos: Descuentos generados por promociones especiales.\nRecargo por Intereses: Cobro de intereses legales generados por la no cancelación de la totalidad del\nrecibo a la fecha de vencimiento.\nOtros Cargos y Abonos (ya gravados con IGV): Cargo de documentos emitidos por compra o\nfinanciamiento de equipos y/o Boletas/Facturas adicionales, ya gravados con IGV. Incluye Facturación\npor encargo de Otros Operadores según normativa vigente.\nGlosario\n.\nOn Net: Comunicación de un teléfono móvil Entel a otro teléfono móvil Entel.\nOff Net: Comunicación de un teléfono móvil Entel a cualquier teléfono fijo o móvil de otro operador.\nLDI: Larga Distancia Internacional.\nRedes Satelitales: Telefonía móvil a números satelitales.\nDestinos Rurales: Telefonía móvil a Destinos Rurales.\nRoaming Internacional: Servicio de Voz y Datos que Entel brinda en otros países.\nDescarga de Contenidos: Cargo por envío de mensajes y descargas.\nMB: Megabytes (1 MB = 1024 KB)\n- El límite de crédito asignado para consumo adicional de servicios será informado por mensaje de texto\nuna vez iniciada la utilización del referido límite. Para contratación de otros servicios, será evaluado\ncrediticiamente en la venta.\n- El pago no oportuno devengará en intereses legales. Entel puede proceder a la suspensión del Servicio a\npartir del día siguiente del último día de pago.\n- Si tu línea es suspendida por falta de pago, se aplicará un cargo por reconexión del servicio.\n- Reconexión del servicio máximo dentro de 24 horas de efectuado el pago correspondiente.\n- Conoce los lugares de pago en www.entel.pe\nMÓVILES: 123 (desde tu Entel) y 611-7777 (desde un teléfono fijo) Llamadas gratis: 0-800-0-9000 (Lima y\nprovincias).\nINTERNET Y SERVICIOS DE VALOR AGREGADO: 123 (desde tu Entel) y 611-7777 (desde un teléfono fijo).\nOSIPTEL: Fono Ayuda: 0-801-12121 Para detalle de llamadas a fijos o móviles consultar gratuitamente Mi\nEntel\" en www.entel.pe\n\n"
+  },
+  {
+    "id": "1OaLhxGIjvctwmZVYE72fBV9WEYza1eGW",
+    "name": "factura evento creación cuantica 14 al 17 agosto 2025.pdf",
+    "path": "",
+    "size": "329141",
+    "modifiedTime": "2025-08-11T23:05:47.654Z",
+    "webViewLink": "https://drive.google.com/file/d/1OaLhxGIjvctwmZVYE72fBV9WEYza1eGW/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n3241724\nlunes, 11 Agosto, 2025\nREFERENCIA\nF301\n00038263\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n17/08/2025\nSALIDA\n14/08/2025\nFacturado a : \nUSUARIO\nEvento Capítulo Uno del Equipo 20\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nSalas\n33,050.85\n33,050.85\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nEiiaS+f9g+y9Ohalw70ASN2UucQ=\nTREINTA Y NUEVE MIL Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n39,000.00\n0.00\n0.00\n0.00\n5,949.15\n0.00\n0.00\n33,050.85\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1lb_0Wjn3gl9QzgbEKmwDzDwm5nbapTwH",
+    "name": "FACTURA CREACION CUANTICA.pdf",
+    "path": "",
+    "size": "327693",
+    "modifiedTime": "2025-08-10T01:41:23.651Z",
+    "webViewLink": "https://drive.google.com/file/d/1lb_0Wjn3gl9QzgbEKmwDzDwm5nbapTwH/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n3247467\nviernes, 8 Agosto, 2025\nREFERENCIA\nF301\n00038208\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nAlex Quiñones\n18/08/2025\nSALIDA\n14/08/2025\nFacturado a : \nUSUARIO\nfernando Aragón\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nAlojamiento\n275.00\n275.00\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nTRESCIENTOS CINCUENTA Y DOS Y 00/100 DOLARES AMERICANOS\nTotal  Propina\nUS $\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n352.00\n0.00\n0.00\n27.50\n49.50\n0.00\n0.00\n275.00\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nDolares\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1tkoSnHoQDcUPVIhmybouRchEkaUuDEkM",
+    "name": "PDF-DOC-E001-11120255547799.pdf",
+    "path": "",
+    "size": "4681",
+    "modifiedTime": "2025-08-09T15:28:16.060Z",
+    "webViewLink": "https://drive.google.com/file/d/1tkoSnHoQDcUPVIhmybouRchEkaUuDEkM/view?usp=drivesdk",
+    "text": " \n \n \nHOSTAL SOL Y LUNA S.A.C.  \nCAL. 13 3RA ETAPA CIENEGUILLA MZA. 13 LOTE. 1 ESQUINA CON\nCALLE 13 Y 15 PAS.TELEFONICA  \nCIENEGUILLA - LIMA - LIMA \nFACTURA ELECTRONICA\nRUC: 20255547799 \nE001-111 \nFecha de Emisión\n: 09/08/2025\nSeñor(es)\n: CREACION CUANTICA E.I.R.L.  \nRUC \n: 20612592811  \nEstablecimiento del Emisor \n:\nCAL. 13 3RA ETAPA CIENEGUILLA -\nMZA. 13 LOTE. 1 ESQUINA CON\nCALLE 13 Y 15 PAS.TELEFONICA\nLIMA-LIMA-CIENEGUILLA \nTipo de Moneda\n: SOLES \nObservación\n: OPERACIÓN SUJETA A\nDETRACCION DEL 12% \nForma de pago: Contado\nCantidad\nUnidad Medida\nDescripción\nValor Unitario\nICBPER\n1.00\nUNIDAD\nSERVICIO DE ALOJAMIENTO EN HABITACIONES\nINDIVIDUALES, DOBLES Y TRIPLES Y SERVICIO DE\nALIMENTACIÓN PARA LOS DIAS 15, 16 Y 17 DE AGOSTO\nDE 2025\n8474.5762711864\n0.00\nValor de Venta de Operaciones Gratuitas : S/ 0.00 \n \n \nSON: DIEZ MIL Y 00/100 SOLES\n \n \nSub Total Ventas :\nS/ 8,474.58 \nAnticipos :\nS/ 0.00 \nDescuentos :\nS/ 0.00 \nValor Venta :\nS/ 8,474.58 \nISC :\nS/ 0.00 \nIGV :\nS/ 1,525.42 \nICBPER :\nS/ 0.00 \nOtros Cargos :\nS/ 0.00 \nOtros Tributos :\nS/ 0.00 \nMonto de redondeo :\nS/ 0.00 \nImporte Total :\nS/ 10,000.00 \nInformación de la detracción\nLeyenda:\nOperación sujeta al Sistema de Pago de Obligaciones Tributarias con el Gobierno Central\nBien o Servicio:\n022  Otros servicios empresariales\nMedio de pago:\n001  Depósito en cuenta\nNro. Cta. Banco de la Nación:\n00066029379\nPorcentaje de detracción:\n12.00\nMonto detracción:\nS/ 1200.00\nEsta es una representación impresa de la factura electrónica, generada en el Sistema de SUNAT. Puede\nverificarla utilizando su clave SOL.\n\n"
+  },
+  {
+    "id": "1mCiXHfId-GnvXGEujDjD4tM7RuXQnwOI",
+    "name": "PDF-DOC-E001-21410329384441.pdf",
+    "path": "",
+    "size": "3927",
+    "modifiedTime": "2025-07-30T17:53:58.040Z",
+    "webViewLink": "https://drive.google.com/file/d/1mCiXHfId-GnvXGEujDjD4tM7RuXQnwOI/view?usp=drivesdk",
+    "text": " \n \nCONTROL C \nURIOL CASTRO CARLOS ALBERTO  \nAV. GERMAN AMEZAGA 375 CIUDAD UNIVERSITARIA  \nLIMA - LIMA - LIMA \nFACTURA ELECTRONICA\nRUC: 10329384441 \nE001-214 \nFecha de Emisión\n: 30/07/2025\nSeñor(es)\n: CREACION CUANTICA E.I.R.L.  \nRUC \n: 20612592811  \nDirección del Cliente \n: CAL. BERLIN 965 URB. SANTA CRUZ\nINT. 302 LIMA-LIMA-MIRAFLORES \nTipo de Moneda\n: SOLES \nObservación\n:  \nForma de pago: Contado\nCantidad\nUnidad Medida\nDescripción\nValor Unitario\nICBPER\n1.00\nUNIDAD\nCOPIAS\n142.3728\n0.00\nValor de Venta de Operaciones Gratuitas : S/ 0.00 \n \n \nSON: CIENTO SESENTA Y OCHO Y 00/100 SOLES\n \n \nSub Total Ventas :\nS/ 142.37 \nAnticipos :\nS/ 0.00 \nDescuentos :\nS/ 0.00 \nValor Venta :\nS/ 142.37 \nISC :\nS/ 0.00 \nIGV :\nS/ 25.63 \nICBPER :\nS/ 0.00 \nOtros Cargos :\nS/ 0.00 \nOtros Tributos :\nS/ 0.00 \nMonto de redondeo :\nS/ 0.00 \nImporte Total :\nS/ 168.00 \nEsta es una representación impresa de la factura electrónica, generada en el Sistema de SUNAT. Puede\nverificarla utilizando su clave SOL.\n\n"
+  },
+  {
+    "id": "1l_T39_fF2jOQ_Vo6U_rypMVuetNR-Yxl",
+    "name": "20602363245-FE01-00004119.pdf",
+    "path": "",
+    "size": "37408",
+    "modifiedTime": "2025-07-30T17:49:20.964Z",
+    "webViewLink": "https://drive.google.com/file/d/1l_T39_fF2jOQ_Vo6U_rypMVuetNR-Yxl/view?usp=drivesdk",
+    "text": "INVERSIONES E INMOBILIARIA V&C \nS.A.C\nAv. 28 de Julio N° 245\nMiraflores - Lima - Peru\nTELÉFONO: 01 680 4640 / +51 951 298 766\nEMAIL: recepcion@hotelequo.com\nPÁG. WEB: www.hotelequo.com\nR.U.C. 20602363245\nFACTURA ELECTRÓNICA\nFE01 - 00004119\nSEÑOR(ES)\n: CREACIÓN CUÁNTICA E.I.R.L.\nRUC\n:\n20612592811\nDIRECCIÓN\n: CAL.BERLIN NRO. 965 INT. 302 URB. SANTA CRUZ LIMA - LIMA - MIRAFLORES\nRESERVA\n: 002-0000004051\nGRUPO\n: /MARIA PATINO GALARRAGA\nINGRESO\n: 31/07/2025\nSALIDA\n: 04/08/2025\nT/C : 002\nOC :\nFECHA EMISIÓN\n: 30/07/2025\nOFICINA\n: EQUO HOTEL\nN° REFERENCIA :\nTotal valor venta gravada\n:\n605.93\nTotal valor venta inafecta\n:\n0.00\nTotal valor venta exonerada\n:\n0.00\nTotal descuentos\n:\n0.00\nI.G.V.\n:\n109.07\nOtros Cargos\n:\n0.00\nIMPORTE TOTAL $\n:\n715.00\nUsuario:\nVALERIA ABDIEL ALQUIZAR PAREDES\nCANTIDAD\nUNIDAD\nDESCRIPCIÓN\nV. UNIT\nTOTAL\n5.00\nHABITACIÓN SIMPLE\n46.61\n233.05\n4.00\nHABITACIÓN SIMPLE\n46.61\n186.44\n4.00\nHABITACIÓN SIMPLE\n46.61\n186.44\nSON: SETECIENTOS QUINCE CON 00/100 DÓLARES\nFORMA PAGO:\nContado\nRepresentación impresa de la FACTURA ELECTRÓNICA, para consultar \nel documento ingrese a la página web: \n\n"
+  },
+  {
+    "id": "1I-jyrrs50DJgtmapLFsp8SunEi39B4Sb",
+    "name": "20100910129-01-F301-37654.pdf",
+    "path": "",
+    "size": "77550",
+    "modifiedTime": "2025-07-30T17:05:54.424Z",
+    "webViewLink": "https://drive.google.com/file/d/1I-jyrrs50DJgtmapLFsp8SunEi39B4Sb/view?usp=drivesdk",
+    "text": "R.U.C. 20100910129\nFACTURA ELECTRÓNICA\nF301-37654\nFECHA DE EMISIÓN\n:\n18/07/2025\nRAZÓN SOCIAL\n:\n:\nO.COMPRA\nCREACION CUANTICA E.I.R.L.\nRUC\n:\n20612592811\nCLIENTE\n:\nJuan Angel Arreola Morales\nDIRECCIÓN\n:\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\nIN\n:\n23/07/2025\nOUT: 27/07/2025\nRVA :\n3246553\nHBA :\nMONEDA\n:\nDÓLARES\nAMERICANOS\nHORA EMISIÓN:\n11:23:32\nSEDE PRINCIPAL:\n AV. 28 DE JULIO 398-MIRAFLORES-LIMA-LIMA\nLIMA 18 - PERU FAX: 445-4027\nSEDE LIMA: CAL.COLON 325-MIRAFLORES-LIMA-LIMA\nTELFS:445-5225 / 445-5135 / 445-6397\nCALLE BELLAVISTA 113-137 - MIRAFLORES-LIMA-LIMA\nSEDE LIMA:\nTELF: 6415050\nAV.PARDO 1080 - URB.ARTESANAL-CUSCO-CUSCO\nSEDE CUSCO:\nTELF:084-239030\nCOMUNIDAD CAMPESINA CHIMU - PUNO -PUNO\nTELF: 051-640000\nSEDE PUNO: CARRETERA DESAGUADERO KM.6.500 PUNO FDO.\nCARTIR PERU S R L\nDESCRIPCIÓN\nCANTIDAD\nPRECIO\nUNITARIO\nTOTAL\nAlojamiento\n1\n275.00\n275.00\nPAX:\nUSUARIO:  Ana Vasquez\nSON : TRESCIENTOS CINCUENTA Y DOS CON 00/100 DÓLARES\nAMERICANOS\nMÉTODO PAGO SUNAT:\nMONTO NETO PENDIENTE DE PAGO:\n0.00\nContado\nOP. EXONERADA\nOP. INAFECTA\nOP. GRAVADA\nT.DSCTO.\nI.S.C\nI.G.V\nPROPINA\nPAID OUT\nR.CONS.10%\nIMPORTE TOTAL\n0.00\n275.00\n0.00\n0.00\n49.50\n27.5\n0.00\n0.00\n352.00\nAUTORIZADO MEDIANTE RESOLUCIÓN NRO. 034-005-0005038/SUNAT\nREPRESENTACIÓN IMPRESA DE LA FACTURA DE VENTA\nCONSULTE SU DOCUMENTO EN HTTP://WWW.HOTELESJOSEANTONIO.COM\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRÁ UN CAMBIO EN EL\nNÚMERO DE ESTE COMPROBANTE.\n0.00\n0.00\nOP.EXPORTACIÓN\n-1-\n\n"
+  },
+  {
+    "id": "1YfVHDf2Jb-vD0USSWaNGeRXzp2xwan9X",
+    "name": "FACTURA ADICIONALES EVENTO CREACION CUANTICA 24,25,26 Y 27JUL2025.pdf",
+    "path": "",
+    "size": "325335",
+    "modifiedTime": "2025-07-30T16:08:26.290Z",
+    "webViewLink": "https://drive.google.com/file/d/1YfVHDf2Jb-vD0USSWaNGeRXzp2xwan9X/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n3245861\nmartes, 29 Julio, 2025\nREFERENCIA\nF301\n00037927\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n27/07/2025\nSALIDA\n24/07/2025\nFacturado a : \nUSUARIO\nADICIONALES\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nDiversos\n1,694.92\n1,694.92\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\n2elPymRbSX0IxBMzwuB51BccE/w=\nDOS MIL Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n2,000.00\n0.00\n0.00\n0.00\n305.08\n0.00\n0.00\n1,694.92\nTotal  Exportacion\n0.00\nCuentas corrientes  \nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1MxOYzK2rueSUElI-zAPid82C9RwgJcDo",
+    "name": "20601007119-01-F003-00007776.pdf",
+    "path": "",
+    "size": "37756",
+    "modifiedTime": "2025-07-25T19:35:45.565Z",
+    "webViewLink": "https://drive.google.com/file/d/1MxOYzK2rueSUElI-zAPid82C9RwgJcDo/view?usp=drivesdk",
+    "text": "MALECON BALTA OPERATOR S.A.C\nAV. JAVIER PRADO OESTE NRO. 769 - SAN ISIDRO - LIMA - LIMA\nR.U.C. 20601007119\nFACTURA ELECTRÓNICA\nF003 N° 00007776\nRAZÓN SOCIAL:\nFECHA DE EMISIÓN:\nCREACION CUANTICA E.I.R.L.\nFECHA DE VENCIMIENTO:\n25/07/2025\nDIRECCIÓN:\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\nMONEDA:\n25/07/2025\n20612592811\nSOLES\nLLEGADA:\n01/08/2025\nSALIDA:\n03/08/2025\nRUC:\nA NOMBRE:\nPASAPORTE:\nFORMA DE PAGO:\nCONTADO\nDESCRIPCIÓN\nCANTIDAD\nPRECIO UNITARIO\nTOTAL\n15,937.50\n1\n15,937.50\nEVENTOS\nEVENTO DEL 01 AL 03 DE AGOSTO 2025\nOBSERVACIONES:\nSON : VEINTE MIL CUATROCIENTOS  CON 00/100 SOLES\nBanco de Crédito del Perú\nDOLARES\nBanco\nSOLES\n191-9747180-1-72\nCCI\nBanco de Crédito del Perú\nNúmero de Cuenta\n191-9673128-0-61\n00219100974718017256\nMoneda\n00219100967312806154\nAUTORIZADO MEDIANTE RESOLUCIÓN NRO.034-005-0005038/SUNAT\nREPRESENTACIÓN IMPRESA DE LA FACTURA ELECTRÓNICA\nPUEDE CONSULTAR ESTE COMPROBANTE EN:https://prod.ebis.pe/CecWeb/Consulta.jsf?e=20601007119\nEXISTE LA POSIBILIDAD DE QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRÁ UN CAMBIO EN EL\nNÚMERO DE COMPROBANTE.\nMÉTODO PAGO SUNAT:\nCONTADO\nMONTO NETO PENDIENTE DE PAGO:\n0.00\n  OP.\nGRAVADA\n0.00\n15,937.50\n  OP.\nINAFECTA\n0.00\n0.00\nOP.\nEXPORTACIÓN\n2,868.\n75\n0.00\nI.G.V\n0.00\nI.S.C\nT.DSCTO.\n IMPORTE\nTOTAL\nR.CONS.10%\nPAID OUT\n1593.75\n0.00\n20,400.00\n0.00\nPROPINA\n  OP.\nEXONERADAS\nBCPLPEPL\nSWITF\nBCPLPEPL\n037 DEMÁS SERVICIOS GRAVADOS CON EL IGV\nBIENES O SERVICIO:\nDEPÓSITO EN CUENTA\nMEDIO PAGO:\n00-046-326121\nNUMERO DE CUENTA:\nPORCENTAJE DETRACCION:\n12 %\n2448.00\nMONTO DE DETRACCION:\nOperación sujeta al Sistema de Pago de Obligaciones Tributarias con el Gobierno Central\n-1-\n\n"
+  },
+  {
+    "id": "1n0Ny8GIegtKzbY9w4C90SOMjPAkh0jaG",
+    "name": "factura evento creacion cuantica 24 al 27 julio 2025.pdf",
+    "path": "",
+    "size": "328048",
+    "modifiedTime": "2025-07-23T21:29:01.063Z",
+    "webViewLink": "https://drive.google.com/file/d/1n0Ny8GIegtKzbY9w4C90SOMjPAkh0jaG/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n3245861\nviernes, 18 Julio, 2025\nREFERENCIA\nF301\n00037656\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nAna Vasquez\n27/07/2025\nSALIDA\n24/07/2025\nFacturado a : \nUSUARIO\nEvento\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nSalas\n14,406.78\n14,406.78\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nEKrJiNIAbKzrpVqbtoXE7LWWBjw=\nDIEZ Y SIETE MIL Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n17,000.00\n0.00\n0.00\n0.00\n2,593.22\n0.00\n0.00\n14,406.78\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1lToiObpwVVMucNvnuNrnyEBunMDqOcBW",
+    "name": "factura alojamiento creacion cuantica-Juan Arreola.pdf",
+    "path": "",
+    "size": "326929",
+    "modifiedTime": "2025-07-18T16:25:44.737Z",
+    "webViewLink": "https://drive.google.com/file/d/1lToiObpwVVMucNvnuNrnyEBunMDqOcBW/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n3246553\nviernes, 18 Julio, 2025\nREFERENCIA\nF301\n00037654\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nAna Vasquez\n27/07/2025\nSALIDA\n23/07/2025\nFacturado a : \nUSUARIO\nJuan Angel Arreola Morales\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nAlojamiento\n275.00\n275.00\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\n81P6RXJnwqEVbRFEyJ5cEI3BexA=\nTRESCIENTOS CINCUENTA Y DOS Y 00/100 DOLARES AMERICANOS\nTotal  Propina\nUS $\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n352.00\n0.00\n0.00\n27.50\n49.50\n0.00\n0.00\n275.00\nTotal  Exportacion\n0.00\nCuentas corrientes  \nTotal  Descuento\nDolares\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1JSjMofZD8ayWOzMGMaGIP3BI0_4rlG3K",
+    "name": "20537386488-01-FH04-3929.pdf",
+    "path": "",
+    "size": "20965",
+    "modifiedTime": "2025-07-14T16:28:34.225Z",
+    "webViewLink": "https://drive.google.com/file/d/1JSjMofZD8ayWOzMGMaGIP3BI0_4rlG3K/view?usp=drivesdk",
+    "text": "Calle Monte Rosa Nro. 283 Urb Chacarilla Del Estanque\nT-+511 2089400 - Santiago de Surco - Lima - LM\nR.U.C. 20537386488\nFACTURA ELECTRÓNICA\nFH04 N° 3929\nRAZÓN SOCIAL:\nFECHA DE EMISIÓN:\nCREACION CUANTICA E.I.R.L\nFECHA DE VENCIMIENTO:\n21/07/2025\nDIRECCIÓN:\nCAL.BERLIN NRO. 965 INT. 302 URB. SANTA CRUZ MIRAFLORES CAL.BERLIN NRO. 965 INT. 302 URB. SANTA\n11/07/2025\n20612592811\nRUC:\nHUÉSPED:\n CREACION CUANTICA E.I.R.L\nFECHA DE SALIDA:\n2025-07-11\n2025-07-11\nFECHA DE LLEGADA:\nPAÍS:\nPERÚ\nTIPO DE CAMBIO:\n1.0\nSOLES\nMONEDA:\nTIPO DE PAGO:\nCONTADO\nORDEN DE COMPRA:\nARIZONA HOLDING SAC\nDESCRIPCIÓN\nCANTIDAD\nPRECIO UNITARIO\nTOTAL\n1,054.68\n1\n1,054.68\nEventos y Catering\n1,054.70\n1\n1,054.70\nEventos Alquiler\nAutorizado mediante resolución Nº 034-005-0005038/SUNAT\nRepresentación impresa de la factura electrónica\nPuede consultar este comprobante en:https://prod.ebis.pe/CecWeb/Consulta.jsf?e=20537386488\n00-076-094152\nNUMERO DE CUENTA:\nPORCENTAJE DETRACCION:\nS/ 324.00\n12 %\nMONTO DE DETRACCION:\nOTROS MEDIOS DE PAGO\nMEDIO PAGO:\nBIENES O SERVICIO:\n037 DEMÁS SERVICIOS GRAVADOS CON EL IGV\nOPERACION SUJETA A DETRACCION\nOPERACION SUJETA AL SISTEMA DE PAGO DE OBLIGACION TRIBUTARIA - 'SPOT'\n0011-0787-0100036703\nCCI\nBBVA\nSON : DOS MIL SETECIENTOS  CON 00/100 SOLES\nBANCO\n0011-0787-0100036657\nBBVA\nSOLES\nMONEDA\n011 -787-000100036703-95\nDOLARES\n011-787-000100036657-93\nNÚMERO DE CUENTA\n0.00\n0.00\n2,109.38\n379.68\n2,700.00\nIMPORTE TOTAL\n0.00\nOP. EXPORTACIÓN\nR.CONS.10%\nI.G.V\nOP. GRAVADA\nOP. INAFECTA\nOP. EXONERADAS\n210.94\nS/\nS/\nS/\nS/\nS/\nS/\nS/\nOP. GRATUITAS\nS/\n0.00\n0.00\nS/\nPROPINA\n-1-\n\nMEDIO DE PAGO\n324.00\nDetraccion 12%\n S/\n2,376.00\nBank Transfer\n S/\n\n"
+  },
+  {
+    "id": "1764ah5an0cyT_c4Aj54gpMCxD8IzHXG6",
+    "name": "S002-186831874_08_20250708.pdf",
+    "path": "",
+    "size": "262382",
+    "modifiedTime": "2025-07-14T16:27:01.736Z",
+    "webViewLink": "https://drive.google.com/file/d/1764ah5an0cyT_c4Aj54gpMCxD8IzHXG6/view?usp=drivesdk",
+    "text": "Página 1 de 2\n+\n+\n-\n+\n+\nEntel Perú S.A.\nRUC: 20106897914\nAv. República de Colombia 791\nPiso 14 - San Isidro - Lima\n¡Hola! Te enviamos tu recibo del mes\n0\n40\n80\n120\n160\n200\n240\nRequest ID: 2736 | Ciclo: 08 | Custcode: 5.7023\nCREACION CUANTICA E.I.R.L.\nMonica Pamela Carrillo\nAv Sergio Bernales Nro 272\nLima - Lima - Lima\nRecibo Nº\nEmisión\n:\n:\nS002-186831874\n08/Jul/2025\nInicio del Periodo\nFin del Periodo\n:\n:\n09/Jul/2025\n08/Ago/2025\nNº de Cuenta\nNº Doc (RUC)\n:\n:\n1.21765711\n20612592811\nTotal a pagar\nVencimiento\nS/ 115.48\n21/Jul/2025\nPlan\nProrrateo\nCargos\nAdicionales\nDescuentos o\nP. Adelantado\nEquipos\nSaldo\nAnterior\nS/ 126.70\nS/ 0.00\nS/ 0.00\n-S/ 11.22\nS/ 0.00\nS/ 0.00\nEn las siguientes páginas\npodrás encontrar el detalle de cada concepto\nFacturación de los últimos 6 meses\nFeb\nMar\nAbr\nMay\nJun\nJul\nDesglose tributario\nSubtotal de Conceptos Facturados (sin IGV)\nIGV del Subtotal (18%)\nTotal (Incl. IGV)\nMontos ya gravados con IGV\nExentos IGV\nSaldo anterior\nTotal a pagar\n97.86\n17.62\n115.48\n0.00\n0.00\n0.00\n115.48\nDocumento válido para efectos tributarios según Res. de Sup. No. 007-99/SUNAT. Documento\nno afecto al régimen de retención del IGV por ser agente de retención, según Res. de Sup. No.\n037-2002/SUNAT. Los saldos de hasta S/0.09 que no cancele por falta de moneda de curso legal\n(S/0.05 y S/0.01), se registrarán y se mantendrán como pendientes de pago hasta su cancelación\nefectiva.\nRecuerda que puedes cambiar de operadora sin perder tu número. El trámite de portabilidad es\nrápido y gratuito. Migra tus líneas de otro operador hacia Entel y disfruta de los beneficios que\ntenemos para ti.\n\nPágina 2 de 2\nMira aquí el detalle\ntu recibo\nResumen\nNúmero\nPlan Tarifario\nPlan\nProrrateo\nCargos\nAdicionales (*)\nDescuentos o\nP. Adelantado\nEquipos (*)\nSaldo\nAnterior\nMonto S/\n(Incl. IGV)\n908931343\nEmpresa PRO 2.0 36.9\n36.90\n0.00\n0.00\n0.00\n0.00\n0.00\n36.90\n912379686\nEmpresa PRO 2.0 44.9\n44.90\n0.00\n0.00\n-11.22\n0.00\n0.00\n33.68\n912379744\nEmpresa PRO 2.0 44.9\n44.90\n0.00\n0.00\n0.00\n0.00\n0.00\n44.90\nCuenta\nCliente\n0.00\n0.00\n0.00\n0.00\n0.00\n0.00\n0.00\nTotal\n126.70\n0.00\n0.00\n-11.22\n0.00\n0.00\n115.48\n(*) Puede incluir conceptos exentos o ya gravados con IGV\nDetalle\nConceptos detallados\nPeríodo\nUnidad\nMonto S/ (Incl. IGV)\n912379686 (Empresa PRO 2.0 44.9)\n33.68\nPlan\n09-jul al 08-ago\n31 días\n44.90\nDescuentos\n-11.22\nDescuento por fidelizacion 25% x 18m\n1\n-11.22\nCuenta Cliente\n0.00\nSaldos Anteriores\n0.00\nRecibo(s) anterior(es)\n115.48\nAbonos / Cargos varios al 08/07/2025\n-115.48\nConceptos facturables\n.\nCargo Fijo (incluye prorrateo): Monto de Renta Mensual y consumo proporcional por los servicios de\nVoz, Mensajería y Datos, según Plan Tarifario Contratado.\nOtros Servicios Contratados: Monto fijo mensual por los servicios de:\n- Paquetes Contratados: Paquetes de datos, mensajería y LDI. Servicios de Blackberry, Localizador,\nEntel Backup y otros servicios de Valor Agregado: licencias, aplicativos de negocio, gestión de\ndispositivos móviles y otros.\n- Garantía: Servicio de reposición de equipos.\n- Arrendamiento: Alquiler de equipos.\nConsumos Adicionales: Monto facturado no comprendido dentro del cargo fijo mensual del plan\ntarifario contratado, por los servicios de Voz, Mensajería, Datos, Roaming Internacional, LDI, Redes\nSatelitales, Destinos Rurales.\nDatos locales y móviles: Servicio de internet brindado a través de equipos móviles, USB Módems,\nRouters, etc.\nDatos Roaming: Servicio de datos que Entel brinda en otros países.\nOtros Cargos y Abonos: Cargos y abonos no recurrentes.\nPromociones y Descuentos: Descuentos generados por promociones especiales.\nRecargo por Intereses: Cobro de intereses legales generados por la no cancelación de la totalidad del\nrecibo a la fecha de vencimiento.\nOtros Cargos y Abonos (ya gravados con IGV): Cargo de documentos emitidos por compra o\nfinanciamiento de equipos y/o Boletas/Facturas adicionales, ya gravados con IGV. Incluye Facturación\npor encargo de Otros Operadores según normativa vigente.\nGlosario\n.\nOn Net: Comunicación de un teléfono móvil Entel a otro teléfono móvil Entel.\nOff Net: Comunicación de un teléfono móvil Entel a cualquier teléfono fijo o móvil de otro operador.\nLDI: Larga Distancia Internacional.\nRedes Satelitales: Telefonía móvil a números satelitales.\nDestinos Rurales: Telefonía móvil a Destinos Rurales.\nRoaming Internacional: Servicio de Voz y Datos que Entel brinda en otros países.\nDescarga de Contenidos: Cargo por envío de mensajes y descargas.\nMB: Megabytes (1 MB = 1024 KB)\n- El límite de crédito asignado para consumo adicional de servicios será informado por mensaje de texto\nuna vez iniciada la utilización del referido límite. Para contratación de otros servicios, será evaluado\ncrediticiamente en la venta.\n- El pago no oportuno devengará en intereses legales. Entel puede proceder a la suspensión del Servicio a\npartir del día siguiente del último día de pago.\n- Si tu línea es suspendida por falta de pago, se aplicará un cargo por reconexión del servicio.\n- Reconexión del servicio máximo dentro de 24 horas de efectuado el pago correspondiente.\n- Conoce los lugares de pago en www.entel.pe\nMÓVILES: 123 (desde tu Entel) y 611-7777 (desde un teléfono fijo) Llamadas gratis: 0-800-0-9000 (Lima y\nprovincias).\nINTERNET Y SERVICIOS DE VALOR AGREGADO: 123 (desde tu Entel) y 611-7777 (desde un teléfono fijo).\nOSIPTEL: Fono Ayuda: 0-801-12121 Para detalle de llamadas a fijos o móviles consultar gratuitamente Mi\nEntel\" en www.entel.pe\n\n"
+  },
+  {
+    "id": "1MgbQEYVDX4Np1SGMpB_XlSbWK5em0y16",
+    "name": "DIP-FACT-Recibo_Ciclico_2025070005_S1AA-0044004950.pdf",
+    "path": "",
+    "size": "139314",
+    "modifiedTime": "2025-07-10T15:27:30.205Z",
+    "webViewLink": "https://drive.google.com/file/d/1MgbQEYVDX4Np1SGMpB_XlSbWK5em0y16/view?usp=drivesdk",
+    "text": "Telefónica del Perú S.A.A.   |   R.U.C. 20100017491   |   Jr. Domingo Martínez Luján N° 1130   |   Lima – Lima - Surquillo\nPágina 1/3\nEmpresas Fija\nRecibo Julio\nN° recibo: S1AA-0044004950\nCREACION CUANTICA EIRL\nRUC: 20612592811 \nCALLE BERLIN 965 Piso 3 URBANIZACION RESIDENCIAL JOSE BALTA,\nMIRAFLORES, 01, LIMA\nCuenta financiera: 753621842 \nID SUSCRIPTOR: 196980437\nID Cliente: 131054354\nAnexo: 1\nTotal a pagar del mes\nS/109.90\nÚltimo día de pago: 21/07\nN° Fijo / Cód. pago: 753621842\nDeuda anterior: S/0.00\nEvolutivo Mensual\nAbr\nMay\nJun\nJul\n \n89.80\n-0.09\n109.81\n109.82\nCiclo de facturación - Julio 2025\n05/07\n21/07\nFecha de\nEmisión\nÚltimo día\nde pago\n¡LLAMA AL 0 800 11311!\nSi tienes un negocio y deseas comprar o portar una línea\nmóvil, adquirir un servicio de internet, TV o telefonía fija.\nCanal exclusivo para Clientes con RUC 20\nResumen de Recibo - NºS1AA-0044004950\nCargos Mensuales\nS/ 109.89\nSubtotal\nS/93.13\nIGV (18%)\nS/16.76\nTotal Afecto\nS/109.89\nDescuentos y Bonificaciones Inafectos\nS/ 0.00\nRedondeo\nS/ 0.01\nTotal Facturado\nS/109.90\nDevoluciones\nS/ 0.00\nDébitos\nS/ 0.00\nTotal a pagar\nS/ 109.90\n\nEmpresas Fija\nTelefónica del Perú S.A.A.   |   R.U.C. 20100017491   |   Jr. Domingo Martínez Luján N° 1130   |   Lima – Lima - Surquillo\nPágina 2/3\nDetalle del recibo - N° S1AA-0044004950 - 196980437\nCargos Mensuales\nPrecio de vta.\nIGV S/109.89\nMovistar Internet 600 Mbps (06Jul al 05Ago)\n93.13\n16.76\n109.89\nDescuentos y Bonificaciones Inafectos\nPrecio de vta.\nIGV\nS/0.00\nBonificacion Prom Internet 1 GB x 12m 600 Mbps (06Jul \nal 05Ago) (VR S/127.03)\n0.00\n0.00\n0.00\nRedondeo\nPrecio de vta.\nIGV\nS/0.01\nRedondeo del mes Actual\n-0.07\n0.00\n-0.07\nRedondeo del mes Anterior\n0.08\n0.00\n0.08\n\nConceptos facturables\nCargos fijos mensuales\nCargo mensual facturado al cliente por el plan contratado\npara los servicios de voz y datos. Cargo fijo proporcional\ndel plan desde la fecha de inicio del servicio hasta el\nsiguiente cierre de facturación\nCargos por llamadas adicionales\nCargos por tráfico de voz, datos, mensajes de texto que\nno se encuentran comprendidos dentro del cargo fijo\nmensual.\nLarga distancia: cargo adicional por llamada de larga\ndistancia nacional o internacional\nKB internet y multimedia: navegación en internet y\ntráfico por descarga de aplicativos\nKB transmisión de datos: envío y recepción de datos.\nRoaming internacional: cargo por llamadas efectuadas y\nrecibidas en el extranjero\nDetalle de documentos afectos al IGV\nCargo por Reconexión: cargo facturado si el cliente\ncancela un recibo después de habérsele cortado por\ndeuda.\nCargo por Reconexión de corte APC (a pedido de cliente):\ncargo facturado al efectuarse la reactivación del servicio\nde la línea luego de cumplirse el plazo de suspensión.\nCargo por llamadas a operadoras rurales: llamadas\nrealizadas a teléfonos fijos rurales como Gilat to Home,\nValtron, Claro Rural, TDP Rural o a teléfonos satelitales\ncomo Tesam.\nRenta fraccionaria por cambio de plan: cargo facturado si\ndurante el ciclo de la facturación el cliente cambió a un\nplan tarifario de cargo fijo mayor al que tenía.\nLugares de pago\nBancos y agentes\nBBVA Continental\nBanco Pichincha\nBCP\nBanco de la Nación\nBanBif\nInterbank\nScotiabank\nOtros\nAgente Multibanco KASNET\nMultibanco\nFullcarga\nRed Digital\nMetro\nWong\nWestern Union\nAlgunos lugares de pago presenciales pueden aplicar cobro de comisión de acuerdo a sus tarifarios vigentes.\nPuede realizar su pago de forma rápida y segura en el App Mi Movistar, YAPE o App o Web de su banco.\nRecuerda que también puede afiliar su recibo\nMovistar al débito automático, más info :\nhttp://smvst.com/DAT\nMayor información sobre lugares de pago en www.movistar.com.pe\n¿Qué es el recibo digital?\nEs un servicio gratuito que ofrece Telefónica, con el que podrá recibir mensualmente su recibo en formato PDF al\ncorreo electrónico que usted indique. El envío del recibo digital va en reemplazo de su recibo físico.\n\n"
+  },
+  {
+    "id": "15io10XZSOnDdnSDekG0TBrlSUJeL5bgQ",
+    "name": "20537386488-01-FH04-3890.pdf",
+    "path": "",
+    "size": "20438",
+    "modifiedTime": "2025-07-08T19:14:41.380Z",
+    "webViewLink": "https://drive.google.com/file/d/15io10XZSOnDdnSDekG0TBrlSUJeL5bgQ/view?usp=drivesdk",
+    "text": "Calle Monte Rosa Nro. 283 Urb Chacarilla Del Estanque\nT-+511 2089400 - Santiago de Surco - Lima - LM\nR.U.C. 20537386488\nFACTURA ELECTRÓNICA\nFH04 N° 3890\nRAZÓN SOCIAL:\nFECHA DE EMISIÓN:\nCREACION CUANTICA E.I.R.L\nFECHA DE VENCIMIENTO:\n18/07/2025\nDIRECCIÓN:\nCAL.BERLIN NRO. 965 INT. 302 URB. SANTA CRUZ MIRAFLORES CAL.BERLIN NRO. 965 INT. 302 URB. SANTA\n08/07/2025\n20612592811\nRUC:\nHUÉSPED:\nLeandro Brunis Aviles\nFECHA DE SALIDA:\n2025-07-10\n2025-07-13\nFECHA DE LLEGADA:\nPAÍS:\nPERÚ\nTIPO DE CAMBIO:\n3.9\nDÓLARES AMERICANOS\nMONEDA:\nTIPO DE PAGO:\nCONTADO\nORDEN DE COMPRA:\nARIZONA HOLDING SAC\nDESCRIPCIÓN\nCANTIDAD\nPRECIO UNITARIO\nTOTAL\n356.99\n1\n356.99\nAlojamiento\nAutorizado mediante resolución Nº 034-005-0005038/SUNAT\nRepresentación impresa de la factura electrónica\nPuede consultar este comprobante en:https://prod.ebis.pe/CecWeb/Consulta.jsf?e=20537386488\nMEDIO DE PAGO\n456.95\nVisa Card\n $\n0011-0787-0100036703\nCCI\nBBVA\nSON : CUATROCIENTOS CINCUENTA Y SEIS CON 95/100 DÓLARES AMERICANOS\nBANCO\n0011-0787-0100036657\nBBVA\nSOLES\nMONEDA\n011 -787-000100036703-95\nDOLARES\n011-787-000100036657-93\nNÚMERO DE CUENTA\n0.00\n0.00\n356.99\n64.26\n456.95\nIMPORTE TOTAL\n0.00\nOP. EXPORTACIÓN\nR.CONS.10%\nI.G.V\nOP. GRAVADA\nOP. INAFECTA\nOP. EXONERADAS\n35.70\n$\n$\n$\n$\n$\n$\n$\nOP. GRATUITAS\n$\n0.00\n0.00\n$\nPROPINA\n-1-\n\n\n"
+  },
+  {
+    "id": "1V7DYf644pJjbBO0lOeyYSM78LPh_tiju",
+    "name": "EstadoCuenta (4).pdf",
+    "path": "",
+    "size": "98895",
+    "modifiedTime": "2025-07-07T21:08:33.678Z",
+    "webViewLink": "https://drive.google.com/file/d/1V7DYf644pJjbBO0lOeyYSM78LPh_tiju/view?usp=drivesdk",
+    "text": "Empresas de\nGeneración\nDistribución \n(Luz del Sur)\nEmpresas de \nTransmisión\nPrecio de \nla energía\nNo incluye IGV\n¿Sabías qué?\nEl precio de la energía que pagas (soles/kWh) es fijado por el OSINERGMIN y se distribuye entre las empresas que la generan y la llevan a tu casa \no negocio.\nLUZ DEL SUR S.A.A.\nAV. CANAVAL Y MOREYRA 380 SAN ISIDRO - LIMA\nRUC: 20331898008\nNº DE SUMINISTRO\nDATOS DEL SUMINISTRO\nTarifa\nBT5B Residencial\nConexión\nSubterránea C2.1\nSector Típico\n1 (SE0133)\nPotencia Contratada\n7.00 KW\nNivel Tensión\n220 V\n \nMedidor\nTRIFÁSICO  Electrónico 3 hilos\nD.N.I. 08780972\n1684209\nSOTO AZPILCUETA JORGE PELAYO\nBERLIN 965 DPTO 302\nMIRAFLORES - LIMA\n0006871\n204.00\nFecha de Emisión: 06-Jun-2025\nFecha de Vencimiento: 23-Jun-2025\nj\u0011U\u0015`e\u0001d\u0007\u0001\u0001\u0001\u0003\u0005\u0001Zk\n16842095 06000000020400\nCargo Fijo\nMant. y Reposición de Conexión\nAlumbrado Público\nInterés Compensatorio\nSUBTOTAL\n   IGV\nElectrificación Rural (Ley N° 28749)\nInterés Moratorio\nTOTAL DEL MES\nAjuste redondeo mes anterior\nAjuste redondeo mes actual\n2.25\n1.73\n13.83\n0.61\n170.68\n30.73\n2.53\n0.03\n203.97\n0.05\n-0.02\n \n \n \n \n \n \n \n \n \n \n \n \n \n \nMES FACTURADO JUNIO 2025\n \n \n \n \n \n \n \n \n \n \n \n \n \n236.80\nkWh\n0\n145\n290\n435\n580\n725\nJun\nJul\nAgo\nSep\nOct\nNov\nDic\nEne\nFeb\nMar\nAbr\nMay\nJun\n \nkWh\nRuta 04-240-2855  Medidor Nro. 6867013 S - 0743\nRecibo Nro. S104-157414 N-BV-18624\nImporte 2 últimos meses facturados\nAbr-25 S/ 250.09 - May-25 S/ 201.90\nÚltima\nlectura\n05/Jun/25\nLectura\nanterior\n06/May/25\nDiferencia\nde lecturas\nFactor de\nmedición\nEnergía a\nfacturar\n(kWh)\nPrecio\nkWh\n(S/)\n47137.10 - 46900.30 =\n236.80\nX\n1.0000\n=\n236.80\nX\n0.6430\nConsumo de energía\n152.26\n1\n63%\n9%\n28%\nTarifa BT5B del 04/May/2025 para LIMA SUR.\n2025\n \n \n \n \n \n \n \n \n \n \n \n \n \n \n0\n145\n290\n435\n580\n725\nMENSAJES PARA EL CLIENTE\nü Estimado cliente, le recordamos que nos puede\ncontactar al 617-5000 (Fonoluz) o en la web\nwww.luzdelsur.pe.\nü El total a pagar incluye: Recargo por FOSE (Ley 27510)\nS/ 4.06\n\n"
+  },
+  {
+    "id": "1_vyDAJYiRZI02jvQX7mgYuXFBBW7EOCm",
+    "name": "EstadoCuenta (3).pdf",
+    "path": "",
+    "size": "98912",
+    "modifiedTime": "2025-07-07T21:06:09.949Z",
+    "webViewLink": "https://drive.google.com/file/d/1_vyDAJYiRZI02jvQX7mgYuXFBBW7EOCm/view?usp=drivesdk",
+    "text": "Empresas de\nGeneración\nDistribución \n(Luz del Sur)\nEmpresas de \nTransmisión\nPrecio de \nla energía\nNo incluye IGV\n¿Sabías qué?\nEl precio de la energía que pagas (soles/kWh) es fijado por el OSINERGMIN y se distribuye entre las empresas que la generan y la llevan a tu casa \no negocio.\nLUZ DEL SUR S.A.A.\nAV. CANAVAL Y MOREYRA 380 SAN ISIDRO - LIMA\nRUC: 20331898008\nNº DE SUMINISTRO\nDATOS DEL SUMINISTRO\nTarifa\nBT5B Residencial\nConexión\nSubterránea C2.1\nSector Típico\n1 (SE0133)\nPotencia Contratada\n7.00 KW\nNivel Tensión\n220 V\n \nMedidor\nTRIFÁSICO  Electrónico 3 hilos\nD.N.I. 08780972\n1684209\nSOTO AZPILCUETA JORGE PELAYO\nBERLIN 965 DPTO 302\nMIRAFLORES - LIMA\n0006877\n201.90\nFecha de Emisión: 07-May-2025\nFecha de Vencimiento: 22-May-2025\nj\u0011U\u0015`e\u0001d\u0006\u0001\u0001\u0001\u0003\u0002[Ck\n16842095 05000000020190\nCargo Fijo\nMant. y Reposición de Conexión\nAlumbrado Público\nSUBTOTAL\n   IGV\nElectrificación Rural (Ley N° 28749)\nTOTAL DEL MES\nAjuste redondeo mes anterior\nAjuste redondeo mes actual\n2.26\n1.74\n12.83\n168.97\n30.42\n2.51\n201.90\n0.05\n-0.05\n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \nMES FACTURADO MAYO 2025\n \n \n \n \n \n \n \n \n \n \n \n \n \n234.60\nkWh\n0\n145\n290\n435\n580\n725\nMay\nJun\nJul\nAgo\nSep\nOct\nNov\nDic\nEne\nFeb\nMar\nAbr\nMay\n \nkWh\nRuta 04-240-2855  Medidor Nro. 6867013 S - 0743\nRecibo Nro. S104-88213 N-BV-18632\nImporte 2 últimos meses facturados\nMar-25 S/ 252.32 - Abr-25 S/ 250.09\nÚltima\nlectura\n06/May/25\nLectura\nanterior\n07/Abr/25\nDiferencia\nde lecturas\nFactor de\nmedición\nEnergía a\nfacturar\n(kWh)\nPrecio\nkWh\n(S/)\n46900.30 - 46665.70 =\n234.60\nX\n1.0000\n=\n234.60\nX\n0.6485\nConsumo de energía\n152.14\n1\n63%\n9%\n28%\nTarifa BT5B del 04/May/2025 para LIMA SUR.\n2025\n \n \n \n \n \n \n \n \n \n \n \n \n \n \n0\n145\n290\n435\n580\n725\nMENSAJES PARA EL CLIENTE\nü Estimado cliente, le recordamos que nos puede\ncontactar al 617-5000 (Fonoluz) o en la web\nwww.luzdelsur.pe.\nü El total a pagar incluye: Recargo por FOSE (Ley 27510)\nS/ 4.18\n\n"
+  },
+  {
+    "id": "1doRv3XOpdXmYsEQeGsGjjdq_osr6ydGh",
+    "name": "F005-00018344.pdf",
+    "path": "",
+    "size": "194603",
+    "modifiedTime": "2025-07-04T21:12:37.138Z",
+    "webViewLink": "https://drive.google.com/file/d/1doRv3XOpdXmYsEQeGsGjjdq_osr6ydGh/view?usp=drivesdk",
+    "text": " \nInversiones PIMI SAC\nDomicilio fiscal: Pasaje Martir Olaya 141\nMiraflores - Lima - Lima - Peru\nrecaudacion@delpilarhotels.com\nTelf: (511) 712-0712 / Fax: (511) 712-0714\n-\n \nR.U.C Nº 20508159863\nFACTURA \nELECTRÓNICA\nF005-00018344\nRazón social\n: CREACION CUANTICA E.I.R.L.\nR.U.C\n: 20612592811\nDirección\n: CAL.LAS DALIAS NRO. 136 URB.\nARMENDARIZ (DPTO 604 - PISO 6) LIMA -\nLIMA - MIRAFLORES\nUbigeo\n: LIMA - LIMA - LIMA\nUrbanización\n: Lima\n \n \nMoneda\n: Soles\nFecha emisión\n: 04/07/2025 13:09:08\nFecha vencimiento\n: 04/07/2025\nForma de pago\n: Contado\nDias credito\n: -\nOrden de compra\n: -\nCliente\n: 03185-CREACION CUANTICA E.I.R.L.\nReserva\n: 048101\nGrupo\n: Entrenamiento de Confianza\nCheck in\n: 12/07/2025\nCheck out\n: 12/07/2025\nCantidad noches\n: 0\nHabitaciones\n: -\nTipo de cambio : 3.670\n \n \nObservaciones:\nInformación de la Detracción\nTipo Operación:\nBien o Servicio:\nMedio de pago:\n1001 Operación Sujeta a Detracción\n019 Arrendamiento de bienes muebles\n001 Depósito en cuenta\nNro. Cta. Banco de la Nación:\nPorcentaje de detracción:\nMonto detraccion:\n-\n10.00\nS/. 350.00\nLeyendas\nLeyenda: 2006    Operaci?n sujeta a detracci?n\nRepresentación Impresa de la factura electrónica, consulte su comprobante en www.infofactperu.pe/consulta \nUsuario: FERNANDO \nCódigo Hash:  fjKMSbPxlOC/OOUZP21NDj1olahCds9KZrRjHoTrauU=\n \npowered by Infomatica\n \nÍtem\n \nCódigo\n \nDescripción\n \nUnd.\n \nCantidad\n \nV. Unitario\n \nP. Unitario\n \nDescuento\n \nValor Venta\n1\n210000\nEVENTOS - SALONES\nNIU\n1.000\n2 734.37500\n3 226.56250\n0.00000\n2 734.38\nSON:TRES MIL QUINIENTOS CON 00/100 SOLES\n \nAnticipo\nS/\n0.00\n \n \nOp. Gravada\nS/\n2 734.38\n \n \nI.G.V 18%\nS/\n492.19\n \n \nOp. Inafecta\nS/\n0.00\n \n \nOp. Exonerada\nS/\n0.00\n \n \nOp. Exportación\nS/\n0.00\n \n \nOp. Gratuita\nS/\n0.00\n \n \nICBPER\nS/\n0.00\n \n \nServicio\nS/\n273.44\n \nImporte Total\nS/\n3 500.00\nOperacion sujeta al spot de detraccion 10%  para alquileres y 12%  para alimentos cta cte 00005137934 - Banco de la Nacion\n.\nABONAR A LAS SIGUIENTES CUENTAS CORRIENTES\n.\n.\n.\nCuenta Corriente bcp Dolares: 191-1516166-117\nCuenta Corriente bcp soles: 191-1514483-007\n.\n.\n.\n\n"
+  },
+  {
+    "id": "1a7QeVJmM68yIEDvNM-tlr__puuqD3JUW",
+    "name": "20537386488-01-FH04-3826.pdf",
+    "path": "",
+    "size": "20821",
+    "modifiedTime": "2025-07-02T18:01:13.138Z",
+    "webViewLink": "https://drive.google.com/file/d/1a7QeVJmM68yIEDvNM-tlr__puuqD3JUW/view?usp=drivesdk",
+    "text": "Calle Monte Rosa Nro. 283 Urb Chacarilla Del Estanque\nT-+511 2089400 - Santiago de Surco - Lima - LM\nR.U.C. 20537386488\nFACTURA ELECTRÓNICA\nFH04 N° 3826\nRAZÓN SOCIAL:\nFECHA DE EMISIÓN:\nCREACION CUANTICA E.I.R.L\nFECHA DE VENCIMIENTO:\n12/07/2025\nDIRECCIÓN:\nCAL.BERLIN NRO. 965 INT. 302 URB. SANTA CRUZ MIRAFLORES CAL.BERLIN NRO. 965 INT. 302 URB. SANTA\n02/07/2025\n20612592811\nRUC:\nHABITACIÓN:\nHUÉSPED:\n9032\n CREACION CUANTICA E.I.R.L\nFECHA DE SALIDA:\n2025-07-11\n2025-07-13\nFECHA DE LLEGADA:\nPAÍS:\nPERÚ\nTIPO DE CAMBIO:\n1.0\nSOLES\nMONEDA:\nTIPO DE PAGO:\nCONTADO\nORDEN DE COMPRA:\nARIZONA HOLDING SAC\nDESCRIPCIÓN\nCANTIDAD\nPRECIO UNITARIO\nTOTAL\n15,625.00\n1\n15,625.00\nEventos Alquiler\nAutorizado mediante resolución Nº 034-005-0005038/SUNAT\nRepresentación impresa de la factura electrónica\nPuede consultar este comprobante en:https://prod.ebis.pe/CecWeb/Consulta.jsf?e=20537386488\n00-076-094152\nNUMERO DE CUENTA:\nPORCENTAJE DETRACCION:\nS/ 2000.00\n10 %\nMONTO DE DETRACCION:\nOTROS MEDIOS DE PAGO\nMEDIO PAGO:\nBIENES O SERVICIO:\n019 ARRENDAMIENTO DE BIENES MUEBLES\nOPERACION SUJETA A DETRACCION\nOPERACION SUJETA AL SISTEMA DE PAGO DE OBLIGACION TRIBUTARIA - 'SPOT'\nMEDIO DE PAGO\n2,000.00\nDetraccion 10%\n S/\n18,000.00\nBank Transfer\n S/\n0011-0787-0100036703\nCCI\nBBVA\nSON : VEINTE MIL CON 00/100 SOLES\nBANCO\n0011-0787-0100036657\nBBVA\nSOLES\nMONEDA\n011 -787-000100036703-95\nDOLARES\n011-787-000100036657-93\nNÚMERO DE CUENTA\n0.00\n0.00\n15,625.00\n2,812.50\n20,000.00\nIMPORTE TOTAL\n0.00\nOP. EXPORTACIÓN\nR.CONS.10%\nI.G.V\nOP. GRAVADA\nOP. INAFECTA\nOP. EXONERADAS\n1562.50\nS/\nS/\nS/\nS/\nS/\nS/\nS/\nOP. GRATUITAS\nS/\n0.00\n0.00\nS/\nPROPINA\n-1-\n\n\n"
+  },
+  {
+    "id": "1Rk1D-AAEu11JidWPAe7kYXmdgvabKNkN",
+    "name": "20537386488-01-FH04-3762.pdf",
+    "path": "",
+    "size": "20811",
+    "modifiedTime": "2025-06-26T01:04:46.988Z",
+    "webViewLink": "https://drive.google.com/file/d/1Rk1D-AAEu11JidWPAe7kYXmdgvabKNkN/view?usp=drivesdk",
+    "text": "Calle Monte Rosa Nro. 283 Urb Chacarilla Del Estanque\nT-+511 2089400 - Santiago de Surco - Lima - LM\nR.U.C. 20537386488\nFACTURA ELECTRÓNICA\nFH04 N° 3762\nRAZÓN SOCIAL:\nFECHA DE EMISIÓN:\nCREACION CUANTICA E.I.R.L\nFECHA DE VENCIMIENTO:\n05/07/2025\nDIRECCIÓN:\nCAL.BERLIN NRO. 965 INT. 302 URB. SANTA CRUZ MIRAFLORES CAL.BERLIN NRO. 965 INT. 302 URB. SANTA\n25/06/2025\n20612592811\nRUC:\nHABITACIÓN:\nHUÉSPED:\n9032\n CREACION CUANTICA E.I.R.L\nFECHA DE SALIDA:\n2025-07-11\n2025-07-13\nFECHA DE LLEGADA:\nPAÍS:\nPERÚ\nTIPO DE CAMBIO:\n1.0\nSOLES\nMONEDA:\nTIPO DE PAGO:\nCONTADO\nORDEN DE COMPRA:\nARIZONA HOLDING SAC\nDESCRIPCIÓN\nCANTIDAD\nPRECIO UNITARIO\nTOTAL\n16,015.63\n1\n16,015.63\nEventos Alquiler\nAutorizado mediante resolución Nº 034-005-0005038/SUNAT\nRepresentación impresa de la factura electrónica\nPuede consultar este comprobante en:https://prod.ebis.pe/CecWeb/Consulta.jsf?e=20537386488\n00-076-094152\nNUMERO DE CUENTA:\nPORCENTAJE DETRACCION:\nS/ 2050.00\n10 %\nMONTO DE DETRACCION:\nOTROS MEDIOS DE PAGO\nMEDIO PAGO:\nBIENES O SERVICIO:\n019 ARRENDAMIENTO DE BIENES MUEBLES\nOPERACION SUJETA A DETRACCION\nOPERACION SUJETA AL SISTEMA DE PAGO DE OBLIGACION TRIBUTARIA - 'SPOT'\nMEDIO DE PAGO\n2,050.00\nDetraccion 10%\n S/\n18,450.00\nBank Transfer\n S/\n0011-0787-0100036703\nCCI\nBBVA\nSON : VEINTE MIL QUINIENTOS  CON 00/100 SOLES\nBANCO\n0011-0787-0100036657\nBBVA\nSOLES\nMONEDA\n011 -787-000100036703-95\nDOLARES\n011-787-000100036657-93\nNÚMERO DE CUENTA\n0.00\n0.00\n16,015.63\n2,882.81\n20,500.00\nIMPORTE TOTAL\n0.00\nOP. EXPORTACIÓN\nR.CONS.10%\nI.G.V\nOP. GRAVADA\nOP. INAFECTA\nOP. EXONERADAS\n1601.56\nS/\nS/\nS/\nS/\nS/\nS/\nS/\nOP. GRATUITAS\nS/\n0.00\n0.00\nS/\nPROPINA\n-1-\n\n\n"
+  },
+  {
+    "id": "1eVXS5d6H2Rmyp6KtaweWeqPtUsKtM0Qv",
+    "name": "20513215887-01-F170-7940.pdf",
+    "path": "",
+    "size": "24994",
+    "modifiedTime": "2025-06-23T18:19:30.332Z",
+    "webViewLink": "https://drive.google.com/file/d/1eVXS5d6H2Rmyp6KtaweWeqPtUsKtM0Qv/view?usp=drivesdk",
+    "text": "Av. Victor Andres Belaunde 198 San Isidro - Lima - San Isidro\nR.U.C. 20513215887\nFACTURA ELECTRÓNICA\nF170 N° 7940\nRAZÓN SOCIAL:\nFECHA DE EMISIÓN:\nCREACION CUANTICA E.I.R.L.\nFECHA DE VENCIMIENTO:\n22/06/2025\nDIRECCIÓN:\nCAL.BERLIN NRO. 965 INT. 302 URB. SANTA CRUZ -LIMA -LIMA MIRAFLORES\n22/06/2025\n20612592811\nRUC:\nDÓLARES AMERICANOS\nCOND. PAGO:\nContado\nMONEDA:\nHABITACIÓN:\nHUÉSPED:\n479\nEDISON PAUL SOSA*** CARRERA\nSALIDA:\n2025-06-18\n2025-06-22\nLLEGADA:\n295\nCONF. N°:\n114314908\nCAJERO:\nORDEN DE COMPRA:\nPAÍS:\nPERÚ\nSociedad de Desarrollo de Hoteles Peruanos S.A.\nDESCRIPCIÓN\nCANTIDAD\nPRECIO\nUNITARIO\nTOTAL\nUNIDAD\nMEDIDA\n340.00\n1\n340.00\nAccommodation\nNIU\n  SON : CUATROCIENTOS TREINTA Y CINCO CON 20/100 DÓLARES AMERICANOS\nAutorizado mediante resolución Nº 034-005-0005038/SUNAT\nRepresentación impresa del comprobante electrónico\nPuede consultar este comprobante\nen:https://prod.ebis.pe/CecWeb/Consulta.jsf?e=SDHP\n0.00\n0.00\n340.00\n0.00\n61.20\n0.00\n0.00\n435.20\nIMPORTE TOTAL\nPAID OUT\nPROPINA\n0.00\nOP. EXPORTACIÓN\nR.CONS.10%\nI.G.V\nT.DSCTO.\nOP. GRAVADA\nOP. INAFECTA\nOP. EXONERADAS\n34.00\n$\n$\n$\n$\n$\n$\n$\n$\n$\n$\n$\n0.00\nSUBBTOTAL\nDESCUENTO\nPROPINA\n$\n0.00\n$\n0.00\nMEDIO DE PAGO\n435.20\n Visa\n $\n-1-\n\n"
+  },
+  {
+    "id": "1irhYuqe3Q3ez_VA2Oez4szQMEsYQo6PP",
+    "name": "EstadoCuenta (2).pdf",
+    "path": "",
+    "size": "98736",
+    "modifiedTime": "2025-06-18T18:07:23.605Z",
+    "webViewLink": "https://drive.google.com/file/d/1irhYuqe3Q3ez_VA2Oez4szQMEsYQo6PP/view?usp=drivesdk",
+    "text": "Empresas de\nGeneración\nDistribución \n(Luz del Sur)\nEmpresas de \nTransmisión\nPrecio de \nla energía\nNo incluye IGV\n¿Sabías qué?\nEl precio de la energía que pagas (soles/kWh) es fijado por el OSINERGMIN y se distribuye entre las empresas que la generan y la llevan a tu casa \no negocio.\nLUZ DEL SUR S.A.A.\nAV. CANAVAL Y MOREYRA 380 SAN ISIDRO - LIMA\nRUC: 20331898008\nNº DE SUMINISTRO\nDATOS DEL SUMINISTRO\nTarifa\nBT5B Residencial\nConexión\nSubterránea C2.1\nSector Típico\n1 (SE0133)\nPotencia Contratada\n6.00 KW\nNivel Tensión\n220 V\n \nMedidor\nTRIFÁSICO  Mecánico 3 hilos\nR.U.C. 20605597557\n2153859\nV Y V PROYECTO 67 S.A.C.\nBENAVIDES 1130 - 1140 - 1150 DPTO 503\nMIRAFLORES - LIMA\n0000392\n186.00\nFecha de Emisión: 14-Abr-2025\nFecha de Vencimiento: 02-May-2025\nj\u00166Ve\u001a,\u0001d\u0005\u0001\u0001\u0001\u0002W\u0001\u0014k\n2153859K 04000000018600\nCargo Fijo\nMant. y Reposición de Conexión\nAlumbrado Público\nInterés Compensatorio\nSUBTOTAL\n   IGV\nElectrificación Rural (Ley N° 28749)\nTOTAL DEL MES\nAjuste redondeo mes anterior\nAjuste redondeo mes actual\n2.26\n1.86\n12.83\n0.04\n155.72\n28.03\n2.29\n186.04\n0.00\n-0.04\n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \nMES FACTURADO ABRIL 2025\n \n \n \n \n \n \n \n \n \n \n \n \n \n213.60\nkWh\n0\n74\n148\n222\n296\n370\nAbr\nMay\nJun\nJul\nAgo\nSep\nOct\nNov\nDic\nEne\nFeb\nMar\nAbr\n \nkWh\nRuta 09-219-1594  Medidor Nro. 7120797 S - 0392\nRecibo Nro. S109-11097 N-BV-08195\nImporte 2 últimos meses facturados\nFeb-25 S/ 101.87 - Mar-25 S/ 189.91\nÚltima\nlectura\n12/Abr/25\nLectura\nanterior\n13/Mar/25\nDiferencia\nde lecturas\nFactor de\nmedición\nEnergía a\nfacturar\n(kWh)\nPrecio\nkWh\n(S/)\n600.10 -\n386.50\n=\n213.60\nX\n1.0000\n=\n213.60\nX\n0.6495\nConsumo de energía\n138.73\n1\n62%\n9%\n29%\nTarifa BT5B del 04/Abr/2025 para LIMA SUR.\n2025\n \n \n \n \n \n \n \n \n \n \n \n \n \n \n0\n74\n148\n222\n296\n370\nMENSAJES PARA EL CLIENTE\nü Estimado cliente, le recordamos que nos puede\ncontactar al 617-5000 (Fonoluz) o en la web\nwww.luzdelsur.pe.\nü El total a pagar incluye: Recargo por FOSE (Ley 27510)\nS/ 3.84\n\n"
+  },
+  {
+    "id": "1XAFmYC9UaIaLPAfGRd983kOACWHnQOIN",
+    "name": "EstadoCuenta (1).pdf",
+    "path": "",
+    "size": "98729",
+    "modifiedTime": "2025-06-18T18:07:11.073Z",
+    "webViewLink": "https://drive.google.com/file/d/1XAFmYC9UaIaLPAfGRd983kOACWHnQOIN/view?usp=drivesdk",
+    "text": "Empresas de\nGeneración\nDistribución \n(Luz del Sur)\nEmpresas de \nTransmisión\nPrecio de \nla energía\nNo incluye IGV\n¿Sabías qué?\nEl precio de la energía que pagas (soles/kWh) es fijado por el OSINERGMIN y se distribuye entre las empresas que la generan y la llevan a tu casa \no negocio.\nLUZ DEL SUR S.A.A.\nAV. CANAVAL Y MOREYRA 380 SAN ISIDRO - LIMA\nRUC: 20331898008\nNº DE SUMINISTRO\nDATOS DEL SUMINISTRO\nTarifa\nBT5B Residencial\nConexión\nSubterránea C2.1\nSector Típico\n1 (SE0133)\nPotencia Contratada\n6.00 KW\nNivel Tensión\n220 V\n \nMedidor\nTRIFÁSICO  Mecánico 3 hilos\nR.U.C. 20605597557\n2153859\nV Y V PROYECTO 67 S.A.C.\nBENAVIDES 1130 - 1140 - 1150 DPTO 503\nMIRAFLORES - LIMA\n0000391\n219.10\nFecha de Emisión: 13-Jun-2025\nFecha de Vencimiento: 30-Jun-2025\nj\u00166Ve\u001a,\u0001d\u0007\u0001\u0001\u0001\u0003\u0014\u000bWk\n2153859K 06000000021910\nCargo Fijo\nMant. y Reposición de Conexión\nAlumbrado Público\nSUBTOTAL\n   IGV\nElectrificación Rural (Ley N° 28749)\nTOTAL DEL MES\nAjuste redondeo mes anterior\nAjuste redondeo mes actual\n2.25\n1.85\n13.83\n183.37\n33.01\n2.75\n219.13\n0.01\n-0.04\n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \nMES FACTURADO JUNIO 2025\n \n \n \n \n \n \n \n \n \n \n \n \n \n257.30\nkWh\n0\n87\n174\n261\n348\n435\nJun\nJul\nAgo\nSep\nOct\nNov\nDic\nEne\nFeb\nMar\nAbr\nMay\nJun\n \nkWh\nRuta 09-219-1594  Medidor Nro. 7120797 S - 0391\nRecibo Nro. S109-154318 N-BV-08221\nImporte 2 últimos meses facturados\nAbr-25 S/ 186.04 - May-25 S/ 187.17\nÚltima\nlectura\n12/Jun/25\nLectura\nanterior\n13/May/25\nDiferencia\nde lecturas\nFactor de\nmedición\nEnergía a\nfacturar\n(kWh)\nPrecio\nkWh\n(S/)\n1073.30 -\n816.00\n=\n257.30\nX\n1.0000\n=\n257.30\nX\n0.6430\nConsumo de energía\n165.44\n1\n63%\n9%\n28%\nTarifa BT5B del 04/May/2025 para LIMA SUR.\n2025\n \n \n \n \n \n \n \n \n \n \n \n \n \n \n0\n87\n174\n261\n348\n435\nMENSAJES PARA EL CLIENTE\nü Estimado cliente, le recordamos que nos puede\ncontactar al 617-5000 (Fonoluz) o en la web\nwww.luzdelsur.pe.\nü El total a pagar incluye: Recargo por FOSE (Ley 27510)\nS/ 4.41\n\n"
+  },
+  {
+    "id": "1QKwy00J2S5ShnpFZXclOOogAfCVg6U2l",
+    "name": "EstadoCuenta.pdf",
+    "path": "",
+    "size": "98698",
+    "modifiedTime": "2025-06-18T18:07:04.200Z",
+    "webViewLink": "https://drive.google.com/file/d/1QKwy00J2S5ShnpFZXclOOogAfCVg6U2l/view?usp=drivesdk",
+    "text": "Empresas de\nGeneración\nDistribución \n(Luz del Sur)\nEmpresas de \nTransmisión\nPrecio de \nla energía\nNo incluye IGV\n¿Sabías qué?\nEl precio de la energía que pagas (soles/kWh) es fijado por el OSINERGMIN y se distribuye entre las empresas que la generan y la llevan a tu casa \no negocio.\nLUZ DEL SUR S.A.A.\nAV. CANAVAL Y MOREYRA 380 SAN ISIDRO - LIMA\nRUC: 20331898008\nNº DE SUMINISTRO\nDATOS DEL SUMINISTRO\nTarifa\nBT5B Residencial\nConexión\nSubterránea C2.1\nSector Típico\n1 (SE0133)\nPotencia Contratada\n6.00 KW\nNivel Tensión\n220 V\n \nMedidor\nTRIFÁSICO  Mecánico 3 hilos\nR.U.C. 20605597557\n2153859\nV Y V PROYECTO 67 S.A.C.\nBENAVIDES 1130 - 1140 - 1150 DPTO 503\nMIRAFLORES - LIMA\n0000391\n187.20\nFecha de Emisión: 14-May-2025\nFecha de Vencimiento: 29-May-2025\nj\u00166Ve\u001a,\u0001d\u0006\u0001\u0001\u0001\u0002X\u0015\"k\n2153859K 05000000018720\nCargo Fijo\nMant. y Reposición de Conexión\nAlumbrado Público\nSUBTOTAL\n   IGV\nElectrificación Rural (Ley N° 28749)\nTOTAL DEL MES\nAjuste redondeo mes anterior\nAjuste redondeo mes actual\n2.26\n1.86\n12.83\n156.66\n28.20\n2.31\n187.17\n0.04\n-0.01\n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \nMES FACTURADO MAYO 2025\n \n \n \n \n \n \n \n \n \n \n \n \n \n215.90\nkWh\n0\n74\n148\n222\n296\n370\nMay\nJun\nJul\nAgo\nSep\nOct\nNov\nDic\nEne\nFeb\nMar\nAbr\nMay\n \nkWh\nRuta 09-219-1594  Medidor Nro. 7120797 S - 0391\nRecibo Nro. S109-82627 N-BV-08199\nImporte 2 últimos meses facturados\nMar-25 S/ 189.91 - Abr-25 S/ 186.04\nÚltima\nlectura\n13/May/25\nLectura\nanterior\n12/Abr/25\nDiferencia\nde lecturas\nFactor de\nmedición\nEnergía a\nfacturar\n(kWh)\nPrecio\nkWh\n(S/)\n816.00 -\n600.10\n=\n215.90\nX\n1.0000\n=\n215.90\nX\n0.6471\nConsumo de energía\n139.71\n1\n63%\n9%\n28%\nTarifa BT5B del 04/May/2025 para LIMA SUR.\n2025\n \n \n \n \n \n \n \n \n \n \n \n \n \n \n0\n74\n148\n222\n296\n370\nMENSAJES PARA EL CLIENTE\nü Estimado cliente, le recordamos que nos puede\ncontactar al 617-5000 (Fonoluz) o en la web\nwww.luzdelsur.pe.\nü El total a pagar incluye: Recargo por FOSE (Ley 27510)\nS/ 3.81\n\n"
+  },
+  {
+    "id": "1Bm-hAEK4i5NU2ieqJ1ksFl6Ew8vMmCMw",
+    "name": "PDF-DOC-E001-30920545450705.pdf",
+    "path": "",
+    "size": "3918",
+    "modifiedTime": "2025-06-17T21:01:01.364Z",
+    "webViewLink": "https://drive.google.com/file/d/1Bm-hAEK4i5NU2ieqJ1ksFl6Ew8vMmCMw/view?usp=drivesdk",
+    "text": " \n \n \nGOLDEN LIONS A. N. E.I.R.L.  \nJR. VISTA ALEGRE 791 CND. DINASTIA II DPTO. 702  \nSANTIAGO DE SURCO - LIMA - LIMA \nFACTURA ELECTRONICA\nRUC: 20545450705 \nE001-309 \nFecha de Emisión\n: 15/06/2025\nSeñor(es)\n: CREACION CUANTICA E.I.R.L.  \nRUC \n: 20612592811  \nEstablecimiento del Emisor \n:\nJR. VISTA ALEGRE 791 CND.\nDINASTIA II DPTO. 702 LIMA-LIMA-\nSANTIAGO DE SURCO \nTipo de Moneda\n: SOLES \nObservación\n:  \nForma de pago: Contado\nCantidad\nUnidad Medida\nDescripción\nValor Unitario\nICBPER\n1.00\nUNIDAD\nALMACENAMIENTO DE MATERIALES DE APOYO\n150.00\n0.00\nValor de Venta de Operaciones Gratuitas : S/ 0.00 \n \n \nSON: CIENTO SETENTA Y SIETE Y 00/100 SOLES\n \n \nSub Total Ventas :\nS/ 150.00 \nAnticipos :\nS/ 0.00 \nDescuentos :\nS/ 0.00 \nValor Venta :\nS/ 150.00 \nISC :\nS/ 0.00 \nIGV :\nS/ 27.00 \nICBPER :\nS/ 0.00 \nOtros Cargos :\nS/ 0.00 \nOtros Tributos :\nS/ 0.00 \nMonto de redondeo :\nS/ 0.00 \nImporte Total :\nS/ 177.00 \nEsta es una representación impresa de la factura electrónica, generada en el Sistema de SUNAT. Puede\nverificarla utilizando su clave SOL.\n\n"
+  },
+  {
+    "id": "1mnTBI7BupdGqRWN0bvb6jbCI_o_ISs0d",
+    "name": "INV302174012.pdf",
+    "path": "",
+    "size": "279400",
+    "modifiedTime": "2025-06-11T18:33:05.475Z",
+    "webViewLink": "https://drive.google.com/file/d/1mnTBI7BupdGqRWN0bvb6jbCI_o_ISs0d/view?usp=drivesdk",
+    "text": "Página 1 de 2\nEntel Perú S.A.\nRUC: 20106897914\nAv. República de Colombia 791\nPiso 14 San Isidro Lima\nCREACION CUANTICA E.I.R.L.\nMONICA PAMELA CARRILLO\nAV SERGIO BERNALES Nro 272\nLIMA-L01\nLIMA-LIMA\nRecibo No.\nEmisión del Recibo\nNo. de Cuenta\nInicio del Periodo\nFin del Periodo\nRUC / DNI\n:\n:\n:\n:\n:\n:\nS001-302174012\n08/JUN/2025\n1.21765711\n09/JUN/2025 (Asignación de Saldo)\n08/JUL/2025\n20612592811\nFACTURACIÓN DEL MES (S/)\nRECIBO DEL MES\nULTIMO DIA DE PAGO\n:\n:\nS/\n115.48\n21/JUN/2025\nTOTAL A PAGAR\n:\nS/\n115.48\n107.37\nCargo Fijo (incluye prorrateo)\n-9.51\nOtros Cargos y Abonos\n97.86\nSub-total\n17.62\nI.G.V. (18%)\n115.48\nTotal\n0.00\nOtros Cargos y Abonos (ya gravados con I.G.V.)\n115.48\nTotal Recibo del Mes\nRESUMEN (Estado de cuenta S/)\n115.48\nRecibo(s) anterior(es)\n-115.48\nPagos / Abonos hasta el 08/06/2025\n0.00\nOtros ajustes (ya gravados con I.G.V.)\n0.00\nDeuda Vencida\n115.48\nRecibo del Mes                S001-302174012\n115.48\nTOTAL A PAGAR\nDocumento válido para efectos tributarios según Res. de Sup. No. 007-99/SUNAT. Documento no afecto al régimen de retención del IGV por ser agente de retención, según Res. de Sup. No. 037-2002/SUNAT.\nLos saldos de hasta S/0.09 que no cancele por falta de moneda de curso legal (S/0.05 y S/0.01), se registrarán y se mantendrán como pendientes de pago hasta su cancelación efectiva.\nRecuerda que puedes cambiar de operadora sin perder tu número. El trámite de portabilidad es rápido y gratuito.\nMigra tus líneas de otro operador hacia Entel y disfruta de los beneficios que tenemos para ti!\n\nPágina 2 de 2\nEntel Perú S.A.\nRUC: 20106897914\nAv. República de Colombia 791\nPiso 14 San Isidro Lima\nCREACION CUANTICA E.I.R.L.\nMONICA PAMELA CARRILLO\nRecibo No.                S001-302174012\nNo. de Cuenta         1.21765711\nRESUMEN\nMontos S/ sin IGV\nNúmero\nPlan Tarifario\nMonto\nCargo Fijo\nProm. y\nOtros Servicios Contratados\nConsumos Adicionales\nTotal\n(Incluye\nprorateo)\nDsctos.\nPaquetes\nContratados\nGarantía\nArrendamiento\nOtros cargos\nVoz\nMensajería\nDatos y\nRoaming Datos\n912379686\nEmpresa PRO 2.0 44.9\n38.05\n38.05\n-\n-\n-\n-\n-\n-\n-\n912379744\nEmpresa PRO 2.0 44.9\n38.05\n38.05\n-\n-\n-\n-\n-\n-\n-\n908931343\nEmpresa PRO 2.0 36.9\n31.27\n31.27\n-\n-\n-\n-\n-\n-\n-\nTotal S/\n107.37\n107.37\n0.00\n0.00\n0.00\n0.00\n0.00\n0.00\n0.00\nOtros Cargos y Abonos\nTotal S/\n1C1E2124 - Promocion 2da hasta la 10ma linea PRO 25% x 18m (5/18) - 51912379686\n-9.51\n-9.51\nVOZ - Consumo Total y Cobro de Consumo Adicional (S/)\nConsumo expresado en minutos y segundos\nNúmero\nMonto\nTelefonía Móvil\nTelefonía Iden\nLDI/Satelital/Rural\nRoaming Internacional\nConexión Directa\nTotal\nOn Net\nOff Net\nMonto\nFijo\nMóvil\nMonto\nConsumo\nConsumo\nConsumo\nConsumo\nConsumo\nMonto\nConsumo\nMonto\nConsumo\nMonto\n912379686\n-\n37:19\n37:18\n-\n0:00\n0:00\n-\n0:00\n-\n0:00\n-\n0:00\n-\n912379744\n-\n996:12\n364:04\n-\n0:00\n0:00\n-\n0:00\n-\n0:00\n-\n0:00\n-\nTotal S/\n0.00\nCONCEPTOS FACTURABLES\nGLOSARIO\nCargo Fijo (incluye prorrateo): Monto de Renta Mensual y consumo proporcional\npor los servicios de Voz, Mensajería y Datos, según Plan Tarifario Contratado.\nOtros Servicios Contratados: Monto fijo mensual por los servicios de:\n• Paquetes Contratados: Paquetes de datos, mensajería y LDI. Servicios\nBlackberry, Localizador, Entel Backup y otros servicios de Valor Agregado:\nlicencias, aplicativos de negocio, gestión de dispositivos móviles y otros.\n• Garantía: Servicio de reposición de equipos.\n• Arrendamiento: Alquiler de equipos.\n.\nConsumos Adicionales: Monto facturado no comprendido dentro del cargo fijo\nmensual del plan tarifario contratado, por los servicios de Voz, Mensajería, Datos,\nRoaming Internacional, LDI, Redes Satelitales, Destinos Rurales.\nDatos locales y móviles: Servicio de internet brindado a través de equipos\nmóviles, USB Módems, Routers, etc\nDatos Roaming: Servicio de datos que Entel brinda en otros paises.\nOtros Cargos y Abonos: Cargos y abonos no recurrentes.\nPromociones y Descuentos: Descuentos generados por promociones especiales.\nRecargo por Intereses: Cobro de intereses legales generados por la no\ncancelación de la totalidad del recibo a la fecha de vencimiento.\nOtros Cargos y Abonos (ya gravados con IGV): Cargo de documentos emitidos\npor compra o financiamiento de equipos y/o Boletas/Facturas adicionales, ya\ngravados con IGV. Incluye Facturación por encargo de Otros Operadores según\nnormativa vigente.\nOn Net: Comunicación de un teléfono móvil Entel a otro teléfono móvil Entel.\nOff Net: Comunicación de un teléfono móvil Entel a cualquier teléfono fijo o móvil de otro operador.\nLDI: Larga Distancia Internacional.\nRedes Satelitales: Telefonía móvil a números satelitales.\nDestinos Rurales: Telefonía móvil a Destinos Rurales.\nRoaming Internacional: Servicio de Voz y Datos que Entel brinda en otros países.\nDescarga de Contenidos: Cargo por envío de mensajes y descargas.\nMB: Megabytes (1 MB = 1024 KB)\n.\n- El límite de crédito asignado a su cuenta es S/0.00\n- El pago no oportuno devengará en intereses legales. Entel puede proceder a la suspensión del\nServicio a partir del día siguiente del último día de pago.\n- El costo por Reactivación de Servicios suspendido por morosidad es de S/8.85 incluido IGV\n- Reconexión del servicio máximo dentro de 24 horas de efectuado el pago correspondiente.\n- Conoce los lugares de pago en www.entel.pe\nComunícate con Entel de lunes a domingo de 6 am a 12 am, inclusive feriados.\nMÓVILES: 123 (desde tu Entel) y 611-7777 (desde un teléfono fijo) - Llamadas gratis: 0-800-1-8844\n(Lima) y 0-800-1-1100 (provincias).\nINTERNET Y SERVICIOS DE VALOR AGREGADO: 123 (desde tu Entel) y 611-7777 (desde un teléfono fijo).\nOSIPTEL: Fono Ayuda: 0-801-12121\nPara detalle de llamadas a fijos o móviles consultar gratuitamente \"Mi Entel\" en www.entel.pe\n\n"
+  },
+  {
+    "id": "1Hk8LUIS2KN3JXtOjeROXvtkKHyG4tc9H",
+    "name": "DIP-FACT-Recibo_Ciclico_2025060005_S1AA-0043172690.pdf",
+    "path": "",
+    "size": "137348",
+    "modifiedTime": "2025-06-10T15:19:35.724Z",
+    "webViewLink": "https://drive.google.com/file/d/1Hk8LUIS2KN3JXtOjeROXvtkKHyG4tc9H/view?usp=drivesdk",
+    "text": "Telefónica del Perú S.A.A.   |   R.U.C. 20100017491   |   Jr. Domingo Martínez Luján N° 1130   |   Lima – Lima - Surquillo\nPágina 1/3\nEmpresas Fija\nRecibo Junio\nN° recibo: S1AA-0043172690\nCREACION CUANTICA EIRL\nRUC: 20612592811 \nCALLE BERLIN 965 Piso 3 URBANIZACION RESIDENCIAL JOSE BALTA,\nMIRAFLORES, 01, LIMA\nCuenta financiera: 753621842 \nID SUSCRIPTOR: 196980437\nID Cliente: 131054354\nAnexo: 1\nTotal a pagar del mes\nS/109.90\nÚltimo día de pago: 21/06\nN° Fijo / Cód. pago: 753621842\nDeuda anterior: S/0.00\n \nPaga a tiempo tu recibo y mantente siempre conectado.\nNo esperes hasta el último día de pago.\nCiclo de facturación - Junio 2025\n05/06\n21/06\nFecha de\nEmisión\nÚltimo día\nde pago\n¡LLAMA AL 0 800 11311!\nSi tienes un negocio y deseas comprar o portar una línea\nmóvil, adquirir un servicio de internet, TV o telefonía fija.\nCanal exclusivo para Clientes con RUC 20\nResumen de Recibo - NºS1AA-0043172690\nCargos Mensuales\nS/ 109.89\nSubtotal\nS/93.13\nIGV (18%)\nS/16.76\nTotal Afecto\nS/109.89\nDescuentos y Bonificaciones Inafectos\nS/ 0.00\nRedondeo\nS/ 0.01\nTotal Facturado\nS/109.90\nDevoluciones\nS/ 0.00\nDébitos\nS/ 0.00\nTotal a pagar\nS/ 109.90\n\nEmpresas Fija\nTelefónica del Perú S.A.A.   |   R.U.C. 20100017491   |   Jr. Domingo Martínez Luján N° 1130   |   Lima – Lima - Surquillo\nPágina 2/3\nDetalle del recibo - N° S1AA-0043172690 - 196980437\nCargos Mensuales\nPrecio de vta.\nIGV S/109.89\nMovistar Internet 600 Mbps (06Jun al 05Jul)\n93.13\n16.76\n109.89\nDescuentos y Bonificaciones Inafectos\nPrecio de vta.\nIGV\nS/0.00\nBonificacion Prom Internet 1 GB x 12m 600 Mbps (06Jun \nal 05Jul) (VR S/127.03)\n0.00\n0.00\n0.00\nRedondeo\nPrecio de vta.\nIGV\nS/0.01\nRedondeo del mes Actual\n-0.08\n0.00\n-0.08\nRedondeo del mes Anterior\n0.09\n0.00\n0.09\n\nConceptos facturables\nCargos fijos mensuales\nCargo mensual facturado al cliente por el plan contratado\npara los servicios de voz y datos. Cargo fijo proporcional\ndel plan desde la fecha de inicio del servicio hasta el\nsiguiente cierre de facturación\nCargos por llamadas adicionales\nCargos por tráfico de voz, datos, mensajes de texto que\nno se encuentran comprendidos dentro del cargo fijo\nmensual.\nLarga distancia: cargo adicional por llamada de larga\ndistancia nacional o internacional\nKB internet y multimedia: navegación en internet y\ntráfico por descarga de aplicativos\nKB transmisión de datos: envío y recepción de datos.\nRoaming internacional: cargo por llamadas efectuadas y\nrecibidas en el extranjero\nDetalle de documentos afectos al IGV\nCargo por Reconexión: cargo facturado si el cliente\ncancela un recibo después de habérsele cortado por\ndeuda.\nCargo por Reconexión de corte APC (a pedido de cliente):\ncargo facturado al efectuarse la reactivación del servicio\nde la línea luego de cumplirse el plazo de suspensión.\nCargo por llamadas a operadoras rurales: llamadas\nrealizadas a teléfonos fijos rurales como Gilat to Home,\nValtron, Claro Rural, TDP Rural o a teléfonos satelitales\ncomo Tesam.\nRenta fraccionaria por cambio de plan: cargo facturado si\ndurante el ciclo de la facturación el cliente cambió a un\nplan tarifario de cargo fijo mayor al que tenía.\nLugares de pago\nBancos y agentes\nBBVA Continental\nBanco Pichincha\nBCP\nBanco de la Nación\nBanBif\nInterbank\nScotiabank\nOtros\nAgente Multibanco KASNET\nMultibanco\nFullcarga\nRed Digital\nMetro\nWong\nWestern Union\nAlgunos lugares de pago presenciales pueden aplicar cobro de comisión de acuerdo a sus tarifarios vigentes.\nPuede realizar su pago de forma rápida y segura en el App Mi Movistar, YAPE o App o Web de su banco.\nRecuerda que también puede afiliar su recibo\nMovistar al débito automático, más info :\nhttp://smvst.com/DAT\nMayor información sobre lugares de pago en www.movistar.com.pe\n¿Qué es el recibo digital?\nEs un servicio gratuito que ofrece Telefónica, con el que podrá recibir mensualmente su recibo en formato PDF al\ncorreo electrónico que usted indique. El envío del recibo digital va en reemplazo de su recibo físico.\n\n"
+  },
+  {
+    "id": "1SQhtnXiDqSzjfLQckWCTigZ-NoL4tY76",
+    "name": "factura alojamiento creacion cuantica-fernando aragon.pdf",
+    "path": "",
+    "size": "323964",
+    "modifiedTime": "2025-06-09T19:41:48.160Z",
+    "webViewLink": "https://drive.google.com/file/d/1SQhtnXiDqSzjfLQckWCTigZ-NoL4tY76/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n3244505\nlunes, 9 Junio, 2025\nREFERENCIA\nF301\n00036565\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nMonica Santillana \n09/06/2025\nSALIDA\n05/06/2025\nFacturado a : \nUSUARIO\nARAGON  , FERNADO\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nAlojamiento\n351.56\n351.56\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nUTZyzYjy5x+Th9IZuZorMeLmntQ=\nCUATROCIENTOS CINCUENTA Y 00/100 DOLARES AMERICANOS\nTotal  Propina\nUS $\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n450.00\n0.00\n0.00\n35.16\n63.28\n0.00\n0.00\n351.56\nTotal  Exportacion\n0.00\nCuentas corrientes  \nTotal  Descuento\nDolares\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1i9x3uMkCudXAqZ_X1ZhofQ1eYm5vfmNQ",
+    "name": "20537386488-01-FH04-3533.pdf",
+    "path": "",
+    "size": "20366",
+    "modifiedTime": "2025-06-07T16:48:12.302Z",
+    "webViewLink": "https://drive.google.com/file/d/1i9x3uMkCudXAqZ_X1ZhofQ1eYm5vfmNQ/view?usp=drivesdk",
+    "text": "Calle Monte Rosa Nro. 283 Urb Chacarilla Del Estanque\nT-+511 2089400 - Santiago de Surco - Lima - LM\nR.U.C. 20537386488\nFACTURA ELECTRÓNICA\nFH04 N° 3533\nRAZÓN SOCIAL:\nFECHA DE EMISIÓN:\nCREACION CUANTICA EIRL\nFECHA DE VENCIMIENTO:\n16/06/2025\nDIRECCIÓN:\nCalle Berlin 965\n06/06/2025\n20612592811\nRUC:\nHABITACIÓN:\nHUÉSPED:\n9073\n CREACION CUANTICA EIRL\nFECHA DE SALIDA:\n2025-06-07\n2025-06-07\nFECHA DE LLEGADA:\nPAÍS:\nPERÚ\nTIPO DE CAMBIO:\n1.0\nSOLES\nMONEDA:\nTIPO DE PAGO:\nCONTADO\nORDEN DE COMPRA:\nARIZONA HOLDING SAC\nDESCRIPCIÓN\nCANTIDAD\nPRECIO UNITARIO\nTOTAL\n19.53\n1\n19.53\nEventos y Catering\n2,348.44\n1\n2,348.44\nEventos Alquiler\nAutorizado mediante resolución Nº 034-005-0005038/SUNAT\nRepresentación impresa de la factura electrónica\nPuede consultar este comprobante en:https://prod.ebis.pe/CecWeb/Consulta.jsf?e=20537386488\n00-076-094152\nNUMERO DE CUENTA:\nPORCENTAJE DETRACCION:\nS/ 364.00\n12 %\nMONTO DE DETRACCION:\nOTROS MEDIOS DE PAGO\nMEDIO PAGO:\nBIENES O SERVICIO:\n037 DEMÁS SERVICIOS GRAVADOS CON EL IGV\nOPERACION SUJETA A DETRACCION\nOPERACION SUJETA AL SISTEMA DE PAGO DE OBLIGACION TRIBUTARIA - 'SPOT'\nMEDIO DE PAGO\n364.00\nDetraccion 12%\n S/\n2,667.00\nBank Transfer\n S/\n0011-0787-0100036703\nCCI\nBBVA\nSON : TRES MIL TREINTA Y UNO CON 00/100 SOLES\nBANCO\n0011-0787-0100036657\nBBVA\nSOLES\nMONEDA\n011 -787-000100036703-95\nDOLARES\n011-787-000100036657-93\nNÚMERO DE CUENTA\n0.00\n0.00\n2,367.97\n426.24\n3,031.00\nIMPORTE TOTAL\n0.00\nOP. EXPORTACIÓN\nR.CONS.10%\nI.G.V\nOP. GRAVADA\nOP. INAFECTA\nOP. EXONERADAS\n236.79\nS/\nS/\nS/\nS/\nS/\nS/\nS/\nOP. GRATUITAS\nS/\n0.00\n0.00\nS/\nPROPINA\n-1-\n\n"
+  },
+  {
+    "id": "1keyGk-X1fzBSKxFPeEPl2mZTmxEEdpaO",
+    "name": "E001-1517 CREACION CUANTICA E.I.R.L..pdf",
+    "path": "",
+    "size": "8948",
+    "modifiedTime": "2025-06-02T19:41:05.933Z",
+    "webViewLink": "https://drive.google.com/file/d/1keyGk-X1fzBSKxFPeEPl2mZTmxEEdpaO/view?usp=drivesdk",
+    "text": " \n \n \nCORPORACION AQUA ANANDA S.A.C.  \nJR. CHAVIN 16 URB. HUERTA LA VIRREYNA  \nBREÑA - LIMA - LIMA \nFACTURA ELECTRONICA\nRUC: 20610414495 \nE001-1517 \nFecha de Emisión\n: 02/06/2025\nSeñor(es)\n: CREACION CUANTICA E.I.R.L.  \nRUC \n: 20612592811  \nDirección del Cliente \n: CAL. BERLIN 965 URB. SANTA CRUZ\nINT. 302 LIMA-LIMA-MIRAFLORES \nTipo de Moneda\n: SOLES \nObservación\n:  \nForma de pago: Contado\nCantidad\nUnidad Medida\nDescripción\nValor Unitario\nICBPER\n1.00\nUNIDAD\nALQUILER DISPENSADOR 2 TIEMPOS - MAYO\n42.375\n0.00\nValor de Venta de Operaciones Gratuitas : S/ 0.00 \n \n \nSON: CINCUENTA Y 00/100 SOLES\n \n \nSub Total Ventas :\nS/ 42.38 \nAnticipos :\nS/ 0.00 \nDescuentos :\nS/ 0.00 \nValor Venta :\nS/ 42.38 \nISC :\nS/ 0.00 \nIGV :\nS/ 7.63 \nICBPER :\nS/ 0.00 \nOtros Cargos :\nS/ 0.00 \nOtros Tributos :\nS/ 0.00 \nMonto de redondeo :\nS/ 0.00 \nImporte Total :\nS/ 50.00 \nEsta es una representación impresa de la factura electrónica, generada en el Sistema de SUNAT. Puede\nverificarla utilizando su clave SOL.\n\n"
+  },
+  {
+    "id": "16yEa_HakBLK3Ka3g7YcO530aH0iQ3VJA",
+    "name": "F101-00008122.pdf",
+    "path": "",
+    "size": "193045",
+    "modifiedTime": "2025-05-28T18:27:28.101Z",
+    "webViewLink": "https://drive.google.com/file/d/16yEa_HakBLK3Ka3g7YcO530aH0iQ3VJA/view?usp=drivesdk",
+    "text": " \nINVERSIONES LUCIANA S.A.\nAv. Arequipa 3940\nMiraflores - Lima - Lima - Peru\nTelf: (511) 2222601\n-\n-\n \nR.U.C Nº 20335065621\nFACTURA \nELECTRÓNICA\nF101-00008122\nRazón social\n: CREACION CUANTICA E.I.R.L.\nR.U.C\n: 20612592811\nDirección\n: AV. SERGIO BERNALES NRO. 272 LIMA -\nLIMA - LIMA,SURQUILLO\nUbigeo\n: SURQUILLO - LIMA - LIMA\nUrbanización\n: .\n \n \nMoneda\n: Soles\nFecha emisión\n: 28/05/2025 13:21:42\nFecha vencimiento\n: 28/05/2025\nForma de pago\n: Contado\nDias credito\n: -\nOrden de compra\n: 3921\nCliente\n: 02842-CREACION CUANTICA E.I.R.L.\nReserva\n: 003921\nGrupo\n: Elmer Andres Idrobo Andrade.\nCheck in\n: 05/06/2025\nCheck out\n: 06/06/2025\nCantidad noches\n: 1\nHabitaciones\n: -\nTipo de cambio : 3.800\n \n \nObservaciones:\nRepresentación Impresa de la factura electrónica, consulte su comprobante en www.infofactperu.pe/consulta \nUsuario: ERIKA \nCódigo Hash:  OVSkfK7u+a2QrpkZWYcMBZaXUGD/8UHqJzDvGl2iC6A=\n \npowered by Infomatica\n \nÍtem\n \nCódigo\n \nDescripción\n \nUnd.\n \nCantidad\n \nV. Unitario\n \nP. Unitario\n \nDescuento\n \nValor Venta\n1\n000003\n28/05/2025 Pre-Pago\nNIU\n1.000\n183.31833\n201.65017\n0.00000\n183.32\nSON:DOSCIENTOS DIECINUEVE CON 98/100 SOLES\n \nAnticipo\nS/\n0.00\n \n \nOp. Gravada\nS/\n183.32\n \n \nI.G.V 10%\nS/\n18.33\n \n \nOp. Inafecta\nS/\n0.00\n \n \nOp. Exonerada\nS/\n0.00\n \n \nOp. Exportación\nS/\n0.00\n \n \nOp. Gratuita\nS/\n0.00\n \n \nICBPER\nS/\n0.00\n \n \nServicio\nS/\n18.33\n \nImporte Total\nS/\n219.98\n.\nABONAR A LAS SIGUIENTES CUENTAS CORRIENTES\n.\n.\n.\nCuenta Corriente BBVA Soles: 0011-0910-01-00061802\nCuenta Corriente BBVA Dolares 0011-0123-01-00103566\nCuenta Corriente Interbak Dolares: 200-300557344-8\nCuenta Corriente Interbak Soles: 200-300557343-0\n.\n\n"
+  },
+  {
+    "id": "1mxWP5-o7V3hANpMOlBjRqynAIOkJbWBr",
+    "name": "F101-00008111.pdf",
+    "path": "",
+    "size": "196761",
+    "modifiedTime": "2025-05-28T16:51:04.572Z",
+    "webViewLink": "https://drive.google.com/file/d/1mxWP5-o7V3hANpMOlBjRqynAIOkJbWBr/view?usp=drivesdk",
+    "text": " \nINVERSIONES LUCIANA S.A.\nAv. Arequipa 3940\nMiraflores - Lima - Lima - Peru\nTelf: (511) 2222601\n-\n-\n \nR.U.C Nº 20335065621\nFACTURA \nELECTRÓNICA\nF101-00008111\nRazón social\n: CREACION CUANTICA E.I.R.L.\nR.U.C\n: 20612592811\nDirección\n: AV. SERGIO BERNALES NRO. 272 LIMA -\nLIMA - LIMA Surquillo Lima Lima Perú\nUbigeo\n: SURQUILLO - LIMA - LIMA\nUrbanización\n: .\n \n \nMoneda\n: Soles\nFecha emisión\n: 27/05/2025 10:49:21\nFecha vencimiento\n: 27/05/2025\nForma de pago\n: Contado\nDias credito\n: -\nOrden de compra\n: 3920\nCliente\n: 02842-CREACION CUANTICA E.I.R.L.\nReserva\n: 003920\nGrupo\n: TALLER - CREAR\nCheck in\n: 27/05/2025\nCheck out\n: 27/05/2025\nCantidad noches\n: 0\nHabitaciones\n: -\nTipo de cambio : 3.800\n \n \nObservaciones:\nInformación de la Detracción\nTipo Operación:\nBien o Servicio:\nMedio de pago:\n1001 Operación Sujeta a Detracción\n019 Arrendamiento de bienes muebles\n003 Transferencia de fondos\nNro. Cta. Banco de la Nación:\nPorcentaje de detracción:\nMonto detraccion:\n00-068-197252\n10.00\nS/. 80.00\nLeyendas\nLeyenda: 2006    Operaci?n sujeta a detracci?n\nRepresentación Impresa de la factura electrónica, consulte su comprobante en www.infofactperu.pe/consulta \nUsuario: ERIKA \nCódigo Hash:  pU3pJ74RTPdza1bJ5UgZIuyIKy96VSkKHGmwCcj6+XQ=\n \npowered by Infomatica\n \nÍtem\n \nCódigo\n \nDescripción\n \nUnd.\n \nCantidad\n \nV. Unitario\n \nP. Unitario\n \nDescuento\n \nValor Venta\n1\n340002\n27/05/2025 SALA SUMAQ\nNIU\n1.000\n666.66667\n733.33333\n0.00000\n666.67\nSON:OCHOCIENTOS CON 00/100 SOLES\n \nAnticipo\nS/\n0.00\n \n \nOp. Gravada\nS/\n666.67\n \n \nI.G.V 10%\nS/\n66.67\n \n \nOp. Inafecta\nS/\n0.00\n \n \nOp. Exonerada\nS/\n0.00\n \n \nOp. Exportación\nS/\n0.00\n \n \nOp. Gratuita\nS/\n0.00\n \n \nICBPER\nS/\n0.00\n \n \nServicio\nS/\n66.67\n \nImporte Total\nS/\n800.00\nOperacion sujeta al spot de detraccion 10%  para alquileres y 12%  para alimentos cta cte 00-068-197252 - Banco de la Nacion\n.\nABONAR A LAS SIGUIENTES CUENTAS CORRIENTES\n.\n.\n.\nCuenta Corriente BBVA Soles: 0011-0910-01-00061802\nCuenta Corriente BBVA Dolares 0011-0123-01-00103566\nCuenta Corriente Interbak Dolares: 200-300557344-8\nCuenta Corriente Interbak Soles: 200-300557343-0\n.\n\n"
+  },
+  {
+    "id": "1VuQj0BJkEXE-RbaVPTg7NTKq6SV-NYMi",
+    "name": "RHE10440011158E00138.pdf",
+    "path": "",
+    "size": "2192",
+    "modifiedTime": "2025-05-27T23:52:28.276Z",
+    "webViewLink": "https://drive.google.com/file/d/1VuQj0BJkEXE-RbaVPTg7NTKq6SV-NYMi/view?usp=drivesdk",
+    "text": "DEL ARTÍCULO 33 DE LA LEY DEL IMPUESTO A LA RENTA\nRecibí de:\nIdentificado con\nObservación\nInciso\nLa suma de:\nTotal por honorarios:\nRetención (\nR.U.C.\nRECIBO POR HONORARIOS ELECTRONICO\nNro:\n10440011158\n-\nE001\n38\nCHIROQUE GOMEZ JOHAN DAVID\nAV. D. ORUE NRO. 261 DPTO. 303 EDIF 9-A LIMA - LIMA - SURQUILLO\n4219794\nTELÉFONO:\nnúmero\nPor concepto de\nde\ndel\nTotal Neto Recibido:\nCREACION CUANTICA E.I.R.L.\nRUC\n20612592811\n QUINIENTOS NOVENTA Y 00/100 SOLES\nPOR SERVICIOS PRESTADOS DE MENSAJERIA Y TRAMITE DOCUMENTARIO\n-\nA\n27\nMayo\n2025\n590.00\n(0.00)\n590.00\nSOLES\n%) IR:\n8\nFecha de emisión\nDomiciliado en\nCAL. BERLIN NRO. 965 INT. 302 URB. SANTA CRUZ LIMA - LIMA - MIRAFLORES\nAL CONTADO\nForma de Pago:\n\n"
+  },
+  {
+    "id": "12YyKZCapJN91iiMlv9u3hJ3htgyGzK8u",
+    "name": "20604775117-01-F012-00007810.pdf",
+    "path": "",
+    "size": "131506",
+    "modifiedTime": "2025-05-27T14:23:22.262Z",
+    "webViewLink": "https://drive.google.com/file/d/12YyKZCapJN91iiMlv9u3hJ3htgyGzK8u/view?usp=drivesdk",
+    "text": "Fecha Ingreso\nHotel\n22/05/2025\nTipo Documento\nHuesped\n0\nApe. Nom.\nHuesped\nCREACION  CUANTICA E.I.R.L.\n22/05/2025\nFecha Ingreso País :\n:\n:\n:\nPaís Emis.\nPasaporte\n:\nPaís Residencia\n:\nFecha Salida Hotel\n26/05/2025\n:\nCant. Dias\nHospedaje\n4\n:\nN° Doc. Huesped\n:\nESPACIO HOTELES SAC\nLIMA - LIMA - SAN ISIDRO\nCALLE IGNACIO MERINO NRO. 160 URB. SAN ISIDRO\nDomicilio Fiscal:\nFACTURA ELECTRÓNICA\nF012-00007810\nR.U.C. 20604775117\nSeñor(es)\nCREACION CUANTICA E.I.R.L.\n20612592811\nDirección Cliente\nCAL.BERLIN NRO. 965 INT. 302 URB. SANTA CRUZ LIMA - LIMA - MIRAFLORES\n26-05-2025\nFecha Emisión\n$\nMoneda\nObservación\n:\n:\n:\n:\n:\n:\nForma de Pago:\nCONTADO\nImporte\nPrec.Unit.\nCantidad\nDescripción\nCódigo\n#\nTeléfono: 207 1800\n50.00\n50.00\n1.00\nSERVICIO DE ALOJAMIENTO\n00\n1\n60.00\n$\nImporte Total\n0\n$\nPropina\n5.00\n$\nIGV 10%\n5.00\n$\nR.C. 10%\n0.00\n$\nDescuento\n0.00\n$\nO.P. Gratuita\n0.00\n$\nO.P. Inafecta\n50.00\n$\nO.P. Gravada\n0.00\n$\nO.P. Exonerada\nSON: SESENTA Y 00/100 DOLARES AMERICANOS\nRepresentación impresa de la Factura Electrónica, el comprobante puede ser solicitado al correo:\nfacturacionelectronica@akuhotels.com, no se permiten cambios de comprobantes pasado los 4 días de emitido\nPágina 1 de 1\n\n"
+  },
+  {
+    "id": "1xBFEsadBZWXhpk-aTWOMi3VxW0xPijj3",
+    "name": "PDF-DOC-E001-27510066673974.pdf",
+    "path": "",
+    "size": "4498",
+    "modifiedTime": "2025-05-27T14:10:56.527Z",
+    "webViewLink": "https://drive.google.com/file/d/1xBFEsadBZWXhpk-aTWOMi3VxW0xPijj3/view?usp=drivesdk",
+    "text": " \n \n \nBOLLET GOMEZ ANGELLA MARIA  \nPROL. PAZOS A.H. M. SEOANE MZA. H LOTE. 10 A 3 CDRAS DE CAMINO\nREAL CON PAZOS  \nSANTIAGO DE SURCO - LIMA - LIMA \nFACTURA ELECTRONICA\nRUC: 10066673974 \nE001-275 \nFecha de Emisión\n: 26/05/2025\nSeñor(es)\n: CREACION CUANTICA E.I.R.L.  \nRUC \n: 20612592811  \nEstablecimiento del Emisor \n:\n---- PROL. PAZOS - A.H. M. SEOANE\nMZA. H LOTE. 10 A 3 CDRAS DE\nCAMINO REAL CON PAZOS LIMA-\nLIMA-SANTIAGO DE SURCO \nTipo de Moneda\n: SOLES \nObservación\n:  \nForma de pago: Contado\nCantidad\nUnidad Medida\nCódigo\nDescripción\nValor Unitario\nICBPER\n10.00\nUNIDAD\n0312\nCOMBO 1 (BUTIFARRA + CAFE) VIERNES 23.05\n12.00\n0.00\n8.00\nUNIDAD\n0315\nCOMBO 2(FILETE APANADO + BEBIDA) SABADO\n24.05\n15.00\n0.00\n8.00\nUNIDAD\n0312\nCOMBO 1 (PAN CON POLLO + BEBIDA) SAB 24.05\n12.00\n0.00\n6.00\nUNIDAD\n0314\nCOMBO 2 (PAN CON MORCILLA Y CAMOTE +\nBEBIDA) DOM 25.05\n15.00\n0.00\n12.00\nUNIDAD\n0312\nCOMBO 1 (PAN CON POLLO + BEBIDA) DOM 25.05\n12.00\n0.00\nValor de Venta de Operaciones Gratuitas : S/ 0.00 \n \n \nSON: SEISCIENTOS SETENTA Y DOS Y 60/100 SOLES\n \n \nSub Total Ventas :\nS/ 570.00 \nAnticipos :\nS/ 0.00 \nDescuentos :\nS/ 0.00 \nValor Venta :\nS/ 570.00 \nISC :\nS/ 0.00 \nIGV :\nS/ 102.60 \nICBPER :\nS/ 0.00 \nOtros Cargos :\nS/ 0.00 \nOtros Tributos :\nS/ 0.00 \nMonto de redondeo :\nS/ 0.00 \nImporte Total :\nS/ 672.60 \nEsta es una representación impresa de la factura electrónica, generada en el Sistema de SUNAT. Puede\nverificarla utilizando su clave SOL.\n\n"
+  },
+  {
+    "id": "1AH6pWk777PYhsvypkKjcTojQIwyb1r3F",
+    "name": "54658b99e4d59821c2d01c178b018b89290f0d3e705554fb55df613cb227c31f.pdf",
+    "path": "",
+    "size": "820529",
+    "modifiedTime": "2025-05-23T01:03:09.712Z",
+    "webViewLink": "https://drive.google.com/file/d/1AH6pWk777PYhsvypkKjcTojQIwyb1r3F/view?usp=drivesdk",
+    "text": "Telefónica del Perú S.A.A.   |   R.U.C. 20100017491   |   Jr. Domingo Martínez Luján N° 1130   |   Lima  Lima - Surquillo\nPágina 1/4\nEmpresas Móvil\nRecibo Mayo\nN° recibo: A1524496429\nCREACION CUANTICA EIRL\nRUC: 20612592811 \nCALLE BERLIN 965 Piso 3 URBANIZACION RESIDENCIAL JOSE BALTA,\nMIRAFLORES, 01, LIMA\nCuenta financiera: 753621842 \nID Cliente: 131054354\nAnexo: 0\nTotal a pagar del mes\nÚltimo día de pago: 21/05\n Cód. pago: \nDeuda anterior: S/89.80\nEvolutivo Mensual\nAbr\nMay\n \n89.80\n-0.09\nCiclo de facturación - Mayo 2025\n05/05\n21/05\nFecha de\nEmisión\nÚltimo día\nde pago\n¡LLAMA AL 0 800 11311!\nSi tienes un negocio y deseas comprar o portar una línea\nmóvil, adquirir un servicio de internet, TV o telefonía fija.\nCanal exclusivo para Clientes con RUC 20\nResumen de Recibo - NºA1524496429\nRedondeo\nS/ 0.00\nSubtotal\nS/0.00\nIGV (18%)\nS/0.00\nTotal Afecto\nS/0.00\nTotal Facturado\nS/0.00\nDevoluciones\nS/ 0.00\nDébitos\nS/ 0.00\nTotal a pagar\nS/ 0.00\n\nTelefónica del Perú S.A.A.   |   R.U.C. 20100017491   |   Jr. Domingo Martínez Luján N° 1130   |   Lima  Lima - Surquillo\nPágina 2/4\nEmpresas Móvil\nDetalle de Recibo - NºA1524496429\nDetalle de facturación\nDetalle de facturación\nCantidad de líneas\nCantidad de líneas\nPrecio unitario\nPrecio unitario\nImporte sin IGV\nImporte sin IGV\nRedondeo\nRedondeo del mes Actual\nS/0.00\nS/-0.09\nRedondeo del mes Anterior\nS/0.00\nS/0.09\n\nTelefónica del Perú S.A.A.   |   R.U.C. 20100017491   |   Jr. Domingo Martínez Luján N° 1130   |   Lima  Lima - Surquillo\nPágina 3/4\nEmpresas Móvil\nANEXO: Detalle de facturación de las lineas móviles\nAnexo 1: \nImporte S/\nRedondeo:\nRedondeo del mes Actual\nS/-0.09\nRedondeo del mes Anterior\nS/0.09\n\nConceptos facturables\nCargos fijos mensuales\nCargo mensual facturado al cliente por el plan contratado\npara los servicios de voz y datos. Cargo fijo proporcional\ndel plan desde la fecha de inicio del servicio hasta el\nsiguiente cierre de facturación\nCargos por llamadas adicionales\nCargos por tráfico de voz, datos, mensajes de texto que\nno se encuentran comprendidos dentro del cargo fijo\nmensual.\nLarga distancia: cargo adicional por llamada de larga\ndistancia nacional o internacional\nKB internet y multimedia: navegación en internet y\ntráfico por descarga de aplicativos\nKB transmisión de datos: envío y recepción de datos.\nRoaming internacional: cargo por llamadas efectuadas y\nrecibidas en el extranjero\nDetalle de documentos afectos al IGV\nCargo por Reconexión: cargo facturado si el cliente\ncancela un recibo después de habérsele cortado por\ndeuda.\nCargo por Reconexión de corte APC (a pedido de cliente):\ncargo facturado al efectuarse la reactivación del servicio\nde la línea luego de cumplirse el plazo de suspensión.\nCargo por llamadas a operadoras rurales: llamadas\nrealizadas a teléfonos fijos rurales como Gilat to Home,\nValtron, Claro Rural, TDP Rural o a teléfonos satelitales\ncomo Tesam.\nRenta fraccionaria por cambio de plan: cargo facturado si\ndurante el ciclo de la facturación el cliente cambió a un\nplan tarifario de cargo fijo mayor al que tenía.\nLugares de pago\nBancos y agentes\nBBVA Continental\nBanco Pichincha\nBCP\nBanco de la Nación\nBanBif\nInterbank\nScotiabank\nOtros\nOtros\nAgente Multibanco KASNET\nMultibanco\nFullcarga\nRed Digital\nAgente Multibanco KASNET\nMultibanco\nFullcarga\nRed Digital\nMetro\nWong\nWestern Union\nAlgunos lugares de pago presenciales pueden aplicar cobro de comisión de acuerdo a sus tarifarios vigentes.\nPuede realizar su pago de forma rápida y segura en el App Mi Movistar, YAPE o App o Web de su banco.\nAlgunos lugares de pago presenciales pueden aplicar cobro de comisión de acuerdo a sus tarifarios vigentes.\nPuede realizar su pago de forma rápida y segura en el App Mi Movistar, YAPE o App o Web de su banco.\nRecuerda que también puede afiliar su recibo\nMovistar al débito automático, más info :\nhttp://smvst.com/DAT\nRecuerda que también puede afiliar su recibo\nMovistar al débito automático, más info :\nhttp://smvst.com/DAT\nMayor información sobre lugares de pago en www.movistar.com.pe\n¿Qué es el recibo digital?\nEs un servicio gratuito que ofrece Telefónica, con el que podrá recibir mensualmente su recibo en formato PDF al\ncorreo electrónico que usted indique. El envío del recibo digital va en reemplazo de su recibo físico.\n\n"
+  },
+  {
+    "id": "1eARPBti_5kXNrUibrBRlTMwBBiae3eh8",
+    "name": "F301-35980 CREACION CUANTICA.pdf",
+    "path": "",
+    "size": "330654",
+    "modifiedTime": "2025-05-21T16:38:22.766Z",
+    "webViewLink": "https://drive.google.com/file/d/1eARPBti_5kXNrUibrBRlTMwBBiae3eh8/view?usp=drivesdk",
+    "text": "FECHA EMISION\nHAB\nCREACION CUANTICA E.I.R.L.\nCAL.LAS DALIAS NRO. 136 URB. ARMENDARIZ (DPTO 604 - PISO 6) LIMA - LIMA - MIRAFLORES\n3241720\nmiércoles, 21 Mayo, 2025\nREFERENCIA\nF301\n00035980\nRESERVA\nFACTURA ELECTRÓNICA\nNro.\nRUC: 20100910129\n              \nRUC : 20612592811\nLLEGADA\nO.COMPRA\nAlison Del Castillo\n08/06/2025\nSALIDA\n05/06/2025\nFacturado a : \nUSUARIO\nEvento\nCARTIR PERU S.R.L.\nSEDE \nPRINCIPAL \n: \nAV. \n28 \nDE \nJULIO \n398 \nMIRAFLORES LIMA LIMA PERU FAX-4454027\nSEDE LIMA: CAL.COLON 325 MIRAFLORES LIMA \nLIMA TELEFONOS : 445-5225 / 445-5135\nSEDE \nLIMA: \nCAL.BELLAVISTA \n113-137\nMIRAFLORES LIMA LIMA  TELEFONO: 6415050\nSEDE CUSCO : AV. PARDO 1080 URB.ARTESANAL\nCUSCO CUSCO TELEFONO : 084-239030\nSEDE PUNO : CARRETERA DESAGUADERO KM 6.5 \nPUNO FDO. COMUNIDAD CAMPESINA CHIMU \nPUNO-PUNO TELEFONO 051-640000\nCANT\nUNID\nDESCRIPCION\nPREC.UNIT\nSUBTOTAL\n1\nSalas\n25,423.73\n25,423.73\nNIU\nTotal  Gravado\nTotal  Inafecto\nTotal  Exonerado\nTotal  IGV \nTotal  R.Consumo\nTotal  Paid. Out\nTotal  Venta\nWSxszsSCBHqttU2QIJCe93BKklQ=\nTREINTA MIL Y 00/100 SOLES\nTotal  Propina\nS/\n18\n10\nREPRESENTACION IMPRESA DEL COMPROBANTE, CONSULTE SU DOCUMENTO EN www.hotelesjoseantonio.com\nEXISTE LA POSIBILIDAD QUE SUNAT RECHACE ESTE DOCUMENTO, LO CUAL REQUERIRA UN CAMBIO EN EL NUMERO DE ESTE COMPROBANTE\nPage 1 of 1\nSON\n%\n%\nTotal Oper.Gratuitas\n30,000.00\n0.00\n0.00\n0.00\n4,576.27\n0.00\n0.00\n25,423.73\nTotal  Exportacion\n0.00\nCuentas corrientes  \nOperación sujeta al SPOT con el gobierno central Cta. Cte. B. N. N°  00-000-779911\nDECRETO  LEGISLATIVO 940.\nTotal  Descuento\nSoles\n0.00\n0.00\n\n"
+  },
+  {
+    "id": "1rrC7OCqnXwAxREom2x84VS-ITWzrcWQQ",
+    "name": "20513215887-01-F170-6696.pdf",
+    "path": "",
+    "size": "25016",
+    "modifiedTime": "2025-05-19T22:08:27.454Z",
+    "webViewLink": "https://drive.google.com/file/d/1rrC7OCqnXwAxREom2x84VS-ITWzrcWQQ/view?usp=drivesdk",
+    "text": "Av. Victor Andres Belaunde 198 San Isidro - Lima - San Isidro\nR.U.C. 20513215887\nFACTURA ELECTRÓNICA\nF170 N° 6696\nRAZÓN SOCIAL:\nFECHA DE EMISIÓN:\nCREACION CUANTICA E.I.R.L.\nFECHA DE VENCIMIENTO:\n19/05/2025\nDIRECCIÓN:\nCAL.BERLIN NRO. 965 INT. 302 URB. SANTA CRUZ -LIMA -LIMA MIRAFLORES\n19/05/2025\n20612592811\nRUC:\nDÓLARES AMERICANOS\nCOND. PAGO:\nContado\nMONEDA:\nHABITACIÓN:\nHUÉSPED:\n357\nMILDRED MUÑOZ*** VASQUEZ\nSALIDA:\n2025-05-14\n2025-05-19\nLLEGADA:\n284\nCONF. N°:\n113560945\nCAJERO:\nORDEN DE COMPRA:\nPAÍS:\nPERÚ\nSociedad de Desarrollo de Hoteles Peruanos S.A.\nDESCRIPCIÓN\nCANTIDAD\nPRECIO\nUNITARIO\nTOTAL\nUNIDAD\nMEDIDA\n375.00\n1\n375.00\nAccommodation\nNIU\n  SON : CUATROCIENTOS OCHENTA  CON 00/100 DÓLARES AMERICANOS\nAutorizado mediante resolución Nº 034-005-0005038/SUNAT\nRepresentación impresa del comprobante electrónico\nPuede consultar este comprobante\nen:https://prod.ebis.pe/CecWeb/Consulta.jsf?e=SDHP\n0.00\n0.00\n375.00\n0.00\n67.50\n0.00\n0.00\n480.00\nIMPORTE TOTAL\nPAID OUT\nPROPINA\n0.00\nOP. EXPORTACIÓN\nR.CONS.10%\nI.G.V\nT.DSCTO.\nOP. GRAVADA\nOP. INAFECTA\nOP. EXONERADAS\n37.50\n$\n$\n$\n$\n$\n$\n$\n$\n$\n$\n$\n0.00\nSUBBTOTAL\nDESCUENTO\nPROPINA\n$\n0.00\n$\n0.00\nMEDIO DE PAGO\n480.00\n Foreign Bank\n $\n-1-\n\n"
+  },
+  {
+    "id": "1K-YrRQ4cFp6lfCHLoDI6ejJGApZlG0CL",
+    "name": "20604775117-01-F012-00007645.pdf",
+    "path": "",
+    "size": "131113",
+    "modifiedTime": "2025-05-13T22:34:57.058Z",
+    "webViewLink": "https://drive.google.com/file/d/1K-YrRQ4cFp6lfCHLoDI6ejJGApZlG0CL/view?usp=drivesdk",
+    "text": "Fecha Ingreso\nHotel\n22/05/2025\nTipo Documento\nHuesped\n0\nApe. Nom.\nHuesped\nCREACION  CUANTICA E.I.R.L.\n22/05/2025\nFecha Ingreso País :\n:\n:\n:\nPaís Emis.\nPasaporte\n:\nPaís Residencia\n:\nFecha Salida Hotel\n26/05/2025\n:\nCant. Dias\nHospedaje\n4\n:\nN° Doc. Huesped\n:\nESPACIO HOTELES SAC\nLIMA - LIMA - SAN ISIDRO\nCALLE IGNACIO MERINO NRO. 160 URB. SAN ISIDRO\nDomicilio Fiscal:\nFACTURA ELECTRÓNICA\nF012-00007645\nR.U.C. 20604775117\nSeñor(es)\nCREACION CUANTICA E.I.R.L.\n20612592811\nDirección Cliente\nCAL.BERLIN NRO. 965 INT. 302 URB. SANTA CRUZ LIMA - LIMA - MIRAFLORES\n09-05-2025\nFecha Emisión\n$\nMoneda\nObservación\n:\n:\n:\n:\n:\n:\nForma de Pago:\nCONTADO\nImporte\nPrec.Unit.\nCantidad\nDescripción\nCódigo\n#\nTeléfono: 207 1800\n550.00\n550.00\n1.00\nSERVICIO DE ALOJAMIENTO\n00\n1\n660.00\n$\nImporte Total\n0\n$\nPropina\n55.00\n$\nIGV 10%\n55.00\n$\nR.C. 10%\n0.00\n$\nDescuento\n0.00\n$\nO.P. Gratuita\n0.00\n$\nO.P. Inafecta\n550.00\n$\nO.P. Gravada\n0.00\n$\nO.P. Exonerada\nSON: SEISCIENTOS SESENTA Y 00/100 DOLARES AMERICANOS\nRepresentación impresa de la Factura Electrónica, el comprobante puede ser solicitado al correo:\nfacturacionelectronica@akuhotels.com, no se permiten cambios de comprobantes pasado los 4 días de emitido\nPágina 1 de 1\n\n"
+  },
+  {
+    "id": "1KpfqAnvSrtJ-WvEfkUhmWdO0j6D0ymrL",
+    "name": "INV302006772.pdf",
+    "path": "",
+    "size": "279153",
+    "modifiedTime": "2025-05-13T14:59:59.847Z",
+    "webViewLink": "https://drive.google.com/file/d/1KpfqAnvSrtJ-WvEfkUhmWdO0j6D0ymrL/view?usp=drivesdk",
+    "text": "Página 1 de 2\nEntel Perú S.A.\nRUC: 20106897914\nAv. República de Colombia 791\nPiso 14 San Isidro Lima\nCREACION CUANTICA E.I.R.L.\nMONICA PAMELA CARRILLO\nAV SERGIO BERNALES Nro 272\nLIMA-L01\nLIMA-LIMA\nRecibo No.\nEmisión del Recibo\nNo. de Cuenta\nInicio del Periodo\nFin del Periodo\nRUC / DNI\n:\n:\n:\n:\n:\n:\nS001-302006772\n08/MAY/2025\n1.21765711\n09/MAY/2025 (Asignación de Saldo)\n08/JUN/2025\n20612592811\nFACTURACIÓN DEL MES (S/)\nRECIBO DEL MES\nULTIMO DIA DE PAGO\n:\n:\nS/\n115.48\n21/MAY/2025\nTOTAL A PAGAR\n:\nS/\n115.48\n107.37\nCargo Fijo (incluye prorrateo)\n-9.51\nOtros Cargos y Abonos\n97.86\nSub-total\n17.62\nI.G.V. (18%)\n115.48\nTotal\n0.00\nOtros Cargos y Abonos (ya gravados con I.G.V.)\n115.48\nTotal Recibo del Mes\nRESUMEN (Estado de cuenta S/)\n142.03\nRecibo(s) anterior(es)\n-142.03\nPagos / Abonos hasta el 08/05/2025\n0.00\nOtros ajustes (ya gravados con I.G.V.)\n0.00\nDeuda Vencida\n115.48\nRecibo del Mes                S001-302006772\n115.48\nTOTAL A PAGAR\nDocumento válido para efectos tributarios según Res. de Sup. No. 007-99/SUNAT. Documento no afecto al régimen de retención del IGV por ser agente de retención, según Res. de Sup. No. 037-2002/SUNAT.\nLos saldos de hasta S/0.09 que no cancele por falta de moneda de curso legal (S/0.05 y S/0.01), se registrarán y se mantendrán como pendientes de pago hasta su cancelación efectiva.\n\nPágina 2 de 2\nEntel Perú S.A.\nRUC: 20106897914\nAv. República de Colombia 791\nPiso 14 San Isidro Lima\nCREACION CUANTICA E.I.R.L.\nMONICA PAMELA CARRILLO\nRecibo No.                S001-302006772\nNo. de Cuenta         1.21765711\nRESUMEN\nMontos S/ sin IGV\nNúmero\nPlan Tarifario\nMonto\nCargo Fijo\nProm. y\nOtros Servicios Contratados\nConsumos Adicionales\nTotal\n(Incluye\nprorateo)\nDsctos.\nPaquetes\nContratados\nGarantía\nArrendamiento\nOtros cargos\nVoz\nMensajería\nDatos y\nRoaming Datos\n912379686\nEmpresa PRO 2.0 44.9\n38.05\n38.05\n-\n-\n-\n-\n-\n-\n-\n912379744\nEmpresa PRO 2.0 44.9\n38.05\n38.05\n-\n-\n-\n-\n-\n-\n-\n908931343\nEmpresa PRO 2.0 36.9\n31.27\n31.27\n-\n-\n-\n-\n-\n-\n-\nTotal S/\n107.37\n107.37\n0.00\n0.00\n0.00\n0.00\n0.00\n0.00\n0.00\nOtros Cargos y Abonos\nTotal S/\n1C1E2124 - Promocion 2da hasta la 10ma linea PRO 25% x 18m (4/18) - 51912379686\n-9.51\n-9.51\nVOZ - Consumo Total y Cobro de Consumo Adicional (S/)\nConsumo expresado en minutos y segundos\nNúmero\nMonto\nTelefonía Móvil\nTelefonía Iden\nLDI/Satelital/Rural\nRoaming Internacional\nConexión Directa\nTotal\nOn Net\nOff Net\nMonto\nFijo\nMóvil\nMonto\nConsumo\nConsumo\nConsumo\nConsumo\nConsumo\nMonto\nConsumo\nMonto\nConsumo\nMonto\n912379686\n-\n119:07\n59:42\n-\n0:00\n0:00\n-\n0:00\n-\n0:00\n-\n0:00\n-\n912379744\n-\n757:01\n382:32\n-\n0:00\n0:00\n-\n0:00\n-\n0:00\n-\n0:00\n-\nTotal S/\n0.00\nCONCEPTOS FACTURABLES\nGLOSARIO\nCargo Fijo (incluye prorrateo): Monto de Renta Mensual y consumo proporcional\npor los servicios de Voz, Mensajería y Datos, según Plan Tarifario Contratado.\nOtros Servicios Contratados: Monto fijo mensual por los servicios de:\n• Paquetes Contratados: Paquetes de datos, mensajería y LDI. Servicios\nBlackberry, Localizador, Entel Backup y otros servicios de Valor Agregado:\nlicencias, aplicativos de negocio, gestión de dispositivos móviles y otros.\n• Garantía: Servicio de reposición de equipos.\n• Arrendamiento: Alquiler de equipos.\n.\nConsumos Adicionales: Monto facturado no comprendido dentro del cargo fijo\nmensual del plan tarifario contratado, por los servicios de Voz, Mensajería, Datos,\nRoaming Internacional, LDI, Redes Satelitales, Destinos Rurales.\nDatos locales y móviles: Servicio de internet brindado a través de equipos\nmóviles, USB Módems, Routers, etc\nDatos Roaming: Servicio de datos que Entel brinda en otros paises.\nOtros Cargos y Abonos: Cargos y abonos no recurrentes.\nPromociones y Descuentos: Descuentos generados por promociones especiales.\nRecargo por Intereses: Cobro de intereses legales generados por la no\ncancelación de la totalidad del recibo a la fecha de vencimiento.\nOtros Cargos y Abonos (ya gravados con IGV): Cargo de documentos emitidos\npor compra o financiamiento de equipos y/o Boletas/Facturas adicionales, ya\ngravados con IGV. Incluye Facturación por encargo de Otros Operadores según\nnormativa vigente.\nOn Net: Comunicación de un teléfono móvil Entel a otro teléfono móvil Entel.\nOff Net: Comunicación de un teléfono móvil Entel a cualquier teléfono fijo o móvil de otro operador.\nLDI: Larga Distancia Internacional.\nRedes Satelitales: Telefonía móvil a números satelitales.\nDestinos Rurales: Telefonía móvil a Destinos Rurales.\nRoaming Internacional: Servicio de Voz y Datos que Entel brinda en otros países.\nDescarga de Contenidos: Cargo por envío de mensajes y descargas.\nMB: Megabytes (1 MB = 1024 KB)\n.\n- El límite de crédito asignado a su cuenta es S/0.00\n- El pago no oportuno devengará en intereses legales. Entel puede proceder a la suspensión del\nServicio a partir del día siguiente del último día de pago.\n- El costo por Reactivación de Servicios suspendido por morosidad es de S/8.85 incluido IGV\n- Reconexión del servicio máximo dentro de 24 horas de efectuado el pago correspondiente.\n- Conoce los lugares de pago en www.entel.pe\nComunícate con Entel de lunes a domingo de 6 am a 12 am, inclusive feriados.\nMÓVILES: 123 (desde tu Entel) y 611-7777 (desde un teléfono fijo) - Llamadas gratis: 0-800-1-8844\n(Lima) y 0-800-1-1100 (provincias).\nINTERNET Y SERVICIOS DE VALOR AGREGADO: 123 (desde tu Entel) y 611-7777 (desde un teléfono fijo).\nOSIPTEL: Fono Ayuda: 0-801-12121\nPara detalle de llamadas a fijos o móviles consultar gratuitamente \"Mi Entel\" en www.entel.pe\n\n"
+  },
+  {
+    "id": "1-urG0DYaBrZIY4lk5g5zi9VDq83Ysg3v",
+    "name": "20600323980-01-F002-00007435.pdf",
+    "path": "",
+    "size": "76709",
+    "modifiedTime": "2025-05-06T23:06:53.806Z",
+    "webViewLink": "https://drive.google.com/file/d/1-urG0DYaBrZIY4lk5g5zi9VDq83Ysg3v/view?usp=drivesdk",
+    "text": "CENTENARIO RENTA INMOBILIARIA S.A.C.\nAv. VICTOR A. BELAUNDE Nro. 147 \n(VIA PRINCIPAL 102-EDIFICIO REAL 4 INTERIOR\n701-702) \nLIMA - LIMA - SAN ISIDRO\nR.U.C.: 20600323980\nFACTURA ELECTRONICA\nNº F002- 00007435\nSEÑOR(ES)\n:CREACION CUANTICA E.I.R.L.\nR.U.C.\n:20612592811\nDIRECCIÓN\n:CALLE BERLIN 965 INT 302 MIRAFLORES LIMA LIMA PE\nFECHA DE EMISION\n:2025-05-05\nMONEDA\n:SOLES\nCONDICIÓN DE PAGO :Contado\nFECHA VENCIMIENTO :2025-05-05\nCODIGO CLIENTE\n0003003399\nCODIGO VENDEDOR\nORDEN DE COMPRA\nFACTURA SAP\nCONTRATO\n0001000000496\nDOCUMENTO SAP\n4600000548\nCodigo\nCantidad\nUnidad\nDescripción\nP. Unit\nV. Unit\nImporte\n1.00\nNIU\nAUDITORIO COMERCIAL DEL 03.05.2025 AL\n03.05.2025\nCER - Real Dos - SALA Real Dos\n2,490.00 \n2,110.17\n2,110.17 \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \nSON :DOS MIL CUATROCIENTOS NOVENTA CON 00/100 SOLES\nOperación sujeta al sistema de pago de Obligaciones Tributarias con el Gobierno Central, sujeta a Detracc. del\n10% si es mayor a S/ 700.00 Cta. Cte. En el Bco. de la Nación N° S/ 00046191390\nForma Pago: Contado\nTotal Gravado\nS/ \n2,110.17 \nTotal No Gravado\nS/ \n0.00 \nTotal Exonerado\nS/ \n0.00 \nTotal IGV 18%\nS/ \n379.83 \nOtros Cargos\nS/ \n0.00 \nTotal Gratuito\nS/ \n0.00 \nImporte Total\nS/ \n2,490.00 \nObservaciones: \nCREACION CUANTICA E.I.R.L. - Auditorios R2 PEN\nRepresentación impresa de la Factura Electrónica\nPodrá ser consultada en http://centenario.ecomprobantes.pe/RENTAINMO\n\n"
+  },
+  {
+    "id": "1j6q3S2oYT9gYJQzugxNVoJ5mj9gBrjKA",
+    "name": "20600323980-01-F002-00007436.pdf",
+    "path": "",
+    "size": "76806",
+    "modifiedTime": "2025-05-06T23:04:59.947Z",
+    "webViewLink": "https://drive.google.com/file/d/1j6q3S2oYT9gYJQzugxNVoJ5mj9gBrjKA/view?usp=drivesdk",
+    "text": "CENTENARIO RENTA INMOBILIARIA S.A.C.\nAv. VICTOR A. BELAUNDE Nro. 147 \n(VIA PRINCIPAL 102-EDIFICIO REAL 4 INTERIOR\n701-702) \nLIMA - LIMA - SAN ISIDRO\nR.U.C.: 20600323980\nFACTURA ELECTRONICA\nNº F002- 00007436\nSEÑOR(ES)\n:CREACION CUANTICA E.I.R.L.\nR.U.C.\n:20612592811\nDIRECCIÓN\n:CALLE BERLIN 965 INT 302 MIRAFLORES LIMA LIMA PE\nFECHA DE EMISION\n:2025-05-05\nMONEDA\n:SOLES\nCONDICIÓN DE PAGO :Contado\nFECHA VENCIMIENTO :2025-05-05\nCODIGO CLIENTE\n0003003399\nCODIGO VENDEDOR\nORDEN DE COMPRA\nFACTURA SAP\nCONTRATO\n0001000000419\nDOCUMENTO SAP\n4600000549\nCodigo\nCantidad\nUnidad\nDescripción\nP. Unit\nV. Unit\nImporte\n1.00\nNIU\nAUDITORIO COMERCIAL DEL 25.05.2025 AL\n27.05.2025\nCER - Real Ocho - SALA A Real Ocho\n6,710.00 \n5,686.44\n5,686.44 \n1.00\nNIU\nAUDITORIO COMERCIAL DEL 25.05.2025 AL\n27.05.2025\nCER - Real Ocho - SALA B Real Ocho\n6,710.00 \n5,686.44\n5,686.44 \n1.00\nNIU\nAUDITORIO COMERCIAL DEL 25.05.2025 AL\n27.05.2025\nCER - Real Ocho - SALA C Real Ocho\n6,710.00 \n5,686.44\n5,686.44 \n \n \n \n \n \n \n \nSON :VEINTE MIL CIENTO TREINTA CON 00/100 SOLES\nOperación sujeta al sistema de pago de Obligaciones Tributarias con el Gobierno Central, sujeta a Detracc. del\n10% si es mayor a S/ 700.00 Cta. Cte. En el Bco. de la Nación N° S/ 00046191390\nForma Pago: Contado\nTotal Gravado\nS/ \n17,059.32 \nTotal No Gravado\nS/ \n0.00 \nTotal Exonerado\nS/ \n0.00 \nTotal IGV 18%\nS/ \n3,070.68 \nOtros Cargos\nS/ \n0.00 \nTotal Gratuito\nS/ \n0.00 \nImporte Total\nS/ \n20,130.00 \nObservaciones: \nCREACION CUANTICA E.I.R.L. - Auditorios R8 PEN\nRepresentación impresa de la Factura Electrónica\nPodrá ser consultada en http://centenario.ecomprobantes.pe/RENTAINMO\n\n"
+  },
+  {
+    "id": "1yPbd9JAmjRTYoNoZttvcvba5F_F6pgYa",
+    "name": "PDF-DOC-E001-141820334777163.pdf",
+    "path": "",
+    "size": "4535",
+    "modifiedTime": "2025-05-06T23:02:36.901Z",
+    "webViewLink": "https://drive.google.com/file/d/1yPbd9JAmjRTYoNoZttvcvba5F_F6pgYa/view?usp=drivesdk",
+    "text": " \n \nLAS OBSIDIANAS \nCONCESIONES ANHERSA S.A.  \nCAL. LAS OBSIDIANAS 1383  \nLA VICTORIA - LIMA - LIMA \nFACTURA ELECTRONICA\nRUC: 20334777163 \nE001-1418 \nFecha de Emisión\n: 06/05/2025\nSeñor(es)\n: CREACION CUANTICA E.I.R.L.  \nRUC \n: 20612592811  \nDirección del Cliente \n: CAL. BERLIN 965 URB. SANTA CRUZ\nINT. 302 LIMA-LIMA-MIRAFLORES \nTipo de Moneda\n: SOLES \nObservación\n:  \nForma de pago: Contado\nCantidad\nUnidad Medida\nDescripción\nValor Unitario\nICBPER\n1.00\nUNIDAD\nSERVICIO DE ALOJAMIENTO Y ALIMENTACION DEL 02\nAL 04 DE MAYO DEL 2025\n13590.90909\n0.00\nValor de Venta de Operaciones Gratuitas : S/ 0.00 \n \n \nSON: CATORCE MIL NOVECIENTOS CINCUENTA Y 00/100 SOLES\n \n \nSub Total Ventas :\nS/ 13,590.91 \nAnticipos :\nS/ 0.00 \nDescuentos :\nS/ 0.00 \nValor Venta :\nS/ 13,590.91 \nISC :\nS/ 0.00 \nIGV :\nS/ 1,359.09 \nICBPER :\nS/ 0.00 \nOtros Cargos :\nS/ 0.00 \nOtros Tributos :\nS/ 0.00 \nMonto de redondeo :\nS/ 0.00 \nImporte Total :\nS/ 14,950.00 \nInformación de la detracción\nLeyenda:\nOperación sujeta al Sistema de Pago de Obligaciones Tributarias con el Gobierno Central\nBien o Servicio:\n037  Demás servicios gravados con el IGV\nMedio de pago:\n001  Depósito en cuenta\nNro. Cta. Banco de la Nación:\n00005194563\nPorcentaje de detracción:\n12.00\nMonto detracción:\nS/ 1794.00\nEsta es una representación impresa de la factura electrónica, generada en el Sistema de SUNAT. Puede\nverificarla utilizando su clave SOL.\n\n"
+  },
+  {
+    "id": "1-7Se5OW816Ul2lrdDrLp-SEUhAfKR42N",
+    "name": "PDF-DOC-E001-13620609531062_250421_183243.pdf",
+    "path": "",
+    "size": "4602",
+    "modifiedTime": "2025-04-22T01:34:33.792Z",
+    "webViewLink": "https://drive.google.com/file/d/1-7Se5OW816Ul2lrdDrLp-SEUhAfKR42N/view?usp=drivesdk",
+    "text": " \n \nGESTION CSA \nGESTION DE CONSENSOS SOCIOAMBIENTALES S.A.C.  \nCAL. CASTILLA LA VIEJA 275 URB. PORTADA DEL SOL  \nLA MOLINA - LIMA - LIMA \nFACTURA ELECTRONICA\nRUC: 20609531062 \nE001-136 \nFecha de Emisión\n: 21/04/2025\nSeñor(es)\n: CREACION CUANTICA E.I.R.L.  \nRUC \n: 20612592811  \nDirección del Cliente \n: CAL. BERLIN 965 URB. SANTA CRUZ\nINT. 302 LIMA-LIMA-MIRAFLORES \nTipo de Moneda\n: DOLAR AMERICANO \nObservación\n:  \nForma de pago: Contado\nCantidad\nUnidad Medida\nCódigo\nDescripción\nValor Unitario\nICBPER\n1.00\nUNIDAD\nGS04\nSERVICIO DE COACHING EN LA ETAPA DE\nSEGUNDO FIN DE SEMANA DURANTE LOS DIAS 18,\n19 Y 20 DE ABRIL 2025.\n1725.00\n0.00\nValor de Venta de Operaciones Gratuitas : $0.00 \n \n \nSON: DOS MIL TREINTA Y CINCO Y 50/100 DOLAR AMERICANO\n \n \nSub Total Ventas :\n$ 1,725.00 \nAnticipos :\n$ 0.00 \nDescuentos :\n$ 0.00 \nValor Venta :\n$ 1,725.00 \nISC :\n$ 0.00 \nIGV :\n$ 310.50 \nICBPER :\n$ 0.00 \nOtros Cargos :\n$ 0.00 \nOtros Tributos :\n$ 0.00 \nMonto de redondeo :\n$ 0.00 \nImporte Total :\n$ 2,035.50 \nInformación de la detracción\nLeyenda:\nOperación sujeta al Sistema de Pago de Obligaciones Tributarias con el Gobierno Central\nBien o Servicio:\n022  Otros servicios empresariales\nMedio de pago:\n001  Depósito en cuenta\nNro. Cta. Banco de la Nación:\n00066197824\nPorcentaje de detracción:\n12.00\nMonto detracción:\nS/ 904.49\nEsta es una representación impresa de la factura electrónica, generada en el Sistema de SUNAT. Puede\nverificarla utilizando su clave SOL.\n\n"
+  },
+  {
+    "id": "1_mlr7iM0y_SkCfwked3hfeRgE5mOpibi",
+    "name": "PDF-DOC-E001-13520609531062_250421_183226.pdf",
+    "path": "",
+    "size": "4600",
+    "modifiedTime": "2025-04-22T01:33:52.003Z",
+    "webViewLink": "https://drive.google.com/file/d/1_mlr7iM0y_SkCfwked3hfeRgE5mOpibi/view?usp=drivesdk",
+    "text": " \n \nGESTION CSA \nGESTION DE CONSENSOS SOCIOAMBIENTALES S.A.C.  \nCAL. CASTILLA LA VIEJA 275 URB. PORTADA DEL SOL  \nLA MOLINA - LIMA - LIMA \nFACTURA ELECTRONICA\nRUC: 20609531062 \nE001-135 \nFecha de Emisión\n: 21/04/2025\nSeñor(es)\n: CREACION CUANTICA E.I.R.L.  \nRUC \n: 20612592811  \nDirección del Cliente \n: CAL. BERLIN 965 URB. SANTA CRUZ\nINT. 302 LIMA-LIMA-MIRAFLORES \nTipo de Moneda\n: DOLAR AMERICANO \nObservación\n:  \nForma de pago: Contado\nCantidad\nUnidad Medida\nCódigo\nDescripción\nValor Unitario\nICBPER\n1.00\nUNIDAD\nGS04\nSERVICIO DE COACHING: EN LA ETAPA DE\nPRIMER FIN DE SEMANA DURANTE LOS DIAS 18,\n19 Y 20 DE ABRIL 2025.\n1725.00\n0.00\nValor de Venta de Operaciones Gratuitas : $0.00 \n \n \nSON: DOS MIL TREINTA Y CINCO Y 50/100 DOLAR AMERICANO\n \n \nSub Total Ventas :\n$ 1,725.00 \nAnticipos :\n$ 0.00 \nDescuentos :\n$ 0.00 \nValor Venta :\n$ 1,725.00 \nISC :\n$ 0.00 \nIGV :\n$ 310.50 \nICBPER :\n$ 0.00 \nOtros Cargos :\n$ 0.00 \nOtros Tributos :\n$ 0.00 \nMonto de redondeo :\n$ 0.00 \nImporte Total :\n$ 2,035.50 \nInformación de la detracción\nLeyenda:\nOperación sujeta al Sistema de Pago de Obligaciones Tributarias con el Gobierno Central\nBien o Servicio:\n022  Otros servicios empresariales\nMedio de pago:\n001  Depósito en cuenta\nNro. Cta. Banco de la Nación:\n00066197824\nPorcentaje de detracción:\n12.00\nMonto detracción:\nS/ 904.49\nEsta es una representación impresa de la factura electrónica, generada en el Sistema de SUNAT. Puede\nverificarla utilizando su clave SOL.\n\n"
+  },
+  {
+    "id": "1Hkfo2ukY5IODvg5t3QIFTg2y2L5-Zvcw",
+    "name": "PDF-DOC-E001-13720609531062_250421_183259.pdf",
+    "path": "",
+    "size": "4600",
+    "modifiedTime": "2025-04-22T01:33:27.161Z",
+    "webViewLink": "https://drive.google.com/file/d/1Hkfo2ukY5IODvg5t3QIFTg2y2L5-Zvcw/view?usp=drivesdk",
+    "text": " \n \nGESTION CSA \nGESTION DE CONSENSOS SOCIOAMBIENTALES S.A.C.  \nCAL. CASTILLA LA VIEJA 275 URB. PORTADA DEL SOL  \nLA MOLINA - LIMA - LIMA \nFACTURA ELECTRONICA\nRUC: 20609531062 \nE001-137 \nFecha de Emisión\n: 21/04/2025\nSeñor(es)\n: CREACION CUANTICA E.I.R.L.  \nRUC \n: 20612592811  \nDirección del Cliente \n: CAL. BERLIN 965 URB. SANTA CRUZ\nINT. 302 LIMA-LIMA-MIRAFLORES \nTipo de Moneda\n: DOLAR AMERICANO \nObservación\n:  \nForma de pago: Contado\nCantidad\nUnidad Medida\nCódigo\nDescripción\nValor Unitario\nICBPER\n1.00\nUNIDAD\nGS04\nSERVICIO DE COACHING EN LA ETAPA DE\nTERCER FIN DE SEMANA DURANTE LOS DIAS 18,\n19 Y 20 DE ABRIL 2025.\n1725.00\n0.00\nValor de Venta de Operaciones Gratuitas : $0.00 \n \n \nSON: DOS MIL TREINTA Y CINCO Y 50/100 DOLAR AMERICANO\n \n \nSub Total Ventas :\n$ 1,725.00 \nAnticipos :\n$ 0.00 \nDescuentos :\n$ 0.00 \nValor Venta :\n$ 1,725.00 \nISC :\n$ 0.00 \nIGV :\n$ 310.50 \nICBPER :\n$ 0.00 \nOtros Cargos :\n$ 0.00 \nOtros Tributos :\n$ 0.00 \nMonto de redondeo :\n$ 0.00 \nImporte Total :\n$ 2,035.50 \nInformación de la detracción\nLeyenda:\nOperación sujeta al Sistema de Pago de Obligaciones Tributarias con el Gobierno Central\nBien o Servicio:\n022  Otros servicios empresariales\nMedio de pago:\n001  Depósito en cuenta\nNro. Cta. Banco de la Nación:\n00066197824\nPorcentaje de detracción:\n12.00\nMonto detracción:\nS/ 904.49\nEsta es una representación impresa de la factura electrónica, generada en el Sistema de SUNAT. Puede\nverificarla utilizando su clave SOL.\n\n"
+  },
+  {
+    "id": "1Q2ZY5f--rURCYMU2svBl2dApOHr0BHdY",
+    "name": "FORMATO DE RECIBO DE CAJA.pdf",
+    "path": "",
+    "size": "75603",
+    "modifiedTime": "2025-04-20T18:32:53.421Z",
+    "webViewLink": "https://drive.google.com/file/d/1Q2ZY5f--rURCYMU2svBl2dApOHr0BHdY/view?usp=drivesdk",
+    "text": "\n"
+  },
+  {
+    "id": "11AziYSuNX3JSSBgJ44KGDqQHpGLMwwKY",
+    "name": "20600323980-01-F002-00007305.pdf",
+    "path": "",
+    "size": "76806",
+    "modifiedTime": "2025-04-18T15:25:25.062Z",
+    "webViewLink": "https://drive.google.com/file/d/11AziYSuNX3JSSBgJ44KGDqQHpGLMwwKY/view?usp=drivesdk",
+    "text": "CENTENARIO RENTA INMOBILIARIA S.A.C.\nAv. VICTOR A. BELAUNDE Nro. 147 \n(VIA PRINCIPAL 102-EDIFICIO REAL 4 INTERIOR\n701-702) \nLIMA - LIMA - SAN ISIDRO\nR.U.C.: 20600323980\nFACTURA ELECTRONICA\nNº F002- 00007305\nSEÑOR(ES)\n:CREACION CUANTICA E.I.R.L.\nR.U.C.\n:20612592811\nDIRECCIÓN\n:CAL.LAS DALIAS 136 URB. ARMENDARIZ DPTO 604 PISO 6 MIRAFLORES LIMA LIMA PE\nFECHA DE EMISION\n:2025-04-09\nMONEDA\n:SOLES\nCONDICIÓN DE PAGO :Contado\nFECHA VENCIMIENTO :2025-04-09\nCODIGO CLIENTE\n0003003399\nCODIGO VENDEDOR\nORDEN DE COMPRA\nFACTURA SAP\nCONTRATO\n0001000000503\nDOCUMENTO SAP\n4600000416\nCodigo\nCantidad\nUnidad\nDescripción\nP. Unit\nV. Unit\nImporte\n1.00\nNIU\nAUDITORIO COMERCIAL DEL 18.04.2025 AL\n20.04.2025\nCER - Real Tres - SUMS - Salón de eventos\n20,130.00 \n17,059.32\n17,059.32 \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \nSON :VEINTE MIL CIENTO TREINTA CON 00/100 SOLES\nOperación sujeta al sistema de pago de Obligaciones Tributarias con el Gobierno Central, sujeta a Detracc. del\n10% si es mayor a S/ 700.00 Cta. Cte. En el Bco. de la Nación N° S/ 00046191390\nForma Pago: Contado\nTotal Gravado\nS/ \n17,059.32 \nTotal No Gravado\nS/ \n0.00 \nTotal Exonerado\nS/ \n0.00 \nTotal IGV 18%\nS/ \n3,070.68 \nOtros Cargos\nS/ \n0.00 \nTotal Gratuito\nS/ \n0.00 \nImporte Total\nS/ \n20,130.00 \nObservaciones: \nCREACION CUANTICA E.I.R.L. - Auditorios Centric Sp\nRepresentación impresa de la Factura Electrónica\nPodrá ser consultada en http://centenario.ecomprobantes.pe/RENTAINMO\n\n"
+  },
+  {
+    "id": "1-TIjF6h0EOeS6aoF8jkBmLagi0hTaX19",
+    "name": "INV301840924.pdf",
+    "path": "",
+    "size": "279215",
+    "modifiedTime": "2025-04-18T15:24:56.556Z",
+    "webViewLink": "https://drive.google.com/file/d/1-TIjF6h0EOeS6aoF8jkBmLagi0hTaX19/view?usp=drivesdk",
+    "text": "Página 1 de 2\nEntel Perú S.A.\nRUC: 20106897914\nAv. República de Colombia 791\nPiso 14 San Isidro Lima\nCREACION CUANTICA E.I.R.L.\nMONICA PAMELA CARRILLO\nAV SERGIO BERNALES Nro 272\nLIMA-L01\nLIMA-LIMA\nRecibo No.\nEmisión del Recibo\nNo. de Cuenta\nInicio del Periodo\nFin del Periodo\nRUC / DNI\n:\n:\n:\n:\n:\n:\nS001-301840924\n08/ABR/2025\n1.21765711\n09/ABR/2025 (Asignación de Saldo)\n08/MAY/2025\n20612592811\nFACTURACIÓN DEL MES (S/)\nRECIBO DEL MES\nULTIMO DIA DE PAGO\n:\n:\nS/\n142.03\n21/ABR/2025\nTOTAL A PAGAR\n:\nS/\n142.03\n107.37\nCargo Fijo (incluye prorrateo)\n12.99\nOtros Cargos y Abonos\n120.36\nSub-total\n21.67\nI.G.V. (18%)\n142.03\nTotal\n0.00\nOtros Cargos y Abonos (ya gravados con I.G.V.)\n142.03\nTotal Recibo del Mes\nRESUMEN (Estado de cuenta S/)\n115.48\nRecibo(s) anterior(es)\n-115.48\nPagos / Abonos hasta el 08/04/2025\n0.00\nOtros ajustes (ya gravados con I.G.V.)\n0.00\nDeuda Vencida\n142.03\nRecibo del Mes                S001-301840924\n142.03\nTOTAL A PAGAR\nDocumento válido para efectos tributarios según Res. de Sup. No. 007-99/SUNAT. Documento no afecto al régimen de retención del IGV por ser agente de retención, según Res. de Sup. No. 037-2002/SUNAT.\nLos saldos de hasta S/0.09 que no cancele por falta de moneda de curso legal (S/0.05 y S/0.01), se registrarán y se mantendrán como pendientes de pago hasta su cancelación efectiva.\n\nPágina 2 de 2\nEntel Perú S.A.\nRUC: 20106897914\nAv. República de Colombia 791\nPiso 14 San Isidro Lima\nCREACION CUANTICA E.I.R.L.\nMONICA PAMELA CARRILLO\nRecibo No.                S001-301840924\nNo. de Cuenta         1.21765711\nRESUMEN\nMontos S/ sin IGV\nNúmero\nPlan Tarifario\nMonto\nCargo Fijo\nProm. y\nOtros Servicios Contratados\nConsumos Adicionales\nTotal\n(Incluye\nprorateo)\nDsctos.\nPaquetes\nContratados\nGarantía\nArrendamiento\nOtros cargos\nVoz\nMensajería\nDatos y\nRoaming Datos\n912379686\nEmpresa PRO 2.0 44.9\n38.05\n38.05\n-\n-\n-\n-\n-\n-\n-\n912379744\nEmpresa PRO 2.0 44.9\n38.05\n38.05\n-\n-\n-\n-\n-\n-\n-\n908931343\nEmpresa PRO 2.0 36.9\n31.27\n31.27\n-\n-\n-\n-\n-\n-\n-\nTotal S/\n107.37\n107.37\n0.00\n0.00\n0.00\n0.00\n0.00\n0.00\n0.00\nOtros Cargos y Abonos\nTotal S/\n1E2124 - Promocion 2da hasta la 10ma linea PRO 25% x 18m (3/18) - 51912379686\n-9.51\nCARGO POR REACTIVACION DE SERVICIO\n22.50\n12.99\nVOZ - Consumo Total y Cobro de Consumo Adicional (S/)\nConsumo expresado en minutos y segundos\nNúmero\nMonto\nTelefonía Móvil\nTelefonía Iden\nLDI/Satelital/Rural\nRoaming Internacional\nConexión Directa\nTotal\nOn Net\nOff Net\nMonto\nFijo\nMóvil\nMonto\nConsumo\nConsumo\nConsumo\nConsumo\nConsumo\nMonto\nConsumo\nMonto\nConsumo\nMonto\n912379686\n-\n149:20\n51:50\n-\n0:00\n0:00\n-\n0:00\n-\n0:00\n-\n0:00\n-\n912379744\n-\n1065:15\n470:46\n-\n0:00\n0:00\n-\n0:00\n-\n0:00\n-\n0:00\n-\nTotal S/\n0.00\nCONCEPTOS FACTURABLES\nGLOSARIO\nCargo Fijo (incluye prorrateo): Monto de Renta Mensual y consumo proporcional\npor los servicios de Voz, Mensajería y Datos, según Plan Tarifario Contratado.\nOtros Servicios Contratados: Monto fijo mensual por los servicios de:\n• Paquetes Contratados: Paquetes de datos, mensajería y LDI. Servicios\nBlackberry, Localizador, Entel Backup y otros servicios de Valor Agregado:\nlicencias, aplicativos de negocio, gestión de dispositivos móviles y otros.\n• Garantía: Servicio de reposición de equipos.\n• Arrendamiento: Alquiler de equipos.\n.\nConsumos Adicionales: Monto facturado no comprendido dentro del cargo fijo\nmensual del plan tarifario contratado, por los servicios de Voz, Mensajería, Datos,\nRoaming Internacional, LDI, Redes Satelitales, Destinos Rurales.\nDatos locales y móviles: Servicio de internet brindado a través de equipos\nmóviles, USB Módems, Routers, etc\nDatos Roaming: Servicio de datos que Entel brinda en otros paises.\nOtros Cargos y Abonos: Cargos y abonos no recurrentes.\nPromociones y Descuentos: Descuentos generados por promociones especiales.\nRecargo por Intereses: Cobro de intereses legales generados por la no\ncancelación de la totalidad del recibo a la fecha de vencimiento.\nOtros Cargos y Abonos (ya gravados con IGV): Cargo de documentos emitidos\npor compra o financiamiento de equipos y/o Boletas/Facturas adicionales, ya\ngravados con IGV. Incluye Facturación por encargo de Otros Operadores según\nnormativa vigente.\nOn Net: Comunicación de un teléfono móvil Entel a otro teléfono móvil Entel.\nOff Net: Comunicación de un teléfono móvil Entel a cualquier teléfono fijo o móvil de otro operador.\nLDI: Larga Distancia Internacional.\nRedes Satelitales: Telefonía móvil a números satelitales.\nDestinos Rurales: Telefonía móvil a Destinos Rurales.\nRoaming Internacional: Servicio de Voz y Datos que Entel brinda en otros países.\nDescarga de Contenidos: Cargo por envío de mensajes y descargas.\nMB: Megabytes (1 MB = 1024 KB)\n.\n- El límite de crédito asignado a su cuenta es S/0.00\n- El pago no oportuno devengará en intereses legales. Entel puede proceder a la suspensión del\nServicio a partir del día siguiente del último día de pago.\n- El costo por Reactivación de Servicios suspendido por morosidad es de S/8.85 incluido IGV\n- Reconexión del servicio máximo dentro de 24 horas de efectuado el pago correspondiente.\n- Conoce los lugares de pago en www.entel.pe\nComunícate con Entel de lunes a domingo de 6 am a 12 am, inclusive feriados.\nMÓVILES: 123 (desde tu Entel) y 611-7777 (desde un teléfono fijo) - Llamadas gratis: 0-800-1-8844\n(Lima) y 0-800-1-1100 (provincias).\nINTERNET Y SERVICIOS DE VALOR AGREGADO: 123 (desde tu Entel) y 611-7777 (desde un teléfono fijo).\nOSIPTEL: Fono Ayuda: 0-801-12121\nPara detalle de llamadas a fijos o móviles consultar gratuitamente \"Mi Entel\" en www.entel.pe\n\n"
+  },
+  {
+    "id": "15AN-vzg2GH-uvjOMVTiaWf0QOVCTpzzh",
+    "name": "20513215887-01-F170-5524.pdf",
+    "path": "",
+    "size": "25085",
+    "modifiedTime": "2025-04-18T15:24:17.852Z",
+    "webViewLink": "https://drive.google.com/file/d/15AN-vzg2GH-uvjOMVTiaWf0QOVCTpzzh/view?usp=drivesdk",
+    "text": "Av. Victor Andres Belaunde 198 San Isidro - Lima - San Isidro\nR.U.C. 20513215887\nFACTURA ELECTRÓNICA\nF170 N° 5524\nRAZÓN SOCIAL:\nFECHA DE EMISIÓN:\nCREACION CUANTICA E.I.R.L.\nFECHA DE VENCIMIENTO:\n14/04/2025\nDIRECCIÓN:\nCAL.BERLIN NRO. 965 INT. 302 URB. SANTA CRUZ -LIMA -LIMA MIRAFLORES\n14/04/2025\n20612592811\nRUC:\nDÓLARES AMERICANOS\nCOND. PAGO:\nContado\nMONEDA:\nHABITACIÓN:\nHUÉSPED:\n385\nMILDRED MUÑOZ*** VELASQUEZ\nSALIDA:\n2025-04-09\n2025-04-14\nLLEGADA:\n284\nCONF. N°:\n112951408\nCAJERO:\nORDEN DE COMPRA:\nPAÍS:\nPERÚ\nSociedad de Desarrollo de Hoteles Peruanos S.A.\nDESCRIPCIÓN\nCANTIDAD\nPRECIO\nUNITARIO\nTOTAL\nUNIDAD\nMEDIDA\n375.00\n1\n375.00\nAccommodation\nNIU\n  SON : CUATROCIENTOS OCHENTA  CON 00/100 DÓLARES AMERICANOS\nAutorizado mediante resolución Nº 034-005-0005038/SUNAT\nRepresentación impresa del comprobante electrónico\nPuede consultar este comprobante\nen:https://prod.ebis.pe/CecWeb/Consulta.jsf?e=SDHP\n0.00\n0.00\n375.00\n0.00\n67.50\n0.00\n0.00\n480.00\nIMPORTE TOTAL\nPAID OUT\nPROPINA\n0.00\nOP. EXPORTACIÓN\nR.CONS.10%\nI.G.V\nT.DSCTO.\nOP. GRAVADA\nOP. INAFECTA\nOP. EXONERADAS\n37.50\n$\n$\n$\n$\n$\n$\n$\n$\n$\n$\n$\n0.00\nSUBBTOTAL\nDESCUENTO\nPROPINA\n$\n0.00\n$\n0.00\nMEDIO DE PAGO\n472.42\n Online Visa\n $\n7.58\n Exchange\n $\n-1-\n\n"
+  },
+  {
+    "id": "1cQxzYHTTnsbH01uy7QyUtyvKCIah6dpk",
+    "name": "20600323980-01-F002-00007349.pdf",
+    "path": "",
+    "size": "76799",
+    "modifiedTime": "2025-04-18T15:23:47.548Z",
+    "webViewLink": "https://drive.google.com/file/d/1cQxzYHTTnsbH01uy7QyUtyvKCIah6dpk/view?usp=drivesdk",
+    "text": "CENTENARIO RENTA INMOBILIARIA S.A.C.\nAv. VICTOR A. BELAUNDE Nro. 147 \n(VIA PRINCIPAL 102-EDIFICIO REAL 4 INTERIOR\n701-702) \nLIMA - LIMA - SAN ISIDRO\nR.U.C.: 20600323980\nFACTURA ELECTRONICA\nNº F002- 00007349\nSEÑOR(ES)\n:CREACION CUANTICA E.I.R.L.\nR.U.C.\n:20612592811\nDIRECCIÓN\n:CALLE BERLIN 965 INT 302 MIRAFLORES LIMA LIMA PE\nFECHA DE EMISION\n:2025-04-15\nMONEDA\n:SOLES\nCONDICIÓN DE PAGO :Contado\nFECHA VENCIMIENTO :2025-04-15\nCODIGO CLIENTE\n0003003399\nCODIGO VENDEDOR\nORDEN DE COMPRA\nFACTURA SAP\nCONTRATO\n0001000000497\nDOCUMENTO SAP\n4600000459\nCodigo\nCantidad\nUnidad\nDescripción\nP. Unit\nV. Unit\nImporte\n1.00\nNIU\nAUDITORIO COMERCIAL DEL 15.05.2025 AL\n18.05.2025\nCER - Real Tres - SUMS - Salón de eventos\n18,450.00 \n15,635.59\n15,635.59 \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \nSON :DIECIOCHO MIL CUATROCIENTOS CINCUENTA CON 00/100 SOLES\nOperación sujeta al sistema de pago de Obligaciones Tributarias con el Gobierno Central, sujeta a Detracc. del\n10% si es mayor a S/ 700.00 Cta. Cte. En el Bco. de la Nación N° S/ 00046191390\nForma Pago: Contado\nTotal Gravado\nS/ \n15,635.59 \nTotal No Gravado\nS/ \n0.00 \nTotal Exonerado\nS/ \n0.00 \nTotal IGV 18%\nS/ \n2,814.41 \nOtros Cargos\nS/ \n0.00 \nTotal Gratuito\nS/ \n0.00 \nImporte Total\nS/ \n18,450.00 \nObservaciones: \nCREACION CUANTICA E.I.R.L. - Auditorios Centric Sp\nRepresentación impresa de la Factura Electrónica\nPodrá ser consultada en http://centenario.ecomprobantes.pe/RENTAINMO\n\n"
+  },
+  {
+    "id": "1CDTmA0ALjq7LT64vMVHopFL6JrE3jb43",
+    "name": "20604775117-01-F012-00007421.pdf",
+    "path": "",
+    "size": "131222",
+    "modifiedTime": "2025-04-18T15:23:31.792Z",
+    "webViewLink": "https://drive.google.com/file/d/1CDTmA0ALjq7LT64vMVHopFL6JrE3jb43/view?usp=drivesdk",
+    "text": "Fecha Ingreso\nHotel\n17/04/2025\nTipo Documento\nHuesped\n0\nApe. Nom.\nHuesped\nCREACION  CUANTICA E.I.R.L.\n17/04/2025\nFecha Ingreso País :\n:\n:\n:\nPaís Emis.\nPasaporte\n:\nPaís Residencia\n:\nFecha Salida Hotel\n21/04/2025\n:\nCant. Dias\nHospedaje\n4\n:\nN° Doc. Huesped\n:\nESPACIO HOTELES SAC\nLIMA - LIMA - SAN ISIDRO\nCALLE IGNACIO MERINO NRO. 160 URB. SAN ISIDRO\nDomicilio Fiscal:\nFACTURA ELECTRÓNICA\nF012-00007421\nR.U.C. 20604775117\nSeñor(es)\nCREACION CUANTICA E.I.R.L.\n20612592811\nDirección Cliente\nCAL.BERLIN NRO. 965 INT. 302 URB. SANTA CRUZ LIMA - LIMA - MIRAFLORES\n16-04-2025\nFecha Emisión\n$\nMoneda\nObservación\n:\n:\n:\n:\n:\n:\nForma de Pago:\nCONTADO\nImporte\nPrec.Unit.\nCantidad\nDescripción\nCódigo\n#\nTeléfono: 207 1800\n600.00\n600.00\n1.00\nSERVICIO DE ALOJAMIENTO\n00\n1\n720.00\n$\nImporte Total\n0\n$\nPropina\n60.00\n$\nIGV 10%\n60.00\n$\nR.C. 10%\n0.00\n$\nDescuento\n0.00\n$\nO.P. Gratuita\n0.00\n$\nO.P. Inafecta\n600.00\n$\nO.P. Gravada\n0.00\n$\nO.P. Exonerada\nSON: SETECIENTOS VEINTE Y 00/100 DOLARES AMERICANOS\nRepresentación impresa de la Factura Electrónica, el comprobante puede ser solicitado al correo:\nfacturacionelectronica@akuhotels.com, no se permiten cambios de comprobantes pasado los 4 días de emitido\nPágina 1 de 1\n\n"
   }
 ]
 ```
@@ -118923,9 +120912,10 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
 
 ```json
 {
-  "updatedAt": "2026-09-04T00:10:45.566280Z",
-  "totalFlights": 53,
-  "source": "Google Drive Sync (7x/dia) - Carpetas Oficiales Vuelos CPSL",
+  "updatedAt": "2026-09-04T09:17:38.572221Z",
+  "totalFlights": 55,
+  "syncFrequency": "7 veces al día (06:00, 09:00, 12:00, 15:00, 18:00, 21:00, 23:30)",
+  "source": "Google Drive Sync (Carpetas Oficiales Vuelos CPSL)",
   "flights": {
     "LA1437": {
       "flightNumber": "LA 1437",
@@ -119103,7 +121093,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador ELMER IDROBO ANDRADE confirmado ruta UIO → GYE",
+      "statusDescription": "Vuelo con entrenador ELMER IDROBO ANDRADE confirmado ruta UIO → GYE",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -119240,7 +121230,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador ELMER IDROBO ANDRADE confirmado ruta GYE → UIO",
+      "statusDescription": "Vuelo con entrenador ELMER IDROBO ANDRADE confirmado ruta GYE → UIO",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -119429,7 +121419,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
+      "statusDescription": "Vuelo con entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -119577,7 +121567,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador JERRY NOLE CONTRERAS confirmado ruta GYE → UIO",
+      "statusDescription": "Vuelo con entrenador JERRY NOLE CONTRERAS confirmado ruta GYE → UIO",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -119622,7 +121612,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador MICHAEL BOADA RUBIANO confirmado ruta LIM → BOG",
+      "statusDescription": "Vuelo con entrenador MICHAEL BOADA RUBIANO confirmado ruta LIM → BOG",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -119816,7 +121806,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador MICHAEL BOADA RUBIANO confirmado ruta BOG → LIM",
+      "statusDescription": "Vuelo con entrenador MICHAEL BOADA RUBIANO confirmado ruta BOG → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -119861,7 +121851,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
+      "statusDescription": "Vuelo con entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -119906,7 +121896,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador FERNANDO ARAGON confirmado ruta GYE → LIM",
+      "statusDescription": "Vuelo con entrenador FERNANDO ARAGON confirmado ruta GYE → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -119951,7 +121941,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador FERNANDO ARAGON confirmado ruta GYE → LIM",
+      "statusDescription": "Vuelo con entrenador FERNANDO ARAGON confirmado ruta GYE → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -119996,7 +121986,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
+      "statusDescription": "Vuelo con entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -120041,7 +122031,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador FERNANDO ARAGON confirmado ruta UIO → LIM",
+      "statusDescription": "Vuelo con entrenador FERNANDO ARAGON confirmado ruta UIO → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -120086,7 +122076,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
+      "statusDescription": "Vuelo con entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -120131,7 +122121,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
+      "statusDescription": "Vuelo con entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -120176,7 +122166,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
+      "statusDescription": "Vuelo con entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -120221,7 +122211,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador ERNESTO DIAZ PABON confirmado ruta UIO → LIM",
+      "statusDescription": "Vuelo con entrenador ERNESTO DIAZ PABON confirmado ruta UIO → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -120363,7 +122353,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador JOSE SANCHEZ MORENO confirmado ruta LIM → UIO",
+      "statusDescription": "Vuelo con entrenador JOSE SANCHEZ MORENO confirmado ruta LIM → UIO",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -120408,7 +122398,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador JESUS ACOSTA RODRIGUEZ confirmado ruta MEX → LIM",
+      "statusDescription": "Vuelo con entrenador JESUS ACOSTA RODRIGUEZ confirmado ruta MEX → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -120453,7 +122443,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador JESUS ACOSTA RODRIGUEZ confirmado ruta MEX → LIM",
+      "statusDescription": "Vuelo con entrenador JESUS ACOSTA RODRIGUEZ confirmado ruta MEX → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -120498,7 +122488,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador MILDRED MUNOZ VASQUEZ confirmado ruta LIM → MDE",
+      "statusDescription": "Vuelo con entrenador MILDRED MUNOZ VASQUEZ confirmado ruta LIM → MDE",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -120543,7 +122533,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
+      "statusDescription": "Vuelo con entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -120588,7 +122578,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador MARIA PATINO GALARRAGA confirmado ruta LIM → UIO",
+      "statusDescription": "Vuelo con entrenador MARIA PATINO GALARRAGA confirmado ruta LIM → UIO",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -120633,7 +122623,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador MICHAEL BOADA RUBIANO confirmado ruta BOG → LIM",
+      "statusDescription": "Vuelo con entrenador MICHAEL BOADA RUBIANO confirmado ruta BOG → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -120678,7 +122668,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador MICHAEL BOADA RUBIANO confirmado ruta LIM → BOG",
+      "statusDescription": "Vuelo con entrenador MICHAEL BOADA RUBIANO confirmado ruta LIM → BOG",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -120723,7 +122713,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
+      "statusDescription": "Vuelo con entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -120815,7 +122805,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta UIO → LIM",
+      "statusDescription": "Vuelo con entrenador Oficial confirmado ruta UIO → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -120860,7 +122850,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta UIO → LIM",
+      "statusDescription": "Vuelo con entrenador Oficial confirmado ruta UIO → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -120905,7 +122895,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta BOG → LIM",
+      "statusDescription": "Vuelo con entrenador Oficial confirmado ruta BOG → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -120950,7 +122940,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta UIO → LIM",
+      "statusDescription": "Vuelo con entrenador Oficial confirmado ruta UIO → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -120995,7 +122985,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta UIO → LIM",
+      "statusDescription": "Vuelo con entrenador Oficial confirmado ruta UIO → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -121040,7 +123030,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta UIO → LIM",
+      "statusDescription": "Vuelo con entrenador Oficial confirmado ruta UIO → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -121085,7 +123075,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta UIO → LIM",
+      "statusDescription": "Vuelo con entrenador Oficial confirmado ruta UIO → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -121130,7 +123120,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta UIO → LIM",
+      "statusDescription": "Vuelo con entrenador Oficial confirmado ruta UIO → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -121175,7 +123165,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta UIO → LIM",
+      "statusDescription": "Vuelo con entrenador Oficial confirmado ruta UIO → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -121220,7 +123210,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta GYE → LIM",
+      "statusDescription": "Vuelo con entrenador Oficial confirmado ruta GYE → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -121265,7 +123255,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta MDE → LIM",
+      "statusDescription": "Vuelo con entrenador Oficial confirmado ruta MDE → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -121310,7 +123300,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta BOG → LIM",
+      "statusDescription": "Vuelo con entrenador Oficial confirmado ruta BOG → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -121355,7 +123345,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta BOG → LIM",
+      "statusDescription": "Vuelo con entrenador Oficial confirmado ruta BOG → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -121368,6 +123358,96 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "radarUrl": "https://www.flightradar24.com/data/flights/la4024",
       "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "AV108": {
+      "flightNumber": "AV 108",
+      "flightCode": "AV108",
+      "airline": "Avianca",
+      "callsign": "AV108",
+      "reservationCode": "CREAR26",
+      "passengers": [
+        "Entrenador Oficial"
+      ],
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-03",
+        "scheduledDeparture": "2026-09-03T14:15:00-05:00",
+        "scheduledArrival": "2026-09-03T15:50:00-05:00",
+        "estimatedDeparture": "2026-09-03T14:15:00-05:00",
+        "estimatedArrival": "2026-09-03T15:50:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo con entrenador Oficial confirmado ruta LIM → UIO",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Mariscal Sucre)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/av108",
+      "checkInUrl": "https://www.avianca.com/es/tu-reserva/check-in/"
+    },
+    "AV8373": {
+      "flightNumber": "AV 8373",
+      "flightCode": "AV8373",
+      "airline": "Avianca",
+      "callsign": "AV8373",
+      "reservationCode": "CREAR26",
+      "passengers": [
+        "Entrenador Oficial"
+      ],
+      "route": {
+        "origin": "BOG",
+        "originCity": "Bogotá",
+        "originAirport": "Aeropuerto Internacional El Dorado",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-03",
+        "scheduledDeparture": "2026-09-03T16:00:00-05:00",
+        "scheduledArrival": "2026-09-03T17:40:00-05:00",
+        "estimatedDeparture": "2026-09-03T16:00:00-05:00",
+        "estimatedArrival": "2026-09-03T17:40:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo con entrenador Oficial confirmado ruta BOG → LIM",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/av8373",
+      "checkInUrl": "https://www.avianca.com/es/tu-reserva/check-in/"
     }
   }
 }
@@ -126244,9 +128324,10 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
 
 ```json
 {
-  "updatedAt": "2026-09-04T00:10:45.566280Z",
-  "totalFlights": 53,
-  "source": "Google Drive Sync (7x/dia) - Carpetas Oficiales Vuelos CPSL",
+  "updatedAt": "2026-09-04T09:17:38.572221Z",
+  "totalFlights": 55,
+  "syncFrequency": "7 veces al día (06:00, 09:00, 12:00, 15:00, 18:00, 21:00, 23:30)",
+  "source": "Google Drive Sync (Carpetas Oficiales Vuelos CPSL)",
   "flights": {
     "LA1437": {
       "flightNumber": "LA 1437",
@@ -126424,7 +128505,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador ELMER IDROBO ANDRADE confirmado ruta UIO → GYE",
+      "statusDescription": "Vuelo con entrenador ELMER IDROBO ANDRADE confirmado ruta UIO → GYE",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -126561,7 +128642,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador ELMER IDROBO ANDRADE confirmado ruta GYE → UIO",
+      "statusDescription": "Vuelo con entrenador ELMER IDROBO ANDRADE confirmado ruta GYE → UIO",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -126750,7 +128831,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
+      "statusDescription": "Vuelo con entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -126898,7 +128979,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador JERRY NOLE CONTRERAS confirmado ruta GYE → UIO",
+      "statusDescription": "Vuelo con entrenador JERRY NOLE CONTRERAS confirmado ruta GYE → UIO",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -126943,7 +129024,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador MICHAEL BOADA RUBIANO confirmado ruta LIM → BOG",
+      "statusDescription": "Vuelo con entrenador MICHAEL BOADA RUBIANO confirmado ruta LIM → BOG",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -127137,7 +129218,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador MICHAEL BOADA RUBIANO confirmado ruta BOG → LIM",
+      "statusDescription": "Vuelo con entrenador MICHAEL BOADA RUBIANO confirmado ruta BOG → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -127182,7 +129263,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
+      "statusDescription": "Vuelo con entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -127227,7 +129308,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador FERNANDO ARAGON confirmado ruta GYE → LIM",
+      "statusDescription": "Vuelo con entrenador FERNANDO ARAGON confirmado ruta GYE → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -127272,7 +129353,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador FERNANDO ARAGON confirmado ruta GYE → LIM",
+      "statusDescription": "Vuelo con entrenador FERNANDO ARAGON confirmado ruta GYE → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -127317,7 +129398,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
+      "statusDescription": "Vuelo con entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -127362,7 +129443,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador FERNANDO ARAGON confirmado ruta UIO → LIM",
+      "statusDescription": "Vuelo con entrenador FERNANDO ARAGON confirmado ruta UIO → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -127407,7 +129488,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
+      "statusDescription": "Vuelo con entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -127452,7 +129533,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
+      "statusDescription": "Vuelo con entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -127497,7 +129578,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
+      "statusDescription": "Vuelo con entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -127542,7 +129623,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador ERNESTO DIAZ PABON confirmado ruta UIO → LIM",
+      "statusDescription": "Vuelo con entrenador ERNESTO DIAZ PABON confirmado ruta UIO → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -127684,7 +129765,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador JOSE SANCHEZ MORENO confirmado ruta LIM → UIO",
+      "statusDescription": "Vuelo con entrenador JOSE SANCHEZ MORENO confirmado ruta LIM → UIO",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -127729,7 +129810,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador JESUS ACOSTA RODRIGUEZ confirmado ruta MEX → LIM",
+      "statusDescription": "Vuelo con entrenador JESUS ACOSTA RODRIGUEZ confirmado ruta MEX → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -127774,7 +129855,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador JESUS ACOSTA RODRIGUEZ confirmado ruta MEX → LIM",
+      "statusDescription": "Vuelo con entrenador JESUS ACOSTA RODRIGUEZ confirmado ruta MEX → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -127819,7 +129900,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador MILDRED MUNOZ VASQUEZ confirmado ruta LIM → MDE",
+      "statusDescription": "Vuelo con entrenador MILDRED MUNOZ VASQUEZ confirmado ruta LIM → MDE",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -127864,7 +129945,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
+      "statusDescription": "Vuelo con entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -127909,7 +129990,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador MARIA PATINO GALARRAGA confirmado ruta LIM → UIO",
+      "statusDescription": "Vuelo con entrenador MARIA PATINO GALARRAGA confirmado ruta LIM → UIO",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -127954,7 +130035,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador MICHAEL BOADA RUBIANO confirmado ruta BOG → LIM",
+      "statusDescription": "Vuelo con entrenador MICHAEL BOADA RUBIANO confirmado ruta BOG → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -127999,7 +130080,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador MICHAEL BOADA RUBIANO confirmado ruta LIM → BOG",
+      "statusDescription": "Vuelo con entrenador MICHAEL BOADA RUBIANO confirmado ruta LIM → BOG",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -128044,7 +130125,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
+      "statusDescription": "Vuelo con entrenador FERNANDO ARAGON confirmado ruta LIM → UIO",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -128136,7 +130217,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta UIO → LIM",
+      "statusDescription": "Vuelo con entrenador Oficial confirmado ruta UIO → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -128181,7 +130262,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta UIO → LIM",
+      "statusDescription": "Vuelo con entrenador Oficial confirmado ruta UIO → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -128226,7 +130307,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta BOG → LIM",
+      "statusDescription": "Vuelo con entrenador Oficial confirmado ruta BOG → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -128271,7 +130352,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta UIO → LIM",
+      "statusDescription": "Vuelo con entrenador Oficial confirmado ruta UIO → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -128316,7 +130397,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta UIO → LIM",
+      "statusDescription": "Vuelo con entrenador Oficial confirmado ruta UIO → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -128361,7 +130442,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta UIO → LIM",
+      "statusDescription": "Vuelo con entrenador Oficial confirmado ruta UIO → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -128406,7 +130487,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta UIO → LIM",
+      "statusDescription": "Vuelo con entrenador Oficial confirmado ruta UIO → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -128451,7 +130532,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta UIO → LIM",
+      "statusDescription": "Vuelo con entrenador Oficial confirmado ruta UIO → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -128496,7 +130577,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta UIO → LIM",
+      "statusDescription": "Vuelo con entrenador Oficial confirmado ruta UIO → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -128541,7 +130622,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta GYE → LIM",
+      "statusDescription": "Vuelo con entrenador Oficial confirmado ruta GYE → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -128586,7 +130667,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta MDE → LIM",
+      "statusDescription": "Vuelo con entrenador Oficial confirmado ruta MDE → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -128631,7 +130712,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta BOG → LIM",
+      "statusDescription": "Vuelo con entrenador Oficial confirmado ruta BOG → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -128676,7 +130757,7 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "status": "ON_TIME",
       "statusLabel": "Confirmado / A tiempo",
-      "statusDescription": "Vuelo de entrenador Oficial confirmado ruta BOG → LIM",
+      "statusDescription": "Vuelo con entrenador Oficial confirmado ruta BOG → LIM",
       "delayMinutes": 0,
       "terminal": "T1",
       "gate": "Confirmándose en aeropuerto",
@@ -128689,6 +130770,96 @@ Ejercicios recomendados antes de un evento real: búsqueda de un participante po
       },
       "radarUrl": "https://www.flightradar24.com/data/flights/la4024",
       "checkInUrl": "https://www.latamairlines.com/pe/es/check-in"
+    },
+    "AV108": {
+      "flightNumber": "AV 108",
+      "flightCode": "AV108",
+      "airline": "Avianca",
+      "callsign": "AV108",
+      "reservationCode": "CREAR26",
+      "passengers": [
+        "Entrenador Oficial"
+      ],
+      "route": {
+        "origin": "LIM",
+        "originCity": "Lima",
+        "originAirport": "Aeropuerto Internacional Jorge Chávez",
+        "destination": "UIO",
+        "destinationCity": "Quito",
+        "destinationAirport": "Aeropuerto Internacional Mariscal Sucre",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-03",
+        "scheduledDeparture": "2026-09-03T14:15:00-05:00",
+        "scheduledArrival": "2026-09-03T15:50:00-05:00",
+        "estimatedDeparture": "2026-09-03T14:15:00-05:00",
+        "estimatedArrival": "2026-09-03T15:50:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo con entrenador Oficial confirmado ruta LIM → UIO",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Mariscal Sucre)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/av108",
+      "checkInUrl": "https://www.avianca.com/es/tu-reserva/check-in/"
+    },
+    "AV8373": {
+      "flightNumber": "AV 8373",
+      "flightCode": "AV8373",
+      "airline": "Avianca",
+      "callsign": "AV8373",
+      "reservationCode": "CREAR26",
+      "passengers": [
+        "Entrenador Oficial"
+      ],
+      "route": {
+        "origin": "BOG",
+        "originCity": "Bogotá",
+        "originAirport": "Aeropuerto Internacional El Dorado",
+        "destination": "LIM",
+        "destinationCity": "Lima",
+        "destinationAirport": "Aeropuerto Internacional Jorge Chávez",
+        "isDirect": true,
+        "stops": 0,
+        "flightDuration": "2h 15m"
+      },
+      "schedule": {
+        "departureDate": "2026-09-03",
+        "scheduledDeparture": "2026-09-03T16:00:00-05:00",
+        "scheduledArrival": "2026-09-03T17:40:00-05:00",
+        "estimatedDeparture": "2026-09-03T16:00:00-05:00",
+        "estimatedArrival": "2026-09-03T17:40:00-05:00",
+        "actualDeparture": null,
+        "actualArrival": null
+      },
+      "status": "ON_TIME",
+      "statusLabel": "Confirmado / A tiempo",
+      "statusDescription": "Vuelo con entrenador Oficial confirmado ruta BOG → LIM",
+      "delayMinutes": 0,
+      "terminal": "T1",
+      "gate": "Confirmándose en aeropuerto",
+      "baggageClaim": "Por confirmar en arribo",
+      "logistics": {
+        "pickupLocation": "Puerta de Llegadas Internacionales (Aeropuerto Internacional Jorge Chávez)",
+        "destination": "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        "driverPickupEstimated": "30 min posteriores al aterrizaje",
+        "driverNote": "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      "radarUrl": "https://www.flightradar24.com/data/flights/av8373",
+      "checkInUrl": "https://www.avianca.com/es/tu-reserva/check-in/"
     }
   }
 }
@@ -130370,6 +132541,179 @@ runRestore()
 
 ---
 
+## Archivo: scripts\src\data\kpisNodus.json
+
+```json
+{
+  "ultimaActualizacion": "2026-09-04T14:35:25.865Z",
+  "resumen": {
+    "totalAsignados": 1401,
+    "totalSentados": 697,
+    "efectividadGlobal": 45.5,
+    "alertas": 12
+  },
+  "equipos": [
+    {
+      "nombre": "EQUIPO LIMA A",
+      "efectividad": 48.2
+    },
+    {
+      "nombre": "EQUIPO LIMA B",
+      "efectividad": 42.1
+    }
+  ]
+}
+```
+
+---
+
+## Archivo: scripts\src\data\reports\reporte_consolidado_1788503042396.json
+
+```json
+[
+  {
+    "coordinador": "Diana M.",
+    "equipo": "EQUIPO 27",
+    "etapa": "C1",
+    "asignados": 178
+  },
+  {
+    "coordinador": "Joyce M.",
+    "equipo": "EQUIPO 28",
+    "etapa": "C1",
+    "asignados": 111
+  }
+]
+```
+
+---
+
+## Archivo: scripts\src\data\reports\reporte_consolidado_1788503137370.json
+
+```json
+[
+  {
+    "coordinador": "Diana M.",
+    "equipo": "EQUIPO 27",
+    "etapa": "C1",
+    "asignados": 178
+  },
+  {
+    "coordinador": "Joyce M.",
+    "equipo": "EQUIPO 28",
+    "etapa": "C1",
+    "asignados": 111
+  }
+]
+```
+
+---
+
+## Archivo: scripts\src\data\reports\reporte_consolidado_1788531679752.json
+
+```json
+[
+  {
+    "coordinador": "Diana M.",
+    "equipo": "EQUIPO 27",
+    "etapa": "C1",
+    "asignados": 178
+  },
+  {
+    "coordinador": "Joyce M.",
+    "equipo": "EQUIPO 28",
+    "etapa": "C1",
+    "asignados": 111
+  }
+]
+```
+
+---
+
+## Archivo: scripts\src\data\reports\reporte_consolidado_1788532064507.json
+
+```json
+[
+  {
+    "coordinador": "Diana M.",
+    "equipo": "EQUIPO 27",
+    "etapa": "C1",
+    "asignados": 178
+  },
+  {
+    "coordinador": "Joyce M.",
+    "equipo": "EQUIPO 28",
+    "etapa": "C1",
+    "asignados": 111
+  }
+]
+```
+
+---
+
+## Archivo: scripts\src\data\reports\reporte_consolidado_1788532169838.json
+
+```json
+[
+  {
+    "coordinador": "Diana M.",
+    "equipo": "EQUIPO 27",
+    "etapa": "C1",
+    "asignados": 178
+  },
+  {
+    "coordinador": "Joyce M.",
+    "equipo": "EQUIPO 28",
+    "etapa": "C1",
+    "asignados": 111
+  }
+]
+```
+
+---
+
+## Archivo: scripts\src\data\reports\reporte_consolidado_1788532297802.json
+
+```json
+[
+  {
+    "coordinador": "Diana M.",
+    "equipo": "EQUIPO 27",
+    "etapa": "C1",
+    "asignados": 178
+  },
+  {
+    "coordinador": "Joyce M.",
+    "equipo": "EQUIPO 28",
+    "etapa": "C1",
+    "asignados": 111
+  }
+]
+```
+
+---
+
+## Archivo: scripts\src\data\reports\reporte_consolidado_1788532560547.json
+
+```json
+[
+  {
+    "coordinador": "Diana M.",
+    "equipo": "EQUIPO 27",
+    "etapa": "C1",
+    "asignados": 178
+  },
+  {
+    "coordinador": "Joyce M.",
+    "equipo": "EQUIPO 28",
+    "etapa": "C1",
+    "asignados": 111
+  }
+]
+```
+
+---
+
 ## Archivo: src\App.css
 
 ```css
@@ -130414,9 +132758,12 @@ import CalendarioMJ from './pages/CalendarioMJ'
 import GeneradorFlyer from './pages/GeneradorFlyer'
 import MonitorVuelosCartas from './pages/MonitorVuelosCartas'
 import VendeSinVender from './pages/VendeSinVender'
+import MasterclassDistinciones from './pages/MasterclassDistinciones'
+import DashboardKpisLima from './pages/DashboardKpisLima'
 import AICopilot from './components/AICopilot'
 import PromptModal from './components/PromptModal'
 import BirthdayAlert from './components/BirthdayAlert'
+import ApdaycPaymentAlert from './components/ApdaycPaymentAlert'
 import HelpModal from './components/HelpModal'
 import ThemeToggle from './components/ThemeToggle'
 
@@ -130518,6 +132865,7 @@ function App() {
       )}
       <PromptModal />
       {currentUser && <BirthdayAlert />}
+      {currentUser && <ApdaycPaymentAlert />}
       <main style={{ flex: 1 }}>
         <Routes>
           <Route path="/login" element={<Login />} />
@@ -130540,6 +132888,12 @@ function App() {
             <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'director_maestria', 'superadmin', 'consolidado', 'qt', 'capitan', 'entrenador', 'entrenador_llamadas', 'manager', 'aliado', 'oficina']} requireSuperAdmin={false}>
               <ManualNodus />
             </RoleRoute>
+          } />
+
+          <Route path="/masterclass-distinciones" element={
+            <PrivateRoute>
+              <MasterclassDistinciones />
+            </PrivateRoute>
           } />
 
           <Route path="/roles" element={
@@ -130696,6 +133050,12 @@ function App() {
           } />
           <Route path="/vuelos" element={<Navigate to="/monitor-vuelos" replace />} />
           <Route path="/cartas" element={<Navigate to="/monitor-vuelos" replace />} />
+
+          <Route path="/kpis-lima" element={
+            <PrivateRoute>
+              <DashboardKpisLima />
+            </PrivateRoute>
+          } />
 
           {/* Best-Seller Causa OS: Vende Sin Vender */}
           <Route path="/vende-sin-vender" element={
@@ -132458,7 +134818,7 @@ Para asegurar la transición exitosa de las sedes operativas internacionales hac
 - **Entrenador / Coach:** Estándar de Elegancia Negra Total (camiseta, camisa o saco de etiqueta negra sin estampados). **Zapatillas deportivas (tenis) de color negro absoluto TOTALMENTE PERMITIDAS** para priorizar la comodidad física y sostener la energía en sala durante jornadas prolongadas.
 - **Aliados:** Viernes: camisa/blusa negra de botones lisa, jean azul índigo liso, calzado cómodo limpio, abrigo negro. Sábado: polo azul índigo o negro de sede y jean negro. Domingo: polo de color del equipo (C2) o azul de sede (C1) y jean azul o negro.
 - **Capitanes:** Formal etiqueta negra jueves y viernes. Sábado: polo negro. Domingo: polo azul sede.
-- **Quantum Team (QT):** Viernes: camisa blanca y jean azul. Sábado: polo plomo/gris QT y jean negro. Domingo: polo azul QT y jean negro.
+- **Quantum Team (QT):** Viernes: traje formal Total Black (saco, camisa negra, pantalón negro). Sábado: polo plomo QT, jean negro, abrigo negro. Domingo: polo azul índigo QT, jean negro, abrigo negro.
 - **Mánagers:** Viernes: traje sastre formal negro. Sábado: polo negro de equipo. Domingo: polo azul o de equipo.
 - **Oficina:** Jueves y viernes etiqueta negra formal. Sáb/Dom polos oficiales y pantalón negro. Diario formal sobrio.
 
@@ -133654,6 +136014,641 @@ export default function AICopilot() {
         </>
       )}
     </div>
+  );
+}
+
+```
+
+---
+
+## Archivo: src\components\ApdaycPaymentAlert.jsx
+
+```javascript
+// src/components/ApdaycPaymentAlert.jsx
+//
+// Alerta URGENTE de Pago APDAYC exclusiva para José Sánchez (Gerente de Lima).
+// Reglas de activación:
+// 1. Alerta prioritaria: Mañana a las 9:00 AM (04/09/2026).
+// 2. Alerta recurrente mensual: 3 días antes de finalizar cada mes.
+// Estilo visual: "Color Arcoíris" (gradientes multicolores animados, brillo dinámico y alto impacto).
+// Canales de acción: WhatsApp (+51 919 563 284), Correo Electrónico (jose.sanchez@crearpsl.net), Google Chat.
+
+import React, { useState, useEffect, useMemo } from 'react';
+import { 
+  AlertTriangle, 
+  CreditCard, 
+  Clock, 
+  MessageSquare, 
+  Mail, 
+  Copy, 
+  CheckCircle, 
+  ExternalLink, 
+  X, 
+  Building, 
+  Sparkles,
+  ChevronDown,
+  ChevronUp
+} from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { useUI } from '../context/UIContext';
+import { openOrCreateDirectMessage } from '../services/googleChatService';
+
+// Datos oficiales de APDAYC extraídos de facturación oficial de eventos Lima
+const APDAYC_CONFIG = {
+  entidad: "APDAYC (Asociación Peruana de Autores y Compositores)",
+  ruc: "20100538203",
+  oficina: "AGECOFER - MIRAFLORES",
+  usuarioCodigo: "248509",
+  razonSocial: "CREACION CUANTICA E.I.R.L.",
+  rucEmpresa: "20612592811",
+  local: "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores, Lima)",
+  concepto: "Comunicación Pública de Obras Musicales / Música Grabada - Eventos y Entrenamientos",
+  responsable: "José Sánchez (Gerente de Sede Lima)",
+  email: "jose.sanchez@crearpsl.net",
+  telefonoWhatsApp: "51919563284",
+  cuentas: [
+    { banco: "BCP", tipo: "Cta. Cte. Soles", numero: "191 0046905 0 86", cci: "00219100004690508658" },
+    { banco: "BBVA", tipo: "Cta. Cte. Soles", numero: "0011 0368 01 00002525", cci: "011 368 000100002525 82" },
+    { banco: "Interbank", tipo: "Cta. Cte. Soles", numero: "200 3000831059", cci: "003 200 003000831059 38" },
+    { banco: "Scotiabank", tipo: "Cta. Cte. Soles", numero: "000 4501799", cci: "009 04300000450179913" }
+  ],
+  portalComprobantes: "http://apdayc.ecomprobantes.pe/Apdayc/formularios/frmInicio.aspx"
+};
+
+// Evalúa si el usuario logueado es José Sánchez o Gerente de Lima
+function isTargetGerenteLima(currentUser) {
+  if (!currentUser) return false;
+  const email = (currentUser.email || '').toLowerCase().trim();
+  const sede = (currentUser.sede || '').toLowerCase().trim();
+  const role = (currentUser.appRole || currentUser.role || '').toLowerCase().trim();
+  
+  const isJose = email === 'jose.sanchez@crearpsl.net' || email === 'jose.sanchez@crearpsl.com';
+  const isLimaManager = (role.includes('gerente') || currentUser.isGerente) && (sede.includes('lima') || sede === '');
+  const isSuperAdminDev = currentUser.isSuperAdmin; // Permite al SuperAdmin auditar la alerta
+
+  return isJose || isLimaManager || isSuperAdminDev;
+}
+
+// Evalúa la ventana de activación temporal:
+// 1. Inmediata / Mañana a las 9:00 AM (Septiembre 2026)
+// 2. 3 días antes de finalizar cada mes
+function evaluateAlertSchedule() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth(); // 0 = Ene, 8 = Sep
+  const day = now.getDate();
+
+  // Días totales del mes actual
+  const lastDayOfMonth = new Date(year, month + 1, 0).getDate();
+  const daysRemaining = lastDayOfMonth - day;
+
+  // Condición 1: Urgente mañana 4 de Septiembre a las 9:00 AM (activa hoy 3 y mañana 4)
+  const isUrgentTomorrowSept4 = (year === 2026 && month === 8 && (day === 3 || day === 4));
+
+  // Condición 2: 3 días antes de finalizar cada mes (daysRemaining <= 3)
+  const isEndOfMonthWindow = daysRemaining <= 3;
+
+  return {
+    isActive: isUrgentTomorrowSept4 || isEndOfMonthWindow,
+    isUrgentTomorrowSept4,
+    isEndOfMonthWindow,
+    daysRemaining,
+    lastDayOfMonth
+  };
+}
+
+export default function ApdaycPaymentAlert() {
+  const { currentUser } = useAuth();
+  const { showToast } = useUI();
+  const [minimized, setMinimized] = useState(false);
+  const [dismissedMonth, setDismissedMonth] = useState(false);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [chatLoading, setChatLoading] = useState(false);
+
+  const scheduleInfo = useMemo(() => evaluateAlertSchedule(), []);
+  const isGerenteLima = useMemo(() => isTargetGerenteLima(currentUser), [currentUser]);
+
+  // Chequeo de confirmación en localStorage para no molestar si ya fue pagado este mes
+  useEffect(() => {
+    const currentMonthKey = `apdayc_paid_${new Date().getFullYear()}_${new Date().getMonth() + 1}`;
+    if (localStorage.getItem(currentMonthKey) === 'true') {
+      setDismissedMonth(true);
+    }
+  }, []);
+
+  if (!isGerenteLima || !scheduleInfo.isActive || dismissedMonth) {
+    return null;
+  }
+
+  const handleMarkAsPaid = () => {
+    const currentMonthKey = `apdayc_paid_${new Date().getFullYear()}_${new Date().getMonth() + 1}`;
+    localStorage.setItem(currentMonthKey, 'true');
+    setDismissedMonth(true);
+    showToast("✅ Pago APDAYC registrado como COMPLETADO para este ciclo mensual.", "success");
+  };
+
+  const handleCopyAccounts = (cuenta) => {
+    const text = `${cuenta.banco} (${cuenta.tipo})\nNúmero: ${cuenta.numero}\nCCI: ${cuenta.cci}`;
+    navigator.clipboard.writeText(text);
+    showToast(`Cuenta ${cuenta.banco} copiada al portapapeles`, 'info');
+  };
+
+  const getWhatsAppUrl = () => {
+    const msg = `🚨 *URGENTE: RECORDATORIO DE PAGO APDAYC - LIMA* 🚨\n\n` +
+      `Estimado José Sánchez (Gerente de Lima):\n` +
+      `De acuerdo a la programación oficial de *CREAR PODER SIN LÍMITES*, se debe realizar el pago mensual de derechos de autor APDAYC para los entrenamientos en Hotel Jose Antonio.\n\n` +
+      `⏰ *Fecha límite:* Mañana a las 9:00 AM\n` +
+      `🏢 *Entidad:* APDAYC (RUC: 20100538203)\n` +
+      `👤 *Código de Usuario:* 248509\n` +
+      `📍 *Local:* Hotel Jose Antonio Deluxe - Miraflores\n\n` +
+      `💳 *Cuentas Oficiales:* \n` +
+      `• BCP Cta Cte: 191 0046905 0 86 (CCI: 00219100004690508658)\n` +
+      `• BBVA Cta Cte: 0011 0368 01 00002525 (CCI: 01136800010000252582)\n` +
+      `• Interbank Cta Cte: 200 3000831059 (CCI: 00320000300083105938)\n\n` +
+      `Por favor remitir el comprobante de transferencia a administración para su archivo legal.`;
+    return `https://wa.me/${APDAYC_CONFIG.telefonoWhatsApp}?text=${encodeURIComponent(msg)}`;
+  };
+
+  const getMailtoUrl = () => {
+    const subject = `[URGENTE] PAGO MENSUAL APDAYC LIMA - MAÑANA 9:00 AM - GERENCIA DE LIMA`;
+    const body = `Estimado José Sánchez,\n\n` +
+      `Te recordamos que de acuerdo al protocolo operativo de CREAR PODER SIN LÍMITES, mañana a las 9:00 AM vence el plazo para efectuar el pago de derechos de autor a APDAYC correspondiente a los eventos en el Hotel Jose Antonio.\n\n` +
+      `DETALLES DE PAGO:\n` +
+      `-----------------------------------------\n` +
+      `Entidad: APDAYC (RUC 20100538203)\n` +
+      `Oficina: AGECOFER - Miraflores\n` +
+      `Código Usuario: 248509\n` +
+      `Empresa Facturada: CREACION CUANTICA E.I.R.L. (RUC 20612592811)\n` +
+      `Local: Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)\n\n` +
+      `CUENTAS BANCARIAS AUTORIZADAS:\n` +
+      `1. BCP Cta. Cte.: 191 0046905 0 86 (CCI: 00219100004690508658)\n` +
+      `2. BBVA Cta. Cte.: 0011 0368 01 00002525 (CCI: 011 368 000100002525 82)\n` +
+      `3. Interbank Cta. Cte.: 200 3000831059 (CCI: 003 200 003000831059 38)\n` +
+      `4. Scotiabank Cta. Cte.: 000 4501799 (CCI: 009 04300000450179913)\n\n` +
+      `Favor confirmar el pago y remitir el voucher digital.\n\n` +
+      `Atentamente,\n` +
+      `Dirección General & Operaciones\n` +
+      `CREAR PODER SIN LÍMITES`;
+    return `mailto:${APDAYC_CONFIG.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  };
+
+  const handleOpenGoogleChat = async () => {
+    setChatLoading(true);
+    try {
+      const res = await openOrCreateDirectMessage(APDAYC_CONFIG.email);
+      if (res.success && res.spaceUri) {
+        window.open(res.spaceUri, '_blank', 'noopener,noreferrer');
+        showToast("Espacio de Google Chat abierto", "success");
+      } else {
+        window.open(`https://mail.google.com/chat/u/0/#chat/dm/users/${APDAYC_CONFIG.email}`, '_blank');
+      }
+    } catch (e) {
+      window.open(`https://mail.google.com/chat/u/0/#chat/dm/users/${APDAYC_CONFIG.email}`, '_blank');
+    } finally {
+      setChatLoading(false);
+    }
+  };
+
+  return (
+    <>
+      <style>{`
+        @keyframes rainbow-glow {
+          0% {
+            border-color: #ff0055;
+            box-shadow: 0 0 20px rgba(255, 0, 85, 0.7), inset 0 0 10px rgba(255, 0, 85, 0.3);
+          }
+          20% {
+            border-color: #ff8800;
+            box-shadow: 0 0 20px rgba(255, 136, 0, 0.7), inset 0 0 10px rgba(255, 136, 0, 0.3);
+          }
+          40% {
+            border-color: #ffee00;
+            box-shadow: 0 0 20px rgba(255, 238, 0, 0.7), inset 0 0 10px rgba(255, 238, 0, 0.3);
+          }
+          60% {
+            border-color: #00ff88;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.7), inset 0 0 10px rgba(0, 255, 136, 0.3);
+          }
+          80% {
+            border-color: #00bfff;
+            box-shadow: 0 0 20px rgba(0, 191, 255, 0.7), inset 0 0 10px rgba(0, 191, 255, 0.3);
+          }
+          100% {
+            border-color: #bf00ff;
+            box-shadow: 0 0 20px rgba(191, 0, 255, 0.7), inset 0 0 10px rgba(191, 0, 255, 0.3);
+          }
+        }
+
+        @keyframes rainbow-text-gradient {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+
+        .rainbow-banner {
+          animation: rainbow-glow 4s linear infinite;
+        }
+
+        .rainbow-text {
+          background: linear-gradient(90deg, #ff0055, #ff8800, #ffee00, #00ff88, #00bfff, #bf00ff, #ff0055);
+          background-size: 300% 300%;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          animation: rainbow-text-gradient 5s ease infinite;
+          font-weight: 900;
+        }
+
+        .rainbow-badge {
+          background: linear-gradient(90deg, rgba(255,0,85,0.2), rgba(255,136,0,0.2), rgba(0,255,136,0.2), rgba(0,191,255,0.2));
+          border: 1px solid rgba(255,255,255,0.3);
+          color: #fff;
+        }
+      `}</style>
+
+      {/* BANNER FLOTANTE SUPERIOR EN PANTALLA */}
+      <div
+        className="rainbow-banner"
+        style={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 9998,
+          background: 'linear-gradient(135deg, rgba(15, 12, 41, 0.98) 0%, rgba(48, 43, 99, 0.98) 50%, rgba(36, 36, 62, 0.98) 100%)',
+          backdropFilter: 'blur(16px)',
+          borderBottom: '3px solid',
+          padding: minimized ? '0.5rem 1.5rem' : '0.85rem 1.5rem',
+          transition: 'all 0.3s ease',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.6)'
+        }}
+        role="alert"
+      >
+        <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+          
+          {/* Lado izquierdo: Título y descripción */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{
+              width: '38px',
+              height: '38px',
+              borderRadius: '10px',
+              background: 'linear-gradient(135deg, #ff0055, #ff8800, #00bfff)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 0 15px rgba(255,0,85,0.5)',
+              flexShrink: 0
+            }}>
+              <AlertTriangle size={22} color="#fff" />
+            </div>
+
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <span className="rainbow-text" style={{ fontSize: '1.05rem', letterSpacing: '0.5px' }}>
+                  ⚡ RECORDATORIO URGENTE: PAGAR APDAYC (LIMA)
+                </span>
+                <span className="rainbow-badge" style={{ padding: '2px 8px', borderRadius: '20px', fontSize: '0.72rem', fontWeight: 800 }}>
+                  MAÑANA 9:00 AM
+                </span>
+                <span style={{ fontSize: '0.75rem', background: 'rgba(255,255,255,0.1)', padding: '2px 8px', borderRadius: '4px', color: '#e0e7ff' }}>
+                  Solo para José Sánchez (Gerente de Lima)
+                </span>
+              </div>
+
+              {!minimized && (
+                <div style={{ fontSize: '0.82rem', color: '#cbd5e1', marginTop: '2px' }}>
+                  Pago obligatorio de derechos de autor para eventos en <strong style={{ color: '#fff' }}>Hotel Jose Antonio</strong>. Vence a las <strong>9:00 AM</strong> (alerta mensual: 3 días antes del cierre de mes).
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Lado derecho: Canales de Notificación y Acciones Rápidas */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+            
+            {/* Botón WhatsApp */}
+            <a
+              href={getWhatsAppUrl()}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
+                color: '#fff',
+                padding: '6px 13px',
+                borderRadius: '8px',
+                fontSize: '0.82rem',
+                fontWeight: 700,
+                textDecoration: 'none',
+                boxShadow: '0 4px 12px rgba(37, 211, 102, 0.4)',
+                cursor: 'pointer'
+              }}
+              title="Enviar alerta por WhatsApp a José Sánchez"
+            >
+              <MessageSquare size={15} />
+              <span>WhatsApp</span>
+            </a>
+
+            {/* Botón Correo */}
+            <a
+              href={getMailtoUrl()}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+                color: '#fff',
+                padding: '6px 13px',
+                borderRadius: '8px',
+                fontSize: '0.82rem',
+                fontWeight: 700,
+                textDecoration: 'none',
+                boxShadow: '0 4px 12px rgba(59, 130, 246, 0.4)',
+                cursor: 'pointer'
+              }}
+              title="Enviar correo urgente a jose.sanchez@crearpsl.net"
+            >
+              <Mail size={15} />
+              <span>Correo</span>
+            </a>
+
+            {/* Botón Google Chat */}
+            <button
+              onClick={handleOpenGoogleChat}
+              disabled={chatLoading}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)',
+                color: '#fff',
+                border: 'none',
+                padding: '6px 13px',
+                borderRadius: '8px',
+                fontSize: '0.82rem',
+                fontWeight: 700,
+                boxShadow: '0 4px 12px rgba(139, 92, 246, 0.4)',
+                cursor: 'pointer'
+              }}
+              title="Abrir chat directo en Google Chat"
+            >
+              <Sparkles size={15} />
+              <span>{chatLoading ? 'Abriendo...' : 'Google Chat'}</span>
+            </button>
+
+            {/* Botón Ver Cuentas Bancarias */}
+            <button
+              onClick={() => setShowDetailsModal(true)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: 'rgba(255, 255, 255, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.25)',
+                color: '#fff',
+                padding: '6px 12px',
+                borderRadius: '8px',
+                fontSize: '0.82rem',
+                fontWeight: 600,
+                cursor: 'pointer'
+              }}
+            >
+              <CreditCard size={15} color="#38bdf8" />
+              <span>Ver Cuentas</span>
+            </button>
+
+            {/* Botón Marcar como Pagado */}
+            <button
+              onClick={handleMarkAsPaid}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                color: '#fff',
+                border: 'none',
+                padding: '6px 12px',
+                borderRadius: '8px',
+                fontSize: '0.82rem',
+                fontWeight: 700,
+                cursor: 'pointer'
+              }}
+              title="Confirmar que el pago ya se realizó"
+            >
+              <CheckCircle size={15} />
+              <span>Ya Pagado</span>
+            </button>
+
+            {/* Botón Minimizar */}
+            <button
+              onClick={() => setMinimized(!minimized)}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: '#94a3b8',
+                cursor: 'pointer',
+                padding: '4px'
+              }}
+              title={minimized ? "Expandir" : "Minimizar"}
+            >
+              {minimized ? <ChevronDown size={18} /> : <ChevronUp size={18} />}
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      {/* MODAL DETALLADO CON DATOS BANCARIOS DE APDAYC */}
+      {showDetailsModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.85)',
+          backdropFilter: 'blur(8px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10001,
+          padding: '1rem'
+        }}>
+          <div
+            className="rainbow-banner"
+            style={{
+              background: '#0a0f1d',
+              borderRadius: '16px',
+              maxWidth: '680px',
+              width: '100%',
+              padding: '2rem',
+              color: '#fff',
+              position: 'relative',
+              maxHeight: '90vh',
+              overflowY: 'auto'
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.2rem' }}>
+              <div>
+                <span className="rainbow-text" style={{ fontSize: '1.4rem' }}>
+                  Instrucciones de Pago APDAYC
+                </span>
+                <p style={{ fontSize: '0.85rem', color: '#94a3b8', marginTop: '4px' }}>
+                  Gestión exclusiva para la Sede Lima — Eventos Hotel Jose Antonio Deluxe
+                </p>
+              </div>
+              <button
+                onClick={() => setShowDetailsModal(false)}
+                style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Ficha Resumen */}
+            <div style={{
+              background: 'rgba(255,255,255,0.03)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: '12px',
+              padding: '1rem',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: '1rem',
+              marginBottom: '1.5rem',
+              fontSize: '0.85rem'
+            }}>
+              <div>
+                <span style={{ color: '#94a3b8' }}>Entidad Recaudadora:</span>
+                <div style={{ fontWeight: 'bold' }}>{APDAYC_CONFIG.entidad}</div>
+                <div style={{ color: '#38bdf8' }}>RUC: {APDAYC_CONFIG.ruc}</div>
+              </div>
+              <div>
+                <span style={{ color: '#94a3b8' }}>Código de Usuario APDAYC:</span>
+                <div style={{ fontWeight: 'bold', fontSize: '1.1rem', color: '#fbbf24' }}>{APDAYC_CONFIG.usuarioCodigo}</div>
+              </div>
+              <div>
+                <span style={{ color: '#94a3b8' }}>Empresa Facturada:</span>
+                <div style={{ fontWeight: 'bold' }}>{APDAYC_CONFIG.razonSocial}</div>
+                <div style={{ color: '#94a3b8' }}>RUC: {APDAYC_CONFIG.rucEmpresa}</div>
+              </div>
+              <div>
+                <span style={{ color: '#94a3b8' }}>Oficina de Recaudación:</span>
+                <div style={{ fontWeight: 'bold' }}>{APDAYC_CONFIG.oficina}</div>
+              </div>
+            </div>
+
+            {/* Cuentas Bancarias */}
+            <h4 style={{ fontSize: '0.95rem', fontWeight: 700, marginBottom: '0.8rem', color: '#38bdf8' }}>
+              💳 Cuentas Bancarias Autorizadas de APDAYC (1-Clic para copiar):
+            </h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.5rem' }}>
+              {APDAYC_CONFIG.cuentas.map((c, i) => (
+                <div
+                  key={i}
+                  style={{
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.12)',
+                    borderRadius: '10px',
+                    padding: '0.9rem',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    gap: '1rem'
+                  }}
+                >
+                  <div>
+                    <div style={{ fontWeight: 'bold', color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span>{c.banco}</span>
+                      <span style={{ fontSize: '0.75rem', color: '#94a3b8', background: 'rgba(255,255,255,0.08)', padding: '2px 6px', borderRadius: '4px' }}>
+                        {c.tipo}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: '0.85rem', color: '#e2e8f0', marginTop: '3px' }}>
+                      Cta: <code>{c.numero}</code>
+                    </div>
+                    <div style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
+                      CCI: <code>{c.cci}</code>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => handleCopyAccounts(c)}
+                    style={{
+                      background: 'rgba(56, 189, 248, 0.15)',
+                      color: '#38bdf8',
+                      border: '1px solid rgba(56, 189, 248, 0.3)',
+                      padding: '8px 14px',
+                      borderRadius: '8px',
+                      fontSize: '0.8rem',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px'
+                    }}
+                  >
+                    <Copy size={14} />
+                    <span>Copiar</span>
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            {/* Enlaces y Acciones */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1.2rem' }}>
+              <a
+                href={APDAYC_CONFIG.portalComprobantes}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  color: '#94a3b8',
+                  fontSize: '0.8rem',
+                  textDecoration: 'underline'
+                }}
+              >
+                <ExternalLink size={14} />
+                <span>Módulo de Facturación Electrónica APDAYC</span>
+              </a>
+
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  onClick={handleMarkAsPaid}
+                  style={{
+                    background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                    color: '#fff',
+                    border: 'none',
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    fontSize: '0.85rem',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Confirmar Pago Realizado
+                </button>
+                <button
+                  onClick={() => setShowDetailsModal(false)}
+                  style={{
+                    background: 'rgba(255,255,255,0.1)',
+                    border: 'none',
+                    color: '#fff',
+                    padding: '8px 16px',
+                    borderRadius: '8px',
+                    fontSize: '0.85rem',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
@@ -143414,6 +146409,311 @@ export const cyclesData = [
   }
 ];
 
+```
+
+---
+
+## Archivo: src\data\kpisLima.json
+
+```json
+{
+  "equipos": [
+    {
+      "Equipo": "EQUIPO 27",
+      "Asignados": 372,
+      "Confirmados": 195,
+      "Sentados": 159,
+      "Efectividad": 0.4274193548,
+      "Desertores C1": 45,
+      "Desertores C2": 4,
+      "Pagos C2": 11,
+      "PX terminan": 0,
+      "\u00daltima actualizaci\u00f3n": "2026-09-03",
+      "Calidad de datos": "Confirmado"
+    },
+    {
+      "Equipo": "EQUIPO 28",
+      "Asignados": 222,
+      "Confirmados": 123,
+      "Sentados": 110,
+      "Efectividad": 0.4954954955,
+      "Desertores C1": 13,
+      "Desertores C2": 7,
+      "Pagos C2": 13,
+      "PX terminan": 0,
+      "\u00daltima actualizaci\u00f3n": "2026-09-03",
+      "Calidad de datos": "Confirmado"
+    },
+    {
+      "Equipo": "EQUIPO 29",
+      "Asignados": 365,
+      "Confirmados": 167,
+      "Sentados": 139,
+      "Efectividad": 0.3808219178,
+      "Desertores C1": 22,
+      "Desertores C2": 4,
+      "Pagos C2": 11,
+      "PX terminan": 0,
+      "\u00daltima actualizaci\u00f3n": "2026-09-03",
+      "Calidad de datos": "Confirmado"
+    },
+    {
+      "Equipo": "EQUIPO 30",
+      "Asignados": 189,
+      "Confirmados": 127,
+      "Sentados": 94,
+      "Efectividad": 0.4973544974,
+      "Desertores C1": 21,
+      "Desertores C2": 2,
+      "Pagos C2": 7,
+      "PX terminan": 0,
+      "\u00daltima actualizaci\u00f3n": "2026-09-03",
+      "Calidad de datos": "Confirmado"
+    }
+  ],
+  "coordinadoras": [
+    {
+      "Coordinadora": "Diana M.",
+      "Equipo": "EQUIPO 27",
+      "Etapa": "Todas",
+      "Asignados": 178,
+      "Confirmados": 95,
+      "Sentados": 80,
+      "Aliados": 5,
+      "Desertores": 19,
+      "Pagos C2": 5,
+      "Enrolamiento PX": 0,
+      "Enrolamiento Managers": 0,
+      "Datos pendientes": 0,
+      "Fuente": "01_DATOS_NORMALIZADOS"
+    },
+    {
+      "Coordinadora": "Diana M.",
+      "Equipo": "EQUIPO 28",
+      "Etapa": "Todas",
+      "Asignados": 111,
+      "Confirmados": 56,
+      "Sentados": 48,
+      "Aliados": 3,
+      "Desertores": 7,
+      "Pagos C2": 5,
+      "Enrolamiento PX": 0,
+      "Enrolamiento Managers": 0,
+      "Datos pendientes": 0,
+      "Fuente": "01_DATOS_NORMALIZADOS"
+    },
+    {
+      "Coordinadora": "Diana M.",
+      "Equipo": "EQUIPO 29",
+      "Etapa": "Todas",
+      "Asignados": 178,
+      "Confirmados": 86,
+      "Sentados": 68,
+      "Aliados": 11,
+      "Desertores": 9,
+      "Pagos C2": 3,
+      "Enrolamiento PX": 0,
+      "Enrolamiento Managers": 0,
+      "Datos pendientes": 0,
+      "Fuente": "01_DATOS_NORMALIZADOS"
+    },
+    {
+      "Coordinadora": "Diana M.",
+      "Equipo": "EQUIPO 30",
+      "Etapa": "Todas",
+      "Asignados": 95,
+      "Confirmados": 62,
+      "Sentados": 43,
+      "Aliados": 12,
+      "Desertores": 8,
+      "Pagos C2": 5,
+      "Enrolamiento PX": 0,
+      "Enrolamiento Managers": 0,
+      "Datos pendientes": 0,
+      "Fuente": "01_DATOS_NORMALIZADOS"
+    },
+    {
+      "Coordinadora": "Joyce M.",
+      "Equipo": "EQUIPO 27",
+      "Etapa": "Todas",
+      "Asignados": 194,
+      "Confirmados": 100,
+      "Sentados": 79,
+      "Aliados": 6,
+      "Desertores": 26,
+      "Pagos C2": 6,
+      "Enrolamiento PX": 0,
+      "Enrolamiento Managers": 0,
+      "Datos pendientes": 0,
+      "Fuente": "01_DATOS_NORMALIZADOS"
+    },
+    {
+      "Coordinadora": "Joyce M.",
+      "Equipo": "EQUIPO 28",
+      "Etapa": "Todas",
+      "Asignados": 111,
+      "Confirmados": 67,
+      "Sentados": 62,
+      "Aliados": 16,
+      "Desertores": 6,
+      "Pagos C2": 8,
+      "Enrolamiento PX": 0,
+      "Enrolamiento Managers": 0,
+      "Datos pendientes": 0,
+      "Fuente": "01_DATOS_NORMALIZADOS"
+    },
+    {
+      "Coordinadora": "Joyce M.",
+      "Equipo": "EQUIPO 29",
+      "Etapa": "Todas",
+      "Asignados": 187,
+      "Confirmados": 81,
+      "Sentados": 71,
+      "Aliados": 10,
+      "Desertores": 13,
+      "Pagos C2": 8,
+      "Enrolamiento PX": 0,
+      "Enrolamiento Managers": 0,
+      "Datos pendientes": 0,
+      "Fuente": "01_DATOS_NORMALIZADOS"
+    },
+    {
+      "Coordinadora": "Joyce M.",
+      "Equipo": "EQUIPO 30",
+      "Etapa": "Todas",
+      "Asignados": 94,
+      "Confirmados": 65,
+      "Sentados": 51,
+      "Aliados": 12,
+      "Desertores": 13,
+      "Pagos C2": 2,
+      "Enrolamiento PX": 0,
+      "Enrolamiento Managers": 0,
+      "Datos pendientes": 0,
+      "Fuente": "01_DATOS_NORMALIZADOS"
+    },
+    {
+      "Coordinadora": "Linid V.",
+      "Equipo": "EQUIPO 27",
+      "Etapa": "Todas",
+      "Asignados": 0,
+      "Confirmados": 0,
+      "Sentados": 0,
+      "Aliados": 1,
+      "Desertores": 0,
+      "Pagos C2": 0,
+      "Enrolamiento PX": 0,
+      "Enrolamiento Managers": 0,
+      "Datos pendientes": 0,
+      "Fuente": "01_DATOS_NORMALIZADOS"
+    },
+    {
+      "Coordinadora": "Linid V.",
+      "Equipo": "EQUIPO 28",
+      "Etapa": "Todas",
+      "Asignados": 0,
+      "Confirmados": 0,
+      "Sentados": 0,
+      "Aliados": 3,
+      "Desertores": 0,
+      "Pagos C2": 0,
+      "Enrolamiento PX": 49,
+      "Enrolamiento Managers": 20,
+      "Datos pendientes": 18,
+      "Fuente": "01_DATOS_NORMALIZADOS"
+    },
+    {
+      "Coordinadora": "Linid V.",
+      "Equipo": "EQUIPO 29",
+      "Etapa": "Todas",
+      "Asignados": 0,
+      "Confirmados": 0,
+      "Sentados": 0,
+      "Aliados": 5,
+      "Desertores": 0,
+      "Pagos C2": 0,
+      "Enrolamiento PX": 0,
+      "Enrolamiento Managers": 0,
+      "Datos pendientes": 0,
+      "Fuente": "01_DATOS_NORMALIZADOS"
+    },
+    {
+      "Coordinadora": "Linid V.",
+      "Equipo": "EQUIPO 30",
+      "Etapa": "Todas",
+      "Asignados": 0,
+      "Confirmados": 0,
+      "Sentados": 0,
+      "Aliados": 3,
+      "Desertores": 0,
+      "Pagos C2": 0,
+      "Enrolamiento PX": 0,
+      "Enrolamiento Managers": 0,
+      "Datos pendientes": 46,
+      "Fuente": "01_DATOS_NORMALIZADOS"
+    },
+    {
+      "Coordinadora": "Leyla P.",
+      "Equipo": "EQUIPO 27",
+      "Etapa": "Todas",
+      "Asignados": 0,
+      "Confirmados": 0,
+      "Sentados": 0,
+      "Aliados": 0,
+      "Desertores": 0,
+      "Pagos C2": 0,
+      "Enrolamiento PX": 122,
+      "Enrolamiento Managers": 50,
+      "Datos pendientes": 0,
+      "Fuente": "01_DATOS_NORMALIZADOS"
+    },
+    {
+      "Coordinadora": "Leyla P.",
+      "Equipo": "EQUIPO 28",
+      "Etapa": "Todas",
+      "Asignados": 0,
+      "Confirmados": 0,
+      "Sentados": 0,
+      "Aliados": 2,
+      "Desertores": 0,
+      "Pagos C2": 0,
+      "Enrolamiento PX": 0,
+      "Enrolamiento Managers": 0,
+      "Datos pendientes": 0,
+      "Fuente": "01_DATOS_NORMALIZADOS"
+    },
+    {
+      "Coordinadora": "Leyla P.",
+      "Equipo": "EQUIPO 29",
+      "Etapa": "Todas",
+      "Asignados": 0,
+      "Confirmados": 0,
+      "Sentados": 0,
+      "Aliados": 6,
+      "Desertores": 0,
+      "Pagos C2": 0,
+      "Enrolamiento PX": 34,
+      "Enrolamiento Managers": 4,
+      "Datos pendientes": 32,
+      "Fuente": "01_DATOS_NORMALIZADOS"
+    },
+    {
+      "Coordinadora": "Leyla P.",
+      "Equipo": "EQUIPO 30",
+      "Etapa": "Todas",
+      "Asignados": 0,
+      "Confirmados": 0,
+      "Sentados": 0,
+      "Aliados": 2,
+      "Desertores": 0,
+      "Pagos C2": 0,
+      "Enrolamiento PX": 0,
+      "Enrolamiento Managers": 0,
+      "Datos pendientes": 0,
+      "Fuente": "01_DATOS_NORMALIZADOS"
+    }
+  ]
+}
 ```
 
 ---
@@ -154418,9 +157718,9 @@ export const VESTIMENTA_2026 = {
   },
   qt: {
     rol: "Quantum Team (QT)",
-    viernes: "Camisa blanca y jean azul oscuro.",
-    sabado: "Polo plomo (gris) oficial de QT y jean negro.",
-    domingo: "Polo azul oficial de QT y jean negro."
+    viernes: "Traje formal 'Total Black' (saco, camisa/blusa negra, pantalón de vestir negro).",
+    sabado: "Polo plomo del Quantum Team, jeans negros y abrigo negro.",
+    domingo: "Polo azul índigo del Quantum Team, jeans negros y abrigo negro."
   },
   managers: {
     rol: "Mánagers de Maestría",
@@ -189139,6 +192439,201 @@ function KPIMetric({ label, value, target, actual, isInverse = false }) {
 
 ---
 
+## Archivo: src\pages\BrandScriptBoard.jsx
+
+```javascript
+import React, { useState } from 'react';
+import { BookOpen, Copy, Check } from 'lucide-react';
+
+export default function BrandScriptBoard() {
+  const [copiedKey, setCopiedKey] = useState(null);
+  const [selectedSede, setSelectedSede] = useState('Lima'); // Default para el guion
+
+  const copyText = (text, key) => {
+    navigator.clipboard.writeText(text);
+    setCopiedKey(key);
+    setTimeout(() => setCopiedKey(null), 2000);
+  };
+
+  const bgCard = 'rgba(0, 0, 0, 0.2)';
+  const borderCard = 'rgba(255, 255, 255, 0.05)';
+  const gold = '#d4af37';
+  const textLight = '#f8fafc';
+  const textMuted = '#94a3b8';
+  const bgSurface = 'rgba(255,255,255,0.02)';
+
+  return (
+    <div style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto', color: 'white', fontFamily: '"Inter", sans-serif' }}>
+      
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
+        <BookOpen size={28} color={gold} />
+        <h1 style={{ margin: 0, fontSize: '1.8rem', fontWeight: 'bold' }}>BrandScript & Guiones MJ</h1>
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        
+        {/* Header del Manual */}
+        <div style={{ background: bgCard, padding: '1.5rem', borderRadius: '12px', border: `1px solid ${borderCard}`, borderLeft: `5px solid ${gold}` }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+            <div>
+              <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: gold, background: '#78350f33', padding: '0.2rem 0.6rem', borderRadius: '4px', textTransform: 'uppercase' }}>
+                Manual Oficial de Enrolamiento Narrativo - Edición V1.0 (2026)
+              </span>
+              <h3 style={{ margin: '0.5rem 0 0.2rem', fontSize: '1.3rem', color: textLight }}>
+                BrandScript SB7 & Guiones de Conversión para Maestría del Juego (MJ)
+              </h3>
+              <p style={{ margin: 0, color: textMuted, fontSize: '0.85rem' }}>
+                Alineación de Mánagers y Capitanes bajo el StoryBrand Framework y Neuromarketing Ético. Cero manipulación, 100% libre elección y fisionomía de Creador.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* MATRIZ SB7-MJ */}
+        <div style={{ background: bgCard, padding: '1.5rem', borderRadius: '12px', border: `1px solid ${borderCard}` }}>
+          <h4 style={{ margin: '0 0 1rem 0', color: gold, fontSize: '1.1rem' }}>
+            🗺️ Matriz del BrandScript Oficial (SB7-MJ)
+          </h4>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
+            {[
+              { title: '1. El Personaje (El Héroe)', desc: 'Graduado de C2: un líder que despertó su poder en sala y busca materializarlo en su vida cotidiana.', border: '#3b82f6' },
+              { title: '2. Tiene un Problema (El Efecto Lunes)', desc: 'Externo (entorno inercial), Interno (miedo al auto-sabotaje y soledad), Filosófico (inaceptable volver a vivir promedio).', border: '#ef4444' },
+              { title: '3. Conoce un Guía (El Entrenador/MJ)', desc: 'No somos los héroes de su historia. Somos su reflejo de posibilidad. Mostramos empatía ("yo también viví el lunes") y autoridad (los resultados de Crear).', border: '#10b981' },
+              { title: '4. Le Da un Plan (El Contenedor)', desc: 'Plan de Proceso (El FI de 15 min para mapear su visión) y Plan de Acuerdo (Compromiso de integridad sin excusas).', border: '#f59e0b' },
+              { title: '5. Lo Llama a la Acción', desc: 'Directo: Agendar la sesión de Futuro Imposible, transicionar la reserva financiera y entrar a la cancha a jugar.', border: '#8b5cf6' },
+              { title: '6. Evita el Fracaso', desc: 'Si no actúa: Regresar a la inercia, perder la tribu de fuego, apagar la fisionomía despertada el fin de semana.', border: '#64748b' },
+              { title: '7. Termina en Éxito', desc: 'Con MJ: Rediseño total de finanzas, relaciones y carrera. Volverse la causa de su universo. El Creador encarnado.', border: '#14b8a6' },
+            ].map((item, i) => (
+              <div key={i} style={{ background: bgSurface, padding: '1rem', borderRadius: '8px', borderLeft: `4px solid ${item.border}` }}>
+                <strong style={{ color: textLight, display: 'block', marginBottom: '0.3rem', fontSize: '0.9rem' }}>{item.title}</strong>
+                <span style={{ color: textMuted, fontSize: '0.8rem', lineHeight: '1.4' }}>{item.desc}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* GUIONES DE COMUNICACIÓN MÁNAGER - PARTICIPANTE */}
+        <div style={{ background: bgCard, padding: '1.5rem', borderRadius: '12px', border: `1px solid ${borderCard}` }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1rem' }}>
+            <h4 style={{ margin: 0, color: gold, fontSize: '1.1rem' }}>
+              💬 Guiones de Conversión Mánager a Px (Scripts Directos)
+            </h4>
+            <select 
+              value={selectedSede} 
+              onChange={(e) => setSelectedSede(e.target.value)}
+              style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border-light)', color: 'white', padding: '0.4rem', borderRadius: '6px', fontSize: '0.85rem' }}
+            >
+              <option value="Lima">Sede Lima</option>
+              <option value="Quito">Sede Quito</option>
+              <option value="Cuenca">Sede Cuenca</option>
+              <option value="Guayaquil">Sede Guayaquil</option>
+            </select>
+          </div>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1rem' }}>
+            
+            {/* Objeción Dinero */}
+            <div style={{ background: bgSurface, padding: '1.2rem', borderRadius: '8px', borderTop: '2px solid #ef4444' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                <strong style={{ color: '#ef4444', fontSize: '0.9rem' }}>Objeción: "No tengo el dinero ahorita"</strong>
+                <button
+                  onClick={() => copyText('En la cultura de Crear, operamos desde la Causa: si tú eres el creador de tu realidad, el dinero es una circunstancia a diseñar, no un límite inamovible. Si estructuramos un plan de abono de bajo riesgo en Nodus, ¿qué opciones ves viables para tu aporte de reserva este viernes?', 'obj1')}
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', background: 'transparent', border: 'none', color: textMuted, cursor: 'pointer', fontSize: '0.8rem' }}
+                >
+                  {copiedKey === 'obj1' ? <Check size={14} color="#10b981" /> : <Copy size={14} />}
+                </button>
+              </div>
+              <div style={{ fontSize: '0.85rem', color: textLight, fontStyle: 'italic', background: 'rgba(0,0,0,0.2)', padding: '0.8rem', borderRadius: '4px' }}>
+                «En la cultura de Crear, operamos desde la Causa: si tú eres el creador de tu realidad, el dinero es una circunstancia a diseñar, no un límite inamovible. Si estructuramos un plan de abono de bajo riesgo en Nodus, ¿qué opciones ves viables para tu aporte de reserva este viernes?»
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        {/* PLANTILLAS DE WHATSAPP OFICIALES */}
+        <div style={{ background: bgCard, padding: '1.5rem', borderRadius: '12px', border: `1px solid ${borderCard}` }}>
+          <h4 style={{ margin: '0 0 1rem 0', color: gold, fontSize: '1.1rem' }}>
+            📱 Plantillas Oficiales de WhatsApp (1-Clic para Copiar)
+          </h4>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '1rem' }}>
+            
+            {/* WhatsApp 1 */}
+            <div style={{ background: bgSurface, padding: '1.2rem', borderRadius: '8px', borderLeft: '3px solid #10b981' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                <strong style={{ color: '#34d399', fontSize: '0.9rem' }}>Plantilla 1: Bienvenida Post-Graduación C2</strong>
+                <button
+                  onClick={() => copyText(`¡Felicidades, Creador! 🔥\n\nAún resuena en la sede la fisionomía y la fuerza de tu palabra declarada este fin de semana en Capítulo Dos. Has salido de "la arena" y hoy tienes en tus manos la posibilidad de diseñar tu propio destino.\n\nEl lunes ha llegado, y con él, la oportunidad de elegir: ¿volver a la inercia cotidiana o entrenar para consolidar tu Breakthrough?\n\nEl equipo de Mánagers y la comunidad de Maestría del Juego ya está lista para recibirte en el contenedor de los 90 días. Tu espacio de estiramiento está guardado.\n\nPaso 1: Ingresa a tu App Nodus 📲\nPaso 2: Agenda tu sesión de calibración de Futuro Imposible (FI) de 15 minutos aquí: [Enlace_Calendly]\nPaso 3: Sostiene tu palabra.\n\nSostener la fisionomía del Ser es el juego de los grandes. Nos vemos en la cancha.\n\nAtentamente,\nEl Equipo de Mánagers y Capitanes de ${selectedSede}\nCREAR PODER SIN LÍMITES 2026.`, 'waPostC2')}
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', background: '#0b132b', border: `1px solid ${borderCard}`, color: textLight, padding: '0.3rem 0.6rem', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer' }}
+                >
+                  {copiedKey === 'waPostC2' ? <Check size={14} color="#10b981" /> : <Copy size={14} />}
+                  {copiedKey === 'waPostC2' ? '¡Copiado!' : 'Copiar Texto'}
+                </button>
+              </div>
+              <div style={{ fontSize: '0.8rem', color: textMuted, whiteSpace: 'pre-line', lineHeight: '1.5' }}>
+                Principio de "Unidad" de Cialdini. Diseñado para reactivar la emoción del domingo e impulsar el agendamiento del FI de 15 min.
+              </div>
+            </div>
+
+            {/* WhatsApp 2 */}
+            <div style={{ background: bgSurface, padding: '1.2rem', borderRadius: '8px', borderLeft: '3px solid #f59e0b' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                <strong style={{ color: gold, fontSize: '0.9rem' }}>Plantilla 2: Recordatorio Preventivo (Viernes 12:00 PM)</strong>
+                <button
+                  onClick={() => copyText(`Hola [Nombre] 🚨\n\nTe saludamos desde la oficina de la sede ${selectedSede}. Hoy es viernes de Capítulo Dos, un día clave para cuidar el contenedor de integridad que declaraste el jueves por la noche.\n\nPara asegurar que tu ingreso al bloque de confrontación de las 15:00 PM sea fluido y libre de distracciones logísticas:\n\n💳 Tu estado actual en Nodus requiere conciliación de caja.\n⏱ El cierre automático de registros contables de la plataforma se ejecutará a las 14:00 PM.\n\nQueremos cuidar tu experiencia y tu palabra. Por favor, acércate a la mesa externa de registro antes de la hora límite o envíanos tu comprobante digital por esta vía para validar tu "Ticket Verde" en el sistema.\n\nSi tienes algún quiebre técnico o financiero de última hora, avísanos de inmediato para diseñar juntos una solución de bajo riesgo con el Gerente de Sede antes de que el sistema aplique el bloqueo automático.\n\n¡Sostener tu palabra es tu mayor poder! Nos vemos en sala. 🛡️\nCREAR PODER SIN LÍMITES`, 'waPrev12')}
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', background: '#0b132b', border: `1px solid ${borderCard}`, color: textLight, padding: '0.3rem 0.6rem', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer' }}
+                >
+                  {copiedKey === 'waPrev12' ? <Check size={14} color="#10b981" /> : <Copy size={14} />}
+                  {copiedKey === 'waPrev12' ? '¡Copiado!' : 'Copiar Texto'}
+                </button>
+              </div>
+              <div style={{ fontSize: '0.8rem', color: textMuted, whiteSpace: 'pre-line', lineHeight: '1.5' }}>
+                Neuromarketing Preventivo. Sustituye la fricción de la penalización de "Palabra Rota" anticipándose al cierre contable de las 14:00 PM.
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        {/* CHECKLIST DE IMPECABILIDAD */}
+        <div style={{ background: bgCard, padding: '1.5rem', borderRadius: '12px', border: `1px solid ${borderCard}` }}>
+          <h4 style={{ margin: '0 0 0.8rem 0', color: '#a855f7', fontSize: '1.1rem' }}>
+            🛡️ Checklist de Impecabilidad del Enrolador Narrativo
+          </h4>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '0.75rem' }}>
+            <div style={{ background: bgSurface, padding: '0.8rem', borderRadius: '6px', fontSize: '0.82rem' }}>
+              <strong style={{ color: '#ec4899', display: 'block' }}>1. Cero Simpatía al Drama</strong>
+              <span style={{ color: textMuted }}>No comprar justificaciones con lástima; sostenerlo en su grandeza de creador.</span>
+            </div>
+            <div style={{ background: bgSurface, padding: '0.8rem', borderRadius: '6px', fontSize: '0.82rem' }}>
+              <strong style={{ color: '#38bdf8', display: 'block' }}>2. Datos vs. Interpretaciones</strong>
+              <span style={{ color: textMuted }}>Separar los hechos objetivos de las historias basadas en el miedo.</span>
+            </div>
+            <div style={{ background: bgSurface, padding: '0.8rem', borderRadius: '6px', fontSize: '0.82rem' }}>
+              <strong style={{ color: '#10b981', display: 'block' }}>3. Respeto a la Autonomía</strong>
+              <span style={{ color: textMuted }}>Elección voluntaria. Erradicación total de culpa y escasez falsa.</span>
+            </div>
+            <div style={{ background: bgSurface, padding: '0.8rem', borderRadius: '6px', fontSize: '0.82rem' }}>
+              <strong style={{ color: gold, display: 'block' }}>4. Fisionomía de Voz</strong>
+              <span style={{ color: textMuted }}>Postura erguida, tono firme y amoroso; la vibración se transmite.</span>
+            </div>
+            <div style={{ background: bgSurface, padding: '0.8rem', borderRadius: '6px', fontSize: '0.82rem' }}>
+              <strong style={{ color: '#a855f7', display: 'block' }}>5. Trazabilidad en Nodus</strong>
+              <span style={{ color: textMuted }}>Registro limpio de acuerdos de pago y fechas límite para la Gerencia.</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+```
+
+---
+
 ## Archivo: src\pages\CalendarioMJ.jsx
 
 ```javascript
@@ -194352,6 +197847,222 @@ export default function ChecklistBoard() {
 
 ---
 
+## Archivo: src\pages\DashboardKpisLima.jsx
+
+```javascript
+import React, { useState, useMemo } from 'react';
+import { ArrowLeft, BarChart2, Users, TrendingUp, AlertTriangle, ShieldCheck, Download, Filter } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useUI } from '../context/UIContext';
+import kpisData from '../data/kpisLima.json';
+
+export default function DashboardKpisLima() {
+  const navigate = useNavigate();
+  const { showToast } = useUI();
+  
+  const [selectedEquipo, setSelectedEquipo] = useState('ALL');
+  const [selectedCoordinadora, setSelectedCoordinadora] = useState('ALL');
+  
+  const equiposData = kpisData.equipos;
+  const coordinadorasData = kpisData.coordinadoras;
+
+  const equiposOptions = ['ALL', ...Array.from(new Set(equiposData.map(e => e.Equipo)))];
+  const coordinadorasOptions = ['ALL', ...Array.from(new Set(coordinadorasData.map(c => c.Coordinadora)))];
+
+  // Filtros combinados
+  const filteredEquipos = useMemo(() => {
+    return equiposData.filter(e => selectedEquipo === 'ALL' || e.Equipo === selectedEquipo);
+  }, [selectedEquipo, equiposData]);
+
+  const filteredCoordinadoras = useMemo(() => {
+    return coordinadorasData.filter(c => 
+      (selectedEquipo === 'ALL' || c.Equipo === selectedEquipo) &&
+      (selectedCoordinadora === 'ALL' || c.Coordinadora === selectedCoordinadora)
+    );
+  }, [selectedEquipo, selectedCoordinadora, coordinadorasData]);
+
+  // Agregados Ejecutivos
+  const totalAsignados = filteredEquipos.reduce((acc, curr) => acc + curr.Asignados, 0);
+  const totalSentados = filteredEquipos.reduce((acc, curr) => acc + curr.Sentados, 0);
+  const efectividadGlobal = totalAsignados > 0 ? (totalSentados / totalAsignados) * 100 : 0;
+  
+  const totalDatosPendientes = filteredCoordinadoras.reduce((acc, curr) => acc + curr['Datos pendientes'], 0);
+  const totalDesertores = filteredEquipos.reduce((acc, curr) => acc + curr['Desertores C1'] + curr['Desertores C2'], 0);
+
+  const renderCard = (title, value, subtitle, icon, colorClass, highlight = false) => (
+    <div className={`glass-panel p-4 ${highlight ? 'border-crear-cyan' : ''}`} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', borderLeft: highlight ? '4px solid var(--crear-cyan)' : '1px solid rgba(255,255,255,0.05)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <span className="text-muted" style={{ fontSize: '0.85rem', fontWeight: 600 }}>{title}</span>
+        {icon}
+      </div>
+      <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-main)', lineHeight: 1.1 }}>
+        {value}
+      </div>
+      <div className={colorClass} style={{ fontSize: '0.75rem', fontWeight: 600 }}>
+        {subtitle}
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="page-container page-transition" style={{ maxWidth: '1200px', margin: '0 auto' }}>
+      
+      {/* HEADER */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+        <div>
+          <button onClick={() => navigate('/')} className="btn-secondary" style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}>
+            <ArrowLeft size={16} /> Volver al Inicio
+          </button>
+          <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
+            <span className="badge badge-primary">Sede Lima</span>
+            <span className="badge badge-success">Actualizado: {equiposData[0]['Última actualización']}</span>
+          </div>
+          <h1 style={{ fontSize: '2rem', margin: 0, background: 'linear-gradient(90deg, #fff, var(--crear-cyan))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            Dashboard Directivo: Equipos y Coordinadoras
+          </h1>
+          <p className="text-muted" style={{ marginTop: '0.4rem', fontSize: '0.95rem' }}>
+            Análisis de efectividad, enrolamiento y calidad de datos operacionales.
+          </p>
+        </div>
+        
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <button onClick={() => showToast('Descargando reporte Excel...', 'success')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Download size={16} /> Exportar
+          </button>
+        </div>
+      </div>
+
+      {/* FILTROS */}
+      <div className="glass-panel" style={{ padding: '1rem', marginBottom: '1.5rem', display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)' }}>
+          <Filter size={18} /> <span style={{ fontWeight: 600 }}>Filtros Globales:</span>
+        </div>
+        
+        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+          <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Equipo:</label>
+          <select 
+            value={selectedEquipo} 
+            onChange={(e) => setSelectedEquipo(e.target.value)}
+            style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border-light)', color: 'white', padding: '0.4rem', borderRadius: '6px', fontSize: '0.85rem' }}
+          >
+            {equiposOptions.map(opt => <option key={opt} value={opt}>{opt === 'ALL' ? 'Todos los Equipos' : opt}</option>)}
+          </select>
+        </div>
+
+        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+          <label style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Coordinadora:</label>
+          <select 
+            value={selectedCoordinadora} 
+            onChange={(e) => setSelectedCoordinadora(e.target.value)}
+            style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border-light)', color: 'white', padding: '0.4rem', borderRadius: '6px', fontSize: '0.85rem' }}
+          >
+            {coordinadorasOptions.map(opt => <option key={opt} value={opt}>{opt === 'ALL' ? 'Todas las Coordinadoras' : opt}</option>)}
+          </select>
+        </div>
+      </div>
+
+      {/* RESUMEN EJECUTIVO (KPIs) */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
+        {renderCard('Total Asignados', totalAsignados, 'Px en base de datos', <Users size={20} className="text-muted" />, 'text-muted')}
+        {renderCard('Total Sentados', totalSentados, 'Px confirmados en sala', <ShieldCheck size={20} color="var(--crear-cyan)" />, 'text-cyan', true)}
+        {renderCard('Efectividad Global', `${efectividadGlobal.toFixed(1)}%`, 'Tasa de conversión final', <TrendingUp size={20} color="var(--color-success)" />, 'text-success')}
+        {renderCard('Alertas (Desertores)', totalDesertores, 'Px retirados C1/C2', <AlertTriangle size={20} color="var(--color-warning)" />, 'text-warning')}
+        {renderCard('Datos Pendientes', totalDatosPendientes, 'Requieren validación', <BarChart2 size={20} color="var(--color-error)" />, 'text-error')}
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(500px, 1fr))', gap: '1.5rem', alignItems: 'start' }}>
+        
+        {/* TABLA DE EQUIPOS */}
+        <div className="glass-panel" style={{ overflow: 'hidden' }}>
+          <div style={{ padding: '1rem 1.2rem', borderBottom: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)' }}>
+            <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--crear-gold)' }}>Rendimiento por Equipos</h3>
+          </div>
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', color: 'var(--text-muted)', fontSize: '0.8rem', textTransform: 'uppercase' }}>
+                  <th style={{ padding: '0.8rem 1rem' }}>Equipo</th>
+                  <th style={{ padding: '0.8rem 1rem' }}>Asignados</th>
+                  <th style={{ padding: '0.8rem 1rem' }}>Confirmados</th>
+                  <th style={{ padding: '0.8rem 1rem' }}>Sentados</th>
+                  <th style={{ padding: '0.8rem 1rem' }}>Efectividad</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredEquipos.map((eq, i) => (
+                  <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                    <td style={{ padding: '0.8rem 1rem', fontWeight: 600, color: 'var(--text-main)' }}>{eq.Equipo}</td>
+                    <td style={{ padding: '0.8rem 1rem' }}>{eq.Asignados}</td>
+                    <td style={{ padding: '0.8rem 1rem' }}>{eq.Confirmados}</td>
+                    <td style={{ padding: '0.8rem 1rem', color: 'var(--crear-cyan)', fontWeight: 'bold' }}>{eq.Sentados}</td>
+                    <td style={{ padding: '0.8rem 1rem' }}>
+                      <span className="badge badge-outline" style={{ border: '1px solid var(--color-success)', color: 'var(--color-success)' }}>
+                        {(eq.Efectividad * 100).toFixed(1)}%
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+                {filteredEquipos.length === 0 && (
+                  <tr>
+                    <td colSpan="5" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>No hay datos para este filtro</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* TABLA DE COORDINADORAS */}
+        <div className="glass-panel" style={{ overflow: 'hidden' }}>
+          <div style={{ padding: '1rem 1.2rem', borderBottom: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)' }}>
+            <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--crear-gold)' }}>Desglose por Coordinadora</h3>
+          </div>
+          <div style={{ overflowX: 'auto', maxHeight: '400px' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+              <thead style={{ position: 'sticky', top: 0, background: '#0e1628', zIndex: 1 }}>
+                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', color: 'var(--text-muted)', fontSize: '0.8rem', textTransform: 'uppercase' }}>
+                  <th style={{ padding: '0.8rem 1rem' }}>Coordinadora</th>
+                  <th style={{ padding: '0.8rem 1rem' }}>Equipo</th>
+                  <th style={{ padding: '0.8rem 1rem' }}>Sentados</th>
+                  <th style={{ padding: '0.8rem 1rem' }}>Aliados</th>
+                  <th style={{ padding: '0.8rem 1rem' }}>P. Pendientes</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredCoordinadoras.map((c, i) => (
+                  <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                    <td style={{ padding: '0.8rem 1rem', fontWeight: 600, color: 'var(--text-main)' }}>{c.Coordinadora}</td>
+                    <td style={{ padding: '0.8rem 1rem', fontSize: '0.85rem' }}>{c.Equipo}</td>
+                    <td style={{ padding: '0.8rem 1rem', color: 'var(--crear-cyan)' }}>{c.Sentados}</td>
+                    <td style={{ padding: '0.8rem 1rem' }}>{c.Aliados}</td>
+                    <td style={{ padding: '0.8rem 1rem' }}>
+                      {c['Datos pendientes'] > 0 ? (
+                        <span className="badge badge-error">{c['Datos pendientes']}</span>
+                      ) : (
+                        <span style={{ color: 'var(--text-muted)' }}>0</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+                {filteredCoordinadoras.length === 0 && (
+                  <tr>
+                    <td colSpan="5" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>No hay datos para este filtro</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+```
+
+---
+
 ## Archivo: src\pages\DirectorioQT.jsx
 
 ```javascript
@@ -194911,7 +198622,7 @@ import {
   TrendingUp, Users, ArrowLeft, RefreshCw, CheckCircle2, 
   AlertCircle, ChevronRight, Filter, ShieldCheck, DollarSign, 
   PhoneCall, Award, Compass, Zap, Layers, BarChart3, Database,
-  Copy, Check, BookOpen
+  Copy, Check
 } from 'lucide-react';
 import { OPERATIONAL_SEDES } from '../data/usersData';
 
@@ -195138,8 +198849,7 @@ export default function EmbudoConversionBoard() {
           { id: 'tabla_sql', label: '🗄️ Vista Relacional SQL (En Vivo)', icon: Database },
           { id: 'coordinacion', label: '📞 Blitz de Coordinación', icon: PhoneCall },
           { id: 'integridad', label: '🛡️ Integridad y Caja', icon: ShieldCheck },
-          { id: 'brandscript', label: '📜 BrandScript & Guiones MJ', icon: BookOpen }
-        ].map(tab => {
+                  ].map(tab => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
           return (
@@ -195542,227 +199252,9 @@ export default function EmbudoConversionBoard() {
         </div>
       )}
 
-      {/* PESTAÑA DE BRANDSCRIPT Y GUIONES MJ */}
-      {activeTab === 'brandscript' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          
-          {/* Header del Manual */}
-          <div style={{ background: bgCard, padding: '1.5rem', borderRadius: '12px', border: `1px solid ${borderCard}`, borderLeft: `5px solid ${gold}` }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-              <div>
-                <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: gold, background: '#78350f33', padding: '0.2rem 0.6rem', borderRadius: '4px', textTransform: 'uppercase' }}>
-                  Manual Oficial de Enrolamiento Narrativo — Edición V1.0 (2026)
-                </span>
-                <h3 style={{ margin: '0.5rem 0 0.2rem', fontSize: '1.3rem', color: textLight }}>
-                  BrandScript SB7 & Guiones de Conversión para Maestría del Juego (MJ)
-                </h3>
-                <p style={{ margin: 0, color: textMuted, fontSize: '0.85rem' }}>
-                  Alineación de Mánagers y Capitanes bajo el StoryBrand Framework y Neuromarketing Ético. Cero manipulación, 100% libre elección y fisionomía de Creador.
-                </p>
-              </div>
-
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <a
-                  href="https://cpsl-campus-interactivo.vercel.app/guiones-mj"
-                  target="_blank"
-                  rel="noreferrer"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.4rem',
-                    background: '#10b98122',
-                    color: '#34d399',
-                    border: '1px solid #10b981',
-                    padding: '0.5rem 1rem',
-                    borderRadius: '8px',
-                    fontSize: '0.85rem',
-                    fontWeight: 'bold',
-                    textDecoration: 'none'
-                  }}
-                >
-                  🚀 Abrir Simulador Interactivo Completo
-                </a>
-              </div>
-            </div>
           </div>
-
-          {/* MATRIZ SB7-MJ */}
-          <div style={{ background: bgCard, padding: '1.5rem', borderRadius: '12px', border: `1px solid ${borderCard}` }}>
-            <h4 style={{ margin: '0 0 1rem 0', color: gold, fontSize: '1.1rem' }}>
-              🗺️ Matriz del BrandScript Oficial (SB7-MJ)
-            </h4>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
-              {[
-                { title: '1. El Personaje (El Héroe)', desc: 'Graduado de C2: un líder que despertó su poder en sala y busca materializarlo en su vida cotidiana.', border: '#3b82f6' },
-                { title: '2. Tiene un Problema (El Efecto Lunes)', desc: 'Externo (entorno inercial), Interno (miedo al auto-sabotaje y soledad), Filosófico (inaceptable volver a vivir promedio).', border: '#ef4444' },
-                { title: '3. Encuentra un Guía', desc: 'El Mánager + Nodus: mentor empático que ya recorrió los 90 días, con autoridad técnica en telemetría.', border: '#8b5cf6' },
-                { title: '4. Que le da un Plan de 3 Pasos', desc: '1) Declara tu Futuro Imposible (FI), 2) Entrena en Integridad (28 entrenamientos), 3) Conquista El Viaje y gradúate en Gratitud.', border: '#10b981' },
-                { title: '5. Y lo llama a la Acción', desc: 'CTA Directo: registro dominical en Nodus. CTA Transicional: sesión de calibración de FI de 15 minutos.', border: gold },
-                { title: '6. Que evita el Fracaso', desc: 'Evitar el marchitamiento de la palabra y caer de vuelta en «la arena» de la víctima perdiendo su Breakthrough.', border: '#ec4899' },
-                { title: '7. Y termina en Éxito', desc: 'Convertirse en un Líder IMO: coherencia, abundancia integral física, emocional y financiera.', border: '#eab308' },
-              ].map((item, idx) => (
-                <div key={idx} style={{ background: bgSurface, padding: '1rem', borderRadius: '8px', borderLeft: `4px solid ${item.border}` }}>
-                  <strong style={{ color: item.border, display: 'block', fontSize: '0.9rem', marginBottom: '0.3rem' }}>{item.title}</strong>
-                  <p style={{ margin: 0, fontSize: '0.85rem', color: textMuted, lineHeight: '1.5' }}>{item.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* GUIONES TELEFÓNICOS CON COPIA 1-CLICK */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '1.5rem' }}>
-            
-            {/* Escenario A */}
-            <div style={{ background: bgCard, padding: '1.5rem', borderRadius: '12px', border: `1px solid ${borderCard}` }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <h4 style={{ margin: 0, color: '#38bdf8', fontSize: '1rem' }}>
-                  📞 Escenario A: Indeciso / Miedo al Efecto Lunes
-                </h4>
-                <button
-                  onClick={() => copyText(`"Hola [Nombre], te saluda [Mánager], tu mánager de soporte. Qué gusto saludarte. Te llamo brevemente, ¿estás en un espacio cómodo de 3 minutos para conversar? Aún vibra en mí el espacio del domingo de Capítulo Dos. Quiero reconocer la fisonomía y la entrega que mostraste en tu Breakthrough. Vi a un creador absoluto en la sala. ¿Cómo se ha sentido apagar el micrófono y regresar a la rutina estos dos días?... Por eso creamos la Maestría del Juego de 90 días. Tu palabra de jueves sigue viva. ¿Eliges sostener tu estiramiento y dar el paso a tu Maestría este fin de semana, o vas a permitir que la inercia del lunes tome las decisiones por ti?"`, 'escA')}
-                  style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', background: bgSurface, border: `1px solid ${borderCard}`, color: textLight, padding: '0.3rem 0.6rem', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer' }}
-                >
-                  {copiedKey === 'escA' ? <Check size={14} color="#10b981" /> : <Copy size={14} />}
-                  {copiedKey === 'escA' ? '¡Copiado!' : 'Copiar Guión'}
-                </button>
-              </div>
-              <div style={{ background: bgSurface, padding: '1rem', borderRadius: '8px', fontSize: '0.85rem', color: textLight, lineHeight: '1.6', fontStyle: 'italic' }}>
-                «Aún vibra en mí el espacio del domingo de Capítulo Dos. Reconozco la fisonomía de creador absoluto que mostraste... El plan es muy sencillo: primero declaramos tu FI, segundo entrenamos en integridad con Nodus, y tercero nos graduamos en Gratitud. ¿Eliges sostener tu estiramiento o vas a permitir que la inercia del lunes decida por ti?»
-              </div>
-            </div>
-
-            {/* Escenario B */}
-            <div style={{ background: bgCard, padding: '1.5rem', borderRadius: '12px', border: `1px solid ${borderCard}` }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <h4 style={{ margin: 0, color: '#34d399', fontSize: '1rem' }}>
-                  💰 Escenario B: Objeción «No tengo dinero»
-                </h4>
-                <button
-                  onClick={() => copyText(`"Reconozco tu honestidad, [Nombre]. Si dejamos la inversión a un lado por un instante... en tu corazón, ¿la Maestría representa un 'sí' rotundo para tu vida, o tienes alguna duda sobre el valor que este entrenamiento aportará a tus metas?... Perfecto. En la cultura de Crear, operamos desde la Causa: el dinero es una circunstancia a diseñar, no un límite inamovible. Si la Plataforma Nodus nos permite estructurar un plan de abono de bajo riesgo y pasos progresivos que se adapte a tus flujos actuales, ¿qué opciones ves viables para generar tu primer aporte de reserva antes de que cerremos el registro este viernes?"`, 'escB')}
-                  style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', background: bgSurface, border: `1px solid ${borderCard}`, color: textLight, padding: '0.3rem 0.6rem', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer' }}
-                >
-                  {copiedKey === 'escB' ? <Check size={14} color="#10b981" /> : <Copy size={14} />}
-                  {copiedKey === 'escB' ? '¡Copiado!' : 'Copiar Guión'}
-                </button>
-              </div>
-              <div style={{ background: bgSurface, padding: '1rem', borderRadius: '8px', fontSize: '0.85rem', color: textLight, lineHeight: '1.6', fontStyle: 'italic' }}>
-                «En la cultura de Crear, operamos desde la Causa: si tú eres el creador de tu realidad, el dinero es una circunstancia a diseñar, no un límite inamovible. Si estructuramos un plan de abono de bajo riesgo en Nodus, ¿qué opciones ves viables para tu aporte de reserva este viernes?»
-              </div>
-            </div>
-
-          </div>
-
-          {/* PLANTILLAS DE WHATSAPP OFICIALES */}
-          <div style={{ background: bgCard, padding: '1.5rem', borderRadius: '12px', border: `1px solid ${borderCard}` }}>
-            <h4 style={{ margin: '0 0 1rem 0', color: gold, fontSize: '1.1rem' }}>
-              💬 Plantillas Oficiales de WhatsApp (1-Clic para Copiar)
-            </h4>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '1rem' }}>
-              
-              {/* WhatsApp 1 */}
-              <div style={{ background: bgSurface, padding: '1.2rem', borderRadius: '8px', borderLeft: '3px solid #10b981' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                  <strong style={{ color: '#34d399', fontSize: '0.9rem' }}>Plantilla 1: Bienvenida Post-Graduación C2</strong>
-                  <button
-                    onClick={() => copyText(`¡Felicidades, Creador! 🦅✨
-
-Aún resuena en la sede la fisionomía y la fuerza de tu palabra declarada este fin de semana en Capítulo Dos. Has salido de "la arena" y hoy tienes en tus manos la posibilidad de diseñar tu propio destino.
-
-El lunes ha llegado, y con él, la oportunidad de elegir: ¿volver a la inercia cotidiana o entrenar para consolidar tu Breakthrough?
-
-El equipo de Mánagers y la comunidad de Maestría del Juego ya está lista para recibirte en el contenedor de los 90 días. Tu espacio de estiramiento está guardado.
-
-Paso 1: Ingresa a tu App Nodus 📱
-Paso 2: Agenda tu sesión de calibración de Futuro Imposible (FI) de 15 minutos aquí: [Enlace_Calendly]
-Paso 3: Sostiene tu palabra.
-
-Sostener la fisionomía del Ser es el juego de los grandes. Nos vemos en la cancha.
-
-Atentamente,
-El Equipo de Mánagers y Capitanes de ${selectedSede}
-CREAR PODER SIN LÍMITES 2026.`, 'waPostC2')}
-                    style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', background: '#0b132b', border: `1px solid ${borderCard}`, color: textLight, padding: '0.3rem 0.6rem', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer' }}
-                  >
-                    {copiedKey === 'waPostC2' ? <Check size={14} color="#10b981" /> : <Copy size={14} />}
-                    {copiedKey === 'waPostC2' ? '¡Copiado!' : 'Copiar Texto'}
-                  </button>
-                </div>
-                <div style={{ fontSize: '0.8rem', color: textMuted, whiteSpace: 'pre-line', lineHeight: '1.5' }}>
-                  Principio de «Unidad» de Cialdini. Diseñado para reactivar la emoción del domingo e impulsar el agendamiento del FI de 15 min.
-                </div>
-              </div>
-
-              {/* WhatsApp 2 */}
-              <div style={{ background: bgSurface, padding: '1.2rem', borderRadius: '8px', borderLeft: '3px solid #f59e0b' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                  <strong style={{ color: gold, fontSize: '0.9rem' }}>Plantilla 2: Recordatorio Preventivo (Viernes 12:00 PM)</strong>
-                  <button
-                    onClick={() => copyText(`Hola [Nombre] 👋
-
-Te saludamos desde la oficina de la sede ${selectedSede}. Hoy es viernes de Capítulo Dos, un día clave para cuidar el contenedor de integridad que declaraste el jueves por la noche.
-
-Para asegurar que tu ingreso al bloque de confrontación de las 15:00 PM sea fluido y libre de distracciones logísticas:
-
-📌 Tu estado actual en Nodus requiere conciliación de caja.
-⏰ El cierre automático de registros contables de la plataforma se ejecutará a las 14:00 PM.
-
-Queremos cuidar tu experiencia y tu palabra. Por favor, acércate a la mesa externa de registro antes de la hora límite o envíanos tu comprobante digital por esta vía para validar tu "Ticket Verde" en el sistema.
-
-Si tienes algún quiebre técnico o financiero de última hora, avísanos de inmediato para diseñar juntos una solución de bajo riesgo con el Gerente de Sede antes de que el sistema aplique el bloqueo automático.
-
-¡Sostener tu palabra es tu mayor poder! Nos vemos en sala. 🛡️
-CREAR PODER SIN LÍMITES`, 'waPrev12')}
-                    style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', background: '#0b132b', border: `1px solid ${borderCard}`, color: textLight, padding: '0.3rem 0.6rem', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer' }}
-                  >
-                    {copiedKey === 'waPrev12' ? <Check size={14} color="#10b981" /> : <Copy size={14} />}
-                    {copiedKey === 'waPrev12' ? '¡Copiado!' : 'Copiar Texto'}
-                  </button>
-                </div>
-                <div style={{ fontSize: '0.8rem', color: textMuted, whiteSpace: 'pre-line', lineHeight: '1.5' }}>
-                  Neuromarketing Preventivo. Sustituye la fricción de la penalización de «Palabra Rota» anticipándose al cierre contable de las 14:00 PM.
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-          {/* CHECKLIST DE IMPECABILIDAD */}
-          <div style={{ background: bgCard, padding: '1.5rem', borderRadius: '12px', border: `1px solid ${borderCard}` }}>
-            <h4 style={{ margin: '0 0 0.8rem 0', color: '#a855f7', fontSize: '1.1rem' }}>
-              🛡️ Checklist de Impecabilidad del Enrolador Narrativo
-            </h4>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '0.75rem' }}>
-              <div style={{ background: bgSurface, padding: '0.8rem', borderRadius: '6px', fontSize: '0.82rem' }}>
-                <strong style={{ color: '#ec4899', display: 'block' }}>1. Cero Simpatía al Drama</strong>
-                <span style={{ color: textMuted }}>No comprar justificaciones con lástima; sostenerlo en su grandeza de creador.</span>
-              </div>
-              <div style={{ background: bgSurface, padding: '0.8rem', borderRadius: '6px', fontSize: '0.82rem' }}>
-                <strong style={{ color: '#38bdf8', display: 'block' }}>2. Datos vs. Interpretaciones</strong>
-                <span style={{ color: textMuted }}>Separar los hechos objetivos de las historias basadas en el miedo.</span>
-              </div>
-              <div style={{ background: bgSurface, padding: '0.8rem', borderRadius: '6px', fontSize: '0.82rem' }}>
-                <strong style={{ color: '#10b981', display: 'block' }}>3. Respeto a la Autonomía</strong>
-                <span style={{ color: textMuted }}>Elección voluntaria. Erradicación total de culpa y escasez falsa.</span>
-              </div>
-              <div style={{ background: bgSurface, padding: '0.8rem', borderRadius: '6px', fontSize: '0.82rem' }}>
-                <strong style={{ color: gold, display: 'block' }}>4. Fisionomía de Voz</strong>
-                <span style={{ color: textMuted }}>Postura erguida, tono firme y amoroso; la vibración se transmite.</span>
-              </div>
-              <div style={{ background: bgSurface, padding: '0.8rem', borderRadius: '6px', fontSize: '0.82rem' }}>
-                <strong style={{ color: '#a855f7', display: 'block' }}>5. Trazabilidad en Nodus</strong>
-                <span style={{ color: textMuted }}>Registro limpio de acuerdos de pago y fechas límite para la Gerencia.</span>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      )}
-
-    </div>
   );
 }
-
 ```
 
 ---
@@ -198222,6 +201714,14 @@ const REPORTES_VISIBLE = (u) => Boolean(
 // ============================================================================
 const CAUSA_OPTIONS_REGISTRY = [
   {
+    id: 'opt-brandscript',
+    title: 'BrandScript & Guiones MJ',
+    description: 'Manual Oficial de Enrolamiento Narrativo para Mánagers',
+    icon: FileText,
+    path: '/brandscript',
+    tags: ['guiones', 'brandscript', 'storybrand', 'neuromarketing', 'conversion', 'ventas', 'enrolamiento']
+  },
+  {
     id: 'opt-reporte-relampago',
     title: '⚡ Reporte Relámpago Post-FDS (Gerentes de Sede)',
     category: 'Reportes Operativos',
@@ -198255,6 +201755,17 @@ const CAUSA_OPTIONS_REGISTRY = [
     roles: null
   },
 
+  {
+    id: 'opt-kpis-lima',
+    title: '📊 Dashboard Directivo (Sede Lima)',
+    category: 'Analítica de Sede',
+    badge: 'Nuevo • Lima',
+    emoji: '📈',
+    desc: 'Análisis de efectividad, enrolamiento y calidad de datos operacionales de equipos y coordinadoras de la Sede Lima.',
+    keywords: ['kpi', 'dashboard', 'lima', 'coordinadoras', 'equipos', 'efectividad', 'desertores', 'analisis', 'datos', 'directivo'],
+    route: '/kpis-lima',
+    roles: null
+  },
   {
     id: 'opt-flyer',
     title: 'Generador de Flyers Oficiales',
@@ -198363,6 +201874,17 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Planificación semanal por bloques de tiempo y alineación del equipo',
     keywords: ['agenda', 'time boxing', 'bloques', 'semana', 'calendario equipo'],
     route: '/calendario-equipo',
+    roles: null
+  },
+  {
+    id: 'opt-masterclass-distinciones',
+    title: 'Masterclass: Distinciones de Liderazgo',
+    category: 'Formación',
+    badge: 'Nuevo',
+    emoji: '🌟',
+    desc: '5 Distinciones Cuánticas: Empatía vs Comodidad, Causa vs Efecto, Hecho vs Interpretación, Rigor vs Agresión, Compromiso vs Obligación.',
+    keywords: ['masterclass', 'distinciones', 'liderazgo', 'empatia', 'causa', 'efecto', 'interpretacion', 'rigor', 'agresion', 'compromiso'],
+    route: '/masterclass-distinciones',
     roles: null
   },
   {
@@ -202895,6 +206417,173 @@ export default function ManualNodus() {
 
 ---
 
+## Archivo: src\pages\MasterclassDistinciones.jsx
+
+```javascript
+import React from 'react';
+
+export default function MasterclassDistinciones() {
+  return (
+    <div className="mc-container">
+      <div dangerouslySetInnerHTML={{ __html: `
+      <style>
+        .mc-container { max-width: 1000px; margin: 0 auto; padding: 2rem; color: #e2e8f0; }
+        .mc-h1 { font-size: 2.5rem; font-weight: 900; background: linear-gradient(to right, #60a5fa, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 1.5rem; }
+        .mc-h2 { font-size: 1.75rem; font-weight: 800; border-bottom: 1px solid #374151; padding-bottom: 0.5rem; margin-top: 2rem; margin-bottom: 1rem; color: #818cf8; }
+        .mc-h3 { font-size: 1.25rem; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem; color: #93c5fd; }
+        .mc-p { margin-bottom: 1rem; line-height: 1.6; }
+        .mc-quote { border-left: 4px solid #f59e0b; background: rgba(245, 158, 11, 0.1); padding: 1rem; margin: 1rem 0; border-radius: 0 8px 8px 0; font-style: italic; color: #fcd34d; }
+        .mc-hr { border: none; border-top: 1px solid #374151; margin: 2rem 0; }
+        .mc-li-disc { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 0.5rem; display: list-item; }
+        .mc-li-decimal { list-style-type: decimal; margin-left: 1.5rem; margin-bottom: 0.5rem; font-weight: bold; color: #93c5fd; display: list-item; }
+        .mc-table-container { overflow-x: auto; margin: 1.5rem 0; border: 1px solid #374151; border-radius: 8px; }
+        .mc-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+        .mc-th { padding: 0.75rem; background: #1f2937; text-align: left; font-weight: bold; color: #fff; }
+        .mc-td { padding: 0.75rem; border-top: 1px solid #374151; }
+      </style>
+` }} />
+      <div className="glass-panel p-8 rounded-2xl shadow-xl">
+        <div dangerouslySetInnerHTML={{ __html: `<h1 className="mc-h1">MASTER CLASS: EL ARTE DE LAS DISTINCIONES CUÁNTICAS</h1>
+<h2 className="mc-h2">Saliendo de "La Arena" del Drama hacia el Alto Rendimiento Operativo</h2>
+<h3 className="mc-h3">GUÍA MAGISTRAL DE ENSEÑANZA AUTÓNOMA Y APLICACIÓN EN SALA (EDICIÓN 2026)</h3>
+
+<p className="mc-p">Bienvenido a la <strong>Master Class definitiva de Liderazgo Ontológico y Operativo de Causa OS</strong>. </p>
+
+<p className="mc-p">En la vida cotidiana, las personas vivimos en una "sopa mental" donde todo está mezclado: los hechos se confunden con nuestras opiniones, el amor se confunde con la complacencia, y nuestras metas se confunden con obligaciones pesadas. Esta falta de claridad es la fuente de toda inercia, mediocridad y drama.</p>
+
+<p className="mc-p">Las <strong>Distinciones</strong> son el bisturí del líder. Distinguir no es clasificar teóricamente; es aprender a ver lo que antes era invisible para poder tomar acciones con un nivel de poder y efectividad completamente nuevo.</p>
+
+<p className="mc-p">Esta guía está diseñada para que tú, de forma autónoma o entrenando a tu equipo en el grounding, domines las <strong>5 Distinciones Fundamentales</strong> que sostienen la fisonomía y la magia de nuestra organización. Cada módulo incluye explicaciones divertidas, analogías en plastilina y guiones listos para la cancha.</p>
+
+<hr className="mc-hr" />
+
+<h2 className="mc-h2">TABLA MAESTRA DE CALIBRACIÓN</h2>
+
+<div className="mc-table-container"><table className="mc-table">
+<thead><tr><th className="mc-th">Distinción</th><th className="mc-th">El Lado Oscuro (Inercia / Reacción)</th><th className="mc-th">El Camino del Líder (Diseño / Poder)</th><th className="mc-th">El Impacto en Sala / Nodus</th></tr></thead><tbody>
+<tr><td className="mc-td">:<hr className="mc-hr" /></td><td className="mc-td">:<hr className="mc-hr" /></td><td className="mc-td">:<hr className="mc-hr" /></td><td className="mc-td">:<hr className="mc-hr" /></td></tr>
+<tr><td className="mc-td"><strong>1. Empatía vs. Comodidad</strong></td><td className="mc-td"><strong>Comodidad (Sympathy):</strong> Validar la excusa, tratar al participante como débil y relajar el estándar para evitar la tensión.</td><td className="mc-td"><strong>Empatía Radical:</strong> Validar la emoción de la persona pero sostener con rigor el estándar, viéndola desde su grandeza.</td><td className="mc-td">Protege el estándar financiero (Ticket Verde) y la fisonomía de sala.</td></tr>
+<tr><td className="mc-td"><strong>2. Causa vs. Efecto</strong></td><td className="mc-td"><strong>Efecto (Espectador):</strong> Vivir en la queja, justificar los malos resultados con factores externos y entrar en el drama.</td><td className="mc-td"><strong>Causa (Creador):</strong> Asumirse como la fuente absoluta de los resultados y responder con impecabilidad ante el quiebre.</td><td className="mc-td">Auditoría de KPIs impecable en Nodus. El staff adueñado de sus números.</td></tr>
+<tr><td className="mc-td"><strong>3. Hecho vs. Interpretación</strong></td><td className="mc-td"><strong>Interpretación (Netflix):</strong> Crear telenovelas mentales, suposiciones, drama personal y justificaciones subjetivas.</td><td className="mc-td"><strong>Hecho (Dato Duro):</strong> Información fría, medible, inmutable y libre de juicios u opiniones personales.</td><td className="mc-td">Reportes de Gerencia de Sede objetivos, cargados con datos limpios de la base de datos.</td></tr>
+<tr><td className="mc-td"><strong>4. Rigor vs. Agresión</strong></td><td className="mc-td"><strong>Agresión (El Látigo):</strong> Imponer control desde el ego, humillar, forzar o atacar la identidad del participante.</td><td className="mc-td"><strong>Rigor (El Contenedor):</strong> Sostener las reglas del juego con total neutralidad y amor, cuidando la dignidad del ser.</td><td className="mc-td">Sostiene la fisonomía visual, el código de vestimenta y la seguridad psicológica.</td></tr>
+<tr><td className="mc-td"><strong>5. Compromiso vs. Obligación</strong></td><td className="mc-td"><strong>Obligación (La Carga):</strong> Operar bajo el "tengo que", el sacrificio y la resistencia biológica ("tratar de").</td><td className="mc-td"><strong>Compromiso (La Elección):</strong> Diseñar acciones por elección voluntaria, guiados por el propósito profundo.</td><td className="mc-td">Enrolamiento fluido hacia Maestría del Juego (MJ) desde el domingo de cierre.</td></tr>
+</tbody></table></div>
+
+<hr className="mc-hr" />
+
+<h2 className="mc-h2">MODULE 1: EMPATÍA RADICAL vs. COMODIDAD (Pobrecititis-Aguda)</h2>
+
+<h3 className="mc-h3">La Analogía del Náufrago 🌊</h3>
+<p className="mc-p">Imagina que vas en un barco y ves a una persona ahogándose en el océano de su drama cotidiano. </p>
+<li className="mc-li-disc"><strong>Si actúas desde la Comodidad (Sympathy/Complacencia):</strong> Te da tanta pena su situación que te lanzas al agua a llorar con ella. Ahora hay dos personas ahogándose, el estándar del barco quedó abandonado y nadie se salvó.</li>
+<li className="mc-li-disc"><strong>Si actúas desde la Empatía Radical:</strong> Le lanzas un salvavidas de alta resistencia, te afirmas con fuerza en la cubierta y sostienes la cuerda con rigor inquebrantable. Validando su miedo, la guías paso a paso para que ella misma nade y suba a bordo.</li>
+
+<h3 className="mc-h3">En la Cancha de la Sala: El Caso del Gafete Olvidado</h3>
+<li className="mc-li-disc">❌ <strong>Fisonomía desde la Comodidad:</strong> </li>
+<p className="mc-p">    > <em>"Ay, entiendo perfectamente, Andrés. El tráfico de Lima el sábado por la mañana es una locura y salir corriendo de casa hace que a cualquiera se le olvide el gafete. Pasa nomás al salón, yo te cubro con el coordinador para que no te llame la atención."</em></p>
+<p className="mc-p">    <em>   </em>El error ontológico:* Trataste a Andrés como débil, rompiste el código de identidad de la sede por evitar una conversación difícil y le enseñaste que las reglas son flexibles ante sus explicaciones.</p>
+<li className="mc-li-disc">✅ <strong>Fisonomía desde la Empatía Radical:</strong> </li>
+<p className="mc-p">    > <em>"Andrés, comprendo perfectamente el nivel de estrés que genera lidiar con el tráfico de la mañana y reconozco tu gran esfuerzo por llegar a tiempo al grounding. El hecho en la sede es que portar el gafete es nuestro estándar innegociable de presencia y autoridad visual. Para cuidar tu fisonomía y el contenedor del equipo, te pido que adquieras un gafete provisional en la mesa de control antes de ingresar al salón de entrenamiento. ¿Te apoyo con el registro rápido?"</em></p>
+<p className="mc-p">    <em>   </em>El poder de la distinción:* Validaste la emoción del estrés (empatía), pero sostuviste la regla visual de fisonomía sin titubeos (rigor), moviendo al staff a resolver de forma inmediata.</p>
+
+<hr className="mc-hr" />
+
+<h2 className="mc-h2">MODULE 2: CAUSA vs. EFECTO (El Jugador vs. El Hincha de Tribuna)</h2>
+
+<h3 className="mc-h3">La Analogía del Estadio de Fútbol ⚽</h3>
+<em>   <strong>Vivir en Efecto (El Hincha de Tribuna):</strong> Está sentado en la comodidad de la grada. No corre, no suda, no tiene riesgo físico. Sin embargo, grita, se queja, culpa al árbitro del mal clima, maldice al director técnico y justifica la derrota diciendo: </em>"Perdimos porque la cancha estaba húmeda"*. Es una víctima pasiva de las circunstancias.
+<li className="mc-li-disc"><strong>Vivir en Causa (El Jugador en la Cancha):</strong> Está en la arena del juego. Corre bajo la lluvia, recibe golpes y se estira por el balón. Si la cancha está húmeda, no se queja; se cambia los tacos de los tenis por unos de mayor agarre. Sabe que él es la fuente del marcador. Si el resultado no es el esperado, se asume como responsable y redefine la estrategia.</li>
+
+<h3 className="mc-h3">En la Cancha de la Sala: El Caso de las Llamadas de Conversión</h3>
+<li className="mc-li-disc">❌ <strong>Fisonomía desde el Efecto (La Justificación):</strong> </li>
+<p className="mc-p">    > <em>"Es que la base de datos que me pasó la oficina de Cuenca estaba desactualizada, los teléfonos daban error de red y la gente no contesta porque el fin de semana largo de feriado los tiene desconectados. Por eso mis mánagers no pudieron agendar las calibraciones."</em></p>
+<p className="mc-p">    <em>   </em>El error ontológico:* Pusiste la fuente del resultado en el exterior (los teléfonos, el feriado, la oficina). Te convertiste en espectador y declaraste tu impotencia ante el quiebre.</p>
+<li className="mc-li-disc">✅ <strong>Fisonomía desde la Causa (La Fuente):</strong> </li>
+<p className="mc-p">    > <em>"El hecho objetivo en la plataforma Nodus es que registramos un 40% de llamadas contestadas. Sabiendo que soy la fuente absoluta del enrolamiento de mi equipo y que el feriado era una variable conocida, asumo que no diseñé un guion alternativo de WhatsApp de alto impacto para romper el filtro de red. En este momento estoy abriendo una sesión de calibración de emergencia con los mánagers para reescribir la invitación de 3 pasos y asegurar que las metas de la sede queden saldadas hoy a las 18:00 PM."</em></p>
+<p className="mc-p">    <em>   </em>El poder de la distinción:* El líder deja de quejarse de la cancha, se asume como causa creadora del resultado y acciona de inmediato con su fisonomía de poder.</p>
+
+<hr className="mc-hr" />
+
+<h2 className="mc-h2">MODULE 3: HECHO vs. INTERPRETACIÓN (Dato Nodus vs. Telenovela Mental)</h2>
+
+<h3 className="mc-h3">La Analogía de la Sopa de Verduras 🍲</h3>
+<p className="mc-p">Imagina una sopa donde los fideos, la zanahoria y el caldo están completamente mezclados. Eso es lo que ocurre en tu mente cuando no separas los Hechos de las Interpretaciones.</p>
+<li className="mc-li-disc"><strong>Los Hechos</strong> son como las verduras crudas antes de entrar a la olla: sólidos, fríos, medibles e indiscutibles ante un juez (ej. la cuenta bancaria registra $0.00 dólares de abono de Juan Torres).</li>
+<em>   <strong>Las Interpretaciones</strong> son el caldo sazonado: es la historia sazonada que tu ego le añade al hecho para justificar el miedo, la rabia o la flojera (ej. </em>"Juan Torres nos está mintiendo, no tiene compromiso, se está burlando del staff y seguro ya se gastó la matrícula"*). 
+
+<p className="mc-p">Las telenovelas mentales consumen el 90% de la energía de una oficina. Causa OS funciona únicamente con datos crudos.</p>
+
+<h3 className="mc-h3">En la Cancha de la Sala: El Caso del Pago Retrasado (Viernes 14:15 PM)</h3>
+<li className="mc-li-disc">❌ <strong>Fisonomía desde la Interpretación:</strong> </li>
+<p className="mc-p">    > <em>"Llamé a la participante María y me di cuenta de que está súper resistente, está en puro drama de escasez y creo que ya no va a tomar el Capítulo Dos porque no quiere estirarse emocionalmente."</em></p>
+<p className="mc-p">    <em>   </em>El error ontológico:* Mezclaste suposición personal con realidad objetiva. Hablaste desde tus juicios e hipótesis, anulando la posibilidad de un diagnóstico real.</p>
+<li className="mc-li-disc">✅ <strong>Fisonomía desde el Hecho (Rigor de Nodus):</strong> </li>
+<p className="mc-p">    > <em>"Llamé a María a las 14:05 PM. Su declaración en la conversación es: 'No cuento con el efectivo en mi cuenta de ahorros en este instante'. El hecho en el sistema es que su casilla de matrícula registra estado 'Pendiente'. Le propuse una alternativa de pago con tarjeta de crédito y su respuesta exacta fue: 'Lo voy a pensar'. Mi acuerdo con ella es llamarla a las 15:00 PM para recibir su decisión definitiva."</em></p>
+<p className="mc-p">    <em>   </em>El poder de la distinción:* Desmantelaste el drama. Presentaste datos limpios y verificables para que la coordinación comercial tome decisiones logísticas inteligentes basadas en hechos objetivos.</p>
+
+<hr className="mc-hr" />
+
+<h2 className="mc-h2">MODULE 4: RIGOR vs. AGRESIÓN (El Sostén del Contenedor vs. El Látigo del Ego)</h2>
+
+<h3 className="mc-h3">La Analogía de las Líneas de la Cancha de Tenis 🎾</h3>
+<li className="mc-li-disc"><strong>La Agresión (El Látigo):</strong> Imagina a un juez de tenis que, cuando un jugador lanza la pelota fuera de la línea, baja de su silla, le grita en la cara, lo insulta y le dice que es un fracasado. Eso es agresión: ataca la identidad del ser humano, genera humillación y destruye el contenedor de seguridad.</li>
+<em>   <strong>El Rigor (El Contenedor):</strong> El juez observa la pelota de manera neutral. Si sale de la línea, simplemente levanta la mano y declara con voz firme y clara: </em>"OUT"*. No hay enojo, no hay drama personal, no hay insultos. Sostiene el límite del juego de forma impecable porque sabe que sin líneas, no hay juego posible. El rigor es el mayor acto de amor y respeto por el juego del participante.
+
+<h3 className="mc-h3">En la Cancha de la Sala: El Aliado con Tenis con Logotipo Blanco</h3>
+<li className="mc-li-disc">❌ <strong>Fisonomía desde la Agresión (Atacar la Identidad):</strong> </li>
+<p className="mc-p">    > <em>"¡Estás rompiendo el estándar de excelencia visual del Quantum Team! Parece que no te importa nada el código de honor de Crear. Quítate esa chompa con logo de inmediato o te vas de la sala."</em></p>
+<p className="mc-p">    <em>   </em>El error ontológico:* Humillaste al voluntario, atacaste su compromiso y sembraste miedo interpersonal, destrozando la seguridad psicológica de tu propio equipo.</p>
+<li className="mc-li-disc">✅ <strong>Fisonomía desde el Rigor (Cuidado del Límite):</strong> </li>
+<p className="mc-p">    > <em>"Sostener nuestra fisonomía de impecabilidad visual es lo que nos da la autoridad moral para guiar al participante hoy. Veo que tu prenda tiene un logotipo visible de marca comercial. Para cuidar nuestro contenedor de neutralidad visual en el salón, te pido que reemplacemos esa prenda por una chompa lisa sin estampados de nuestro baúl de apoyo de la oficina antes de iniciar el grounding. Yo te acompaño a buscarla."</em></p>
+<p className="mc-p">    <em>   </em>El poder de la distinción:* Mantuviste el límite innegociable del código de vestimenta con absoluta firmeza, pero cuidando con total amor y respeto la dignidad y el Ser del voluntario.</p>
+
+<hr className="mc-hr" />
+
+<h2 className="mc-h2">MODULE 5: COMPROMISO vs. OBLIGACIÓN (La Elección del Creador vs. La Camisa de Fuerza)</h2>
+
+<h3 className="mc-h3">La Analogía de la Puerta con Picaporte Único 🚪</h3>
+<p className="mc-p">Imagina una puerta pesada que solo tiene manija y picaporte del <strong>lado de adentro</strong>. Nadie puede empujarla desde afuera para abrirla; solo la persona que está adentro puede elegir girar la manija y abrir el paso de forma voluntaria.</p>
+<li className="mc-li-disc"><strong>La Obligación (El "Tengo que"):</strong> Es cuando intentas empujar la puerta desde afuera a base de fuerza, presión psicológica, culpa o manipulación (falsa escasez de Cialdini). El participante accede por miedo o presión social, sintiéndose en una camisa de fuerza. El lunes por la mañana, la puerta se cierra de golpe por resentimiento de compra.</li>
+<em>   <strong>El Compromiso (El "Elijo"):</strong> Es cuando el enrolador aplica el Círculo Dorado de Sinek. Conecta con el "Por Qué" profundo del participante, haciendo que este decida de forma voluntaria girar el picaporte desde adentro. El participante no dice </em>"Tengo que inscribirme"<em>; dice </em>"Elijo expandir mi liderazgo porque mi familia lo vale"*. Esta decisión es duradera y sostiene su fisonomía de poder durante los 90 días del ciclo.
+
+<h3 className="mc-h3">En la Cancha de la Sala: El Cierre de la Inscripción a MJ el Domingo</h3>
+<li className="mc-li-disc">❌ <strong>Fisonomía desde la Obligación (La Presión):</strong> </li>
+<p className="mc-p">    > <em>"Firma este acuerdo de una vez. Quedan solo dos cupos con descuento y si no te registras hoy, estás demostrando que no te amas a ti mismo y que prefieres quedarte estancado en tu mediocridad."</em></p>
+<p className="mc-p">    <em>   </em>El error ontológico:* Utilizaste la manipulación y la falsa escasez de baja escala. Forzaste la decisión atacando su autoestima, lo que garantiza deserción masiva y un pésimo clima de servicio.</p>
+<li className="mc-li-disc">✅ <strong>Fisonomía desde el Compromiso (La Elección Responsable):</strong> </li>
+<p className="mc-p">    > <em>"Tu visión de libertad financiera que declaraste hoy es gigante. Sostener ese estándar el lunes en tu negocio sin una estructura que te cuide va a requerir de ti un alto nivel de energía. La Maestría de 90 días no es un curso pesado; es el andamiaje digital en Nodus y el equipo de mánagers que protegerán tu visión. Iniciar tu registro en caja hoy es la primera acción física que le demuestra a tu mente que estás eligiendo tu sueño de forma real. ¿Damos de alta tu Ticket Verde de acceso hoy?"</em></p>
+<p className="mc-p">    <em>   </em>El poder de la distinción:* Presentaste la estructura como un soporte de valor para su propio sueño. Sostuviste la invitación con total elegancia y permitiste que el participante abriera de forma voluntaria la puerta de su transformación.</p>
+
+<hr className="mc-hr" />
+
+<h2 className="mc-h2">TALLER DE ALINEACIÓN: LA AUTO-AUDITORÍA DE INTEGRIDAD (Checklist de Grounding)</h2>
+
+<p className="mc-p">Antes de abrir las puertas de la sede o iniciar una jornada de llamadas de conversión, haz que tu equipo se reúna en parejas durante <strong>10 minutos</strong> y se auto-califique con total honestidad bajo este cuestionario de calibración de Causa OS:</p>
+
+<li className="mc-li-decimal"><strong>¿Desde qué fisonomía voy a hablar hoy?</strong> </li>
+<p className="mc-p">    <em>   </em>¿Comodidad y simpatía para 'caer bien' o Empatía Radical para guiar hacia el estiramiento?*</p>
+<li className="mc-li-decimal"><strong>¿Dónde estoy parado ontológicamente en este instante?</strong> </li>
+<p className="mc-p">    <em>   </em>¿En el Efecto (quejándome de la base de datos o el clima) o en la Causa (asumiendo responsabilidad absoluta por cada conversación)?*</p>
+<li className="mc-li-decimal"><strong>¿De qué está hecha mi comunicación comercial?</strong> </li>
+<p className="mc-p">    <em>   </em>¿De Interpretaciones subjetivas y juicios sobre los participantes o de Hechos objetivos y limpios registrados en la plataforma Nodus?*</p>
+<li className="mc-li-decimal"><strong>¿Cómo voy a sostener los límites del salón de entrenamiento hoy?</strong> </li>
+<p className="mc-p">    <em>   </em>¿Desde la Agresión y el control de mi ego o desde el Rigor neutral y amoroso que protege la integridad del juego?*</p>
+<li className="mc-li-decimal"><strong>¿Cómo estoy enrolando al participante hacia su siguiente nivel?</strong> </li>
+<p className="mc-p">    <em>   </em>¿Desde la Obligación y la presión barata o inspirando una Elección voluntaria alineada con su propio 'Para Qué'?*</p>
+
+<hr className="mc-hr" />
+<em>Este documento magistral constituye el estándar educativo para la fisonomía y el lenguaje de las sedes de Crear Poder Sin Límites.</em>
+<em>Generado el 3 de Septiembre de 2026 | Clasificación: CONFIDENCIAL - MANUAL DE ENTRENAMIENTO DE STAFF.</em>
+` }} />
+      </div>
+    </div>
+  );
+}
+
+```
+
+---
+
 ## Archivo: src\pages\MisKPIs.jsx
 
 ```javascript
@@ -204599,7 +208288,7 @@ export default function NodusDataMap() {
 
 ```javascript
 import React, { useState } from 'react';
-import { Mail, CheckCircle2, FileText, Lock, Plus, Search } from 'lucide-react';
+import { Mail, CheckCircle2, FileText, Lock, Plus, Search, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -204615,73 +208304,80 @@ export default function OfficialAgreements() {
   ];
 
   return (
-    <div className="agreements-container p-4 md:p-8 max-w-7xl mx-auto min-h-screen">
-      <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
+    <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto', minHeight: '100vh', color: '#fff' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h1 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-500 flex items-center gap-3">
-            <Mail className="text-purple-400" size={32} />
+          <h1 style={{ fontSize: '2rem', fontWeight: 900, margin: 0, display: 'flex', alignItems: 'center', gap: '10px', color: '#a855f7' }}>
+            <Mail size={32} color="#a855f7" />
             Acuerdos y Trazabilidad (Oficial)
           </h1>
-          <p className="text-gray-400 text-sm mt-1 uppercase tracking-wider font-bold">
+          <p style={{ color: '#9ca3af', fontSize: '0.85rem', marginTop: '5px', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 'bold' }}>
             Lo que no está aquí, no existe. (Sustituto de Correo Interno)
           </p>
         </div>
-        <div className="flex gap-4">
-          <button className="btn-primary flex items-center gap-2 bg-gradient-to-r from-purple-500 to-indigo-600 border-none text-white font-bold px-4 py-2 rounded-xl hover:from-purple-400 hover:to-indigo-500 transition-all shadow-lg shadow-purple-500/25">
+        <div style={{ display: 'flex', gap: '1rem' }}>
+          <button 
+            className="btn-primary" 
+            style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'linear-gradient(135deg, #a855f7, #6366f1)', border: 'none', color: '#fff', padding: '0.6rem 1.2rem', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 15px rgba(168, 85, 247, 0.4)' }}
+          >
             <Plus size={20} /> Nuevo Acuerdo
           </button>
-          <button onClick={() => navigate('/home')} className="btn-secondary">
-            Volver al Home
+          <button 
+            onClick={() => navigate('/home')} 
+            className="btn-secondary"
+            style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', padding: '0.6rem 1.2rem', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
+          >
+            <ArrowLeft size={18} /> Volver al Home
           </button>
         </div>
       </div>
 
-      <div className="glass-panel p-6 border border-gray-800 rounded-2xl mb-8 flex items-center gap-4 shadow-xl">
-        <Search className="text-gray-500" />
+      <div className="glass-panel" style={{ padding: '1rem 1.5rem', borderRadius: '12px', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <Search color="#6b7280" />
         <input 
           type="text"
           placeholder="Buscar por título, autor o categoría..."
-          className="bg-transparent border-none text-white w-full focus:outline-none placeholder-gray-600 font-medium"
+          style={{ background: 'transparent', border: 'none', color: '#fff', width: '100%', outline: 'none', fontSize: '1rem' }}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
         {agreements.map(agr => (
-          <div key={agr.id} className="glass-panel p-6 border border-gray-800 rounded-2xl shadow-xl hover:-translate-y-1 transition-all duration-300 group relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-              <Lock size={64} className="text-purple-400" />
+          <div key={agr.id} className="glass-panel" style={{ padding: '1.5rem', borderRadius: '12px', position: 'relative', overflow: 'hidden', transition: 'transform 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
+            <div style={{ position: 'absolute', top: '10px', right: '10px', opacity: 0.05 }}>
+              <Lock size={64} color="#a855f7" />
             </div>
             
-            <div className="flex items-center justify-between mb-4 relative z-10">
-              <span className="px-3 py-1 bg-purple-900/30 border border-purple-500/30 text-purple-300 text-xs font-bold uppercase tracking-wider rounded-full">
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', position: 'relative', zIndex: 10 }}>
+              <span style={{ padding: '4px 10px', background: 'rgba(168, 85, 247, 0.2)', border: '1px solid rgba(168, 85, 247, 0.4)', color: '#d8b4fe', fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase', borderRadius: '20px' }}>
                 {agr.category}
               </span>
-              <span className="text-xs font-bold text-gray-500">{agr.date}</span>
+              <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#6b7280' }}>{agr.date}</span>
             </div>
 
-            <h3 className="text-xl font-bold text-white mb-2 relative z-10 leading-tight">{agr.title}</h3>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#fff', marginBottom: '0.5rem', position: 'relative', zIndex: 10, lineHeight: 1.3 }}>{agr.title}</h3>
             
-            <div className="flex items-center gap-2 mb-6 relative z-10">
-              <div className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center text-xs font-bold text-white">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1.5rem', position: 'relative', zIndex: 10 }}>
+              <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#374151', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 'bold', color: '#fff' }}>
                 {agr.author.charAt(0)}
               </div>
-              <span className="text-sm font-medium text-gray-400">{agr.author}</span>
+              <span style={{ fontSize: '0.85rem', fontWeight: 500, color: '#9ca3af' }}>{agr.author}</span>
             </div>
 
-            <div className="border-t border-gray-800 pt-4 flex items-center justify-between relative z-10">
-              <div className="flex items-center gap-2">
+            <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', zIndex: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 {agr.status.includes('Aprobado') ? (
-                  <CheckCircle2 className="text-emerald-500" size={18} />
+                  <CheckCircle2 color="#10b981" size={16} />
                 ) : (
-                  <FileText className="text-amber-500" size={18} />
+                  <FileText color="#f59e0b" size={16} />
                 )}
-                <span className={`text-sm font-bold ${agr.status.includes('Aprobado') ? 'text-emerald-400' : 'text-amber-400'}`}>
+                <span style={{ fontSize: '0.85rem', fontWeight: 'bold', color: agr.status.includes('Aprobado') ? '#34d399' : '#fbbf24' }}>
                   {agr.status}
                 </span>
               </div>
-              <button className="text-xs font-bold text-purple-400 hover:text-purple-300 uppercase tracking-wider">
+              <button style={{ background: 'transparent', border: 'none', fontSize: '0.75rem', fontWeight: 'bold', color: '#a855f7', cursor: 'pointer', textTransform: 'uppercase' }}>
                 Ver Documento
               </button>
             </div>

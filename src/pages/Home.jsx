@@ -101,6 +101,14 @@ const REPORTES_VISIBLE = (u) => Boolean(
 // ============================================================================
 const CAUSA_OPTIONS_REGISTRY = [
   {
+    id: 'opt-brandscript',
+    title: 'BrandScript & Guiones MJ',
+    description: 'Manual Oficial de Enrolamiento Narrativo para Mánagers',
+    icon: FileText,
+    path: '/brandscript',
+    tags: ['guiones', 'brandscript', 'storybrand', 'neuromarketing', 'conversion', 'ventas', 'enrolamiento']
+  },
+  {
     id: 'opt-reporte-relampago',
     title: '⚡ Reporte Relámpago Post-FDS (Gerentes de Sede)',
     category: 'Reportes Operativos',
