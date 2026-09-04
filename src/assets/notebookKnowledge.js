@@ -1169,7 +1169,7 @@ Para asegurar la transición exitosa de las sedes operativas internacionales hac
 - **Entrenador / Coach:** Estándar de Elegancia Negra Total (camiseta, camisa o saco de etiqueta negra sin estampados). **Zapatillas deportivas (tenis) de color negro absoluto TOTALMENTE PERMITIDAS** para priorizar la comodidad física y sostener la energía en sala durante jornadas prolongadas.
 - **Aliados:** Viernes: camisa/blusa negra de botones lisa, jean azul índigo liso, calzado cómodo limpio, abrigo negro. Sábado: polo azul índigo o negro de sede y jean negro. Domingo: polo de color del equipo (C2) o azul de sede (C1) y jean azul o negro.
 - **Capitanes:** Formal etiqueta negra jueves y viernes. Sábado: polo negro. Domingo: polo azul sede.
-- **Quantum Team (QT):** Viernes: camisa blanca y jean azul. Sábado: polo plomo/gris QT y jean negro. Domingo: polo azul QT y jean negro.
+- **Quantum Team (QT):** Viernes: traje formal Total Black (saco, camisa negra, pantalón negro). Sábado: polo plomo QT, jean negro, abrigo negro. Domingo: polo azul índigo QT, jean negro, abrigo negro.
 - **Mánagers:** Viernes: traje sastre formal negro. Sábado: polo negro de equipo. Domingo: polo azul o de equipo.
 - **Oficina:** Jueves y viernes etiqueta negra formal. Sáb/Dom polos oficiales y pantalón negro. Diario formal sobrio.
 

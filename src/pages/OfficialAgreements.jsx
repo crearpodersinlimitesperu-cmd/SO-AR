@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, CheckCircle2, FileText, Lock, Plus, Search } from 'lucide-react';
+import { Mail, CheckCircle2, FileText, Lock, Plus, Search, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -15,73 +15,80 @@ export default function OfficialAgreements() {
   ];
 
   return (
-    <div className="agreements-container p-4 md:p-8 max-w-7xl mx-auto min-h-screen">
-      <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
+    <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto', minHeight: '100vh', color: '#fff' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h1 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-500 flex items-center gap-3">
-            <Mail className="text-purple-400" size={32} />
+          <h1 style={{ fontSize: '2rem', fontWeight: 900, margin: 0, display: 'flex', alignItems: 'center', gap: '10px', color: '#a855f7' }}>
+            <Mail size={32} color="#a855f7" />
             Acuerdos y Trazabilidad (Oficial)
           </h1>
-          <p className="text-gray-400 text-sm mt-1 uppercase tracking-wider font-bold">
+          <p style={{ color: '#9ca3af', fontSize: '0.85rem', marginTop: '5px', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 'bold' }}>
             Lo que no está aquí, no existe. (Sustituto de Correo Interno)
           </p>
         </div>
-        <div className="flex gap-4">
-          <button className="btn-primary flex items-center gap-2 bg-gradient-to-r from-purple-500 to-indigo-600 border-none text-white font-bold px-4 py-2 rounded-xl hover:from-purple-400 hover:to-indigo-500 transition-all shadow-lg shadow-purple-500/25">
+        <div style={{ display: 'flex', gap: '1rem' }}>
+          <button 
+            className="btn-primary" 
+            style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'linear-gradient(135deg, #a855f7, #6366f1)', border: 'none', color: '#fff', padding: '0.6rem 1.2rem', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 4px 15px rgba(168, 85, 247, 0.4)' }}
+          >
             <Plus size={20} /> Nuevo Acuerdo
           </button>
-          <button onClick={() => navigate('/home')} className="btn-secondary">
-            Volver al Home
+          <button 
+            onClick={() => navigate('/home')} 
+            className="btn-secondary"
+            style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', padding: '0.6rem 1.2rem', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
+          >
+            <ArrowLeft size={18} /> Volver al Home
           </button>
         </div>
       </div>
 
-      <div className="glass-panel p-6 border border-gray-800 rounded-2xl mb-8 flex items-center gap-4 shadow-xl">
-        <Search className="text-gray-500" />
+      <div className="glass-panel" style={{ padding: '1rem 1.5rem', borderRadius: '12px', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <Search color="#6b7280" />
         <input 
           type="text"
           placeholder="Buscar por título, autor o categoría..."
-          className="bg-transparent border-none text-white w-full focus:outline-none placeholder-gray-600 font-medium"
+          style={{ background: 'transparent', border: 'none', color: '#fff', width: '100%', outline: 'none', fontSize: '1rem' }}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
         {agreements.map(agr => (
-          <div key={agr.id} className="glass-panel p-6 border border-gray-800 rounded-2xl shadow-xl hover:-translate-y-1 transition-all duration-300 group relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-              <Lock size={64} className="text-purple-400" />
+          <div key={agr.id} className="glass-panel" style={{ padding: '1.5rem', borderRadius: '12px', position: 'relative', overflow: 'hidden', transition: 'transform 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
+            <div style={{ position: 'absolute', top: '10px', right: '10px', opacity: 0.05 }}>
+              <Lock size={64} color="#a855f7" />
             </div>
             
-            <div className="flex items-center justify-between mb-4 relative z-10">
-              <span className="px-3 py-1 bg-purple-900/30 border border-purple-500/30 text-purple-300 text-xs font-bold uppercase tracking-wider rounded-full">
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', position: 'relative', zIndex: 10 }}>
+              <span style={{ padding: '4px 10px', background: 'rgba(168, 85, 247, 0.2)', border: '1px solid rgba(168, 85, 247, 0.4)', color: '#d8b4fe', fontSize: '0.75rem', fontWeight: 'bold', textTransform: 'uppercase', borderRadius: '20px' }}>
                 {agr.category}
               </span>
-              <span className="text-xs font-bold text-gray-500">{agr.date}</span>
+              <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#6b7280' }}>{agr.date}</span>
             </div>
 
-            <h3 className="text-xl font-bold text-white mb-2 relative z-10 leading-tight">{agr.title}</h3>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#fff', marginBottom: '0.5rem', position: 'relative', zIndex: 10, lineHeight: 1.3 }}>{agr.title}</h3>
             
-            <div className="flex items-center gap-2 mb-6 relative z-10">
-              <div className="w-6 h-6 rounded-full bg-gray-700 flex items-center justify-center text-xs font-bold text-white">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1.5rem', position: 'relative', zIndex: 10 }}>
+              <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#374151', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 'bold', color: '#fff' }}>
                 {agr.author.charAt(0)}
               </div>
-              <span className="text-sm font-medium text-gray-400">{agr.author}</span>
+              <span style={{ fontSize: '0.85rem', fontWeight: 500, color: '#9ca3af' }}>{agr.author}</span>
             </div>
 
-            <div className="border-t border-gray-800 pt-4 flex items-center justify-between relative z-10">
-              <div className="flex items-center gap-2">
+            <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', zIndex: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 {agr.status.includes('Aprobado') ? (
-                  <CheckCircle2 className="text-emerald-500" size={18} />
+                  <CheckCircle2 color="#10b981" size={16} />
                 ) : (
-                  <FileText className="text-amber-500" size={18} />
+                  <FileText color="#f59e0b" size={16} />
                 )}
-                <span className={`text-sm font-bold ${agr.status.includes('Aprobado') ? 'text-emerald-400' : 'text-amber-400'}`}>
+                <span style={{ fontSize: '0.85rem', fontWeight: 'bold', color: agr.status.includes('Aprobado') ? '#34d399' : '#fbbf24' }}>
                   {agr.status}
                 </span>
               </div>
-              <button className="text-xs font-bold text-purple-400 hover:text-purple-300 uppercase tracking-wider">
+              <button style={{ background: 'transparent', border: 'none', fontSize: '0.75rem', fontWeight: 'bold', color: '#a855f7', cursor: 'pointer', textTransform: 'uppercase' }}>
                 Ver Documento
               </button>
             </div>

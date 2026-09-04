@@ -245,6 +245,17 @@ const CAUSA_OPTIONS_REGISTRY = [
     roles: null
   },
   {
+    id: 'opt-masterclass-distinciones',
+    title: 'Masterclass: Distinciones de Liderazgo',
+    category: 'Formación',
+    badge: 'Nuevo',
+    emoji: '🌟',
+    desc: '5 Distinciones Cuánticas: Empatía vs Comodidad, Causa vs Efecto, Hecho vs Interpretación, Rigor vs Agresión, Compromiso vs Obligación.',
+    keywords: ['masterclass', 'distinciones', 'liderazgo', 'empatia', 'causa', 'efecto', 'interpretacion', 'rigor', 'agresion', 'compromiso'],
+    route: '/masterclass-distinciones',
+    roles: null
+  },
+  {
     id: 'opt-horarios-entrenamientos',
     title: 'Horarios de Entrenamientos y Código de Vestimenta',
     category: 'Operaciones',

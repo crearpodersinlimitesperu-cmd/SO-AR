@@ -133,9 +133,9 @@ export const VESTIMENTA_2026 = {
   },
   qt: {
     rol: "Quantum Team (QT)",
-    viernes: "Camisa blanca y jean azul oscuro.",
-    sabado: "Polo plomo (gris) oficial de QT y jean negro.",
-    domingo: "Polo azul oficial de QT y jean negro."
+    viernes: "Traje formal 'Total Black' (saco, camisa/blusa negra, pantalón de vestir negro).",
+    sabado: "Polo plomo del Quantum Team, jeans negros y abrigo negro.",
+    domingo: "Polo azul índigo del Quantum Team, jeans negros y abrigo negro."
   },
   managers: {
     rol: "Mánagers de Maestría",

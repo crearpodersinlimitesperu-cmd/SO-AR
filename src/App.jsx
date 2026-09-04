@@ -30,6 +30,7 @@ import CalendarioMJ from './pages/CalendarioMJ'
 import GeneradorFlyer from './pages/GeneradorFlyer'
 import MonitorVuelosCartas from './pages/MonitorVuelosCartas'
 import VendeSinVender from './pages/VendeSinVender'
+import MasterclassDistinciones from './pages/MasterclassDistinciones'
 import AICopilot from './components/AICopilot'
 import PromptModal from './components/PromptModal'
 import BirthdayAlert from './components/BirthdayAlert'
@@ -158,6 +159,12 @@ function App() {
             <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'director_maestria', 'superadmin', 'consolidado', 'qt', 'capitan', 'entrenador', 'entrenador_llamadas', 'manager', 'aliado', 'oficina']} requireSuperAdmin={false}>
               <ManualNodus />
             </RoleRoute>
+          } />
+
+          <Route path="/masterclass-distinciones" element={
+            <PrivateRoute>
+              <MasterclassDistinciones />
+            </PrivateRoute>
           } />
 
           <Route path="/roles" element={
