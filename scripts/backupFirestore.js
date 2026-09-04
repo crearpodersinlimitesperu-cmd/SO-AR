@@ -2,27 +2,35 @@ import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
 import zlib from 'zlib';
-import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, getDocs } from 'firebase/firestore';
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import { initializeApp, cert, getApps } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
 
 dotenv.config();
 
-const DEFAULT_KEY = ['AIzaSy', 'AxYg9g2hn7', 'fIGyaI1s', 'jLgVzf9X', 'MQ2B0HI'].join('');
-const DEFAULT_APP_ID = ['1:899912053762:web:', '1b78d6d9fc5471861e231b'].join('');
+let db;
+let projectId = 'centro-operativo-cpsl';
+const saPath = './centro-operativo-cpsl-65ad52160f45.json';
 
-const firebaseConfig = {
-  apiKey: process.env.VITE_FIREBASE_API_KEY || DEFAULT_KEY,
-  authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN || "campus-crear.firebaseapp.com",
-  projectId: process.env.VITE_FIREBASE_PROJECT_ID || "campus-crear",
-  storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET || "campus-crear.firebasestorage.app",
-  messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "899912053762",
-  appId: process.env.VITE_FIREBASE_APP_ID || DEFAULT_APP_ID
-};
+if (fs.existsSync(saPath)) {
+  try {
+    const serviceAccount = JSON.parse(fs.readFileSync(saPath, 'utf8'));
+    projectId = serviceAccount.project_id || projectId;
+    if (!getApps().length) {
+      initializeApp({ credential: cert(serviceAccount) });
+    }
+    db = getFirestore();
+    console.log(`🔐 Autenticado con Service Account en proyecto: ${projectId}`);
+  } catch (e) {
+    console.warn("⚠️ Error leyendo Service Account:", e.message);
+  }
+}
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
+if (!db) {
+  if (!getApps().length) {
+    initializeApp();
+  }
+  db = getFirestore();
+}
 
 const COLLECTIONS_TO_BACKUP = [
   'users',
@@ -35,37 +43,24 @@ const COLLECTIONS_TO_BACKUP = [
   'reports',
   'user_profiles',
   'notifications',
-  'mail'
+  'mail',
+  'qt_directory',
+  'managers_directory',
+  'staff_directory',
+  'mj_calendars'
 ];
-
-async function authenticateIfPossible() {
-  const adminEmail = process.env.ADMIN_EMAIL || process.env.GMAIL_USER;
-  const adminPass = process.env.ADMIN_PASS || process.env.GMAIL_PASS;
-
-  if (adminEmail && adminPass) {
-    try {
-      console.log(`🔐 Intentando autenticación administrativa como: ${adminEmail}...`);
-      await signInWithEmailAndPassword(auth, adminEmail, adminPass);
-      console.log("   ✅ Autenticación exitosa.");
-    } catch (authErr) {
-      console.warn("   ⚠️ No se pudo autenticar vía Email/Password (continuando con permisos por defecto):", authErr.message);
-    }
-  }
-}
 
 async function runBackup() {
   console.log("=================================================");
   console.log("🛡️ INICIANDO AUTO-RESPALDO INMUTABLE DE FIRESTORE");
-  console.log(`📌 Proyecto: ${firebaseConfig.projectId}`);
+  console.log(`📌 Proyecto: ${projectId}`);
   console.log(`⏰ Fecha/Hora: ${new Date().toISOString()}`);
   console.log("=================================================");
-
-  await authenticateIfPossible();
 
   const backupData = {
     version: "2.8.0",
     createdAt: new Date().toISOString(),
-    projectId: firebaseConfig.projectId,
+    projectId: projectId,
     collections: {},
     counts: {}
   };
@@ -75,8 +70,7 @@ async function runBackup() {
   for (const collName of COLLECTIONS_TO_BACKUP) {
     try {
       console.log(`📦 Exportando colección: [${collName}]...`);
-      const collRef = collection(db, collName);
-      const snapshot = await getDocs(collRef);
+      const snapshot = await db.collection(collName).get();
       
       const docsList = [];
       snapshot.forEach(docSnap => {
