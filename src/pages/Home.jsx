@@ -102,11 +102,14 @@ const REPORTES_VISIBLE = (u) => Boolean(
 const CAUSA_OPTIONS_REGISTRY = [
   {
     id: 'opt-brandscript',
-    title: 'BrandScript & Guiones MJ',
-    description: 'Manual Oficial de Enrolamiento Narrativo para Mánagers',
-    icon: FileText,
-    path: '/brandscript',
-    tags: ['guiones', 'brandscript', 'storybrand', 'neuromarketing', 'conversion', 'ventas', 'enrolamiento']
+    title: '📜 BrandScript & Guiones MJ',
+    category: 'Ventas y Enrolamiento',
+    badge: 'Manual Oficial',
+    emoji: '📜',
+    desc: 'Manual Oficial de Enrolamiento Narrativo para Mánagers y Entrenadores.',
+    keywords: ['guiones', 'brandscript', 'storybrand', 'neuromarketing', 'conversion', 'ventas', 'enrolamiento', 'mj'],
+    route: '/brandscript',
+    roles: null
   },
   {
     id: 'opt-reporte-relampago',
@@ -1503,6 +1506,10 @@ export default function Home() {
 
                 <button onClick={() => { setShowToolsDropdown(false); navigate('/vende-sin-vender'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: 'var(--crear-gold)', borderColor: 'rgba(255, 183, 3, 0.4)', background: 'rgba(255, 183, 3, 0.1)', fontWeight: 'bold' }}>
                   📖 Vende Sin Vender (Causa OS)
+                </button>
+
+                <button onClick={() => { setShowToolsDropdown(false); navigate('/brandscript'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#38bdf8', borderColor: 'rgba(56, 189, 248, 0.4)', background: 'rgba(56, 189, 248, 0.1)', fontWeight: 'bold' }}>
+                  📜 BrandScript & Guiones MJ
                 </button>
               </div>
             )}

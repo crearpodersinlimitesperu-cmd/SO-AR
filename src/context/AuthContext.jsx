@@ -1,4 +1,4 @@
-﻿import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { auth } from '../services/firebase';
 import { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'firebase/auth';
 import { collection, query, where, getDocs, doc, getDoc, setDoc, serverTimestamp, addDoc } from 'firebase/firestore';
@@ -224,35 +224,64 @@ export function AuthProvider({ children }) {
       const user = result.user;
       const rawEmail = user.email.trim().toLowerCase();
       
-      // FORZAR USO DE .NET (Excepto para los correos autorizados explicitamente de gmail)
-      const allowedGmails = ['armando.pilacuan@gmail.com', 'gomeznueve@gmail.com', 'emalejodiaz@gmail.com', 'anamonroyt@gmail.com', 'dibrafi@gmail.com', 'fernandomendozaclavijo22@gmail.com', 'marylourdespat@gmail.com', 'direccion@bmbgbrokers.com', 'milacampuzano21@gmail.com'];
-      if (!rawEmail.endsWith('@crearpsl.net') && !allowedGmails.includes(rawEmail)) {
-        // Rechazar acceso
-        await auth.signOut();
-        throw new Error('ACCESO DENEGADO: Por política corporativa, debes iniciar sesión exclusivamente con tu correo corporativo @crearpsl.net');
-      }
+      // FORZAR USO DE .NET (Excepto para los correos autorizados explicitamente de gmail y miembros registrados)
+      const allowedGmails = [
+        'armando.pilacuan@gmail.com', 
+        'gomeznueve@gmail.com', 
+        'emalejodiaz@gmail.com', 
+        'anamonroyt@gmail.com', 
+        'dibrafi@gmail.com', 
+        'fernandomendozaclavijo22@gmail.com', 
+        'marylourdespat@gmail.com', 
+        'direccion@bmbgbrokers.com', 
+        'milacampuzano21@gmail.com',
+        'cardenaslopezgina@gmail.com',
+        'cardenasgina29@gmail.com',
+        'rouz1414@gmail.com',
+        'brunische66@gmail.com'
+      ];
       const normalizedEmail = rawEmail.replace('@crearpsl.com', '@crearpsl.net');
       
-      // Buscar en Firestore con búsqueda progresiva
+      // Buscar en Firestore con búsqueda progresiva (revisando normalized y raw)
       let foundUser = await findUserInFirestore(normalizedEmail);
+      if (!foundUser && rawEmail !== normalizedEmail) {
+        foundUser = await findUserInFirestore(rawEmail);
+      }
 
       // Fallback a directorio de staff migrado
       if (!foundUser) {
         try {
           const staffRef = collection(db, "staff_directory");
           
-          let sq = query(staffRef, where("emails", "array-contains", normalizedEmail));
+          let sq = query(staffRef, where("emails", "array-contains", rawEmail));
           let sSnap = await getDocs(sq);
           if (!sSnap.empty) {
             foundUser = sSnap.docs[0].data();
           } else {
-            sq = query(staffRef, where("email", "==", normalizedEmail));
+            sq = query(staffRef, where("email", "==", rawEmail));
             sSnap = await getDocs(sq);
             if (!sSnap.empty) foundUser = sSnap.docs[0].data();
           }
         } catch (err) {
           console.error("Error consultando staff_directory:", err);
         }
+      }
+
+      // Fallback a directorio de QT
+      if (!foundUser) {
+        try {
+          const qtRef = collection(db, "qt_directory");
+          let qSnap = await getDocs(query(qtRef, where("email", "==", rawEmail)));
+          if (!qSnap.empty) foundUser = qSnap.docs[0].data();
+        } catch (err) {
+          console.error("Error consultando qt_directory:", err);
+        }
+      }
+
+      // Verificación de política: si no es @crearpsl.net, ni está en la lista blanca, ni en Firestore/QT, se rechaza
+      if (!rawEmail.endsWith('@crearpsl.net') && !allowedGmails.includes(rawEmail) && !foundUser) {
+        await auth.signOut();
+        throw new Error('ACCESO DENEGADO: Por política corporativa, debes iniciar sesión exclusivamente con tu correo corporativo @crearpsl.net');
       }
 
       // 🆕 (02/09/2026) Respaldo: catálogo estático usersToImport.js (findUserByAnyEmail).

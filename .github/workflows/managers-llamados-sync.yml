@@ -1,4 +1,4 @@
-﻿name: Managers & Llamados Sheet Sync
+name: Managers & Llamados Sheet Sync
 
 on:
   schedule:
@@ -21,21 +21,20 @@ jobs:
       - name: Install dependencies
         run: npm install --include=optional
 
-      - name: Escribir la llave de la Service Account
-        run: echo "$GOOGLE_SERVICE_ACCOUNT_JSON" > centro-operativo-cpsl-65ad52160f45.json
+      - name: Escribir la llave de la Service Account y Ejecutar Sync
         env:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
-
-      - name: Run Managers & Llamados Sync
-        env:
           VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
           VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
           VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
           VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
           VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
-        run: node sync_managers_llamados.mjs
-
-      - name: Borrar la llave del runner
-        if: always()
-        run: rm -f centro-operativo-cpsl-65ad52160f45.json
+        run: |
+          if [ -z "$GOOGLE_SERVICE_ACCOUNT_JSON" ]; then
+            echo "ℹ️ GOOGLE_SERVICE_ACCOUNT_JSON no está configurado en GitHub Secrets. Sincronización remota omitida."
+            exit 0
+          fi
+          echo "$GOOGLE_SERVICE_ACCOUNT_JSON" > centro-operativo-cpsl-65ad52160f45.json
+          node sync_managers_llamados.mjs
+          rm -f centro-operativo-cpsl-65ad52160f45.json

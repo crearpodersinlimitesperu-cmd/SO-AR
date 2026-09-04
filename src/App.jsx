@@ -25,6 +25,7 @@ import StrategyBoard from './pages/StrategyBoard'
 import OfficialAgreements from './pages/OfficialAgreements'
 import TeamCalendar from './pages/TeamCalendar'
 import EmbudoConversionBoard from './pages/EmbudoConversionBoard'
+import BrandScriptBoard from './pages/BrandScriptBoard'
 import NodusDataMap from './pages/NodusDataMap'
 import CalendarioMJ from './pages/CalendarioMJ'
 import GeneradorFlyer from './pages/GeneradorFlyer'
@@ -274,6 +275,12 @@ function App() {
           <Route path="/embudo-conversion" element={
             <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'entrenador', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coordinador_mj']} requireSuperAdmin={false}>
               <EmbudoConversionBoard />
+            </RoleRoute>
+          } />
+
+          <Route path="/brandscript" element={
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'entrenador', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coordinador_mj', 'qt', 'capitan']} requireSuperAdmin={false}>
+              <BrandScriptBoard />
             </RoleRoute>
           } />
 
