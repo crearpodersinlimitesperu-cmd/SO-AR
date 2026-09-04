@@ -649,9 +649,9 @@ export const USERS_TO_IMPORT = [
     ],
     "sede": "UIO",
     "emails": [
-      "ketherine.aguirre@crearpsl.net"
+      "katherine.aguirre@crearpsl.net"
     ],
-    "email": "ketherine.aguirre@crearpsl.net"
+    "email": "katherine.aguirre@crearpsl.net"
   },
   {
     "id": "staff_santiagoproao",

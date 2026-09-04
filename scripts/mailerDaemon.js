@@ -106,7 +106,7 @@ function buildIcsAttachment(calendarEvent) {
   const lines = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//SO-AR//Causa OS//ES',
+    'PRODID:-//Causa OS//ES',
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
     'BEGIN:VEVENT',
@@ -115,13 +115,13 @@ function buildIcsAttachment(calendarEvent) {
     `DTSTART:${dtStart}`,
     `DTEND:${dtEnd}`,
     `SUMMARY:${escapeIcsText(calendarEvent.title)}`,
-    `DESCRIPTION:${escapeIcsText(calendarEvent.description || 'Tarea de SO-AR — CREAR Poder Sin Límites.')}`,
+    `DESCRIPTION:${escapeIcsText(calendarEvent.description || 'Tarea de Causa OS — CREAR PODER SIN LÍMITES.')}`,
     'STATUS:CONFIRMED',
     'END:VEVENT',
     'END:VCALENDAR'
   ];
   return {
-    filename: 'tarea-so-ar.ics',
+    filename: 'tarea-causa-os.ics',
     content: lines.join('\r\n'),
     contentType: 'text/calendar; charset=utf-8; method=PUBLISH'
   };
@@ -146,23 +146,25 @@ async function processMailDoc(docSnap) {
 
   const validRecipients = [];
   for (const rawTo of rawRecipients) {
-    const to = String(rawTo).toLowerCase().trim();
+    let to = String(rawTo).toLowerCase().trim()
+      .replace('@crearpls.com', '@crearpsl.net')
+      .replace(/ketherine\.aguirre@/g, 'katherine.aguirre@');
     const isCorporate = ['@crearpsl.net', '@crearpsl.com'].some(d => to.endsWith(d));
     if (isCorporate) {
-      validRecipients.push(rawTo);
+      validRecipients.push(to);
       continue;
     }
     try {
       const snap = await db.collection('users').where('emails', 'array-contains', to).get();
       if (snap.empty) {
-        console.warn(`⚠️ Intento de envío a correo no registrado: ${rawTo}`);
+        console.warn(`⚠️ Intento de envío a correo no registrado: ${to}`);
       } else {
-        validRecipients.push(rawTo);
+        validRecipients.push(to);
       }
     } catch (error) {
       console.error("Error validando correo contra la base de datos:", error.message);
       // No bloqueamos el envío por un error de validación (p.ej. Firestore momentáneamente inaccesible).
-      validRecipients.push(rawTo);
+      validRecipients.push(to);
     }
   }
 
@@ -176,20 +178,14 @@ async function processMailDoc(docSnap) {
 
   console.log(`📧 Procesando correo para: ${validRecipients.join(', ')}`);
 
-  const rawHtml = data.message?.html || '<p>Tienes una notificación del sistema SO-AR.</p>';
+  const rawHtml = data.message?.html || '<p>Tienes una notificación del sistema Causa OS.</p>';
   const cleanHtml = sanitizeHtml(rawHtml, {
-    allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img', 'h1', 'h2', 'table', 'tr', 'td', 'th', 'thead', 'tbody', 'div', 'span', 'hr']),
+    allowedTags: ['p', 'b', 'i', 'em', 'strong', 'a', 'h1', 'h2', 'h3', 'ul', 'ol', 'li', 'br', 'hr', 'div', 'span'],
     allowedAttributes: {
-      ...sanitizeHtml.defaults.allowedAttributes,
-      'a': ['href', 'name', 'target', 'style'],
-      'img': ['src', 'alt', 'style'],
+      'a': ['href', 'target', 'style', 'class'],
+      'p': ['style', 'class'],
       'div': ['style', 'class'],
       'span': ['style', 'class'],
-      'table': ['style', 'class', 'border', 'cellpadding', 'cellspacing'],
-      'td': ['style', 'class'],
-      'th': ['style', 'class'],
-      'tr': ['style', 'class'],
-      'p': ['style', 'class'],
       'h1': ['style', 'class'],
       'h2': ['style', 'class'],
       'h3': ['style', 'class']
@@ -197,9 +193,9 @@ async function processMailDoc(docSnap) {
   });
 
   const mailOptions = {
-    from: `"CREAR Poder Sin Límites" <${process.env.GMAIL_SERVER_EMAIL}>`,
+    from: `"CREAR PODER SIN LÍMITES" <${process.env.GMAIL_SERVER_EMAIL}>`,
     to: validRecipients,
-    subject: data.message?.subject || 'Notificación SO-AR — CREAR Poder Sin Límites',
+    subject: data.message?.subject || 'Notificación Causa OS — CREAR PODER SIN LÍMITES',
     html: cleanHtml
   };
 

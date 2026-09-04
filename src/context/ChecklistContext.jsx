@@ -200,8 +200,10 @@ export function ChecklistProvider({ children }) {
       const customId = `custom_${Date.now()}`;
       const taskRef = doc(db, 'tasks', customId);
       
-      // Sanitizar correos para prevenir errores de dominio (ej: crearpls.com -> crearpsl.net)
-      const sanitizeEmail = (e) => (typeof e === 'string' ? e.trim().toLowerCase().replace('@crearpls.com', '@crearpsl.net') : '');
+      // Sanitizar correos para prevenir errores de dominio y ortografía (ej: crearpls.com -> crearpsl.net, ketherine -> katherine)
+      const sanitizeEmail = (e) => (typeof e === 'string' ? e.trim().toLowerCase()
+        .replace('@crearpls.com', '@crearpsl.net')
+        .replace(/ketherine\.aguirre@/gi, 'katherine.aguirre@') : '');
       const cleanData = { ...taskData };
       if (Array.isArray(cleanData.assignedToEmails)) {
         cleanData.assignedToEmails = [...new Set(cleanData.assignedToEmails.map(sanitizeEmail).filter(Boolean))];
@@ -288,7 +290,9 @@ export function ChecklistProvider({ children }) {
       if (!taskSnap.exists()) return false;
       const currentTask = taskSnap.data();
 
-      const sanitizeEmail = (e) => (typeof e === 'string' ? e.trim().toLowerCase().replace('@crearpls.com', '@crearpsl.net') : '');
+      const sanitizeEmail = (e) => (typeof e === 'string' ? e.trim().toLowerCase()
+        .replace('@crearpls.com', '@crearpsl.net')
+        .replace(/ketherine\.aguirre@/gi, 'katherine.aguirre@') : '');
       const cleanUpdatedData = { ...updatedData };
       if (Array.isArray(cleanUpdatedData.assignedToEmails)) {
         cleanUpdatedData.assignedToEmails = [...new Set(cleanUpdatedData.assignedToEmails.map(sanitizeEmail).filter(Boolean))];
