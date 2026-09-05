@@ -1,7 +1,7 @@
 import { FlagIcon, getFlagForSede } from '../utils/flags';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { X, HelpCircle, Mail, Send, CheckCircle2, BookOpen, AlertTriangle, ShieldAlert, HeartPulse, PhoneCall, Zap, ExternalLink } from 'lucide-react';
+import { X, HelpCircle, Mail, Send, CheckCircle2, BookOpen, AlertTriangle, ShieldAlert, HeartPulse, PhoneCall, Zap, ExternalLink, MessageSquare } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import OnboardingTourModal from './OnboardingTourModal';
 import { useAuth } from '../context/AuthContext';
@@ -357,22 +357,24 @@ export default function HelpModal({ isOpen, onClose }) {
                 </div>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                   <a
-                    href={`https://wa.me/593994848037?text=${encodeURIComponent(`Hola Sistemas/Causa OS, soy ${currentUser?.name || 'Usuario'} (${currentUser?.sede || 'Sede'}). Tengo una consulta/reporte: `)}`}
+                    href="https://mail.google.com/chat/u/0/"
                     target="_blank"
                     rel="noreferrer"
                     className="btn-secondary"
-                    style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', display: 'flex', alignItems: 'center', gap: '0.4rem', textDecoration: 'none', color: '#22c55e', borderColor: 'rgba(34,197,94,0.3)' }}
-                    title="Escribir por WhatsApp a Soporte de Sistemas"
+                    style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', display: 'flex', alignItems: 'center', gap: '0.4rem', textDecoration: 'none', color: '#26c6da', borderColor: 'rgba(38,198,218,0.4)', background: 'rgba(0, 172, 193, 0.12)' }}
+                    title="Abrir Google Chat Corporativo (@crearpsl.net)"
                   >
-                    💬 WhatsApp Sistemas
+                    <MessageSquare size={14} color="#26c6da" />
+                    <span>Google Chat</span>
                   </a>
                   <a
                     href={`mailto:sistemas@crearpsl.net,jose.sanchez@crearpsl.net?subject=${encodeURIComponent(`Ticket Causa OS - ${currentUser?.name || 'Usuario'} [${currentUser?.sede || ''}]`)}`}
                     className="btn-secondary"
-                    style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', display: 'flex', alignItems: 'center', gap: '0.4rem', textDecoration: 'none', color: 'var(--crear-gold)', borderColor: 'rgba(212,175,55,0.3)' }}
+                    style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', display: 'flex', alignItems: 'center', gap: '0.4rem', textDecoration: 'none', color: 'var(--crear-gold)', borderColor: 'rgba(212,175,55,0.3)', background: 'rgba(212,175,55,0.08)' }}
                     title="Enviar correo directo"
                   >
-                    ✉️ Correo Directo
+                    <Mail size={14} color="var(--crear-gold)" />
+                    <span>Correo Directo</span>
                   </a>
                 </div>
               </div>
