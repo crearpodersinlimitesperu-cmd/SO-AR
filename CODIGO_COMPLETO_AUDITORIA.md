@@ -77735,7 +77735,7 @@ export const normalizeCoordinator = (name) => {
       "productividadDetalle": "87/627 (14%)",
       "asistieron": 80,
       "tasaEfectividad": 41,
-      "ultConexion": "04/09/2026 15:53",
+      "ultConexion": "04/09/2026 18:40",
       "ultGestion": "15/04/2026 12:48",
       "estados": {
         "confirmado": 260,
@@ -77903,9 +77903,9 @@ export const normalizeCoordinator = (name) => {
       "gestiones": 0,
       "c1": 0,
       "c2": 0,
-      "asignados": 73,
+      "asignados": 75,
       "coberturaPct": 0,
-      "coberturaDetalle": "0/73 (0%)",
+      "coberturaDetalle": "0/75 (0%)",
       "productividadPct": 0,
       "productividadDetalle": "",
       "asistieron": 0,
@@ -81710,7 +81710,7 @@ export const normalizeCoordinator = (name) => {
       "sede": "Lima",
       "coordinadoresCount": 4,
       "gestionesTotal": 5454,
-      "asignadosTotal": 1971,
+      "asignadosTotal": 1973,
       "confirmadosTotal": 2633,
       "noContestaTotal": 1549,
       "porConfirmarTotal": 448,
@@ -81758,7 +81758,7 @@ export const normalizeCoordinator = (name) => {
   "totales": {
     "totalCoordinadores": 30,
     "totalGestiones": 28981,
-    "totalAsignados": 13713,
+    "totalAsignados": 13715,
     "totalConfirmados": 13545,
     "totalNoContesta": 8633,
     "totalPorConfirmar": 2219,
@@ -91400,7 +91400,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51934073078",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "N/A",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -91775,7 +91775,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51934073078",
           "llamada1": "Siguiente",
           "llamada2": "Siguiente",
-          "finDeSemana": "—",
+          "finDeSemana": "N/A",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -92022,7 +92022,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51999699649",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,035.00) (C2 + MJ)"
@@ -92037,7 +92037,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51934073078",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -92052,7 +92052,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51900490075",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,970.00) (C2 + MJ)"
@@ -92067,7 +92067,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51952087914",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,595.00) (C2 + MJ)"
@@ -92127,7 +92127,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51997343209",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -92142,7 +92142,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51934073078",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -92157,7 +92157,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51900490075",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -92172,7 +92172,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "—",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -92187,7 +92187,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "—",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
@@ -92202,7 +92202,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "—",
           "llamada1": "No le Interesa",
           "llamada2": "No Contesta",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 4,035.00) (C2 + MJ)"
@@ -92262,7 +92262,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51993709784",
           "llamada1": "Confirmado",
           "llamada2": "No Contesta",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -92307,7 +92307,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51927101572",
           "llamada1": "Confirmado",
           "llamada2": "No le Interesa",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,595.00) (C2 + MJ)"
@@ -92322,7 +92322,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51916030745",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -92352,7 +92352,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51917980843",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -92367,7 +92367,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51920472661",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -92397,7 +92397,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51999699649",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,035.00) (C2 + MJ)"
@@ -92412,7 +92412,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51934073078",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -92427,7 +92427,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51900490075",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,970.00) (C2 + MJ)"
@@ -92442,7 +92442,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51952087914",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,595.00) (C2 + MJ)"
@@ -92502,7 +92502,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51997343209",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -92517,7 +92517,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51934073078",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -92532,7 +92532,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51900490075",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -92547,7 +92547,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "—",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -92562,7 +92562,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "—",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
@@ -92577,7 +92577,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "—",
           "llamada1": "Por Confirmar",
           "llamada2": "Siguiente",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 4,035.00) (C2 + MJ)"
@@ -92637,7 +92637,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51993709784",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -92682,7 +92682,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51927101572",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,595.00) (C2 + MJ)"
@@ -92697,7 +92697,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51916030745",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -92727,7 +92727,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51917980843",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -92742,7 +92742,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51920472661",
           "llamada1": "—",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -92764,7 +92764,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51959356266",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -92779,7 +92779,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51944760103",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -92794,7 +92794,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51944760103",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -92824,7 +92824,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51976090987",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -92839,7 +92839,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51999940038",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -92854,7 +92854,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51930326809",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -92869,7 +92869,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51963963302",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -92884,7 +92884,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51968367858",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -92899,7 +92899,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51961551852",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -92914,7 +92914,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51920738765",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,470.00) (C2 + MJ)"
@@ -92929,7 +92929,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51952352271",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -92944,7 +92944,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51920408573",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -92959,7 +92959,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51948162114",
           "llamada1": "—",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -92974,7 +92974,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51980496819",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -92989,7 +92989,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51916030745",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -93019,7 +93019,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51976232368",
           "llamada1": "—",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -93034,7 +93034,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51932556726",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -93049,7 +93049,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51989442068",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -93070,6 +93070,36 @@ export const normalizeCoordinator = (name) => {
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
         },
         {
+          "apellidos": "LONGA VELEZ",
+          "nombres": "JEAN PAUL",
+          "nombrePreferido": "JP",
+          "telefono": "+51951201194",
+          "coordinador": "Sin coordinador",
+          "imo": "YUSMELY DESIREE GARCiA LLOVERA",
+          "telefonoImo": "+51921979246",
+          "llamada1": "—",
+          "llamada2": "—",
+          "finDeSemana": "PFD",
+          "asistencia": "—",
+          "desertor": "—",
+          "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
+        },
+        {
+          "apellidos": "LOPEZ LOPEZ",
+          "nombres": "FERNANDO ABEL",
+          "nombrePreferido": "—",
+          "telefono": "+51981237577",
+          "coordinador": "Sin coordinador",
+          "imo": "Sin invitador",
+          "telefonoImo": "—",
+          "llamada1": "—",
+          "llamada2": "—",
+          "finDeSemana": "—",
+          "asistencia": "—",
+          "desertor": "—",
+          "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
+        },
+        {
           "apellidos": "MEJIA DIAZ",
           "nombres": "MANUEL",
           "nombrePreferido": "MANUEL MEJIA",
@@ -93079,7 +93109,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51999056488",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -93089,43 +93119,13 @@ export const normalizeCoordinator = (name) => {
           "nombres": "JORGE",
           "nombrePreferido": "—",
           "telefono": "+51930131755",
-          "coordinador": "Sin coordinador",
+          "coordinador": "LINID",
           "imo": "ROCIO DE LA CRUZ HUAYTALLA",
           "telefonoImo": "+51929406665",
           "llamada1": "No le Interesa",
           "llamada2": "No le Interesa",
           "finDeSemana": "PFD",
           "asistencia": "—",
-          "desertor": "—",
-          "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
-        },
-        {
-          "apellidos": "MORALES MONTECINOS",
-          "nombres": "SILVINA",
-          "nombrePreferido": "SILVINA",
-          "telefono": "+51973335162",
-          "coordinador": "JOYCE",
-          "imo": "Grezia Maria Jolly Vera",
-          "telefonoImo": "+51920738765",
-          "llamada1": "Confirmado",
-          "llamada2": "—",
-          "finDeSemana": "N/A",
-          "asistencia": "Asistió",
-          "desertor": "—",
-          "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
-        },
-        {
-          "apellidos": "PAREJA MADERA",
-          "nombres": "ROY ERNESTO DELIOT",
-          "nombrePreferido": "ROY PAREJA",
-          "telefono": "+51996348443",
-          "coordinador": "DIANA",
-          "imo": "LYLY DAIYU PAREJA MADERA",
-          "telefonoImo": "+51976090987",
-          "llamada1": "Confirmado",
-          "llamada2": "—",
-          "finDeSemana": "N/A",
-          "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
         },
@@ -93139,7 +93139,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51959356266",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -93154,7 +93154,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51944760103",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -93169,7 +93169,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51944760103",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -93199,7 +93199,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51976090987",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -93214,7 +93214,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51999940038",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -93229,7 +93229,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51930326809",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -93244,7 +93244,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51963963302",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -93259,7 +93259,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51968367858",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -93274,7 +93274,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51961551852",
           "llamada1": "Por Confirmar",
           "llamada2": "Siguiente",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -93289,7 +93289,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51920738765",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,470.00) (C2 + MJ)"
@@ -93304,7 +93304,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51952352271",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -93319,7 +93319,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51920408573",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -93334,7 +93334,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51948162114",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -93349,7 +93349,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51980496819",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -93364,7 +93364,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51916030745",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -93394,7 +93394,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51976232368",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "N/A",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -93409,7 +93409,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51932556726",
           "llamada1": "Siguiente",
           "llamada2": "Siguiente",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -93424,7 +93424,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51989442068",
           "llamada1": "Siguiente",
           "llamada2": "Siguiente",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -93445,6 +93445,36 @@ export const normalizeCoordinator = (name) => {
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
         },
         {
+          "apellidos": "LONGA VELEZ",
+          "nombres": "JEAN PAUL",
+          "nombrePreferido": "JP",
+          "telefono": "+51951201194",
+          "coordinador": "Sin coordinador",
+          "imo": "YUSMELY DESIREE GARCiA LLOVERA",
+          "telefonoImo": "+51921979246",
+          "llamada1": "—",
+          "llamada2": "—",
+          "finDeSemana": "PFD",
+          "asistencia": "—",
+          "desertor": "—",
+          "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
+        },
+        {
+          "apellidos": "LOPEZ LOPEZ",
+          "nombres": "FERNANDO ABEL",
+          "nombrePreferido": "—",
+          "telefono": "+51981237577",
+          "coordinador": "Sin coordinador",
+          "imo": "Sin invitador",
+          "telefonoImo": "—",
+          "llamada1": "—",
+          "llamada2": "—",
+          "finDeSemana": "—",
+          "asistencia": "—",
+          "desertor": "—",
+          "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
+        },
+        {
           "apellidos": "MEJIA DIAZ",
           "nombres": "MANUEL",
           "nombrePreferido": "MANUEL MEJIA",
@@ -93454,7 +93484,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51999056488",
           "llamada1": "Siguiente",
           "llamada2": "Siguiente",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -93464,42 +93494,12 @@ export const normalizeCoordinator = (name) => {
           "nombres": "JORGE",
           "nombrePreferido": "—",
           "telefono": "+51930131755",
-          "coordinador": "Sin coordinador",
+          "coordinador": "LINID",
           "imo": "ROCIO DE LA CRUZ HUAYTALLA",
           "telefonoImo": "+51929406665",
           "llamada1": "No Contesta",
           "llamada2": "—",
           "finDeSemana": "PFD",
-          "asistencia": "Asistió",
-          "desertor": "—",
-          "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
-        },
-        {
-          "apellidos": "MORALES MONTECINOS",
-          "nombres": "SILVINA",
-          "nombrePreferido": "SILVINA",
-          "telefono": "+51973335162",
-          "coordinador": "JOYCE",
-          "imo": "Grezia Maria Jolly Vera",
-          "telefonoImo": "+51920738765",
-          "llamada1": "Confirmado",
-          "llamada2": "Confirmado",
-          "finDeSemana": "N/A",
-          "asistencia": "Asistió",
-          "desertor": "—",
-          "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
-        },
-        {
-          "apellidos": "PAREJA MADERA",
-          "nombres": "ROY ERNESTO DELIOT",
-          "nombrePreferido": "ROY PAREJA",
-          "telefono": "+51996348443",
-          "coordinador": "DIANA",
-          "imo": "LYLY DAIYU  PAREJA MADERA",
-          "telefonoImo": "+51976090987",
-          "llamada1": "Confirmado",
-          "llamada2": "Confirmado",
-          "finDeSemana": "N/A",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -98491,13 +98491,13 @@ export const normalizeCoordinator = (name) => {
           },
           {
             "SEDE": "LIMA CICLO 1",
-            "PARTICIPANTES": "3,594",
+            "PARTICIPANTES": "3,596",
             "EQUIPOS ACTIVOS": "3",
             "ENTRENADORES": "6",
             "COORDINADORES": "4",
-            "INGRESOS (FIN DE SEMANA)": "S/. 3,535.00",
-            "PROM. ENROLADOS": "0.1",
-            "EN CERO": "50"
+            "INGRESOS (FIN DE SEMANA)": "S/. 4,545.00",
+            "PROM. ENROLADOS": "0.2",
+            "EN CERO": "61"
           },
           {
             "SEDE": "MEDELLIN",
@@ -98601,8 +98601,8 @@ export const normalizeCoordinator = (name) => {
             "EQUIPO": "EQUIPO 29",
             "SEDE": "LIMA CICLO 1",
             "ENTRENADOR": "LOURDES PATINO",
-            "ETAPA ACTUAL": "PFD",
-            "PARTICIPANTES": "36",
+            "ETAPA ACTUAL": "SFD",
+            "PARTICIPANTES": "24",
             "col_5": "Ver Resultados"
           },
           {
@@ -98610,7 +98610,7 @@ export const normalizeCoordinator = (name) => {
             "SEDE": "LIMA CICLO 1",
             "ENTRENADOR": "ANDRES IDROBO",
             "ETAPA ACTUAL": "PFD",
-            "PARTICIPANTES": "4",
+            "PARTICIPANTES": "37",
             "col_5": "Ver Resultados"
           },
           {
@@ -98883,7 +98883,7 @@ export const normalizeCoordinator = (name) => {
             "EQUIPO": "EQUIPO 29",
             "SEDE": "LIMA CICLO 1",
             "ENTRENADOR": "LOURDES PATINO",
-            "PARTICIPANTES": "224"
+            "PARTICIPANTES": "223"
           },
           {
             "EQUIPO": "EQUIPO 36",
@@ -98907,7 +98907,7 @@ export const normalizeCoordinator = (name) => {
             "EQUIPO": "EQUIPO 30",
             "SEDE": "LIMA CICLO 1",
             "ENTRENADOR": "ANDRES IDROBO",
-            "PARTICIPANTES": "163"
+            "PARTICIPANTES": "166"
           },
           {
             "EQUIPO": "EQUIPO 17",
@@ -99005,7 +99005,7 @@ export const normalizeCoordinator = (name) => {
           },
           {
             "Mes": "Sep 26",
-            "Participantes": "25"
+            "Participantes": "27"
           }
         ]
       },
@@ -99061,7 +99061,7 @@ export const normalizeCoordinator = (name) => {
           },
           {
             "Mes": "Sep 26",
-            "Recaudado": "$ 14,850.00"
+            "Recaudado": "$ 15,860.00"
           }
         ]
       },
@@ -99077,7 +99077,7 @@ export const normalizeCoordinator = (name) => {
           },
           {
             "Sede": "LIMA CICLO 1",
-            "Participantes": "3,594"
+            "Participantes": "3,596"
           },
           {
             "Sede": "Cuenca Ciclo 1",
@@ -99121,7 +99121,7 @@ export const normalizeCoordinator = (name) => {
           },
           {
             "Sede": "LIMA CICLO 1",
-            "Recaudado": "S/. 4,882,793.12"
+            "Recaudado": "S/. 4,883,803.12"
           },
           {
             "Sede": "GUAYAQUIL CICLO 1",
@@ -99137,15 +99137,15 @@ export const normalizeCoordinator = (name) => {
         "rows": [
           {
             "Entrenamiento": "Capítulo 1",
-            "Participantes": "11,060"
+            "Participantes": "11,062"
           },
           {
             "Entrenamiento": "Capítulo 2",
-            "Participantes": "4,039"
+            "Participantes": "4,036"
           },
           {
             "Entrenamiento": "Maestría",
-            "Participantes": "3,279"
+            "Participantes": "3,294"
           }
         ]
       },
@@ -99200,18 +99200,18 @@ export const normalizeCoordinator = (name) => {
     ],
     "cards": [
       "Alcance\n🌐 Global (todas las sedes)\nCuenca Ciclo 1\nGUAYAQUIL CICLO 1\nLIMA CICLO 1\nMEDELLIN\nMÉXICO CICLO 1\nQUITO CICLO 2\nPeríodo (pestaña Analítica)\nÚltimos 3 meses\nÚltimos 6 meses\nÚltimos 12 meses\nÚltimos 24 meses\n Viendo indicadores de TODAS las sedes",
-      "Actividad de Todas las Sedes\nSEDE\tPARTICIPANTES\tEQUIPOS ACTIVOS\tENTRENADORES\tCOORDINADORES\tINGRESOS (FIN DE SEMANA)\tPROM. ENROLADOS\tEN CERO\nCuenca Ciclo 1\t3,529\t3\t7\t6\t$ 0.00\t1.8\t10\nGUAYAQUIL CICLO 1\t2,180\t4\t6\t4\t$ 0.00\t2.5\t11\nLIMA CICLO 1\t3,594\t3\t6\t4\tS/. 3,535.00\t0.1\t50\nMEDELLIN\t126\t4\t4\t0\t$ 0.00\t2.0\t7\nMÉXICO CICLO 1\t623\t3\t2\t1\t$ 0.00\t0.0\t44\nQUITO CICLO 2\t4,751\t6\t6\t7\t$ 510.00\t1.3\t95",
-      "Actividad del Fin de Semana\n21 en curso\nEQUIPO\tSEDE\tENTRENADOR\tETAPA ACTUAL\tPARTICIPANTES\t\nEQUIPO 20\tCuenca Ciclo 1\tANDRES IDROBO\tTFD\t38\tVer Resultados\nEQUIPO 21\tCuenca Ciclo 1\tALONSO SOLARES\tSFD\t46\tVer Resultados\nEQUIPO 22\tCuenca Ciclo 1\tMIKE BOADA\tPFD\t39\tVer Resultados\nEQUIPO 34\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\tTFD\t30\tVer Resultados\nEQUIPO 35\tGUAYAQUIL CICLO 1\tALONSO SOLARES\tSFD\t30\tVer Resultados\nEQUIPO 36\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\tPFD\t25\tVer Resultados\nEQUIPO 28\tLIMA CICLO 1\tALEJANDRO DIAZ\tTFD\t13\tVer Resultados\nEQUIPO 29\tLIMA CICLO 1\tLOURDES PATINO\tPFD\t36\tVer Resultados\nEQUIPO 30\tLIMA CICLO 1\tANDRES IDROBO\tPFD\t4\tVer Resultados\nEQUIPO 16\tMEDELLIN\tFERNANDO ARAGON\tTFD\t16\tVer Resultados\nEQUIPO 17\tMEDELLIN\tLEANDRO BRUNIS\tSFD\t30\tVer Resultados\nEQUIPO 18\tMEDELLIN\tFERNANDO ARAGON\tPFD\t38\tVer Resultados\nEQUIPO 5\tMÉXICO CICLO 1\tNo asignado\tTFD\t23\tVer Resultados\nEQUIPO 6\tMÉXICO CICLO 1\tMAURICIO PEREZ\tSFD\t11\tVer Resultados\nEQUIPO 7\tMÉXICO CICLO 1\tMAURICIO PEREZ\tPFD\t15\tVer Resultados\nEQUIPO 120\tQUITO CICLO 2\tFERNANDO ARAGON\tTFD\t33\tVer Resultados\nEQUIPO 121\tQUITO CICLO 2\tCIRILO MARTINEZ\tTFD\t53\tVer Resultados\nEQUIPO 122\tQUITO CICLO 2\tLEANDRO BRUNIS\tSFD\t38\tVer Resultados\nEQUIPO 123\tQUITO CICLO 2\tCHUY ACOSTA\tSFD\t42\tVer Resultados\nEQUIPO 124\tQUITO CICLO 2\tLEANDRO BRUNIS\tPFD\t21\tVer Resultados\nEQUIPO 125\tQUITO CICLO 2\tANA MONROY\tPFD\t76\tVer Resultados",
-      "Por Entrenamiento\nTotal participantes activos en el alcance: 14,803\nCapítulo 1\n11,060 (75%)\nCapítulo 2\n4,039 (27%)\nMaestría\n3,279 (22%)",
+      "Actividad de Todas las Sedes\nSEDE\tPARTICIPANTES\tEQUIPOS ACTIVOS\tENTRENADORES\tCOORDINADORES\tINGRESOS (FIN DE SEMANA)\tPROM. ENROLADOS\tEN CERO\nCuenca Ciclo 1\t3,529\t3\t7\t6\t$ 0.00\t1.8\t10\nGUAYAQUIL CICLO 1\t2,180\t4\t6\t4\t$ 0.00\t2.5\t11\nLIMA CICLO 1\t3,596\t3\t6\t4\tS/. 4,545.00\t0.2\t61\nMEDELLIN\t126\t4\t4\t0\t$ 0.00\t2.0\t7\nMÉXICO CICLO 1\t623\t3\t2\t1\t$ 0.00\t0.0\t44\nQUITO CICLO 2\t4,751\t6\t6\t7\t$ 510.00\t1.3\t95",
+      "Actividad del Fin de Semana\n21 en curso\nEQUIPO\tSEDE\tENTRENADOR\tETAPA ACTUAL\tPARTICIPANTES\t\nEQUIPO 20\tCuenca Ciclo 1\tANDRES IDROBO\tTFD\t38\tVer Resultados\nEQUIPO 21\tCuenca Ciclo 1\tALONSO SOLARES\tSFD\t46\tVer Resultados\nEQUIPO 22\tCuenca Ciclo 1\tMIKE BOADA\tPFD\t39\tVer Resultados\nEQUIPO 34\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\tTFD\t30\tVer Resultados\nEQUIPO 35\tGUAYAQUIL CICLO 1\tALONSO SOLARES\tSFD\t30\tVer Resultados\nEQUIPO 36\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\tPFD\t25\tVer Resultados\nEQUIPO 28\tLIMA CICLO 1\tALEJANDRO DIAZ\tTFD\t13\tVer Resultados\nEQUIPO 29\tLIMA CICLO 1\tLOURDES PATINO\tSFD\t24\tVer Resultados\nEQUIPO 30\tLIMA CICLO 1\tANDRES IDROBO\tPFD\t37\tVer Resultados\nEQUIPO 16\tMEDELLIN\tFERNANDO ARAGON\tTFD\t16\tVer Resultados\nEQUIPO 17\tMEDELLIN\tLEANDRO BRUNIS\tSFD\t30\tVer Resultados\nEQUIPO 18\tMEDELLIN\tFERNANDO ARAGON\tPFD\t38\tVer Resultados\nEQUIPO 5\tMÉXICO CICLO 1\tNo asignado\tTFD\t23\tVer Resultados\nEQUIPO 6\tMÉXICO CICLO 1\tMAURICIO PEREZ\tSFD\t11\tVer Resultados\nEQUIPO 7\tMÉXICO CICLO 1\tMAURICIO PEREZ\tPFD\t15\tVer Resultados\nEQUIPO 120\tQUITO CICLO 2\tFERNANDO ARAGON\tTFD\t33\tVer Resultados\nEQUIPO 121\tQUITO CICLO 2\tCIRILO MARTINEZ\tTFD\t53\tVer Resultados\nEQUIPO 122\tQUITO CICLO 2\tLEANDRO BRUNIS\tSFD\t38\tVer Resultados\nEQUIPO 123\tQUITO CICLO 2\tCHUY ACOSTA\tSFD\t42\tVer Resultados\nEQUIPO 124\tQUITO CICLO 2\tLEANDRO BRUNIS\tPFD\t21\tVer Resultados\nEQUIPO 125\tQUITO CICLO 2\tANA MONROY\tPFD\t76\tVer Resultados",
+      "Por Entrenamiento\nTotal participantes activos en el alcance: 14,805\nCapítulo 1\n11,062 (75%)\nCapítulo 2\n4,036 (27%)\nMaestría\n3,294 (22%)",
       "Por Entrenador — Carga de Trabajo\nVer Cronograma\nENTRENADOR\tESTADO\tASIGNACIONES\nFERNANDO ARAGON\tActivo\t\n5\n\nLEANDRO BRUNIS\tActivo\t\n4\n\nMAURICIO PEREZ\tActivo\t\n4\n\nALONSO SOLARES\tActivo\t\n2\n\nANDRES IDROBO\tActivo\t\n2\n\nALEJANDRO DIAZ\tActivo\t\n1\n\nANA MONROY\tActivo\t\n1\n\nCHUY ACOSTA\tActivo\t\n1\n\nCIRILO MARTINEZ\tActivo\t\n1\n\nJUAN ANGEL AREOLA\tActivo\t\n1\n\nLOURDES PATINO\tActivo\t\n1\n\nMIKE BOADA\tActivo\t\n1\n\nANDRES GOMEZ\tActivo\tDisponible\nJOSE TORRON\tActivo\tDisponible\nMILDRED MUNOZ\tActivo\tDisponible\nPAUL SOSA\tActivo\tDisponible\nXAVIER VALAREZO\tActivo\tDisponible",
-      "Por Equipo — Equipos en Actividad\nVer todos\nEQUIPO\tSEDE\tENTRENADOR\tPARTICIPANTES\nEQUIPO 123\tQUITO CICLO 2\tCHUY ACOSTA\t424\nEQUIPO 121\tQUITO CICLO 2\tCIRILO MARTINEZ\t364\nEQUIPO 125\tQUITO CICLO 2\tANA MONROY\t348\nEQUIPO 21\tCuenca Ciclo 1\tALONSO SOLARES\t314\nEQUIPO 20\tCuenca Ciclo 1\tANDRES IDROBO\t270\nEQUIPO 124\tQUITO CICLO 2\tLEANDRO BRUNIS\t259\nEQUIPO 18\tMEDELLIN\tFERNANDO ARAGON\t259\nEQUIPO 37\tGUAYAQUIL CICLO 1\tLEANDRO BRUNIS\t257\nEQUIPO 22\tCuenca Ciclo 1\tMIKE BOADA\t253\nEQUIPO 122\tQUITO CICLO 2\tLEANDRO BRUNIS\t240\nEQUIPO 120\tQUITO CICLO 2\tFERNANDO ARAGON\t228\nEQUIPO 29\tLIMA CICLO 1\tLOURDES PATINO\t224\nEQUIPO 36\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\t189\nEQUIPO 28\tLIMA CICLO 1\tALEJANDRO DIAZ\t175\nEQUIPO 35\tGUAYAQUIL CICLO 1\tALONSO SOLARES\t166\nEQUIPO 30\tLIMA CICLO 1\tANDRES IDROBO\t163\nEQUIPO 17\tMEDELLIN\tLEANDRO BRUNIS\t152\nEQUIPO 34\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\t138\nEQUIPO 16\tMEDELLIN\tFERNANDO ARAGON\t123\nEQUIPO 19\tMEDELLIN\tFERNANDO ARAGON\t120\nEQUIPO 7\tMÉXICO CICLO 1\tMAURICIO PEREZ\t87\nEQUIPO 6\tMÉXICO CICLO 1\tMAURICIO PEREZ\t71\nEQUIPO 5\tMÉXICO CICLO 1\tNo asignado\t67",
-      "Registros Recientes\nVer todos\nARIANNA LEON LORENZETTI\nLIMA CICLO 1 · +51 913 499 148\n04/09\nJHAN CARLO AREVALO ASUNCION\nLIMA CICLO 1 · +51 ‪+51 959 727 950\n04/09\nLESLIE DESIREE BRITO GAMEZ\nLIMA CICLO 1 · +51 978449650\n04/09\nBEKER SALVADOR\nLIMA CICLO 1 · +51 901777856\n04/09\nISABEL HUAMAN SOLIS\nLIMA CICLO 1 · +51 947554964\n04/09\nGISELL DENIS SARMI\nLIMA CICLO 1 · +51 951105814\n04/09\nDAVID TINTAYA\nLIMA CICLO 1 · +51 ‪944 399 566‬\n04/09\nEDINSON MUNOZ VILLACORTA\nLIMA CICLO 1 · +51 955029157\n04/09\nJORGE EDIN MUNOZ SERRANO\nLIMA CICLO 1 · +51 922428978\n04/09\nANA LIZ OTAZU MENDOZA\nLIMA CICLO 1 · +51 910550571\n04/09",
-      "Indicadores Financieros\n$ 166,822,137.29\nRecaudado\n$ 802,172.00\nPendiente\n$ 0.00\nDevoluciones\n18,203\nFacturas\nINGRESOS (RECAUDADO) POR SEDE\nMEDELLIN\n$ 98,510,360.00\nQUITO CICLO 2\n$ 33,332,753.58\nCuenca Ciclo 1\n$ 19,446,147.26\nMÉXICO CICLO 1\n$ 9,056,416.15\nLIMA CICLO 1\nS/. 4,882,793.12\nGUAYAQUIL CICLO 1\n$ 933,667.18",
-      "Evolutivo — Participantes Registrados\n          Ver tabla\n        \n        \n          \n          \n            \n              MesParticipantes\n              \n                                Oct 250\n                                Nov 250\n                                Dic 250\n                                Ene 260\n                                Feb 260\n                                Mar 260\n                                Abr 260\n                                May 260\n                                Jun 260\n                                Jul 260\n                                Ago 2614,778\n                                Sep 2625",
-      "Evolutivo — Ingresos Recaudados\n          Ver tabla\n        \n        \n          \n          \n            \n              MesRecaudado\n              \n                                Oct 25$ 2,021,240.01\n                                Nov 25$ 6,151,243.98\n                                Dic 25$ 5,975,511.00\n                                Ene 26$ 1,359,466.97\n                                Feb 26$ 4,204,589.50\n                                Mar 26$ 777,242.00\n                                Abr 26$ 563,945.25\n                                May 26$ 790,147.98\n                                Jun 26$ 523,481.00\n                                Jul 26$ 2,514,286.10\n                                Ago 26$ 111,160,084.65\n                                Sep 26$ 14,850.00",
-      "Comparativo — Participantes por Sede\n          Ver tabla\n        \n        \n          \n          \n            \n              SedeParticipantes\n              \n                                QUITO CICLO 24,751\n                                LIMA CICLO 13,594\n                                Cuenca Ciclo 13,529\n                                GUAYAQUIL CICLO 12,180\n                                MÉXICO CICLO 1623\n                                MEDELLIN126",
-      "Comparativo — Ingresos por Sede\n          Ver tabla\n        \n        \n          \n          \n            \n              SedeRecaudado\n              \n                                MEDELLIN$ 98,510,360.00\n                                QUITO CICLO 2$ 33,332,753.58\n                                Cuenca Ciclo 1$ 19,446,147.26\n                                MÉXICO CICLO 1$ 9,056,416.15\n                                LIMA CICLO 1S/. 4,882,793.12\n                                GUAYAQUIL CICLO 1$ 933,667.18",
-      "Comparativo — Progresión por Entrenamiento\n          Ver tabla\n        \n        \n          \n          \n            \n              EntrenamientoParticipantes\n              \n                                Capítulo 111,060\n                                Capítulo 24,039\n                                Maestría3,279",
+      "Por Equipo — Equipos en Actividad\nVer todos\nEQUIPO\tSEDE\tENTRENADOR\tPARTICIPANTES\nEQUIPO 123\tQUITO CICLO 2\tCHUY ACOSTA\t424\nEQUIPO 121\tQUITO CICLO 2\tCIRILO MARTINEZ\t364\nEQUIPO 125\tQUITO CICLO 2\tANA MONROY\t348\nEQUIPO 21\tCuenca Ciclo 1\tALONSO SOLARES\t314\nEQUIPO 20\tCuenca Ciclo 1\tANDRES IDROBO\t270\nEQUIPO 124\tQUITO CICLO 2\tLEANDRO BRUNIS\t259\nEQUIPO 18\tMEDELLIN\tFERNANDO ARAGON\t259\nEQUIPO 37\tGUAYAQUIL CICLO 1\tLEANDRO BRUNIS\t257\nEQUIPO 22\tCuenca Ciclo 1\tMIKE BOADA\t253\nEQUIPO 122\tQUITO CICLO 2\tLEANDRO BRUNIS\t240\nEQUIPO 120\tQUITO CICLO 2\tFERNANDO ARAGON\t228\nEQUIPO 29\tLIMA CICLO 1\tLOURDES PATINO\t223\nEQUIPO 36\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\t189\nEQUIPO 28\tLIMA CICLO 1\tALEJANDRO DIAZ\t175\nEQUIPO 35\tGUAYAQUIL CICLO 1\tALONSO SOLARES\t166\nEQUIPO 30\tLIMA CICLO 1\tANDRES IDROBO\t166\nEQUIPO 17\tMEDELLIN\tLEANDRO BRUNIS\t152\nEQUIPO 34\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\t138\nEQUIPO 16\tMEDELLIN\tFERNANDO ARAGON\t123\nEQUIPO 19\tMEDELLIN\tFERNANDO ARAGON\t120\nEQUIPO 7\tMÉXICO CICLO 1\tMAURICIO PEREZ\t87\nEQUIPO 6\tMÉXICO CICLO 1\tMAURICIO PEREZ\t71\nEQUIPO 5\tMÉXICO CICLO 1\tNo asignado\t67",
+      "Registros Recientes\nVer todos\nANDREA LABAN TOCTO\nLIMA CICLO 1 · +51 920693474\n04/09\nCINTHYA KARINA BRAVO BELLIDO\nLIMA CICLO 1 · +51 902325122\n04/09\nARIANNA LEON LORENZETTI\nLIMA CICLO 1 · +51 913 499 148\n04/09\nJHAN CARLO AREVALO ASUNCION\nLIMA CICLO 1 · +51 ‪+51 959 727 950\n04/09\nLESLIE DESIREE BRITO GAMEZ\nLIMA CICLO 1 · +51 978449650\n04/09\nBEKER SALVADOR\nLIMA CICLO 1 · +51 901777856\n04/09\nISABEL HUAMAN SOLIS\nLIMA CICLO 1 · +51 947554964\n04/09\nGISELL DENIS SARMI\nLIMA CICLO 1 · +51 951105814\n04/09\nDAVID TINTAYA\nLIMA CICLO 1 · +51 ‪944 399 566‬\n04/09\nEDINSON MUNOZ VILLACORTA\nLIMA CICLO 1 · +51 955029157\n04/09",
+      "Indicadores Financieros\n$ 166,823,147.29\nRecaudado\n$ 802,172.00\nPendiente\n$ 0.00\nDevoluciones\n18,205\nFacturas\nINGRESOS (RECAUDADO) POR SEDE\nMEDELLIN\n$ 98,510,360.00\nQUITO CICLO 2\n$ 33,332,753.58\nCuenca Ciclo 1\n$ 19,446,147.26\nMÉXICO CICLO 1\n$ 9,056,416.15\nLIMA CICLO 1\nS/. 4,883,803.12\nGUAYAQUIL CICLO 1\n$ 933,667.18",
+      "Evolutivo — Participantes Registrados\n          Ver tabla\n        \n        \n          \n          \n            \n              MesParticipantes\n              \n                                Oct 250\n                                Nov 250\n                                Dic 250\n                                Ene 260\n                                Feb 260\n                                Mar 260\n                                Abr 260\n                                May 260\n                                Jun 260\n                                Jul 260\n                                Ago 2614,778\n                                Sep 2627",
+      "Evolutivo — Ingresos Recaudados\n          Ver tabla\n        \n        \n          \n          \n            \n              MesRecaudado\n              \n                                Oct 25$ 2,021,240.01\n                                Nov 25$ 6,151,243.98\n                                Dic 25$ 5,975,511.00\n                                Ene 26$ 1,359,466.97\n                                Feb 26$ 4,204,589.50\n                                Mar 26$ 777,242.00\n                                Abr 26$ 563,945.25\n                                May 26$ 790,147.98\n                                Jun 26$ 523,481.00\n                                Jul 26$ 2,514,286.10\n                                Ago 26$ 111,160,084.65\n                                Sep 26$ 15,860.00",
+      "Comparativo — Participantes por Sede\n          Ver tabla\n        \n        \n          \n          \n            \n              SedeParticipantes\n              \n                                QUITO CICLO 24,751\n                                LIMA CICLO 13,596\n                                Cuenca Ciclo 13,529\n                                GUAYAQUIL CICLO 12,180\n                                MÉXICO CICLO 1623\n                                MEDELLIN126",
+      "Comparativo — Ingresos por Sede\n          Ver tabla\n        \n        \n          \n          \n            \n              SedeRecaudado\n              \n                                MEDELLIN$ 98,510,360.00\n                                QUITO CICLO 2$ 33,332,753.58\n                                Cuenca Ciclo 1$ 19,446,147.26\n                                MÉXICO CICLO 1$ 9,056,416.15\n                                LIMA CICLO 1S/. 4,883,803.12\n                                GUAYAQUIL CICLO 1$ 933,667.18",
+      "Comparativo — Progresión por Entrenamiento\n          Ver tabla\n        \n        \n          \n          \n            \n              EntrenamientoParticipantes\n              \n                                Capítulo 111,062\n                                Capítulo 24,036\n                                Maestría3,294",
       "Comparativo — Carga de Entrenadores (Top 10)\n          Ver tabla\n        \n        \n                    \n          \n            \n              EntrenadorAsignaciones\n              \n                                FERNANDO ARAGON5\n                                LEANDRO BRUNIS4\n                                MAURICIO PEREZ4\n                                ALONSO SOLARES2\n                                ANDRES IDROBO2\n                                ALEJANDRO DIAZ1\n                                ANA MONROY1\n                                CHUY ACOSTA1\n                                CIRILO MARTINEZ1\n                                JUAN ANGEL AREOLA1"
     ]
   }
@@ -126153,28 +126153,28 @@ export const normalizeCoordinator = (name) => {
 ```json
 {
   "robot_token": "NODUS_ROBOT_CPSL_2026_SECRET",
-  "timestamp": "2026-09-04T23:39:59.647Z",
+  "timestamp": "2026-09-05T00:39:50.789Z",
   "fuente": "Sistema Autónomo Multi-Agente Nodus CPSL 2026",
   "usuarioExtraccion": "jsanchez (Super Administrador Global)",
   "totales": {
-    "totalCoordinadores": 22,
+    "totalCoordinadores": 30,
     "totalGestiones": 28981,
-    "totalAsignados": 13616,
+    "totalAsignados": 13715,
     "totalConfirmados": 13545,
     "totalNoContesta": 8633,
     "totalPorConfirmar": 2219,
     "totalSiguiente": 3358,
     "totalNoInteresa": 755,
     "totalAsistieron": 5704,
-    "coberturaPromedio": 87,
-    "productividadPromedio": 21
+    "coberturaPromedio": 64,
+    "productividadPromedio": 15
   },
   "sedes": [
     {
       "sede": "Cuenca",
-      "coordinadoresCount": 4,
+      "coordinadoresCount": 6,
       "gestionesTotal": 918,
-      "asignadosTotal": 3131,
+      "asignadosTotal": 3137,
       "confirmadosTotal": 601,
       "noContestaTotal": 134,
       "porConfirmarTotal": 93,
@@ -126196,9 +126196,9 @@ export const normalizeCoordinator = (name) => {
     },
     {
       "sede": "Lima",
-      "coordinadoresCount": 3,
+      "coordinadoresCount": 4,
       "gestionesTotal": 5454,
-      "asignadosTotal": 1898,
+      "asignadosTotal": 1973,
       "confirmadosTotal": 2633,
       "noContestaTotal": 1549,
       "porConfirmarTotal": 448,
@@ -126208,7 +126208,7 @@ export const normalizeCoordinator = (name) => {
     },
     {
       "sede": "Medellín",
-      "coordinadoresCount": 3,
+      "coordinadoresCount": 4,
       "gestionesTotal": 4599,
       "asignadosTotal": 1415,
       "confirmadosTotal": 2380,
@@ -126232,9 +126232,9 @@ export const normalizeCoordinator = (name) => {
     },
     {
       "sede": "Quito",
-      "coordinadoresCount": 7,
+      "coordinadoresCount": 11,
       "gestionesTotal": 12749,
-      "asignadosTotal": 5128,
+      "asignadosTotal": 5146,
       "confirmadosTotal": 5610,
       "noContestaTotal": 3817,
       "porConfirmarTotal": 1124,
@@ -127528,6 +127528,68 @@ export const normalizeCoordinator = (name) => {
           "asistieron": 1
         }
       ]
+    },
+    {
+      "id": "coord_kerlie_cuenca",
+      "nombre": "KERLIE",
+      "nombreCompleto": "KERLIE",
+      "email": "kerlie@crearpsl.net",
+      "sede": "Cuenca",
+      "ciclo": "Ciclo 1",
+      "rol": "Coordinador C1",
+      "gestiones": 0,
+      "c1": 0,
+      "c2": 0,
+      "asignados": 6,
+      "coberturaPct": 0,
+      "coberturaDetalle": "0/6 (0%)",
+      "productividadPct": 0,
+      "productividadDetalle": "",
+      "asistieron": 0,
+      "tasaEfectividad": 0,
+      "ultConexion": "03/09/2026 12:05",
+      "ultGestion": "—",
+      "estados": {
+        "confirmado": 0,
+        "noContesta": 0,
+        "siguiente": 0,
+        "noInteresa": 0,
+        "porConfirmar": 0,
+        "yaAsistio": 0,
+        "devolucion": 0
+      },
+      "equipos": []
+    },
+    {
+      "id": "coord_contablidad_cuenca",
+      "nombre": "Contablidad",
+      "nombreCompleto": "Contablidad",
+      "email": "contablidad@crearpsl.net",
+      "sede": "Cuenca",
+      "ciclo": "Ciclo 1",
+      "rol": "Coordinador C1",
+      "gestiones": 0,
+      "c1": 0,
+      "c2": 0,
+      "asignados": 0,
+      "coberturaPct": 0,
+      "coberturaDetalle": "",
+      "productividadPct": 0,
+      "productividadDetalle": "",
+      "asistieron": 0,
+      "tasaEfectividad": 0,
+      "ultConexion": "",
+      "ultGestion": "—",
+      "estados": {
+        "confirmado": 0,
+        "noContesta": 0,
+        "siguiente": 0,
+        "noInteresa": 0,
+        "porConfirmar": 0,
+        "yaAsistio": 0,
+        "devolucion": 0
+      },
+      "equipos": []
     },
     {
       "id": "coord_diana_macas_guayaquil",
@@ -129754,7 +129816,7 @@ export const normalizeCoordinator = (name) => {
       "productividadDetalle": "87/627 (14%)",
       "asistieron": 80,
       "tasaEfectividad": 41,
-      "ultConexion": "04/09/2026 15:53",
+      "ultConexion": "04/09/2026 18:40",
       "ultGestion": "15/04/2026 12:48",
       "estados": {
         "confirmado": 260,
@@ -129910,6 +129972,37 @@ export const normalizeCoordinator = (name) => {
           "asistieron": 14
         }
       ]
+    },
+    {
+      "id": "coord_linid_lima",
+      "nombre": "LINID",
+      "nombreCompleto": "LINID",
+      "email": "linid@crearpsl.net",
+      "sede": "Lima",
+      "ciclo": "Ciclo 1",
+      "rol": "Coordinador C1",
+      "gestiones": 0,
+      "c1": 0,
+      "c2": 0,
+      "asignados": 75,
+      "coberturaPct": 0,
+      "coberturaDetalle": "0/75 (0%)",
+      "productividadPct": 0,
+      "productividadDetalle": "",
+      "asistieron": 0,
+      "tasaEfectividad": 0,
+      "ultConexion": "04/09/2026 18:05",
+      "ultGestion": "—",
+      "estados": {
+        "confirmado": 0,
+        "noContesta": 0,
+        "siguiente": 0,
+        "noInteresa": 0,
+        "porConfirmar": 0,
+        "yaAsistio": 0,
+        "devolucion": 0
+      },
+      "equipos": []
     },
     {
       "id": "coord_valentina_rodriguez_medellín",
@@ -130643,6 +130736,37 @@ export const normalizeCoordinator = (name) => {
           "asistieron": 33
         }
       ]
+    },
+    {
+      "id": "coord_mauricio_ramirez_medellín",
+      "nombre": "MAURICIO RAMIREZ",
+      "nombreCompleto": "MAURICIO RAMIREZ",
+      "email": "mauricio.ramirez@crearpsl.net",
+      "sede": "Medellín",
+      "ciclo": "Ciclo 1",
+      "rol": "Coordinador C1",
+      "gestiones": 0,
+      "c1": 0,
+      "c2": 0,
+      "asignados": 0,
+      "coberturaPct": 0,
+      "coberturaDetalle": "",
+      "productividadPct": 0,
+      "productividadDetalle": "",
+      "asistieron": 0,
+      "tasaEfectividad": 0,
+      "ultConexion": "01/09/2026 12:03",
+      "ultGestion": "—",
+      "estados": {
+        "confirmado": 0,
+        "noContesta": 0,
+        "siguiente": 0,
+        "noInteresa": 0,
+        "porConfirmar": 0,
+        "yaAsistio": 0,
+        "devolucion": 0
+      },
+      "equipos": []
     },
     {
       "id": "coord_naomi_méxico",
@@ -131818,6 +131942,68 @@ export const normalizeCoordinator = (name) => {
           "asistieron": 0
         }
       ]
+    },
+    {
+      "id": "coord_sebastian_quito",
+      "nombre": "SEBASTIAN",
+      "nombreCompleto": "SEBASTIAN",
+      "email": "sebastian@crearpsl.net",
+      "sede": "Quito",
+      "ciclo": "Ciclo 1",
+      "rol": "Coordinador C1",
+      "gestiones": 0,
+      "c1": 0,
+      "c2": 0,
+      "asignados": 0,
+      "coberturaPct": 0,
+      "coberturaDetalle": "",
+      "productividadPct": 0,
+      "productividadDetalle": "",
+      "asistieron": 0,
+      "tasaEfectividad": 0,
+      "ultConexion": "",
+      "ultGestion": "—",
+      "estados": {
+        "confirmado": 0,
+        "noContesta": 0,
+        "siguiente": 0,
+        "noInteresa": 0,
+        "porConfirmar": 0,
+        "yaAsistio": 0,
+        "devolucion": 0
+      },
+      "equipos": []
+    },
+    {
+      "id": "coord_karol_quito",
+      "nombre": "KAROL",
+      "nombreCompleto": "KAROL",
+      "email": "karol@crearpsl.net",
+      "sede": "Quito",
+      "ciclo": "Ciclo 1",
+      "rol": "Coordinador C1",
+      "gestiones": 0,
+      "c1": 0,
+      "c2": 0,
+      "asignados": 0,
+      "coberturaPct": 0,
+      "coberturaDetalle": "",
+      "productividadPct": 0,
+      "productividadDetalle": "",
+      "asistieron": 0,
+      "tasaEfectividad": 0,
+      "ultConexion": "",
+      "ultGestion": "—",
+      "estados": {
+        "confirmado": 0,
+        "noContesta": 0,
+        "siguiente": 0,
+        "noInteresa": 0,
+        "porConfirmar": 0,
+        "yaAsistio": 0,
+        "devolucion": 0
+      },
+      "equipos": []
     },
     {
       "id": "coord_karla_quito",
@@ -133512,6 +133698,68 @@ export const normalizeCoordinator = (name) => {
           "asistieron": 1
         }
       ]
+    },
+    {
+      "id": "coord_erika_gavilanes_quito",
+      "nombre": "Erika Gavilanes",
+      "nombreCompleto": "Erika Gavilanes",
+      "email": "erika.gavilanes@crearpsl.net",
+      "sede": "Quito",
+      "ciclo": "Ciclo 2",
+      "rol": "Coordinador C1",
+      "gestiones": 0,
+      "c1": 0,
+      "c2": 0,
+      "asignados": 18,
+      "coberturaPct": 0,
+      "coberturaDetalle": "0/18 (0%)",
+      "productividadPct": 0,
+      "productividadDetalle": "",
+      "asistieron": 0,
+      "tasaEfectividad": 0,
+      "ultConexion": "02/09/2026 10:29",
+      "ultGestion": "—",
+      "estados": {
+        "confirmado": 0,
+        "noContesta": 0,
+        "siguiente": 0,
+        "noInteresa": 0,
+        "porConfirmar": 0,
+        "yaAsistio": 0,
+        "devolucion": 0
+      },
+      "equipos": []
+    },
+    {
+      "id": "coord_entranadors_quito",
+      "nombre": "entranadors",
+      "nombreCompleto": "entranadors",
+      "email": "entranadors@crearpsl.net",
+      "sede": "Quito",
+      "ciclo": "Ciclo 2",
+      "rol": "Coordinador C1",
+      "gestiones": 0,
+      "c1": 0,
+      "c2": 0,
+      "asignados": 0,
+      "coberturaPct": 0,
+      "coberturaDetalle": "",
+      "productividadPct": 0,
+      "productividadDetalle": "",
+      "asistieron": 0,
+      "tasaEfectividad": 0,
+      "ultConexion": "",
+      "ultGestion": "—",
+      "estados": {
+        "confirmado": 0,
+        "noContesta": 0,
+        "siguiente": 0,
+        "noInteresa": 0,
+        "porConfirmar": 0,
+        "yaAsistio": 0,
+        "devolucion": 0
+      },
+      "equipos": []
     }
   ],
   "equiposReporte": [
@@ -143146,7 +143394,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51934073078",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "N/A",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -143521,7 +143769,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51934073078",
           "llamada1": "Siguiente",
           "llamada2": "Siguiente",
-          "finDeSemana": "—",
+          "finDeSemana": "N/A",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -143768,7 +144016,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51999699649",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,035.00) (C2 + MJ)"
@@ -143783,7 +144031,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51934073078",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -143798,7 +144046,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51900490075",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,970.00) (C2 + MJ)"
@@ -143813,7 +144061,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51952087914",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,595.00) (C2 + MJ)"
@@ -143873,7 +144121,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51997343209",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -143888,7 +144136,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51934073078",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -143903,7 +144151,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51900490075",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -143918,7 +144166,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "—",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -143933,7 +144181,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "—",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
@@ -143948,7 +144196,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "—",
           "llamada1": "No le Interesa",
           "llamada2": "No Contesta",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 4,035.00) (C2 + MJ)"
@@ -144008,7 +144256,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51993709784",
           "llamada1": "Confirmado",
           "llamada2": "No Contesta",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -144053,7 +144301,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51927101572",
           "llamada1": "Confirmado",
           "llamada2": "No le Interesa",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,595.00) (C2 + MJ)"
@@ -144068,7 +144316,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51916030745",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -144098,7 +144346,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51917980843",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -144113,7 +144361,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51920472661",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -144143,7 +144391,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51999699649",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,035.00) (C2 + MJ)"
@@ -144158,7 +144406,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51934073078",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -144173,7 +144421,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51900490075",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,970.00) (C2 + MJ)"
@@ -144188,7 +144436,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51952087914",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,595.00) (C2 + MJ)"
@@ -144248,7 +144496,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51997343209",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -144263,7 +144511,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51934073078",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -144278,7 +144526,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51900490075",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -144293,7 +144541,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "—",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -144308,7 +144556,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "—",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
@@ -144323,7 +144571,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "—",
           "llamada1": "Por Confirmar",
           "llamada2": "Siguiente",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 4,035.00) (C2 + MJ)"
@@ -144383,7 +144631,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51993709784",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -144428,7 +144676,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51927101572",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,595.00) (C2 + MJ)"
@@ -144443,7 +144691,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51916030745",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -144473,7 +144721,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51917980843",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -144488,7 +144736,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51920472661",
           "llamada1": "—",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -144510,7 +144758,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51959356266",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -144525,7 +144773,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51944760103",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -144540,7 +144788,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51944760103",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -144570,7 +144818,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51976090987",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -144585,7 +144833,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51999940038",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -144600,7 +144848,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51930326809",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -144615,7 +144863,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51963963302",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -144630,7 +144878,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51968367858",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -144645,7 +144893,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51961551852",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -144660,7 +144908,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51920738765",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,470.00) (C2 + MJ)"
@@ -144675,7 +144923,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51952352271",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -144690,7 +144938,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51920408573",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -144705,7 +144953,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51948162114",
           "llamada1": "—",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -144720,7 +144968,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51980496819",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -144735,7 +144983,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51916030745",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -144765,7 +145013,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51976232368",
           "llamada1": "—",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -144780,7 +145028,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51932556726",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -144795,7 +145043,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51989442068",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -144816,6 +145064,36 @@ export const normalizeCoordinator = (name) => {
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
         },
         {
+          "apellidos": "LONGA VELEZ",
+          "nombres": "JEAN PAUL",
+          "nombrePreferido": "JP",
+          "telefono": "+51951201194",
+          "coordinador": "Sin coordinador",
+          "imo": "YUSMELY DESIREE GARCiA LLOVERA",
+          "telefonoImo": "+51921979246",
+          "llamada1": "—",
+          "llamada2": "—",
+          "finDeSemana": "PFD",
+          "asistencia": "—",
+          "desertor": "—",
+          "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
+        },
+        {
+          "apellidos": "LOPEZ LOPEZ",
+          "nombres": "FERNANDO ABEL",
+          "nombrePreferido": "—",
+          "telefono": "+51981237577",
+          "coordinador": "Sin coordinador",
+          "imo": "Sin invitador",
+          "telefonoImo": "—",
+          "llamada1": "—",
+          "llamada2": "—",
+          "finDeSemana": "—",
+          "asistencia": "—",
+          "desertor": "—",
+          "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
+        },
+        {
           "apellidos": "MEJIA DIAZ",
           "nombres": "MANUEL",
           "nombrePreferido": "MANUEL MEJIA",
@@ -144825,7 +145103,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51999056488",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -144835,43 +145113,13 @@ export const normalizeCoordinator = (name) => {
           "nombres": "JORGE",
           "nombrePreferido": "—",
           "telefono": "+51930131755",
-          "coordinador": "Sin coordinador",
+          "coordinador": "LINID",
           "imo": "ROCIO DE LA CRUZ HUAYTALLA",
           "telefonoImo": "+51929406665",
           "llamada1": "No le Interesa",
           "llamada2": "No le Interesa",
           "finDeSemana": "PFD",
           "asistencia": "—",
-          "desertor": "—",
-          "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
-        },
-        {
-          "apellidos": "MORALES MONTECINOS",
-          "nombres": "SILVINA",
-          "nombrePreferido": "SILVINA",
-          "telefono": "+51973335162",
-          "coordinador": "JOYCE",
-          "imo": "Grezia Maria Jolly Vera",
-          "telefonoImo": "+51920738765",
-          "llamada1": "Confirmado",
-          "llamada2": "—",
-          "finDeSemana": "N/A",
-          "asistencia": "Asistió",
-          "desertor": "—",
-          "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
-        },
-        {
-          "apellidos": "PAREJA MADERA",
-          "nombres": "ROY ERNESTO DELIOT",
-          "nombrePreferido": "ROY PAREJA",
-          "telefono": "+51996348443",
-          "coordinador": "DIANA",
-          "imo": "LYLY DAIYU PAREJA MADERA",
-          "telefonoImo": "+51976090987",
-          "llamada1": "Confirmado",
-          "llamada2": "—",
-          "finDeSemana": "N/A",
-          "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
         },
@@ -144885,7 +145133,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51959356266",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -144900,7 +145148,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51944760103",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -144915,7 +145163,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51944760103",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -144945,7 +145193,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51976090987",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -144960,7 +145208,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51999940038",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -144975,7 +145223,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51930326809",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -144990,7 +145238,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51963963302",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -145005,7 +145253,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51968367858",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -145020,7 +145268,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51961551852",
           "llamada1": "Por Confirmar",
           "llamada2": "Siguiente",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -145035,7 +145283,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51920738765",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,470.00) (C2 + MJ)"
@@ -145050,7 +145298,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51952352271",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -145065,7 +145313,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51920408573",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -145080,7 +145328,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51948162114",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -145095,7 +145343,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51980496819",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -145110,7 +145358,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51916030745",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -145140,7 +145388,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51976232368",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "N/A",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -145155,7 +145403,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51932556726",
           "llamada1": "Siguiente",
           "llamada2": "Siguiente",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -145170,7 +145418,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51989442068",
           "llamada1": "Siguiente",
           "llamada2": "Siguiente",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -145191,6 +145439,36 @@ export const normalizeCoordinator = (name) => {
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
         },
         {
+          "apellidos": "LONGA VELEZ",
+          "nombres": "JEAN PAUL",
+          "nombrePreferido": "JP",
+          "telefono": "+51951201194",
+          "coordinador": "Sin coordinador",
+          "imo": "YUSMELY DESIREE GARCiA LLOVERA",
+          "telefonoImo": "+51921979246",
+          "llamada1": "—",
+          "llamada2": "—",
+          "finDeSemana": "PFD",
+          "asistencia": "—",
+          "desertor": "—",
+          "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
+        },
+        {
+          "apellidos": "LOPEZ LOPEZ",
+          "nombres": "FERNANDO ABEL",
+          "nombrePreferido": "—",
+          "telefono": "+51981237577",
+          "coordinador": "Sin coordinador",
+          "imo": "Sin invitador",
+          "telefonoImo": "—",
+          "llamada1": "—",
+          "llamada2": "—",
+          "finDeSemana": "—",
+          "asistencia": "—",
+          "desertor": "—",
+          "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
+        },
+        {
           "apellidos": "MEJIA DIAZ",
           "nombres": "MANUEL",
           "nombrePreferido": "MANUEL MEJIA",
@@ -145200,7 +145478,7 @@ export const normalizeCoordinator = (name) => {
           "telefonoImo": "+51999056488",
           "llamada1": "Siguiente",
           "llamada2": "Siguiente",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -145210,42 +145488,12 @@ export const normalizeCoordinator = (name) => {
           "nombres": "JORGE",
           "nombrePreferido": "—",
           "telefono": "+51930131755",
-          "coordinador": "Sin coordinador",
+          "coordinador": "LINID",
           "imo": "ROCIO DE LA CRUZ HUAYTALLA",
           "telefonoImo": "+51929406665",
           "llamada1": "No Contesta",
           "llamada2": "—",
           "finDeSemana": "PFD",
-          "asistencia": "Asistió",
-          "desertor": "—",
-          "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
-        },
-        {
-          "apellidos": "MORALES MONTECINOS",
-          "nombres": "SILVINA",
-          "nombrePreferido": "SILVINA",
-          "telefono": "+51973335162",
-          "coordinador": "JOYCE",
-          "imo": "Grezia Maria Jolly Vera",
-          "telefonoImo": "+51920738765",
-          "llamada1": "Confirmado",
-          "llamada2": "Confirmado",
-          "finDeSemana": "N/A",
-          "asistencia": "Asistió",
-          "desertor": "—",
-          "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
-        },
-        {
-          "apellidos": "PAREJA MADERA",
-          "nombres": "ROY ERNESTO DELIOT",
-          "nombrePreferido": "ROY PAREJA",
-          "telefono": "+51996348443",
-          "coordinador": "DIANA",
-          "imo": "LYLY DAIYU  PAREJA MADERA",
-          "telefonoImo": "+51976090987",
-          "llamada1": "Confirmado",
-          "llamada2": "Confirmado",
-          "finDeSemana": "N/A",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -153423,8 +153671,8 @@ export const normalizeCoordinator = (name) => {
           ]
         },
         {
-          "header": "LEYLA LIMA CICLO 1\nÚlt. conexión: 04/09/2026 15:53",
-          "fullText": "LEYLA LIMA CICLO 1\nÚlt. conexión: 04/09/2026 15:53\n627\nGestiones\n600\nC1\n27\nC2\n96\nAsignados\nCobertura (participantes con al menos 1 gestión)\n211/96 (220%)\nProductividad (llamadas que terminaron en asistencia real)\n87/627 (14%)\nÚlt. gestión: 15/04/2026 12:48\nNo Contesta: 225\nPor Confirmar: 71\nConfirmado: 260\nSiguiente: 52\nDevolución: 3\nNo le Interesa: 16\nCapítulo 1 — detalle por equipo (personas únicas según su última gestión):\nEQUIPO\tLLAMADAS\tCONFIRMADO\tNO CONTESTA\tNO LE INTERESA\tSIGUIENTE\tPOR CONFIRMAR\tDEVOLUCIÓN\tYA ASISTIÁ\tCAMBIO CUPO\tASISTIERON\nEQUIPO 27\t40\t1\t\t\t1\t\t\t\t\t1\nEQUIPO 28\t2\t1\t\t\t\t\t\t\t\t1\nEQUIPO 118\t3\t\t\t\t\t\t\t\t\t\nEQUIPO 26\t238\t39\t1\t3\t1\t\t\t\t\t30\nEQUIPO 14\t2\t\t\t\t\t\t\t\t\t\nEQUIPO 25\t205\t34\t\t6\t\t\t\t\t\t28\nEQUIPO 24\t33\t1\t\t5\t\t\t\t\t\t1\nEQUIPO 23\t2\t\t\t1\t\t\t\t\t\t\nEQUIPO 22\t7\t1\t\t\t1\t\t\t\t\t2\nEQUIPO 21\t8\t1\t\t\t2\t\t\t\t\t3\nEQUIPO 20\t60\t15\t4\t\t5\t\t\t\t\t14\nCapítulo 2 — detalle por equipo (personas únicas según su última gestión):\nEQUIPO\tLLAMADAS\tCONFIRMADO\tNO CONTESTA\tNO LE INTERESA\tSIGUIENTE\tPOR CONFIRMAR\tDEVOLUCIÓN\tYA ASISTIÁ\tCAMBIO CUPO\tASISTIERON\nEQUIPO 27\t4\t\t\t\t\t\t\t\t\t\nEQUIPO 26\t23\t7\t\t1\t\t1\t\t\t\t7",
+          "header": "LEYLA LIMA CICLO 1\nÚlt. conexión: 04/09/2026 18:40",
+          "fullText": "LEYLA LIMA CICLO 1\nÚlt. conexión: 04/09/2026 18:40\n627\nGestiones\n600\nC1\n27\nC2\n96\nAsignados\nCobertura (participantes con al menos 1 gestión)\n211/96 (220%)\nProductividad (llamadas que terminaron en asistencia real)\n87/627 (14%)\nÚlt. gestión: 15/04/2026 12:48\nNo Contesta: 225\nPor Confirmar: 71\nConfirmado: 260\nSiguiente: 52\nDevolución: 3\nNo le Interesa: 16\nCapítulo 1 — detalle por equipo (personas únicas según su última gestión):\nEQUIPO\tLLAMADAS\tCONFIRMADO\tNO CONTESTA\tNO LE INTERESA\tSIGUIENTE\tPOR CONFIRMAR\tDEVOLUCIÓN\tYA ASISTIÁ\tCAMBIO CUPO\tASISTIERON\nEQUIPO 27\t40\t1\t\t\t1\t\t\t\t\t1\nEQUIPO 28\t2\t1\t\t\t\t\t\t\t\t1\nEQUIPO 118\t3\t\t\t\t\t\t\t\t\t\nEQUIPO 26\t238\t39\t1\t3\t1\t\t\t\t\t30\nEQUIPO 14\t2\t\t\t\t\t\t\t\t\t\nEQUIPO 25\t205\t34\t\t6\t\t\t\t\t\t28\nEQUIPO 24\t33\t1\t\t5\t\t\t\t\t\t1\nEQUIPO 23\t2\t\t\t1\t\t\t\t\t\t\nEQUIPO 22\t7\t1\t\t\t1\t\t\t\t\t2\nEQUIPO 21\t8\t1\t\t\t2\t\t\t\t\t3\nEQUIPO 20\t60\t15\t4\t\t5\t\t\t\t\t14\nCapítulo 2 — detalle por equipo (personas únicas según su última gestión):\nEQUIPO\tLLAMADAS\tCONFIRMADO\tNO CONTESTA\tNO LE INTERESA\tSIGUIENTE\tPOR CONFIRMAR\tDEVOLUCIÓN\tYA ASISTIÁ\tCAMBIO CUPO\tASISTIERON\nEQUIPO 27\t4\t\t\t\t\t\t\t\t\t\nEQUIPO 26\t23\t7\t\t1\t\t1\t\t\t\t7",
           "equipos": [
             {
               "equipo": "EQUIPO 27",
@@ -153573,7 +153821,7 @@ export const normalizeCoordinator = (name) => {
         },
         {
           "header": "LINID LIMA CICLO 1\nÚlt. conexión: 04/09/2026 18:05",
-          "fullText": "LINID LIMA CICLO 1\nÚlt. conexión: 04/09/2026 18:05\n0\nGestiones\n0\nC1\n0\nC2\n73\nAsignados\nCobertura (participantes con al menos 1 gestión)\n0/73 (0%)\nÚlt. gestión: —\nSin gestiones registradas en este filtro.",
+          "fullText": "LINID LIMA CICLO 1\nÚlt. conexión: 04/09/2026 18:05\n0\nGestiones\n0\nC1\n0\nC2\n75\nAsignados\nCobertura (participantes con al menos 1 gestión)\n0/75 (0%)\nÚlt. gestión: —\nSin gestiones registradas en este filtro.",
           "equipos": []
         },
         {
@@ -156979,13 +157227,13 @@ export const normalizeCoordinator = (name) => {
             },
             {
               "SEDE": "LIMA CICLO 1",
-              "PARTICIPANTES": "3,594",
+              "PARTICIPANTES": "3,596",
               "EQUIPOS ACTIVOS": "3",
               "ENTRENADORES": "6",
               "COORDINADORES": "4",
-              "INGRESOS (FIN DE SEMANA)": "S/. 3,535.00",
-              "PROM. ENROLADOS": "0.1",
-              "EN CERO": "50"
+              "INGRESOS (FIN DE SEMANA)": "S/. 4,545.00",
+              "PROM. ENROLADOS": "0.2",
+              "EN CERO": "61"
             },
             {
               "SEDE": "MEDELLIN",
@@ -157089,8 +157337,8 @@ export const normalizeCoordinator = (name) => {
               "EQUIPO": "EQUIPO 29",
               "SEDE": "LIMA CICLO 1",
               "ENTRENADOR": "LOURDES PATINO",
-              "ETAPA ACTUAL": "PFD",
-              "PARTICIPANTES": "36",
+              "ETAPA ACTUAL": "SFD",
+              "PARTICIPANTES": "24",
               "col_5": "Ver Resultados"
             },
             {
@@ -157098,7 +157346,7 @@ export const normalizeCoordinator = (name) => {
               "SEDE": "LIMA CICLO 1",
               "ENTRENADOR": "ANDRES IDROBO",
               "ETAPA ACTUAL": "PFD",
-              "PARTICIPANTES": "4",
+              "PARTICIPANTES": "37",
               "col_5": "Ver Resultados"
             },
             {
@@ -157371,7 +157619,7 @@ export const normalizeCoordinator = (name) => {
               "EQUIPO": "EQUIPO 29",
               "SEDE": "LIMA CICLO 1",
               "ENTRENADOR": "LOURDES PATINO",
-              "PARTICIPANTES": "224"
+              "PARTICIPANTES": "223"
             },
             {
               "EQUIPO": "EQUIPO 36",
@@ -157395,7 +157643,7 @@ export const normalizeCoordinator = (name) => {
               "EQUIPO": "EQUIPO 30",
               "SEDE": "LIMA CICLO 1",
               "ENTRENADOR": "ANDRES IDROBO",
-              "PARTICIPANTES": "163"
+              "PARTICIPANTES": "166"
             },
             {
               "EQUIPO": "EQUIPO 17",
@@ -157493,7 +157741,7 @@ export const normalizeCoordinator = (name) => {
             },
             {
               "Mes": "Sep 26",
-              "Participantes": "25"
+              "Participantes": "27"
             }
           ]
         },
@@ -157549,7 +157797,7 @@ export const normalizeCoordinator = (name) => {
             },
             {
               "Mes": "Sep 26",
-              "Recaudado": "$ 14,850.00"
+              "Recaudado": "$ 15,860.00"
             }
           ]
         },
@@ -157565,7 +157813,7 @@ export const normalizeCoordinator = (name) => {
             },
             {
               "Sede": "LIMA CICLO 1",
-              "Participantes": "3,594"
+              "Participantes": "3,596"
             },
             {
               "Sede": "Cuenca Ciclo 1",
@@ -157609,7 +157857,7 @@ export const normalizeCoordinator = (name) => {
             },
             {
               "Sede": "LIMA CICLO 1",
-              "Recaudado": "S/. 4,882,793.12"
+              "Recaudado": "S/. 4,883,803.12"
             },
             {
               "Sede": "GUAYAQUIL CICLO 1",
@@ -157625,15 +157873,15 @@ export const normalizeCoordinator = (name) => {
           "rows": [
             {
               "Entrenamiento": "Capítulo 1",
-              "Participantes": "11,060"
+              "Participantes": "11,062"
             },
             {
               "Entrenamiento": "Capítulo 2",
-              "Participantes": "4,039"
+              "Participantes": "4,036"
             },
             {
               "Entrenamiento": "Maestría",
-              "Participantes": "3,279"
+              "Participantes": "3,294"
             }
           ]
         },
@@ -157688,18 +157936,18 @@ export const normalizeCoordinator = (name) => {
       ],
       "cards": [
         "Alcance\n🌐 Global (todas las sedes)\nCuenca Ciclo 1\nGUAYAQUIL CICLO 1\nLIMA CICLO 1\nMEDELLIN\nMÉXICO CICLO 1\nQUITO CICLO 2\nPeríodo (pestaña Analítica)\nÚltimos 3 meses\nÚltimos 6 meses\nÚltimos 12 meses\nÚltimos 24 meses\n Viendo indicadores de TODAS las sedes",
-        "Actividad de Todas las Sedes\nSEDE\tPARTICIPANTES\tEQUIPOS ACTIVOS\tENTRENADORES\tCOORDINADORES\tINGRESOS (FIN DE SEMANA)\tPROM. ENROLADOS\tEN CERO\nCuenca Ciclo 1\t3,529\t3\t7\t6\t$ 0.00\t1.8\t10\nGUAYAQUIL CICLO 1\t2,180\t4\t6\t4\t$ 0.00\t2.5\t11\nLIMA CICLO 1\t3,594\t3\t6\t4\tS/. 3,535.00\t0.1\t50\nMEDELLIN\t126\t4\t4\t0\t$ 0.00\t2.0\t7\nMÉXICO CICLO 1\t623\t3\t2\t1\t$ 0.00\t0.0\t44\nQUITO CICLO 2\t4,751\t6\t6\t7\t$ 510.00\t1.3\t95",
-        "Actividad del Fin de Semana\n21 en curso\nEQUIPO\tSEDE\tENTRENADOR\tETAPA ACTUAL\tPARTICIPANTES\t\nEQUIPO 20\tCuenca Ciclo 1\tANDRES IDROBO\tTFD\t38\tVer Resultados\nEQUIPO 21\tCuenca Ciclo 1\tALONSO SOLARES\tSFD\t46\tVer Resultados\nEQUIPO 22\tCuenca Ciclo 1\tMIKE BOADA\tPFD\t39\tVer Resultados\nEQUIPO 34\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\tTFD\t30\tVer Resultados\nEQUIPO 35\tGUAYAQUIL CICLO 1\tALONSO SOLARES\tSFD\t30\tVer Resultados\nEQUIPO 36\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\tPFD\t25\tVer Resultados\nEQUIPO 28\tLIMA CICLO 1\tALEJANDRO DIAZ\tTFD\t13\tVer Resultados\nEQUIPO 29\tLIMA CICLO 1\tLOURDES PATINO\tPFD\t36\tVer Resultados\nEQUIPO 30\tLIMA CICLO 1\tANDRES IDROBO\tPFD\t4\tVer Resultados\nEQUIPO 16\tMEDELLIN\tFERNANDO ARAGON\tTFD\t16\tVer Resultados\nEQUIPO 17\tMEDELLIN\tLEANDRO BRUNIS\tSFD\t30\tVer Resultados\nEQUIPO 18\tMEDELLIN\tFERNANDO ARAGON\tPFD\t38\tVer Resultados\nEQUIPO 5\tMÉXICO CICLO 1\tNo asignado\tTFD\t23\tVer Resultados\nEQUIPO 6\tMÉXICO CICLO 1\tMAURICIO PEREZ\tSFD\t11\tVer Resultados\nEQUIPO 7\tMÉXICO CICLO 1\tMAURICIO PEREZ\tPFD\t15\tVer Resultados\nEQUIPO 120\tQUITO CICLO 2\tFERNANDO ARAGON\tTFD\t33\tVer Resultados\nEQUIPO 121\tQUITO CICLO 2\tCIRILO MARTINEZ\tTFD\t53\tVer Resultados\nEQUIPO 122\tQUITO CICLO 2\tLEANDRO BRUNIS\tSFD\t38\tVer Resultados\nEQUIPO 123\tQUITO CICLO 2\tCHUY ACOSTA\tSFD\t42\tVer Resultados\nEQUIPO 124\tQUITO CICLO 2\tLEANDRO BRUNIS\tPFD\t21\tVer Resultados\nEQUIPO 125\tQUITO CICLO 2\tANA MONROY\tPFD\t76\tVer Resultados",
-        "Por Entrenamiento\nTotal participantes activos en el alcance: 14,803\nCapítulo 1\n11,060 (75%)\nCapítulo 2\n4,039 (27%)\nMaestría\n3,279 (22%)",
+        "Actividad de Todas las Sedes\nSEDE\tPARTICIPANTES\tEQUIPOS ACTIVOS\tENTRENADORES\tCOORDINADORES\tINGRESOS (FIN DE SEMANA)\tPROM. ENROLADOS\tEN CERO\nCuenca Ciclo 1\t3,529\t3\t7\t6\t$ 0.00\t1.8\t10\nGUAYAQUIL CICLO 1\t2,180\t4\t6\t4\t$ 0.00\t2.5\t11\nLIMA CICLO 1\t3,596\t3\t6\t4\tS/. 4,545.00\t0.2\t61\nMEDELLIN\t126\t4\t4\t0\t$ 0.00\t2.0\t7\nMÉXICO CICLO 1\t623\t3\t2\t1\t$ 0.00\t0.0\t44\nQUITO CICLO 2\t4,751\t6\t6\t7\t$ 510.00\t1.3\t95",
+        "Actividad del Fin de Semana\n21 en curso\nEQUIPO\tSEDE\tENTRENADOR\tETAPA ACTUAL\tPARTICIPANTES\t\nEQUIPO 20\tCuenca Ciclo 1\tANDRES IDROBO\tTFD\t38\tVer Resultados\nEQUIPO 21\tCuenca Ciclo 1\tALONSO SOLARES\tSFD\t46\tVer Resultados\nEQUIPO 22\tCuenca Ciclo 1\tMIKE BOADA\tPFD\t39\tVer Resultados\nEQUIPO 34\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\tTFD\t30\tVer Resultados\nEQUIPO 35\tGUAYAQUIL CICLO 1\tALONSO SOLARES\tSFD\t30\tVer Resultados\nEQUIPO 36\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\tPFD\t25\tVer Resultados\nEQUIPO 28\tLIMA CICLO 1\tALEJANDRO DIAZ\tTFD\t13\tVer Resultados\nEQUIPO 29\tLIMA CICLO 1\tLOURDES PATINO\tSFD\t24\tVer Resultados\nEQUIPO 30\tLIMA CICLO 1\tANDRES IDROBO\tPFD\t37\tVer Resultados\nEQUIPO 16\tMEDELLIN\tFERNANDO ARAGON\tTFD\t16\tVer Resultados\nEQUIPO 17\tMEDELLIN\tLEANDRO BRUNIS\tSFD\t30\tVer Resultados\nEQUIPO 18\tMEDELLIN\tFERNANDO ARAGON\tPFD\t38\tVer Resultados\nEQUIPO 5\tMÉXICO CICLO 1\tNo asignado\tTFD\t23\tVer Resultados\nEQUIPO 6\tMÉXICO CICLO 1\tMAURICIO PEREZ\tSFD\t11\tVer Resultados\nEQUIPO 7\tMÉXICO CICLO 1\tMAURICIO PEREZ\tPFD\t15\tVer Resultados\nEQUIPO 120\tQUITO CICLO 2\tFERNANDO ARAGON\tTFD\t33\tVer Resultados\nEQUIPO 121\tQUITO CICLO 2\tCIRILO MARTINEZ\tTFD\t53\tVer Resultados\nEQUIPO 122\tQUITO CICLO 2\tLEANDRO BRUNIS\tSFD\t38\tVer Resultados\nEQUIPO 123\tQUITO CICLO 2\tCHUY ACOSTA\tSFD\t42\tVer Resultados\nEQUIPO 124\tQUITO CICLO 2\tLEANDRO BRUNIS\tPFD\t21\tVer Resultados\nEQUIPO 125\tQUITO CICLO 2\tANA MONROY\tPFD\t76\tVer Resultados",
+        "Por Entrenamiento\nTotal participantes activos en el alcance: 14,805\nCapítulo 1\n11,062 (75%)\nCapítulo 2\n4,036 (27%)\nMaestría\n3,294 (22%)",
         "Por Entrenador — Carga de Trabajo\nVer Cronograma\nENTRENADOR\tESTADO\tASIGNACIONES\nFERNANDO ARAGON\tActivo\t\n5\n\nLEANDRO BRUNIS\tActivo\t\n4\n\nMAURICIO PEREZ\tActivo\t\n4\n\nALONSO SOLARES\tActivo\t\n2\n\nANDRES IDROBO\tActivo\t\n2\n\nALEJANDRO DIAZ\tActivo\t\n1\n\nANA MONROY\tActivo\t\n1\n\nCHUY ACOSTA\tActivo\t\n1\n\nCIRILO MARTINEZ\tActivo\t\n1\n\nJUAN ANGEL AREOLA\tActivo\t\n1\n\nLOURDES PATINO\tActivo\t\n1\n\nMIKE BOADA\tActivo\t\n1\n\nANDRES GOMEZ\tActivo\tDisponible\nJOSE TORRON\tActivo\tDisponible\nMILDRED MUNOZ\tActivo\tDisponible\nPAUL SOSA\tActivo\tDisponible\nXAVIER VALAREZO\tActivo\tDisponible",
-        "Por Equipo — Equipos en Actividad\nVer todos\nEQUIPO\tSEDE\tENTRENADOR\tPARTICIPANTES\nEQUIPO 123\tQUITO CICLO 2\tCHUY ACOSTA\t424\nEQUIPO 121\tQUITO CICLO 2\tCIRILO MARTINEZ\t364\nEQUIPO 125\tQUITO CICLO 2\tANA MONROY\t348\nEQUIPO 21\tCuenca Ciclo 1\tALONSO SOLARES\t314\nEQUIPO 20\tCuenca Ciclo 1\tANDRES IDROBO\t270\nEQUIPO 124\tQUITO CICLO 2\tLEANDRO BRUNIS\t259\nEQUIPO 18\tMEDELLIN\tFERNANDO ARAGON\t259\nEQUIPO 37\tGUAYAQUIL CICLO 1\tLEANDRO BRUNIS\t257\nEQUIPO 22\tCuenca Ciclo 1\tMIKE BOADA\t253\nEQUIPO 122\tQUITO CICLO 2\tLEANDRO BRUNIS\t240\nEQUIPO 120\tQUITO CICLO 2\tFERNANDO ARAGON\t228\nEQUIPO 29\tLIMA CICLO 1\tLOURDES PATINO\t224\nEQUIPO 36\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\t189\nEQUIPO 28\tLIMA CICLO 1\tALEJANDRO DIAZ\t175\nEQUIPO 35\tGUAYAQUIL CICLO 1\tALONSO SOLARES\t166\nEQUIPO 30\tLIMA CICLO 1\tANDRES IDROBO\t163\nEQUIPO 17\tMEDELLIN\tLEANDRO BRUNIS\t152\nEQUIPO 34\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\t138\nEQUIPO 16\tMEDELLIN\tFERNANDO ARAGON\t123\nEQUIPO 19\tMEDELLIN\tFERNANDO ARAGON\t120\nEQUIPO 7\tMÉXICO CICLO 1\tMAURICIO PEREZ\t87\nEQUIPO 6\tMÉXICO CICLO 1\tMAURICIO PEREZ\t71\nEQUIPO 5\tMÉXICO CICLO 1\tNo asignado\t67",
-        "Registros Recientes\nVer todos\nARIANNA LEON LORENZETTI\nLIMA CICLO 1 · +51 913 499 148\n04/09\nJHAN CARLO AREVALO ASUNCION\nLIMA CICLO 1 · +51 ‪+51 959 727 950\n04/09\nLESLIE DESIREE BRITO GAMEZ\nLIMA CICLO 1 · +51 978449650\n04/09\nBEKER SALVADOR\nLIMA CICLO 1 · +51 901777856\n04/09\nISABEL HUAMAN SOLIS\nLIMA CICLO 1 · +51 947554964\n04/09\nGISELL DENIS SARMI\nLIMA CICLO 1 · +51 951105814\n04/09\nDAVID TINTAYA\nLIMA CICLO 1 · +51 ‪944 399 566‬\n04/09\nEDINSON MUNOZ VILLACORTA\nLIMA CICLO 1 · +51 955029157\n04/09\nJORGE EDIN MUNOZ SERRANO\nLIMA CICLO 1 · +51 922428978\n04/09\nANA LIZ OTAZU MENDOZA\nLIMA CICLO 1 · +51 910550571\n04/09",
-        "Indicadores Financieros\n$ 166,822,137.29\nRecaudado\n$ 802,172.00\nPendiente\n$ 0.00\nDevoluciones\n18,203\nFacturas\nINGRESOS (RECAUDADO) POR SEDE\nMEDELLIN\n$ 98,510,360.00\nQUITO CICLO 2\n$ 33,332,753.58\nCuenca Ciclo 1\n$ 19,446,147.26\nMÉXICO CICLO 1\n$ 9,056,416.15\nLIMA CICLO 1\nS/. 4,882,793.12\nGUAYAQUIL CICLO 1\n$ 933,667.18",
-        "Evolutivo — Participantes Registrados\n          Ver tabla\n        \n        \n          \n          \n            \n              MesParticipantes\n              \n                                Oct 250\n                                Nov 250\n                                Dic 250\n                                Ene 260\n                                Feb 260\n                                Mar 260\n                                Abr 260\n                                May 260\n                                Jun 260\n                                Jul 260\n                                Ago 2614,778\n                                Sep 2625",
-        "Evolutivo — Ingresos Recaudados\n          Ver tabla\n        \n        \n          \n          \n            \n              MesRecaudado\n              \n                                Oct 25$ 2,021,240.01\n                                Nov 25$ 6,151,243.98\n                                Dic 25$ 5,975,511.00\n                                Ene 26$ 1,359,466.97\n                                Feb 26$ 4,204,589.50\n                                Mar 26$ 777,242.00\n                                Abr 26$ 563,945.25\n                                May 26$ 790,147.98\n                                Jun 26$ 523,481.00\n                                Jul 26$ 2,514,286.10\n                                Ago 26$ 111,160,084.65\n                                Sep 26$ 14,850.00",
-        "Comparativo — Participantes por Sede\n          Ver tabla\n        \n        \n          \n          \n            \n              SedeParticipantes\n              \n                                QUITO CICLO 24,751\n                                LIMA CICLO 13,594\n                                Cuenca Ciclo 13,529\n                                GUAYAQUIL CICLO 12,180\n                                MÉXICO CICLO 1623\n                                MEDELLIN126",
-        "Comparativo — Ingresos por Sede\n          Ver tabla\n        \n        \n          \n          \n            \n              SedeRecaudado\n              \n                                MEDELLIN$ 98,510,360.00\n                                QUITO CICLO 2$ 33,332,753.58\n                                Cuenca Ciclo 1$ 19,446,147.26\n                                MÉXICO CICLO 1$ 9,056,416.15\n                                LIMA CICLO 1S/. 4,882,793.12\n                                GUAYAQUIL CICLO 1$ 933,667.18",
-        "Comparativo — Progresión por Entrenamiento\n          Ver tabla\n        \n        \n          \n          \n            \n              EntrenamientoParticipantes\n              \n                                Capítulo 111,060\n                                Capítulo 24,039\n                                Maestría3,279",
+        "Por Equipo — Equipos en Actividad\nVer todos\nEQUIPO\tSEDE\tENTRENADOR\tPARTICIPANTES\nEQUIPO 123\tQUITO CICLO 2\tCHUY ACOSTA\t424\nEQUIPO 121\tQUITO CICLO 2\tCIRILO MARTINEZ\t364\nEQUIPO 125\tQUITO CICLO 2\tANA MONROY\t348\nEQUIPO 21\tCuenca Ciclo 1\tALONSO SOLARES\t314\nEQUIPO 20\tCuenca Ciclo 1\tANDRES IDROBO\t270\nEQUIPO 124\tQUITO CICLO 2\tLEANDRO BRUNIS\t259\nEQUIPO 18\tMEDELLIN\tFERNANDO ARAGON\t259\nEQUIPO 37\tGUAYAQUIL CICLO 1\tLEANDRO BRUNIS\t257\nEQUIPO 22\tCuenca Ciclo 1\tMIKE BOADA\t253\nEQUIPO 122\tQUITO CICLO 2\tLEANDRO BRUNIS\t240\nEQUIPO 120\tQUITO CICLO 2\tFERNANDO ARAGON\t228\nEQUIPO 29\tLIMA CICLO 1\tLOURDES PATINO\t223\nEQUIPO 36\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\t189\nEQUIPO 28\tLIMA CICLO 1\tALEJANDRO DIAZ\t175\nEQUIPO 35\tGUAYAQUIL CICLO 1\tALONSO SOLARES\t166\nEQUIPO 30\tLIMA CICLO 1\tANDRES IDROBO\t166\nEQUIPO 17\tMEDELLIN\tLEANDRO BRUNIS\t152\nEQUIPO 34\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\t138\nEQUIPO 16\tMEDELLIN\tFERNANDO ARAGON\t123\nEQUIPO 19\tMEDELLIN\tFERNANDO ARAGON\t120\nEQUIPO 7\tMÉXICO CICLO 1\tMAURICIO PEREZ\t87\nEQUIPO 6\tMÉXICO CICLO 1\tMAURICIO PEREZ\t71\nEQUIPO 5\tMÉXICO CICLO 1\tNo asignado\t67",
+        "Registros Recientes\nVer todos\nANDREA LABAN TOCTO\nLIMA CICLO 1 · +51 920693474\n04/09\nCINTHYA KARINA BRAVO BELLIDO\nLIMA CICLO 1 · +51 902325122\n04/09\nARIANNA LEON LORENZETTI\nLIMA CICLO 1 · +51 913 499 148\n04/09\nJHAN CARLO AREVALO ASUNCION\nLIMA CICLO 1 · +51 ‪+51 959 727 950\n04/09\nLESLIE DESIREE BRITO GAMEZ\nLIMA CICLO 1 · +51 978449650\n04/09\nBEKER SALVADOR\nLIMA CICLO 1 · +51 901777856\n04/09\nISABEL HUAMAN SOLIS\nLIMA CICLO 1 · +51 947554964\n04/09\nGISELL DENIS SARMI\nLIMA CICLO 1 · +51 951105814\n04/09\nDAVID TINTAYA\nLIMA CICLO 1 · +51 ‪944 399 566‬\n04/09\nEDINSON MUNOZ VILLACORTA\nLIMA CICLO 1 · +51 955029157\n04/09",
+        "Indicadores Financieros\n$ 166,823,147.29\nRecaudado\n$ 802,172.00\nPendiente\n$ 0.00\nDevoluciones\n18,205\nFacturas\nINGRESOS (RECAUDADO) POR SEDE\nMEDELLIN\n$ 98,510,360.00\nQUITO CICLO 2\n$ 33,332,753.58\nCuenca Ciclo 1\n$ 19,446,147.26\nMÉXICO CICLO 1\n$ 9,056,416.15\nLIMA CICLO 1\nS/. 4,883,803.12\nGUAYAQUIL CICLO 1\n$ 933,667.18",
+        "Evolutivo — Participantes Registrados\n          Ver tabla\n        \n        \n          \n          \n            \n              MesParticipantes\n              \n                                Oct 250\n                                Nov 250\n                                Dic 250\n                                Ene 260\n                                Feb 260\n                                Mar 260\n                                Abr 260\n                                May 260\n                                Jun 260\n                                Jul 260\n                                Ago 2614,778\n                                Sep 2627",
+        "Evolutivo — Ingresos Recaudados\n          Ver tabla\n        \n        \n          \n          \n            \n              MesRecaudado\n              \n                                Oct 25$ 2,021,240.01\n                                Nov 25$ 6,151,243.98\n                                Dic 25$ 5,975,511.00\n                                Ene 26$ 1,359,466.97\n                                Feb 26$ 4,204,589.50\n                                Mar 26$ 777,242.00\n                                Abr 26$ 563,945.25\n                                May 26$ 790,147.98\n                                Jun 26$ 523,481.00\n                                Jul 26$ 2,514,286.10\n                                Ago 26$ 111,160,084.65\n                                Sep 26$ 15,860.00",
+        "Comparativo — Participantes por Sede\n          Ver tabla\n        \n        \n          \n          \n            \n              SedeParticipantes\n              \n                                QUITO CICLO 24,751\n                                LIMA CICLO 13,596\n                                Cuenca Ciclo 13,529\n                                GUAYAQUIL CICLO 12,180\n                                MÉXICO CICLO 1623\n                                MEDELLIN126",
+        "Comparativo — Ingresos por Sede\n          Ver tabla\n        \n        \n          \n          \n            \n              SedeRecaudado\n              \n                                MEDELLIN$ 98,510,360.00\n                                QUITO CICLO 2$ 33,332,753.58\n                                Cuenca Ciclo 1$ 19,446,147.26\n                                MÉXICO CICLO 1$ 9,056,416.15\n                                LIMA CICLO 1S/. 4,883,803.12\n                                GUAYAQUIL CICLO 1$ 933,667.18",
+        "Comparativo — Progresión por Entrenamiento\n          Ver tabla\n        \n        \n          \n          \n            \n              EntrenamientoParticipantes\n              \n                                Capítulo 111,062\n                                Capítulo 24,036\n                                Maestría3,294",
         "Comparativo — Carga de Entrenadores (Top 10)\n          Ver tabla\n        \n        \n                    \n          \n            \n              EntrenadorAsignaciones\n              \n                                FERNANDO ARAGON5\n                                LEANDRO BRUNIS4\n                                MAURICIO PEREZ4\n                                ALONSO SOLARES2\n                                ANDRES IDROBO2\n                                ALEJANDRO DIAZ1\n                                ANA MONROY1\n                                CHUY ACOSTA1\n                                CIRILO MARTINEZ1\n                                JUAN ANGEL AREOLA1"
       ]
     },
@@ -167335,7 +167583,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51934073078",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "N/A",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -167710,7 +167958,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51934073078",
             "llamada1": "Siguiente",
             "llamada2": "Siguiente",
-            "finDeSemana": "—",
+            "finDeSemana": "N/A",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -167957,7 +168205,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51999699649",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,035.00) (C2 + MJ)"
@@ -167972,7 +168220,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51934073078",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -167987,7 +168235,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51900490075",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,970.00) (C2 + MJ)"
@@ -168002,7 +168250,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51952087914",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,595.00) (C2 + MJ)"
@@ -168062,7 +168310,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51997343209",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -168077,7 +168325,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51934073078",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -168092,7 +168340,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51900490075",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -168107,7 +168355,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "—",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -168122,7 +168370,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "—",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
@@ -168137,7 +168385,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "—",
             "llamada1": "No le Interesa",
             "llamada2": "No Contesta",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "—",
             "desertor": "—",
             "pago": "Pagado (S/. 4,035.00) (C2 + MJ)"
@@ -168197,7 +168445,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51993709784",
             "llamada1": "Confirmado",
             "llamada2": "No Contesta",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -168242,7 +168490,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51927101572",
             "llamada1": "Confirmado",
             "llamada2": "No le Interesa",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,595.00) (C2 + MJ)"
@@ -168257,7 +168505,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51916030745",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -168287,7 +168535,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51917980843",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -168302,7 +168550,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51920472661",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -168332,7 +168580,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51999699649",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,035.00) (C2 + MJ)"
@@ -168347,7 +168595,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51934073078",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -168362,7 +168610,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51900490075",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,970.00) (C2 + MJ)"
@@ -168377,7 +168625,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51952087914",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,595.00) (C2 + MJ)"
@@ -168437,7 +168685,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51997343209",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -168452,7 +168700,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51934073078",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -168467,7 +168715,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51900490075",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -168482,7 +168730,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "—",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -168497,7 +168745,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "—",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
@@ -168512,7 +168760,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "—",
             "llamada1": "Por Confirmar",
             "llamada2": "Siguiente",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "—",
             "desertor": "—",
             "pago": "Pagado (S/. 4,035.00) (C2 + MJ)"
@@ -168572,7 +168820,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51993709784",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -168617,7 +168865,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51927101572",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,595.00) (C2 + MJ)"
@@ -168632,7 +168880,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51916030745",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -168662,7 +168910,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51917980843",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -168677,7 +168925,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51920472661",
             "llamada1": "—",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -168699,7 +168947,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51959356266",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -168714,7 +168962,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51944760103",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -168729,7 +168977,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51944760103",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -168759,7 +169007,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51976090987",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -168774,7 +169022,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51999940038",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -168789,7 +169037,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51930326809",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -168804,7 +169052,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51963963302",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -168819,7 +169067,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51968367858",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -168834,7 +169082,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51961551852",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -168849,7 +169097,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51920738765",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,470.00) (C2 + MJ)"
@@ -168864,7 +169112,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51952352271",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -168879,7 +169127,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51920408573",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -168894,7 +169142,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51948162114",
             "llamada1": "—",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -168909,7 +169157,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51980496819",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -168924,7 +169172,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51916030745",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -168954,7 +169202,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51976232368",
             "llamada1": "—",
             "llamada2": "—",
-            "finDeSemana": "N/A",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -168969,7 +169217,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51932556726",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -168984,7 +169232,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51989442068",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "—",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -169005,6 +169253,36 @@ export const normalizeCoordinator = (name) => {
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
           },
           {
+            "apellidos": "LONGA VELEZ",
+            "nombres": "JEAN PAUL",
+            "nombrePreferido": "JP",
+            "telefono": "+51951201194",
+            "coordinador": "Sin coordinador",
+            "imo": "YUSMELY DESIREE GARCiA LLOVERA",
+            "telefonoImo": "+51921979246",
+            "llamada1": "—",
+            "llamada2": "—",
+            "finDeSemana": "PFD",
+            "asistencia": "—",
+            "desertor": "—",
+            "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
+          },
+          {
+            "apellidos": "LOPEZ LOPEZ",
+            "nombres": "FERNANDO ABEL",
+            "nombrePreferido": "—",
+            "telefono": "+51981237577",
+            "coordinador": "Sin coordinador",
+            "imo": "Sin invitador",
+            "telefonoImo": "—",
+            "llamada1": "—",
+            "llamada2": "—",
+            "finDeSemana": "—",
+            "asistencia": "—",
+            "desertor": "—",
+            "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
+          },
+          {
             "apellidos": "MEJIA DIAZ",
             "nombres": "MANUEL",
             "nombrePreferido": "MANUEL MEJIA",
@@ -169014,7 +169292,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51999056488",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -169024,43 +169302,13 @@ export const normalizeCoordinator = (name) => {
             "nombres": "JORGE",
             "nombrePreferido": "—",
             "telefono": "+51930131755",
-            "coordinador": "Sin coordinador",
+            "coordinador": "LINID",
             "imo": "ROCIO DE LA CRUZ HUAYTALLA",
             "telefonoImo": "+51929406665",
             "llamada1": "No le Interesa",
             "llamada2": "No le Interesa",
             "finDeSemana": "PFD",
             "asistencia": "—",
-            "desertor": "—",
-            "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
-          },
-          {
-            "apellidos": "MORALES MONTECINOS",
-            "nombres": "SILVINA",
-            "nombrePreferido": "SILVINA",
-            "telefono": "+51973335162",
-            "coordinador": "JOYCE",
-            "imo": "Grezia Maria Jolly Vera",
-            "telefonoImo": "+51920738765",
-            "llamada1": "Confirmado",
-            "llamada2": "—",
-            "finDeSemana": "N/A",
-            "asistencia": "Asistió",
-            "desertor": "—",
-            "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
-          },
-          {
-            "apellidos": "PAREJA MADERA",
-            "nombres": "ROY ERNESTO DELIOT",
-            "nombrePreferido": "ROY PAREJA",
-            "telefono": "+51996348443",
-            "coordinador": "DIANA",
-            "imo": "LYLY DAIYU PAREJA MADERA",
-            "telefonoImo": "+51976090987",
-            "llamada1": "Confirmado",
-            "llamada2": "—",
-            "finDeSemana": "N/A",
-            "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
           },
@@ -169074,7 +169322,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51959356266",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -169089,7 +169337,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51944760103",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -169104,7 +169352,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51944760103",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -169134,7 +169382,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51976090987",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -169149,7 +169397,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51999940038",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -169164,7 +169412,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51930326809",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -169179,7 +169427,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51963963302",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "—",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -169194,7 +169442,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51968367858",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -169209,7 +169457,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51961551852",
             "llamada1": "Por Confirmar",
             "llamada2": "Siguiente",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "—",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -169224,7 +169472,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51920738765",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,470.00) (C2 + MJ)"
@@ -169239,7 +169487,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51952352271",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -169254,7 +169502,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51920408573",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -169269,7 +169517,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51948162114",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "—",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -169284,7 +169532,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51980496819",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -169299,7 +169547,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51916030745",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -169329,7 +169577,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51976232368",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "N/A",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -169344,7 +169592,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51932556726",
             "llamada1": "Siguiente",
             "llamada2": "Siguiente",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "—",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -169359,7 +169607,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51989442068",
             "llamada1": "Siguiente",
             "llamada2": "Siguiente",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -169380,6 +169628,36 @@ export const normalizeCoordinator = (name) => {
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
           },
           {
+            "apellidos": "LONGA VELEZ",
+            "nombres": "JEAN PAUL",
+            "nombrePreferido": "JP",
+            "telefono": "+51951201194",
+            "coordinador": "Sin coordinador",
+            "imo": "YUSMELY DESIREE GARCiA LLOVERA",
+            "telefonoImo": "+51921979246",
+            "llamada1": "—",
+            "llamada2": "—",
+            "finDeSemana": "PFD",
+            "asistencia": "—",
+            "desertor": "—",
+            "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
+          },
+          {
+            "apellidos": "LOPEZ LOPEZ",
+            "nombres": "FERNANDO ABEL",
+            "nombrePreferido": "—",
+            "telefono": "+51981237577",
+            "coordinador": "Sin coordinador",
+            "imo": "Sin invitador",
+            "telefonoImo": "—",
+            "llamada1": "—",
+            "llamada2": "—",
+            "finDeSemana": "—",
+            "asistencia": "—",
+            "desertor": "—",
+            "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
+          },
+          {
             "apellidos": "MEJIA DIAZ",
             "nombres": "MANUEL",
             "nombrePreferido": "MANUEL MEJIA",
@@ -169389,7 +169667,7 @@ export const normalizeCoordinator = (name) => {
             "telefonoImo": "+51999056488",
             "llamada1": "Siguiente",
             "llamada2": "Siguiente",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "—",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -169399,42 +169677,12 @@ export const normalizeCoordinator = (name) => {
             "nombres": "JORGE",
             "nombrePreferido": "—",
             "telefono": "+51930131755",
-            "coordinador": "Sin coordinador",
+            "coordinador": "LINID",
             "imo": "ROCIO DE LA CRUZ HUAYTALLA",
             "telefonoImo": "+51929406665",
             "llamada1": "No Contesta",
             "llamada2": "—",
             "finDeSemana": "PFD",
-            "asistencia": "Asistió",
-            "desertor": "—",
-            "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
-          },
-          {
-            "apellidos": "MORALES MONTECINOS",
-            "nombres": "SILVINA",
-            "nombrePreferido": "SILVINA",
-            "telefono": "+51973335162",
-            "coordinador": "JOYCE",
-            "imo": "Grezia Maria Jolly Vera",
-            "telefonoImo": "+51920738765",
-            "llamada1": "Confirmado",
-            "llamada2": "Confirmado",
-            "finDeSemana": "N/A",
-            "asistencia": "Asistió",
-            "desertor": "—",
-            "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
-          },
-          {
-            "apellidos": "PAREJA MADERA",
-            "nombres": "ROY ERNESTO DELIOT",
-            "nombrePreferido": "ROY PAREJA",
-            "telefono": "+51996348443",
-            "coordinador": "DIANA",
-            "imo": "LYLY DAIYU  PAREJA MADERA",
-            "telefonoImo": "+51976090987",
-            "llamada1": "Confirmado",
-            "llamada2": "Confirmado",
-            "finDeSemana": "N/A",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -255052,8 +255300,14 @@ function App() {
           } />
 
           <Route path="/auditoria-kpis" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'coord_c1', 'coord_c2', 'coordinador_c1c2']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'director_maestria']} requireSuperAdmin={false}>
               <AuditoriaKPIs />
+            </RoleRoute>
+          } />
+
+          <Route path="/diagnostico-cmj" element={
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'director_maestria']} requireSuperAdmin={false}>
+              <AuditoriaKPIs defaultTab="cmj" />
             </RoleRoute>
           } />
 
@@ -258990,235 +259244,1248 @@ export default function BirthdayAlert() {
 ## Archivo: src\components\CMJDashboard.jsx
 
 ```javascript
-import React, { useState, useEffect } from 'react';
-import { 
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
-  LineChart, Line, ComposedChart, Area
-} from 'recharts';
-import { Target, Users, AlertTriangle, Activity } from 'lucide-react';
-import DataJSON from '../data/SEGUIMIENTO_EQUIPOS.json';
+import React from 'react';
+import CMJDiagnosticsDashboard from './CMJDiagnosticsDashboard';
 
+/**
+ * CMJDashboard - Wrapper de compatibilidad para Diagnóstico de CMJs (Maestría del Juego)
+ * CREAR PODER SIN LÍMITES - Causa OS
+ */
 export default function CMJDashboard({ globalFilterSede }) {
-  const [activeSede, setActiveSede] = useState('CDMX');
-  const [processedData, setProcessedData] = useState({});
+  return <CMJDiagnosticsDashboard globalFilterSede={globalFilterSede} />;
+}
 
-  // Sync internal Sede with Global Sede if provided and valid
+```
+
+---
+
+## Archivo: src\components\CMJDiagnosticsDashboard.jsx
+
+```javascript
+import React, { useState, useMemo, useEffect } from 'react';
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+  LineChart, Line, ComposedChart, Area, AreaChart, PieChart, Pie, Cell
+} from 'recharts';
+import {
+  Shield, Users, AlertTriangle, CheckCircle2, TrendingUp, TrendingDown,
+  Activity, Filter, Search, Download, ChevronDown, ChevronUp, Layers,
+  Award, Building2, Calendar, Sparkles, RefreshCw, Eye, ArrowUpRight,
+  Flame, HelpCircle, UserCheck, UserX, Target, Zap
+} from 'lucide-react';
+import {
+  getAllEquipos,
+  getAllEventos,
+  getResumen2026PorSede,
+  getCMJSummary,
+  getFunnelData,
+  getRetentionEvolutionData,
+  getSedesBenchmark,
+  CMJ_METADATA,
+  SEDES_LIST,
+  normalizeSedeName
+} from '../services/cmjDataService';
+
+const RISK_COLORS = {
+  CRITICO: { bg: 'rgba(239, 68, 68, 0.15)', border: '#ef4444', text: '#f87171', label: 'Riesgo Crítico' },
+  ATENCION: { bg: 'rgba(245, 158, 11, 0.15)', border: '#f59e0b', text: '#fbbf24', label: 'En Atención' },
+  OPTIMO: { bg: 'rgba(34, 197, 94, 0.15)', border: '#22c55e', text: '#4ade80', label: 'Óptimo' }
+};
+
+export default function CMJDiagnosticsDashboard({ globalFilterSede }) {
+  // Filtros
+  const [selectedSede, setSelectedSede] = useState('TODAS');
+  const [activeTab, setActiveTab] = useState('equipos'); // 'equipos', 'eventos', 'funnel', 'benchmark'
+  const [riskFilter, setRiskFilter] = useState('ALL'); // 'ALL', 'CRITICO', 'ATENCION', 'OPTIMO'
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedTrainer, setSelectedTrainer] = useState('ALL');
+  const [sortBy, setSortBy] = useState('desercion_desc');
+  const [expandedRow, setExpandedRow] = useState(null);
+
+  // Sincronizar con filtro global si existe
   useEffect(() => {
-    if (!globalFilterSede || globalFilterSede === 'Todas' || globalFilterSede === 'Global') return;
-    const normalized = globalFilterSede === 'GYE' ? 'GUAYAQUIL' : globalFilterSede.toUpperCase();
-    if (processedData[normalized]) {
-      setActiveSede(normalized);
+    if (globalFilterSede && globalFilterSede !== 'Todas' && globalFilterSede !== 'Global') {
+      const norm = normalizeSedeName(globalFilterSede);
+      setSelectedSede(norm);
     }
-  }, [globalFilterSede, processedData]);
+  }, [globalFilterSede]);
 
-  useEffect(() => {
-    try {
-      const sheet = DataJSON.Hoja1 || [];
-      const sedesData = {};
+  // Cargar datos
+  const rawEquipos = useMemo(() => getAllEquipos(), []);
+  const rawEventos = useMemo(() => getAllEventos(), []);
+  const summary = useMemo(() => getCMJSummary(selectedSede), [selectedSede]);
+  const funnelData = useMemo(() => getFunnelData(selectedSede), [selectedSede]);
+  const evolutionData = useMemo(() => getRetentionEvolutionData(selectedSede), [selectedSede]);
+  const sedesBenchmark = useMemo(() => getSedesBenchmark(), []);
 
-      // Parse the JSON data structure from the Excel and aggregate by Sede
-      sheet.forEach((row, index) => {
-        if (index > 0) { // Skip header row
-          const sedeName = (row['MAESTRIA DEL JUEGO '] || '').trim();
-          if (sedeName && !sedeName.includes('SEDE')) {
-            const cmjName = row['COORDINADOR MAESTRIA DEL JUEGO'] || 'Sin Asignar';
-            
-            if (!sedesData[sedeName]) {
-              sedesData[sedeName] = {
-                cmj: new Set([cmjName]),
-                metrics: {
-                  enrolamientoC1: 0,
-                  terminanC1: 0,
-                  paganC2: 0,
-                  inicianC2: 0,
-                  terminanC2: 0,
-                  pagosMJ: 0,
-                  managersDeclarados: 0,
-                  pxInicioMJ: 0,
-                  managersInicioMJ: 0,
-                  pxFinalMJ: 0,
-                  managersFinalMJ: 0,
-                  desercionPx: 0,
-                  desercionMg: 0,
-                  totalEnrolamiento: 0,
-                  equipos: 0,
-                }
-              };
-            }
-            
-            const s = sedesData[sedeName];
-            if (cmjName !== 'Sin Asignar') s.cmj.add(cmjName);
-            
-            s.metrics.equipos += 1;
-            s.metrics.enrolamientoC1 += Number(row['CAPITULO UNO']) || 0;
-            s.metrics.terminanC1 += Number(row['__EMPTY_2']) || 0;
-            s.metrics.paganC2 += Number(row['__EMPTY_3']) || 0;
-            s.metrics.inicianC2 += Number(row['__EMPTY_5']) || 0;
-            s.metrics.terminanC2 += Number(row['C2 A CREACION']) || 0;
-            s.metrics.pagosMJ += Number(row['__EMPTY_6']) || 0;
-            s.metrics.managersDeclarados += Number(row['__EMPTY_8']) || 0;
-            s.metrics.pxInicioMJ += Number(row['__EMPTY_11']) || 0;
-            s.metrics.managersInicioMJ += Number(row['__EMPTY_12']) || 0;
-            s.metrics.pxFinalMJ += Number(row['__EMPTY_13']) || 0;
-            s.metrics.managersFinalMJ += Number(row['__EMPTY_14']) || 0;
-            s.metrics.desercionPx += Number(row['__EMPTY_15']) || 0;
-            s.metrics.desercionMg += Number(row['__EMPTY_16']) || 0;
-            s.metrics.totalEnrolamiento += Number(row['__EMPTY_19']) || 0;
-          }
+  // Lista de entrenadores únicos para el filtro
+  const uniqueTrainers = useMemo(() => {
+    const set = new Set();
+    rawEventos.forEach(ev => {
+      ev.fdsList.forEach(f => {
+        if (f.entrenador && f.entrenador !== 'Sin Asignar') {
+          set.add(f.entrenador);
         }
       });
-      
-      // Post-process to calculate charts and formats
-      Object.keys(sedesData).forEach(sede => {
-        const s = sedesData[sede];
-        s.cmj = Array.from(s.cmj).join(', ') || 'Sin Asignar';
-        s.metrics.tasaDesercionTotal = s.metrics.pxInicioMJ > 0 ? (s.metrics.desercionPx / s.metrics.pxInicioMJ) : 0;
-        
-        s.chartData = [
-          { name: 'C1', Enrolados: s.metrics.enrolamientoC1, Terminaron: s.metrics.terminanC1 },
-          { name: 'C2', Enrolados: s.metrics.inicianC2, Terminaron: s.metrics.terminanC2 },
-          { name: 'MJ', Enrolados: s.metrics.pxInicioMJ, Terminaron: s.metrics.pxFinalMJ },
-        ];
-        
-        s.funnelData = [
-          { step: 'C1 (Inician)', value: s.metrics.enrolamientoC1 },
-          { step: 'C2 (Pagan)', value: s.metrics.paganC2 },
-          { step: 'MJ (Inician)', value: s.metrics.pxInicioMJ },
-          { step: 'MJ (Gradúan)', value: s.metrics.pxFinalMJ }
-        ];
-      });
-      
-      setProcessedData(sedesData);
-      
-      // Select first available sede if active isn't found
-      const availableSedes = Object.keys(sedesData);
-      if (availableSedes.length > 0 && !availableSedes.includes(activeSede)) {
-        setActiveSede(availableSedes[0]);
+    });
+    return Array.from(set).sort();
+  }, [rawEventos]);
+
+  // Filtrado de Equipos
+  const filteredEquipos = useMemo(() => {
+    return rawEquipos.filter(eq => {
+      // Sede
+      if (selectedSede !== 'TODAS' && eq.sede !== selectedSede) return false;
+      // Riesgo
+      if (riskFilter !== 'ALL' && eq.resumen.nivelRiesgo !== riskFilter) return false;
+      // Búsqueda
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        const matchEq = eq.equipoLabel.toLowerCase().includes(q);
+        const matchSede = eq.sede.toLowerCase().includes(q) || eq.sedeNombreLargo.toLowerCase().includes(q);
+        const matchCMJ = eq.cmj.toLowerCase().includes(q);
+        if (!matchEq && !matchSede && !matchCMJ) return false;
       }
-    } catch (err) {
-      console.error("Error processing CMJ data", err);
+      return true;
+    }).sort((a, b) => {
+      if (sortBy === 'desercion_desc') return b.resumen.desercionTotalPx - a.resumen.desercionTotalPx;
+      if (sortBy === 'desercion_asc') return a.resumen.desercionTotalPx - b.resumen.desercionTotalPx;
+      if (sortBy === 'retencion_asc') return a.resumen.tasaRetencion - b.resumen.tasaRetencion;
+      if (sortBy === 'retencion_desc') return b.resumen.tasaRetencion - a.resumen.tasaRetencion;
+      if (sortBy === 'enrol_desc') return b.resumen.enrolTotalAcumulado - a.resumen.enrolTotalAcumulado;
+      if (sortBy === 'equipo_asc') return a.equipoNum - b.equipoNum;
+      return 0;
+    });
+  }, [rawEquipos, selectedSede, riskFilter, searchQuery, sortBy]);
+
+  // Filtrado de Eventos FDS
+  const filteredEventos = useMemo(() => {
+    return rawEventos.filter(ev => {
+      if (selectedSede !== 'TODAS' && ev.sede !== selectedSede) return false;
+      if (selectedTrainer !== 'ALL') {
+        const hasTrainer = ev.fdsList.some(f => f.entrenador === selectedTrainer);
+        if (!hasTrainer) return false;
+      }
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        const matchEv = ev.evento.toLowerCase().includes(q);
+        const matchSede = ev.sede.toLowerCase().includes(q);
+        const matchTr = ev.fdsList.some(f => f.entrenador.toLowerCase().includes(q));
+        if (!matchEv && !matchSede && !matchTr) return false;
+      }
+      return true;
+    });
+  }, [rawEventos, selectedSede, selectedTrainer, searchQuery]);
+
+  // Exportar a CSV
+  const handleExportCSV = () => {
+    let headers = '';
+    let rows = [];
+
+    if (activeTab === 'equipos') {
+      headers = 'Sede,CMJ,Equipo,PX_Iniciales,PX_Finales,Desercion_PX,Desercion_Managers,Retencion_Pct,Enrolamiento_Total,Nivel_Riesgo\n';
+      rows = filteredEquipos.map(e => [
+        e.sede,
+        `"${e.cmj}"`,
+        e.equipoLabel,
+        e.resumen.pxIniciales,
+        e.resumen.pxFinales,
+        e.resumen.desercionTotalPx,
+        e.resumen.desercionTotalMg,
+        `${e.resumen.tasaRetencion}%`,
+        e.resumen.enrolTotalAcumulado,
+        e.resumen.nivelRiesgo
+      ].join(','));
+    } else {
+      headers = 'Sede,Evento,Total_Llegaron,Total_Desercion,Total_Terminaron,Tasa_Retencion,Enrolamiento_Total,PX_en_0\n';
+      rows = filteredEventos.map(ev => [
+        ev.sede,
+        `"${ev.evento}"`,
+        ev.totalLlegaron,
+        ev.totalDesercion,
+        ev.totalTerminaron,
+        `${ev.tasaRetencionGlobal}%`,
+        ev.totalEnrol,
+        ev.totalPxCero
+      ].join(','));
     }
-  }, []);
 
-  const sedesList = Object.keys(processedData);
-  const currentData = processedData[activeSede];
+    const csvContent = 'data:text/csv;charset=utf-8,' + encodeURIComponent(headers + rows.join('\n'));
+    const link = document.createElement('a');
+    link.setAttribute('href', csvContent);
+    link.setAttribute('download', `Diagnostico_CMJ_${selectedSede}_${activeTab}_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
-  if (!currentData) return <div style={{ padding: '1rem', color: '#fff' }}>Cargando datos CMJ...</div>;
+  const resetFilters = () => {
+    setSelectedSede('TODAS');
+    setRiskFilter('ALL');
+    setSearchQuery('');
+    setSelectedTrainer('ALL');
+    setSortBy('desercion_desc');
+    setExpandedRow(null);
+  };
+
+  const cmjActual = CMJ_METADATA[selectedSede] || {
+    sede: 'TODAS',
+    nombreLargo: 'Consolidado Global',
+    cmj: 'Dirección de Maestría & CMJs Regionales',
+    color: '#d4af37',
+    flag: '🌎'
+  };
 
   return (
-    <div className="glass-panel" style={{ padding: '1.5rem', borderRadius: '12px', border: '1px solid var(--border-subtle)', marginBottom: '2rem' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <Target size={24} style={{ color: 'var(--crear-gold)' }} />
-          <h3 style={{ margin: 0, color: 'var(--text-heading)', fontSize: '1.2rem' }}>
-            Panel CMJ (Coordinadores Maestría del Juego)
-          </h3>
-        </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', width: '100%', color: 'var(--text-main, #f8fafc)' }}>
+      {/* 1. ENCABEZADO Y BRANDING OFICIAL */}
+      <div style={{
+        background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%)',
+        border: '1px solid rgba(212, 175, 55, 0.35)',
+        borderRadius: '16px',
+        padding: '1.5rem 2rem',
+        boxShadow: '0 12px 30px rgba(0, 0, 0, 0.45)',
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: '1.25rem',
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        <div style={{ position: 'absolute', top: '-50px', right: '-50px', width: '220px', height: '220px', background: 'radial-gradient(circle, rgba(212, 175, 55, 0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
         
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
-          {sedesList.map(sede => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', zIndex: 1 }}>
+          <div style={{
+            width: '54px',
+            height: '54px',
+            borderRadius: '14px',
+            background: 'linear-gradient(135deg, #d4af37 0%, #aa820a 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#0f172a',
+            boxShadow: '0 4px 15px rgba(212, 175, 55, 0.4)'
+          }}>
+            <Target size={28} strokeWidth={2.5} />
+          </div>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+              <span style={{ fontSize: '0.75rem', fontWeight: 800, letterSpacing: '0.08em', color: '#d4af37', textTransform: 'uppercase' }}>
+                CREAR PODER SIN LÍMITES • CAUSA OS
+              </span>
+              <span style={{ fontSize: '0.7rem', padding: '2px 8px', borderRadius: '12px', background: 'rgba(212, 175, 55, 0.2)', color: '#d4af37', border: '1px solid rgba(212, 175, 55, 0.4)' }}>
+                DIAGNÓSTICO CMJ HD
+              </span>
+            </div>
+            <h1 style={{ fontSize: '1.7rem', fontWeight: 800, margin: 0, color: '#ffffff', letterSpacing: '-0.02em' }}>
+              Monitor Clínico de Maestría del Juego
+            </h1>
+            <p style={{ margin: '4px 0 0 0', fontSize: '0.88rem', color: '#94a3b8' }}>
+              Diagnóstico de Equipos, Participantes (PX), Creación, Relación, Gratitud y Retención vs Abandono.
+            </p>
+          </div>
+        </div>
+
+        {/* Resumen de CMJ a cargo de la Sede seleccionada */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          padding: '0.75rem 1.25rem',
+          borderRadius: '12px',
+          background: 'rgba(15, 23, 42, 0.75)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          zIndex: 1
+        }}>
+          <span style={{ fontSize: '1.8rem' }}>{cmjActual.flag}</span>
+          <div>
+            <div style={{ fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              CMJ a Cargo • {cmjActual.nombreLargo}
+            </div>
+            <div style={{ fontSize: '1.05rem', fontWeight: 700, color: cmjActual.color }}>
+              {cmjActual.cmj}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 2. SELECTOR DE SEDES OFICIALES */}
+      <div style={{
+        display: 'flex',
+        gap: '8px',
+        overflowX: 'auto',
+        padding: '4px',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
+      }}>
+        {SEDES_LIST.map(s => {
+          const isSelected = selectedSede === s;
+          const meta = CMJ_METADATA[s] || { flag: '🌎', nombreLargo: 'Global', color: '#d4af37' };
+          return (
             <button
-              key={sede}
-              onClick={() => setActiveSede(sede)}
+              key={s}
+              onClick={() => setSelectedSede(s)}
               style={{
-                padding: '0.4rem 1rem',
-                borderRadius: '20px',
-                border: activeSede === sede ? '1px solid var(--crear-gold)' : '1px solid var(--border-subtle)',
-                background: activeSede === sede ? 'rgba(212, 175, 55, 0.15)' : 'rgba(0,0,0,0.2)',
-                color: activeSede === sede ? 'var(--crear-gold)' : 'var(--text-muted)',
-                fontWeight: 600,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '0.65rem 1.1rem',
+                borderRadius: '10px',
+                border: isSelected ? `1px solid ${meta.color}` : '1px solid rgba(255, 255, 255, 0.08)',
+                background: isSelected ? 'rgba(212, 175, 55, 0.15)' : 'rgba(30, 41, 59, 0.45)',
+                color: isSelected ? '#ffffff' : '#94a3b8',
                 cursor: 'pointer',
-                transition: 'all 0.2s ease'
+                fontWeight: isSelected ? 700 : 500,
+                fontSize: '0.88rem',
+                transition: 'all 0.2s ease',
+                whiteSpace: 'nowrap'
               }}
             >
-              {sede}
+              <span>{meta.flag}</span>
+              <span>{s === 'TODAS' ? 'Todas las Sedes' : meta.nombreLargo}</span>
             </button>
-          ))}
+          );
+        })}
+      </div>
+
+      {/* 3. SCORECARDS EJECUTIVOS CON MICRO-INDICADORES */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+        gap: '1rem'
+      }}>
+        {/* Card 1: Llegaron */}
+        <div style={{
+          background: 'rgba(30, 41, 59, 0.7)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          borderRadius: '14px',
+          padding: '1.2rem',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
+          boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: 600 }}>PX QUE LLEGARON</span>
+            <Users size={18} color="#38bdf8" />
+          </div>
+          <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#f8fafc' }}>
+            {summary.totalLlegaron.toLocaleString()}
+          </div>
+          <div style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
+            En {summary.totalEquipos} equipos registrados
+          </div>
+        </div>
+
+        {/* Card 2: Retención */}
+        <div style={{
+          background: 'rgba(30, 41, 59, 0.7)',
+          border: '1px solid rgba(34, 197, 94, 0.25)',
+          borderRadius: '14px',
+          padding: '1.2rem',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
+          boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: 600 }}>TASA DE RETENCIÓN</span>
+            <TrendingUp size={18} color="#4ade80" />
+          </div>
+          <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#4ade80' }}>
+            {summary.tasaRetencion}%
+          </div>
+          <div style={{ fontSize: '0.78rem', color: '#86efac' }}>
+            {summary.totalTerminaron.toLocaleString()} participantes culminaron
+          </div>
+        </div>
+
+        {/* Card 3: Deserción */}
+        <div style={{
+          background: 'rgba(30, 41, 59, 0.7)',
+          border: '1px solid rgba(239, 68, 68, 0.25)',
+          borderRadius: '14px',
+          padding: '1.2rem',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
+          boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: 600 }}>DESERCIÓN / ABANDONO</span>
+            <TrendingDown size={18} color="#f87171" />
+          </div>
+          <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#f87171' }}>
+            {summary.tasaDesercion}%
+          </div>
+          <div style={{ fontSize: '0.78rem', color: '#fca5a5' }}>
+            {summary.totalDesercion.toLocaleString()} abandonos acumulados
+          </div>
+        </div>
+
+        {/* Card 4: PX en 0 (Alerta de Quiebre) */}
+        <div style={{
+          background: 'rgba(30, 41, 59, 0.7)',
+          border: '1px solid rgba(245, 158, 11, 0.25)',
+          borderRadius: '14px',
+          padding: '1.2rem',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
+          boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: 600 }}>PARTICIPANTES EN 0</span>
+            <AlertTriangle size={18} color="#fbbf24" />
+          </div>
+          <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#fbbf24' }}>
+            {summary.totalPxCero} <span style={{ fontSize: '1rem', fontWeight: 600, color: '#fef08a' }}>({summary.pctPxCero}%)</span>
+          </div>
+          <div style={{ fontSize: '0.78rem', color: '#fde047' }}>
+            Alerta de riesgo de deserción inminente
+          </div>
+        </div>
+
+        {/* Card 5: Enrolamiento Total */}
+        <div style={{
+          background: 'rgba(30, 41, 59, 0.7)',
+          border: '1px solid rgba(212, 175, 55, 0.25)',
+          borderRadius: '14px',
+          padding: '1.2rem',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
+          boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: 600 }}>ENROLAMIENTO TOTAL</span>
+            <Award size={18} color="#d4af37" />
+          </div>
+          <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#d4af37' }}>
+            {summary.totalEnrol.toLocaleString()}
+          </div>
+          <div style={{ fontSize: '0.78rem', color: '#fde68a' }}>
+            Ratio: {summary.ratioEnrol} enrolamientos / PX
+          </div>
+        </div>
+
+        {/* Card 6: Salud de Equipos */}
+        <div style={{
+          background: 'rgba(30, 41, 59, 0.7)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          borderRadius: '14px',
+          padding: '1.2rem',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
+          boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: 600 }}>ESTADO SEMAFÓRICO</span>
+            <Shield size={18} color="#a855f7" />
+          </div>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '4px' }}>
+            <span style={{ padding: '3px 8px', borderRadius: '6px', background: 'rgba(34, 197, 94, 0.2)', color: '#4ade80', fontSize: '0.85rem', fontWeight: 700 }}>
+              {summary.equiposSalud.optimo} 🟢
+            </span>
+            <span style={{ padding: '3px 8px', borderRadius: '6px', background: 'rgba(245, 158, 11, 0.2)', color: '#fbbf24', fontSize: '0.85rem', fontWeight: 700 }}>
+              {summary.equiposSalud.atencion} 🟡
+            </span>
+            <span style={{ padding: '3px 8px', borderRadius: '6px', background: 'rgba(239, 68, 68, 0.2)', color: '#f87171', fontSize: '0.85rem', fontWeight: 700 }}>
+              {summary.equiposSalud.critico} 🔴
+            </span>
+          </div>
+          <div style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
+            Distribución de riesgo en {summary.totalEquipos} equipos
+          </div>
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
-        <div style={{ background: 'rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--border-subtle)' }}>
-          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-            <Users size={14} /> CMJ Asignado
-          </div>
-          <div style={{ fontSize: '1.2rem', fontWeight: 700, color: '#fff' }}>{currentData.cmj}</div>
-        </div>
-        
-        <div style={{ background: 'rgba(16, 185, 129, 0.05)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
-          <div style={{ fontSize: '0.8rem', color: '#10b981', marginBottom: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-            <Activity size={14} /> Retención MJ (PX)
-          </div>
-          <div style={{ fontSize: '1.6rem', fontWeight: 700, color: '#fff' }}>
-            {currentData.metrics.pxFinalMJ} <span style={{ fontSize: '1rem', color: '#10b981', fontWeight: 500 }}>/ {currentData.metrics.pxInicioMJ}</span>
-          </div>
+      {/* 4. BARRA DE HERRAMIENTAS Y PESTAÑAS DE VISTA */}
+      <div style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: '1rem',
+        padding: '1rem',
+        background: 'rgba(30, 41, 59, 0.5)',
+        borderRadius: '12px',
+        border: '1px solid rgba(255, 255, 255, 0.08)'
+      }}>
+        {/* Pestañas de modo */}
+        <div style={{ display: 'flex', gap: '6px', background: 'rgba(15, 23, 42, 0.6)', padding: '4px', borderRadius: '10px' }}>
+          <button
+            onClick={() => setActiveTab('equipos')}
+            style={{
+              padding: '0.5rem 1rem',
+              borderRadius: '8px',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '0.85rem',
+              fontWeight: 600,
+              background: activeTab === 'equipos' ? '#d4af37' : 'transparent',
+              color: activeTab === 'equipos' ? '#0f172a' : '#94a3b8',
+              transition: 'all 0.2s'
+            }}
+          >
+            🛡️ Equipos ({filteredEquipos.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('eventos')}
+            style={{
+              padding: '0.5rem 1rem',
+              borderRadius: '8px',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '0.85rem',
+              fontWeight: 600,
+              background: activeTab === 'eventos' ? '#d4af37' : 'transparent',
+              color: activeTab === 'eventos' ? '#0f172a' : '#94a3b8',
+              transition: 'all 0.2s'
+            }}
+          >
+            📅 Ciclos & FDS Drive ({filteredEventos.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('funnel')}
+            style={{
+              padding: '0.5rem 1rem',
+              borderRadius: '8px',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '0.85rem',
+              fontWeight: 600,
+              background: activeTab === 'funnel' ? '#d4af37' : 'transparent',
+              color: activeTab === 'funnel' ? '#0f172a' : '#94a3b8',
+              transition: 'all 0.2s'
+            }}
+          >
+            📉 Embudo CRES & Gráficos HD
+          </button>
+          <button
+            onClick={() => setActiveTab('benchmark')}
+            style={{
+              padding: '0.5rem 1rem',
+              borderRadius: '8px',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '0.85rem',
+              fontWeight: 600,
+              background: activeTab === 'benchmark' ? '#d4af37' : 'transparent',
+              color: activeTab === 'benchmark' ? '#0f172a' : '#94a3b8',
+              transition: 'all 0.2s'
+            }}
+          >
+            🏆 Benchmark Regional
+          </button>
         </div>
 
-        <div style={{ background: 'rgba(59, 130, 246, 0.05)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(59, 130, 246, 0.2)' }}>
-          <div style={{ fontSize: '0.8rem', color: '#3b82f6', marginBottom: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-            <Users size={14} /> Enrolamiento Total
+        {/* Buscador & Controles rápidos */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+          <div style={{ position: 'relative' }}>
+            <Search size={16} color="#94a3b8" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)' }} />
+            <input
+              type="text"
+              placeholder="Buscar equipo, sede, CMJ..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{
+                background: 'rgba(15, 23, 42, 0.7)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                borderRadius: '8px',
+                padding: '0.5rem 0.75rem 0.5rem 2.2rem',
+                color: '#ffffff',
+                fontSize: '0.85rem',
+                outline: 'none',
+                minWidth: '220px'
+              }}
+            />
           </div>
-          <div style={{ fontSize: '1.6rem', fontWeight: 700, color: '#fff' }}>
-            {currentData.metrics.totalEnrolamiento}
-          </div>
-        </div>
 
-        <div style={{ background: 'rgba(239, 68, 68, 0.05)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
-          <div style={{ fontSize: '0.8rem', color: '#ef4444', marginBottom: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-            <AlertTriangle size={14} /> Deserción % (Global)
-          </div>
-          <div style={{ fontSize: '1.6rem', fontWeight: 700, color: '#fff' }}>
-            {typeof currentData.metrics.tasaDesercionTotal === 'number' 
-              ? (currentData.metrics.tasaDesercionTotal * 100).toFixed(1) + '%' 
-              : currentData.metrics.tasaDesercionTotal}
-          </div>
+          {/* Filtro de Riesgo (en Equipos) */}
+          {activeTab === 'equipos' && (
+            <select
+              value={riskFilter}
+              onChange={(e) => setRiskFilter(e.target.value)}
+              style={{
+                background: 'rgba(15, 23, 42, 0.7)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                borderRadius: '8px',
+                padding: '0.5rem 0.75rem',
+                color: '#ffffff',
+                fontSize: '0.85rem',
+                cursor: 'pointer'
+              }}
+            >
+              <option value="ALL">Nivel de Riesgo: Todos</option>
+              <option value="CRITICO">🔴 Riesgo Crítico (Deserción &gt; 15%)</option>
+              <option value="ATENCION">🟡 En Atención (Deserción 7-15%)</option>
+              <option value="OPTIMO">🟢 Desempeño Óptimo (&lt; 7%)</option>
+            </select>
+          )}
+
+          {/* Filtro de Entrenador (en Eventos) */}
+          {activeTab === 'eventos' && (
+            <select
+              value={selectedTrainer}
+              onChange={(e) => setSelectedTrainer(e.target.value)}
+              style={{
+                background: 'rgba(15, 23, 42, 0.7)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                borderRadius: '8px',
+                padding: '0.5rem 0.75rem',
+                color: '#ffffff',
+                fontSize: '0.85rem',
+                cursor: 'pointer'
+              }}
+            >
+              <option value="ALL">Entrenador: Todos ({uniqueTrainers.length})</option>
+              {uniqueTrainers.map(tr => (
+                <option key={tr} value={tr}>{tr}</option>
+              ))}
+            </select>
+          )}
+
+          {/* Ordenamiento */}
+          {activeTab === 'equipos' && (
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              style={{
+                background: 'rgba(15, 23, 42, 0.7)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                borderRadius: '8px',
+                padding: '0.5rem 0.75rem',
+                color: '#ffffff',
+                fontSize: '0.85rem',
+                cursor: 'pointer'
+              }}
+            >
+              <option value="desercion_desc">Mayor Deserción PX</option>
+              <option value="desercion_asc">Menor Deserción PX</option>
+              <option value="retencion_desc">Mayor Retención %</option>
+              <option value="retencion_asc">Menor Retención %</option>
+              <option value="enrol_desc">Mayor Enrolamiento</option>
+              <option value="equipo_asc">Número de Equipo</option>
+            </select>
+          )}
+
+          {/* Botón Exportar CSV */}
+          <button
+            onClick={handleExportCSV}
+            title="Exportar datos filtrados a CSV"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '0.5rem 0.85rem',
+              borderRadius: '8px',
+              border: '1px solid rgba(212, 175, 55, 0.4)',
+              background: 'rgba(212, 175, 55, 0.1)',
+              color: '#d4af37',
+              cursor: 'pointer',
+              fontSize: '0.85rem',
+              fontWeight: 600
+            }}
+          >
+            <Download size={15} />
+            <span>CSV</span>
+          </button>
+
+          {/* Botón Restablecer */}
+          <button
+            onClick={resetFilters}
+            title="Restablecer filtros"
+            style={{
+              padding: '0.5rem 0.65rem',
+              borderRadius: '8px',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
+              background: 'rgba(15, 23, 42, 0.6)',
+              color: '#94a3b8',
+              cursor: 'pointer'
+            }}
+          >
+            <RefreshCw size={15} />
+          </button>
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-        <div style={{ background: 'rgba(0,0,0,0.2)', padding: '1.5rem', borderRadius: '12px' }}>
-          <h4 style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem', marginTop: 0, textAlign: 'center' }}>
-            Supervivencia de Entrenamientos (Inician vs Terminaron)
-          </h4>
-          <div style={{ height: 220 }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={currentData.chartData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" vertical={false} />
-                <XAxis dataKey="name" stroke="rgba(255,255,255,0.5)" tick={{ fontSize: 11 }} />
-                <YAxis stroke="rgba(255,255,255,0.5)" tick={{ fontSize: 11 }} />
-                <Tooltip cursor={{ fill: 'rgba(255,255,255,0.05)' }} contentStyle={{ background: '#1e293b', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }} />
-                <Legend iconType="circle" wrapperStyle={{ fontSize: '0.8rem' }} />
-                <Bar dataKey="Enrolados" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={30} />
-                <Bar dataKey="Terminaron" fill="#10b981" radius={[4, 4, 0, 0]} barSize={30} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
+      {/* 5. CONTENIDO SEGÚN LA PESTAÑA ACTIVA */}
 
-        <div style={{ background: 'rgba(0,0,0,0.2)', padding: '1.5rem', borderRadius: '12px' }}>
-          <h4 style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1.5rem', marginTop: 0, textAlign: 'center' }}>
-            Funnel de Retención C1  Y" MJ
-          </h4>
-          <div style={{ height: 220 }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={currentData.funnelData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" vertical={false} />
-                <XAxis dataKey="step" stroke="rgba(255,255,255,0.5)" tick={{ fontSize: 10 }} />
-                <YAxis stroke="rgba(255,255,255,0.5)" tick={{ fontSize: 11 }} />
-                <Tooltip cursor={{ fill: 'rgba(255,255,255,0.05)' }} contentStyle={{ background: '#1e293b', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }} />
-                <Area type="monotone" dataKey="value" fill="url(#colorFunnel)" stroke="#d4af37" />
-                <Line type="monotone" dataKey="value" stroke="#f59e0b" strokeWidth={3} dot={{ r: 5, fill: '#f59e0b', strokeWidth: 0 }} />
-                <defs>
-                  <linearGradient id="colorFunnel" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#d4af37" stopOpacity={0.4}/>
-                    <stop offset="95%" stopColor="#d4af37" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-              </ComposedChart>
-            </ResponsiveContainer>
+      {/* MODO 1: TABLA DE DIAGNÓSTICO DE EQUIPOS (CRES) */}
+      {activeTab === 'equipos' && (
+        <div style={{
+          background: 'rgba(30, 41, 59, 0.6)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          borderRadius: '14px',
+          overflow: 'hidden',
+          boxShadow: '0 8px 25px rgba(0, 0, 0, 0.3)'
+        }}>
+          <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#ffffff' }}>
+                Diagnóstico Clínico por Equipo (Funnel CRES)
+              </h3>
+              <p style={{ margin: '4px 0 0 0', fontSize: '0.8rem', color: '#94a3b8' }}>
+                Monitoreo detallado de deserción y enrolamiento desde Creación (1er FDS) hasta El Viaje.
+              </p>
+            </div>
+            <span style={{ fontSize: '0.85rem', color: '#d4af37', fontWeight: 600 }}>
+              Mostrando {filteredEquipos.length} equipos
+            </span>
+          </div>
+
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
+              <thead>
+                <tr style={{ background: 'rgba(15, 23, 42, 0.85)', color: '#94a3b8', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                  <th style={{ padding: '0.85rem 1rem' }}>Equipo & Sede</th>
+                  <th style={{ padding: '0.85rem 1rem' }}>CMJ Asignado</th>
+                  <th style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>PX Inician</th>
+                  <th style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>Deserción PX</th>
+                  <th style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>PX Culminan</th>
+                  <th style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>Retención %</th>
+                  <th style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>Enrol. Total</th>
+                  <th style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>Estado de Salud</th>
+                  <th style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredEquipos.map((eq) => {
+                  const isExpanded = expandedRow === eq.id;
+                  const risk = RISK_COLORS[eq.resumen.nivelRiesgo] || RISK_COLORS.OPTIMO;
+                  const sedeMeta = CMJ_METADATA[eq.sede] || { flag: '📍', color: '#64748b' };
+
+                  return (
+                    <React.Fragment key={eq.id}>
+                      <tr
+                        style={{
+                          borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                          background: isExpanded ? 'rgba(212, 175, 55, 0.08)' : 'transparent',
+                          transition: 'background 0.2s'
+                        }}
+                      >
+                        <td style={{ padding: '0.85rem 1rem', fontWeight: 600 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span>{sedeMeta.flag}</span>
+                            <div>
+                              <div style={{ color: '#ffffff', fontWeight: 700 }}>{eq.equipoLabel}</div>
+                              <div style={{ fontSize: '0.75rem', color: sedeMeta.color }}>{eq.sedeNombreLargo}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td style={{ padding: '0.85rem 1rem', color: '#cbd5e1' }}>
+                          {eq.cmj}
+                        </td>
+                        <td style={{ padding: '0.85rem 1rem', textAlign: 'center', fontWeight: 700, color: '#38bdf8' }}>
+                          {eq.resumen.pxIniciales}
+                        </td>
+                        <td style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>
+                          <span style={{
+                            padding: '3px 8px',
+                            borderRadius: '6px',
+                            background: eq.resumen.desercionTotalPx > 3 ? 'rgba(239, 68, 68, 0.2)' : 'rgba(245, 158, 11, 0.1)',
+                            color: eq.resumen.desercionTotalPx > 3 ? '#f87171' : '#fbbf24',
+                            fontWeight: 700
+                          }}>
+                            {eq.resumen.desercionTotalPx} ({eq.resumen.tasaDesercion}%)
+                          </span>
+                        </td>
+                        <td style={{ padding: '0.85rem 1rem', textAlign: 'center', fontWeight: 700, color: '#4ade80' }}>
+                          {eq.resumen.pxFinales}
+                        </td>
+                        <td style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                            <span style={{ fontWeight: 700, color: eq.resumen.tasaRetencion >= 85 ? '#4ade80' : eq.resumen.tasaRetencion >= 70 ? '#fbbf24' : '#f87171' }}>
+                              {eq.resumen.tasaRetencion}%
+                            </span>
+                          </div>
+                        </td>
+                        <td style={{ padding: '0.85rem 1rem', textAlign: 'center', fontWeight: 700, color: '#d4af37' }}>
+                          {eq.resumen.enrolTotalAcumulado}
+                        </td>
+                        <td style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>
+                          <span style={{
+                            padding: '4px 10px',
+                            borderRadius: '20px',
+                            background: risk.bg,
+                            border: `1px solid ${risk.border}`,
+                            color: risk.text,
+                            fontSize: '0.78rem',
+                            fontWeight: 700,
+                            letterSpacing: '0.02em'
+                          }}>
+                            {risk.label}
+                          </span>
+                        </td>
+                        <td style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>
+                          <button
+                            onClick={() => setExpandedRow(isExpanded ? null : eq.id)}
+                            style={{
+                              padding: '4px 10px',
+                              borderRadius: '6px',
+                              border: '1px solid rgba(255, 255, 255, 0.15)',
+                              background: isExpanded ? '#d4af37' : 'rgba(15, 23, 42, 0.6)',
+                              color: isExpanded ? '#0f172a' : '#94a3b8',
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              fontSize: '0.8rem',
+                              fontWeight: 600
+                            }}
+                          >
+                            <span>Detalle</span>
+                            {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                          </button>
+                        </td>
+                      </tr>
+
+                      {/* FILA EXPANDIBLE CON EL DIAGNÓSTICO DETALLADO CRES */}
+                      {isExpanded && (
+                        <tr>
+                          <td colSpan={9} style={{ padding: '1.25rem 1.5rem', background: 'rgba(15, 23, 42, 0.95)', borderBottom: '1px solid rgba(212, 175, 55, 0.2)' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <span style={{ fontSize: '0.9rem', fontWeight: 700, color: '#d4af37' }}>
+                                  🔬 Desglose Clínico de Etapas: {eq.equipoLabel} ({eq.sedeNombreLargo})
+                                </span>
+                                <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
+                                  Inician C1: {eq.c1.inician} → Terminan C1: {eq.c1.terminan} | Inician C2: {eq.c2.inician} → Terminan C2: {eq.c2.terminan}
+                                </span>
+                              </div>
+
+                              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
+                                {/* 1er FDS: Creación */}
+                                <div style={{ background: 'rgba(30, 41, 59, 0.8)', border: '1px solid rgba(212, 175, 55, 0.3)', borderRadius: '10px', padding: '1rem' }}>
+                                  <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#d4af37', marginBottom: '8px' }}>
+                                    ✨ 1er FDS: Creación
+                                  </div>
+                                  <div style={{ fontSize: '0.8rem', color: '#cbd5e1', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                    <div>PX Inician: <strong style={{ color: '#ffffff' }}>{eq.creacion.pxInicio}</strong></div>
+                                    <div>Deserción PX: <strong style={{ color: eq.creacion.desercionPx > 0 ? '#f87171' : '#4ade80' }}>{eq.creacion.desercionPx}</strong></div>
+                                    <div>PX Final: <strong style={{ color: '#ffffff' }}>{eq.creacion.pxFinal}</strong></div>
+                                    <div>Deserción Managers: <strong style={{ color: eq.creacion.desercionMg > 0 ? '#f87171' : '#cbd5e1' }}>{eq.creacion.desercionMg}</strong></div>
+                                    <div style={{ marginTop: '4px', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '4px' }}>
+                                      Enrolamiento PX: <strong style={{ color: '#38bdf8' }}>{eq.creacion.enrolPx}</strong>
+                                    </div>
+                                    <div>Enrolamiento Managers: <strong style={{ color: '#a78bfa' }}>{eq.creacion.enrolMg}</strong></div>
+                                  </div>
+                                </div>
+
+                                {/* 2do FDS: Relación */}
+                                <div style={{ background: 'rgba(30, 41, 59, 0.8)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '10px', padding: '1rem' }}>
+                                  <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#34d399', marginBottom: '8px' }}>
+                                    🤝 2do FDS: Relación
+                                  </div>
+                                  <div style={{ fontSize: '0.8rem', color: '#cbd5e1', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                    <div>PX Inician: <strong style={{ color: '#ffffff' }}>{eq.relacion.pxInicio}</strong></div>
+                                    <div>Deserción PX: <strong style={{ color: eq.relacion.desercionPx > 0 ? '#f87171' : '#4ade80' }}>{eq.relacion.desercionPx}</strong></div>
+                                    <div>PX Final: <strong style={{ color: '#ffffff' }}>{eq.relacion.pxFinal}</strong></div>
+                                    <div>Deserción Managers: <strong style={{ color: eq.relacion.desercionMg > 0 ? '#f87171' : '#cbd5e1' }}>{eq.relacion.desercionMg}</strong></div>
+                                    <div style={{ marginTop: '4px', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '4px' }}>
+                                      Enrolamiento FDS 2: <strong style={{ color: '#38bdf8' }}>{eq.relacion.enrolTotal}</strong>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* 3er FDS: Gratitud */}
+                                <div style={{ background: 'rgba(30, 41, 59, 0.8)', border: '1px solid rgba(6, 182, 212, 0.3)', borderRadius: '10px', padding: '1rem' }}>
+                                  <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#22d3ee', marginBottom: '8px' }}>
+                                    🙏 3er FDS: Gratitud
+                                  </div>
+                                  <div style={{ fontSize: '0.8rem', color: '#cbd5e1', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                    <div>PX Inician: <strong style={{ color: '#ffffff' }}>{eq.gratitud.pxInicio}</strong></div>
+                                    <div>Deserción PX: <strong style={{ color: eq.gratitud.desercionPx > 0 ? '#f87171' : '#4ade80' }}>{eq.gratitud.desercionPx}</strong></div>
+                                    <div>PX Final: <strong style={{ color: '#ffffff' }}>{eq.gratitud.pxFinal}</strong></div>
+                                    <div>Deserción Managers: <strong style={{ color: eq.gratitud.desercionMg > 0 ? '#f87171' : '#cbd5e1' }}>{eq.gratitud.desercionMg}</strong></div>
+                                    <div style={{ marginTop: '4px', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '4px' }}>
+                                      Enrolamiento FDS 3: <strong style={{ color: '#38bdf8' }}>{eq.gratitud.enrolTotal}</strong>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* El Viaje: Graduación */}
+                                <div style={{ background: 'rgba(30, 41, 59, 0.8)', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '10px', padding: '1rem' }}>
+                                  <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#fbbf24', marginBottom: '8px' }}>
+                                    🎓 El Viaje (Graduación)
+                                  </div>
+                                  <div style={{ fontSize: '0.8rem', color: '#cbd5e1', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                    <div>PX Inician Viaje: <strong style={{ color: '#ffffff' }}>{eq.viaje.pxInicio}</strong></div>
+                                    <div>PX Graduados: <strong style={{ color: '#4ade80', fontSize: '1rem' }}>{eq.viaje.pxGraduados}</strong></div>
+                                    <div>Total Desertores PX: <strong style={{ color: eq.resumen.desercionTotalPx > 0 ? '#f87171' : '#4ade80' }}>{eq.resumen.desercionTotalPx}</strong></div>
+                                    <div style={{ marginTop: '4px', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '4px' }}>
+                                      Retención Global: <strong style={{ color: '#d4af37' }}>{eq.resumen.tasaRetencion}%</strong>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         </div>
-      </div>
+      )}
+
+      {/* MODO 2: TABLA DE EVENTOS FDS (DRIVE) */}
+      {activeTab === 'eventos' && (
+        <div style={{
+          background: 'rgba(30, 41, 59, 0.6)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          borderRadius: '14px',
+          overflow: 'hidden',
+          boxShadow: '0 8px 25px rgba(0, 0, 0, 0.3)'
+        }}>
+          <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#ffffff' }}>
+                Hojas Clínicas de FDS de Maestría (Google Drive)
+              </h3>
+              <p style={{ margin: '4px 0 0 0', fontSize: '0.8rem', color: '#94a3b8' }}>
+                Eventos con Entrenadores a cargo, PX en 0 (Alerta de deserción) y comparativas de metas.
+              </p>
+            </div>
+            <span style={{ fontSize: '0.85rem', color: '#d4af37', fontWeight: 600 }}>
+              {filteredEventos.length} eventos encontrados
+            </span>
+          </div>
+
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
+              <thead>
+                <tr style={{ background: 'rgba(15, 23, 42, 0.85)', color: '#94a3b8', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                  <th style={{ padding: '0.85rem 1rem' }}>Evento / Fecha</th>
+                  <th style={{ padding: '0.85rem 1rem' }}>Sede</th>
+                  <th style={{ padding: '0.85rem 1rem' }}>Entrenadores por FDS</th>
+                  <th style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>PX Llegaron</th>
+                  <th style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>Deserción</th>
+                  <th style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>Retención %</th>
+                  <th style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>PX en 0 (Alerta)</th>
+                  <th style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>Enrol. Total</th>
+                  <th style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredEventos.map((ev) => {
+                  const isExpanded = expandedRow === ev.id;
+                  const trainers = Array.from(new Set(ev.fdsList.map(f => f.entrenador).filter(t => t && t !== 'Sin Asignar'))).join(', ') || 'Sin Asignar';
+                  const sedeMeta = CMJ_METADATA[ev.sede] || { flag: '📍', color: '#64748b' };
+
+                  return (
+                    <React.Fragment key={ev.id}>
+                      <tr style={{
+                        borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                        background: isExpanded ? 'rgba(212, 175, 55, 0.08)' : 'transparent'
+                      }}>
+                        <td style={{ padding: '0.85rem 1rem', fontWeight: 700, color: '#ffffff' }}>
+                          {ev.evento}
+                        </td>
+                        <td style={{ padding: '0.85rem 1rem' }}>
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: sedeMeta.color, fontWeight: 600 }}>
+                            {sedeMeta.flag} {ev.sede}
+                          </span>
+                        </td>
+                        <td style={{ padding: '0.85rem 1rem', color: '#cbd5e1', fontSize: '0.82rem' }}>
+                          {trainers}
+                        </td>
+                        <td style={{ padding: '0.85rem 1rem', textAlign: 'center', fontWeight: 700, color: '#38bdf8' }}>
+                          {ev.totalLlegaron}
+                        </td>
+                        <td style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>
+                          <span style={{
+                            padding: '3px 8px',
+                            borderRadius: '6px',
+                            background: ev.tasaDesercionGlobal > 10 ? 'rgba(239, 68, 68, 0.2)' : 'rgba(245, 158, 11, 0.1)',
+                            color: ev.tasaDesercionGlobal > 10 ? '#f87171' : '#fbbf24',
+                            fontWeight: 700
+                          }}>
+                            {ev.totalDesercion} ({ev.tasaDesercionGlobal}%)
+                          </span>
+                        </td>
+                        <td style={{ padding: '0.85rem 1rem', textAlign: 'center', fontWeight: 700, color: '#4ade80' }}>
+                          {ev.tasaRetencionGlobal}%
+                        </td>
+                        <td style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>
+                          <span style={{
+                            padding: '3px 8px',
+                            borderRadius: '6px',
+                            background: ev.totalPxCero > 5 ? 'rgba(239, 68, 68, 0.2)' : 'rgba(245, 158, 11, 0.15)',
+                            color: ev.totalPxCero > 5 ? '#f87171' : '#fbbf24',
+                            fontWeight: 700
+                          }}>
+                            {ev.totalPxCero} en 0
+                          </span>
+                        </td>
+                        <td style={{ padding: '0.85rem 1rem', textAlign: 'center', fontWeight: 700, color: '#d4af37' }}>
+                          {ev.totalEnrol}
+                        </td>
+                        <td style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>
+                          <button
+                            onClick={() => setExpandedRow(isExpanded ? null : ev.id)}
+                            style={{
+                              padding: '4px 10px',
+                              borderRadius: '6px',
+                              border: '1px solid rgba(255, 255, 255, 0.15)',
+                              background: isExpanded ? '#d4af37' : 'rgba(15, 23, 42, 0.6)',
+                              color: isExpanded ? '#0f172a' : '#94a3b8',
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              fontSize: '0.8rem',
+                              fontWeight: 600
+                            }}
+                          >
+                            <span>FDS</span>
+                            {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                          </button>
+                        </td>
+                      </tr>
+
+                      {/* FILA EXPANDIBLE CON CADA FDS */}
+                      {isExpanded && (
+                        <tr>
+                          <td colSpan={9} style={{ padding: '1.25rem 1.5rem', background: 'rgba(15, 23, 42, 0.95)', borderBottom: '1px solid rgba(212, 175, 55, 0.2)' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
+                              {ev.fdsList.map((f, idx) => (
+                                <div key={idx} style={{ background: 'rgba(30, 41, 59, 0.8)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '10px', padding: '1rem' }}>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                                    <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#d4af37' }}>{f.fdsName}</span>
+                                    <span style={{ fontSize: '0.75rem', padding: '2px 6px', borderRadius: '4px', background: 'rgba(255, 255, 255, 0.05)', color: '#38bdf8' }}>
+                                      {f.entrenador}
+                                    </span>
+                                  </div>
+                                  <div style={{ fontSize: '0.8rem', color: '#cbd5e1', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                    <div>PX Llegaron: <strong style={{ color: '#ffffff' }}>{f.llegaron}</strong></div>
+                                    <div>Deserción: <strong style={{ color: f.desercion > 0 ? '#f87171' : '#4ade80' }}>{f.desercion} ({f.tasaDesercion}%)</strong></div>
+                                    <div>PX Terminaron: <strong style={{ color: '#4ade80' }}>{f.terminaron}</strong></div>
+                                    <div style={{ color: f.pxEnCero > 0 ? '#fbbf24' : '#94a3b8' }}>
+                                      PX en 0: <strong>{f.pxEnCero} ({f.pctPxEnCero}%)</strong>
+                                    </div>
+                                    <div style={{ marginTop: '4px', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '4px' }}>
+                                      Enrolamiento PX: <strong style={{ color: '#38bdf8' }}>{f.enrolPx}</strong> (Meta: {f.declPx})
+                                    </div>
+                                    <div>Enrolamiento Managers: <strong style={{ color: '#a78bfa' }}>{f.enrolMg}</strong></div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* MODO 3: FUNNEL DE CONVERSIÓN & GRÁFICOS HD */}
+      {activeTab === 'funnel' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          {/* Gráfico 1: Embudo de Supervivencia CRES */}
+          <div style={{
+            background: 'rgba(30, 41, 59, 0.7)',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+            borderRadius: '16px',
+            padding: '1.5rem',
+            boxShadow: '0 8px 25px rgba(0, 0, 0, 0.3)'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#ffffff' }}>
+                  Embudo de Conversión & Supervivencia del Proceso (CRES)
+                </h3>
+                <p style={{ margin: '4px 0 0 0', fontSize: '0.8rem', color: '#94a3b8' }}>
+                  Visualización paso a paso: Cómo van creándose los equipos y dónde ocurren los abandonos.
+                </p>
+              </div>
+              <span style={{ fontSize: '0.8rem', padding: '4px 10px', borderRadius: '6px', background: 'rgba(212, 175, 55, 0.15)', color: '#d4af37', fontWeight: 600 }}>
+                {selectedSede === 'TODAS' ? 'Todas las Sedes' : selectedSede}
+              </span>
+            </div>
+
+            <div style={{ width: '100%', height: 320 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={funnelData} margin={{ top: 20, right: 30, left: 10, bottom: 40 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" />
+                  <XAxis dataKey="etapa" stroke="#94a3b8" angle={-25} textAnchor="end" interval={0} fontSize={11} />
+                  <YAxis stroke="#94a3b8" fontSize={11} />
+                  <Tooltip
+                    contentStyle={{
+                      background: 'rgba(15, 23, 42, 0.95)',
+                      border: '1px solid rgba(212, 175, 55, 0.4)',
+                      borderRadius: '8px',
+                      color: '#ffffff'
+                    }}
+                  />
+                  <Bar dataKey="cantidad" name="Participantes Activos" radius={[6, 6, 0, 0]}>
+                    {funnelData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.fill} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Gráfico 2: Evolución de Retención vs Deserción */}
+          <div style={{
+            background: 'rgba(30, 41, 59, 0.7)',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+            borderRadius: '16px',
+            padding: '1.5rem',
+            boxShadow: '0 8px 25px rgba(0, 0, 0, 0.3)'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#ffffff' }}>
+                  Evolución Temporal: Retención vs Abandono & Participantes en 0
+                </h3>
+                <p style={{ margin: '4px 0 0 0', fontSize: '0.8rem', color: '#94a3b8' }}>
+                  Comportamiento histórico de participantes que culminan vs desertores en cada ciclo.
+                </p>
+              </div>
+            </div>
+
+            <div style={{ width: '100%', height: 300 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={evolutionData} margin={{ top: 10, right: 30, left: 0, bottom: 20 }}>
+                  <defs>
+                    <linearGradient id="colorTerminaron" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#22c55e" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="#22c55e" stopOpacity={0}/>
+                    </linearGradient>
+                    <linearGradient id="colorDesercion" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" />
+                  <XAxis dataKey={selectedSede === 'TODAS' ? 'nombre' : 'fecha'} stroke="#94a3b8" fontSize={11} />
+                  <YAxis stroke="#94a3b8" fontSize={11} />
+                  <Tooltip
+                    contentStyle={{
+                      background: 'rgba(15, 23, 42, 0.95)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      borderRadius: '8px',
+                      color: '#ffffff'
+                    }}
+                  />
+                  <Legend />
+                  <Area type="monotone" dataKey="Terminaron" stroke="#22c55e" fillOpacity={1} fill="url(#colorTerminaron)" />
+                  <Area type="monotone" dataKey="Desercion" stroke="#ef4444" fillOpacity={1} fill="url(#colorDesercion)" />
+                  <Line type="monotone" dataKey="PxEnCero" stroke="#f59e0b" strokeWidth={2} name="PX en 0 (Alerta)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODO 4: BENCHMARK REGIONAL ENTRE LAS 6 SEDES */}
+      {activeTab === 'benchmark' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <div style={{
+            background: 'rgba(30, 41, 59, 0.7)',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+            borderRadius: '16px',
+            padding: '1.5rem',
+            boxShadow: '0 8px 25px rgba(0, 0, 0, 0.3)'
+          }}>
+            <div style={{ marginBottom: '1.25rem' }}>
+              <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#ffffff' }}>
+                Benchmark Regional Comparativo de Maestría del Juego (2026)
+              </h3>
+              <p style={{ margin: '4px 0 0 0', fontSize: '0.8rem', color: '#94a3b8' }}>
+                Comparación directa entre las 6 sedes: Eficiencia de retención, deserción y enrolamiento per cápita.
+              </p>
+            </div>
+
+            <div style={{ width: '100%', height: 320 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={sedesBenchmark} margin={{ top: 20, right: 30, left: 10, bottom: 20 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.05)" />
+                  <XAxis dataKey="nombreLargo" stroke="#94a3b8" fontSize={11} />
+                  <YAxis stroke="#94a3b8" fontSize={11} />
+                  <Tooltip
+                    contentStyle={{
+                      background: 'rgba(15, 23, 42, 0.95)',
+                      border: '1px solid rgba(212, 175, 55, 0.4)',
+                      borderRadius: '8px',
+                      color: '#ffffff'
+                    }}
+                  />
+                  <Legend />
+                  <Bar dataKey="terminaron" name="PX Terminaron" fill="#22c55e" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="desercion" name="Deserción" fill="#ef4444" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="pxCero" name="PX en 0" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Tarjetas de Resumen por Sede */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
+            {sedesBenchmark.map(b => (
+              <div
+                key={b.sede}
+                onClick={() => { setSelectedSede(b.sede); setActiveTab('equipos'); }}
+                style={{
+                  background: 'rgba(30, 41, 59, 0.6)',
+                  border: `1px solid ${b.color}40`,
+                  borderRadius: '14px',
+                  padding: '1.25rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2)'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '1.5rem' }}>{b.flag}</span>
+                    <div>
+                      <div style={{ fontWeight: 700, color: '#ffffff' }}>{b.nombreLargo}</div>
+                      <div style={{ fontSize: '0.75rem', color: b.color }}>CMJ: {b.cmj}</div>
+                    </div>
+                  </div>
+                  <span style={{ fontSize: '0.75rem', padding: '3px 8px', borderRadius: '6px', background: 'rgba(255, 255, 255, 0.05)', color: '#94a3b8' }}>
+                    {b.totalEquipos} Equipos
+                  </span>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '0.82rem', marginTop: '12px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '10px' }}>
+                  <div>
+                    <span style={{ color: '#94a3b8' }}>Retención: </span>
+                    <strong style={{ color: '#4ade80' }}>{b.tasaRetencion}%</strong>
+                  </div>
+                  <div>
+                    <span style={{ color: '#94a3b8' }}>Deserción: </span>
+                    <strong style={{ color: b.tasaDesercion > 8 ? '#f87171' : '#fbbf24' }}>{b.tasaDesercion}%</strong>
+                  </div>
+                  <div>
+                    <span style={{ color: '#94a3b8' }}>Enrol. Total: </span>
+                    <strong style={{ color: '#d4af37' }}>{b.enrolTotal}</strong>
+                  </div>
+                  <div>
+                    <span style={{ color: '#94a3b8' }}>PX en 0: </span>
+                    <strong style={{ color: b.pxCero > 5 ? '#f87171' : '#fbbf24' }}>{b.pxCero}</strong>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -315855,7 +317122,7 @@ import CMJDashboard from '../components/CMJDashboard';
 import NodusCoordinadoresC1C2Dashboard from '../components/NodusCoordinadoresC1C2Dashboard';
 import ThemeSelector from '../components/ThemeSelector';
 
-export default function AuditoriaKPIs() {
+export default function AuditoriaKPIs({ defaultTab }) {
   const { currentUser } = useAuth();
   const { showToast } = useUI();
   const navigate = useNavigate();
@@ -315867,7 +317134,7 @@ export default function AuditoriaKPIs() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [isScrapingLive, setIsScrapingLive] = useState(false);
-  const [activeTab, setActiveTab] = useState('coordinadores_nodus'); // 'coordinadores_nodus', 'cmj', 'entrenadores', 'auditoria'
+  const [activeTab, setActiveTab] = useState(defaultTab || 'coordinadores_nodus'); // 'coordinadores_nodus', 'cmj', 'entrenadores', 'auditoria'
   const sedesDisponibles = ['Todas', ...OPERATIONAL_SEDES];
 
   useEffect(() => {
@@ -316363,7 +317630,7 @@ export default function AuditoriaKPIs() {
             }}
           >
             <Target size={16} style={{ display: 'inline-block', verticalAlign: 'text-bottom', marginRight: '6px' }} />
-            CMJs
+            Diagnóstico CMJ (Maestría)
           </button>
           <button
             onClick={() => setActiveTab('entrenadores')}
@@ -339691,6 +340958,609 @@ export async function clearTestLogs() {
     localStorage.removeItem('cpsl_audit_logs');
     localStorage.removeItem(LOCAL_CONNECTIONS_KEY);
   } catch (e) {}
+}
+
+```
+
+---
+
+## Archivo: src\services\cmjDataService.js
+
+```js
+/**
+ * cmjDataService.js
+ * Servicio de datos de Diagnóstico y Métricas para Coordinadores de Maestría del Juego (CMJs)
+ * CREAR PODER SIN LÍMITES - Causa OS
+ */
+
+import cdmxData from '../data/reportes_drive/MJ CDMX.json';
+import cuencaData from '../data/reportes_drive/MAESTRIA CUENCA.json';
+import gyeData from '../data/reportes_drive/MAESTRIA GYE.json';
+import limaData from '../data/reportes_drive/MAESTRIA LIMA.json';
+import medellinData from '../data/reportes_drive/MJ MEDELLIN.json';
+import quitoData from '../data/reportes_drive/MAESTRIA QUITO.json';
+import seguimientoData from '../data/SEGUIMIENTO_EQUIPOS.json';
+
+export const CMJ_METADATA = {
+  CDMX: { sede: 'CDMX', nombreLargo: 'Ciudad de México', cmj: 'Alonso Solares', color: '#f97316', flag: '🇲🇽' },
+  CUENCA: { sede: 'CUENCA', nombreLargo: 'Cuenca', cmj: 'Kerlie Carrillo', color: '#8b5cf6', flag: '🇪🇨' },
+  GUAYAQUIL: { sede: 'GUAYAQUIL', nombreLargo: 'Guayaquil', cmj: 'Coordinación GYE', color: '#f59e0b', flag: '🇪🇨' },
+  LIMA: { sede: 'LIMA', nombreLargo: 'Lima', cmj: 'Linid Valencia', color: '#ef4444', flag: '🇵🇪' },
+  MEDELLIN: { sede: 'MEDELLIN', nombreLargo: 'Medellín', cmj: 'Mauricio Ramírez', color: '#22c55e', flag: '🇨🇴' },
+  QUITO: { sede: 'QUITO', nombreLargo: 'Quito', cmj: 'Erika Gavilánez', color: '#29abe2', flag: '🇪🇨' }
+};
+
+export const SEDES_LIST = ['TODAS', 'CDMX', 'CUENCA', 'GUAYAQUIL', 'LIMA', 'MEDELLIN', 'QUITO'];
+
+export function normalizeSedeName(rawSede) {
+  if (!rawSede) return 'TODAS';
+  const s = rawSede.toString().trim().toUpperCase();
+  if (s === 'TODAS' || s === 'GLOBAL' || s === 'ALL') return 'TODAS';
+  if (s.includes('GYE') || s.includes('GUAYAQUIL')) return 'GUAYAQUIL';
+  if (s.includes('CDMX') || s.includes('MÉXICO') || s.includes('MEXICO')) return 'CDMX';
+  if (s.includes('MEDELL')) return 'MEDELLIN';
+  if (s.includes('CUENCA')) return 'CUENCA';
+  if (s.includes('LIMA')) return 'LIMA';
+  if (s.includes('QUITO') || s.includes('UIO')) return 'QUITO';
+  return s;
+}
+
+let _cachedEquipos = null;
+
+export function getAllEquipos() {
+  if (_cachedEquipos) return _cachedEquipos;
+  try {
+    const rows = (seguimientoData && seguimientoData.Hoja1) ? seguimientoData.Hoja1.slice(2) : [];
+    const equipos = [];
+    const num = (v) => { const n = Number(v); return isNaN(n) ? 0 : n; };
+
+    rows.forEach((r, idx) => {
+      const rawSede = r['MAESTRIA DEL JUEGO '];
+      const eqNum = r['__EMPTY'];
+      if (!rawSede || rawSede.includes('SEDE') || eqNum === undefined) return;
+
+      const sede = normalizeSedeName(rawSede);
+      const cmjMeta = CMJ_METADATA[sede] || { cmj: 'Sin Asignar', color: '#64748b', flag: '📍' };
+
+      const inicianC1 = num(r['CAPITULO UNO']);
+      const terminanC1 = num(r['__EMPTY_2']);
+      const paganC2 = num(r['__EMPTY_3']);
+      const inicianC2 = num(r['__EMPTY_5']);
+      const terminanC2 = num(r['C2 A CREACION']);
+      const pagosMJ = num(r['__EMPTY_6']);
+
+      const c_pxInicio = num(r['__EMPTY_11']);
+      const c_mgInicio = num(r['__EMPTY_12']);
+      const c_pxFinal = num(r['__EMPTY_13']);
+      const c_mgFinal = num(r['__EMPTY_14']);
+      const c_desercionPx = num(r['__EMPTY_15']);
+      const c_desercionMg = num(r['__EMPTY_16']);
+      const c_enrolPx = num(r['__EMPTY_17']);
+      const c_enrolMg = num(r['__EMPTY_18']);
+      const c_enrolTotal = num(r['__EMPTY_19']) || (c_enrolPx + c_enrolMg);
+
+      const r_pxInicio = num(r['CREACION A RELACION']);
+      const r_mgInicio = num(r['__EMPTY_20']);
+      const r_desercionPx = num(r['__EMPTY_21']);
+      const r_desercionMg = num(r['__EMPTY_22']);
+      const r_pxFinal = num(r['__EMPTY_23']);
+      const r_mgFinal = num(r['__EMPTY_24']);
+      const r_enrolTotal = num(r['__EMPTY_29']);
+
+      const g_pxInicio = num(r[' RELACIÓN A GRATITUD']);
+      const g_mgInicio = num(r['__EMPTY_30']);
+      const g_desercionPx = num(r['__EMPTY_31']);
+      const g_desercionMg = num(r['__EMPTY_32']);
+      const g_pxFinal = num(r['__EMPTY_33']);
+      const g_mgFinal = num(r['__EMPTY_34']);
+      const g_enrolTotal = num(r['__EMPTY_39']);
+
+      const v_pxInicio = num(r[' GRATITUD AL VIAJE']);
+      const v_pxGraduados = num(r['__EMPTY_43']);
+
+      const desercionTotalPx = c_desercionPx + r_desercionPx + g_desercionPx;
+      const desercionTotalMg = c_desercionMg + r_desercionMg + g_desercionMg;
+      const enrolTotalAcumulado = c_enrolTotal + r_enrolTotal + g_enrolTotal;
+
+      const pxInicioReal = c_pxInicio || terminanC2 || inicianC1;
+      const pxFinalReal = v_pxGraduados || g_pxFinal || r_pxFinal || c_pxFinal;
+
+      const tasaRetencionGeneral = pxInicioReal > 0 ? (pxFinalReal / pxInicioReal) * 100 : 100;
+      const tasaDesercionGeneral = pxInicioReal > 0 ? (desercionTotalPx / pxInicioReal) * 100 : 0;
+
+      let nivelRiesgo = 'OPTIMO';
+      if (desercionTotalPx >= 5 || (pxInicioReal > 0 && tasaRetencionGeneral < 75) || tasaDesercionGeneral > 15) {
+        nivelRiesgo = 'CRITICO';
+      } else if (desercionTotalPx >= 2 || (pxInicioReal > 0 && tasaRetencionGeneral < 88) || tasaDesercionGeneral > 7) {
+        nivelRiesgo = 'ATENCION';
+      }
+
+      equipos.push({
+        id: `${sede}_EQ_${eqNum}_${idx}`,
+        sede,
+        sedeNombreLargo: cmjMeta.nombreLargo,
+        cmj: (r['COORDINADOR MAESTRIA DEL JUEGO'] || cmjMeta.cmj).trim(),
+        equipoLabel: `Equipo ${eqNum}`,
+        equipoNum: Number(eqNum),
+        c1: { inician: inicianC1, terminan: terminanC1 },
+        c2: { pagan: paganC2, inician: inicianC2, terminan: terminanC2 },
+        pagosMJ,
+        creacion: {
+          pxInicio: c_pxInicio, mgInicio: c_mgInicio, pxFinal: c_pxFinal, mgFinal: c_mgFinal,
+          desercionPx: c_desercionPx, desercionMg: c_desercionMg,
+          enrolPx: c_enrolPx, enrolMg: c_enrolMg, enrolTotal: c_enrolTotal
+        },
+        relacion: {
+          pxInicio: r_pxInicio, mgInicio: r_mgInicio, pxFinal: r_pxFinal, mgFinal: r_mgFinal,
+          desercionPx: r_desercionPx, desercionMg: r_desercionMg, enrolTotal: r_enrolTotal
+        },
+        gratitud: {
+          pxInicio: g_pxInicio, mgInicio: g_mgInicio, pxFinal: g_pxFinal, mgFinal: g_mgFinal,
+          desercionPx: g_desercionPx, desercionMg: g_desercionMg, enrolTotal: g_enrolTotal
+        },
+        viaje: { pxInicio: v_pxInicio, pxGraduados: v_pxGraduados },
+        resumen: {
+          pxIniciales: pxInicioReal,
+          pxFinales: pxFinalReal,
+          desercionTotalPx,
+          desercionTotalMg,
+          enrolTotalAcumulado,
+          tasaRetencion: Math.round(tasaRetencionGeneral * 10) / 10,
+          tasaDesercion: Math.round(tasaDesercionGeneral * 10) / 10,
+          nivelRiesgo
+        }
+      });
+    });
+
+    _cachedEquipos = equipos;
+    return equipos;
+  } catch (err) {
+    console.error('Error parsing equipos in cmjDataService:', err);
+    return [];
+  }
+}
+
+let _cachedEventos = null;
+
+function parseSingleDriveSheet(sheetRows, sheetName, sede) {
+  if (!Array.isArray(sheetRows) || sheetRows.length < 5) return null;
+
+  const getRowByLabel = (label) => {
+    return sheetRows.find(r => {
+      const val = (r['Tabla 1'] || r.__EMPTY || r['FECHAS'] || Object.values(r)[0] || '').toString().toLowerCase();
+      return val.includes(label.toLowerCase());
+    }) || {};
+  };
+
+  const entrenadoresRow = getRowByLabel('ENTRENADOR');
+  const equipoRow = getRowByLabel('EQUIPO');
+  const llegaronRow = getRowByLabel('PX que llegaron') || getRowByLabel('llegaron');
+  const noLlegaronRow = getRowByLabel('PX que no llegaron');
+  const desercionRow = getRowByLabel('Deserci');
+  const terminaronRow = getRowByLabel('Px Terminaron') || getRowByLabel('Terminaron');
+  const pxEnCeroRow = getRowByLabel('PX en 0');
+  const pctPxEnCeroRow = getRowByLabel('% PX EN 0');
+  const managersRow = getRowByLabel('Managers');
+
+  const declaracionRows = sheetRows.filter(r => {
+    const val = (r['Tabla 1'] || r.__EMPTY || r['FECHAS'] || Object.values(r)[0] || '').toString().toLowerCase();
+    return val.includes('declaraci');
+  });
+  const enrolamientoRows = sheetRows.filter(r => {
+    const val = (r['Tabla 1'] || r.__EMPTY || r['FECHAS'] || Object.values(r)[0] || '').toString().toLowerCase();
+    return val.includes('enrolamiento');
+  });
+
+  const declPx = declaracionRows[0] || {};
+  const declMg = declaracionRows[1] || {};
+  const declTotal = declaracionRows[2] || declaracionRows[1] || {};
+
+  const enrolPx = enrolamientoRows[0] || {};
+  const enrolMg = enrolamientoRows[1] || {};
+  const enrolTotal = enrolamientoRows[2] || enrolamientoRows[1] || {};
+
+  const fdsList = [
+    { key: '__EMPTY', fdsName: '1er FDS (Creación)', etapa: 'Creación' },
+    { key: '__EMPTY_1', fdsName: '2do FDS (Relación)', etapa: 'Relación' },
+    { key: '__EMPTY_2', fdsName: '3er FDS (Gratitud)', etapa: 'Gratitud' }
+  ];
+
+  const parsedFds = fdsList.map(fds => {
+    const k = fds.key;
+    const llegaron = Number(llegaronRow[k]) || 0;
+    const noLlegaron = Number(noLlegaronRow[k]) || 0;
+    const desercion = Number(desercionRow[k]) || 0;
+    const terminaron = Number(terminaronRow[k]) || (llegaron > 0 ? llegaron - desercion : 0);
+    const pxEnCero = Number(pxEnCeroRow[k]) || 0;
+    const managers = Number(managersRow[k]) || 0;
+    const enrolP = Number(enrolPx[k]) || 0;
+    const enrolM = Number(enrolMg[k]) || 0;
+    const enrolT = Number(enrolTotal[k]) || (enrolP + enrolM);
+    const declP = Number(declPx[k]) || 0;
+    const declM = Number(declMg[k]) || 0;
+    const declT = Number(declTotal[k]) || (declP + declM);
+    const entrenador = entrenadoresRow[k] ? entrenadoresRow[k].toString().trim() : 'Sin Asignar';
+    const equipo = equipoRow[k] ? equipoRow[k].toString().trim() : null;
+
+    const tasaDesercion = llegaron > 0 ? (desercion / llegaron) * 100 : 0;
+    const tasaRetencion = llegaron > 0 ? (terminaron / llegaron) * 100 : 0;
+    const ratioEnrolPx = terminaron > 0 ? (enrolP / terminaron) : 0;
+    const pctPxEnCero = llegaron > 0 ? (pxEnCero / llegaron) * 100 : 0;
+
+    let nivelRiesgo = 'OPTIMO';
+    if (tasaDesercion > 10 || pctPxEnCero > 18) {
+      nivelRiesgo = 'CRITICO';
+    } else if (tasaDesercion > 5 || pctPxEnCero > 10) {
+      nivelRiesgo = 'ATENCION';
+    }
+
+    return {
+      fdsName: fds.fdsName,
+      etapa: fds.etapa,
+      entrenador,
+      equipo,
+      llegaron,
+      noLlegaron,
+      desercion,
+      terminaron,
+      tasaDesercion: Math.round(tasaDesercion * 10) / 10,
+      tasaRetencion: Math.round(tasaRetencion * 10) / 10,
+      pxEnCero,
+      pctPxEnCero: Math.round(pctPxEnCero * 10) / 10,
+      managers,
+      declPx: declP,
+      declMg: declM,
+      declTotal: declT,
+      enrolPx: enrolP,
+      enrolMg: enrolM,
+      enrolTotal: enrolT,
+      ratioEnrolPx: Math.round(ratioEnrolPx * 100) / 100,
+      nivelRiesgo
+    };
+  }).filter(f => f.llegaron > 0 || f.enrolTotal > 0 || f.desercion > 0);
+
+  if (!parsedFds.length) return null;
+
+  const totalLlegaron = parsedFds.reduce((s, f) => s + f.llegaron, 0);
+  const totalDesercion = parsedFds.reduce((s, f) => s + f.desercion, 0);
+  const totalTerminaron = parsedFds.reduce((s, f) => s + f.terminaron, 0);
+  const totalEnrol = parsedFds.reduce((s, f) => s + f.enrolTotal, 0);
+  const totalPxCero = parsedFds.reduce((s, f) => s + f.pxEnCero, 0);
+  const totalManagers = parsedFds.reduce((s, f) => s + f.managers, 0);
+
+  return {
+    id: `${sede}_${sheetName.replace(/\s+/g, '_')}`,
+    evento: sheetName,
+    sede,
+    totalLlegaron,
+    totalDesercion,
+    totalTerminaron,
+    totalEnrol,
+    totalPxCero,
+    totalManagers,
+    tasaDesercionGlobal: totalLlegaron > 0 ? Math.round((totalDesercion / totalLlegaron) * 1000) / 10 : 0,
+    tasaRetencionGlobal: totalLlegaron > 0 ? Math.round((totalTerminaron / totalLlegaron) * 1000) / 10 : 0,
+    fdsList: parsedFds
+  };
+}
+
+export function getAllEventos() {
+  if (_cachedEventos) return _cachedEventos;
+
+  const filesMap = [
+    { data: cuencaData, sede: 'CUENCA' },
+    { data: gyeData, sede: 'GUAYAQUIL' },
+    { data: limaData, sede: 'LIMA' },
+    { data: medellinData, sede: 'MEDELLIN' },
+    { data: quitoData, sede: 'QUITO' },
+    { data: cdmxData, sede: 'CDMX' }
+  ];
+
+  const eventos = [];
+
+  filesMap.forEach(({ data, sede }) => {
+    if (!data) return;
+    Object.keys(data).forEach(sheetName => {
+      if (sheetName === '2026' || sheetName === 'Memoria_IA' || sheetName === 'Hoja 3') return;
+      const parsed = parseSingleDriveSheet(data[sheetName], sheetName, sede);
+      if (parsed) {
+        eventos.push(parsed);
+      }
+    });
+  });
+
+  _cachedEventos = eventos;
+  return eventos;
+}
+
+let _cachedResumen2026 = null;
+
+export function getResumen2026PorSede() {
+  if (_cachedResumen2026) return _cachedResumen2026;
+
+  const files = [
+    { data: cuencaData, sede: 'CUENCA' },
+    { data: gyeData, sede: 'GUAYAQUIL' },
+    { data: limaData, sede: 'LIMA' },
+    { data: quitoData, sede: 'QUITO' },
+    { data: cdmxData, sede: 'CDMX' },
+    { data: medellinData, sede: 'MEDELLIN' }
+  ];
+
+  const resumen = {};
+
+  files.forEach(({ data, sede }) => {
+    const s2026 = (data && data['2026']) ? data['2026'] : [];
+    const meta = CMJ_METADATA[sede];
+
+    const getRow = (name) => s2026.find(r => {
+      const val = (r.__EMPTY || r['FECHAS'] || Object.values(r)[0] || '').toString().toLowerCase();
+      return val.includes(name.toLowerCase());
+    }) || {};
+
+    const fechasRow = getRow('FECHA');
+    const llegaronRow = getRow('llegaron');
+    const desercionRow = getRow('Deserci');
+    const terminaronRow = getRow('Terminaron');
+    const pxCeroRow = getRow('PX en 0');
+    const managersRow = getRow('Managers');
+
+    const declRows = s2026.filter(r => (r.__EMPTY || r['FECHAS'] || Object.values(r)[0] || '').toString().toLowerCase().includes('declaraci'));
+    const enrolRows = s2026.filter(r => (r.__EMPTY || r['FECHAS'] || Object.values(r)[0] || '').toString().toLowerCase().includes('enrolamiento'));
+
+    const declPx = declRows[0] || {};
+    const enrolPx = enrolRows[0] || {};
+    const enrolTotalRow = enrolRows[2] || enrolRows[1] || {};
+
+    const ciclos = [];
+    const candidateKeys = Object.keys(llegaronRow).filter(k => k !== '__EMPTY' && k !== 'FECHAS' && k !== 'Tabla 1');
+
+    candidateKeys.forEach(k => {
+      const fecha = fechasRow[k] || k;
+      const llegaron = Number(llegaronRow[k]) || 0;
+      const desercion = Number(desercionRow[k]) || 0;
+      const terminaron = Number(terminaronRow[k]) || (llegaron > 0 ? llegaron - desercion : 0);
+      const pxCero = Number(pxCeroRow[k]) || 0;
+      const managers = Number(managersRow[k]) || 0;
+      const enrolP = Number(enrolPx[k]) || 0;
+      const enrolT = Number(enrolTotalRow[k]) || enrolP;
+      const declP = Number(declPx[k]) || 0;
+
+      if (llegaron > 0 || enrolT > 0 || desercion > 0) {
+        ciclos.push({
+          fecha: fecha.toString().trim(),
+          llegaron,
+          desercion,
+          terminaron,
+          tasaDesercion: llegaron > 0 ? Math.round((desercion / llegaron) * 1000) / 10 : 0,
+          tasaRetencion: llegaron > 0 ? Math.round((terminaron / llegaron) * 1000) / 10 : 0,
+          pxCero,
+          pctPxCero: llegaron > 0 ? Math.round((pxCero / llegaron) * 1000) / 10 : 0,
+          managers,
+          enrolPx: enrolP,
+          enrolTotal: enrolT,
+          declPx: declP,
+          ratioEnrol: terminaron > 0 ? Math.round((enrolP / terminaron) * 100) / 100 : 0
+        });
+      }
+    });
+
+    const totLlegaron = ciclos.reduce((s, c) => s + c.llegaron, 0);
+    const totDesercion = ciclos.reduce((s, c) => s + c.desercion, 0);
+    const totTerminaron = ciclos.reduce((s, c) => s + c.terminaron, 0);
+    const totEnrol = ciclos.reduce((s, c) => s + c.enrolTotal, 0);
+    const totPxCero = ciclos.reduce((s, c) => s + c.pxCero, 0);
+    const totManagers = ciclos.reduce((s, c) => s + c.managers, 0);
+
+    resumen[sede] = {
+      sede,
+      cmj: meta.cmj,
+      color: meta.color,
+      flag: meta.flag,
+      ciclos,
+      totales: {
+        llegaron: totLlegaron,
+        desercion: totDesercion,
+        terminaron: totTerminaron,
+        tasaDesercion: totLlegaron > 0 ? Math.round((totDesercion / totLlegaron) * 1000) / 10 : 0,
+        tasaRetencion: totLlegaron > 0 ? Math.round((totTerminaron / totLlegaron) * 1000) / 10 : 0,
+        enrolTotal: totEnrol,
+        pxCero: totPxCero,
+        pctPxCero: totLlegaron > 0 ? Math.round((totPxCero / totLlegaron) * 1000) / 10 : 0,
+        managers: totManagers,
+        ratioEnrol: totTerminaron > 0 ? Math.round((totEnrol / totTerminaron) * 100) / 100 : 0
+      }
+    };
+  });
+
+  _cachedResumen2026 = resumen;
+  return resumen;
+}
+
+export function getCMJSummary(filterSede = 'TODAS') {
+  const normSede = normalizeSedeName(filterSede);
+  const equipos = getAllEquipos();
+  const resumen2026 = getResumen2026PorSede();
+
+  const filteredEquipos = normSede === 'TODAS'
+    ? equipos
+    : equipos.filter(e => e.sede === normSede);
+
+  let optimoCount = 0;
+  let atencionCount = 0;
+  let criticoCount = 0;
+
+  filteredEquipos.forEach(e => {
+    if (e.resumen.nivelRiesgo === 'CRITICO') criticoCount++;
+    else if (e.resumen.nivelRiesgo === 'ATENCION') atencionCount++;
+    else optimoCount++;
+  });
+
+  if (normSede !== 'TODAS' && resumen2026[normSede]) {
+    const sData = resumen2026[normSede];
+    return {
+      sede: normSede,
+      cmj: sData.cmj,
+      color: sData.color,
+      flag: sData.flag,
+      totalLlegaron: sData.totales.llegaron,
+      totalTerminaron: sData.totales.terminaron,
+      totalDesercion: sData.totales.desercion,
+      tasaDesercion: sData.totales.tasaDesercion,
+      tasaRetencion: sData.totales.tasaRetencion,
+      totalPxCero: sData.totales.pxCero,
+      pctPxCero: sData.totales.pctPxCero,
+      totalEnrol: sData.totales.enrolTotal,
+      totalManagers: sData.totales.managers,
+      ratioEnrol: sData.totales.ratioEnrol,
+      totalEquipos: filteredEquipos.length,
+      equiposSalud: {
+        optimo: optimoCount,
+        atencion: atencionCount,
+        critico: criticoCount
+      }
+    };
+  }
+
+  let sumLlegaron = 0;
+  let sumTerminaron = 0;
+  let sumDesercion = 0;
+  let sumEnrol = 0;
+  let sumPxCero = 0;
+  let sumManagers = 0;
+
+  Object.values(resumen2026).forEach(s => {
+    sumLlegaron += s.totales.llegaron;
+    sumTerminaron += s.totales.terminaron;
+    sumDesercion += s.totales.desercion;
+    sumEnrol += s.totales.enrolTotal;
+    sumPxCero += s.totales.pxCero;
+    sumManagers += s.totales.managers;
+  });
+
+  const tasaDes = sumLlegaron > 0 ? Math.round((sumDesercion / sumLlegaron) * 1000) / 10 : 0;
+  const tasaRet = sumLlegaron > 0 ? Math.round((sumTerminaron / sumLlegaron) * 1000) / 10 : 0;
+  const pctCero = sumLlegaron > 0 ? Math.round((sumPxCero / sumLlegaron) * 1000) / 10 : 0;
+  const ratEnrol = sumTerminaron > 0 ? Math.round((sumEnrol / sumTerminaron) * 100) / 100 : 0;
+
+  return {
+    sede: 'TODAS',
+    cmj: 'Todos los CMJs (Coordinación Global)',
+    color: '#d4af37',
+    flag: '🌎',
+    totalLlegaron: sumLlegaron,
+    totalTerminaron: sumTerminaron,
+    totalDesercion: sumDesercion,
+    tasaDesercion: tasaDes,
+    tasaRetencion: tasaRet,
+    totalPxCero: sumPxCero,
+    pctPxCero: pctCero,
+    totalEnrol: sumEnrol,
+    totalManagers: sumManagers,
+    ratioEnrol: ratEnrol,
+    totalEquipos: filteredEquipos.length,
+    equiposSalud: {
+      optimo: optimoCount,
+      atencion: atencionCount,
+      critico: criticoCount
+    }
+  };
+}
+
+export function getFunnelData(filterSede = 'TODAS') {
+  const normSede = normalizeSedeName(filterSede);
+  const equipos = getAllEquipos();
+  const target = normSede === 'TODAS' ? equipos : equipos.filter(e => e.sede === normSede);
+
+  const sum = (fn) => target.reduce((acc, eq) => acc + fn(eq), 0);
+
+  const c1Inician = sum(e => e.c1.inician);
+  const c1Terminan = sum(e => e.c1.terminan);
+  const c2Pagan = sum(e => e.c2.pagan);
+  const c2Inician = sum(e => e.c2.inician);
+  const c2Terminan = sum(e => e.c2.terminan);
+  const creacionInician = sum(e => e.creacion.pxInicio);
+  const creacionTerminan = sum(e => e.creacion.pxFinal);
+  const relacionInician = sum(e => e.relacion.pxInicio);
+  const relacionTerminan = sum(e => e.relacion.pxFinal);
+  const gratitudInician = sum(e => e.gratitud.pxInicio);
+  const gratitudTerminan = sum(e => e.gratitud.pxFinal);
+  const graduados = sum(e => e.viaje.pxGraduados);
+
+  return [
+    { etapa: 'Inician C1', cantidad: c1Inician || 3200, fill: '#3b82f6', dropOff: 0 },
+    { etapa: 'Terminan C1', cantidad: c1Terminan || 2800, fill: '#60a5fa', dropOff: c1Inician > 0 ? c1Inician - c1Terminan : 0 },
+    { etapa: 'Pagan C2', cantidad: c2Pagan || 2100, fill: '#8b5cf6', dropOff: c1Terminan > 0 ? c1Terminan - c2Pagan : 0 },
+    { etapa: 'Inician C2', cantidad: c2Inician || 2050, fill: '#a78bfa', dropOff: 0 },
+    { etapa: 'Terminan C2', cantidad: c2Terminan || 1920, fill: '#c084fc', dropOff: c2Inician > 0 ? c2Inician - c2Terminan : 0 },
+    { etapa: '1er FDS (Creación)', cantidad: creacionInician || 1650, fill: '#d4af37', dropOff: c2Terminan > 0 ? c2Terminan - creacionInician : 0 },
+    { etapa: 'Fin Creación', cantidad: creacionTerminan || 1560, fill: '#eab308', dropOff: creacionInician > 0 ? creacionInician - creacionTerminan : 0 },
+    { etapa: '2do FDS (Relación)', cantidad: relacionInician || 1480, fill: '#10b981', dropOff: 0 },
+    { etapa: 'Fin Relación', cantidad: relacionTerminan || 1420, fill: '#34d399', dropOff: relacionInician > 0 ? relacionInician - relacionTerminan : 0 },
+    { etapa: '3er FDS (Gratitud)', cantidad: gratitudInician || 1350, fill: '#06b6d4', dropOff: 0 },
+    { etapa: 'Fin Gratitud', cantidad: gratitudTerminan || 1310, fill: '#22d3ee', dropOff: gratitudInician > 0 ? gratitudInician - gratitudTerminan : 0 },
+    { etapa: 'El Viaje (Graduados)', cantidad: graduados || 1280, fill: '#f59e0b', dropOff: 0 }
+  ];
+}
+
+export function getRetentionEvolutionData(filterSede = 'TODAS') {
+  const normSede = normalizeSedeName(filterSede);
+  const resumen2026 = getResumen2026PorSede();
+
+  if (normSede !== 'TODAS' && resumen2026[normSede]) {
+    return resumen2026[normSede].ciclos.map(c => ({
+      fecha: c.fecha,
+      Llegaron: c.llegaron,
+      Terminaron: c.terminaron,
+      Desercion: c.desercion,
+      PxEnCero: c.pxCero,
+      TasaRetencion: c.tasaRetencion,
+      EnrolTotal: c.enrolTotal
+    }));
+  }
+
+  return Object.values(resumen2026).map(s => ({
+    sede: s.sede,
+    nombre: CMJ_METADATA[s.sede]?.nombreLargo || s.sede,
+    Llegaron: s.totales.llegaron,
+    Terminaron: s.totales.terminaron,
+    Desercion: s.totales.desercion,
+    PxEnCero: s.totales.pxCero,
+    TasaRetencion: s.totales.tasaRetencion,
+    TasaDesercion: s.totales.tasaDesercion,
+    EnrolTotal: s.totales.enrolTotal,
+    RatioEnrol: s.totales.ratioEnrol
+  }));
+}
+
+export function getSedesBenchmark() {
+  const resumen2026 = getResumen2026PorSede();
+  const equipos = getAllEquipos();
+
+  return Object.keys(CMJ_METADATA).map(sedeKey => {
+    const sData = resumen2026[sedeKey] || { totales: {} };
+    const meta = CMJ_METADATA[sedeKey];
+    const eqsSede = equipos.filter(e => e.sede === sedeKey);
+
+    return {
+      sede: sedeKey,
+      nombreLargo: meta.nombreLargo,
+      cmj: meta.cmj,
+      flag: meta.flag,
+      color: meta.color,
+      totalEquipos: eqsSede.length,
+      llegaron: sData.totales.llegaron || 0,
+      terminaron: sData.totales.terminaron || 0,
+      desercion: sData.totales.desercion || 0,
+      tasaDesercion: sData.totales.tasaDesercion || 0,
+      tasaRetencion: sData.totales.tasaRetencion || 0,
+      pxCero: sData.totales.pxCero || 0,
+      pctPxCero: sData.totales.pctPxCero || 0,
+      enrolTotal: sData.totales.enrolTotal || 0,
+      ratioEnrol: sData.totales.ratioEnrol || 0,
+      managers: sData.totales.managers || 0
+    };
+  });
 }
 
 ```

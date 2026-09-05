@@ -13,7 +13,7 @@ import CMJDashboard from '../components/CMJDashboard';
 import NodusCoordinadoresC1C2Dashboard from '../components/NodusCoordinadoresC1C2Dashboard';
 import ThemeSelector from '../components/ThemeSelector';
 
-export default function AuditoriaKPIs() {
+export default function AuditoriaKPIs({ defaultTab }) {
   const { currentUser } = useAuth();
   const { showToast } = useUI();
   const navigate = useNavigate();
@@ -25,7 +25,7 @@ export default function AuditoriaKPIs() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [isScrapingLive, setIsScrapingLive] = useState(false);
-  const [activeTab, setActiveTab] = useState('coordinadores_nodus'); // 'coordinadores_nodus', 'cmj', 'entrenadores', 'auditoria'
+  const [activeTab, setActiveTab] = useState(defaultTab || 'coordinadores_nodus'); // 'coordinadores_nodus', 'cmj', 'entrenadores', 'auditoria'
   const sedesDisponibles = ['Todas', ...OPERATIONAL_SEDES];
 
   useEffect(() => {
@@ -521,7 +521,7 @@ export default function AuditoriaKPIs() {
             }}
           >
             <Target size={16} style={{ display: 'inline-block', verticalAlign: 'text-bottom', marginRight: '6px' }} />
-            CMJs
+            Diagnóstico CMJ (Maestría)
           </button>
           <button
             onClick={() => setActiveTab('entrenadores')}
