@@ -221,6 +221,7 @@ export function AuthProvider({ children }) {
     const provider = new GoogleAuthProvider();
     provider.addScope('https://www.googleapis.com/auth/calendar.events');
     provider.addScope('https://www.googleapis.com/auth/tasks');
+    provider.addScope('https://www.googleapis.com/auth/drive.file');
     try {
       const result = await reauthenticateWithPopup(auth.currentUser, provider);
       const credential = GoogleAuthProvider.credentialFromResult(result);
@@ -239,6 +240,7 @@ export function AuthProvider({ children }) {
     const provider = new GoogleAuthProvider();
     provider.addScope('https://www.googleapis.com/auth/calendar.events');
     provider.addScope('https://www.googleapis.com/auth/tasks');
+    provider.addScope('https://www.googleapis.com/auth/drive.file');
 
     try {
       const result = await signInWithPopup(auth, provider);

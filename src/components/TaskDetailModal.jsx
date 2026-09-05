@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   X, CheckCircle2, Clock, Calendar, AlertCircle, 
   ExternalLink, Link as LinkIcon, Plus, Trash2, Edit3, 
   Send, Sparkles, User, FileText, Check, ShieldCheck,
-  TrendingUp, RefreshCw
+  TrendingUp, RefreshCw, UploadCloud, Paperclip, FileCheck,
+  FolderPlus, Loader2
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useChecklist } from '../context/ChecklistContext';
 import { useUI } from '../context/UIContext';
 import { getFlagForSede } from '../utils/flags';
+import { uploadEvidenceDocument } from '../services/googleDriveService';
 
 const getCountdown = (deadlineIso) => {
   if (!deadlineIso) return { label: 'Sin fecha límite', color: '#9ca3af', bg: 'rgba(156,163,175,0.12)', border: '#9ca3af', overdue: false };
@@ -30,6 +32,36 @@ const getCountdown = (deadlineIso) => {
   return { label: `🟢 ${timeStr} restantes`, color: '#ffffff', bg: '#16a34a', border: '#166534', overdue: false };
 };
 
+const formatFileSize = (bytes) => {
+  if (!bytes || isNaN(bytes)) return '';
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+};
+
+const getEvidenceCategory = (url = '', fileName = '', provider = '') => {
+  const text = `${url} ${fileName} ${provider}`.toLowerCase();
+  if (text.includes('drive.google.com') || provider === 'google_drive') {
+    return { icon: '📁', label: 'Google Drive', color: '#00d2ff', bg: 'rgba(0, 210, 255, 0.12)', border: 'rgba(0, 210, 255, 0.35)' };
+  }
+  if (text.includes('.pdf')) {
+    return { icon: '📄', label: 'PDF', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.12)', border: 'rgba(239, 68, 68, 0.35)' };
+  }
+  if (text.includes('.xls') || text.includes('.xlsx') || text.includes('.csv') || text.includes('sheet')) {
+    return { icon: '📊', label: 'Excel / Planilla', color: '#10b981', bg: 'rgba(16, 185, 129, 0.12)', border: 'rgba(16, 185, 129, 0.35)' };
+  }
+  if (text.includes('.doc') || text.includes('.docx') || text.includes('docs.google.com/document')) {
+    return { icon: '📝', label: 'Word / Doc', color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.12)', border: 'rgba(59, 130, 246, 0.35)' };
+  }
+  if (text.includes('.png') || text.includes('.jpg') || text.includes('.jpeg') || text.includes('.webp') || text.includes('image')) {
+    return { icon: '🖼️', label: 'Imagen', color: '#ec4899', bg: 'rgba(236, 72, 153, 0.12)', border: 'rgba(236, 72, 153, 0.35)' };
+  }
+  if (provider === 'firebase_storage' || text.includes('firebasestorage')) {
+    return { icon: '☁️', label: 'Almacenamiento Cloud', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.12)', border: 'rgba(245, 158, 11, 0.35)' };
+  }
+  return { icon: '🔗', label: 'Enlace', color: 'var(--crear-gold)', bg: 'rgba(212, 175, 55, 0.12)', border: 'rgba(212, 175, 55, 0.35)' };
+};
+
 export default function TaskDetailModal({ 
   isOpen, 
   onClose, 
@@ -37,7 +69,7 @@ export default function TaskDetailModal({
   onEditTaskParams = null,
   resolveAssigneeName = null 
 }) {
-  const { currentUser } = useAuth();
+  const { currentUser, reauthenticateGoogle } = useAuth();
   const { updateTaskDetails, toggleTask } = useChecklist();
   const { showToast } = useUI();
 
@@ -48,6 +80,14 @@ export default function TaskDetailModal({
   const [newEvidenceUrl, setNewEvidenceUrl] = useState('');
   const [newEvidenceTitle, setNewEvidenceTitle] = useState('');
   const [showAddEvidence, setShowAddEvidence] = useState(false);
+
+  // Estados para subida de archivos y Google Drive
+  const [evidenceMode, setEvidenceMode] = useState('upload'); // 'upload' | 'link'
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [isUploadingFile, setIsUploadingFile] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState('');
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef(null);
 
   const [notesList, setNotesList] = useState([]);
   const [newNoteText, setNewNoteText] = useState('');
@@ -96,9 +136,106 @@ export default function TaskDetailModal({
       setNewEvidenceUrl('');
       setNewEvidenceTitle('');
       setShowAddEvidence(false);
+      setSelectedFile(null);
+      setIsUploadingFile(false);
+      setUploadProgress('');
+      setIsDragging(false);
+      setEvidenceMode('upload');
       setNewNoteText('');
     }
   }, [task, isOpen]);
+
+  // Manejadores para adjuntar documentos (Google Drive / Cloud)
+  const handleFileSelect = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setSelectedFile(file);
+      if (!newEvidenceTitle.trim()) {
+        const cleanName = file.name.replace(/\.[^/.]+$/, "");
+        setNewEvidenceTitle(cleanName);
+      }
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+      setSelectedFile(file);
+      if (!newEvidenceTitle.trim()) {
+        const cleanName = file.name.replace(/\.[^/.]+$/, "");
+        setNewEvidenceTitle(cleanName);
+      }
+    }
+  };
+
+  const handleUploadFile = async () => {
+    if (!selectedFile) {
+      showToast('Por favor selecciona o arrastra un archivo primero.', 'error');
+      return;
+    }
+
+    setIsUploadingFile(true);
+    setUploadProgress('Conectando...');
+
+    try {
+      let accessToken = sessionStorage.getItem('googleAccessToken');
+      if (!accessToken && reauthenticateGoogle) {
+        setUploadProgress('Solicitando acceso a Google Drive...');
+        accessToken = await reauthenticateGoogle();
+      }
+
+      setUploadProgress(accessToken ? 'Subiendo documento a Google Drive...' : 'Subiendo documento a la nube...');
+      
+      const result = await uploadEvidenceDocument(selectedFile, {
+        accessToken,
+        taskId: task.id
+      });
+
+      const newEvidence = {
+        id: `ev_${Date.now()}`,
+        url: result.url,
+        title: newEvidenceTitle.trim() || selectedFile.name,
+        fileName: selectedFile.name,
+        fileSize: selectedFile.size,
+        provider: result.provider,
+        createdAt: new Date().toISOString(),
+        addedByName: currentUser?.displayName || currentUser?.name || currentUser?.email || 'Usuario',
+        addedByEmail: currentUser?.email || ''
+      };
+
+      setEvidencesList(prev => [newEvidence, ...prev]);
+      setSelectedFile(null);
+      setNewEvidenceTitle('');
+      setShowAddEvidence(false);
+      showToast(
+        result.provider === 'google_drive' 
+          ? '📁 Documento guardado en Google Drive exitosamente.' 
+          : '☁️ Documento guardado en la nube exitosamente.',
+        'success'
+      );
+    } catch (err) {
+      console.error('Error al subir documento:', err);
+      showToast(err.message || 'Error al subir el archivo.', 'error');
+    } finally {
+      setIsUploadingFile(false);
+      setUploadProgress('');
+    }
+  };
 
   if (!isOpen || !task) return null;
 
@@ -528,9 +665,9 @@ export default function TaskDetailModal({
                   type="button"
                   onClick={() => setShowAddEvidence(true)}
                   style={{
-                    padding: '0.35rem 0.75rem',
+                    padding: '0.4rem 0.85rem',
                     borderRadius: '6px',
-                    fontSize: '0.78rem',
+                    fontSize: '0.8rem',
                     fontWeight: 700,
                     cursor: 'pointer',
                     background: 'rgba(212, 175, 55, 0.15)',
@@ -538,102 +675,282 @@ export default function TaskDetailModal({
                     border: '1px solid rgba(212, 175, 55, 0.4)',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '0.3rem'
+                    gap: '0.4rem'
                   }}
                 >
-                  <Plus size={14} /> Adjuntar Evidencia
+                  <Plus size={14} /> + Adjuntar Evidencia
                 </button>
               )}
             </div>
 
-            {/* Formulario para añadir nueva evidencia */}
+            {/* Formulario para añadir nueva evidencia (Subida a Drive / Enlace) */}
             {showAddEvidence && (
               <div style={{
                 background: 'rgba(0, 0, 0, 0.35)',
-                border: '1px dashed rgba(212, 175, 55, 0.4)',
-                borderRadius: '8px',
-                padding: '0.9rem',
+                border: '1px dashed rgba(212, 175, 55, 0.45)',
+                borderRadius: '10px',
+                padding: '1rem',
                 marginBottom: '1rem',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '0.6rem'
+                gap: '0.8rem'
               }}>
-                <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--crear-gold)' }}>
-                  📎 Nueva Evidencia (Google Drive, Docs, Sheets, Enlace de Foto, etc.):
-                </div>
-
-                <input 
-                  type="url"
-                  placeholder="https://drive.google.com/file/... o enlace web de evidencia"
-                  value={newEvidenceUrl}
-                  onChange={(e) => setNewEvidenceUrl(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '0.55rem 0.8rem',
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    border: '1px solid rgba(255, 255, 255, 0.15)',
-                    borderRadius: '6px',
-                    color: '#ffffff',
-                    fontSize: '0.85rem',
-                    outline: 'none',
-                    boxSizing: 'border-box'
-                  }}
-                />
-
-                <input 
-                  type="text"
-                  placeholder="Descripción de la evidencia (ej: Presupuesto Agosto final, Foto de asistencia, etc.)"
-                  value={newEvidenceTitle}
-                  onChange={(e) => setNewEvidenceTitle(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '0.55rem 0.8rem',
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    border: '1px solid rgba(255, 255, 255, 0.15)',
-                    borderRadius: '6px',
-                    color: '#ffffff',
-                    fontSize: '0.85rem',
-                    outline: 'none',
-                    boxSizing: 'border-box'
-                  }}
-                />
-
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '0.3rem' }}>
+                {/* Pestañas de modo: Subir Archivo vs Pegar Enlace */}
+                <div style={{ display: 'flex', gap: '0.5rem', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '0.6rem' }}>
                   <button
                     type="button"
-                    onClick={() => { setShowAddEvidence(false); setNewEvidenceUrl(''); }}
+                    onClick={() => setEvidenceMode('upload')}
                     style={{
-                      padding: '0.4rem 0.8rem',
+                      padding: '0.35rem 0.8rem',
                       borderRadius: '6px',
-                      fontSize: '0.78rem',
-                      background: 'transparent',
-                      color: 'var(--text-muted)',
-                      border: '1px solid rgba(255, 255, 255, 0.15)',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleAddEvidenceItem}
-                    style={{
-                      padding: '0.4rem 0.9rem',
-                      borderRadius: '6px',
-                      fontSize: '0.78rem',
+                      fontSize: '0.8rem',
                       fontWeight: 700,
-                      background: 'var(--crear-gold)',
-                      color: '#000000',
-                      border: 'none',
                       cursor: 'pointer',
+                      border: 'none',
+                      background: evidenceMode === 'upload' ? 'rgba(0, 210, 255, 0.2)' : 'transparent',
+                      color: evidenceMode === 'upload' ? 'var(--crear-cyan)' : 'var(--text-muted)',
+                      borderBottom: evidenceMode === 'upload' ? '2px solid var(--crear-cyan)' : '2px solid transparent',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '0.3rem'
+                      gap: '0.4rem'
                     }}
                   >
-                    <Plus size={14} /> Añadir a la lista
+                    <UploadCloud size={14} /> 📁 Subir Archivo (Google Drive / Nube)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEvidenceMode('link')}
+                    style={{
+                      padding: '0.35rem 0.8rem',
+                      borderRadius: '6px',
+                      fontSize: '0.8rem',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      border: 'none',
+                      background: evidenceMode === 'link' ? 'rgba(212, 175, 55, 0.2)' : 'transparent',
+                      color: evidenceMode === 'link' ? 'var(--crear-gold)' : 'var(--text-muted)',
+                      borderBottom: evidenceMode === 'link' ? '2px solid var(--crear-gold)' : '2px solid transparent',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.4rem'
+                    }}
+                  >
+                    <LinkIcon size={14} /> 🔗 Pegar Enlace
                   </button>
                 </div>
+
+                {/* MODO SUBIR ARCHIVO */}
+                {evidenceMode === 'upload' && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.ppt,.pptx,image/*"
+                      onChange={handleFileSelect}
+                      style={{ display: 'none' }}
+                    />
+
+                    {/* Zona Dropzone */}
+                    <div
+                      onDragOver={handleDragOver}
+                      onDragLeave={handleDragLeave}
+                      onDrop={handleDrop}
+                      onClick={() => fileInputRef.current?.click()}
+                      style={{
+                        padding: selectedFile ? '0.9rem' : '1.4rem 1rem',
+                        border: isDragging ? '2px dashed var(--crear-cyan)' : '1px dashed rgba(255, 255, 255, 0.2)',
+                        borderRadius: '8px',
+                        background: isDragging ? 'rgba(0, 210, 255, 0.08)' : 'rgba(255, 255, 255, 0.03)',
+                        textAlign: 'center',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '0.4rem'
+                      }}
+                    >
+                      {selectedFile ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', width: '100%', justifyContent: 'center' }}>
+                          <FileCheck size={24} style={{ color: 'var(--crear-cyan)' }} />
+                          <div style={{ textAlign: 'left' }}>
+                            <div style={{ color: '#ffffff', fontWeight: 700, fontSize: '0.88rem' }}>
+                              {selectedFile.name}
+                            </div>
+                            <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>
+                              Tamaño: {formatFileSize(selectedFile.size)} • Clic para cambiar
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <UploadCloud size={30} style={{ color: 'var(--crear-cyan)', opacity: 0.85 }} />
+                          <div style={{ color: '#ffffff', fontSize: '0.85rem', fontWeight: 600 }}>
+                            Haz clic para examinar o arrastra aquí tu documento
+                          </div>
+                          <div style={{ color: 'var(--text-muted)', fontSize: '0.74rem' }}>
+                            PDF, Excel, Word, Fotos o Comprobantes (máx. 25MB)
+                          </div>
+                        </>
+                      )}
+                    </div>
+
+                    <input
+                      type="text"
+                      placeholder="Nombre o descripción de la evidencia (opcional)"
+                      value={newEvidenceTitle}
+                      onChange={(e) => setNewEvidenceTitle(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '0.55rem 0.8rem',
+                        background: 'rgba(255, 255, 255, 0.05)',
+                        border: '1px solid rgba(255, 255, 255, 0.15)',
+                        borderRadius: '6px',
+                        color: '#ffffff',
+                        fontSize: '0.85rem',
+                        outline: 'none',
+                        boxSizing: 'border-box'
+                      }}
+                    />
+
+                    {isUploadingFile && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--crear-cyan)', fontSize: '0.82rem', padding: '0.2rem 0' }}>
+                        <RefreshCw size={14} className="animate-spin" />
+                        <span>{uploadProgress || 'Subiendo archivo...'}</span>
+                      </div>
+                    )}
+
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '0.2rem' }}>
+                      <button
+                        type="button"
+                        disabled={isUploadingFile}
+                        onClick={() => { setShowAddEvidence(false); setSelectedFile(null); }}
+                        style={{
+                          padding: '0.45rem 0.85rem',
+                          borderRadius: '6px',
+                          fontSize: '0.8rem',
+                          background: 'transparent',
+                          color: 'var(--text-muted)',
+                          border: '1px solid rgba(255, 255, 255, 0.15)',
+                          cursor: isUploadingFile ? 'not-allowed' : 'pointer'
+                        }}
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        type="button"
+                        disabled={!selectedFile || isUploadingFile}
+                        onClick={handleUploadFile}
+                        style={{
+                          padding: '0.45rem 1rem',
+                          borderRadius: '6px',
+                          fontSize: '0.8rem',
+                          fontWeight: 700,
+                          background: selectedFile && !isUploadingFile ? 'var(--crear-cyan)' : 'rgba(255,255,255,0.1)',
+                          color: selectedFile && !isUploadingFile ? '#000000' : 'var(--text-muted)',
+                          border: 'none',
+                          cursor: selectedFile && !isUploadingFile ? 'pointer' : 'not-allowed',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.4rem',
+                          transition: 'all 0.15s ease'
+                        }}
+                      >
+                        {isUploadingFile ? (
+                          <>
+                            <RefreshCw size={14} className="animate-spin" /> Guardando...
+                          </>
+                        ) : (
+                          <>
+                            <UploadCloud size={14} /> ☁️ Subir y Guardar en Google Drive
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* MODO PEGAR ENLACE MANUAL */}
+                {evidenceMode === 'link' && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.7rem' }}>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                      Ingresa el enlace de Google Drive, Google Sheets, Docs o cualquier recurso web:
+                    </div>
+
+                    <input 
+                      type="url"
+                      placeholder="https://drive.google.com/file/... o enlace web"
+                      value={newEvidenceUrl}
+                      onChange={(e) => setNewEvidenceUrl(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '0.55rem 0.8rem',
+                        background: 'rgba(255, 255, 255, 0.05)',
+                        border: '1px solid rgba(255, 255, 255, 0.15)',
+                        borderRadius: '6px',
+                        color: '#ffffff',
+                        fontSize: '0.85rem',
+                        outline: 'none',
+                        boxSizing: 'border-box'
+                      }}
+                    />
+
+                    <input 
+                      type="text"
+                      placeholder="Descripción de la evidencia (ej: Presupuesto Agosto final, Foto de asistencia)"
+                      value={newEvidenceTitle}
+                      onChange={(e) => setNewEvidenceTitle(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '0.55rem 0.8rem',
+                        background: 'rgba(255, 255, 255, 0.05)',
+                        border: '1px solid rgba(255, 255, 255, 0.15)',
+                        borderRadius: '6px',
+                        color: '#ffffff',
+                        fontSize: '0.85rem',
+                        outline: 'none',
+                        boxSizing: 'border-box'
+                      }}
+                    />
+
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '0.2rem' }}>
+                      <button
+                        type="button"
+                        onClick={() => { setShowAddEvidence(false); setNewEvidenceUrl(''); }}
+                        style={{
+                          padding: '0.45rem 0.85rem',
+                          borderRadius: '6px',
+                          fontSize: '0.8rem',
+                          background: 'transparent',
+                          color: 'var(--text-muted)',
+                          border: '1px solid rgba(255, 255, 255, 0.15)',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleAddEvidenceItem}
+                        style={{
+                          padding: '0.45rem 1rem',
+                          borderRadius: '6px',
+                          fontSize: '0.8rem',
+                          fontWeight: 700,
+                          background: 'var(--crear-gold)',
+                          color: '#000000',
+                          border: 'none',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.4rem'
+                        }}
+                      >
+                        <Plus size={14} /> Añadir a la lista
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -641,91 +958,111 @@ export default function TaskDetailModal({
             {evidencesList.length === 0 ? (
               <div style={{
                 textAlign: 'center',
-                padding: '1.2rem',
+                padding: '1.4rem',
                 background: 'rgba(0, 0, 0, 0.18)',
                 borderRadius: '8px',
                 color: 'var(--text-muted)',
-                fontSize: '0.82rem'
+                fontSize: '0.82rem',
+                border: '1px dashed rgba(255,255,255,0.06)'
               }}>
-                Sin evidencias adjuntas todavía. Haz click en <strong>"+ Adjuntar Evidencia"</strong> para ingresar tu enlace de Google Drive o documento.
+                Sin evidencias adjuntas todavía. Haz clic en <strong>"+ Adjuntar Evidencia"</strong> para subir un archivo a Google Drive o ingresar tu enlace.
               </div>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-                {evidencesList.map((ev, idx) => (
-                  <div
-                    key={ev.id || idx}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      background: 'rgba(0, 0, 0, 0.3)',
-                      border: '1px solid rgba(255, 255, 255, 0.08)',
-                      borderRadius: '8px',
-                      padding: '0.65rem 0.9rem',
-                      gap: '0.8rem',
-                      flexWrap: 'wrap'
-                    }}
-                  >
-                    <div style={{ flex: 1, minWidth: '180px' }}>
-                      <div style={{ fontWeight: 700, fontSize: '0.85rem', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                        <FileText size={15} style={{ color: 'var(--crear-cyan)', flexShrink: 0 }} />
-                        <span>{ev.title || 'Evidencia adjunta'}</span>
-                      </div>
-                      <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '0.2rem', wordBreak: 'break-all' }}>
-                        {ev.url}
-                      </div>
-                      {ev.addedByName && (
-                        <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: '0.1rem' }}>
-                          Adjuntado por: {ev.addedByName} {ev.createdAt ? `• ${new Date(ev.createdAt).toLocaleDateString()}` : ''}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+                {evidencesList.map((ev, idx) => {
+                  const category = getEvidenceCategory(ev.url, ev.fileName || ev.title, ev.provider);
+                  return (
+                    <div
+                      key={ev.id || idx}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        background: 'rgba(0, 0, 0, 0.3)',
+                        border: '1px solid rgba(255, 255, 255, 0.08)',
+                        borderRadius: '8px',
+                        padding: '0.7rem 0.95rem',
+                        gap: '0.8rem',
+                        flexWrap: 'wrap'
+                      }}
+                    >
+                      <div style={{ flex: 1, minWidth: '180px' }}>
+                        <div style={{ fontWeight: 700, fontSize: '0.85rem', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap' }}>
+                          <span style={{ fontSize: '1.1rem' }}>{category.icon}</span>
+                          <span>{ev.title || ev.fileName || 'Evidencia adjunta'}</span>
+                          <span style={{
+                            fontSize: '0.68rem',
+                            padding: '0.12rem 0.45rem',
+                            borderRadius: '10px',
+                            background: category.bg,
+                            color: category.color,
+                            border: `1px solid ${category.border}`,
+                            fontWeight: 700
+                          }}>
+                            {category.label}
+                          </span>
+                          {ev.fileSize && (
+                            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                              ({formatFileSize(ev.fileSize)})
+                            </span>
+                          )}
                         </div>
-                      )}
-                    </div>
+                        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '0.2rem', wordBreak: 'break-all' }}>
+                          {ev.url}
+                        </div>
+                        {ev.addedByName && (
+                          <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
+                            Adjuntado por: {ev.addedByName} {ev.createdAt ? `• ${new Date(ev.createdAt).toLocaleDateString()}` : ''}
+                          </div>
+                        )}
+                      </div>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <a 
-                        href={ev.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '0.35rem',
-                          background: 'rgba(41, 171, 226, 0.18)',
-                          color: 'var(--crear-cyan)',
-                          border: '1px solid rgba(41, 171, 226, 0.4)',
-                          padding: '0.35rem 0.75rem',
-                          borderRadius: '6px',
-                          fontSize: '0.78rem',
-                          fontWeight: 700,
-                          textDecoration: 'none',
-                          cursor: 'pointer',
-                          transition: 'all 0.15s ease'
-                        }}
-                      >
-                        <ExternalLink size={13} /> Abrir Evidencia ↗
-                      </a>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <a 
+                          href={ev.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.35rem',
+                            background: 'rgba(41, 171, 226, 0.18)',
+                            color: 'var(--crear-cyan)',
+                            border: '1px solid rgba(41, 171, 226, 0.4)',
+                            padding: '0.38rem 0.75rem',
+                            borderRadius: '6px',
+                            fontSize: '0.78rem',
+                            fontWeight: 700,
+                            textDecoration: 'none',
+                            cursor: 'pointer',
+                            transition: 'all 0.15s ease'
+                          }}
+                        >
+                          <ExternalLink size={13} /> Abrir Evidencia ↗
+                        </a>
 
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveEvidence(ev.id)}
-                        style={{
-                          background: 'rgba(239, 68, 68, 0.12)',
-                          color: '#ef4444',
-                          border: '1px solid rgba(239, 68, 68, 0.3)',
-                          padding: '0.35rem',
-                          borderRadius: '6px',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center'
-                        }}
-                        title="Eliminar evidencia"
-                      >
-                        <Trash2 size={13} />
-                      </button>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveEvidence(ev.id)}
+                          style={{
+                            background: 'rgba(239, 68, 68, 0.12)',
+                            color: '#ef4444',
+                            border: '1px solid rgba(239, 68, 68, 0.3)',
+                            padding: '0.38rem',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}
+                          title="Eliminar evidencia"
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

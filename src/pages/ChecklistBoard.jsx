@@ -15,6 +15,7 @@ import TaskCollaborationModal from '../components/TaskCollaborationModal';
 import LearningReflectionModal from '../components/LearningReflectionModal';
 import NewExcellenceModal from '../components/NewExcellenceModal';
 import SyncHistoryModal from '../components/SyncHistoryModal';
+import TaskDetailModal from '../components/TaskDetailModal';
 
 // Fases operativas reales existentes en src/data/checklistData.js (cyclePhase).
 // No existen 'PRE-C2' ni 'POST-C2' como fases propias: todo lo de C2 usa la fase única 'C2'.
@@ -47,6 +48,8 @@ export default function ChecklistBoard() {
   const [taskForReflection, setTaskForReflection] = useState(null);
   const [taskForExcellence, setTaskForExcellence] = useState(null);
   const [qtPhaseFilter, setQtPhaseFilter] = useState('all'); // 'all' o una de las fases reales del rol (ver PHASE_ORDER)
+  const [selectedTaskForDetail, setSelectedTaskForDetail] = useState(null);
+  const [showTaskDetailModal, setShowTaskDetailModal] = useState(false);
 
   const { currentUser } = useAuth();
   const { tasks, toggleTask, updateTaskDetails, inviteCollaborator, syncTasksToGoogle } = useChecklist();
@@ -171,25 +174,21 @@ export default function ChecklistBoard() {
     }
   };
 
-  const handleAddEvidence = async (task) => {
-    const url = await showPrompt("Introduce el link de la evidencia (Google Drive, Docs, etc):", task.evidenceUrl || "");
-    if (url !== null) {
-      updateTaskDetails(task.id, { evidenceUrl: url });
-    }
+  const handleOpenTaskDetail = (task) => {
+    setSelectedTaskForDetail(task);
+    setShowTaskDetailModal(true);
   };
 
-  const handleAddComment = async (task) => {
-    const comment = await showPrompt("Añadir comentario u observación:", task.comments || "");
-    if (comment !== null) {
-      updateTaskDetails(task.id, { comments: comment });
-    }
+  const handleAddEvidence = (task) => {
+    handleOpenTaskDetail(task);
   };
 
-  const handleProgressChange = async (task) => {
-    const p = await showPrompt("Actualizar porcentaje de avance (0-100):", task.progressPercentage || 0);
-    if (p !== null && !isNaN(p)) {
-      updateTaskDetails(task.id, { progressPercentage: Math.min(100, Math.max(0, parseInt(p))) });
-    }
+  const handleAddComment = (task) => {
+    handleOpenTaskDetail(task);
+  };
+
+  const handleProgressChange = (task) => {
+    handleOpenTaskDetail(task);
   };
 
   const handleSetDeadline = async (task) => {
@@ -335,12 +334,23 @@ export default function ChecklistBoard() {
                   />
                   <div>
                     <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1rem' }}>
-                      <h3 className={task.completed ? 'text-muted' : 'text-white'} style={{ margin: '0 0 0.4rem 0', textDecoration: task.completed ? 'line-through' : 'none', fontSize: '1.05rem' }}>
+                      <h3 
+                        className={task.completed ? 'text-muted' : 'text-white'} 
+                        onClick={() => handleOpenTaskDetail(task)}
+                        style={{ 
+                          margin: '0 0 0.4rem 0', 
+                          textDecoration: task.completed ? 'line-through' : 'none', 
+                          fontSize: '1.05rem',
+                          cursor: 'pointer',
+                          transition: 'color 0.15s ease'
+                        }}
+                        title="Haz clic para ver detalles, registrar avances o adjuntar evidencias a Google Drive"
+                      >
                         {task.task || task.title}
                       </h3>
                       {canEditTask(task) && !task.completed && (
                         <button 
-                          onClick={() => handleEditClick(task)}
+                          onClick={(e) => { e.stopPropagation(); handleEditClick(task); }}
                           style={{ background: 'none', border: 'none', color: 'var(--crear-cyan)', cursor: 'pointer', padding: '0.2rem', display: 'flex', alignItems: 'center' }}
                           title="Editar Tarea"
                         >
@@ -466,8 +476,24 @@ export default function ChecklistBoard() {
                   <button onClick={() => handleAddComment(task)} style={{ background: 'none', border: '1px solid rgba(255,255,255,0.2)', color: 'var(--text-muted)', padding: '0.3rem 0.8rem', borderRadius: '4px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem', cursor: 'pointer' }}>
                     <Edit3 size={14} /> Notas
                   </button>
-                  <button onClick={() => handleAddEvidence(task)} style={{ background: 'none', border: '1px solid rgba(255,255,255,0.2)', color: 'var(--text-muted)', padding: '0.3rem 0.8rem', borderRadius: '4px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem', cursor: 'pointer' }}>
-                    <LinkIcon size={14} /> Evidencia
+                  <button 
+                    onClick={() => handleAddEvidence(task)} 
+                    style={{ 
+                      background: 'rgba(212, 175, 55, 0.12)', 
+                      border: '1px solid rgba(212, 175, 55, 0.4)', 
+                      color: 'var(--crear-gold)', 
+                      padding: '0.3rem 0.8rem', 
+                      borderRadius: '4px', 
+                      fontSize: '0.8rem', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '0.3rem', 
+                      cursor: 'pointer',
+                      fontWeight: 600
+                    }}
+                    title="Adjuntar documentos en Google Drive o registrar evidencias"
+                  >
+                    <LinkIcon size={14} /> 📎 Evidencia (Drive)
                   </button>
                   <button onClick={() => handleProgressChange(task)} style={{ background: 'none', border: '1px solid rgba(255,255,255,0.2)', color: 'var(--text-muted)', padding: '0.3rem 0.8rem', borderRadius: '4px', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.3rem', cursor: 'pointer' }}>
                     % Avance
@@ -515,6 +541,24 @@ export default function ChecklistBoard() {
       />
 
       <SyncHistoryModal isOpen={showSyncHistoryModal} onClose={() => setShowSyncHistoryModal(false)} />
+
+      {/* MODAL DE DETALLE DE TAREA, AVANCE Y EVIDENCIAS CON GOOGLE DRIVE */}
+      <TaskDetailModal
+        isOpen={showTaskDetailModal}
+        onClose={() => {
+          setShowTaskDetailModal(false);
+          setSelectedTaskForDetail(null);
+        }}
+        task={selectedTaskForDetail}
+        onEditTaskParams={(t) => {
+          setShowTaskDetailModal(false);
+          handleEditClick(t);
+        }}
+        resolveAssigneeName={(email) => {
+          const u = usersData.find(usr => usr.email?.toLowerCase() === email?.toLowerCase());
+          return u ? u.name : email;
+        }}
+      />
     </div>
   );
 }
