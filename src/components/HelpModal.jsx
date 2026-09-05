@@ -47,22 +47,43 @@ export default function HelpModal({ isOpen, onClose }) {
     }
 
     try {
+      // 1. Guardar primero en Firestore para garantizar persistencia y trazabilidad inmutable
+      await addDoc(collection(db, 'sugerencias_soporte'), {
+        userId: currentUser?.uid || '',
+        userName: currentUser?.name || currentUser?.displayName || 'Usuario Causa OS',
+        userEmail: currentUser?.email || '',
+        userRole: currentUser?.appRole || currentUser?.role || 'miembro',
+        userSede: currentUser?.sede || 'Global',
+        suggestion: suggestion.trim(),
+        imageUrl: imageUrl || '',
+        status: 'Pendiente', // 'Pendiente' | 'En Revisión' | 'Resuelto'
+        createdAt: serverTimestamp(),
+        createdAtIso: new Date().toISOString()
+      });
+
+      // 2. Despachar a la cola de correos incluyendo a José y Sistemas
       await addDoc(collection(db, 'mail'), {
-        to: 'sistemas@crearpsl.net',
+        to: ['sistemas@crearpsl.net', 'jose.sanchez@crearpsl.net'],
         message: {
-          subject: `💡 Nueva Sugerencia Causa OS de ${currentUser?.name || 'Usuario'}`,
+          subject: `💡 Nueva Sugerencia Causa OS de ${currentUser?.name || 'Usuario'} [${currentUser?.sede || 'Global'}]`,
           html: `
             <h3>Nueva sugerencia/reporte desde la plataforma Causa OS</h3>
-            <p><strong>Usuario:</strong> ${currentUser?.name} (${currentUser?.email})</p>
-            <p><strong>Rol:</strong> ${currentUser?.appRole}</p>
-            <p><strong>Sede:</strong> ${currentUser?.sede}</p>
+            <p><strong>Usuario:</strong> ${currentUser?.name || 'Usuario'} (${currentUser?.email})</p>
+            <p><strong>Rol:</strong> ${currentUser?.appRole || currentUser?.role}</p>
+            <p><strong>Sede:</strong> ${currentUser?.sede || 'Global'}</p>
+            <p><strong>Fecha:</strong> ${new Date().toLocaleString('es-ES', { dateStyle: 'medium', timeStyle: 'short' })}</p>
             <hr />
-            <p>${suggestion.replace(/\n/g, '<br>')}</p>
-            ${imageUrl ? `<br/><p><strong>Evidencia Adjunta:</strong><br/><a href="${imageUrl}" target="_blank"><img src="${imageUrl}" style="max-width: 500px; max-height: 500px; border-radius: 8px; margin-top: 10px;" /></a></p>` : ''}
+            <div style="background: #f8fafc; padding: 15px; border-left: 4px solid #0284c7; font-size: 15px;">
+              ${suggestion.replace(/\n/g, '<br>')}
+            </div>
+            ${imageUrl ? `<br/><p><strong>Evidencia Adjunta:</strong><br/><a href="${imageUrl}" target="_blank"><img src="${imageUrl}" style="max-width: 500px; max-height: 500px; border-radius: 8px; margin-top: 10px; border: 1px solid #ccc;" /></a></p>` : ''}
+            <br/>
+            <p><em>Este ticket ha sido guardado automáticamente en la bandeja de Sugerencias de Causa OS.</em></p>
           `
         },
         createdAt: serverTimestamp()
       });
+      toast.success("¡Sugerencia registrada con éxito en el Centro de Control y notificada a Dirección!");
       setSuccess(true);
       setSuggestion('');
       setSuggestionImage(null);
@@ -72,7 +93,7 @@ export default function HelpModal({ isOpen, onClose }) {
       }, 3000);
     } catch (error) {
       console.error("Error enviando sugerencia:", error);
-      toast.error("Hubo un error enviando la sugerencia. Por favor intenta de nuevo.");
+      toast.error("Hubo un error registrando la sugerencia. Por favor intenta de nuevo.");
     } finally {
       setIsSubmitting(false);
     }
@@ -327,45 +348,71 @@ export default function HelpModal({ isOpen, onClose }) {
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-              <h3 style={{ color: 'var(--crear-cyan)', marginTop: 0 }}>Envía tus Sugerencias</h3>
-              <p style={{ color: 'var(--text-muted)' }}>
-                ¿Encontraste un error? ¿Tienes una idea para mejorar la plataforma? Escríbenos y el equipo de sistemas lo revisará directamente en <strong>sistemas@crearpsl.net</strong>.
-              </p>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.8rem' }}>
+                <div>
+                  <h3 style={{ color: 'var(--crear-cyan)', margin: '0 0 0.3rem 0' }}>Buzón Directo de Sugerencias y Soporte</h3>
+                  <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.9rem' }}>
+                    Tus reportes y sugerencias se guardan en el <strong>Centro de Control de Causa OS</strong> y se notifican directamente a Sistemas y Dirección.
+                  </p>
+                </div>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <a
+                    href={`https://wa.me/593994848037?text=${encodeURIComponent(`Hola Sistemas/Causa OS, soy ${currentUser?.name || 'Usuario'} (${currentUser?.sede || 'Sede'}). Tengo una consulta/reporte: `)}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="btn-secondary"
+                    style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', display: 'flex', alignItems: 'center', gap: '0.4rem', textDecoration: 'none', color: '#22c55e', borderColor: 'rgba(34,197,94,0.3)' }}
+                    title="Escribir por WhatsApp a Soporte de Sistemas"
+                  >
+                    💬 WhatsApp Sistemas
+                  </a>
+                  <a
+                    href={`mailto:sistemas@crearpsl.net,jose.sanchez@crearpsl.net?subject=${encodeURIComponent(`Ticket Causa OS - ${currentUser?.name || 'Usuario'} [${currentUser?.sede || ''}]`)}`}
+                    className="btn-secondary"
+                    style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem', display: 'flex', alignItems: 'center', gap: '0.4rem', textDecoration: 'none', color: 'var(--crear-gold)', borderColor: 'rgba(212,175,55,0.3)' }}
+                    title="Enviar correo directo"
+                  >
+                    ✉️ Correo Directo
+                  </a>
+                </div>
+              </div>
 
               {success ? (
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#22c55e' }}>
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#22c55e', padding: '2rem 0' }}>
                   <CheckCircle2 size={48} style={{ marginBottom: '1rem' }} />
-                  <h3 style={{ margin: 0 }}>¡Mensaje Enviado!</h3>
-                  <p>Gracias por ayudarnos a mejorar Causa OS.</p>
+                  <h3 style={{ margin: 0 }}>¡Sugerencia Registrada y Notificada!</h3>
+                  <p style={{ color: 'var(--text-muted)', textAlign: 'center', maxWidth: '450px', marginTop: '0.5rem' }}>
+                    Tu mensaje fue guardado con éxito en el Centro de Control y notificado a <strong>jose.sanchez@crearpsl.net</strong> y al equipo de Sistemas.
+                  </p>
                 </div>
               ) : (
-                <form onSubmit={handleSendSuggestion} style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1.5rem', marginTop: '1rem' }}>
+                <form onSubmit={handleSendSuggestion} style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1.2rem', marginTop: '1.2rem' }}>
                   <textarea
                     value={suggestion}
                     onChange={(e) => setSuggestion(e.target.value)}
-                    placeholder="Escribe tu sugerencia, reporte de bug o idea de mejora aquí..."
+                    placeholder="Describe en detalle la sugerencia, reporte de bug, inconsistencia o mejora requerida..."
                     required
                     style={{
-                      flex: 1, minHeight: '150px', padding: '1rem', borderRadius: '8px',
+                      flex: 1, minHeight: '140px', padding: '1rem', borderRadius: '8px',
                       background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border-subtle)',
-                      color: '#fff', fontSize: '1rem', resize: 'vertical', fontFamily: 'inherit'
+                      color: '#fff', fontSize: '0.95rem', resize: 'vertical', fontFamily: 'inherit'
                     }}
                   />
                   
                   <div style={{
                     background: 'rgba(255,255,255,0.03)',
                     border: '1px dashed var(--border-strong)',
-                    padding: '1rem',
+                    padding: '0.9rem',
                     borderRadius: '8px',
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: '0.5rem'
+                    gap: '0.4rem'
                   }}>
-                    <label style={{ color: 'var(--crear-cyan)', fontWeight: 600, fontSize: '0.9rem' }}>
-                      📸 Adjunta una captura de pantalla (Opcional pero recomendado)
+                    <label style={{ color: 'var(--crear-cyan)', fontWeight: 600, fontSize: '0.85rem' }}>
+                      📸 Adjunta captura de pantalla o evidencia (Recomendado)
                     </label>
-                    <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                      Si estás reportando un error o caso a corregir, una foto nos ayudará a comprenderlo mucho mejor.
+                    <p style={{ margin: 0, fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                      Si estás reportando un error visual o cruce de datos, una imagen permite resolverlo de inmediato.
                     </p>
                     <input 
                       type="file" 
@@ -375,14 +422,14 @@ export default function HelpModal({ isOpen, onClose }) {
                           setSuggestionImage(e.target.files[0]);
                         }
                       }}
-                      style={{ marginTop: '0.5rem', fontSize: '0.9rem' }}
+                      style={{ marginTop: '0.4rem', fontSize: '0.85rem' }}
                     />
                   </div>
 
                   <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
-                    <button type="button" className="btn-secondary" onClick={onClose} style={{ padding: '0.8rem 1.5rem' }}>Cancelar</button>
-                    <button type="submit" className="btn-primary" disabled={isSubmitting || !suggestion.trim()} style={{ background: 'var(--crear-cyan)', color: '#000', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.8rem 1.5rem' }}>
-                      {isSubmitting ? 'Enviando...' : <><Send size={18} /> Enviar Mensaje</>}
+                    <button type="button" className="btn-secondary" onClick={onClose} style={{ padding: '0.7rem 1.4rem' }}>Cancelar</button>
+                    <button type="submit" className="btn-primary" disabled={isSubmitting || !suggestion.trim()} style={{ background: 'var(--crear-cyan)', color: '#000', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.7rem 1.4rem', fontWeight: 'bold' }}>
+                      {isSubmitting ? 'Registrando y enviando...' : <><Send size={18} /> Enviar Sugerencia</>}
                     </button>
                   </div>
                 </form>

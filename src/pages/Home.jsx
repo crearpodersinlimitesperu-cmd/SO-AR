@@ -755,6 +755,21 @@ export default function Home() {
     if (activeRole === 'consolidado') {
       return true;
     }
+
+    // 1. Si la tarea fue asignada nominalmente a alguien más, no computar en mi progreso
+    const hasSpecificAssignees = (Array.isArray(t.assignedToEmails) && t.assignedToEmails.length > 0) || Boolean(t.assignedToEmail);
+    if (hasSpecificAssignees) return false;
+
+    // 2. Si la tarea pertenece a otra sede específica, no computar en mi progreso
+    const taskSede = t.assignedSede || t.sede;
+    if (taskSede && taskSede !== 'Global' && taskSede !== 'Sede Global') {
+      const userSede = normalizeSede(currentUser?.sede);
+      const normTaskSede = normalizeSede(taskSede);
+      if (userSede && userSede !== 'Sede Global' && normTaskSede !== userSede) {
+        return false;
+      }
+    }
+
     return t.role === activeRole;
   });
   const completedForProgress = myTasksForProgress.filter(t => t.completed || t.status === 'Completada').length;

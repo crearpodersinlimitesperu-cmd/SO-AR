@@ -7,7 +7,7 @@ import { useCycles } from '../context/CyclesContext';
 import { useUI } from '../context/UIContext';
 
 import { roles } from '../data/checklistData';
-import { usersData, normalizeRole, ROLE_COLORS, ROLE_DISPLAY_NAMES, getRoleDisplayName } from '../data/usersData';
+import { usersData, normalizeRole, normalizeSede, ROLE_COLORS, ROLE_DISPLAY_NAMES, getRoleDisplayName } from '../data/usersData';
 import { calculateAutomaticDeadline } from '../utils/soarDates';
 import { ArrowLeft, Target, Link as LinkIcon, Edit3, Clock, ShieldAlert, Users, Sparkles } from 'lucide-react';
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
@@ -79,7 +79,6 @@ export default function ChecklistBoard() {
   }
 
   // Las tareas mías incluyen: rol directo, asignadas a mi correo O donde soy colaborador aceptado
-
   const myTasks = tasks.filter(t => {
     if (roleId === 'consolidado') return true;
 
@@ -88,20 +87,38 @@ export default function ChecklistBoard() {
     
     const isAssigned = (t.assignedToEmails && t.assignedToEmails.some(e => e.toLowerCase() === userEmailCom || e.toLowerCase() === userEmailNet)) || t.assignedToEmail?.toLowerCase() === userEmailCom || t.assignedToEmail?.toLowerCase() === userEmailNet;
     const isCollaborator = t.collaborators?.some(c => c.toLowerCase() === userEmailCom || c.toLowerCase() === userEmailNet);
+    const isMyCreation = t.createdBy?.toLowerCase() === userEmailCom || t.createdBy?.toLowerCase() === userEmailNet;
 
-    if (currentUser?.isSuperAdmin) {
-      return t.role === roleId || isAssigned || isCollaborator;
+    // SuperAdmin o Dirección tienen visibilidad completa
+    if (currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.appRole === 'direccion') {
+      return normalizeRole(t.role) === roleId || isAssigned || isCollaborator || isMyCreation;
     }
 
-    if ((roleId === 'gerente' || roleId === 'director_maestria') && t.role === roleId) {
-      if (!t.assignedToEmail && !(t.assignedToEmails && t.assignedToEmails.length > 0)) return true;
-      const isMyCreation = t.createdBy?.toLowerCase() === userEmailCom || t.createdBy?.toLowerCase() === userEmailNet;
-      return isAssigned || isMyCreation || isCollaborator;
+    // 1. GOBERNANZA DE DELEGACIÓN NOMINAL:
+    // Si la tarea tiene destinatarios específicos, solo la ven los asignados, colaboradores o creador.
+    const hasSpecificAssignees = (Array.isArray(t.assignedToEmails) && t.assignedToEmails.length > 0) || Boolean(t.assignedToEmail);
+    if (hasSpecificAssignees) {
+      return isAssigned || isCollaborator || isMyCreation;
     }
 
-    return t.role === roleId || isAssigned || isCollaborator;
+    // 2. GOBERNANZA DE ROL:
+    const tRoleNorm = normalizeRole(t.role);
+    if (tRoleNorm !== roleId) {
+      return isAssigned || isCollaborator || isMyCreation;
+    }
+
+    // 3. GOBERNANZA DE SEDE:
+    const taskSede = t.assignedSede || t.sede;
+    if (taskSede && taskSede !== 'Global' && taskSede !== 'Sede Global') {
+      const userSede = normalizeSede(currentUser?.sede);
+      const normTaskSede = normalizeSede(taskSede);
+      if (userSede && userSede !== 'Sede Global' && normTaskSede !== userSede) {
+        return false;
+      }
+    }
+
+    return true;
   });
-
 
   const filterParam = searchParams.get('filter');
 

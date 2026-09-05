@@ -4,7 +4,7 @@ import { useChecklist } from '../context/ChecklistContext';
 import { useAuth } from '../context/AuthContext';
 import { useCycles } from '../context/CyclesContext';
 import { useUI } from '../context/UIContext';
-import { doc, setDoc, collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
+import { doc, setDoc, updateDoc, collection, query, orderBy, limit, getDocs, onSnapshot } from 'firebase/firestore';
 import { db, auth } from '../services/firebase';
 import { normalizeRole, normalizeSede, OPERATIONAL_SEDES } from '../data/usersData';
 import { getAllCompanyUsers } from '../services/userService';
@@ -626,6 +626,238 @@ function AuditLogView() {
   );
 }
 
+function SuggestionsView() {
+  const [suggestions, setSuggestions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filterStatus, setFilterStatus] = useState('TODAS'); // 'TODAS' | 'Pendiente' | 'En Revisión' | 'Resuelto'
+  const [selectedImg, setSelectedImg] = useState(null);
+  const { showToast } = useUI();
+
+  useEffect(() => {
+    try {
+      const q = query(collection(db, 'sugerencias_soporte'), orderBy('createdAt', 'desc'), limit(100));
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        const list = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setSuggestions(list);
+        setLoading(false);
+      }, (err) => {
+        console.error("Error escuchando sugerencias:", err);
+        setLoading(false);
+      });
+      return () => unsubscribe();
+    } catch (e) {
+      console.error(e);
+      setLoading(false);
+    }
+  }, []);
+
+  const handleUpdateStatus = async (id, newStatus) => {
+    try {
+      await updateDoc(doc(db, 'sugerencias_soporte', id), {
+        status: newStatus
+      });
+      showToast(`Estado actualizado a: ${newStatus}`, 'success');
+    } catch (err) {
+      console.error("Error actualizando estado:", err);
+      showToast('Error al actualizar estado', 'error');
+    }
+  };
+
+  const filtered = suggestions.filter(item => {
+    if (filterStatus === 'TODAS') return true;
+    return item.status === filterStatus;
+  });
+
+  const getStatusBadge = (status) => {
+    if (status === 'Resuelto') {
+      return { bg: 'rgba(34,197,94,0.15)', color: '#22c55e', border: '#22c55e', text: '✅ Resuelto' };
+    }
+    if (status === 'En Revisión') {
+      return { bg: 'rgba(234,179,8,0.15)', color: '#eab308', border: '#eab308', text: '⏳ En Revisión' };
+    }
+    return { bg: 'rgba(239,68,68,0.15)', color: '#ef4444', border: '#ef4444', text: '🔴 Pendiente' };
+  };
+
+  return (
+    <div className="glass-panel" style={{ padding: '2rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+        <div>
+          <h2 style={{ color: 'var(--crear-cyan)', margin: 0, display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+            💡 Buzón de Sugerencias y Reportes de Usuarios
+          </h2>
+          <p style={{ color: 'var(--text-muted)', margin: '0.3rem 0 0 0', fontSize: '0.9rem' }}>
+            Retroalimentación, ideas y reportes enviados por colaboradores desde el Centro de Ayuda Causa OS en tiempo real.
+          </p>
+        </div>
+        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+          <select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            style={{
+              background: 'rgba(255,255,255,0.08)',
+              color: 'white',
+              border: '1px solid rgba(255,255,255,0.2)',
+              padding: '0.4rem 0.8rem',
+              borderRadius: '6px',
+              fontSize: '0.85rem'
+            }}
+          >
+            <option value="TODAS" style={{ color: 'black' }}>🔍 Todos los Estados ({suggestions.length})</option>
+            <option value="Pendiente" style={{ color: 'black' }}>🔴 Pendientes ({suggestions.filter(s => s.status === 'Pendiente' || !s.status).length})</option>
+            <option value="En Revisión" style={{ color: 'black' }}>⏳ En Revisión ({suggestions.filter(s => s.status === 'En Revisión').length})</option>
+            <option value="Resuelto" style={{ color: 'black' }}>✅ Resueltos ({suggestions.filter(s => s.status === 'Resuelto').length})</option>
+          </select>
+        </div>
+      </div>
+
+      {loading ? (
+        <p style={{ color: 'var(--text-muted)' }}>Cargando sugerencias en tiempo real...</p>
+      ) : filtered.length === 0 ? (
+        <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+          <p style={{ margin: 0 }}>No hay sugerencias registradas con el filtro seleccionado.</p>
+        </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          {filtered.map((item) => {
+            const badge = getStatusBadge(item.status);
+            const dateStr = item.createdAt?.toDate ? item.createdAt.toDate().toLocaleString('es-ES', { dateStyle: 'medium', timeStyle: 'short' }) : (item.createdAtIso ? new Date(item.createdAtIso).toLocaleString('es-ES', { dateStyle: 'medium', timeStyle: 'short' }) : 'Reciente');
+            return (
+              <div
+                key={item.id}
+                style={{
+                  background: 'rgba(255,255,255,0.02)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: '10px',
+                  padding: '1.2rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.8rem'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.5rem' }}>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+                      <strong style={{ fontSize: '1.05rem', color: 'var(--text-heading)' }}>{item.userName || 'Usuario'}</strong>
+                      <span style={{ fontSize: '0.8rem', color: 'var(--crear-gold)', background: 'rgba(212,175,55,0.1)', padding: '0.2rem 0.5rem', borderRadius: '4px' }}>
+                        {item.userRole || 'Colaborador'}
+                      </span>
+                      <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                        📍 {item.userSede || 'Global'}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
+                      ✉️ {item.userEmail || 'Sin correo'} • 🕒 {dateStr}
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+                    <span style={{
+                      padding: '0.25rem 0.6rem',
+                      borderRadius: '12px',
+                      fontSize: '0.78rem',
+                      fontWeight: 'bold',
+                      background: badge.bg,
+                      color: badge.color,
+                      border: `1px solid ${badge.border}44`
+                    }}>
+                      {badge.text}
+                    </span>
+                    <select
+                      value={item.status || 'Pendiente'}
+                      onChange={(e) => handleUpdateStatus(item.id, e.target.value)}
+                      style={{
+                        background: 'rgba(255,255,255,0.05)',
+                        border: '1px solid var(--border-subtle)',
+                        color: '#fff',
+                        fontSize: '0.75rem',
+                        padding: '0.25rem 0.5rem',
+                        borderRadius: '4px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <option value="Pendiente" style={{ color: 'black' }}>Marcar Pendiente</option>
+                      <option value="En Revisión" style={{ color: 'black' }}>Marcar En Revisión</option>
+                      <option value="Resuelto" style={{ color: 'black' }}>Marcar Resuelto</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div style={{
+                  background: 'rgba(0,0,0,0.3)',
+                  padding: '1rem',
+                  borderRadius: '6px',
+                  color: 'var(--text-main)',
+                  fontSize: '0.92rem',
+                  lineHeight: 1.5,
+                  whiteSpace: 'pre-wrap'
+                }}>
+                  {item.suggestion}
+                </div>
+
+                {item.imageUrl && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Evidencia adjunta:</span>
+                    <button
+                      onClick={() => setSelectedImg(item.imageUrl)}
+                      style={{ background: 'transparent', border: '1px solid var(--crear-cyan)', color: 'var(--crear-cyan)', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.78rem', cursor: 'pointer' }}
+                    >
+                      🔍 Ver Captura
+                    </button>
+                    <a
+                      href={item.imageUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}
+                    >
+                      Abrir enlace
+                    </a>
+                  </div>
+                )}
+
+                <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center', marginTop: '0.2rem' }}>
+                  {item.userEmail && (
+                    <a
+                      href={`mailto:${item.userEmail}?subject=${encodeURIComponent(`Respuesta a tu reporte en Causa OS`)}`}
+                      className="btn-secondary"
+                      style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
+                    >
+                      <Mail size={12} /> Responder por Correo
+                    </a>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {selectedImg && (
+        <div
+          onClick={() => setSelectedImg(null)}
+          style={{
+            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+            background: 'rgba(0,0,0,0.85)', zIndex: 100000,
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem'
+          }}
+        >
+          <div style={{ position: 'relative', maxWidth: '90vw', maxHeight: '90vh' }}>
+            <img src={selectedImg} alt="Evidencia" style={{ maxWidth: '100%', maxHeight: '90vh', borderRadius: '8px', objectFit: 'contain' }} />
+            <button
+              onClick={() => setSelectedImg(null)}
+              style={{ position: 'absolute', top: '-15px', right: '-15px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '50%', width: '30px', height: '30px', cursor: 'pointer', fontWeight: 'bold' }}
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function GlobalView({ tasks, navigate, realUsersData = [] }) {
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter(t => t.completed || t.status === 'Completada').length;
@@ -1030,6 +1262,9 @@ export default function SuperAdminPanel() {
             {currentUser?.isSuperAdmin && (
               <button style={tabStyle('auditoria')} onClick={() => setActiveView('auditoria')}>🛡️ Auditoría</button>
             )}
+            {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') && (
+              <button style={tabStyle('sugerencias')} onClick={() => setActiveView('sugerencias')}>💡 Buzón Sugerencias</button>
+            )}
           </div>
           {activeView === 'global' && <GlobalView tasks={tasks} navigate={navigate} realUsersData={realUsersData} />}
           {activeView === 'sede' && (
@@ -1066,6 +1301,9 @@ export default function SuperAdminPanel() {
           )}
           {activeView === 'auditoria' && (
             <AuditLogView />
+          )}
+          {activeView === 'sugerencias' && (
+            <SuggestionsView />
           )}
         </>
       )}
