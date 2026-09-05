@@ -1,6 +1,6 @@
 {
   "robot_token": "NODUS_ROBOT_CPSL_2026_SECRET",
-  "timestamp": "2026-09-04T23:28:45.944Z",
+  "timestamp": "2026-09-04T23:39:59.647Z",
   "fuente": "Sistema Autónomo Multi-Agente Nodus CPSL 2026",
   "usuarioExtraccion": "jsanchez (Super Administrador Global)",
   "totales": {
@@ -3462,7 +3462,7 @@
       "productividadDetalle": "470/2086 (23%)",
       "asistieron": 350,
       "tasaEfectividad": 53,
-      "ultConexion": "04/09/2026 16:32",
+      "ultConexion": "04/09/2026 18:36",
       "ultGestion": "01/09/2026 11:13",
       "estados": {
         "confirmado": 1108,
@@ -18650,7 +18650,7 @@
           "telefonoImo": "+51993709784",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -18845,7 +18845,7 @@
           "telefonoImo": "+51930526967",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
@@ -18905,7 +18905,7 @@
           "telefonoImo": "—",
           "llamada1": "No le Interesa",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -18935,7 +18935,7 @@
           "telefonoImo": "+51929406665",
           "llamada1": "No le Interesa",
           "llamada2": "No le Interesa",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -19025,7 +19025,7 @@
           "telefonoImo": "+51993709784",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -19220,7 +19220,7 @@
           "telefonoImo": "+51930526967",
           "llamada1": "Por Confirmar",
           "llamada2": "Siguiente",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
@@ -19280,7 +19280,7 @@
           "telefonoImo": "—",
           "llamada1": "—",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -19310,7 +19310,7 @@
           "telefonoImo": "+51929406665",
           "llamada1": "No Contesta",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -27343,8 +27343,8 @@
           ]
         },
         {
-          "header": "DIANA LIMA CICLO 1\nÚlt. conexión: 04/09/2026 16:32",
-          "fullText": "DIANA LIMA CICLO 1\nÚlt. conexión: 04/09/2026 16:32\n2086\nGestiones\n1783\nC1\n303\nC2\n880\nAsignados\nCobertura (participantes con al menos 1 gestión)\n837/880 (95%)\nProductividad (llamadas que terminaron en asistencia real)\n470/2086 (23%)\nÚlt. gestión: 01/09/2026 11:13\nNo Contesta: 619\nConfirmado: 1108\nPor Confirmar: 53\nNo le Interesa: 165\nSiguiente: 140\nYa Asistiá: 1\nCapítulo 1 — detalle por equipo (personas únicas según su última gestión):\nEQUIPO\tLLAMADAS\tCONFIRMADO\tNO CONTESTA\tNO LE INTERESA\tSIGUIENTE\tPOR CONFIRMAR\tDEVOLUCIÓN\tYA ASISTIÁ\tCAMBIO CUPO\tASISTIERON\nEQUIPO 30\t132\t52\t10\t1\t9\t3\t\t\t\t39\nEQUIPO 28\t172\t38\t33\t3\t1\t\t\t\t\t42\nEQUIPO 27\t214\t74\t23\t4\t3\t\t\t\t\t66\nEQUIPO 29\t229\t73\t14\t4\t6\t\t\t\t\t52\nEQUIPO 26\t329\t62\t51\t4\t\t\t\t\t\t50\nEQUIPO 25\t297\t28\t2\t80\t1\t\t\t\t\t27\nEQUIPO 24\t40\t1\t\t17\t\t\t\t\t\t1\nEQUIPO 23\t42\t2\t\t9\t\t\t\t\t\t2\nEQUIPO 22\t150\t45\t\t5\t\t\t\t\t\t35\nEQUIPO 21\t151\t40\t2\t1\t1\t\t\t\t\t36\nEQUIPO 20\t23\t\t\t2\t\t\t\t\t\t\nEQUIPO 19\t2\t\t\t\t\t\t\t\t\t\nEQUIPO 18\t2\t\t\t\t\t\t\t\t\t\nCapítulo 2 — detalle por equipo (personas únicas según su última gestión):\nEQUIPO\tLLAMADAS\tCONFIRMADO\tNO CONTESTA\tNO LE INTERESA\tSIGUIENTE\tPOR CONFIRMAR\tDEVOLUCIÓN\tYA ASISTIÁ\tCAMBIO CUPO\tASISTIERON\nEQUIPO 30\t54\t14\t\t\t4\t\t\t\t\t14\nEQUIPO 28\t52\t20\t\t1\t2\t\t\t\t\t22\nEQUIPO 27\t68\t24\t\t4\t\t\t\t\t\t27\nEQUIPO 29\t43\t17\t\t\t4\t1\t\t\t\t20\nEQUIPO 26\t38\t8\t1\t7\t1\t\t\t\t\t15\nEQUIPO 25\t45\t12\t\t7\t\t\t\t\t\t19\nEQUIPO 24\t2\t\t\t2\t\t\t\t\t\t2\nEQUIPO 23\t1\t\t\t1\t\t\t\t\t\t1",
+          "header": "DIANA LIMA CICLO 1\nÚlt. conexión: 04/09/2026 18:36",
+          "fullText": "DIANA LIMA CICLO 1\nÚlt. conexión: 04/09/2026 18:36\n2086\nGestiones\n1783\nC1\n303\nC2\n880\nAsignados\nCobertura (participantes con al menos 1 gestión)\n837/880 (95%)\nProductividad (llamadas que terminaron en asistencia real)\n470/2086 (23%)\nÚlt. gestión: 01/09/2026 11:13\nNo Contesta: 619\nConfirmado: 1108\nPor Confirmar: 53\nNo le Interesa: 165\nSiguiente: 140\nYa Asistiá: 1\nCapítulo 1 — detalle por equipo (personas únicas según su última gestión):\nEQUIPO\tLLAMADAS\tCONFIRMADO\tNO CONTESTA\tNO LE INTERESA\tSIGUIENTE\tPOR CONFIRMAR\tDEVOLUCIÓN\tYA ASISTIÁ\tCAMBIO CUPO\tASISTIERON\nEQUIPO 30\t132\t52\t10\t1\t9\t3\t\t\t\t39\nEQUIPO 28\t172\t38\t33\t3\t1\t\t\t\t\t42\nEQUIPO 27\t214\t74\t23\t4\t3\t\t\t\t\t66\nEQUIPO 29\t229\t73\t14\t4\t6\t\t\t\t\t52\nEQUIPO 26\t329\t62\t51\t4\t\t\t\t\t\t50\nEQUIPO 25\t297\t28\t2\t80\t1\t\t\t\t\t27\nEQUIPO 24\t40\t1\t\t17\t\t\t\t\t\t1\nEQUIPO 23\t42\t2\t\t9\t\t\t\t\t\t2\nEQUIPO 22\t150\t45\t\t5\t\t\t\t\t\t35\nEQUIPO 21\t151\t40\t2\t1\t1\t\t\t\t\t36\nEQUIPO 20\t23\t\t\t2\t\t\t\t\t\t\nEQUIPO 19\t2\t\t\t\t\t\t\t\t\t\nEQUIPO 18\t2\t\t\t\t\t\t\t\t\t\nCapítulo 2 — detalle por equipo (personas únicas según su última gestión):\nEQUIPO\tLLAMADAS\tCONFIRMADO\tNO CONTESTA\tNO LE INTERESA\tSIGUIENTE\tPOR CONFIRMAR\tDEVOLUCIÓN\tYA ASISTIÁ\tCAMBIO CUPO\tASISTIERON\nEQUIPO 30\t54\t14\t\t\t4\t\t\t\t\t14\nEQUIPO 28\t52\t20\t\t1\t2\t\t\t\t\t22\nEQUIPO 27\t68\t24\t\t4\t\t\t\t\t\t27\nEQUIPO 29\t43\t17\t\t\t4\t1\t\t\t\t20\nEQUIPO 26\t38\t8\t1\t7\t1\t\t\t\t\t15\nEQUIPO 25\t45\t12\t\t7\t\t\t\t\t\t19\nEQUIPO 24\t2\t\t\t2\t\t\t\t\t\t2\nEQUIPO 23\t1\t\t\t1\t\t\t\t\t\t1",
           "equipos": [
             {
               "equipo": "EQUIPO 30",
@@ -31080,7 +31080,7 @@
               "COORDINADORES": "4",
               "INGRESOS (FIN DE SEMANA)": "S/. 3,535.00",
               "PROM. ENROLADOS": "0.1",
-              "EN CERO": "37"
+              "EN CERO": "50"
             },
             {
               "SEDE": "MEDELLIN",
@@ -31186,6 +31186,14 @@
               "ENTRENADOR": "LOURDES PATINO",
               "ETAPA ACTUAL": "PFD",
               "PARTICIPANTES": "36",
+              "col_5": "Ver Resultados"
+            },
+            {
+              "EQUIPO": "EQUIPO 30",
+              "SEDE": "LIMA CICLO 1",
+              "ENTRENADOR": "ANDRES IDROBO",
+              "ETAPA ACTUAL": "PFD",
+              "PARTICIPANTES": "4",
               "col_5": "Ver Resultados"
             },
             {
@@ -31720,7 +31728,7 @@
             },
             {
               "Entrenamiento": "Maestría",
-              "Participantes": "3,278"
+              "Participantes": "3,279"
             }
           ]
         },
@@ -31775,9 +31783,9 @@
       ],
       "cards": [
         "Alcance\n🌐 Global (todas las sedes)\nCuenca Ciclo 1\nGUAYAQUIL CICLO 1\nLIMA CICLO 1\nMEDELLIN\nMÉXICO CICLO 1\nQUITO CICLO 2\nPeríodo (pestaña Analítica)\nÚltimos 3 meses\nÚltimos 6 meses\nÚltimos 12 meses\nÚltimos 24 meses\n Viendo indicadores de TODAS las sedes",
-        "Actividad de Todas las Sedes\nSEDE\tPARTICIPANTES\tEQUIPOS ACTIVOS\tENTRENADORES\tCOORDINADORES\tINGRESOS (FIN DE SEMANA)\tPROM. ENROLADOS\tEN CERO\nCuenca Ciclo 1\t3,529\t3\t7\t6\t$ 0.00\t1.8\t10\nGUAYAQUIL CICLO 1\t2,180\t4\t6\t4\t$ 0.00\t2.5\t11\nLIMA CICLO 1\t3,594\t3\t6\t4\tS/. 3,535.00\t0.1\t37\nMEDELLIN\t126\t4\t4\t0\t$ 0.00\t2.0\t7\nMÉXICO CICLO 1\t623\t3\t2\t1\t$ 0.00\t0.0\t44\nQUITO CICLO 2\t4,751\t6\t6\t7\t$ 510.00\t1.3\t95",
-        "Actividad del Fin de Semana\n20 en curso\nEQUIPO\tSEDE\tENTRENADOR\tETAPA ACTUAL\tPARTICIPANTES\t\nEQUIPO 20\tCuenca Ciclo 1\tANDRES IDROBO\tTFD\t38\tVer Resultados\nEQUIPO 21\tCuenca Ciclo 1\tALONSO SOLARES\tSFD\t46\tVer Resultados\nEQUIPO 22\tCuenca Ciclo 1\tMIKE BOADA\tPFD\t39\tVer Resultados\nEQUIPO 34\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\tTFD\t30\tVer Resultados\nEQUIPO 35\tGUAYAQUIL CICLO 1\tALONSO SOLARES\tSFD\t30\tVer Resultados\nEQUIPO 36\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\tPFD\t25\tVer Resultados\nEQUIPO 28\tLIMA CICLO 1\tALEJANDRO DIAZ\tTFD\t13\tVer Resultados\nEQUIPO 29\tLIMA CICLO 1\tLOURDES PATINO\tPFD\t36\tVer Resultados\nEQUIPO 16\tMEDELLIN\tFERNANDO ARAGON\tTFD\t16\tVer Resultados\nEQUIPO 17\tMEDELLIN\tLEANDRO BRUNIS\tSFD\t30\tVer Resultados\nEQUIPO 18\tMEDELLIN\tFERNANDO ARAGON\tPFD\t38\tVer Resultados\nEQUIPO 5\tMÉXICO CICLO 1\tNo asignado\tTFD\t23\tVer Resultados\nEQUIPO 6\tMÉXICO CICLO 1\tMAURICIO PEREZ\tSFD\t11\tVer Resultados\nEQUIPO 7\tMÉXICO CICLO 1\tMAURICIO PEREZ\tPFD\t15\tVer Resultados\nEQUIPO 120\tQUITO CICLO 2\tFERNANDO ARAGON\tTFD\t33\tVer Resultados\nEQUIPO 121\tQUITO CICLO 2\tCIRILO MARTINEZ\tTFD\t53\tVer Resultados\nEQUIPO 122\tQUITO CICLO 2\tLEANDRO BRUNIS\tSFD\t38\tVer Resultados\nEQUIPO 123\tQUITO CICLO 2\tCHUY ACOSTA\tSFD\t42\tVer Resultados\nEQUIPO 124\tQUITO CICLO 2\tLEANDRO BRUNIS\tPFD\t21\tVer Resultados\nEQUIPO 125\tQUITO CICLO 2\tANA MONROY\tPFD\t76\tVer Resultados",
-        "Por Entrenamiento\nTotal participantes activos en el alcance: 14,803\nCapítulo 1\n11,060 (75%)\nCapítulo 2\n4,039 (27%)\nMaestría\n3,278 (22%)",
+        "Actividad de Todas las Sedes\nSEDE\tPARTICIPANTES\tEQUIPOS ACTIVOS\tENTRENADORES\tCOORDINADORES\tINGRESOS (FIN DE SEMANA)\tPROM. ENROLADOS\tEN CERO\nCuenca Ciclo 1\t3,529\t3\t7\t6\t$ 0.00\t1.8\t10\nGUAYAQUIL CICLO 1\t2,180\t4\t6\t4\t$ 0.00\t2.5\t11\nLIMA CICLO 1\t3,594\t3\t6\t4\tS/. 3,535.00\t0.1\t50\nMEDELLIN\t126\t4\t4\t0\t$ 0.00\t2.0\t7\nMÉXICO CICLO 1\t623\t3\t2\t1\t$ 0.00\t0.0\t44\nQUITO CICLO 2\t4,751\t6\t6\t7\t$ 510.00\t1.3\t95",
+        "Actividad del Fin de Semana\n21 en curso\nEQUIPO\tSEDE\tENTRENADOR\tETAPA ACTUAL\tPARTICIPANTES\t\nEQUIPO 20\tCuenca Ciclo 1\tANDRES IDROBO\tTFD\t38\tVer Resultados\nEQUIPO 21\tCuenca Ciclo 1\tALONSO SOLARES\tSFD\t46\tVer Resultados\nEQUIPO 22\tCuenca Ciclo 1\tMIKE BOADA\tPFD\t39\tVer Resultados\nEQUIPO 34\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\tTFD\t30\tVer Resultados\nEQUIPO 35\tGUAYAQUIL CICLO 1\tALONSO SOLARES\tSFD\t30\tVer Resultados\nEQUIPO 36\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\tPFD\t25\tVer Resultados\nEQUIPO 28\tLIMA CICLO 1\tALEJANDRO DIAZ\tTFD\t13\tVer Resultados\nEQUIPO 29\tLIMA CICLO 1\tLOURDES PATINO\tPFD\t36\tVer Resultados\nEQUIPO 30\tLIMA CICLO 1\tANDRES IDROBO\tPFD\t4\tVer Resultados\nEQUIPO 16\tMEDELLIN\tFERNANDO ARAGON\tTFD\t16\tVer Resultados\nEQUIPO 17\tMEDELLIN\tLEANDRO BRUNIS\tSFD\t30\tVer Resultados\nEQUIPO 18\tMEDELLIN\tFERNANDO ARAGON\tPFD\t38\tVer Resultados\nEQUIPO 5\tMÉXICO CICLO 1\tNo asignado\tTFD\t23\tVer Resultados\nEQUIPO 6\tMÉXICO CICLO 1\tMAURICIO PEREZ\tSFD\t11\tVer Resultados\nEQUIPO 7\tMÉXICO CICLO 1\tMAURICIO PEREZ\tPFD\t15\tVer Resultados\nEQUIPO 120\tQUITO CICLO 2\tFERNANDO ARAGON\tTFD\t33\tVer Resultados\nEQUIPO 121\tQUITO CICLO 2\tCIRILO MARTINEZ\tTFD\t53\tVer Resultados\nEQUIPO 122\tQUITO CICLO 2\tLEANDRO BRUNIS\tSFD\t38\tVer Resultados\nEQUIPO 123\tQUITO CICLO 2\tCHUY ACOSTA\tSFD\t42\tVer Resultados\nEQUIPO 124\tQUITO CICLO 2\tLEANDRO BRUNIS\tPFD\t21\tVer Resultados\nEQUIPO 125\tQUITO CICLO 2\tANA MONROY\tPFD\t76\tVer Resultados",
+        "Por Entrenamiento\nTotal participantes activos en el alcance: 14,803\nCapítulo 1\n11,060 (75%)\nCapítulo 2\n4,039 (27%)\nMaestría\n3,279 (22%)",
         "Por Entrenador — Carga de Trabajo\nVer Cronograma\nENTRENADOR\tESTADO\tASIGNACIONES\nFERNANDO ARAGON\tActivo\t\n5\n\nLEANDRO BRUNIS\tActivo\t\n4\n\nMAURICIO PEREZ\tActivo\t\n4\n\nALONSO SOLARES\tActivo\t\n2\n\nANDRES IDROBO\tActivo\t\n2\n\nALEJANDRO DIAZ\tActivo\t\n1\n\nANA MONROY\tActivo\t\n1\n\nCHUY ACOSTA\tActivo\t\n1\n\nCIRILO MARTINEZ\tActivo\t\n1\n\nJUAN ANGEL AREOLA\tActivo\t\n1\n\nLOURDES PATINO\tActivo\t\n1\n\nMIKE BOADA\tActivo\t\n1\n\nANDRES GOMEZ\tActivo\tDisponible\nJOSE TORRON\tActivo\tDisponible\nMILDRED MUNOZ\tActivo\tDisponible\nPAUL SOSA\tActivo\tDisponible\nXAVIER VALAREZO\tActivo\tDisponible",
         "Por Equipo — Equipos en Actividad\nVer todos\nEQUIPO\tSEDE\tENTRENADOR\tPARTICIPANTES\nEQUIPO 123\tQUITO CICLO 2\tCHUY ACOSTA\t424\nEQUIPO 121\tQUITO CICLO 2\tCIRILO MARTINEZ\t364\nEQUIPO 125\tQUITO CICLO 2\tANA MONROY\t348\nEQUIPO 21\tCuenca Ciclo 1\tALONSO SOLARES\t314\nEQUIPO 20\tCuenca Ciclo 1\tANDRES IDROBO\t270\nEQUIPO 124\tQUITO CICLO 2\tLEANDRO BRUNIS\t259\nEQUIPO 18\tMEDELLIN\tFERNANDO ARAGON\t259\nEQUIPO 37\tGUAYAQUIL CICLO 1\tLEANDRO BRUNIS\t257\nEQUIPO 22\tCuenca Ciclo 1\tMIKE BOADA\t253\nEQUIPO 122\tQUITO CICLO 2\tLEANDRO BRUNIS\t240\nEQUIPO 120\tQUITO CICLO 2\tFERNANDO ARAGON\t228\nEQUIPO 29\tLIMA CICLO 1\tLOURDES PATINO\t224\nEQUIPO 36\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\t189\nEQUIPO 28\tLIMA CICLO 1\tALEJANDRO DIAZ\t175\nEQUIPO 35\tGUAYAQUIL CICLO 1\tALONSO SOLARES\t166\nEQUIPO 30\tLIMA CICLO 1\tANDRES IDROBO\t163\nEQUIPO 17\tMEDELLIN\tLEANDRO BRUNIS\t152\nEQUIPO 34\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\t138\nEQUIPO 16\tMEDELLIN\tFERNANDO ARAGON\t123\nEQUIPO 19\tMEDELLIN\tFERNANDO ARAGON\t120\nEQUIPO 7\tMÉXICO CICLO 1\tMAURICIO PEREZ\t87\nEQUIPO 6\tMÉXICO CICLO 1\tMAURICIO PEREZ\t71\nEQUIPO 5\tMÉXICO CICLO 1\tNo asignado\t67",
         "Registros Recientes\nVer todos\nARIANNA LEON LORENZETTI\nLIMA CICLO 1 · +51 913 499 148\n04/09\nJHAN CARLO AREVALO ASUNCION\nLIMA CICLO 1 · +51 ‪+51 959 727 950\n04/09\nLESLIE DESIREE BRITO GAMEZ\nLIMA CICLO 1 · +51 978449650\n04/09\nBEKER SALVADOR\nLIMA CICLO 1 · +51 901777856\n04/09\nISABEL HUAMAN SOLIS\nLIMA CICLO 1 · +51 947554964\n04/09\nGISELL DENIS SARMI\nLIMA CICLO 1 · +51 951105814\n04/09\nDAVID TINTAYA\nLIMA CICLO 1 · +51 ‪944 399 566‬\n04/09\nEDINSON MUNOZ VILLACORTA\nLIMA CICLO 1 · +51 955029157\n04/09\nJORGE EDIN MUNOZ SERRANO\nLIMA CICLO 1 · +51 922428978\n04/09\nANA LIZ OTAZU MENDOZA\nLIMA CICLO 1 · +51 910550571\n04/09",
@@ -31786,7 +31794,7 @@
         "Evolutivo — Ingresos Recaudados\n          Ver tabla\n        \n        \n          \n          \n            \n              MesRecaudado\n              \n                                Oct 25$ 2,021,240.01\n                                Nov 25$ 6,151,243.98\n                                Dic 25$ 5,975,511.00\n                                Ene 26$ 1,359,466.97\n                                Feb 26$ 4,204,589.50\n                                Mar 26$ 777,242.00\n                                Abr 26$ 563,945.25\n                                May 26$ 790,147.98\n                                Jun 26$ 523,481.00\n                                Jul 26$ 2,514,286.10\n                                Ago 26$ 111,160,084.65\n                                Sep 26$ 14,850.00",
         "Comparativo — Participantes por Sede\n          Ver tabla\n        \n        \n          \n          \n            \n              SedeParticipantes\n              \n                                QUITO CICLO 24,751\n                                LIMA CICLO 13,594\n                                Cuenca Ciclo 13,529\n                                GUAYAQUIL CICLO 12,180\n                                MÉXICO CICLO 1623\n                                MEDELLIN126",
         "Comparativo — Ingresos por Sede\n          Ver tabla\n        \n        \n          \n          \n            \n              SedeRecaudado\n              \n                                MEDELLIN$ 98,510,360.00\n                                QUITO CICLO 2$ 33,332,753.58\n                                Cuenca Ciclo 1$ 19,446,147.26\n                                MÉXICO CICLO 1$ 9,056,416.15\n                                LIMA CICLO 1S/. 4,882,793.12\n                                GUAYAQUIL CICLO 1$ 933,667.18",
-        "Comparativo — Progresión por Entrenamiento\n          Ver tabla\n        \n        \n          \n          \n            \n              EntrenamientoParticipantes\n              \n                                Capítulo 111,060\n                                Capítulo 24,039\n                                Maestría3,278",
+        "Comparativo — Progresión por Entrenamiento\n          Ver tabla\n        \n        \n          \n          \n            \n              EntrenamientoParticipantes\n              \n                                Capítulo 111,060\n                                Capítulo 24,039\n                                Maestría3,279",
         "Comparativo — Carga de Entrenadores (Top 10)\n          Ver tabla\n        \n        \n                    \n          \n            \n              EntrenadorAsignaciones\n              \n                                FERNANDO ARAGON5\n                                LEANDRO BRUNIS4\n                                MAURICIO PEREZ4\n                                ALONSO SOLARES2\n                                ANDRES IDROBO2\n                                ALEJANDRO DIAZ1\n                                ANA MONROY1\n                                CHUY ACOSTA1\n                                CIRILO MARTINEZ1\n                                JUAN ANGEL AREOLA1"
       ]
     },
@@ -42831,7 +42839,7 @@
             "telefonoImo": "+51993709784",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -43026,7 +43034,7 @@
             "telefonoImo": "+51930526967",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "—",
             "desertor": "—",
             "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
@@ -43086,7 +43094,7 @@
             "telefonoImo": "—",
             "llamada1": "No le Interesa",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "—",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -43116,7 +43124,7 @@
             "telefonoImo": "+51929406665",
             "llamada1": "No le Interesa",
             "llamada2": "No le Interesa",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "—",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -43206,7 +43214,7 @@
             "telefonoImo": "+51993709784",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -43401,7 +43409,7 @@
             "telefonoImo": "+51930526967",
             "llamada1": "Por Confirmar",
             "llamada2": "Siguiente",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
@@ -43461,7 +43469,7 @@
             "telefonoImo": "—",
             "llamada1": "—",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -43491,7 +43499,7 @@
             "telefonoImo": "+51929406665",
             "llamada1": "No Contesta",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"

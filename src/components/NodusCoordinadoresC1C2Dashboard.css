@@ -821,3 +821,73 @@
   border-bottom: 1px solid var(--nodus-nested-td-border);
   color: var(--nodus-text-main);
 }
+
+/* --- 5.1 BARRA DE FILTROS ACTIVOS Y CHIPS --- */
+.nodus-active-filters-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding-top: 0.65rem;
+  border-top: 1px dashed var(--nodus-border-filters);
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.nodus-active-filters-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--nodus-text-muted);
+}
+
+.nodus-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: rgba(255, 193, 7, 0.14);
+  color: #ffc107;
+  border: 1px solid rgba(255, 193, 7, 0.35);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+[data-theme="light"] .nodus-filter-chip,
+.theme-light .nodus-filter-chip {
+  background: rgba(217, 119, 6, 0.1);
+  color: #b45309;
+  border-color: rgba(217, 119, 6, 0.3);
+}
+
+.nodus-filter-chip:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.4);
+  transform: translateY(-1px);
+}
+
+.nodus-btn-clear-filters {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: auto;
+}
+
+.nodus-btn-clear-filters:hover {
+  background: #ef4444;
+  color: #ffffff;
+}

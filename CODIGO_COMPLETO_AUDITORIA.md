@@ -215037,6 +215037,76 @@ export default function NewExcellenceModal({ isOpen, onClose, task, onComplete }
   color: var(--nodus-text-main);
 }
 
+/* --- 5.1 BARRA DE FILTROS ACTIVOS Y CHIPS --- */
+.nodus-active-filters-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding-top: 0.65rem;
+  border-top: 1px dashed var(--nodus-border-filters);
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.nodus-active-filters-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--nodus-text-muted);
+}
+
+.nodus-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: rgba(255, 193, 7, 0.14);
+  color: #ffc107;
+  border: 1px solid rgba(255, 193, 7, 0.35);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+[data-theme="light"] .nodus-filter-chip,
+.theme-light .nodus-filter-chip {
+  background: rgba(217, 119, 6, 0.1);
+  color: #b45309;
+  border-color: rgba(217, 119, 6, 0.3);
+}
+
+.nodus-filter-chip:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.4);
+  transform: translateY(-1px);
+}
+
+.nodus-btn-clear-filters {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: auto;
+}
+
+.nodus-btn-clear-filters:hover {
+  background: #ef4444;
+  color: #ffffff;
+}
+
 ```
 
 ---
@@ -215051,7 +215121,7 @@ import {
   Users, PhoneCall, CheckCircle2, AlertCircle, Clock, Search, Filter,
   RefreshCw, BarChart2, PieChart as PieChartIcon, TrendingUp, ChevronDown,
   ChevronRight, Award, MapPin, Building2, Layers, UserCheck, PhoneOff,
-  Calendar, Eye, ArrowUpDown, Download, CheckCircle
+  Calendar, Eye, ArrowUpDown, Download, CheckCircle, X
 } from 'lucide-react';
 import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip,
@@ -215092,6 +215162,7 @@ export default function NodusCoordinadoresC1C2Dashboard() {
     color: isLight ? '#0f172a' : '#ffffff',
     padding: '2px 0'
   }), [isLight]);
+
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -215114,6 +215185,22 @@ export default function NodusCoordinadoresC1C2Dashboard() {
       ...prev,
       [coordId]: !prev[coordId]
     }));
+  };
+
+  const hasActiveFilters = Boolean(
+    selectedSede !== 'TODAS' ||
+    selectedEquipo !== 'TODOS' ||
+    selectedEntrenamiento !== 'TODOS' ||
+    selectedCiclo !== 'TODOS' ||
+    searchTerm.trim() !== ''
+  );
+
+  const clearAllFilters = () => {
+    setSearchTerm('');
+    setSelectedSede('TODAS');
+    setSelectedEquipo('TODOS');
+    setSelectedEntrenamiento('TODOS');
+    setSelectedCiclo('TODOS');
   };
 
   // Carga y suscripción en tiempo real desde Firestore
@@ -215203,46 +215290,107 @@ export default function NodusCoordinadoresC1C2Dashboard() {
     });
   }, [data, selectedSede]);
 
-  // Filtrado y ordenamiento de coordinadores
+  // Filtrado exhaustivo y contextual de coordinadores
   const filteredCoordinadores = useMemo(() => {
     if (!data?.coordinadores) return [];
 
-    return data.coordinadores.filter(c => {
-      // Filtro de búsqueda
-      if (searchTerm) {
-        const term = searchTerm.toLowerCase();
-        const matchesName = c.nombre?.toLowerCase().includes(term) || c.nombreCompleto?.toLowerCase().includes(term);
-        const matchesSede = c.sede?.toLowerCase().includes(term);
-        const matchesEquipos = (c.equipos || []).some(eq => eq.equipo?.toLowerCase().includes(term));
-        if (!matchesName && !matchesSede && !matchesEquipos) return false;
-      }
+    const result = [];
 
-      // Filtro por Sede
-      if (selectedSede !== 'TODAS' && c.sede !== selectedSede) {
-        return false;
-      }
+    for (const c of data.coordinadores) {
+      // 1. Filtro Sede
+      if (selectedSede !== 'TODAS' && c.sede !== selectedSede) continue;
 
-      // Filtro por Ciclo
-      if (selectedCiclo !== 'TODOS' && c.ciclo !== selectedCiclo) {
-        return false;
-      }
+      // 2. Filtro Ciclo
+      if (selectedCiclo !== 'TODOS' && c.ciclo !== selectedCiclo) continue;
 
-      // Filtro por Entrenamiento (C1 o C2)
-      if (selectedEntrenamiento === 'C1' && c.c1 === 0) return false;
-      if (selectedEntrenamiento === 'C2' && c.c2 === 0) return false;
+      // 3. Filtro Entrenamiento (C1 / C2)
+      if (selectedEntrenamiento === 'C1' && (!c.c1 || c.c1 === 0)) continue;
+      if (selectedEntrenamiento === 'C2' && (!c.c2 || c.c2 === 0)) continue;
 
-      // Filtro por Equipo
+      // 4. Filtro por Equipo
+      let matchingEquipos = c.equipos || [];
       if (selectedEquipo !== 'TODOS') {
-        const hasEquipo = (c.equipos || []).some(eq => eq.equipo === selectedEquipo);
-        if (!hasEquipo) return false;
+        matchingEquipos = matchingEquipos.filter(eq => eq.equipo === selectedEquipo);
+        if (matchingEquipos.length === 0) continue;
       }
 
-      return true;
-    }).sort((a, b) => {
-      if (sortBy === 'gestiones') return b.gestiones - a.gestiones;
-      if (sortBy === 'cobertura') return b.coberturaPct - a.coberturaPct;
-      if (sortBy === 'productividad') return b.productividadPct - a.productividadPct;
-      if (sortBy === 'confirmados') return (b.estados?.confirmado || 0) - (a.estados?.confirmado || 0);
+      // 5. Búsqueda por texto (nombre, email, sede, o equipo)
+      if (searchTerm) {
+        const term = searchTerm.toLowerCase().trim();
+        const matchCoord = (c.nombre || '').toLowerCase().includes(term) ||
+                           (c.nombreCompleto || '').toLowerCase().includes(term) ||
+                           (c.email || '').toLowerCase().includes(term) ||
+                           (c.sede || '').toLowerCase().includes(term);
+        const eqMatches = matchingEquipos.filter(eq => (eq.equipo || '').toLowerCase().includes(term));
+
+        if (!matchCoord && eqMatches.length === 0) continue;
+
+        // Si la búsqueda coincidió específicamente con un equipo, mostramos solo esos equipos en el desglose
+        if (!matchCoord && eqMatches.length > 0) {
+          matchingEquipos = eqMatches;
+        }
+      }
+
+      // 6. Cómputo de métricas exactas según el filtro aplicado
+      const isEquipoFiltered = selectedEquipo !== 'TODOS' || (searchTerm && matchingEquipos.length < (c.equipos || []).length);
+      
+      let dispGestiones = c.gestiones;
+      let dispConfirmados = c.estados?.confirmado || 0;
+      let dispNoContesta = c.estados?.noContesta || 0;
+      let dispPorConfirmar = c.estados?.porConfirmar || 0;
+      let dispSiguiente = c.estados?.siguiente || 0;
+      let dispNoInteresa = c.estados?.noInteresa || 0;
+      let dispAsistieron = c.asistieron || 0;
+      let dispAsignados = c.asignados;
+
+      if (isEquipoFiltered) {
+        dispGestiones = matchingEquipos.reduce((s, e) => s + (e.llamadas || 0), 0);
+        dispConfirmados = matchingEquipos.reduce((s, e) => s + (e.confirmado || 0), 0);
+        dispNoContesta = matchingEquipos.reduce((s, e) => s + (e.noContesta || 0), 0);
+        dispPorConfirmar = matchingEquipos.reduce((s, e) => s + (e.porConfirmar || 0), 0);
+        dispSiguiente = matchingEquipos.reduce((s, e) => s + (e.siguiente || 0), 0);
+        dispNoInteresa = matchingEquipos.reduce((s, e) => s + (e.noInteresa || 0), 0);
+        dispAsistieron = matchingEquipos.reduce((s, e) => s + (e.asistieron || 0), 0);
+        dispAsignados = dispGestiones;
+      } else if (selectedEntrenamiento === 'C1') {
+        dispGestiones = c.c1;
+      } else if (selectedEntrenamiento === 'C2') {
+        dispGestiones = c.c2;
+      }
+
+      const coberturaPct = dispAsignados > 0 && isEquipoFiltered
+        ? Math.min(100, Math.round((dispGestiones / dispAsignados) * 100))
+        : c.coberturaPct;
+
+      const productividadPct = dispGestiones > 0 && isEquipoFiltered
+        ? Math.round((dispAsistieron / dispGestiones) * 100)
+        : c.productividadPct;
+
+      result.push({
+        ...c,
+        visibleEquipos: matchingEquipos,
+        isSpecificFilter: isEquipoFiltered || selectedEntrenamiento !== 'TODOS',
+        displayStats: {
+          gestiones: dispGestiones,
+          confirmados: dispConfirmados,
+          noContesta: dispNoContesta,
+          porConfirmar: dispPorConfirmar,
+          siguiente: dispSiguiente,
+          noInteresa: dispNoInteresa,
+          asistieron: dispAsistieron,
+          asignados: dispAsignados,
+          coberturaPct,
+          productividadPct
+        }
+      });
+    }
+
+    // Ordenamiento
+    return result.sort((a, b) => {
+      if (sortBy === 'gestiones') return b.displayStats.gestiones - a.displayStats.gestiones;
+      if (sortBy === 'cobertura') return b.displayStats.coberturaPct - a.displayStats.coberturaPct;
+      if (sortBy === 'productividad') return b.displayStats.productividadPct - a.displayStats.productividadPct;
+      if (sortBy === 'confirmados') return b.displayStats.confirmados - a.displayStats.confirmados;
       if (sortBy === 'nombre') return a.nombre.localeCompare(b.nombre);
       return 0;
     });
@@ -215251,17 +215399,17 @@ export default function NodusCoordinadoresC1C2Dashboard() {
   // Métricas agregadas reactivas según los filtros aplicados
   const aggregatedStats = useMemo(() => {
     const list = filteredCoordinadores;
-    const totalGestiones = list.reduce((acc, c) => acc + (c.gestiones || 0), 0);
-    const totalAsignados = list.reduce((acc, c) => acc + (c.asignados || 0), 0);
-    const totalConfirmados = list.reduce((acc, c) => acc + (c.estados?.confirmado || 0), 0);
-    const totalNoContesta = list.reduce((acc, c) => acc + (c.estados?.noContesta || 0), 0);
-    const totalPorConfirmar = list.reduce((acc, c) => acc + (c.estados?.porConfirmar || 0), 0);
-    const totalSiguiente = list.reduce((acc, c) => acc + (c.estados?.siguiente || 0), 0);
-    const totalNoInteresa = list.reduce((acc, c) => acc + (c.estados?.noInteresa || 0), 0);
-    const totalAsistieron = list.reduce((acc, c) => acc + (c.asistieron || 0), 0);
+    const totalGestiones = list.reduce((acc, c) => acc + (c.displayStats.gestiones || 0), 0);
+    const totalAsignados = list.reduce((acc, c) => acc + (c.displayStats.asignados || 0), 0);
+    const totalConfirmados = list.reduce((acc, c) => acc + (c.displayStats.confirmados || 0), 0);
+    const totalNoContesta = list.reduce((acc, c) => acc + (c.displayStats.noContesta || 0), 0);
+    const totalPorConfirmar = list.reduce((acc, c) => acc + (c.displayStats.porConfirmar || 0), 0);
+    const totalSiguiente = list.reduce((acc, c) => acc + (c.displayStats.siguiente || 0), 0);
+    const totalNoInteresa = list.reduce((acc, c) => acc + (c.displayStats.noInteresa || 0), 0);
+    const totalAsistieron = list.reduce((acc, c) => acc + (c.displayStats.asistieron || 0), 0);
 
-    const coberturaProm = list.length ? Math.round(list.reduce((acc, c) => acc + (c.coberturaPct || 0), 0) / list.length) : 0;
-    const productividadProm = list.length ? Math.round(list.reduce((acc, c) => acc + (c.productividadPct || 0), 0) / list.length) : 0;
+    const coberturaProm = list.length ? Math.round(list.reduce((acc, c) => acc + (c.displayStats.coberturaPct || 0), 0) / list.length) : 0;
+    const productividadProm = list.length ? Math.round(list.reduce((acc, c) => acc + (c.displayStats.productividadPct || 0), 0) / list.length) : 0;
 
     return {
       coordinadoresCount: list.length,
@@ -215279,33 +215427,48 @@ export default function NodusCoordinadoresC1C2Dashboard() {
     };
   }, [filteredCoordinadores]);
 
-  // Datos para Gráfico 1: Top 12 Coordinadores por Gestiones y Confirmados
+  // Datos para Gráfico 1: Coordinadores Filtrados (hasta 16 o todos si son <= 20)
   const chartCoordinadoresData = useMemo(() => {
-    return filteredCoordinadores.slice(0, 12).map(c => ({
+    const limit = filteredCoordinadores.length <= 18 ? filteredCoordinadores.length : 14;
+    return filteredCoordinadores.slice(0, limit).map(c => ({
       name: `${c.nombre} (${c.sede.slice(0, 3)})`,
-      gestiones: c.gestiones,
-      confirmados: c.estados?.confirmado || 0,
+      gestiones: c.displayStats.gestiones,
+      confirmados: c.displayStats.confirmados,
       c1: c.c1,
       c2: c.c2,
-      cobertura: c.coberturaPct
+      cobertura: c.displayStats.coberturaPct
     }));
   }, [filteredCoordinadores]);
 
-  // Datos para Gráfico 2: Desglose por Sedes
+  // Datos para Gráfico 2: Desglose por Sedes (computado estrictamente desde los datos filtrados)
   const chartSedesData = useMemo(() => {
-    if (!data?.sedes) return [];
-    return data.sedes.map(s => ({
-      sede: s.sede,
-      gestiones: s.gestionesTotal,
-      confirmados: s.confirmadosTotal,
-      asignados: s.asignadosTotal,
-      c1: s.c1Total,
-      c2: s.c2Total,
-      coordinadores: s.coordinadoresCount
-    })).sort((a, b) => b.gestiones - a.gestiones);
-  }, [data]);
+    if (!filteredCoordinadores.length) return [];
+    
+    const sedesMap = {};
+    filteredCoordinadores.forEach(c => {
+      if (!sedesMap[c.sede]) {
+        sedesMap[c.sede] = {
+          sede: c.sede,
+          gestiones: 0,
+          confirmados: 0,
+          asignados: 0,
+          c1: 0,
+          c2: 0,
+          coordinadores: 0
+        };
+      }
+      sedesMap[c.sede].gestiones += c.displayStats.gestiones;
+      sedesMap[c.sede].confirmados += c.displayStats.confirmados;
+      sedesMap[c.sede].asignados += c.displayStats.asignados;
+      sedesMap[c.sede].c1 += c.c1 || 0;
+      sedesMap[c.sede].c2 += c.c2 || 0;
+      sedesMap[c.sede].coordinadores += 1;
+    });
 
-  // Datos para Gráfico 3: Distribución Global de Estados (Donut)
+    return Object.values(sedesMap).sort((a, b) => b.gestiones - a.gestiones);
+  }, [filteredCoordinadores]);
+
+  // Datos para Gráfico 3: Distribución Global de Estados (Donut adaptado a lo filtrado)
   const chartEstadosData = useMemo(() => {
     return [
       { name: 'Confirmado', value: aggregatedStats.totalConfirmados, color: COLORS.confirmado },
@@ -215320,23 +215483,27 @@ export default function NodusCoordinadoresC1C2Dashboard() {
   const timeSinceSync = useMemo(() => {
     if (!data?.timestamp) return 'Reciente';
     try {
-      const diffMs = Date.now() - new Date(data.timestamp).getTime();
+      const syncDate = new Date(data.timestamp);
+      const now = new Date();
+      const diffMs = now.getTime() - syncDate.getTime();
       const diffMins = Math.floor(diffMs / 60000);
-      if (diffMins < 1) return 'Hace unos segundos';
+
+      if (diffMins < 1) return 'Hace instantes';
+      if (diffMins === 1) return 'Hace 1 min';
       if (diffMins < 60) return `Hace ${diffMins} min`;
       const diffHours = Math.floor(diffMins / 60);
-      return `Hace ${diffHours} h y ${diffMins % 60} min`;
-    } catch {
+      return `Hace ${diffHours} h ${diffMins % 60} m`;
+    } catch (e) {
       return 'Reciente';
     }
-  }, [data?.timestamp]);
+  }, [data]);
 
   if (loading) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', gap: '1rem', background: 'var(--nodus-bg-card, rgba(17, 34, 64, 0.7))', borderRadius: '16px', border: '1px solid var(--nodus-border-card, rgba(255, 255, 255, 0.08))', color: 'var(--nodus-text-sub, #94a3b8)' }}>
         <RefreshCw size={36} color="#ffc107" style={{ animation: 'spin 1s linear infinite' }} />
         <p style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--nodus-text-title, #f8fafc)', margin: 0 }}>Cargando datos ejecutivos de Coordinadores C1 & C2...</p>
-        <p style={{ fontSize: '0.78rem', color: '#64748b', margin: 0 }}>Conectando con el enjambre de agentes autónomos Nodus</p>
+        <p style={{ fontSize: '0.78rem', color: 'var(--nodus-text-muted, #64748b)', margin: 0 }}>Conectando con el enjambre de agentes autónomos Nodus</p>
       </div>
     );
   }
@@ -215380,7 +215547,7 @@ export default function NodusCoordinadoresC1C2Dashboard() {
         </div>
       </div>
 
-      {/* 2. SCORECARDS EJECUTIVAS */}
+      {/* 2. SCORECARDS EJECUTIVAS REACTIVAS A FILTROS */}
       <div className="nodus-scorecards-grid">
         <div className="nodus-card">
           <div className="nodus-card-header">
@@ -215388,7 +215555,11 @@ export default function NodusCoordinadoresC1C2Dashboard() {
             <Users size={16} color="#ffc107" />
           </div>
           <div className="nodus-card-value">{aggregatedStats.coordinadoresCount}</div>
-          <div className="nodus-card-footer">En {selectedSede === 'TODAS' ? '6 Sedes' : selectedSede}</div>
+          <div className="nodus-card-footer">
+            {hasActiveFilters
+              ? `Filtrado (${filteredCoordinadores.length} encontrados)`
+              : (selectedSede === 'TODAS' ? 'En 6 Sedes' : selectedSede)}
+          </div>
         </div>
 
         <div className="nodus-card">
@@ -215397,16 +215568,22 @@ export default function NodusCoordinadoresC1C2Dashboard() {
             <PhoneCall size={16} color="#0ea5e9" />
           </div>
           <div className="nodus-card-value highlight-sky">{aggregatedStats.totalGestiones.toLocaleString()}</div>
-          <div className="nodus-card-footer">Llamadas realizadas</div>
+          <div className="nodus-card-footer">
+            {selectedEquipo !== 'TODOS'
+              ? `Llamadas de ${selectedEquipo}`
+              : (selectedEntrenamiento !== 'TODOS' ? `Solo ${selectedEntrenamiento}` : 'Llamadas realizadas')}
+          </div>
         </div>
 
         <div className="nodus-card">
           <div className="nodus-card-header">
-            <span>Asignados</span>
-            <Building2 size={16} color="#a855f7" />
+            <span>{selectedEquipo !== 'TODOS' ? 'Gestiones Equipo' : 'Asignados'}</span>
+            <Clock size={16} color="#8b5cf6" />
           </div>
           <div className="nodus-card-value">{aggregatedStats.totalAsignados.toLocaleString()}</div>
-          <div className="nodus-card-footer">Participantes meta</div>
+          <div className="nodus-card-footer">
+            {selectedEquipo !== 'TODOS' ? 'Llamadas registradas' : 'Participantes únicos'}
+          </div>
         </div>
 
         <div className="nodus-card">
@@ -215415,7 +215592,7 @@ export default function NodusCoordinadoresC1C2Dashboard() {
             <CheckCircle2 size={16} color="#10b981" />
           </div>
           <div className="nodus-card-value highlight-emerald">{aggregatedStats.totalConfirmados.toLocaleString()}</div>
-          <div className="nodus-card-footer" style={{ color: '#10b981' }}>{aggregatedStats.tasaEfectividad}% efectividad</div>
+          <div className="nodus-card-footer">{aggregatedStats.tasaEfectividad}% efectividad</div>
         </div>
 
         <div className="nodus-card">
@@ -215453,6 +215630,25 @@ export default function NodusCoordinadoresC1C2Dashboard() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="nodus-search-input"
             />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm('')}
+                style={{
+                  position: 'absolute',
+                  right: '10px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--nodus-text-muted)',
+                  cursor: 'pointer',
+                  fontSize: '12px'
+                }}
+                title="Borrar búsqueda"
+              >
+                ✕
+              </button>
+            )}
           </div>
 
           <div className="nodus-select-group">
@@ -215530,6 +215726,41 @@ export default function NodusCoordinadoresC1C2Dashboard() {
             </div>
           </div>
         </div>
+
+        {/* CHIPS DE FILTROS ACTIVOS CON BOTÓN RESTABLECER */}
+        {hasActiveFilters && (
+          <div className="nodus-active-filters-bar">
+            <span className="nodus-active-filters-label">Filtrando por:</span>
+            {selectedSede !== 'TODAS' && (
+              <span className="nodus-filter-chip" onClick={() => setSelectedSede('TODAS')} title="Quitar filtro de sede">
+                <MapPin size={11} /> Sede: {selectedSede} ✕
+              </span>
+            )}
+            {selectedEquipo !== 'TODOS' && (
+              <span className="nodus-filter-chip" onClick={() => setSelectedEquipo('TODOS')} title="Quitar filtro de equipo">
+                <Layers size={11} /> {selectedEquipo} ✕
+              </span>
+            )}
+            {selectedEntrenamiento !== 'TODOS' && (
+              <span className="nodus-filter-chip" onClick={() => setSelectedEntrenamiento('TODOS')} title="Quitar filtro de capítulo">
+                <Award size={11} /> {selectedEntrenamiento === 'C1' ? 'Solo Capítulo 1' : 'Solo Capítulo 2'} ✕
+              </span>
+            )}
+            {selectedCiclo !== 'TODOS' && (
+              <span className="nodus-filter-chip" onClick={() => setSelectedCiclo('TODOS')} title="Quitar filtro de ciclo">
+                <Calendar size={11} /> {selectedCiclo} ✕
+              </span>
+            )}
+            {searchTerm.trim() !== '' && (
+              <span className="nodus-filter-chip" onClick={() => setSearchTerm('')} title="Quitar búsqueda de texto">
+                <Search size={11} /> "{searchTerm}" ✕
+              </span>
+            )}
+            <button onClick={clearAllFilters} className="nodus-btn-clear-filters" title="Restablecer todos los filtros a su estado inicial">
+              Restablecer Filtros
+            </button>
+          </div>
+        )}
       </div>
 
       {/* 4. SECCIÓN DE GRÁFICOS */}
@@ -215561,8 +215792,8 @@ export default function NodusCoordinadoresC1C2Dashboard() {
             </button>
           </div>
 
-          <div style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
-            Mostrando {filteredCoordinadores.length} coordinadores
+          <div style={{ fontSize: '0.78rem', color: 'var(--nodus-text-muted)' }}>
+            Mostrando {chartCoordinadoresData.length} de {filteredCoordinadores.length} coordinadores {hasActiveFilters && '(filtrados)'}
           </div>
         </div>
 
@@ -215575,10 +215806,10 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                 <YAxis stroke={axisStroke} fontSize={11} />
                 <Tooltip contentStyle={chartTooltipStyle} itemStyle={chartItemStyle} />
                 <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '8px', color: isLight ? '#334155' : '#cbd5e1' }} />
-                <Bar dataKey="gestiones" name="Gestiones Totales" fill="#0ea5e9" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="gestiones" name="Gestiones Filtradas" fill={isLight ? '#0284c7' : '#0ea5e9'} radius={[4, 4, 0, 0]} />
                 <Bar dataKey="confirmados" name="Confirmados" fill="#10b981" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="c1" name="Capítulo 1" fill="#eab308" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="c2" name="Capítulo 2" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+                {selectedEntrenamiento !== 'C2' && <Bar dataKey="c1" name="Capítulo 1" fill="#eab308" radius={[4, 4, 0, 0]} />}
+                {selectedEntrenamiento !== 'C1' && <Bar dataKey="c2" name="Capítulo 2" fill="#8b5cf6" radius={[4, 4, 0, 0]} />}
               </BarChart>
             </ResponsiveContainer>
           )}
@@ -215645,9 +215876,14 @@ export default function NodusCoordinadoresC1C2Dashboard() {
           <div className="nodus-table-title">
             <Users size={18} color="#ffc107" />
             <span>Detalle Puntual por Colaborador y Equipos Asignados</span>
+            {hasActiveFilters && (
+              <span style={{ fontSize: '0.68rem', padding: '0.2rem 0.6rem', borderRadius: '12px', background: 'rgba(255,193,7,0.18)', color: '#ffc107', fontWeight: 700, border: '1px solid rgba(255,193,7,0.3)' }}>
+                Filtros Activos ({filteredCoordinadores.length} encontrados)
+              </span>
+            )}
           </div>
-          <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
-            {filteredCoordinadores.length} coordinadores encontrados
+          <span style={{ fontSize: '0.78rem', color: 'var(--nodus-text-muted)' }}>
+            Mostrando {filteredCoordinadores.length} {filteredCoordinadores.length === 1 ? 'coordinador' : 'coordinadores'}
           </span>
         </div>
 
@@ -215671,14 +215907,23 @@ export default function NodusCoordinadoresC1C2Dashboard() {
             <tbody>
               {filteredCoordinadores.length === 0 ? (
                 <tr>
-                  <td colSpan={11} style={{ padding: '3rem 1rem', textAlign: 'center', color: '#64748b' }}>
-                    No se encontraron coordinadores con los filtros seleccionados.
+                  <td colSpan={11} style={{ padding: '3rem 1rem', textAlign: 'center', color: 'var(--nodus-text-muted)' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.6rem' }}>
+                      <AlertCircle size={24} color="#f59e0b" />
+                      <span>No se encontraron coordinadores con los filtros seleccionados.</span>
+                      {hasActiveFilters && (
+                        <button onClick={clearAllFilters} className="nodus-btn-clear-filters" style={{ margin: '0.4rem auto 0 auto' }}>
+                          Restablecer Filtros
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ) : (
                 filteredCoordinadores.map((coord) => {
                   const isExpanded = !!expandedRows[coord.id];
-                  const hasEquipos = (coord.equipos || []).length > 0;
+                  const hasEquipos = (coord.visibleEquipos || []).length > 0;
+                  const isFilteredEquipo = selectedEquipo !== 'TODOS';
 
                   return (
                     <React.Fragment key={coord.id}>
@@ -215692,11 +215937,16 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                             <div>
                               <div style={{ fontWeight: 700, color: 'var(--nodus-text-title)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                                 {coord.nombre}
-                                {coord.c2 > 0 && (
+                                {coord.c2 > 0 && selectedEntrenamiento !== 'C1' && (
                                   <span className="nodus-badge-c1c2">C1+C2</span>
                                 )}
+                                {isFilteredEquipo && (
+                                  <span style={{ fontSize: '0.65rem', padding: '0.1rem 0.4rem', borderRadius: '4px', background: 'rgba(56, 189, 248, 0.15)', color: '#0284c7', fontWeight: 700, border: '1px solid rgba(56, 189, 248, 0.3)' }}>
+                                    {selectedEquipo}
+                                  </span>
+                                )}
                               </div>
-                              <div style={{ fontSize: '0.75rem', color: '#94a3b8', fontFamily: 'monospace' }}>
+                              <div style={{ fontSize: '0.75rem', color: 'var(--nodus-text-muted)', fontFamily: 'monospace' }}>
                                 {coord.email}
                               </div>
                             </div>
@@ -215710,67 +215960,79 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                               <MapPin size={13} color="#ffc107" />
                               {coord.sede}
                             </span>
-                            <span style={{ fontSize: '0.72rem', color: '#64748b' }}>
+                            <span style={{ fontSize: '0.72rem', color: 'var(--nodus-text-muted)' }}>
                               {coord.ciclo}
                             </span>
                           </div>
                         </td>
 
                         {/* Gestiones */}
-                        <td className="nodus-td" style={{ textAlign: 'right', fontWeight: 800, color: '#38bdf8', fontSize: '0.95rem' }}>
-                          {coord.gestiones.toLocaleString()}
+                        <td className="nodus-td" style={{ textAlign: 'right', fontWeight: 800, color: '#0284c7', fontSize: '0.95rem' }}>
+                          {coord.displayStats.gestiones.toLocaleString()}
                         </td>
 
                         {/* C1 / C2 */}
                         <td className="nodus-td" style={{ textAlign: 'right' }}>
-                          <span style={{ color: '#ffc107', fontWeight: 700 }}>{coord.c1}</span>
-                          <span style={{ color: '#64748b', margin: '0 0.3rem' }}>/</span>
-                          <span style={{ color: '#a78bfa', fontWeight: 700 }}>{coord.c2}</span>
+                          <span style={{
+                            color: selectedEntrenamiento === 'C2' ? 'var(--nodus-text-muted)' : '#ffc107',
+                            fontWeight: selectedEntrenamiento === 'C1' ? 800 : 700,
+                            opacity: selectedEntrenamiento === 'C2' ? 0.4 : 1
+                          }}>{coord.c1}</span>
+                          <span style={{ color: 'var(--nodus-text-muted)', margin: '0 0.3rem' }}>/</span>
+                          <span style={{
+                            color: selectedEntrenamiento === 'C1' ? 'var(--nodus-text-muted)' : '#a78bfa',
+                            fontWeight: selectedEntrenamiento === 'C2' ? 800 : 700,
+                            opacity: selectedEntrenamiento === 'C1' ? 0.4 : 1
+                          }}>{coord.c2}</span>
                         </td>
 
                         {/* Asignados */}
                         <td className="nodus-td" style={{ textAlign: 'right', color: 'var(--nodus-text-main)', fontWeight: 600 }}>
-                          {coord.asignados.toLocaleString()}
+                          {coord.displayStats.asignados.toLocaleString()}
                         </td>
 
                         {/* Cobertura */}
                         <td className="nodus-td" style={{ textAlign: 'center' }}>
                           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
-                            <span style={{ fontWeight: 800, color: '#ffc107' }}>{coord.coberturaPct}%</span>
+                            <span style={{ fontWeight: 800, color: '#ffc107' }}>{coord.displayStats.coberturaPct}%</span>
                             <div style={{ width: '60px', height: '4px', background: 'var(--nodus-progress-bg)', borderRadius: '2px', overflow: 'hidden' }}>
-                              <div style={{ width: `${coord.coberturaPct}%`, height: '100%', background: '#ffc107', borderRadius: '2px' }} />
+                              <div style={{ width: `${coord.displayStats.coberturaPct}%`, height: '100%', background: '#ffc107', borderRadius: '2px' }} />
                             </div>
-                            <span style={{ fontSize: '0.68rem', color: '#64748b' }}>{coord.coberturaDetalle?.split(' ')[0]}</span>
+                            <span style={{ fontSize: '0.68rem', color: 'var(--nodus-text-muted)' }}>
+                              {coord.coberturaDetalle?.split(' ')[0] || ''}
+                            </span>
                           </div>
                         </td>
 
                         {/* Productividad */}
                         <td className="nodus-td" style={{ textAlign: 'center' }}>
                           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
-                            <span style={{ fontWeight: 800, color: '#14b8a6' }}>{coord.productividadPct}%</span>
+                            <span style={{ fontWeight: 800, color: '#14b8a6' }}>{coord.displayStats.productividadPct}%</span>
                             <div style={{ width: '60px', height: '4px', background: 'var(--nodus-progress-bg)', borderRadius: '2px', overflow: 'hidden' }}>
-                              <div style={{ width: `${coord.productividadPct}%`, height: '100%', background: '#14b8a6', borderRadius: '2px' }} />
+                              <div style={{ width: `${coord.displayStats.productividadPct}%`, height: '100%', background: '#14b8a6', borderRadius: '2px' }} />
                             </div>
-                            <span style={{ fontSize: '0.68rem', color: '#64748b' }}>{coord.productividadDetalle?.split(' ')[0]}</span>
+                            <span style={{ fontSize: '0.68rem', color: 'var(--nodus-text-muted)' }}>
+                              {coord.productividadDetalle?.split(' ')[0] || ''}
+                            </span>
                           </div>
                         </td>
 
                         {/* Confirmados */}
                         <td className="nodus-td" style={{ textAlign: 'right' }}>
                           <span className="nodus-badge-confirmados">
-                            {coord.estados?.confirmado || 0}
+                            {coord.displayStats.confirmados}
                           </span>
                         </td>
 
                         {/* Asistieron */}
                         <td className="nodus-td" style={{ textAlign: 'right' }}>
                           <span className="nodus-badge-asistieron">
-                            {coord.asistieron || 0}
+                            {coord.displayStats.asistieron}
                           </span>
                         </td>
 
                         {/* Última Gestión */}
-                        <td className="nodus-td" style={{ textAlign: 'center', fontSize: '0.72rem', color: '#94a3b8', fontFamily: 'monospace' }}>
+                        <td className="nodus-td" style={{ textAlign: 'center', fontSize: '0.72rem', color: 'var(--nodus-text-muted)', fontFamily: 'monospace' }}>
                           {coord.ultGestion || coord.ultConexion || 'N/D'}
                         </td>
 
@@ -215780,17 +216042,20 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                             <button
                               onClick={() => toggleRow(coord.id)}
                               className={`nodus-btn-expand ${isExpanded ? 'expanded' : ''}`}
+                              title={isFilteredEquipo ? `Ver detalle de ${selectedEquipo}` : `Ver desglose de ${coord.visibleEquipos.length} equipos`}
                             >
-                              <span>Equipos ({coord.equipos.length})</span>
+                              <span>
+                                {isFilteredEquipo ? selectedEquipo : `Equipos (${coord.visibleEquipos.length})`}
+                              </span>
                               {isExpanded ? <ChevronDown size={13} /> : <ChevronRight size={13} />}
                             </button>
                           ) : (
-                            <span style={{ fontSize: '0.72rem', color: '#64748b', fontStyle: 'italic' }}>Sin equipos</span>
+                            <span style={{ fontSize: '0.72rem', color: 'var(--nodus-text-muted)', fontStyle: 'italic' }}>Sin equipos</span>
                           )}
                         </td>
                       </tr>
 
-                      {/* SUBTABLA ANIDADA */}
+                      {/* SUBTABLA ANIDADA (SOLO MUESTRA LOS EQUIPOS FILTRADOS) */}
                       {isExpanded && hasEquipos && (
                         <tr>
                           <td colSpan={11} className="nodus-nested-wrapper">
@@ -215799,9 +216064,14 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                                 <h4 className="nodus-nested-title">
                                   <Layers size={14} />
                                   <span>Desglose por Equipo — {coord.nombre} ({coord.sede})</span>
+                                  {isFilteredEquipo && (
+                                    <span style={{ fontSize: '0.68rem', padding: '0.15rem 0.5rem', borderRadius: '4px', background: 'rgba(56, 189, 248, 0.18)', color: '#0284c7', fontWeight: 700, marginLeft: '0.5rem' }}>
+                                      Filtrado: {selectedEquipo}
+                                    </span>
+                                  )}
                                 </h4>
-                                <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
-                                  {coord.equipos.length} equipos gestionados
+                                <span style={{ fontSize: '0.72rem', color: 'var(--nodus-text-muted)' }}>
+                                  {coord.visibleEquipos.length} {coord.visibleEquipos.length === 1 ? 'equipo mostrado' : 'equipos mostrados'}
                                 </span>
                               </div>
 
@@ -215820,20 +216090,20 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                                     </tr>
                                   </thead>
                                   <tbody>
-                                    {coord.equipos.map((eq, eqIdx) => {
+                                    {coord.visibleEquipos.map((eq, eqIdx) => {
                                       const tasaAsist = eq.confirmado > 0 ? Math.round((eq.asistieron / eq.confirmado) * 100) : 0;
                                       return (
                                         <tr key={eqIdx} style={{ transition: 'background 0.15s ease' }}>
                                           <td className="nodus-nested-td" style={{ fontWeight: 700, color: 'var(--nodus-text-title)' }}>
                                             {eq.equipo}
                                           </td>
-                                          <td className="nodus-nested-td" style={{ textAlign: 'right', color: '#38bdf8', fontWeight: 600 }}>
+                                          <td className="nodus-nested-td" style={{ textAlign: 'right', color: '#0284c7', fontWeight: 600 }}>
                                             {eq.llamadas}
                                           </td>
                                           <td className="nodus-nested-td" style={{ textAlign: 'right', color: '#10b981', fontWeight: 700 }}>
                                             {eq.confirmado}
                                           </td>
-                                          <td className="nodus-nested-td" style={{ textAlign: 'right', color: '#94a3b8' }}>
+                                          <td className="nodus-nested-td" style={{ textAlign: 'right', color: 'var(--nodus-text-muted)' }}>
                                             {eq.noContesta}
                                           </td>
                                           <td className="nodus-nested-td" style={{ textAlign: 'right', color: '#fbbf24' }}>
@@ -215842,7 +216112,7 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                                           <td className="nodus-nested-td" style={{ textAlign: 'right', color: '#60a5fa' }}>
                                             {eq.siguiente}
                                           </td>
-                                          <td className="nodus-nested-td" style={{ textAlign: 'right', color: '#38bdf8', fontWeight: 700 }}>
+                                          <td className="nodus-nested-td" style={{ textAlign: 'right', color: '#0284c7', fontWeight: 700 }}>
                                             {eq.asistieron}
                                           </td>
                                           <td className="nodus-nested-td" style={{ textAlign: 'center' }}>
