@@ -264825,15 +264825,18 @@ export default function NodusCoordinadoresC1C2Dashboard() {
     padding: '2px 0'
   }), [isLight]);
 
-  // Tooltip Glassmorphic personalizado para el gráfico de coordinadores
+  // Tooltip Glassmorphic personalizado para el gráfico de coordinadores y equipos
   const CustomCoordTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       const item = payload[0].payload;
+      const isTeam = Boolean(item.isTeam);
       return (
         <div className="nodus-chart-custom-tooltip">
           <div className="nodus-tooltip-header">
-            <span className="nodus-tooltip-title">{item.fullName || label}</span>
-            <span className="nodus-tooltip-badge">{item.sede}</span>
+            <span className="nodus-tooltip-title">{item.fullName || item.name || label}</span>
+            <span className="nodus-tooltip-badge">
+              {item.sede} {isTeam ? `• ${item.capitulo}` : ''}
+            </span>
           </div>
           <div className="nodus-tooltip-body">
             <div className="nodus-tooltip-row highlight-gold">
@@ -264886,6 +264889,7 @@ export default function NodusCoordinadoresC1C2Dashboard() {
 
   // Filtros
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCoordinador, setSelectedCoordinador] = useState('TODOS');
   const [selectedSede, setSelectedSede] = useState('TODAS');
   const [selectedEquipo, setSelectedEquipo] = useState('TODOS');
   const [selectedEntrenamiento, setSelectedEntrenamiento] = useState('TODOS'); // TODOS, C1, C2
@@ -264893,6 +264897,7 @@ export default function NodusCoordinadoresC1C2Dashboard() {
   const [sortBy, setSortBy] = useState('sentados'); // sentados, sentadosC1, sentadosC2, gestiones, cobertura, productividad, confirmados, nombre
   const [activeChartTab, setActiveChartTab] = useState('coordinadores'); // coordinadores, sedes, estados
   const [chartMetric, setChartMetric] = useState('sentados'); // 'sentados' (C1 vs C2), 'gestiones' (Llamadas), 'integral' (Doble eje)
+  const [singleCoordView, setSingleCoordView] = useState('equipos'); // 'equipos' | 'resumen'
 
   // Filas expandidas (para ver desglose de equipos)
   const [expandedRows, setExpandedRows] = useState({});
@@ -264905,6 +264910,7 @@ export default function NodusCoordinadoresC1C2Dashboard() {
   };
 
   const hasActiveFilters = Boolean(
+    selectedCoordinador !== 'TODOS' ||
     selectedSede !== 'TODAS' ||
     selectedEquipo !== 'TODOS' ||
     selectedEntrenamiento !== 'TODOS' ||
@@ -264914,10 +264920,12 @@ export default function NodusCoordinadoresC1C2Dashboard() {
 
   const clearAllFilters = () => {
     setSearchTerm('');
+    setSelectedCoordinador('TODOS');
     setSelectedSede('TODAS');
     setSelectedEquipo('TODOS');
     setSelectedEntrenamiento('TODOS');
     setSelectedCiclo('TODOS');
+    setSingleCoordView('equipos');
   };
 
   // Carga y suscripción en tiempo real desde Firestore
@@ -265052,30 +265060,152 @@ export default function NodusCoordinadoresC1C2Dashboard() {
     });
   }, [data]);
 
-  // Lista única de sedes (basada exclusivamente en coordinadores C1 y C2)
-  const sedesList = useMemo(() => {
-    const set = new Set(c1c2Coordinadores.map(c => c.sede).filter(Boolean));
-    return Array.from(set).sort();
-  }, [c1c2Coordinadores]);
+  // 1. Coordinadores disponibles para el dropdown (dependen de Sede, Ciclo, Entrenamiento, Equipo y Búsqueda)
+  const coordinadoresList = useMemo(() => {
+    let list = c1c2Coordinadores.filter(c => {
+      if (selectedSede !== 'TODAS' && c.sede !== selectedSede) return false;
+      if (selectedCiclo !== 'TODOS' && c.ciclo !== selectedCiclo) return false;
+      if (selectedEntrenamiento === 'C1' && c.sentadosC1 === 0 && c.gestionesC1 === 0) return false;
+      if (selectedEntrenamiento === 'C2' && c.sentadosC2 === 0 && c.gestionesC2 === 0) return false;
+      if (selectedEquipo !== 'TODOS' && !(c.equipos || []).some(eq => eq.equipo === selectedEquipo)) return false;
+      return true;
+    });
 
-  // Lista única de equipos disponibles según la sede seleccionada
+    if (searchTerm.trim()) {
+      const term = searchTerm.toLowerCase().trim();
+      const matched = list.filter(c => 
+        (c.nombre || '').toLowerCase().includes(term) ||
+        (c.nombreCompleto || '').toLowerCase().includes(term) ||
+        (c.email || '').toLowerCase().includes(term) ||
+        (c.equipos || []).some(eq => (eq.equipo || '').toLowerCase().includes(term))
+      );
+      if (matched.length > 0) {
+        list = matched;
+      }
+    }
+
+    return list.sort((a, b) => a.nombre.localeCompare(b.nombre));
+  }, [c1c2Coordinadores, selectedSede, selectedCiclo, selectedEntrenamiento, selectedEquipo, searchTerm]);
+
+  // 2. Lista única de sedes interdependiente y congruente
+  const sedesList = useMemo(() => {
+    let coords = c1c2Coordinadores;
+
+    // Si hay un coordinador explícitamente seleccionado
+    if (selectedCoordinador !== 'TODOS') {
+      coords = coords.filter(c => c.nombre === selectedCoordinador);
+    }
+
+    // Si hay búsqueda por texto, filtramos las sedes de los coordinadores/equipos coincidentes
+    if (searchTerm.trim()) {
+      const term = searchTerm.toLowerCase().trim();
+      const matched = coords.filter(c => 
+        (c.nombre || '').toLowerCase().includes(term) ||
+        (c.nombreCompleto || '').toLowerCase().includes(term) ||
+        (c.email || '').toLowerCase().includes(term) ||
+        (c.equipos || []).some(eq => (eq.equipo || '').toLowerCase().includes(term))
+      );
+      if (matched.length > 0) {
+        coords = matched;
+      }
+    }
+
+    // Si hay equipo seleccionado
+    if (selectedEquipo !== 'TODOS') {
+      coords = coords.filter(c => (c.equipos || []).some(eq => eq.equipo === selectedEquipo));
+    }
+
+    // Si hay filtro de entrenamiento
+    if (selectedEntrenamiento === 'C1') {
+      coords = coords.filter(c => c.sentadosC1 > 0 || c.gestionesC1 > 0);
+    } else if (selectedEntrenamiento === 'C2') {
+      coords = coords.filter(c => c.sentadosC2 > 0 || c.gestionesC2 > 0);
+    }
+
+    // Si hay ciclo seleccionado
+    if (selectedCiclo !== 'TODOS') {
+      coords = coords.filter(c => c.ciclo === selectedCiclo);
+    }
+
+    const set = new Set(coords.map(c => c.sede).filter(Boolean));
+    return Array.from(set).sort();
+  }, [c1c2Coordinadores, selectedCoordinador, searchTerm, selectedEquipo, selectedEntrenamiento, selectedCiclo]);
+
+  // 3. Lista única de equipos disponibles interdependiente y congruente
   const equiposList = useMemo(() => {
     let coords = c1c2Coordinadores;
+
+    // Si hay un coordinador seleccionado
+    if (selectedCoordinador !== 'TODOS') {
+      coords = coords.filter(c => c.nombre === selectedCoordinador);
+    }
+
+    // Si hay búsqueda por texto que coincida con algún coordinador
+    if (searchTerm.trim()) {
+      const term = searchTerm.toLowerCase().trim();
+      const matched = coords.filter(c => 
+        (c.nombre || '').toLowerCase().includes(term) ||
+        (c.nombreCompleto || '').toLowerCase().includes(term) ||
+        (c.email || '').toLowerCase().includes(term)
+      );
+      if (matched.length > 0) {
+        coords = matched;
+      }
+    }
+
+    // Si hay sede seleccionada
     if (selectedSede !== 'TODAS') {
       coords = coords.filter(c => c.sede === selectedSede);
     }
+
+    // Si hay ciclo seleccionado
+    if (selectedCiclo !== 'TODOS') {
+      coords = coords.filter(c => c.ciclo === selectedCiclo);
+    }
+
     const set = new Set();
     coords.forEach(c => {
       (c.equipos || []).forEach(eq => {
-        if (eq.equipo) set.add(eq.equipo);
+        if (!eq.equipo) return;
+        const eqNum = parseInt(eq.equipo.replace(/\D/g, '')) || 0;
+        
+        // Filtro estricto por capítulo C1 (< 100) vs C2 (>= 100)
+        if (selectedEntrenamiento === 'C1' && eqNum >= 100) return;
+        if (selectedEntrenamiento === 'C2' && eqNum < 100) return;
+
+        set.add(eq.equipo);
       });
     });
+
     return Array.from(set).sort((a, b) => {
       const numA = parseInt(a.replace(/\D/g, '')) || 0;
       const numB = parseInt(b.replace(/\D/g, '')) || 0;
       return numA - numB;
     });
-  }, [c1c2Coordinadores, selectedSede]);
+  }, [c1c2Coordinadores, selectedCoordinador, searchTerm, selectedSede, selectedCiclo, selectedEntrenamiento]);
+
+  // Sincronización automática de selectores para evitar combinaciones incoherentes
+  useEffect(() => {
+    if (selectedSede !== 'TODAS' && !sedesList.includes(selectedSede)) {
+      if (sedesList.length === 1) {
+        setSelectedSede(sedesList[0]);
+      } else {
+        setSelectedSede('TODAS');
+      }
+    }
+  }, [sedesList, selectedSede]);
+
+  useEffect(() => {
+    if (selectedEquipo !== 'TODOS' && !equiposList.includes(selectedEquipo)) {
+      setSelectedEquipo('TODOS');
+    }
+  }, [equiposList, selectedEquipo]);
+
+  useEffect(() => {
+    if (selectedCoordinador !== 'TODOS' && !coordinadoresList.some(c => c.nombre === selectedCoordinador)) {
+      setSelectedCoordinador('TODOS');
+    }
+  }, [coordinadoresList, selectedCoordinador]);
 
   // Filtrado exhaustivo y contextual de coordinadores C1 & C2
   const filteredCoordinadores = useMemo(() => {
@@ -265084,6 +265214,9 @@ export default function NodusCoordinadoresC1C2Dashboard() {
     const result = [];
 
     for (const c of c1c2Coordinadores) {
+      // 0. Filtro Coordinador
+      if (selectedCoordinador !== 'TODOS' && c.nombre !== selectedCoordinador) continue;
+
       // 1. Filtro Sede
       if (selectedSede !== 'TODAS' && c.sede !== selectedSede) continue;
 
@@ -265254,6 +265387,74 @@ export default function NodusCoordinadoresC1C2Dashboard() {
       cobertura: c.displayStats.coberturaPct
     }));
   }, [filteredCoordinadores]);
+
+  // Datos para Gráfico de Equipos (desglose exhaustivo cuando hay 1 coordinador filtrado o seleccionado)
+  const chartTeamsData = useMemo(() => {
+    if (!filteredCoordinadores.length || filteredCoordinadores.length !== 1) return [];
+
+    const coord = filteredCoordinadores[0];
+    const teams = coord.visibleEquipos || coord.equipos || [];
+
+    // Agrupamos equipos por nombre para consolidar si hay registros repetidos
+    const teamAggMap = {};
+    teams.forEach(eq => {
+      const name = eq.equipo;
+      if (!name) return;
+      const num = parseInt(name.replace(/\D/g, '')) || 0;
+      const isC1 = num < 100;
+
+      // Filtros por capítulo si aplica
+      if (selectedEntrenamiento === 'C1' && !isC1) return;
+      if (selectedEntrenamiento === 'C2' && isC1) return;
+      if (selectedEquipo !== 'TODOS' && name !== selectedEquipo) return;
+
+      if (!teamAggMap[name]) {
+        teamAggMap[name] = {
+          name,
+          teamNum: num,
+          isTeam: true,
+          capitulo: isC1 ? 'Capítulo 1' : 'Capítulo 2',
+          sede: coord.sede,
+          sentadosC1: 0,
+          sentadosC2: 0,
+          totalSentados: 0,
+          gestiones: 0,
+          gestionesC1: 0,
+          gestionesC2: 0,
+          confirmados: 0,
+          noContesta: 0,
+          porConfirmar: 0,
+          siguiente: 0,
+          noInteresa: 0
+        };
+      }
+
+      const asist = eq.asistieron || 0;
+      const llam = eq.llamadas || 0;
+      const conf = eq.confirmado || 0;
+
+      if (isC1) {
+        teamAggMap[name].sentadosC1 += asist;
+        teamAggMap[name].gestionesC1 += llam;
+      } else {
+        teamAggMap[name].sentadosC2 += asist;
+        teamAggMap[name].gestionesC2 += llam;
+      }
+      teamAggMap[name].totalSentados += asist;
+      teamAggMap[name].gestiones += llam;
+      teamAggMap[name].confirmados += conf;
+      teamAggMap[name].noContesta += (eq.noContesta || 0);
+      teamAggMap[name].porConfirmar += (eq.porConfirmar || 0);
+      teamAggMap[name].siguiente += (eq.siguiente || 0);
+      teamAggMap[name].noInteresa += (eq.noInteresa || 0);
+    });
+
+    return Object.values(teamAggMap).sort((a, b) => a.teamNum - b.teamNum);
+  }, [filteredCoordinadores, selectedEntrenamiento, selectedEquipo]);
+
+  const isSingleCoord = filteredCoordinadores.length === 1;
+  const isShowingTeams = isSingleCoord && singleCoordView === 'equipos' && chartTeamsData.length > 0;
+  const activeChartData = isShowingTeams ? chartTeamsData : chartCoordinadoresData;
 
   // Datos para Gráfico 2: Desglose por Sedes (computado estrictamente desde los datos filtrados)
   const chartSedesData = useMemo(() => {
@@ -265472,16 +265673,54 @@ export default function NodusCoordinadoresC1C2Dashboard() {
 
           <div className="nodus-select-group">
             <div className="nodus-select-item">
+              <Users size={14} color="#ffc107" />
+              <select
+                value={selectedCoordinador}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setSelectedCoordinador(val);
+                  if (val !== 'TODOS') {
+                    const coord = c1c2Coordinadores.find(c => c.nombre === val);
+                    if (coord) {
+                      setSelectedSede(coord.sede);
+                    }
+                  }
+                }}
+                className="nodus-select"
+                style={{ maxWidth: '175px' }}
+                title="Filtrar por colaborador / coordinador individual"
+              >
+                <option value="TODOS">
+                  {coordinadoresList.length === 1 ? `Coord: ${coordinadoresList[0].nombre}` : `Todos Coord (${coordinadoresList.length})`}
+                </option>
+                {coordinadoresList.map(c => (
+                  <option key={c.id || c.nombre} value={c.nombre}>
+                    {c.nombre} ({c.sede})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="nodus-select-item">
               <MapPin size={14} color="#ffc107" />
               <select
                 value={selectedSede}
                 onChange={(e) => {
-                  setSelectedSede(e.target.value);
+                  const newSede = e.target.value;
+                  setSelectedSede(newSede);
                   setSelectedEquipo('TODOS');
+                  if (newSede !== 'TODAS' && selectedCoordinador !== 'TODOS') {
+                    const currentCoord = c1c2Coordinadores.find(c => c.nombre === selectedCoordinador);
+                    if (currentCoord && currentCoord.sede !== newSede) {
+                      setSelectedCoordinador('TODOS');
+                    }
+                  }
                 }}
                 className="nodus-select"
               >
-                <option value="TODAS">Todas las Sedes</option>
+                <option value="TODAS">
+                  {sedesList.length === 1 ? `Sede: ${sedesList[0]}` : `Todas las Sedes (${sedesList.length})`}
+                </option>
                 {sedesList.map(s => (
                   <option key={s} value={s}>{s}</option>
                 ))}
@@ -265494,9 +265733,11 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                 value={selectedEquipo}
                 onChange={(e) => setSelectedEquipo(e.target.value)}
                 className="nodus-select"
-                style={{ maxWidth: '140px' }}
+                style={{ maxWidth: '145px' }}
               >
-                <option value="TODOS">Todos Equipos</option>
+                <option value="TODOS">
+                  {equiposList.length === 1 ? `Equipo: ${equiposList[0]}` : `Todos Equipos (${equiposList.length})`}
+                </option>
                 {equiposList.map(eq => (
                   <option key={eq} value={eq}>{eq}</option>
                 ))}
@@ -265553,6 +265794,11 @@ export default function NodusCoordinadoresC1C2Dashboard() {
         {hasActiveFilters && (
           <div className="nodus-active-filters-bar">
             <span className="nodus-active-filters-label">Filtrando por:</span>
+            {selectedCoordinador !== 'TODOS' && (
+              <span className="nodus-filter-chip" onClick={() => setSelectedCoordinador('TODOS')} title="Quitar filtro de coordinador">
+                <Users size={11} /> Coord: {selectedCoordinador} ✕
+              </span>
+            )}
             {selectedSede !== 'TODAS' && (
               <span className="nodus-filter-chip" onClick={() => setSelectedSede('TODAS')} title="Quitar filtro de sede">
                 <MapPin size={11} /> Sede: {selectedSede} ✕
@@ -265614,8 +265860,38 @@ export default function NodusCoordinadoresC1C2Dashboard() {
             </button>
           </div>
 
-          <div style={{ fontSize: '0.78rem', color: 'var(--nodus-text-muted)' }}>
-            Mostrando {chartCoordinadoresData.length} de {filteredCoordinadores.length} coordinadores {hasActiveFilters && '(filtrados)'}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flexWrap: 'wrap' }}>
+            {isSingleCoord && chartTeamsData.length > 0 && (
+              <div className="nodus-metric-toggle-group" style={{ marginBottom: 0 }}>
+                <button
+                  type="button"
+                  onClick={() => setSingleCoordView('equipos')}
+                  className={`nodus-metric-toggle-btn ${singleCoordView === 'equipos' ? 'active' : ''}`}
+                  style={{ padding: '0.3rem 0.65rem', fontSize: '0.74rem' }}
+                  title="Ver cada equipo del coordinador en el gráfico de barras"
+                >
+                  <Layers size={13} color="#38bdf8" />
+                  <span>Desglose por Equipos ({chartTeamsData.length})</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSingleCoordView('resumen')}
+                  className={`nodus-metric-toggle-btn ${singleCoordView === 'resumen' ? 'active' : ''}`}
+                  style={{ padding: '0.3rem 0.65rem', fontSize: '0.74rem' }}
+                  title="Ver barra consolidada de este coordinador"
+                >
+                  <Users size={13} color="#ffc107" />
+                  <span>Resumen Coordinador</span>
+                </button>
+              </div>
+            )}
+
+            <div style={{ fontSize: '0.78rem', color: 'var(--nodus-text-muted)' }}>
+              {isShowingTeams
+                ? `Mostrando ${chartTeamsData.length} equipos de ${filteredCoordinadores[0].nombre} (${filteredCoordinadores[0].sede})`
+                : `Mostrando ${chartCoordinadoresData.length} de ${filteredCoordinadores.length} coordinadores ${hasActiveFilters ? '(filtrados)' : ''}`
+              }
+            </div>
           </div>
         </div>
 
@@ -265657,7 +265933,7 @@ export default function NodusCoordinadoresC1C2Dashboard() {
 
               {chartMetric === 'sentados' && (
                 <ResponsiveContainer width="100%" height={400}>
-                  <BarChart data={chartCoordinadoresData} margin={{ top: 15, right: 25, left: 15, bottom: 65 }}>
+                  <BarChart data={activeChartData} margin={{ top: 15, right: 25, left: 15, bottom: 65 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} />
                     <XAxis
                       dataKey="name"
@@ -265685,7 +265961,7 @@ export default function NodusCoordinadoresC1C2Dashboard() {
 
               {chartMetric === 'gestiones' && (
                 <ResponsiveContainer width="100%" height={400}>
-                  <BarChart data={chartCoordinadoresData} margin={{ top: 15, right: 25, left: 15, bottom: 65 }}>
+                  <BarChart data={activeChartData} margin={{ top: 15, right: 25, left: 15, bottom: 65 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} />
                     <XAxis
                       dataKey="name"
@@ -265714,7 +265990,7 @@ export default function NodusCoordinadoresC1C2Dashboard() {
 
               {chartMetric === 'integral' && (
                 <ResponsiveContainer width="100%" height={400}>
-                  <ComposedChart data={chartCoordinadoresData} margin={{ top: 15, right: 30, left: 15, bottom: 65 }}>
+                  <ComposedChart data={activeChartData} margin={{ top: 15, right: 30, left: 15, bottom: 65 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} />
                     <XAxis
                       dataKey="name"
