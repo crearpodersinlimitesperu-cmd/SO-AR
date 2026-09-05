@@ -354,5 +354,22 @@ service cloud.firestore {
     match /user_stats/{document} {
       allow read, write: if isAuthenticated();
     }
+
+    // ========================================================================
+    // CPSL INTERRUPCIÓN (CAMPUS INTERACTIVO) - USUARIOS Y SESIONES
+    // Cualquier usuario autenticado con Google puede acceder a su propio perfil,
+    // progreso y registrar sesiones sin restricción de sede o rol administrativo.
+    // ========================================================================
+    match /users/{userId} {
+      allow read, write: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
+
+      match /progress/{docId} {
+        allow read, write: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
+      }
+
+      match /sessions/{sessionId} {
+        allow read, write: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
+      }
+    }
   }
 }
