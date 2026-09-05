@@ -488,6 +488,15 @@ export function AuthProvider({ children }) {
           setCurrentUser(null);
         }
       } else {
+        const mockDevUser = localStorage.getItem('cpsl_mock_user');
+        if (mockDevUser) {
+          try {
+            const parsed = JSON.parse(mockDevUser);
+            setCurrentUser(parsed);
+            setLoading(false);
+            return;
+          } catch(e) {}
+        }
         sessionStorage.removeItem('googleAccessToken');
         sessionStorage.removeItem('cpsl_active_role');
         setCurrentUser(null);

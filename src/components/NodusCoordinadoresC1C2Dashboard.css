@@ -381,6 +381,22 @@
   color: #38bdf8;
 }
 
+.nodus-card-value.highlight-gold {
+  color: #d97706;
+}
+
+[data-theme="dark"] .nodus-card-value.highlight-gold {
+  color: #f59e0b;
+}
+
+.nodus-card-value.highlight-purple {
+  color: #7c3aed;
+}
+
+[data-theme="dark"] .nodus-card-value.highlight-purple {
+  color: #a855f7;
+}
+
 .nodus-card-footer {
   font-size: 0.75rem;
   color: var(--nodus-text-muted);
@@ -723,16 +739,84 @@
 
 .nodus-badge-asistieron {
   display: inline-block;
-  padding: 0.25rem 0.65rem;
+  padding: 0.28rem 0.75rem;
   border-radius: 8px;
-  background: rgba(14, 165, 233, 0.15);
-  border: 1px solid rgba(14, 165, 233, 0.35);
-  color: #0284c7;
+  background: rgba(16, 185, 129, 0.18);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #059669;
   font-weight: 800;
+  box-shadow: 0 1px 4px rgba(16, 185, 129, 0.15);
 }
 
 [data-theme="dark"] .nodus-badge-asistieron {
-  color: #38bdf8;
+  background: rgba(16, 185, 129, 0.22);
+  color: #10b981;
+  border-color: rgba(16, 185, 129, 0.5);
+  box-shadow: 0 1px 8px rgba(16, 185, 129, 0.25);
+}
+
+.nodus-badge-sentados-c1 {
+  display: inline-block;
+  padding: 0.25rem 0.65rem;
+  border-radius: 8px;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: #b45309;
+  font-weight: 800;
+}
+
+[data-theme="dark"] .nodus-badge-sentados-c1 {
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.45);
+}
+
+.nodus-badge-sentados-c2 {
+  display: inline-block;
+  padding: 0.25rem 0.65rem;
+  border-radius: 8px;
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  color: #7c3aed;
+  font-weight: 800;
+}
+
+[data-theme="dark"] .nodus-badge-sentados-c2 {
+  background: rgba(139, 92, 246, 0.2);
+  color: #a855f7;
+  border-color: rgba(139, 92, 246, 0.45);
+}
+
+.nodus-badge-c1-small {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  background: rgba(245, 158, 11, 0.15);
+  color: #b45309;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  margin-left: 0.4rem;
+}
+
+[data-theme="dark"] .nodus-badge-c1-small {
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.nodus-badge-c2-small {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  background: rgba(139, 92, 246, 0.18);
+  color: #7c3aed;
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  margin-left: 0.4rem;
+}
+
+[data-theme="dark"] .nodus-badge-c2-small {
+  color: #a855f7;
+  border-color: rgba(139, 92, 246, 0.45);
 }
 
 .nodus-btn-expand {
@@ -891,3 +975,171 @@
   background: #ef4444;
   color: #ffffff;
 }
+
+/* --- 6.1 SELECTOR DE MÉTRICA DE RENDIMIENTO (PILLS) --- */
+.nodus-metric-toggle-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.85rem;
+}
+
+.nodus-metric-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  background: var(--nodus-bg-card);
+  color: var(--nodus-text-muted);
+  border: 1px solid var(--nodus-border-card);
+  transition: all 0.2s ease;
+}
+
+.nodus-metric-toggle-btn:hover {
+  color: var(--nodus-text-title);
+  border-color: rgba(255, 193, 7, 0.4);
+  transform: translateY(-1px);
+}
+
+.nodus-metric-toggle-btn.active {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(217, 119, 6, 0.15) 100%);
+  color: #d97706;
+  border-color: rgba(245, 158, 11, 0.6);
+  box-shadow: 0 2px 10px rgba(245, 158, 11, 0.2);
+}
+
+[data-theme="dark"] .nodus-metric-toggle-btn.active {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(139, 92, 246, 0.15) 100%);
+  color: #fbbf24;
+  border-color: #f59e0b;
+}
+
+/* --- 6.2 TOOLTIP GLASSMORPHIC PERSONALIZADO DE ALTA GAMA --- */
+.nodus-chart-custom-tooltip {
+  background: rgba(10, 20, 38, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 14px;
+  padding: 0.85rem 1.1rem;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(245, 158, 11, 0.12);
+  min-width: 240px;
+  font-family: var(--font-body, 'Inter', sans-serif);
+}
+
+[data-theme="light"] .nodus-chart-custom-tooltip {
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(217, 119, 6, 0.35);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+.nodus-tooltip-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.45rem;
+  margin-bottom: 0.6rem;
+}
+
+[data-theme="light"] .nodus-tooltip-header {
+  border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+
+.nodus-tooltip-title {
+  font-size: 0.84rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+[data-theme="light"] .nodus-tooltip-title {
+  color: #0f172a;
+}
+
+.nodus-tooltip-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+  background: rgba(245, 158, 11, 0.18);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.nodus-tooltip-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.nodus-tooltip-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.76rem;
+  color: #94a3b8;
+}
+
+[data-theme="light"] .nodus-tooltip-row {
+  color: #475569;
+}
+
+.nodus-tooltip-row.highlight-gold {
+  color: #fbbf24;
+}
+
+.nodus-tooltip-row.highlight-purple {
+  color: #c084fc;
+}
+
+.nodus-tooltip-row.highlight-emerald {
+  color: #34d399;
+}
+
+.nodus-tooltip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 0.4rem;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.nodus-tooltip-dot.gold { background: #f59e0b; box-shadow: 0 0 6px #f59e0b; }
+.nodus-tooltip-dot.purple { background: #8b5cf6; box-shadow: 0 0 6px #8b5cf6; }
+.nodus-tooltip-dot.emerald { background: #10b981; box-shadow: 0 0 6px #10b981; }
+.nodus-tooltip-dot.sky { background: #0ea5e9; }
+.nodus-tooltip-dot.green { background: #10b981; }
+
+.nodus-tooltip-val {
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: #ffffff;
+}
+
+[data-theme="light"] .nodus-tooltip-val {
+  color: #0f172a;
+}
+
+.nodus-tooltip-val.bold {
+  font-weight: 800;
+  font-size: 0.85rem;
+}
+
+.nodus-tooltip-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 0.35rem 0;
+}
+
+[data-theme="light"] .nodus-tooltip-divider {
+  background: rgba(0, 0, 0, 0.08);
+}
+

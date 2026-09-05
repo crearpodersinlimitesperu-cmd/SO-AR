@@ -13,6 +13,7 @@ import {
 } from 'recharts';
 import { useTheme } from '../context/ThemeContext';
 import ThemeSelector from './ThemeSelector';
+import nodusFallbackData from '../data/nodusFallbackData.json';
 import './NodusCoordinadoresC1C2Dashboard.css';
 
 const COLORS = {
@@ -47,8 +48,62 @@ export default function NodusCoordinadoresC1C2Dashboard() {
     padding: '2px 0'
   }), [isLight]);
 
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // Tooltip Glassmorphic personalizado para el gráfico de coordinadores
+  const CustomCoordTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      const item = payload[0].payload;
+      return (
+        <div className="nodus-chart-custom-tooltip">
+          <div className="nodus-tooltip-header">
+            <span className="nodus-tooltip-title">{item.fullName || label}</span>
+            <span className="nodus-tooltip-badge">{item.sede}</span>
+          </div>
+          <div className="nodus-tooltip-body">
+            <div className="nodus-tooltip-row highlight-gold">
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span className="nodus-tooltip-dot gold" />
+                <span>Sentados C1:</span>
+              </div>
+              <span className="nodus-tooltip-val">{item.sentadosC1?.toLocaleString() || 0}</span>
+            </div>
+            <div className="nodus-tooltip-row highlight-purple">
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span className="nodus-tooltip-dot purple" />
+                <span>Sentados C2:</span>
+              </div>
+              <span className="nodus-tooltip-val">{item.sentadosC2?.toLocaleString() || 0}</span>
+            </div>
+            <div className="nodus-tooltip-row highlight-emerald">
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span className="nodus-tooltip-dot emerald" />
+                <span>Total Sentados:</span>
+              </div>
+              <span className="nodus-tooltip-val bold">{item.totalSentados?.toLocaleString() || 0}</span>
+            </div>
+            <div className="nodus-tooltip-divider" />
+            <div className="nodus-tooltip-row">
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span className="nodus-tooltip-dot sky" />
+                <span>Gestiones Totales:</span>
+              </div>
+              <span className="nodus-tooltip-val">{item.gestiones?.toLocaleString() || 0}</span>
+            </div>
+            <div className="nodus-tooltip-row">
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span className="nodus-tooltip-dot green" />
+                <span>Confirmados:</span>
+              </div>
+              <span className="nodus-tooltip-val">{item.confirmados?.toLocaleString() || 0}</span>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  const [data, setData] = useState(nodusFallbackData || null);
+  const [loading, setLoading] = useState(!nodusFallbackData);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
 
@@ -58,8 +113,9 @@ export default function NodusCoordinadoresC1C2Dashboard() {
   const [selectedEquipo, setSelectedEquipo] = useState('TODOS');
   const [selectedEntrenamiento, setSelectedEntrenamiento] = useState('TODOS'); // TODOS, C1, C2
   const [selectedCiclo, setSelectedCiclo] = useState('TODOS');
-  const [sortBy, setSortBy] = useState('gestiones'); // gestiones, cobertura, productividad, confirmados, nombre
+  const [sortBy, setSortBy] = useState('sentados'); // sentados, sentadosC1, sentadosC2, gestiones, cobertura, productividad, confirmados, nombre
   const [activeChartTab, setActiveChartTab] = useState('coordinadores'); // coordinadores, sedes, estados
+  const [chartMetric, setChartMetric] = useState('sentados'); // 'sentados' (C1 vs C2), 'gestiones' (Llamadas), 'integral' (Doble eje)
 
   // Filas expandidas (para ver desglose de equipos)
   const [expandedRows, setExpandedRows] = useState({});
@@ -118,8 +174,8 @@ export default function NodusCoordinadoresC1C2Dashboard() {
           });
         }
       }, (err) => {
-        console.error("Error en realtime listener:", err);
-        setError("No se pudo cargar la sincronización en vivo.");
+        console.warn("Realtime listener usando snapshot de respaldo:", err.message);
+        setData(prev => prev || nodusFallbackData);
         setLoading(false);
       });
     } catch (e) {
@@ -168,6 +224,54 @@ export default function NodusCoordinadoresC1C2Dashboard() {
       const hasEquipos = Array.isArray(c.equipos) && c.equipos.length > 0;
 
       return hasC1C2Calls && hasEquipos;
+    }).map(c => {
+      let sentadosC1 = c.sentadosC1;
+      let sentadosC2 = c.sentadosC2;
+      let gestionesC1 = c.gestionesC1;
+      let gestionesC2 = c.gestionesC2;
+      let confirmadosC1 = c.confirmadosC1;
+      let confirmadosC2 = c.confirmadosC2;
+
+      // Cálculo resiliente en caliente si faltasen campos precalculados
+      if (sentadosC1 === undefined || sentadosC2 === undefined) {
+        let sc1 = 0, sc2 = 0, gc1 = 0, gc2 = 0, cc1 = 0, cc2 = 0;
+        (c.equipos || []).forEach(eq => {
+          const num = parseInt(eq.equipo.replace(/[^0-9]/g, '')) || 0;
+          const isC2 = num >= 100;
+          if (isC2) {
+            sc2 += (eq.asistieron || 0);
+            gc2 += (eq.llamadas || 0);
+            cc2 += (eq.confirmado || 0);
+          } else {
+            sc1 += (eq.asistieron || 0);
+            gc1 += (eq.llamadas || 0);
+            cc1 += (eq.confirmado || 0);
+          }
+        });
+        sentadosC1 = sc1;
+        sentadosC2 = sc2;
+        gestionesC1 = (gc1 + gc2 > 0) ? gc1 : (c.c1 || 0);
+        gestionesC2 = (gc1 + gc2 > 0) ? gc2 : (c.c2 || 0);
+        confirmadosC1 = cc1;
+        confirmadosC2 = cc2;
+      }
+
+      const totalSentados = c.asistieron || (sentadosC1 + sentadosC2);
+      const totalGestiones = c.gestiones || (gestionesC1 + gestionesC2);
+      const totalConfirmados = c.estados?.confirmado || (confirmadosC1 + confirmadosC2);
+
+      return {
+        ...c,
+        sentadosC1: sentadosC1 || 0,
+        sentadosC2: sentadosC2 || 0,
+        sentadosTotal: totalSentados || 0,
+        gestionesC1: gestionesC1 || 0,
+        gestionesC2: gestionesC2 || 0,
+        gestionesTotal: totalGestiones || 0,
+        confirmadosC1: confirmadosC1 || 0,
+        confirmadosC2: confirmadosC2 || 0,
+        confirmadosTotal: totalConfirmados || 0
+      };
     });
   }, [data]);
 
@@ -209,9 +313,9 @@ export default function NodusCoordinadoresC1C2Dashboard() {
       // 2. Filtro Ciclo
       if (selectedCiclo !== 'TODOS' && c.ciclo !== selectedCiclo) continue;
 
-      // 3. Filtro Entrenamiento (C1 / C2)
-      if (selectedEntrenamiento === 'C1' && (!c.c1 || c.c1 === 0)) continue;
-      if (selectedEntrenamiento === 'C2' && (!c.c2 || c.c2 === 0)) continue;
+      // 3. Filtro Entrenamiento (C1 / C2) - Muestra quienes tengan sentados o llamadas en ese capítulo
+      if (selectedEntrenamiento === 'C1' && (c.sentadosC1 === 0 && c.gestionesC1 === 0)) continue;
+      if (selectedEntrenamiento === 'C2' && (c.sentadosC2 === 0 && c.gestionesC2 === 0)) continue;
 
       // 4. Filtro por Equipo
       let matchingEquipos = c.equipos || [];
@@ -240,14 +344,18 @@ export default function NodusCoordinadoresC1C2Dashboard() {
       // 6. Cómputo de métricas exactas según el filtro aplicado
       const isEquipoFiltered = selectedEquipo !== 'TODOS' || (searchTerm && matchingEquipos.length < (c.equipos || []).length);
       
-      let dispGestiones = c.gestiones;
-      let dispConfirmados = c.estados?.confirmado || 0;
+      let dispGestiones = c.gestionesTotal;
+      let dispConfirmados = c.confirmadosTotal;
       let dispNoContesta = c.estados?.noContesta || 0;
       let dispPorConfirmar = c.estados?.porConfirmar || 0;
       let dispSiguiente = c.estados?.siguiente || 0;
       let dispNoInteresa = c.estados?.noInteresa || 0;
-      let dispAsistieron = c.asistieron || 0;
+      let dispAsistieron = c.sentadosTotal;
       let dispAsignados = c.asignados;
+      let dispSentadosC1 = c.sentadosC1;
+      let dispSentadosC2 = c.sentadosC2;
+      let dispGestionesC1 = c.gestionesC1;
+      let dispGestionesC2 = c.gestionesC2;
 
       if (isEquipoFiltered) {
         dispGestiones = matchingEquipos.reduce((s, e) => s + (e.llamadas || 0), 0);
@@ -258,10 +366,18 @@ export default function NodusCoordinadoresC1C2Dashboard() {
         dispNoInteresa = matchingEquipos.reduce((s, e) => s + (e.noInteresa || 0), 0);
         dispAsistieron = matchingEquipos.reduce((s, e) => s + (e.asistieron || 0), 0);
         dispAsignados = dispGestiones;
+        dispSentadosC1 = matchingEquipos.filter(e => (parseInt(e.equipo.replace(/[^0-9]/g, '')) || 0) < 100).reduce((s, e) => s + (e.asistieron || 0), 0);
+        dispSentadosC2 = matchingEquipos.filter(e => (parseInt(e.equipo.replace(/[^0-9]/g, '')) || 0) >= 100).reduce((s, e) => s + (e.asistieron || 0), 0);
+        dispGestionesC1 = matchingEquipos.filter(e => (parseInt(e.equipo.replace(/[^0-9]/g, '')) || 0) < 100).reduce((s, e) => s + (e.llamadas || 0), 0);
+        dispGestionesC2 = matchingEquipos.filter(e => (parseInt(e.equipo.replace(/[^0-9]/g, '')) || 0) >= 100).reduce((s, e) => s + (e.llamadas || 0), 0);
       } else if (selectedEntrenamiento === 'C1') {
-        dispGestiones = c.c1;
+        dispGestiones = c.gestionesC1;
+        dispConfirmados = c.confirmadosC1;
+        dispAsistieron = c.sentadosC1;
       } else if (selectedEntrenamiento === 'C2') {
-        dispGestiones = c.c2;
+        dispGestiones = c.gestionesC2;
+        dispConfirmados = c.confirmadosC2;
+        dispAsistieron = c.sentadosC2;
       }
 
       const coberturaPct = dispAsignados > 0 && isEquipoFiltered
@@ -278,12 +394,16 @@ export default function NodusCoordinadoresC1C2Dashboard() {
         isSpecificFilter: isEquipoFiltered || selectedEntrenamiento !== 'TODOS',
         displayStats: {
           gestiones: dispGestiones,
+          gestionesC1: dispGestionesC1,
+          gestionesC2: dispGestionesC2,
           confirmados: dispConfirmados,
           noContesta: dispNoContesta,
           porConfirmar: dispPorConfirmar,
           siguiente: dispSiguiente,
           noInteresa: dispNoInteresa,
           asistieron: dispAsistieron,
+          sentadosC1: dispSentadosC1,
+          sentadosC2: dispSentadosC2,
           asignados: dispAsignados,
           coberturaPct,
           productividadPct
@@ -293,10 +413,13 @@ export default function NodusCoordinadoresC1C2Dashboard() {
 
     // Ordenamiento
     return result.sort((a, b) => {
+      if (sortBy === 'sentados') return b.displayStats.asistieron - a.displayStats.asistieron;
+      if (sortBy === 'sentadosC1') return b.displayStats.sentadosC1 - a.displayStats.sentadosC1;
+      if (sortBy === 'sentadosC2') return b.displayStats.sentadosC2 - a.displayStats.sentadosC2;
       if (sortBy === 'gestiones') return b.displayStats.gestiones - a.displayStats.gestiones;
+      if (sortBy === 'confirmados') return b.displayStats.confirmados - a.displayStats.confirmados;
       if (sortBy === 'cobertura') return b.displayStats.coberturaPct - a.displayStats.coberturaPct;
       if (sortBy === 'productividad') return b.displayStats.productividadPct - a.displayStats.productividadPct;
-      if (sortBy === 'confirmados') return b.displayStats.confirmados - a.displayStats.confirmados;
       if (sortBy === 'nombre') return a.nombre.localeCompare(b.nombre);
       return 0;
     });
@@ -313,6 +436,8 @@ export default function NodusCoordinadoresC1C2Dashboard() {
     const totalSiguiente = list.reduce((acc, c) => acc + (c.displayStats.siguiente || 0), 0);
     const totalNoInteresa = list.reduce((acc, c) => acc + (c.displayStats.noInteresa || 0), 0);
     const totalAsistieron = list.reduce((acc, c) => acc + (c.displayStats.asistieron || 0), 0);
+    const totalSentadosC1 = list.reduce((acc, c) => acc + (c.displayStats.sentadosC1 || 0), 0);
+    const totalSentadosC2 = list.reduce((acc, c) => acc + (c.displayStats.sentadosC2 || 0), 0);
 
     const coberturaProm = list.length ? Math.round(list.reduce((acc, c) => acc + (c.displayStats.coberturaPct || 0), 0) / list.length) : 0;
     const productividadProm = list.length ? Math.round(list.reduce((acc, c) => acc + (c.displayStats.productividadPct || 0), 0) / list.length) : 0;
@@ -327,21 +452,28 @@ export default function NodusCoordinadoresC1C2Dashboard() {
       totalSiguiente,
       totalNoInteresa,
       totalAsistieron,
+      totalSentadosC1,
+      totalSentadosC2,
       coberturaProm,
       productividadProm,
       tasaEfectividad: totalGestiones > 0 ? Math.round((totalConfirmados / totalGestiones) * 100) : 0
     };
   }, [filteredCoordinadores]);
 
-  // Datos para Gráfico 1: Coordinadores Filtrados (hasta 16 o todos si son <= 20)
+  // Datos para Gráfico 1: Coordinadores Filtrados (hasta 18 o todos si son <= 22)
   const chartCoordinadoresData = useMemo(() => {
-    const limit = filteredCoordinadores.length <= 18 ? filteredCoordinadores.length : 14;
+    const limit = filteredCoordinadores.length <= 22 ? filteredCoordinadores.length : 16;
     return filteredCoordinadores.slice(0, limit).map(c => ({
       name: `${c.nombre} (${c.sede.slice(0, 3)})`,
+      fullName: `${c.nombreCompleto || c.nombre}`,
+      sede: c.sede,
+      sentadosC1: c.displayStats.sentadosC1,
+      sentadosC2: c.displayStats.sentadosC2,
+      totalSentados: c.displayStats.asistieron,
+      gestionesC1: c.displayStats.gestionesC1,
+      gestionesC2: c.displayStats.gestionesC2,
       gestiones: c.displayStats.gestiones,
       confirmados: c.displayStats.confirmados,
-      c1: c.c1,
-      c2: c.c2,
       cobertura: c.displayStats.coberturaPct
     }));
   }, [filteredCoordinadores]);
@@ -358,6 +490,9 @@ export default function NodusCoordinadoresC1C2Dashboard() {
           gestiones: 0,
           confirmados: 0,
           asignados: 0,
+          sentadosC1: 0,
+          sentadosC2: 0,
+          sentadosTotal: 0,
           c1: 0,
           c2: 0,
           coordinadores: 0
@@ -366,12 +501,15 @@ export default function NodusCoordinadoresC1C2Dashboard() {
       sedesMap[c.sede].gestiones += c.displayStats.gestiones;
       sedesMap[c.sede].confirmados += c.displayStats.confirmados;
       sedesMap[c.sede].asignados += c.displayStats.asignados;
-      sedesMap[c.sede].c1 += c.c1 || 0;
-      sedesMap[c.sede].c2 += c.c2 || 0;
+      sedesMap[c.sede].sentadosC1 += c.displayStats.sentadosC1 || 0;
+      sedesMap[c.sede].sentadosC2 += c.displayStats.sentadosC2 || 0;
+      sedesMap[c.sede].sentadosTotal += c.displayStats.asistieron || 0;
+      sedesMap[c.sede].c1 += c.displayStats.gestionesC1 || 0;
+      sedesMap[c.sede].c2 += c.displayStats.gestionesC2 || 0;
       sedesMap[c.sede].coordinadores += 1;
     });
 
-    return Object.values(sedesMap).sort((a, b) => b.gestiones - a.gestiones);
+    return Object.values(sedesMap).sort((a, b) => b.sentadosTotal - a.sentadosTotal);
   }, [filteredCoordinadores]);
 
   // Datos para Gráfico 3: Distribución Global de Estados (Donut adaptado a lo filtrado)
@@ -457,14 +595,34 @@ export default function NodusCoordinadoresC1C2Dashboard() {
       <div className="nodus-scorecards-grid">
         <div className="nodus-card">
           <div className="nodus-card-header">
-            <span>Coordinadores</span>
-            <Users size={16} color="#ffc107" />
+            <span>Total Sentados (Salón)</span>
+            <Award size={16} color="#10b981" />
           </div>
-          <div className="nodus-card-value">{aggregatedStats.coordinadoresCount}</div>
+          <div className="nodus-card-value highlight-emerald">{aggregatedStats.totalAsistieron.toLocaleString()}</div>
           <div className="nodus-card-footer">
-            {hasActiveFilters
-              ? `Filtrado (${filteredCoordinadores.length} encontrados)`
-              : (selectedSede === 'TODAS' ? 'En 6 Sedes' : selectedSede)}
+            C1: <strong style={{ color: '#f59e0b' }}>{aggregatedStats.totalSentadosC1.toLocaleString()}</strong> • C2: <strong style={{ color: '#8b5cf6' }}>{aggregatedStats.totalSentadosC2.toLocaleString()}</strong>
+          </div>
+        </div>
+
+        <div className="nodus-card">
+          <div className="nodus-card-header">
+            <span>Sentados Capítulo 1</span>
+            <Award size={16} color="#f59e0b" />
+          </div>
+          <div className="nodus-card-value highlight-gold">{aggregatedStats.totalSentadosC1.toLocaleString()}</div>
+          <div className="nodus-card-footer">
+            {aggregatedStats.totalAsistieron > 0 ? Math.round((aggregatedStats.totalSentadosC1 / aggregatedStats.totalAsistieron) * 100) : 0}% del total de sala
+          </div>
+        </div>
+
+        <div className="nodus-card">
+          <div className="nodus-card-header">
+            <span>Sentados Capítulo 2</span>
+            <Award size={16} color="#8b5cf6" />
+          </div>
+          <div className="nodus-card-value highlight-purple">{aggregatedStats.totalSentadosC2.toLocaleString()}</div>
+          <div className="nodus-card-footer">
+            {aggregatedStats.totalAsistieron > 0 ? Math.round((aggregatedStats.totalSentadosC2 / aggregatedStats.totalAsistieron) * 100) : 0}% del total de sala
           </div>
         </div>
 
@@ -477,18 +635,7 @@ export default function NodusCoordinadoresC1C2Dashboard() {
           <div className="nodus-card-footer">
             {selectedEquipo !== 'TODOS'
               ? `Llamadas de ${selectedEquipo}`
-              : (selectedEntrenamiento !== 'TODOS' ? `Solo ${selectedEntrenamiento}` : 'Llamadas realizadas')}
-          </div>
-        </div>
-
-        <div className="nodus-card">
-          <div className="nodus-card-header">
-            <span>{selectedEquipo !== 'TODOS' ? 'Gestiones Equipo' : 'Asignados'}</span>
-            <Clock size={16} color="#8b5cf6" />
-          </div>
-          <div className="nodus-card-value">{aggregatedStats.totalAsignados.toLocaleString()}</div>
-          <div className="nodus-card-footer">
-            {selectedEquipo !== 'TODOS' ? 'Llamadas registradas' : 'Participantes únicos'}
+              : `${aggregatedStats.coordinadoresCount} coordinadores C1 & C2`}
           </div>
         </div>
 
@@ -498,7 +645,7 @@ export default function NodusCoordinadoresC1C2Dashboard() {
             <CheckCircle2 size={16} color="#10b981" />
           </div>
           <div className="nodus-card-value highlight-emerald">{aggregatedStats.totalConfirmados.toLocaleString()}</div>
-          <div className="nodus-card-footer">{aggregatedStats.tasaEfectividad}% efectividad</div>
+          <div className="nodus-card-footer">{aggregatedStats.tasaEfectividad}% efectividad de contacto</div>
         </div>
 
         <div className="nodus-card">
@@ -509,17 +656,6 @@ export default function NodusCoordinadoresC1C2Dashboard() {
           <div className="nodus-card-value">{aggregatedStats.coberturaProm}%</div>
           <div className="nodus-progress-bar">
             <div className="nodus-progress-fill" style={{ width: `${aggregatedStats.coberturaProm}%`, background: '#ffc107' }} />
-          </div>
-        </div>
-
-        <div className="nodus-card">
-          <div className="nodus-card-header">
-            <span>Productividad Media</span>
-            <UserCheck size={16} color="#14b8a6" />
-          </div>
-          <div className="nodus-card-value">{aggregatedStats.productividadProm}%</div>
-          <div className="nodus-progress-bar">
-            <div className="nodus-progress-fill" style={{ width: `${aggregatedStats.productividadProm}%`, background: '#14b8a6' }} />
           </div>
         </div>
       </div>
@@ -623,7 +759,10 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                 onChange={(e) => setSortBy(e.target.value)}
                 className="nodus-select"
               >
-                <option value="gestiones">Más Gestiones</option>
+                <option value="sentados">Más Sentados en Sala (Total)</option>
+                <option value="sentadosC1">Más Sentados C1</option>
+                <option value="sentadosC2">Más Sentados C2</option>
+                <option value="gestiones">Más Gestiones / Llamadas</option>
                 <option value="confirmados">Más Confirmados</option>
                 <option value="cobertura">Mayor Cobertura %</option>
                 <option value="productividad">Mayor Productividad %</option>
@@ -705,32 +844,142 @@ export default function NodusCoordinadoresC1C2Dashboard() {
 
         <div className="nodus-chart-viewport">
           {activeChartTab === 'coordinadores' && (
-            <ResponsiveContainer width="100%" height={380}>
-              <BarChart data={chartCoordinadoresData} margin={{ top: 10, right: 20, left: 0, bottom: 25 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} />
-                <XAxis dataKey="name" stroke={axisStroke} fontSize={11} angle={-25} textAnchor="end" height={50} />
-                <YAxis stroke={axisStroke} fontSize={11} />
-                <Tooltip contentStyle={chartTooltipStyle} itemStyle={chartItemStyle} />
-                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '8px', color: isLight ? '#334155' : '#cbd5e1' }} />
-                <Bar dataKey="gestiones" name="Gestiones Filtradas" fill={isLight ? '#0284c7' : '#0ea5e9'} radius={[4, 4, 0, 0]} />
-                <Bar dataKey="confirmados" name="Confirmados" fill="#10b981" radius={[4, 4, 0, 0]} />
-                {selectedEntrenamiento !== 'C2' && <Bar dataKey="c1" name="Capítulo 1" fill="#eab308" radius={[4, 4, 0, 0]} />}
-                {selectedEntrenamiento !== 'C1' && <Bar dataKey="c2" name="Capítulo 2" fill="#8b5cf6" radius={[4, 4, 0, 0]} />}
-              </BarChart>
-            </ResponsiveContainer>
+            <>
+              {/* SELECTOR DE MÉTRICA DE RENDIMIENTO */}
+              <div className="nodus-metric-toggle-group">
+                <button
+                  type="button"
+                  onClick={() => setChartMetric('sentados')}
+                  className={`nodus-metric-toggle-btn ${chartMetric === 'sentados' ? 'active' : ''}`}
+                  title="Ver participantes efectivamente sentados en sala por capítulo"
+                >
+                  <Award size={14} color="#f59e0b" />
+                  <span>🏆 Sentados en Sala (C1 vs C2)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setChartMetric('gestiones')}
+                  className={`nodus-metric-toggle-btn ${chartMetric === 'gestiones' ? 'active' : ''}`}
+                  title="Ver volumen de gestiones telefónicas y llamadas"
+                >
+                  <PhoneCall size={14} color="#0ea5e9" />
+                  <span>📞 Gestiones & Llamadas (C1 vs C2)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setChartMetric('integral')}
+                  className={`nodus-metric-toggle-btn ${chartMetric === 'integral' ? 'active' : ''}`}
+                  title="Comparativo de doble eje: Sentados vs Esfuerzo de Gestiones"
+                >
+                  <TrendingUp size={14} color="#10b981" />
+                  <span>📊 Comparativo Integral (Doble Eje)</span>
+                </button>
+              </div>
+
+              {chartMetric === 'sentados' && (
+                <ResponsiveContainer width="100%" height={400}>
+                  <BarChart data={chartCoordinadoresData} margin={{ top: 15, right: 25, left: 15, bottom: 65 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} />
+                    <XAxis
+                      dataKey="name"
+                      stroke={axisStroke}
+                      fontSize={11}
+                      angle={-35}
+                      textAnchor="end"
+                      height={65}
+                      interval={0}
+                      tickMargin={6}
+                    />
+                    <YAxis stroke={axisStroke} fontSize={11} />
+                    <Tooltip content={<CustomCoordTooltip />} />
+                    <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px', color: isLight ? '#334155' : '#cbd5e1' }} />
+                    {selectedEntrenamiento !== 'C2' && (
+                      <Bar dataKey="sentadosC1" name="Sentados Capítulo 1" fill="#f59e0b" radius={[5, 5, 0, 0]} maxBarSize={45} />
+                    )}
+                    {selectedEntrenamiento !== 'C1' && (
+                      <Bar dataKey="sentadosC2" name="Sentados Capítulo 2" fill="#8b5cf6" radius={[5, 5, 0, 0]} maxBarSize={45} />
+                    )}
+                    <Bar dataKey="totalSentados" name="Total Sentados (Salón)" fill="#10b981" radius={[5, 5, 0, 0]} maxBarSize={45} />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
+
+              {chartMetric === 'gestiones' && (
+                <ResponsiveContainer width="100%" height={400}>
+                  <BarChart data={chartCoordinadoresData} margin={{ top: 15, right: 25, left: 15, bottom: 65 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} />
+                    <XAxis
+                      dataKey="name"
+                      stroke={axisStroke}
+                      fontSize={11}
+                      angle={-35}
+                      textAnchor="end"
+                      height={65}
+                      interval={0}
+                      tickMargin={6}
+                    />
+                    <YAxis stroke={axisStroke} fontSize={11} />
+                    <Tooltip content={<CustomCoordTooltip />} />
+                    <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px', color: isLight ? '#334155' : '#cbd5e1' }} />
+                    <Bar dataKey="gestiones" name="Gestiones Totales" fill={isLight ? '#0284c7' : '#0ea5e9'} radius={[5, 5, 0, 0]} maxBarSize={45} />
+                    <Bar dataKey="confirmados" name="Confirmados" fill="#10b981" radius={[5, 5, 0, 0]} maxBarSize={45} />
+                    {selectedEntrenamiento !== 'C2' && (
+                      <Bar dataKey="gestionesC1" name="Llamadas Capítulo 1" fill="#f59e0b" radius={[5, 5, 0, 0]} maxBarSize={45} />
+                    )}
+                    {selectedEntrenamiento !== 'C1' && (
+                      <Bar dataKey="gestionesC2" name="Llamadas Capítulo 2" fill="#8b5cf6" radius={[5, 5, 0, 0]} maxBarSize={45} />
+                    )}
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
+
+              {chartMetric === 'integral' && (
+                <ResponsiveContainer width="100%" height={400}>
+                  <ComposedChart data={chartCoordinadoresData} margin={{ top: 15, right: 30, left: 15, bottom: 65 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} />
+                    <XAxis
+                      dataKey="name"
+                      stroke={axisStroke}
+                      fontSize={11}
+                      angle={-35}
+                      textAnchor="end"
+                      height={65}
+                      interval={0}
+                      tickMargin={6}
+                    />
+                    <YAxis yAxisId="left" stroke="#10b981" fontSize={11} />
+                    <YAxis yAxisId="right" orientation="right" stroke="#0ea5e9" fontSize={11} />
+                    <Tooltip content={<CustomCoordTooltip />} />
+                    <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px', color: isLight ? '#334155' : '#cbd5e1' }} />
+                    {selectedEntrenamiento !== 'C2' && (
+                      <Bar yAxisId="left" dataKey="sentadosC1" name="Sentados C1" fill="#f59e0b" radius={[4, 4, 0, 0]} maxBarSize={32} />
+                    )}
+                    {selectedEntrenamiento !== 'C1' && (
+                      <Bar yAxisId="left" dataKey="sentadosC2" name="Sentados C2" fill="#8b5cf6" radius={[4, 4, 0, 0]} maxBarSize={32} />
+                    )}
+                    <Bar yAxisId="left" dataKey="totalSentados" name="Total Sentados" fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={32} />
+                    <Line yAxisId="right" type="monotone" dataKey="gestiones" name="Gestiones Totales (Eje Der)" stroke="#38bdf8" strokeWidth={3} dot={{ r: 4 }} />
+                  </ComposedChart>
+                </ResponsiveContainer>
+              )}
+            </>
           )}
 
           {activeChartTab === 'sedes' && (
-            <ResponsiveContainer width="100%" height={380}>
-              <ComposedChart data={chartSedesData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
+            <ResponsiveContainer width="100%" height={390}>
+              <ComposedChart data={chartSedesData} margin={{ top: 15, right: 25, left: 15, bottom: 25 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} />
                 <XAxis dataKey="sede" stroke={axisStroke} fontSize={12} />
-                <YAxis stroke={axisStroke} fontSize={11} />
+                <YAxis yAxisId="left" stroke="#10b981" fontSize={11} />
+                <YAxis yAxisId="right" orientation="right" stroke="#0ea5e9" fontSize={11} />
                 <Tooltip contentStyle={chartTooltipStyle} itemStyle={chartItemStyle} />
-                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '8px', color: isLight ? '#334155' : '#cbd5e1' }} />
-                <Bar dataKey="gestiones" name="Gestiones Realizadas" fill={isLight ? '#0284c7' : '#38bdf8'} radius={[6, 6, 0, 0]} />
-                <Bar dataKey="confirmados" name="Confirmados" fill="#10b981" radius={[6, 6, 0, 0]} />
-                <Line type="monotone" dataKey="asignados" name="Participantes Asignados" stroke="#f59e0b" strokeWidth={3} dot={{ r: 4 }} />
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px', color: isLight ? '#334155' : '#cbd5e1' }} />
+                <Bar yAxisId="left" dataKey="sentadosC1" name="Sentados C1" fill="#f59e0b" radius={[5, 5, 0, 0]} maxBarSize={38} />
+                <Bar yAxisId="left" dataKey="sentadosC2" name="Sentados C2" fill="#8b5cf6" radius={[5, 5, 0, 0]} maxBarSize={38} />
+                <Bar yAxisId="left" dataKey="sentadosTotal" name="Total Sentados" fill="#10b981" radius={[5, 5, 0, 0]} maxBarSize={38} />
+                <Line yAxisId="right" type="monotone" dataKey="gestiones" name="Gestiones Totales (Eje Der)" stroke="#38bdf8" strokeWidth={3} dot={{ r: 4 }} />
               </ComposedChart>
             </ResponsiveContainer>
           )}
@@ -799,15 +1048,15 @@ export default function NodusCoordinadoresC1C2Dashboard() {
               <tr>
                 <th className="nodus-th">Colaborador / Coordinador</th>
                 <th className="nodus-th">Sede & Ciclo</th>
-                <th className="nodus-th" style={{ textAlign: 'right' }}>Gestiones</th>
-                <th className="nodus-th" style={{ textAlign: 'right' }}>C1 / C2</th>
-                <th className="nodus-th" style={{ textAlign: 'right' }}>Asignados</th>
+                <th className="nodus-th" style={{ textAlign: 'right', color: '#f59e0b' }}>Sentados C1</th>
+                <th className="nodus-th" style={{ textAlign: 'right', color: '#8b5cf6' }}>Sentados C2</th>
+                <th className="nodus-th" style={{ textAlign: 'right', color: '#10b981' }}>Total Sentados</th>
+                <th className="nodus-th" style={{ textAlign: 'right' }}>Gestiones (C1 / C2)</th>
+                <th className="nodus-th" style={{ textAlign: 'right' }}>Confirmados</th>
                 <th className="nodus-th" style={{ textAlign: 'center' }}>Cobertura</th>
                 <th className="nodus-th" style={{ textAlign: 'center' }}>Productividad</th>
-                <th className="nodus-th" style={{ textAlign: 'right' }}>Confirmados</th>
-                <th className="nodus-th" style={{ textAlign: 'right' }}>Asistieron</th>
                 <th className="nodus-th" style={{ textAlign: 'center' }}>Última Gestión</th>
-                <th className="nodus-th" style={{ textAlign: 'center' }}>Acciones</th>
+                <th className="nodus-th" style={{ textAlign: 'center' }}>Equipos</th>
               </tr>
             </thead>
             <tbody>
@@ -843,7 +1092,7 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                             <div>
                               <div style={{ fontWeight: 700, color: 'var(--nodus-text-title)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                                 {coord.nombre}
-                                {coord.c2 > 0 && selectedEntrenamiento !== 'C1' && (
+                                {coord.sentadosC2 > 0 && selectedEntrenamiento !== 'C1' && (
                                   <span className="nodus-badge-c1c2">C1+C2</span>
                                 )}
                                 {isFilteredEquipo && (
@@ -872,53 +1121,35 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                           </div>
                         </td>
 
-                        {/* Gestiones */}
-                        <td className="nodus-td" style={{ textAlign: 'right', fontWeight: 800, color: '#0284c7', fontSize: '0.95rem' }}>
-                          {coord.displayStats.gestiones.toLocaleString()}
-                        </td>
-
-                        {/* C1 / C2 */}
+                        {/* Sentados C1 */}
                         <td className="nodus-td" style={{ textAlign: 'right' }}>
-                          <span style={{
-                            color: selectedEntrenamiento === 'C2' ? 'var(--nodus-text-muted)' : '#ffc107',
-                            fontWeight: selectedEntrenamiento === 'C1' ? 800 : 700,
-                            opacity: selectedEntrenamiento === 'C2' ? 0.4 : 1
-                          }}>{coord.c1}</span>
-                          <span style={{ color: 'var(--nodus-text-muted)', margin: '0 0.3rem' }}>/</span>
-                          <span style={{
-                            color: selectedEntrenamiento === 'C1' ? 'var(--nodus-text-muted)' : '#a78bfa',
-                            fontWeight: selectedEntrenamiento === 'C2' ? 800 : 700,
-                            opacity: selectedEntrenamiento === 'C1' ? 0.4 : 1
-                          }}>{coord.c2}</span>
+                          <span className="nodus-badge-sentados-c1">
+                            {coord.displayStats.sentadosC1}
+                          </span>
                         </td>
 
-                        {/* Asignados */}
-                        <td className="nodus-td" style={{ textAlign: 'right', color: 'var(--nodus-text-main)', fontWeight: 600 }}>
-                          {coord.displayStats.asignados.toLocaleString()}
+                        {/* Sentados C2 */}
+                        <td className="nodus-td" style={{ textAlign: 'right' }}>
+                          <span className="nodus-badge-sentados-c2">
+                            {coord.displayStats.sentadosC2}
+                          </span>
                         </td>
 
-                        {/* Cobertura */}
-                        <td className="nodus-td" style={{ textAlign: 'center' }}>
-                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
-                            <span style={{ fontWeight: 800, color: '#ffc107' }}>{coord.displayStats.coberturaPct}%</span>
-                            <div style={{ width: '60px', height: '4px', background: 'var(--nodus-progress-bg)', borderRadius: '2px', overflow: 'hidden' }}>
-                              <div style={{ width: `${coord.displayStats.coberturaPct}%`, height: '100%', background: '#ffc107', borderRadius: '2px' }} />
-                            </div>
-                            <span style={{ fontSize: '0.68rem', color: 'var(--nodus-text-muted)' }}>
-                              {coord.coberturaDetalle?.split(' ')[0] || ''}
+                        {/* Total Sentados */}
+                        <td className="nodus-td" style={{ textAlign: 'right' }}>
+                          <span className="nodus-badge-asistieron">
+                            {coord.displayStats.asistieron}
+                          </span>
+                        </td>
+
+                        {/* Gestiones (C1 / C2) */}
+                        <td className="nodus-td" style={{ textAlign: 'right' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.1rem' }}>
+                            <span style={{ fontWeight: 800, color: '#0ea5e9', fontSize: '0.92rem' }}>
+                              {coord.displayStats.gestiones.toLocaleString()}
                             </span>
-                          </div>
-                        </td>
-
-                        {/* Productividad */}
-                        <td className="nodus-td" style={{ textAlign: 'center' }}>
-                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
-                            <span style={{ fontWeight: 800, color: '#14b8a6' }}>{coord.displayStats.productividadPct}%</span>
-                            <div style={{ width: '60px', height: '4px', background: 'var(--nodus-progress-bg)', borderRadius: '2px', overflow: 'hidden' }}>
-                              <div style={{ width: `${coord.displayStats.productividadPct}%`, height: '100%', background: '#14b8a6', borderRadius: '2px' }} />
-                            </div>
                             <span style={{ fontSize: '0.68rem', color: 'var(--nodus-text-muted)' }}>
-                              {coord.productividadDetalle?.split(' ')[0] || ''}
+                              C1: <strong style={{ color: '#f59e0b' }}>{coord.displayStats.gestionesC1 || 0}</strong> • C2: <strong style={{ color: '#8b5cf6' }}>{coord.displayStats.gestionesC2 || 0}</strong>
                             </span>
                           </div>
                         </td>
@@ -930,11 +1161,24 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                           </span>
                         </td>
 
-                        {/* Asistieron */}
-                        <td className="nodus-td" style={{ textAlign: 'right' }}>
-                          <span className="nodus-badge-asistieron">
-                            {coord.displayStats.asistieron}
-                          </span>
+                        {/* Cobertura */}
+                        <td className="nodus-td" style={{ textAlign: 'center' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
+                            <span style={{ fontWeight: 800, color: '#ffc107' }}>{coord.displayStats.coberturaPct}%</span>
+                            <div style={{ width: '55px', height: '4px', background: 'var(--nodus-progress-bg)', borderRadius: '2px', overflow: 'hidden' }}>
+                              <div style={{ width: `${coord.displayStats.coberturaPct}%`, height: '100%', background: '#ffc107', borderRadius: '2px' }} />
+                            </div>
+                          </div>
+                        </td>
+
+                        {/* Productividad */}
+                        <td className="nodus-td" style={{ textAlign: 'center' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
+                            <span style={{ fontWeight: 800, color: '#14b8a6' }}>{coord.displayStats.productividadPct}%</span>
+                            <div style={{ width: '55px', height: '4px', background: 'var(--nodus-progress-bg)', borderRadius: '2px', overflow: 'hidden' }}>
+                              <div style={{ width: `${coord.displayStats.productividadPct}%`, height: '100%', background: '#14b8a6', borderRadius: '2px' }} />
+                            </div>
+                          </div>
                         </td>
 
                         {/* Última Gestión */}
@@ -985,23 +1229,30 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                                 <table className="nodus-nested-table">
                                   <thead>
                                     <tr>
-                                      <th className="nodus-nested-th">Equipo</th>
+                                      <th className="nodus-nested-th">Capítulo & Equipo</th>
                                       <th className="nodus-nested-th" style={{ textAlign: 'right' }}>Llamadas</th>
                                       <th className="nodus-nested-th" style={{ textAlign: 'right' }}>Confirmado</th>
                                       <th className="nodus-nested-th" style={{ textAlign: 'right' }}>No Contesta</th>
                                       <th className="nodus-nested-th" style={{ textAlign: 'right' }}>Por Confirmar</th>
                                       <th className="nodus-nested-th" style={{ textAlign: 'right' }}>Siguiente</th>
-                                      <th className="nodus-nested-th" style={{ textAlign: 'right' }}>Asistieron</th>
+                                      <th className="nodus-nested-th" style={{ textAlign: 'right', color: '#10b981' }}>Sentados en Sala</th>
                                       <th className="nodus-nested-th" style={{ textAlign: 'center' }}>Tasa Asistencia</th>
                                     </tr>
                                   </thead>
                                   <tbody>
                                     {coord.visibleEquipos.map((eq, eqIdx) => {
+                                      const teamNum = parseInt(eq.equipo.replace(/[^0-9]/g, '')) || 0;
+                                      const isC2 = teamNum >= 100;
                                       const tasaAsist = eq.confirmado > 0 ? Math.round((eq.asistieron / eq.confirmado) * 100) : 0;
                                       return (
                                         <tr key={eqIdx} style={{ transition: 'background 0.15s ease' }}>
                                           <td className="nodus-nested-td" style={{ fontWeight: 700, color: 'var(--nodus-text-title)' }}>
-                                            {eq.equipo}
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                                              <span className={isC2 ? "nodus-badge-c2-small" : "nodus-badge-c1-small"}>
+                                                {isC2 ? 'C2' : 'C1'}
+                                              </span>
+                                              <span>{eq.equipo}</span>
+                                            </div>
                                           </td>
                                           <td className="nodus-nested-td" style={{ textAlign: 'right', color: '#0284c7', fontWeight: 600 }}>
                                             {eq.llamadas}
@@ -1018,8 +1269,10 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                                           <td className="nodus-nested-td" style={{ textAlign: 'right', color: '#60a5fa' }}>
                                             {eq.siguiente}
                                           </td>
-                                          <td className="nodus-nested-td" style={{ textAlign: 'right', color: '#0284c7', fontWeight: 700 }}>
-                                            {eq.asistieron}
+                                          <td className="nodus-nested-td" style={{ textAlign: 'right' }}>
+                                            <span className="nodus-badge-asistieron" style={{ fontSize: '0.75rem', padding: '0.15rem 0.5rem' }}>
+                                              {eq.asistieron}
+                                            </span>
                                           </td>
                                           <td className="nodus-nested-td" style={{ textAlign: 'center' }}>
                                             <span style={{

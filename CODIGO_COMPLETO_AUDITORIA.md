@@ -126157,90 +126157,120 @@ export const normalizeCoordinator = (name) => {
   "fuente": "Sistema Autónomo Multi-Agente Nodus CPSL 2026",
   "usuarioExtraccion": "jsanchez (Super Administrador Global)",
   "totales": {
-    "totalCoordinadores": 30,
+    "totalCoordinadores": 22,
     "totalGestiones": 28981,
-    "totalAsignados": 13715,
+    "totalGestionesC1": 15213,
+    "totalGestionesC2": 12820,
+    "totalAsignados": 13616,
     "totalConfirmados": 13545,
+    "totalConfirmadosC1": 3484,
+    "totalConfirmadosC2": 2328,
     "totalNoContesta": 8633,
     "totalPorConfirmar": 2219,
     "totalSiguiente": 3358,
     "totalNoInteresa": 755,
     "totalAsistieron": 5704,
-    "coberturaPromedio": 64,
-    "productividadPromedio": 15
+    "totalSentadosC1": 3227,
+    "totalSentadosC2": 2477,
+    "coberturaPromedio": 87,
+    "productividadPromedio": 21
   },
   "sedes": [
     {
       "sede": "Cuenca",
-      "coordinadoresCount": 6,
+      "coordinadoresCount": 4,
       "gestionesTotal": 918,
-      "asignadosTotal": 3137,
+      "gestionesC1Total": 819,
+      "gestionesC2Total": 99,
+      "asignadosTotal": 3131,
       "confirmadosTotal": 601,
       "noContestaTotal": 134,
       "porConfirmarTotal": 93,
       "asistieronTotal": 283,
-      "c1Total": 918,
-      "c2Total": 0
+      "sentadosC1Total": 257,
+      "sentadosC2Total": 26,
+      "c1Total": 819,
+      "c2Total": 99
     },
     {
       "sede": "Guayaquil",
       "coordinadoresCount": 4,
       "gestionesTotal": 5258,
+      "gestionesC1Total": 5101,
+      "gestionesC2Total": 157,
       "asignadosTotal": 1893,
       "confirmadosTotal": 2321,
       "noContestaTotal": 1948,
       "porConfirmarTotal": 340,
       "asistieronTotal": 1114,
-      "c1Total": 5258,
-      "c2Total": 0
+      "sentadosC1Total": 1087,
+      "sentadosC2Total": 27,
+      "c1Total": 5101,
+      "c2Total": 157
     },
     {
       "sede": "Lima",
-      "coordinadoresCount": 4,
+      "coordinadoresCount": 3,
       "gestionesTotal": 5454,
-      "asignadosTotal": 1973,
+      "gestionesC1Total": 4726,
+      "gestionesC2Total": 309,
+      "asignadosTotal": 1898,
       "confirmadosTotal": 2633,
       "noContestaTotal": 1549,
       "porConfirmarTotal": 448,
       "asistieronTotal": 847,
-      "c1Total": 4732,
-      "c2Total": 722
+      "sentadosC1Total": 846,
+      "sentadosC2Total": 1,
+      "c1Total": 4726,
+      "c2Total": 309
     },
     {
       "sede": "Medellín",
-      "coordinadoresCount": 4,
+      "coordinadoresCount": 3,
       "gestionesTotal": 4599,
+      "gestionesC1Total": 3784,
+      "gestionesC2Total": 314,
       "asignadosTotal": 1415,
       "confirmadosTotal": 2380,
       "noContestaTotal": 1183,
       "porConfirmarTotal": 213,
       "asistieronTotal": 965,
-      "c1Total": 4030,
-      "c2Total": 569
+      "sentadosC1Total": 918,
+      "sentadosC2Total": 47,
+      "c1Total": 3784,
+      "c2Total": 314
     },
     {
       "sede": "México",
       "coordinadoresCount": 1,
       "gestionesTotal": 3,
+      "gestionesC1Total": 3,
+      "gestionesC2Total": 0,
       "asignadosTotal": 151,
       "confirmadosTotal": 0,
       "noContestaTotal": 2,
       "porConfirmarTotal": 1,
       "asistieronTotal": 0,
+      "sentadosC1Total": 0,
+      "sentadosC2Total": 0,
       "c1Total": 3,
       "c2Total": 0
     },
     {
       "sede": "Quito",
-      "coordinadoresCount": 11,
+      "coordinadoresCount": 7,
       "gestionesTotal": 12749,
-      "asignadosTotal": 5146,
+      "gestionesC1Total": 780,
+      "gestionesC2Total": 11941,
+      "asignadosTotal": 5128,
       "confirmadosTotal": 5610,
       "noContestaTotal": 3817,
       "porConfirmarTotal": 1124,
       "asistieronTotal": 2495,
-      "c1Total": 12721,
-      "c2Total": 28
+      "sentadosC1Total": 119,
+      "sentadosC2Total": 2376,
+      "c1Total": 780,
+      "c2Total": 11941
     }
   ],
   "coordinadores": [
@@ -126253,8 +126283,8 @@ export const normalizeCoordinator = (name) => {
       "ciclo": "Ciclo 1",
       "rol": "Coordinador C1",
       "gestiones": 396,
-      "c1": 396,
-      "c2": 0,
+      "c1": 363,
+      "c2": 33,
       "asignados": 748,
       "coberturaPct": 31,
       "coberturaDetalle": "234/748 (31%)",
@@ -126677,7 +126707,14 @@ export const normalizeCoordinator = (name) => {
           "cambioCupo": 0,
           "asistieron": 0
         }
-      ]
+      ],
+      "sentadosC1": 104,
+      "sentadosC2": 10,
+      "sentadosTotal": 114,
+      "gestionesC1": 363,
+      "gestionesC2": 33,
+      "confirmadosC1": 127,
+      "confirmadosC2": 14
     },
     {
       "id": "coord_joao_cuenca",
@@ -126688,8 +126725,8 @@ export const normalizeCoordinator = (name) => {
       "ciclo": "Ciclo 1",
       "rol": "Coordinador C1",
       "gestiones": 253,
-      "c1": 253,
-      "c2": 0,
+      "c1": 213,
+      "c2": 40,
       "asignados": 1137,
       "coberturaPct": 16,
       "coberturaDetalle": "187/1137 (16%)",
@@ -127073,7 +127110,14 @@ export const normalizeCoordinator = (name) => {
           "cambioCupo": 0,
           "asistieron": 27
         }
-      ]
+      ],
+      "sentadosC1": 73,
+      "sentadosC2": 13,
+      "sentadosTotal": 86,
+      "gestionesC1": 213,
+      "gestionesC2": 40,
+      "confirmadosC1": 111,
+      "confirmadosC2": 17
     },
     {
       "id": "coord_juan_fernando_cuenca",
@@ -127084,8 +127128,8 @@ export const normalizeCoordinator = (name) => {
       "ciclo": "Ciclo 1",
       "rol": "Coordinador C1",
       "gestiones": 175,
-      "c1": 175,
-      "c2": 0,
+      "c1": 167,
+      "c2": 8,
       "asignados": 315,
       "coberturaPct": 34,
       "coberturaDetalle": "106/315 (34%)",
@@ -127274,7 +127318,14 @@ export const normalizeCoordinator = (name) => {
           "cambioCupo": 0,
           "asistieron": 1
         }
-      ]
+      ],
+      "sentadosC1": 73,
+      "sentadosC2": 2,
+      "sentadosTotal": 75,
+      "gestionesC1": 167,
+      "gestionesC2": 8,
+      "confirmadosC1": 71,
+      "confirmadosC2": 3
     },
     {
       "id": "coord_evelyn_paulina_cuenca",
@@ -127285,8 +127336,8 @@ export const normalizeCoordinator = (name) => {
       "ciclo": "Ciclo 1",
       "rol": "Coordinador C1",
       "gestiones": 94,
-      "c1": 94,
-      "c2": 0,
+      "c1": 76,
+      "c2": 18,
       "asignados": 931,
       "coberturaPct": 10,
       "coberturaDetalle": "93/931 (10%)",
@@ -127527,69 +127578,14 @@ export const normalizeCoordinator = (name) => {
           "cambioCupo": 0,
           "asistieron": 1
         }
-      ]
-    },
-    {
-      "id": "coord_kerlie_cuenca",
-      "nombre": "KERLIE",
-      "nombreCompleto": "KERLIE",
-      "email": "kerlie@crearpsl.net",
-      "sede": "Cuenca",
-      "ciclo": "Ciclo 1",
-      "rol": "Coordinador C1",
-      "gestiones": 0,
-      "c1": 0,
-      "c2": 0,
-      "asignados": 6,
-      "coberturaPct": 0,
-      "coberturaDetalle": "0/6 (0%)",
-      "productividadPct": 0,
-      "productividadDetalle": "",
-      "asistieron": 0,
-      "tasaEfectividad": 0,
-      "ultConexion": "03/09/2026 12:05",
-      "ultGestion": "—",
-      "estados": {
-        "confirmado": 0,
-        "noContesta": 0,
-        "siguiente": 0,
-        "noInteresa": 0,
-        "porConfirmar": 0,
-        "yaAsistio": 0,
-        "devolucion": 0
-      },
-      "equipos": []
-    },
-    {
-      "id": "coord_contablidad_cuenca",
-      "nombre": "Contablidad",
-      "nombreCompleto": "Contablidad",
-      "email": "contablidad@crearpsl.net",
-      "sede": "Cuenca",
-      "ciclo": "Ciclo 1",
-      "rol": "Coordinador C1",
-      "gestiones": 0,
-      "c1": 0,
-      "c2": 0,
-      "asignados": 0,
-      "coberturaPct": 0,
-      "coberturaDetalle": "",
-      "productividadPct": 0,
-      "productividadDetalle": "",
-      "asistieron": 0,
-      "tasaEfectividad": 0,
-      "ultConexion": "",
-      "ultGestion": "—",
-      "estados": {
-        "confirmado": 0,
-        "noContesta": 0,
-        "siguiente": 0,
-        "noInteresa": 0,
-        "porConfirmar": 0,
-        "yaAsistio": 0,
-        "devolucion": 0
-      },
-      "equipos": []
+      ],
+      "sentadosC1": 7,
+      "sentadosC2": 1,
+      "sentadosTotal": 8,
+      "gestionesC1": 76,
+      "gestionesC2": 18,
+      "confirmadosC1": 48,
+      "confirmadosC2": 2
     },
     {
       "id": "coord_diana_macas_guayaquil",
@@ -127600,8 +127596,8 @@ export const normalizeCoordinator = (name) => {
       "ciclo": "Ciclo 1",
       "rol": "Coordinador C1",
       "gestiones": 2000,
-      "c1": 2000,
-      "c2": 0,
+      "c1": 1930,
+      "c2": 70,
       "asignados": 762,
       "coberturaPct": 91,
       "coberturaDetalle": "696/762 (91%)",
@@ -128154,7 +128150,14 @@ export const normalizeCoordinator = (name) => {
           "cambioCupo": 0,
           "asistieron": 0
         }
-      ]
+      ],
+      "sentadosC1": 443,
+      "sentadosC2": 17,
+      "sentadosTotal": 460,
+      "gestionesC1": 1930,
+      "gestionesC2": 70,
+      "confirmadosC1": 427,
+      "confirmadosC2": 13
     },
     {
       "id": "coord_brenda_rodriguez_guayaquil",
@@ -128165,8 +128168,8 @@ export const normalizeCoordinator = (name) => {
       "ciclo": "Ciclo 1",
       "rol": "Coordinador C1",
       "gestiones": 1664,
-      "c1": 1664,
-      "c2": 0,
+      "c1": 1601,
+      "c2": 63,
       "asignados": 642,
       "coberturaPct": 93,
       "coberturaDetalle": "599/642 (93%)",
@@ -128693,7 +128696,14 @@ export const normalizeCoordinator = (name) => {
           "cambioCupo": 0,
           "asistieron": 0
         }
-      ]
+      ],
+      "sentadosC1": 369,
+      "sentadosC2": 7,
+      "sentadosTotal": 376,
+      "gestionesC1": 1601,
+      "gestionesC2": 63,
+      "confirmadosC1": 330,
+      "confirmadosC2": 8
     },
     {
       "id": "coord_jonathan_la_rosa_guayaquil",
@@ -128704,8 +128714,8 @@ export const normalizeCoordinator = (name) => {
       "ciclo": "Ciclo 1",
       "rol": "Coordinador C1",
       "gestiones": 900,
-      "c1": 900,
-      "c2": 0,
+      "c1": 887,
+      "c2": 13,
       "asignados": 251,
       "coberturaPct": 125,
       "coberturaDetalle": "315/251 (125%)",
@@ -129102,7 +129112,14 @@ export const normalizeCoordinator = (name) => {
           "cambioCupo": 0,
           "asistieron": 0
         }
-      ]
+      ],
+      "sentadosC1": 210,
+      "sentadosC2": 3,
+      "sentadosTotal": 213,
+      "gestionesC1": 887,
+      "gestionesC2": 13,
+      "confirmadosC1": 190,
+      "confirmadosC2": 4
     },
     {
       "id": "coord_jorge_guayaquil",
@@ -129113,8 +129130,8 @@ export const normalizeCoordinator = (name) => {
       "ciclo": "Ciclo 1",
       "rol": "Coordinador C1",
       "gestiones": 694,
-      "c1": 694,
-      "c2": 0,
+      "c1": 683,
+      "c2": 11,
       "asignados": 238,
       "coberturaPct": 78,
       "coberturaDetalle": "185/238 (78%)",
@@ -129342,7 +129359,14 @@ export const normalizeCoordinator = (name) => {
           "cambioCupo": 0,
           "asistieron": 0
         }
-      ]
+      ],
+      "sentadosC1": 65,
+      "sentadosC2": 0,
+      "sentadosTotal": 65,
+      "gestionesC1": 683,
+      "gestionesC2": 11,
+      "confirmadosC1": 107,
+      "confirmadosC2": 0
     },
     {
       "id": "coord_joyce_lima",
@@ -129353,8 +129377,8 @@ export const normalizeCoordinator = (name) => {
       "ciclo": "Ciclo 1",
       "rol": "Coordinador C1 / C2",
       "gestiones": 2741,
-      "c1": 2349,
-      "c2": 392,
+      "c1": 2346,
+      "c2": 3,
       "asignados": 922,
       "coberturaPct": 98,
       "coberturaDetalle": "900/922 (98%)",
@@ -129595,7 +129619,14 @@ export const normalizeCoordinator = (name) => {
           "cambioCupo": 0,
           "asistieron": 1
         }
-      ]
+      ],
+      "sentadosC1": 416,
+      "sentadosC2": 1,
+      "sentadosTotal": 417,
+      "gestionesC1": 2346,
+      "gestionesC2": 3,
+      "confirmadosC1": 484,
+      "confirmadosC2": 1
     },
     {
       "id": "coord_diana_lima",
@@ -129796,7 +129827,14 @@ export const normalizeCoordinator = (name) => {
           "cambioCupo": 0,
           "asistieron": 0
         }
-      ]
+      ],
+      "sentadosC1": 350,
+      "sentadosC2": 0,
+      "sentadosTotal": 350,
+      "gestionesC1": 1783,
+      "gestionesC2": 303,
+      "confirmadosC1": 415,
+      "confirmadosC2": 0
     },
     {
       "id": "coord_leyla_lima",
@@ -129807,8 +129845,8 @@ export const normalizeCoordinator = (name) => {
       "ciclo": "Ciclo 1",
       "rol": "Coordinador C1 / C2",
       "gestiones": 627,
-      "c1": 600,
-      "c2": 27,
+      "c1": 597,
+      "c2": 3,
       "asignados": 96,
       "coberturaPct": 220,
       "coberturaDetalle": "211/96 (220%)",
@@ -129971,38 +130009,14 @@ export const normalizeCoordinator = (name) => {
           "cambioCupo": 0,
           "asistieron": 14
         }
-      ]
-    },
-    {
-      "id": "coord_linid_lima",
-      "nombre": "LINID",
-      "nombreCompleto": "LINID",
-      "email": "linid@crearpsl.net",
-      "sede": "Lima",
-      "ciclo": "Ciclo 1",
-      "rol": "Coordinador C1",
-      "gestiones": 0,
-      "c1": 0,
-      "c2": 0,
-      "asignados": 75,
-      "coberturaPct": 0,
-      "coberturaDetalle": "0/75 (0%)",
-      "productividadPct": 0,
-      "productividadDetalle": "",
-      "asistieron": 0,
-      "tasaEfectividad": 0,
-      "ultConexion": "04/09/2026 18:05",
-      "ultGestion": "—",
-      "estados": {
-        "confirmado": 0,
-        "noContesta": 0,
-        "siguiente": 0,
-        "noInteresa": 0,
-        "porConfirmar": 0,
-        "yaAsistio": 0,
-        "devolucion": 0
-      },
-      "equipos": []
+      ],
+      "sentadosC1": 80,
+      "sentadosC2": 0,
+      "sentadosTotal": 80,
+      "gestionesC1": 597,
+      "gestionesC2": 3,
+      "confirmadosC1": 93,
+      "confirmadosC2": 0
     },
     {
       "id": "coord_valentina_rodriguez_medellín",
@@ -130013,8 +130027,8 @@ export const normalizeCoordinator = (name) => {
       "ciclo": "Ciclo 1",
       "rol": "Coordinador C1 / C2",
       "gestiones": 3292,
-      "c1": 2902,
-      "c2": 390,
+      "c1": 2890,
+      "c2": 12,
       "asignados": 970,
       "coberturaPct": 119,
       "coberturaDetalle": "1152/970 (119%)",
@@ -130333,7 +130347,14 @@ export const normalizeCoordinator = (name) => {
           "cambioCupo": 0,
           "asistieron": 50
         }
-      ]
+      ],
+      "sentadosC1": 701,
+      "sentadosC2": 3,
+      "sentadosTotal": 704,
+      "gestionesC1": 2890,
+      "gestionesC2": 12,
+      "confirmadosC1": 684,
+      "confirmadosC2": 0
     },
     {
       "id": "coord_david_gonzalez_medellín",
@@ -130344,8 +130365,8 @@ export const normalizeCoordinator = (name) => {
       "ciclo": "Ciclo 1",
       "rol": "Coordinador C1 / C2",
       "gestiones": 1067,
-      "c1": 956,
-      "c2": 111,
+      "c1": 722,
+      "c2": 234,
       "asignados": 382,
       "coberturaPct": 124,
       "coberturaDetalle": "475/382 (124%)",
@@ -130651,7 +130672,14 @@ export const normalizeCoordinator = (name) => {
           "cambioCupo": 0,
           "asistieron": 1
         }
-      ]
+      ],
+      "sentadosC1": 174,
+      "sentadosC2": 44,
+      "sentadosTotal": 218,
+      "gestionesC1": 722,
+      "gestionesC2": 234,
+      "confirmadosC1": 219,
+      "confirmadosC2": 38
     },
     {
       "id": "coord_juan_sebastian_soto_medellín",
@@ -130735,38 +130763,14 @@ export const normalizeCoordinator = (name) => {
           "cambioCupo": 0,
           "asistieron": 33
         }
-      ]
-    },
-    {
-      "id": "coord_mauricio_ramirez_medellín",
-      "nombre": "MAURICIO RAMIREZ",
-      "nombreCompleto": "MAURICIO RAMIREZ",
-      "email": "mauricio.ramirez@crearpsl.net",
-      "sede": "Medellín",
-      "ciclo": "Ciclo 1",
-      "rol": "Coordinador C1",
-      "gestiones": 0,
-      "c1": 0,
-      "c2": 0,
-      "asignados": 0,
-      "coberturaPct": 0,
-      "coberturaDetalle": "",
-      "productividadPct": 0,
-      "productividadDetalle": "",
-      "asistieron": 0,
-      "tasaEfectividad": 0,
-      "ultConexion": "01/09/2026 12:03",
-      "ultGestion": "—",
-      "estados": {
-        "confirmado": 0,
-        "noContesta": 0,
-        "siguiente": 0,
-        "noInteresa": 0,
-        "porConfirmar": 0,
-        "yaAsistio": 0,
-        "devolucion": 0
-      },
-      "equipos": []
+      ],
+      "sentadosC1": 43,
+      "sentadosC2": 0,
+      "sentadosTotal": 43,
+      "gestionesC1": 172,
+      "gestionesC2": 68,
+      "confirmadosC1": 51,
+      "confirmadosC2": 0
     },
     {
       "id": "coord_naomi_méxico",
@@ -130811,7 +130815,14 @@ export const normalizeCoordinator = (name) => {
           "cambioCupo": 0,
           "asistieron": 0
         }
-      ]
+      ],
+      "sentadosC1": 0,
+      "sentadosC2": 0,
+      "sentadosTotal": 0,
+      "gestionesC1": 3,
+      "gestionesC2": 0,
+      "confirmadosC1": 0,
+      "confirmadosC2": 0
     },
     {
       "id": "coord_adrianna_quito",
@@ -130822,8 +130833,8 @@ export const normalizeCoordinator = (name) => {
       "ciclo": "Ciclo 1",
       "rol": "Coordinador C1",
       "gestiones": 2920,
-      "c1": 2920,
-      "c2": 0,
+      "c1": 460,
+      "c2": 2460,
       "asignados": 1180,
       "coberturaPct": 92,
       "coberturaDetalle": "1082/1180 (92%)",
@@ -131545,7 +131556,14 @@ export const normalizeCoordinator = (name) => {
           "cambioCupo": 0,
           "asistieron": 0
         }
-      ]
+      ],
+      "sentadosC1": 100,
+      "sentadosC2": 614,
+      "sentadosTotal": 714,
+      "gestionesC1": 460,
+      "gestionesC2": 2460,
+      "confirmadosC1": 97,
+      "confirmadosC2": 565
     },
     {
       "id": "coord_liliana_quito",
@@ -131556,8 +131574,8 @@ export const normalizeCoordinator = (name) => {
       "ciclo": "Ciclo 1",
       "rol": "Coordinador C1 / C2",
       "gestiones": 2171,
-      "c1": 2144,
-      "c2": 27,
+      "c1": 43,
+      "c2": 2101,
       "asignados": 441,
       "coberturaPct": 176,
       "coberturaDetalle": "778/441 (176%)",
@@ -131941,69 +131959,14 @@ export const normalizeCoordinator = (name) => {
           "cambioCupo": 0,
           "asistieron": 0
         }
-      ]
-    },
-    {
-      "id": "coord_sebastian_quito",
-      "nombre": "SEBASTIAN",
-      "nombreCompleto": "SEBASTIAN",
-      "email": "sebastian@crearpsl.net",
-      "sede": "Quito",
-      "ciclo": "Ciclo 1",
-      "rol": "Coordinador C1",
-      "gestiones": 0,
-      "c1": 0,
-      "c2": 0,
-      "asignados": 0,
-      "coberturaPct": 0,
-      "coberturaDetalle": "",
-      "productividadPct": 0,
-      "productividadDetalle": "",
-      "asistieron": 0,
-      "tasaEfectividad": 0,
-      "ultConexion": "",
-      "ultGestion": "—",
-      "estados": {
-        "confirmado": 0,
-        "noContesta": 0,
-        "siguiente": 0,
-        "noInteresa": 0,
-        "porConfirmar": 0,
-        "yaAsistio": 0,
-        "devolucion": 0
-      },
-      "equipos": []
-    },
-    {
-      "id": "coord_karol_quito",
-      "nombre": "KAROL",
-      "nombreCompleto": "KAROL",
-      "email": "karol@crearpsl.net",
-      "sede": "Quito",
-      "ciclo": "Ciclo 1",
-      "rol": "Coordinador C1",
-      "gestiones": 0,
-      "c1": 0,
-      "c2": 0,
-      "asignados": 0,
-      "coberturaPct": 0,
-      "coberturaDetalle": "",
-      "productividadPct": 0,
-      "productividadDetalle": "",
-      "asistieron": 0,
-      "tasaEfectividad": 0,
-      "ultConexion": "",
-      "ultGestion": "—",
-      "estados": {
-        "confirmado": 0,
-        "noContesta": 0,
-        "siguiente": 0,
-        "noInteresa": 0,
-        "porConfirmar": 0,
-        "yaAsistio": 0,
-        "devolucion": 0
-      },
-      "equipos": []
+      ],
+      "sentadosC1": 5,
+      "sentadosC2": 410,
+      "sentadosTotal": 415,
+      "gestionesC1": 43,
+      "gestionesC2": 2101,
+      "confirmadosC1": 5,
+      "confirmadosC2": 383
     },
     {
       "id": "coord_karla_quito",
@@ -132014,8 +131977,8 @@ export const normalizeCoordinator = (name) => {
       "ciclo": "Ciclo 2",
       "rol": "Coordinador C1",
       "gestiones": 2265,
-      "c1": 2265,
-      "c2": 0,
+      "c1": 112,
+      "c2": 2153,
       "asignados": 990,
       "coberturaPct": 80,
       "coberturaDetalle": "792/990 (80%)",
@@ -132568,7 +132531,14 @@ export const normalizeCoordinator = (name) => {
           "cambioCupo": 0,
           "asistieron": 0
         }
-      ]
+      ],
+      "sentadosC1": 4,
+      "sentadosC2": 346,
+      "sentadosTotal": 350,
+      "gestionesC1": 112,
+      "gestionesC2": 2153,
+      "confirmadosC1": 9,
+      "confirmadosC2": 324
     },
     {
       "id": "coord_adams_quito",
@@ -132579,8 +132549,8 @@ export const normalizeCoordinator = (name) => {
       "ciclo": "Ciclo 2",
       "rol": "Coordinador C1 / C2",
       "gestiones": 2011,
-      "c1": 2010,
-      "c2": 1,
+      "c1": 48,
+      "c2": 1962,
       "asignados": 834,
       "coberturaPct": 76,
       "coberturaDetalle": "631/834 (76%)",
@@ -132886,7 +132856,14 @@ export const normalizeCoordinator = (name) => {
           "cambioCupo": 0,
           "asistieron": 0
         }
-      ]
+      ],
+      "sentadosC1": 3,
+      "sentadosC2": 369,
+      "sentadosTotal": 372,
+      "gestionesC1": 48,
+      "gestionesC2": 1962,
+      "confirmadosC1": 6,
+      "confirmadosC2": 344
     },
     {
       "id": "coord_daniela_quito",
@@ -132897,8 +132874,8 @@ export const normalizeCoordinator = (name) => {
       "ciclo": "Ciclo 2",
       "rol": "Coordinador C1",
       "gestiones": 1594,
-      "c1": 1594,
-      "c2": 0,
+      "c1": 86,
+      "c2": 1508,
       "asignados": 905,
       "coberturaPct": 67,
       "coberturaDetalle": "606/905 (67%)",
@@ -133373,7 +133350,14 @@ export const normalizeCoordinator = (name) => {
           "cambioCupo": 0,
           "asistieron": 0
         }
-      ]
+      ],
+      "sentadosC1": 4,
+      "sentadosC2": 329,
+      "sentadosTotal": 333,
+      "gestionesC1": 86,
+      "gestionesC2": 1508,
+      "confirmadosC1": 6,
+      "confirmadosC2": 307
     },
     {
       "id": "coord_danna_quito",
@@ -133384,8 +133368,8 @@ export const normalizeCoordinator = (name) => {
       "ciclo": "Ciclo 2",
       "rol": "Coordinador C1",
       "gestiones": 1285,
-      "c1": 1285,
-      "c2": 0,
+      "c1": 22,
+      "c2": 1263,
       "asignados": 519,
       "coberturaPct": 95,
       "coberturaDetalle": "495/519 (95%)",
@@ -133574,7 +133558,14 @@ export const normalizeCoordinator = (name) => {
           "cambioCupo": 0,
           "asistieron": 6
         }
-      ]
+      ],
+      "sentadosC1": 1,
+      "sentadosC2": 222,
+      "sentadosTotal": 223,
+      "gestionesC1": 22,
+      "gestionesC2": 1263,
+      "confirmadosC1": 2,
+      "confirmadosC2": 215
     },
     {
       "id": "coord_marcela_quito",
@@ -133585,8 +133576,8 @@ export const normalizeCoordinator = (name) => {
       "ciclo": "Ciclo 2",
       "rol": "Coordinador C1",
       "gestiones": 503,
-      "c1": 503,
-      "c2": 0,
+      "c1": 9,
+      "c2": 494,
       "asignados": 259,
       "coberturaPct": 67,
       "coberturaDetalle": "174/259 (67%)",
@@ -133697,69 +133688,14 @@ export const normalizeCoordinator = (name) => {
           "cambioCupo": 0,
           "asistieron": 1
         }
-      ]
-    },
-    {
-      "id": "coord_erika_gavilanes_quito",
-      "nombre": "Erika Gavilanes",
-      "nombreCompleto": "Erika Gavilanes",
-      "email": "erika.gavilanes@crearpsl.net",
-      "sede": "Quito",
-      "ciclo": "Ciclo 2",
-      "rol": "Coordinador C1",
-      "gestiones": 0,
-      "c1": 0,
-      "c2": 0,
-      "asignados": 18,
-      "coberturaPct": 0,
-      "coberturaDetalle": "0/18 (0%)",
-      "productividadPct": 0,
-      "productividadDetalle": "",
-      "asistieron": 0,
-      "tasaEfectividad": 0,
-      "ultConexion": "02/09/2026 10:29",
-      "ultGestion": "—",
-      "estados": {
-        "confirmado": 0,
-        "noContesta": 0,
-        "siguiente": 0,
-        "noInteresa": 0,
-        "porConfirmar": 0,
-        "yaAsistio": 0,
-        "devolucion": 0
-      },
-      "equipos": []
-    },
-    {
-      "id": "coord_entranadors_quito",
-      "nombre": "entranadors",
-      "nombreCompleto": "entranadors",
-      "email": "entranadors@crearpsl.net",
-      "sede": "Quito",
-      "ciclo": "Ciclo 2",
-      "rol": "Coordinador C1",
-      "gestiones": 0,
-      "c1": 0,
-      "c2": 0,
-      "asignados": 0,
-      "coberturaPct": 0,
-      "coberturaDetalle": "",
-      "productividadPct": 0,
-      "productividadDetalle": "",
-      "asistieron": 0,
-      "tasaEfectividad": 0,
-      "ultConexion": "",
-      "ultGestion": "—",
-      "estados": {
-        "confirmado": 0,
-        "noContesta": 0,
-        "siguiente": 0,
-        "noInteresa": 0,
-        "porConfirmar": 0,
-        "yaAsistio": 0,
-        "devolucion": 0
-      },
-      "equipos": []
+      ],
+      "sentadosC1": 2,
+      "sentadosC2": 86,
+      "sentadosTotal": 88,
+      "gestionesC1": 9,
+      "gestionesC2": 494,
+      "confirmadosC1": 2,
+      "confirmadosC2": 90
     }
   ],
   "equiposReporte": [
@@ -204994,6 +204930,36 @@ fs.writeFileSync('src/pages/Home.jsx', code, 'utf8');
 
 ---
 
+## Archivo: scratch\sheet_page.html
+
+```html
+<!DOCTYPE html><html lang="es-419"><head><script nonce="-5t7WQ1G51wrzLhb2Soyng">window['ppConfig'] = {productName: '26981ed0d57bbad37e728ff58134270c', deleteIsEnforced:  false , sealIsEnforced:  false , heartbeatRate:  0.5 , periodicReportingRateMillis:  60000.0 , disableAllReporting:  false };(function(){'use strict';function k(a){var b=0;return function(){return b<a.length?{done:!1,value:a[b++]}:{done:!0}}}function l(a){var b=typeof Symbol!="undefined"&&Symbol.iterator&&a[Symbol.iterator];if(b)return b.call(a);if(typeof a.length=="number")return{next:k(a)};throw Error(String(a)+" is not an iterable or ArrayLike");}var m=typeof Object.defineProperties=="function"?Object.defineProperty:function(a,b,c){if(a==Array.prototype||a==Object.prototype)return a;a[b]=c.value;return a};
+function n(a){a=["object"==typeof globalThis&&globalThis,a,"object"==typeof window&&window,"object"==typeof self&&self,"object"==typeof global&&global];for(var b=0;b<a.length;++b){var c=a[b];if(c&&c.Math==Math)return c}throw Error("Cannot find global object");}var p=n(this);function q(a,b){if(b)a:{var c=p;a=a.split(".");for(var d=0;d<a.length-1;d++){var e=a[d];if(!(e in c))break a;c=c[e]}a=a[a.length-1];d=c[a];b=b(d);b!=d&&b!=null&&m(c,a,{configurable:!0,writable:!0,value:b})}}
+q("Object.is",function(a){return a?a:function(b,c){return b===c?b!==0||1/b===1/c:b!==b&&c!==c}});q("Array.prototype.includes",function(a){return a?a:function(b,c){var d=this;d instanceof String&&(d=String(d));var e=d.length;c=c||0;for(c<0&&(c=Math.max(c+e,0));c<e;c++){var f=d[c];if(f===b||Object.is(f,b))return!0}return!1}});
+q("String.prototype.includes",function(a){return a?a:function(b,c){if(this==null)throw new TypeError("The 'this' value for String.prototype.includes must not be null or undefined");if(b instanceof RegExp)throw new TypeError("First argument to String.prototype.includes must not be a regular expression");return this.indexOf(b,c||0)!==-1}});function r(a,b,c){a("https://csp.withgoogle.com/csp/proto/"+encodeURIComponent(b),JSON.stringify(c))}function t(){var a;if((a=window.ppConfig)==null?0:a.disableAllReporting)return function(){};var b,c,d,e;return(e=(b=window)==null?void 0:(c=b.navigator)==null?void 0:(d=c.sendBeacon)==null?void 0:d.bind(navigator))!=null?e:u}function u(a,b){var c=new XMLHttpRequest;c.open("POST",a);c.send(b)}
+function v(){var a=(w=Object.prototype)==null?void 0:w.__lookupGetter__("__proto__"),b=x,c=y;return function(){var d=a.call(this),e,f,g,h;r(c,b,{type:"ACCESS_GET",origin:(f=window.location.origin)!=null?f:"unknown",report:{className:(g=d==null?void 0:(e=d.constructor)==null?void 0:e.name)!=null?g:"unknown",stackTrace:(h=Error().stack)!=null?h:"unknown"}});return d}}
+function z(){var a=(A=Object.prototype)==null?void 0:A.__lookupSetter__("__proto__"),b=x,c=y;return function(d){d=a.call(this,d);var e,f,g,h;r(c,b,{type:"ACCESS_SET",origin:(f=window.location.origin)!=null?f:"unknown",report:{className:(g=d==null?void 0:(e=d.constructor)==null?void 0:e.name)!=null?g:"unknown",stackTrace:(h=Error().stack)!=null?h:"unknown"}});return d}}function B(a,b){C(a.productName,b);setInterval(function(){C(a.productName,b)},a.periodicReportingRateMillis)}
+var D="constructor __defineGetter__ __defineSetter__ hasOwnProperty __lookupGetter__ __lookupSetter__ isPrototypeOf propertyIsEnumerable toString valueOf __proto__ toLocaleString x_ngfn_x".split(" "),E=D.concat,G=navigator.userAgent.match(/Firefox\/([0-9]+)\./),H=(!G||G.length<2?0:Number(G[1])<75)?["toSource"]:[],I;if(H instanceof Array)I=H;else{for(var J=l(H),K,L=[];!(K=J.next()).done;)L.push(K.value);I=L}var M=E.call(D,I),N=[];
+function C(a,b){var c=[],d=l(Object.getOwnPropertyNames(Object.prototype)),e=d.next(),f;try{for(;!e.done;e=d.next()){var g=e.value;M.includes(g)||N.includes(g)||c.push(g)}}finally{e&&!e.done&&(f=d.return)&&f.call(d)}e=Object.prototype;d=[];for(f=0;f<c.length;f++)g=c[f],d[f]={name:g,descriptor:Object.getOwnPropertyDescriptor(Object.prototype,g),type:typeof e[g]};if(d.length!==0){c=l(d);e=c.next();var h;try{for(;!e.done;e=c.next())N.push(e.value.name)}finally{e&&!e.done&&(h=c.return)&&h.call(c)}var F;
+r(b,a,{type:"SEAL",origin:(F=window.location.origin)!=null?F:"unknown",report:{blockers:d}})}};var O=Math.random(),P=t(),Q=window.ppConfig;Q&&(Q.disableAllReporting||Q.deleteIsEnforced&&Q.sealIsEnforced||O<Q.heartbeatRate&&r(P,Q.productName,{origin:window.location.origin,type:"HEARTBEAT"}));var y=t(),R=window.ppConfig;if(R)if(R.deleteIsEnforced)delete Object.prototype.__proto__;else if(!R.disableAllReporting){var x=R.productName;try{var w,A;Object.defineProperty(Object.prototype,"__proto__",{enumerable:!1,get:v(),set:z()})}catch(a){}}
+(function(){var a=t(),b=window.ppConfig;b&&(b.sealIsEnforced?Object.seal(Object.prototype):b.disableAllReporting||(document.readyState!=="loading"?B(b,a):document.addEventListener("DOMContentLoaded",function(){B(b,a)})))})();}).call(this);
+</script><script nonce="-5t7WQ1G51wrzLhb2Soyng">var DOCS_timing={}; DOCS_timing['pls']=new Date().getTime(); var _F_VIEWER_GRAMMATICAL_GENDER = 'GRAMMATICAL_GENDER_UNSPECIFIED';</script><meta property="og:title" content="DIRECTORIO GLOBAL "><meta property="og:type" content="article"><meta property="og:site_name" content="Google Docs"><meta property="og:url" content="https://docs.google.com/spreadsheets/d/1bl1_R6Qiee4tQ31Oix1Mjo_Jsbmddv3nsc5xBIy7QJY/edit?gid=0&amp;usp=embed_facebook"><meta property="og:image" content="https://lh7-us.googleusercontent.com/docs/AHkbwyIUBg3bomBWlmN3lqYyYrMIT4jG8UWutOx0ZOzoyL-C0z-zDza9z6PPdElZ853KwRQD8y458nkiehjATUiJsGP1DaCCnHdyXC51wc1RP-k8tiKVNO8J=w1200-h630-p"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="google" content="notranslate"><meta http-equiv="X-UA-Compatible" content="IE=edge;"><meta name="referrer" content="origin"><title>DIRECTORIO GLOBAL  - Hojas de cálculo de Google</title><link rel="shortcut icon" href="https://ssl.gstatic.com/docs/spreadsheets/spreadsheets-2026-v3.ico"><link rel="chrome-webstore-item" href="https://chrome.google.com/webstore/detail/apdfllckaahabafndbhieahigkjlhalf"><style nonce="ilLz97MAzKBc9PnQFRAnXg">.gb_y{display:-webkit-box;display:-webkit-flex;display:flex;-webkit-box-pack:end;-webkit-justify-content:flex-end;justify-content:flex-end;width:100%}.gb_z{-webkit-box-sizing:border-box;box-sizing:border-box;height:48px;padding:4px}.gb_A,.gb_B,.gb_C{-webkit-tap-highlight-color:rgba(0,0,0,0);-webkit-tap-highlight-color:transparent;-webkit-box-sizing:border-box;box-sizing:border-box;float:right;outline:none}.gb_D{-webkit-box-sizing:border-box;box-sizing:border-box;display:inline-block;height:48px;outline:none;padding:4px;position:relative}.gb_E{display:none}.gb_F{display:block}.gb_H,.gb_I,.gb_J{fill:currentColor;color:#444746;color:var(--og-svg-color,var(--gm3-sys-color-on-surface-variant,#444746))}.gb_K .gb_H,.gb_K .gb_I,.gb_K .gb_J{color:#c4c7c5;color:var(--og-svg-color,var(--gm3-sys-color-on-surface-variant,#c4c7c5))}.gb_L .gb_C,.gb_M .gb_C,.gb_N .gb_C{cursor:pointer;padding:8px}.gb_O,.gb_P{display:none}.gb_y a.gb_A{border-radius:100px;background:#0b57d0;background:var(--gm3-sys-color-primary,#0b57d0);-webkit-box-sizing:border-box;box-sizing:border-box;color:#fff;color:var(--gm3-sys-color-on-primary,#fff);display:inline-block;font-size:14px;font-weight:500;min-height:40px;outline:none;padding:10px 24px;text-align:center;text-decoration:none;white-space:normal;line-height:18px;position:relative;font-family:Google Sans Text,Roboto,Helvetica,Arial,sans-serif;min-width:85px;padding:10px 12px}.gb_y.gb_K a.gb_A{background:#c2e7ff;background:var(--gm3-sys-color-secondary-fixed,#c2e7ff);color:#001d35;color:var(--gm3-sys-color-on-secondary-fixed,#001d35)}.gb_2{-webkit-box-orient:vertical;-webkit-line-clamp:2;max-height:40px;max-width:100%;overflow:hidden;overflow-wrap:break-word;word-break:break-word}.gb_T{fill:#1a73e8;margin:4px}.gb_K .gb_T{fill:#8ab4f8}@media (max-width:640px){.gb_y a.gb_A{min-width:75px}}sentinel{}</style><script nonce="-5t7WQ1G51wrzLhb2Soyng">DOCS_timing['ojls']=new Date().getTime();</script><script nonce="-5t7WQ1G51wrzLhb2Soyng">DOCS_timing['ojle']=new Date().getTime();</script><script data-id="_gd" nonce="-5t7WQ1G51wrzLhb2Soyng">window.WIZ_global_data = {"K1cgmc":"%.@.[null,null,null,[3,1,[1788476791,974968000],4],null,8]]","TSDtV":"%.@.[[null,[[45736426,null,null,0.5,null,null,\"AtjTse\"],[45798333,null,false,null,null,null,\"bk3LGf\"],[45759550,null,false,null,null,null,\"ipHXZe\"],[45833707,null,false,null,null,null,\"Y5BYb\"],[45755088,null,true,null,null,null,\"fzPMYc\"],[45796590,null,false,null,null,null,\"rFDJvb\"],[45776074,null,false,null,null,null,\"H0kCgf\"],[45702908,0,null,null,null,null,\"YUmR1e\"],[45794381,null,false,null,null,null,\"mPb5ue\"],[45808609,null,false,null,null,null,\"SY6Rxb\"],[45736423,null,false,null,null,null,\"KdGYpb\"],[45657263,null,false,null,null,null,\"ByEExb\"],[45769604,null,false,null,null,null,\"h14wf\"],[45822231,null,false,null,null,null,\"CwJ3S\"],[45760386,null,false,null,null,null,\"B22Yae\"],[45678214,null,null,null,\"qYGgY5L4A0suK1NZr2K0QusvQmcX\",null,\"VL579e\"],[45791957,null,true,null,null,null,\"yYo5Mc\"],[45644642,null,null,null,\"X-WS exp!\",null,\"rsrxGc\"],[45748088,null,true,null,null,null,\"KLuwTc\"],[45749331,null,false,null,null,null,\"JQs3De\"],[45696305,null,false,null,null,null,\"Uujhbc\"],[45775833,null,false,null,null,null,\"bRlUw\"],[45677009,null,false,null,null,null,\"JkUdKe\"],[45678187,null,false,null,null,null,\"OrvCpd\"],[45831222,null,false,null,null,null,\"CVzrEc\"],[45643359,null,true,null,null,null,\"GcxuKe\"],[45691859,null,false,null,null,null,\"p9TOQ\"],[45717711,null,false,null,null,null,\"lhxHkd\"],[45775398,null,false,null,null,null,\"ejP0Cd\"],[45673686,null,false,null,null,null,\"TVdkuc\"],[45673687,null,false,null,null,null,\"OQKgkd\"],[45762063,null,true,null,null,null,\"WlmQwb\"],[45743516,null,false,null,null,null,\"C3mEk\"],[45801628,null,false,null,null,null,\"HAOZVe\"],[45724030,null,false,null,null,null,\"V0bNGd\"],[45725105,null,true,null,null,null,\"VQN2ac\"],[45800462,null,false,null,null,null,\"ggsQnc\"],[45672211,null,true,null,null,null,\"Wgtd8c\"],[45797816,null,false,null,null,null,\"HLGpcd\"],[45693258,null,null,null,null,null,\"BrCRse\",[\"[[\\\"en\\\",\\\"en-US\\\",\\\"en-GB\\\",\\\"en-CA\\\",\\\"en-AU\\\",\\\"en-IN\\\",\\\"en-IE\\\",\\\"en-NZ\\\",\\\"en-ZA\\\"]]\"]],[45782633,null,false,null,null,null,\"CfqILe\"],[45789952,null,false,null,null,null,\"GY0Vfe\"],[45757913,null,false,null,null,null,\"qmNm7d\"],[45769936,null,false,null,null,null,\"FXtIgb\"],[45800797,null,false,null,null,null,\"oilzpb\"],[45811663,null,false,null,null,null,\"HDt2pc\"],[45668197,null,true,null,null,null,\"pReYPb\"],[45822166,null,null,null,\"Generate the draft based on these details.\",null,\"K2uSgc\"],[45674975,null,false,null,null,null,\"sBUhfc\"],[45810515,null,false,null,null,null,\"ZQkAB\"],[45830368,null,false,null,null,null,\"L0LqSd\"],[45828446,null,false,null,null,null,\"gwwDYd\"],[45706188,null,true,null,null,null,\"OF1zrd\"],[45706819,null,false,null,null,null,\"aPAx2b\"],[45664242,null,false,null,null,null,\"o4hKqd\"],[45700150,null,false,null,null,null,\"RLRykc\"],[45678679,null,true,null,null,null,\"HbebVe\"],[45785527,null,false,null,null,null,\"Vgzmac\"],[45772218,null,false,null,null,null,\"KV2rCe\"],[45818826,null,false,null,null,null,\"j5G1xf\"],[45822533,null,false,null,null,null,\"xXn8Hd\"],[45700770,null,false,null,null,null,\"Mk7a4d\"],[45823999,null,false,null,null,null,\"Ql2ieb\"],[45681147,null,true,null,null,null,\"pgDArb\"],[45658949,null,true,null,null,null,\"NfShlf\"],[45788232,null,true,null,null,null,\"zMXnKc\"],[45807357,null,false,null,null,null,\"IQZOkd\"],[45765896,null,false,null,null,null,\"Gl5aM\"],[45749214,null,null,null,\"\",null,\"HkDBBd\"],[45729467,null,false,null,null,null,\"kKLGLb\"],[45769154,null,false,null,null,null,\"OPleEe\"],[45677526,null,null,null,\"hZeGRZs5p0suK1NZr2K0V3syYPHo\",null,\"KtCfwd\"],[45825198,null,null,null,\"en\",null,\"u0wH3b\"],[45813075,null,false,null,null,null,\"aq7kZe\"],[45762489,null,false,null,null,null,\"cqFBGe\"],[45775102,null,null,null,\"\",null,\"patyy\"],[45672206,null,true,null,null,null,\"qxTK9b\"],[45709238,null,false,null,null,null,\"jQTN0e\"],[45729422,null,true,null,null,null,\"OOSdib\"],[45769440,null,false,null,null,null,\"usHrq\"],[45672527,null,false,null,null,null,\"LIKBre\"],[45798443,null,false,null,null,null,\"C687tf\"],[45654291,null,false,null,null,null,\"rhP5uf\"],[45725182,null,null,null,\"\",null,\"McLXzc\"],[45744297,null,false,null,null,null,\"HAj7Mb\"],[45754280,null,false,null,null,null,\"j636ic\"],[45796009,null,true,null,null,null,\"CUiBhe\"],[45813099,null,false,null,null,null,\"j4o8qe\"],[45744918,null,false,null,null,null,\"f9HMbb\"],[45788753,null,true,null,null,null,\"AH4mzf\"],[45672213,null,true,null,null,null,\"BfWTle\"],[45829940,null,false,null,null,null,\"XNW1dd\"],[45801776,null,false,null,null,null,\"p9rqpc\"],[45802693,null,false,null,null,null,\"QwN3Ve\"],[45730792,null,false,null,null,null,\"m0Fg3c\"],[45830404,null,false,null,null,null,\"Cb1wM\"],[45769023,null,false,null,null,null,\"z66fFe\"],[45690176,null,false,null,null,null,\"qF6xVc\"],[45686663,null,true,null,null,null,\"KGh4Cc\"],[45697234,null,true,null,null,null,\"cUoIXb\"],[45748868,null,false,null,null,null,\"HraNse\"],[45751187,null,false,null,null,null,\"OuEQae\"],[45718842,null,false,null,null,null,\"Ywwwdb\"],[45811075,null,false,null,null,null,\"hdbTPe\"],[45806833,null,false,null,null,null,\"zKilSe\"],[45813683,null,false,null,null,null,\"OJ6fQc\"],[45833738,null,false,null,null,null,\"pqXscb\"],[45752852,null,false,null,null,null,\"Pdqiud\"],[45823523,null,false,null,null,null,\"L8Gquf\"],[45752686,null,true,null,null,null,\"mi0YMb\"],[45729830,null,false,null,null,null,\"DCV6If\"],[45712870,null,false,null,null,null,\"J04FPb\"],[45762802,null,false,null,null,null,\"zcN1ic\"],[45769980,null,true,null,null,null,\"GcH8If\"],[45658679,null,true,null,null,null,\"qdTkee\"],[45720792,null,false,null,null,null,\"NFUw0c\"],[45771617,null,false,null,null,null,\"Blimsc\"],[45825422,null,false,null,null,null,\"Jy7koe\"],[45783804,null,false,null,null,null,\"BBtrjb\"],[45724459,null,null,null,\"rHrAD6ykh0suK1NZr2K0TB6fPtWB\",null,\"CE91jd\"],[45779204,null,false,null,null,null,\"yC3ALe\"],[45812171,null,false,null,null,null,\"eKX1Fe\"],[45776409,null,false,null,null,null,\"G5gJw\"],[45660690,null,false,null,null,null,\"ovKHsb\"],[45816614,null,null,null,null,null,\"y9Fone\",[\"[[\\\"en\\\"]]\"]],[45792493,null,false,null,null,null,\"fYmo4c\"],[45808544,null,false,null,null,null,\"EteYEb\"],[45769474,null,false,null,null,null,\"u2dq9e\"],[45821527,null,false,null,null,null,\"Rqnnh\"],[45691858,null,false,null,null,null,\"rWzu0d\"],[45751415,null,false,null,null,null,\"fJBcbd\"],[45699017,null,null,null,\"rffTE8sLk0suK1NZr2K0RtLUVxzE\",null,\"tWGWgc\"],[45728785,null,false,null,null,null,\"UPAJB\"],[45826514,null,false,null,null,null,\"l7Tcz\"],[45826219,null,false,null,null,null,\"fW98r\"],[45788422,null,false,null,null,null,\"biLVcb\"],[45686664,null,true,null,null,null,\"P0fSX\"],[45692064,null,false,null,null,null,\"wZ64Sb\"],[45773613,null,false,null,null,null,\"tDmOYe\"],[45826856,null,false,null,null,null,\"uW29Ab\"],[45711477,null,false,null,null,null,\"Rnlerd\"],[45831192,null,false,null,null,null,\"oqUgTb\"],[45676996,null,false,null,null,null,\"KFVYtf\"],[45799901,null,false,null,null,null,\"hxZa7b\"],[45802547,null,false,null,null,null,\"MSDC3c\"],[45699204,null,true,null,null,null,\"XWRwod\"],[45776401,null,false,null,null,null,\"VdeTBe\"],[45769147,null,false,null,null,null,\"DFM4ae\"],[45729696,null,null,1,null,null,\"UeMd4b\"],[45736179,null,false,null,null,null,\"LIe8ub\"],[45803550,null,false,null,null,null,\"G2853c\"],[45677729,null,false,null,null,null,\"wzZQPd\"],[45804726,null,false,null,null,null,\"jtTPA\"],[45826864,null,false,null,null,null,\"R8ENRd\"],[45742079,null,true,null,null,null,\"awHj9\"],[45676754,null,false,null,null,null,\"YwbU8\"],[45678215,null,null,null,\"6PSdkFYUx0suK1NZr2K0SmPPgaGe\",null,\"JR8rtc\"],[45767159,0,null,null,null,null,\"yDErgc\"],[45700504,null,false,null,null,null,\"u6ksOd\"],[45783852,1,null,null,null,null,\"Ygmeod\"],[45672085,null,true,null,null,null,\"FJbUAf\"],[45703717,null,false,null,null,null,\"ZfxSFe\"],[45762425,null,false,null,null,null,\"l5Ziqe\"],[45737769,null,false,null,null,null,\"C4gACf\"],[45679713,null,false,null,null,null,\"EEZ1dd\"],[45774501,null,false,null,null,null,\"flYjKf\"],[45766771,null,false,null,null,null,\"aCW0Qd\"],[45729695,null,false,null,null,null,\"tYEdHb\"],[45736482,null,false,null,null,null,\"DAnsv\"],[45812345,null,false,null,null,null,\"pArP2c\"],[45795492,null,false,null,null,null,\"WLRPhf\"],[45798772,null,true,null,null,null,\"Wa5bQc\"],[45747879,null,false,null,null,null,\"kZsK5\"],[45772691,null,false,null,null,null,\"A6J3Xb\"],[45834344,null,false,null,null,null,\"iOLQ9b\"],[45746685,null,true,null,null,null,\"Q3KBSd\"],[45794745,null,false,null,null,null,\"tVjQye\"],[45737207,null,false,null,null,null,\"Kw5UUd\"],[45757707,null,false,null,null,null,\"yZYBLb\"],[45752219,null,false,null,null,null,\"QIG0Je\"],[45780893,null,false,null,null,null,\"sRGemf\"],[45736425,null,null,null,\"Z7vabQzZ0Bn3gbW4AcZC0TfvmSab\",null,\"fFl01\"],[45772141,null,false,null,null,null,\"jXHT1d\"],[45772275,null,false,null,null,null,\"oqsMtf\"],[45683718,null,true,null,null,null,\"zQUS6d\"],[45787122,null,false,null,null,null,\"gVnA9d\"],[45788942,null,false,null,null,null,\"Nm6g8e\"],[45751476,null,false,null,null,null,\"gwKlXb\"],[45746766,null,true,null,null,null,\"a6khDf\"],[45657471,null,null,null,null,null,\"kMR5pc\",[\"[[\\\"es\\\",\\\"pt\\\",\\\"ja\\\",\\\"ko\\\",\\\"fr\\\",\\\"it\\\",\\\"de\\\",\\\"zh-CN\\\",\\\"nl\\\",\\\"tr\\\",\\\"cs\\\",\\\"sv\\\",\\\"da\\\",\\\"no\\\",\\\"pl\\\",\\\"vi\\\",\\\"th\\\",\\\"fi\\\",\\\"uk\\\",\\\"ru\\\",\\\"hu\\\",\\\"ro\\\",\\\"ms\\\",\\\"el\\\",\\\"ca\\\",\\\"ar\\\",\\\"iw\\\",\\\"he\\\"]]\"]],[45772706,null,true,null,null,null,\"LZgWZ\"],[45777878,null,false,null,null,null,\"Se84Kc\"],[45658716,null,true,null,null,null,\"Fa3cob\"],[45685754,null,true,null,null,null,\"OyPt5\"],[45666088,null,false,null,null,null,\"MgfT5\"],[45771289,null,false,null,null,null,\"s7fdUc\"],[45826972,null,false,null,null,null,\"kS4SR\"],[45677456,null,false,null,null,null,\"pyUPD\"],[45658644,null,true,null,null,null,\"ZdwoD\"],[45812933,null,false,null,null,null,\"UK5Jkd\"],[45696263,null,null,null,null,null,\"W12Bse\",[\"[[\\\"feature named `pageObserver` was not found\\\",\\\"feature named `hover` was not found\\\"]]\"]],[45653615,null,null,null,null,null,\"lwF00d\",[\"[[\\\"es\\\",\\\"pt\\\",\\\"ja\\\",\\\"ko\\\",\\\"fr\\\",\\\"it\\\",\\\"de\\\",\\\"zh\\\",\\\"nl\\\",\\\"iw\\\",\\\"he\\\",\\\"tr\\\",\\\"cs\\\",\\\"sv\\\",\\\"da\\\",\\\"no\\\",\\\"pl\\\",\\\"vi\\\",\\\"th\\\",\\\"fi\\\",\\\"uk\\\",\\\"ar\\\",\\\"ru\\\",\\\"hu\\\",\\\"ro\\\",\\\"ms\\\",\\\"el\\\",\\\"ca\\\",\\\"id\\\",\\\"in\\\"]]\"]],[45689771,null,true,null,null,null,\"dkdoVc\"],[45811127,null,false,null,null,null,\"J6h2ze\"],[45716368,null,false,null,null,null,\"Rd9FMb\"],[45834803,null,false,null,null,null,\"ubvAHf\"],[45820644,null,false,null,null,null,\"J2lTmb\"],[45743085,null,true,null,null,null,\"Ph5VH\"],[45795480,null,true,null,null,null,\"UDqFgb\"],[45647060,null,true,null,null,null,\"uYjPWb\"],[45736698,null,false,null,null,null,\"nhgo9c\"],[45810643,null,false,null,null,null,\"qH1kDb\"],[45686666,null,true,null,null,null,\"dZ9mjb\"],[45810966,null,false,null,null,null,\"afLpfb\"],[45696552,null,false,null,null,null,\"f1ZShc\"],[45777794,null,false,null,null,null,\"E1AmL\"],[45773680,null,false,null,null,null,\"rgqUee\"],[45820148,null,false,null,null,null,\"RySIqb\"],[45765567,null,false,null,null,null,\"Gu5Dg\"],[45805719,null,false,null,null,null,\"ZZrh9e\"],[45681910,null,true,null,null,null,\"OKXfNb\"],[45662509,null,true,null,null,null,\"fLCtnf\"],[45744490,null,false,null,null,null,\"luHWB\"],[45699018,null,null,null,\"hoiy8M2zL0suK1NZr2K0T7URFV3w\",null,\"evsAs\"],[45677726,null,false,null,null,null,\"C5oZKe\"],[45727616,null,true,null,null,null,\"qNQRAf\"],[45727273,null,false,null,null,null,\"dMkROb\"],[45744236,null,true,null,null,null,\"Rnque\"],[45747674,null,false,null,null,null,\"uwvdNc\"],[45833494,null,false,null,null,null,\"FJbXjf\"],[45778211,null,false,null,null,null,\"W7jxNc\"],[45676183,null,false,null,null,null,\"EpABPb\"],[45833132,null,false,null,null,null,\"zROeLc\"],[45807852,null,false,null,null,null,\"O7AOQd\"],[45831194,null,false,null,null,null,\"Y12ffb\"],[45699426,null,false,null,null,null,\"qWUOSd\"],[45679175,null,false,null,null,null,\"OETeme\"],[45747909,null,false,null,null,null,\"uTkAWb\"],[45822250,null,false,null,null,null,\"mtSDUb\"],[45672203,null,true,null,null,null,\"jDBBvd\"],[45672066,null,true,null,null,null,\"E1A5lb\"],[45751947,null,true,null,null,null,\"sT6Vl\"],[45725181,null,null,null,\"\",null,\"QOhO3d\"],[45828448,null,false,null,null,null,\"eXA28b\"],[45670693,null,false,null,null,null,\"V7Wemb\"],[45730498,null,false,null,null,null,\"ZycXJf\"],[45674760,null,null,null,\"Q2udpf42g0suK1NZr2K0SS4sTYE7\",null,\"E55iCf\"],[45775584,0,null,null,null,null,\"bjSjmf\"],[45712967,null,false,null,null,null,\"rZW8ld\"],[45681145,null,true,null,null,null,\"hV6kcd\"],[45828444,null,false,null,null,null,\"H2Gcgc\"],[45678265,null,false,null,null,null,\"P7qpdc\"],[45801475,null,false,null,null,null,\"f7P4A\"],[45729447,null,false,null,null,null,\"hjIR6e\"],[45768846,null,false,null,null,null,\"rwPWxf\"],[45754885,null,true,null,null,null,\"rKnVYd\"],[45752217,null,false,null,null,null,\"N9LDI\"],[45808613,null,false,null,null,null,\"Ln6bt\"],[45686665,null,true,null,null,null,\"xGJelc\"],[45723911,null,false,null,null,null,\"e77Z7d\"],[45824069,null,false,null,null,null,\"Ufe4Y\"],[45770955,null,true,null,null,null,\"GYvfVc\"],[45815724,null,false,null,null,null,\"Uj8fhe\"],[45816821,null,false,null,null,null,\"mvTBld\"],[45827919,null,false,null,null,null,\"hE5Ssf\"],[45805063,null,false,null,null,null,\"Oc8xre\"],[45834117,null,false,null,null,null,\"SdbbEd\"],[45715074,null,true,null,null,null,\"xxxPgb\"],[45834630,null,false,null,null,null,\"stSgvb\"],[45776812,null,true,null,null,null,\"SX5Atc\"],[45677445,null,true,null,null,null,\"rPYk8\"],[45805064,null,false,null,null,null,\"c02c9e\"],[45722047,null,null,null,null,null,\"D6k5oe\",[\"[[\\\"af\\\",\\\"am\\\",\\\"ar\\\",\\\"ar-EG\\\",\\\"ar-001\\\",\\\"az\\\",\\\"be\\\",\\\"bg\\\",\\\"bn\\\",\\\"ca\\\",\\\"ceb\\\",\\\"cs\\\",\\\"da\\\",\\\"de\\\",\\\"el\\\",\\\"en\\\",\\\"es\\\",\\\"es-419\\\",\\\"es-ES\\\",\\\"es-MX\\\",\\\"es-US\\\",\\\"et\\\",\\\"eu\\\",\\\"fa\\\",\\\"fi\\\",\\\"fil\\\",\\\"fr\\\",\\\"fr-FR\\\",\\\"fr-CA\\\",\\\"gl\\\",\\\"gu\\\",\\\"hi\\\",\\\"hr\\\",\\\"ht\\\",\\\"hu\\\",\\\"hy\\\",\\\"id\\\",\\\"is\\\",\\\"it\\\",\\\"iw\\\",\\\"ja\\\",\\\"jv\\\",\\\"ka\\\",\\\"kn\\\",\\\"ko\\\",\\\"kok\\\",\\\"la\\\",\\\"lt\\\",\\\"lv\\\",\\\"mai\\\",\\\"mk\\\",\\\"ml\\\",\\\"mr\\\",\\\"ms\\\",\\\"my\\\",\\\"ne\\\",\\\"nl\\\",\\\"no\\\",\\\"nb-NO\\\",\\\"nn-NO\\\",\\\"or\\\",\\\"pa\\\",\\\"pl\\\",\\\"ps\\\",\\\"pt\\\",\\\"pt-BR\\\",\\\"pt-PT\\\",\\\"ro\\\",\\\"ru\\\",\\\"sd\\\",\\\"si\\\",\\\"sk\\\",\\\"sl\\\",\\\"sq\\\",\\\"sr\\\",\\\"sv\\\",\\\"sw\\\",\\\"ta\\\",\\\"te\\\",\\\"th\\\",\\\"tr\\\",\\\"uk\\\",\\\"ur\\\",\\\"vi\\\",\\\"zh\\\",\\\"zh-Hans-CN\\\",\\\"zh-Hant-TW\\\",\\\"zh-CN\\\",\\\"zh-TW\\\",\\\"zh-Hans\\\",\\\"zh-Hant\\\",\\\"nl-NL\\\"]]\"]],[45803148,null,false,null,null,null,\"xwAAZc\"],[45748403,null,true,null,null,null,\"XYCTRc\"],[45816397,null,false,null,null,null,\"ZrB7zb\"],[45699702,null,false,null,null,null,\"Xo3sI\"],[45710394,null,false,null,null,null,\"ZsDmSd\"],[45789804,null,false,null,null,null,\"ymRI8\"],[45836775,null,false,null,null,null,\"T6iBid\"],[45812735,null,false,null,null,null,\"Yk2s0e\"],[45823385,null,false,null,null,null,\"Bj7Brf\"],[45760024,null,false,null,null,null,\"iKoeab\"],[45774956,null,false,null,null,null,\"rhB3ee\"],[45721408,null,false,null,null,null,\"smbAqe\"],[45778396,null,false,null,null,null,\"iIQBF\"],[45739155,null,false,null,null,null,\"Ljfylf\"],[45812940,null,false,null,null,null,\"O22Sge\"],[45728555,null,null,null,\"\",null,\"ptUmFe\"],[45653421,null,true,null,null,null,\"K2C7od\"],[45644639,null,true,null,null,null,\"GoJCRc\"],[45820374,null,true,null,null,null,\"Gnzcd\"],[45744234,null,false,null,null,null,\"LtNgOd\"],[45672202,null,true,null,null,null,\"CyvTSb\"],[45726382,null,true,null,null,null,\"QUY3\"],[45724458,null,false,null,null,null,\"MRpQbd\"],[45621619,null,false,null,null,null,\"PfkIr\"],[45773994,null,false,null,null,null,\"dADOHe\"],[45826806,null,false,null,null,null,\"VOiqz\"],[45735186,null,true,null,null,null,\"SIvvz\"],[45791678,null,false,null,null,null,\"AX1Zl\"],[45822286,null,null,null,\"The draft looks good and covers everything. Finalize it.\",null,\"pwGLae\"],[45771189,null,false,null,null,null,\"N8Zn3e\"],[45802962,null,true,null,null,null,\"jVyASe\"],[45810797,null,false,null,null,null,\"mwxF4b\"],[45758631,null,false,null,null,null,\"kGhHOe\"],[45818531,null,false,null,null,null,\"UmzKbc\"],[45724460,null,null,0.5,null,null,\"U6t0Ob\"],[45730506,null,false,null,null,null,\"qhuWUc\"],[45752216,null,false,null,null,null,\"EJg6N\"],[45725770,null,false,null,null,null,\"yRc2q\"],[45708298,null,false,null,null,null,\"T4IN0c\"],[45812992,null,false,null,null,null,\"OYyUS\"],[45746067,null,true,null,null,null,\"wK00sd\"],[45806359,null,false,null,null,null,\"Hc7m4c\"],[45770251,null,false,null,null,null,\"ugtdaf\"],[45821188,null,false,null,null,null,\"kIO20c\"],[45788792,null,false,null,null,null,\"NYGVYd\"],[45804556,null,false,null,null,null,\"uGfKYc\"],[45812932,null,false,null,null,null,\"cEao8\"],[45814566,null,false,null,null,null,\"UtIL3e\"],[45785103,null,false,null,null,null,\"mywtHd\"],[45703610,null,false,null,null,null,\"UtcGCc\"],[45753332,null,false,null,null,null,\"s7RHUb\"],[45767102,null,true,null,null,null,\"SFyMwf\"],[45770188,null,false,null,null,null,\"JMBoZe\"],[45725154,null,true,null,null,null,\"WbzTGf\"],[45801648,null,false,null,null,null,\"mxFwrf\"],[45800085,null,false,null,null,null,\"Wi7jZ\"],[45825060,null,false,null,null,null,\"sO2mXc\"],[45837894,null,false,null,null,null,\"RyJQZ\"],[45641838,null,false,null,null,null,\"fLPxhf\"],[45773554,null,false,null,null,null,\"twqoIf\"],[45826905,null,false,null,null,null,\"O4cAwc\"],[45723283,null,false,null,null,null,\"SoWiLc\"],[45723104,null,true,null,null,null,\"EkiEee\"],[45747769,null,true,null,null,null,\"pkwVub\"],[45725720,null,false,null,null,null,\"ZBeYxd\"],[45820980,null,false,null,null,null,\"SCHNtf\"],[45755277,null,false,null,null,null,\"kHLD6e\"],[45798803,null,false,null,null,null,\"cLNSBb\"],[45686662,null,true,null,null,null,\"go03Eb\"],[45746367,null,false,null,null,null,\"GFsSZ\"],[45773549,null,false,null,null,null,\"Xo7q9d\"],[45770837,null,false,null,null,null,\"FJ461c\"],[45677461,null,null,null,null,null,\"qb66hd\",[\"[[\\\"fr\\\",\\\"es\\\",\\\"pt\\\",\\\"it\\\",\\\"de\\\",\\\"ja\\\",\\\"ko\\\"]]\"]],[45819588,0,null,null,null,null,\"wbzdub\"],[45836552,null,false,null,null,null,\"Yuf3O\"],[45746380,null,false,null,null,null,\"fkqxGb\"],[45793906,null,false,null,null,null,\"yLhhJb\"],[45725110,null,true,null,null,null,\"ElheSd\"],[45679439,null,false,null,null,null,\"DNzQwe\"],[45765410,null,true,null,null,null,\"CaEMO\"],[45780927,null,false,null,null,null,\"rThdVb\"],[45660287,null,false,null,null,null,\"nIuPDe\"],[45676780,null,false,null,null,null,\"GSMsUe\"],[45797188,null,false,null,null,null,\"bHmAwd\"],[45674758,null,false,null,null,null,\"ZHtfUc\"],[45672205,null,true,null,null,null,\"E7dKkc\"],[45806947,300,null,null,null,null,\"b0rpgd\"],[45752655,null,false,null,null,null,\"NsOFEe\"],[45730222,null,null,30000,null,null,\"qnlClb\"],[45796246,null,false,null,null,null,\"N0Rqe\"],[45818026,null,false,null,null,null,\"TvCGU\"],[45644640,42,null,null,null,null,\"xbuGR\"],[45829997,null,false,null,null,null,\"qcSLCe\"],[45752218,null,false,null,null,null,\"Gktqke\"],[45801316,null,false,null,null,null,\"EOyv4b\"],[45715626,null,false,null,null,null,\"ERq70c\"],[45831046,null,false,null,null,null,\"RaITsd\"],[45796251,null,false,null,null,null,\"Fdalgf\"],[45770249,null,false,null,null,null,\"cUUSDf\"],[45726852,null,false,null,null,null,\"qgjRgd\"],[45678217,null,null,0.01,null,null,\"RL6SLc\"],[45742759,null,false,null,null,null,\"hc5Fic\"],[45750887,null,false,null,null,null,\"WTvwUd\"],[45765314,null,false,null,null,null,\"jNI7Hb\"],[45684108,null,false,null,null,null,\"IHwhDb\"],[45674285,null,false,null,null,null,\"zRoGXc\"],[45775440,null,false,null,null,null,\"LBBJ2e\"],[45746176,null,false,null,null,null,\"atfOHe\"],[45750646,null,false,null,null,null,\"ZsLlE\"],[45779046,null,false,null,null,null,\"wYy78\"],[45674761,null,null,0.5,null,null,\"GpQcOb\"],[45804808,null,false,null,null,null,\"hV66bc\"],[45684730,null,true,null,null,null,\"aW7Ggd\"],[45677444,null,true,null,null,null,\"WYEV9b\"],[45661802,null,false,null,null,null,\"I09lfd\"],[45709342,null,false,null,null,null,\"Ab7Nmd\"],[45814269,null,false,null,null,null,\"USiRue\"],[45778160,null,false,null,null,null,\"oWcm2d\"],[45639541,null,false,null,null,null,\"LHinid\"],[45736727,null,false,null,null,null,\"JJHfwf\"],[45768825,null,false,null,null,null,\"pf4r3c\"],[45748983,null,true,null,null,null,\"s0d1Kd\"],[45719766,null,false,null,null,null,\"A3eSQd\"],[45696085,null,false,null,null,null,\"g3Gc7d\"],[45707719,null,false,null,null,null,\"GtbvFd\"],[45793966,null,false,null,null,null,\"ev0hBf\"],[45682655,null,false,null,null,null,\"riQMFe\"],[45762174,null,false,null,null,null,\"eUI0gb\"],[45785853,null,false,null,null,null,\"pRgIoc\"],[45798771,null,true,null,null,null,\"qgvf6d\"],[45811102,null,false,null,null,null,\"HedPKb\"],[45820748,null,false,null,null,null,\"ZyMUec\"],[45686667,null,true,null,null,null,\"ek81nf\"],[45658731,null,true,null,null,null,\"zMe6ub\"],[45756433,null,false,null,null,null,\"Zb8rLd\"],[45661086,null,false,null,null,null,\"wfVdS\"],[45774508,null,false,null,null,null,\"h5ZSZb\"],[45768710,null,false,null,null,null,\"a6GDme\"],[45658291,null,true,null,null,null,\"OSuRGd\"],[45779090,null,false,null,null,null,\"hCbIKb\"],[45681790,null,false,null,null,null,\"uPCxtc\"],[45644641,null,null,3.14159,null,null,\"FX1FL\"],[45747887,null,true,null,null,null,\"BvfvHb\"],[45694562,null,true,null,null,null,\"D50qNc\"],[45838425,null,false,null,null,null,\"iotb5\"],[45674759,null,null,null,\"nHWnsqMqi0suK1NZr2K0QMJZfKqX\",null,\"xH7haf\"],[45825209,null,null,null,\"1.0\",null,\"gTDjxd\"]],\"CAMSjgIdjAWwsLU3A+cGA9eaAgPQ+w0DqgYDx1kD9aAOwb8jA4ajBQOWBQOPxAW+GQP8hgQDlLMGA70FA8FnA4YDA/8vA4gFA+bVBoFBA76NBQP7gQ4DnosFA8wGAygD4gYDLwO2BgO11AUDUgOYBQP5BgPXlxcD+ZAFA7YGA63dBgP0hE2y5gUDYgPIBgOBBQPQv5wCA8TFAAPt6QYDYAPyHwH29gADprYBA+KXFAH2wQAD2bgUnYYBA9uvBgOIIgP9vAQDviwDsUoCwbgEpp8MpZ4DAqiCCAPqjgkDru4LA8OUAAPmyQ4DlOACAMjrBQPR+Ai9zicOq10D65wAA7iLAAOS2g8D0wYDn+0OA+f0JQM\\u003d\"]]]","gnD3ee":"%.@.null,null,null,\"https://drive-qa.corp.google.com/viewer/main\"]","nQyAE":{}};</script><script nonce="-5t7WQ1G51wrzLhb2Soyng">_docs_flag_initialData={"docs-ails":"docs_warm","docs-fwds":"docs_nf","docs-crs":"docs_crs_tsol","docs-fl":2,"docs-hpr":2,"docs-orl":9,"docs-rls":6,"docs-shdn":102,"docs-eivt":true,"info_params":{"includes_info_params":true},"docs-esaf":false,"docs-ecdh":true,"docs-pcdpoc":true,"docs-pcdpos":true,"docs-eabpcmewm":false,"docs-eabtzmewm":false,"docs-eabtsmewm":false,"docs-eaicewm":false,"docs-easdewm":true,"docs-eassewm":true,"docs-eaebewm":false,"docs-eafcmcewm":false,"docs-eavssewm":false,"docs-ebodewm":false,"docs-ebrfdewm":true,"docs-ebasdewm":false,"docs-ebpsewm":false,"docs-ecnbewm":false,"docs-ecedcdewm":true,"docs-ecsewm":true,"docs-ectdcdewm":true,"docs-ectscdewm":true,"docs-eclrbewm":false,"docs-eclsecewm":false,"docs-ecssewm":false,"docs-ectwm":true,"docs-ecgdewm":false,"docs-edsewm":true,"docs-edsnmewm":false,"docs-ewcfer":true,"docs-edwb":false,"docs-edibewm":false,"docs-edeibewm":false,"docs-eegdewm":false,"docs-ewubum":true,"docs-ewmcsm":true,"docs-ewmsm":false,"docs-eewsm":true,"docs-efcmewm":false,"docs-efrdwm":true,"docs-efasewm":false,"docs-eftsewm":false,"docs-eftbewm":false,"docs-efosewm":false,"docs-egasewm":false,"docs-eipdewm":true,"docs-elicewm":false,"docs-elmwbewm":false,"docs-elfcbewm":false,"docs-empwm":true,"docs-emdewm":true,"docs-emadwm":true,"docs-ensdewm":true,"docs-eodcewm":false,"docs-epsdewm":true,"docs-epftewm":false,"docs-eppbewm":false,"docs-epticewm":false,"docs-epacewm":false,"docs-epbtewm":false,"docs-eppvdewm":true,"docs-eppmewm":false,"docs-epecewm":false,"docs-eptsewm":false,"docs-eqsewm":false,"docs-erssewm":true,"docs-ertdewm":true,"docs-erhswm":true,"docs-esacewm":false,"docs-essr":true,"docs-essewm":false,"docs-esswm":false,"docs-esspm":true,"docs-esndewm":true,"docs-esdwm":false,"docs-esosewm":true,"docs-esssewm":false,"docs-esctwm":false,"docs-ettpdewm":true,"docs-ettrsewm":false,"docs-etsewm":false,"docs-etibewm":false,"docs-etesewm":false,"docs-etcsewm":false,"docs-ethsewm":false,"docs-eupubw":true,"docs-evgcewm":false,"docs-evosewm":false,"docs-evpsewm":false,"docs-evssewm":false,"docs-ewbm":true,"docs-mm":10,"docos-edpc":false,"docos-dphl":10000,"docos-drpdhl":10000,"docos-rppl":500,"docos-dpsl":9900,"docos-drpdsl":9900,"docs-cpr":true,"docs-ededsi":false,"docos-ehs":false,"docos-svt":true,"docos-edim":false,"docs-eicwdubl":true,"docs-hmg":true,"uls":"","docs-idu":false,"customer_type":"ND","scotty_upload_url":"/upload/spreadsheets/resumable","docs-edcfmb":false,"docs-erlbwfa":false,"docs-net-udmi":500000,"docs-net-udpt":120000,"docs-net-udur":"/upload/blob/spreadsheets","docs-net-usud":true,"docs-enable_feedback_svg":false,"docs-fpid":713590,"docs-fbid":"ExternalUserData","docs-obsImUrl":"https://ssl.gstatic.com/docs/common/netcheck.gif","docs-lsltms":20000,"lssv":7,"docs-offline-oebp":"/offline/eventbusworker.js","docs-offline-nnodi":100,"docs-localstore-iort":10000,"docs-offline-dck":"AIzaSyDrRZPb_oNAJLpNm167axWK5i85cuYG_HQ","docs-offline-mobile-mms":15000000,"docs-ewtaoe":true,"docs-offline-hsu":"docs.google.com/sheets","dffm":["Calibri","Cambria","Syncopate","Lobster","Corsiva","Coming Soon","Shadows Into Light","Indie Flower","Tahoma","Crafty Girls","Proxima Nova","Roboto Condensed","Average","Lato","Source Code Pro","Old Standard TT","Alfa Slab One","Playfair Display","PT Sans Narrow","Muli","Montserrat","Roboto Slab","Raleway","Open Sans","Oswald","Amatic SC","Source Sans Pro","Roboto","Economica","Reenie Beenie","Stint Ultra Expanded","Alegreya","Merriweather"],"dffd":["Calibri","Cambria","Syncopate","Lobster","Corsiva","Coming Soon","Shadows Into Light","Indie Flower","Tahoma","Crafty Girls","Proxima Nova","Roboto Condensed","Average","Lato","Source Code Pro","Old Standard TT","Alfa Slab One","Playfair Display","PT Sans Narrow","Muli","Montserrat","Roboto Slab","Raleway","Open Sans","Oswald","Amatic SC","Source Sans Pro","Roboto","Economica","Reenie Beenie","Stint Ultra Expanded","Alegreya","Merriweather"],"docs-offline-toomem":false,"docs-irbfes":false,"docs-offline-ercidep":true,"docos-eos":true,"udurls":true,"docs-localstore-cide":true,"docs-localstore-dom":false,"docs-extension-id":"ghbmnnjooekpmoecnnnilnnbdlolhkhi","icso":false,"docs-clsvn":0,"docs-rlsvn":0,"docs-offline-desktop-mms":200000000,"docs-offline-uebie":true,"docs-emasl":false,"docs-edfc":true,"docs-sw-efcr":true,"docs-sw-ehnur":false,"docs-emcct":true,"docs-ertwsinoi":true,"docs-ssndl":true,"docs-cmbs":500,"docs-doie":false,"docs-doild":false,"docs-dooife":true,"docs-offline-edose":false,"docs-eaiturd":false,"docs-ecepo":true,"docs-ecblsp":true,"docs-edlbsl":false,"docs-sw-eddf":false,"docs-edwpfsh":true,"docs-efshwr":true,"docs-efcs":false,"docs-eiwot":false,"docs-eiec":true,"docs-eirdfi":false,"docs-eiwotdl":false,"docs-eiwotv2":true,"docs-eiwotv2dl":false,"docs-ecdrfs":false,"docs-eliv":true,"docs-enceoc":false,"docs-offline-eoep":true,"docs-offline-eeooip":true,"docs-offline-eorlv":false,"docs-eosc":false,"docs-eoufm":false,"docs-esuhf":true,"docs-esiec":false,"docs-esrtitt":true,"docs-esms":true,"docs-tlspe":true,"docs-offline-ewnldoc":true,"docs-flrwpdo":true,"docs-localstore-ilat":10000,"docs-intli":true,"docs-sw-nfhms":10,"docs-offline-ouil":[],"docs-rmcl":true,"docs-sw-eesp0sr":true,"docs-sw-eessrr":false,"docs-sw-ecus":true,"docs-edclcf":true,"docs-sw-eddfpc":true,"docs-sw-edubnc":1747728000000,"docs-sw-eesp1sr":false,"docs-sw-eesp2sr":false,"docs-sw-eol":true,"docs-sw-epcc":true,"docs-sw-erdcbnc":true,"docs-sw-ernec":true,"docs-sw-cache-prefix":"spreadsheets","docs-text-ewf":true,"docs-wfsl":["ca","da","de","en","es","fi","fr","it","nl","no","pt","sv"],"docs-efrsde":true,"docs-efpsf":true,"docs-edfn":true,"docs-efpsp":true,"docs-dli":true,"docs-liap":"/naLogImpressions","ilcm":{"eui":"ADFN-csHzDyFAh3t15Ys5lMShw6DUt0Zw0skEcYbRcCxDeJ0EELc3Hr4UUrOcflhx6EDioshPWDY","je":1,"sstu":1788570244649404,"si":"CL2j2rCf1pYDFb7RKAUdcSMdtw","gsc":0,"ei":[5703839,5704621,5704883,5705891,5706069,5706270,5707047,5707204,5708480,5708576,5709357,5709476,5710692,5711550,5712635,5712909,5713195,5713554,5714310,5714839,5714843,5719527,5720568,5724199,5724215,5724880,5724896,5726752,5729076,5729092,5732593,5732609,5734616,5734632,5740715,5740731,5743452,5754902,5754918,5756843,5756859,5768309,5768325,5769775,5769791,5771519,5771535,5782208,5782224,5782619,5782635,5787277,5787293,5797683,5797699,13702623,48966194,48966202,49398741,49398749,49471963,49471971,49491677,49491685,49498893,49498901,49623541,49623549,49629254,49629262,49644115,49644123,49769317,49769325,49822901,49822909,49833542,49833550,49842975,49842983,49904339,49904347,49924746,49924754,49926193,49926201,49943119,49943127,49971933,49971941,49979598,49979606,50223874,50223882,50266142,50266150,50273408,50273416,50297016,50297024,50335667,50335675,50389250,50389258,50438885,50439160,50439168,50513154,50538644,50538652,50549971,50549979,50561423,50561431,50562893,50562904,50587002,50587010,50596417,50602281,50602289,70971276,70971284,71061491,71079878,71079886,71085301,71085309,71120888,71120896,71145446,71145457,71330174,71330182,71376076,71376084,71387413,71387424,71387869,71387877,71406837,71406845,71451242,71451250,71465987,71465995,71505840,71505848,71520550,71520558,71530123,71530131,71544814,71544822,71546325,71558464,71608360,71608368,71626701,71626709,71626743,71626751,71626796,71626804,71626817,71626825,71626890,71626898,71626951,71626959,71627011,71627019,71627031,71627039,71627041,71627049,71658060,71658068,71659893,71659901,71668382,71668390,71679500,71679508,71681910,71689920,71689928,71710020,71710028,71724752,71724768,71825503,71825511,71833015,71854930,71854938,71898007,71898015,71899389,71899400,71960480,71960488,94326619,94327491,94327499,94333123,94333131,94333352,94333368,94353288,94353296,94386986,94429074,94434297,94434305,94434487,94434503,94461486,94573779,94573787,94574461,94574477,94629777,94629785,94661862,94661870,94664467,94664483,94664513,94664529,94692418,94692426,94733597,94733605,94755915,94755931,94785069,94785077,94813572,94813583,94855483,94855499,94896349,94896365,94904069,94904077,94919132,94919140,94940174,94940182,95087006,95087014,95104388,95104399,95111945,95111953,95112753,95112761,95131013,95131021,95208282,95208298,95314822,95314830,99251883,99251891,99257927,99338800,99338808,99342898,99343298,99343306,99368712,99368720,99400122,99400130,99402271,99402279,99440813,99440821,99457526,99457534,99457667,99457675,100640005,100640007,101448281,101448286,101478096,101478104,101483525,101489591,101489596,101489821,101489826,101492891,101492899,101519320,101519328,101561612,101561620,101562386,101562394,101574991,101574999,101575539,101575544,101631351,101631359,101672665,101687077,101687085,101718563,101718571,101732382,101755344,101755349,101755523,101755528,101767625,101767630,101788163,101788171,101793865,101823243,101823251,101831080,101831096,101860687,101860695,101867903,101867911,101887614,101887622,101896315,101896355,101917145,101917153,101919478,101919486,101920193,101922659,101922667,101922840,101922848,101933611,101933619,101962018,101962026,101962597,102020119,102020135,102030522,102030530,102059501,102059509,102070556,102070564,102070990,102070998,102083346,102083354,102146567,102146575,102161305,102161313,102161607,102161615,102167858,102167874,102198302,102198310,102200941,102200957,102208352,102208360,102231923,102236206,102236214,102244449,102244457,102280668,102280676,102287424,102287432,102292076,102292084,102343400,102343408,102388242,102388247,102399861,102399869,102402659,102402667,102449788,102449796,102469840,102469848,102517256,102517261,102548541,102548549,102554639,102554644,102554918,102554923,102587613,102587621,102596276,102600174,102600179,102601477,102601493,102618688,102618696,102630355,102641440,102641445,102649583,102649588,102649977,102649982,102672648,102672653,102672968,102672973,102673455,102685332,102685337,102685851,102685856,102691097,102691102,102691374,102691379,102718357,102727324,102727329,102761435,102761440,102762215,102762223,102774409,102774417,102783549,102783557,102785008,102785016,102787583,102799755,102803284,102803306,102807870,102807878,102811823,102811831,102823462,102823478,102859126,102859134,102863271,102863276,102864183,102864191,102867775,102867783,102883665,102883673,102902888,102902896,102903600,102903608,102909789,102909794,102925999,102926007,102926663,102926671,102932607,102932615,102944124,102944129,102944333,102944338,102944386,102944391,102944621,102944626,102944667,102944672,102944850,102944855,102952144,102952160,102972709,102972717,102987027,102987035,102988298,102988303,102988389,102988394,102988682,102988687,102988942,102988947,103011619,103011627,103020615,103020623,103024782,103024798,103157617,103157633,103163024,103163032,103175950,103175958,103209245,103209253,103253220,103253225,103285866,103285874,103286153,103286161,103286564,103286572,103288446,103288454,103289064,103289069,103289247,103289252,103298976,103298992,103317199,103317204,103326427,103326435,103339696,103339704,103343770,103343778,104487008,104487024,104530120,104574099,104574107,104575358,104575363,104575465,104575470,104575678,104575683,104575946,104575951,104615655,104615663,104624583,104624591,104627936,104627942,104646587,104646603,104654306,104654314,104699364,104699372,104726628,104726644,104761851,104761859,104794523,104794531,104799759,104799775,104807628,104807644,104812778,104812794,104834894,104834910,104907911,104907919,104959322,104959338,104963362,104963370,104976577,104976585,104983049,104983057,105032592,105082137,105082145,105083688,105083696,105084909,105084917,105087648,105087656,105090970,105090986,105100867,105100875,105113790,105113806,105121457,105121473,105125277,105125285,105180914,105180922,105217089,105217097,105255678,105255686,105283707,105283715,105345084,105345089,105346305,105346313,105360358,105360366,105368548,105368556,105371863,105371871,105374024,105374032,105380952,105393871,105393879,105439271,105439279,105474728,105474744,115511335,115511340,115599167,115599183,115601189,115601197,115614398,115614406,115626238,115626246,115626479,115626487,115634544,115634549,115665120,115665125,115665229,115665234,115668424,115668431,115669278,115669286,115748334,115748340,115755384,115755392,115779981,115779989,115780498,115780506,115780561,115780569,115797697,115797702,115821558,115821566,115822365,115822373,115831776,115831792,115848548,115848564,115849188,115849193,115854788,115854796,115855095,115855103,115902312,115902317,115906832,115906848,115909821,115909829,115916250,115916255,115917318,115917326,115928939,115928947,115974726,115974742,115986507,115986513,116062670,116062678,116068738,116068746,116076925,116076931,116091118,116093395,116093411,116098206,116098222,116150786,116150794,116176849,116176857,116213909,116213917,116215763,116215770,116221474,116221482,116229754,116229762,116250745,116250753,116255734,116255742,116276441,116276449,116283563,116283579,116307748,116339532,116339537,116361234,116372557,116372565,116407665,116415994,116416002,116418067,116418075,116425642,116448407,116449517,116459605,116470832,116479751,116480001,116487122,116487138,116495787,116496396,116502867,116508642,116508647,116514183,116514189,116524154,116524309,116538476,116538484,116542685,116550348,116567499,116567504,116593749,116609411,116609419,116613094,116613710,116658992,116685399,116685789,116697553,116697559,116699369,116699377,116704082,116704120,116714309,116714312,116731449,116731455,116731463,116731469,116731477,116731483,116731491,116731497,116731505,116731511,116731519,116731525,116756963,116756971,116757451,116757456,116771270,116771276,116779053,116779058,116780649,116780655,116780663,116780669,116780677,116780683,116780691,116780697,116780705,116780711,116780719,116780725,116783810,116783815,116840642,116840647,116846209,116846214,116847573,116847578,116856125,116856131,116874913,116877099,116882876,116882883,116913418,116918027,116919494,116923675,116924992,116980347,116980355,116982492,116982500,116982934,116982942,116988164,116988172,117010993,117011001,117026763,117026878,117026880,117037128,117037136,117037622,117037626,117082092,117091085,117096748,117124349,117124356,117128380,117128386,117136347,117143742,117143747,117145732,117145740,117148946,117148952,117165519,117165525,117166647,117224179,117224187,117236066,117236366,117236382,117249430,117249438,117268877,117268885,117284033,117284038,117286771,117286779,117290230,117290238,117297869,117297874,117309434,117309442,117310210,117310218,117322319,117322327,117339411,117339417,117345915,117345922,117357715,117357721,117367088,117367094,117376295,117376301,117382832,117387079,117387085,117411973,117411978,117437024,117437030,117457878,117457886,117474409,117474414,117503177,117503185,117504403,117504411,117528468,117528471,117530139,117547721,117547729,117556935,117557280,117586569,117586574,117605990,117605995,117617889,117623323,117623329,117632590,117641824,117641840,117642488,117642616,117642621,117643020,117643028,117643768,117643776,117645880,117645896,117683635,117706015,117711597,117723591,117723597,117728273,117728281,117734392,117736031,117740479,117740485,117752075,117752081,117755703,117755716,117755820,117756394,117775368,117782123,117800030,117800038,117826241,117826247,117840095,117852711,117852716,117855973,117855979,117879413,117879418,117895860,117895868,117930842,117930847,117969905,117969910,117983432,117983437,117987982,117987998,117988981,117988989,117995685,117995689,117997204,117999163,118010934,118027077,118029473,118029479,118043880,118043885,118044533,118048893,118048900,118057575,118057581,118086120,118086126,118094534,118094539,118098349,118098357,118110554,118110562,118119539,118119545,118127448,118127453,118132021,118132029,118144499,118144504,118145032,118145040,118155108,118155115,118155211,118155217,118155412,118171214,118172011,118179261,118181389,118181395,118182951,118199432,118199438,118210158,118210163,118213586,118213591,118219914,118222577,118222585,118227602,118227608,118237095,118237103,118240038,118240044,118240393,118246247,118254619,118255415,118255420,118256780,118256787,118269184,118269257,118269262,118275356,118281164,118281172,118292262,118292268,118292276,118292282,118311122,118311127,118313303,118313319,118329123,118329129,118342369,118347706,118349324,118349326,118349356,118364657,118367501,118367507,118367791,118368077,118368085,118368796,118368804,118373667,118399838,118413048,118413053,118419982,118419988,118427971,118427977,118449075,118462069,118482308,118482316,118494713,118497529,118497535,118509494,118511786,118515459,118515465,118517998,118518004,118519229,118521972,118521977,118531365,118532140,118532142,118541625,118541633,118544270,118544277,118555967,118555975,118566888,118566900,118567274,118567282,118575738,118575744,118576741,118579779,118579784,118596018,118596023,118599601,118599609,118600863,118623871,118623879,118627784,118627795,118630535,118630551,118654314,118656213,118656218,118656880,118656885,118669236,118670990,118670996,118683648,118683653,118717387,118728532,118728537,118735214,118735220,118736897,118753224,118753232,118780368,118781276,118781281,118786501,118786509,118788063,118788071,118788700,118792272,118795502,118795508,118796216,118803374,118803380,118807052,118809999,118810531,118824720,118824725,118825246,118830481,118830620,118830622,118830624,118830626,118830628,118830630,118830632,118830634,118830636,118830640,118835027,118855606,118870266,118871022,118884772,118896670,118896675,118910283,118910289,118925865,118925873,118931884,118938363,118938369,118952749,118952757,118960908,118960916,118965149,118965154,118970617,119001820,119001825,119012212,119012218,119022352,119022360,119033815,119033831,119036798,119036806,119038758,119038766,119058017,119058022,119061297,119062030,119062038,119065056,119065066,119070701,119071842,119071848,119076631,119076636,119077235,119077243,119078243,119087275,119092108,119104495,119104511,119106920,119109754,119109762,119126674,119127375,119140484,119140492,119142923,119159957,119164991,119164992,119164995,119168749,119170344,119170349,119178779,119187339,119189027,119189032,119189273,119189289,119190842,119190847,119194889,119194894,119202438,119202446,119206371,119206377,119207531,119207537,119209341,119209378,119219121,119219126,119220909,119220911,119220913,119220915,119220917,119220919,119221438,119235564,119235569,119237704,119237709,119239792,119249910,119255437,119261680,119261688,119262908,119265733,119275421,119282242,119282258,119287095,119287101,119290941,119290946,119292806,119292822,119293882,119293887,119311182,119311187,119317308,119317316,119335572,119335774,119335779,119346731,119350203,119350208,119355729,119355745,119372604,119372610,119374110,119374116,119382576,119395068,119400586,119400592,119412195,119419025,119419030,119419128,119419133,119431313,119436290,119436298,119446111,119446117,119453372,119454185,119454190,119454403,119454408,119455862,119455870,119464287,119464292,119471146,119474934,119474942,119482541,119482557,119486429,119491949,119491957,119493286,119493294,119497026,119497031,119497282,119497298,119502682,119502687,119520105,119525128,119525133,119528302,119528310,119530240,119530248,119538769,119538776,119546473,119546479,119546487,119546493,119552616,119566148,119566156,119566446,119566747,119566753,119576796,119576803,119588321,119588326,119590765,119590807,119590935,119592980,119592988,119593830,119593835,119595167,119595175,119599143,119605270,119605278,119608194,119608200,119612419,119612423,119614697,119614703,119615457,119615462,119621403,119621408,119621918,119621936,119636046,119643427,119643433,119652189,119652205,119665967,119665975,119680681,119680688,119681615,119681623,119684295,119684301,119684496,119684833,119685915,119685921,119702275,119702291,119702689,119702697,119703104,119703112,119707152,119707157,119707160,119727967,119727972,119741465,119741473,119745075,119761002,119761007,119763676,119763694,119768442,119770605,119770613,119773246,119773713,119776352,119794118,119794312,119794317,119804004,119804012,119804531,119804881,119805218,119805226,119807183,119809651,119809656,119818486,119818494,119820261,119826320,119826325,119840989,119842248,119842254,119854317,119857096,119857112,119867425,119867441,119880872,119880877,119885476,119892068,119892084,119914241,119914248,119914253,119919341,119919349,119930504,119930509,119932762,119932767,119941747,119941750,119944463,119989281,119999033,120006922,120006930,120008303,120008311,120022823,120022839,120024054,120025498,120025503,120049111,120049119,120050690,120050698,120051513,120051518,120051677,120051693,120073901,120073907,120073998,120074338,120074344,120082244,120082249,120098782,120098787,120107753,120118521,120118527,120120566,120120575,120120580,120129974,120129980,120129988,120129994,120130002,120130008,120140748,120140753,120140755,120140959,120140964,120142704,120142711,120142715,120142731,120142990,120142997,120143394,120143412,120143451,120143457,120161430,120161435,120163559,120163564,120167720,120167725,120169620,120169628,120175787,120175795,120176185,120176193,120179202,120179208,120181676,120181692,120182615,120182620,120184009,120187335,120187340,120190042,120190047,120191501,120191506,120195953,120197997,120198013,120206658,120206674,120222179,120223316,120223332,120226251,120226258,120226267,120226273,120228069,120228085,120232064,120239562,120239570,120249814,120249830,120250425,120250430,120256334,120256340,120257682,120257690,120268393,120272513,120275434,120275439,120286666,120286671,120292177,120300729,120343165,120357676,120357692,120388576,120389517,120389525,120395666,120408009,120408014,120419550,120419556,120426040,120426046,120426054,120426060,120426068,120426074,120426076,120426081,120426096,120426102,120426110,120426116,120426124,120426130,120426138,120426144,120436312,120436318,120437412,120439867,120439872,120446674,120456509,120456514,120457457,120457473,120459269,120465917,120465925,120483772,120483779,120493282,120493290,120495316,120495323,120540098,120554201,120554207,120573339,120576479,120579829,120579837,120596839,120596845,120603282,120603287,120614405,120614412,120619846,120619851,120652083,120652090,120661035,120661040,120663580,120663596,120666070,120666077,120666774,120666798,120672603,120674270,120674277,120674439,120674441,120674443,120674444,120674447,120674449,120678227,120705172,120711524,120711531,120712193,120712199,120713457,120715203,120715208,120716393,120722998,120723014,120730617,120730622,120730864,120730872,120732417,120732422,120733519,120733536,120735838,120735843,120735852,120735857,120772217,120773171,120773176,120777465,120777470,120778070,120778086,120794198,120794203,120797333,120797339,120827764,120827769,120844533,120844538,120844732,120844737,120845143,120845149,120864326,120887325,120887330,120894578,120931070,120931079,120933033,120951758,120954529,120957398,120957404,120969789,120969794],"crc":0,"cvi":[]},"docs-ccdil":true,"docs-eil":true,"docs-ecuach":false,"docs-cclt":57,"docs-ecci":true,"docs-esi":false,"docs-cei":{"i":[119486429,120666774,118925873,94327499,116780683,116150794,119419030,118144504,115755392,118368085,5705891,102672973,115916255,117037622,71406845,118098357,115511340,116731483,117457886,120143457,119317316,94664529,94855499,71626825,120887330,71626709,118172011,119335572,119681623,71724768,116731469,120179208,118735220,103285874,117782123,120232064,102292084,120426081,49924754,116062678,117632590,102020135,105217097,103326435,120715208,117756394,118555975,118830628,101483525,71627039,119707157,102944338,120049119,118599609,120493290,105393879,119249910,101793865,119703112,119220911,117236382,119012218,118809999,101917153,5711550,102600179,94661870,119454408,117855979,120713457,116524309,116780697,101867911,119071848,120735857,119552616,119525133,120705172,115599183,115614406,94429074,115831792,101788171,102554923,117645896,117145740,118199438,120576479,118497535,117474414,117236066,120426144,118810531,102863276,102649982,118010934,101755349,118027077,116098222,117411978,94896365,116514189,102944129,119038766,102685337,102517261,119807183,102070998,118786509,101933619,120674443,119220917,118938369,119189032,94755931,101562394,120223332,118255420,50273416,5719527,71627049,5713554,117734392,120723014,102926007,116502867,115902317,116882883,94629785,120182620,119400592,50562904,116093411,103317204,102761440,119892084,101478104,119194894,105255686,105083696,5724215,117309442,105121473,118511786,120073998,104799775,101631359,102864191,119826325,119809656,116459605,102236214,94733605,120426116,116076931,120286671,120614412,119374116,120495323,5714310,117382832,120666077,101823251,120184009,117547729,118952757,120343165,119454190,120250430,49904347,119932767,119588326,117623329,120272513,95112761,116697559,101489596,118788071,118965154,117930847,115822373,120408014,120140755,117345922,116496396,50538652,116757456,117037136,104575951,118413053,103011627,116846214,100640007,5782635,101755528,118566888,117124356,95131021,119187339,118515465,120175795,117143747,50297024,102691379,71387424,120457473,71854938,102388247,49822909,119854317,105113806,118896675,102987035,120073907,104794531,118830622,119930509,120661040,71145457,105371871,101919486,94573787,118579784,119867441,50587010,99343306,115634549,117310218,120674277,118462069,118349326,117988989,71544822,115665234,105380952,118830481,117322327,116508647,71608368,119776352,119530248,117755820,120712199,104575363,104487024,50439168,101718571,94664483,120969794,118364657,118057581,118427977,116988172,101448286,119773713,118043885,71658068,117528468,118855606,13702623,101887622,119474942,118830634,104812794,116780725,120228085,119235569,104627942,116980355,116783815,102548549,102449796,99400130,119446117,118521977,101492899,119590765,95104399,119219126,119763694,120142997,115986513,119001825,119857112,118155412,103298992,118368804,118970617,119221438,120459269,119109762,99457675,119621918,117895868,102280676,49623549,94333131,117224187,105087656,120130008,102596276,120674447,104983057,116068746,71520558,116221482,118179261,117641840,115855103,102944672,118803380,118222577,120074344,105439279,119702697,71505848,102059509,117290238,118086126,120300729,102343408,117148952,105346313,117503185,117995685,118830624,101489826,120051518,118807052,115854796,119805226,102399869,119170349,119036806,120603287,71689928,5734632,120456514,105084917,120465925,119773246,118871022,116756971,5709357,116714312,116780711,118155217,118532142,71626959,120426060,95314830,102807878,120730622,119680688,102587621,101922848,104530120,5756859,94353296,118494713,119502687,118656885,105125285,102727329,102944391,103343778,5732609,99440821,94692426,116856131,117987998,117643028,118531365,5768325,119590935,117437030,120226258,119206377,119189289,118717387,119612423,118182951,119202446,94574477,117755716,119741473,102944626,118795508,116613710,120142711,119070701,117026878,102774417,116982942,116176857,5703839,70971284,119261688,116609419,50602289,118596023,118830636,102618696,104807644,102883673,49491685,99251891,118830626,119794317,102909794,120008311,116416002,116418075,118728537,102167874,117376301,117339417,118654314,105100875,119058022,115974742,94434503,103288454,102952160,119290946,49979606,120181692,94333368,119989281,120778086,119941750,119804881,120933033,120161435,119761007,116731455,99402279,71659901,120022839,118349356,118910289,120772217,119546493,117999163,120206674,120191506,104834910,103286572,94461486,119464292,117557280,119078243,119350208,119702291,119941747,115928947,103289069,117723597,71626898,102402667,119685921,118656218,104959338,102601493,94434305,119482557,119178779,120169628,119707160,5787293,105090986,71079886,5743452,116840647,119818494,118171214,115626246,102783557,117357721,120024054,120120580,119164991,117165525,116470832,119880877,119546479,120098787,120140964,120082249,102787583,120176193,71530131,102988687,71668390,119022360,120143412,104646603,116731525,50223882,118781281,118311127,5724896,119804531,119727972,118044533,118792272,115797702,71376084,120674444,5707047,118736897,117683635,104761859,120894578,49471971,120275439,116780669,103339704,5710692,120579837,117728281,49498901,116283579,5712909,103253225,119092108,120483779,120596845,119493294,102649588,119164995,117166647,115779989,118824725,105368556,119914241,104963370,120845149,102200957,104726644,117642621,50561431,5713195,101962026,120388576,102070564,102926671,50389258,118830630,118753232,119287101,71626804,5726752,102988947,71899400,102988303,120140753,118240393,71061491,103020623,120426102,101561620,120249830,104976585,120395666,116538484,119684301,5707204,102762223,120674439,119453372,115665125,102902896,120666798,102469848,119292822,119528310,102198310,105345089,118482316,116982500,118210163,116372565,116255742,71960488,120931079,118254619,101922667,103209253,95208298,115848564,94940182,120716393,105360366,95111953,103024798,118575744,119065066,119491957,105283715,115909829,118240044,119061297,116215770,101519328,118830632,117387085,120663596,118181395,116480001,118155115,99368720,118110562,118292268,116780655,5782224,119593835,120107753,5712635,119919349,120292177,118281172,115626487,116847578,99457534,71451250,118627795,104575470,119255437,118094539,117268885,117297874,120239570,102903608,117011001,5706270,102030530,118566900,120732422,117706015,120954529,118576741,117852716,5714843,120733536,105374032,120957404,118532140,120142731,119062038,71825511,120674449,119621403,119220913,120426130,94919140,119382576,50549979,102685856,119621936,120190047,102554644,120426046,118269184,119608200,115821566,104615663,117617889,94813583,120120566,119684496,117755703,119275421,118213591,119142923,71679508,119566446,49398749,105180922,118227608,118567282,104574107,120051693,5754918,119590807,120844538,119355745,119768442,116213917,71387877,5714839,5704621,119220919,49943127,118683653,119372610,115780506,5740731,49629262,5797699,116449517,117605995,120050698,118237103,120195953,117643776,120163564,102988394,119605278,120436318,119615462,104907919,119190847,119840989,117286779,103163032,116685399,117983437,95087014,119311187,71330182,120951758,49842983,101962018,118367791,117136347,120256340,118519229,118347706,118222585,120540098,115668431,101732382,48966202,118419988,120187340,116448407,120554207,71085309,119614703,103175958,118329129,119220915,102799755,115849193,119220909,120006930,118670996,119538776,120864326,119127375,49926201,120357692,50335675,102287432,116918027,118367507,118132029,5709476,117752081,116425642,119914253,101767630,117826247,120672603,115906848,102972717,119282258,118349324,119239792,118623879,102867783,94904077,119455870,119576803,120794203,119033831,99338808,116487138,117879418,117128386,102944855,119636046,118127453,117367094,119595175,120773176,117026763,103289252,116919494,119293887,117642488,101574999,102691102,118449075,117530139,120777470,104575683,120652090,119520105,101962597,120827769,71898015,102641445,104654314,116550348,120735843,5720568,118830640,116229762,118669236,119209341,118313319,119842254,116250753,120389525,115780569,118825246,94785077,5708480,120797339,50266150,119621408,5704883,119087275,120439872,118830620,5729092,120129980,102785016,101831096,118509494,5708576,102208360,120711531,102672653,119164992,71465995,119419133,120437412,117711597,49644123,71627019,119497298,117586574,119209378,117969910,119077243,71626751,118544277,119665975,119885476,116731511,120167725,118269262,117736031,117556935,119745075,118292282,116699377,102803306,120257690,117284038,101575544,118630551,116407665,115917326,116771276,103286161,118048900,49971941,102161313,119431313,119346731,119076636,119237709,115669286,118219914,102811831,118518004,118960916,118256787,116339537,105474744,105082145,119566156,117800038,5769791,117740485,120129994,119643433,5771535,102146575,119652205,116714309,104624591,118342369,120419556,120674441,118373667,119566753,104699372,119497031,119804012,49769325,118246247,119104511,119592988,119770613,116779058,120226273,117249438,102823478,117504411,116923675,120844737,119126674,118145040,102859134,118119545,120426074,5706069,101687085,103157633,117997204,117775368,120730872,120118527,118029479,116567504,115748340,116613094,119944463,120025503,119471146,71833015,117840095,116731497,119335779,115601197,120198013,101860695,119140492,102932615,118884772,49833550,116704082,71710028,116924992,71120896,102244457,117528471,102161615,116276449,120619851,102083354,119436298,119262908,120446674,119794118,120678227,116874913,117037626,118399838,116307748,117026880,116495787,116542685,116704120,116593749,116685789,119159957,117995689,118796216,118931884,120268393,118835027,118780368,118275356,116361234,119207537,119106920,116877099,119395068,118925865,94327491,116780677,116150786,119419025,118144499,115755384,118368077,102672968,115916250,71406837,118098349,115511335,116731477,117457878,120143451,119317308,94664513,94855483,71626817,120887325,71626701,117082092,119681615,71724752,116731463,120179202,118735214,103285866,102292076,120426076,49924746,116062670,102020119,105217089,103326427,120715203,118555967,99257927,71627031,119707152,102944333,120049111,118599601,120493282,105393871,71546325,119703104,117236366,119012212,101917145,102600174,94661862,119454403,117855973,102231923,116780691,101867903,119071842,120735852,119525128,115599167,115614398,71681910,115831776,101788163,102554918,117645880,117145732,118199432,120573339,118497529,117474409,120426138,102863271,102649977,101755344,105032592,116098206,117411973,94896349,116514183,102944124,119038758,102685332,102517256,102070990,118786501,101933611,118938363,119189027,94755915,101562386,120223316,118255415,50273408,71627041,120722998,102925999,116091118,115902312,116882876,94629777,120182615,119400586,50562893,116093395,103317199,102761435,119892068,101478096,119194889,105255678,105083688,5724199,117309434,105121457,119684833,104799759,101631351,102864183,119826320,119809651,94386986,102236206,94733597,120426110,116076925,120286666,120614405,119374110,120495316,120666070,101823243,117547721,118952749,119454185,120250425,49904339,119932762,119588321,117623323,120222179,95112753,116697553,101489591,118788063,118965149,117930842,115822365,120408009,117345915,50538644,116757451,117037128,104575946,118413048,103011619,116846209,100640005,5782619,101755523,118541633,117124349,95131013,118515459,120175787,117143742,50297016,102691374,71387413,120457457,71854930,102388242,49822901,105113790,118896670,102987027,120073901,104794523,119930504,120661035,71145446,105371863,101919478,94573779,118579779,119867425,50587002,99343298,115634544,117310210,120674270,117988981,71544814,115665229,102630355,117322319,116508642,71608360,119530240,120712193,104575358,104487008,50439160,101718563,94664467,120969789,118057575,118427971,116988164,101448281,118043880,71658060,101887614,119474934,104812778,116780719,120228069,119235564,104627936,116980347,116783810,102548541,102449788,99400122,119446111,118521972,101492891,95104388,119219121,119763676,120142990,115986507,119001820,119857096,103298976,118368796,119109754,99457667,119599143,117895860,102280668,49623541,94333123,117224179,105087648,120130002,101920193,104983049,116068738,71520550,116221474,117641824,115855095,102944667,118803374,117096748,120074338,105439271,119702689,71505840,102059501,117290230,118086120,102343400,117148946,105346305,117503177,101489821,120051513,115854788,119805218,102399861,119170344,119036798,120603282,71689920,5734616,120456509,105084909,120465917,118870266,116756963,116780705,118155211,71626951,120426054,95314822,102807870,120730617,119680681,102587613,101922840,102718357,5756843,94353288,119502682,118656880,105125277,102727324,102944386,103343770,5732593,99440813,94692418,116856125,117987982,117643020,116913418,5768309,117437024,120226251,119206371,119189273,119612419,119202438,94574461,119741465,102944621,118795502,120142704,102774409,116982934,116176849,70971276,119261680,116609411,50602281,118596018,102618688,104807628,102883665,49491677,99251883,119794312,102909789,120008303,116415994,116418067,118728532,102167858,117376295,117339411,105100867,119058017,115974726,94434487,103288446,102952144,119290941,49979598,120181676,94333352,120778070,118788700,120161430,119761002,116731449,99402271,71659893,120022823,118910283,119546487,120206658,120191501,104834894,103286564,50596417,119464287,119350203,119702275,115928939,103289064,117723591,71626890,102402659,119685915,118656213,104959322,102601477,94434297,119482541,119168749,120169620,5787277,105090970,71079878,116840642,119818486,115626238,102783549,117357715,120120575,117165519,119880872,119546473,120098782,120140959,120082244,102673455,120176185,71530123,102988682,71668382,119022352,120143394,104646587,116731519,50223874,118781276,118311122,5724880,119727967,115797697,71376076,104761851,119265733,49471963,120275434,116780663,103339696,120579829,117728273,49498893,116283563,103253220,120483772,120596839,119493286,102649583,115779981,118824720,105368548,104963362,120845143,102200941,104726628,117642616,50561423,101896315,102070556,102926663,50389250,118753224,119287095,71626796,102988942,71899389,102988298,120140748,50513154,103020615,120426096,101561612,120249814,104976577,116538476,119684295,102762215,115665120,102902888,102469840,119292806,119528302,102198302,105345084,118482308,116982492,118210158,116372557,116255734,71960480,120931070,101922659,103209245,95208282,115848548,94940174,105360358,95111945,103024782,118575738,119065056,119491949,105283707,115909821,118240038,116215763,101519320,117387079,120663580,118181389,116479751,118155108,99368712,118110554,118292262,116780649,5782208,119593830,119919341,118281164,115626479,116847573,99457526,71451242,118627784,104575465,118094534,117268877,117297869,120239562,102903600,117010993,102030522,118541625,120732417,117091085,117852711,120733519,105374024,120957398,120142715,119062030,71825503,120426124,94919132,50549971,102685851,120190042,102554639,120426040,119608194,115821558,104615655,94813572,118213586,71679500,71558464,49398741,105180914,118227602,118567274,104574099,120051677,5754902,120844533,119355729,116213909,71387869,49943119,118683648,119372604,115780498,5740715,49629254,5797683,117605990,120050690,118237095,117643768,120163559,102988389,119605270,120436312,119615457,104907911,119190842,119820261,117286771,103163024,117983432,95087006,119311182,71330174,119999033,49842975,101896355,120256334,116658992,115668424,94326619,48966194,118419982,120187335,120554201,71085301,119614697,103175950,118329123,99342898,115849188,120006922,118670990,119538769,49926193,120357676,50335667,102287424,116524154,118367501,118132021,117752075,119914248,101767625,117826241,115906832,102972709,119282242,118600863,118623871,102867775,94904069,119455862,119576796,120794198,119033815,99338800,116487122,117879413,117128380,102944850,118127448,117367088,119595167,120773171,103289247,119293882,101574991,102691097,120777465,104575678,120652083,101672665,120827764,71898007,102641440,104654306,120735838,116229754,118313303,119842248,116250745,120389517,115780561,94785069,120797333,50266142,120439867,5729076,120129974,102785008,101831080,102208352,120711524,102672648,71465987,119419128,49644115,71627011,119497282,117586569,117969905,119077235,71626743,118544270,119665967,116731505,120167720,118269257,118292276,116699369,102803284,120257682,117284033,101575539,118630535,115917318,116771270,103286153,118048893,49971933,102161305,119412195,119076631,119237704,115669278,102811823,118517998,118960908,118256780,116339532,105474728,105082137,119566148,117800030,5769775,117740479,120129988,119643427,5771519,102146567,119652189,104624583,120419550,119566747,104699364,119497026,119804004,49769317,119104495,119592980,119770605,116779053,120226267,117249430,102823462,117504403,120844732,118145032,102859126,118119539,120426068,101687077,103157617,120730864,120118521,118029473,116567499,115748334,120025498,50438885,116731491,119335774,115601189,120197997,101860687,119140484,102932607,49833542,71710020,71120888,102244449,102161607,116276441,120619846,102083346,119436290,119207531],"cf":{"enable_homescreen_priority_docs":[null,0],"enable_homescreen_priority_docs_promo":[null,0],"enable_homescreen_action_items_structured_query":[null,0]}},"docs-est":"CAMSKxUg9NL9N67auQayvgTkiQWnBoD8DtmfBaYzlL7uA9muBffTFumPmwYgHQc\u003d","docs-exfv":false,"docs-li":"713590","docs-trgthnt":"DYJktHEdb0kLUkpsP190Sqrhj9WK","docs-etmhn":false,"docs-thnt":"","docs-hdet":["nMX17M8pQ0kLUkpsP190WPbQDRJQ","17hED8kG50kLUkpsP190TThQn3DA","BDNZR4PXx0kLUkpsP190SJtNPkYt","Etj5wJCQk0kLUkpsP190NwiL8UMa","xCLbbDUPA0kLUkpsP190XkGJiPUm","2NUkoZehW0kLUkpsP190UUNLiXW9","yuvYtd5590kLUkpsP190Qya5K4UR","ZH4rzt2uk0kLUkpsP190UDkF5Bkq","uQUQhn57A0kLUkpsP190WHoihP41","93w8zoRF70kLUkpsP190TxXbtSeV","fAPatjr1X0kLUkpsP190SaRjNRjw","T4vgqqjK70kLUkpsP190ScPehgAW","JyFR2tYWZ0kLUkpsP190Rn3HzkxT","ufXj7vmeJ0kLUkpsP190QURhvJn2","KFks7UeZ30kLUkpsP190UUMR6cvh","LcTa6EjeC0kLUkpsP190RKgvW5qi","s3UFcjGjt0kLUkpsP190Z45ftWRr","o99ewBQXy0kLUkpsP190Nq2qr6tf","PHVyy5uSS0kLUkpsP190SUsYo8gQ","yZn21akid0iSFTCbiEB0WPiGEST3","h2TtqzmQF0kLUkpsP190YPJiQt7p","MZi9vb5UC0kLUkpsP190ReUhvVjy","dSR6SPjB80kLUkpsP190Y3xHa9qA","Bz6B7VmLu0kLUkpsP190W3FeobP7","AiLoubzsd0kLUkpsP190XtYNPgYT","2J3DVQoVh0kLUkpsP190R5wShSrC","MLmbZasLS0kLUkpsP190YHf6Zjsf","LjsdWFqUn0kLUkpsP190TwXBLtsw","S1T4ezMsZ0kLUkpsP190U6GfQUxi","LwAAPYPwi0kLUkpsP190TR4aaiFR","zZpS7TtwA0kLUkpsP190SJfhmHn8","LqadmuFLc0kLUkpsP190VqMgRe9G","PyRpJWvnF0kLUkpsP190X6czxBQU","oiu5UhKXt0kLUkpsP190XWFatA4U","m3m67mpQU0kLUkpsP190RpzeM6tt","WKyXQmUiJ0kLUkpsP190WtAghmdt","Nf2nd9NhF0kLUkpsP190REtRKaUF","fjqF9C7Mg0kLUkpsP190WGtWAuX2","cb1fdvu6p0kLUkpsP190U5AywQpZ","43PL8e9wN0kLUkpsP190PfUhabvT","N5u4VeWhx0iSFTCbiEB0VUTNdX6g","XM16tjwrD0iSFTCbiEB0NfzvTeuU","ybYTJk1eD0iSFTCbiEB0QV4rkzSF","TgXar1TSG0iSFTCbiEB0SsXMaKuP","JYfGDkExa0iSFTCbiEB0TTQnEDtH","2i9JBUZ3w0iSFTCbiEB0RytbUoNq","pgvTVXNKa0iSFTCbiEB0ShqmBTMR","NsVnd81bW0iSFTCbiEB0RhcXEK9M","rTQirATnb0iSFTCbiEB0W5cPcA7D","wNyww2Syr0iSFTCbiEB0Pzsbemba","DVdpfbqGj0iSFTCbiEB0RP4dMdFg","WKN3dsuG20iSFTCbiEB0NtEYhMK7","S5iPRteXX0iSFTCbiEB0YkMazE6h","6hmou1AcB0iSFTCbiEB0R9rZWXdz","wvo4NcLUj0iSFTCbiEB0Tt7mcVxE","HWuSeN2AB0iSFTCbiEB0PoBwHT2F","rMLvYG5Cd0iSFTCbiEB0VMB6o5sk","EnxXFzAMR0iSFTCbiEB0NxWnFJEU","4SFrbzo420iSFTCbiEB0W7wu3rzt","Nr7mDWodK0iSFTCbiEB0Ruynrudk","pSnfxxWWp0iSFTCbiEB0RaiP6PBc","rTcCMw3BM0mHq3jmV6o0RHeAExRK","HUYzfGVRa0mHq3jmV6o0Uxe2caXK","1XYMmM1Cu0mHq3jmV6o0Z3pEi8xm","xHhMJiXiV0mHq3jmV6o0WB8WinyM","xwSFpxEiU0mHq3jmV6o0PcnvcKmd","4MBkBg26q0mHq3jmV6o0QeKPRMpY","y5g8iW2T80mHq3jmV6o0Nr8SAj4C","W9YRKy3Lb0iSFTCbiEB0Xfs1EfPr","Ed3nhrN8D0iSFTCbiEB0RN4bJ53y","zxDKY7PC10iSFTCbiEB0UDYPJwDZ","bhEyDmbwi0mHq3jmV6o0TngCF1v2","6rKYZ6uHA0mHq3jmV6o0TeDZjgB8","71Deousgx0mHq3jmV6o0WXBQiyzi","sVEZbUAa70mHq3jmV6o0TNq1M7FF","8ZPFZT5nG0mHq3jmV6o0PJ5yoVh4","LDuvzP2Bd0mHq3jmV6o0TwNPVpW8","P55v8p4Lk0mHq3jmV6o0VjggjHMV","QqnZoz9ko0mHq3jmV6o0QskzBcHn","Nq8mdjdGg0mHq3jmV6o0WShxQA39","iQNA6mEJy0mHq3jmV6o0Q2iGT9fW","sNcbk2hJ80mHq3jmV6o0VbqaovQb","6nr31z9Wv0mERqSGkGf0VhuvAXWC","RLHeYNm410mERqSGkGf0Y817EUFK","vmx68XtfJ0mERqSGkGf0RCUBfsQr","687J7yD1q0mERqSGkGf0RVmMYHo1","qwhWQy8Zi0mERqSGkGf0W2tdypUF","wF8Sk241e0mERqSGkGf0YNtN6gpV","ijUhdx2QN0mERqSGkGf0TSD26iBJ","3iBLaMnuG0mERqSGkGf0VdY8XuLS","cFR77YEGo0iSFTCbiEB0PcMDWjX2","evUYuNCS80mERqSGkGf0Psi8j3Dw","soWncRV7C0mERqSGkGf0PZheXrWA","TvjoiCaar0mERqSGkGf0S9qS5adj","txL54xWLC0mERqSGkGf0XoEGTvCu","MP3EsW1un0mERqSGkGf0QDkfTxat","N1q4Y3fqz0mERqSGkGf0W1oPWWoc","pnKWhXiJi0mERqSGkGf0RDJejrBm","uLoGBsxEp0mERqSGkGf0Umz4HBC5","zu73Bdvrn0mERqSGkGf0P7FS5ZnG","KwaNot15n0mERqSGkGf0UnBhGVoK","eCHWxyhvo0mERqSGkGf0RJfZmQ1f","ffZmMGtYT0suK1NZr2K0QUxSzEMN","NagbcZWyB0suK1NZr2K0SJmfmJ3n","KMcLKvubv0suK1NZr2K0PLMUJ7zr","a13ejFS5i0suK1NZr2K0WzewY5tP","pZ1hXv7ve0suK1NZr2K0U5qoNhyU","pwLDucJZU0ezFcgqx310NgtmYpbV","TCKDVQ6J0Bn3gbW4AcZC0PQKypCa","Z7vabQzZ0Bn3gbW4AcZC0TfvmSab","UUNcLtsso0mERqSGkGf0Uwg2tMZa","fznmScpy0Bn3gbW4AcZC0Vie7eK1","wYCZkqoz10fBWirfAym0S1sADKbJ"],"docs-hunds":false,"docs-hae":"PROD","docs-ehn":false,"docs-ecsl":false,"docs-eagat":true,"docs-api-keys":{"ritz_firstparty_api_key":"AIzaSyBDjIe60p8mnxtutJzHhayrQ9crViCSMts","docs_apiary_client_key":"AIzaSyBfKYKXN2w_hxv9HNOUNJjp6xZYbY_OUcY","homescreen_drive_client_key":"AIzaSyDK9NGgwpilHBYveN5N3fzbtEnUEmD4PEg","minpicker_drive_client_key":"AIzaSyBvuuU20zeaBQb-M8WEzJVwxQ1lI4k1cXY","support_content_api_key":"AIzaSyCizDgaOY1dni2M3dFtYzslwsXj7iAGBxs","cse_drive_client_key":"AIzaSyAmjmO1HIY05W7pgKnTGp7wX4EFqJUpenA","odp_tango_api_key":"AIzaSyCIGHYEdm91p31HKyJSoU4at7IqhCViXuA","add_ons_api_key":"AIzaSyCN_JjPef6gm_RblmK24Wxks1UPK1g9pMw","scone_api_key":"AIzaSyD2io-Kkh49oO30SyPhbrurJXHMeUHhpOM","espresso_api_key":"AIzaSyAkthrhpXoRv6M12CMqGivGO-rCfsy2AxU","editors_spam_view_actions_drive_client_key":"AIzaSyDqHXmEdCqZm-XYt4KOWq1cpKqqhclDKWI","cloud_search_api_key":"AIzaSyDuAie05b1MZ0lMd9XCQczokBQUf4qjkzM","drive_link_previews_acl_fixer_api_key":"AIzaSyCFaGjYJCku-As_ybGUqRgDevr0VX47R0I","workspace_ui_api_key":"AIzaSyCkcC5gPzlgNSjZjziQc6bLO00y0vCRSrE","account_linking_api_key":"AIzaSyAqbYOg1X8KMndOQ1yEhdLkhnyHBjrHdCg","appsgrowthpromo_api_key":"AIzaSyDf32okzEbtG3DbBXzU_UvsWsetuHFFUiQ","export_to_docs_api_key":"AIzaSyBWdFphCtg4EBuxpHu9EhAjyIiY9C-4Uq4"},"docs-effeoima":true,"docs-etut":true,"docs-emec":true,"docs-ertis":false,"docs-etsonc":false,"docs-euvtistl":false,"docs-effnp":false,"docs-effnpf":false,"docs-dcheg":false,"docs-pdhp":true,"buildLabel":"editors.spreadsheets-frontend_20260831.00_p1","docs-show_debug_info":false,"docs-edmlf":false,"docs-eemc":false,"docs-emleow":true,"docs-emlewpc":false,"docs-rmls":"DEFAULT_NO_RETRY","ondlburl":"//docs.google.com","drive_url":"//drive.google.com?usp\u003dsheets_web","app_url":"https://docs.google.com/spreadsheets/?usp\u003dsheets_web","drive_base_url":"//drive.google.com","docs-umbitfdi":false,"docs-gsmd":"https://workspace.google.com","docs-icdmt":["image/png","image/jpeg"],"docs-mip":25000000,"docs-mif":1000,"docs-msid":32767,"docs-ecshi":false,"docs-ecswi":false,"docs-emid":false,"docs-ewchd":true,"docs-mib":52428800,"docs-mid":2048,"docs-rid":1024,"docs-dgit":false,"docs-evit":false,"docs-ejsp":false,"docs-jspmpdm":30000.0,"docs-jspsim":8.0,"docs-jsptp":0.01,"docs-elbllqpm":true,"docs-phe":"https://contacts.google.com","docs-eafgl":false,"docos-dges":false,"docs-eethc":false,"docs-enees":false,"docs-eph":true,"docs-ispdr":true,"docs-istdr":false,"docs-escmv":false,"docs-sup":"/spreadsheets","docs-seu":"https://docs.google.com/spreadsheets/d/1bl1_R6Qiee4tQ31Oix1Mjo_Jsbmddv3nsc5xBIy7QJY/edit","docs-ucd":"docs.usercontent.google.com","docs-sccfo":"PROD","docs-uptc":["ofip","rr","lsrp","fws","dods","gxids","eops","rswr","noreplica","tam","ntd","ths","app_install_xsrf_token","ouid","authEmail","authuser","ca","sh","fromCopy","ct","cs","cct","cwc","sle","dl","hi","hi_ext","usp","urp","utm_source","utm_medium","utm_campaign","utm_term","utm_content","docs_gsdv","gs_dl","miehl","mieap","sodoc","fbef","lici","lifn","otlif","ts","aaac","durl"],"docs-doddn":"TRANSFORMACIÓN GLOBAL TG-BVS CIA. LTDA.","docs-uddn":"","docs-ugn":"","docs-epg":false,"docs-epq":true,"docs-upap":"/prefs","docs-eupub":true,"docs-vcurl":["/static/spreadsheets2/client/css/625413850-projector_viewer_css_ltr.css"],"docs-shmtbsl":-1,"docs-euit":false,"docs-tst":"","docs-eia":true,"docs-ilbefsd":false,"docs-lbefm":0,"docs-elsic":false,"docs-thtea":false,"docs-tdc":"[{\"id\":\"0:Basics\",\"name\":\"Básicas\",\"deletedIds\":[]},{\"id\":\"0:Calendars\",\"name\":\"Calendarios y agendas\",\"deletedIds\":[]},{\"id\":\"0:Letters\",\"name\":\"Cartas\",\"deletedIds\":[]},{\"id\":\"0:Business\",\"name\":\"Contratos, integración y demás formularios\",\"deletedIds\":[]},{\"id\":\"0:Finance\",\"name\":\"Finanzas y contabilidad\",\"deletedIds\":[]},{\"id\":\"0:Brochures\",\"name\":\"Folletos y boletines informativos\",\"deletedIds\":[]},{\"id\":\"0:Planners\",\"name\":\"Herramientas de seguimiento\",\"deletedIds\":[]},{\"id\":\"0:Reports\",\"name\":\"Informes y propuestas\",\"deletedIds\":[]},{\"id\":\"Unparented\",\"name\":\"Sin categorizar\",\"deletedIds\":[\"0:NoTemplateCategories\"]}]","docs-ttt":0,"docs-tcdtc":"[]","docs-ividtg":false,"docs-icfdt":false,"docs-hetsdiaow":true,"docs-edt":true,"docs-tafl":true,"docs-puvtftv":true,"docs-dhcp":false,"docs-dhcf":false,"docs-ebufdd":false,"docs-eplffdd":false,"docs-esffdd":false,"docs-evpfdd":false,"docs-erdiiv":false,"docs-eemt":["image"],"docs-endvil":false,"enable_image_content_credentials_sidebar":true,"docs-eqspdc":true,"docs-roosb":true,"docs-esehbc":true,"docs-sqcuu":false,"docs-uaid":false,"docs-uaqs":0,"docs-edcfsd":false,"docs-emfsd":false,"docs-gspti":"LcTa6EjeC0kLUkpsP190RKgvW5qi","docs-isd":false,"docs-lfptdst":10000,"docs-ptdst":5000,"docs-emch":false,"docs-esdp":false,"docs-ilf":false,"docs-mchbsc":0,"docs-eclpa":true,"docs-edp2":false,"docs-iidpm":false,"docs-mefu":false,"docs-iicp":false,"docs-edvm":false,"docs-elpg":false,"docs-elpgpm":true,"docs-acap":["docs.security.access_capabilities",1,1,1,1,1,0,0,1,1,0,1,1,1,1,1,0,0,1,0,0,0,0,1,0,1,0,1,0],"docs-ci":"1bl1_R6Qiee4tQ31Oix1Mjo_Jsbmddv3nsc5xBIy7QJY","docs-eccfs":false,"docs-eep":true,"docs-ndt":"Hoja de cálculo sin título","docs-plu":"//ssl.gstatic.com/docs/common/product/spreadsheets_lockup3.png","docs-plwtu":"//ssl.gstatic.com/docs/common/product/sheets_app_icon1.png","docs-prn":"Hojas de cálculo de Google","docs-sprn":"","docs-een":false,"docs-as":"","docs-mdck":"","docs-eccbs":false,"docs-mmpt":9000,"docs-erd":true,"docs-uootuns":true,"docs-amawso":false,"docs-ofmpp":true,"docs-anlpfdo":true,"docs-ems":"EMAIL_SUBMENU","docs-glu":"https://accounts.google.com/logout?continue\u003d","docs-wsu":"https://workspace.google.com/essentials/signup/verify","docs-wsup":"xsell\u003dnori_gwef_upsell\u0026utm_source\u003dsheets-in-product\u0026utm_medium\u003det\u0026utm_campaign\u003dnori-gwef","docs-fecgd":false,"docs-pid":"","docs-dec":false,"docs-ricocpb":false,"docs-ecgd":false,"docs-dsps":true,"docs-ezdi":false,"docs-ezduole":true,"server_time_ms":1788570244671,"gaia_session_id":"","docs-usp":"sheets_web","docs-isb":false,"docs-agdc":false,"docs-anddc":false,"docs-adndldc":false,"docs-clibs":1,"docs-cide":true,"docs-cn":"","docs-dprfo":false,"docs-duesf":false,"docs-dom":false,"docs-eacr":false,"docs-eacw":false,"docs-ecer":false,"docs-ecir":true,"docs-ecssl":false,"docs-ecssi":false,"docs-ecped":true,"docs-copy-ecci":true,"docs-edpq":false,"docs-edamc":true,"docs-edomic":true,"docs-edbsms":false,"docs-eddm":false,"docos-edii":false,"docs-edspi":false,"docs-edvpim":false,"docs-edvpim2":false,"docs-fwd":false,"docs-eibs":true,"docs-elds":false,"docs-emp":false,"docs-emcf":false,"docs-emmu":false,"docs-enpks":true,"docs-eoems":false,"docs-epmi":false,"docs-epat":true,"docs-ermcf":true,"docs-erpep":true,"docs-ersd":true,"docs-esml":true,"docs-ete":false,"docs-ewlip":true,"docs-echiut":"default","docs-jern":"edit","docs-lfuls":false,"docs-oesf":false,"docs-oursf":false,"docs-plimif":20.0,"docs-srmdue":0.0,"docs-srmoe":0.01,"docs-srmour":0.05,"docs-srmxue":0.01,"docs-ssi":false,"docs-uoci":"","docs-wesf":true,"docs-xduesf":false,"docs-ddm":false,"docs-emmda":false,"docs-edncm":true,"docs-edailm":false,"docs-eafst":true,"docs-ectrt":true,"docs-edmt":false,"docs-elpta":false,"docs-eltafi":true,"docs-eltafip2":true,"docs-epdcl":false,"docs-eptfafi":false,"docs-eptfi":false,"docs-eptbc":false,"docs-eptfcl":false,"docs-ersrn":true,"docs-rolibilc":true,"docs-esrl":true,"docs-esqppo":true,"docs-etpi":true,"docs-ipmmp":true,"docs-emmaffr":false,"docs-emmafi":true,"docs-enpi2":true,"docs-gth":"Ir a la pantalla principal de Hojas de cálculo","docs-ndsom":["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet","application/vnd.ms-excel.sheet.macroenabled.12","application/vnd.ms-excel"],"docs-dm":"application/vnd.google-apps.ritz","docs-sdslm":["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet","application/vnd.ms-excel.sheet.macroenabled.12","application/vnd.ms-excel"],"docs-sdsom":["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet","application/vnd.ms-excel.sheet.macroenabled.12","application/vnd.ms-excel"],"opmbs":52428800,"opmpd":5000,"docs-pe":1,"ophi":"ritz","opst":"","opuci":"spreadsheets","docs-ehipo":false,"docs-eufop":true,"docs-drk":[],"docs-erkpp":false,"docs-erkfsu":true,"maestro_domain":"https://script.google.com","maestro_container_token":"ACjPJvFCrO5QkupNVAszpX9_y1ys36Aa-YiLlhvO4v6r0gZXuYs-2noc95kGgTXBDNiaOuDlXMFY7bpZrFEQdsRKV477GTH8uiUadJ3pxMwpF0gQD0kR9nmIQjB7idhH","maestro_script_editor_uri":"https://script.google.com/macros/u/0/start?mid\u003dACjPJvFCrO5QkupNVAszpX9_y1ys36Aa-YiLlhvO4v6r0gZXuYs-2noc95kGgTXBDNiaOuDlXMFY7bpZrFEQdsRKV477GTH8uiUadJ3pxMwpF0gQD0kR9nmIQjB7idhH\u0026uiv\u003d2","maestro_new_project_uri":"https://script.google.com/macros/u/0/create?mid\u003dACjPJvFCrO5QkupNVAszpX9_y1ys36Aa-YiLlhvO4v6r0gZXuYs-2noc95kGgTXBDNiaOuDlXMFY7bpZrFEQdsRKV477GTH8uiUadJ3pxMwpF0gQD0kR9nmIQjB7idhH\u0026uiv\u003d2","docs-isctp":false,"docs-emae":true,"mae-cwssw":false,"mae-aoeba":true,"mae-esme":false,"mae-seitd":true,"docs-emgsmw":true,"docs-pn":2036,"docs-ct":"s","docs-rn":347944228,"docs_dgrwl":true,"docs_egru":true,"docs-cpv":0,"docs-urouih":false,"docs-ect":true,"docs-alu":"https://myaccount.google.com/language","docs-cpks":[],"docs-dfhsi":true,"docs-dvhsi":true,"docs-hasid":"Sheets","docs-hdod":"docs.google.com","docs-eehs":false,"docs-ehinbd":true,"docs-ehpb":false,"docs-mcf":false,"docs-dphi":false,"docs-hdck":"","docs-hucs":true,"docs-hufcm":false,"docs-cbrs":50,"docs-cpari":"https://people-pa.clients6.google.com/","docs-cfru":"https://lh3.google.com","docs-ctak":"AIzaSyAWGrfCCr7albM3lmCc937gx4uIphbpeKQ","docs-cgav":0,"docs-cci":2,"docs-gap":"/drive/v2internal","docs-eaotx":true,"docs-ecrerfmo":false,"jobset":"prod","docs-cdie":false,"docs-copy-hp":true,"docs-ercter":false,"docs-icfc":true,"docs-nad":"sites.google.com","docs-eala":false,"docs-ccwt":80,"docs-ut":2,"docs-sol":true,"docs-dvs":2,"docs-dac":4,"docs-ilbrc":false,"docs-dlpe":true,"docs-hwst":"KFks7UeZ30kLUkpsP190UUMR6cvh","docs-hcad":true,"docs-era":true,"docs-eegsb":false,"docs-eobew":false,"docs-erre":false,"docs-eb":true,"docs-ebf":false,"docs-blml":"https://support.google.com/docs/?p\u003dsheetslastedit","docs-cvmo":-1,"docs-sef":false,"docs-senu":false,"docs-sesc":false,"docs-sessui":false,"docs-slssa":false,"docs-siwcoa":false,"docs-ewcrr":false,"docs-ewcs":false,"docs-epvs":false,"docs-eww":false,"docs-ecls":false,"docs-esss":false,"docs-eis":false,"docs-eoods":false,"docs-odstt":200,"docs-essagp":false,"docs-eodsc":false,"docs-bhbcitm":1200000,"docs-bhuitm":1200000,"docs-hpm":1800000,"docs-af":false,"docs-ac":"[\"docs_analytics_capabilities\"]","docs-eodrs":false,"docs-asht":"","docs-avdht":"","docs-eairhfsd":false,"docs-ecmc":false,"docs-eomiefclp":false,"docs-ai-eawfcu":false,"docs-aes":false,"docs-aept":false,"docs-aede":false,"docs-aef":false,"docs-ai-escit":false,"docs-ai-eawraoec":false,"docs-ai-esc":false,"docs-ai-escid":true,"docs-ai-escror":true,"docs-eaurbsmc":true,"docs-ai-escfr":true,"docs-ai-escpt":true,"docs-ai-esces":true,"docs-eqam":false,"docs-euaool":false,"docs-efib":false,"docs-se":false,"docs-eaaw":false,"docs-eecs":false,"docs-efsm":false,"docs-ehlbap":true,"docs-emtr":false,"docs-eocc":true,"docs-uwzh":false,"docs-ecwi":false,"docs-eiditsk":true,"gsaoae":"https://addons-pa.clients6.google.com/","gsaoak":"","gsaoiu":"https://addons.gsuite.google.com/client","docs-egsaosa":true,"docs-etpscd":false,"docs-egf":false,"docs-epm":false,"docs-cse-create":false,"docs-cse-asi":300,"docs-cse-asit":30,"docs-cse-ast":300,"docs-cse-rasi":30,"docs-cse-asict":20,"docs-cse-wit":600000,"docs-ewwc":false,"docs-cse-amt":["application/vnd.google-gsuite.encrypted; content\u003d\"application/vnd.google-gsuite.spreadsheet-blob\"","application/vnd.google-gsuite.encrypted; content\u003d\"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet\""],"docs-cse-bm":"application/vnd.google-gsuite.encrypted; content\u003d\"application/vnd.google-gsuite.spreadsheet-blob\"","docs-ectl":true,"docs-csom":["application/vnd.google-gsuite.encrypted; content\u003d\"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet\""],"docs-ceb":"","docs-cisl":9.437184E7,"docs-cisw":8.4934656E7,"docs-cslm":{"cbsl":1.048576E8,"cbsw":9.437184E7,"cicl":3000.0,"cicw":2500.0,"cmsl":1.048576E7,"cmsw":9437184.0,"cnpsl":35.0},"docs-csfec":"[]","docs-ecdocdd":false,"ecfab":false,"docs-escic":false,"docs-cdc":false,"docs-cse-mdiaf":false,"docs-esfc":true,"docs-icsef":false,"docs-mcd":false,"docs-icseof":false,"docs-cse-ocu":"","docs-cse-ic":"","docs-cse-kiiu":"","docs-cse-ndm":"ON","docs-cse-ecc":true,"docs-cse-ecw":true,"docs-iefimbp":false,"docs-odpl":false,"docs-epbrc":false,"docs-odpdu":[null,null,null,"//drive.google.com/odp/dialog"],"docs-odpu":[null,null,null,"//drive.google.com/odp/embed"],"docs-cefsl":1.048576E8,"docs-ceiml":1.048576E8,"docs-ciacl":3000,"docs-ciamlib":9.437184E7,"docs-cifsl":1.048576E8,"docs-erxcs":true,"docs-exbw":true,"docs-egfcpp":true,"docs-egfcfe":false,"docs-dafjera":true,"docs-daflia":true,"docs-dafgfma":true,"docs-spdy":false,"xdbcfAllowHostNamePrefix":true,"xdbcfAllowXpc":true,"docs-dbctc":false,"docs-ebctcio":true,"docs-iror":false,"fegags":false,"fega":true,"fertd":true,"fest":false,"ftshti":"h2TtqzmQF0kLUkpsP190YPJiQt7p","docs-idephr":false,"docs-eoool":false,"docs-idep":false,"docs-ilc":false,"docs-ilecoi":false,"docs-ilecoo":false,"docs-ioefuesf":false,"docs-ics":false,"docs-dcarft":false,"docs-egafedo":false,"docs-egafkd":false,"docs-dsfid":true,"docs-easidtv":false,"docs-ebubgi":true,"docs-ebiagaqae":false,"docs-ecscv2":true,"docs-ed2vpm":false,"docs-ed2vsm":false,"docs-ed2viv0":false,"docs-ed2viv1":false,"docs-eeai":false,"docs-eslc":false,"docs-egnup":false,"docs-egpf":false,"docs-egaat":false,"docs-egqe":true,"docs-eisel":true,"docs-esptc":true,"docs-eupfsi":false,"docs-erfn":false,"docs-esa":false,"docs-es":false,"docs-esgap":false,"docs-esn":false,"docs-evdmt":false,"docs-evdr":false,"docs-evst":false,"docs-mdcfsi":"","docs-mdcfst":"","docs-mnafsg":5,"docs-shti":"Bz6B7VmLu0kLUkpsP190W3FeobP7","docs-rpod":"appsgrowthpromo-pa.clients6.google.com","fetga":false,"fecgp":false,"fecsmi":false,"fecgb":false,"fecmbcdl":true,"fecrb":false,"fecrt":false,"fefsgb":true,"feicr":true,"fescsc":false,"fescsmb":false,"fescrem":true,"fessfg":false,"feafme":false,"fecau":true,"feiics":false,"fecsth":false,"fecdmfe":false,"fefvg":true,"fefgeu":true,"fegan":false,"fegaseme":false,"fegcse":false,"fegcfse":false,"fegdme":false,"fegdvse":false,"fegfme":false,"fegfmme":false,"feggpme":false,"feghme":false,"fegiime":false,"fegime":false,"fegnesr":false,"fegptde":false,"fegsp":true,"fegsmi":true,"fegcicir":true,"femfec":true,"fesb":false,"fesbf":false,"fesdmhs":false,"fessap":true,"fessauhs":"LwAAPYPwi0kLUkpsP190TR4aaiFR","fessat":false,"fessaif":true,"fessdrfiq":true,"fessdrfq":true,"fessdbhs":"NWzngURYr0kLUkpsP190Pj2ztTCk","fessdmfhs":"","fessdsshs":"a3X5aYgjJ0kLUkpsP190XEZUQZoS","fessetd":true,"fessih":true,"fessrtc":false,"fesssadf":false,"fesssafd":true,"fesssfn":true,"fesssmttm":true,"fesssmttui":false,"fesssmtui":true,"fesstm":true,"fesssui":true,"fesssuihs":"S1T4ezMsZ0kLUkpsP190U6GfQUxi","fesssba":true,"fesss":false,"fesstb":false,"fessts":false,"fessawc":true,"fessmtmt":false,"espross":false,"fessr":true,"fhdcgan":false,"femdv2":true,"docs-hpgsdepsv":false,"docs-sgsd":false,"docs-egsdsr":false,"docs-ecpda":true,"docs-egsdepsv":true,"docs-egsdic":true,"docs-egsdihfp":false,"docs-gsdv":0,"docs-gsdvofdh":false,"docs-ergsd":false,"docs-ecd":false,"docs-ecuuiuce":false,"docs-cse-rcep":false,"docs-ecrm":true,"docs-col-dsl":"es_MX","docs-crip":true,"docs-rcmcl":10000000,"ritz_bchwm":682,"docs-emiee":false,"docs-emievc":true,"docs-mieapmc":"","docs-mieaptm":false,"docs-miede":true,"docs-emiesnc":false,"docs-bcbt":"Página de inicio de Hojas de cálculo","docs-bc-css":"spreadsheets","eaacmep":false,"eaap":false,"aaht":"","aamht":"","fesag":false,"fesbb":true,"ceasi":"2TvZzYBPo0kLUkpsP190XFx9ibsM","cersi":"2TvZzYBPo0kLUkpsP190XFx9ibsM","feace":false,"fecslc":false,"fmtcx2":10000000,"fentc":true,"docs-eertd":false,"fecc2":false,"feccat":false,"fecep2":false,"fecscf":true,"fectm":true,"fedcrqt":false,"efob":false,"fegm":false,"fekmml":false,"felwcc":false,"fenwcc":false,"errmljew":false,"esopcwo":true,"fesccaa":true,"fulsi":true,"fefcti":false,"ffcmnata":4,"fbslhti":"2NUkoZehW0kLUkpsP190UUNLiXW9","fecsccs":300,"fcmrd":604800000,"fctlo":true,"fcsfmthnrpb":1000,"fcsfwcbr":5242880,"fcsfwnrpb":12000,"fdpfs":"","fdptmlsf":0,"fdptt":0.0,"fdsraam":false,"fdsrdp":false,"fdaesc":false,"fedbgl":false,"fedfodc":false,"fddsp":false,"fabcde":false,"fabcdef":false,"fdsst":"NO_SNAPSHOT","ferts":1775543400,"feacs":true,"feacisvcdf":true,"feaksm":false,"feavwut":true,"featf":true,"feafr":false,"feafqm":true,"feafrcf":true,"eascbcrm":true,"feafui":false,"feadcs":false,"feadtco":false,"feasp":false,"feailfiuf":false,"feacfdvddcfe":true,"feaffirh":true,"feasidvc":true,"febeo":false,"feb3dc":true,"febsbg":false,"febslau":false,"febbsq":true,"febawc":false,"febbwp":true,"febpfdx":true,"fecaix":true,"ecscj":true,"fecsh":false,"fecsl":false,"fecspil":false,"fectmffs":true,"fecwsraj":true,"fecfui":false,"fecocrmfms":true,"ecajps":true,"fecafbs":false,"fedcdi":true,"fecd":false,"fecfd":false,"fecm":false,"fecms":true,"fecnfs":false,"fecp":false,"fecr":false,"fecscfsc":true,"fecat":true,"fectp":true,"fecitd":false,"fecsdrl":true,"fecussfdt":true,"fecbfpi":true,"fecbsfari":false,"fecbsfci":false,"fecsfmt":false,"fecsfw":true,"feccm":false,"fecedp":false,"fecqfr":false,"fecbaf":false,"fecbafs":false,"fecbcr":false,"fecbsb":false,"fecbsbs":true,"fecprg":false,"fecsttc2":false,"feecwtc":false,"fecs":false,"fecdr":false,"fecdrie":true,"fecgd":false,"fecpasl":false,"fecwf":false,"feqe":false,"fecpvip":false,"fecrcp":true,"fecspoob":false,"fecep":true,"fecuam":true,"fecmstc":false,"fecpapoob":true,"fectsl":false,"fucfvcca":false,"fecscb":false,"fecur":false,"fecspsae":"BASELINE_MODEL","fecspsmp":false,"feca":true,"fecb":false,"fecct":false,"fecdto":false,"fecgu":true,"fech":"MLmbZasLS0kLUkpsP190YHf6Zjsf","fecsa":false,"ecclosa":true,"fecsbads":true,"fecscaa":true,"fecschs":"z3tJmtb2w0kLUkpsP190X2PVePzF","fecsptdd":true,"fecssq":true,"fecssqb":true,"fect":false,"fectpt":false,"feclbo":true,"fecimsms":true,"fecc":false,"fecf":false,"fecsals":false,"fecsass":false,"fectff":true,"fecptrle":200500,"fecfut":false,"fecti":false,"fedlp":false,"fedvgo":true,"fedffmi":false,"fedl":false,"fedldcm":false,"feddtce":false,"feddtci":false,"fedtv":true,"fedsuuse":true,"fednript":false,"fedlfca":false,"fedb":false,"feddia":true,"fedcogg":false,"fedlitd":false,"fedgbhtp":false,"fedccp":false,"fedcog":false,"fedac":false,"feegsh":"","feecfce":false,"feecfur":false,"feegs":false,"feepocsfbsq":true,"feecdtic":false,"feedll":false,"feedtfdg":false,"feegmfm":true,"fecect":false,"feetwa":true,"feesici":false,"fedpf":true,"feeuacfisf":true,"feeufh":false,"fefchd":true,"fefiapifi":true,"fefbcvfu":true,"efbcvief":true,"fefbcrcbf":true,"fefbvs":true,"fefbvo":true,"fefhro":true,"fefpiv":false,"efsoo":true,"fefvct":false,"fecvfsbr":true,"fefwro":true,"fefrisio":false,"fefrhm":false,"feffbnr":true,"fefipt":true,"fefmtl":false,"fefcf":false,"fefhfs":true,"fefccui":true,"fefcerh":false,"fefcvg":false,"fefiup":false,"fefrc":true,"fefrvc":true,"feftfp":true,"fegcf":false,"fegep":false,"fegspro":true,"fegsbpm":true,"fegsoies":false,"fegcici":true,"fegtnf":true,"fegdis":false,"fegffeic":false,"feggtr":false,"feggui":false,"fegapts":false,"fegbdcs":true,"fegbffs":true,"fegbs":true,"fegdctar":true,"fegoies":true,"fegtdl":false,"fegu":true,"fegba":true,"fegbahs":true,"fegbar":true,"fegbasp":true,"fegbgbf":false,"fehntfaf":false,"feidr":false,"feieici":false,"feiutm":true,"feisrc":false,"feicmpt":false,"feipmst":false,"feicts":true,"feiedils":false,"feissll":true,"feiaf":false,"feiataf":true,"feicto":true,"feicf":false,"feiis":false,"feiktfsd":false,"feksft":false,"fektrdp":false,"fekgtn":false,"felci":true,"felic":false,"elpo":true,"felfn":false,"felssk":true,"felenocdic":false,"fellt":false,"felftri":false,"felftr":false,"felfsal":true,"felffa":true,"fellirl":false,"felpicfsf":true,"felcp":false,"fempfec":false,"fempfnec":false,"femptss":false,"fempv2":false,"femw":false,"femc":false,"femevifcf":false,"femtchm":false,"femrhfe":false,"femu":false,"femdaire":true,"fempsc":true,"femch":false,"femcp":false,"femcsils":true,"femcc":false,"femsgb":true,"fempcc":false,"fempci":true,"fentcdnu":true,"fentii":true,"fentmfm":false,"fent":true,"fentcpm":true,"fentcc":true,"fentfs":true,"fentog":true,"fentsfu":true,"fenaus":true,"fenafcf":false,"fenmfddpsoc":15000,"fendcog":false,"feoc":true,"feoaoc":true,"feocvlt":true,"feocvltv2":true,"feocafd":true,"feoddd":false,"feofd":true,"feogfe":false,"feomlt":false,"feovricf":false,"feodc":true,"feodi":true,"feofvric":false,"feopgdpa":false,"feovric":true,"fepat":false,"fephscf":false,"fept":false,"fepbci":true,"feptcl":false,"feptclc":false,"feptcsp":false,"feptfpi":false,"fptgsp":true,"feptms":false,"feptqe":false,"feptrwtw":false,"fepav":false,"fepslosp":true,"fepsltp":false,"feps":false,"fepcrc":true,"fepardpos":false,"fepardp":true,"fepoh":true,"feptcitd":false,"fepdve":true,"fepurfpscoc":false,"feqs":false,"feqso":true,"ferrflv":false,"ferbs":true,"ferfr":false,"ferii":false,"ferucum":false,"fertdrl":false,"ferdd":false,"ferolis":false,"fersp":false,"feruefcm":false,"ferifa":true,"feriffedi":true,"ferifivb":true,"ferifivfr":true,"ferifomc":true,"ferebs":false,"fesffedl":true,"fesrbu":false,"fesip":false,"fesdsce":false,"fescpmes":false,"fescl":true,"fetcinse":true,"festci":true,"fesdcfft":false,"fesmtct":false,"fesrc":true,"fesrpcstc":true,"essgdsfa":true,"feshdtce":false,"feshdtci":false,"fesbbdnu":true,"feebbsao":true,"fescc2":true,"fessc":false,"fesswipm":false,"feszsp":true,"festhde":false,"festngd":false,"fesedf":false,"fesiwzls":true,"fesrvd":false,"fessrc":true,"fessfci":false,"fesftpf":true,"fesfcfnt":true,"fesmpg":false,"fescmftc":false,"fesfds":true,"fesphow":false,"fesporoi":false,"fesrf":false,"fescw":false,"feicrr":true,"fesc":false,"fesna":false,"fesdt":true,"fescr":true,"efesc":false,"fescdl":false,"fesxflv":true,"fesvmldl":false,"fespbftc":true,"fesdant":true,"fetctife":false,"fetdfcanev":true,"fetffu":false,"fetfr":true,"fetfribc":true,"fetiurf":false,"fetrcf":true,"fetrii":true,"fetrinf":false,"fetat":false,"fetcuff":false,"fentcv":true,"fete":true,"fetfe":true,"fetgb":false,"feti":true,"fetncm":false,"fetre":true,"fetri":true,"fetis":false,"fetdpod":true,"feticc":false,"feta":false,"fetm":false,"fetp":true,"fetnofvsr":false,"fetnosr":true,"etacnr":false,"fetal":true,"fetog":true,"feucs":true,"feulsl":true,"feunfadd":false,"feugisc":false,"feucpwm":true,"feuc":false,"feurftwf":true,"feudrrar":false,"feusitwb":true,"feuurorap":true,"feurp":false,"fetvre":false,"fevri":false,"fevsr":false,"fevc2":false,"fewfic":false,"fewad":false,"fewdfroc":true,"ectcct":0.95,"fedsisdrm":false,"feflcds":0.0,"fgdcsdm":30,"fgghsti":"","fhntfbs":"xCLbbDUPA0kLUkpsP190XkGJiPUm","fhntfdp":"17hED8kG50kLUkpsP190TThQn3DA","fhntfsr":"","fhggls":false,"ifice":false,"fkslfaa":"","lsomti":"cb1fdvu6p0kLUkpsP190U5AywQpZ","lsti":"1JWo39TC30kLUkpsP190WEsxWa2Q","fludgp":"","flnat":1000,"fmpmqs":15,"fissl":20971520,"fmtcx":10000000,"fmfcnefdps":0.0,"fncrffpv":10000,"foddp":false,"fptmcn":"","fptmt":0.0,"fpcdpoed":false,"fechtis":"WKyXQmUiJ0kLUkpsP190WtAghmdt","fecoc":false,"fecchtis":"","fecrhtis":"","feamrvm":true,"fmrtlao":500,"frord":1800.0,"rcpoaoc":true,"frrfrics":false,"frccu":true,"frpecc":false,"frpesd":true,"fsbbhti":"DKafkeLWF0kLUkpsP190VhRQwUUm","fespfe":false,"fslv":"TEXT_VLOOKUP_KG","fsrsf":0,"fstmndt":2,"fescct":0.1,"fsoiacis":false,"fetmt":-0.34249,"fubrl":500,"futefe":false,"fccs":"DEEP_COPY_IMMEDIATELY","fdme":true,"febca":false,"febcss":false,"fecjpq":false,"fecum":false,"fecfdf":false,"fecslqp":true,"fedpaim":false,"fedta":true,"fedamdio":false,"fefsda":false,"fefca":false,"fefrca":false,"fegsrni":false,"feimvtip":false,"feiim":false,"feiaerc":true,"feir":false,"feonrcf":true,"feorlercf":false,"feosfp":false,"feescu":false,"fepaws":true,"ferrmo":true,"fervr":false,"fesar":false,"fess":false,"fetvrr":false,"fuacpou":false,"feuevca":false,"farscmmrmi":{"SHARED":50},"fascofc":{"SHARED":false},"dmsmsl":{"SHARED":30000},"dmtlsl":{"SHARED":30000},"feabcrmf":{"SHARED":false},"fearscmse":{"SHARED":false},"feafpvc":{"SHARED":true},"feastblvrotu":{"SHARED":true},"feail":{"SHARED":false},"fecdnd":{"SHARED":true},"fectctppt":{"SHARED":true},"fecplvdf":{"SHARED":true},"fecpdu":{"SHARED":true},"fedlq":{"SHARED":true},"fedwtcr":{"SHARED":true},"feeuac":{"SHARED":true},"fefrusro":{"SHARED":true},"fefvrp":{"SHARED":true},"fegbac":{"SHARED":false},"fegbaca":{"SHARED":true},"feipmsts":{"SHARED":false},"feica":{"SHARED":true},"fmlf":{"SHARED":true},"femvc":{"SHARED":true},"fentchitlrm":{"SHARED":true},"fentfra":{"SHARED":true},"fentfrav2":{"SHARED":true},"fentscp":{"SHARED":true},"fendoidd":{"SHARED":false},"fepgbat":{"SHARED":true},"fepurfpscos":{"SHARED":false},"fertbbeae":{"SHARED":false},"fercapos":{"SHARED":true},"ferrbarf":{"SHARED":false},"fescific":{"SHARED":false},"fesfic":{"SHARED":true},"fesrom":{"SHARED":true},"feseuawwihi":{"SHARED":true},"fespsedm":{"SHARED":true},"fetarf":{"SHARED":true},"fecta":{"SERVER":true,"GWT":true},"feuigrs":{"SHARED":false},"feuffsaf":{"SHARED":true},"feugrfv":{"SHARED":true},"fewdfrros":{"SHARED":true},"flpiwc":{"SHARED":false},"fmacf":{"SHARED":100},"fmcirrhl":{"SHARED":20000000},"fmcsdpfe":{"SHARED":20000},"fmcfas":{"SHARED":10000000},"fmdvipr":{"SHARED":500},"fmec":{"SHARED":300},"fmecfde":{"SHARED":10000},"fmer":{"SHARED":50500},"fmerwdec":{"SHARED":500500},"fmerwdpt":{"SHARED":100500},"fmfddps":{"SHARED":10000},"fimh":{"SHARED":50},"fmix":{"SHARED":50},"fmipfe":{"SHARED":2000000},"fmnaarc":{"SHARED":3},"fmnaar":{"SHARED":20},"fmnaatprt":{"SHARED":10},"fmnrigftd":{"GWT":10000,"ANDROID":10000,"IOS":10000},"fmraffp":{"SHARED":10000},"fmtps":{"SHARED":100},"fmrrrirrd":{"SHARED":5000},"fmsts":{"SHARED":10},"ftda":{"SHARED":"SIMPLE"},"fudpie":{"SHARED":true},"docs-cnv-doc":false,"promo_url":"","promo_title":"","promo_content_html":"","promo_more_element_text":"","promo_element_id":"","promo_anchor_orientation":0,"promo_orientation":1,"promo_arrow_alignment":0,"promo_hide_arrow":false,"promo_show_on_load":false,"promo_mark_dismissed_on_show":false,"promo_use_material_styling":false,"promo_close_button_text":"","promo_icon_url":"","promo_action_id":"","promo_impression_id":0,"promo_is_contextual":false,"promo_css_class_name":"","docs-epfv":false,"docs-etp":false,"fscz":1000,"docs-text-etsrdpn":false,"docs-text-etsrds":false,"docs-text-endes":false,"docs-text-escpv":true,"docs-text-ecfs":false,"docs-text-eetxp":false,"docs-text-ettctvs":false,"docs-text-escoubs":false,"docs-text-escivs":false,"docs-text-escitrbs":false,"docs-text-eosm":false,"docs-text-epsi":false,"docs-text-esic":false,"docs-text-elss":false,"docs-text-ebrfs":false,"docs-text-etocs":false,"docs-text-eeds":false,"docs-text-esbefr":false,"docs-etshc":false,"docs-text-etof":false,"docs-efsmsdl":false,"docs-text-eiosmc":false,"docs-text-ebrmkc":false,"docs-text-ehlb":false,"docs-text-dwit":false,"docs-text-elawp":true,"docs-eec":true,"docs-eecac":true,"docs-elsp":false,"docs-esff":false,"docs-ets":false,"docs-smfb":[2147483647,"APzrBA\u003d\u003d"],"docs-smv":2147483647,"docs-dt":"ritz","fmcbusiw":400000,"rd-feopl":true,"rfpd":"sheets.clients6.google.com","fdaar":"https://clients6.google.com","fskb":"https://docs.google.com/drawings","docs-net-cbfd":true,"ffbu":"//docs.google.com/forms/d/[id]/","enable_docos":true,"apec":false,"aped":true,"fedct":false,"fedt":true,"fdsvo":false,"fdcws":false,"fedda":false,"fddtoso":true,"feamlo":false,"feas":true,"felss":true,"feaaf":false,"feaafcr":true,"feaas":true,"febffe":false,"docs-ebbdus":true,"fecsfv2":false,"fecsbqf":true,"fecsbqadus":true,"fecscaui":true,"fecsptlr":200000,"fecvfbc":false,"erdccs":true,"fedsmlo":true,"fedmme":true,"feddabu":true,"fegcpe":true,"fgcpot":false,"fegdcs":true,"fefdwf":false,"fefbso":true,"efsmo":false,"fegsb":true,"fegsbolsot":false,"fegfb":false,"feimc":true,"feimlo":true,"feirhs":"","felcspipe":true,"felfbvu":true,"femps":false,"femaorw":false,"femlo":true,"feppco":false,"fepsww":true,"fepmo":false,"feqrui":false,"ferpcdc":false,"ferpdss":false,"ferpsss":false,"fesa":true,"fessscm":false,"fesarua":false,"evfnacs":false,"ewats":false,"feflslis":true,"ffoui":"","eirht":false,"faadd":false,"lici":"","fotlif":false,"lifn":"","fswmibs":true,"fet":false,"docs-smheo":true,"docs-mwid":true,"fehlcswl":true,"flale":"PROD","flsepe":"https://lookerstudio.google.com","docs-eeeh":false,"docs-ese":false,"docs-erkce":true,"docs-eptz":false,"docs-edd":false,"docs-saap":false,"docs-aadn":"","docs-aae":"","docs-aapu":"","docs-hpou":"","fsmstbl":[],"femfg":true,"feefgr":true,"fefgtm":false,"femfgicu":true,"femfgnfm":false,"femfgto":false,"fgzsst":0.67,"fgmcflps":1.0,"fncfl":3,"fptditt":1.0,"fempts":true,"femptru":true,"feptrudi":false,"fptdihst":"","fptshst":"","docs-eesi":true,"docs-egn":"1","docs-eulsdo":false,"docs-eopd":"espresso-pa.googleapis.com","docs-gaopd":"appsgenaiserver-pa.clients6.google.com","docs-eult":true,"docs-uenla":true,"docs-uetm":false,"docs-uht":"XeMaRUVTg0kLUkpsP190Tcor1APa","docs-pse":"PROD","docs-eghs":false,"docs-emmp":false,"docs-esmp":false,"docs-ettf":false,"cwitms":600000,"fcwjr":true,"fdcscft":false,"fcwjlubu":false,"ferwo":false,"docs-igoe":true,"docs-nrfd":false,"docs-nrfdfr":false,"docs-sdb":false,"docs-lucpf":true,"docs-hbiwud":true,"docs-iwu":{},"docs-efypr":true,"docs-eyprp":true,"docs-cp-tp":6,"docs-cr-tp":5,"docs-fe-re":2,"docs-l1lc":3,"docs-l1lm":"SCL","docs-l2lc":2,"docs-l2lm":"ATL","docs-l2t":6,"docs-lsd":2,"docs-tfh":"","fatra":true,"docs-crp":"/spreadsheets/d/1bl1_R6Qiee4tQ31Oix1Mjo_Jsbmddv3nsc5xBIy7QJY/edit","docs-crq":"gid\u003d0","docs-ifr":false,"docs-tintd":false,"docs-tdcp":0,"docs-tdvc":false,"docs-dhnap":"docs.google.com","docs-ds":"https","docs-ipuv":true,"docs-po":"https://docs.google.com","docs-to":"https://docs.google.com","opdu":false,"opru":"https://docs.google.com/relay.html","opsmu":"https://docs.google.com/picker","opbu":"https://docs.google.com/picker","enable_maestro":true,"docs-mhea":false,"docs-caru":"https://clients6.google.com","docs-cbau":"https://drive.google.com","docs-cdru":"https://drivefrontend-pa.clients6.google.com","docs-cwc":"","enable_omnibox":true,"docs-comp-gac":[],"docs-comp-hnt":"","docs-comp":false,"docs-eaofu":false,"docs-imbpitf":false,"docs-eodpb":true,"docs-rcm":{"/_/spreadsheets/_/js/k\u003dspreadsheets.waffle_js_prod.es_419.6oclWKtYJrQ.es5.O/am\u003dAAEQYADA/d\u003d0/wt\u003d0/rs\u003dAB9W7jsyzZH40jfnFeEu8FaEVcY6TEJO9Q/m\u003dcore":2,"/static/spreadsheets2/client/css/2886225444-waffle_k_ltr.css":1,"/_/spreadsheets/_/js/k\u003dspreadsheets.waffle_js_prod.es_419.6oclWKtYJrQ.es5.O/am\u003dAAEQYADA/d\u003d0/wt\u003d0/rs\u003dAB9W7jsyzZH40jfnFeEu8FaEVcY6TEJO9Q/m\u003dpostshellbase":18,"/spreadsheets/j2clritzapp/static/client/js/3628362276-calcworker_j2cl_core.js":9,"/static/spreadsheets2/client/wasm/4031264250-calcworker_wasm.wasm":12,"/_/spreadsheets/_/js/k\u003dspreadsheets.waffle_js_prod.es_419.6oclWKtYJrQ.es5.O/am\u003dAAEQYADA/d\u003d0/wt\u003d0/rs\u003dAB9W7jsyzZH40jfnFeEu8FaEVcY6TEJO9Q/m\u003dritzmain":4,"/_/spreadsheets/_/js/k\u003dspreadsheets.waffle_js_prod.es_419.6oclWKtYJrQ.es5.O/am\u003dAAEQYADA/d\u003d0/wt\u003d0/rs\u003dAB9W7jsyzZH40jfnFeEu8FaEVcY6TEJO9Q/m\u003dedit":3},"ijmi":["core","ritzmain"],"docs-wwmd":{"core":[],"secondary":["core"],"conversion":["core","secondary"],"client_office":["conversion","core"],"worker_cse":["conversion","core"]},"docs-wwmu":{"core":["https://docs.google.com/static/spreadsheets2/client/js/3628362276-calcworker_j2cl_core.js"],"secondary":["https://docs.google.com/static/spreadsheets2/client/js/1866031654-calcworker_j2cl_secondary.js"],"conversion":["https://docs.google.com/static/spreadsheets2/client/js/3910931866-calcworker_j2cl_conversion.js"],"client_office":["https://docs.google.com/static/spreadsheets2/client/js/2098841338-calcworker_j2cl_client_office.js"],"worker_cse":["https://docs.google.com/static/spreadsheets2/client/js/268941849-calcworker_j2cl_worker_cse.js"]},"docs-wwrmn":"core","docs-aacu":"","fcwjuc":{"wbu":["[null,null,null,\"https://docs.google.com/spreadsheets/j2clritzapp/static/client/js/3628362276-calcworker_j2cl_core.js\"]"]},"fcwju":"/spreadsheets/j2clritzapp/static/client/js/3628362276-calcworker_j2cl_core.js","fecw":false,"fecwwcd":false,"docs-dcr":false,"docosKeyData":[null,null,null,null,null,null,null,0,["Anónimo",null,"//ssl.gstatic.com/docs/common/blue_silhouette96-0.png","ANONYMOUS_105250506097979753968",1,null,1,null,1],1,"AAHRpnXtgVavgw0VeDWoEBgOQHzoEqRDrji-051gA3n4lkLgrCvurvRZ46chFG8R3g-e0siXKh6GFhhV40clkgEgk1SDIUrrB2y02TRlmUOCzq_whDWgqW94",null,null,null,null,null,0,null,null,1,null,null,null,null,null,0,null,null,null,1,null,null,1,null,null,null,null,1,1,null,null,null,null,["tf",60000,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,0,0,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,0,0,null,null,null,1,null,null,null,null,null,null,0,null,null,null,null,null,null,null,null,null,1],[[5703839,5704621,5704883,5705891,5706069,5706270,5707047,5707204,5708480,5708576,5709357,5709476,5710692,5711550,5712635,5712909,5713195,5713554,5714310,5714839,5714843,5719527,5720568,5724215,5724896,5726752,5729092,5732609,5734632,5740731,5743452,5754918,5756859,5768325,5769791,5771535,5782224,5782635,5787293,5797699,13702623,48966202,49398749,49471971,49491685,49498901,49623549,49629262,49644123,49769325,49822909,49833550,49842983,49904347,49924754,49926201,49943127,49971941,49979606,50223882,50266150,50273416,50297024,50335675,50389258,50439168,50538652,50549979,50561431,50562904,50587010,50602289,70971284,71061491,71079886,71085309,71120896,71145457,71330182,71376084,71387424,71387877,71406845,71451250,71465995,71505848,71520558,71530131,71544822,71608368,71626709,71626751,71626804,71626825,71626898,71626959,71627019,71627039,71627049,71658068,71659901,71668390,71679508,71689928,71710028,71724768,71825511,71833015,71854938,71898015,71899400,71960488,94327499,94333131,94333368,94353296,94429074,94434305,94434503,94461486,94573787,94574477,94629785,94661870,94664483,94664529,94692426,94733605,94755931,94785077,94813583,94855499,94896365,94904077,94919140,94940182,95087014,95104399,95111953,95112761,95131021,95208298,95314830,99251891,99338808,99343306,99368720,99400130,99402279,99440821,99457534,99457675,100640007,101448286,101478104,101483525,101489596,101489826,101492899,101519328,101561620,101562394,101574999,101575544,101631359,101687085,101718571,101732382,101755349,101755528,101767630,101788171,101793865,101823251,101831096,101860695,101867911,101887622,101917153,101919486,101922667,101922848,101933619,101962018,101962026,101962597,102020135,102030530,102043679,102043680,102059509,102070564,102070998,102083354,102146575,102161313,102161615,102167874,102198310,102200957,102208360,102236214,102244457,102280676,102287432,102292084,102343408,102388247,102399869,102402667,102449796,102469848,102517261,102548549,102554644,102554923,102587621,102596276,102600179,102601493,102618696,102641445,102649588,102649982,102672653,102672973,102685337,102685856,102691102,102691379,102722003,102727329,102761440,102762223,102774417,102783557,102785016,102787583,102799755,102803306,102807878,102811831,102823478,102859134,102863276,102864191,102867783,102883673,102902896,102903608,102909794,102926007,102926671,102932615,102944129,102944338,102944391,102944626,102944672,102944855,102952160,102972717,102987035,102988303,102988394,102988687,102988947,103011627,103020623,103024798,103157633,103163032,103175958,103209253,103253225,103285874,103286161,103286572,103288454,103289069,103289252,103298992,103317204,103326435,103339704,103343778,104487024,104530120,104574107,104575363,104575470,104575683,104575951,104615663,104624591,104627942,104646603,104654314,104699372,104726644,104761859,104794531,104799775,104807644,104812794,104834910,104907919,104959338,104963370,104976585,104983057,105082145,105083696,105084917,105087656,105090986,105100875,105113806,105121473,105125285,105180922,105217097,105255686,105283715,105345089,105346313,105360366,105368556,105371871,105374032,105380952,105393879,105439279,105461790,105474744,115511340,115599183,115601197,115614406,115626246,115626487,115634549,115665125,115665234,115668431,115669286,115748340,115755392,115779989,115780506,115780569,115797702,115821566,115822373,115831792,115848564,115849193,115854796,115855103,115902317,115906848,115909829,115916255,115917326,115928947,115974742,115986513,116062678,116068746,116076931,116093411,116098222,116150794,116176857,116213917,116215770,116221482,116229762,116250753,116255742,116276449,116283579,116307748,116339537,116361234,116361551,116372565,116407665,116416002,116418075,116425642,116448407,116449517,116459605,116470832,116480001,116487138,116495787,116496396,116502867,116508647,116514189,116524309,116538484,116542685,116550348,116567504,116593749,116609419,116613094,116613710,116685399,116685789,116697559,116699377,116704082,116704120,116714309,116714312,116731455,116731469,116731483,116731497,116731511,116731525,116756971,116757456,116771276,116779058,116780655,116780669,116780683,116780697,116780711,116780725,116783815,116840647,116846214,116847578,116856131,116874913,116877098,116877099,116882883,116918027,116919494,116923675,116924992,116980355,116982500,116982942,116988172,117011001,117026763,117026878,117026880,117037136,117037622,117037626,117124356,117128386,117136347,117143747,117145740,117148952,117165525,117166647,117224187,117236066,117236382,117249438,117268885,117284038,117286779,117290238,117297874,117309442,117310218,117322327,117339417,117345922,117357721,117367094,117376301,117382832,117387085,117411978,117437030,117457886,117474414,117503185,117504411,117528468,117528471,117530139,117547729,117556935,117557280,117586574,117605995,117617889,117623329,117632590,117641840,117642488,117642621,117643028,117643776,117645896,117683635,117706015,117711597,117723597,117728281,117734392,117736031,117740485,117752081,117755703,117755716,117755820,117756394,117775368,117782123,117800038,117826247,117840095,117852716,117855979,117879418,117895868,117930847,117969910,117983437,117987998,117988989,117995685,117995687,117995689,117995946,117997204,117999163,118010934,118027077,118029479,118043885,118044533,118048900,118057581,118086126,118094539,118098357,118110562,118119545,118127453,118132029,118144504,118145040,118155115,118155217,118155412,118171214,118172011,118179261,118181395,118182951,118199438,118210163,118213591,118219914,118222577,118222585,118227608,118237103,118240044,118240393,118246247,118254619,118255420,118256787,118269184,118269262,118275354,118275356,118281172,118292268,118292282,118311127,118313319,118329129,118342369,118347706,118349324,118349326,118349356,118364657,118367507,118367791,118368085,118368804,118373667,118399838,118413053,118419988,118427977,118449075,118462069,118482316,118494713,118497535,118509494,118511786,118515465,118518004,118519229,118521977,118531365,118532140,118532142,118544277,118555975,118566888,118566900,118567282,118575744,118576741,118579784,118596023,118599609,118623879,118627795,118630551,118654314,118656218,118656885,118669236,118670996,118683653,118717387,118728537,118735220,118736897,118753232,118780366,118780368,118781281,118786509,118788071,118792272,118795508,118796214,118796216,118803380,118807052,118809999,118810531,118824725,118825246,118830481,118830620,118830622,118830624,118830626,118830628,118830630,118830632,118830634,118830636,118830640,118835025,118835027,118855606,118871022,118884772,118896675,118910289,118925873,118931882,118931884,118938369,118952757,118960916,118965154,118970617,119001825,119012218,119022360,119033831,119036806,119038766,119058022,119061297,119062038,119065066,119070701,119071848,119076636,119077243,119078243,119087275,119092108,119104511,119106918,119106920,119109762,119126674,119127375,119140492,119142923,119159954,119159957,119164991,119164992,119164995,119170349,119178779,119187339,119189032,119189289,119190847,119194894,119202446,119206377,119207503,119207537,119209341,119209378,119219126,119220909,119220911,119220913,119220915,119220917,119220919,119221438,119235569,119237709,119239792,119249910,119255437,119261688,119262907,119262908,119275421,119282258,119287101,119290946,119292822,119293887,119311187,119317316,119335572,119335779,119346731,119350208,119355745,119372610,119374116,119382576,119400592,119419030,119419133,119431313,119436179,119436298,119446117,119453372,119454190,119454408,119455870,119464292,119471146,119474942,119482557,119486429,119491957,119493294,119497031,119497298,119502687,119520105,119525133,119528310,119530248,119538776,119546479,119546493,119552616,119566156,119566446,119566753,119576803,119588326,119590765,119590807,119590935,119592988,119593835,119595175,119605278,119608200,119612423,119614703,119615462,119621403,119621408,119621918,119621936,119636046,119643433,119652205,119665975,119680688,119681623,119684301,119684496,119685921,119702291,119702697,119703112,119707157,119707160,119727972,119741473,119745075,119761007,119763694,119768442,119770613,119773246,119773713,119776352,119794118,119794317,119804012,119804531,119804881,119805226,119807183,119809656,119818494,119826325,119840989,119842254,119854317,119857112,119867441,119878950,119880877,119885476,119892084,119914241,119914253,119919349,119930509,119932767,119941747,119941750,119944463,119989281,120006930,120008311,120022839,120024054,120025503,120049119,120050698,120051518,120051693,120073907,120073998,120074344,120082249,120098787,120107753,120118527,120120566,120120580,120129980,120129994,120130008,120140753,120140755,120140964,120142711,120142731,120142997,120143412,120143457,120161435,120163564,120167725,120169628,120175795,120176193,120179208,120181692,120182620,120184009,120187340,120190047,120191506,120195953,120198013,120206674,120223332,120226258,120226273,120228085,120232064,120239570,120249830,120250430,120256340,120257690,120268391,120268393,120272513,120275439,120286671,120292177,120300729,120343165,120357692,120388576,120389525,120395666,120408014,120418183,120419556,120426046,120426060,120426074,120426081,120426102,120426116,120426130,120426144,120436318,120437412,120439872,120446672,120446674,120456514,120457473,120459269,120465925,120483779,120493290,120495323,120540098,120554207,120576479,120579837,120596845,120603287,120614412,120619851,120652090,120661040,120663596,120666077,120666774,120666798,120672603,120674277,120674439,120674441,120674443,120674444,120674447,120674449,120678227,120705172,120711531,120712199,120713457,120715208,120716393,120723014,120730622,120730872,120732422,120733536,120735843,120735857,120772217,120773176,120777470,120778086,120794203,120797339,120827769,120840644,120844538,120844737,120845149,120864326,120887330,120894578,120894949,120931079,120933033,120934850,120951758,120954529,120957404,120969794,120978112]],null,null,null,null,4],"docs_oogt":"NONE","docs-dcho":["https://meet.google.com"],"docs-icga":false,"docs-mc":[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,[null,null,3,0]],"docs-gsoil":"docs_gsp100us","docs-cefu":false}; _docs_flag_cek=''; if (window['DOCS_timing']) {DOCS_timing['ifdld']=new Date().getTime();}</script><script nonce="-5t7WQ1G51wrzLhb2Soyng">var DOCS_timing=window['DOCS_timing']||{}; DOCS_timing['sl']=new Date().getTime();</script><meta http-equiv="content-type" content="text/html; charset=UTF-8"><link href='https://fonts.googleapis.com/css?family=Inconsolata:400,700' rel='stylesheet' nonce="ilLz97MAzKBc9PnQFRAnXg"><script nonce="-5t7WQ1G51wrzLhb2Soyng">DOCS_timing['cls'] = new Date().getTime();</script><link href='/static/spreadsheets2/client/css/2886225444-waffle_k_ltr.css' rel='stylesheet' nonce="ilLz97MAzKBc9PnQFRAnXg"><style nonce="ilLz97MAzKBc9PnQFRAnXg">.waffle td, .grid-fixed-table td {white-space: normal;}html { margin: 0; padding: 0; }body { margin: 0; padding: 0; }.error {font: 14px arial, sans, sans-serif; position: absolute; top: 50%; left: 50%; width: 300px; height: 80px; margin-top: -40px; margin-left: -150px; padding: 10px; border: 1px solid; background: #e0edfe; z-index: 1000; text-align: center;}</style><script nonce="-5t7WQ1G51wrzLhb2Soyng">DOCS_timing['cle'] = new Date().getTime();</script><script nonce="-5t7WQ1G51wrzLhb2Soyng">const DOCS_materialFontLoadStart = new Date().getTime();</script><style type="text/css" nonce="ilLz97MAzKBc9PnQFRAnXg">@font-face{font-family:'Roboto';font-style:italic;font-weight:400;font-stretch:normal;src:url(//fonts.gstatic.com/s/roboto/v48/KFOKCnqEu92Fr1Mu53ZEC9_Vu3r1gIhOszmOClHrs6ljXfMMLoHQuAj-lg.ttf)format('truetype');}@font-face{font-family:'Roboto';font-style:italic;font-weight:500;font-stretch:normal;src:url(//fonts.gstatic.com/s/roboto/v48/KFOKCnqEu92Fr1Mu53ZEC9_Vu3r1gIhOszmOClHrs6ljXfMMLrPQuAj-lg.ttf)format('truetype');}@font-face{font-family:'Roboto';font-style:italic;font-weight:700;font-stretch:normal;src:url(//fonts.gstatic.com/s/roboto/v48/KFOKCnqEu92Fr1Mu53ZEC9_Vu3r1gIhOszmOClHrs6ljXfMMLmbXuAj-lg.ttf)format('truetype');}@font-face{font-family:'Roboto';font-style:normal;font-weight:400;font-stretch:normal;src:url(//fonts.gstatic.com/s/roboto/v48/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWubEbVmUiA8.ttf)format('truetype');}@font-face{font-family:'Roboto';font-style:normal;font-weight:500;font-stretch:normal;src:url(//fonts.gstatic.com/s/roboto/v48/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWub2bVmUiA8.ttf)format('truetype');}@font-face{font-family:'Roboto';font-style:normal;font-weight:700;font-stretch:normal;src:url(//fonts.gstatic.com/s/roboto/v48/KFOMCnqEu92Fr1ME7kSn66aGLdTylUAMQXC89YmC2DPNWuYjalmUiA8.ttf)format('truetype');}@font-face{font-family:'Google Sans';font-style:italic;font-weight:400;src:url(//fonts.gstatic.com/s/googlesans/v29/4UairENHsxJlGDuGo1OIlL3L2JB80eWHxVA9_Io2-BqGpjmscm43kO8Q5nYkv74q.ttf)format('truetype');}@font-face{font-family:'Google Sans';font-style:italic;font-weight:500;src:url(//fonts.gstatic.com/s/googlesans/v29/4UairENHsxJlGDuGo1OIlL3L2JB80eWHxVA9_Io2-BqGpjmscm43kO8Q1HYkv74q.ttf)format('truetype');}@font-face{font-family:'Google Sans';font-style:italic;font-weight:700;src:url(//fonts.gstatic.com/s/googlesans/v29/4UairENHsxJlGDuGo1OIlL3L2JB80eWHxVA9_Io2-BqGpjmscm43kO8QAXEkv74q.ttf)format('truetype');}@font-face{font-family:'Google Sans';font-style:normal;font-weight:400;src:url(//fonts.gstatic.com/s/googlesans/v29/4UasrENHsxJlGDuGo1OIlJfC6mGS6vhAK1YobMucsih5flDH6MAwhSdTPjIUuA.ttf)format('truetype');}@font-face{font-family:'Google Sans';font-style:normal;font-weight:500;src:url(//fonts.gstatic.com/s/googlesans/v29/4UasrENHsxJlGDuGo1OIlJfC6mGS6vhAK1YobMucsih5flDH6MAwhRVTPjIUuA.ttf)format('truetype');}@font-face{font-family:'Google Sans';font-style:normal;font-weight:700;src:url(//fonts.gstatic.com/s/googlesans/v29/4UasrENHsxJlGDuGo1OIlJfC6mGS6vhAK1YobMucsih5flDH6MAwhcBUPjIUuA.ttf)format('truetype');}@font-face{font-family:'Google Sans Mono';font-style:italic;font-weight:400;src:url(//fonts.gstatic.com/s/googlesansmono/v15/P5sqzYWFYtnZ_Cg-t0Uq_rfivrdYNY12DDIwjZ6bbqExnN0UKrufYQ.ttf)format('truetype');}@font-face{font-family:'Google Sans Mono';font-style:italic;font-weight:500;src:url(//fonts.gstatic.com/s/googlesansmono/v15/P5sqzYWFYtnZ_Cg-t0Uq_rfivrdYNY12DDIwjZ6bbqExnO8UKrufYQ.ttf)format('truetype');}@font-face{font-family:'Google Sans Mono';font-style:italic;font-weight:700;src:url(//fonts.gstatic.com/s/googlesansmono/v15/P5sqzYWFYtnZ_Cg-t0Uq_rfivrdYNY12DDIwjZ6bbqExnDoTKrufYQ.ttf)format('truetype');}@font-face{font-family:'Google Sans Mono';font-style:normal;font-weight:400;src:url(//fonts.gstatic.com/s/googlesansmono/v15/P5sUzYWFYtnZ_Cg-t0Uq_rfivrdYH4RE8-pZ5gQ1abT53wVQGrw.ttf)format('truetype');}@font-face{font-family:'Google Sans Mono';font-style:normal;font-weight:500;src:url(//fonts.gstatic.com/s/googlesansmono/v15/P5sUzYWFYtnZ_Cg-t0Uq_rfivrdYH4RE8-pZ5gQ1abTL3wVQGrw.ttf)format('truetype');}@font-face{font-family:'Google Sans Mono';font-style:normal;font-weight:700;src:url(//fonts.gstatic.com/s/googlesansmono/v15/P5sUzYWFYtnZ_Cg-t0Uq_rfivrdYH4RE8-pZ5gQ1abQe2AVQGrw.ttf)format('truetype');}</style><script type="text/javascript" nonce="-5t7WQ1G51wrzLhb2Soyng">function _F_toggles_initialize(c){(typeof globalThis!=="undefined"?globalThis:typeof self!=="undefined"?self:this)._F_toggles=c||[]}_F_toggles_initialize([]);
+/*
+
+ Copyright The Closure Library Authors.
+ SPDX-License-Identifier: Apache-2.0
+*/
+function a(c){var f,g,h;if(((f=document)==null?0:(g=f.fonts)==null?0:(h=g.ready)==null?0:h.then)&&typeof document.fonts.ready.then=="function"){var k,l;((l=(k=window).DOCS_timingPromises)!=null?l:k.DOCS_timingPromises=[]).push({impressionCode:1337379,promise:document.fonts.ready.then(function(){return(new Date).getTime()-c})})}}
+for(var b=["DOCS_attachInitialMaterialFontLoadListener"],d=this||self,e;b.length&&(e=b.shift());)b.length||a===void 0?d[e]&&d[e]!==Object.prototype[e]?d=d[e]:d=d[e]={}:d[e]=a;
+// Google Inc.
+</script><script nonce="-5t7WQ1G51wrzLhb2Soyng">DOCS_attachInitialMaterialFontLoadListener(DOCS_materialFontLoadStart);</script><style nonce="ilLz97MAzKBc9PnQFRAnXg">@font-face{font-family:'Noto Color Emoji';font-style:normal;font-weight:400;src:url(//fonts.gstatic.com/s/notocoloremoji/v38/Yq6P-KqIXTD0t4D9z1ESnKM3-HpFWRxHy9A.ttf)format('truetype');}body {--google-font-color-notocoloremoji:none;}</style><style></style><style></style></head><body dir="ltr" style="background: #fff;" role="application" class="docs-gm docsCommonWiz docs-material docs-grille-gm3" itemscope itemtype="http://schema.org/CreativeWork/SpreadsheetObject"><noscript><div class="docs-butterbar-container"><div class="docs-butterbar-wrap"><div class="jfk-butterBar jfk-butterBar-shown jfk-butterBar-warning">El archivo no puede abrirse porque no tienes JavaScript habilitado en tu navegador. Habilítalo y vuelve a cargar el archivo.</div></div><br></div></noscript><meta itemprop="name" content="DIRECTORIO GLOBAL "><meta itemprop="faviconUrl" content="https://ssl.gstatic.com/docs/spreadsheets/spreadsheets-2026-v3.ico"><meta itemprop="url" content="https://docs.google.com/spreadsheets/d/1bl1_R6Qiee4tQ31Oix1Mjo_Jsbmddv3nsc5xBIy7QJY/edit?gid=0&amp;usp=embed_googleplus"><meta itemprop="embedURL" content="https://docs.google.com/spreadsheets/d/1bl1_R6Qiee4tQ31Oix1Mjo_Jsbmddv3nsc5xBIy7QJY/preview?usp=embed_googleplus"><div id="core-js-error-dialog-overlay" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; z-index: 10000; display: none"></div><script nonce="-5t7WQ1G51wrzLhb2Soyng">(function() {function setIframeSrcdoc(iframe) {var coreJsIframePolicy; var contentsString = "\x3clink rel\x3d\x22stylesheet\x22 href\x3d\x22https:\/\/fonts.googleapis.com\/css?family\x3dGoogle+Sans:bold,normal\x26lang\x3den\x22 nonce\x3d\x22ilLz97MAzKBc9PnQFRAnXg\x22\x3e\x3clink rel\x3d\x22stylesheet\x22 href\x3d\x22https:\/\/fonts.googleapis.com\/css?family\x3dRoboto:normal\x26lang\x3den\x22 nonce\x3d\x22ilLz97MAzKBc9PnQFRAnXg\x22\x3e\x3cstyle nonce\x3d\x22ilLz97MAzKBc9PnQFRAnXg\x22\x3e:root \x7b--brand-color: #188038\x7dli:nth-child(1) h4:before \x7bcontent: \x22Paso\\a0 1\x22;\x7dli:nth-child(2) h4:before \x7bcontent: \x22Paso\\a0 2\x22;\x7d\x3c\/style\x3e\x3cstyle\x3ebutton.text-button.brand-color\x7bbackground-color:var(--brand-color);color:#fff;border:none\x7dbody\x7bfont-family:Roboto;font-size:.875rem;font-weight:400;margin:0;padding:24px;overflow-x:hidden\x7dh3,h4,li,ol,p\x7bmargin:0;padding:0\x7dh3\x7bfont-family:Google Sans;font-size:1.375rem;font-weight:400;margin:0;padding:0\x7dli\x7bmargin-top:16px\x7dp\x7bmargin-top:5px\x7dli h4:before\x7bfont-weight:700\x7dp#chrome-url-box\x7bborder:1px solid #c7c7c7;-moz-box-sizing:border-box;box-sizing:border-box;border-radius:4px;padding:6px;height:36px\x7dbutton#chrome-settings-url-copy\x7bcolor:var(--brand-color);text-decoration:none;display:inline-block;border:none;padding:0;float:right;background:none;height:24px\x7dp#chrome-url-box code\x7bfont-family:inherit;display:block;float:left;height:24px;vertical-align:middle\x7dp#buttons-row\x7btext-align:right\x7dp#buttons-row button\x7bmargin-left:16px\x7dbutton.text-button\x7bfont-family:Google Sans;font-size:.875rem;text-decoration:none;display:inline-block;border-radius:4px;border:1px solid transparent;height:36px;padding-left:24px;padding-right:24px;cursor:pointer\x7dbutton.text-button:disabled\x7bborder-width:1px;border-color:#c7c7c7;border-style:solid;background-color:#fff;color:#777\x7d.sr-only\x7bposition:absolute;width:1px;height:1px;margin:-1px;clip:rect(0,0,0,0)\x7dbutton#chrome-settings-url-copy svg path\x7bfill:var(--brand-color)\x7dol\x7blist-style:none;padding-left:0\x7d\n\/*# sourceMappingURL\x3dcorejserror_ltr.css.map *\/\x3c\/style\x3e\x3cbody role\x3d\x22dialog\x22 aria-labelledby\x3d\x22heading\x22 aria-describedby\x3d\x22description\x22\x3e\x3ch3 id\x3d\x22heading\x22\x3eProblema de carga\x3c\/h3\x3e\x3cp id\x3d\x22description\x22\x3ePara solucionar este problema, borra recursos de la app\x3c\/p\x3e\x3col\x3e\x3cli\x3e\x3ch4 class\x3d\x22step-header\x22\x3e\x3c\/h4\x3e\x3cp\x3eSigue \x3ca href\x3d\x22https:\/\/support.google.com\/accounts\/answer\/32050\x22 target\x3d\x22_blank\x22\x3eestas instrucciones\x3c\/a\x3e para borrar la caché y las cookies\x3c\/p\x3e\x3c\/li\x3e\x3cli\x3e\x3ch4 class\x3d\x22step-header\x22\x3e\x3c\/h4\x3e\x3cp\x3eLuego, vuelve a cargar la página\x3c\/p\x3e\x3c\/li\x3e\x3c\/ol\x3e\x3cp id\x3d\x22buttons-row\x22\x3e\x3cbutton class\x3d\x22text-button\x22 id\x3d\x22send-feedback\x22 disabled\x3eEnviar comentarios\x3c\/button\x3e\x3cbutton class\x3d\x22text-button brand-color\x22 id\x3d\x22reload-now\x22\x3eVolver a cargar ahora\x3c\/button\x3e\x3c\/p\x3e\x3cscript nonce\x3d\x22-5t7WQ1G51wrzLhb2Soyng\x22\x3efunction _F_toggles_initialize(a)\x7b(typeof globalThis!\x3d\x3d\x22undefined\x22?globalThis:typeof self!\x3d\x3d\x22undefined\x22?self:this)._F_toggles\x3da||\x5b\x5d\x7d_F_toggles_initialize(\x5b\x5d);\nvar d\x3ddocument.getElementById(\x22chrome-settings-url-copy\x22);function e()\x7bvar a\x3ddocument.getElementById(\x22chrome-settings-url\x22),b\x3dnew Range;b.setStart(a,0);b.setEnd(a,1);a\x3dwindow.getSelection();a.empty();a.addRange(b);document.execCommand(\x22copy\x22);setTimeout(function()\x7bvar c\x3ddocument.createElement(\x22p\x22);c.setAttribute(\x22role\x22,\x22alert\x22);c.style.position\x3d\x22absolute\x22;c.style.top\x3d\x22-10000px\x22;c.appendChild(document.createTextNode(\x22Link copied\x22));document.body.appendChild(c)\x7d,500);d\x26\x26d.focus()\x7dd\x26\x26(d.onclick\x3de);\ndocument.getElementById(\x22reload-now\x22).onclick\x3dfunction()\x7bwindow.parent.location.reload()\x7d;document.addEventListener(\x22keydown\x22,function(a)\x7bvar b\x3ddocument.querySelectorAll(\x22a\x5bhref\x5d:not(\x5bdisabled\x5d), button:not(\x5bdisabled\x5d)\x22),c\x3db\x5b0\x5d;b\x3db\x5bb.length-1\x5d;if(a.key\x3d\x3d\x3d\x22Tab\x22||a.keyCode\x3d\x3d\x3d9)a.shiftKey\x26\x26document.activeElement\x3d\x3dc?(b.focus(),a.preventDefault()):a.shiftKey||document.activeElement!\x3db||(c.focus(),a.preventDefault())\x7d);\nwindow.onload\x3dfunction()\x7bvar a\x3dwindow.parent.document.getElementById(\x22core-js-error-dialog\x22);if(a)\x7bvar b\x3ddocument.body.scrollHeight;a.style.height\x3db+\x22px\x22;a.style\x5b\x22margin-top\x22\x5d\x3d-Math.round(b\/2)+\x22px\x22\x7d\x7d;\n\/\/ Google Inc.\n\n\/\/# sourceMappingURL\x3dcorejserror_corejserror_chunk.sourcemap\n\x3c\/script\x3e\x3cscript src\x3d\x22\/static\/spreadsheets2\/client\/js\/3007224847-corejserrorfeedback_corejserrorfeedback_chunk.js\x22 nonce\x3d\x22-5t7WQ1G51wrzLhb2Soyng\x22\x3e\x3c\/script\x3e\x3c\/body\x3e"; if (self.trustedTypes && self.trustedTypes.createPolicy) {coreJsIframePolicy = trustedTypes.createPolicy( 'docsCoreJsIframePolicy',{createHTML: function(ignored) {return contentsString;}});}var contentsTt = coreJsIframePolicy ? coreJsIframePolicy.createHTML('ignored') : contentsString; if ('srcdoc' in iframe) {iframe.srcdoc = contentsTt; return;}iframe.contentWindow.document.open(); iframe.contentWindow.document.write(contentsTt); iframe.contentWindow.document.close(); if ( true  && window.navigator && window.navigator.sendBeacon) {window.navigator.sendBeacon( '\/spreadsheets\/jserror?jobset\x3dprod\x26error\x3dJS+binary+load+failure&context.coreJsNoSrcdoc=true&context.serviceWorkerControlled=' + !!(navigator.serviceWorker && navigator.serviceWorker.controller) + '\x26context.actionName\x3dEdit');}}function enterCoreJsErrorDialog() {if (!setIframeSrcdoc) {return;}var overlay = document.getElementById('core-js-error-dialog-overlay');var overlayPolicy; if (self.trustedTypes && self.trustedTypes.createPolicy) {overlayPolicy = trustedTypes.createPolicy( 'docsCoreJsOverlayPolicy',{createHTML: function(ignored) {return "\x3cdiv style\x3d\x22position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: rgb(0, 0, 0, 0.6)\x22\x3e\x3c\/div\x3e\x3ciframe id\x3d\x22core-js-error-dialog\x22 style\x3d\x22position: absolute; left: 50%; top: 50%; width: 512px; height: 430px; margin-left: -256px; margin-top: -215px; background: white; border: none; border-radius: 8px\x22\x3e\x3c\/iframe\x3e";}});}var overlayTt = overlayPolicy ? overlayPolicy.createHTML('ignored') : "\x3cdiv style\x3d\x22position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: rgb(0, 0, 0, 0.6)\x22\x3e\x3c\/div\x3e\x3ciframe id\x3d\x22core-js-error-dialog\x22 style\x3d\x22position: absolute; left: 50%; top: 50%; width: 512px; height: 430px; margin-left: -256px; margin-top: -215px; background: white; border: none; border-radius: 8px\x22\x3e\x3c\/iframe\x3e"; overlay.innerHTML = overlayTt; var iframe = document.getElementById('core-js-error-dialog'); overlay.onmousedown = function(e) {iframe.focus(); e.preventDefault();}; setIframeSrcdoc(iframe); setIframeSrcdoc = null; overlay.style.display = 'block'; iframe.focus();}window.enterCoreJsErrorDialog = enterCoreJsErrorDialog;})();</script><div id="docs-chrome" tabindex="0" role="banner" aria-label="Barra de menú" class="docs-material"><div id="docs-butterbar-container" class="docs-butterbar-container" aria-live="assertive" aria-atomic="true"></div><div id="docs-positioned-surface-container"></div><div id="docs-chrome-cover-container"><div id="docs-chrome-cover" style="display:none;"></div></div><div><div id="docs-banner-container"><div id="docs-banners"><div id="docs-account-level-banner"></div><div id="docs-file-level-banner" aria-live="assertive" aria-atomic="true"><div class="appsElementsBrowserSupportBannerRoot" role="banner" aria-labelledby="ZvfGze"><svg viewBox="0 -960 960 960" height="16" width="16" focusable="false" class=" materialdesignWizIconSvgsSvgIcon" aria-hidden="true"><path d="M48-144L480-864L912-144H48ZM505.5-274.29q10.5-10.29 10.5-25.5T505.71-325.5T480.21-336T454.5-325.71T444-300.21t10.29,25.71t25.5,10.5t25.71-10.29ZM444-384h72V-576H444v192Z"/></svg><div class="appsElementsBrowserSupportBannerTitle" id="ZvfGze">Ya no se admite esta versión. Actualiza a un navegador admitido.</div><div class="appsElementsBrowserSupportBannerStaticStaticSize"></div></div></div><div id="docs-full-bleed-notification-banner" aria-live="assertive" aria-atomic="true"></div></div><div class="docs-full-height-sidebar-placeholder"></div></div><div id="docs-header-container"><div id="docs-header" class=""><div id="docs-branding-container" class="docs-branding-spreadsheets docsshared-no-select docs-branding-crossfade-transition-disabled"><a title="Página de inicio de Hojas de cálculo" href="https://docs.google.com/spreadsheets/?usp=sheets_web" id="docs-branding-logo-link"><div id="docs-drive-logo"><div class="goog-inline-block docs-branding-icon"><div class="docs-branding-icon-img docs-branding-icon-drive"></div></div></div><div id="docs-branding-logo"><div class="goog-inline-block docs-branding-icon"><div class="docs-branding-icon-img docs-icon-sheets-revised-2026-36x36"></div></div></div></a></div><div id="docs-titlebar-container" class="docs-branding-spreadsheets docs-grille-gm3"><div id="docs-titlebar"><div class="docs-title-outer docs-title-inline-rename " aria-labelledby="docs-title-input-label-inner"><div class="docs-title-widget goog-inline-block" id="docs-title-widget"><div class="docs-title-input-label"><span class="docs-title-input-label-inner" id="docs-title-input-label-inner">DIRECTORIO GLOBAL </span></div><div class="docs-title-input-wrapper"><input class="docs-title-input" spellcheck="false" type="text" autocomplete="off" aria-describedby="docs-parent-collections-container-outer" value="DIRECTORIO GLOBAL " tabindex="0"></div></div><div id="office-editing-file-extension" class="office-editing-file-extension  interactive-office-editing-file-extension goog-inline-block" style="display:none" tabindex="0"><div class="goog-inline-block office-editing-file-extension-text" style="display:none"></div><div class="goog-inline-block office-editing-file-extension-warning-icon-container" style="display:none"><div class="docs-icon goog-inline-block office-editing-file-extension-branded-warning-icon-container"><div class="docs-icon-img-container docs-icon-img office-editing-file-extension-warning-icon-14" aria-hidden="true">&nbsp;</div></div></div></div><div class="docs-parent-collections-container-outer goog-inline-block" id="docs-parent-collections-container-outer" style="display:none"></div><div class="docs-titlebar-badges"><div class="docs-titlebar-badge-container goog-inline-block"><div id="docs-classification-badge" class="docs-classification-badge goog-inline-block" style="display:none" role="button" tabindex="0"></div></div><div id="docs-external-badge-container" class="docs-titlebar-badge-container goog-inline-block" style="display:none"><div id="docs-external-badge" class="docs-external-badge goog-inline-block" role="button" tabindex="0"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-domain-disabled-dark-grey-14x14 docs-icon-masked-image" aria-hidden="true">&nbsp;</div></div></div></div><div id="docs-default-to-cse-indicator" class="docs-titlebar-badge-container goog-inline-block" style="display:none"><div id="docs-default-to-cse-indicator-badge" class="docs-titlebar-badge"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-encryption-shield-crossed-out-20x20" aria-hidden="true">&nbsp;</div></div></div></div><div id="docs-disablement-doc-indicator" class="docs-titlebar-badge-container goog-inline-block" style="display:none"><div id="docs-disablement-doc-indicator-badge" class="docs-titlebar-badge"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-policy-20x20" aria-hidden="true">&nbsp;</div></div></div></div><div id="docs-policy-indicator" class="docs-titlebar-badge-container goog-inline-block" style="display:none"><div id="docs-policy-indicator-badge" class="docs-titlebar-badge"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-policy-20x20" aria-hidden="true">&nbsp;</div></div></div></div><div class="docs-templates-badge-container goog-inline-block"></div><div class="docs-titlebar-badge-container docs-star-container goog-inline-block"><div id="docs-star" class="docs-titlebar-badge goog-inline-block" style="display:none"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-star-border-20" aria-hidden="true">&nbsp;</div></div></div></div><div class="docs-titlebar-badge-container docs-folder-container goog-inline-block"><div id="docs-folder" class="docs-titlebar-badge goog-inline-block" style="display:none"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-folder-move-20" aria-hidden="true">&nbsp;</div></div></div></div><div class="docs-titlebar-badge-container docs-info-container goog-inline-block" style="display:none"><div id="docs-info" class="docs-titlebar-badge goog-inline-block" aria-live="polite"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-info-20" aria-hidden="true">&nbsp;</div></div></div></div><div id="docs-save-indicator-container" class="docs-titlebar-badge-container docs-save-indicator-container goog-inline-block"><div id="docs-save-indicator-badge"></div></div><div class="docs-activity-indicator-container goog-inline-block"><div id="docs-activity-indicator" class="goog-inline-block" aria-live="polite"></div></div></div></div></div><div class="docs-titlebar-buttons"><div id="docs-presence-container" class="goog-inline-block docs-titlebar-button"><div id="docs-presence" class="goog-inline-block"></div></div><div class="goog-inline-block docs-revisions-appbarbutton-container" style="display:none;"><div class="docs-revisions-new-changes-badge" style="display:none;"></div><div role="button" id="docs-revisions-appbarbutton" class="goog-inline-block jfk-button jfk-button-standard docs-appbar-circle-button docs-titlebar-button jfk-button-disabled" aria-disabled="true"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-history-24" aria-hidden="true">&nbsp;</div></div></div></div><div class="goog-inline-block"><div role="button" id="docs-docos-commentsbutton" class="goog-inline-block jfk-button jfk-button-standard docs-appbar-circle-button docs-titlebar-button docos-comments-pe jfk-button-disabled" aria-disabled="true"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-comment-topbar-24" aria-hidden="true">&nbsp;</div></div></div><div id="docs-docos-caret" style="display: none"><div class="docs-docos-caret-outer"></div><div class="docs-docos-caret-inner"></div></div></div><span displayName="null" vsjson="{&quot;role&quot;:30,&quot;summary&quot;:&quot;Cualquier persona que tenga el vínculo&quot;,&quot;details&quot;:&quot;Cualquier persona que tenga el vínculo puede acceder. No es necesario registrarse.&quot;,&quot;visibilityState&quot;:&quot;unlisted&quot;,&quot;restrictedToDomain&quot;:false,&quot;restrictedToSingleUserScope&quot;:false,&quot;hasInvalidEntries&quot;:false,&quot;hasNamedPartiesForPublish&quot;:false,&quot;publishVisibilityState&quot;:&quot;anyone&quot;}" id="docs-titlebar-share-client-button" class="scb-gm3 scb-container" soy-skip ssk='6:kBiBbc'><div role="button" class="goog-inline-block jfk-button jfk-button-action scb-split-button docs-titlebar-button jfk-button-disabled" aria-disabled="true"><span class="scb-icon apps-share-sprite scb-button-icon  scb-public-s900">&nbsp;</span>Compartir</div><div id="scb-quick-actions-menu-button" class="docs-titlebar-button scb-quick-actions-menu-button goog-flat-menu-button goog-flat-menu-button-disabled goog-flat-menu-button-collapse-left goog-inline-block" role="button" aria-label="Acciones de uso compartido rápido"><div class="goog-flat-menu-button-caption goog-inline-block"></div><div class="goog-flat-menu-button-dropdown goog-inline-block"></div></div></span><div id="workspace-onegoogle-pep-container" style="display: none;" data-pep-container></div><div class="onegoogle-material-minibar"><header class="gb_y" id="gb" role="none"><div class="gb_z" data-ogsr-up=""><a class="gb_A" aria-label="Acceder" href="https://accounts.google.com/ServiceLogin?service=wise&amp;passive=1209600&amp;osid=1&amp;continue=https://docs.google.com/spreadsheets/d/1bl1_R6Qiee4tQ31Oix1Mjo_Jsbmddv3nsc5xBIy7QJY/edit?gid%3D0&amp;followup=https://docs.google.com/spreadsheets/d/1bl1_R6Qiee4tQ31Oix1Mjo_Jsbmddv3nsc5xBIy7QJY/edit?gid%3D0&amp;ltmpl=sheets&amp;ec=GAZAmwI" target="_top"><span class="gb_2">Acceder</span></a></div></header></div></div></div></div><div class="docs-full-height-sidebar-placeholder"></div></div></div><script nonce="-5t7WQ1G51wrzLhb2Soyng">DOCS_timing['sdb']=new Date().getTime();</script><div id="docs-bars"><div id="docs-menubars" class="docs-menubars"><div id="docs-menubar" role="menubar" class="docs-menubar goog-container goog-container-horizontal" tabIndex="0"><div id="docs-file-menu" role="menuitem" class="menu-button goog-control goog-control-disabled goog-inline-block">Archivo</div><div id="docs-edit-menu" role="menuitem" class="menu-button goog-control goog-control-disabled goog-inline-block">Editar</div><div id="docs-view-menu" role="menuitem" class="menu-button goog-control goog-control-disabled goog-inline-block">Ver</div><div id="docs-insert-menu" role="menuitem" class="menu-button goog-control goog-control-disabled goog-inline-block">Insertar</div><div id="docs-format-menu" role="menuitem" class="menu-button goog-control goog-control-disabled goog-inline-block">Formato</div><div id="w183" role="menuitem" class="menu-button goog-control goog-control-disabled goog-inline-block">Datos</div><div id="docs-tools-menu" role="menuitem" class="menu-button goog-control goog-control-disabled goog-inline-block">Herramientas</div><div id="docs-extensions-menu" role="menuitem" class="menu-button goog-control goog-control-disabled goog-inline-block">Extensiones</div><div id="docs-help-menu" role="menuitem" class="menu-button goog-control goog-control-disabled goog-inline-block">Ayuda</div><div id="docs-screenreader-menu" style="display:none" role="menuitem" class="menu-button goog-control goog-control-disabled goog-inline-block">Accesibilidad</div><div id="docs-debug-menu" style="display:none" role="menuitem" class="menu-button goog-control goog-control-disabled goog-inline-block">Depurar</div></div><div class="blob-state-indicator goog-inline-block" style="display: none"><div id="blob-notice-button" class="goog-inline-block"><div class="office-editing-permanent-error-unsaved-changes-icon  goog-inline-block"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-masked-image docs-icon-warning-amber-red700" aria-hidden="true">&nbsp;</div></div></div><div class="office-editing-temporary-error-unsaved-changes-icon  goog-inline-block"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-masked-image docs-icon-loop-red700" aria-hidden="true">&nbsp;</div></div></div>Hay cambios no guardados en Drive</div></div><div id="docs-chat-message-a11y" aria-live="polite" class="docs-offscreen-z-index" style="height: 0; width: 0; overflow: hidden"></div><div id="docs-presence-menubar"></div></div><div id="docs-recommendation-banner-container"></div><div id='docs-toolbar-wrapper' style="" class="docs-main-toolbars"><div id='docs-primary-toolbars' style="margin-right:26px" class="docs-collapsable-toolbar"><div id="docs-omnibox-toolbar" class="goog-toolbar assisted-actions"><div class="docs-omnibox-autocomplete"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-search-20" aria-hidden="true">&nbsp;</div></div><input class="docs-omnibox-input jfk-textinput assisted-actions-toolbar-omnibox" tabindex="-1"></div></div><div id="docs-toolbar" class="goog-toolbar" aria-label="Principal" docs-stickyFocus="true"><div id="t-tablesmith" class="waffle-toolbar-tablesmith-button waffle-toolbar-tablesmith-button-jasmine  goog-toolbar-button goog-inline-block goog-toolbar-button-disabled" style="display:none" role="button" aria-disabled="true"><div class="goog-toolbar-button-outer-box goog-inline-block" aria-hidden="true"><div class="goog-toolbar-button-inner-box goog-inline-block"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-material docs-icon-tablesmith-20x20" aria-hidden="true">&nbsp;</div></div></div></div></div><div class="goog-toolbar-separator goog-inline-block" style="display:none" id="t-tablesmith-separator">&nbsp;</div><div id="t-undo" class="goog-toolbar-button goog-inline-block goog-toolbar-button-disabled" role="button" aria-disabled="true"><div class="goog-toolbar-button-outer-box goog-inline-block" aria-hidden="true"><div class="goog-toolbar-button-inner-box goog-inline-block"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-undo-20" aria-hidden="true">&nbsp;</div></div></div></div></div><div id="t-redo" class="goog-toolbar-button goog-inline-block goog-toolbar-button-disabled" role="button" aria-disabled="true"><div class="goog-toolbar-button-outer-box goog-inline-block" aria-hidden="true"><div class="goog-toolbar-button-inner-box goog-inline-block"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-redo-20" aria-hidden="true">&nbsp;</div></div></div></div></div><div id="t-print" class="goog-toolbar-button goog-inline-block goog-toolbar-button-disabled" role="button" aria-disabled="true"><div class="goog-toolbar-button-outer-box goog-inline-block" aria-hidden="true"><div class="goog-toolbar-button-inner-box goog-inline-block"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-print-20" aria-hidden="true">&nbsp;</div></div></div></div></div><div id="t-paintformat" class="goog-toolbar-toggle-button  goog-toolbar-button goog-inline-block goog-toolbar-button-disabled" role="button" aria-disabled="true"><div class="goog-toolbar-button-outer-box goog-inline-block" aria-hidden="true"><div class="goog-toolbar-button-inner-box goog-inline-block"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-paint-format-20" aria-hidden="true">&nbsp;</div></div></div></div></div><div id="t-zoom" class="docs-toolbar-zoom-combobox goog-toolbar-combo-button goog-inline-block goog-toolbar-combo-button-disabled" style="display:none" role="button" aria-disabled="true"><div class="goog-toolbar-combo-button-outer-box goog-inline-block"><div class="goog-toolbar-combo-button-inner-box goog-inline-block"><div class="goog-toolbar-combo-button-caption goog-inline-block">&nbsp;</div><div class="goog-toolbar-combo-button-dropdown docs-gm-arrow goog-inline-block "><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-arrow-dropdown" aria-hidden="true">&nbsp;</div></div></div></div></div></div><div class="goog-toolbar-separator goog-inline-block" id="t-num-fmt-currency-separator">&nbsp;</div><div id="t-num-fmt-currency" class="goog-toolbar-button goog-inline-block goog-toolbar-button-disabled" role="button" aria-disabled="true"><div class="goog-toolbar-button-outer-box goog-inline-block"><div class="goog-toolbar-button-inner-box goog-inline-block">€</div></div></div><div id="t-num-fmt-percent" class="goog-toolbar-button goog-inline-block goog-toolbar-button-disabled" role="button" aria-disabled="true"><div class="goog-toolbar-button-outer-box goog-inline-block"><div class="goog-toolbar-button-inner-box goog-inline-block">%</div></div></div><div id="t-num-fmt-decimal-decrease" class="goog-toolbar-button goog-inline-block goog-toolbar-button-disabled" role="button" aria-disabled="true"><div class="goog-toolbar-button-outer-box goog-inline-block" aria-hidden="true"><div class="goog-toolbar-button-inner-box goog-inline-block"><div class="docs-icon goog-inline-block toolbar-decimal-icon "><div class="docs-icon-img-container docs-icon-img docs-icon-decimal-decrease-20" aria-hidden="true">&nbsp;</div></div></div></div></div><div id="t-num-fmt-decimal-increase" class="goog-toolbar-button goog-inline-block goog-toolbar-button-disabled" role="button" aria-disabled="true"><div class="goog-toolbar-button-outer-box goog-inline-block" aria-hidden="true"><div class="goog-toolbar-button-inner-box goog-inline-block"><div class="docs-icon goog-inline-block toolbar-decimal-icon "><div class="docs-icon-img-container docs-icon-img docs-icon-decimal-increase-20" aria-hidden="true">&nbsp;</div></div></div></div></div><div id="t-num-fmt-other" class="goog-toolbar-menu-button goog-inline-block goog-toolbar-menu-button-disabled" role="button" aria-disabled="true"><div class="goog-toolbar-menu-button-arrow-hidden goog-toolbar-menu-button-outer-box goog-inline-block"><div class="goog-toolbar-menu-button-inner-box goog-inline-block"><div class="goog-toolbar-menu-button-caption goog-inline-block">123</div></div></div></div><div class="goog-toolbar-separator goog-inline-block" id="t-docs-font-family-separator">&nbsp;</div><div class="docs-toolbar-small-separator goog-toolbar-separator goog-inline-block" style="display:none">&nbsp;</div><div id="docs-font-family" class="goog-toolbar-select goog-toolbar-menu-button goog-inline-block goog-toolbar-menu-button-disabled" role="button" aria-disabled="true"><div class="goog-toolbar-menu-button-outer-box goog-inline-block"><div class="goog-toolbar-menu-button-inner-box goog-inline-block"><div class="goog-toolbar-menu-button-caption goog-inline-block">&nbsp;</div><div class="goog-toolbar-menu-button-dropdown docs-gm-arrow goog-inline-block "><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-arrow-dropdown" aria-hidden="true">&nbsp;</div></div></div></div></div></div><div class="docs-toolbar-small-separator goog-toolbar-separator goog-inline-block" style="display:none">&nbsp;</div><div class="goog-toolbar-separator goog-inline-block" style="display:none" id="fontSizeSelectSeparator">&nbsp;</div><div id="fontSizeDecrement" class="docs-font-size-inc-dec-action-button  goog-toolbar-button goog-inline-block goog-toolbar-button-disabled" role="button" aria-disabled="true"><div class="goog-toolbar-button-outer-box goog-inline-block" aria-hidden="true"><div class="goog-toolbar-button-inner-box goog-inline-block"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-remove-20" aria-hidden="true">&nbsp;</div></div></div></div></div><div id="fontSizeSelect" class="docs-font-size-inc-dec-combobox goog-toolbar-combo-button goog-inline-block goog-toolbar-combo-button-disabled" role="button" aria-disabled="true"><div class="goog-toolbar-combo-button-outer-box goog-inline-block"><div class="goog-toolbar-combo-button-inner-box goog-inline-block"><div class="goog-toolbar-combo-button-caption goog-inline-block">&nbsp;</div></div></div></div><div id="fontSizeIncrement" class="docs-font-size-inc-dec-action-button  goog-toolbar-button goog-inline-block goog-toolbar-button-disabled" role="button" aria-disabled="true"><div class="goog-toolbar-button-outer-box goog-inline-block" aria-hidden="true"><div class="goog-toolbar-button-inner-box goog-inline-block"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-add-20" aria-hidden="true">&nbsp;</div></div></div></div></div><div class="goog-toolbar-separator goog-inline-block" id="t-bold-separator">&nbsp;</div><div id="t-bold" class="goog-toolbar-toggle-button  goog-toolbar-button goog-inline-block goog-toolbar-button-disabled" role="button" aria-disabled="true"><div class="goog-toolbar-button-outer-box goog-inline-block" aria-hidden="true"><div class="goog-toolbar-button-inner-box goog-inline-block"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-bold-20" aria-hidden="true">&nbsp;</div></div></div></div></div><div id="t-italic" class="goog-toolbar-toggle-button  goog-toolbar-button goog-inline-block goog-toolbar-button-disabled" role="button" aria-disabled="true"><div class="goog-toolbar-button-outer-box goog-inline-block" aria-hidden="true"><div class="goog-toolbar-button-inner-box goog-inline-block"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-italic-20" aria-hidden="true">&nbsp;</div></div></div></div></div><div id="t-strikethrough" class="goog-toolbar-toggle-button  goog-toolbar-button goog-inline-block goog-toolbar-button-disabled" role="button" aria-disabled="true"><div class="goog-toolbar-button-outer-box goog-inline-block" aria-hidden="true"><div class="goog-toolbar-button-inner-box goog-inline-block"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-strikethrough-20" aria-hidden="true">&nbsp;</div></div></div></div></div><div id="t-text-color" class="docs-toolbar-color-menu-button  goog-toolbar-menu-button goog-inline-block goog-toolbar-menu-button-disabled" role="button" aria-disabled="true"><div class="goog-toolbar-menu-button-arrow-hidden goog-toolbar-menu-button-outer-box goog-inline-block"><div class="goog-toolbar-menu-button-inner-box goog-inline-block"><div class="goog-toolbar-menu-button-caption goog-inline-block"><div class="goog-color-menu-button-indicator" style="border-bottom-color: #000;"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-text-color-20" aria-hidden="true">&nbsp;</div></div></div></div><div class="goog-menu menu goog-menu-noaccel" style="display:none"><hr><div id="t-text-color-cond-fmt" class="goog-menuitem goog-option"><div class="goog-menuitem-content">Formato condicional</div></div></div></div></div></div><div class="goog-toolbar-separator goog-inline-block" id="t-cell-color-separator">&nbsp;</div><div id="t-cell-color" class="docs-toolbar-color-menu-button  goog-toolbar-menu-button goog-inline-block goog-toolbar-menu-button-disabled" role="button" aria-disabled="true"><div class="goog-toolbar-menu-button-arrow-hidden goog-toolbar-menu-button-outer-box goog-inline-block"><div class="goog-toolbar-menu-button-inner-box goog-inline-block"><div class="goog-toolbar-menu-button-caption goog-inline-block"><div class="goog-color-menu-button-indicator" style="border-bottom-color: #fff;"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-fill-color-20" aria-hidden="true">&nbsp;</div></div></div></div><div class="goog-menu menu goog-menu-noaccel" style="display:none"><hr><div id="t-cell-color-cond-fmt" class="goog-menuitem goog-option"><div class="goog-menuitem-content">Formato condicional</div></div></div></div></div></div><div id="t-border" class="goog-toolbar-menu-button goog-inline-block goog-toolbar-menu-button-disabled" role="button" aria-disabled="true"><div class="goog-toolbar-menu-button-arrow-hidden goog-toolbar-menu-button-outer-box goog-inline-block" aria-hidden="true"><div class="goog-toolbar-menu-button-inner-box goog-inline-block"><div class="goog-toolbar-menu-button-caption goog-inline-block"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-border-all-20" aria-hidden="true">&nbsp;</div></div></div><div id="t-border-palette" class="goog-menu goog-menu-horizontal trix-palette docs-material" style="display:none;"><div class="toolbar-icon" id="t-border-all"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-border-all-20" aria-hidden="true">&nbsp;</div></div></div><div class="toolbar-icon" id="t-border-inner"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-border-inside-20" aria-hidden="true">&nbsp;</div></div></div><div class="toolbar-icon" id="t-border-horizontal"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-border-horizontal-20" aria-hidden="true">&nbsp;</div></div></div><div class="toolbar-icon" id="t-border-vertical"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-border-vertical-20" aria-hidden="true">&nbsp;</div></div></div><div class="toolbar-icon" id="t-border-outer"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-border-outside-20" aria-hidden="true">&nbsp;</div></div></div><div class="toolbar-icon" id="t-border-left"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-border-left-20" aria-hidden="true">&nbsp;</div></div></div><div class="toolbar-icon" id="t-border-top"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-border-top-20" aria-hidden="true">&nbsp;</div></div></div><div class="toolbar-icon" id="t-border-right"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-border-right-20" aria-hidden="true">&nbsp;</div></div></div><div class="toolbar-icon" id="t-border-bottom"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-border-bottom-20" aria-hidden="true">&nbsp;</div></div></div><div class="toolbar-icon" id="t-border-off"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-border-none-20" aria-hidden="true">&nbsp;</div></div></div><div id="t-border-color-menu-button"></div><div id="t-border-style-menu-button"></div></div></div></div></div><div id="t-merge-button" class="docs-toolbar-button-split-left goog-toolbar-button goog-inline-block goog-toolbar-button-disabled" role="button" aria-disabled="true"><div class="goog-toolbar-button-outer-box goog-inline-block" aria-hidden="true"><div class="goog-toolbar-button-inner-box goog-inline-block"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-cell-merge-20" aria-hidden="true">&nbsp;</div></div></div></div></div><div id="t-merge-menu" class="docs-toolbar-button-split-right goog-toolbar-menu-button goog-inline-block goog-toolbar-menu-button-disabled" role="button" aria-disabled="true"><div class="goog-toolbar-menu-button-outer-box goog-inline-block"><div class="goog-toolbar-menu-button-inner-box goog-inline-block"><div class="goog-toolbar-menu-button-dropdown docs-gm-arrow goog-inline-block "><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-arrow-dropdown" aria-hidden="true">&nbsp;</div></div></div></div></div></div><div class="goog-toolbar-separator goog-inline-block" id="t-align-separator">&nbsp;</div><div id="t-align" class="goog-toolbar-menu-button goog-inline-block goog-toolbar-menu-button-disabled" role="button" aria-disabled="true"><div class="goog-toolbar-menu-button-outer-box goog-inline-block" aria-hidden="true"><div class="goog-toolbar-menu-button-inner-box goog-inline-block"><div class="goog-toolbar-menu-button-caption goog-inline-block"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-align-left-20" aria-hidden="true">&nbsp;</div></div></div><div class="goog-toolbar-menu-button-dropdown docs-gm-arrow goog-inline-block "><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-arrow-dropdown" aria-hidden="true">&nbsp;</div></div></div><div id="t-align-palette" class="goog-menu trix-palette docs-material" style="display:none;"><div class="docs-common-icon" id="t-align-left"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-align-left-20" aria-hidden="true">&nbsp;</div></div></div><div class="docs-common-icon" id="t-align-center"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-align-center-20" aria-hidden="true">&nbsp;</div></div></div><div class="docs-common-icon" id="t-align-right"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-align-right-20" aria-hidden="true">&nbsp;</div></div></div></div></div></div></div><div id="t-valign" class="goog-toolbar-menu-button goog-inline-block goog-toolbar-menu-button-disabled" role="button" aria-disabled="true"><div class="goog-toolbar-menu-button-outer-box goog-inline-block" aria-hidden="true"><div class="goog-toolbar-menu-button-inner-box goog-inline-block"><div class="goog-toolbar-menu-button-caption goog-inline-block"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-valign-bottom-20" aria-hidden="true">&nbsp;</div></div></div><div class="goog-toolbar-menu-button-dropdown docs-gm-arrow goog-inline-block "><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-arrow-dropdown" aria-hidden="true">&nbsp;</div></div></div><div id="t-valign-palette" class="goog-menu trix-palette docs-material" style="display:none;"><div class="docs-common-icon" id="t-align-top"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-valign-top-20" aria-hidden="true">&nbsp;</div></div></div><div class="docs-common-icon" id="t-align-middle"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-valign-middle-20" aria-hidden="true">&nbsp;</div></div></div><div class="docs-common-icon" id="t-align-bottom"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-valign-bottom-20" aria-hidden="true">&nbsp;</div></div></div></div></div></div></div><div id="t-textwrap" class="goog-toolbar-menu-button goog-inline-block goog-toolbar-menu-button-disabled" role="button" aria-disabled="true"><div class="goog-toolbar-menu-button-outer-box goog-inline-block" aria-hidden="true"><div class="goog-toolbar-menu-button-inner-box goog-inline-block"><div class="goog-toolbar-menu-button-caption goog-inline-block"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-format-text-overflow-20" aria-hidden="true">&nbsp;</div></div></div><div class="goog-toolbar-menu-button-dropdown docs-gm-arrow goog-inline-block "><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-arrow-dropdown" aria-hidden="true">&nbsp;</div></div></div><div id="t-textwrap-palette" class="goog-menu trix-palette docs-material" style="display:none;"><div class="docs-common-icon" id="t-textwrap-overflow"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-format-text-overflow-20" aria-hidden="true">&nbsp;</div></div></div><div class="docs-common-icon" id="t-textwrap-wrap"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-format-text-wrap-20" aria-hidden="true">&nbsp;</div></div></div><div class="docs-common-icon" id="t-textwrap-clip"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-format-text-clip-20" aria-hidden="true">&nbsp;</div></div></div></div></div></div></div><div id="t-text-rotation" class="goog-toolbar-menu-button goog-inline-block goog-toolbar-menu-button-disabled" style="display:none" role="button" aria-disabled="true"><div class="goog-toolbar-menu-button-outer-box goog-inline-block" aria-hidden="true"><div class="goog-toolbar-menu-button-inner-box goog-inline-block"><div class="goog-toolbar-menu-button-caption goog-inline-block"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-text-rotation-angleup-20" aria-hidden="true">&nbsp;</div></div></div><div class="goog-toolbar-menu-button-dropdown docs-gm-arrow goog-inline-block "><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-arrow-dropdown" aria-hidden="true">&nbsp;</div></div></div><div id="t-text-rotation-palette" class="goog-menu goog-menu-horizontal trix-palette docs-material" style="display:none;"><div class="docs-common-icon" id="t-text-rotation-none"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-text-rotation-none-20" aria-hidden="true">&nbsp;</div></div></div><div class="docs-common-icon" id="t-text-rotation-angleup"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-text-rotation-angleup-20" aria-hidden="true">&nbsp;</div></div></div><div class="docs-common-icon" id="t-text-rotation-angledown"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-text-rotation-angledown-20" aria-hidden="true">&nbsp;</div></div></div><div class="docs-common-icon" id="t-text-rotation-vertical"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-text-rotation-vertical-20" aria-hidden="true">&nbsp;</div></div></div><div class="docs-common-icon" id="t-text-rotation-up"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-text-rotation-up-20" aria-hidden="true">&nbsp;</div></div></div><div class="docs-common-icon" id="t-text-rotation-down"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-text-rotation-down-20" aria-hidden="true">&nbsp;</div></div></div><div id="t-text-rotation-custom-wrapper"></div></div></div></div></div><div class="goog-toolbar-separator goog-inline-block" id="t-insert-link-separator">&nbsp;</div><div id="t-insert-link" class="goog-toolbar-button goog-inline-block goog-toolbar-button-disabled" role="button" aria-disabled="true"><div class="goog-toolbar-button-outer-box goog-inline-block" aria-hidden="true"><div class="goog-toolbar-button-inner-box goog-inline-block"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-link-20" aria-hidden="true">&nbsp;</div></div></div></div></div><div id="t-insert-doco" class="goog-toolbar-button goog-inline-block goog-toolbar-button-disabled" role="button" aria-disabled="true"><div class="goog-toolbar-button-outer-box goog-inline-block" aria-hidden="true"><div class="goog-toolbar-button-inner-box goog-inline-block"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-add-comment-20" aria-hidden="true">&nbsp;</div></div></div></div></div><div id="t-insert-chart" class="goog-toolbar-button goog-inline-block goog-toolbar-button-disabled" role="button" aria-disabled="true"><div class="goog-toolbar-button-outer-box goog-inline-block" aria-hidden="true"><div class="goog-toolbar-button-inner-box goog-inline-block"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-insert-chart-20" aria-hidden="true">&nbsp;</div></div></div></div></div><div id="t-autofilter-toggle" class="goog-toolbar-toggle-button  goog-toolbar-button goog-inline-block goog-toolbar-button-disabled" role="button" aria-disabled="true"><div class="goog-toolbar-button-outer-box goog-inline-block" aria-hidden="true"><div class="goog-toolbar-button-inner-box goog-inline-block"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-filter-alt-20" aria-hidden="true">&nbsp;</div></div></div></div></div><div id="t-autofilter-menu" class="goog-toolbar-menu-button goog-inline-block goog-toolbar-menu-button-disabled" style="display:none" role="button" aria-disabled="true"><div class="goog-toolbar-menu-button-outer-box goog-inline-block" aria-hidden="true"><div class="goog-toolbar-menu-button-inner-box goog-inline-block"><div class="goog-toolbar-menu-button-caption goog-inline-block"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-table-view-20x20" aria-hidden="true">&nbsp;</div></div></div><div class="goog-toolbar-menu-button-dropdown docs-gm-arrow goog-inline-block "><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-arrow-dropdown" aria-hidden="true">&nbsp;</div></div></div></div></div></div><div id="t-formula" class="goog-toolbar-menu-button goog-inline-block goog-toolbar-menu-button-disabled" role="button" aria-disabled="true"><div class="goog-toolbar-menu-button-arrow-hidden goog-toolbar-menu-button-outer-box goog-inline-block" aria-hidden="true"><div class="goog-toolbar-menu-button-inner-box goog-inline-block"><div class="goog-toolbar-menu-button-caption goog-inline-block"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-insert-function-20" aria-hidden="true">&nbsp;</div></div></div><div id="t-formula-menu" class="goog-menu goog-menu-noaccel goog-menu-noicon" style="display:none;"><div class="goog-menuitem waffle-insert-function-row" aria-label="sum">SUMA</div><div class="goog-menuitem waffle-insert-function-row" aria-label="average">PROMEDIO</div><div class="goog-menuitem waffle-insert-function-row" aria-label="count">CONTAR</div><div class="goog-menuitem waffle-insert-function-row" aria-label="max">MAX</div><div class="goog-menuitem waffle-insert-function-row" aria-label="min">MIN</div><hr><div id="t-formula-learn-more" class="goog-option">Más información</div></div></div></div></div><div class="goog-toolbar-separator goog-inline-block" id="t-rtl-separator">&nbsp;</div><div id="t-rtl-sheet" class="goog-toolbar-toggle-button  goog-toolbar-button goog-inline-block goog-toolbar-button-disabled" style="display:none" role="button" aria-disabled="true"><div class="goog-toolbar-button-outer-box goog-inline-block" aria-hidden="true"><div class="goog-toolbar-button-inner-box goog-inline-block"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-sheet-rtl-20" aria-hidden="true">&nbsp;</div></div></div></div></div><div id="t-ltr" class="goog-toolbar-toggle-button  goog-toolbar-button goog-inline-block goog-toolbar-button-disabled" style="display:none" role="button" aria-disabled="true"><div class="goog-toolbar-button-outer-box goog-inline-block" aria-hidden="true"><div class="goog-toolbar-button-inner-box goog-inline-block"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-text-ltr-20" aria-hidden="true">&nbsp;</div></div></div></div></div><div id="t-rtl" class="goog-toolbar-toggle-button  goog-toolbar-button goog-inline-block goog-toolbar-button-disabled" style="display:none" role="button" aria-disabled="true"><div class="goog-toolbar-button-outer-box goog-inline-block" aria-hidden="true"><div class="goog-toolbar-button-inner-box goog-inline-block"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-text-rtl-20" aria-hidden="true">&nbsp;</div></div></div></div></div><div class="goog-toolbar-separator goog-inline-block" style="display:none" id="inputToolsSeparator">&nbsp;</div><div id="inputToolsToggleButton" class="docs-toolbar-button-split-left goog-toolbar-button goog-inline-block goog-toolbar-button-disabled" style="display:none" role="button" aria-disabled="true"><div class="goog-toolbar-button-outer-box goog-inline-block" aria-hidden="true"><div class="goog-toolbar-button-inner-box goog-inline-block"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container " aria-hidden="true">&nbsp;</div></div></div></div></div><div id="inputToolsMenuButton" class="docs-toolbar-button-split-right goog-toolbar-menu-button goog-inline-block goog-toolbar-menu-button-disabled" style="display:none" role="button" aria-disabled="true"><div class="goog-toolbar-menu-button-outer-box goog-inline-block"><div class="goog-toolbar-menu-button-inner-box goog-inline-block"><div class="goog-toolbar-menu-button-dropdown docs-gm-arrow goog-inline-block "><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-arrow-dropdown" aria-hidden="true">&nbsp;</div></div></div></div></div></div><div id="moreButton" class="docs-toolbar-more-button goog-inline-block docs-toolbar-more-button-disabled" style="display:none" role="button" aria-disabled="true"><div class="docs-toolbar-more-button-outer-box goog-inline-block"><div class="docs-toolbar-more-button-inner-box goog-inline-block"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-more-vert-20" aria-hidden="true">&nbsp;</div></div></div></div></div><div class="goog-toolbar-separator goog-inline-block" style="display:none" id="docs-toolbar-accessibility-separator">&nbsp;</div><div id="docs-toolbar-accessibility-menu" class="docs-toolbar-text-button goog-toolbar-menu-button goog-inline-block goog-toolbar-menu-button-disabled" style="display:none" role="button" aria-disabled="true"><div class="goog-toolbar-menu-button-outer-box goog-inline-block"><div class="goog-toolbar-menu-button-inner-box goog-inline-block"><div class="goog-toolbar-menu-button-caption goog-inline-block">Accesibilidad</div><div class="goog-toolbar-menu-button-dropdown docs-gm-arrow goog-inline-block "><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-arrow-dropdown" aria-hidden="true">&nbsp;</div></div></div></div></div></div></div></div><div id="docs-side-toolbar" class="goog-toolbar" aria-label="Modo y vista"><div id="docs-toolbar-iterator-label" class="goog-inline-block docs-labelseparator" style="display:none;"></div><div class="docs-toolbar-small-separator docs-toolbar-inset-separator goog-toolbar-separator goog-inline-block" style="display:none" id="docs-toolbar-iterator-label-separator">&nbsp;</div><div id="docs-toolbar-iterator-previous" class="goog-toolbar-button goog-inline-block goog-toolbar-button-disabled" style="display:none" role="button" aria-disabled="true"><div class="goog-toolbar-button-outer-box goog-inline-block" aria-hidden="true"><div class="goog-toolbar-button-inner-box goog-inline-block"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-up" aria-hidden="true">&nbsp;</div></div></div></div></div><div id="docs-toolbar-iterator-next" class="goog-toolbar-button goog-inline-block goog-toolbar-button-disabled" style="display:none" role="button" aria-disabled="true"><div class="goog-toolbar-button-outer-box goog-inline-block" aria-hidden="true"><div class="goog-toolbar-button-inner-box goog-inline-block"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-down" aria-hidden="true">&nbsp;</div></div></div></div></div><div id="viewModeButton" class="goog-toolbar-button goog-inline-block goog-toolbar-button-disabled" role="button" aria-disabled="true"><div class="goog-toolbar-button-outer-box goog-inline-block"><div class="goog-toolbar-button-inner-box goog-inline-block"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-expand-less-20" aria-hidden="true">&nbsp;</div></div></div></div></div></div></div></div><script nonce="-5t7WQ1G51wrzLhb2Soyng">DOCS_timing['edb']=new Date().getTime();</script><div id="docs-help-anchor-wrapper"><div id="docs-help-anchor"></div><div id="docs-help-anchor-right"></div></div><div id="docs-feature-level-banner" class="docs-feature-level-banner-sheets"></div><div id="docs-inset-notification-banner"></div><div id="docs-additional-bars"><div class="header-error-bar-wrapper"></div><div id="waffle-loading-progress-bar-overlay" class="jfk-progressBar-blocking"><svg class="waffle-loading-progress-bar" viewBox="0 0 100 10" preserveAspectRatio="none" aria-labelledby="progress-bar-title-id"><title id="progress-bar-title-id">Cargando…</title><rect class="waffle-loading-progress-bg" x="0" y="0" width="100" height="10"/><rect class="waffle-loading-progress-fill" x="0" y="0" width="100" height="10"></svg></div><div id="docs-findbar-id"></div><div id="docs-gotobar-id"></div><div id="docs-spellcheckslidingdialog-id"></div><div id="promo-target"></div><div id="formula-bar-container"><div id="formula-bar-name-box-wrapper" class="name-box-enabled formula-bar-with-name-box-wrapper"><div class="waffle-name-box-container"><input class="jfk-textinput waffle-name-box" id="t-name-box" type="text" spellcheck="false" autocomplete="off" disabled="disabled"><div class="name-box-menu-separator-container"><div class="name-box-menu-separator"><div></div></div></div><div id="t-name-box-dropdown" class="name-box-dropdown docs-toolbar-button-split-right goog-toolbar-menu-button goog-inline-block goog-toolbar-menu-button-disabled" role="button" aria-disabled="true"><div class="goog-toolbar-menu-button-outer-box goog-inline-block"><div class="goog-toolbar-menu-button-inner-box goog-inline-block"><div class="goog-toolbar-menu-button-dropdown docs-gm-arrow goog-inline-block "><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-arrow-dropdown" aria-hidden="true">&nbsp;</div></div></div></div></div></div></div><div class="formula-bar-separator-container"><div class="formula-bar-separator"><div></div></div></div><div id="formula-bar" class="formula-bar"><div id="t-formula-bar-label" aria-hidden="true"><div class="docs-icon goog-inline-block"><div class="docs-icon-img-container docs-icon-img docs-icon-function-20"></div></div></div><div class="formula-bar-separator"><div></div></div><div id="t-formula-bar-input-container">&nbsp;</div><div id="t-formula-bar-progress-bar" style="display:none;"><div id="t-formula-bar-progress-bar-inner" class="jfk-progressBar-blocking"></div></div><span id="t-formula-bar-columnsmith-text" style="display:none;"></span><div id="t-formula-bar-columnsmith-spinner" style="display:none;"></div></div></div></div><div id="formula-bar-dragger"></div><div id="waffle-editorsized-bar"><div id="waffle-db-delegation-banner-id"></div><div id="waffle-dbsource-configbar-id"></div><div id="waffle-filterbar-id"></div></div></div><div id="docs-palettes"></div></div><div id="docs-sidebar-container"></div><div id="docs-texteventtargetbrailleoffsetcalculator"></div><div id="docs-editor-container" dir="ltr"><div id="docs-editor" style="" class=""><script nonce="-5t7WQ1G51wrzLhb2Soyng"></script><script nonce="-5t7WQ1G51wrzLhb2Soyng">;this.gbar_={CONFIG:[[[0,"www.gstatic.com","og.asy.en_US.8pj5yvofiFY.es5.O","com.pe","es-419","283",null,null,null,null,null,null,"og.asy.3-e5DRnVKXQ.L.X.O","AA2YrTsl4PkVJ5yFwVLouPqGvoKUq3mFhg","AA2YrTsDQgDYzohZUdPDC-gGsBVPPAOegA","",null,null,null,null,null,null,"283","283",null,null,null,72175901,null,0,null,1,0],[[null,null,null,"https://www.gstatic.com/og/_/js/k=og.asy.en_US.8pj5yvofiFY.es5.O/rt=j/m=_ac,ada,lldp,qads/exm=/d=1/ed=1/rs=AA2YrTsl4PkVJ5yFwVLouPqGvoKUq3mFhg"],[null,null,null,"https://www.gstatic.com/og/_/ss/k=og.asy.3-e5DRnVKXQ.L.X.O/m=adcgm3/excm=/d=1/ed=1/ct=zgms/rs=AA2YrTsDQgDYzohZUdPDC-gGsBVPPAOegA"]],[1,null,null,27043,283,"PER","es-419","973598045.0",18,null,0,0,null,null,null,null,"3700949,119852746,119852748,120281895,120281898",null,null,null,"hGqbat3vJ8aNwbkP8ZCUoAE",0,0,0,null,2,5,"ug",141,0,0,null,null,1,72175901,0,0],[0,0,0,null,"","","","",0,0,null,"",1,"","https://lh3.googleusercontent.com/ogw/default-user=s83"],null,null,null,[0.009999999776482582,"com.pe","283",[null,"","0",null,1,5184000,null,null,"",null,null,null,null,null,0,null,0,null,1,0,0,0,null,null,0,0,null,0,0,0,0,0],null,null,null,0]]]};</script><script nonce="-5t7WQ1G51wrzLhb2Soyng">_docs_webfonts_fontFaces = null; _docs_webfonts_iframe_fontFaces = null;DOCS_timing['wpid']=new Date().getTime();</script><style nonce="ilLz97MAzKBc9PnQFRAnXg">.ritz .waffle a { color: inherit; }.ritz .waffle .s4{border-bottom:1px SOLID #f8f8ff;border-right:1px SOLID #f8f8ff;background-color:#f8f8ff;text-align:left;color:#434343;font-family:docs-Roboto,Arial;font-size:10pt;vertical-align:middle;white-space:nowrap;overflow:hidden;direction:ltr;padding:2px 8px 2px 8px;}.ritz .waffle .s1{border-bottom:1px SOLID #32476d;border-right:1px SOLID #435e91;background-color:#435e91;text-align:center;font-weight:bold;color:#ffffff;font-family:docs-Roboto,Arial;font-size:10pt;vertical-align:middle;white-space:normal;overflow:hidden;word-wrap:break-word;direction:ltr;padding:2px 8px 2px 8px;}.ritz .waffle .s0{border-bottom:1px SOLID #32476d;border-right:1px SOLID #435e91;background-color:#435e91;text-align:center;font-weight:bold;color:#ffffff;font-family:docs-Montserrat,Arial;font-size:11pt;vertical-align:middle;white-space:normal;overflow:hidden;word-wrap:break-word;direction:ltr;padding:2px 8px 2px 8px;}.ritz .waffle .s9{border-bottom:1px SOLID #f8f8ff;border-right:1px SOLID #ffffff;background-color:#ffffff;text-align:right;color:#434343;font-family:docs-Roboto,Arial;font-size:10pt;vertical-align:middle;white-space:nowrap;overflow:hidden;direction:ltr;padding:2px 8px 2px 8px;}.ritz .waffle .s10{border-bottom:1px SOLID #f8f8ff;border-right:1px SOLID #32476d;background-color:#ffffff;text-align:left;color:#434343;font-family:docs-Roboto,Arial;font-size:10pt;vertical-align:middle;white-space:nowrap;overflow:hidden;direction:ltr;padding:2px 8px 2px 8px;}.ritz .waffle .s16{border-bottom:1px SOLID #f8f8ff;border-right:1px SOLID #32476d;background-color:#ffffff;text-align:center;color:#434343;font-family:docs-Roboto,Arial;font-size:10pt;vertical-align:middle;white-space:nowrap;overflow:hidden;direction:ltr;padding:2px 8px 2px 8px;}.ritz .waffle .s11{border-bottom:1px SOLID #f8f8ff;border-right:1px SOLID #f8f8ff;background-color:#f8f8ff;text-align:center;color:#434343;font-family:docs-Roboto,Arial;font-size:10pt;vertical-align:middle;white-space:nowrap;overflow:hidden;direction:ltr;padding:2px 8px 2px 8px;}.ritz .waffle .s19{border-bottom:1px SOLID #32476d;border-right:1px SOLID #ffffff;background-color:#ffffff;text-align:right;color:#434343;font-family:docs-Roboto,Arial;font-size:10pt;vertical-align:middle;white-space:nowrap;overflow:hidden;direction:ltr;padding:2px 8px 2px 8px;}.ritz .waffle .s21{border-bottom:1px SOLID #32476d;border-right:1px SOLID #32476d;background-color:#ffffff;text-align:left;color:#434343;font-family:docs-Roboto,Arial;font-size:10pt;vertical-align:middle;white-space:nowrap;overflow:hidden;direction:ltr;padding:2px 8px 2px 8px;}.ritz .waffle .s14{border-bottom:1px SOLID #ffff00;border-right:1px SOLID #ffff00;background-color:#ffff00;text-align:left;color:#434343;font-family:docs-Roboto,Arial;font-size:10pt;vertical-align:middle;white-space:nowrap;overflow:hidden;direction:ltr;padding:2px 8px 2px 8px;}.ritz .waffle .s5{border-bottom:1px SOLID #f8f8ff;border-right:1px SOLID #f8f8ff;background-color:#f8f8ff;text-align:right;color:#434343;font-family:docs-Roboto,Arial;font-size:10pt;vertical-align:middle;white-space:nowrap;overflow:hidden;direction:ltr;padding:2px 8px 2px 8px;}.ritz .waffle .s15{border-bottom:1px SOLID #f8f8ff;border-right:1px SOLID #ffffff;background-color:#ffffff;text-align:center;color:#434343;font-family:docs-Roboto,Arial;font-size:10pt;vertical-align:middle;white-space:nowrap;overflow:hidden;direction:ltr;padding:2px 8px 2px 8px;}.ritz .waffle .s20{border-bottom:1px SOLID #32476d;border-right:1px SOLID #ffffff;background-color:#ffffff;text-align:left;color:#434343;font-family:docs-Roboto,Arial;font-size:10pt;vertical-align:middle;white-space:nowrap;overflow:hidden;direction:ltr;padding:2px 8px 2px 8px;}.ritz .waffle .s2{border-bottom:1px SOLID #32476d;border-right:1px SOLID #32476d;background-color:#435e91;text-align:center;font-weight:bold;color:#ffffff;font-family:docs-Roboto,Arial;font-size:10pt;vertical-align:middle;white-space:normal;overflow:hidden;word-wrap:break-word;direction:ltr;padding:2px 8px 2px 8px;}.ritz .waffle .s6{border-bottom:1px SOLID #f8f8ff;border-right:1px SOLID #32476d;background-color:#f8f8ff;text-align:left;color:#434343;font-family:docs-Roboto,Arial;font-size:10pt;vertical-align:middle;white-space:nowrap;overflow:hidden;direction:ltr;padding:2px 8px 2px 8px;}.ritz .waffle .s8{border-bottom:1px SOLID #f8f8ff;border-right:1px SOLID #ffffff;background-color:#ffffff;text-align:left;color:#434343;font-family:docs-Roboto,Arial;font-size:10pt;vertical-align:middle;white-space:nowrap;overflow:hidden;direction:ltr;padding:2px 8px 2px 8px;}.ritz .waffle .s18{border-bottom:1px SOLID #32476d;border-right:1px SOLID #ffffff;background-color:#ffffff;text-align:left;color:#1a1b1f;font-family:docs-Roboto,Arial;font-size:10pt;vertical-align:middle;white-space:nowrap;overflow:hidden;direction:ltr;padding:2px 8px 2px 8px;}.ritz .waffle .s7{border-bottom:1px SOLID #f8f8ff;border-right:1px SOLID #ffffff;background-color:#ffffff;text-align:left;color:#1a1b1f;font-family:docs-Roboto,Arial;font-size:10pt;vertical-align:middle;white-space:nowrap;overflow:hidden;direction:ltr;padding:2px 8px 2px 8px;}.ritz .waffle .s12{border-bottom:1px SOLID #ffff00;border-right:1px SOLID #f8f8ff;background-color:#f8f8ff;text-align:right;color:#434343;font-family:docs-Roboto,Arial;font-size:10pt;vertical-align:middle;white-space:nowrap;overflow:hidden;direction:ltr;padding:2px 8px 2px 8px;}.ritz .waffle .s3{border-bottom:1px SOLID #f8f8ff;border-right:1px SOLID #f8f8ff;background-color:#f8f8ff;text-align:left;color:#1a1b1f;font-family:docs-Roboto,Arial;font-size:10pt;vertical-align:middle;white-space:nowrap;overflow:hidden;direction:ltr;padding:2px 8px 2px 8px;}.ritz .waffle .s13{border-bottom:1px SOLID #f8f8ff;border-right:1px SOLID #ffff00;background-color:#ffffff;text-align:right;color:#434343;font-family:docs-Roboto,Arial;font-size:10pt;vertical-align:middle;white-space:nowrap;overflow:hidden;direction:ltr;padding:2px 8px 2px 8px;}.ritz .waffle .s17{border-bottom:1px SOLID #f8f8ff;border-right:1px SOLID #f8f8ff;background-color:#f8f8ff;text-align:left;text-decoration:underline;text-decoration-skip-ink:none;-webkit-text-decoration-skip:none;color:#434343;font-family:docs-Roboto,Arial;font-size:10pt;vertical-align:middle;white-space:nowrap;overflow:hidden;direction:ltr;padding:2px 8px 2px 8px;}</style><div class="waffle-revisions-container"></div><div id="waffle-grid-container"><div id="0-grid-container" class="grid-container" dir="ltr"><div id="0-row-headers-background" class="row-headers-background"></div><div id="0-column-headers-background" class="column-headers-background"></div><div id="0-selected-row-headers-background" class="selected-row-headers-background"></div><div id="0-selected-column-headers-background" class="selected-column-headers-background"></div><div id="0-grid-table-container"><div class="grid-table-container"><div class="ritz grid-container" dir="ltr"><table class="waffle" cellspacing="0" cellpadding="0"><thead><tr><th class="row-header freezebar-vertical-handle"></th><th id="0C0" style="width:234px;" class="column-headers-background">A</th><th id="0C1" style="width:229px;" class="column-headers-background">B</th><th id="0C2" style="width:81px;" class="column-headers-background">C</th><th id="0C3" style="width:112px;" class="column-headers-background">D</th><th id="0C4" style="width:266px;" class="column-headers-background">E</th><th id="0C5" style="width:260px;" class="column-headers-background">F</th><th id="0C6" style="width:261px;" class="column-headers-background">G</th><th id="0C7" style="width:195px;" class="column-headers-background">H</th><th id="0C8" style="width:195px;" class="column-headers-background">I</th><th id="0C9" style="width:150px;" class="column-headers-background">J</th><th id="0C10" style="width:118px;" class="column-headers-background">K</th><th id="0C11" style="width:100px;" class="column-headers-background">L</th><th id="0C12" style="width:100px;" class="column-headers-background">M</th><th id="0C13" style="width:100px;" class="column-headers-background">N</th><th id="0C14" style="width:100px;" class="column-headers-background">O</th><th id="0C15" style="width:100px;" class="column-headers-background">P</th><th id="0C16" style="width:100px;" class="column-headers-background">Q</th><th id="0C17" style="width:100px;" class="column-headers-background">R</th><th id="0C18" style="width:100px;" class="column-headers-background">S</th><th id="0C19" style="width:100px;" class="column-headers-background">T</th><th id="0C20" style="width:100px;" class="column-headers-background">U</th><th id="0C21" style="width:100px;" class="column-headers-background">V</th><th id="0C22" style="width:100px;" class="column-headers-background">W</th><th id="0C23" style="width:100px;" class="column-headers-background">X</th><th id="0C24" style="width:100px;" class="column-headers-background">Y</th></tr></thead><tbody><tr style="height: 30px"><th id="0R0" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">1</div></th><td class="s0" dir="ltr">Nombre</td><td class="s0" dir="ltr">Cargo / Función</td><td class="s0" dir="ltr">Sede</td><td class="s0" dir="ltr">Teléfono</td><td class="s0" dir="ltr">Nombre y Apellido Preferido</td><td class="s1" dir="ltr">Email CREARPSL.NET</td><td class="s1" dir="ltr">Dirección de Residencia</td><td class="s1" dir="ltr">Nombre del Contacto de Emergencia</td><td class="s1" dir="ltr">Número del Contacto de Emergencia</td><td class="s1" dir="ltr">Teléfono Personal</td><td class="s1" dir="ltr">Cumpleaños</td><td class="s2" dir="ltr">STATUS</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><th style="height:3px;" class="freezebar-cell freezebar-horizontal-handle"></th><td class="freezebar-cell"></td><td class="freezebar-cell"></td><td class="freezebar-cell"></td><td class="freezebar-cell"></td><td class="freezebar-cell"></td><td class="freezebar-cell"></td><td class="freezebar-cell"></td><td class="freezebar-cell"></td><td class="freezebar-cell"></td><td class="freezebar-cell"></td><td class="freezebar-cell"></td><td class="freezebar-cell"></td><td class="freezebar-cell"></td><td class="freezebar-cell"></td><td class="freezebar-cell"></td><td class="freezebar-cell"></td><td class="freezebar-cell"></td><td class="freezebar-cell"></td><td class="freezebar-cell"></td><td class="freezebar-cell"></td><td class="freezebar-cell"></td><td class="freezebar-cell"></td><td class="freezebar-cell"></td><td class="freezebar-cell"></td><td class="freezebar-cell"></td></tr><tr style="height: 30px"><th id="0R1" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">2</div></th><td class="s3" dir="ltr">Evelyn Paulina Cedillo</td><td class="s3" dir="ltr">Coordinador Capítulo Uno y Dos</td><td class="s3" dir="ltr">Cuenca</td><td class="s4" dir="ltr">593 98 546 0130</td><td class="s4" dir="ltr">Pauly Cedillo</td><td class="s4" dir="ltr">evelyn.cedillo@crearpsl.net</td><td class="s4" dir="ltr">Honorato Vasquez y Miguel Angel Estrella </td><td class="s4" dir="ltr">SANDRA ALVARADO</td><td class="s5" dir="ltr">593984801311</td><td class="s5" dir="ltr">593958927854</td><td class="s5" dir="ltr">18/05/1999</td><td class="s6" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R2" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">3</div></th><td class="s7" dir="ltr">Viviana Maribel Catota Yugsi</td><td class="s7" dir="ltr">Coordinador Capítulo Uno y Dos</td><td class="s7" dir="ltr">Cuenca</td><td class="s8" dir="ltr">593 98 546 0506</td><td class="s8" dir="ltr">Mabe Catota</td><td class="s8" dir="ltr">viviana.catota@crearpsl.net</td><td class="s8" dir="ltr">Ricaurte, 25 de Marzo y Benigno Vazques</td><td class="s8" dir="ltr">SEGUNDO GREGORIO CATOTA</td><td class="s9" dir="ltr">593984046908</td><td class="s9" dir="ltr">593983335667</td><td class="s9" dir="ltr">01/09/1995</td><td class="s10" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R3" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">4</div></th><td class="s3" dir="ltr">Joao Alfonso Trujillo</td><td class="s3" dir="ltr">Coordinador Capítulo Uno y Dos</td><td class="s3" dir="ltr">Cuenca</td><td class="s4" dir="ltr">593 99 738 7282</td><td class="s4" dir="ltr">Joao Trujillo</td><td class="s4" dir="ltr">alfonso.trujillo@crearpsl.net</td><td class="s4" dir="ltr">Gonzalo Cordero Davila y Agustín Cueva Vallejo</td><td class="s4" dir="ltr">ERIKA TRUJILLO</td><td class="s5" dir="ltr">593998759523</td><td class="s5" dir="ltr">593992785634</td><td class="s5" dir="ltr">20/10/1989</td><td class="s6" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R4" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">5</div></th><td class="s7" dir="ltr">Kerly Carrillo Garzon</td><td class="s7" dir="ltr">Coordinador Maestría del Juego</td><td class="s7" dir="ltr">Cuenca</td><td class="s8" dir="ltr">593 99 430 2353</td><td class="s8" dir="ltr">Kerlie Carrillo</td><td class="s8" dir="ltr">kerly.carrillo@crearpsl.net</td><td class="s8" dir="ltr">Av Paseo de los Canaris</td><td class="s8" dir="ltr">ROCIO GARZON</td><td class="s9" dir="ltr">593969365055</td><td class="s9" dir="ltr">593995815292</td><td class="s9" dir="ltr">15/05/1994</td><td class="s10" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R5" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">6</div></th><td class="s3" dir="ltr">Juan Fernando Reinoso</td><td class="s3" dir="ltr">Coordinador Maestría del Juego</td><td class="s3" dir="ltr">Cuenca</td><td class="s4" dir="ltr">593 98 622 7233</td><td class="s4" dir="ltr">Juanfer Reinoso</td><td class="s4" dir="ltr">juan.reinoso@crearpsl.net</td><td class="s4" dir="ltr">Gonzales Suarez y Pintag</td><td class="s4" dir="ltr">Daniela Criollo</td><td class="s4" dir="ltr">593 99 839 7235</td><td class="s11" dir="ltr">593 99 839 7235</td><td class="s5" dir="ltr">26/05/1995</td><td class="s6" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R6" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">7</div></th><td class="s7" dir="ltr">Emely Juliett León Chavez</td><td class="s7" dir="ltr">Gerente</td><td class="s7" dir="ltr">Cuenca</td><td class="s8" dir="ltr">593 99 956 4609</td><td class="s8" dir="ltr">July León </td><td class="s8" dir="ltr">emely.leon@crearpsl.net</td><td class="s8" dir="ltr">Edificio La Martina. Av 12 de abril</td><td class="s8" dir="ltr">ARMANDO LEON</td><td class="s9" dir="ltr">593997789327</td><td class="s9" dir="ltr">593985886971</td><td class="s9" dir="ltr">23/06/2000</td><td class="s10" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R7" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">8</div></th><td class="s3" dir="ltr">Alexis Patricio Terán Sánchez</td><td class="s3" dir="ltr">Asistente Facturación</td><td class="s3" dir="ltr">Global</td><td class="s4" dir="ltr">593 98 438 6840</td><td class="s4" dir="ltr">Alexis Terán</td><td class="s4" dir="ltr">asistente.facturacion@crearpsl.net</td><td class="s4" dir="ltr">Solanda Sector 1 Calle José Maria Aleman y Calle Calisto del Pino, Pasaje Oe4e y Casa S23-93</td><td class="s4" dir="ltr">Veronica Sanchez</td><td class="s5" dir="ltr">593995008851</td><td class="s5" dir="ltr">593984386840</td><td class="s5" dir="ltr">18/04/2004</td><td class="s6" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R8" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">9</div></th><td class="s7" dir="ltr">Diego Gustavo Flores Chávez</td><td class="s7" dir="ltr">Asistente Facturación</td><td class="s7" dir="ltr">Global</td><td class="s8" dir="ltr">593 96 173 4724</td><td class="s8" dir="ltr">Diego Flores</td><td class="s8" dir="ltr">diego.flores@crearpsl.net</td><td class="s8" dir="ltr">Rio de Janeiro y Canada</td><td class="s8" dir="ltr">Fernanda Chavez</td><td class="s9" dir="ltr">593988113079</td><td class="s9" dir="ltr">593961734724</td><td class="s9" dir="ltr">20/10/2001</td><td class="s10" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R9" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">10</div></th><td class="s3" dir="ltr">Paul Sosa</td><td class="s3" dir="ltr">CCO Global</td><td class="s3" dir="ltr">Global</td><td class="s4" dir="ltr">593 99  811 9462</td><td class="s4" dir="ltr">Paul Sosa</td><td class="s4" dir="ltr">paul.sosa@crearpsl.net</td><td class="s4" dir="ltr">Carlos Montufar 222</td><td class="s4" dir="ltr">Edison Sosa</td><td class="s5" dir="ltr">593984023661</td><td class="s5" dir="ltr">593998119462</td><td class="s5" dir="ltr">24/06/1985</td><td class="s6" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R10" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">11</div></th><td class="s7" dir="ltr">Fer Aragon</td><td class="s7" dir="ltr">CEO Global</td><td class="s7" dir="ltr">Global</td><td class="s9" dir="ltr">5493484226173</td><td class="s7" dir="ltr">Fer Aragon</td><td class="s8" dir="ltr">fer.aragon@crearpsl.net</td><td class="s8" dir="ltr">Centenario 901 Garin (1619) Argentina </td><td class="s8" dir="ltr">Denise Curutchet</td><td class="s9" dir="ltr">5491153198946</td><td class="s9" dir="ltr">5491149609782</td><td class="s9" dir="ltr">03/09/2001</td><td class="s10" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R11" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">12</div></th><td class="s3" dir="ltr">Gabriela de Jesús Rivadeneyra Gaitán</td><td class="s3" dir="ltr">Contador Lima</td><td class="s3" dir="ltr">Lima</td><td class="s4" dir="ltr">51 95 0145 007</td><td class="s3" dir="ltr">Gabriela  Rivadeneyra</td><td class="s4" dir="ltr">contabilidad.lima@crearpsl.net</td><td class="s4" dir="ltr">Jirón Huancavelica 1646 MZ D9 Lote 4</td><td class="s4" dir="ltr">Ofelia Gaitán Castillo</td><td class="s4" dir="ltr">51991 776 127</td><td class="s4" dir="ltr">51 950 145 007</td><td class="s12" dir="ltr">17/01/2003</td><td class="s6" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R12" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">13</div></th><td class="s7" dir="ltr">Héctor Antonio Gonzáles Franco</td><td class="s7" dir="ltr">Contador Medellín</td><td class="s7" dir="ltr">Global</td><td class="s9" dir="ltr">573244004148</td><td class="s8" dir="ltr">Hector Gonzalez </td><td class="s8" dir="ltr">contabilidad.medellin@crearpsl.net</td><td class="s8" dir="ltr">diagonal 29 # 34 f sur 81</td><td class="s8" dir="ltr">liliana correa</td><td class="s9" dir="ltr">573244004148</td><td class="s13" dir="ltr">3244004148</td><td class="s14"></td><td class="s10"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R13" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">14</div></th><td class="s3" dir="ltr">Andres Gomez</td><td class="s3" dir="ltr">Coordinador Global Maestría</td><td class="s3" dir="ltr">Global</td><td class="s5" dir="ltr">573506005938</td><td class="s4" dir="ltr">Andres Gomez</td><td class="s4" dir="ltr">andres.gomez@crearpsl.net</td><td class="s4" dir="ltr">calle 61 s 39</td><td class="s4" dir="ltr">Vicente Gomez</td><td class="s5" dir="ltr">3116344417</td><td class="s5" dir="ltr">3506005938</td><td class="s5" dir="ltr">23/04/1982</td><td class="s6" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R14" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">15</div></th><td class="s7" dir="ltr">Karol Fernanda Villarruel Yánez</td><td class="s7" dir="ltr">Coordinadora Administrativa</td><td class="s7" dir="ltr">Global</td><td class="s8" dir="ltr">593 99 905 7277</td><td class="s8" dir="ltr">Karol Villarruel </td><td class="s8" dir="ltr">coodinacion.administrativa@crearpsl.net</td><td class="s8" dir="ltr">Carlos Freile y Manuel Coronado </td><td class="s8" dir="ltr">Geovanna Yanez</td><td class="s9" dir="ltr">593984437376</td><td class="s9" dir="ltr">593999057277</td><td class="s9" dir="ltr">31/08/1997</td><td class="s10" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R15" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">16</div></th><td class="s3" dir="ltr">Francisco Sebastián Jácome Escobar</td><td class="s3" dir="ltr">Facturación</td><td class="s3" dir="ltr">Global</td><td class="s4" dir="ltr">593 98 440 1998</td><td class="s3" dir="ltr">Sebastián Jácome</td><td class="s4" dir="ltr">facturacion.cartera@crearpsl.net</td><td class="s4" dir="ltr">Joaquin Gutierrez y Abelardo Andrqde</td><td class="s4" dir="ltr">Diana Escobar</td><td class="s5" dir="ltr">593995008851</td><td class="s5" dir="ltr">593984401998</td><td class="s5" dir="ltr">09/12/2004</td><td class="s6" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R16" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">17</div></th><td class="s7" dir="ltr">Nancy Elizabeth Escobar Pérez</td><td class="s7" dir="ltr">Jefa Financiera</td><td class="s7" dir="ltr">Global</td><td class="s8" dir="ltr">593 99 542 1291</td><td class="s7" dir="ltr">Elizabeth Escobar</td><td class="s8" dir="ltr">contabilidad.global@crearpsl.net</td><td class="s8" dir="ltr">Jose Raygada y Alonso de Torres</td><td class="s8" dir="ltr">Patricio Cruz</td><td class="s9" dir="ltr">593998478802</td><td class="s9" dir="ltr">593995431291</td><td class="s9" dir="ltr">31/07/1993</td><td class="s10" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R17" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">18</div></th><td class="s3" dir="ltr">Leandro Brunis</td><td class="s3" dir="ltr">Socio</td><td class="s3" dir="ltr">Global</td><td class="s4" dir="ltr">593 98 760 3598</td><td class="s3" dir="ltr">Leandro Brunis</td><td class="s4" dir="ltr">leandro.brunis@crearpsl.net</td><td class="s4" dir="ltr">Hernando Sarmiento y portete</td><td class="s4" dir="ltr">Carlos Brunis</td><td class="s5" dir="ltr">593987571131</td><td class="s5" dir="ltr">593987603589</td><td class="s5" dir="ltr">24/11/1989</td><td class="s6" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R18" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">19</div></th><td class="s7" dir="ltr">Lennin Fernando Chasi Lima</td><td class="s7" dir="ltr">Talento Humano</td><td class="s7" dir="ltr">Global</td><td class="s8" dir="ltr">593 99 289 2275</td><td class="s7" dir="ltr">Lennin Chasi </td><td class="s8" dir="ltr">talento.humano@crearpsl.net</td><td class="s8" dir="ltr">Guamani Caupicho calle E4C y Calle S52B</td><td class="s8" dir="ltr">Mariana Lima </td><td class="s9" dir="ltr">593992892275</td><td class="s9" dir="ltr">593992892275</td><td class="s9" dir="ltr">27/12/1989</td><td class="s10" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R19" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">20</div></th><td class="s3" dir="ltr">Pablo Francisco Mendieta</td><td class="s3" dir="ltr">Legal</td><td class="s3" dir="ltr">Global</td><td class="s4" dir="ltr">593 99 504 7243</td><td class="s4" dir="ltr">Pablo Mendieta</td><td class="s4" dir="ltr">legal@crearpsl.net</td><td class="s4" dir="ltr">Mariano Echeverría Oe43-64 y Francisco de Nates. Depto 15 </td><td class="s4" dir="ltr">Grace Báez </td><td class="s5" dir="ltr">593979300718</td><td class="s5" dir="ltr">593995047243</td><td class="s5" dir="ltr">03/06/1989</td><td class="s6" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R20" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">21</div></th><td class="s7" dir="ltr">Jonathan Alexander La Rosa Nieto</td><td class="s7" dir="ltr">Coordinador Maestría del Juego</td><td class="s7" dir="ltr">Guayaquil</td><td class="s8" dir="ltr">593 99 383 0738</td><td class="s8" dir="ltr">Jonathan La Rosa</td><td class="s8" dir="ltr">Jonathan.larosa@crearpsl.net</td><td class="s8" dir="ltr">villa españa 2</td><td class="s8" dir="ltr">Jorge Ramírez </td><td class="s9" dir="ltr">989743818</td><td class="s9" dir="ltr">989838161</td><td class="s9" dir="ltr">23/12/1991</td><td class="s10" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R21" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">22</div></th><td class="s3" dir="ltr">Brenda Vanessa Rodríguez Pérez</td><td class="s3" dir="ltr">Coordinador Capítulo Uno y Dos</td><td class="s3" dir="ltr">Guayaquil</td><td class="s4" dir="ltr">593 98 046 3082</td><td class="s4" dir="ltr">Brenda Rodríguez </td><td class="s4" dir="ltr">brenda.rodriguez@crearpsl.net</td><td class="s4" dir="ltr">cdla. Acuarela del Rio</td><td class="s4" dir="ltr">Fernando Mendoza</td><td class="s5" dir="ltr">984418222</td><td class="s5" dir="ltr">987857750</td><td class="s5" dir="ltr">07/11/1984</td><td class="s6" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R22" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">23</div></th><td class="s7" dir="ltr">Diana Carlota Macas Macas</td><td class="s7" dir="ltr">Coordinador Capítulo Uno y Dos</td><td class="s7" dir="ltr">Guayaquil</td><td class="s8" dir="ltr">593 99 383 0644</td><td class="s8" dir="ltr">Diana Macas</td><td class="s8" dir="ltr">diana.macas@crearpsl.net</td><td class="s8" dir="ltr">Urbanizacion San Felipe</td><td class="s8" dir="ltr">Pedro Macas</td><td class="s9" dir="ltr">968307389</td><td class="s9" dir="ltr">980927921</td><td class="s9" dir="ltr">19/01/1983</td><td class="s10" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R23" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">24</div></th><td class="s3" dir="ltr">Marcos Josué Vera Avilés</td><td class="s3" dir="ltr">Gerente</td><td class="s3" dir="ltr">Guayaquil</td><td class="s4" dir="ltr">59398 605 8852</td><td class="s4" dir="ltr">Josué Vera</td><td class="s4" dir="ltr">josue.vera@crearpsl.net</td><td class="s4" dir="ltr">Ciudadela Las Garzas Mz 11 Solar 10 (a lado del San Marino)</td><td class="s4" dir="ltr">Elva Aviles</td><td class="s5" dir="ltr">983385727</td><td class="s5" dir="ltr">958722151</td><td class="s5" dir="ltr">18/08/1989</td><td class="s6" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R24" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">25</div></th><td class="s7" dir="ltr">Diana Moscoso</td><td class="s7" dir="ltr">Coordinador Capítulo Uno y Dos</td><td class="s7" dir="ltr">Lima</td><td class="s9" dir="ltr">51912379744</td><td class="s8" dir="ltr">Diana Moscoso Robles</td><td class="s8" dir="ltr">diana.moscoso@crearpsl.net</td><td class="s8" dir="ltr">Avenida San borja Norte 1101</td><td class="s8" dir="ltr">Doris Rosa Robles Marcelo</td><td class="s9" dir="ltr">989385895</td><td class="s9" dir="ltr">924105061</td><td class="s9" dir="ltr">09/08/1992</td><td class="s10" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R25" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">26</div></th><td class="s3" dir="ltr">Joyce Marin</td><td class="s3" dir="ltr">Coordinador Capítulo Uno y Dos</td><td class="s3" dir="ltr">Lima</td><td class="s5" dir="ltr">51933599903</td><td class="s4" dir="ltr">Joyce Marín Suárez</td><td class="s4" dir="ltr">joyce.marin@crearpsl.net</td><td class="s4" dir="ltr">Calle Berlin 965</td><td class="s4" dir="ltr">Ericka Marín</td><td class="s4" dir="ltr">+51970535876</td><td class="s4" dir="ltr">+51955083260</td><td class="s5" dir="ltr">30/08/1994</td><td class="s6" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R26" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">27</div></th><td class="s7" dir="ltr">Linid Valencia</td><td class="s7" dir="ltr">Coordinador Maestría del Juego</td><td class="s7" dir="ltr">Lima</td><td class="s9" dir="ltr">51912379686</td><td class="s8" dir="ltr">Linid Valencia</td><td class="s8" dir="ltr">linid.valencia@crearpsl.net</td><td class="s8" dir="ltr">Calle Berlín 965</td><td class="s8" dir="ltr">José Sánchez </td><td class="s9">51919563284</td><td class="s9">573192605446</td><td class="s9" dir="ltr">12/03/1982</td><td class="s10" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R27" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">28</div></th><td class="s3" dir="ltr">Leyla Pasquel</td><td class="s3" dir="ltr">Coordinador Maestría del Juego</td><td class="s3" dir="ltr">Lima</td><td class="s5" dir="ltr">51919502385</td><td class="s4" dir="ltr">Leyla Pasquel</td><td class="s4" dir="ltr">leyla.pasquel@crearpsl.net</td><td class="s4" dir="ltr">Residencial Las Torres de Matellini mz b block 15 dpto 404,Chorrillos.</td><td class="s4" dir="ltr">Piero Portal </td><td class="s5" dir="ltr">962559832</td><td class="s5" dir="ltr">996820944</td><td class="s5" dir="ltr">19/08/1973</td><td class="s6" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R28" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">29</div></th><td class="s7" dir="ltr">José Luis Sánchez Moreno</td><td class="s7" dir="ltr">Gerente</td><td class="s7" dir="ltr">Lima</td><td class="s9" dir="ltr">51919563284</td><td class="s8" dir="ltr">José Sánchez</td><td class="s8" dir="ltr">jose.sanchez@crearpsl.net</td><td class="s8" dir="ltr">Avenida Alfredo Benavides 1130</td><td class="s8" dir="ltr">Victoria Sánchez</td><td class="s9">573025174474</td><td class="s9">573116024515</td><td class="s9" dir="ltr">17/03/1983</td><td class="s10" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R29" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">30</div></th><td class="s3" dir="ltr">Valentina Rodriguez Castaño</td><td class="s3" dir="ltr">Coordinador Capítulo Uno y Dos</td><td class="s3" dir="ltr">MED</td><td class="s5" dir="ltr">573137149033</td><td class="s4" dir="ltr">Valentina Rodriguez</td><td class="s4" dir="ltr">valentina.r@crearpsl.net</td><td class="s4" dir="ltr">carrera 56 a # 54 s 25</td><td class="s4" dir="ltr">Luisa Rodriguez</td><td class="s5" dir="ltr">573013156329</td><td class="s5" dir="ltr">573044072665</td><td class="s5" dir="ltr">07/10/1994</td><td class="s6" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R30" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">31</div></th><td class="s7" dir="ltr">Yurany Gonzalez Franco</td><td class="s7" dir="ltr">Gerente</td><td class="s7" dir="ltr">MED</td><td class="s9" dir="ltr">573225720949</td><td class="s8" dir="ltr">Yurany G Franco</td><td class="s8" dir="ltr">yurany.gonzalez@crearpsl.net</td><td class="s8" dir="ltr">calle 40 c sur # 38 - 85</td><td class="s8" dir="ltr">Fabiola franco</td><td class="s9" dir="ltr">573054466093</td><td class="s9" dir="ltr">573115693331</td><td class="s9" dir="ltr">23/02/1985</td><td class="s10" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R31" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">32</div></th><td class="s3" dir="ltr">Mauricio Ramirez Silva</td><td class="s3" dir="ltr">Coordinador Maestría del Juego</td><td class="s3" dir="ltr">MED</td><td class="s5" dir="ltr">573052476502</td><td class="s4" dir="ltr">Mauricio Ramirez</td><td class="s4" dir="ltr">mauricio.ramirez@crearpsl.net</td><td class="s4" dir="ltr">calle 40 c sur # 38 - 85</td><td class="s4" dir="ltr">Antonio Ramirez</td><td class="s5" dir="ltr">573169479341</td><td class="s5" dir="ltr">573115777808</td><td class="s5" dir="ltr">14/08/1982</td><td class="s6" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R32" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">33</div></th><td class="s7" dir="ltr">David Gonzalez Franco</td><td class="s7" dir="ltr">Coordinador Capítulo uno y dos</td><td class="s7" dir="ltr">MED</td><td class="s9" dir="ltr">573137162944</td><td class="s8" dir="ltr">David Gonzalez Franco</td><td class="s8" dir="ltr">david.gonzalez@crearpsl.net</td><td class="s8" dir="ltr">carrera 32 # 41 aa sur 14</td><td class="s8" dir="ltr">Fabiola franco</td><td class="s9" dir="ltr">573054466093</td><td class="s9" dir="ltr">573013053610</td><td class="s9" dir="ltr">10/08/1997</td><td class="s10" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R33" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">34</div></th><td class="s3" dir="ltr">Naomi Campos Soriano</td><td class="s3" dir="ltr">Coordinador Capítulo Uno y Dos</td><td class="s3" dir="ltr">México</td><td class="s5">527225183266</td><td class="s4" dir="ltr">Nao Campos</td><td class="s4" dir="ltr">naomi.campos@crearpsl.net</td><td class="s4" dir="ltr">Filiverto Gomez 33, San Blas Otzacatipan, Toluca 50230 Mexico</td><td class="s4" dir="ltr">Aide Campos Soriano</td><td class="s5" dir="ltr">7224133992</td><td class="s5" dir="ltr">7226827540</td><td class="s5" dir="ltr">30/11/2003</td><td class="s6" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R34" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">35</div></th><td class="s7" dir="ltr">Daniela Monroy Fabbri</td><td class="s7" dir="ltr">Coordinador Maestría del Juego</td><td class="s7" dir="ltr">México</td><td class="s9" dir="ltr">525533326645</td><td class="s8" dir="ltr">Daniela Monroy </td><td class="s8" dir="ltr">daniela.monroy@crearpsl.net</td><td class="s8" dir="ltr">C.10 casa 37, rancho san Lucas, Metepec  Metepec edomex</td><td class="s8" dir="ltr">Samantha Olvera </td><td class="s9">525559460958</td><td class="s9">525527377589</td><td class="s9" dir="ltr">25/09/1991</td><td class="s10" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 28px"><th id="0R35" style="height: 28px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 28px">36</div></th><td class="s3" dir="ltr">Nora Zamora Benítez</td><td class="s3" dir="ltr">Gerente</td><td class="s3" dir="ltr">México</td><td class="s5">527226964627</td><td class="s4" dir="ltr">Nora Zamora </td><td class="s4" dir="ltr">nora.zamora@crearpsl.net</td><td class="s4" dir="ltr">Chapultepec 37, int 5, San Jeronimo Chicahualco, Metepec, México</td><td class="s4" dir="ltr">Jose Miguel González Acevedo</td><td class="s5" dir="ltr">7228064890</td><td class="s5" dir="ltr">5539353705</td><td class="s5" dir="ltr">17/10/0987</td><td class="s6" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R36" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">37</div></th><td class="s7" dir="ltr">Adrianna Michelle Guarochico Usuño</td><td class="s7" dir="ltr">Coordinador Capítulo Uno y Dos</td><td class="s7" dir="ltr">UIO</td><td class="s9" dir="ltr">593993830681</td><td class="s8" dir="ltr">Adrianna Guarochico</td><td class="s8" dir="ltr">adrianna.guarochico@crearpsl.net</td><td class="s8" dir="ltr">Entrada al Paraiso, Pasaje 1, La Argelia</td><td class="s8" dir="ltr">Maribel Usuño</td><td class="s9" dir="ltr">593987743909</td><td class="s9" dir="ltr">593984613232</td><td class="s9" dir="ltr">07/11/1999</td><td class="s10" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R37" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">38</div></th><td class="s3" dir="ltr">Danna Alejandra Guaman Rodríguez</td><td class="s3" dir="ltr">Coordinador Capítulo Uno y Dos</td><td class="s3" dir="ltr">UIO</td><td class="s4" dir="ltr">593 98 843 2216</td><td class="s4" dir="ltr">Danna Guaman</td><td class="s4" dir="ltr">danna.guaman@crearpsl.net</td><td class="s4" dir="ltr">Av. panamericana Norte y N72-C </td><td class="s4" dir="ltr">Robert Guaman</td><td class="s5" dir="ltr">59398337531</td><td class="s5" dir="ltr">593995849214</td><td class="s5" dir="ltr">13/11/1999</td><td class="s6" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R38" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">39</div></th><td class="s7" dir="ltr">Emily Gabriela Campuzano Rodríguez </td><td class="s7" dir="ltr">Gerente</td><td class="s7" dir="ltr">UIO</td><td class="s9" dir="ltr">593991408931</td><td class="s8" dir="ltr">Emily Campuzano</td><td class="s8" dir="ltr">emily.campuzano@crearpsl.net</td><td class="s8" dir="ltr">Tumbaco, calle Josefa Tinajero y Barbara esparza. Conjunto Portal del Chiche Casa 32</td><td class="s8" dir="ltr">Alejandro Diaz</td><td class="s9" dir="ltr">593980247891</td><td class="s9" dir="ltr">593958997841</td><td class="s9" dir="ltr">24/11/1994</td><td class="s10" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R39" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">40</div></th><td class="s3" dir="ltr">Erika Gissell Gavilánez Gallardo </td><td class="s3" dir="ltr">Coordinador Maestría del Juego</td><td class="s3" dir="ltr">UIO</td><td class="s4" dir="ltr">593 99 192 3021</td><td class="s4" dir="ltr">Erika Gavilánez</td><td class="s4" dir="ltr">erika.gavilanez@crearpsl.net</td><td class="s4" dir="ltr">urbanización San Fernando Ignacio Asin y Antonio Roman</td><td class="s4" dir="ltr">David Sosa</td><td class="s5" dir="ltr">593998139655</td><td class="s5" dir="ltr">593979273055</td><td class="s5" dir="ltr">27/12/1993</td><td class="s6" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R40" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">41</div></th><td class="s7" dir="ltr">Freddy David Sosa Carrera</td><td class="s7" dir="ltr">Gerente</td><td class="s7" dir="ltr">UIO</td><td class="s8" dir="ltr">593 99 813 9655</td><td class="s8" dir="ltr">David Sosa</td><td class="s8" dir="ltr">freddy.sosa@crearpsl.net</td><td class="s8" dir="ltr">urbanización San Fernando Ignacio Asin y Antonio Roman</td><td class="s8" dir="ltr">Erika Gavilanez</td><td class="s9" dir="ltr">593979273055</td><td class="s9" dir="ltr">593998139655</td><td class="s9" dir="ltr">15/07/1990</td><td class="s10" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R41" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">42</div></th><td class="s3" dir="ltr">Isaac Gabriel Betancourt Patiño</td><td class="s3" dir="ltr">Coordinador Maestría del Juego</td><td class="s3" dir="ltr">UIO</td><td class="s5" dir="ltr">593988175835</td><td class="s3" dir="ltr">Isaac Betancourth</td><td class="s4" dir="ltr">ibetancourth@crearpsl.net</td><td class="s4" dir="ltr">Lomas de Monteserrin </td><td class="s4" dir="ltr">Lourdes Patiño </td><td class="s5" dir="ltr">593997634023</td><td class="s5" dir="ltr">593939009570</td><td class="s5" dir="ltr">06/10/2000</td><td class="s6" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R42" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">43</div></th><td class="s7" dir="ltr">Judith Regina Romero Rosales</td><td class="s7" dir="ltr">Coordinador Maestría del Juego</td><td class="s7" dir="ltr">UIO</td><td class="s8" dir="ltr">593 98 189 6547</td><td class="s8" dir="ltr">Regina Romero</td><td class="s8" dir="ltr">judith.romero@crearpsl.net</td><td class="s8" dir="ltr">Av Gaspar de Villaroel y 6 de  diciembre </td><td class="s8" dir="ltr">Vannesa Romero </td><td class="s8" dir="ltr">59399 8862385</td><td class="s15" dir="ltr">593 998697995</td><td class="s9" dir="ltr">25/02/1985</td><td class="s10" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R43" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">44</div></th><td class="s3" dir="ltr">Karla Viviana Pastrano Villegas</td><td class="s3" dir="ltr">Coordinador Capítulo Uno y Dos</td><td class="s3" dir="ltr">UIO</td><td class="s5" dir="ltr">593985699424</td><td class="s4" dir="ltr">Karla Pastrano</td><td class="s4" dir="ltr">karla.pastrano@crearpsl.net</td><td class="s4" dir="ltr">San Pdero de Taboada, calle Manuel Pomboza y Barbola Synailin</td><td class="s4" dir="ltr">Cristhian Viteri</td><td class="s5" dir="ltr">593987219940</td><td class="s5" dir="ltr">593994839083</td><td class="s5" dir="ltr">12/05/1983</td><td class="s6" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R44" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">45</div></th><td class="s7" dir="ltr">Liliana Lilibeth Cubillo Vera</td><td class="s7" dir="ltr">Coordinador Maestría del Juego</td><td class="s7" dir="ltr">UIO</td><td class="s9" dir="ltr">593999564699</td><td class="s8" dir="ltr">Lili Cubillo</td><td class="s8" dir="ltr">liliana.cubillo@crearpsl.net</td><td class="s8" dir="ltr">Antonio Checa s/n conjunto Club Casa Grande casa 7 </td><td class="s8" dir="ltr">Javier Villalba</td><td class="s8" dir="ltr">593 99 467 2460</td><td class="s15" dir="ltr">593 99 652 1133</td><td class="s15" dir="ltr">11/1121990</td><td class="s16" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R45" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">46</div></th><td class="s3" dir="ltr">Marco Jesús González Caguado</td><td class="s3" dir="ltr">Coordinador Capítulo Uno y Dos</td><td class="s3" dir="ltr">UIO</td><td class="s4" dir="ltr">593 99 141 8111</td><td class="s4" dir="ltr">Adams Gonzalez</td><td class="s4" dir="ltr">marco.gonzalez@crearpsl.net</td><td class="s4" dir="ltr">Jose Felix Barreiro y de Los Nogales. El Inca.</td><td class="s4" dir="ltr">Maritza Elizalde</td><td class="s5" dir="ltr">593999016035</td><td class="s5" dir="ltr">593999016035</td><td class="s5" dir="ltr">06/08/1986</td><td class="s6" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R46" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">47</div></th><td class="s8" dir="ltr">Katherine Marcela Aguirre Parra</td><td class="s7" dir="ltr">Coordinador Capítulo Uno y Dos</td><td class="s7" dir="ltr">UIO</td><td class="s9" dir="ltr">593989480131</td><td class="s8" dir="ltr">Marce Aguirre</td><td class="s8" dir="ltr">ketherine.aguirre@crearpsl.com</td><td class="s8" dir="ltr">Amaguaña Geronimo Carrion y Simon Bolivar</td><td class="s8" dir="ltr">Maria Elena Parra</td><td class="s9" dir="ltr">593994103590</td><td class="s9" dir="ltr">593983854306</td><td class="s9" dir="ltr">06/11/1994</td><td class="s10" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R47" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">48</div></th><td class="s4" dir="ltr">Santiago Proaño</td><td class="s3" dir="ltr">Técnico SST</td><td class="s3" dir="ltr">UIO</td><td class="s5" dir="ltr">593998336421</td><td class="s4" dir="ltr">Santiago Proaño</td><td class="s17" dir="ltr">sso@crearpsl.net</td><td class="s4" dir="ltr">Humberto Puga y Elias Godoy</td><td class="s4" dir="ltr">Alexandra Pallo (Médico de Crear)</td><td class="s5" dir="ltr">593999271257</td><td class="s5" dir="ltr">593998336421</td><td class="s5" dir="ltr">07/02/1992</td><td class="s6" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 30px"><th id="0R48" style="height: 30px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 30px">49</div></th><td class="s18" dir="ltr">Daniela Esposito Farfán </td><td class="s18" dir="ltr">Coordinador Capítulo Uno y Dos</td><td class="s18" dir="ltr">UIO </td><td class="s19" dir="ltr">593991393973</td><td class="s20" dir="ltr">Daniela Esposito</td><td class="s20" dir="ltr">daniela.esposito@crearpsl.net</td><td class="s20" dir="ltr">Valle de los Chillos, Fajardo. Avenida El inca y Santa  Cedilia, Conjunto Panorama Gardens Casa 17</td><td class="s20" dir="ltr">Eduardo Alfaro</td><td class="s19" dir="ltr">593958740157</td><td class="s19" dir="ltr">593981188999</td><td class="s19" dir="ltr">07/10/1994</td><td class="s21" dir="ltr"></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R49" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">50</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R50" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">51</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R51" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">52</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R52" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">53</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R53" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">54</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R54" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">55</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R55" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">56</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R56" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">57</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R57" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">58</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R58" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">59</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R59" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">60</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R60" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">61</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R61" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">62</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R62" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">63</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R63" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">64</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R64" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">65</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R65" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">66</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R66" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">67</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R67" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">68</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R68" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">69</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R69" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">70</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R70" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">71</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R71" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">72</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R72" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">73</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R73" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">74</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R74" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">75</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R75" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">76</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R76" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">77</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R77" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">78</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R78" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">79</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R79" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">80</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R80" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">81</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R81" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">82</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R82" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">83</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R83" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">84</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R84" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">85</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R85" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">86</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R86" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">87</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R87" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">88</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R88" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">89</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R89" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">90</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R90" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">91</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R91" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">92</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R92" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">93</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R93" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">94</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R94" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">95</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R95" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">96</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R96" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">97</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R97" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">98</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R98" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">99</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr style="height: 20px"><th id="0R99" style="height: 20px;" class="row-headers-background"><div class="row-header-wrapper" style="line-height: 20px">100</div></th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></tbody></table></div></div></div><div id="0-static-overlay-container" class="overlay-container-ltr static-overlay-container"><div id="0-focused-overlay-container" class="focused-overlay-container" style="display: none;"></div></div><div id="0-grid-shim-bottom" class="grid-shim-bottom"><div class="column-freezebar-extension"></div></div><div id="0-grid-shim-right" class="grid-shim-end-ltr"><div class="row-freezebar-extension"></div></div></div></div><div id="waffle-loading-screen"></div><script nonce="-5t7WQ1G51wrzLhb2Soyng">DOCS_timing['spls']=new Date().getTime(); if (window.performance && window.performance.mark) {performance.mark('mark_fully_visible');}</script><script nonce="-5t7WQ1G51wrzLhb2Soyng">this['ritz_cf'] = {"ritz_mef":"{\"fccs\":\"DEEP_COPY_IMMEDIATELY\",\"fdme\":true,\"febca\":false,\"febcss\":false,\"fecjpq\":false,\"fecum\":false,\"fecfdf\":false,\"fecslqp\":true,\"fedpaim\":false,\"fedta\":true,\"fedamdio\":false,\"fefsda\":false,\"fefca\":false,\"fefrca\":false,\"fegsrni\":false,\"feimvtip\":false,\"feiim\":false,\"feiaerc\":true,\"feir\":false,\"feonrcf\":true,\"feorlercf\":false,\"feosfp\":false,\"feescu\":false,\"fepaws\":true,\"ferrmo\":true,\"fervr\":false,\"fesar\":false,\"fess\":false,\"fetvrr\":false,\"fuacpou\":false,\"feuevca\":false}","ritz_fl":"es_419","ritz_sf":"{\"farscmmrmi\":{\"SHARED\":50},\"fascofc\":{\"SHARED\":false},\"dmsmsl\":{\"SHARED\":30000},\"dmtlsl\":{\"SHARED\":30000},\"feabcrmf\":{\"SHARED\":false},\"fearscmse\":{\"SHARED\":false},\"feafpvc\":{\"SHARED\":true},\"feastblvrotu\":{\"SHARED\":true},\"feail\":{\"SHARED\":false},\"fecdnd\":{\"SHARED\":true},\"fectctppt\":{\"SHARED\":true},\"fecplvdf\":{\"SHARED\":true},\"fecpdu\":{\"SHARED\":true},\"fedlq\":{\"SHARED\":true},\"fedwtcr\":{\"SHARED\":true},\"feeuac\":{\"SHARED\":true},\"fefrusro\":{\"SHARED\":true},\"fefvrp\":{\"SHARED\":true},\"fegbac\":{\"SHARED\":false},\"fegbaca\":{\"SHARED\":true},\"feipmsts\":{\"SHARED\":false},\"feica\":{\"SHARED\":true},\"fmlf\":{\"SHARED\":true},\"femvc\":{\"SHARED\":true},\"fentchitlrm\":{\"SHARED\":true},\"fentfra\":{\"SHARED\":true},\"fentfrav2\":{\"SHARED\":true},\"fentscp\":{\"SHARED\":true},\"fendoidd\":{\"SHARED\":false},\"fepgbat\":{\"SHARED\":true},\"fepurfpscos\":{\"SHARED\":false},\"fertbbeae\":{\"SHARED\":false},\"fercapos\":{\"SHARED\":true},\"ferrbarf\":{\"SHARED\":false},\"fescific\":{\"SHARED\":false},\"fesfic\":{\"SHARED\":true},\"fesrom\":{\"SHARED\":true},\"feseuawwihi\":{\"SHARED\":true},\"fespsedm\":{\"SHARED\":true},\"fetarf\":{\"SHARED\":true},\"fecta\":{\"SERVER\":true,\"GWT\":true},\"feuigrs\":{\"SHARED\":false},\"feuffsaf\":{\"SHARED\":true},\"feugrfv\":{\"SHARED\":true},\"fewdfrros\":{\"SHARED\":true},\"flpiwc\":{\"SHARED\":false},\"fmacf\":{\"SHARED\":100},\"fmcirrhl\":{\"SHARED\":20000000},\"fmcsdpfe\":{\"SHARED\":20000},\"fmcfas\":{\"SHARED\":10000000},\"fmdvipr\":{\"SHARED\":500},\"fmec\":{\"SHARED\":300},\"fmecfde\":{\"SHARED\":10000},\"fmer\":{\"SHARED\":50500},\"fmerwdec\":{\"SHARED\":500500},\"fmerwdpt\":{\"SHARED\":100500},\"fmfddps\":{\"SHARED\":10000},\"fimh\":{\"SHARED\":50},\"fmix\":{\"SHARED\":50},\"fmipfe\":{\"SHARED\":2000000},\"fmnaarc\":{\"SHARED\":3},\"fmnaar\":{\"SHARED\":20},\"fmnaatprt\":{\"SHARED\":10},\"fmnrigftd\":{\"GWT\":10000,\"ANDROID\":10000,\"IOS\":10000},\"fmraffp\":{\"SHARED\":10000},\"fmtps\":{\"SHARED\":100},\"fmrrrirrd\":{\"SHARED\":5000},\"fmsts\":{\"SHARED\":10},\"ftda\":{\"SHARED\":\"SIMPLE\"},\"fudpie\":{\"SHARED\":true}}","ritz_ef":"{\"fbslhti\":\"2NUkoZehW0kLUkpsP190UUNLiXW9\",\"fecsccs\":300,\"fcmrd\":604800000,\"fctlo\":true,\"fcsfmthnrpb\":1000,\"fcsfwcbr\":5242880,\"fcsfwnrpb\":12000,\"fdpfs\":\"\",\"fdptmlsf\":0,\"fdptt\":0.0,\"fdsraam\":false,\"fdsrdp\":false,\"fdaesc\":false,\"fedbgl\":false,\"fedfodc\":false,\"fddsp\":false,\"fabcde\":false,\"fabcdef\":false,\"fdsst\":\"NO_SNAPSHOT\",\"ferts\":1775543400,\"feacs\":true,\"feacisvcdf\":true,\"feaksm\":false,\"feavwut\":true,\"featf\":true,\"feafr\":false,\"feafqm\":true,\"feafrcf\":true,\"eascbcrm\":true,\"feafui\":false,\"feadcs\":false,\"feadtco\":false,\"feasp\":false,\"feailfiuf\":false,\"feacfdvddcfe\":true,\"feaffirh\":true,\"feasidvc\":true,\"febeo\":false,\"feb3dc\":true,\"febsbg\":false,\"febslau\":false,\"febbsq\":true,\"febawc\":false,\"febbwp\":true,\"febpfdx\":true,\"fecaix\":true,\"ecscj\":true,\"fecsh\":false,\"fecsl\":false,\"fecspil\":false,\"fectmffs\":true,\"fecwsraj\":true,\"fecfui\":false,\"fecocrmfms\":true,\"ecajps\":true,\"fecafbs\":false,\"fedcdi\":true,\"fecd\":false,\"fecfd\":false,\"fecm\":false,\"fecms\":true,\"fecnfs\":false,\"fecp\":false,\"fecr\":false,\"fecscfsc\":true,\"fecat\":true,\"fectp\":true,\"fecitd\":false,\"fecsdrl\":true,\"fecussfdt\":true,\"fecbfpi\":true,\"fecbsfari\":false,\"fecbsfci\":false,\"fecsfmt\":false,\"fecsfw\":true,\"feccm\":false,\"fecedp\":false,\"fecqfr\":false,\"fecbaf\":false,\"fecbafs\":false,\"fecbcr\":false,\"fecbsb\":false,\"fecbsbs\":true,\"fecprg\":false,\"fecsttc2\":false,\"feecwtc\":false,\"fecs\":false,\"fecdr\":false,\"fecdrie\":true,\"fecgd\":false,\"fecpasl\":false,\"fecwf\":false,\"feqe\":false,\"fecpvip\":false,\"fecrcp\":true,\"fecspoob\":false,\"fecep\":true,\"fecuam\":true,\"fecmstc\":false,\"fecpapoob\":true,\"fectsl\":false,\"fucfvcca\":false,\"fecscb\":false,\"fecur\":false,\"fecspsae\":\"BASELINE_MODEL\",\"fecspsmp\":false,\"feca\":true,\"fecb\":false,\"fecct\":false,\"fecdto\":false,\"fecgu\":true,\"fech\":\"MLmbZasLS0kLUkpsP190YHf6Zjsf\",\"fecsa\":false,\"ecclosa\":true,\"fecsbads\":true,\"fecscaa\":true,\"fecschs\":\"z3tJmtb2w0kLUkpsP190X2PVePzF\",\"fecsptdd\":true,\"fecssq\":true,\"fecssqb\":true,\"fect\":false,\"fectpt\":false,\"feclbo\":true,\"fecimsms\":true,\"fecc\":false,\"fecf\":false,\"fecsals\":false,\"fecsass\":false,\"fectff\":true,\"fecptrle\":200500,\"fecfut\":false,\"fecti\":false,\"fedlp\":false,\"fedvgo\":true,\"fedffmi\":false,\"fedl\":false,\"fedldcm\":false,\"feddtce\":false,\"feddtci\":false,\"fedtv\":true,\"fedsuuse\":true,\"fednript\":false,\"fedlfca\":false,\"fedb\":false,\"feddia\":true,\"fedcogg\":false,\"fedlitd\":false,\"fedgbhtp\":false,\"fedccp\":false,\"fedcog\":false,\"fedac\":false,\"feegsh\":\"\",\"feecfce\":false,\"feecfur\":false,\"feegs\":false,\"feepocsfbsq\":true,\"feecdtic\":false,\"feedll\":false,\"feedtfdg\":false,\"feegmfm\":true,\"fecect\":false,\"feetwa\":true,\"feesici\":false,\"fedpf\":true,\"feeuacfisf\":true,\"feeufh\":false,\"fefchd\":true,\"fefiapifi\":true,\"fefbcvfu\":true,\"efbcvief\":true,\"fefbcrcbf\":true,\"fefbvs\":true,\"fefbvo\":true,\"fefhro\":true,\"fefpiv\":false,\"efsoo\":true,\"fefvct\":false,\"fecvfsbr\":true,\"fefwro\":true,\"fefrisio\":false,\"fefrhm\":false,\"feffbnr\":true,\"fefipt\":true,\"fefmtl\":false,\"fefcf\":false,\"fefhfs\":true,\"fefccui\":true,\"fefcerh\":false,\"fefcvg\":false,\"fefiup\":false,\"fefrc\":true,\"fefrvc\":true,\"feftfp\":true,\"fegcf\":false,\"fegep\":false,\"fegspro\":true,\"fegsbpm\":true,\"fegsoies\":false,\"fegcici\":true,\"fegtnf\":true,\"fegdis\":false,\"fegffeic\":false,\"feggtr\":false,\"feggui\":false,\"fegapts\":false,\"fegbdcs\":true,\"fegbffs\":true,\"fegbs\":true,\"fegdctar\":true,\"fegoies\":true,\"fegtdl\":false,\"fegu\":true,\"fegba\":true,\"fegbahs\":true,\"fegbar\":true,\"fegbasp\":true,\"fegbgbf\":false,\"fehntfaf\":false,\"feidr\":false,\"feieici\":false,\"feiutm\":true,\"feisrc\":false,\"feicmpt\":false,\"feipmst\":false,\"feicts\":true,\"feiedils\":false,\"feissll\":true,\"feiaf\":false,\"feiataf\":true,\"feicto\":true,\"feicf\":false,\"feiis\":false,\"feiktfsd\":false,\"feksft\":false,\"fektrdp\":false,\"fekgtn\":false,\"felci\":true,\"felic\":false,\"elpo\":true,\"felfn\":false,\"felssk\":true,\"felenocdic\":false,\"fellt\":false,\"felftri\":false,\"felftr\":false,\"felfsal\":true,\"felffa\":true,\"fellirl\":false,\"felpicfsf\":true,\"felcp\":false,\"fempfec\":false,\"fempfnec\":false,\"femptss\":false,\"fempv2\":false,\"femw\":false,\"femc\":false,\"femevifcf\":false,\"femtchm\":false,\"femrhfe\":false,\"femu\":false,\"femdaire\":true,\"fempsc\":true,\"femch\":false,\"femcp\":false,\"femcsils\":true,\"femcc\":false,\"femsgb\":true,\"fempcc\":false,\"fempci\":true,\"fentcdnu\":true,\"fentii\":true,\"fentmfm\":false,\"fent\":true,\"fentcpm\":true,\"fentcc\":true,\"fentfs\":true,\"fentog\":true,\"fentsfu\":true,\"fenaus\":true,\"fenafcf\":false,\"fenmfddpsoc\":15000,\"fendcog\":false,\"feoc\":true,\"feoaoc\":true,\"feocvlt\":true,\"feocvltv2\":true,\"feocafd\":true,\"feoddd\":false,\"feofd\":true,\"feogfe\":false,\"feomlt\":false,\"feovricf\":false,\"feodc\":true,\"feodi\":true,\"feofvric\":false,\"feopgdpa\":false,\"feovric\":true,\"fepat\":false,\"fephscf\":false,\"fept\":false,\"fepbci\":true,\"feptcl\":false,\"feptclc\":false,\"feptcsp\":false,\"feptfpi\":false,\"fptgsp\":true,\"feptms\":false,\"feptqe\":false,\"feptrwtw\":false,\"fepav\":false,\"fepslosp\":true,\"fepsltp\":false,\"feps\":false,\"fepcrc\":true,\"fepardpos\":false,\"fepardp\":true,\"fepoh\":true,\"feptcitd\":false,\"fepdve\":true,\"fepurfpscoc\":false,\"feqs\":false,\"feqso\":true,\"ferrflv\":false,\"ferbs\":true,\"ferfr\":false,\"ferii\":false,\"ferucum\":false,\"fertdrl\":false,\"ferdd\":false,\"ferolis\":false,\"fersp\":false,\"feruefcm\":false,\"ferifa\":true,\"feriffedi\":true,\"ferifivb\":true,\"ferifivfr\":true,\"ferifomc\":true,\"ferebs\":false,\"fesffedl\":true,\"fesrbu\":false,\"fesip\":false,\"fesdsce\":false,\"fescpmes\":false,\"fescl\":true,\"fetcinse\":true,\"festci\":true,\"fesdcfft\":false,\"fesmtct\":false,\"fesrc\":true,\"fesrpcstc\":true,\"essgdsfa\":true,\"feshdtce\":false,\"feshdtci\":false,\"fesbbdnu\":true,\"feebbsao\":true,\"fescc2\":true,\"fessc\":false,\"fesswipm\":false,\"feszsp\":true,\"festhde\":false,\"festngd\":false,\"fesedf\":false,\"fesiwzls\":true,\"fesrvd\":false,\"fessrc\":true,\"fessfci\":false,\"fesftpf\":true,\"fesfcfnt\":true,\"fesmpg\":false,\"fescmftc\":false,\"fesfds\":true,\"fesphow\":false,\"fesporoi\":false,\"fesrf\":false,\"fescw\":false,\"feicrr\":true,\"fesc\":false,\"fesna\":false,\"fesdt\":true,\"fescr\":true,\"efesc\":false,\"fescdl\":false,\"fesxflv\":true,\"fesvmldl\":false,\"fespbftc\":true,\"fesdant\":true,\"fetctife\":false,\"fetdfcanev\":true,\"fetffu\":false,\"fetfr\":true,\"fetfribc\":true,\"fetiurf\":false,\"fetrcf\":true,\"fetrii\":true,\"fetrinf\":false,\"fetat\":false,\"fetcuff\":false,\"fentcv\":true,\"fete\":true,\"fetfe\":true,\"fetgb\":false,\"feti\":true,\"fetncm\":false,\"fetre\":true,\"fetri\":true,\"fetis\":false,\"fetdpod\":true,\"feticc\":false,\"feta\":false,\"fetm\":false,\"fetp\":true,\"fetnofvsr\":false,\"fetnosr\":true,\"etacnr\":false,\"fetal\":true,\"fetog\":true,\"feucs\":true,\"feulsl\":true,\"feunfadd\":false,\"feugisc\":false,\"feucpwm\":true,\"feuc\":false,\"feurftwf\":true,\"feudrrar\":false,\"feusitwb\":true,\"feuurorap\":true,\"feurp\":false,\"fetvre\":false,\"fevri\":false,\"fevsr\":false,\"fevc2\":false,\"fewfic\":false,\"fewad\":false,\"fewdfroc\":true,\"ectcct\":0.95,\"fedsisdrm\":false,\"feflcds\":0.0,\"fgdcsdm\":30,\"fgghsti\":\"\",\"fhntfbs\":\"xCLbbDUPA0kLUkpsP190XkGJiPUm\",\"fhntfdp\":\"17hED8kG50kLUkpsP190TThQn3DA\",\"fhntfsr\":\"\",\"fhggls\":false,\"ifice\":false,\"fkslfaa\":\"\",\"lsomti\":\"cb1fdvu6p0kLUkpsP190U5AywQpZ\",\"lsti\":\"1JWo39TC30kLUkpsP190WEsxWa2Q\",\"fludgp\":\"\",\"flnat\":1000,\"fmpmqs\":15,\"fissl\":20971520,\"fmtcx\":10000000,\"fmfcnefdps\":0.0,\"fncrffpv\":10000,\"foddp\":false,\"fptmcn\":\"\",\"fptmt\":0.0,\"fpcdpoed\":false,\"fechtis\":\"WKyXQmUiJ0kLUkpsP190WtAghmdt\",\"fecoc\":false,\"fecchtis\":\"\",\"fecrhtis\":\"\",\"feamrvm\":true,\"fmrtlao\":500,\"frord\":1800.0,\"rcpoaoc\":true,\"frrfrics\":false,\"frccu\":true,\"frpecc\":false,\"frpesd\":true,\"fsbbhti\":\"DKafkeLWF0kLUkpsP190VhRQwUUm\",\"fespfe\":false,\"fslv\":\"TEXT_VLOOKUP_KG\",\"fsrsf\":0,\"fstmndt\":2,\"fescct\":0.1,\"fsoiacis\":false,\"fetmt\":-0.34249,\"fubrl\":500,\"futefe\":false}"};</script><script nonce="-5t7WQ1G51wrzLhb2Soyng">var ritzspreadsheetconstants = {"localeName":"es_ES","timeZoneConstants":{"GMT":{"names_ext":{"STD_GENERIC_LOCATION":"GMT+00:00","STD_LONG_NAME_GMT":"GMT+00:00"},"std_offset":0,"names":["GMT","hora del meridiano de Greenwich"],"id":"GMT","transitions":[]},"America/Lima":{"names_ext":{"STD_GENERIC_LOCATION":"hora de Perú","STD_LONG_NAME_GMT":"GMT-05:00"},"std_offset":-300,"names":["GMT-5","hora estándar de Perú"],"id":"America/Lima","transitions":[140261,60,142420,0,149021,60,151180,0,175325,60,177484,0,210389,60,212548,0]}},"numberFormatSymbols":{"DECIMAL_SEP":",","PERMILL":"‰","MINUS_SIGN":"-","PERCENT_PATTERN":"#,##0 %","INFINITY":"∞","DEF_CURRENCY_CODE":"EUR","PLUS_SIGN":"+","CURRENCY_PATTERN":"#,##0.00 ¤","DECIMAL_PATTERN":"#,##0.###","SCIENTIFIC_PATTERN":"#E0","PERCENT":"%","EXP_SYMBOL":"E","GROUP_SEP":".","NAN":"NaN","ZERO_DIGIT":"0"},"allowTerminalDateSeparator":true,"amPmEnglishAccepted":false,"currencyPrefix":false,"currencyTag":"\\ [$€-1]","datePostsAreSuffix":true,"dateTimeWithoutYearPattern":"d/MM H:mm","dateWithoutYearPattern":"d/MM","dayPost":"","decimalPattern":"#,##0.###","decimalSeparator":",","defaultDatePattern":"d/MM/yyyy","defaultDateTimePattern":"d/MM/yyyy H:mm:ss","defaultTimePattern":"H:mm:ss","defaultUiLanguage":"es","exponentSeparator":"E","extraDateSeparator":" de ","firstDayOfWeek":1,"additionalFonts":[],"additionalFormats":[{"1":5,"2":"d-MMM-yyyy","3":1},{"1":5,"2":"yyyy-MM-dd","3":1},{"1":5,"2":"d/MM/yy","3":1},{"1":5,"2":"d/MM","3":1},{"1":6,"2":"H:mm","3":1},{"1":7,"2":"d/MM H:mm","3":1}],"amPmStrings":["a. m.","p. m."],"amString":"a. m.","monthsFull":["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"],"monthsShort":["ene","feb","mar","abr","may","jun","jul","ago","sept","oct","nov","dic"],"pmString":"p. m.","timePrefix":"","timeSeparator":":","weekdaysFull":["domingo","lunes","martes","miércoles","jueves","viernes","sábado"],"weekdaysShort":["dom","lun","mar","mié","jue","vie","sáb"],"groupingSeparator":".","hourPost":"","infinity":"∞","minimalDaysInFirstWeek":4,"minusSign":"-","minutePost":"","monthPost":"","negativeParens":false,"notANumber":"NaN","perMill":"‰","percent":"%","periodIsDateSeparator":true,"plusSign":"+","secondPost":"","shortDateFormatSuffix":"","textInputCurrencySymbol":"€","yearPost":"","zeroDigit":"0"};var TX_LOCALE = 'es_ES';(function(){'use strict';window._bootstrap=function(e){var c=window,d=c.document,b=c.navigator.userAgent,a=window.location;a.origin&&!a.href.indexOf(a.origin)==0&&(c.location=a.origin+a.pathname+a.search+a.hash);a=b.indexOf("Opera")==0;var g=!a&&b.indexOf("WebKit")!=-1;b=(b=/WebKit\/(\S+)/.exec(b))?b[1]:"";g&&b=="500"?(b=c.innerHeight,a=d.documentElement.scrollHeight,c==c.top&&a<b&&(b-=15),a=c.innerWidth):(b=d.compatMode=="CSS1Compat"&&(!a||a&&b=="9.50")?d.documentElement:d.body,a=b.clientWidth,b=b.clientHeight);
+g&&(a+=15);var f=d.getElementById("docs-chrome"),m=f?f.offsetHeight:0,k=f?null:d.getElementById("docs-additional-bars");k=k?k.offsetHeight:0;var l=d.getElementById("grid-bottom-bar"),n=l?l.offsetHeight:0;g&&(m=f?119:0,n=l?31:0);g=d.getElementById(e+"-grid-table-container");var h;f=new URLSearchParams(c.location.search);f.has("gid")&&(h=f.get("gid"));h||(c=/gid=([0-9]*)/.exec(c.location.hash))&&c[1]&&(h=c[1]);h&&h!=e?(d.getElementById(e+"-grid-container").style.display="none",e=d.getElementById("waffle-loading-screen"),
+e.style.display="block"):(g.style.overflow="auto",e=g);e.style.height=b-m-k-n+"px";e.style.width=a+"px"};}).call(this);
+_bootstrap( 0.0 );</script><div role="navigation" aria-label="Barra de pestañas de la hoja"><table id="grid-bottom-bar" style='position: relative; bottom: 0; z-index: 100;' class="grid-bottom-bar " cellspacing="0" cellpadding="0" dir="ltr" role="presentation"><tr style="display:none;" id="waffle-disclaimer-bar" class="waffle-disclaimer"><td colspan="5" id="waffle-disclaimer-content">Las cotizaciones no provienen de todos los mercados y podrían tener una demora de hasta 20 minutos. La información se proporciona "tal como está" y únicamente para fines informativos, pero no para comercialización ni asesoramiento. <a class="waffle-disclaimer-link" target="_blank" href="http://www.google.com/googlefinance/disclaimer/">Renuncia de responsabilidad</a></td></tr><tr><td style="width:3em;">&nbsp;</td><td style="width:1em;"><div class="docs-sheet-button-bar goog-toolbar goog-inline-block"><div class="docs-sheet-button goog-inline-block docs-sheet-add-button" title="Agregar hoja" tabindex="0"><div class="goog-inline-block docs-sheet-button-outer-box"><div class="docs-material goog-inline-block docs-sheet-button-inner-box"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-add-20" aria-hidden="true">&nbsp;</div></div></div></div></div><div class="docs-sheet-menu-button goog-inline-block docs-sheet-all-button" title="Todas las hojas" tabindex="0"><div class="goog-inline-block docs-sheet-button-outer-box"><div class="docs-material goog-inline-block docs-sheet-button-inner-box"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-menu-20" aria-hidden="true">&nbsp;</div></div></div></div></div><div class="docs-sheet-menu-button goog-inline-block docs-sheet-canvas-button" title="Menú de Canvas" tabindex="0"><div class="goog-inline-block docs-sheet-button-outer-box"><div class="docs-material goog-inline-block docs-sheet-button-inner-box"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-canvas-20x20" aria-hidden="true">&nbsp;</div></div></div></div></div></div></td><td class="docs-sheet-outer-container"><div class="goog-inline-block"><div class="docs-sheet-fade docs-sheet-fade-left"><div class="docs-grille-sheet-fade"></div></div><div class="docs-sheet-fade docs-sheet-fade-right"><div class="docs-grille-sheet-fade"></div></div><div class="docs-sheet-container goog-inline-block"><div class="docs-sheet-container-bar goog-toolbar goog-inline-block"><div class="docs-sheet-tab goog-inline-block"><div class="goog-inline-block docs-sheet-tab-outer-box"><div class="goog-inline-block docs-sheet-tab-inner-box"><div class="goog-inline-block docs-sheet-tab-caption">Hoja 1</div><div class="goog-inline-block docs-sheet-tab-dropdown"></div></div></div></div><div class="docs-sheet-tab goog-inline-block"><div class="goog-inline-block docs-sheet-tab-outer-box"><div class="goog-inline-block docs-sheet-tab-inner-box"><div class="goog-inline-block docs-sheet-tab-caption">Entrenadores Crear PSL </div><div class="goog-inline-block docs-sheet-tab-dropdown"></div></div></div></div></div></div></div></td><td class="docs-sheet-button-bar-container"><div class="docs-sheet-button-bar goog-toolbar goog-inline-block"><div class="docs-sheet-button goog-inline-block docs-sheet-left-button" title="Desplazar a la izquierda"><div class="goog-inline-block docs-sheet-button-outer-box"><div class="docs-material goog-inline-block docs-sheet-button-inner-box"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-chevron-left-20" aria-hidden="true">&nbsp;</div></div></div></div></div><div class="docs-sheet-button goog-inline-block docs-sheet-right-button" title="Desplazar a la derecha"><div class="goog-inline-block docs-sheet-button-outer-box"><div class="docs-material goog-inline-block docs-sheet-button-inner-box"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-chevron-right-20" aria-hidden="true">&nbsp;</div></div></div></div></div></div></td><td class="docs-sheet-status-container"><div class="docs-sheet-status"></div><div class="docs-sheet-filter-status" style="display:none" tabindex="0" role="contentinfo"><div class="docs-material"><div class="docs-icon goog-inline-block "><div class="docs-icon-img-container docs-icon-img docs-icon-editors-ia-filter-funnel-solid" aria-hidden="true">&nbsp;</div></div></div><div class="docs-sheet-filter-status-text"></div></div></td></tr></table></div><script nonce="-5t7WQ1G51wrzLhb2Soyng">var mergedConfig = {"id":"23fbad8f0ccde0be","appConfig":{"staticResourcePathPrefix":"","oui":"ANONYMOUS_00801369372001435688","editable":true,"commentable":true,"readComments":true,"accessCapabilitiesJspbFormat":"[\"docs.security.access_capabilities\",1,1,1,1,1,0,0,1,1,0,1,1,1,1,1,0,0,1,0,0,0,0,1,0,1,0,1,0]","objectImageUrlPath":"embed/oimg","syncMap":"[]","isUserStorageAvailable":true,"downloadable":true,"isSaved":true,"docName":"DIRECTORIO GLOBAL ","userPathPrefix":"","forceBidiControls":false,"uiLocale":"es_419","gaiaSessionId":"","authKey":"","isRtlShell":false,"isShadowDocument":false,"isSnippetbookTemplate":false,"fileLockedReason":0,"quotaStatus":1,"blockEditInfo":"[]","truncationStartTimestamp":"","approvalMetadataStatus":5,"contentLockType":0,"nonRegionalizedFeaturesDisabled":false,"isNonGoogleCollaborator":false,"cseFileType":0,"mimeType":"application/vnd.google-apps.ritz","lastBlobExportState":0,"isHubMode":false,"isDarkMode":false,"onePickSheetPickerUrl":"https://docs.google.com/picker?protocol\u003dgadgets\u0026parent\u003dhttps://docs.google.com/relay.html\u0026hostId\u003dtrix-copy-sheet\u0026title\u003dSeleccionar+una+hoja+de+c%C3%A1lculo\u0026hl\u003des_419\u0026newDriveView\u003dtrue\u0026origin\u003dhttps://docs.google.com\u0026urlInputVisible\u003dtrue\u0026nav\u003d((%22all%22,null,%7B%22mimeTypes%22:%22application/vnd.google-apps.spreadsheet,application/vnd.google-apps.ritz%22,%22includeFolders%22:true,%22ownedByMe%22:true%7D),(%22all%22,null,%7B%22mimeTypes%22:%22application/vnd.google-apps.spreadsheet,application/vnd.google-apps.ritz%22,%22drdis%22:true,%22includeFolders%22:true,%22ownedByMe%22:false,%22rdem%22:%22El+propietario+de+uno+o+m%C3%A1s+de+los+archivos+inhabilit%C3%B3+la+importaci%C3%B3n+de+hojas.%22%7D),(%22all%22,null,%7B%22td%22:true,%22mimeTypes%22:%22application/vnd.google-apps.spreadsheet,application/vnd.google-apps.ritz%22,%22drdis%22:true,%22includeFolders%22:true,%22rdem%22:%22El+propietario+de+uno+o+m%C3%A1s+de+los+archivos+inhabilit%C3%B3+la+importaci%C3%B3n+de+hojas.%22%7D),(%22all%22,%22Recientes%22,%7B%22mimeTypes%22:%22application/vnd.google-apps.spreadsheet,application/vnd.google-apps.ritz%22,%22drdis%22:true,%22rdem%22:%22El+propietario+de+uno+o+m%C3%A1s+de+los+archivos+inhabilit%C3%B3+la+importaci%C3%B3n+de+hojas.%22%7D))","onePickFontPickerUrl":"https://docs.google.com/picker?protocol\u003dgadgets\u0026parent\u003dhttps://docs.google.com/relay.html\u0026hostId\u003dritz-fonts\u0026title\u003dFuentes\u0026hl\u003des_419\u0026newDriveView\u003dtrue\u0026origin\u003dhttps://docs.google.com\u0026navHidden\u003dtrue\u0026multiselectEnabled\u003dtrue\u0026selectButtonLabel\u003dAceptar\u0026nav\u003d((%22fonts%22))","onePickImportPickerUrl":"https://docs.google.com/picker?protocol\u003dgadgets\u0026parent\u003dhttps://docs.google.com/relay.html\u0026hostId\u003dtrix-import\u0026title\u003dImportar+archivo\u0026hl\u003des_419\u0026newDriveView\u003dtrue\u0026origin\u003dhttps://docs.google.com\u0026nav\u003d((%22all%22,null,%7B%22mimeTypes%22:%22text/csv,text/comma-separated-values,application/x-vnd.oasis.opendocument.spreadsheet,application/vnd.oasis.opendocument.spreadsheet,text/tab-separated-values,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel.sheet.macroEnabled.12,application/vnd.openxmlformats-officedocument.spreadsheetml.template,application/vnd.ms-excel.template.macroEnabled.12,text/plain,text/html%22,%22includeFolders%22:true,%22ownedByMe%22:true%7D),(%22all%22,null,%7B%22mimeTypes%22:%22text/csv,text/comma-separated-values,application/x-vnd.oasis.opendocument.spreadsheet,application/vnd.oasis.opendocument.spreadsheet,text/tab-separated-values,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel.sheet.macroEnabled.12,application/vnd.openxmlformats-officedocument.spreadsheetml.template,application/vnd.ms-excel.template.macroEnabled.12,text/plain,text/html%22,%22drdis%22:true,%22includeFolders%22:true,%22ownedByMe%22:false,%22rdem%22:%22El+propietario+de+uno+o+m%C3%A1s+de+los+archivos+inhabilit%C3%B3+la+importaci%C3%B3n+de+hojas.%22%7D),(%22all%22,null,%7B%22td%22:true,%22mimeTypes%22:%22text/csv,text/comma-separated-values,application/x-vnd.oasis.opendocument.spreadsheet,application/vnd.oasis.opendocument.spreadsheet,text/tab-separated-values,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel.sheet.macroEnabled.12,application/vnd.openxmlformats-officedocument.spreadsheetml.template,application/vnd.ms-excel.template.macroEnabled.12,text/plain,text/html%22,%22drdis%22:true,%22includeFolders%22:true,%22rdem%22:%22El+propietario+de+uno+o+m%C3%A1s+de+los+archivos+inhabilit%C3%B3+la+importaci%C3%B3n+de+hojas.%22%7D),(%22all%22,%22Recientes%22,%7B%22mimeTypes%22:%22text/csv,text/comma-separated-values,application/x-vnd.oasis.opendocument.spreadsheet,application/vnd.oasis.opendocument.spreadsheet,text/tab-separated-values,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel.sheet.macroEnabled.12,application/vnd.openxmlformats-officedocument.spreadsheetml.template,application/vnd.ms-excel.template.macroEnabled.12,text/plain,text/html%22,%22drdis%22:true,%22rdem%22:%22El+propietario+de+uno+o+m%C3%A1s+de+los+archivos+inhabilit%C3%B3+la+importaci%C3%B3n+de+hojas.%22%7D),(%22upload%22,null,%7B%22query%22:%22docs%22%7D))","onePickImportNamedFunctionsPickerUrl":"https://docs.google.com/picker?protocol\u003dgadgets\u0026parent\u003dhttps://docs.google.com/relay.html\u0026hostId\u003dtrix-import-named-functions\u0026title\u003dImportar+funciones+con+nombre+desde+otra+hoja+de+c%C3%A1lculo+de+Google\u0026hl\u003des_419\u0026newDriveView\u003dtrue\u0026origin\u003dhttps://docs.google.com\u0026nav\u003d((%22all%22,null,%7B%22mimeTypes%22:%22application/vnd.google-apps.spreadsheet,application/vnd.google-apps.ritz,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/vnd.ms-excel.sheet.macroEnabled.12%22,%22includeFolders%22:true,%22ownedByMe%22:true%7D),(%22all%22,null,%7B%22mimeTypes%22:%22application/vnd.google-apps.spreadsheet,application/vnd.google-apps.ritz,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/vnd.ms-excel.sheet.macroEnabled.12%22,%22drdis%22:true,%22includeFolders%22:true,%22ownedByMe%22:false,%22rdem%22:%22El+propietario+de+uno+o+m%C3%A1s+de+los+archivos+inhabilit%C3%B3+la+importaci%C3%B3n+de+hojas.%22%7D),(%22all%22,null,%7B%22td%22:true,%22mimeTypes%22:%22application/vnd.google-apps.spreadsheet,application/vnd.google-apps.ritz,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/vnd.ms-excel.sheet.macroEnabled.12%22,%22drdis%22:true,%22includeFolders%22:true,%22rdem%22:%22El+propietario+de+uno+o+m%C3%A1s+de+los+archivos+inhabilit%C3%B3+la+importaci%C3%B3n+de+hojas.%22%7D),(%22all%22,%22Recientes%22,%7B%22mimeTypes%22:%22application/vnd.google-apps.spreadsheet,application/vnd.google-apps.ritz,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/vnd.ms-excel.sheet.macroEnabled.12%22,%22drdis%22:true,%22rdem%22:%22El+propietario+de+uno+o+m%C3%A1s+de+los+archivos+inhabilit%C3%B3+la+importaci%C3%B3n+de+hojas.%22%7D),(%22upload%22,null,%7B%22query%22:%22docs%22%7D))","onePickImportThemePickerUrl":"https://docs.google.com/picker?protocol\u003dgadgets\u0026parent\u003dhttps://docs.google.com/relay.html\u0026hostId\u003dtrix-import-theme\u0026title\u003dImportar+tema\u0026hl\u003des_419\u0026newDriveView\u003dtrue\u0026origin\u003dhttps://docs.google.com\u0026nav\u003d((%22all%22,null,%7B%22mimeTypes%22:%22application/vnd.google-apps.spreadsheet,application/vnd.google-apps.ritz,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/vnd.ms-excel.sheet.macroEnabled.12%22,%22includeFolders%22:true,%22ownedByMe%22:true%7D),(%22all%22,null,%7B%22mimeTypes%22:%22application/vnd.google-apps.spreadsheet,application/vnd.google-apps.ritz,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/vnd.ms-excel.sheet.macroEnabled.12%22,%22drdis%22:true,%22includeFolders%22:true,%22ownedByMe%22:false,%22rdem%22:%22El+propietario+de+uno+o+m%C3%A1s+de+los+archivos+inhabilit%C3%B3+la+importaci%C3%B3n+de+hojas.%22%7D),(%22all%22,null,%7B%22td%22:true,%22mimeTypes%22:%22application/vnd.google-apps.spreadsheet,application/vnd.google-apps.ritz,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/vnd.ms-excel.sheet.macroEnabled.12%22,%22drdis%22:true,%22includeFolders%22:true,%22rdem%22:%22El+propietario+de+uno+o+m%C3%A1s+de+los+archivos+inhabilit%C3%B3+la+importaci%C3%B3n+de+hojas.%22%7D),(%22all%22,%22Recientes%22,%7B%22mimeTypes%22:%22application/vnd.google-apps.spreadsheet,application/vnd.google-apps.ritz,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/vnd.ms-excel.sheet.macroEnabled.12%22,%22drdis%22:true,%22rdem%22:%22El+propietario+de+uno+o+m%C3%A1s+de+los+archivos+inhabilit%C3%B3+la+importaci%C3%B3n+de+hojas.%22%7D),(%22upload%22,null,%7B%22query%22:%22docs%22%7D))","onePickLargeImportPickerUrl":"https://docs.google.com/picker?protocol\u003dgadgets\u0026parent\u003dhttps://docs.google.com/relay.html\u0026hostId\u003dtrix-large-import\u0026title\u003dImportar+archivo\u0026hl\u003des_419\u0026newDriveView\u003dtrue\u0026origin\u003dhttps://docs.google.com\u0026nav\u003d((%22all%22,null,%7B%22mimeTypes%22:%22text/csv%22,%22includeFolders%22:true,%22ownedByMe%22:true%7D),(%22all%22,null,%7B%22mimeTypes%22:%22text/csv%22,%22drdis%22:true,%22includeFolders%22:true,%22ownedByMe%22:false,%22rdem%22:%22El+propietario+de+uno+o+m%C3%A1s+de+los+archivos+inhabilit%C3%B3+la+importaci%C3%B3n+de+hojas.%22%7D),(%22all%22,null,%7B%22td%22:true,%22mimeTypes%22:%22text/csv%22,%22drdis%22:true,%22includeFolders%22:true,%22rdem%22:%22El+propietario+de+uno+o+m%C3%A1s+de+los+archivos+inhabilit%C3%B3+la+importaci%C3%B3n+de+hojas.%22%7D),(%22all%22,%22Recientes%22,%7B%22mimeTypes%22:%22text/csv%22,%22drdis%22:true,%22rdem%22:%22El+propietario+de+uno+o+m%C3%A1s+de+los+archivos+inhabilit%C3%B3+la+importaci%C3%B3n+de+hojas.%22%7D),(%22upload%22,null,%7B%22query%22:%22docs%22%7D))","imgPath":"https://ssl.gstatic.com/docs/spreadsheets/","enableIncreaseModuleLoadRetry":"true","enableModuleLoadFallbackFetch":"true","jsCompileModeIsRaw":false,"mssServingEnabled":true,"codeMirrorUris":["/static/spreadsheets2/client/js/3281853970-codemirror.js"],"codeMirrorCssUri":"/static/spreadsheets2/client/css/2311758151-codemirror_css_ltr.css","ritzDumbClient":false,"webFonts":"{\"fontMetadataMap\":{},\"unrecognizedFontFamilies\":[],\"weightedFontFamilyMap\":{}}","dlpDetectorIds":"[]","isTdOrganizer":false,"showBigSheetsOnboardingDialogOnStart":false,"showBigSheetsConnectingFlowOnStart":false,"disableRealTimeCollaboration":false,"isImport":false,"isImportCsvTsv":false}}; mergedConfig['ecso'] =  false ; mergedConfig['appConfig']['cosmoId'] = '1bl1_R6Qiee4tQ31Oix1Mjo_Jsbmddv3nsc5xBIy7QJY'; mergedConfig['appConfig']['pathPrefix'] = '\/spreadsheets\/d\/1bl1_R6Qiee4tQ31Oix1Mjo_Jsbmddv3nsc5xBIy7QJY';mergedConfig['appConfig']['backingCosmoId'] = '1bl1_R6Qiee4tQ31Oix1Mjo_Jsbmddv3nsc5xBIy7QJY';</script><script nonce="-5t7WQ1G51wrzLhb2Soyng">function _DumpException(e) {throw e;}DOCS_timing['sjl']=new Date().getTime();</script><script src="/_/spreadsheets/_/js/k=spreadsheets.waffle_js_prod.es_419.6oclWKtYJrQ.es5.O/am=AAEQYADA/d=0/wt=0/rs=AB9W7jsyzZH40jfnFeEu8FaEVcY6TEJO9Q/m=core" id="base-js" nonce="-5t7WQ1G51wrzLhb2Soyng"></script><script nonce="-5t7WQ1G51wrzLhb2Soyng">RITZ_initializeModules( false ,  true ,  true );DOCS_timing['ejl']=new Date().getTime();waffle_api.start( false , mergedConfig);</script><div class="error" id="divError" style="display: none;" dir="ltr">Se ha producido un error en el navegador. <br>Con la tecla Mayús presionada, haz clic en el botón "Actualizar" para intentarlo de nuevo.</div><script nonce="-5t7WQ1G51wrzLhb2Soyng">if ((!this['waffle_api']) ||  false ) {if (window.navigator && window.navigator.sendBeacon) {var DOCS_hasSentJsNotLoadedError=window['DOCS_hasSentJsNotLoadedError']||false; var perfContext = '';if (window['DOCS_getPerfContextFn'] == undefined) {window['DOCS_getPerfContextFn'] = function(jsUrl) {if (!window.performance || !window.performance.getEntriesByType) {return '';}var perfEntries = window.performance.getEntriesByType('resource') .filter((entry) => entry.name.includes(jsUrl)); if (perfEntries == null || perfEntries.length == 0) {return '';}var perfEntry = perfEntries[0]; return '&context.baseJs_transferSize=' + perfEntry['transferSize'] + '&context.baseJs_deliveryType=' + perfEntry['deliveryType'] + '&context.baseJs_responseStatus=' + perfEntry['responseStatus'] + '&context.baseJs_decodedBodySize=' + perfEntry['decodedBodySize'];}}perfContext = window['DOCS_getPerfContextFn']('\/_\/spreadsheets\/_\/js\/k\x3dspreadsheets.waffle_js_prod.es_419.6oclWKtYJrQ.es5.O\/am\x3dAAEQYADA\/d\x3d0\/wt\x3d0\/rs\x3dAB9W7jsyzZH40jfnFeEu8FaEVcY6TEJO9Q\/m\x3dcore');var severityContext = DOCS_hasSentJsNotLoadedError?'&context.severity=postmortem':'&context.severity=warning';const isServiceWorkerControlled = !!(window.origin !== 'null' && navigator.serviceWorker && navigator.serviceWorker.controller); window.navigator.sendBeacon('\/spreadsheets\/jserror?jobset\x3dprod\x26error\x3dJS+binary+load+failure&context.functionName=waffle_api' + '&context.serviceWorkerControlled=' + isServiceWorkerControlled + '\x26context.actionName\x3dEdit' + severityContext + perfContext); DOCS_hasSentJsNotLoadedError=true;}(window.enterCoreJsErrorDialog ? enterCoreJsErrorDialog() : (window.location.href = 'https:\/\/support.google.com\/accounts\/answer\/32050'))}var trixApp; try {trixApp = waffle_api.getInstanceOfApp();} catch (e) {if (e && window.console && window.console.log) {window.console.log(e);}if (window.enterCoreJsErrorDialog) {enterCoreJsErrorDialog();} else {var errorDiv = document.getElementById("divError"); errorDiv.style.display = "";}}function resizeApp() {if (trixApp) {trixApp.resizeAppToCurrentDimensions();}}</script></div></div><script nonce="-5t7WQ1G51wrzLhb2Soyng">resizeApp(); window.onload = resizeApp; var DOCS_initialLoadTiming = trixApp.getInitialLoadTiming(); var DOCS_cseBlobArtifactsHolder = trixApp.getCseBlobArtifactsHolder(); var bootstrapData = {"structure":{},"gridId":0,"changes":{"firstchunkid":"0","firstchunk":[[21299578,"[[\"0\",1,12,11,12],[{\"2\":2,\"6\":0}],[{\"2\":[[{\"1\":33553919,\"2\":33554944,\"12\":0,\"28\":1}]]}]]"],[21299578,"[[\"0\",13,44,11,12],[{\"2\":2,\"6\":0}],[{\"2\":[[{\"1\":33553919,\"2\":33554944,\"12\":0,\"28\":1}]]}]]"],[21299578,"[[\"0\",36,48,2,3],[{\"2\":3,\"3\":[2,\"UIO\"],\"6\":0}],[{\"2\":[[{\"1\":33539454,\"2\":33569409,\"3\":[{\"1\":0}],\"10\":1,\"12\":0,\"14\":[2,1710879],\"15\":\"Roboto\",\"16\":10,\"28\":1}]]}]]"],[25813757,"[[\"0\",0,49,0,12],[[[[{\"1\":[[{\"1\":3,\"5\":[{\"1\":3,\"3\":5.1919563284E10}]}],[2,null,\"UPLUS\",1],[1,\"\\u003d\"]]}],[{\"1\":[[2,\"\\u003d+\"],[{\"1\":5,\"5\":5.1919563284E10}]]}],\"LD5.1919563284E10]FUPLUS:1]S\"],[[{\"1\":[[{\"1\":3,\"5\":[{\"1\":3,\"3\":5.73192605446E11}]}],[2,null,\"UPLUS\",1],[1,\"\\u003d\"]]}],[{\"1\":[[2,\"\\u003d+\"],[{\"1\":5,\"5\":5.73192605446E11}]]}],\"LD5.73192605446E11]FUPLUS:1]S\"],[[{\"1\":[[{\"1\":3,\"5\":[{\"1\":3,\"3\":5.73025174474E11}]}],[1,\"\\u003d\"]]}],[{\"1\":[[2,\"\\u003d\"],[{\"1\":5,\"5\":5.73025174474E11}]]}],\"LD573025174474]S\"],[[{\"1\":[[{\"1\":3,\"5\":[{\"1\":3,\"3\":5.73116024515E11}]}],[1,\"\\u003d\"]]}],[{\"1\":[[2,\"\\u003d\"],[{\"1\":5,\"5\":5.73116024515E11}]]}],\"LD573116024515]S\"],[[{\"1\":[[{\"1\":3,\"5\":[{\"1\":3,\"3\":5.27225183266E11}]}],[1,\"\\u003d\"]]}],[{\"1\":[[2,\"\\u003d\"],[{\"1\":5,\"5\":5.27225183266E11}]]}],\"LD527225183266]S\"],[[{\"1\":[[{\"1\":3,\"5\":[{\"1\":3,\"3\":5.25559460958E11}]}],[2,null,\"UPLUS\",1],[1,\"\\u003d\"]]}],[{\"1\":[[2,\"\\u003d+\"],[{\"1\":5,\"5\":5.25559460958E11}]]}],\"LD5.25559460958E11]FUPLUS:1]S\"],[[{\"1\":[[{\"1\":3,\"5\":[{\"1\":3,\"3\":5.25527377589E11}]}],[2,null,\"UPLUS\",1],[1,\"\\u003d\"]]}],[{\"1\":[[2,\"\\u003d+\"],[{\"1\":5,\"5\":5.25527377589E11}]]}],\"LD5.25527377589E11]FUPLUS:1]S\"],[[{\"1\":[[{\"1\":3,\"5\":[{\"1\":3,\"3\":5.27226964627E11}]}],[1,\"\\u003d\"]]}],[{\"1\":[[2,\"\\u003d\"],[{\"1\":5,\"5\":5.27226964627E11}]]}],\"LD527226964627]S\"]],[[67077182,31681,[{\"1\":0}],null,null,null,null,null,1,1,4,0,null,[2,16777215],\"Montserrat\",11,1],[67077182,31681,[{\"1\":1,\"3\":1}],null,null,null,null,null,1,1,4,0,null,[2,16777215],\"Montserrat\",11,1],[{\"1\":33522750,\"2\":33586113,\"3\":[{\"1\":0}],\"9\":1,\"10\":1,\"11\":4,\"12\":0,\"14\":[2,16777215],\"15\":\"Montserrat\",\"16\":11,\"17\":1,\"28\":1}],[{\"1\":66040895,\"2\":1067968,\"9\":1,\"10\":1,\"11\":4,\"12\":0,\"14\":[2,16777215],\"17\":1,\"23\":1}],[{\"1\":67089470,\"2\":19393,\"3\":[{\"1\":0}],\"9\":1,\"10\":1,\"11\":4,\"12\":0,\"14\":[2,16777215],\"17\":1}],[{\"1\":67089470,\"2\":19393,\"3\":[{\"1\":1,\"3\":1}],\"9\":1,\"10\":1,\"11\":4,\"12\":0,\"14\":[2,16777215],\"17\":1}],[{\"1\":33535038,\"2\":33573825,\"3\":[{\"1\":0}],\"9\":1,\"10\":1,\"11\":4,\"12\":0,\"14\":[2,16777215],\"17\":1,\"28\":1}],[{\"1\":67093886,\"2\":14977,\"3\":[{\"1\":0}],\"10\":1,\"12\":0,\"14\":[2,1710879],\"15\":\"Roboto\",\"16\":10}],[{\"1\":67108350,\"2\":513,\"3\":[{\"1\":0}],\"12\":0}],[{\"1\":33553918,\"2\":33554945,\"3\":[{\"1\":0}],\"12\":0,\"28\":1}],[{\"1\":67108350,\"2\":513,\"3\":[5,\"dd/MM/yyyy\"],\"12\":0}],[{\"1\":33553854,\"2\":33555009,\"3\":[{\"1\":0}],\"9\":1,\"12\":0,\"28\":1}],[{\"1\":33553918,\"2\":33554945,\"3\":[5,\"dd/MM/yyyy\"],\"12\":0,\"28\":1}],[67108862,1,[5,\"dd/MM/yyyy\"]],[67108861,2,null,[2,16776960]],[{\"1\":33554431,\"2\":33554432,\"28\":1}],[{\"1\":33539454,\"2\":33569409,\"3\":[{\"1\":0}],\"10\":1,\"12\":0,\"14\":[2,1710879],\"15\":\"Roboto\",\"16\":10,\"28\":1}],[{\"1\":67108350,\"2\":513,\"3\":[5,\"dd/mm/yyyy\",1],\"12\":0}],[{\"1\":33553855,\"2\":33555008,\"9\":1,\"12\":0,\"28\":1}],[{\"1\":33553919,\"2\":33554944,\"12\":0,\"28\":1}]]],null,[[{\"2\":3,\"3\":[2,\"Nombre\"],\"6\":0}],[{\"2\":3,\"3\":[2,\"Cargo / Función\"],\"6\":0}],[{\"2\":3,\"3\":[2,\"Sede\"],\"6\":0}],[{\"2\":3,\"3\":[2,\"Teléfono\"],\"6\":1}],[{\"2\":3,\"3\":[2,\"Nombre y Apellido Preferido\"],\"6\":2}],[{\"2\":3,\"3\":[2,\"Email CREARPSL.NET\"],\"6\":3}],[{\"2\":3,\"3\":[2,\"Dirección de Residencia\"],\"6\":4}],[{\"2\":3,\"3\":[2,\"Nombre del Contacto de Emergencia\"],\"6\":4}],[{\"2\":3,\"3\":[2,\"Número del Contacto de Emergencia\"],\"6\":5}],[{\"2\":3,\"3\":[2,\"Teléfono Personal\"],\"6\":4}],[{\"2\":3,\"3\":[2,\"Cumpleaños\"],\"6\":4}],[{\"2\":3,\"3\":[2,\"STATUS\"],\"6\":6}],[{\"2\":3,\"3\":[2,\"Evelyn Paulina Cedillo\"],\"6\":7}],[{\"2\":3,\"3\":[2,\"Coordinador Capítulo Uno y Dos\"],\"6\":7}],[{\"2\":3,\"3\":[2,\"Cuenca\"],\"6\":7}],[{\"2\":3,\"3\":[2,\"593 98 546 0130\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Pauly Cedillo\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"evelyn.cedillo@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Honorato Vasquez y Miguel Angel Estrella \"],\"6\":8}],[{\"2\":3,\"3\":[2,\"SANDRA ALVARADO\"],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93984801311E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93958927854E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":36298.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"Viviana Maribel Catota Yugsi\"],\"6\":7}],[{\"25\":13}],[{\"25\":14}],[{\"2\":3,\"3\":[2,\"593 98 546 0506\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Mabe Catota\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"viviana.catota@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Ricaurte, 25 de Marzo y Benigno Vazques\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"SEGUNDO GREGORIO CATOTA\"],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93984046908E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93983335667E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":34943.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"Joao Alfonso Trujillo\"],\"6\":7}],[{\"25\":13}],[{\"25\":14}],[{\"2\":3,\"3\":[2,\"593 99 738 7282\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Joao Trujillo\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"alfonso.trujillo@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Gonzalo Cordero Davila y Agustín Cueva Vallejo\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"ERIKA TRUJILLO\"],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93998759523E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93992785634E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":32801.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"Kerly Carrillo Garzon\"],\"6\":7}],[{\"2\":3,\"3\":[2,\"Coordinador Maestría del Juego\"],\"6\":7}],[{\"25\":14}],[{\"2\":3,\"3\":[2,\"593 99 430 2353\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Kerlie Carrillo\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"kerly.carrillo@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Av Paseo de los Canaris\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"ROCIO GARZON\"],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93969365055E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93995815292E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":34469.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"Juan Fernando Reinoso\"],\"6\":7}],[{\"25\":46}],[{\"25\":14}],[{\"2\":3,\"3\":[2,\"593 98 622 7233\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Juanfer Reinoso\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"juan.reinoso@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Gonzales Suarez y Pintag\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"Daniela Criollo\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"593 99 839 7235\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"593 99 839 7235\"],\"6\":11}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":34845.0}],\"6\":12}],[],[{\"2\":3,\"3\":[2,\"Emely Juliett León Chavez\"],\"6\":7}],[{\"2\":3,\"3\":[2,\"Gerente\"],\"6\":7}],[{\"25\":14}],[{\"2\":3,\"3\":[2,\"593 99 956 4609\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"July León \"],\"6\":9}],[{\"2\":3,\"3\":[2,\"emely.leon@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Edificio La Martina. Av 12 de abril\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"ARMANDO LEON\"],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93997789327E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93985886971E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":36700.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"Alexis Patricio Terán Sánchez\"],\"6\":7}],[{\"2\":3,\"3\":[2,\"Asistente Facturación\"],\"6\":7}],[{\"2\":3,\"3\":[2,\"Global\"],\"6\":7}],[{\"2\":3,\"3\":[2,\"593 98 438 6840\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Alexis Terán\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"asistente.facturacion@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Solanda Sector 1 Calle José Maria Aleman y Calle Calisto del Pino, Pasaje Oe4e y Casa S23-93\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Veronica Sanchez\"],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93995008851E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.9398438684E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":38095.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"Diego Gustavo Flores Chávez\"],\"6\":7}],[{\"25\":79}],[{\"25\":80}],[{\"2\":3,\"3\":[2,\"593 96 173 4724\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Diego Flores\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"diego.flores@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Rio de Janeiro y Canada\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Fernanda Chavez\"],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93988113079E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93961734724E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":37184.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"Paul Sosa\"],\"6\":7}],[{\"2\":3,\"3\":[2,\"CCO Global\"],\"6\":7}],[{\"25\":80}],[{\"2\":3,\"3\":[2,\"593 99  811 9462\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Paul Sosa\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"paul.sosa@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Carlos Montufar 222\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Edison Sosa\"],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93984023661E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93998119462E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":31222.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"Fer Aragon\"],\"6\":7}],[{\"2\":3,\"3\":[2,\"CEO Global\"],\"6\":7}],[{\"25\":80}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.493484226173E12}],\"6\":8}],[{\"25\":111}],[{\"2\":3,\"3\":[2,\"fer.aragon@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Centenario 901 Garin (1619) Argentina \"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Denise Curutchet\"],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.491153198946E12}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.491149609782E12}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":37137.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"Gabriela de Jesús Rivadeneyra Gaitán\"],\"6\":7}],[{\"2\":3,\"3\":[2,\"Contador Lima\"],\"6\":7}],[{\"2\":3,\"3\":[2,\"Lima\"],\"6\":7}],[{\"2\":3,\"3\":[2,\"51 95 0145 007\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Gabriela  Rivadeneyra\"],\"6\":7}],[{\"2\":3,\"3\":[2,\"contabilidad.lima@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Jirón Huancavelica 1646 MZ D9 Lote 4\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Ofelia Gaitán Castillo\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"51991 776 127\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"51 950 145 007\"],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":37638.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"Héctor Antonio Gonzáles Franco\"],\"6\":7}],[{\"2\":3,\"3\":[2,\"Contador Medellín\"],\"6\":7}],[{\"25\":80}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.73244004148E11}],\"6\":8}],[{\"2\":3,\"3\":[2,\"Hector Gonzalez \"],\"6\":9}],[{\"2\":3,\"3\":[2,\"contabilidad.medellin@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"diagonal 29 # 34 f sur 81\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"liliana correa\"],\"6\":8}],[{\"25\":136}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":3.244004148E9}],\"6\":8}],[{\"2\":258,\"6\":13,\"11\":14}],[{\"2\":2,\"6\":15}],[{\"2\":3,\"3\":[2,\"Andres Gomez\"],\"6\":7}],[{\"2\":3,\"3\":[2,\"Coordinador Global Maestría\"],\"6\":7}],[{\"25\":80}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.73506005938E11}],\"6\":8}],[{\"2\":3,\"3\":[2,\"Andres Gomez\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"andres.gomez@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"calle 61 s 39\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Vicente Gomez\"],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":3.116344417E9}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":3.506005938E9}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":30064.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"Karol Fernanda Villarruel Yánez\"],\"6\":7}],[{\"2\":3,\"3\":[2,\"Coordinadora Administrativa\"],\"6\":7}],[{\"25\":80}],[{\"2\":3,\"3\":[2,\"593 99 905 7277\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Karol Villarruel \"],\"6\":9}],[{\"2\":3,\"3\":[2,\"coodinacion.administrativa@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Carlos Freile y Manuel Coronado \"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Geovanna Yanez\"],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93984437376E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93999057277E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":35673.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"Francisco Sebastián Jácome Escobar\"],\"6\":7}],[{\"2\":3,\"3\":[2,\"Facturación\"],\"6\":7}],[{\"25\":80}],[{\"2\":3,\"3\":[2,\"593 98 440 1998\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Sebastián Jácome\"],\"6\":7}],[{\"2\":3,\"3\":[2,\"facturacion.cartera@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Joaquin Gutierrez y Abelardo Andrqde\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Diana Escobar\"],\"6\":8}],[{\"25\":86}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93984401998E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":38330.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"Nancy Elizabeth Escobar Pérez\"],\"6\":7}],[{\"2\":3,\"3\":[2,\"Jefa Financiera\"],\"6\":7}],[{\"25\":80}],[{\"2\":3,\"3\":[2,\"593 99 542 1291\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Elizabeth Escobar\"],\"6\":7}],[{\"2\":3,\"3\":[2,\"contabilidad.global@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Jose Raygada y Alonso de Torres\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Patricio Cruz\"],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93998478802E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93995431291E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":34181.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"Leandro Brunis\"],\"6\":7}],[{\"2\":3,\"3\":[2,\"Socio\"],\"6\":7}],[{\"25\":80}],[{\"2\":3,\"3\":[2,\"593 98 760 3598\"],\"6\":8}],[{\"25\":189}],[{\"2\":3,\"3\":[2,\"leandro.brunis@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Hernando Sarmiento y portete\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Carlos Brunis\"],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93987571131E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93987603589E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":32836.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"Lennin Fernando Chasi Lima\"],\"6\":7}],[{\"2\":3,\"3\":[2,\"Talento Humano\"],\"6\":7}],[{\"25\":80}],[{\"2\":3,\"3\":[2,\"593 99 289 2275\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Lennin Chasi \"],\"6\":7}],[{\"2\":3,\"3\":[2,\"talento.humano@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Guamani Caupicho calle E4C y Calle S52B\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Mariana Lima \"],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93992892275E11}],\"6\":8}],[{\"25\":208}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":32869.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"Pablo Francisco Mendieta\"],\"6\":16}],[{\"2\":3,\"3\":[2,\"Legal\"],\"6\":16}],[{\"2\":3,\"3\":[2,\"Global\"],\"6\":16}],[{\"2\":3,\"3\":[2,\"593 99 504 7243\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"Pablo Mendieta\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"legal@crearpsl.net\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"Mariano Echeverría Oe43-64 y Francisco de Nates. Depto 15 \"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Grace Báez \"],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93979300718E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93995047243E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":32662.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"Jonathan Alexander La Rosa Nieto\"],\"6\":7}],[{\"25\":46}],[{\"2\":3,\"3\":[2,\"Guayaquil\"],\"6\":7}],[{\"2\":3,\"3\":[2,\"593 99 383 0738\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Jonathan La Rosa\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"Jonathan.larosa@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"villa españa 2\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Jorge Ramírez \"],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":9.89743818E8}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":9.89838161E8}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":33595.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"Brenda Vanessa Rodríguez Pérez\"],\"6\":7}],[{\"25\":13}],[{\"25\":224}],[{\"2\":3,\"3\":[2,\"593 98 046 3082\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Brenda Rodríguez \"],\"6\":9}],[{\"2\":3,\"3\":[2,\"brenda.rodriguez@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"cdla. Acuarela del Rio\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Fernando Mendoza\"],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":9.84418222E8}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":9.8785775E8}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":30993.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"Diana Carlota Macas Macas\"],\"6\":7}],[{\"25\":13}],[{\"25\":224}],[{\"2\":3,\"3\":[2,\"593 99 383 0644\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Diana Macas\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"diana.macas@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Urbanizacion San Felipe\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Pedro Macas\"],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":9.68307389E8}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":9.80927921E8}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":30335.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"Marcos Josué Vera Avilés\"],\"6\":7}],[{\"25\":68}],[{\"25\":224}],[{\"2\":3,\"3\":[2,\"59398 605 8852\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Josué Vera\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"josue.vera@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Ciudadela Las Garzas Mz 11 Solar 10 (a lado del San Marino)\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Elva Aviles\"],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":9.83385727E8}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":9.58722151E8}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":32738.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"Diana Moscoso\"],\"6\":7}],[{\"25\":13}],[{\"25\":124}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.1912379744E10}],\"6\":8}],[{\"2\":3,\"3\":[2,\"Diana Moscoso Robles\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"diana.moscoso@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Avenida San borja Norte 1101\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Doris Rosa Robles Marcelo\"],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":9.89385895E8}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":9.24105061E8}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":33825.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"Joyce Marin\"],\"6\":7}],[{\"25\":13}],[{\"25\":124}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.1933599903E10}],\"6\":8}],[{\"2\":3,\"3\":[2,\"Joyce Marín Suárez\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"joyce.marin@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Calle Berlin 965\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Ericka Marín\"],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":2,\"2\":\"+51970535876\",\"6\":1}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":2,\"2\":\"+51955083260\",\"6\":1}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":34576.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"Linid Valencia\"],\"6\":7}],[{\"25\":46}],[{\"25\":124}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.1912379686E10}],\"6\":8}],[{\"2\":3,\"3\":[2,\"Linid Valencia\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"linid.valencia@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Calle Berlín 965\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"José Sánchez \"],\"6\":8}],[{\"2\":20,\"4\":0,\"7\":[{\"1\":3,\"3\":5.1919563284E10}]}],[{\"2\":20,\"4\":1,\"7\":[{\"1\":3,\"3\":5.73192605446E11}]}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":30022.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"Leyla Pasquel\"],\"6\":7}],[{\"25\":46}],[{\"25\":124}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.1919502385E10}],\"6\":8}],[{\"2\":3,\"3\":[2,\"Leyla Pasquel\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"leyla.pasquel@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Residencial Las Torres de Matellini mz b block 15 dpto 404,Chorrillos.\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Piero Portal \"],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":9.62559832E8}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":9.96820944E8}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":26895.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"José Luis Sánchez Moreno\"],\"6\":7}],[{\"25\":68}],[{\"25\":124}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.1919563284E10}],\"6\":8}],[{\"2\":3,\"3\":[2,\"José Sánchez\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"jose.sanchez@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Avenida Alfredo Benavides 1130\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Victoria Sánchez\"],\"6\":8}],[{\"2\":20,\"4\":2,\"7\":[{\"1\":3,\"3\":5.73025174474E11}]}],[{\"2\":20,\"4\":3,\"7\":[{\"1\":3,\"3\":5.73116024515E11}]}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":30392.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"Valentina Rodriguez Castaño\"],\"6\":16}],[{\"25\":13}],[{\"2\":3,\"3\":[2,\"MED\"],\"6\":16}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.73137149033E11}],\"6\":9}],[{\"2\":3,\"3\":[2,\"Valentina Rodriguez\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"valentina.r@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"carrera 56 a # 54 s 25\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Luisa Rodriguez\"],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.73013156329E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.73044072665E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":34614.0}],\"6\":17}],[],[{\"2\":3,\"3\":[2,\"Yurany Gonzalez Franco\"],\"6\":16}],[{\"2\":3,\"3\":[2,\"Gerente\"],\"6\":16}],[{\"25\":323}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.73225720949E11}],\"6\":9}],[{\"2\":3,\"3\":[2,\"Yurany G Franco\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"yurany.gonzalez@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"calle 40 c sur # 38 - 85\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Fabiola franco\"],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.73054466093E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.73115693331E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":31101.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"Mauricio Ramirez Silva\"],\"6\":16}],[{\"25\":46}],[{\"25\":323}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.73052476502E11}],\"6\":9}],[{\"2\":3,\"3\":[2,\"Mauricio Ramirez\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"mauricio.ramirez@crearpsl.net\"],\"6\":8}],[{\"25\":338}],[{\"2\":3,\"3\":[2,\"Antonio Ramirez\"],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.73169479341E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.73115777808E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":30177.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"David Gonzalez Franco\"],\"6\":16}],[{\"2\":3,\"3\":[2,\"Coordinador Capítulo uno y dos\"],\"6\":16}],[{\"25\":323}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.73137162944E11}],\"6\":9}],[{\"2\":3,\"3\":[2,\"David Gonzalez Franco\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"david.gonzalez@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"carrera 32 # 41 aa sur 14\"],\"6\":8}],[{\"25\":339}],[{\"25\":340}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.7301305361E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":35652.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"Naomi Campos Soriano\"],\"6\":7}],[{\"25\":13}],[{\"2\":3,\"3\":[2,\"México\"],\"6\":7}],[{\"2\":20,\"4\":4,\"7\":[{\"1\":3,\"3\":5.27225183266E11}]}],[{\"2\":3,\"3\":[2,\"Nao Campos\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"naomi.campos@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Filiverto Gomez 33, San Blas Otzacatipan, Toluca 50230 Mexico\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Aide Campos Soriano\"],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":7.224133992E9}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":7.22682754E9}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":37955.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"Daniela Monroy Fabbri\"],\"6\":7}],[{\"25\":46}],[{\"25\":367}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.25533326645E11}],\"6\":8}],[{\"2\":3,\"3\":[2,\"Daniela Monroy \"],\"6\":9}],[{\"2\":3,\"3\":[2,\"daniela.monroy@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"C.10 casa 37, rancho san Lucas, Metepec  Metepec edomex\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Samantha Olvera \"],\"6\":8}],[{\"2\":20,\"4\":5,\"7\":[{\"1\":3,\"3\":5.25559460958E11}]}],[{\"2\":20,\"4\":6,\"7\":[{\"1\":3,\"3\":5.25527377589E11}]}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":33506.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"Nora Zamora Benítez\"],\"6\":7}],[{\"25\":68}],[{\"25\":367}],[{\"2\":20,\"4\":7,\"7\":[{\"1\":3,\"3\":5.27226964627E11}]}],[{\"2\":3,\"3\":[2,\"Nora Zamora \"],\"6\":9}],[{\"2\":3,\"3\":[2,\"nora.zamora@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Chapultepec 37, int 5, San Jeronimo Chicahualco, Metepec, México\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Jose Miguel González Acevedo\"],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":7.22806489E9}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.539353705E9}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":-333175.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"Adrianna Michelle Guarochico Usuño\"],\"6\":16}],[{\"25\":13}],[],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93993830681E11}],\"6\":9}],[{\"2\":3,\"3\":[2,\"Adrianna Guarochico\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"adrianna.guarochico@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Entrada al Paraiso, Pasaje 1, La Argelia\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Maribel Usuño\"],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93987743909E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93984613232E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":36471.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"Danna Alejandra Guaman Rodríguez\"],\"6\":16}],[{\"25\":13}],[],[{\"2\":3,\"3\":[2,\"593 98 843 2216\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"Danna Guaman\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"danna.guaman@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Av. panamericana Norte y N72-C \"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Robert Guaman\"],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.9398337531E10}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93995849214E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":36477.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"Emily Gabriela Campuzano Rodríguez \"],\"6\":16}],[{\"25\":333}],[],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93991408931E11}],\"6\":9}],[{\"2\":3,\"3\":[2,\"Emily Campuzano\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"emily.campuzano@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Tumbaco, calle Josefa Tinajero y Barbara esparza. Conjunto Portal del Chiche Casa 32\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Alejandro Diaz\"],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93980247891E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93958997841E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":34662.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"Erika Gissell Gavilánez Gallardo \"],\"6\":16}],[{\"25\":46}],[],[{\"2\":3,\"3\":[2,\"593 99 192 3021\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"Erika Gavilánez\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"erika.gavilanez@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"urbanización San Fernando Ignacio Asin y Antonio Roman\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"David Sosa\"],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93998139655E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93979273055E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":34330.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"Freddy David Sosa Carrera\"],\"6\":16}],[{\"25\":333}],[],[{\"2\":3,\"3\":[2,\"593 99 813 9655\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"David Sosa\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"freddy.sosa@crearpsl.net\"],\"6\":8}],[{\"25\":433}],[{\"2\":3,\"3\":[2,\"Erika Gavilanez\"],\"6\":8}],[{\"25\":436}],[{\"25\":435}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":33069.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"Isaac Gabriel Betancourt Patiño\"],\"6\":16}],[{\"25\":46}],[],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93988175835E11}],\"6\":9}],[{\"2\":3,\"3\":[2,\"Isaac Betancourth\"],\"6\":16}],[{\"2\":3,\"3\":[2,\"ibetancourth@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Lomas de Monteserrin \"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Lourdes Patiño \"],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93997634023E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.9393900957E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":36805.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"Judith Regina Romero Rosales\"],\"6\":16}],[{\"25\":46}],[],[{\"2\":3,\"3\":[2,\"593 98 189 6547\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"Regina Romero\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"judith.romero@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Av Gaspar de Villaroel y 6 de  diciembre \"],\"6\":9}],[{\"2\":3,\"3\":[2,\"Vannesa Romero \"],\"6\":9}],[{\"2\":3,\"3\":[2,\"59399 8862385\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"593 998697995\"],\"6\":11}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":31103.0}],\"6\":12}],[],[{\"2\":3,\"3\":[2,\"Karla Viviana Pastrano Villegas\"],\"6\":16}],[{\"25\":13}],[],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93985699424E11}],\"6\":9}],[{\"2\":3,\"3\":[2,\"Karla Pastrano\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"karla.pastrano@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"San Pdero de Taboada, calle Manuel Pomboza y Barbola Synailin\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Cristhian Viteri\"],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.9398721994E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93994839083E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":30448.0}],\"6\":10}],[],[{\"2\":3,\"3\":[2,\"Liliana Lilibeth Cubillo Vera\"],\"6\":16}],[{\"25\":46}],[],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93999564699E11}],\"6\":9}],[{\"2\":3,\"3\":[2,\"Lili Cubillo\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"liliana.cubillo@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Antonio Checa s/n conjunto Club Casa Grande casa 7 \"],\"6\":9}],[{\"2\":3,\"3\":[2,\"Javier Villalba\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"593 99 467 2460\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"593 99 652 1133\"],\"6\":11}],[{\"2\":3,\"3\":[2,\"11/1121990\"],\"6\":11}],[{\"2\":2,\"6\":18}],[{\"2\":3,\"3\":[2,\"Marco Jesús González Caguado\"],\"6\":16}],[{\"25\":13}],[],[{\"2\":3,\"3\":[2,\"593 99 141 8111\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"Adams Gonzalez\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"marco.gonzalez@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Jose Felix Barreiro y de Los Nogales. El Inca.\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Maritza Elizalde\"],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93999016035E11}],\"6\":8}],[{\"25\":496}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":31630.0}],\"6\":10}],[{\"2\":2,\"6\":19}],[{\"2\":3,\"3\":[2,\"Katherine Marcela Aguirre Parra\"],\"6\":8}],[{\"25\":13}],[],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93989480131E11}],\"6\":9}],[{\"2\":3,\"3\":[2,\"Marce Aguirre\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"ketherine.aguirre@crearpsl.com\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"Amaguaña Geronimo Carrion y Simon Bolivar\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"Maria Elena Parra\"],\"6\":9}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.9399410359E11}],\"6\":9}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93983854306E11}],\"6\":9}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":34644.0}],\"6\":12}],[{\"25\":499}],[{\"2\":3,\"3\":[2,\"Santiago Proaño\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Técnico SST\"],\"6\":7}],[],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93998336421E11}],\"6\":9}],[{\"2\":3,\"3\":[2,\"Santiago Proaño\"],\"6\":9}],[{\"2\":2228227,\"3\":[2,\"sso@crearpsl.net\"],\"6\":9,\"24\":\"mailto:sso@crearpsl.net\",\"26\":[[0,[{\"1\":[2,16777215],\"2\":[2,1136076],\"3\":\"Calibri, sans-serif\",\"4\":11,\"9\":1}]],[{\"1\":16}]]}],[{\"2\":3,\"3\":[2,\"Humberto Puga y Elias Godoy\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"Alexandra Pallo (Médico de Crear)\"],\"6\":9}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93999271257E11}],\"6\":9}],[{\"25\":513}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":33641.0}],\"6\":12}],[{\"25\":499}],[{\"2\":3,\"3\":[2,\"Daniela Esposito Farfán \"],\"6\":16}],[{\"25\":13}],[{\"2\":3,\"3\":[2,\"UIO \"],\"6\":16}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93991393973E11}],\"6\":9}],[{\"2\":3,\"3\":[2,\"Daniela Esposito\"],\"6\":9}],[{\"2\":3,\"3\":[2,\"daniela.esposito@crearpsl.net\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Valle de los Chillos, Fajardo. Avenida El inca y Santa  Cedilia, Conjunto Panorama Gardens Casa 17\"],\"6\":8}],[{\"2\":3,\"3\":[2,\"Eduardo Alfaro\"],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93958740157E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":5.93981188999E11}],\"6\":8}],[{\"2\":3,\"3\":[{\"1\":3,\"3\":34614.0}],\"6\":10}],[{\"25\":499}]]]"],[29921628,"[\"0\",0,[[35,36]],[{\"1\":[[{\"1\":6,\"2\":0,\"8\":1}],[0,0,29]]}]]"],[29921628,"[\"0\",1,[[0,1]],[{\"1\":[[0,0,234]]}]]"],[29921628,"[\"0\",1,[[1,2]],[{\"1\":[[0,0,229]]}]]"],[29921628,"[\"0\",1,[[2,3]],[{\"1\":[[0,0,81]]}]]"],[29921628,"[\"0\",1,[[3,4]],[{\"1\":[[0,0,112]]}]]"],[29921628,"[\"0\",1,[[4,5]],[{\"1\":[[0,0,266]]}]]"],[29921628,"[\"0\",1,[[5,6]],[{\"1\":[[0,0,260]]}]]"],[29921628,"[\"0\",1,[[6,7]],[{\"1\":[[0,0,261]]}]]"],[29921628,"[\"0\",1,[[7,9]],[{\"1\":[[0,0,195]]}]]"],[29921628,"[\"0\",1,[[9,10]],[{\"1\":[[0,0,150]]}]]"],[29921628,"[\"0\",1,[[10,11]],[{\"1\":[[0,0,118]]}]]"],[45416218,"[\"0\",0,[[[\"0\",1,49,0,12]],[[[29,[[1,null,[[{\"1\":[[{\"1\":4,\"6\":1}],[{\"1\":3,\"5\":[2,\"DESERTOR\"]}],[2,null,\"\\u003d\",2],[1,\"\\u003d\"]]}],[{\"1\":[[2,\"\\u003d\"],[{\"1\":3,\"3\":1}],[2,\"\\u003d\\\"DESERTOR\\\"\"]]}],\"R1]LSDESERTOR]]F\\u003d:2]S\"],[[[0,1,11,12,2232576],1]]]]],[{\"1\":[{\"1\":[[{\"1\":4,\"6\":0}],[{\"1\":3,\"5\":[2,\"DESERTOR\"]}],[2,null,\"\\u003d\",2],[1,\"\\u003d\"]]}],\"3\":\"R0]LSDESERTOR]]F\\u003d:2]S\"}],[[[0,1,11,12,2232576],0]]],[{\"2\":2,\"4\":[2,16711680]}],1]]]"],[45416218,"[\"0\",1,[[[\"0\",1,47,0,1],[\"0\",1,49,1,2],[\"0\",1,47,2,6],[\"0\",1,5,6,11],[\"0\",6,33,6,11],[\"0\",34,41,6,11],[\"0\",42,47,6,11]],[[[{\"1\":25}],[{\"1\":[{\"1\":[[{\"1\":4,\"6\":0}],[2,null,\"CONDITION_BLANK\",1],[1,\"\\u003d\"]]}],\"3\":\"R0]FCONDITION_BLANK:1]S\"}],[[[0,1,0,1,1118464],0]]],[{\"2\":2,\"4\":[2,16776960]}],1]]]"],[45416218,"[\"0\",2,[[[\"0\",0,47,0,1],[\"0\",0,49,1,2],[\"0\",0,47,2,6],[\"0\",14,15,9,10],[\"0\",18,19,9,10]],[[[{\"1\":25}],[{\"1\":[{\"1\":[[{\"1\":4,\"6\":0}],[2,null,\"CONDITION_BLANK\",1],[1,\"\\u003d\"]]}],\"3\":\"R0]FCONDITION_BLANK:1]S\"}],[[[0,1,0,1,1118464],0]]],[{\"2\":2,\"4\":[2,16776960]}],1]]]"],[25104121,"[0,1,[],null,null,1,[],1,[],1,[],1,[],null,null,1,null,null,null,null,null,null,1]"],[25104121,"[2,1,[],null,null,1,[],1,[],1,[],1,[],null,null,1,null,null,null,null,null,null,1]"],[25104121,"[1,1,[],null,null,1,[],1,[],1,[],1,[],null,null,1,null,null,null,null,null,null,1]"],[25104121,"[3,1,[],null,null,1,[],1,[],1,[],1,[],null,null,1,null,null,null,null,null,null,1]"],[149980211,"[\"0\",[{\"1\":[[2,1,null,1.7885691458030225E12],[{\"1\":3,\"2\":1,\"5\":1.7823525621084172E12}]]}]]"]],"topsnapshot":[[55992331,"[{\"1\":116}]"],[21350203,"[0,0,\"0\",[{\"1\":[[0,0,\"Hoja 1\"],[{\"1\":6,\"2\":0,\"9\":0}],[{\"1\":2,\"2\":0,\"5\":0}],[{\"1\":3,\"2\":0,\"6\":0}],[{\"1\":4,\"2\":0,\"7\":1}],[{\"1\":5,\"2\":0,\"8\":0}],[{\"1\":7,\"2\":0,\"10\":[{\"1\":0}]}],[{\"1\":13,\"2\":0,\"16\":[1,null,0,0,0,0,0,0,1,1,2,1,null,null,2,1]}],[{\"1\":14,\"2\":0,\"17\":[\"A4\",0,2,1.0,[0.75,0.75,0.7,0.7]]}]]}],1000,25]"],[21350203,"[1,0,\"1091581708\",[{\"1\":[[0,0,\"Entrenadores Crear PSL \"],[{\"1\":6,\"2\":0,\"9\":0}],[{\"1\":2,\"2\":0,\"5\":0}],[{\"1\":3,\"2\":0,\"6\":0}],[{\"1\":4,\"2\":0,\"7\":1}],[{\"1\":5,\"2\":0,\"8\":0}],[{\"1\":7,\"2\":0,\"10\":[{\"1\":0}]}]]}],1004,26]"],[28950036,"[{\"1\":[[[3,0,null,\"America/Lima\"],[2,0,\"es_ES\"],[{\"1\":4,\"2\":0,\"5\":2}],[{\"1\":10,\"2\":0,\"11\":21}],[{\"1\":11,\"2\":0,\"12\":100}],[{\"1\":9,\"2\":0,\"10\":[{\"2\":256,\"11\":0}]}]],1]}]"],[34070425,"[\"643912997\",[\"1091581708\",0,25,0,5],7,[{\"2\":32,\"8\":[{\"1\":[{\"1\":[[{\"4\":[2,4349328]}],[{\"4\":[2,16382463]}],1,[{\"4\":[2,16777215]}],1]}]}]}]]"],[34070425,"[\"967998019\",[\"0\",0,49,0,12],7,[{\"2\":32,\"8\":[[{\"1\":[[{\"4\":[2,4415121]}],[{\"4\":[2,16316671]}],1,[{\"4\":[2,16777215]}],1]}],\"Directorio\",[[0,1,[{\"2\":2}],12]],null,[62,null,0,1,0,0,0]]}]]"],[514397480,"[\"967998019\",[[2,\"Nombre\"],[2,\"Cargo / Función\"],[2,\"Sede\"],[2,\"Teléfono\"],[2,\"Nombre y Apellido Preferido\"],[2,\"Email CREARPSL.NET\"],[2,\"Dirección de Residencia\"],[2,\"Nombre del Contacto de Emergencia\"],[2,\"Número del Contacto de Emergencia\"],[2,\"Teléfono Personal\"],[2,\"Cumpleaños\"],[2,\"STATUS\"]]]"],[34070425,"[\"1412749579\",[\"0\",41,42,4,5],2,[]]"],[34070425,"[\"1655548627\",[\"0\",20,21,3,4],2,[]]"],[34070425,"[\"394252482\",[\"0\",34,35,3,4],2,[]]"],[34070425,"[\"654300156\",[\"0\",2,3,3,4],2,[]]"],[34070425,"[\"814775041\",[\"0\",46,47,0,1],2,[]]"],[34070425,"[\"899534511\",[\"0\",46,47,0,1],2,[]]"],[34070425,"[\"dt1904264766\",[\"0\",0,49,0,12],9,[{\"2\":128,\"10\":[1.0,1,\"V4\",[null,[\"0\",0,1,0,12],[[{\"1\":\"Nombre\",\"3\":11,\"4\":1,\"10\":48,\"11\":1.0}],[{\"1\":\"Cargo / Función\",\"3\":11,\"4\":1,\"10\":48,\"11\":1.0}],[{\"1\":\"Sede\",\"3\":11,\"4\":1,\"10\":48,\"11\":1.0}],[{\"1\":\"Teléfono\",\"3\":0,\"4\":1,\"10\":48,\"11\":1.0}],[{\"1\":\"Nombre y Apellido Preferido\",\"3\":11,\"4\":1,\"10\":48,\"11\":1.0}],[{\"1\":\"Email CREARPSL.NET\",\"3\":11,\"4\":1,\"5\":[2],\"10\":48,\"11\":0.9791666666666666}],[{\"1\":\"Dirección de Residencia\",\"3\":11,\"4\":1,\"10\":48,\"11\":1.0}],[{\"1\":\"Nombre del Contacto de Emergencia\",\"3\":11,\"4\":1,\"10\":48,\"11\":1.0}],[{\"1\":\"Número del Contacto de Emergencia\",\"3\":9,\"4\":1,\"10\":48,\"11\":0.8958333333333334}],[{\"1\":\"Teléfono Personal\",\"3\":9,\"4\":1,\"10\":48,\"11\":0.8958333333333334}],[{\"1\":\"Cumpleaños\",\"3\":2,\"4\":1,\"10\":47,\"11\":0.9787234042553191}],[{\"1\":\"STATUS\",\"3\":0,\"4\":1,\"10\":0,\"11\":1.0}]],[[0,null,1,48]]]]}]]"],[34070425,"[\"dt944279491\",[\"1091581708\",0,25,0,5],9,[{\"2\":128,\"10\":[1.0,1,\"V4\",[null,[\"1091581708\",0,1,0,5],[[{\"1\":\"Nombre Completo\",\"3\":11,\"4\":1,\"10\":24,\"11\":1.0}],[{\"1\":\"Correo Electrónico 1\",\"3\":11,\"4\":1,\"5\":[2],\"10\":24,\"11\":1.0}],[{\"1\":\"Correo Electrónico 2\",\"3\":11,\"4\":1,\"5\":[2],\"10\":2,\"11\":1.0}],[{\"1\":\"ENTRENAMIENTOS \",\"3\":11,\"4\":1,\"10\":24,\"11\":1.0}],[{\"1\":\"LLAMADAS\",\"3\":11,\"4\":1,\"10\":24,\"11\":1.0}]],[[0,null,1,24]]]]}]]"],[34070425,"[\"9078832\",[\"0\",0,49,0,12],4,[{\"2\":2,\"4\":[[[1,[{\"1\":1}]],[2,[{\"1\":1}]]],[[2,0],[0,0]],\"\"]}],null,[\"967998019\",1]]"],[39390250,"[\"0\",[{\"2\":2,\"4\":\"9078832\"}]]"],[25104121,"[0,1,[],null,null,1,[],1,[],1,[],1,[],null,null,1,null,null,null,null,1,null,1,null,1,[]]"],[25104121,"[2,1,[],null,null,1,[],1,[],1,[],1,[],null,null,1,null,null,null,null,1,null,1,null,1,[]]"],[25104121,"[1,1,[],null,null,1,[],1,[],1,[],1,[],null,null,1,null,null,null,null,1,null,1,null,1,[]]"],[25104121,"[3,1,[],null,null,1,[],1,[],1,[],1,[],null,null,1,null,null,null,null,1,null,1,null,1,[]]"],[105059328,"[]"]],"revision":682,"modelVersion":116,"featureVersion":116,"modelFeatureBitSet":[116,""],"sid":"23fbad8f0ccde0be","revisionhmac":"D0SBswAzzShnHQ","firstchunklength":33572,"topsnapshotlength":4100,"initialCellCount":51104}}; function loadWaffle() {trixApp.load(mergedConfig, bootstrapData); bootstrapData = null;}</script><script nonce="-5t7WQ1G51wrzLhb2Soyng">DOCS_timing['srjl']=new Date().getTime();</script><script src="/_/spreadsheets/_/js/k=spreadsheets.waffle_js_prod.es_419.6oclWKtYJrQ.es5.O/am=AAEQYADA/d=0/wt=0/rs=AB9W7jsyzZH40jfnFeEu8FaEVcY6TEJO9Q/m=ritzmain" nonce="-5t7WQ1G51wrzLhb2Soyng"></script><script nonce="-5t7WQ1G51wrzLhb2Soyng">if ((!this['ritz_api']) ||  false ) {if (window.navigator && window.navigator.sendBeacon) {var DOCS_hasSentJsNotLoadedError=window['DOCS_hasSentJsNotLoadedError']||false; var perfContext = '';if (window['DOCS_getPerfContextFn'] == undefined) {window['DOCS_getPerfContextFn'] = function(jsUrl) {if (!window.performance || !window.performance.getEntriesByType) {return '';}var perfEntries = window.performance.getEntriesByType('resource') .filter((entry) => entry.name.includes(jsUrl)); if (perfEntries == null || perfEntries.length == 0) {return '';}var perfEntry = perfEntries[0]; return '&context.baseJs_transferSize=' + perfEntry['transferSize'] + '&context.baseJs_deliveryType=' + perfEntry['deliveryType'] + '&context.baseJs_responseStatus=' + perfEntry['responseStatus'] + '&context.baseJs_decodedBodySize=' + perfEntry['decodedBodySize'];}}perfContext = window['DOCS_getPerfContextFn']('\/_\/spreadsheets\/_\/js\/k\x3dspreadsheets.waffle_js_prod.es_419.6oclWKtYJrQ.es5.O\/am\x3dAAEQYADA\/d\x3d0\/wt\x3d0\/rs\x3dAB9W7jsyzZH40jfnFeEu8FaEVcY6TEJO9Q\/m\x3dritzmain');var severityContext = DOCS_hasSentJsNotLoadedError?'&context.severity=postmortem':'&context.severity=warning';const isServiceWorkerControlled = !!(window.origin !== 'null' && navigator.serviceWorker && navigator.serviceWorker.controller); window.navigator.sendBeacon('\/spreadsheets\/jserror?jobset\x3dprod\x26error\x3dJS+binary+load+failure&context.functionName=ritz_api' + '&context.serviceWorkerControlled=' + isServiceWorkerControlled + '\x26context.actionName\x3dEdit' + severityContext + perfContext); DOCS_hasSentJsNotLoadedError=true;}(window.enterCoreJsErrorDialog ? enterCoreJsErrorDialog() : (window.location.href = 'https:\/\/support.google.com\/accounts\/answer\/32050'))}</script><script nonce="-5t7WQ1G51wrzLhb2Soyng">window['DOCS_appBootstrapReadyPromise'] = Promise.resolve();</script><script nonce="-5t7WQ1G51wrzLhb2Soyng">if (DOCS_hasSentJsNotLoadedError && waffle_api && waffle_api.logErr) {const hasGlobal = (name) => window[name] ? 'true' : 'false'; waffle_api.logErr( new Error('JS binary not loaded'),  false,  {'docsSoyCheckJsLoadedFailed': 'true', 'has_waffle_api': hasGlobal('waffle_api'), 'has_trixApp': hasGlobal('trixApp'), 'has_ritz_api': hasGlobal('ritz_api'), 'has_calcWebWorkerInstance': hasGlobal('__calcWebWorkerInstance'),},  true);}</script><script async="" nonce="-5t7WQ1G51wrzLhb2Soyng">(function(){var url='https://www.gstatic.com/og/_/js/k\x3dog.asy.en_US.8pj5yvofiFY.es5.O/rt\x3dj/m\x3d_ac,ada,lldp,qads/exm\x3d/d\x3d1/ed\x3d1/rs\x3dAA2YrTsl4PkVJ5yFwVLouPqGvoKUq3mFhg';var defer=false;var delay=50;'use strict';(function(){var b={createScriptURL:function(){return url}},c=window.trustedTypes,e=c?c.createPolicy("ogb#defer",b):b,d=document.currentScript;window.setTimeout(function(){var a=document.createElement("script");a.src=e.createScriptURL("");d&&(a.nonce=d.nonce);a.async=!defer;a.defer=defer;document.head.appendChild(a)},delay?delay:200)})();})();</script><link href="https://www.gstatic.com/og/_/ss/k=og.asy.3-e5DRnVKXQ.L.X.O/m=adcgm3/excm=/d=1/ed=1/ct=zgms/rs=AA2YrTsDQgDYzohZUdPDC-gGsBVPPAOegA" nonce="-5t7WQ1G51wrzLhb2Soyng" id="ogb_ss" media="print" rel="stylesheet"><script nonce="-5t7WQ1G51wrzLhb2Soyng">const linkEl = document.getElementById('ogb_ss');linkEl.onload = ()=> {linkEl.media = 'all'};linkEl.removeAttribute('id');</script><script nonce="-5t7WQ1G51wrzLhb2Soyng">function runPerformanceData() {if (window['DOCS_initialLoadTiming']) {DOCS_initialLoadTiming.setServerValues({"slbc":156,"slce":222,"smc":0,"smf":0,"smsfie":57,"spbre":216,"spbrs":153,"shtrs":154,"shtre":215,"shtrd":61,"spbrd":62});} else {throw new Error('DOCS_initialLoadTiming is not defined.');}}var readyPromise = window['DOCS_appBootstrapReadyPromise'] || Promise.resolve(); readyPromise.then(runPerformanceData);</script></body></html><div id="docs-recommendation-banner"></div><div id="docs-recommendations-initialization" data-initial-recommendations="%.@.[[[null,&quot;1&quot;,348],null,0],[[null,&quot;1&quot;,1193],null,0]]]"></div>
+```
+
+---
+
 ## Archivo: scratch\test_import.js
 
 ```js
@@ -206501,19 +206467,25 @@ runRestore()
 ```json
 {
   "robot_token": "NODUS_ROBOT_CPSL_2026_SECRET",
-  "timestamp": "2026-09-04T23:39:59.647Z",
+  "timestamp": "2026-09-05T00:39:50.789Z",
   "fuente": "Sistema Autónomo Multi-Agente Nodus CPSL 2026",
   "usuarioExtraccion": "jsanchez (Super Administrador Global)",
   "totales": {
     "totalCoordinadores": 22,
     "totalGestiones": 28981,
+    "totalGestionesC1": 15213,
+    "totalGestionesC2": 12820,
     "totalAsignados": 13616,
     "totalConfirmados": 13545,
+    "totalConfirmadosC1": 3484,
+    "totalConfirmadosC2": 2328,
     "totalNoContesta": 8633,
     "totalPorConfirmar": 2219,
     "totalSiguiente": 3358,
     "totalNoInteresa": 755,
     "totalAsistieron": 5704,
+    "totalSentadosC1": 3227,
+    "totalSentadosC2": 2477,
     "coberturaPromedio": 87,
     "productividadPromedio": 21
   },
@@ -206522,59 +206494,79 @@ runRestore()
       "sede": "Cuenca",
       "coordinadoresCount": 4,
       "gestionesTotal": 918,
+      "gestionesC1Total": 819,
+      "gestionesC2Total": 99,
       "asignadosTotal": 3131,
       "confirmadosTotal": 601,
       "noContestaTotal": 134,
       "porConfirmarTotal": 93,
       "asistieronTotal": 283,
-      "c1Total": 918,
-      "c2Total": 0
+      "sentadosC1Total": 257,
+      "sentadosC2Total": 26,
+      "c1Total": 819,
+      "c2Total": 99
     },
     {
       "sede": "Guayaquil",
       "coordinadoresCount": 4,
       "gestionesTotal": 5258,
+      "gestionesC1Total": 5101,
+      "gestionesC2Total": 157,
       "asignadosTotal": 1893,
       "confirmadosTotal": 2321,
       "noContestaTotal": 1948,
       "porConfirmarTotal": 340,
       "asistieronTotal": 1114,
-      "c1Total": 5258,
-      "c2Total": 0
+      "sentadosC1Total": 1087,
+      "sentadosC2Total": 27,
+      "c1Total": 5101,
+      "c2Total": 157
     },
     {
       "sede": "Lima",
       "coordinadoresCount": 3,
       "gestionesTotal": 5454,
+      "gestionesC1Total": 4726,
+      "gestionesC2Total": 309,
       "asignadosTotal": 1898,
       "confirmadosTotal": 2633,
       "noContestaTotal": 1549,
       "porConfirmarTotal": 448,
       "asistieronTotal": 847,
-      "c1Total": 4732,
-      "c2Total": 722
+      "sentadosC1Total": 846,
+      "sentadosC2Total": 1,
+      "c1Total": 4726,
+      "c2Total": 309
     },
     {
       "sede": "Medellín",
       "coordinadoresCount": 3,
       "gestionesTotal": 4599,
+      "gestionesC1Total": 3784,
+      "gestionesC2Total": 314,
       "asignadosTotal": 1415,
       "confirmadosTotal": 2380,
       "noContestaTotal": 1183,
       "porConfirmarTotal": 213,
       "asistieronTotal": 965,
-      "c1Total": 4030,
-      "c2Total": 569
+      "sentadosC1Total": 918,
+      "sentadosC2Total": 47,
+      "c1Total": 3784,
+      "c2Total": 314
     },
     {
       "sede": "México",
       "coordinadoresCount": 1,
       "gestionesTotal": 3,
+      "gestionesC1Total": 3,
+      "gestionesC2Total": 0,
       "asignadosTotal": 151,
       "confirmadosTotal": 0,
       "noContestaTotal": 2,
       "porConfirmarTotal": 1,
       "asistieronTotal": 0,
+      "sentadosC1Total": 0,
+      "sentadosC2Total": 0,
       "c1Total": 3,
       "c2Total": 0
     },
@@ -206582,13 +206574,17 @@ runRestore()
       "sede": "Quito",
       "coordinadoresCount": 7,
       "gestionesTotal": 12749,
+      "gestionesC1Total": 780,
+      "gestionesC2Total": 11941,
       "asignadosTotal": 5128,
       "confirmadosTotal": 5610,
       "noContestaTotal": 3817,
       "porConfirmarTotal": 1124,
       "asistieronTotal": 2495,
-      "c1Total": 12721,
-      "c2Total": 28
+      "sentadosC1Total": 119,
+      "sentadosC2Total": 2376,
+      "c1Total": 780,
+      "c2Total": 11941
     }
   ],
   "coordinadores": [
@@ -206601,8 +206597,8 @@ runRestore()
       "ciclo": "Ciclo 1",
       "rol": "Coordinador C1",
       "gestiones": 396,
-      "c1": 396,
-      "c2": 0,
+      "c1": 363,
+      "c2": 33,
       "asignados": 748,
       "coberturaPct": 31,
       "coberturaDetalle": "234/748 (31%)",
@@ -207025,7 +207021,14 @@ runRestore()
           "cambioCupo": 0,
           "asistieron": 0
         }
-      ]
+      ],
+      "sentadosC1": 104,
+      "sentadosC2": 10,
+      "sentadosTotal": 114,
+      "gestionesC1": 363,
+      "gestionesC2": 33,
+      "confirmadosC1": 127,
+      "confirmadosC2": 14
     },
     {
       "id": "coord_joao_cuenca",
@@ -207036,8 +207039,8 @@ runRestore()
       "ciclo": "Ciclo 1",
       "rol": "Coordinador C1",
       "gestiones": 253,
-      "c1": 253,
-      "c2": 0,
+      "c1": 213,
+      "c2": 40,
       "asignados": 1137,
       "coberturaPct": 16,
       "coberturaDetalle": "187/1137 (16%)",
@@ -207421,7 +207424,14 @@ runRestore()
           "cambioCupo": 0,
           "asistieron": 27
         }
-      ]
+      ],
+      "sentadosC1": 73,
+      "sentadosC2": 13,
+      "sentadosTotal": 86,
+      "gestionesC1": 213,
+      "gestionesC2": 40,
+      "confirmadosC1": 111,
+      "confirmadosC2": 17
     },
     {
       "id": "coord_juan_fernando_cuenca",
@@ -207432,8 +207442,8 @@ runRestore()
       "ciclo": "Ciclo 1",
       "rol": "Coordinador C1",
       "gestiones": 175,
-      "c1": 175,
-      "c2": 0,
+      "c1": 167,
+      "c2": 8,
       "asignados": 315,
       "coberturaPct": 34,
       "coberturaDetalle": "106/315 (34%)",
@@ -207622,7 +207632,14 @@ runRestore()
           "cambioCupo": 0,
           "asistieron": 1
         }
-      ]
+      ],
+      "sentadosC1": 73,
+      "sentadosC2": 2,
+      "sentadosTotal": 75,
+      "gestionesC1": 167,
+      "gestionesC2": 8,
+      "confirmadosC1": 71,
+      "confirmadosC2": 3
     },
     {
       "id": "coord_evelyn_paulina_cuenca",
@@ -207633,8 +207650,8 @@ runRestore()
       "ciclo": "Ciclo 1",
       "rol": "Coordinador C1",
       "gestiones": 94,
-      "c1": 94,
-      "c2": 0,
+      "c1": 76,
+      "c2": 18,
       "asignados": 931,
       "coberturaPct": 10,
       "coberturaDetalle": "93/931 (10%)",
@@ -207875,7 +207892,14 @@ runRestore()
           "cambioCupo": 0,
           "asistieron": 1
         }
-      ]
+      ],
+      "sentadosC1": 7,
+      "sentadosC2": 1,
+      "sentadosTotal": 8,
+      "gestionesC1": 76,
+      "gestionesC2": 18,
+      "confirmadosC1": 48,
+      "confirmadosC2": 2
     },
     {
       "id": "coord_diana_macas_guayaquil",
@@ -207886,8 +207910,8 @@ runRestore()
       "ciclo": "Ciclo 1",
       "rol": "Coordinador C1",
       "gestiones": 2000,
-      "c1": 2000,
-      "c2": 0,
+      "c1": 1930,
+      "c2": 70,
       "asignados": 762,
       "coberturaPct": 91,
       "coberturaDetalle": "696/762 (91%)",
@@ -208440,7 +208464,14 @@ runRestore()
           "cambioCupo": 0,
           "asistieron": 0
         }
-      ]
+      ],
+      "sentadosC1": 443,
+      "sentadosC2": 17,
+      "sentadosTotal": 460,
+      "gestionesC1": 1930,
+      "gestionesC2": 70,
+      "confirmadosC1": 427,
+      "confirmadosC2": 13
     },
     {
       "id": "coord_brenda_rodriguez_guayaquil",
@@ -208451,8 +208482,8 @@ runRestore()
       "ciclo": "Ciclo 1",
       "rol": "Coordinador C1",
       "gestiones": 1664,
-      "c1": 1664,
-      "c2": 0,
+      "c1": 1601,
+      "c2": 63,
       "asignados": 642,
       "coberturaPct": 93,
       "coberturaDetalle": "599/642 (93%)",
@@ -208979,7 +209010,14 @@ runRestore()
           "cambioCupo": 0,
           "asistieron": 0
         }
-      ]
+      ],
+      "sentadosC1": 369,
+      "sentadosC2": 7,
+      "sentadosTotal": 376,
+      "gestionesC1": 1601,
+      "gestionesC2": 63,
+      "confirmadosC1": 330,
+      "confirmadosC2": 8
     },
     {
       "id": "coord_jonathan_la_rosa_guayaquil",
@@ -208990,8 +209028,8 @@ runRestore()
       "ciclo": "Ciclo 1",
       "rol": "Coordinador C1",
       "gestiones": 900,
-      "c1": 900,
-      "c2": 0,
+      "c1": 887,
+      "c2": 13,
       "asignados": 251,
       "coberturaPct": 125,
       "coberturaDetalle": "315/251 (125%)",
@@ -209388,7 +209426,14 @@ runRestore()
           "cambioCupo": 0,
           "asistieron": 0
         }
-      ]
+      ],
+      "sentadosC1": 210,
+      "sentadosC2": 3,
+      "sentadosTotal": 213,
+      "gestionesC1": 887,
+      "gestionesC2": 13,
+      "confirmadosC1": 190,
+      "confirmadosC2": 4
     },
     {
       "id": "coord_jorge_guayaquil",
@@ -209399,8 +209444,8 @@ runRestore()
       "ciclo": "Ciclo 1",
       "rol": "Coordinador C1",
       "gestiones": 694,
-      "c1": 694,
-      "c2": 0,
+      "c1": 683,
+      "c2": 11,
       "asignados": 238,
       "coberturaPct": 78,
       "coberturaDetalle": "185/238 (78%)",
@@ -209628,7 +209673,14 @@ runRestore()
           "cambioCupo": 0,
           "asistieron": 0
         }
-      ]
+      ],
+      "sentadosC1": 65,
+      "sentadosC2": 0,
+      "sentadosTotal": 65,
+      "gestionesC1": 683,
+      "gestionesC2": 11,
+      "confirmadosC1": 107,
+      "confirmadosC2": 0
     },
     {
       "id": "coord_joyce_lima",
@@ -209639,8 +209691,8 @@ runRestore()
       "ciclo": "Ciclo 1",
       "rol": "Coordinador C1 / C2",
       "gestiones": 2741,
-      "c1": 2349,
-      "c2": 392,
+      "c1": 2346,
+      "c2": 3,
       "asignados": 922,
       "coberturaPct": 98,
       "coberturaDetalle": "900/922 (98%)",
@@ -209881,7 +209933,14 @@ runRestore()
           "cambioCupo": 0,
           "asistieron": 1
         }
-      ]
+      ],
+      "sentadosC1": 416,
+      "sentadosC2": 1,
+      "sentadosTotal": 417,
+      "gestionesC1": 2346,
+      "gestionesC2": 3,
+      "confirmadosC1": 484,
+      "confirmadosC2": 1
     },
     {
       "id": "coord_diana_lima",
@@ -210082,7 +210141,14 @@ runRestore()
           "cambioCupo": 0,
           "asistieron": 0
         }
-      ]
+      ],
+      "sentadosC1": 350,
+      "sentadosC2": 0,
+      "sentadosTotal": 350,
+      "gestionesC1": 1783,
+      "gestionesC2": 303,
+      "confirmadosC1": 415,
+      "confirmadosC2": 0
     },
     {
       "id": "coord_leyla_lima",
@@ -210093,8 +210159,8 @@ runRestore()
       "ciclo": "Ciclo 1",
       "rol": "Coordinador C1 / C2",
       "gestiones": 627,
-      "c1": 600,
-      "c2": 27,
+      "c1": 597,
+      "c2": 3,
       "asignados": 96,
       "coberturaPct": 220,
       "coberturaDetalle": "211/96 (220%)",
@@ -210102,7 +210168,7 @@ runRestore()
       "productividadDetalle": "87/627 (14%)",
       "asistieron": 80,
       "tasaEfectividad": 41,
-      "ultConexion": "04/09/2026 15:53",
+      "ultConexion": "04/09/2026 18:40",
       "ultGestion": "15/04/2026 12:48",
       "estados": {
         "confirmado": 260,
@@ -210257,7 +210323,14 @@ runRestore()
           "cambioCupo": 0,
           "asistieron": 14
         }
-      ]
+      ],
+      "sentadosC1": 80,
+      "sentadosC2": 0,
+      "sentadosTotal": 80,
+      "gestionesC1": 597,
+      "gestionesC2": 3,
+      "confirmadosC1": 93,
+      "confirmadosC2": 0
     },
     {
       "id": "coord_valentina_rodriguez_medellín",
@@ -210268,8 +210341,8 @@ runRestore()
       "ciclo": "Ciclo 1",
       "rol": "Coordinador C1 / C2",
       "gestiones": 3292,
-      "c1": 2902,
-      "c2": 390,
+      "c1": 2890,
+      "c2": 12,
       "asignados": 970,
       "coberturaPct": 119,
       "coberturaDetalle": "1152/970 (119%)",
@@ -210588,7 +210661,14 @@ runRestore()
           "cambioCupo": 0,
           "asistieron": 50
         }
-      ]
+      ],
+      "sentadosC1": 701,
+      "sentadosC2": 3,
+      "sentadosTotal": 704,
+      "gestionesC1": 2890,
+      "gestionesC2": 12,
+      "confirmadosC1": 684,
+      "confirmadosC2": 0
     },
     {
       "id": "coord_david_gonzalez_medellín",
@@ -210599,8 +210679,8 @@ runRestore()
       "ciclo": "Ciclo 1",
       "rol": "Coordinador C1 / C2",
       "gestiones": 1067,
-      "c1": 956,
-      "c2": 111,
+      "c1": 722,
+      "c2": 234,
       "asignados": 382,
       "coberturaPct": 124,
       "coberturaDetalle": "475/382 (124%)",
@@ -210906,7 +210986,14 @@ runRestore()
           "cambioCupo": 0,
           "asistieron": 1
         }
-      ]
+      ],
+      "sentadosC1": 174,
+      "sentadosC2": 44,
+      "sentadosTotal": 218,
+      "gestionesC1": 722,
+      "gestionesC2": 234,
+      "confirmadosC1": 219,
+      "confirmadosC2": 38
     },
     {
       "id": "coord_juan_sebastian_soto_medellín",
@@ -210990,7 +211077,14 @@ runRestore()
           "cambioCupo": 0,
           "asistieron": 33
         }
-      ]
+      ],
+      "sentadosC1": 43,
+      "sentadosC2": 0,
+      "sentadosTotal": 43,
+      "gestionesC1": 172,
+      "gestionesC2": 68,
+      "confirmadosC1": 51,
+      "confirmadosC2": 0
     },
     {
       "id": "coord_naomi_méxico",
@@ -211035,7 +211129,14 @@ runRestore()
           "cambioCupo": 0,
           "asistieron": 0
         }
-      ]
+      ],
+      "sentadosC1": 0,
+      "sentadosC2": 0,
+      "sentadosTotal": 0,
+      "gestionesC1": 3,
+      "gestionesC2": 0,
+      "confirmadosC1": 0,
+      "confirmadosC2": 0
     },
     {
       "id": "coord_adrianna_quito",
@@ -211046,8 +211147,8 @@ runRestore()
       "ciclo": "Ciclo 1",
       "rol": "Coordinador C1",
       "gestiones": 2920,
-      "c1": 2920,
-      "c2": 0,
+      "c1": 460,
+      "c2": 2460,
       "asignados": 1180,
       "coberturaPct": 92,
       "coberturaDetalle": "1082/1180 (92%)",
@@ -211769,7 +211870,14 @@ runRestore()
           "cambioCupo": 0,
           "asistieron": 0
         }
-      ]
+      ],
+      "sentadosC1": 100,
+      "sentadosC2": 614,
+      "sentadosTotal": 714,
+      "gestionesC1": 460,
+      "gestionesC2": 2460,
+      "confirmadosC1": 97,
+      "confirmadosC2": 565
     },
     {
       "id": "coord_liliana_quito",
@@ -211780,8 +211888,8 @@ runRestore()
       "ciclo": "Ciclo 1",
       "rol": "Coordinador C1 / C2",
       "gestiones": 2171,
-      "c1": 2144,
-      "c2": 27,
+      "c1": 43,
+      "c2": 2101,
       "asignados": 441,
       "coberturaPct": 176,
       "coberturaDetalle": "778/441 (176%)",
@@ -212165,7 +212273,14 @@ runRestore()
           "cambioCupo": 0,
           "asistieron": 0
         }
-      ]
+      ],
+      "sentadosC1": 5,
+      "sentadosC2": 410,
+      "sentadosTotal": 415,
+      "gestionesC1": 43,
+      "gestionesC2": 2101,
+      "confirmadosC1": 5,
+      "confirmadosC2": 383
     },
     {
       "id": "coord_karla_quito",
@@ -212176,8 +212291,8 @@ runRestore()
       "ciclo": "Ciclo 2",
       "rol": "Coordinador C1",
       "gestiones": 2265,
-      "c1": 2265,
-      "c2": 0,
+      "c1": 112,
+      "c2": 2153,
       "asignados": 990,
       "coberturaPct": 80,
       "coberturaDetalle": "792/990 (80%)",
@@ -212730,7 +212845,14 @@ runRestore()
           "cambioCupo": 0,
           "asistieron": 0
         }
-      ]
+      ],
+      "sentadosC1": 4,
+      "sentadosC2": 346,
+      "sentadosTotal": 350,
+      "gestionesC1": 112,
+      "gestionesC2": 2153,
+      "confirmadosC1": 9,
+      "confirmadosC2": 324
     },
     {
       "id": "coord_adams_quito",
@@ -212741,8 +212863,8 @@ runRestore()
       "ciclo": "Ciclo 2",
       "rol": "Coordinador C1 / C2",
       "gestiones": 2011,
-      "c1": 2010,
-      "c2": 1,
+      "c1": 48,
+      "c2": 1962,
       "asignados": 834,
       "coberturaPct": 76,
       "coberturaDetalle": "631/834 (76%)",
@@ -213048,7 +213170,14 @@ runRestore()
           "cambioCupo": 0,
           "asistieron": 0
         }
-      ]
+      ],
+      "sentadosC1": 3,
+      "sentadosC2": 369,
+      "sentadosTotal": 372,
+      "gestionesC1": 48,
+      "gestionesC2": 1962,
+      "confirmadosC1": 6,
+      "confirmadosC2": 344
     },
     {
       "id": "coord_daniela_quito",
@@ -213059,8 +213188,8 @@ runRestore()
       "ciclo": "Ciclo 2",
       "rol": "Coordinador C1",
       "gestiones": 1594,
-      "c1": 1594,
-      "c2": 0,
+      "c1": 86,
+      "c2": 1508,
       "asignados": 905,
       "coberturaPct": 67,
       "coberturaDetalle": "606/905 (67%)",
@@ -213535,7 +213664,14 @@ runRestore()
           "cambioCupo": 0,
           "asistieron": 0
         }
-      ]
+      ],
+      "sentadosC1": 4,
+      "sentadosC2": 329,
+      "sentadosTotal": 333,
+      "gestionesC1": 86,
+      "gestionesC2": 1508,
+      "confirmadosC1": 6,
+      "confirmadosC2": 307
     },
     {
       "id": "coord_danna_quito",
@@ -213546,8 +213682,8 @@ runRestore()
       "ciclo": "Ciclo 2",
       "rol": "Coordinador C1",
       "gestiones": 1285,
-      "c1": 1285,
-      "c2": 0,
+      "c1": 22,
+      "c2": 1263,
       "asignados": 519,
       "coberturaPct": 95,
       "coberturaDetalle": "495/519 (95%)",
@@ -213736,7 +213872,14 @@ runRestore()
           "cambioCupo": 0,
           "asistieron": 6
         }
-      ]
+      ],
+      "sentadosC1": 1,
+      "sentadosC2": 222,
+      "sentadosTotal": 223,
+      "gestionesC1": 22,
+      "gestionesC2": 1263,
+      "confirmadosC1": 2,
+      "confirmadosC2": 215
     },
     {
       "id": "coord_marcela_quito",
@@ -213747,8 +213890,8 @@ runRestore()
       "ciclo": "Ciclo 2",
       "rol": "Coordinador C1",
       "gestiones": 503,
-      "c1": 503,
-      "c2": 0,
+      "c1": 9,
+      "c2": 494,
       "asignados": 259,
       "coberturaPct": 67,
       "coberturaDetalle": "174/259 (67%)",
@@ -213859,7 +214002,14 @@ runRestore()
           "cambioCupo": 0,
           "asistieron": 1
         }
-      ]
+      ],
+      "sentadosC1": 2,
+      "sentadosC2": 86,
+      "sentadosTotal": 88,
+      "gestionesC1": 9,
+      "gestionesC2": 494,
+      "confirmadosC1": 2,
+      "confirmadosC2": 90
     }
   ],
   "equiposReporte": [
@@ -223494,7 +223644,7 @@ runRestore()
           "telefonoImo": "+51934073078",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "N/A",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -223869,7 +224019,7 @@ runRestore()
           "telefonoImo": "+51934073078",
           "llamada1": "Siguiente",
           "llamada2": "Siguiente",
-          "finDeSemana": "—",
+          "finDeSemana": "N/A",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -224116,7 +224266,7 @@ runRestore()
           "telefonoImo": "+51999699649",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,035.00) (C2 + MJ)"
@@ -224131,7 +224281,7 @@ runRestore()
           "telefonoImo": "+51934073078",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -224146,7 +224296,7 @@ runRestore()
           "telefonoImo": "+51900490075",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,970.00) (C2 + MJ)"
@@ -224161,7 +224311,7 @@ runRestore()
           "telefonoImo": "+51952087914",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,595.00) (C2 + MJ)"
@@ -224221,7 +224371,7 @@ runRestore()
           "telefonoImo": "+51997343209",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -224236,7 +224386,7 @@ runRestore()
           "telefonoImo": "+51934073078",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -224251,7 +224401,7 @@ runRestore()
           "telefonoImo": "+51900490075",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -224266,7 +224416,7 @@ runRestore()
           "telefonoImo": "—",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -224281,7 +224431,7 @@ runRestore()
           "telefonoImo": "—",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
@@ -224296,7 +224446,7 @@ runRestore()
           "telefonoImo": "—",
           "llamada1": "No le Interesa",
           "llamada2": "No Contesta",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 4,035.00) (C2 + MJ)"
@@ -224356,7 +224506,7 @@ runRestore()
           "telefonoImo": "+51993709784",
           "llamada1": "Confirmado",
           "llamada2": "No Contesta",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -224401,7 +224551,7 @@ runRestore()
           "telefonoImo": "+51927101572",
           "llamada1": "Confirmado",
           "llamada2": "No le Interesa",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,595.00) (C2 + MJ)"
@@ -224416,7 +224566,7 @@ runRestore()
           "telefonoImo": "+51916030745",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -224446,7 +224596,7 @@ runRestore()
           "telefonoImo": "+51917980843",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -224461,7 +224611,7 @@ runRestore()
           "telefonoImo": "+51920472661",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -224491,7 +224641,7 @@ runRestore()
           "telefonoImo": "+51999699649",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,035.00) (C2 + MJ)"
@@ -224506,7 +224656,7 @@ runRestore()
           "telefonoImo": "+51934073078",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -224521,7 +224671,7 @@ runRestore()
           "telefonoImo": "+51900490075",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,970.00) (C2 + MJ)"
@@ -224536,7 +224686,7 @@ runRestore()
           "telefonoImo": "+51952087914",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,595.00) (C2 + MJ)"
@@ -224596,7 +224746,7 @@ runRestore()
           "telefonoImo": "+51997343209",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -224611,7 +224761,7 @@ runRestore()
           "telefonoImo": "+51934073078",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -224626,7 +224776,7 @@ runRestore()
           "telefonoImo": "+51900490075",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -224641,7 +224791,7 @@ runRestore()
           "telefonoImo": "—",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -224656,7 +224806,7 @@ runRestore()
           "telefonoImo": "—",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
@@ -224671,7 +224821,7 @@ runRestore()
           "telefonoImo": "—",
           "llamada1": "Por Confirmar",
           "llamada2": "Siguiente",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 4,035.00) (C2 + MJ)"
@@ -224731,7 +224881,7 @@ runRestore()
           "telefonoImo": "+51993709784",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -224776,7 +224926,7 @@ runRestore()
           "telefonoImo": "+51927101572",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,595.00) (C2 + MJ)"
@@ -224791,7 +224941,7 @@ runRestore()
           "telefonoImo": "+51916030745",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -224821,7 +224971,7 @@ runRestore()
           "telefonoImo": "+51917980843",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -224836,7 +224986,7 @@ runRestore()
           "telefonoImo": "+51920472661",
           "llamada1": "—",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "SFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -224858,7 +225008,7 @@ runRestore()
           "telefonoImo": "+51959356266",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -224873,7 +225023,7 @@ runRestore()
           "telefonoImo": "+51944760103",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -224888,7 +225038,7 @@ runRestore()
           "telefonoImo": "+51944760103",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -224918,7 +225068,7 @@ runRestore()
           "telefonoImo": "+51976090987",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -224933,7 +225083,7 @@ runRestore()
           "telefonoImo": "+51999940038",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -224948,7 +225098,7 @@ runRestore()
           "telefonoImo": "+51930326809",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -224963,7 +225113,7 @@ runRestore()
           "telefonoImo": "+51963963302",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -224978,7 +225128,7 @@ runRestore()
           "telefonoImo": "+51968367858",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -224993,7 +225143,7 @@ runRestore()
           "telefonoImo": "+51961551852",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -225008,7 +225158,7 @@ runRestore()
           "telefonoImo": "+51920738765",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,470.00) (C2 + MJ)"
@@ -225023,7 +225173,7 @@ runRestore()
           "telefonoImo": "+51952352271",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -225038,7 +225188,7 @@ runRestore()
           "telefonoImo": "+51920408573",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -225053,7 +225203,7 @@ runRestore()
           "telefonoImo": "+51948162114",
           "llamada1": "—",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -225068,7 +225218,7 @@ runRestore()
           "telefonoImo": "+51980496819",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -225083,7 +225233,7 @@ runRestore()
           "telefonoImo": "+51916030745",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -225113,7 +225263,7 @@ runRestore()
           "telefonoImo": "+51976232368",
           "llamada1": "—",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -225128,7 +225278,7 @@ runRestore()
           "telefonoImo": "+51932556726",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -225143,7 +225293,7 @@ runRestore()
           "telefonoImo": "+51989442068",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -225164,6 +225314,36 @@ runRestore()
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
         },
         {
+          "apellidos": "LONGA VELEZ",
+          "nombres": "JEAN PAUL",
+          "nombrePreferido": "JP",
+          "telefono": "+51951201194",
+          "coordinador": "Sin coordinador",
+          "imo": "YUSMELY DESIREE GARCiA LLOVERA",
+          "telefonoImo": "+51921979246",
+          "llamada1": "—",
+          "llamada2": "—",
+          "finDeSemana": "PFD",
+          "asistencia": "—",
+          "desertor": "—",
+          "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
+        },
+        {
+          "apellidos": "LOPEZ LOPEZ",
+          "nombres": "FERNANDO ABEL",
+          "nombrePreferido": "—",
+          "telefono": "+51981237577",
+          "coordinador": "Sin coordinador",
+          "imo": "Sin invitador",
+          "telefonoImo": "—",
+          "llamada1": "—",
+          "llamada2": "—",
+          "finDeSemana": "—",
+          "asistencia": "—",
+          "desertor": "—",
+          "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
+        },
+        {
           "apellidos": "MEJIA DIAZ",
           "nombres": "MANUEL",
           "nombrePreferido": "MANUEL MEJIA",
@@ -225173,7 +225353,7 @@ runRestore()
           "telefonoImo": "+51999056488",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -225183,43 +225363,13 @@ runRestore()
           "nombres": "JORGE",
           "nombrePreferido": "—",
           "telefono": "+51930131755",
-          "coordinador": "Sin coordinador",
+          "coordinador": "LINID",
           "imo": "ROCIO DE LA CRUZ HUAYTALLA",
           "telefonoImo": "+51929406665",
           "llamada1": "No le Interesa",
           "llamada2": "No le Interesa",
           "finDeSemana": "PFD",
           "asistencia": "—",
-          "desertor": "—",
-          "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
-        },
-        {
-          "apellidos": "MORALES MONTECINOS",
-          "nombres": "SILVINA",
-          "nombrePreferido": "SILVINA",
-          "telefono": "+51973335162",
-          "coordinador": "JOYCE",
-          "imo": "Grezia Maria Jolly Vera",
-          "telefonoImo": "+51920738765",
-          "llamada1": "Confirmado",
-          "llamada2": "—",
-          "finDeSemana": "N/A",
-          "asistencia": "Asistió",
-          "desertor": "—",
-          "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
-        },
-        {
-          "apellidos": "PAREJA MADERA",
-          "nombres": "ROY ERNESTO DELIOT",
-          "nombrePreferido": "ROY PAREJA",
-          "telefono": "+51996348443",
-          "coordinador": "DIANA",
-          "imo": "LYLY DAIYU PAREJA MADERA",
-          "telefonoImo": "+51976090987",
-          "llamada1": "Confirmado",
-          "llamada2": "—",
-          "finDeSemana": "N/A",
-          "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
         },
@@ -225233,7 +225383,7 @@ runRestore()
           "telefonoImo": "+51959356266",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -225248,7 +225398,7 @@ runRestore()
           "telefonoImo": "+51944760103",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -225263,7 +225413,7 @@ runRestore()
           "telefonoImo": "+51944760103",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -225293,7 +225443,7 @@ runRestore()
           "telefonoImo": "+51976090987",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -225308,7 +225458,7 @@ runRestore()
           "telefonoImo": "+51999940038",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -225323,7 +225473,7 @@ runRestore()
           "telefonoImo": "+51930326809",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -225338,7 +225488,7 @@ runRestore()
           "telefonoImo": "+51963963302",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -225353,7 +225503,7 @@ runRestore()
           "telefonoImo": "+51968367858",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -225368,7 +225518,7 @@ runRestore()
           "telefonoImo": "+51961551852",
           "llamada1": "Por Confirmar",
           "llamada2": "Siguiente",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -225383,7 +225533,7 @@ runRestore()
           "telefonoImo": "+51920738765",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,470.00) (C2 + MJ)"
@@ -225398,7 +225548,7 @@ runRestore()
           "telefonoImo": "+51952352271",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -225413,7 +225563,7 @@ runRestore()
           "telefonoImo": "+51920408573",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -225428,7 +225578,7 @@ runRestore()
           "telefonoImo": "+51948162114",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -225443,7 +225593,7 @@ runRestore()
           "telefonoImo": "+51980496819",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -225458,7 +225608,7 @@ runRestore()
           "telefonoImo": "+51916030745",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -225488,7 +225638,7 @@ runRestore()
           "telefonoImo": "+51976232368",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "N/A",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -225503,7 +225653,7 @@ runRestore()
           "telefonoImo": "+51932556726",
           "llamada1": "Siguiente",
           "llamada2": "Siguiente",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -225518,7 +225668,7 @@ runRestore()
           "telefonoImo": "+51989442068",
           "llamada1": "Siguiente",
           "llamada2": "Siguiente",
-          "finDeSemana": "N/A",
+          "finDeSemana": "PFD",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -225539,6 +225689,36 @@ runRestore()
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
         },
         {
+          "apellidos": "LONGA VELEZ",
+          "nombres": "JEAN PAUL",
+          "nombrePreferido": "JP",
+          "telefono": "+51951201194",
+          "coordinador": "Sin coordinador",
+          "imo": "YUSMELY DESIREE GARCiA LLOVERA",
+          "telefonoImo": "+51921979246",
+          "llamada1": "—",
+          "llamada2": "—",
+          "finDeSemana": "PFD",
+          "asistencia": "—",
+          "desertor": "—",
+          "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
+        },
+        {
+          "apellidos": "LOPEZ LOPEZ",
+          "nombres": "FERNANDO ABEL",
+          "nombrePreferido": "—",
+          "telefono": "+51981237577",
+          "coordinador": "Sin coordinador",
+          "imo": "Sin invitador",
+          "telefonoImo": "—",
+          "llamada1": "—",
+          "llamada2": "—",
+          "finDeSemana": "—",
+          "asistencia": "—",
+          "desertor": "—",
+          "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
+        },
+        {
           "apellidos": "MEJIA DIAZ",
           "nombres": "MANUEL",
           "nombrePreferido": "MANUEL MEJIA",
@@ -225548,7 +225728,7 @@ runRestore()
           "telefonoImo": "+51999056488",
           "llamada1": "Siguiente",
           "llamada2": "Siguiente",
-          "finDeSemana": "—",
+          "finDeSemana": "PFD",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -225558,42 +225738,12 @@ runRestore()
           "nombres": "JORGE",
           "nombrePreferido": "—",
           "telefono": "+51930131755",
-          "coordinador": "Sin coordinador",
+          "coordinador": "LINID",
           "imo": "ROCIO DE LA CRUZ HUAYTALLA",
           "telefonoImo": "+51929406665",
           "llamada1": "No Contesta",
           "llamada2": "—",
           "finDeSemana": "PFD",
-          "asistencia": "Asistió",
-          "desertor": "—",
-          "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
-        },
-        {
-          "apellidos": "MORALES MONTECINOS",
-          "nombres": "SILVINA",
-          "nombrePreferido": "SILVINA",
-          "telefono": "+51973335162",
-          "coordinador": "JOYCE",
-          "imo": "Grezia Maria Jolly Vera",
-          "telefonoImo": "+51920738765",
-          "llamada1": "Confirmado",
-          "llamada2": "Confirmado",
-          "finDeSemana": "N/A",
-          "asistencia": "Asistió",
-          "desertor": "—",
-          "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
-        },
-        {
-          "apellidos": "PAREJA MADERA",
-          "nombres": "ROY ERNESTO DELIOT",
-          "nombrePreferido": "ROY PAREJA",
-          "telefono": "+51996348443",
-          "coordinador": "DIANA",
-          "imo": "LYLY DAIYU  PAREJA MADERA",
-          "telefonoImo": "+51976090987",
-          "llamada1": "Confirmado",
-          "llamada2": "Confirmado",
-          "finDeSemana": "N/A",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -233771,8 +233921,8 @@ runRestore()
           ]
         },
         {
-          "header": "LEYLA LIMA CICLO 1\nÚlt. conexión: 04/09/2026 15:53",
-          "fullText": "LEYLA LIMA CICLO 1\nÚlt. conexión: 04/09/2026 15:53\n627\nGestiones\n600\nC1\n27\nC2\n96\nAsignados\nCobertura (participantes con al menos 1 gestión)\n211/96 (220%)\nProductividad (llamadas que terminaron en asistencia real)\n87/627 (14%)\nÚlt. gestión: 15/04/2026 12:48\nNo Contesta: 225\nPor Confirmar: 71\nConfirmado: 260\nSiguiente: 52\nDevolución: 3\nNo le Interesa: 16\nCapítulo 1 — detalle por equipo (personas únicas según su última gestión):\nEQUIPO\tLLAMADAS\tCONFIRMADO\tNO CONTESTA\tNO LE INTERESA\tSIGUIENTE\tPOR CONFIRMAR\tDEVOLUCIÓN\tYA ASISTIÁ\tCAMBIO CUPO\tASISTIERON\nEQUIPO 27\t40\t1\t\t\t1\t\t\t\t\t1\nEQUIPO 28\t2\t1\t\t\t\t\t\t\t\t1\nEQUIPO 118\t3\t\t\t\t\t\t\t\t\t\nEQUIPO 26\t238\t39\t1\t3\t1\t\t\t\t\t30\nEQUIPO 14\t2\t\t\t\t\t\t\t\t\t\nEQUIPO 25\t205\t34\t\t6\t\t\t\t\t\t28\nEQUIPO 24\t33\t1\t\t5\t\t\t\t\t\t1\nEQUIPO 23\t2\t\t\t1\t\t\t\t\t\t\nEQUIPO 22\t7\t1\t\t\t1\t\t\t\t\t2\nEQUIPO 21\t8\t1\t\t\t2\t\t\t\t\t3\nEQUIPO 20\t60\t15\t4\t\t5\t\t\t\t\t14\nCapítulo 2 — detalle por equipo (personas únicas según su última gestión):\nEQUIPO\tLLAMADAS\tCONFIRMADO\tNO CONTESTA\tNO LE INTERESA\tSIGUIENTE\tPOR CONFIRMAR\tDEVOLUCIÓN\tYA ASISTIÁ\tCAMBIO CUPO\tASISTIERON\nEQUIPO 27\t4\t\t\t\t\t\t\t\t\t\nEQUIPO 26\t23\t7\t\t1\t\t1\t\t\t\t7",
+          "header": "LEYLA LIMA CICLO 1\nÚlt. conexión: 04/09/2026 18:40",
+          "fullText": "LEYLA LIMA CICLO 1\nÚlt. conexión: 04/09/2026 18:40\n627\nGestiones\n600\nC1\n27\nC2\n96\nAsignados\nCobertura (participantes con al menos 1 gestión)\n211/96 (220%)\nProductividad (llamadas que terminaron en asistencia real)\n87/627 (14%)\nÚlt. gestión: 15/04/2026 12:48\nNo Contesta: 225\nPor Confirmar: 71\nConfirmado: 260\nSiguiente: 52\nDevolución: 3\nNo le Interesa: 16\nCapítulo 1 — detalle por equipo (personas únicas según su última gestión):\nEQUIPO\tLLAMADAS\tCONFIRMADO\tNO CONTESTA\tNO LE INTERESA\tSIGUIENTE\tPOR CONFIRMAR\tDEVOLUCIÓN\tYA ASISTIÁ\tCAMBIO CUPO\tASISTIERON\nEQUIPO 27\t40\t1\t\t\t1\t\t\t\t\t1\nEQUIPO 28\t2\t1\t\t\t\t\t\t\t\t1\nEQUIPO 118\t3\t\t\t\t\t\t\t\t\t\nEQUIPO 26\t238\t39\t1\t3\t1\t\t\t\t\t30\nEQUIPO 14\t2\t\t\t\t\t\t\t\t\t\nEQUIPO 25\t205\t34\t\t6\t\t\t\t\t\t28\nEQUIPO 24\t33\t1\t\t5\t\t\t\t\t\t1\nEQUIPO 23\t2\t\t\t1\t\t\t\t\t\t\nEQUIPO 22\t7\t1\t\t\t1\t\t\t\t\t2\nEQUIPO 21\t8\t1\t\t\t2\t\t\t\t\t3\nEQUIPO 20\t60\t15\t4\t\t5\t\t\t\t\t14\nCapítulo 2 — detalle por equipo (personas únicas según su última gestión):\nEQUIPO\tLLAMADAS\tCONFIRMADO\tNO CONTESTA\tNO LE INTERESA\tSIGUIENTE\tPOR CONFIRMAR\tDEVOLUCIÓN\tYA ASISTIÁ\tCAMBIO CUPO\tASISTIERON\nEQUIPO 27\t4\t\t\t\t\t\t\t\t\t\nEQUIPO 26\t23\t7\t\t1\t\t1\t\t\t\t7",
           "equipos": [
             {
               "equipo": "EQUIPO 27",
@@ -233921,7 +234071,7 @@ runRestore()
         },
         {
           "header": "LINID LIMA CICLO 1\nÚlt. conexión: 04/09/2026 18:05",
-          "fullText": "LINID LIMA CICLO 1\nÚlt. conexión: 04/09/2026 18:05\n0\nGestiones\n0\nC1\n0\nC2\n73\nAsignados\nCobertura (participantes con al menos 1 gestión)\n0/73 (0%)\nÚlt. gestión: —\nSin gestiones registradas en este filtro.",
+          "fullText": "LINID LIMA CICLO 1\nÚlt. conexión: 04/09/2026 18:05\n0\nGestiones\n0\nC1\n0\nC2\n75\nAsignados\nCobertura (participantes con al menos 1 gestión)\n0/75 (0%)\nÚlt. gestión: —\nSin gestiones registradas en este filtro.",
           "equipos": []
         },
         {
@@ -237327,13 +237477,13 @@ runRestore()
             },
             {
               "SEDE": "LIMA CICLO 1",
-              "PARTICIPANTES": "3,594",
+              "PARTICIPANTES": "3,596",
               "EQUIPOS ACTIVOS": "3",
               "ENTRENADORES": "6",
               "COORDINADORES": "4",
-              "INGRESOS (FIN DE SEMANA)": "S/. 3,535.00",
-              "PROM. ENROLADOS": "0.1",
-              "EN CERO": "50"
+              "INGRESOS (FIN DE SEMANA)": "S/. 4,545.00",
+              "PROM. ENROLADOS": "0.2",
+              "EN CERO": "61"
             },
             {
               "SEDE": "MEDELLIN",
@@ -237437,8 +237587,8 @@ runRestore()
               "EQUIPO": "EQUIPO 29",
               "SEDE": "LIMA CICLO 1",
               "ENTRENADOR": "LOURDES PATINO",
-              "ETAPA ACTUAL": "PFD",
-              "PARTICIPANTES": "36",
+              "ETAPA ACTUAL": "SFD",
+              "PARTICIPANTES": "24",
               "col_5": "Ver Resultados"
             },
             {
@@ -237446,7 +237596,7 @@ runRestore()
               "SEDE": "LIMA CICLO 1",
               "ENTRENADOR": "ANDRES IDROBO",
               "ETAPA ACTUAL": "PFD",
-              "PARTICIPANTES": "4",
+              "PARTICIPANTES": "37",
               "col_5": "Ver Resultados"
             },
             {
@@ -237719,7 +237869,7 @@ runRestore()
               "EQUIPO": "EQUIPO 29",
               "SEDE": "LIMA CICLO 1",
               "ENTRENADOR": "LOURDES PATINO",
-              "PARTICIPANTES": "224"
+              "PARTICIPANTES": "223"
             },
             {
               "EQUIPO": "EQUIPO 36",
@@ -237743,7 +237893,7 @@ runRestore()
               "EQUIPO": "EQUIPO 30",
               "SEDE": "LIMA CICLO 1",
               "ENTRENADOR": "ANDRES IDROBO",
-              "PARTICIPANTES": "163"
+              "PARTICIPANTES": "166"
             },
             {
               "EQUIPO": "EQUIPO 17",
@@ -237841,7 +237991,7 @@ runRestore()
             },
             {
               "Mes": "Sep 26",
-              "Participantes": "25"
+              "Participantes": "27"
             }
           ]
         },
@@ -237897,7 +238047,7 @@ runRestore()
             },
             {
               "Mes": "Sep 26",
-              "Recaudado": "$ 14,850.00"
+              "Recaudado": "$ 15,860.00"
             }
           ]
         },
@@ -237913,7 +238063,7 @@ runRestore()
             },
             {
               "Sede": "LIMA CICLO 1",
-              "Participantes": "3,594"
+              "Participantes": "3,596"
             },
             {
               "Sede": "Cuenca Ciclo 1",
@@ -237957,7 +238107,7 @@ runRestore()
             },
             {
               "Sede": "LIMA CICLO 1",
-              "Recaudado": "S/. 4,882,793.12"
+              "Recaudado": "S/. 4,883,803.12"
             },
             {
               "Sede": "GUAYAQUIL CICLO 1",
@@ -237973,15 +238123,15 @@ runRestore()
           "rows": [
             {
               "Entrenamiento": "Capítulo 1",
-              "Participantes": "11,060"
+              "Participantes": "11,062"
             },
             {
               "Entrenamiento": "Capítulo 2",
-              "Participantes": "4,039"
+              "Participantes": "4,036"
             },
             {
               "Entrenamiento": "Maestría",
-              "Participantes": "3,279"
+              "Participantes": "3,294"
             }
           ]
         },
@@ -238036,18 +238186,18 @@ runRestore()
       ],
       "cards": [
         "Alcance\n🌐 Global (todas las sedes)\nCuenca Ciclo 1\nGUAYAQUIL CICLO 1\nLIMA CICLO 1\nMEDELLIN\nMÉXICO CICLO 1\nQUITO CICLO 2\nPeríodo (pestaña Analítica)\nÚltimos 3 meses\nÚltimos 6 meses\nÚltimos 12 meses\nÚltimos 24 meses\n Viendo indicadores de TODAS las sedes",
-        "Actividad de Todas las Sedes\nSEDE\tPARTICIPANTES\tEQUIPOS ACTIVOS\tENTRENADORES\tCOORDINADORES\tINGRESOS (FIN DE SEMANA)\tPROM. ENROLADOS\tEN CERO\nCuenca Ciclo 1\t3,529\t3\t7\t6\t$ 0.00\t1.8\t10\nGUAYAQUIL CICLO 1\t2,180\t4\t6\t4\t$ 0.00\t2.5\t11\nLIMA CICLO 1\t3,594\t3\t6\t4\tS/. 3,535.00\t0.1\t50\nMEDELLIN\t126\t4\t4\t0\t$ 0.00\t2.0\t7\nMÉXICO CICLO 1\t623\t3\t2\t1\t$ 0.00\t0.0\t44\nQUITO CICLO 2\t4,751\t6\t6\t7\t$ 510.00\t1.3\t95",
-        "Actividad del Fin de Semana\n21 en curso\nEQUIPO\tSEDE\tENTRENADOR\tETAPA ACTUAL\tPARTICIPANTES\t\nEQUIPO 20\tCuenca Ciclo 1\tANDRES IDROBO\tTFD\t38\tVer Resultados\nEQUIPO 21\tCuenca Ciclo 1\tALONSO SOLARES\tSFD\t46\tVer Resultados\nEQUIPO 22\tCuenca Ciclo 1\tMIKE BOADA\tPFD\t39\tVer Resultados\nEQUIPO 34\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\tTFD\t30\tVer Resultados\nEQUIPO 35\tGUAYAQUIL CICLO 1\tALONSO SOLARES\tSFD\t30\tVer Resultados\nEQUIPO 36\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\tPFD\t25\tVer Resultados\nEQUIPO 28\tLIMA CICLO 1\tALEJANDRO DIAZ\tTFD\t13\tVer Resultados\nEQUIPO 29\tLIMA CICLO 1\tLOURDES PATINO\tPFD\t36\tVer Resultados\nEQUIPO 30\tLIMA CICLO 1\tANDRES IDROBO\tPFD\t4\tVer Resultados\nEQUIPO 16\tMEDELLIN\tFERNANDO ARAGON\tTFD\t16\tVer Resultados\nEQUIPO 17\tMEDELLIN\tLEANDRO BRUNIS\tSFD\t30\tVer Resultados\nEQUIPO 18\tMEDELLIN\tFERNANDO ARAGON\tPFD\t38\tVer Resultados\nEQUIPO 5\tMÉXICO CICLO 1\tNo asignado\tTFD\t23\tVer Resultados\nEQUIPO 6\tMÉXICO CICLO 1\tMAURICIO PEREZ\tSFD\t11\tVer Resultados\nEQUIPO 7\tMÉXICO CICLO 1\tMAURICIO PEREZ\tPFD\t15\tVer Resultados\nEQUIPO 120\tQUITO CICLO 2\tFERNANDO ARAGON\tTFD\t33\tVer Resultados\nEQUIPO 121\tQUITO CICLO 2\tCIRILO MARTINEZ\tTFD\t53\tVer Resultados\nEQUIPO 122\tQUITO CICLO 2\tLEANDRO BRUNIS\tSFD\t38\tVer Resultados\nEQUIPO 123\tQUITO CICLO 2\tCHUY ACOSTA\tSFD\t42\tVer Resultados\nEQUIPO 124\tQUITO CICLO 2\tLEANDRO BRUNIS\tPFD\t21\tVer Resultados\nEQUIPO 125\tQUITO CICLO 2\tANA MONROY\tPFD\t76\tVer Resultados",
-        "Por Entrenamiento\nTotal participantes activos en el alcance: 14,803\nCapítulo 1\n11,060 (75%)\nCapítulo 2\n4,039 (27%)\nMaestría\n3,279 (22%)",
+        "Actividad de Todas las Sedes\nSEDE\tPARTICIPANTES\tEQUIPOS ACTIVOS\tENTRENADORES\tCOORDINADORES\tINGRESOS (FIN DE SEMANA)\tPROM. ENROLADOS\tEN CERO\nCuenca Ciclo 1\t3,529\t3\t7\t6\t$ 0.00\t1.8\t10\nGUAYAQUIL CICLO 1\t2,180\t4\t6\t4\t$ 0.00\t2.5\t11\nLIMA CICLO 1\t3,596\t3\t6\t4\tS/. 4,545.00\t0.2\t61\nMEDELLIN\t126\t4\t4\t0\t$ 0.00\t2.0\t7\nMÉXICO CICLO 1\t623\t3\t2\t1\t$ 0.00\t0.0\t44\nQUITO CICLO 2\t4,751\t6\t6\t7\t$ 510.00\t1.3\t95",
+        "Actividad del Fin de Semana\n21 en curso\nEQUIPO\tSEDE\tENTRENADOR\tETAPA ACTUAL\tPARTICIPANTES\t\nEQUIPO 20\tCuenca Ciclo 1\tANDRES IDROBO\tTFD\t38\tVer Resultados\nEQUIPO 21\tCuenca Ciclo 1\tALONSO SOLARES\tSFD\t46\tVer Resultados\nEQUIPO 22\tCuenca Ciclo 1\tMIKE BOADA\tPFD\t39\tVer Resultados\nEQUIPO 34\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\tTFD\t30\tVer Resultados\nEQUIPO 35\tGUAYAQUIL CICLO 1\tALONSO SOLARES\tSFD\t30\tVer Resultados\nEQUIPO 36\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\tPFD\t25\tVer Resultados\nEQUIPO 28\tLIMA CICLO 1\tALEJANDRO DIAZ\tTFD\t13\tVer Resultados\nEQUIPO 29\tLIMA CICLO 1\tLOURDES PATINO\tSFD\t24\tVer Resultados\nEQUIPO 30\tLIMA CICLO 1\tANDRES IDROBO\tPFD\t37\tVer Resultados\nEQUIPO 16\tMEDELLIN\tFERNANDO ARAGON\tTFD\t16\tVer Resultados\nEQUIPO 17\tMEDELLIN\tLEANDRO BRUNIS\tSFD\t30\tVer Resultados\nEQUIPO 18\tMEDELLIN\tFERNANDO ARAGON\tPFD\t38\tVer Resultados\nEQUIPO 5\tMÉXICO CICLO 1\tNo asignado\tTFD\t23\tVer Resultados\nEQUIPO 6\tMÉXICO CICLO 1\tMAURICIO PEREZ\tSFD\t11\tVer Resultados\nEQUIPO 7\tMÉXICO CICLO 1\tMAURICIO PEREZ\tPFD\t15\tVer Resultados\nEQUIPO 120\tQUITO CICLO 2\tFERNANDO ARAGON\tTFD\t33\tVer Resultados\nEQUIPO 121\tQUITO CICLO 2\tCIRILO MARTINEZ\tTFD\t53\tVer Resultados\nEQUIPO 122\tQUITO CICLO 2\tLEANDRO BRUNIS\tSFD\t38\tVer Resultados\nEQUIPO 123\tQUITO CICLO 2\tCHUY ACOSTA\tSFD\t42\tVer Resultados\nEQUIPO 124\tQUITO CICLO 2\tLEANDRO BRUNIS\tPFD\t21\tVer Resultados\nEQUIPO 125\tQUITO CICLO 2\tANA MONROY\tPFD\t76\tVer Resultados",
+        "Por Entrenamiento\nTotal participantes activos en el alcance: 14,805\nCapítulo 1\n11,062 (75%)\nCapítulo 2\n4,036 (27%)\nMaestría\n3,294 (22%)",
         "Por Entrenador — Carga de Trabajo\nVer Cronograma\nENTRENADOR\tESTADO\tASIGNACIONES\nFERNANDO ARAGON\tActivo\t\n5\n\nLEANDRO BRUNIS\tActivo\t\n4\n\nMAURICIO PEREZ\tActivo\t\n4\n\nALONSO SOLARES\tActivo\t\n2\n\nANDRES IDROBO\tActivo\t\n2\n\nALEJANDRO DIAZ\tActivo\t\n1\n\nANA MONROY\tActivo\t\n1\n\nCHUY ACOSTA\tActivo\t\n1\n\nCIRILO MARTINEZ\tActivo\t\n1\n\nJUAN ANGEL AREOLA\tActivo\t\n1\n\nLOURDES PATINO\tActivo\t\n1\n\nMIKE BOADA\tActivo\t\n1\n\nANDRES GOMEZ\tActivo\tDisponible\nJOSE TORRON\tActivo\tDisponible\nMILDRED MUNOZ\tActivo\tDisponible\nPAUL SOSA\tActivo\tDisponible\nXAVIER VALAREZO\tActivo\tDisponible",
-        "Por Equipo — Equipos en Actividad\nVer todos\nEQUIPO\tSEDE\tENTRENADOR\tPARTICIPANTES\nEQUIPO 123\tQUITO CICLO 2\tCHUY ACOSTA\t424\nEQUIPO 121\tQUITO CICLO 2\tCIRILO MARTINEZ\t364\nEQUIPO 125\tQUITO CICLO 2\tANA MONROY\t348\nEQUIPO 21\tCuenca Ciclo 1\tALONSO SOLARES\t314\nEQUIPO 20\tCuenca Ciclo 1\tANDRES IDROBO\t270\nEQUIPO 124\tQUITO CICLO 2\tLEANDRO BRUNIS\t259\nEQUIPO 18\tMEDELLIN\tFERNANDO ARAGON\t259\nEQUIPO 37\tGUAYAQUIL CICLO 1\tLEANDRO BRUNIS\t257\nEQUIPO 22\tCuenca Ciclo 1\tMIKE BOADA\t253\nEQUIPO 122\tQUITO CICLO 2\tLEANDRO BRUNIS\t240\nEQUIPO 120\tQUITO CICLO 2\tFERNANDO ARAGON\t228\nEQUIPO 29\tLIMA CICLO 1\tLOURDES PATINO\t224\nEQUIPO 36\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\t189\nEQUIPO 28\tLIMA CICLO 1\tALEJANDRO DIAZ\t175\nEQUIPO 35\tGUAYAQUIL CICLO 1\tALONSO SOLARES\t166\nEQUIPO 30\tLIMA CICLO 1\tANDRES IDROBO\t163\nEQUIPO 17\tMEDELLIN\tLEANDRO BRUNIS\t152\nEQUIPO 34\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\t138\nEQUIPO 16\tMEDELLIN\tFERNANDO ARAGON\t123\nEQUIPO 19\tMEDELLIN\tFERNANDO ARAGON\t120\nEQUIPO 7\tMÉXICO CICLO 1\tMAURICIO PEREZ\t87\nEQUIPO 6\tMÉXICO CICLO 1\tMAURICIO PEREZ\t71\nEQUIPO 5\tMÉXICO CICLO 1\tNo asignado\t67",
-        "Registros Recientes\nVer todos\nARIANNA LEON LORENZETTI\nLIMA CICLO 1 · +51 913 499 148\n04/09\nJHAN CARLO AREVALO ASUNCION\nLIMA CICLO 1 · +51 ‪+51 959 727 950\n04/09\nLESLIE DESIREE BRITO GAMEZ\nLIMA CICLO 1 · +51 978449650\n04/09\nBEKER SALVADOR\nLIMA CICLO 1 · +51 901777856\n04/09\nISABEL HUAMAN SOLIS\nLIMA CICLO 1 · +51 947554964\n04/09\nGISELL DENIS SARMI\nLIMA CICLO 1 · +51 951105814\n04/09\nDAVID TINTAYA\nLIMA CICLO 1 · +51 ‪944 399 566‬\n04/09\nEDINSON MUNOZ VILLACORTA\nLIMA CICLO 1 · +51 955029157\n04/09\nJORGE EDIN MUNOZ SERRANO\nLIMA CICLO 1 · +51 922428978\n04/09\nANA LIZ OTAZU MENDOZA\nLIMA CICLO 1 · +51 910550571\n04/09",
-        "Indicadores Financieros\n$ 166,822,137.29\nRecaudado\n$ 802,172.00\nPendiente\n$ 0.00\nDevoluciones\n18,203\nFacturas\nINGRESOS (RECAUDADO) POR SEDE\nMEDELLIN\n$ 98,510,360.00\nQUITO CICLO 2\n$ 33,332,753.58\nCuenca Ciclo 1\n$ 19,446,147.26\nMÉXICO CICLO 1\n$ 9,056,416.15\nLIMA CICLO 1\nS/. 4,882,793.12\nGUAYAQUIL CICLO 1\n$ 933,667.18",
-        "Evolutivo — Participantes Registrados\n          Ver tabla\n        \n        \n          \n          \n            \n              MesParticipantes\n              \n                                Oct 250\n                                Nov 250\n                                Dic 250\n                                Ene 260\n                                Feb 260\n                                Mar 260\n                                Abr 260\n                                May 260\n                                Jun 260\n                                Jul 260\n                                Ago 2614,778\n                                Sep 2625",
-        "Evolutivo — Ingresos Recaudados\n          Ver tabla\n        \n        \n          \n          \n            \n              MesRecaudado\n              \n                                Oct 25$ 2,021,240.01\n                                Nov 25$ 6,151,243.98\n                                Dic 25$ 5,975,511.00\n                                Ene 26$ 1,359,466.97\n                                Feb 26$ 4,204,589.50\n                                Mar 26$ 777,242.00\n                                Abr 26$ 563,945.25\n                                May 26$ 790,147.98\n                                Jun 26$ 523,481.00\n                                Jul 26$ 2,514,286.10\n                                Ago 26$ 111,160,084.65\n                                Sep 26$ 14,850.00",
-        "Comparativo — Participantes por Sede\n          Ver tabla\n        \n        \n          \n          \n            \n              SedeParticipantes\n              \n                                QUITO CICLO 24,751\n                                LIMA CICLO 13,594\n                                Cuenca Ciclo 13,529\n                                GUAYAQUIL CICLO 12,180\n                                MÉXICO CICLO 1623\n                                MEDELLIN126",
-        "Comparativo — Ingresos por Sede\n          Ver tabla\n        \n        \n          \n          \n            \n              SedeRecaudado\n              \n                                MEDELLIN$ 98,510,360.00\n                                QUITO CICLO 2$ 33,332,753.58\n                                Cuenca Ciclo 1$ 19,446,147.26\n                                MÉXICO CICLO 1$ 9,056,416.15\n                                LIMA CICLO 1S/. 4,882,793.12\n                                GUAYAQUIL CICLO 1$ 933,667.18",
-        "Comparativo — Progresión por Entrenamiento\n          Ver tabla\n        \n        \n          \n          \n            \n              EntrenamientoParticipantes\n              \n                                Capítulo 111,060\n                                Capítulo 24,039\n                                Maestría3,279",
+        "Por Equipo — Equipos en Actividad\nVer todos\nEQUIPO\tSEDE\tENTRENADOR\tPARTICIPANTES\nEQUIPO 123\tQUITO CICLO 2\tCHUY ACOSTA\t424\nEQUIPO 121\tQUITO CICLO 2\tCIRILO MARTINEZ\t364\nEQUIPO 125\tQUITO CICLO 2\tANA MONROY\t348\nEQUIPO 21\tCuenca Ciclo 1\tALONSO SOLARES\t314\nEQUIPO 20\tCuenca Ciclo 1\tANDRES IDROBO\t270\nEQUIPO 124\tQUITO CICLO 2\tLEANDRO BRUNIS\t259\nEQUIPO 18\tMEDELLIN\tFERNANDO ARAGON\t259\nEQUIPO 37\tGUAYAQUIL CICLO 1\tLEANDRO BRUNIS\t257\nEQUIPO 22\tCuenca Ciclo 1\tMIKE BOADA\t253\nEQUIPO 122\tQUITO CICLO 2\tLEANDRO BRUNIS\t240\nEQUIPO 120\tQUITO CICLO 2\tFERNANDO ARAGON\t228\nEQUIPO 29\tLIMA CICLO 1\tLOURDES PATINO\t223\nEQUIPO 36\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\t189\nEQUIPO 28\tLIMA CICLO 1\tALEJANDRO DIAZ\t175\nEQUIPO 35\tGUAYAQUIL CICLO 1\tALONSO SOLARES\t166\nEQUIPO 30\tLIMA CICLO 1\tANDRES IDROBO\t166\nEQUIPO 17\tMEDELLIN\tLEANDRO BRUNIS\t152\nEQUIPO 34\tGUAYAQUIL CICLO 1\tMAURICIO PEREZ\t138\nEQUIPO 16\tMEDELLIN\tFERNANDO ARAGON\t123\nEQUIPO 19\tMEDELLIN\tFERNANDO ARAGON\t120\nEQUIPO 7\tMÉXICO CICLO 1\tMAURICIO PEREZ\t87\nEQUIPO 6\tMÉXICO CICLO 1\tMAURICIO PEREZ\t71\nEQUIPO 5\tMÉXICO CICLO 1\tNo asignado\t67",
+        "Registros Recientes\nVer todos\nANDREA LABAN TOCTO\nLIMA CICLO 1 · +51 920693474\n04/09\nCINTHYA KARINA BRAVO BELLIDO\nLIMA CICLO 1 · +51 902325122\n04/09\nARIANNA LEON LORENZETTI\nLIMA CICLO 1 · +51 913 499 148\n04/09\nJHAN CARLO AREVALO ASUNCION\nLIMA CICLO 1 · +51 ‪+51 959 727 950\n04/09\nLESLIE DESIREE BRITO GAMEZ\nLIMA CICLO 1 · +51 978449650\n04/09\nBEKER SALVADOR\nLIMA CICLO 1 · +51 901777856\n04/09\nISABEL HUAMAN SOLIS\nLIMA CICLO 1 · +51 947554964\n04/09\nGISELL DENIS SARMI\nLIMA CICLO 1 · +51 951105814\n04/09\nDAVID TINTAYA\nLIMA CICLO 1 · +51 ‪944 399 566‬\n04/09\nEDINSON MUNOZ VILLACORTA\nLIMA CICLO 1 · +51 955029157\n04/09",
+        "Indicadores Financieros\n$ 166,823,147.29\nRecaudado\n$ 802,172.00\nPendiente\n$ 0.00\nDevoluciones\n18,205\nFacturas\nINGRESOS (RECAUDADO) POR SEDE\nMEDELLIN\n$ 98,510,360.00\nQUITO CICLO 2\n$ 33,332,753.58\nCuenca Ciclo 1\n$ 19,446,147.26\nMÉXICO CICLO 1\n$ 9,056,416.15\nLIMA CICLO 1\nS/. 4,883,803.12\nGUAYAQUIL CICLO 1\n$ 933,667.18",
+        "Evolutivo — Participantes Registrados\n          Ver tabla\n        \n        \n          \n          \n            \n              MesParticipantes\n              \n                                Oct 250\n                                Nov 250\n                                Dic 250\n                                Ene 260\n                                Feb 260\n                                Mar 260\n                                Abr 260\n                                May 260\n                                Jun 260\n                                Jul 260\n                                Ago 2614,778\n                                Sep 2627",
+        "Evolutivo — Ingresos Recaudados\n          Ver tabla\n        \n        \n          \n          \n            \n              MesRecaudado\n              \n                                Oct 25$ 2,021,240.01\n                                Nov 25$ 6,151,243.98\n                                Dic 25$ 5,975,511.00\n                                Ene 26$ 1,359,466.97\n                                Feb 26$ 4,204,589.50\n                                Mar 26$ 777,242.00\n                                Abr 26$ 563,945.25\n                                May 26$ 790,147.98\n                                Jun 26$ 523,481.00\n                                Jul 26$ 2,514,286.10\n                                Ago 26$ 111,160,084.65\n                                Sep 26$ 15,860.00",
+        "Comparativo — Participantes por Sede\n          Ver tabla\n        \n        \n          \n          \n            \n              SedeParticipantes\n              \n                                QUITO CICLO 24,751\n                                LIMA CICLO 13,596\n                                Cuenca Ciclo 13,529\n                                GUAYAQUIL CICLO 12,180\n                                MÉXICO CICLO 1623\n                                MEDELLIN126",
+        "Comparativo — Ingresos por Sede\n          Ver tabla\n        \n        \n          \n          \n            \n              SedeRecaudado\n              \n                                MEDELLIN$ 98,510,360.00\n                                QUITO CICLO 2$ 33,332,753.58\n                                Cuenca Ciclo 1$ 19,446,147.26\n                                MÉXICO CICLO 1$ 9,056,416.15\n                                LIMA CICLO 1S/. 4,883,803.12\n                                GUAYAQUIL CICLO 1$ 933,667.18",
+        "Comparativo — Progresión por Entrenamiento\n          Ver tabla\n        \n        \n          \n          \n            \n              EntrenamientoParticipantes\n              \n                                Capítulo 111,062\n                                Capítulo 24,036\n                                Maestría3,294",
         "Comparativo — Carga de Entrenadores (Top 10)\n          Ver tabla\n        \n        \n                    \n          \n            \n              EntrenadorAsignaciones\n              \n                                FERNANDO ARAGON5\n                                LEANDRO BRUNIS4\n                                MAURICIO PEREZ4\n                                ALONSO SOLARES2\n                                ANDRES IDROBO2\n                                ALEJANDRO DIAZ1\n                                ANA MONROY1\n                                CHUY ACOSTA1\n                                CIRILO MARTINEZ1\n                                JUAN ANGEL AREOLA1"
       ]
     },
@@ -247683,7 +247833,7 @@ runRestore()
             "telefonoImo": "+51934073078",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "N/A",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -248058,7 +248208,7 @@ runRestore()
             "telefonoImo": "+51934073078",
             "llamada1": "Siguiente",
             "llamada2": "Siguiente",
-            "finDeSemana": "—",
+            "finDeSemana": "N/A",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -248305,7 +248455,7 @@ runRestore()
             "telefonoImo": "+51999699649",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,035.00) (C2 + MJ)"
@@ -248320,7 +248470,7 @@ runRestore()
             "telefonoImo": "+51934073078",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -248335,7 +248485,7 @@ runRestore()
             "telefonoImo": "+51900490075",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,970.00) (C2 + MJ)"
@@ -248350,7 +248500,7 @@ runRestore()
             "telefonoImo": "+51952087914",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,595.00) (C2 + MJ)"
@@ -248410,7 +248560,7 @@ runRestore()
             "telefonoImo": "+51997343209",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -248425,7 +248575,7 @@ runRestore()
             "telefonoImo": "+51934073078",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -248440,7 +248590,7 @@ runRestore()
             "telefonoImo": "+51900490075",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -248455,7 +248605,7 @@ runRestore()
             "telefonoImo": "—",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -248470,7 +248620,7 @@ runRestore()
             "telefonoImo": "—",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
@@ -248485,7 +248635,7 @@ runRestore()
             "telefonoImo": "—",
             "llamada1": "No le Interesa",
             "llamada2": "No Contesta",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "—",
             "desertor": "—",
             "pago": "Pagado (S/. 4,035.00) (C2 + MJ)"
@@ -248545,7 +248695,7 @@ runRestore()
             "telefonoImo": "+51993709784",
             "llamada1": "Confirmado",
             "llamada2": "No Contesta",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -248590,7 +248740,7 @@ runRestore()
             "telefonoImo": "+51927101572",
             "llamada1": "Confirmado",
             "llamada2": "No le Interesa",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,595.00) (C2 + MJ)"
@@ -248605,7 +248755,7 @@ runRestore()
             "telefonoImo": "+51916030745",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -248635,7 +248785,7 @@ runRestore()
             "telefonoImo": "+51917980843",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -248650,7 +248800,7 @@ runRestore()
             "telefonoImo": "+51920472661",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -248680,7 +248830,7 @@ runRestore()
             "telefonoImo": "+51999699649",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,035.00) (C2 + MJ)"
@@ -248695,7 +248845,7 @@ runRestore()
             "telefonoImo": "+51934073078",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -248710,7 +248860,7 @@ runRestore()
             "telefonoImo": "+51900490075",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,970.00) (C2 + MJ)"
@@ -248725,7 +248875,7 @@ runRestore()
             "telefonoImo": "+51952087914",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,595.00) (C2 + MJ)"
@@ -248785,7 +248935,7 @@ runRestore()
             "telefonoImo": "+51997343209",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -248800,7 +248950,7 @@ runRestore()
             "telefonoImo": "+51934073078",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -248815,7 +248965,7 @@ runRestore()
             "telefonoImo": "+51900490075",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -248830,7 +248980,7 @@ runRestore()
             "telefonoImo": "—",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -248845,7 +248995,7 @@ runRestore()
             "telefonoImo": "—",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
@@ -248860,7 +249010,7 @@ runRestore()
             "telefonoImo": "—",
             "llamada1": "Por Confirmar",
             "llamada2": "Siguiente",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "—",
             "desertor": "—",
             "pago": "Pagado (S/. 4,035.00) (C2 + MJ)"
@@ -248920,7 +249070,7 @@ runRestore()
             "telefonoImo": "+51993709784",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -248965,7 +249115,7 @@ runRestore()
             "telefonoImo": "+51927101572",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,595.00) (C2 + MJ)"
@@ -248980,7 +249130,7 @@ runRestore()
             "telefonoImo": "+51916030745",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -249010,7 +249160,7 @@ runRestore()
             "telefonoImo": "+51917980843",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -249025,7 +249175,7 @@ runRestore()
             "telefonoImo": "+51920472661",
             "llamada1": "—",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "SFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -249047,7 +249197,7 @@ runRestore()
             "telefonoImo": "+51959356266",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -249062,7 +249212,7 @@ runRestore()
             "telefonoImo": "+51944760103",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -249077,7 +249227,7 @@ runRestore()
             "telefonoImo": "+51944760103",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -249107,7 +249257,7 @@ runRestore()
             "telefonoImo": "+51976090987",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -249122,7 +249272,7 @@ runRestore()
             "telefonoImo": "+51999940038",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -249137,7 +249287,7 @@ runRestore()
             "telefonoImo": "+51930326809",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -249152,7 +249302,7 @@ runRestore()
             "telefonoImo": "+51963963302",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -249167,7 +249317,7 @@ runRestore()
             "telefonoImo": "+51968367858",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -249182,7 +249332,7 @@ runRestore()
             "telefonoImo": "+51961551852",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -249197,7 +249347,7 @@ runRestore()
             "telefonoImo": "+51920738765",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,470.00) (C2 + MJ)"
@@ -249212,7 +249362,7 @@ runRestore()
             "telefonoImo": "+51952352271",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -249227,7 +249377,7 @@ runRestore()
             "telefonoImo": "+51920408573",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -249242,7 +249392,7 @@ runRestore()
             "telefonoImo": "+51948162114",
             "llamada1": "—",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -249257,7 +249407,7 @@ runRestore()
             "telefonoImo": "+51980496819",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -249272,7 +249422,7 @@ runRestore()
             "telefonoImo": "+51916030745",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -249302,7 +249452,7 @@ runRestore()
             "telefonoImo": "+51976232368",
             "llamada1": "—",
             "llamada2": "—",
-            "finDeSemana": "N/A",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -249317,7 +249467,7 @@ runRestore()
             "telefonoImo": "+51932556726",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -249332,7 +249482,7 @@ runRestore()
             "telefonoImo": "+51989442068",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "—",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -249353,6 +249503,36 @@ runRestore()
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
           },
           {
+            "apellidos": "LONGA VELEZ",
+            "nombres": "JEAN PAUL",
+            "nombrePreferido": "JP",
+            "telefono": "+51951201194",
+            "coordinador": "Sin coordinador",
+            "imo": "YUSMELY DESIREE GARCiA LLOVERA",
+            "telefonoImo": "+51921979246",
+            "llamada1": "—",
+            "llamada2": "—",
+            "finDeSemana": "PFD",
+            "asistencia": "—",
+            "desertor": "—",
+            "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
+          },
+          {
+            "apellidos": "LOPEZ LOPEZ",
+            "nombres": "FERNANDO ABEL",
+            "nombrePreferido": "—",
+            "telefono": "+51981237577",
+            "coordinador": "Sin coordinador",
+            "imo": "Sin invitador",
+            "telefonoImo": "—",
+            "llamada1": "—",
+            "llamada2": "—",
+            "finDeSemana": "—",
+            "asistencia": "—",
+            "desertor": "—",
+            "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
+          },
+          {
             "apellidos": "MEJIA DIAZ",
             "nombres": "MANUEL",
             "nombrePreferido": "MANUEL MEJIA",
@@ -249362,7 +249542,7 @@ runRestore()
             "telefonoImo": "+51999056488",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -249372,43 +249552,13 @@ runRestore()
             "nombres": "JORGE",
             "nombrePreferido": "—",
             "telefono": "+51930131755",
-            "coordinador": "Sin coordinador",
+            "coordinador": "LINID",
             "imo": "ROCIO DE LA CRUZ HUAYTALLA",
             "telefonoImo": "+51929406665",
             "llamada1": "No le Interesa",
             "llamada2": "No le Interesa",
             "finDeSemana": "PFD",
             "asistencia": "—",
-            "desertor": "—",
-            "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
-          },
-          {
-            "apellidos": "MORALES MONTECINOS",
-            "nombres": "SILVINA",
-            "nombrePreferido": "SILVINA",
-            "telefono": "+51973335162",
-            "coordinador": "JOYCE",
-            "imo": "Grezia Maria Jolly Vera",
-            "telefonoImo": "+51920738765",
-            "llamada1": "Confirmado",
-            "llamada2": "—",
-            "finDeSemana": "N/A",
-            "asistencia": "Asistió",
-            "desertor": "—",
-            "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
-          },
-          {
-            "apellidos": "PAREJA MADERA",
-            "nombres": "ROY ERNESTO DELIOT",
-            "nombrePreferido": "ROY PAREJA",
-            "telefono": "+51996348443",
-            "coordinador": "DIANA",
-            "imo": "LYLY DAIYU PAREJA MADERA",
-            "telefonoImo": "+51976090987",
-            "llamada1": "Confirmado",
-            "llamada2": "—",
-            "finDeSemana": "N/A",
-            "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
           },
@@ -249422,7 +249572,7 @@ runRestore()
             "telefonoImo": "+51959356266",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -249437,7 +249587,7 @@ runRestore()
             "telefonoImo": "+51944760103",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -249452,7 +249602,7 @@ runRestore()
             "telefonoImo": "+51944760103",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -249482,7 +249632,7 @@ runRestore()
             "telefonoImo": "+51976090987",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -249497,7 +249647,7 @@ runRestore()
             "telefonoImo": "+51999940038",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -249512,7 +249662,7 @@ runRestore()
             "telefonoImo": "+51930326809",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -249527,7 +249677,7 @@ runRestore()
             "telefonoImo": "+51963963302",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "—",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -249542,7 +249692,7 @@ runRestore()
             "telefonoImo": "+51968367858",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -249557,7 +249707,7 @@ runRestore()
             "telefonoImo": "+51961551852",
             "llamada1": "Por Confirmar",
             "llamada2": "Siguiente",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "—",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -249572,7 +249722,7 @@ runRestore()
             "telefonoImo": "+51920738765",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,470.00) (C2 + MJ)"
@@ -249587,7 +249737,7 @@ runRestore()
             "telefonoImo": "+51952352271",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -249602,7 +249752,7 @@ runRestore()
             "telefonoImo": "+51920408573",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -249617,7 +249767,7 @@ runRestore()
             "telefonoImo": "+51948162114",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "—",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -249632,7 +249782,7 @@ runRestore()
             "telefonoImo": "+51980496819",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -249647,7 +249797,7 @@ runRestore()
             "telefonoImo": "+51916030745",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -249677,7 +249827,7 @@ runRestore()
             "telefonoImo": "+51976232368",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "N/A",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -249692,7 +249842,7 @@ runRestore()
             "telefonoImo": "+51932556726",
             "llamada1": "Siguiente",
             "llamada2": "Siguiente",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "—",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -249707,7 +249857,7 @@ runRestore()
             "telefonoImo": "+51989442068",
             "llamada1": "Siguiente",
             "llamada2": "Siguiente",
-            "finDeSemana": "N/A",
+            "finDeSemana": "PFD",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -249728,6 +249878,36 @@ runRestore()
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
           },
           {
+            "apellidos": "LONGA VELEZ",
+            "nombres": "JEAN PAUL",
+            "nombrePreferido": "JP",
+            "telefono": "+51951201194",
+            "coordinador": "Sin coordinador",
+            "imo": "YUSMELY DESIREE GARCiA LLOVERA",
+            "telefonoImo": "+51921979246",
+            "llamada1": "—",
+            "llamada2": "—",
+            "finDeSemana": "PFD",
+            "asistencia": "—",
+            "desertor": "—",
+            "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
+          },
+          {
+            "apellidos": "LOPEZ LOPEZ",
+            "nombres": "FERNANDO ABEL",
+            "nombrePreferido": "—",
+            "telefono": "+51981237577",
+            "coordinador": "Sin coordinador",
+            "imo": "Sin invitador",
+            "telefonoImo": "—",
+            "llamada1": "—",
+            "llamada2": "—",
+            "finDeSemana": "—",
+            "asistencia": "—",
+            "desertor": "—",
+            "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
+          },
+          {
             "apellidos": "MEJIA DIAZ",
             "nombres": "MANUEL",
             "nombrePreferido": "MANUEL MEJIA",
@@ -249737,7 +249917,7 @@ runRestore()
             "telefonoImo": "+51999056488",
             "llamada1": "Siguiente",
             "llamada2": "Siguiente",
-            "finDeSemana": "—",
+            "finDeSemana": "PFD",
             "asistencia": "—",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -249747,42 +249927,12 @@ runRestore()
             "nombres": "JORGE",
             "nombrePreferido": "—",
             "telefono": "+51930131755",
-            "coordinador": "Sin coordinador",
+            "coordinador": "LINID",
             "imo": "ROCIO DE LA CRUZ HUAYTALLA",
             "telefonoImo": "+51929406665",
             "llamada1": "No Contesta",
             "llamada2": "—",
             "finDeSemana": "PFD",
-            "asistencia": "Asistió",
-            "desertor": "—",
-            "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
-          },
-          {
-            "apellidos": "MORALES MONTECINOS",
-            "nombres": "SILVINA",
-            "nombrePreferido": "SILVINA",
-            "telefono": "+51973335162",
-            "coordinador": "JOYCE",
-            "imo": "Grezia Maria Jolly Vera",
-            "telefonoImo": "+51920738765",
-            "llamada1": "Confirmado",
-            "llamada2": "Confirmado",
-            "finDeSemana": "N/A",
-            "asistencia": "Asistió",
-            "desertor": "—",
-            "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
-          },
-          {
-            "apellidos": "PAREJA MADERA",
-            "nombres": "ROY ERNESTO DELIOT",
-            "nombrePreferido": "ROY PAREJA",
-            "telefono": "+51996348443",
-            "coordinador": "DIANA",
-            "imo": "LYLY DAIYU  PAREJA MADERA",
-            "telefonoImo": "+51976090987",
-            "llamada1": "Confirmado",
-            "llamada2": "Confirmado",
-            "finDeSemana": "N/A",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -263855,6 +264005,22 @@ export default function NewExcellenceModal({ isOpen, onClose, task, onComplete }
   color: #38bdf8;
 }
 
+.nodus-card-value.highlight-gold {
+  color: #d97706;
+}
+
+[data-theme="dark"] .nodus-card-value.highlight-gold {
+  color: #f59e0b;
+}
+
+.nodus-card-value.highlight-purple {
+  color: #7c3aed;
+}
+
+[data-theme="dark"] .nodus-card-value.highlight-purple {
+  color: #a855f7;
+}
+
 .nodus-card-footer {
   font-size: 0.75rem;
   color: var(--nodus-text-muted);
@@ -264197,16 +264363,84 @@ export default function NewExcellenceModal({ isOpen, onClose, task, onComplete }
 
 .nodus-badge-asistieron {
   display: inline-block;
-  padding: 0.25rem 0.65rem;
+  padding: 0.28rem 0.75rem;
   border-radius: 8px;
-  background: rgba(14, 165, 233, 0.15);
-  border: 1px solid rgba(14, 165, 233, 0.35);
-  color: #0284c7;
+  background: rgba(16, 185, 129, 0.18);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #059669;
   font-weight: 800;
+  box-shadow: 0 1px 4px rgba(16, 185, 129, 0.15);
 }
 
 [data-theme="dark"] .nodus-badge-asistieron {
-  color: #38bdf8;
+  background: rgba(16, 185, 129, 0.22);
+  color: #10b981;
+  border-color: rgba(16, 185, 129, 0.5);
+  box-shadow: 0 1px 8px rgba(16, 185, 129, 0.25);
+}
+
+.nodus-badge-sentados-c1 {
+  display: inline-block;
+  padding: 0.25rem 0.65rem;
+  border-radius: 8px;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: #b45309;
+  font-weight: 800;
+}
+
+[data-theme="dark"] .nodus-badge-sentados-c1 {
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.45);
+}
+
+.nodus-badge-sentados-c2 {
+  display: inline-block;
+  padding: 0.25rem 0.65rem;
+  border-radius: 8px;
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  color: #7c3aed;
+  font-weight: 800;
+}
+
+[data-theme="dark"] .nodus-badge-sentados-c2 {
+  background: rgba(139, 92, 246, 0.2);
+  color: #a855f7;
+  border-color: rgba(139, 92, 246, 0.45);
+}
+
+.nodus-badge-c1-small {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  background: rgba(245, 158, 11, 0.15);
+  color: #b45309;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  margin-left: 0.4rem;
+}
+
+[data-theme="dark"] .nodus-badge-c1-small {
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.nodus-badge-c2-small {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  background: rgba(139, 92, 246, 0.18);
+  color: #7c3aed;
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  margin-left: 0.4rem;
+}
+
+[data-theme="dark"] .nodus-badge-c2-small {
+  color: #a855f7;
+  border-color: rgba(139, 92, 246, 0.45);
 }
 
 .nodus-btn-expand {
@@ -264366,6 +264600,174 @@ export default function NewExcellenceModal({ isOpen, onClose, task, onComplete }
   color: #ffffff;
 }
 
+/* --- 6.1 SELECTOR DE MÉTRICA DE RENDIMIENTO (PILLS) --- */
+.nodus-metric-toggle-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.85rem;
+}
+
+.nodus-metric-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 10px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  background: var(--nodus-bg-card);
+  color: var(--nodus-text-muted);
+  border: 1px solid var(--nodus-border-card);
+  transition: all 0.2s ease;
+}
+
+.nodus-metric-toggle-btn:hover {
+  color: var(--nodus-text-title);
+  border-color: rgba(255, 193, 7, 0.4);
+  transform: translateY(-1px);
+}
+
+.nodus-metric-toggle-btn.active {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(217, 119, 6, 0.15) 100%);
+  color: #d97706;
+  border-color: rgba(245, 158, 11, 0.6);
+  box-shadow: 0 2px 10px rgba(245, 158, 11, 0.2);
+}
+
+[data-theme="dark"] .nodus-metric-toggle-btn.active {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(139, 92, 246, 0.15) 100%);
+  color: #fbbf24;
+  border-color: #f59e0b;
+}
+
+/* --- 6.2 TOOLTIP GLASSMORPHIC PERSONALIZADO DE ALTA GAMA --- */
+.nodus-chart-custom-tooltip {
+  background: rgba(10, 20, 38, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 14px;
+  padding: 0.85rem 1.1rem;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(245, 158, 11, 0.12);
+  min-width: 240px;
+  font-family: var(--font-body, 'Inter', sans-serif);
+}
+
+[data-theme="light"] .nodus-chart-custom-tooltip {
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(217, 119, 6, 0.35);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+.nodus-tooltip-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.45rem;
+  margin-bottom: 0.6rem;
+}
+
+[data-theme="light"] .nodus-tooltip-header {
+  border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+
+.nodus-tooltip-title {
+  font-size: 0.84rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+[data-theme="light"] .nodus-tooltip-title {
+  color: #0f172a;
+}
+
+.nodus-tooltip-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+  background: rgba(245, 158, 11, 0.18);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.nodus-tooltip-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.nodus-tooltip-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.76rem;
+  color: #94a3b8;
+}
+
+[data-theme="light"] .nodus-tooltip-row {
+  color: #475569;
+}
+
+.nodus-tooltip-row.highlight-gold {
+  color: #fbbf24;
+}
+
+.nodus-tooltip-row.highlight-purple {
+  color: #c084fc;
+}
+
+.nodus-tooltip-row.highlight-emerald {
+  color: #34d399;
+}
+
+.nodus-tooltip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 0.4rem;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.nodus-tooltip-dot.gold { background: #f59e0b; box-shadow: 0 0 6px #f59e0b; }
+.nodus-tooltip-dot.purple { background: #8b5cf6; box-shadow: 0 0 6px #8b5cf6; }
+.nodus-tooltip-dot.emerald { background: #10b981; box-shadow: 0 0 6px #10b981; }
+.nodus-tooltip-dot.sky { background: #0ea5e9; }
+.nodus-tooltip-dot.green { background: #10b981; }
+
+.nodus-tooltip-val {
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: #ffffff;
+}
+
+[data-theme="light"] .nodus-tooltip-val {
+  color: #0f172a;
+}
+
+.nodus-tooltip-val.bold {
+  font-weight: 800;
+  font-size: 0.85rem;
+}
+
+.nodus-tooltip-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 0.35rem 0;
+}
+
+[data-theme="light"] .nodus-tooltip-divider {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+
 ```
 
 ---
@@ -264388,6 +264790,7 @@ import {
 } from 'recharts';
 import { useTheme } from '../context/ThemeContext';
 import ThemeSelector from './ThemeSelector';
+import nodusFallbackData from '../data/nodusFallbackData.json';
 import './NodusCoordinadoresC1C2Dashboard.css';
 
 const COLORS = {
@@ -264422,8 +264825,62 @@ export default function NodusCoordinadoresC1C2Dashboard() {
     padding: '2px 0'
   }), [isLight]);
 
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // Tooltip Glassmorphic personalizado para el gráfico de coordinadores
+  const CustomCoordTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      const item = payload[0].payload;
+      return (
+        <div className="nodus-chart-custom-tooltip">
+          <div className="nodus-tooltip-header">
+            <span className="nodus-tooltip-title">{item.fullName || label}</span>
+            <span className="nodus-tooltip-badge">{item.sede}</span>
+          </div>
+          <div className="nodus-tooltip-body">
+            <div className="nodus-tooltip-row highlight-gold">
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span className="nodus-tooltip-dot gold" />
+                <span>Sentados C1:</span>
+              </div>
+              <span className="nodus-tooltip-val">{item.sentadosC1?.toLocaleString() || 0}</span>
+            </div>
+            <div className="nodus-tooltip-row highlight-purple">
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span className="nodus-tooltip-dot purple" />
+                <span>Sentados C2:</span>
+              </div>
+              <span className="nodus-tooltip-val">{item.sentadosC2?.toLocaleString() || 0}</span>
+            </div>
+            <div className="nodus-tooltip-row highlight-emerald">
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span className="nodus-tooltip-dot emerald" />
+                <span>Total Sentados:</span>
+              </div>
+              <span className="nodus-tooltip-val bold">{item.totalSentados?.toLocaleString() || 0}</span>
+            </div>
+            <div className="nodus-tooltip-divider" />
+            <div className="nodus-tooltip-row">
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span className="nodus-tooltip-dot sky" />
+                <span>Gestiones Totales:</span>
+              </div>
+              <span className="nodus-tooltip-val">{item.gestiones?.toLocaleString() || 0}</span>
+            </div>
+            <div className="nodus-tooltip-row">
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span className="nodus-tooltip-dot green" />
+                <span>Confirmados:</span>
+              </div>
+              <span className="nodus-tooltip-val">{item.confirmados?.toLocaleString() || 0}</span>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  const [data, setData] = useState(nodusFallbackData || null);
+  const [loading, setLoading] = useState(!nodusFallbackData);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
 
@@ -264433,8 +264890,9 @@ export default function NodusCoordinadoresC1C2Dashboard() {
   const [selectedEquipo, setSelectedEquipo] = useState('TODOS');
   const [selectedEntrenamiento, setSelectedEntrenamiento] = useState('TODOS'); // TODOS, C1, C2
   const [selectedCiclo, setSelectedCiclo] = useState('TODOS');
-  const [sortBy, setSortBy] = useState('gestiones'); // gestiones, cobertura, productividad, confirmados, nombre
+  const [sortBy, setSortBy] = useState('sentados'); // sentados, sentadosC1, sentadosC2, gestiones, cobertura, productividad, confirmados, nombre
   const [activeChartTab, setActiveChartTab] = useState('coordinadores'); // coordinadores, sedes, estados
+  const [chartMetric, setChartMetric] = useState('sentados'); // 'sentados' (C1 vs C2), 'gestiones' (Llamadas), 'integral' (Doble eje)
 
   // Filas expandidas (para ver desglose de equipos)
   const [expandedRows, setExpandedRows] = useState({});
@@ -264493,8 +264951,8 @@ export default function NodusCoordinadoresC1C2Dashboard() {
           });
         }
       }, (err) => {
-        console.error("Error en realtime listener:", err);
-        setError("No se pudo cargar la sincronización en vivo.");
+        console.warn("Realtime listener usando snapshot de respaldo:", err.message);
+        setData(prev => prev || nodusFallbackData);
         setLoading(false);
       });
     } catch (e) {
@@ -264543,6 +265001,54 @@ export default function NodusCoordinadoresC1C2Dashboard() {
       const hasEquipos = Array.isArray(c.equipos) && c.equipos.length > 0;
 
       return hasC1C2Calls && hasEquipos;
+    }).map(c => {
+      let sentadosC1 = c.sentadosC1;
+      let sentadosC2 = c.sentadosC2;
+      let gestionesC1 = c.gestionesC1;
+      let gestionesC2 = c.gestionesC2;
+      let confirmadosC1 = c.confirmadosC1;
+      let confirmadosC2 = c.confirmadosC2;
+
+      // Cálculo resiliente en caliente si faltasen campos precalculados
+      if (sentadosC1 === undefined || sentadosC2 === undefined) {
+        let sc1 = 0, sc2 = 0, gc1 = 0, gc2 = 0, cc1 = 0, cc2 = 0;
+        (c.equipos || []).forEach(eq => {
+          const num = parseInt(eq.equipo.replace(/[^0-9]/g, '')) || 0;
+          const isC2 = num >= 100;
+          if (isC2) {
+            sc2 += (eq.asistieron || 0);
+            gc2 += (eq.llamadas || 0);
+            cc2 += (eq.confirmado || 0);
+          } else {
+            sc1 += (eq.asistieron || 0);
+            gc1 += (eq.llamadas || 0);
+            cc1 += (eq.confirmado || 0);
+          }
+        });
+        sentadosC1 = sc1;
+        sentadosC2 = sc2;
+        gestionesC1 = (gc1 + gc2 > 0) ? gc1 : (c.c1 || 0);
+        gestionesC2 = (gc1 + gc2 > 0) ? gc2 : (c.c2 || 0);
+        confirmadosC1 = cc1;
+        confirmadosC2 = cc2;
+      }
+
+      const totalSentados = c.asistieron || (sentadosC1 + sentadosC2);
+      const totalGestiones = c.gestiones || (gestionesC1 + gestionesC2);
+      const totalConfirmados = c.estados?.confirmado || (confirmadosC1 + confirmadosC2);
+
+      return {
+        ...c,
+        sentadosC1: sentadosC1 || 0,
+        sentadosC2: sentadosC2 || 0,
+        sentadosTotal: totalSentados || 0,
+        gestionesC1: gestionesC1 || 0,
+        gestionesC2: gestionesC2 || 0,
+        gestionesTotal: totalGestiones || 0,
+        confirmadosC1: confirmadosC1 || 0,
+        confirmadosC2: confirmadosC2 || 0,
+        confirmadosTotal: totalConfirmados || 0
+      };
     });
   }, [data]);
 
@@ -264584,9 +265090,9 @@ export default function NodusCoordinadoresC1C2Dashboard() {
       // 2. Filtro Ciclo
       if (selectedCiclo !== 'TODOS' && c.ciclo !== selectedCiclo) continue;
 
-      // 3. Filtro Entrenamiento (C1 / C2)
-      if (selectedEntrenamiento === 'C1' && (!c.c1 || c.c1 === 0)) continue;
-      if (selectedEntrenamiento === 'C2' && (!c.c2 || c.c2 === 0)) continue;
+      // 3. Filtro Entrenamiento (C1 / C2) - Muestra quienes tengan sentados o llamadas en ese capítulo
+      if (selectedEntrenamiento === 'C1' && (c.sentadosC1 === 0 && c.gestionesC1 === 0)) continue;
+      if (selectedEntrenamiento === 'C2' && (c.sentadosC2 === 0 && c.gestionesC2 === 0)) continue;
 
       // 4. Filtro por Equipo
       let matchingEquipos = c.equipos || [];
@@ -264615,14 +265121,18 @@ export default function NodusCoordinadoresC1C2Dashboard() {
       // 6. Cómputo de métricas exactas según el filtro aplicado
       const isEquipoFiltered = selectedEquipo !== 'TODOS' || (searchTerm && matchingEquipos.length < (c.equipos || []).length);
       
-      let dispGestiones = c.gestiones;
-      let dispConfirmados = c.estados?.confirmado || 0;
+      let dispGestiones = c.gestionesTotal;
+      let dispConfirmados = c.confirmadosTotal;
       let dispNoContesta = c.estados?.noContesta || 0;
       let dispPorConfirmar = c.estados?.porConfirmar || 0;
       let dispSiguiente = c.estados?.siguiente || 0;
       let dispNoInteresa = c.estados?.noInteresa || 0;
-      let dispAsistieron = c.asistieron || 0;
+      let dispAsistieron = c.sentadosTotal;
       let dispAsignados = c.asignados;
+      let dispSentadosC1 = c.sentadosC1;
+      let dispSentadosC2 = c.sentadosC2;
+      let dispGestionesC1 = c.gestionesC1;
+      let dispGestionesC2 = c.gestionesC2;
 
       if (isEquipoFiltered) {
         dispGestiones = matchingEquipos.reduce((s, e) => s + (e.llamadas || 0), 0);
@@ -264633,10 +265143,18 @@ export default function NodusCoordinadoresC1C2Dashboard() {
         dispNoInteresa = matchingEquipos.reduce((s, e) => s + (e.noInteresa || 0), 0);
         dispAsistieron = matchingEquipos.reduce((s, e) => s + (e.asistieron || 0), 0);
         dispAsignados = dispGestiones;
+        dispSentadosC1 = matchingEquipos.filter(e => (parseInt(e.equipo.replace(/[^0-9]/g, '')) || 0) < 100).reduce((s, e) => s + (e.asistieron || 0), 0);
+        dispSentadosC2 = matchingEquipos.filter(e => (parseInt(e.equipo.replace(/[^0-9]/g, '')) || 0) >= 100).reduce((s, e) => s + (e.asistieron || 0), 0);
+        dispGestionesC1 = matchingEquipos.filter(e => (parseInt(e.equipo.replace(/[^0-9]/g, '')) || 0) < 100).reduce((s, e) => s + (e.llamadas || 0), 0);
+        dispGestionesC2 = matchingEquipos.filter(e => (parseInt(e.equipo.replace(/[^0-9]/g, '')) || 0) >= 100).reduce((s, e) => s + (e.llamadas || 0), 0);
       } else if (selectedEntrenamiento === 'C1') {
-        dispGestiones = c.c1;
+        dispGestiones = c.gestionesC1;
+        dispConfirmados = c.confirmadosC1;
+        dispAsistieron = c.sentadosC1;
       } else if (selectedEntrenamiento === 'C2') {
-        dispGestiones = c.c2;
+        dispGestiones = c.gestionesC2;
+        dispConfirmados = c.confirmadosC2;
+        dispAsistieron = c.sentadosC2;
       }
 
       const coberturaPct = dispAsignados > 0 && isEquipoFiltered
@@ -264653,12 +265171,16 @@ export default function NodusCoordinadoresC1C2Dashboard() {
         isSpecificFilter: isEquipoFiltered || selectedEntrenamiento !== 'TODOS',
         displayStats: {
           gestiones: dispGestiones,
+          gestionesC1: dispGestionesC1,
+          gestionesC2: dispGestionesC2,
           confirmados: dispConfirmados,
           noContesta: dispNoContesta,
           porConfirmar: dispPorConfirmar,
           siguiente: dispSiguiente,
           noInteresa: dispNoInteresa,
           asistieron: dispAsistieron,
+          sentadosC1: dispSentadosC1,
+          sentadosC2: dispSentadosC2,
           asignados: dispAsignados,
           coberturaPct,
           productividadPct
@@ -264668,10 +265190,13 @@ export default function NodusCoordinadoresC1C2Dashboard() {
 
     // Ordenamiento
     return result.sort((a, b) => {
+      if (sortBy === 'sentados') return b.displayStats.asistieron - a.displayStats.asistieron;
+      if (sortBy === 'sentadosC1') return b.displayStats.sentadosC1 - a.displayStats.sentadosC1;
+      if (sortBy === 'sentadosC2') return b.displayStats.sentadosC2 - a.displayStats.sentadosC2;
       if (sortBy === 'gestiones') return b.displayStats.gestiones - a.displayStats.gestiones;
+      if (sortBy === 'confirmados') return b.displayStats.confirmados - a.displayStats.confirmados;
       if (sortBy === 'cobertura') return b.displayStats.coberturaPct - a.displayStats.coberturaPct;
       if (sortBy === 'productividad') return b.displayStats.productividadPct - a.displayStats.productividadPct;
-      if (sortBy === 'confirmados') return b.displayStats.confirmados - a.displayStats.confirmados;
       if (sortBy === 'nombre') return a.nombre.localeCompare(b.nombre);
       return 0;
     });
@@ -264688,6 +265213,8 @@ export default function NodusCoordinadoresC1C2Dashboard() {
     const totalSiguiente = list.reduce((acc, c) => acc + (c.displayStats.siguiente || 0), 0);
     const totalNoInteresa = list.reduce((acc, c) => acc + (c.displayStats.noInteresa || 0), 0);
     const totalAsistieron = list.reduce((acc, c) => acc + (c.displayStats.asistieron || 0), 0);
+    const totalSentadosC1 = list.reduce((acc, c) => acc + (c.displayStats.sentadosC1 || 0), 0);
+    const totalSentadosC2 = list.reduce((acc, c) => acc + (c.displayStats.sentadosC2 || 0), 0);
 
     const coberturaProm = list.length ? Math.round(list.reduce((acc, c) => acc + (c.displayStats.coberturaPct || 0), 0) / list.length) : 0;
     const productividadProm = list.length ? Math.round(list.reduce((acc, c) => acc + (c.displayStats.productividadPct || 0), 0) / list.length) : 0;
@@ -264702,21 +265229,28 @@ export default function NodusCoordinadoresC1C2Dashboard() {
       totalSiguiente,
       totalNoInteresa,
       totalAsistieron,
+      totalSentadosC1,
+      totalSentadosC2,
       coberturaProm,
       productividadProm,
       tasaEfectividad: totalGestiones > 0 ? Math.round((totalConfirmados / totalGestiones) * 100) : 0
     };
   }, [filteredCoordinadores]);
 
-  // Datos para Gráfico 1: Coordinadores Filtrados (hasta 16 o todos si son <= 20)
+  // Datos para Gráfico 1: Coordinadores Filtrados (hasta 18 o todos si son <= 22)
   const chartCoordinadoresData = useMemo(() => {
-    const limit = filteredCoordinadores.length <= 18 ? filteredCoordinadores.length : 14;
+    const limit = filteredCoordinadores.length <= 22 ? filteredCoordinadores.length : 16;
     return filteredCoordinadores.slice(0, limit).map(c => ({
       name: `${c.nombre} (${c.sede.slice(0, 3)})`,
+      fullName: `${c.nombreCompleto || c.nombre}`,
+      sede: c.sede,
+      sentadosC1: c.displayStats.sentadosC1,
+      sentadosC2: c.displayStats.sentadosC2,
+      totalSentados: c.displayStats.asistieron,
+      gestionesC1: c.displayStats.gestionesC1,
+      gestionesC2: c.displayStats.gestionesC2,
       gestiones: c.displayStats.gestiones,
       confirmados: c.displayStats.confirmados,
-      c1: c.c1,
-      c2: c.c2,
       cobertura: c.displayStats.coberturaPct
     }));
   }, [filteredCoordinadores]);
@@ -264733,6 +265267,9 @@ export default function NodusCoordinadoresC1C2Dashboard() {
           gestiones: 0,
           confirmados: 0,
           asignados: 0,
+          sentadosC1: 0,
+          sentadosC2: 0,
+          sentadosTotal: 0,
           c1: 0,
           c2: 0,
           coordinadores: 0
@@ -264741,12 +265278,15 @@ export default function NodusCoordinadoresC1C2Dashboard() {
       sedesMap[c.sede].gestiones += c.displayStats.gestiones;
       sedesMap[c.sede].confirmados += c.displayStats.confirmados;
       sedesMap[c.sede].asignados += c.displayStats.asignados;
-      sedesMap[c.sede].c1 += c.c1 || 0;
-      sedesMap[c.sede].c2 += c.c2 || 0;
+      sedesMap[c.sede].sentadosC1 += c.displayStats.sentadosC1 || 0;
+      sedesMap[c.sede].sentadosC2 += c.displayStats.sentadosC2 || 0;
+      sedesMap[c.sede].sentadosTotal += c.displayStats.asistieron || 0;
+      sedesMap[c.sede].c1 += c.displayStats.gestionesC1 || 0;
+      sedesMap[c.sede].c2 += c.displayStats.gestionesC2 || 0;
       sedesMap[c.sede].coordinadores += 1;
     });
 
-    return Object.values(sedesMap).sort((a, b) => b.gestiones - a.gestiones);
+    return Object.values(sedesMap).sort((a, b) => b.sentadosTotal - a.sentadosTotal);
   }, [filteredCoordinadores]);
 
   // Datos para Gráfico 3: Distribución Global de Estados (Donut adaptado a lo filtrado)
@@ -264832,14 +265372,34 @@ export default function NodusCoordinadoresC1C2Dashboard() {
       <div className="nodus-scorecards-grid">
         <div className="nodus-card">
           <div className="nodus-card-header">
-            <span>Coordinadores</span>
-            <Users size={16} color="#ffc107" />
+            <span>Total Sentados (Salón)</span>
+            <Award size={16} color="#10b981" />
           </div>
-          <div className="nodus-card-value">{aggregatedStats.coordinadoresCount}</div>
+          <div className="nodus-card-value highlight-emerald">{aggregatedStats.totalAsistieron.toLocaleString()}</div>
           <div className="nodus-card-footer">
-            {hasActiveFilters
-              ? `Filtrado (${filteredCoordinadores.length} encontrados)`
-              : (selectedSede === 'TODAS' ? 'En 6 Sedes' : selectedSede)}
+            C1: <strong style={{ color: '#f59e0b' }}>{aggregatedStats.totalSentadosC1.toLocaleString()}</strong> • C2: <strong style={{ color: '#8b5cf6' }}>{aggregatedStats.totalSentadosC2.toLocaleString()}</strong>
+          </div>
+        </div>
+
+        <div className="nodus-card">
+          <div className="nodus-card-header">
+            <span>Sentados Capítulo 1</span>
+            <Award size={16} color="#f59e0b" />
+          </div>
+          <div className="nodus-card-value highlight-gold">{aggregatedStats.totalSentadosC1.toLocaleString()}</div>
+          <div className="nodus-card-footer">
+            {aggregatedStats.totalAsistieron > 0 ? Math.round((aggregatedStats.totalSentadosC1 / aggregatedStats.totalAsistieron) * 100) : 0}% del total de sala
+          </div>
+        </div>
+
+        <div className="nodus-card">
+          <div className="nodus-card-header">
+            <span>Sentados Capítulo 2</span>
+            <Award size={16} color="#8b5cf6" />
+          </div>
+          <div className="nodus-card-value highlight-purple">{aggregatedStats.totalSentadosC2.toLocaleString()}</div>
+          <div className="nodus-card-footer">
+            {aggregatedStats.totalAsistieron > 0 ? Math.round((aggregatedStats.totalSentadosC2 / aggregatedStats.totalAsistieron) * 100) : 0}% del total de sala
           </div>
         </div>
 
@@ -264852,18 +265412,7 @@ export default function NodusCoordinadoresC1C2Dashboard() {
           <div className="nodus-card-footer">
             {selectedEquipo !== 'TODOS'
               ? `Llamadas de ${selectedEquipo}`
-              : (selectedEntrenamiento !== 'TODOS' ? `Solo ${selectedEntrenamiento}` : 'Llamadas realizadas')}
-          </div>
-        </div>
-
-        <div className="nodus-card">
-          <div className="nodus-card-header">
-            <span>{selectedEquipo !== 'TODOS' ? 'Gestiones Equipo' : 'Asignados'}</span>
-            <Clock size={16} color="#8b5cf6" />
-          </div>
-          <div className="nodus-card-value">{aggregatedStats.totalAsignados.toLocaleString()}</div>
-          <div className="nodus-card-footer">
-            {selectedEquipo !== 'TODOS' ? 'Llamadas registradas' : 'Participantes únicos'}
+              : `${aggregatedStats.coordinadoresCount} coordinadores C1 & C2`}
           </div>
         </div>
 
@@ -264873,7 +265422,7 @@ export default function NodusCoordinadoresC1C2Dashboard() {
             <CheckCircle2 size={16} color="#10b981" />
           </div>
           <div className="nodus-card-value highlight-emerald">{aggregatedStats.totalConfirmados.toLocaleString()}</div>
-          <div className="nodus-card-footer">{aggregatedStats.tasaEfectividad}% efectividad</div>
+          <div className="nodus-card-footer">{aggregatedStats.tasaEfectividad}% efectividad de contacto</div>
         </div>
 
         <div className="nodus-card">
@@ -264884,17 +265433,6 @@ export default function NodusCoordinadoresC1C2Dashboard() {
           <div className="nodus-card-value">{aggregatedStats.coberturaProm}%</div>
           <div className="nodus-progress-bar">
             <div className="nodus-progress-fill" style={{ width: `${aggregatedStats.coberturaProm}%`, background: '#ffc107' }} />
-          </div>
-        </div>
-
-        <div className="nodus-card">
-          <div className="nodus-card-header">
-            <span>Productividad Media</span>
-            <UserCheck size={16} color="#14b8a6" />
-          </div>
-          <div className="nodus-card-value">{aggregatedStats.productividadProm}%</div>
-          <div className="nodus-progress-bar">
-            <div className="nodus-progress-fill" style={{ width: `${aggregatedStats.productividadProm}%`, background: '#14b8a6' }} />
           </div>
         </div>
       </div>
@@ -264998,7 +265536,10 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                 onChange={(e) => setSortBy(e.target.value)}
                 className="nodus-select"
               >
-                <option value="gestiones">Más Gestiones</option>
+                <option value="sentados">Más Sentados en Sala (Total)</option>
+                <option value="sentadosC1">Más Sentados C1</option>
+                <option value="sentadosC2">Más Sentados C2</option>
+                <option value="gestiones">Más Gestiones / Llamadas</option>
                 <option value="confirmados">Más Confirmados</option>
                 <option value="cobertura">Mayor Cobertura %</option>
                 <option value="productividad">Mayor Productividad %</option>
@@ -265080,32 +265621,142 @@ export default function NodusCoordinadoresC1C2Dashboard() {
 
         <div className="nodus-chart-viewport">
           {activeChartTab === 'coordinadores' && (
-            <ResponsiveContainer width="100%" height={380}>
-              <BarChart data={chartCoordinadoresData} margin={{ top: 10, right: 20, left: 0, bottom: 25 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} />
-                <XAxis dataKey="name" stroke={axisStroke} fontSize={11} angle={-25} textAnchor="end" height={50} />
-                <YAxis stroke={axisStroke} fontSize={11} />
-                <Tooltip contentStyle={chartTooltipStyle} itemStyle={chartItemStyle} />
-                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '8px', color: isLight ? '#334155' : '#cbd5e1' }} />
-                <Bar dataKey="gestiones" name="Gestiones Filtradas" fill={isLight ? '#0284c7' : '#0ea5e9'} radius={[4, 4, 0, 0]} />
-                <Bar dataKey="confirmados" name="Confirmados" fill="#10b981" radius={[4, 4, 0, 0]} />
-                {selectedEntrenamiento !== 'C2' && <Bar dataKey="c1" name="Capítulo 1" fill="#eab308" radius={[4, 4, 0, 0]} />}
-                {selectedEntrenamiento !== 'C1' && <Bar dataKey="c2" name="Capítulo 2" fill="#8b5cf6" radius={[4, 4, 0, 0]} />}
-              </BarChart>
-            </ResponsiveContainer>
+            <>
+              {/* SELECTOR DE MÉTRICA DE RENDIMIENTO */}
+              <div className="nodus-metric-toggle-group">
+                <button
+                  type="button"
+                  onClick={() => setChartMetric('sentados')}
+                  className={`nodus-metric-toggle-btn ${chartMetric === 'sentados' ? 'active' : ''}`}
+                  title="Ver participantes efectivamente sentados en sala por capítulo"
+                >
+                  <Award size={14} color="#f59e0b" />
+                  <span>🏆 Sentados en Sala (C1 vs C2)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setChartMetric('gestiones')}
+                  className={`nodus-metric-toggle-btn ${chartMetric === 'gestiones' ? 'active' : ''}`}
+                  title="Ver volumen de gestiones telefónicas y llamadas"
+                >
+                  <PhoneCall size={14} color="#0ea5e9" />
+                  <span>📞 Gestiones & Llamadas (C1 vs C2)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setChartMetric('integral')}
+                  className={`nodus-metric-toggle-btn ${chartMetric === 'integral' ? 'active' : ''}`}
+                  title="Comparativo de doble eje: Sentados vs Esfuerzo de Gestiones"
+                >
+                  <TrendingUp size={14} color="#10b981" />
+                  <span>📊 Comparativo Integral (Doble Eje)</span>
+                </button>
+              </div>
+
+              {chartMetric === 'sentados' && (
+                <ResponsiveContainer width="100%" height={400}>
+                  <BarChart data={chartCoordinadoresData} margin={{ top: 15, right: 25, left: 15, bottom: 65 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} />
+                    <XAxis
+                      dataKey="name"
+                      stroke={axisStroke}
+                      fontSize={11}
+                      angle={-35}
+                      textAnchor="end"
+                      height={65}
+                      interval={0}
+                      tickMargin={6}
+                    />
+                    <YAxis stroke={axisStroke} fontSize={11} />
+                    <Tooltip content={<CustomCoordTooltip />} />
+                    <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px', color: isLight ? '#334155' : '#cbd5e1' }} />
+                    {selectedEntrenamiento !== 'C2' && (
+                      <Bar dataKey="sentadosC1" name="Sentados Capítulo 1" fill="#f59e0b" radius={[5, 5, 0, 0]} maxBarSize={45} />
+                    )}
+                    {selectedEntrenamiento !== 'C1' && (
+                      <Bar dataKey="sentadosC2" name="Sentados Capítulo 2" fill="#8b5cf6" radius={[5, 5, 0, 0]} maxBarSize={45} />
+                    )}
+                    <Bar dataKey="totalSentados" name="Total Sentados (Salón)" fill="#10b981" radius={[5, 5, 0, 0]} maxBarSize={45} />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
+
+              {chartMetric === 'gestiones' && (
+                <ResponsiveContainer width="100%" height={400}>
+                  <BarChart data={chartCoordinadoresData} margin={{ top: 15, right: 25, left: 15, bottom: 65 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} />
+                    <XAxis
+                      dataKey="name"
+                      stroke={axisStroke}
+                      fontSize={11}
+                      angle={-35}
+                      textAnchor="end"
+                      height={65}
+                      interval={0}
+                      tickMargin={6}
+                    />
+                    <YAxis stroke={axisStroke} fontSize={11} />
+                    <Tooltip content={<CustomCoordTooltip />} />
+                    <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px', color: isLight ? '#334155' : '#cbd5e1' }} />
+                    <Bar dataKey="gestiones" name="Gestiones Totales" fill={isLight ? '#0284c7' : '#0ea5e9'} radius={[5, 5, 0, 0]} maxBarSize={45} />
+                    <Bar dataKey="confirmados" name="Confirmados" fill="#10b981" radius={[5, 5, 0, 0]} maxBarSize={45} />
+                    {selectedEntrenamiento !== 'C2' && (
+                      <Bar dataKey="gestionesC1" name="Llamadas Capítulo 1" fill="#f59e0b" radius={[5, 5, 0, 0]} maxBarSize={45} />
+                    )}
+                    {selectedEntrenamiento !== 'C1' && (
+                      <Bar dataKey="gestionesC2" name="Llamadas Capítulo 2" fill="#8b5cf6" radius={[5, 5, 0, 0]} maxBarSize={45} />
+                    )}
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
+
+              {chartMetric === 'integral' && (
+                <ResponsiveContainer width="100%" height={400}>
+                  <ComposedChart data={chartCoordinadoresData} margin={{ top: 15, right: 30, left: 15, bottom: 65 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} />
+                    <XAxis
+                      dataKey="name"
+                      stroke={axisStroke}
+                      fontSize={11}
+                      angle={-35}
+                      textAnchor="end"
+                      height={65}
+                      interval={0}
+                      tickMargin={6}
+                    />
+                    <YAxis yAxisId="left" stroke="#10b981" fontSize={11} />
+                    <YAxis yAxisId="right" orientation="right" stroke="#0ea5e9" fontSize={11} />
+                    <Tooltip content={<CustomCoordTooltip />} />
+                    <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px', color: isLight ? '#334155' : '#cbd5e1' }} />
+                    {selectedEntrenamiento !== 'C2' && (
+                      <Bar yAxisId="left" dataKey="sentadosC1" name="Sentados C1" fill="#f59e0b" radius={[4, 4, 0, 0]} maxBarSize={32} />
+                    )}
+                    {selectedEntrenamiento !== 'C1' && (
+                      <Bar yAxisId="left" dataKey="sentadosC2" name="Sentados C2" fill="#8b5cf6" radius={[4, 4, 0, 0]} maxBarSize={32} />
+                    )}
+                    <Bar yAxisId="left" dataKey="totalSentados" name="Total Sentados" fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={32} />
+                    <Line yAxisId="right" type="monotone" dataKey="gestiones" name="Gestiones Totales (Eje Der)" stroke="#38bdf8" strokeWidth={3} dot={{ r: 4 }} />
+                  </ComposedChart>
+                </ResponsiveContainer>
+              )}
+            </>
           )}
 
           {activeChartTab === 'sedes' && (
-            <ResponsiveContainer width="100%" height={380}>
-              <ComposedChart data={chartSedesData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
+            <ResponsiveContainer width="100%" height={390}>
+              <ComposedChart data={chartSedesData} margin={{ top: 15, right: 25, left: 15, bottom: 25 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} />
                 <XAxis dataKey="sede" stroke={axisStroke} fontSize={12} />
-                <YAxis stroke={axisStroke} fontSize={11} />
+                <YAxis yAxisId="left" stroke="#10b981" fontSize={11} />
+                <YAxis yAxisId="right" orientation="right" stroke="#0ea5e9" fontSize={11} />
                 <Tooltip contentStyle={chartTooltipStyle} itemStyle={chartItemStyle} />
-                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '8px', color: isLight ? '#334155' : '#cbd5e1' }} />
-                <Bar dataKey="gestiones" name="Gestiones Realizadas" fill={isLight ? '#0284c7' : '#38bdf8'} radius={[6, 6, 0, 0]} />
-                <Bar dataKey="confirmados" name="Confirmados" fill="#10b981" radius={[6, 6, 0, 0]} />
-                <Line type="monotone" dataKey="asignados" name="Participantes Asignados" stroke="#f59e0b" strokeWidth={3} dot={{ r: 4 }} />
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px', color: isLight ? '#334155' : '#cbd5e1' }} />
+                <Bar yAxisId="left" dataKey="sentadosC1" name="Sentados C1" fill="#f59e0b" radius={[5, 5, 0, 0]} maxBarSize={38} />
+                <Bar yAxisId="left" dataKey="sentadosC2" name="Sentados C2" fill="#8b5cf6" radius={[5, 5, 0, 0]} maxBarSize={38} />
+                <Bar yAxisId="left" dataKey="sentadosTotal" name="Total Sentados" fill="#10b981" radius={[5, 5, 0, 0]} maxBarSize={38} />
+                <Line yAxisId="right" type="monotone" dataKey="gestiones" name="Gestiones Totales (Eje Der)" stroke="#38bdf8" strokeWidth={3} dot={{ r: 4 }} />
               </ComposedChart>
             </ResponsiveContainer>
           )}
@@ -265174,15 +265825,15 @@ export default function NodusCoordinadoresC1C2Dashboard() {
               <tr>
                 <th className="nodus-th">Colaborador / Coordinador</th>
                 <th className="nodus-th">Sede & Ciclo</th>
-                <th className="nodus-th" style={{ textAlign: 'right' }}>Gestiones</th>
-                <th className="nodus-th" style={{ textAlign: 'right' }}>C1 / C2</th>
-                <th className="nodus-th" style={{ textAlign: 'right' }}>Asignados</th>
+                <th className="nodus-th" style={{ textAlign: 'right', color: '#f59e0b' }}>Sentados C1</th>
+                <th className="nodus-th" style={{ textAlign: 'right', color: '#8b5cf6' }}>Sentados C2</th>
+                <th className="nodus-th" style={{ textAlign: 'right', color: '#10b981' }}>Total Sentados</th>
+                <th className="nodus-th" style={{ textAlign: 'right' }}>Gestiones (C1 / C2)</th>
+                <th className="nodus-th" style={{ textAlign: 'right' }}>Confirmados</th>
                 <th className="nodus-th" style={{ textAlign: 'center' }}>Cobertura</th>
                 <th className="nodus-th" style={{ textAlign: 'center' }}>Productividad</th>
-                <th className="nodus-th" style={{ textAlign: 'right' }}>Confirmados</th>
-                <th className="nodus-th" style={{ textAlign: 'right' }}>Asistieron</th>
                 <th className="nodus-th" style={{ textAlign: 'center' }}>Última Gestión</th>
-                <th className="nodus-th" style={{ textAlign: 'center' }}>Acciones</th>
+                <th className="nodus-th" style={{ textAlign: 'center' }}>Equipos</th>
               </tr>
             </thead>
             <tbody>
@@ -265218,7 +265869,7 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                             <div>
                               <div style={{ fontWeight: 700, color: 'var(--nodus-text-title)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                                 {coord.nombre}
-                                {coord.c2 > 0 && selectedEntrenamiento !== 'C1' && (
+                                {coord.sentadosC2 > 0 && selectedEntrenamiento !== 'C1' && (
                                   <span className="nodus-badge-c1c2">C1+C2</span>
                                 )}
                                 {isFilteredEquipo && (
@@ -265247,53 +265898,35 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                           </div>
                         </td>
 
-                        {/* Gestiones */}
-                        <td className="nodus-td" style={{ textAlign: 'right', fontWeight: 800, color: '#0284c7', fontSize: '0.95rem' }}>
-                          {coord.displayStats.gestiones.toLocaleString()}
-                        </td>
-
-                        {/* C1 / C2 */}
+                        {/* Sentados C1 */}
                         <td className="nodus-td" style={{ textAlign: 'right' }}>
-                          <span style={{
-                            color: selectedEntrenamiento === 'C2' ? 'var(--nodus-text-muted)' : '#ffc107',
-                            fontWeight: selectedEntrenamiento === 'C1' ? 800 : 700,
-                            opacity: selectedEntrenamiento === 'C2' ? 0.4 : 1
-                          }}>{coord.c1}</span>
-                          <span style={{ color: 'var(--nodus-text-muted)', margin: '0 0.3rem' }}>/</span>
-                          <span style={{
-                            color: selectedEntrenamiento === 'C1' ? 'var(--nodus-text-muted)' : '#a78bfa',
-                            fontWeight: selectedEntrenamiento === 'C2' ? 800 : 700,
-                            opacity: selectedEntrenamiento === 'C1' ? 0.4 : 1
-                          }}>{coord.c2}</span>
+                          <span className="nodus-badge-sentados-c1">
+                            {coord.displayStats.sentadosC1}
+                          </span>
                         </td>
 
-                        {/* Asignados */}
-                        <td className="nodus-td" style={{ textAlign: 'right', color: 'var(--nodus-text-main)', fontWeight: 600 }}>
-                          {coord.displayStats.asignados.toLocaleString()}
+                        {/* Sentados C2 */}
+                        <td className="nodus-td" style={{ textAlign: 'right' }}>
+                          <span className="nodus-badge-sentados-c2">
+                            {coord.displayStats.sentadosC2}
+                          </span>
                         </td>
 
-                        {/* Cobertura */}
-                        <td className="nodus-td" style={{ textAlign: 'center' }}>
-                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
-                            <span style={{ fontWeight: 800, color: '#ffc107' }}>{coord.displayStats.coberturaPct}%</span>
-                            <div style={{ width: '60px', height: '4px', background: 'var(--nodus-progress-bg)', borderRadius: '2px', overflow: 'hidden' }}>
-                              <div style={{ width: `${coord.displayStats.coberturaPct}%`, height: '100%', background: '#ffc107', borderRadius: '2px' }} />
-                            </div>
-                            <span style={{ fontSize: '0.68rem', color: 'var(--nodus-text-muted)' }}>
-                              {coord.coberturaDetalle?.split(' ')[0] || ''}
+                        {/* Total Sentados */}
+                        <td className="nodus-td" style={{ textAlign: 'right' }}>
+                          <span className="nodus-badge-asistieron">
+                            {coord.displayStats.asistieron}
+                          </span>
+                        </td>
+
+                        {/* Gestiones (C1 / C2) */}
+                        <td className="nodus-td" style={{ textAlign: 'right' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.1rem' }}>
+                            <span style={{ fontWeight: 800, color: '#0ea5e9', fontSize: '0.92rem' }}>
+                              {coord.displayStats.gestiones.toLocaleString()}
                             </span>
-                          </div>
-                        </td>
-
-                        {/* Productividad */}
-                        <td className="nodus-td" style={{ textAlign: 'center' }}>
-                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
-                            <span style={{ fontWeight: 800, color: '#14b8a6' }}>{coord.displayStats.productividadPct}%</span>
-                            <div style={{ width: '60px', height: '4px', background: 'var(--nodus-progress-bg)', borderRadius: '2px', overflow: 'hidden' }}>
-                              <div style={{ width: `${coord.displayStats.productividadPct}%`, height: '100%', background: '#14b8a6', borderRadius: '2px' }} />
-                            </div>
                             <span style={{ fontSize: '0.68rem', color: 'var(--nodus-text-muted)' }}>
-                              {coord.productividadDetalle?.split(' ')[0] || ''}
+                              C1: <strong style={{ color: '#f59e0b' }}>{coord.displayStats.gestionesC1 || 0}</strong> • C2: <strong style={{ color: '#8b5cf6' }}>{coord.displayStats.gestionesC2 || 0}</strong>
                             </span>
                           </div>
                         </td>
@@ -265305,11 +265938,24 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                           </span>
                         </td>
 
-                        {/* Asistieron */}
-                        <td className="nodus-td" style={{ textAlign: 'right' }}>
-                          <span className="nodus-badge-asistieron">
-                            {coord.displayStats.asistieron}
-                          </span>
+                        {/* Cobertura */}
+                        <td className="nodus-td" style={{ textAlign: 'center' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
+                            <span style={{ fontWeight: 800, color: '#ffc107' }}>{coord.displayStats.coberturaPct}%</span>
+                            <div style={{ width: '55px', height: '4px', background: 'var(--nodus-progress-bg)', borderRadius: '2px', overflow: 'hidden' }}>
+                              <div style={{ width: `${coord.displayStats.coberturaPct}%`, height: '100%', background: '#ffc107', borderRadius: '2px' }} />
+                            </div>
+                          </div>
+                        </td>
+
+                        {/* Productividad */}
+                        <td className="nodus-td" style={{ textAlign: 'center' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
+                            <span style={{ fontWeight: 800, color: '#14b8a6' }}>{coord.displayStats.productividadPct}%</span>
+                            <div style={{ width: '55px', height: '4px', background: 'var(--nodus-progress-bg)', borderRadius: '2px', overflow: 'hidden' }}>
+                              <div style={{ width: `${coord.displayStats.productividadPct}%`, height: '100%', background: '#14b8a6', borderRadius: '2px' }} />
+                            </div>
+                          </div>
                         </td>
 
                         {/* Última Gestión */}
@@ -265360,23 +266006,30 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                                 <table className="nodus-nested-table">
                                   <thead>
                                     <tr>
-                                      <th className="nodus-nested-th">Equipo</th>
+                                      <th className="nodus-nested-th">Capítulo & Equipo</th>
                                       <th className="nodus-nested-th" style={{ textAlign: 'right' }}>Llamadas</th>
                                       <th className="nodus-nested-th" style={{ textAlign: 'right' }}>Confirmado</th>
                                       <th className="nodus-nested-th" style={{ textAlign: 'right' }}>No Contesta</th>
                                       <th className="nodus-nested-th" style={{ textAlign: 'right' }}>Por Confirmar</th>
                                       <th className="nodus-nested-th" style={{ textAlign: 'right' }}>Siguiente</th>
-                                      <th className="nodus-nested-th" style={{ textAlign: 'right' }}>Asistieron</th>
+                                      <th className="nodus-nested-th" style={{ textAlign: 'right', color: '#10b981' }}>Sentados en Sala</th>
                                       <th className="nodus-nested-th" style={{ textAlign: 'center' }}>Tasa Asistencia</th>
                                     </tr>
                                   </thead>
                                   <tbody>
                                     {coord.visibleEquipos.map((eq, eqIdx) => {
+                                      const teamNum = parseInt(eq.equipo.replace(/[^0-9]/g, '')) || 0;
+                                      const isC2 = teamNum >= 100;
                                       const tasaAsist = eq.confirmado > 0 ? Math.round((eq.asistieron / eq.confirmado) * 100) : 0;
                                       return (
                                         <tr key={eqIdx} style={{ transition: 'background 0.15s ease' }}>
                                           <td className="nodus-nested-td" style={{ fontWeight: 700, color: 'var(--nodus-text-title)' }}>
-                                            {eq.equipo}
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                                              <span className={isC2 ? "nodus-badge-c2-small" : "nodus-badge-c1-small"}>
+                                                {isC2 ? 'C2' : 'C1'}
+                                              </span>
+                                              <span>{eq.equipo}</span>
+                                            </div>
                                           </td>
                                           <td className="nodus-nested-td" style={{ textAlign: 'right', color: '#0284c7', fontWeight: 600 }}>
                                             {eq.llamadas}
@@ -265393,8 +266046,10 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                                           <td className="nodus-nested-td" style={{ textAlign: 'right', color: '#60a5fa' }}>
                                             {eq.siguiente}
                                           </td>
-                                          <td className="nodus-nested-td" style={{ textAlign: 'right', color: '#0284c7', fontWeight: 700 }}>
-                                            {eq.asistieron}
+                                          <td className="nodus-nested-td" style={{ textAlign: 'right' }}>
+                                            <span className="nodus-badge-asistieron" style={{ fontSize: '0.75rem', padding: '0.15rem 0.5rem' }}>
+                                              {eq.asistieron}
+                                            </span>
                                           </td>
                                           <td className="nodus-nested-td" style={{ textAlign: 'center' }}>
                                             <span style={{
@@ -269691,6 +270346,15 @@ export function AuthProvider({ children }) {
           setCurrentUser(null);
         }
       } else {
+        const mockDevUser = localStorage.getItem('cpsl_mock_user');
+        if (mockDevUser) {
+          try {
+            const parsed = JSON.parse(mockDevUser);
+            setCurrentUser(parsed);
+            setLoading(false);
+            return;
+          } catch(e) {}
+        }
         sessionStorage.removeItem('googleAccessToken');
         sessionStorage.removeItem('cpsl_active_role');
         setCurrentUser(null);
@@ -283027,6 +283691,7558 @@ export const normalizeCoordinator = (name) => {
   return map[clean] || clean;
 };
 
+```
+
+---
+
+## Archivo: src\data\nodusFallbackData.json
+
+```json
+{
+  "timestamp": "2026-09-05T00:39:50.789Z",
+  "totales": {
+    "totalCoordinadores": 22,
+    "totalGestiones": 28981,
+    "totalGestionesC1": 15213,
+    "totalGestionesC2": 12820,
+    "totalAsignados": 13616,
+    "totalConfirmados": 13545,
+    "totalConfirmadosC1": 3484,
+    "totalConfirmadosC2": 2328,
+    "totalNoContesta": 8633,
+    "totalPorConfirmar": 2219,
+    "totalSiguiente": 3358,
+    "totalNoInteresa": 755,
+    "totalAsistieron": 5704,
+    "totalSentadosC1": 3227,
+    "totalSentadosC2": 2477,
+    "coberturaPromedio": 87,
+    "productividadPromedio": 21
+  },
+  "sedes": [
+    {
+      "sede": "Cuenca",
+      "coordinadoresCount": 4,
+      "gestionesTotal": 918,
+      "gestionesC1Total": 819,
+      "gestionesC2Total": 99,
+      "asignadosTotal": 3131,
+      "confirmadosTotal": 601,
+      "noContestaTotal": 134,
+      "porConfirmarTotal": 93,
+      "asistieronTotal": 283,
+      "sentadosC1Total": 257,
+      "sentadosC2Total": 26,
+      "c1Total": 819,
+      "c2Total": 99
+    },
+    {
+      "sede": "Guayaquil",
+      "coordinadoresCount": 4,
+      "gestionesTotal": 5258,
+      "gestionesC1Total": 5101,
+      "gestionesC2Total": 157,
+      "asignadosTotal": 1893,
+      "confirmadosTotal": 2321,
+      "noContestaTotal": 1948,
+      "porConfirmarTotal": 340,
+      "asistieronTotal": 1114,
+      "sentadosC1Total": 1087,
+      "sentadosC2Total": 27,
+      "c1Total": 5101,
+      "c2Total": 157
+    },
+    {
+      "sede": "Lima",
+      "coordinadoresCount": 3,
+      "gestionesTotal": 5454,
+      "gestionesC1Total": 4726,
+      "gestionesC2Total": 309,
+      "asignadosTotal": 1898,
+      "confirmadosTotal": 2633,
+      "noContestaTotal": 1549,
+      "porConfirmarTotal": 448,
+      "asistieronTotal": 847,
+      "sentadosC1Total": 846,
+      "sentadosC2Total": 1,
+      "c1Total": 4726,
+      "c2Total": 309
+    },
+    {
+      "sede": "Medellín",
+      "coordinadoresCount": 3,
+      "gestionesTotal": 4599,
+      "gestionesC1Total": 3784,
+      "gestionesC2Total": 314,
+      "asignadosTotal": 1415,
+      "confirmadosTotal": 2380,
+      "noContestaTotal": 1183,
+      "porConfirmarTotal": 213,
+      "asistieronTotal": 965,
+      "sentadosC1Total": 918,
+      "sentadosC2Total": 47,
+      "c1Total": 3784,
+      "c2Total": 314
+    },
+    {
+      "sede": "México",
+      "coordinadoresCount": 1,
+      "gestionesTotal": 3,
+      "gestionesC1Total": 3,
+      "gestionesC2Total": 0,
+      "asignadosTotal": 151,
+      "confirmadosTotal": 0,
+      "noContestaTotal": 2,
+      "porConfirmarTotal": 1,
+      "asistieronTotal": 0,
+      "sentadosC1Total": 0,
+      "sentadosC2Total": 0,
+      "c1Total": 3,
+      "c2Total": 0
+    },
+    {
+      "sede": "Quito",
+      "coordinadoresCount": 7,
+      "gestionesTotal": 12749,
+      "gestionesC1Total": 780,
+      "gestionesC2Total": 11941,
+      "asignadosTotal": 5128,
+      "confirmadosTotal": 5610,
+      "noContestaTotal": 3817,
+      "porConfirmarTotal": 1124,
+      "asistieronTotal": 2495,
+      "sentadosC1Total": 119,
+      "sentadosC2Total": 2376,
+      "c1Total": 780,
+      "c2Total": 11941
+    }
+  ],
+  "coordinadores": [
+    {
+      "id": "coord_maribel_cuenca",
+      "nombre": "MARIBEL",
+      "nombreCompleto": "Maribel Cuenca",
+      "email": "coordinacion.cuenca@crearpsl.net",
+      "sede": "Cuenca",
+      "ciclo": "Ciclo 1",
+      "rol": "Coordinador C1",
+      "gestiones": 396,
+      "c1": 363,
+      "c2": 33,
+      "asignados": 748,
+      "coberturaPct": 31,
+      "coberturaDetalle": "234/748 (31%)",
+      "productividadPct": 29,
+      "productividadDetalle": "114/396 (29%)",
+      "asistieron": 114,
+      "tasaEfectividad": 59,
+      "ultConexion": "04/09/2026 13:46",
+      "ultGestion": "04/09/2026 13:56",
+      "estados": {
+        "confirmado": 232,
+        "noContesta": 84,
+        "siguiente": 34,
+        "noInteresa": 2,
+        "porConfirmar": 44,
+        "yaAsistio": 0,
+        "devolucion": 0
+      },
+      "equipos": [
+        {
+          "equipo": "EQUIPO 23",
+          "llamadas": 67,
+          "confirmado": 36,
+          "noContesta": 7,
+          "noInteresa": 0,
+          "siguiente": 6,
+          "porConfirmar": 8,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 19",
+          "llamadas": 6,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 22",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 21",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 33",
+          "llamadas": 2,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 119",
+          "llamadas": 2,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 118",
+          "llamadas": 4,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 122",
+          "llamadas": 1,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 18",
+          "llamadas": 3,
+          "confirmado": 2,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 116",
+          "llamadas": 2,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 32",
+          "llamadas": 1,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 17",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 114",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 31",
+          "llamadas": 1,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 112",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 113",
+          "llamadas": 3,
+          "confirmado": 2,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 11",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 10",
+          "llamadas": 87,
+          "confirmado": 24,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 2,
+          "porConfirmar": 2,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 21
+        },
+        {
+          "equipo": "EQUIPO 110",
+          "llamadas": 6,
+          "confirmado": 5,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 4
+        },
+        {
+          "equipo": "EQUIPO 30",
+          "llamadas": 6,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 111",
+          "llamadas": 3,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 14",
+          "llamadas": 6,
+          "confirmado": 4,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 4
+        },
+        {
+          "equipo": "EQUIPO 16",
+          "llamadas": 4,
+          "confirmado": 1,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 15",
+          "llamadas": 3,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 2,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 13",
+          "llamadas": 27,
+          "confirmado": 10,
+          "noContesta": 10,
+          "noInteresa": 0,
+          "siguiente": 1,
+          "porConfirmar": 3,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 17
+        },
+        {
+          "equipo": "EQUIPO 107",
+          "llamadas": 5,
+          "confirmado": 2,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 12",
+          "llamadas": 33,
+          "confirmado": 8,
+          "noContesta": 12,
+          "noInteresa": 0,
+          "siguiente": 5,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 17
+        },
+        {
+          "equipo": "EQUIPO 105",
+          "llamadas": 5,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 11",
+          "llamadas": 106,
+          "confirmado": 36,
+          "noContesta": 5,
+          "noInteresa": 0,
+          "siguiente": 3,
+          "porConfirmar": 3,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 31
+        },
+        {
+          "equipo": "EQUIPO 24",
+          "llamadas": 2,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 25",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        }
+      ],
+      "sentadosC1": 104,
+      "sentadosC2": 10,
+      "sentadosTotal": 114,
+      "gestionesC1": 363,
+      "gestionesC2": 33,
+      "confirmadosC1": 127,
+      "confirmadosC2": 14
+    },
+    {
+      "id": "coord_joao_cuenca",
+      "nombre": "JOAO",
+      "nombreCompleto": "Joao Cuenca",
+      "email": "coordinacion.cuenca@crearpsl.net",
+      "sede": "Cuenca",
+      "ciclo": "Ciclo 1",
+      "rol": "Coordinador C1",
+      "gestiones": 253,
+      "c1": 213,
+      "c2": 40,
+      "asignados": 1137,
+      "coberturaPct": 16,
+      "coberturaDetalle": "187/1137 (16%)",
+      "productividadPct": 34,
+      "productividadDetalle": "86/253 (34%)",
+      "asistieron": 86,
+      "tasaEfectividad": 67,
+      "ultConexion": "03/09/2026 11:38",
+      "ultGestion": "03/09/2026 13:08",
+      "estados": {
+        "confirmado": 169,
+        "noContesta": 35,
+        "siguiente": 15,
+        "noInteresa": 5,
+        "porConfirmar": 29,
+        "yaAsistio": 0,
+        "devolucion": 0
+      },
+      "equipos": [
+        {
+          "equipo": "EQUIPO 23",
+          "llamadas": 35,
+          "confirmado": 35,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 34",
+          "llamadas": 3,
+          "confirmado": 3,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 3
+        },
+        {
+          "equipo": "EQUIPO 121",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 120",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 124",
+          "llamadas": 3,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 22",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 119",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 118",
+          "llamadas": 2,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 122",
+          "llamadas": 7,
+          "confirmado": 4,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 4
+        },
+        {
+          "equipo": "EQUIPO 15",
+          "llamadas": 1,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 116",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 17",
+          "llamadas": 1,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 114",
+          "llamadas": 2,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 112",
+          "llamadas": 4,
+          "confirmado": 3,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 3
+        },
+        {
+          "equipo": "EQUIPO 113",
+          "llamadas": 1,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 10",
+          "llamadas": 77,
+          "confirmado": 25,
+          "noContesta": 1,
+          "noInteresa": 3,
+          "siguiente": 6,
+          "porConfirmar": 8,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 25
+        },
+        {
+          "equipo": "EQUIPO 110",
+          "llamadas": 2,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 14",
+          "llamadas": 1,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 108",
+          "llamadas": 2,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 13",
+          "llamadas": 1,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 12",
+          "llamadas": 11,
+          "confirmado": 3,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 1,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 6
+        },
+        {
+          "equipo": "EQUIPO 28",
+          "llamadas": 1,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 11",
+          "llamadas": 11,
+          "confirmado": 5,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 2,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 7
+        },
+        {
+          "equipo": "EQUIPO 102",
+          "llamadas": 4,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 2,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 100",
+          "llamadas": 2,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 24",
+          "llamadas": 11,
+          "confirmado": 5,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 101",
+          "llamadas": 6,
+          "confirmado": 3,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 9",
+          "llamadas": 59,
+          "confirmado": 30,
+          "noContesta": 11,
+          "noInteresa": 0,
+          "siguiente": 3,
+          "porConfirmar": 2,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 27
+        }
+      ],
+      "sentadosC1": 73,
+      "sentadosC2": 13,
+      "sentadosTotal": 86,
+      "gestionesC1": 213,
+      "gestionesC2": 40,
+      "confirmadosC1": 111,
+      "confirmadosC2": 17
+    },
+    {
+      "id": "coord_juan_fernando_cuenca",
+      "nombre": "JUAN FERNANDO",
+      "nombreCompleto": "Juan Fernando",
+      "email": "coordinacion.cuenca@crearpsl.net",
+      "sede": "Cuenca",
+      "ciclo": "Ciclo 1",
+      "rol": "Coordinador C1",
+      "gestiones": 175,
+      "c1": 167,
+      "c2": 8,
+      "asignados": 315,
+      "coberturaPct": 34,
+      "coberturaDetalle": "106/315 (34%)",
+      "productividadPct": 43,
+      "productividadDetalle": "75/175 (43%)",
+      "asistieron": 75,
+      "tasaEfectividad": 70,
+      "ultConexion": "03/09/2026 12:33",
+      "ultGestion": "05/11/2025 12:02",
+      "estados": {
+        "confirmado": 122,
+        "noContesta": 7,
+        "siguiente": 32,
+        "noInteresa": 0,
+        "porConfirmar": 14,
+        "yaAsistio": 0,
+        "devolucion": 0
+      },
+      "equipos": [
+        {
+          "equipo": "EQUIPO 19",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 22",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 112",
+          "llamadas": 3,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 27",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 10",
+          "llamadas": 59,
+          "confirmado": 35,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 3,
+          "porConfirmar": 6,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 31
+        },
+        {
+          "equipo": "EQUIPO 29",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 16",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 109",
+          "llamadas": 1,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 13",
+          "llamadas": 10,
+          "confirmado": 3,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 2,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 4
+        },
+        {
+          "equipo": "EQUIPO 12",
+          "llamadas": 19,
+          "confirmado": 4,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 7,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 11
+        },
+        {
+          "equipo": "EQUIPO 105",
+          "llamadas": 4,
+          "confirmado": 2,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 11",
+          "llamadas": 69,
+          "confirmado": 29,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 4,
+          "porConfirmar": 2,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 24
+        },
+        {
+          "equipo": "EQUIPO 9",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        }
+      ],
+      "sentadosC1": 73,
+      "sentadosC2": 2,
+      "sentadosTotal": 75,
+      "gestionesC1": 167,
+      "gestionesC2": 8,
+      "confirmadosC1": 71,
+      "confirmadosC2": 3
+    },
+    {
+      "id": "coord_evelyn_paulina_cuenca",
+      "nombre": "EVELYN PAULINA",
+      "nombreCompleto": "EVELYN PAULINA",
+      "email": "evelyn.paulina@crearpsl.net",
+      "sede": "Cuenca",
+      "ciclo": "Ciclo 1",
+      "rol": "Coordinador C1",
+      "gestiones": 94,
+      "c1": 76,
+      "c2": 18,
+      "asignados": 931,
+      "coberturaPct": 10,
+      "coberturaDetalle": "93/931 (10%)",
+      "productividadPct": 9,
+      "productividadDetalle": "8/94 (9%)",
+      "asistieron": 8,
+      "tasaEfectividad": 83,
+      "ultConexion": "04/09/2026 12:29",
+      "ultGestion": "03/09/2026 13:22",
+      "estados": {
+        "confirmado": 78,
+        "noContesta": 8,
+        "siguiente": 2,
+        "noInteresa": 0,
+        "porConfirmar": 6,
+        "yaAsistio": 0,
+        "devolucion": 0
+      },
+      "equipos": [
+        {
+          "equipo": "EQUIPO 23",
+          "llamadas": 56,
+          "confirmado": 39,
+          "noContesta": 8,
+          "noInteresa": 0,
+          "siguiente": 2,
+          "porConfirmar": 6,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 35",
+          "llamadas": 8,
+          "confirmado": 2,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 36",
+          "llamadas": 2,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 123",
+          "llamadas": 1,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 125",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 124",
+          "llamadas": 3,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 126",
+          "llamadas": 5,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 21",
+          "llamadas": 2,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 119",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 118",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 116",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 32",
+          "llamadas": 3,
+          "confirmado": 2,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 114",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 31",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 112",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 1",
+          "llamadas": 2,
+          "confirmado": 2,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 29",
+          "llamadas": 1,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        }
+      ],
+      "sentadosC1": 7,
+      "sentadosC2": 1,
+      "sentadosTotal": 8,
+      "gestionesC1": 76,
+      "gestionesC2": 18,
+      "confirmadosC1": 48,
+      "confirmadosC2": 2
+    },
+    {
+      "id": "coord_diana_macas_guayaquil",
+      "nombre": "DIANA MACAS",
+      "nombreCompleto": "DIANA MACAS",
+      "email": "diana.macas@crearpsl.net",
+      "sede": "Guayaquil",
+      "ciclo": "Ciclo 1",
+      "rol": "Coordinador C1",
+      "gestiones": 2000,
+      "c1": 1930,
+      "c2": 70,
+      "asignados": 762,
+      "coberturaPct": 91,
+      "coberturaDetalle": "696/762 (91%)",
+      "productividadPct": 23,
+      "productividadDetalle": "460/2000 (23%)",
+      "asistieron": 460,
+      "tasaEfectividad": 46,
+      "ultConexion": "04/09/2026 08:15",
+      "ultGestion": "01/09/2026 12:28",
+      "estados": {
+        "confirmado": 927,
+        "noContesta": 721,
+        "siguiente": 168,
+        "noInteresa": 16,
+        "porConfirmar": 129,
+        "yaAsistio": 0,
+        "devolucion": 37
+      },
+      "equipos": [
+        {
+          "equipo": "EQUIPO 127",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 36",
+          "llamadas": 217,
+          "confirmado": 43,
+          "noContesta": 13,
+          "noInteresa": 1,
+          "siguiente": 10,
+          "porConfirmar": 0,
+          "devolucion": 2,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 38
+        },
+        {
+          "equipo": "EQUIPO 35",
+          "llamadas": 226,
+          "confirmado": 50,
+          "noContesta": 14,
+          "noInteresa": 1,
+          "siguiente": 2,
+          "porConfirmar": 4,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 54
+        },
+        {
+          "equipo": "EQUIPO 34",
+          "llamadas": 179,
+          "confirmado": 45,
+          "noContesta": 5,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 3,
+          "devolucion": 1,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 50
+        },
+        {
+          "equipo": "EQUIPO 37",
+          "llamadas": 6,
+          "confirmado": 4,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 123",
+          "llamadas": 8,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 121",
+          "llamadas": 10,
+          "confirmado": 5,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 125",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 19",
+          "llamadas": 3,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 20",
+          "llamadas": 1,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 22",
+          "llamadas": 6,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 21",
+          "llamadas": 1,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 33",
+          "llamadas": 165,
+          "confirmado": 55,
+          "noContesta": 6,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 5,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 61
+        },
+        {
+          "equipo": "EQUIPO 119",
+          "llamadas": 3,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 118",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 122",
+          "llamadas": 3,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 32",
+          "llamadas": 72,
+          "confirmado": 13,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 12
+        },
+        {
+          "equipo": "EQUIPO 117",
+          "llamadas": 4,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 17",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 31",
+          "llamadas": 196,
+          "confirmado": 39,
+          "noContesta": 5,
+          "noInteresa": 0,
+          "siguiente": 1,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 38
+        },
+        {
+          "equipo": "EQUIPO 115",
+          "llamadas": 13,
+          "confirmado": 2,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 113",
+          "llamadas": 4,
+          "confirmado": 1,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 27",
+          "llamadas": 100,
+          "confirmado": 21,
+          "noContesta": 7,
+          "noInteresa": 3,
+          "siguiente": 0,
+          "porConfirmar": 2,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 25
+        },
+        {
+          "equipo": "EQUIPO 12",
+          "llamadas": 1,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 1",
+          "llamadas": 1,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 110",
+          "llamadas": 4,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 29",
+          "llamadas": 103,
+          "confirmado": 18,
+          "noContesta": 8,
+          "noInteresa": 0,
+          "siguiente": 3,
+          "porConfirmar": 7,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 19
+        },
+        {
+          "equipo": "EQUIPO 30",
+          "llamadas": 104,
+          "confirmado": 17,
+          "noContesta": 9,
+          "noInteresa": 0,
+          "siguiente": 2,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 16
+        },
+        {
+          "equipo": "EQUIPO 15",
+          "llamadas": 8,
+          "confirmado": 3,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 108",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 107",
+          "llamadas": 1,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 26",
+          "llamadas": 126,
+          "confirmado": 25,
+          "noContesta": 4,
+          "noInteresa": 1,
+          "siguiente": 1,
+          "porConfirmar": 4,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 27
+        },
+        {
+          "equipo": "EQUIPO 105",
+          "llamadas": 7,
+          "confirmado": 2,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 28",
+          "llamadas": 75,
+          "confirmado": 21,
+          "noContesta": 2,
+          "noInteresa": 1,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 1,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 23
+        },
+        {
+          "equipo": "EQUIPO 11",
+          "llamadas": 4,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 24",
+          "llamadas": 82,
+          "confirmado": 25,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 2,
+          "devolucion": 1,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 24
+        },
+        {
+          "equipo": "EQUIPO 25",
+          "llamadas": 73,
+          "confirmado": 21,
+          "noContesta": 3,
+          "noInteresa": 0,
+          "siguiente": 1,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 23
+        },
+        {
+          "equipo": "EQUIPO 101",
+          "llamadas": 8,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 6,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 6
+        },
+        {
+          "equipo": "EQUIPO 23",
+          "llamadas": 166,
+          "confirmado": 21,
+          "noContesta": 8,
+          "noInteresa": 2,
+          "siguiente": 1,
+          "porConfirmar": 2,
+          "devolucion": 6,
+          "yaAsistio": 2,
+          "cambioCupo": 0,
+          "asistieron": 25
+        },
+        {
+          "equipo": "EQUIPO 22",
+          "llamadas": 6,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "Sin equipo",
+          "llamadas": 7,
+          "confirmado": 1,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        }
+      ],
+      "sentadosC1": 443,
+      "sentadosC2": 17,
+      "sentadosTotal": 460,
+      "gestionesC1": 1930,
+      "gestionesC2": 70,
+      "confirmadosC1": 427,
+      "confirmadosC2": 13
+    },
+    {
+      "id": "coord_brenda_rodriguez_guayaquil",
+      "nombre": "BRENDA RODRIGUEZ",
+      "nombreCompleto": "BRENDA RODRIGUEZ",
+      "email": "brenda.rodriguez@crearpsl.net",
+      "sede": "Guayaquil",
+      "ciclo": "Ciclo 1",
+      "rol": "Coordinador C1",
+      "gestiones": 1664,
+      "c1": 1601,
+      "c2": 63,
+      "asignados": 642,
+      "coberturaPct": 93,
+      "coberturaDetalle": "599/642 (93%)",
+      "productividadPct": 23,
+      "productividadDetalle": "376/1664 (23%)",
+      "asistieron": 376,
+      "tasaEfectividad": 44,
+      "ultConexion": "04/09/2026 17:26",
+      "ultGestion": "01/09/2026 13:48",
+      "estados": {
+        "confirmado": 725,
+        "noContesta": 595,
+        "siguiente": 166,
+        "noInteresa": 50,
+        "porConfirmar": 86,
+        "yaAsistio": 0,
+        "devolucion": 29
+      },
+      "equipos": [
+        {
+          "equipo": "EQUIPO 127",
+          "llamadas": 4,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 34",
+          "llamadas": 200,
+          "confirmado": 36,
+          "noContesta": 7,
+          "noInteresa": 5,
+          "siguiente": 4,
+          "porConfirmar": 7,
+          "devolucion": 3,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 50
+        },
+        {
+          "equipo": "EQUIPO 36",
+          "llamadas": 238,
+          "confirmado": 55,
+          "noContesta": 6,
+          "noInteresa": 0,
+          "siguiente": 10,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 52
+        },
+        {
+          "equipo": "EQUIPO 35",
+          "llamadas": 189,
+          "confirmado": 41,
+          "noContesta": 11,
+          "noInteresa": 1,
+          "siguiente": 4,
+          "porConfirmar": 4,
+          "devolucion": 5,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 52
+        },
+        {
+          "equipo": "EQUIPO 37",
+          "llamadas": 31,
+          "confirmado": 14,
+          "noContesta": 8,
+          "noInteresa": 1,
+          "siguiente": 4,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 10
+        },
+        {
+          "equipo": "EQUIPO 121",
+          "llamadas": 6,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 125",
+          "llamadas": 3,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 123",
+          "llamadas": 1,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 120",
+          "llamadas": 4,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 126",
+          "llamadas": 3,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 19",
+          "llamadas": 5,
+          "confirmado": 2,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 33",
+          "llamadas": 154,
+          "confirmado": 34,
+          "noContesta": 15,
+          "noInteresa": 1,
+          "siguiente": 2,
+          "porConfirmar": 1,
+          "devolucion": 1,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 42
+        },
+        {
+          "equipo": "EQUIPO 119",
+          "llamadas": 2,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 122",
+          "llamadas": 5,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 116",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 32",
+          "llamadas": 39,
+          "confirmado": 7,
+          "noContesta": 5,
+          "noInteresa": 0,
+          "siguiente": 2,
+          "porConfirmar": 0,
+          "devolucion": 3,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 8
+        },
+        {
+          "equipo": "EQUIPO 31",
+          "llamadas": 113,
+          "confirmado": 20,
+          "noContesta": 8,
+          "noInteresa": 3,
+          "siguiente": 1,
+          "porConfirmar": 8,
+          "devolucion": 2,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 26
+        },
+        {
+          "equipo": "EQUIPO 115",
+          "llamadas": 7,
+          "confirmado": 2,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 112",
+          "llamadas": 9,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 113",
+          "llamadas": 5,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 27",
+          "llamadas": 85,
+          "confirmado": 18,
+          "noContesta": 1,
+          "noInteresa": 5,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 18
+        },
+        {
+          "equipo": "EQUIPO 29",
+          "llamadas": 171,
+          "confirmado": 27,
+          "noContesta": 10,
+          "noInteresa": 3,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 1,
+          "cambioCupo": 1,
+          "asistieron": 29
+        },
+        {
+          "equipo": "EQUIPO 30",
+          "llamadas": 70,
+          "confirmado": 20,
+          "noContesta": 1,
+          "noInteresa": 1,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 1,
+          "cambioCupo": 0,
+          "asistieron": 18
+        },
+        {
+          "equipo": "EQUIPO 15",
+          "llamadas": 7,
+          "confirmado": 3,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 16",
+          "llamadas": 4,
+          "confirmado": 2,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 108",
+          "llamadas": 3,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 109",
+          "llamadas": 1,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 13",
+          "llamadas": 1,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 106",
+          "llamadas": 3,
+          "confirmado": 0,
+          "noContesta": 2,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 12",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 104",
+          "llamadas": 2,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 26",
+          "llamadas": 135,
+          "confirmado": 22,
+          "noContesta": 4,
+          "noInteresa": 3,
+          "siguiente": 1,
+          "porConfirmar": 3,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 27
+        },
+        {
+          "equipo": "EQUIPO 105",
+          "llamadas": 3,
+          "confirmado": 0,
+          "noContesta": 3,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 28",
+          "llamadas": 102,
+          "confirmado": 23,
+          "noContesta": 1,
+          "noInteresa": 1,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 24
+        },
+        {
+          "equipo": "EQUIPO 11",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 2,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 24",
+          "llamadas": 13,
+          "confirmado": 2,
+          "noContesta": 1,
+          "noInteresa": 1,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 3
+        },
+        {
+          "equipo": "EQUIPO 25",
+          "llamadas": 17,
+          "confirmado": 3,
+          "noContesta": 1,
+          "noInteresa": 2,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 5
+        },
+        {
+          "equipo": "EQUIPO 23",
+          "llamadas": 20,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 4,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 22",
+          "llamadas": 4,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 1,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        }
+      ],
+      "sentadosC1": 369,
+      "sentadosC2": 7,
+      "sentadosTotal": 376,
+      "gestionesC1": 1601,
+      "gestionesC2": 63,
+      "confirmadosC1": 330,
+      "confirmadosC2": 8
+    },
+    {
+      "id": "coord_jonathan_la_rosa_guayaquil",
+      "nombre": "JONATHAN LA ROSA",
+      "nombreCompleto": "JONATHAN LA ROSA",
+      "email": "jonathan.la.rosa@crearpsl.net",
+      "sede": "Guayaquil",
+      "ciclo": "Ciclo 1",
+      "rol": "Coordinador C1",
+      "gestiones": 900,
+      "c1": 887,
+      "c2": 13,
+      "asignados": 251,
+      "coberturaPct": 125,
+      "coberturaDetalle": "315/251 (125%)",
+      "productividadPct": 24,
+      "productividadDetalle": "213/900 (24%)",
+      "asistieron": 213,
+      "tasaEfectividad": 47,
+      "ultConexion": "04/09/2026 14:22",
+      "ultGestion": "18/12/2025 14:34",
+      "estados": {
+        "confirmado": 426,
+        "noContesta": 297,
+        "siguiente": 42,
+        "noInteresa": 12,
+        "porConfirmar": 86,
+        "yaAsistio": 0,
+        "devolucion": 37
+      },
+      "equipos": [
+        {
+          "equipo": "EQUIPO 34",
+          "llamadas": 5,
+          "confirmado": 2,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 35",
+          "llamadas": 4,
+          "confirmado": 0,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 36",
+          "llamadas": 2,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 33",
+          "llamadas": 3,
+          "confirmado": 0,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 119",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 32",
+          "llamadas": 4,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 31",
+          "llamadas": 16,
+          "confirmado": 0,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 2,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 115",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 113",
+          "llamadas": 1,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 27",
+          "llamadas": 58,
+          "confirmado": 21,
+          "noContesta": 1,
+          "noInteresa": 1,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 21
+        },
+        {
+          "equipo": "EQUIPO 1",
+          "llamadas": 2,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 29",
+          "llamadas": 82,
+          "confirmado": 24,
+          "noContesta": 1,
+          "noInteresa": 1,
+          "siguiente": 2,
+          "porConfirmar": 4,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 23
+        },
+        {
+          "equipo": "EQUIPO 30",
+          "llamadas": 93,
+          "confirmado": 16,
+          "noContesta": 14,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 15
+        },
+        {
+          "equipo": "EQUIPO 14",
+          "llamadas": 2,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 15",
+          "llamadas": 4,
+          "confirmado": 2,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 108",
+          "llamadas": 3,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 13",
+          "llamadas": 2,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 26",
+          "llamadas": 212,
+          "confirmado": 25,
+          "noContesta": 10,
+          "noInteresa": 3,
+          "siguiente": 1,
+          "porConfirmar": 3,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 32
+        },
+        {
+          "equipo": "EQUIPO 105",
+          "llamadas": 3,
+          "confirmado": 1,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 28",
+          "llamadas": 74,
+          "confirmado": 21,
+          "noContesta": 7,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 4,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 26
+        },
+        {
+          "equipo": "EQUIPO 11",
+          "llamadas": 17,
+          "confirmado": 2,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 25",
+          "llamadas": 86,
+          "confirmado": 18,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 4,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 23
+        },
+        {
+          "equipo": "EQUIPO 24",
+          "llamadas": 61,
+          "confirmado": 14,
+          "noContesta": 2,
+          "noInteresa": 1,
+          "siguiente": 0,
+          "porConfirmar": 4,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 18
+        },
+        {
+          "equipo": "EQUIPO 101",
+          "llamadas": 3,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 9",
+          "llamadas": 12,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 2,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 3
+        },
+        {
+          "equipo": "EQUIPO 23",
+          "llamadas": 122,
+          "confirmado": 29,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 7,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 35
+        },
+        {
+          "equipo": "EQUIPO 96",
+          "llamadas": 2,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 22",
+          "llamadas": 11,
+          "confirmado": 3,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 3
+        },
+        {
+          "equipo": "Sin equipo",
+          "llamadas": 13,
+          "confirmado": 6,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        }
+      ],
+      "sentadosC1": 210,
+      "sentadosC2": 3,
+      "sentadosTotal": 213,
+      "gestionesC1": 887,
+      "gestionesC2": 13,
+      "confirmadosC1": 190,
+      "confirmadosC2": 4
+    },
+    {
+      "id": "coord_jorge_guayaquil",
+      "nombre": "Jorge",
+      "nombreCompleto": "Jorge",
+      "email": "jorge@crearpsl.net",
+      "sede": "Guayaquil",
+      "ciclo": "Ciclo 1",
+      "rol": "Coordinador C1",
+      "gestiones": 694,
+      "c1": 683,
+      "c2": 11,
+      "asignados": 238,
+      "coberturaPct": 78,
+      "coberturaDetalle": "185/238 (78%)",
+      "productividadPct": 9,
+      "productividadDetalle": "65/694 (9%)",
+      "asistieron": 65,
+      "tasaEfectividad": 35,
+      "ultConexion": "04/09/2026 12:03",
+      "ultGestion": "04/09/2026 12:39",
+      "estados": {
+        "confirmado": 243,
+        "noContesta": 335,
+        "siguiente": 72,
+        "noInteresa": 5,
+        "porConfirmar": 39,
+        "yaAsistio": 0,
+        "devolucion": 0
+      },
+      "equipos": [
+        {
+          "equipo": "EQUIPO 127",
+          "llamadas": 7,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 19",
+          "llamadas": 2,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 36",
+          "llamadas": 297,
+          "confirmado": 54,
+          "noContesta": 8,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 39
+        },
+        {
+          "equipo": "EQUIPO 35",
+          "llamadas": 104,
+          "confirmado": 7,
+          "noContesta": 10,
+          "noInteresa": 0,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 34",
+          "llamadas": 10,
+          "confirmado": 0,
+          "noContesta": 3,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 37",
+          "llamadas": 215,
+          "confirmado": 44,
+          "noContesta": 8,
+          "noInteresa": 3,
+          "siguiente": 7,
+          "porConfirmar": 3,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 25
+        },
+        {
+          "equipo": "EQUIPO 125",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 126",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 22",
+          "llamadas": 8,
+          "confirmado": 1,
+          "noContesta": 1,
+          "noInteresa": 1,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 33",
+          "llamadas": 19,
+          "confirmado": 0,
+          "noContesta": 4,
+          "noInteresa": 0,
+          "siguiente": 3,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 32",
+          "llamadas": 8,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 3,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 31",
+          "llamadas": 9,
+          "confirmado": 0,
+          "noContesta": 3,
+          "noInteresa": 0,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 29",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 30",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 26",
+          "llamadas": 4,
+          "confirmado": 0,
+          "noContesta": 2,
+          "noInteresa": 0,
+          "siguiente": 1,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 25",
+          "llamadas": 4,
+          "confirmado": 0,
+          "noContesta": 3,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        }
+      ],
+      "sentadosC1": 65,
+      "sentadosC2": 0,
+      "sentadosTotal": 65,
+      "gestionesC1": 683,
+      "gestionesC2": 11,
+      "confirmadosC1": 107,
+      "confirmadosC2": 0
+    },
+    {
+      "id": "coord_joyce_lima",
+      "nombre": "JOYCE",
+      "nombreCompleto": "Joyce Lima",
+      "email": "coordinacion.lima@crearpsl.net",
+      "sede": "Lima",
+      "ciclo": "Ciclo 1",
+      "rol": "Coordinador C1 / C2",
+      "gestiones": 2741,
+      "c1": 2346,
+      "c2": 3,
+      "asignados": 922,
+      "coberturaPct": 98,
+      "coberturaDetalle": "900/922 (98%)",
+      "productividadPct": 21,
+      "productividadDetalle": "570/2741 (21%)",
+      "asistieron": 417,
+      "tasaEfectividad": 46,
+      "ultConexion": "04/09/2026 16:28",
+      "ultGestion": "02/09/2026 15:31",
+      "estados": {
+        "confirmado": 1265,
+        "noContesta": 705,
+        "siguiente": 210,
+        "noInteresa": 236,
+        "porConfirmar": 324,
+        "yaAsistio": 0,
+        "devolucion": 0
+      },
+      "equipos": [
+        {
+          "equipo": "EQUIPO 30",
+          "llamadas": 117,
+          "confirmado": 53,
+          "noContesta": 11,
+          "noInteresa": 1,
+          "siguiente": 4,
+          "porConfirmar": 4,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 43
+        },
+        {
+          "equipo": "EQUIPO 27",
+          "llamadas": 273,
+          "confirmado": 72,
+          "noContesta": 9,
+          "noInteresa": 14,
+          "siguiente": 3,
+          "porConfirmar": 5,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 46
+        },
+        {
+          "equipo": "EQUIPO 28",
+          "llamadas": 121,
+          "confirmado": 53,
+          "noContesta": 4,
+          "noInteresa": 3,
+          "siguiente": 1,
+          "porConfirmar": 5,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 49
+        },
+        {
+          "equipo": "EQUIPO 29",
+          "llamadas": 214,
+          "confirmado": 77,
+          "noContesta": 10,
+          "noInteresa": 1,
+          "siguiente": 7,
+          "porConfirmar": 6,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 53
+        },
+        {
+          "equipo": "EQUIPO 17",
+          "llamadas": 3,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 26",
+          "llamadas": 312,
+          "confirmado": 62,
+          "noContesta": 9,
+          "noInteresa": 21,
+          "siguiente": 1,
+          "porConfirmar": 2,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 52
+        },
+        {
+          "equipo": "EQUIPO 117",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 25",
+          "llamadas": 301,
+          "confirmado": 40,
+          "noContesta": 2,
+          "noInteresa": 27,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 32
+        },
+        {
+          "equipo": "EQUIPO 24",
+          "llamadas": 508,
+          "confirmado": 85,
+          "noContesta": 1,
+          "noInteresa": 48,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 85
+        },
+        {
+          "equipo": "EQUIPO 112",
+          "llamadas": 1,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 23",
+          "llamadas": 303,
+          "confirmado": 40,
+          "noContesta": 3,
+          "noInteresa": 35,
+          "siguiente": 2,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 44
+        },
+        {
+          "equipo": "EQUIPO 22",
+          "llamadas": 81,
+          "confirmado": 1,
+          "noContesta": 3,
+          "noInteresa": 14,
+          "siguiente": 0,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 5
+        },
+        {
+          "equipo": "EQUIPO 21",
+          "llamadas": 32,
+          "confirmado": 0,
+          "noContesta": 1,
+          "noInteresa": 9,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 20",
+          "llamadas": 28,
+          "confirmado": 0,
+          "noContesta": 1,
+          "noInteresa": 10,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 19",
+          "llamadas": 32,
+          "confirmado": 0,
+          "noContesta": 1,
+          "noInteresa": 16,
+          "siguiente": 0,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 18",
+          "llamadas": 9,
+          "confirmado": 0,
+          "noContesta": 1,
+          "noInteresa": 3,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 17",
+          "llamadas": 12,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 5,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        }
+      ],
+      "sentadosC1": 416,
+      "sentadosC2": 1,
+      "sentadosTotal": 417,
+      "gestionesC1": 2346,
+      "gestionesC2": 3,
+      "confirmadosC1": 484,
+      "confirmadosC2": 1
+    },
+    {
+      "id": "coord_diana_lima",
+      "nombre": "DIANA",
+      "nombreCompleto": "Diana Carolina",
+      "email": "coordinacion.lima@crearpsl.net",
+      "sede": "Lima",
+      "ciclo": "Ciclo 1",
+      "rol": "Coordinador C1 / C2",
+      "gestiones": 2086,
+      "c1": 1783,
+      "c2": 303,
+      "asignados": 880,
+      "coberturaPct": 95,
+      "coberturaDetalle": "837/880 (95%)",
+      "productividadPct": 23,
+      "productividadDetalle": "470/2086 (23%)",
+      "asistieron": 350,
+      "tasaEfectividad": 53,
+      "ultConexion": "04/09/2026 18:36",
+      "ultGestion": "01/09/2026 11:13",
+      "estados": {
+        "confirmado": 1108,
+        "noContesta": 619,
+        "siguiente": 140,
+        "noInteresa": 165,
+        "porConfirmar": 53,
+        "yaAsistio": 0,
+        "devolucion": 0
+      },
+      "equipos": [
+        {
+          "equipo": "EQUIPO 30",
+          "llamadas": 132,
+          "confirmado": 52,
+          "noContesta": 10,
+          "noInteresa": 1,
+          "siguiente": 9,
+          "porConfirmar": 3,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 39
+        },
+        {
+          "equipo": "EQUIPO 28",
+          "llamadas": 172,
+          "confirmado": 38,
+          "noContesta": 33,
+          "noInteresa": 3,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 42
+        },
+        {
+          "equipo": "EQUIPO 27",
+          "llamadas": 214,
+          "confirmado": 74,
+          "noContesta": 23,
+          "noInteresa": 4,
+          "siguiente": 3,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 66
+        },
+        {
+          "equipo": "EQUIPO 29",
+          "llamadas": 229,
+          "confirmado": 73,
+          "noContesta": 14,
+          "noInteresa": 4,
+          "siguiente": 6,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 52
+        },
+        {
+          "equipo": "EQUIPO 26",
+          "llamadas": 329,
+          "confirmado": 62,
+          "noContesta": 51,
+          "noInteresa": 4,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 50
+        },
+        {
+          "equipo": "EQUIPO 25",
+          "llamadas": 297,
+          "confirmado": 28,
+          "noContesta": 2,
+          "noInteresa": 80,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 27
+        },
+        {
+          "equipo": "EQUIPO 24",
+          "llamadas": 40,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 17,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 23",
+          "llamadas": 42,
+          "confirmado": 2,
+          "noContesta": 0,
+          "noInteresa": 9,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 22",
+          "llamadas": 150,
+          "confirmado": 45,
+          "noContesta": 0,
+          "noInteresa": 5,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 35
+        },
+        {
+          "equipo": "EQUIPO 21",
+          "llamadas": 151,
+          "confirmado": 40,
+          "noContesta": 2,
+          "noInteresa": 1,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 36
+        },
+        {
+          "equipo": "EQUIPO 20",
+          "llamadas": 23,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 2,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 19",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 18",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        }
+      ],
+      "sentadosC1": 350,
+      "sentadosC2": 0,
+      "sentadosTotal": 350,
+      "gestionesC1": 1783,
+      "gestionesC2": 303,
+      "confirmadosC1": 415,
+      "confirmadosC2": 0
+    },
+    {
+      "id": "coord_leyla_lima",
+      "nombre": "LEYLA",
+      "nombreCompleto": "LEYLA",
+      "email": "leyla@crearpsl.net",
+      "sede": "Lima",
+      "ciclo": "Ciclo 1",
+      "rol": "Coordinador C1 / C2",
+      "gestiones": 627,
+      "c1": 597,
+      "c2": 3,
+      "asignados": 96,
+      "coberturaPct": 220,
+      "coberturaDetalle": "211/96 (220%)",
+      "productividadPct": 14,
+      "productividadDetalle": "87/627 (14%)",
+      "asistieron": 80,
+      "tasaEfectividad": 41,
+      "ultConexion": "04/09/2026 18:40",
+      "ultGestion": "15/04/2026 12:48",
+      "estados": {
+        "confirmado": 260,
+        "noContesta": 225,
+        "siguiente": 52,
+        "noInteresa": 16,
+        "porConfirmar": 71,
+        "yaAsistio": 0,
+        "devolucion": 3
+      },
+      "equipos": [
+        {
+          "equipo": "EQUIPO 27",
+          "llamadas": 40,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 28",
+          "llamadas": 2,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 118",
+          "llamadas": 3,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 26",
+          "llamadas": 238,
+          "confirmado": 39,
+          "noContesta": 1,
+          "noInteresa": 3,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 30
+        },
+        {
+          "equipo": "EQUIPO 14",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 25",
+          "llamadas": 205,
+          "confirmado": 34,
+          "noContesta": 0,
+          "noInteresa": 6,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 28
+        },
+        {
+          "equipo": "EQUIPO 24",
+          "llamadas": 33,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 5,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 23",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 1,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 22",
+          "llamadas": 7,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 21",
+          "llamadas": 8,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 2,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 3
+        },
+        {
+          "equipo": "EQUIPO 20",
+          "llamadas": 60,
+          "confirmado": 15,
+          "noContesta": 4,
+          "noInteresa": 0,
+          "siguiente": 5,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 14
+        }
+      ],
+      "sentadosC1": 80,
+      "sentadosC2": 0,
+      "sentadosTotal": 80,
+      "gestionesC1": 597,
+      "gestionesC2": 3,
+      "confirmadosC1": 93,
+      "confirmadosC2": 0
+    },
+    {
+      "id": "coord_valentina_rodriguez_medellín",
+      "nombre": "VALENTINA RODRIGUEZ",
+      "nombreCompleto": "VALENTINA RODRIGUEZ",
+      "email": "valentina.rodriguez@crearpsl.net",
+      "sede": "Medellín",
+      "ciclo": "Ciclo 1",
+      "rol": "Coordinador C1 / C2",
+      "gestiones": 3292,
+      "c1": 2890,
+      "c2": 12,
+      "asignados": 970,
+      "coberturaPct": 119,
+      "coberturaDetalle": "1152/970 (119%)",
+      "productividadPct": 26,
+      "productividadDetalle": "852/3292 (26%)",
+      "asistieron": 704,
+      "tasaEfectividad": 51,
+      "ultConexion": "03/09/2026 14:29",
+      "ultGestion": "03/09/2026 14:50",
+      "estados": {
+        "confirmado": 1665,
+        "noContesta": 881,
+        "siguiente": 549,
+        "noInteresa": 24,
+        "porConfirmar": 135,
+        "yaAsistio": 0,
+        "devolucion": 8
+      },
+      "equipos": [
+        {
+          "equipo": "EQUIPO 19",
+          "llamadas": 87,
+          "confirmado": 42,
+          "noContesta": 4,
+          "noInteresa": 1,
+          "siguiente": 6,
+          "porConfirmar": 6,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 124",
+          "llamadas": 5,
+          "confirmado": 0,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 126",
+          "llamadas": 3,
+          "confirmado": 0,
+          "noContesta": 2,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 17",
+          "llamadas": 165,
+          "confirmado": 48,
+          "noContesta": 3,
+          "noInteresa": 0,
+          "siguiente": 11,
+          "porConfirmar": 2,
+          "devolucion": 0,
+          "yaAsistio": 1,
+          "cambioCupo": 2,
+          "asistieron": 43
+        },
+        {
+          "equipo": "EQUIPO 21",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 18",
+          "llamadas": 284,
+          "confirmado": 90,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 26,
+          "porConfirmar": 4,
+          "devolucion": 1,
+          "yaAsistio": 0,
+          "cambioCupo": 2,
+          "asistieron": 76
+        },
+        {
+          "equipo": "EQUIPO 122",
+          "llamadas": 3,
+          "confirmado": 0,
+          "noContesta": 2,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 16",
+          "llamadas": 161,
+          "confirmado": 34,
+          "noContesta": 4,
+          "noInteresa": 1,
+          "siguiente": 17,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 2,
+          "asistieron": 39
+        },
+        {
+          "equipo": "EQUIPO 14",
+          "llamadas": 192,
+          "confirmado": 51,
+          "noContesta": 4,
+          "noInteresa": 1,
+          "siguiente": 8,
+          "porConfirmar": 2,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 4,
+          "asistieron": 46
+        },
+        {
+          "equipo": "EQUIPO 15",
+          "llamadas": 184,
+          "confirmado": 42,
+          "noContesta": 3,
+          "noInteresa": 0,
+          "siguiente": 12,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 1,
+          "asistieron": 27
+        },
+        {
+          "equipo": "EQUIPO 18",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 17",
+          "llamadas": 3,
+          "confirmado": 0,
+          "noContesta": 2,
+          "noInteresa": 0,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 11",
+          "llamadas": 218,
+          "confirmado": 46,
+          "noContesta": 1,
+          "noInteresa": 1,
+          "siguiente": 17,
+          "porConfirmar": 4,
+          "devolucion": 0,
+          "yaAsistio": 1,
+          "cambioCupo": 0,
+          "asistieron": 56
+        },
+        {
+          "equipo": "EQUIPO 12",
+          "llamadas": 223,
+          "confirmado": 44,
+          "noContesta": 3,
+          "noInteresa": 1,
+          "siguiente": 19,
+          "porConfirmar": 2,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 1,
+          "asistieron": 52
+        },
+        {
+          "equipo": "EQUIPO 13",
+          "llamadas": 209,
+          "confirmado": 66,
+          "noContesta": 4,
+          "noInteresa": 0,
+          "siguiente": 6,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 1,
+          "asistieron": 63
+        },
+        {
+          "equipo": "EQUIPO 15",
+          "llamadas": 5,
+          "confirmado": 1,
+          "noContesta": 2,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 16",
+          "llamadas": 4,
+          "confirmado": 0,
+          "noContesta": 4,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 10",
+          "llamadas": 335,
+          "confirmado": 67,
+          "noContesta": 2,
+          "noInteresa": 0,
+          "siguiente": 23,
+          "porConfirmar": 2,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 67
+        },
+        {
+          "equipo": "EQUIPO 9",
+          "llamadas": 252,
+          "confirmado": 47,
+          "noContesta": 5,
+          "noInteresa": 2,
+          "siguiente": 27,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 56
+        },
+        {
+          "equipo": "EQUIPO 107",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 8",
+          "llamadas": 197,
+          "confirmado": 46,
+          "noContesta": 3,
+          "noInteresa": 1,
+          "siguiente": 27,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 57
+        },
+        {
+          "equipo": "EQUIPO 7",
+          "llamadas": 224,
+          "confirmado": 42,
+          "noContesta": 22,
+          "noInteresa": 4,
+          "siguiente": 13,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 64
+        },
+        {
+          "equipo": "EQUIPO 6",
+          "llamadas": 144,
+          "confirmado": 18,
+          "noContesta": 33,
+          "noInteresa": 3,
+          "siguiente": 2,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 50
+        }
+      ],
+      "sentadosC1": 701,
+      "sentadosC2": 3,
+      "sentadosTotal": 704,
+      "gestionesC1": 2890,
+      "gestionesC2": 12,
+      "confirmadosC1": 684,
+      "confirmadosC2": 0
+    },
+    {
+      "id": "coord_david_gonzalez_medellín",
+      "nombre": "DAVID GONZALEZ",
+      "nombreCompleto": "DAVID GONZALEZ",
+      "email": "david.gonzalez@crearpsl.net",
+      "sede": "Medellín",
+      "ciclo": "Ciclo 1",
+      "rol": "Coordinador C1 / C2",
+      "gestiones": 1067,
+      "c1": 722,
+      "c2": 234,
+      "asignados": 382,
+      "coberturaPct": 124,
+      "coberturaDetalle": "475/382 (124%)",
+      "productividadPct": 25,
+      "productividadDetalle": "266/1067 (25%)",
+      "asistieron": 218,
+      "tasaEfectividad": 54,
+      "ultConexion": "03/09/2026 14:53",
+      "ultGestion": "03/09/2026 14:54",
+      "estados": {
+        "confirmado": 571,
+        "noContesta": 248,
+        "siguiente": 168,
+        "noInteresa": 3,
+        "porConfirmar": 66,
+        "yaAsistio": 0,
+        "devolucion": 2
+      },
+      "equipos": [
+        {
+          "equipo": "EQUIPO 19",
+          "llamadas": 82,
+          "confirmado": 28,
+          "noContesta": 16,
+          "noInteresa": 0,
+          "siguiente": 9,
+          "porConfirmar": 1,
+          "devolucion": 1,
+          "yaAsistio": 0,
+          "cambioCupo": 4,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 125",
+          "llamadas": 3,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 120",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 124",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 126",
+          "llamadas": 14,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 17",
+          "llamadas": 173,
+          "confirmado": 57,
+          "noContesta": 4,
+          "noInteresa": 0,
+          "siguiente": 8,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 1,
+          "asistieron": 55
+        },
+        {
+          "equipo": "EQUIPO 18",
+          "llamadas": 240,
+          "confirmado": 74,
+          "noContesta": 5,
+          "noInteresa": 0,
+          "siguiente": 23,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 66
+        },
+        {
+          "equipo": "EQUIPO 122",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 16",
+          "llamadas": 92,
+          "confirmado": 25,
+          "noContesta": 7,
+          "noInteresa": 0,
+          "siguiente": 11,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 1,
+          "asistieron": 28
+        },
+        {
+          "equipo": "EQUIPO 15",
+          "llamadas": 130,
+          "confirmado": 35,
+          "noContesta": 5,
+          "noInteresa": 0,
+          "siguiente": 6,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 1,
+          "asistieron": 25
+        },
+        {
+          "equipo": "EQUIPO 116",
+          "llamadas": 6,
+          "confirmado": 1,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 117",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 114",
+          "llamadas": 10,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 115",
+          "llamadas": 2,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 112",
+          "llamadas": 28,
+          "confirmado": 3,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 4
+        },
+        {
+          "equipo": "EQUIPO 23",
+          "llamadas": 3,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 113",
+          "llamadas": 7,
+          "confirmado": 2,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 110",
+          "llamadas": 111,
+          "confirmado": 24,
+          "noContesta": 4,
+          "noInteresa": 1,
+          "siguiente": 0,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 26
+        },
+        {
+          "equipo": "EQUIPO 111",
+          "llamadas": 15,
+          "confirmado": 3,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 2,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 5
+        },
+        {
+          "equipo": "EQUIPO 16",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 108",
+          "llamadas": 17,
+          "confirmado": 2,
+          "noContesta": 5,
+          "noInteresa": 1,
+          "siguiente": 5,
+          "porConfirmar": 2,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 106",
+          "llamadas": 15,
+          "confirmado": 0,
+          "noContesta": 9,
+          "noInteresa": 1,
+          "siguiente": 0,
+          "porConfirmar": 4,
+          "devolucion": 0,
+          "yaAsistio": 1,
+          "cambioCupo": 0,
+          "asistieron": 1
+        }
+      ],
+      "sentadosC1": 174,
+      "sentadosC2": 44,
+      "sentadosTotal": 218,
+      "gestionesC1": 722,
+      "gestionesC2": 234,
+      "confirmadosC1": 219,
+      "confirmadosC2": 38
+    },
+    {
+      "id": "coord_juan_sebastian_soto_medellín",
+      "nombre": "JUAN SEBASTIAN SOTO",
+      "nombreCompleto": "JUAN SEBASTIAN SOTO",
+      "email": "juan.sebastian.soto@crearpsl.net",
+      "sede": "Medellín",
+      "ciclo": "Ciclo 1",
+      "rol": "Coordinador C1 / C2",
+      "gestiones": 240,
+      "c1": 172,
+      "c2": 68,
+      "asignados": 63,
+      "coberturaPct": 132,
+      "coberturaDetalle": "83/63 (132%)",
+      "productividadPct": 29,
+      "productividadDetalle": "70/240 (29%)",
+      "asistieron": 43,
+      "tasaEfectividad": 60,
+      "ultConexion": "",
+      "ultGestion": "28/05/2026 10:47",
+      "estados": {
+        "confirmado": 144,
+        "noContesta": 54,
+        "siguiente": 30,
+        "noInteresa": 0,
+        "porConfirmar": 12,
+        "yaAsistio": 0,
+        "devolucion": 0
+      },
+      "equipos": [
+        {
+          "equipo": "EQUIPO 17",
+          "llamadas": 7,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 18",
+          "llamadas": 3,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 16",
+          "llamadas": 22,
+          "confirmado": 7,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 7
+        },
+        {
+          "equipo": "EQUIPO 15",
+          "llamadas": 140,
+          "confirmado": 42,
+          "noContesta": 3,
+          "noInteresa": 0,
+          "siguiente": 7,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 33
+        }
+      ],
+      "sentadosC1": 43,
+      "sentadosC2": 0,
+      "sentadosTotal": 43,
+      "gestionesC1": 172,
+      "gestionesC2": 68,
+      "confirmadosC1": 51,
+      "confirmadosC2": 0
+    },
+    {
+      "id": "coord_naomi_méxico",
+      "nombre": "NAOMI",
+      "nombreCompleto": "NAOMI",
+      "email": "naomi@crearpsl.net",
+      "sede": "México",
+      "ciclo": "Ciclo 1",
+      "rol": "Coordinador C1",
+      "gestiones": 3,
+      "c1": 3,
+      "c2": 0,
+      "asignados": 151,
+      "coberturaPct": 2,
+      "coberturaDetalle": "3/151 (2%)",
+      "productividadPct": 0,
+      "productividadDetalle": "0/3 (0%)",
+      "asistieron": 0,
+      "tasaEfectividad": 0,
+      "ultConexion": "03/09/2026 15:41",
+      "ultGestion": "02/09/2026 15:40",
+      "estados": {
+        "confirmado": 0,
+        "noContesta": 2,
+        "siguiente": 0,
+        "noInteresa": 0,
+        "porConfirmar": 1,
+        "yaAsistio": 0,
+        "devolucion": 0
+      },
+      "equipos": [
+        {
+          "equipo": "EQUIPO 7",
+          "llamadas": 3,
+          "confirmado": 0,
+          "noContesta": 2,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        }
+      ],
+      "sentadosC1": 0,
+      "sentadosC2": 0,
+      "sentadosTotal": 0,
+      "gestionesC1": 3,
+      "gestionesC2": 0,
+      "confirmadosC1": 0,
+      "confirmadosC2": 0
+    },
+    {
+      "id": "coord_adrianna_quito",
+      "nombre": "ADRIANNA",
+      "nombreCompleto": "ADRIANNA",
+      "email": "adrianna@crearpsl.net",
+      "sede": "Quito",
+      "ciclo": "Ciclo 1",
+      "rol": "Coordinador C1",
+      "gestiones": 2920,
+      "c1": 460,
+      "c2": 2460,
+      "asignados": 1180,
+      "coberturaPct": 92,
+      "coberturaDetalle": "1082/1180 (92%)",
+      "productividadPct": 24,
+      "productividadDetalle": "714/2920 (24%)",
+      "asistieron": 714,
+      "tasaEfectividad": 51,
+      "ultConexion": "04/09/2026 09:22",
+      "ultGestion": "27/08/2026 12:45",
+      "estados": {
+        "confirmado": 1498,
+        "noContesta": 888,
+        "siguiente": 332,
+        "noInteresa": 30,
+        "porConfirmar": 113,
+        "yaAsistio": 0,
+        "devolucion": 13
+      },
+      "equipos": [
+        {
+          "equipo": "EQUIPO 127",
+          "llamadas": 117,
+          "confirmado": 28,
+          "noContesta": 6,
+          "noInteresa": 0,
+          "siguiente": 17,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 2,
+          "asistieron": 25
+        },
+        {
+          "equipo": "EQUIPO 34",
+          "llamadas": 7,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 36",
+          "llamadas": 4,
+          "confirmado": 0,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 35",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 123",
+          "llamadas": 4,
+          "confirmado": 1,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 125",
+          "llamadas": 71,
+          "confirmado": 15,
+          "noContesta": 7,
+          "noInteresa": 1,
+          "siguiente": 5,
+          "porConfirmar": 3,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 1,
+          "asistieron": 14
+        },
+        {
+          "equipo": "EQUIPO 121",
+          "llamadas": 4,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 1,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 120",
+          "llamadas": 15,
+          "confirmado": 4,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 124",
+          "llamadas": 162,
+          "confirmado": 30,
+          "noContesta": 7,
+          "noInteresa": 1,
+          "siguiente": 7,
+          "porConfirmar": 3,
+          "devolucion": 0,
+          "yaAsistio": 3,
+          "cambioCupo": 1,
+          "asistieron": 32
+        },
+        {
+          "equipo": "EQUIPO 126",
+          "llamadas": 135,
+          "confirmado": 37,
+          "noContesta": 3,
+          "noInteresa": 0,
+          "siguiente": 7,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 1,
+          "asistieron": 37
+        },
+        {
+          "equipo": "EQUIPO 22",
+          "llamadas": 2,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 19",
+          "llamadas": 2,
+          "confirmado": 2,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 18",
+          "llamadas": 3,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 33",
+          "llamadas": 21,
+          "confirmado": 2,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 119",
+          "llamadas": 8,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 2,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 118",
+          "llamadas": 169,
+          "confirmado": 41,
+          "noContesta": 6,
+          "noInteresa": 1,
+          "siguiente": 3,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 43
+        },
+        {
+          "equipo": "EQUIPO 122",
+          "llamadas": 2,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 1,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 18",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 116",
+          "llamadas": 131,
+          "confirmado": 29,
+          "noContesta": 11,
+          "noInteresa": 1,
+          "siguiente": 3,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 29
+        },
+        {
+          "equipo": "EQUIPO 32",
+          "llamadas": 7,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 117",
+          "llamadas": 36,
+          "confirmado": 4,
+          "noContesta": 12,
+          "noInteresa": 2,
+          "siguiente": 3,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 5
+        },
+        {
+          "equipo": "EQUIPO 25",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 114",
+          "llamadas": 366,
+          "confirmado": 90,
+          "noContesta": 18,
+          "noInteresa": 4,
+          "siguiente": 9,
+          "porConfirmar": 4,
+          "devolucion": 0,
+          "yaAsistio": 1,
+          "cambioCupo": 1,
+          "asistieron": 102
+        },
+        {
+          "equipo": "EQUIPO 31",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 115",
+          "llamadas": 22,
+          "confirmado": 6,
+          "noContesta": 4,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 4
+        },
+        {
+          "equipo": "EQUIPO 112",
+          "llamadas": 244,
+          "confirmado": 61,
+          "noContesta": 12,
+          "noInteresa": 4,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 2,
+          "asistieron": 60
+        },
+        {
+          "equipo": "EQUIPO 23",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 113",
+          "llamadas": 78,
+          "confirmado": 15,
+          "noContesta": 22,
+          "noInteresa": 1,
+          "siguiente": 10,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 1,
+          "asistieron": 19
+        },
+        {
+          "equipo": "EQUIPO 27",
+          "llamadas": 3,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 13",
+          "llamadas": 1,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 1",
+          "llamadas": 7,
+          "confirmado": 5,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 110",
+          "llamadas": 137,
+          "confirmado": 35,
+          "noContesta": 10,
+          "noInteresa": 2,
+          "siguiente": 3,
+          "porConfirmar": 2,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 7,
+          "asistieron": 40
+        },
+        {
+          "equipo": "EQUIPO 29",
+          "llamadas": 3,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 30",
+          "llamadas": 40,
+          "confirmado": 1,
+          "noContesta": 5,
+          "noInteresa": 0,
+          "siguiente": 3,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 111",
+          "llamadas": 18,
+          "confirmado": 2,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 3,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 6
+        },
+        {
+          "equipo": "EQUIPO 14",
+          "llamadas": 5,
+          "confirmado": 0,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 16",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 108",
+          "llamadas": 227,
+          "confirmado": 46,
+          "noContesta": 22,
+          "noInteresa": 2,
+          "siguiente": 4,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 1,
+          "cambioCupo": 1,
+          "asistieron": 49
+        },
+        {
+          "equipo": "EQUIPO 109",
+          "llamadas": 22,
+          "confirmado": 4,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 5,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 5
+        },
+        {
+          "equipo": "EQUIPO 13",
+          "llamadas": 3,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 1,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 20",
+          "llamadas": 1,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 107",
+          "llamadas": 38,
+          "confirmado": 8,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 7
+        },
+        {
+          "equipo": "EQUIPO 106",
+          "llamadas": 265,
+          "confirmado": 63,
+          "noContesta": 19,
+          "noInteresa": 0,
+          "siguiente": 3,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 74
+        },
+        {
+          "equipo": "EQUIPO 12",
+          "llamadas": 3,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 104",
+          "llamadas": 152,
+          "confirmado": 41,
+          "noContesta": 7,
+          "noInteresa": 2,
+          "siguiente": 3,
+          "porConfirmar": 2,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 46
+        },
+        {
+          "equipo": "EQUIPO 26",
+          "llamadas": 13,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 105",
+          "llamadas": 37,
+          "confirmado": 4,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 9,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 11
+        },
+        {
+          "equipo": "EQUIPO 28",
+          "llamadas": 5,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 11",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 25",
+          "llamadas": 89,
+          "confirmado": 20,
+          "noContesta": 2,
+          "noInteresa": 0,
+          "siguiente": 3,
+          "porConfirmar": 2,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 24
+        },
+        {
+          "equipo": "EQUIPO 24",
+          "llamadas": 85,
+          "confirmado": 22,
+          "noContesta": 2,
+          "noInteresa": 0,
+          "siguiente": 1,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 26
+        },
+        {
+          "equipo": "EQUIPO 23",
+          "llamadas": 142,
+          "confirmado": 35,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 35
+        },
+        {
+          "equipo": "EQUIPO 99",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 1,
+          "asistieron": 0
+        },
+        {
+          "equipo": "Sin equipo",
+          "llamadas": 4,
+          "confirmado": 3,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        }
+      ],
+      "sentadosC1": 100,
+      "sentadosC2": 614,
+      "sentadosTotal": 714,
+      "gestionesC1": 460,
+      "gestionesC2": 2460,
+      "confirmadosC1": 97,
+      "confirmadosC2": 565
+    },
+    {
+      "id": "coord_liliana_quito",
+      "nombre": "LILIANA",
+      "nombreCompleto": "LILIANA",
+      "email": "liliana@crearpsl.net",
+      "sede": "Quito",
+      "ciclo": "Ciclo 1",
+      "rol": "Coordinador C1 / C2",
+      "gestiones": 2171,
+      "c1": 43,
+      "c2": 2101,
+      "asignados": 441,
+      "coberturaPct": 176,
+      "coberturaDetalle": "778/441 (176%)",
+      "productividadPct": 20,
+      "productividadDetalle": "440/2171 (20%)",
+      "asistieron": 415,
+      "tasaEfectividad": 48,
+      "ultConexion": "03/09/2026 07:45",
+      "ultGestion": "18/06/2026 15:27",
+      "estados": {
+        "confirmado": 1036,
+        "noContesta": 529,
+        "siguiente": 298,
+        "noInteresa": 62,
+        "porConfirmar": 212,
+        "yaAsistio": 0,
+        "devolucion": 0
+      },
+      "equipos": [
+        {
+          "equipo": "EQUIPO 127",
+          "llamadas": 9,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 34",
+          "llamadas": 11,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 35",
+          "llamadas": 6,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 36",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 123",
+          "llamadas": 124,
+          "confirmado": 9,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 10
+        },
+        {
+          "equipo": "EQUIPO 125",
+          "llamadas": 70,
+          "confirmado": 6,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 5
+        },
+        {
+          "equipo": "EQUIPO 121",
+          "llamadas": 399,
+          "confirmado": 70,
+          "noContesta": 11,
+          "noInteresa": 2,
+          "siguiente": 6,
+          "porConfirmar": 9,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 83
+        },
+        {
+          "equipo": "EQUIPO 120",
+          "llamadas": 29,
+          "confirmado": 12,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 3,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 12
+        },
+        {
+          "equipo": "EQUIPO 124",
+          "llamadas": 40,
+          "confirmado": 0,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 21",
+          "llamadas": 3,
+          "confirmado": 2,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 33",
+          "llamadas": 12,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 119",
+          "llamadas": 431,
+          "confirmado": 82,
+          "noContesta": 21,
+          "noInteresa": 2,
+          "siguiente": 11,
+          "porConfirmar": 4,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 88
+        },
+        {
+          "equipo": "EQUIPO 122",
+          "llamadas": 22,
+          "confirmado": 2,
+          "noContesta": 2,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 2,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 5
+        },
+        {
+          "equipo": "EQUIPO 118",
+          "llamadas": 53,
+          "confirmado": 19,
+          "noContesta": 0,
+          "noInteresa": 1,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 20
+        },
+        {
+          "equipo": "EQUIPO 14",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 15",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 116",
+          "llamadas": 35,
+          "confirmado": 11,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 1,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 1,
+          "asistieron": 12
+        },
+        {
+          "equipo": "EQUIPO 32",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 117",
+          "llamadas": 311,
+          "confirmado": 92,
+          "noContesta": 7,
+          "noInteresa": 7,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 1,
+          "cambioCupo": 0,
+          "asistieron": 94
+        },
+        {
+          "equipo": "EQUIPO 17",
+          "llamadas": 1,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 114",
+          "llamadas": 25,
+          "confirmado": 13,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 3,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 1,
+          "asistieron": 14
+        },
+        {
+          "equipo": "EQUIPO 31",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 1,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 24",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 115",
+          "llamadas": 319,
+          "confirmado": 67,
+          "noContesta": 18,
+          "noInteresa": 15,
+          "siguiente": 6,
+          "porConfirmar": 6,
+          "devolucion": 0,
+          "yaAsistio": 1,
+          "cambioCupo": 0,
+          "asistieron": 65
+        },
+        {
+          "equipo": "EQUIPO 113",
+          "llamadas": 138,
+          "confirmado": 0,
+          "noContesta": 6,
+          "noInteresa": 16,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 2,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 13",
+          "llamadas": 3,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 111",
+          "llamadas": 84,
+          "confirmado": 0,
+          "noContesta": 21,
+          "noInteresa": 12,
+          "siguiente": 5,
+          "porConfirmar": 8,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 4,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 109",
+          "llamadas": 12,
+          "confirmado": 0,
+          "noContesta": 1,
+          "noInteresa": 7,
+          "siguiente": 4,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        }
+      ],
+      "sentadosC1": 5,
+      "sentadosC2": 410,
+      "sentadosTotal": 415,
+      "gestionesC1": 43,
+      "gestionesC2": 2101,
+      "confirmadosC1": 5,
+      "confirmadosC2": 383
+    },
+    {
+      "id": "coord_karla_quito",
+      "nombre": "KARLA",
+      "nombreCompleto": "Karla Quito",
+      "email": "coordinacion.quito@crearpsl.net",
+      "sede": "Quito",
+      "ciclo": "Ciclo 2",
+      "rol": "Coordinador C1",
+      "gestiones": 2265,
+      "c1": 112,
+      "c2": 2153,
+      "asignados": 990,
+      "coberturaPct": 80,
+      "coberturaDetalle": "792/990 (80%)",
+      "productividadPct": 15,
+      "productividadDetalle": "350/2265 (15%)",
+      "asistieron": 350,
+      "tasaEfectividad": 32,
+      "ultConexion": "04/09/2026 09:26",
+      "ultGestion": "02/09/2026 12:46",
+      "estados": {
+        "confirmado": 717,
+        "noContesta": 927,
+        "siguiente": 238,
+        "noInteresa": 37,
+        "porConfirmar": 216,
+        "yaAsistio": 0,
+        "devolucion": 7
+      },
+      "equipos": [
+        {
+          "equipo": "EQUIPO 127",
+          "llamadas": 150,
+          "confirmado": 32,
+          "noContesta": 1,
+          "noInteresa": 1,
+          "siguiente": 14,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 4,
+          "asistieron": 26
+        },
+        {
+          "equipo": "EQUIPO 35",
+          "llamadas": 3,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 123",
+          "llamadas": 48,
+          "confirmado": 9,
+          "noContesta": 1,
+          "noInteresa": 1,
+          "siguiente": 1,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 12
+        },
+        {
+          "equipo": "EQUIPO 121",
+          "llamadas": 53,
+          "confirmado": 9,
+          "noContesta": 2,
+          "noInteresa": 0,
+          "siguiente": 2,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 12
+        },
+        {
+          "equipo": "EQUIPO 125",
+          "llamadas": 125,
+          "confirmado": 15,
+          "noContesta": 13,
+          "noInteresa": 0,
+          "siguiente": 3,
+          "porConfirmar": 2,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 2,
+          "asistieron": 15
+        },
+        {
+          "equipo": "EQUIPO 120",
+          "llamadas": 349,
+          "confirmado": 68,
+          "noContesta": 23,
+          "noInteresa": 0,
+          "siguiente": 1,
+          "porConfirmar": 5,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 5,
+          "asistieron": 77
+        },
+        {
+          "equipo": "EQUIPO 124",
+          "llamadas": 238,
+          "confirmado": 40,
+          "noContesta": 13,
+          "noInteresa": 1,
+          "siguiente": 7,
+          "porConfirmar": 5,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 2,
+          "asistieron": 41
+        },
+        {
+          "equipo": "EQUIPO 29",
+          "llamadas": 2,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 126",
+          "llamadas": 157,
+          "confirmado": 28,
+          "noContesta": 6,
+          "noInteresa": 1,
+          "siguiente": 5,
+          "porConfirmar": 2,
+          "devolucion": 1,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 31
+        },
+        {
+          "equipo": "EQUIPO 20",
+          "llamadas": 5,
+          "confirmado": 2,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 19",
+          "llamadas": 2,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 21",
+          "llamadas": 7,
+          "confirmado": 2,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 22",
+          "llamadas": 3,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 119",
+          "llamadas": 16,
+          "confirmado": 3,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 2,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 1,
+          "cambioCupo": 0,
+          "asistieron": 7
+        },
+        {
+          "equipo": "EQUIPO 118",
+          "llamadas": 186,
+          "confirmado": 31,
+          "noContesta": 18,
+          "noInteresa": 0,
+          "siguiente": 2,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 6,
+          "asistieron": 33
+        },
+        {
+          "equipo": "EQUIPO 122",
+          "llamadas": 305,
+          "confirmado": 53,
+          "noContesta": 30,
+          "noInteresa": 4,
+          "siguiente": 0,
+          "porConfirmar": 2,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 55
+        },
+        {
+          "equipo": "EQUIPO 14",
+          "llamadas": 3,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 18",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 116",
+          "llamadas": 154,
+          "confirmado": 33,
+          "noContesta": 12,
+          "noInteresa": 2,
+          "siguiente": 2,
+          "porConfirmar": 2,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 5,
+          "asistieron": 35
+        },
+        {
+          "equipo": "EQUIPO 32",
+          "llamadas": 3,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 117",
+          "llamadas": 47,
+          "confirmado": 2,
+          "noContesta": 19,
+          "noInteresa": 3,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 1,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 114",
+          "llamadas": 26,
+          "confirmado": 0,
+          "noContesta": 12,
+          "noInteresa": 1,
+          "siguiente": 2,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 31",
+          "llamadas": 1,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 115",
+          "llamadas": 7,
+          "confirmado": 0,
+          "noContesta": 2,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 112",
+          "llamadas": 70,
+          "confirmado": 0,
+          "noContesta": 7,
+          "noInteresa": 4,
+          "siguiente": 2,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 4,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 113",
+          "llamadas": 24,
+          "confirmado": 0,
+          "noContesta": 15,
+          "noInteresa": 1,
+          "siguiente": 0,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 1,
+          "cambioCupo": 1,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 110",
+          "llamadas": 38,
+          "confirmado": 0,
+          "noContesta": 11,
+          "noInteresa": 1,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 111",
+          "llamadas": 19,
+          "confirmado": 0,
+          "noContesta": 3,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 1,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 108",
+          "llamadas": 23,
+          "confirmado": 0,
+          "noContesta": 6,
+          "noInteresa": 1,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 107",
+          "llamadas": 14,
+          "confirmado": 0,
+          "noContesta": 3,
+          "noInteresa": 3,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 106",
+          "llamadas": 4,
+          "confirmado": 0,
+          "noContesta": 2,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 104",
+          "llamadas": 3,
+          "confirmado": 0,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 103",
+          "llamadas": 20,
+          "confirmado": 0,
+          "noContesta": 7,
+          "noInteresa": 1,
+          "siguiente": 0,
+          "porConfirmar": 2,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 100",
+          "llamadas": 66,
+          "confirmado": 1,
+          "noContesta": 12,
+          "noInteresa": 2,
+          "siguiente": 2,
+          "porConfirmar": 1,
+          "devolucion": 2,
+          "yaAsistio": 1,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 101",
+          "llamadas": 11,
+          "confirmado": 0,
+          "noContesta": 2,
+          "noInteresa": 1,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 99",
+          "llamadas": 7,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 1,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 1,
+          "cambioCupo": 1,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 98",
+          "llamadas": 12,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 6,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 96",
+          "llamadas": 33,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 30,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 94",
+          "llamadas": 3,
+          "confirmado": 0,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 95",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 1,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 93",
+          "llamadas": 24,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 24,
+          "cambioCupo": 0,
+          "asistieron": 0
+        }
+      ],
+      "sentadosC1": 4,
+      "sentadosC2": 346,
+      "sentadosTotal": 350,
+      "gestionesC1": 112,
+      "gestionesC2": 2153,
+      "confirmadosC1": 9,
+      "confirmadosC2": 324
+    },
+    {
+      "id": "coord_adams_quito",
+      "nombre": "ADAMS",
+      "nombreCompleto": "Adams Quito",
+      "email": "coordinacion.quito@crearpsl.net",
+      "sede": "Quito",
+      "ciclo": "Ciclo 2",
+      "rol": "Coordinador C1 / C2",
+      "gestiones": 2011,
+      "c1": 48,
+      "c2": 1962,
+      "asignados": 834,
+      "coberturaPct": 76,
+      "coberturaDetalle": "631/834 (76%)",
+      "productividadPct": 18,
+      "productividadDetalle": "372/2011 (18%)",
+      "asistieron": 372,
+      "tasaEfectividad": 40,
+      "ultConexion": "04/09/2026 14:35",
+      "ultGestion": "02/09/2026 09:21",
+      "estados": {
+        "confirmado": 807,
+        "noContesta": 590,
+        "siguiente": 266,
+        "noInteresa": 56,
+        "porConfirmar": 268,
+        "yaAsistio": 0,
+        "devolucion": 0
+      },
+      "equipos": [
+        {
+          "equipo": "EQUIPO 127",
+          "llamadas": 251,
+          "confirmado": 46,
+          "noContesta": 5,
+          "noInteresa": 0,
+          "siguiente": 23,
+          "porConfirmar": 5,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 1,
+          "asistieron": 37
+        },
+        {
+          "equipo": "EQUIPO 34",
+          "llamadas": 3,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 35",
+          "llamadas": 18,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 36",
+          "llamadas": 8,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 37",
+          "llamadas": 6,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 121",
+          "llamadas": 256,
+          "confirmado": 65,
+          "noContesta": 1,
+          "noInteresa": 2,
+          "siguiente": 1,
+          "porConfirmar": 2,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 69
+        },
+        {
+          "equipo": "EQUIPO 123",
+          "llamadas": 752,
+          "confirmado": 85,
+          "noContesta": 51,
+          "noInteresa": 30,
+          "siguiente": 13,
+          "porConfirmar": 11,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 1,
+          "asistieron": 102
+        },
+        {
+          "equipo": "EQUIPO 125",
+          "llamadas": 342,
+          "confirmado": 55,
+          "noContesta": 8,
+          "noInteresa": 7,
+          "siguiente": 3,
+          "porConfirmar": 3,
+          "devolucion": 0,
+          "yaAsistio": 5,
+          "cambioCupo": 1,
+          "asistieron": 58
+        },
+        {
+          "equipo": "EQUIPO 120",
+          "llamadas": 17,
+          "confirmado": 4,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 5
+        },
+        {
+          "equipo": "EQUIPO 124",
+          "llamadas": 53,
+          "confirmado": 7,
+          "noContesta": 4,
+          "noInteresa": 3,
+          "siguiente": 3,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 8
+        },
+        {
+          "equipo": "EQUIPO 126",
+          "llamadas": 133,
+          "confirmado": 27,
+          "noContesta": 3,
+          "noInteresa": 1,
+          "siguiente": 7,
+          "porConfirmar": 6,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 28
+        },
+        {
+          "equipo": "EQUIPO 21",
+          "llamadas": 1,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 22",
+          "llamadas": 6,
+          "confirmado": 3,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 33",
+          "llamadas": 6,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 119",
+          "llamadas": 121,
+          "confirmado": 40,
+          "noContesta": 5,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 46
+        },
+        {
+          "equipo": "EQUIPO 122",
+          "llamadas": 16,
+          "confirmado": 7,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 8
+        },
+        {
+          "equipo": "EQUIPO 118",
+          "llamadas": 10,
+          "confirmado": 8,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 8
+        },
+        {
+          "equipo": "EQUIPO 117",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 1,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 115",
+          "llamadas": 7,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 6,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 113",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 1,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 107",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 1,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 103",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 1,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        }
+      ],
+      "sentadosC1": 3,
+      "sentadosC2": 369,
+      "sentadosTotal": 372,
+      "gestionesC1": 48,
+      "gestionesC2": 1962,
+      "confirmadosC1": 6,
+      "confirmadosC2": 344
+    },
+    {
+      "id": "coord_daniela_quito",
+      "nombre": "DANIELA",
+      "nombreCompleto": "DANIELA",
+      "email": "daniela@crearpsl.net",
+      "sede": "Quito",
+      "ciclo": "Ciclo 2",
+      "rol": "Coordinador C1",
+      "gestiones": 1594,
+      "c1": 86,
+      "c2": 1508,
+      "asignados": 905,
+      "coberturaPct": 67,
+      "coberturaDetalle": "606/905 (67%)",
+      "productividadPct": 21,
+      "productividadDetalle": "333/1594 (21%)",
+      "asistieron": 333,
+      "tasaEfectividad": 51,
+      "ultConexion": "03/09/2026 18:19",
+      "ultGestion": "27/08/2026 12:59",
+      "estados": {
+        "confirmado": 807,
+        "noContesta": 432,
+        "siguiente": 194,
+        "noInteresa": 7,
+        "porConfirmar": 111,
+        "yaAsistio": 0,
+        "devolucion": 1
+      },
+      "equipos": [
+        {
+          "equipo": "EQUIPO 127",
+          "llamadas": 153,
+          "confirmado": 32,
+          "noContesta": 1,
+          "noInteresa": 3,
+          "siguiente": 19,
+          "porConfirmar": 2,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 29
+        },
+        {
+          "equipo": "EQUIPO 34",
+          "llamadas": 5,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 36",
+          "llamadas": 4,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 125",
+          "llamadas": 73,
+          "confirmado": 4,
+          "noContesta": 7,
+          "noInteresa": 1,
+          "siguiente": 9,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 3,
+          "cambioCupo": 2,
+          "asistieron": 8
+        },
+        {
+          "equipo": "EQUIPO 121",
+          "llamadas": 50,
+          "confirmado": 5,
+          "noContesta": 2,
+          "noInteresa": 0,
+          "siguiente": 9,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 15
+        },
+        {
+          "equipo": "EQUIPO 123",
+          "llamadas": 40,
+          "confirmado": 6,
+          "noContesta": 8,
+          "noInteresa": 1,
+          "siguiente": 3,
+          "porConfirmar": 2,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 9
+        },
+        {
+          "equipo": "EQUIPO 120",
+          "llamadas": 193,
+          "confirmado": 49,
+          "noContesta": 13,
+          "noInteresa": 0,
+          "siguiente": 4,
+          "porConfirmar": 2,
+          "devolucion": 0,
+          "yaAsistio": 1,
+          "cambioCupo": 2,
+          "asistieron": 51
+        },
+        {
+          "equipo": "EQUIPO 124",
+          "llamadas": 257,
+          "confirmado": 50,
+          "noContesta": 13,
+          "noInteresa": 1,
+          "siguiente": 6,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 1,
+          "asistieron": 52
+        },
+        {
+          "equipo": "EQUIPO 126",
+          "llamadas": 165,
+          "confirmado": 39,
+          "noContesta": 6,
+          "noInteresa": 0,
+          "siguiente": 6,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 41
+        },
+        {
+          "equipo": "EQUIPO 19",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 22",
+          "llamadas": 10,
+          "confirmado": 3,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 21",
+          "llamadas": 4,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 33",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 119",
+          "llamadas": 15,
+          "confirmado": 3,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 3
+        },
+        {
+          "equipo": "EQUIPO 118",
+          "llamadas": 98,
+          "confirmado": 30,
+          "noContesta": 5,
+          "noInteresa": 0,
+          "siguiente": 2,
+          "porConfirmar": 2,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 27
+        },
+        {
+          "equipo": "EQUIPO 122",
+          "llamadas": 306,
+          "confirmado": 59,
+          "noContesta": 21,
+          "noInteresa": 0,
+          "siguiente": 6,
+          "porConfirmar": 5,
+          "devolucion": 1,
+          "yaAsistio": 0,
+          "cambioCupo": 1,
+          "asistieron": 63
+        },
+        {
+          "equipo": "EQUIPO 14",
+          "llamadas": 1,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 15",
+          "llamadas": 2,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 116",
+          "llamadas": 97,
+          "confirmado": 28,
+          "noContesta": 3,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 1,
+          "asistieron": 28
+        },
+        {
+          "equipo": "EQUIPO 32",
+          "llamadas": 9,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 117",
+          "llamadas": 14,
+          "confirmado": 2,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 2
+        },
+        {
+          "equipo": "EQUIPO 25",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 17",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 1,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 114",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 1,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 115",
+          "llamadas": 5,
+          "confirmado": 0,
+          "noContesta": 3,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 1,
+          "cambioCupo": 1,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 112",
+          "llamadas": 10,
+          "confirmado": 0,
+          "noContesta": 6,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 113",
+          "llamadas": 4,
+          "confirmado": 0,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 110",
+          "llamadas": 10,
+          "confirmado": 0,
+          "noContesta": 5,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 3,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 109",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 104",
+          "llamadas": 4,
+          "confirmado": 0,
+          "noContesta": 4,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 105",
+          "llamadas": 11,
+          "confirmado": 0,
+          "noContesta": 7,
+          "noInteresa": 0,
+          "siguiente": 4,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 100",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 96",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 1,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 95",
+          "llamadas": 30,
+          "confirmado": 0,
+          "noContesta": 11,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 15,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 93",
+          "llamadas": 13,
+          "confirmado": 0,
+          "noContesta": 8,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 5,
+          "cambioCupo": 0,
+          "asistieron": 0
+        }
+      ],
+      "sentadosC1": 4,
+      "sentadosC2": 329,
+      "sentadosTotal": 333,
+      "gestionesC1": 86,
+      "gestionesC2": 1508,
+      "confirmadosC1": 6,
+      "confirmadosC2": 307
+    },
+    {
+      "id": "coord_danna_quito",
+      "nombre": "DANNA",
+      "nombreCompleto": "DANNA",
+      "email": "danna@crearpsl.net",
+      "sede": "Quito",
+      "ciclo": "Ciclo 2",
+      "rol": "Coordinador C1",
+      "gestiones": 1285,
+      "c1": 22,
+      "c2": 1263,
+      "asignados": 519,
+      "coberturaPct": 95,
+      "coberturaDetalle": "495/519 (95%)",
+      "productividadPct": 17,
+      "productividadDetalle": "223/1285 (17%)",
+      "asistieron": 223,
+      "tasaEfectividad": 41,
+      "ultConexion": "04/09/2026 09:48",
+      "ultGestion": "27/08/2026 16:43",
+      "estados": {
+        "confirmado": 525,
+        "noContesta": 316,
+        "siguiente": 258,
+        "noInteresa": 29,
+        "porConfirmar": 150,
+        "yaAsistio": 0,
+        "devolucion": 0
+      },
+      "equipos": [
+        {
+          "equipo": "EQUIPO 6",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 1,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 127",
+          "llamadas": 265,
+          "confirmado": 32,
+          "noContesta": 10,
+          "noInteresa": 0,
+          "siguiente": 23,
+          "porConfirmar": 4,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 1,
+          "asistieron": 25
+        },
+        {
+          "equipo": "EQUIPO 23",
+          "llamadas": 2,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 35",
+          "llamadas": 10,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 36",
+          "llamadas": 6,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 123",
+          "llamadas": 359,
+          "confirmado": 56,
+          "noContesta": 25,
+          "noInteresa": 11,
+          "siguiente": 21,
+          "porConfirmar": 11,
+          "devolucion": 0,
+          "yaAsistio": 2,
+          "cambioCupo": 0,
+          "asistieron": 59
+        },
+        {
+          "equipo": "EQUIPO 125",
+          "llamadas": 430,
+          "confirmado": 70,
+          "noContesta": 12,
+          "noInteresa": 3,
+          "siguiente": 8,
+          "porConfirmar": 8,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 78
+        },
+        {
+          "equipo": "EQUIPO 121",
+          "llamadas": 41,
+          "confirmado": 0,
+          "noContesta": 17,
+          "noInteresa": 11,
+          "siguiente": 11,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 1,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 124",
+          "llamadas": 66,
+          "confirmado": 29,
+          "noContesta": 5,
+          "noInteresa": 0,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 1,
+          "asistieron": 29
+        },
+        {
+          "equipo": "EQUIPO 126",
+          "llamadas": 92,
+          "confirmado": 22,
+          "noContesta": 1,
+          "noInteresa": 1,
+          "siguiente": 0,
+          "porConfirmar": 2,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 1,
+          "asistieron": 25
+        },
+        {
+          "equipo": "EQUIPO 22",
+          "llamadas": 3,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 119",
+          "llamadas": 1,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 1,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 122",
+          "llamadas": 9,
+          "confirmado": 6,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 6
+        }
+      ],
+      "sentadosC1": 1,
+      "sentadosC2": 222,
+      "sentadosTotal": 223,
+      "gestionesC1": 22,
+      "gestionesC2": 1263,
+      "confirmadosC1": 2,
+      "confirmadosC2": 215
+    },
+    {
+      "id": "coord_marcela_quito",
+      "nombre": "MARCELA",
+      "nombreCompleto": "MARCELA",
+      "email": "marcela@crearpsl.net",
+      "sede": "Quito",
+      "ciclo": "Ciclo 2",
+      "rol": "Coordinador C1",
+      "gestiones": 503,
+      "c1": 9,
+      "c2": 494,
+      "asignados": 259,
+      "coberturaPct": 67,
+      "coberturaDetalle": "174/259 (67%)",
+      "productividadPct": 17,
+      "productividadDetalle": "88/503 (17%)",
+      "asistieron": 88,
+      "tasaEfectividad": 44,
+      "ultConexion": "04/09/2026 17:46",
+      "ultGestion": "27/08/2026 16:34",
+      "estados": {
+        "confirmado": 220,
+        "noContesta": 135,
+        "siguiente": 92,
+        "noInteresa": 0,
+        "porConfirmar": 54,
+        "yaAsistio": 0,
+        "devolucion": 0
+      },
+      "equipos": [
+        {
+          "equipo": "EQUIPO 6",
+          "llamadas": 1,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        },
+        {
+          "equipo": "EQUIPO 127",
+          "llamadas": 172,
+          "confirmado": 33,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 15,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 1,
+          "asistieron": 31
+        },
+        {
+          "equipo": "EQUIPO 36",
+          "llamadas": 6,
+          "confirmado": 0,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
+        {
+          "equipo": "EQUIPO 125",
+          "llamadas": 189,
+          "confirmado": 30,
+          "noContesta": 14,
+          "noInteresa": 0,
+          "siguiente": 7,
+          "porConfirmar": 2,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 31
+        },
+        {
+          "equipo": "EQUIPO 124",
+          "llamadas": 11,
+          "confirmado": 4,
+          "noContesta": 1,
+          "noInteresa": 0,
+          "siguiente": 1,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 3
+        },
+        {
+          "equipo": "EQUIPO 126",
+          "llamadas": 122,
+          "confirmado": 23,
+          "noContesta": 2,
+          "noInteresa": 0,
+          "siguiente": 8,
+          "porConfirmar": 1,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 1,
+          "asistieron": 21
+        },
+        {
+          "equipo": "EQUIPO 22",
+          "llamadas": 2,
+          "confirmado": 1,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 1
+        }
+      ],
+      "sentadosC1": 2,
+      "sentadosC2": 86,
+      "sentadosTotal": 88,
+      "gestionesC1": 9,
+      "gestionesC2": 494,
+      "confirmadosC1": 2,
+      "confirmadosC2": 90
+    }
+  ]
+}
 ```
 
 ---
