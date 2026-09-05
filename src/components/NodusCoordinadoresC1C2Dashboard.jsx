@@ -11,6 +11,8 @@ import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip,
   Legend, CartesianGrid, Cell, PieChart, Pie, ComposedChart, Line
 } from 'recharts';
+import { useTheme } from '../context/ThemeContext';
+import ThemeSelector from './ThemeSelector';
 import './NodusCoordinadoresC1C2Dashboard.css';
 
 const COLORS = {
@@ -27,6 +29,23 @@ const COLORS = {
 const PIE_COLORS = ['#10b981', '#f59e0b', '#64748b', '#3b82f6', '#ef4444'];
 
 export default function NodusCoordinadoresC1C2Dashboard() {
+  const { activeTheme } = useTheme();
+  const isLight = activeTheme === 'light';
+
+  const gridStroke = isLight ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.08)';
+  const axisStroke = isLight ? '#64748b' : '#94a3b8';
+  const chartTooltipStyle = useMemo(() => ({
+    backgroundColor: isLight ? '#ffffff' : '#0a192f',
+    borderColor: isLight ? 'rgba(15, 23, 42, 0.15)' : '#334155',
+    borderRadius: '12px',
+    color: isLight ? '#0f172a' : '#ffffff',
+    boxShadow: isLight ? '0 10px 25px rgba(0,0,0,0.1)' : '0 10px 30px rgba(0,0,0,0.6)',
+    fontSize: '12px'
+  }), [isLight]);
+  const chartItemStyle = useMemo(() => ({
+    color: isLight ? '#0f172a' : '#ffffff',
+    padding: '2px 0'
+  }), [isLight]);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -268,9 +287,9 @@ export default function NodusCoordinadoresC1C2Dashboard() {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', gap: '1rem', background: 'rgba(17, 34, 64, 0.7)', borderRadius: '16px', border: '1px solid rgba(255, 255, 255, 0.08)', color: '#94a3b8' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', gap: '1rem', background: 'var(--nodus-bg-card, rgba(17, 34, 64, 0.7))', borderRadius: '16px', border: '1px solid var(--nodus-border-card, rgba(255, 255, 255, 0.08))', color: 'var(--nodus-text-sub, #94a3b8)' }}>
         <RefreshCw size={36} color="#ffc107" style={{ animation: 'spin 1s linear infinite' }} />
-        <p style={{ fontSize: '1rem', fontWeight: 600, color: '#f8fafc', margin: 0 }}>Cargando datos ejecutivos de Coordinadores C1 & C2...</p>
+        <p style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--nodus-text-title, #f8fafc)', margin: 0 }}>Cargando datos ejecutivos de Coordinadores C1 & C2...</p>
         <p style={{ fontSize: '0.78rem', color: '#64748b', margin: 0 }}>Conectando con el enjambre de agentes autónomos Nodus</p>
       </div>
     );
@@ -296,6 +315,8 @@ export default function NodusCoordinadoresC1C2Dashboard() {
         </div>
 
         <div className="nodus-header-right">
+          <ThemeSelector compact={false} />
+
           <div className="nodus-sync-indicator">
             <span className="nodus-pulse-dot" />
             <span>Sincronizado: <strong style={{ color: '#10b981' }}>{timeSinceSync}</strong></span>
@@ -329,8 +350,8 @@ export default function NodusCoordinadoresC1C2Dashboard() {
             <span>Gestiones Totales</span>
             <PhoneCall size={16} color="#0ea5e9" />
           </div>
-          <div className="nodus-card-value" style={{ color: '#38bdf8' }}>{aggregatedStats.totalGestiones.toLocaleString()}</div>
-          <div className="nodus-card-footer" style={{ color: '#38bdf8' }}>Llamadas realizadas</div>
+          <div className="nodus-card-value highlight-sky">{aggregatedStats.totalGestiones.toLocaleString()}</div>
+          <div className="nodus-card-footer">Llamadas realizadas</div>
         </div>
 
         <div className="nodus-card">
@@ -503,14 +524,11 @@ export default function NodusCoordinadoresC1C2Dashboard() {
           {activeChartTab === 'coordinadores' && (
             <ResponsiveContainer width="100%" height={380}>
               <BarChart data={chartCoordinadoresData} margin={{ top: 10, right: 20, left: 0, bottom: 25 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.5} />
-                <XAxis dataKey="name" stroke="#94a3b8" fontSize={11} angle={-25} textAnchor="end" height={50} />
-                <YAxis stroke="#94a3b8" fontSize={11} />
-                <Tooltip
-                  contentStyle={{ backgroundColor: '#0a192f', borderColor: '#334155', borderRadius: '12px', color: '#fff', fontSize: '12px' }}
-                  itemStyle={{ padding: '2px 0' }}
-                />
-                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '8px' }} />
+                <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} />
+                <XAxis dataKey="name" stroke={axisStroke} fontSize={11} angle={-25} textAnchor="end" height={50} />
+                <YAxis stroke={axisStroke} fontSize={11} />
+                <Tooltip contentStyle={chartTooltipStyle} itemStyle={chartItemStyle} />
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '8px', color: isLight ? '#334155' : '#cbd5e1' }} />
                 <Bar dataKey="gestiones" name="Gestiones Totales" fill="#0ea5e9" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="confirmados" name="Confirmados" fill="#10b981" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="c1" name="Capítulo 1" fill="#eab308" radius={[4, 4, 0, 0]} />
@@ -522,14 +540,12 @@ export default function NodusCoordinadoresC1C2Dashboard() {
           {activeChartTab === 'sedes' && (
             <ResponsiveContainer width="100%" height={380}>
               <ComposedChart data={chartSedesData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.5} />
-                <XAxis dataKey="sede" stroke="#94a3b8" fontSize={12} />
-                <YAxis stroke="#94a3b8" fontSize={11} />
-                <Tooltip
-                  contentStyle={{ backgroundColor: '#0a192f', borderColor: '#334155', borderRadius: '12px', color: '#fff', fontSize: '12px' }}
-                />
-                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '8px' }} />
-                <Bar dataKey="gestiones" name="Gestiones Realizadas" fill="#3b82f6" radius={[6, 6, 0, 0]} />
+                <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} />
+                <XAxis dataKey="sede" stroke={axisStroke} fontSize={12} />
+                <YAxis stroke={axisStroke} fontSize={11} />
+                <Tooltip contentStyle={chartTooltipStyle} itemStyle={chartItemStyle} />
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '8px', color: isLight ? '#334155' : '#cbd5e1' }} />
+                <Bar dataKey="gestiones" name="Gestiones Realizadas" fill={isLight ? '#0284c7' : '#38bdf8'} radius={[6, 6, 0, 0]} />
                 <Bar dataKey="confirmados" name="Confirmados" fill="#10b981" radius={[6, 6, 0, 0]} />
                 <Line type="monotone" dataKey="asignados" name="Participantes Asignados" stroke="#f59e0b" strokeWidth={3} dot={{ r: 4 }} />
               </ComposedChart>
@@ -556,9 +572,7 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                         <Cell key={`cell-${index}`} fill={entry.color || PIE_COLORS[index % PIE_COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip
-                      contentStyle={{ backgroundColor: '#0a192f', borderColor: '#334155', borderRadius: '12px', color: '#fff', fontSize: '12px' }}
-                    />
+                    <Tooltip contentStyle={chartTooltipStyle} itemStyle={chartItemStyle} />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
@@ -568,9 +582,9 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                   <div key={idx} className="nodus-legend-item">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                       <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: e.color }} />
-                      <span style={{ color: '#cbd5e1', fontWeight: 500 }}>{e.name}</span>
+                      <span style={{ color: isLight ? '#334155' : '#cbd5e1', fontWeight: 500 }}>{e.name}</span>
                     </div>
-                    <span style={{ fontWeight: 800, color: '#ffffff' }}>{e.value.toLocaleString()}</span>
+                    <span style={{ fontWeight: 800, color: isLight ? '#0f172a' : '#ffffff' }}>{e.value.toLocaleString()}</span>
                   </div>
                 ))}
               </div>
@@ -630,7 +644,7 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                               {coord.nombre.slice(0, 2)}
                             </div>
                             <div>
-                              <div style={{ fontWeight: 700, color: '#ffffff', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                              <div style={{ fontWeight: 700, color: 'var(--nodus-text-title)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                                 {coord.nombre}
                                 {coord.c2 > 0 && (
                                   <span className="nodus-badge-c1c2">C1+C2</span>
@@ -646,7 +660,7 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                         {/* Sede & Ciclo */}
                         <td className="nodus-td">
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
-                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: '#f1f5f9', fontWeight: 600 }}>
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: 'var(--nodus-text-title)', fontWeight: 600 }}>
                               <MapPin size={13} color="#ffc107" />
                               {coord.sede}
                             </span>
@@ -669,7 +683,7 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                         </td>
 
                         {/* Asignados */}
-                        <td className="nodus-td" style={{ textAlign: 'right', color: '#cbd5e1', fontWeight: 600 }}>
+                        <td className="nodus-td" style={{ textAlign: 'right', color: 'var(--nodus-text-main)', fontWeight: 600 }}>
                           {coord.asignados.toLocaleString()}
                         </td>
 
@@ -677,7 +691,7 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                         <td className="nodus-td" style={{ textAlign: 'center' }}>
                           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
                             <span style={{ fontWeight: 800, color: '#ffc107' }}>{coord.coberturaPct}%</span>
-                            <div style={{ width: '60px', height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
+                            <div style={{ width: '60px', height: '4px', background: 'var(--nodus-progress-bg)', borderRadius: '2px', overflow: 'hidden' }}>
                               <div style={{ width: `${coord.coberturaPct}%`, height: '100%', background: '#ffc107', borderRadius: '2px' }} />
                             </div>
                             <span style={{ fontSize: '0.68rem', color: '#64748b' }}>{coord.coberturaDetalle?.split(' ')[0]}</span>
@@ -688,7 +702,7 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                         <td className="nodus-td" style={{ textAlign: 'center' }}>
                           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
                             <span style={{ fontWeight: 800, color: '#14b8a6' }}>{coord.productividadPct}%</span>
-                            <div style={{ width: '60px', height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
+                            <div style={{ width: '60px', height: '4px', background: 'var(--nodus-progress-bg)', borderRadius: '2px', overflow: 'hidden' }}>
                               <div style={{ width: `${coord.productividadPct}%`, height: '100%', background: '#14b8a6', borderRadius: '2px' }} />
                             </div>
                             <span style={{ fontSize: '0.68rem', color: '#64748b' }}>{coord.productividadDetalle?.split(' ')[0]}</span>
@@ -733,7 +747,7 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                       {/* SUBTABLA ANIDADA */}
                       {isExpanded && hasEquipos && (
                         <tr>
-                          <td colSpan={11} style={{ padding: '0.75rem 1.5rem', background: 'rgba(10, 25, 47, 0.98)' }}>
+                          <td colSpan={11} className="nodus-nested-wrapper">
                             <div className="nodus-nested-panel">
                               <div className="nodus-nested-header">
                                 <h4 className="nodus-nested-title">
@@ -764,7 +778,7 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                                       const tasaAsist = eq.confirmado > 0 ? Math.round((eq.asistieron / eq.confirmado) * 100) : 0;
                                       return (
                                         <tr key={eqIdx} style={{ transition: 'background 0.15s ease' }}>
-                                          <td className="nodus-nested-td" style={{ fontWeight: 700, color: '#ffffff' }}>
+                                          <td className="nodus-nested-td" style={{ fontWeight: 700, color: 'var(--nodus-text-title)' }}>
                                             {eq.equipo}
                                           </td>
                                           <td className="nodus-nested-td" style={{ textAlign: 'right', color: '#38bdf8', fontWeight: 600 }}>
@@ -791,9 +805,9 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                                               borderRadius: '6px',
                                               fontSize: '0.72rem',
                                               fontWeight: 700,
-                                              background: tasaAsist >= 80 ? 'rgba(16, 185, 129, 0.2)' : tasaAsist >= 50 ? 'rgba(245, 158, 11, 0.2)' : 'rgba(255, 255, 255, 0.08)',
-                                              color: tasaAsist >= 80 ? '#10b981' : tasaAsist >= 50 ? '#f59e0b' : '#94a3b8',
-                                              border: `1px solid ${tasaAsist >= 80 ? 'rgba(16, 185, 129, 0.4)' : tasaAsist >= 50 ? 'rgba(245, 158, 11, 0.4)' : 'rgba(255, 255, 255, 0.1)'}`
+                                              background: tasaAsist >= 80 ? 'rgba(16, 185, 129, 0.18)' : tasaAsist >= 50 ? 'rgba(245, 158, 11, 0.18)' : (isLight ? 'rgba(100, 116, 139, 0.12)' : 'rgba(255, 255, 255, 0.08)'),
+                                              color: tasaAsist >= 80 ? (isLight ? '#059669' : '#10b981') : tasaAsist >= 50 ? (isLight ? '#b45309' : '#fbbf24') : (isLight ? '#475569' : '#94a3b8'),
+                                              border: `1px solid ${tasaAsist >= 80 ? 'rgba(16, 185, 129, 0.4)' : tasaAsist >= 50 ? 'rgba(245, 158, 11, 0.4)' : (isLight ? 'rgba(100, 116, 139, 0.25)' : 'rgba(255, 255, 255, 0.1)')}`
                                             }}>
                                               {tasaAsist}%
                                             </span>

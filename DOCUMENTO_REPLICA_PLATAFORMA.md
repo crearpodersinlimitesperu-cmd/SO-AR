@@ -214213,19 +214213,156 @@ export default function NewExcellenceModal({ isOpen, onClose, task, onComplete }
 ## Archivo: src\components\NodusCoordinadoresC1C2Dashboard.css
 
 ```css
-﻿/* =========================================================================
+/* =========================================================================
    ESTILOS EJECUTIVOS: NODUS COORDINADORES C1 & C2 DASHBOARD
    CREAR PODER SIN LÍMITES - CAUSA OS
+   SOPORTE IMPECABLE MODO DÍA, NOCHE Y AUTO
    ========================================================================= */
 
+/* --- 1. DEFINICIÓN DE VARIABLES DE TEMA (DARK / NOCHE POR DEFECTO) --- */
 .nodus-dashboard-container {
+  --nodus-bg-banner: linear-gradient(135deg, rgba(17, 34, 64, 0.95) 0%, rgba(10, 25, 47, 0.98) 100%);
+  --nodus-border-banner: rgba(255, 193, 7, 0.35);
+  --nodus-banner-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+
+  --nodus-bg-card: rgba(17, 34, 64, 0.75);
+  --nodus-bg-card-hover: rgba(23, 42, 77, 0.9);
+  --nodus-border-card: rgba(255, 255, 255, 0.08);
+  --nodus-border-card-hover: rgba(255, 193, 7, 0.4);
+  --nodus-card-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  --nodus-card-shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.45);
+
+  --nodus-bg-filters: rgba(17, 34, 64, 0.85);
+  --nodus-border-filters: rgba(255, 255, 255, 0.1);
+
+  --nodus-bg-input: rgba(10, 25, 47, 0.8);
+  --nodus-border-input: rgba(255, 255, 255, 0.12);
+  --nodus-color-input: #ffffff;
+  --nodus-placeholder-input: #64748b;
+
+  --nodus-bg-select-item: rgba(10, 25, 47, 0.8);
+  --nodus-border-select-item: rgba(255, 255, 255, 0.12);
+  --nodus-color-select: #e2e8f0;
+  --nodus-bg-select-option: #0a192f;
+  --nodus-color-select-option: #ffffff;
+
+  --nodus-bg-charts: rgba(17, 34, 64, 0.85);
+  --nodus-border-charts: rgba(255, 255, 255, 0.1);
+  --nodus-chart-header-border: rgba(255, 255, 255, 0.08);
+  --nodus-chart-tab-hover: rgba(255, 255, 255, 0.05);
+  --nodus-chart-tab-hover-color: #ffffff;
+  --nodus-legend-bg: rgba(10, 25, 47, 0.7);
+  --nodus-legend-border: rgba(255, 255, 255, 0.08);
+
+  --nodus-bg-table: rgba(17, 34, 64, 0.85);
+  --nodus-border-table: rgba(255, 255, 255, 0.1);
+  --nodus-table-header-bg: rgba(10, 25, 47, 0.6);
+  --nodus-th-bg: rgba(10, 25, 47, 0.95);
+  --nodus-th-color: #94a3b8;
+  --nodus-th-border: rgba(255, 255, 255, 0.1);
+  --nodus-td-border: rgba(255, 255, 255, 0.05);
+  --nodus-tr-hover: rgba(255, 255, 255, 0.035);
+  --nodus-tr-expanded: rgba(255, 193, 7, 0.03);
+
+  --nodus-btn-expand-bg: rgba(10, 25, 47, 0.9);
+  --nodus-btn-expand-border: rgba(255, 193, 7, 0.35);
+  --nodus-btn-expand-color: #ffc107;
+  --nodus-btn-expand-hover: rgba(255, 193, 7, 0.2);
+
+  --nodus-nested-wrapper-bg: rgba(10, 25, 47, 0.98);
+  --nodus-nested-panel-bg: rgba(10, 25, 47, 0.95);
+  --nodus-nested-border: rgba(255, 193, 7, 0.25);
+  --nodus-nested-th-bg: rgba(10, 25, 47, 0.9);
+  --nodus-nested-th-color: #94a3b8;
+  --nodus-nested-td-border: rgba(255, 255, 255, 0.04);
+
+  --nodus-text-main: #f8fafc;
+  --nodus-text-title: #ffffff;
+  --nodus-text-sub: #94a3b8;
+  --nodus-text-muted: #64748b;
+  --nodus-progress-bg: rgba(255, 255, 255, 0.1);
+
+  --nodus-sync-bg: rgba(10, 25, 47, 0.8);
+  --nodus-sync-border: rgba(255, 255, 255, 0.12);
+  --nodus-sync-text: #cbd5e1;
+
   width: 100%;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
   font-family: var(--font-body, 'Inter', sans-serif);
-  color: #f8fafc;
+  color: var(--nodus-text-main);
   box-sizing: border-box;
+  transition: color 0.3s ease;
+}
+
+/* --- 2. OVERRIDES PARA MODO DÍA (LIGHT MODE) --- */
+[data-theme="light"] .nodus-dashboard-container,
+.theme-light .nodus-dashboard-container {
+  --nodus-bg-banner: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  --nodus-border-banner: rgba(217, 119, 6, 0.35);
+  --nodus-banner-shadow: 0 4px 20px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 1);
+
+  --nodus-bg-card: #ffffff;
+  --nodus-bg-card-hover: #fcfcfd;
+  --nodus-border-card: rgba(15, 23, 42, 0.12);
+  --nodus-border-card-hover: rgba(217, 119, 6, 0.45);
+  --nodus-card-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  --nodus-card-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.08);
+
+  --nodus-bg-filters: #ffffff;
+  --nodus-border-filters: rgba(15, 23, 42, 0.12);
+
+  --nodus-bg-input: #f8fafc;
+  --nodus-border-input: rgba(15, 23, 42, 0.2);
+  --nodus-color-input: #0f172a;
+  --nodus-placeholder-input: #94a3b8;
+
+  --nodus-bg-select-item: #f8fafc;
+  --nodus-border-select-item: rgba(15, 23, 42, 0.15);
+  --nodus-color-select: #0f172a;
+  --nodus-bg-select-option: #ffffff;
+  --nodus-color-select-option: #0f172a;
+
+  --nodus-bg-charts: #ffffff;
+  --nodus-border-charts: rgba(15, 23, 42, 0.12);
+  --nodus-chart-header-border: rgba(15, 23, 42, 0.1);
+  --nodus-chart-tab-hover: #f1f5f9;
+  --nodus-chart-tab-hover-color: #0f172a;
+  --nodus-legend-bg: #f8fafc;
+  --nodus-legend-border: rgba(15, 23, 42, 0.1);
+
+  --nodus-bg-table: #ffffff;
+  --nodus-border-table: rgba(15, 23, 42, 0.12);
+  --nodus-table-header-bg: #f8fafc;
+  --nodus-th-bg: #f1f5f9;
+  --nodus-th-color: #475569;
+  --nodus-th-border: rgba(15, 23, 42, 0.12);
+  --nodus-td-border: rgba(15, 23, 42, 0.08);
+  --nodus-tr-hover: #f8fafc;
+  --nodus-tr-expanded: rgba(245, 158, 11, 0.05);
+
+  --nodus-btn-expand-bg: #f8fafc;
+  --nodus-btn-expand-border: rgba(217, 119, 6, 0.4);
+  --nodus-btn-expand-color: #b45309;
+  --nodus-btn-expand-hover: rgba(245, 158, 11, 0.15);
+
+  --nodus-nested-wrapper-bg: #f8fafc;
+  --nodus-nested-panel-bg: #ffffff;
+  --nodus-nested-border: rgba(217, 119, 6, 0.3);
+  --nodus-nested-th-bg: #f1f5f9;
+  --nodus-nested-th-color: #475569;
+  --nodus-nested-td-border: rgba(15, 23, 42, 0.08);
+
+  --nodus-text-main: #0f172a;
+  --nodus-text-title: #0f172a;
+  --nodus-text-sub: #475569;
+  --nodus-text-muted: #64748b;
+  --nodus-progress-bg: rgba(15, 23, 42, 0.08);
+
+  --nodus-sync-bg: #f1f5f9;
+  --nodus-sync-border: rgba(15, 23, 42, 0.12);
+  --nodus-sync-text: #334155;
 }
 
 .nodus-dashboard-container *,
@@ -214234,7 +214371,7 @@ export default function NewExcellenceModal({ isOpen, onClose, task, onComplete }
   box-sizing: border-box;
 }
 
-/* 1. Header Banner */
+/* --- 3. HEADER BANNER EJECUTIVO --- */
 .nodus-header-banner {
   display: flex;
   justify-content: space-between;
@@ -214242,11 +214379,12 @@ export default function NewExcellenceModal({ isOpen, onClose, task, onComplete }
   flex-wrap: wrap;
   gap: 1.25rem;
   padding: 1.25rem 1.75rem;
-  background: linear-gradient(135deg, rgba(17, 34, 64, 0.95) 0%, rgba(10, 25, 47, 0.98) 100%);
-  border: 1px solid rgba(255, 193, 7, 0.35);
+  background: var(--nodus-bg-banner);
+  border: 1px solid var(--nodus-border-banner);
   border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  box-shadow: var(--nodus-banner-shadow);
   backdrop-filter: blur(16px);
+  transition: all 0.3s ease;
 }
 
 .nodus-header-left {
@@ -214272,12 +214410,13 @@ export default function NewExcellenceModal({ isOpen, onClose, task, onComplete }
   font-family: var(--font-heading, 'Montserrat', sans-serif);
   font-size: 1.35rem;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--nodus-text-title);
   margin: 0;
   display: flex;
   align-items: center;
   gap: 0.6rem;
   flex-wrap: wrap;
+  transition: color 0.3s ease;
 }
 
 .nodus-badge-live {
@@ -214286,21 +214425,27 @@ export default function NewExcellenceModal({ isOpen, onClose, task, onComplete }
   padding: 0.2rem 0.6rem;
   border-radius: 20px;
   background: rgba(255, 193, 7, 0.18);
-  color: #ffc107;
+  color: #d97706;
   border: 1px solid rgba(255, 193, 7, 0.4);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
+[data-theme="dark"] .nodus-badge-live {
+  color: #ffc107;
+}
+
 .nodus-header-subtitle {
-  font-size: 0.8rem;
-  color: #94a3b8;
+  font-size: 0.82rem;
+  color: var(--nodus-text-sub);
   margin: 0.25rem 0 0 0;
+  transition: color 0.3s ease;
 }
 
 .nodus-header-right {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 0.75rem;
 }
 
@@ -214309,11 +214454,12 @@ export default function NewExcellenceModal({ isOpen, onClose, task, onComplete }
   align-items: center;
   gap: 0.5rem;
   padding: 0.45rem 0.85rem;
-  background: rgba(10, 25, 47, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--nodus-sync-bg);
+  border: 1px solid var(--nodus-sync-border);
   border-radius: 10px;
   font-size: 0.78rem;
-  color: #cbd5e1;
+  color: var(--nodus-sync-text);
+  transition: all 0.3s ease;
 }
 
 .nodus-pulse-dot {
@@ -214324,6 +214470,23 @@ export default function NewExcellenceModal({ isOpen, onClose, task, onComplete }
   background: #10b981;
 }
 
+.nodus-pulse-dot::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.5);
+  animation: pulse-ring 2s infinite ease-out;
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.8); opacity: 0.8; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+
 .nodus-btn-refresh {
   display: flex;
   align-items: center;
@@ -214331,12 +214494,16 @@ export default function NewExcellenceModal({ isOpen, onClose, task, onComplete }
   padding: 0.48rem 0.9rem;
   background: rgba(255, 193, 7, 0.15);
   border: 1px solid rgba(255, 193, 7, 0.4);
-  color: #ffc107;
+  color: #b45309;
   border-radius: 10px;
   font-size: 0.78rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
+}
+
+[data-theme="dark"] .nodus-btn-refresh {
+  color: #ffc107;
 }
 
 .nodus-btn-refresh:hover:not(:disabled) {
@@ -214350,7 +214517,7 @@ export default function NewExcellenceModal({ isOpen, onClose, task, onComplete }
   cursor: not-allowed;
 }
 
-/* 2. Scorecards Grid */
+/* --- 4. SCORECARDS EJECUTIVAS --- */
 .nodus-scorecards-grid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
@@ -214377,29 +214544,30 @@ export default function NewExcellenceModal({ isOpen, onClose, task, onComplete }
 }
 
 .nodus-card {
-  background: rgba(17, 34, 64, 0.75);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--nodus-bg-card);
+  border: 1px solid var(--nodus-border-card);
   border-radius: 14px;
   padding: 1.1rem 1.25rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--nodus-card-shadow);
   transition: all 0.25s ease;
   backdrop-filter: blur(10px);
 }
 
 .nodus-card:hover {
-  border-color: rgba(255, 193, 7, 0.35);
+  background: var(--nodus-bg-card-hover);
+  border-color: var(--nodus-border-card-hover);
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.45);
+  box-shadow: var(--nodus-card-shadow-hover);
 }
 
 .nodus-card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  color: #94a3b8;
+  color: var(--nodus-text-muted);
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -214411,24 +214579,33 @@ export default function NewExcellenceModal({ isOpen, onClose, task, onComplete }
   font-family: var(--font-heading, 'Montserrat', sans-serif);
   font-size: 1.7rem;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--nodus-text-title);
   line-height: 1.2;
+  transition: color 0.3s ease;
 }
 
 .nodus-card-value.highlight-emerald {
   color: #10b981;
 }
 
+.nodus-card-value.highlight-sky {
+  color: #0284c7;
+}
+
+[data-theme="dark"] .nodus-card-value.highlight-sky {
+  color: #38bdf8;
+}
+
 .nodus-card-footer {
   font-size: 0.75rem;
-  color: #94a3b8;
+  color: var(--nodus-text-muted);
   margin-top: 0.4rem;
 }
 
 .nodus-progress-bar {
   width: 100%;
   height: 6px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--nodus-progress-bg);
   border-radius: 4px;
   overflow: hidden;
   margin-top: 0.5rem;
@@ -214440,16 +214617,17 @@ export default function NewExcellenceModal({ isOpen, onClose, task, onComplete }
   transition: width 0.5s ease-in-out;
 }
 
-/* 3. Barra de Filtros */
+/* --- 5. BARRA DE FILTROS MULTIDIMENSIONALES --- */
 .nodus-filters-bar {
-  background: rgba(17, 34, 64, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--nodus-bg-filters);
+  border: 1px solid var(--nodus-border-filters);
   border-radius: 14px;
   padding: 1rem 1.25rem;
   display: flex;
   flex-direction: column;
   gap: 0.85rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+  box-shadow: var(--nodus-card-shadow);
+  transition: all 0.3s ease;
 }
 
 .nodus-filters-row {
@@ -214472,17 +214650,17 @@ export default function NewExcellenceModal({ isOpen, onClose, task, onComplete }
   left: 0.85rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #94a3b8;
+  color: var(--nodus-text-muted);
   pointer-events: none;
 }
 
 .nodus-search-input {
   width: 100%;
   padding: 0.55rem 0.85rem 0.55rem 2.4rem;
-  background: rgba(10, 25, 47, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--nodus-bg-input);
+  border: 1px solid var(--nodus-border-input);
   border-radius: 10px;
-  color: #ffffff;
+  color: var(--nodus-color-input);
   font-size: 0.82rem;
   outline: none;
   transition: all 0.2s ease;
@@ -214494,7 +214672,7 @@ export default function NewExcellenceModal({ isOpen, onClose, task, onComplete }
 }
 
 .nodus-search-input::placeholder {
-  color: #64748b;
+  color: var(--nodus-placeholder-input);
 }
 
 .nodus-select-group {
@@ -214508,33 +214686,35 @@ export default function NewExcellenceModal({ isOpen, onClose, task, onComplete }
   display: flex;
   align-items: center;
   gap: 0.45rem;
-  background: rgba(10, 25, 47, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--nodus-bg-select-item);
+  border: 1px solid var(--nodus-border-select-item);
   border-radius: 10px;
   padding: 0.45rem 0.75rem;
+  transition: all 0.2s ease;
 }
 
 .nodus-select {
   background: transparent;
   border: none;
-  color: #e2e8f0;
+  color: var(--nodus-color-select);
   font-size: 0.8rem;
   outline: none;
   cursor: pointer;
 }
 
 .nodus-select option {
-  background: #0a192f;
-  color: #ffffff;
+  background: var(--nodus-bg-select-option);
+  color: var(--nodus-color-select-option);
 }
 
-/* 4. Sección de Gráficos */
+/* --- 6. SECCIÓN DE GRÁFICOS RECHARTS --- */
 .nodus-charts-section {
-  background: rgba(17, 34, 64, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--nodus-bg-charts);
+  border: 1px solid var(--nodus-border-charts);
   border-radius: 16px;
   padding: 1.25rem 1.5rem;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--nodus-card-shadow);
+  transition: all 0.3s ease;
 }
 
 .nodus-charts-header {
@@ -214543,7 +214723,7 @@ export default function NewExcellenceModal({ isOpen, onClose, task, onComplete }
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--nodus-chart-header-border);
   padding-bottom: 0.85rem;
   margin-bottom: 1.25rem;
 }
@@ -214565,21 +214745,25 @@ export default function NewExcellenceModal({ isOpen, onClose, task, onComplete }
   font-weight: 600;
   cursor: pointer;
   background: transparent;
-  color: #94a3b8;
+  color: var(--nodus-text-muted);
   border: 1px solid transparent;
   transition: all 0.2s ease;
 }
 
 .nodus-chart-tab-btn:hover {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.05);
+  color: var(--nodus-chart-tab-hover-color);
+  background: var(--nodus-chart-tab-hover);
 }
 
 .nodus-chart-tab-btn.active-tab {
   background: rgba(255, 193, 7, 0.15);
-  color: #ffc107;
+  color: #b45309;
   border-color: rgba(255, 193, 7, 0.4);
   box-shadow: 0 2px 8px rgba(255, 193, 7, 0.15);
+}
+
+[data-theme="dark"] .nodus-chart-tab-btn.active-tab {
+  color: #ffc107;
 }
 
 .nodus-chart-viewport {
@@ -214623,19 +214807,21 @@ export default function NewExcellenceModal({ isOpen, onClose, task, onComplete }
   align-items: center;
   justify-content: space-between;
   padding: 0.6rem 0.85rem;
-  background: rgba(10, 25, 47, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--nodus-legend-bg);
+  border: 1px solid var(--nodus-legend-border);
   border-radius: 10px;
   font-size: 0.8rem;
+  transition: all 0.2s ease;
 }
 
-/* 5. Tabla de Coordinadores */
+/* --- 7. TABLA DE COORDINADORES EJECUTIVA --- */
 .nodus-table-container {
-  background: rgba(17, 34, 64, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--nodus-bg-table);
+  border: 1px solid var(--nodus-border-table);
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--nodus-card-shadow);
+  transition: all 0.3s ease;
 }
 
 .nodus-table-header {
@@ -214643,8 +214829,8 @@ export default function NewExcellenceModal({ isOpen, onClose, task, onComplete }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(10, 25, 47, 0.6);
+  border-bottom: 1px solid var(--nodus-chart-header-border);
+  background: var(--nodus-table-header-bg);
 }
 
 .nodus-table-title {
@@ -214654,7 +214840,7 @@ export default function NewExcellenceModal({ isOpen, onClose, task, onComplete }
   font-family: var(--font-heading, 'Montserrat', sans-serif);
   font-size: 0.95rem;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--nodus-text-title);
 }
 
 .nodus-table-scroll {
@@ -214670,29 +214856,36 @@ export default function NewExcellenceModal({ isOpen, onClose, task, onComplete }
 }
 
 .nodus-th {
-  background: rgba(10, 25, 47, 0.95);
-  color: #94a3b8;
+  background: var(--nodus-th-bg);
+  color: var(--nodus-th-color);
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   padding: 0.85rem 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--nodus-th-border);
   font-weight: 700;
   white-space: nowrap;
+  transition: all 0.2s ease;
 }
 
 .nodus-td {
   padding: 0.9rem 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--nodus-td-border);
   vertical-align: middle;
+  color: var(--nodus-text-main);
+  transition: all 0.2s ease;
+}
+
+.nodus-tr {
+  transition: background 0.15s ease;
 }
 
 .nodus-tr:hover {
-  background: rgba(255, 255, 255, 0.035);
+  background: var(--nodus-tr-hover);
 }
 
 .nodus-tr.expanded-row {
-  background: rgba(255, 193, 7, 0.03);
+  background: var(--nodus-tr-expanded);
 }
 
 /* Badges y Elementos de Celda */
@@ -214702,7 +214895,7 @@ export default function NewExcellenceModal({ isOpen, onClose, task, onComplete }
   border-radius: 50%;
   background: rgba(255, 193, 7, 0.15);
   border: 1px solid rgba(255, 193, 7, 0.4);
-  color: #ffc107;
+  color: #b45309;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -214711,14 +214904,22 @@ export default function NewExcellenceModal({ isOpen, onClose, task, onComplete }
   flex-shrink: 0;
 }
 
+[data-theme="dark"] .nodus-coord-avatar {
+  color: #ffc107;
+}
+
 .nodus-badge-c1c2 {
   font-size: 0.68rem;
   padding: 0.15rem 0.4rem;
   border-radius: 6px;
   background: rgba(139, 92, 246, 0.2);
-  color: #a78bfa;
+  color: #7c3aed;
   border: 1px solid rgba(139, 92, 246, 0.4);
   font-weight: 600;
+}
+
+[data-theme="dark"] .nodus-badge-c1c2 {
+  color: #a78bfa;
 }
 
 .nodus-badge-confirmados {
@@ -214727,8 +214928,12 @@ export default function NewExcellenceModal({ isOpen, onClose, task, onComplete }
   border-radius: 8px;
   background: rgba(16, 185, 129, 0.15);
   border: 1px solid rgba(16, 185, 129, 0.35);
-  color: #10b981;
+  color: #059669;
   font-weight: 800;
+}
+
+[data-theme="dark"] .nodus-badge-confirmados {
+  color: #10b981;
 }
 
 .nodus-badge-asistieron {
@@ -214737,8 +214942,12 @@ export default function NewExcellenceModal({ isOpen, onClose, task, onComplete }
   border-radius: 8px;
   background: rgba(14, 165, 233, 0.15);
   border: 1px solid rgba(14, 165, 233, 0.35);
-  color: #38bdf8;
+  color: #0284c7;
   font-weight: 800;
+}
+
+[data-theme="dark"] .nodus-badge-asistieron {
+  color: #38bdf8;
 }
 
 .nodus-btn-expand {
@@ -214750,14 +214959,14 @@ export default function NewExcellenceModal({ isOpen, onClose, task, onComplete }
   font-size: 0.75rem;
   font-weight: 700;
   cursor: pointer;
-  background: rgba(10, 25, 47, 0.9);
-  color: #ffc107;
-  border: 1px solid rgba(255, 193, 7, 0.35);
+  background: var(--nodus-btn-expand-bg);
+  color: var(--nodus-btn-expand-color);
+  border: 1px solid var(--nodus-btn-expand-border);
   transition: all 0.2s ease;
 }
 
 .nodus-btn-expand:hover {
-  background: rgba(255, 193, 7, 0.2);
+  background: var(--nodus-btn-expand-hover);
   border-color: #ffc107;
 }
 
@@ -214768,31 +214977,43 @@ export default function NewExcellenceModal({ isOpen, onClose, task, onComplete }
 }
 
 /* Sub-tabla anidada de equipos */
+.nodus-nested-wrapper {
+  padding: 0.75rem 1.5rem;
+  background: var(--nodus-nested-wrapper-bg);
+  transition: background 0.3s ease;
+}
+
 .nodus-nested-panel {
-  background: rgba(10, 25, 47, 0.95);
-  border: 1px solid rgba(255, 193, 7, 0.25);
+  background: var(--nodus-nested-panel-bg);
+  border: 1px solid var(--nodus-nested-border);
   border-radius: 12px;
   padding: 1rem;
   margin: 0.5rem 0;
-  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
 }
 
 .nodus-nested-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--nodus-chart-header-border);
   padding-bottom: 0.5rem;
   margin-bottom: 0.75rem;
 }
 
 .nodus-nested-title {
-  color: #ffc107;
+  color: #d97706;
   font-size: 0.8rem;
   font-weight: 700;
   display: flex;
   align-items: center;
   gap: 0.45rem;
+  margin: 0;
+}
+
+[data-theme="dark"] .nodus-nested-title {
+  color: #ffc107;
 }
 
 .nodus-nested-table {
@@ -214802,16 +215023,18 @@ export default function NewExcellenceModal({ isOpen, onClose, task, onComplete }
 }
 
 .nodus-nested-th {
-  color: #94a3b8;
+  background: var(--nodus-nested-th-bg);
+  color: var(--nodus-nested-th-color);
   font-size: 0.68rem;
   text-transform: uppercase;
   padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--nodus-nested-td-border);
 }
 
 .nodus-nested-td {
   padding: 0.55rem 0.75rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid var(--nodus-nested-td-border);
+  color: var(--nodus-text-main);
 }
 
 ```
@@ -214834,6 +215057,8 @@ import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip,
   Legend, CartesianGrid, Cell, PieChart, Pie, ComposedChart, Line
 } from 'recharts';
+import { useTheme } from '../context/ThemeContext';
+import ThemeSelector from './ThemeSelector';
 import './NodusCoordinadoresC1C2Dashboard.css';
 
 const COLORS = {
@@ -214850,6 +215075,23 @@ const COLORS = {
 const PIE_COLORS = ['#10b981', '#f59e0b', '#64748b', '#3b82f6', '#ef4444'];
 
 export default function NodusCoordinadoresC1C2Dashboard() {
+  const { activeTheme } = useTheme();
+  const isLight = activeTheme === 'light';
+
+  const gridStroke = isLight ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.08)';
+  const axisStroke = isLight ? '#64748b' : '#94a3b8';
+  const chartTooltipStyle = useMemo(() => ({
+    backgroundColor: isLight ? '#ffffff' : '#0a192f',
+    borderColor: isLight ? 'rgba(15, 23, 42, 0.15)' : '#334155',
+    borderRadius: '12px',
+    color: isLight ? '#0f172a' : '#ffffff',
+    boxShadow: isLight ? '0 10px 25px rgba(0,0,0,0.1)' : '0 10px 30px rgba(0,0,0,0.6)',
+    fontSize: '12px'
+  }), [isLight]);
+  const chartItemStyle = useMemo(() => ({
+    color: isLight ? '#0f172a' : '#ffffff',
+    padding: '2px 0'
+  }), [isLight]);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -215091,9 +215333,9 @@ export default function NodusCoordinadoresC1C2Dashboard() {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', gap: '1rem', background: 'rgba(17, 34, 64, 0.7)', borderRadius: '16px', border: '1px solid rgba(255, 255, 255, 0.08)', color: '#94a3b8' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem', gap: '1rem', background: 'var(--nodus-bg-card, rgba(17, 34, 64, 0.7))', borderRadius: '16px', border: '1px solid var(--nodus-border-card, rgba(255, 255, 255, 0.08))', color: 'var(--nodus-text-sub, #94a3b8)' }}>
         <RefreshCw size={36} color="#ffc107" style={{ animation: 'spin 1s linear infinite' }} />
-        <p style={{ fontSize: '1rem', fontWeight: 600, color: '#f8fafc', margin: 0 }}>Cargando datos ejecutivos de Coordinadores C1 & C2...</p>
+        <p style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--nodus-text-title, #f8fafc)', margin: 0 }}>Cargando datos ejecutivos de Coordinadores C1 & C2...</p>
         <p style={{ fontSize: '0.78rem', color: '#64748b', margin: 0 }}>Conectando con el enjambre de agentes autónomos Nodus</p>
       </div>
     );
@@ -215119,6 +215361,8 @@ export default function NodusCoordinadoresC1C2Dashboard() {
         </div>
 
         <div className="nodus-header-right">
+          <ThemeSelector compact={false} />
+
           <div className="nodus-sync-indicator">
             <span className="nodus-pulse-dot" />
             <span>Sincronizado: <strong style={{ color: '#10b981' }}>{timeSinceSync}</strong></span>
@@ -215152,8 +215396,8 @@ export default function NodusCoordinadoresC1C2Dashboard() {
             <span>Gestiones Totales</span>
             <PhoneCall size={16} color="#0ea5e9" />
           </div>
-          <div className="nodus-card-value" style={{ color: '#38bdf8' }}>{aggregatedStats.totalGestiones.toLocaleString()}</div>
-          <div className="nodus-card-footer" style={{ color: '#38bdf8' }}>Llamadas realizadas</div>
+          <div className="nodus-card-value highlight-sky">{aggregatedStats.totalGestiones.toLocaleString()}</div>
+          <div className="nodus-card-footer">Llamadas realizadas</div>
         </div>
 
         <div className="nodus-card">
@@ -215326,14 +215570,11 @@ export default function NodusCoordinadoresC1C2Dashboard() {
           {activeChartTab === 'coordinadores' && (
             <ResponsiveContainer width="100%" height={380}>
               <BarChart data={chartCoordinadoresData} margin={{ top: 10, right: 20, left: 0, bottom: 25 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.5} />
-                <XAxis dataKey="name" stroke="#94a3b8" fontSize={11} angle={-25} textAnchor="end" height={50} />
-                <YAxis stroke="#94a3b8" fontSize={11} />
-                <Tooltip
-                  contentStyle={{ backgroundColor: '#0a192f', borderColor: '#334155', borderRadius: '12px', color: '#fff', fontSize: '12px' }}
-                  itemStyle={{ padding: '2px 0' }}
-                />
-                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '8px' }} />
+                <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} />
+                <XAxis dataKey="name" stroke={axisStroke} fontSize={11} angle={-25} textAnchor="end" height={50} />
+                <YAxis stroke={axisStroke} fontSize={11} />
+                <Tooltip contentStyle={chartTooltipStyle} itemStyle={chartItemStyle} />
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '8px', color: isLight ? '#334155' : '#cbd5e1' }} />
                 <Bar dataKey="gestiones" name="Gestiones Totales" fill="#0ea5e9" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="confirmados" name="Confirmados" fill="#10b981" radius={[4, 4, 0, 0]} />
                 <Bar dataKey="c1" name="Capítulo 1" fill="#eab308" radius={[4, 4, 0, 0]} />
@@ -215345,14 +215586,12 @@ export default function NodusCoordinadoresC1C2Dashboard() {
           {activeChartTab === 'sedes' && (
             <ResponsiveContainer width="100%" height={380}>
               <ComposedChart data={chartSedesData} margin={{ top: 10, right: 20, left: 0, bottom: 10 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.5} />
-                <XAxis dataKey="sede" stroke="#94a3b8" fontSize={12} />
-                <YAxis stroke="#94a3b8" fontSize={11} />
-                <Tooltip
-                  contentStyle={{ backgroundColor: '#0a192f', borderColor: '#334155', borderRadius: '12px', color: '#fff', fontSize: '12px' }}
-                />
-                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '8px' }} />
-                <Bar dataKey="gestiones" name="Gestiones Realizadas" fill="#3b82f6" radius={[6, 6, 0, 0]} />
+                <CartesianGrid strokeDasharray="3 3" stroke={gridStroke} />
+                <XAxis dataKey="sede" stroke={axisStroke} fontSize={12} />
+                <YAxis stroke={axisStroke} fontSize={11} />
+                <Tooltip contentStyle={chartTooltipStyle} itemStyle={chartItemStyle} />
+                <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '8px', color: isLight ? '#334155' : '#cbd5e1' }} />
+                <Bar dataKey="gestiones" name="Gestiones Realizadas" fill={isLight ? '#0284c7' : '#38bdf8'} radius={[6, 6, 0, 0]} />
                 <Bar dataKey="confirmados" name="Confirmados" fill="#10b981" radius={[6, 6, 0, 0]} />
                 <Line type="monotone" dataKey="asignados" name="Participantes Asignados" stroke="#f59e0b" strokeWidth={3} dot={{ r: 4 }} />
               </ComposedChart>
@@ -215379,9 +215618,7 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                         <Cell key={`cell-${index}`} fill={entry.color || PIE_COLORS[index % PIE_COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip
-                      contentStyle={{ backgroundColor: '#0a192f', borderColor: '#334155', borderRadius: '12px', color: '#fff', fontSize: '12px' }}
-                    />
+                    <Tooltip contentStyle={chartTooltipStyle} itemStyle={chartItemStyle} />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
@@ -215391,9 +215628,9 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                   <div key={idx} className="nodus-legend-item">
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                       <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: e.color }} />
-                      <span style={{ color: '#cbd5e1', fontWeight: 500 }}>{e.name}</span>
+                      <span style={{ color: isLight ? '#334155' : '#cbd5e1', fontWeight: 500 }}>{e.name}</span>
                     </div>
-                    <span style={{ fontWeight: 800, color: '#ffffff' }}>{e.value.toLocaleString()}</span>
+                    <span style={{ fontWeight: 800, color: isLight ? '#0f172a' : '#ffffff' }}>{e.value.toLocaleString()}</span>
                   </div>
                 ))}
               </div>
@@ -215453,7 +215690,7 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                               {coord.nombre.slice(0, 2)}
                             </div>
                             <div>
-                              <div style={{ fontWeight: 700, color: '#ffffff', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                              <div style={{ fontWeight: 700, color: 'var(--nodus-text-title)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                                 {coord.nombre}
                                 {coord.c2 > 0 && (
                                   <span className="nodus-badge-c1c2">C1+C2</span>
@@ -215469,7 +215706,7 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                         {/* Sede & Ciclo */}
                         <td className="nodus-td">
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
-                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: '#f1f5f9', fontWeight: 600 }}>
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: 'var(--nodus-text-title)', fontWeight: 600 }}>
                               <MapPin size={13} color="#ffc107" />
                               {coord.sede}
                             </span>
@@ -215492,7 +215729,7 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                         </td>
 
                         {/* Asignados */}
-                        <td className="nodus-td" style={{ textAlign: 'right', color: '#cbd5e1', fontWeight: 600 }}>
+                        <td className="nodus-td" style={{ textAlign: 'right', color: 'var(--nodus-text-main)', fontWeight: 600 }}>
                           {coord.asignados.toLocaleString()}
                         </td>
 
@@ -215500,7 +215737,7 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                         <td className="nodus-td" style={{ textAlign: 'center' }}>
                           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
                             <span style={{ fontWeight: 800, color: '#ffc107' }}>{coord.coberturaPct}%</span>
-                            <div style={{ width: '60px', height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
+                            <div style={{ width: '60px', height: '4px', background: 'var(--nodus-progress-bg)', borderRadius: '2px', overflow: 'hidden' }}>
                               <div style={{ width: `${coord.coberturaPct}%`, height: '100%', background: '#ffc107', borderRadius: '2px' }} />
                             </div>
                             <span style={{ fontSize: '0.68rem', color: '#64748b' }}>{coord.coberturaDetalle?.split(' ')[0]}</span>
@@ -215511,7 +215748,7 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                         <td className="nodus-td" style={{ textAlign: 'center' }}>
                           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
                             <span style={{ fontWeight: 800, color: '#14b8a6' }}>{coord.productividadPct}%</span>
-                            <div style={{ width: '60px', height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
+                            <div style={{ width: '60px', height: '4px', background: 'var(--nodus-progress-bg)', borderRadius: '2px', overflow: 'hidden' }}>
                               <div style={{ width: `${coord.productividadPct}%`, height: '100%', background: '#14b8a6', borderRadius: '2px' }} />
                             </div>
                             <span style={{ fontSize: '0.68rem', color: '#64748b' }}>{coord.productividadDetalle?.split(' ')[0]}</span>
@@ -215556,7 +215793,7 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                       {/* SUBTABLA ANIDADA */}
                       {isExpanded && hasEquipos && (
                         <tr>
-                          <td colSpan={11} style={{ padding: '0.75rem 1.5rem', background: 'rgba(10, 25, 47, 0.98)' }}>
+                          <td colSpan={11} className="nodus-nested-wrapper">
                             <div className="nodus-nested-panel">
                               <div className="nodus-nested-header">
                                 <h4 className="nodus-nested-title">
@@ -215587,7 +215824,7 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                                       const tasaAsist = eq.confirmado > 0 ? Math.round((eq.asistieron / eq.confirmado) * 100) : 0;
                                       return (
                                         <tr key={eqIdx} style={{ transition: 'background 0.15s ease' }}>
-                                          <td className="nodus-nested-td" style={{ fontWeight: 700, color: '#ffffff' }}>
+                                          <td className="nodus-nested-td" style={{ fontWeight: 700, color: 'var(--nodus-text-title)' }}>
                                             {eq.equipo}
                                           </td>
                                           <td className="nodus-nested-td" style={{ textAlign: 'right', color: '#38bdf8', fontWeight: 600 }}>
@@ -215614,9 +215851,9 @@ export default function NodusCoordinadoresC1C2Dashboard() {
                                               borderRadius: '6px',
                                               fontSize: '0.72rem',
                                               fontWeight: 700,
-                                              background: tasaAsist >= 80 ? 'rgba(16, 185, 129, 0.2)' : tasaAsist >= 50 ? 'rgba(245, 158, 11, 0.2)' : 'rgba(255, 255, 255, 0.08)',
-                                              color: tasaAsist >= 80 ? '#10b981' : tasaAsist >= 50 ? '#f59e0b' : '#94a3b8',
-                                              border: `1px solid ${tasaAsist >= 80 ? 'rgba(16, 185, 129, 0.4)' : tasaAsist >= 50 ? 'rgba(245, 158, 11, 0.4)' : 'rgba(255, 255, 255, 0.1)'}`
+                                              background: tasaAsist >= 80 ? 'rgba(16, 185, 129, 0.18)' : tasaAsist >= 50 ? 'rgba(245, 158, 11, 0.18)' : (isLight ? 'rgba(100, 116, 139, 0.12)' : 'rgba(255, 255, 255, 0.08)'),
+                                              color: tasaAsist >= 80 ? (isLight ? '#059669' : '#10b981') : tasaAsist >= 50 ? (isLight ? '#b45309' : '#fbbf24') : (isLight ? '#475569' : '#94a3b8'),
+                                              border: `1px solid ${tasaAsist >= 80 ? 'rgba(16, 185, 129, 0.4)' : tasaAsist >= 50 ? 'rgba(245, 158, 11, 0.4)' : (isLight ? 'rgba(100, 116, 139, 0.25)' : 'rgba(255, 255, 255, 0.1)')}`
                                             }}>
                                               {tasaAsist}%
                                             </span>
@@ -267332,6 +267569,7 @@ import { OPERATIONAL_SEDES } from '../data/usersData';
 import DriveDashboard from '../components/DriveDashboard';
 import CMJDashboard from '../components/CMJDashboard';
 import NodusCoordinadoresC1C2Dashboard from '../components/NodusCoordinadoresC1C2Dashboard';
+import ThemeSelector from '../components/ThemeSelector';
 
 export default function AuditoriaKPIs() {
   const { currentUser } = useAuth();
@@ -267790,9 +268028,9 @@ export default function AuditoriaKPIs() {
   };
 
   return (
-    <div style={{ maxWidth: '1080px', margin: '0 auto', padding: '2rem 1rem' }}>
+    <div style={{ maxWidth: activeTab === 'coordinadores_nodus' ? '1420px' : '1080px', margin: '0 auto', padding: '1.5rem 1rem', transition: 'max-width 0.3s ease' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-        <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center', flexWrap: 'wrap' }}>
           <button onClick={() => navigate('/gerente')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <ArrowLeft size={16} /> Volver a Causa OS
           </button>
@@ -267814,6 +268052,7 @@ export default function AuditoriaKPIs() {
             📊 Embudo C1 ➔ C2 ➔ MJ
           </button>
         </div>
+        <ThemeSelector />
       </div>
 
         {/* Dashboards Integrados Tabs */}

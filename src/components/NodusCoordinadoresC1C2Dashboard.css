@@ -1,16 +1,153 @@
-﻿/* =========================================================================
+/* =========================================================================
    ESTILOS EJECUTIVOS: NODUS COORDINADORES C1 & C2 DASHBOARD
    CREAR PODER SIN LÍMITES - CAUSA OS
+   SOPORTE IMPECABLE MODO DÍA, NOCHE Y AUTO
    ========================================================================= */
 
+/* --- 1. DEFINICIÓN DE VARIABLES DE TEMA (DARK / NOCHE POR DEFECTO) --- */
 .nodus-dashboard-container {
+  --nodus-bg-banner: linear-gradient(135deg, rgba(17, 34, 64, 0.95) 0%, rgba(10, 25, 47, 0.98) 100%);
+  --nodus-border-banner: rgba(255, 193, 7, 0.35);
+  --nodus-banner-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+
+  --nodus-bg-card: rgba(17, 34, 64, 0.75);
+  --nodus-bg-card-hover: rgba(23, 42, 77, 0.9);
+  --nodus-border-card: rgba(255, 255, 255, 0.08);
+  --nodus-border-card-hover: rgba(255, 193, 7, 0.4);
+  --nodus-card-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  --nodus-card-shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.45);
+
+  --nodus-bg-filters: rgba(17, 34, 64, 0.85);
+  --nodus-border-filters: rgba(255, 255, 255, 0.1);
+
+  --nodus-bg-input: rgba(10, 25, 47, 0.8);
+  --nodus-border-input: rgba(255, 255, 255, 0.12);
+  --nodus-color-input: #ffffff;
+  --nodus-placeholder-input: #64748b;
+
+  --nodus-bg-select-item: rgba(10, 25, 47, 0.8);
+  --nodus-border-select-item: rgba(255, 255, 255, 0.12);
+  --nodus-color-select: #e2e8f0;
+  --nodus-bg-select-option: #0a192f;
+  --nodus-color-select-option: #ffffff;
+
+  --nodus-bg-charts: rgba(17, 34, 64, 0.85);
+  --nodus-border-charts: rgba(255, 255, 255, 0.1);
+  --nodus-chart-header-border: rgba(255, 255, 255, 0.08);
+  --nodus-chart-tab-hover: rgba(255, 255, 255, 0.05);
+  --nodus-chart-tab-hover-color: #ffffff;
+  --nodus-legend-bg: rgba(10, 25, 47, 0.7);
+  --nodus-legend-border: rgba(255, 255, 255, 0.08);
+
+  --nodus-bg-table: rgba(17, 34, 64, 0.85);
+  --nodus-border-table: rgba(255, 255, 255, 0.1);
+  --nodus-table-header-bg: rgba(10, 25, 47, 0.6);
+  --nodus-th-bg: rgba(10, 25, 47, 0.95);
+  --nodus-th-color: #94a3b8;
+  --nodus-th-border: rgba(255, 255, 255, 0.1);
+  --nodus-td-border: rgba(255, 255, 255, 0.05);
+  --nodus-tr-hover: rgba(255, 255, 255, 0.035);
+  --nodus-tr-expanded: rgba(255, 193, 7, 0.03);
+
+  --nodus-btn-expand-bg: rgba(10, 25, 47, 0.9);
+  --nodus-btn-expand-border: rgba(255, 193, 7, 0.35);
+  --nodus-btn-expand-color: #ffc107;
+  --nodus-btn-expand-hover: rgba(255, 193, 7, 0.2);
+
+  --nodus-nested-wrapper-bg: rgba(10, 25, 47, 0.98);
+  --nodus-nested-panel-bg: rgba(10, 25, 47, 0.95);
+  --nodus-nested-border: rgba(255, 193, 7, 0.25);
+  --nodus-nested-th-bg: rgba(10, 25, 47, 0.9);
+  --nodus-nested-th-color: #94a3b8;
+  --nodus-nested-td-border: rgba(255, 255, 255, 0.04);
+
+  --nodus-text-main: #f8fafc;
+  --nodus-text-title: #ffffff;
+  --nodus-text-sub: #94a3b8;
+  --nodus-text-muted: #64748b;
+  --nodus-progress-bg: rgba(255, 255, 255, 0.1);
+
+  --nodus-sync-bg: rgba(10, 25, 47, 0.8);
+  --nodus-sync-border: rgba(255, 255, 255, 0.12);
+  --nodus-sync-text: #cbd5e1;
+
   width: 100%;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
   font-family: var(--font-body, 'Inter', sans-serif);
-  color: #f8fafc;
+  color: var(--nodus-text-main);
   box-sizing: border-box;
+  transition: color 0.3s ease;
+}
+
+/* --- 2. OVERRIDES PARA MODO DÍA (LIGHT MODE) --- */
+[data-theme="light"] .nodus-dashboard-container,
+.theme-light .nodus-dashboard-container {
+  --nodus-bg-banner: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  --nodus-border-banner: rgba(217, 119, 6, 0.35);
+  --nodus-banner-shadow: 0 4px 20px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 1);
+
+  --nodus-bg-card: #ffffff;
+  --nodus-bg-card-hover: #fcfcfd;
+  --nodus-border-card: rgba(15, 23, 42, 0.12);
+  --nodus-border-card-hover: rgba(217, 119, 6, 0.45);
+  --nodus-card-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  --nodus-card-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.08);
+
+  --nodus-bg-filters: #ffffff;
+  --nodus-border-filters: rgba(15, 23, 42, 0.12);
+
+  --nodus-bg-input: #f8fafc;
+  --nodus-border-input: rgba(15, 23, 42, 0.2);
+  --nodus-color-input: #0f172a;
+  --nodus-placeholder-input: #94a3b8;
+
+  --nodus-bg-select-item: #f8fafc;
+  --nodus-border-select-item: rgba(15, 23, 42, 0.15);
+  --nodus-color-select: #0f172a;
+  --nodus-bg-select-option: #ffffff;
+  --nodus-color-select-option: #0f172a;
+
+  --nodus-bg-charts: #ffffff;
+  --nodus-border-charts: rgba(15, 23, 42, 0.12);
+  --nodus-chart-header-border: rgba(15, 23, 42, 0.1);
+  --nodus-chart-tab-hover: #f1f5f9;
+  --nodus-chart-tab-hover-color: #0f172a;
+  --nodus-legend-bg: #f8fafc;
+  --nodus-legend-border: rgba(15, 23, 42, 0.1);
+
+  --nodus-bg-table: #ffffff;
+  --nodus-border-table: rgba(15, 23, 42, 0.12);
+  --nodus-table-header-bg: #f8fafc;
+  --nodus-th-bg: #f1f5f9;
+  --nodus-th-color: #475569;
+  --nodus-th-border: rgba(15, 23, 42, 0.12);
+  --nodus-td-border: rgba(15, 23, 42, 0.08);
+  --nodus-tr-hover: #f8fafc;
+  --nodus-tr-expanded: rgba(245, 158, 11, 0.05);
+
+  --nodus-btn-expand-bg: #f8fafc;
+  --nodus-btn-expand-border: rgba(217, 119, 6, 0.4);
+  --nodus-btn-expand-color: #b45309;
+  --nodus-btn-expand-hover: rgba(245, 158, 11, 0.15);
+
+  --nodus-nested-wrapper-bg: #f8fafc;
+  --nodus-nested-panel-bg: #ffffff;
+  --nodus-nested-border: rgba(217, 119, 6, 0.3);
+  --nodus-nested-th-bg: #f1f5f9;
+  --nodus-nested-th-color: #475569;
+  --nodus-nested-td-border: rgba(15, 23, 42, 0.08);
+
+  --nodus-text-main: #0f172a;
+  --nodus-text-title: #0f172a;
+  --nodus-text-sub: #475569;
+  --nodus-text-muted: #64748b;
+  --nodus-progress-bg: rgba(15, 23, 42, 0.08);
+
+  --nodus-sync-bg: #f1f5f9;
+  --nodus-sync-border: rgba(15, 23, 42, 0.12);
+  --nodus-sync-text: #334155;
 }
 
 .nodus-dashboard-container *,
@@ -19,7 +156,7 @@
   box-sizing: border-box;
 }
 
-/* 1. Header Banner */
+/* --- 3. HEADER BANNER EJECUTIVO --- */
 .nodus-header-banner {
   display: flex;
   justify-content: space-between;
@@ -27,11 +164,12 @@
   flex-wrap: wrap;
   gap: 1.25rem;
   padding: 1.25rem 1.75rem;
-  background: linear-gradient(135deg, rgba(17, 34, 64, 0.95) 0%, rgba(10, 25, 47, 0.98) 100%);
-  border: 1px solid rgba(255, 193, 7, 0.35);
+  background: var(--nodus-bg-banner);
+  border: 1px solid var(--nodus-border-banner);
   border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  box-shadow: var(--nodus-banner-shadow);
   backdrop-filter: blur(16px);
+  transition: all 0.3s ease;
 }
 
 .nodus-header-left {
@@ -57,12 +195,13 @@
   font-family: var(--font-heading, 'Montserrat', sans-serif);
   font-size: 1.35rem;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--nodus-text-title);
   margin: 0;
   display: flex;
   align-items: center;
   gap: 0.6rem;
   flex-wrap: wrap;
+  transition: color 0.3s ease;
 }
 
 .nodus-badge-live {
@@ -71,21 +210,27 @@
   padding: 0.2rem 0.6rem;
   border-radius: 20px;
   background: rgba(255, 193, 7, 0.18);
-  color: #ffc107;
+  color: #d97706;
   border: 1px solid rgba(255, 193, 7, 0.4);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
+[data-theme="dark"] .nodus-badge-live {
+  color: #ffc107;
+}
+
 .nodus-header-subtitle {
-  font-size: 0.8rem;
-  color: #94a3b8;
+  font-size: 0.82rem;
+  color: var(--nodus-text-sub);
   margin: 0.25rem 0 0 0;
+  transition: color 0.3s ease;
 }
 
 .nodus-header-right {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 0.75rem;
 }
 
@@ -94,11 +239,12 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.45rem 0.85rem;
-  background: rgba(10, 25, 47, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--nodus-sync-bg);
+  border: 1px solid var(--nodus-sync-border);
   border-radius: 10px;
   font-size: 0.78rem;
-  color: #cbd5e1;
+  color: var(--nodus-sync-text);
+  transition: all 0.3s ease;
 }
 
 .nodus-pulse-dot {
@@ -109,6 +255,23 @@
   background: #10b981;
 }
 
+.nodus-pulse-dot::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.5);
+  animation: pulse-ring 2s infinite ease-out;
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.8); opacity: 0.8; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+
 .nodus-btn-refresh {
   display: flex;
   align-items: center;
@@ -116,12 +279,16 @@
   padding: 0.48rem 0.9rem;
   background: rgba(255, 193, 7, 0.15);
   border: 1px solid rgba(255, 193, 7, 0.4);
-  color: #ffc107;
+  color: #b45309;
   border-radius: 10px;
   font-size: 0.78rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
+}
+
+[data-theme="dark"] .nodus-btn-refresh {
+  color: #ffc107;
 }
 
 .nodus-btn-refresh:hover:not(:disabled) {
@@ -135,7 +302,7 @@
   cursor: not-allowed;
 }
 
-/* 2. Scorecards Grid */
+/* --- 4. SCORECARDS EJECUTIVAS --- */
 .nodus-scorecards-grid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
@@ -162,29 +329,30 @@
 }
 
 .nodus-card {
-  background: rgba(17, 34, 64, 0.75);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--nodus-bg-card);
+  border: 1px solid var(--nodus-border-card);
   border-radius: 14px;
   padding: 1.1rem 1.25rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--nodus-card-shadow);
   transition: all 0.25s ease;
   backdrop-filter: blur(10px);
 }
 
 .nodus-card:hover {
-  border-color: rgba(255, 193, 7, 0.35);
+  background: var(--nodus-bg-card-hover);
+  border-color: var(--nodus-border-card-hover);
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.45);
+  box-shadow: var(--nodus-card-shadow-hover);
 }
 
 .nodus-card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  color: #94a3b8;
+  color: var(--nodus-text-muted);
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -196,24 +364,33 @@
   font-family: var(--font-heading, 'Montserrat', sans-serif);
   font-size: 1.7rem;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--nodus-text-title);
   line-height: 1.2;
+  transition: color 0.3s ease;
 }
 
 .nodus-card-value.highlight-emerald {
   color: #10b981;
 }
 
+.nodus-card-value.highlight-sky {
+  color: #0284c7;
+}
+
+[data-theme="dark"] .nodus-card-value.highlight-sky {
+  color: #38bdf8;
+}
+
 .nodus-card-footer {
   font-size: 0.75rem;
-  color: #94a3b8;
+  color: var(--nodus-text-muted);
   margin-top: 0.4rem;
 }
 
 .nodus-progress-bar {
   width: 100%;
   height: 6px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--nodus-progress-bg);
   border-radius: 4px;
   overflow: hidden;
   margin-top: 0.5rem;
@@ -225,16 +402,17 @@
   transition: width 0.5s ease-in-out;
 }
 
-/* 3. Barra de Filtros */
+/* --- 5. BARRA DE FILTROS MULTIDIMENSIONALES --- */
 .nodus-filters-bar {
-  background: rgba(17, 34, 64, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--nodus-bg-filters);
+  border: 1px solid var(--nodus-border-filters);
   border-radius: 14px;
   padding: 1rem 1.25rem;
   display: flex;
   flex-direction: column;
   gap: 0.85rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+  box-shadow: var(--nodus-card-shadow);
+  transition: all 0.3s ease;
 }
 
 .nodus-filters-row {
@@ -257,17 +435,17 @@
   left: 0.85rem;
   top: 50%;
   transform: translateY(-50%);
-  color: #94a3b8;
+  color: var(--nodus-text-muted);
   pointer-events: none;
 }
 
 .nodus-search-input {
   width: 100%;
   padding: 0.55rem 0.85rem 0.55rem 2.4rem;
-  background: rgba(10, 25, 47, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--nodus-bg-input);
+  border: 1px solid var(--nodus-border-input);
   border-radius: 10px;
-  color: #ffffff;
+  color: var(--nodus-color-input);
   font-size: 0.82rem;
   outline: none;
   transition: all 0.2s ease;
@@ -279,7 +457,7 @@
 }
 
 .nodus-search-input::placeholder {
-  color: #64748b;
+  color: var(--nodus-placeholder-input);
 }
 
 .nodus-select-group {
@@ -293,33 +471,35 @@
   display: flex;
   align-items: center;
   gap: 0.45rem;
-  background: rgba(10, 25, 47, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--nodus-bg-select-item);
+  border: 1px solid var(--nodus-border-select-item);
   border-radius: 10px;
   padding: 0.45rem 0.75rem;
+  transition: all 0.2s ease;
 }
 
 .nodus-select {
   background: transparent;
   border: none;
-  color: #e2e8f0;
+  color: var(--nodus-color-select);
   font-size: 0.8rem;
   outline: none;
   cursor: pointer;
 }
 
 .nodus-select option {
-  background: #0a192f;
-  color: #ffffff;
+  background: var(--nodus-bg-select-option);
+  color: var(--nodus-color-select-option);
 }
 
-/* 4. Sección de Gráficos */
+/* --- 6. SECCIÓN DE GRÁFICOS RECHARTS --- */
 .nodus-charts-section {
-  background: rgba(17, 34, 64, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--nodus-bg-charts);
+  border: 1px solid var(--nodus-border-charts);
   border-radius: 16px;
   padding: 1.25rem 1.5rem;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--nodus-card-shadow);
+  transition: all 0.3s ease;
 }
 
 .nodus-charts-header {
@@ -328,7 +508,7 @@
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--nodus-chart-header-border);
   padding-bottom: 0.85rem;
   margin-bottom: 1.25rem;
 }
@@ -350,21 +530,25 @@
   font-weight: 600;
   cursor: pointer;
   background: transparent;
-  color: #94a3b8;
+  color: var(--nodus-text-muted);
   border: 1px solid transparent;
   transition: all 0.2s ease;
 }
 
 .nodus-chart-tab-btn:hover {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.05);
+  color: var(--nodus-chart-tab-hover-color);
+  background: var(--nodus-chart-tab-hover);
 }
 
 .nodus-chart-tab-btn.active-tab {
   background: rgba(255, 193, 7, 0.15);
-  color: #ffc107;
+  color: #b45309;
   border-color: rgba(255, 193, 7, 0.4);
   box-shadow: 0 2px 8px rgba(255, 193, 7, 0.15);
+}
+
+[data-theme="dark"] .nodus-chart-tab-btn.active-tab {
+  color: #ffc107;
 }
 
 .nodus-chart-viewport {
@@ -408,19 +592,21 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.6rem 0.85rem;
-  background: rgba(10, 25, 47, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--nodus-legend-bg);
+  border: 1px solid var(--nodus-legend-border);
   border-radius: 10px;
   font-size: 0.8rem;
+  transition: all 0.2s ease;
 }
 
-/* 5. Tabla de Coordinadores */
+/* --- 7. TABLA DE COORDINADORES EJECUTIVA --- */
 .nodus-table-container {
-  background: rgba(17, 34, 64, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--nodus-bg-table);
+  border: 1px solid var(--nodus-border-table);
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--nodus-card-shadow);
+  transition: all 0.3s ease;
 }
 
 .nodus-table-header {
@@ -428,8 +614,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(10, 25, 47, 0.6);
+  border-bottom: 1px solid var(--nodus-chart-header-border);
+  background: var(--nodus-table-header-bg);
 }
 
 .nodus-table-title {
@@ -439,7 +625,7 @@
   font-family: var(--font-heading, 'Montserrat', sans-serif);
   font-size: 0.95rem;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--nodus-text-title);
 }
 
 .nodus-table-scroll {
@@ -455,29 +641,36 @@
 }
 
 .nodus-th {
-  background: rgba(10, 25, 47, 0.95);
-  color: #94a3b8;
+  background: var(--nodus-th-bg);
+  color: var(--nodus-th-color);
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   padding: 0.85rem 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--nodus-th-border);
   font-weight: 700;
   white-space: nowrap;
+  transition: all 0.2s ease;
 }
 
 .nodus-td {
   padding: 0.9rem 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--nodus-td-border);
   vertical-align: middle;
+  color: var(--nodus-text-main);
+  transition: all 0.2s ease;
+}
+
+.nodus-tr {
+  transition: background 0.15s ease;
 }
 
 .nodus-tr:hover {
-  background: rgba(255, 255, 255, 0.035);
+  background: var(--nodus-tr-hover);
 }
 
 .nodus-tr.expanded-row {
-  background: rgba(255, 193, 7, 0.03);
+  background: var(--nodus-tr-expanded);
 }
 
 /* Badges y Elementos de Celda */
@@ -487,7 +680,7 @@
   border-radius: 50%;
   background: rgba(255, 193, 7, 0.15);
   border: 1px solid rgba(255, 193, 7, 0.4);
-  color: #ffc107;
+  color: #b45309;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -496,14 +689,22 @@
   flex-shrink: 0;
 }
 
+[data-theme="dark"] .nodus-coord-avatar {
+  color: #ffc107;
+}
+
 .nodus-badge-c1c2 {
   font-size: 0.68rem;
   padding: 0.15rem 0.4rem;
   border-radius: 6px;
   background: rgba(139, 92, 246, 0.2);
-  color: #a78bfa;
+  color: #7c3aed;
   border: 1px solid rgba(139, 92, 246, 0.4);
   font-weight: 600;
+}
+
+[data-theme="dark"] .nodus-badge-c1c2 {
+  color: #a78bfa;
 }
 
 .nodus-badge-confirmados {
@@ -512,8 +713,12 @@
   border-radius: 8px;
   background: rgba(16, 185, 129, 0.15);
   border: 1px solid rgba(16, 185, 129, 0.35);
-  color: #10b981;
+  color: #059669;
   font-weight: 800;
+}
+
+[data-theme="dark"] .nodus-badge-confirmados {
+  color: #10b981;
 }
 
 .nodus-badge-asistieron {
@@ -522,8 +727,12 @@
   border-radius: 8px;
   background: rgba(14, 165, 233, 0.15);
   border: 1px solid rgba(14, 165, 233, 0.35);
-  color: #38bdf8;
+  color: #0284c7;
   font-weight: 800;
+}
+
+[data-theme="dark"] .nodus-badge-asistieron {
+  color: #38bdf8;
 }
 
 .nodus-btn-expand {
@@ -535,14 +744,14 @@
   font-size: 0.75rem;
   font-weight: 700;
   cursor: pointer;
-  background: rgba(10, 25, 47, 0.9);
-  color: #ffc107;
-  border: 1px solid rgba(255, 193, 7, 0.35);
+  background: var(--nodus-btn-expand-bg);
+  color: var(--nodus-btn-expand-color);
+  border: 1px solid var(--nodus-btn-expand-border);
   transition: all 0.2s ease;
 }
 
 .nodus-btn-expand:hover {
-  background: rgba(255, 193, 7, 0.2);
+  background: var(--nodus-btn-expand-hover);
   border-color: #ffc107;
 }
 
@@ -553,31 +762,43 @@
 }
 
 /* Sub-tabla anidada de equipos */
+.nodus-nested-wrapper {
+  padding: 0.75rem 1.5rem;
+  background: var(--nodus-nested-wrapper-bg);
+  transition: background 0.3s ease;
+}
+
 .nodus-nested-panel {
-  background: rgba(10, 25, 47, 0.95);
-  border: 1px solid rgba(255, 193, 7, 0.25);
+  background: var(--nodus-nested-panel-bg);
+  border: 1px solid var(--nodus-nested-border);
   border-radius: 12px;
   padding: 1rem;
   margin: 0.5rem 0;
-  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
 }
 
 .nodus-nested-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--nodus-chart-header-border);
   padding-bottom: 0.5rem;
   margin-bottom: 0.75rem;
 }
 
 .nodus-nested-title {
-  color: #ffc107;
+  color: #d97706;
   font-size: 0.8rem;
   font-weight: 700;
   display: flex;
   align-items: center;
   gap: 0.45rem;
+  margin: 0;
+}
+
+[data-theme="dark"] .nodus-nested-title {
+  color: #ffc107;
 }
 
 .nodus-nested-table {
@@ -587,14 +808,16 @@
 }
 
 .nodus-nested-th {
-  color: #94a3b8;
+  background: var(--nodus-nested-th-bg);
+  color: var(--nodus-nested-th-color);
   font-size: 0.68rem;
   text-transform: uppercase;
   padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--nodus-nested-td-border);
 }
 
 .nodus-nested-td {
   padding: 0.55rem 0.75rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid var(--nodus-nested-td-border);
+  color: var(--nodus-text-main);
 }

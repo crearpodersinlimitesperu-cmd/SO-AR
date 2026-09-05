@@ -11,6 +11,7 @@ import { OPERATIONAL_SEDES } from '../data/usersData';
 import DriveDashboard from '../components/DriveDashboard';
 import CMJDashboard from '../components/CMJDashboard';
 import NodusCoordinadoresC1C2Dashboard from '../components/NodusCoordinadoresC1C2Dashboard';
+import ThemeSelector from '../components/ThemeSelector';
 
 export default function AuditoriaKPIs() {
   const { currentUser } = useAuth();
@@ -469,9 +470,9 @@ export default function AuditoriaKPIs() {
   };
 
   return (
-    <div style={{ maxWidth: '1080px', margin: '0 auto', padding: '2rem 1rem' }}>
+    <div style={{ maxWidth: activeTab === 'coordinadores_nodus' ? '1420px' : '1080px', margin: '0 auto', padding: '1.5rem 1rem', transition: 'max-width 0.3s ease' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-        <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center', flexWrap: 'wrap' }}>
           <button onClick={() => navigate('/gerente')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <ArrowLeft size={16} /> Volver a Causa OS
           </button>
@@ -493,6 +494,7 @@ export default function AuditoriaKPIs() {
             📊 Embudo C1 ➔ C2 ➔ MJ
           </button>
         </div>
+        <ThemeSelector />
       </div>
 
         {/* Dashboards Integrados Tabs */}
