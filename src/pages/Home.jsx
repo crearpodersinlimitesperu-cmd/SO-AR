@@ -17,6 +17,7 @@ import { getFlagForSede } from '../utils/flags';
 import { createGoogleEvent } from '../services/googleSync';
 import { calculateAutomaticDeadline } from '../utils/soarDates';
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
+import TaskDetailModal from '../components/TaskDetailModal';
 import VenueConfigModal from '../components/VenueConfigModal';
 import ViewModeSelector from '../components/ViewModeSelector';
 import ThemeToggle from '../components/ThemeToggle';
@@ -624,6 +625,8 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [taskBeingEdited, setTaskBeingEdited] = useState(null); // tarea a editar desde el panel "Tareas que has asignado"
+  const [selectedTaskForDetail, setSelectedTaskForDetail] = useState(null);
+  const [showTaskDetailModal, setShowTaskDetailModal] = useState(false);
   const [tareasAsignadasFilter, setTareasAsignadasFilter] = useState('Activas'); // 'Activas' | 'Vencidas' | 'Cumplidas' | 'Todas'
   const [showVenueModal, setShowVenueModal] = useState(false);
   const [showHorariosModal, setShowHorariosModal] = useState(false);
@@ -2188,7 +2191,14 @@ export default function Home() {
                       return (
                         <li 
                           key={task.id}
-                          onClick={() => navigate(`/checklist/${currentUser?.appRole}?filter=${isCrit ? 'criticas' : 'importantes'}`)}
+                          onClick={() => {
+                            if (task.assignedToEmail || (Array.isArray(task.assignedToEmails) && task.assignedToEmails.length > 0) || task.createdBy || (task.id && String(task.id).startsWith('custom_'))) {
+                              setSelectedTaskForDetail(task);
+                              setShowTaskDetailModal(true);
+                            } else {
+                              navigate(`/checklist/${currentUser?.appRole}?filter=${isCrit ? 'criticas' : 'importantes'}`);
+                            }
+                          }}
                           style={{ padding: '0.65rem 0.8rem', background: bg, borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.6rem', border: `1px solid ${color}33` }}
                         >
                           <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: color, flexShrink: 0 }}></span>
@@ -2263,16 +2273,35 @@ export default function Home() {
                     : (task.assignedToEmail ? [task.assignedToEmail] : []);
                   const asignadosLabel = emails.length > 0 ? emails.map(resolveAssigneeName).join(', ') : 'Cualquiera en el rol';
                   const esCreador = task.__direction === 'asignada_por_mi';
+                  const hasEvidence = Boolean(task.evidenceUrl || task.evidence_url || (Array.isArray(task.evidences) && task.evidences.length > 0));
+                  const progressPct = typeof task.progressPercentage === 'number' ? task.progressPercentage : (isDone ? 100 : 0);
 
                   return (
                     <div
                       key={task.id}
+                      onClick={() => {
+                        setSelectedTaskForDetail(task);
+                        setShowTaskDetailModal(true);
+                      }}
                       style={{
                         display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap',
-                        padding: '0.65rem 0.8rem', borderRadius: '8px',
+                        padding: '0.75rem 0.9rem', borderRadius: '10px',
                         background: isDone ? 'rgba(52, 168, 83, 0.08)' : 'rgba(255,255,255,0.03)',
-                        border: `1px solid ${isDone ? 'rgba(52, 168, 83, 0.25)' : 'var(--border-subtle)'}`
+                        border: `1px solid ${isDone ? 'rgba(52, 168, 83, 0.25)' : 'var(--border-subtle)'}`,
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
                       }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = 'rgba(41, 171, 226, 0.5)';
+                        e.currentTarget.style.background = isDone ? 'rgba(52, 168, 83, 0.12)' : 'rgba(41, 171, 226, 0.07)';
+                        e.currentTarget.style.transform = 'translateY(-1px)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = isDone ? 'rgba(52, 168, 83, 0.25)' : 'var(--border-subtle)';
+                        e.currentTarget.style.background = isDone ? 'rgba(52, 168, 83, 0.08)' : 'rgba(255,255,255,0.03)';
+                        e.currentTarget.style.transform = 'translateY(0)';
+                      }}
+                      title="Haz click para ver avances y adjuntar evidencias"
                     >
                       <div style={{ flex: 1, minWidth: '160px' }}>
                         <span className="text-white" style={{ fontSize: '0.85rem', fontWeight: 600, display: 'block' }}>
@@ -2287,9 +2316,32 @@ export default function Home() {
                             {esCreador ? '→ TÚ ASIGNASTE' : '← TE ASIGNARON'}
                           </span>
                         </span>
-                        <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                          {esCreador ? `👤 Asignada a: ${asignadosLabel}` : `👤 Asignada por: ${resolveAssigneeName(task.createdBy)}`}
-                        </span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.25rem', flexWrap: 'wrap' }}>
+                          <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                            {esCreador ? `👤 Asignada a: ${asignadosLabel}` : `👤 Asignada por: ${resolveAssigneeName(task.createdBy)}`}
+                          </span>
+                          {progressPct > 0 && (
+                            <span style={{
+                              fontSize: '0.68rem', fontWeight: 700,
+                              color: progressPct === 100 ? '#10b981' : 'var(--crear-cyan)',
+                              background: progressPct === 100 ? 'rgba(16, 185, 129, 0.12)' : 'rgba(41, 171, 226, 0.12)',
+                              padding: '1px 6px', borderRadius: '8px',
+                              border: `1px solid ${progressPct === 100 ? 'rgba(16, 185, 129, 0.3)' : 'rgba(41, 171, 226, 0.3)'}`
+                            }}>
+                              📊 {progressPct}% avance
+                            </span>
+                          )}
+                          {hasEvidence && (
+                            <span style={{
+                              fontSize: '0.68rem', fontWeight: 700,
+                              color: 'var(--crear-gold)', background: 'rgba(212, 175, 55, 0.12)',
+                              padding: '1px 6px', borderRadius: '8px',
+                              border: '1px solid rgba(212, 175, 55, 0.35)'
+                            }}>
+                              📎 Con Evidencia
+                            </span>
+                          )}
+                        </div>
                       </div>
                       {!isDone && (
                         <span style={{
@@ -2303,8 +2355,13 @@ export default function Home() {
                       )}
                       {esCreador && (
                         <button
-                          onClick={() => { setTaskBeingEdited(task); setShowTaskModal(true); }}
-                          title="Editar tarea"
+                          type="button"
+                          onClick={(e) => { 
+                            e.stopPropagation();
+                            setTaskBeingEdited(task); 
+                            setShowTaskModal(true); 
+                          }}
+                          title="Editar configuración de la tarea"
                           style={{
                             background: 'rgba(41, 171, 226, 0.12)', border: '1px solid rgba(41, 171, 226, 0.4)',
                             borderRadius: '6px', padding: '0.3rem 0.6rem', fontSize: '0.72rem', fontWeight: 700,
@@ -2350,6 +2407,22 @@ export default function Home() {
         isOpen={showTaskModal}
         onClose={() => { setShowTaskModal(false); setTaskBeingEdited(null); }}
         taskToEdit={taskBeingEdited}
+      />
+
+      {/* MODAL DETALLE, AVANCES Y EVIDENCIAS DE TAREA */}
+      <TaskDetailModal
+        isOpen={showTaskDetailModal}
+        onClose={() => {
+          setShowTaskDetailModal(false);
+          setSelectedTaskForDetail(null);
+        }}
+        task={selectedTaskForDetail ? (allTasks?.find(t => t.id === selectedTaskForDetail.id) || selectedTaskForDetail) : null}
+        onEditTaskParams={(taskToEdit) => {
+          setShowTaskDetailModal(false);
+          setTaskBeingEdited(taskToEdit);
+          setShowTaskModal(true);
+        }}
+        resolveAssigneeName={resolveAssigneeName}
       />
 
       {/* MODAL CONFIGURACIÓN DE HOTELES Y SALONES */}

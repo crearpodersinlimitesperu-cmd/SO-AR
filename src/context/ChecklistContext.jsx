@@ -58,23 +58,28 @@ export function ChecklistProvider({ children }) {
   // que quede completo para cualquier otro que lo lea) + el cambio pedido; si ya existe,
   // se actualiza normalmente sin tocar el resto de sus campos.
   const writeTaskDoc = async (taskId, updates) => {
-    const taskRef = doc(db, 'tasks', taskId);
-    const snap = await getDoc(taskRef);
-    if (!snap.exists()) {
-      const baseTask = checklistData.find(t => t.id === taskId);
-      await setDoc(taskRef, {
-        ...(baseTask || {}),
-        id: taskId,
-        completed: false,
-        status: 'Pendiente',
-        priority: baseTask?.isCritical ? '🔴 ROJO' : '🟡 AMARILLO',
-        progressPercentage: 0,
-        deadline: baseTask ? calculateAutomaticDeadline(baseTask, currentCycle) : null,
-        created_at: new Date().toISOString(),
-        ...updates
-      });
-    } else {
-      await updateDoc(taskRef, updates);
+    try {
+      const taskRef = doc(db, 'tasks', taskId);
+      const snap = await getDoc(taskRef);
+      if (!snap.exists()) {
+        const baseTask = checklistData.find(t => t.id === taskId);
+        await setDoc(taskRef, {
+          ...(baseTask || {}),
+          id: taskId,
+          completed: false,
+          status: 'Pendiente',
+          priority: baseTask?.isCritical ? '🔴 ROJO' : '🟡 AMARILLO',
+          progressPercentage: 0,
+          deadline: baseTask ? calculateAutomaticDeadline(baseTask, currentCycle) : null,
+          created_at: new Date().toISOString(),
+          ...updates
+        });
+      } else {
+        await updateDoc(taskRef, updates);
+      }
+    } catch (err) {
+      console.warn("writeTaskDoc local update fallback:", err);
+      setTasks(prev => prev.map(t => t.id === taskId ? { ...t, ...updates } : t));
     }
   };
 
@@ -141,10 +146,15 @@ export function ChecklistProvider({ children }) {
       const EXECUTIVE_ROLES_NO_CHECKLIST = ['ceo', 'cco', 'socio', 'super_admin', 'direccion'];
       const userRoleForFallback = currentUser?.appRole || currentUser?.role || '';
       const userEmailLower = (currentUser?.email || '').toLowerCase().trim();
+      let devCustom = [];
+      try {
+        devCustom = JSON.parse(localStorage.getItem('cpsl_dev_tasks') || '[]');
+      } catch(e) {}
+
       if (EXECUTIVE_ROLES_NO_CHECKLIST.includes(userRoleForFallback) || 
           userEmailLower === 'fer.aragon@crearpsl.net' || 
           userEmailLower === 'paul.sosa@crearpsl.net') {
-        setTasks([]);
+        setTasks(devCustom);
         setLoading(false);
         return;
       }
@@ -156,7 +166,7 @@ export function ChecklistProvider({ children }) {
         progressPercentage: 0,
         deadline: calculateAutomaticDeadline(task, currentCycle)
       }));
-      setTasks(localTasks);
+      setTasks([...localTasks, ...devCustom]);
       setLoading(false);
     });
 
