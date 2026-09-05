@@ -11,6 +11,7 @@ import { useChecklist } from '../context/ChecklistContext';
 import { useUI } from '../context/UIContext';
 import { getFlagForSede } from '../utils/flags';
 import { uploadEvidenceDocument } from '../services/googleDriveService';
+import { celebrateVictory } from '../utils/neuroFeedback';
 
 const getCountdown = (deadlineIso) => {
   if (!deadlineIso) return { label: 'Sin fecha límite', color: '#9ca3af', bg: 'rgba(156,163,175,0.12)', border: '#9ca3af', overdue: false };
@@ -353,6 +354,9 @@ export default function TaskDetailModal({
       };
 
       await updateTaskDetails(task.id, updates);
+      if (isCompleted || progress === 100) {
+        celebrateVictory();
+      }
       showToast('🎉 ¡Tarea actualizada y avances guardados exitosamente!', 'success');
       onClose();
     } catch (err) {
@@ -379,7 +383,7 @@ export default function TaskDetailModal({
       padding: '1rem'
     }}>
       <div 
-        className="glass-panel"
+        className="glass-panel task-detail-modal-card"
         style={{
           width: '100%',
           maxWidth: '680px',

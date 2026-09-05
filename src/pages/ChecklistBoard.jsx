@@ -13,9 +13,11 @@ import { ArrowLeft, Target, Link as LinkIcon, Edit3, Clock, ShieldAlert, Users, 
 import TaskAssignmentModal from '../components/TaskAssignmentModal';
 import TaskCollaborationModal from '../components/TaskCollaborationModal';
 import LearningReflectionModal from '../components/LearningReflectionModal';
+import TaskCompletionChoiceModal from '../components/TaskCompletionChoiceModal';
 import NewExcellenceModal from '../components/NewExcellenceModal';
 import SyncHistoryModal from '../components/SyncHistoryModal';
 import TaskDetailModal from '../components/TaskDetailModal';
+import { celebrateVictory } from '../utils/neuroFeedback';
 
 // Fases operativas reales existentes en src/data/checklistData.js (cyclePhase).
 // No existen 'PRE-C2' ni 'POST-C2' como fases propias: todo lo de C2 usa la fase única 'C2'.
@@ -46,6 +48,7 @@ export default function ChecklistBoard() {
   const [showSyncHistoryModal, setShowSyncHistoryModal] = useState(false);
   const [selectedTaskForCollab, setSelectedTaskForCollab] = useState(null);
   const [taskForReflection, setTaskForReflection] = useState(null);
+  const [taskForCompletionChoice, setTaskForCompletionChoice] = useState(null);
   const [taskForExcellence, setTaskForExcellence] = useState(null);
   const [qtPhaseFilter, setQtPhaseFilter] = useState('all'); // 'all' o una de las fases reales del rol (ver PHASE_ORDER)
   const [selectedTaskForDetail, setSelectedTaskForDetail] = useState(null);
@@ -154,17 +157,37 @@ export default function ChecklistBoard() {
   const handleStatusChange = async (task) => {
     if (processingTasks.has(task.id)) return;
     
-    // Si la tarea se está marcando como completada y es crítica/alta prioridad, proponer reflexión
-    if (!task.completed && (task.isCritical || task.priority === 'Crítica' || task.priority === 'Alta')) {
-      setTaskForReflection(task);
+    // Si la tarea ya estaba completada, desmarcarla inmediatamente
+    if (task.completed || task.status === 'Completada') {
+      try {
+        setProcessingTasks(prev => new Set(prev).add(task.id));
+        await toggleTask(task.id, true);
+      } catch (err) {
+        console.error("Error toggling task status:", err);
+      } finally {
+        setProcessingTasks(prev => {
+          const next = new Set(prev);
+          next.delete(task.id);
+          return next;
+        });
+      }
       return;
     }
-    
+
+    // Si la tarea se está completando: permitir elegir en 1 clic
+    // si desea solo completarla a máxima velocidad o compartir su experiencia
+    setTaskForCompletionChoice(task);
+  };
+
+  const handleExecuteCompleteOnly = async (task) => {
+    if (!task) return;
+    setTaskForCompletionChoice(null);
     try {
       setProcessingTasks(prev => new Set(prev).add(task.id));
-      await toggleTask(task.id, task.completed);
+      await toggleTask(task.id, false);
+      celebrateVictory();
     } catch (err) {
-      console.error("Error toggling task status:", err);
+      console.error("Error al completar tarea:", err);
     } finally {
       setProcessingTasks(prev => {
         const next = new Set(prev);
@@ -172,6 +195,11 @@ export default function ChecklistBoard() {
         return next;
       });
     }
+  };
+
+  const handleExecuteShareExperience = (task) => {
+    setTaskForCompletionChoice(null);
+    setTaskForReflection(task);
   };
 
   const handleOpenTaskDetail = (task) => {
@@ -520,6 +548,15 @@ export default function ChecklistBoard() {
         onClose={() => setShowCollabModal(false)}
         task={selectedTaskForCollab}
         onSendInvitation={inviteCollaborator}
+      />
+
+      {/* MODAL DE ELECCIÓN RÁPIDA: COMPLETAR TAREA VS COMPARTIR EXPERIENCIA */}
+      <TaskCompletionChoiceModal
+        isOpen={!!taskForCompletionChoice}
+        task={taskForCompletionChoice}
+        onCompleteOnly={() => handleExecuteCompleteOnly(taskForCompletionChoice)}
+        onShareExperience={() => handleExecuteShareExperience(taskForCompletionChoice)}
+        onClose={() => setTaskForCompletionChoice(null)}
       />
 
       {/* MODAL DE REFLEXIÓN Y APRENDIZAJE */}
