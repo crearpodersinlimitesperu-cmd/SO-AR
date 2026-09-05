@@ -147,17 +147,39 @@ export default function NodusCoordinadoresC1C2Dashboard() {
     }
   };
 
-  // Lista única de sedes
-  const sedesList = useMemo(() => {
+  // 1. Filtrado de seguridad estricto: Única y exclusivamente coordinadores operativos de C1 y C2
+  // Se excluyen departamentos (contabilidad, facturación, entrenadores, soporte, admin) y usuarios sin llamadas/equipos en C1 o C2
+  const c1c2Coordinadores = useMemo(() => {
     if (!data?.coordinadores) return [];
-    const set = new Set(data.coordinadores.map(c => c.sede).filter(Boolean));
-    return Array.from(set).sort();
+    return data.coordinadores.filter(c => {
+      if (!c) return false;
+      const name = (c.nombre || '').toLowerCase().trim();
+      const email = (c.email || '').toLowerCase().trim();
+
+      // Excluir cuentas departamentales, finanzas, entrenadores, administrativas o soporte
+      if (name.includes('contab') || email.includes('contab')) return false;
+      if (name.includes('entrena') || email.includes('entrena')) return false;
+      if (name.includes('admin') || email.includes('admin')) return false;
+      if (name.includes('soporte') || email.includes('soporte')) return false;
+      if (name.includes('factura') || email.includes('factura')) return false;
+
+      // Debe ser un coordinador de C1 o C2 con llamadas reales o equipos asignados
+      const hasC1C2Calls = (Number(c.c1) > 0 || Number(c.c2) > 0 || Number(c.gestiones) > 0);
+      const hasEquipos = Array.isArray(c.equipos) && c.equipos.length > 0;
+
+      return hasC1C2Calls && hasEquipos;
+    });
   }, [data]);
+
+  // Lista única de sedes (basada exclusivamente en coordinadores C1 y C2)
+  const sedesList = useMemo(() => {
+    const set = new Set(c1c2Coordinadores.map(c => c.sede).filter(Boolean));
+    return Array.from(set).sort();
+  }, [c1c2Coordinadores]);
 
   // Lista única de equipos disponibles según la sede seleccionada
   const equiposList = useMemo(() => {
-    if (!data?.coordinadores) return [];
-    let coords = data.coordinadores;
+    let coords = c1c2Coordinadores;
     if (selectedSede !== 'TODAS') {
       coords = coords.filter(c => c.sede === selectedSede);
     }
@@ -172,15 +194,15 @@ export default function NodusCoordinadoresC1C2Dashboard() {
       const numB = parseInt(b.replace(/\D/g, '')) || 0;
       return numA - numB;
     });
-  }, [data, selectedSede]);
+  }, [c1c2Coordinadores, selectedSede]);
 
-  // Filtrado exhaustivo y contextual de coordinadores
+  // Filtrado exhaustivo y contextual de coordinadores C1 & C2
   const filteredCoordinadores = useMemo(() => {
-    if (!data?.coordinadores) return [];
+    if (!c1c2Coordinadores.length) return [];
 
     const result = [];
 
-    for (const c of data.coordinadores) {
+    for (const c of c1c2Coordinadores) {
       // 1. Filtro Sede
       if (selectedSede !== 'TODAS' && c.sede !== selectedSede) continue;
 
@@ -278,7 +300,7 @@ export default function NodusCoordinadoresC1C2Dashboard() {
       if (sortBy === 'nombre') return a.nombre.localeCompare(b.nombre);
       return 0;
     });
-  }, [data, searchTerm, selectedSede, selectedEquipo, selectedEntrenamiento, selectedCiclo, sortBy]);
+  }, [c1c2Coordinadores, searchTerm, selectedSede, selectedEquipo, selectedEntrenamiento, selectedCiclo, sortBy]);
 
   // Métricas agregadas reactivas según los filtros aplicados
   const aggregatedStats = useMemo(() => {
@@ -759,7 +781,7 @@ export default function NodusCoordinadoresC1C2Dashboard() {
         <div className="nodus-table-header">
           <div className="nodus-table-title">
             <Users size={18} color="#ffc107" />
-            <span>Detalle Puntual por Colaborador y Equipos Asignados</span>
+            <span>Coordinadores Activos C1 & C2</span>
             {hasActiveFilters && (
               <span style={{ fontSize: '0.68rem', padding: '0.2rem 0.6rem', borderRadius: '12px', background: 'rgba(255,193,7,0.18)', color: '#ffc107', fontWeight: 700, border: '1px solid rgba(255,193,7,0.3)' }}>
                 Filtros Activos ({filteredCoordinadores.length} encontrados)
@@ -767,7 +789,7 @@ export default function NodusCoordinadoresC1C2Dashboard() {
             )}
           </div>
           <span style={{ fontSize: '0.78rem', color: 'var(--nodus-text-muted)' }}>
-            Mostrando {filteredCoordinadores.length} {filteredCoordinadores.length === 1 ? 'coordinador' : 'coordinadores'}
+            Mostrando {filteredCoordinadores.length} {filteredCoordinadores.length === 1 ? 'coordinador C1/C2' : 'coordinadores C1/C2'}
           </span>
         </div>
 

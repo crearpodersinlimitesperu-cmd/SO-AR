@@ -260,7 +260,7 @@ class NodusNormalizerAgent {
   normalizeData(rawCoordinadores, rawDashboard, rawEquiposReporte) {
     console.log("🧠 [Agente 2 - Normalizador] Procesando y correlacionando información...");
 
-    const coordinadores = rawCoordinadores.map(item => {
+    const rawCoordinadoresList = rawCoordinadores.map(item => {
       const lines = item.fullText.split('\n').map(l => l.trim()).filter(Boolean);
       const nameLine = lines[0];
 
@@ -390,6 +390,20 @@ class NodusNormalizerAgent {
       };
     });
 
+    // Filtrar estrictamente solo coordinadores de C1 y C2 (excluir departamentos, contabilidad, entrenadores, finanzas o cuentas sin C1/C2)
+    const coordinadores = rawCoordinadoresList.filter(c => {
+      const name = (c.nombre || '').toLowerCase().trim();
+      const email = (c.email || '').toLowerCase().trim();
+      if (name.includes('contab') || email.includes('contab')) return false;
+      if (name.includes('entrena') || email.includes('entrena')) return false;
+      if (name.includes('admin') || email.includes('admin')) return false;
+      if (name.includes('soporte') || email.includes('soporte')) return false;
+      if (name.includes('factura') || email.includes('factura')) return false;
+      const hasActivity = (Number(c.c1) > 0 || Number(c.c2) > 0 || Number(c.gestiones) > 0);
+      const hasEquipos = Array.isArray(c.equipos) && c.equipos.length > 0;
+      return hasActivity && hasEquipos;
+    });
+
     // Consolidado por Sedes
     const sedesSummary = {};
     coordinadores.forEach(c => {
@@ -434,11 +448,11 @@ class NodusNormalizerAgent {
       productividadPromedio: coordinadores.length ? Math.round(coordinadores.reduce((a, b) => a + b.productividadPct, 0) / coordinadores.length) : 0,
     };
 
-    if (coordinadores.length < 20) {
-      throw new Error(`[Agente 2 - Normalizador] Alerta de integridad: Solo se detectaron ${coordinadores.length} coordinadores. Extracción incompleta cancelada.`);
+    if (coordinadores.length < 15) {
+      throw new Error(`[Agente 2 - Normalizador] Alerta de integridad: Solo se detectaron ${coordinadores.length} coordinadores C1/C2 válidos. Extracción incompleta cancelada.`);
     }
 
-    console.log(`✅ [Agente 2 - Normalizador] Datos normalizados: ${coordinadores.length} coordinadores en ${Object.keys(sedesSummary).length} sedes.`);
+    console.log(`✅ [Agente 2 - Normalizador] Datos normalizados: ${coordinadores.length} coordinadores C1/C2 válidos en ${Object.keys(sedesSummary).length} sedes.`);
 
     return {
       coordinadores,
