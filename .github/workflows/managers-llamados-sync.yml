@@ -37,4 +37,5 @@ jobs:
           fi
           echo "$GOOGLE_SERVICE_ACCOUNT_JSON" > centro-operativo-cpsl-65ad52160f45.json
           node sync_managers_llamados.mjs
+          node scripts/syncKpisLlamadas.mjs
           rm -f centro-operativo-cpsl-65ad52160f45.json

@@ -19,7 +19,8 @@
     "audit:platform": "node scripts/platform_audit.mjs",
     "flyer:generate": "node scripts/generar_flyer.mjs",
     "sync:nodus": "node scripts/nodusMultiAgentSync.mjs",
-    "daemon:nodus": "node scripts/nodusDaemon.mjs"
+    "daemon:nodus": "node scripts/nodusDaemon.mjs",
+    "sync:kpis": "node scripts/syncKpisLlamadas.mjs"
   },
   "dependencies": {
     "cors": "^2.8.6",

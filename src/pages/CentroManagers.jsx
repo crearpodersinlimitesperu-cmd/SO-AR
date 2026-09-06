@@ -38,9 +38,11 @@ import {
   ChevronLeft, ChevronRight, DollarSign, Layers, ArrowLeft,
   Sparkles, ToggleLeft, ToggleRight, Archive, RotateCcw, X,
   Edit3, Trash2, UserPlus, Shield, Crown, Check, CheckSquare, Square,
-  ShieldCheck, Lock, AlertTriangle, Target, ArrowUpDown, ArrowUp, ArrowDown
+  ShieldCheck, Lock, AlertTriangle, Target, ArrowUpDown, ArrowUp, ArrowDown,
+  BarChart3
 } from 'lucide-react';
 import CMJDashboard from '../components/CMJDashboard';
+import KPIsEntrenadoresLlamadas from '../components/KPIsEntrenadoresLlamadas';
 
 const SEDE_COLORS = {
   Quito: "#29abe2", Lima: "#ef4444", Guayaquil: "#f59e0b",
@@ -1611,8 +1613,11 @@ export default function CentroManagers() {
             { id: 'grupales', icon: Layers, label: `Grupales (${groupTeams.length})` },
             ...(canViewAll ? [
               { id: 'dashboard', icon: Award, label: 'Sedes' },
-              { id: 'entrenadores', icon: UserCheck, label: 'Entrenadores' }
-            ] : []),
+              { id: 'entrenadores', icon: UserCheck, label: 'Entrenadores' },
+              { id: 'kpis_llamadas', icon: BarChart3, label: 'KPIs Llamadas' }
+            ] : (isTrainerRole ? [
+              { id: 'kpis_llamadas', icon: BarChart3, label: 'KPIs Llamadas' }
+            ] : [])),
             ...(canViewLiquidacion ? [
               { id: 'liquidacion', icon: DollarSign, label: `Liquidación (${liquidacionData.pendientes.length})` }
             ] : [])
@@ -2419,6 +2424,11 @@ export default function CentroManagers() {
               ))}
             </div>
           </div>
+        )}
+
+        {/* KPIS DE ENTRENADORES DE LLAMADAS (05/09/2026) — Análisis en tiempo real de Google Sheets */}
+        {activeTab === 'kpis_llamadas' && (canViewAll || isTrainerRole) && (
+          <KPIsEntrenadoresLlamadas allManagersList={managers} />
         )}
 
         {/* LIQUIDACIÓN DE ENTRENADORES (02/09/2026) — solo José Sánchez y Elizabeth Escobar */}

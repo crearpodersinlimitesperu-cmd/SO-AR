@@ -355,6 +355,12 @@ service cloud.firestore {
       allow read, write: if isAuthenticated();
     }
 
+    // (05/09/2026) KPIs de Entrenadores de Llamadas - sincronizado con Google Sheets
+    match /kpis_entrenadores_llamadas/{document=**} {
+      allow read: if isAuthenticated();
+      allow write: if isSuperAdmin() || isGerenteODireccion() || canManageManagers();
+    }
+
     // ========================================================================
     // CPSL INTERRUPCIÓN (CAMPUS INTERACTIVO) - USUARIOS Y SESIONES
     // Cualquier usuario autenticado con Google puede acceder a su propio perfil,
