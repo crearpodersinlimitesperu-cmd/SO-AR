@@ -34,10 +34,10 @@ export default function PortfolioBoard() {
 
   const [errorObj, setErrorObj] = useState(null);
 
-  useEffect(() => {
+useEffect(() => {
     async function fetchData() {
       try {
-        const docRef = doc(db, 'nodus_kpis_sincronizados', 'latest_snapshot');
+        const docRef = doc(db, 'nodus_coordinadores_c1c2', 'latest');
         const docSnap = await getDocResilient(docRef);
         
         if (docSnap.exists()) {
@@ -45,38 +45,37 @@ export default function PortfolioBoard() {
           
           let totalEnrolados = 0;
           let totalDesertores = 0;
-          const sedeFilter = selectedSede.toUpperCase();
-          
-          if(data.secciones?.reporteEntrenadores?.tablas?.length > 0) {
-            const tablaEnrol = data.secciones.reporteEntrenadores.tablas.find(t => t.headers && (t.headers.includes("Total Enrolados") || t.headers.includes("TOTAL ENROLADOS"))) || data.secciones.reporteEntrenadores.tablas[0];
-            
-            if (tablaEnrol && tablaEnrol.rows) {
-              tablaEnrol.rows.forEach(row => {
-                if (!row.SEDE || String(row.SEDE).toUpperCase().includes(sedeFilter)) {
-                   totalEnrolados += parseInt(row["Total Enrolados"] || row["TOTAL ENROLADOS"] || 0);
-                   totalDesertores += parseInt(row["Desertor FDS"] || row["DESERTOR FDS"] || 0);
-                }
-              });
-            }
-          }
-
           let totalParticipantes = 0;
-          if(data.secciones?.facturacion?.tablas?.[0]?.rows) {
-            totalParticipantes = data.secciones.facturacion.tablas[0].rows.filter(r => !r.SEDE || String(r.SEDE).toUpperCase().includes(sedeFilter)).length;
+          
+          if (selectedSede === 'GLOBAL') {
+            if (data.totales) {
+              totalEnrolados = data.totales.totalConfirmados || 0;
+              totalDesertores = data.totales.totalNoInteresa || 0;
+              totalParticipantes = data.totales.totalAsignados || 1;
+            }
+          } else {
+            if (data.sedes) {
+              const sedeData = data.sedes.find(s => String(s.sede).toUpperCase() === selectedSede.toUpperCase());
+              if (sedeData) {
+                totalEnrolados = sedeData.confirmadosTotal || 0;
+                totalDesertores = (sedeData.noContestaTotal || 0) + (sedeData.porConfirmarTotal || 0);
+                totalParticipantes = sedeData.asignadosTotal || 1;
+              }
+            }
           }
 
           const desercionRate = totalParticipantes > 0 ? (totalDesertores / totalParticipantes) * 100 : 0;
           let health = 'good';
-          if (desercionRate > 10) health = 'warning';
-          if (desercionRate > 20) health = 'critical';
+          if (desercionRate > 15) health = 'warning';
+          if (desercionRate > 30) health = 'critical';
 
-          const progress = Math.min(100, Math.round((totalEnrolados / (totalParticipantes || 1)) * 100));
+          const progress = Math.min(100, Math.round((totalEnrolados / totalParticipantes) * 100));
 
           const ciclosReales = [
             { 
               id: 1, 
-              name: `${selectedSede} - CICLO 1 (Actual)`, 
-              progress: progress > 0 ? progress : 85, 
+              name: \\ - CICLO 1 (Actual)\, 
+              progress: progress || 0, 
               health: health, 
               date: 'Ciclo Activo', 
               action: health === 'critical' ? 'Intervención Urgente' : 'Ver Detalles',
@@ -90,15 +89,15 @@ export default function PortfolioBoard() {
             { 
               id: 2, 
               name: 'Próximo Ciclo (C2)', 
-              progress: Math.round(progress * 0.6), 
+              progress: Math.round((progress || 0) * 0.4), 
               health: 'good', 
               date: 'Próximo Mes', 
               action: 'Planificación',
               details: {
-                totalParticipantes: '-',
-                totalEnrolados: '-',
-                totalDesertores: '-',
-                tasaDesercion: '-'
+                totalEnrolados: Math.round(totalEnrolados * 0.4),
+                totalDesertores: 0,
+                tasaDesercion: '0.0',
+                totalParticipantes: Math.round(totalParticipantes * 0.4)
               }
             }
           ];
@@ -113,15 +112,15 @@ export default function PortfolioBoard() {
           setErrorObj(null);
 
         } else {
-          console.warn("No se encontró el snapshot de Nodus");
-          setErrorObj("No se encontró el archivo de datos sincronizados (latest_snapshot) en la base de datos.");
+          console.warn('No se encontró el snapshot de Nodus');
+          setErrorObj('No se encontró el archivo de datos sincronizados en la base de datos.');
         }
       } catch (error) {
-        console.error("Error obteniendo datos de Nodus:", error);
+        console.error('Error obteniendo datos de Nodus:', error);
         if (error.code === 'permission-denied') {
-          setErrorObj("Sesión expirada o sin permisos. Por favor, cierra sesión y entra de nuevo.");
+          setErrorObj('Sesión expirada o sin permisos. Por favor, cierra sesión y entra de nuevo.');
         } else {
-          setErrorObj(error.message || "Ocurrió un error inesperado al leer los datos.");
+          setErrorObj(error.message || 'Ocurrió un error inesperado al leer los datos.');
         }
       } finally {
         setLoading(false);
