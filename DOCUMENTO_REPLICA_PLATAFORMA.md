@@ -214747,6 +214747,8 @@ import {
   Legend, Cell, PieChart, Pie
 } from 'recharts';
 import { subscribeToKpisSummary, slugify } from '../services/kpisLlamadasService';
+import { useAuth } from '../context/AuthContext';
+import { canViewKPIsLlamadas } from '../config/permissions';
 
 const SHEET_MANAGERS_URL = 'https://docs.google.com/spreadsheets/d/1KF58QXAiIk4KP_9G2aiAM3ERVoptcqKlIraszNKq2Ow/edit?usp=drive_link';
 const SHEET_LLAMADOS_URL = 'https://docs.google.com/spreadsheets/d/1lWAHh1PSAKu9eU6DOBxZExrHMbCYc3f2Sr8GdghNxD0/edit?usp=drive_link';
@@ -214767,6 +214769,9 @@ const COLORS_SEDES = {
 };
 
 export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
+  const { currentUser } = useAuth();
+  const hasAccess = canViewKPIsLlamadas(currentUser);
+
   const [data, setData] = useState(null);
   const [activeSubView, setActiveSubView] = useState('entrenadores'); // 'entrenadores' | 'graficas_retencion' | 'directorio_estados'
   const [search, setSearch] = useState('');
@@ -214780,13 +214785,14 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
   const [modalFilterStatus, setModalFilterStatus] = useState('todos');
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Escuchar datos en tiempo real
+  // Escuchar datos en tiempo real solo si el usuario tiene acceso
   useEffect(() => {
+    if (!hasAccess) return;
     const unsub = subscribeToKpisSummary((kpiPayload) => {
       setData(kpiPayload);
     });
     return () => unsub();
-  }, []);
+  }, [hasAccess]);
 
   // Mapeo rápido de managers por teléfono / sede desde allManagersList o managersSheet1
   const phoneByManagerName = useMemo(() => {
@@ -214996,6 +215002,41 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
       setIsRefreshing(false);
     }, 900);
   };
+
+  if (!hasAccess) {
+    return (
+      <div style={{
+        background: '#ffffff',
+        borderRadius: '16px',
+        padding: '3rem 2rem',
+        textAlign: 'center',
+        border: '1px solid #fee2e2',
+        maxWidth: '560px',
+        margin: '3rem auto',
+        boxShadow: '0 4px 12px rgba(239, 68, 68, 0.08)'
+      }}>
+        <div style={{
+          width: '56px',
+          height: '56px',
+          borderRadius: '50%',
+          background: '#fef2f2',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          margin: '0 auto 1rem',
+          color: '#ef4444'
+        }}>
+          <AlertTriangle size={28} />
+        </div>
+        <h3 style={{ margin: '0 0 0.5rem', color: '#991b1b', fontSize: '1.2rem', fontWeight: 800 }}>
+          Acceso Restringido a Dirección
+        </h3>
+        <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem', lineHeight: '1.6' }}>
+          Este módulo de auditoría financiera, balance de llamadas y análisis de retención/deserción está reservado exclusivamente para la Dirección y Administración Central.
+        </p>
+      </div>
+    );
+  }
 
   if (!data) {
     return (
@@ -225056,6 +225097,35 @@ export const canViewLiquidacionEntrenadores = (currentUser) => {
   const email = (currentUser.email || '').trim().toLowerCase();
   return LIQUIDACION_ENTRENADORES_EMAILS.includes(email);
 };
+
+/**
+ * Emails o roles autorizados a ver la pestaña "KPIs de Entrenadores de Llamadas" (Auditoría financiera,
+ * facturación $77,550 USD, graduados, deserción y matriz de 16 llamadas).
+ * REGLA ESTRICTA (pedido explícito de José, 05/09/2026):
+ * "esto solo lo pueden ver directores y yo"
+ * Únicamente SuperAdmin (José Sánchez / Armando Pilacuán / Paul Sosa), el email de José Sánchez
+ * ('jose.sanchez@crearpsl.net'), y roles de Dirección (director_maestria, direccion, ceo, cco, cfo).
+ * NO pueden verlo entrenadores, coordinadores, gerentes de sede, capitanes ni colaboradores operativos.
+ */
+export const canViewKPIsLlamadas = (currentUser) => {
+  if (!currentUser) return false;
+  const email = (currentUser.email || '').trim().toLowerCase();
+
+  // "yo" / SuperAdmin
+  if (email === 'jose.sanchez@crearpsl.net') return true;
+  if (currentUser.isSuperAdmin || isSuperAdminEmail(email)) return true;
+
+  // "directores"
+  if (currentUser.isDireccion) return true;
+  const role = (currentUser.appRole || currentUser.role || '').toLowerCase();
+  const roles = (currentUser.roles || []).map(r => String(r).toLowerCase());
+
+  if (isDireccionRole(role) || role === 'director_maestria') return true;
+  if (roles.some(r => isDireccionRole(r) || r === 'director_maestria')) return true;
+
+  return false;
+};
+
 
 /**
  * NOTAS DE SEGUIMIENTO (02/09/2026) — feedback que el entrenador de llamadas deja
@@ -330971,7 +331041,8 @@ import {
   canViewLiquidacionEntrenadores,
   canWriteNotaSeguimiento,
   canViewAllNotasSeguimiento,
-  canReplyNotaSeguimiento
+  canReplyNotaSeguimiento,
+  canViewKPIsLlamadas
 } from '../config/permissions';
 import { 
   INITIAL_MANAGERS, 
@@ -331079,6 +331150,8 @@ export default function CentroManagers() {
   const userCanAssign = canAssignTrainer(currentUser);
   // Pestaña de Liquidación de Entrenadores: solo José Sánchez y Elizabeth Escobar (02/09/2026)
   const canViewLiquidacion = canViewLiquidacionEntrenadores(currentUser);
+  // Pestaña de KPIs de Llamadas: REGLA ESTRICTA (05/09/2026) solo Directores y José Sánchez / SuperAdmin
+  const userCanViewKPIsLlamadas = canViewKPIsLlamadas(currentUser);
   // Notas de Seguimiento post-llamada (02/09/2026): quién puede dejar una nota,
   // quién puede ver el historial completo (no solo lo propio), y quién puede
   // responder a una nota como CMJ. Ver comentarios de estas 3 funciones en
@@ -332568,11 +332641,11 @@ export default function CentroManagers() {
             { id: 'grupales', icon: Layers, label: `Grupales (${groupTeams.length})` },
             ...(canViewAll ? [
               { id: 'dashboard', icon: Award, label: 'Sedes' },
-              { id: 'entrenadores', icon: UserCheck, label: 'Entrenadores' },
+              { id: 'entrenadores', icon: UserCheck, label: 'Entrenadores' }
+            ] : []),
+            ...(userCanViewKPIsLlamadas ? [
               { id: 'kpis_llamadas', icon: BarChart3, label: 'KPIs Llamadas' }
-            ] : (isTrainerRole ? [
-              { id: 'kpis_llamadas', icon: BarChart3, label: 'KPIs Llamadas' }
-            ] : [])),
+            ] : []),
             ...(canViewLiquidacion ? [
               { id: 'liquidacion', icon: DollarSign, label: `Liquidación (${liquidacionData.pendientes.length})` }
             ] : [])
@@ -333381,9 +333454,20 @@ export default function CentroManagers() {
           </div>
         )}
 
-        {/* KPIS DE ENTRENADORES DE LLAMADAS (05/09/2026) — Análisis en tiempo real de Google Sheets */}
-        {activeTab === 'kpis_llamadas' && (canViewAll || isTrainerRole) && (
-          <KPIsEntrenadoresLlamadas allManagersList={managers} />
+        {/* KPIS DE ENTRENADORES DE LLAMADAS — REGLA ESTRICTA (05/09/2026): Solo Directores y José Sánchez / SuperAdmin */}
+        {activeTab === 'kpis_llamadas' && (
+          userCanViewKPIsLlamadas ? (
+            <KPIsEntrenadoresLlamadas allManagersList={managers} />
+          ) : (
+            <div style={{ background: bgCard, borderRadius: '12px', padding: '3rem', textAlign: 'center', border: `1px solid ${borderLight}` }}>
+              <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#ef4444', marginBottom: '0.5rem' }}>
+                🔒 Acceso Restringido
+              </div>
+              <p style={{ color: textMuted, fontSize: '0.9rem', margin: 0 }}>
+                Este módulo de KPIs y auditoría de llamadas está reservado exclusivamente para Dirección y Administración.
+              </p>
+            </div>
+          )
         )}
 
         {/* LIQUIDACIÓN DE ENTRENADORES (02/09/2026) — solo José Sánchez y Elizabeth Escobar */}

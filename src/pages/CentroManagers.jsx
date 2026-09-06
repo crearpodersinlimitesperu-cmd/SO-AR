@@ -16,7 +16,8 @@ import {
   canViewLiquidacionEntrenadores,
   canWriteNotaSeguimiento,
   canViewAllNotasSeguimiento,
-  canReplyNotaSeguimiento
+  canReplyNotaSeguimiento,
+  canViewKPIsLlamadas
 } from '../config/permissions';
 import { 
   INITIAL_MANAGERS, 
@@ -124,6 +125,8 @@ export default function CentroManagers() {
   const userCanAssign = canAssignTrainer(currentUser);
   // Pestaña de Liquidación de Entrenadores: solo José Sánchez y Elizabeth Escobar (02/09/2026)
   const canViewLiquidacion = canViewLiquidacionEntrenadores(currentUser);
+  // Pestaña de KPIs de Llamadas: REGLA ESTRICTA (05/09/2026) solo Directores y José Sánchez / SuperAdmin
+  const userCanViewKPIsLlamadas = canViewKPIsLlamadas(currentUser);
   // Notas de Seguimiento post-llamada (02/09/2026): quién puede dejar una nota,
   // quién puede ver el historial completo (no solo lo propio), y quién puede
   // responder a una nota como CMJ. Ver comentarios de estas 3 funciones en
@@ -1613,11 +1616,11 @@ export default function CentroManagers() {
             { id: 'grupales', icon: Layers, label: `Grupales (${groupTeams.length})` },
             ...(canViewAll ? [
               { id: 'dashboard', icon: Award, label: 'Sedes' },
-              { id: 'entrenadores', icon: UserCheck, label: 'Entrenadores' },
+              { id: 'entrenadores', icon: UserCheck, label: 'Entrenadores' }
+            ] : []),
+            ...(userCanViewKPIsLlamadas ? [
               { id: 'kpis_llamadas', icon: BarChart3, label: 'KPIs Llamadas' }
-            ] : (isTrainerRole ? [
-              { id: 'kpis_llamadas', icon: BarChart3, label: 'KPIs Llamadas' }
-            ] : [])),
+            ] : []),
             ...(canViewLiquidacion ? [
               { id: 'liquidacion', icon: DollarSign, label: `Liquidación (${liquidacionData.pendientes.length})` }
             ] : [])
@@ -2426,9 +2429,20 @@ export default function CentroManagers() {
           </div>
         )}
 
-        {/* KPIS DE ENTRENADORES DE LLAMADAS (05/09/2026) — Análisis en tiempo real de Google Sheets */}
-        {activeTab === 'kpis_llamadas' && (canViewAll || isTrainerRole) && (
-          <KPIsEntrenadoresLlamadas allManagersList={managers} />
+        {/* KPIS DE ENTRENADORES DE LLAMADAS — REGLA ESTRICTA (05/09/2026): Solo Directores y José Sánchez / SuperAdmin */}
+        {activeTab === 'kpis_llamadas' && (
+          userCanViewKPIsLlamadas ? (
+            <KPIsEntrenadoresLlamadas allManagersList={managers} />
+          ) : (
+            <div style={{ background: bgCard, borderRadius: '12px', padding: '3rem', textAlign: 'center', border: `1px solid ${borderLight}` }}>
+              <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#ef4444', marginBottom: '0.5rem' }}>
+                🔒 Acceso Restringido
+              </div>
+              <p style={{ color: textMuted, fontSize: '0.9rem', margin: 0 }}>
+                Este módulo de KPIs y auditoría de llamadas está reservado exclusivamente para Dirección y Administración.
+              </p>
+            </div>
+          )
         )}
 
         {/* LIQUIDACIÓN DE ENTRENADORES (02/09/2026) — solo José Sánchez y Elizabeth Escobar */}

@@ -227,6 +227,35 @@ export const canViewLiquidacionEntrenadores = (currentUser) => {
 };
 
 /**
+ * Emails o roles autorizados a ver la pestaña "KPIs de Entrenadores de Llamadas" (Auditoría financiera,
+ * facturación $77,550 USD, graduados, deserción y matriz de 16 llamadas).
+ * REGLA ESTRICTA (pedido explícito de José, 05/09/2026):
+ * "esto solo lo pueden ver directores y yo"
+ * Únicamente SuperAdmin (José Sánchez / Armando Pilacuán / Paul Sosa), el email de José Sánchez
+ * ('jose.sanchez@crearpsl.net'), y roles de Dirección (director_maestria, direccion, ceo, cco, cfo).
+ * NO pueden verlo entrenadores, coordinadores, gerentes de sede, capitanes ni colaboradores operativos.
+ */
+export const canViewKPIsLlamadas = (currentUser) => {
+  if (!currentUser) return false;
+  const email = (currentUser.email || '').trim().toLowerCase();
+
+  // "yo" / SuperAdmin
+  if (email === 'jose.sanchez@crearpsl.net') return true;
+  if (currentUser.isSuperAdmin || isSuperAdminEmail(email)) return true;
+
+  // "directores"
+  if (currentUser.isDireccion) return true;
+  const role = (currentUser.appRole || currentUser.role || '').toLowerCase();
+  const roles = (currentUser.roles || []).map(r => String(r).toLowerCase());
+
+  if (isDireccionRole(role) || role === 'director_maestria') return true;
+  if (roles.some(r => isDireccionRole(r) || r === 'director_maestria')) return true;
+
+  return false;
+};
+
+
+/**
  * NOTAS DE SEGUIMIENTO (02/09/2026) — feedback que el entrenador de llamadas deja
  * después de cada llamada (individual o grupal), pedido explícito de José: "puedan
  * dejar notas individuales, grupales, por llamadas que deben de guardarse en un

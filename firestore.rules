@@ -355,10 +355,18 @@ service cloud.firestore {
       allow read, write: if isAuthenticated();
     }
 
-    // (05/09/2026) KPIs de Entrenadores de Llamadas - sincronizado con Google Sheets
+    // (05/09/2026) KPIs de Entrenadores de Llamadas - REGLA ESTRICTA: solo directores y José Sánchez / SuperAdmin
     match /kpis_entrenadores_llamadas/{document=**} {
-      allow read: if isAuthenticated();
-      allow write: if isSuperAdmin() || isGerenteODireccion() || canManageManagers();
+      allow read: if isSuperAdmin() || email() == 'jose.sanchez@crearpsl.net' || email() in [
+        'emely.leon@crearpsl.net',
+        'fer.aragon@crearpsl.net',
+        'andres.gomez@crearpsl.net',
+        'gomeznueve@gmail.com',
+        'contabilidad.global@crearpsl.net',
+        'leandro.brunis@crearpsl.net',
+        'paul.sosa@crearpsl.net'
+      ];
+      allow write: if isSuperAdmin() || email() == 'jose.sanchez@crearpsl.net';
     }
 
     // ========================================================================

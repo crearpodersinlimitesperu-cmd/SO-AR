@@ -11,6 +11,8 @@ import {
   Legend, Cell, PieChart, Pie
 } from 'recharts';
 import { subscribeToKpisSummary, slugify } from '../services/kpisLlamadasService';
+import { useAuth } from '../context/AuthContext';
+import { canViewKPIsLlamadas } from '../config/permissions';
 
 const SHEET_MANAGERS_URL = 'https://docs.google.com/spreadsheets/d/1KF58QXAiIk4KP_9G2aiAM3ERVoptcqKlIraszNKq2Ow/edit?usp=drive_link';
 const SHEET_LLAMADOS_URL = 'https://docs.google.com/spreadsheets/d/1lWAHh1PSAKu9eU6DOBxZExrHMbCYc3f2Sr8GdghNxD0/edit?usp=drive_link';
@@ -31,6 +33,9 @@ const COLORS_SEDES = {
 };
 
 export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
+  const { currentUser } = useAuth();
+  const hasAccess = canViewKPIsLlamadas(currentUser);
+
   const [data, setData] = useState(null);
   const [activeSubView, setActiveSubView] = useState('entrenadores'); // 'entrenadores' | 'graficas_retencion' | 'directorio_estados'
   const [search, setSearch] = useState('');
@@ -44,13 +49,14 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
   const [modalFilterStatus, setModalFilterStatus] = useState('todos');
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Escuchar datos en tiempo real
+  // Escuchar datos en tiempo real solo si el usuario tiene acceso
   useEffect(() => {
+    if (!hasAccess) return;
     const unsub = subscribeToKpisSummary((kpiPayload) => {
       setData(kpiPayload);
     });
     return () => unsub();
-  }, []);
+  }, [hasAccess]);
 
   // Mapeo rápido de managers por teléfono / sede desde allManagersList o managersSheet1
   const phoneByManagerName = useMemo(() => {
@@ -260,6 +266,41 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
       setIsRefreshing(false);
     }, 900);
   };
+
+  if (!hasAccess) {
+    return (
+      <div style={{
+        background: '#ffffff',
+        borderRadius: '16px',
+        padding: '3rem 2rem',
+        textAlign: 'center',
+        border: '1px solid #fee2e2',
+        maxWidth: '560px',
+        margin: '3rem auto',
+        boxShadow: '0 4px 12px rgba(239, 68, 68, 0.08)'
+      }}>
+        <div style={{
+          width: '56px',
+          height: '56px',
+          borderRadius: '50%',
+          background: '#fef2f2',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          margin: '0 auto 1rem',
+          color: '#ef4444'
+        }}>
+          <AlertTriangle size={28} />
+        </div>
+        <h3 style={{ margin: '0 0 0.5rem', color: '#991b1b', fontSize: '1.2rem', fontWeight: 800 }}>
+          Acceso Restringido a Dirección
+        </h3>
+        <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem', lineHeight: '1.6' }}>
+          Este módulo de auditoría financiera, balance de llamadas y análisis de retención/deserción está reservado exclusivamente para la Dirección y Administración Central.
+        </p>
+      </div>
+    );
+  }
 
   if (!data) {
     return (
