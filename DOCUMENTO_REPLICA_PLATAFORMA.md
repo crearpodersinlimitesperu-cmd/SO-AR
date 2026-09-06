@@ -214043,7 +214043,7 @@ export default function HelpModal({ isOpen, onClose }) {
                   <p>La sección de KPIs ha sido reconstruida y mejorada para gerentes y directores.</p>
                   <ul style={{ paddingLeft: '1.5rem', marginBottom: '1.5rem' }}>
                     <li><strong>Tab CMJ:</strong> Consolidado automático (desde Drive) que suma la retención, deserción y enrolamiento total de <em>todos</em> los Coordinadores de la Maestría de la sede seleccionada.</li>
-                    <li><strong>Tab Entrenadores Maestría:</strong> Métricas operativas de avance, gráficas y cierres enfocadas en el desempeño del Entrenador por sede.</li>
+                    <li><strong>Tab Coordinadores de Maestría:</strong> Métricas operativas de avance, gráficas y cierres enfocadas en el desempeño del Entrenador por sede.</li>
                     <li><strong>Tab Auditoría de KPIs:</strong> Espacio exclusivo para revisar y auditar los formularios semanales cargados manualmente por el Quantum Team (QT y Coordinadores).</li>
                     <li><strong>Horarios de Entrenamiento y Vestimenta:</strong> Consulta el cronograma oficial de sala (Jueves a Domingo) y código de vestimenta haciendo clic en el botón <strong>⏰ Horarios y Vestimenta</strong> en la barra superior de Inicio, en el Dashboard Gerencial o en el Manual Nodus.</li>
                     <li><strong>Flyers Globales:</strong> Acceso a recursos de diseño para Capítulo 1 en la pantalla de inicio.</li>
@@ -329327,6 +329327,17 @@ export default function AuditoriaKPIs({ defaultTab }) {
         filtered = filtered.filter(r => r.sede && r.sede.toUpperCase().includes(searchTerm));
       }
 
+      
+      // MERGE LOCAL REVIEW STATUS
+      const localReviews = getLocalReports();
+      filtered = filtered.map(r => {
+        const local = localReviews.find(l => l.id === r.id);
+        if (local && local.status === 'reviewed') {
+          return { ...r, status: 'reviewed', reviewedBy: local.reviewedBy, reviewedAt: local.reviewedAt };
+        }
+        return r;
+      });
+
       setReports(filtered);
     } catch (error) {
       if (error.code === 'permission-denied') {
@@ -329353,12 +329364,15 @@ export default function AuditoriaKPIs({ defaultTab }) {
     } : r);
     setReports(updated);
 
-    const allLocal = getLocalReports().map(r => r.id === reportId ? {
-      ...r,
-      status: 'reviewed',
-      reviewedBy: reviewerName,
-      reviewedAt: nowIso
-    } : r);
+    let allLocal = getLocalReports();
+    const existing = allLocal.find(r => r.id === reportId);
+    if (existing) {
+      existing.status = 'reviewed';
+      existing.reviewedBy = reviewerName;
+      existing.reviewedAt = nowIso;
+    } else {
+      allLocal.push({ id: reportId, status: 'reviewed', reviewedBy: reviewerName, reviewedAt: nowIso });
+    }
     saveLocalReports(allLocal);
 
     showToast("Reporte marcado como revisado", "success");
@@ -329534,7 +329548,7 @@ export default function AuditoriaKPIs({ defaultTab }) {
             }}
           >
             <Users size={16} style={{ display: 'inline-block', verticalAlign: 'text-bottom', marginRight: '6px' }} />
-            Entrenadores Maestría
+            Coordinadores de Maestría
           </button>
           <button
             onClick={() => setActiveTab('auditoria')}
@@ -341300,7 +341314,10 @@ export default function Home() {
 
               {/* PANEL PRIORIDAD TOP 3 */}
               <div className="glass-panel" style={{ padding: '1.2rem' }}>
-                <h3 className="text-blue" style={{ marginTop: 0, borderBottom: '1px solid rgba(0,212,255,0.2)', paddingBottom: '0.4rem', fontSize: '1rem' }}>TU PRIORIDAD (Top 3)</h3>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(0,212,255,0.2)', paddingBottom: '0.4rem', marginBottom: '0.8rem' }}>
+                  <h3 className="text-blue" style={{ marginTop: 0, marginBottom: 0, borderBottom: 'none', paddingBottom: 0, fontSize: '1rem' }}>TU PRIORIDAD (Top 3)</h3>
+                  <button onClick={() => navigate(`/checklist/${currentUser?.appRole || 'gerente'}`)} style={{ background: 'transparent', border: '1px solid var(--crear-gold)', color: 'var(--crear-gold)', borderRadius: '4px', padding: '4px 8px', fontSize: '0.75rem', cursor: 'pointer' }}>Ver Tareas Generales →</button>
+                </div>
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0.8rem 0 0 0', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   {urgentTasks.slice(0, 3).length === 0 ? (
                     <li className="text-muted" style={{ padding: '0.5rem 0', fontSize: '0.85rem' }}>No tienes tareas urgentes pendientes. ¡Excelente!</li>
