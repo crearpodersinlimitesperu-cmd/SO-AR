@@ -74,7 +74,7 @@ useEffect(() => {
           const ciclosReales = [
             { 
               id: 1, 
-              name: \\ - CICLO 1 (Actual)\, 
+              name: `${selectedSede} - CICLO 1 (Actual)`, 
               progress: progress || 0, 
               health: health, 
               date: 'Ciclo Activo', 
@@ -210,7 +210,8 @@ useEffect(() => {
               ))}
             </div>
 
-            {/* LISTA DETALLADA */}
+            {/* LISTA DETALLADA O RECURSOS */}
+            {viewMode === 'active' ? (
             <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '2rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
               <h2 style={{ fontSize: '1.2rem', color: textDark, fontWeight: 800, margin: '0 0 1.5rem 0', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                 <Box color="#d97706" /> Detalle de Portafolio Sincronizado
@@ -289,6 +290,18 @@ useEffect(() => {
                 </table>
               </div>
             </div>
+            ) : (
+              <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '4rem 2rem', textAlign: 'center', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+                <ShieldCheck size={48} color="#94a3b8" style={{ margin: '0 auto 1.5rem', display: 'block' }} />
+                <h2 style={{ fontSize: '1.5rem', color: textDark, fontWeight: 800, marginBottom: '0.75rem' }}>Capacidad de Recursos</h2>
+                <p style={{ color: textMuted, maxWidth: '500px', margin: '0 auto 2rem', lineHeight: '1.6' }}>
+                  Esta vista de asignación de capacidad de entrenadores, coordinadores y salas está actualmente en desarrollo para la sede {selectedSede}.
+                </p>
+                <button onClick={() => setViewMode('active')} style={{ padding: '0.75rem 1.5rem', borderRadius: '8px', background: textDark, color: '#fff', fontWeight: 700, border: 'none', cursor: 'pointer', fontSize: '0.9rem' }}>
+                  Volver a Ciclos Activos
+                </button>
+              </div>
+            )}
           </>
         )}
       </main>
