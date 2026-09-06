@@ -80,7 +80,7 @@ jobs:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/centro-operativo-cpsl-65ad52160f45.json
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npx --yes firebase-tools@latest deploy --only hosting --project centro-operativo-cpsl --non-interactive 2>&1 | tee /tmp/deploy_output.log
+          npx --yes firebase-tools@latest deploy --only hosting,firestore:rules --project centro-operativo-cpsl --non-interactive 2>&1 | tee /tmp/deploy_output.log
           DEPLOY_EXIT=${PIPESTATUS[0]}
 
           # (04/09/2026) FIX — antes este paso terminaba SIEMPRE con "exit 0",
