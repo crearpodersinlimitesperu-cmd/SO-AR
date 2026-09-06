@@ -214738,7 +214738,9 @@ import React, { useState, useMemo, useEffect } from 'react';
 import {
   TrendingUp, BarChart3, Users, DollarSign, CheckCircle2,
   Clock, Calendar, Search, Filter, ExternalLink, RefreshCw,
-  X, ArrowUpDown, ChevronRight, Phone, Award, Eye, Download, Info
+  X, ArrowUpDown, ChevronRight, Phone, Award, Eye, Download,
+  Info, GraduationCap, UserX, UserCheck, AlertTriangle, UserMinus,
+  Sparkles, Check, PieChart as PieIcon, ListFilter
 } from 'lucide-react';
 import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip,
@@ -214751,23 +214753,31 @@ const SHEET_LLAMADOS_URL = 'https://docs.google.com/spreadsheets/d/1lWAHh1PSAKu9
 
 const COLORS_SEDES = {
   'Quito': '#3b82f6',
+  'QUITO': '#3b82f6',
   'Lima': '#10b981',
+  'LIMA': '#10b981',
   'Guayaquil': '#f59e0b',
   'Cuenca': '#8b5cf6',
+  'CUENCA': '#8b5cf6',
   'Medellín': '#ec4899',
+  'Medellin': '#ec4899',
+  'MEDELLIN': '#ec4899',
   'CDMX': '#06b6d4',
   'Sin Sede': '#94a3b8'
 };
 
 export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
   const [data, setData] = useState(null);
+  const [activeSubView, setActiveSubView] = useState('entrenadores'); // 'entrenadores' | 'graficas_retencion' | 'directorio_estados'
   const [search, setSearch] = useState('');
   const [filterSede, setFilterSede] = useState('Todas');
-  const [filterStatus, setFilterStatus] = useState('todos'); // 'todos' | 'con_pendientes' | 'completados' | 'sin_actividad'
-  const [sortBy, setSortBy] = useState('montoTotal'); // 'montoTotal' | 'totalLlamadas' | 'pagadoLlamadas' | 'pendienteLlamadas' | 'entrenador'
+  const [filterStatus, setFilterStatus] = useState('todos'); // 'todos' | 'con_pendientes' | 'completados' | 'alta_graduacion' | 'alta_desercion'
+  const [filterManagerStatus, setFilterManagerStatus] = useState('todos'); // 'todos' | 'GRADUADO' | 'DESERTOR' | 'EN_JUEGO' | 'sin_entrenador'
+  const [sortBy, setSortBy] = useState('montoTotal');
   const [sortOrder, setSortOrder] = useState('desc');
   const [selectedTrainer, setSelectedTrainer] = useState(null);
   const [modalSearch, setModalSearch] = useState('');
+  const [modalFilterStatus, setModalFilterStatus] = useState('todos');
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Escuchar datos en tiempo real
@@ -214778,17 +214788,21 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
     return () => unsub();
   }, []);
 
-  // Mapeo rápido de managers por teléfono / sede desde allManagersList (Sheet 1)
+  // Mapeo rápido de managers por teléfono / sede desde allManagersList o managersSheet1
   const phoneByManagerName = useMemo(() => {
     const map = {};
-    (allManagersList || []).forEach(m => {
+    (data?.managersSheet1 || []).forEach(m => {
       if (m.nombre) {
-        const clean = m.nombre.trim().toLowerCase();
-        map[clean] = m.telefono || '';
+        map[m.nombre.trim().toLowerCase()] = m.telefono || '';
+      }
+    });
+    (allManagersList || []).forEach(m => {
+      if (m.nombre && !map[m.nombre.trim().toLowerCase()]) {
+        map[m.nombre.trim().toLowerCase()] = m.telefono || '';
       }
     });
     return map;
-  }, [allManagersList]);
+  }, [data, allManagersList]);
 
   // Lista de entrenadores procesada con filtros y orden
   const processedTrainers = useMemo(() => {
@@ -214828,18 +214842,20 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
     // Filtro por sede
     if (filterSede !== 'Todas') {
       list = list.filter(t => 
-        t.topSede === filterSede || 
-        t.detalles.some(d => d.sede === filterSede)
+        t.topSede.toLowerCase().includes(filterSede.toLowerCase()) || 
+        t.detalles.some(d => d.sede.toLowerCase().includes(filterSede.toLowerCase()))
       );
     }
 
-    // Filtro por estado de cobro
+    // Filtro por estado de cobro o desempeño
     if (filterStatus === 'con_pendientes') {
       list = list.filter(t => t.pendienteLlamadas > 0);
     } else if (filterStatus === 'completados') {
       list = list.filter(t => t.totalLlamadas > 0 && t.pendienteLlamadas === 0);
-    } else if (filterStatus === 'sin_actividad') {
-      list = list.filter(t => t.totalLlamadas === 0);
+    } else if (filterStatus === 'alta_graduacion') {
+      list = list.filter(t => t.tasaGraduacion >= 65 && t.totalAsignados > 0);
+    } else if (filterStatus === 'alta_desercion') {
+      list = list.filter(t => t.tasaDesercion >= 30 && t.totalAsignados > 0);
     }
 
     // Ordenamiento
@@ -214849,13 +214865,46 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
       if (typeof valA === 'string') {
         return sortOrder === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
       }
-      return sortOrder === 'asc' ? valA - valB : valB - valA;
+      return sortOrder === 'asc' ? (valA || 0) - (valB || 0) : (valB || 0) - (valA || 0);
     });
 
     return list;
   }, [data, search, filterSede, filterStatus, sortBy, sortOrder]);
 
-  // Top 10 entrenadores para gráfico de barras por facturación
+  // Lista de Managers de Sheet 1 procesada
+  const processedManagersList = useMemo(() => {
+    if (!data?.managersSheet1) return [];
+    let list = [...data.managersSheet1];
+
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      list = list.filter(m => 
+        m.nombre.toLowerCase().includes(q) ||
+        m.entrenador.toLowerCase().includes(q) ||
+        m.sede.toLowerCase().includes(q) ||
+        m.nombreEquipo.toLowerCase().includes(q) ||
+        m.coordinador.toLowerCase().includes(q)
+      );
+    }
+
+    if (filterSede !== 'Todas') {
+      list = list.filter(m => m.sede.toLowerCase().includes(filterSede.toLowerCase()));
+    }
+
+    if (filterManagerStatus === 'GRADUADO') {
+      list = list.filter(m => m.estado === 'GRADUADO');
+    } else if (filterManagerStatus === 'DESERTOR') {
+      list = list.filter(m => m.estado === 'DESERTOR');
+    } else if (filterManagerStatus === 'EN_JUEGO') {
+      list = list.filter(m => m.estado === 'EN_JUEGO');
+    } else if (filterManagerStatus === 'sin_entrenador') {
+      list = list.filter(m => !m.tieneEntrenador);
+    }
+
+    return list;
+  }, [data, search, filterSede, filterManagerStatus]);
+
+  // Top 10 entrenadores para gráfico de facturación
   const topRevenueTrainers = useMemo(() => {
     if (!data?.kpis) return [];
     return [...data.kpis]
@@ -214864,13 +214913,30 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
       .slice(0, 10);
   }, [data]);
 
-  // Top 10 entrenadores para gráfico apilado Pagadas vs Pendientes
-  const topVolumeTrainers = useMemo(() => {
+  // Top 12 entrenadores para gráfico de Graduados vs Desertores
+  const topRetentionTrainers = useMemo(() => {
     if (!data?.kpis) return [];
     return [...data.kpis]
-      .filter(t => t.totalLlamadas > 0)
-      .sort((a, b) => b.totalLlamadas - a.totalLlamadas)
-      .slice(0, 10);
+      .filter(t => (t.totalAsignados || 0) > 0)
+      .sort((a, b) => (b.totalAsignados || 0) - (a.totalAsignados || 0))
+      .slice(0, 12);
+  }, [data]);
+
+  // Datos para gráfico Donut de Estado del Ciclo de Vida
+  const statusPieData = useMemo(() => {
+    if (!data?.totales?.statusDist) {
+      return [
+        { name: 'Graduados', value: 447, color: '#10b981' },
+        { name: 'Desertores', value: 168, color: '#ef4444' },
+        { name: 'En Juego', value: 84, color: '#3b82f6' }
+      ];
+    }
+    const dist = data.totales.statusDist;
+    return [
+      { name: 'Graduados', value: dist.Graduados || 0, color: '#10b981' },
+      { name: 'Desertores', value: dist.Desertores || 0, color: '#ef4444' },
+      { name: 'En Juego', value: dist['En Juego'] || 0, color: '#3b82f6' }
+    ];
   }, [data]);
 
   // Datos para gráfico de distribución por Sede
@@ -214878,7 +214944,12 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
     if (!data?.llamadosDetalle) return [];
     const counts = {};
     data.llamadosDetalle.forEach(d => {
-      const s = d.sede || 'Sin Sede';
+      let s = d.sede || 'Sin Sede';
+      if (s.toLowerCase().includes('quito')) s = 'Quito';
+      else if (s.toLowerCase().includes('lima')) s = 'Lima';
+      else if (s.toLowerCase().includes('cuenca')) s = 'Cuenca';
+      else if (s.toLowerCase().includes('guayaquil')) s = 'Guayaquil';
+      else if (s.toLowerCase().includes('medellin')) s = 'Medellín';
       counts[s] = (counts[s] || 0) + 1;
     });
     return Object.entries(counts).map(([name, value]) => ({
@@ -214888,7 +214959,6 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
     })).sort((a, b) => b.value - a.value);
   }, [data]);
 
-  // Totales calculados en base al dataset filtrado o global
   const statsGlobal = useMemo(() => {
     if (!data?.totales) {
       return {
@@ -214896,7 +214966,16 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
         totalPagado: 3102,
         totalPendiente: 2241,
         montoTotal: 77550,
-        porcentajePagado: 57.4
+        porcentajePagado: 57,
+        totalManagers: 699,
+        totalGraduados: 447,
+        totalDesertores: 168,
+        totalActivos: 84,
+        totalAsignados: 681,
+        totalSinAsignar: 18,
+        tasaGraduacionGlobal: 64,
+        tasaDesercionGlobal: 24,
+        tasaAsignacionGlobal: 97
       };
     }
     return data.totales;
@@ -214913,7 +214992,6 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    // Simular un trigger de refresco visual o sincronización rápida
     setTimeout(() => {
       setIsRefreshing(false);
     }, 900);
@@ -214923,15 +215001,15 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
     return (
       <div style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>
         <RefreshCw className="animate-spin" size={32} style={{ margin: '0 auto 1rem auto', color: '#7c3aed' }} />
-        <p style={{ fontWeight: 600 }}>Cargando datos analíticos de llamadas en tiempo real...</p>
+        <p style={{ fontWeight: 600 }}>Cargando analítica en tiempo real de Google Sheets...</p>
       </div>
     );
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
       
-      {/* 1. HEADER DE CONTROL Y CONEXIÓN EN VIVO */}
+      {/* 1. HERO HEADER DE CONTROL Y CONEXIÓN EN TIEMPO REAL */}
       <div style={{
         background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)',
         borderRadius: '16px',
@@ -214961,18 +215039,18 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
               border: '1px solid rgba(139, 92, 246, 0.4)'
             }}>
               <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981', display: 'inline-block' }} />
-              Datos en Vivo • Google Sheets v4
+              Google Sheets API v4 • En Vivo
             </span>
             <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
-              Última actualización: {new Date(data.metadata?.generatedAt || Date.now()).toLocaleTimeString()}
+              699 Managers • 34 Entrenadores • 5,402 Llamadas
             </span>
           </div>
 
           <h2 style={{ fontSize: '1.75rem', fontWeight: 800, margin: 0, letterSpacing: '-0.02em', color: '#f8fafc' }}>
-            Panel de KPIs: Entrenadores de Llamadas
+            Auditoría Ejecutiva: Llamadas, Graduados y Deserción
           </h2>
-          <p style={{ margin: '0.4rem 0 0 0', color: '#cbd5e1', fontSize: '0.92rem', maxWidth: '650px' }}>
-            Auditoría en tiempo real de llamadas asignadas, recaudación acumulada ($), llamadas completadas vs. pendientes y cumplimiento por sede.
+          <p style={{ margin: '0.4rem 0 0 0', color: '#cbd5e1', fontSize: '0.92rem', maxWidth: '720px' }}>
+            Monitoreo en tiempo real de llamadas ($77,550 USD), rendimiento de retención (Graduados vs. Desertores), asignaciones de entrenadores y matriz de 1 a 16 llamadas.
           </p>
         </div>
 
@@ -214986,17 +215064,16 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
               color: '#f8fafc',
               border: '1px solid rgba(255, 255, 255, 0.2)',
               borderRadius: '8px',
-              padding: '0.6rem 1rem',
+              padding: '0.55rem 0.9rem',
               fontSize: '0.82rem',
               fontWeight: 600,
               display: 'flex',
               alignItems: 'center',
-              gap: '0.5rem',
-              textDecoration: 'none',
-              transition: 'all 0.2s ease'
+              gap: '0.45rem',
+              textDecoration: 'none'
             }}
           >
-            <ExternalLink size={15} /> Hoja Llamados
+            <ExternalLink size={14} /> Hoja Llamados
           </a>
 
           <a
@@ -215008,17 +215085,16 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
               color: '#f8fafc',
               border: '1px solid rgba(255, 255, 255, 0.2)',
               borderRadius: '8px',
-              padding: '0.6rem 1rem',
+              padding: '0.55rem 0.9rem',
               fontSize: '0.82rem',
               fontWeight: 600,
               display: 'flex',
               alignItems: 'center',
-              gap: '0.5rem',
-              textDecoration: 'none',
-              transition: 'all 0.2s ease'
+              gap: '0.45rem',
+              textDecoration: 'none'
             }}
           >
-            <ExternalLink size={15} /> Hoja Managers
+            <ExternalLink size={14} /> Hoja Managers
           </a>
 
           <button
@@ -215029,49 +215105,49 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
               color: '#ffffff',
               border: 'none',
               borderRadius: '8px',
-              padding: '0.6rem 1.1rem',
-              fontSize: '0.85rem',
+              padding: '0.55rem 1rem',
+              fontSize: '0.82rem',
               fontWeight: 700,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: '0.5rem',
+              gap: '0.45rem',
               boxShadow: '0 4px 12px rgba(124, 58, 237, 0.35)',
               opacity: isRefreshing ? 0.7 : 1
             }}
           >
-            <RefreshCw size={15} className={isRefreshing ? 'animate-spin' : ''} />
-            {isRefreshing ? 'Sincronizando...' : 'Actualizar'}
+            <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} />
+            {isRefreshing ? 'Actualizando...' : 'Actualizar'}
           </button>
         </div>
       </div>
 
-      {/* 2. TARJETAS DE RESUMEN EJECUTIVO (SCORECARDS) */}
+      {/* 2. TABLERO DE SCORECARDS GLOBALES (Llamadas, Graduados, Desertores, Asignados) */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-        gap: '1.25rem'
+        gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))',
+        gap: '1rem'
       }}>
-        {/* Total Facturado */}
+        {/* Monto Generado */}
         <div style={{
           background: '#ffffff',
           borderRadius: '12px',
-          padding: '1.25rem 1.5rem',
+          padding: '1.15rem 1.25rem',
           border: '1px solid #e2e8f0',
           borderLeft: '5px solid #8b5cf6',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.03)'
+          boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#64748b', fontSize: '0.85rem', fontWeight: 600 }}>
-            <span>Monto Total Generado</span>
-            <span style={{ background: '#f5f3ff', color: '#7c3aed', padding: '0.3rem', borderRadius: '8px' }}>
-              <DollarSign size={18} />
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#64748b', fontSize: '0.8rem', fontWeight: 600 }}>
+            <span>Monto Generado</span>
+            <span style={{ background: '#f5f3ff', color: '#7c3aed', padding: '0.3rem', borderRadius: '6px' }}>
+              <DollarSign size={16} />
             </span>
           </div>
-          <div style={{ fontSize: '1.85rem', fontWeight: 900, color: '#0f172a', margin: '0.4rem 0 0.2rem 0' }}>
+          <div style={{ fontSize: '1.65rem', fontWeight: 900, color: '#0f172a', margin: '0.3rem 0 0.1rem 0' }}>
             ${statsGlobal.montoTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
-          <div style={{ fontSize: '0.78rem', color: '#64748b' }}>
-            Tarifa estándar: <strong>$25.00</strong> por llamada pagada
+          <div style={{ fontSize: '0.74rem', color: '#64748b' }}>
+            Tarifa: $25 USD / llamada
           </div>
         </div>
 
@@ -215079,358 +215155,231 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
         <div style={{
           background: '#ffffff',
           borderRadius: '12px',
-          padding: '1.25rem 1.5rem',
+          padding: '1.15rem 1.25rem',
           border: '1px solid #e2e8f0',
           borderLeft: '5px solid #3b82f6',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.03)'
+          boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#64748b', fontSize: '0.85rem', fontWeight: 600 }}>
-            <span>Total Llamadas Registradas</span>
-            <span style={{ background: '#eff6ff', color: '#2563eb', padding: '0.3rem', borderRadius: '8px' }}>
-              <BarChart3 size={18} />
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#64748b', fontSize: '0.8rem', fontWeight: 600 }}>
+            <span>Total Llamadas</span>
+            <span style={{ background: '#eff6ff', color: '#2563eb', padding: '0.3rem', borderRadius: '6px' }}>
+              <BarChart3 size={16} />
             </span>
           </div>
-          <div style={{ fontSize: '1.85rem', fontWeight: 900, color: '#0f172a', margin: '0.4rem 0 0.2rem 0' }}>
+          <div style={{ fontSize: '1.65rem', fontWeight: 900, color: '#0f172a', margin: '0.3rem 0 0.1rem 0' }}>
             {statsGlobal.totalLlamadas.toLocaleString('en-US')}
           </div>
-          <div style={{ fontSize: '0.78rem', color: '#64748b' }}>
-            En 34 entrenadores y 934 seguimientos
+          <div style={{ fontSize: '0.74rem', color: '#059669', fontWeight: 700 }}>
+            {statsGlobal.totalPagado} Pagadas ({statsGlobal.porcentajePagado}%)
           </div>
         </div>
 
-        {/* Llamadas Pagadas */}
+        {/* Graduados */}
         <div style={{
           background: '#ffffff',
           borderRadius: '12px',
-          padding: '1.25rem 1.5rem',
+          padding: '1.15rem 1.25rem',
           border: '1px solid #e2e8f0',
           borderLeft: '5px solid #10b981',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.03)'
+          boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#64748b', fontSize: '0.85rem', fontWeight: 600 }}>
-            <span>Llamadas Pagadas / Cobradas</span>
-            <span style={{ background: '#ecfdf5', color: '#059669', padding: '0.3rem', borderRadius: '8px' }}>
-              <CheckCircle2 size={18} />
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#64748b', fontSize: '0.8rem', fontWeight: 600 }}>
+            <span>Managers Graduados</span>
+            <span style={{ background: '#ecfdf5', color: '#059669', padding: '0.3rem', borderRadius: '6px' }}>
+              <GraduationCap size={16} />
             </span>
           </div>
-          <div style={{ fontSize: '1.85rem', fontWeight: 900, color: '#059669', margin: '0.4rem 0 0.2rem 0' }}>
-            {statsGlobal.totalPagado.toLocaleString('en-US')}
+          <div style={{ fontSize: '1.65rem', fontWeight: 900, color: '#059669', margin: '0.3rem 0 0.1rem 0' }}>
+            {statsGlobal.totalGraduados}
           </div>
-          <div style={{ fontSize: '0.78rem', color: '#059669', fontWeight: 700 }}>
-            {statsGlobal.porcentajePagado}% del volumen total liquidado
+          <div style={{ fontSize: '0.74rem', color: '#059669', fontWeight: 700 }}>
+            {statsGlobal.tasaGraduacionGlobal}% del total de managers
           </div>
         </div>
 
-        {/* Llamadas Pendientes */}
+        {/* Desertores */}
         <div style={{
           background: '#ffffff',
           borderRadius: '12px',
-          padding: '1.25rem 1.5rem',
+          padding: '1.15rem 1.25rem',
+          border: '1px solid #e2e8f0',
+          borderLeft: '5px solid #ef4444',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#64748b', fontSize: '0.8rem', fontWeight: 600 }}>
+            <span>Desertores</span>
+            <span style={{ background: '#fef2f2', color: '#dc2626', padding: '0.3rem', borderRadius: '6px' }}>
+              <UserX size={16} />
+            </span>
+          </div>
+          <div style={{ fontSize: '1.65rem', fontWeight: 900, color: '#dc2626', margin: '0.3rem 0 0.1rem 0' }}>
+            {statsGlobal.totalDesertores}
+          </div>
+          <div style={{ fontSize: '0.74rem', color: '#dc2626', fontWeight: 700 }}>
+            {statsGlobal.tasaDesercionGlobal}% índice de abandono
+          </div>
+        </div>
+
+        {/* En Juego / Activos */}
+        <div style={{
+          background: '#ffffff',
+          borderRadius: '12px',
+          padding: '1.15rem 1.25rem',
+          border: '1px solid #e2e8f0',
+          borderLeft: '5px solid #06b6d4',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#64748b', fontSize: '0.8rem', fontWeight: 600 }}>
+            <span>En Juego (Activos)</span>
+            <span style={{ background: '#ecfeff', color: '#0891b2', padding: '0.3rem', borderRadius: '6px' }}>
+              <TrendingUp size={16} />
+            </span>
+          </div>
+          <div style={{ fontSize: '1.65rem', fontWeight: 900, color: '#0891b2', margin: '0.3rem 0 0.1rem 0' }}>
+            {statsGlobal.totalActivos}
+          </div>
+          <div style={{ fontSize: '0.74rem', color: '#0891b2', fontWeight: 700 }}>
+            {((statsGlobal.totalActivos / statsGlobal.totalManagers) * 100).toFixed(1)}% en proceso activo
+          </div>
+        </div>
+
+        {/* Asignados a Entrenador */}
+        <div style={{
+          background: '#ffffff',
+          borderRadius: '12px',
+          padding: '1.15rem 1.25rem',
           border: '1px solid #e2e8f0',
           borderLeft: '5px solid #f59e0b',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.03)'
+          boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#64748b', fontSize: '0.85rem', fontWeight: 600 }}>
-            <span>Llamadas Pendientes</span>
-            <span style={{ background: '#fffbeb', color: '#d97706', padding: '0.3rem', borderRadius: '8px' }}>
-              <Clock size={18} />
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#64748b', fontSize: '0.8rem', fontWeight: 600 }}>
+            <span>Con Entrenador</span>
+            <span style={{ background: '#fffbeb', color: '#d97706', padding: '0.3rem', borderRadius: '6px' }}>
+              <UserCheck size={16} />
             </span>
           </div>
-          <div style={{ fontSize: '1.85rem', fontWeight: 900, color: '#d97706', margin: '0.4rem 0 0.2rem 0' }}>
-            {statsGlobal.totalPendiente.toLocaleString('en-US')}
+          <div style={{ fontSize: '1.65rem', fontWeight: 900, color: '#d97706', margin: '0.3rem 0 0.1rem 0' }}>
+            {statsGlobal.totalAsignados}
           </div>
-          <div style={{ fontSize: '0.78rem', color: '#d97706', fontWeight: 700 }}>
-            {(100 - statsGlobal.porcentajePagado).toFixed(1)}% pendiente de liquidación
-          </div>
-        </div>
-
-        {/* Entrenadores Activos */}
-        <div style={{
-          background: '#ffffff',
-          borderRadius: '12px',
-          padding: '1.25rem 1.5rem',
-          border: '1px solid #e2e8f0',
-          borderLeft: '5px solid #6366f1',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.03)'
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#64748b', fontSize: '0.85rem', fontWeight: 600 }}>
-            <span>Entrenadores Activos</span>
-            <span style={{ background: '#e0e7ff', color: '#4338ca', padding: '0.3rem', borderRadius: '8px' }}>
-              <Award size={18} />
-            </span>
-          </div>
-          <div style={{ fontSize: '1.85rem', fontWeight: 900, color: '#0f172a', margin: '0.4rem 0 0.2rem 0' }}>
-            {data.kpis?.filter(k => k.totalLlamadas > 0).length || 23}
-          </div>
-          <div style={{ fontSize: '0.78rem', color: '#64748b' }}>
-            De 34 entrenadores registrados en catálogo
+          <div style={{ fontSize: '0.74rem', color: statsGlobal.totalSinAsignar > 0 ? '#ef4444' : '#64748b', fontWeight: 700 }}>
+            {statsGlobal.totalSinAsignar} sin entrenador asignado
           </div>
         </div>
       </div>
 
-      {/* 3. SECCIÓN DE GRÁFICAS DE ALTO IMPACTO (RECHARTS) */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(480px, 1fr))',
-        gap: '1.5rem'
-      }}>
-        {/* GRÁFICA 1: Monto Total Generado por Entrenador */}
-        <div style={{
-          background: '#ffffff',
-          borderRadius: '14px',
-          padding: '1.5rem',
-          border: '1px solid #e2e8f0',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-          display: 'flex',
-          flexDirection: 'column'
-        }}>
-          <div style={{ marginBottom: '1rem' }}>
-            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#0f172a' }}>
-              Monto Total Generado por Entrenador ($)
-            </h3>
-            <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>
-              Clasificación de entrenadores según ingresos totales por llamadas pagadas ($25/llamada)
-            </p>
-          </div>
-
-          <div style={{ width: '100%', height: '360px' }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={topRevenueTrainers}
-                layout="vertical"
-                margin={{ top: 5, right: 30, left: 90, bottom: 5 }}
-              >
-                <XAxis
-                  type="number"
-                  tickFormatter={(val) => `$${val}`}
-                  stroke="#94a3b8"
-                  fontSize={12}
-                />
-                <YAxis
-                  type="category"
-                  dataKey="entrenador"
-                  stroke="#475569"
-                  fontSize={12}
-                  tickLine={false}
-                  width={110}
-                />
-                <Tooltip
-                  formatter={(value) => [`$${value.toLocaleString()} USD`, 'Monto Generado']}
-                  labelFormatter={(name) => `Entrenador: ${name}`}
-                  contentStyle={{ background: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '0.85rem' }}
-                />
-                <Bar dataKey="montoTotal" fill="#4a90e2" radius={[0, 6, 6, 0]}>
-                  {topRevenueTrainers.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={index === 0 ? '#7c3aed' : index < 3 ? '#3b82f6' : '#60a5fa'}
-                    />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* GRÁFICA 2: Distribución de Llamadas: Pagadas vs Pendientes */}
-        <div style={{
-          background: '#ffffff',
-          borderRadius: '14px',
-          padding: '1.5rem',
-          border: '1px solid #e2e8f0',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-          display: 'flex',
-          flexDirection: 'column'
-        }}>
-          <div style={{ marginBottom: '1rem' }}>
-            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#0f172a' }}>
-              Distribución de Llamadas: Pagadas vs Pendientes
-            </h3>
-            <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>
-              Análisis del volumen total de llamadas por entrenador y su estado de cobro
-            </p>
-          </div>
-
-          <div style={{ width: '100%', height: '360px' }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={topVolumeTrainers}
-                layout="vertical"
-                margin={{ top: 5, right: 30, left: 90, bottom: 5 }}
-              >
-                <XAxis type="number" stroke="#94a3b8" fontSize={12} />
-                <YAxis
-                  type="category"
-                  dataKey="entrenador"
-                  stroke="#475569"
-                  fontSize={12}
-                  tickLine={false}
-                  width={110}
-                />
-                <Tooltip
-                  formatter={(value, name) => [value, name === 'pagadoLlamadas' ? 'Pagadas' : 'Pendientes']}
-                  contentStyle={{ background: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '0.85rem' }}
-                />
-                <Legend
-                  verticalAlign="top"
-                  align="right"
-                  formatter={(value) => (value === 'pagadoLlamadas' ? 'Pagadas (Completadas)' : 'Pendientes')}
-                  wrapperStyle={{ fontSize: '0.8rem', paddingBottom: '10px' }}
-                />
-                <Bar dataKey="pagadoLlamadas" stackId="a" fill="#10b981" radius={[0, 0, 0, 0]} />
-                <Bar dataKey="pendienteLlamadas" stackId="a" fill="#f59e0b" radius={[0, 6, 6, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* GRÁFICA 3: Distribución por Sede */}
-        <div style={{
-          background: '#ffffff',
-          borderRadius: '14px',
-          padding: '1.5rem',
-          border: '1px solid #e2e8f0',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-          display: 'flex',
-          flexDirection: 'column'
-        }}>
-          <div style={{ marginBottom: '1rem' }}>
-            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#0f172a' }}>
-              Distribución de Managers con Llamadas por Sede
-            </h3>
-            <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>
-              Concentración geográfica de managers con llamadas de entrenamiento registradas
-            </p>
-          </div>
-
-          <div style={{ width: '100%', height: '280px', display: 'flex', alignItems: 'center' }}>
-            <ResponsiveContainer width="60%" height="100%">
-              <PieChart>
-                <Pie
-                  data={sedePieData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={95}
-                  paddingAngle={3}
-                  dataKey="value"
-                >
-                  {sedePieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  formatter={(value, name) => [`${value} managers (${((value / 934) * 100).toFixed(1)}%)`, name]}
-                  contentStyle={{ background: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '0.85rem' }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-
-            <div style={{ width: '40%', display: 'flex', flexDirection: 'column', gap: '0.5rem', paddingLeft: '1rem' }}>
-              {sedePieData.map((item) => (
-                <div key={item.name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.82rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: item.color }} />
-                    <span style={{ fontWeight: 600, color: '#334155' }}>{item.name}</span>
-                  </div>
-                  <span style={{ fontWeight: 800, color: '#0f172a' }}>{item.value}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* TARJETA RESUMEN DE CICLOS Y EFECTIVIDAD */}
-        <div style={{
-          background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
-          borderRadius: '14px',
-          padding: '1.5rem',
-          border: '1px solid #e2e8f0',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between'
-        }}>
-          <div>
-            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#0f172a' }}>
-              Efectividad Global de Ejecución
-            </h3>
-            <p style={{ margin: '0.2rem 0 1.25rem 0', fontSize: '0.8rem', color: '#64748b' }}>
-              Relación entre llamadas programadas vs. recaudación efectiva ejecutada
-            </p>
-
-            <div style={{ marginBottom: '1.25rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '0.4rem' }}>
-                <span style={{ color: '#475569', fontWeight: 600 }}>Tasa de Liquidación / Cobro:</span>
-                <strong style={{ color: '#10b981' }}>{statsGlobal.porcentajePagado}%</strong>
-              </div>
-              <div style={{ height: '12px', background: '#e2e8f0', borderRadius: '6px', overflow: 'hidden', display: 'flex' }}>
-                <div style={{ width: `${statsGlobal.porcentajePagado}%`, background: '#10b981', transition: 'width 0.5s' }} />
-                <div style={{ width: `${100 - statsGlobal.porcentajePagado}%`, background: '#f59e0b', transition: 'width 0.5s' }} />
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginTop: '0.4rem', color: '#64748b' }}>
-                <span>● Pagado: {statsGlobal.totalPagado} (${(statsGlobal.totalPagado * 25).toLocaleString()})</span>
-                <span>● Pendiente: {statsGlobal.totalPendiente} (${(statsGlobal.totalPendiente * 25).toLocaleString()})</span>
-              </div>
-            </div>
-
-            <div style={{ background: '#ffffff', borderRadius: '8px', padding: '1rem', border: '1px solid #e2e8f0' }}>
-              <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.5rem' }}>
-                Métricas de Impacto Operativo
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', fontSize: '0.82rem' }}>
-                <div>
-                  <div style={{ color: '#94a3b8' }}>Promedio llamadas/coach:</div>
-                  <div style={{ fontWeight: 800, color: '#0f172a', fontSize: '1rem' }}>
-                    {Math.round(statsGlobal.totalLlamadas / 34)}
-                  </div>
-                </div>
-                <div>
-                  <div style={{ color: '#94a3b8' }}>Recaudación media:</div>
-                  <div style={{ fontWeight: 800, color: '#0f172a', fontSize: '1rem' }}>
-                    ${Math.round(statsGlobal.montoTotal / 34).toLocaleString()}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div style={{ marginTop: '1rem', padding: '0.75rem 1rem', background: '#e0e7ff', borderRadius: '8px', border: '1px solid #c7d2fe', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <Info size={18} style={{ color: '#4338ca', flexShrink: 0 }} />
-            <div style={{ fontSize: '0.75rem', color: '#3730a3', lineHeight: '1.3' }}>
-              Cada llamada de entrenamiento completada genera un valor pactado de $25.00 USD. Los datos se actualizan automáticamente contra Google Sheets.
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 4. FILTROS Y CONTROLES DE LA TABLA MAESTRA */}
+      {/* 3. SUBBARRA DE VISTAS (Navegación interna) */}
       <div style={{
         background: '#ffffff',
         borderRadius: '12px',
-        padding: '1.25rem 1.5rem',
+        border: '1px solid #e2e8f0',
+        padding: '0.5rem',
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: '0.75rem'
+      }}>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <button
+            onClick={() => setActiveSubView('entrenadores')}
+            style={{
+              padding: '0.55rem 1rem',
+              borderRadius: '8px',
+              border: 'none',
+              background: activeSubView === 'entrenadores' ? '#7c3aed' : 'transparent',
+              color: activeSubView === 'entrenadores' ? '#ffffff' : '#64748b',
+              fontWeight: 700,
+              fontSize: '0.85rem',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            <Award size={16} /> Entrenadores & Llamadas (34)
+          </button>
+
+          <button
+            onClick={() => setActiveSubView('graficas_retencion')}
+            style={{
+              padding: '0.55rem 1rem',
+              borderRadius: '8px',
+              border: 'none',
+              background: activeSubView === 'graficas_retencion' ? '#7c3aed' : 'transparent',
+              color: activeSubView === 'graficas_retencion' ? '#ffffff' : '#64748b',
+              fontWeight: 700,
+              fontSize: '0.85rem',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            <BarChart3 size={16} /> Gráficas de Retención & Deserción
+          </button>
+
+          <button
+            onClick={() => setActiveSubView('directorio_estados')}
+            style={{
+              padding: '0.55rem 1rem',
+              borderRadius: '8px',
+              border: 'none',
+              background: activeSubView === 'directorio_estados' ? '#7c3aed' : 'transparent',
+              color: activeSubView === 'directorio_estados' ? '#ffffff' : '#64748b',
+              fontWeight: 700,
+              fontSize: '0.85rem',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            <Users size={16} /> Directorio de Managers por Estado ({data.managersSheet1?.length || 699})
+          </button>
+        </div>
+
+        {/* Contador Rápido de Estados */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', fontSize: '0.78rem', paddingRight: '0.5rem' }}>
+          <span style={{ background: '#ecfdf5', color: '#059669', padding: '0.2rem 0.5rem', borderRadius: '6px', fontWeight: 700 }}>
+            🎓 {statsGlobal.totalGraduados} Graduados
+          </span>
+          <span style={{ background: '#fef2f2', color: '#dc2626', padding: '0.2rem 0.5rem', borderRadius: '6px', fontWeight: 700 }}>
+            ⚠️ {statsGlobal.totalDesertores} Desertores
+          </span>
+          <span style={{ background: '#eff6ff', color: '#2563eb', padding: '0.2rem 0.5rem', borderRadius: '6px', fontWeight: 700 }}>
+            ⚡ {statsGlobal.totalActivos} En Juego
+          </span>
+        </div>
+      </div>
+
+      {/* 4. FILTROS DINÁMICOS */}
+      <div style={{
+        background: '#ffffff',
+        borderRadius: '12px',
+        padding: '1rem 1.25rem',
         border: '1px solid #e2e8f0',
         display: 'flex',
         flexWrap: 'wrap',
         alignItems: 'center',
         justifyContent: 'space-between',
-        gap: '1rem',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+        gap: '0.75rem'
       }}>
-        {/* Buscador */}
-        <div style={{ position: 'relative', minWidth: '280px', flex: '1 1 300px', maxWidth: '420px' }}>
-          <Search size={16} style={{ position: 'absolute', left: '12px', top: '12px', color: '#94a3b8' }} />
+        <div style={{ position: 'relative', minWidth: '260px', flex: '1 1 280px', maxWidth: '380px' }}>
+          <Search size={15} style={{ position: 'absolute', left: '12px', top: '11px', color: '#94a3b8' }} />
           <input
             type="text"
-            placeholder="Buscar por entrenador o sede..."
+            placeholder={activeSubView === 'directorio_estados' ? "Buscar manager, equipo, entrenador o sede..." : "Buscar entrenador o sede..."}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{
               width: '100%',
-              padding: '0.6rem 2.2rem 0.6rem 2.4rem',
+              padding: '0.55rem 2rem 0.55rem 2.3rem',
               borderRadius: '8px',
               border: '1px solid #cbd5e1',
-              fontSize: '0.88rem',
+              fontSize: '0.85rem',
               outline: 'none',
               background: '#f8fafc',
               color: '#0f172a'
@@ -215439,14 +215388,13 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
           {search && (
             <button
               onClick={() => setSearch('')}
-              style={{ position: 'absolute', right: '10px', top: '10px', background: 'transparent', border: 'none', cursor: 'pointer', color: '#94a3b8' }}
+              style={{ position: 'absolute', right: '10px', top: '9px', background: 'transparent', border: 'none', cursor: 'pointer', color: '#94a3b8' }}
             >
-              <X size={15} />
+              <X size={14} />
             </button>
           )}
         </div>
 
-        {/* Filtros Dropdown */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center' }}>
           {/* Filtro Sede */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
@@ -215455,10 +215403,10 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
               value={filterSede}
               onChange={(e) => setFilterSede(e.target.value)}
               style={{
-                padding: '0.55rem 0.8rem',
+                padding: '0.5rem 0.75rem',
                 borderRadius: '8px',
                 border: '1px solid #cbd5e1',
-                fontSize: '0.85rem',
+                fontSize: '0.82rem',
                 background: '#ffffff',
                 color: '#334155',
                 cursor: 'pointer',
@@ -215475,227 +215423,726 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
             </select>
           </div>
 
-          {/* Filtro Estado */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>Estado:</span>
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              style={{
-                padding: '0.55rem 0.8rem',
-                borderRadius: '8px',
-                border: '1px solid #cbd5e1',
-                fontSize: '0.85rem',
-                background: '#ffffff',
-                color: '#334155',
-                cursor: 'pointer',
-                fontWeight: 600
-              }}
-            >
-              <option value="todos">Todos los Estados</option>
-              <option value="con_pendientes">Con Llamadas Pendientes</option>
-              <option value="completados">100% Pagados</option>
-              <option value="sin_actividad">Sin Actividad (0 llamadas)</option>
-            </select>
-          </div>
+          {activeSubView === 'directorio_estados' ? (
+            /* Filtro de Estado para Directorio de Managers */
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>Estado:</span>
+              <select
+                value={filterManagerStatus}
+                onChange={(e) => setFilterManagerStatus(e.target.value)}
+                style={{
+                  padding: '0.5rem 0.75rem',
+                  borderRadius: '8px',
+                  border: '1px solid #cbd5e1',
+                  fontSize: '0.82rem',
+                  background: '#ffffff',
+                  color: '#334155',
+                  cursor: 'pointer',
+                  fontWeight: 600
+                }}
+              >
+                <option value="todos">Todos los Managers</option>
+                <option value="GRADUADO">🎓 Graduados ({statsGlobal.totalGraduados})</option>
+                <option value="DESERTOR">⚠️ Desertores ({statsGlobal.totalDesertores})</option>
+                <option value="EN_JUEGO">⚡ En Juego ({statsGlobal.totalActivos})</option>
+                <option value="sin_entrenador">🚫 Sin Entrenador ({statsGlobal.totalSinAsignar})</option>
+              </select>
+            </div>
+          ) : (
+            /* Filtro de Desempeño para Entrenadores */
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>Rendimiento:</span>
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                style={{
+                  padding: '0.5rem 0.75rem',
+                  borderRadius: '8px',
+                  border: '1px solid #cbd5e1',
+                  fontSize: '0.82rem',
+                  background: '#ffffff',
+                  color: '#334155',
+                  cursor: 'pointer',
+                  fontWeight: 600
+                }}
+              >
+                <option value="todos">Todos los Entrenadores</option>
+                <option value="alta_graduacion">⭐ Alta Graduación (≥65%)</option>
+                <option value="alta_desercion">⚠️ Alerta Deserción (≥30%)</option>
+                <option value="con_pendientes">Con Llamadas Pendientes</option>
+                <option value="completados">100% Pagados</option>
+              </select>
+            </div>
+          )}
 
-          <div style={{ fontSize: '0.82rem', color: '#64748b', fontWeight: 600, marginLeft: '0.5rem' }}>
-            Mostrando <strong>{processedTrainers.length}</strong> entrenadores
+          <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>
+            {activeSubView === 'directorio_estados' ? (
+              <span><strong>{processedManagersList.length}</strong> managers</span>
+            ) : (
+              <span><strong>{processedTrainers.length}</strong> entrenadores</span>
+            )}
           </div>
         </div>
       </div>
 
-      {/* 5. TABLA MAESTRA DE ENTRENADORES */}
-      <div style={{
-        background: '#ffffff',
-        borderRadius: '14px',
-        border: '1px solid #e2e8f0',
-        overflow: 'hidden',
-        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)'
-      }}>
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
-            <thead>
-              <tr style={{ background: '#f8fafc', borderBottom: '2px solid #e2e8f0', color: '#475569', fontWeight: 700, fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                <th style={{ padding: '1rem 1.25rem', cursor: 'pointer' }} onClick={() => handleSort('entrenador')}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                    Entrenador <ArrowUpDown size={13} />
-                  </div>
-                </th>
-                <th style={{ padding: '1rem 1rem' }}>Sede Principal</th>
-                <th style={{ padding: '1rem 1rem', textAlign: 'center', cursor: 'pointer' }} onClick={() => handleSort('totalLlamadas')}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}>
-                    Total Llamadas <ArrowUpDown size={13} />
-                  </div>
-                </th>
-                <th style={{ padding: '1rem 1rem', textAlign: 'center', cursor: 'pointer' }} onClick={() => handleSort('pagadoLlamadas')}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}>
-                    Pagadas <ArrowUpDown size={13} />
-                  </div>
-                </th>
-                <th style={{ padding: '1rem 1rem', textAlign: 'center', cursor: 'pointer' }} onClick={() => handleSort('pendienteLlamadas')}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}>
-                    Pendientes <ArrowUpDown size={13} />
-                  </div>
-                </th>
-                <th style={{ padding: '1rem 1rem', textAlign: 'right', cursor: 'pointer' }} onClick={() => handleSort('montoTotal')}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.4rem' }}>
-                    Monto Generado ($) <ArrowUpDown size={13} />
-                  </div>
-                </th>
-                <th style={{ padding: '1rem 1rem', textAlign: 'center' }}>Cumplimiento</th>
-                <th style={{ padding: '1rem 1.25rem', textAlign: 'center' }}>Detalle</th>
-              </tr>
-            </thead>
-            <tbody>
-              {processedTrainers.length === 0 ? (
-                <tr>
-                  <td colSpan={8} style={{ padding: '3rem', textAlign: 'center', color: '#94a3b8', fontStyle: 'italic' }}>
-                    No se encontraron entrenadores con los filtros seleccionados.
-                  </td>
+      {/* 5. VISTA A: ENTRENADORES & LLAMADAS (TABLA MAESTRA ENRIQUECIDA) */}
+      {activeSubView === 'entrenadores' && (
+        <div style={{
+          background: '#ffffff',
+          borderRadius: '14px',
+          border: '1px solid #e2e8f0',
+          overflow: 'hidden',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)'
+        }}>
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.86rem' }}>
+              <thead>
+                <tr style={{ background: '#f8fafc', borderBottom: '2px solid #e2e8f0', color: '#475569', fontWeight: 700, fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  <th style={{ padding: '0.9rem 1.25rem', cursor: 'pointer' }} onClick={() => handleSort('entrenador')}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      Entrenador <ArrowUpDown size={12} />
+                    </div>
+                  </th>
+                  <th style={{ padding: '0.9rem 0.8rem' }}>Sede</th>
+                  <th style={{ padding: '0.9rem 0.8rem', textAlign: 'center', cursor: 'pointer' }} onClick={() => handleSort('totalAsignados')}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem' }}>
+                      Asignados <ArrowUpDown size={12} />
+                    </div>
+                  </th>
+                  <th style={{ padding: '0.9rem 0.8rem', textAlign: 'center', cursor: 'pointer' }} onClick={() => handleSort('graduados')}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem' }}>
+                      Graduados <ArrowUpDown size={12} />
+                    </div>
+                  </th>
+                  <th style={{ padding: '0.9rem 0.8rem', textAlign: 'center', cursor: 'pointer' }} onClick={() => handleSort('desertores')}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem' }}>
+                      Desertores <ArrowUpDown size={12} />
+                    </div>
+                  </th>
+                  <th style={{ padding: '0.9rem 0.8rem', textAlign: 'center', cursor: 'pointer' }} onClick={() => handleSort('activos')}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem' }}>
+                      En Juego <ArrowUpDown size={12} />
+                    </div>
+                  </th>
+                  <th style={{ padding: '0.9rem 0.8rem', textAlign: 'center', cursor: 'pointer' }} onClick={() => handleSort('totalLlamadas')}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem' }}>
+                      Llamadas <ArrowUpDown size={12} />
+                    </div>
+                  </th>
+                  <th style={{ padding: '0.9rem 0.8rem', textAlign: 'center' }}>Pag / Pend</th>
+                  <th style={{ padding: '0.9rem 1rem', textAlign: 'right', cursor: 'pointer' }} onClick={() => handleSort('montoTotal')}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.3rem' }}>
+                      Monto ($) <ArrowUpDown size={12} />
+                    </div>
+                  </th>
+                  <th style={{ padding: '0.9rem 1rem', textAlign: 'center' }}>% Éxito</th>
+                  <th style={{ padding: '0.9rem 1.25rem', textAlign: 'center' }}>Acción</th>
                 </tr>
-              ) : (
-                processedTrainers.map((t, idx) => {
-                  const pct = t.totalLlamadas > 0 ? Math.round((t.pagadoLlamadas / t.totalLlamadas) * 100) : 0;
-                  return (
-                    <tr
-                      key={t.entrenador}
-                      style={{
-                        borderBottom: '1px solid #f1f5f9',
-                        transition: 'background 0.15s ease',
-                        background: idx % 2 === 0 ? '#ffffff' : '#fafafa'
-                      }}
-                      onMouseEnter={(e) => e.currentTarget.style.background = '#f1f5f9'}
-                      onMouseLeave={(e) => e.currentTarget.style.background = idx % 2 === 0 ? '#ffffff' : '#fafafa'}
-                    >
-                      {/* Entrenador */}
-                      <td style={{ padding: '1rem 1.25rem' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                          <div style={{
-                            width: '36px',
-                            height: '36px',
-                            borderRadius: '50%',
-                            background: '#e0e7ff',
-                            color: '#4338ca',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontWeight: 800,
-                            fontSize: '0.85rem'
-                          }}>
-                            {t.entrenador.charAt(0)}
-                          </div>
-                          <div>
-                            <div style={{ fontWeight: 700, color: '#0f172a' }}>{t.entrenador}</div>
-                            <div style={{ fontSize: '0.74rem', color: '#64748b' }}>
-                              {t.managersCount} managers en seguimiento
+              </thead>
+              <tbody>
+                {processedTrainers.length === 0 ? (
+                  <tr>
+                    <td colSpan={11} style={{ padding: '3rem', textAlign: 'center', color: '#94a3b8', fontStyle: 'italic' }}>
+                      No se encontraron entrenadores con los criterios aplicados.
+                    </td>
+                  </tr>
+                ) : (
+                  processedTrainers.map((t, idx) => {
+                    const pctGrad = t.tasaGraduacion || 0;
+                    const pctDes = t.tasaDesercion || 0;
+                    return (
+                      <tr
+                        key={t.entrenador}
+                        style={{
+                          borderBottom: '1px solid #f1f5f9',
+                          transition: 'background 0.15s ease',
+                          background: idx % 2 === 0 ? '#ffffff' : '#fafafa'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = '#f1f5f9'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = idx % 2 === 0 ? '#ffffff' : '#fafafa'}
+                      >
+                        {/* Entrenador */}
+                        <td style={{ padding: '0.85rem 1.25rem' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                            <div style={{
+                              width: '34px',
+                              height: '34px',
+                              borderRadius: '50%',
+                              background: '#e0e7ff',
+                              color: '#4338ca',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontWeight: 800,
+                              fontSize: '0.82rem'
+                            }}>
+                              {t.entrenador.charAt(0)}
+                            </div>
+                            <div>
+                              <div style={{ fontWeight: 700, color: '#0f172a' }}>{t.entrenador}</div>
+                              <div style={{ fontSize: '0.72rem', color: '#64748b' }}>
+                                {t.detalles.length} en matriz de llamadas
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </td>
+                        </td>
 
-                      {/* Sede */}
-                      <td style={{ padding: '1rem 1rem' }}>
-                        <span style={{
-                          padding: '0.25rem 0.6rem',
-                          borderRadius: '6px',
-                          fontSize: '0.75rem',
-                          fontWeight: 700,
-                          background: `${COLORS_SEDES[t.topSede] || '#64748b'}15`,
-                          color: COLORS_SEDES[t.topSede] || '#64748b'
-                        }}>
-                          {t.topSede}
-                        </span>
-                      </td>
-
-                      {/* Total Llamadas */}
-                      <td style={{ padding: '1rem 1rem', textAlign: 'center', fontWeight: 800, color: '#1e293b' }}>
-                        {t.totalLlamadas}
-                      </td>
-
-                      {/* Pagadas */}
-                      <td style={{ padding: '1rem 1rem', textAlign: 'center' }}>
-                        <span style={{
-                          background: '#ecfdf5',
-                          color: '#059669',
-                          padding: '0.25rem 0.6rem',
-                          borderRadius: '6px',
-                          fontWeight: 700,
-                          fontSize: '0.82rem'
-                        }}>
-                          {t.pagadoLlamadas}
-                        </span>
-                      </td>
-
-                      {/* Pendientes */}
-                      <td style={{ padding: '1rem 1rem', textAlign: 'center' }}>
-                        <span style={{
-                          background: t.pendienteLlamadas > 0 ? '#fffbeb' : '#f1f5f9',
-                          color: t.pendienteLlamadas > 0 ? '#d97706' : '#94a3b8',
-                          padding: '0.25rem 0.6rem',
-                          borderRadius: '6px',
-                          fontWeight: 700,
-                          fontSize: '0.82rem'
-                        }}>
-                          {t.pendienteLlamadas}
-                        </span>
-                      </td>
-
-                      {/* Monto Generado */}
-                      <td style={{ padding: '1rem 1rem', textAlign: 'right' }}>
-                        <span style={{
-                          fontWeight: 800,
-                          fontSize: '0.95rem',
-                          color: t.montoTotal > 0 ? '#7c3aed' : '#94a3b8'
-                        }}>
-                          ${t.montoTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </span>
-                      </td>
-
-                      {/* Cumplimiento */}
-                      <td style={{ padding: '1rem 1rem', textAlign: 'center' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-                          <div style={{ width: '60px', height: '6px', background: '#e2e8f0', borderRadius: '3px', overflow: 'hidden' }}>
-                            <div style={{ width: `${pct}%`, height: '100%', background: pct >= 70 ? '#10b981' : pct >= 40 ? '#f59e0b' : '#ef4444' }} />
-                          </div>
-                          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: pct >= 70 ? '#16a34a' : '#d97706' }}>
-                            {pct}%
-                          </span>
-                        </div>
-                      </td>
-
-                      {/* Acciones */}
-                      <td style={{ padding: '1rem 1.25rem', textAlign: 'center' }}>
-                        <button
-                          onClick={() => { setSelectedTrainer(t); setModalSearch(''); }}
-                          style={{
-                            background: '#7c3aed',
-                            color: '#ffffff',
-                            border: 'none',
-                            borderRadius: '6px',
-                            padding: '0.45rem 0.85rem',
-                            fontSize: '0.78rem',
+                        {/* Sede */}
+                        <td style={{ padding: '0.85rem 0.8rem' }}>
+                          <span style={{
+                            padding: '0.2rem 0.5rem',
+                            borderRadius: '5px',
+                            fontSize: '0.74rem',
                             fontWeight: 700,
-                            cursor: 'pointer',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '0.35rem',
-                            boxShadow: '0 2px 4px rgba(124, 58, 237, 0.2)'
-                          }}
-                        >
-                          <Eye size={13} /> Ver Managers ({t.detalles.length})
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+                            background: `${COLORS_SEDES[t.topSede] || '#64748b'}15`,
+                            color: COLORS_SEDES[t.topSede] || '#64748b'
+                          }}>
+                            {t.topSede}
+                          </span>
+                        </td>
 
-      {/* 6. MODAL DE AUDITORÍA DETALLADA POR ENTRENADOR (DRILL DOWN) */}
+                        {/* Asignados en Directorio */}
+                        <td style={{ padding: '0.85rem 0.8rem', textAlign: 'center', fontWeight: 800, color: '#0f172a' }}>
+                          {t.totalAsignados || 0}
+                        </td>
+
+                        {/* Graduados */}
+                        <td style={{ padding: '0.85rem 0.8rem', textAlign: 'center' }}>
+                          <span style={{
+                            background: '#ecfdf5',
+                            color: '#059669',
+                            padding: '0.2rem 0.55rem',
+                            borderRadius: '6px',
+                            fontWeight: 800,
+                            fontSize: '0.8rem'
+                          }}>
+                            {t.graduados || 0} <span style={{ fontSize: '0.7rem', fontWeight: 600 }}>({pctGrad}%)</span>
+                          </span>
+                        </td>
+
+                        {/* Desertores */}
+                        <td style={{ padding: '0.85rem 0.8rem', textAlign: 'center' }}>
+                          <span style={{
+                            background: (t.desertores || 0) > 0 ? '#fef2f2' : '#f8fafc',
+                            color: (t.desertores || 0) > 0 ? '#dc2626' : '#94a3b8',
+                            padding: '0.2rem 0.55rem',
+                            borderRadius: '6px',
+                            fontWeight: 800,
+                            fontSize: '0.8rem'
+                          }}>
+                            {t.desertores || 0} <span style={{ fontSize: '0.7rem', fontWeight: 600 }}>({pctDes}%)</span>
+                          </span>
+                        </td>
+
+                        {/* En Juego */}
+                        <td style={{ padding: '0.85rem 0.8rem', textAlign: 'center' }}>
+                          <span style={{
+                            background: (t.activos || 0) > 0 ? '#eff6ff' : '#f8fafc',
+                            color: (t.activos || 0) > 0 ? '#2563eb' : '#94a3b8',
+                            padding: '0.2rem 0.55rem',
+                            borderRadius: '6px',
+                            fontWeight: 800,
+                            fontSize: '0.8rem'
+                          }}>
+                            {t.activos || 0}
+                          </span>
+                        </td>
+
+                        {/* Total Llamadas */}
+                        <td style={{ padding: '0.85rem 0.8rem', textAlign: 'center', fontWeight: 800, color: '#1e293b' }}>
+                          {t.totalLlamadas}
+                        </td>
+
+                        {/* Pagadas vs Pendientes */}
+                        <td style={{ padding: '0.85rem 0.8rem', textAlign: 'center', fontSize: '0.76rem' }}>
+                          <span style={{ color: '#059669', fontWeight: 700 }}>{t.pagadoLlamadas}</span>
+                          <span style={{ color: '#94a3b8', margin: '0 3px' }}>/</span>
+                          <span style={{ color: t.pendienteLlamadas > 0 ? '#d97706' : '#94a3b8', fontWeight: 700 }}>{t.pendienteLlamadas}</span>
+                        </td>
+
+                        {/* Monto Generado */}
+                        <td style={{ padding: '0.85rem 1rem', textAlign: 'right' }}>
+                          <span style={{
+                            fontWeight: 900,
+                            fontSize: '0.92rem',
+                            color: t.montoTotal > 0 ? '#7c3aed' : '#94a3b8'
+                          }}>
+                            ${t.montoTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </span>
+                        </td>
+
+                        {/* Barra de Éxito / Graduación */}
+                        <td style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}>
+                            <div style={{ width: '50px', height: '6px', background: '#e2e8f0', borderRadius: '3px', overflow: 'hidden' }}>
+                              <div style={{ width: `${pctGrad}%`, height: '100%', background: pctGrad >= 65 ? '#10b981' : pctGrad >= 40 ? '#f59e0b' : '#ef4444' }} />
+                            </div>
+                            <span style={{ fontSize: '0.72rem', fontWeight: 700, color: pctGrad >= 65 ? '#16a34a' : '#d97706' }}>
+                              {pctGrad}%
+                            </span>
+                          </div>
+                        </td>
+
+                        {/* Acciones */}
+                        <td style={{ padding: '0.85rem 1.25rem', textAlign: 'center' }}>
+                          <button
+                            onClick={() => { setSelectedTrainer(t); setModalSearch(''); setModalFilterStatus('todos'); }}
+                            style={{
+                              background: '#7c3aed',
+                              color: '#ffffff',
+                              border: 'none',
+                              borderRadius: '6px',
+                              padding: '0.4rem 0.75rem',
+                              fontSize: '0.76rem',
+                              fontWeight: 700,
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.35rem',
+                              boxShadow: '0 2px 4px rgba(124, 58, 237, 0.2)'
+                            }}
+                          >
+                            <Eye size={12} /> Ver Detalle
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* 6. VISTA B: GRÁFICAS DE RETENCIÓN & DESERCIÓN */}
+      {activeSubView === 'graficas_retencion' && (
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(480px, 1fr))',
+          gap: '1.5rem'
+        }}>
+          {/* GRÁFICA: Graduados vs Desertores vs En Juego por Entrenador */}
+          <div style={{
+            background: '#ffffff',
+            borderRadius: '14px',
+            padding: '1.5rem',
+            border: '1px solid #e2e8f0',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            <div style={{ marginBottom: '1rem' }}>
+              <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#0f172a' }}>
+                Retención por Entrenador: Graduados vs. Desertores vs. En Juego
+              </h3>
+              <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>
+                Mide cuántos managers de cada entrenador alcanzaron la meta frente a las bajas
+              </p>
+            </div>
+
+            <div style={{ width: '100%', height: '380px' }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={topRetentionTrainers}
+                  layout="vertical"
+                  margin={{ top: 5, right: 30, left: 100, bottom: 5 }}
+                >
+                  <XAxis type="number" stroke="#94a3b8" fontSize={12} />
+                  <YAxis
+                    type="category"
+                    dataKey="entrenador"
+                    stroke="#475569"
+                    fontSize={12}
+                    tickLine={false}
+                    width={110}
+                  />
+                  <Tooltip
+                    contentStyle={{ background: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '0.82rem' }}
+                  />
+                  <Legend
+                    verticalAlign="top"
+                    align="right"
+                    wrapperStyle={{ fontSize: '0.8rem', paddingBottom: '10px' }}
+                  />
+                  <Bar dataKey="graduados" name="Graduados" stackId="a" fill="#10b981" />
+                  <Bar dataKey="desertores" name="Desertores" stackId="a" fill="#ef4444" />
+                  <Bar dataKey="activos" name="En Juego" stackId="a" fill="#3b82f6" radius={[0, 4, 4, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* GRÁFICA: Donut de Distribución General de Managers */}
+          <div style={{
+            background: '#ffffff',
+            borderRadius: '14px',
+            padding: '1.5rem',
+            border: '1px solid #e2e8f0',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            <div style={{ marginBottom: '1rem' }}>
+              <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#0f172a' }}>
+                Ciclo de Vida Global de Managers (699)
+              </h3>
+              <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>
+                Proporción de graduados (64%), bajas/desertores (24%) y managers activos (12%)
+              </p>
+            </div>
+
+            <div style={{ width: '100%', height: '280px', display: 'flex', alignItems: 'center' }}>
+              <ResponsiveContainer width="55%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={statusPieData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={65}
+                    outerRadius={95}
+                    paddingAngle={4}
+                    dataKey="value"
+                  >
+                    {statusPieData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    formatter={(val) => [`${val} (${((val / statsGlobal.totalManagers) * 100).toFixed(1)}%)`, 'Cantidad']}
+                    contentStyle={{ background: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '0.82rem' }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+
+              <div style={{ width: '45%', display: 'flex', flexDirection: 'column', gap: '0.75rem', paddingLeft: '1rem' }}>
+                {statusPieData.map((item) => (
+                  <div key={item.name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.85rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span style={{ width: '12px', height: '12px', borderRadius: '50%', background: item.color }} />
+                      <span style={{ fontWeight: 600, color: '#334155' }}>{item.name}</span>
+                    </div>
+                    <span style={{ fontWeight: 800, color: '#0f172a' }}>
+                      {item.value} ({((item.value / statsGlobal.totalManagers) * 100).toFixed(1)}%)
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ marginTop: '1rem', padding: '0.75rem 1rem', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '0.8rem', color: '#475569' }}>
+              <strong>Cobertura de Asignación:</strong> 681 de los 699 managers (97.4%) cuentan con entrenador de llamadas formalmente registrado.
+            </div>
+          </div>
+
+          {/* GRÁFICA: Monto Total Generado ($) por Entrenador */}
+          <div style={{
+            background: '#ffffff',
+            borderRadius: '14px',
+            padding: '1.5rem',
+            border: '1px solid #e2e8f0',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            <div style={{ marginBottom: '1rem' }}>
+              <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#0f172a' }}>
+                Top Entrenadores por Recaudación ($)
+              </h3>
+              <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>
+                Total facturado por llamadas efectivas completadas ($25/llamada)
+              </p>
+            </div>
+
+            <div style={{ width: '100%', height: '320px' }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={topRevenueTrainers}
+                  layout="vertical"
+                  margin={{ top: 5, right: 30, left: 90, bottom: 5 }}
+                >
+                  <XAxis type="number" tickFormatter={(val) => `$${val}`} stroke="#94a3b8" fontSize={11} />
+                  <YAxis type="category" dataKey="entrenador" stroke="#475569" fontSize={11} tickLine={false} width={110} />
+                  <Tooltip
+                    formatter={(value) => [`$${value.toLocaleString()} USD`, 'Monto Generado']}
+                    contentStyle={{ background: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '0.82rem' }}
+                  />
+                  <Bar dataKey="montoTotal" fill="#7c3aed" radius={[0, 6, 6, 0]}>
+                    {topRevenueTrainers.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={index === 0 ? '#7c3aed' : index < 3 ? '#6366f1' : '#3b82f6'}
+                      />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* GRÁFICA: Distribución por Sede */}
+          <div style={{
+            background: '#ffffff',
+            borderRadius: '14px',
+            padding: '1.5rem',
+            border: '1px solid #e2e8f0',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            <div style={{ marginBottom: '1rem' }}>
+              <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#0f172a' }}>
+                Distribución Geográfica de Llamadas
+              </h3>
+              <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>
+                Participación por sede en la matriz operativa
+              </p>
+            </div>
+
+            <div style={{ width: '100%', height: '320px', display: 'flex', alignItems: 'center' }}>
+              <ResponsiveContainer width="55%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={sedePieData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={55}
+                    outerRadius={85}
+                    paddingAngle={3}
+                    dataKey="value"
+                  >
+                    {sedePieData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    formatter={(val, name) => [`${val} llamadas registradas`, name]}
+                    contentStyle={{ background: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '0.82rem' }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+
+              <div style={{ width: '45%', display: 'flex', flexDirection: 'column', gap: '0.45rem', paddingLeft: '0.5rem' }}>
+                {sedePieData.map((item) => (
+                  <div key={item.name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.8rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: item.color }} />
+                      <span style={{ fontWeight: 600, color: '#334155' }}>{item.name}</span>
+                    </div>
+                    <span style={{ fontWeight: 800, color: '#0f172a' }}>{item.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 7. VISTA C: DIRECTORIO DE MANAGERS POR ESTADO (GRADUADOS, DESERTORES, EN JUEGO, ASIGNADOS) */}
+      {activeSubView === 'directorio_estados' && (
+        <div style={{
+          background: '#ffffff',
+          borderRadius: '14px',
+          border: '1px solid #e2e8f0',
+          overflow: 'hidden',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)'
+        }}>
+          {/* Quick Filter Buttons with Counts */}
+          <div style={{ padding: '1rem 1.5rem', background: '#f8fafc', borderBottom: '1px solid #e2e8f0', display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <button
+              onClick={() => setFilterManagerStatus('todos')}
+              style={{
+                padding: '0.4rem 0.85rem',
+                borderRadius: '20px',
+                border: filterManagerStatus === 'todos' ? '2px solid #7c3aed' : '1px solid #cbd5e1',
+                background: filterManagerStatus === 'todos' ? '#f5f3ff' : '#ffffff',
+                color: filterManagerStatus === 'todos' ? '#7c3aed' : '#475569',
+                fontWeight: 700,
+                fontSize: '0.8rem',
+                cursor: 'pointer'
+              }}
+            >
+              Todos ({statsGlobal.totalManagers})
+            </button>
+
+            <button
+              onClick={() => setFilterManagerStatus('GRADUADO')}
+              style={{
+                padding: '0.4rem 0.85rem',
+                borderRadius: '20px',
+                border: filterManagerStatus === 'GRADUADO' ? '2px solid #10b981' : '1px solid #cbd5e1',
+                background: filterManagerStatus === 'GRADUADO' ? '#ecfdf5' : '#ffffff',
+                color: filterManagerStatus === 'GRADUADO' ? '#059669' : '#475569',
+                fontWeight: 700,
+                fontSize: '0.8rem',
+                cursor: 'pointer'
+              }}
+            >
+              🎓 Graduados ({statsGlobal.totalGraduados})
+            </button>
+
+            <button
+              onClick={() => setFilterManagerStatus('DESERTOR')}
+              style={{
+                padding: '0.4rem 0.85rem',
+                borderRadius: '20px',
+                border: filterManagerStatus === 'DESERTOR' ? '2px solid #ef4444' : '1px solid #cbd5e1',
+                background: filterManagerStatus === 'DESERTOR' ? '#fef2f2' : '#ffffff',
+                color: filterManagerStatus === 'DESERTOR' ? '#dc2626' : '#475569',
+                fontWeight: 700,
+                fontSize: '0.8rem',
+                cursor: 'pointer'
+              }}
+            >
+              ⚠️ Desertores ({statsGlobal.totalDesertores})
+            </button>
+
+            <button
+              onClick={() => setFilterManagerStatus('EN_JUEGO')}
+              style={{
+                padding: '0.4rem 0.85rem',
+                borderRadius: '20px',
+                border: filterManagerStatus === 'EN_JUEGO' ? '2px solid #3b82f6' : '1px solid #cbd5e1',
+                background: filterManagerStatus === 'EN_JUEGO' ? '#eff6ff' : '#ffffff',
+                color: filterManagerStatus === 'EN_JUEGO' ? '#2563eb' : '#475569',
+                fontWeight: 700,
+                fontSize: '0.8rem',
+                cursor: 'pointer'
+              }}
+            >
+              ⚡ En Juego ({statsGlobal.totalActivos})
+            </button>
+
+            <button
+              onClick={() => setFilterManagerStatus('sin_entrenador')}
+              style={{
+                padding: '0.4rem 0.85rem',
+                borderRadius: '20px',
+                border: filterManagerStatus === 'sin_entrenador' ? '2px solid #f59e0b' : '1px solid #cbd5e1',
+                background: filterManagerStatus === 'sin_entrenador' ? '#fffbeb' : '#ffffff',
+                color: filterManagerStatus === 'sin_entrenador' ? '#d97706' : '#475569',
+                fontWeight: 700,
+                fontSize: '0.8rem',
+                cursor: 'pointer'
+              }}
+            >
+              🚫 Sin Entrenador ({statsGlobal.totalSinAsignar})
+            </button>
+          </div>
+
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
+              <thead>
+                <tr style={{ background: '#f8fafc', borderBottom: '2px solid #e2e8f0', color: '#475569', fontWeight: 700, fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  <th style={{ padding: '0.85rem 1.25rem' }}>Manager</th>
+                  <th style={{ padding: '0.85rem 0.8rem' }}>Sede</th>
+                  <th style={{ padding: '0.85rem 0.8rem' }}>Equipo</th>
+                  <th style={{ padding: '0.85rem 1rem' }}>Entrenador Asignado</th>
+                  <th style={{ padding: '0.85rem 1rem' }}>Coordinador MJ</th>
+                  <th style={{ padding: '0.85rem 0.8rem', textAlign: 'center' }}>Estado</th>
+                  <th style={{ padding: '0.85rem 1.25rem', textAlign: 'right' }}>Contacto</th>
+                </tr>
+              </thead>
+              <tbody>
+                {processedManagersList.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} style={{ padding: '3rem', textAlign: 'center', color: '#94a3b8', fontStyle: 'italic' }}>
+                      No se encontraron managers con el filtro seleccionado.
+                    </td>
+                  </tr>
+                ) : (
+                  processedManagersList.slice(0, 250).map((m, idx) => {
+                    const isGrad = m.estado === 'GRADUADO';
+                    const isDes = m.estado === 'DESERTOR';
+                    return (
+                      <tr
+                        key={m.id || idx}
+                        style={{
+                          borderBottom: '1px solid #f1f5f9',
+                          background: idx % 2 === 0 ? '#ffffff' : '#fafafa'
+                        }}
+                      >
+                        <td style={{ padding: '0.85rem 1.25rem', fontWeight: 700, color: '#0f172a' }}>
+                          {m.nombre}
+                        </td>
+                        <td style={{ padding: '0.85rem 0.8rem' }}>
+                          <span style={{
+                            padding: '0.2rem 0.5rem',
+                            borderRadius: '5px',
+                            fontSize: '0.74rem',
+                            fontWeight: 700,
+                            background: `${COLORS_SEDES[m.sede] || '#64748b'}15`,
+                            color: COLORS_SEDES[m.sede] || '#64748b'
+                          }}>
+                            {m.sede || 'Sin Sede'}
+                          </span>
+                        </td>
+                        <td style={{ padding: '0.85rem 0.8rem', color: '#475569' }}>
+                          <div style={{ fontWeight: 600 }}>{m.nombreEquipo || '—'}</div>
+                          {m.numEquipo && <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>Equipo #{m.numEquipo}</div>}
+                        </td>
+                        <td style={{ padding: '0.85rem 1rem', color: m.entrenador !== 'Sin Asignar' ? '#1e293b' : '#94a3b8', fontWeight: 600 }}>
+                          {m.entrenador}
+                        </td>
+                        <td style={{ padding: '0.85rem 1rem', fontSize: '0.78rem', color: '#64748b' }}>
+                          {m.coordinador || '—'}
+                        </td>
+                        <td style={{ padding: '0.85rem 0.8rem', textAlign: 'center' }}>
+                          <span style={{
+                            padding: '0.25rem 0.65rem',
+                            borderRadius: '20px',
+                            fontWeight: 800,
+                            fontSize: '0.74rem',
+                            textTransform: 'uppercase',
+                            background: isGrad ? '#ecfdf5' : isDes ? '#fef2f2' : '#eff6ff',
+                            color: isGrad ? '#059669' : isDes ? '#dc2626' : '#2563eb',
+                            border: `1px solid ${isGrad ? '#a7f3d0' : isDes ? '#fecaca' : '#bfdbfe'}`
+                          }}>
+                            {isGrad ? '🎓 GRADUADO' : isDes ? '⚠️ DESERTOR' : '⚡ EN JUEGO'}
+                          </span>
+                        </td>
+                        <td style={{ padding: '0.85rem 1.25rem', textAlign: 'right' }}>
+                          {m.telefono ? (
+                            <a
+                              href={`https://wa.me/${m.telefono.replace(/[^0-9]/g, '')}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{
+                                background: '#25D366',
+                                color: '#ffffff',
+                                padding: '0.3rem 0.65rem',
+                                borderRadius: '6px',
+                                fontSize: '0.75rem',
+                                fontWeight: 700,
+                                textDecoration: 'none',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.3rem'
+                              }}
+                            >
+                              <Phone size={12} /> {m.telefono}
+                            </a>
+                          ) : (
+                            <span style={{ fontSize: '0.72rem', color: '#cbd5e1' }}>Sin tel</span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {processedManagersList.length > 250 && (
+            <div style={{ padding: '0.75rem', textAlign: 'center', fontSize: '0.78rem', color: '#64748b', background: '#f8fafc', borderTop: '1px solid #e2e8f0' }}>
+              Mostrando los primeros 250 de <strong>{processedManagersList.length}</strong> managers coincidentes. Utilice el buscador para afinar su consulta.
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* 8. MODAL DRILL-DOWN POR ENTRENADOR (CON MATRIZ DE 16 LLAMADAS Y ESTADO) */}
       {selectedTrainer && (
         <div style={{
           position: 'fixed',
@@ -215716,7 +216163,7 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
             borderRadius: '16px',
             width: '100%',
             maxWidth: '1100px',
-            maxHeight: '90vh',
+            maxHeight: '92vh',
             display: 'flex',
             flexDirection: 'column',
             boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
@@ -215724,7 +216171,7 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
           }}>
             {/* Modal Header */}
             <div style={{
-              padding: '1.5rem 2rem',
+              padding: '1.25rem 2rem',
               background: '#f8fafc',
               borderBottom: '1px solid #e2e8f0',
               display: 'flex',
@@ -215747,14 +216194,14 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
                   {selectedTrainer.entrenador.charAt(0)}
                 </div>
                 <div>
-                  <h3 style={{ margin: 0, fontSize: '1.3rem', fontWeight: 800, color: '#0f172a' }}>
+                  <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: '#0f172a' }}>
                     {selectedTrainer.entrenador}
                   </h3>
-                  <div style={{ fontSize: '0.82rem', color: '#64748b', display: 'flex', gap: '1rem', marginTop: '0.2rem' }}>
+                  <div style={{ fontSize: '0.8rem', color: '#64748b', display: 'flex', flexWrap: 'wrap', gap: '1rem', marginTop: '0.2rem' }}>
                     <span>Sede: <strong>{selectedTrainer.topSede}</strong></span>
-                    <span>Total llamadas: <strong>{selectedTrainer.totalLlamadas}</strong></span>
-                    <span>Pagadas: <strong style={{ color: '#16a34a' }}>{selectedTrainer.pagadoLlamadas}</strong></span>
-                    <span>Pendientes: <strong style={{ color: '#d97706' }}>{selectedTrainer.pendienteLlamadas}</strong></span>
+                    <span>Asignados: <strong>{selectedTrainer.totalAsignados || 0}</strong></span>
+                    <span>Graduados: <strong style={{ color: '#059669' }}>{selectedTrainer.graduados || 0} ({selectedTrainer.tasaGraduacion}%)</strong></span>
+                    <span>Desertores: <strong style={{ color: '#dc2626' }}>{selectedTrainer.desertores || 0} ({selectedTrainer.tasaDesercion}%)</strong></span>
                     <span>Monto: <strong style={{ color: '#7c3aed' }}>${selectedTrainer.montoTotal.toLocaleString()}</strong></span>
                   </div>
                 </div>
@@ -215779,73 +216226,109 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
               </button>
             </div>
 
-            {/* Modal Search & Subheader */}
-            <div style={{ padding: '1rem 2rem', background: '#ffffff', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
-              <div style={{ position: 'relative', flex: '1', maxWidth: '380px' }}>
-                <Search size={15} style={{ position: 'absolute', left: '10px', top: '10px', color: '#94a3b8' }} />
+            {/* Modal Controls */}
+            <div style={{ padding: '0.85rem 2rem', background: '#ffffff', borderBottom: '1px solid #e2e8f0', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem' }}>
+              <div style={{ position: 'relative', flex: '1', maxWidth: '340px' }}>
+                <Search size={14} style={{ position: 'absolute', left: '10px', top: '10px', color: '#94a3b8' }} />
                 <input
                   type="text"
-                  placeholder="Buscar manager o equipo en este entrenador..."
+                  placeholder="Buscar manager en este entrenador..."
                   value={modalSearch}
                   onChange={(e) => setModalSearch(e.target.value)}
                   style={{
                     width: '100%',
-                    padding: '0.5rem 1rem 0.5rem 2.2rem',
+                    padding: '0.45rem 1rem 0.45rem 2.1rem',
                     borderRadius: '8px',
                     border: '1px solid #cbd5e1',
-                    fontSize: '0.82rem',
+                    fontSize: '0.8rem',
                     outline: 'none'
                   }}
                 />
               </div>
 
-              <div style={{ fontSize: '0.78rem', color: '#64748b', display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
-                  <span style={{ width: '12px', height: '12px', background: '#10b981', borderRadius: '3px', display: 'inline-block' }} /> Asistió (SI)
-                </span>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
-                  <span style={{ width: '12px', height: '12px', background: '#ef4444', borderRadius: '3px', display: 'inline-block' }} /> Ausente (NO)
-                </span>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
-                  <span style={{ width: '12px', height: '12px', background: '#e2e8f0', borderRadius: '3px', display: 'inline-block' }} /> Pendiente (-)
-                </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <select
+                  value={modalFilterStatus}
+                  onChange={(e) => setModalFilterStatus(e.target.value)}
+                  style={{
+                    padding: '0.4rem 0.65rem',
+                    borderRadius: '6px',
+                    border: '1px solid #cbd5e1',
+                    fontSize: '0.78rem',
+                    background: '#ffffff',
+                    fontWeight: 600
+                  }}
+                >
+                  <option value="todos">Todos los Estados</option>
+                  <option value="GRADUADO">Solo Graduados</option>
+                  <option value="DESERTOR">Solo Desertores</option>
+                  <option value="EN_JUEGO">Solo En Juego</option>
+                </select>
+
+                <div style={{ fontSize: '0.75rem', color: '#64748b', display: 'flex', gap: '0.75rem', alignItems: 'center', marginLeft: '0.5rem' }}>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                    <span style={{ width: '10px', height: '10px', background: '#10b981', borderRadius: '3px', display: 'inline-block' }} /> SI
+                  </span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                    <span style={{ width: '10px', height: '10px', background: '#ef4444', borderRadius: '3px', display: 'inline-block' }} /> NO
+                  </span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                    <span style={{ width: '10px', height: '10px', background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '3px', display: 'inline-block' }} /> Pendiente
+                  </span>
+                </div>
               </div>
             </div>
 
-            {/* Modal Body - Matriz 1 a 16 */}
-            <div style={{ padding: '1.5rem 2rem', overflowY: 'auto', flex: 1 }}>
+            {/* Modal Body */}
+            <div style={{ padding: '1.25rem 2rem', overflowY: 'auto', flex: 1 }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem' }}>
                 <thead>
                   <tr style={{ background: '#f8fafc', borderBottom: '2px solid #e2e8f0', color: '#64748b', textTransform: 'uppercase', fontSize: '0.72rem' }}>
-                    <th style={{ padding: '0.75rem 1rem', textAlign: 'left' }}>Manager</th>
-                    <th style={{ padding: '0.75rem 0.5rem', textAlign: 'left' }}>Sede / Equipo</th>
-                    <th style={{ padding: '0.75rem 0.5rem', textAlign: 'center' }}>Total</th>
-                    <th style={{ padding: '0.75rem 0.5rem', textAlign: 'center' }}>Matriz 16 Llamadas</th>
-                    <th style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>Contacto</th>
+                    <th style={{ padding: '0.65rem 0.8rem', textAlign: 'left' }}>Manager</th>
+                    <th style={{ padding: '0.65rem 0.5rem', textAlign: 'left' }}>Equipo</th>
+                    <th style={{ padding: '0.65rem 0.5rem', textAlign: 'center' }}>Estado</th>
+                    <th style={{ padding: '0.65rem 0.5rem', textAlign: 'center' }}>Total</th>
+                    <th style={{ padding: '0.65rem 0.5rem', textAlign: 'center' }}>Matriz 16 Llamadas</th>
+                    <th style={{ padding: '0.65rem 0.8rem', textAlign: 'right' }}>Contacto</th>
                   </tr>
                 </thead>
                 <tbody>
                   {selectedTrainer.detalles
-                    .filter(m => !modalSearch.trim() || 
-                      m.manager.toLowerCase().includes(modalSearch.toLowerCase()) || 
-                      m.equipo.toLowerCase().includes(modalSearch.toLowerCase())
-                    )
+                    .filter(m => {
+                      if (modalFilterStatus !== 'todos' && m.estado !== modalFilterStatus) return false;
+                      if (!modalSearch.trim()) return true;
+                      const q = modalSearch.toLowerCase();
+                      return m.manager.toLowerCase().includes(q) || m.equipo.toLowerCase().includes(q);
+                    })
                     .map((item, idx) => {
-                      const phone = phoneByManagerName[item.manager.trim().toLowerCase()] || '';
+                      const phone = phoneByManagerName[item.manager.trim().toLowerCase()] || item.telefono || '';
+                      const isGrad = item.estado === 'GRADUADO';
+                      const isDes = item.estado === 'DESERTOR';
                       return (
                         <tr key={idx} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                          <td style={{ padding: '0.75rem 1rem', fontWeight: 700, color: '#0f172a' }}>
+                          <td style={{ padding: '0.65rem 0.8rem', fontWeight: 700, color: '#0f172a' }}>
                             {item.manager}
                           </td>
-                          <td style={{ padding: '0.75rem 0.5rem', color: '#475569' }}>
+                          <td style={{ padding: '0.65rem 0.5rem', color: '#475569' }}>
                             <div>{item.sede}</div>
                             <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>{item.equipo}</div>
                           </td>
-                          <td style={{ padding: '0.75rem 0.5rem', textAlign: 'center', fontWeight: 800, color: '#7c3aed' }}>
+                          <td style={{ padding: '0.65rem 0.5rem', textAlign: 'center' }}>
+                            <span style={{
+                              padding: '0.15rem 0.5rem',
+                              borderRadius: '12px',
+                              fontSize: '0.68rem',
+                              fontWeight: 800,
+                              background: isGrad ? '#ecfdf5' : isDes ? '#fef2f2' : '#eff6ff',
+                              color: isGrad ? '#059669' : isDes ? '#dc2626' : '#2563eb'
+                            }}>
+                              {isGrad ? 'GRADUADO' : isDes ? 'DESERTOR' : 'EN JUEGO'}
+                            </span>
+                          </td>
+                          <td style={{ padding: '0.65rem 0.5rem', textAlign: 'center', fontWeight: 800, color: '#7c3aed' }}>
                             {item.totalReportado}
                           </td>
-                          {/* Cuadricula 1 a 16 */}
-                          <td style={{ padding: '0.75rem 0.5rem' }}>
+                          <td style={{ padding: '0.65rem 0.5rem' }}>
                             <div style={{ display: 'flex', gap: '3px', justifyContent: 'center' }}>
                               {(item.calls || []).map((c, cIdx) => {
                                 const isYes = c === 'SI';
@@ -215873,8 +216356,7 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
                               })}
                             </div>
                           </td>
-                          {/* Teléfono / WhatsApp */}
-                          <td style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>
+                          <td style={{ padding: '0.65rem 0.8rem', textAlign: 'right' }}>
                             {phone ? (
                               <a
                                 href={`https://wa.me/${phone.replace(/[^0-9]/g, '')}`}
@@ -215883,17 +216365,17 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
                                 style={{
                                   background: '#25D366',
                                   color: '#ffffff',
-                                  padding: '0.3rem 0.6rem',
+                                  padding: '0.25rem 0.55rem',
                                   borderRadius: '6px',
-                                  fontSize: '0.75rem',
+                                  fontSize: '0.72rem',
                                   fontWeight: 700,
                                   textDecoration: 'none',
                                   display: 'inline-flex',
                                   alignItems: 'center',
-                                  gap: '0.3rem'
+                                  gap: '0.25rem'
                                 }}
                               >
-                                <Phone size={12} /> WhatsApp
+                                <Phone size={11} /> WhatsApp
                               </a>
                             ) : (
                               <span style={{ fontSize: '0.72rem', color: '#cbd5e1' }}>Sin tel</span>
@@ -215907,7 +216389,7 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
             </div>
 
             {/* Modal Footer */}
-            <div style={{ padding: '1rem 2rem', background: '#f8fafc', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'flex-end' }}>
+            <div style={{ padding: '0.85rem 2rem', background: '#f8fafc', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'flex-end' }}>
               <button
                 onClick={() => setSelectedTrainer(null)}
                 style={{
@@ -215915,8 +216397,8 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
                   color: '#ffffff',
                   border: 'none',
                   borderRadius: '8px',
-                  padding: '0.6rem 1.4rem',
-                  fontSize: '0.85rem',
+                  padding: '0.55rem 1.25rem',
+                  fontSize: '0.82rem',
                   fontWeight: 700,
                   cursor: 'pointer'
                 }}
@@ -227625,13 +228107,13 @@ export const cyclesData = [
 ```json
 {
   "metadata": {
-    "generatedAt": "2026-09-06T00:36:25.708Z",
+    "generatedAt": "2026-09-06T00:46:56.928Z",
     "sheetManagersId": "1KF58QXAiIk4KP_9G2aiAM3ERVoptcqKlIraszNKq2Ow",
     "sheetLlamadosId": "1lWAHh1PSAKu9eU6DOBxZExrHMbCYc3f2Sr8GdghNxD0",
     "totalTrainers": 34,
     "totalDetailedRecords": 934,
     "totalManagersSheet1": 699,
-    "syncDurationMs": 2007
+    "syncDurationMs": 1262
   },
   "totales": {
     "totalLlamadas": 5402,
@@ -227639,288 +228121,633 @@ export const cyclesData = [
     "totalPendiente": 2241,
     "montoTotal": 77550,
     "porcentajePagado": 57,
+    "totalManagers": 699,
+    "totalGraduados": 447,
+    "totalDesertores": 168,
+    "totalActivos": 84,
+    "totalAsignados": 681,
+    "totalSinAsignar": 18,
+    "tasaGraduacionGlobal": 64,
+    "tasaDesercionGlobal": 24,
+    "tasaAsignacionGlobal": 97,
     "sedesDist": {
-      "CDMX": 10,
-      "Cuenca": 63,
-      "Lima": 142,
-      "Medellín": 37,
-      "Quito": 561,
-      "Guayaquil": 101,
-      "Sin Sede": 20
+      "Cuenca": 65,
+      "CUENCA": 17,
+      "Medellin": 17,
+      "CDMX": 8,
+      "Sin Sede": 93,
+      "Lima": 51,
+      "Medellín": 8,
+      "MEDELLIN": 8,
+      "Guayaquil": 49,
+      "LIMA": 22,
+      "Quito C1": 20,
+      "Quito C2": 20,
+      "Quito": 260,
+      "QUITO": 61
+    },
+    "sedesStatus": {
+      "Cuenca": {
+        "total": 65,
+        "graduados": 32,
+        "desertores": 28,
+        "activos": 5
+      },
+      "CUENCA": {
+        "total": 17,
+        "graduados": 9,
+        "desertores": 6,
+        "activos": 2
+      },
+      "Medellin": {
+        "total": 17,
+        "graduados": 13,
+        "desertores": 4,
+        "activos": 0
+      },
+      "CDMX": {
+        "total": 8,
+        "graduados": 0,
+        "desertores": 0,
+        "activos": 8
+      },
+      "Sin Sede": {
+        "total": 93,
+        "graduados": 80,
+        "desertores": 5,
+        "activos": 8
+      },
+      "Lima": {
+        "total": 51,
+        "graduados": 24,
+        "desertores": 12,
+        "activos": 15
+      },
+      "Medellín": {
+        "total": 8,
+        "graduados": 2,
+        "desertores": 2,
+        "activos": 4
+      },
+      "MEDELLIN": {
+        "total": 8,
+        "graduados": 5,
+        "desertores": 3,
+        "activos": 0
+      },
+      "Guayaquil": {
+        "total": 49,
+        "graduados": 8,
+        "desertores": 8,
+        "activos": 33
+      },
+      "LIMA": {
+        "total": 22,
+        "graduados": 12,
+        "desertores": 10,
+        "activos": 0
+      },
+      "Quito C1": {
+        "total": 20,
+        "graduados": 17,
+        "desertores": 3,
+        "activos": 0
+      },
+      "Quito C2": {
+        "total": 20,
+        "graduados": 19,
+        "desertores": 1,
+        "activos": 0
+      },
+      "Quito": {
+        "total": 260,
+        "graduados": 189,
+        "desertores": 62,
+        "activos": 9
+      },
+      "QUITO": {
+        "total": 61,
+        "graduados": 37,
+        "desertores": 24,
+        "activos": 0
+      }
+    },
+    "statusDist": {
+      "Graduados": 447,
+      "Desertores": 168,
+      "En Juego": 84
     }
   },
   "kpis": [
     {
       "entrenador": "Alejandro Diaz",
+      "normKey": "alejandrodiaz",
       "totalLlamadas": 370,
       "pagadoLlamadas": 240,
       "pendienteLlamadas": 130,
       "montoTotal": 6000,
-      "porcentajePagado": 65
+      "porcentajePagado": 65,
+      "totalAsignados": 36,
+      "graduados": 26,
+      "desertores": 7,
+      "activos": 3,
+      "tasaGraduacion": 72,
+      "tasaDesercion": 19
     },
     {
       "entrenador": "Ana Cristina Sánchez",
+      "normKey": "anacristinasanchez",
       "totalLlamadas": 88,
       "pagadoLlamadas": 0,
       "pendienteLlamadas": 88,
       "montoTotal": 0,
-      "porcentajePagado": 0
+      "porcentajePagado": 0,
+      "totalAsignados": 10,
+      "graduados": 5,
+      "desertores": 5,
+      "activos": 0,
+      "tasaGraduacion": 50,
+      "tasaDesercion": 50
     },
     {
       "entrenador": "Ana Monroy",
+      "normKey": "anamonroy",
       "totalLlamadas": 329,
       "pagadoLlamadas": 198,
       "pendienteLlamadas": 131,
       "montoTotal": 4950,
-      "porcentajePagado": 60
+      "porcentajePagado": 60,
+      "totalAsignados": 41,
+      "graduados": 28,
+      "desertores": 9,
+      "activos": 4,
+      "tasaGraduacion": 68,
+      "tasaDesercion": 22
     },
     {
       "entrenador": "Andrea Mejía",
+      "normKey": "andreamejia",
       "totalLlamadas": 0,
       "pagadoLlamadas": 0,
       "pendienteLlamadas": 0,
       "montoTotal": 0,
-      "porcentajePagado": 0
+      "porcentajePagado": 0,
+      "totalAsignados": 0,
+      "graduados": 0,
+      "desertores": 0,
+      "activos": 0,
+      "tasaGraduacion": 0,
+      "tasaDesercion": 0
     },
     {
       "entrenador": "Andrés Gómez",
+      "normKey": "andresgomez",
       "totalLlamadas": 217,
       "pagadoLlamadas": 91,
       "pendienteLlamadas": 126,
       "montoTotal": 2275,
-      "porcentajePagado": 42
+      "porcentajePagado": 42,
+      "totalAsignados": 19,
+      "graduados": 16,
+      "desertores": 3,
+      "activos": 0,
+      "tasaGraduacion": 84,
+      "tasaDesercion": 16
     },
     {
       "entrenador": "Andrés Idrobo",
+      "normKey": "andresidrobo",
       "totalLlamadas": 379,
       "pagadoLlamadas": 266,
       "pendienteLlamadas": 93,
       "montoTotal": 6650,
-      "porcentajePagado": 70
+      "porcentajePagado": 70,
+      "totalAsignados": 43,
+      "graduados": 35,
+      "desertores": 6,
+      "activos": 2,
+      "tasaGraduacion": 81,
+      "tasaDesercion": 14
     },
     {
       "entrenador": "Camila Torres",
+      "normKey": "camilatorres",
       "totalLlamadas": 0,
       "pagadoLlamadas": 0,
       "pendienteLlamadas": 0,
       "montoTotal": 0,
-      "porcentajePagado": 0
+      "porcentajePagado": 0,
+      "totalAsignados": 0,
+      "graduados": 0,
+      "desertores": 0,
+      "activos": 0,
+      "tasaGraduacion": 0,
+      "tasaDesercion": 0
     },
     {
       "entrenador": "Carolina Live",
+      "normKey": "carolinalive",
       "totalLlamadas": 0,
       "pagadoLlamadas": 0,
       "pendienteLlamadas": 0,
       "montoTotal": 0,
-      "porcentajePagado": 0
+      "porcentajePagado": 0,
+      "totalAsignados": 0,
+      "graduados": 0,
+      "desertores": 0,
+      "activos": 0,
+      "tasaGraduacion": 0,
+      "tasaDesercion": 0
     },
     {
       "entrenador": "Carolina Santamaria",
+      "normKey": "carolinasantamaria",
       "totalLlamadas": 0,
       "pagadoLlamadas": 0,
       "pendienteLlamadas": 0,
       "montoTotal": 0,
-      "porcentajePagado": 0
+      "porcentajePagado": 0,
+      "totalAsignados": 0,
+      "graduados": 0,
+      "desertores": 0,
+      "activos": 0,
+      "tasaGraduacion": 0,
+      "tasaDesercion": 0
     },
     {
       "entrenador": "Christian Tito",
+      "normKey": "christiantito",
       "totalLlamadas": 102,
       "pagadoLlamadas": 33,
       "pendienteLlamadas": 69,
       "montoTotal": 825,
-      "porcentajePagado": 32
+      "porcentajePagado": 32,
+      "totalAsignados": 6,
+      "graduados": 6,
+      "desertores": 0,
+      "activos": 0,
+      "tasaGraduacion": 100,
+      "tasaDesercion": 0
     },
     {
       "entrenador": "Daniela Monroy",
+      "normKey": "danielamonroy",
       "totalLlamadas": 0,
       "pagadoLlamadas": 0,
       "pendienteLlamadas": 0,
       "montoTotal": 0,
-      "porcentajePagado": 0
+      "porcentajePagado": 0,
+      "totalAsignados": 6,
+      "graduados": 0,
+      "desertores": 2,
+      "activos": 4,
+      "tasaGraduacion": 0,
+      "tasaDesercion": 33
     },
     {
       "entrenador": "David Sosa",
+      "normKey": "davidsosa",
       "totalLlamadas": 99,
       "pagadoLlamadas": 73,
       "pendienteLlamadas": 26,
       "montoTotal": 1825,
-      "porcentajePagado": 74
+      "porcentajePagado": 74,
+      "totalAsignados": 11,
+      "graduados": 5,
+      "desertores": 6,
+      "activos": 0,
+      "tasaGraduacion": 45,
+      "tasaDesercion": 55
     },
     {
       "entrenador": "Diego Bravo",
+      "normKey": "diegobravo",
       "totalLlamadas": 492,
       "pagadoLlamadas": 249,
       "pendienteLlamadas": 243,
       "montoTotal": 6225,
-      "porcentajePagado": 51
+      "porcentajePagado": 51,
+      "totalAsignados": 32,
+      "graduados": 21,
+      "desertores": 11,
+      "activos": 0,
+      "tasaGraduacion": 66,
+      "tasaDesercion": 34
     },
     {
       "entrenador": "Doris Balseca",
+      "normKey": "dorisbalseca",
       "totalLlamadas": 0,
       "pagadoLlamadas": 0,
       "pendienteLlamadas": 0,
       "montoTotal": 0,
-      "porcentajePagado": 0
+      "porcentajePagado": 0,
+      "totalAsignados": 0,
+      "graduados": 0,
+      "desertores": 0,
+      "activos": 0,
+      "tasaGraduacion": 0,
+      "tasaDesercion": 0
     },
     {
       "entrenador": "Erika Gavilánez",
+      "normKey": "erikagavilanez",
       "totalLlamadas": 331,
       "pagadoLlamadas": 255,
       "pendienteLlamadas": 76,
       "montoTotal": 6375,
-      "porcentajePagado": 77
+      "porcentajePagado": 77,
+      "totalAsignados": 47,
+      "graduados": 33,
+      "desertores": 8,
+      "activos": 6,
+      "tasaGraduacion": 70,
+      "tasaDesercion": 17
     },
     {
       "entrenador": "Fernanda Pereira",
+      "normKey": "fernandapereira",
       "totalLlamadas": 0,
       "pagadoLlamadas": 0,
       "pendienteLlamadas": 0,
       "montoTotal": 0,
-      "porcentajePagado": 0
+      "porcentajePagado": 0,
+      "totalAsignados": 0,
+      "graduados": 0,
+      "desertores": 0,
+      "activos": 0,
+      "tasaGraduacion": 0,
+      "tasaDesercion": 0
     },
     {
       "entrenador": "Fernando Mendoza",
+      "normKey": "fernandomendoza",
       "totalLlamadas": 194,
       "pagadoLlamadas": 90,
       "pendienteLlamadas": 104,
       "montoTotal": 2250,
-      "porcentajePagado": 46
+      "porcentajePagado": 46,
+      "totalAsignados": 46,
+      "graduados": 29,
+      "desertores": 6,
+      "activos": 11,
+      "tasaGraduacion": 63,
+      "tasaDesercion": 13
     },
     {
       "entrenador": "Isaac Betancourt",
+      "normKey": "isaacbetancourt",
       "totalLlamadas": 111,
       "pagadoLlamadas": 93,
       "pendienteLlamadas": 18,
       "montoTotal": 2325,
-      "porcentajePagado": 84
+      "porcentajePagado": 84,
+      "totalAsignados": 12,
+      "graduados": 9,
+      "desertores": 3,
+      "activos": 0,
+      "tasaGraduacion": 75,
+      "tasaDesercion": 25
     },
     {
       "entrenador": "Jesus Acosta",
+      "normKey": "chuyacosta",
       "totalLlamadas": 88,
       "pagadoLlamadas": 43,
       "pendienteLlamadas": 45,
       "montoTotal": 1075,
-      "porcentajePagado": 49
+      "porcentajePagado": 49,
+      "totalAsignados": 11,
+      "graduados": 8,
+      "desertores": 1,
+      "activos": 2,
+      "tasaGraduacion": 73,
+      "tasaDesercion": 9
     },
     {
       "entrenador": "José Sánchez",
+      "normKey": "josesanchez",
       "totalLlamadas": 208,
       "pagadoLlamadas": 110,
       "pendienteLlamadas": 98,
       "montoTotal": 2750,
-      "porcentajePagado": 53
+      "porcentajePagado": 53,
+      "totalAsignados": 38,
+      "graduados": 18,
+      "desertores": 15,
+      "activos": 5,
+      "tasaGraduacion": 47,
+      "tasaDesercion": 39
     },
     {
       "entrenador": "José Torron",
+      "normKey": "josetorron",
       "totalLlamadas": 112,
       "pagadoLlamadas": 62,
       "pendienteLlamadas": 50,
       "montoTotal": 1550,
-      "porcentajePagado": 55
+      "porcentajePagado": 55,
+      "totalAsignados": 18,
+      "graduados": 13,
+      "desertores": 5,
+      "activos": 0,
+      "tasaGraduacion": 72,
+      "tasaDesercion": 28
     },
     {
       "entrenador": "Josué Vera",
+      "normKey": "josuevera",
       "totalLlamadas": 361,
       "pagadoLlamadas": 178,
       "pendienteLlamadas": 183,
       "montoTotal": 4450,
-      "porcentajePagado": 49
+      "porcentajePagado": 49,
+      "totalAsignados": 38,
+      "graduados": 21,
+      "desertores": 12,
+      "activos": 5,
+      "tasaGraduacion": 55,
+      "tasaDesercion": 32
     },
     {
       "entrenador": "Julio Narváez",
+      "normKey": "julionarvaez",
       "totalLlamadas": 401,
       "pagadoLlamadas": 220,
       "pendienteLlamadas": 181,
       "montoTotal": 5500,
-      "porcentajePagado": 55
+      "porcentajePagado": 55,
+      "totalAsignados": 52,
+      "graduados": 31,
+      "desertores": 11,
+      "activos": 10,
+      "tasaGraduacion": 60,
+      "tasaDesercion": 21
     },
     {
       "entrenador": "Kerlie Carrillo",
+      "normKey": "kerliecarrillo",
       "totalLlamadas": 0,
       "pagadoLlamadas": 0,
       "pendienteLlamadas": 0,
       "montoTotal": 0,
-      "porcentajePagado": 0
+      "porcentajePagado": 0,
+      "totalAsignados": 7,
+      "graduados": 0,
+      "desertores": 0,
+      "activos": 7,
+      "tasaGraduacion": 0,
+      "tasaDesercion": 0
     },
     {
       "entrenador": "Kriscia Rodas",
+      "normKey": "krisciarodas",
       "totalLlamadas": 42,
       "pagadoLlamadas": 22,
       "pendienteLlamadas": 20,
       "montoTotal": 550,
-      "porcentajePagado": 52
+      "porcentajePagado": 52,
+      "totalAsignados": 6,
+      "graduados": 3,
+      "desertores": 3,
+      "activos": 0,
+      "tasaGraduacion": 50,
+      "tasaDesercion": 50
     },
     {
       "entrenador": "Leandro",
+      "normKey": "leandro",
       "totalLlamadas": 32,
       "pagadoLlamadas": 0,
       "pendienteLlamadas": 32,
       "montoTotal": 0,
-      "porcentajePagado": 0
+      "porcentajePagado": 0,
+      "totalAsignados": 0,
+      "graduados": 0,
+      "desertores": 0,
+      "activos": 0,
+      "tasaGraduacion": 0,
+      "tasaDesercion": 0
     },
     {
       "entrenador": "Linid Valencia",
+      "normKey": "linidvalencia",
       "totalLlamadas": 90,
       "pagadoLlamadas": 0,
       "pendienteLlamadas": 77,
       "montoTotal": 0,
-      "porcentajePagado": 0
+      "porcentajePagado": 0,
+      "totalAsignados": 20,
+      "graduados": 8,
+      "desertores": 7,
+      "activos": 5,
+      "tasaGraduacion": 40,
+      "tasaDesercion": 35
     },
     {
       "entrenador": "Lourdes Patiño",
+      "normKey": "lourdespatino",
       "totalLlamadas": 455,
       "pagadoLlamadas": 254,
       "pendienteLlamadas": 175,
       "montoTotal": 6350,
-      "porcentajePagado": 56
+      "porcentajePagado": 56,
+      "totalAsignados": 60,
+      "graduados": 38,
+      "desertores": 15,
+      "activos": 7,
+      "tasaGraduacion": 63,
+      "tasaDesercion": 25
     },
     {
       "entrenador": "María José Román",
+      "normKey": "mariajoseroman",
       "totalLlamadas": 202,
       "pagadoLlamadas": 213,
       "pendienteLlamadas": -11,
       "montoTotal": 5325,
-      "porcentajePagado": 105
+      "porcentajePagado": 105,
+      "totalAsignados": 22,
+      "graduados": 17,
+      "desertores": 5,
+      "activos": 0,
+      "tasaGraduacion": 77,
+      "tasaDesercion": 23
     },
     {
       "entrenador": "Mauricio Ramírez",
+      "normKey": "mauricioramirez",
       "totalLlamadas": 218,
       "pagadoLlamadas": 88,
       "pendienteLlamadas": 130,
       "montoTotal": 2200,
-      "porcentajePagado": 40
+      "porcentajePagado": 40,
+      "totalAsignados": 37,
+      "graduados": 21,
+      "desertores": 12,
+      "activos": 4,
+      "tasaGraduacion": 57,
+      "tasaDesercion": 32
     },
     {
       "entrenador": "Mike Boada",
+      "normKey": "mikeboada",
       "totalLlamadas": 100,
       "pagadoLlamadas": 103,
       "pendienteLlamadas": -3,
       "montoTotal": 2575,
-      "porcentajePagado": 103
+      "porcentajePagado": 103,
+      "totalAsignados": 38,
+      "graduados": 27,
+      "desertores": 8,
+      "activos": 3,
+      "tasaGraduacion": 71,
+      "tasaDesercion": 21
     },
     {
       "entrenador": "Mila Campuzano",
+      "normKey": "milacampuzano",
       "totalLlamadas": 80,
       "pagadoLlamadas": 69,
       "pendienteLlamadas": 11,
       "montoTotal": 1725,
-      "porcentajePagado": 86
+      "porcentajePagado": 86,
+      "totalAsignados": 9,
+      "graduados": 5,
+      "desertores": 1,
+      "activos": 3,
+      "tasaGraduacion": 56,
+      "tasaDesercion": 11
     },
     {
       "entrenador": "Mildred Muñoz",
+      "normKey": "mildredmunoz",
       "totalLlamadas": 240,
       "pagadoLlamadas": 108,
       "pendienteLlamadas": 132,
       "montoTotal": 2700,
-      "porcentajePagado": 45
+      "porcentajePagado": 45,
+      "totalAsignados": 25,
+      "graduados": 21,
+      "desertores": 4,
+      "activos": 0,
+      "tasaGraduacion": 84,
+      "tasaDesercion": 16
     },
     {
       "entrenador": "Pamela Carrillo",
+      "normKey": "pamelacarrillo",
       "totalLlamadas": 61,
       "pagadoLlamadas": 44,
       "pendienteLlamadas": 17,
       "montoTotal": 1100,
-      "porcentajePagado": 72
+      "porcentajePagado": 72,
+      "totalAsignados": 7,
+      "graduados": 3,
+      "desertores": 3,
+      "activos": 1,
+      "tasaGraduacion": 43,
+      "tasaDesercion": 43
     }
   ],
   "llamadosDetalle": [
@@ -227955,7 +228782,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "5540843176",
+      "coordinador": "ALONSO SOLARES"
     },
     {
       "id": "llam_2",
@@ -227988,7 +228820,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "5527377589",
+      "coordinador": "ALONSO SOLARES"
     },
     {
       "id": "llam_3",
@@ -228021,7 +228858,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "5539353705",
+      "coordinador": "ALONSO SOLARES"
     },
     {
       "id": "llam_4",
@@ -228054,7 +228896,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "5514956218",
+      "coordinador": "ALONSO SOLARES"
     },
     {
       "id": "llam_5",
@@ -228087,7 +228934,12 @@ export const cyclesData = [
       ],
       "agosto": 3,
       "septiembre": 4,
-      "octubre": 2
+      "octubre": 2,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "5930984959494",
+      "coordinador": "MIGUEL TORRES"
     },
     {
       "id": "llam_6",
@@ -228120,7 +228972,12 @@ export const cyclesData = [
       ],
       "agosto": 3,
       "septiembre": 1,
-      "octubre": 2
+      "octubre": 2,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "5930980184471",
+      "coordinador": "MIGUEL TORRES"
     },
     {
       "id": "llam_7",
@@ -228153,7 +229010,12 @@ export const cyclesData = [
       ],
       "agosto": 4,
       "septiembre": 3,
-      "octubre": 3
+      "octubre": 3,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_8",
@@ -228186,7 +229048,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0980184471",
+      "coordinador": "JUAN FERNANDO REINOSO"
     },
     {
       "id": "llam_9",
@@ -228219,7 +229086,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_10",
@@ -228252,7 +229124,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_11",
@@ -228285,7 +229162,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "3104429169",
+      "coordinador": ""
     },
     {
       "id": "llam_12",
@@ -228318,7 +229200,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "3103886732",
+      "coordinador": ""
     },
     {
       "id": "llam_13",
@@ -228351,7 +229238,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "3104429169",
+      "coordinador": ""
     },
     {
       "id": "llam_14",
@@ -228384,7 +229276,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "3134004302",
+      "coordinador": ""
     },
     {
       "id": "llam_15",
@@ -228417,7 +229314,12 @@ export const cyclesData = [
       ],
       "agosto": 4,
       "septiembre": 4,
-      "octubre": 2
+      "octubre": 2,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "5930998024307",
+      "coordinador": "MIGUEL TORRES"
     },
     {
       "id": "llam_16",
@@ -228450,7 +229352,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "7223057233",
+      "coordinador": "ALONSO SOLARES"
     },
     {
       "id": "llam_17",
@@ -228483,7 +229390,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "3511507519",
+      "coordinador": "ALONSO SOLARES"
     },
     {
       "id": "llam_18",
@@ -228516,7 +229428,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 2,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0988817401",
+      "coordinador": "MIGUEL TORRES"
     },
     {
       "id": "llam_19",
@@ -228549,7 +229466,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0992848576",
+      "coordinador": "MIGUEL TORRES"
     },
     {
       "id": "llam_20",
@@ -228582,7 +229504,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 3,
-      "octubre": 2
+      "octubre": 2,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0968535607",
+      "coordinador": "MIGUEL TORRES"
     },
     {
       "id": "llam_21",
@@ -228615,7 +229542,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_22",
@@ -228648,7 +229580,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "3234282671",
+      "coordinador": ""
     },
     {
       "id": "llam_23",
@@ -228681,7 +229618,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "3244391563",
+      "coordinador": ""
     },
     {
       "id": "llam_24",
@@ -228714,7 +229656,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "3012779494",
+      "coordinador": ""
     },
     {
       "id": "llam_25",
@@ -228747,7 +229694,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+573206949379",
+      "coordinador": "MAURICIO RAMIREZ"
     },
     {
       "id": "llam_26",
@@ -228780,7 +229732,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+573233644192",
+      "coordinador": "MAURICIO RAMIREZ"
     },
     {
       "id": "llam_27",
@@ -228813,7 +229770,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "3052476502",
+      "coordinador": ""
     },
     {
       "id": "llam_28",
@@ -228846,7 +229808,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_29",
@@ -228879,7 +229846,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "5519706103",
+      "coordinador": "DANIELA MONROY"
     },
     {
       "id": "llam_30",
@@ -228912,7 +229884,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "984123196",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_31",
@@ -228945,7 +229922,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 3
+      "octubre": 3,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0983335667",
+      "coordinador": "KERLY CARRILLO - JUANFER REINOSO"
     },
     {
       "id": "llam_32",
@@ -228978,7 +229960,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 3
+      "octubre": 3,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593 99 554 7752",
+      "coordinador": "MIGUEL TORRES"
     },
     {
       "id": "llam_33",
@@ -229011,7 +229998,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 2
+      "octubre": 2,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "593 96 229 8765",
+      "coordinador": "MIGUEL TORRES"
     },
     {
       "id": "llam_34",
@@ -229044,7 +230036,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_35",
@@ -229077,7 +230074,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_36",
@@ -229110,7 +230112,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+573044072665",
+      "coordinador": ""
     },
     {
       "id": "llam_37",
@@ -229143,7 +230150,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+573246082756",
+      "coordinador": ""
     },
     {
       "id": "llam_38",
@@ -229176,7 +230188,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "9711213956",
+      "coordinador": "DANIELA MONROY"
     },
     {
       "id": "llam_39",
@@ -229209,7 +230226,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0980177146",
+      "coordinador": "JOSUE VERA"
     },
     {
       "id": "llam_40",
@@ -229242,7 +230264,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0995815292",
+      "coordinador": "JOSUE VERA"
     },
     {
       "id": "llam_41",
@@ -229275,7 +230302,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_42",
@@ -229308,7 +230340,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+51 990 184 115",
+      "coordinador": ""
     },
     {
       "id": "llam_43",
@@ -229341,7 +230378,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+573013053610",
+      "coordinador": ""
     },
     {
       "id": "llam_44",
@@ -229374,7 +230416,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+573044072665",
+      "coordinador": ""
     },
     {
       "id": "llam_45",
@@ -229407,7 +230454,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51 985 610 048",
+      "coordinador": ""
     },
     {
       "id": "llam_46",
@@ -229440,7 +230492,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_47",
@@ -229473,7 +230530,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0988903378",
+      "coordinador": "JOSUE VERA"
     },
     {
       "id": "llam_48",
@@ -229506,7 +230568,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0981966878",
+      "coordinador": "KERLY CARRILLO"
     },
     {
       "id": "llam_49",
@@ -229539,7 +230606,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0996849484",
+      "coordinador": "JOSUE VERA"
     },
     {
       "id": "llam_50",
@@ -229572,7 +230644,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593 99 249 2027",
+      "coordinador": ""
     },
     {
       "id": "llam_51",
@@ -229605,7 +230682,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_52",
@@ -229638,7 +230720,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_53",
@@ -229671,7 +230758,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0984077123",
+      "coordinador": "JOSUE VERA"
     },
     {
       "id": "llam_54",
@@ -229704,7 +230796,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593980927921",
+      "coordinador": ""
     },
     {
       "id": "llam_55",
@@ -229737,7 +230834,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51 996 820 944",
+      "coordinador": ""
     },
     {
       "id": "llam_56",
@@ -229770,7 +230872,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+573194169780",
+      "coordinador": ""
     },
     {
       "id": "llam_57",
@@ -229803,7 +230910,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+573225052109",
+      "coordinador": ""
     },
     {
       "id": "llam_58",
@@ -229836,7 +230948,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_59",
@@ -229869,7 +230986,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0999084200",
+      "coordinador": "JOSUE VERA"
     },
     {
       "id": "llam_60",
@@ -229902,7 +231024,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51 983 708 896",
+      "coordinador": ""
     },
     {
       "id": "llam_61",
@@ -229935,7 +231062,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0992848576",
+      "coordinador": "MIGUEL TORRES"
     },
     {
       "id": "llam_62",
@@ -229968,7 +231100,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0997244234",
+      "coordinador": "JOSUE VERA"
     },
     {
       "id": "llam_63",
@@ -230001,7 +231138,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+51 985 031 721",
+      "coordinador": ""
     },
     {
       "id": "llam_64",
@@ -230034,7 +231176,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51947469418",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_65",
@@ -230067,7 +231214,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_66",
@@ -230100,7 +231252,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+573206949379",
+      "coordinador": "MAURICIO RAMIREZ"
     },
     {
       "id": "llam_67",
@@ -230133,7 +231290,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+573146726436",
+      "coordinador": "MAURICIO RAMIREZ"
     },
     {
       "id": "llam_68",
@@ -230166,7 +231328,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0999731178",
+      "coordinador": "KERLY CARRILLO"
     },
     {
       "id": "llam_69",
@@ -230199,7 +231366,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0983168859",
+      "coordinador": "KERLY CARRILLO"
     },
     {
       "id": "llam_70",
@@ -230232,7 +231404,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_71",
@@ -230265,7 +231442,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+51 990 184 115",
+      "coordinador": ""
     },
     {
       "id": "llam_72",
@@ -230298,7 +231480,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51 987 020 591",
+      "coordinador": ""
     },
     {
       "id": "llam_73",
@@ -230331,7 +231518,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51 999 105 525",
+      "coordinador": ""
     },
     {
       "id": "llam_74",
@@ -230364,7 +231556,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51958058579",
+      "coordinador": ""
     },
     {
       "id": "llam_75",
@@ -230397,7 +231594,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_76",
@@ -230430,7 +231632,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51 985 610 048",
+      "coordinador": ""
     },
     {
       "id": "llam_77",
@@ -230463,7 +231670,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "3113691829",
+      "coordinador": "MAURICIO RAMIREZ"
     },
     {
       "id": "llam_78",
@@ -230496,7 +231708,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+51 994 704 928",
+      "coordinador": ""
     },
     {
       "id": "llam_79",
@@ -230529,7 +231746,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+51 961 892 790",
+      "coordinador": ""
     },
     {
       "id": "llam_80",
@@ -230562,7 +231784,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0994481646",
+      "coordinador": "KERLY CARRILLO"
     },
     {
       "id": "llam_81",
@@ -230595,7 +231822,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0993893819",
+      "coordinador": "KERLY CARRILLO"
     },
     {
       "id": "llam_82",
@@ -230628,7 +231860,12 @@ export const cyclesData = [
       ],
       "agosto": 4,
       "septiembre": 3,
-      "octubre": 3
+      "octubre": 3,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51 936 558 835",
+      "coordinador": ""
     },
     {
       "id": "llam_83",
@@ -230661,7 +231898,12 @@ export const cyclesData = [
       ],
       "agosto": 4,
       "septiembre": 4,
-      "octubre": 3
+      "octubre": 3,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51 944 243 222",
+      "coordinador": ""
     },
     {
       "id": "llam_84",
@@ -230694,7 +231936,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+573246110466",
+      "coordinador": "MAURICIO RAMIREZ"
     },
     {
       "id": "llam_85",
@@ -230727,7 +231974,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+573233644192",
+      "coordinador": "MAURICIO RAMIREZ"
     },
     {
       "id": "llam_86",
@@ -230760,7 +232012,12 @@ export const cyclesData = [
       ],
       "agosto": 4,
       "septiembre": 4,
-      "octubre": 3
+      "octubre": 3,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51 907 418 863",
+      "coordinador": ""
     },
     {
       "id": "llam_87",
@@ -230793,7 +232050,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0995889161",
+      "coordinador": "KERLY CARRILLO"
     },
     {
       "id": "llam_88",
@@ -230826,7 +232088,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0998899953",
+      "coordinador": "KERLY CARRILLO"
     },
     {
       "id": "llam_89",
@@ -230859,7 +232126,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+51 962 365 323",
+      "coordinador": ""
     },
     {
       "id": "llam_90",
@@ -230892,7 +232164,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51 907 503 084",
+      "coordinador": ""
     },
     {
       "id": "llam_91",
@@ -230925,7 +232202,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "961164574",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_92",
@@ -230958,7 +232240,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593 99 249 2027",
+      "coordinador": ""
     },
     {
       "id": "llam_93",
@@ -230991,7 +232278,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+573215607716",
+      "coordinador": "MAURICIO RAMIREZ"
     },
     {
       "id": "llam_94",
@@ -231024,7 +232316,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+573017628483",
+      "coordinador": "MAURICIO RAMIREZ"
     },
     {
       "id": "llam_95",
@@ -231057,7 +232354,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0997258052",
+      "coordinador": "KERLY CARRILLO"
     },
     {
       "id": "llam_96",
@@ -231090,7 +232392,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0995780948",
+      "coordinador": "KERLY CARRILLO"
     },
     {
       "id": "llam_97",
@@ -231123,7 +232430,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0958927854",
+      "coordinador": "KERLY CARRILLO"
     },
     {
       "id": "llam_98",
@@ -231156,7 +232468,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51 998 450 224",
+      "coordinador": ""
     },
     {
       "id": "llam_99",
@@ -231189,7 +232506,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 3
+      "octubre": 3,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51 962 511575",
+      "coordinador": ""
     },
     {
       "id": "llam_100",
@@ -231222,7 +232544,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 3
+      "octubre": 3,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51 996 820 944",
+      "coordinador": ""
     },
     {
       "id": "llam_101",
@@ -231255,7 +232582,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0981327243",
+      "coordinador": "KERLY CARRILLO"
     },
     {
       "id": "llam_102",
@@ -231288,7 +232620,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0981966878",
+      "coordinador": "KERLY CARRILLO"
     },
     {
       "id": "llam_103",
@@ -231321,7 +232658,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0988718274",
+      "coordinador": "KERLY CARRILLO"
     },
     {
       "id": "llam_104",
@@ -231354,7 +232696,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0987656778",
+      "coordinador": "JUAN FER REINOSO"
     },
     {
       "id": "llam_105",
@@ -231387,7 +232734,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 1
+      "octubre": 1,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "996612880",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_106",
@@ -231420,7 +232772,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51 987 020 591",
+      "coordinador": ""
     },
     {
       "id": "llam_107",
@@ -231453,7 +232810,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51 964 140 549",
+      "coordinador": ""
     },
     {
       "id": "llam_108",
@@ -231486,7 +232848,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51 999 105 525",
+      "coordinador": ""
     },
     {
       "id": "llam_109",
@@ -231519,7 +232886,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51 989 947 797",
+      "coordinador": ""
     },
     {
       "id": "llam_110",
@@ -231552,7 +232924,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+573246110466",
+      "coordinador": "MAURICIO RAMIREZ"
     },
     {
       "id": "llam_111",
@@ -231585,7 +232962,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+573123063012",
+      "coordinador": "MAURICIO RAMIREZ"
     },
     {
       "id": "llam_112",
@@ -231618,7 +233000,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+573163270732",
+      "coordinador": "MAURICIO RAMIREZ"
     },
     {
       "id": "llam_113",
@@ -231651,7 +233038,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+573146726436",
+      "coordinador": "MAURICIO RAMIREZ"
     },
     {
       "id": "llam_114",
@@ -231684,7 +233076,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0983335667",
+      "coordinador": "KERLY CARRILLO - JUANFER REINOSO"
     },
     {
       "id": "llam_115",
@@ -231717,7 +233114,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0995862422",
+      "coordinador": "KERLY CARRILLO - JUANFER REINOSO"
     },
     {
       "id": "llam_116",
@@ -231750,7 +233152,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0993746081",
+      "coordinador": "KERLY CARRILLO - JUANFER REINOSO"
     },
     {
       "id": "llam_117",
@@ -231783,7 +233190,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0987583826",
+      "coordinador": "KERLY CARRILLO - JUANFER REINOSO"
     },
     {
       "id": "llam_118",
@@ -231816,7 +233228,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593980927921",
+      "coordinador": ""
     },
     {
       "id": "llam_119",
@@ -231849,7 +233266,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51947469418",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_120",
@@ -231882,7 +233304,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51 998 044 097",
+      "coordinador": ""
     },
     {
       "id": "llam_121",
@@ -231915,7 +233342,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51 953 656 959",
+      "coordinador": ""
     },
     {
       "id": "llam_122",
@@ -231948,7 +233380,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+57 3195952194",
+      "coordinador": "MAURICIO RAMIREZ"
     },
     {
       "id": "llam_123",
@@ -231981,7 +233418,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+57 3243611278",
+      "coordinador": "MAURICIO RAMIREZ"
     },
     {
       "id": "llam_124",
@@ -232014,7 +233456,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+57 3042071111",
+      "coordinador": "MAURICIO RAMIREZ"
     },
     {
       "id": "llam_125",
@@ -232047,7 +233494,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0958758565",
+      "coordinador": "KERLY CARRILLO / JUAN FERNANDO REINOSO"
     },
     {
       "id": "llam_126",
@@ -232080,7 +233532,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0958881296",
+      "coordinador": "KERLY CARRILLO / JUAN FERNANDO REINOSO"
     },
     {
       "id": "llam_127",
@@ -232113,7 +233570,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0998410632",
+      "coordinador": "KERLY CARRILLO / JUAN FERNANDO REINOSO"
     },
     {
       "id": "llam_128",
@@ -232146,7 +233608,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0984833315",
+      "coordinador": "KERLY CARRILLO / JUAN FERNANDO REINOSO"
     },
     {
       "id": "llam_129",
@@ -232179,7 +233646,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593963291572",
+      "coordinador": ""
     },
     {
       "id": "llam_130",
@@ -232212,7 +233684,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593990196376",
+      "coordinador": ""
     },
     {
       "id": "llam_131",
@@ -232245,7 +233722,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593999881365",
+      "coordinador": ""
     },
     {
       "id": "llam_132",
@@ -232278,7 +233760,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593969532866",
+      "coordinador": ""
     },
     {
       "id": "llam_133",
@@ -232311,7 +233798,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "593991631172",
+      "coordinador": ""
     },
     {
       "id": "llam_134",
@@ -232344,7 +233836,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "975242055",
+      "coordinador": ""
     },
     {
       "id": "llam_135",
@@ -232377,7 +233874,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "971248667",
+      "coordinador": ""
     },
     {
       "id": "llam_136",
@@ -232410,7 +233912,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "954821488",
+      "coordinador": ""
     },
     {
       "id": "llam_137",
@@ -232443,7 +233950,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "946011882",
+      "coordinador": ""
     },
     {
       "id": "llam_138",
@@ -232476,7 +233988,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "949191577",
+      "coordinador": ""
     },
     {
       "id": "llam_139",
@@ -232509,7 +234026,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "970870801",
+      "coordinador": ""
     },
     {
       "id": "llam_140",
@@ -232542,7 +234064,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "+51981237577",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_141",
@@ -232575,7 +234102,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "5527377589",
+      "coordinador": "ALONSO SOLARES"
     },
     {
       "id": "llam_142",
@@ -232608,7 +234140,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "981701570",
+      "coordinador": ""
     },
     {
       "id": "llam_143",
@@ -232641,7 +234178,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "936558835",
+      "coordinador": ""
     },
     {
       "id": "llam_144",
@@ -232674,7 +234216,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0980184471",
+      "coordinador": "JUAN FERNANDO REINOSO"
     },
     {
       "id": "llam_145",
@@ -232707,7 +234254,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0992101126",
+      "coordinador": "JUAN FERNANDO REINOSO"
     },
     {
       "id": "llam_146",
@@ -232740,7 +234292,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0961628015",
+      "coordinador": "JUAN FERNANDO REINOSO"
     },
     {
       "id": "llam_147",
@@ -232773,7 +234330,12 @@ export const cyclesData = [
       ],
       "agosto": 3,
       "septiembre": 4,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593983238632",
+      "coordinador": ""
     },
     {
       "id": "llam_148",
@@ -232806,7 +234368,12 @@ export const cyclesData = [
       ],
       "agosto": 4,
       "septiembre": 0,
-      "octubre": 1
+      "octubre": 1,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593980899920",
+      "coordinador": ""
     },
     {
       "id": "llam_149",
@@ -232839,7 +234406,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593980636031",
+      "coordinador": ""
     },
     {
       "id": "llam_150",
@@ -232872,7 +234444,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593986678514",
+      "coordinador": ""
     },
     {
       "id": "llam_151",
@@ -232905,7 +234482,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51 998 450224",
+      "coordinador": ""
     },
     {
       "id": "llam_152",
@@ -232938,7 +234520,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51 945 111938",
+      "coordinador": ""
     },
     {
       "id": "llam_153",
@@ -232971,7 +234558,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "941842840",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_154",
@@ -233004,7 +234596,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+51 956 268830",
+      "coordinador": ""
     },
     {
       "id": "llam_155",
@@ -233037,7 +234634,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51 962 511575",
+      "coordinador": ""
     },
     {
       "id": "llam_156",
@@ -233070,7 +234672,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "934690932",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_157",
@@ -233103,7 +234710,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "951815674",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_158",
@@ -233136,7 +234748,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51 980 496819",
+      "coordinador": ""
     },
     {
       "id": "llam_159",
@@ -233169,7 +234786,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0999737261",
+      "coordinador": "KERLY CARRILLO"
     },
     {
       "id": "llam_160",
@@ -233202,7 +234824,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0969497795",
+      "coordinador": "KERLY CARRILLO"
     },
     {
       "id": "llam_161",
@@ -233235,7 +234862,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "593982449947",
+      "coordinador": ""
     },
     {
       "id": "llam_162",
@@ -233268,7 +234900,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0988759534",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_163",
@@ -233301,7 +234938,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51 924 105 061",
+      "coordinador": ""
     },
     {
       "id": "llam_164",
@@ -233334,7 +234976,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "996612880",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_165",
@@ -233367,7 +235014,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51 991 215 652",
+      "coordinador": ""
     },
     {
       "id": "llam_166",
@@ -233400,7 +235052,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593989743818",
+      "coordinador": ""
     },
     {
       "id": "llam_167",
@@ -233433,7 +235090,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0984975094",
+      "coordinador": "JUAN FER REINOSO"
     },
     {
       "id": "llam_168",
@@ -233466,7 +235128,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0983937853",
+      "coordinador": "JUAN FER REINOSO"
     },
     {
       "id": "llam_169",
@@ -233499,7 +235166,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0987408003",
+      "coordinador": "JUAN FER REINOSO"
     },
     {
       "id": "llam_170",
@@ -233532,7 +235204,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0987656778",
+      "coordinador": "JUAN FER REINOSO"
     },
     {
       "id": "llam_171",
@@ -233565,7 +235242,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "593984294753",
+      "coordinador": ""
     },
     {
       "id": "llam_172",
@@ -233598,7 +235280,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593986361725",
+      "coordinador": ""
     },
     {
       "id": "llam_173",
@@ -233631,7 +235318,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 4
+      "octubre": 4,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593998559879",
+      "coordinador": ""
     },
     {
       "id": "llam_174",
@@ -233664,7 +235356,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 4
+      "octubre": 4,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593968991462",
+      "coordinador": ""
     },
     {
       "id": "llam_175",
@@ -233697,7 +235394,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51 920 122 990",
+      "coordinador": ""
     },
     {
       "id": "llam_176",
@@ -233730,7 +235432,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51 930 702 843",
+      "coordinador": ""
     },
     {
       "id": "llam_177",
@@ -233763,7 +235470,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51 924 255 051",
+      "coordinador": ""
     },
     {
       "id": "llam_178",
@@ -233796,7 +235508,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "989665820",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_179",
@@ -233829,7 +235546,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51 952 372 756",
+      "coordinador": ""
     },
     {
       "id": "llam_180",
@@ -233862,7 +235584,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51 991 512 467",
+      "coordinador": ""
     },
     {
       "id": "llam_181",
@@ -233895,7 +235622,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51 921 979 246",
+      "coordinador": ""
     },
     {
       "id": "llam_182",
@@ -233928,7 +235660,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51996592870",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_183",
@@ -233961,7 +235698,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+51 985 461 746",
+      "coordinador": ""
     },
     {
       "id": "llam_184",
@@ -233994,7 +235736,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51 981 087 758",
+      "coordinador": ""
     },
     {
       "id": "llam_185",
@@ -234027,7 +235774,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+51 983 701 400",
+      "coordinador": ""
     },
     {
       "id": "llam_186",
@@ -234060,7 +235812,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51 973 827 510",
+      "coordinador": ""
     },
     {
       "id": "llam_187",
@@ -234093,7 +235850,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "+573137791253",
+      "coordinador": "MAURICIO RAMIREZ"
     },
     {
       "id": "llam_188",
@@ -234126,7 +235888,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+573116042782",
+      "coordinador": "MAURICIO RAMIREZ"
     },
     {
       "id": "llam_189",
@@ -234159,7 +235926,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "+573013053610",
+      "coordinador": "MAURICIO RAMIREZ"
     },
     {
       "id": "llam_190",
@@ -234192,7 +235964,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0986074127",
+      "coordinador": "JOSUE VERA"
     },
     {
       "id": "llam_191",
@@ -234225,7 +236002,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_192",
@@ -234258,7 +236040,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0967241443",
+      "coordinador": "KERLY CARRILLO"
     },
     {
       "id": "llam_193",
@@ -234291,7 +236078,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "593999766343",
+      "coordinador": ""
     },
     {
       "id": "llam_194",
@@ -234324,7 +236116,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593996161745",
+      "coordinador": ""
     },
     {
       "id": "llam_195",
@@ -234357,7 +236154,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593988674650",
+      "coordinador": ""
     },
     {
       "id": "llam_196",
@@ -234390,7 +236192,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593958714988",
+      "coordinador": ""
     },
     {
       "id": "llam_197",
@@ -234423,7 +236230,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593989838161",
+      "coordinador": ""
     },
     {
       "id": "llam_198",
@@ -234456,7 +236268,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+51961491513",
+      "coordinador": ""
     },
     {
       "id": "llam_199",
@@ -234489,7 +236306,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593993027018",
+      "coordinador": ""
     },
     {
       "id": "llam_200",
@@ -234522,7 +236344,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51943064793",
+      "coordinador": ""
     },
     {
       "id": "llam_201",
@@ -234555,7 +236382,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51931059726",
+      "coordinador": ""
     },
     {
       "id": "llam_202",
@@ -234588,7 +236420,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51958058579",
+      "coordinador": ""
     },
     {
       "id": "llam_203",
@@ -234621,7 +236458,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51967197761",
+      "coordinador": ""
     },
     {
       "id": "llam_204",
@@ -234654,7 +236496,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51940243206",
+      "coordinador": ""
     },
     {
       "id": "llam_205",
@@ -234687,7 +236534,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0986672823",
+      "coordinador": ""
     },
     {
       "id": "llam_206",
@@ -234720,7 +236572,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0988790330",
+      "coordinador": ""
     },
     {
       "id": "llam_207",
@@ -234753,7 +236610,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0986074127",
+      "coordinador": ""
     },
     {
       "id": "llam_208",
@@ -234786,7 +236648,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0981767888",
+      "coordinador": ""
     },
     {
       "id": "llam_209",
@@ -234819,7 +236686,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_210",
@@ -234852,7 +236724,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0996856906",
+      "coordinador": ""
     },
     {
       "id": "llam_211",
@@ -234885,7 +236762,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0982907381",
+      "coordinador": ""
     },
     {
       "id": "llam_212",
@@ -234918,7 +236800,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0986672823",
+      "coordinador": ""
     },
     {
       "id": "llam_213",
@@ -234951,7 +236838,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0990832845",
+      "coordinador": ""
     },
     {
       "id": "llam_214",
@@ -234984,7 +236876,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0983487965",
+      "coordinador": ""
     },
     {
       "id": "llam_215",
@@ -235017,7 +236914,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+51982791484",
+      "coordinador": ""
     },
     {
       "id": "llam_216",
@@ -235050,7 +236952,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51989063639",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_217",
@@ -235083,7 +236990,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+51954884632",
+      "coordinador": ""
     },
     {
       "id": "llam_218",
@@ -235116,7 +237028,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+51961496514",
+      "coordinador": ""
     },
     {
       "id": "llam_219",
@@ -235149,7 +237066,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51989455869",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_220",
@@ -235182,7 +237104,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+51958110726",
+      "coordinador": ""
     },
     {
       "id": "llam_221",
@@ -235215,7 +237142,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+51992798459",
+      "coordinador": ""
     },
     {
       "id": "llam_222",
@@ -235248,7 +237180,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51947469418",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_223",
@@ -235281,7 +237218,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51999927725",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_224",
@@ -235314,7 +237256,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0962784962",
+      "coordinador": ""
     },
     {
       "id": "llam_225",
@@ -235347,7 +237294,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0990196376",
+      "coordinador": ""
     },
     {
       "id": "llam_226",
@@ -235380,7 +237332,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0978667245",
+      "coordinador": ""
     },
     {
       "id": "llam_227",
@@ -235413,7 +237370,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0960641112",
+      "coordinador": ""
     },
     {
       "id": "llam_228",
@@ -235446,7 +237408,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "951815674",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_229",
@@ -235479,7 +237446,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "968104053",
+      "coordinador": ""
     },
     {
       "id": "llam_230",
@@ -235512,7 +237484,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "929809609",
+      "coordinador": ""
     },
     {
       "id": "llam_231",
@@ -235545,7 +237522,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "993717944",
+      "coordinador": ""
     },
     {
       "id": "llam_232",
@@ -235578,7 +237560,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_233",
@@ -235611,7 +237598,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "931283234",
+      "coordinador": ""
     },
     {
       "id": "llam_234",
@@ -235644,7 +237636,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+51962559832",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_235",
@@ -235677,7 +237674,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "941842840",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_236",
@@ -235710,7 +237712,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0963058531",
+      "coordinador": ""
     },
     {
       "id": "llam_237",
@@ -235743,7 +237750,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0989743818",
+      "coordinador": ""
     },
     {
       "id": "llam_238",
@@ -235776,7 +237788,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "962338667",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_239",
@@ -235809,7 +237826,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "970373769",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_240",
@@ -235842,7 +237864,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "981701570",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_241",
@@ -235875,7 +237902,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "934593496",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_242",
@@ -235908,7 +237940,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "979375441",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_243",
@@ -235941,7 +237978,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0984613232",
+      "coordinador": ""
     },
     {
       "id": "llam_244",
@@ -235974,7 +238016,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0987427733",
+      "coordinador": ""
     },
     {
       "id": "llam_245",
@@ -236007,7 +238054,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0985726631",
+      "coordinador": ""
     },
     {
       "id": "llam_246",
@@ -236040,7 +238092,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0959283977",
+      "coordinador": ""
     },
     {
       "id": "llam_247",
@@ -236073,7 +238130,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0998579112",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_248",
@@ -236106,7 +238168,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0968103800",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_249",
@@ -236139,7 +238206,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0990893926",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_250",
@@ -236172,7 +238244,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "980648582",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_251",
@@ -236205,7 +238282,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "989665820",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_252",
@@ -236238,7 +238320,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "922972827",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_253",
@@ -236271,7 +238358,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "934690932",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_254",
@@ -236304,7 +238396,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "920738765",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_255",
@@ -236337,7 +238434,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0994709294",
+      "coordinador": ""
     },
     {
       "id": "llam_256",
@@ -236370,7 +238472,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "+51922042189",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_257",
@@ -236403,7 +238510,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "951 381 389",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_258",
@@ -236436,7 +238548,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "981 237 577",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_259",
@@ -236469,7 +238586,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "969 587 076",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_260",
@@ -236502,7 +238624,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "946 011 882",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_261",
@@ -236535,7 +238662,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "913 863 730",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_262",
@@ -236568,7 +238700,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "941 433 268",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_263",
@@ -236601,7 +238738,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "098057981",
+      "coordinador": ""
     },
     {
       "id": "llam_264",
@@ -236634,7 +238776,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0980805649",
+      "coordinador": ""
     },
     {
       "id": "llam_265",
@@ -236667,7 +238814,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51996468297",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_266",
@@ -236700,7 +238852,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+51999261944",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_267",
@@ -236733,7 +238890,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51947676664",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_268",
@@ -236766,7 +238928,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51978581515",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_269",
@@ -236799,7 +238966,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51944521634",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_270",
@@ -236832,7 +239004,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+51999699649",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_271",
@@ -236865,7 +239042,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51996592870",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_272",
@@ -236898,7 +239080,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51969721562",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_273",
@@ -236931,7 +239118,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+51 956 268830",
+      "coordinador": ""
     },
     {
       "id": "llam_274",
@@ -236964,7 +239156,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51987724882",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_275",
@@ -236997,7 +239194,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51976232368",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_276",
@@ -237030,7 +239232,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+51963421178",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_277",
@@ -237063,7 +239270,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0984270873",
+      "coordinador": "JONATHAN LA ROSA"
     },
     {
       "id": "llam_278",
@@ -237096,7 +239308,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0988759534",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_279",
@@ -237129,7 +239346,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0997035955",
+      "coordinador": ""
     },
     {
       "id": "llam_280",
@@ -237162,7 +239384,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "+1(609)6353345",
+      "coordinador": "JONATHAN LA ROSA"
     },
     {
       "id": "llam_281",
@@ -237195,7 +239422,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0983573513",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_282",
@@ -237228,7 +239460,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "927788191",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_283",
@@ -237261,7 +239498,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "924476603",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_284",
@@ -237294,7 +239536,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "970737769",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_285",
@@ -237327,7 +239574,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "996612880",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_286",
@@ -237360,7 +239612,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "962511575",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_287",
@@ -237393,7 +239650,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0969610316",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_288",
@@ -237426,7 +239688,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0986389625",
+      "coordinador": "KERLY CARRILLO"
     },
     {
       "id": "llam_289",
@@ -237459,7 +239726,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0992569679",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_290",
@@ -237492,7 +239764,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0984051438",
+      "coordinador": "KERLY CARRILLO"
     },
     {
       "id": "llam_291",
@@ -237525,7 +239802,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0958814888",
+      "coordinador": "KERLY CARRILLO"
     },
     {
       "id": "llam_292",
@@ -237558,7 +239840,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0999890352",
+      "coordinador": "KERLY CARRILLO"
     },
     {
       "id": "llam_293",
@@ -237591,7 +239878,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0983869325",
+      "coordinador": "KERLY CARRILLO"
     },
     {
       "id": "llam_294",
@@ -237624,7 +239916,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0983834620",
+      "coordinador": "JUAN FER REINOSO"
     },
     {
       "id": "llam_295",
@@ -237657,7 +239954,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0967241443",
+      "coordinador": "KERLY CARRILLO"
     },
     {
       "id": "llam_296",
@@ -237690,7 +239992,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_297",
@@ -237723,7 +240030,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_298",
@@ -237756,7 +240068,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": "LILI CUBILLO"
     },
     {
       "id": "llam_299",
@@ -237789,7 +240106,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0993793890",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_300",
@@ -237822,7 +240144,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": "LILI CUBILLO"
     },
     {
       "id": "llam_301",
@@ -237855,7 +240182,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": "REGINA ROMERO"
     },
     {
       "id": "llam_302",
@@ -237888,7 +240220,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0961944443",
+      "coordinador": "REGINA ROMERO"
     },
     {
       "id": "llam_303",
@@ -237921,7 +240258,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_304",
@@ -237954,7 +240296,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+51962559832",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_305",
@@ -237987,7 +240334,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+51922972827",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_306",
@@ -238020,7 +240372,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+51957072400",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_307",
@@ -238053,7 +240410,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0991802330",
+      "coordinador": "JOSUE VERA"
     },
     {
       "id": "llam_308",
@@ -238086,7 +240448,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0986074127",
+      "coordinador": "JOSUE VERA"
     },
     {
       "id": "llam_309",
@@ -238119,7 +240486,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0959114621",
+      "coordinador": "JONATHAN LA ROSA"
     },
     {
       "id": "llam_310",
@@ -238152,7 +240524,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0981767888",
+      "coordinador": "JONATHAN LA ROSA"
     },
     {
       "id": "llam_311",
@@ -238185,7 +240562,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0984270873",
+      "coordinador": "JONATHAN LA ROSA"
     },
     {
       "id": "llam_312",
@@ -238218,7 +240600,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "984430689",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_313",
@@ -238251,7 +240638,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_314",
@@ -238284,7 +240676,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0998895959",
+      "coordinador": "JONATHAN LA ROSA"
     },
     {
       "id": "llam_315",
@@ -238317,7 +240714,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0968306238",
+      "coordinador": "JONATHAN LA ROSA"
     },
     {
       "id": "llam_316",
@@ -238350,7 +240752,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "+1(609)6353345",
+      "coordinador": "JONATHAN LA ROSA"
     },
     {
       "id": "llam_317",
@@ -238383,7 +240790,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "+51998795068",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_318",
@@ -238416,7 +240828,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "+51902807431",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_319",
@@ -238449,7 +240866,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0968306238",
+      "coordinador": "JONATHAN LA ROSA"
     },
     {
       "id": "llam_320",
@@ -238482,7 +240904,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_321",
@@ -238515,7 +240942,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_322",
@@ -238548,7 +240980,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_323",
@@ -238581,7 +241018,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_324",
@@ -238614,7 +241056,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_325",
@@ -238647,7 +241094,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_326",
@@ -238680,7 +241132,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_327",
@@ -238713,7 +241170,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_328",
@@ -238746,7 +241208,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_329",
@@ -238779,7 +241246,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_330",
@@ -238812,7 +241284,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0995815292",
+      "coordinador": "JOSUE VERA"
     },
     {
       "id": "llam_331",
@@ -238845,7 +241322,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_332",
@@ -238878,7 +241360,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_333",
@@ -238911,7 +241398,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_334",
@@ -238944,7 +241436,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_335",
@@ -238977,7 +241474,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_336",
@@ -239010,7 +241512,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_337",
@@ -239043,7 +241550,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_338",
@@ -239076,7 +241588,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_339",
@@ -239109,7 +241626,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+5930993238513",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_340",
@@ -239142,7 +241664,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_341",
@@ -239175,7 +241702,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_342",
@@ -239208,7 +241740,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_343",
@@ -239241,7 +241778,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_344",
@@ -239274,7 +241816,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_345",
@@ -239307,7 +241854,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0995986195",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_346",
@@ -239340,7 +241892,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_347",
@@ -239373,7 +241930,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_348",
@@ -239406,7 +241968,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_349",
@@ -239439,7 +242006,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_350",
@@ -239472,7 +242044,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_351",
@@ -239505,7 +242082,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_352",
@@ -239538,7 +242120,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_353",
@@ -239571,7 +242158,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_354",
@@ -239604,7 +242196,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_355",
@@ -239637,7 +242234,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_356",
@@ -239670,7 +242272,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_357",
@@ -239703,7 +242310,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_358",
@@ -239736,7 +242348,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_359",
@@ -239769,7 +242386,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_360",
@@ -239802,7 +242424,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_361",
@@ -239835,7 +242462,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_362",
@@ -239868,7 +242500,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_363",
@@ -239901,7 +242538,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_364",
@@ -239934,7 +242576,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_365",
@@ -239967,7 +242614,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_366",
@@ -240000,7 +242652,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_367",
@@ -240033,7 +242690,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_368",
@@ -240066,7 +242728,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0991680131",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_369",
@@ -240099,7 +242766,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_370",
@@ -240132,7 +242804,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_371",
@@ -240165,7 +242842,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_372",
@@ -240198,7 +242880,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_373",
@@ -240231,7 +242918,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_374",
@@ -240264,7 +242956,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_375",
@@ -240297,7 +242994,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_376",
@@ -240330,7 +243032,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_377",
@@ -240363,7 +243070,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_378",
@@ -240396,7 +243108,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_379",
@@ -240429,7 +243146,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_380",
@@ -240462,7 +243184,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_381",
@@ -240495,7 +243222,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_382",
@@ -240528,7 +243260,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_383",
@@ -240561,7 +243298,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "961164574",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_384",
@@ -240594,7 +243336,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_385",
@@ -240627,7 +243374,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_386",
@@ -240660,7 +243412,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_387",
@@ -240693,7 +243450,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_388",
@@ -240726,7 +243488,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_389",
@@ -240759,7 +243526,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_390",
@@ -240792,7 +243564,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_391",
@@ -240825,7 +243602,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_392",
@@ -240858,7 +243640,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_393",
@@ -240891,7 +243678,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_394",
@@ -240924,7 +243716,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_395",
@@ -240957,7 +243754,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_396",
@@ -240990,7 +243792,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_397",
@@ -241023,7 +243830,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_398",
@@ -241056,7 +243868,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_399",
@@ -241089,7 +243906,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_400",
@@ -241122,7 +243944,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_401",
@@ -241155,7 +243982,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_402",
@@ -241188,7 +244020,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_403",
@@ -241221,7 +244058,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_404",
@@ -241254,7 +244096,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_405",
@@ -241287,7 +244134,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_406",
@@ -241320,7 +244172,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": "REGINA ROMERO"
     },
     {
       "id": "llam_407",
@@ -241353,7 +244210,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_408",
@@ -241386,7 +244248,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_409",
@@ -241419,7 +244286,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_410",
@@ -241452,7 +244324,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_411",
@@ -241485,7 +244362,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_412",
@@ -241518,7 +244400,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_413",
@@ -241551,7 +244438,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_414",
@@ -241584,7 +244476,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_415",
@@ -241617,7 +244514,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_416",
@@ -241650,7 +244552,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0999761820",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_417",
@@ -241683,7 +244590,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_418",
@@ -241716,7 +244628,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_419",
@@ -241749,7 +244666,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593 994837809",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_420",
@@ -241782,7 +244704,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_421",
@@ -241815,7 +244742,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_422",
@@ -241848,7 +244780,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_423",
@@ -241881,7 +244818,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_424",
@@ -241914,7 +244856,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_425",
@@ -241947,7 +244894,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_426",
@@ -241980,7 +244932,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "962992736",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_427",
@@ -242013,7 +244970,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_428",
@@ -242046,7 +245008,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_429",
@@ -242079,7 +245046,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_430",
@@ -242112,7 +245084,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_431",
@@ -242145,7 +245122,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_432",
@@ -242178,7 +245160,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_433",
@@ -242211,7 +245198,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_434",
@@ -242244,7 +245236,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_435",
@@ -242277,7 +245274,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_436",
@@ -242310,7 +245312,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+5930984939196",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_437",
@@ -242343,7 +245350,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_438",
@@ -242376,7 +245388,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_439",
@@ -242409,7 +245426,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_440",
@@ -242442,7 +245464,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_441",
@@ -242475,7 +245502,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_442",
@@ -242508,7 +245540,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_443",
@@ -242541,7 +245578,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_444",
@@ -242574,7 +245616,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_445",
@@ -242607,7 +245654,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_446",
@@ -242640,7 +245692,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_447",
@@ -242673,7 +245730,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_448",
@@ -242706,7 +245768,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_449",
@@ -242739,7 +245806,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_450",
@@ -242772,7 +245844,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_451",
@@ -242805,7 +245882,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_452",
@@ -242838,7 +245920,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_453",
@@ -242871,7 +245958,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_454",
@@ -242904,7 +245996,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_455",
@@ -242937,7 +246034,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_456",
@@ -242970,7 +246072,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_457",
@@ -243003,7 +246110,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_458",
@@ -243036,7 +246148,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_459",
@@ -243069,7 +246186,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "984432469",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_460",
@@ -243102,7 +246224,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_461",
@@ -243135,7 +246262,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_462",
@@ -243168,7 +246300,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_463",
@@ -243201,7 +246338,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_464",
@@ -243234,7 +246376,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_465",
@@ -243267,7 +246414,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_466",
@@ -243300,7 +246452,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_467",
@@ -243333,7 +246490,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_468",
@@ -243366,7 +246528,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_469",
@@ -243399,7 +246566,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_470",
@@ -243432,7 +246604,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_471",
@@ -243465,7 +246642,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_472",
@@ -243498,7 +246680,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_473",
@@ -243531,7 +246718,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_474",
@@ -243564,7 +246756,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_475",
@@ -243597,7 +246794,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+5930984499954",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_476",
@@ -243630,7 +246832,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+5930992310545",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_477",
@@ -243663,7 +246870,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+5930983061351",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_478",
@@ -243696,7 +246908,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+593968525606",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_479",
@@ -243729,7 +246946,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+5930997473043",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_480",
@@ -243762,7 +246984,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "979151395",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_481",
@@ -243795,7 +247022,12 @@ export const cyclesData = [
       ],
       "agosto": 3,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593979138817",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_482",
@@ -243828,7 +247060,12 @@ export const cyclesData = [
       ],
       "agosto": 3,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+5930985860761",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_483",
@@ -243861,7 +247098,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+5930995390495",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_484",
@@ -243894,7 +247136,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_485",
@@ -243927,7 +247174,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+5930987159621",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_486",
@@ -243960,7 +247212,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+5930995297942",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_487",
@@ -243993,7 +247250,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+5930996841945",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_488",
@@ -244026,7 +247288,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_489",
@@ -244059,7 +247326,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_490",
@@ -244092,7 +247364,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_491",
@@ -244125,7 +247402,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+5930984435866",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_492",
@@ -244158,7 +247440,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+5930984425095",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_493",
@@ -244191,7 +247478,12 @@ export const cyclesData = [
       ],
       "agosto": 3,
       "septiembre": 4,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+5930995824801",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_494",
@@ -244224,7 +247516,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+5930991608776",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_495",
@@ -244257,7 +247554,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+5930986987448",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_496",
@@ -244290,7 +247592,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_497",
@@ -244323,7 +247630,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+5930995791221",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_498",
@@ -244356,7 +247668,12 @@ export const cyclesData = [
       ],
       "agosto": 3,
       "septiembre": 3,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+5930998631853",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_499",
@@ -244389,7 +247706,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+5930968952298",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_500",
@@ -244422,7 +247744,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+5930962043232",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_501",
@@ -244455,7 +247782,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+5930995342526",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_502",
@@ -244488,7 +247820,12 @@ export const cyclesData = [
       ],
       "agosto": 4,
       "septiembre": 4,
-      "octubre": 1
+      "octubre": 1,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+5930998553017",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_503",
@@ -244521,7 +247858,12 @@ export const cyclesData = [
       ],
       "agosto": 4,
       "septiembre": 2,
-      "octubre": 1
+      "octubre": 1,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+5930990373602",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_504",
@@ -244554,7 +247896,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+5930963146246",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_505",
@@ -244587,7 +247934,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+5930992450002",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_506",
@@ -244620,7 +247972,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+5930992672029",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_507",
@@ -244653,7 +248010,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+5930997019475",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_508",
@@ -244686,7 +248048,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+5930984939196",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_509",
@@ -244719,7 +248086,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+5930998045560",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_510",
@@ -244752,7 +248124,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+5930962669609",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_511",
@@ -244785,7 +248162,12 @@ export const cyclesData = [
       ],
       "agosto": 4,
       "septiembre": 0,
-      "octubre": 1
+      "octubre": 1,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_512",
@@ -244818,7 +248200,12 @@ export const cyclesData = [
       ],
       "agosto": 4,
       "septiembre": 0,
-      "octubre": 1
+      "octubre": 1,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+5930984606993",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_513",
@@ -244851,7 +248238,12 @@ export const cyclesData = [
       ],
       "agosto": 1,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+5930995902993",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_514",
@@ -244884,7 +248276,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_515",
@@ -244917,7 +248314,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+5930993238513",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_516",
@@ -244950,7 +248352,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+5930994825120",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_517",
@@ -244983,7 +248390,12 @@ export const cyclesData = [
       ],
       "agosto": 2,
       "septiembre": 4,
-      "octubre": 4
+      "octubre": 4,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593984917757",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_518",
@@ -245016,7 +248428,12 @@ export const cyclesData = [
       ],
       "agosto": 2,
       "septiembre": 4,
-      "octubre": 4
+      "octubre": 4,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593994051010",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_519",
@@ -245049,7 +248466,12 @@ export const cyclesData = [
       ],
       "agosto": 2,
       "septiembre": 3,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+593987634771",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_520",
@@ -245082,7 +248504,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593983771118",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_521",
@@ -245115,7 +248542,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593998526285",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_522",
@@ -245148,7 +248580,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593997252932",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_523",
@@ -245181,7 +248618,12 @@ export const cyclesData = [
       ],
       "agosto": 2,
       "septiembre": 4,
-      "octubre": 4
+      "octubre": 4,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593958846495",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_524",
@@ -245214,7 +248656,12 @@ export const cyclesData = [
       ],
       "agosto": 2,
       "septiembre": 4,
-      "octubre": 4
+      "octubre": 4,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593987372976",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_525",
@@ -245247,7 +248694,12 @@ export const cyclesData = [
       ],
       "agosto": 2,
       "septiembre": 4,
-      "octubre": 4
+      "octubre": 4,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593958604427",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_526",
@@ -245280,7 +248732,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "969032027",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_527",
@@ -245313,7 +248770,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593992740689",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_528",
@@ -245346,7 +248808,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+593968525606",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_529",
@@ -245379,7 +248846,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593984573440",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_530",
@@ -245412,7 +248884,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_531",
@@ -245445,7 +248922,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0991687219",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_532",
@@ -245478,7 +248960,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593 99 554 7752",
+      "coordinador": "MIGUEL TORRES"
     },
     {
       "id": "llam_533",
@@ -245511,7 +248998,12 @@ export const cyclesData = [
       ],
       "agosto": 2,
       "septiembre": 4,
-      "octubre": 4
+      "octubre": 4,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593958825825",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_534",
@@ -245544,7 +249036,12 @@ export const cyclesData = [
       ],
       "agosto": 2,
       "septiembre": 4,
-      "octubre": 4
+      "octubre": 4,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593992800733",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_535",
@@ -245577,7 +249074,12 @@ export const cyclesData = [
       ],
       "agosto": 2,
       "septiembre": 4,
-      "octubre": 4
+      "octubre": 4,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593984551062",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_536",
@@ -245610,7 +249112,12 @@ export const cyclesData = [
       ],
       "agosto": 2,
       "septiembre": 4,
-      "octubre": 4
+      "octubre": 4,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593984339531",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_537",
@@ -245643,7 +249150,12 @@ export const cyclesData = [
       ],
       "agosto": 2,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_538",
@@ -245676,7 +249188,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "9711213956",
+      "coordinador": "DANIELA MONROY"
     },
     {
       "id": "llam_539",
@@ -245709,7 +249226,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0980177146",
+      "coordinador": "JOSUE VERA"
     },
     {
       "id": "llam_540",
@@ -245742,7 +249264,12 @@ export const cyclesData = [
       ],
       "agosto": 3,
       "septiembre": 4,
-      "octubre": 3
+      "octubre": 3,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0996521133",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_541",
@@ -245775,7 +249302,12 @@ export const cyclesData = [
       ],
       "agosto": 1,
       "septiembre": 3,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "593 99 148 8105",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_542",
@@ -245808,7 +249340,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+51 990 184 115",
+      "coordinador": ""
     },
     {
       "id": "llam_543",
@@ -245841,7 +249378,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+573013053610",
+      "coordinador": ""
     },
     {
       "id": "llam_544",
@@ -245874,7 +249416,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+573044072665",
+      "coordinador": ""
     },
     {
       "id": "llam_545",
@@ -245907,7 +249454,12 @@ export const cyclesData = [
       ],
       "agosto": 2,
       "septiembre": 4,
-      "octubre": 4
+      "octubre": 4,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593 99 272 5687",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_546",
@@ -245940,7 +249492,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593 998507448",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_547",
@@ -245973,7 +249530,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 2,
-      "octubre": 3
+      "octubre": 3,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593 995515665",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_548",
@@ -246006,7 +249568,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 2,
-      "octubre": 3
+      "octubre": 3,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593 995037113",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_549",
@@ -246039,7 +249606,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 2,
-      "octubre": 4
+      "octubre": 4,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593 994837809",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_550",
@@ -246072,7 +249644,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593 983449967",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_551",
@@ -246105,7 +249682,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 2,
-      "octubre": 4
+      "octubre": 4,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593 991070235",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_552",
@@ -246138,7 +249720,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 1,
-      "octubre": 3
+      "octubre": 3,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593 996178727",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_553",
@@ -246171,7 +249758,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 2,
-      "octubre": 4
+      "octubre": 4,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593 981714761",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_554",
@@ -246204,7 +249796,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593 963284609",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_555",
@@ -246237,7 +249834,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 1,
-      "octubre": 4
+      "octubre": 4,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593962663140",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_556",
@@ -246270,7 +249872,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 1,
-      "octubre": 4
+      "octubre": 4,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593978689304",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_557",
@@ -246303,7 +249910,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "983854306",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_558",
@@ -246336,7 +249948,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "597996240797",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_559",
@@ -246369,7 +249986,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0982407266",
+      "coordinador": "ROBERTO RODRIGUEZ"
     },
     {
       "id": "llam_560",
@@ -246402,7 +250024,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 2,
-      "octubre": 4
+      "octubre": 4,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_561",
@@ -246435,7 +250062,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 2,
-      "octubre": 3
+      "octubre": 3,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593992487806",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_562",
@@ -246468,7 +250100,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 1,
-      "octubre": 4
+      "octubre": 4,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593979964083",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_563",
@@ -246501,7 +250138,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 1,
-      "octubre": 3
+      "octubre": 3,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+5930984435866",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_564",
@@ -246534,7 +250176,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 1,
-      "octubre": 4
+      "octubre": 4,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593999817089",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_565",
@@ -246567,7 +250214,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593984872902",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_566",
@@ -246600,7 +250252,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 4
+      "octubre": 4,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593967975777",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_567",
@@ -246633,7 +250290,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 4
+      "octubre": 4,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593998862385",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_568",
@@ -246666,7 +250328,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 2
+      "octubre": 2,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593987662574",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_569",
@@ -246699,7 +250366,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 2
+      "octubre": 2,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "593996029957",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_570",
@@ -246732,7 +250404,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593995266768",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_571",
@@ -246765,7 +250442,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593979138817",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_572",
@@ -246798,7 +250480,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 1
+      "octubre": 1,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593985267774",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_573",
@@ -246831,7 +250518,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 2
+      "octubre": 2,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593995275755",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_574",
@@ -246864,7 +250556,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 2
+      "octubre": 2,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593982910201",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_575",
@@ -246897,7 +250594,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593999701679",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_576",
@@ -246930,7 +250632,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593999849832",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_577",
@@ -246963,7 +250670,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "593992789103",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_578",
@@ -246996,7 +250708,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593988008607",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_579",
@@ -247029,7 +250746,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593988234569",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_580",
@@ -247062,7 +250784,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0987515639",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_581",
@@ -247095,7 +250822,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0998071513",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_582",
@@ -247128,7 +250860,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0980810907",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_583",
@@ -247161,7 +250898,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0978990144",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_584",
@@ -247194,7 +250936,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0980554584",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_585",
@@ -247227,7 +250974,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0998366343",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_586",
@@ -247260,7 +251012,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0958822877",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_587",
@@ -247293,7 +251050,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0961442340",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_588",
@@ -247326,7 +251088,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0995986195",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_589",
@@ -247359,7 +251126,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_590",
@@ -247392,7 +251164,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0983131161",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_591",
@@ -247425,7 +251202,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0991089099",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_592",
@@ -247458,7 +251240,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0993664644",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_593",
@@ -247491,7 +251278,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0994606173",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_594",
@@ -247524,7 +251316,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0992596999",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_595",
@@ -247557,7 +251354,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0982327222",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_596",
@@ -247590,7 +251392,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0999021921",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_597",
@@ -247623,7 +251430,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_598",
@@ -247656,7 +251468,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0999031327",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_599",
@@ -247689,7 +251506,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0984458759",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_600",
@@ -247722,7 +251544,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0984939196",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_601",
@@ -247755,7 +251582,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0986937742",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_602",
@@ -247788,7 +251620,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0959013902",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_603",
@@ -247821,7 +251658,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0998777325",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_604",
@@ -247854,7 +251696,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0999761820",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_605",
@@ -247887,7 +251734,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_606",
@@ -247920,7 +251772,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0999101568",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_607",
@@ -247953,7 +251810,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0963085663",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_608",
@@ -247986,7 +251848,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0987953073",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_609",
@@ -248019,7 +251886,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0997705135",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_610",
@@ -248052,7 +251924,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_611",
@@ -248085,7 +251962,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_612",
@@ -248118,7 +252000,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0999101568",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_613",
@@ -248151,7 +252038,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0998746653",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_614",
@@ -248184,7 +252076,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "995082481",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_615",
@@ -248217,7 +252114,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0990365232",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_616",
@@ -248250,7 +252152,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0996920266",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_617",
@@ -248283,7 +252190,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0984355230",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_618",
@@ -248316,7 +252228,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "995082481",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_619",
@@ -248349,7 +252266,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0992034860",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_620",
@@ -248382,7 +252304,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "99 881 5065",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_621",
@@ -248415,7 +252342,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "99 570 6657",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_622",
@@ -248448,7 +252380,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "99 971 7749",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_623",
@@ -248481,7 +252418,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "95 891 2040",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_624",
@@ -248514,7 +252456,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "99 013 8300",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_625",
@@ -248547,7 +252494,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "95 872 2184",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_626",
@@ -248580,7 +252532,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "98 062 3021",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_627",
@@ -248613,7 +252570,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "99 244 9643",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_628",
@@ -248646,7 +252608,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "98 809 1929",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_629",
@@ -248679,7 +252646,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "98 739 7514",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_630",
@@ -248712,7 +252684,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "95 945 4765",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_631",
@@ -248745,7 +252722,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0979244825",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_632",
@@ -248778,7 +252760,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0988314134",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_633",
@@ -248811,7 +252798,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0987942544",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_634",
@@ -248844,7 +252836,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0983344715",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_635",
@@ -248877,7 +252874,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0991687219",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_636",
@@ -248910,7 +252912,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0984588057",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_637",
@@ -248943,7 +252950,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0998479299",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_638",
@@ -248976,7 +252988,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0960938705",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_639",
@@ -249009,7 +253026,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0961944443",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_640",
@@ -249042,7 +253064,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0992087336",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_641",
@@ -249075,7 +253102,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0960291037",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_642",
@@ -249108,7 +253140,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0987139380",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_643",
@@ -249141,7 +253178,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0992711047",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_644",
@@ -249174,7 +253216,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0967239396",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_645",
@@ -249207,7 +253254,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0969054277",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_646",
@@ -249240,7 +253292,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0996038966",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_647",
@@ -249273,7 +253330,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0959944151",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_648",
@@ -249306,7 +253368,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0978668372",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_649",
@@ -249339,7 +253406,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0995658053",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_650",
@@ -249372,7 +253444,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0991680131",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_651",
@@ -249405,7 +253482,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593 99 853 5921",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_652",
@@ -249438,7 +253520,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "998367570",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_653",
@@ -249471,7 +253558,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593 98 760 9978",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_654",
@@ -249504,7 +253596,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593 96 716 7148",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_655",
@@ -249537,7 +253634,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593 98 336 4157",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_656",
@@ -249570,7 +253672,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "998336421",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_657",
@@ -249603,7 +253710,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593 99 797 2542",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_658",
@@ -249636,7 +253748,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593 98 150 4191",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_659",
@@ -249669,7 +253786,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593 96 102 5273",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_660",
@@ -249702,7 +253824,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0987278887",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_661",
@@ -249735,7 +253862,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0997354933",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_662",
@@ -249768,7 +253900,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0962985900",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_663",
@@ -249801,7 +253938,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0981333528",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_664",
@@ -249834,7 +253976,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0996656415",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_665",
@@ -249867,7 +254014,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0963482451",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_666",
@@ -249900,7 +254052,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0987698037",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_667",
@@ -249933,7 +254090,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0967518179",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_668",
@@ -249966,7 +254128,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_669",
@@ -249999,7 +254166,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0991233384",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_670",
@@ -250032,7 +254204,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0939009570",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_671",
@@ -250065,7 +254242,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593 98 345 1934",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_672",
@@ -250098,7 +254280,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593 96 324 5579",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_673",
@@ -250131,7 +254318,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593 99 423 6151",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_674",
@@ -250164,7 +254356,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593 99 840 5655",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_675",
@@ -250197,7 +254394,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593 99 009 3959",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_676",
@@ -250230,7 +254432,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593 99 371 0023",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_677",
@@ -250263,7 +254470,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593 99 986 7599",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_678",
@@ -250296,7 +254508,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593 98 322 5846",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_679",
@@ -250329,7 +254546,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593 96 975 4134",
+      "coordinador": "ALEJANDRO DIAZ"
     },
     {
       "id": "llam_680",
@@ -250362,7 +254584,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593 98 729 9373",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_681",
@@ -250395,7 +254622,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_682",
@@ -250428,7 +254660,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593 96 976 7956",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_683",
@@ -250461,7 +254698,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593 99 733 7099",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_684",
@@ -250494,7 +254736,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "593 99 397 8520",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_685",
@@ -250527,7 +254774,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "995706657",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_686",
@@ -250560,7 +254812,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "983581451",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_687",
@@ -250593,7 +254850,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "984104374",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_688",
@@ -250626,7 +254888,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "998789582",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_689",
@@ -250659,7 +254926,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "996577231",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_690",
@@ -250692,7 +254964,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "939672110",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_691",
@@ -250725,7 +255002,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "992512392",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_692",
@@ -250758,7 +255040,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "995225784",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_693",
@@ -250791,7 +255078,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "998032222",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_694",
@@ -250824,7 +255116,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "983090926",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_695",
@@ -250857,7 +255154,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "988993540",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_696",
@@ -250890,7 +255192,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "987621305",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_697",
@@ -250923,7 +255230,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "992520266",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_698",
@@ -250956,7 +255268,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "998294954",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_699",
@@ -250989,7 +255306,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "983598854",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_700",
@@ -251022,7 +255344,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "987634771",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_701",
@@ -251055,7 +255382,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "983598854",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_702",
@@ -251088,7 +255420,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "984917757",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_703",
@@ -251121,7 +255458,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "983090926",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_704",
@@ -251154,7 +255496,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "984917757",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_705",
@@ -251187,7 +255534,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+593999849832",
+      "coordinador": "ROBERTO RODRIGUEZ"
     },
     {
       "id": "llam_706",
@@ -251220,7 +255572,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593995358735",
+      "coordinador": "ROBERTO RODRIGUEZ"
     },
     {
       "id": "llam_707",
@@ -251253,7 +255610,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_708",
@@ -251286,7 +255648,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+593958834058",
+      "coordinador": "ROBERTO RODRIGUEZ"
     },
     {
       "id": "llam_709",
@@ -251319,7 +255686,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+593999752777",
+      "coordinador": "ROBERTO RODRIGUEZ"
     },
     {
       "id": "llam_710",
@@ -251352,7 +255724,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593961027772",
+      "coordinador": "ROBERTO RODRIGUEZ"
     },
     {
       "id": "llam_711",
@@ -251385,7 +255762,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593995275755",
+      "coordinador": "ROBERTO RODRIGUEZ"
     },
     {
       "id": "llam_712",
@@ -251418,7 +255800,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593998303108",
+      "coordinador": "ROBERTO RODRIGUEZ"
     },
     {
       "id": "llam_713",
@@ -251451,7 +255838,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593969268572",
+      "coordinador": "ROBERTO RODRIGUEZ"
     },
     {
       "id": "llam_714",
@@ -251484,7 +255876,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "984443805",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_715",
@@ -251517,7 +255914,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "993467965",
+      "coordinador": ""
     },
     {
       "id": "llam_716",
@@ -251550,7 +255952,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "981744833",
+      "coordinador": ""
     },
     {
       "id": "llam_717",
@@ -251583,7 +255990,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "983476990",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_718",
@@ -251616,7 +256028,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "981333528",
+      "coordinador": ""
     },
     {
       "id": "llam_719",
@@ -251649,7 +256066,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "979312645",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_720",
@@ -251682,7 +256104,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "993714455",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_721",
@@ -251715,7 +256142,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "995321338",
+      "coordinador": ""
     },
     {
       "id": "llam_722",
@@ -251748,7 +256180,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "994347819",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_723",
@@ -251781,7 +256218,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "992935885",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_724",
@@ -251814,7 +256256,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "978834609",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_725",
@@ -251847,7 +256294,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "997918732",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_726",
@@ -251880,7 +256332,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "978813781",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_727",
@@ -251913,7 +256370,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "998110306",
+      "coordinador": ""
     },
     {
       "id": "llam_728",
@@ -251946,7 +256408,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "981370601",
+      "coordinador": ""
     },
     {
       "id": "llam_729",
@@ -251979,7 +256446,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0984801468",
+      "coordinador": "ALEJANDRO DIAZ"
     },
     {
       "id": "llam_730",
@@ -252012,7 +256484,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0983282523",
+      "coordinador": "ALEJANDRO DIAZ"
     },
     {
       "id": "llam_731",
@@ -252045,7 +256522,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0989324457",
+      "coordinador": "ALEJANDRO DIAZ"
     },
     {
       "id": "llam_732",
@@ -252078,7 +256560,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0990342527",
+      "coordinador": "ALEJANDRO DIAZ"
     },
     {
       "id": "llam_733",
@@ -252111,7 +256598,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "984939196",
+      "coordinador": "ALEJANDRO DIAZ"
     },
     {
       "id": "llam_734",
@@ -252144,7 +256636,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "984432469",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_735",
@@ -252177,7 +256674,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "984564752",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_736",
@@ -252210,7 +256712,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "984430689",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_737",
@@ -252243,7 +256750,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "963136490",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_738",
@@ -252276,7 +256788,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "984123196",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_739",
@@ -252309,7 +256826,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "999681812",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_740",
@@ -252342,7 +256864,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "980687383",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_741",
@@ -252375,7 +256902,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "990394123",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_742",
@@ -252408,7 +256940,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "984092584",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_743",
@@ -252441,7 +256978,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "962992736",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_744",
@@ -252474,7 +257016,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "984401998",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_745",
@@ -252507,7 +257054,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0979138817",
+      "coordinador": "ROBERTO RODRIGUEZ"
     },
     {
       "id": "llam_746",
@@ -252540,7 +257092,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0995652114",
+      "coordinador": "ROBERTO RODRIGUEZ"
     },
     {
       "id": "llam_747",
@@ -252573,7 +257130,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0998307134",
+      "coordinador": "ROBERTO RODRIGUEZ"
     },
     {
       "id": "llam_748",
@@ -252606,7 +257168,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0987245276",
+      "coordinador": "ROBERTO RODRIGUEZ"
     },
     {
       "id": "llam_749",
@@ -252639,7 +257206,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0994839083",
+      "coordinador": "ROBERTO RODRIGUEZ"
     },
     {
       "id": "llam_750",
@@ -252672,7 +257244,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0996521133",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_751",
@@ -252705,7 +257282,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0958720323",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_752",
@@ -252738,7 +257320,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0987458601",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_753",
@@ -252771,7 +257358,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0958720323",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_754",
@@ -252804,7 +257396,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0963552245",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_755",
@@ -252837,7 +257434,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0988626954",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_756",
@@ -252870,7 +257472,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0962556731",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_757",
@@ -252903,7 +257510,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "997336202",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_758",
@@ -252936,7 +257548,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+593 99 924 3226",
+      "coordinador": "ALEJANDRO DIAZ"
     },
     {
       "id": "llam_759",
@@ -252969,7 +257586,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+593 99 848 6533",
+      "coordinador": "ALEJANDRO DIAZ"
     },
     {
       "id": "llam_760",
@@ -253002,7 +257624,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593 98 681 3400",
+      "coordinador": "ALEJANDRO DIAZ"
     },
     {
       "id": "llam_761",
@@ -253035,7 +257662,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593 98 681 3400",
+      "coordinador": "ALEJANDRO DIAZ"
     },
     {
       "id": "llam_762",
@@ -253068,7 +257700,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "982343184",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_763",
@@ -253101,7 +257738,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "999057277",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_764",
@@ -253134,7 +257776,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "981744833",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_765",
@@ -253167,7 +257814,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": "LILI CUBILLO"
     },
     {
       "id": "llam_766",
@@ -253200,7 +257852,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "+51970764599",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_767",
@@ -253233,7 +257890,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "999661970",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_768",
@@ -253266,7 +257928,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0958740157",
+      "coordinador": "ROBERTO RODRIGUEZ"
     },
     {
       "id": "llam_769",
@@ -253299,7 +257966,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0963214210",
+      "coordinador": "ROBERTO RODRIGUEZ"
     },
     {
       "id": "llam_770",
@@ -253332,7 +258004,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_771",
@@ -253365,7 +258042,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0964147060",
+      "coordinador": "ROBERTO RODRIGUEZ"
     },
     {
       "id": "llam_772",
@@ -253398,7 +258080,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "991850773",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_773",
@@ -253431,7 +258118,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "985328921",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_774",
@@ -253464,7 +258156,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "985328833",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_775",
@@ -253497,7 +258194,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "999911902",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_776",
@@ -253530,7 +258232,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "979101070",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_777",
@@ -253563,7 +258270,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "997488500",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_778",
@@ -253596,7 +258308,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "987302676",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_779",
@@ -253629,7 +258346,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_780",
@@ -253662,7 +258384,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "961164574",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_781",
@@ -253695,7 +258422,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+593 98 495 6356",
+      "coordinador": "ALEJANDRO DIAZ"
     },
     {
       "id": "llam_782",
@@ -253728,7 +258460,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+593 98 118 1398",
+      "coordinador": "ALEJANDRO DIAZ"
     },
     {
       "id": "llam_783",
@@ -253761,7 +258498,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593 96 975 4134",
+      "coordinador": "ALEJANDRO DIAZ"
     },
     {
       "id": "llam_784",
@@ -253794,7 +258536,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "994745370",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_785",
@@ -253827,7 +258574,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "+593 98 755 7553",
+      "coordinador": "ALEJANDRO DIAZ"
     },
     {
       "id": "llam_786",
@@ -253860,7 +258612,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+593 98 532 8992",
+      "coordinador": "ALEJANDRO DIAZ"
     },
     {
       "id": "llam_787",
@@ -253893,7 +258650,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "990462746",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_788",
@@ -253926,7 +258688,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "999450690",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_789",
@@ -253959,7 +258726,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "983508986",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_790",
@@ -253992,7 +258764,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "999057032",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_791",
@@ -254025,7 +258802,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "982376593",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_792",
@@ -254058,7 +258840,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "998779049",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_793",
@@ -254091,7 +258878,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "963553071",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_794",
@@ -254124,7 +258916,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "+51930526967",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_795",
@@ -254157,7 +258954,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "+51948162114",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_796",
@@ -254190,7 +258992,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "+51999699649",
+      "coordinador": "LEYLA PASQUEL"
     },
     {
       "id": "llam_797",
@@ -254223,7 +259030,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "+51920738765",
+      "coordinador": "LEYLA PASQUEL"
     },
     {
       "id": "llam_798",
@@ -254256,7 +259068,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "+51930326809",
+      "coordinador": "LEYLA PASQUEL"
     },
     {
       "id": "llam_799",
@@ -254289,7 +259106,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+51912413787",
+      "coordinador": "LEYLA PASQUEL"
     },
     {
       "id": "llam_800",
@@ -254322,7 +259144,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "+51904408130",
+      "coordinador": "LEYLA PASQUEL"
     },
     {
       "id": "llam_801",
@@ -254355,7 +259182,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_802",
@@ -254388,7 +259220,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "0960652421",
+      "coordinador": "REGINA ROMERO"
     },
     {
       "id": "llam_803",
@@ -254421,7 +259258,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "5527377589",
+      "coordinador": "ALONSO SOLARES"
     },
     {
       "id": "llam_804",
@@ -254454,7 +259296,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_805",
@@ -254487,7 +259334,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0958927854",
+      "coordinador": "KERLY CARRILLO"
     },
     {
       "id": "llam_806",
@@ -254520,7 +259372,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0998280875",
+      "coordinador": "KERLY CARRILLO"
     },
     {
       "id": "llam_807",
@@ -254553,7 +259410,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0963021449",
+      "coordinador": "KERLY CARRILLO"
     },
     {
       "id": "llam_808",
@@ -254586,7 +259448,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": "FERNANDO MENDOZA"
     },
     {
       "id": "llam_809",
@@ -254619,7 +259486,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": "FERNANDO MENDOZA"
     },
     {
       "id": "llam_810",
@@ -254652,7 +259524,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "+51922042189",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_811",
@@ -254685,7 +259562,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "+51980496819",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_812",
@@ -254718,7 +259600,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "+51988595686",
+      "coordinador": "LINID VALENCIA"
     },
     {
       "id": "llam_813",
@@ -254751,7 +259638,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_814",
@@ -254784,7 +259676,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_815",
@@ -254817,7 +259714,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_816",
@@ -254850,7 +259752,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "+573216507980",
+      "coordinador": "MAURICIO RAMIREZ"
     },
     {
       "id": "llam_817",
@@ -254883,7 +259790,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0961901809",
+      "coordinador": "JONATHAN LA ROSA"
     },
     {
       "id": "llam_818",
@@ -254916,7 +259828,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0998775445",
+      "coordinador": "JONATHAN LA ROSA"
     },
     {
       "id": "llam_819",
@@ -254949,7 +259866,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0961901809",
+      "coordinador": "JONATHAN LA ROSA"
     },
     {
       "id": "llam_820",
@@ -254982,7 +259904,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+573233644192",
+      "coordinador": "MAURICIO RAMIREZ"
     },
     {
       "id": "llam_821",
@@ -255015,7 +259942,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0998775445",
+      "coordinador": "JONATHAN LA ROSA"
     },
     {
       "id": "llam_822",
@@ -255048,7 +259980,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_823",
@@ -255081,7 +260018,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "+51 956 268830",
+      "coordinador": ""
     },
     {
       "id": "llam_824",
@@ -255114,7 +260056,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_825",
@@ -255147,7 +260094,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_826",
@@ -255180,7 +260132,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_827",
@@ -255213,7 +260170,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_828",
@@ -255246,7 +260208,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_829",
@@ -255279,7 +260246,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_830",
@@ -255312,7 +260284,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_831",
@@ -255345,7 +260322,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_832",
@@ -255378,7 +260360,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_833",
@@ -255411,7 +260398,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_834",
@@ -255444,7 +260436,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_835",
@@ -255477,7 +260474,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_836",
@@ -255510,7 +260512,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_837",
@@ -255543,7 +260550,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_838",
@@ -255576,7 +260588,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_839",
@@ -255609,7 +260626,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_840",
@@ -255642,7 +260664,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_841",
@@ -255675,7 +260702,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_842",
@@ -255708,7 +260740,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_843",
@@ -255741,14 +260778,19 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_844",
       "entrenador": "Mildred Muñoz",
       "manager": "Wilson Vallejo",
       "sede": "Quito",
-      "equipo": "",
+      "equipo": "METAMORFOSIS",
       "fechaInicio": "",
       "fechaFinal": "",
       "totalReportado": 0,
@@ -255774,7 +260816,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0981767888",
+      "coordinador": "JONATHAN LA ROSA"
     },
     {
       "id": "llam_845",
@@ -255807,7 +260854,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_846",
@@ -255840,7 +260892,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_847",
@@ -255873,7 +260930,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_848",
@@ -255906,7 +260968,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_849",
@@ -255939,7 +261006,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_850",
@@ -255972,7 +261044,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_851",
@@ -256005,7 +261082,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_852",
@@ -256038,7 +261120,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_853",
@@ -256071,7 +261158,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_854",
@@ -256104,7 +261196,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_855",
@@ -256137,7 +261234,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_856",
@@ -256170,7 +261272,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_857",
@@ -256203,7 +261310,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_858",
@@ -256236,7 +261348,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_859",
@@ -256269,7 +261386,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_860",
@@ -256302,7 +261424,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_861",
@@ -256335,7 +261462,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_862",
@@ -256368,7 +261500,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_863",
@@ -256401,7 +261538,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_864",
@@ -256434,7 +261576,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_865",
@@ -256467,7 +261614,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0980805649",
+      "coordinador": "JONATHAN LA ROSA"
     },
     {
       "id": "llam_866",
@@ -256500,7 +261652,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0981969172",
+      "coordinador": "JONATHAN LA ROSA"
     },
     {
       "id": "llam_867",
@@ -256533,7 +261690,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0985800390",
+      "coordinador": "JONATHAN LA ROSA"
     },
     {
       "id": "llam_868",
@@ -256566,7 +261728,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0994600397",
+      "coordinador": "JONATHAN LA ROSA"
     },
     {
       "id": "llam_869",
@@ -256599,7 +261766,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0962806824",
+      "coordinador": "JONATHAN LA ROSA"
     },
     {
       "id": "llam_870",
@@ -256632,7 +261804,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0991006617",
+      "coordinador": "JONATHAN LA ROSA"
     },
     {
       "id": "llam_871",
@@ -256665,7 +261842,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0987765563",
+      "coordinador": "JONATHAN LA ROSA"
     },
     {
       "id": "llam_872",
@@ -256698,7 +261880,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0981359517",
+      "coordinador": "JONATHAN LA ROSA"
     },
     {
       "id": "llam_873",
@@ -256731,7 +261918,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0991318669",
+      "coordinador": "JONATHAN LA ROSA"
     },
     {
       "id": "llam_874",
@@ -256764,7 +261956,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0989167400",
+      "coordinador": "JONATHAN LA ROSA"
     },
     {
       "id": "llam_875",
@@ -256797,7 +261994,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0968306238",
+      "coordinador": "JONATHAN LA ROSA"
     },
     {
       "id": "llam_876",
@@ -256830,7 +262032,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "969032027",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_877",
@@ -256863,7 +262070,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0995606621",
+      "coordinador": "ROBERTO RODRIGUEZ"
     },
     {
       "id": "llam_878",
@@ -256896,7 +262108,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "+1(609)6353345",
+      "coordinador": "JONATHAN LA ROSA"
     },
     {
       "id": "llam_879",
@@ -256929,7 +262146,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0998895959",
+      "coordinador": "JONATHAN LA ROSA"
     },
     {
       "id": "llam_880",
@@ -256962,7 +262184,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0993083068",
+      "coordinador": "JONATHAN LA ROSA"
     },
     {
       "id": "llam_881",
@@ -256995,7 +262222,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "+51997213218",
+      "coordinador": "LEYLA PASQUEL"
     },
     {
       "id": "llam_882",
@@ -257028,7 +262260,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "+51981295423",
+      "coordinador": "LEYLA PASQUEL"
     },
     {
       "id": "llam_883",
@@ -257061,7 +262298,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0959114621",
+      "coordinador": "JONATHAN LA ROSA"
     },
     {
       "id": "llam_884",
@@ -257094,7 +262336,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0984270873",
+      "coordinador": "JONATHAN LA ROSA"
     },
     {
       "id": "llam_885",
@@ -257127,7 +262374,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "984430689",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_886",
@@ -257160,7 +262412,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0981767888",
+      "coordinador": "JONATHAN LA ROSA"
     },
     {
       "id": "llam_887",
@@ -257193,7 +262450,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "997336202",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_888",
@@ -257226,7 +262488,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "984898787",
+      "coordinador": "ALEJANDRO DIAZ"
     },
     {
       "id": "llam_889",
@@ -257259,7 +262526,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "986151899",
+      "coordinador": "ALEJANDRO DIAZ"
     },
     {
       "id": "llam_890",
@@ -257292,7 +262564,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "983047100",
+      "coordinador": "ALEJANDRO DIAZ"
     },
     {
       "id": "llam_891",
@@ -257325,7 +262602,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "981188999",
+      "coordinador": "ALEJANDRO DIAZ"
     },
     {
       "id": "llam_892",
@@ -257358,7 +262640,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "984909501",
+      "coordinador": "ALEJANDRO DIAZ"
     },
     {
       "id": "llam_893",
@@ -257391,7 +262678,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "969546635",
+      "coordinador": "ALEJANDRO DIAZ"
     },
     {
       "id": "llam_894",
@@ -257424,7 +262716,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "998336421",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_895",
@@ -257457,7 +262754,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "963416160",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_896",
@@ -257490,7 +262792,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "979351211",
+      "coordinador": "ALEJANDRO DIAZ"
     },
     {
       "id": "llam_897",
@@ -257523,7 +262830,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "988618235",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_898",
@@ -257556,7 +262868,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "996352930",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_899",
@@ -257589,7 +262906,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "962284570",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_900",
@@ -257622,7 +262944,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "939118370",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_901",
@@ -257655,7 +262982,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "996574352",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_902",
@@ -257688,7 +263020,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "",
+      "coordinador": "LEYLA PASQUEL"
     },
     {
       "id": "llam_903",
@@ -257721,7 +263058,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "984617373",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_904",
@@ -257754,7 +263096,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "998367570",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_905",
@@ -257787,7 +263134,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_906",
@@ -257820,7 +263172,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_907",
@@ -257853,7 +263210,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_908",
@@ -257886,7 +263248,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_909",
@@ -257919,7 +263286,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_910",
@@ -257952,7 +263324,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_911",
@@ -257985,7 +263362,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_912",
@@ -258018,7 +263400,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_913",
@@ -258051,7 +263438,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_914",
@@ -258084,7 +263476,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_915",
@@ -258117,7 +263514,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_916",
@@ -258150,7 +263552,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_917",
@@ -258183,7 +263590,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "986535888",
+      "coordinador": "ISAAC BETANCOURTH"
     },
     {
       "id": "llam_918",
@@ -258216,7 +263628,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_919",
@@ -258249,7 +263666,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": ""
     },
     {
       "id": "llam_920",
@@ -258282,7 +263704,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0987216770",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_921",
@@ -258315,7 +263742,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "0993239903",
+      "coordinador": "JOSUÉ VERA"
     },
     {
       "id": "llam_922",
@@ -258348,7 +263780,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "0982407266",
+      "coordinador": "ROBERTO RODRIGUEZ"
     },
     {
       "id": "llam_923",
@@ -258381,7 +263818,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "958936593",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_924",
@@ -258414,7 +263856,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_925",
@@ -258447,7 +263894,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "986919506",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_926",
@@ -258480,7 +263932,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "983854306",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_927",
@@ -258513,7 +263970,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "995321338",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_928",
@@ -258546,7 +264008,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "995849214",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_929",
@@ -258579,7 +264046,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "telefono": "998758461",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_930",
@@ -258612,7 +264084,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "telefono": "994347819",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_931",
@@ -258645,7 +264122,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_932",
@@ -258678,7 +264160,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_933",
@@ -258711,7 +264198,12 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": "ERIKA GAVILANEZ"
     },
     {
       "id": "llam_934",
@@ -258744,7 +264236,11897 @@ export const cyclesData = [
       ],
       "agosto": 0,
       "septiembre": 0,
-      "octubre": 0
+      "octubre": 0,
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "telefono": "",
+      "coordinador": "ERIKA GAVILANEZ"
+    }
+  ],
+  "managersSheet1": [
+    {
+      "id": "mgr_1",
+      "orden": "3",
+      "nombre": "David Valdiviezo",
+      "rol": "MANAGER",
+      "telefono": "0984833315",
+      "numEquipo": "14",
+      "nombreEquipo": "SHAI UBUNTU",
+      "tieneEntrenador": true,
+      "entrenador": "Pamela Carrillo",
+      "coordinador": "KERLY CARRILLO / JUAN FERNANDO REINOSO",
+      "sede": "Cuenca",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_2",
+      "orden": "4",
+      "nombre": "Michelle Zuniga",
+      "rol": "MANAGER",
+      "telefono": "0958758565",
+      "numEquipo": "14",
+      "nombreEquipo": "SHAI UBUNTU",
+      "tieneEntrenador": true,
+      "entrenador": "David Sosa",
+      "coordinador": "KERLY CARRILLO / JUAN FERNANDO REINOSO",
+      "sede": "Cuenca",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_3",
+      "orden": "2",
+      "nombre": "Diego Leon",
+      "rol": "MANAGER",
+      "telefono": "0992101126",
+      "numEquipo": "15",
+      "nombreEquipo": "LIDER-ATIK",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "JUAN FERNANDO REINOSO",
+      "sede": "CUENCA",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_4",
+      "orden": "3",
+      "nombre": "Renato Marquez",
+      "rol": "MANAGER",
+      "telefono": "0961628015",
+      "numEquipo": "15",
+      "nombreEquipo": "LIDER-ATIK",
+      "tieneEntrenador": true,
+      "entrenador": "Isaac Betancourt",
+      "coordinador": "JUAN FERNANDO REINOSO",
+      "sede": "CUENCA",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_5",
+      "orden": "1",
+      "nombre": "Javier Torres",
+      "rol": "Capitán",
+      "telefono": "5930998024307",
+      "numEquipo": "1",
+      "nombreEquipo": "TRINA MUNAY KI",
+      "tieneEntrenador": false,
+      "entrenador": "Mildred Muñoz",
+      "coordinador": "MIGUEL TORRES",
+      "sede": "Cuenca",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_6",
+      "orden": "2",
+      "nombre": "Amada Amendaño",
+      "rol": "Manager",
+      "telefono": "5930999084200",
+      "numEquipo": "1",
+      "nombreEquipo": "TRINA MUNAY KI",
+      "tieneEntrenador": false,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "MIGUEL TORRES",
+      "sede": "Cuenca",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_7",
+      "orden": "3",
+      "nombre": "Andrea Medina",
+      "rol": "Manager",
+      "telefono": "5930983807026",
+      "numEquipo": "1",
+      "nombreEquipo": "TRINA MUNAY KI",
+      "tieneEntrenador": false,
+      "entrenador": "Josué Vera",
+      "coordinador": "MIGUEL TORRES",
+      "sede": "Cuenca",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_8",
+      "orden": "5",
+      "nombre": "Santiago Yunga",
+      "rol": "Manager",
+      "telefono": "5930984959494",
+      "numEquipo": "1",
+      "nombreEquipo": "TRINA MUNAY KI",
+      "tieneEntrenador": false,
+      "entrenador": "Alejandro Diaz",
+      "coordinador": "MIGUEL TORRES",
+      "sede": "Cuenca",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_9",
+      "orden": "1",
+      "nombre": "Diego Camargo",
+      "rol": "Capitán",
+      "telefono": "3103886732",
+      "numEquipo": "1",
+      "nombreEquipo": "HENKO",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Gómez",
+      "coordinador": "",
+      "sede": "Medellin",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_10",
+      "orden": "3",
+      "nombre": "Juan Maya",
+      "rol": "Manager",
+      "telefono": "3134004302",
+      "numEquipo": "1",
+      "nombreEquipo": "HENKO",
+      "tieneEntrenador": true,
+      "entrenador": "Mike Boada",
+      "coordinador": "",
+      "sede": "Medellin",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_11",
+      "orden": "4",
+      "nombre": "Ulises Ordaz",
+      "rol": "MANAGER",
+      "telefono": "5514956218",
+      "numEquipo": "1",
+      "nombreEquipo": "MARDUK AETT",
+      "tieneEntrenador": true,
+      "entrenador": "José Sánchez",
+      "coordinador": "ALONSO SOLARES",
+      "sede": "CDMX",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_12",
+      "orden": "2",
+      "nombre": "Daniela Monroy",
+      "rol": "MANAGER",
+      "telefono": "5527377589",
+      "numEquipo": "1",
+      "nombreEquipo": "MARDUK AETT",
+      "tieneEntrenador": true,
+      "entrenador": "José Sánchez",
+      "coordinador": "ALONSO SOLARES",
+      "sede": "CDMX",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_13",
+      "orden": "3",
+      "nombre": "Nora Zamora",
+      "rol": "MANAGER",
+      "telefono": "5539353705",
+      "numEquipo": "1",
+      "nombreEquipo": "MARDUK AETT",
+      "tieneEntrenador": true,
+      "entrenador": "José Sánchez",
+      "coordinador": "ALONSO SOLARES",
+      "sede": "CDMX",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_14",
+      "orden": "1",
+      "nombre": "Edith Castillo",
+      "rol": "CAPITANA",
+      "telefono": "5540843176",
+      "numEquipo": "1",
+      "nombreEquipo": "MARDUK AETT",
+      "tieneEntrenador": true,
+      "entrenador": "José Sánchez",
+      "coordinador": "ALONSO SOLARES",
+      "sede": "CDMX",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_15",
+      "orden": "2",
+      "nombre": "Jennifer Iñiguez",
+      "rol": "Manager",
+      "telefono": "0988817401",
+      "numEquipo": "2",
+      "nombreEquipo": "INTI CAMARI",
+      "tieneEntrenador": true,
+      "entrenador": "José Torron",
+      "coordinador": "MIGUEL TORRES",
+      "sede": "Cuenca",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_16",
+      "orden": "3",
+      "nombre": "Vanesa Quezada",
+      "rol": "Manager",
+      "telefono": "0968535607",
+      "numEquipo": "2",
+      "nombreEquipo": "INTI CAMARI",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "MIGUEL TORRES",
+      "sede": "Cuenca",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_17",
+      "orden": "1",
+      "nombre": "Mauricio Ramirez",
+      "rol": "Capitán",
+      "telefono": "3052476502",
+      "numEquipo": "2",
+      "nombreEquipo": "NICAN AXCAN",
+      "tieneEntrenador": true,
+      "entrenador": "Mildred Muñoz",
+      "coordinador": "",
+      "sede": "Medellin",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_18",
+      "orden": "3",
+      "nombre": "Brian Morales",
+      "rol": "Manager",
+      "telefono": "34671265641",
+      "numEquipo": "2",
+      "nombreEquipo": "NICAN AXCAN",
+      "tieneEntrenador": true,
+      "entrenador": "Mike Boada",
+      "coordinador": "",
+      "sede": "Medellin",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_19",
+      "orden": "2",
+      "nombre": "Daniela Perez",
+      "rol": "Manager",
+      "telefono": "3206949379",
+      "numEquipo": "2",
+      "nombreEquipo": "NICAN AXCAN",
+      "tieneEntrenador": true,
+      "entrenador": "José Sánchez",
+      "coordinador": "",
+      "sede": "Medellin",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_20",
+      "orden": "6",
+      "nombre": "Jaime Arenas",
+      "rol": "Manager",
+      "telefono": "3012779494",
+      "numEquipo": "2",
+      "nombreEquipo": "NICAN AXCAN",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "",
+      "sede": "Medellin",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_21",
+      "orden": "5",
+      "nombre": "Miguel Patiño",
+      "rol": "Manager",
+      "telefono": "3244391563",
+      "numEquipo": "2",
+      "nombreEquipo": "NICAN AXCAN",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Gómez",
+      "coordinador": "",
+      "sede": "Medellin",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_22",
+      "orden": "2",
+      "nombre": "Martha Guerrero",
+      "rol": "MANAGER",
+      "telefono": "3511507519",
+      "numEquipo": "2",
+      "nombreEquipo": "ALOHI MAU",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "ALONSO SOLARES",
+      "sede": "CDMX",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_23",
+      "orden": "1",
+      "nombre": "Ernesto Sepúlveda",
+      "rol": "CAPITÁN",
+      "telefono": "7223057233",
+      "numEquipo": "2",
+      "nombreEquipo": "ALOHI MAU",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "ALONSO SOLARES",
+      "sede": "CDMX",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_24",
+      "orden": "1",
+      "nombre": "Mabe Catota",
+      "rol": "Capitana",
+      "telefono": "593 98 333 5667",
+      "numEquipo": "3",
+      "nombreEquipo": "Athalaya Kumi",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "MIGUEL TORRES",
+      "sede": "Cuenca",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_25",
+      "orden": "2",
+      "nombre": "Pamela Tixi",
+      "rol": "Manager",
+      "telefono": "593 99 554 7752",
+      "numEquipo": "3",
+      "nombreEquipo": "Athalaya Kumi",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "MIGUEL TORRES",
+      "sede": "Cuenca",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_26",
+      "orden": "1",
+      "nombre": "Ledis Daza",
+      "rol": "Capitana",
+      "telefono": "+573246082756",
+      "numEquipo": "3",
+      "nombreEquipo": "KAIROS",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Gómez",
+      "coordinador": "",
+      "sede": "Medellin",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_27",
+      "orden": "1",
+      "nombre": "Gabriel Ordáz",
+      "rol": "CAPITÁN",
+      "telefono": "5519706103",
+      "numEquipo": "3",
+      "nombreEquipo": "TORA BUSHIDO",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "DANIELA MONROY",
+      "sede": "CDMX",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_28",
+      "orden": "1",
+      "nombre": "Kerlie Carrillo",
+      "rol": "Capitán",
+      "telefono": "0995815292",
+      "numEquipo": "4",
+      "nombreEquipo": "Alquimia",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "JOSUE VERA",
+      "sede": "Cuenca",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_29",
+      "orden": "1",
+      "nombre": "Valentina Rodriguez",
+      "rol": "CAPITANA",
+      "telefono": "+573044072665",
+      "numEquipo": "4",
+      "nombreEquipo": "KHORA NOVA",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "",
+      "sede": "Medellin",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_30",
+      "orden": "2",
+      "nombre": "David Gonzalez Franco",
+      "rol": "MANAGER",
+      "telefono": "+573013053610",
+      "numEquipo": "4",
+      "nombreEquipo": "KHORA NOVA",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "",
+      "sede": "Medellin",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_31",
+      "orden": "1",
+      "nombre": "Nelson Jimenez",
+      "rol": "CAPITÁN",
+      "telefono": "9711213956",
+      "numEquipo": "4",
+      "nombreEquipo": "QUIRON 33",
+      "tieneEntrenador": true,
+      "entrenador": "Linid Valencia",
+      "coordinador": "DANIELA MONROY",
+      "sede": "CDMX",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_32",
+      "orden": "1",
+      "nombre": "Colombia Ochoa",
+      "rol": "Capitana",
+      "telefono": "0996849484",
+      "numEquipo": "5",
+      "nombreEquipo": "NovaPakari",
+      "tieneEntrenador": true,
+      "entrenador": "José Torron",
+      "coordinador": "JOSUE VERA",
+      "sede": "Cuenca",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_33",
+      "orden": "3",
+      "nombre": "Ismael Marquez",
+      "rol": "Manager",
+      "telefono": "0988903378",
+      "numEquipo": "5",
+      "nombreEquipo": "NovaPakari",
+      "tieneEntrenador": true,
+      "entrenador": "Alejandro Diaz",
+      "coordinador": "JOSUE VERA",
+      "sede": "Cuenca",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_34",
+      "orden": "2",
+      "nombre": "Juan Fernando Reinoso",
+      "rol": "Manager",
+      "telefono": "0981966878",
+      "numEquipo": "5",
+      "nombreEquipo": "NovaPakari",
+      "tieneEntrenador": true,
+      "entrenador": "Diego Bravo",
+      "coordinador": "JOSUE VERA",
+      "sede": "Cuenca",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_35",
+      "orden": "1",
+      "nombre": "Amendaño Rosa",
+      "rol": "Capitana",
+      "telefono": "0999084200",
+      "numEquipo": "6",
+      "nombreEquipo": "NUNA KAWSAY",
+      "tieneEntrenador": true,
+      "entrenador": "Mildred Muñoz",
+      "coordinador": "JOSUE VERA",
+      "sede": "Cuenca",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_36",
+      "orden": "1",
+      "nombre": "Maria Fernanda Alvarez",
+      "rol": "MANAGER",
+      "telefono": "+573225052109",
+      "numEquipo": "6",
+      "nombreEquipo": "ZENSEIS",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "",
+      "sede": "Medellin",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_37",
+      "orden": "1",
+      "nombre": "Anel Orihuela",
+      "rol": "Capitán",
+      "telefono": "+51 983 708 896",
+      "numEquipo": "6",
+      "nombreEquipo": "Atipaqkuna",
+      "tieneEntrenador": false,
+      "entrenador": "Mildred Muñoz",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_38",
+      "orden": "2",
+      "nombre": "Leyla Pasquel",
+      "rol": "Manager",
+      "telefono": "+51 996 820 944",
+      "numEquipo": "6",
+      "nombreEquipo": "Atipaqkuna",
+      "tieneEntrenador": false,
+      "entrenador": "Julio Narváez",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_39",
+      "orden": "1",
+      "nombre": "Jose Galindo",
+      "rol": "CAPITAN",
+      "telefono": "0992848576",
+      "numEquipo": "7",
+      "nombreEquipo": "KAIROSTHER",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "JOSUE VERA",
+      "sede": "Cuenca",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_40",
+      "orden": "2",
+      "nombre": "Jose Luis Prado",
+      "rol": "Managers",
+      "telefono": "0997244234",
+      "numEquipo": "7",
+      "nombreEquipo": "KAIROSTHER",
+      "tieneEntrenador": true,
+      "entrenador": "Diego Bravo",
+      "coordinador": "JOSUE VERA",
+      "sede": "Cuenca",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_41",
+      "orden": "2",
+      "nombre": "Juan Manuel Granda",
+      "rol": "Manager",
+      "telefono": "+51 947 469 418",
+      "numEquipo": "7",
+      "nombreEquipo": "Espartanos",
+      "tieneEntrenador": false,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "",
+      "sede": "Lima",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_42",
+      "orden": "1",
+      "nombre": "Daniela Perez",
+      "rol": "CAPITANA",
+      "telefono": "+573206949379",
+      "numEquipo": "7",
+      "nombreEquipo": "EXCELZUS",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Gómez",
+      "coordinador": "MAURICIO RAMIREZ",
+      "sede": "Medellin",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_43",
+      "orden": "2",
+      "nombre": "Martha Londoño",
+      "rol": "MANAGER",
+      "telefono": "+573146726436",
+      "numEquipo": "7",
+      "nombreEquipo": "EXCELZUS",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "MAURICIO RAMIREZ",
+      "sede": "Medellin",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_44",
+      "orden": "1",
+      "nombre": "Alba Abad",
+      "rol": "Capitana",
+      "telefono": "0999731178",
+      "numEquipo": "8",
+      "nombreEquipo": "METANOIA",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "KERLY CARRILLO",
+      "sede": "Cuenca",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_45",
+      "orden": "3",
+      "nombre": "Carlos Puglla",
+      "rol": "Manager",
+      "telefono": "0963451858",
+      "numEquipo": "8",
+      "nombreEquipo": "METANOIA",
+      "tieneEntrenador": true,
+      "entrenador": "Mila Campuzano",
+      "coordinador": "KERLY CARRILLO",
+      "sede": "Cuenca",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_46",
+      "orden": "1",
+      "nombre": "Manuel Vivanco",
+      "rol": "Capitán",
+      "telefono": "+51 985 610 048",
+      "numEquipo": "8",
+      "nombreEquipo": "Pretorianos Infinitos",
+      "tieneEntrenador": false,
+      "entrenador": "Julio Narváez",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_47",
+      "orden": "4",
+      "nombre": "Lucy Giovanna Ostoa Bernaola",
+      "rol": "Manager",
+      "telefono": "+51 949 191 577",
+      "numEquipo": "8",
+      "nombreEquipo": "Pretorianos Infinitos",
+      "tieneEntrenador": false,
+      "entrenador": "Julio Narváez",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_48",
+      "orden": "6",
+      "nombre": "Roberto Condezo",
+      "rol": "Manager",
+      "telefono": "+51 999 105 525",
+      "numEquipo": "8",
+      "nombreEquipo": "Pretorianos Infinitos",
+      "tieneEntrenador": false,
+      "entrenador": "Ana Cristina Sánchez",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_49",
+      "orden": "7",
+      "nombre": "Tonny Gutierrez",
+      "rol": "Manager",
+      "telefono": "+51 958 058 579",
+      "numEquipo": "8",
+      "nombreEquipo": "Pretorianos Infinitos",
+      "tieneEntrenador": false,
+      "entrenador": "Ana Cristina Sánchez",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_50",
+      "orden": "8",
+      "nombre": "Viviana Alcantara",
+      "rol": "Manager",
+      "telefono": "+51 987 020 591",
+      "numEquipo": "8",
+      "nombreEquipo": "Pretorianos Infinitos",
+      "tieneEntrenador": false,
+      "entrenador": "Ana Cristina Sánchez",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_51",
+      "orden": "1",
+      "nombre": "Verónica Prado",
+      "rol": "CAPITANA",
+      "telefono": "0994481646",
+      "numEquipo": "9",
+      "nombreEquipo": "ATARAXIA",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "KERLY CARRILLO",
+      "sede": "Cuenca",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_52",
+      "orden": "2",
+      "nombre": "Geovanni Dominguez",
+      "rol": "MANAGER",
+      "telefono": "0993893819",
+      "numEquipo": "9",
+      "nombreEquipo": "ATARAXIA",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "KERLY CARRILLO",
+      "sede": "Cuenca",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_53",
+      "orden": "1",
+      "nombre": "Rosemary De Paz",
+      "rol": "Capitana",
+      "telefono": "+51 907 418 863",
+      "numEquipo": "9",
+      "nombreEquipo": "Fenixkingo",
+      "tieneEntrenador": true,
+      "entrenador": "Mildred Muñoz",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_54",
+      "orden": "2",
+      "nombre": "Carmen Gricelda Pérez Chinchay",
+      "rol": "Manager",
+      "telefono": "+51 936 558 835",
+      "numEquipo": "9",
+      "nombreEquipo": "Fenixkingo",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_55",
+      "orden": "3",
+      "nombre": "Nancy Huallipe",
+      "rol": "Manager",
+      "telefono": "+51 944 243 222",
+      "numEquipo": "9",
+      "nombreEquipo": "Fenixkingo",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_56",
+      "orden": "2",
+      "nombre": "Rosy Bayas",
+      "rol": "MANAGER",
+      "telefono": "0995889161",
+      "numEquipo": "10",
+      "nombreEquipo": "ÑUKA KALLPA",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "KERLY CARRILLO",
+      "sede": "Cuenca",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_57",
+      "orden": "1",
+      "nombre": "Carlos Mejia",
+      "rol": "CAPITAN",
+      "telefono": "0998899953",
+      "numEquipo": "10",
+      "nombreEquipo": "ÑUKA KALLPA",
+      "tieneEntrenador": true,
+      "entrenador": "Mike Boada",
+      "coordinador": "KERLY CARRILLO",
+      "sede": "Cuenca",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_58",
+      "orden": "2",
+      "nombre": "Juan Pablo Lema Bermudez",
+      "rol": "MANAGER",
+      "telefono": "+573017628483",
+      "numEquipo": "10",
+      "nombreEquipo": "KRATOS MAGNUS",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "MAURICIO RAMIREZ",
+      "sede": "Medellín",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_59",
+      "orden": "1",
+      "nombre": "Veronica Gallego Taborda",
+      "rol": "MANAGER",
+      "telefono": "+573215607716",
+      "numEquipo": "10",
+      "nombreEquipo": "KRATOS MAGNUS",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "MAURICIO RAMIREZ",
+      "sede": "Medellín",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_60",
+      "orden": "1",
+      "nombre": "July León",
+      "rol": "Capitana",
+      "telefono": "+51 907 503 084",
+      "numEquipo": "10",
+      "nombreEquipo": "David Poderosos",
+      "tieneEntrenador": true,
+      "entrenador": "Mildred Muñoz",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_61",
+      "orden": "2",
+      "nombre": "Bryan Caicedo",
+      "rol": "Manager",
+      "telefono": "+593 96 353 4655",
+      "numEquipo": "10",
+      "nombreEquipo": "David Poderosos",
+      "tieneEntrenador": true,
+      "entrenador": "José Torron",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_62",
+      "orden": "3",
+      "nombre": "Pamela Carrillo",
+      "rol": "Manager",
+      "telefono": "+593 99 249 2027",
+      "numEquipo": "10",
+      "nombreEquipo": "David Poderosos",
+      "tieneEntrenador": true,
+      "entrenador": "José Torron",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_63",
+      "orden": "1",
+      "nombre": "Juanjo Carranza",
+      "rol": "CAPITAN",
+      "telefono": "0995780948",
+      "numEquipo": "11",
+      "nombreEquipo": "ZÉNTI BRAMHADES",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "KERLY CARRILLO",
+      "sede": "Cuenca",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_64",
+      "orden": "3",
+      "nombre": "Edwin Jimbo",
+      "rol": "MANAGER",
+      "telefono": "0997258052",
+      "numEquipo": "11",
+      "nombreEquipo": "ZÉNTI BRAMHADES",
+      "tieneEntrenador": true,
+      "entrenador": "Alejandro Diaz",
+      "coordinador": "KERLY CARRILLO",
+      "sede": "Cuenca",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_65",
+      "orden": "2",
+      "nombre": "Pauly Cedillo",
+      "rol": "MANAGER",
+      "telefono": "0958927854",
+      "numEquipo": "11",
+      "nombreEquipo": "ZÉNTI BRAMHADES",
+      "tieneEntrenador": true,
+      "entrenador": "José Sánchez",
+      "coordinador": "KERLY CARRILLO",
+      "sede": "Cuenca",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_66",
+      "orden": "2",
+      "nombre": "Elizabeth Morales Carcelén",
+      "rol": "CAPITANA",
+      "telefono": "+51 998 450 224",
+      "numEquipo": "11",
+      "nombreEquipo": "Lobos",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Cristina Sánchez",
+      "coordinador": "",
+      "sede": "Lima",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_67",
+      "orden": "1",
+      "nombre": "Leyla Kelly Pasquel Alfaro",
+      "rol": "CAPITANA",
+      "telefono": "+51 996 820 944",
+      "numEquipo": "11",
+      "nombreEquipo": "Lobos",
+      "tieneEntrenador": true,
+      "entrenador": "Mildred Muñoz",
+      "coordinador": "",
+      "sede": "Lima",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_68",
+      "orden": "3",
+      "nombre": "Marco Antonio Villarreal Valdiviezo",
+      "rol": "CAPITANA",
+      "telefono": "+51 962 511 575",
+      "numEquipo": "11",
+      "nombreEquipo": "Lobos",
+      "tieneEntrenador": true,
+      "entrenador": "Isaac Betancourt",
+      "coordinador": "",
+      "sede": "Lima",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_69",
+      "orden": "3",
+      "nombre": "Christian Robalino",
+      "rol": "MANAGER",
+      "telefono": "0981327243",
+      "numEquipo": "12",
+      "nombreEquipo": "ANÁSTASIS",
+      "tieneEntrenador": true,
+      "entrenador": "Alejandro Diaz",
+      "coordinador": "KERLY CARRILLO",
+      "sede": "Cuenca",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_70",
+      "orden": "1",
+      "nombre": "Juan Fernando Reinoso",
+      "rol": "CAPITAN",
+      "telefono": "0981966878",
+      "numEquipo": "12",
+      "nombreEquipo": "ANÁSTASIS",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "KERLY CARRILLO",
+      "sede": "Cuenca",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_71",
+      "orden": "2",
+      "nombre": "Belen Muquincho",
+      "rol": "MANAGER",
+      "telefono": "0988718274",
+      "numEquipo": "12",
+      "nombreEquipo": "ANÁSTASIS",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "KERLY CARRILLO",
+      "sede": "Cuenca",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_72",
+      "orden": "2",
+      "nombre": "Kriscia Liszet Rodas Quispe",
+      "rol": "CAPITANA",
+      "telefono": "+51 964 140 549",
+      "numEquipo": "12",
+      "nombreEquipo": "INVICTUS GIBBOR",
+      "tieneEntrenador": true,
+      "entrenador": "Josué Vera",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_73",
+      "orden": "3",
+      "nombre": "Manuel Yakima Rivera",
+      "rol": "CAPITANA",
+      "telefono": "+51 996 612 880",
+      "numEquipo": "12",
+      "nombreEquipo": "INVICTUS GIBBOR",
+      "tieneEntrenador": true,
+      "entrenador": "Alejandro Diaz",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_74",
+      "orden": "4",
+      "nombre": "María Celli Huayanca Diaz",
+      "rol": "CAPITANA",
+      "telefono": "+51 989 947 797",
+      "numEquipo": "12",
+      "nombreEquipo": "INVICTUS GIBBOR",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_75",
+      "orden": "1",
+      "nombre": "Roberto Condezo",
+      "rol": "CAPITANA",
+      "telefono": "+51 999 105 525",
+      "numEquipo": "12",
+      "nombreEquipo": "INVICTUS GIBBOR",
+      "tieneEntrenador": true,
+      "entrenador": "Josué Vera",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_76",
+      "orden": "5",
+      "nombre": "Viviana Elizabeth Alcántara Maurtua",
+      "rol": "CAPITANA",
+      "telefono": "+51 987 020 591",
+      "numEquipo": "12",
+      "nombreEquipo": "INVICTUS GIBBOR",
+      "tieneEntrenador": true,
+      "entrenador": "Alejandro Diaz",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_77",
+      "orden": "3",
+      "nombre": "Elizabeth Dominguez",
+      "rol": "MANAGER",
+      "telefono": "+573123063012",
+      "numEquipo": "12",
+      "nombreEquipo": "APOLO 12",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Gómez",
+      "coordinador": "MAURICIO RAMIREZ",
+      "sede": "MEDELLIN",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_78",
+      "orden": "4",
+      "nombre": "Katherine Ospina Duque",
+      "rol": "MANAGER",
+      "telefono": "+573163270732",
+      "numEquipo": "12",
+      "nombreEquipo": "APOLO 12",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Gómez",
+      "coordinador": "MAURICIO RAMIREZ",
+      "sede": "MEDELLIN",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_79",
+      "orden": "1",
+      "nombre": "Martha Lucia Londoño",
+      "rol": "CAPITANA",
+      "telefono": "+573146726436",
+      "numEquipo": "12",
+      "nombreEquipo": "APOLO 12",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Gómez",
+      "coordinador": "MAURICIO RAMIREZ",
+      "sede": "MEDELLIN",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_80",
+      "orden": "1",
+      "nombre": "Mabe Catota",
+      "rol": "CAPITANA",
+      "telefono": "0983335667",
+      "numEquipo": "13",
+      "nombreEquipo": "SIC PARVIS MAGNA",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "KERLY CARRILLO - JUANFER REINOSO",
+      "sede": "Cuenca",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_81",
+      "orden": "2",
+      "nombre": "Paul Ochoa",
+      "rol": "MANAGER",
+      "telefono": "0995862422",
+      "numEquipo": "13",
+      "nombreEquipo": "SIC PARVIS MAGNA",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "KERLY CARRILLO - JUANFER REINOSO",
+      "sede": "Cuenca",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_82",
+      "orden": "4",
+      "nombre": "Miriam Ordoñez",
+      "rol": "MANAGER",
+      "telefono": "0993746081",
+      "numEquipo": "13",
+      "nombreEquipo": "SIC PARVIS MAGNA",
+      "tieneEntrenador": true,
+      "entrenador": "José Sánchez",
+      "coordinador": "KERLY CARRILLO - JUANFER REINOSO",
+      "sede": "Cuenca",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_83",
+      "orden": "1",
+      "nombre": "Jorge Luis León De Los Ríos",
+      "rol": "CAPITANA",
+      "telefono": "+51 998 044 097",
+      "numEquipo": "13",
+      "nombreEquipo": "Águilas De Fuego",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_84",
+      "orden": "3",
+      "nombre": "Juan Manuel Granda",
+      "rol": "CAPITANA",
+      "telefono": "+51 947 469 418",
+      "numEquipo": "13",
+      "nombreEquipo": "Águilas De Fuego",
+      "tieneEntrenador": true,
+      "entrenador": "Diego Bravo",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_85",
+      "orden": "2",
+      "nombre": "Sarita Ramos",
+      "rol": "CAPITANA",
+      "telefono": "+51 953 656 959",
+      "numEquipo": "13",
+      "nombreEquipo": "Águilas De Fuego",
+      "tieneEntrenador": true,
+      "entrenador": "María José Román",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_86",
+      "orden": "1",
+      "nombre": "Diana Macas",
+      "rol": "CAPITANA",
+      "telefono": "593980927921",
+      "numEquipo": "13",
+      "nombreEquipo": "WARANKA KALLPAWAN",
+      "tieneEntrenador": false,
+      "entrenador": "Chuy Acosta",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_87",
+      "orden": "3",
+      "nombre": "Estefania Chavarria",
+      "rol": "MANAGER",
+      "telefono": "+57 3195952194",
+      "numEquipo": "13",
+      "nombreEquipo": "KRONOS DYNATUS",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "MAURICIO RAMIREZ",
+      "sede": "MEDELLIN",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_88",
+      "orden": "1",
+      "nombre": "Vanessa Giraldo",
+      "rol": "CAPITANA",
+      "telefono": "+57 3243611278",
+      "numEquipo": "13",
+      "nombreEquipo": "KRONOS DYNATUS",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "MAURICIO RAMIREZ",
+      "sede": "MEDELLIN",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_89",
+      "orden": "2",
+      "nombre": "Andreina Tenelema",
+      "rol": "CAPITANA",
+      "telefono": "593990196376",
+      "numEquipo": "14",
+      "nombreEquipo": "KAMINARI KUNTURI",
+      "tieneEntrenador": true,
+      "entrenador": "José Torron",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_90",
+      "orden": "3",
+      "nombre": "Gaby Roman",
+      "rol": "CAPITANA",
+      "telefono": "593999881365",
+      "numEquipo": "14",
+      "nombreEquipo": "KAMINARI KUNTURI",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_91",
+      "orden": "4",
+      "nombre": "Jonathan Vargas",
+      "rol": "CAPITANA",
+      "telefono": "593963291572",
+      "numEquipo": "14",
+      "nombreEquipo": "KAMINARI KUNTURI",
+      "tieneEntrenador": true,
+      "entrenador": "José Torron",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_92",
+      "orden": "1",
+      "nombre": "Kevin Tiban",
+      "rol": "CAPITANA",
+      "telefono": "593969532866",
+      "numEquipo": "14",
+      "nombreEquipo": "KAMINARI KUNTURI",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_93",
+      "orden": "2",
+      "nombre": "Camila León Moore",
+      "rol": "CAPITANA",
+      "telefono": "981701570",
+      "numEquipo": "14",
+      "nombreEquipo": "LEONKUNA",
+      "tieneEntrenador": true,
+      "entrenador": "Mildred Muñoz",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_94",
+      "orden": "1",
+      "nombre": "Cármen Pérez Pérez",
+      "rol": "CAPITANA",
+      "telefono": "936558835",
+      "numEquipo": "14",
+      "nombreEquipo": "LEONKUNA",
+      "tieneEntrenador": true,
+      "entrenador": "Mildred Muñoz",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_95",
+      "orden": "3",
+      "nombre": "Gareth Said Ramos Pérez",
+      "rol": "CAPITANA",
+      "telefono": "946011882",
+      "numEquipo": "14",
+      "nombreEquipo": "LEONKUNA",
+      "tieneEntrenador": true,
+      "entrenador": "María José Román",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_96",
+      "orden": "4",
+      "nombre": "Gregoria Alhuay Rojas",
+      "rol": "CAPITANA",
+      "telefono": "975242055",
+      "numEquipo": "14",
+      "nombreEquipo": "LEONKUNA",
+      "tieneEntrenador": true,
+      "entrenador": "Diego Bravo",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_97",
+      "orden": "6",
+      "nombre": "Reyna Jaramillo",
+      "rol": "CAPITANA",
+      "telefono": "954821488",
+      "numEquipo": "14",
+      "nombreEquipo": "LEONKUNA",
+      "tieneEntrenador": true,
+      "entrenador": "José Torron",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_98",
+      "orden": "7",
+      "nombre": "Rony Landeo",
+      "rol": "CAPITANA",
+      "telefono": "971248667",
+      "numEquipo": "14",
+      "nombreEquipo": "LEONKUNA",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_99",
+      "orden": "8",
+      "nombre": "Sandra Marlene López Chahua",
+      "rol": "CAPITANA",
+      "telefono": "970870801",
+      "numEquipo": "14",
+      "nombreEquipo": "LEONKUNA",
+      "tieneEntrenador": true,
+      "entrenador": "María José Román",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_100",
+      "orden": "2",
+      "nombre": "Paul Pinos",
+      "rol": "MANAGER",
+      "telefono": "0958881296",
+      "numEquipo": "14",
+      "nombreEquipo": "SHAI UBUNTU",
+      "tieneEntrenador": true,
+      "entrenador": "José Sánchez",
+      "coordinador": "KERLY CARRILLO / JUAN FERNANDO REINOSO",
+      "sede": "Cuenca",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_101",
+      "orden": "1",
+      "nombre": "Fabian Naula",
+      "rol": "CAPITAN",
+      "telefono": "0998410632",
+      "numEquipo": "14",
+      "nombreEquipo": "SHAI UBUNTU",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "KERLY CARRILLO / JUAN FERNANDO REINOSO",
+      "sede": "Cuenca",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_102",
+      "orden": "1",
+      "nombre": "Mariana Catrillon",
+      "rol": "MANAGER",
+      "telefono": "+573137791253",
+      "numEquipo": "14",
+      "nombreEquipo": "RAGNAROK",
+      "tieneEntrenador": true,
+      "entrenador": "José Sánchez",
+      "coordinador": "MAURICIO RAMIREZ",
+      "sede": "Medellín",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_103",
+      "orden": "2",
+      "nombre": "Alexandra Tapullima",
+      "rol": "CAPITANA",
+      "telefono": "+51 941 482840",
+      "numEquipo": "15",
+      "nombreEquipo": "DRAGONES CUÁNTICOS",
+      "tieneEntrenador": true,
+      "entrenador": "Josué Vera",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_104",
+      "orden": "3",
+      "nombre": "Daysi Requejo",
+      "rol": "CAPITANA",
+      "telefono": "+51 945 111938",
+      "numEquipo": "15",
+      "nombreEquipo": "DRAGONES CUÁNTICOS",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_105",
+      "orden": "4",
+      "nombre": "Diego Barbieri",
+      "rol": "CAPITANA",
+      "telefono": "+51 951 815674",
+      "numEquipo": "15",
+      "nombreEquipo": "DRAGONES CUÁNTICOS",
+      "tieneEntrenador": true,
+      "entrenador": "Mauricio Ramírez",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_106",
+      "orden": "1",
+      "nombre": "Elizabeth Morales",
+      "rol": "CAPITANA",
+      "telefono": "+51 998 450224",
+      "numEquipo": "15",
+      "nombreEquipo": "DRAGONES CUÁNTICOS",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_107",
+      "orden": "5",
+      "nombre": "Liz Trujillo",
+      "rol": "CAPITANA",
+      "telefono": "+51 980 496819",
+      "numEquipo": "15",
+      "nombreEquipo": "DRAGONES CUÁNTICOS",
+      "tieneEntrenador": true,
+      "entrenador": "Mauricio Ramírez",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_108",
+      "orden": "7",
+      "nombre": "Marco Antonio Villarreal Valdiviezo",
+      "rol": "CAPITANA",
+      "telefono": "+51 962 511575",
+      "numEquipo": "15",
+      "nombreEquipo": "DRAGONES CUÁNTICOS",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_109",
+      "orden": "2",
+      "nombre": "Anita Guevara",
+      "rol": "CAPITANA",
+      "telefono": "593980636031",
+      "numEquipo": "15",
+      "nombreEquipo": "URUZ MERAKI",
+      "tieneEntrenador": true,
+      "entrenador": "Josué Vera",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_110",
+      "orden": "3",
+      "nombre": "Jhomaira Esparza",
+      "rol": "CAPITANA",
+      "telefono": "593980899920",
+      "numEquipo": "15",
+      "nombreEquipo": "URUZ MERAKI",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_111",
+      "orden": "1",
+      "nombre": "Myriam Crespin",
+      "rol": "CAPITANA",
+      "telefono": "593983238632",
+      "numEquipo": "15",
+      "nombreEquipo": "URUZ MERAKI",
+      "tieneEntrenador": true,
+      "entrenador": "Chuy Acosta",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_112",
+      "orden": "4",
+      "nombre": "Rutc Vera",
+      "rol": "CAPITANA",
+      "telefono": "593986678514",
+      "numEquipo": "15",
+      "nombreEquipo": "URUZ MERAKI",
+      "tieneEntrenador": true,
+      "entrenador": "Josué Vera",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_113",
+      "orden": "1",
+      "nombre": "Andrea Medina",
+      "rol": "CAPITANA",
+      "telefono": "0980184471",
+      "numEquipo": "15",
+      "nombreEquipo": "LIDER-ATIK",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "JUAN FERNANDO REINOSO",
+      "sede": "CUENCA",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_114",
+      "orden": "1",
+      "nombre": "David Gonzalez",
+      "rol": "CAPITAN",
+      "telefono": "+573013053610",
+      "numEquipo": "15",
+      "nombreEquipo": "NEO DRAKARYS",
+      "tieneEntrenador": true,
+      "entrenador": "ERIKA GAVILANEZ",
+      "coordinador": "MAURICIO RAMIREZ",
+      "sede": "Medellín",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_115",
+      "orden": "1",
+      "nombre": "Jorge Ramirez",
+      "rol": "CAPITANA",
+      "telefono": "593989743818",
+      "numEquipo": "16",
+      "nombreEquipo": "Ara Ambiguus",
+      "tieneEntrenador": true,
+      "entrenador": "Mildred Muñoz",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_116",
+      "orden": "3",
+      "nombre": "Luis Pruna",
+      "rol": "CAPITANA",
+      "telefono": "593988759534",
+      "numEquipo": "16",
+      "nombreEquipo": "Ara Ambiguus",
+      "tieneEntrenador": true,
+      "entrenador": "Mike Boada",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_117",
+      "orden": "3",
+      "nombre": "Allyzon León Suarez",
+      "rol": "CAPITANA",
+      "telefono": "+51 991 215 652",
+      "numEquipo": "16",
+      "nombreEquipo": "ATMA DE TITANES",
+      "tieneEntrenador": true,
+      "entrenador": "María José Román",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_118",
+      "orden": "1",
+      "nombre": "Diana Moscosso",
+      "rol": "CAPITANA",
+      "telefono": "+51 924 105 061",
+      "numEquipo": "16",
+      "nombreEquipo": "ATMA DE TITANES",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_119",
+      "orden": "2",
+      "nombre": "Manuel Yakima Rivera",
+      "rol": "CAPITANA",
+      "telefono": "+51 996 612 880",
+      "numEquipo": "16",
+      "nombreEquipo": "ATMA DE TITANES",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_120",
+      "orden": "2",
+      "nombre": "Cristina Vintimilla",
+      "rol": "MANAGER",
+      "telefono": "0999737261",
+      "numEquipo": "16",
+      "nombreEquipo": "ARÚTAM",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "KERLY CARRILLO",
+      "sede": "CUENCA",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_121",
+      "orden": "1",
+      "nombre": "Gerard Avila",
+      "rol": "CAPITAN",
+      "telefono": "0969497795",
+      "numEquipo": "16",
+      "nombreEquipo": "ARÚTAM",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "KERLY CARRILLO",
+      "sede": "CUENCA",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_122",
+      "orden": "1",
+      "nombre": "Juan Esteban Ossa",
+      "rol": "MANAGER",
+      "telefono": "+573216507980",
+      "numEquipo": "16",
+      "nombreEquipo": "CERBERUS",
+      "tieneEntrenador": true,
+      "entrenador": "JESUS ACOSTA",
+      "coordinador": "MAURICIO RAMIREZ",
+      "sede": "Medellín",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_123",
+      "orden": "2",
+      "nombre": "Brian Morales",
+      "rol": "MANAGER",
+      "telefono": "+573233644192",
+      "numEquipo": "16",
+      "nombreEquipo": "CERBERUS",
+      "tieneEntrenador": true,
+      "entrenador": "JESUS ACOSTA",
+      "coordinador": "MAURICIO RAMIREZ",
+      "sede": "Medellín",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_124",
+      "orden": "2",
+      "nombre": "Jammel Arvelaez",
+      "rol": "CAPITANA",
+      "telefono": "593986361725",
+      "numEquipo": "17",
+      "nombreEquipo": "HATUM BRAHMA",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Cristina Sánchez",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_125",
+      "orden": "4",
+      "nombre": "Valeria Tiban",
+      "rol": "CAPITANA",
+      "telefono": "593968991462",
+      "numEquipo": "17",
+      "nombreEquipo": "HATUM BRAHMA",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_126",
+      "orden": "1",
+      "nombre": "Xavier Calero",
+      "rol": "CAPITANA",
+      "telefono": "593998559879",
+      "numEquipo": "17",
+      "nombreEquipo": "HATUM BRAHMA",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_127",
+      "orden": "1",
+      "nombre": "Rocio De La Paz Huaytalla",
+      "rol": "CAPITANA",
+      "telefono": "+51 924 255 051",
+      "numEquipo": "17",
+      "nombreEquipo": "JAGUARES DE ORO",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_128",
+      "orden": "2",
+      "nombre": "Anamelva Quiñonez",
+      "rol": "MANAGER",
+      "telefono": "+51 920 122 990",
+      "numEquipo": "17",
+      "nombreEquipo": "JAGUARES DE ORO",
+      "tieneEntrenador": true,
+      "entrenador": "Alejandro Diaz",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_129",
+      "orden": "3",
+      "nombre": "Britney Safiro Olenka",
+      "rol": "MANAGER",
+      "telefono": "+51 981 087 758",
+      "numEquipo": "17",
+      "nombreEquipo": "JAGUARES DE ORO",
+      "tieneEntrenador": true,
+      "entrenador": "Josué Vera",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_130",
+      "orden": "5",
+      "nombre": "Isabel Correa",
+      "rol": "MANAGER",
+      "telefono": "+51 996 592 870",
+      "numEquipo": "17",
+      "nombreEquipo": "JAGUARES DE ORO",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_131",
+      "orden": "6",
+      "nombre": "Jean Carlos Rios",
+      "rol": "MANAGER",
+      "telefono": "+51 991 512 467",
+      "numEquipo": "17",
+      "nombreEquipo": "JAGUARES DE ORO",
+      "tieneEntrenador": true,
+      "entrenador": "Diego Bravo",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_132",
+      "orden": "7",
+      "nombre": "Juana Maria Falcon",
+      "rol": "MANAGER",
+      "telefono": "+51 973 827 510",
+      "numEquipo": "17",
+      "nombreEquipo": "JAGUARES DE ORO",
+      "tieneEntrenador": true,
+      "entrenador": "Mila Campuzano",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_133",
+      "orden": "8",
+      "nombre": "Pamela Morales",
+      "rol": "MANAGER",
+      "telefono": "+51 952 372 756",
+      "numEquipo": "17",
+      "nombreEquipo": "JAGUARES DE ORO",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_134",
+      "orden": "10",
+      "nombre": "Raul Chavez Inche",
+      "rol": "MANAGER",
+      "telefono": "+51 930 702 843",
+      "numEquipo": "17",
+      "nombreEquipo": "JAGUARES DE ORO",
+      "tieneEntrenador": true,
+      "entrenador": "Alejandro Diaz",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_135",
+      "orden": "11",
+      "nombre": "Rosmery Ochoa Ferrer",
+      "rol": "MANAGER",
+      "telefono": "+51 907 418 863",
+      "numEquipo": "17",
+      "nombreEquipo": "JAGUARES DE ORO",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_136",
+      "orden": "12",
+      "nombre": "Yusmely García",
+      "rol": "MANAGER",
+      "telefono": "+51 921 979 246",
+      "numEquipo": "17",
+      "nombreEquipo": "JAGUARES DE ORO",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_137",
+      "orden": "137",
+      "nombre": "Josue Aviles",
+      "rol": "CAPITANA",
+      "telefono": "0984975094",
+      "numEquipo": "17",
+      "nombreEquipo": "JATARI",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "JUAN FER REINOSO",
+      "sede": "CUENCA",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_138",
+      "orden": "138",
+      "nombre": "Estefania Castillo",
+      "rol": "MANAGER",
+      "telefono": "0983937853",
+      "numEquipo": "17",
+      "nombreEquipo": "JATARI",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "JUAN FER REINOSO",
+      "sede": "CUENCA",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_139",
+      "orden": "139",
+      "nombre": "Juan Diego Jara",
+      "rol": "MANAGER",
+      "telefono": "0987408003",
+      "numEquipo": "17",
+      "nombreEquipo": "JATARI",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "JUAN FER REINOSO",
+      "sede": "CUENCA",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_140",
+      "orden": "2",
+      "nombre": "Elvis Cuellar",
+      "rol": "MANAGER",
+      "telefono": "+51943064793",
+      "numEquipo": "18",
+      "nombreEquipo": "ÁNGELES DE FUEGO",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_141",
+      "orden": "2",
+      "nombre": "Evelyn Muñoz",
+      "rol": "MANAGER",
+      "telefono": "593958714988",
+      "numEquipo": "18",
+      "nombreEquipo": "SUMAQ KAWSAYKUNA",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_142",
+      "orden": "3",
+      "nombre": "Jaime Ibarra",
+      "rol": "MANAGER",
+      "telefono": "593996161745",
+      "numEquipo": "18",
+      "nombreEquipo": "SUMAQ KAWSAYKUNA",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_143",
+      "orden": "4",
+      "nombre": "Jonathan La Rosa",
+      "rol": "MANAGER",
+      "telefono": "593989838161",
+      "numEquipo": "18",
+      "nombreEquipo": "SUMAQ KAWSAYKUNA",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_144",
+      "orden": "1",
+      "nombre": "Soledad Ramirez",
+      "rol": "MANAGER",
+      "telefono": "593988674650",
+      "numEquipo": "18",
+      "nombreEquipo": "SUMAQ KAWSAYKUNA",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_145",
+      "orden": "3",
+      "nombre": "Joyce Marin",
+      "rol": "MANAGER",
+      "telefono": "+593993027018",
+      "numEquipo": "18",
+      "nombreEquipo": "ÁNGELES DE FUEGO",
+      "tieneEntrenador": true,
+      "entrenador": "Diego Bravo",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_146",
+      "orden": "4",
+      "nombre": "Lidia Crsitina Martinez Puente",
+      "rol": "MANAGER",
+      "telefono": "+51940243206",
+      "numEquipo": "18",
+      "nombreEquipo": "ÁNGELES DE FUEGO",
+      "tieneEntrenador": true,
+      "entrenador": "Mauricio Ramírez",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_147",
+      "orden": "5",
+      "nombre": "Raquel Riveros Ramos",
+      "rol": "MANAGER",
+      "telefono": "+51931059726",
+      "numEquipo": "18",
+      "nombreEquipo": "ÁNGELES DE FUEGO",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_148",
+      "orden": "6",
+      "nombre": "Rocio Ayvar Vega",
+      "rol": "MANAGER",
+      "telefono": "+51967197761",
+      "numEquipo": "18",
+      "nombreEquipo": "ÁNGELES DE FUEGO",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_149",
+      "orden": "1",
+      "nombre": "Tonny Gutiérrez",
+      "rol": "CAPITAN",
+      "telefono": "+51958058579",
+      "numEquipo": "18",
+      "nombreEquipo": "ÁNGELES DE FUEGO",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_150",
+      "orden": "4",
+      "nombre": "Alexander Yunga",
+      "rol": "MANAGER",
+      "telefono": "0999890352",
+      "numEquipo": "18",
+      "nombreEquipo": "VALHARYN",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "KERLY CARRILLO",
+      "sede": "CUENCA",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_151",
+      "orden": "5",
+      "nombre": "Blanca Orellana",
+      "rol": "MANAGER",
+      "telefono": "0983869325",
+      "numEquipo": "18",
+      "nombreEquipo": "VALHARYN",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "KERLY CARRILLO",
+      "sede": "CUENCA",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_152",
+      "orden": "1",
+      "nombre": "Cynthia Tixi",
+      "rol": "CAPITANA",
+      "telefono": "0958814888",
+      "numEquipo": "18",
+      "nombreEquipo": "VALHARYN",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "KERLY CARRILLO",
+      "sede": "CUENCA",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_153",
+      "orden": "7",
+      "nombre": "Leisi Medina Idrogo",
+      "rol": "MANAGER",
+      "telefono": "+51989063639",
+      "numEquipo": "19",
+      "nombreEquipo": "VIKINGOS DE FUEGO",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "LINID VALENCIA",
+      "sede": "Lima",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_154",
+      "orden": "2",
+      "nombre": "Angella Maria Bollet Gomez",
+      "rol": "MANAGER",
+      "telefono": "+51989455869",
+      "numEquipo": "19",
+      "nombreEquipo": "VIKINGOS DE FUEGO",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "LINID VALENCIA",
+      "sede": "Lima",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_155",
+      "orden": "1",
+      "nombre": "Juan Manuel Granda",
+      "rol": "CAPITAN",
+      "telefono": "+51947469418",
+      "numEquipo": "19",
+      "nombreEquipo": "VIKINGOS DE FUEGO",
+      "tieneEntrenador": true,
+      "entrenador": "Mike Boada",
+      "coordinador": "LINID VALENCIA",
+      "sede": "Lima",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_156",
+      "orden": "8",
+      "nombre": "Lucas Alberto Sanchez Silva",
+      "rol": "MANAGER",
+      "telefono": "+51999927725",
+      "numEquipo": "19",
+      "nombreEquipo": "VIKINGOS DE FUEGO",
+      "tieneEntrenador": true,
+      "entrenador": "Mila Campuzano",
+      "coordinador": "LINID VALENCIA",
+      "sede": "Lima",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_157",
+      "orden": "1",
+      "nombre": "Batioja Alexys",
+      "rol": "MANAGER",
+      "telefono": "0996856906",
+      "numEquipo": "19",
+      "nombreEquipo": "RYBAS IKIGAI",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_158",
+      "orden": "2",
+      "nombre": "Batioja Arturo",
+      "rol": "MANAGER",
+      "telefono": "0986672823",
+      "numEquipo": "19",
+      "nombreEquipo": "RYBAS IKIGAI",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_159",
+      "orden": "3",
+      "nombre": "Bustos Alexander",
+      "rol": "MANAGER",
+      "telefono": "0988790330",
+      "numEquipo": "19",
+      "nombreEquipo": "RYBAS IKIGAI",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_160",
+      "orden": "5",
+      "nombre": "Castilllo Ana Laura",
+      "rol": "MANAGER",
+      "telefono": "0993813010",
+      "numEquipo": "19",
+      "nombreEquipo": "RYBAS IKIGAI",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_161",
+      "orden": "4",
+      "nombre": "Chàvez Alexandra",
+      "rol": "MANAGER",
+      "telefono": "0982907381",
+      "numEquipo": "19",
+      "nombreEquipo": "RYBAS IKIGAI",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_162",
+      "orden": "6",
+      "nombre": "Mendoza Mauricio",
+      "rol": "MANAGER",
+      "telefono": "0990832845",
+      "numEquipo": "19",
+      "nombreEquipo": "RYBAS IKIGAI",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_163",
+      "orden": "7",
+      "nombre": "Robbys Mabel",
+      "rol": "MANAGER",
+      "telefono": "0986074127",
+      "numEquipo": "19",
+      "nombreEquipo": "RYBAS IKIGAI",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_164",
+      "orden": "8",
+      "nombre": "Valdez Heidy",
+      "rol": "MANAGER",
+      "telefono": "0983487965",
+      "numEquipo": "19",
+      "nombreEquipo": "RYBAS IKIGAI",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_165",
+      "orden": "9",
+      "nombre": "Vallejo Xavier",
+      "rol": "MANAGER",
+      "telefono": "0981767888",
+      "numEquipo": "19",
+      "nombreEquipo": "RYBAS IKIGAI",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_166",
+      "orden": "2",
+      "nombre": "Karina Valdiviezo",
+      "rol": "MANAGER",
+      "telefono": "0967241443",
+      "numEquipo": "19",
+      "nombreEquipo": "KAIROS-CUM",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "JUAN FER REINOSO",
+      "sede": "Cuenca",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_167",
+      "orden": "1",
+      "nombre": "Marcelo Riera",
+      "rol": "CAPITAN",
+      "telefono": "0983834620",
+      "numEquipo": "19",
+      "nombreEquipo": "KAIROS-CUM",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "JUAN FER REINOSO",
+      "sede": "Cuenca",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_168",
+      "orden": "3",
+      "nombre": "Correa Cristian",
+      "rol": "MANAGER",
+      "telefono": "0960641112",
+      "numEquipo": "20",
+      "nombreEquipo": "NANKURUNAISA",
+      "tieneEntrenador": true,
+      "entrenador": "José Torron",
+      "coordinador": "",
+      "sede": "Guayaquil",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_169",
+      "orden": "1",
+      "nombre": "Tenelema Andreina",
+      "rol": "MANAGER",
+      "telefono": "0990196376",
+      "numEquipo": "20",
+      "nombreEquipo": "NANKURUNAISA",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "",
+      "sede": "Guayaquil",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_170",
+      "orden": "2",
+      "nombre": "Diego Barbieri",
+      "rol": "MANAGER",
+      "telefono": "951815674",
+      "numEquipo": "20",
+      "nombreEquipo": "KUNTUR MARKA",
+      "tieneEntrenador": true,
+      "entrenador": "Alejandro Diaz",
+      "coordinador": "LINID VALENCIA",
+      "sede": "Lima",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_171",
+      "orden": "7",
+      "nombre": "Piero Alessandro Portal Pasquel",
+      "rol": "MANAGER",
+      "telefono": "962559832",
+      "numEquipo": "20",
+      "nombreEquipo": "KUNTUR MARKA",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "LINID VALENCIA",
+      "sede": "Lima",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_172",
+      "orden": "1",
+      "nombre": "Alexandra Tapullima",
+      "rol": "CAPITANA",
+      "telefono": "941842840",
+      "numEquipo": "20",
+      "nombreEquipo": "KUNTUR MARKA",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "LINID VALENCIA",
+      "sede": "Lima",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_173",
+      "orden": "1",
+      "nombre": "Paulina Cedillo",
+      "rol": "CAPITANA",
+      "telefono": "0958927854",
+      "numEquipo": "20",
+      "nombreEquipo": "KISMET WAYRA",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "KERLY CARRILLO",
+      "sede": "Cuenca",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_174",
+      "orden": "3",
+      "nombre": "Carlos Moncayo",
+      "rol": "MANAGER",
+      "telefono": "0963021449",
+      "numEquipo": "20",
+      "nombreEquipo": "KISMET WAYRA",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "KERLY CARRILLO",
+      "sede": "Cuenca",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_175",
+      "orden": "2",
+      "nombre": "Edison Yunga",
+      "rol": "MANAGER",
+      "telefono": "0998280875",
+      "numEquipo": "20",
+      "nombreEquipo": "KISMET WAYRA",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "KERLY CARRILLO",
+      "sede": "Cuenca",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_176",
+      "orden": "1",
+      "nombre": "Guarochico Adrianna",
+      "rol": "MANAGER",
+      "telefono": "0984613232",
+      "numEquipo": "21",
+      "nombreEquipo": "RAGNAROK",
+      "tieneEntrenador": true,
+      "entrenador": "Mildred Muñoz",
+      "coordinador": "",
+      "sede": "Guayaquil",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_177",
+      "orden": "2",
+      "nombre": "Ramírez Jorge",
+      "rol": "MANAGER",
+      "telefono": "0989743818",
+      "numEquipo": "21",
+      "nombreEquipo": "RAGNAROK",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "",
+      "sede": "Guayaquil",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_178",
+      "orden": "5",
+      "nombre": "Ariskerla Montano Miranda",
+      "rol": "MANAGER",
+      "telefono": "979375441",
+      "numEquipo": "21",
+      "nombreEquipo": "TEMPLARIOS DEL ALBA",
+      "tieneEntrenador": true,
+      "entrenador": "Mila Campuzano",
+      "coordinador": "LINID VALENCIA",
+      "sede": "Lima",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_179",
+      "orden": "4",
+      "nombre": "Jose Alonso Galvez Lopez",
+      "rol": "MANAGER",
+      "telefono": "962338667",
+      "numEquipo": "21",
+      "nombreEquipo": "TEMPLARIOS DEL ALBA",
+      "tieneEntrenador": true,
+      "entrenador": "Alejandro Diaz",
+      "coordinador": "LINID VALENCIA",
+      "sede": "Lima",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_180",
+      "orden": "3",
+      "nombre": "Milagros Castañeda Orbe",
+      "rol": "MANAGER",
+      "telefono": "934593496",
+      "numEquipo": "21",
+      "nombreEquipo": "TEMPLARIOS DEL ALBA",
+      "tieneEntrenador": true,
+      "entrenador": "Mauricio Ramírez",
+      "coordinador": "LINID VALENCIA",
+      "sede": "Lima",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_181",
+      "orden": "4",
+      "nombre": "Axel Angulo",
+      "rol": "MANAGER",
+      "telefono": "0985726631",
+      "numEquipo": "22",
+      "nombreEquipo": "TITANES KOTETSU",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "",
+      "sede": "Guayaquil",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_182",
+      "orden": "5",
+      "nombre": "Charo Yaneth Aponte Pérez",
+      "rol": "MANAGER",
+      "telefono": "980648582",
+      "numEquipo": "22",
+      "nombreEquipo": "LEGENDARIOS DEL SAMSARA",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "LINID VALENCIA",
+      "sede": "Lima",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_183",
+      "orden": "4",
+      "nombre": "Grezia Maia Jolly Vera",
+      "rol": "MANAGER",
+      "telefono": "920738765",
+      "numEquipo": "22",
+      "nombreEquipo": "LEGENDARIOS DEL SAMSARA",
+      "tieneEntrenador": true,
+      "entrenador": "Mauricio Ramírez",
+      "coordinador": "LINID VALENCIA",
+      "sede": "Lima",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_184",
+      "orden": "1",
+      "nombre": "Rosmery Ochoa Ferrer",
+      "rol": "CAPITANA",
+      "telefono": "989665820",
+      "numEquipo": "22",
+      "nombreEquipo": "LEGENDARIOS DEL SAMSARA",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "LINID VALENCIA",
+      "sede": "Lima",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_185",
+      "orden": "1",
+      "nombre": "VERONICA CLAVIJO",
+      "rol": "CAPITAN",
+      "telefono": "",
+      "numEquipo": "21",
+      "nombreEquipo": "LOTUS IKIGAI",
+      "tieneEntrenador": true,
+      "entrenador": "JUAN FER REINOSO",
+      "coordinador": "FERNANDO MENDOZA",
+      "sede": "CUENCA",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_186",
+      "orden": "2",
+      "nombre": "SEBASTIAN RIVAS",
+      "rol": "MANAGER",
+      "telefono": "",
+      "numEquipo": "21",
+      "nombreEquipo": "LOTUS IKIGAI",
+      "tieneEntrenador": true,
+      "entrenador": "JUAN FER REINOSO",
+      "coordinador": "FERNANDO MENDOZA",
+      "sede": "CUENCA",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_187",
+      "orden": "3",
+      "nombre": "Francisco Montoya",
+      "rol": "MANAGER",
+      "telefono": "0968103800",
+      "numEquipo": "22",
+      "nombreEquipo": "TITANES KOTETSU",
+      "tieneEntrenador": true,
+      "entrenador": "Mila Campuzano",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Guayaquil",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_188",
+      "orden": "4",
+      "nombre": "Giovanna Palomino Marcos",
+      "rol": "MANAGER",
+      "telefono": "993 717 944",
+      "numEquipo": "23",
+      "nombreEquipo": "SAMURAI KALLPA",
+      "tieneEntrenador": true,
+      "entrenador": "Alejandro Diaz",
+      "coordinador": "LINID VALENCIA",
+      "sede": "Lima",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_189",
+      "orden": "2",
+      "nombre": "Jessica López López",
+      "rol": "MANAGER",
+      "telefono": "951 381 389",
+      "numEquipo": "23",
+      "nombreEquipo": "SAMURAI KALLPA",
+      "tieneEntrenador": true,
+      "entrenador": "Alejandro Diaz",
+      "coordinador": "LINID VALENCIA",
+      "sede": "Lima",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_190",
+      "orden": "3",
+      "nombre": "Fernando Abel López López",
+      "rol": "MANAGER",
+      "telefono": "981 237 577",
+      "numEquipo": "23",
+      "nombreEquipo": "SAMURAI KALLPA",
+      "tieneEntrenador": true,
+      "entrenador": "David Sosa",
+      "coordinador": "LINID VALENCIA",
+      "sede": "Lima",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_191",
+      "orden": "5",
+      "nombre": "Gissella Huaman Celestino",
+      "rol": "MANAGER",
+      "telefono": "969 587 076",
+      "numEquipo": "23",
+      "nombreEquipo": "SAMURAI KALLPA",
+      "tieneEntrenador": true,
+      "entrenador": "Diego Bravo",
+      "coordinador": "LINID VALENCIA",
+      "sede": "Lima",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_192",
+      "orden": "1",
+      "nombre": "Gareth Ramos Pérez",
+      "rol": "MANAGER",
+      "telefono": "946 011 882",
+      "numEquipo": "23",
+      "nombreEquipo": "SAMURAI KALLPA",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "LINID VALENCIA",
+      "sede": "Lima",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_193",
+      "orden": "7",
+      "nombre": "Vaneza Ramírez",
+      "rol": "MANAGER",
+      "telefono": "913 863 730",
+      "numEquipo": "23",
+      "nombreEquipo": "SAMURAI KALLPA",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "LINID VALENCIA",
+      "sede": "Lima",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_194",
+      "orden": "6",
+      "nombre": "David Emerson Contreras Luchine",
+      "rol": "MANAGER",
+      "telefono": "941 433 268",
+      "numEquipo": "23",
+      "nombreEquipo": "SAMURAI KALLPA",
+      "tieneEntrenador": true,
+      "entrenador": "Isaac Betancourt",
+      "coordinador": "LINID VALENCIA",
+      "sede": "Lima",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_195",
+      "orden": "2",
+      "nombre": "Eduardo Haro",
+      "rol": "MANAGER",
+      "telefono": "098057981",
+      "numEquipo": "24",
+      "nombreEquipo": "ALKHEMIA FINIX",
+      "tieneEntrenador": true,
+      "entrenador": "David Sosa",
+      "coordinador": "",
+      "sede": "Guayaquil",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_196",
+      "orden": "2",
+      "nombre": "Ana Carina Cardenas",
+      "rol": "MANAGER",
+      "telefono": "+51996468297",
+      "numEquipo": "24",
+      "nombreEquipo": "KAIRU",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "LINID VALENCIA",
+      "sede": "LIMA",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_197",
+      "orden": "4",
+      "nombre": "Elizabeth Huamani",
+      "rol": "MANAGER",
+      "telefono": "+51947676664",
+      "numEquipo": "24",
+      "nombreEquipo": "KAIRU",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "LINID VALENCIA",
+      "sede": "LIMA",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_198",
+      "orden": "5",
+      "nombre": "Fernando Juan Lopez Melo",
+      "rol": "MANAGER",
+      "telefono": "+51978581515",
+      "numEquipo": "24",
+      "nombreEquipo": "KAIRU",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "LINID VALENCIA",
+      "sede": "LIMA",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_199",
+      "orden": "6",
+      "nombre": "Geraldine Stephanie Otrera",
+      "rol": "MANAGER",
+      "telefono": "+51944521634",
+      "numEquipo": "24",
+      "nombreEquipo": "KAIRU",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "LINID VALENCIA",
+      "sede": "LIMA",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_200",
+      "orden": "1",
+      "nombre": "Isabel Correa",
+      "rol": "CAPITANA",
+      "telefono": "+51996592870",
+      "numEquipo": "24",
+      "nombreEquipo": "KAIRU",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "LINID VALENCIA",
+      "sede": "LIMA",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_201",
+      "orden": "8",
+      "nombre": "Lely Altamirano Llantoy",
+      "rol": "MANAGER",
+      "telefono": "+51969721562",
+      "numEquipo": "24",
+      "nombreEquipo": "KAIRU",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "LINID VALENCIA",
+      "sede": "LIMA",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_202",
+      "orden": "9",
+      "nombre": "Luis Alberto Hernandez Mendoza",
+      "rol": "MANAGER",
+      "telefono": "+51956268830",
+      "numEquipo": "24",
+      "nombreEquipo": "KAIRU",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "LINID VALENCIA",
+      "sede": "LIMA",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_203",
+      "orden": "10",
+      "nombre": "Marina Patricia Cruzado Mamani",
+      "rol": "MANAGER",
+      "telefono": "+51987724882",
+      "numEquipo": "24",
+      "nombreEquipo": "KAIRU",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "LINID VALENCIA",
+      "sede": "LIMA",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_204",
+      "orden": "11",
+      "nombre": "Otty Zuley Urteaga Silva",
+      "rol": "MANAGER",
+      "telefono": "+51976232368",
+      "numEquipo": "24",
+      "nombreEquipo": "KAIRU",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "LINID VALENCIA",
+      "sede": "LIMA",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_205",
+      "orden": "205",
+      "nombre": "Yenny Paola Flores Tipismana",
+      "rol": "MANAGER",
+      "telefono": "+51963421178",
+      "numEquipo": "24",
+      "nombreEquipo": "KAIRU",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "LINID VALENCIA",
+      "sede": "LIMA",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_206",
+      "orden": "5",
+      "nombre": "Mariela Lopez",
+      "rol": "MANAGER",
+      "telefono": "0997035955",
+      "numEquipo": "25",
+      "nombreEquipo": "WAKANDA TAKEMARU",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "",
+      "sede": "Guayaquil",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_207",
+      "orden": "1",
+      "nombre": "Manuel Yakima Rivera",
+      "rol": "CAPITAN",
+      "telefono": "996612880",
+      "numEquipo": "25",
+      "nombreEquipo": "SINCHI RUNA",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "LINID VALENCIA",
+      "sede": "LIMA",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_208",
+      "orden": "2",
+      "nombre": "Marco Antonio Villarreal",
+      "rol": "MANAGER",
+      "telefono": "962511575",
+      "numEquipo": "25",
+      "nombreEquipo": "SINCHI RUNA",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "LINID VALENCIA",
+      "sede": "LIMA",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_209",
+      "orden": "6",
+      "nombre": "Pedro Solis",
+      "rol": "MANAGER",
+      "telefono": "0990893926",
+      "numEquipo": "22",
+      "nombreEquipo": "TITANES KOTETSU",
+      "tieneEntrenador": true,
+      "entrenador": "Mila Campuzano",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Guayaquil",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_210",
+      "orden": "1",
+      "nombre": "Sharon Andrade",
+      "rol": "CAPITANA",
+      "telefono": "0998579112",
+      "numEquipo": "22",
+      "nombreEquipo": "TITANES KOTETSU",
+      "tieneEntrenador": true,
+      "entrenador": "Mike Boada",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Guayaquil",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_211",
+      "orden": "3",
+      "nombre": "Shirley Velasquez",
+      "rol": "MANAGER",
+      "telefono": "0980422186",
+      "numEquipo": "25",
+      "nombreEquipo": "WAKANDA TAKEMARU",
+      "tieneEntrenador": true,
+      "entrenador": "Mauricio Ramírez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Guayaquil",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_212",
+      "orden": "2",
+      "nombre": "Paola Vera",
+      "rol": "MANAGER",
+      "telefono": "0983573513",
+      "numEquipo": "25",
+      "nombreEquipo": "WAKANDA TAKEMARU",
+      "tieneEntrenador": true,
+      "entrenador": "Pamela Carrillo",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Guayaquil",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_213",
+      "orden": "2",
+      "nombre": "Jahaira Muñoz",
+      "rol": "MANAGER",
+      "telefono": "0969610316",
+      "numEquipo": "26",
+      "nombreEquipo": "NINA RIKUKUNA",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Guayaquil",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_214",
+      "orden": "4",
+      "nombre": "Erik Vaca",
+      "rol": "MANAGER",
+      "telefono": "0984270873",
+      "numEquipo": "25",
+      "nombreEquipo": "WAKANDA TAKEMARU",
+      "tieneEntrenador": true,
+      "entrenador": "Alejandro Diaz",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Guayaquil",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_215",
+      "orden": "1",
+      "nombre": "Luis Pruna",
+      "rol": "CAPITAN",
+      "telefono": "0988759534",
+      "numEquipo": "25",
+      "nombreEquipo": "WAKANDA TAKEMARU",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Guayaquil",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_216",
+      "orden": "1",
+      "nombre": "Jose Maria Velategui",
+      "rol": "CAPITAN",
+      "telefono": "0987216770",
+      "numEquipo": "26",
+      "nombreEquipo": "NINA RIKUKUNA",
+      "tieneEntrenador": true,
+      "entrenador": "Mike Boada",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Guayaquil",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_217",
+      "orden": "3",
+      "nombre": "Danna Ochoa",
+      "rol": "MANAGER",
+      "telefono": "0992569679",
+      "numEquipo": "26",
+      "nombreEquipo": "NINA RIKUKUNA",
+      "tieneEntrenador": true,
+      "entrenador": "Mila Campuzano",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Guayaquil",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_218",
+      "orden": "3",
+      "nombre": "Brian Steve Sangay Salvatierra",
+      "rol": "MANAGER",
+      "telefono": "+51902807431",
+      "numEquipo": "26",
+      "nombreEquipo": "PROMETHEUS IGNIS",
+      "tieneEntrenador": true,
+      "entrenador": "Josué Vera",
+      "coordinador": "LINID VALENCIA",
+      "sede": "Lima",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_219",
+      "orden": "5",
+      "nombre": "Camila Alegria Verastegui Duran",
+      "rol": "MANAGER",
+      "telefono": "+51930526967",
+      "numEquipo": "26",
+      "nombreEquipo": "PROMETHEUS IGNIS",
+      "tieneEntrenador": true,
+      "entrenador": "Josué Vera",
+      "coordinador": "LINID VALENCIA",
+      "sede": "Lima",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_220",
+      "orden": "9",
+      "nombre": "Maria Olarte Barrientos",
+      "rol": "MANAGER",
+      "telefono": "+51948162114",
+      "numEquipo": "26",
+      "nombreEquipo": "PROMETHEUS IGNIS",
+      "tieneEntrenador": true,
+      "entrenador": "Josué Vera",
+      "coordinador": "LINID VALENCIA",
+      "sede": "Lima",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_221",
+      "orden": "4",
+      "nombre": "Bryan Rodny Lopez Hanco",
+      "rol": "MANAGER",
+      "telefono": "+51970764599",
+      "numEquipo": "26",
+      "nombreEquipo": "PROMETHEUS IGNIS",
+      "tieneEntrenador": true,
+      "entrenador": "Josué Vera",
+      "coordinador": "LINID VALENCIA",
+      "sede": "Lima",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_222",
+      "orden": "2",
+      "nombre": "Anita Esperanza Flores Tipismana",
+      "rol": "MANAGER",
+      "telefono": "+51998795068",
+      "numEquipo": "26",
+      "nombreEquipo": "PROMETHEUS IGNIS",
+      "tieneEntrenador": true,
+      "entrenador": "Josué Vera",
+      "coordinador": "LINID VALENCIA",
+      "sede": "Lima",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_223",
+      "orden": "1",
+      "nombre": "Vicente Benitez",
+      "rol": "CAPITAN",
+      "telefono": "0993239903",
+      "numEquipo": "27",
+      "nombreEquipo": "AQA MAGMA",
+      "tieneEntrenador": true,
+      "entrenador": "Mike Boada",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Guayaquil",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_224",
+      "orden": "2",
+      "nombre": "Karina Zamora",
+      "rol": "MANAGER",
+      "telefono": "0993793890",
+      "numEquipo": "27",
+      "nombreEquipo": "AQA MAGMA",
+      "tieneEntrenador": true,
+      "entrenador": "Alejandro Diaz",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Guayaquil",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_225",
+      "orden": "4",
+      "nombre": "Jose Israel Maquera Montoya",
+      "rol": "MANAGER",
+      "telefono": "+51904408130",
+      "numEquipo": "27",
+      "nombreEquipo": "KAY THERON",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "LEYLA PASQUEL",
+      "sede": "Lima",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_226",
+      "orden": "2",
+      "nombre": "Grezia Maria Jolly Vera",
+      "rol": "MANAGER",
+      "telefono": "+51920738765",
+      "numEquipo": "27",
+      "nombreEquipo": "KAY THERON",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "LEYLA PASQUEL",
+      "sede": "Lima",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_227",
+      "orden": "3",
+      "nombre": "Gustavo Adolfo Fernandez Espinoza",
+      "rol": "MANAGER",
+      "telefono": "+51930326809",
+      "numEquipo": "27",
+      "nombreEquipo": "KAY THERON",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "LEYLA PASQUEL",
+      "sede": "Lima",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_228",
+      "orden": "1",
+      "nombre": "Gina Cardenas Lopez",
+      "rol": "MANAGER",
+      "telefono": "+51999699649",
+      "numEquipo": "27",
+      "nombreEquipo": "KAY THERON",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "LEYLA PASQUEL",
+      "sede": "Lima",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_229",
+      "orden": "1",
+      "nombre": "Laura Toapanta",
+      "rol": "CAPITANA",
+      "telefono": "0991802330",
+      "numEquipo": "28",
+      "nombreEquipo": "KRAXX PHOENIX",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "JOSUE VERA",
+      "sede": "Guayaquil",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_230",
+      "orden": "1",
+      "nombre": "Giovanna Palomino Marcos",
+      "rol": "CAPITAN",
+      "telefono": "+51922042189",
+      "numEquipo": "28",
+      "nombreEquipo": "UBUNTU",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "LINID VALENCIA",
+      "sede": "Lima",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_231",
+      "orden": "2",
+      "nombre": "Liz Carol Trujillo Mallqui",
+      "rol": "MANAGER",
+      "telefono": "+51980496819",
+      "numEquipo": "28",
+      "nombreEquipo": "UBUNTU",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "LINID VALENCIA",
+      "sede": "Lima",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_232",
+      "orden": "3",
+      "nombre": "Francisco Manuel Huaman Rios",
+      "rol": "MANAGER",
+      "telefono": "+51988595686",
+      "numEquipo": "28",
+      "nombreEquipo": "UBUNTU",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "LINID VALENCIA",
+      "sede": "Lima",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_233",
+      "orden": "1",
+      "nombre": "Mabel Robbys",
+      "rol": "CAPITANA",
+      "telefono": "0986074127",
+      "numEquipo": "29",
+      "nombreEquipo": "YUKI NO RYU",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "JOSUE VERA",
+      "sede": "Guayaquil",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_234",
+      "orden": "2",
+      "nombre": "Tania Aurora Sanchez Castro",
+      "rol": "MANAGER",
+      "telefono": "+51981295423",
+      "numEquipo": "29",
+      "nombreEquipo": "QUANTUM PHOENIX",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "LEYLA PASQUEL",
+      "sede": "Lima",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_235",
+      "orden": "1",
+      "nombre": "Italo Alonso Roman Nomura",
+      "rol": "MANAGER",
+      "telefono": "+51997213218",
+      "numEquipo": "29",
+      "nombreEquipo": "QUANTUM PHOENIX",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "LEYLA PASQUEL",
+      "sede": "Lima",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_236",
+      "orden": "4",
+      "nombre": "Karina Garcia",
+      "rol": "MANAGER",
+      "telefono": "0939935732",
+      "numEquipo": "30",
+      "nombreEquipo": "METAMORFOSIS",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "JONATHAN LA ROSA",
+      "sede": "Guayaquil",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_237",
+      "orden": "2",
+      "nombre": "Alvaro Angarita",
+      "rol": "MANAGER",
+      "telefono": "0959114621",
+      "numEquipo": "30",
+      "nombreEquipo": "METAMORFOSIS",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "JONATHAN LA ROSA",
+      "sede": "Guayaquil",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_238",
+      "orden": "1",
+      "nombre": "Wilson Vallejo",
+      "rol": "CAPITAN",
+      "telefono": "0981767888",
+      "numEquipo": "30",
+      "nombreEquipo": "METAMORFOSIS",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "JONATHAN LA ROSA",
+      "sede": "Guayaquil",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_239",
+      "orden": "3",
+      "nombre": "Erik Vaca",
+      "rol": "MANAGER",
+      "telefono": "0984270873",
+      "numEquipo": "30",
+      "nombreEquipo": "METAMORFOSIS",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "JONATHAN LA ROSA",
+      "sede": "Guayaquil",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_240",
+      "orden": "1",
+      "nombre": "Fernando Lopez Lopez",
+      "rol": "CAPITAN",
+      "telefono": "+51981237577",
+      "numEquipo": "30",
+      "nombreEquipo": "-",
+      "tieneEntrenador": true,
+      "entrenador": "Alejandro Diaz",
+      "coordinador": "LINID VALENCIA",
+      "sede": "Lima",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_241",
+      "orden": "4",
+      "nombre": "Diego Silva",
+      "rol": "MANAGER",
+      "telefono": "+1(609)6353345",
+      "numEquipo": "31",
+      "nombreEquipo": "YUTAKA-KAIROZEN",
+      "tieneEntrenador": true,
+      "entrenador": "Linid Valencia",
+      "coordinador": "JONATHAN LA ROSA",
+      "sede": "Guayaquil",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_242",
+      "orden": "1",
+      "nombre": "Belen Garcia",
+      "rol": "CAPITANA",
+      "telefono": "0968306238",
+      "numEquipo": "31",
+      "nombreEquipo": "YUTAKA-KAIROZEN",
+      "tieneEntrenador": true,
+      "entrenador": "Linid Valencia",
+      "coordinador": "JONATHAN LA ROSA",
+      "sede": "Guayaquil",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_243",
+      "orden": "2",
+      "nombre": "Mariela Guerrero",
+      "rol": "MANAGER",
+      "telefono": "0993083068",
+      "numEquipo": "31",
+      "nombreEquipo": "YUTAKA-KAIROZEN",
+      "tieneEntrenador": true,
+      "entrenador": "Linid Valencia",
+      "coordinador": "JONATHAN LA ROSA",
+      "sede": "Guayaquil",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_244",
+      "orden": "3",
+      "nombre": "Leo Angarita",
+      "rol": "MANAGER",
+      "telefono": "0998895959",
+      "numEquipo": "31",
+      "nombreEquipo": "YUTAKA-KAIROZEN",
+      "tieneEntrenador": true,
+      "entrenador": "Linid Valencia",
+      "coordinador": "JONATHAN LA ROSA",
+      "sede": "Guayaquil",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_245",
+      "orden": "1",
+      "nombre": "Isabella Torres",
+      "rol": "CAPITANA",
+      "telefono": "0961901809",
+      "numEquipo": "32",
+      "nombreEquipo": "ALQUIMIA",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "JONATHAN LA ROSA",
+      "sede": "Guayaquil",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_246",
+      "orden": "2",
+      "nombre": "Ivonne Recaurte",
+      "rol": "MANAGER",
+      "telefono": "0998775445",
+      "numEquipo": "32",
+      "nombreEquipo": "ALQUIMIA",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "JONATHAN LA ROSA",
+      "sede": "Guayaquil",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_247",
+      "orden": "1",
+      "nombre": "Enrrique Franco",
+      "rol": "CAPITAN",
+      "telefono": "0980805649",
+      "numEquipo": "33",
+      "nombreEquipo": "ARÚTAM TSUNKI",
+      "tieneEntrenador": true,
+      "entrenador": "Mauricio Ramírez",
+      "coordinador": "JONATHAN LA ROSA",
+      "sede": "Guayaquil",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_248",
+      "orden": "2",
+      "nombre": "Evelyn Orellana",
+      "rol": "MANAGER",
+      "telefono": "0981969172",
+      "numEquipo": "33",
+      "nombreEquipo": "ARÚTAM TSUNKI",
+      "tieneEntrenador": true,
+      "entrenador": "Mauricio Ramírez",
+      "coordinador": "JONATHAN LA ROSA",
+      "sede": "Guayaquil",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_249",
+      "orden": "3",
+      "nombre": "Fernanda Ibañez",
+      "rol": "MANAGER",
+      "telefono": "0985800390",
+      "numEquipo": "33",
+      "nombreEquipo": "ARÚTAM TSUNKI",
+      "tieneEntrenador": true,
+      "entrenador": "Mauricio Ramírez",
+      "coordinador": "JONATHAN LA ROSA",
+      "sede": "Guayaquil",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_250",
+      "orden": "2",
+      "nombre": "Oscar Moran",
+      "rol": "MANAGER",
+      "telefono": "0962806824",
+      "numEquipo": "34",
+      "nombreEquipo": "FRACTAL SHINE",
+      "tieneEntrenador": true,
+      "entrenador": "Kerlie Carrillo",
+      "coordinador": "JONATHAN LA ROSA",
+      "sede": "Guayaquil",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_251",
+      "orden": "5",
+      "nombre": "Pilar Rodriguez",
+      "rol": "MANAGER",
+      "telefono": "0981359517",
+      "numEquipo": "34",
+      "nombreEquipo": "FRACTAL SHINE",
+      "tieneEntrenador": true,
+      "entrenador": "Kerlie Carrillo",
+      "coordinador": "JONATHAN LA ROSA",
+      "sede": "Guayaquil",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_252",
+      "orden": "1",
+      "nombre": "Abigail Ordoñez",
+      "rol": "MANAGER",
+      "telefono": "+5930984499954",
+      "numEquipo": "79",
+      "nombreEquipo": "Ayni Inti Sarpay",
+      "tieneEntrenador": true,
+      "entrenador": "Alejandro Diaz",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C1",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_253",
+      "orden": "2",
+      "nombre": "Margarita Lema",
+      "rol": "MANAGER",
+      "telefono": "+5930983061351",
+      "numEquipo": "79",
+      "nombreEquipo": "Ayni Inti Sarpay",
+      "tieneEntrenador": true,
+      "entrenador": "Mike Boada",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C1",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_254",
+      "orden": "3",
+      "nombre": "Ruth Parreño",
+      "rol": "MANAGER",
+      "telefono": "+5930992310545",
+      "numEquipo": "79",
+      "nombreEquipo": "Ayni Inti Sarpay",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Gómez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C1",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_255",
+      "orden": "2",
+      "nombre": "Alejandro Arteaga",
+      "rol": "MANAGER",
+      "telefono": "+5930995390495",
+      "numEquipo": "80",
+      "nombreEquipo": "Vuitanta",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C2",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_256",
+      "orden": "1",
+      "nombre": "Angie León",
+      "rol": "MANAGER",
+      "telefono": "+5930997473043",
+      "numEquipo": "80",
+      "nombreEquipo": "Vuitanta",
+      "tieneEntrenador": true,
+      "entrenador": "Alejandro Diaz",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C2",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_257",
+      "orden": "3",
+      "nombre": "Christian Bustamante",
+      "rol": "MANAGER",
+      "telefono": "+5930985860761",
+      "numEquipo": "80",
+      "nombreEquipo": "Vuitanta",
+      "tieneEntrenador": true,
+      "entrenador": "José Torron",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C2",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_258",
+      "orden": "4",
+      "nombre": "Daniel Vera",
+      "rol": "MANAGER",
+      "telefono": "+5930998731046",
+      "numEquipo": "80",
+      "nombreEquipo": "Vuitanta",
+      "tieneEntrenador": true,
+      "entrenador": "Christian Tito",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C2",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_259",
+      "orden": "5",
+      "nombre": "Jennifer Villavicencio",
+      "rol": "MANAGER",
+      "telefono": "+5930979138817",
+      "numEquipo": "80",
+      "nombreEquipo": "Vuitanta",
+      "tieneEntrenador": true,
+      "entrenador": "Christian Tito",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C2",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_260",
+      "orden": "2",
+      "nombre": "Carlos Intriago",
+      "rol": "MANAGER",
+      "telefono": "+5930996841945",
+      "numEquipo": "81",
+      "nombreEquipo": "Dracarys",
+      "tieneEntrenador": true,
+      "entrenador": "Chuy Acosta",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C1",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_261",
+      "orden": "3",
+      "nombre": "Evelyn Román",
+      "rol": "MANAGER",
+      "telefono": "+5930987159621",
+      "numEquipo": "81",
+      "nombreEquipo": "Dracarys",
+      "tieneEntrenador": true,
+      "entrenador": "Alejandro Diaz",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C1",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_262",
+      "orden": "1",
+      "nombre": "Mafer Calderón",
+      "rol": "MANAGER",
+      "telefono": "+5930995297942",
+      "numEquipo": "81",
+      "nombreEquipo": "Dracarys",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Gómez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C1",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_263",
+      "orden": "6",
+      "nombre": "Miriam Flores",
+      "rol": "MANAGER",
+      "telefono": "+5930988035696",
+      "numEquipo": "81",
+      "nombreEquipo": "Dracarys",
+      "tieneEntrenador": true,
+      "entrenador": "José Torron",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C1",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_264",
+      "orden": "7",
+      "nombre": "Miroslava Román",
+      "rol": "MANAGER",
+      "telefono": "+5930984425095",
+      "numEquipo": "81",
+      "nombreEquipo": "Dracarys",
+      "tieneEntrenador": true,
+      "entrenador": "Mildred Muñoz",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C1",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_265",
+      "orden": "2",
+      "nombre": "David Ruiz",
+      "rol": "MANAGER",
+      "telefono": "+5930991608776",
+      "numEquipo": "82",
+      "nombreEquipo": "Toruk Makto",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Gómez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C1",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_266",
+      "orden": "3",
+      "nombre": "Génesis Méndez",
+      "rol": "MANAGER",
+      "telefono": "+5930998307134",
+      "numEquipo": "82",
+      "nombreEquipo": "Toruk Makto",
+      "tieneEntrenador": true,
+      "entrenador": "Chuy Acosta",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C1",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_267",
+      "orden": "4",
+      "nombre": "Mery Largo",
+      "rol": "MANAGER",
+      "telefono": "+5930995824801",
+      "numEquipo": "82",
+      "nombreEquipo": "Toruk Makto",
+      "tieneEntrenador": true,
+      "entrenador": "Alejandro Diaz",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C1",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_268",
+      "orden": "5",
+      "nombre": "Ronald Cargua",
+      "rol": "MANAGER",
+      "telefono": "+5930995791221",
+      "numEquipo": "82",
+      "nombreEquipo": "Toruk Makto",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C1",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_269",
+      "orden": "6",
+      "nombre": "Sandy Monserrate",
+      "rol": "MANAGER",
+      "telefono": "+5930962043232",
+      "numEquipo": "82",
+      "nombreEquipo": "Toruk Makto",
+      "tieneEntrenador": true,
+      "entrenador": "Mildred Muñoz",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C1",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_270",
+      "orden": "7",
+      "nombre": "Sara Fernández",
+      "rol": "MANAGER",
+      "telefono": "+5930998631853",
+      "numEquipo": "82",
+      "nombreEquipo": "Toruk Makto",
+      "tieneEntrenador": true,
+      "entrenador": "Mike Boada",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C1",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_271",
+      "orden": "8",
+      "nombre": "Savie Barriga",
+      "rol": "MANAGER",
+      "telefono": "+5930986987448",
+      "numEquipo": "82",
+      "nombreEquipo": "Toruk Makto",
+      "tieneEntrenador": true,
+      "entrenador": "Chuy Acosta",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C1",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_272",
+      "orden": "9",
+      "nombre": "Sebastián Ulloa",
+      "rol": "MANAGER",
+      "telefono": "+5930968952298",
+      "numEquipo": "82",
+      "nombreEquipo": "Toruk Makto",
+      "tieneEntrenador": true,
+      "entrenador": "Mike Boada",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C1",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_273",
+      "orden": "1",
+      "nombre": "Stefany Herrera",
+      "rol": "MANAGER",
+      "telefono": "+5930995342526",
+      "numEquipo": "82",
+      "nombreEquipo": "Toruk Makto",
+      "tieneEntrenador": true,
+      "entrenador": "Mildred Muñoz",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C1",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_274",
+      "orden": "2",
+      "nombre": "Abigail Calderón",
+      "rol": "MANAGER",
+      "telefono": "+5930958918232",
+      "numEquipo": "83",
+      "nombreEquipo": "Tzucan",
+      "tieneEntrenador": true,
+      "entrenador": "Mike Boada",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C2",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_275",
+      "orden": "3",
+      "nombre": "Alba Baez",
+      "rol": "MANAGER",
+      "telefono": "+5930963146246",
+      "numEquipo": "83",
+      "nombreEquipo": "Tzucan",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Gómez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C2",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_276",
+      "orden": "4",
+      "nombre": "Andrés Armas",
+      "rol": "MANAGER",
+      "telefono": "+5930984939196",
+      "numEquipo": "83",
+      "nombreEquipo": "Tzucan",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C2",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_277",
+      "orden": "5",
+      "nombre": "Andrés Banda",
+      "rol": "MANAGER",
+      "telefono": "+5930997019475",
+      "numEquipo": "83",
+      "nombreEquipo": "Tzucan",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C2",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_278",
+      "orden": "6",
+      "nombre": "Anthony Velastegui",
+      "rol": "MANAGER",
+      "telefono": "+5930985519571",
+      "numEquipo": "83",
+      "nombreEquipo": "Tzucan",
+      "tieneEntrenador": true,
+      "entrenador": "Mike Boada",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C2",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_279",
+      "orden": "7",
+      "nombre": "Carlos Naveda",
+      "rol": "MANAGER",
+      "telefono": "+5930984606993",
+      "numEquipo": "83",
+      "nombreEquipo": "Tzucan",
+      "tieneEntrenador": true,
+      "entrenador": "Mike Boada",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C2",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_280",
+      "orden": "8",
+      "nombre": "Diana Ramirez",
+      "rol": "MANAGER",
+      "telefono": "+5930998045560",
+      "numEquipo": "83",
+      "nombreEquipo": "Tzucan",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C2",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_281",
+      "orden": "9",
+      "nombre": "Erick Tamayo",
+      "rol": "MANAGER",
+      "telefono": "+5930990373602",
+      "numEquipo": "83",
+      "nombreEquipo": "Tzucan",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Gómez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C2",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_282",
+      "orden": "1",
+      "nombre": "Erika Pazmiño",
+      "rol": "MANAGER",
+      "telefono": "+5930993238513",
+      "numEquipo": "83",
+      "nombreEquipo": "Tzucan",
+      "tieneEntrenador": true,
+      "entrenador": "Mike Boada",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C2",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_283",
+      "orden": "10",
+      "nombre": "Evelyn Hernandez",
+      "rol": "MANAGER",
+      "telefono": "+5930992450002",
+      "numEquipo": "83",
+      "nombreEquipo": "Tzucan",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Gómez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C2",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_284",
+      "orden": "11",
+      "nombre": "Franklin Herrera",
+      "rol": "MANAGER",
+      "telefono": "+5930962669609",
+      "numEquipo": "83",
+      "nombreEquipo": "Tzucan",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C2",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_285",
+      "orden": "12",
+      "nombre": "Hugo Cordova",
+      "rol": "MANAGER",
+      "telefono": "+5930994825120",
+      "numEquipo": "83",
+      "nombreEquipo": "Tzucan",
+      "tieneEntrenador": true,
+      "entrenador": "Mildred Muñoz",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C2",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_286",
+      "orden": "13",
+      "nombre": "Jonathan Guaraca",
+      "rol": "MANAGER",
+      "telefono": "+5930992672029",
+      "numEquipo": "83",
+      "nombreEquipo": "Tzucan",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C2",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_287",
+      "orden": "14",
+      "nombre": "Xavier Calle",
+      "rol": "MANAGER",
+      "telefono": "+5930998553017",
+      "numEquipo": "83",
+      "nombreEquipo": "Tzucan",
+      "tieneEntrenador": true,
+      "entrenador": "Alejandro Diaz",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C2",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_288",
+      "orden": "2",
+      "nombre": "Alejandra Muñoz",
+      "rol": "MANAGER",
+      "telefono": "+593958825825",
+      "numEquipo": "84",
+      "nombreEquipo": "Byakko Hanshi",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_289",
+      "orden": "4",
+      "nombre": "Andrés Wong",
+      "rol": "MANAGER",
+      "telefono": "+593983771118",
+      "numEquipo": "84",
+      "nombreEquipo": "Byakko Hanshi",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_290",
+      "orden": "5",
+      "nombre": "Belen Trujillo",
+      "rol": "MANAGER",
+      "telefono": "+593998526285",
+      "numEquipo": "84",
+      "nombreEquipo": "Byakko Hanshi",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_291",
+      "orden": "1",
+      "nombre": "Christian Quiroz M.",
+      "rol": "MANAGER",
+      "telefono": "+593987333702",
+      "numEquipo": "84",
+      "nombreEquipo": "Byakko Hanshi",
+      "tieneEntrenador": true,
+      "entrenador": "Mildred Muñoz",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_292",
+      "orden": "6",
+      "nombre": "Diana Villamar",
+      "rol": "MANAGER",
+      "telefono": "+593997252932",
+      "numEquipo": "84",
+      "nombreEquipo": "Byakko Hanshi",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_293",
+      "orden": "8",
+      "nombre": "Frank Calderón",
+      "rol": "MANAGER",
+      "telefono": "+593992740689",
+      "numEquipo": "84",
+      "nombreEquipo": "Byakko Hanshi",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_294",
+      "orden": "9",
+      "nombre": "Gabriela Espin",
+      "rol": "MANAGER",
+      "telefono": "+593984573440",
+      "numEquipo": "84",
+      "nombreEquipo": "Byakko Hanshi",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_295",
+      "orden": "10",
+      "nombre": "Grace Zambrano",
+      "rol": "MANAGER",
+      "telefono": "+593992800733",
+      "numEquipo": "84",
+      "nombreEquipo": "Byakko Hanshi",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_296",
+      "orden": "11",
+      "nombre": "Jahel Salazar",
+      "rol": "MANAGER",
+      "telefono": "+593984339531",
+      "numEquipo": "84",
+      "nombreEquipo": "Byakko Hanshi",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_297",
+      "orden": "12",
+      "nombre": "Jean Pierre Quiroz",
+      "rol": "MANAGER",
+      "telefono": "+593984551062",
+      "numEquipo": "84",
+      "nombreEquipo": "Byakko Hanshi",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_298",
+      "orden": "13",
+      "nombre": "Liss Acosta",
+      "rol": "MANAGER",
+      "telefono": "+593958846495",
+      "numEquipo": "84",
+      "nombreEquipo": "Byakko Hanshi",
+      "tieneEntrenador": true,
+      "entrenador": "Christian Tito",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_299",
+      "orden": "14",
+      "nombre": "Magy Mendoza",
+      "rol": "MANAGER",
+      "telefono": "+593987372976",
+      "numEquipo": "84",
+      "nombreEquipo": "Byakko Hanshi",
+      "tieneEntrenador": true,
+      "entrenador": "Christian Tito",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_300",
+      "orden": "15",
+      "nombre": "Maishel Freire",
+      "rol": "MANAGER",
+      "telefono": "+593958604427",
+      "numEquipo": "84",
+      "nombreEquipo": "Byakko Hanshi",
+      "tieneEntrenador": true,
+      "entrenador": "Christian Tito",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_301",
+      "orden": "16",
+      "nombre": "Martin  Quiroz",
+      "rol": "MANAGER",
+      "telefono": "+593995606621",
+      "numEquipo": "84",
+      "nombreEquipo": "Byakko Hanshi",
+      "tieneEntrenador": true,
+      "entrenador": "Christian Tito",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_302",
+      "orden": "17",
+      "nombre": "Mau Rivadeneira",
+      "rol": "MANAGER",
+      "telefono": "+593984917757",
+      "numEquipo": "84",
+      "nombreEquipo": "Byakko Hanshi",
+      "tieneEntrenador": true,
+      "entrenador": "Alejandro Diaz",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_303",
+      "orden": "18",
+      "nombre": "Mikaella Correa",
+      "rol": "MANAGER",
+      "telefono": "+593994051010",
+      "numEquipo": "84",
+      "nombreEquipo": "Byakko Hanshi",
+      "tieneEntrenador": true,
+      "entrenador": "Alejandro Diaz",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_304",
+      "orden": "20",
+      "nombre": "Poleth Montalvo",
+      "rol": "MANAGER",
+      "telefono": "+593991687219",
+      "numEquipo": "84",
+      "nombreEquipo": "Byakko Hanshi",
+      "tieneEntrenador": true,
+      "entrenador": "Josué Vera",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_305",
+      "orden": "22",
+      "nombre": "William Sanchez",
+      "rol": "MANAGER",
+      "telefono": "+593986813400",
+      "numEquipo": "84",
+      "nombreEquipo": "Byakko Hanshi",
+      "tieneEntrenador": true,
+      "entrenador": "Josué Vera",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_306",
+      "orden": "2",
+      "nombre": "Fernanda Salazar",
+      "rol": "MANAGER",
+      "telefono": "593 99 518 9260",
+      "numEquipo": "85",
+      "nombreEquipo": "Ahaba Jai",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_307",
+      "orden": "4",
+      "nombre": "Guillermo Tamayo",
+      "rol": "MANAGER",
+      "telefono": "593 96 905 4276",
+      "numEquipo": "85",
+      "nombreEquipo": "Ahaba Jai",
+      "tieneEntrenador": true,
+      "entrenador": "José Torron",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_308",
+      "orden": "1",
+      "nombre": "Lilibeth Cubillo",
+      "rol": "MANAGER",
+      "telefono": "593 99 652 1133",
+      "numEquipo": "85",
+      "nombreEquipo": "Ahaba Jai",
+      "tieneEntrenador": true,
+      "entrenador": "Chuy Acosta",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_309",
+      "orden": "5",
+      "nombre": "Margarita Pillajo",
+      "rol": "MANAGER",
+      "telefono": "+593 99 272 5687",
+      "numEquipo": "85",
+      "nombreEquipo": "Ahaba Jai",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_310",
+      "orden": "7",
+      "nombre": "Victoria Cazorla",
+      "rol": "MANAGER",
+      "telefono": "+593 99 680 2001",
+      "numEquipo": "85",
+      "nombreEquipo": "Ahaba Jai",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_311",
+      "orden": "2",
+      "nombre": "Alejandra Tenemaza",
+      "rol": "MANAGER",
+      "telefono": "593 991070235",
+      "numEquipo": "86",
+      "nombreEquipo": "Sula Amay",
+      "tieneEntrenador": true,
+      "entrenador": "María José Román",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_312",
+      "orden": "3",
+      "nombre": "Andres Valle",
+      "rol": "MANAGER",
+      "telefono": "593 963284609",
+      "numEquipo": "86",
+      "nombreEquipo": "Sula Amay",
+      "tieneEntrenador": true,
+      "entrenador": "María José Román",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_313",
+      "orden": "4",
+      "nombre": "Daniel Tapia",
+      "rol": "MANAGER",
+      "telefono": "593 998507448",
+      "numEquipo": "86",
+      "nombreEquipo": "Sula Amay",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Gómez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_314",
+      "orden": "5",
+      "nombre": "Darwin Cisneros",
+      "rol": "MANAGER",
+      "telefono": "593 996178727",
+      "numEquipo": "86",
+      "nombreEquipo": "Sula Amay",
+      "tieneEntrenador": true,
+      "entrenador": "María José Román",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_315",
+      "orden": "6",
+      "nombre": "Fabiola Lara",
+      "rol": "MANAGER",
+      "telefono": "593 981714761",
+      "numEquipo": "86",
+      "nombreEquipo": "Sula Amay",
+      "tieneEntrenador": true,
+      "entrenador": "María José Román",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_316",
+      "orden": "7",
+      "nombre": "Jonathan Herrera",
+      "rol": "MANAGER",
+      "telefono": "593 995515665",
+      "numEquipo": "86",
+      "nombreEquipo": "Sula Amay",
+      "tieneEntrenador": true,
+      "entrenador": "Diego Bravo",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_317",
+      "orden": "1",
+      "nombre": "Jose Maria Jimenez",
+      "rol": "MANAGER",
+      "telefono": "593 983449967",
+      "numEquipo": "86",
+      "nombreEquipo": "Sula Amay",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_318",
+      "orden": "8",
+      "nombre": "Milton Chicaiza",
+      "rol": "MANAGER",
+      "telefono": "593 995037113",
+      "numEquipo": "86",
+      "nombreEquipo": "Sula Amay",
+      "tieneEntrenador": true,
+      "entrenador": "Diego Bravo",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_319",
+      "orden": "9",
+      "nombre": "Sandra Moreno",
+      "rol": "MANAGER",
+      "telefono": "593 994837809",
+      "numEquipo": "86",
+      "nombreEquipo": "Sula Amay",
+      "tieneEntrenador": true,
+      "entrenador": "Diego Bravo",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_320",
+      "orden": "3",
+      "nombre": "Adams Gonzalez",
+      "rol": "MANAGER",
+      "telefono": "593963928499",
+      "numEquipo": "87",
+      "nombreEquipo": "Grifus Invictus",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_321",
+      "orden": "4",
+      "nombre": "Dario Betancourt",
+      "rol": "MANAGER",
+      "telefono": "597996240797",
+      "numEquipo": "87",
+      "nombreEquipo": "Grifus Invictus",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Gómez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_322",
+      "orden": "5",
+      "nombre": "Emanuel Llumiquinga",
+      "rol": "MANAGER",
+      "telefono": "593979964083",
+      "numEquipo": "87",
+      "nombreEquipo": "Grifus Invictus",
+      "tieneEntrenador": true,
+      "entrenador": "Diego Bravo",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_323",
+      "orden": "6",
+      "nombre": "Fabricio Medina",
+      "rol": "MANAGER",
+      "telefono": "593967975777",
+      "numEquipo": "87",
+      "nombreEquipo": "Grifus Invictus",
+      "tieneEntrenador": true,
+      "entrenador": "Mildred Muñoz",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_324",
+      "orden": "7",
+      "nombre": "Fernando Mediavilla",
+      "rol": "MANAGER",
+      "telefono": "593984435866",
+      "numEquipo": "87",
+      "nombreEquipo": "Grifus Invictus",
+      "tieneEntrenador": true,
+      "entrenador": "Diego Bravo",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_325",
+      "orden": "2",
+      "nombre": "Francisco Abad",
+      "rol": "MANAGER",
+      "telefono": "593999817089",
+      "numEquipo": "87",
+      "nombreEquipo": "Grifus Invictus",
+      "tieneEntrenador": true,
+      "entrenador": "María José Román",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_326",
+      "orden": "9",
+      "nombre": "Michelle Vargas",
+      "rol": "MANAGER",
+      "telefono": "593962663140",
+      "numEquipo": "87",
+      "nombreEquipo": "Grifus Invictus",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_327",
+      "orden": "10",
+      "nombre": "Romina Marconi",
+      "rol": "MANAGER",
+      "telefono": "593992487806",
+      "numEquipo": "87",
+      "nombreEquipo": "Grifus Invictus",
+      "tieneEntrenador": true,
+      "entrenador": "Chuy Acosta",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_328",
+      "orden": "11",
+      "nombre": "Santiago Benitez",
+      "rol": "MANAGER",
+      "telefono": "593994347819",
+      "numEquipo": "87",
+      "nombreEquipo": "Grifus Invictus",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_329",
+      "orden": "8",
+      "nombre": "Valeria Espinoza",
+      "rol": "MANAGER",
+      "telefono": "593962180647",
+      "numEquipo": "87",
+      "nombreEquipo": "Grifus Invictus",
+      "tieneEntrenador": true,
+      "entrenador": "Chuy Acosta",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_330",
+      "orden": "1",
+      "nombre": "Vanessa Romero",
+      "rol": "MANAGER",
+      "telefono": "593998862385",
+      "numEquipo": "87",
+      "nombreEquipo": "Grifus Invictus",
+      "tieneEntrenador": true,
+      "entrenador": "Mildred Muñoz",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_331",
+      "orden": "12",
+      "nombre": "Ximena Calispa",
+      "rol": "MANAGER",
+      "telefono": "593978689304",
+      "numEquipo": "87",
+      "nombreEquipo": "Grifus Invictus",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_332",
+      "orden": "13",
+      "nombre": "Yahaira Fierro",
+      "rol": "MANAGER",
+      "telefono": "593984872902",
+      "numEquipo": "87",
+      "nombreEquipo": "Grifus Invictus",
+      "tieneEntrenador": true,
+      "entrenador": "Mike Boada",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_333",
+      "orden": "2",
+      "nombre": "Andrés Mena",
+      "rol": "MANAGER",
+      "telefono": "593987662574",
+      "numEquipo": "88",
+      "nombreEquipo": "CATEPHRIA",
+      "tieneEntrenador": true,
+      "entrenador": "Alejandro Diaz",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_334",
+      "orden": "3",
+      "nombre": "Carlos Ortíz",
+      "rol": "MANAGER",
+      "telefono": "593999701679",
+      "numEquipo": "88",
+      "nombreEquipo": "CATEPHRIA",
+      "tieneEntrenador": true,
+      "entrenador": "Isaac Betancourt",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_335",
+      "orden": "1",
+      "nombre": "Daniel Escobar",
+      "rol": "MANAGER",
+      "telefono": "593995266768",
+      "numEquipo": "88",
+      "nombreEquipo": "CATEPHRIA",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Gómez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_336",
+      "orden": "5",
+      "nombre": "Jennifer Villavicencio",
+      "rol": "MANAGER",
+      "telefono": "593979138817",
+      "numEquipo": "88",
+      "nombreEquipo": "CATEPHRIA",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_337",
+      "orden": "6",
+      "nombre": "Juan Castillo",
+      "rol": "MANAGER",
+      "telefono": "593995275755",
+      "numEquipo": "88",
+      "nombreEquipo": "CATEPHRIA",
+      "tieneEntrenador": true,
+      "entrenador": "Isaac Betancourt",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_338",
+      "orden": "7",
+      "nombre": "Juliana Quiroz",
+      "rol": "MANAGER",
+      "telefono": "593988008607",
+      "numEquipo": "88",
+      "nombreEquipo": "CATEPHRIA",
+      "tieneEntrenador": true,
+      "entrenador": "Mike Boada",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_339",
+      "orden": "9",
+      "nombre": "Leonila Castillo",
+      "rol": "MANAGER",
+      "telefono": "593999849832",
+      "numEquipo": "88",
+      "nombreEquipo": "CATEPHRIA",
+      "tieneEntrenador": true,
+      "entrenador": "José Torron",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_340",
+      "orden": "10",
+      "nombre": "Lorena Carrión",
+      "rol": "MANAGER",
+      "telefono": "593988234569",
+      "numEquipo": "88",
+      "nombreEquipo": "CATEPHRIA",
+      "tieneEntrenador": true,
+      "entrenador": "Mike Boada",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_341",
+      "orden": "11",
+      "nombre": "Mónica Mena",
+      "rol": "MANAGER",
+      "telefono": "593982910201",
+      "numEquipo": "88",
+      "nombreEquipo": "CATEPHRIA",
+      "tieneEntrenador": true,
+      "entrenador": "Isaac Betancourt",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_342",
+      "orden": "12",
+      "nombre": "Yolanda Torres",
+      "rol": "MANAGER",
+      "telefono": "593985267774",
+      "numEquipo": "88",
+      "nombreEquipo": "CATEPHRIA",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_343",
+      "orden": "2",
+      "nombre": "Evelyn Cuenca",
+      "rol": "MANAGER",
+      "telefono": "0958822877",
+      "numEquipo": "89",
+      "nombreEquipo": "SHAKTI EMUNAH",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_344",
+      "orden": "3",
+      "nombre": "Mireya Adriano",
+      "rol": "MANAGER",
+      "telefono": "0980554584",
+      "numEquipo": "89",
+      "nombreEquipo": "SHAKTI EMUNAH",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_345",
+      "orden": "5",
+      "nombre": "Cesar Rodriguez",
+      "rol": "MANAGER",
+      "telefono": "0978990144",
+      "numEquipo": "89",
+      "nombreEquipo": "SHAKTI EMUNAH",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_346",
+      "orden": "1",
+      "nombre": "Diana Martinez",
+      "rol": "MANAGER",
+      "telefono": "0995986195",
+      "numEquipo": "89",
+      "nombreEquipo": "SHAKTI EMUNAH",
+      "tieneEntrenador": true,
+      "entrenador": "Mildred Muñoz",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_347",
+      "orden": "6",
+      "nombre": "Francisco Pacheco",
+      "rol": "MANAGER",
+      "telefono": "0961442340",
+      "numEquipo": "89",
+      "nombreEquipo": "SHAKTI EMUNAH",
+      "tieneEntrenador": true,
+      "entrenador": "María José Román",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_348",
+      "orden": "7",
+      "nombre": "Pablo Ortiz",
+      "rol": "MANAGER",
+      "telefono": "0987515639",
+      "numEquipo": "89",
+      "nombreEquipo": "SHAKTI EMUNAH",
+      "tieneEntrenador": true,
+      "entrenador": "Alejandro Diaz",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_349",
+      "orden": "2",
+      "nombre": "Abigail Aillon",
+      "rol": "MANAGER",
+      "telefono": "0982327222",
+      "numEquipo": "90",
+      "nombreEquipo": "ACADIA SEMPER FI",
+      "tieneEntrenador": true,
+      "entrenador": "Isaac Betancourt",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_350",
+      "orden": "1",
+      "nombre": "Alejandro Gomez",
+      "rol": "MANAGER",
+      "telefono": "0999761820",
+      "numEquipo": "90",
+      "nombreEquipo": "ACADIA SEMPER FI",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_351",
+      "orden": "4",
+      "nombre": "Deisy Chacon",
+      "rol": "MANAGER",
+      "telefono": "0998777325",
+      "numEquipo": "90",
+      "nombreEquipo": "ACADIA SEMPER FI",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_352",
+      "orden": "5",
+      "nombre": "Felipe Catillo",
+      "rol": "MANAGER",
+      "telefono": "0999031327",
+      "numEquipo": "90",
+      "nombreEquipo": "ACADIA SEMPER FI",
+      "tieneEntrenador": true,
+      "entrenador": "José Torron",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_353",
+      "orden": "6",
+      "nombre": "Gaby Sanchez",
+      "rol": "MANAGER",
+      "telefono": "0959013902",
+      "numEquipo": "90",
+      "nombreEquipo": "ACADIA SEMPER FI",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_354",
+      "orden": "7",
+      "nombre": "Gaby Valarezo",
+      "rol": "MANAGER",
+      "telefono": "0983131161",
+      "numEquipo": "90",
+      "nombreEquipo": "ACADIA SEMPER FI",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_355",
+      "orden": "8",
+      "nombre": "Javier Pazmiño",
+      "rol": "MANAGER",
+      "telefono": "0994606173",
+      "numEquipo": "90",
+      "nombreEquipo": "ACADIA SEMPER FI",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_356",
+      "orden": "9",
+      "nombre": "Jessy Salazar",
+      "rol": "MANAGER",
+      "telefono": "0992596999",
+      "numEquipo": "90",
+      "nombreEquipo": "ACADIA SEMPER FI",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_357",
+      "orden": "10",
+      "nombre": "Jhonatan Rualez",
+      "rol": "MANAGER",
+      "telefono": "0999021921",
+      "numEquipo": "90",
+      "nombreEquipo": "ACADIA SEMPER FI",
+      "tieneEntrenador": true,
+      "entrenador": "Isaac Betancourt",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_358",
+      "orden": "11",
+      "nombre": "Leon Armas",
+      "rol": "MANAGER",
+      "telefono": "0984939196",
+      "numEquipo": "90",
+      "nombreEquipo": "ACADIA SEMPER FI",
+      "tieneEntrenador": true,
+      "entrenador": "Josué Vera",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_359",
+      "orden": "12",
+      "nombre": "Leonardo Espin",
+      "rol": "MANAGER",
+      "telefono": "0993664644",
+      "numEquipo": "90",
+      "nombreEquipo": "ACADIA SEMPER FI",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_360",
+      "orden": "1",
+      "nombre": "Fabian Abad",
+      "rol": "MANAGER",
+      "telefono": "0998746653",
+      "numEquipo": "91",
+      "nombreEquipo": "HAMSA TADAKATSU",
+      "tieneEntrenador": true,
+      "entrenador": "María José Román",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_361",
+      "orden": "2",
+      "nombre": "Fernando Apuango De La Cruz",
+      "rol": "MANAGER",
+      "telefono": "0986985620",
+      "numEquipo": "91",
+      "nombreEquipo": "HAMSA TADAKATSU",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_362",
+      "orden": "3",
+      "nombre": "Horacio Mafla",
+      "rol": "MANAGER",
+      "telefono": "0987953073",
+      "numEquipo": "91",
+      "nombreEquipo": "HAMSA TADAKATSU",
+      "tieneEntrenador": true,
+      "entrenador": "Josué Vera",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_363",
+      "orden": "4",
+      "nombre": "Jorge Rodriguez",
+      "rol": "MANAGER",
+      "telefono": "0999101568",
+      "numEquipo": "91",
+      "nombreEquipo": "HAMSA TADAKATSU",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_364",
+      "orden": "5",
+      "nombre": "Pablo Soria",
+      "rol": "MANAGER",
+      "telefono": "0997705135",
+      "numEquipo": "91",
+      "nombreEquipo": "HAMSA TADAKATSU",
+      "tieneEntrenador": true,
+      "entrenador": "Josué Vera",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_365",
+      "orden": "7",
+      "nombre": "Veronica Morales",
+      "rol": "MANAGER",
+      "telefono": "0985113033",
+      "numEquipo": "91",
+      "nombreEquipo": "HAMSA TADAKATSU",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_366",
+      "orden": "2",
+      "nombre": "Karla Paredes",
+      "rol": "MANAGER",
+      "telefono": "0996920266",
+      "numEquipo": "92",
+      "nombreEquipo": "APIS TITANIUM",
+      "tieneEntrenador": true,
+      "entrenador": "Diego Bravo",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_367",
+      "orden": "3",
+      "nombre": "Margarita Buenaño",
+      "rol": "MANAGER",
+      "telefono": "0984355230",
+      "numEquipo": "92",
+      "nombreEquipo": "APIS TITANIUM",
+      "tieneEntrenador": true,
+      "entrenador": "Diego Bravo",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_368",
+      "orden": "4",
+      "nombre": "Maritza Romero",
+      "rol": "Manager",
+      "telefono": "5930980184471",
+      "numEquipo": "1",
+      "nombreEquipo": "TRINA MUNAY KI",
+      "tieneEntrenador": false,
+      "entrenador": "Chuy Acosta",
+      "coordinador": "MIGUEL TORRES",
+      "sede": "Cuenca",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_369",
+      "orden": "2",
+      "nombre": "Felipe Rhenals",
+      "rol": "Manager",
+      "telefono": "3104429169",
+      "numEquipo": "1",
+      "nombreEquipo": "HENKO",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "",
+      "sede": "Medellin",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_370",
+      "orden": "1",
+      "nombre": "Jose Galindo",
+      "rol": "Capitan",
+      "telefono": "0992848576",
+      "numEquipo": "2",
+      "nombreEquipo": "INTI CAMARI",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "MIGUEL TORRES",
+      "sede": "Cuenca",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_371",
+      "orden": "4",
+      "nombre": "Alejandro Calle",
+      "rol": "Manager",
+      "telefono": "3234282671",
+      "numEquipo": "2",
+      "nombreEquipo": "NICAN AXCAN",
+      "tieneEntrenador": true,
+      "entrenador": "Alejandro Diaz",
+      "coordinador": "",
+      "sede": "Medellin",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_372",
+      "orden": "4",
+      "nombre": "Ignacio Jiménez",
+      "rol": "Manager",
+      "telefono": "593 96 229 8765",
+      "numEquipo": "3",
+      "nombreEquipo": "Athalaya Kumi",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "MIGUEL TORRES",
+      "sede": "Cuenca",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_373",
+      "orden": "3",
+      "nombre": "Mateo Pachacama",
+      "rol": "Manager",
+      "telefono": "593 98 412 3196",
+      "numEquipo": "3",
+      "nombreEquipo": "Athalaya Kumi",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Cristina Sánchez",
+      "coordinador": "MIGUEL TORRES",
+      "sede": "Cuenca",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_374",
+      "orden": "2",
+      "nombre": "Dayanna Lopez",
+      "rol": "Manager",
+      "telefono": "0980177146",
+      "numEquipo": "4",
+      "nombreEquipo": "Alquimia",
+      "tieneEntrenador": true,
+      "entrenador": "José Torron",
+      "coordinador": "JOSUE VERA",
+      "sede": "Cuenca",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_375",
+      "orden": "2",
+      "nombre": "Franklim Zeas",
+      "rol": "MANAGER",
+      "telefono": "0984077123",
+      "numEquipo": "6",
+      "nombreEquipo": "NUNA KAWSAY",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "JOSUE VERA",
+      "sede": "Cuenca",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_376",
+      "orden": "1",
+      "nombre": "Edgar Kevin Garces",
+      "rol": "CAPITAN",
+      "telefono": "+573194169780",
+      "numEquipo": "6",
+      "nombreEquipo": "ZENSEIS",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "",
+      "sede": "Medellin",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_377",
+      "orden": "1",
+      "nombre": "Aída Núñez",
+      "rol": "Manager",
+      "telefono": "+51 985 031 721",
+      "numEquipo": "7",
+      "nombreEquipo": "Espartanos",
+      "tieneEntrenador": false,
+      "entrenador": "Alejandro Diaz",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_378",
+      "orden": "2",
+      "nombre": "Marco Mendez",
+      "rol": "Manager",
+      "telefono": "0983168859",
+      "numEquipo": "8",
+      "nombreEquipo": "METANOIA",
+      "tieneEntrenador": true,
+      "entrenador": "Mauricio Ramírez",
+      "coordinador": "KERLY CARRILLO",
+      "sede": "Cuenca",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_379",
+      "orden": "2",
+      "nombre": "Carlos Ramirez",
+      "rol": "Manager",
+      "telefono": "+51 990 184 115",
+      "numEquipo": "8",
+      "nombreEquipo": "Pretorianos Infinitos",
+      "tieneEntrenador": false,
+      "entrenador": "Ana Cristina Sánchez",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_380",
+      "orden": "3",
+      "nombre": "Evelyn Flores",
+      "rol": "Manager",
+      "telefono": "+51 994 704 928",
+      "numEquipo": "8",
+      "nombreEquipo": "Pretorianos Infinitos",
+      "tieneEntrenador": false,
+      "entrenador": "Mildred Muñoz",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_381",
+      "orden": "5",
+      "nombre": "Lusy Diaz",
+      "rol": "Manager",
+      "telefono": "+51 961 892 790",
+      "numEquipo": "8",
+      "nombreEquipo": "Pretorianos Infinitos",
+      "tieneEntrenador": false,
+      "entrenador": "Mildred Muñoz",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_382",
+      "orden": "1",
+      "nombre": "Laura Vanessa Durango Araque",
+      "rol": "CAPITANA",
+      "telefono": "3113691829",
+      "numEquipo": "8",
+      "nombreEquipo": "INFINITYMO",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Gómez",
+      "coordinador": "MAURICIO RAMIREZ",
+      "sede": "Medellin",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_383",
+      "orden": "2",
+      "nombre": "John Benitez",
+      "rol": "MANAGER",
+      "telefono": "+573246110466",
+      "numEquipo": "9",
+      "nombreEquipo": "AMARÚ",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "MAURICIO RAMIREZ",
+      "sede": "Medellín",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_384",
+      "orden": "1",
+      "nombre": "Brian Morales",
+      "rol": "CAPITAN",
+      "telefono": "+573233644192",
+      "numEquipo": "9",
+      "nombreEquipo": "AMARÚ",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "MAURICIO RAMIREZ",
+      "sede": "Medellín",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_385",
+      "orden": "1",
+      "nombre": "Erika Flor Blanco Alvis",
+      "rol": "Capitana",
+      "telefono": "+51 962 365 323",
+      "numEquipo": "10",
+      "nombreEquipo": "David's Poderosos",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Cristina Sánchez",
+      "coordinador": "",
+      "sede": "Sin Sede",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_386",
+      "orden": "4",
+      "nombre": "Martha Rea",
+      "rol": "MANAGER",
+      "telefono": "0982969608",
+      "numEquipo": "12",
+      "nombreEquipo": "ANÁSTASIS",
+      "tieneEntrenador": true,
+      "entrenador": "Kriscia Rodas",
+      "coordinador": "KERLY CARRILLO",
+      "sede": "Cuenca",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_387",
+      "orden": "3",
+      "nombre": "Diego Mora",
+      "rol": "MANAGER",
+      "telefono": "0987583826",
+      "numEquipo": "13",
+      "nombreEquipo": "SIC PARVIS MAGNA",
+      "tieneEntrenador": true,
+      "entrenador": "Mila Campuzano",
+      "coordinador": "KERLY CARRILLO - JUANFER REINOSO",
+      "sede": "Cuenca",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_388",
+      "orden": "5",
+      "nombre": "Soraya Lara",
+      "rol": "CAPITANA",
+      "telefono": "593991631172",
+      "numEquipo": "14",
+      "nombreEquipo": "KAMINARI KUNTURI",
+      "tieneEntrenador": true,
+      "entrenador": "Mike Boada",
+      "coordinador": "",
+      "sede": "Cuenca",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_389",
+      "orden": "5",
+      "nombre": "Lucy Ostoa",
+      "rol": "CAPITANA",
+      "telefono": "949191577",
+      "numEquipo": "14",
+      "nombreEquipo": "LEONKUNA",
+      "tieneEntrenador": true,
+      "entrenador": "María José Román",
+      "coordinador": "",
+      "sede": "Cuenca",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_390",
+      "orden": "6",
+      "nombre": "Luis Alberto Hernández Mendoza",
+      "rol": "CAPITANA",
+      "telefono": "+51 956 268830",
+      "numEquipo": "15",
+      "nombreEquipo": "DRAGONES CUÁNTICOS",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "",
+      "sede": "Cuenca",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_391",
+      "orden": "8",
+      "nombre": "Paul Gamarra",
+      "rol": "CAPITANA",
+      "telefono": "+51 934 690932",
+      "numEquipo": "15",
+      "nombreEquipo": "DRAGONES CUÁNTICOS",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "",
+      "sede": "Cuenca",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_392",
+      "orden": "2",
+      "nombre": "Anggie Espinoza",
+      "rol": "CAPITANA",
+      "telefono": "593982449947",
+      "numEquipo": "16",
+      "nombreEquipo": "Ara Ambiguus",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Cristina Sánchez",
+      "coordinador": "",
+      "sede": "Cuenca",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_393",
+      "orden": "3",
+      "nombre": "Jose Gualchi",
+      "rol": "CAPITANA",
+      "telefono": "593984294753",
+      "numEquipo": "17",
+      "nombreEquipo": "HATUM BRAHMA",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Cristina Sánchez",
+      "coordinador": "",
+      "sede": "Cuenca",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_394",
+      "orden": "4",
+      "nombre": "Geraldine Vanessa Sotomayor",
+      "rol": "MANAGER",
+      "telefono": "+51 983 701 400",
+      "numEquipo": "17",
+      "nombreEquipo": "JAGUARES DE ORO",
+      "tieneEntrenador": true,
+      "entrenador": "Mauricio Ramírez",
+      "coordinador": "",
+      "sede": "Cuenca",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_395",
+      "orden": "9",
+      "nombre": "Pilar De La Cruz Huaytalla",
+      "rol": "MANAGER",
+      "telefono": "+51 985 461 746",
+      "numEquipo": "17",
+      "nombreEquipo": "JAGUARES DE ORO",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "",
+      "sede": "Cuenca",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_396",
+      "orden": "7",
+      "nombre": "Zara Castillo Herrera",
+      "rol": "MANAGER",
+      "telefono": "+51961491513",
+      "numEquipo": "18",
+      "nombreEquipo": "ÁNGELES DE FUEGO",
+      "tieneEntrenador": true,
+      "entrenador": "Alejandro Diaz",
+      "coordinador": "",
+      "sede": "Cuenca",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_397",
+      "orden": "5",
+      "nombre": "Paul Recalde",
+      "rol": "MANAGER",
+      "telefono": "593999766343",
+      "numEquipo": "18",
+      "nombreEquipo": "SUMAQ KAWSAYKUNA",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "",
+      "sede": "Cuenca",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_398",
+      "orden": "4",
+      "nombre": "Carlos Alberto Castillo Tipismana",
+      "rol": "MANAGER",
+      "telefono": "+51982791484",
+      "numEquipo": "19",
+      "nombreEquipo": "VIKINGOS DE FUEGO",
+      "tieneEntrenador": true,
+      "entrenador": "David Sosa",
+      "coordinador": "",
+      "sede": "Cuenca",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_399",
+      "orden": "5",
+      "nombre": "Cristian Jonathan Arone Chachayma",
+      "rol": "MANAGER",
+      "telefono": "+51961496514",
+      "numEquipo": "19",
+      "nombreEquipo": "VIKINGOS DE FUEGO",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "",
+      "sede": "Cuenca",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_400",
+      "orden": "9",
+      "nombre": "Maria Elena Romero Ramirez",
+      "rol": "MANAGER",
+      "telefono": "+51954884632",
+      "numEquipo": "19",
+      "nombreEquipo": "VIKINGOS DE FUEGO",
+      "tieneEntrenador": true,
+      "entrenador": "Isaac Betancourt",
+      "coordinador": "",
+      "sede": "Lima",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_401",
+      "orden": "6",
+      "nombre": "Hector Canqui Valladares",
+      "rol": "MANAGER",
+      "telefono": "+51992798459",
+      "numEquipo": "19",
+      "nombreEquipo": "VIKINGOS DE FUEGO",
+      "tieneEntrenador": true,
+      "entrenador": "Mauricio Ramírez",
+      "coordinador": "",
+      "sede": "Lima",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_402",
+      "orden": "3",
+      "nombre": "Anthony Leo Altamirano Llaccuas",
+      "rol": "MANAGER",
+      "telefono": "+51958110726",
+      "numEquipo": "19",
+      "nombreEquipo": "VIKINGOS DE FUEGO",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "",
+      "sede": "Lima",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_403",
+      "orden": "2",
+      "nombre": "Argotti Emiliano",
+      "rol": "MANAGER",
+      "telefono": "0962784962",
+      "numEquipo": "20",
+      "nombreEquipo": "NANKURUNAISA",
+      "tieneEntrenador": true,
+      "entrenador": "Alejandro Diaz",
+      "coordinador": "",
+      "sede": "Guayaquil",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_404",
+      "orden": "4",
+      "nombre": "Correa Mabel",
+      "rol": "MANAGER",
+      "telefono": "0978667245",
+      "numEquipo": "20",
+      "nombreEquipo": "NANKURUNAISA",
+      "tieneEntrenador": true,
+      "entrenador": "José Sánchez",
+      "coordinador": "",
+      "sede": "Guayaquil",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_405",
+      "orden": "5",
+      "nombre": "Ordoñez Diego",
+      "rol": "MANAGER",
+      "telefono": "0963058531",
+      "numEquipo": "20",
+      "nombreEquipo": "NANKURUNAISA",
+      "tieneEntrenador": true,
+      "entrenador": "Mildred Muñoz",
+      "coordinador": "",
+      "sede": "Guayaquil",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_406",
+      "orden": "6",
+      "nombre": "Miriam Mendoza Pilco",
+      "rol": "MANAGER",
+      "telefono": "929809609",
+      "numEquipo": "20",
+      "nombreEquipo": "KUNTUR MARKA",
+      "tieneEntrenador": true,
+      "entrenador": "David Sosa",
+      "coordinador": "",
+      "sede": "Lima",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_407",
+      "orden": "4",
+      "nombre": "Katia De Paz",
+      "rol": "MANAGER",
+      "telefono": "968104053",
+      "numEquipo": "20",
+      "nombreEquipo": "KUNTUR MARKA",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "",
+      "sede": "Lima",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_408",
+      "orden": "3",
+      "nombre": "Giovana Palomino Marcos",
+      "rol": "MANAGER",
+      "telefono": "993717944",
+      "numEquipo": "20",
+      "nombreEquipo": "KUNTUR MARKA",
+      "tieneEntrenador": true,
+      "entrenador": "Diego Bravo",
+      "coordinador": "",
+      "sede": "Lima",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_409",
+      "orden": "8",
+      "nombre": "Rhania Untiveros Requejo",
+      "rol": "MANAGER",
+      "telefono": "948948750",
+      "numEquipo": "20",
+      "nombreEquipo": "KUNTUR MARKA",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "",
+      "sede": "Lima",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_410",
+      "orden": "5",
+      "nombre": "Luz Mabel Chipana",
+      "rol": "MANAGER",
+      "telefono": "931283234",
+      "numEquipo": "20",
+      "nombreEquipo": "KUNTUR MARKA",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "",
+      "sede": "Lima",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_411",
+      "orden": "1",
+      "nombre": "Camila Lucía León More",
+      "rol": "CAPITANA",
+      "telefono": "981701570",
+      "numEquipo": "21",
+      "nombreEquipo": "TEMPLARIOS DEL ALBA",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "LINID VALENCIA",
+      "sede": "Lima",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_412",
+      "orden": "2",
+      "nombre": "Jhen Ponce Espinoza",
+      "rol": "MANAGER",
+      "telefono": "970373769",
+      "numEquipo": "21",
+      "nombreEquipo": "TEMPLARIOS DEL ALBA",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "LINID VALENCIA",
+      "sede": "Lima",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_413",
+      "orden": "2",
+      "nombre": "Gabriela Carbo",
+      "rol": "MANAGER",
+      "telefono": "0959283977",
+      "numEquipo": "22",
+      "nombreEquipo": "TITANES KOTETSU",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "",
+      "sede": "Guayaquil",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_414",
+      "orden": "5",
+      "nombre": "Karla Vera",
+      "rol": "MANAGER",
+      "telefono": "0987427733",
+      "numEquipo": "22",
+      "nombreEquipo": "TITANES KOTETSU",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "",
+      "sede": "Guayaquil",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_415",
+      "orden": "3",
+      "nombre": "Jose Guillermos Curi",
+      "rol": "MANAGER",
+      "telefono": "922972827",
+      "numEquipo": "22",
+      "nombreEquipo": "LEGENDARIOS DEL SAMSARA",
+      "tieneEntrenador": true,
+      "entrenador": "David Sosa",
+      "coordinador": "LINID VALENCIA",
+      "sede": "Lima",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_416",
+      "orden": "2",
+      "nombre": "Paul Gamarra",
+      "rol": "MANAGER",
+      "telefono": "934690932",
+      "numEquipo": "22",
+      "nombreEquipo": "LEGENDARIOS DEL SAMSARA",
+      "tieneEntrenador": true,
+      "entrenador": "Josué Vera",
+      "coordinador": "LINID VALENCIA",
+      "sede": "Lima",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_417",
+      "orden": "1",
+      "nombre": "Karla Jimenez",
+      "rol": "MANAGER",
+      "telefono": "0994709294",
+      "numEquipo": "23",
+      "nombreEquipo": "ESTOICOS INVICTUS",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Gómez",
+      "coordinador": "",
+      "sede": "Guayaquil",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_418",
+      "orden": "1",
+      "nombre": "Enrique Franco",
+      "rol": "MANAGER",
+      "telefono": "0980805649",
+      "numEquipo": "24",
+      "nombreEquipo": "ALKHEMIA FINIX",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "",
+      "sede": "Guayaquil",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_419",
+      "orden": "4",
+      "nombre": "Fernando Mediavilla",
+      "rol": "MANAGER",
+      "telefono": "+5930984435866",
+      "numEquipo": "81",
+      "nombreEquipo": "Dracarys",
+      "tieneEntrenador": true,
+      "entrenador": "Mildred Muñoz",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C1",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_420",
+      "orden": "5",
+      "nombre": "Joselyn Ushiña",
+      "rol": "MANAGER",
+      "telefono": "+5930958648685",
+      "numEquipo": "81",
+      "nombreEquipo": "Dracarys",
+      "tieneEntrenador": true,
+      "entrenador": "Alejandro Diaz",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C1",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_421",
+      "orden": "7",
+      "nombre": "Bladimir Parra",
+      "rol": "MANAGER",
+      "telefono": "+5930995902993",
+      "numEquipo": "83",
+      "nombreEquipo": "Tzucan",
+      "tieneEntrenador": true,
+      "entrenador": "Mike Boada",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C2",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_422",
+      "orden": "7",
+      "nombre": "Elena Llanos",
+      "rol": "MANAGER",
+      "telefono": "+593968525606",
+      "numEquipo": "84",
+      "nombreEquipo": "Byakko Hanshi",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Cuenca",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_423",
+      "orden": "19",
+      "nombre": "Nicole Murgeytio",
+      "rol": "MANAGER",
+      "telefono": "+593987634771",
+      "numEquipo": "84",
+      "nombreEquipo": "Byakko Hanshi",
+      "tieneEntrenador": true,
+      "entrenador": "Alejandro Diaz",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Cuenca",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_424",
+      "orden": "21",
+      "nombre": "Ruben Cadena",
+      "rol": "MANAGER",
+      "telefono": "+593987512450",
+      "numEquipo": "84",
+      "nombreEquipo": "Byakko Hanshi",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Cuenca",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_425",
+      "orden": "3",
+      "nombre": "Anderson Ortega",
+      "rol": "MANAGER",
+      "telefono": "+593997446147",
+      "numEquipo": "84",
+      "nombreEquipo": "Byakko Hanshi",
+      "tieneEntrenador": true,
+      "entrenador": "Mike Boada",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito C1",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_426",
+      "orden": "3",
+      "nombre": "Fernando González",
+      "rol": "MANAGER",
+      "telefono": "593 99 148 8105",
+      "numEquipo": "85",
+      "nombreEquipo": "Ahaba Jai",
+      "tieneEntrenador": true,
+      "entrenador": "José Torron",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Cuenca",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_427",
+      "orden": "6",
+      "nombre": "Michelle Cardenas",
+      "rol": "MANAGER",
+      "telefono": "=+593 99 935 7124",
+      "numEquipo": "85",
+      "nombreEquipo": "Ahaba Jai",
+      "tieneEntrenador": true,
+      "entrenador": "José Torron",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Cuenca",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_428",
+      "orden": "4",
+      "nombre": "Fabricio Montero",
+      "rol": "MANAGER",
+      "telefono": "593992789103",
+      "numEquipo": "88",
+      "nombreEquipo": "CATEPHRIA",
+      "tieneEntrenador": true,
+      "entrenador": "Josué Vera",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_429",
+      "orden": "8",
+      "nombre": "Kathy Mena",
+      "rol": "MANAGER",
+      "telefono": "593996029957",
+      "numEquipo": "88",
+      "nombreEquipo": "CATEPHRIA",
+      "tieneEntrenador": true,
+      "entrenador": "Alejandro Diaz",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_430",
+      "orden": "4",
+      "nombre": "Cesar Montenegro",
+      "rol": "MANAGER",
+      "telefono": "0998366343",
+      "numEquipo": "89",
+      "nombreEquipo": "SHAKTI EMUNAH",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_431",
+      "orden": "8",
+      "nombre": "Sofia Dueñas",
+      "rol": "MANAGER",
+      "telefono": "0998071513",
+      "numEquipo": "89",
+      "nombreEquipo": "SHAKTI EMUNAH",
+      "tieneEntrenador": true,
+      "entrenador": "Diego Bravo",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_432",
+      "orden": "9",
+      "nombre": "William Paladines",
+      "rol": "MANAGER",
+      "telefono": "0980810907",
+      "numEquipo": "89",
+      "nombreEquipo": "SHAKTI EMUNAH",
+      "tieneEntrenador": true,
+      "entrenador": "Diego Bravo",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_433",
+      "orden": "3",
+      "nombre": "Carolina Santamaria",
+      "rol": "MANAGER",
+      "telefono": "0987459234",
+      "numEquipo": "90",
+      "nombreEquipo": "ACADIA SEMPER FI",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_434",
+      "orden": "13",
+      "nombre": "Monica Chavez",
+      "rol": "MANAGER",
+      "telefono": "0986937742",
+      "numEquipo": "90",
+      "nombreEquipo": "ACADIA SEMPER FI",
+      "tieneEntrenador": true,
+      "entrenador": "Josué Vera",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_435",
+      "orden": "14",
+      "nombre": "Plutarco Almeida",
+      "rol": "MANAGER",
+      "telefono": "0984458759",
+      "numEquipo": "90",
+      "nombreEquipo": "ACADIA SEMPER FI",
+      "tieneEntrenador": true,
+      "entrenador": "José Torron",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_436",
+      "orden": "15",
+      "nombre": "Ruben Cadena",
+      "rol": "MANAGER",
+      "telefono": "0987512450",
+      "numEquipo": "90",
+      "nombreEquipo": "ACADIA SEMPER FI",
+      "tieneEntrenador": true,
+      "entrenador": "Isaac Betancourt",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_437",
+      "orden": "16",
+      "nombre": "Victor Gomez",
+      "rol": "MANAGER",
+      "telefono": "0991089099",
+      "numEquipo": "90",
+      "nombreEquipo": "ACADIA SEMPER FI",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_438",
+      "orden": "1",
+      "nombre": "Paul Morales",
+      "rol": "MANAGER",
+      "telefono": "0963085663",
+      "numEquipo": "91",
+      "nombreEquipo": "HAMSA TADAKATSU",
+      "tieneEntrenador": true,
+      "entrenador": "José Torron",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_439",
+      "orden": "4",
+      "nombre": "Cadena Martinez Kevin Joel",
+      "rol": "MANAGER",
+      "telefono": "98 739 7514",
+      "numEquipo": "93",
+      "nombreEquipo": "METATRON",
+      "tieneEntrenador": true,
+      "entrenador": "María José Román",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_440",
+      "orden": "8",
+      "nombre": "Vera Geovanna",
+      "rol": "MANAGER",
+      "telefono": "0967239396",
+      "numEquipo": "95",
+      "nombreEquipo": "LYUN USHUAY RHUA",
+      "tieneEntrenador": true,
+      "entrenador": "Mike Boada",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_441",
+      "orden": "2",
+      "nombre": "David Valarezo",
+      "rol": "MANAGER",
+      "telefono": "0959944151",
+      "numEquipo": "96",
+      "nombreEquipo": "NINARI",
+      "tieneEntrenador": true,
+      "entrenador": "Josué Vera",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_442",
+      "orden": "5",
+      "nombre": "Edmundo Carvajal",
+      "rol": "MANAGER",
+      "telefono": "0978668372",
+      "numEquipo": "96",
+      "nombreEquipo": "NINARI",
+      "tieneEntrenador": true,
+      "entrenador": "María José Román",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_443",
+      "orden": "1",
+      "nombre": "Darwin Alejandro Enriquez Pupiales",
+      "rol": "MANAGER",
+      "telefono": "0981333528",
+      "numEquipo": "98",
+      "nombreEquipo": "VALHALLA DRAKI",
+      "tieneEntrenador": true,
+      "entrenador": "María José Román",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_444",
+      "orden": "2",
+      "nombre": "Edison Javier Lutuala Valiente",
+      "rol": "MANAGER",
+      "telefono": "0962985900",
+      "numEquipo": "98",
+      "nombreEquipo": "VALHALLA DRAKI",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_445",
+      "orden": "5",
+      "nombre": "Tannia Jacqueline Valverde Pando",
+      "rol": "MANAGER",
+      "telefono": "0987278887",
+      "numEquipo": "98",
+      "nombreEquipo": "VALHALLA DRAKI",
+      "tieneEntrenador": true,
+      "entrenador": "José Sánchez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_446",
+      "orden": "4",
+      "nombre": "Andrés Macias",
+      "rol": "MANAGER",
+      "telefono": "0963482451",
+      "numEquipo": "99",
+      "nombreEquipo": "HENSU CHIKARA",
+      "tieneEntrenador": true,
+      "entrenador": "Diego Bravo",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_447",
+      "orden": "3",
+      "nombre": "Fernando Gozalez",
+      "rol": "MANAGER",
+      "telefono": "0991488105",
+      "numEquipo": "99",
+      "nombreEquipo": "HENSU CHIKARA",
+      "tieneEntrenador": true,
+      "entrenador": "Josué Vera",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_448",
+      "orden": "3",
+      "nombre": "Evelyn Quinaloa",
+      "rol": "MANAGER",
+      "telefono": "984104374",
+      "numEquipo": "101",
+      "nombreEquipo": "SUMAQ SHIN",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_449",
+      "orden": "6",
+      "nombre": "Flor Mendoza",
+      "rol": "MANAGER",
+      "telefono": "979151395",
+      "numEquipo": "102",
+      "nombreEquipo": "RIKCHARI MUNAY",
+      "tieneEntrenador": true,
+      "entrenador": "María José Román",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_450",
+      "orden": "7",
+      "nombre": "Juan Carlos Carguacundo",
+      "rol": "MANAGER",
+      "telefono": "998789582",
+      "numEquipo": "102",
+      "nombreEquipo": "RIKCHARI MUNAY",
+      "tieneEntrenador": true,
+      "entrenador": "David Sosa",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_451",
+      "orden": "1",
+      "nombre": "Pablo Cobos",
+      "rol": "CAPITAN",
+      "telefono": "998032222",
+      "numEquipo": "102",
+      "nombreEquipo": "RIKCHARI MUNAY",
+      "tieneEntrenador": true,
+      "entrenador": "Mike Boada",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_452",
+      "orden": "5",
+      "nombre": "Diego Jacome",
+      "rol": "MANAGER",
+      "telefono": "987621305",
+      "numEquipo": "103",
+      "nombreEquipo": "MEMENTO MORI",
+      "tieneEntrenador": true,
+      "entrenador": "Diego Bravo",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_453",
+      "orden": "4",
+      "nombre": "Ariana Estrada",
+      "rol": "MANAGER",
+      "telefono": "983598854",
+      "numEquipo": "103",
+      "nombreEquipo": "MEMENTO MORI",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_454",
+      "orden": "8",
+      "nombre": "Karina Guaraca",
+      "rol": "MANAGER",
+      "telefono": "998294954",
+      "numEquipo": "103",
+      "nombreEquipo": "MEMENTO MORI",
+      "tieneEntrenador": true,
+      "entrenador": "José Sánchez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_455",
+      "orden": "1",
+      "nombre": "Castillo Reyes Leonila Gabriela",
+      "rol": "CAPITÁN",
+      "telefono": "+593999849832",
+      "numEquipo": "104",
+      "nombreEquipo": "RAGNAROK CHAKANA",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "ROBERTO RODRIGUEZ",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_456",
+      "orden": "9",
+      "nombre": "\\nSalazar Benitez \\tJean Pierre",
+      "rol": "MANAGER",
+      "telefono": "+593998195158",
+      "numEquipo": "104",
+      "nombreEquipo": "RAGNAROK CHAKANA",
+      "tieneEntrenador": true,
+      "entrenador": "David Sosa",
+      "coordinador": "ROBERTO RODRIGUEZ",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_457",
+      "orden": "3",
+      "nombre": "Jaqui Reyes Giovanny Javier",
+      "rol": "MANAGER",
+      "telefono": "+593958834058",
+      "numEquipo": "104",
+      "nombreEquipo": "RAGNAROK CHAKANA",
+      "tieneEntrenador": true,
+      "entrenador": "Diego Bravo",
+      "coordinador": "ROBERTO RODRIGUEZ",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_458",
+      "orden": "4",
+      "nombre": "Benitez Nieto Tatiana Mishell",
+      "rol": "MANAGER",
+      "telefono": "+593999752777",
+      "numEquipo": "104",
+      "nombreEquipo": "RAGNAROK CHAKANA",
+      "tieneEntrenador": true,
+      "entrenador": "José Sánchez",
+      "coordinador": "ROBERTO RODRIGUEZ",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_459",
+      "orden": "3",
+      "nombre": "Carcelen Carla",
+      "rol": "MANAGER",
+      "telefono": "981370601",
+      "numEquipo": "105",
+      "nombreEquipo": "KRALLARI IPSOFACTO",
+      "tieneEntrenador": true,
+      "entrenador": "Pamela Carrillo",
+      "coordinador": "",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_460",
+      "orden": "4",
+      "nombre": "Carius Jonathan",
+      "rol": "MANAGER",
+      "telefono": "981744833",
+      "numEquipo": "105",
+      "nombreEquipo": "KRALLARI IPSOFACTO",
+      "tieneEntrenador": true,
+      "entrenador": "Diego Bravo",
+      "coordinador": "",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_461",
+      "orden": "5",
+      "nombre": "Chaluisa Nathalia",
+      "rol": "MANAGER",
+      "telefono": "998110306",
+      "numEquipo": "105",
+      "nombreEquipo": "KRALLARI IPSOFACTO",
+      "tieneEntrenador": true,
+      "entrenador": "Pamela Carrillo",
+      "coordinador": "",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_462",
+      "orden": "6",
+      "nombre": "Enriquez Alejandro",
+      "rol": "MANAGER",
+      "telefono": "981333528",
+      "numEquipo": "105",
+      "nombreEquipo": "KRALLARI IPSOFACTO",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_463",
+      "orden": "10",
+      "nombre": "Morejon Cristina",
+      "rol": "MANAGER",
+      "telefono": "995321338",
+      "numEquipo": "105",
+      "nombreEquipo": "KRALLARI IPSOFACTO",
+      "tieneEntrenador": true,
+      "entrenador": "José Sánchez",
+      "coordinador": "",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_464",
+      "orden": "15",
+      "nombre": "Villamar Veronica",
+      "rol": "MANAGER",
+      "telefono": "993467965",
+      "numEquipo": "105",
+      "nombreEquipo": "KRALLARI IPSOFACTO",
+      "tieneEntrenador": true,
+      "entrenador": "Diego Bravo",
+      "coordinador": "",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_465",
+      "orden": "12",
+      "nombre": "Paz Cristina",
+      "rol": "MANAGER",
+      "telefono": "984443805",
+      "numEquipo": "105",
+      "nombreEquipo": "KRALLARI IPSOFACTO",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_466",
+      "orden": "2",
+      "nombre": "Benitez Santiago",
+      "rol": "MANAGER",
+      "telefono": "994347819",
+      "numEquipo": "105",
+      "nombreEquipo": "KRALLARI IPSOFACTO",
+      "tieneEntrenador": true,
+      "entrenador": "Josué Vera",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_467",
+      "orden": "7",
+      "nombre": "Guerrero Moraima",
+      "rol": "MANAGER",
+      "telefono": "992935885",
+      "numEquipo": "105",
+      "nombreEquipo": "KRALLARI IPSOFACTO",
+      "tieneEntrenador": true,
+      "entrenador": "Josué Vera",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_468",
+      "orden": "4",
+      "nombre": "Marco Clavijo",
+      "rol": "MANAGER",
+      "telefono": "0990342527",
+      "numEquipo": "106",
+      "nombreEquipo": "KAIZEN MUKETSU",
+      "tieneEntrenador": true,
+      "entrenador": "Mauricio Ramírez",
+      "coordinador": "ALEJANDRO DIAZ",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_469",
+      "orden": "1",
+      "nombre": "Andres Leon Armas",
+      "rol": "CAPITAN",
+      "telefono": "984939196",
+      "numEquipo": "106",
+      "nombreEquipo": "KAIZEN MUKETSU",
+      "tieneEntrenador": true,
+      "entrenador": "Mike Boada",
+      "coordinador": "ALEJANDRO DIAZ",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_470",
+      "orden": "5",
+      "nombre": "Juan Cuzco",
+      "rol": "MANAGER",
+      "telefono": "990394123",
+      "numEquipo": "107",
+      "nombreEquipo": "ARUTAM REN",
+      "tieneEntrenador": true,
+      "entrenador": "Kriscia Rodas",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_471",
+      "orden": "9",
+      "nombre": "Mateo Pachacama",
+      "rol": "MANAGER",
+      "telefono": "984123196",
+      "numEquipo": "107",
+      "nombreEquipo": "ARUTAM REN",
+      "tieneEntrenador": true,
+      "entrenador": "Josué Vera",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_472",
+      "orden": "2",
+      "nombre": "Andrea Pozo",
+      "rol": "MANAGER",
+      "telefono": "984564752",
+      "numEquipo": "107",
+      "nombreEquipo": "ARUTAM REN",
+      "tieneEntrenador": true,
+      "entrenador": "Diego Bravo",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_473",
+      "orden": "7",
+      "nombre": "Alisson Barreros",
+      "rol": "MANAGER",
+      "telefono": "963136490",
+      "numEquipo": "107",
+      "nombreEquipo": "ARUTAM REN",
+      "tieneEntrenador": true,
+      "entrenador": "José Sánchez",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_474",
+      "orden": "8",
+      "nombre": "Martin Garcia",
+      "rol": "MANAGER",
+      "telefono": "999681812",
+      "numEquipo": "107",
+      "nombreEquipo": "ARUTAM REN",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_475",
+      "orden": "4",
+      "nombre": "Jorge Gaunulema",
+      "rol": "MANAGER",
+      "telefono": "984092584",
+      "numEquipo": "107",
+      "nombreEquipo": "ARUTAM REN",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_476",
+      "orden": "3",
+      "nombre": "Bryan Iza",
+      "rol": "MANAGER",
+      "telefono": "962992736",
+      "numEquipo": "107",
+      "nombreEquipo": "ARUTAM REN",
+      "tieneEntrenador": true,
+      "entrenador": "Mauricio Ramírez",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_477",
+      "orden": "4",
+      "nombre": "Génesis Méndez",
+      "rol": "MANAGER",
+      "telefono": "0998307134",
+      "numEquipo": "108",
+      "nombreEquipo": "NIKA AKAPANA",
+      "tieneEntrenador": true,
+      "entrenador": "José Sánchez",
+      "coordinador": "ROBERTO RODRIGUEZ",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_478",
+      "orden": "2",
+      "nombre": "Ximena Briones",
+      "rol": "MANAGER",
+      "telefono": "0987245276",
+      "numEquipo": "108",
+      "nombreEquipo": "NIKA AKAPANA",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "ROBERTO RODRIGUEZ",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_479",
+      "orden": "6",
+      "nombre": "Octavio Murgueytio",
+      "rol": "MANAGER",
+      "telefono": "0987458601",
+      "numEquipo": "109",
+      "nombreEquipo": "NITYA LIKTHAM",
+      "tieneEntrenador": true,
+      "entrenador": "Diego Bravo",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_480",
+      "orden": "2",
+      "nombre": "Alex Anrrango",
+      "rol": "MANAGER",
+      "telefono": "0988626954",
+      "numEquipo": "109",
+      "nombreEquipo": "NITYA LIKTHAM",
+      "tieneEntrenador": true,
+      "entrenador": "Kriscia Rodas",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_481",
+      "orden": "5",
+      "nombre": "Maria Fernanda Bassantes",
+      "rol": "MANAGER",
+      "telefono": "0958720323",
+      "numEquipo": "109",
+      "nombreEquipo": "NITYA LIKTHAM",
+      "tieneEntrenador": true,
+      "entrenador": "Diego Bravo",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_482",
+      "orden": "5",
+      "nombre": "Isabela Torres",
+      "rol": "MANAGER",
+      "telefono": "0961901809",
+      "numEquipo": "30",
+      "nombreEquipo": "METAMORFOSIS",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "JONATHAN LA ROSA",
+      "sede": "Guayaquil",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_483",
+      "orden": "6",
+      "nombre": "Valeria Cevallos",
+      "rol": "MANAGER",
+      "telefono": "999661970",
+      "numEquipo": "111",
+      "nombreEquipo": "SAN SARU",
+      "tieneEntrenador": true,
+      "entrenador": "Mauricio Ramírez",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "QUITO",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_484",
+      "orden": "4",
+      "nombre": "Grecia Mendez",
+      "rol": "MANAGER",
+      "telefono": "0963214210",
+      "numEquipo": "112",
+      "nombreEquipo": "RAYNOR AETERNUM",
+      "tieneEntrenador": true,
+      "entrenador": "José Sánchez",
+      "coordinador": "ROBERTO RODRIGUEZ",
+      "sede": "QUITO",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_485",
+      "orden": "1",
+      "nombre": "Bryan Caicedo",
+      "rol": "CAPITAN",
+      "telefono": "961164574",
+      "numEquipo": "113",
+      "nombreEquipo": "HIKARI KJAZAC",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "QUITO",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_486",
+      "orden": "7",
+      "nombre": "Giss Trujillo",
+      "rol": "MANAGER",
+      "telefono": "991850773",
+      "numEquipo": "113",
+      "nombreEquipo": "HIKARI KJAZAC",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "QUITO",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_487",
+      "orden": "2",
+      "nombre": "Bryan Pesantez",
+      "rol": "MANAGER",
+      "telefono": "+593 98 495 6356",
+      "numEquipo": "114",
+      "nombreEquipo": "KIA AMORIS",
+      "tieneEntrenador": true,
+      "entrenador": "Mauricio Ramírez",
+      "coordinador": "ALEJANDRO DIAZ",
+      "sede": "QUITO",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_488",
+      "orden": "2",
+      "nombre": "Diego Albuja",
+      "rol": "MANAGER",
+      "telefono": "990462746",
+      "numEquipo": "115",
+      "nombreEquipo": "UBUNTU QUASAR",
+      "tieneEntrenador": true,
+      "entrenador": "Linid Valencia",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "QUITO",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_489",
+      "orden": "1",
+      "nombre": "Mario Salazar",
+      "rol": "MANAGER",
+      "telefono": "0990365232",
+      "numEquipo": "92",
+      "nombreEquipo": "APIS TITANIUM",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_490",
+      "orden": "2",
+      "nombre": "Jhon Benitez",
+      "rol": "MANAGER",
+      "telefono": "+573246110466",
+      "numEquipo": "12",
+      "nombreEquipo": "APOLO 12",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Gómez",
+      "coordinador": "MAURICIO RAMIREZ",
+      "sede": "MEDELLIN",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_491",
+      "orden": "4",
+      "nombre": "Oscar Rosero",
+      "rol": "MANAGER",
+      "telefono": "0992034860",
+      "numEquipo": "92",
+      "nombreEquipo": "APIS TITANIUM",
+      "tieneEntrenador": true,
+      "entrenador": "María José Román",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_492",
+      "orden": "5",
+      "nombre": "Sara Castillo",
+      "rol": "MANAGER",
+      "telefono": "995082481",
+      "numEquipo": "92",
+      "nombreEquipo": "APIS TITANIUM",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_493",
+      "orden": "2",
+      "nombre": "Abad Gonza Misael Sebastian",
+      "rol": "MANAGER",
+      "telefono": "95 872 2184",
+      "numEquipo": "93",
+      "nombreEquipo": "METATRON",
+      "tieneEntrenador": true,
+      "entrenador": "Diego Bravo",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_494",
+      "orden": "3",
+      "nombre": "Altuna Alvarez Gabriela Lucia",
+      "rol": "MANAGER",
+      "telefono": "99 013 8300",
+      "numEquipo": "93",
+      "nombreEquipo": "METATRON",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_495",
+      "orden": "5",
+      "nombre": "Espinoza Ortiz Ivana Patricia",
+      "rol": "MANAGER",
+      "telefono": "98 062 3021",
+      "numEquipo": "93",
+      "nombreEquipo": "METATRON",
+      "tieneEntrenador": true,
+      "entrenador": "José Sánchez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_496",
+      "orden": "6",
+      "nombre": "Gonza Gonzalez Jair Israel",
+      "rol": "MANAGER",
+      "telefono": "95 945 4765",
+      "numEquipo": "93",
+      "nombreEquipo": "METATRON",
+      "tieneEntrenador": true,
+      "entrenador": "Mildred Muñoz",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_497",
+      "orden": "7",
+      "nombre": "Guerrero Viteri Marcia Ximena",
+      "rol": "MANAGER",
+      "telefono": "95 891 2040",
+      "numEquipo": "93",
+      "nombreEquipo": "METATRON",
+      "tieneEntrenador": true,
+      "entrenador": "Diego Bravo",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_498",
+      "orden": "8",
+      "nombre": "Itas Mazón  Karen Sulay",
+      "rol": "MANAGER",
+      "telefono": "99 244 9643",
+      "numEquipo": "93",
+      "nombreEquipo": "METATRON",
+      "tieneEntrenador": true,
+      "entrenador": "José Sánchez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_499",
+      "orden": "1",
+      "nombre": "Martinez Guerrero Marjorie Ximena",
+      "rol": "MANAGER",
+      "telefono": "99 971 7749",
+      "numEquipo": "93",
+      "nombreEquipo": "METATRON",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_500",
+      "orden": "9",
+      "nombre": "Rubio Rosero Andrea Lizbeth",
+      "rol": "MANAGER",
+      "telefono": "99 881 5065",
+      "numEquipo": "93",
+      "nombreEquipo": "METATRON",
+      "tieneEntrenador": true,
+      "entrenador": "Alejandro Diaz",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_501",
+      "orden": "10",
+      "nombre": "Soria Paredes Margarita De Las Mercedes",
+      "rol": "MANAGER",
+      "telefono": "99 570 6657",
+      "numEquipo": "93",
+      "nombreEquipo": "METATRON",
+      "tieneEntrenador": true,
+      "entrenador": "Alejandro Diaz",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_502",
+      "orden": "11",
+      "nombre": "Varela Cano Susana Noemi",
+      "rol": "MANAGER",
+      "telefono": "98 809 1929",
+      "numEquipo": "93",
+      "nombreEquipo": "METATRON",
+      "tieneEntrenador": true,
+      "entrenador": "María José Román",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_503",
+      "orden": "3",
+      "nombre": "Ismael Guzman",
+      "rol": "MANAGER",
+      "telefono": "0987942544",
+      "numEquipo": "94",
+      "nombreEquipo": "EAYN ALNASR",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_504",
+      "orden": "4",
+      "nombre": "Karina Mazon",
+      "rol": "MANAGER",
+      "telefono": "0984588057",
+      "numEquipo": "94",
+      "nombreEquipo": "EAYN ALNASR",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_505",
+      "orden": "1",
+      "nombre": "Lizzie Zambrano",
+      "rol": "MANAGER",
+      "telefono": "0979244825",
+      "numEquipo": "94",
+      "nombreEquipo": "EAYN ALNASR",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_506",
+      "orden": "2",
+      "nombre": "Poleth Montalvo",
+      "rol": "MANAGER",
+      "telefono": "0991687219",
+      "numEquipo": "94",
+      "nombreEquipo": "EAYN ALNASR",
+      "tieneEntrenador": true,
+      "entrenador": "José Sánchez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_507",
+      "orden": "5",
+      "nombre": "Sandra Erazo",
+      "rol": "MANAGER",
+      "telefono": "0988314134",
+      "numEquipo": "94",
+      "nombreEquipo": "EAYN ALNASR",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_508",
+      "orden": "6",
+      "nombre": "Sandra Naula",
+      "rol": "MANAGER",
+      "telefono": "0983344715",
+      "numEquipo": "94",
+      "nombreEquipo": "EAYN ALNASR",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_509",
+      "orden": "4",
+      "nombre": "Asanza Nadia",
+      "rol": "MANAGER",
+      "telefono": "0992087336",
+      "numEquipo": "95",
+      "nombreEquipo": "LYUN USHUAY RHUA",
+      "tieneEntrenador": true,
+      "entrenador": "Josué Vera",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_510",
+      "orden": "6",
+      "nombre": "Pozo Camila",
+      "rol": "MANAGER",
+      "telefono": "0987139380",
+      "numEquipo": "95",
+      "nombreEquipo": "LYUN USHUAY RHUA",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_511",
+      "orden": "7",
+      "nombre": "Suarez Marlene",
+      "rol": "MANAGER",
+      "telefono": "0992711047",
+      "numEquipo": "95",
+      "nombreEquipo": "LYUN USHUAY RHUA",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_512",
+      "orden": "2",
+      "nombre": "Yesid Santander",
+      "rol": "MANAGER",
+      "telefono": "+57 3042071111",
+      "numEquipo": "13",
+      "nombreEquipo": "KRONOS DYNATUS",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "MAURICIO RAMIREZ",
+      "sede": "MEDELLIN",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_513",
+      "orden": "3",
+      "nombre": "Tamayo Dayana",
+      "rol": "MANAGER",
+      "telefono": "0961944443",
+      "numEquipo": "95",
+      "nombreEquipo": "LYUN USHUAY RHUA",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_514",
+      "orden": "9",
+      "nombre": "Tamayo Jandery",
+      "rol": "MANAGER",
+      "telefono": "0969054277",
+      "numEquipo": "95",
+      "nombreEquipo": "LYUN USHUAY RHUA",
+      "tieneEntrenador": true,
+      "entrenador": "Mildred Muñoz",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_515",
+      "orden": "5",
+      "nombre": "Tito Mateo",
+      "rol": "MANAGER",
+      "telefono": "0960291037",
+      "numEquipo": "95",
+      "nombreEquipo": "LYUN USHUAY RHUA",
+      "tieneEntrenador": true,
+      "entrenador": "Josué Vera",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_516",
+      "orden": "1",
+      "nombre": "Vasquez Kevin",
+      "rol": "MANAGER",
+      "telefono": "0998479299",
+      "numEquipo": "95",
+      "nombreEquipo": "LYUN USHUAY RHUA",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_517",
+      "orden": "2",
+      "nombre": "Villamar Paz",
+      "rol": "MANAGER",
+      "telefono": "0960938705",
+      "numEquipo": "95",
+      "nombreEquipo": "LYUN USHUAY RHUA",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_518",
+      "orden": "3",
+      "nombre": "Gerardo Mediavilla",
+      "rol": "MANAGER",
+      "telefono": "0995658053",
+      "numEquipo": "96",
+      "nombreEquipo": "NINARI",
+      "tieneEntrenador": true,
+      "entrenador": "Mauricio Ramírez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_519",
+      "orden": "519",
+      "nombre": "Martha Rea",
+      "rol": "MANAGER",
+      "telefono": "0987656778",
+      "numEquipo": "17",
+      "nombreEquipo": "JATARI",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "JUAN FER REINOSO",
+      "sede": "CUENCA",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_520",
+      "orden": "3",
+      "nombre": "Angel Enrique Young",
+      "rol": "MANAGER",
+      "telefono": "+51999261944",
+      "numEquipo": "24",
+      "nombreEquipo": "KAIRU",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "LINID VALENCIA",
+      "sede": "LIMA",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_521",
+      "orden": "2",
+      "nombre": "Andres Mauricio Vargas",
+      "rol": "MANAGER",
+      "telefono": "+573116042782",
+      "numEquipo": "14",
+      "nombreEquipo": "RAGNAROK",
+      "tieneEntrenador": true,
+      "entrenador": "José Sánchez",
+      "coordinador": "MAURICIO RAMIREZ",
+      "sede": "MEDELLIN",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_522",
+      "orden": "1",
+      "nombre": "Miguel Torres",
+      "rol": "MANAGER",
+      "telefono": "0991680131",
+      "numEquipo": "96",
+      "nombreEquipo": "NINARI",
+      "tieneEntrenador": true,
+      "entrenador": "Mike Boada",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_523",
+      "orden": "4",
+      "nombre": "Nancy Mendoza",
+      "rol": "MANAGER",
+      "telefono": "0996038966",
+      "numEquipo": "96",
+      "nombreEquipo": "NINARI",
+      "tieneEntrenador": true,
+      "entrenador": "Alejandro Diaz",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_524",
+      "orden": "7",
+      "nombre": "Gina Cárdenaz López",
+      "rol": "MANAGER",
+      "telefono": "+51999699649",
+      "numEquipo": "24",
+      "nombreEquipo": "KAIRU",
+      "tieneEntrenador": true,
+      "entrenador": "Erika Gavilánez",
+      "coordinador": "LINID VALENCIA",
+      "sede": "LIMA",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_525",
+      "orden": "6",
+      "nombre": "Francisco Romero",
+      "rol": "MANAGER",
+      "telefono": "0984051438",
+      "numEquipo": "18",
+      "nombreEquipo": "VALHARYN",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "KERLY CARRILLO",
+      "sede": "CUENCA",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_526",
+      "orden": "3",
+      "nombre": "Hugo Castillo",
+      "rol": "MANAGER",
+      "telefono": "0986389625",
+      "numEquipo": "18",
+      "nombreEquipo": "VALHARYN",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "KERLY CARRILLO",
+      "sede": "CUENCA",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_527",
+      "orden": "2",
+      "nombre": "Adriana Ramirez",
+      "rol": "MANAGER",
+      "telefono": "+593 98 760 9978",
+      "numEquipo": "97",
+      "nombreEquipo": "BINDU MUHOPO",
+      "tieneEntrenador": true,
+      "entrenador": "Diego Bravo",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_528",
+      "orden": "3",
+      "nombre": "Briggette Picoita",
+      "rol": "MANAGER",
+      "telefono": "+593 96 716 7148",
+      "numEquipo": "97",
+      "nombreEquipo": "BINDU MUHOPO",
+      "tieneEntrenador": true,
+      "entrenador": "José Sánchez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_529",
+      "orden": "4",
+      "nombre": "Jonathan Hernández",
+      "rol": "MANAGER",
+      "telefono": "+593 99 853 5921",
+      "numEquipo": "97",
+      "nombreEquipo": "BINDU MUHOPO",
+      "tieneEntrenador": true,
+      "entrenador": "Alejandro Diaz",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_530",
+      "orden": "5",
+      "nombre": "Karina Segura",
+      "rol": "MANAGER",
+      "telefono": "+593 99 797 2542",
+      "numEquipo": "97",
+      "nombreEquipo": "BINDU MUHOPO",
+      "tieneEntrenador": true,
+      "entrenador": "María José Román",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_531",
+      "orden": "6",
+      "nombre": "Lizardo Zarate",
+      "rol": "MANAGER",
+      "telefono": "+593 96 102 5273",
+      "numEquipo": "97",
+      "nombreEquipo": "BINDU MUHOPO",
+      "tieneEntrenador": true,
+      "entrenador": "Mauricio Ramírez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_532",
+      "orden": "7",
+      "nombre": "Mishell Moscoso",
+      "rol": "MANAGER",
+      "telefono": "+593 98 336 4157",
+      "numEquipo": "97",
+      "nombreEquipo": "BINDU MUHOPO",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_533",
+      "orden": "8",
+      "nombre": "Santiago Alarcón",
+      "rol": "MANAGER",
+      "telefono": "+593 98 405 7534",
+      "numEquipo": "97",
+      "nombreEquipo": "BINDU MUHOPO",
+      "tieneEntrenador": true,
+      "entrenador": "Alejandro Diaz",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_534",
+      "orden": "1",
+      "nombre": "Vielka Altuna",
+      "rol": "MANAGER",
+      "telefono": "+593 99 657 4352",
+      "numEquipo": "97",
+      "nombreEquipo": "BINDU MUHOPO",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_535",
+      "orden": "9",
+      "nombre": "Willow Paladines",
+      "rol": "MANAGER",
+      "telefono": "+593 98 150 4191",
+      "numEquipo": "97",
+      "nombreEquipo": "BINDU MUHOPO",
+      "tieneEntrenador": true,
+      "entrenador": "Mauricio Ramírez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_536",
+      "orden": "3",
+      "nombre": "Helar Muguruza",
+      "rol": "MANAGER",
+      "telefono": "924476603",
+      "numEquipo": "25",
+      "nombreEquipo": "SINCHI RUNA",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "LINID VALENCIA",
+      "sede": "LIMA",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_537",
+      "orden": "5",
+      "nombre": "Jhen Ponce",
+      "rol": "MANAGER",
+      "telefono": "970737769",
+      "numEquipo": "25",
+      "nombreEquipo": "SINCHI RUNA",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "LINID VALENCIA",
+      "sede": "LIMA",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_538",
+      "orden": "3",
+      "nombre": "Geovana Elizabeth Tamayo Guachamin",
+      "rol": "MANAGER",
+      "telefono": "0997354933",
+      "numEquipo": "98",
+      "nombreEquipo": "VALHALLA DRAKI",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_539",
+      "orden": "2",
+      "nombre": "Karina Valdiviezo",
+      "rol": "MANAGER",
+      "telefono": "0967241443",
+      "numEquipo": "18",
+      "nombreEquipo": "VALHARYN",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "KERLY CARRILLO",
+      "sede": "CUENCA",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_540",
+      "orden": "4",
+      "nombre": "María Teresa Maejía Villalba",
+      "rol": "MANAGER",
+      "telefono": "0996656415",
+      "numEquipo": "98",
+      "nombreEquipo": "VALHALLA DRAKI",
+      "tieneEntrenador": true,
+      "entrenador": "Mila Campuzano",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_541",
+      "orden": "5",
+      "nombre": "Evelyn Moreno",
+      "rol": "MANAGER",
+      "telefono": "0967518179",
+      "numEquipo": "99",
+      "nombreEquipo": "HENSU CHIKARA",
+      "tieneEntrenador": true,
+      "entrenador": "José Sánchez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_542",
+      "orden": "1",
+      "nombre": "Isaac Betancourt",
+      "rol": "MANAGER",
+      "telefono": "0939009570",
+      "numEquipo": "99",
+      "nombreEquipo": "HENSU CHIKARA",
+      "tieneEntrenador": true,
+      "entrenador": "Mike Boada",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_543",
+      "orden": "2",
+      "nombre": "Kevin Córdova",
+      "rol": "MANAGER",
+      "telefono": "0987698037",
+      "numEquipo": "99",
+      "nombreEquipo": "HENSU CHIKARA",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_544",
+      "orden": "6",
+      "nombre": "Nathaly  Velez",
+      "rol": "MANAGER",
+      "telefono": "0991233384",
+      "numEquipo": "99",
+      "nombreEquipo": "HENSU CHIKARA",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_545",
+      "orden": "2",
+      "nombre": "Alex Orbe",
+      "rol": "MANAGER",
+      "telefono": "593 98 345 1934",
+      "numEquipo": "100",
+      "nombreEquipo": "DUNAMIS PATSAK",
+      "tieneEntrenador": true,
+      "entrenador": "David Sosa",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_546",
+      "orden": "3",
+      "nombre": "Andrea Contreras",
+      "rol": "MANAGER",
+      "telefono": "+593 99 840 5655",
+      "numEquipo": "100",
+      "nombreEquipo": "DUNAMIS PATSAK",
+      "tieneEntrenador": true,
+      "entrenador": "Isaac Betancourt",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_547",
+      "orden": "4",
+      "nombre": "Daniel Valdez",
+      "rol": "MANAGER",
+      "telefono": "+593 99 423 6151",
+      "numEquipo": "100",
+      "nombreEquipo": "DUNAMIS PATSAK",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_548",
+      "orden": "5",
+      "nombre": "Darwin Delgado",
+      "rol": "MANAGER",
+      "telefono": "+593 99 009 3959",
+      "numEquipo": "100",
+      "nombreEquipo": "DUNAMIS PATSAK",
+      "tieneEntrenador": true,
+      "entrenador": "Isaac Betancourt",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_549",
+      "orden": "4",
+      "nombre": "David Rodriguez",
+      "rol": "MANAGER",
+      "telefono": "927788191",
+      "numEquipo": "25",
+      "nombreEquipo": "SINCHI RUNA",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "LINID VALENCIA",
+      "sede": "LIMA",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_550",
+      "orden": "1",
+      "nombre": "Diego Bravo",
+      "rol": "CAPITAN",
+      "telefono": "593 99 397 8520",
+      "numEquipo": "100",
+      "nombreEquipo": "DUNAMIS PATSAK",
+      "tieneEntrenador": true,
+      "entrenador": "Mike Boada",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_551",
+      "orden": "6",
+      "nombre": "Elizabeth Jarrin",
+      "rol": "MANAGER",
+      "telefono": "+593 98 729 9373",
+      "numEquipo": "100",
+      "nombreEquipo": "DUNAMIS PATSAK",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_552",
+      "orden": "7",
+      "nombre": "Estefania Romero",
+      "rol": "MANAGER",
+      "telefono": "+593 98 322 5846",
+      "numEquipo": "100",
+      "nombreEquipo": "DUNAMIS PATSAK",
+      "tieneEntrenador": true,
+      "entrenador": "Josué Vera",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_553",
+      "orden": "8",
+      "nombre": "Isabel Cardenas",
+      "rol": "MANAGER",
+      "telefono": "+593 99 371 0023",
+      "numEquipo": "100",
+      "nombreEquipo": "DUNAMIS PATSAK",
+      "tieneEntrenador": true,
+      "entrenador": "José Sánchez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_554",
+      "orden": "9",
+      "nombre": "Marcela Tituaña",
+      "rol": "MANAGER",
+      "telefono": "+593 99 733 7099",
+      "numEquipo": "100",
+      "nombreEquipo": "DUNAMIS PATSAK",
+      "tieneEntrenador": true,
+      "entrenador": "María José Román",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_555",
+      "orden": "10",
+      "nombre": "Monica Casanova",
+      "rol": "MANAGER",
+      "telefono": "+593 98 755 7553",
+      "numEquipo": "100",
+      "nombreEquipo": "DUNAMIS PATSAK",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_556",
+      "orden": "11",
+      "nombre": "Ricardo Esteves",
+      "rol": "MANAGER",
+      "telefono": "+593 99 986 7599",
+      "numEquipo": "100",
+      "nombreEquipo": "DUNAMIS PATSAK",
+      "tieneEntrenador": true,
+      "entrenador": "José Sánchez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_557",
+      "orden": "12",
+      "nombre": "Sandra Hurtado",
+      "rol": "MANAGER",
+      "telefono": "+593 96 324 5579",
+      "numEquipo": "100",
+      "nombreEquipo": "DUNAMIS PATSAK",
+      "tieneEntrenador": true,
+      "entrenador": "David Sosa",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_558",
+      "orden": "13",
+      "nombre": "Sofia Vasco",
+      "rol": "MANAGER",
+      "telefono": "+593 98 784 4984",
+      "numEquipo": "100",
+      "nombreEquipo": "DUNAMIS PATSAK",
+      "tieneEntrenador": true,
+      "entrenador": "María José Román",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_559",
+      "orden": "14",
+      "nombre": "Yoxibeth Garcia",
+      "rol": "MANAGER",
+      "telefono": "+593 96 976 7956",
+      "numEquipo": "100",
+      "nombreEquipo": "DUNAMIS PATSAK",
+      "tieneEntrenador": true,
+      "entrenador": "María José Román",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_560",
+      "orden": "3",
+      "nombre": "Natalia Cajas",
+      "rol": "MANAGER",
+      "telefono": "+593 99 924 3226",
+      "numEquipo": "110",
+      "nombreEquipo": "BUSHI MASAI",
+      "tieneEntrenador": true,
+      "entrenador": "José Sánchez",
+      "coordinador": "ALEJANDRO DIAZ",
+      "sede": "QUITO",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_561",
+      "orden": "2",
+      "nombre": "Ena Carrera",
+      "rol": "MANAGER",
+      "telefono": "983581451",
+      "numEquipo": "101",
+      "nombreEquipo": "SUMAQ SHIN",
+      "tieneEntrenador": true,
+      "entrenador": "Josué Vera",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_562",
+      "orden": "1",
+      "nombre": "Margarita Soria",
+      "rol": "CAPITANA",
+      "telefono": "995706657",
+      "numEquipo": "101",
+      "nombreEquipo": "SUMAQ SHIN",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_563",
+      "orden": "1",
+      "nombre": "Piero Alessandro Portal Pasquel",
+      "rol": "CAPITÁN",
+      "telefono": "+51962559832",
+      "numEquipo": "26",
+      "nombreEquipo": "PROMETHEUS IGNIS",
+      "tieneEntrenador": true,
+      "entrenador": "Josué Vera",
+      "coordinador": "LINID VALENCIA",
+      "sede": "LIMA",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_564",
+      "orden": "5",
+      "nombre": "Edison Hatty",
+      "rol": "MANAGER",
+      "telefono": "996577231",
+      "numEquipo": "102",
+      "nombreEquipo": "RIKCHARI MUNAY",
+      "tieneEntrenador": true,
+      "entrenador": "Diego Bravo",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_565",
+      "orden": "3",
+      "nombre": "Dayana Zambrano",
+      "rol": "MANAGER",
+      "telefono": "939672110",
+      "numEquipo": "102",
+      "nombreEquipo": "RIKCHARI MUNAY",
+      "tieneEntrenador": true,
+      "entrenador": "José Sánchez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_566",
+      "orden": "4",
+      "nombre": "Doris Pazmiño",
+      "rol": "MANAGER",
+      "telefono": "992512392",
+      "numEquipo": "102",
+      "nombreEquipo": "RIKCHARI MUNAY",
+      "tieneEntrenador": true,
+      "entrenador": "Josué Vera",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_567",
+      "orden": "2",
+      "nombre": "Anahi Reyes",
+      "rol": "MANAGER",
+      "telefono": "995225784",
+      "numEquipo": "102",
+      "nombreEquipo": "RIKCHARI MUNAY",
+      "tieneEntrenador": true,
+      "entrenador": "Mauricio Ramírez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_568",
+      "orden": "4",
+      "nombre": "Jonathan Zamora",
+      "rol": "MANAGER",
+      "telefono": "999450690",
+      "numEquipo": "115",
+      "nombreEquipo": "UBUNTU QUASAR",
+      "tieneEntrenador": true,
+      "entrenador": "Linid Valencia",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "QUITO",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_569",
+      "orden": "7",
+      "nombre": "Jose Guillermo Curi Salvador",
+      "rol": "MANAGER",
+      "telefono": "+51922972827",
+      "numEquipo": "26",
+      "nombreEquipo": "PROMETHEUS IGNIS",
+      "tieneEntrenador": true,
+      "entrenador": "Josué Vera",
+      "coordinador": "LINID VALENCIA",
+      "sede": "LIMA",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_570",
+      "orden": "8",
+      "nombre": "Jolber Vargas Enriquez",
+      "rol": "MANAGER",
+      "telefono": "+51957072400",
+      "numEquipo": "26",
+      "nombreEquipo": "PROMETHEUS IGNIS",
+      "tieneEntrenador": true,
+      "entrenador": "Josué Vera",
+      "coordinador": "LINID VALENCIA",
+      "sede": "LIMA",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_571",
+      "orden": "7",
+      "nombre": "Sandra Mendieta",
+      "rol": "MANAGER",
+      "telefono": "983508986",
+      "numEquipo": "115",
+      "nombreEquipo": "UBUNTU QUASAR",
+      "tieneEntrenador": true,
+      "entrenador": "Linid Valencia",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "QUITO",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_572",
+      "orden": "1",
+      "nombre": "Natalia Cepeda",
+      "rol": "CAPITANA",
+      "telefono": "983090926",
+      "numEquipo": "103",
+      "nombreEquipo": "MEMENTO MORI",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_573",
+      "orden": "7",
+      "nombre": "Alexis Bazurto",
+      "rol": "MANAGER",
+      "telefono": "988993540",
+      "numEquipo": "103",
+      "nombreEquipo": "MEMENTO MORI",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_574",
+      "orden": "6",
+      "nombre": "Daniel Vinueza",
+      "rol": "MANAGER",
+      "telefono": "992520266",
+      "numEquipo": "103",
+      "nombreEquipo": "MEMENTO MORI",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_575",
+      "orden": "9",
+      "nombre": "Nicole Murgueytio",
+      "rol": "MANAGER",
+      "telefono": "987634771",
+      "numEquipo": "103",
+      "nombreEquipo": "MEMENTO MORI",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_576",
+      "orden": "3",
+      "nombre": "Natt Arteaga",
+      "rol": "MANAGER",
+      "telefono": "983090926",
+      "numEquipo": "103",
+      "nombreEquipo": "MEMENTO MORI",
+      "tieneEntrenador": true,
+      "entrenador": "Mauricio Ramírez",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_577",
+      "orden": "2",
+      "nombre": "Mauricio Rivadeneira",
+      "rol": "MANAGER",
+      "telefono": "984917757",
+      "numEquipo": "103",
+      "nombreEquipo": "MEMENTO MORI",
+      "tieneEntrenador": true,
+      "entrenador": "Pamela Carrillo",
+      "coordinador": "JOSUÉ VERA",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_578",
+      "orden": "2",
+      "nombre": "Vasco Basantes Johanna Paola",
+      "rol": "MANAGER",
+      "telefono": "+593995358735",
+      "numEquipo": "104",
+      "nombreEquipo": "RAGNAROK CHAKANA",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "ROBERTO RODRIGUEZ",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_579",
+      "orden": "5",
+      "nombre": "Tituana Suquillo Maria Paulina",
+      "rol": "MANAGER",
+      "telefono": "+593961027772",
+      "numEquipo": "104",
+      "nombreEquipo": "RAGNAROK CHAKANA",
+      "tieneEntrenador": true,
+      "entrenador": "Josué Vera",
+      "coordinador": "ROBERTO RODRIGUEZ",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_580",
+      "orden": "6",
+      "nombre": "Castillo Reyes Juan Fernando",
+      "rol": "MANAGER",
+      "telefono": "+593995275755",
+      "numEquipo": "104",
+      "nombreEquipo": "RAGNAROK CHAKANA",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "ROBERTO RODRIGUEZ",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_581",
+      "orden": "7",
+      "nombre": "Merino Tarqui Margarita Noemi",
+      "rol": "MANAGER",
+      "telefono": "+593998303108",
+      "numEquipo": "104",
+      "nombreEquipo": "RAGNAROK CHAKANA",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "ROBERTO RODRIGUEZ",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_582",
+      "orden": "8",
+      "nombre": "Lita Ayala Maria Augusta",
+      "rol": "MANAGER",
+      "telefono": "+593969268572",
+      "numEquipo": "104",
+      "nombreEquipo": "RAGNAROK CHAKANA",
+      "tieneEntrenador": true,
+      "entrenador": "Pamela Carrillo",
+      "coordinador": "ROBERTO RODRIGUEZ",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_583",
+      "orden": "1",
+      "nombre": "Romero Jose Angel",
+      "rol": "CAPITAN",
+      "telefono": "978813781",
+      "numEquipo": "105",
+      "nombreEquipo": "KRALLARI IPSOFACTO",
+      "tieneEntrenador": true,
+      "entrenador": "Mike Boada",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_584",
+      "orden": "9",
+      "nombre": "Micolta Brianna",
+      "rol": "MANAGER",
+      "telefono": "983476990",
+      "numEquipo": "105",
+      "nombreEquipo": "KRALLARI IPSOFACTO",
+      "tieneEntrenador": true,
+      "entrenador": "Diego Bravo",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_585",
+      "orden": "13",
+      "nombre": "Pereira Jennifer",
+      "rol": "MANAGER",
+      "telefono": "979312645",
+      "numEquipo": "105",
+      "nombreEquipo": "KRALLARI IPSOFACTO",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_586",
+      "orden": "14",
+      "nombre": "Piarpuezan Camila Marcela",
+      "rol": "MANAGER",
+      "telefono": "993714455",
+      "numEquipo": "105",
+      "nombreEquipo": "KRALLARI IPSOFACTO",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_587",
+      "orden": "8",
+      "nombre": "Hatty Christian",
+      "rol": "MANAGER",
+      "telefono": "978834609",
+      "numEquipo": "105",
+      "nombreEquipo": "KRALLARI IPSOFACTO",
+      "tieneEntrenador": true,
+      "entrenador": "Mauricio Ramírez",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_588",
+      "orden": "11",
+      "nombre": "Navas Yamilex",
+      "rol": "MANAGER",
+      "telefono": "997918732",
+      "numEquipo": "105",
+      "nombreEquipo": "KRALLARI IPSOFACTO",
+      "tieneEntrenador": true,
+      "entrenador": "Mauricio Ramírez",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_589",
+      "orden": "3",
+      "nombre": "Laura Villagomez",
+      "rol": "MANAGER",
+      "telefono": "0984801468",
+      "numEquipo": "106",
+      "nombreEquipo": "KAIZEN MUKETSU",
+      "tieneEntrenador": true,
+      "entrenador": "José Sánchez",
+      "coordinador": "ALEJANDRO DIAZ",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_590",
+      "orden": "5",
+      "nombre": "Stefany Quilumba",
+      "rol": "MANAGER",
+      "telefono": "0983282523",
+      "numEquipo": "106",
+      "nombreEquipo": "KAIZEN MUKETSU",
+      "tieneEntrenador": true,
+      "entrenador": "Josué Vera",
+      "coordinador": "ALEJANDRO DIAZ",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_591",
+      "orden": "2",
+      "nombre": "Juan Garzon",
+      "rol": "MANAGER",
+      "telefono": "0989324457",
+      "numEquipo": "106",
+      "nombreEquipo": "KAIZEN MUKETSU",
+      "tieneEntrenador": true,
+      "entrenador": "Kriscia Rodas",
+      "coordinador": "ALEJANDRO DIAZ",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_592",
+      "orden": "3",
+      "nombre": "Emerita Salas",
+      "rol": "MANAGER",
+      "telefono": "982376593",
+      "numEquipo": "115",
+      "nombreEquipo": "UBUNTU QUASAR",
+      "tieneEntrenador": true,
+      "entrenador": "Linid Valencia",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "QUITO",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_593",
+      "orden": "1",
+      "nombre": "Victoria Andrade",
+      "rol": "CAPITAN",
+      "telefono": "984432469",
+      "numEquipo": "107",
+      "nombreEquipo": "ARUTAM REN",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_594",
+      "orden": "6",
+      "nombre": "Karina Garcia",
+      "rol": "MANAGER",
+      "telefono": "984430689",
+      "numEquipo": "107",
+      "nombreEquipo": "ARUTAM REN",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_595",
+      "orden": "10",
+      "nombre": "Paola Almeida",
+      "rol": "MANAGER",
+      "telefono": "980687383",
+      "numEquipo": "107",
+      "nombreEquipo": "ARUTAM REN",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_596",
+      "orden": "11",
+      "nombre": "Sebastian Jacome",
+      "rol": "MANAGER",
+      "telefono": "984401998",
+      "numEquipo": "107",
+      "nombreEquipo": "ARUTAM REN",
+      "tieneEntrenador": true,
+      "entrenador": "Pamela Carrillo",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_597",
+      "orden": "5",
+      "nombre": "Alex Pico",
+      "rol": "MANAGER",
+      "telefono": "0995652114",
+      "numEquipo": "108",
+      "nombreEquipo": "NIKA AKAPANA",
+      "tieneEntrenador": true,
+      "entrenador": "David Sosa",
+      "coordinador": "ROBERTO RODRIGUEZ",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_598",
+      "orden": "1",
+      "nombre": "Jennifer Villavicincio",
+      "rol": "CAPITÁN",
+      "telefono": "0979138817",
+      "numEquipo": "108",
+      "nombreEquipo": "NIKA AKAPANA",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "ROBERTO RODRIGUEZ",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_599",
+      "orden": "2",
+      "nombre": "Andres Mosquera",
+      "rol": "MANAGER",
+      "telefono": "958936593",
+      "numEquipo": "117",
+      "nombreEquipo": "OHANA WARRIORS",
+      "tieneEntrenador": true,
+      "entrenador": "Mike Boada",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "QUITO",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_600",
+      "orden": "3",
+      "nombre": "Karla Pastrano",
+      "rol": "MANAGER",
+      "telefono": "0994839083",
+      "numEquipo": "108",
+      "nombreEquipo": "NIKA AKAPANA",
+      "tieneEntrenador": true,
+      "entrenador": "Kriscia Rodas",
+      "coordinador": "ROBERTO RODRIGUEZ",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_601",
+      "orden": "1",
+      "nombre": "Lilibeth Cubillo",
+      "rol": "CAPITANA",
+      "telefono": "0996521133",
+      "numEquipo": "109",
+      "nombreEquipo": "NITYA LIKTHAM",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_602",
+      "orden": "4",
+      "nombre": "Luis Sabay",
+      "rol": "MANAGER",
+      "telefono": "0963552245",
+      "numEquipo": "109",
+      "nombreEquipo": "NITYA LIKTHAM",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_603",
+      "orden": "3",
+      "nombre": "Carlos Lara Burgos",
+      "rol": "MANAGER",
+      "telefono": "0962556731",
+      "numEquipo": "109",
+      "nombreEquipo": "NITYA LIKTHAM",
+      "tieneEntrenador": true,
+      "entrenador": "Mike Boada",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_604",
+      "orden": "2",
+      "nombre": "Carolina Vintimilla",
+      "rol": "MANAGER",
+      "telefono": "+593 98 615 1899",
+      "numEquipo": "110",
+      "nombreEquipo": "BUSHI MASAI",
+      "tieneEntrenador": true,
+      "entrenador": "Diego Bravo",
+      "coordinador": "ALEJANDRO DIAZ",
+      "sede": "QUITO",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_605",
+      "orden": "4",
+      "nombre": "Ruth Calvache",
+      "rol": "MANAGER",
+      "telefono": "+593 99 848 6533",
+      "numEquipo": "110",
+      "nombreEquipo": "BUSHI MASAI",
+      "tieneEntrenador": true,
+      "entrenador": "Josué Vera",
+      "coordinador": "ALEJANDRO DIAZ",
+      "sede": "QUITO",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_606",
+      "orden": "1",
+      "nombre": "Williams Sanchez",
+      "rol": "CAPITAN",
+      "telefono": "+593 98 681 3400",
+      "numEquipo": "110",
+      "nombreEquipo": "BUSHI MASAI",
+      "tieneEntrenador": true,
+      "entrenador": "Josué Vera",
+      "coordinador": "ALEJANDRO DIAZ",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_607",
+      "orden": "4",
+      "nombre": "Edwin Calero",
+      "rol": "MANAGER",
+      "telefono": "969057507",
+      "numEquipo": "111",
+      "nombreEquipo": "SAN SARU",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "QUITO",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_608",
+      "orden": "5",
+      "nombre": "Jonathan Carius",
+      "rol": "MANAGER",
+      "telefono": "981744833",
+      "numEquipo": "111",
+      "nombreEquipo": "SAN SARU",
+      "tieneEntrenador": true,
+      "entrenador": "Josué Vera",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "QUITO",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_609",
+      "orden": "3",
+      "nombre": "Juan Moreno",
+      "rol": "MANAGER",
+      "telefono": "982343184",
+      "numEquipo": "111",
+      "nombreEquipo": "SAN SARU",
+      "tieneEntrenador": true,
+      "entrenador": "Diego Bravo",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "QUITO",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_610",
+      "orden": "2",
+      "nombre": "Karol Villaruel",
+      "rol": "MANAGER",
+      "telefono": "999057277",
+      "numEquipo": "111",
+      "nombreEquipo": "SAN SARU",
+      "tieneEntrenador": true,
+      "entrenador": "José Sánchez",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "QUITO",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_611",
+      "orden": "1",
+      "nombre": "Maria Belen Llumiquinga",
+      "rol": "CAPITANA",
+      "telefono": "986535888",
+      "numEquipo": "111",
+      "nombreEquipo": "SAN SARU",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "QUITO",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_612",
+      "orden": "1",
+      "nombre": "Arianna Mendez",
+      "rol": "CAPITANA",
+      "telefono": "0964147060",
+      "numEquipo": "112",
+      "nombreEquipo": "RAYNOR AETERNUM",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "ROBERTO RODRIGUEZ",
+      "sede": "QUITO",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_613",
+      "orden": "3",
+      "nombre": "Eduardo Alfaro",
+      "rol": "MANAGER",
+      "telefono": "0958740157",
+      "numEquipo": "112",
+      "nombreEquipo": "RAYNOR AETERNUM",
+      "tieneEntrenador": true,
+      "entrenador": "Fernando Mendoza",
+      "coordinador": "ROBERTO RODRIGUEZ",
+      "sede": "QUITO",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_614",
+      "orden": "2",
+      "nombre": "Ivan Tinillo",
+      "rol": "MANAGER",
+      "telefono": "0992869343",
+      "numEquipo": "112",
+      "nombreEquipo": "RAYNOR AETERNUM",
+      "tieneEntrenador": true,
+      "entrenador": "Kriscia Rodas",
+      "coordinador": "ROBERTO RODRIGUEZ",
+      "sede": "QUITO",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_615",
+      "orden": "6",
+      "nombre": "Joshua Albuja",
+      "rol": "MANAGER",
+      "telefono": "985328921",
+      "numEquipo": "113",
+      "nombreEquipo": "HIKARI KJAZAC",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "QUITO",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_616",
+      "orden": "5",
+      "nombre": "Kenneth Albuja",
+      "rol": "MANAGER",
+      "telefono": "985328833",
+      "numEquipo": "113",
+      "nombreEquipo": "HIKARI KJAZAC",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "QUITO",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_617",
+      "orden": "2",
+      "nombre": "Luis Caicedo",
+      "rol": "MANAGER",
+      "telefono": "999911902",
+      "numEquipo": "113",
+      "nombreEquipo": "HIKARI KJAZAC",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "QUITO",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_618",
+      "orden": "9",
+      "nombre": "Sara Vasco",
+      "rol": "MANAGER",
+      "telefono": "979101070",
+      "numEquipo": "113",
+      "nombreEquipo": "HIKARI KJAZAC",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "QUITO",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_619",
+      "orden": "4",
+      "nombre": "Solange Escobar",
+      "rol": "MANAGER",
+      "telefono": "997488500",
+      "numEquipo": "113",
+      "nombreEquipo": "HIKARI KJAZAC",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "QUITO",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_620",
+      "orden": "8",
+      "nombre": "Ximena Gallardo",
+      "rol": "MANAGER",
+      "telefono": "987302676",
+      "numEquipo": "113",
+      "nombreEquipo": "HIKARI KJAZAC",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "QUITO",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_621",
+      "orden": "3",
+      "nombre": "Erick Bravo",
+      "rol": "MANAGER",
+      "telefono": "994745370",
+      "numEquipo": "113",
+      "nombreEquipo": "HIKARI KJAZAC",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "QUITO",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_622",
+      "orden": "3",
+      "nombre": "Guido Gamboa",
+      "rol": "MANAGER",
+      "telefono": "+593 98 118 1398",
+      "numEquipo": "114",
+      "nombreEquipo": "KIA AMORIS",
+      "tieneEntrenador": true,
+      "entrenador": "Mauricio Ramírez",
+      "coordinador": "ALEJANDRO DIAZ",
+      "sede": "QUITO",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_623",
+      "orden": "4",
+      "nombre": "Monica Casanova",
+      "rol": "MANAGER",
+      "telefono": "+593 96 975 4134",
+      "numEquipo": "114",
+      "nombreEquipo": "KIA AMORIS",
+      "tieneEntrenador": true,
+      "entrenador": "Mauricio Ramírez",
+      "coordinador": "ALEJANDRO DIAZ",
+      "sede": "QUITO",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_624",
+      "orden": "1",
+      "nombre": "Wilson Albuja",
+      "rol": "CAPITAN",
+      "telefono": "+593 98 755 7553",
+      "numEquipo": "114",
+      "nombreEquipo": "KIA AMORIS",
+      "tieneEntrenador": true,
+      "entrenador": "Mauricio Ramírez",
+      "coordinador": "ALEJANDRO DIAZ",
+      "sede": "QUITO",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_625",
+      "orden": "5",
+      "nombre": "Dayana Martinez",
+      "rol": "MANAGER",
+      "telefono": "+593 98 532 8992",
+      "numEquipo": "114",
+      "nombreEquipo": "KIA AMORIS",
+      "tieneEntrenador": true,
+      "entrenador": "Mauricio Ramírez",
+      "coordinador": "ALEJANDRO DIAZ",
+      "sede": "QUITO",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_626",
+      "orden": "6",
+      "nombre": "Kristel Defas",
+      "rol": "MANAGER",
+      "telefono": "999057032",
+      "numEquipo": "115",
+      "nombreEquipo": "UBUNTU QUASAR",
+      "tieneEntrenador": true,
+      "entrenador": "Linid Valencia",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "QUITO",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_627",
+      "orden": "5",
+      "nombre": "Nahya Bermeo",
+      "rol": "MANAGER",
+      "telefono": "998779049",
+      "numEquipo": "115",
+      "nombreEquipo": "UBUNTU QUASAR",
+      "tieneEntrenador": true,
+      "entrenador": "Linid Valencia",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "QUITO",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_628",
+      "orden": "8",
+      "nombre": "Victor Sanchez",
+      "rol": "MANAGER",
+      "telefono": "963553071",
+      "numEquipo": "115",
+      "nombreEquipo": "UBUNTU QUASAR",
+      "tieneEntrenador": true,
+      "entrenador": "Linid Valencia",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "QUITO",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_629",
+      "orden": "1",
+      "nombre": "Martín Quiroz",
+      "rol": "CAPITAN",
+      "telefono": "969032027",
+      "numEquipo": "115",
+      "nombreEquipo": "UBUNTU QUASAR",
+      "tieneEntrenador": true,
+      "entrenador": "Linid Valencia",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "QUITO",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_630",
+      "orden": "1",
+      "nombre": "Paola Camacho",
+      "rol": "CAPITÁN",
+      "telefono": "0995606621",
+      "numEquipo": "116",
+      "nombreEquipo": "RENKIN-SHI",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "ROBERTO RODRIGUEZ",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_631",
+      "orden": "2",
+      "nombre": "Adams Gonzalez",
+      "rol": "MANAGER",
+      "telefono": "0982407266",
+      "numEquipo": "116",
+      "nombreEquipo": "RENKIN-SHI",
+      "tieneEntrenador": true,
+      "entrenador": "Andrés Idrobo",
+      "coordinador": "ROBERTO RODRIGUEZ",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_632",
+      "orden": "1",
+      "nombre": "Cristina Morejon",
+      "rol": "CAPITAN",
+      "telefono": "",
+      "numEquipo": "117",
+      "nombreEquipo": "OHANA WARRIORS",
+      "tieneEntrenador": true,
+      "entrenador": "Mike Boada",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "QUITO",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_633",
+      "orden": "3",
+      "nombre": "Danna Guaman",
+      "rol": "MANAGER",
+      "telefono": "995321338",
+      "numEquipo": "117",
+      "nombreEquipo": "OHANA WARRIORS",
+      "tieneEntrenador": true,
+      "entrenador": "Mike Boada",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "QUITO",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_634",
+      "orden": "6",
+      "nombre": "Jonathan Pillajo",
+      "rol": "MANAGER",
+      "telefono": "995849214",
+      "numEquipo": "117",
+      "nombreEquipo": "OHANA WARRIORS",
+      "tieneEntrenador": true,
+      "entrenador": "Mike Boada",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "QUITO",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_635",
+      "orden": "7",
+      "nombre": "Lisbeth Congo",
+      "rol": "MANAGER",
+      "telefono": "998758461",
+      "numEquipo": "117",
+      "nombreEquipo": "OHANA WARRIORS",
+      "tieneEntrenador": true,
+      "entrenador": "Mike Boada",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "QUITO",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_636",
+      "orden": "8",
+      "nombre": "Marcela Aguirre",
+      "rol": "MANAGER",
+      "telefono": "986919506",
+      "numEquipo": "117",
+      "nombreEquipo": "OHANA WARRIORS",
+      "tieneEntrenador": true,
+      "entrenador": "Mike Boada",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "QUITO",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_637",
+      "orden": "4",
+      "nombre": "Santiago Benitez",
+      "rol": "MANAGER",
+      "telefono": "983854306",
+      "numEquipo": "117",
+      "nombreEquipo": "OHANA WARRIORS",
+      "tieneEntrenador": true,
+      "entrenador": "Mike Boada",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "QUITO",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_638",
+      "orden": "5",
+      "nombre": "Thomas Garcia",
+      "rol": "MANAGER",
+      "telefono": "994347819",
+      "numEquipo": "117",
+      "nombreEquipo": "OHANA WARRIORS",
+      "tieneEntrenador": true,
+      "entrenador": "Mike Boada",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "QUITO",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_639",
+      "orden": "9",
+      "nombre": "Carolina Vintimilla",
+      "rol": "MANAGER",
+      "telefono": "997336202",
+      "numEquipo": "117",
+      "nombreEquipo": "OHANA WARRIORS",
+      "tieneEntrenador": true,
+      "entrenador": "Mike Boada",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "QUITO",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_640",
+      "orden": "1",
+      "nombre": "Carolina Quishpe",
+      "rol": "CAPITANA",
+      "telefono": "986151899",
+      "numEquipo": "118",
+      "nombreEquipo": "KAMAK MIRAI",
+      "tieneEntrenador": true,
+      "entrenador": "Linid Valencia",
+      "coordinador": "ALEJANDRO DIAZ",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_641",
+      "orden": "2",
+      "nombre": "Daniela Esposito",
+      "rol": "MANAGER",
+      "telefono": "983047100",
+      "numEquipo": "118",
+      "nombreEquipo": "KAMAK MIRAI",
+      "tieneEntrenador": true,
+      "entrenador": "Linid Valencia",
+      "coordinador": "ALEJANDRO DIAZ",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_642",
+      "orden": "3",
+      "nombre": "David Salvador",
+      "rol": "MANAGER",
+      "telefono": "981188999",
+      "numEquipo": "118",
+      "nombreEquipo": "KAMAK MIRAI",
+      "tieneEntrenador": true,
+      "entrenador": "Linid Valencia",
+      "coordinador": "ALEJANDRO DIAZ",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_643",
+      "orden": "4",
+      "nombre": "Gabriela Tapia",
+      "rol": "MANAGER",
+      "telefono": "984909501",
+      "numEquipo": "118",
+      "nombreEquipo": "KAMAK MIRAI",
+      "tieneEntrenador": true,
+      "entrenador": "Linid Valencia",
+      "coordinador": "ALEJANDRO DIAZ",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_644",
+      "orden": "5",
+      "nombre": "Javier Salas",
+      "rol": "MANAGER",
+      "telefono": "969546635",
+      "numEquipo": "118",
+      "nombreEquipo": "KAMAK MIRAI",
+      "tieneEntrenador": true,
+      "entrenador": "Linid Valencia",
+      "coordinador": "ALEJANDRO DIAZ",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_645",
+      "orden": "6",
+      "nombre": "Robert Pastrana",
+      "rol": "MANAGER",
+      "telefono": "984898787",
+      "numEquipo": "118",
+      "nombreEquipo": "KAMAK MIRAI",
+      "tieneEntrenador": true,
+      "entrenador": "Linid Valencia",
+      "coordinador": "ALEJANDRO DIAZ",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_646",
+      "orden": "7",
+      "nombre": "Gabriela Altuna",
+      "rol": "MANAGER",
+      "telefono": "979351211",
+      "numEquipo": "118",
+      "nombreEquipo": "KAMAK MIRAI",
+      "tieneEntrenador": true,
+      "entrenador": "Linid Valencia",
+      "coordinador": "ALEJANDRO DIAZ",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_647",
+      "orden": "1",
+      "nombre": "Carolina Herrera",
+      "rol": "CAPITANA",
+      "telefono": "988618235",
+      "numEquipo": "119",
+      "nombreEquipo": "AURA IWIA",
+      "tieneEntrenador": true,
+      "entrenador": "Mauricio Ramírez",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "QUITO",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_648",
+      "orden": "2",
+      "nombre": "Christian Sosa",
+      "rol": "MANAGER",
+      "telefono": "996352930",
+      "numEquipo": "119",
+      "nombreEquipo": "AURA IWIA",
+      "tieneEntrenador": true,
+      "entrenador": "Mauricio Ramírez",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "QUITO",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_649",
+      "orden": "3",
+      "nombre": "Robert Espinoza",
+      "rol": "MANAGER",
+      "telefono": "962284570",
+      "numEquipo": "119",
+      "nombreEquipo": "AURA IWIA",
+      "tieneEntrenador": true,
+      "entrenador": "Mauricio Ramírez",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "QUITO",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_650",
+      "orden": "4",
+      "nombre": "Santiago Proaño",
+      "rol": "MANAGER",
+      "telefono": "939118370",
+      "numEquipo": "119",
+      "nombreEquipo": "AURA IWIA",
+      "tieneEntrenador": true,
+      "entrenador": "Mauricio Ramírez",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "QUITO",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_651",
+      "orden": "5",
+      "nombre": "Vielka Altuna",
+      "rol": "MANAGER",
+      "telefono": "998336421",
+      "numEquipo": "119",
+      "nombreEquipo": "AURA IWIA",
+      "tieneEntrenador": true,
+      "entrenador": "Mauricio Ramírez",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "QUITO",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_652",
+      "orden": "6",
+      "nombre": "Jhonny Cuascota",
+      "rol": "MANAGER",
+      "telefono": "996574352",
+      "numEquipo": "119",
+      "nombreEquipo": "AURA IWIA",
+      "tieneEntrenador": true,
+      "entrenador": "Mauricio Ramírez",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "QUITO",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_653",
+      "orden": "7",
+      "nombre": "Nilda Nicol Nolasco Chipana",
+      "rol": "MANAGER",
+      "telefono": "992796887",
+      "numEquipo": "119",
+      "nombreEquipo": "AURA IWIA",
+      "tieneEntrenador": true,
+      "entrenador": "Mauricio Ramírez",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "QUITO",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_654",
+      "orden": "5",
+      "nombre": "Jampier Piero Policarpo Vera",
+      "rol": "MANAGER",
+      "telefono": "+51912413787",
+      "numEquipo": "27",
+      "nombreEquipo": "KAY THERON",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "LEYLA PASQUEL",
+      "sede": "LIMA",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_655",
+      "orden": "6",
+      "nombre": "Jennifer Marmol",
+      "rol": "MANAGER",
+      "telefono": "",
+      "numEquipo": "27",
+      "nombreEquipo": "KAY THERON",
+      "tieneEntrenador": true,
+      "entrenador": "Ana Monroy",
+      "coordinador": "LEYLA PASQUEL",
+      "sede": "LIMA",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_656",
+      "orden": "8",
+      "nombre": "Lluli Miniguano",
+      "rol": "MANAGER",
+      "telefono": "984617373",
+      "numEquipo": "119",
+      "nombreEquipo": "AURA IWIA",
+      "tieneEntrenador": true,
+      "entrenador": "Mauricio Ramírez",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "QUITO",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_657",
+      "orden": "9",
+      "nombre": "Verito Muzo",
+      "rol": "MANAGER",
+      "telefono": "963416160",
+      "numEquipo": "119",
+      "nombreEquipo": "AURA IWIA",
+      "tieneEntrenador": true,
+      "entrenador": "Mauricio Ramírez",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "QUITO",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_658",
+      "orden": "10",
+      "nombre": "Santiago Alarcón",
+      "rol": "MANAGER",
+      "telefono": "998367570",
+      "numEquipo": "119",
+      "nombreEquipo": "AURA IWIA",
+      "tieneEntrenador": true,
+      "entrenador": "Mauricio Ramírez",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "QUITO",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_659",
+      "orden": "4",
+      "nombre": "Mateo Recalde",
+      "rol": "MANAGER",
+      "telefono": "0987765563",
+      "numEquipo": "34",
+      "nombreEquipo": "FRACTAL SHINE",
+      "tieneEntrenador": true,
+      "entrenador": "Kerlie Carrillo",
+      "coordinador": "JONATHAN LA ROSA",
+      "sede": "Guayaquil",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_660",
+      "orden": "7",
+      "nombre": "Andres Jurado",
+      "rol": "MANAGER",
+      "telefono": "0989167400",
+      "numEquipo": "34",
+      "nombreEquipo": "FRACTAL SHINE",
+      "tieneEntrenador": true,
+      "entrenador": "Kerlie Carrillo",
+      "coordinador": "JONATHAN LA ROSA",
+      "sede": "Guayaquil",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_661",
+      "orden": "1",
+      "nombre": "Veronica Morales",
+      "rol": "MANAGER",
+      "telefono": "",
+      "numEquipo": "120",
+      "nombreEquipo": "MAHORI KAYA",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_662",
+      "orden": "2",
+      "nombre": "Ximena Mejía",
+      "rol": "MANAGER",
+      "telefono": "",
+      "numEquipo": "120",
+      "nombreEquipo": "MAHORI KAYA",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_663",
+      "orden": "3",
+      "nombre": "Jessika Maldonado",
+      "rol": "MANAGER",
+      "telefono": "",
+      "numEquipo": "120",
+      "nombreEquipo": "MAHORI KAYA",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_664",
+      "orden": "6",
+      "nombre": "Jorge Guanulema",
+      "rol": "MANAGER",
+      "telefono": "",
+      "numEquipo": "120",
+      "nombreEquipo": "MAHORI KAYA",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "QUITO",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_665",
+      "orden": "7",
+      "nombre": "Anny Alarcón",
+      "rol": "MANAGER",
+      "telefono": "",
+      "numEquipo": "120",
+      "nombreEquipo": "MAHORI KAYA",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "QUITO",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_666",
+      "orden": "8",
+      "nombre": "Freddy Angamarca",
+      "rol": "MANAGER",
+      "telefono": "",
+      "numEquipo": "120",
+      "nombreEquipo": "MAHORI KAYA",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "QUITO",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_667",
+      "orden": "4",
+      "nombre": "Jessica Pinango",
+      "rol": "MANAGER",
+      "telefono": "",
+      "numEquipo": "120",
+      "nombreEquipo": "MAHORI KAYA",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_668",
+      "orden": "5",
+      "nombre": "Santiago Larrea",
+      "rol": "MANAGER",
+      "telefono": "",
+      "numEquipo": "120",
+      "nombreEquipo": "MAHORI KAYA",
+      "tieneEntrenador": true,
+      "entrenador": "Lourdes Patiño",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_669",
+      "orden": "9",
+      "nombre": "Sofia Vasco",
+      "rol": "MANAGER",
+      "telefono": "",
+      "numEquipo": "121",
+      "nombreEquipo": "ALFA MURI",
+      "tieneEntrenador": true,
+      "entrenador": "José Sánchez",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_670",
+      "orden": "1",
+      "nombre": "Bryan Anrrango",
+      "rol": "CAPITANA",
+      "telefono": "",
+      "numEquipo": "121",
+      "nombreEquipo": "ALFA MURI",
+      "tieneEntrenador": true,
+      "entrenador": "José Sánchez",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_671",
+      "orden": "2",
+      "nombre": "Eduardo Carapaz",
+      "rol": "MANAGER",
+      "telefono": "",
+      "numEquipo": "121",
+      "nombreEquipo": "ALFA MURI",
+      "tieneEntrenador": true,
+      "entrenador": "José Sánchez",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_672",
+      "orden": "5",
+      "nombre": "Lisseth Lucero",
+      "rol": "MANAGER",
+      "telefono": "",
+      "numEquipo": "121",
+      "nombreEquipo": "ALFA MURI",
+      "tieneEntrenador": true,
+      "entrenador": "JOSE SANCHEZ",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "QUITO",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_673",
+      "orden": "6",
+      "nombre": "Brenda Farfan",
+      "rol": "MANAGER",
+      "telefono": "",
+      "numEquipo": "121",
+      "nombreEquipo": "ALFA MURI",
+      "tieneEntrenador": true,
+      "entrenador": "JOSE SANCHEZ",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "QUITO",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_674",
+      "orden": "7",
+      "nombre": "Angel Malacatus",
+      "rol": "MANAGER",
+      "telefono": "",
+      "numEquipo": "121",
+      "nombreEquipo": "ALFA MURI",
+      "tieneEntrenador": true,
+      "entrenador": "JOSE SANCHEZ",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "QUITO",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_675",
+      "orden": "8",
+      "nombre": "Edwin Calero",
+      "rol": "MANAGER",
+      "telefono": "",
+      "numEquipo": "121",
+      "nombreEquipo": "ALFA MURI",
+      "tieneEntrenador": true,
+      "entrenador": "JOSE SANCHEZ",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "QUITO",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_676",
+      "orden": "3",
+      "nombre": "Omar Guanoquiza",
+      "rol": "MANAGER",
+      "telefono": "",
+      "numEquipo": "121",
+      "nombreEquipo": "ALFA MURI",
+      "tieneEntrenador": true,
+      "entrenador": "José Sánchez",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "Quito",
+      "estado": "GRADUADO",
+      "isGraduado": true,
+      "isDesertor": false,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_677",
+      "orden": "4",
+      "nombre": "Gabriela Osio",
+      "rol": "MANAGER",
+      "telefono": "",
+      "numEquipo": "121",
+      "nombreEquipo": "ALFA MURI",
+      "tieneEntrenador": true,
+      "entrenador": "José Sánchez",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_678",
+      "orden": "3",
+      "nombre": "Byron Figuero",
+      "rol": "MANAGER",
+      "telefono": "0991006617",
+      "numEquipo": "34",
+      "nombreEquipo": "FRACTAL SHINE",
+      "tieneEntrenador": true,
+      "entrenador": "Kerlie Carrillo",
+      "coordinador": "JONATHAN LA ROSA",
+      "sede": "Guayaquil",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_679",
+      "orden": "6",
+      "nombre": "Sandra Freire",
+      "rol": "MANAGER",
+      "telefono": "0991318669",
+      "numEquipo": "34",
+      "nombreEquipo": "FRACTAL SHINE",
+      "tieneEntrenador": true,
+      "entrenador": "Kerlie Carrillo",
+      "coordinador": "JONATHAN LA ROSA",
+      "sede": "Guayaquil",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_680",
+      "orden": "1",
+      "nombre": "Iliana Delgado",
+      "rol": "CAPITANA",
+      "telefono": "0994600397",
+      "numEquipo": "34",
+      "nombreEquipo": "FRACTAL SHINE",
+      "tieneEntrenador": true,
+      "entrenador": "Kerlie Carrillo",
+      "coordinador": "JONATHAN LA ROSA",
+      "sede": "Guayaquil",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_681",
+      "orden": "2",
+      "nombre": "Wilson Conza",
+      "rol": "MANAGER",
+      "telefono": "0961944443",
+      "numEquipo": "123",
+      "nombreEquipo": "SHOSHIN ITAI",
+      "tieneEntrenador": true,
+      "entrenador": "Daniela Monroy",
+      "coordinador": "REGINA ROMERO",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_682",
+      "orden": "3",
+      "nombre": "Eduardo Leon",
+      "rol": "MANAGER",
+      "telefono": "0960652421",
+      "numEquipo": "123",
+      "nombreEquipo": "SHOSHIN ITAI",
+      "tieneEntrenador": true,
+      "entrenador": "Daniela Monroy",
+      "coordinador": "REGINA ROMERO",
+      "sede": "Quito",
+      "estado": "DESERTOR",
+      "isGraduado": false,
+      "isDesertor": true,
+      "isActivo": false
+    },
+    {
+      "id": "mgr_683",
+      "orden": "1",
+      "nombre": "Maria Elena Andrade",
+      "rol": "MANAGER",
+      "telefono": "",
+      "numEquipo": "122",
+      "nombreEquipo": "KAIZEN MAINICHI",
+      "tieneEntrenador": true,
+      "entrenador": "Daniela Monroy",
+      "coordinador": "LILI CUBILLO",
+      "sede": "Quito",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_684",
+      "orden": "2",
+      "nombre": "Viviana Ruiz",
+      "rol": "MANAGER",
+      "telefono": "",
+      "numEquipo": "122",
+      "nombreEquipo": "KAIZEN MAINICHI",
+      "tieneEntrenador": true,
+      "entrenador": "Daniela Monroy",
+      "coordinador": "LILI CUBILLO",
+      "sede": "Quito",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_685",
+      "orden": "3",
+      "nombre": "Edwin Calero",
+      "rol": "CAPITAN",
+      "telefono": "",
+      "numEquipo": "122",
+      "nombreEquipo": "KAIZEN MAINICHI",
+      "tieneEntrenador": true,
+      "entrenador": "Daniela Monroy",
+      "coordinador": "LILI CUBILLO",
+      "sede": "Quito",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_686",
+      "orden": "1",
+      "nombre": "Dayana Tamayo",
+      "rol": "CAPITANA",
+      "telefono": "",
+      "numEquipo": "123",
+      "nombreEquipo": "SHOSHIN ITAI",
+      "tieneEntrenador": true,
+      "entrenador": "Daniela Monroy",
+      "coordinador": "REGINA ROMERO",
+      "sede": "Quito",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_687",
+      "orden": "1",
+      "nombre": "Ivan Tinillo",
+      "rol": "CAPITÁN",
+      "telefono": "",
+      "numEquipo": "124",
+      "nombreEquipo": "AZRAK AETERNA",
+      "tieneEntrenador": true,
+      "entrenador": "FERNANDO MENDOZA",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "Quito",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_688",
+      "orden": "2",
+      "nombre": "Ivan Tinilo",
+      "rol": "MANAGER",
+      "telefono": "",
+      "numEquipo": "124",
+      "nombreEquipo": "AZRAK AETERNA",
+      "tieneEntrenador": true,
+      "entrenador": "FERNANDO MENDOZA",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "Quito",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_689",
+      "orden": "3",
+      "nombre": "Ivan Mejía",
+      "rol": "MANAGER",
+      "telefono": "",
+      "numEquipo": "124",
+      "nombreEquipo": "AZRAK AETERNA",
+      "tieneEntrenador": true,
+      "entrenador": "FERNANDO MENDOZA",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "Quito",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_690",
+      "orden": "4",
+      "nombre": "Doris Balseca",
+      "rol": "MANAGER",
+      "telefono": "",
+      "numEquipo": "124",
+      "nombreEquipo": "AZRAK AETERNA",
+      "tieneEntrenador": true,
+      "entrenador": "FERNANDO MENDOZA",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "Quito",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_691",
+      "orden": "5",
+      "nombre": "Andrea Mejía",
+      "rol": "MANAGER",
+      "telefono": "",
+      "numEquipo": "124",
+      "nombreEquipo": "AZRAK AETERNA",
+      "tieneEntrenador": true,
+      "entrenador": "FERNANDO MENDOZA",
+      "coordinador": "ISAAC BETANCOURTH",
+      "sede": "Quito",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_692",
+      "orden": "1",
+      "nombre": "Fernanda Pereira",
+      "rol": "CAPITANA",
+      "telefono": "",
+      "numEquipo": "125",
+      "nombreEquipo": "HATUN PUSHAK",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "Sin Sede",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_693",
+      "orden": "2",
+      "nombre": "Carolina Live",
+      "rol": "MANAGER",
+      "telefono": "",
+      "numEquipo": "125",
+      "nombreEquipo": "HATUN PUSHAK",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "Sin Sede",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_694",
+      "orden": "3",
+      "nombre": "Carolina Santamaria",
+      "rol": "MANAGER",
+      "telefono": "",
+      "numEquipo": "125",
+      "nombreEquipo": "HATUN PUSHAK",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "Sin Sede",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_695",
+      "orden": "4",
+      "nombre": "Ruben Cadena",
+      "rol": "MANAGER",
+      "telefono": "",
+      "numEquipo": "125",
+      "nombreEquipo": "HATUN PUSHAK",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "Sin Sede",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_696",
+      "orden": "5",
+      "nombre": "Camila Torres",
+      "rol": "MANAGER",
+      "telefono": "",
+      "numEquipo": "125",
+      "nombreEquipo": "HATUN PUSHAK",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "Sin Sede",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_697",
+      "orden": "6",
+      "nombre": "Solange Ortiz",
+      "rol": "MANAGER",
+      "telefono": "",
+      "numEquipo": "125",
+      "nombreEquipo": "HATUN PUSHAK",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "Sin Sede",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_698",
+      "orden": "7",
+      "nombre": "Monica Roman",
+      "rol": "MANAGER",
+      "telefono": "",
+      "numEquipo": "125",
+      "nombreEquipo": "HATUN PUSHAK",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "Sin Sede",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
+    },
+    {
+      "id": "mgr_699",
+      "orden": "8",
+      "nombre": "Sofy Castelo",
+      "rol": "MANAGER",
+      "telefono": "",
+      "numEquipo": "125",
+      "nombreEquipo": "HATUN PUSHAK",
+      "tieneEntrenador": true,
+      "entrenador": "Julio Narváez",
+      "coordinador": "ERIKA GAVILANEZ",
+      "sede": "Sin Sede",
+      "estado": "EN_JUEGO",
+      "isGraduado": false,
+      "isDesertor": false,
+      "isActivo": true
     }
   ]
 }
@@ -337339,6 +354721,7 @@ export function subscribeToKpisSummary(callback) {
           totales: data.totales || defaultKpisData.totales,
           kpis: data.kpis || defaultKpisData.kpis,
           llamadosDetalle: defaultKpisData.llamadosDetalle,
+          managersSheet1: defaultKpisData.managersSheet1 || [],
         });
       }
     }, (error) => {

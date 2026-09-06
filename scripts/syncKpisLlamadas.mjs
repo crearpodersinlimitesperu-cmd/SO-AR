@@ -27,7 +27,38 @@ const sheetsApi = google.sheets({ version: 'v4', auth });
 const SHEET_MANAGERS_ID = '1KF58QXAiIk4KP_9G2aiAM3ERVoptcqKlIraszNKq2Ow';
 const SHEET_LLAMADOS_ID = '1lWAHh1PSAKu9eU6DOBxZExrHMbCYc3f2Sr8GdghNxD0';
 
-function slug(s) {
+export function normalizeTrainerName(s) {
+  const clean = String(s || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '');
+
+  if (clean.includes('jesusacosta') || clean.includes('chuyacosta')) return 'chuyacosta';
+  if (clean.includes('erikagavilanez')) return 'erikagavilanez';
+  if (clean.includes('fernandomendoza')) return 'fernandomendoza';
+  if (clean.includes('josesanchez')) return 'josesanchez';
+  if (clean.includes('juanferreinoso') || clean.includes('juanfernandoreinoso')) return 'juanfernandoreinoso';
+  if (clean.includes('alejandrodiaz')) return 'alejandrodiaz';
+  if (clean.includes('andresidrobo')) return 'andresidrobo';
+  if (clean.includes('andresgomez')) return 'andresgomez';
+  if (clean.includes('anacristinasanchez')) return 'anacristinasanchez';
+  if (clean.includes('anamonroy')) return 'anamonroy';
+  if (clean.includes('danielamonroy')) return 'danielamonroy';
+  if (clean.includes('mariajoseroman')) return 'mariajoseroman';
+  if (clean.includes('mildredmunoz')) return 'mildredmunoz';
+  if (clean.includes('lourdespatino')) return 'lourdespatino';
+  if (clean.includes('kerliecarrillo') || clean.includes('kerlycarrillo')) return 'kerliecarrillo';
+  if (clean.includes('julionarvaez')) return 'julionarvaez';
+  if (clean.includes('diegobravo')) return 'diegobravo';
+  if (clean.includes('davidsosa')) return 'davidsosa';
+  if (clean.includes('josetorr')) return 'josetorron';
+  if (clean.includes('pamelacarrillo')) return 'pamelacarrillo';
+  if (clean.includes('mauricio')) return 'mauricioramirez';
+  return clean || 'sin-asignar';
+}
+
+export function slug(s) {
   return String(s || '')
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
@@ -36,15 +67,23 @@ function slug(s) {
     .replace(/^-+|-+$/g, '') || 'sin-nombre';
 }
 
+function cleanStr(s) {
+  return String(s || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '');
+}
+
 export async function syncKpisLlamadas() {
-  console.log('=== Iniciando Sincronización en Tiempo Real de KPIs de Entrenadores de Llamadas ===');
+  console.log('=== Iniciando Sincronización Integral de KPIs (Llamadas, Graduados, Desertores, Asignados) ===');
   const startTime = Date.now();
 
-  // 1. Sheet 1: Managers Directorio
+  // 1. Sheet 1: Managers Directorio Maestro
   console.log('Leyendo Sheet 1 (Managers)...');
   const resMan = await sheetsApi.spreadsheets.values.get({
     spreadsheetId: SHEET_MANAGERS_ID,
-    range: "'Hoja1'!A1:L1200",
+    range: "'Hoja1'!A1:L1500",
   });
   const manRows = resMan.data.values || [];
   console.log(`Sheet 1: ${manRows.length} filas leídas.`);
@@ -58,35 +97,157 @@ export async function syncKpisLlamadas() {
   const kpiRows = resKpis.data.values || [];
   console.log(`Sheet 2 (KPIs): ${kpiRows.length} filas leídas.`);
 
-  // 3. Sheet 2: LLamadas Detalladas
+  // 3. Sheet 2: LLamadas Detalle 1 a 16
   console.log('Leyendo Sheet 2 (LLamadas detalle)...');
   const resLlam = await sheetsApi.spreadsheets.values.get({
     spreadsheetId: SHEET_LLAMADOS_ID,
-    range: "'LLamadas'!A1:Z1500",
+    range: "'LLamadas'!A1:Z1800",
   });
   const llamRows = resLlam.data.values || [];
   console.log(`Sheet 2 (LLamadas): ${llamRows.length} filas leídas.`);
 
-  // Parse KPIs
+  // A. Parse Sheet 1 Managers (Directorio Maestro)
+  const managersSheet1 = [];
+  const statusByManagerCleanName = new Map();
+  const trainerManagersMap = {};
+
+  let totalGraduados = 0;
+  let totalDesertores = 0;
+  let totalActivos = 0;
+  let totalAsignados = 0;
+  let totalSinAsignar = 0;
+
+  for (let i = 1; i < manRows.length; i++) {
+    const r = manRows[i];
+    if (!r || !r[1]) continue;
+
+    const orden = r[0]?.trim() || `${i}`;
+    const nombre = r[1]?.trim() || '';
+    const rol = r[2]?.trim() || 'MANAGER';
+    const telefono = r[3]?.trim() || '';
+    const numEquipo = r[4]?.trim() || '';
+    const nombreEquipo = r[5]?.trim() || '';
+    const tieneEntrRaw = (r[6] || '').trim().toLowerCase();
+    const tieneEntrenador = tieneEntrRaw === 'si' || tieneEntrRaw === 'sí';
+    const entrenadorRaw = r[7]?.trim() || '';
+    const coordinador = r[8]?.trim() || '';
+    const sede = r[9]?.trim() || 'Sin Sede';
+    const graduadoVal = (r[10] || '').trim().toUpperCase();
+    const desertorVal = (r[11] || '').trim().toUpperCase();
+
+    const isGraduado = graduadoVal.includes('GRADUAD') || graduadoVal === 'SI' || graduadoVal === 'X';
+    const isDesertor = desertorVal.includes('DESERT') || desertorVal === 'SI' || desertorVal === 'X';
+
+    let estado = 'EN_JUEGO';
+    if (isGraduado) {
+      estado = 'GRADUADO';
+      totalGraduados++;
+    } else if (isDesertor) {
+      estado = 'DESERTOR';
+      totalDesertores++;
+    } else {
+      totalActivos++;
+    }
+
+    const hasAssignedTrainer = tieneEntrenador;
+    if (hasAssignedTrainer) {
+      totalAsignados++;
+    } else {
+      totalSinAsignar++;
+    }
+
+    const managerObj = {
+      id: `mgr_${i}`,
+      orden,
+      nombre,
+      rol,
+      telefono,
+      numEquipo,
+      nombreEquipo,
+      tieneEntrenador: hasAssignedTrainer,
+      entrenador: entrenadorRaw || 'Sin Asignar',
+      coordinador,
+      sede,
+      estado,
+      isGraduado,
+      isDesertor,
+      isActivo: estado === 'EN_JUEGO'
+    };
+
+    managersSheet1.push(managerObj);
+    statusByManagerCleanName.set(cleanStr(nombre), {
+      estado,
+      isGraduado,
+      isDesertor,
+      telefono,
+      coordinador,
+      nombreEquipo,
+      numEquipo
+    });
+
+    if (entrenadorRaw && entrenadorRaw !== '-' && entrenadorRaw.toLowerCase() !== 'sin asignar') {
+      const tNorm = normalizeTrainerName(entrenadorRaw);
+      if (!trainerManagersMap[tNorm]) {
+        trainerManagersMap[tNorm] = {
+          total: 0,
+          graduados: 0,
+          desertores: 0,
+          activos: 0,
+          managers: []
+        };
+      }
+      trainerManagersMap[tNorm].total++;
+      if (isGraduado) trainerManagersMap[tNorm].graduados++;
+      else if (isDesertor) trainerManagersMap[tNorm].desertores++;
+      else trainerManagersMap[tNorm].activos++;
+      trainerManagersMap[tNorm].managers.push(managerObj);
+    }
+  }
+
+  // B. Parse KPIs Entrenadores (Sheet 2)
   const kpis = [];
   for (let i = 2; i < kpiRows.length; i++) {
     const r = kpiRows[i];
     if (!r || !r[1] || r[1] === 'Suma total') continue;
+    const entrenadorName = r[1].trim();
     const totalLlamadas = parseInt(r[2] || '0', 10);
     const pagadoLlamadas = parseFloat((r[3] || '0').replace('$', '').replace(/,/g, ''));
     const pendienteLlamadas = parseFloat((r[4] || '0').replace('$', '').replace(/,/g, ''));
     const montoTotal = parseFloat((r[5] || '0').replace('$', '').replace(/,/g, ''));
+
+    const tNorm = normalizeTrainerName(entrenadorName);
+    const trainerStats = trainerManagersMap[tNorm] || {
+      total: 0,
+      graduados: 0,
+      desertores: 0,
+      activos: 0,
+      managers: []
+    };
+
+    const totalAsignadosTrainer = trainerStats.total;
+    const graduadosTrainer = trainerStats.graduados;
+    const desertoresTrainer = trainerStats.desertores;
+    const activosTrainer = trainerStats.activos;
+
     kpis.push({
-      entrenador: r[1].trim(),
+      entrenador: entrenadorName,
+      normKey: tNorm,
       totalLlamadas,
       pagadoLlamadas,
       pendienteLlamadas,
       montoTotal,
       porcentajePagado: totalLlamadas > 0 ? Math.round((pagadoLlamadas / totalLlamadas) * 100) : 0,
+      // Métricas de ciclo de vida del manager
+      totalAsignados: totalAsignadosTrainer,
+      graduados: graduadosTrainer,
+      desertores: desertoresTrainer,
+      activos: activosTrainer,
+      tasaGraduacion: totalAsignadosTrainer > 0 ? Math.round((graduadosTrainer / totalAsignadosTrainer) * 100) : 0,
+      tasaDesercion: totalAsignadosTrainer > 0 ? Math.round((desertoresTrainer / totalAsignadosTrainer) * 100) : 0,
     });
   }
 
-  // Parse LLamadas detailed
+  // C. Parse Sheet 2 LLamadas detalladas
   const llamadosDetalle = [];
   for (let i = 1; i < llamRows.length; i++) {
     const r = llamRows[i];
@@ -104,12 +265,15 @@ export async function syncKpisLlamadas() {
       else if (val === 'NO') ausentes++;
     }
 
+    const mClean = cleanStr(manager);
+    const sheet1Meta = statusByManagerCleanName.get(mClean) || {};
+
     llamadosDetalle.push({
       id: `llam_${i}`,
       entrenador: entrenador || 'Sin Asignar',
       manager: manager || '',
       sede: r[2]?.trim() || '',
-      equipo: r[3]?.trim() || '',
+      equipo: r[3]?.trim() || sheet1Meta.nombreEquipo || '',
       fechaInicio: r[4]?.trim() || '',
       fechaFinal: r[5]?.trim() || '',
       totalReportado: parseInt(r[22] || '0', 10),
@@ -119,6 +283,11 @@ export async function syncKpisLlamadas() {
       agosto: parseInt(r[23] || '0', 10) || 0,
       septiembre: parseInt(r[24] || '0', 10) || 0,
       octubre: parseInt(r[25] || '0', 10) || 0,
+      estado: sheet1Meta.estado || 'EN_JUEGO',
+      isGraduado: !!sheet1Meta.isGraduado,
+      isDesertor: !!sheet1Meta.isDesertor,
+      telefono: sheet1Meta.telefono || '',
+      coordinador: sheet1Meta.coordinador || '',
     });
   }
 
@@ -130,10 +299,23 @@ export async function syncKpisLlamadas() {
 
   // Agrupamiento por Sede
   const sedesDist = {};
-  llamadosDetalle.forEach(d => {
-    const s = d.sede || 'Sin Sede';
+  const sedesStatus = {};
+  managersSheet1.forEach(m => {
+    const s = m.sede || 'Sin Sede';
     sedesDist[s] = (sedesDist[s] || 0) + 1;
+    if (!sedesStatus[s]) {
+      sedesStatus[s] = { total: 0, graduados: 0, desertores: 0, activos: 0 };
+    }
+    sedesStatus[s].total++;
+    if (m.isGraduado) sedesStatus[s].graduados++;
+    else if (m.isDesertor) sedesStatus[s].desertores++;
+    else sedesStatus[s].activos++;
   });
+
+  const totalManagers = managersSheet1.length;
+  const tasaGraduacionGlobal = totalManagers > 0 ? Math.round((totalGraduados / totalManagers) * 100) : 0;
+  const tasaDesercionGlobal = totalManagers > 0 ? Math.round((totalDesertores / totalManagers) * 100) : 0;
+  const tasaAsignacionGlobal = totalManagers > 0 ? Math.round((totalAsignados / totalManagers) * 100) : 0;
 
   const compiledData = {
     metadata: {
@@ -142,7 +324,7 @@ export async function syncKpisLlamadas() {
       sheetLlamadosId: SHEET_LLAMADOS_ID,
       totalTrainers: kpis.length,
       totalDetailedRecords: llamadosDetalle.length,
-      totalManagersSheet1: manRows.length > 1 ? manRows.length - 1 : 0,
+      totalManagersSheet1: totalManagers,
       syncDurationMs: Date.now() - startTime
     },
     totales: {
@@ -151,10 +333,26 @@ export async function syncKpisLlamadas() {
       totalPendiente,
       montoTotal,
       porcentajePagado: totalLlamadas > 0 ? Math.round((totalPagado / totalLlamadas) * 100) : 0,
+      totalManagers,
+      totalGraduados,
+      totalDesertores,
+      totalActivos,
+      totalAsignados,
+      totalSinAsignar,
+      tasaGraduacionGlobal,
+      tasaDesercionGlobal,
+      tasaAsignacionGlobal,
       sedesDist,
+      sedesStatus,
+      statusDist: {
+        Graduados: totalGraduados,
+        Desertores: totalDesertores,
+        'En Juego': totalActivos,
+      }
     },
     kpis,
     llamadosDetalle,
+    managersSheet1,
   };
 
   // Guardar archivo JSON local
@@ -175,25 +373,28 @@ export async function syncKpisLlamadas() {
     actualizadoEl: new Date().toISOString()
   });
 
-  // 2. Entrenadores con sus managers
-  const managersByTrainer = {};
+  // 2. Entrenadores con sus managers de ambas hojas
+  const managersByTrainerDetail = {};
   llamadosDetalle.forEach(m => {
     const t = m.entrenador || 'Sin Asignar';
-    if (!managersByTrainer[t]) managersByTrainer[t] = [];
-    managersByTrainer[t].push(m);
+    if (!managersByTrainerDetail[t]) managersByTrainerDetail[t] = [];
+    managersByTrainerDetail[t].push(m);
   });
 
   for (const kpi of kpis) {
     const trainerName = kpi.entrenador;
     const trainerSlug = slug(trainerName);
     const trainerRef = db.collection('kpis_entrenadores_llamadas').doc(trainerSlug);
-    const list = managersByTrainer[trainerName] || [];
+    const callsList = managersByTrainerDetail[trainerName] || [];
+    const tNorm = normalizeTrainerName(trainerName);
+    const directoryList = trainerManagersMap[tNorm]?.managers || [];
 
     batch.set(trainerRef, {
       ...kpi,
       slug: trainerSlug,
-      managersCount: list.length,
-      managersList: list,
+      managersCount: callsList.length,
+      managersList: callsList,
+      directoryManagers: directoryList,
       actualizadoEl: new Date().toISOString()
     });
   }

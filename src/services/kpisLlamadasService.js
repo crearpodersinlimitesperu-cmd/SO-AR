@@ -21,6 +21,7 @@ export function subscribeToKpisSummary(callback) {
           totales: data.totales || defaultKpisData.totales,
           kpis: data.kpis || defaultKpisData.kpis,
           llamadosDetalle: defaultKpisData.llamadosDetalle,
+          managersSheet1: defaultKpisData.managersSheet1 || [],
         });
       }
     }, (error) => {

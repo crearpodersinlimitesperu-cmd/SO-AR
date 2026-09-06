@@ -2,7 +2,9 @@ import React, { useState, useMemo, useEffect } from 'react';
 import {
   TrendingUp, BarChart3, Users, DollarSign, CheckCircle2,
   Clock, Calendar, Search, Filter, ExternalLink, RefreshCw,
-  X, ArrowUpDown, ChevronRight, Phone, Award, Eye, Download, Info
+  X, ArrowUpDown, ChevronRight, Phone, Award, Eye, Download,
+  Info, GraduationCap, UserX, UserCheck, AlertTriangle, UserMinus,
+  Sparkles, Check, PieChart as PieIcon, ListFilter
 } from 'lucide-react';
 import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip,
@@ -15,23 +17,31 @@ const SHEET_LLAMADOS_URL = 'https://docs.google.com/spreadsheets/d/1lWAHh1PSAKu9
 
 const COLORS_SEDES = {
   'Quito': '#3b82f6',
+  'QUITO': '#3b82f6',
   'Lima': '#10b981',
+  'LIMA': '#10b981',
   'Guayaquil': '#f59e0b',
   'Cuenca': '#8b5cf6',
+  'CUENCA': '#8b5cf6',
   'Medellín': '#ec4899',
+  'Medellin': '#ec4899',
+  'MEDELLIN': '#ec4899',
   'CDMX': '#06b6d4',
   'Sin Sede': '#94a3b8'
 };
 
 export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
   const [data, setData] = useState(null);
+  const [activeSubView, setActiveSubView] = useState('entrenadores'); // 'entrenadores' | 'graficas_retencion' | 'directorio_estados'
   const [search, setSearch] = useState('');
   const [filterSede, setFilterSede] = useState('Todas');
-  const [filterStatus, setFilterStatus] = useState('todos'); // 'todos' | 'con_pendientes' | 'completados' | 'sin_actividad'
-  const [sortBy, setSortBy] = useState('montoTotal'); // 'montoTotal' | 'totalLlamadas' | 'pagadoLlamadas' | 'pendienteLlamadas' | 'entrenador'
+  const [filterStatus, setFilterStatus] = useState('todos'); // 'todos' | 'con_pendientes' | 'completados' | 'alta_graduacion' | 'alta_desercion'
+  const [filterManagerStatus, setFilterManagerStatus] = useState('todos'); // 'todos' | 'GRADUADO' | 'DESERTOR' | 'EN_JUEGO' | 'sin_entrenador'
+  const [sortBy, setSortBy] = useState('montoTotal');
   const [sortOrder, setSortOrder] = useState('desc');
   const [selectedTrainer, setSelectedTrainer] = useState(null);
   const [modalSearch, setModalSearch] = useState('');
+  const [modalFilterStatus, setModalFilterStatus] = useState('todos');
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Escuchar datos en tiempo real
@@ -42,17 +52,21 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
     return () => unsub();
   }, []);
 
-  // Mapeo rápido de managers por teléfono / sede desde allManagersList (Sheet 1)
+  // Mapeo rápido de managers por teléfono / sede desde allManagersList o managersSheet1
   const phoneByManagerName = useMemo(() => {
     const map = {};
-    (allManagersList || []).forEach(m => {
+    (data?.managersSheet1 || []).forEach(m => {
       if (m.nombre) {
-        const clean = m.nombre.trim().toLowerCase();
-        map[clean] = m.telefono || '';
+        map[m.nombre.trim().toLowerCase()] = m.telefono || '';
+      }
+    });
+    (allManagersList || []).forEach(m => {
+      if (m.nombre && !map[m.nombre.trim().toLowerCase()]) {
+        map[m.nombre.trim().toLowerCase()] = m.telefono || '';
       }
     });
     return map;
-  }, [allManagersList]);
+  }, [data, allManagersList]);
 
   // Lista de entrenadores procesada con filtros y orden
   const processedTrainers = useMemo(() => {
@@ -92,18 +106,20 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
     // Filtro por sede
     if (filterSede !== 'Todas') {
       list = list.filter(t => 
-        t.topSede === filterSede || 
-        t.detalles.some(d => d.sede === filterSede)
+        t.topSede.toLowerCase().includes(filterSede.toLowerCase()) || 
+        t.detalles.some(d => d.sede.toLowerCase().includes(filterSede.toLowerCase()))
       );
     }
 
-    // Filtro por estado de cobro
+    // Filtro por estado de cobro o desempeño
     if (filterStatus === 'con_pendientes') {
       list = list.filter(t => t.pendienteLlamadas > 0);
     } else if (filterStatus === 'completados') {
       list = list.filter(t => t.totalLlamadas > 0 && t.pendienteLlamadas === 0);
-    } else if (filterStatus === 'sin_actividad') {
-      list = list.filter(t => t.totalLlamadas === 0);
+    } else if (filterStatus === 'alta_graduacion') {
+      list = list.filter(t => t.tasaGraduacion >= 65 && t.totalAsignados > 0);
+    } else if (filterStatus === 'alta_desercion') {
+      list = list.filter(t => t.tasaDesercion >= 30 && t.totalAsignados > 0);
     }
 
     // Ordenamiento
@@ -113,13 +129,46 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
       if (typeof valA === 'string') {
         return sortOrder === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
       }
-      return sortOrder === 'asc' ? valA - valB : valB - valA;
+      return sortOrder === 'asc' ? (valA || 0) - (valB || 0) : (valB || 0) - (valA || 0);
     });
 
     return list;
   }, [data, search, filterSede, filterStatus, sortBy, sortOrder]);
 
-  // Top 10 entrenadores para gráfico de barras por facturación
+  // Lista de Managers de Sheet 1 procesada
+  const processedManagersList = useMemo(() => {
+    if (!data?.managersSheet1) return [];
+    let list = [...data.managersSheet1];
+
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      list = list.filter(m => 
+        m.nombre.toLowerCase().includes(q) ||
+        m.entrenador.toLowerCase().includes(q) ||
+        m.sede.toLowerCase().includes(q) ||
+        m.nombreEquipo.toLowerCase().includes(q) ||
+        m.coordinador.toLowerCase().includes(q)
+      );
+    }
+
+    if (filterSede !== 'Todas') {
+      list = list.filter(m => m.sede.toLowerCase().includes(filterSede.toLowerCase()));
+    }
+
+    if (filterManagerStatus === 'GRADUADO') {
+      list = list.filter(m => m.estado === 'GRADUADO');
+    } else if (filterManagerStatus === 'DESERTOR') {
+      list = list.filter(m => m.estado === 'DESERTOR');
+    } else if (filterManagerStatus === 'EN_JUEGO') {
+      list = list.filter(m => m.estado === 'EN_JUEGO');
+    } else if (filterManagerStatus === 'sin_entrenador') {
+      list = list.filter(m => !m.tieneEntrenador);
+    }
+
+    return list;
+  }, [data, search, filterSede, filterManagerStatus]);
+
+  // Top 10 entrenadores para gráfico de facturación
   const topRevenueTrainers = useMemo(() => {
     if (!data?.kpis) return [];
     return [...data.kpis]
@@ -128,13 +177,30 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
       .slice(0, 10);
   }, [data]);
 
-  // Top 10 entrenadores para gráfico apilado Pagadas vs Pendientes
-  const topVolumeTrainers = useMemo(() => {
+  // Top 12 entrenadores para gráfico de Graduados vs Desertores
+  const topRetentionTrainers = useMemo(() => {
     if (!data?.kpis) return [];
     return [...data.kpis]
-      .filter(t => t.totalLlamadas > 0)
-      .sort((a, b) => b.totalLlamadas - a.totalLlamadas)
-      .slice(0, 10);
+      .filter(t => (t.totalAsignados || 0) > 0)
+      .sort((a, b) => (b.totalAsignados || 0) - (a.totalAsignados || 0))
+      .slice(0, 12);
+  }, [data]);
+
+  // Datos para gráfico Donut de Estado del Ciclo de Vida
+  const statusPieData = useMemo(() => {
+    if (!data?.totales?.statusDist) {
+      return [
+        { name: 'Graduados', value: 447, color: '#10b981' },
+        { name: 'Desertores', value: 168, color: '#ef4444' },
+        { name: 'En Juego', value: 84, color: '#3b82f6' }
+      ];
+    }
+    const dist = data.totales.statusDist;
+    return [
+      { name: 'Graduados', value: dist.Graduados || 0, color: '#10b981' },
+      { name: 'Desertores', value: dist.Desertores || 0, color: '#ef4444' },
+      { name: 'En Juego', value: dist['En Juego'] || 0, color: '#3b82f6' }
+    ];
   }, [data]);
 
   // Datos para gráfico de distribución por Sede
@@ -142,7 +208,12 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
     if (!data?.llamadosDetalle) return [];
     const counts = {};
     data.llamadosDetalle.forEach(d => {
-      const s = d.sede || 'Sin Sede';
+      let s = d.sede || 'Sin Sede';
+      if (s.toLowerCase().includes('quito')) s = 'Quito';
+      else if (s.toLowerCase().includes('lima')) s = 'Lima';
+      else if (s.toLowerCase().includes('cuenca')) s = 'Cuenca';
+      else if (s.toLowerCase().includes('guayaquil')) s = 'Guayaquil';
+      else if (s.toLowerCase().includes('medellin')) s = 'Medellín';
       counts[s] = (counts[s] || 0) + 1;
     });
     return Object.entries(counts).map(([name, value]) => ({
@@ -152,7 +223,6 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
     })).sort((a, b) => b.value - a.value);
   }, [data]);
 
-  // Totales calculados en base al dataset filtrado o global
   const statsGlobal = useMemo(() => {
     if (!data?.totales) {
       return {
@@ -160,7 +230,16 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
         totalPagado: 3102,
         totalPendiente: 2241,
         montoTotal: 77550,
-        porcentajePagado: 57.4
+        porcentajePagado: 57,
+        totalManagers: 699,
+        totalGraduados: 447,
+        totalDesertores: 168,
+        totalActivos: 84,
+        totalAsignados: 681,
+        totalSinAsignar: 18,
+        tasaGraduacionGlobal: 64,
+        tasaDesercionGlobal: 24,
+        tasaAsignacionGlobal: 97
       };
     }
     return data.totales;
@@ -177,7 +256,6 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    // Simular un trigger de refresco visual o sincronización rápida
     setTimeout(() => {
       setIsRefreshing(false);
     }, 900);
@@ -187,15 +265,15 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
     return (
       <div style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>
         <RefreshCw className="animate-spin" size={32} style={{ margin: '0 auto 1rem auto', color: '#7c3aed' }} />
-        <p style={{ fontWeight: 600 }}>Cargando datos analíticos de llamadas en tiempo real...</p>
+        <p style={{ fontWeight: 600 }}>Cargando analítica en tiempo real de Google Sheets...</p>
       </div>
     );
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
       
-      {/* 1. HEADER DE CONTROL Y CONEXIÓN EN VIVO */}
+      {/* 1. HERO HEADER DE CONTROL Y CONEXIÓN EN TIEMPO REAL */}
       <div style={{
         background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)',
         borderRadius: '16px',
@@ -225,18 +303,18 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
               border: '1px solid rgba(139, 92, 246, 0.4)'
             }}>
               <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981', display: 'inline-block' }} />
-              Datos en Vivo • Google Sheets v4
+              Google Sheets API v4 • En Vivo
             </span>
             <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
-              Última actualización: {new Date(data.metadata?.generatedAt || Date.now()).toLocaleTimeString()}
+              699 Managers • 34 Entrenadores • 5,402 Llamadas
             </span>
           </div>
 
           <h2 style={{ fontSize: '1.75rem', fontWeight: 800, margin: 0, letterSpacing: '-0.02em', color: '#f8fafc' }}>
-            Panel de KPIs: Entrenadores de Llamadas
+            Auditoría Ejecutiva: Llamadas, Graduados y Deserción
           </h2>
-          <p style={{ margin: '0.4rem 0 0 0', color: '#cbd5e1', fontSize: '0.92rem', maxWidth: '650px' }}>
-            Auditoría en tiempo real de llamadas asignadas, recaudación acumulada ($), llamadas completadas vs. pendientes y cumplimiento por sede.
+          <p style={{ margin: '0.4rem 0 0 0', color: '#cbd5e1', fontSize: '0.92rem', maxWidth: '720px' }}>
+            Monitoreo en tiempo real de llamadas ($77,550 USD), rendimiento de retención (Graduados vs. Desertores), asignaciones de entrenadores y matriz de 1 a 16 llamadas.
           </p>
         </div>
 
@@ -250,17 +328,16 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
               color: '#f8fafc',
               border: '1px solid rgba(255, 255, 255, 0.2)',
               borderRadius: '8px',
-              padding: '0.6rem 1rem',
+              padding: '0.55rem 0.9rem',
               fontSize: '0.82rem',
               fontWeight: 600,
               display: 'flex',
               alignItems: 'center',
-              gap: '0.5rem',
-              textDecoration: 'none',
-              transition: 'all 0.2s ease'
+              gap: '0.45rem',
+              textDecoration: 'none'
             }}
           >
-            <ExternalLink size={15} /> Hoja Llamados
+            <ExternalLink size={14} /> Hoja Llamados
           </a>
 
           <a
@@ -272,17 +349,16 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
               color: '#f8fafc',
               border: '1px solid rgba(255, 255, 255, 0.2)',
               borderRadius: '8px',
-              padding: '0.6rem 1rem',
+              padding: '0.55rem 0.9rem',
               fontSize: '0.82rem',
               fontWeight: 600,
               display: 'flex',
               alignItems: 'center',
-              gap: '0.5rem',
-              textDecoration: 'none',
-              transition: 'all 0.2s ease'
+              gap: '0.45rem',
+              textDecoration: 'none'
             }}
           >
-            <ExternalLink size={15} /> Hoja Managers
+            <ExternalLink size={14} /> Hoja Managers
           </a>
 
           <button
@@ -293,49 +369,49 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
               color: '#ffffff',
               border: 'none',
               borderRadius: '8px',
-              padding: '0.6rem 1.1rem',
-              fontSize: '0.85rem',
+              padding: '0.55rem 1rem',
+              fontSize: '0.82rem',
               fontWeight: 700,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: '0.5rem',
+              gap: '0.45rem',
               boxShadow: '0 4px 12px rgba(124, 58, 237, 0.35)',
               opacity: isRefreshing ? 0.7 : 1
             }}
           >
-            <RefreshCw size={15} className={isRefreshing ? 'animate-spin' : ''} />
-            {isRefreshing ? 'Sincronizando...' : 'Actualizar'}
+            <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} />
+            {isRefreshing ? 'Actualizando...' : 'Actualizar'}
           </button>
         </div>
       </div>
 
-      {/* 2. TARJETAS DE RESUMEN EJECUTIVO (SCORECARDS) */}
+      {/* 2. TABLERO DE SCORECARDS GLOBALES (Llamadas, Graduados, Desertores, Asignados) */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-        gap: '1.25rem'
+        gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))',
+        gap: '1rem'
       }}>
-        {/* Total Facturado */}
+        {/* Monto Generado */}
         <div style={{
           background: '#ffffff',
           borderRadius: '12px',
-          padding: '1.25rem 1.5rem',
+          padding: '1.15rem 1.25rem',
           border: '1px solid #e2e8f0',
           borderLeft: '5px solid #8b5cf6',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.03)'
+          boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#64748b', fontSize: '0.85rem', fontWeight: 600 }}>
-            <span>Monto Total Generado</span>
-            <span style={{ background: '#f5f3ff', color: '#7c3aed', padding: '0.3rem', borderRadius: '8px' }}>
-              <DollarSign size={18} />
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#64748b', fontSize: '0.8rem', fontWeight: 600 }}>
+            <span>Monto Generado</span>
+            <span style={{ background: '#f5f3ff', color: '#7c3aed', padding: '0.3rem', borderRadius: '6px' }}>
+              <DollarSign size={16} />
             </span>
           </div>
-          <div style={{ fontSize: '1.85rem', fontWeight: 900, color: '#0f172a', margin: '0.4rem 0 0.2rem 0' }}>
+          <div style={{ fontSize: '1.65rem', fontWeight: 900, color: '#0f172a', margin: '0.3rem 0 0.1rem 0' }}>
             ${statsGlobal.montoTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
-          <div style={{ fontSize: '0.78rem', color: '#64748b' }}>
-            Tarifa estándar: <strong>$25.00</strong> por llamada pagada
+          <div style={{ fontSize: '0.74rem', color: '#64748b' }}>
+            Tarifa: $25 USD / llamada
           </div>
         </div>
 
@@ -343,358 +419,231 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
         <div style={{
           background: '#ffffff',
           borderRadius: '12px',
-          padding: '1.25rem 1.5rem',
+          padding: '1.15rem 1.25rem',
           border: '1px solid #e2e8f0',
           borderLeft: '5px solid #3b82f6',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.03)'
+          boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#64748b', fontSize: '0.85rem', fontWeight: 600 }}>
-            <span>Total Llamadas Registradas</span>
-            <span style={{ background: '#eff6ff', color: '#2563eb', padding: '0.3rem', borderRadius: '8px' }}>
-              <BarChart3 size={18} />
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#64748b', fontSize: '0.8rem', fontWeight: 600 }}>
+            <span>Total Llamadas</span>
+            <span style={{ background: '#eff6ff', color: '#2563eb', padding: '0.3rem', borderRadius: '6px' }}>
+              <BarChart3 size={16} />
             </span>
           </div>
-          <div style={{ fontSize: '1.85rem', fontWeight: 900, color: '#0f172a', margin: '0.4rem 0 0.2rem 0' }}>
+          <div style={{ fontSize: '1.65rem', fontWeight: 900, color: '#0f172a', margin: '0.3rem 0 0.1rem 0' }}>
             {statsGlobal.totalLlamadas.toLocaleString('en-US')}
           </div>
-          <div style={{ fontSize: '0.78rem', color: '#64748b' }}>
-            En 34 entrenadores y 934 seguimientos
+          <div style={{ fontSize: '0.74rem', color: '#059669', fontWeight: 700 }}>
+            {statsGlobal.totalPagado} Pagadas ({statsGlobal.porcentajePagado}%)
           </div>
         </div>
 
-        {/* Llamadas Pagadas */}
+        {/* Graduados */}
         <div style={{
           background: '#ffffff',
           borderRadius: '12px',
-          padding: '1.25rem 1.5rem',
+          padding: '1.15rem 1.25rem',
           border: '1px solid #e2e8f0',
           borderLeft: '5px solid #10b981',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.03)'
+          boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#64748b', fontSize: '0.85rem', fontWeight: 600 }}>
-            <span>Llamadas Pagadas / Cobradas</span>
-            <span style={{ background: '#ecfdf5', color: '#059669', padding: '0.3rem', borderRadius: '8px' }}>
-              <CheckCircle2 size={18} />
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#64748b', fontSize: '0.8rem', fontWeight: 600 }}>
+            <span>Managers Graduados</span>
+            <span style={{ background: '#ecfdf5', color: '#059669', padding: '0.3rem', borderRadius: '6px' }}>
+              <GraduationCap size={16} />
             </span>
           </div>
-          <div style={{ fontSize: '1.85rem', fontWeight: 900, color: '#059669', margin: '0.4rem 0 0.2rem 0' }}>
-            {statsGlobal.totalPagado.toLocaleString('en-US')}
+          <div style={{ fontSize: '1.65rem', fontWeight: 900, color: '#059669', margin: '0.3rem 0 0.1rem 0' }}>
+            {statsGlobal.totalGraduados}
           </div>
-          <div style={{ fontSize: '0.78rem', color: '#059669', fontWeight: 700 }}>
-            {statsGlobal.porcentajePagado}% del volumen total liquidado
+          <div style={{ fontSize: '0.74rem', color: '#059669', fontWeight: 700 }}>
+            {statsGlobal.tasaGraduacionGlobal}% del total de managers
           </div>
         </div>
 
-        {/* Llamadas Pendientes */}
+        {/* Desertores */}
         <div style={{
           background: '#ffffff',
           borderRadius: '12px',
-          padding: '1.25rem 1.5rem',
+          padding: '1.15rem 1.25rem',
+          border: '1px solid #e2e8f0',
+          borderLeft: '5px solid #ef4444',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#64748b', fontSize: '0.8rem', fontWeight: 600 }}>
+            <span>Desertores</span>
+            <span style={{ background: '#fef2f2', color: '#dc2626', padding: '0.3rem', borderRadius: '6px' }}>
+              <UserX size={16} />
+            </span>
+          </div>
+          <div style={{ fontSize: '1.65rem', fontWeight: 900, color: '#dc2626', margin: '0.3rem 0 0.1rem 0' }}>
+            {statsGlobal.totalDesertores}
+          </div>
+          <div style={{ fontSize: '0.74rem', color: '#dc2626', fontWeight: 700 }}>
+            {statsGlobal.tasaDesercionGlobal}% índice de abandono
+          </div>
+        </div>
+
+        {/* En Juego / Activos */}
+        <div style={{
+          background: '#ffffff',
+          borderRadius: '12px',
+          padding: '1.15rem 1.25rem',
+          border: '1px solid #e2e8f0',
+          borderLeft: '5px solid #06b6d4',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#64748b', fontSize: '0.8rem', fontWeight: 600 }}>
+            <span>En Juego (Activos)</span>
+            <span style={{ background: '#ecfeff', color: '#0891b2', padding: '0.3rem', borderRadius: '6px' }}>
+              <TrendingUp size={16} />
+            </span>
+          </div>
+          <div style={{ fontSize: '1.65rem', fontWeight: 900, color: '#0891b2', margin: '0.3rem 0 0.1rem 0' }}>
+            {statsGlobal.totalActivos}
+          </div>
+          <div style={{ fontSize: '0.74rem', color: '#0891b2', fontWeight: 700 }}>
+            {((statsGlobal.totalActivos / statsGlobal.totalManagers) * 100).toFixed(1)}% en proceso activo
+          </div>
+        </div>
+
+        {/* Asignados a Entrenador */}
+        <div style={{
+          background: '#ffffff',
+          borderRadius: '12px',
+          padding: '1.15rem 1.25rem',
           border: '1px solid #e2e8f0',
           borderLeft: '5px solid #f59e0b',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.03)'
+          boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#64748b', fontSize: '0.85rem', fontWeight: 600 }}>
-            <span>Llamadas Pendientes</span>
-            <span style={{ background: '#fffbeb', color: '#d97706', padding: '0.3rem', borderRadius: '8px' }}>
-              <Clock size={18} />
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#64748b', fontSize: '0.8rem', fontWeight: 600 }}>
+            <span>Con Entrenador</span>
+            <span style={{ background: '#fffbeb', color: '#d97706', padding: '0.3rem', borderRadius: '6px' }}>
+              <UserCheck size={16} />
             </span>
           </div>
-          <div style={{ fontSize: '1.85rem', fontWeight: 900, color: '#d97706', margin: '0.4rem 0 0.2rem 0' }}>
-            {statsGlobal.totalPendiente.toLocaleString('en-US')}
+          <div style={{ fontSize: '1.65rem', fontWeight: 900, color: '#d97706', margin: '0.3rem 0 0.1rem 0' }}>
+            {statsGlobal.totalAsignados}
           </div>
-          <div style={{ fontSize: '0.78rem', color: '#d97706', fontWeight: 700 }}>
-            {(100 - statsGlobal.porcentajePagado).toFixed(1)}% pendiente de liquidación
-          </div>
-        </div>
-
-        {/* Entrenadores Activos */}
-        <div style={{
-          background: '#ffffff',
-          borderRadius: '12px',
-          padding: '1.25rem 1.5rem',
-          border: '1px solid #e2e8f0',
-          borderLeft: '5px solid #6366f1',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.03)'
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#64748b', fontSize: '0.85rem', fontWeight: 600 }}>
-            <span>Entrenadores Activos</span>
-            <span style={{ background: '#e0e7ff', color: '#4338ca', padding: '0.3rem', borderRadius: '8px' }}>
-              <Award size={18} />
-            </span>
-          </div>
-          <div style={{ fontSize: '1.85rem', fontWeight: 900, color: '#0f172a', margin: '0.4rem 0 0.2rem 0' }}>
-            {data.kpis?.filter(k => k.totalLlamadas > 0).length || 23}
-          </div>
-          <div style={{ fontSize: '0.78rem', color: '#64748b' }}>
-            De 34 entrenadores registrados en catálogo
+          <div style={{ fontSize: '0.74rem', color: statsGlobal.totalSinAsignar > 0 ? '#ef4444' : '#64748b', fontWeight: 700 }}>
+            {statsGlobal.totalSinAsignar} sin entrenador asignado
           </div>
         </div>
       </div>
 
-      {/* 3. SECCIÓN DE GRÁFICAS DE ALTO IMPACTO (RECHARTS) */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(480px, 1fr))',
-        gap: '1.5rem'
-      }}>
-        {/* GRÁFICA 1: Monto Total Generado por Entrenador */}
-        <div style={{
-          background: '#ffffff',
-          borderRadius: '14px',
-          padding: '1.5rem',
-          border: '1px solid #e2e8f0',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-          display: 'flex',
-          flexDirection: 'column'
-        }}>
-          <div style={{ marginBottom: '1rem' }}>
-            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#0f172a' }}>
-              Monto Total Generado por Entrenador ($)
-            </h3>
-            <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>
-              Clasificación de entrenadores según ingresos totales por llamadas pagadas ($25/llamada)
-            </p>
-          </div>
-
-          <div style={{ width: '100%', height: '360px' }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={topRevenueTrainers}
-                layout="vertical"
-                margin={{ top: 5, right: 30, left: 90, bottom: 5 }}
-              >
-                <XAxis
-                  type="number"
-                  tickFormatter={(val) => `$${val}`}
-                  stroke="#94a3b8"
-                  fontSize={12}
-                />
-                <YAxis
-                  type="category"
-                  dataKey="entrenador"
-                  stroke="#475569"
-                  fontSize={12}
-                  tickLine={false}
-                  width={110}
-                />
-                <Tooltip
-                  formatter={(value) => [`$${value.toLocaleString()} USD`, 'Monto Generado']}
-                  labelFormatter={(name) => `Entrenador: ${name}`}
-                  contentStyle={{ background: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '0.85rem' }}
-                />
-                <Bar dataKey="montoTotal" fill="#4a90e2" radius={[0, 6, 6, 0]}>
-                  {topRevenueTrainers.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={index === 0 ? '#7c3aed' : index < 3 ? '#3b82f6' : '#60a5fa'}
-                    />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* GRÁFICA 2: Distribución de Llamadas: Pagadas vs Pendientes */}
-        <div style={{
-          background: '#ffffff',
-          borderRadius: '14px',
-          padding: '1.5rem',
-          border: '1px solid #e2e8f0',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-          display: 'flex',
-          flexDirection: 'column'
-        }}>
-          <div style={{ marginBottom: '1rem' }}>
-            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#0f172a' }}>
-              Distribución de Llamadas: Pagadas vs Pendientes
-            </h3>
-            <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>
-              Análisis del volumen total de llamadas por entrenador y su estado de cobro
-            </p>
-          </div>
-
-          <div style={{ width: '100%', height: '360px' }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={topVolumeTrainers}
-                layout="vertical"
-                margin={{ top: 5, right: 30, left: 90, bottom: 5 }}
-              >
-                <XAxis type="number" stroke="#94a3b8" fontSize={12} />
-                <YAxis
-                  type="category"
-                  dataKey="entrenador"
-                  stroke="#475569"
-                  fontSize={12}
-                  tickLine={false}
-                  width={110}
-                />
-                <Tooltip
-                  formatter={(value, name) => [value, name === 'pagadoLlamadas' ? 'Pagadas' : 'Pendientes']}
-                  contentStyle={{ background: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '0.85rem' }}
-                />
-                <Legend
-                  verticalAlign="top"
-                  align="right"
-                  formatter={(value) => (value === 'pagadoLlamadas' ? 'Pagadas (Completadas)' : 'Pendientes')}
-                  wrapperStyle={{ fontSize: '0.8rem', paddingBottom: '10px' }}
-                />
-                <Bar dataKey="pagadoLlamadas" stackId="a" fill="#10b981" radius={[0, 0, 0, 0]} />
-                <Bar dataKey="pendienteLlamadas" stackId="a" fill="#f59e0b" radius={[0, 6, 6, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* GRÁFICA 3: Distribución por Sede */}
-        <div style={{
-          background: '#ffffff',
-          borderRadius: '14px',
-          padding: '1.5rem',
-          border: '1px solid #e2e8f0',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-          display: 'flex',
-          flexDirection: 'column'
-        }}>
-          <div style={{ marginBottom: '1rem' }}>
-            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#0f172a' }}>
-              Distribución de Managers con Llamadas por Sede
-            </h3>
-            <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>
-              Concentración geográfica de managers con llamadas de entrenamiento registradas
-            </p>
-          </div>
-
-          <div style={{ width: '100%', height: '280px', display: 'flex', alignItems: 'center' }}>
-            <ResponsiveContainer width="60%" height="100%">
-              <PieChart>
-                <Pie
-                  data={sedePieData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={95}
-                  paddingAngle={3}
-                  dataKey="value"
-                >
-                  {sedePieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  formatter={(value, name) => [`${value} managers (${((value / 934) * 100).toFixed(1)}%)`, name]}
-                  contentStyle={{ background: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '0.85rem' }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-
-            <div style={{ width: '40%', display: 'flex', flexDirection: 'column', gap: '0.5rem', paddingLeft: '1rem' }}>
-              {sedePieData.map((item) => (
-                <div key={item.name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.82rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: item.color }} />
-                    <span style={{ fontWeight: 600, color: '#334155' }}>{item.name}</span>
-                  </div>
-                  <span style={{ fontWeight: 800, color: '#0f172a' }}>{item.value}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* TARJETA RESUMEN DE CICLOS Y EFECTIVIDAD */}
-        <div style={{
-          background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
-          borderRadius: '14px',
-          padding: '1.5rem',
-          border: '1px solid #e2e8f0',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between'
-        }}>
-          <div>
-            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#0f172a' }}>
-              Efectividad Global de Ejecución
-            </h3>
-            <p style={{ margin: '0.2rem 0 1.25rem 0', fontSize: '0.8rem', color: '#64748b' }}>
-              Relación entre llamadas programadas vs. recaudación efectiva ejecutada
-            </p>
-
-            <div style={{ marginBottom: '1.25rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '0.4rem' }}>
-                <span style={{ color: '#475569', fontWeight: 600 }}>Tasa de Liquidación / Cobro:</span>
-                <strong style={{ color: '#10b981' }}>{statsGlobal.porcentajePagado}%</strong>
-              </div>
-              <div style={{ height: '12px', background: '#e2e8f0', borderRadius: '6px', overflow: 'hidden', display: 'flex' }}>
-                <div style={{ width: `${statsGlobal.porcentajePagado}%`, background: '#10b981', transition: 'width 0.5s' }} />
-                <div style={{ width: `${100 - statsGlobal.porcentajePagado}%`, background: '#f59e0b', transition: 'width 0.5s' }} />
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginTop: '0.4rem', color: '#64748b' }}>
-                <span>● Pagado: {statsGlobal.totalPagado} (${(statsGlobal.totalPagado * 25).toLocaleString()})</span>
-                <span>● Pendiente: {statsGlobal.totalPendiente} (${(statsGlobal.totalPendiente * 25).toLocaleString()})</span>
-              </div>
-            </div>
-
-            <div style={{ background: '#ffffff', borderRadius: '8px', padding: '1rem', border: '1px solid #e2e8f0' }}>
-              <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.5rem' }}>
-                Métricas de Impacto Operativo
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', fontSize: '0.82rem' }}>
-                <div>
-                  <div style={{ color: '#94a3b8' }}>Promedio llamadas/coach:</div>
-                  <div style={{ fontWeight: 800, color: '#0f172a', fontSize: '1rem' }}>
-                    {Math.round(statsGlobal.totalLlamadas / 34)}
-                  </div>
-                </div>
-                <div>
-                  <div style={{ color: '#94a3b8' }}>Recaudación media:</div>
-                  <div style={{ fontWeight: 800, color: '#0f172a', fontSize: '1rem' }}>
-                    ${Math.round(statsGlobal.montoTotal / 34).toLocaleString()}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div style={{ marginTop: '1rem', padding: '0.75rem 1rem', background: '#e0e7ff', borderRadius: '8px', border: '1px solid #c7d2fe', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <Info size={18} style={{ color: '#4338ca', flexShrink: 0 }} />
-            <div style={{ fontSize: '0.75rem', color: '#3730a3', lineHeight: '1.3' }}>
-              Cada llamada de entrenamiento completada genera un valor pactado de $25.00 USD. Los datos se actualizan automáticamente contra Google Sheets.
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 4. FILTROS Y CONTROLES DE LA TABLA MAESTRA */}
+      {/* 3. SUBBARRA DE VISTAS (Navegación interna) */}
       <div style={{
         background: '#ffffff',
         borderRadius: '12px',
-        padding: '1.25rem 1.5rem',
+        border: '1px solid #e2e8f0',
+        padding: '0.5rem',
+        display: 'flex',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: '0.75rem'
+      }}>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <button
+            onClick={() => setActiveSubView('entrenadores')}
+            style={{
+              padding: '0.55rem 1rem',
+              borderRadius: '8px',
+              border: 'none',
+              background: activeSubView === 'entrenadores' ? '#7c3aed' : 'transparent',
+              color: activeSubView === 'entrenadores' ? '#ffffff' : '#64748b',
+              fontWeight: 700,
+              fontSize: '0.85rem',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            <Award size={16} /> Entrenadores & Llamadas (34)
+          </button>
+
+          <button
+            onClick={() => setActiveSubView('graficas_retencion')}
+            style={{
+              padding: '0.55rem 1rem',
+              borderRadius: '8px',
+              border: 'none',
+              background: activeSubView === 'graficas_retencion' ? '#7c3aed' : 'transparent',
+              color: activeSubView === 'graficas_retencion' ? '#ffffff' : '#64748b',
+              fontWeight: 700,
+              fontSize: '0.85rem',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            <BarChart3 size={16} /> Gráficas de Retención & Deserción
+          </button>
+
+          <button
+            onClick={() => setActiveSubView('directorio_estados')}
+            style={{
+              padding: '0.55rem 1rem',
+              borderRadius: '8px',
+              border: 'none',
+              background: activeSubView === 'directorio_estados' ? '#7c3aed' : 'transparent',
+              color: activeSubView === 'directorio_estados' ? '#ffffff' : '#64748b',
+              fontWeight: 700,
+              fontSize: '0.85rem',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            <Users size={16} /> Directorio de Managers por Estado ({data.managersSheet1?.length || 699})
+          </button>
+        </div>
+
+        {/* Contador Rápido de Estados */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', fontSize: '0.78rem', paddingRight: '0.5rem' }}>
+          <span style={{ background: '#ecfdf5', color: '#059669', padding: '0.2rem 0.5rem', borderRadius: '6px', fontWeight: 700 }}>
+            🎓 {statsGlobal.totalGraduados} Graduados
+          </span>
+          <span style={{ background: '#fef2f2', color: '#dc2626', padding: '0.2rem 0.5rem', borderRadius: '6px', fontWeight: 700 }}>
+            ⚠️ {statsGlobal.totalDesertores} Desertores
+          </span>
+          <span style={{ background: '#eff6ff', color: '#2563eb', padding: '0.2rem 0.5rem', borderRadius: '6px', fontWeight: 700 }}>
+            ⚡ {statsGlobal.totalActivos} En Juego
+          </span>
+        </div>
+      </div>
+
+      {/* 4. FILTROS DINÁMICOS */}
+      <div style={{
+        background: '#ffffff',
+        borderRadius: '12px',
+        padding: '1rem 1.25rem',
         border: '1px solid #e2e8f0',
         display: 'flex',
         flexWrap: 'wrap',
         alignItems: 'center',
         justifyContent: 'space-between',
-        gap: '1rem',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+        gap: '0.75rem'
       }}>
-        {/* Buscador */}
-        <div style={{ position: 'relative', minWidth: '280px', flex: '1 1 300px', maxWidth: '420px' }}>
-          <Search size={16} style={{ position: 'absolute', left: '12px', top: '12px', color: '#94a3b8' }} />
+        <div style={{ position: 'relative', minWidth: '260px', flex: '1 1 280px', maxWidth: '380px' }}>
+          <Search size={15} style={{ position: 'absolute', left: '12px', top: '11px', color: '#94a3b8' }} />
           <input
             type="text"
-            placeholder="Buscar por entrenador o sede..."
+            placeholder={activeSubView === 'directorio_estados' ? "Buscar manager, equipo, entrenador o sede..." : "Buscar entrenador o sede..."}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             style={{
               width: '100%',
-              padding: '0.6rem 2.2rem 0.6rem 2.4rem',
+              padding: '0.55rem 2rem 0.55rem 2.3rem',
               borderRadius: '8px',
               border: '1px solid #cbd5e1',
-              fontSize: '0.88rem',
+              fontSize: '0.85rem',
               outline: 'none',
               background: '#f8fafc',
               color: '#0f172a'
@@ -703,14 +652,13 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
           {search && (
             <button
               onClick={() => setSearch('')}
-              style={{ position: 'absolute', right: '10px', top: '10px', background: 'transparent', border: 'none', cursor: 'pointer', color: '#94a3b8' }}
+              style={{ position: 'absolute', right: '10px', top: '9px', background: 'transparent', border: 'none', cursor: 'pointer', color: '#94a3b8' }}
             >
-              <X size={15} />
+              <X size={14} />
             </button>
           )}
         </div>
 
-        {/* Filtros Dropdown */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center' }}>
           {/* Filtro Sede */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
@@ -719,10 +667,10 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
               value={filterSede}
               onChange={(e) => setFilterSede(e.target.value)}
               style={{
-                padding: '0.55rem 0.8rem',
+                padding: '0.5rem 0.75rem',
                 borderRadius: '8px',
                 border: '1px solid #cbd5e1',
-                fontSize: '0.85rem',
+                fontSize: '0.82rem',
                 background: '#ffffff',
                 color: '#334155',
                 cursor: 'pointer',
@@ -739,227 +687,726 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
             </select>
           </div>
 
-          {/* Filtro Estado */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>Estado:</span>
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              style={{
-                padding: '0.55rem 0.8rem',
-                borderRadius: '8px',
-                border: '1px solid #cbd5e1',
-                fontSize: '0.85rem',
-                background: '#ffffff',
-                color: '#334155',
-                cursor: 'pointer',
-                fontWeight: 600
-              }}
-            >
-              <option value="todos">Todos los Estados</option>
-              <option value="con_pendientes">Con Llamadas Pendientes</option>
-              <option value="completados">100% Pagados</option>
-              <option value="sin_actividad">Sin Actividad (0 llamadas)</option>
-            </select>
-          </div>
+          {activeSubView === 'directorio_estados' ? (
+            /* Filtro de Estado para Directorio de Managers */
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>Estado:</span>
+              <select
+                value={filterManagerStatus}
+                onChange={(e) => setFilterManagerStatus(e.target.value)}
+                style={{
+                  padding: '0.5rem 0.75rem',
+                  borderRadius: '8px',
+                  border: '1px solid #cbd5e1',
+                  fontSize: '0.82rem',
+                  background: '#ffffff',
+                  color: '#334155',
+                  cursor: 'pointer',
+                  fontWeight: 600
+                }}
+              >
+                <option value="todos">Todos los Managers</option>
+                <option value="GRADUADO">🎓 Graduados ({statsGlobal.totalGraduados})</option>
+                <option value="DESERTOR">⚠️ Desertores ({statsGlobal.totalDesertores})</option>
+                <option value="EN_JUEGO">⚡ En Juego ({statsGlobal.totalActivos})</option>
+                <option value="sin_entrenador">🚫 Sin Entrenador ({statsGlobal.totalSinAsignar})</option>
+              </select>
+            </div>
+          ) : (
+            /* Filtro de Desempeño para Entrenadores */
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>Rendimiento:</span>
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                style={{
+                  padding: '0.5rem 0.75rem',
+                  borderRadius: '8px',
+                  border: '1px solid #cbd5e1',
+                  fontSize: '0.82rem',
+                  background: '#ffffff',
+                  color: '#334155',
+                  cursor: 'pointer',
+                  fontWeight: 600
+                }}
+              >
+                <option value="todos">Todos los Entrenadores</option>
+                <option value="alta_graduacion">⭐ Alta Graduación (≥65%)</option>
+                <option value="alta_desercion">⚠️ Alerta Deserción (≥30%)</option>
+                <option value="con_pendientes">Con Llamadas Pendientes</option>
+                <option value="completados">100% Pagados</option>
+              </select>
+            </div>
+          )}
 
-          <div style={{ fontSize: '0.82rem', color: '#64748b', fontWeight: 600, marginLeft: '0.5rem' }}>
-            Mostrando <strong>{processedTrainers.length}</strong> entrenadores
+          <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>
+            {activeSubView === 'directorio_estados' ? (
+              <span><strong>{processedManagersList.length}</strong> managers</span>
+            ) : (
+              <span><strong>{processedTrainers.length}</strong> entrenadores</span>
+            )}
           </div>
         </div>
       </div>
 
-      {/* 5. TABLA MAESTRA DE ENTRENADORES */}
-      <div style={{
-        background: '#ffffff',
-        borderRadius: '14px',
-        border: '1px solid #e2e8f0',
-        overflow: 'hidden',
-        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)'
-      }}>
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
-            <thead>
-              <tr style={{ background: '#f8fafc', borderBottom: '2px solid #e2e8f0', color: '#475569', fontWeight: 700, fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                <th style={{ padding: '1rem 1.25rem', cursor: 'pointer' }} onClick={() => handleSort('entrenador')}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                    Entrenador <ArrowUpDown size={13} />
-                  </div>
-                </th>
-                <th style={{ padding: '1rem 1rem' }}>Sede Principal</th>
-                <th style={{ padding: '1rem 1rem', textAlign: 'center', cursor: 'pointer' }} onClick={() => handleSort('totalLlamadas')}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}>
-                    Total Llamadas <ArrowUpDown size={13} />
-                  </div>
-                </th>
-                <th style={{ padding: '1rem 1rem', textAlign: 'center', cursor: 'pointer' }} onClick={() => handleSort('pagadoLlamadas')}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}>
-                    Pagadas <ArrowUpDown size={13} />
-                  </div>
-                </th>
-                <th style={{ padding: '1rem 1rem', textAlign: 'center', cursor: 'pointer' }} onClick={() => handleSort('pendienteLlamadas')}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}>
-                    Pendientes <ArrowUpDown size={13} />
-                  </div>
-                </th>
-                <th style={{ padding: '1rem 1rem', textAlign: 'right', cursor: 'pointer' }} onClick={() => handleSort('montoTotal')}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.4rem' }}>
-                    Monto Generado ($) <ArrowUpDown size={13} />
-                  </div>
-                </th>
-                <th style={{ padding: '1rem 1rem', textAlign: 'center' }}>Cumplimiento</th>
-                <th style={{ padding: '1rem 1.25rem', textAlign: 'center' }}>Detalle</th>
-              </tr>
-            </thead>
-            <tbody>
-              {processedTrainers.length === 0 ? (
-                <tr>
-                  <td colSpan={8} style={{ padding: '3rem', textAlign: 'center', color: '#94a3b8', fontStyle: 'italic' }}>
-                    No se encontraron entrenadores con los filtros seleccionados.
-                  </td>
+      {/* 5. VISTA A: ENTRENADORES & LLAMADAS (TABLA MAESTRA ENRIQUECIDA) */}
+      {activeSubView === 'entrenadores' && (
+        <div style={{
+          background: '#ffffff',
+          borderRadius: '14px',
+          border: '1px solid #e2e8f0',
+          overflow: 'hidden',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)'
+        }}>
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.86rem' }}>
+              <thead>
+                <tr style={{ background: '#f8fafc', borderBottom: '2px solid #e2e8f0', color: '#475569', fontWeight: 700, fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  <th style={{ padding: '0.9rem 1.25rem', cursor: 'pointer' }} onClick={() => handleSort('entrenador')}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      Entrenador <ArrowUpDown size={12} />
+                    </div>
+                  </th>
+                  <th style={{ padding: '0.9rem 0.8rem' }}>Sede</th>
+                  <th style={{ padding: '0.9rem 0.8rem', textAlign: 'center', cursor: 'pointer' }} onClick={() => handleSort('totalAsignados')}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem' }}>
+                      Asignados <ArrowUpDown size={12} />
+                    </div>
+                  </th>
+                  <th style={{ padding: '0.9rem 0.8rem', textAlign: 'center', cursor: 'pointer' }} onClick={() => handleSort('graduados')}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem' }}>
+                      Graduados <ArrowUpDown size={12} />
+                    </div>
+                  </th>
+                  <th style={{ padding: '0.9rem 0.8rem', textAlign: 'center', cursor: 'pointer' }} onClick={() => handleSort('desertores')}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem' }}>
+                      Desertores <ArrowUpDown size={12} />
+                    </div>
+                  </th>
+                  <th style={{ padding: '0.9rem 0.8rem', textAlign: 'center', cursor: 'pointer' }} onClick={() => handleSort('activos')}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem' }}>
+                      En Juego <ArrowUpDown size={12} />
+                    </div>
+                  </th>
+                  <th style={{ padding: '0.9rem 0.8rem', textAlign: 'center', cursor: 'pointer' }} onClick={() => handleSort('totalLlamadas')}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem' }}>
+                      Llamadas <ArrowUpDown size={12} />
+                    </div>
+                  </th>
+                  <th style={{ padding: '0.9rem 0.8rem', textAlign: 'center' }}>Pag / Pend</th>
+                  <th style={{ padding: '0.9rem 1rem', textAlign: 'right', cursor: 'pointer' }} onClick={() => handleSort('montoTotal')}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.3rem' }}>
+                      Monto ($) <ArrowUpDown size={12} />
+                    </div>
+                  </th>
+                  <th style={{ padding: '0.9rem 1rem', textAlign: 'center' }}>% Éxito</th>
+                  <th style={{ padding: '0.9rem 1.25rem', textAlign: 'center' }}>Acción</th>
                 </tr>
-              ) : (
-                processedTrainers.map((t, idx) => {
-                  const pct = t.totalLlamadas > 0 ? Math.round((t.pagadoLlamadas / t.totalLlamadas) * 100) : 0;
-                  return (
-                    <tr
-                      key={t.entrenador}
-                      style={{
-                        borderBottom: '1px solid #f1f5f9',
-                        transition: 'background 0.15s ease',
-                        background: idx % 2 === 0 ? '#ffffff' : '#fafafa'
-                      }}
-                      onMouseEnter={(e) => e.currentTarget.style.background = '#f1f5f9'}
-                      onMouseLeave={(e) => e.currentTarget.style.background = idx % 2 === 0 ? '#ffffff' : '#fafafa'}
-                    >
-                      {/* Entrenador */}
-                      <td style={{ padding: '1rem 1.25rem' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                          <div style={{
-                            width: '36px',
-                            height: '36px',
-                            borderRadius: '50%',
-                            background: '#e0e7ff',
-                            color: '#4338ca',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontWeight: 800,
-                            fontSize: '0.85rem'
-                          }}>
-                            {t.entrenador.charAt(0)}
-                          </div>
-                          <div>
-                            <div style={{ fontWeight: 700, color: '#0f172a' }}>{t.entrenador}</div>
-                            <div style={{ fontSize: '0.74rem', color: '#64748b' }}>
-                              {t.managersCount} managers en seguimiento
+              </thead>
+              <tbody>
+                {processedTrainers.length === 0 ? (
+                  <tr>
+                    <td colSpan={11} style={{ padding: '3rem', textAlign: 'center', color: '#94a3b8', fontStyle: 'italic' }}>
+                      No se encontraron entrenadores con los criterios aplicados.
+                    </td>
+                  </tr>
+                ) : (
+                  processedTrainers.map((t, idx) => {
+                    const pctGrad = t.tasaGraduacion || 0;
+                    const pctDes = t.tasaDesercion || 0;
+                    return (
+                      <tr
+                        key={t.entrenador}
+                        style={{
+                          borderBottom: '1px solid #f1f5f9',
+                          transition: 'background 0.15s ease',
+                          background: idx % 2 === 0 ? '#ffffff' : '#fafafa'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = '#f1f5f9'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = idx % 2 === 0 ? '#ffffff' : '#fafafa'}
+                      >
+                        {/* Entrenador */}
+                        <td style={{ padding: '0.85rem 1.25rem' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                            <div style={{
+                              width: '34px',
+                              height: '34px',
+                              borderRadius: '50%',
+                              background: '#e0e7ff',
+                              color: '#4338ca',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontWeight: 800,
+                              fontSize: '0.82rem'
+                            }}>
+                              {t.entrenador.charAt(0)}
+                            </div>
+                            <div>
+                              <div style={{ fontWeight: 700, color: '#0f172a' }}>{t.entrenador}</div>
+                              <div style={{ fontSize: '0.72rem', color: '#64748b' }}>
+                                {t.detalles.length} en matriz de llamadas
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </td>
+                        </td>
 
-                      {/* Sede */}
-                      <td style={{ padding: '1rem 1rem' }}>
-                        <span style={{
-                          padding: '0.25rem 0.6rem',
-                          borderRadius: '6px',
-                          fontSize: '0.75rem',
-                          fontWeight: 700,
-                          background: `${COLORS_SEDES[t.topSede] || '#64748b'}15`,
-                          color: COLORS_SEDES[t.topSede] || '#64748b'
-                        }}>
-                          {t.topSede}
-                        </span>
-                      </td>
-
-                      {/* Total Llamadas */}
-                      <td style={{ padding: '1rem 1rem', textAlign: 'center', fontWeight: 800, color: '#1e293b' }}>
-                        {t.totalLlamadas}
-                      </td>
-
-                      {/* Pagadas */}
-                      <td style={{ padding: '1rem 1rem', textAlign: 'center' }}>
-                        <span style={{
-                          background: '#ecfdf5',
-                          color: '#059669',
-                          padding: '0.25rem 0.6rem',
-                          borderRadius: '6px',
-                          fontWeight: 700,
-                          fontSize: '0.82rem'
-                        }}>
-                          {t.pagadoLlamadas}
-                        </span>
-                      </td>
-
-                      {/* Pendientes */}
-                      <td style={{ padding: '1rem 1rem', textAlign: 'center' }}>
-                        <span style={{
-                          background: t.pendienteLlamadas > 0 ? '#fffbeb' : '#f1f5f9',
-                          color: t.pendienteLlamadas > 0 ? '#d97706' : '#94a3b8',
-                          padding: '0.25rem 0.6rem',
-                          borderRadius: '6px',
-                          fontWeight: 700,
-                          fontSize: '0.82rem'
-                        }}>
-                          {t.pendienteLlamadas}
-                        </span>
-                      </td>
-
-                      {/* Monto Generado */}
-                      <td style={{ padding: '1rem 1rem', textAlign: 'right' }}>
-                        <span style={{
-                          fontWeight: 800,
-                          fontSize: '0.95rem',
-                          color: t.montoTotal > 0 ? '#7c3aed' : '#94a3b8'
-                        }}>
-                          ${t.montoTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </span>
-                      </td>
-
-                      {/* Cumplimiento */}
-                      <td style={{ padding: '1rem 1rem', textAlign: 'center' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-                          <div style={{ width: '60px', height: '6px', background: '#e2e8f0', borderRadius: '3px', overflow: 'hidden' }}>
-                            <div style={{ width: `${pct}%`, height: '100%', background: pct >= 70 ? '#10b981' : pct >= 40 ? '#f59e0b' : '#ef4444' }} />
-                          </div>
-                          <span style={{ fontSize: '0.75rem', fontWeight: 700, color: pct >= 70 ? '#16a34a' : '#d97706' }}>
-                            {pct}%
-                          </span>
-                        </div>
-                      </td>
-
-                      {/* Acciones */}
-                      <td style={{ padding: '1rem 1.25rem', textAlign: 'center' }}>
-                        <button
-                          onClick={() => { setSelectedTrainer(t); setModalSearch(''); }}
-                          style={{
-                            background: '#7c3aed',
-                            color: '#ffffff',
-                            border: 'none',
-                            borderRadius: '6px',
-                            padding: '0.45rem 0.85rem',
-                            fontSize: '0.78rem',
+                        {/* Sede */}
+                        <td style={{ padding: '0.85rem 0.8rem' }}>
+                          <span style={{
+                            padding: '0.2rem 0.5rem',
+                            borderRadius: '5px',
+                            fontSize: '0.74rem',
                             fontWeight: 700,
-                            cursor: 'pointer',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '0.35rem',
-                            boxShadow: '0 2px 4px rgba(124, 58, 237, 0.2)'
-                          }}
-                        >
-                          <Eye size={13} /> Ver Managers ({t.detalles.length})
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+                            background: `${COLORS_SEDES[t.topSede] || '#64748b'}15`,
+                            color: COLORS_SEDES[t.topSede] || '#64748b'
+                          }}>
+                            {t.topSede}
+                          </span>
+                        </td>
 
-      {/* 6. MODAL DE AUDITORÍA DETALLADA POR ENTRENADOR (DRILL DOWN) */}
+                        {/* Asignados en Directorio */}
+                        <td style={{ padding: '0.85rem 0.8rem', textAlign: 'center', fontWeight: 800, color: '#0f172a' }}>
+                          {t.totalAsignados || 0}
+                        </td>
+
+                        {/* Graduados */}
+                        <td style={{ padding: '0.85rem 0.8rem', textAlign: 'center' }}>
+                          <span style={{
+                            background: '#ecfdf5',
+                            color: '#059669',
+                            padding: '0.2rem 0.55rem',
+                            borderRadius: '6px',
+                            fontWeight: 800,
+                            fontSize: '0.8rem'
+                          }}>
+                            {t.graduados || 0} <span style={{ fontSize: '0.7rem', fontWeight: 600 }}>({pctGrad}%)</span>
+                          </span>
+                        </td>
+
+                        {/* Desertores */}
+                        <td style={{ padding: '0.85rem 0.8rem', textAlign: 'center' }}>
+                          <span style={{
+                            background: (t.desertores || 0) > 0 ? '#fef2f2' : '#f8fafc',
+                            color: (t.desertores || 0) > 0 ? '#dc2626' : '#94a3b8',
+                            padding: '0.2rem 0.55rem',
+                            borderRadius: '6px',
+                            fontWeight: 800,
+                            fontSize: '0.8rem'
+                          }}>
+                            {t.desertores || 0} <span style={{ fontSize: '0.7rem', fontWeight: 600 }}>({pctDes}%)</span>
+                          </span>
+                        </td>
+
+                        {/* En Juego */}
+                        <td style={{ padding: '0.85rem 0.8rem', textAlign: 'center' }}>
+                          <span style={{
+                            background: (t.activos || 0) > 0 ? '#eff6ff' : '#f8fafc',
+                            color: (t.activos || 0) > 0 ? '#2563eb' : '#94a3b8',
+                            padding: '0.2rem 0.55rem',
+                            borderRadius: '6px',
+                            fontWeight: 800,
+                            fontSize: '0.8rem'
+                          }}>
+                            {t.activos || 0}
+                          </span>
+                        </td>
+
+                        {/* Total Llamadas */}
+                        <td style={{ padding: '0.85rem 0.8rem', textAlign: 'center', fontWeight: 800, color: '#1e293b' }}>
+                          {t.totalLlamadas}
+                        </td>
+
+                        {/* Pagadas vs Pendientes */}
+                        <td style={{ padding: '0.85rem 0.8rem', textAlign: 'center', fontSize: '0.76rem' }}>
+                          <span style={{ color: '#059669', fontWeight: 700 }}>{t.pagadoLlamadas}</span>
+                          <span style={{ color: '#94a3b8', margin: '0 3px' }}>/</span>
+                          <span style={{ color: t.pendienteLlamadas > 0 ? '#d97706' : '#94a3b8', fontWeight: 700 }}>{t.pendienteLlamadas}</span>
+                        </td>
+
+                        {/* Monto Generado */}
+                        <td style={{ padding: '0.85rem 1rem', textAlign: 'right' }}>
+                          <span style={{
+                            fontWeight: 900,
+                            fontSize: '0.92rem',
+                            color: t.montoTotal > 0 ? '#7c3aed' : '#94a3b8'
+                          }}>
+                            ${t.montoTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </span>
+                        </td>
+
+                        {/* Barra de Éxito / Graduación */}
+                        <td style={{ padding: '0.85rem 1rem', textAlign: 'center' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}>
+                            <div style={{ width: '50px', height: '6px', background: '#e2e8f0', borderRadius: '3px', overflow: 'hidden' }}>
+                              <div style={{ width: `${pctGrad}%`, height: '100%', background: pctGrad >= 65 ? '#10b981' : pctGrad >= 40 ? '#f59e0b' : '#ef4444' }} />
+                            </div>
+                            <span style={{ fontSize: '0.72rem', fontWeight: 700, color: pctGrad >= 65 ? '#16a34a' : '#d97706' }}>
+                              {pctGrad}%
+                            </span>
+                          </div>
+                        </td>
+
+                        {/* Acciones */}
+                        <td style={{ padding: '0.85rem 1.25rem', textAlign: 'center' }}>
+                          <button
+                            onClick={() => { setSelectedTrainer(t); setModalSearch(''); setModalFilterStatus('todos'); }}
+                            style={{
+                              background: '#7c3aed',
+                              color: '#ffffff',
+                              border: 'none',
+                              borderRadius: '6px',
+                              padding: '0.4rem 0.75rem',
+                              fontSize: '0.76rem',
+                              fontWeight: 700,
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.35rem',
+                              boxShadow: '0 2px 4px rgba(124, 58, 237, 0.2)'
+                            }}
+                          >
+                            <Eye size={12} /> Ver Detalle
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* 6. VISTA B: GRÁFICAS DE RETENCIÓN & DESERCIÓN */}
+      {activeSubView === 'graficas_retencion' && (
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(480px, 1fr))',
+          gap: '1.5rem'
+        }}>
+          {/* GRÁFICA: Graduados vs Desertores vs En Juego por Entrenador */}
+          <div style={{
+            background: '#ffffff',
+            borderRadius: '14px',
+            padding: '1.5rem',
+            border: '1px solid #e2e8f0',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            <div style={{ marginBottom: '1rem' }}>
+              <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#0f172a' }}>
+                Retención por Entrenador: Graduados vs. Desertores vs. En Juego
+              </h3>
+              <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>
+                Mide cuántos managers de cada entrenador alcanzaron la meta frente a las bajas
+              </p>
+            </div>
+
+            <div style={{ width: '100%', height: '380px' }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={topRetentionTrainers}
+                  layout="vertical"
+                  margin={{ top: 5, right: 30, left: 100, bottom: 5 }}
+                >
+                  <XAxis type="number" stroke="#94a3b8" fontSize={12} />
+                  <YAxis
+                    type="category"
+                    dataKey="entrenador"
+                    stroke="#475569"
+                    fontSize={12}
+                    tickLine={false}
+                    width={110}
+                  />
+                  <Tooltip
+                    contentStyle={{ background: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '0.82rem' }}
+                  />
+                  <Legend
+                    verticalAlign="top"
+                    align="right"
+                    wrapperStyle={{ fontSize: '0.8rem', paddingBottom: '10px' }}
+                  />
+                  <Bar dataKey="graduados" name="Graduados" stackId="a" fill="#10b981" />
+                  <Bar dataKey="desertores" name="Desertores" stackId="a" fill="#ef4444" />
+                  <Bar dataKey="activos" name="En Juego" stackId="a" fill="#3b82f6" radius={[0, 4, 4, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* GRÁFICA: Donut de Distribución General de Managers */}
+          <div style={{
+            background: '#ffffff',
+            borderRadius: '14px',
+            padding: '1.5rem',
+            border: '1px solid #e2e8f0',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            <div style={{ marginBottom: '1rem' }}>
+              <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#0f172a' }}>
+                Ciclo de Vida Global de Managers (699)
+              </h3>
+              <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>
+                Proporción de graduados (64%), bajas/desertores (24%) y managers activos (12%)
+              </p>
+            </div>
+
+            <div style={{ width: '100%', height: '280px', display: 'flex', alignItems: 'center' }}>
+              <ResponsiveContainer width="55%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={statusPieData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={65}
+                    outerRadius={95}
+                    paddingAngle={4}
+                    dataKey="value"
+                  >
+                    {statusPieData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    formatter={(val) => [`${val} (${((val / statsGlobal.totalManagers) * 100).toFixed(1)}%)`, 'Cantidad']}
+                    contentStyle={{ background: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '0.82rem' }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+
+              <div style={{ width: '45%', display: 'flex', flexDirection: 'column', gap: '0.75rem', paddingLeft: '1rem' }}>
+                {statusPieData.map((item) => (
+                  <div key={item.name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.85rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span style={{ width: '12px', height: '12px', borderRadius: '50%', background: item.color }} />
+                      <span style={{ fontWeight: 600, color: '#334155' }}>{item.name}</span>
+                    </div>
+                    <span style={{ fontWeight: 800, color: '#0f172a' }}>
+                      {item.value} ({((item.value / statsGlobal.totalManagers) * 100).toFixed(1)}%)
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ marginTop: '1rem', padding: '0.75rem 1rem', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0', fontSize: '0.8rem', color: '#475569' }}>
+              <strong>Cobertura de Asignación:</strong> 681 de los 699 managers (97.4%) cuentan con entrenador de llamadas formalmente registrado.
+            </div>
+          </div>
+
+          {/* GRÁFICA: Monto Total Generado ($) por Entrenador */}
+          <div style={{
+            background: '#ffffff',
+            borderRadius: '14px',
+            padding: '1.5rem',
+            border: '1px solid #e2e8f0',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            <div style={{ marginBottom: '1rem' }}>
+              <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#0f172a' }}>
+                Top Entrenadores por Recaudación ($)
+              </h3>
+              <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>
+                Total facturado por llamadas efectivas completadas ($25/llamada)
+              </p>
+            </div>
+
+            <div style={{ width: '100%', height: '320px' }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={topRevenueTrainers}
+                  layout="vertical"
+                  margin={{ top: 5, right: 30, left: 90, bottom: 5 }}
+                >
+                  <XAxis type="number" tickFormatter={(val) => `$${val}`} stroke="#94a3b8" fontSize={11} />
+                  <YAxis type="category" dataKey="entrenador" stroke="#475569" fontSize={11} tickLine={false} width={110} />
+                  <Tooltip
+                    formatter={(value) => [`$${value.toLocaleString()} USD`, 'Monto Generado']}
+                    contentStyle={{ background: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '0.82rem' }}
+                  />
+                  <Bar dataKey="montoTotal" fill="#7c3aed" radius={[0, 6, 6, 0]}>
+                    {topRevenueTrainers.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={index === 0 ? '#7c3aed' : index < 3 ? '#6366f1' : '#3b82f6'}
+                      />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* GRÁFICA: Distribución por Sede */}
+          <div style={{
+            background: '#ffffff',
+            borderRadius: '14px',
+            padding: '1.5rem',
+            border: '1px solid #e2e8f0',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            <div style={{ marginBottom: '1rem' }}>
+              <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#0f172a' }}>
+                Distribución Geográfica de Llamadas
+              </h3>
+              <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.8rem', color: '#64748b' }}>
+                Participación por sede en la matriz operativa
+              </p>
+            </div>
+
+            <div style={{ width: '100%', height: '320px', display: 'flex', alignItems: 'center' }}>
+              <ResponsiveContainer width="55%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={sedePieData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={55}
+                    outerRadius={85}
+                    paddingAngle={3}
+                    dataKey="value"
+                  >
+                    {sedePieData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    formatter={(val, name) => [`${val} llamadas registradas`, name]}
+                    contentStyle={{ background: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '0.82rem' }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+
+              <div style={{ width: '45%', display: 'flex', flexDirection: 'column', gap: '0.45rem', paddingLeft: '0.5rem' }}>
+                {sedePieData.map((item) => (
+                  <div key={item.name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.8rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: item.color }} />
+                      <span style={{ fontWeight: 600, color: '#334155' }}>{item.name}</span>
+                    </div>
+                    <span style={{ fontWeight: 800, color: '#0f172a' }}>{item.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 7. VISTA C: DIRECTORIO DE MANAGERS POR ESTADO (GRADUADOS, DESERTORES, EN JUEGO, ASIGNADOS) */}
+      {activeSubView === 'directorio_estados' && (
+        <div style={{
+          background: '#ffffff',
+          borderRadius: '14px',
+          border: '1px solid #e2e8f0',
+          overflow: 'hidden',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)'
+        }}>
+          {/* Quick Filter Buttons with Counts */}
+          <div style={{ padding: '1rem 1.5rem', background: '#f8fafc', borderBottom: '1px solid #e2e8f0', display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <button
+              onClick={() => setFilterManagerStatus('todos')}
+              style={{
+                padding: '0.4rem 0.85rem',
+                borderRadius: '20px',
+                border: filterManagerStatus === 'todos' ? '2px solid #7c3aed' : '1px solid #cbd5e1',
+                background: filterManagerStatus === 'todos' ? '#f5f3ff' : '#ffffff',
+                color: filterManagerStatus === 'todos' ? '#7c3aed' : '#475569',
+                fontWeight: 700,
+                fontSize: '0.8rem',
+                cursor: 'pointer'
+              }}
+            >
+              Todos ({statsGlobal.totalManagers})
+            </button>
+
+            <button
+              onClick={() => setFilterManagerStatus('GRADUADO')}
+              style={{
+                padding: '0.4rem 0.85rem',
+                borderRadius: '20px',
+                border: filterManagerStatus === 'GRADUADO' ? '2px solid #10b981' : '1px solid #cbd5e1',
+                background: filterManagerStatus === 'GRADUADO' ? '#ecfdf5' : '#ffffff',
+                color: filterManagerStatus === 'GRADUADO' ? '#059669' : '#475569',
+                fontWeight: 700,
+                fontSize: '0.8rem',
+                cursor: 'pointer'
+              }}
+            >
+              🎓 Graduados ({statsGlobal.totalGraduados})
+            </button>
+
+            <button
+              onClick={() => setFilterManagerStatus('DESERTOR')}
+              style={{
+                padding: '0.4rem 0.85rem',
+                borderRadius: '20px',
+                border: filterManagerStatus === 'DESERTOR' ? '2px solid #ef4444' : '1px solid #cbd5e1',
+                background: filterManagerStatus === 'DESERTOR' ? '#fef2f2' : '#ffffff',
+                color: filterManagerStatus === 'DESERTOR' ? '#dc2626' : '#475569',
+                fontWeight: 700,
+                fontSize: '0.8rem',
+                cursor: 'pointer'
+              }}
+            >
+              ⚠️ Desertores ({statsGlobal.totalDesertores})
+            </button>
+
+            <button
+              onClick={() => setFilterManagerStatus('EN_JUEGO')}
+              style={{
+                padding: '0.4rem 0.85rem',
+                borderRadius: '20px',
+                border: filterManagerStatus === 'EN_JUEGO' ? '2px solid #3b82f6' : '1px solid #cbd5e1',
+                background: filterManagerStatus === 'EN_JUEGO' ? '#eff6ff' : '#ffffff',
+                color: filterManagerStatus === 'EN_JUEGO' ? '#2563eb' : '#475569',
+                fontWeight: 700,
+                fontSize: '0.8rem',
+                cursor: 'pointer'
+              }}
+            >
+              ⚡ En Juego ({statsGlobal.totalActivos})
+            </button>
+
+            <button
+              onClick={() => setFilterManagerStatus('sin_entrenador')}
+              style={{
+                padding: '0.4rem 0.85rem',
+                borderRadius: '20px',
+                border: filterManagerStatus === 'sin_entrenador' ? '2px solid #f59e0b' : '1px solid #cbd5e1',
+                background: filterManagerStatus === 'sin_entrenador' ? '#fffbeb' : '#ffffff',
+                color: filterManagerStatus === 'sin_entrenador' ? '#d97706' : '#475569',
+                fontWeight: 700,
+                fontSize: '0.8rem',
+                cursor: 'pointer'
+              }}
+            >
+              🚫 Sin Entrenador ({statsGlobal.totalSinAsignar})
+            </button>
+          </div>
+
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.85rem' }}>
+              <thead>
+                <tr style={{ background: '#f8fafc', borderBottom: '2px solid #e2e8f0', color: '#475569', fontWeight: 700, fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  <th style={{ padding: '0.85rem 1.25rem' }}>Manager</th>
+                  <th style={{ padding: '0.85rem 0.8rem' }}>Sede</th>
+                  <th style={{ padding: '0.85rem 0.8rem' }}>Equipo</th>
+                  <th style={{ padding: '0.85rem 1rem' }}>Entrenador Asignado</th>
+                  <th style={{ padding: '0.85rem 1rem' }}>Coordinador MJ</th>
+                  <th style={{ padding: '0.85rem 0.8rem', textAlign: 'center' }}>Estado</th>
+                  <th style={{ padding: '0.85rem 1.25rem', textAlign: 'right' }}>Contacto</th>
+                </tr>
+              </thead>
+              <tbody>
+                {processedManagersList.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} style={{ padding: '3rem', textAlign: 'center', color: '#94a3b8', fontStyle: 'italic' }}>
+                      No se encontraron managers con el filtro seleccionado.
+                    </td>
+                  </tr>
+                ) : (
+                  processedManagersList.slice(0, 250).map((m, idx) => {
+                    const isGrad = m.estado === 'GRADUADO';
+                    const isDes = m.estado === 'DESERTOR';
+                    return (
+                      <tr
+                        key={m.id || idx}
+                        style={{
+                          borderBottom: '1px solid #f1f5f9',
+                          background: idx % 2 === 0 ? '#ffffff' : '#fafafa'
+                        }}
+                      >
+                        <td style={{ padding: '0.85rem 1.25rem', fontWeight: 700, color: '#0f172a' }}>
+                          {m.nombre}
+                        </td>
+                        <td style={{ padding: '0.85rem 0.8rem' }}>
+                          <span style={{
+                            padding: '0.2rem 0.5rem',
+                            borderRadius: '5px',
+                            fontSize: '0.74rem',
+                            fontWeight: 700,
+                            background: `${COLORS_SEDES[m.sede] || '#64748b'}15`,
+                            color: COLORS_SEDES[m.sede] || '#64748b'
+                          }}>
+                            {m.sede || 'Sin Sede'}
+                          </span>
+                        </td>
+                        <td style={{ padding: '0.85rem 0.8rem', color: '#475569' }}>
+                          <div style={{ fontWeight: 600 }}>{m.nombreEquipo || '—'}</div>
+                          {m.numEquipo && <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>Equipo #{m.numEquipo}</div>}
+                        </td>
+                        <td style={{ padding: '0.85rem 1rem', color: m.entrenador !== 'Sin Asignar' ? '#1e293b' : '#94a3b8', fontWeight: 600 }}>
+                          {m.entrenador}
+                        </td>
+                        <td style={{ padding: '0.85rem 1rem', fontSize: '0.78rem', color: '#64748b' }}>
+                          {m.coordinador || '—'}
+                        </td>
+                        <td style={{ padding: '0.85rem 0.8rem', textAlign: 'center' }}>
+                          <span style={{
+                            padding: '0.25rem 0.65rem',
+                            borderRadius: '20px',
+                            fontWeight: 800,
+                            fontSize: '0.74rem',
+                            textTransform: 'uppercase',
+                            background: isGrad ? '#ecfdf5' : isDes ? '#fef2f2' : '#eff6ff',
+                            color: isGrad ? '#059669' : isDes ? '#dc2626' : '#2563eb',
+                            border: `1px solid ${isGrad ? '#a7f3d0' : isDes ? '#fecaca' : '#bfdbfe'}`
+                          }}>
+                            {isGrad ? '🎓 GRADUADO' : isDes ? '⚠️ DESERTOR' : '⚡ EN JUEGO'}
+                          </span>
+                        </td>
+                        <td style={{ padding: '0.85rem 1.25rem', textAlign: 'right' }}>
+                          {m.telefono ? (
+                            <a
+                              href={`https://wa.me/${m.telefono.replace(/[^0-9]/g, '')}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{
+                                background: '#25D366',
+                                color: '#ffffff',
+                                padding: '0.3rem 0.65rem',
+                                borderRadius: '6px',
+                                fontSize: '0.75rem',
+                                fontWeight: 700,
+                                textDecoration: 'none',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.3rem'
+                              }}
+                            >
+                              <Phone size={12} /> {m.telefono}
+                            </a>
+                          ) : (
+                            <span style={{ fontSize: '0.72rem', color: '#cbd5e1' }}>Sin tel</span>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {processedManagersList.length > 250 && (
+            <div style={{ padding: '0.75rem', textAlign: 'center', fontSize: '0.78rem', color: '#64748b', background: '#f8fafc', borderTop: '1px solid #e2e8f0' }}>
+              Mostrando los primeros 250 de <strong>{processedManagersList.length}</strong> managers coincidentes. Utilice el buscador para afinar su consulta.
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* 8. MODAL DRILL-DOWN POR ENTRENADOR (CON MATRIZ DE 16 LLAMADAS Y ESTADO) */}
       {selectedTrainer && (
         <div style={{
           position: 'fixed',
@@ -980,7 +1427,7 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
             borderRadius: '16px',
             width: '100%',
             maxWidth: '1100px',
-            maxHeight: '90vh',
+            maxHeight: '92vh',
             display: 'flex',
             flexDirection: 'column',
             boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
@@ -988,7 +1435,7 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
           }}>
             {/* Modal Header */}
             <div style={{
-              padding: '1.5rem 2rem',
+              padding: '1.25rem 2rem',
               background: '#f8fafc',
               borderBottom: '1px solid #e2e8f0',
               display: 'flex',
@@ -1011,14 +1458,14 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
                   {selectedTrainer.entrenador.charAt(0)}
                 </div>
                 <div>
-                  <h3 style={{ margin: 0, fontSize: '1.3rem', fontWeight: 800, color: '#0f172a' }}>
+                  <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: '#0f172a' }}>
                     {selectedTrainer.entrenador}
                   </h3>
-                  <div style={{ fontSize: '0.82rem', color: '#64748b', display: 'flex', gap: '1rem', marginTop: '0.2rem' }}>
+                  <div style={{ fontSize: '0.8rem', color: '#64748b', display: 'flex', flexWrap: 'wrap', gap: '1rem', marginTop: '0.2rem' }}>
                     <span>Sede: <strong>{selectedTrainer.topSede}</strong></span>
-                    <span>Total llamadas: <strong>{selectedTrainer.totalLlamadas}</strong></span>
-                    <span>Pagadas: <strong style={{ color: '#16a34a' }}>{selectedTrainer.pagadoLlamadas}</strong></span>
-                    <span>Pendientes: <strong style={{ color: '#d97706' }}>{selectedTrainer.pendienteLlamadas}</strong></span>
+                    <span>Asignados: <strong>{selectedTrainer.totalAsignados || 0}</strong></span>
+                    <span>Graduados: <strong style={{ color: '#059669' }}>{selectedTrainer.graduados || 0} ({selectedTrainer.tasaGraduacion}%)</strong></span>
+                    <span>Desertores: <strong style={{ color: '#dc2626' }}>{selectedTrainer.desertores || 0} ({selectedTrainer.tasaDesercion}%)</strong></span>
                     <span>Monto: <strong style={{ color: '#7c3aed' }}>${selectedTrainer.montoTotal.toLocaleString()}</strong></span>
                   </div>
                 </div>
@@ -1043,73 +1490,109 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
               </button>
             </div>
 
-            {/* Modal Search & Subheader */}
-            <div style={{ padding: '1rem 2rem', background: '#ffffff', borderBottom: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
-              <div style={{ position: 'relative', flex: '1', maxWidth: '380px' }}>
-                <Search size={15} style={{ position: 'absolute', left: '10px', top: '10px', color: '#94a3b8' }} />
+            {/* Modal Controls */}
+            <div style={{ padding: '0.85rem 2rem', background: '#ffffff', borderBottom: '1px solid #e2e8f0', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem' }}>
+              <div style={{ position: 'relative', flex: '1', maxWidth: '340px' }}>
+                <Search size={14} style={{ position: 'absolute', left: '10px', top: '10px', color: '#94a3b8' }} />
                 <input
                   type="text"
-                  placeholder="Buscar manager o equipo en este entrenador..."
+                  placeholder="Buscar manager en este entrenador..."
                   value={modalSearch}
                   onChange={(e) => setModalSearch(e.target.value)}
                   style={{
                     width: '100%',
-                    padding: '0.5rem 1rem 0.5rem 2.2rem',
+                    padding: '0.45rem 1rem 0.45rem 2.1rem',
                     borderRadius: '8px',
                     border: '1px solid #cbd5e1',
-                    fontSize: '0.82rem',
+                    fontSize: '0.8rem',
                     outline: 'none'
                   }}
                 />
               </div>
 
-              <div style={{ fontSize: '0.78rem', color: '#64748b', display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
-                  <span style={{ width: '12px', height: '12px', background: '#10b981', borderRadius: '3px', display: 'inline-block' }} /> Asistió (SI)
-                </span>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
-                  <span style={{ width: '12px', height: '12px', background: '#ef4444', borderRadius: '3px', display: 'inline-block' }} /> Ausente (NO)
-                </span>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
-                  <span style={{ width: '12px', height: '12px', background: '#e2e8f0', borderRadius: '3px', display: 'inline-block' }} /> Pendiente (-)
-                </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <select
+                  value={modalFilterStatus}
+                  onChange={(e) => setModalFilterStatus(e.target.value)}
+                  style={{
+                    padding: '0.4rem 0.65rem',
+                    borderRadius: '6px',
+                    border: '1px solid #cbd5e1',
+                    fontSize: '0.78rem',
+                    background: '#ffffff',
+                    fontWeight: 600
+                  }}
+                >
+                  <option value="todos">Todos los Estados</option>
+                  <option value="GRADUADO">Solo Graduados</option>
+                  <option value="DESERTOR">Solo Desertores</option>
+                  <option value="EN_JUEGO">Solo En Juego</option>
+                </select>
+
+                <div style={{ fontSize: '0.75rem', color: '#64748b', display: 'flex', gap: '0.75rem', alignItems: 'center', marginLeft: '0.5rem' }}>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                    <span style={{ width: '10px', height: '10px', background: '#10b981', borderRadius: '3px', display: 'inline-block' }} /> SI
+                  </span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                    <span style={{ width: '10px', height: '10px', background: '#ef4444', borderRadius: '3px', display: 'inline-block' }} /> NO
+                  </span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                    <span style={{ width: '10px', height: '10px', background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '3px', display: 'inline-block' }} /> Pendiente
+                  </span>
+                </div>
               </div>
             </div>
 
-            {/* Modal Body - Matriz 1 a 16 */}
-            <div style={{ padding: '1.5rem 2rem', overflowY: 'auto', flex: 1 }}>
+            {/* Modal Body */}
+            <div style={{ padding: '1.25rem 2rem', overflowY: 'auto', flex: 1 }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem' }}>
                 <thead>
                   <tr style={{ background: '#f8fafc', borderBottom: '2px solid #e2e8f0', color: '#64748b', textTransform: 'uppercase', fontSize: '0.72rem' }}>
-                    <th style={{ padding: '0.75rem 1rem', textAlign: 'left' }}>Manager</th>
-                    <th style={{ padding: '0.75rem 0.5rem', textAlign: 'left' }}>Sede / Equipo</th>
-                    <th style={{ padding: '0.75rem 0.5rem', textAlign: 'center' }}>Total</th>
-                    <th style={{ padding: '0.75rem 0.5rem', textAlign: 'center' }}>Matriz 16 Llamadas</th>
-                    <th style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>Contacto</th>
+                    <th style={{ padding: '0.65rem 0.8rem', textAlign: 'left' }}>Manager</th>
+                    <th style={{ padding: '0.65rem 0.5rem', textAlign: 'left' }}>Equipo</th>
+                    <th style={{ padding: '0.65rem 0.5rem', textAlign: 'center' }}>Estado</th>
+                    <th style={{ padding: '0.65rem 0.5rem', textAlign: 'center' }}>Total</th>
+                    <th style={{ padding: '0.65rem 0.5rem', textAlign: 'center' }}>Matriz 16 Llamadas</th>
+                    <th style={{ padding: '0.65rem 0.8rem', textAlign: 'right' }}>Contacto</th>
                   </tr>
                 </thead>
                 <tbody>
                   {selectedTrainer.detalles
-                    .filter(m => !modalSearch.trim() || 
-                      m.manager.toLowerCase().includes(modalSearch.toLowerCase()) || 
-                      m.equipo.toLowerCase().includes(modalSearch.toLowerCase())
-                    )
+                    .filter(m => {
+                      if (modalFilterStatus !== 'todos' && m.estado !== modalFilterStatus) return false;
+                      if (!modalSearch.trim()) return true;
+                      const q = modalSearch.toLowerCase();
+                      return m.manager.toLowerCase().includes(q) || m.equipo.toLowerCase().includes(q);
+                    })
                     .map((item, idx) => {
-                      const phone = phoneByManagerName[item.manager.trim().toLowerCase()] || '';
+                      const phone = phoneByManagerName[item.manager.trim().toLowerCase()] || item.telefono || '';
+                      const isGrad = item.estado === 'GRADUADO';
+                      const isDes = item.estado === 'DESERTOR';
                       return (
                         <tr key={idx} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                          <td style={{ padding: '0.75rem 1rem', fontWeight: 700, color: '#0f172a' }}>
+                          <td style={{ padding: '0.65rem 0.8rem', fontWeight: 700, color: '#0f172a' }}>
                             {item.manager}
                           </td>
-                          <td style={{ padding: '0.75rem 0.5rem', color: '#475569' }}>
+                          <td style={{ padding: '0.65rem 0.5rem', color: '#475569' }}>
                             <div>{item.sede}</div>
                             <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>{item.equipo}</div>
                           </td>
-                          <td style={{ padding: '0.75rem 0.5rem', textAlign: 'center', fontWeight: 800, color: '#7c3aed' }}>
+                          <td style={{ padding: '0.65rem 0.5rem', textAlign: 'center' }}>
+                            <span style={{
+                              padding: '0.15rem 0.5rem',
+                              borderRadius: '12px',
+                              fontSize: '0.68rem',
+                              fontWeight: 800,
+                              background: isGrad ? '#ecfdf5' : isDes ? '#fef2f2' : '#eff6ff',
+                              color: isGrad ? '#059669' : isDes ? '#dc2626' : '#2563eb'
+                            }}>
+                              {isGrad ? 'GRADUADO' : isDes ? 'DESERTOR' : 'EN JUEGO'}
+                            </span>
+                          </td>
+                          <td style={{ padding: '0.65rem 0.5rem', textAlign: 'center', fontWeight: 800, color: '#7c3aed' }}>
                             {item.totalReportado}
                           </td>
-                          {/* Cuadricula 1 a 16 */}
-                          <td style={{ padding: '0.75rem 0.5rem' }}>
+                          <td style={{ padding: '0.65rem 0.5rem' }}>
                             <div style={{ display: 'flex', gap: '3px', justifyContent: 'center' }}>
                               {(item.calls || []).map((c, cIdx) => {
                                 const isYes = c === 'SI';
@@ -1137,8 +1620,7 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
                               })}
                             </div>
                           </td>
-                          {/* Teléfono / WhatsApp */}
-                          <td style={{ padding: '0.75rem 1rem', textAlign: 'right' }}>
+                          <td style={{ padding: '0.65rem 0.8rem', textAlign: 'right' }}>
                             {phone ? (
                               <a
                                 href={`https://wa.me/${phone.replace(/[^0-9]/g, '')}`}
@@ -1147,17 +1629,17 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
                                 style={{
                                   background: '#25D366',
                                   color: '#ffffff',
-                                  padding: '0.3rem 0.6rem',
+                                  padding: '0.25rem 0.55rem',
                                   borderRadius: '6px',
-                                  fontSize: '0.75rem',
+                                  fontSize: '0.72rem',
                                   fontWeight: 700,
                                   textDecoration: 'none',
                                   display: 'inline-flex',
                                   alignItems: 'center',
-                                  gap: '0.3rem'
+                                  gap: '0.25rem'
                                 }}
                               >
-                                <Phone size={12} /> WhatsApp
+                                <Phone size={11} /> WhatsApp
                               </a>
                             ) : (
                               <span style={{ fontSize: '0.72rem', color: '#cbd5e1' }}>Sin tel</span>
@@ -1171,7 +1653,7 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
             </div>
 
             {/* Modal Footer */}
-            <div style={{ padding: '1rem 2rem', background: '#f8fafc', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'flex-end' }}>
+            <div style={{ padding: '0.85rem 2rem', background: '#f8fafc', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'flex-end' }}>
               <button
                 onClick={() => setSelectedTrainer(null)}
                 style={{
@@ -1179,8 +1661,8 @@ export default function KPIsEntrenadoresLlamadas({ allManagersList = [] }) {
                   color: '#ffffff',
                   border: 'none',
                   borderRadius: '8px',
-                  padding: '0.6rem 1.4rem',
-                  fontSize: '0.85rem',
+                  padding: '0.55rem 1.25rem',
+                  fontSize: '0.82rem',
                   fontWeight: 700,
                   cursor: 'pointer'
                 }}
