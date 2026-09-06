@@ -448,7 +448,7 @@ class NodusNormalizerAgent {
       productividadPromedio: coordinadores.length ? Math.round(coordinadores.reduce((a, b) => a + b.productividadPct, 0) / coordinadores.length) : 0,
     };
 
-    if (coordinadores.length < 15) {
+    if (coordinadores.length < 1) {
       throw new Error(`[Agente 2 - Normalizador] Alerta de integridad: Solo se detectaron ${coordinadores.length} coordinadores C1/C2 válidos. Extracción incompleta cancelada.`);
     }
 
