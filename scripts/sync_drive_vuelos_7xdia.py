@@ -255,7 +255,7 @@ def sync_from_drive():
                 orig_city, orig_air = AIRPORT_CITIES.get(origin_code, (origin_code, f"Aeropuerto {origin_code}"))
                 dest_city, dest_air = AIRPORT_CITIES.get(dest_code, (dest_code, f"Aeropuerto {dest_code}"))
 
-                flight_key = fl_clean
+                flight_key = f'{fl_clean}_{dep_iso_date}'
                 airline_name = get_airline_name(flight_key)
 
                 if flight_key not in all_flights:

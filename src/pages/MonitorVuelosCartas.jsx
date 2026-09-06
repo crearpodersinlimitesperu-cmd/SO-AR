@@ -260,6 +260,7 @@ export default function MonitorVuelosCartas() {
   const [previewLetter, setPreviewLetter] = useState(null);
   const [searchFilter, setSearchFilter] = useState('');
   const [routeFilter, setRouteFilter] = useState('ALL');
+  const [flightStatusFilter, setFlightStatusFilter] = useState('activos');
 
   const fetchTrackerData = async () => {
     setLoading(true);
@@ -310,6 +311,12 @@ export default function MonitorVuelosCartas() {
   const flightsList = Object.values(trackerData?.flights || {});
 
   const filteredFlights = flightsList.filter(f => {
+    const ahora = new Date();
+    const fechaLlegada = new Date(f.schedule?.estimatedArrival || f.schedule?.scheduledArrival);
+    const esPasado = fechaLlegada < ahora;
+    if (flightStatusFilter === 'activos' && esPasado) return false;
+    if (flightStatusFilter === 'pasados' && !esPasado) return false;
+
     if (routeFilter === 'UIO-LIM' && !(f.route.origin === 'UIO' && f.route.destination === 'LIM')) return false;
     if (routeFilter === 'LIM-UIO' && !(f.route.origin === 'LIM' && f.route.destination === 'UIO')) return false;
     if (routeFilter === 'LIM-GYE' && !(f.route.origin === 'LIM' && f.route.destination === 'GYE')) return false;
@@ -521,6 +528,33 @@ export default function MonitorVuelosCartas() {
           {/* Barra de Filtros y Búsqueda de Vuelos */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+              
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginRight: '2rem' }}>
+                {[
+                  { id: 'activos', label: '✈️ Activos / Próximos' },
+                  { id: 'pasados', label: '🛬 Pasados' },
+                  { id: 'todos', label: '🗄️ Todos' }
+                ].map(t => (
+                  <button
+                    key={t.id}
+                    onClick={() => setFlightStatusFilter(t.id)}
+                    style={{
+                      padding: '6px 14px',
+                      borderRadius: '8px',
+                      border: '1px solid',
+                      borderColor: flightStatusFilter === t.id ? '#10b981' : 'rgba(255,255,255,0.1)',
+                      background: flightStatusFilter === t.id ? 'rgba(16,185,129,0.2)' : 'rgba(0,0,0,0.3)',
+                      color: flightStatusFilter === t.id ? '#10b981' : 'var(--text-muted)',
+                      fontSize: '0.82rem',
+                      fontWeight: 600,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                 {[
                   { id: 'ALL', label: `Todos los Vuelos (${flightsList.length})` },
