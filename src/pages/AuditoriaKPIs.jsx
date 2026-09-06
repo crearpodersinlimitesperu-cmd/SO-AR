@@ -326,6 +326,17 @@ export default function AuditoriaKPIs({ defaultTab }) {
         filtered = filtered.filter(r => r.sede && r.sede.toUpperCase().includes(searchTerm));
       }
 
+      
+      // MERGE LOCAL REVIEW STATUS
+      const localReviews = getLocalReports();
+      filtered = filtered.map(r => {
+        const local = localReviews.find(l => l.id === r.id);
+        if (local && local.status === 'reviewed') {
+          return { ...r, status: 'reviewed', reviewedBy: local.reviewedBy, reviewedAt: local.reviewedAt };
+        }
+        return r;
+      });
+
       setReports(filtered);
     } catch (error) {
       if (error.code === 'permission-denied') {
@@ -352,12 +363,15 @@ export default function AuditoriaKPIs({ defaultTab }) {
     } : r);
     setReports(updated);
 
-    const allLocal = getLocalReports().map(r => r.id === reportId ? {
-      ...r,
-      status: 'reviewed',
-      reviewedBy: reviewerName,
-      reviewedAt: nowIso
-    } : r);
+    let allLocal = getLocalReports();
+    const existing = allLocal.find(r => r.id === reportId);
+    if (existing) {
+      existing.status = 'reviewed';
+      existing.reviewedBy = reviewerName;
+      existing.reviewedAt = nowIso;
+    } else {
+      allLocal.push({ id: reportId, status: 'reviewed', reviewedBy: reviewerName, reviewedAt: nowIso });
+    }
     saveLocalReports(allLocal);
 
     showToast("Reporte marcado como revisado", "success");
@@ -533,7 +547,7 @@ export default function AuditoriaKPIs({ defaultTab }) {
             }}
           >
             <Users size={16} style={{ display: 'inline-block', verticalAlign: 'text-bottom', marginRight: '6px' }} />
-            Entrenadores Maestría
+            Coordinadores de Maestría
           </button>
           <button
             onClick={() => setActiveTab('auditoria')}

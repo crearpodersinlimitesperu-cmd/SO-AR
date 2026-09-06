@@ -328,7 +328,7 @@ export default function HelpModal({ isOpen, onClose }) {
                   <p>La sección de KPIs ha sido reconstruida y mejorada para gerentes y directores.</p>
                   <ul style={{ paddingLeft: '1.5rem', marginBottom: '1.5rem' }}>
                     <li><strong>Tab CMJ:</strong> Consolidado automático (desde Drive) que suma la retención, deserción y enrolamiento total de <em>todos</em> los Coordinadores de la Maestría de la sede seleccionada.</li>
-                    <li><strong>Tab Entrenadores Maestría:</strong> Métricas operativas de avance, gráficas y cierres enfocadas en el desempeño del Entrenador por sede.</li>
+                    <li><strong>Tab Coordinadores de Maestría:</strong> Métricas operativas de avance, gráficas y cierres enfocadas en el desempeño del Entrenador por sede.</li>
                     <li><strong>Tab Auditoría de KPIs:</strong> Espacio exclusivo para revisar y auditar los formularios semanales cargados manualmente por el Quantum Team (QT y Coordinadores).</li>
                     <li><strong>Horarios de Entrenamiento y Vestimenta:</strong> Consulta el cronograma oficial de sala (Jueves a Domingo) y código de vestimenta haciendo clic en el botón <strong>⏰ Horarios y Vestimenta</strong> en la barra superior de Inicio, en el Dashboard Gerencial o en el Manual Nodus.</li>
                     <li><strong>Flyers Globales:</strong> Acceso a recursos de diseño para Capítulo 1 en la pantalla de inicio.</li>

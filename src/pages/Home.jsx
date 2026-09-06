@@ -2193,7 +2193,10 @@ export default function Home() {
 
               {/* PANEL PRIORIDAD TOP 3 */}
               <div className="glass-panel" style={{ padding: '1.2rem' }}>
-                <h3 className="text-blue" style={{ marginTop: 0, borderBottom: '1px solid rgba(0,212,255,0.2)', paddingBottom: '0.4rem', fontSize: '1rem' }}>TU PRIORIDAD (Top 3)</h3>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(0,212,255,0.2)', paddingBottom: '0.4rem', marginBottom: '0.8rem' }}>
+                  <h3 className="text-blue" style={{ marginTop: 0, marginBottom: 0, borderBottom: 'none', paddingBottom: 0, fontSize: '1rem' }}>TU PRIORIDAD (Top 3)</h3>
+                  <button onClick={() => navigate(`/checklist/${currentUser?.appRole || 'gerente'}`)} style={{ background: 'transparent', border: '1px solid var(--crear-gold)', color: 'var(--crear-gold)', borderRadius: '4px', padding: '4px 8px', fontSize: '0.75rem', cursor: 'pointer' }}>Ver Tareas Generales →</button>
+                </div>
                 <ul style={{ listStyle: 'none', padding: 0, margin: '0.8rem 0 0 0', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   {urgentTasks.slice(0, 3).length === 0 ? (
                     <li className="text-muted" style={{ padding: '0.5rem 0', fontSize: '0.85rem' }}>No tienes tareas urgentes pendientes. ¡Excelente!</li>
