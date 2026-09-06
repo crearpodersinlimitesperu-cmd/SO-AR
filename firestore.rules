@@ -90,6 +90,7 @@ service cloud.firestore {
       return isAuthenticated() && (
         resourceData.assignedToEmail == email() ||
         (resourceData.assigned_to != null && resourceData.assigned_to == email()) ||
+        (resourceData.assignedToEmails != null && email() in resourceData.assignedToEmails) ||
         // Se conserva por compatibilidad si alg├║n flujo futuro s├¡ llega a usar el uid real:
         (resourceData.ownerId != null && resourceData.ownerId == request.auth.uid)
       );
@@ -112,7 +113,7 @@ service cloud.firestore {
       return isAuthenticated() &&
         request.resource.data.diff(resource.data).affectedKeys().hasOnly([
           'completed', 'status', 'completions', 'progress', 'progressPercentage',
-          'evidence_url', 'evidenceUrl', 'date', 'googleSynced'
+          'evidence_url', 'evidenceUrl', 'date', 'googleSynced', 'evidences', 'comments', 'progressNotes', 'authorEmail'
         ]);
     }
 
