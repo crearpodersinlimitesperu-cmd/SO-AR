@@ -33,34 +33,32 @@ export default function StrategyBoard() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const docRef = doc(db, 'nodus_kpis_sincronizados', 'latest_snapshot');
+        const docRef = doc(db, 'nodus_coordinadores_c1c2', 'latest');
         const docSnap = await getDocResilient(docRef);
         
         if (docSnap.exists()) {
           const data = docSnap.data();
           let okrGenerales = [];
 
-          // OKR 1: ACTIVIDAD DE COORDINADORES (Tasa de Contactabilidad)
-          let totalGestiones = 0;
           let totalAsignados = 0;
-          
-          if(data.secciones?.actividadCoordinadores?.kpis?.length > 0) {
-            data.secciones.actividadCoordinadores.kpis.forEach(kpi => {
-              if (kpi.content) {
-                let gestiones = 0;
-                let asignados = 0;
-                kpi.content.forEach((line, index) => {
-                  if (line === "Gestiones" && index > 0) {
-                     gestiones = parseInt(kpi.content[index-1]) || 0;
-                  }
-                  if (line === "Asignados" && index > 0) {
-                     asignados = parseInt(kpi.content[index-1]) || 0;
-                  }
-                });
-                totalGestiones += gestiones;
-                totalAsignados += asignados;
+          let totalGestiones = 0;
+          let totalConfirmados = 0;
+
+          if (selectedSede === 'GLOBAL') {
+            if (data.totales) {
+              totalAsignados = data.totales.totalAsignados || 0;
+              totalGestiones = data.totales.totalGestiones || 0;
+              totalConfirmados = data.totales.totalConfirmados || 0;
+            }
+          } else {
+            if (data.sedes) {
+              const sedeData = data.sedes.find(s => String(s.sede).toUpperCase() === selectedSede.toUpperCase());
+              if (sedeData) {
+                totalAsignados = sedeData.asignadosTotal || 0;
+                totalGestiones = sedeData.gestionesTotal || 0;
+                totalConfirmados = sedeData.confirmadosTotal || 0;
               }
-            });
+            }
           }
 
           let contactabilidadRate = totalAsignados > 0 ? Math.round((totalGestiones / totalAsignados) * 100) : 0;
@@ -70,38 +68,22 @@ export default function StrategyBoard() {
             id: 1,
             owner: 'Mesa de Registro',
             objective: 'Maximizar Tasa de Contactabilidad Base C1',
-            progress: contactabilidadRate || 85,
+            progress: contactabilidadRate || 0,
             keyResults: [
-              { id: 'kr1', text: 'Total Gestiones Realizadas (Coordinadores)', current: totalGestiones || 1500, target: totalAsignados || 1800, unit: 'llamadas' }
+              { id: 'kr1', text: 'Total Gestiones Realizadas (Coordinadores)', current: totalGestiones, target: totalAsignados, unit: 'llamadas' }
             ]
           });
 
-          // OKR 2: ENROLAMIENTO (Reporte Entrenadores)
-          let enroladosParticipantes = 0;
-          let metaDeclaracion = 0;
-
-          if(data.secciones?.reporteEntrenadores?.tablas?.length > 0) {
-            const tablaEnrol = data.secciones.reporteEntrenadores.tablas.find(t => t.headers && (t.headers.includes("Total Enrolados") || t.headers.includes("TOTAL ENROLADOS"))) || data.secciones.reporteEntrenadores.tablas[0];
-            if (tablaEnrol && tablaEnrol.rows) {
-              tablaEnrol.rows.forEach(row => {
-                if (row["Tipo IMO"] === "PARTICIPANTE" || row["TIPO IMO"] === "PARTICIPANTE") {
-                  enroladosParticipantes += parseInt(row["Total Enrolados"] || row["TOTAL ENROLADOS"] || 0);
-                  metaDeclaracion += parseInt(row["Declaración"] || row["DECLARACIÓN"] || 0);
-                }
-              });
-            }
-          }
-
-          let enrolRate = metaDeclaracion > 0 ? Math.round((enroladosParticipantes / metaDeclaracion) * 100) : 0;
+          let enrolRate = totalAsignados > 0 ? Math.round((totalConfirmados / totalAsignados) * 100) : 0;
           if(enrolRate > 100) enrolRate = 100;
 
           okrGenerales.push({
             id: 2,
             owner: 'Staff Elite',
             objective: 'Cumplimiento de Metas de Enrolamiento (Participantes)',
-            progress: enrolRate || 65,
+            progress: enrolRate || 0,
             keyResults: [
-              { id: 'kr2', text: 'Alcanzar el 100% de la Declaración del Staff', current: enroladosParticipantes || 20, target: metaDeclaracion || 40, unit: 'enrolados' }
+              { id: 'kr2', text: 'Enrolamiento de Participantes Base Asignados', current: totalConfirmados, target: totalAsignados, unit: 'enrolados' }
             ]
           });
 
@@ -111,12 +93,12 @@ export default function StrategyBoard() {
           if (okrGenerales.length > 0) {
              prom = Math.round(okrGenerales.reduce((acc, curr) => acc + curr.progress, 0) / okrGenerales.length);
           }
-          setGlobalHealth(prom || 78);
+          setGlobalHealth(prom || 0);
           setErrorObj(null);
 
         } else {
           console.warn("No se encontró el snapshot de Nodus");
-          setErrorObj("No se encontró el archivo de datos sincronizados (latest_snapshot) en la base de datos.");
+          setErrorObj("No se encontró el archivo de datos sincronizados (latest) en la base de datos.");
         }
       } catch (error) {
         console.error("Error obteniendo datos de Nodus:", error);
@@ -130,7 +112,7 @@ export default function StrategyBoard() {
       }
     }
     fetchData();
-  }, []);
+  }, [selectedSede]);
 
   return (
     <div style={{ minHeight: '100vh', background: bgLight, color: textDark, paddingBottom: '4rem', fontFamily: 'Inter, system-ui, sans-serif' }}>
@@ -186,10 +168,10 @@ export default function StrategyBoard() {
             {/* RESUMEN GLOBAL */}
             <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.5rem', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
               <div>
-                <div style={{ fontSize: '0.75rem', color: textMuted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.5rem' }}>Salud Estratégica Global</div>
+                <div style={{ fontSize: '0.75rem', color: textMuted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.5rem' }}>{`Salud Estratégica ${selectedSede === 'GLOBAL' ? 'Global' : selectedSede}`}</div>
                 <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.5rem' }}>
                   <span style={{ fontSize: '2.5rem', fontWeight: 900, color: '#10b981', lineHeight: 1 }}>{globalHealth}%</span>
-                  <span style={{ color: textMuted, fontSize: '0.9rem', marginBottom: '0.3rem' }}>Cumplimiento Global (Calculado en Vivo)</span>
+                  <span style={{ color: textMuted, fontSize: '0.9rem', marginBottom: '0.3rem' }}>{`Cumplimiento ${selectedSede === 'GLOBAL' ? 'Global' : 'Sede'} (Calculado en Vivo)`}</span>
                 </div>
               </div>
               <div style={{ padding: '1rem', background: '#ecfdf5', borderRadius: '50%', color: '#10b981' }}>
@@ -214,7 +196,7 @@ export default function StrategyBoard() {
                         <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: textDark, margin: 0 }}>{okr.objective}</h3>
                       </div>
                       <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontSize: '0.7rem', color: textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.2rem' }}>Progreso Global</div>
+                        <div style={{ fontSize: '0.7rem', color: textMuted, fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.2rem' }}>{`Progreso ${selectedSede === 'GLOBAL' ? 'Global' : 'Sede'}`}</div>
                         <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#3b82f6' }}>{okr.progress}%</div>
                       </div>
                     </div>
