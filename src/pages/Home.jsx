@@ -573,7 +573,12 @@ const MODULE_REGISTRY = [
 const isModuleVisible = (mod, currentUser) => {
   if (typeof mod.visible === 'function') return mod.visible(currentUser);
   if (mod.roles === null) return true;
-  return hasRoleAccess(mod.roles || []);
+  const allowedRoles = mod.roles || [];
+  if (currentUser?.isSuperAdmin) return true;
+  if (currentUser?.appRole === 'consolidado') {
+    return (currentUser?.roles || []).some(r => allowedRoles.includes(r));
+  }
+  return allowedRoles.includes(currentUser?.appRole);
 };
 
 // ============================================================================
@@ -1481,13 +1486,22 @@ export default function Home() {
                 )}
 
                 {canAccessMonitorVuelos(currentUser) && (
-                  <button 
-                    onClick={() => { setShowToolsDropdown(false); navigate('/monitor-vuelos'); }} 
-                    className="btn-secondary" 
-                    style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem', border: '1px solid rgba(56, 189, 248, 0.3)', cursor: 'pointer' }}
-                  >
-                    ✈️ Monitor de Vuelos y Cartas
-                  </button>
+                  <>
+                    <button 
+                      onClick={() => { setShowToolsDropdown(false); navigate('/monitor-vuelos'); }} 
+                      className="btn-secondary" 
+                      style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem', border: '1px solid rgba(56, 189, 248, 0.3)', cursor: 'pointer' }}
+                    >
+                      ✈️ Monitor de Vuelos y Cartas
+                    </button>
+                    <button 
+                      onClick={() => { setShowToolsDropdown(false); window.open('https://crearpsl.net/imose31lima', '_blank'); }} 
+                      className="btn-secondary" 
+                      style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(168, 85, 247, 0.15)', color: '#a855f7', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem', border: '1px solid rgba(168, 85, 247, 0.3)', cursor: 'pointer' }}
+                    >
+                      🦅 Monitor de IMOs
+                    </button>
+                  </>
                 )}
 
                 {hasRoleAccess(['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan']) && (
@@ -1643,6 +1657,12 @@ export default function Home() {
             </button>
           )}
 
+          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']) && (
+            <button onClick={() => navigate('/crm-maestro')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #047857)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+              <Users size={14} style={{ display: 'inline', marginRight: '4px' }} /> BASE MAESTRA CRM
+            </button>
+          )}
+
           {canAccessCalendarioMJ(currentUser) && (
             <button onClick={() => navigate('/calendario-mj')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #1a75bc, #29abe2)', color: 'white', border: 'none' }}>
               📅 Calendario MJ
@@ -1656,9 +1676,14 @@ export default function Home() {
           )}
 
           {canAccessMonitorVuelos(currentUser) && (
-            <button onClick={() => navigate('/monitor-vuelos')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #38bdf8, #0284c7)', color: 'white', fontWeight: 'bold', border: 'none' }}>
-              ✈️ Monitor de Vuelos
-            </button>
+            <>
+              <button onClick={() => navigate('/monitor-vuelos')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #38bdf8, #0284c7)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+                ✈️ Monitor de Vuelos
+              </button>
+              <button onClick={() => window.open('https://crearpsl.net/imose31lima', '_blank')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #a855f7, #7e22ce)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+                🦅 Monitor de IMOs
+              </button>
+            </>
           )}
         </div>
       )}
@@ -1836,14 +1861,24 @@ export default function Home() {
                 🎯 Mis Metas
               </button>
               {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']) && (
-                <button
-                  className="btn-secondary hover-glow"
-                  onClick={() => navigate('/superadmin')}
-                  title="Directorio Global — Panel Super Admin"
-                  style={{ flex: 1, minWidth: '150px', padding: '0.85rem 1rem', fontSize: '0.95rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', background: 'rgba(139, 92, 246, 0.12)', borderColor: 'rgba(139, 92, 246, 0.4)', color: '#a78bfa' }}
-                >
-                  🌐 Directorio Global
-                </button>
+                <>
+                  <button
+                    className="btn-secondary hover-glow"
+                    onClick={() => navigate('/superadmin')}
+                    title="Directorio Global — Panel Super Admin"
+                    style={{ flex: 1, minWidth: '150px', padding: '0.85rem 1rem', fontSize: '0.95rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', background: 'rgba(139, 92, 246, 0.12)', borderColor: 'rgba(139, 92, 246, 0.4)', color: '#a78bfa' }}
+                  >
+                    👑 Directorio Global
+                  </button>
+                  <button
+                    className="btn-secondary hover-glow"
+                    onClick={() => navigate('/crm-maestro')}
+                    title="Base Maestra CRM (Nodus)"
+                    style={{ flex: 1, minWidth: '150px', padding: '0.85rem 1rem', fontSize: '0.95rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', background: 'rgba(52, 211, 153, 0.12)', borderColor: 'rgba(52, 211, 153, 0.4)', color: '#34d399' }}
+                  >
+                    <Users size={18} /> CRM Nodus
+                  </button>
+                </>
               )}
             </div>
           </div>
@@ -2464,3 +2499,4 @@ export default function Home() {
     </div>
   );
 }
+
