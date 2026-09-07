@@ -404,26 +404,43 @@ export default function ChecklistBoard() {
                       )}
                     </div>
 
-                    {/* FECHA Y HORA LÍMITE AUTOMÁTICA Causa OS */}
-                    {(() => {
-                      const effectiveDeadline = task.deadline || calculateAutomaticDeadline(task, currentCycle);
-                      return (
-                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.25rem 0.6rem', borderRadius: '6px', background: 'rgba(255, 215, 0, 0.1)', border: '1px solid rgba(255, 215, 0, 0.3)', marginBottom: '0.5rem', fontSize: '0.8rem' }}>
-                          <Clock size={13} color="var(--crear-gold)" />
-                          <span style={{ color: 'var(--crear-gold)', fontWeight: 'bold' }}>
-                            ⏰ Límite: {effectiveDeadline}
-                          </span>
-                          {!task.completed && (
-                            <button 
-                              onClick={() => handleSetDeadline(task)}
-                              style={{ background: 'none', border: 'none', color: '#29abe2', cursor: 'pointer', fontSize: '0.75rem', textDecoration: 'underline', padding: '0 0.2rem', marginLeft: '0.3rem' }}
-                            >
-                              {task.deadline ? 'Modificar' : 'Ajustar'}
-                            </button>
-                          )}
-                        </div>
-                      );
-                    })()}
+                      {/* FECHA Y HORA LÍMITE AUTOMÁTICA Causa OS */}
+                      {(() => {
+                        const effectiveDeadline = task.deadline || calculateAutomaticDeadline(task, currentCycle);
+                        const countdown = getCountdownInfo(effectiveDeadline);
+                        return (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
+                            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.25rem 0.6rem', borderRadius: '6px', background: 'rgba(255, 215, 0, 0.1)', border: '1px solid rgba(255, 215, 0, 0.3)', fontSize: '0.8rem' }}>
+                              <Clock size={13} color="var(--crear-gold)" />
+                              <span style={{ color: 'var(--crear-gold)', fontWeight: 'bold' }}>
+                                ⏱ Límite: {effectiveDeadline}
+                              </span>
+                              {!task.completed && (
+                                <button 
+                                  onClick={() => handleSetDeadline(task)}
+                                  style={{ background: 'none', border: 'none', color: '#29abe2', cursor: 'pointer', fontSize: '0.75rem', textDecoration: 'underline', padding: '0 0.2rem', marginLeft: '0.3rem' }}
+                                >
+                                  {task.deadline ? 'Modificar' : 'Ajustar'}
+                                </button>
+                              )}
+                            </div>
+                            
+                            {!task.completed && countdown && (
+                              <div style={{ 
+                                padding: '0.25rem 0.6rem', 
+                                borderRadius: '6px', 
+                                fontSize: '0.75rem', 
+                                fontWeight: 'bold',
+                                color: countdown.color, 
+                                background: countdown.bg, 
+                                border: `1px solid ${countdown.border}` 
+                              }}>
+                                {countdown.label}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })()}
                     
                     {task.associatedGoal && (
                       <div style={{ background: 'rgba(41, 171, 226, 0.1)', border: '1px solid rgba(41, 171, 226, 0.3)', padding: '0.5rem', borderRadius: '4px', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem' }}>
