@@ -7,7 +7,7 @@ export default function MonitorImos() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const q = query(collection(db, 'imo_missions'), orderBy('startedAt', 'desc'));
+    const q = query(collection(db, 'imo_missions'), orderBy('lastUpdated', 'desc'));
     
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const data = [];
@@ -121,28 +121,32 @@ export default function MonitorImos() {
                 </td>
               </tr>
             ) : missions.map((m) => {
-              const enrolledKeys = Object.keys(m.enrolledStatus || {});
-              const totalEnrolled = enrolledKeys.length;
-              let confirmed = 0;
-              let guaranteed = 0;
+              const enrolledKeys = Object.keys(m.checks || {});
+              const totalEnrolled = m.totalEnrolados || 0;
+              const confirmed = m.completados || 0;
+              let contacted = 0;
+              let assisted = 0;
               enrolledKeys.forEach(k => {
-                if (m.enrolledStatus[k]?.confirmed) confirmed++;
-                if (m.enrolledStatus[k]?.guaranteed) guaranteed++;
+                if (m.checks[k]?.contacto) contacted++;
+                if (m.checks[k]?.asistencia) assisted++;
               });
 
-              const isCompleted = m.missionCompleted;
-              const dateStarted = new Date(m.startedAt).toLocaleString();
+              const isCompleted = m.progreso === 100;
+              const dateStarted = m.lastUpdated?.toDate ? m.lastUpdated.toDate().toLocaleString() : 'Reciente';
 
               return (
                 <tr key={m.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                  <td style={{ padding: '1rem', fontWeight: 600 }}>{m.imoName || 'Desconocido'}</td>
+                  <td style={{ padding: '1rem', fontWeight: 600 }}>
+                    {m.imoNombre || 'Desconocido'}
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{m.equipo || ''}</div>
+                  </td>
                   <td style={{ padding: '1rem', fontSize: '0.9rem' }} className="text-muted">{dateStarted}</td>
                   <td style={{ padding: '1rem' }}>
-                    <div>Confirmados: {confirmed} / {totalEnrolled}</div>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--crear-blue)' }}>Garantizados: {guaranteed}</div>
+                    <div>Progreso: {m.progreso || 0}%</div>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--crear-blue)' }}>Contactados: {contacted} | Asistirán: {assisted}</div>
                   </td>
                   <td style={{ padding: '1rem', fontWeight: 700 }}>
-                    {confirmed}
+                    {confirmed} / {totalEnrolled}
                   </td>
                   <td style={{ padding: '1rem' }}>
                     {isCompleted ? (
