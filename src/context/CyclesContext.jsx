@@ -106,11 +106,14 @@ export function CyclesProvider({ children }) {
     });
 
     const today = new Date();
+    // Miramos hasta 21 días atrás para no saltar prematuramente al siguiente ciclo 
+    // mientras la sede sigue procesando las tareas POST-MJ del ciclo recién terminado.
+    const lookbackDate = new Date(today.getTime() - 21 * 24 * 60 * 60 * 1000);
     
     let nextEvent = null;
     for (const e of sedeEvents) {
         const d = new Date((e.fecha_inicio || e.start).replace('Z', ''));
-        if (d >= today && ['CAPITULO UNO', 'CAPITULO DOS', 'MAESTRIA DEL JUEGO'].includes(e.nombre || e.name)) {
+        if (d >= lookbackDate && ['CAPITULO UNO', 'CAPITULO DOS', 'MAESTRIA DEL JUEGO'].includes(e.nombre || e.name)) {
             nextEvent = e;
             break;
         }

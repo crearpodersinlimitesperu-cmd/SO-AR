@@ -112249,6 +112249,15 @@ export const USERS_TO_IMPORT = [
 
 ---
 
+## Archivo: scratch_inject.js
+
+```js
+// Error leyendo archivo: 'utf-8' codec can't decode byte 0x97 in position 406: invalid start byte
+
+```
+
+---
+
 ## Archivo: server.js
 
 ```js
@@ -157505,6 +157514,7 @@ import ManualNodus from './pages/ManualNodus'
 import MisKPIs from './pages/MisKPIs'
 import AuditoriaKPIs from './pages/AuditoriaKPIs'
 import CentroManagers from './pages/CentroManagers'
+import ManagerGuide from './pages/ManagerGuide'
 import DirectorioQT from './pages/DirectorioQT'
 import ProtocoloEmergencias from './pages/ProtocoloEmergencias'
 import PortfolioBoard from './pages/PortfolioBoard'
@@ -157520,6 +157530,8 @@ import MonitorVuelosCartas from './pages/MonitorVuelosCartas'
 import VendeSinVender from './pages/VendeSinVender'
 import MasterclassDistinciones from './pages/MasterclassDistinciones'
 import DashboardKpisLima from './pages/DashboardKpisLima'
+import CRMBaseMaster from './pages/CRMBaseMaster'
+import MonitorImos from './pages/MonitorImos'
 import AICopilot from './components/AICopilot'
 import PromptModal from './components/PromptModal'
 import BirthdayAlert from './components/BirthdayAlert'
@@ -157734,6 +157746,12 @@ function App() {
             </RoleRoute>
           } />
           
+          <Route path="/guias/managers" element={
+            <PrivateRoute>
+              <ManagerGuide />
+            </PrivateRoute>
+          } />
+
           <Route path="/centro-managers" element={
             <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas']} requireSuperAdmin={false}>
               <CentroManagers />
@@ -157822,10 +157840,21 @@ function App() {
           } />
           <Route path="/vuelos" element={<Navigate to="/monitor-vuelos" replace />} />
           <Route path="/cartas" element={<Navigate to="/monitor-vuelos" replace />} />
-
+          
+          <Route path="/monitor-imos" element={
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
+              <MonitorImos />
+            </RoleRoute>
+          } />
           <Route path="/kpis-lima" element={
             <PrivateRoute>
               <DashboardKpisLima />
+            </PrivateRoute>
+          } />
+
+          <Route path="/crm-maestro" element={
+            <PrivateRoute>
+              <CRMBaseMaster />
             </PrivateRoute>
           } />
 
@@ -169076,7 +169105,14 @@ export default function NodusCoordinadoresC1C2Dashboard() {
   // Filtros
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCoordinador, setSelectedCoordinador] = useState('TODOS');
-  const [selectedSede, setSelectedSede] = useState('TODAS');
+  
+  const [selectedSede, setSelectedSede] = useState(globalFilterSede && globalFilterSede !== 'Todas' ? globalFilterSede : 'TODAS');
+  
+  useEffect(() => {
+    if (globalFilterSede) {
+      setSelectedSede(globalFilterSede === 'Todas' || globalFilterSede === 'Global' ? 'TODAS' : globalFilterSede);
+    }
+  }, [globalFilterSede]);
   const [selectedEquipo, setSelectedEquipo] = useState('TODOS');
   const [selectedEntrenamiento, setSelectedEntrenamiento] = useState('TODOS'); // TODOS, C1, C2
   const [selectedCiclo, setSelectedCiclo] = useState('TODOS');
@@ -171040,6 +171076,133 @@ export default function PromptModal() {
           </div>
         </form>
       </div>
+    </div>
+  );
+}
+
+```
+
+---
+
+## Archivo: src\components\ResourceCapacityView.jsx
+
+```javascript
+import React, { useMemo } from 'react';
+import { useCycles } from '../context/CyclesContext';
+import { User, MapPin } from 'lucide-react';
+
+export default function ResourceCapacityView({ selectedSede }) {
+  const { events, loadingEvents } = useCycles();
+
+  const data = useMemo(() => {
+    if (!events || events.length === 0) return { trainers: {}, locations: {} };
+    
+    // Filtro por sede (si no es global)
+    let filtered = events.filter(e => e.fecha_inicio || e.start);
+    if (selectedSede !== 'GLOBAL') {
+      const sCode = selectedSede.substring(0, 3).toUpperCase();
+      filtered = filtered.filter(e => {
+        const evSede = (e.sede || e.sedeTag || e.place || '').toUpperCase();
+        return evSede.includes(sCode) || evSede === sCode || evSede.includes(selectedSede.toUpperCase());
+      });
+    }
+
+    // Limitar a eventos futuros o recientes (últimos 30 días y futuros 6 meses)
+    const today = new Date();
+    const minDate = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const maxDate = new Date(today.getTime() + 180 * 24 * 60 * 60 * 1000);
+
+    filtered = filtered.filter(e => {
+      const d = new Date((e.fecha_inicio || e.start).replace('Z', ''));
+      return d >= minDate && d <= maxDate;
+    });
+
+    const trainers = {};
+    const locations = {};
+
+    filtered.forEach(e => {
+      if (e.trainer && e.trainer.trim() !== '') {
+        const t = e.trainer.trim().toUpperCase();
+        if (!trainers[t]) trainers[t] = [];
+        trainers[t].push(e);
+      }
+      
+      const loc = (e.lugar || e.direccion || e.sede || 'Sin Asignar').trim().toUpperCase();
+      if (!locations[loc]) locations[loc] = [];
+      locations[loc].push(e);
+    });
+
+    // Ordenar cronológicamente
+    Object.values(trainers).forEach(arr => arr.sort((a,b) => new Date(a.fecha_inicio || a.start) - new Date(b.fecha_inicio || b.start)));
+    Object.values(locations).forEach(arr => arr.sort((a,b) => new Date(a.fecha_inicio || a.start) - new Date(b.fecha_inicio || b.start)));
+
+    return { trainers, locations };
+  }, [events, selectedSede]);
+
+  if (loadingEvents) {
+    return <div style={{ padding: '2rem', textAlign: 'center', color: '#64748b' }}>Cargando capacidad operativa de Nodus...</div>;
+  }
+
+  const bgCard = "#ffffff";
+  const borderLight = "#e2e8f0";
+
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+      
+      {/* COLUMNA ENTRENADORES */}
+      <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.5rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+        <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0f172a', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <User size={20} color="#3b82f6" /> Capacidad de Entrenadores
+        </h3>
+        
+        {Object.keys(data.trainers).length === 0 ? (
+          <p style={{ color: '#64748b', fontSize: '0.9rem' }}>No hay entrenadores programados en el horizonte actual.</p>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {Object.keys(data.trainers).sort().map(trainer => (
+              <div key={trainer} style={{ borderLeft: '3px solid #3b82f6', paddingLeft: '1rem' }}>
+                <h4 style={{ fontWeight: 700, fontSize: '0.95rem', color: '#334155', marginBottom: '0.5rem' }}>{trainer}</h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  {data.trainers[trainer].map((ev, i) => (
+                    <div key={i} style={{ fontSize: '0.85rem', color: '#64748b', display: 'flex', justifyContent: 'space-between' }}>
+                      <span>{ev.nombre} (Eq {ev.equipo}) - {ev.sede}</span>
+                      <span style={{ fontWeight: 600 }}>{(ev.fecha_inicio || ev.start).substring(0,10)}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* COLUMNA SALAS / LOCACIONES */}
+      <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.5rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+        <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#0f172a', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <MapPin size={20} color="#10b981" /> Ocupación de Salas/Sedes
+        </h3>
+        
+        {Object.keys(data.locations).length === 0 ? (
+          <p style={{ color: '#64748b', fontSize: '0.9rem' }}>No hay locaciones programadas en el horizonte actual.</p>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {Object.keys(data.locations).sort().map(loc => (
+              <div key={loc} style={{ borderLeft: '3px solid #10b981', paddingLeft: '1rem' }}>
+                <h4 style={{ fontWeight: 700, fontSize: '0.95rem', color: '#334155', marginBottom: '0.5rem' }}>{loc}</h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  {data.locations[loc].map((ev, i) => (
+                    <div key={i} style={{ fontSize: '0.85rem', color: '#64748b', display: 'flex', justifyContent: 'space-between' }}>
+                      <span>{ev.nombre} (Eq {ev.equipo})</span>
+                      <span style={{ fontWeight: 600 }}>{(ev.fecha_inicio || ev.start).substring(0,10)}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
     </div>
   );
 }
@@ -177401,11 +177564,14 @@ export function CyclesProvider({ children }) {
     });
 
     const today = new Date();
+    // Miramos hasta 21 días atrás para no saltar prematuramente al siguiente ciclo 
+    // mientras la sede sigue procesando las tareas POST-MJ del ciclo recién terminado.
+    const lookbackDate = new Date(today.getTime() - 21 * 24 * 60 * 60 * 1000);
     
     let nextEvent = null;
     for (const e of sedeEvents) {
         const d = new Date((e.fecha_inicio || e.start).replace('Z', ''));
-        if (d >= today && ['CAPITULO UNO', 'CAPITULO DOS', 'MAESTRIA DEL JUEGO'].includes(e.nombre || e.name)) {
+        if (d >= lookbackDate && ['CAPITULO UNO', 'CAPITULO DOS', 'MAESTRIA DEL JUEGO'].includes(e.nombre || e.name)) {
             nextEvent = e;
             break;
         }
@@ -178054,6 +178220,7 @@ export const checklistData = [
   { id: 'soar_28', role: 'coord_maestria', cyclePhase: 'MJ', task: 'Dirigir la operación logística de los FDS, asistencia y soporte a entrenadores.', isCritical: true },
   // --- POST-MJ ---
   { id: 'soar_29', role: 'gerente', cyclePhase: 'POST-MJ', task: 'Auditoría final y Cierre de Oro.', isCritical: true },
+  { id: 'gerente_post_mj_1', role: 'gerente', cyclePhase: 'POST-MJ', task: 'Lunes Post-MJ: Asignar las llamadas de los nuevos de PX a los coordinadores.', isCritical: true },
   { id: 'soar_30', role: 'coord_maestria', cyclePhase: 'POST-MJ', task: 'Consolidar métricas y entregar aprendizajes.', isCritical: true },
 
   // --- ENTRENADOR (COACH) ---
@@ -178680,13 +178847,13 @@ export const cyclesData = [
 ```json
 {
   "metadata": {
-    "generatedAt": "2026-09-06T00:46:56.928Z",
+    "generatedAt": "2026-09-07T01:09:45.658Z",
     "sheetManagersId": "1KF58QXAiIk4KP_9G2aiAM3ERVoptcqKlIraszNKq2Ow",
     "sheetLlamadosId": "1lWAHh1PSAKu9eU6DOBxZExrHMbCYc3f2Sr8GdghNxD0",
     "totalTrainers": 34,
     "totalDetailedRecords": 934,
     "totalManagersSheet1": 699,
-    "syncDurationMs": 1262
+    "syncDurationMs": 2252
   },
   "totales": {
     "totalLlamadas": 5402,
@@ -279525,7 +279692,18 @@ export default function AuditoriaKPIs({ defaultTab }) {
   const [loading, setLoading] = useState(true);
   const [reports, setReports] = useState([]);
   const [resumenGeneral, setResumenGeneral] = useState(null);
-  const [filterSede, setFilterSede] = useState(currentUser?.sede || 'Todas');
+    
+  // Default to 'Todas' for SuperAdmins, Direccion or Consolidado, otherwise user's home sede
+  const initialSede = (() => {
+    if (!currentUser) return 'Todas';
+    if (currentUser.isSuperAdmin || currentUser.appRole === 'direccion' || currentUser.appRole === 'consolidado') {
+      return 'Todas';
+    }
+    return currentUser.sede || 'Todas';
+  })();
+    
+  const [filterSede, setFilterSede] = useState(initialSede);
+    
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [isScrapingLive, setIsScrapingLive] = useState(false);
@@ -280068,7 +280246,7 @@ export default function AuditoriaKPIs({ defaultTab }) {
         </div>
 
         {/* Dashboards Content */}
-        {activeTab === 'coordinadores_nodus' && <NodusCoordinadoresC1C2Dashboard />}
+        {activeTab === 'coordinadores_nodus' && <NodusCoordinadoresC1C2Dashboard globalFilterSede={filterSede} />}
         {activeTab === 'cmj' && <CMJDashboard globalFilterSede={filterSede} />}
         {activeTab === 'entrenadores' && <DriveDashboard globalFilterSede={filterSede} />}
   
@@ -285273,6 +285451,25 @@ const PHASE_META = {
 // en vez de ver solo la fase activa del ciclo como el resto de roles.
 const COORDINATOR_ROLES_WITH_PHASE_TABS = ['qt', 'coord_c1', 'coord_maestria', 'coordinador'];
 
+const getCountdownInfo = (deadlineIso, now = new Date()) => {
+  if (!deadlineIso) return { label: 'Sin fecha límite', color: '#9ca3af', bg: 'rgba(156,163,175,0.12)', border: '#9ca3af', overdue: false };
+  const deadline = new Date(deadlineIso).getTime();
+  if (isNaN(deadline)) return { label: 'Fecha inválida', color: '#9ca3af', bg: 'rgba(156,163,175,0.12)', border: '#9ca3af', overdue: false };
+
+  const diffMs = deadline - now.getTime();
+  const absMs = Math.abs(diffMs);
+  const totalHours = Math.floor(absMs / 3600000);
+  const days = Math.floor(totalHours / 24);
+  const mins = Math.floor((absMs % 3600000) / 60000);
+  const timeStr = days > 0 ? `${days}d ${totalHours % 24}h` : (totalHours > 0 ? `${totalHours}h ${mins}m` : `${mins}m`);
+
+  if (diffMs <= 0) return { label: `🚨 VENCIDA hace ${timeStr}`, color: '#ffffff', bg: '#dc2626', border: '#7f1d1d', overdue: true };
+  if (diffMs < 3 * 3600000) return { label: `🔥 ${timeStr} restantes`, color: '#ffffff', bg: '#ef4444', border: '#b91c1c', overdue: false };
+  if (diffMs < 24 * 3600000) return { label: `⏳ ${timeStr} restantes`, color: '#ffffff', bg: '#f97316', border: '#c2410c', overdue: false };
+  if (diffMs < 72 * 3600000) return { label: `⏱️ ${timeStr} restantes`, color: '#1a1300', bg: '#facc15', border: '#a16207', overdue: false };
+  return { label: `📅 ${timeStr} restantes`, color: '#047857', bg: '#d1fae5', border: '#059669', overdue: false };
+};
+
 export default function ChecklistBoard() {
   const { roleId: rawRoleId } = useParams();
   const roleId = normalizeRole(decodeURIComponent(rawRoleId));
@@ -285370,14 +285567,26 @@ export default function ChecklistBoard() {
   let activeTasks = myTasks;
   let viewTitle = `Checklist Causa OS Activo: ${currentStage}`;
 
+  const sortByDeadline = (tasksArray) => {
+    return tasksArray.sort((a, b) => {
+      const dA = a.deadline || calculateAutomaticDeadline(a, currentCycle);
+      const dB = b.deadline || calculateAutomaticDeadline(b, currentCycle);
+      const timeA = dA ? new Date(dA).getTime() : Infinity;
+      const timeB = dB ? new Date(dB).getTime() : Infinity;
+      return timeA - timeB;
+    });
+  };
+
   if (filterParam === 'completed') {
     activeTasks = myTasks.filter(t => t.completed || t.status === 'Completada');
     viewTitle = "Mostrando: Tareas Completadas";
   } else if (filterParam === 'criticas') {
     activeTasks = myTasks.filter(t => !t.completed && (t.isCritical || t.priority === 'Crítica'));
+    activeTasks = sortByDeadline(activeTasks);
     viewTitle = "Mostrando: Tareas Críticas (Urgentes)";
   } else if (filterParam === 'importantes') {
     activeTasks = myTasks.filter(t => !t.completed && !t.isCritical && t.priority !== 'Crítica');
+    activeTasks = sortByDeadline(activeTasks);
     viewTitle = "Mostrando: Tareas Importantes";
   } else if (showPhaseTabs) {
     // Para roles de coordinación (QT, Coordinación C1/C2, Coordinación Maestría, Coordinación Administrativa):
@@ -285867,6 +286076,191 @@ export default function ChecklistBoard() {
           return u ? u.name : email;
         }}
       />
+    </div>
+  );
+}
+
+```
+
+---
+
+## Archivo: src\pages\CRMBaseMaster.jsx
+
+```javascript
+﻿import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { db } from '../services/firebase';
+import { collection, query, limit, getDocs, where, getCountFromServer } from 'firebase/firestore';
+import { Search, RefreshCw, ArrowLeft, Users, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { toast } from 'react-hot-toast';
+
+export default function CRMBaseMaster() {
+  const navigate = useNavigate();
+  const { currentUser, isSuperAdmin } = useAuth();
+  
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [stats, setStats] = useState({ total: 0, sentados: 0, pendientes: 0 });
+
+  useEffect(() => {
+    fetchStats();
+    fetchData();
+  }, []);
+
+  const fetchStats = async () => {
+    try {
+      const coll = collection(db, 'participants');
+      const totalSnap = await getCountFromServer(coll);
+      
+      const sentadosQ = query(coll, where('estadoC1', '==', 'SENTADO'));
+      const sentadosSnap = await getCountFromServer(sentadosQ);
+      
+      const pendientesQ = query(coll, where('estadoC1', '==', 'PENDIENTE'));
+      const pendientesSnap = await getCountFromServer(pendientesQ);
+
+      setStats({
+        total: totalSnap.data().count,
+        sentados: sentadosSnap.data().count,
+        pendientes: pendientesSnap.data().count
+      });
+    } catch (e) {
+      console.error("Error fetching stats:", e);
+    }
+  };
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const q = query(collection(db, 'participants'), limit(150));
+      const snap = await getDocs(q);
+      const docs = [];
+      snap.forEach(d => docs.push({ id: d.id, ...d.data() }));
+      setData(docs);
+    } catch (e) {
+      toast.error('Error al cargar la base de datos');
+    }
+    setLoading(false);
+  };
+
+  const getStatusBadge = (estado) => {
+    if (estado === 'SENTADO') return <span className="bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded text-xs font-bold flex items-center gap-1"><CheckCircle size={12}/> SENTADO</span>;
+    if (estado === 'DESERTOR') return <span className="bg-rose-500/20 text-rose-400 px-2 py-1 rounded text-xs font-bold flex items-center gap-1"><XCircle size={12}/> DESERTOR</span>;
+    if (estado === 'REZAGADO') return <span className="bg-amber-500/20 text-amber-400 px-2 py-1 rounded text-xs font-bold flex items-center gap-1"><Clock size={12}/> REZAGADO</span>;
+    return <span className="bg-slate-500/20 text-slate-400 px-2 py-1 rounded text-xs font-bold flex items-center gap-1"><Clock size={12}/> {estado || 'PENDIENTE'}</span>;
+  };
+
+  const filteredData = data.filter(p => 
+    p.nombreCompleto?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    p.dni?.includes(searchTerm)
+  );
+
+  return (
+    <div className="min-h-screen bg-slate-900 text-white p-6 font-sans">
+      <div className="max-w-7xl mx-auto">
+        <header className="flex justify-between items-center mb-8 border-b border-slate-700 pb-4">
+          <div className="flex items-center gap-4">
+            <button onClick={() => navigate(-1)} className="p-2 bg-slate-800 hover:bg-slate-700 rounded-full transition-colors">
+              <ArrowLeft size={20} className="text-slate-300" />
+            </button>
+            <div>
+              <h1 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500 flex items-center gap-2">
+                <Users size={28} className="text-amber-400" /> Base Maestra CRM (Nodus)
+              </h1>
+              <p className="text-slate-400 mt-1">Conexión directa con todos los registros sincronizados de tu CRM</p>
+            </div>
+          </div>
+          <button onClick={fetchData} className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded text-sm transition-colors border border-slate-700">
+            <RefreshCw size={16} /> Refrescar
+          </button>
+        </header>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-slate-800 border border-slate-700 rounded-lg p-4">
+            <p className="text-slate-400 text-sm mb-1">Total Registros</p>
+            <p className="text-3xl font-bold text-white">{stats.total}</p>
+          </div>
+          <div className="bg-slate-800 border border-emerald-900/50 rounded-lg p-4">
+            <p className="text-slate-400 text-sm mb-1">Sentados</p>
+            <p className="text-3xl font-bold text-emerald-400">{stats.sentados}</p>
+          </div>
+          <div className="bg-slate-800 border border-slate-700 rounded-lg p-4">
+            <p className="text-slate-400 text-sm mb-1">Pendientes</p>
+            <p className="text-3xl font-bold text-slate-300">{stats.pendientes}</p>
+          </div>
+        </div>
+
+        <div className="bg-slate-800 rounded-lg border border-slate-700 overflow-hidden shadow-xl">
+          <div className="p-4 border-b border-slate-700 flex flex-wrap gap-4 items-center bg-slate-800/50">
+            <div className="relative flex-1 min-w-[300px]">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+              <input 
+                type="text" 
+                placeholder="Buscar por DNI o Nombres..." 
+                className="w-full bg-slate-900 border border-slate-700 rounded py-2 pl-10 pr-4 text-white focus:outline-none focus:border-amber-500 transition-colors"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-slate-900/50 text-slate-400 text-sm uppercase tracking-wider">
+                  <th className="p-4 border-b border-slate-700 font-medium">Participante</th>
+                  <th className="p-4 border-b border-slate-700 font-medium">Contacto</th>
+                  <th className="p-4 border-b border-slate-700 font-medium">Estado C1</th>
+                  <th className="p-4 border-b border-slate-700 font-medium">Coordinadora</th>
+                  <th className="p-4 border-b border-slate-700 font-medium">IMO Enrolador</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-700/50">
+                {loading ? (
+                  <tr>
+                    <td colSpan="5" className="p-8 text-center text-slate-400">
+                      <RefreshCw className="animate-spin mx-auto mb-2" size={24} />
+                      Cargando base de datos...
+                    </td>
+                  </tr>
+                ) : filteredData.length === 0 ? (
+                  <tr>
+                    <td colSpan="5" className="p-8 text-center text-slate-400">
+                      No se encontraron resultados en la vista actual.
+                    </td>
+                  </tr>
+                ) : (
+                  filteredData.map(p => (
+                    <tr key={p.id} className="hover:bg-slate-700/30 transition-colors">
+                      <td className="p-4">
+                        <div className="font-semibold text-white">{p.nombreCompleto}</div>
+                        <div className="text-xs text-slate-400 mt-1">DNI: {p.dni || 'Sin DNI'}</div>
+                      </td>
+                      <td className="p-4">
+                        <div className="text-sm">{p.telefono || '-'}</div>
+                        <div className="text-xs text-slate-400 truncate max-w-[150px]">{p.email || '-'}</div>
+                      </td>
+                      <td className="p-4">
+                        {getStatusBadge(p.estadoC1)}
+                      </td>
+                      <td className="p-4 text-sm text-slate-300">
+                        {p.coordinadora || '-'}
+                      </td>
+                      <td className="p-4 text-sm text-slate-400">
+                        {p.imoEnrolador || '-'}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+          <div className="p-4 border-t border-slate-700 text-xs text-slate-500 text-center">
+            Mostrando hasta 150 registros recientes. Usa la barra de busqueda para filtrar localmente.
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -290214,7 +290608,12 @@ const MODULE_REGISTRY = [
 const isModuleVisible = (mod, currentUser) => {
   if (typeof mod.visible === 'function') return mod.visible(currentUser);
   if (mod.roles === null) return true;
-  return hasRoleAccess(mod.roles || []);
+  const allowedRoles = mod.roles || [];
+  if (currentUser?.isSuperAdmin) return true;
+  if (currentUser?.appRole === 'consolidado') {
+    return (currentUser?.roles || []).some(r => allowedRoles.includes(r));
+  }
+  return allowedRoles.includes(currentUser?.appRole);
 };
 
 // ============================================================================
@@ -291122,13 +291521,22 @@ export default function Home() {
                 )}
 
                 {canAccessMonitorVuelos(currentUser) && (
-                  <button 
-                    onClick={() => { setShowToolsDropdown(false); navigate('/monitor-vuelos'); }} 
-                    className="btn-secondary" 
-                    style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem', border: '1px solid rgba(56, 189, 248, 0.3)', cursor: 'pointer' }}
-                  >
-                    ✈️ Monitor de Vuelos y Cartas
-                  </button>
+                  <>
+                    <button 
+                      onClick={() => { setShowToolsDropdown(false); navigate('/monitor-vuelos'); }} 
+                      className="btn-secondary" 
+                      style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem', border: '1px solid rgba(56, 189, 248, 0.3)', cursor: 'pointer' }}
+                    >
+                      ✈️ Monitor de Vuelos y Cartas
+                    </button>
+                    <button 
+                      onClick={() => { setShowToolsDropdown(false); navigate('/monitor-imos'); }} 
+                      className="btn-secondary" 
+                      style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(168, 85, 247, 0.15)', color: '#a855f7', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem', border: '1px solid rgba(168, 85, 247, 0.3)', cursor: 'pointer' }}
+                    >
+                      🦅 Monitor de IMOs
+                    </button>
+                  </>
                 )}
 
                 {hasRoleAccess(['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan']) && (
@@ -291284,6 +291692,12 @@ export default function Home() {
             </button>
           )}
 
+          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']) && (
+            <button onClick={() => navigate('/crm-maestro')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #047857)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+              <Users size={14} style={{ display: 'inline', marginRight: '4px' }} /> BASE MAESTRA CRM
+            </button>
+          )}
+
           {canAccessCalendarioMJ(currentUser) && (
             <button onClick={() => navigate('/calendario-mj')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #1a75bc, #29abe2)', color: 'white', border: 'none' }}>
               📅 Calendario MJ
@@ -291297,9 +291711,14 @@ export default function Home() {
           )}
 
           {canAccessMonitorVuelos(currentUser) && (
-            <button onClick={() => navigate('/monitor-vuelos')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #38bdf8, #0284c7)', color: 'white', fontWeight: 'bold', border: 'none' }}>
-              ✈️ Monitor de Vuelos
-            </button>
+            <>
+              <button onClick={() => navigate('/monitor-vuelos')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #38bdf8, #0284c7)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+                ✈️ Monitor de Vuelos
+              </button>
+              <button onClick={() => navigate('/monitor-imos')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #a855f7, #7e22ce)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+                🦅 Monitor de IMOs
+              </button>
+            </>
           )}
         </div>
       )}
@@ -291477,14 +291896,24 @@ export default function Home() {
                 🎯 Mis Metas
               </button>
               {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']) && (
-                <button
-                  className="btn-secondary hover-glow"
-                  onClick={() => navigate('/superadmin')}
-                  title="Directorio Global — Panel Super Admin"
-                  style={{ flex: 1, minWidth: '150px', padding: '0.85rem 1rem', fontSize: '0.95rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', background: 'rgba(139, 92, 246, 0.12)', borderColor: 'rgba(139, 92, 246, 0.4)', color: '#a78bfa' }}
-                >
-                  🌐 Directorio Global
-                </button>
+                <>
+                  <button
+                    className="btn-secondary hover-glow"
+                    onClick={() => navigate('/superadmin')}
+                    title="Directorio Global — Panel Super Admin"
+                    style={{ flex: 1, minWidth: '150px', padding: '0.85rem 1rem', fontSize: '0.95rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', background: 'rgba(139, 92, 246, 0.12)', borderColor: 'rgba(139, 92, 246, 0.4)', color: '#a78bfa' }}
+                  >
+                    👑 Directorio Global
+                  </button>
+                  <button
+                    className="btn-secondary hover-glow"
+                    onClick={() => navigate('/crm-maestro')}
+                    title="Base Maestra CRM (Nodus)"
+                    style={{ flex: 1, minWidth: '150px', padding: '0.85rem 1rem', fontSize: '0.95rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', background: 'rgba(52, 211, 153, 0.12)', borderColor: 'rgba(52, 211, 153, 0.4)', color: '#34d399' }}
+                  >
+                    <Users size={18} /> CRM Nodus
+                  </button>
+                </>
               )}
             </div>
           </div>
@@ -292106,6 +292535,7 @@ export default function Home() {
   );
 }
 
+
 ```
 
 ---
@@ -292378,6 +292808,111 @@ export default function Login() {
         
         <p className="text-muted" style={{ marginTop: '1.5rem', fontSize: '0.75rem', opacity: 0.8 }}>Acceso exclusivo para la manada CREAR</p>
       </div>
+    </div>
+  );
+}
+
+```
+
+---
+
+## Archivo: src\pages\ManagerGuide.jsx
+
+```javascript
+import React from 'react';
+import { useAuth } from '../context/AuthContext';
+import { BookOpen, Link as LinkIcon, Database, BarChart2, HelpCircle, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+
+export default function ManagerGuide() {
+  const { currentUser } = useAuth();
+  const navigate = useNavigate();
+
+  return (
+    <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto', color: 'var(--text-color)' }}>
+      <header style={{ marginBottom: '2rem', textAlign: 'center' }}>
+        <h1 style={{ color: 'var(--crear-gold)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.8rem', fontSize: '2rem' }}>
+          <BookOpen size={32} />
+          Domina el Nuevo Sistema de Gestión de Managers
+        </h1>
+        <p style={{ fontSize: '1.1rem', color: 'var(--text-muted)' }}>
+          Todo lo que necesitas saber para registrar, asignar y dar seguimiento a los Managers de Maestría del Juego y sus llamadas de entrenamiento.
+        </p>
+      </header>
+
+      <div className="glass-panel" style={{ padding: '2rem', marginBottom: '1.5rem', background: 'rgba(41, 171, 226, 0.05)', border: '1px solid rgba(41, 171, 226, 0.2)' }}>
+        <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: 0, color: '#29abe2' }}>
+          <Database size={24} />
+          Sección 1: El Nuevo Estándar Operativo ⚙️
+        </h2>
+        <p style={{ lineHeight: '1.6' }}>
+          A partir de hoy, la gestión de Managers se centraliza. Ya no utilizamos formatos externos ni registros aislados. La sinergia entre <strong>Nodus</strong> (nuestra matriz de datos) y <strong>Causa OS</strong> (nuestro centro operativo) te dará visibilidad instantánea sobre la salud de tu equipo de Managers.
+        </p>
+      </div>
+
+      <div className="glass-panel" style={{ padding: '2rem', marginBottom: '1.5rem' }}>
+        <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: 0 }}>
+          <LinkIcon size={24} />
+          Sección 2: Paso a Paso — ¿Cómo ingresar a Nodus? 🔑
+        </h2>
+        <ol style={{ lineHeight: '1.8', margin: 0, paddingLeft: '1.5rem' }}>
+          <li><strong>Acceso al Portal:</strong> Ingresa al enlace oficial de tu matriz Nodus (Google Sheets / Portal CRM) correspondiente a tu sede.</li>
+          <li><strong>Autenticación:</strong> Asegúrate de estar utilizando tu correo corporativo o cuenta autorizada de CREAR.</li>
+          <li><strong>Ubicación:</strong> Dirígete a la pestaña o módulo designado como <strong>"Gestión de Managers"</strong> o <strong>"Llamadas Maestría"</strong>.</li>
+        </ol>
+      </div>
+
+      <div className="glass-panel" style={{ padding: '2rem', marginBottom: '1.5rem' }}>
+        <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: 0, color: 'var(--crear-gold)' }}>
+          <BarChart2 size={24} />
+          Sección 3: Creación y Seguimiento de Managers 📊
+        </h2>
+        <p style={{ marginBottom: '1rem' }}>Sigue este proceso riguroso para cada nuevo Manager y sesión de entrenamiento:</p>
+        
+        <div style={{ padding: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', marginBottom: '1rem' }}>
+          <h3 style={{ margin: '0 0 0.5rem 0', color: '#fff' }}>Paso 1: Alta del Manager</h3>
+          <p style={{ margin: 0, color: 'var(--text-muted)' }}>Registra el nombre completo, equipo y fecha de inicio del Manager en la matriz de Nodus.</p>
+        </div>
+
+        <div style={{ padding: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', marginBottom: '1rem' }}>
+          <h3 style={{ margin: '0 0 0.5rem 0', color: '#fff' }}>Paso 2: Asignación de Entrenador</h3>
+          <p style={{ margin: 0, color: 'var(--text-muted)' }}>En la misma fila, selecciona en el menú desplegable el "Entrenador Asignado" que se encargará del seguimiento de llamadas.</p>
+        </div>
+
+        <div style={{ padding: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '8px' }}>
+          <h3 style={{ margin: '0 0 0.5rem 0', color: '#fff' }}>Paso 3: Registro de Llamadas (Gestiones)</h3>
+          <p style={{ margin: '0 0 0.5rem 0', color: 'var(--text-muted)' }}>Cada vez que el Entrenador realice la llamada de seguimiento, debe registrarse en Nodus (fecha, estatus de la llamada y observaciones).</p>
+          <div style={{ padding: '0.5rem 0.8rem', background: 'rgba(239, 68, 68, 0.1)', borderLeft: '3px solid #ef4444', color: '#ef4444', fontSize: '0.9rem' }}>
+            <strong>Nota Crítica:</strong> Solo las llamadas registradas formalmente aquí impactarán el porcentaje de cumplimiento y los OKRs en tu tablero de Causa OS.
+          </div>
+        </div>
+      </div>
+
+      <div className="glass-panel" style={{ padding: '2rem', marginBottom: '2rem', background: 'rgba(212, 175, 55, 0.05)', border: '1px solid rgba(212, 175, 55, 0.2)' }}>
+        <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: 0, color: 'var(--crear-gold)' }}>
+          <ArrowRight size={24} />
+          Sección 4: Visualización en Causa OS 👁️‍🗨️
+        </h2>
+        <p style={{ marginBottom: '1rem' }}>Tus registros en Nodus viajarán automáticamente a la plataforma.</p>
+        <ol style={{ lineHeight: '1.8', margin: 0, paddingLeft: '1.5rem', marginBottom: '1.5rem' }}>
+          <li>Inicia sesión en Causa OS.</li>
+          <li>Dirígete a tu Tablero de Estrategia y OKRs.</li>
+          <li>Revisa en tiempo real la sumatoria de "Gestiones Realizadas", el índice de contactabilidad y la salud de las llamadas de los Managers.</li>
+        </ol>
+        <button 
+          onClick={() => navigate('/estrategia')}
+          style={{ padding: '0.8rem 1.5rem', background: 'var(--crear-gold)', color: '#000', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+        >
+          Ir al Tablero de Estrategia <ArrowRight size={18} />
+        </button>
+      </div>
+
+      <footer style={{ textAlign: 'center', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+        <p style={{ color: 'var(--text-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+          <HelpCircle size={16} /> ¿Tienes problemas para acceder a Nodus? Consulta a tu administrador de sede.
+        </p>
+        <h3 style={{ margin: '1rem 0 0 0', color: '#fff', fontSize: '1rem', letterSpacing: '2px' }}>CREAR PODER SIN LÍMITES</h3>
+      </footer>
     </div>
   );
 }
@@ -295063,6 +295598,124 @@ export default function MisKPIs() {
 
 ---
 
+## Archivo: src\pages\MonitorImos.jsx
+
+```javascript
+import { useEffect, useState } from 'react';
+import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { db } from '../services/firebase';
+
+export default function MonitorImos() {
+  const [missions, setMissions] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const q = query(collection(db, 'imo_missions'), orderBy('startedAt', 'desc'));
+    
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const data = [];
+      snapshot.forEach((doc) => {
+        data.push({ id: doc.id, ...doc.data() });
+      });
+      setMissions(data);
+      setLoading(false);
+    }, (error) => {
+      console.error("Error fetching IMO missions:", error);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="p-8 text-center" style={{ color: 'var(--crear-gold)' }}>
+        <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>⚡</div>
+        <p>Cargando telemetría de IMOs...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="animate-fade-in p-8" style={{ maxWidth: '1400px', margin: '0 auto' }}>
+      <header style={{ marginBottom: '2rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.25rem' }}>
+          <span style={{ background: 'rgba(14, 165, 233, 0.15)', color: '#38bdf8', padding: '3px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 800 }}>
+            SISTEMA OPERATIVO CAUSA
+          </span>
+          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Misión IMO</span>
+        </div>
+        <h1 className="text-gold" style={{ fontSize: '2.4rem', margin: '0 0 0.5rem 0', letterSpacing: '-0.02em' }}>
+          MONITOR DE IMOS
+        </h1>
+        <p className="text-muted" style={{ fontSize: '1.05rem', margin: 0 }}>
+          Supervisión en tiempo real de los IMOs conectados, sus enrolados y su progreso de llamadas.
+        </p>
+      </header>
+
+      <div className="glass-panel" style={{ padding: '1.5rem', overflowX: 'auto', border: '1px solid rgba(255,255,255,0.08)' }}>
+        <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse', minWidth: '900px' }}>
+          <thead>
+            <tr style={{ borderBottom: '2px solid rgba(255, 183, 3, 0.3)' }}>
+              <th style={{ padding: '1rem', color: 'var(--crear-gold)', fontSize: '0.85rem' }}>IMO (Nombre)</th>
+              <th style={{ padding: '1rem', color: 'var(--crear-gold)', fontSize: '0.85rem' }}>Inicio Misión</th>
+              <th style={{ padding: '1rem', color: 'var(--crear-gold)', fontSize: '0.85rem' }}>Avance Enrolados</th>
+              <th style={{ padding: '1rem', color: 'var(--crear-gold)', fontSize: '0.85rem' }}>Total Confirmados</th>
+              <th style={{ padding: '1rem', color: 'var(--crear-gold)', fontSize: '0.85rem' }}>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {missions.length === 0 ? (
+              <tr>
+                <td colSpan={5} style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                  No hay misiones de IMOs registradas actualmente.
+                </td>
+              </tr>
+            ) : missions.map((m) => {
+              const enrolledKeys = Object.keys(m.enrolledStatus || {});
+              const totalEnrolled = enrolledKeys.length;
+              let confirmed = 0;
+              let guaranteed = 0;
+              enrolledKeys.forEach(k => {
+                if (m.enrolledStatus[k]?.confirmed) confirmed++;
+                if (m.enrolledStatus[k]?.guaranteed) guaranteed++;
+              });
+
+              const isCompleted = m.missionCompleted;
+              const dateStarted = new Date(m.startedAt).toLocaleString();
+
+              return (
+                <tr key={m.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                  <td style={{ padding: '1rem', fontWeight: 600 }}>{m.imoName || 'Desconocido'}</td>
+                  <td style={{ padding: '1rem', fontSize: '0.9rem' }} className="text-muted">{dateStarted}</td>
+                  <td style={{ padding: '1rem' }}>
+                    <div>Confirmados: {confirmed} / {totalEnrolled}</div>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--crear-blue)' }}>Garantizados: {guaranteed}</div>
+                  </td>
+                  <td style={{ padding: '1rem', fontWeight: 700 }}>
+                    {confirmed}
+                  </td>
+                  <td style={{ padding: '1rem' }}>
+                    {isCompleted ? (
+                      <span style={{ color: '#22c55e', background: 'rgba(34, 197, 94, 0.15)', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 700 }}>Completado</span>
+                    ) : (
+                      <span style={{ color: '#ef4444', background: 'rgba(239, 68, 68, 0.15)', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 700 }}>En Progreso</span>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+```
+
+---
+
 ## Archivo: src\pages\MonitorVuelosCartas.jsx
 
 ```javascript
@@ -296599,6 +297252,7 @@ export default function OfficialAgreements() {
 ```javascript
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useCycles } from '../context/CyclesContext';
 import { Briefcase, TrendingUp, AlertCircle, CheckCircle2, ChevronRight, Activity, Clock, ShieldCheck, Box, ArrowLeft, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { doc } from 'firebase/firestore';
@@ -296607,6 +297261,7 @@ import { OPERATIONAL_SEDES, normalizeSede } from '../data/usersData';
 
 export default function PortfolioBoard() {
   const { currentUser } = useAuth();
+  const { events } = useCycles();
   const navigate = useNavigate();
   const [viewMode, setViewMode] = useState('active');
   const [loading, setLoading] = useState(true);
@@ -296677,36 +297332,71 @@ useEffect(() => {
 
           const progress = Math.min(100, Math.round((totalEnrolados / totalParticipantes) * 100));
 
-          const ciclosReales = [
-            { 
-              id: 1, 
-              name: `${selectedSede} - CICLO 1 (Actual)`, 
-              progress: progress || 0, 
-              health: health, 
-              date: 'Ciclo Activo', 
-              action: health === 'critical' ? 'Intervención Urgente' : 'Ver Detalles',
-              details: {
-                totalEnrolados: totalEnrolados,
-                totalDesertores: totalDesertores,
-                tasaDesercion: desercionRate.toFixed(1),
-                totalParticipantes: totalParticipantes
+          let ciclosReales = [];
+          if (events && events.length > 0) {
+            const today = new Date();
+            const lookbackDate = new Date(today.getTime() - 10 * 24 * 60 * 60 * 1000);
+            
+            let filtered = events.filter(e => {
+              const d = new Date((e.fecha_inicio || e.start).replace('Z', ''));
+              if (d < lookbackDate) return false;
+              if (!['CAPITULO UNO', 'CAPITULO DOS', 'MAESTRIA DEL JUEGO'].includes(e.nombre || e.name)) return false;
+              if (selectedSede === 'GLOBAL') return true;
+              const sCode = selectedSede.substring(0, 3).toUpperCase();
+              const evSede = (e.sede || e.sedeTag || e.place || '').toUpperCase();
+              return evSede.includes(sCode) || evSede === sCode || evSede.includes(selectedSede.toUpperCase());
+            });
+            
+            filtered.sort((a,b) => new Date(a.fecha_inicio || a.start) - new Date(b.fecha_inicio || b.start));
+            
+            const upcomingEvents = filtered.slice(0, 3);
+            
+            ciclosReales = upcomingEvents.map((ev, index) => {
+              const baseName = ev.nombre || ev.name;
+              const isFirst = index === 0;
+              
+              const tEnr = isFirst ? totalEnrolados : Math.round(totalEnrolados * (0.6 - (index * 0.2)));
+              const tDes = isFirst ? totalDesertores : 0;
+              const tPar = isFirst ? totalParticipantes : Math.round(totalParticipantes * (0.6 - (index * 0.2)));
+              const prog = isFirst ? progress : (tPar > 0 ? Math.round((tEnr / tPar) * 100) : 0);
+              
+              const dateStr = new Date((ev.fecha_inicio || ev.start).replace('Z', '')).toLocaleDateString('es-ES', { month: 'short', day: 'numeric', year: 'numeric' });
+              
+              return {
+                id: index + 1,
+                name: `${selectedSede === 'GLOBAL' ? (ev.sede || 'Global') : selectedSede} - ${baseName} (Eq ${ev.equipo})`,
+                progress: prog || 0,
+                health: isFirst ? health : 'good',
+                date: dateStr,
+                action: isFirst && health === 'critical' ? 'Intervención Urgente' : (isFirst ? 'Ver Detalles' : 'Planificación'),
+                details: {
+                  totalEnrolados: tEnr,
+                  totalDesertores: tDes,
+                  tasaDesercion: isFirst ? desercionRate.toFixed(1) : '0.0',
+                  totalParticipantes: tPar
+                }
+              };
+            });
+          }
+          
+          if (ciclosReales.length === 0) {
+            ciclosReales = [
+              { 
+                id: 1, 
+                name: `${selectedSede} - Ciclo Activo`, 
+                progress: progress || 0, 
+                health: health, 
+                date: 'Pendiente Calendario', 
+                action: health === 'critical' ? 'Intervención Urgente' : 'Ver Detalles',
+                details: {
+                  totalEnrolados: totalEnrolados,
+                  totalDesertores: totalDesertores,
+                  tasaDesercion: desercionRate.toFixed(1),
+                  totalParticipantes: totalParticipantes
+                }
               }
-            },
-            { 
-              id: 2, 
-              name: 'Próximo Ciclo (C2)', 
-              progress: Math.round((progress || 0) * 0.4), 
-              health: 'good', 
-              date: 'Próximo Mes', 
-              action: 'Planificación',
-              details: {
-                totalEnrolados: Math.round(totalEnrolados * 0.4),
-                totalDesertores: 0,
-                tasaDesercion: '0.0',
-                totalParticipantes: Math.round(totalParticipantes * 0.4)
-              }
-            }
-          ];
+            ];
+          }
 
           setPortfolio(ciclosReales);
           setStats({
@@ -296733,7 +297423,7 @@ useEffect(() => {
       }
     }
     fetchData();
-  }, [selectedSede]);
+  }, [selectedSede, events]);
 
   return (
     <div style={{ minHeight: '100vh', background: bgLight, color: textDark, paddingBottom: '4rem', fontFamily: 'Inter, system-ui, sans-serif' }}>
@@ -306775,6 +307465,7 @@ const TASK_DEADLINE_RULES = {
   'mj_imposibles': { base: 'maestria_start', offsetDays: 1, time: '15:00', label: 'MJ Sábado 15:00' },
 
   // --- POST-MAESTRÍA ---
+  'gerente_post_mj_1': { base: 'maestria_start', offsetDays: 3, time: '18:00', label: 'Lunes Post-MJ 18:00' },
   'cmj_post_1': { base: 'maestria_start', offsetDays: 4, time: '18:00', label: 'Lunes Post-MJ 18:00' },
   'cmj_post_2': { base: 'maestria_start', offsetDays: 5, time: '18:00', label: 'Martes Cierre de Oro 18:00' },
   'cierre_mj_oro': { base: 'maestria_end', offsetDays: 0, time: '20:00', label: 'Domingo MJ' }

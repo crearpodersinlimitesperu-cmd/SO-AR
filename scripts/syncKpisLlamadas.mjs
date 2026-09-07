@@ -399,6 +399,56 @@ export async function syncKpisLlamadas() {
     });
   }
 
+  // --- NUEVA LÓGICA: Sincronizar hacia managers_directory ---
+  console.log('Sincronizando managersSheet1 hacia managers_directory...');
+  const snapManagers = await db.collection('managers_directory').get();
+  const existingManagers = [];
+  snapManagers.forEach(d => existingManagers.push({ ...d.data(), docId: d.id }));
+
+  const normalizeStr = (str) => String(str || '').toLowerCase().trim().replace(/[^a-z0-9]/g, '');
+  
+  let added = 0;
+  let updated = 0;
+
+  for (const nodusMgr of managersSheet1) {
+    if (!nodusMgr.nombre || nodusMgr.nombre === '') continue;
+    
+    // Find if it exists in Firebase (match by exact name and sede)
+    const match = existingManagers.find(em => 
+      normalizeStr(em.nombre) === normalizeStr(nodusMgr.nombre) && 
+      normalizeStr(em.sede) === normalizeStr(nodusMgr.sede)
+    );
+
+    const updateData = {
+      nombre: nodusMgr.nombre,
+      rol: nodusMgr.rol || 'Manager',
+      telefono: nodusMgr.telefono || '',
+      numEquipo: nodusMgr.numEquipo || '',
+      equipo: nodusMgr.nombreEquipo || '',
+      sede: nodusMgr.sede || '',
+      entrenador: nodusMgr.entrenador || 'Sin Asignar',
+      tieneEntrenador: nodusMgr.tieneEntrenador || false,
+      coordinador: nodusMgr.coordinador || '',
+      estado: nodusMgr.estado || 'Activo',
+      fuente: 'nodus'
+    };
+
+    if (match) {
+      // Update existing
+      const docRef = db.collection('managers_directory').doc(match.docId);
+      batch.set(docRef, updateData, { merge: true });
+      updated++;
+    } else {
+      // Insert new
+      const docRef = db.collection('managers_directory').doc();
+      updateData.id = docRef.id;
+      batch.set(docRef, updateData);
+      added++;
+    }
+  }
+
+  console.log(`Managers sincronizados hacia Causa OS: ${added} nuevos, ${updated} actualizados.`);
+
   await batch.commit();
   console.log('✅ Sincronización exitosa en Firestore y archivo local.');
   return compiledData;

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useCycles } from '../context/CyclesContext';
 import { Briefcase, TrendingUp, AlertCircle, CheckCircle2, ChevronRight, Activity, Clock, ShieldCheck, Box, ArrowLeft, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { doc } from 'firebase/firestore';
@@ -8,6 +9,7 @@ import { OPERATIONAL_SEDES, normalizeSede } from '../data/usersData';
 
 export default function PortfolioBoard() {
   const { currentUser } = useAuth();
+  const { events } = useCycles();
   const navigate = useNavigate();
   const [viewMode, setViewMode] = useState('active');
   const [loading, setLoading] = useState(true);
@@ -78,36 +80,71 @@ useEffect(() => {
 
           const progress = Math.min(100, Math.round((totalEnrolados / totalParticipantes) * 100));
 
-          const ciclosReales = [
-            { 
-              id: 1, 
-              name: `${selectedSede} - CICLO 1 (Actual)`, 
-              progress: progress || 0, 
-              health: health, 
-              date: 'Ciclo Activo', 
-              action: health === 'critical' ? 'Intervención Urgente' : 'Ver Detalles',
-              details: {
-                totalEnrolados: totalEnrolados,
-                totalDesertores: totalDesertores,
-                tasaDesercion: desercionRate.toFixed(1),
-                totalParticipantes: totalParticipantes
+          let ciclosReales = [];
+          if (events && events.length > 0) {
+            const today = new Date();
+            const lookbackDate = new Date(today.getTime() - 10 * 24 * 60 * 60 * 1000);
+            
+            let filtered = events.filter(e => {
+              const d = new Date((e.fecha_inicio || e.start).replace('Z', ''));
+              if (d < lookbackDate) return false;
+              if (!['CAPITULO UNO', 'CAPITULO DOS', 'MAESTRIA DEL JUEGO'].includes(e.nombre || e.name)) return false;
+              if (selectedSede === 'GLOBAL') return true;
+              const sCode = selectedSede.substring(0, 3).toUpperCase();
+              const evSede = (e.sede || e.sedeTag || e.place || '').toUpperCase();
+              return evSede.includes(sCode) || evSede === sCode || evSede.includes(selectedSede.toUpperCase());
+            });
+            
+            filtered.sort((a,b) => new Date(a.fecha_inicio || a.start) - new Date(b.fecha_inicio || b.start));
+            
+            const upcomingEvents = filtered.slice(0, 3);
+            
+            ciclosReales = upcomingEvents.map((ev, index) => {
+              const baseName = ev.nombre || ev.name;
+              const isFirst = index === 0;
+              
+              const tEnr = isFirst ? totalEnrolados : Math.round(totalEnrolados * (0.6 - (index * 0.2)));
+              const tDes = isFirst ? totalDesertores : 0;
+              const tPar = isFirst ? totalParticipantes : Math.round(totalParticipantes * (0.6 - (index * 0.2)));
+              const prog = isFirst ? progress : (tPar > 0 ? Math.round((tEnr / tPar) * 100) : 0);
+              
+              const dateStr = new Date((ev.fecha_inicio || ev.start).replace('Z', '')).toLocaleDateString('es-ES', { month: 'short', day: 'numeric', year: 'numeric' });
+              
+              return {
+                id: index + 1,
+                name: `${selectedSede === 'GLOBAL' ? (ev.sede || 'Global') : selectedSede} - ${baseName} (Eq ${ev.equipo})`,
+                progress: prog || 0,
+                health: isFirst ? health : 'good',
+                date: dateStr,
+                action: isFirst && health === 'critical' ? 'Intervención Urgente' : (isFirst ? 'Ver Detalles' : 'Planificación'),
+                details: {
+                  totalEnrolados: tEnr,
+                  totalDesertores: tDes,
+                  tasaDesercion: isFirst ? desercionRate.toFixed(1) : '0.0',
+                  totalParticipantes: tPar
+                }
+              };
+            });
+          }
+          
+          if (ciclosReales.length === 0) {
+            ciclosReales = [
+              { 
+                id: 1, 
+                name: `${selectedSede} - Ciclo Activo`, 
+                progress: progress || 0, 
+                health: health, 
+                date: 'Pendiente Calendario', 
+                action: health === 'critical' ? 'Intervención Urgente' : 'Ver Detalles',
+                details: {
+                  totalEnrolados: totalEnrolados,
+                  totalDesertores: totalDesertores,
+                  tasaDesercion: desercionRate.toFixed(1),
+                  totalParticipantes: totalParticipantes
+                }
               }
-            },
-            { 
-              id: 2, 
-              name: 'Próximo Ciclo (C2)', 
-              progress: Math.round((progress || 0) * 0.4), 
-              health: 'good', 
-              date: 'Próximo Mes', 
-              action: 'Planificación',
-              details: {
-                totalEnrolados: Math.round(totalEnrolados * 0.4),
-                totalDesertores: 0,
-                tasaDesercion: '0.0',
-                totalParticipantes: Math.round(totalParticipantes * 0.4)
-              }
-            }
-          ];
+            ];
+          }
 
           setPortfolio(ciclosReales);
           setStats({
@@ -134,7 +171,7 @@ useEffect(() => {
       }
     }
     fetchData();
-  }, [selectedSede]);
+  }, [selectedSede, events]);
 
   return (
     <div style={{ minHeight: '100vh', background: bgLight, color: textDark, paddingBottom: '4rem', fontFamily: 'Inter, system-ui, sans-serif' }}>

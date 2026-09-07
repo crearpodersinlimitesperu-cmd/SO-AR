@@ -113,7 +113,14 @@ export default function NodusCoordinadoresC1C2Dashboard() {
   // Filtros
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCoordinador, setSelectedCoordinador] = useState('TODOS');
-  const [selectedSede, setSelectedSede] = useState('TODAS');
+  
+  const [selectedSede, setSelectedSede] = useState(globalFilterSede && globalFilterSede !== 'Todas' ? globalFilterSede : 'TODAS');
+  
+  useEffect(() => {
+    if (globalFilterSede) {
+      setSelectedSede(globalFilterSede === 'Todas' || globalFilterSede === 'Global' ? 'TODAS' : globalFilterSede);
+    }
+  }, [globalFilterSede]);
   const [selectedEquipo, setSelectedEquipo] = useState('TODOS');
   const [selectedEntrenamiento, setSelectedEntrenamiento] = useState('TODOS'); // TODOS, C1, C2
   const [selectedCiclo, setSelectedCiclo] = useState('TODOS');

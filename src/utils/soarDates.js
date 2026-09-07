@@ -47,6 +47,7 @@ const TASK_DEADLINE_RULES = {
   'mj_imposibles': { base: 'maestria_start', offsetDays: 1, time: '15:00', label: 'MJ Sábado 15:00' },
 
   // --- POST-MAESTRÍA ---
+  'gerente_post_mj_1': { base: 'maestria_start', offsetDays: 3, time: '18:00', label: 'Lunes Post-MJ 18:00' },
   'cmj_post_1': { base: 'maestria_start', offsetDays: 4, time: '18:00', label: 'Lunes Post-MJ 18:00' },
   'cmj_post_2': { base: 'maestria_start', offsetDays: 5, time: '18:00', label: 'Martes Cierre de Oro 18:00' },
   'cierre_mj_oro': { base: 'maestria_end', offsetDays: 0, time: '20:00', label: 'Domingo MJ' }

@@ -1495,7 +1495,7 @@ export default function Home() {
                       ✈️ Monitor de Vuelos y Cartas
                     </button>
                     <button 
-                      onClick={() => { setShowToolsDropdown(false); window.open('https://crearpsl.net/imose31lima', '_blank'); }} 
+                      onClick={() => { setShowToolsDropdown(false); navigate('/monitor-imos'); }} 
                       className="btn-secondary" 
                       style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(168, 85, 247, 0.15)', color: '#a855f7', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem', border: '1px solid rgba(168, 85, 247, 0.3)', cursor: 'pointer' }}
                     >
@@ -1680,7 +1680,7 @@ export default function Home() {
               <button onClick={() => navigate('/monitor-vuelos')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #38bdf8, #0284c7)', color: 'white', fontWeight: 'bold', border: 'none' }}>
                 ✈️ Monitor de Vuelos
               </button>
-              <button onClick={() => window.open('https://crearpsl.net/imose31lima', '_blank')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #a855f7, #7e22ce)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+              <button onClick={() => navigate('/monitor-imos')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #a855f7, #7e22ce)', color: 'white', fontWeight: 'bold', border: 'none' }}>
                 🦅 Monitor de IMOs
               </button>
             </>

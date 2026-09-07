@@ -18,6 +18,7 @@ import ManualNodus from './pages/ManualNodus'
 import MisKPIs from './pages/MisKPIs'
 import AuditoriaKPIs from './pages/AuditoriaKPIs'
 import CentroManagers from './pages/CentroManagers'
+import ManagerGuide from './pages/ManagerGuide'
 import DirectorioQT from './pages/DirectorioQT'
 import ProtocoloEmergencias from './pages/ProtocoloEmergencias'
 import PortfolioBoard from './pages/PortfolioBoard'
@@ -33,6 +34,8 @@ import MonitorVuelosCartas from './pages/MonitorVuelosCartas'
 import VendeSinVender from './pages/VendeSinVender'
 import MasterclassDistinciones from './pages/MasterclassDistinciones'
 import DashboardKpisLima from './pages/DashboardKpisLima'
+import CRMBaseMaster from './pages/CRMBaseMaster'
+import MonitorImos from './pages/MonitorImos'
 import AICopilot from './components/AICopilot'
 import PromptModal from './components/PromptModal'
 import BirthdayAlert from './components/BirthdayAlert'
@@ -247,6 +250,12 @@ function App() {
             </RoleRoute>
           } />
           
+          <Route path="/guias/managers" element={
+            <PrivateRoute>
+              <ManagerGuide />
+            </PrivateRoute>
+          } />
+
           <Route path="/centro-managers" element={
             <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas']} requireSuperAdmin={false}>
               <CentroManagers />
@@ -335,10 +344,21 @@ function App() {
           } />
           <Route path="/vuelos" element={<Navigate to="/monitor-vuelos" replace />} />
           <Route path="/cartas" element={<Navigate to="/monitor-vuelos" replace />} />
-
+          
+          <Route path="/monitor-imos" element={
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
+              <MonitorImos />
+            </RoleRoute>
+          } />
           <Route path="/kpis-lima" element={
             <PrivateRoute>
               <DashboardKpisLima />
+            </PrivateRoute>
+          } />
+
+          <Route path="/crm-maestro" element={
+            <PrivateRoute>
+              <CRMBaseMaster />
             </PrivateRoute>
           } />
 

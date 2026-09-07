@@ -238,144 +238,6 @@ service cloud.firestore {
     // rol que calcula el cliente. isSuperAdmin() e isGerenteODireccion() NO se ven
     // afectados por esto (son listas de correo fijas, no leen este campo "role").
     match /users/{userId} {
-      allow read: if isAuthenticated();
-      allow create: if isSuperAdmin() || (isAuthenticated() && request.auth.uid == userId);
-      allow update: if isSuperAdmin() ||
-        (isAuthenticated() && request.auth.uid == userId &&
-         !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'roles', 'isSuperAdmin']));
-      allow delete: if isSuperAdmin();
-
-      // Historial de chats del Copiloto IA (AICopilot.jsx): esta es la ÚNICA ruta de toda
-      // la app donde currentUser.uid corresponde de verdad al uid real de Firebase Auth
-      // (viene del objeto crudo de Firebase, no se sobreescribe en buildUserObject), así
-      // que aquí sí se puede comparar contra request.auth.uid con seguridad.
-      match /copilot_chats/{chatId} {
-        allow read, write: if isAuthenticated() && request.auth.uid == userId;
-      }
-    }
-
-    // AUDIT LOGS
-    match /audit_logs/{logId} {
-      allow read: if isSuperAdmin();
-      allow create: if isAuthenticated();
-    }
-
-    // NODUS: mecanismo seguro de token del robot para sincronización horaria autónoma
-    match /nodus_kpis_sincronizados/{document=**} {
-      allow read: if isAuthenticated();
-      allow write: if request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET";
-    }
-
-    match /nodus_coordinadores_c1c2/{document=**} {
-      allow read: if isAuthenticated();
-      allow write: if request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET";
-    }
-
-    match /nodus_kpis_history/{document=**} {
-      allow read: if isAuthenticated();
-      allow write: if request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET";
-    }
-
-    // ------------------------------------------------------------------------
-    // TODO: revisar individualmente y restringir cuando se conozca el patr├│n
-    // real de lectura/escritura de cada una. Por ahora se dejan EXACTAMENTE
-    // como est├ín hoy en producci├│n (cualquier autenticado lee y escribe) para
-    // no romper nada que no audit├® a fondo.
-    // ------------------------------------------------------------------------
-    match /staff_directory/{document} {
-      allow read, write: if isAuthenticated();
-    }
-
-    // (02/09/2026) Ya NO forma parte del bloque "TODO" de arriba — se restringió
-    // explícitamente el 02/09/2026 (confirmado por José). Ver canManageManagers().
-    match /managers_directory/{document} {
-      allow read: if isAuthenticated();
-      allow create, delete: if isSuperAdmin() || isGerenteODireccion() || canManageManagers();
-      allow update: if isSuperAdmin() || isGerenteODireccion() || canManageManagers() ||
-                    (isAuthenticated() &&
-                     request.resource.data.diff(resource.data).affectedKeys()
-                       .hasOnly(['llamadaFecha', 'llamadaAsistio']));
-    }
-
-    // (02/09/2026) Historial de llamadas grupales (nunca se sobrescribe, cada llamada
-    // es un documento nuevo) — base de la pestaña de Liquidación de Entrenadores.
-    match /llamadas_grupales_historial/{document} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated(); // cualquier entrenador registra su propia llamada, igual que hoy
-      allow update, delete: if isSuperAdmin() || isGerenteODireccion() || canManageManagers();
-    }
-
-    // (02/09/2026) Liquidación de Entrenadores ($400 por equipo al llegar a 7 llamadas).
-    // REGLA ESTRICTA (pedido explícito de José): "esta info solo la debo de ver yo y
-    // Elizabeth Escobar" — debe coincidir con LIQUIDACION_ENTRENADORES_EMAILS en
-    // src/config/permissions.js; si cambia esa lista hay que actualizar AMBOS lugares.
-    match /liquidaciones_pagos/{document} {
-      allow read, write: if isAuthenticated() && email() in [
-        'jose.sanchez@crearpsl.net',
-        'contabilidad.global@crearpsl.net'
-      ];
-    }
-
-    // (02/09/2026) NOTAS DE SEGUIMIENTO — feedback que el entrenador de llamadas deja
-    // después de cada llamada (individual o grupal), para detectar y anticiparse a
-    // quiebres. Pedido explícito de José: "deben de guardarse en un historial por
-    // persona y jamás perderse" — por eso NO hay "allow delete" (ninguna nota se
-    // puede borrar) y "allow update" solo permite AGREGAR una respuesta del CMJ,
-    // nunca modificar la nota original (diff().affectedKeys().hasOnly(['respuestas'])).
-    // Visibilidad (pedido explícito de José): quien la escribió + CMJ/Dirección de
-    // Maestría (callerRole()) + Gerencia/Dirección (isGerenteODireccion()) + SuperAdmin.
-    // Confirmado explícitamente por José antes de tocar firestore.rules.
-    match /notas_seguimiento/{document} {
-      allow read: if isSuperAdmin() || isGerenteODireccion() || callerRole() ||
-                    (isAuthenticated() && resource.data.autorEmail == email());
-      allow create: if isAuthenticated() && request.resource.data.autorEmail == email();
-      allow update: if (isSuperAdmin() || callerRole()) &&
-                    request.resource.data.diff(resource.data).affectedKeys().hasOnly(['respuestas']);
-      // Sin "allow delete": ninguna nota de seguimiento se puede eliminar (histórico permanente).
-    }
-
-    match /excellence_standards/{document} {
-      allow read, write: if isAuthenticated();
-    }
-    match /kpi_reports/{document} {
-      allow read, write: if isAuthenticated();
-    }
-    match /learning_logs/{document} {
-      allow read, write: if isAuthenticated();
-    }
-    match /qt_directory/{document} {
-      allow read, write: if isAuthenticated();
-    }
-    match /success_patterns/{document} {
-      allow read, write: if isAuthenticated();
-    }
-    match /sync_history/{document} {
-      allow read, write: if isAuthenticated();
-    }
-    match /user_stats/{document} {
-      allow read, write: if isAuthenticated();
-    }
-
-    // (05/09/2026) KPIs de Entrenadores de Llamadas - REGLA ESTRICTA: solo directores y José Sánchez / SuperAdmin
-    match /kpis_entrenadores_llamadas/{document=**} {
-      allow read: if isSuperAdmin() || email() == 'jose.sanchez@crearpsl.net' || email() in [
-        'emely.leon@crearpsl.net',
-        'fer.aragon@crearpsl.net',
-        'andres.gomez@crearpsl.net',
-        'gomeznueve@gmail.com',
-        'contabilidad.global@crearpsl.net',
-        'leandro.brunis@crearpsl.net',
-        'paul.sosa@crearpsl.net'
-      ];
-      allow write: if isSuperAdmin() || email() == 'jose.sanchez@crearpsl.net';
-    }
-
-    // ========================================================================
-    // CPSL INTERRUPCIÓN (CAMPUS INTERACTIVO) - USUARIOS Y SESIONES
-    // Cualquier usuario autenticado con Google puede acceder a su propio perfil,
-    // progreso y registrar sesiones sin restricción de sede o rol administrativo.
-    // ========================================================================
-    match /users/{userId} {
       allow read, write: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
 
       match /progress/{docId} {
@@ -385,6 +247,11 @@ service cloud.firestore {
       match /sessions/{sessionId} {
         allow read, write: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
       }
+    }
+
+    // CRM Nodus (Participants)
+    match /participants/{document=**} {
+      allow read, write: if isSuperAdmin() || isGerenteODireccion();
     }
   }
 }

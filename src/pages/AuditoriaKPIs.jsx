@@ -21,7 +21,18 @@ export default function AuditoriaKPIs({ defaultTab }) {
   const [loading, setLoading] = useState(true);
   const [reports, setReports] = useState([]);
   const [resumenGeneral, setResumenGeneral] = useState(null);
-  const [filterSede, setFilterSede] = useState(currentUser?.sede || 'Todas');
+    
+  // Default to 'Todas' for SuperAdmins, Direccion or Consolidado, otherwise user's home sede
+  const initialSede = (() => {
+    if (!currentUser) return 'Todas';
+    if (currentUser.isSuperAdmin || currentUser.appRole === 'direccion' || currentUser.appRole === 'consolidado') {
+      return 'Todas';
+    }
+    return currentUser.sede || 'Todas';
+  })();
+    
+  const [filterSede, setFilterSede] = useState(initialSede);
+    
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [isScrapingLive, setIsScrapingLive] = useState(false);
@@ -564,7 +575,7 @@ export default function AuditoriaKPIs({ defaultTab }) {
         </div>
 
         {/* Dashboards Content */}
-        {activeTab === 'coordinadores_nodus' && <NodusCoordinadoresC1C2Dashboard />}
+        {activeTab === 'coordinadores_nodus' && <NodusCoordinadoresC1C2Dashboard globalFilterSede={filterSede} />}
         {activeTab === 'cmj' && <CMJDashboard globalFilterSede={filterSede} />}
         {activeTab === 'entrenadores' && <DriveDashboard globalFilterSede={filterSede} />}
   

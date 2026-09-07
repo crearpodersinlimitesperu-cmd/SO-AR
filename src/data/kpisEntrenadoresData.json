@@ -1,12 +1,12 @@
 {
   "metadata": {
-    "generatedAt": "2026-09-06T00:46:56.928Z",
+    "generatedAt": "2026-09-07T01:09:45.658Z",
     "sheetManagersId": "1KF58QXAiIk4KP_9G2aiAM3ERVoptcqKlIraszNKq2Ow",
     "sheetLlamadosId": "1lWAHh1PSAKu9eU6DOBxZExrHMbCYc3f2Sr8GdghNxD0",
     "totalTrainers": 34,
     "totalDetailedRecords": 934,
     "totalManagersSheet1": 699,
-    "syncDurationMs": 1262
+    "syncDurationMs": 2252
   },
   "totales": {
     "totalLlamadas": 5402,

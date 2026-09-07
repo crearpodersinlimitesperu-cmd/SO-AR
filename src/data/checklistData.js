@@ -111,6 +111,7 @@ export const checklistData = [
   { id: 'soar_28', role: 'coord_maestria', cyclePhase: 'MJ', task: 'Dirigir la operación logística de los FDS, asistencia y soporte a entrenadores.', isCritical: true },
   // --- POST-MJ ---
   { id: 'soar_29', role: 'gerente', cyclePhase: 'POST-MJ', task: 'Auditoría final y Cierre de Oro.', isCritical: true },
+  { id: 'gerente_post_mj_1', role: 'gerente', cyclePhase: 'POST-MJ', task: 'Lunes Post-MJ: Asignar las llamadas de los nuevos de PX a los coordinadores.', isCritical: true },
   { id: 'soar_30', role: 'coord_maestria', cyclePhase: 'POST-MJ', task: 'Consolidar métricas y entregar aprendizajes.', isCritical: true },
 
   // --- ENTRENADOR (COACH) ---

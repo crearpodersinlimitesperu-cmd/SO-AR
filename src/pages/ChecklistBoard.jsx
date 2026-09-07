@@ -36,6 +36,25 @@ const PHASE_META = {
 // en vez de ver solo la fase activa del ciclo como el resto de roles.
 const COORDINATOR_ROLES_WITH_PHASE_TABS = ['qt', 'coord_c1', 'coord_maestria', 'coordinador'];
 
+const getCountdownInfo = (deadlineIso, now = new Date()) => {
+  if (!deadlineIso) return { label: 'Sin fecha límite', color: '#9ca3af', bg: 'rgba(156,163,175,0.12)', border: '#9ca3af', overdue: false };
+  const deadline = new Date(deadlineIso).getTime();
+  if (isNaN(deadline)) return { label: 'Fecha inválida', color: '#9ca3af', bg: 'rgba(156,163,175,0.12)', border: '#9ca3af', overdue: false };
+
+  const diffMs = deadline - now.getTime();
+  const absMs = Math.abs(diffMs);
+  const totalHours = Math.floor(absMs / 3600000);
+  const days = Math.floor(totalHours / 24);
+  const mins = Math.floor((absMs % 3600000) / 60000);
+  const timeStr = days > 0 ? `${days}d ${totalHours % 24}h` : (totalHours > 0 ? `${totalHours}h ${mins}m` : `${mins}m`);
+
+  if (diffMs <= 0) return { label: `🚨 VENCIDA hace ${timeStr}`, color: '#ffffff', bg: '#dc2626', border: '#7f1d1d', overdue: true };
+  if (diffMs < 3 * 3600000) return { label: `🔥 ${timeStr} restantes`, color: '#ffffff', bg: '#ef4444', border: '#b91c1c', overdue: false };
+  if (diffMs < 24 * 3600000) return { label: `⏳ ${timeStr} restantes`, color: '#ffffff', bg: '#f97316', border: '#c2410c', overdue: false };
+  if (diffMs < 72 * 3600000) return { label: `⏱️ ${timeStr} restantes`, color: '#1a1300', bg: '#facc15', border: '#a16207', overdue: false };
+  return { label: `📅 ${timeStr} restantes`, color: '#047857', bg: '#d1fae5', border: '#059669', overdue: false };
+};
+
 export default function ChecklistBoard() {
   const { roleId: rawRoleId } = useParams();
   const roleId = normalizeRole(decodeURIComponent(rawRoleId));
@@ -133,14 +152,26 @@ export default function ChecklistBoard() {
   let activeTasks = myTasks;
   let viewTitle = `Checklist Causa OS Activo: ${currentStage}`;
 
+  const sortByDeadline = (tasksArray) => {
+    return tasksArray.sort((a, b) => {
+      const dA = a.deadline || calculateAutomaticDeadline(a, currentCycle);
+      const dB = b.deadline || calculateAutomaticDeadline(b, currentCycle);
+      const timeA = dA ? new Date(dA).getTime() : Infinity;
+      const timeB = dB ? new Date(dB).getTime() : Infinity;
+      return timeA - timeB;
+    });
+  };
+
   if (filterParam === 'completed') {
     activeTasks = myTasks.filter(t => t.completed || t.status === 'Completada');
     viewTitle = "Mostrando: Tareas Completadas";
   } else if (filterParam === 'criticas') {
     activeTasks = myTasks.filter(t => !t.completed && (t.isCritical || t.priority === 'Crítica'));
+    activeTasks = sortByDeadline(activeTasks);
     viewTitle = "Mostrando: Tareas Críticas (Urgentes)";
   } else if (filterParam === 'importantes') {
     activeTasks = myTasks.filter(t => !t.completed && !t.isCritical && t.priority !== 'Crítica');
+    activeTasks = sortByDeadline(activeTasks);
     viewTitle = "Mostrando: Tareas Importantes";
   } else if (showPhaseTabs) {
     // Para roles de coordinación (QT, Coordinación C1/C2, Coordinación Maestría, Coordinación Administrativa):
