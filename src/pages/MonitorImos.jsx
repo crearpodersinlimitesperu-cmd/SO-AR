@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { collection, query, orderBy, onSnapshot, deleteDoc, doc, writeBatch } from 'firebase/firestore';
 import { db } from '../services/firebase';
 
 export default function MonitorImos() {
   const [missions, setMissions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const q = query(collection(db, 'imo_missions'), orderBy('lastUpdated', 'desc'));
@@ -59,6 +61,27 @@ export default function MonitorImos() {
 
   return (
     <div className="animate-fade-in p-8" style={{ maxWidth: '1400px', margin: '0 auto' }}>
+      <button
+        onClick={() => navigate('/')}
+        style={{
+          background: 'transparent',
+          color: 'var(--crear-blue, #38bdf8)',
+          border: 'none',
+          padding: '0.4rem 0',
+          marginBottom: '1rem',
+          cursor: 'pointer',
+          fontSize: '0.9rem',
+          fontWeight: 600,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px',
+          transition: 'opacity 0.2s ease'
+        }}
+        onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.7'; }}
+        onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
+      >
+        ← Volver al Centro Operativo
+      </button>
       <header style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.25rem' }}>
