@@ -253,5 +253,15 @@ service cloud.firestore {
     match /participants/{document=**} {
       allow read, write: if isSuperAdmin() || isGerenteODireccion();
     }
+
+    // IMO MISSIONS (Misión IMO — landing pública en crearpsl.net/imose31lima)
+    // Los IMOs NO hacen login (no hay auth), así que la escritura debe ser abierta.
+    // La lectura se abre también para que el onSnapshot del frontend IMO funcione.
+    // El delete se abre a autenticados (Reset desde el Monitor en Causa OS).
+    match /imo_missions/{missionId} {
+      allow read: if true;
+      allow create, update: if true;
+      allow delete: if isGerenteODireccion() || isSuperAdmin();
+    }
   }
 }
