@@ -21,7 +21,14 @@ export default function PortfolioBoard() {
   // portafolio de cualquier otra sede o el consolidado, cuando debería ver solo la suya.
   // Dirección/CFO/CEO/CCO/superadmin/consolidado (ver allowedRoles en App.jsx para esta
   // ruta) sí conservan visión global, tal como pide la matriz de roles.
-  const isGlobalPortfolioRole = currentUser?.isSuperAdmin || ['direccion', 'cfo', 'ceo', 'cco', 'consolidado'].includes(currentUser?.appRole);
+    const isGlobalPortfolioRole = (() => {
+    if (currentUser?.isSuperAdmin) return true;
+    const exec = ['direccion', 'cfo', 'ceo', 'cco'];
+    if (currentUser?.appRole === 'consolidado') {
+      return (currentUser?.roles || []).some(r => exec.includes(r));
+    }
+    return exec.includes(currentUser?.appRole);
+  })();
   const [selectedSede, setSelectedSede] = useState(() => isGlobalPortfolioRole ? 'GLOBAL' : normalizeSede(currentUser?.sede));
 
   const sedesDisponibles = isGlobalPortfolioRole ? ['GLOBAL', ...OPERATIONAL_SEDES] : [normalizeSede(currentUser?.sede)];

@@ -82,16 +82,16 @@ const isTrainerMatchingUser = (evTrainer, user) => {
 // hay que actualizar también esta lista para que el buscador no muestre
 // accesos desactualizados o incorrectos.
 // ============================================================================
-const EXEC_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado'];
+const EXEC_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin'];
 const KPI_ROLES = ['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan'];
-const DIRECTORIO_QT_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'consolidado'];
-const CAMPUS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'consolidado'];
-const CENTRO_MANAGERS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'consolidado'];
-const MANUAL_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'consolidado'];
-const MANUAL_NODUS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'consolidado'];
+const DIRECTORIO_QT_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin'];
+const CAMPUS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin'];
+const CENTRO_MANAGERS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin'];
+const MANUAL_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin'];
+const MANUAL_NODUS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin'];
 const REPORTES_VISIBLE = (u) => Boolean(
   u?.isSuperAdmin || u?.isGerente ||
-  ['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'capitan', 'qt', 'direccion', 'director_maestria', 'consolidado', 'aliado', 'manager'].includes(u?.appRole)
+  ['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'capitan', 'qt', 'direccion', 'director_maestria', 'aliado', 'manager'].includes(u?.appRole)
 );
 
 // ============================================================================
@@ -243,7 +243,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Editor y visor oficial del cronograma de Maestría del Juego para todas las sedes',
     keywords: ['calendario mj', 'maestria del juego', 'cronograma mj', 'fechas maestria', 'e28', 'e29', 'e30', 'equipos'],
     route: '/calendario-mj',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria', 'coord_maestria', 'coordinador_mj']
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria', 'coord_maestria', 'coordinador_mj']
   },
   {
     id: 'opt-calendario-global',
@@ -344,7 +344,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Gestión de llamadas, seguimiento a participantes PX, aliados y coordinadores',
     keywords: ['centro managers', 'managers', 'llamadas', 'px', 'aliados', 'seguimiento equipos'],
     route: '/centro-managers',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'consolidado']
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin']
   },
   {
     id: 'opt-directorio-qt',
@@ -355,7 +355,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Teléfonos, WhatsApp directos y correos de todo el equipo de coordinación y staff',
     keywords: ['directorio', 'directorio qt', 'telefonos', 'whatsapp', 'contactos staff', 'coordinadores'],
     route: '/directorio-qt',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'consolidado']
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin']
   },
   {
     id: 'opt-gerencial',
@@ -366,7 +366,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Panel de control de alta dirección y toma de decisiones estratégicas',
     keywords: ['gerente', 'gerencial', 'comite', 'direccion', 'dashboard gerencial'],
     route: '/gerente',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado']
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']
   },
   {
     id: 'opt-estrategia',
@@ -377,7 +377,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Mapa estratégico y seguimiento de objetivos clave y resultados',
     keywords: ['estrategia', 'okrs', 'cascade', 'objetivos', 'iniciativas'],
     route: '/estrategia',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado']
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']
   },
   {
     id: 'opt-portafolio',
@@ -388,7 +388,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Supervisión de iniciativas, proyectos corporativos y cronogramas de entrega',
     keywords: ['portafolio', 'pmo', 'proyectos', 'planview', 'gantt'],
     route: '/portafolio',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado']
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']
   },
   {
     id: 'opt-auditoria-kpis',
@@ -399,7 +399,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Detección de anomalías, inconsistencias y validación cruzada de números',
     keywords: ['auditoria', 'auditoria kpis', 'control', 'revision metricas', 'inconsistencias'],
     route: '/auditoria-kpis',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado']
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']
   },
   {
     id: 'opt-acuerdos',
@@ -443,7 +443,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Gestión integral de usuarios, asignación de roles, permisos y configuración del sistema',
     keywords: ['superadmin', 'centro de mando', 'administracion', 'usuarios', 'roles', 'permisos'],
     route: '/superadmin',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado']
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']
   },
   {
     id: 'opt-sedes',
@@ -476,7 +476,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Documentación paso a paso de todas las funciones de Causa OS',
     keywords: ['manual', 'guia', 'manual causa', 'instructivo', 'como funciona', 'ayuda'],
     route: '/manual',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'consolidado']
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin']
   },
   {
     id: 'opt-manual-nodus',
@@ -509,7 +509,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Plataforma interactiva de entrenamiento, videos y recursos de capacitación',
     keywords: ['campus', 'campus interactivo', 'academia', 'cursos', 'videos', 'capacitacion'],
     external: 'https://cpsl-campus-interactivo.vercel.app/ruta',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'consolidado']
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin']
   },
   {
     id: 'opt-tema',
@@ -573,7 +573,7 @@ const MODULE_REGISTRY = [
 const isModuleVisible = (mod, currentUser) => {
   if (typeof mod.visible === 'function') return mod.visible(currentUser);
   if (mod.roles === null) return true;
-  return (mod.roles || []).includes(currentUser?.appRole);
+  return hasRoleAccess(mod.roles || []);
 };
 
 // ============================================================================
@@ -606,6 +606,14 @@ const getCountdownInfo = (deadlineIso, now) => {
 };
 
 export default function Home() {
+  const hasRoleAccess = (allowedRoles) => {
+    if (currentUser?.isSuperAdmin) return true;
+    if (currentUser?.appRole === 'consolidado') {
+      return (currentUser?.roles || []).some(r => allowedRoles.includes(r));
+    }
+    return allowedRoles.includes(currentUser?.appRole);
+  };
+
   const { currentUser, logout, switchRole, reauthenticateGoogle } = useAuth();
   const { currentCycle, currentStage, events, loadingEvents } = useCycles();
   const { tasks: allTasks, loading: loadingTasks, syncTasksToGoogle, acceptCollaboration, rejectCollaboration } = useChecklist();
@@ -827,7 +835,7 @@ export default function Home() {
 
   const globalSearchOptionResults = !globalSearchActive ? [] : CAUSA_OPTIONS_REGISTRY
     .filter(opt => {
-      if (opt.roles && !opt.roles.includes(currentUser?.appRole) && !currentUser?.isSuperAdmin) {
+      if (opt.roles && !hasRoleAccess(opt.roles) && !currentUser?.isSuperAdmin) {
         return false;
       }
       if (typeof opt.visible === 'function' && !opt.visible(currentUser)) {
@@ -1413,7 +1421,7 @@ export default function Home() {
                 boxShadow: '0 20px 50px rgba(0,0,0,0.95), 0 0 25px rgba(41, 171, 226, 0.2)',
                 border: '1px solid rgba(41, 171, 226, 0.4)'
               }}>
-                {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado'].includes(currentUser?.appRole) ? (
+                {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']) ? (
                   <>
                     <button onClick={() => { setShowToolsDropdown(false); navigate('/gerente'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                       💼 Causa OS Gerencial
@@ -1482,7 +1490,7 @@ export default function Home() {
                   </button>
                 )}
 
-                {['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan'].includes(currentUser?.appRole) && (
+                {hasRoleAccess(['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan']) && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/mis-kpis'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                     📊 Mis KPIs
                   </button>
@@ -1494,13 +1502,13 @@ export default function Home() {
                   </button>
                 )}
 
-                {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+                {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']) && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/superadmin'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                     🌐 Centro de Mando
                   </button>
                 )}
 
-                {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+                {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']) && (
                   <button onClick={() => { setShowToolsDropdown(false); window.open('/calendario_global.html?v=' + Date.now() + '&email=' + encodeURIComponent(currentUser?.email || '') + '&name=' + encodeURIComponent(currentUser?.displayName || currentUser?.name || ''), '_blank'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                     📅 Calendario Global Maestro ↗
                   </button>
@@ -1511,7 +1519,7 @@ export default function Home() {
                   🎓 Campus Interactivo ↗
                 </button>
 
-                {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+                {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin']) && (
                   <div style={{ display: 'flex', gap: '0.2rem', padding: '0.2rem' }}>
                     <button onClick={() => { setShowToolsDropdown(false); navigate('/centro-managers'); }} className="btn-secondary" style={{ flex: 1, textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                       🎯 Centro de Managers
@@ -1565,7 +1573,7 @@ export default function Home() {
               ⏰ Horarios y Vestimenta
             </button>
           )}
-          {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado'].includes(currentUser?.appRole) ? (
+          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']) ? (
             <button onClick={() => navigate('/gerente')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'var(--crear-gold)', color: 'black' }}>
               💼 SO-AR Gerencial
             </button>
@@ -1574,7 +1582,7 @@ export default function Home() {
               💼 Mi Dashboard
             </button>
           )}
-          {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']) && (
             <>
               <button onClick={() => navigate('/portafolio')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #0ea5e9, #0369a1)', color: 'white', border: 'none' }}>
                 📈 Portafolio PMO
@@ -1588,7 +1596,7 @@ export default function Home() {
             </>
           )}
 
-          {['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan'].includes(currentUser?.appRole) && (
+          {hasRoleAccess(['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan']) && (
             <button onClick={() => navigate('/mis-kpis')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #047857)', color: 'white', border: 'none' }}>
               📊 Mis KPIs
             </button>
@@ -1612,13 +1620,13 @@ export default function Home() {
             </button>
           )}
 
-          {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']) && (
             <button onClick={() => navigate('/superadmin')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #8b5cf6, #29abe2)', color: 'white', border: 'none' }}>
               🌐 Centro de Mando
             </button>
           )}
 
-          {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']) && (
             <button onClick={() => window.open('/calendario_global.html?v=' + Date.now() + '&email=' + encodeURIComponent(currentUser?.email || '') + '&name=' + encodeURIComponent(currentUser?.displayName || currentUser?.name || ''), '_blank')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #ef4444)', color: 'white', border: 'none' }}>
               📅 Calendario Global
             </button>
@@ -1629,7 +1637,7 @@ export default function Home() {
             🎓 Campus Interactivo
           </button>
 
-          {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin']) && (
             <button onClick={() => navigate('/centro-managers')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#000', fontWeight: 'bold', border: 'none' }}>
               👑 Centro Managers
             </button>
@@ -1827,7 +1835,7 @@ export default function Home() {
               >
                 🎯 Mis Metas
               </button>
-              {['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado'].includes(currentUser?.appRole) && (
+              {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']) && (
                 <button
                   className="btn-secondary hover-glow"
                   onClick={() => navigate('/superadmin')}
@@ -1848,7 +1856,7 @@ export default function Home() {
       {viewMode !== 'lite' && (
         <>
           {/* MI PROGRESO GENERAL */}
-          {(viewMode === 'compact' || customModules.progress !== false) && !['entrenador', 'entrenador_llamadas'].includes(currentUser?.appRole) && (
+          {(viewMode === 'compact' || customModules.progress !== false) && !hasRoleAccess(['entrenador', 'entrenador_llamadas']) && (
             <div className="glass-panel" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
                 <h3 className="text-main" style={{ margin: 0, fontSize: '1.1rem' }}>Mi Progreso General en el Ciclo</h3>
@@ -1888,9 +1896,9 @@ export default function Home() {
                       }}
                       style={{ background: 'none', border: 'none', color: activeEventTab === 'locales' ? 'var(--crear-gold)' : 'var(--text-muted)', fontWeight: activeEventTab === 'locales' ? 'bold' : 'normal', cursor: 'pointer', fontSize: '0.85rem' }}
                     >
-                      {['entrenador', 'entrenador_llamadas'].includes(currentUser?.appRole) ? 'MIS FECHAS' : 'MI SEDE'}
+                      {hasRoleAccess(['entrenador', 'entrenador_llamadas']) ? 'MIS FECHAS' : 'MI SEDE'}
                     </button>
-                    {(!['entrenador', 'entrenador_llamadas'].includes(currentUser?.appRole) && (currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.isGerente || ['gerente', 'direccion', 'director_maestria', 'cfo'].includes(currentUser?.appRole) || currentUser?.sede?.toLowerCase().includes('global'))) && (
+                    {(!hasRoleAccess(['entrenador', 'entrenador_llamadas']) && (currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.isGerente || hasRoleAccess(['gerente', 'direccion', 'director_maestria', 'cfo']) || currentUser?.sede?.toLowerCase().includes('global'))) && (
                       <button 
                         onClick={() => setActiveEventTab('globales')}
                         style={{ background: 'none', border: 'none', color: activeEventTab === 'globales' ? 'var(--crear-gold)' : 'var(--text-muted)', fontWeight: activeEventTab === 'globales' ? 'bold' : 'normal', cursor: 'pointer', fontSize: '0.85rem' }}
@@ -1963,7 +1971,7 @@ export default function Home() {
                 <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                   {(() => {
                     const role = currentUser?.appRole || '';
-                    const isSuperOrDir = currentUser?.isSuperAdmin || currentUser?.isDireccion || ['direccion', 'cfo', 'ceo', 'cco', 'superadmin', 'consolidado'].includes(role);
+                    const isSuperOrDir = currentUser?.isSuperAdmin || currentUser?.isDireccion || ['direccion', 'cfo', 'ceo', 'cco', 'superadmin'].includes(role);
                     const isGerente = role === 'gerente' || currentUser?.isGerente;
                     const isCoordC1C2 = ['coord_c1', 'coord_c2', 'coordinador_c1c2'].includes(role);
                     const isCoordMJ = ['coord_maestria', 'coordinador_mj', 'director_maestria'].includes(role);
@@ -2130,7 +2138,7 @@ export default function Home() {
                                 <span style={{ fontSize: '0.75rem', color: 'var(--crear-cyan)', display: 'block', marginTop: '0.1rem' }}>
                                   🏨 {hotelVenue}
                                 </span>
-                                {(!['qt', 'capitan', 'manager', 'aliado'].includes(currentUser?.appRole)) && (
+                                {(!hasRoleAccess(['qt', 'capitan', 'manager', 'aliado'])) && (
                                   <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginTop: '0.1rem' }}>
                                     🎙️ Trainer: {ev.trainer || ev.entrenador || 'Por confirmar'}
                                   </span>
@@ -2410,7 +2418,7 @@ export default function Home() {
               <button className="btn-secondary" onClick={() => navigate('/metas')} style={{ padding: '0.8rem 1.4rem', fontSize: '1rem', fontWeight: 'bold' }}>
                 VER MIS METAS
               </button>
-              {(currentUser?.isSuperAdmin || currentUser?.isGerente || ['coord_c1', 'coord_maestria', 'capitan', 'qt', 'direccion', 'director_maestria', 'consolidado'].includes(currentUser?.appRole)) && (
+              {(currentUser?.isSuperAdmin || currentUser?.isGerente || hasRoleAccess(['coord_c1', 'coord_maestria', 'capitan', 'qt', 'direccion', 'director_maestria'])) && (
                 <button className="btn-secondary" onClick={() => navigate('/reportes')} style={{ padding: '0.8rem 1.4rem', fontSize: '1rem', fontWeight: 'bold' }}>
                   ENVIAR REPORTES
                 </button>

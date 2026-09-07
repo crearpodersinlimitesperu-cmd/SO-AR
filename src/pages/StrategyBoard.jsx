@@ -15,7 +15,14 @@ export default function StrategyBoard() {
   // — arrancaba fijo en 'Lima' y el desplegable ofrecía GLOBAL + las 6 sedes libremente a
   // cualquiera. Un Gerente ahora ve solo su sede; dirección/CFO/CEO/CCO/superadmin/consolidado
   // (ver allowedRoles en App.jsx para /estrategia) conservan visión global.
-  const isGlobalStrategyRole = currentUser?.isSuperAdmin || ['direccion', 'cfo', 'ceo', 'cco', 'consolidado'].includes(currentUser?.appRole);
+    const isGlobalStrategyRole = (() => {
+    if (currentUser?.isSuperAdmin) return true;
+    const exec = ['direccion', 'cfo', 'ceo', 'cco'];
+    if (currentUser?.appRole === 'consolidado') {
+      return (currentUser?.roles || []).some(r => exec.includes(r));
+    }
+    return exec.includes(currentUser?.appRole);
+  })();
   const [selectedSede, setSelectedSede] = useState(() => isGlobalStrategyRole ? 'GLOBAL' : normalizeSede(currentUser?.sede));
 
   const sedesDisponibles = isGlobalStrategyRole ? ['GLOBAL', ...OPERATIONAL_SEDES] : [normalizeSede(currentUser?.sede)];
