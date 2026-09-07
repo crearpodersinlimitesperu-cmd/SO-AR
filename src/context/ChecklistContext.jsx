@@ -223,13 +223,23 @@ export function ChecklistProvider({ children }) {
         cleanData.assignedToEmail = sanitizeEmail(cleanData.assignedToEmail);
       }
 
-      batch.set(taskRef, {
-        id: customId,
-        ...cleanData,
-        completed: false,
-        status: 'Pendiente',
-        created_at: new Date().toISOString()
-      });
+      if (cleanData.isRecurringTemplate) {
+        const templateRef = doc(db, 'recurring_tasks_templates', customId);
+        batch.set(templateRef, {
+          id: customId,
+          ...cleanData,
+          created_at: new Date().toISOString(),
+          active: true
+        });
+      } else {
+        batch.set(taskRef, {
+          id: customId,
+          ...cleanData,
+          completed: false,
+          status: 'Pendiente',
+          created_at: new Date().toISOString()
+        });
+      }
 
       // Asegurarse de tener un arreglo unificado de correos (legacy o nuevo)
       const emailsToNotify = [];
@@ -239,8 +249,8 @@ export function ChecklistProvider({ children }) {
         emailsToNotify.push(cleanData.assignedToEmail);
       }
 
-      // Si la tarea tiene asignaciones directas a uno o más usuarios
-      if (emailsToNotify.length > 0) {
+      // Si la tarea tiene asignaciones directas a uno o más usuarios y no es una plantilla
+      if (emailsToNotify.length > 0 && !cleanData.isRecurringTemplate) {
         emailsToNotify.forEach(email => {
           const cleanEmail = sanitizeEmail(email);
           // 1. Notificación In-App

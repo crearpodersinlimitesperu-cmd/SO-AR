@@ -1,0 +1,102 @@
+name: 🚀 Deploy to Firebase Hosting
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch: # Permite lanzar manualmente desde GitHub UI
+
+jobs:
+  build-and-deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write # Necesario para reportar el error real a un Issue si el deploy falla (ver paso final)
+
+    steps:
+      - name: ⬇️ Checkout código
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          # NOTA (28/08/2026): se quitó "cache: 'npm'" como hipótesis para el fallo
+          # del run 33206219486 (intentos 1 y 2). Esa hipótesis NO era la causa real
+          # — la causa real (confirmada leyendo el log real del run #136, con ayuda
+          # del usuario) fue que dump_code.py (usado por el script "prebuild" de
+          # package.json) no estaba en git por una regla *.py de .gitignore — ver
+          # el commit que restaura dump_code.py y agrega la excepción !dump_code.py.
+          # Se deja quitado el caché de todos modos (no perjudica, y evita esta
+          # categoría de duda a futuro), pero no es la corrección real de este fallo.
+
+      - name: 📦 Instalar dependencias
+        run: npm install --include=optional
+
+      - name: 🔨 Build de producción
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+          VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}
+          VITE_GROQ_API_KEY: ${{ secrets.VITE_GROQ_API_KEY }}
+          VITE_QT_SHEET_CSV_URL: ${{ secrets.VITE_QT_SHEET_CSV_URL }}
+          VITE_COPILOTO_WORKER_URL: ${{ secrets.VITE_COPILOTO_WORKER_URL }}
+        run: npm run build
+
+      # (04/09/2026) FIX — José confirmó (con el log real del run 33899830258,
+      # pegado a mano porque Claude no puede leer logs crudos de Actions) que
+      # el deploy llevaba tiempo fallando en silencio:
+      #   "Authentication Error: Your credentials are no longer valid."
+      # El secret FIREBASE_TOKEN usaba el flujo --token de firebase-tools, que
+      # Firebase ya marcó como obsoleto y que vence sin aviso. Se reemplaza por
+      # autenticación con cuenta de servicio (GOOGLE_APPLICATION_CREDENTIALS),
+      # reutilizando el mismo Secret GOOGLE_SERVICE_ACCOUNT_JSON que ya usa
+      # mail-dispatch.yml — mismo patrón: escribir la llave, verificarla,
+      # usarla, borrarla siempre al final.
+      # PENDIENTE DE CONFIRMAR: esa cuenta de servicio se creó para
+      # Firestore/Admin SDK — no está confirmado que tenga permiso IAM de
+      # Firebase Hosting. Si este paso falla con un error de permisos (no de
+      # autenticación), hay que agregarle el rol "Firebase Hosting Admin" en
+      # Google Cloud Console → IAM.
+      - name: 🔑 Escribir la llave de la Service Account
+        run: echo "$GOOGLE_SERVICE_ACCOUNT_JSON" > centro-operativo-cpsl-65ad52160f45.json
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+
+      - name: 🩺 Verificar que la llave se escribió correctamente
+        run: |
+          echo "Tamaño del archivo (bytes):"
+          wc -c < centro-operativo-cpsl-65ad52160f45.json
+          node -e "JSON.parse(require('fs').readFileSync('centro-operativo-cpsl-65ad52160f45.json','utf8')); console.log('✅ JSON válido — la llave se escribió correctamente.')"
+
+      - name: 🚀 Deploy to Firebase Hosting
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/centro-operativo-cpsl-65ad52160f45.json
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npx --yes firebase-tools@latest deploy --only hosting --project centro-operativo-cpsl --non-interactive 2>&1 | tee /tmp/deploy_output.log
+          DEPLOY_EXIT=${PIPESTATUS[0]}
+
+          # (04/09/2026) FIX — antes este paso terminaba SIEMPRE con "exit 0",
+          # sin importar si el deploy real había fallado, así que GitHub
+          # mostraba ✅ verde aunque no se hubiera subido nada a producción
+          # (así pasó con FIREBASE_TOKEN vencido: semanas de "éxito" falso).
+          # Ahora, si falla, se reporta la salida real a un GitHub Issue vía
+          # scripts/report_deploy_failure.py (ya existía pero nunca se llamaba)
+          # y el job termina con el código de salida real, para que se vea ❌.
+          if [ "$DEPLOY_EXIT" -ne 0 ]; then
+            echo "❌ El despliegue a Firebase Hosting falló de verdad — ver el Issue de diagnóstico creado en este repo."
+            python3 scripts/report_deploy_failure.py /tmp/deploy_output.log || true
+          fi
+
+          exit "$DEPLOY_EXIT"
+
+      - name: 🗑️ Borrar la llave del runner
+        if: always()
+        run: rm -f centro-operativo-cpsl-65ad52160f45.json

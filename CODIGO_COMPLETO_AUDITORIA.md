@@ -171186,6 +171186,14 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
     return d.toISOString().split('T')[0];
   };
 
+  
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [recurrence, setRecurrence] = useState({
+    cycle: 'TODOS',
+    phase: 'PRE',
+    daysBefore: 3
+  });
+
   const [newTask, setNewTask] = useState({
     title: '',
     role: currentUser?.appRole || 'gerente',
@@ -171268,6 +171276,11 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
       assignedToEmails: canAssignSpecific ? (newTask.assignedToEmails?.length > 0 ? newTask.assignedToEmails : [currentUser?.email]) : (prefilledUser?.email ? [prefilledUser.email] : [currentUser?.email]),
       assignedSede: canAssignSpecific ? (newTask.assignedSede || currentUser?.sede || 'Global') : (prefilledUser?.sede || currentUser?.sede || 'Global')
     };
+
+    if (isRecurring) {
+      taskData.isRecurringTemplate = true;
+      taskData.recurrence = recurrence;
+    }
 
     let success = false;
     if (taskToEdit) {
@@ -176723,13 +176736,23 @@ export function ChecklistProvider({ children }) {
         cleanData.assignedToEmail = sanitizeEmail(cleanData.assignedToEmail);
       }
 
-      batch.set(taskRef, {
-        id: customId,
-        ...cleanData,
-        completed: false,
-        status: 'Pendiente',
-        created_at: new Date().toISOString()
-      });
+      if (cleanData.isRecurringTemplate) {
+        const templateRef = doc(db, 'recurring_tasks_templates', customId);
+        batch.set(templateRef, {
+          id: customId,
+          ...cleanData,
+          created_at: new Date().toISOString(),
+          active: true
+        });
+      } else {
+        batch.set(taskRef, {
+          id: customId,
+          ...cleanData,
+          completed: false,
+          status: 'Pendiente',
+          created_at: new Date().toISOString()
+        });
+      }
 
       // Asegurarse de tener un arreglo unificado de correos (legacy o nuevo)
       const emailsToNotify = [];
@@ -176739,8 +176762,8 @@ export function ChecklistProvider({ children }) {
         emailsToNotify.push(cleanData.assignedToEmail);
       }
 
-      // Si la tarea tiene asignaciones directas a uno o más usuarios
-      if (emailsToNotify.length > 0) {
+      // Si la tarea tiene asignaciones directas a uno o más usuarios y no es una plantilla
+      if (emailsToNotify.length > 0 && !cleanData.isRecurringTemplate) {
         emailsToNotify.forEach(email => {
           const cleanEmail = sanitizeEmail(email);
           // 1. Notificación In-App

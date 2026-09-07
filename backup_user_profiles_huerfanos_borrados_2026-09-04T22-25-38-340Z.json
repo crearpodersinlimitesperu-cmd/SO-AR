@@ -1,0 +1,18 @@
+[
+  {
+    "correo": "jose.sanchez@crearpsl.net",
+    "docId": "huSHoqB2u5dqoGUCEzMLUir77Vz1",
+    "data": {
+      "role": "miembro",
+      "lastLoginAt": "2026-08-22T17:22:27.595Z",
+      "lastAction": "LOGIN_REAL",
+      "lastIp": "2001:1388:80d:1225:2df3:9c20:ae56:512a",
+      "sede": "Lima",
+      "lastLocation": "Lima, Peru",
+      "lastUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36",
+      "name": "José Luis Sánchez Moreno",
+      "lastLoginAtIso": "2026-08-22T17:22:27.740Z",
+      "email": "jose.sanchez@crearpsl.net"
+    }
+  }
+]

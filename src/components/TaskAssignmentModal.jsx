@@ -22,6 +22,14 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
     return d.toISOString().split('T')[0];
   };
 
+  
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [recurrence, setRecurrence] = useState({
+    cycle: 'TODOS',
+    phase: 'PRE',
+    daysBefore: 3
+  });
+
   const [newTask, setNewTask] = useState({
     title: '',
     role: currentUser?.appRole || 'gerente',
@@ -104,6 +112,11 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
       assignedToEmails: canAssignSpecific ? (newTask.assignedToEmails?.length > 0 ? newTask.assignedToEmails : [currentUser?.email]) : (prefilledUser?.email ? [prefilledUser.email] : [currentUser?.email]),
       assignedSede: canAssignSpecific ? (newTask.assignedSede || currentUser?.sede || 'Global') : (prefilledUser?.sede || currentUser?.sede || 'Global')
     };
+
+    if (isRecurring) {
+      taskData.isRecurringTemplate = true;
+      taskData.recurrence = recurrence;
+    }
 
     let success = false;
     if (taskToEdit) {
