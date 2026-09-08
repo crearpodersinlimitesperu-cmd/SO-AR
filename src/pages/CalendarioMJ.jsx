@@ -915,29 +915,157 @@ function CalendarioPreview({ cal, onClose }) {
     // sobre fondo azul oscuro. Fix: fijar aquí un color oscuro de base para
     // toda la vista previa/exportación, independiente del tema de la app — las
     // filas que ya tienen su propio "color" (blanco sobre azul) no cambian.
-    <div style={{ background: '#f3f4f6', minHeight: '100vh', padding: '1.5rem', color: '#1e293b' }}>
+    <div className="mj-preview-wrapper" style={{ background: '#f3f4f6', minHeight: '100vh', padding: '1.5rem', color: '#1e293b' }}>
       <style>{`
-        @media print {
-          .no-print { display: none !important; }
-          body { background: white !important; }
-          .mj-page { box-shadow: none !important; margin: 0 !important; page-break-after: always; }
+        @page {
+          size: A4 portrait;
+          margin: 8mm 10mm 8mm 10mm;
         }
-        .mj-table td, .mj-table th { border: 1px solid #cbd5e1; padding: 6px 10px; font-size: 12px; vertical-align: top; white-space: pre-line; }
+        .mj-table td, .mj-table th {
+          border: 1px solid #cbd5e1;
+          padding: 5px 8px;
+          font-size: 11px;
+          vertical-align: middle;
+          white-space: pre-line;
+        }
+        @media print {
+          *, *::before, *::after {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
+          }
+          html, body {
+            background: #ffffff !important;
+            color: #1e293b !important;
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+          .no-print {
+            display: none !important;
+            visibility: hidden !important;
+          }
+          .mj-preview-wrapper {
+            background: #ffffff !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            min-height: auto !important;
+          }
+          .mj-page {
+            box-shadow: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            max-width: 100% !important;
+            width: 100% !important;
+            background: #ffffff !important;
+          }
+          .mj-page-1 {
+            page-break-after: always !important;
+            break-after: page !important;
+          }
+          .mj-page-2 {
+            page-break-before: always !important;
+            break-before: page !important;
+            page-break-after: avoid !important;
+            break-after: avoid !important;
+          }
+          .mj-page-header {
+            margin-bottom: 0.45rem !important;
+          }
+          .mj-page-header h1 {
+            font-size: 1.02rem !important;
+            line-height: 1.2 !important;
+            color: #1a75bc !important;
+          }
+          .mj-page-header img {
+            height: 58px !important;
+          }
+          .mj-table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            page-break-inside: auto !important;
+            break-inside: auto !important;
+          }
+          .mj-table tr {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+          }
+          .mj-table thead {
+            display: table-header-group !important;
+          }
+          .mj-table th {
+            background-color: #1a75bc !important;
+            color: #ffffff !important;
+            padding: 4px 6px !important;
+            font-size: 10px !important;
+            border: 1px solid #94a3b8 !important;
+            font-weight: 800 !important;
+          }
+          .mj-table td {
+            border: 1px solid #cbd5e1 !important;
+            padding: 2.8px 5px !important;
+            font-size: 9.2px !important;
+            line-height: 1.2 !important;
+            vertical-align: middle !important;
+          }
+          .mj-row-fds td {
+            background-color: #2f6fa8 !important;
+            color: #ffffff !important;
+            font-weight: 700 !important;
+            padding: 3px 5px !important;
+          }
+          .mj-row-cierre td {
+            background-color: #2f6fa8 !important;
+            color: #ffffff !important;
+            font-weight: 700 !important;
+            text-align: center !important;
+            padding: 4px 5px !important;
+          }
+          .mj-row-destacado td {
+            background-color: #fef08a !important;
+            color: #1e293b !important;
+            font-weight: 700 !important;
+          }
+          .mj-row-alt td {
+            background-color: #eaf3fb !important;
+            color: #1e293b !important;
+          }
+          .mj-row-white td {
+            background-color: #ffffff !important;
+            color: #1e293b !important;
+          }
+          .mj-page-2-title {
+            background-color: #dbeafe !important;
+            color: #1e3a8a !important;
+            font-weight: 900 !important;
+            font-size: 1.1rem !important;
+            padding: 0.5rem !important;
+            margin-bottom: 0.8rem !important;
+            text-align: center !important;
+          }
+          .mj-page-2-box {
+            background-color: #f8fafc !important;
+            border: 1px solid #cbd5e1 !important;
+            padding: 0.9rem !important;
+            font-size: 0.76rem !important;
+            line-height: 1.48 !important;
+            color: #1e293b !important;
+          }
+        }
       `}</style>
 
       <div className="no-print flex gap-3 mb-4" style={{ maxWidth: '850px', margin: '0 auto 1rem' }}>
         <button onClick={onClose} className="btn-secondary" style={{ padding: '0.5rem 1rem', borderRadius: '8px' }}>
           <ArrowLeft size={16} style={{ display: 'inline', marginRight: '0.3rem' }} /> Volver al listado
         </button>
-        <button onClick={() => window.print()} className="btn-primary" style={{ padding: '0.5rem 1rem', borderRadius: '8px', background: '#1a75bc', color: 'white', border: 'none', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+        <button onClick={() => window.print()} className="btn-primary" style={{ padding: '0.5rem 1rem', borderRadius: '8px', background: '#1a75bc', color: 'white', border: 'none', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer' }}>
           <Printer size={16} /> Exportar PDF
         </button>
       </div>
 
       {/* Página 1: calendario */}
-      <div className="mj-page" style={{ background: 'white', maxWidth: '850px', margin: '0 auto 2rem', padding: '2rem', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-          <h1 style={{ color: headerBg, fontSize: '1.3rem', fontWeight: 900, margin: 0 }}>
+      <div className="mj-page mj-page-1" style={{ background: 'white', maxWidth: '850px', margin: '0 auto 2rem', padding: '2rem', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
+        <div className="mj-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
+          <h1 style={{ color: headerBg, fontSize: '1.25rem', fontWeight: 900, margin: 0, lineHeight: 1.25 }}>
             CALENDARIO DE MAESTRÍA DEL JUEGO-{(displayCal.sede || '').toUpperCase()}<br />
             EQUIPO {displayCal.equipoNumero} – {(displayCal.equipoNombre || '').toUpperCase()}
           </h1>
@@ -945,12 +1073,12 @@ function CalendarioPreview({ cal, onClose }) {
               usa Home.jsx) — antes esto era texto estilizado simulando un
               logo, no el logo real de la marca. Agrandado el mismo día a
               pedido de José ("el logo de CREAR debe de estar más grande"). */}
-          <img src="/logo.png" alt="CREAR Poder sin límites" style={{ height: '100px', width: 'auto', objectFit: 'contain', flexShrink: 0 }} />
+          <img src="/logo.png" alt="CREAR Poder sin límites" style={{ height: '75px', width: 'auto', objectFit: 'contain', flexShrink: 0 }} />
         </div>
 
         <table className="mj-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
-            <tr style={{ background: headerBg, color: 'white' }}>
+            <tr className="mj-header-row" style={{ background: headerBg, color: 'white' }}>
               <th style={{ width: '45%' }}>ACTIVIDAD</th>
               <th style={{ width: '25%' }}>FECHA</th>
               <th style={{ width: '30%' }}>HORA</th>
@@ -959,7 +1087,7 @@ function CalendarioPreview({ cal, onClose }) {
           <tbody>
             {displayCal.fds.map((fdsBlock) => (
               <React.Fragment key={fdsBlock.id}>
-                <tr style={{ background: '#2f6fa8', color: 'white', fontWeight: 700 }}>
+                <tr className="mj-row-fds" style={{ background: '#2f6fa8', color: 'white', fontWeight: 700 }}>
                   <td>{fdsBlock.titulo}</td>
                   <td>{formatRangoFds(fdsBlock)}</td>
                   <td style={{ whiteSpace: 'pre-line' }}>{fdsBlock.horario}</td>
@@ -971,19 +1099,26 @@ function CalendarioPreview({ cal, onClose }) {
                     seguir viéndola para completarla). La franja de cierre
                     (esCierre) es la única excepción — no es un evento con
                     fecha, así que siempre se muestra. */}
-                {displayCal.actividades.filter(a => a.seccion === fdsBlock.id && (a.esCierre || a.fecha)).map((act, i) => (
-                  act.esCierre ? (
-                    <tr key={i} style={{ background: '#2f6fa8', color: 'white' }}>
-                      <td colSpan={3} style={{ fontWeight: 700, textAlign: 'center', padding: '0.6rem' }}>{act.actividad}</td>
-                    </tr>
-                  ) : (
-                    <tr key={i} style={{ background: act.destacado ? '#fef08a' : (i % 2 === 0 ? 'white' : rowAlt) }}>
+                {displayCal.actividades.filter(a => a.seccion === fdsBlock.id && (a.esCierre || a.fecha)).map((act, i) => {
+                  if (act.esCierre) {
+                    return (
+                      <tr key={i} className="mj-row-cierre" style={{ background: '#2f6fa8', color: 'white' }}>
+                        <td colSpan={3} style={{ fontWeight: 700, textAlign: 'center', padding: '0.5rem' }}>{act.actividad}</td>
+                      </tr>
+                    );
+                  }
+                  const isDest = !!act.destacado;
+                  const isAlt = !isDest && (i % 2 !== 0);
+                  const rowClass = isDest ? 'mj-row-destacado' : (isAlt ? 'mj-row-alt' : 'mj-row-white');
+                  const rowBg = isDest ? '#fef08a' : (isAlt ? rowAlt : 'white');
+                  return (
+                    <tr key={i} className={rowClass} style={{ background: rowBg, color: '#1e293b' }}>
                       <td style={{ fontWeight: 600 }}>{renderActividadTexto(act.actividad)}</td>
                       <td>{formatFecha(act.fecha)}</td>
                       <td>{act.hora}</td>
                     </tr>
-                  )
-                ))}
+                  );
+                })}
               </React.Fragment>
             ))}
           </tbody>
@@ -991,18 +1126,18 @@ function CalendarioPreview({ cal, onClose }) {
       </div>
 
       {/* Página 2: fin de tu entrenamiento */}
-      <div className="mj-page" style={{ background: 'white', maxWidth: '850px', margin: '0 auto', padding: '2rem', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-          <h1 style={{ color: headerBg, fontSize: '1.1rem', fontWeight: 900, margin: 0 }}>
+      <div className="mj-page mj-page-2" style={{ background: 'white', maxWidth: '850px', margin: '0 auto', padding: '2rem', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}>
+        <div className="mj-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
+          <h1 style={{ color: headerBg, fontSize: '1.15rem', fontWeight: 900, margin: 0, lineHeight: 1.25 }}>
             CALENDARIO DE MAESTRÍA DEL JUEGO-{(displayCal.sede || '').toUpperCase()}<br />
             EQUIPO {displayCal.equipoNumero} – {(displayCal.equipoNombre || '').toUpperCase()}
           </h1>
-          <img src="/logo.png" alt="CREAR Poder sin límites" style={{ height: '88px', width: 'auto', objectFit: 'contain', flexShrink: 0 }} />
+          <img src="/logo.png" alt="CREAR Poder sin límites" style={{ height: '75px', width: 'auto', objectFit: 'contain', flexShrink: 0 }} />
         </div>
-        <div style={{ background: '#dbeafe', textAlign: 'center', fontWeight: 900, fontSize: '1.3rem', padding: '0.8rem', marginBottom: '1.5rem' }}>
+        <div className="mj-page-2-title" style={{ background: '#dbeafe', color: '#1e3a8a', textAlign: 'center', fontWeight: 900, fontSize: '1.25rem', padding: '0.7rem', marginBottom: '1.2rem' }}>
           FIN DE TU ENTRENAMIENTO
         </div>
-        <div style={{ background: '#f1f5f9', border: '1px solid #cbd5e1', padding: '1.2rem', fontSize: '0.82rem', whiteSpace: 'pre-line', lineHeight: 1.6 }}>
+        <div className="mj-page-2-box" style={{ background: '#f8fafc', border: '1px solid #cbd5e1', padding: '1.2rem', fontSize: '0.82rem', whiteSpace: 'pre-line', lineHeight: 1.6, color: '#1e293b' }}>
           {displayCal.infoText}
         </div>
       </div>

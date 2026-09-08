@@ -428,15 +428,18 @@ function App() {
               ThemeToggle tal cual (mismo componente que ya funcionaba en Home) —
               no se tocó ThemeContext.jsx ni su lógica. */}
           {showFloatingThemeToggle && (
-            <div style={{ position: 'fixed', top: '1rem', right: '1rem', zIndex: 8500 }}>
+            <div className="no-print" style={{ position: 'fixed', top: '1rem', right: '1rem', zIndex: 8500 }}>
               <ThemeToggle />
             </div>
           )}
           {/* Copiloto SO-AR: restringido a Gerentes y Directivos por decisión explícita (26/08/2026) */}
           {(currentUser.isSuperAdmin || currentUser.isGerente || currentUser.isDireccion) && (
-            <AICopilot />
+            <div className="no-print">
+              <AICopilot />
+            </div>
           )}
           <button
+            className="no-print"
             onClick={() => setShowHelp(true)}
             title="Manual y Ayuda"
             style={{
@@ -465,7 +468,9 @@ function App() {
         </>
       )}
 
-      <HelpModal isOpen={showHelp} onClose={() => setShowHelp(false)} />
+      <div className="no-print">
+        <HelpModal isOpen={showHelp} onClose={() => setShowHelp(false)} />
+      </div>
     </div>
   )
 }
