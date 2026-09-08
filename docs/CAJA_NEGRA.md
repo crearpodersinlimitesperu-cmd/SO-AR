@@ -24,3 +24,7 @@ Estas reglas son absolutas y se han generado a partir del feedback crítico de D
     - Las tareas de los roles operativos (Coordinador C1/C2, Coordinador Maestría, Gerente de Sede, Capitán, Quantum Team) son **cíclicas** y se repiten rigurosamente en cada ciclo de entrenamiento (`C1 -> C2 -> MJ -> C1...`) siguiendo las fechas del calendario central.
     - **Cero pérdida de datos / No duplicidad:** No se debe borrar, reemplazar ni duplicar tareas existentes en Firestore ni en el catálogo de tareas asignadas.
     - El seguimiento de avance y completitud debe ser multidimensional por ciclo (`sede_cycleId`), permitiendo que un ciclo nuevo arranque en estado limpio para sus tareas sin afectar el historial o la auditoría de ciclos pasados.
+16. **ENRUTAMIENTO ESTRICTO DE GOOGLE CHAT POR SEDE:**
+    - El espacio configurado de Google Chat (`spaces/AAQAOaOPrZU`) pertenece **ÚNICA Y EXCLUSIVAMENTE a la Sede Lima**.
+    - Todos los reportes diarios de llamadas y operativos emitidos por coordinadores de Lima se despachan automáticamente a dicho espacio.
+    - PROHIBIDO mezclar reportes de otras sedes (Quito, Guayaquil, Cuenca, Medellín, México) en el espacio de Lima. Cada sede se conectará de manera independiente a su propio espacio a medida que compartan sus respectivos webhooks.

@@ -172,17 +172,29 @@ export async function sendReportToGoogleChat(report) {
       return { success: false, reason: 'disabled' };
     }
 
-    // Buscar webhook específico para la sede o el general
-    const sedeNorm = (report.sede || '').trim();
-    const webhookUrl = (config.sedesWebhooks && config.sedesWebhooks[sedeNorm]) ||
-                       config.webhookUrl ||
-                       localStorage.getItem(WEBHOOK_STORAGE_KEY) ||
-                       (typeof import.meta !== 'undefined' && import.meta.env?.VITE_GOOGLE_CHAT_WEBHOOK_URL) ||
-                       '';
+    // Regla de Enrutamiento Estricto por Sede (08/09/2026 - Confirmado por José):
+    // El espacio actual de Google Chat es ÚNICA Y EXCLUSIVAMENTE para la Sede Lima.
+    // Los reportes de Lima van a su espacio. Las demás sedes se conectarán a medida que
+    // compartan y configuren su propio webhook de espacio.
+    const sedeRaw = (report.sede || '').toLowerCase().trim();
+    const isLima = sedeRaw.includes('lima') || sedeRaw === 'lim' || sedeRaw.includes('sede-lima');
 
-    if (!webhookUrl || !webhookUrl.startsWith('http')) {
-      console.info('Google Chat Webhook no configurado aún en Causa OS.');
-      return { success: false, reason: 'no_webhook_url' };
+    let webhookUrl = '';
+    if (isLima) {
+      webhookUrl = (config.sedesWebhooks && (config.sedesWebhooks['Lima'] || config.sedesWebhooks['LIM'])) ||
+                   config.webhookUrl ||
+                   'https://chat.googleapis.com/v1/spaces/AAQAOaOPrZU/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=kQPcLjhngGrsBm_xH23mzXmVF4AjUOCofQnt3N0SBww';
+    } else {
+      // Para otras sedes (Quito, GYE, etc.), solo enviar si esa sede específica tiene su webhook registrado
+      const sedeKey = Object.keys(config.sedesWebhooks || {}).find(
+        k => k.toLowerCase() === sedeRaw
+      );
+      webhookUrl = sedeKey ? config.sedesWebhooks[sedeKey] : '';
+      
+      if (!webhookUrl) {
+        console.info(`Google Chat: Sede "${report.sede}" aún no tiene espacio configurado. Omitiendo envío para no mezclar con Lima.`);
+        return { success: false, reason: 'sede_webhook_pending', sede: report.sede };
+      }
     }
 
     const { type, submitted_by, sede, cycle_id, stage, created_at, data } = report;
