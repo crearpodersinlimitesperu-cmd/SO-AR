@@ -306870,10 +306870,11 @@ import {
   ArrowLeft, FileText, Send, Zap, Clock, ShieldAlert, Sparkles, 
   BarChart3, CheckCircle2, AlertTriangle, Star, RefreshCw, ThumbsUp, 
   ThumbsDown, AlertCircle, Building2, Lock, Unlock, Eye, Database, Download,
-  ChevronDown, ChevronUp, Check, Users, PhoneCall
+  ChevronDown, ChevronUp, Check, Users, PhoneCall, MessageSquare
 } from 'lucide-react';
 import { OPERATIONAL_SEDES } from '../data/usersData';
 import nodusFallbackData from '../data/nodusFallbackData.json';
+import { sendReportToGoogleChat, getGoogleChatWebhookConfig, saveGoogleChatWebhookConfig } from '../services/googleChatService';
 
 // POOL MAESTRO DE 12 PREGUNTAS ROTATIVAS (NODUS & CAUSA OS V1.0)
 const POOL_PREGUNTAS = {
@@ -306943,6 +306944,77 @@ export default function ReportesBoard() {
   const [nodusEquiposDisponibles, setNodusEquiposDisponibles] = useState([]);
   const [selectedNodusTeam, setSelectedNodusTeam] = useState('auto');
   const [nodusMatchedCoord, setNodusMatchedCoord] = useState(null);
+
+  // Configuración de Webhook Google Chat
+  const [showChatWebhookModal, setShowChatWebhookModal] = useState(false);
+  const [chatWebhookUrl, setChatWebhookUrl] = useState('');
+  const [chatWebhookEnabled, setChatWebhookEnabled] = useState(true);
+  const [testingChatWebhook, setTestingChatWebhook] = useState(false);
+
+  useEffect(() => {
+    getGoogleChatWebhookConfig().then(cfg => {
+      if (cfg?.webhookUrl) setChatWebhookUrl(cfg.webhookUrl);
+      if (cfg?.enabled !== undefined) setChatWebhookEnabled(cfg.enabled);
+    });
+  }, []);
+
+  const handleTestChatWebhook = async () => {
+    if (!chatWebhookUrl.trim()) {
+      showToast('Ingresa primero la URL del Webhook de Google Chat.', 'warning');
+      return;
+    }
+    setTestingChatWebhook(true);
+    try {
+      await saveGoogleChatWebhookConfig({
+        webhookUrl: chatWebhookUrl.trim(),
+        enabled: chatWebhookEnabled
+      });
+
+      const testRep = {
+        id: 'test_' + Date.now(),
+        type: 'Llamadas',
+        submitted_by: currentUser?.displayName || currentUser?.email || 'Diana Yesenia Moscoso Robles',
+        sede: currentUser?.sede || 'Lima',
+        cycle_id: currentCycle?.id || 'LIM-EQ-30',
+        stage: currentStage || 'PRE-MJ',
+        created_at: new Date().toISOString(),
+        data: {
+          nuevos_OK: 4,
+          rezagados_OK: 8,
+          nuevos_XC: 0,
+          rezagados_XC: 0,
+          nuevos_NC: 0,
+          rezagados_NC: 34,
+          nuevos_PENDIENTES: 44,
+          rezagados_PENDIENTES: 67
+        }
+      };
+
+      const res = await sendReportToGoogleChat(testRep);
+      if (res.success) {
+        showToast('¡Reporte de prueba enviado a Google Chat con éxito! Revisa tu espacio.', 'success');
+      } else {
+        showToast(`Google Chat respondió con error: ${res.error || res.reason}`, 'error');
+      }
+    } catch (err) {
+      showToast('Error al conectar con el webhook de Google Chat.', 'error');
+    } finally {
+      setTestingChatWebhook(false);
+    }
+  };
+
+  const handleSaveChatWebhook = async () => {
+    const ok = await saveGoogleChatWebhookConfig({
+      webhookUrl: chatWebhookUrl.trim(),
+      enabled: chatWebhookEnabled
+    });
+    if (ok) {
+      showToast('Configuración de Google Chat guardada exitosamente.', 'success');
+      setShowChatWebhookModal(false);
+    } else {
+      showToast('Error al guardar configuración.', 'error');
+    }
+  };
 
   const handleExtraerDeNodus = async (teamOverride = null) => {
     setLoadingNodus(true);
@@ -307195,7 +307267,7 @@ export default function ReportesBoard() {
       }
 
       // 1. Guardar en Firestore
-      await addDoc(collection(db, 'reports'), {
+      const newReportRef = await addDoc(collection(db, 'reports'), {
         type: reportType,
         cycle_id: currentCycle?.id || 'CICLO-2026',
         stage: currentStage || 'C1',
@@ -307203,6 +307275,20 @@ export default function ReportesBoard() {
         sede: currentUser?.sede || formData.sede_id || 'Global',
         created_at: new Date().toISOString(),
         data: finalData
+      });
+
+      // 1.1 Enviar automáticamente al espacio de Google Chat configurado
+      sendReportToGoogleChat({
+        id: newReportRef.id,
+        type: reportType,
+        cycle_id: currentCycle?.id || 'CICLO-2026',
+        stage: currentStage || 'C1',
+        submitted_by: currentUser?.displayName || currentUser?.email || 'Staff Autorizado',
+        sede: currentUser?.sede || formData.sede_id || 'Global',
+        created_at: new Date().toISOString(),
+        data: finalData
+      }).catch(chatErr => {
+        console.warn('Google Chat notification fallback:', chatErr);
       });
 
       // 2. Regla para Llamadas
@@ -307913,9 +307999,33 @@ export default function ReportesBoard() {
       `}</style>
       
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-        <button onClick={() => navigate('/')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem' }}>
-          <ArrowLeft size={18} /> Volver al Inicio
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
+          <button onClick={() => navigate('/')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem' }}>
+            <ArrowLeft size={18} /> Volver al Inicio
+          </button>
+          {canViewEvolucionDashboard && (
+            <button
+              onClick={() => setShowChatWebhookModal(true)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                padding: '0.5rem 1rem',
+                background: chatWebhookUrl ? 'rgba(41, 171, 226, 0.15)' : 'rgba(255, 255, 255, 0.06)',
+                border: chatWebhookUrl ? '1px solid var(--crear-cyan)' : '1px solid rgba(255,255,255,0.2)',
+                color: chatWebhookUrl ? 'var(--crear-cyan)' : 'var(--text-muted)',
+                borderRadius: '8px',
+                fontWeight: 700,
+                fontSize: '0.82rem',
+                cursor: 'pointer'
+              }}
+              title="Configurar webhook para enviar reportes a un espacio de Google Chat"
+            >
+              <MessageSquare size={16} />
+              {chatWebhookUrl ? 'Google Chat Conectado' : 'Conectar Google Chat'}
+            </button>
+          )}
+        </div>
 
         {/* CONMUTADOR DE VISTAS (Solo Directivos y Gerentes) */}
         {canViewEvolucionDashboard ? (
@@ -308417,6 +308527,139 @@ export default function ReportesBoard() {
             </div>
           </div>
 
+        </div>
+      )}
+
+      {/* MODAL DE CONFIGURACIÓN WEBHOOK GOOGLE CHAT */}
+      {showChatWebhookModal && (
+        <div 
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.85)',
+            backdropFilter: 'blur(6px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+            padding: '1rem'
+          }}
+          onClick={() => setShowChatWebhookModal(false)}
+        >
+          <div 
+            className="glass-panel"
+            style={{
+              maxWidth: '560px',
+              width: '100%',
+              padding: '2rem',
+              borderRadius: '16px',
+              border: '1px solid rgba(41, 171, 226, 0.3)',
+              background: '#0a0f1d'
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '1.2rem' }}>
+              <div style={{ background: 'rgba(41, 171, 226, 0.15)', padding: '10px', borderRadius: '12px', color: 'var(--crear-cyan)' }}>
+                <MessageSquare size={26} />
+              </div>
+              <div>
+                <h3 style={{ margin: 0, color: '#fff', fontSize: '1.2rem' }}>Integración con Google Chat</h3>
+                <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                  Envía reportes operativos y de llamadas automáticamente a tu espacio de equipo
+                </p>
+              </div>
+            </div>
+
+            <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', padding: '1rem', marginBottom: '1.5rem', fontSize: '0.8rem', color: '#cbd5e1' }}>
+              <strong style={{ color: 'var(--crear-gold)', display: 'block', marginBottom: '0.4rem' }}>
+                📌 ¿Cómo obtener la URL en 3 pasos rápidos?
+              </strong>
+              <ol style={{ margin: 0, paddingLeft: '1.2rem', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                <li>En Google Chat, abre el espacio donde quieres recibir los reportes.</li>
+                <li>Haz clic en el título del espacio ➔ <b>Configuración de apps e integraciones</b>.</li>
+                <li>Selecciona <b>Webhooks</b> ➔ <b>Agregar webhook</b>, ponle de nombre <i>Causa OS</i> y copia la URL generada.</li>
+              </ol>
+            </div>
+
+            <div style={{ marginBottom: '1.2rem' }}>
+              <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: '0.4rem', fontWeight: 600 }}>
+                URL del Webhook de Google Chat *
+              </label>
+              <input
+                type="url"
+                placeholder="https://chat.googleapis.com/v1/spaces/AAAA.../messages?key=...&token=..."
+                value={chatWebhookUrl}
+                onChange={e => setChatWebhookUrl(e.target.value)}
+                className="form-input"
+                style={{ fontSize: '0.82rem', fontFamily: 'monospace' }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', background: 'rgba(0,0,0,0.3)', padding: '0.8rem 1rem', borderRadius: '8px' }}>
+              <div>
+                <span style={{ color: '#fff', fontSize: '0.85rem', fontWeight: 600, display: 'block' }}>
+                  Envío Automático Activo
+                </span>
+                <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>
+                  Disparar al enviar cada reporte
+                </span>
+              </div>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  checked={chatWebhookEnabled}
+                  onChange={e => setChatWebhookEnabled(e.target.checked)}
+                  style={{ width: '18px', height: '18px', accentColor: 'var(--crear-cyan)' }}
+                />
+                <span style={{ color: chatWebhookEnabled ? '#10b981' : '#64748b', fontSize: '0.8rem', fontWeight: 700 }}>
+                  {chatWebhookEnabled ? 'Habilitado' : 'Pausado'}
+                </span>
+              </label>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                onClick={handleTestChatWebhook}
+                disabled={testingChatWebhook || !chatWebhookUrl.trim()}
+                style={{
+                  padding: '0.6rem 1rem',
+                  borderRadius: '8px',
+                  border: '1px solid rgba(41, 171, 226, 0.4)',
+                  background: 'rgba(41, 171, 226, 0.1)',
+                  color: 'var(--crear-cyan)',
+                  fontSize: '0.82rem',
+                  fontWeight: 700,
+                  cursor: (testingChatWebhook || !chatWebhookUrl.trim()) ? 'not-allowed' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem'
+                }}
+              >
+                {testingChatWebhook ? <RefreshCw size={14} className="spin" /> : <Send size={14} />}
+                Probar Notificación
+              </button>
+
+              <div style={{ display: 'flex', gap: '0.6rem' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowChatWebhookModal(false)}
+                  className="btn-secondary"
+                  style={{ padding: '0.6rem 1rem', fontSize: '0.82rem' }}
+                >
+                  Cerrar
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveChatWebhook}
+                  className="btn-primary"
+                  style={{ padding: '0.6rem 1.2rem', fontSize: '0.82rem', fontWeight: 800 }}
+                >
+                  Guardar Configuración
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
@@ -314737,7 +314980,8 @@ export { app, db, auth, googleProvider, storage };
 // de "Correo" como respaldo, en vez de romper la experiencia.
 
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { auth } from './firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { auth, db } from './firebase';
 
 const CHAT_SCOPE = 'https://www.googleapis.com/auth/chat.spaces';
 const TOKEN_KEY = 'googleChatToken';
@@ -314817,6 +315061,249 @@ export async function openOrCreateDirectMessage(email) {
     return { success: true, spaceUri: space.spaceUri };
   } catch (error) {
     console.error('Error abriendo Google Chat:', error);
+    return { success: false, error: error.message || String(error) };
+  }
+}
+
+// ============================================================================
+// INTEGRACIÓN INCOMING WEBHOOK GOOGLE CHAT (ESPACIOS DE EQUIPO / CANALES)
+// Permite enviar notificaciones automáticas y tarjetas de reportes a cualquier
+// espacio de Google Chat sin requerir login o permisos manuales del coordinador.
+// ============================================================================
+
+const WEBHOOK_STORAGE_KEY = 'causaos_google_chat_webhook';
+
+/**
+ * Lee la configuración de Google Chat Webhook desde Firestore o fallback local/env.
+ */
+export async function getGoogleChatWebhookConfig() {
+  try {
+    const snap = await getDoc(doc(db, 'settings', 'google_chat'));
+    if (snap.exists()) {
+      return snap.data();
+    }
+  } catch (e) {
+    console.warn('Error leyendo settings/google_chat de Firestore:', e);
+  }
+  const localUrl = localStorage.getItem(WEBHOOK_STORAGE_KEY) || '';
+  const envUrl = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_GOOGLE_CHAT_WEBHOOK_URL) || '';
+  return {
+    webhookUrl: localUrl || envUrl || '',
+    sedesWebhooks: {},
+    enabled: true
+  };
+}
+
+/**
+ * Guarda la URL del Webhook de Google Chat en Firestore y localStorage.
+ */
+export async function saveGoogleChatWebhookConfig(config) {
+  try {
+    if (config.webhookUrl) {
+      localStorage.setItem(WEBHOOK_STORAGE_KEY, config.webhookUrl.trim());
+    }
+    await setDoc(doc(db, 'settings', 'google_chat'), {
+      ...config,
+      updated_at: new Date().toISOString()
+    }, { merge: true });
+    return true;
+  } catch (e) {
+    console.error('Error guardando settings/google_chat:', e);
+    return false;
+  }
+}
+
+/**
+ * Envía automáticamente un reporte a un espacio de Google Chat vía Incoming Webhook.
+ * @param {Object} report - Objeto del reporte recién creado
+ */
+export async function sendReportToGoogleChat(report) {
+  if (!report) return { success: false, reason: 'no_report' };
+
+  try {
+    const config = await getGoogleChatWebhookConfig();
+    if (config.enabled === false) {
+      return { success: false, reason: 'disabled' };
+    }
+
+    // Buscar webhook específico para la sede o el general
+    const sedeNorm = (report.sede || '').trim();
+    const webhookUrl = (config.sedesWebhooks && config.sedesWebhooks[sedeNorm]) ||
+                       config.webhookUrl ||
+                       localStorage.getItem(WEBHOOK_STORAGE_KEY) ||
+                       (typeof import.meta !== 'undefined' && import.meta.env?.VITE_GOOGLE_CHAT_WEBHOOK_URL) ||
+                       '';
+
+    if (!webhookUrl || !webhookUrl.startsWith('http')) {
+      console.info('Google Chat Webhook no configurado aún en Causa OS.');
+      return { success: false, reason: 'no_webhook_url' };
+    }
+
+    const { type, submitted_by, sede, cycle_id, stage, created_at, data } = report;
+    const fechaLegible = new Date(created_at || Date.now()).toLocaleString('es-PE', {
+      dateStyle: 'medium',
+      timeStyle: 'short'
+    });
+
+    let headerTitle = 'CREAR PODER SIN LÍMITES';
+    let headerSubtitle = 'Nuevo Reporte Operativo';
+    let widgets = [];
+    let textSummary = '';
+
+    if (type === 'Llamadas') {
+      headerSubtitle = '📞 Reporte Diario de Llamadas';
+      const okNuevos = Number(data?.nuevos_OK) || 0;
+      const okRez = Number(data?.rezagados_OK) || 0;
+      const totalOk = okNuevos + okRez;
+
+      const xcNuevos = Number(data?.nuevos_XC) || 0;
+      const xcRez = Number(data?.rezagados_XC) || 0;
+      const totalXc = xcNuevos + xcRez;
+
+      const ncNuevos = Number(data?.nuevos_NC) || 0;
+      const ncRez = Number(data?.rezagados_NC) || 0;
+      const totalNc = ncNuevos + ncRez;
+
+      const pendNuevos = Number(data?.nuevos_PENDIENTES) || 0;
+      const pendRez = Number(data?.rezagados_PENDIENTES) || 0;
+      const totalPend = pendNuevos + pendRez;
+
+      textSummary = `📢 *CREAR PODER SIN LÍMITES — Reporte de Llamadas*\n` +
+        `👤 *Coordinador(a):* ${submitted_by}\n` +
+        `📍 *Sede:* ${sede} | *Equipo:* ${cycle_id || 'N/A'} | *Etapa:* ${stage || 'N/A'}\n` +
+        `⏰ *Fecha:* ${fechaLegible}\n\n` +
+        `🟢 *CONFIRMADOS (OK):* ${totalOk} (${okNuevos} nuevos · ${okRez} rez.)\n` +
+        `🟡 *POR CONFIRMAR (XC):* ${totalXc} (${xcNuevos} nuevos · ${xcRez} rez.)\n` +
+        `🔴 *NO CONTESTA (NC):* ${totalNc} (${ncNuevos} nuevos · ${ncRez} rez.)\n` +
+        `🔵 *PENDIENTES:* ${totalPend} (${pendNuevos} nuevos · ${pendRez} rez.)`;
+
+      widgets = [
+        {
+          decoratedText: {
+            topLabel: '👤 Coordinador(a)',
+            text: `<b>${submitted_by}</b>`
+          }
+        },
+        {
+          decoratedText: {
+            topLabel: '📍 Sede & Equipo',
+            text: `<b>${sede}</b> • ${cycle_id || 'Global'} • <i>${stage || ''}</i>`
+          }
+        },
+        {
+          decoratedText: {
+            topLabel: '⏰ Fecha y Hora',
+            text: fechaLegible
+          }
+        },
+        {
+          decoratedText: {
+            topLabel: '🟢 CONFIRMADOS (OK)',
+            text: `<font color="#10b981"><b>${totalOk}</b></font> (${okNuevos} nuevos · ${okRez} rez.)`
+          }
+        },
+        {
+          decoratedText: {
+            topLabel: '🟡 POR CONFIRMAR (XC)',
+            text: `<font color="#f59e0b"><b>${totalXc}</b></font> (${xcNuevos} nuevos · ${xcRez} rez.)`
+          }
+        },
+        {
+          decoratedText: {
+            topLabel: '🔴 NO CONTESTA (NC)',
+            text: `<font color="#ef4444"><b>${totalNc}</b></font> (${ncNuevos} nuevos · ${ncRez} rez.)`
+          }
+        },
+        {
+          decoratedText: {
+            topLabel: '🔵 PENDIENTES',
+            text: `<font color="#38bdf8"><b>${totalPend}</b></font> (${pendNuevos} nuevos · ${pendRez} rez.)`
+          }
+        }
+      ];
+    } else if (type === 'ReporteRelampagoFDS') {
+      headerSubtitle = '⚡ Reporte Relámpago Post-FDS (Gerencia)';
+      textSummary = `⚡ *CREAR PODER SIN LÍMITES — Reporte Relámpago Post-FDS*\n` +
+        `👤 *Gerente / Emisor:* ${submitted_by}\n` +
+        `📍 *Sede:* ${sede} | *FDS:* ${data?.fds_tipo || 'N/A'}\n` +
+        `🏆 *Sentados:* ${data?.sentados_inicio || 0} ➔ *Graduados:* ${data?.graduados_cierre || 0}\n` +
+        `📈 *Tasa TRO:* ${data?.tasa_retencion_automatica || 0}%`;
+
+      widgets = [
+        { decoratedText: { topLabel: '👤 Gerente / Emisor', text: `<b>${submitted_by}</b>` } },
+        { decoratedText: { topLabel: '📍 Sede & Tipo', text: `<b>${sede}</b> • ${data?.fds_tipo || 'FDS'}` } },
+        { decoratedText: { topLabel: '🏆 Sentados ➔ Graduados', text: `<b>${data?.sentados_inicio || 0}</b> sentados ➔ <b>${data?.graduados_cierre || 0}</b> graduados` } },
+        { decoratedText: { topLabel: '📈 Tasa Retención Operativa (TRO)', text: `<b>${data?.tasa_retencion_automatica || 0}%</b>` } }
+      ];
+    } else {
+      headerSubtitle = `📋 Reporte: ${type}`;
+      textSummary = `📋 *CREAR PODER SIN LÍMITES — Nuevo Reporte*\n` +
+        `👤 *Emisor:* ${submitted_by}\n` +
+        `📍 *Sede:* ${sede} | *Tipo:* ${type}\n` +
+        `⏰ *Fecha:* ${fechaLegible}`;
+
+      widgets = [
+        { decoratedText: { topLabel: '👤 Emisor', text: `<b>${submitted_by}</b>` } },
+        { decoratedText: { topLabel: '📍 Sede', text: `<b>${sede}</b>` } },
+        { decoratedText: { topLabel: '⏰ Fecha', text: fechaLegible } }
+      ];
+    }
+
+    const payload = {
+      text: textSummary,
+      cardsV2: [
+        {
+          cardId: `rep_${report.id || Date.now()}`,
+          card: {
+            header: {
+              title: headerTitle,
+              subtitle: headerSubtitle,
+              imageUrl: 'https://crearglobal.com/favicon.ico',
+              imageType: 'CIRCLE'
+            },
+            sections: [
+              {
+                widgets: widgets
+              },
+              {
+                widgets: [
+                  {
+                    buttonList: {
+                      buttons: [
+                        {
+                          text: '🚀 Abrir Causa OS',
+                          onClick: {
+                            openLink: {
+                              url: 'https://so-ar-crearpsl.web.app/reportes'
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    };
+
+    const res = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      const errText = await res.text().catch(() => '');
+      console.error(`Google Chat webhook falló (HTTP ${res.status}):`, errText);
+      return { success: false, error: errText };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error enviando reporte a Google Chat:', error);
     return { success: false, error: error.message || String(error) };
   }
 }

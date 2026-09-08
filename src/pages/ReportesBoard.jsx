@@ -9,10 +9,11 @@ import {
   ArrowLeft, FileText, Send, Zap, Clock, ShieldAlert, Sparkles, 
   BarChart3, CheckCircle2, AlertTriangle, Star, RefreshCw, ThumbsUp, 
   ThumbsDown, AlertCircle, Building2, Lock, Unlock, Eye, Database, Download,
-  ChevronDown, ChevronUp, Check, Users, PhoneCall
+  ChevronDown, ChevronUp, Check, Users, PhoneCall, MessageSquare
 } from 'lucide-react';
 import { OPERATIONAL_SEDES } from '../data/usersData';
 import nodusFallbackData from '../data/nodusFallbackData.json';
+import { sendReportToGoogleChat, getGoogleChatWebhookConfig, saveGoogleChatWebhookConfig } from '../services/googleChatService';
 
 // POOL MAESTRO DE 12 PREGUNTAS ROTATIVAS (NODUS & CAUSA OS V1.0)
 const POOL_PREGUNTAS = {
@@ -82,6 +83,77 @@ export default function ReportesBoard() {
   const [nodusEquiposDisponibles, setNodusEquiposDisponibles] = useState([]);
   const [selectedNodusTeam, setSelectedNodusTeam] = useState('auto');
   const [nodusMatchedCoord, setNodusMatchedCoord] = useState(null);
+
+  // Configuración de Webhook Google Chat
+  const [showChatWebhookModal, setShowChatWebhookModal] = useState(false);
+  const [chatWebhookUrl, setChatWebhookUrl] = useState('');
+  const [chatWebhookEnabled, setChatWebhookEnabled] = useState(true);
+  const [testingChatWebhook, setTestingChatWebhook] = useState(false);
+
+  useEffect(() => {
+    getGoogleChatWebhookConfig().then(cfg => {
+      if (cfg?.webhookUrl) setChatWebhookUrl(cfg.webhookUrl);
+      if (cfg?.enabled !== undefined) setChatWebhookEnabled(cfg.enabled);
+    });
+  }, []);
+
+  const handleTestChatWebhook = async () => {
+    if (!chatWebhookUrl.trim()) {
+      showToast('Ingresa primero la URL del Webhook de Google Chat.', 'warning');
+      return;
+    }
+    setTestingChatWebhook(true);
+    try {
+      await saveGoogleChatWebhookConfig({
+        webhookUrl: chatWebhookUrl.trim(),
+        enabled: chatWebhookEnabled
+      });
+
+      const testRep = {
+        id: 'test_' + Date.now(),
+        type: 'Llamadas',
+        submitted_by: currentUser?.displayName || currentUser?.email || 'Diana Yesenia Moscoso Robles',
+        sede: currentUser?.sede || 'Lima',
+        cycle_id: currentCycle?.id || 'LIM-EQ-30',
+        stage: currentStage || 'PRE-MJ',
+        created_at: new Date().toISOString(),
+        data: {
+          nuevos_OK: 4,
+          rezagados_OK: 8,
+          nuevos_XC: 0,
+          rezagados_XC: 0,
+          nuevos_NC: 0,
+          rezagados_NC: 34,
+          nuevos_PENDIENTES: 44,
+          rezagados_PENDIENTES: 67
+        }
+      };
+
+      const res = await sendReportToGoogleChat(testRep);
+      if (res.success) {
+        showToast('¡Reporte de prueba enviado a Google Chat con éxito! Revisa tu espacio.', 'success');
+      } else {
+        showToast(`Google Chat respondió con error: ${res.error || res.reason}`, 'error');
+      }
+    } catch (err) {
+      showToast('Error al conectar con el webhook de Google Chat.', 'error');
+    } finally {
+      setTestingChatWebhook(false);
+    }
+  };
+
+  const handleSaveChatWebhook = async () => {
+    const ok = await saveGoogleChatWebhookConfig({
+      webhookUrl: chatWebhookUrl.trim(),
+      enabled: chatWebhookEnabled
+    });
+    if (ok) {
+      showToast('Configuración de Google Chat guardada exitosamente.', 'success');
+      setShowChatWebhookModal(false);
+    } else {
+      showToast('Error al guardar configuración.', 'error');
+    }
+  };
 
   const handleExtraerDeNodus = async (teamOverride = null) => {
     setLoadingNodus(true);
@@ -334,7 +406,7 @@ export default function ReportesBoard() {
       }
 
       // 1. Guardar en Firestore
-      await addDoc(collection(db, 'reports'), {
+      const newReportRef = await addDoc(collection(db, 'reports'), {
         type: reportType,
         cycle_id: currentCycle?.id || 'CICLO-2026',
         stage: currentStage || 'C1',
@@ -342,6 +414,20 @@ export default function ReportesBoard() {
         sede: currentUser?.sede || formData.sede_id || 'Global',
         created_at: new Date().toISOString(),
         data: finalData
+      });
+
+      // 1.1 Enviar automáticamente al espacio de Google Chat configurado
+      sendReportToGoogleChat({
+        id: newReportRef.id,
+        type: reportType,
+        cycle_id: currentCycle?.id || 'CICLO-2026',
+        stage: currentStage || 'C1',
+        submitted_by: currentUser?.displayName || currentUser?.email || 'Staff Autorizado',
+        sede: currentUser?.sede || formData.sede_id || 'Global',
+        created_at: new Date().toISOString(),
+        data: finalData
+      }).catch(chatErr => {
+        console.warn('Google Chat notification fallback:', chatErr);
       });
 
       // 2. Regla para Llamadas
@@ -1052,9 +1138,33 @@ export default function ReportesBoard() {
       `}</style>
       
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-        <button onClick={() => navigate('/')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem' }}>
-          <ArrowLeft size={18} /> Volver al Inicio
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
+          <button onClick={() => navigate('/')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem' }}>
+            <ArrowLeft size={18} /> Volver al Inicio
+          </button>
+          {canViewEvolucionDashboard && (
+            <button
+              onClick={() => setShowChatWebhookModal(true)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                padding: '0.5rem 1rem',
+                background: chatWebhookUrl ? 'rgba(41, 171, 226, 0.15)' : 'rgba(255, 255, 255, 0.06)',
+                border: chatWebhookUrl ? '1px solid var(--crear-cyan)' : '1px solid rgba(255,255,255,0.2)',
+                color: chatWebhookUrl ? 'var(--crear-cyan)' : 'var(--text-muted)',
+                borderRadius: '8px',
+                fontWeight: 700,
+                fontSize: '0.82rem',
+                cursor: 'pointer'
+              }}
+              title="Configurar webhook para enviar reportes a un espacio de Google Chat"
+            >
+              <MessageSquare size={16} />
+              {chatWebhookUrl ? 'Google Chat Conectado' : 'Conectar Google Chat'}
+            </button>
+          )}
+        </div>
 
         {/* CONMUTADOR DE VISTAS (Solo Directivos y Gerentes) */}
         {canViewEvolucionDashboard ? (
@@ -1556,6 +1666,139 @@ export default function ReportesBoard() {
             </div>
           </div>
 
+        </div>
+      )}
+
+      {/* MODAL DE CONFIGURACIÓN WEBHOOK GOOGLE CHAT */}
+      {showChatWebhookModal && (
+        <div 
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.85)',
+            backdropFilter: 'blur(6px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+            padding: '1rem'
+          }}
+          onClick={() => setShowChatWebhookModal(false)}
+        >
+          <div 
+            className="glass-panel"
+            style={{
+              maxWidth: '560px',
+              width: '100%',
+              padding: '2rem',
+              borderRadius: '16px',
+              border: '1px solid rgba(41, 171, 226, 0.3)',
+              background: '#0a0f1d'
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '1.2rem' }}>
+              <div style={{ background: 'rgba(41, 171, 226, 0.15)', padding: '10px', borderRadius: '12px', color: 'var(--crear-cyan)' }}>
+                <MessageSquare size={26} />
+              </div>
+              <div>
+                <h3 style={{ margin: 0, color: '#fff', fontSize: '1.2rem' }}>Integración con Google Chat</h3>
+                <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                  Envía reportes operativos y de llamadas automáticamente a tu espacio de equipo
+                </p>
+              </div>
+            </div>
+
+            <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', padding: '1rem', marginBottom: '1.5rem', fontSize: '0.8rem', color: '#cbd5e1' }}>
+              <strong style={{ color: 'var(--crear-gold)', display: 'block', marginBottom: '0.4rem' }}>
+                📌 ¿Cómo obtener la URL en 3 pasos rápidos?
+              </strong>
+              <ol style={{ margin: 0, paddingLeft: '1.2rem', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                <li>En Google Chat, abre el espacio donde quieres recibir los reportes.</li>
+                <li>Haz clic en el título del espacio ➔ <b>Configuración de apps e integraciones</b>.</li>
+                <li>Selecciona <b>Webhooks</b> ➔ <b>Agregar webhook</b>, ponle de nombre <i>Causa OS</i> y copia la URL generada.</li>
+              </ol>
+            </div>
+
+            <div style={{ marginBottom: '1.2rem' }}>
+              <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: '0.4rem', fontWeight: 600 }}>
+                URL del Webhook de Google Chat *
+              </label>
+              <input
+                type="url"
+                placeholder="https://chat.googleapis.com/v1/spaces/AAAA.../messages?key=...&token=..."
+                value={chatWebhookUrl}
+                onChange={e => setChatWebhookUrl(e.target.value)}
+                className="form-input"
+                style={{ fontSize: '0.82rem', fontFamily: 'monospace' }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', background: 'rgba(0,0,0,0.3)', padding: '0.8rem 1rem', borderRadius: '8px' }}>
+              <div>
+                <span style={{ color: '#fff', fontSize: '0.85rem', fontWeight: 600, display: 'block' }}>
+                  Envío Automático Activo
+                </span>
+                <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>
+                  Disparar al enviar cada reporte
+                </span>
+              </div>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  checked={chatWebhookEnabled}
+                  onChange={e => setChatWebhookEnabled(e.target.checked)}
+                  style={{ width: '18px', height: '18px', accentColor: 'var(--crear-cyan)' }}
+                />
+                <span style={{ color: chatWebhookEnabled ? '#10b981' : '#64748b', fontSize: '0.8rem', fontWeight: 700 }}>
+                  {chatWebhookEnabled ? 'Habilitado' : 'Pausado'}
+                </span>
+              </label>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                onClick={handleTestChatWebhook}
+                disabled={testingChatWebhook || !chatWebhookUrl.trim()}
+                style={{
+                  padding: '0.6rem 1rem',
+                  borderRadius: '8px',
+                  border: '1px solid rgba(41, 171, 226, 0.4)',
+                  background: 'rgba(41, 171, 226, 0.1)',
+                  color: 'var(--crear-cyan)',
+                  fontSize: '0.82rem',
+                  fontWeight: 700,
+                  cursor: (testingChatWebhook || !chatWebhookUrl.trim()) ? 'not-allowed' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem'
+                }}
+              >
+                {testingChatWebhook ? <RefreshCw size={14} className="spin" /> : <Send size={14} />}
+                Probar Notificación
+              </button>
+
+              <div style={{ display: 'flex', gap: '0.6rem' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowChatWebhookModal(false)}
+                  className="btn-secondary"
+                  style={{ padding: '0.6rem 1rem', fontSize: '0.82rem' }}
+                >
+                  Cerrar
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveChatWebhook}
+                  className="btn-primary"
+                  style={{ padding: '0.6rem 1.2rem', fontSize: '0.82rem', fontWeight: 800 }}
+                >
+                  Guardar Configuración
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
