@@ -286610,7 +286610,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
-import { collection, getDocs, getDoc, updateDoc, doc } from 'firebase/firestore';
+import { collection, getDocs, getDoc, updateDoc, doc, query, orderBy, limit } from 'firebase/firestore';
 import { db, auth, getDocResilient } from '../services/firebase';
 import { CheckCircle2, AlertCircle, ArrowLeft, Users, Target, PhoneCall } from 'lucide-react';
 import CountryFlag from '../components/CountryFlag';
@@ -286921,14 +286921,67 @@ export default function AuditoriaKPIs({ defaultTab }) {
     setLoading(true);
 
     try {
+      let allData = [];
+
+      // 1. Cargar reportes operativos reales enviados desde el Centro de Reportes (Firestore 'reports')
+      try {
+        const reportsSnap = await getDocs(query(collection(db, 'reports'), orderBy('created_at', 'desc'), limit(100)));
+        reportsSnap.docs.forEach(docSnap => {
+          const r = docSnap.data();
+          const data = r.data || {};
+          
+          const statusPills = [];
+          const dynamicMetrics = [];
+          
+          if (r.type === 'Llamadas') {
+            const nuevosOk = Number(data.nuevos_OK || 0);
+            const rezagadosOk = Number(data.rezagados_OK || 0);
+            const totalOk = nuevosOk + rezagadosOk;
+            
+            dynamicMetrics.push({ label: 'Total OK (Confirmados)', value: String(totalOk) });
+            dynamicMetrics.push({ label: 'Nuevos OK', value: String(nuevosOk) });
+            dynamicMetrics.push({ label: 'Rezagados OK', value: String(rezagadosOk) });
+            
+            if (data.rezagados_NC) statusPills.push({ label: 'No Contesta', value: String(data.rezagados_NC) });
+            if (data.rezagados_SIG) statusPills.push({ label: 'Siguiente', value: String(data.rezagados_SIG) });
+            if (data.nuevos_PENDIENTES || data.rezagados_PENDIENTES) {
+              const pend = (Number(data.nuevos_PENDIENTES || 0) + Number(data.rezagados_PENDIENTES || 0));
+              statusPills.push({ label: 'Pendientes', value: String(pend) });
+            }
+          } else {
+            Object.entries(data).forEach(([k, v]) => {
+              if (typeof v === 'number' || typeof v === 'string') {
+                dynamicMetrics.push({ label: k.replace(/_/g, ' '), value: String(v) });
+              }
+            });
+          }
+
+          allData.push({
+            id: docSnap.id,
+            userName: r.submitted_by || 'Coordinadora',
+            coordinator: r.submitted_by || 'Coordinadora',
+            sede: r.sede || 'Lima',
+            role: r.stage === 'MJ' ? 'coord_maestria' : 'coord_c1',
+            status: 'pending',
+            createdAt: r.created_at || new Date().toISOString(),
+            dynamicMetrics,
+            statusPills,
+            tipoReporte: r.type,
+            rawContent: [r.submitted_by, r.sede, r.type]
+          });
+        });
+      } catch (err) {
+        console.warn("Aviso: No se pudo leer collection 'reports':", err);
+      }
+
+      // 2. Cargar snapshot de Nodus
       const nodusRef = doc(db, 'nodus_kpis_sincronizados', 'latest_snapshot');
       const nodusSnap = await getDocResilient(nodusRef);
       
-      let allData = [];
-
       if (nodusSnap.exists()) {
         const snapData = nodusSnap.data();
-        allData = parseNodusData(snapData);
+        const nodusParsed = parseNodusData(snapData);
+        allData = [...allData, ...nodusParsed];
         setResumenGeneral(parseResumenGeneral(snapData));
       } else {
         setResumenGeneral(null);
