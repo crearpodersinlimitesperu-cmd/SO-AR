@@ -32,9 +32,9 @@ const PHASE_META = {
   'MJ': { emoji: '🏆', label: 'MJ', color: '#f59e0b' },
   'POST-MJ': { emoji: '🌅', label: 'POST-MJ', color: '#22c55e' },
 };
-// Roles de coordinación que navegan su checklist por pestañas de fase (catálogo completo),
-// en vez de ver solo la fase activa del ciclo como el resto de roles.
-const COORDINATOR_ROLES_WITH_PHASE_TABS = ['qt', 'coord_c1', 'coord_maestria', 'coordinador'];
+// Roles operativos que navegan su checklist por pestañas de fase (catálogo completo),
+// permitiendo ver y ejecutar tareas cíclicas en cada etapa (C1, C2, MJ).
+const COORDINATOR_ROLES_WITH_PHASE_TABS = ['qt', 'coord_c1', 'coord_maestria', 'coordinador', 'gerente', 'capitan'];
 
 const getCountdownInfo = (deadlineIso, now = new Date()) => {
   if (!deadlineIso) return { label: 'Sin fecha límite', color: '#9ca3af', bg: 'rgba(156,163,175,0.12)', border: '#9ca3af', overdue: false };

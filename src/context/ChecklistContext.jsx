@@ -97,9 +97,14 @@ export function ChecklistProvider({ children }) {
           let sedeStatus = data.status;
           
           if (data.completions) {
-            const mySedeData = data.completions[userSede] || { completed: false, status: 'Pendiente' };
-            sedeCompleted = mySedeData.completed;
-            sedeStatus = mySedeData.status;
+            const cycleKey = currentCycle?.id ? `${userSede}__${currentCycle.id}` : null;
+            const myCycleData = cycleKey ? data.completions[cycleKey] : null;
+            const mySedeData = data.completions[userSede];
+            const effective = (myCycleData && myCycleData.completed !== undefined)
+              ? myCycleData
+              : (mySedeData || { completed: false, status: 'Pendiente' });
+            sedeCompleted = effective.completed;
+            sedeStatus = effective.status;
           }
 
           return {
@@ -180,14 +185,26 @@ export function ChecklistProvider({ children }) {
   const toggleTask = async (taskId, currentStatus) => {
     try {
       const userSede = currentUser?.sede?.trim() || 'Global';
+      const cycleKey = currentCycle?.id ? `${userSede}__${currentCycle.id}` : null;
 
-      // Update both legacy and map formats just in case it's a custom task
-      await writeTaskDoc(taskId, {
+      const updates = {
         completed: !currentStatus,
         status: !currentStatus ? 'Completada' : 'Pendiente',
         [`completions.${userSede}.completed`]: !currentStatus,
-        [`completions.${userSede}.status`]: !currentStatus ? 'Completada' : 'Pendiente'
-      });
+        [`completions.${userSede}.status`]: !currentStatus ? 'Completada' : 'Pendiente',
+        [`completions.${userSede}.updatedAt`]: new Date().toISOString()
+      };
+
+      if (cycleKey) {
+        updates[`completions.${cycleKey}.completed`] = !currentStatus;
+        updates[`completions.${cycleKey}.status`] = !currentStatus ? 'Completada' : 'Pendiente';
+        updates[`completions.${cycleKey}.cycleId`] = currentCycle.id;
+        updates[`completions.${cycleKey}.cycleName`] = currentCycle.name || '';
+        updates[`completions.${cycleKey}.updatedAt`] = new Date().toISOString();
+      }
+
+      // Update both legacy and map formats just in case it's a custom task
+      await writeTaskDoc(taskId, updates);
     } catch (error) {
       console.error("Error updating task:", error);
       showToast("No se pudo actualizar la tarea. Revisa los permisos de Firestore.", "error");
@@ -456,10 +473,16 @@ export function ChecklistProvider({ children }) {
     });
     if (roleTasks.length === 0) return 0;
 
+    const cycleKey = currentCycle?.id ? `${targetSede}__${currentCycle.id}` : null;
+
     const completed = roleTasks.filter(t => {
-      // Si usamos forceSede, revisamos el mapa de completions. Si no, usamos el completed mapeado.
-      if (forceSede && t.completions) {
-        return t.completions[forceSede]?.completed === true;
+      if (t.completions) {
+        if (cycleKey && t.completions[cycleKey] !== undefined) {
+          return t.completions[cycleKey].completed === true;
+        }
+        if (t.completions[targetSede] !== undefined) {
+          return t.completions[targetSede].completed === true;
+        }
       }
       return t.completed || t.status === 'Completada';
     }).length;
