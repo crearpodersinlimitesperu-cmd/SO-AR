@@ -296590,13 +296590,13 @@ import { collection, onSnapshot, addDoc, updateDoc, doc, query, where, orderBy, 
 import { useAuth } from '../context/AuthContext';
 import { useCycles } from '../context/CyclesContext';
 import { useUI } from '../context/UIContext';
-import { ArrowLeft, Target, Settings, GitMerge, Users, UserPlus, Award, CheckCircle2, Plus, Edit3 } from 'lucide-react';
+import { ArrowLeft, Target, Settings, GitMerge, Users, UserPlus, Award, CheckCircle2, Plus, Edit3, Calendar, Clock, Sparkles, Check } from 'lucide-react';
 import GoalDivisionModal from '../components/GoalDivisionModal';
 import { normalizeSede } from '../data/usersData';
 
 export default function GoalsBoard() {
   const { currentUser } = useAuth();
-  const { currentCycle } = useCycles();
+  const { currentCycle, events } = useCycles();
   const { showToast, showPrompt } = useUI();
   const navigate = useNavigate();
   const [goals, setGoals] = useState([]);
@@ -296613,6 +296613,16 @@ export default function GoalsBoard() {
   // Modal de Asignación / División de Metas
   const [selectedGoalForAssignment, setSelectedGoalForAssignment] = useState(null);
   const [showDivisionModal, setShowDivisionModal] = useState(false);
+
+  // Calendarios y Reportes para sincronización y avance automático
+  const [mjCalendars, setMjCalendars] = useState([]);
+  const [coordinatorReports, setCoordinatorReports] = useState([]);
+
+  // Modal Reporte de Sentados en Sala (Gerencia al inicio del entrenamiento)
+  const [showSentadosModal, setShowSentadosModal] = useState(false);
+  const [selectedGoalForSentados, setSelectedGoalForSentados] = useState(null);
+  const [sentadosData, setSentadosData] = useState({ sentados: '', managers: '', apoyos: '', observaciones: '' });
+  const [savingSentados, setSavingSentados] = useState(false);
 
   // Wizard State
   const [showWizard, setShowWizard] = useState(false);
@@ -296698,6 +296708,209 @@ export default function GoalsBoard() {
       clearTimeout(timer);
     };
   }, [currentUser?.sede, currentUser?.isSuperAdmin, currentUser?.appRole, currentUser?.isDireccion]);
+
+  // Escuchar calendarios oficiales de Maestría y reportes de coordinadoras
+  useEffect(() => {
+    let unsubMJ = () => {};
+    let unsubRep = () => {};
+    try {
+      unsubMJ = onSnapshot(collection(db, 'mj_calendars'), (snap) => {
+        setMjCalendars(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      }, (err) => console.warn("Error leyendo mj_calendars:", err));
+
+      const qRep = query(collection(db, 'reports'), orderBy('created_at', 'desc'), limit(50));
+      unsubRep = onSnapshot(qRep, (snap) => {
+        setCoordinatorReports(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      }, (err) => console.warn("Error leyendo reports en GoalsBoard:", err));
+    } catch (e) {
+      console.warn("Error iniciando listeners adicionales:", e);
+    }
+    return () => {
+      unsubMJ();
+      unsubRep();
+    };
+  }, []);
+
+  // Coherencia con el Calendario: obtiene fechas oficiales de la etapa/evento
+  const getGoalCalendarInfo = (goal) => {
+    if (!goal) return null;
+    const titleLower = (goal.title || '').toLowerCase();
+    const sedeNorm = (goal.sede || '').toLowerCase();
+
+    // 1. Calendarios de Maestría (mj_calendars)
+    const calMatch = mjCalendars.find(c => {
+      const cSede = (c.sede || '').toLowerCase();
+      return sedeNorm && (cSede.includes(sedeNorm) || sedeNorm.includes(cSede));
+    });
+
+    if (calMatch && calMatch.fds) {
+      let fdsKey = null;
+      if (titleLower.includes('creación') || titleLower.includes('creacion')) fdsKey = 'creacion';
+      else if (titleLower.includes('relación') || titleLower.includes('relacion')) fdsKey = 'relacion';
+      else if (titleLower.includes('gratitud')) fdsKey = 'gratitud';
+
+      if (fdsKey) {
+        const fds = calMatch.fds.find(f => f.id === fdsKey);
+        if (fds && fds.fechaInicio) {
+          const now = new Date().toISOString().slice(0, 10);
+          const isStarted = now >= fds.fechaInicio;
+          const isPast = fds.fechaFin ? now > fds.fechaFin : false;
+          return {
+            tipo: fds.titulo || fdsKey.toUpperCase(),
+            fechaInicio: fds.fechaInicio,
+            fechaFin: fds.fechaFin,
+            equipo: `${calMatch.equipoNumero ? 'Equipo ' + calMatch.equipoNumero : ''} ${calMatch.equipoNombre || ''}`.trim(),
+            isStarted,
+            isPast
+          };
+        }
+      }
+    }
+
+    // 2. Eventos generales (CyclesContext events)
+    if (events && events.length > 0) {
+      const evMatch = events.find(e => {
+        const evSede = (e.sede || e.sedeTag || e.place || '').toLowerCase();
+        const evNombre = (e.nombre || e.name || '').toLowerCase();
+        const sedeCoincide = !sedeNorm || evSede.includes(sedeNorm) || sedeNorm.includes(evSede);
+        if (!sedeCoincide) return false;
+
+        if (titleLower.includes('capítulo 1') || titleLower.includes('capitulo 1') || titleLower.includes('c1')) {
+          return evNombre.includes('c1') || evNombre.includes('capítulo 1') || evNombre.includes('capitulo 1');
+        }
+        if (titleLower.includes('capítulo 2') || titleLower.includes('capitulo 2') || titleLower.includes('c2')) {
+          return evNombre.includes('c2') || evNombre.includes('capítulo 2') || evNombre.includes('capitulo 2');
+        }
+        return false;
+      });
+
+      if (evMatch) {
+        const fInicio = evMatch.fecha_inicio || evMatch.start;
+        const fFin = evMatch.fecha_fin || evMatch.end;
+        const now = new Date().toISOString().slice(0, 10);
+        const isStarted = fInicio ? now >= fInicio.slice(0, 10) : false;
+        const isPast = fFin ? now > fFin.slice(0, 10) : false;
+        return {
+          tipo: evMatch.nombre || evMatch.name,
+          fechaInicio: fInicio,
+          fechaFin: fFin,
+          equipo: evMatch.equipo || '',
+          isStarted,
+          isPast
+        };
+      }
+    }
+
+    return null;
+  };
+
+  // Avance acumulado desde reportes de coordinadoras
+  const getGoalReportsSummary = (goal) => {
+    if (!goal || !coordinatorReports.length) return null;
+    const sedeNorm = (goal.sede || '').toLowerCase();
+
+    const matchingReports = coordinatorReports.filter(r => {
+      const rSede = (r.sede || r.data?.sede_id || '').toLowerCase();
+      return !sedeNorm || rSede.includes(sedeNorm) || sedeNorm.includes(rSede);
+    });
+
+    let totalOk = 0;
+    let totalReportsCount = 0;
+    let lastCoord = '';
+
+    matchingReports.forEach(r => {
+      if (r.type === 'Llamadas' && r.data) {
+        const ok = (Number(r.data.nuevos_OK) || 0) + (Number(r.data.rezagados_OK) || 0);
+        if (ok > 0) {
+          totalOk += ok;
+          totalReportsCount++;
+          lastCoord = r.submitted_by;
+        }
+      }
+    });
+
+    if (totalOk > 0) {
+      return { totalOk, totalReportsCount, lastCoord };
+    }
+    return null;
+  };
+
+  const handleSyncReportsProgress = async (goal, totalOk) => {
+    try {
+      const targetVal = Number(goal.targetValue || 1);
+      const newProgress = Math.min(100, Math.round((totalOk / targetVal) * 100));
+      const goalRef = doc(db, 'goals', goal.id);
+      await updateDoc(goalRef, {
+        currentValue: totalOk,
+        progress: newProgress,
+        autoSyncedFromReports: true,
+        updatedAt: new Date().toISOString()
+      });
+      await performRollUp(goal.id, newProgress);
+      showToast(`Avance sincronizado con éxito desde Reportes: ${totalOk} OK (${newProgress}%).`, 'success');
+    } catch (err) {
+      console.error(err);
+      showToast('Error al sincronizar avance con reportes.', 'error');
+    }
+  };
+
+  // Guardar Reporte de Sentados en Sala (Gerente / Oficina al iniciar entrenamiento)
+  const handleSaveSentadosReport = async (e) => {
+    e.preventDefault();
+    if (!selectedGoalForSentados || !sentadosData.sentados) {
+      showToast('Por favor ingresa la cantidad de participantes sentados en sala.', 'error');
+      return;
+    }
+    setSavingSentados(true);
+    try {
+      const sentadosNum = Number(sentadosData.sentados) || 0;
+      const targetVal = Number(selectedGoalForSentados.targetValue || 1);
+      const newProgress = Math.min(100, Math.round((sentadosNum / targetVal) * 100));
+
+      // 1. Actualizar la Meta en Firestore
+      const goalRef = doc(db, 'goals', selectedGoalForSentados.id);
+      await updateDoc(goalRef, {
+        currentValue: sentadosNum,
+        progress: newProgress,
+        sentadosReportados: true,
+        sentadosReportedBy: currentUser?.displayName || currentUser?.name || currentUser?.email || 'Gerente',
+        sentadosReportedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+
+      // 2. Registrar en la colección 'reports' como Reporte Oficial de Sentados
+      await addDoc(collection(db, 'reports'), {
+        type: 'ReporteSentadosSala',
+        goal_id: selectedGoalForSentados.id,
+        goal_title: selectedGoalForSentados.title,
+        sede: selectedGoalForSentados.sede || currentUser?.sede || 'Global',
+        cycle_id: currentCycle?.name || selectedGoalForSentados.cyclePhase || 'CICLO-2026',
+        submitted_by: currentUser?.displayName || currentUser?.email || 'Gerencia de Sede',
+        created_at: new Date().toISOString(),
+        data: {
+          sentados: sentadosNum,
+          targetValue: targetVal,
+          cumplimiento_pct: newProgress,
+          managers: sentadosData.managers ? Number(sentadosData.managers) : null,
+          apoyos: sentadosData.apoyos ? Number(sentadosData.apoyos) : null,
+          observaciones: sentadosData.observaciones || ''
+        }
+      });
+
+      // 3. Rollup a meta padre
+      await performRollUp(selectedGoalForSentados.id, newProgress);
+
+      showToast(`✅ Reporte de Sentados registrado: ${sentadosNum} participantes en sala (${newProgress}%).`, 'success');
+      setShowSentadosModal(false);
+      setSentadosData({ sentados: '', managers: '', apoyos: '', observaciones: '' });
+      setSelectedGoalForSentados(null);
+    } catch (err) {
+      console.error("Error guardando reporte de sentados:", err);
+      showToast('Error al registrar reporte de sentados.', 'error');
+    } finally {
+      setSavingSentados(false);
+    }
+  };
 
   const handleWizardChange = (stageId, field, value) => {
     setWizardData(prev => ({
@@ -296962,11 +297175,13 @@ export default function GoalsBoard() {
   const renderGoal = (goal) => {
     const parentGoal = goals.find(g => g.id === goal.parentId);
     const isAssigned = goal.assignedCoordinators && Array.isArray(goal.assignedCoordinators) && goal.assignedCoordinators.length > 0;
+    const calInfo = getGoalCalendarInfo(goal);
+    const repSummary = getGoalReportsSummary(goal);
     
     return (
       <div key={goal.id} className="glass-panel" style={{ padding: '1.5rem', transition: 'all 0.3s ease' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1rem' }}>
-          <div>
+          <div style={{ flex: 1, minWidth: '280px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
               <span style={{ 
                 fontSize: '0.7rem', fontWeight: 'bold', padding: '0.2rem 0.6rem', borderRadius: '4px',
@@ -296982,6 +297197,25 @@ export default function GoalsBoard() {
                   background: 'rgba(255, 255, 255, 0.1)', color: 'var(--text-muted)'
                 }}>
                   📍 {goal.sede}
+                </span>
+              )}
+
+              {/* COHERENCIA CON CALENDARIO OFICIAL */}
+              {calInfo && (
+                <span style={{
+                  fontSize: '0.72rem', fontWeight: 'bold', padding: '0.2rem 0.6rem', borderRadius: '6px',
+                  background: calInfo.isStarted ? 'rgba(34, 197, 94, 0.15)' : 'rgba(56, 189, 248, 0.15)',
+                  color: calInfo.isStarted ? '#22c55e' : '#38bdf8',
+                  border: calInfo.isStarted ? '1px solid rgba(34, 197, 94, 0.35)' : '1px solid rgba(56, 189, 248, 0.3)',
+                  display: 'inline-flex', alignItems: 'center', gap: '4px'
+                }}>
+                  <Calendar size={12} />
+                  <span>{calInfo.tipo}: {calInfo.fechaInicio ? calInfo.fechaInicio.slice(5) : ''} {calInfo.fechaFin ? 'al ' + calInfo.fechaFin.slice(5) : ''}</span>
+                  {calInfo.isStarted && !calInfo.isPast && (
+                    <span style={{ marginLeft: '4px', background: '#22c55e', color: '#000', padding: '1px 5px', borderRadius: '4px', fontSize: '0.62rem', fontWeight: 900 }}>
+                      EN SALA
+                    </span>
+                  )}
                 </span>
               )}
               
@@ -297011,11 +297245,62 @@ export default function GoalsBoard() {
                 </>
               ) : `KPI: ${goal.kpi}`}
             </p>
+
+            {/* AVANCE AUTOMÁTICO DESDE REPORTES DE COORDINADORAS */}
+            {repSummary && !goal.sentadosReportados && (
+              <div style={{ marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '0.75rem', color: '#10b981', background: 'rgba(16, 185, 129, 0.12)', padding: '3px 8px', borderRadius: '6px', border: '1px solid rgba(16, 185, 129, 0.25)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  <Sparkles size={12} /> {repSummary.totalOk} confirmados según reportes de coordinadoras ({repSummary.lastCoord})
+                </span>
+                {(canManageGoals && Number(goal.currentValue || 0) < repSummary.totalOk) && (
+                  <button
+                    type="button"
+                    onClick={() => handleSyncReportsProgress(goal, repSummary.totalOk)}
+                    style={{ background: 'transparent', border: 'none', color: 'var(--crear-cyan)', textDecoration: 'underline', cursor: 'pointer', fontWeight: 700, fontSize: '0.75rem', padding: 0 }}
+                  >
+                    ⚡ Sincronizar al avance ({repSummary.totalOk}/{goal.targetValue})
+                  </button>
+                )}
+              </div>
+            )}
           </div>
 
           {/* BOTONES DE ACCIÓN PARA GERENTES Y DIRECTIVOS */}
           {goal.targetValue && canManageGoals && (
-            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
+              {/* ACCIÓN OPERATIVA: REPORTAR SENTADOS EN SALA */}
+              {goal.sentadosReportados ? (
+                <span style={{ fontSize: '0.78rem', background: 'rgba(16, 185, 129, 0.18)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.35)', padding: '0.45rem 0.8rem', borderRadius: '8px', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                  <CheckCircle2 size={14} /> Sentados en Sala: {goal.currentValue}
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedGoalForSentados(goal);
+                    setShowSentadosModal(true);
+                  }}
+                  className="btn-primary"
+                  style={{
+                    background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                    border: '1px solid #34d399',
+                    color: '#fff',
+                    padding: '0.45rem 0.9rem',
+                    fontSize: '0.8rem',
+                    fontWeight: 800,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.4rem',
+                    boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
+                    cursor: 'pointer'
+                  }}
+                  title="Registrar reporte de participantes sentados en sala al inicio del entrenamiento"
+                >
+                  <Users size={14} />
+                  <span>Registrar Sentados</span>
+                </button>
+              )}
+
               <button 
                 type="button"
                 onClick={() => openAssignmentModal(goal)}
@@ -297302,6 +297587,114 @@ export default function GoalsBoard() {
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1.5rem' }}>
                 <button type="button" className="btn-secondary" onClick={() => setShowDailyModal(false)}>Cancelar</button>
                 <button type="submit" className="btn-primary">Crear Meta</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL REGISTRAR REPORTE DE SENTADOS EN SALA (GERENCIA) */}
+      {showSentadosModal && selectedGoalForSentados && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1100, padding: '1rem' }}>
+          <div className="glass-panel" style={{ width: '100%', maxWidth: '520px', padding: '2rem', border: '1px solid rgba(16, 185, 129, 0.4)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '1rem' }}>
+              <div style={{ background: 'rgba(16, 185, 129, 0.2)', padding: '10px', borderRadius: '10px' }}>
+                <Users size={24} color="#10b981" />
+              </div>
+              <div>
+                <h2 style={{ margin: 0, color: '#10b981', fontSize: '1.35rem' }}>Reporte de Sentados en Sala</h2>
+                <p className="text-muted" style={{ margin: 0, fontSize: '0.82rem' }}>
+                  {selectedGoalForSentados.title} • {selectedGoalForSentados.sede || 'Sede'}
+                </p>
+              </div>
+            </div>
+
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.2rem', lineHeight: 1.4 }}>
+              Ingresa el número real de participantes que se sentaron en sala al inicio del entrenamiento para cerrar y auditar la meta oficial (Meta fijada: <strong style={{ color: '#fff' }}>{selectedGoalForSentados.targetValue}</strong>).
+            </p>
+
+            <form onSubmit={handleSaveSentadosReport} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.4rem', color: '#fff', fontSize: '0.88rem', fontWeight: 700 }}>
+                  Participantes Sentados en Sala (Obligatorio) *
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  required
+                  className="form-input"
+                  value={sentadosData.sentados}
+                  onChange={e => setSentadosData(prev => ({ ...prev, sentados: e.target.value }))}
+                  placeholder={`Ej: ${selectedGoalForSentados.targetValue}`}
+                  style={{ fontSize: '1.2rem', fontWeight: 900, color: '#10b981' }}
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.4rem', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                    Managers Presentes (Opcional)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    className="form-input"
+                    value={sentadosData.managers}
+                    onChange={e => setSentadosData(prev => ({ ...prev, managers: e.target.value }))}
+                    placeholder="Ej: 10"
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.4rem', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                    Apoyos en Mesa (Opcional)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    className="form-input"
+                    value={sentadosData.apoyos}
+                    onChange={e => setSentadosData(prev => ({ ...prev, apoyos: e.target.value }))}
+                    placeholder="Ej: 18"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.4rem', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                  Observaciones / Novedades de Apertura
+                </label>
+                <textarea
+                  className="form-input"
+                  rows="3"
+                  value={sentadosData.observaciones}
+                  onChange={e => setSentadosData(prev => ({ ...prev, observaciones: e.target.value }))}
+                  placeholder="Detalles sobre inicio a tiempo, energía de apertura o incidencias..."
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.8rem', marginTop: '1rem' }}>
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  onClick={() => setShowSentadosModal(false)}
+                  disabled={savingSentados}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="btn-primary"
+                  disabled={savingSentados}
+                  style={{
+                    background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                    border: 'none',
+                    color: '#fff',
+                    fontWeight: 800,
+                    padding: '0.6rem 1.4rem'
+                  }}
+                >
+                  {savingSentados ? 'Guardando...' : 'Confirmar Reporte Oficial'}
+                </button>
               </div>
             </form>
           </div>
@@ -305817,14 +306210,15 @@ export default function ProtocoloEmergencias() {
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../services/firebase';
-import { collection, addDoc, getDocs, getDoc, updateDoc, doc, query, where, orderBy, limit } from 'firebase/firestore';
+import { collection, addDoc, getDocs, getDoc, updateDoc, doc, query, where, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import { useAuth } from '../context/AuthContext';
 import { useCycles } from '../context/CyclesContext';
 import { useUI } from '../context/UIContext';
 import { 
   ArrowLeft, FileText, Send, Zap, Clock, ShieldAlert, Sparkles, 
   BarChart3, CheckCircle2, AlertTriangle, Star, RefreshCw, ThumbsUp, 
-  ThumbsDown, AlertCircle, Building2, Lock, Unlock, Eye, Database, Download
+  ThumbsDown, AlertCircle, Building2, Lock, Unlock, Eye, Database, Download,
+  ChevronDown, ChevronUp, Check, Users, PhoneCall
 } from 'lucide-react';
 import { OPERATIONAL_SEDES } from '../data/usersData';
 import nodusFallbackData from '../data/nodusFallbackData.json';
@@ -305884,6 +306278,12 @@ export default function ReportesBoard() {
   const [relampagoReports, setRelampagoReports] = useState([]);
   const [pulsoReports, setPulsoReports] = useState([]);
   const [loadingDashboard, setLoadingDashboard] = useState(false);
+
+  // Feed en tiempo real de Reportes Diarios para Gerentes y Directivos
+  const [dailyReports, setDailyReports] = useState([]);
+  const [loadingDailyReports, setLoadingDailyReports] = useState(true);
+  const [filterSedeFeed, setFilterSedeFeed] = useState('Todas');
+  const [expandedReportId, setExpandedReportId] = useState(null);
 
   // Sincronización inteligente de Nodus (Cero Pereza)
   const [loadingNodus, setLoadingNodus] = useState(false);
@@ -306047,6 +306447,47 @@ export default function ReportesBoard() {
       console.error("Error fetching dashboard evolucion data:", e);
     } finally {
       setLoadingDashboard(false);
+    }
+  };
+
+  // Inicializar sede del filtro
+  useEffect(() => {
+    if (currentUser?.sede && !isDireccion) {
+      setFilterSedeFeed(currentUser.sede);
+    }
+  }, [currentUser?.sede, isDireccion]);
+
+  // Escuchar reportes en tiempo real para Directivos y Gerentes
+  useEffect(() => {
+    if (!canViewEvolucionDashboard && !isDireccion && !isGerente) return;
+    try {
+      const qReports = query(collection(db, 'reports'), orderBy('created_at', 'desc'), limit(50));
+      const unsub = onSnapshot(qReports, (snapshot) => {
+        const reps = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        setDailyReports(reps);
+        setLoadingDailyReports(false);
+      }, (err) => {
+        console.warn("Error escuchando reports en tiempo real:", err);
+        setLoadingDailyReports(false);
+      });
+      return () => unsub();
+    } catch (err) {
+      console.warn("Error iniciando listener de reports:", err);
+      setLoadingDailyReports(false);
+    }
+  }, [canViewEvolucionDashboard, isDireccion, isGerente]);
+
+  const handleMarkReviewed = async (reportId) => {
+    try {
+      const repRef = doc(db, 'reports', reportId);
+      await updateDoc(repRef, {
+        reviewedBy: currentUser?.displayName || currentUser?.name || currentUser?.email || 'Gerencia',
+        reviewedAt: new Date().toISOString()
+      });
+      showToast('Reporte marcado como auditado/revisado.', 'success');
+    } catch (e) {
+      console.error(e);
+      showToast('Error al marcar reporte como revisado.', 'error');
     }
   };
 
@@ -306774,6 +307215,31 @@ export default function ReportesBoard() {
     return <p className="text-muted">Selecciona un tipo de reporte para ver el formato.</p>;
   };
 
+  const filteredDailyReports = useMemo(() => {
+    return dailyReports.filter(r => {
+      if (!filterSedeFeed || filterSedeFeed === 'Todas') return true;
+      const rSede = (r.sede || r.data?.sede_id || '').toLowerCase();
+      const fSede = filterSedeFeed.toLowerCase();
+      return rSede.includes(fSede) || fSede.includes(rSede);
+    });
+  }, [dailyReports, filterSedeFeed]);
+
+  const formatReportDate = (iso) => {
+    if (!iso) return '';
+    try {
+      const d = new Date(iso);
+      return d.toLocaleString('es-PE', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch {
+      return iso;
+    }
+  };
+
   return (
     <div style={{ maxWidth: '960px', margin: '0 auto', padding: '2rem 1rem' }}>
       <style>{`
@@ -306916,9 +307382,238 @@ export default function ReportesBoard() {
             </div>
           </div>
 
+          {/* BANDEJA DE REPORTES DIARIOS (DIRECTIVOS Y GERENTES) */}
+          {canViewEvolucionDashboard && (
+            <div style={{ marginBottom: '2.5rem', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '1.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.2rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                  <div style={{ background: 'rgba(41, 171, 226, 0.15)', padding: '10px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <FileText size={22} color="var(--crear-cyan, #29abe2)" />
+                  </div>
+                  <div>
+                    <h2 style={{ margin: 0, fontSize: '1.25rem', color: '#fff', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      Reportes Diarios de Coordinadores
+                      <span style={{ fontSize: '0.72rem', background: 'rgba(34, 197, 94, 0.2)', color: '#22c55e', padding: '2px 8px', borderRadius: '12px', fontWeight: 800 }}>
+                        En Vivo
+                      </span>
+                    </h2>
+                    <p style={{ margin: '0.2rem 0 0', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+                      Monitoreo en tiempo real de llamadas, avances y confirmados reportados por los coordinadores de sede.
+                    </p>
+                  </div>
+                </div>
+
+                {/* FILTRO POR SEDE */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 700 }}>Filtrar Sede:</span>
+                  <select
+                    value={filterSedeFeed}
+                    onChange={e => setFilterSedeFeed(e.target.value)}
+                    className="form-input"
+                    style={{ width: 'auto', padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}
+                  >
+                    <option value="Todas">🌐 Todas las Sedes</option>
+                    <option value="Lima">Lima</option>
+                    <option value="Quito">Quito</option>
+                    <option value="Guayaquil">Guayaquil</option>
+                    <option value="Cuenca">Cuenca</option>
+                    <option value="Bogota">Bogotá</option>
+                    <option value="Medellin">Medellín</option>
+                    <option value="Mexico">México</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* LISTA DE REPORTES */}
+              {loadingDailyReports ? (
+                <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
+                  <RefreshCw size={24} className="spin" style={{ margin: '0 auto 0.5rem' }} />
+                  <p style={{ margin: 0, fontSize: '0.85rem' }}>Cargando reportes diarios de coordinadores...</p>
+                </div>
+              ) : filteredDailyReports.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '2.5rem 1rem', background: 'rgba(0,0,0,0.2)', borderRadius: '12px', border: '1px dashed rgba(255,255,255,0.1)' }}>
+                  <CheckCircle2 size={32} color="#64748b" style={{ margin: '0 auto 0.5rem' }} />
+                  <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.9rem' }}>
+                    No hay reportes recientes registrados para <strong>{filterSedeFeed}</strong>.
+                  </p>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
+                  {filteredDailyReports.map(rep => {
+                    const isExpanded = expandedReportId === rep.id;
+                    const d = rep.data || {};
+                    const totalOk = (Number(d.nuevos_OK) || 0) + (Number(d.rezagados_OK) || 0);
+                    const totalXc = (Number(d.nuevos_XC) || 0) + (Number(d.rezagados_XC) || 0);
+                    const totalNc = (Number(d.nuevos_NC) || 0) + (Number(d.rezagados_NC) || 0);
+                    const totalPend = (Number(d.nuevos_PENDIENTES) || 0) + (Number(d.rezagados_PENDIENTES) || 0);
+
+                    return (
+                      <div
+                        key={rep.id}
+                        style={{
+                          background: 'rgba(255,255,255,0.03)',
+                          border: '1px solid rgba(255,255,255,0.07)',
+                          borderRadius: '12px',
+                          padding: '1.1rem 1.3rem',
+                          transition: 'all 0.2s'
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.8rem', marginBottom: '0.8rem' }}>
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                              <span style={{ fontWeight: 800, color: '#fff', fontSize: '1.02rem' }}>
+                                {rep.submitted_by || 'Coordinador(a)'}
+                              </span>
+                              <span style={{ fontSize: '0.72rem', background: 'rgba(255, 193, 7, 0.18)', color: 'var(--crear-gold)', padding: '2px 8px', borderRadius: '10px', fontWeight: 700 }}>
+                                📍 {rep.sede || 'Global'}
+                              </span>
+                              {rep.cycle_id && (
+                                <span style={{ fontSize: '0.72rem', background: 'rgba(41, 171, 226, 0.18)', color: 'var(--crear-cyan)', padding: '2px 8px', borderRadius: '10px', fontWeight: 700 }}>
+                                  {rep.cycle_id}
+                                </span>
+                              )}
+                              {rep.stage && (
+                                <span style={{ fontSize: '0.72rem', background: 'rgba(168, 85, 247, 0.18)', color: '#c084fc', padding: '2px 8px', borderRadius: '10px', fontWeight: 700 }}>
+                                  {rep.stage}
+                                </span>
+                              )}
+                            </div>
+                            <div style={{ color: 'var(--text-muted)', fontSize: '0.78rem', marginTop: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+                              <Clock size={13} /> {formatReportDate(rep.created_at)}
+                              <span>•</span>
+                              <span style={{ color: '#94a3b8' }}>Tipo: <strong>{rep.type === 'Llamadas' ? 'Reporte Diario de Llamadas' : rep.type}</strong></span>
+                            </div>
+                          </div>
+
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                            {rep.reviewedBy ? (
+                              <span style={{ fontSize: '0.75rem', background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '4px 10px', borderRadius: '8px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                                <Check size={14} /> Auditado por {rep.reviewedBy}
+                              </span>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => handleMarkReviewed(rep.id)}
+                                style={{
+                                  background: 'rgba(16, 185, 129, 0.15)',
+                                  border: '1px solid #10b981',
+                                  color: '#10b981',
+                                  borderRadius: '8px',
+                                  padding: '0.4rem 0.8rem',
+                                  fontSize: '0.75rem',
+                                  fontWeight: 800,
+                                  cursor: 'pointer'
+                                }}
+                              >
+                                ✓ Marcar como Visto
+                              </button>
+                            )}
+
+                            <button
+                              type="button"
+                              onClick={() => setExpandedReportId(isExpanded ? null : rep.id)}
+                              style={{
+                                background: 'transparent',
+                                border: '1px solid rgba(255,255,255,0.15)',
+                                color: 'var(--text-muted)',
+                                borderRadius: '8px',
+                                padding: '0.4rem 0.7rem',
+                                fontSize: '0.75rem',
+                                fontWeight: 700,
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.3rem'
+                              }}
+                            >
+                              {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                              {isExpanded ? 'Ocultar' : 'Detalle'}
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* PÍLDORAS DE MÉTRICAS */}
+                        {rep.type === 'Llamadas' && (
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.6rem', marginTop: '0.5rem' }}>
+                            <div style={{ background: 'rgba(16, 185, 129, 0.12)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '8px', padding: '0.5rem 0.8rem' }}>
+                              <div style={{ fontSize: '0.7rem', color: '#10b981', fontWeight: 700 }}>CONFIRMADOS (OK)</div>
+                              <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#10b981' }}>{totalOk}</div>
+                              <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>{d.nuevos_OK || 0} nuevos · {d.rezagados_OK || 0} rez.</div>
+                            </div>
+                            <div style={{ background: 'rgba(245, 158, 11, 0.12)', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '8px', padding: '0.5rem 0.8rem' }}>
+                              <div style={{ fontSize: '0.7rem', color: '#f59e0b', fontWeight: 700 }}>POR CONFIRMAR (XC)</div>
+                              <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#f59e0b' }}>{totalXc}</div>
+                              <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>{d.nuevos_XC || 0} nuevos · {d.rezagados_XC || 0} rez.</div>
+                            </div>
+                            <div style={{ background: 'rgba(239, 68, 68, 0.12)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '8px', padding: '0.5rem 0.8rem' }}>
+                              <div style={{ fontSize: '0.7rem', color: '#ef4444', fontWeight: 700 }}>NO CONTESTA (NC)</div>
+                              <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#ef4444' }}>{totalNc}</div>
+                              <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>{d.nuevos_NC || 0} nuevos · {d.rezagados_NC || 0} rez.</div>
+                            </div>
+                            <div style={{ background: 'rgba(56, 189, 248, 0.12)', border: '1px solid rgba(56, 189, 248, 0.3)', borderRadius: '8px', padding: '0.5rem 0.8rem' }}>
+                              <div style={{ fontSize: '0.7rem', color: '#38bdf8', fontWeight: 700 }}>PENDIENTES</div>
+                              <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#38bdf8' }}>{totalPend}</div>
+                              <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>{d.nuevos_PENDIENTES || 0} nuevos · {d.rezagados_PENDIENTES || 0} rez.</div>
+                            </div>
+                          </div>
+                        )}
+
+                        {rep.type === 'ReporteRelampagoFDS' && (
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.6rem', marginTop: '0.5rem' }}>
+                            <div style={{ background: 'rgba(167, 139, 250, 0.12)', border: '1px solid rgba(167, 139, 250, 0.3)', borderRadius: '8px', padding: '0.5rem 0.8rem' }}>
+                              <div style={{ fontSize: '0.7rem', color: '#a78bfa', fontWeight: 700 }}>RETENCIÓN (TRO)</div>
+                              <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#a78bfa' }}>{d.tasa_retencion_automatica || 0}%</div>
+                            </div>
+                            <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '8px', padding: '0.5rem 0.8rem' }}>
+                              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 700 }}>SENTADOS / GRADUADOS</div>
+                              <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fff' }}>{d.sentados_inicio || 0} / {d.graduados_cierre || 0}</div>
+                            </div>
+                            <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '8px', padding: '0.5rem 0.8rem' }}>
+                              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 700 }}>QUIEBRE</div>
+                              <div style={{ fontSize: '0.9rem', fontWeight: 800, color: d.tipo_quiebre === 'Ninguno' ? '#10b981' : '#ef4444' }}>{d.tipo_quiebre || 'Ninguno'}</div>
+                            </div>
+                          </div>
+                        )}
+
+                        {rep.type === 'ReporteSentadosSala' && (
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.6rem', marginTop: '0.5rem' }}>
+                            <div style={{ background: 'rgba(16, 185, 129, 0.12)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '8px', padding: '0.5rem 0.8rem' }}>
+                              <div style={{ fontSize: '0.7rem', color: '#10b981', fontWeight: 700 }}>SENTADOS EN SALA</div>
+                              <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#10b981' }}>{d.sentados || 0}</div>
+                            </div>
+                            {d.managers && (
+                              <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '8px', padding: '0.5rem 0.8rem' }}>
+                                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 700 }}>MANAGERS</div>
+                                <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fff' }}>{d.managers}</div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* DETALLE EXPANDIBLE */}
+                        {isExpanded && (
+                          <div style={{ marginTop: '0.9rem', paddingTop: '0.8rem', borderTop: '1px solid rgba(255,255,255,0.08)', fontSize: '0.82rem' }}>
+                            <div style={{ color: 'var(--crear-cyan)', fontWeight: 700, marginBottom: '0.4rem' }}>
+                              Desglose Operativo de Gestión:
+                            </div>
+                            <div style={{ background: 'rgba(0,0,0,0.3)', padding: '0.8rem', borderRadius: '8px', fontFamily: 'monospace', fontSize: '0.78rem', color: '#cbd5e1', whiteSpace: 'pre-wrap' }}>
+                              {JSON.stringify(d, null, 2)}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
           {isDireccion ? (
-            <div style={{ padding: '2rem', textAlign: 'center', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
-              <p className="text-muted">Rol de Dirección Global: Monitoreas todos los reportes desde la pestaña <strong>Dashboard Evolución</strong>.</p>
+            <div style={{ padding: '1.5rem', textAlign: 'center', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <p className="text-muted" style={{ margin: 0 }}>
+                Rol de Dirección Global: Puedes analizar la evolución histórica de liderazgo y clima en la pestaña <strong>Dashboard Evolución</strong>.
+              </p>
             </div>
           ) : (
             <form onSubmit={handleSubmit}>

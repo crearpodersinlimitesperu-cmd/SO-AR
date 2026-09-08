@@ -1,14 +1,15 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../services/firebase';
-import { collection, addDoc, getDocs, getDoc, updateDoc, doc, query, where, orderBy, limit } from 'firebase/firestore';
+import { collection, addDoc, getDocs, getDoc, updateDoc, doc, query, where, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import { useAuth } from '../context/AuthContext';
 import { useCycles } from '../context/CyclesContext';
 import { useUI } from '../context/UIContext';
 import { 
   ArrowLeft, FileText, Send, Zap, Clock, ShieldAlert, Sparkles, 
   BarChart3, CheckCircle2, AlertTriangle, Star, RefreshCw, ThumbsUp, 
-  ThumbsDown, AlertCircle, Building2, Lock, Unlock, Eye, Database, Download
+  ThumbsDown, AlertCircle, Building2, Lock, Unlock, Eye, Database, Download,
+  ChevronDown, ChevronUp, Check, Users, PhoneCall
 } from 'lucide-react';
 import { OPERATIONAL_SEDES } from '../data/usersData';
 import nodusFallbackData from '../data/nodusFallbackData.json';
@@ -68,6 +69,12 @@ export default function ReportesBoard() {
   const [relampagoReports, setRelampagoReports] = useState([]);
   const [pulsoReports, setPulsoReports] = useState([]);
   const [loadingDashboard, setLoadingDashboard] = useState(false);
+
+  // Feed en tiempo real de Reportes Diarios para Gerentes y Directivos
+  const [dailyReports, setDailyReports] = useState([]);
+  const [loadingDailyReports, setLoadingDailyReports] = useState(true);
+  const [filterSedeFeed, setFilterSedeFeed] = useState('Todas');
+  const [expandedReportId, setExpandedReportId] = useState(null);
 
   // Sincronización inteligente de Nodus (Cero Pereza)
   const [loadingNodus, setLoadingNodus] = useState(false);
@@ -231,6 +238,47 @@ export default function ReportesBoard() {
       console.error("Error fetching dashboard evolucion data:", e);
     } finally {
       setLoadingDashboard(false);
+    }
+  };
+
+  // Inicializar sede del filtro
+  useEffect(() => {
+    if (currentUser?.sede && !isDireccion) {
+      setFilterSedeFeed(currentUser.sede);
+    }
+  }, [currentUser?.sede, isDireccion]);
+
+  // Escuchar reportes en tiempo real para Directivos y Gerentes
+  useEffect(() => {
+    if (!canViewEvolucionDashboard && !isDireccion && !isGerente) return;
+    try {
+      const qReports = query(collection(db, 'reports'), orderBy('created_at', 'desc'), limit(50));
+      const unsub = onSnapshot(qReports, (snapshot) => {
+        const reps = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        setDailyReports(reps);
+        setLoadingDailyReports(false);
+      }, (err) => {
+        console.warn("Error escuchando reports en tiempo real:", err);
+        setLoadingDailyReports(false);
+      });
+      return () => unsub();
+    } catch (err) {
+      console.warn("Error iniciando listener de reports:", err);
+      setLoadingDailyReports(false);
+    }
+  }, [canViewEvolucionDashboard, isDireccion, isGerente]);
+
+  const handleMarkReviewed = async (reportId) => {
+    try {
+      const repRef = doc(db, 'reports', reportId);
+      await updateDoc(repRef, {
+        reviewedBy: currentUser?.displayName || currentUser?.name || currentUser?.email || 'Gerencia',
+        reviewedAt: new Date().toISOString()
+      });
+      showToast('Reporte marcado como auditado/revisado.', 'success');
+    } catch (e) {
+      console.error(e);
+      showToast('Error al marcar reporte como revisado.', 'error');
     }
   };
 
@@ -958,6 +1006,31 @@ export default function ReportesBoard() {
     return <p className="text-muted">Selecciona un tipo de reporte para ver el formato.</p>;
   };
 
+  const filteredDailyReports = useMemo(() => {
+    return dailyReports.filter(r => {
+      if (!filterSedeFeed || filterSedeFeed === 'Todas') return true;
+      const rSede = (r.sede || r.data?.sede_id || '').toLowerCase();
+      const fSede = filterSedeFeed.toLowerCase();
+      return rSede.includes(fSede) || fSede.includes(rSede);
+    });
+  }, [dailyReports, filterSedeFeed]);
+
+  const formatReportDate = (iso) => {
+    if (!iso) return '';
+    try {
+      const d = new Date(iso);
+      return d.toLocaleString('es-PE', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch {
+      return iso;
+    }
+  };
+
   return (
     <div style={{ maxWidth: '960px', margin: '0 auto', padding: '2rem 1rem' }}>
       <style>{`
@@ -1100,9 +1173,238 @@ export default function ReportesBoard() {
             </div>
           </div>
 
+          {/* BANDEJA DE REPORTES DIARIOS (DIRECTIVOS Y GERENTES) */}
+          {canViewEvolucionDashboard && (
+            <div style={{ marginBottom: '2.5rem', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', padding: '1.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.2rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                  <div style={{ background: 'rgba(41, 171, 226, 0.15)', padding: '10px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <FileText size={22} color="var(--crear-cyan, #29abe2)" />
+                  </div>
+                  <div>
+                    <h2 style={{ margin: 0, fontSize: '1.25rem', color: '#fff', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      Reportes Diarios de Coordinadores
+                      <span style={{ fontSize: '0.72rem', background: 'rgba(34, 197, 94, 0.2)', color: '#22c55e', padding: '2px 8px', borderRadius: '12px', fontWeight: 800 }}>
+                        En Vivo
+                      </span>
+                    </h2>
+                    <p style={{ margin: '0.2rem 0 0', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+                      Monitoreo en tiempo real de llamadas, avances y confirmados reportados por los coordinadores de sede.
+                    </p>
+                  </div>
+                </div>
+
+                {/* FILTRO POR SEDE */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 700 }}>Filtrar Sede:</span>
+                  <select
+                    value={filterSedeFeed}
+                    onChange={e => setFilterSedeFeed(e.target.value)}
+                    className="form-input"
+                    style={{ width: 'auto', padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}
+                  >
+                    <option value="Todas">🌐 Todas las Sedes</option>
+                    <option value="Lima">Lima</option>
+                    <option value="Quito">Quito</option>
+                    <option value="Guayaquil">Guayaquil</option>
+                    <option value="Cuenca">Cuenca</option>
+                    <option value="Bogota">Bogotá</option>
+                    <option value="Medellin">Medellín</option>
+                    <option value="Mexico">México</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* LISTA DE REPORTES */}
+              {loadingDailyReports ? (
+                <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
+                  <RefreshCw size={24} className="spin" style={{ margin: '0 auto 0.5rem' }} />
+                  <p style={{ margin: 0, fontSize: '0.85rem' }}>Cargando reportes diarios de coordinadores...</p>
+                </div>
+              ) : filteredDailyReports.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '2.5rem 1rem', background: 'rgba(0,0,0,0.2)', borderRadius: '12px', border: '1px dashed rgba(255,255,255,0.1)' }}>
+                  <CheckCircle2 size={32} color="#64748b" style={{ margin: '0 auto 0.5rem' }} />
+                  <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.9rem' }}>
+                    No hay reportes recientes registrados para <strong>{filterSedeFeed}</strong>.
+                  </p>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
+                  {filteredDailyReports.map(rep => {
+                    const isExpanded = expandedReportId === rep.id;
+                    const d = rep.data || {};
+                    const totalOk = (Number(d.nuevos_OK) || 0) + (Number(d.rezagados_OK) || 0);
+                    const totalXc = (Number(d.nuevos_XC) || 0) + (Number(d.rezagados_XC) || 0);
+                    const totalNc = (Number(d.nuevos_NC) || 0) + (Number(d.rezagados_NC) || 0);
+                    const totalPend = (Number(d.nuevos_PENDIENTES) || 0) + (Number(d.rezagados_PENDIENTES) || 0);
+
+                    return (
+                      <div
+                        key={rep.id}
+                        style={{
+                          background: 'rgba(255,255,255,0.03)',
+                          border: '1px solid rgba(255,255,255,0.07)',
+                          borderRadius: '12px',
+                          padding: '1.1rem 1.3rem',
+                          transition: 'all 0.2s'
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.8rem', marginBottom: '0.8rem' }}>
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                              <span style={{ fontWeight: 800, color: '#fff', fontSize: '1.02rem' }}>
+                                {rep.submitted_by || 'Coordinador(a)'}
+                              </span>
+                              <span style={{ fontSize: '0.72rem', background: 'rgba(255, 193, 7, 0.18)', color: 'var(--crear-gold)', padding: '2px 8px', borderRadius: '10px', fontWeight: 700 }}>
+                                📍 {rep.sede || 'Global'}
+                              </span>
+                              {rep.cycle_id && (
+                                <span style={{ fontSize: '0.72rem', background: 'rgba(41, 171, 226, 0.18)', color: 'var(--crear-cyan)', padding: '2px 8px', borderRadius: '10px', fontWeight: 700 }}>
+                                  {rep.cycle_id}
+                                </span>
+                              )}
+                              {rep.stage && (
+                                <span style={{ fontSize: '0.72rem', background: 'rgba(168, 85, 247, 0.18)', color: '#c084fc', padding: '2px 8px', borderRadius: '10px', fontWeight: 700 }}>
+                                  {rep.stage}
+                                </span>
+                              )}
+                            </div>
+                            <div style={{ color: 'var(--text-muted)', fontSize: '0.78rem', marginTop: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+                              <Clock size={13} /> {formatReportDate(rep.created_at)}
+                              <span>•</span>
+                              <span style={{ color: '#94a3b8' }}>Tipo: <strong>{rep.type === 'Llamadas' ? 'Reporte Diario de Llamadas' : rep.type}</strong></span>
+                            </div>
+                          </div>
+
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                            {rep.reviewedBy ? (
+                              <span style={{ fontSize: '0.75rem', background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '4px 10px', borderRadius: '8px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                                <Check size={14} /> Auditado por {rep.reviewedBy}
+                              </span>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => handleMarkReviewed(rep.id)}
+                                style={{
+                                  background: 'rgba(16, 185, 129, 0.15)',
+                                  border: '1px solid #10b981',
+                                  color: '#10b981',
+                                  borderRadius: '8px',
+                                  padding: '0.4rem 0.8rem',
+                                  fontSize: '0.75rem',
+                                  fontWeight: 800,
+                                  cursor: 'pointer'
+                                }}
+                              >
+                                ✓ Marcar como Visto
+                              </button>
+                            )}
+
+                            <button
+                              type="button"
+                              onClick={() => setExpandedReportId(isExpanded ? null : rep.id)}
+                              style={{
+                                background: 'transparent',
+                                border: '1px solid rgba(255,255,255,0.15)',
+                                color: 'var(--text-muted)',
+                                borderRadius: '8px',
+                                padding: '0.4rem 0.7rem',
+                                fontSize: '0.75rem',
+                                fontWeight: 700,
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.3rem'
+                              }}
+                            >
+                              {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                              {isExpanded ? 'Ocultar' : 'Detalle'}
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* PÍLDORAS DE MÉTRICAS */}
+                        {rep.type === 'Llamadas' && (
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.6rem', marginTop: '0.5rem' }}>
+                            <div style={{ background: 'rgba(16, 185, 129, 0.12)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '8px', padding: '0.5rem 0.8rem' }}>
+                              <div style={{ fontSize: '0.7rem', color: '#10b981', fontWeight: 700 }}>CONFIRMADOS (OK)</div>
+                              <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#10b981' }}>{totalOk}</div>
+                              <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>{d.nuevos_OK || 0} nuevos · {d.rezagados_OK || 0} rez.</div>
+                            </div>
+                            <div style={{ background: 'rgba(245, 158, 11, 0.12)', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '8px', padding: '0.5rem 0.8rem' }}>
+                              <div style={{ fontSize: '0.7rem', color: '#f59e0b', fontWeight: 700 }}>POR CONFIRMAR (XC)</div>
+                              <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#f59e0b' }}>{totalXc}</div>
+                              <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>{d.nuevos_XC || 0} nuevos · {d.rezagados_XC || 0} rez.</div>
+                            </div>
+                            <div style={{ background: 'rgba(239, 68, 68, 0.12)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '8px', padding: '0.5rem 0.8rem' }}>
+                              <div style={{ fontSize: '0.7rem', color: '#ef4444', fontWeight: 700 }}>NO CONTESTA (NC)</div>
+                              <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#ef4444' }}>{totalNc}</div>
+                              <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>{d.nuevos_NC || 0} nuevos · {d.rezagados_NC || 0} rez.</div>
+                            </div>
+                            <div style={{ background: 'rgba(56, 189, 248, 0.12)', border: '1px solid rgba(56, 189, 248, 0.3)', borderRadius: '8px', padding: '0.5rem 0.8rem' }}>
+                              <div style={{ fontSize: '0.7rem', color: '#38bdf8', fontWeight: 700 }}>PENDIENTES</div>
+                              <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#38bdf8' }}>{totalPend}</div>
+                              <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>{d.nuevos_PENDIENTES || 0} nuevos · {d.rezagados_PENDIENTES || 0} rez.</div>
+                            </div>
+                          </div>
+                        )}
+
+                        {rep.type === 'ReporteRelampagoFDS' && (
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.6rem', marginTop: '0.5rem' }}>
+                            <div style={{ background: 'rgba(167, 139, 250, 0.12)', border: '1px solid rgba(167, 139, 250, 0.3)', borderRadius: '8px', padding: '0.5rem 0.8rem' }}>
+                              <div style={{ fontSize: '0.7rem', color: '#a78bfa', fontWeight: 700 }}>RETENCIÓN (TRO)</div>
+                              <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#a78bfa' }}>{d.tasa_retencion_automatica || 0}%</div>
+                            </div>
+                            <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '8px', padding: '0.5rem 0.8rem' }}>
+                              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 700 }}>SENTADOS / GRADUADOS</div>
+                              <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fff' }}>{d.sentados_inicio || 0} / {d.graduados_cierre || 0}</div>
+                            </div>
+                            <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '8px', padding: '0.5rem 0.8rem' }}>
+                              <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 700 }}>QUIEBRE</div>
+                              <div style={{ fontSize: '0.9rem', fontWeight: 800, color: d.tipo_quiebre === 'Ninguno' ? '#10b981' : '#ef4444' }}>{d.tipo_quiebre || 'Ninguno'}</div>
+                            </div>
+                          </div>
+                        )}
+
+                        {rep.type === 'ReporteSentadosSala' && (
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.6rem', marginTop: '0.5rem' }}>
+                            <div style={{ background: 'rgba(16, 185, 129, 0.12)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '8px', padding: '0.5rem 0.8rem' }}>
+                              <div style={{ fontSize: '0.7rem', color: '#10b981', fontWeight: 700 }}>SENTADOS EN SALA</div>
+                              <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#10b981' }}>{d.sentados || 0}</div>
+                            </div>
+                            {d.managers && (
+                              <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '8px', padding: '0.5rem 0.8rem' }}>
+                                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 700 }}>MANAGERS</div>
+                                <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fff' }}>{d.managers}</div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* DETALLE EXPANDIBLE */}
+                        {isExpanded && (
+                          <div style={{ marginTop: '0.9rem', paddingTop: '0.8rem', borderTop: '1px solid rgba(255,255,255,0.08)', fontSize: '0.82rem' }}>
+                            <div style={{ color: 'var(--crear-cyan)', fontWeight: 700, marginBottom: '0.4rem' }}>
+                              Desglose Operativo de Gestión:
+                            </div>
+                            <div style={{ background: 'rgba(0,0,0,0.3)', padding: '0.8rem', borderRadius: '8px', fontFamily: 'monospace', fontSize: '0.78rem', color: '#cbd5e1', whiteSpace: 'pre-wrap' }}>
+                              {JSON.stringify(d, null, 2)}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
           {isDireccion ? (
-            <div style={{ padding: '2rem', textAlign: 'center', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
-              <p className="text-muted">Rol de Dirección Global: Monitoreas todos los reportes desde la pestaña <strong>Dashboard Evolución</strong>.</p>
+            <div style={{ padding: '1.5rem', textAlign: 'center', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <p className="text-muted" style={{ margin: 0 }}>
+                Rol de Dirección Global: Puedes analizar la evolución histórica de liderazgo y clima en la pestaña <strong>Dashboard Evolución</strong>.
+              </p>
             </div>
           ) : (
             <form onSubmit={handleSubmit}>
