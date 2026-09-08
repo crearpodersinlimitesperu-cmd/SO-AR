@@ -21,6 +21,7 @@ export default function AuditoriaKPIs({ defaultTab }) {
   const [loading, setLoading] = useState(true);
   const [reports, setReports] = useState([]);
   const [resumenGeneral, setResumenGeneral] = useState(null);
+  const [filterStatus, setFilterStatus] = useState('all'); // 'all' | 'pending' | 'reviewed'
     
   // Default to 'Todas' for SuperAdmins, Direccion or Consolidado, otherwise user's home sede
   const initialSede = (() => {
@@ -38,6 +39,24 @@ export default function AuditoriaKPIs({ defaultTab }) {
   const [isScrapingLive, setIsScrapingLive] = useState(false);
   const [activeTab, setActiveTab] = useState(defaultTab || 'coordinadores_nodus'); // 'coordinadores_nodus', 'cmj', 'entrenadores', 'auditoria'
   const sedesDisponibles = ['Todas', ...OPERATIONAL_SEDES];
+
+  // Helper para identificar el envío más reciente por coordinadora y etapa
+  // Esto garantiza una sumatoria coherente sin duplicar números si una coordinadora envía varias veces
+  const tagLatestReports = (list) => {
+    const sorted = [...(list || [])].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+    const seen = new Set();
+    return sorted.map(rep => {
+      const coordName = (rep.userName || rep.coordinator || '').trim().toLowerCase();
+      const coordSede = (rep.sede || '').trim().toLowerCase();
+      const coordStage = (rep.stage || rep.tipoReporte || '').trim().toLowerCase();
+      const key = `${coordName}__${coordSede}__${coordStage}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        return { ...rep, isLatest: true };
+      }
+      return { ...rep, isLatest: false };
+    });
+  };
 
   useEffect(() => {
     fetchReports();
@@ -121,6 +140,7 @@ export default function AuditoriaKPIs({ defaultTab }) {
             }
           }
 
+          const totalOkParsed = parseInt(confirmados) || 0;
           allData.push({
             id: `nodus_${index}`,
             userName: name,
@@ -128,10 +148,14 @@ export default function AuditoriaKPIs({ defaultTab }) {
             coordinator: name,
             sede: sede,
             role: roleStr,
+            stage: roleStr === 'coord_maestria' ? 'MJ' : 'C1',
             gestionesTotal: parseInt(gestiones) || 0,
             asignados: parseInt(asignados) || 0,
             dynamicMetrics: dynamicMetrics,
             statusPills: statusPills,
+            totalOk: totalOkParsed,
+            nuevosOk: totalOkParsed,
+            rezagadosOk: 0,
             status: 'pending',
             createdAt: data.timestamp || new Date().toISOString(),
             rawContent: content
@@ -262,7 +286,7 @@ export default function AuditoriaKPIs({ defaultTab }) {
           const dataTime = data.timestamp ? new Date(data.timestamp).getTime() : 0;
           if (dataTime >= dispatchStartedAt) {
             const parsedData = parseNodusData(data);
-            setReports(parsedData);
+            setReports(tagLatestReports(parsedData));
             setResumenGeneral(parseResumenGeneral(data));
             showToast("Datos de Nodus (filtrados por fecha) actualizados.", "success");
             found = true;
@@ -324,11 +348,14 @@ export default function AuditoriaKPIs({ defaultTab }) {
           
           const statusPills = [];
           const dynamicMetrics = [];
+          let nuevosOk = 0;
+          let rezagadosOk = 0;
+          let totalOk = 0;
           
           if (r.type === 'Llamadas') {
-            const nuevosOk = Number(data.nuevos_OK || 0);
-            const rezagadosOk = Number(data.rezagados_OK || 0);
-            const totalOk = nuevosOk + rezagadosOk;
+            nuevosOk = Number(data.nuevos_OK || 0);
+            rezagadosOk = Number(data.rezagados_OK || 0);
+            totalOk = nuevosOk + rezagadosOk;
             
             dynamicMetrics.push({ label: 'Total OK (Confirmados)', value: String(totalOk) });
             dynamicMetrics.push({ label: 'Nuevos OK', value: String(nuevosOk) });
@@ -348,17 +375,26 @@ export default function AuditoriaKPIs({ defaultTab }) {
             });
           }
 
+          const isRev = r.status === 'reviewed' || !!r.reviewedBy || !!r.reviewed_by;
+
           allData.push({
             id: docSnap.id,
             userName: r.submitted_by || 'Coordinadora',
             coordinator: r.submitted_by || 'Coordinadora',
             sede: r.sede || 'Lima',
+            stage: r.stage || (r.type === 'Llamadas' ? 'C1' : ''),
             role: r.stage === 'MJ' ? 'coord_maestria' : 'coord_c1',
-            status: 'pending',
+            status: isRev ? 'reviewed' : (r.status || 'pending'),
+            reviewedBy: r.reviewedBy || r.reviewed_by || null,
+            reviewedAt: r.reviewedAt || r.reviewed_at || null,
             createdAt: r.created_at || new Date().toISOString(),
             dynamicMetrics,
             statusPills,
             tipoReporte: r.type,
+            totalOk,
+            nuevosOk,
+            rezagadosOk,
+            data,
             rawContent: [r.submitted_by, r.sede, r.type]
           });
         });
@@ -390,16 +426,18 @@ export default function AuditoriaKPIs({ defaultTab }) {
         filtered = filtered.filter(r => r.sede && r.sede.toUpperCase().includes(searchTerm));
       }
 
-      
       // MERGE LOCAL REVIEW STATUS
       const localReviews = getLocalReports();
       filtered = filtered.map(r => {
         const local = localReviews.find(l => l.id === r.id);
-        if (local && local.status === 'reviewed') {
-          return { ...r, status: 'reviewed', reviewedBy: local.reviewedBy, reviewedAt: local.reviewedAt };
+        if (local && local.status) {
+          return { ...r, status: local.status, reviewedBy: local.reviewedBy, reviewedAt: local.reviewedAt };
         }
         return r;
       });
+
+      // Tag latest report per coordinator and stage for coherent sum
+      filtered = tagLatestReports(filtered);
 
       setReports(filtered);
     } catch (error) {
@@ -414,51 +452,69 @@ export default function AuditoriaKPIs({ defaultTab }) {
     setLoading(false);
   };
 
-  const handleMarkAsReviewed = async (reportId) => {
+  const handleToggleReviewed = async (reportId, currentStatus) => {
+    const isCurrentlyReviewed = currentStatus === 'reviewed';
+    const nextStatus = isCurrentlyReviewed ? 'pending' : 'reviewed';
     const reviewerName = currentUser?.name || currentUser?.displayName || 'Dirección / Gerencia';
     const nowIso = new Date().toISOString();
 
     // Actualizar localmente de inmediato
     const updated = reports.map(r => r.id === reportId ? {
       ...r,
-      status: 'reviewed',
-      reviewedBy: reviewerName,
-      reviewedAt: nowIso
+      status: nextStatus,
+      reviewedBy: nextStatus === 'reviewed' ? reviewerName : null,
+      reviewedAt: nextStatus === 'reviewed' ? nowIso : null
     } : r);
     setReports(updated);
 
     let allLocal = getLocalReports();
     const existing = allLocal.find(r => r.id === reportId);
     if (existing) {
-      existing.status = 'reviewed';
-      existing.reviewedBy = reviewerName;
-      existing.reviewedAt = nowIso;
+      existing.status = nextStatus;
+      existing.reviewedBy = nextStatus === 'reviewed' ? reviewerName : null;
+      existing.reviewedAt = nextStatus === 'reviewed' ? nowIso : null;
     } else {
-      allLocal.push({ id: reportId, status: 'reviewed', reviewedBy: reviewerName, reviewedAt: nowIso });
+      allLocal.push({ id: reportId, status: nextStatus, reviewedBy: nextStatus === 'reviewed' ? reviewerName : null, reviewedAt: nextStatus === 'reviewed' ? nowIso : null });
     }
     saveLocalReports(allLocal);
 
-    showToast("Reporte marcado como revisado", "success");
+    showToast(nextStatus === 'reviewed' ? "Reporte marcado como revisado" : "Reporte regresado a pendiente", "success");
 
     // Intentar sync en Firestore en background
     try {
-      await updateDoc(doc(db, 'kpi_reports', reportId), {
-        status: 'reviewed',
-        reviewedBy: reviewerName,
-        reviewedAt: new Date()
+      await updateDoc(doc(db, 'reports', reportId), {
+        status: nextStatus,
+        reviewedBy: nextStatus === 'reviewed' ? reviewerName : null,
+        reviewed_by: nextStatus === 'reviewed' ? reviewerName : null,
+        reviewedAt: nextStatus === 'reviewed' ? new Date() : null
       });
+    } catch (_) {
+      try {
+        await updateDoc(doc(db, 'kpi_reports', reportId), {
+          status: nextStatus,
+          reviewedBy: nextStatus === 'reviewed' ? reviewerName : null,
+          reviewedAt: nextStatus === 'reviewed' ? new Date() : null
+        });
+      } catch (e) {
+        console.warn("Aviso Firestore al actualizar reporte:", e);
+      }
+    }
+
+    try {
       await recordAuditEvent({
         email: currentUser?.email || 'admin',
         name: reviewerName,
         role: currentUser?.appRole || 'gerente',
         sede: currentUser?.sede || 'Global',
-        action: 'AUDITORIA_KPI_REVISADO',
-        details: `Reporte ${reportId} aprobado y auditado por ${reviewerName}`
+        action: nextStatus === 'reviewed' ? 'AUDITORIA_KPI_REVISADO' : 'AUDITORIA_KPI_REABIERTO',
+        details: `Reporte ${reportId} ${nextStatus === 'reviewed' ? 'aprobado y auditado' : 'reabierto a pendiente'} por ${reviewerName}`
       });
     } catch (e) {
-      console.warn("Aviso Firestore al actualizar reporte:", e);
+      console.warn("Aviso auditoría:", e);
     }
   };
+
+  const handleMarkAsReviewed = (reportId) => handleToggleReviewed(reportId, 'pending');
 
   // Helpers de visualización
   const renderC1Data = (report = {}) => {
@@ -727,7 +783,7 @@ export default function AuditoriaKPIs({ defaultTab }) {
             </pre>
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1rem' }}>
           <div>
             <h2 style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', fontSize: '1.7rem', margin: '0 0 0.4rem 0', fontWeight: 800, color: 'var(--text-heading, #0f172a)' }}>
               <Target color="#f59e0b" /> Auditoría de KPIs
@@ -740,6 +796,108 @@ export default function AuditoriaKPIs({ defaultTab }) {
             {reports.length} {reports.length === 1 ? 'Reporte registrado' : 'Reportes registrados'}
           </div>
         </div>
+
+        {/* Pestañas de Filtrado por Estado: Todos / Pendientes por Revisar / Revisados */}
+        {(() => {
+          const pendingCount = reports.filter(r => r.status !== 'reviewed').length;
+          const reviewedCount = reports.filter(r => r.status === 'reviewed').length;
+
+          return (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                onClick={() => setFilterStatus('all')}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.55rem 1.1rem',
+                  borderRadius: '24px',
+                  fontSize: '0.88rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  border: '1px solid',
+                  borderColor: filterStatus === 'all' ? '#3b82f6' : 'var(--border-subtle, #cbd5e1)',
+                  background: filterStatus === 'all' ? '#3b82f6' : 'var(--bg-card, #ffffff)',
+                  color: filterStatus === 'all' ? '#ffffff' : 'var(--text-main, #334155)',
+                  boxShadow: filterStatus === 'all' ? '0 3px 10px rgba(59,130,246,0.35)' : '0 1px 3px rgba(0,0,0,0.04)',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <span>📋 Todos</span>
+                <span style={{
+                  background: filterStatus === 'all' ? 'rgba(255,255,255,0.25)' : 'var(--bg-card-hover, #f1f5f9)',
+                  padding: '2px 8px',
+                  borderRadius: '12px',
+                  fontSize: '0.78rem',
+                  fontWeight: 800
+                }}>{reports.length}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setFilterStatus('pending')}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.55rem 1.1rem',
+                  borderRadius: '24px',
+                  fontSize: '0.88rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  border: '1px solid',
+                  borderColor: filterStatus === 'pending' ? '#f59e0b' : 'var(--border-subtle, #cbd5e1)',
+                  background: filterStatus === 'pending' ? '#f59e0b' : 'var(--bg-card, #ffffff)',
+                  color: filterStatus === 'pending' ? '#ffffff' : 'var(--text-main, #334155)',
+                  boxShadow: filterStatus === 'pending' ? '0 3px 10px rgba(245,158,11,0.35)' : '0 1px 3px rgba(0,0,0,0.04)',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <span>⏳ Pendientes por Revisar</span>
+                <span style={{
+                  background: filterStatus === 'pending' ? 'rgba(255,255,255,0.25)' : '#fef3c7',
+                  color: filterStatus === 'pending' ? '#ffffff' : '#92400e',
+                  padding: '2px 8px',
+                  borderRadius: '12px',
+                  fontSize: '0.78rem',
+                  fontWeight: 800
+                }}>{pendingCount}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setFilterStatus('reviewed')}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.55rem 1.1rem',
+                  borderRadius: '24px',
+                  fontSize: '0.88rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  border: '1px solid',
+                  borderColor: filterStatus === 'reviewed' ? '#10b981' : 'var(--border-subtle, #cbd5e1)',
+                  background: filterStatus === 'reviewed' ? '#10b981' : 'var(--bg-card, #ffffff)',
+                  color: filterStatus === 'reviewed' ? '#ffffff' : 'var(--text-main, #334155)',
+                  boxShadow: filterStatus === 'reviewed' ? '0 3px 10px rgba(16,185,129,0.35)' : '0 1px 3px rgba(0,0,0,0.04)',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <span>✅ Revisados</span>
+                <span style={{
+                  background: filterStatus === 'reviewed' ? 'rgba(255,255,255,0.25)' : '#dcfce7',
+                  color: filterStatus === 'reviewed' ? '#ffffff' : '#166534',
+                  padding: '2px 8px',
+                  borderRadius: '12px',
+                  fontSize: '0.78rem',
+                  fontWeight: 800
+                }}>{reviewedCount}</span>
+              </button>
+            </div>
+          );
+        })()}
 
         {/* (02/09/2026) Resumen general Capítulo 1 / Capítulo 2 / Maestría —
             pedido de José. Viene de secciones.dashboardPrincipal (tabla
@@ -782,74 +940,196 @@ export default function AuditoriaKPIs({ defaultTab }) {
           </p>
         )}
 
-        {loading ? (
-          <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--crear-gold, #f59e0b)', fontWeight: 600 }}>Cargando reportes de KPIs...</div>
-        ) : reports.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted, #64748b)' }}>No hay reportes de KPIs en la sede seleccionada.</div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-            {Array.from(groupBySede(reports)).map(([sedeLabel, repsInSede]) => (
-            <div key={sedeLabel}>
-              <h3 style={{
-                display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 0 1rem',
-                fontSize: '1rem', fontWeight: 800, color: 'var(--crear-gold, #f59e0b)',
-                borderBottom: '1px solid var(--border-subtle, #e2e8f0)', paddingBottom: '0.5rem'
-              }}>
-                <CountryFlag sede={sedeLabel} /> {sedeLabel}
-                <span style={{ fontWeight: 500, fontSize: '0.8rem', color: 'var(--text-muted, #64748b)' }}>
-                  ({repsInSede.length} {repsInSede.length === 1 ? 'coordinador' : 'coordinadores'})
-                </span>
-              </h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              {repsInSede.map(rep => (
-              <div key={rep.id} style={{
-                background: rep.status === 'reviewed' ? 'rgba(16, 185, 129, 0.04)' : 'var(--bg-card, #ffffff)',
-                border: '1px solid',
-                borderColor: rep.status === 'reviewed' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(245, 158, 11, 0.3)',
-                borderRadius: '12px',
-                padding: '1.5rem',
-                boxShadow: '0 2px 6px rgba(0,0,0,0.03)'
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', borderBottom: '1px solid var(--border-subtle, #e2e8f0)', paddingBottom: '1rem' }}>
-                  <div>
-                    <h3 style={{ margin: '0 0 0.35rem', color: 'var(--text-heading, #0f172a)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800 }}>
-                      <Users size={18} color="#f59e0b" /> {rep.userName} 
-                      <span style={{ fontSize: '0.75rem', background: '#e0f2fe', color: '#0369a1', padding: '2px 8px', borderRadius: '12px', display: 'inline-flex', alignItems: 'center', gap: '0.2rem', fontWeight: 700 }}>
-                        <CountryFlag sede={rep.sede} /> {rep.sede}
-                      </span>
-                    </h3>
-                    <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted, #64748b)' }}>
-                      {rep.role === 'qt' ? 'Quantum Team' : rep.role === 'coord_maestria' ? 'Coordinador de Maestría' : 'Coordinador C1/C2'} • Enviado: {formatDate(rep.createdAt)}
-                    </p>
-                  </div>
-                  <div>
-                    {rep.status === 'reviewed' ? (
-                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', color: '#10b981', fontWeight: 800, fontSize: '0.9rem' }}>
-                          <CheckCircle2 size={18} /> Revisado
+        {(() => {
+          const displayedReports = reports.filter(r => {
+            if (filterStatus === 'pending') return r.status !== 'reviewed';
+            if (filterStatus === 'reviewed') return r.status === 'reviewed';
+            return true;
+          });
+
+          if (loading) {
+            return (
+              <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--crear-gold, #f59e0b)', fontWeight: 600 }}>
+                Cargando reportes de KPIs...
+              </div>
+            );
+          }
+
+          if (reports.length === 0) {
+            return (
+              <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted, #64748b)' }}>
+                No hay reportes de KPIs en la sede seleccionada.
+              </div>
+            );
+          }
+
+          if (displayedReports.length === 0) {
+            return (
+              <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted, #64748b)', background: 'var(--bg-card-hover, #f8fafc)', borderRadius: '12px', border: '1px dashed var(--border-subtle, #cbd5e1)', margin: '1rem 0' }}>
+                <p style={{ margin: '0 0 0.5rem', fontWeight: 700, fontSize: '1.05rem', color: 'var(--text-heading, #0f172a)' }}>
+                  No hay reportes en la pestaña "{filterStatus === 'pending' ? 'Pendientes por Revisar' : 'Revisados'}"
+                </p>
+                <p style={{ margin: 0, fontSize: '0.88rem' }}>
+                  Puedes cambiar a <strong>"📋 Todos"</strong> para revisar el historial completo.
+                </p>
+              </div>
+            );
+          }
+
+          return (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
+              {Array.from(groupBySede(displayedReports)).map(([sedeLabel, repsInSede]) => {
+                // Cálculo de Sumatoria Coherente (solo toma el último envío vigente de cada coordinadora)
+                const latestReps = repsInSede.filter(r => r.isLatest);
+                const totalOkVigente = latestReps.reduce((acc, r) => acc + (Number(r.totalOk) || 0), 0);
+                const nuevosOkVigente = latestReps.reduce((acc, r) => acc + (Number(r.nuevosOk) || 0), 0);
+                const rezagadosOkVigente = latestReps.reduce((acc, r) => acc + (Number(r.rezagadosOk) || 0), 0);
+                const uniqueCoords = Array.from(new Set(repsInSede.map(r => (r.userName || r.coordinator || '').trim()))).filter(Boolean);
+
+                return (
+                  <div key={sedeLabel}>
+                    <div style={{
+                      display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem',
+                      borderBottom: '1px solid var(--border-subtle, #e2e8f0)', paddingBottom: '0.6rem', margin: '0 0 1rem'
+                    }}>
+                      <h3 style={{
+                        display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0,
+                        fontSize: '1.1rem', fontWeight: 800, color: 'var(--crear-gold, #f59e0b)'
+                      }}>
+                        <CountryFlag sede={sedeLabel} /> {sedeLabel}
+                        <span style={{ fontWeight: 600, fontSize: '0.82rem', color: 'var(--text-muted, #64748b)' }}>
+                          ({uniqueCoords.length} {uniqueCoords.length === 1 ? 'coordinadora' : 'coordinadoras'} • {repsInSede.length} {repsInSede.length === 1 ? 'reporte' : 'reportes'})
                         </span>
-                        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted, #64748b)' }}>Por {rep.reviewedBy}</span>
+                      </h3>
+                    </div>
+
+                    {/* Banner de Sumatoria Coherente de la Sede */}
+                    <div style={{
+                      background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(59, 130, 246, 0.05) 100%)',
+                      border: '1px solid rgba(245, 158, 11, 0.3)',
+                      borderRadius: '12px',
+                      padding: '1rem 1.25rem',
+                      marginBottom: '1.25rem',
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      gap: '1rem'
+                    }}>
+                      <div>
+                        <div style={{ fontWeight: 800, fontSize: '0.92rem', color: 'var(--text-heading, #0f172a)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                          📊 Sumatoria Coherente de la Sede
+                          <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#0369a1', background: '#e0f2fe', padding: '2px 8px', borderRadius: '10px' }}>
+                            Sin duplicar reenvíos
+                          </span>
+                        </div>
+                        <div style={{ fontSize: '0.8rem', color: 'var(--text-muted, #64748b)', marginTop: '0.25rem' }}>
+                          Suma automática basada en el último envío vigente de cada coordinadora ({latestReps.length} vigentes, {repsInSede.length - latestReps.length} históricos guardados).
+                        </div>
                       </div>
-                    ) : (
-                      <button 
-                        onClick={() => handleMarkAsReviewed(rep.id)}
-                        className="btn-neon-action" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', fontSize: '0.85rem', fontWeight: 700, borderRadius: '8px', background: '#3b82f6', color: '#ffffff', border: 'none', cursor: 'pointer' }}
-                      >
-                        <CheckCircle2 size={16} /> Marcar como Revisado
-                      </button>
-                    )}
+                      <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+                        <div style={{ background: '#ecfdf5', border: '1px solid #a7f3d0', padding: '0.4rem 0.85rem', borderRadius: '8px', textAlign: 'center' }}>
+                          <div style={{ fontSize: '0.7rem', color: '#065f46', fontWeight: 800, textTransform: 'uppercase' }}>Total OK (Vigente)</div>
+                          <div style={{ fontSize: '1.3rem', fontWeight: 900, color: '#047857' }}>{totalOkVigente}</div>
+                        </div>
+                        <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', padding: '0.4rem 0.85rem', borderRadius: '8px', textAlign: 'center' }}>
+                          <div style={{ fontSize: '0.7rem', color: '#1e40af', fontWeight: 800, textTransform: 'uppercase' }}>Nuevos OK</div>
+                          <div style={{ fontSize: '1.3rem', fontWeight: 900, color: '#1d4ed8' }}>{nuevosOkVigente}</div>
+                        </div>
+                        <div style={{ background: '#fef3c7', border: '1px solid #fde68a', padding: '0.4rem 0.85rem', borderRadius: '8px', textAlign: 'center' }}>
+                          <div style={{ fontSize: '0.7rem', color: '#92400e', fontWeight: 800, textTransform: 'uppercase' }}>Rezagados OK</div>
+                          <div style={{ fontSize: '1.3rem', fontWeight: 900, color: '#b45309' }}>{rezagadosOkVigente}</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                      {repsInSede.map(rep => (
+                        <div key={rep.id} style={{
+                          background: rep.status === 'reviewed' ? 'rgba(16, 185, 129, 0.04)' : 'var(--bg-card, #ffffff)',
+                          border: '1px solid',
+                          borderColor: rep.status === 'reviewed' ? 'rgba(16, 185, 129, 0.35)' : 'rgba(245, 158, 11, 0.35)',
+                          borderRadius: '12px',
+                          padding: '1.5rem',
+                          boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
+                          opacity: rep.isLatest ? 1 : 0.88,
+                          position: 'relative'
+                        }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', borderBottom: '1px solid var(--border-subtle, #e2e8f0)', paddingBottom: '1rem' }}>
+                            <div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.35rem' }}>
+                                <h3 style={{ margin: 0, color: 'var(--text-heading, #0f172a)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800, fontSize: '1.15rem' }}>
+                                  <Users size={18} color="#f59e0b" /> {rep.userName} 
+                                  <span style={{ fontSize: '0.75rem', background: '#e0f2fe', color: '#0369a1', padding: '2px 8px', borderRadius: '12px', display: 'inline-flex', alignItems: 'center', gap: '0.2rem', fontWeight: 700 }}>
+                                    <CountryFlag sede={rep.sede} /> {rep.sede}
+                                  </span>
+                                </h3>
+                                {rep.isLatest ? (
+                                  <span style={{ fontSize: '0.72rem', background: '#dcfce7', color: '#166534', border: '1px solid #86efac', padding: '2px 8px', borderRadius: '12px', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                                    ⚡ Envío Vigente
+                                  </span>
+                                ) : (
+                                  <span style={{ fontSize: '0.72rem', background: '#f1f5f9', color: '#475569', border: '1px solid #cbd5e1', padding: '2px 8px', borderRadius: '12px', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                                    📋 Envío Anterior (Histórico)
+                                  </span>
+                                )}
+                              </div>
+                              <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--text-muted, #64748b)' }}>
+                                {rep.role === 'qt' ? 'Quantum Team' : rep.role === 'coord_maestria' ? 'Coordinador de Maestría' : 'Coordinador C1/C2'} • Enviado: {formatDate(rep.createdAt)}
+                              </p>
+                            </div>
+
+                            <div>
+                              {rep.status === 'reviewed' ? (
+                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.25rem' }}>
+                                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', color: '#10b981', fontWeight: 800, fontSize: '0.9rem' }}>
+                                    <CheckCircle2 size={18} /> Revisado
+                                  </span>
+                                  {rep.reviewedBy && (
+                                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted, #64748b)' }}>
+                                      Por {rep.reviewedBy}
+                                    </span>
+                                  )}
+                                  <button
+                                    type="button"
+                                    onClick={() => handleToggleReviewed(rep.id, rep.status)}
+                                    title="Regresar este reporte a pendiente por revisar"
+                                    style={{
+                                      background: 'none',
+                                      border: 'none',
+                                      color: 'var(--text-muted, #94a3b8)',
+                                      fontSize: '0.72rem',
+                                      cursor: 'pointer',
+                                      textDecoration: 'underline',
+                                      padding: '2px 0',
+                                      marginTop: '2px'
+                                    }}
+                                  >
+                                    Desmarcar revisión
+                                  </button>
+                                </div>
+                              ) : (
+                                <button 
+                                  onClick={() => handleToggleReviewed(rep.id, rep.status)}
+                                  className="btn-neon-action" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', fontSize: '0.85rem', fontWeight: 700, borderRadius: '8px', background: '#3b82f6', color: '#ffffff', border: 'none', cursor: 'pointer' }}
+                                >
+                                  <CheckCircle2 size={16} /> Marcar como Revisado
+                                </button>
+                              )}
+                            </div>
+                          </div>
+
+                          {rep.role === 'coord_c1' ? renderC1Data(rep) : rep.role === 'coord_maestria' ? renderMaestriaData(rep) : renderQTData(rep)}
+
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-
-                {rep.role === 'coord_c1' ? renderC1Data(rep) : rep.role === 'coord_maestria' ? renderMaestriaData(rep) : renderQTData(rep)}
-
-              </div>
-              ))}
-              </div>
+                );
+              })}
             </div>
-            ))}
-          </div>
-        )}
+          );
+        })()}
       </div>
       </>
       )}
