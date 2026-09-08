@@ -462,9 +462,33 @@ export const OFFICIAL_PERMISSION_MATRIX = {
     directivos: 'GLOBAL',
     gerente: 'GLOBAL'
   },
+  // 'sistema_cartas': módulo confirmado por José (08/09/2026) como GENUINAMENTE
+  // DISTINTO de "Monitor de Vuelos" ("Son dos cosas distintas de verdad"), aunque
+  // hoy comparten página/ruta (/monitor-vuelos) en el código. Se deja esta entrada
+  // de la matriz documentada, pero NINGÚN botón la usa todavía — separarla en una
+  // vista propia es un cambio de producto más grande, pendiente de alcance con José.
   'sistema_cartas': {
     directivos: 'GLOBAL',
     gerente: 'GLOBAL'
+  },
+  // 'monitor_vuelos': fila "✈️ Monitor de Vuelos" de la Matriz Oficial. Antes,
+  // canAccessMonitorVuelos() leía por error la entrada 'sistema_cartas' (ver nota
+  // arriba) — corregido para usar esta entrada propia (08/09/2026).
+  'monitor_vuelos': {
+    directivos: 'GLOBAL',
+    gerente: 'SEDE'
+  },
+  // 'monitor_imos': fila "🦅 Monitor de IMOs" de la Matriz Oficial. Antes compartía
+  // gate con Monitor de Vuelos (vía canAccessMonitorVuelos/'sistema_cartas'), lo
+  // cual excluía indebidamente a Coordinadores C1Y2 y de MJ. Corregido con su
+  // propia entrada (08/09/2026). El alcance "SOLO LIMA" es un scope declarativo —
+  // no hay enforcement real de sede en el cliente ni en firestore.rules todavía
+  // (Fase 2, fuera de alcance de esta ronda).
+  'monitor_imos': {
+    directivos: 'GLOBAL',
+    gerente: 'SEDE_LIMA',
+    coord_c1: 'SEDE_LIMA',
+    coord_maestria: 'SEDE_LIMA'
   },
   'copilot': {
     directivos: 'GLOBAL',
@@ -498,15 +522,17 @@ export const OFFICIAL_PERMISSION_MATRIX = {
     aliado: 'WHATSAPP',
     manager: 'WHATSAPP'
   },
+  // 'flyers_c1': confirmado explícitamente por José (08/09/2026) que Directivos
+  // NO tienen acceso — se removió la clave 'directivos' (antes era 'GLOBAL').
   'flyers_c1': {
-    directivos: 'GLOBAL',
     gerente: 'GLOBAL',
     coord_c1: 'GLOBAL',
     coord_maestria: 'GLOBAL'
   },
+  // 'calendario_mj': confirmado explícitamente por José (08/09/2026, "sí, así es
+  // correcto") que SOLO Coordinadores de MJ tienen acceso — se removieron las
+  // claves 'directivos' y 'gerente' (antes GLOBAL y SEDE respectivamente).
   'calendario_mj': {
-    directivos: 'GLOBAL',
-    gerente: 'SEDE',
     coord_maestria: 'GLOBAL'
   },
   'agenda_timeboxing': {
@@ -525,14 +551,18 @@ export const OFFICIAL_PERMISSION_MATRIX = {
  */
 export const checkModuleAccess = (currentUser, moduleKey) => {
   if (!currentUser) return { hasAccess: false, scope: 'NONE' };
-  
+
   // Super Admin tiene acceso GLOBAL a todo
   if (currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email)) {
     return { hasAccess: true, scope: 'GLOBAL' };
   }
 
   const role = currentUser.appRole || 'participante';
-  const isDir = isDireccionRole(role) || currentUser.isDireccion;
+  // director_maestria se trata como Directivos en TODA la plataforma, confirmado
+  // explícitamente por José (08/09/2026: "Como Directivos"). Antes este rol se
+  // mapeaba más abajo a la clave 'coord_maestria' de la matriz, lo cual le daba
+  // el acceso de Coordinador de MJ en vez de Dirección — corregido aquí.
+  const isDir = isDireccionRole(role) || currentUser.isDireccion || role === 'director_maestria';
   const isGer = role === 'gerente' || currentUser.isGerente;
 
   const matrixEntry = OFFICIAL_PERMISSION_MATRIX[moduleKey];
@@ -547,9 +577,10 @@ export const checkModuleAccess = (currentUser, moduleKey) => {
   }
 
   // Mapear rol normalizado a claves de matriz
+  // (director_maestria ya no se mapea aquí — ver isDir arriba)
   let roleKey = role;
   if (role === 'coord_c2' || role === 'coordinador_c1c2') roleKey = 'coord_c1';
-  if (role === 'coordinador_mj' || role === 'director_maestria') roleKey = 'coord_maestria';
+  if (role === 'coordinador_mj') roleKey = 'coord_maestria';
   if (role === 'entrenador_llamadas') roleKey = 'entrenador';
 
   const roleScope = matrixEntry[roleKey];
@@ -583,7 +614,20 @@ export const canAccessCalendarioMJ = (currentUser) => {
 };
 
 export const canAccessMonitorVuelos = (currentUser) => {
-  return checkModuleAccess(currentUser, 'sistema_cartas').hasAccess;
+  // Corregido (08/09/2026): antes leía por error la entrada 'sistema_cartas'
+  // (un módulo distinto, confirmado por José). Ahora usa su propia entrada
+  // 'monitor_vuelos' en la Matriz Oficial.
+  return checkModuleAccess(currentUser, 'monitor_vuelos').hasAccess;
+};
+
+/**
+ * "🦅 Monitor de IMOs" — fila propia de la Matriz Oficial. Antes de esta
+ * corrección (08/09/2026) el botón de Monitor de IMOs en Home.jsx compartía el
+ * gate de canAccessMonitorVuelos(), lo que excluía indebidamente a
+ * Coordinadores C1Y2 y de MJ (Lima) que la Matriz sí autoriza.
+ */
+export const canAccessMonitorIMOs = (currentUser) => {
+  return checkModuleAccess(currentUser, 'monitor_imos').hasAccess;
 };
 
 export const canAccessHotelesSede = (currentUser) => {

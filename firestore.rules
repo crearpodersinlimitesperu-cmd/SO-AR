@@ -117,6 +117,38 @@ service cloud.firestore {
         ]);
     }
 
+    // (07/09/2026) EFFECTIVE ROLE — confirmado explícitamente por José antes de tocar
+    // firestore.rules (pidió que el selector "cambiar rol" de Home.jsx deje de ser
+    // decorativo). Antes de esto, callerRole()/canManageManagers() leían SIEMPRE
+    // users/{uid}.data.role — el cargo "oficial" guardado en el login — sin importar qué
+    // rol hubiera elegido la persona en el selector (switchRole() en AuthContext.jsx solo
+    // actualizaba estado local de React, nunca escribía a Firestore).
+    // Esta función agrega un segundo campo, activeRoleOverride, que switchRole() sí
+    // escribe en users/{uid}. A propósito NO reutilizamos el campo "role" existente:
+    // ese campo lo leen también SuperAdminPanel.jsx (para agrupar gente en el Centro de
+    // Mando), GerenteDashboard.jsx (para asignar responsables de tareas por rol),
+    // UserAuditReport.jsx (que marca "Conflicto Rol" si no coincide con el catálogo
+    // estático) y causa_sync_bot.mjs — sobrescribirlo con la vista de sesión de alguien
+    // habría alterado esos reportes y esa sincronización. "role" sigue siendo el cargo
+    // oficial de la persona; activeRoleOverride es solo la vista activa de ESTA sesión.
+    // Solo se usa el override si es exactamente uno de los roles que la propia persona
+    // ya tiene en su arreglo "roles" en ese mismo documento — así, si alguien manipulara
+    // el cliente para escribir un valor arbitrario en activeRoleOverride, no logra nada
+    // que no pudiera ya lograr escribiendo directamente en "role" (ver el RIESGO CONOCIDO
+    // ya documentado más abajo en match /users/{userId}, aceptado explícitamente por José
+    // el 03/09/2026 — este cambio no amplía esa superficie, la comparte).
+    // NOTA: el modo "consolidado" (vista agregada de varios roles a la vez) no tiene un
+    // único "rol efectivo" equivalente — por eso activeRoleOverride == 'consolidado' NO
+    // se usa aquí, y estas dos funciones siguen evaluando el "role" oficial en ese caso.
+    function effectiveRole() {
+      let u = get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+      return (("activeRoleOverride" in u) && u.activeRoleOverride != null &&
+              u.activeRoleOverride != 'consolidado' &&
+              ("roles" in u) && (u.activeRoleOverride in u.roles))
+        ? u.activeRoleOverride
+        : u.role;
+    }
+
     // (29/08/2026) MJ_CALENDARS: el rol operativo del usuario (coord_maestria,
     // director_maestria, etc.) no viaja en el token de autenticación ni se
     // puede inferir de una lista fija de correos como isGerenteODireccion().
@@ -128,10 +160,11 @@ service cloud.firestore {
     // Firebase Auth, no el correo. get() para lectura de reglas no depende de
     // la regla "allow read" de esa colección, así que esto funciona aunque
     // "users" solo permita escritura a SuperAdmin.
+    // (07/09/2026) Ahora usa effectiveRole() en vez de leer .data.role directo, para que
+    // el selector de rol de Home.jsx sí tenga efecto real aquí — ver comentario arriba.
     function callerRole() {
       return isAuthenticated() &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role
-        in ['coord_maestria', 'director_maestria'];
+        effectiveRole() in ['coord_maestria', 'director_maestria'];
     }
 
     // (02/09/2026) MANAGERS_DIRECTORY: mismo patrón que callerRole() (users/{uid}.data.role)
@@ -141,10 +174,10 @@ service cloud.firestore {
     // (incluyendo los entrenadores de correo personal agregados el 02/09/2026) crear,
     // borrar o modificar cualquier campo de cualquier manager. Confirmado explícitamente
     // por José antes de tocar firestore.rules.
+    // (07/09/2026) Ahora usa effectiveRole() — ver comentario en callerRole() arriba.
     function canManageManagers() {
       return isAuthenticated() &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role
-        in ['coord_maestria', 'director_maestria', 'coordinador_mj'];
+        effectiveRole() in ['coord_maestria', 'director_maestria', 'coordinador_mj'];
     }
 
     // MJ_CALENDARS (29/08/2026): calendarios de Maestría del Juego por equipo
@@ -237,6 +270,12 @@ service cloud.firestore {
     // — igual que "goals" y otras colecciones de esta misma plataforma ya confían en el
     // rol que calcula el cliente. isSuperAdmin() e isGerenteODireccion() NO se ven
     // afectados por esto (son listas de correo fijas, no leen este campo "role").
+    //
+    // (07/09/2026) NOTA: este mismo documento ahora también puede tener un campo
+    // activeRoleOverride (escrito por switchRole() en AuthContext.jsx) — ver
+    // effectiveRole() más arriba. No es un campo nuevo con reglas propias: queda
+    // cubierto por el mismo "allow read, write" de aquí abajo, dentro del mismo riesgo
+    // ya aceptado en el párrafo anterior (no lo amplía).
     match /users/{userId} {
       allow read, write: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
 

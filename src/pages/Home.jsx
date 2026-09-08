@@ -23,11 +23,11 @@ import ViewModeSelector from '../components/ViewModeSelector';
 import ThemeToggle from '../components/ThemeToggle';
 import { getVenueForTraining } from '../data/venuesData';
 import { ROLE_DISPLAY_NAMES, normalizeSede } from '../data/usersData';
-import { 
+import {
   canAssignTrainer, canViewAllManagers, isDireccionRole, isGlobalQTCoordinator,
-  canAccessAgendaTimeBoxing, canAccessFlyersC1, canAccessCalendarioMJ, 
-  canAccessMonitorVuelos, canAccessHotelesSede, canAccessManualQT, 
-  canAccessDirectorioQT, canAccessManualNodus, canAccessCampusInteractivo 
+  canAccessAgendaTimeBoxing, canAccessFlyersC1, canAccessCalendarioMJ,
+  canAccessMonitorVuelos, canAccessMonitorIMOs, canAccessHotelesSede, canAccessManualQT,
+  canAccessDirectorioQT, canAccessManualNodus, canAccessCampusInteractivo
 } from '../config/permissions';
 import EffectiveCommunicationButton from '../components/EffectiveCommunicationButton';
 import { getAllCompanyUsers } from '../services/userService';
@@ -82,13 +82,16 @@ const isTrainerMatchingUser = (evTrainer, user) => {
 // hay que actualizar también esta lista para que el buscador no muestre
 // accesos desactualizados o incorrectos.
 // ============================================================================
-const EXEC_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin'];
+const EXEC_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria'];
 const KPI_ROLES = ['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan'];
-const DIRECTORIO_QT_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin'];
+const DIRECTORIO_QT_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'director_maestria'];
+// CAMPUS_ROLES: ya no se usa como filtro — Campus Interactivo es abierto a TODOS los
+// roles según la Matriz Oficial (fila "Campus Interactivo" = X en las 9 columnas).
+// Se deja declarada solo por si se necesita revertir a un acceso restringido.
 const CAMPUS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin'];
-const CENTRO_MANAGERS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin'];
-const MANUAL_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin'];
-const MANUAL_NODUS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin'];
+const CENTRO_MANAGERS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'director_maestria'];
+const MANUAL_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'director_maestria'];
+const MANUAL_NODUS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'director_maestria'];
 const REPORTES_VISIBLE = (u) => Boolean(
   u?.isSuperAdmin || u?.isGerente ||
   ['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'capitan', 'qt', 'direccion', 'director_maestria', 'aliado', 'manager'].includes(u?.appRole)
@@ -166,7 +169,9 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Diseño y descarga de afiches oficiales para Instagram, WhatsApp y redes por sede',
     keywords: ['flyer', 'flyers', 'generador', 'afiche', 'diseño', 'diseno', 'poster', 'descargar flyer', 'hd', '1080x1920', 'tierra', 'bot flyer', 'imagen'],
     route: '/generador-flyer',
-    roles: null
+    // Antes era null (abierto a todos, incluidos Directivos). Corregido según
+    // confirmación explícita de José (08/09/2026): Directivos NO tienen acceso.
+    roles: ['gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj']
   },
   {
     id: 'opt-new-task',
@@ -243,7 +248,9 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Editor y visor oficial del cronograma de Maestría del Juego para todas las sedes',
     keywords: ['calendario mj', 'maestria del juego', 'cronograma mj', 'fechas maestria', 'e28', 'e29', 'e30', 'equipos'],
     route: '/calendario-mj',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria', 'coord_maestria', 'coordinador_mj']
+    // Corregido según confirmación explícita de José (08/09/2026): "sí, así es
+    // correcto" — SOLO Coordinadores de MJ. Directivos y Gerentes NO tienen acceso.
+    roles: ['coord_maestria', 'coordinador_mj']
   },
   {
     id: 'opt-calendario-global',
@@ -254,7 +261,9 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Cronograma global consolidado de eventos, talleres y hitos para Lima, Quito, GYE y Cuenca',
     keywords: ['calendario global', 'calendario maestro', 'fechas globales', 'eventos', 'cronograma', 'google calendar'],
     external: 'calendario-global',
-    roles: null
+    // Antes era null (abierto a todos). Corregido: Directivos + Gerentes
+    // únicamente según la Matriz Oficial (08/09/2026).
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']
   },
   {
     id: 'opt-agenda-equipo',
@@ -344,7 +353,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Gestión de llamadas, seguimiento a participantes PX, aliados y coordinadores',
     keywords: ['centro managers', 'managers', 'llamadas', 'px', 'aliados', 'seguimiento equipos'],
     route: '/centro-managers',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin']
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'director_maestria']
   },
   {
     id: 'opt-directorio-qt',
@@ -355,7 +364,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Teléfonos, WhatsApp directos y correos de todo el equipo de coordinación y staff',
     keywords: ['directorio', 'directorio qt', 'telefonos', 'whatsapp', 'contactos staff', 'coordinadores'],
     route: '/directorio-qt',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin']
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'director_maestria']
   },
   {
     id: 'opt-gerencial',
@@ -366,7 +375,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Panel de control de alta dirección y toma de decisiones estratégicas',
     keywords: ['gerente', 'gerencial', 'comite', 'direccion', 'dashboard gerencial'],
     route: '/gerente',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']
   },
   {
     id: 'opt-estrategia',
@@ -377,7 +386,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Mapa estratégico y seguimiento de objetivos clave y resultados',
     keywords: ['estrategia', 'okrs', 'cascade', 'objetivos', 'iniciativas'],
     route: '/estrategia',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']
   },
   {
     id: 'opt-portafolio',
@@ -388,7 +397,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Supervisión de iniciativas, proyectos corporativos y cronogramas de entrega',
     keywords: ['portafolio', 'pmo', 'proyectos', 'planview', 'gantt'],
     route: '/portafolio',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']
   },
   {
     id: 'opt-auditoria-kpis',
@@ -399,7 +408,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Detección de anomalías, inconsistencias y validación cruzada de números',
     keywords: ['auditoria', 'auditoria kpis', 'control', 'revision metricas', 'inconsistencias'],
     route: '/auditoria-kpis',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']
   },
   {
     id: 'opt-acuerdos',
@@ -443,7 +452,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Gestión integral de usuarios, asignación de roles, permisos y configuración del sistema',
     keywords: ['superadmin', 'centro de mando', 'administracion', 'usuarios', 'roles', 'permisos'],
     route: '/superadmin',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']
   },
   {
     id: 'opt-sedes',
@@ -476,7 +485,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Documentación paso a paso de todas las funciones de Causa OS',
     keywords: ['manual', 'guia', 'manual causa', 'instructivo', 'como funciona', 'ayuda'],
     route: '/manual',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin']
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'director_maestria']
   },
   {
     id: 'opt-manual-nodus',
@@ -487,7 +496,10 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Gobernanza simbiótica Nodus + Causa OS, 9 niveles, vestimenta 2026, 14 KPIs y manual paso a paso de Nodus',
     keywords: ['manual nodus', 'nodus', 'gobernanza', 'guia nodus', 'plataforma nodus', 'imo', 'kpis', 'triggers', 'vestimenta', 'el viaje', 'paul sosa', 'fer aragon', 'elizabeth escobar'],
     route: '/manual-nodus',
-    roles: null
+    // Antes era null (abierto a todos). Corregido para que coincida con
+    // MANUAL_NODUS_ROLES / la Matriz Oficial: Directivos, Gerentes,
+    // Coordinadores C1Y2 y Coordinadores de MJ únicamente (08/09/2026).
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'director_maestria']
   },
   {
     id: 'opt-vende-sin-vender',
@@ -509,7 +521,9 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Plataforma interactiva de entrenamiento, videos y recursos de capacitación',
     keywords: ['campus', 'campus interactivo', 'academia', 'cursos', 'videos', 'capacitacion'],
     external: 'https://cpsl-campus-interactivo.vercel.app/ruta',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin']
+    // Antes restringía a un subconjunto de roles. Corregido: Campus Interactivo
+    // es abierto a TODOS los roles según la Matriz Oficial (08/09/2026).
+    roles: null
   },
   {
     id: 'opt-tema',
@@ -558,8 +572,11 @@ const MODULE_REGISTRY = [
   { id: 'mis-kpis', label: 'Mis KPIs', emoji: '📊', route: '/mis-kpis', roles: KPI_ROLES },
   { id: 'directorio-qt', label: 'Directorio QT', emoji: '⚡', route: '/directorio-qt', roles: DIRECTORIO_QT_ROLES },
   { id: 'superadmin', label: 'Centro de Mando', emoji: '🌐', route: '/superadmin', roles: EXEC_ROLES },
-  { id: 'calendario-global', label: 'Calendario Global Maestro', emoji: '📅', external: 'calendario-global', roles: null },
-  { id: 'campus', label: 'Campus Interactivo', emoji: '🎓', external: 'https://cpsl-campus-interactivo.vercel.app/ruta', roles: CAMPUS_ROLES },
+  // Antes era null (abierto a todos). Corregido: Directivos + Gerentes únicamente
+  // según la Matriz Oficial, fila "Calendario Global" (08/09/2026).
+  { id: 'calendario-global', label: 'Calendario Global Maestro', emoji: '📅', external: 'calendario-global', roles: EXEC_ROLES },
+  // Abierto a TODOS los roles según la Matriz Oficial (antes usaba CAMPUS_ROLES, restrictivo).
+  { id: 'campus', label: 'Campus Interactivo', emoji: '🎓', external: 'https://cpsl-campus-interactivo.vercel.app/ruta', roles: null },
   { id: 'centro-managers', label: 'Centro de Managers', emoji: '🎯', route: '/centro-managers', roles: CENTRO_MANAGERS_ROLES },
   { id: 'protocolo-emergencias', label: 'Protocolo de Emergencias', emoji: '🚨', route: '/protocolo-emergencias', roles: null },
   { id: 'manual', label: 'Manual / Guía Causa OS / QT', emoji: '📘', route: '/manual', roles: MANUAL_ROLES },
@@ -567,7 +584,10 @@ const MODULE_REGISTRY = [
   { id: 'checklist', label: 'Mi Checklist Operativo', emoji: '✅', route: (u) => `/checklist/${u?.appRole || 'capitan'}`, roles: null },
   { id: 'metas', label: 'Mis Metas', emoji: '🏆', route: '/metas', roles: null },
   { id: 'reportes', label: 'Enviar Reportes', emoji: '📤', route: '/reportes', roles: null, visible: REPORTES_VISIBLE },
-  { id: 'generador-flyer', label: 'Generador de Flyers Oficiales', emoji: '🎨', route: '/generador-flyer', roles: [...EXEC_ROLES, 'coordinador', 'coord_c1', 'coord_c2', 'coordinador_c1c2'] },
+  // Corregido según confirmación explícita de José (08/09/2026): Directivos (y
+  // director_maestria, tratado como Directivos) NO tienen acceso a Flyers C1.
+  // Solo Gerentes, Coordinadores C1Y2 y Coordinadores de MJ, según la Matriz Oficial.
+  { id: 'generador-flyer', label: 'Generador de Flyers Oficiales', emoji: '🎨', route: '/generador-flyer', roles: ['gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj'] },
 ];
 
 const isModuleVisible = (mod, currentUser) => {
@@ -1426,7 +1446,7 @@ export default function Home() {
                 boxShadow: '0 20px 50px rgba(0,0,0,0.95), 0 0 25px rgba(41, 171, 226, 0.2)',
                 border: '1px solid rgba(41, 171, 226, 0.4)'
               }}>
-                {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']) ? (
+                {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) ? (
                   <>
                     <button onClick={() => { setShowToolsDropdown(false); navigate('/gerente'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                       💼 Causa OS Gerencial
@@ -1486,22 +1506,26 @@ export default function Home() {
                 )}
 
                 {canAccessMonitorVuelos(currentUser) && (
-                  <>
-                    <button 
-                      onClick={() => { setShowToolsDropdown(false); navigate('/monitor-vuelos'); }} 
-                      className="btn-secondary" 
-                      style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem', border: '1px solid rgba(56, 189, 248, 0.3)', cursor: 'pointer' }}
-                    >
-                      ✈️ Monitor de Vuelos y Cartas
-                    </button>
-                    <button 
-                      onClick={() => { setShowToolsDropdown(false); navigate('/monitor-imos'); }} 
-                      className="btn-secondary" 
-                      style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(168, 85, 247, 0.15)', color: '#a855f7', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem', border: '1px solid rgba(168, 85, 247, 0.3)', cursor: 'pointer' }}
-                    >
-                      🦅 Monitor de IMOs
-                    </button>
-                  </>
+                  <button
+                    onClick={() => { setShowToolsDropdown(false); navigate('/monitor-vuelos'); }}
+                    className="btn-secondary"
+                    style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem', border: '1px solid rgba(56, 189, 248, 0.3)', cursor: 'pointer' }}
+                  >
+                    ✈️ Monitor de Vuelos y Cartas
+                  </button>
+                )}
+                {/* Antes usaba canAccessMonitorVuelos (compartía gate con "Monitor de
+                    Vuelos" vía la entrada 'sistema_cartas'), lo que excluía indebidamente
+                    a Coordinadores C1Y2 y de MJ que la Matriz Oficial sí autoriza para
+                    Monitor de IMOs. Corregido con su propio canAccessMonitorIMOs (08/09/2026). */}
+                {canAccessMonitorIMOs(currentUser) && (
+                  <button
+                    onClick={() => { setShowToolsDropdown(false); navigate('/monitor-imos'); }}
+                    className="btn-secondary"
+                    style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(168, 85, 247, 0.15)', color: '#a855f7', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem', border: '1px solid rgba(168, 85, 247, 0.3)', cursor: 'pointer' }}
+                  >
+                    🦅 Monitor de IMOs
+                  </button>
                 )}
 
                 {hasRoleAccess(['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan']) && (
@@ -1516,13 +1540,13 @@ export default function Home() {
                   </button>
                 )}
 
-                {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']) && (
+                {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/superadmin'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                     🌐 Centro de Mando
                   </button>
                 )}
 
-                {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']) && (
+                {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) && (
                   <button onClick={() => { setShowToolsDropdown(false); window.open('/calendario_global.html?v=' + Date.now() + '&email=' + encodeURIComponent(currentUser?.email || '') + '&name=' + encodeURIComponent(currentUser?.displayName || currentUser?.name || ''), '_blank'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                     📅 Calendario Global Maestro ↗
                   </button>
@@ -1533,7 +1557,7 @@ export default function Home() {
                   🎓 Campus Interactivo ↗
                 </button>
 
-                {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin']) && (
+                {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'director_maestria']) && (
                   <div style={{ display: 'flex', gap: '0.2rem', padding: '0.2rem' }}>
                     <button onClick={() => { setShowToolsDropdown(false); navigate('/centro-managers'); }} className="btn-secondary" style={{ flex: 1, textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                       🎯 Centro de Managers
@@ -1587,7 +1611,7 @@ export default function Home() {
               ⏰ Horarios y Vestimenta
             </button>
           )}
-          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']) ? (
+          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) ? (
             <button onClick={() => navigate('/gerente')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'var(--crear-gold)', color: 'black' }}>
               💼 SO-AR Gerencial
             </button>
@@ -1596,7 +1620,7 @@ export default function Home() {
               💼 Mi Dashboard
             </button>
           )}
-          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']) && (
+          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) && (
             <>
               <button onClick={() => navigate('/portafolio')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #0ea5e9, #0369a1)', color: 'white', border: 'none' }}>
                 📈 Portafolio PMO
@@ -1634,13 +1658,13 @@ export default function Home() {
             </button>
           )}
 
-          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']) && (
+          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) && (
             <button onClick={() => navigate('/superadmin')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #8b5cf6, #29abe2)', color: 'white', border: 'none' }}>
               🌐 Centro de Mando
             </button>
           )}
 
-          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']) && (
+          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) && (
             <button onClick={() => window.open('/calendario_global.html?v=' + Date.now() + '&email=' + encodeURIComponent(currentUser?.email || '') + '&name=' + encodeURIComponent(currentUser?.displayName || currentUser?.name || ''), '_blank')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #ef4444)', color: 'white', border: 'none' }}>
               📅 Calendario Global
             </button>
@@ -1651,13 +1675,13 @@ export default function Home() {
             🎓 Campus Interactivo
           </button>
 
-          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin']) && (
+          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'director_maestria']) && (
             <button onClick={() => navigate('/centro-managers')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#000', fontWeight: 'bold', border: 'none' }}>
               👑 Centro Managers
             </button>
           )}
 
-          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']) && (
+          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) && (
             <button onClick={() => navigate('/crm-maestro')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #047857)', color: 'white', fontWeight: 'bold', border: 'none' }}>
               <Users size={14} style={{ display: 'inline', marginRight: '4px' }} /> BASE MAESTRA CRM
             </button>
@@ -1676,14 +1700,14 @@ export default function Home() {
           )}
 
           {canAccessMonitorVuelos(currentUser) && (
-            <>
-              <button onClick={() => navigate('/monitor-vuelos')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #38bdf8, #0284c7)', color: 'white', fontWeight: 'bold', border: 'none' }}>
-                ✈️ Monitor de Vuelos
-              </button>
-              <button onClick={() => navigate('/monitor-imos')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #a855f7, #7e22ce)', color: 'white', fontWeight: 'bold', border: 'none' }}>
-                🦅 Monitor de IMOs
-              </button>
-            </>
+            <button onClick={() => navigate('/monitor-vuelos')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #38bdf8, #0284c7)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+              ✈️ Monitor de Vuelos
+            </button>
+          )}
+          {canAccessMonitorIMOs(currentUser) && (
+            <button onClick={() => navigate('/monitor-imos')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #a855f7, #7e22ce)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+              🦅 Monitor de IMOs
+            </button>
           )}
         </div>
       )}
@@ -1860,7 +1884,7 @@ export default function Home() {
               >
                 🎯 Mis Metas
               </button>
-              {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']) && (
+              {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) && (
                 <>
                   <button
                     className="btn-secondary hover-glow"

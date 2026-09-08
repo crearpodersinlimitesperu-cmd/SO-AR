@@ -80,10 +80,21 @@ function RoleRoute({ children, allowedRoles = [], requireSuperAdmin = false }) {
   }
 
   // Verificación de Roles permitidos
+  // NOTA (08/09/2026, documentando comportamiento preexistente, NO modificado en
+  // esta ronda): "currentUser.isDireccion" es un bypass general — cualquier
+  // usuario con ese flag en true pasa CUALQUIER RoleRoute, sin importar lo que
+  // diga allowedRoles. Esto significa que rutas donde la Matriz Oficial pide
+  // excluir explícitamente a Directivos (p. ej. /calendario-mj, /generador-flyer)
+  // no quedan 100% bloqueadas por esta vía para quien ya tenga isDireccion=true —
+  // solo se bloquea a quien NO tenga ese flag. Cerrarlo del todo requeriría un
+  // parámetro explícito (p. ej. algo como `excludeDireccionBypass`) para que cada
+  // <RoleRoute> declare si esa excepción aplica o no — cambio más grande, no
+  // incluido en esta ronda (Fase 1: "sin tocar firestore.rules", y este mecanismo
+  // es compartido por TODAS las rutas protegidas de la app).
   if (allowedRoles.length > 0) {
-    const hasRole = allowedRoles.includes(currentUser.appRole) || 
-                    currentUser.isSuperAdmin || 
-                    currentUser.isDireccion || 
+    const hasRole = allowedRoles.includes(currentUser.appRole) ||
+                    currentUser.isSuperAdmin ||
+                    currentUser.isDireccion ||
                     (currentUser.roles || []).some(r => allowedRoles.includes(r));
     if (!hasRole) {
       showToast(`ACCESO DENEGADO: Tu rol actual (${currentUser.appRole}) no tiene acceso a esta sección.`, "error");
@@ -155,13 +166,19 @@ function App() {
           } />
 
           <Route path="/manual" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'consolidado', 'director_maestria']} requireSuperAdmin={false}>
               <ManualGuia />
             </RoleRoute>
           } />
 
+          {/* Narrowed 08/09/2026 to match MANUAL_NODUS_ROLES en Home.jsx y la fila
+              "Manual Nodus" de la Matriz Oficial (Directivos, Gerentes, Coordinadores
+              C1Y2 y Coordinadores de MJ). Antes incluía literalmente todos los roles
+              del sistema (qt, capitan, entrenador, entrenador_llamadas, manager,
+              aliado, oficina), permitiendo acceso directo por URL a cualquiera aunque
+              el botón/menú ya lo ocultara. */}
           <Route path="/manual-nodus" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'director_maestria', 'superadmin', 'consolidado', 'qt', 'capitan', 'entrenador', 'entrenador_llamadas', 'manager', 'aliado', 'oficina']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'director_maestria', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
               <ManualNodus />
             </RoleRoute>
           } />
@@ -232,20 +249,24 @@ function App() {
             </RoleRoute>
           } />
 
+          {/* Narrowed 08/09/2026: la fila "Auditoría de KPIs" de la Matriz Oficial es
+              Directivos + Gerentes únicamente. Antes incluía también coordinadores
+              C1Y2 y de MJ, que no figuran en esa fila. /diagnostico-cmj comparte el
+              mismo componente (AuditoriaKPIs) y se alinea al mismo criterio. */}
           <Route path="/auditoria-kpis" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'director_maestria']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria']} requireSuperAdmin={false}>
               <AuditoriaKPIs />
             </RoleRoute>
           } />
 
           <Route path="/diagnostico-cmj" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'director_maestria']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria']} requireSuperAdmin={false}>
               <AuditoriaKPIs defaultTab="cmj" />
             </RoleRoute>
           } />
 
           <Route path="/superadmin" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria']} requireSuperAdmin={false}>
               <SuperAdminPanel />
             </RoleRoute>
           } />
@@ -257,13 +278,13 @@ function App() {
           } />
 
           <Route path="/centro-managers" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'director_maestria']} requireSuperAdmin={false}>
               <CentroManagers />
             </RoleRoute>
           } />
 
           <Route path="/directorio-qt" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'director_maestria']} requireSuperAdmin={false}>
               <DirectorioQT />
             </RoleRoute>
           } />
@@ -276,13 +297,13 @@ function App() {
 
           {/* PMO Culture Integrations */}
           <Route path="/portafolio" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria']} requireSuperAdmin={false}>
               <PortfolioBoard />
             </RoleRoute>
           } />
-          
+
           <Route path="/estrategia" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria']} requireSuperAdmin={false}>
               <StrategyBoard />
             </RoleRoute>
           } />
@@ -322,16 +343,33 @@ function App() {
 
           {/* Calendario de Maestría del Juego (29/08/2026): generador/editor del
               calendario oficial por equipo (formato CREAR), pedido por José a
-              partir de 3 PDF de ejemplo reales. Ver notas en CalendarioMJ.jsx. */}
+              partir de 3 PDF de ejemplo reales. Ver notas en CalendarioMJ.jsx.
+              Narrowed 08/09/2026: José confirmó explícitamente ("sí, así es
+              correcto") que SOLO Coordinadores de MJ tienen acceso — se removieron
+              direccion/cfo/ceo/cco/gerente/superadmin/consolidado/director_maestria.
+              LIMITACIÓN CONOCIDA: RoleRoute deja pasar igual a cualquier usuario con
+              currentUser.isDireccion=true (Directivos) o isSuperAdmin=true, sin
+              importar allowedRoles — ver comentario en el componente RoleRoute más
+              abajo. Esta narrowing bloquea el acceso vía URL directa a Gerentes y a
+              cualquier Directivo que NO tenga esos flags, pero no a quienes sí los
+              tienen. Arreglarlo del todo requiere tocar RoleRoute mismo (fuera de
+              alcance de esta ronda, no confirmado con José). */}
           <Route path="/calendario-mj" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria', 'coord_maestria', 'coordinador_mj']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['coord_maestria', 'coordinador_mj']} requireSuperAdmin={false}>
               <CalendarioMJ />
             </RoleRoute>
           } />
 
-          {/* Generador de Flyers Oficiales (02/09/2026): Generador HD 1080x1920 con fechas por sede */}
+          {/* Generador de Flyers Oficiales (02/09/2026): Generador HD 1080x1920 con fechas por sede.
+              Narrowed 08/09/2026: José confirmó explícitamente que Directivos NO
+              tienen acceso (y director_maestria se trata como Directivos). Se
+              removieron direccion/cfo/ceo/cco/superadmin/consolidado/director_maestria
+              y se agregaron coord_maestria/coordinador_mj (presentes en la Matriz
+              Oficial pero ausentes antes). MISMA LIMITACIÓN CONOCIDA de RoleRoute
+              descrita arriba en /calendario-mj: no bloquea a quien ya tiene
+              isDireccion/isSuperAdmin=true. */}
           <Route path="/generador-flyer" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria', 'coord_c1', 'coord_c2', 'coordinador_c1c2']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj']} requireSuperAdmin={false}>
               <GeneradorFlyer />
             </RoleRoute>
           } />
@@ -345,8 +383,13 @@ function App() {
           <Route path="/vuelos" element={<Navigate to="/monitor-vuelos" replace />} />
           <Route path="/cartas" element={<Navigate to="/monitor-vuelos" replace />} />
           
+          {/* Ampliado 08/09/2026: la fila "Monitor de IMOs" de la Matriz Oficial
+              también autoriza a Coordinadores C1Y2 y de MJ (alcance "SOLO LIMA" —
+              el enforcement real de sede queda pendiente para Fase 2, no
+              implementado aquí). Antes solo dejaba pasar a Directivos/Gerentes,
+              igual que Monitor de Vuelos, con el que compartía gate por error. */}
           <Route path="/monitor-imos" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria', 'coord_c1', 'coord_maestria']} requireSuperAdmin={false}>
               <MonitorImos />
             </RoleRoute>
           } />

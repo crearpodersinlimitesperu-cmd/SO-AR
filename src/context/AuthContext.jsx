@@ -18,30 +18,73 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const { showToast } = useUI();
 
+  // (07/09/2026) DIAGNÓSTICO CONFIRMADO CON DATOS REALES: 60 de 144 correos en
+  // la colección "users" tienen MÁS DE UN documento — típicamente uno creado
+  // por bootstrapSync.js/qtSyncDaemon.js con un ID tipo slug (ej.
+  // "jose_sanchez_crearpsl", con "roles" casi siempre en null) y otro creado
+  // por el propio login con ID = UID real de Firebase Auth (con "roles" bien
+  // poblado como arreglo). Antes de este fix, cuando una consulta encontraba
+  // ambos documentos, `snap.docs[0]` devolvía el que Firestore ordenara
+  // primero (orden no controlado por nosotros, prácticamente una moneda al
+  // aire) — así que en cada login la persona podía "perder" sus roles
+  // múltiples si por azar se devolvía el documento slug en vez del UID.
+  // Esto es justamente por qué el selector de "cambiar rol" no aparecía de
+  // forma consistente para gente con más de un cargo real.
+  // Las reglas de Firestore (firestore.rules) SIEMPRE validan permisos
+  // leyendo users/{request.auth.uid} — por eso, cuando hay varios documentos
+  // para el mismo correo, preferimos deliberadamente el que tiene forma de
+  // UID de Firebase Auth: es el mismo que las reglas van a usar de todos
+  // modos, así que usarlo también para leer el perfil hace que el
+  // comportamiento sea consistente en vez de aleatorio.
+  const pareceUidFirebase = (docId) => /^[A-Za-z0-9]{20,36}$/.test(docId) && !docId.includes('_');
+
+  const elegirDocumentoCanonico = (snap) => {
+    if (snap.empty) return null;
+    if (snap.size === 1) return snap.docs[0];
+    // Si hay varios documentos para el mismo correo, preferir el que tiene
+    // forma de UID de Firebase Auth (el mismo que usan las reglas de
+    // seguridad y las escrituras de login). Si ninguno tiene esa forma,
+    // se mantiene el comportamiento anterior (el primero que devuelva Firestore).
+    const conFormaDeUid = snap.docs.find((d) => pareceUidFirebase(d.id));
+    return conFormaDeUid || snap.docs[0];
+  };
+
   // Búsqueda progresiva de usuarios en Firestore
   const findUserInFirestore = async (normalizedEmail) => {
     try {
       const usersRef = collection(db, "users");
-      
+
       // 1. emails array-contains
       let q = query(usersRef, where("emails", "array-contains", normalizedEmail));
       let snap = await getDocs(q);
-      if (!snap.empty) return snap.docs[0].data();
+      if (!snap.empty) {
+        const elegido = elegirDocumentoCanonico(snap);
+        return { ...elegido.data(), _docId: elegido.id };
+      }
 
       // 2. email ==
       q = query(usersRef, where("email", "==", normalizedEmail));
       snap = await getDocs(q);
-      if (!snap.empty) return snap.docs[0].data();
+      if (!snap.empty) {
+        const elegido = elegirDocumentoCanonico(snap);
+        return { ...elegido.data(), _docId: elegido.id };
+      }
 
       // 3. corporateEmail ==
       q = query(usersRef, where("corporateEmail", "==", normalizedEmail));
       snap = await getDocs(q);
-      if (!snap.empty) return snap.docs[0].data();
+      if (!snap.empty) {
+        const elegido = elegirDocumentoCanonico(snap);
+        return { ...elegido.data(), _docId: elegido.id };
+      }
 
       // 4. personalEmail ==
       q = query(usersRef, where("personalEmail", "==", normalizedEmail));
       snap = await getDocs(q);
-      if (!snap.empty) return snap.docs[0].data();
+      if (!snap.empty) {
+        const elegido = elegirDocumentoCanonico(snap);
+        return { ...elegido.data(), _docId: elegido.id };
+      }
 
     } catch (err) {
       console.error("Error consultando Firestore:", err);
@@ -52,6 +95,27 @@ export function AuthProvider({ children }) {
   const switchRole = (newRole) => {
     const canonicalNewRole = normalizeRole(newRole);
     sessionStorage.setItem('cpsl_active_role', canonicalNewRole);
+
+    // (07/09/2026) Confirmado explícitamente por José: hasta ahora este selector solo
+    // cambiaba el estado local de React (lo que se VE), nunca escribía a Firestore — así
+    // que cualquier acción protegida por firestore.rules (por ejemplo guardar en
+    // mj_calendars o gestionar managers_directory) seguía evaluándose con el rol
+    // "oficial" guardado en el login, sin importar qué eligiera la persona aquí. Este
+    // setDoc hace que el cambio sea real: guarda el rol elegido en users/{uid}, en un
+    // campo NUEVO y separado (activeRoleOverride) — nunca en "role", porque ese campo
+    // también lo usan SuperAdminPanel.jsx, GerenteDashboard.jsx, UserAuditReport.jsx y
+    // causa_sync_bot.mjs como el cargo oficial de la persona, no como su vista de
+    // sesión. Ver effectiveRole() en firestore.rules para el lado que lo consume.
+    // Es "fire and forget": no bloquea el cambio visual si la escritura tarda o falla
+    // (queda igual que antes en ese caso — decorativo pero sin romper la sesión), y el
+    // error se registra en consola para poder diagnosticarlo si pasa seguido.
+    if (auth.currentUser?.uid) {
+      setDoc(doc(db, 'users', auth.currentUser.uid), { activeRoleOverride: canonicalNewRole }, { merge: true })
+        .catch((err) => {
+          console.error('No se pudo guardar el rol activo en Firestore (el cambio de vista sigue funcionando localmente):', err);
+        });
+    }
+
     setCurrentUser(prev => {
       if (!prev) return null;
       const isConsolidated = canonicalNewRole === 'consolidado';
