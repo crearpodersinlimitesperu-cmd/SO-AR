@@ -168,13 +168,26 @@ export default function DirectorioQT() {
   }, [members, selectedSede, selectedEdicion, searchQuery]);
 
   // Estadísticas rápidas
+  // BUG REAL encontrado y corregido (08/09/2026, reportado por José viendo la
+  // plataforma en modo simulador como un QT de Quito: "no sé si estos datos
+  // corresponden a la realidad y sede"): estas 4 tarjetas ("Total QT Activos",
+  // "Líderes Senior", "Sedes Cubiertas", "Perfiles Verificados") se calculaban
+  // sobre `members` — la lista CRUDA SIN FILTRAR por rol/sede — mientras que la
+  // lista de tarjetas de abajo sí usa `filteredMembers` (con el filtro real de
+  // "SOLO SU SEDE" para QT/Coord C1Y2). Resultado: un QT de una sola sede veía
+  // en el encabezado el total GLOBAL de las 5 sedes (42 QT, 19 Senior, 5 Sedes)
+  // aunque la lista de tarjetas debajo ya le mostraba solo su propia sede — un
+  // desajuste real entre lo que dicen los números y lo que la lista realmente
+  // muestra. Ahora ambos usan la misma fuente (`filteredMembers`), así que las
+  // tarjetas reflejan exactamente lo que el usuario tiene delante, sede
+  // incluida.
   const stats = useMemo(() => {
-    const total = members.length;
-    const seniors = members.filter(m => m.isSenior).length;
-    const sedesCount = new Set(members.map(m => m.sede)).size;
-    const activos = members.filter(m => m.esActivo).length;
+    const total = filteredMembers.length;
+    const seniors = filteredMembers.filter(m => m.isSenior).length;
+    const sedesCount = new Set(filteredMembers.map(m => m.sede)).size;
+    const activos = filteredMembers.filter(m => m.esActivo).length;
     return { total, seniors, sedesCount, activos };
-  }, [members]);
+  }, [filteredMembers]);
 
   const formatLastUpdated = (isoDate) => {
     if (!isoDate) return 'Desconocido';

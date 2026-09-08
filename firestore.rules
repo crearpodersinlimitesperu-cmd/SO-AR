@@ -324,6 +324,71 @@ service cloud.firestore {
         ));
     }
 
+    // ⚠️ SEGUNDO HALLAZGO REAL (08/09/2026), encontrado DESPUÉS de desplegar la
+    // restauración de arriba, al revisar el reporte de José de que "Auditoría de
+    // Accesos y Movimientos" (SuperAdminPanel.jsx) aparecía vacía. Investigando esa
+    // pantalla se encontró que estas 7 colecciones (audit_logs entre ellas) también
+    // se quedaron SIN NINGÚN bloque "match" — pero por una causa DISTINTA a las 11
+    // de arriba: un commit de OTRO agente de IA trabajando este mismo repo en
+    // paralelo ("Migrar MonitorImos a Causa OS", autor genérico
+    // "Crear Poder Sin Limites", hoy 08/09/2026 a las 16:19, ANTES de que esta
+    // sesión empezara su propio trabajo de Fase 1/Fase 2) borró por accidente 144
+    // líneas de firestore.rules al mover código de Monitor de IMOs, incluyendo
+    // estos 7 bloques completos, sin que ninguna sesión lo notara ni lo
+    // documentara. Restauradas aquí EXACTAMENTE como estaban antes de ese commit
+    // (mismos permisos, sin ningún cambio ni endurecimiento nuevo) — confirmado
+    // explícitamente por José antes de tocar este archivo otra vez.
+    match /audit_logs/{logId} {
+      allow read: if isSuperAdmin();
+      allow create: if isAuthenticated();
+    }
+
+    // NODUS: mecanismo seguro de token del robot para sincronización horaria autónoma
+    match /nodus_kpis_sincronizados/{document=**} {
+      allow read: if isAuthenticated();
+      allow write: if request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET";
+    }
+
+    match /nodus_coordinadores_c1c2/{document=**} {
+      allow read: if isAuthenticated();
+      allow write: if request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET";
+    }
+
+    match /nodus_kpis_history/{document=**} {
+      allow read: if isAuthenticated();
+      allow write: if request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET";
+    }
+
+    // NOTAS DE SEGUIMIENTO — feedback que el entrenador de llamadas deja después de
+    // cada llamada (individual o grupal), para detectar y anticiparse a quiebres.
+    // Pedido explícito de José (vigente desde antes de perderse esta regla): "deben
+    // de guardarse en un historial por persona y jamás perderse" — por eso NO hay
+    // "allow delete" (ninguna nota se puede borrar) y "allow update" solo permite
+    // AGREGAR una respuesta del CMJ, nunca modificar la nota original.
+    match /notas_seguimiento/{document} {
+      allow read: if isSuperAdmin() || isGerenteODireccion() || callerRole() ||
+                    (isAuthenticated() && resource.data.autorEmail == email());
+      allow create: if isAuthenticated() && request.resource.data.autorEmail == email();
+      allow update: if (isSuperAdmin() || callerRole()) &&
+                    request.resource.data.diff(resource.data).affectedKeys().hasOnly(['respuestas']);
+      // Sin "allow delete": ninguna nota de seguimiento se puede eliminar (histórico permanente).
+    }
+
+    // KPIs de Entrenadores de Llamadas — REGLA ESTRICTA: solo directores y José
+    // Sánchez / SuperAdmin.
+    match /kpis_entrenadores_llamadas/{document=**} {
+      allow read: if isSuperAdmin() || email() == 'jose.sanchez@crearpsl.net' || email() in [
+        'emely.leon@crearpsl.net',
+        'fer.aragon@crearpsl.net',
+        'andres.gomez@crearpsl.net',
+        'gomeznueve@gmail.com',
+        'contabilidad.global@crearpsl.net',
+        'leandro.brunis@crearpsl.net',
+        'paul.sosa@crearpsl.net'
+      ];
+      allow write: if isSuperAdmin() || email() == 'jose.sanchez@crearpsl.net';
+    }
+
     // TASKS
     match /tasks/{taskId} {
       allow read: if isAuthenticated();

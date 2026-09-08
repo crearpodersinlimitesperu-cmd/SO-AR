@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../services/firebase';
 import { collection, query, limit, getDocs, where, getCountFromServer } from 'firebase/firestore';
@@ -6,10 +6,22 @@ import { Search, RefreshCw, ArrowLeft, Users, CheckCircle, XCircle, Clock } from
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-hot-toast';
 
+// BUG REAL encontrado y corregido (08/09/2026, reportado por José: "esta base de
+// datos esta horrible"). Esta página usaba clases de Tailwind CSS (bg-emerald-500/20,
+// px-2 py-1 rounded, grid grid-cols-4, etc.) pero el proyecto NO tiene Tailwind
+// instalado — no existe tailwind.config, no está en package.json, y no hay
+// directivas @tailwind en ningún CSS de la plataforma. Era la ÚNICA página de toda
+// la app usando ese framework, así que ninguna de esas clases hacía nada — de ahí
+// el texto plano sin estilo que se veía. Reescrita aquí con estilos en línea,
+// siguiendo el mismo lenguaje visual (fondo oscuro, acentos dorados, tarjetas con
+// borde sutil) que ya usan el resto de páginas de la plataforma (ej. DirectorioQT.jsx).
+// La lógica de datos (fetchStats, fetchData, búsqueda) no se tocó — es exactamente
+// la misma que ya estaba.
+
 export default function CRMBaseMaster() {
   const navigate = useNavigate();
   const { currentUser, isSuperAdmin } = useAuth();
-  
+
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -24,10 +36,10 @@ export default function CRMBaseMaster() {
     try {
       const coll = collection(db, 'participants');
       const totalSnap = await getCountFromServer(coll);
-      
+
       const sentadosQ = query(coll, where('estadoC1', '==', 'SENTADO'));
       const sentadosSnap = await getCountFromServer(sentadosQ);
-      
+
       const pendientesQ = query(coll, where('estadoC1', '==', 'PENDIENTE'));
       const pendientesSnap = await getCountFromServer(pendientesQ);
 
@@ -55,110 +67,144 @@ export default function CRMBaseMaster() {
     setLoading(false);
   };
 
-  const getStatusBadge = (estado) => {
-    if (estado === 'SENTADO') return <span className="bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded text-xs font-bold flex items-center gap-1"><CheckCircle size={12}/> SENTADO</span>;
-    if (estado === 'DESERTOR') return <span className="bg-rose-500/20 text-rose-400 px-2 py-1 rounded text-xs font-bold flex items-center gap-1"><XCircle size={12}/> DESERTOR</span>;
-    if (estado === 'REZAGADO') return <span className="bg-amber-500/20 text-amber-400 px-2 py-1 rounded text-xs font-bold flex items-center gap-1"><Clock size={12}/> REZAGADO</span>;
-    return <span className="bg-slate-500/20 text-slate-400 px-2 py-1 rounded text-xs font-bold flex items-center gap-1"><Clock size={12}/> {estado || 'PENDIENTE'}</span>;
+  // Paleta consistente con el resto de la plataforma (ver DirectorioQT.jsx, Home.jsx)
+  const bgPage = '#0d152d';
+  const bgCard = 'rgba(255,255,255,0.03)';
+  const bgCardHeader = 'rgba(255,255,255,0.02)';
+  const bgInput = 'rgba(0,0,0,0.25)';
+  const borderSubtle = 'rgba(255,255,255,0.08)';
+  const gold = 'var(--crear-gold, #f59e0b)';
+  const textMain = '#f1f5f9';
+  const textMuted = '#94a3b8';
+
+  const STATUS_STYLES = {
+    SENTADO: { bg: 'rgba(16,185,129,0.15)', color: '#34d399', Icon: CheckCircle },
+    DESERTOR: { bg: 'rgba(244,63,94,0.15)', color: '#fb7185', Icon: XCircle },
+    REZAGADO: { bg: 'rgba(245,158,11,0.15)', color: '#fbbf24', Icon: Clock },
+    PENDIENTE: { bg: 'rgba(148,163,184,0.15)', color: '#94a3b8', Icon: Clock }
   };
 
-  const filteredData = data.filter(p => 
-    p.nombreCompleto?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+  const getStatusBadge = (estado) => {
+    const key = estado && STATUS_STYLES[estado] ? estado : 'PENDIENTE';
+    const { bg, color, Icon } = STATUS_STYLES[key];
+    return (
+      <span style={{ background: bg, color, padding: '0.25rem 0.6rem', borderRadius: '6px', fontSize: '0.72rem', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: '0.3rem', whiteSpace: 'nowrap' }}>
+        <Icon size={12} /> {estado || 'PENDIENTE'}
+      </span>
+    );
+  };
+
+  const filteredData = data.filter(p =>
+    p.nombreCompleto?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     p.dni?.includes(searchTerm)
   );
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white p-6 font-sans">
-      <div className="max-w-7xl mx-auto">
-        <header className="flex justify-between items-center mb-8 border-b border-slate-700 pb-4">
-          <div className="flex items-center gap-4">
-            <button onClick={() => navigate(-1)} className="p-2 bg-slate-800 hover:bg-slate-700 rounded-full transition-colors">
-              <ArrowLeft size={20} className="text-slate-300" />
+    <div style={{ minHeight: '100vh', background: bgPage, color: textMain, padding: '1.5rem', fontFamily: 'inherit' }}>
+      <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+
+        {/* HEADER */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem', paddingBottom: '1rem', borderBottom: `1px solid ${borderSubtle}` }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <button
+              onClick={() => navigate(-1)}
+              className="btn-secondary"
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', borderRadius: '8px', cursor: 'pointer' }}
+            >
+              <ArrowLeft size={16} /> Volver a Causa OS
             </button>
             <div>
-              <h1 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500 flex items-center gap-2">
-                <Users size={28} className="text-amber-400" /> Base Maestra CRM (Nodus)
+              <h1 style={{ margin: 0, fontSize: '1.7rem', fontWeight: 900, color: gold, display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                <Users size={26} color={gold} /> Base Maestra CRM (Nodus)
               </h1>
-              <p className="text-slate-400 mt-1">Conexión directa con todos los registros sincronizados de tu CRM</p>
+              <p style={{ margin: '0.3rem 0 0 0', color: textMuted, fontSize: '0.88rem' }}>
+                Conexión directa con todos los registros sincronizados de tu CRM
+              </p>
             </div>
           </div>
-          <button onClick={fetchData} className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded text-sm transition-colors border border-slate-700">
+          <button
+            onClick={fetchData}
+            className="btn-secondary"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.55rem 1.1rem', borderRadius: '8px', fontSize: '0.85rem', cursor: 'pointer' }}
+          >
             <RefreshCw size={16} /> Refrescar
           </button>
-        </header>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-slate-800 border border-slate-700 rounded-lg p-4">
-            <p className="text-slate-400 text-sm mb-1">Total Registros</p>
-            <p className="text-3xl font-bold text-white">{stats.total}</p>
+        {/* TARJETAS DE ESTADÍSTICAS */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+          <div style={{ background: bgCard, border: `1px solid ${borderSubtle}`, borderRadius: '12px', padding: '1.1rem' }}>
+            <div style={{ color: textMuted, fontSize: '0.8rem', marginBottom: '0.3rem', fontWeight: 600 }}>Total Registros</div>
+            <div style={{ fontSize: '1.9rem', fontWeight: 800, color: textMain }}>{stats.total}</div>
           </div>
-          <div className="bg-slate-800 border border-emerald-900/50 rounded-lg p-4">
-            <p className="text-slate-400 text-sm mb-1">Sentados</p>
-            <p className="text-3xl font-bold text-emerald-400">{stats.sentados}</p>
+          <div style={{ background: bgCard, border: '1px solid rgba(16,185,129,0.3)', borderRadius: '12px', padding: '1.1rem' }}>
+            <div style={{ color: textMuted, fontSize: '0.8rem', marginBottom: '0.3rem', fontWeight: 600 }}>Sentados</div>
+            <div style={{ fontSize: '1.9rem', fontWeight: 800, color: '#34d399' }}>{stats.sentados}</div>
           </div>
-          <div className="bg-slate-800 border border-slate-700 rounded-lg p-4">
-            <p className="text-slate-400 text-sm mb-1">Pendientes</p>
-            <p className="text-3xl font-bold text-slate-300">{stats.pendientes}</p>
+          <div style={{ background: bgCard, border: `1px solid ${borderSubtle}`, borderRadius: '12px', padding: '1.1rem' }}>
+            <div style={{ color: textMuted, fontSize: '0.8rem', marginBottom: '0.3rem', fontWeight: 600 }}>Pendientes</div>
+            <div style={{ fontSize: '1.9rem', fontWeight: 800, color: '#cbd5e1' }}>{stats.pendientes}</div>
           </div>
         </div>
 
-        <div className="bg-slate-800 rounded-lg border border-slate-700 overflow-hidden shadow-xl">
-          <div className="p-4 border-b border-slate-700 flex flex-wrap gap-4 items-center bg-slate-800/50">
-            <div className="relative flex-1 min-w-[300px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-              <input 
-                type="text" 
-                placeholder="Buscar por DNI o Nombres..." 
-                className="w-full bg-slate-900 border border-slate-700 rounded py-2 pl-10 pr-4 text-white focus:outline-none focus:border-amber-500 transition-colors"
+        {/* TABLA */}
+        <div style={{ background: bgCard, border: `1px solid ${borderSubtle}`, borderRadius: '12px', overflow: 'hidden' }}>
+          <div style={{ padding: '1rem', borderBottom: `1px solid ${borderSubtle}`, background: bgCardHeader, display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center' }}>
+            <div style={{ position: 'relative', flex: 1, minWidth: '280px' }}>
+              <Search size={16} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: textMuted }} />
+              <input
+                type="text"
+                placeholder="Buscar por DNI o Nombres..."
+                style={{ width: '100%', background: bgInput, border: `1px solid ${borderSubtle}`, borderRadius: '8px', padding: '0.55rem 1rem 0.55rem 2.3rem', color: textMain, fontSize: '0.85rem', outline: 'none', boxSizing: 'border-box' }}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
               <thead>
-                <tr className="bg-slate-900/50 text-slate-400 text-sm uppercase tracking-wider">
-                  <th className="p-4 border-b border-slate-700 font-medium">Participante</th>
-                  <th className="p-4 border-b border-slate-700 font-medium">Contacto</th>
-                  <th className="p-4 border-b border-slate-700 font-medium">Estado C1</th>
-                  <th className="p-4 border-b border-slate-700 font-medium">Coordinadora</th>
-                  <th className="p-4 border-b border-slate-700 font-medium">IMO Enrolador</th>
+                <tr style={{ background: 'rgba(0,0,0,0.2)', color: textMuted, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  <th style={{ padding: '0.9rem 1rem', borderBottom: `1px solid ${borderSubtle}`, fontWeight: 700 }}>Participante</th>
+                  <th style={{ padding: '0.9rem 1rem', borderBottom: `1px solid ${borderSubtle}`, fontWeight: 700 }}>Contacto</th>
+                  <th style={{ padding: '0.9rem 1rem', borderBottom: `1px solid ${borderSubtle}`, fontWeight: 700 }}>Estado C1</th>
+                  <th style={{ padding: '0.9rem 1rem', borderBottom: `1px solid ${borderSubtle}`, fontWeight: 700 }}>Coordinadora</th>
+                  <th style={{ padding: '0.9rem 1rem', borderBottom: `1px solid ${borderSubtle}`, fontWeight: 700 }}>IMO Enrolador</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-700/50">
+              <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan="5" className="p-8 text-center text-slate-400">
-                      <RefreshCw className="animate-spin mx-auto mb-2" size={24} />
+                    <td colSpan="5" style={{ padding: '2.5rem', textAlign: 'center', color: textMuted }}>
+                      <RefreshCw size={22} style={{ display: 'block', margin: '0 auto 0.5rem', animation: 'spin 1s linear infinite' }} />
                       Cargando base de datos...
                     </td>
                   </tr>
                 ) : filteredData.length === 0 ? (
                   <tr>
-                    <td colSpan="5" className="p-8 text-center text-slate-400">
+                    <td colSpan="5" style={{ padding: '2.5rem', textAlign: 'center', color: textMuted }}>
                       No se encontraron resultados en la vista actual.
                     </td>
                   </tr>
                 ) : (
-                  filteredData.map(p => (
-                    <tr key={p.id} className="hover:bg-slate-700/30 transition-colors">
-                      <td className="p-4">
-                        <div className="font-semibold text-white">{p.nombreCompleto}</div>
-                        <div className="text-xs text-slate-400 mt-1">DNI: {p.dni || 'Sin DNI'}</div>
+                  filteredData.map((p, idx) => (
+                    <tr key={p.id} style={{ borderBottom: idx === filteredData.length - 1 ? 'none' : `1px solid rgba(255,255,255,0.05)` }}>
+                      <td style={{ padding: '0.9rem 1rem' }}>
+                        <div style={{ fontWeight: 700, color: textMain }}>{p.nombreCompleto}</div>
+                        <div style={{ fontSize: '0.72rem', color: textMuted, marginTop: '0.15rem' }}>DNI: {p.dni || 'Sin DNI'}</div>
                       </td>
-                      <td className="p-4">
-                        <div className="text-sm">{p.telefono || '-'}</div>
-                        <div className="text-xs text-slate-400 truncate max-w-[150px]">{p.email || '-'}</div>
+                      <td style={{ padding: '0.9rem 1rem' }}>
+                        <div style={{ fontSize: '0.85rem' }}>{p.telefono || '-'}</div>
+                        <div style={{ fontSize: '0.72rem', color: textMuted, maxWidth: '160px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.email || '-'}</div>
                       </td>
-                      <td className="p-4">
+                      <td style={{ padding: '0.9rem 1rem' }}>
                         {getStatusBadge(p.estadoC1)}
                       </td>
-                      <td className="p-4 text-sm text-slate-300">
+                      <td style={{ padding: '0.9rem 1rem', fontSize: '0.85rem', color: '#cbd5e1' }}>
                         {p.coordinadora || '-'}
                       </td>
-                      <td className="p-4 text-sm text-slate-400">
+                      <td style={{ padding: '0.9rem 1rem', fontSize: '0.85rem', color: textMuted }}>
                         {p.imoEnrolador || '-'}
                       </td>
                     </tr>
@@ -167,11 +213,12 @@ export default function CRMBaseMaster() {
               </tbody>
             </table>
           </div>
-          <div className="p-4 border-t border-slate-700 text-xs text-slate-500 text-center">
-            Mostrando hasta 150 registros recientes. Usa la barra de busqueda para filtrar localmente.
+          <div style={{ padding: '0.9rem', borderTop: `1px solid ${borderSubtle}`, textAlign: 'center', fontSize: '0.72rem', color: textMuted }}>
+            Mostrando hasta 150 registros recientes. Usa la barra de búsqueda para filtrar localmente.
           </div>
         </div>
       </div>
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }

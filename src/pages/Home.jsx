@@ -1641,7 +1641,13 @@ export default function Home() {
           )}
 
           {canAccessManualQT(currentUser) && (
-            <button onClick={() => navigate('/manual')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #0284c7, #2563eb)', color: 'white', border: 'none' }}>
+            // BUG REAL encontrado y corregido (08/09/2026, reportado por José: "esto debería
+            // de llevar al manual del QT no un manual de causa"). Antes navegaba a /manual
+            // (ManualGuia.jsx), que abre por defecto en la pestaña general "brochure" de
+            // Causa OS — la sección exclusiva de QT existe ahí (pestaña "Guía por Rol"), pero
+            // no es lo primero que se ve. José eligió la opción de llevar directo al Manual QT
+            // externo completo (el mismo enlace que ya existía dentro de esa sección).
+            <button onClick={() => window.open('https://crearpsl.net/manual_quantum_team.html', '_blank', 'noopener,noreferrer')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #0284c7, #2563eb)', color: 'white', border: 'none' }}>
               📘 Manual QT
             </button>
           )}
@@ -2089,7 +2095,17 @@ export default function Home() {
                       }
 
                       // 5. Filtro tab locales vs globales para Gerentes y Directivos
-                      if (activeEventTab === 'locales' || (isGerente && !isSuperOrDir)) {
+                      // BUG REAL encontrado y corregido (08/09/2026, confirmado explícitamente por
+                      // José: "los Directivos y Gerentes pueden ver todas las sedes"): antes,
+                      // Gerente quedaba forzado a "solo su sede" con "(isGerente && !isSuperOrDir)"
+                      // sin importar qué pestaña tuviera seleccionada — el botón "GLOBAL" ya era
+                      // visible para Gerente en la UI (ver el toggle más arriba) pero no tenía
+                      // ningún efecto real para ese rol, porque este OR lo ignoraba. La Matriz
+                      // Oficial pone a "gerente" en 'GLOBAL' para eventos_entrenamientos (ver
+                      // OFFICIAL_PERMISSION_MATRIX en permissions.js, corregido en esta misma
+                      // ronda). Ahora Gerente respeta la pestaña igual que Dirección: arranca en
+                      // "locales" (mismo default de siempre) pero el botón "GLOBAL" si funciona.
+                      if (activeEventTab === 'locales') {
                         const userSede = currentUser?.sede || '';
                         if (!userSede || userSede.toLowerCase().includes('global')) return true;
                         const evSede = ev.sede || ev.sedeTag || '';

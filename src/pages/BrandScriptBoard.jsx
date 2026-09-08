@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { BookOpen, Copy, Check } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { BookOpen, Copy, Check, ArrowLeft } from 'lucide-react';
 
 export default function BrandScriptBoard() {
+  const navigate = useNavigate();
   const [copiedKey, setCopiedKey] = useState(null);
   const [selectedSede, setSelectedSede] = useState('Lima'); // Default para el guion
 
@@ -20,7 +22,20 @@ export default function BrandScriptBoard() {
 
   return (
     <div style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto', color: 'white', fontFamily: '"Inter", sans-serif' }}>
-      
+
+      {/* BUG REAL encontrado y corregido (08/09/2026, reportado por José: "este modulo
+          no tiene atras para regresar"). Este componente no importaba useNavigate ni
+          tenía ningún botón de vuelta — a diferencia del resto de páginas de la
+          plataforma (ej. DirectorioQT.jsx), que sí siguen el patrón "Volver a Causa
+          OS". Se agrega aquí el mismo patrón. */}
+      <button
+        onClick={() => navigate('/home')}
+        className="btn-secondary"
+        style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', borderRadius: '8px', cursor: 'pointer', marginBottom: '1.5rem' }}
+      >
+        <ArrowLeft size={16} /> Volver a Causa OS
+      </button>
+
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
         <BookOpen size={28} color={gold} />
         <h1 style={{ margin: 0, fontSize: '1.8rem', fontWeight: 'bold' }}>BrandScript & Guiones MJ</h1>

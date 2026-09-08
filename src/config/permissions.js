@@ -502,9 +502,15 @@ export const OFFICIAL_PERMISSION_MATRIX = {
     coord_c1: 'GLOBAL',
     coord_maestria: 'GLOBAL'
   },
+  // (08/09/2026) CORREGIDO — confirmado explícitamente por José: "los Directivos y
+  // Gerentes pueden ver todas las sedes". Antes 'gerente' decía 'SEDE' aquí, pero
+  // Home.jsx ya tenía un botón "GLOBAL" visible para Gerente que no hacía nada real
+  // (el filtro forzaba sede local sin importar la pestaña elegida) — ver el fix
+  // correspondiente en el filtro de eventos de Home.jsx. Ahora la matriz y el
+  // comportamiento real coinciden: Gerente = GLOBAL, igual que Directivos.
   'eventos_entrenamientos': {
     directivos: 'GLOBAL',
-    gerente: 'SEDE',
+    gerente: 'GLOBAL',
     coord_c1: 'SEDE_C1C2',
     coord_maestria: 'SEDE_MJ',
     entrenador: 'ASIGNADOS',
