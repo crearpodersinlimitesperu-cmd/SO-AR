@@ -2078,8 +2078,9 @@ export default function Home() {
                         return isTrainerMatchingUser(ev.trainer || ev.entrenador, currentUser);
                       }
 
-                      // 2. Coordinadores C1/C2: solo los de su sede y solo C1/C2
-                      if (isCoordC1C2) {
+                      // 2. Coordinadores (C1/C2 y Maestría): Confirmado por José (08/09/2026):
+                      // "las coordinadoras de cada sede pueden ver todas las fechas de sus sedes tanto de mj como de c1y c2 todas las fechas y entrenadores"
+                      if (isCoordC1C2 || isCoordMJ) {
                         const userSede = currentUser?.sede || '';
                         const evSede = ev.sede || ev.sedeTag || '';
                         if (userSede && !userSede.toLowerCase().includes('global')) {
@@ -2087,21 +2088,8 @@ export default function Home() {
                             return false;
                           }
                         }
-                        const name = (ev.nombre || ev.name || '').toUpperCase();
-                        return name.includes('CAPITULO UNO') || name.includes('C1') || name.includes('CAPÍTULO UNO') || name.includes('CAPITULO DOS') || name.includes('C2') || name.includes('CAPÍTULO DOS');
-                      }
-
-                      // 3. Coordinadores MJ: solo los de su sede y solo MJ
-                      if (isCoordMJ) {
-                        const userSede = currentUser?.sede || '';
-                        const evSede = ev.sede || ev.sedeTag || '';
-                        if (userSede && !userSede.toLowerCase().includes('global')) {
-                          if (!evSede || (!evSede.toLowerCase().includes(userSede.toLowerCase()) && !userSede.toLowerCase().includes(evSede.toLowerCase()))) {
-                            return false;
-                          }
-                        }
-                        const name = (ev.nombre || ev.name || '').toUpperCase();
-                        return name.includes('MAESTRIA') || name.includes('MJ') || name.includes('MAESTRÍA');
+                        // Ven todos los eventos y entrenadores de su sede (C1, C2 y MJ)
+                        return true;
                       }
 
                       // 4. Capitanes, Aliados y Managers: solo los de su equipo

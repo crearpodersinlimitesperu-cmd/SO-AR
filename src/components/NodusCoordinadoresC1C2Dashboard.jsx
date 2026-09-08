@@ -29,7 +29,7 @@ const COLORS = {
 
 const PIE_COLORS = ['#10b981', '#f59e0b', '#64748b', '#3b82f6', '#ef4444'];
 
-export default function NodusCoordinadoresC1C2Dashboard() {
+export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {}) {
   const { activeTheme } = useTheme();
   const isLight = activeTheme === 'light';
 

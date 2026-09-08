@@ -18,6 +18,13 @@ export default function GoalsBoard() {
   const [loading, setLoading] = useState(true);
   const [selectedSedeFilter, setSelectedSedeFilter] = useState('Todas');
 
+  const canManageGoals = Boolean(
+    currentUser?.isSuperAdmin ||
+    currentUser?.isDireccion ||
+    ['gerente', 'direccion', 'cfo', 'ceo', 'cco', 'director_maestria', 'superadmin', 'consolidado'].includes(currentUser?.appRole) ||
+    (currentUser?.roles || []).some(r => ['gerente', 'direccion', 'cfo', 'ceo', 'cco', 'director_maestria', 'superadmin', 'consolidado'].includes(r))
+  );
+
   // Modal de Asignación / División de Metas
   const [selectedGoalForAssignment, setSelectedGoalForAssignment] = useState(null);
   const [showDivisionModal, setShowDivisionModal] = useState(false);
@@ -421,8 +428,8 @@ export default function GoalsBoard() {
             </p>
           </div>
 
-          {/* BOTONES DE ACCIÓN PARA GERENTES Y COORDINADORAS */}
-          {goal.targetValue && (
+          {/* BOTONES DE ACCIÓN PARA GERENTES Y DIRECTIVOS */}
+          {goal.targetValue && canManageGoals && (
             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
               <button 
                 type="button"
@@ -452,15 +459,15 @@ export default function GoalsBoard() {
           <div style={{ flex: 1, height: '12px', background: 'rgba(255,255,255,0.06)', borderRadius: '6px', overflow: 'hidden' }}>
             <div style={{ 
               height: '100%', 
-              width: `${Math.min(goal.progress, 100)}%`, 
-              background: goal.progress >= 100 
+              width: `${Math.min(Number(goal.progress) || 0, 100)}%`, 
+              background: (Number(goal.progress) || 0) >= 100 
                 ? 'linear-gradient(90deg, #22c55e, #16a34a)' 
                 : 'linear-gradient(90deg, #00d2ff, #0284c7)', 
               transition: 'width 0.4s ease' 
             }} />
           </div>
           <span className="text-gold" style={{ fontWeight: 'bold', minWidth: '45px', fontSize: '1.05rem' }}>
-            {goal.progress}%
+            {Number(goal.progress) || 0}%
           </span>
         </div>
 

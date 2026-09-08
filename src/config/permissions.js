@@ -531,12 +531,14 @@ export const OFFICIAL_PERMISSION_MATRIX = {
   // Home.jsx ya tenía un botón "GLOBAL" visible para Gerente que no hacía nada real
   // (el filtro forzaba sede local sin importar la pestaña elegida) — ver el fix
   // correspondiente en el filtro de eventos de Home.jsx. Ahora la matriz y el
-  // comportamiento real coinciden: Gerente = GLOBAL, igual que Directivos.
+  // (08/09/2026) CORREGIDO — confirmado explícitamente por José:
+  // "las coordinadoras de cada sede pueden ver todas las fechas de sus sedes tanto de mj como de c1y c2 todas las fechas y entrenadores"
+  // Ahora tanto coord_c1 como coord_maestria tienen acceso completo a todas las fechas y entrenadores de su sede.
   'eventos_entrenamientos': {
     directivos: 'GLOBAL',
     gerente: 'GLOBAL',
-    coord_c1: 'SEDE_C1C2',
-    coord_maestria: 'SEDE_MJ',
+    coord_c1: 'SEDE_TODAS_FECHAS',
+    coord_maestria: 'SEDE_TODAS_FECHAS',
     entrenador: 'ASIGNADOS',
     qt: 'SEDE_C1C2_PROXIMOS_SIN_TRAINER',
     capitan: 'EQUIPO',

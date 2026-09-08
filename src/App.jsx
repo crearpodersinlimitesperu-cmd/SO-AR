@@ -223,7 +223,7 @@ function App() {
           } />
 
           <Route path="/metas" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'director_maestria', 'coordinador', 'qt', 'capitan']} requireSuperAdmin={false}>
               <GoalsBoard />
             </RoleRoute>
           } />

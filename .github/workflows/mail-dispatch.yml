@@ -2,8 +2,8 @@ name: 📧 Mail Dispatch & Inactivity Alerts
 
 on:
   schedule:
-    # Runs every 30 minutes
-    - cron: '*/30 * * * *'
+    # Runs every 5 minutes for faster mail delivery
+    - cron: '*/5 * * * *'
   workflow_dispatch: # Allow manual trigger from GitHub UI
 
 jobs:
@@ -58,6 +58,8 @@ jobs:
         env:
           GMAIL_SERVER_EMAIL: ${{ secrets.GMAIL_USER }}
           GMAIL_SERVER_APP_PASSWORD: ${{ secrets.GMAIL_PASS }}
+          LIMA_GMAIL_USER: ${{ secrets.LIMA_GMAIL_USER }}
+          LIMA_GMAIL_PASS: ${{ secrets.LIMA_GMAIL_PASS }}
         run: |
           node scripts/mailerDaemon.js --one-shot
 

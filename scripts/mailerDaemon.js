@@ -58,6 +58,17 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+let limaTransporter = null;
+if (process.env.LIMA_GMAIL_USER && process.env.LIMA_GMAIL_PASS) {
+  limaTransporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.LIMA_GMAIL_USER,
+      pass: process.env.LIMA_GMAIL_PASS
+    }
+  });
+}
+
 const isOneShot = process.argv.includes('--one-shot');
 
 // --- 2.1 GENERACIÓN DE INVITACIÓN DE CALENDARIO (.ics) — (04/09/2026) ---
@@ -144,12 +155,21 @@ async function processMailDoc(docSnap) {
     return;
   }
 
+  const isImoWelcome = data.type === 'imo_welcome';
+
   const validRecipients = [];
   for (const rawTo of rawRecipients) {
     let to = String(rawTo).toLowerCase().trim()
       .replace('@crearpls.com', '@crearpsl.net')
       .replace(/ketherine\.aguirre@/g, 'katherine.aguirre@')
       .replace(/coodinacion\.administrativa@/g, 'coordinacion.administrativa@');
+    
+    if (isImoWelcome) {
+      // IMO participants aren't registered users in Causa OS, skip validation
+      validRecipients.push(to);
+      continue;
+    }
+
     const isCorporate = ['@crearpsl.net', '@crearpsl.com'].some(d => to.endsWith(d));
     if (isCorporate) {
       validRecipients.push(to);
@@ -164,7 +184,6 @@ async function processMailDoc(docSnap) {
       }
     } catch (error) {
       console.error("Error validando correo contra la base de datos:", error.message);
-      // No bloqueamos el envío por un error de validación (p.ej. Firestore momentáneamente inaccesible).
       validRecipients.push(to);
     }
   }
@@ -181,7 +200,7 @@ async function processMailDoc(docSnap) {
 
   const rawHtml = data.message?.html || '<p>Tienes una notificación del sistema Causa OS.</p>';
   const cleanHtml = sanitizeHtml(rawHtml, {
-    allowedTags: ['p', 'b', 'i', 'em', 'strong', 'a', 'h1', 'h2', 'h3', 'ul', 'ol', 'li', 'br', 'hr', 'div', 'span'],
+    allowedTags: ['p', 'b', 'i', 'em', 'strong', 'a', 'h1', 'h2', 'h3', 'ul', 'ol', 'li', 'br', 'hr', 'div', 'span', 'img', 'audio', 'source', 'iframe'],
     allowedAttributes: {
       'a': ['href', 'target', 'style', 'class'],
       'p': ['style', 'class'],
@@ -189,27 +208,31 @@ async function processMailDoc(docSnap) {
       'span': ['style', 'class'],
       'h1': ['style', 'class'],
       'h2': ['style', 'class'],
-      'h3': ['style', 'class']
+      'h3': ['style', 'class'],
+      'img': ['src', 'alt', 'style', 'width', 'height'],
+      'audio': ['controls', 'style', 'src'],
+      'source': ['src', 'type'],
+      'iframe': ['src', 'width', 'height', 'frameborder', 'allow', 'allowfullscreen']
     }
   });
 
+  const mailSender = (isImoWelcome && limaTransporter) ? process.env.LIMA_GMAIL_USER : process.env.GMAIL_SERVER_EMAIL;
+  const currentTransporter = (isImoWelcome && limaTransporter) ? limaTransporter : transporter;
+
   const mailOptions = {
-    from: `"CREAR PODER SIN LÍMITES" <${process.env.GMAIL_SERVER_EMAIL}>`,
+    from: `"CREAR PODER SIN LÍMITES" <${mailSender}>`,
     to: validRecipients,
     subject: data.message?.subject || 'Notificación Causa OS — CREAR PODER SIN LÍMITES',
     html: cleanHtml
   };
 
-  // nodemailer arma el adjunto .ics correctamente por sí solo a partir de
-  // "icalEvent" (no hace falta también agregarlo a mano en "attachments" —
-  // eso duplicaría el archivo en el correo).
   const icsAttachment = buildIcsAttachment(data.calendarEvent);
   if (icsAttachment) {
     mailOptions.icalEvent = { method: 'PUBLISH', filename: icsAttachment.filename, content: icsAttachment.content };
   }
 
   try {
-    await transporter.sendMail(mailOptions);
+    await currentTransporter.sendMail(mailOptions);
     console.log(`✅ Correo enviado con éxito a ${validRecipients.join(', ')}`);
     await db.collection('mail').doc(docSnap.id).update({
       'delivery.state': 'SUCCESS',

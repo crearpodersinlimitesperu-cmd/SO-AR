@@ -1,16 +1,17 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../services/firebase';
-import { collection, addDoc, getDocs, updateDoc, doc, query, where, orderBy, limit } from 'firebase/firestore';
+import { collection, addDoc, getDocs, getDoc, updateDoc, doc, query, where, orderBy, limit } from 'firebase/firestore';
 import { useAuth } from '../context/AuthContext';
 import { useCycles } from '../context/CyclesContext';
 import { useUI } from '../context/UIContext';
 import { 
   ArrowLeft, FileText, Send, Zap, Clock, ShieldAlert, Sparkles, 
   BarChart3, CheckCircle2, AlertTriangle, Star, RefreshCw, ThumbsUp, 
-  ThumbsDown, AlertCircle, Building2, Lock, Unlock, Eye
+  ThumbsDown, AlertCircle, Building2, Lock, Unlock, Eye, Database, Download
 } from 'lucide-react';
 import { OPERATIONAL_SEDES } from '../data/usersData';
+import nodusFallbackData from '../data/nodusFallbackData.json';
 
 // POOL MAESTRO DE 12 PREGUNTAS ROTATIVAS (NODUS & CAUSA OS V1.0)
 const POOL_PREGUNTAS = {
@@ -45,6 +46,20 @@ export default function ReportesBoard() {
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(false);
 
+  // Control estricto de visibilidad: Solo Directivos y Gerentes pueden ver el Dashboard de Evolución (08/09/2026 - Confirmado por José)
+  const role = (currentUser?.activeRole || currentUser?.appRole || currentUser?.role || '').toLowerCase();
+  const roles = (currentUser?.roles || []).map(r => String(r).toLowerCase());
+  const isDireccion = currentUser?.isDireccion || role === 'direccion' || roles.includes('direccion');
+  const isGerente = currentUser?.isGerente || role === 'gerente' || roles.includes('gerente');
+
+  const canViewEvolucionDashboard = Boolean(
+    currentUser?.isSuperAdmin ||
+    isDireccion ||
+    isGerente ||
+    ['gerente', 'direccion', 'cfo', 'ceo', 'cco', 'superadmin', 'consolidado', 'director_maestria'].includes(role) ||
+    roles.some(r => ['gerente', 'direccion', 'cfo', 'ceo', 'cco', 'superadmin', 'consolidado', 'director_maestria'].includes(r))
+  );
+
   // Micro-pulso state (selección aleatoria de 3 preguntas)
   const [pulsoQuestions, setPulsoQuestions] = useState([]);
   const [pulsoRespuestas, setPulsoRespuestas] = useState({});
@@ -53,6 +68,127 @@ export default function ReportesBoard() {
   const [relampagoReports, setRelampagoReports] = useState([]);
   const [pulsoReports, setPulsoReports] = useState([]);
   const [loadingDashboard, setLoadingDashboard] = useState(false);
+
+  // Sincronización inteligente de Nodus (Cero Pereza)
+  const [loadingNodus, setLoadingNodus] = useState(false);
+  const [nodusStatusMsg, setNodusStatusMsg] = useState('');
+  const [nodusEquiposDisponibles, setNodusEquiposDisponibles] = useState([]);
+  const [selectedNodusTeam, setSelectedNodusTeam] = useState('auto');
+  const [nodusMatchedCoord, setNodusMatchedCoord] = useState(null);
+
+  const handleExtraerDeNodus = async (teamOverride = null) => {
+    setLoadingNodus(true);
+    setNodusStatusMsg('');
+    try {
+      let nodusData = null;
+      try {
+        const docRef = doc(db, 'nodus_coordinadores_c1c2', 'latest');
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          nodusData = docSnap.data();
+        }
+      } catch (err) {
+        console.warn("Lectura Firestore nodus_coordinadores_c1c2 falló, usando respaldo local:", err);
+      }
+
+      if (!nodusData || !nodusData.coordinadores) {
+        nodusData = nodusFallbackData;
+      }
+
+      const userEmail = (currentUser?.email || '').toLowerCase().trim();
+      const userName = (currentUser?.displayName || currentUser?.name || '').toLowerCase().trim();
+      const userSede = (currentUser?.sede || '').toLowerCase().trim();
+
+      const coords = nodusData.coordinadores || [];
+      
+      // 1. Buscar coordinador por coincidencia de email o nombre
+      let coord = coords.find(c => {
+        const cEmail = (c.email || '').toLowerCase();
+        const cNombre = (c.nombre || '').toLowerCase();
+        const cNombreComp = (c.nombreCompleto || '').toLowerCase();
+        return (userEmail && (cEmail === userEmail || userEmail.includes(cNombre))) ||
+               (userName && (cNombreComp.includes(userName) || userName.includes(cNombreComp) || cNombre.includes(userName) || userName.includes(cNombre)));
+      });
+
+      // 2. Si Joyce está activa (simulada o real)
+      if (!coord && (userName.includes('joyce') || userEmail.includes('joyce'))) {
+        coord = coords.find(c => c.id === 'coord_joyce_lima' || (c.nombre || '').toLowerCase().includes('joyce'));
+      }
+
+      // 3. Si no se encuentra por nombre, buscar por sede operativa
+      if (!coord && userSede) {
+        coord = coords.find(c => (c.sede || '').toLowerCase() === userSede);
+      }
+
+      // 4. Fallback: primer coordinador
+      if (!coord && coords.length > 0) {
+        coord = coords[0];
+      }
+
+      if (!coord) {
+        showToast('No se encontró información registrada en Nodus para este usuario.', 'error');
+        setLoadingNodus(false);
+        return;
+      }
+
+      setNodusMatchedCoord(coord);
+      const equipos = coord.equipos || [];
+      setNodusEquiposDisponibles(equipos);
+
+      const targetTeamName = teamOverride !== null ? teamOverride : selectedNodusTeam;
+      let targetData = null;
+      let labelTarget = '';
+
+      if (targetTeamName && targetTeamName !== 'auto' && targetTeamName !== 'acumulado') {
+        targetData = equipos.find(e => e.equipo === targetTeamName);
+        labelTarget = targetTeamName;
+      } else if (targetTeamName === 'acumulado' || equipos.length === 0) {
+        targetData = coord.estados;
+        labelTarget = 'Total Acumulado';
+      } else {
+        // 'auto': primer equipo o el que tenga mayor actividad reciente
+        targetData = equipos.find(e => (e.confirmado || 0) > 0) || equipos[0] || coord.estados;
+        labelTarget = targetData?.equipo || 'Último Equipo';
+      }
+
+      if (!targetData) {
+        targetData = coord.estados || {};
+        labelTarget = 'General';
+      }
+
+      const nuevosValores = {
+        nuevos_OK: Number(targetData.confirmado || 0),
+        nuevos_XC: Number(targetData.porConfirmar || 0),
+        nuevos_NC: Number(targetData.noContesta || 0),
+        nuevos_NI: Number(targetData.noInteresa || 0),
+        nuevos_SIG: Number(targetData.siguiente || 0),
+        nuevos_OS: Number(targetData.yaAsistio || 0),
+        nuevos_PENDIENTES: Number(targetData.pendientes || 0),
+        rezagados_OK: Number(targetData.rezagados_OK || 0),
+        rezagados_XC: Number(targetData.rezagados_XC || 0),
+        rezagados_NC: Number(targetData.rezagados_NC || 0),
+        rezagados_NI: Number(targetData.rezagados_NI || 0),
+        rezagados_SIG: Number(targetData.rezagados_SIG || 0),
+        rezagados_PENDIENTES: Number(targetData.rezagados_PENDIENTES || 0),
+        sede_id: coord.sede || currentUser?.sede || 'Lima'
+      };
+
+      setFormData(prev => ({
+        ...prev,
+        ...nuevosValores
+      }));
+
+      const coordLabel = coord.nombreCompleto || coord.nombre;
+      const msg = `Nodus Sincronizado: ${coordLabel} (${coord.sede}) • ${labelTarget} -> ${nuevosValores.nuevos_OK} OK (Confirmados), ${nuevosValores.nuevos_XC} XC, ${nuevosValores.nuevos_NC} NC.`;
+      setNodusStatusMsg(msg);
+      showToast(`¡Datos extraídos de Nodus con éxito! (${labelTarget})`, 'success');
+    } catch (e) {
+      console.error("Error al extraer datos de Nodus:", e);
+      showToast('Error al extraer datos de Nodus.', 'error');
+    } finally {
+      setLoadingNodus(false);
+    }
+  };
 
   // Inicializar o regenerar preguntas del Micro-Pulso
   const shufflePulso = () => {
@@ -70,12 +206,16 @@ export default function ReportesBoard() {
     }
   }, [reportType]);
 
-  // Cargar datos para el dashboard de evolución
+  // Cargar datos para el dashboard de evolución (solo si tiene permisos de directivo o gerente)
   useEffect(() => {
-    if (activeTab === 'dashboard_evolucion') {
+    if (!canViewEvolucionDashboard && activeTab === 'dashboard_evolucion') {
+      setActiveTab('formulario');
+      return;
+    }
+    if (activeTab === 'dashboard_evolucion' && canViewEvolucionDashboard) {
       fetchEvolucionData();
     }
-  }, [activeTab]);
+  }, [activeTab, canViewEvolucionDashboard]);
 
   const fetchEvolucionData = async () => {
     setLoadingDashboard(true);
@@ -198,10 +338,6 @@ export default function ReportesBoard() {
       setLoading(false);
     }
   };
-
-  const role = currentUser?.activeRole || currentUser?.appRole || '';
-  const isDireccion = role === 'direccion';
-  const isGerente = currentUser?.isGerente || ['gerente', 'superadmin', 'direccion'].includes(role);
 
   // Renderizador de formularios
   const renderFormFields = () => {
@@ -631,7 +767,14 @@ export default function ReportesBoard() {
               {metrics.map(m => (
                 <div key={`nuevos_${m}`}>
                   <label className="text-muted" style={{ fontSize: '0.8rem', display: 'block', marginBottom: '0.2rem' }}>{m}</label>
-                  <input type="number" name={`nuevos_${m}`} onChange={handleChange} className="form-input" placeholder="0" />
+                  <input 
+                    type="number" 
+                    name={`nuevos_${m}`} 
+                    value={formData[`nuevos_${m}`] !== undefined ? formData[`nuevos_${m}`] : ''} 
+                    onChange={handleChange} 
+                    className="form-input" 
+                    placeholder="0" 
+                  />
                 </div>
               ))}
               <div style={{ background: 'rgba(255,255,255,0.05)', padding: '0.5rem', borderRadius: '4px' }}>
@@ -646,7 +789,14 @@ export default function ReportesBoard() {
               {metrics.filter(m => m !== 'OS').map(m => (
                 <div key={`rezagados_${m}`}>
                   <label className="text-muted" style={{ fontSize: '0.8rem', display: 'block', marginBottom: '0.2rem' }}>{m}</label>
-                  <input type="number" name={`rezagados_${m}`} onChange={handleChange} className="form-input" placeholder="0" />
+                  <input 
+                    type="number" 
+                    name={`rezagados_${m}`} 
+                    value={formData[`rezagados_${m}`] !== undefined ? formData[`rezagados_${m}`] : ''} 
+                    onChange={handleChange} 
+                    className="form-input" 
+                    placeholder="0" 
+                  />
                 </div>
               ))}
               <div style={{ background: 'rgba(255,255,255,0.05)', padding: '0.5rem', borderRadius: '4px' }}>
@@ -655,10 +805,94 @@ export default function ReportesBoard() {
               </div>
             </div>
           </div>
+
           <div style={{ background: 'rgba(52, 168, 83, 0.1)', border: '1px solid #34a853', padding: '1rem', borderRadius: '8px' }}>
             <p style={{ margin: 0, color: '#34a853', fontSize: '0.9rem' }}>
               💡 Al enviar este reporte, los "OK" se sumarán automáticamente a la Meta de Entrenamiento activa para evitar doble digitación.
             </p>
+          </div>
+
+          {/* BOTÓN Y PANEL DE EXTRACCIÓN AUTOMÁTICA DESDE NODUS */}
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(41, 171, 226, 0.12) 0%, rgba(3, 105, 161, 0.08) 100%)',
+            border: '1px solid rgba(41, 171, 226, 0.35)',
+            borderRadius: '10px',
+            padding: '1.2rem',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.8rem'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.8rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                <div style={{ background: 'rgba(41, 171, 226, 0.2)', padding: '8px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Database size={20} color="var(--crear-cyan, #29abe2)" />
+                </div>
+                <div>
+                  <div style={{ fontWeight: 800, color: '#fff', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    Sincronización Nodus
+                    <span style={{ fontSize: '0.7rem', background: 'rgba(41, 171, 226, 0.25)', color: 'var(--crear-cyan, #29abe2)', padding: '2px 8px', borderRadius: '12px', fontWeight: 700 }}>
+                      Cero Pereza
+                    </span>
+                  </div>
+                  <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                    Auto-completa los campos de llamadas directamente con los datos auditados en Nodus.
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+                {nodusEquiposDisponibles.length > 0 && (
+                  <select
+                    value={selectedNodusTeam}
+                    onChange={(e) => {
+                      setSelectedNodusTeam(e.target.value);
+                      handleExtraerDeNodus(e.target.value);
+                    }}
+                    className="form-input"
+                    style={{ width: 'auto', minWidth: '170px', padding: '0.5rem 0.8rem', fontSize: '0.85rem' }}
+                  >
+                    <option value="auto">⚡ Equipo Activo</option>
+                    <option value="acumulado">📊 Total Acumulado</option>
+                    {nodusEquiposDisponibles.map(eq => (
+                      <option key={eq.equipo} value={eq.equipo}>
+                        {eq.equipo} ({eq.confirmado || 0} OK)
+                      </option>
+                    ))}
+                  </select>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => handleExtraerDeNodus()}
+                  disabled={loadingNodus}
+                  style={{
+                    background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+                    color: '#fff',
+                    border: '1px solid #38bdf8',
+                    borderRadius: '8px',
+                    padding: '0.65rem 1.4rem',
+                    fontWeight: 800,
+                    fontSize: '0.92rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    boxShadow: '0 4px 14px rgba(2, 132, 199, 0.35)',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  {loadingNodus ? <RefreshCw size={16} className="spin" /> : <Download size={16} />}
+                  {loadingNodus ? 'Extrayendo de Nodus...' : 'Extraer de Nodus'}
+                </button>
+              </div>
+            </div>
+
+            {nodusStatusMsg && (
+              <div style={{ background: 'rgba(0, 0, 0, 0.35)', padding: '0.6rem 0.9rem', borderRadius: '6px', fontSize: '0.82rem', color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <CheckCircle2 size={16} color="#34d399" />
+                <span>{nodusStatusMsg}</span>
+              </div>
+            )}
           </div>
         </div>
       );
@@ -735,6 +969,13 @@ export default function ReportesBoard() {
         .form-input:focus {
           outline: none; border-color: var(--crear-cyan, #29abe2);
         }
+        .spin {
+          animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
       `}</style>
       
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
@@ -742,45 +983,51 @@ export default function ReportesBoard() {
           <ArrowLeft size={18} /> Volver al Inicio
         </button>
 
-        {/* CONMUTADOR DE VISTAS */}
-        <div style={{ display: 'flex', gap: '0.5rem', background: 'rgba(255,255,255,0.04)', padding: '4px', borderRadius: '8px' }}>
-          <button
-            onClick={() => setActiveTab('formulario')}
-            style={{
-              padding: '0.5rem 1.2rem',
-              borderRadius: '6px',
-              border: 'none',
-              background: activeTab === 'formulario' ? 'var(--crear-cyan, #29abe2)' : 'transparent',
-              color: activeTab === 'formulario' ? '#000' : 'var(--text-muted)',
-              fontWeight: 800,
-              fontSize: '0.85rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.4rem'
-            }}
-          >
-            <FileText size={16} /> Enviar Reportes
-          </button>
-          <button
-            onClick={() => setActiveTab('dashboard_evolucion')}
-            style={{
-              padding: '0.5rem 1.2rem',
-              borderRadius: '6px',
-              border: 'none',
-              background: activeTab === 'dashboard_evolucion' ? 'var(--crear-gold, #ffb703)' : 'transparent',
-              color: activeTab === 'dashboard_evolucion' ? '#000' : 'var(--text-muted)',
-              fontWeight: 800,
-              fontSize: '0.85rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.4rem'
-            }}
-          >
-            <BarChart3 size={16} /> Dashboard Evolución (Causa OS)
-          </button>
-        </div>
+        {/* CONMUTADOR DE VISTAS (Solo Directivos y Gerentes) */}
+        {canViewEvolucionDashboard ? (
+          <div style={{ display: 'flex', gap: '0.5rem', background: 'rgba(255,255,255,0.04)', padding: '4px', borderRadius: '8px' }}>
+            <button
+              onClick={() => setActiveTab('formulario')}
+              style={{
+                padding: '0.5rem 1.2rem',
+                borderRadius: '6px',
+                border: 'none',
+                background: activeTab === 'formulario' ? 'var(--crear-cyan, #29abe2)' : 'transparent',
+                color: activeTab === 'formulario' ? '#000' : 'var(--text-muted)',
+                fontWeight: 800,
+                fontSize: '0.85rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem'
+              }}
+            >
+              <FileText size={16} /> Enviar Reportes
+            </button>
+            <button
+              onClick={() => setActiveTab('dashboard_evolucion')}
+              style={{
+                padding: '0.5rem 1.2rem',
+                borderRadius: '6px',
+                border: 'none',
+                background: activeTab === 'dashboard_evolucion' ? 'var(--crear-gold, #ffb703)' : 'transparent',
+                color: activeTab === 'dashboard_evolucion' ? '#000' : 'var(--text-muted)',
+                fontWeight: 800,
+                fontSize: '0.85rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem'
+              }}
+            >
+              <BarChart3 size={16} /> Dashboard Evolución (Causa OS)
+            </button>
+          </div>
+        ) : (
+          <div style={{ fontWeight: 800, color: 'var(--crear-cyan)', fontSize: '0.88rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <FileText size={16} /> Módulo Oficial de Reportes
+          </div>
+        )}
       </div>
 
       {/* VISTA 1: FORMULARIO DE REPORTES */}
@@ -798,31 +1045,33 @@ export default function ReportesBoard() {
 
           {/* ACCESOS DIRECTOS DESTACADOS */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
-            {/* CARD 1: REPORTE RELAMPAGO GERENTE */}
-            <div 
-              onClick={() => setReportType('ReporteRelampagoFDS')}
-              style={{
-                background: reportType === 'ReporteRelampagoFDS' ? 'rgba(245,158,11,0.2)' : 'rgba(255,255,255,0.03)',
-                border: reportType === 'ReporteRelampagoFDS' ? '2px solid #f59e0b' : '1px solid rgba(255,255,255,0.08)',
-                borderRadius: '12px',
-                padding: '1.2rem',
-                cursor: 'pointer',
-                transition: 'all 0.2s'
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
-                <span style={{ color: '#fbbf24', fontWeight: 800, fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                  <Zap size={15} /> GERENTES DE SEDE
-                </span>
-                <span style={{ background: 'rgba(245,158,11,0.2)', color: '#fbbf24', fontSize: '0.7rem', padding: '2px 8px', borderRadius: '10px', fontWeight: 'bold' }}>
-                  &lt; 3 minutos
-                </span>
+            {/* CARD 1: REPORTE RELAMPAGO GERENTE (Solo Directivos y Gerentes) */}
+            {canViewEvolucionDashboard && (
+              <div 
+                onClick={() => setReportType('ReporteRelampagoFDS')}
+                style={{
+                  background: reportType === 'ReporteRelampagoFDS' ? 'rgba(245,158,11,0.2)' : 'rgba(255,255,255,0.03)',
+                  border: reportType === 'ReporteRelampagoFDS' ? '2px solid #f59e0b' : '1px solid rgba(255,255,255,0.08)',
+                  borderRadius: '12px',
+                  padding: '1.2rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
+                  <span style={{ color: '#fbbf24', fontWeight: 800, fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                    <Zap size={15} /> GERENTES DE SEDE
+                  </span>
+                  <span style={{ background: 'rgba(245,158,11,0.2)', color: '#fbbf24', fontSize: '0.7rem', padding: '2px 8px', borderRadius: '10px', fontWeight: 'bold' }}>
+                    &lt; 3 minutos
+                  </span>
+                </div>
+                <h3 style={{ margin: '0 0 0.3rem', fontSize: '1.1rem', color: '#fff' }}>⚡ Reporte Relámpago Post-FDS</h3>
+                <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>
+                  Evaluación 5 Puntos (Entrenador, Logística, Staff, Retención TRO y Quiebres). Habilitado Domingo 21:00 a Lunes 12:00 PM.
+                </p>
               </div>
-              <h3 style={{ margin: '0 0 0.3rem', fontSize: '1.1rem', color: '#fff' }}>⚡ Reporte Relámpago Post-FDS</h3>
-              <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>
-                Evaluación 5 Puntos (Entrenador, Logística, Staff, Retención TRO y Quiebres). Habilitado Domingo 21:00 a Lunes 12:00 PM.
-              </p>
-            </div>
+            )}
 
             {/* CARD 2: MICRO-PULSO STAFF */}
             <div 
@@ -867,7 +1116,9 @@ export default function ReportesBoard() {
                   className="form-input"
                 >
                   <option value="">-- Selecciona Formato Oficial Autorizado --</option>
-                  <option value="ReporteRelampagoFDS">⚡ Reporte Relámpago Post-FDS (Gerente de Sede &lt;3 min)</option>
+                  {canViewEvolucionDashboard && (
+                    <option value="ReporteRelampagoFDS">⚡ Reporte Relámpago Post-FDS (Gerente de Sede &lt;3 min)</option>
+                  )}
                   <option value="MicroPulsoStaff">🎧 Micro-Pulso de Staff (Escucha Activa 3 Preguntas &lt;30 seg)</option>
                   <option value="Llamadas">1. Reporte de Llamadas (C1)</option>
                   <option value="FDS">2. Reporte FDS (Sede C1 tradicional)</option>
@@ -893,8 +1144,8 @@ export default function ReportesBoard() {
         </div>
       )}
 
-      {/* VISTA 2: DASHBOARD DE EVOLUCIÓN ORGANIZACIONAL (CAUSA OS) */}
-      {activeTab === 'dashboard_evolucion' && (
+      {/* VISTA 2: DASHBOARD DE EVOLUCIÓN ORGANIZACIONAL (CAUSA OS - Solo Directivos y Gerentes) */}
+      {activeTab === 'dashboard_evolucion' && canViewEvolucionDashboard && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.8rem' }}>
           
           {/* HEADER DEL DASHBOARD */}

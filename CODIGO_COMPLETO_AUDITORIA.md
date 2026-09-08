@@ -122929,6 +122929,6683 @@ export default defineConfig({
 
 ---
 
+## Archivo: Claude outputs\App.jsx
+
+```javascript
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
+import { useAuth } from './context/AuthContext'
+import { useUI } from './context/UIContext'
+import './index.css'
+
+import LearningDashboard from './pages/LearningDashboard'
+import ExcellenceDashboard from './pages/ExcellenceDashboard'
+import Login from './pages/Login'
+import Home from './pages/Home'
+import RoleSelector from './pages/RoleSelector'
+import ChecklistBoard from './pages/ChecklistBoard'
+import GerenteDashboard from './pages/GerenteDashboard'
+import GoalsBoard from './pages/GoalsBoard'
+import ReportesBoard from './pages/ReportesBoard'
+import SuperAdminPanel from './pages/SuperAdminPanel'
+import ManualGuia from './pages/ManualGuia'
+import ManualNodus from './pages/ManualNodus'
+import MisKPIs from './pages/MisKPIs'
+import AuditoriaKPIs from './pages/AuditoriaKPIs'
+import CentroManagers from './pages/CentroManagers'
+import ManagerGuide from './pages/ManagerGuide'
+import DirectorioQT from './pages/DirectorioQT'
+import ProtocoloEmergencias from './pages/ProtocoloEmergencias'
+import PortfolioBoard from './pages/PortfolioBoard'
+import StrategyBoard from './pages/StrategyBoard'
+import OfficialAgreements from './pages/OfficialAgreements'
+import TeamCalendar from './pages/TeamCalendar'
+import EmbudoConversionBoard from './pages/EmbudoConversionBoard'
+import BrandScriptBoard from './pages/BrandScriptBoard'
+import NodusDataMap from './pages/NodusDataMap'
+import CalendarioMJ from './pages/CalendarioMJ'
+import GeneradorFlyer from './pages/GeneradorFlyer'
+import MonitorVuelosCartas from './pages/MonitorVuelosCartas'
+import VendeSinVender from './pages/VendeSinVender'
+import MasterclassDistinciones from './pages/MasterclassDistinciones'
+import DashboardKpisLima from './pages/DashboardKpisLima'
+import CRMBaseMaster from './pages/CRMBaseMaster'
+import MonitorImos from './pages/MonitorImos'
+import AICopilot from './components/AICopilot'
+import PromptModal from './components/PromptModal'
+import BirthdayAlert from './components/BirthdayAlert'
+import ApdaycPaymentAlert from './components/ApdaycPaymentAlert'
+import HelpModal from './components/HelpModal'
+import ThemeToggle from './components/ThemeToggle'
+
+import { useState } from 'react'
+import { HelpCircle } from 'lucide-react'
+
+// Componente para proteger autenticación básica
+function PrivateRoute({ children }) {
+  const { currentUser, loading } = useAuth();
+  
+  if (loading) {
+    return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><p className="text-gold">Cargando...</p></div>;
+  }
+  
+  return currentUser ? children : <Navigate to="/login" replace />;
+}
+
+// Componente para proteger autorización por Roles (S3 / Audit Fix)
+// NOTA (08/09/2026): "currentUser.isDireccion" es, por defecto, un bypass general —
+// cualquier usuario con ese flag en true pasa CUALQUIER RoleRoute, sin importar lo
+// que diga allowedRoles. Esto es intencional y se conserva para la enorme mayoría
+// de rutas (Dirección normalmente debe poder entrar a todo). Pero hay un puñado de
+// rutas donde la Matriz Oficial pide excluir explícitamente a Directivos (p. ej.
+// /calendario-mj, /generador-flyer) — para esas, se agregó el prop opcional
+// `excludeDireccionBypass` (default false, así que NINGUNA ruta existente cambia de
+// comportamiento a menos que lo declare explícitamente). Con
+// excludeDireccionBypass=true, isDireccion deja de ser un pase libre y el usuario
+// debe estar literalmente en `allowedRoles` (o en su array `roles` para multi-rol) —
+// isSuperAdmin SIGUE siendo un bypass total incluso con esta bandera, porque un
+// Super Admin debe poder entrar a cualquier sección para soporte/depuración.
+function RoleRoute({ children, allowedRoles = [], requireSuperAdmin = false, excludeDireccionBypass = false }) {
+  const { currentUser, loading } = useAuth();
+  const { showToast } = useUI();
+
+  if (loading) {
+    return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><p className="text-gold">Verificando permisos...</p></div>;
+  }
+
+  if (!currentUser) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // Verificación de Super Admin
+  if (requireSuperAdmin) {
+    if (currentUser.isSuperAdmin) {
+      return children;
+    }
+    showToast("ACCESO DENEGADO: Esta sección requiere privilegios de Super Administrador.", "error");
+    return <Navigate to="/home" replace />;
+  }
+
+  // Verificación de Roles permitidos
+  if (allowedRoles.length > 0) {
+    const hasRole = allowedRoles.includes(currentUser.appRole) ||
+                    currentUser.isSuperAdmin ||
+                    (!excludeDireccionBypass && currentUser.isDireccion) ||
+                    (currentUser.roles || []).some(r => allowedRoles.includes(r));
+    if (!hasRole) {
+      showToast(`ACCESO DENEGADO: Tu rol actual (${currentUser.appRole}) no tiene acceso a esta sección.`, "error");
+      return <Navigate to="/home" replace />;
+    }
+  }
+
+  return children;
+}
+
+function App() {
+  const { originalAdminUser, currentUser, stopSimulation } = useAuth();
+  const [showHelp, setShowHelp] = useState(false);
+  const location = useLocation();
+  // /home ya tiene su propio selector "Tema:" inline (junto al selector de Vista) —
+  // no se duplica aquí para no repetir el mismo control dos veces en esa página.
+  const showFloatingThemeToggle = !location.pathname.startsWith('/home');
+
+  return (
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      {originalAdminUser && (
+        <div style={{
+          background: 'var(--crear-gold)',
+          color: '#000',
+          padding: '0.8rem 2rem',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          fontWeight: 'bold',
+          zIndex: 9999,
+          boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+          position: 'sticky',
+          top: 0
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <span>⚠️ MODO SIMULADOR ACTIVO:</span>
+            <span>Estás viendo la plataforma como <strong>{currentUser?.name}</strong></span>
+          </div>
+          <button 
+            onClick={stopSimulation}
+            style={{
+              background: '#000',
+              color: 'var(--crear-gold)',
+              border: 'none',
+              padding: '0.4rem 1rem',
+              borderRadius: '6px',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              fontSize: '0.85rem'
+            }}
+          >
+            ❌ Terminar Simulación
+          </button>
+        </div>
+      )}
+      <PromptModal />
+      {currentUser && <BirthdayAlert />}
+      {currentUser && <ApdaycPaymentAlert />}
+      <main style={{ flex: 1 }}>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          
+          <Route path="/" element={<Navigate to="/home" replace />} />
+          
+          <Route path="/home" element={
+            <PrivateRoute>
+              <Home />
+            </PrivateRoute>
+          } />
+
+          <Route path="/manual" element={
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'consolidado', 'director_maestria']} requireSuperAdmin={false}>
+              <ManualGuia />
+            </RoleRoute>
+          } />
+
+          {/* Narrowed 08/09/2026 to match MANUAL_NODUS_ROLES en Home.jsx y la fila
+              "Manual Nodus" de la Matriz Oficial (Directivos, Gerentes, Coordinadores
+              C1Y2 y Coordinadores de MJ). Antes incluía literalmente todos los roles
+              del sistema (qt, capitan, entrenador, entrenador_llamadas, manager,
+              aliado, oficina), permitiendo acceso directo por URL a cualquiera aunque
+              el botón/menú ya lo ocultara. */}
+          <Route path="/manual-nodus" element={
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'director_maestria', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
+              <ManualNodus />
+            </RoleRoute>
+          } />
+
+          <Route path="/masterclass-distinciones" element={
+            <PrivateRoute>
+              <MasterclassDistinciones />
+            </PrivateRoute>
+          } />
+
+          <Route path="/roles" element={
+            <PrivateRoute>
+              <RoleSelector />
+            </PrivateRoute>
+          } />
+          
+          <Route path="/learning" element={
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'director_maestria']}>
+              <LearningDashboard />
+            </RoleRoute>
+          } />
+
+
+
+          <Route path="/excelencia" element={
+            <PrivateRoute>
+              <ExcellenceDashboard />
+            </PrivateRoute>
+          } />
+          
+          <Route path="/gerente" element={
+            <RoleRoute allowedRoles={['gerente', 'direccion', 'cfo', 'ceo', 'cco', 'superadmin', 'consolidado', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'director_maestria', 'entrenador', 'entrenador_llamadas', 'qt', 'capitan']}>
+              <GerenteDashboard />
+            </RoleRoute>
+          } />
+          
+          <Route path="/checklist/:roleId" element={
+            <PrivateRoute>
+              <ChecklistBoard />
+            </PrivateRoute>
+          } />
+
+          <Route path="/metas" element={
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
+              <GoalsBoard />
+            </RoleRoute>
+          } />
+
+          <Route path="/reportes" element={
+            <RoleRoute allowedRoles={['gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'capitan', 'qt', 'direccion', 'director_maestria', 'aliado', 'manager', 'consolidado', 'superadmin', 'cfo', 'ceo', 'cco']}>
+              <ReportesBoard />
+            </RoleRoute>
+          } />
+          <Route path="/micro-pulso" element={
+            <PrivateRoute>
+              <ReportesBoard />
+            </PrivateRoute>
+          } />
+          <Route path="/reporte-relampago" element={
+            <PrivateRoute>
+              <ReportesBoard />
+            </PrivateRoute>
+          } />
+
+          <Route path="/mis-kpis" element={
+            <RoleRoute allowedRoles={['coord_c1', 'coord_maestria', 'qt', 'capitan']} requireSuperAdmin={false}>
+              <MisKPIs />
+            </RoleRoute>
+          } />
+
+          {/* Narrowed 08/09/2026: la fila "Auditoría de KPIs" de la Matriz Oficial es
+              Directivos + Gerentes únicamente. Antes incluía también coordinadores
+              C1Y2 y de MJ, que no figuran en esa fila. /diagnostico-cmj comparte el
+              mismo componente (AuditoriaKPIs) y se alinea al mismo criterio. */}
+          <Route path="/auditoria-kpis" element={
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria']} requireSuperAdmin={false}>
+              <AuditoriaKPIs />
+            </RoleRoute>
+          } />
+
+          <Route path="/diagnostico-cmj" element={
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria']} requireSuperAdmin={false}>
+              <AuditoriaKPIs defaultTab="cmj" />
+            </RoleRoute>
+          } />
+
+          <Route path="/superadmin" element={
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria']} requireSuperAdmin={false}>
+              <SuperAdminPanel />
+            </RoleRoute>
+          } />
+          
+          <Route path="/guias/managers" element={
+            <PrivateRoute>
+              <ManagerGuide />
+            </PrivateRoute>
+          } />
+
+          <Route path="/centro-managers" element={
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'director_maestria']} requireSuperAdmin={false}>
+              <CentroManagers />
+            </RoleRoute>
+          } />
+
+          <Route path="/directorio-qt" element={
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'director_maestria']} requireSuperAdmin={false}>
+              <DirectorioQT />
+            </RoleRoute>
+          } />
+
+          <Route path="/protocolo-emergencias" element={
+            <PrivateRoute>
+              <ProtocoloEmergencias />
+            </PrivateRoute>
+          } />
+
+          {/* PMO Culture Integrations */}
+          <Route path="/portafolio" element={
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria']} requireSuperAdmin={false}>
+              <PortfolioBoard />
+            </RoleRoute>
+          } />
+
+          <Route path="/estrategia" element={
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria']} requireSuperAdmin={false}>
+              <StrategyBoard />
+            </RoleRoute>
+          } />
+
+          <Route path="/embudo-conversion" element={
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'entrenador', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coordinador_mj']} requireSuperAdmin={false}>
+              <EmbudoConversionBoard />
+            </RoleRoute>
+          } />
+
+          <Route path="/brandscript" element={
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'entrenador', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coordinador_mj', 'qt', 'capitan']} requireSuperAdmin={false}>
+              <BrandScriptBoard />
+            </RoleRoute>
+          } />
+
+          <Route path="/acuerdos" element={
+            <PrivateRoute>
+              <OfficialAgreements />
+            </PrivateRoute>
+          } />
+
+          <Route path="/calendario-equipo" element={
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'director_maestria']} requireSuperAdmin={false}>
+              <TeamCalendar />
+            </RoleRoute>
+          } />
+
+          {/* Nodus Data Map (28/08/2026): mismo criterio de acceso que el Copiloto SO-AR
+              y que ROLES_GERENCIA en cloudflare-worker/src/index.js — solo gerencia/dirección,
+              decidido así explícitamente con José. */}
+          <Route path="/nodus-data-map" element={
+            <RoleRoute allowedRoles={['gerente', 'direccion', 'cfo', 'cco', 'ceo', 'director_maestria', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
+              <NodusDataMap />
+            </RoleRoute>
+          } />
+
+          {/* Calendario de Maestría del Juego (29/08/2026): generador/editor del
+              calendario oficial por equipo (formato CREAR), pedido por José a
+              partir de 3 PDF de ejemplo reales. Ver notas en CalendarioMJ.jsx.
+              Narrowed 08/09/2026: José confirmó explícitamente ("sí, así es
+              correcto") que SOLO Coordinadores de MJ tienen acceso — se removieron
+              direccion/cfo/ceo/cco/gerente/superadmin/consolidado/director_maestria.
+              excludeDireccionBypass=true agregado 08/09/2026 (confirmado por José):
+              cierra el bypass general de RoleRoute para Directivos en ESTA ruta
+              específicamente, así que ahora si un Directivo entra por URL directa
+              también es rechazado — antes solo se ocultaba el botón. isSuperAdmin
+              sigue teniendo acceso (soporte/depuración). */}
+          <Route path="/calendario-mj" element={
+            <RoleRoute allowedRoles={['coord_maestria', 'coordinador_mj']} requireSuperAdmin={false} excludeDireccionBypass={true}>
+              <CalendarioMJ />
+            </RoleRoute>
+          } />
+
+          {/* Generador de Flyers Oficiales (02/09/2026): Generador HD 1080x1920 con fechas por sede.
+              Narrowed 08/09/2026: José confirmó explícitamente que Directivos NO
+              tienen acceso (y director_maestria se trata como Directivos). Se
+              removieron direccion/cfo/ceo/cco/superadmin/consolidado/director_maestria
+              y se agregaron coord_maestria/coordinador_mj (presentes en la Matriz
+              Oficial pero ausentes antes). excludeDireccionBypass=true agregado
+              08/09/2026 (confirmado por José), misma razón que en /calendario-mj. */}
+          <Route path="/generador-flyer" element={
+            <RoleRoute allowedRoles={['gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj']} requireSuperAdmin={false} excludeDireccionBypass={true}>
+              <GeneradorFlyer />
+            </RoleRoute>
+          } />
+
+          {/* Monitor de Vuelos y Cartas Oficiales */}
+          {/* Contiene AMBAS: "Monitor de Vuelos" (Directivos+Gerentes) y "Sistema de
+              Cartas" (solo Gerentes) como pestañas separadas dentro de
+              MonitorVuelosCartas.jsx (08/09/2026) — el guard de ruta debe cubrir la
+              UNIÓN de ambas audiencias; el gate fino por pestaña vive dentro del
+              componente (canAccessMonitorVuelos / canAccessSistemaCartas). */}
+          <Route path="/monitor-vuelos" element={
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria']} requireSuperAdmin={false}>
+              <MonitorVuelosCartas />
+            </RoleRoute>
+          } />
+          <Route path="/vuelos" element={<Navigate to="/monitor-vuelos" replace />} />
+          <Route path="/cartas" element={<Navigate to="/monitor-vuelos" replace />} />
+          
+          {/* Ampliado 08/09/2026: la fila "Monitor de IMOs" de la Matriz Oficial
+              también autoriza a Coordinadores C1Y2 y de MJ (alcance "SOLO LIMA" —
+              el enforcement real de sede queda pendiente para Fase 2, no
+              implementado aquí). Antes solo dejaba pasar a Directivos/Gerentes,
+              igual que Monitor de Vuelos, con el que compartía gate por error. */}
+          <Route path="/monitor-imos" element={
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria', 'coord_c1', 'coord_maestria']} requireSuperAdmin={false}>
+              <MonitorImos />
+            </RoleRoute>
+          } />
+          <Route path="/kpis-lima" element={
+            <PrivateRoute>
+              <DashboardKpisLima />
+            </PrivateRoute>
+          } />
+
+          <Route path="/crm-maestro" element={
+            <PrivateRoute>
+              <CRMBaseMaster />
+            </PrivateRoute>
+          } />
+
+          {/* Best-Seller Causa OS: Vende Sin Vender */}
+          <Route path="/vende-sin-vender" element={
+            <PrivateRoute>
+              <VendeSinVender />
+            </PrivateRoute>
+          } />
+          <Route path="/causa-vende" element={<Navigate to="/vende-sin-vender" replace />} />
+
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
+      
+      {/* Botón flotante de ayuda */}
+      {currentUser && (
+        <>
+          {/* Selector Día/Noche/Auto: disponible en toda la plataforma (27/08/2026),
+              flotante para no interferir con el layout de cada página. Reutiliza
+              ThemeToggle tal cual (mismo componente que ya funcionaba en Home) —
+              no se tocó ThemeContext.jsx ni su lógica. */}
+          {showFloatingThemeToggle && (
+            <div style={{ position: 'fixed', top: '1rem', right: '1rem', zIndex: 8500 }}>
+              <ThemeToggle />
+            </div>
+          )}
+          {/* Copiloto SO-AR: restringido a Gerentes y Directivos por decisión explícita (26/08/2026) */}
+          {(currentUser.isSuperAdmin || currentUser.isGerente || currentUser.isDireccion) && (
+            <AICopilot />
+          )}
+          <button
+            onClick={() => setShowHelp(true)}
+            title="Manual y Ayuda"
+            style={{
+              position: 'fixed',
+              bottom: '2rem',
+              right: '6.5rem',
+              width: '56px',
+              height: '56px',
+              borderRadius: '50%',
+              background: 'var(--crear-gold)',
+              color: '#000',
+              border: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+              cursor: 'pointer',
+              zIndex: 9000,
+              transition: 'transform 0.2s ease',
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+          >
+            <HelpCircle size={28} />
+          </button>
+        </>
+      )}
+
+      <HelpModal isOpen={showHelp} onClose={() => setShowHelp(false)} />
+    </div>
+  )
+}
+
+export default App
+
+```
+
+---
+
+## Archivo: Claude outputs\AuthContext.jsx
+
+```javascript
+import { createContext, useContext, useEffect, useState } from 'react';
+import { auth } from '../services/firebase';
+import { signInWithPopup, reauthenticateWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'firebase/auth';
+import { collection, query, where, getDocs, doc, getDoc, setDoc, serverTimestamp, addDoc } from 'firebase/firestore';
+import { db } from '../services/firebase';
+import { normalizeRole, ROLE_DISPLAY_NAMES, findUserByAnyEmail } from '../data/usersData';
+import { isSuperAdminEmail, isDireccionRole, isGerenciaRole, canSimulate, DUAL_ROLE_TRAINER_EMAILS } from '../config/permissions';
+import { useUI } from './UIContext';
+import { recordAuditEvent, fetchNetworkInfo } from '../services/auditService';
+import { normalizeUserRecord } from '../utils/userNormalizer';
+import { enforceUserRolesAgent } from '../services/roleAgentDaemon';
+
+const AuthContext = createContext();
+
+export function AuthProvider({ children }) {
+  const [currentUser, setCurrentUser] = useState(null);
+  const [originalAdminUser, setOriginalAdminUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const { showToast } = useUI();
+
+  // (07/09/2026) DIAGNÓSTICO CONFIRMADO CON DATOS REALES: 60 de 144 correos en
+  // la colección "users" tienen MÁS DE UN documento — típicamente uno creado
+  // por bootstrapSync.js/qtSyncDaemon.js con un ID tipo slug (ej.
+  // "jose_sanchez_crearpsl", con "roles" casi siempre en null) y otro creado
+  // por el propio login con ID = UID real de Firebase Auth (con "roles" bien
+  // poblado como arreglo). Antes de este fix, cuando una consulta encontraba
+  // ambos documentos, `snap.docs[0]` devolvía el que Firestore ordenara
+  // primero (orden no controlado por nosotros, prácticamente una moneda al
+  // aire) — así que en cada login la persona podía "perder" sus roles
+  // múltiples si por azar se devolvía el documento slug en vez del UID.
+  // Esto es justamente por qué el selector de "cambiar rol" no aparecía de
+  // forma consistente para gente con más de un cargo real.
+  // Las reglas de Firestore (firestore.rules) SIEMPRE validan permisos
+  // leyendo users/{request.auth.uid} — por eso, cuando hay varios documentos
+  // para el mismo correo, preferimos deliberadamente el que tiene forma de
+  // UID de Firebase Auth: es el mismo que las reglas van a usar de todos
+  // modos, así que usarlo también para leer el perfil hace que el
+  // comportamiento sea consistente en vez de aleatorio.
+  const pareceUidFirebase = (docId) => /^[A-Za-z0-9]{20,36}$/.test(docId) && !docId.includes('_');
+
+  const elegirDocumentoCanonico = (snap) => {
+    if (snap.empty) return null;
+    if (snap.size === 1) return snap.docs[0];
+    // Si hay varios documentos para el mismo correo, preferir el que tiene
+    // forma de UID de Firebase Auth (el mismo que usan las reglas de
+    // seguridad y las escrituras de login). Si ninguno tiene esa forma,
+    // se mantiene el comportamiento anterior (el primero que devuelva Firestore).
+    const conFormaDeUid = snap.docs.find((d) => pareceUidFirebase(d.id));
+    return conFormaDeUid || snap.docs[0];
+  };
+
+  // Búsqueda progresiva de usuarios en Firestore
+  const findUserInFirestore = async (normalizedEmail) => {
+    try {
+      const usersRef = collection(db, "users");
+
+      // 1. emails array-contains
+      let q = query(usersRef, where("emails", "array-contains", normalizedEmail));
+      let snap = await getDocs(q);
+      if (!snap.empty) {
+        const elegido = elegirDocumentoCanonico(snap);
+        return { ...elegido.data(), _docId: elegido.id };
+      }
+
+      // 2. email ==
+      q = query(usersRef, where("email", "==", normalizedEmail));
+      snap = await getDocs(q);
+      if (!snap.empty) {
+        const elegido = elegirDocumentoCanonico(snap);
+        return { ...elegido.data(), _docId: elegido.id };
+      }
+
+      // 3. corporateEmail ==
+      q = query(usersRef, where("corporateEmail", "==", normalizedEmail));
+      snap = await getDocs(q);
+      if (!snap.empty) {
+        const elegido = elegirDocumentoCanonico(snap);
+        return { ...elegido.data(), _docId: elegido.id };
+      }
+
+      // 4. personalEmail ==
+      q = query(usersRef, where("personalEmail", "==", normalizedEmail));
+      snap = await getDocs(q);
+      if (!snap.empty) {
+        const elegido = elegirDocumentoCanonico(snap);
+        return { ...elegido.data(), _docId: elegido.id };
+      }
+
+    } catch (err) {
+      console.error("Error consultando Firestore:", err);
+    }
+    return null;
+  };
+
+  const switchRole = (newRole) => {
+    const canonicalNewRole = normalizeRole(newRole);
+    sessionStorage.setItem('cpsl_active_role', canonicalNewRole);
+
+    // (07/09/2026) Confirmado explícitamente por José: hasta ahora este selector solo
+    // cambiaba el estado local de React (lo que se VE), nunca escribía a Firestore — así
+    // que cualquier acción protegida por firestore.rules (por ejemplo guardar en
+    // mj_calendars o gestionar managers_directory) seguía evaluándose con el rol
+    // "oficial" guardado en el login, sin importar qué eligiera la persona aquí. Este
+    // setDoc hace que el cambio sea real: guarda el rol elegido en users/{uid}, en un
+    // campo NUEVO y separado (activeRoleOverride) — nunca en "role", porque ese campo
+    // también lo usan SuperAdminPanel.jsx, GerenteDashboard.jsx, UserAuditReport.jsx y
+    // causa_sync_bot.mjs como el cargo oficial de la persona, no como su vista de
+    // sesión. Ver effectiveRole() en firestore.rules para el lado que lo consume.
+    // Es "fire and forget": no bloquea el cambio visual si la escritura tarda o falla
+    // (queda igual que antes en ese caso — decorativo pero sin romper la sesión), y el
+    // error se registra en consola para poder diagnosticarlo si pasa seguido.
+    if (auth.currentUser?.uid) {
+      setDoc(doc(db, 'users', auth.currentUser.uid), { activeRoleOverride: canonicalNewRole }, { merge: true })
+        .catch((err) => {
+          console.error('No se pudo guardar el rol activo en Firestore (el cambio de vista sigue funcionando localmente):', err);
+        });
+    }
+
+    setCurrentUser(prev => {
+      if (!prev) return null;
+      const isConsolidated = canonicalNewRole === 'consolidado';
+      const userRoles = prev.roles || [prev.appRole || ''];
+      const hasDireccion = userRoles.some(r => isDireccionRole(r)) || isDireccionRole(prev.role) || isDireccionRole(prev.rawRole);
+      const hasGerente = userRoles.some(r => isGerenciaRole(r)) || isGerenciaRole(prev.role);
+      const isSuper = prev.isSuperAdmin || isSuperAdminEmail(prev.email);
+
+      // (08/09/2026) BUG REAL encontrado y corregido, reportado por José probando el
+      // selector de roles: "cuando cambio de rol esto se debería modificar, que solo
+      // se vean los del rol". Antes, isDireccion/isGerente quedaban forzados a `true`
+      // para cualquier SuperAdmin sin importar el rol elegido en el selector (por el
+      // "isSuper ||" al inicio de cada fórmula) — así que simular "Entrenador" o "QT"
+      // seguía mostrando TODO como si fuera Dirección/Gerente. Ahora, cuando se elige
+      // un rol específico (no 'consolidado'), estas banderas reflejan ÚNICAMENTE ese
+      // rol simulado — igual que las vería una persona real con ese rol — y se agrega
+      // `isRoleSimulationActive` para que checkModuleAccess() (permissions.js) y
+      // hasRoleAccess()/isModuleVisible() (Home.jsx) sepan que deben dejar de aplicar
+      // el bypass total de SuperAdmin mientras dura la simulación. `isSuperAdmin` en sí
+      // NUNCA se apaga (sigue siendo su identidad real de cuenta: conserva el badge,
+      // el acceso al propio selector, y la capacidad de volver a "Vista Consolidada").
+      const isRoleSimulationActive = !isConsolidated;
+      const isDireccion = isConsolidated
+        ? (isSuper || hasDireccion)
+        : isDireccionRole(canonicalNewRole);
+      const isGerente = isConsolidated
+        ? (isSuper || isDireccion || hasGerente)
+        : (isDireccion || canonicalNewRole === 'gerente' || canonicalNewRole === 'director_maestria');
+
+      const updated = {
+        ...prev,
+        activeRole: canonicalNewRole,
+        appRole: canonicalNewRole,
+        isConsolidatedView: isConsolidated,
+        isDireccion,
+        isGerente,
+        isSuperAdmin: isSuper,
+        isRoleSimulationActive
+      };
+
+      recordAuditEvent({
+        email: prev.email || '',
+        name: prev.name || prev.displayName || 'Usuario',
+        role: canonicalNewRole,
+        sede: prev.sede || 'Global',
+        action: 'CAMBIO_ROL',
+        details: `Cambió de rol activo a: ${ROLE_DISPLAY_NAMES[canonicalNewRole] || canonicalNewRole}`
+      });
+
+      return updated;
+    });
+    showToast(`Rol activo cambiado a: ${ROLE_DISPLAY_NAMES[canonicalNewRole] || canonicalNewRole}`, 'info');
+  };
+
+  const simulateUser = (targetUser) => {
+    if (!canSimulate(currentUser, originalAdminUser)) {
+      showToast('Acceso Denegado: Solo Super Administradores y Directivos pueden simular usuarios.', 'error');
+      return;
+    }
+    setOriginalAdminUser(currentUser);
+    sessionStorage.removeItem('cpsl_active_role');
+    
+    const targetEmail = targetUser.emails?.[0] || targetUser.email || '';
+    const mockAuthUser = {
+      email: targetEmail,
+      displayName: targetUser.name,
+      uid: targetUser.id || 'simulated_uid'
+    };
+
+    const simulatedUser = buildUserObject(mockAuthUser, targetUser, targetEmail);
+    setCurrentUser({
+      ...simulatedUser,
+      isSimulated: true
+    });
+
+    recordAuditEvent({
+      email: currentUser?.email || 'admin@crearpsl.net',
+      name: currentUser?.name || 'Super Administrador',
+      role: currentUser?.appRole || 'superadmin',
+      sede: currentUser?.sede || 'Global',
+      action: 'SIMULACION_ADMIN',
+      details: `El administrador visualizó la pantalla de: ${targetUser.name} (${targetEmail})`,
+      isSimulation: true
+    });
+
+    showToast(`Iniciando simulación como ${targetUser.name}`, 'success');
+  };
+
+  const stopSimulation = () => {
+    if (originalAdminUser) {
+      sessionStorage.removeItem('cpsl_active_role');
+      recordAuditEvent({
+        email: originalAdminUser.email || '',
+        name: originalAdminUser.name || 'Admin',
+        role: originalAdminUser.appRole || 'direccion',
+        sede: originalAdminUser.sede || 'Global',
+        action: 'FIN_SIMULACION',
+        details: 'Fin de sesión simulada'
+      });
+      setCurrentUser(originalAdminUser);
+      setOriginalAdminUser(null);
+      showToast('Simulación terminada. Bienvenido de vuelta, Admin.', 'success');
+    }
+  };
+
+  const buildUserObject = (user, foundUser, normalizedEmail) => {
+    const canonicalRole = normalizeRole(foundUser.role);
+    const isSuperAdmin = isSuperAdminEmail(normalizedEmail) || isSuperAdminEmail(foundUser.email);
+
+    let assignedRoles = [canonicalRole];
+    if (foundUser.roles && foundUser.roles.length > 0) {
+      assignedRoles = foundUser.roles.map(r => normalizeRole(r));
+    }
+
+    // Filtrar roles inválidos (null = roles que no son del sistema, como 'student')
+    assignedRoles = assignedRoles.filter(r => r != null);
+    
+    // Si es SuperAdmin, inyectarle los roles gerenciales y de consolidado para que tenga el selector
+    if (isSuperAdmin) {
+      if (!assignedRoles.includes('gerente')) assignedRoles.push('gerente');
+      if (!assignedRoles.includes('direccion')) assignedRoles.push('direccion');
+      if (!assignedRoles.includes('consolidado')) assignedRoles.push('consolidado');
+    }
+
+    // 🔥 GOBERNANZA: Si es un Entrenador Dual (ej. Andres Gomez) y por base de datos no tiene
+    // el array de roles, se inyecta obligatoriamente 'entrenador' para activar el selector.
+    if (DUAL_ROLE_TRAINER_EMAILS.includes(normalizedEmail)) {
+      if (!assignedRoles.includes('entrenador')) {
+        assignedRoles.push('entrenador');
+      }
+    }
+
+    // ensure unique
+    assignedRoles = Array.from(new Set(assignedRoles.filter(r => r && r !== 'miembro')));
+    if (assignedRoles.length === 0) assignedRoles = ['miembro'];
+
+    const hasDireccion = assignedRoles.some(r => isDireccionRole(r)) || isDireccionRole(canonicalRole);
+    const hasGerente = assignedRoles.some(r => isGerenciaRole(r)) || isGerenciaRole(canonicalRole);
+
+    const savedActiveRole = sessionStorage.getItem('cpsl_active_role');
+    const isConsolidated = savedActiveRole === 'consolidado';
+    
+    let activeRole = canonicalRole;
+    if (isConsolidated) {
+      activeRole = 'consolidado';
+    } else if (savedActiveRole && assignedRoles.includes(savedActiveRole)) {
+      activeRole = savedActiveRole;
+    } else if (assignedRoles.length > 0) {
+      activeRole = assignedRoles[0];
+    }
+
+    // (08/09/2026) Mismo fix que en switchRole() más abajo: si al cargar/recargar la
+    // página ya había un rol simulado guardado en sessionStorage (savedActiveRole, no
+    // 'consolidado'), isDireccion/isGerente deben reflejar SOLO ese rol para un
+    // SuperAdmin, no su privilegio real — si no, la simulación se "olvidaba" cada vez
+    // que la página se recargaba.
+    const isRoleSimulationActive = Boolean(savedActiveRole) && !isConsolidated;
+    const isDireccion = isConsolidated
+      ? (isSuperAdmin || hasDireccion)
+      : (isRoleSimulationActive ? isDireccionRole(activeRole) : (isSuperAdmin || isDireccionRole(activeRole)));
+    const isGerente = isConsolidated
+      ? (isSuperAdmin || isDireccion || hasGerente)
+      : (isRoleSimulationActive ? (isDireccion || activeRole === 'gerente' || activeRole === 'director_maestria') : (isSuperAdmin || isDireccion || activeRole === 'gerente' || activeRole === 'director_maestria'));
+
+    return {
+      ...user,
+      email: foundUser.email || user.email, // 🚨 Unifica TODO sobre el correo primario para que coincida con DB y Checklist
+      name: foundUser.name || user.displayName || 'Colaborador CREAR',
+      appRole: activeRole,
+      activeRole: activeRole,
+      roles: assignedRoles,
+      isConsolidatedView: isConsolidated,
+      isGerente,
+      isSuperAdmin,
+      isDireccion,
+      isRoleSimulationActive,
+      sede: foundUser.sede || 'Global',
+      document: foundUser.document || '',
+      docType: foundUser.docType || '',
+      dbId: foundUser.id,
+      rawRole: foundUser.role,
+      role: canonicalRole
+    };
+  };
+
+  // (04/09/2026) José reportó el error "No se encontró sesión con permisos
+  // de Google. Por favor, cierra sesión y vuelve a entrar." — el token de
+  // acceso de Google (sessionStorage.googleAccessToken) dura ~1 hora y no
+  // hay forma de refrescarlo automáticamente, así que cualquier intento de
+  // usar Calendar/Tasks después de esa hora fallaba y obligaba a cerrar
+  // sesión completa. Esta función hace lo mismo que loginWithGoogle pero con
+  // reauthenticateWithPopup (un popup corto, sin perder la sesión de la app
+  // ni recargar la página) — los 3 lugares que leen googleAccessToken la
+  // llaman como respaldo automático cuando no encuentran el token.
+  const reauthenticateGoogle = async () => {
+    if (!auth.currentUser) return null;
+    const provider = new GoogleAuthProvider();
+    provider.addScope('https://www.googleapis.com/auth/calendar.events');
+    provider.addScope('https://www.googleapis.com/auth/tasks');
+    provider.addScope('https://www.googleapis.com/auth/drive.file');
+    try {
+      const result = await reauthenticateWithPopup(auth.currentUser, provider);
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      if (credential && credential.accessToken) {
+        sessionStorage.setItem('googleAccessToken', credential.accessToken);
+        return credential.accessToken;
+      }
+      return null;
+    } catch (error) {
+      console.error('Error reautenticando con Google:', error);
+      return null;
+    }
+  };
+
+  const loginWithGoogle = async () => {
+    const provider = new GoogleAuthProvider();
+    provider.addScope('https://www.googleapis.com/auth/calendar.events');
+    provider.addScope('https://www.googleapis.com/auth/tasks');
+    provider.addScope('https://www.googleapis.com/auth/drive.file');
+
+    try {
+      const result = await signInWithPopup(auth, provider);
+
+      // Extract Google Access Token for API calls
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      if (credential && credential.accessToken) {
+        sessionStorage.setItem('googleAccessToken', credential.accessToken);
+      }
+      
+      const user = result.user;
+      const rawEmail = user.email.trim().toLowerCase();
+      
+      // FORZAR USO DE .NET (Excepto para los correos autorizados explicitamente de gmail y miembros registrados)
+      const allowedGmails = [
+        'armando.pilacuan@gmail.com', 
+        'gomeznueve@gmail.com', 
+        'emalejodiaz@gmail.com', 
+        'anamonroyt@gmail.com', 
+        'dibrafi@gmail.com', 
+        'fernandomendozaclavijo22@gmail.com', 
+        'marylourdespat@gmail.com', 
+        'direccion@bmbgbrokers.com', 
+        'milacampuzano21@gmail.com',
+        'cardenaslopezgina@gmail.com',
+        'cardenasgina29@gmail.com',
+        'rouz1414@gmail.com',
+        'brunische66@gmail.com'
+      ];
+      const normalizedEmail = rawEmail.replace('@crearpsl.com', '@crearpsl.net');
+      
+      // Buscar en Firestore con búsqueda progresiva (revisando normalized y raw)
+      let foundUser = await findUserInFirestore(normalizedEmail);
+      if (!foundUser && rawEmail !== normalizedEmail) {
+        foundUser = await findUserInFirestore(rawEmail);
+      }
+
+      // Fallback a directorio de staff migrado
+      if (!foundUser) {
+        try {
+          const staffRef = collection(db, "staff_directory");
+          
+          let sq = query(staffRef, where("emails", "array-contains", rawEmail));
+          let sSnap = await getDocs(sq);
+          if (!sSnap.empty) {
+            foundUser = sSnap.docs[0].data();
+          } else {
+            sq = query(staffRef, where("email", "==", rawEmail));
+            sSnap = await getDocs(sq);
+            if (!sSnap.empty) foundUser = sSnap.docs[0].data();
+          }
+        } catch (err) {
+          console.error("Error consultando staff_directory:", err);
+        }
+      }
+
+      // Fallback a directorio de QT
+      if (!foundUser) {
+        try {
+          const qtRef = collection(db, "qt_directory");
+          let qSnap = await getDocs(query(qtRef, where("email", "==", rawEmail)));
+          if (!qSnap.empty) foundUser = qSnap.docs[0].data();
+        } catch (err) {
+          console.error("Error consultando qt_directory:", err);
+        }
+      }
+
+      // Verificación de política: si no es @crearpsl.net, ni está en la lista blanca, ni en Firestore/QT, se rechaza
+      if (!rawEmail.endsWith('@crearpsl.net') && !allowedGmails.includes(rawEmail) && !foundUser) {
+        await auth.signOut();
+        throw new Error('ACCESO DENEGADO: Por política corporativa, debes iniciar sesión exclusivamente con tu correo corporativo @crearpsl.net');
+      }
+
+      // 🆕 (02/09/2026) Respaldo: catálogo estático usersToImport.js (findUserByAnyEmail).
+      // Antes de este fix, si el correo todavía no existía en Firestore (típicamente
+      // porque nadie corrió una importación manual para esa persona), el login caía
+      // directo al "colaborador" genérico, aunque esa persona ya estuviera correctamente
+      // registrada como entrenador/etc. en el código fuente. Caso real confirmado:
+      // Lourdes Patiño (marylourdespat@gmail.com) — ver managers_directory/liquidacion,
+      // reportado por José el 02/09/2026.
+      if (!foundUser) {
+        const staticUser = findUserByAnyEmail(normalizedEmail);
+        if (staticUser) {
+          foundUser = { ...staticUser };
+        }
+      }
+
+      if (!foundUser) {
+        foundUser = {
+          id: user.uid,
+          uid: user.uid,
+          name: user.displayName || "Usuario",
+          role: "colaborador",
+          sede: "Global",
+          emails: [normalizedEmail],
+          email: normalizedEmail
+        };
+      } else {
+        foundUser.uid = user.uid; // Asegurar que tenga el UID correcto
+      }
+
+      // Normalizar el registro usando el esquema canónico (Hito 1)
+      let canonicalUser = normalizeUserRecord(foundUser, 'login');
+
+      // 🕵️‍♂️ AGENTE ONLINE: Validar y sanar multiroles 
+      const updatedRoles = await enforceUserRolesAgent(user, user.uid, canonicalUser.roles);
+      canonicalUser.roles = updatedRoles;
+
+      // 🔥 CRÍTICO: Guardar el usuario en la colección "users"
+      // Si no existe aquí, las reglas de Firestore (Hito 0) rechazarán todas sus peticiones.
+      try {
+        await setDoc(doc(db, 'users', user.uid), canonicalUser, { merge: true });
+      } catch (e) {
+        console.warn('Cannot update /users since only superadmin can, continuing login');
+      }
+
+      const userObj = buildUserObject(user, canonicalUser, normalizedEmail);
+      setCurrentUser(userObj);
+
+      recordAuditEvent({
+        uid: user.uid,
+        email: normalizedEmail,
+        name: foundUser.name || user.displayName,
+        role: canonicalUser.appRole,
+        sede: canonicalUser.sede,
+        action: 'LOGIN',
+        details: 'Inicio de sesión exitoso'
+      });
+
+      return user;
+    } catch (error) {
+      console.error("Error signing in with Google", error);
+      throw error;
+    }
+  };
+
+  const logout = async () => {
+    if (currentUser && !currentUser.isSimulated) {
+      try {
+        await recordAuditEvent({
+          email: currentUser.email || currentUser.emails?.[0] || 'Desconocido',
+          name: currentUser.name || 'Desconocido',
+          role: currentUser.appRole || 'Desconocido',
+          sede: currentUser.sede || 'Desconocida',
+          action: 'LOGOUT',
+          details: 'Cierre de sesión manual'
+        });
+      } catch (e) {}
+    }
+    sessionStorage.removeItem('googleAccessToken');
+    sessionStorage.removeItem('cpsl_active_role');
+    return signOut(auth);
+  };
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const rawEmail = user.email.trim().toLowerCase();
+        const normalizedEmail = rawEmail.replace('@crearpsl.com', '@crearpsl.net');
+        
+        let foundUser = await findUserInFirestore(normalizedEmail);
+        
+        if (!foundUser) {
+          try {
+            const staffRef = collection(db, "staff_directory");
+            let sq = query(staffRef, where("emails", "array-contains", normalizedEmail));
+            let sSnap = await getDocs(sq);
+            if (!sSnap.empty) {
+              foundUser = sSnap.docs[0].data();
+            } else {
+              sq = query(staffRef, where("email", "==", normalizedEmail));
+              sSnap = await getDocs(sq);
+              if (!sSnap.empty) foundUser = sSnap.docs[0].data();
+            }
+          } catch (err) {
+            console.error("Error consultando staff_directory:", err);
+          }
+        }
+        
+        // 🆕 (02/09/2026) Mismo respaldo que en loginWithGoogle: catálogo estático
+        // antes de descartar al usuario por completo en esta ruta de sesión persistida.
+        if (!foundUser) {
+          const staticUser = findUserByAnyEmail(normalizedEmail);
+          if (staticUser) {
+            foundUser = { ...staticUser, uid: user.uid };
+          }
+        }
+
+        if (!foundUser && isSuperAdminEmail(normalizedEmail)) {
+          foundUser = {
+            id: user.uid,
+            uid: user.uid,
+            name: user.displayName || "Administrador",
+            role: "gerente",
+            sede: "Global",
+            emails: [normalizedEmail]
+          };
+        } else if (foundUser) {
+          foundUser.uid = user.uid;
+        }
+
+        if (foundUser) {
+          let canonicalUser = normalizeUserRecord(foundUser, 'onAuthStateChanged');
+          
+          // 🕵️‍♂️ AGENTE ONLINE: Validar y sanar multiroles 
+          const updatedRoles = await enforceUserRolesAgent(user, user.uid, canonicalUser.roles);
+          canonicalUser.roles = updatedRoles;
+
+          // 🔥 CRÍTICO: Guardar el usuario en la colección "users"
+          try {
+            try {
+        await setDoc(doc(db, 'users', user.uid), canonicalUser, { merge: true });
+      } catch (e) {
+        console.warn('Cannot update /users since only superadmin can, continuing login');
+      }
+          } catch (err) {
+            console.error("Error guardando perfil de usuario en auth state:", err);
+          }
+
+          const userObj = buildUserObject(user, canonicalUser, normalizedEmail);
+          setCurrentUser(userObj);
+          
+          if (!userObj.isSimulated) {
+            setLoading(false);
+          }
+          try {
+            const todayStr = new Date().toISOString().slice(0, 10);
+            const sessionLogKey = `audit_login_${normalizedEmail}_${todayStr}`;
+            if (!sessionStorage.getItem(sessionLogKey)) {
+              await recordAuditEvent({
+                email: foundUser.email || normalizedEmail,
+                name: foundUser.name || user.displayName || 'Desconocido',
+                role: foundUser.role || 'Desconocido',
+                sede: foundUser.sede || 'Desconocida',
+                action: 'LOGIN',
+                details: 'Inicio de sesión / Actividad diaria'
+              });
+              sessionStorage.setItem(sessionLogKey, 'true');
+            }
+          } catch(e) {
+            console.error("Error actualizando login en auditoría:", e);
+          }
+        } else {
+          sessionStorage.removeItem('googleAccessToken');
+          sessionStorage.removeItem('cpsl_active_role');
+          auth.signOut();
+          setCurrentUser(null);
+        }
+      } else {
+        const mockDevUser = localStorage.getItem('cpsl_mock_user');
+        if (mockDevUser) {
+          try {
+            const parsed = JSON.parse(mockDevUser);
+            setCurrentUser(parsed);
+            setLoading(false);
+            return;
+          } catch(e) {}
+        }
+        sessionStorage.removeItem('googleAccessToken');
+        sessionStorage.removeItem('cpsl_active_role');
+        setCurrentUser(null);
+      }
+      setLoading(false);
+    });
+    
+    return unsubscribe;
+  }, []);
+
+  return (
+    <AuthContext.Provider value={{ currentUser, originalAdminUser, loginWithGoogle, reauthenticateGoogle, logout, loading, switchRole, simulateUser, stopSimulation }}>
+      {!loading && children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuth() {
+  return useContext(AuthContext);
+}
+
+
+```
+
+---
+
+## Archivo: Claude outputs\BrandScriptBoard.jsx
+
+```javascript
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { BookOpen, Copy, Check, ArrowLeft } from 'lucide-react';
+
+export default function BrandScriptBoard() {
+  const navigate = useNavigate();
+  const [copiedKey, setCopiedKey] = useState(null);
+  const [selectedSede, setSelectedSede] = useState('Lima'); // Default para el guion
+
+  const copyText = (text, key) => {
+    navigator.clipboard.writeText(text);
+    setCopiedKey(key);
+    setTimeout(() => setCopiedKey(null), 2000);
+  };
+
+  const bgCard = 'rgba(0, 0, 0, 0.2)';
+  const borderCard = 'rgba(255, 255, 255, 0.05)';
+  const gold = '#d4af37';
+  const textLight = '#f8fafc';
+  const textMuted = '#94a3b8';
+  const bgSurface = 'rgba(255,255,255,0.02)';
+
+  return (
+    <div style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto', color: 'white', fontFamily: '"Inter", sans-serif' }}>
+
+      {/* BUG REAL encontrado y corregido (08/09/2026, reportado por José: "este modulo
+          no tiene atras para regresar"). Este componente no importaba useNavigate ni
+          tenía ningún botón de vuelta — a diferencia del resto de páginas de la
+          plataforma (ej. DirectorioQT.jsx), que sí siguen el patrón "Volver a Causa
+          OS". Se agrega aquí el mismo patrón. */}
+      <button
+        onClick={() => navigate('/home')}
+        className="btn-secondary"
+        style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', borderRadius: '8px', cursor: 'pointer', marginBottom: '1.5rem' }}
+      >
+        <ArrowLeft size={16} /> Volver a Causa OS
+      </button>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
+        <BookOpen size={28} color={gold} />
+        <h1 style={{ margin: 0, fontSize: '1.8rem', fontWeight: 'bold' }}>BrandScript & Guiones MJ</h1>
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        
+        {/* Header del Manual */}
+        <div style={{ background: bgCard, padding: '1.5rem', borderRadius: '12px', border: `1px solid ${borderCard}`, borderLeft: `5px solid ${gold}` }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+            <div>
+              <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: gold, background: '#78350f33', padding: '0.2rem 0.6rem', borderRadius: '4px', textTransform: 'uppercase' }}>
+                Manual Oficial de Enrolamiento Narrativo - Edición V1.0 (2026)
+              </span>
+              <h3 style={{ margin: '0.5rem 0 0.2rem', fontSize: '1.3rem', color: textLight }}>
+                BrandScript SB7 & Guiones de Conversión para Maestría del Juego (MJ)
+              </h3>
+              <p style={{ margin: 0, color: textMuted, fontSize: '0.85rem' }}>
+                Alineación de Mánagers y Capitanes bajo el StoryBrand Framework y Neuromarketing Ético. Cero manipulación, 100% libre elección y fisionomía de Creador.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* MATRIZ SB7-MJ */}
+        <div style={{ background: bgCard, padding: '1.5rem', borderRadius: '12px', border: `1px solid ${borderCard}` }}>
+          <h4 style={{ margin: '0 0 1rem 0', color: gold, fontSize: '1.1rem' }}>
+            🗺️ Matriz del BrandScript Oficial (SB7-MJ)
+          </h4>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
+            {[
+              { title: '1. El Personaje (El Héroe)', desc: 'Graduado de C2: un líder que despertó su poder en sala y busca materializarlo en su vida cotidiana.', border: '#3b82f6' },
+              { title: '2. Tiene un Problema (El Efecto Lunes)', desc: 'Externo (entorno inercial), Interno (miedo al auto-sabotaje y soledad), Filosófico (inaceptable volver a vivir promedio).', border: '#ef4444' },
+              { title: '3. Conoce un Guía (El Entrenador/MJ)', desc: 'No somos los héroes de su historia. Somos su reflejo de posibilidad. Mostramos empatía ("yo también viví el lunes") y autoridad (los resultados de Crear).', border: '#10b981' },
+              { title: '4. Le Da un Plan (El Contenedor)', desc: 'Plan de Proceso (El FI de 15 min para mapear su visión) y Plan de Acuerdo (Compromiso de integridad sin excusas).', border: '#f59e0b' },
+              { title: '5. Lo Llama a la Acción', desc: 'Directo: Agendar la sesión de Futuro Imposible, transicionar la reserva financiera y entrar a la cancha a jugar.', border: '#8b5cf6' },
+              { title: '6. Evita el Fracaso', desc: 'Si no actúa: Regresar a la inercia, perder la tribu de fuego, apagar la fisionomía despertada el fin de semana.', border: '#64748b' },
+              { title: '7. Termina en Éxito', desc: 'Con MJ: Rediseño total de finanzas, relaciones y carrera. Volverse la causa de su universo. El Creador encarnado.', border: '#14b8a6' },
+            ].map((item, i) => (
+              <div key={i} style={{ background: bgSurface, padding: '1rem', borderRadius: '8px', borderLeft: `4px solid ${item.border}` }}>
+                <strong style={{ color: textLight, display: 'block', marginBottom: '0.3rem', fontSize: '0.9rem' }}>{item.title}</strong>
+                <span style={{ color: textMuted, fontSize: '0.8rem', lineHeight: '1.4' }}>{item.desc}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* GUIONES DE COMUNICACIÓN MÁNAGER - PARTICIPANTE */}
+        <div style={{ background: bgCard, padding: '1.5rem', borderRadius: '12px', border: `1px solid ${borderCard}` }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1rem' }}>
+            <h4 style={{ margin: 0, color: gold, fontSize: '1.1rem' }}>
+              💬 Guiones de Conversión Mánager a Px (Scripts Directos)
+            </h4>
+            <select 
+              value={selectedSede} 
+              onChange={(e) => setSelectedSede(e.target.value)}
+              style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid var(--border-light)', color: 'white', padding: '0.4rem', borderRadius: '6px', fontSize: '0.85rem' }}
+            >
+              <option value="Lima">Sede Lima</option>
+              <option value="Quito">Sede Quito</option>
+              <option value="Cuenca">Sede Cuenca</option>
+              <option value="Guayaquil">Sede Guayaquil</option>
+            </select>
+          </div>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1rem' }}>
+            
+            {/* Objeción Dinero */}
+            <div style={{ background: bgSurface, padding: '1.2rem', borderRadius: '8px', borderTop: '2px solid #ef4444' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                <strong style={{ color: '#ef4444', fontSize: '0.9rem' }}>Objeción: "No tengo el dinero ahorita"</strong>
+                <button
+                  onClick={() => copyText('En la cultura de Crear, operamos desde la Causa: si tú eres el creador de tu realidad, el dinero es una circunstancia a diseñar, no un límite inamovible. Si estructuramos un plan de abono de bajo riesgo en Nodus, ¿qué opciones ves viables para tu aporte de reserva este viernes?', 'obj1')}
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', background: 'transparent', border: 'none', color: textMuted, cursor: 'pointer', fontSize: '0.8rem' }}
+                >
+                  {copiedKey === 'obj1' ? <Check size={14} color="#10b981" /> : <Copy size={14} />}
+                </button>
+              </div>
+              <div style={{ fontSize: '0.85rem', color: textLight, fontStyle: 'italic', background: 'rgba(0,0,0,0.2)', padding: '0.8rem', borderRadius: '4px' }}>
+                «En la cultura de Crear, operamos desde la Causa: si tú eres el creador de tu realidad, el dinero es una circunstancia a diseñar, no un límite inamovible. Si estructuramos un plan de abono de bajo riesgo en Nodus, ¿qué opciones ves viables para tu aporte de reserva este viernes?»
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        {/* PLANTILLAS DE WHATSAPP OFICIALES */}
+        <div style={{ background: bgCard, padding: '1.5rem', borderRadius: '12px', border: `1px solid ${borderCard}` }}>
+          <h4 style={{ margin: '0 0 1rem 0', color: gold, fontSize: '1.1rem' }}>
+            📱 Plantillas Oficiales de WhatsApp (1-Clic para Copiar)
+          </h4>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '1rem' }}>
+            
+            {/* WhatsApp 1 */}
+            <div style={{ background: bgSurface, padding: '1.2rem', borderRadius: '8px', borderLeft: '3px solid #10b981' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                <strong style={{ color: '#34d399', fontSize: '0.9rem' }}>Plantilla 1: Bienvenida Post-Graduación C2</strong>
+                <button
+                  onClick={() => copyText(`¡Felicidades, Creador! 🔥\n\nAún resuena en la sede la fisionomía y la fuerza de tu palabra declarada este fin de semana en Capítulo Dos. Has salido de "la arena" y hoy tienes en tus manos la posibilidad de diseñar tu propio destino.\n\nEl lunes ha llegado, y con él, la oportunidad de elegir: ¿volver a la inercia cotidiana o entrenar para consolidar tu Breakthrough?\n\nEl equipo de Mánagers y la comunidad de Maestría del Juego ya está lista para recibirte en el contenedor de los 90 días. Tu espacio de estiramiento está guardado.\n\nPaso 1: Ingresa a tu App Nodus 📲\nPaso 2: Agenda tu sesión de calibración de Futuro Imposible (FI) de 15 minutos aquí: [Enlace_Calendly]\nPaso 3: Sostiene tu palabra.\n\nSostener la fisionomía del Ser es el juego de los grandes. Nos vemos en la cancha.\n\nAtentamente,\nEl Equipo de Mánagers y Capitanes de ${selectedSede}\nCREAR PODER SIN LÍMITES 2026.`, 'waPostC2')}
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', background: '#0b132b', border: `1px solid ${borderCard}`, color: textLight, padding: '0.3rem 0.6rem', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer' }}
+                >
+                  {copiedKey === 'waPostC2' ? <Check size={14} color="#10b981" /> : <Copy size={14} />}
+                  {copiedKey === 'waPostC2' ? '¡Copiado!' : 'Copiar Texto'}
+                </button>
+              </div>
+              <div style={{ fontSize: '0.8rem', color: textMuted, whiteSpace: 'pre-line', lineHeight: '1.5' }}>
+                Principio de "Unidad" de Cialdini. Diseñado para reactivar la emoción del domingo e impulsar el agendamiento del FI de 15 min.
+              </div>
+            </div>
+
+            {/* WhatsApp 2 */}
+            <div style={{ background: bgSurface, padding: '1.2rem', borderRadius: '8px', borderLeft: '3px solid #f59e0b' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                <strong style={{ color: gold, fontSize: '0.9rem' }}>Plantilla 2: Recordatorio Preventivo (Viernes 12:00 PM)</strong>
+                <button
+                  onClick={() => copyText(`Hola [Nombre] 🚨\n\nTe saludamos desde la oficina de la sede ${selectedSede}. Hoy es viernes de Capítulo Dos, un día clave para cuidar el contenedor de integridad que declaraste el jueves por la noche.\n\nPara asegurar que tu ingreso al bloque de confrontación de las 15:00 PM sea fluido y libre de distracciones logísticas:\n\n💳 Tu estado actual en Nodus requiere conciliación de caja.\n⏱ El cierre automático de registros contables de la plataforma se ejecutará a las 14:00 PM.\n\nQueremos cuidar tu experiencia y tu palabra. Por favor, acércate a la mesa externa de registro antes de la hora límite o envíanos tu comprobante digital por esta vía para validar tu "Ticket Verde" en el sistema.\n\nSi tienes algún quiebre técnico o financiero de última hora, avísanos de inmediato para diseñar juntos una solución de bajo riesgo con el Gerente de Sede antes de que el sistema aplique el bloqueo automático.\n\n¡Sostener tu palabra es tu mayor poder! Nos vemos en sala. 🛡️\nCREAR PODER SIN LÍMITES`, 'waPrev12')}
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', background: '#0b132b', border: `1px solid ${borderCard}`, color: textLight, padding: '0.3rem 0.6rem', borderRadius: '6px', fontSize: '0.75rem', cursor: 'pointer' }}
+                >
+                  {copiedKey === 'waPrev12' ? <Check size={14} color="#10b981" /> : <Copy size={14} />}
+                  {copiedKey === 'waPrev12' ? '¡Copiado!' : 'Copiar Texto'}
+                </button>
+              </div>
+              <div style={{ fontSize: '0.8rem', color: textMuted, whiteSpace: 'pre-line', lineHeight: '1.5' }}>
+                Neuromarketing Preventivo. Sustituye la fricción de la penalización de "Palabra Rota" anticipándose al cierre contable de las 14:00 PM.
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        {/* CHECKLIST DE IMPECABILIDAD */}
+        <div style={{ background: bgCard, padding: '1.5rem', borderRadius: '12px', border: `1px solid ${borderCard}` }}>
+          <h4 style={{ margin: '0 0 0.8rem 0', color: '#a855f7', fontSize: '1.1rem' }}>
+            🛡️ Checklist de Impecabilidad del Enrolador Narrativo
+          </h4>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '0.75rem' }}>
+            <div style={{ background: bgSurface, padding: '0.8rem', borderRadius: '6px', fontSize: '0.82rem' }}>
+              <strong style={{ color: '#ec4899', display: 'block' }}>1. Cero Simpatía al Drama</strong>
+              <span style={{ color: textMuted }}>No comprar justificaciones con lástima; sostenerlo en su grandeza de creador.</span>
+            </div>
+            <div style={{ background: bgSurface, padding: '0.8rem', borderRadius: '6px', fontSize: '0.82rem' }}>
+              <strong style={{ color: '#38bdf8', display: 'block' }}>2. Datos vs. Interpretaciones</strong>
+              <span style={{ color: textMuted }}>Separar los hechos objetivos de las historias basadas en el miedo.</span>
+            </div>
+            <div style={{ background: bgSurface, padding: '0.8rem', borderRadius: '6px', fontSize: '0.82rem' }}>
+              <strong style={{ color: '#10b981', display: 'block' }}>3. Respeto a la Autonomía</strong>
+              <span style={{ color: textMuted }}>Elección voluntaria. Erradicación total de culpa y escasez falsa.</span>
+            </div>
+            <div style={{ background: bgSurface, padding: '0.8rem', borderRadius: '6px', fontSize: '0.82rem' }}>
+              <strong style={{ color: gold, display: 'block' }}>4. Fisionomía de Voz</strong>
+              <span style={{ color: textMuted }}>Postura erguida, tono firme y amoroso; la vibración se transmite.</span>
+            </div>
+            <div style={{ background: bgSurface, padding: '0.8rem', borderRadius: '6px', fontSize: '0.82rem' }}>
+              <strong style={{ color: '#a855f7', display: 'block' }}>5. Trazabilidad en Nodus</strong>
+              <span style={{ color: textMuted }}>Registro limpio de acuerdos de pago y fechas límite para la Gerencia.</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+```
+
+---
+
+## Archivo: Claude outputs\CRMBaseMaster.jsx
+
+```javascript
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { db } from '../services/firebase';
+import { collection, query, limit, getDocs, where, getCountFromServer } from 'firebase/firestore';
+import { Search, RefreshCw, ArrowLeft, Users, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { toast } from 'react-hot-toast';
+import { canViewCRMMaestro } from '../config/permissions';
+
+// BUG REAL encontrado y corregido (08/09/2026, reportado por José: "esta base de
+// datos esta horrible"). Esta página usaba clases de Tailwind CSS (bg-emerald-500/20,
+// px-2 py-1 rounded, grid grid-cols-4, etc.) pero el proyecto NO tiene Tailwind
+// instalado — no existe tailwind.config, no está en package.json, y no hay
+// directivas @tailwind en ningún CSS de la plataforma. Era la ÚNICA página de toda
+// la app usando ese framework, así que ninguna de esas clases hacía nada — de ahí
+// el texto plano sin estilo que se veía. Reescrita aquí con estilos en línea,
+// siguiendo el mismo lenguaje visual (fondo oscuro, acentos dorados, tarjetas con
+// borde sutil) que ya usan el resto de páginas de la plataforma (ej. DirectorioQT.jsx).
+// La lógica de datos (fetchStats, fetchData, búsqueda) no se tocó — es exactamente
+// la misma que ya estaba.
+
+export default function CRMBaseMaster() {
+  const navigate = useNavigate();
+  const { currentUser } = useAuth();
+
+  // BUG REAL corregido (08/09/2026, pedido explícito de José: "esta base solo la
+  // puedo ver yo"). Antes esta página no tenía NINGÚN control de acceso propio —
+  // la ruta /crm-maestro en App.jsx solo exige <PrivateRoute> (cualquier usuario
+  // autenticado), así que cualquier colaborador logueado podía ver los 2999
+  // registros de participantes (nombre, DNI, teléfono, IMO enrolador) de toda la
+  // plataforma. Ver canViewCRMMaestro() en permissions.js — por ahora solo
+  // restringe la INTERFAZ; la colección "participants" en firestore.rules sigue
+  // permitiendo lectura a cualquier SuperAdmin o Gerente/Dirección a nivel de
+  // base de datos, y estrecharla ahí requiere autorización explícita antes de
+  // tocar firestore.rules.
+  const hasAccess = canViewCRMMaestro(currentUser);
+
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [stats, setStats] = useState({ total: 0, sentados: 0, pendientes: 0 });
+
+  useEffect(() => {
+    if (!hasAccess) return;
+    fetchStats();
+    fetchData();
+  }, [hasAccess]);
+
+  const fetchStats = async () => {
+    try {
+      const coll = collection(db, 'participants');
+      const totalSnap = await getCountFromServer(coll);
+
+      const sentadosQ = query(coll, where('estadoC1', '==', 'SENTADO'));
+      const sentadosSnap = await getCountFromServer(sentadosQ);
+
+      const pendientesQ = query(coll, where('estadoC1', '==', 'PENDIENTE'));
+      const pendientesSnap = await getCountFromServer(pendientesQ);
+
+      setStats({
+        total: totalSnap.data().count,
+        sentados: sentadosSnap.data().count,
+        pendientes: pendientesSnap.data().count
+      });
+    } catch (e) {
+      console.error("Error fetching stats:", e);
+    }
+  };
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const q = query(collection(db, 'participants'), limit(150));
+      const snap = await getDocs(q);
+      const docs = [];
+      snap.forEach(d => docs.push({ id: d.id, ...d.data() }));
+      setData(docs);
+    } catch (e) {
+      toast.error('Error al cargar la base de datos');
+    }
+    setLoading(false);
+  };
+
+  // Paleta consistente con el resto de la plataforma (ver DirectorioQT.jsx, Home.jsx)
+  const bgPage = '#0d152d';
+  const bgCard = 'rgba(255,255,255,0.03)';
+  const bgCardHeader = 'rgba(255,255,255,0.02)';
+  const bgInput = 'rgba(0,0,0,0.25)';
+  const borderSubtle = 'rgba(255,255,255,0.08)';
+  const gold = 'var(--crear-gold, #f59e0b)';
+  const textMain = '#f1f5f9';
+  const textMuted = '#94a3b8';
+
+  const STATUS_STYLES = {
+    SENTADO: { bg: 'rgba(16,185,129,0.15)', color: '#34d399', Icon: CheckCircle },
+    DESERTOR: { bg: 'rgba(244,63,94,0.15)', color: '#fb7185', Icon: XCircle },
+    REZAGADO: { bg: 'rgba(245,158,11,0.15)', color: '#fbbf24', Icon: Clock },
+    PENDIENTE: { bg: 'rgba(148,163,184,0.15)', color: '#94a3b8', Icon: Clock }
+  };
+
+  const getStatusBadge = (estado) => {
+    const key = estado && STATUS_STYLES[estado] ? estado : 'PENDIENTE';
+    const { bg, color, Icon } = STATUS_STYLES[key];
+    return (
+      <span style={{ background: bg, color, padding: '0.25rem 0.6rem', borderRadius: '6px', fontSize: '0.72rem', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: '0.3rem', whiteSpace: 'nowrap' }}>
+        <Icon size={12} /> {estado || 'PENDIENTE'}
+      </span>
+    );
+  };
+
+  const filteredData = data.filter(p =>
+    p.nombreCompleto?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    p.dni?.includes(searchTerm)
+  );
+
+  if (!hasAccess) {
+    return (
+      <div style={{ minHeight: '100vh', background: bgPage, color: textMain, padding: '1.5rem', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ maxWidth: '440px', textAlign: 'center', background: bgCard, border: `1px solid ${borderSubtle}`, borderRadius: '16px', padding: '2.5rem 2rem' }}>
+          <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>🔒</div>
+          <h2 style={{ margin: '0 0 0.6rem 0', color: gold, fontSize: '1.3rem' }}>Acceso Restringido</h2>
+          <p style={{ margin: '0 0 1.5rem 0', color: textMuted, fontSize: '0.9rem' }}>
+            Esta base de datos (Base Maestra CRM / Nodus) es de acceso exclusivo. No tienes permiso para verla.
+          </p>
+          <button
+            onClick={() => navigate('/home')}
+            className="btn-secondary"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1.2rem', borderRadius: '8px', cursor: 'pointer' }}
+          >
+            <ArrowLeft size={16} /> Volver a Causa OS
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ minHeight: '100vh', background: bgPage, color: textMain, padding: '1.5rem', fontFamily: 'inherit' }}>
+      <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+
+        {/* HEADER */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem', paddingBottom: '1rem', borderBottom: `1px solid ${borderSubtle}` }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <button
+              onClick={() => navigate(-1)}
+              className="btn-secondary"
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', borderRadius: '8px', cursor: 'pointer' }}
+            >
+              <ArrowLeft size={16} /> Volver a Causa OS
+            </button>
+            <div>
+              <h1 style={{ margin: 0, fontSize: '1.7rem', fontWeight: 900, color: gold, display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                <Users size={26} color={gold} /> Base Maestra CRM (Nodus)
+              </h1>
+              <p style={{ margin: '0.3rem 0 0 0', color: textMuted, fontSize: '0.88rem' }}>
+                Conexión directa con todos los registros sincronizados de tu CRM
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={fetchData}
+            className="btn-secondary"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.55rem 1.1rem', borderRadius: '8px', fontSize: '0.85rem', cursor: 'pointer' }}
+          >
+            <RefreshCw size={16} /> Refrescar
+          </button>
+        </div>
+
+        {/* TARJETAS DE ESTADÍSTICAS */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+          <div style={{ background: bgCard, border: `1px solid ${borderSubtle}`, borderRadius: '12px', padding: '1.1rem' }}>
+            <div style={{ color: textMuted, fontSize: '0.8rem', marginBottom: '0.3rem', fontWeight: 600 }}>Total Registros</div>
+            <div style={{ fontSize: '1.9rem', fontWeight: 800, color: textMain }}>{stats.total}</div>
+          </div>
+          <div style={{ background: bgCard, border: '1px solid rgba(16,185,129,0.3)', borderRadius: '12px', padding: '1.1rem' }}>
+            <div style={{ color: textMuted, fontSize: '0.8rem', marginBottom: '0.3rem', fontWeight: 600 }}>Sentados</div>
+            <div style={{ fontSize: '1.9rem', fontWeight: 800, color: '#34d399' }}>{stats.sentados}</div>
+          </div>
+          <div style={{ background: bgCard, border: `1px solid ${borderSubtle}`, borderRadius: '12px', padding: '1.1rem' }}>
+            <div style={{ color: textMuted, fontSize: '0.8rem', marginBottom: '0.3rem', fontWeight: 600 }}>Pendientes</div>
+            <div style={{ fontSize: '1.9rem', fontWeight: 800, color: '#cbd5e1' }}>{stats.pendientes}</div>
+          </div>
+        </div>
+
+        {/* TABLA */}
+        <div style={{ background: bgCard, border: `1px solid ${borderSubtle}`, borderRadius: '12px', overflow: 'hidden' }}>
+          <div style={{ padding: '1rem', borderBottom: `1px solid ${borderSubtle}`, background: bgCardHeader, display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center' }}>
+            <div style={{ position: 'relative', flex: 1, minWidth: '280px' }}>
+              <Search size={16} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: textMuted }} />
+              <input
+                type="text"
+                placeholder="Buscar por DNI o Nombres..."
+                style={{ width: '100%', background: bgInput, border: `1px solid ${borderSubtle}`, borderRadius: '8px', padding: '0.55rem 1rem 0.55rem 2.3rem', color: textMain, fontSize: '0.85rem', outline: 'none', boxSizing: 'border-box' }}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+              <thead>
+                <tr style={{ background: 'rgba(0,0,0,0.2)', color: textMuted, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  <th style={{ padding: '0.9rem 1rem', borderBottom: `1px solid ${borderSubtle}`, fontWeight: 700 }}>Participante</th>
+                  <th style={{ padding: '0.9rem 1rem', borderBottom: `1px solid ${borderSubtle}`, fontWeight: 700 }}>Contacto</th>
+                  <th style={{ padding: '0.9rem 1rem', borderBottom: `1px solid ${borderSubtle}`, fontWeight: 700 }}>Estado C1</th>
+                  <th style={{ padding: '0.9rem 1rem', borderBottom: `1px solid ${borderSubtle}`, fontWeight: 700 }}>Coordinadora</th>
+                  <th style={{ padding: '0.9rem 1rem', borderBottom: `1px solid ${borderSubtle}`, fontWeight: 700 }}>IMO Enrolador</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan="5" style={{ padding: '2.5rem', textAlign: 'center', color: textMuted }}>
+                      <RefreshCw size={22} style={{ display: 'block', margin: '0 auto 0.5rem', animation: 'spin 1s linear infinite' }} />
+                      Cargando base de datos...
+                    </td>
+                  </tr>
+                ) : filteredData.length === 0 ? (
+                  <tr>
+                    <td colSpan="5" style={{ padding: '2.5rem', textAlign: 'center', color: textMuted }}>
+                      No se encontraron resultados en la vista actual.
+                    </td>
+                  </tr>
+                ) : (
+                  filteredData.map((p, idx) => (
+                    <tr key={p.id} style={{ borderBottom: idx === filteredData.length - 1 ? 'none' : `1px solid rgba(255,255,255,0.05)` }}>
+                      <td style={{ padding: '0.9rem 1rem' }}>
+                        <div style={{ fontWeight: 700, color: textMain }}>{p.nombreCompleto}</div>
+                        <div style={{ fontSize: '0.72rem', color: textMuted, marginTop: '0.15rem' }}>DNI: {p.dni || 'Sin DNI'}</div>
+                      </td>
+                      <td style={{ padding: '0.9rem 1rem' }}>
+                        <div style={{ fontSize: '0.85rem' }}>{p.telefono || '-'}</div>
+                        <div style={{ fontSize: '0.72rem', color: textMuted, maxWidth: '160px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.email || '-'}</div>
+                      </td>
+                      <td style={{ padding: '0.9rem 1rem' }}>
+                        {getStatusBadge(p.estadoC1)}
+                      </td>
+                      <td style={{ padding: '0.9rem 1rem', fontSize: '0.85rem', color: '#cbd5e1' }}>
+                        {p.coordinadora || '-'}
+                      </td>
+                      <td style={{ padding: '0.9rem 1rem', fontSize: '0.85rem', color: textMuted }}>
+                        {p.imoEnrolador || '-'}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+          <div style={{ padding: '0.9rem', borderTop: `1px solid ${borderSubtle}`, textAlign: 'center', fontSize: '0.72rem', color: textMuted }}>
+            Mostrando hasta 150 registros recientes. Usa la barra de búsqueda para filtrar localmente.
+          </div>
+        </div>
+      </div>
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+    </div>
+  );
+}
+
+```
+
+---
+
+## Archivo: Claude outputs\DirectorioQT.jsx
+
+```javascript
+import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { useUI } from '../context/UIContext';
+import { 
+  getQTMembers, 
+  clearQTCache,
+  normalizeQTSede
+} from '../services/qtSheetService';
+import { 
+  isGlobalQTCoordinator, 
+  hasQTPrivileges, 
+  isDireccionRole, 
+  isNonOperationalDirector 
+} from '../config/permissions';
+import CountryFlag from '../components/CountryFlag';
+import { 
+  Users, 
+  RefreshCw, 
+  ExternalLink, 
+  Search, 
+  ArrowLeft, 
+  Award, 
+  Phone, 
+  Mail, 
+  CheckCircle2, 
+  ShieldCheck,
+  Grid,
+  List,
+  Flame,
+  FileSpreadsheet,
+  MessageSquare
+} from 'lucide-react';
+
+function InstagramIcon({ size = 14 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ verticalAlign: 'middle' }}>
+      <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+      <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+    </svg>
+  );
+}
+
+export default function DirectorioQT() {
+  const { currentUser } = useAuth();
+  const { showToast } = useUI();
+  const navigate = useNavigate();
+  
+  const userSede = normalizeQTSede(currentUser?.sede || '');
+
+  const [members, setMembers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState(null);
+  
+  // Filtros
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedSede, setSelectedSede] = useState('Todas');
+  const [selectedEdicion, setSelectedEdicion] = useState('Todas');
+  const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'table'
+
+  useEffect(() => {
+    loadMembers(false);
+  }, []);
+
+  const handleOpenGoogleChat = (email) => {
+    if (!email) {
+      window.open('https://chat.google.com/u/0/', '_blank');
+      return;
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(email)
+        .then(() => showToast(`Email copiado: ${email}. Pégalo en Google Chat.`, 'success'))
+        .catch(() => showToast(`No se pudo copiar automáticamente. Busca a: ${email}`, 'error'));
+    } else {
+      showToast(`Busca en Google Chat a: ${email}`, 'success');
+    }
+    window.open('https://chat.google.com/u/0/', '_blank');
+  };
+
+  const loadMembers = async (forceRefresh = false) => {
+    if (forceRefresh) {
+      setRefreshing(true);
+      clearQTCache();
+    } else {
+      setLoading(true);
+    }
+
+    try {
+      const result = await getQTMembers({ forceRefresh });
+      setMembers(result.data || []);
+      setLastUpdated(result.lastUpdated);
+      
+      if (forceRefresh) {
+        showToast(`¡Sincronización exitosa! ${result.total} integrantes de Quantum Team normalizados y actualizados.`, 'success');
+      }
+    } catch (err) {
+      console.error("Error cargando directorio QT:", err);
+      showToast("Error al cargar los datos desde Google Sheets.", "error");
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  // Filtrado reactivo
+  const filteredMembers = useMemo(() => {
+    const userRole = currentUser?.appRole || '';
+    
+    // Si es superadmin, dirección (operativa o no), o gerente
+    const isSuper = currentUser?.isSuperAdmin || userRole === 'director_maestria' || isDireccionRole(userRole) || currentUser?.email === 'jose.sanchez@crearpsl.net' || currentUser?.email === 'armando.pilacuan@gmail.com';
+    const isGerente = userRole === 'gerente';
+    
+    // Usamos las nuevas banderas de permisos
+    const isQTGlobal = isGlobalQTCoordinator(currentUser);
+    const hasQT = hasQTPrivileges(currentUser);
+    
+    return members.filter(m => {
+      // 0. Reglas de Jerarquía Corporativa
+      const userSede = normalizeQTSede(currentUser?.sede || '');
+      const isGlobalUser = userSede.toLowerCase().includes('global');
+      
+      if (!isSuper && !isQTGlobal && !isGerente) {
+        if (isGlobalUser) {
+          // Global users see everything
+        } else if (['coord_c1', 'coord_c2', 'coordinador_c1c2'].includes(userRole)) {
+          // Coordinador C1/C2: solo su sede (+ Coordinador Global) según Matriz
+          const isTargetQTGlobal = m.sede === 'Global' || m.email?.toLowerCase().includes('brunis') || m.email?.toLowerCase().includes('cardenas');
+          if (m.sede !== userSede && !isTargetQTGlobal) return false;
+        } else if (hasQT) {
+          // Un QT normal ve solo su sede y al Coordinador Global
+          const isTargetQTGlobal = m.sede === 'Global' || m.email?.toLowerCase().includes('brunis') || m.email?.toLowerCase().includes('cardenas');
+          if (m.sede !== userSede && !isTargetQTGlobal) return false;
+        } else {
+          // Cualquier otro rol ve su sede
+          if (m.sede !== userSede) return false;
+        }
+      }
+
+      // Filtro por sede manual de la UI
+      if (selectedSede !== 'Todas' && m.sede !== selectedSede) {
+        return false;
+      }
+
+      // Filtro por experiencia / edición
+      if (selectedEdicion !== 'Todas') {
+        if (selectedEdicion === 'senior' && !m.isSenior) return false;
+        if (selectedEdicion === 'reciente' && !m.ediciones.toLowerCase().includes('primera')) return false;
+        if (selectedEdicion === 'intermedio' && !(m.ediciones.includes('1 a 3') || m.ediciones.includes('4 a 8'))) return false;
+      }
+
+      // Búsqueda libre con normalización sin tildes y multi-palabra
+      if (searchQuery.trim()) {
+        const normalize = (str = '') => str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+        const qTokens = normalize(searchQuery).split(/\s+/).filter(Boolean);
+        
+        const targetString = normalize(
+          `${m.nombre || ''} ${m.docNumero || ''} ${m.email || ''} ${m.instagram || ''} ${m.sede || ''} ${m.talla || ''} ${m.ediciones || ''} ${m.whatsapp || ''} ${m.declaracion || ''}`
+        );
+
+        // Debe coincidir con todos los términos buscados (búsqueda flexible en cualquier orden)
+        return qTokens.every(token => targetString.includes(token));
+      }
+
+      return true;
+    });
+  }, [members, selectedSede, selectedEdicion, searchQuery]);
+
+  // Estadísticas rápidas
+  // BUG REAL encontrado y corregido (08/09/2026, reportado por José viendo la
+  // plataforma en modo simulador como un QT de Quito: "no sé si estos datos
+  // corresponden a la realidad y sede"): estas 4 tarjetas ("Total QT Activos",
+  // "Líderes Senior", "Sedes Cubiertas", "Perfiles Verificados") se calculaban
+  // sobre `members` — la lista CRUDA SIN FILTRAR por rol/sede — mientras que la
+  // lista de tarjetas de abajo sí usa `filteredMembers` (con el filtro real de
+  // "SOLO SU SEDE" para QT/Coord C1Y2). Resultado: un QT de una sola sede veía
+  // en el encabezado el total GLOBAL de las 5 sedes (42 QT, 19 Senior, 5 Sedes)
+  // aunque la lista de tarjetas debajo ya le mostraba solo su propia sede — un
+  // desajuste real entre lo que dicen los números y lo que la lista realmente
+  // muestra. Ahora ambos usan la misma fuente (`filteredMembers`), así que las
+  // tarjetas reflejan exactamente lo que el usuario tiene delante, sede
+  // incluida.
+  const stats = useMemo(() => {
+    const total = filteredMembers.length;
+    const seniors = filteredMembers.filter(m => m.isSenior).length;
+    const sedesCount = new Set(filteredMembers.map(m => m.sede)).size;
+    const activos = filteredMembers.filter(m => m.esActivo).length;
+    return { total, seniors, sedesCount, activos };
+  }, [filteredMembers]);
+
+  const formatLastUpdated = (isoDate) => {
+    if (!isoDate) return 'Desconocido';
+    try {
+      const d = new Date(isoDate);
+      return isNaN(d.getTime()) ? 'Reciente' : d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' (' + d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }) + ')';
+    } catch (e) {
+      return 'Reciente';
+    }
+  };
+
+  return (
+    <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '2rem 1.5rem', color: 'var(--text-main, #0f172a)' }}>
+      {/* HEADER SUPERIOR */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+        <button 
+          onClick={() => navigate('/home')} 
+          className="btn-secondary" 
+          style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', borderRadius: '8px', cursor: 'pointer' }}
+        >
+          <ArrowLeft size={16} /> Volver a Causa OS
+        </button>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+          {currentUser?.isSuperAdmin && !isNonOperationalDirector(currentUser) && (
+            <button 
+              onClick={() => loadMembers(true)}
+              disabled={refreshing || loading}
+              className="btn-secondary"
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.55rem 1.1rem', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}
+            >
+              <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} style={{ animation: refreshing ? 'spin 1s linear infinite' : 'none' }} />
+              {refreshing ? 'Sincronizando...' : 'Sincronizar Google Sheets'}
+            </button>
+          )}
+
+        </div>
+      </div>
+
+      {/* TITULAR Y BANNER */}
+      <div className="glass-panel" style={{ padding: '1.8rem 2rem', borderRadius: '16px', border: '1px solid var(--border-subtle, #cbd5e1)', marginBottom: '1.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginBottom: '0.6rem' }}>
+          <div style={{ background: 'linear-gradient(135deg, #f59e0b, #d97706)', padding: '0.6rem', borderRadius: '12px', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Flame size={28} />
+          </div>
+          <div>
+            <h1 style={{ margin: 0, fontSize: '1.65rem', fontWeight: 900, color: 'var(--text-heading, #0f172a)' }}>
+              Directorio Oficial Quantum Team (QT)
+            </h1>
+            <p style={{ margin: 0, fontSize: '0.88rem', color: 'var(--text-muted, #64748b)' }}>
+              Sincronización en vivo con la base oficial • Última sincronización: <strong>{formatLastUpdated(lastUpdated)}</strong>
+            </p>
+          </div>
+        </div>
+
+        {/* METRICAS RAPIDAS */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1rem', marginTop: '1.25rem' }}>
+          <div style={{ background: 'var(--bg-card-hover, rgba(255,255,255,0.03))', padding: '1rem', borderRadius: '12px', border: '1px solid var(--border-subtle, rgba(255,255,255,0.08))' }}>
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted, #64748b)', fontWeight: 600 }}>Total QT Activos</div>
+            <div style={{ fontSize: '1.7rem', fontWeight: 800, color: 'var(--text-heading, #0f172a)' }}>{stats.total}</div>
+          </div>
+          <div style={{ background: 'var(--bg-card-hover, rgba(255,255,255,0.03))', padding: '1rem', borderRadius: '12px', border: '1px solid var(--border-subtle, rgba(255,255,255,0.08))' }}>
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted, #64748b)', fontWeight: 600 }}>Líderes Senior (+15 ed.)</div>
+            <div style={{ fontSize: '1.7rem', fontWeight: 800, color: 'var(--crear-gold, #f59e0b)' }}>{stats.seniors}</div>
+          </div>
+          <div style={{ background: 'var(--bg-card-hover, rgba(255,255,255,0.03))', padding: '1rem', borderRadius: '12px', border: '1px solid var(--border-subtle, rgba(255,255,255,0.08))' }}>
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted, #64748b)', fontWeight: 600 }}>Sedes Cubiertas</div>
+            <div style={{ fontSize: '1.7rem', fontWeight: 800, color: '#3b82f6' }}>{stats.sedesCount}</div>
+          </div>
+          <div style={{ background: 'var(--bg-card-hover, rgba(255,255,255,0.03))', padding: '1rem', borderRadius: '12px', border: '1px solid var(--border-subtle, rgba(255,255,255,0.08))' }}>
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted, #64748b)', fontWeight: 600 }}>Perfiles Verificados</div>
+            <div style={{ fontSize: '1.7rem', fontWeight: 800, color: '#10b981' }}>{stats.activos}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* BARRA DE FILTROS Y CONTROLES */}
+      <div className="glass-panel" style={{ padding: '1.25rem 1.5rem', borderRadius: '14px', border: '1px solid var(--border-subtle, rgba(255,255,255,0.08))', marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1, minWidth: '280px', flexWrap: 'wrap' }}>
+          {/* Buscador */}
+          <div style={{ position: 'relative', flex: 1, minWidth: '220px' }}>
+            <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted, #64748b)' }} />
+            <input 
+              type="text"
+              placeholder="Buscar por nombre, cédula/DNI, email, instagram..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '0.55rem 1rem 0.55rem 2.25rem',
+                borderRadius: '8px',
+                border: '1px solid var(--border-subtle, #cbd5e1)',
+                background: 'var(--bg-card, #ffffff)',
+                color: 'var(--text-main, #0f172a)',
+                fontSize: '0.9rem'
+              }}
+            />
+          </div>
+
+          {/* Filtro Sede */}
+          <select
+            value={selectedSede}
+            onChange={(e) => setSelectedSede(e.target.value)}
+            style={{ 
+              padding: '0.55rem 0.9rem', 
+              borderRadius: '8px', 
+              border: '1px solid var(--border-subtle, rgba(255, 255, 255, 0.2))', 
+              background: 'var(--bg-dark-alt, #0d152d)', 
+              color: 'var(--text-heading, #ffffff)', 
+              fontWeight: 700, 
+              fontSize: '0.85rem',
+              cursor: 'pointer',
+              colorScheme: 'dark'
+            }}
+          >
+            <option value="Todas" style={{ background: '#0d152d', color: '#ffffff' }}>Todas las Sedes Permitidas</option>
+            {(!currentUser || currentUser.isSuperAdmin || currentUser.appRole === 'director_maestria' || currentUser.appRole === 'direccion' || currentUser.appRole === 'gerente' || userSede === 'Quito') && <option value="Quito" style={{ background: '#0d152d', color: '#ffffff' }}>Quito</option>}
+            {(!currentUser || currentUser.isSuperAdmin || currentUser.appRole === 'director_maestria' || currentUser.appRole === 'direccion' || currentUser.appRole === 'gerente' || userSede === 'Guayaquil') && <option value="Guayaquil" style={{ background: '#0d152d', color: '#ffffff' }}>Guayaquil</option>}
+            {(!currentUser || currentUser.isSuperAdmin || currentUser.appRole === 'director_maestria' || currentUser.appRole === 'direccion' || currentUser.appRole === 'gerente' || userSede === 'Cuenca') && <option value="Cuenca" style={{ background: '#0d152d', color: '#ffffff' }}>Cuenca</option>}
+            {(!currentUser || currentUser.isSuperAdmin || currentUser.appRole === 'director_maestria' || currentUser.appRole === 'direccion' || currentUser.appRole === 'gerente' || userSede === 'Lima') && <option value="Lima" style={{ background: '#0d152d', color: '#ffffff' }}>Lima</option>}
+            {(!currentUser || currentUser.isSuperAdmin || currentUser.appRole === 'director_maestria' || currentUser.appRole === 'direccion' || currentUser.appRole === 'gerente' || userSede === 'Medellín') && <option value="Medellín" style={{ background: '#0d152d', color: '#ffffff' }}>Medellín</option>}
+            {(!currentUser || currentUser.isSuperAdmin || currentUser.appRole === 'director_maestria' || currentUser.appRole === 'direccion' || currentUser.appRole === 'gerente' || userSede === 'México') && <option value="México" style={{ background: '#0d152d', color: '#ffffff' }}>México</option>}
+          </select>
+
+          {/* Filtro Experiencia */}
+          <select
+            value={selectedEdicion}
+            onChange={(e) => setSelectedEdicion(e.target.value)}
+            style={{ 
+              padding: '0.55rem 0.9rem', 
+              borderRadius: '8px', 
+              border: '1px solid var(--border-subtle, rgba(255, 255, 255, 0.2))', 
+              background: 'var(--bg-dark-alt, #0d152d)', 
+              color: 'var(--text-heading, #ffffff)', 
+              fontWeight: 700, 
+              fontSize: '0.85rem',
+              cursor: 'pointer',
+              colorScheme: 'dark'
+            }}
+          >
+            <option value="Todas" style={{ background: '#0d152d', color: '#ffffff' }}>Toda Experiencia</option>
+            <option value="senior" style={{ background: '#0d152d', color: '#ffffff' }}>🏆 Líderes Senior (+9 a +15 ed.)</option>
+            <option value="intermedio" style={{ background: '#0d152d', color: '#ffffff' }}>✨ 1 a 8 Ediciones</option>
+            <option value="reciente" style={{ background: '#0d152d', color: '#ffffff' }}>🌱 Graduados Recientes</option>
+          </select>
+        </div>
+
+        {/* Vista Toggle & Contador */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted, #64748b)' }}>
+            Mostrando {filteredMembers.length} de {members.length}
+          </span>
+          <div style={{ display: 'flex', border: '1px solid var(--border-subtle, #cbd5e1)', borderRadius: '8px', overflow: 'hidden' }}>
+            <button 
+              onClick={() => setViewMode('grid')}
+              style={{ background: viewMode === 'grid' ? 'var(--crear-blue, #29abe2)' : 'transparent', color: viewMode === 'grid' ? '#fff' : 'var(--text-muted, #64748b)', border: 'none', padding: '0.45rem 0.75rem', cursor: 'pointer' }}
+              title="Vista de Cuadrícula"
+            >
+              <Grid size={16} />
+            </button>
+            <button 
+              onClick={() => setViewMode('table')}
+              style={{ background: viewMode === 'table' ? 'var(--crear-blue, #29abe2)' : 'transparent', color: viewMode === 'table' ? '#fff' : 'var(--text-muted, #64748b)', border: 'none', padding: '0.45rem 0.75rem', cursor: 'pointer' }}
+              title="Vista de Tabla"
+            >
+              <List size={16} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* CONTENIDO PRINCIPAL */}
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: '4rem 1rem', color: 'var(--crear-gold, #f59e0b)', fontWeight: 700 }}>
+          <RefreshCw size={32} className="animate-spin" style={{ animation: 'spin 1s linear infinite', margin: '0 auto 1rem' }} />
+          <div>Cargando e integrando directorio de Quantum Team desde Google Sheets...</div>
+        </div>
+      ) : filteredMembers.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: '4rem 1rem', background: 'var(--bg-card, #ffffff)', borderRadius: '16px', border: '1px solid var(--border-subtle, #e2e8f0)' }}>
+          <Users size={48} style={{ color: 'var(--text-muted, #64748b)', marginBottom: '1rem' }} />
+          <h3 style={{ margin: '0 0 0.5rem', fontWeight: 700 }}>No se encontraron integrantes de Quantum Team</h3>
+          <p style={{ margin: 0, color: 'var(--text-muted, #64748b)', fontSize: '0.9rem' }}>Intenta cambiando los filtros o la búsqueda.</p>
+        </div>
+      ) : viewMode === 'grid' ? (
+        /* VISTA DE CUADRÍCULA (CARDS) */
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '1.25rem' }}>
+          {filteredMembers.map((m) => (
+            <div 
+              key={m.id}
+              className="glass-panel"
+              style={{
+                borderRadius: '14px',
+                border: '1px solid',
+                borderColor: m.isSenior ? 'rgba(245, 158, 11, 0.4)' : 'var(--border-subtle, rgba(255,255,255,0.08))',
+                padding: '1.4rem',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                position: 'relative'
+              }}
+            >
+              {m.isSenior && (
+                <div style={{ position: 'absolute', top: '12px', right: '12px', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#000', fontSize: '0.68rem', fontWeight: 800, padding: '2px 8px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
+                  <Award size={11} /> SENIOR
+                </div>
+              )}
+
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem', paddingRight: m.isSenior ? '65px' : '0' }}>
+                  <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-heading, #ffffff)' }}>
+                    {m.nombre}
+                  </h3>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.85rem', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '0.75rem', background: 'rgba(41, 171, 226, 0.15)', color: 'var(--crear-cyan, #29abe2)', border: '1px solid rgba(41, 171, 226, 0.3)', padding: '2px 8px', borderRadius: '12px', display: 'inline-flex', alignItems: 'center', gap: '0.2rem', fontWeight: 700 }}>
+                    <CountryFlag sede={m.sede} /> {m.sede}
+                  </span>
+                  {m.docNumero && (
+                    <span style={{ fontSize: '0.75rem', background: 'rgba(255, 255, 255, 0.05)', color: 'var(--text-muted, #94a3b8)', border: '1px solid rgba(255, 255, 255, 0.1)', padding: '2px 8px', borderRadius: '12px', fontWeight: 600 }}>
+                      {m.docTipo}: {m.docNumero}
+                    </span>
+                  )}
+                  {m.talla && (
+                    <span style={{ fontSize: '0.75rem', background: 'rgba(245, 158, 11, 0.15)', color: 'var(--crear-gold, #f59e0b)', border: '1px solid rgba(245, 158, 11, 0.3)', padding: '2px 8px', borderRadius: '12px', fontWeight: 700 }}>
+                      Talla: {m.talla}
+                    </span>
+                  )}
+                </div>
+
+                <div style={{ fontSize: '0.82rem', color: 'var(--text-muted, #94a3b8)', marginBottom: '0.85rem' }}>
+                  <strong style={{ color: 'var(--text-main, #ffffff)' }}>Ediciones:</strong> {m.ediciones}
+                </div>
+
+                {m.declaracion && (
+                  <div style={{ background: 'rgba(255, 255, 255, 0.02)', padding: '0.85rem', borderRadius: '8px', borderLeft: '3px solid var(--crear-gold, #f59e0b)', marginBottom: '1rem', fontStyle: 'italic', fontSize: '0.82rem', color: 'var(--text-main, #e2e8f0)', lineHeight: '1.45' }}>
+                    "{m.declaracion}"
+                  </div>
+                )}
+              </div>
+
+              <div style={{ borderTop: '1px solid var(--border-subtle, rgba(255,255,255,0.08))', paddingTop: '0.9rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  {m.whatsappUrl && (
+                    <a 
+                      href={m.whatsappUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="btn-secondary"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', padding: '0.35rem 0.75rem', borderRadius: '6px', fontSize: '0.78rem', background: 'rgba(34, 197, 94, 0.15)', color: '#22c55e', border: '1px solid rgba(34, 197, 94, 0.3)', fontWeight: 700, textDecoration: 'none' }}
+                      title="Abrir chat de WhatsApp"
+                    >
+                      <Phone size={13} /> WhatsApp
+                    </a>
+                  )}
+
+                  {m.instagram && m.instagramUrl && (
+                    <a 
+                      href={m.instagramUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="btn-secondary"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', padding: '0.35rem 0.75rem', borderRadius: '6px', fontSize: '0.78rem', background: 'rgba(236, 72, 153, 0.15)', color: '#ec4899', border: '1px solid rgba(236, 72, 153, 0.3)', fontWeight: 700, textDecoration: 'none' }}
+                      title="Ver perfil de Instagram"
+                    >
+                      <InstagramIcon size={13} /> {m.instagram}
+                    </a>
+                  )}
+                </div>
+
+                  {!m.whatsappUrl && m.email && (
+                    <a 
+                      href={`mailto:${m.email}`}
+                      style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '0.78rem', color: 'var(--crear-blue)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+                      title={`Enviar correo a ${m.email}`}
+                    >
+                      <Mail size={13} /> Correo
+                    </a>
+                  )}
+                  {m.email && (
+                    <a 
+                      href={`https://mail.google.com/chat/u/0/#chat/dm/${m.email}`}
+                      target="_blank" rel="noopener noreferrer"
+                      style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '0.78rem', color: '#10b981', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+                      title={`Google Chat con ${m.email}`}
+                    >
+                      <MessageSquare size={13} /> G. Chat
+                    </a>
+                  )}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        /* VISTA DE TABLA */
+        <div className="glass-panel" style={{ overflowX: 'auto', borderRadius: '14px', border: '1px solid var(--border-subtle, rgba(255,255,255,0.08))' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
+            <thead>
+              <tr style={{ background: 'rgba(255,255,255,0.03)', borderBottom: '2px solid var(--border-subtle, rgba(255,255,255,0.08))' }}>
+                <th style={{ padding: '0.9rem 1rem', fontWeight: 700, color: 'var(--text-heading, #ffffff)' }}>#</th>
+                <th style={{ padding: '0.9rem 1rem', fontWeight: 700, color: 'var(--text-heading, #ffffff)' }}>Nombre & Sede</th>
+                <th style={{ padding: '0.9rem 1rem', fontWeight: 700, color: 'var(--text-heading, #ffffff)' }}>Documento</th>
+                <th style={{ padding: '0.9rem 1rem', fontWeight: 700, color: 'var(--text-heading, #ffffff)' }}>Ediciones en QT</th>
+                <th style={{ padding: '0.9rem 1rem', fontWeight: 700, color: 'var(--text-heading, #ffffff)' }}>Talla</th>
+                <th style={{ padding: '0.9rem 1rem', fontWeight: 700, color: 'var(--text-heading, #ffffff)' }}>Instagram</th>
+                <th style={{ padding: '0.9rem 1rem', fontWeight: 700, color: 'var(--text-heading, #ffffff)' }}>Contacto</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredMembers.map((m, idx) => (
+                <tr key={m.id} style={{ borderBottom: '1px solid var(--border-subtle, rgba(255,255,255,0.05))' }}>
+                  <td style={{ padding: '0.85rem 1rem', color: 'var(--text-muted, #94a3b8)' }}>{idx + 1}</td>
+                  <td style={{ padding: '0.85rem 1rem' }}>
+                    <div style={{ fontWeight: 700, color: 'var(--text-heading, #ffffff)' }}>{m.nombre}</div>
+                    <div style={{ fontSize: '0.78rem', color: 'var(--text-muted, #94a3b8)', display: 'flex', alignItems: 'center', gap: '0.3rem', marginTop: '2px' }}>
+                      <CountryFlag sede={m.sede} /> {m.sede}
+                    </div>
+                  </td>
+                  <td style={{ padding: '0.85rem 1rem', color: 'var(--text-main, #e2e8f0)' }}>
+                    {m.docTipo}: {m.docNumero}
+                  </td>
+                  <td style={{ padding: '0.85rem 1rem' }}>
+                    <span style={{ fontSize: '0.8rem', background: m.isSenior ? 'rgba(245, 158, 11, 0.15)' : 'rgba(255,255,255,0.05)', color: m.isSenior ? 'var(--crear-gold, #f59e0b)' : 'var(--text-muted, #94a3b8)', border: m.isSenior ? '1px solid rgba(245, 158, 11, 0.3)' : '1px solid rgba(255,255,255,0.1)', padding: '2px 8px', borderRadius: '10px', fontWeight: m.isSenior ? 700 : 500 }}>
+                      {m.ediciones}
+                    </span>
+                  </td>
+                  <td style={{ padding: '0.85rem 1rem', fontWeight: 700, color: m.talla ? 'var(--crear-gold)' : 'var(--text-muted)' }}>{m.talla || '-'}</td>
+                  <td style={{ padding: '0.85rem 1rem' }}>
+                    {m.instagram ? (
+                      <a href={m.instagramUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#ec4899', textDecoration: 'none', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
+                        <InstagramIcon size={12} /> {m.instagram}
+                      </a>
+                    ) : '-'}
+                  </td>
+                  <td style={{ padding: '0.85rem 1rem' }}>
+                    <div style={{ display: 'flex', gap: '0.4rem', flexDirection: 'column' }}>
+                      {m.whatsappUrl && (
+                        <a href={m.whatsappUrl} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(34, 197, 94, 0.15)', color: '#22c55e', border: '1px solid rgba(34, 197, 94, 0.3)', padding: '4px 8px', borderRadius: '6px', textDecoration: 'none', fontWeight: 700, fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
+                          <Phone size={11} /> WhatsApp
+                        </a>
+                      )}
+                      {!m.whatsappUrl && m.email && (
+                        <a href={`mailto:${m.email}`} style={{ background: 'rgba(0, 210, 255, 0.15)', color: 'var(--crear-blue)', border: '1px solid rgba(0, 210, 255, 0.3)', padding: '4px 8px', borderRadius: '6px', textDecoration: 'none', fontWeight: 700, fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }} title={`Enviar correo a ${m.email}`}>
+                          <Mail size={11} /> Correo
+                        </a>
+                      )}
+                      {m.email && (
+                        <a href={`https://mail.google.com/chat/u/0/#chat/dm/${m.email}`} target="_blank" rel="noopener noreferrer" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '4px 8px', borderRadius: '6px', textDecoration: 'none', fontWeight: 700, fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }} title={`Google Chat con ${m.email}`}>
+                          <MessageSquare size={11} /> G. Chat
+                        </a>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
+```
+
+---
+
+## Archivo: Claude outputs\Home.jsx
+
+```javascript
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { useCycles } from '../context/CyclesContext';
+import { useChecklist } from '../context/ChecklistContext';
+import { useUI } from '../context/UIContext';
+import { useTheme } from '../context/ThemeContext';
+import { useNotifications } from '../context/NotificationContext';
+import { 
+  FileText, LogOut, Clock, Calendar as CalendarIcon, MapPin, CheckCircle2, 
+  AlertCircle, Circle, RefreshCw, CalendarPlus, Bell, Users, AtSign, 
+  BookOpen, Lightbulb, Search, X, Filter, ChevronDown, Sparkles,
+  Zap, LayoutGrid, Sliders, CheckSquare, ArrowRight, ArrowUpRight, ShieldCheck,
+  TrendingUp, Compass, HelpCircle
+} from 'lucide-react';
+import { getFlagForSede } from '../utils/flags';
+import { createGoogleEvent } from '../services/googleSync';
+import { calculateAutomaticDeadline } from '../utils/soarDates';
+import TaskAssignmentModal from '../components/TaskAssignmentModal';
+import TaskDetailModal from '../components/TaskDetailModal';
+import VenueConfigModal from '../components/VenueConfigModal';
+import ViewModeSelector from '../components/ViewModeSelector';
+import ThemeToggle from '../components/ThemeToggle';
+import { getVenueForTraining } from '../data/venuesData';
+import { ROLE_DISPLAY_NAMES, normalizeSede } from '../data/usersData';
+import {
+  canAssignTrainer, canViewAllManagers, isDireccionRole, isGlobalQTCoordinator,
+  canAccessAgendaTimeBoxing, canAccessFlyersC1, canAccessCalendarioMJ,
+  canAccessMonitorVuelos, canAccessMonitorIMOs, canAccessHotelesSede, canAccessManualQT,
+  canAccessDirectorioQT, canAccessManualNodus, canAccessCampusInteractivo
+} from '../config/permissions';
+import EffectiveCommunicationButton from '../components/EffectiveCommunicationButton';
+import { getAllCompanyUsers } from '../services/userService';
+import UserProfileModal from '../components/UserProfileModal';
+import HorariosEntrenamientoModal from '../components/HorariosEntrenamientoModal';
+import { INITIAL_MANAGERS } from '../data/managersData';
+
+/**
+ * Normaliza y verifica si un evento está asignado a un entrenador específico
+ */
+const isTrainerMatchingUser = (evTrainer, user) => {
+  if (!evTrainer || !user) return false;
+  const normalize = (str) => (str || '')
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .trim();
+
+  const trainerStr = normalize(evTrainer);
+  const userName = normalize(user.name || user.displayName || '');
+  const userEmail = normalize(user.email || '');
+
+  if (!trainerStr || trainerStr === 'tba' || /^\d+$/.test(trainerStr) || /^eq\s*\d+$/i.test(trainerStr)) return false;
+
+  if (userName && (trainerStr.includes(userName) || userName.includes(trainerStr))) return true;
+
+  const nameParts = userName.split(/\s+/).filter(p => p.length >= 3);
+  const trainerParts = trainerStr.split(/[\/\s,\-]+/).filter(p => p.length >= 3);
+  
+  if (nameParts.length > 0) {
+    const matchedTokens = nameParts.filter(part => trainerParts.some(tp => tp.includes(part) || part.includes(tp)));
+    if (matchedTokens.length >= Math.min(2, nameParts.length)) return true;
+  }
+
+  const emailPrefix = userEmail.split('@')[0];
+  const emailTokens = emailPrefix.split(/[\._\-]/).filter(t => t.length >= 3);
+  if (emailTokens.length > 0) {
+    const matchedEmailTokens = emailTokens.filter(tok => trainerParts.some(tp => tp.includes(tok) || tok.includes(tp)));
+    if (matchedEmailTokens.length >= Math.min(2, emailTokens.length)) return true;
+  }
+
+  return false;
+};
+
+// ============================================================================
+// BUSCADOR GLOBAL — Registro de módulos/páginas (28/08/2026)
+// ----------------------------------------------------------------------------
+// Refleja exactamente las mismas rutas y los mismos arrays de roles que ya
+// usan el menú "🛠️ Más Módulos y Herramientas" y la Barra Pro en este mismo
+// archivo (ver las secciones "MENÚ DESPLEGABLE DE MÁS MÓDULOS" y "BARRA PRO
+// COMPLETA" más abajo). Si se agrega, quita o re-permisiona un módulo ahí,
+// hay que actualizar también esta lista para que el buscador no muestre
+// accesos desactualizados o incorrectos.
+// ============================================================================
+const EXEC_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria'];
+const KPI_ROLES = ['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan'];
+const DIRECTORIO_QT_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'director_maestria'];
+// CAMPUS_ROLES: ya no se usa como filtro — Campus Interactivo es abierto a TODOS los
+// roles según la Matriz Oficial (fila "Campus Interactivo" = X en las 9 columnas).
+// Se deja declarada solo por si se necesita revertir a un acceso restringido.
+const CAMPUS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin'];
+const CENTRO_MANAGERS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'director_maestria'];
+const MANUAL_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'director_maestria'];
+const MANUAL_NODUS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'director_maestria'];
+const REPORTES_VISIBLE = (u) => Boolean(
+  u?.isSuperAdmin || u?.isGerente ||
+  ['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'capitan', 'qt', 'direccion', 'director_maestria', 'aliado', 'manager'].includes(u?.appRole)
+);
+
+// ============================================================================
+// REGISTRO DE OPCIONES Y ACCIONES DE CAUSA OS (02/09/2026)
+// ----------------------------------------------------------------------------
+// Permite buscar directamente herramientas, botones clave, accesos rápidos,
+// cartas de entrenadores, vuelos, configuraciones y acciones del sistema.
+// ============================================================================
+const CAUSA_OPTIONS_REGISTRY = [
+  {
+    id: 'opt-brandscript',
+    title: '📜 BrandScript & Guiones MJ',
+    category: 'Ventas y Enrolamiento',
+    badge: 'Manual Oficial',
+    emoji: '📜',
+    desc: 'Manual Oficial de Enrolamiento Narrativo para Mánagers y Entrenadores.',
+    keywords: ['guiones', 'brandscript', 'storybrand', 'neuromarketing', 'conversion', 'ventas', 'enrolamiento', 'mj'],
+    route: '/brandscript',
+    roles: null
+  },
+  {
+    id: 'opt-reporte-relampago',
+    title: '⚡ Reporte Relámpago Post-FDS (Gerentes de Sede)',
+    category: 'Reportes Operativos',
+    badge: '<3 min • Nodus',
+    emoji: '⚡',
+    desc: 'Evaluación de 5 puntos post-FDS: Entrenador (1-5), Infraestructura (1-5), Staff (1-5), Retención TRO % y Quiebres Críticos. Habilitado Domingo 21:00 a Lunes 12:00 PM.',
+    keywords: ['reporte relampago', 'relampago', 'reporte post fds', 'reportes', 'fds', 'gerente', 'retencion', 'tro', 'lunes 12', 'candado presupuestario', 'evaluacion entrenador'],
+    route: '/reportes',
+    roles: null
+  },
+  {
+    id: 'opt-micro-pulso',
+    title: '🎧 Micro-Pulso de Staff (3 Preguntas Aleatorias)',
+    category: 'Escucha Activa',
+    badge: '<30 seg • Cero Pereza',
+    emoji: '🎧',
+    desc: 'Micro-encuesta rotativa de baja fricción: Seguridad Psicológica (Amy Edmondson), Liderazgo Project Oxygen y Buzón Stop a la Burocracia (Gary Hamel). Lunes 11:00 AM a Martes 18:00 PM.',
+    keywords: ['micro pulso', 'micropulso', 'pulso staff', '3 preguntas', 'seguridad psicologica', 'oxygen', 'humanocracy', 'stop', 'buzon stop', 'escucha activa'],
+    route: '/reportes',
+    roles: null
+  },
+  {
+    id: 'opt-dashboard-evolucion',
+    title: '📊 Dashboard de Evolución Organizacional (Causa OS)',
+    category: 'Inteligencia Organizacional',
+    badge: 'Seguridad & Rider',
+    emoji: '📊',
+    desc: 'Monitor en vivo de temperatura de seguridad psicológica (<85%), ranking histórico de entrenadores y buzón de simplificación operativa Trim & Stack.',
+    keywords: ['dashboard evolucion', 'evolucion organizacional', 'seguridad psicologica', 'rider entrenador', 'trim and stack', 'metricas humanas'],
+    route: '/reportes',
+    roles: null
+  },
+
+  {
+    id: 'opt-kpis-lima',
+    title: '📊 Dashboard Directivo (Sede Lima)',
+    category: 'Analítica de Sede',
+    badge: 'Nuevo • Lima',
+    emoji: '📈',
+    desc: 'Análisis de efectividad, enrolamiento y calidad de datos operacionales de equipos y coordinadoras de la Sede Lima.',
+    keywords: ['kpi', 'dashboard', 'lima', 'coordinadoras', 'equipos', 'efectividad', 'desertores', 'analisis', 'datos', 'directivo'],
+    route: '/kpis-lima',
+    roles: null
+  },
+  {
+    id: 'opt-flyer',
+    title: 'Generador de Flyers Oficiales',
+    category: 'Herramienta HD',
+    badge: 'Flyer 1080x1920',
+    emoji: '🎨',
+    desc: 'Diseño y descarga de afiches oficiales para Instagram, WhatsApp y redes por sede',
+    keywords: ['flyer', 'flyers', 'generador', 'afiche', 'diseño', 'diseno', 'poster', 'descargar flyer', 'hd', '1080x1920', 'tierra', 'bot flyer', 'imagen'],
+    route: '/generador-flyer',
+    // Antes era null (abierto a todos, incluidos Directivos). Corregido según
+    // confirmación explícita de José (08/09/2026): Directivos NO tienen acceso.
+    roles: ['gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj']
+  },
+  {
+    id: 'opt-new-task',
+    title: 'Crear Nueva Tarea (+ TAREA)',
+    category: 'Acción Rápida',
+    badge: '+ Tarea',
+    emoji: '➕',
+    desc: 'Abrir ventana para crear, asignar y fechar una nueva tarea o compromiso',
+    keywords: ['crear tarea', 'nueva tarea', 'tarea', 'task', 'asignar tarea', 'pendiente', 'agregar tarea', '+ tarea'],
+    action: 'new_task',
+    roles: null
+  },
+  {
+    id: 'opt-cartas-hub',
+    title: 'Cartas de Entrenadores e Itinerarios de Vuelo',
+    category: 'Operaciones Lima',
+    badge: 'Vuelos y Migraciones',
+    emoji: '✈️',
+    desc: 'Cartas de compromiso, itinerarios confirmados, escalas técnicas, boletos y migración',
+    keywords: ['cartas', 'carta', 'entrenadores', 'itinerario', 'vuelos', 'pasajes', 'boletos', 'migraciones', 'recojo hotel', 'checkin', 'avianca', 'latam'],
+    external: 'https://cartas.crearpsl.net',
+    roles: null
+  },
+  {
+    id: 'opt-carta-alejo',
+    title: 'Carta Alejandro Díaz (Equipo 28 - Gratitud)',
+    category: 'Carta Oficial',
+    badge: 'Avianca AS58FE',
+    emoji: '📄',
+    desc: 'Vuelos AV108 / AV51, escala en Bogotá, carta de migración y recojo 07:05 AM',
+    keywords: ['alejo', 'alejandro diaz', 'equipo 28', 'gratitud', 'as58fe', 'avianca', 'carta alejo'],
+    external: 'https://cartas.crearpsl.net/carta_alejandro_diaz_e28.html',
+    roles: null
+  },
+  {
+    id: 'opt-carta-lourdes',
+    title: 'Carta Lourdes Patiño (Equipo 29 - Relación)',
+    category: 'Carta Oficial',
+    badge: 'LATAM JYUAGO',
+    emoji: '📄',
+    desc: 'Vuelo directo LA 1437, retorno con escala en Guayaquil, carta migración y recojo 07:50 AM',
+    keywords: ['lourdes', 'lourdes patino', 'equipo 29', 'relacion', 'jyuago', 'latam', 'carta lourdes'],
+    external: 'https://cartas.crearpsl.net/carta_lourdes_patino_e29.html',
+    roles: null
+  },
+  {
+    id: 'opt-monitor-vuelos',
+    title: '✈️ Monitor de Vuelos y Cartas Oficiales',
+    category: 'Logística de Entrenadores',
+    badge: 'Radar en Vivo',
+    emoji: '✈️',
+    desc: 'Control de vuelos en vivo (LATAM/Avianca), logística de choferes, recojo en aeropuerto y repositorio de cartas oficiales',
+    keywords: ['vuelos', 'vuelo', 'cartas', 'carta', 'monitor de vuelos', 'radar', 'itinerario', 'chofer', 'hotel', 'andres idrobo', 'lourdes patino', 'alejandro diaz', 'migraciones', 'latam', 'avianca'],
+    route: '/monitor-vuelos',
+    roles: null
+  },
+  {
+    id: 'opt-carta-andres',
+    title: 'Carta Andrés Idrobo (Equipo 30 - Creación)',
+    category: 'Carta Oficial',
+    badge: 'LATAM DJBJJD',
+    emoji: '📄',
+    desc: 'Vuelos con escala en Guayaquil LA 1351 / LA 1430, carta migración y recojo 8:30 PM',
+    keywords: ['andres', 'andres idrobo', 'equipo 30', 'creacion', 'djbjjd', 'latam', 'carta andres'],
+    external: '/cartas/carta_andres_idrobo_e30.html',
+    roles: null
+  },
+  {
+    id: 'opt-calendario-mj',
+    title: 'Calendario de Maestría del Juego (MJ)',
+    category: 'Cronograma',
+    badge: 'E28 / E29 / E30',
+    emoji: '📅',
+    desc: 'Editor y visor oficial del cronograma de Maestría del Juego para todas las sedes',
+    keywords: ['calendario mj', 'maestria del juego', 'cronograma mj', 'fechas maestria', 'e28', 'e29', 'e30', 'equipos'],
+    route: '/calendario-mj',
+    // Corregido según confirmación explícita de José (08/09/2026): "sí, así es
+    // correcto" — SOLO Coordinadores de MJ. Directivos y Gerentes NO tienen acceso.
+    roles: ['coord_maestria', 'coordinador_mj']
+  },
+  {
+    id: 'opt-calendario-global',
+    title: 'Calendario Global Maestro',
+    category: 'Agenda General',
+    badge: 'Todas las Sedes',
+    emoji: '📅',
+    desc: 'Cronograma global consolidado de eventos, talleres y hitos para Lima, Quito, GYE y Cuenca',
+    keywords: ['calendario global', 'calendario maestro', 'fechas globales', 'eventos', 'cronograma', 'google calendar'],
+    external: 'calendario-global',
+    // Antes era null (abierto a todos). Corregido: Directivos + Gerentes
+    // únicamente según la Matriz Oficial (08/09/2026).
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']
+  },
+  {
+    id: 'opt-agenda-equipo',
+    title: 'Agenda y Time Boxing del Equipo',
+    category: 'Productividad',
+    badge: 'Time Boxing',
+    emoji: '🗓️',
+    desc: 'Planificación semanal por bloques de tiempo y alineación del equipo',
+    keywords: ['agenda', 'time boxing', 'bloques', 'semana', 'calendario equipo'],
+    route: '/calendario-equipo',
+    roles: null
+  },
+  {
+    id: 'opt-masterclass-distinciones',
+    title: 'Masterclass: Distinciones de Liderazgo',
+    category: 'Formación',
+    badge: 'Nuevo',
+    emoji: '🌟',
+    desc: '5 Distinciones Cuánticas: Empatía vs Comodidad, Causa vs Efecto, Hecho vs Interpretación, Rigor vs Agresión, Compromiso vs Obligación.',
+    keywords: ['masterclass', 'distinciones', 'liderazgo', 'empatia', 'causa', 'efecto', 'interpretacion', 'rigor', 'agresion', 'compromiso'],
+    route: '/masterclass-distinciones',
+    roles: null
+  },
+  {
+    id: 'opt-horarios-entrenamientos',
+    title: 'Horarios de Entrenamientos y Código de Vestimenta',
+    category: 'Operaciones',
+    badge: 'C1 / C2 / MJ',
+    emoji: '⏰',
+    desc: 'Horarios oficiales de sala (Jueves a Domingo), aperturas, recesos, noches de confianza y código de vestimenta oficial',
+    keywords: ['horarios', 'horario', 'vestimenta', 'ropa', 'turnos', 'c1', 'c2', 'maestria', 'horas', 'cronograma', 'lima', 'jueves', 'viernes', 'sabado', 'domingo'],
+    action: 'open_horarios_modal',
+    roles: null
+  },
+
+  {
+    id: 'opt-checklist',
+    title: 'Mi Checklist Operativo',
+    category: 'Operaciones',
+    badge: 'Ciclo Activo',
+    emoji: '✅',
+    desc: 'Listado de compromisos y tareas críticas del ciclo según tu rol',
+    keywords: ['checklist', 'mis tareas', 'operativo', 'c1', 'c2', 'pendientes', 'actividades'],
+    route: (u) => `/checklist/${u?.appRole || 'capitan'}`,
+    roles: null
+  },
+  {
+    id: 'opt-metas',
+    title: 'Mis Metas y Puntuación',
+    category: 'Rendimiento',
+    badge: 'Score',
+    emoji: '🏆',
+    desc: 'Panel de metas personales y del equipo, cumplimiento de objetivos y avance',
+    keywords: ['metas', 'mis metas', 'score', 'objetivos', 'puntaje', 'avance', 'resultados'],
+    route: '/metas',
+    roles: null
+  },
+  {
+    id: 'opt-kpis',
+    title: 'Mis KPIs y Métricas',
+    category: 'Indicadores',
+    badge: 'Métricas',
+    emoji: '📊',
+    desc: 'Indicadores clave de rendimiento: deserción, confirmados, reentrenados y futuros imposibles',
+    keywords: ['kpi', 'kpis', 'mis kpis', 'metricas', 'indicadores', 'desercion', 'confirmados', 'reentrenados', 'enrolamiento'],
+    route: '/mis-kpis',
+    roles: ['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan']
+  },
+  {
+    id: 'opt-reportes',
+    title: 'Enviar Reportes Operativos',
+    category: 'Formularios',
+    badge: 'Envío',
+    emoji: '📤',
+    desc: 'Envío de reportes periódicos a gerencia y coordinadores',
+    keywords: ['reporte', 'reportes', 'enviar reportes', 'formulario', 'informe'],
+    route: '/reportes',
+    roles: null,
+    visible: REPORTES_VISIBLE
+  },
+  {
+    id: 'opt-centro-managers',
+    title: 'Centro de Managers',
+    category: 'Gestión de Equipos',
+    badge: 'PX y Aliados',
+    emoji: '🎯',
+    desc: 'Gestión de llamadas, seguimiento a participantes PX, aliados y coordinadores',
+    keywords: ['centro managers', 'managers', 'llamadas', 'px', 'aliados', 'seguimiento equipos'],
+    route: '/centro-managers',
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'director_maestria']
+  },
+  {
+    id: 'opt-directorio-qt',
+    title: 'Directorio Quantum Team (QT)',
+    category: 'Contactos',
+    badge: 'WhatsApp y Teléfonos',
+    emoji: '⚡',
+    desc: 'Teléfonos, WhatsApp directos y correos de todo el equipo de coordinación y staff',
+    keywords: ['directorio', 'directorio qt', 'telefonos', 'whatsapp', 'contactos staff', 'coordinadores'],
+    route: '/directorio-qt',
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'director_maestria']
+  },
+  {
+    id: 'opt-gerencial',
+    title: 'Causa OS Gerencial',
+    category: 'Ejecutivo',
+    badge: 'Gerencia',
+    emoji: '💼',
+    desc: 'Panel de control de alta dirección y toma de decisiones estratégicas',
+    keywords: ['gerente', 'gerencial', 'comite', 'direccion', 'dashboard gerencial'],
+    route: '/gerente',
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']
+  },
+  {
+    id: 'opt-estrategia',
+    title: 'Estrategia OKRs (Cascade)',
+    category: 'Estrategia',
+    badge: 'OKRs',
+    emoji: '🎯',
+    desc: 'Mapa estratégico y seguimiento de objetivos clave y resultados',
+    keywords: ['estrategia', 'okrs', 'cascade', 'objetivos', 'iniciativas'],
+    route: '/estrategia',
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']
+  },
+  {
+    id: 'opt-portafolio',
+    title: 'Portafolio PMO (Planview)',
+    category: 'Proyectos',
+    badge: 'PMO',
+    emoji: '📈',
+    desc: 'Supervisión de iniciativas, proyectos corporativos y cronogramas de entrega',
+    keywords: ['portafolio', 'pmo', 'proyectos', 'planview', 'gantt'],
+    route: '/portafolio',
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']
+  },
+  {
+    id: 'opt-auditoria-kpis',
+    title: 'Auditoría de KPIs',
+    category: 'Auditoría',
+    badge: 'Control',
+    emoji: '📉',
+    desc: 'Detección de anomalías, inconsistencias y validación cruzada de números',
+    keywords: ['auditoria', 'auditoria kpis', 'control', 'revision metricas', 'inconsistencias'],
+    route: '/auditoria-kpis',
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']
+  },
+  {
+    id: 'opt-acuerdos',
+    title: 'Acuerdos Oficiales (Correo)',
+    category: 'Compromisos',
+    badge: 'Minutas',
+    emoji: '✉️',
+    desc: 'Redacción y consulta de actas de reunión y acuerdos formales del equipo',
+    keywords: ['acuerdos', 'minutas', 'actas', 'correo', 'compromisos'],
+    route: '/acuerdos',
+    roles: null
+  },
+  {
+    id: 'opt-learning',
+    title: 'Inteligencia Colectiva (Learning)',
+    category: 'Conocimiento',
+    badge: 'Learning',
+    emoji: '🧠',
+    desc: 'Repositorio de lecciones aprendidas, mejoras operativas e ideas del equipo',
+    keywords: ['learning', 'aprendizaje', 'lecciones aprendidas', 'inteligencia colectiva', 'ideas'],
+    route: '/learning',
+    roles: null
+  },
+  {
+    id: 'opt-excelencia',
+    title: 'Excelencia Operativa',
+    category: 'Calidad',
+    badge: 'Estándares',
+    emoji: '👑',
+    desc: 'Reconocimientos, estándares de ejecución y manual de buenas prácticas',
+    keywords: ['excelencia', 'excelencia operativa', 'calidad', 'estandares', 'reconocimientos'],
+    route: '/excelencia',
+    roles: null
+  },
+  {
+    id: 'opt-superadmin',
+    title: 'Centro de Mando (Super Admin)',
+    category: 'Administración',
+    badge: 'Sistema',
+    emoji: '🌐',
+    desc: 'Gestión integral de usuarios, asignación de roles, permisos y configuración del sistema',
+    keywords: ['superadmin', 'centro de mando', 'administracion', 'usuarios', 'roles', 'permisos'],
+    route: '/superadmin',
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']
+  },
+  {
+    id: 'opt-sedes',
+    title: 'Configuración de Sedes y Salones',
+    category: 'Configuración',
+    badge: 'Locales',
+    emoji: '🏢',
+    desc: 'Configurar aforos, salones, hoteles y direcciones de cada sede (Lima, Quito, GYE, Cuenca)',
+    keywords: ['sede', 'sedes', 'configurar sedes', 'salones', 'hoteles', 'aforo', 'locales'],
+    action: 'venue_modal',
+    roles: null
+  },
+  {
+    id: 'opt-emergencias',
+    title: 'Protocolo de Emergencias',
+    category: 'Seguridad',
+    badge: 'SOS',
+    emoji: '🚨',
+    desc: 'Flujo de actuación ante emergencias médicas, logísticas o de seguridad',
+    keywords: ['emergencia', 'emergencias', 'protocolo emergencias', 'sos', 'urgencias', 'medico'],
+    route: '/protocolo-emergencias',
+    roles: null
+  },
+  {
+    id: 'opt-manual',
+    title: 'Manual / Guía Causa OS / QT',
+    category: 'Ayuda',
+    badge: 'Manual',
+    emoji: '📘',
+    desc: 'Documentación paso a paso de todas las funciones de Causa OS',
+    keywords: ['manual', 'guia', 'manual causa', 'instructivo', 'como funciona', 'ayuda'],
+    route: '/manual',
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'director_maestria']
+  },
+  {
+    id: 'opt-manual-nodus',
+    title: 'Gobernanza y Manual Nodus (Edición 2026)',
+    category: 'Gobernanza',
+    badge: '18 Caps + 9 Niveles',
+    emoji: '📗',
+    desc: 'Gobernanza simbiótica Nodus + Causa OS, 9 niveles, vestimenta 2026, 14 KPIs y manual paso a paso de Nodus',
+    keywords: ['manual nodus', 'nodus', 'gobernanza', 'guia nodus', 'plataforma nodus', 'imo', 'kpis', 'triggers', 'vestimenta', 'el viaje', 'paul sosa', 'fer aragon', 'elizabeth escobar'],
+    route: '/manual-nodus',
+    // Antes era null (abierto a todos). Corregido para que coincida con
+    // MANUAL_NODUS_ROLES / la Matriz Oficial: Directivos, Gerentes,
+    // Coordinadores C1Y2 y Coordinadores de MJ únicamente (08/09/2026).
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'director_maestria']
+  },
+  {
+    id: 'opt-vende-sin-vender',
+    title: '📖 Vende Sin Vender (Best-Seller Causa OS)',
+    category: 'Formación y Liderazgo',
+    badge: 'Best-Seller 2026',
+    emoji: '📖',
+    desc: 'El Arte de Enrolar y Despertar Gigantes: Neuromarketing Ético, Alex Hormozi y Causa OS con 8 gráficas narrativas interactivas',
+    keywords: ['vende sin vender', 'libro', 'best seller', 'hormozi', 'yoda', 'perro guardian', 'ecuacion de valor', 'ticket verde', 'rezagados', 'enrolamiento', 'storybrand'],
+    route: '/vende-sin-vender',
+    roles: null
+  },
+  {
+    id: 'opt-campus',
+    title: 'Campus Interactivo CREAR',
+    category: 'Academia',
+    badge: 'Formación',
+    emoji: '🎓',
+    desc: 'Plataforma interactiva de entrenamiento, videos y recursos de capacitación',
+    keywords: ['campus', 'campus interactivo', 'academia', 'cursos', 'videos', 'capacitacion'],
+    external: 'https://cpsl-campus-interactivo.vercel.app/ruta',
+    // Antes restringía a un subconjunto de roles. Corregido: Campus Interactivo
+    // es abierto a TODOS los roles según la Matriz Oficial (08/09/2026).
+    roles: null
+  },
+  {
+    id: 'opt-tema',
+    title: 'Cambiar Modo de Tema (Claro / Oscuro / Auto)',
+    category: 'Apariencia',
+    badge: 'Tema',
+    emoji: '🌓',
+    desc: 'Alternar entre Modo Oscuro (noche), Modo Claro (día) o Automático según la hora',
+    keywords: ['tema', 'modo oscuro', 'modo claro', 'dark mode', 'light mode', 'apariencia', 'colores', 'dia', 'noche', 'auto'],
+    action: 'toggle_theme',
+    roles: null
+  },
+  {
+    id: 'opt-vista',
+    title: 'Cambiar Vista de Pantalla (Lite / Compacto / Pro)',
+    category: 'Interfaz',
+    badge: 'Vista',
+    emoji: '👁️',
+    desc: 'Cambiar la densidad de información en el inicio: Modo Pro, Compacto o Lite',
+    keywords: ['vista', 'cambiar vista', 'modo pro', 'compacto', 'lite', 'densidad', 'interfaz'],
+    action: 'change_view',
+    roles: null
+  },
+  {
+    id: 'opt-logout',
+    title: 'Cerrar Sesión (Salir de Causa OS)',
+    category: 'Cuenta',
+    badge: 'Salir',
+    emoji: '🚪',
+    desc: 'Desconectar tu cuenta y salir de la plataforma',
+    keywords: ['salir', 'cerrar sesion', 'logout', 'desconectar'],
+    action: 'logout',
+    roles: null
+  }
+];
+
+const MODULE_REGISTRY = [
+  { id: 'gerencial', label: 'Causa OS Gerencial', emoji: '💼', route: '/gerente', roles: EXEC_ROLES },
+  { id: 'portafolio', label: 'Portafolio PMO (Planview)', emoji: '📈', route: '/portafolio', roles: EXEC_ROLES },
+  { id: 'estrategia', label: 'Estrategia OKRs (Cascade)', emoji: '🎯', route: '/estrategia', roles: EXEC_ROLES },
+  { id: 'auditoria-kpis', label: 'Auditoría de KPIs', emoji: '📉', route: '/auditoria-kpis', roles: EXEC_ROLES },
+  { id: 'acuerdos', label: 'Acuerdos Oficiales (Correo)', emoji: '✉️', route: '/acuerdos', roles: EXEC_ROLES },
+  { id: 'calendario-equipo', label: 'Agenda y Time Boxing', emoji: '🗓️', route: '/calendario-equipo', roles: null },
+  { id: 'learning', label: 'Inteligencia Colectiva (Learning)', emoji: '🧠', route: '/learning', roles: EXEC_ROLES },
+  { id: 'excelencia', label: 'Excelencia Operativa', emoji: '👑', route: '/excelencia', roles: EXEC_ROLES },
+  { id: 'mis-kpis', label: 'Mis KPIs', emoji: '📊', route: '/mis-kpis', roles: KPI_ROLES },
+  { id: 'directorio-qt', label: 'Directorio QT', emoji: '⚡', route: '/directorio-qt', roles: DIRECTORIO_QT_ROLES },
+  { id: 'superadmin', label: 'Centro de Mando', emoji: '🌐', route: '/superadmin', roles: EXEC_ROLES },
+  // Antes era null (abierto a todos). Corregido: Directivos + Gerentes únicamente
+  // según la Matriz Oficial, fila "Calendario Global" (08/09/2026).
+  { id: 'calendario-global', label: 'Calendario Global Maestro', emoji: '📅', external: 'calendario-global', roles: EXEC_ROLES },
+  // Abierto a TODOS los roles según la Matriz Oficial (antes usaba CAMPUS_ROLES, restrictivo).
+  { id: 'campus', label: 'Campus Interactivo', emoji: '🎓', external: 'https://cpsl-campus-interactivo.vercel.app/ruta', roles: null },
+  { id: 'centro-managers', label: 'Centro de Managers', emoji: '🎯', route: '/centro-managers', roles: CENTRO_MANAGERS_ROLES },
+  { id: 'protocolo-emergencias', label: 'Protocolo de Emergencias', emoji: '🚨', route: '/protocolo-emergencias', roles: null },
+  { id: 'manual', label: 'Manual / Guía Causa OS / QT', emoji: '📘', route: '/manual', roles: MANUAL_ROLES },
+  { id: 'manual-nodus', label: 'Manual Práctico Nodus', emoji: '📗', route: '/manual-nodus', roles: MANUAL_NODUS_ROLES },
+  { id: 'checklist', label: 'Mi Checklist Operativo', emoji: '✅', route: (u) => `/checklist/${u?.appRole || 'capitan'}`, roles: null },
+  { id: 'metas', label: 'Mis Metas', emoji: '🏆', route: '/metas', roles: null },
+  { id: 'reportes', label: 'Enviar Reportes', emoji: '📤', route: '/reportes', roles: null, visible: REPORTES_VISIBLE },
+  // Corregido según confirmación explícita de José (08/09/2026): Directivos (y
+  // director_maestria, tratado como Directivos) NO tienen acceso a Flyers C1.
+  // Solo Gerentes, Coordinadores C1Y2 y Coordinadores de MJ, según la Matriz Oficial.
+  { id: 'generador-flyer', label: 'Generador de Flyers Oficiales', emoji: '🎨', route: '/generador-flyer', roles: ['gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj'] },
+];
+
+// BUG REAL corregido (08/09/2026, reportado por José: "soy superusuario con
+// acceso a todo lo cual debería aparecer en mi selector"). El selector de rol
+// inline de la barra PRO (más abajo, junto al nombre/avatar) solo listaba
+// `currentUser.roles` — para un SuperAdmin eso son solo los 3-4 roles que
+// buildUserObject() le inyecta automáticamente en AuthContext.jsx (gerente,
+// direccion, consolidado, y entrenador si aplica DUAL_ROLE_TRAINER_EMAILS), no
+// TODOS los roles del sistema. Un SuperAdmin necesita poder simular cualquier
+// rol para probar la plataforma, así que para él la lista de opciones ahora es
+// esta lista fija de todos los roles reales de Causa OS (mismo catálogo que ya
+// usa RoleSelector.jsx en su `roleHierarchy`), en vez de su array personal de
+// roles asignados en Firestore. Se excluye 'student' a propósito: no es un rol
+// del sistema SO-AR (ver el comentario en ROLE_DISPLAY_NAMES, usersData.js).
+const ALL_SIMULATABLE_ROLES = [
+  'consolidado', 'direccion', 'cfo', 'gerente', 'director_maestria',
+  'coord_c1', 'coord_maestria', 'capitan', 'manager',
+  'entrenador', 'entrenador_llamadas', 'qt',
+  'finanzas', 'coordinador', 'talento_humano', 'legal',
+  'asistente_impuestos_quito', 'tecnico_sst'
+];
+
+const isModuleVisible = (mod, currentUser) => {
+  if (typeof mod.visible === 'function') return mod.visible(currentUser);
+  if (mod.roles === null) return true;
+  const allowedRoles = mod.roles || [];
+  // BUG REAL corregido (08/09/2026, reportado por José: "cuando cambio de rol
+  // esto se debería modificar, que solo se vean los del rol") — ver la nota
+  // completa en checkModuleAccess() (permissions.js) y en switchRole()
+  // (AuthContext.jsx). Mientras isRoleSimulationActive es true, un SuperAdmin
+  // ya NO recibe el bypass total: los botones del PRO bar (MODULE_REGISTRY) se
+  // filtran exactamente igual que para el rol que tiene elegido en el selector.
+  if (currentUser?.isSuperAdmin && !currentUser?.isRoleSimulationActive) return true;
+  if (currentUser?.appRole === 'consolidado') {
+    return (currentUser?.roles || []).some(r => allowedRoles.includes(r));
+  }
+  return allowedRoles.includes(currentUser?.appRole);
+};
+
+// ============================================================================
+// TAREAS QUE HAS ASIGNADO — cuenta regresiva (28/08/2026)
+// ----------------------------------------------------------------------------
+// Calcula el texto y color de la cuenta regresiva hasta la fecha límite de una
+// tarea, a partir de "now" (se le pasa el estado "time" que ya existe en Home
+// y se actualiza cada segundo, así que esto queda "vivo" sin agregar un
+// segundo intervalo). Los umbrales de color (3h / 24h / 72h) son una
+// RECOMENDACIÓN razonable, no algo que José haya especificado con números
+// exactos — se puede ajustar si prefiere otros cortes.
+// ============================================================================
+const getCountdownInfo = (deadlineIso, now) => {
+  if (!deadlineIso) return { label: 'Sin fecha límite', color: '#9ca3af', bg: 'rgba(156,163,175,0.12)', border: '#9ca3af', overdue: false };
+  const deadline = new Date(deadlineIso).getTime();
+  if (isNaN(deadline)) return { label: 'Fecha inválida', color: '#9ca3af', bg: 'rgba(156,163,175,0.12)', border: '#9ca3af', overdue: false };
+
+  const diffMs = deadline - now.getTime();
+  const absMs = Math.abs(diffMs);
+  const totalHours = Math.floor(absMs / 3600000);
+  const days = Math.floor(totalHours / 24);
+  const mins = Math.floor((absMs % 3600000) / 60000);
+  const timeStr = days > 0 ? `${days}d ${totalHours % 24}h` : (totalHours > 0 ? `${totalHours}h ${mins}m` : `${mins}m`);
+
+  if (diffMs <= 0) return { label: `⏰ VENCIDA hace ${timeStr}`, color: '#ffffff', bg: '#dc2626', border: '#7f1d1d', overdue: true };
+  if (diffMs < 3 * 3600000) return { label: `🔴 ${timeStr} restantes`, color: '#ffffff', bg: '#ef4444', border: '#b91c1c', overdue: false };
+  if (diffMs < 24 * 3600000) return { label: `🟠 ${timeStr} restantes`, color: '#ffffff', bg: '#f97316', border: '#c2410c', overdue: false };
+  if (diffMs < 72 * 3600000) return { label: `🟡 ${timeStr} restantes`, color: '#1a1300', bg: '#facc15', border: '#a16207', overdue: false };
+  return { label: `🟢 ${timeStr} restantes`, color: '#ffffff', bg: '#16a34a', border: '#166534', overdue: false };
+};
+
+export default function Home() {
+  const hasRoleAccess = (allowedRoles) => {
+    // Mismo fix de simulación de rol que isModuleVisible() más arriba y
+    // checkModuleAccess() en permissions.js (08/09/2026).
+    if (currentUser?.isSuperAdmin && !currentUser?.isRoleSimulationActive) return true;
+    if (currentUser?.appRole === 'consolidado') {
+      return (currentUser?.roles || []).some(r => allowedRoles.includes(r));
+    }
+    return allowedRoles.includes(currentUser?.appRole);
+  };
+
+  const { currentUser, logout, switchRole, reauthenticateGoogle } = useAuth();
+  const { currentCycle, currentStage, events, loadingEvents } = useCycles();
+  const { tasks: allTasks, loading: loadingTasks, syncTasksToGoogle, acceptCollaboration, rejectCollaboration } = useChecklist();
+  const { showToast, viewMode, setViewMode, customModules } = useUI();
+  const { themeMode, setThemeMode } = useTheme();
+  const { notifications, unreadCount, markAllAsRead } = useNotifications();
+  const navigate = useNavigate();
+
+  // Reloj local
+  const [time, setTime] = useState(new Date());
+  
+  // Eventos locales
+  const [activeEventTab, setActiveEventTab] = useState('locales');
+  const [timeFilter, setTimeFilter] = useState('futuros');
+  const [selectedSedeFilter, setSelectedSedeFilter] = useState('todas');
+  const [selectedTrainingFilter, setSelectedTrainingFilter] = useState('todos');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showTaskModal, setShowTaskModal] = useState(false);
+  const [taskBeingEdited, setTaskBeingEdited] = useState(null); // tarea a editar desde el panel "Tareas que has asignado"
+  const [selectedTaskForDetail, setSelectedTaskForDetail] = useState(null);
+  const [showTaskDetailModal, setShowTaskDetailModal] = useState(false);
+  const [tareasAsignadasFilter, setTareasAsignadasFilter] = useState('Activas'); // 'Activas' | 'Vencidas' | 'Cumplidas' | 'Todas'
+  const [showVenueModal, setShowVenueModal] = useState(false);
+  const [showHorariosModal, setShowHorariosModal] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showToolsDropdown, setShowToolsDropdown] = useState(false);
+  const toolsDropdownRef = useRef(null);
+  const notificationsRef = useRef(null); // (03/09/2026) fix: faltaba cerrar este panel al hacer click fuera
+
+  // BUSCADOR GLOBAL (28/08/2026) — Personas + Páginas y módulos + Equipos/Capitanes
+  const [globalSearchTerm, setGlobalSearchTerm] = useState('');
+  const [showGlobalSearchResults, setShowGlobalSearchResults] = useState(false);
+  const globalSearchRef = useRef(null);
+  const [realUsersData, setRealUsersData] = useState([]);
+  const [usersLoading, setUsersLoading] = useState(true);
+  const [selectedSearchUser, setSelectedSearchUser] = useState(null);
+  const [showSearchUserModal, setShowSearchUserModal] = useState(false);
+
+  // Carga de personas para el buscador (misma fuente que Centro de Mando: getAllCompanyUsers())
+  useEffect(() => {
+    let isMounted = true;
+    async function fetchUsersForSearch() {
+      try {
+        const users = await getAllCompanyUsers();
+        if (isMounted) setRealUsersData(users);
+      } catch (err) {
+        console.error("Error cargando usuarios para el buscador global:", err);
+      } finally {
+        if (isMounted) setUsersLoading(false);
+      }
+    }
+    fetchUsersForSearch();
+    return () => { isMounted = false; };
+  }, []);
+
+  // Cerrar el buscador global al hacer click fuera
+  useEffect(() => {
+    function handleClickOutsideSearch(event) {
+      if (globalSearchRef.current && !globalSearchRef.current.contains(event.target)) {
+        setShowGlobalSearchResults(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutsideSearch);
+    return () => document.removeEventListener("mousedown", handleClickOutsideSearch);
+  }, []);
+
+  // Cerrar dropdown al hacer click fuera
+  // (03/09/2026) FIX — el panel de Notificaciones no tenía este cierre por
+  // click-afuera, y ambos dropdowns (Notificaciones y Más Módulos) podían
+  // quedar abiertos al mismo tiempo sin excluirse entre sí. En modo oscuro
+  // los dos usan un fondo casi transparente (glass-panel), así que al
+  // superponerse el texto de ambos se mezclaba y se veía ilegible (ver
+  // captura de José). Ahora también se cierran mutuamente al abrir el otro.
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (toolsDropdownRef.current && !toolsDropdownRef.current.contains(event.target)) {
+        setShowToolsDropdown(false);
+      }
+      if (notificationsRef.current && !notificationsRef.current.contains(event.target)) {
+        setShowNotifications(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleAddEventToGoogle = async (ev, startDate, endDate) => {
+    let token = sessionStorage.getItem('googleAccessToken');
+    if (!token) {
+      // (04/09/2026) Antes se seguía sin token (createGoogleEvent caía al
+      // enlace manual de Google Calendar) — ahora intenta primero un popup
+      // corto de reautenticación para poder usar la API directamente.
+      token = await reauthenticateGoogle();
+    }
+    const hotelLocation = getVenueForTraining(ev.sede || ev.sedeTag || currentUser?.sede, ev.nombre || ev.name, ev.lugar, ev.direccion);
+    
+    const result = await createGoogleEvent({
+      summary: `CREAR: ${ev.nombre || ev.name}`,
+      location: hotelLocation,
+      description: `Lugar / Hotel Oficial: ${hotelLocation}\n${ev.detalles || ''}${currentUser?.appRole !== 'qt' ? `\nEntrenador: ${ev.trainer || ev.entrenador || 'TBA'}` : ''}`,
+      start: startDate,
+      end: endDate
+    }, token);
+
+    if (result.success) {
+      if (result.via === 'api') {
+        showToast(`¡"${ev.nombre || ev.name}" añadido a tu Google Calendar exitosamente!`, "success");
+      } else {
+        showToast(`Abriendo Google Calendar para agendar "${ev.nombre || ev.name}"...`, "info");
+      }
+    } else {
+      showToast(result.error || "Hubo un error al abrir el calendario.", "error");
+    }
+  };
+
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const handleLogout = async () => {
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
+    try {
+      await logout();
+      navigate('/login');
+    } catch (error) {
+      console.error("Error al cerrar sesión", error);
+      setIsLoggingOut(false);
+    }
+  };
+
+  // Cálculo de tareas del usuario
+  const userEmail = (currentUser?.email || '').toLowerCase().trim();
+  const activeRole = currentUser?.appRole || currentUser?.role || 'gerente';
+  const isExecutiveUser = ['ceo', 'cco', 'socio', 'super_admin', 'direccion'].includes(activeRole) || 
+                          userEmail === 'fer.aragon@crearpsl.net' || 
+                          userEmail === 'paul.sosa@crearpsl.net';
+
+  const myTasksForProgress = allTasks.filter(t => {
+    const isAssigned = (t.assignedToEmails && t.assignedToEmails.some(e => e.toLowerCase().trim() === userEmail)) || 
+                       (t.assignedToEmail && t.assignedToEmail.toLowerCase().trim() === userEmail) ||
+                       (t.collaborators && t.collaborators.map(c => c.toLowerCase().trim()).includes(userEmail));
+    if (isAssigned) return true;
+    if (isExecutiveUser) return false; // Roles ejecutivos / Fer y Paul no tienen tareas operativas por defecto
+    if (activeRole === 'consolidado') {
+      return true;
+    }
+
+    // 1. Si la tarea fue asignada nominalmente a alguien más, no computar en mi progreso
+    const hasSpecificAssignees = (Array.isArray(t.assignedToEmails) && t.assignedToEmails.length > 0) || Boolean(t.assignedToEmail);
+    if (hasSpecificAssignees) return false;
+
+    // 2. Si la tarea pertenece a otra sede específica, no computar en mi progreso
+    const taskSede = t.assignedSede || t.sede;
+    if (taskSede && taskSede !== 'Global' && taskSede !== 'Sede Global') {
+      const userSede = normalizeSede(currentUser?.sede);
+      const normTaskSede = normalizeSede(taskSede);
+      if (userSede && userSede !== 'Sede Global' && normTaskSede !== userSede) {
+        return false;
+      }
+    }
+
+    return t.role === activeRole;
+  });
+  const completedForProgress = myTasksForProgress.filter(t => t.completed || t.status === 'Completada').length;
+  const progressPercentage = myTasksForProgress.length > 0 ? Math.round((completedForProgress / myTasksForProgress.length) * 100) : 0;
+  const criticasCount = myTasksForProgress.filter(t => !t.completed && (t.isCritical || t.priority === '🔴 ROJO')).length;
+  const importantesCount = myTasksForProgress.filter(t => !t.completed && t.status !== 'Completada' && !t.isCritical && t.priority !== '🔴 ROJO').length;
+
+  const urgentTasks = myTasksForProgress.filter(t => !t.completed && t.status !== 'Completada');
+  urgentTasks.sort((a, b) => {
+    const valA = (a.isCritical || a.priority === '🔴 ROJO') ? 3 : (a.priority === '🟡 AMARILLO' ? 2 : 1);
+    const valB = (b.isCritical || b.priority === '🔴 ROJO') ? 3 : (b.priority === '🟡 AMARILLO' ? 2 : 1);
+    return valB - valA;
+  });
+
+  // ==========================================================================
+  // BUSCADOR GLOBAL — lógica de resultados (28/08/2026)
+  // --------------------------------------------------------------------------
+  // DATO FALTANTE / INFERENCIA (declarado explícitamente por REGLA ABSOLUTA):
+  // Causa OS no tenía, antes de este cambio, un módulo de "buscador global"
+  // documentado con reglas de visibilidad propias, así que el alcance de
+  // "Personas" y "Equipos/Capitanes" aquí se apoya en el mismo criterio ya
+  // usado en otras pantallas de la app (canViewAllManagers/isDireccionRole =
+  // ver TODO; el resto = solo su propia sede + registros marcados como
+  // Sede Global). Si esto no es lo que José quiere, hay que ajustarlo.
+  // "Páginas y módulos" sí es un HECHO: son exactamente las mismas rutas y
+  // los mismos arrays de roles que ya usa el menú "Más Módulos y Herramientas"
+  // de este archivo.
+  // ==========================================================================
+  const canSeeGlobalDirectory = Boolean(
+    (currentUser?.isSuperAdmin && !currentUser?.isRoleSimulationActive) ||
+    currentUser?.isDireccion ||
+    isDireccionRole(currentUser?.appRole) ||
+    canViewAllManagers(currentUser)
+  );
+  const currentUserSedeNorm = normalizeSede(currentUser?.sede);
+  const normalizeSearchText = (str) =>
+    (str || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim();
+
+  const globalSearchQ = globalSearchTerm.trim().toLowerCase();
+  const globalSearchActive = globalSearchQ.length >= 2;
+
+  const searchTokens = !globalSearchActive
+    ? []
+    : normalizeSearchText(globalSearchTerm).split(/\s+/).filter(Boolean);
+
+  const matchesAllTokens = (searchableText) => {
+    if (searchTokens.length === 0) return false;
+    const target = normalizeSearchText(searchableText);
+    return searchTokens.every(t => target.includes(t));
+  };
+
+  const globalSearchOptionResults = !globalSearchActive ? [] : CAUSA_OPTIONS_REGISTRY
+    .filter(opt => {
+      if (opt.roles && !hasRoleAccess(opt.roles) && !(currentUser?.isSuperAdmin && !currentUser?.isRoleSimulationActive)) {
+        return false;
+      }
+      if (typeof opt.visible === 'function' && !opt.visible(currentUser)) {
+        return false;
+      }
+      const fullSearchable = `${opt.title} ${opt.category || ''} ${opt.badge || ''} ${opt.desc || ''} ${(opt.keywords || []).join(' ')}`;
+      return matchesAllTokens(fullSearchable);
+    })
+    .slice(0, 8);
+
+  const globalSearchPeopleResults = !globalSearchActive ? [] : (realUsersData || [])
+    .filter(u => {
+      if (canSeeGlobalDirectory) return true;
+      const uSede = normalizeSede(u.sede);
+      return uSede === currentUserSedeNorm || uSede === 'Sede Global' || isGlobalQTCoordinator({ email: u.email });
+    })
+    .filter(u => {
+      const name = (u.name || u.displayName || '').toLowerCase();
+      const email = (u.email || '').toLowerCase();
+      const role = (ROLE_DISPLAY_NAMES[u.role] || u.role || '').toLowerCase();
+      const sede = (u.sede || '').toLowerCase();
+      return name.includes(globalSearchQ) || email.includes(globalSearchQ) || role.includes(globalSearchQ) || sede.includes(globalSearchQ);
+    })
+    .slice(0, 8);
+
+  const globalSearchModuleResults = !globalSearchActive ? [] : MODULE_REGISTRY
+    .filter(mod => isModuleVisible(mod, currentUser))
+    .filter(mod => mod.label.toLowerCase().includes(globalSearchQ))
+    .slice(0, 8);
+
+  const globalSearchTeamResults = (() => {
+    if (!globalSearchActive) return [];
+    const seenTeams = new Map();
+    const capitanHits = [];
+    INITIAL_MANAGERS.forEach(m => {
+      const mSede = normalizeSede(m.sede);
+      if (!canSeeGlobalDirectory && mSede !== currentUserSedeNorm && mSede !== 'Sede Global') return;
+
+      if (m.equipo) {
+        const key = `${mSede}_${m.equipo}`;
+        const teamStr = `${m.equipo} ${m.numEquipo || ''} ${mSede} ${m.entrenador || ''}`.toLowerCase();
+        if (!seenTeams.has(key) && teamStr.includes(globalSearchQ)) {
+          seenTeams.set(key, { type: 'equipo', key, equipo: m.equipo, sede: mSede });
+        }
+      }
+
+      const rol = (m.rol || '').toLowerCase();
+      if (rol.includes('capitan') && (m.nombre || '').toLowerCase().includes(globalSearchQ)) {
+        capitanHits.push({ type: 'capitan', key: `cap_${m.id}`, id: m.id, nombre: m.nombre, equipo: m.equipo, sede: mSede });
+      }
+    });
+    return [...Array.from(seenTeams.values()).slice(0, 5), ...capitanHits.slice(0, 5)];
+  })();
+
+  const handleSelectSearchOption = (opt) => {
+    setShowGlobalSearchResults(false);
+    setGlobalSearchTerm('');
+    if (opt.action === 'open_horarios_modal') {
+      setShowHorariosModal(true);
+    } else if (opt.action === 'new_task') {
+      setShowTaskModal(true);
+    } else if (opt.action === 'venue_modal') {
+      setShowVenueModal(true);
+    } else if (opt.action === 'toggle_theme') {
+      const nextTheme = themeMode === 'dark' ? 'light' : (themeMode === 'light' ? 'auto' : 'dark');
+      setThemeMode?.(nextTheme);
+      showToast?.(`Tema cambiado a: ${nextTheme === 'light' ? 'Día (Claro)' : nextTheme === 'dark' ? 'Noche (Oscuro)' : 'Automático'}`, 'info');
+    } else if (opt.action === 'change_view') {
+      const nextView = viewMode === 'pro' ? 'compact' : (viewMode === 'compact' ? 'lite' : 'pro');
+      setViewMode?.(nextView);
+      showToast?.(`Vista cambiada a: ${nextView.toUpperCase()}`, 'info');
+    } else if (opt.action === 'logout') {
+      logout();
+    } else if (opt.external === 'calendario-global') {
+      window.open('/calendario_global.html?v=' + Date.now() + '&email=' + encodeURIComponent(currentUser?.email || '') + '&name=' + encodeURIComponent(currentUser?.displayName || currentUser?.name || ''), '_blank');
+    } else if (opt.external) {
+      window.open(opt.external, '_blank');
+    } else if (typeof opt.route === 'function') {
+      navigate(opt.route(currentUser));
+    } else if (opt.route) {
+      navigate(opt.route);
+    }
+  };
+
+  const handleSelectSearchPerson = (u) => {
+    setSelectedSearchUser(u);
+    setShowSearchUserModal(true);
+    setShowGlobalSearchResults(false);
+    setGlobalSearchTerm('');
+  };
+
+  const handleSelectSearchModule = (mod) => {
+    setShowGlobalSearchResults(false);
+    setGlobalSearchTerm('');
+    if (mod.external === 'calendario-global') {
+      window.open('/calendario_global.html?v=' + Date.now() + '&email=' + encodeURIComponent(currentUser?.email || '') + '&name=' + encodeURIComponent(currentUser?.displayName || currentUser?.name || ''), '_blank');
+    } else if (mod.external) {
+      window.open(mod.external, '_blank');
+    } else if (typeof mod.route === 'function') {
+      navigate(mod.route(currentUser));
+    } else if (mod.route) {
+      navigate(mod.route);
+    }
+  };
+
+  const handleSelectSearchTeam = (item) => {
+    setShowGlobalSearchResults(false);
+    setGlobalSearchTerm('');
+    if (item.type === 'equipo') {
+      navigate(`/centro-managers?tab=grupales&q=${encodeURIComponent(item.equipo)}&sede=${encodeURIComponent(item.sede)}`);
+    } else {
+      navigate(`/centro-managers?tab=directorio&q=${encodeURIComponent(item.nombre)}&sede=${encodeURIComponent(item.sede)}`);
+    }
+  };
+
+  // ==========================================================================
+  // TAREAS QUE HAS ASIGNADO A OTROS + TAREAS QUE TE ASIGNARON A TI (28/08/2026,
+  // ampliado 04/09/2026 a pedido de José: "podrían ir también las que me
+  // asignan")
+  // --------------------------------------------------------------------------
+  // "tasks" (allTasks) ya trae TODA la colección "tasks" de Firestore sin
+  // filtrar (ChecklistContext hace onSnapshot sobre la colección completa),
+  // así que no hace falta una consulta nueva. Se combinan dos grupos:
+  //   1. Tareas donde createdBy === mi correo (las que YO asigné a otros).
+  //   2. Tareas donde YO aparezco en assignedToEmails/assignedToEmail/
+  //      collaborators (las que ME asignaron a mí), EXCLUYENDO las que yo
+  //      mismo creé (para no duplicar una tarea que me autoasigné).
+  // Cada tarea queda marcada con __direction ('asignada_por_mi' |
+  // 'asignada_a_mi') para poder distinguirlas visualmente y para que el
+  // botón "Editar" solo aparezca en las que yo creé (regla confirmada por
+  // José: solo el creador de la tarea puede editarla).
+  const userDisplayNameByEmail = {};
+  (realUsersData || []).forEach(u => {
+    if (u.email) userDisplayNameByEmail[u.email.toLowerCase().trim()] = u.name || u.displayName || u.email;
+  });
+  const resolveAssigneeName = (email) => userDisplayNameByEmail[(email || '').toLowerCase().trim()] || email;
+
+  const tareasQueHeAsignado = [
+    ...(allTasks || [])
+      .filter(t => (t.createdBy || '').toLowerCase().trim() === userEmail && userEmail)
+      .map(t => ({ ...t, __direction: 'asignada_por_mi' })),
+    ...(allTasks || [])
+      .filter(t => {
+        const yaEsCreador = (t.createdBy || '').toLowerCase().trim() === userEmail;
+        if (yaEsCreador || !userEmail) return false; // evita duplicar autoasignadas
+        return (t.assignedToEmails && t.assignedToEmails.some(e => e.toLowerCase().trim() === userEmail)) ||
+               (t.assignedToEmail && t.assignedToEmail.toLowerCase().trim() === userEmail) ||
+               (t.collaborators && t.collaborators.map(c => c.toLowerCase().trim()).includes(userEmail));
+      })
+      .map(t => ({ ...t, __direction: 'asignada_a_mi' }))
+  ]
+    .sort((a, b) => {
+      const da = a.deadline ? new Date(a.deadline).getTime() : Infinity;
+      const dbTime = b.deadline ? new Date(b.deadline).getTime() : Infinity;
+      return da - dbTime;
+    });
+
+  return (
+    <div style={{ maxWidth: viewMode === 'lite' ? '780px' : '960px', margin: '0 auto', padding: viewMode === 'lite' ? '1.5rem 1rem' : '2rem 1rem' }}>
+      
+      {/* CABECERA PRINCIPAL */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+        <div>
+          <div style={{ 
+            display: 'flex', 
+            gap: '2rem', 
+            alignItems: 'center', 
+            marginBottom: '1.5rem', 
+            flexWrap: 'wrap',
+            padding: '0.5rem 0'
+          }}>
+            <img 
+              src="/logo.png" 
+              alt="Crear Poder Sin Limites" 
+              style={{ 
+                height: viewMode === 'lite' ? '70px' : '85px', 
+                objectFit: 'contain', 
+                display: 'block',
+                filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.08))',
+                transition: 'transform 0.3s ease'
+              }} 
+            />
+            <div style={{ 
+              height: '50px', 
+              width: '1px', 
+              background: 'linear-gradient(to bottom, transparent, var(--border-strong), transparent)', 
+              display: viewMode === 'lite' ? 'none' : 'block',
+              opacity: 0.6
+            }}></div>
+            <img 
+              src="/causa-logo-transparent.png" 
+              alt="Causa OS" 
+              className="causa-logo"
+              style={{ 
+                height: viewMode === 'lite' ? '70px' : '85px', 
+                objectFit: 'contain', 
+                display: 'block', 
+                transformOrigin: 'left center',
+                filter: 'drop-shadow(0 4px 15px rgba(0, 191, 255, 0.2))',
+                transition: 'transform 0.3s ease'
+              }} 
+            />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+            <h1 className="text-blue" style={{ margin: 0, fontSize: viewMode === 'lite' ? '2.5rem' : '3rem', fontWeight: '900', letterSpacing: '-1px', textShadow: '0 0 20px rgba(100, 255, 218, 0.3)' }}>
+              Causa OS
+            </h1>
+            <h2 className="text-gold" style={{ margin: 0, fontSize: viewMode === 'lite' ? '1.5rem' : '1.8rem', fontWeight: '700', letterSpacing: '-0.5px' }}>
+              {time.getHours() < 12 ? 'Buenos días' : time.getHours() < 19 ? 'Buenas tardes' : 'Buenas noches'}, {currentUser?.displayName || currentUser?.name || 'Equipo'}
+            </h2>
+          </div>
+          <p className="text-muted" style={{ margin: '0.8rem 0 0', textTransform: 'uppercase', fontSize: '0.85rem' }}>
+            {((currentUser?.isSuperAdmin && !currentUser?.isRoleSimulationActive) || currentUser?.appRole === 'direccion') ? 'MÚLTIPLES EQUIPOS (GLOBAL) • VISIÓN MÚLTIPLES SEDES' : (currentCycle ? `${currentCycle.name} • ETAPA: ${currentStage}` : 'CARGANDO CICLO...')}
+          </p>
+          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginTop: '0.8rem', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <Clock size={15} className="text-blue" />
+              <span className="text-white" style={{ fontWeight: 'bold', fontSize: '1.05rem' }}>
+                {time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+              </span>
+              <span className="text-muted" style={{ marginLeft: '0.3rem', fontSize: '0.85rem' }}>
+                {time.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })}
+              </span>
+            </div>
+
+            <span style={{ 
+              background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(6, 95, 70, 0.3))', 
+              border: '1px solid #10b981', 
+              color: '#10b981', 
+              padding: '2px 8px', 
+              borderRadius: '12px', 
+              fontSize: '0.72rem', 
+              fontWeight: 700, 
+              display: 'inline-flex', 
+              alignItems: 'center', 
+              gap: '5px' 
+            }}>
+              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981', display: 'inline-block', boxShadow: '0 0 6px #10b981' }}></span>
+              Causa OS v2.8.0
+            </span>
+          </div>
+        </div>
+
+        {/* CONTROLES SUPERIORES Y SELECTOR DE VISTA */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.8rem' }}>
+          
+          {/* SELECTOR DE MODO DE VISTA Y TEMA */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '600' }}>Tema:</span>
+              <ThemeToggle />
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '600' }}>Vista:</span>
+              <ViewModeSelector />
+            </div>
+          </div>
+
+          {/* BUSCADOR GLOBAL (Opciones de Causa + Personas + Páginas y módulos + Equipos/Capitanes) */}
+          <div ref={globalSearchRef} style={{ position: 'relative', width: '100%', maxWidth: '360px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(255,255,255,0.06)', border: '1px solid var(--border-strong)', borderRadius: '8px', padding: '0.45rem 0.75rem', boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.2)' }}>
+              <Search size={15} className="text-muted" style={{ color: 'var(--crear-cyan)' }} />
+              <input
+                type="text"
+                value={globalSearchTerm}
+                onChange={(e) => { setGlobalSearchTerm(e.target.value); setShowGlobalSearchResults(true); }}
+                onFocus={() => setShowGlobalSearchResults(true)}
+                placeholder="Buscar opciones de Causa, páginas, personas, equipos..."
+                style={{ flex: 1, minWidth: 0, background: 'transparent', border: 'none', outline: 'none', color: 'var(--text-main)', fontSize: '0.85rem' }}
+              />
+              {globalSearchTerm && (
+                <X size={14} className="text-muted" style={{ cursor: 'pointer', flexShrink: 0 }} onClick={() => { setGlobalSearchTerm(''); setShowGlobalSearchResults(false); }} />
+              )}
+            </div>
+
+            {showGlobalSearchResults && globalSearchActive && (
+              <div className="glass-panel dropdown-panel" style={{
+                position: 'absolute',
+                top: '110%',
+                left: 0,
+                right: 0,
+                zIndex: 9999,
+                maxHeight: '420px',
+                overflowY: 'auto',
+                padding: '0.6rem',
+                background: '#0c1527',
+                borderRadius: '14px',
+                boxShadow: '0 20px 50px rgba(0,0,0,0.95), 0 0 25px rgba(41, 171, 226, 0.2)',
+                border: '1px solid rgba(41, 171, 226, 0.4)',
+                textAlign: 'left'
+              }}>
+                {usersLoading && (
+                  <div className="text-muted" style={{ fontSize: '0.78rem', padding: '0.4rem' }}>Cargando personas...</div>
+                )}
+
+                {!usersLoading && globalSearchOptionResults.length === 0 && globalSearchPeopleResults.length === 0 && globalSearchModuleResults.length === 0 && globalSearchTeamResults.length === 0 && (
+                  <div className="text-muted" style={{ fontSize: '0.8rem', padding: '0.5rem' }}>Sin resultados para "{globalSearchTerm}"</div>
+                )}
+
+                {/* ⚡ SECCIÓN DESTACADA: OPCIONES Y ACCIONES DE CAUSA */}
+                {globalSearchOptionResults.length > 0 && (
+                  <div style={{ marginBottom: '0.6rem', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '0.4rem' }}>
+                    <div style={{ fontSize: '0.72rem', fontWeight: 800, color: 'var(--crear-cyan)', textTransform: 'uppercase', padding: '0.2rem 0.4rem', letterSpacing: '0.5px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span>⚡ Opciones y Acciones de Causa</span>
+                      <span style={{ fontSize: '0.65rem', background: 'rgba(41,171,226,0.18)', color: 'var(--crear-cyan)', padding: '1px 6px', borderRadius: '10px' }}>{globalSearchOptionResults.length}</span>
+                    </div>
+                    {globalSearchOptionResults.map(opt => (
+                      <button
+                        key={opt.id}
+                        onClick={() => handleSelectSearchOption(opt)}
+                        style={{ display: 'flex', alignItems: 'flex-start', gap: '0.55rem', width: '100%', textAlign: 'left', padding: '0.45rem 0.5rem', background: 'transparent', border: 'none', borderRadius: '6px', cursor: 'pointer', color: 'var(--text-main)', transition: 'background 0.15s ease' }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(41,171,226,0.15)'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                      >
+                        <span style={{ fontSize: '1.2rem', lineHeight: 1, marginTop: '2px', flexShrink: 0 }}>{opt.emoji}</span>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                            <span style={{ fontSize: '0.84rem', fontWeight: 700, color: 'var(--text-main)' }}>{opt.title}</span>
+                            {opt.badge && (
+                              <span style={{ fontSize: '0.63rem', padding: '1px 5px', borderRadius: '4px', background: 'rgba(41,171,226,0.2)', color: 'var(--crear-cyan)', fontWeight: 600 }}>{opt.badge}</span>
+                            )}
+                          </div>
+                          {opt.desc && (
+                            <div style={{ fontSize: '0.71rem', color: 'var(--text-muted)', marginTop: '2px', lineHeight: 1.3 }}>{opt.desc}</div>
+                          )}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {globalSearchPeopleResults.length > 0 && (
+                  <div style={{ marginBottom: '0.5rem' }}>
+                    <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--crear-gold)', textTransform: 'uppercase', padding: '0.2rem 0.4rem' }}>Personas</div>
+                    {globalSearchPeopleResults.map((u, i) => (
+                      <button
+                        key={u.id || u.email || i}
+                        onClick={() => handleSelectSearchPerson(u)}
+                        style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', width: '100%', textAlign: 'left', padding: '0.45rem 0.5rem', background: 'transparent', border: 'none', borderRadius: '6px', cursor: 'pointer', color: 'var(--text-main)' }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(41,171,226,0.1)'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                      >
+                        <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>👤 {u.name || u.displayName || u.email}</span>
+                        <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{ROLE_DISPLAY_NAMES[u.role] || u.role || ''}{u.sede ? ` • ${u.sede}` : ''}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {globalSearchModuleResults.length > 0 && (
+                  <div style={{ marginBottom: '0.5rem' }}>
+                    <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--crear-cyan)', textTransform: 'uppercase', padding: '0.2rem 0.4rem' }}>Páginas y módulos</div>
+                    {globalSearchModuleResults.map(mod => (
+                      <button
+                        key={mod.id}
+                        onClick={() => handleSelectSearchModule(mod)}
+                        style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', width: '100%', textAlign: 'left', padding: '0.45rem 0.5rem', background: 'transparent', border: 'none', borderRadius: '6px', cursor: 'pointer', color: 'var(--text-main)', fontSize: '0.85rem' }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(41,171,226,0.1)'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                      >
+                        {mod.emoji} {mod.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {globalSearchTeamResults.length > 0 && (
+                  <div>
+                    <div style={{ fontSize: '0.7rem', fontWeight: 700, color: '#d97706', textTransform: 'uppercase', padding: '0.2rem 0.4rem' }}>Equipos y Capitanes (Centro de Managers)</div>
+                    {globalSearchTeamResults.map((item, i) => (
+                      <button
+                        key={item.key || i}
+                        onClick={() => handleSelectSearchTeam(item)}
+                        style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', width: '100%', textAlign: 'left', padding: '0.45rem 0.5rem', background: 'transparent', border: 'none', borderRadius: '6px', cursor: 'pointer', color: 'var(--text-main)' }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(217,119,6,0.1)'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                      >
+                        {item.type === 'equipo' ? (
+                          <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>👥 Equipo {item.equipo}</span>
+                        ) : (
+                          <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>🎖️ {item.nombre} (Capitán)</span>
+                        )}
+                        <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{item.sede}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+            <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <span style={{ fontSize: '0.9rem', fontWeight: 'bold', color: 'var(--text-main)' }}>{currentUser?.name || currentUser?.displayName || 'Usuario'}</span>
+              <span style={{ fontSize: '0.75rem', color: 'var(--crear-gold)', fontWeight: 'bold', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'flex-end' }}>
+                {currentUser?.isSuperAdmin && !currentUser?.isSimulated && !currentUser?.isRoleSimulationActive
+                  ? <>Super Admin | Gerente Lima {getFlagForSede('Lima')}</>
+                  : <>{currentUser?.appRole === 'consolidado' ? 'Vista Consolidada (Global)' : (ROLE_DISPLAY_NAMES[currentUser?.appRole] || currentUser?.appRole?.replace(/_/g, ' ') || 'Miembro')} {getFlagForSede(currentUser?.sede)}</>}
+              </span>
+              {((currentUser?.roles && currentUser.roles.length > 1) || currentUser?.isSuperAdmin) && (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.4rem', marginTop: '3px' }}>
+                  <select
+                    value={currentUser.activeRole || currentUser.appRole}
+                    onChange={(e) => switchRole(e.target.value)}
+                    style={{
+                      padding: '0.2rem 0.5rem',
+                      borderRadius: '6px',
+                      background: 'rgba(255, 183, 3, 0.15)',
+                      border: '1px solid var(--crear-gold)',
+                      color: 'var(--text-heading)',
+                      fontSize: '0.75rem',
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                      outline: 'none'
+                    }}
+                    title="Cambiar tu rol activo"
+                  >
+                    {(currentUser?.isSuperAdmin ? ALL_SIMULATABLE_ROLES : currentUser.roles).map(r => (
+                      <option key={r} value={r} style={{ background: '#0d152d', color: '#ffffff' }}>
+                        🎭 {r === 'consolidado' ? 'Vista Consolidada (Global)' : (ROLE_DISPLAY_NAMES[r] || r.toUpperCase())}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </div>
+
+            {currentUser?.photoURL ? (
+              <img src={currentUser.photoURL} alt="Avatar" style={{ width: '38px', height: '38px', borderRadius: '50%', border: '2px solid var(--crear-gold)' }} />
+            ) : (
+              <div style={{ width: '38px', height: '38px', borderRadius: '50%', backgroundColor: 'var(--crear-blue)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', border: '2px solid var(--crear-gold)' }}>
+                {currentUser?.displayName ? currentUser.displayName.charAt(0) : 'U'}
+              </div>
+            )}
+            
+            {/* Notificaciones */}
+            <div style={{ position: 'relative' }} ref={notificationsRef}>
+              <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }} onClick={() => { setShowNotifications(!showNotifications); setShowToolsDropdown(false); }}>
+                <Bell size={20} className="text-white" />
+                {unreadCount > 0 && (
+                  <div style={{ position: 'absolute', top: '-4px', right: '-4px', background: 'var(--color-error)', color: 'white', borderRadius: '50%', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.68rem', fontWeight: 'bold' }}>
+                    {unreadCount}
+                  </div>
+                )}
+              </div>
+
+              {showNotifications && (
+                <div className="glass-panel dropdown-panel" style={{
+                  position: 'absolute',
+                  top: '125%',
+                  right: 0,
+                  width: '360px',
+                  zIndex: 9999,
+                  padding: '1rem',
+                  background: '#0c1527',
+                  borderRadius: '14px',
+                  boxShadow: '0 20px 50px rgba(0,0,0,0.95), 0 0 25px rgba(41, 171, 226, 0.2)',
+                  border: '1px solid rgba(41, 171, 226, 0.4)'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '0.6rem' }}>
+                    <h4 style={{ margin: 0, color: 'var(--crear-gold)', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.95rem' }}>
+                      <span>🔔</span> Notificaciones
+                    </h4>
+                    <button
+                      onClick={() => { markAllAsRead(); setShowNotifications(false); }}
+                      style={{ background: 'rgba(41,171,226,0.15)', border: '1px solid rgba(41,171,226,0.3)', color: 'var(--crear-cyan)', fontSize: '0.72rem', padding: '3px 10px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
+                    >
+                      Marcar leídas
+                    </button>
+                  </div>
+                  <div style={{ maxHeight: '350px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.6rem', paddingRight: '0.4rem' }}>
+                    {notifications?.length > 0 ? notifications.map(n => (
+                      <div key={n.id} style={{
+                        fontSize: '0.8rem',
+                        padding: '0.75rem',
+                        background: n.read ? 'rgba(255, 255, 255, 0.03)' : 'rgba(41, 171, 226, 0.12)',
+                        borderRadius: '8px',
+                        border: '1px solid rgba(255, 255, 255, 0.08)',
+                        borderLeft: n.read ? '1px solid rgba(255, 255, 255, 0.08)' : '3px solid var(--crear-cyan)'
+                      }}>
+                        <strong style={{ color: n.read ? 'var(--text-muted)' : '#ffffff', display: 'block', marginBottom: '0.2rem', fontSize: '0.84rem' }}>
+                          {n.title || 'Alerta'}
+                        </strong>
+                        <p style={{ margin: 0, color: 'var(--text-main)', lineHeight: '1.4', fontSize: '0.78rem' }}>
+                          {n.message}
+                        </p>
+                        {n.created_at && (
+                          <span style={{ display: 'block', fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: '4px' }}>
+                            {new Date(n.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        )}
+                      </div>
+                    )) : (
+                      <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', margin: '1.5rem 0' }}>
+                        No tienes notificaciones recientes.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <button 
+              type="button"
+              onClick={() => setShowTaskModal(true)} 
+              className="btn-neon-action"
+              style={{ padding: '0.4rem 0.8rem', fontSize: '0.82rem' }}
+            >
+              <span style={{ fontSize: '1rem', lineHeight: 1 }}>+</span>
+              <span>TAREA</span>
+            </button>
+
+            {/* BOTÓN DE COMUNICACIÓN EFECTIVA OFICIAL SEGÚN MATRIZ */}
+            <EffectiveCommunicationButton currentUser={currentUser} />
+
+            {/* BOTÓN SALIR */}
+            <button onClick={handleLogout} className="btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.82rem', display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+              <LogOut size={15} /> Salir
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* BARRA DE HERRAMIENTAS ADAPTABLE SEGÚN MODO */}
+      {viewMode === 'compact' && (
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', padding: '0.6rem 1rem', flexWrap: 'wrap', gap: '0.8rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+            <button
+              onClick={() => navigate(currentUser?.appRole === 'gerente' ? '/gerente' : `/checklist/${currentUser?.appRole || 'capitan'}`)}
+              className="btn-primary"
+              style={{ padding: '0.45rem 1rem', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+            >
+              📋 Abrir Mi Checklist
+            </button>
+            <button
+              onClick={() => navigate('/metas')}
+              className="btn-secondary"
+              style={{ padding: '0.45rem 0.9rem', fontSize: '0.85rem' }}
+            >
+              🎯 Mis Metas
+            </button>
+            {canAccessAgendaTimeBoxing(currentUser) && (
+              <button
+                onClick={() => setShowHorariosModal(true)}
+                className="btn-secondary"
+                title="Horarios oficiales de entrenamiento y código de vestimenta"
+                style={{ padding: '0.45rem 0.9rem', fontSize: '0.85rem', color: 'var(--crear-cyan)', borderColor: 'rgba(41, 171, 226, 0.5)', background: 'rgba(41, 171, 226, 0.12)', fontWeight: 'bold' }}
+              >
+                ⏰ Horarios y Vestimenta
+              </button>
+            )}
+            {canAccessFlyersC1(currentUser) && (
+              <button onClick={() => navigate('/generador-flyer')} className="btn-secondary" title="Generador de Flyers Oficiales para Capítulos Uno" style={{ padding: '0.45rem 0.9rem', fontSize: '0.85rem', color: '#f59e0b', borderColor: 'rgba(245, 158, 11, 0.5)', background: 'rgba(245, 158, 11, 0.12)', fontWeight: 'bold' }}>
+                🎨 Flyers C1 Globales
+              </button>
+            )}
+          </div>
+
+          {/* MENÚ DESPLEGABLE DE MÁS MÓDULOS */}
+          <div style={{ position: 'relative' }} ref={toolsDropdownRef}>
+            <button
+              onClick={() => { setShowToolsDropdown(!showToolsDropdown); setShowNotifications(false); }}
+              className="btn-secondary hover-glow"
+              style={{ padding: '0.45rem 1rem', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(41, 171, 226, 0.1)', borderColor: 'rgba(41, 171, 226, 0.4)', color: 'var(--crear-cyan)', fontWeight: 'bold' }}
+            >
+              🛠️ Más Módulos y Herramientas <ChevronDown size={16} />
+            </button>
+
+            {showToolsDropdown && (
+              <div className="glass-panel dropdown-panel" style={{
+                position: 'absolute',
+                top: '120%',
+                right: 0,
+                width: '270px',
+                zIndex: 9999,
+                padding: '0.75rem',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.4rem',
+                background: '#0c1527',
+                borderRadius: '14px',
+                boxShadow: '0 20px 50px rgba(0,0,0,0.95), 0 0 25px rgba(41, 171, 226, 0.2)',
+                border: '1px solid rgba(41, 171, 226, 0.4)'
+              }}>
+                {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) ? (
+                  <>
+                    <button onClick={() => { setShowToolsDropdown(false); navigate('/gerente'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
+                      💼 Causa OS Gerencial
+                    </button>
+                    <button onClick={() => { setShowToolsDropdown(false); navigate('/portafolio'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: 'var(--crear-cyan)', background: 'rgba(41, 171, 226, 0.1)' }}>
+                      📈 Portafolio PMO (Planview)
+                    </button>
+                    <button onClick={() => { setShowToolsDropdown(false); navigate('/estrategia'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#10b981', background: 'rgba(16, 185, 129, 0.1)' }}>
+                      🎯 Estrategia OKRs (Cascade)
+                    </button>
+                    <button onClick={() => { setShowToolsDropdown(false); navigate('/auditoria-kpis'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
+                      📉 Auditoría de KPIs
+                    </button>
+                    <button onClick={() => { setShowToolsDropdown(false); navigate('/nodus-data-map'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#f59e0b', background: 'rgba(245, 158, 11, 0.1)' }}>
+                      🗺️ Nodus Data Map
+                    </button>
+                  </>
+                ) : (
+                  <button onClick={() => { setShowToolsDropdown(false); navigate(`/checklist/${currentUser?.appRole || 'capitan'}`); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
+                    💼 Mi Dashboard / Checklist
+                  </button>
+                )}
+
+                {(currentUser?.appRole !== 'qt') && (
+                  <button onClick={() => { setShowToolsDropdown(false); navigate('/acuerdos'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#a855f7', background: 'rgba(168, 85, 247, 0.1)' }}>
+                    ✉️ Acuerdos Oficiales (Correo)
+                  </button>
+                )}
+
+                {canAccessAgendaTimeBoxing(currentUser) && (
+                  <>
+                    <button onClick={() => { setShowToolsDropdown(false); navigate('/calendario-equipo'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#f97316', background: 'rgba(249, 115, 22, 0.1)' }}>
+                      🗓️ Agenda y Time Boxing
+                    </button>
+                    <button onClick={() => { setShowToolsDropdown(false); setShowHorariosModal(true); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: 'var(--crear-cyan)', background: 'rgba(41, 171, 226, 0.1)' }}>
+                      ⏰ Horarios de Entrenamientos
+                    </button>
+                  </>
+                )}
+
+                {(currentUser?.appRole !== 'qt') && (
+                  <button onClick={() => { setShowToolsDropdown(false); navigate('/learning'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(41, 171, 226, 0.1)', color: 'var(--crear-cyan)' }}>
+                    🧠 Inteligencia Colectiva (Learning)
+                  </button>
+                )}
+
+                {(currentUser?.appRole !== 'qt') && (
+                  <button onClick={() => { setShowToolsDropdown(false); navigate('/excelencia'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(255, 183, 3, 0.15)', color: 'var(--crear-gold)' }}>
+                    👑 Excelencia Operativa
+                  </button>
+                )}
+
+                {canAccessFlyersC1(currentUser) && (
+                  <button onClick={() => { setShowToolsDropdown(false); navigate('/generador-flyer'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(234, 179, 8, 0.15)', color: '#facc15', fontWeight: 'bold' }}>
+                    🎨 Generador de Flyers Oficiales
+                  </button>
+                )}
+
+                {canAccessMonitorVuelos(currentUser) && (
+                  <button
+                    onClick={() => { setShowToolsDropdown(false); navigate('/monitor-vuelos'); }}
+                    className="btn-secondary"
+                    style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem', border: '1px solid rgba(56, 189, 248, 0.3)', cursor: 'pointer' }}
+                  >
+                    ✈️ Monitor de Vuelos y Cartas
+                  </button>
+                )}
+                {/* Antes usaba canAccessMonitorVuelos (compartía gate con "Monitor de
+                    Vuelos" vía la entrada 'sistema_cartas'), lo que excluía indebidamente
+                    a Coordinadores C1Y2 y de MJ que la Matriz Oficial sí autoriza para
+                    Monitor de IMOs. Corregido con su propio canAccessMonitorIMOs (08/09/2026). */}
+                {canAccessMonitorIMOs(currentUser) && (
+                  <button
+                    onClick={() => { setShowToolsDropdown(false); navigate('/monitor-imos'); }}
+                    className="btn-secondary"
+                    style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(168, 85, 247, 0.15)', color: '#a855f7', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem', border: '1px solid rgba(168, 85, 247, 0.3)', cursor: 'pointer' }}
+                  >
+                    🦅 Monitor de IMOs
+                  </button>
+                )}
+
+                {hasRoleAccess(['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan']) && (
+                  <button onClick={() => { setShowToolsDropdown(false); navigate('/mis-kpis'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
+                    📊 Mis KPIs
+                  </button>
+                )}
+
+                {canAccessDirectorioQT(currentUser) && (
+                  <button onClick={() => { setShowToolsDropdown(false); navigate('/directorio-qt'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
+                    ⚡ Directorio QT
+                  </button>
+                )}
+
+                {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) && (
+                  <button onClick={() => { setShowToolsDropdown(false); navigate('/superadmin'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
+                    🌐 Centro de Mando
+                  </button>
+                )}
+
+                {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) && (
+                  <button onClick={() => { setShowToolsDropdown(false); window.open('/calendario_global.html?v=' + Date.now() + '&email=' + encodeURIComponent(currentUser?.email || '') + '&name=' + encodeURIComponent(currentUser?.displayName || currentUser?.name || ''), '_blank'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
+                    📅 Calendario Global Maestro ↗
+                  </button>
+                )}
+
+                {/* Campus Interactivo: Para TODOS los roles según Matriz */}
+                <button onClick={() => { setShowToolsDropdown(false); window.open('https://cpsl-campus-interactivo.vercel.app/ruta', '_blank'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#10b981', background: 'rgba(16, 185, 129, 0.1)' }}>
+                  🎓 Campus Interactivo ↗
+                </button>
+
+                {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'director_maestria']) && (
+                  <div style={{ display: 'flex', gap: '0.2rem', padding: '0.2rem' }}>
+                    <button onClick={() => { setShowToolsDropdown(false); navigate('/centro-managers'); }} className="btn-secondary" style={{ flex: 1, textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
+                      🎯 Centro de Managers
+                    </button>
+                    <button onClick={() => { setShowToolsDropdown(false); navigate('/centro-managers?tab=directorio'); }} className="btn-secondary" style={{ padding: '0.5rem', fontSize: '0.82rem' }}>
+                      👥
+                    </button>
+                  </div>
+                )}
+
+                {canAccessCalendarioMJ(currentUser) && (
+                  <button onClick={() => { setShowToolsDropdown(false); navigate('/calendario-mj'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#1a75bc', background: 'rgba(26, 117, 188, 0.1)' }}>
+                    📅 Calendario de Maestría del Juego
+                  </button>
+                )}
+
+                <button onClick={() => { setShowToolsDropdown(false); navigate('/protocolo-emergencias'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.4)', background: 'rgba(239, 68, 68, 0.1)', fontWeight: 'bold' }}>
+                  🚨 Protocolo de Emergencias
+                </button>
+
+                {canAccessManualQT(currentUser) && (
+                  <button onClick={() => { setShowToolsDropdown(false); navigate('/manual'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
+                    📘 Manual / Guía Causa OS / QT
+                  </button>
+                )}
+
+                {canAccessManualNodus(currentUser) && (
+                  <button onClick={() => { setShowToolsDropdown(false); navigate('/manual-nodus'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.4)', background: 'rgba(16, 185, 129, 0.1)', fontWeight: 'bold' }}>
+                    📗 Manual Práctico Nodus
+                  </button>
+                )}
+
+                <button onClick={() => { setShowToolsDropdown(false); navigate('/vende-sin-vender'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: 'var(--crear-gold)', borderColor: 'rgba(255, 183, 3, 0.4)', background: 'rgba(255, 183, 3, 0.1)', fontWeight: 'bold' }}>
+                  📖 Vende Sin Vender (Causa OS)
+                </button>
+
+                <button onClick={() => { setShowToolsDropdown(false); navigate('/brandscript'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', color: '#38bdf8', borderColor: 'rgba(56, 189, 248, 0.4)', background: 'rgba(56, 189, 248, 0.1)', fontWeight: 'bold' }}>
+                  📜 BrandScript & Guiones MJ
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* BARRA PRO COMPLETA (SI ESTÁ EN MODO PRO) */}
+      {viewMode === 'pro' && customModules.advancedTools !== false && (
+        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '1.5rem', padding: '0.75rem', background: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.06)' }}>
+          {canAccessAgendaTimeBoxing(currentUser) && (
+            <button onClick={() => setShowHorariosModal(true)} className="btn-primary" title="Horarios oficiales de entrenamiento y código de vestimenta" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #06b6d4, #0284c7)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+              ⏰ Horarios y Vestimenta
+            </button>
+          )}
+          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) ? (
+            <button onClick={() => navigate('/gerente')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'var(--crear-gold)', color: 'black' }}>
+              💼 SO-AR Gerencial
+            </button>
+          ) : (
+            <button onClick={() => navigate(`/checklist/${currentUser?.appRole || 'capitan'}`)} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'var(--crear-gold)', color: 'black' }}>
+              💼 Mi Dashboard
+            </button>
+          )}
+          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) && (
+            <>
+              <button onClick={() => navigate('/portafolio')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #0ea5e9, #0369a1)', color: 'white', border: 'none' }}>
+                📈 Portafolio PMO
+              </button>
+              <button onClick={() => navigate('/estrategia')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #047857)', color: 'white', border: 'none' }}>
+                🎯 OKRs (Cascade)
+              </button>
+              <button onClick={() => navigate('/auditoria-kpis')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'transparent', border: '1px solid #10b981', color: '#10b981' }}>
+                📉 Auditoría KPIs
+              </button>
+            </>
+          )}
+
+          {hasRoleAccess(['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan']) && (
+            <button onClick={() => navigate('/mis-kpis')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #047857)', color: 'white', border: 'none' }}>
+              📊 Mis KPIs
+            </button>
+          )}
+
+          {canAccessManualQT(currentUser) && (
+            // BUG REAL encontrado y corregido (08/09/2026, reportado por José: "esto debería
+            // de llevar al manual del QT no un manual de causa"). Antes navegaba a /manual
+            // (ManualGuia.jsx), que abre por defecto en la pestaña general "brochure" de
+            // Causa OS — la sección exclusiva de QT existe ahí (pestaña "Guía por Rol"), pero
+            // no es lo primero que se ve. José eligió la opción de llevar directo al Manual QT
+            // externo completo (el mismo enlace que ya existía dentro de esa sección).
+            <button onClick={() => window.open('https://crearpsl.net/manual_quantum_team.html', '_blank', 'noopener,noreferrer')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #0284c7, #2563eb)', color: 'white', border: 'none' }}>
+              📘 Manual QT
+            </button>
+          )}
+
+          {canAccessManualNodus(currentUser) && (
+            <button onClick={() => navigate('/manual-nodus')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #047857)', color: 'white', border: 'none' }}>
+              📗 Manual Nodus
+            </button>
+          )}
+
+          {canAccessDirectorioQT(currentUser) && (
+            <button onClick={() => navigate('/directorio-qt')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: 'white', border: 'none' }}>
+              ⚡ Directorio QT
+            </button>
+          )}
+
+          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) && (
+            <button onClick={() => navigate('/superadmin')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #8b5cf6, #29abe2)', color: 'white', border: 'none' }}>
+              🌐 Centro de Mando
+            </button>
+          )}
+
+          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) && (
+            <button onClick={() => window.open('/calendario_global.html?v=' + Date.now() + '&email=' + encodeURIComponent(currentUser?.email || '') + '&name=' + encodeURIComponent(currentUser?.displayName || currentUser?.name || ''), '_blank')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #ef4444)', color: 'white', border: 'none' }}>
+              📅 Calendario Global
+            </button>
+          )}
+
+          {/* Campus Interactivo: abierto a TODOS los 9 roles */}
+          <button onClick={() => window.open('https://cpsl-campus-interactivo.vercel.app/ruta', '_blank')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #059669)', color: 'white', border: 'none' }}>
+            🎓 Campus Interactivo
+          </button>
+
+          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'director_maestria']) && (
+            <button onClick={() => navigate('/centro-managers')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#000', fontWeight: 'bold', border: 'none' }}>
+              👑 Centro Managers
+            </button>
+          )}
+
+          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) && (
+            <button onClick={() => navigate('/crm-maestro')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #047857)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+              <Users size={14} style={{ display: 'inline', marginRight: '4px' }} /> BASE MAESTRA CRM
+            </button>
+          )}
+
+          {canAccessCalendarioMJ(currentUser) && (
+            <button onClick={() => navigate('/calendario-mj')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #1a75bc, #29abe2)', color: 'white', border: 'none' }}>
+              📅 Calendario MJ
+            </button>
+          )}
+
+          {canAccessFlyersC1(currentUser) && (
+            <button onClick={() => navigate('/generador-flyer')} className="btn-primary" title="Generador de Flyers Oficiales para Capítulos Uno" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #ec4899)', color: 'white', fontWeight: 'bold', border: 'none', boxShadow: '0 0 15px rgba(245, 158, 11, 0.4)' }}>
+              🎨 Flyers C1 Globales
+            </button>
+          )}
+
+          {canAccessMonitorVuelos(currentUser) && (
+            <button onClick={() => navigate('/monitor-vuelos')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #38bdf8, #0284c7)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+              ✈️ Monitor de Vuelos
+            </button>
+          )}
+          {canAccessMonitorIMOs(currentUser) && (
+            <button onClick={() => navigate('/monitor-imos')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #a855f7, #7e22ce)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+              🦅 Monitor de IMOs
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* BANNER INTERACTIVO DE SOLICITUDES DE COLABORACIÓN */}
+      {(() => {
+        const pendingInvites = (notifications || []).filter(n => n.type === 'COLLABORATION_INVITE' && !n.read && n.status !== 'ACEPTADA' && n.status !== 'RECHAZADA');
+        if (pendingInvites.length === 0) return null;
+
+        return (
+          <div className="glass-panel" style={{ padding: '1.2rem', marginBottom: '1.5rem', border: '1px solid rgba(0, 210, 255, 0.4)', background: 'rgba(0, 210, 255, 0.05)', boxShadow: '0 0 25px rgba(0, 210, 255, 0.15)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.8rem' }}>
+              <Users size={20} color="var(--crear-blue)" />
+              <h3 style={{ margin: 0, fontSize: '1.05rem', color: '#ffffff' }}>
+                🤝 Invitaciones de Colaboración ({pendingInvites.length} pendientes)
+              </h3>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+              {pendingInvites.map(inv => (
+                <div key={inv.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0, 0, 0, 0.35)', padding: '0.8rem', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.08)', flexWrap: 'wrap', gap: '0.8rem' }}>
+                  <div style={{ flex: 1, minWidth: '220px' }}>
+                    <div style={{ fontWeight: 'bold', color: 'var(--crear-blue)', fontSize: '0.9rem' }}>{inv.title}</div>
+                    <div style={{ color: 'var(--text-main)', fontSize: '0.82rem', marginTop: '0.2rem' }}>{inv.message}</div>
+                    <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginTop: '0.2rem' }}>
+                      Tarea: <strong style={{ color: '#ffffff' }}>{inv.taskTitle}</strong>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <button
+                      type="button"
+                      onClick={() => acceptCollaboration(inv)}
+                      className="btn-neon-action"
+                      style={{ padding: '0.35rem 0.8rem', fontSize: '0.78rem' }}
+                    >
+                      ✅ Aceptar
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => rejectCollaboration(inv)}
+                      className="btn-secondary"
+                      style={{ padding: '0.35rem 0.7rem', fontSize: '0.78rem' }}
+                    >
+                      ❌ Declinar
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* ======================================================== */}
+      {/* VISTA MODO LITE (ULTRA-LIMPIO / ENFOQUE DIARIO) */}
+      {/* ======================================================== */}
+      {viewMode === 'lite' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          
+          {/* TARJETA HERO: MI ENFOQUE DE HOY */}
+          <div className="glass-panel" style={{ padding: '1.8rem', border: '1px solid rgba(212, 175, 55, 0.3)', background: 'linear-gradient(180deg, rgba(212, 175, 55, 0.08) 0%, rgba(13, 21, 45, 0.9) 100%)', boxShadow: '0 15px 35px rgba(0,0,0,0.5)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.2rem', flexWrap: 'wrap', gap: '0.8rem' }}>
+              <div>
+                <span style={{ fontSize: '0.75rem', color: 'var(--crear-gold)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }}>⚡ Vista Rápida Diaria</span>
+                <h2 style={{ margin: '0.2rem 0 0 0', color: '#ffffff', fontSize: '1.5rem', fontWeight: '800' }}>Tus Pendientes Críticos</h2>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <span style={{ fontSize: '1.8rem', fontWeight: '900', color: 'var(--crear-gold)' }}>{progressPercentage}%</span>
+                <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)' }}>cumplimiento</span>
+              </div>
+            </div>
+
+            {/* Barra de Progreso */}
+            <div style={{ width: '100%', height: '10px', background: 'rgba(255,255,255,0.08)', borderRadius: '6px', overflow: 'hidden', marginBottom: '1.5rem' }}>
+              <div style={{ height: '100%', width: `${progressPercentage}%`, background: 'linear-gradient(90deg, #29abe2, #d4af37)', transition: 'width 0.5s ease-out' }} />
+            </div>
+
+            {/* Resumen de contadores */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.8rem', marginBottom: '1.5rem' }}>
+              <div 
+                onClick={() => navigate(`/checklist/${currentUser?.appRole}?filter=criticas`)}
+                style={{ padding: '0.8rem', background: 'rgba(239, 68, 68, 0.12)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '8px', textAlign: 'center', cursor: 'pointer' }}
+              >
+                <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#ef4444' }}>{criticasCount}</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>🔴 Críticas</div>
+              </div>
+              <div 
+                onClick={() => navigate(`/checklist/${currentUser?.appRole}?filter=importantes`)}
+                style={{ padding: '0.8rem', background: 'rgba(245, 158, 11, 0.12)', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '8px', textAlign: 'center', cursor: 'pointer' }}
+              >
+                <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#ffb347' }}>{importantesCount}</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>🟡 Importantes</div>
+              </div>
+              <div 
+                onClick={() => navigate(`/checklist/${currentUser?.appRole}?filter=completed`)}
+                style={{ padding: '0.8rem', background: 'rgba(16, 185, 129, 0.12)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '8px', textAlign: 'center', cursor: 'pointer' }}
+              >
+                <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#10b981' }}>{completedForProgress}</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>🟢 Listas</div>
+              </div>
+            </div>
+
+            {/* Lista de Tareas Urgentes (Top 5 en Lite) */}
+            <h4 style={{ margin: '0 0 0.8rem 0', color: 'var(--crear-cyan)', fontSize: '0.95rem' }}>🎯 Tareas para Hoy:</h4>
+            {urgentTasks.length === 0 ? (
+              <div style={{ padding: '1.5rem', textAlign: 'center', background: 'rgba(0,0,0,0.2)', borderRadius: '8px' }}>
+                <CheckCircle2 size={32} color="#10b981" style={{ margin: '0 auto 0.5rem' }} />
+                <p style={{ margin: 0, color: '#10b981', fontWeight: 'bold' }}>¡Excelente! No tienes tareas urgentes pendientes.</p>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.5rem' }}>
+                {urgentTasks.slice(0, 5).map(task => {
+                  const isCrit = task.isCritical || task.priority === '🔴 ROJO';
+                  const color = isCrit ? '#ef4444' : '#ffb347';
+                  const bg = isCrit ? 'rgba(239, 68, 68, 0.1)' : 'rgba(245, 158, 11, 0.08)';
+
+                  return (
+                    <div 
+                      key={task.id}
+                      onClick={() => navigate(currentUser?.appRole === 'gerente' ? '/gerente' : `/checklist/${currentUser?.appRole}`)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '0.75rem 1rem',
+                        background: bg,
+                        border: `1px solid ${color}33`,
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        transition: 'transform 0.15s'
+                      }}
+                      onMouseOver={e => e.currentTarget.style.transform = 'translateX(4px)'}
+                      onMouseOut={e => e.currentTarget.style.transform = 'translateX(0)'}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flex: 1, minWidth: 0 }}>
+                        <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: color, flexShrink: 0 }} />
+                        <span style={{ fontSize: '0.88rem', color: '#ffffff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {task.task || task.title}
+                        </span>
+                      </div>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--crear-gold)', fontWeight: 'bold', marginLeft: '0.5rem', flexShrink: 0 }}>
+                        ⏰ {task.deadline || calculateAutomaticDeadline(task, currentCycle)}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* BOTONES PRINCIPALES DE ACCIÓN */}
+            <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap' }}>
+                  <button 
+                    onClick={() => navigate('/gerente-dashboard')}
+                    style={{ flex: 1, padding: '0.8rem', background: 'var(--crear-blue)', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', boxShadow: '0 4px 10px rgba(2, 132, 199, 0.3)' }}
+                  >
+                    <ArrowUpRight size={18} />
+                    <span>
+                      💼 Causa OS Gerencial
+                    </span>
+                  </button>
+              <button 
+                className="btn-primary" 
+                onClick={() => navigate(currentUser?.appRole === 'gerente' ? '/gerente' : `/checklist/${currentUser?.appRole || 'capitan'}`)} 
+                style={{ flex: 2, minWidth: '200px', padding: '0.85rem 1.5rem', fontSize: '1rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+              >
+                <span>👉 Ir a mi Checklist Completo</span>
+                <ArrowRight size={18} />
+              </button>
+              <button
+                className="btn-secondary"
+                onClick={() => navigate('/metas')}
+                style={{ flex: 1, minWidth: '130px', padding: '0.85rem 1rem', fontSize: '0.95rem', fontWeight: 'bold' }}
+              >
+                🎯 Mis Metas
+              </button>
+              {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) && (
+                <>
+                  <button
+                    className="btn-secondary hover-glow"
+                    onClick={() => navigate('/superadmin')}
+                    title="Directorio Global — Panel Super Admin"
+                    style={{ flex: 1, minWidth: '150px', padding: '0.85rem 1rem', fontSize: '0.95rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', background: 'rgba(139, 92, 246, 0.12)', borderColor: 'rgba(139, 92, 246, 0.4)', color: '#a78bfa' }}
+                  >
+                    👑 Directorio Global
+                  </button>
+                  <button
+                    className="btn-secondary hover-glow"
+                    onClick={() => navigate('/crm-maestro')}
+                    title="Base Maestra CRM (Nodus)"
+                    style={{ flex: 1, minWidth: '150px', padding: '0.85rem 1rem', fontSize: '0.95rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', background: 'rgba(52, 211, 153, 0.12)', borderColor: 'rgba(52, 211, 153, 0.4)', color: '#34d399' }}
+                  >
+                    <Users size={18} /> CRM Nodus
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* VISTA MODO COMPACTO / PRO */}
+      {/* ======================================================== */}
+      {viewMode !== 'lite' && (
+        <>
+          {/* MI PROGRESO GENERAL */}
+          {(viewMode === 'compact' || customModules.progress !== false) && !hasRoleAccess(['entrenador', 'entrenador_llamadas']) && (
+            <div className="glass-panel" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem' }}>
+                <h3 className="text-main" style={{ margin: 0, fontSize: '1.1rem' }}>Mi Progreso General en el Ciclo</h3>
+                <span className="text-gold" style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>{progressPercentage}%</span>
+              </div>
+              <div style={{ width: '100%', height: '10px', background: 'rgba(255,255,255,0.05)', borderRadius: '6px', overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: `${progressPercentage}%`, background: 'var(--crear-gold)', transition: 'width 0.5s ease-out' }} />
+              </div>
+            </div>
+          )}
+
+          {/* PANEL DE EVENTOS */}
+          {(viewMode === 'compact' || customModules.events !== false) && (
+            <div className="glass-panel" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(0,212,255,0.2)', paddingBottom: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.8rem' }}>
+                <h3 className="text-blue" style={{ marginTop: 0, marginBottom: 0, display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.1rem' }}>
+                  <CalendarIcon size={18} /> EVENTOS Y ENTRENAMIENTOS
+                </h3>
+                <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                  {canAccessHotelesSede(currentUser) && (
+                    <button 
+                      type="button"
+                      onClick={() => setShowVenueModal(true)}
+                      className="btn-secondary"
+                      style={{ padding: '0.25rem 0.6rem', fontSize: '0.78rem' }}
+                      title="Configurar el hotel o salón oficial por defecto de la sede"
+                    >
+                      🏨 Hoteles / Salones
+                    </button>
+                  )}
+
+                  <div style={{ display: 'flex', gap: '0.4rem', borderLeft: '1px solid rgba(255,255,255,0.1)', paddingLeft: '0.6rem' }}>
+                    <button 
+                      onClick={() => {
+                        setActiveEventTab('locales');
+                        setSelectedSedeFilter('todas');
+                      }}
+                      style={{ background: 'none', border: 'none', color: activeEventTab === 'locales' ? 'var(--crear-gold)' : 'var(--text-muted)', fontWeight: activeEventTab === 'locales' ? 'bold' : 'normal', cursor: 'pointer', fontSize: '0.85rem' }}
+                    >
+                      {hasRoleAccess(['entrenador', 'entrenador_llamadas']) ? 'MIS FECHAS' : 'MI SEDE'}
+                    </button>
+                    {(!hasRoleAccess(['entrenador', 'entrenador_llamadas']) && ((currentUser?.isSuperAdmin && !currentUser?.isRoleSimulationActive) || currentUser?.isDireccion || currentUser?.isGerente || hasRoleAccess(['gerente', 'direccion', 'director_maestria', 'cfo']) || currentUser?.sede?.toLowerCase().includes('global'))) && (
+                      <button 
+                        onClick={() => setActiveEventTab('globales')}
+                        style={{ background: 'none', border: 'none', color: activeEventTab === 'globales' ? 'var(--crear-gold)' : 'var(--text-muted)', fontWeight: activeEventTab === 'globales' ? 'bold' : 'normal', cursor: 'pointer', fontSize: '0.85rem' }}
+                      >
+                        GLOBAL
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Filtros */}
+              <div style={{ 
+                display: 'flex', 
+                gap: '0.5rem', 
+                alignItems: 'center', 
+                flexWrap: 'wrap', 
+                marginBottom: '1rem', 
+                background: 'rgba(255,255,255,0.03)', 
+                padding: '0.5rem 0.7rem', 
+                borderRadius: '8px', 
+                border: '1px solid rgba(255,255,255,0.06)' 
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                  <Clock size={13} style={{ color: 'var(--crear-blue)' }} />
+                  <select 
+                    value={timeFilter}
+                    onChange={(e) => setTimeFilter(e.target.value)}
+                    style={{ background: 'rgba(255,255,255,0.07)', color: 'white', border: '1px solid rgba(255,255,255,0.15)', padding: '0.25rem 0.5rem', borderRadius: '6px', fontSize: '0.78rem', cursor: 'pointer' }}
+                  >
+                    <option value="futuros" style={{ background: '#0d152d' }}>⏳ Próximos</option>
+                    <option value="hoy" style={{ background: '#0d152d' }}>🔥 Hoy</option>
+                    <option value="todos" style={{ background: '#0d152d' }}>🗓 Todos</option>
+                    <option value="pasados" style={{ background: '#0d152d' }}>📁 Historial</option>
+                  </select>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                  <Filter size={13} style={{ color: 'var(--crear-gold)' }} />
+                  <select 
+                    value={selectedTrainingFilter}
+                    onChange={(e) => setSelectedTrainingFilter(e.target.value)}
+                    style={{ background: 'rgba(255,255,255,0.07)', color: 'white', border: '1px solid rgba(255,255,255,0.15)', padding: '0.25rem 0.5rem', borderRadius: '6px', fontSize: '0.78rem', cursor: 'pointer' }}
+                  >
+                    <option value="todos" style={{ background: '#0d152d' }}>Todos los tipos</option>
+                    <option value="C1" style={{ background: '#0d152d' }}>Capítulo 1</option>
+                    <option value="C2" style={{ background: '#0d152d' }}>Capítulo 2</option>
+                    <option value="MJ" style={{ background: '#0d152d' }}>Maestría del Juego</option>
+                    <option value="VIAJE" style={{ background: '#0d152d' }}>Viajes</option>
+                    <option value="OTROS" style={{ background: '#0d152d' }}>Confianza / Tanque</option>
+                  </select>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', flex: 1, minWidth: '150px' }}>
+                  <Search size={13} style={{ color: 'var(--text-muted)' }} />
+                  <input 
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Buscar evento, trainer o lugar..."
+                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', padding: '0.25rem 0.5rem', borderRadius: '6px', fontSize: '0.78rem', width: '100%' }}
+                  />
+                </div>
+              </div>
+
+              {/* Lista de eventos filtrados */}
+              {loadingEvents ? (
+                <p className="text-muted" style={{ fontSize: '0.85rem' }}>Cargando eventos oficiales...</p>
+              ) : (
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                  {(() => {
+                    const role = currentUser?.appRole || '';
+                    const isSuperOrDir = currentUser?.isSuperAdmin || currentUser?.isDireccion || ['direccion', 'cfo', 'ceo', 'cco', 'superadmin'].includes(role);
+                    const isGerente = role === 'gerente' || currentUser?.isGerente;
+                    const isCoordC1C2 = ['coord_c1', 'coord_c2', 'coordinador_c1c2'].includes(role);
+                    const isCoordMJ = ['coord_maestria', 'coordinador_mj', 'director_maestria'].includes(role);
+                    const isEntrenador = ['entrenador', 'entrenador_llamadas'].includes(role);
+                    const isQT = role === 'qt' || (currentUser?.roles || []).includes('qt');
+                    const isEquipoRole = ['capitan', 'aliado', 'manager'].includes(role);
+
+                    let displayEvents = (events || []).filter(ev => {
+                      // 1. Entrenadores: solo los eventos que él/ella dictará
+                      if (isEntrenador) {
+                        return isTrainerMatchingUser(ev.trainer || ev.entrenador, currentUser);
+                      }
+
+                      // 2. Coordinadores C1/C2: solo los de su sede y solo C1/C2
+                      if (isCoordC1C2) {
+                        const userSede = currentUser?.sede || '';
+                        const evSede = ev.sede || ev.sedeTag || '';
+                        if (userSede && !userSede.toLowerCase().includes('global')) {
+                          if (!evSede || (!evSede.toLowerCase().includes(userSede.toLowerCase()) && !userSede.toLowerCase().includes(evSede.toLowerCase()))) {
+                            return false;
+                          }
+                        }
+                        const name = (ev.nombre || ev.name || '').toUpperCase();
+                        return name.includes('CAPITULO UNO') || name.includes('C1') || name.includes('CAPÍTULO UNO') || name.includes('CAPITULO DOS') || name.includes('C2') || name.includes('CAPÍTULO DOS');
+                      }
+
+                      // 3. Coordinadores MJ: solo los de su sede y solo MJ
+                      if (isCoordMJ) {
+                        const userSede = currentUser?.sede || '';
+                        const evSede = ev.sede || ev.sedeTag || '';
+                        if (userSede && !userSede.toLowerCase().includes('global')) {
+                          if (!evSede || (!evSede.toLowerCase().includes(userSede.toLowerCase()) && !userSede.toLowerCase().includes(evSede.toLowerCase()))) {
+                            return false;
+                          }
+                        }
+                        const name = (ev.nombre || ev.name || '').toUpperCase();
+                        return name.includes('MAESTRIA') || name.includes('MJ') || name.includes('MAESTRÍA');
+                      }
+
+                      // 4. Capitanes, Aliados y Managers: solo los de su equipo
+                      if (isEquipoRole) {
+                        const userTeam = (currentUser?.equipo || currentUser?.equipoAsignado || '').toLowerCase().trim();
+                        if (userTeam) {
+                          const name = (ev.nombre || ev.name || '').toLowerCase();
+                          const desc = (ev.descripcion || ev.desc || '').toLowerCase();
+                          return name.includes(userTeam) || desc.includes(userTeam);
+                        }
+                        const userSede = currentUser?.sede || '';
+                        const evSede = ev.sede || ev.sedeTag || '';
+                        if (userSede && !userSede.toLowerCase().includes('global')) {
+                          if (!evSede || (!evSede.toLowerCase().includes(userSede.toLowerCase()) && !userSede.toLowerCase().includes(evSede.toLowerCase()))) {
+                            return false;
+                          }
+                        }
+                        return true;
+                      }
+
+                      // 5. Filtro tab locales vs globales para Gerentes y Directivos
+                      // BUG REAL encontrado y corregido (08/09/2026, confirmado explícitamente por
+                      // José: "los Directivos y Gerentes pueden ver todas las sedes"): antes,
+                      // Gerente quedaba forzado a "solo su sede" con "(isGerente && !isSuperOrDir)"
+                      // sin importar qué pestaña tuviera seleccionada — el botón "GLOBAL" ya era
+                      // visible para Gerente en la UI (ver el toggle más arriba) pero no tenía
+                      // ningún efecto real para ese rol, porque este OR lo ignoraba. La Matriz
+                      // Oficial pone a "gerente" en 'GLOBAL' para eventos_entrenamientos (ver
+                      // OFFICIAL_PERMISSION_MATRIX en permissions.js, corregido en esta misma
+                      // ronda). Ahora Gerente respeta la pestaña igual que Dirección: arranca en
+                      // "locales" (mismo default de siempre) pero el botón "GLOBAL" si funciona.
+                      if (activeEventTab === 'locales') {
+                        const userSede = currentUser?.sede || '';
+                        if (!userSede || userSede.toLowerCase().includes('global')) return true;
+                        const evSede = ev.sede || ev.sedeTag || '';
+                        if (!evSede) return false;
+                        return evSede.toLowerCase().includes(userSede.toLowerCase()) || userSede.toLowerCase().includes(evSede.toLowerCase());
+                      }
+
+                      return true;
+                    });
+
+                    if (searchQuery.trim()) {
+                      const q = searchQuery.toLowerCase().trim();
+                      displayEvents = displayEvents.filter(ev => {
+                        const name = (ev.nombre || ev.name || '').toLowerCase();
+                        const trainer = (ev.trainer || ev.entrenador || '').toLowerCase();
+                        const sede = (ev.sede || ev.sedeTag || ev.place || ev.address || ev.lugar || '').toLowerCase();
+                        return name.includes(q) || trainer.includes(q) || sede.includes(q);
+                      });
+                    }
+
+                    if (timeFilter !== 'todos') {
+                      const today = new Date();
+                      today.setHours(0, 0, 0, 0);
+                      const now = today.getTime();
+                      displayEvents = displayEvents.filter(ev => {
+                        const evDate = new Date(ev.fecha_inicio || ev.start || new Date());
+                        evDate.setHours(0, 0, 0, 0);
+                        const evTime = evDate.getTime();
+                        if (timeFilter === 'futuros') return evTime >= now;
+                        if (timeFilter === 'pasados') return evTime < now;
+                        if (timeFilter === 'hoy') return evTime === now;
+                        return true;
+                      });
+                    }
+
+                    if (selectedTrainingFilter !== 'todos') {
+                      displayEvents = displayEvents.filter(ev => {
+                        const name = (ev.nombre || ev.name || '').toUpperCase();
+                        if (selectedTrainingFilter === 'C1') return name.includes('CAPITULO UNO') || name.includes('C1') || name.includes('CAPÍTULO UNO');
+                        if (selectedTrainingFilter === 'C2') return name.includes('CAPITULO DOS') || name.includes('C2') || name.includes('CAPÍTULO DOS');
+                        if (selectedTrainingFilter === 'MJ') return name.includes('MAESTRIA') || name.includes('MJ') || name.includes('MAESTRÍA');
+                        if (selectedTrainingFilter === 'VIAJE') return name.includes('VIAJE') || name.includes('RETIRO');
+                        if (selectedTrainingFilter === 'OTROS') return !name.includes('CAPITULO') && !name.includes('MAESTRIA') && !name.includes('VIAJE') && !name.includes('CAPÍTULO') && !name.includes('MAESTRÍA');
+                        return true;
+                      });
+                    }
+
+                    // Sort events by date ascending so closest events show first
+                    displayEvents.sort((a, b) => {
+                      const dateA = new Date(a.fecha_inicio || a.start || 0).getTime();
+                      const dateB = new Date(b.fecha_inicio || b.start || 0).getTime();
+                      return timeFilter === 'pasados' ? dateB - dateA : dateA - dateB; // Past events descending, future ascending
+                    });
+
+                    // --- QT Filter Logic: solo de su sede, solo C1 y C2 actual y próximo, SIN entrenador asignado ---
+                    // La Matriz Oficial define este alcance como "SEDE_C1C2_PROXIMOS_SIN_TRAINER"
+                    // (ver OFFICIAL_PERMISSION_MATRIX.eventos_entrenamientos.qt en permissions.js).
+                    // Antes (hasta 08/09/2026) el filtro cubría sede + C1/C2 + actual/próximo, pero
+                    // NO excluía eventos que ya tienen entrenador asignado — corregido aquí.
+                    if (isQT) {
+                      const qtNow = new Date().getTime();
+                      const userSede = currentUser?.sede || '';
+                      let c1Count = 0;
+                      let c2Count = 0;
+                      displayEvents = displayEvents.filter(ev => {
+                        if (userSede && !userSede.toLowerCase().includes('global')) {
+                          const evSede = ev.sede || ev.sedeTag || '';
+                          if (!evSede || (!evSede.toLowerCase().includes(userSede.toLowerCase()) && !userSede.toLowerCase().includes(evSede.toLowerCase()))) {
+                            return false;
+                          }
+                        }
+                        const dateMs = new Date(ev.fecha_inicio || ev.start || 0).getTime();
+                        if (dateMs < qtNow) return false;
+                        // "SIN TRAINER": si el evento ya tiene un entrenador asignado, QT ya no
+                        // necesita verlo en su lista de pendientes.
+                        const trainerAsignado = (ev.trainer || ev.entrenador || '').trim();
+                        if (trainerAsignado) return false;
+                        const name = (ev.nombre || ev.name || '').toUpperCase();
+                        if (name.includes('CAPITULO UNO') || name.includes('C1') || name.includes('CAPÍTULO UNO')) {
+                          c1Count++;
+                          return c1Count <= 2;
+                        }
+                        if (name.includes('CAPITULO DOS') || name.includes('C2') || name.includes('CAPÍTULO DOS')) {
+                          c2Count++;
+                          return c2Count <= 2;
+                        }
+                        return false; // QTs SOLO ven C1 y C2 de su sede (actual y próximo, sin entrenador)
+                      });
+                    }
+
+                    if (displayEvents.length === 0) {
+                      return (
+                        <div style={{ padding: '1.5rem 1rem', textAlign: 'center' }}>
+                          <p className="text-muted" style={{ margin: 0, fontSize: '0.85rem' }}>No hay eventos registrados en este filtro.</p>
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div style={{ maxHeight: '320px', overflowY: 'auto', paddingRight: '0.4rem' }}>
+                        {displayEvents.slice(0, 8).map((ev, i) => {
+                          const baseDate = ev.fecha_inicio || ev.start;
+                          const evStartDate = new Date(baseDate || new Date());
+                          let evEndDate = new Date(ev.fecha_fin || baseDate || new Date());
+                          const hotelVenue = getVenueForTraining(ev.sede || ev.sedeTag || currentUser?.sede, ev.nombre || ev.name, ev.lugar, ev.direccion);
+
+                          return (
+                            <li key={i} style={{ padding: '0.6rem 0', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.8rem' }}>
+                              <div style={{ minWidth: 0 }}>
+                                <span className="text-white" style={{ fontWeight: 'bold', fontSize: '0.92rem', display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                  {ev.nombre || ev.name || 'Entrenamiento'}
+                                </span>
+                                <span style={{ fontSize: '0.75rem', color: 'var(--crear-cyan)', display: 'block', marginTop: '0.1rem' }}>
+                                  🏨 {hotelVenue}
+                                </span>
+                                {(!hasRoleAccess(['qt', 'capitan', 'manager', 'aliado'])) && (
+                                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginTop: '0.1rem' }}>
+                                    🎙️ Trainer: {ev.trainer || ev.entrenador || 'Por confirmar'}
+                                  </span>
+                                )}
+                              </div>
+                              <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                                <span className="text-gold" style={{ fontWeight: 'bold', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.2rem', justifyContent: 'flex-end' }}>
+                                  <MapPin size={11} /> {getFlagForSede(ev.sede || ev.sedeTag)} {ev.sede || ev.sedeTag || 'GLOBAL'}
+                                </span>
+                                <span className="text-muted" style={{ fontSize: '0.75rem', display: 'block' }}>
+                                  {ev.fecha_inicio ? ev.fecha_inicio.substring(0, 10) : ''}
+                                </span>
+                                <button 
+                                  onClick={() => handleAddEventToGoogle(ev, evStartDate, evEndDate)}
+                                  style={{ background: 'transparent', border: '1px solid rgba(41, 171, 226, 0.3)', color: 'var(--crear-cyan)', padding: '0.15rem 0.4rem', borderRadius: '4px', fontSize: '0.68rem', display: 'flex', alignItems: 'center', gap: '0.2rem', marginTop: '0.25rem', cursor: 'pointer', marginLeft: 'auto' }}
+                                  title="Agendar en Google Calendar"
+                                >
+                                  <CalendarPlus size={11} /> Agendar
+                                </button>
+                              </div>
+                            </li>
+                          );
+                        })}
+                      </div>
+                    );
+                  })()}
+                </ul>
+              )}
+            </div>
+          )}
+
+          {/* GRID DE PENDIENTES & PRIORIDAD TOP 3 */}
+          {(viewMode === 'compact' || customModules.todayTasks !== false) && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.2rem', marginBottom: '2rem' }}>
+              
+              {/* PANEL HOY */}
+              <div className="glass-panel" style={{ padding: '1.2rem' }}>
+                <h3 className="text-blue" style={{ marginTop: 0, borderBottom: '1px solid rgba(0,212,255,0.2)', paddingBottom: '0.4rem', fontSize: '1rem' }}>HOY (Tus Pendientes)</h3>
+                <ul style={{ listStyle: 'none', padding: 0, margin: '0.8rem 0 0 0', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  <li 
+                    onClick={() => navigate(`/checklist/${currentUser?.appRole}?filter=criticas`)}
+                    style={{ padding: '0.65rem 0.8rem', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '6px', color: 'var(--color-error)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', border: '1px solid rgba(239, 68, 68, 0.2)', fontSize: '0.85rem' }}
+                  >
+                    <AlertCircle size={16} /> <strong>{criticasCount}</strong> críticas (Hoy)
+                  </li>
+                  <li 
+                    onClick={() => navigate(`/checklist/${currentUser?.appRole}?filter=importantes`)}
+                    style={{ padding: '0.65rem 0.8rem', background: 'rgba(245, 158, 11, 0.1)', borderRadius: '6px', color: '#ffb347', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', border: '1px solid rgba(245, 158, 11, 0.2)', fontSize: '0.85rem' }}
+                  >
+                    <Circle size={16} /> <strong>{importantesCount}</strong> importantes
+                  </li>
+                  <li 
+                    onClick={() => navigate(`/checklist/${currentUser?.appRole}?filter=completed`)}
+                    style={{ padding: '0.65rem 0.8rem', background: 'rgba(52, 168, 83, 0.1)', borderRadius: '6px', color: 'var(--color-success)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', border: '1px solid rgba(52, 168, 83, 0.2)', fontSize: '0.85rem' }}
+                  >
+                    <CheckCircle2 size={16} /> <strong>{completedForProgress}</strong> completadas
+                  </li>
+                </ul>
+              </div>
+
+              {/* PANEL PRIORIDAD TOP 3 */}
+              <div className="glass-panel" style={{ padding: '1.2rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(0,212,255,0.2)', paddingBottom: '0.4rem', marginBottom: '0.8rem' }}>
+                  <h3 className="text-blue" style={{ marginTop: 0, marginBottom: 0, borderBottom: 'none', paddingBottom: 0, fontSize: '1rem' }}>TU PRIORIDAD (Top 3)</h3>
+                  <button onClick={() => navigate(`/checklist/${currentUser?.appRole || 'gerente'}`)} style={{ background: 'transparent', border: '1px solid var(--crear-gold)', color: 'var(--crear-gold)', borderRadius: '4px', padding: '4px 8px', fontSize: '0.75rem', cursor: 'pointer' }}>Ver Tareas Generales →</button>
+                </div>
+                <ul style={{ listStyle: 'none', padding: 0, margin: '0.8rem 0 0 0', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  {urgentTasks.slice(0, 3).length === 0 ? (
+                    <li className="text-muted" style={{ padding: '0.5rem 0', fontSize: '0.85rem' }}>No tienes tareas urgentes pendientes. ¡Excelente!</li>
+                  ) : (
+                    urgentTasks.slice(0, 3).map(task => {
+                      const isCrit = task.isCritical || task.priority === '🔴 ROJO';
+                      const color = isCrit ? 'var(--color-error)' : '#ffb347';
+                      const bg = isCrit ? 'rgba(239, 68, 68, 0.1)' : 'rgba(245, 158, 11, 0.1)';
+
+                      return (
+                        <li 
+                          key={task.id}
+                          onClick={() => {
+                            if (task.assignedToEmail || (Array.isArray(task.assignedToEmails) && task.assignedToEmails.length > 0) || task.createdBy || (task.id && String(task.id).startsWith('custom_'))) {
+                              setSelectedTaskForDetail(task);
+                              setShowTaskDetailModal(true);
+                            } else {
+                              navigate(`/checklist/${currentUser?.appRole}?filter=${isCrit ? 'criticas' : 'importantes'}`);
+                            }
+                          }}
+                          style={{ padding: '0.65rem 0.8rem', background: bg, borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.6rem', border: `1px solid ${color}33` }}
+                        >
+                          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: color, flexShrink: 0 }}></span>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <span className="text-white" style={{ fontSize: '0.82rem', display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              {task.task || task.title}
+                            </span>
+                            <span style={{ fontSize: '0.72rem', color: 'var(--crear-gold)', fontWeight: 'bold' }}>
+                              ⏰ Límite: {task.deadline || calculateAutomaticDeadline(task, currentCycle)}
+                            </span>
+                          </div>
+                        </li>
+                      );
+                    })
+                  )}
+                </ul>
+              </div>
+            </div>
+          )}
+
+          {/* PANEL: TAREAS QUE HAS ASIGNADO A OTROS (con cuenta regresiva) */}
+          {tareasQueHeAsignado.length > 0 && (() => {
+            // Clasificación para las pestañas de filtro (Activas/Vencidas/Cumplidas/Todas).
+            const clasificadas = tareasQueHeAsignado.map(task => {
+              const isDone = task.completed || task.status === 'Completada';
+              const isOverdue = !isDone && getCountdownInfo(task.deadline, time).overdue;
+              return { task, isDone, isOverdue };
+            });
+            const counts = {
+              Activas: clasificadas.filter(c => !c.isDone && !c.isOverdue).length,
+              Vencidas: clasificadas.filter(c => c.isOverdue).length,
+              Cumplidas: clasificadas.filter(c => c.isDone).length,
+              Todas: clasificadas.length
+            };
+            const visibles = clasificadas.filter(c => {
+              if (tareasAsignadasFilter === 'Activas') return !c.isDone && !c.isOverdue;
+              if (tareasAsignadasFilter === 'Vencidas') return c.isOverdue;
+              if (tareasAsignadasFilter === 'Cumplidas') return c.isDone;
+              return true; // Todas
+            });
+
+            return (
+            <div className="glass-panel" style={{ padding: '1.2rem', marginBottom: '2rem' }}>
+              <h3 className="text-blue" style={{ marginTop: 0, borderBottom: '1px solid rgba(0,212,255,0.2)', paddingBottom: '0.4rem', fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                📋 MIS TAREAS ASIGNADAS ({tareasQueHeAsignado.length})
+              </h3>
+              <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', marginTop: '0.8rem' }}>
+                {['Activas', 'Vencidas', 'Cumplidas', 'Todas'].map(f => (
+                  <button
+                    key={f}
+                    onClick={() => setTareasAsignadasFilter(f)}
+                    style={{
+                      padding: '0.3rem 0.75rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 700,
+                      border: `1px solid ${tareasAsignadasFilter === f ? 'var(--crear-cyan)' : 'var(--border-subtle)'}`,
+                      background: tareasAsignadasFilter === f ? 'rgba(41, 171, 226, 0.18)' : 'transparent',
+                      color: tareasAsignadasFilter === f ? 'var(--crear-cyan)' : 'var(--text-muted)',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {f} ({counts[f]})
+                  </button>
+                ))}
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.8rem', maxHeight: '360px', overflowY: 'auto' }}>
+                {visibles.length === 0 && (
+                  <p className="text-muted" style={{ fontSize: '0.82rem', padding: '0.5rem 0' }}>No hay tareas en "{tareasAsignadasFilter}".</p>
+                )}
+                {visibles.map(({ task, isDone }) => {
+                  const countdown = getCountdownInfo(task.deadline, time);
+                  const emails = task.assignedToEmails && task.assignedToEmails.length > 0
+                    ? task.assignedToEmails
+                    : (task.assignedToEmail ? [task.assignedToEmail] : []);
+                  const asignadosLabel = emails.length > 0 ? emails.map(resolveAssigneeName).join(', ') : 'Cualquiera en el rol';
+                  const esCreador = task.__direction === 'asignada_por_mi';
+                  const hasEvidence = Boolean(task.evidenceUrl || task.evidence_url || (Array.isArray(task.evidences) && task.evidences.length > 0));
+                  const progressPct = typeof task.progressPercentage === 'number' ? task.progressPercentage : (isDone ? 100 : 0);
+
+                  return (
+                    <div
+                      key={task.id}
+                      onClick={() => {
+                        setSelectedTaskForDetail(task);
+                        setShowTaskDetailModal(true);
+                      }}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap',
+                        padding: '0.75rem 0.9rem', borderRadius: '10px',
+                        background: isDone ? 'rgba(52, 168, 83, 0.08)' : 'rgba(255,255,255,0.03)',
+                        border: `1px solid ${isDone ? 'rgba(52, 168, 83, 0.25)' : 'var(--border-subtle)'}`,
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = 'rgba(41, 171, 226, 0.5)';
+                        e.currentTarget.style.background = isDone ? 'rgba(52, 168, 83, 0.12)' : 'rgba(41, 171, 226, 0.07)';
+                        e.currentTarget.style.transform = 'translateY(-1px)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = isDone ? 'rgba(52, 168, 83, 0.25)' : 'var(--border-subtle)';
+                        e.currentTarget.style.background = isDone ? 'rgba(52, 168, 83, 0.08)' : 'rgba(255,255,255,0.03)';
+                        e.currentTarget.style.transform = 'translateY(0)';
+                      }}
+                      title="Haz click para ver avances y adjuntar evidencias"
+                    >
+                      <div style={{ flex: 1, minWidth: '160px' }}>
+                        <span className="text-white" style={{ fontSize: '0.85rem', fontWeight: 600, display: 'block' }}>
+                          {isDone ? '✅ ' : ''}{task.task || task.title}
+                          <span style={{
+                            marginLeft: '0.5rem', fontSize: '0.65rem', fontWeight: 700, padding: '0.1rem 0.45rem',
+                            borderRadius: '10px', verticalAlign: 'middle',
+                            background: esCreador ? 'rgba(41, 171, 226, 0.15)' : 'rgba(255, 193, 7, 0.15)',
+                            color: esCreador ? 'var(--crear-cyan)' : '#ffc107',
+                            border: `1px solid ${esCreador ? 'rgba(41, 171, 226, 0.4)' : 'rgba(255, 193, 7, 0.4)'}`
+                          }}>
+                            {esCreador ? '→ TÚ ASIGNASTE' : '← TE ASIGNARON'}
+                          </span>
+                        </span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.25rem', flexWrap: 'wrap' }}>
+                          <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                            {esCreador ? `👤 Asignada a: ${asignadosLabel}` : `👤 Asignada por: ${resolveAssigneeName(task.createdBy)}`}
+                          </span>
+                          {progressPct > 0 && (
+                            <span style={{
+                              fontSize: '0.68rem', fontWeight: 700,
+                              color: progressPct === 100 ? '#10b981' : 'var(--crear-cyan)',
+                              background: progressPct === 100 ? 'rgba(16, 185, 129, 0.12)' : 'rgba(41, 171, 226, 0.12)',
+                              padding: '1px 6px', borderRadius: '8px',
+                              border: `1px solid ${progressPct === 100 ? 'rgba(16, 185, 129, 0.3)' : 'rgba(41, 171, 226, 0.3)'}`
+                            }}>
+                              📊 {progressPct}% avance
+                            </span>
+                          )}
+                          {hasEvidence && (
+                            <span style={{
+                              fontSize: '0.68rem', fontWeight: 700,
+                              color: 'var(--crear-gold)', background: 'rgba(212, 175, 55, 0.12)',
+                              padding: '1px 6px', borderRadius: '8px',
+                              border: '1px solid rgba(212, 175, 55, 0.35)'
+                            }}>
+                              📎 Con Evidencia
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      {!isDone && (
+                        <span style={{
+                          fontSize: '0.88rem', fontWeight: 800, padding: '0.42rem 0.9rem', borderRadius: '20px',
+                          color: countdown.color, background: countdown.bg, border: `2px solid ${countdown.border}`,
+                          whiteSpace: 'nowrap', letterSpacing: '0.02em',
+                          boxShadow: '0 1px 4px rgba(0,0,0,0.25)'
+                        }}>
+                          {countdown.label}
+                        </span>
+                      )}
+                      {esCreador && (
+                        <button
+                          type="button"
+                          onClick={(e) => { 
+                            e.stopPropagation();
+                            setTaskBeingEdited(task); 
+                            setShowTaskModal(true); 
+                          }}
+                          title="Editar configuración de la tarea"
+                          style={{
+                            background: 'rgba(41, 171, 226, 0.12)', border: '1px solid rgba(41, 171, 226, 0.4)',
+                            borderRadius: '6px', padding: '0.3rem 0.6rem', fontSize: '0.72rem', fontWeight: 700,
+                            color: 'var(--crear-cyan)', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0
+                          }}
+                        >
+                          ✏️ Editar
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            );
+          })()}
+
+          {/* BOTONES INFERIORES */}
+          {(viewMode === 'compact' || customModules.shortcuts !== false) && (
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
+              <button 
+                className="btn-primary" 
+                onClick={() => navigate(currentUser?.appRole === 'gerente' ? '/gerente' : `/checklist/${currentUser?.appRole || 'capitan'}`)} 
+                style={{ padding: '0.8rem 1.6rem', fontSize: '1rem', fontWeight: 'bold' }}
+              >
+                IR A MI CHECKLIST OPERATIVO ({ROLE_DISPLAY_NAMES[currentUser?.appRole] || currentUser?.appRole?.toUpperCase()})
+              </button>
+              <button className="btn-secondary" onClick={() => navigate('/metas')} style={{ padding: '0.8rem 1.4rem', fontSize: '1rem', fontWeight: 'bold' }}>
+                VER MIS METAS
+              </button>
+              {((currentUser?.isSuperAdmin && !currentUser?.isRoleSimulationActive) || currentUser?.isGerente || hasRoleAccess(['coord_c1', 'coord_maestria', 'capitan', 'qt', 'direccion', 'director_maestria'])) && (
+                <button className="btn-secondary" onClick={() => navigate('/reportes')} style={{ padding: '0.8rem 1.4rem', fontSize: '1rem', fontWeight: 'bold' }}>
+                  ENVIAR REPORTES
+                </button>
+              )}
+            </div>
+          )}
+        </>
+      )}
+
+      {/* MODAL ASIGNAR TAREA */}
+      <TaskAssignmentModal
+        isOpen={showTaskModal}
+        onClose={() => { setShowTaskModal(false); setTaskBeingEdited(null); }}
+        taskToEdit={taskBeingEdited}
+      />
+
+      {/* MODAL DETALLE, AVANCES Y EVIDENCIAS DE TAREA */}
+      <TaskDetailModal
+        isOpen={showTaskDetailModal}
+        onClose={() => {
+          setShowTaskDetailModal(false);
+          setSelectedTaskForDetail(null);
+        }}
+        task={selectedTaskForDetail ? (allTasks?.find(t => t.id === selectedTaskForDetail.id) || selectedTaskForDetail) : null}
+        onEditTaskParams={(taskToEdit) => {
+          setShowTaskDetailModal(false);
+          setTaskBeingEdited(taskToEdit);
+          setShowTaskModal(true);
+        }}
+        resolveAssigneeName={resolveAssigneeName}
+      />
+
+      {/* MODAL CONFIGURACIÓN DE HOTELES Y SALONES */}
+      <VenueConfigModal isOpen={showVenueModal} onClose={() => setShowVenueModal(false)} />
+
+      {/* MODAL DE PERFIL DE PERSONA (abierto desde el Buscador Global) */}
+      {showSearchUserModal && selectedSearchUser && (
+        <UserProfileModal isOpen={showSearchUserModal} onClose={() => setShowSearchUserModal(false)} user={selectedSearchUser} allTasks={allTasks} />
+      )}
+
+      {/* MODAL HORARIOS DE ENTRENAMIENTOS Y CÓDIGO DE VESTIMENTA */}
+      <HorariosEntrenamientoModal isOpen={showHorariosModal} onClose={() => setShowHorariosModal(false)} />
+    </div>
+  );
+}
+
+
+```
+
+---
+
+## Archivo: Claude outputs\MonitorVuelosCartas.jsx
+
+```javascript
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { useUI } from '../context/UIContext';
+import { canAccessMonitorVuelos, canAccessSistemaCartas } from '../config/permissions';
+import {
+  Plane,
+  FileText,
+  Clock,
+  MapPin,
+  ExternalLink,
+  Copy,
+  Search,
+  Building,
+  Phone,
+  ArrowLeft,
+  RefreshCw,
+  CheckCircle,
+  AlertTriangle,
+  User,
+  Share2,
+  X,
+  Compass,
+  Car
+} from 'lucide-react';
+
+const FALLBACK_TRACKER = {
+  updatedAt: "2026-09-03T20:21:23.790Z",
+  flights: {
+    LA1437: {
+      flightNumber: "LA 1437",
+      flightCode: "LA1437",
+      airline: "LATAM Airlines",
+      callsign: "LAN1437",
+      reservationCode: "DJBJJD",
+      passengers: [
+        "Elmer Andrés Idrovo Andrade",
+        "María de Lourdes Patiño"
+      ],
+      route: {
+        origin: "UIO",
+        originCity: "Quito",
+        originAirport: "Aeropuerto Internacional Mariscal Sucre",
+        destination: "LIM",
+        destinationCity: "Lima",
+        destinationAirport: "Aeropuerto Internacional Jorge Chávez",
+        isDirect: true,
+        stops: 0,
+        flightDuration: "2h 15m"
+      },
+      schedule: {
+        departureDate: "2026-09-04",
+        scheduledDeparture: "2026-09-04T07:55:00-05:00",
+        scheduledArrival: "2026-09-04T10:10:00-05:00",
+        estimatedDeparture: "2026-09-04T07:55:00-05:00",
+        estimatedArrival: "2026-09-04T10:10:00-05:00",
+        actualDeparture: null,
+        actualArrival: null
+      },
+      status: "ON_TIME",
+      statusLabel: "A tiempo",
+      statusDescription: "Vuelo confirmado y a tiempo para despegue directo UIO → LIM",
+      delayMinutes: 0,
+      terminal: "T1",
+      gate: "Confirmándose en aeropuerto",
+      baggageClaim: "Por confirmar en arribo",
+      logistics: {
+        pickupLocation: "Puerta de Llegadas Internacionales (Aeropuerto Jorge Chávez)",
+        destination: "Hotel Jose Antonio Deluxe (Calle Bellavista 133, Miraflores)",
+        driverPickupEstimated: "10:35 AM",
+        driverNote: "El conductor te contactará 1h antes por WhatsApp con datos del auto y placa oficial."
+      },
+      radarUrl: "https://www.flightradar24.com/data/flights/la1437",
+      checkInUrl: "https://www.latamairlines.com/pe/es/check-in",
+      relatedLetters: [
+        { name: "Carta Andrés Idrovo", url: "/cartas/carta_andres_idrobo_e30.html" },
+        { name: "Carta Lourdes Patiño", url: "/cartas/carta_lourdes_patino_e29.html" }
+      ]
+    },
+    LA1449: {
+      flightNumber: "LA 1449",
+      flightCode: "LA1449",
+      airline: "LATAM Airlines",
+      callsign: "LAN1449",
+      reservationCode: "DJBJJD",
+      passengers: [
+        "Elmer Andrés Idrovo Andrade"
+      ],
+      route: {
+        origin: "LIM",
+        originCity: "Lima",
+        originAirport: "Aeropuerto Internacional Jorge Chávez",
+        destination: "UIO",
+        destinationCity: "Quito",
+        destinationAirport: "Aeropuerto Internacional Mariscal Sucre",
+        isDirect: false,
+        stops: 1,
+        stopover: "Guayaquil (GYE) - Escala de 4h 00m",
+        flightDuration: "7h 02m (con escala)"
+      },
+      schedule: {
+        departureDate: "2026-09-06",
+        scheduledDeparture: "2026-09-06T23:35:00-05:00",
+        scheduledArrival: "2026-09-07T06:37:00-05:00",
+        estimatedDeparture: "2026-09-06T23:35:00-05:00",
+        estimatedArrival: "2026-09-07T06:37:00-05:00",
+        actualDeparture: null,
+        actualArrival: null
+      },
+      status: "ON_TIME",
+      statusLabel: "Programado · A tiempo",
+      statusDescription: "Vuelo de retorno programado",
+      delayMinutes: 0,
+      terminal: "T1",
+      gate: "Por confirmar",
+      baggageClaim: null,
+      logistics: {
+        pickupLocation: "Lobby del Hotel Jose Antonio Deluxe",
+        driverPickupEstimated: "8:30 PM (20:30 hrs)",
+        destination: "Aeropuerto Jorge Chávez",
+        driverNote: "Recojo 3h antes para vuelo internacional nocturno."
+      },
+      radarUrl: "https://www.flightradar24.com/data/flights/la1449",
+      checkInUrl: "https://www.latamairlines.com/pe/es/check-in",
+      relatedLetters: [
+        { name: "Carta Andrés Idrovo (Retorno)", url: "/cartas/carta_andres_idrobo_e30.html" }
+      ]
+    },
+    AV108: {
+      flightNumber: "AV 108",
+      flightCode: "AV108",
+      airline: "Avianca",
+      callsign: "AVA108",
+      reservationCode: "AVCONF",
+      passengers: [
+        "Alejandro Díaz Pabón"
+      ],
+      route: {
+        origin: "BOG",
+        originCity: "Bogotá",
+        originAirport: "Aeropuerto Internacional El Dorado",
+        destination: "LIM",
+        destinationCity: "Lima",
+        destinationAirport: "Aeropuerto Internacional Jorge Chávez",
+        isDirect: true,
+        stops: 0,
+        flightDuration: "3h 05m"
+      },
+      schedule: {
+        departureDate: "2026-09-04",
+        scheduledDeparture: "2026-09-04T06:15:00-05:00",
+        scheduledArrival: "2026-09-04T09:20:00-05:00",
+        estimatedDeparture: "2026-09-04T06:15:00-05:00",
+        estimatedArrival: "2026-09-04T09:20:00-05:00",
+        actualDeparture: null,
+        actualArrival: null
+      },
+      status: "ON_TIME",
+      statusLabel: "A tiempo",
+      statusDescription: "Vuelo confirmado y a tiempo",
+      delayMinutes: 0,
+      terminal: "T1",
+      gate: "Por confirmar",
+      baggageClaim: "Por confirmar",
+      logistics: {
+        pickupLocation: "Puerta de Llegadas Internacionales (Aeropuerto Jorge Chávez)",
+        destination: "Hotel Jose Antonio Deluxe",
+        driverPickupEstimated: "09:45 AM",
+        driverNote: "Conductor esperará en llegadas internacionales con cartel oficial CPSL."
+      },
+      radarUrl: "https://www.flightradar24.com/data/flights/av108",
+      checkInUrl: "https://www.avianca.com",
+      relatedLetters: [
+        { name: "Carta Alejandro Díaz", url: "/cartas/carta_alejandro_diaz_e28.html" }
+      ]
+    }
+  }
+};
+
+const OFICIAL_LETTERS = [
+  {
+    id: 'carta-andres-idrovo',
+    entrenador: 'Elmer Andrés Idrovo Andrade',
+    rol: 'Entrenador Principal',
+    equipo: 'Equipo 30 - Creación',
+    sede: 'Lima',
+    url: '/cartas/carta_andres_idrobo_e30.html',
+    badge: 'LATAM DJBJJD',
+    fecha: 'Septiembre 2026',
+    descripcion: 'Carta oficial de invitación, itinerario de vuelos UIO ➔ LIM (LA 1437) y LIM ➔ UIO (LA 1449), hotel y logística de chofer.',
+    vuelos: ['LA 1437', 'LA 1449']
+  },
+  {
+    id: 'carta-lourdes-patino',
+    entrenador: 'María de Lourdes Patiño',
+    rol: 'Entrenadora de Sala',
+    equipo: 'Equipo 29 - Relación',
+    sede: 'Lima',
+    url: '/cartas/carta_lourdes_patino_e29.html',
+    badge: 'LATAM DJBJJD',
+    fecha: 'Septiembre 2026',
+    descripcion: 'Carta oficial de invitación, itinerario de vuelo internacional UIO ➔ LIM (LA 1437), hospedaje y viáticos de coordinación.',
+    vuelos: ['LA 1437']
+  },
+  {
+    id: 'carta-alejandro-diaz',
+    entrenador: 'Alejandro Díaz Pabón',
+    rol: 'Entrenador Senior',
+    equipo: 'Equipo 28 - Gratitud',
+    sede: 'Lima',
+    url: '/cartas/carta_alejandro_diaz_e28.html',
+    badge: 'Avianca AVCONF',
+    fecha: 'Septiembre 2026',
+    descripcion: 'Carta de facilitación e itinerario de vuelo BOG ➔ LIM (AV 108), transporte en Lima y agenda del fin de semana.',
+    vuelos: ['AV 108']
+  },
+  {
+    id: 'carta-julio-narvaez',
+    entrenador: 'Julio Narváez',
+    rol: 'Entrenador / Facilitador',
+    equipo: 'Equipo 28 - El Viaje',
+    sede: 'Lima',
+    url: '/cartas/julio-narvaez-elviaje-e28.html',
+    badge: 'Maestría del Juego',
+    fecha: 'Septiembre 2026',
+    descripcion: 'Carta de confirmación logística y requerimientos de sala para Maestría del Juego El Viaje.',
+    vuelos: []
+  },
+  {
+    id: 'carta-fernando-aragon',
+    entrenador: 'Fernando Aragón',
+    rol: 'Coach de Transformación',
+    equipo: 'CC1 - Transformación',
+    sede: 'Lima',
+    url: '/cartas/fernando-aragon-c1.html',
+    badge: 'CC1 Oficial',
+    fecha: 'Agosto - Septiembre 2026',
+    descripcion: 'Carta oficial de asignación y cronograma de intervención ontológica para CC1.',
+    vuelos: []
+  },
+  {
+    id: 'carta-migraciones-oficial',
+    entrenador: 'Superintendencia Nacional de Migraciones (Perú)',
+    rol: 'Respaldo Institucional Oficial',
+    equipo: 'CREAR PODER SIN LÍMITES S.A.C.',
+    sede: 'Aeropuerto Internacional Jorge Chávez',
+    url: '/cartas/carta_invitacion_migraciones.html',
+    badge: 'Documento Legal Migratorio',
+    fecha: 'Oficial 2026',
+    descripcion: 'Carta de respaldo institucional, personería jurídica y acreditación oficial de conferencistas extranjeros.',
+    vuelos: ['LA 1437', 'AV 108', 'LA 1449']
+  }
+];
+
+export default function MonitorVuelosCartas() {
+  const navigate = useNavigate();
+  const { showToast } = useUI();
+  const { currentUser } = useAuth();
+  const [activeTab, setActiveTab] = useState('radar'); // 'radar' | 'cartas' | 'logistica'
+  const [trackerData, setTrackerData] = useState(FALLBACK_TRACKER);
+  const [loading, setLoading] = useState(false);
+  const [previewLetter, setPreviewLetter] = useState(null);
+  const [searchFilter, setSearchFilter] = useState('');
+  const [routeFilter, setRouteFilter] = useState('ALL');
+  const [flightStatusFilter, setFlightStatusFilter] = useState('activos');
+
+  // Separación Monitor de Vuelos / Sistema de Cartas (08/09/2026, pedido explícito
+  // de José: "son dos cosas distintas de verdad"). Antes esta página no tenía NINGÚN
+  // gate interno por rol — cualquiera que entrara a /monitor-vuelos veía las 3
+  // pestañas completas. Ahora cada pestaña se gatea según su propia fila de la
+  // Matriz Oficial: "radar" (Monitor de Vuelos) = Directivos + Gerentes de su sede;
+  // "cartas" (Sistema de Cartas) = SOLO Gerentes, Directivos NO tienen acceso. La
+  // pestaña "logistica" (Hotel & Choferes) no tiene fila propia en la Matriz — se
+  // deja visible para quien ya pudo entrar a la página (Directivos o Gerentes),
+  // sin restricción adicional propia.
+  const puedeVerRadar = canAccessMonitorVuelos(currentUser);
+  const puedeVerCartas = canAccessSistemaCartas(currentUser);
+
+  // Si el usuario cae en una pestaña a la que no tiene acceso (p. ej. un Directivo
+  // cuyo activeTab por defecto es 'radar' pero de algún modo llega a 'cartas'),
+  // lo movemos a la primera pestaña que sí puede ver.
+  useEffect(() => {
+    if (activeTab === 'radar' && !puedeVerRadar) {
+      setActiveTab(puedeVerCartas ? 'cartas' : 'logistica');
+    } else if (activeTab === 'cartas' && !puedeVerCartas) {
+      setActiveTab(puedeVerRadar ? 'radar' : 'logistica');
+    }
+  }, [activeTab, puedeVerRadar, puedeVerCartas]);
+
+  const fetchTrackerData = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/vuelos_tracker.json?t=' + Date.now());
+      if (res.ok) {
+        const data = await res.json();
+        setTrackerData(data);
+        showToast('Radar de vuelos sincronizado en tiempo real', 'success');
+      } else {
+        const res2 = await fetch('/cartas/vuelos_tracker.json?t=' + Date.now());
+        if (res2.ok) {
+          const data2 = await res2.json();
+          setTrackerData(data2);
+          showToast('Radar de vuelos sincronizado', 'success');
+        }
+      }
+    } catch (e) {
+      console.warn('Usando datos de respaldo para tracker de vuelos:', e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTrackerData();
+  }, []);
+
+  const copyToClipboard = (text, label = 'Información') => {
+    navigator.clipboard.writeText(text);
+    showToast(`${label} copiado al portapapeles`, 'success');
+  };
+
+  const copyDriverBriefing = (flight) => {
+    const text = `✈️ *CREAR PODER SIN LÍMITES - BRIEFING DE RECOJO DE ENTRENADOR*\n\n` +
+      `📌 *Vuelo:* ${flight.flightNumber} (${flight.airline})\n` +
+      `👤 *Pasajero(s):* ${flight.passengers.join(', ')}\n` +
+      `🛫 *Ruta:* ${flight.route.originCity} (${flight.route.origin}) ➔ ${flight.route.destinationCity} (${flight.route.destination})\n` +
+      `⏰ *Llegada Estimada:* ${new Date(flight.schedule.estimatedArrival).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}\n` +
+      `📍 *Punto de Recojo:* ${flight.logistics.pickupLocation}\n` +
+      `🏨 *Destino:* ${flight.logistics.destination}\n` +
+      `🚗 *Hora Chofer:* ${flight.logistics.driverPickupEstimated}\n` +
+      `ℹ️ *Nota:* ${flight.logistics.driverNote}\n` +
+      `🔗 *Radar en vivo:* ${flight.radarUrl}`;
+    copyToClipboard(text, 'Briefing de WhatsApp para chofer');
+  };
+
+  const flightsList = Object.values(trackerData?.flights || {});
+
+  const filteredFlights = flightsList.filter(f => {
+    const ahora = new Date();
+    const fechaLlegada = new Date(f.schedule?.estimatedArrival || f.schedule?.scheduledArrival);
+    const esPasado = fechaLlegada < ahora;
+    if (flightStatusFilter === 'activos' && esPasado) return false;
+    if (flightStatusFilter === 'pasados' && !esPasado) return false;
+
+    if (routeFilter === 'UIO-LIM' && !(f.route.origin === 'UIO' && f.route.destination === 'LIM')) return false;
+    if (routeFilter === 'LIM-UIO' && !(f.route.origin === 'LIM' && f.route.destination === 'UIO')) return false;
+    if (routeFilter === 'LIM-GYE' && !(f.route.origin === 'LIM' && f.route.destination === 'GYE')) return false;
+    if (routeFilter === 'BOG-LIM' && !(f.route.origin === 'BOG' && f.route.destination === 'LIM')) return false;
+
+    if (searchFilter.trim()) {
+      const q = searchFilter.toLowerCase().trim();
+      const matchPax = f.passengers?.some(p => p.toLowerCase().includes(q));
+      const matchFlight = f.flightNumber?.toLowerCase().includes(q) || f.flightCode?.toLowerCase().includes(q);
+      const matchCity = f.route?.originCity?.toLowerCase().includes(q) || f.route?.destinationCity?.toLowerCase().includes(q) || f.route?.origin?.toLowerCase().includes(q) || f.route?.destination?.toLowerCase().includes(q);
+      const matchAirline = f.airline?.toLowerCase().includes(q);
+      const matchPnr = f.reservationCode?.toLowerCase().includes(q);
+      return matchPax || matchFlight || matchCity || matchAirline || matchPnr;
+    }
+    return true;
+  });
+
+  const filteredLetters = OFICIAL_LETTERS.filter(l => {
+    const matchSearch = l.entrenador.toLowerCase().includes(searchFilter.toLowerCase()) ||
+      l.equipo.toLowerCase().includes(searchFilter.toLowerCase()) ||
+      l.sede.toLowerCase().includes(searchFilter.toLowerCase());
+    return matchSearch;
+  });
+
+  return (
+    <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '1.5rem', minHeight: '90vh' }}>
+      
+      {/* HEADER DE PÁGINA */}
+      <div style={{ marginBottom: '2rem' }}>
+        <button
+          onClick={() => navigate('/home')}
+          className="btn-secondary"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            padding: '0.4rem 0.8rem',
+            fontSize: '0.85rem',
+            marginBottom: '1rem',
+            cursor: 'pointer'
+          }}
+        >
+          <ArrowLeft size={16} /> Volver al Inicio
+        </button>
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.3rem' }}>
+              <span style={{
+                background: 'rgba(255, 183, 3, 0.15)',
+                color: 'var(--crear-gold)',
+                padding: '4px 12px',
+                borderRadius: '20px',
+                fontSize: '0.8rem',
+                fontWeight: 'bold',
+                letterSpacing: '0.05em'
+              }}>
+                CREAR PODER SIN LÍMITES
+              </span>
+              <span style={{
+                background: 'rgba(56, 189, 248, 0.15)',
+                color: '#38bdf8',
+                padding: '4px 12px',
+                borderRadius: '20px',
+                fontSize: '0.8rem',
+                fontWeight: 'bold'
+              }}>
+                LOGÍSTICA DE ENTRENADORES 2026
+              </span>
+            </div>
+            <h1 style={{ fontSize: '2.4rem', margin: '0.2rem 0', fontWeight: 800, color: '#fff' }}>
+              ✈️ Monitor de Vuelos y Cartas Oficiales
+            </h1>
+            <p className="text-muted" style={{ margin: 0, fontSize: '1rem' }}>
+              Centro operativo de arribos de conferencistas internacionales, logística de transporte y repositorio oficial de cartas de facilitación.
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <button
+              onClick={fetchTrackerData}
+              disabled={loading}
+              className="btn-secondary"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                padding: '0.6rem 1rem',
+                fontSize: '0.85rem',
+                cursor: loading ? 'not-allowed' : 'pointer'
+              }}
+            >
+              <RefreshCw size={15} className={loading ? 'animate-spin' : ''} />
+              {loading ? 'Actualizando...' : 'Actualizar Radar'}
+            </button>
+          </div>
+        </div>
+
+        {/* NAVEGACIÓN POR PESTAÑAS */}
+        <div style={{
+          display: 'flex',
+          gap: '10px',
+          background: 'rgba(255, 255, 255, 0.03)',
+          padding: '6px',
+          borderRadius: '16px',
+          border: '1px solid rgba(255,255,255,0.08)',
+          marginTop: '1.5rem'
+        }}>
+          {puedeVerRadar && (
+            <button
+              onClick={() => setActiveTab('radar')}
+              style={{
+                flex: 1,
+                padding: '12px 18px',
+                borderRadius: '12px',
+                border: 'none',
+                background: activeTab === 'radar' ? 'linear-gradient(135deg, rgba(56,189,248,0.2) 0%, rgba(56,189,248,0.05) 100%)' : 'transparent',
+                color: activeTab === 'radar' ? '#38bdf8' : 'var(--text-muted)',
+                fontWeight: 700,
+                fontSize: '0.95rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                borderBottom: activeTab === 'radar' ? '2px solid #38bdf8' : '2px solid transparent',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <Plane size={18} />
+              <span>Radar de Vuelos en Vivo</span>
+              <span style={{
+                background: '#38bdf8',
+                color: '#000',
+                padding: '2px 8px',
+                borderRadius: '10px',
+                fontSize: '0.75rem',
+                fontWeight: 800
+              }}>
+                {flightsList.length}
+              </span>
+            </button>
+          )}
+
+          {puedeVerCartas && (
+            <button
+              onClick={() => setActiveTab('cartas')}
+              style={{
+                flex: 1,
+                padding: '12px 18px',
+                borderRadius: '12px',
+                border: 'none',
+                background: activeTab === 'cartas' ? 'linear-gradient(135deg, rgba(255,183,3,0.2) 0%, rgba(255,183,3,0.05) 100%)' : 'transparent',
+                color: activeTab === 'cartas' ? 'var(--crear-gold)' : 'var(--text-muted)',
+                fontWeight: 700,
+                fontSize: '0.95rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                borderBottom: activeTab === 'cartas' ? '2px solid var(--crear-gold)' : '2px solid transparent',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <FileText size={18} />
+              <span>Repositorio de Cartas y Migraciones</span>
+              <span style={{
+                background: 'var(--crear-gold)',
+                color: '#000',
+                padding: '2px 8px',
+                borderRadius: '10px',
+                fontSize: '0.75rem',
+                fontWeight: 800
+              }}>
+                {OFICIAL_LETTERS.length}
+              </span>
+            </button>
+          )}
+
+          <button
+            onClick={() => setActiveTab('logistica')}
+            style={{
+              flex: 1,
+              padding: '12px 18px',
+              borderRadius: '12px',
+              border: 'none',
+              background: activeTab === 'logistica' ? 'linear-gradient(135deg, rgba(16,185,129,0.2) 0%, rgba(16,185,129,0.05) 100%)' : 'transparent',
+              color: activeTab === 'logistica' ? '#34d399' : 'var(--text-muted)',
+              fontWeight: 700,
+              fontSize: '0.95rem',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              borderBottom: activeTab === 'logistica' ? '2px solid #34d399' : '2px solid transparent',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <Car size={18} />
+            <span>Hotel & Choferes de Sede</span>
+          </button>
+        </div>
+      </div>
+
+      {/* ========================================================= */}
+      {/* PESTAÑA 1: RADAR DE VUELOS EN TIEMPO REAL                 */}
+      {/* ========================================================= */}
+      {activeTab === 'radar' && puedeVerRadar && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          
+          {/* Barra de Filtros y Búsqueda de Vuelos */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+              
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginRight: '2rem' }}>
+                {[
+                  { id: 'activos', label: '✈️ Activos / Próximos' },
+                  { id: 'pasados', label: '🛬 Pasados' },
+                  { id: 'todos', label: '🗄️ Todos' }
+                ].map(t => (
+                  <button
+                    key={t.id}
+                    onClick={() => setFlightStatusFilter(t.id)}
+                    style={{
+                      padding: '6px 14px',
+                      borderRadius: '8px',
+                      border: '1px solid',
+                      borderColor: flightStatusFilter === t.id ? '#10b981' : 'rgba(255,255,255,0.1)',
+                      background: flightStatusFilter === t.id ? 'rgba(16,185,129,0.2)' : 'rgba(0,0,0,0.3)',
+                      color: flightStatusFilter === t.id ? '#10b981' : 'var(--text-muted)',
+                      fontSize: '0.82rem',
+                      fontWeight: 600,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                {[
+                  { id: 'ALL', label: `Todos los Vuelos (${flightsList.length})` },
+                  { id: 'UIO-LIM', label: 'Quito ➔ Lima (UIO → LIM)' },
+                  { id: 'LIM-UIO', label: 'Lima ➔ Quito (LIM → UIO)' },
+                  { id: 'LIM-GYE', label: 'Lima ➔ Guayaquil (LIM → GYE)' },
+                  { id: 'BOG-LIM', label: 'Bogotá ➔ Lima (BOG → LIM)' }
+                ].map(r => (
+                  <button
+                    key={r.id}
+                    onClick={() => setRouteFilter(r.id)}
+                    style={{
+                      padding: '6px 14px',
+                      borderRadius: '8px',
+                      border: '1px solid',
+                      borderColor: routeFilter === r.id ? '#38bdf8' : 'rgba(255,255,255,0.1)',
+                      background: routeFilter === r.id ? 'rgba(56,189,248,0.2)' : 'rgba(0,0,0,0.3)',
+                      color: routeFilter === r.id ? '#38bdf8' : 'var(--text-muted)',
+                      fontSize: '0.82rem',
+                      fontWeight: 600,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {r.label}
+                  </button>
+                ))}
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{
+                  background: 'rgba(52, 211, 153, 0.15)',
+                  color: '#34d399',
+                  padding: '3px 10px',
+                  borderRadius: '12px',
+                  fontSize: '0.75rem',
+                  fontWeight: 'bold',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px'
+                }}>
+                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#34d399', display: 'inline-block' }}></span>
+                  Drive Sync (7x/día)
+                </span>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                  Sincronizado: <span style={{ color: '#fff' }}>{new Date(trackerData?.updatedAt || Date.now()).toLocaleTimeString()}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Input de Búsqueda de Pasajero/Vuelo */}
+            <div style={{ position: 'relative', width: '100%' }}>
+              <Search size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+              <input
+                type="text"
+                value={searchFilter}
+                onChange={(e) => setSearchFilter(e.target.value)}
+                placeholder="Buscar por entrenador (ej. Elmer Idrobo, María Patiño, Fernando Aragón, Diego Bravo, Carlos Brunis...), vuelo o PNR..."
+                style={{
+                  width: '100%',
+                  padding: '10px 16px 10px 42px',
+                  background: 'rgba(255,255,255,0.04)',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  borderRadius: '10px',
+                  color: '#fff',
+                  fontSize: '0.9rem',
+                  outline: 'none',
+                  boxSizing: 'border-box'
+                }}
+              />
+              {searchFilter && (
+                <button
+                  onClick={() => setSearchFilter('')}
+                  style={{
+                    position: 'absolute',
+                    right: '12px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'var(--text-muted)',
+                    cursor: 'pointer',
+                    fontSize: '0.85rem'
+                  }}
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Tarjetas de Vuelos */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '1.5rem' }}>
+            {filteredFlights.map((flight, idx) => {
+              const depTime = new Date(flight.schedule.scheduledDeparture).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+              const arrTime = new Date(flight.schedule.estimatedArrival).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+              return (
+                <div
+                  key={idx}
+                  className="glass-panel"
+                  style={{
+                    padding: '1.8rem',
+                    borderTop: '4px solid #38bdf8',
+                    background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.05) 0%, rgba(7, 13, 31, 0.95) 100%)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '1.2rem',
+                    position: 'relative'
+                  }}
+                >
+                  {/* Encabezado Vuelo */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.2rem' }}>
+                        <span style={{ fontSize: '1.4rem', fontWeight: 900, color: '#fff' }}>
+                          {flight.flightNumber}
+                        </span>
+                        <span style={{
+                          background: 'rgba(255,255,255,0.1)',
+                          padding: '2px 8px',
+                          borderRadius: '6px',
+                          fontSize: '0.75rem',
+                          color: '#e2e8f0',
+                          fontWeight: 700
+                        }}>
+                          {flight.airline}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                        Reserva: <strong style={{ color: 'var(--crear-gold)' }}>{flight.reservationCode}</strong> • Callsign: {flight.callsign}
+                      </div>
+                    </div>
+
+                    <span style={{
+                      background: flight.status === 'ON_TIME' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                      color: flight.status === 'ON_TIME' ? '#34d399' : '#f87171',
+                      border: `1px solid ${flight.status === 'ON_TIME' ? 'rgba(16, 185, 129, 0.4)' : 'rgba(239, 68, 68, 0.4)'}`,
+                      padding: '4px 10px',
+                      borderRadius: '12px',
+                      fontSize: '0.75rem',
+                      fontWeight: 800
+                    }}>
+                      ● {flight.statusLabel}
+                    </span>
+                  </div>
+
+                  {/* Pasajeros / Entrenadores */}
+                  <div style={{
+                    background: 'rgba(0,0,0,0.3)',
+                    padding: '0.8rem 1rem',
+                    borderRadius: '10px',
+                    border: '1px solid rgba(255,255,255,0.06)'
+                  }}>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>
+                      Entrenador(es) a Bordo:
+                    </div>
+                    {flight.passengers.map((p, pIdx) => (
+                      <div key={pIdx} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.95rem', fontWeight: 700, color: '#fff' }}>
+                        <User size={15} color="var(--crear-gold)" />
+                        <span>{p}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Ruta y Tiempos */}
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '1rem',
+                    background: 'rgba(255,255,255,0.02)',
+                    borderRadius: '12px',
+                    border: '1px solid rgba(255,255,255,0.06)'
+                  }}>
+                    <div style={{ textAlign: 'center', flex: 1 }}>
+                      <div style={{ fontSize: '1.6rem', fontWeight: 900, color: '#38bdf8' }}>{flight.route.origin}</div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{flight.route.originCity}</div>
+                      <div style={{ fontSize: '0.85rem', fontWeight: 700, marginTop: '4px', color: '#fff' }}>{depTime}</div>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, padding: '0 10px' }}>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{flight.route.flightDuration}</span>
+                      <div style={{
+                        width: '100%',
+                        height: '2px',
+                        background: 'linear-gradient(90deg, #38bdf8 0%, var(--crear-gold) 100%)',
+                        position: 'relative',
+                        margin: '6px 0'
+                      }}>
+                        <Plane size={14} style={{ position: 'absolute', top: '-6px', left: '45%', color: 'var(--crear-gold)' }} />
+                      </div>
+                      <span style={{ fontSize: '0.7rem', color: flight.route.isDirect ? '#10b981' : '#fbbf24', fontWeight: 600 }}>
+                        {flight.route.isDirect ? 'Directo' : flight.route.stopover || '1 Escala'}
+                      </span>
+                    </div>
+
+                    <div style={{ textAlign: 'center', flex: 1 }}>
+                      <div style={{ fontSize: '1.6rem', fontWeight: 900, color: 'var(--crear-gold)' }}>{flight.route.destination}</div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{flight.route.destinationCity}</div>
+                      <div style={{ fontSize: '0.85rem', fontWeight: 700, marginTop: '4px', color: '#fff' }}>{arrTime}</div>
+                    </div>
+                  </div>
+
+                  {/* Información Logística de Chofer */}
+                  <div style={{ fontSize: '0.82rem', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#e2e8f0' }}>
+                      <MapPin size={14} color="#38bdf8" />
+                      <span><strong>Recojo:</strong> {flight.logistics.pickupLocation}</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#e2e8f0' }}>
+                      <Building size={14} color="var(--crear-gold)" />
+                      <span><strong>Destino:</strong> {flight.logistics.destination}</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#34d399' }}>
+                      <Clock size={14} />
+                      <span><strong>Hora Estimada Chofer:</strong> {flight.logistics.driverPickupEstimated}</span>
+                    </div>
+                  </div>
+
+                  {/* Acciones y Enlaces */}
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '8px',
+                    borderTop: '1px solid rgba(255,255,255,0.08)',
+                    paddingTop: '1rem'
+                  }}>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <a
+                        href={flight.radarUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn-secondary"
+                        style={{
+                          flex: 1,
+                          fontSize: '0.78rem',
+                          padding: '8px 12px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px',
+                          textDecoration: 'none',
+                          color: '#38bdf8',
+                          borderColor: 'rgba(56, 189, 248, 0.4)'
+                        }}
+                      >
+                        <Compass size={14} />
+                        FlightRadar24
+                      </a>
+
+                      <button
+                        onClick={() => copyDriverBriefing(flight)}
+                        className="btn-secondary"
+                        style={{
+                          flex: 1,
+                          fontSize: '0.78rem',
+                          padding: '8px 12px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px'
+                        }}
+                      >
+                        <Share2 size={14} />
+                        WhatsApp Chofer
+                      </button>
+                    </div>
+
+                    {/* Cartas relacionadas directas */}
+                    {flight.relatedLetters && flight.relatedLetters.length > 0 && (
+                      <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '4px' }}>
+                        {flight.relatedLetters.map((rl, rlIdx) => (
+                          <button
+                            key={rlIdx}
+                            onClick={() => setPreviewLetter(rl)}
+                            style={{
+                              background: 'rgba(255, 183, 3, 0.12)',
+                              color: 'var(--crear-gold)',
+                              border: '1px solid rgba(255, 183, 3, 0.3)',
+                              borderRadius: '6px',
+                              padding: '5px 10px',
+                              fontSize: '0.75rem',
+                              fontWeight: 600,
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '4px'
+                            }}
+                          >
+                            <FileText size={12} />
+                            {rl.name}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================= */}
+      {/* PESTAÑA 2: REPOSITORIO DE CARTAS Y MIGRACIONES            */}
+      {/* ========================================================= */}
+      {activeTab === 'cartas' && puedeVerCartas && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          
+          {/* Buscador de Cartas */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+            <div style={{ position: 'relative', minWidth: '300px', flex: 1, maxWidth: '500px' }}>
+              <Search size={16} style={{ position: 'absolute', left: '12px', top: '12px', color: 'var(--text-muted)' }} />
+              <input
+                type="text"
+                placeholder="Buscar por entrenador, equipo o documento..."
+                value={searchFilter}
+                onChange={(e) => setSearchFilter(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px 10px 36px',
+                  borderRadius: '10px',
+                  background: 'rgba(255,255,255,0.04)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  color: '#fff',
+                  fontSize: '0.9rem'
+                }}
+              />
+            </div>
+
+            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+              Mostrando <strong style={{ color: 'var(--crear-gold)' }}>{filteredLetters.length}</strong> documentos oficiales
+            </div>
+          </div>
+
+          {/* Grid de Cartas */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '1.2rem' }}>
+            {filteredLetters.map(letter => (
+              <div
+                key={letter.id}
+                className="glass-panel"
+                style={{
+                  padding: '1.5rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  gap: '1rem',
+                  borderLeft: '4px solid var(--crear-gold)',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px', marginBottom: '0.5rem' }}>
+                    <span style={{
+                      background: 'rgba(255, 183, 3, 0.15)',
+                      color: 'var(--crear-gold)',
+                      padding: '2px 8px',
+                      borderRadius: '6px',
+                      fontSize: '0.75rem',
+                      fontWeight: 700
+                    }}>
+                      {letter.badge}
+                    </span>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                      {letter.fecha}
+                    </span>
+                  </div>
+
+                  <h3 style={{ margin: '0.2rem 0', fontSize: '1.2rem', color: '#fff' }}>
+                    {letter.entrenador}
+                  </h3>
+
+                  <div style={{ fontSize: '0.85rem', color: '#38bdf8', fontWeight: 600, marginBottom: '0.5rem' }}>
+                    {letter.rol} • <span style={{ color: 'var(--text-muted)' }}>{letter.equipo}</span>
+                  </div>
+
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0, lineHeight: '1.5' }}>
+                    {letter.descripcion}
+                  </p>
+                </div>
+
+                <div style={{
+                  display: 'flex',
+                  gap: '8px',
+                  borderTop: '1px solid rgba(255,255,255,0.06)',
+                  paddingTop: '0.8rem'
+                }}>
+                  <button
+                    onClick={() => setPreviewLetter(letter)}
+                    className="btn-primary"
+                    style={{
+                      flex: 1,
+                      fontSize: '0.8rem',
+                      padding: '8px 14px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px'
+                    }}
+                  >
+                    <FileText size={14} />
+                    Ver Previa
+                  </button>
+
+                  <a
+                    href={letter.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-secondary"
+                    style={{
+                      fontSize: '0.8rem',
+                      padding: '8px 12px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '4px',
+                      textDecoration: 'none'
+                    }}
+                  >
+                    <ExternalLink size={14} />
+                  </a>
+
+                  <button
+                    onClick={() => copyToClipboard(window.location.origin + letter.url, 'Enlace de la carta')}
+                    className="btn-secondary"
+                    style={{
+                      fontSize: '0.8rem',
+                      padding: '8px 12px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                    title="Copiar enlace"
+                  >
+                    <Copy size={14} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================= */}
+      {/* PESTAÑA 3: LOGÍSTICA DE HOTEL Y CHOFERES                  */}
+      {/* ========================================================= */}
+      {activeTab === 'logistica' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          
+          {/* Tarjeta del Hotel Oficial */}
+          <div className="glass-panel" style={{ padding: '2rem', borderLeft: '4px solid #10b981' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.2rem' }}>
+              <div>
+                <span style={{
+                  background: 'rgba(16, 185, 129, 0.15)',
+                  color: '#34d399',
+                  padding: '4px 10px',
+                  borderRadius: '12px',
+                  fontSize: '0.75rem',
+                  fontWeight: 800
+                }}>
+                  SEDE OFICIAL DE HOSPEDAJE 2026
+                </span>
+                <h2 style={{ fontSize: '1.8rem', margin: '0.4rem 0 0', color: '#fff' }}>
+                  Hotel Jose Antonio Deluxe
+                </h2>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '4px' }}>
+                  <MapPin size={16} color="var(--crear-gold)" />
+                  <span>Calle Bellavista 133, Miraflores, Lima 15074, Perú</span>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <a
+                  href="https://maps.google.com/?q=Hotel+Jose+Antonio+Deluxe+Miraflores+Lima"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-secondary"
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', textDecoration: 'none' }}
+                >
+                  <MapPin size={15} /> Ver en Google Maps
+                </a>
+              </div>
+            </div>
+
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+              gap: '1rem',
+              background: 'rgba(0,0,0,0.3)',
+              padding: '1.2rem',
+              borderRadius: '12px',
+              border: '1px solid rgba(255,255,255,0.06)'
+            }}>
+              <div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Check-in / Check-out</div>
+                <div style={{ fontSize: '1rem', fontWeight: 700, color: '#fff', marginTop: '2px' }}>Check-in: 15:00 | Check-out: 12:00</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>*Coordinado Early Check-in según arribo de vuelo</div>
+              </div>
+
+              <div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Teléfono Recepción</div>
+                <div style={{ fontSize: '1rem', fontWeight: 700, color: '#fff', marginTop: '2px' }}>(+51 1) 712-4400</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Atención 24 Horas</div>
+              </div>
+
+              <div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Servicios Incluidos</div>
+                <div style={{ fontSize: '1rem', fontWeight: 700, color: '#34d399', marginTop: '2px' }}>Desayuno Buffet & WiFi Alta Velocidad</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Room Service disponible</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Protocolo de Operación Chofer y Recojo */}
+          <div className="glass-panel" style={{ padding: '2rem' }}>
+            <h3 style={{ fontSize: '1.4rem', margin: '0 0 1rem', color: '#fff' }}>
+              Protocolo Oficial de Traslado y Bienvenida
+            </h3>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
+              <div style={{ background: 'rgba(255,255,255,0.02)', padding: '1.2rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--crear-gold)', fontWeight: 700, marginBottom: '0.5rem' }}>
+                  <CheckCircle size={18} />
+                  <span>1. Contacto Previo (1h antes)</span>
+                </div>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0, lineHeight: '1.5' }}>
+                  El chofer asignado contacta al entrenador vía WhatsApp indicando modelo de vehículo, color, número de placa oficial y foto del conductor.
+                </p>
+              </div>
+
+              <div style={{ background: 'rgba(255,255,255,0.02)', padding: '1.2rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#38bdf8', fontWeight: 700, marginBottom: '0.5rem' }}>
+                  <MapPin size={18} />
+                  <span>2. Punto de Espera en Aeropuerto</span>
+                </div>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0, lineHeight: '1.5' }}>
+                  Ubicación exacta: <strong>Puerta de Llegadas Internacionales</strong> del Aeropuerto Internacional Jorge Chávez con cartel oficial con la marca <strong>CREAR PODER SIN LÍMITES</strong>.
+                </p>
+              </div>
+
+              <div style={{ background: 'rgba(255,255,255,0.02)', padding: '1.2rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#34d399', fontWeight: 700, marginBottom: '0.5rem' }}>
+                  <Building size={18} />
+                  <span>3. Traslado y Check-in</span>
+                </div>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0, lineHeight: '1.5' }}>
+                  Traslado directo hacia el Hotel Jose Antonio Deluxe en Miraflores. El equipo de Gerencia de Sede confirma arribo y entrega de llaves.
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      )}
+
+      {/* ========================================================= */}
+      {/* MODAL DE PREVISUALIZACIÓN DE CARTAS                       */}
+      {/* ========================================================= */}
+      {previewLetter && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.85)',
+          backdropFilter: 'blur(8px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000,
+          padding: '1rem'
+        }}>
+          <div className="glass-panel" style={{
+            width: '100%',
+            maxWidth: '1000px',
+            height: '92vh',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden',
+            border: '1px solid rgba(255,183,3,0.4)',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.8)'
+          }}>
+            {/* Header Modal */}
+            <div style={{
+              padding: '1rem 1.5rem',
+              borderBottom: '1px solid rgba(255,255,255,0.1)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              background: 'rgba(0,0,0,0.5)'
+            }}>
+              <div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--crear-gold)', fontWeight: 800, textTransform: 'uppercase' }}>
+                  DOCUMENTO OFICIAL CPSL
+                </div>
+                <h3 style={{ margin: '0.2rem 0 0', fontSize: '1.2rem', color: '#fff' }}>
+                  {previewLetter.entrenador || previewLetter.name}
+                </h3>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <a
+                  href={previewLetter.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-secondary"
+                  style={{ fontSize: '0.8rem', padding: '6px 12px', display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none' }}
+                >
+                  <ExternalLink size={14} /> Abrir en Pestaña Nueva
+                </a>
+                <button
+                  onClick={() => setPreviewLetter(null)}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'var(--text-muted)',
+                    cursor: 'pointer',
+                    padding: '4px'
+                  }}
+                >
+                  <X size={22} />
+                </button>
+              </div>
+            </div>
+
+            {/* Iframe View */}
+            <div style={{ flex: 1, background: '#fff' }}>
+              <iframe
+                src={previewLetter.url}
+                title={previewLetter.entrenador || previewLetter.name}
+                style={{ width: '100%', height: '100%', border: 'none' }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+    </div>
+  );
+}
+
+```
+
+---
+
+## Archivo: Claude outputs\permissions.js
+
+```js
+// Configuración centralizada de permisos y roles administrativos
+// Este archivo es la ÚNICA fuente de verdad para emails con privilegios elevados.
+// Cualquier cambio de SuperAdmin se hace AQUÍ, no disperso en el código.
+
+/**
+ * Emails con privilegios de Super Administrador.
+ * Estos usuarios tienen acceso total: Centro de Mando, reinicio de ciclos,
+ * gestión de metas, y visibilidad global multi-sede.
+ */
+export const SUPER_ADMIN_EMAILS = [
+  'jose.sanchez@crearpsl.net',   // José Sánchez — SuperAdmin + Gerente Lima
+  'armando.pilacuan@gmail.com',  // Armando Pilacuán — SuperAdmin
+  'paul.sosa@crearpsl.net'       // Paul Sosa — SuperAdmin
+];
+
+/**
+ * Roles que otorgan privilegios de Dirección (equivalente a SuperAdmin por rol)
+ */
+export const DIRECCION_ROLES = ['direccion', 'cfo', 'cco', 'ceo'];
+
+/**
+ * Roles que otorgan privilegios de Gerencia
+ */
+export const GERENCIA_ROLES = ['gerente', ...DIRECCION_ROLES];
+
+/**
+ * Verifica si un email tiene privilegios de SuperAdmin
+ * @param {string} email 
+ * @returns {boolean}
+ */
+export const isSuperAdminEmail = (email) => {
+  if (!email) return false;
+  return SUPER_ADMIN_EMAILS.includes(email.trim().toLowerCase());
+};
+
+/**
+ * Verifica si el usuario actual tiene permisos para simular vistas de otros colaboradores.
+ * REGLA ESTRICTA DE SEGURIDAD:
+ * ÚNICA Y EXCLUSIVAMENTE los Super Administradores pueden simular usuarios.
+ * @param {Object} currentUser
+ * @param {Object} originalAdminUser
+ * @returns {boolean}
+ */
+export const canSimulate = (currentUser, originalAdminUser = null) => {
+  if (originalAdminUser) {
+    return Boolean(originalAdminUser.isSuperAdmin || isSuperAdminEmail(originalAdminUser.email) || DIRECCION_ROLES.includes(originalAdminUser.appRole));
+  }
+  if (!currentUser) return false;
+  return Boolean(currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email) || DIRECCION_ROLES.includes(currentUser.appRole));
+};
+
+/**
+ * Verifica si un rol normalizado tiene privilegios de Dirección
+ * @param {string} role - Rol normalizado
+ * @returns {boolean}
+ */
+export const isDireccionRole = (role) => {
+  return DIRECCION_ROLES.includes(role);
+};
+
+/**
+ * Verifica si un rol normalizado tiene privilegios de Gerencia
+ * @param {string} role - Rol normalizado  
+ * @returns {boolean}
+ */
+export const isGerenciaRole = (role) => {
+  return GERENCIA_ROLES.includes(role);
+};
+
+/**
+ * Verifica si el usuario es Coordinador Global QT (Carlos Brunis)
+ */
+export const isGlobalQTCoordinator = (currentUser) => {
+  if (!currentUser) return false;
+  const email = (currentUser.email || '').toLowerCase();
+  return email.includes('carlos.brunis') || email.includes('brunische66');
+};
+
+/**
+ * Verifica si el usuario tiene privilegios del Quantum Team (QT).
+ * Incluye a Leyla (que tiene rol dual de coord_maestria y qt).
+ */
+export const hasQTPrivileges = (currentUser) => {
+  if (!currentUser) return false;
+  const email = (currentUser.email || '').toLowerCase();
+  const name = (currentUser.name || currentUser.displayName || '').toLowerCase();
+  const r = currentUser.appRole;
+  
+  if (r === 'qt') return true;
+  // Regla especial: Leyla (Lima) es coord_maestria y qt senior
+  if (name.includes('leyla') || email.includes('leyla')) return true;
+  
+  return false;
+};
+
+/**
+ * Verifica si el usuario es un directivo no operativo.
+ * Según feedback: Fer, Paul, Elizabeth, Andres Gomez, Karol pueden ver todo
+ * pero NO deben ver botones operativos (como actualizar sheets).
+ */
+export const isNonOperationalDirector = (currentUser) => {
+  if (!currentUser) return false;
+  const email = (currentUser.email || '').toLowerCase();
+  const name = (currentUser.name || currentUser.displayName || '').toLowerCase();
+  
+  const nonOperationalNames = ['fer', 'paul', 'elizabeth', 'andres', 'karol'];
+  // Si tiene rol de direccion pero coincide con estos nombres/emails
+  if (isDireccionRole(currentUser.appRole) || currentUser.isDireccion) {
+    return nonOperationalNames.some(n => name.includes(n) || email.includes(n));
+  }
+  return false;
+};
+
+/**
+ * Verifica si un usuario puede agregar nuevos managers (Coordinador Maestría, Director Maestría o SuperAdmin)
+ */
+export const canAddManagers = (currentUser) => {
+  if (!currentUser) return false;
+  if (currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email)) return true;
+  const r = currentUser.appRole;
+  return r === 'director_maestria' || r === 'coord_maestria' || r === 'coordinador_mj';
+};
+
+/**
+ * Verifica si un usuario puede asignar o reasignar entrenadores a managers.
+ * REGLA ESTRICTA:
+ * SOLO Fer Aragón, Paul Sosa y los SuperAdministradores (José Sánchez, Armando Pilacuán, etc.)
+ * tienen permiso para editar o reasignar entrenadores. Nadie más.
+ */
+export const canAssignTrainer = (currentUser) => {
+  if (!currentUser) return false;
+  if (currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email)) return true;
+  
+  const email = (currentUser.email || '').trim().toLowerCase();
+
+  // Fer y Paul autorizados exclusivamente
+  const allowedEmails = [
+    'fer.aragon@crearpsl.net',
+    'fer.aragon@crearpsl.com',
+    'paul.sosa@crearpsl.net'
+  ];
+  if (allowedEmails.includes(email)) return true;
+
+  const name = (currentUser.name || currentUser.displayName || '').toLowerCase();
+  if (name.includes('fer aragon') || name.includes('fernando aragon') || name.includes('paul sosa')) {
+    return true;
+  }
+
+  return false;
+};
+
+/**
+ * Verifica si un usuario puede cambiar el estado de un manager (Graduaciones / Deserciones).
+ * REGLA ESTRICTA DE GOBERNANZA (INVIOLABLE):
+ * Restringida ÚNICA Y EXCLUSIVAMENTE a:
+ * 1. Coordinación de Maestría del Juego (coord_maestria / coordinador_mj)
+ * 2. Dirección de Maestría (director_maestria)
+ * 3. Super Administradores
+ * 
+ * Entrenadores, capitanes, coordinadores C1/C2, gerentes de sede y demás roles NO pueden cambiar estados.
+ */
+export const canChangeManagerStatus = (currentUser) => {
+  if (!currentUser) return false;
+  if (currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email)) return true;
+  const r = currentUser.appRole;
+  return r === 'director_maestria' || r === 'coord_maestria' || r === 'coordinador_mj';
+};
+
+export const canViewAllManagers = (currentUser) => {
+  if (!currentUser) return false;
+  if (currentUser.isSuperAdmin || currentUser.isDireccion || isSuperAdminEmail(currentUser.email)) return true;
+  const r = currentUser.appRole;
+  return r === 'director_maestria' || isDireccionRole(r);
+};
+
+/**
+ * Verifica si el usuario puede ver managers de su sede (Coordinadores de Maestría y Gerentes de Sede).
+ */
+export const canViewSede = (currentUser) => {
+  if (!currentUser) return false;
+  const r = currentUser.appRole;
+  // Gerentes, Coordinadores y Capitanes pueden ver su sede
+  return r === 'coord_maestria' || r === 'coordinador_mj' || r === 'coord_c1' || r === 'capitan' || r === 'gerente' || currentUser.isGerente;
+};
+
+/**
+ * Emails de entrenadores que TAMBIÉN tienen un rol corporativo (dual-role).
+ * Estos usuarios pueden alternar entre su vista de entrenador y su rol de oficina.
+ */
+export const DUAL_ROLE_TRAINER_EMAILS = [
+  'jose.sanchez@crearpsl.net',      // SuperAdmin + Gerente Lima + Entrenador
+  'andres.gomez@crearpsl.net',     // Director Maestría del Juego + Entrenador C2 + Entrenador Relación MJ + Entrenador de Llamadas (confirmado por José, 02/09/2026)
+  'fer.aragon@crearpsl.net',        // Corporativo + Entrenador C1
+  'paul.sosa@crearpsl.net',         // Corporativo + Entrenador C2+MJ
+  'leandro.brunis@crearpsl.net',    // Dirección / Corporativo + Entrenador C1 (Leandro Brunis)
+  'carlos.brunis@crearpsl.net',     // Coordinador QT Global + Entrenador (Carlos Brunis)
+  'linid.valencia@crearpsl.net',    // Coordinadora MJ + Entrenadora
+  'brunische66@gmail.com',
+  'daniela.monroy@crearpsl.net',      // Entrenadora de llamadas
+  'erika.gavilanez@crearpsl.net',     // Coordinadora MJ + Entrenadora de llamadas
+  'mauricio.ramirez@crearpsl.net',    // Entrenador de llamadas
+  'emalejodiaz@gmail.com',            // Entrenador de llamadas
+  'anamonroyt@gmail.com',             // Entrenadora de llamadas
+  'dibrafi@gmail.com',                // Entrenador de llamadas
+  'fernandomendozaclavijo22@gmail.com', // Entrenador de llamadas
+  'marylourdespat@gmail.com',         // Entrenadora de llamadas
+  'direccion@bmbgbrokers.com',        // Entrenador de llamadas
+  'milacampuzano21@gmail.com',        // Entrenadora de llamadas
+];
+
+/**
+ * Emails autorizados a ver la pestaña "Liquidación de Entrenadores" (pago de $400
+ * por equipo al llegar a 7 llamadas grupales registradas).
+ * REGLA ESTRICTA (pedido explícito de José, 02/09/2026):
+ * "esta info solo la debo de ver yo y Elizabeth Escobar" — únicamente estos dos
+ * correos, sin excepción automática para otros SuperAdmin ni Dirección.
+ */
+export const LIQUIDACION_ENTRENADORES_EMAILS = [
+  'jose.sanchez@crearpsl.net',        // José Sánchez
+  'contabilidad.global@crearpsl.net', // Elizabeth Escobar (CFO)
+];
+
+export const canViewLiquidacionEntrenadores = (currentUser) => {
+  if (!currentUser) return false;
+  const email = (currentUser.email || '').trim().toLowerCase();
+  return LIQUIDACION_ENTRENADORES_EMAILS.includes(email);
+};
+
+/**
+ * Emails autorizados a ver "Base Maestra CRM (Nodus)" (/crm-maestro): el listado
+ * completo y SIN filtrar de participantes de TODA la plataforma — nombre, DNI,
+ * teléfono, estado C1, coordinadora e IMO enrolador, sin distinción de sede.
+ * REGLA ESTRICTA (pedido explícito de José, 08/09/2026): "esta base solo la puedo
+ * ver yo" — únicamente este correo, sin excepción automática para otros
+ * SuperAdmin ni Dirección (mismo patrón que LIQUIDACION_ENTRENADORES_EMAILS
+ * arriba). NOTA: esto solo controla el acceso en la interfaz (el componente
+ * CRMBaseMaster.jsx). A nivel de base de datos, firestore.rules todavía permite
+ * leer la colección "participants" a CUALQUIER SuperAdmin o Gerente/Dirección
+ * (regla existente: isSuperAdmin() || isGerenteODireccion()) — restringirla ahí
+ * también a solo este correo requeriría tocar firestore.rules, lo cual necesita
+ * tu autorización explícita antes de hacerse.
+ */
+export const CRM_MAESTRO_ACCESS_EMAILS = [
+  'jose.sanchez@crearpsl.net',
+];
+
+export const canViewCRMMaestro = (currentUser) => {
+  if (!currentUser) return false;
+  const email = (currentUser.email || '').trim().toLowerCase();
+  return CRM_MAESTRO_ACCESS_EMAILS.includes(email);
+};
+
+/**
+ * Emails o roles autorizados a ver la pestaña "KPIs de Entrenadores de Llamadas" (Auditoría financiera,
+ * facturación $77,550 USD, graduados, deserción y matriz de 16 llamadas).
+ * REGLA ESTRICTA (pedido explícito de José, 05/09/2026):
+ * "esto solo lo pueden ver directores y yo"
+ * Únicamente SuperAdmin (José Sánchez / Armando Pilacuán / Paul Sosa), el email de José Sánchez
+ * ('jose.sanchez@crearpsl.net'), y roles de Dirección (director_maestria, direccion, ceo, cco, cfo).
+ * NO pueden verlo entrenadores, coordinadores, gerentes de sede, capitanes ni colaboradores operativos.
+ */
+export const canViewKPIsLlamadas = (currentUser) => {
+  if (!currentUser) return false;
+  const email = (currentUser.email || '').trim().toLowerCase();
+
+  // "yo" / SuperAdmin
+  if (email === 'jose.sanchez@crearpsl.net') return true;
+  if (currentUser.isSuperAdmin || isSuperAdminEmail(email)) return true;
+
+  // "directores"
+  if (currentUser.isDireccion) return true;
+  const role = (currentUser.appRole || currentUser.role || '').toLowerCase();
+  const roles = (currentUser.roles || []).map(r => String(r).toLowerCase());
+
+  if (isDireccionRole(role) || role === 'director_maestria') return true;
+  if (roles.some(r => isDireccionRole(r) || r === 'director_maestria')) return true;
+
+  return false;
+};
+
+
+/**
+ * NOTAS DE SEGUIMIENTO (02/09/2026) — feedback que el entrenador de llamadas deja
+ * después de cada llamada (individual o grupal), pedido explícito de José: "puedan
+ * dejar notas individuales, grupales, por llamadas que deben de guardarse en un
+ * historial por persona y jamás perderse y usarse para notar quiebres y
+ * adelantarnos a los quiebres".
+ *
+ * ¿Puede el usuario actual CREAR una nota? Solo controla si se muestra el botón en
+ * la UI — la restricción real de escritura vive en firestore.rules
+ * (request.resource.data.autorEmail == su propio correo).
+ */
+export const canWriteNotaSeguimiento = (currentUser) => {
+  if (!currentUser) return false;
+  const role = currentUser.appRole || currentUser.role;
+  const roles = currentUser.roles || (role ? [role] : []);
+  return role === 'entrenador' || role === 'entrenador_llamadas' ||
+    roles.includes('entrenador') || roles.includes('entrenador_llamadas') ||
+    DUAL_ROLE_TRAINER_EMAILS.includes((currentUser.email || '').toLowerCase());
+};
+
+/**
+ * ¿Puede el usuario actual VER todas las notas de seguimiento (no solo las que
+ * escribió)? Pedido explícito de José: "quien la escribió y los CMJ y los
+ * gerentes y los directores". Debe coincidir con callerRole() (coord_maestria /
+ * director_maestria) + isGerenteODireccion() en firestore.rules — si esto
+ * cambia, actualizar AMBOS lugares.
+ */
+export const canViewAllNotasSeguimiento = (currentUser) => {
+  if (!currentUser) return false;
+  const role = currentUser.appRole || currentUser.role;
+  const roles = currentUser.roles || (role ? [role] : []);
+  return role === 'coord_maestria' || role === 'director_maestria' ||
+    roles.includes('coord_maestria') || roles.includes('director_maestria') ||
+    isGerenciaRole(role) || roles.some(isGerenciaRole);
+};
+
+/**
+ * ¿Puede el usuario actual RESPONDER a una nota de seguimiento? Pedido explícito
+ * de José: "los CMJ pueden responder a estas notas (opcional)" — solo CMJ, no
+ * toda la gerencia. Debe coincidir con callerRole() en firestore.rules.
+ */
+export const canReplyNotaSeguimiento = (currentUser) => {
+  if (!currentUser) return false;
+  const role = currentUser.appRole || currentUser.role;
+  const roles = currentUser.roles || (role ? [role] : []);
+  return role === 'coord_maestria' || role === 'director_maestria' ||
+    roles.includes('coord_maestria') || roles.includes('director_maestria');
+};
+
+/**
+ * Devuelve la lista de roles a los que el usuario actual puede asignar tareas,
+ * basado en la jerarquía del organigrama de CREAR PSL.
+ * @param {Object} currentUser - Objeto del usuario logueado
+ * @returns {Array<{id: string, name: string}>}
+ */
+export const getAssignableRoles = (currentUser) => {
+  const normRole = currentUser?.appRole;
+  
+  if (!normRole) return [];
+
+  // Todos los roles corporativos / directivos
+  const directivos = [
+    { id: 'direccion', name: 'Dirección Global' },
+    { id: 'cfo', name: 'CFO' },
+    { id: 'ceo', name: 'CEO' },
+    { id: 'cco', name: 'CCO' }
+  ];
+
+  const baseManagers = [
+    { id: 'gerente', name: 'Gerente de Sede' },
+    { id: 'director_maestria', name: 'Director de Maestría' },
+    { id: 'coord_maestria', name: 'Coordinador Maestría' },
+    { id: 'coord_c1', name: 'Coordinador C1/C2' },
+    { id: 'capitan', name: 'Capitán' },
+    { id: 'manager', name: 'Manager' },
+    { id: 'qt', name: 'Quantum Team (QT)' },
+    { id: 'coordinador', name: 'Coordinador Administrativo' },
+    { id: 'finanzas', name: 'Finanzas' },
+    { id: 'talento_humano', name: 'Talento Humano' },
+    { id: 'admin', name: 'Equipo Administrativo' }
+  ];
+
+  if (currentUser.isSuperAdmin || isDireccionRole(normRole) || normRole === 'director_maestria') {
+    return [
+      ...directivos,
+      ...baseManagers
+    ];
+  }
+
+  if (normRole === 'gerente') {
+    return [
+      { id: 'gerente', name: 'Gerente (O a otros Gerentes)' },
+      { id: 'coord_c1', name: 'Coordinador C1/C2' },
+      { id: 'coord_maestria', name: 'Coordinador Maestría' },
+      { id: 'capitan', name: 'Capitán' },
+      { id: 'qt', name: 'Quantum Team (QT)' },
+      { id: 'manager', name: 'Manager' },
+      { id: 'admin', name: 'Equipo Administrativo' }
+    ];
+  }
+
+  if (normRole === 'coord_c1') {
+    return [
+      { id: 'coord_c1', name: 'Coordinador C1/C2 (A mí mismo)' },
+      { id: 'capitan', name: 'Capitán' },
+      { id: 'qt', name: 'Quantum Team (QT)' }
+    ];
+  }
+
+  if (normRole === 'coord_maestria') {
+    return [
+      { id: 'coord_maestria', name: 'Coordinador Maestría (A mí mismo)' },
+      { id: 'manager', name: 'Manager' }
+    ];
+  }
+
+  if (normRole === 'qt') {
+    return [
+      { id: 'qt', name: 'Quantum Team (A mí mismo)' },
+      { id: 'coord_c1', name: 'Coordinador C1/C2' }
+    ];
+  }
+
+  // Base roles: Capitán, Manager, etc.
+  return [
+    { id: normRole, name: 'A mí mismo' }
+  ];
+};
+
+/**
+ * MATRIZ OFICIAL DE PERMISOS Y VISTAS POR ROL (CREAR PODER SIN LÍMITES)
+ * Fuente: Matriz Oficial de Acceso y Visibilidad Causa OS (roles Causa OS en Google Sheets)
+ * ID: 1gt7kJblS5sULWDAZ_Gg1aQMIJTmkOIK2snaM-nnNdfI
+ */
+export const OFFICIAL_PERMISSION_MATRIX = {
+  'causa_os': {
+    directivos: 'GLOBAL',
+    gerente: 'SEDE',
+    coord_c1: 'DASHBOARD',
+    coord_maestria: 'DASHBOARD',
+    entrenador: 'DASHBOARD',
+    qt: 'DASHBOARD',
+    capitan: 'DASHBOARD',
+    aliado: 'DASHBOARD',
+    manager: 'DASHBOARD'
+  },
+  'portafolio_pmo': {
+    directivos: 'GLOBAL',
+    gerente: 'SEDE'
+  },
+  'okrs_cascade': {
+    directivos: 'GLOBAL',
+    gerente: 'SEDE'
+  },
+  'auditoria_kpis': {
+    directivos: 'GLOBAL',
+    gerente: 'SEDE'
+  },
+  'manual_qt': {
+    directivos: 'GLOBAL',
+    gerente: 'GLOBAL',
+    coord_c1: 'GLOBAL',
+    qt: 'GLOBAL'
+  },
+  'directorio_qt': {
+    directivos: 'GLOBAL',
+    gerente: 'GLOBAL',
+    coord_c1: 'SEDE',
+    qt: 'GLOBAL'
+  },
+  'centro_de_mando': {
+    directivos: 'GLOBAL',
+    gerente: 'SEDE'
+  },
+  'calendario_global': {
+    directivos: 'GLOBAL',
+    gerente: 'GLOBAL'
+  },
+  'campus_interactivo': {
+    directivos: 'GLOBAL',
+    gerente: 'GLOBAL',
+    coord_c1: 'GLOBAL',
+    coord_maestria: 'GLOBAL',
+    entrenador: 'GLOBAL',
+    qt: 'GLOBAL',
+    capitan: 'GLOBAL',
+    aliado: 'GLOBAL',
+    manager: 'GLOBAL'
+  },
+  'centro_managers': {
+    directivos: 'GLOBAL',
+    gerente: 'SEDE',
+    coord_maestria: 'SEDE',
+    entrenador: 'ASIGNADOS'
+  },
+  'hoteles_sede': {
+    directivos: 'GLOBAL',
+    gerente: 'SEDE'
+  },
+  'asignar_meta': {
+    directivos: 'GLOBAL',
+    gerente: 'SEDE'
+  },
+  'directorio_equipo': {
+    directivos: 'GLOBAL',
+    gerente: 'GLOBAL'
+  },
+  // 'sistema_cartas': módulo confirmado por José (08/09/2026) como GENUINAMENTE
+  // DISTINTO de "Monitor de Vuelos" ("Son dos cosas distintas de verdad"). Ahora sí
+  // tiene su propia pestaña gateada dentro de /monitor-vuelos (MonitorVuelosCartas.jsx,
+  // pestaña "Repositorio de Cartas y Migraciones") — antes ningún botón la usaba.
+  // CORREGIDO (08/09/2026): la fila real de la Matriz Oficial ("Sistema de Cartas: -
+  // | X | ...") NO le da acceso a Directivos, solo a Gerentes — esta entrada tenía
+  // por error 'directivos: GLOBAL', que nunca se había notado porque nada la leía
+  // todavía. Se removió esa clave.
+  'sistema_cartas': {
+    gerente: 'GLOBAL'
+  },
+  // 'monitor_vuelos': fila "✈️ Monitor de Vuelos" de la Matriz Oficial. Antes,
+  // canAccessMonitorVuelos() leía por error la entrada 'sistema_cartas' (ver nota
+  // arriba) — corregido para usar esta entrada propia (08/09/2026).
+  'monitor_vuelos': {
+    directivos: 'GLOBAL',
+    gerente: 'SEDE'
+  },
+  // 'monitor_imos': fila "🦅 Monitor de IMOs" de la Matriz Oficial. Antes compartía
+  // gate con Monitor de Vuelos (vía canAccessMonitorVuelos/'sistema_cartas'), lo
+  // cual excluía indebidamente a Coordinadores C1Y2 y de MJ. Corregido con su
+  // propia entrada (08/09/2026). El alcance "SOLO LIMA" es un scope declarativo —
+  // no hay enforcement real de sede en el cliente ni en firestore.rules todavía
+  // (Fase 2, fuera de alcance de esta ronda).
+  'monitor_imos': {
+    directivos: 'GLOBAL',
+    gerente: 'SEDE_LIMA',
+    coord_c1: 'SEDE_LIMA',
+    coord_maestria: 'SEDE_LIMA'
+  },
+  'copilot': {
+    directivos: 'GLOBAL',
+    gerente: 'GLOBAL'
+  },
+  'manual_nodus': {
+    directivos: 'GLOBAL',
+    gerente: 'GLOBAL',
+    coord_c1: 'GLOBAL',
+    coord_maestria: 'GLOBAL'
+  },
+  // (08/09/2026) CORREGIDO — confirmado explícitamente por José: "los Directivos y
+  // Gerentes pueden ver todas las sedes". Antes 'gerente' decía 'SEDE' aquí, pero
+  // Home.jsx ya tenía un botón "GLOBAL" visible para Gerente que no hacía nada real
+  // (el filtro forzaba sede local sin importar la pestaña elegida) — ver el fix
+  // correspondiente en el filtro de eventos de Home.jsx. Ahora la matriz y el
+  // comportamiento real coinciden: Gerente = GLOBAL, igual que Directivos.
+  'eventos_entrenamientos': {
+    directivos: 'GLOBAL',
+    gerente: 'GLOBAL',
+    coord_c1: 'SEDE_C1C2',
+    coord_maestria: 'SEDE_MJ',
+    entrenador: 'ASIGNADOS',
+    qt: 'SEDE_C1C2_PROXIMOS_SIN_TRAINER',
+    capitan: 'EQUIPO',
+    aliado: 'EQUIPO',
+    manager: 'EQUIPO'
+  },
+  'comunicacion_efectiva': {
+    directivos: 'GOOGLE_CHAT',
+    gerente: 'GOOGLE_CHAT',
+    coord_c1: 'GOOGLE_CHAT',
+    coord_maestria: 'GOOGLE_CHAT',
+    entrenador: 'GOOGLE_CHAT',
+    qt: 'WHATSAPP',
+    capitan: 'WHATSAPP',
+    aliado: 'WHATSAPP',
+    manager: 'WHATSAPP'
+  },
+  // 'flyers_c1': confirmado explícitamente por José (08/09/2026) que Directivos
+  // NO tienen acceso — se removió la clave 'directivos' (antes era 'GLOBAL').
+  'flyers_c1': {
+    gerente: 'GLOBAL',
+    coord_c1: 'GLOBAL',
+    coord_maestria: 'GLOBAL'
+  },
+  // 'calendario_mj': confirmado explícitamente por José (08/09/2026, "sí, así es
+  // correcto") que SOLO Coordinadores de MJ tienen acceso — se removieron las
+  // claves 'directivos' y 'gerente' (antes GLOBAL y SEDE respectivamente).
+  'calendario_mj': {
+    coord_maestria: 'GLOBAL'
+  },
+  'agenda_timeboxing': {
+    directivos: 'GLOBAL',
+    gerente: 'GLOBAL',
+    coord_c1: 'GLOBAL',
+    coord_maestria: 'GLOBAL'
+  }
+};
+
+/**
+ * Valida el nivel de acceso de un usuario para un módulo específico según la Matriz Oficial
+ * @param {Object} currentUser 
+ * @param {string} moduleKey 
+ * @returns {{ hasAccess: boolean, scope: 'GLOBAL' | 'SEDE' | 'DASHBOARD' | 'ASIGNADOS' | 'NONE' | string }}
+ */
+export const checkModuleAccess = (currentUser, moduleKey) => {
+  if (!currentUser) return { hasAccess: false, scope: 'NONE' };
+
+  // Super Admin tiene acceso GLOBAL a todo — EXCEPTO mientras está simulando
+  // activamente un rol específico con el selector de rol (activeRoleOverride).
+  // BUG REAL corregido (08/09/2026, reportado por José: "cuando cambio de rol
+  // esto se debería modificar, que solo se vean los del rol"): antes este bypass
+  // se aplicaba siempre para cualquier SuperAdmin sin mirar qué rol tenía elegido
+  // en el selector, así que los botones del dashboard nunca se filtraban al
+  // simular otro rol. Ver isRoleSimulationActive en AuthContext.jsx (switchRole /
+  // buildUserObject) — se activa solo cuando se elige un rol concreto distinto de
+  // 'consolidado', y con eso esta función cae al cálculo normal de abajo, que ya
+  // usa currentUser.appRole (el rol simulado).
+  if ((currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email)) && !currentUser.isRoleSimulationActive) {
+    return { hasAccess: true, scope: 'GLOBAL' };
+  }
+
+  const role = currentUser.appRole || 'participante';
+  // director_maestria se trata como Directivos en TODA la plataforma, confirmado
+  // explícitamente por José (08/09/2026: "Como Directivos"). Antes este rol se
+  // mapeaba más abajo a la clave 'coord_maestria' de la matriz, lo cual le daba
+  // el acceso de Coordinador de MJ en vez de Dirección — corregido aquí.
+  const isDir = isDireccionRole(role) || currentUser.isDireccion || role === 'director_maestria';
+  const isGer = role === 'gerente' || currentUser.isGerente;
+
+  const matrixEntry = OFFICIAL_PERMISSION_MATRIX[moduleKey];
+  if (!matrixEntry) return { hasAccess: false, scope: 'NONE' };
+
+  if (isDir && matrixEntry.directivos) {
+    return { hasAccess: true, scope: matrixEntry.directivos };
+  }
+
+  if (isGer && matrixEntry.gerente) {
+    return { hasAccess: true, scope: matrixEntry.gerente };
+  }
+
+  // Mapear rol normalizado a claves de matriz
+  // (director_maestria ya no se mapea aquí — ver isDir arriba)
+  let roleKey = role;
+  if (role === 'coord_c2' || role === 'coordinador_c1c2') roleKey = 'coord_c1';
+  if (role === 'coordinador_mj') roleKey = 'coord_maestria';
+  if (role === 'entrenador_llamadas') roleKey = 'entrenador';
+
+  const roleScope = matrixEntry[roleKey];
+  if (roleScope) {
+    return { hasAccess: true, scope: roleScope };
+  }
+
+  return { hasAccess: false, scope: 'NONE' };
+};
+
+/**
+ * Canal Oficial de Comunicación según Matriz
+ * @param {Object} currentUser
+ * @returns {'GOOGLE_CHAT' | 'WHATSAPP'}
+ */
+export const getEffectiveCommunicationChannel = (currentUser) => {
+  const access = checkModuleAccess(currentUser, 'comunicacion_efectiva');
+  return access.scope === 'WHATSAPP' ? 'WHATSAPP' : 'GOOGLE_CHAT';
+};
+
+export const canAccessAgendaTimeBoxing = (currentUser) => {
+  return checkModuleAccess(currentUser, 'agenda_timeboxing').hasAccess;
+};
+
+export const canAccessFlyersC1 = (currentUser) => {
+  return checkModuleAccess(currentUser, 'flyers_c1').hasAccess;
+};
+
+export const canAccessCalendarioMJ = (currentUser) => {
+  return checkModuleAccess(currentUser, 'calendario_mj').hasAccess;
+};
+
+export const canAccessMonitorVuelos = (currentUser) => {
+  // Corregido (08/09/2026): antes leía por error la entrada 'sistema_cartas'
+  // (un módulo distinto, confirmado por José). Ahora usa su propia entrada
+  // 'monitor_vuelos' en la Matriz Oficial.
+  return checkModuleAccess(currentUser, 'monitor_vuelos').hasAccess;
+};
+
+/**
+ * "Sistema de Cartas" (pestaña "Repositorio de Cartas y Migraciones" dentro de
+ * /monitor-vuelos) — nueva función (08/09/2026), separada de
+ * canAccessMonitorVuelos por pedido explícito de José ("son dos cosas distintas
+ * de verdad"). Según la Matriz Oficial: SOLO Gerentes, Directivos NO tienen acceso.
+ */
+export const canAccessSistemaCartas = (currentUser) => {
+  return checkModuleAccess(currentUser, 'sistema_cartas').hasAccess;
+};
+
+/**
+ * "🦅 Monitor de IMOs" — fila propia de la Matriz Oficial. Antes de esta
+ * corrección (08/09/2026) el botón de Monitor de IMOs en Home.jsx compartía el
+ * gate de canAccessMonitorVuelos(), lo que excluía indebidamente a
+ * Coordinadores C1Y2 y de MJ (Lima) que la Matriz sí autoriza.
+ */
+export const canAccessMonitorIMOs = (currentUser) => {
+  return checkModuleAccess(currentUser, 'monitor_imos').hasAccess;
+};
+
+export const canAccessHotelesSede = (currentUser) => {
+  return checkModuleAccess(currentUser, 'hoteles_sede').hasAccess;
+};
+
+export const canAccessManualQT = (currentUser) => {
+  return checkModuleAccess(currentUser, 'manual_qt').hasAccess;
+};
+
+export const canAccessDirectorioQT = (currentUser) => {
+  return checkModuleAccess(currentUser, 'directorio_qt').hasAccess;
+};
+
+export const canAccessManualNodus = (currentUser) => {
+  return checkModuleAccess(currentUser, 'manual_nodus').hasAccess;
+};
+
+export const canAccessCampusInteractivo = (currentUser) => {
+  return checkModuleAccess(currentUser, 'campus_interactivo').hasAccess;
+};
+
+
+
+
+```
+
+---
+
 ## Archivo: cloudflare-worker\package.json
 
 ```json
@@ -155868,6 +162545,17 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+let limaTransporter = null;
+if (process.env.LIMA_GMAIL_USER && process.env.LIMA_GMAIL_PASS) {
+  limaTransporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.LIMA_GMAIL_USER,
+      pass: process.env.LIMA_GMAIL_PASS
+    }
+  });
+}
+
 const isOneShot = process.argv.includes('--one-shot');
 
 // --- 2.1 GENERACIÓN DE INVITACIÓN DE CALENDARIO (.ics) — (04/09/2026) ---
@@ -155954,12 +162642,21 @@ async function processMailDoc(docSnap) {
     return;
   }
 
+  const isImoWelcome = data.type === 'imo_welcome';
+
   const validRecipients = [];
   for (const rawTo of rawRecipients) {
     let to = String(rawTo).toLowerCase().trim()
       .replace('@crearpls.com', '@crearpsl.net')
       .replace(/ketherine\.aguirre@/g, 'katherine.aguirre@')
       .replace(/coodinacion\.administrativa@/g, 'coordinacion.administrativa@');
+    
+    if (isImoWelcome) {
+      // IMO participants aren't registered users in Causa OS, skip validation
+      validRecipients.push(to);
+      continue;
+    }
+
     const isCorporate = ['@crearpsl.net', '@crearpsl.com'].some(d => to.endsWith(d));
     if (isCorporate) {
       validRecipients.push(to);
@@ -155974,7 +162671,6 @@ async function processMailDoc(docSnap) {
       }
     } catch (error) {
       console.error("Error validando correo contra la base de datos:", error.message);
-      // No bloqueamos el envío por un error de validación (p.ej. Firestore momentáneamente inaccesible).
       validRecipients.push(to);
     }
   }
@@ -155991,7 +162687,7 @@ async function processMailDoc(docSnap) {
 
   const rawHtml = data.message?.html || '<p>Tienes una notificación del sistema Causa OS.</p>';
   const cleanHtml = sanitizeHtml(rawHtml, {
-    allowedTags: ['p', 'b', 'i', 'em', 'strong', 'a', 'h1', 'h2', 'h3', 'ul', 'ol', 'li', 'br', 'hr', 'div', 'span'],
+    allowedTags: ['p', 'b', 'i', 'em', 'strong', 'a', 'h1', 'h2', 'h3', 'ul', 'ol', 'li', 'br', 'hr', 'div', 'span', 'img', 'audio', 'source', 'iframe'],
     allowedAttributes: {
       'a': ['href', 'target', 'style', 'class'],
       'p': ['style', 'class'],
@@ -155999,27 +162695,31 @@ async function processMailDoc(docSnap) {
       'span': ['style', 'class'],
       'h1': ['style', 'class'],
       'h2': ['style', 'class'],
-      'h3': ['style', 'class']
+      'h3': ['style', 'class'],
+      'img': ['src', 'alt', 'style', 'width', 'height'],
+      'audio': ['controls', 'style', 'src'],
+      'source': ['src', 'type'],
+      'iframe': ['src', 'width', 'height', 'frameborder', 'allow', 'allowfullscreen']
     }
   });
 
+  const mailSender = (isImoWelcome && limaTransporter) ? process.env.LIMA_GMAIL_USER : process.env.GMAIL_SERVER_EMAIL;
+  const currentTransporter = (isImoWelcome && limaTransporter) ? limaTransporter : transporter;
+
   const mailOptions = {
-    from: `"CREAR PODER SIN LÍMITES" <${process.env.GMAIL_SERVER_EMAIL}>`,
+    from: `"CREAR PODER SIN LÍMITES" <${mailSender}>`,
     to: validRecipients,
     subject: data.message?.subject || 'Notificación Causa OS — CREAR PODER SIN LÍMITES',
     html: cleanHtml
   };
 
-  // nodemailer arma el adjunto .ics correctamente por sí solo a partir de
-  // "icalEvent" (no hace falta también agregarlo a mano en "attachments" —
-  // eso duplicaría el archivo en el correo).
   const icsAttachment = buildIcsAttachment(data.calendarEvent);
   if (icsAttachment) {
     mailOptions.icalEvent = { method: 'PUBLISH', filename: icsAttachment.filename, content: icsAttachment.content };
   }
 
   try {
-    await transporter.sendMail(mailOptions);
+    await currentTransporter.sendMail(mailOptions);
     console.log(`✅ Correo enviado con éxito a ${validRecipients.join(', ')}`);
     await db.collection('mail').doc(docSnap.id).update({
       'delivery.state': 'SUCCESS',
@@ -157554,14 +164254,26 @@ function PrivateRoute({ children }) {
 }
 
 // Componente para proteger autorización por Roles (S3 / Audit Fix)
-function RoleRoute({ children, allowedRoles = [], requireSuperAdmin = false }) {
+// NOTA (08/09/2026): "currentUser.isDireccion" es, por defecto, un bypass general —
+// cualquier usuario con ese flag en true pasa CUALQUIER RoleRoute, sin importar lo
+// que diga allowedRoles. Esto es intencional y se conserva para la enorme mayoría
+// de rutas (Dirección normalmente debe poder entrar a todo). Pero hay un puñado de
+// rutas donde la Matriz Oficial pide excluir explícitamente a Directivos (p. ej.
+// /calendario-mj, /generador-flyer) — para esas, se agregó el prop opcional
+// `excludeDireccionBypass` (default false, así que NINGUNA ruta existente cambia de
+// comportamiento a menos que lo declare explícitamente). Con
+// excludeDireccionBypass=true, isDireccion deja de ser un pase libre y el usuario
+// debe estar literalmente en `allowedRoles` (o en su array `roles` para multi-rol) —
+// isSuperAdmin SIGUE siendo un bypass total incluso con esta bandera, porque un
+// Super Admin debe poder entrar a cualquier sección para soporte/depuración.
+function RoleRoute({ children, allowedRoles = [], requireSuperAdmin = false, excludeDireccionBypass = false }) {
   const { currentUser, loading } = useAuth();
   const { showToast } = useUI();
-  
+
   if (loading) {
     return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><p className="text-gold">Verificando permisos...</p></div>;
   }
-  
+
   if (!currentUser) {
     return <Navigate to="/login" replace />;
   }
@@ -157577,16 +164289,16 @@ function RoleRoute({ children, allowedRoles = [], requireSuperAdmin = false }) {
 
   // Verificación de Roles permitidos
   if (allowedRoles.length > 0) {
-    const hasRole = allowedRoles.includes(currentUser.appRole) || 
-                    currentUser.isSuperAdmin || 
-                    currentUser.isDireccion || 
+    const hasRole = allowedRoles.includes(currentUser.appRole) ||
+                    currentUser.isSuperAdmin ||
+                    (!excludeDireccionBypass && currentUser.isDireccion) ||
                     (currentUser.roles || []).some(r => allowedRoles.includes(r));
     if (!hasRole) {
       showToast(`ACCESO DENEGADO: Tu rol actual (${currentUser.appRole}) no tiene acceso a esta sección.`, "error");
       return <Navigate to="/home" replace />;
     }
   }
-  
+
   return children;
 }
 
@@ -157651,13 +164363,19 @@ function App() {
           } />
 
           <Route path="/manual" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'consolidado', 'director_maestria']} requireSuperAdmin={false}>
               <ManualGuia />
             </RoleRoute>
           } />
 
+          {/* Narrowed 08/09/2026 to match MANUAL_NODUS_ROLES en Home.jsx y la fila
+              "Manual Nodus" de la Matriz Oficial (Directivos, Gerentes, Coordinadores
+              C1Y2 y Coordinadores de MJ). Antes incluía literalmente todos los roles
+              del sistema (qt, capitan, entrenador, entrenador_llamadas, manager,
+              aliado, oficina), permitiendo acceso directo por URL a cualquiera aunque
+              el botón/menú ya lo ocultara. */}
           <Route path="/manual-nodus" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'director_maestria', 'superadmin', 'consolidado', 'qt', 'capitan', 'entrenador', 'entrenador_llamadas', 'manager', 'aliado', 'oficina']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'director_maestria', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
               <ManualNodus />
             </RoleRoute>
           } />
@@ -157701,7 +164419,7 @@ function App() {
           } />
 
           <Route path="/metas" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'director_maestria', 'coordinador', 'qt', 'capitan']} requireSuperAdmin={false}>
               <GoalsBoard />
             </RoleRoute>
           } />
@@ -157728,20 +164446,24 @@ function App() {
             </RoleRoute>
           } />
 
+          {/* Narrowed 08/09/2026: la fila "Auditoría de KPIs" de la Matriz Oficial es
+              Directivos + Gerentes únicamente. Antes incluía también coordinadores
+              C1Y2 y de MJ, que no figuran en esa fila. /diagnostico-cmj comparte el
+              mismo componente (AuditoriaKPIs) y se alinea al mismo criterio. */}
           <Route path="/auditoria-kpis" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'director_maestria']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria']} requireSuperAdmin={false}>
               <AuditoriaKPIs />
             </RoleRoute>
           } />
 
           <Route path="/diagnostico-cmj" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'director_maestria']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria']} requireSuperAdmin={false}>
               <AuditoriaKPIs defaultTab="cmj" />
             </RoleRoute>
           } />
 
           <Route path="/superadmin" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria']} requireSuperAdmin={false}>
               <SuperAdminPanel />
             </RoleRoute>
           } />
@@ -157753,13 +164475,13 @@ function App() {
           } />
 
           <Route path="/centro-managers" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'director_maestria']} requireSuperAdmin={false}>
               <CentroManagers />
             </RoleRoute>
           } />
 
           <Route path="/directorio-qt" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'director_maestria']} requireSuperAdmin={false}>
               <DirectorioQT />
             </RoleRoute>
           } />
@@ -157772,13 +164494,13 @@ function App() {
 
           {/* PMO Culture Integrations */}
           <Route path="/portafolio" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria']} requireSuperAdmin={false}>
               <PortfolioBoard />
             </RoleRoute>
           } />
-          
+
           <Route path="/estrategia" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria']} requireSuperAdmin={false}>
               <StrategyBoard />
             </RoleRoute>
           } />
@@ -157818,31 +164540,55 @@ function App() {
 
           {/* Calendario de Maestría del Juego (29/08/2026): generador/editor del
               calendario oficial por equipo (formato CREAR), pedido por José a
-              partir de 3 PDF de ejemplo reales. Ver notas en CalendarioMJ.jsx. */}
+              partir de 3 PDF de ejemplo reales. Ver notas en CalendarioMJ.jsx.
+              Narrowed 08/09/2026: José confirmó explícitamente ("sí, así es
+              correcto") que SOLO Coordinadores de MJ tienen acceso — se removieron
+              direccion/cfo/ceo/cco/gerente/superadmin/consolidado/director_maestria.
+              excludeDireccionBypass=true agregado 08/09/2026 (confirmado por José):
+              cierra el bypass general de RoleRoute para Directivos en ESTA ruta
+              específicamente, así que ahora si un Directivo entra por URL directa
+              también es rechazado — antes solo se ocultaba el botón. isSuperAdmin
+              sigue teniendo acceso (soporte/depuración). */}
           <Route path="/calendario-mj" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria', 'coord_maestria', 'coordinador_mj']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['coord_maestria', 'coordinador_mj']} requireSuperAdmin={false} excludeDireccionBypass={true}>
               <CalendarioMJ />
             </RoleRoute>
           } />
 
-          {/* Generador de Flyers Oficiales (02/09/2026): Generador HD 1080x1920 con fechas por sede */}
+          {/* Generador de Flyers Oficiales (02/09/2026): Generador HD 1080x1920 con fechas por sede.
+              Narrowed 08/09/2026: José confirmó explícitamente que Directivos NO
+              tienen acceso (y director_maestria se trata como Directivos). Se
+              removieron direccion/cfo/ceo/cco/superadmin/consolidado/director_maestria
+              y se agregaron coord_maestria/coordinador_mj (presentes en la Matriz
+              Oficial pero ausentes antes). excludeDireccionBypass=true agregado
+              08/09/2026 (confirmado por José), misma razón que en /calendario-mj. */}
           <Route path="/generador-flyer" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria', 'coord_c1', 'coord_c2', 'coordinador_c1c2']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj']} requireSuperAdmin={false} excludeDireccionBypass={true}>
               <GeneradorFlyer />
             </RoleRoute>
           } />
 
           {/* Monitor de Vuelos y Cartas Oficiales */}
+          {/* Contiene AMBAS: "Monitor de Vuelos" (Directivos+Gerentes) y "Sistema de
+              Cartas" (solo Gerentes) como pestañas separadas dentro de
+              MonitorVuelosCartas.jsx (08/09/2026) — el guard de ruta debe cubrir la
+              UNIÓN de ambas audiencias; el gate fino por pestaña vive dentro del
+              componente (canAccessMonitorVuelos / canAccessSistemaCartas). */}
           <Route path="/monitor-vuelos" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria']} requireSuperAdmin={false}>
               <MonitorVuelosCartas />
             </RoleRoute>
           } />
           <Route path="/vuelos" element={<Navigate to="/monitor-vuelos" replace />} />
           <Route path="/cartas" element={<Navigate to="/monitor-vuelos" replace />} />
           
+          {/* Ampliado 08/09/2026: la fila "Monitor de IMOs" de la Matriz Oficial
+              también autoriza a Coordinadores C1Y2 y de MJ (alcance "SOLO LIMA" —
+              el enforcement real de sede queda pendiente para Fase 2, no
+              implementado aquí). Antes solo dejaba pasar a Directivos/Gerentes,
+              igual que Monitor de Vuelos, con el que compartía gate por error. */}
           <Route path="/monitor-imos" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria', 'coord_c1', 'coord_maestria']} requireSuperAdmin={false}>
               <MonitorImos />
             </RoleRoute>
           } />
@@ -169021,7 +175767,7 @@ const COLORS = {
 
 const PIE_COLORS = ['#10b981', '#f59e0b', '#64748b', '#3b82f6', '#ef4444'];
 
-export default function NodusCoordinadoresC1C2Dashboard() {
+export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {}) {
   const { activeTheme } = useTheme();
   const isLight = activeTheme === 'light';
 
@@ -175755,6 +182501,30 @@ export const canViewLiquidacionEntrenadores = (currentUser) => {
 };
 
 /**
+ * Emails autorizados a ver "Base Maestra CRM (Nodus)" (/crm-maestro): el listado
+ * completo y SIN filtrar de participantes de TODA la plataforma — nombre, DNI,
+ * teléfono, estado C1, coordinadora e IMO enrolador, sin distinción de sede.
+ * REGLA ESTRICTA (pedido explícito de José, 08/09/2026): "esta base solo la puedo
+ * ver yo" — únicamente este correo, sin excepción automática para otros
+ * SuperAdmin ni Dirección (mismo patrón que LIQUIDACION_ENTRENADORES_EMAILS
+ * arriba). NOTA: esto solo controla el acceso en la interfaz (el componente
+ * CRMBaseMaster.jsx). A nivel de base de datos, firestore.rules todavía permite
+ * leer la colección "participants" a CUALQUIER SuperAdmin o Gerente/Dirección
+ * (regla existente: isSuperAdmin() || isGerenteODireccion()) — restringirla ahí
+ * también a solo este correo requeriría tocar firestore.rules, lo cual necesita
+ * tu autorización explícita antes de hacerse.
+ */
+export const CRM_MAESTRO_ACCESS_EMAILS = [
+  'jose.sanchez@crearpsl.net',
+];
+
+export const canViewCRMMaestro = (currentUser) => {
+  if (!currentUser) return false;
+  const email = (currentUser.email || '').trim().toLowerCase();
+  return CRM_MAESTRO_ACCESS_EMAILS.includes(email);
+};
+
+/**
  * Emails o roles autorizados a ver la pestaña "KPIs de Entrenadores de Llamadas" (Auditoría financiera,
  * facturación $77,550 USD, graduados, deserción y matriz de 16 llamadas).
  * REGLA ESTRICTA (pedido explícito de José, 05/09/2026):
@@ -175990,9 +182760,35 @@ export const OFFICIAL_PERMISSION_MATRIX = {
     directivos: 'GLOBAL',
     gerente: 'GLOBAL'
   },
+  // 'sistema_cartas': módulo confirmado por José (08/09/2026) como GENUINAMENTE
+  // DISTINTO de "Monitor de Vuelos" ("Son dos cosas distintas de verdad"). Ahora sí
+  // tiene su propia pestaña gateada dentro de /monitor-vuelos (MonitorVuelosCartas.jsx,
+  // pestaña "Repositorio de Cartas y Migraciones") — antes ningún botón la usaba.
+  // CORREGIDO (08/09/2026): la fila real de la Matriz Oficial ("Sistema de Cartas: -
+  // | X | ...") NO le da acceso a Directivos, solo a Gerentes — esta entrada tenía
+  // por error 'directivos: GLOBAL', que nunca se había notado porque nada la leía
+  // todavía. Se removió esa clave.
   'sistema_cartas': {
-    directivos: 'GLOBAL',
     gerente: 'GLOBAL'
+  },
+  // 'monitor_vuelos': fila "✈️ Monitor de Vuelos" de la Matriz Oficial. Antes,
+  // canAccessMonitorVuelos() leía por error la entrada 'sistema_cartas' (ver nota
+  // arriba) — corregido para usar esta entrada propia (08/09/2026).
+  'monitor_vuelos': {
+    directivos: 'GLOBAL',
+    gerente: 'SEDE'
+  },
+  // 'monitor_imos': fila "🦅 Monitor de IMOs" de la Matriz Oficial. Antes compartía
+  // gate con Monitor de Vuelos (vía canAccessMonitorVuelos/'sistema_cartas'), lo
+  // cual excluía indebidamente a Coordinadores C1Y2 y de MJ. Corregido con su
+  // propia entrada (08/09/2026). El alcance "SOLO LIMA" es un scope declarativo —
+  // no hay enforcement real de sede en el cliente ni en firestore.rules todavía
+  // (Fase 2, fuera de alcance de esta ronda).
+  'monitor_imos': {
+    directivos: 'GLOBAL',
+    gerente: 'SEDE_LIMA',
+    coord_c1: 'SEDE_LIMA',
+    coord_maestria: 'SEDE_LIMA'
   },
   'copilot': {
     directivos: 'GLOBAL',
@@ -176004,11 +182800,19 @@ export const OFFICIAL_PERMISSION_MATRIX = {
     coord_c1: 'GLOBAL',
     coord_maestria: 'GLOBAL'
   },
+  // (08/09/2026) CORREGIDO — confirmado explícitamente por José: "los Directivos y
+  // Gerentes pueden ver todas las sedes". Antes 'gerente' decía 'SEDE' aquí, pero
+  // Home.jsx ya tenía un botón "GLOBAL" visible para Gerente que no hacía nada real
+  // (el filtro forzaba sede local sin importar la pestaña elegida) — ver el fix
+  // correspondiente en el filtro de eventos de Home.jsx. Ahora la matriz y el
+  // (08/09/2026) CORREGIDO — confirmado explícitamente por José:
+  // "las coordinadoras de cada sede pueden ver todas las fechas de sus sedes tanto de mj como de c1y c2 todas las fechas y entrenadores"
+  // Ahora tanto coord_c1 como coord_maestria tienen acceso completo a todas las fechas y entrenadores de su sede.
   'eventos_entrenamientos': {
     directivos: 'GLOBAL',
-    gerente: 'SEDE',
-    coord_c1: 'SEDE_C1C2',
-    coord_maestria: 'SEDE_MJ',
+    gerente: 'GLOBAL',
+    coord_c1: 'SEDE_TODAS_FECHAS',
+    coord_maestria: 'SEDE_TODAS_FECHAS',
     entrenador: 'ASIGNADOS',
     qt: 'SEDE_C1C2_PROXIMOS_SIN_TRAINER',
     capitan: 'EQUIPO',
@@ -176026,15 +182830,17 @@ export const OFFICIAL_PERMISSION_MATRIX = {
     aliado: 'WHATSAPP',
     manager: 'WHATSAPP'
   },
+  // 'flyers_c1': confirmado explícitamente por José (08/09/2026) que Directivos
+  // NO tienen acceso — se removió la clave 'directivos' (antes era 'GLOBAL').
   'flyers_c1': {
-    directivos: 'GLOBAL',
     gerente: 'GLOBAL',
     coord_c1: 'GLOBAL',
     coord_maestria: 'GLOBAL'
   },
+  // 'calendario_mj': confirmado explícitamente por José (08/09/2026, "sí, así es
+  // correcto") que SOLO Coordinadores de MJ tienen acceso — se removieron las
+  // claves 'directivos' y 'gerente' (antes GLOBAL y SEDE respectivamente).
   'calendario_mj': {
-    directivos: 'GLOBAL',
-    gerente: 'SEDE',
     coord_maestria: 'GLOBAL'
   },
   'agenda_timeboxing': {
@@ -176053,14 +182859,27 @@ export const OFFICIAL_PERMISSION_MATRIX = {
  */
 export const checkModuleAccess = (currentUser, moduleKey) => {
   if (!currentUser) return { hasAccess: false, scope: 'NONE' };
-  
-  // Super Admin tiene acceso GLOBAL a todo
-  if (currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email)) {
+
+  // Super Admin tiene acceso GLOBAL a todo — EXCEPTO mientras está simulando
+  // activamente un rol específico con el selector de rol (activeRoleOverride).
+  // BUG REAL corregido (08/09/2026, reportado por José: "cuando cambio de rol
+  // esto se debería modificar, que solo se vean los del rol"): antes este bypass
+  // se aplicaba siempre para cualquier SuperAdmin sin mirar qué rol tenía elegido
+  // en el selector, así que los botones del dashboard nunca se filtraban al
+  // simular otro rol. Ver isRoleSimulationActive en AuthContext.jsx (switchRole /
+  // buildUserObject) — se activa solo cuando se elige un rol concreto distinto de
+  // 'consolidado', y con eso esta función cae al cálculo normal de abajo, que ya
+  // usa currentUser.appRole (el rol simulado).
+  if ((currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email)) && !currentUser.isRoleSimulationActive) {
     return { hasAccess: true, scope: 'GLOBAL' };
   }
 
   const role = currentUser.appRole || 'participante';
-  const isDir = isDireccionRole(role) || currentUser.isDireccion;
+  // director_maestria se trata como Directivos en TODA la plataforma, confirmado
+  // explícitamente por José (08/09/2026: "Como Directivos"). Antes este rol se
+  // mapeaba más abajo a la clave 'coord_maestria' de la matriz, lo cual le daba
+  // el acceso de Coordinador de MJ en vez de Dirección — corregido aquí.
+  const isDir = isDireccionRole(role) || currentUser.isDireccion || role === 'director_maestria';
   const isGer = role === 'gerente' || currentUser.isGerente;
 
   const matrixEntry = OFFICIAL_PERMISSION_MATRIX[moduleKey];
@@ -176075,9 +182894,10 @@ export const checkModuleAccess = (currentUser, moduleKey) => {
   }
 
   // Mapear rol normalizado a claves de matriz
+  // (director_maestria ya no se mapea aquí — ver isDir arriba)
   let roleKey = role;
   if (role === 'coord_c2' || role === 'coordinador_c1c2') roleKey = 'coord_c1';
-  if (role === 'coordinador_mj' || role === 'director_maestria') roleKey = 'coord_maestria';
+  if (role === 'coordinador_mj') roleKey = 'coord_maestria';
   if (role === 'entrenador_llamadas') roleKey = 'entrenador';
 
   const roleScope = matrixEntry[roleKey];
@@ -176111,7 +182931,30 @@ export const canAccessCalendarioMJ = (currentUser) => {
 };
 
 export const canAccessMonitorVuelos = (currentUser) => {
+  // Corregido (08/09/2026): antes leía por error la entrada 'sistema_cartas'
+  // (un módulo distinto, confirmado por José). Ahora usa su propia entrada
+  // 'monitor_vuelos' en la Matriz Oficial.
+  return checkModuleAccess(currentUser, 'monitor_vuelos').hasAccess;
+};
+
+/**
+ * "Sistema de Cartas" (pestaña "Repositorio de Cartas y Migraciones" dentro de
+ * /monitor-vuelos) — nueva función (08/09/2026), separada de
+ * canAccessMonitorVuelos por pedido explícito de José ("son dos cosas distintas
+ * de verdad"). Según la Matriz Oficial: SOLO Gerentes, Directivos NO tienen acceso.
+ */
+export const canAccessSistemaCartas = (currentUser) => {
   return checkModuleAccess(currentUser, 'sistema_cartas').hasAccess;
+};
+
+/**
+ * "🦅 Monitor de IMOs" — fila propia de la Matriz Oficial. Antes de esta
+ * corrección (08/09/2026) el botón de Monitor de IMOs en Home.jsx compartía el
+ * gate de canAccessMonitorVuelos(), lo que excluía indebidamente a
+ * Coordinadores C1Y2 y de MJ (Lima) que la Matriz sí autoriza.
+ */
+export const canAccessMonitorIMOs = (currentUser) => {
+  return checkModuleAccess(currentUser, 'monitor_imos').hasAccess;
 };
 
 export const canAccessHotelesSede = (currentUser) => {
@@ -176164,30 +183007,73 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const { showToast } = useUI();
 
+  // (07/09/2026) DIAGNÓSTICO CONFIRMADO CON DATOS REALES: 60 de 144 correos en
+  // la colección "users" tienen MÁS DE UN documento — típicamente uno creado
+  // por bootstrapSync.js/qtSyncDaemon.js con un ID tipo slug (ej.
+  // "jose_sanchez_crearpsl", con "roles" casi siempre en null) y otro creado
+  // por el propio login con ID = UID real de Firebase Auth (con "roles" bien
+  // poblado como arreglo). Antes de este fix, cuando una consulta encontraba
+  // ambos documentos, `snap.docs[0]` devolvía el que Firestore ordenara
+  // primero (orden no controlado por nosotros, prácticamente una moneda al
+  // aire) — así que en cada login la persona podía "perder" sus roles
+  // múltiples si por azar se devolvía el documento slug en vez del UID.
+  // Esto es justamente por qué el selector de "cambiar rol" no aparecía de
+  // forma consistente para gente con más de un cargo real.
+  // Las reglas de Firestore (firestore.rules) SIEMPRE validan permisos
+  // leyendo users/{request.auth.uid} — por eso, cuando hay varios documentos
+  // para el mismo correo, preferimos deliberadamente el que tiene forma de
+  // UID de Firebase Auth: es el mismo que las reglas van a usar de todos
+  // modos, así que usarlo también para leer el perfil hace que el
+  // comportamiento sea consistente en vez de aleatorio.
+  const pareceUidFirebase = (docId) => /^[A-Za-z0-9]{20,36}$/.test(docId) && !docId.includes('_');
+
+  const elegirDocumentoCanonico = (snap) => {
+    if (snap.empty) return null;
+    if (snap.size === 1) return snap.docs[0];
+    // Si hay varios documentos para el mismo correo, preferir el que tiene
+    // forma de UID de Firebase Auth (el mismo que usan las reglas de
+    // seguridad y las escrituras de login). Si ninguno tiene esa forma,
+    // se mantiene el comportamiento anterior (el primero que devuelva Firestore).
+    const conFormaDeUid = snap.docs.find((d) => pareceUidFirebase(d.id));
+    return conFormaDeUid || snap.docs[0];
+  };
+
   // Búsqueda progresiva de usuarios en Firestore
   const findUserInFirestore = async (normalizedEmail) => {
     try {
       const usersRef = collection(db, "users");
-      
+
       // 1. emails array-contains
       let q = query(usersRef, where("emails", "array-contains", normalizedEmail));
       let snap = await getDocs(q);
-      if (!snap.empty) return snap.docs[0].data();
+      if (!snap.empty) {
+        const elegido = elegirDocumentoCanonico(snap);
+        return { ...elegido.data(), _docId: elegido.id };
+      }
 
       // 2. email ==
       q = query(usersRef, where("email", "==", normalizedEmail));
       snap = await getDocs(q);
-      if (!snap.empty) return snap.docs[0].data();
+      if (!snap.empty) {
+        const elegido = elegirDocumentoCanonico(snap);
+        return { ...elegido.data(), _docId: elegido.id };
+      }
 
       // 3. corporateEmail ==
       q = query(usersRef, where("corporateEmail", "==", normalizedEmail));
       snap = await getDocs(q);
-      if (!snap.empty) return snap.docs[0].data();
+      if (!snap.empty) {
+        const elegido = elegirDocumentoCanonico(snap);
+        return { ...elegido.data(), _docId: elegido.id };
+      }
 
       // 4. personalEmail ==
       q = query(usersRef, where("personalEmail", "==", normalizedEmail));
       snap = await getDocs(q);
-      if (!snap.empty) return snap.docs[0].data();
+      if (!snap.empty) {
+        const elegido = elegirDocumentoCanonico(snap);
+        return { ...elegido.data(), _docId: elegido.id };
+      }
 
     } catch (err) {
       console.error("Error consultando Firestore:", err);
@@ -176198,6 +183084,27 @@ export function AuthProvider({ children }) {
   const switchRole = (newRole) => {
     const canonicalNewRole = normalizeRole(newRole);
     sessionStorage.setItem('cpsl_active_role', canonicalNewRole);
+
+    // (07/09/2026) Confirmado explícitamente por José: hasta ahora este selector solo
+    // cambiaba el estado local de React (lo que se VE), nunca escribía a Firestore — así
+    // que cualquier acción protegida por firestore.rules (por ejemplo guardar en
+    // mj_calendars o gestionar managers_directory) seguía evaluándose con el rol
+    // "oficial" guardado en el login, sin importar qué eligiera la persona aquí. Este
+    // setDoc hace que el cambio sea real: guarda el rol elegido en users/{uid}, en un
+    // campo NUEVO y separado (activeRoleOverride) — nunca en "role", porque ese campo
+    // también lo usan SuperAdminPanel.jsx, GerenteDashboard.jsx, UserAuditReport.jsx y
+    // causa_sync_bot.mjs como el cargo oficial de la persona, no como su vista de
+    // sesión. Ver effectiveRole() en firestore.rules para el lado que lo consume.
+    // Es "fire and forget": no bloquea el cambio visual si la escritura tarda o falla
+    // (queda igual que antes en ese caso — decorativo pero sin romper la sesión), y el
+    // error se registra en consola para poder diagnosticarlo si pasa seguido.
+    if (auth.currentUser?.uid) {
+      setDoc(doc(db, 'users', auth.currentUser.uid), { activeRoleOverride: canonicalNewRole }, { merge: true })
+        .catch((err) => {
+          console.error('No se pudo guardar el rol activo en Firestore (el cambio de vista sigue funcionando localmente):', err);
+        });
+    }
+
     setCurrentUser(prev => {
       if (!prev) return null;
       const isConsolidated = canonicalNewRole === 'consolidado';
@@ -176206,8 +183113,26 @@ export function AuthProvider({ children }) {
       const hasGerente = userRoles.some(r => isGerenciaRole(r)) || isGerenciaRole(prev.role);
       const isSuper = prev.isSuperAdmin || isSuperAdminEmail(prev.email);
 
-      const isDireccion = isSuper || (isConsolidated ? hasDireccion : isDireccionRole(canonicalNewRole));
-      const isGerente = isSuper || isDireccion || (isConsolidated ? (hasGerente || hasDireccion) : (canonicalNewRole === 'gerente' || canonicalNewRole === 'director_maestria'));
+      // (08/09/2026) BUG REAL encontrado y corregido, reportado por José probando el
+      // selector de roles: "cuando cambio de rol esto se debería modificar, que solo
+      // se vean los del rol". Antes, isDireccion/isGerente quedaban forzados a `true`
+      // para cualquier SuperAdmin sin importar el rol elegido en el selector (por el
+      // "isSuper ||" al inicio de cada fórmula) — así que simular "Entrenador" o "QT"
+      // seguía mostrando TODO como si fuera Dirección/Gerente. Ahora, cuando se elige
+      // un rol específico (no 'consolidado'), estas banderas reflejan ÚNICAMENTE ese
+      // rol simulado — igual que las vería una persona real con ese rol — y se agrega
+      // `isRoleSimulationActive` para que checkModuleAccess() (permissions.js) y
+      // hasRoleAccess()/isModuleVisible() (Home.jsx) sepan que deben dejar de aplicar
+      // el bypass total de SuperAdmin mientras dura la simulación. `isSuperAdmin` en sí
+      // NUNCA se apaga (sigue siendo su identidad real de cuenta: conserva el badge,
+      // el acceso al propio selector, y la capacidad de volver a "Vista Consolidada").
+      const isRoleSimulationActive = !isConsolidated;
+      const isDireccion = isConsolidated
+        ? (isSuper || hasDireccion)
+        : isDireccionRole(canonicalNewRole);
+      const isGerente = isConsolidated
+        ? (isSuper || isDireccion || hasGerente)
+        : (isDireccion || canonicalNewRole === 'gerente' || canonicalNewRole === 'director_maestria');
 
       const updated = {
         ...prev,
@@ -176216,7 +183141,8 @@ export function AuthProvider({ children }) {
         isConsolidatedView: isConsolidated,
         isDireccion,
         isGerente,
-        isSuperAdmin: isSuper
+        isSuperAdmin: isSuper,
+        isRoleSimulationActive
       };
 
       recordAuditEvent({
@@ -176330,8 +183256,18 @@ export function AuthProvider({ children }) {
       activeRole = assignedRoles[0];
     }
 
-    const isDireccion = isSuperAdmin || (isConsolidated ? hasDireccion : isDireccionRole(activeRole));
-    const isGerente = isSuperAdmin || isDireccion || (isConsolidated ? (hasGerente || hasDireccion) : (activeRole === 'gerente' || activeRole === 'director_maestria'));
+    // (08/09/2026) Mismo fix que en switchRole() más abajo: si al cargar/recargar la
+    // página ya había un rol simulado guardado en sessionStorage (savedActiveRole, no
+    // 'consolidado'), isDireccion/isGerente deben reflejar SOLO ese rol para un
+    // SuperAdmin, no su privilegio real — si no, la simulación se "olvidaba" cada vez
+    // que la página se recargaba.
+    const isRoleSimulationActive = Boolean(savedActiveRole) && !isConsolidated;
+    const isDireccion = isConsolidated
+      ? (isSuperAdmin || hasDireccion)
+      : (isRoleSimulationActive ? isDireccionRole(activeRole) : (isSuperAdmin || isDireccionRole(activeRole)));
+    const isGerente = isConsolidated
+      ? (isSuperAdmin || isDireccion || hasGerente)
+      : (isRoleSimulationActive ? (isDireccion || activeRole === 'gerente' || activeRole === 'director_maestria') : (isSuperAdmin || isDireccion || activeRole === 'gerente' || activeRole === 'director_maestria'));
 
     return {
       ...user,
@@ -176344,6 +183280,7 @@ export function AuthProvider({ children }) {
       isGerente,
       isSuperAdmin,
       isDireccion,
+      isRoleSimulationActive,
       sede: foundUser.sede || 'Global',
       document: foundUser.document || '',
       docType: foundUser.docType || '',
@@ -280505,9 +287442,11 @@ function KPIMetric({ label, value, target, actual, isInverse = false }) {
 
 ```javascript
 import React, { useState } from 'react';
-import { BookOpen, Copy, Check } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { BookOpen, Copy, Check, ArrowLeft } from 'lucide-react';
 
 export default function BrandScriptBoard() {
+  const navigate = useNavigate();
   const [copiedKey, setCopiedKey] = useState(null);
   const [selectedSede, setSelectedSede] = useState('Lima'); // Default para el guion
 
@@ -280526,7 +287465,20 @@ export default function BrandScriptBoard() {
 
   return (
     <div style={{ padding: '2rem', maxWidth: '1400px', margin: '0 auto', color: 'white', fontFamily: '"Inter", sans-serif' }}>
-      
+
+      {/* BUG REAL encontrado y corregido (08/09/2026, reportado por José: "este modulo
+          no tiene atras para regresar"). Este componente no importaba useNavigate ni
+          tenía ningún botón de vuelta — a diferencia del resto de páginas de la
+          plataforma (ej. DirectorioQT.jsx), que sí siguen el patrón "Volver a Causa
+          OS". Se agrega aquí el mismo patrón. */}
+      <button
+        onClick={() => navigate('/home')}
+        className="btn-secondary"
+        style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', borderRadius: '8px', cursor: 'pointer', marginBottom: '1.5rem' }}
+      >
+        <ArrowLeft size={16} /> Volver a Causa OS
+      </button>
+
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
         <BookOpen size={28} color={gold} />
         <h1 style={{ margin: 0, fontSize: '1.8rem', fontWeight: 'bold' }}>BrandScript & Guiones MJ</h1>
@@ -286087,36 +293039,62 @@ export default function ChecklistBoard() {
 ## Archivo: src\pages\CRMBaseMaster.jsx
 
 ```javascript
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../services/firebase';
 import { collection, query, limit, getDocs, where, getCountFromServer } from 'firebase/firestore';
 import { Search, RefreshCw, ArrowLeft, Users, CheckCircle, XCircle, Clock } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-hot-toast';
+import { canViewCRMMaestro } from '../config/permissions';
+
+// BUG REAL encontrado y corregido (08/09/2026, reportado por José: "esta base de
+// datos esta horrible"). Esta página usaba clases de Tailwind CSS (bg-emerald-500/20,
+// px-2 py-1 rounded, grid grid-cols-4, etc.) pero el proyecto NO tiene Tailwind
+// instalado — no existe tailwind.config, no está en package.json, y no hay
+// directivas @tailwind en ningún CSS de la plataforma. Era la ÚNICA página de toda
+// la app usando ese framework, así que ninguna de esas clases hacía nada — de ahí
+// el texto plano sin estilo que se veía. Reescrita aquí con estilos en línea,
+// siguiendo el mismo lenguaje visual (fondo oscuro, acentos dorados, tarjetas con
+// borde sutil) que ya usan el resto de páginas de la plataforma (ej. DirectorioQT.jsx).
+// La lógica de datos (fetchStats, fetchData, búsqueda) no se tocó — es exactamente
+// la misma que ya estaba.
 
 export default function CRMBaseMaster() {
   const navigate = useNavigate();
-  const { currentUser, isSuperAdmin } = useAuth();
-  
+  const { currentUser } = useAuth();
+
+  // BUG REAL corregido (08/09/2026, pedido explícito de José: "esta base solo la
+  // puedo ver yo"). Antes esta página no tenía NINGÚN control de acceso propio —
+  // la ruta /crm-maestro en App.jsx solo exige <PrivateRoute> (cualquier usuario
+  // autenticado), así que cualquier colaborador logueado podía ver los 2999
+  // registros de participantes (nombre, DNI, teléfono, IMO enrolador) de toda la
+  // plataforma. Ver canViewCRMMaestro() en permissions.js — por ahora solo
+  // restringe la INTERFAZ; la colección "participants" en firestore.rules sigue
+  // permitiendo lectura a cualquier SuperAdmin o Gerente/Dirección a nivel de
+  // base de datos, y estrecharla ahí requiere autorización explícita antes de
+  // tocar firestore.rules.
+  const hasAccess = canViewCRMMaestro(currentUser);
+
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [stats, setStats] = useState({ total: 0, sentados: 0, pendientes: 0 });
 
   useEffect(() => {
+    if (!hasAccess) return;
     fetchStats();
     fetchData();
-  }, []);
+  }, [hasAccess]);
 
   const fetchStats = async () => {
     try {
       const coll = collection(db, 'participants');
       const totalSnap = await getCountFromServer(coll);
-      
+
       const sentadosQ = query(coll, where('estadoC1', '==', 'SENTADO'));
       const sentadosSnap = await getCountFromServer(sentadosQ);
-      
+
       const pendientesQ = query(coll, where('estadoC1', '==', 'PENDIENTE'));
       const pendientesSnap = await getCountFromServer(pendientesQ);
 
@@ -286144,110 +293122,165 @@ export default function CRMBaseMaster() {
     setLoading(false);
   };
 
-  const getStatusBadge = (estado) => {
-    if (estado === 'SENTADO') return <span className="bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded text-xs font-bold flex items-center gap-1"><CheckCircle size={12}/> SENTADO</span>;
-    if (estado === 'DESERTOR') return <span className="bg-rose-500/20 text-rose-400 px-2 py-1 rounded text-xs font-bold flex items-center gap-1"><XCircle size={12}/> DESERTOR</span>;
-    if (estado === 'REZAGADO') return <span className="bg-amber-500/20 text-amber-400 px-2 py-1 rounded text-xs font-bold flex items-center gap-1"><Clock size={12}/> REZAGADO</span>;
-    return <span className="bg-slate-500/20 text-slate-400 px-2 py-1 rounded text-xs font-bold flex items-center gap-1"><Clock size={12}/> {estado || 'PENDIENTE'}</span>;
+  // Paleta consistente con el resto de la plataforma (ver DirectorioQT.jsx, Home.jsx)
+  const bgPage = '#0d152d';
+  const bgCard = 'rgba(255,255,255,0.03)';
+  const bgCardHeader = 'rgba(255,255,255,0.02)';
+  const bgInput = 'rgba(0,0,0,0.25)';
+  const borderSubtle = 'rgba(255,255,255,0.08)';
+  const gold = 'var(--crear-gold, #f59e0b)';
+  const textMain = '#f1f5f9';
+  const textMuted = '#94a3b8';
+
+  const STATUS_STYLES = {
+    SENTADO: { bg: 'rgba(16,185,129,0.15)', color: '#34d399', Icon: CheckCircle },
+    DESERTOR: { bg: 'rgba(244,63,94,0.15)', color: '#fb7185', Icon: XCircle },
+    REZAGADO: { bg: 'rgba(245,158,11,0.15)', color: '#fbbf24', Icon: Clock },
+    PENDIENTE: { bg: 'rgba(148,163,184,0.15)', color: '#94a3b8', Icon: Clock }
   };
 
-  const filteredData = data.filter(p => 
-    p.nombreCompleto?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+  const getStatusBadge = (estado) => {
+    const key = estado && STATUS_STYLES[estado] ? estado : 'PENDIENTE';
+    const { bg, color, Icon } = STATUS_STYLES[key];
+    return (
+      <span style={{ background: bg, color, padding: '0.25rem 0.6rem', borderRadius: '6px', fontSize: '0.72rem', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: '0.3rem', whiteSpace: 'nowrap' }}>
+        <Icon size={12} /> {estado || 'PENDIENTE'}
+      </span>
+    );
+  };
+
+  const filteredData = data.filter(p =>
+    p.nombreCompleto?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     p.dni?.includes(searchTerm)
   );
 
+  if (!hasAccess) {
+    return (
+      <div style={{ minHeight: '100vh', background: bgPage, color: textMain, padding: '1.5rem', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ maxWidth: '440px', textAlign: 'center', background: bgCard, border: `1px solid ${borderSubtle}`, borderRadius: '16px', padding: '2.5rem 2rem' }}>
+          <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>🔒</div>
+          <h2 style={{ margin: '0 0 0.6rem 0', color: gold, fontSize: '1.3rem' }}>Acceso Restringido</h2>
+          <p style={{ margin: '0 0 1.5rem 0', color: textMuted, fontSize: '0.9rem' }}>
+            Esta base de datos (Base Maestra CRM / Nodus) es de acceso exclusivo. No tienes permiso para verla.
+          </p>
+          <button
+            onClick={() => navigate('/home')}
+            className="btn-secondary"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1.2rem', borderRadius: '8px', cursor: 'pointer' }}
+          >
+            <ArrowLeft size={16} /> Volver a Causa OS
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-slate-900 text-white p-6 font-sans">
-      <div className="max-w-7xl mx-auto">
-        <header className="flex justify-between items-center mb-8 border-b border-slate-700 pb-4">
-          <div className="flex items-center gap-4">
-            <button onClick={() => navigate(-1)} className="p-2 bg-slate-800 hover:bg-slate-700 rounded-full transition-colors">
-              <ArrowLeft size={20} className="text-slate-300" />
+    <div style={{ minHeight: '100vh', background: bgPage, color: textMain, padding: '1.5rem', fontFamily: 'inherit' }}>
+      <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+
+        {/* HEADER */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem', paddingBottom: '1rem', borderBottom: `1px solid ${borderSubtle}` }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <button
+              onClick={() => navigate(-1)}
+              className="btn-secondary"
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', borderRadius: '8px', cursor: 'pointer' }}
+            >
+              <ArrowLeft size={16} /> Volver a Causa OS
             </button>
             <div>
-              <h1 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500 flex items-center gap-2">
-                <Users size={28} className="text-amber-400" /> Base Maestra CRM (Nodus)
+              <h1 style={{ margin: 0, fontSize: '1.7rem', fontWeight: 900, color: gold, display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                <Users size={26} color={gold} /> Base Maestra CRM (Nodus)
               </h1>
-              <p className="text-slate-400 mt-1">Conexión directa con todos los registros sincronizados de tu CRM</p>
+              <p style={{ margin: '0.3rem 0 0 0', color: textMuted, fontSize: '0.88rem' }}>
+                Conexión directa con todos los registros sincronizados de tu CRM
+              </p>
             </div>
           </div>
-          <button onClick={fetchData} className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded text-sm transition-colors border border-slate-700">
+          <button
+            onClick={fetchData}
+            className="btn-secondary"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.55rem 1.1rem', borderRadius: '8px', fontSize: '0.85rem', cursor: 'pointer' }}
+          >
             <RefreshCw size={16} /> Refrescar
           </button>
-        </header>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-slate-800 border border-slate-700 rounded-lg p-4">
-            <p className="text-slate-400 text-sm mb-1">Total Registros</p>
-            <p className="text-3xl font-bold text-white">{stats.total}</p>
+        {/* TARJETAS DE ESTADÍSTICAS */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+          <div style={{ background: bgCard, border: `1px solid ${borderSubtle}`, borderRadius: '12px', padding: '1.1rem' }}>
+            <div style={{ color: textMuted, fontSize: '0.8rem', marginBottom: '0.3rem', fontWeight: 600 }}>Total Registros</div>
+            <div style={{ fontSize: '1.9rem', fontWeight: 800, color: textMain }}>{stats.total}</div>
           </div>
-          <div className="bg-slate-800 border border-emerald-900/50 rounded-lg p-4">
-            <p className="text-slate-400 text-sm mb-1">Sentados</p>
-            <p className="text-3xl font-bold text-emerald-400">{stats.sentados}</p>
+          <div style={{ background: bgCard, border: '1px solid rgba(16,185,129,0.3)', borderRadius: '12px', padding: '1.1rem' }}>
+            <div style={{ color: textMuted, fontSize: '0.8rem', marginBottom: '0.3rem', fontWeight: 600 }}>Sentados</div>
+            <div style={{ fontSize: '1.9rem', fontWeight: 800, color: '#34d399' }}>{stats.sentados}</div>
           </div>
-          <div className="bg-slate-800 border border-slate-700 rounded-lg p-4">
-            <p className="text-slate-400 text-sm mb-1">Pendientes</p>
-            <p className="text-3xl font-bold text-slate-300">{stats.pendientes}</p>
+          <div style={{ background: bgCard, border: `1px solid ${borderSubtle}`, borderRadius: '12px', padding: '1.1rem' }}>
+            <div style={{ color: textMuted, fontSize: '0.8rem', marginBottom: '0.3rem', fontWeight: 600 }}>Pendientes</div>
+            <div style={{ fontSize: '1.9rem', fontWeight: 800, color: '#cbd5e1' }}>{stats.pendientes}</div>
           </div>
         </div>
 
-        <div className="bg-slate-800 rounded-lg border border-slate-700 overflow-hidden shadow-xl">
-          <div className="p-4 border-b border-slate-700 flex flex-wrap gap-4 items-center bg-slate-800/50">
-            <div className="relative flex-1 min-w-[300px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-              <input 
-                type="text" 
-                placeholder="Buscar por DNI o Nombres..." 
-                className="w-full bg-slate-900 border border-slate-700 rounded py-2 pl-10 pr-4 text-white focus:outline-none focus:border-amber-500 transition-colors"
+        {/* TABLA */}
+        <div style={{ background: bgCard, border: `1px solid ${borderSubtle}`, borderRadius: '12px', overflow: 'hidden' }}>
+          <div style={{ padding: '1rem', borderBottom: `1px solid ${borderSubtle}`, background: bgCardHeader, display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center' }}>
+            <div style={{ position: 'relative', flex: 1, minWidth: '280px' }}>
+              <Search size={16} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: textMuted }} />
+              <input
+                type="text"
+                placeholder="Buscar por DNI o Nombres..."
+                style={{ width: '100%', background: bgInput, border: `1px solid ${borderSubtle}`, borderRadius: '8px', padding: '0.55rem 1rem 0.55rem 2.3rem', color: textMain, fontSize: '0.85rem', outline: 'none', boxSizing: 'border-box' }}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
               <thead>
-                <tr className="bg-slate-900/50 text-slate-400 text-sm uppercase tracking-wider">
-                  <th className="p-4 border-b border-slate-700 font-medium">Participante</th>
-                  <th className="p-4 border-b border-slate-700 font-medium">Contacto</th>
-                  <th className="p-4 border-b border-slate-700 font-medium">Estado C1</th>
-                  <th className="p-4 border-b border-slate-700 font-medium">Coordinadora</th>
-                  <th className="p-4 border-b border-slate-700 font-medium">IMO Enrolador</th>
+                <tr style={{ background: 'rgba(0,0,0,0.2)', color: textMuted, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  <th style={{ padding: '0.9rem 1rem', borderBottom: `1px solid ${borderSubtle}`, fontWeight: 700 }}>Participante</th>
+                  <th style={{ padding: '0.9rem 1rem', borderBottom: `1px solid ${borderSubtle}`, fontWeight: 700 }}>Contacto</th>
+                  <th style={{ padding: '0.9rem 1rem', borderBottom: `1px solid ${borderSubtle}`, fontWeight: 700 }}>Estado C1</th>
+                  <th style={{ padding: '0.9rem 1rem', borderBottom: `1px solid ${borderSubtle}`, fontWeight: 700 }}>Coordinadora</th>
+                  <th style={{ padding: '0.9rem 1rem', borderBottom: `1px solid ${borderSubtle}`, fontWeight: 700 }}>IMO Enrolador</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-700/50">
+              <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan="5" className="p-8 text-center text-slate-400">
-                      <RefreshCw className="animate-spin mx-auto mb-2" size={24} />
+                    <td colSpan="5" style={{ padding: '2.5rem', textAlign: 'center', color: textMuted }}>
+                      <RefreshCw size={22} style={{ display: 'block', margin: '0 auto 0.5rem', animation: 'spin 1s linear infinite' }} />
                       Cargando base de datos...
                     </td>
                   </tr>
                 ) : filteredData.length === 0 ? (
                   <tr>
-                    <td colSpan="5" className="p-8 text-center text-slate-400">
+                    <td colSpan="5" style={{ padding: '2.5rem', textAlign: 'center', color: textMuted }}>
                       No se encontraron resultados en la vista actual.
                     </td>
                   </tr>
                 ) : (
-                  filteredData.map(p => (
-                    <tr key={p.id} className="hover:bg-slate-700/30 transition-colors">
-                      <td className="p-4">
-                        <div className="font-semibold text-white">{p.nombreCompleto}</div>
-                        <div className="text-xs text-slate-400 mt-1">DNI: {p.dni || 'Sin DNI'}</div>
+                  filteredData.map((p, idx) => (
+                    <tr key={p.id} style={{ borderBottom: idx === filteredData.length - 1 ? 'none' : `1px solid rgba(255,255,255,0.05)` }}>
+                      <td style={{ padding: '0.9rem 1rem' }}>
+                        <div style={{ fontWeight: 700, color: textMain }}>{p.nombreCompleto}</div>
+                        <div style={{ fontSize: '0.72rem', color: textMuted, marginTop: '0.15rem' }}>DNI: {p.dni || 'Sin DNI'}</div>
                       </td>
-                      <td className="p-4">
-                        <div className="text-sm">{p.telefono || '-'}</div>
-                        <div className="text-xs text-slate-400 truncate max-w-[150px]">{p.email || '-'}</div>
+                      <td style={{ padding: '0.9rem 1rem' }}>
+                        <div style={{ fontSize: '0.85rem' }}>{p.telefono || '-'}</div>
+                        <div style={{ fontSize: '0.72rem', color: textMuted, maxWidth: '160px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.email || '-'}</div>
                       </td>
-                      <td className="p-4">
+                      <td style={{ padding: '0.9rem 1rem' }}>
                         {getStatusBadge(p.estadoC1)}
                       </td>
-                      <td className="p-4 text-sm text-slate-300">
+                      <td style={{ padding: '0.9rem 1rem', fontSize: '0.85rem', color: '#cbd5e1' }}>
                         {p.coordinadora || '-'}
                       </td>
-                      <td className="p-4 text-sm text-slate-400">
+                      <td style={{ padding: '0.9rem 1rem', fontSize: '0.85rem', color: textMuted }}>
                         {p.imoEnrolador || '-'}
                       </td>
                     </tr>
@@ -286256,11 +293289,12 @@ export default function CRMBaseMaster() {
               </tbody>
             </table>
           </div>
-          <div className="p-4 border-t border-slate-700 text-xs text-slate-500 text-center">
-            Mostrando hasta 150 registros recientes. Usa la barra de busqueda para filtrar localmente.
+          <div style={{ padding: '0.9rem', borderTop: `1px solid ${borderSubtle}`, textAlign: 'center', fontSize: '0.72rem', color: textMuted }}>
+            Mostrando hasta 150 registros recientes. Usa la barra de búsqueda para filtrar localmente.
           </div>
         </div>
       </div>
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }
@@ -286658,13 +293692,26 @@ export default function DirectorioQT() {
   }, [members, selectedSede, selectedEdicion, searchQuery]);
 
   // Estadísticas rápidas
+  // BUG REAL encontrado y corregido (08/09/2026, reportado por José viendo la
+  // plataforma en modo simulador como un QT de Quito: "no sé si estos datos
+  // corresponden a la realidad y sede"): estas 4 tarjetas ("Total QT Activos",
+  // "Líderes Senior", "Sedes Cubiertas", "Perfiles Verificados") se calculaban
+  // sobre `members` — la lista CRUDA SIN FILTRAR por rol/sede — mientras que la
+  // lista de tarjetas de abajo sí usa `filteredMembers` (con el filtro real de
+  // "SOLO SU SEDE" para QT/Coord C1Y2). Resultado: un QT de una sola sede veía
+  // en el encabezado el total GLOBAL de las 5 sedes (42 QT, 19 Senior, 5 Sedes)
+  // aunque la lista de tarjetas debajo ya le mostraba solo su propia sede — un
+  // desajuste real entre lo que dicen los números y lo que la lista realmente
+  // muestra. Ahora ambos usan la misma fuente (`filteredMembers`), así que las
+  // tarjetas reflejan exactamente lo que el usuario tiene delante, sede
+  // incluida.
   const stats = useMemo(() => {
-    const total = members.length;
-    const seniors = members.filter(m => m.isSenior).length;
-    const sedesCount = new Set(members.map(m => m.sede)).size;
-    const activos = members.filter(m => m.esActivo).length;
+    const total = filteredMembers.length;
+    const seniors = filteredMembers.filter(m => m.isSenior).length;
+    const sedesCount = new Set(filteredMembers.map(m => m.sede)).size;
+    const activos = filteredMembers.filter(m => m.esActivo).length;
     return { total, seniors, sedesCount, activos };
-  }, [members]);
+  }, [filteredMembers]);
 
   const formatLastUpdated = (isoDate) => {
     if (!isoDate) return 'Desconocido';
@@ -289325,6 +296372,13 @@ export default function GoalsBoard() {
   const [loading, setLoading] = useState(true);
   const [selectedSedeFilter, setSelectedSedeFilter] = useState('Todas');
 
+  const canManageGoals = Boolean(
+    currentUser?.isSuperAdmin ||
+    currentUser?.isDireccion ||
+    ['gerente', 'direccion', 'cfo', 'ceo', 'cco', 'director_maestria', 'superadmin', 'consolidado'].includes(currentUser?.appRole) ||
+    (currentUser?.roles || []).some(r => ['gerente', 'direccion', 'cfo', 'ceo', 'cco', 'director_maestria', 'superadmin', 'consolidado'].includes(r))
+  );
+
   // Modal de Asignación / División de Metas
   const [selectedGoalForAssignment, setSelectedGoalForAssignment] = useState(null);
   const [showDivisionModal, setShowDivisionModal] = useState(false);
@@ -289728,8 +296782,8 @@ export default function GoalsBoard() {
             </p>
           </div>
 
-          {/* BOTONES DE ACCIÓN PARA GERENTES Y COORDINADORAS */}
-          {goal.targetValue && (
+          {/* BOTONES DE ACCIÓN PARA GERENTES Y DIRECTIVOS */}
+          {goal.targetValue && canManageGoals && (
             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
               <button 
                 type="button"
@@ -289759,15 +296813,15 @@ export default function GoalsBoard() {
           <div style={{ flex: 1, height: '12px', background: 'rgba(255,255,255,0.06)', borderRadius: '6px', overflow: 'hidden' }}>
             <div style={{ 
               height: '100%', 
-              width: `${Math.min(goal.progress, 100)}%`, 
-              background: goal.progress >= 100 
+              width: `${Math.min(Number(goal.progress) || 0, 100)}%`, 
+              background: (Number(goal.progress) || 0) >= 100 
                 ? 'linear-gradient(90deg, #22c55e, #16a34a)' 
                 : 'linear-gradient(90deg, #00d2ff, #0284c7)', 
               transition: 'width 0.4s ease' 
             }} />
           </div>
           <span className="text-gold" style={{ fontWeight: 'bold', minWidth: '45px', fontSize: '1.05rem' }}>
-            {goal.progress}%
+            {Number(goal.progress) || 0}%
           </span>
         </div>
 
@@ -290058,11 +297112,11 @@ import ViewModeSelector from '../components/ViewModeSelector';
 import ThemeToggle from '../components/ThemeToggle';
 import { getVenueForTraining } from '../data/venuesData';
 import { ROLE_DISPLAY_NAMES, normalizeSede } from '../data/usersData';
-import { 
+import {
   canAssignTrainer, canViewAllManagers, isDireccionRole, isGlobalQTCoordinator,
-  canAccessAgendaTimeBoxing, canAccessFlyersC1, canAccessCalendarioMJ, 
-  canAccessMonitorVuelos, canAccessHotelesSede, canAccessManualQT, 
-  canAccessDirectorioQT, canAccessManualNodus, canAccessCampusInteractivo 
+  canAccessAgendaTimeBoxing, canAccessFlyersC1, canAccessCalendarioMJ,
+  canAccessMonitorVuelos, canAccessMonitorIMOs, canAccessHotelesSede, canAccessManualQT,
+  canAccessDirectorioQT, canAccessManualNodus, canAccessCampusInteractivo
 } from '../config/permissions';
 import EffectiveCommunicationButton from '../components/EffectiveCommunicationButton';
 import { getAllCompanyUsers } from '../services/userService';
@@ -290117,13 +297171,16 @@ const isTrainerMatchingUser = (evTrainer, user) => {
 // hay que actualizar también esta lista para que el buscador no muestre
 // accesos desactualizados o incorrectos.
 // ============================================================================
-const EXEC_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin'];
+const EXEC_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria'];
 const KPI_ROLES = ['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan'];
-const DIRECTORIO_QT_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin'];
+const DIRECTORIO_QT_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'director_maestria'];
+// CAMPUS_ROLES: ya no se usa como filtro — Campus Interactivo es abierto a TODOS los
+// roles según la Matriz Oficial (fila "Campus Interactivo" = X en las 9 columnas).
+// Se deja declarada solo por si se necesita revertir a un acceso restringido.
 const CAMPUS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin'];
-const CENTRO_MANAGERS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin'];
-const MANUAL_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin'];
-const MANUAL_NODUS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin'];
+const CENTRO_MANAGERS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'director_maestria'];
+const MANUAL_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'director_maestria'];
+const MANUAL_NODUS_ROLES = ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'director_maestria'];
 const REPORTES_VISIBLE = (u) => Boolean(
   u?.isSuperAdmin || u?.isGerente ||
   ['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'capitan', 'qt', 'direccion', 'director_maestria', 'aliado', 'manager'].includes(u?.appRole)
@@ -290201,7 +297258,9 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Diseño y descarga de afiches oficiales para Instagram, WhatsApp y redes por sede',
     keywords: ['flyer', 'flyers', 'generador', 'afiche', 'diseño', 'diseno', 'poster', 'descargar flyer', 'hd', '1080x1920', 'tierra', 'bot flyer', 'imagen'],
     route: '/generador-flyer',
-    roles: null
+    // Antes era null (abierto a todos, incluidos Directivos). Corregido según
+    // confirmación explícita de José (08/09/2026): Directivos NO tienen acceso.
+    roles: ['gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj']
   },
   {
     id: 'opt-new-task',
@@ -290278,7 +297337,9 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Editor y visor oficial del cronograma de Maestría del Juego para todas las sedes',
     keywords: ['calendario mj', 'maestria del juego', 'cronograma mj', 'fechas maestria', 'e28', 'e29', 'e30', 'equipos'],
     route: '/calendario-mj',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria', 'coord_maestria', 'coordinador_mj']
+    // Corregido según confirmación explícita de José (08/09/2026): "sí, así es
+    // correcto" — SOLO Coordinadores de MJ. Directivos y Gerentes NO tienen acceso.
+    roles: ['coord_maestria', 'coordinador_mj']
   },
   {
     id: 'opt-calendario-global',
@@ -290289,7 +297350,9 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Cronograma global consolidado de eventos, talleres y hitos para Lima, Quito, GYE y Cuenca',
     keywords: ['calendario global', 'calendario maestro', 'fechas globales', 'eventos', 'cronograma', 'google calendar'],
     external: 'calendario-global',
-    roles: null
+    // Antes era null (abierto a todos). Corregido: Directivos + Gerentes
+    // únicamente según la Matriz Oficial (08/09/2026).
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']
   },
   {
     id: 'opt-agenda-equipo',
@@ -290379,7 +297442,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Gestión de llamadas, seguimiento a participantes PX, aliados y coordinadores',
     keywords: ['centro managers', 'managers', 'llamadas', 'px', 'aliados', 'seguimiento equipos'],
     route: '/centro-managers',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin']
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'director_maestria']
   },
   {
     id: 'opt-directorio-qt',
@@ -290390,7 +297453,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Teléfonos, WhatsApp directos y correos de todo el equipo de coordinación y staff',
     keywords: ['directorio', 'directorio qt', 'telefonos', 'whatsapp', 'contactos staff', 'coordinadores'],
     route: '/directorio-qt',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin']
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'director_maestria']
   },
   {
     id: 'opt-gerencial',
@@ -290401,7 +297464,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Panel de control de alta dirección y toma de decisiones estratégicas',
     keywords: ['gerente', 'gerencial', 'comite', 'direccion', 'dashboard gerencial'],
     route: '/gerente',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']
   },
   {
     id: 'opt-estrategia',
@@ -290412,7 +297475,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Mapa estratégico y seguimiento de objetivos clave y resultados',
     keywords: ['estrategia', 'okrs', 'cascade', 'objetivos', 'iniciativas'],
     route: '/estrategia',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']
   },
   {
     id: 'opt-portafolio',
@@ -290423,7 +297486,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Supervisión de iniciativas, proyectos corporativos y cronogramas de entrega',
     keywords: ['portafolio', 'pmo', 'proyectos', 'planview', 'gantt'],
     route: '/portafolio',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']
   },
   {
     id: 'opt-auditoria-kpis',
@@ -290434,7 +297497,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Detección de anomalías, inconsistencias y validación cruzada de números',
     keywords: ['auditoria', 'auditoria kpis', 'control', 'revision metricas', 'inconsistencias'],
     route: '/auditoria-kpis',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']
   },
   {
     id: 'opt-acuerdos',
@@ -290478,7 +297541,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Gestión integral de usuarios, asignación de roles, permisos y configuración del sistema',
     keywords: ['superadmin', 'centro de mando', 'administracion', 'usuarios', 'roles', 'permisos'],
     route: '/superadmin',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']
   },
   {
     id: 'opt-sedes',
@@ -290511,7 +297574,7 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Documentación paso a paso de todas las funciones de Causa OS',
     keywords: ['manual', 'guia', 'manual causa', 'instructivo', 'como funciona', 'ayuda'],
     route: '/manual',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin']
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'qt', 'superadmin', 'director_maestria']
   },
   {
     id: 'opt-manual-nodus',
@@ -290522,7 +297585,10 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Gobernanza simbiótica Nodus + Causa OS, 9 niveles, vestimenta 2026, 14 KPIs y manual paso a paso de Nodus',
     keywords: ['manual nodus', 'nodus', 'gobernanza', 'guia nodus', 'plataforma nodus', 'imo', 'kpis', 'triggers', 'vestimenta', 'el viaje', 'paul sosa', 'fer aragon', 'elizabeth escobar'],
     route: '/manual-nodus',
-    roles: null
+    // Antes era null (abierto a todos). Corregido para que coincida con
+    // MANUAL_NODUS_ROLES / la Matriz Oficial: Directivos, Gerentes,
+    // Coordinadores C1Y2 y Coordinadores de MJ únicamente (08/09/2026).
+    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin', 'director_maestria']
   },
   {
     id: 'opt-vende-sin-vender',
@@ -290544,7 +297610,9 @@ const CAUSA_OPTIONS_REGISTRY = [
     desc: 'Plataforma interactiva de entrenamiento, videos y recursos de capacitación',
     keywords: ['campus', 'campus interactivo', 'academia', 'cursos', 'videos', 'capacitacion'],
     external: 'https://cpsl-campus-interactivo.vercel.app/ruta',
-    roles: ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'superadmin']
+    // Antes restringía a un subconjunto de roles. Corregido: Campus Interactivo
+    // es abierto a TODOS los roles según la Matriz Oficial (08/09/2026).
+    roles: null
   },
   {
     id: 'opt-tema',
@@ -290593,8 +297661,11 @@ const MODULE_REGISTRY = [
   { id: 'mis-kpis', label: 'Mis KPIs', emoji: '📊', route: '/mis-kpis', roles: KPI_ROLES },
   { id: 'directorio-qt', label: 'Directorio QT', emoji: '⚡', route: '/directorio-qt', roles: DIRECTORIO_QT_ROLES },
   { id: 'superadmin', label: 'Centro de Mando', emoji: '🌐', route: '/superadmin', roles: EXEC_ROLES },
-  { id: 'calendario-global', label: 'Calendario Global Maestro', emoji: '📅', external: 'calendario-global', roles: null },
-  { id: 'campus', label: 'Campus Interactivo', emoji: '🎓', external: 'https://cpsl-campus-interactivo.vercel.app/ruta', roles: CAMPUS_ROLES },
+  // Antes era null (abierto a todos). Corregido: Directivos + Gerentes únicamente
+  // según la Matriz Oficial, fila "Calendario Global" (08/09/2026).
+  { id: 'calendario-global', label: 'Calendario Global Maestro', emoji: '📅', external: 'calendario-global', roles: EXEC_ROLES },
+  // Abierto a TODOS los roles según la Matriz Oficial (antes usaba CAMPUS_ROLES, restrictivo).
+  { id: 'campus', label: 'Campus Interactivo', emoji: '🎓', external: 'https://cpsl-campus-interactivo.vercel.app/ruta', roles: null },
   { id: 'centro-managers', label: 'Centro de Managers', emoji: '🎯', route: '/centro-managers', roles: CENTRO_MANAGERS_ROLES },
   { id: 'protocolo-emergencias', label: 'Protocolo de Emergencias', emoji: '🚨', route: '/protocolo-emergencias', roles: null },
   { id: 'manual', label: 'Manual / Guía Causa OS / QT', emoji: '📘', route: '/manual', roles: MANUAL_ROLES },
@@ -290602,14 +297673,43 @@ const MODULE_REGISTRY = [
   { id: 'checklist', label: 'Mi Checklist Operativo', emoji: '✅', route: (u) => `/checklist/${u?.appRole || 'capitan'}`, roles: null },
   { id: 'metas', label: 'Mis Metas', emoji: '🏆', route: '/metas', roles: null },
   { id: 'reportes', label: 'Enviar Reportes', emoji: '📤', route: '/reportes', roles: null, visible: REPORTES_VISIBLE },
-  { id: 'generador-flyer', label: 'Generador de Flyers Oficiales', emoji: '🎨', route: '/generador-flyer', roles: [...EXEC_ROLES, 'coordinador', 'coord_c1', 'coord_c2', 'coordinador_c1c2'] },
+  // Corregido según confirmación explícita de José (08/09/2026): Directivos (y
+  // director_maestria, tratado como Directivos) NO tienen acceso a Flyers C1.
+  // Solo Gerentes, Coordinadores C1Y2 y Coordinadores de MJ, según la Matriz Oficial.
+  { id: 'generador-flyer', label: 'Generador de Flyers Oficiales', emoji: '🎨', route: '/generador-flyer', roles: ['gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj'] },
+];
+
+// BUG REAL corregido (08/09/2026, reportado por José: "soy superusuario con
+// acceso a todo lo cual debería aparecer en mi selector"). El selector de rol
+// inline de la barra PRO (más abajo, junto al nombre/avatar) solo listaba
+// `currentUser.roles` — para un SuperAdmin eso son solo los 3-4 roles que
+// buildUserObject() le inyecta automáticamente en AuthContext.jsx (gerente,
+// direccion, consolidado, y entrenador si aplica DUAL_ROLE_TRAINER_EMAILS), no
+// TODOS los roles del sistema. Un SuperAdmin necesita poder simular cualquier
+// rol para probar la plataforma, así que para él la lista de opciones ahora es
+// esta lista fija de todos los roles reales de Causa OS (mismo catálogo que ya
+// usa RoleSelector.jsx en su `roleHierarchy`), en vez de su array personal de
+// roles asignados en Firestore. Se excluye 'student' a propósito: no es un rol
+// del sistema SO-AR (ver el comentario en ROLE_DISPLAY_NAMES, usersData.js).
+const ALL_SIMULATABLE_ROLES = [
+  'consolidado', 'direccion', 'cfo', 'gerente', 'director_maestria',
+  'coord_c1', 'coord_maestria', 'capitan', 'manager',
+  'entrenador', 'entrenador_llamadas', 'qt',
+  'finanzas', 'coordinador', 'talento_humano', 'legal',
+  'asistente_impuestos_quito', 'tecnico_sst'
 ];
 
 const isModuleVisible = (mod, currentUser) => {
   if (typeof mod.visible === 'function') return mod.visible(currentUser);
   if (mod.roles === null) return true;
   const allowedRoles = mod.roles || [];
-  if (currentUser?.isSuperAdmin) return true;
+  // BUG REAL corregido (08/09/2026, reportado por José: "cuando cambio de rol
+  // esto se debería modificar, que solo se vean los del rol") — ver la nota
+  // completa en checkModuleAccess() (permissions.js) y en switchRole()
+  // (AuthContext.jsx). Mientras isRoleSimulationActive es true, un SuperAdmin
+  // ya NO recibe el bypass total: los botones del PRO bar (MODULE_REGISTRY) se
+  // filtran exactamente igual que para el rol que tiene elegido en el selector.
+  if (currentUser?.isSuperAdmin && !currentUser?.isRoleSimulationActive) return true;
   if (currentUser?.appRole === 'consolidado') {
     return (currentUser?.roles || []).some(r => allowedRoles.includes(r));
   }
@@ -290647,7 +297747,9 @@ const getCountdownInfo = (deadlineIso, now) => {
 
 export default function Home() {
   const hasRoleAccess = (allowedRoles) => {
-    if (currentUser?.isSuperAdmin) return true;
+    // Mismo fix de simulación de rol que isModuleVisible() más arriba y
+    // checkModuleAccess() en permissions.js (08/09/2026).
+    if (currentUser?.isSuperAdmin && !currentUser?.isRoleSimulationActive) return true;
     if (currentUser?.appRole === 'consolidado') {
       return (currentUser?.roles || []).some(r => allowedRoles.includes(r));
     }
@@ -290847,7 +297949,7 @@ export default function Home() {
   // de este archivo.
   // ==========================================================================
   const canSeeGlobalDirectory = Boolean(
-    currentUser?.isSuperAdmin ||
+    (currentUser?.isSuperAdmin && !currentUser?.isRoleSimulationActive) ||
     currentUser?.isDireccion ||
     isDireccionRole(currentUser?.appRole) ||
     canViewAllManagers(currentUser)
@@ -290875,7 +297977,7 @@ export default function Home() {
 
   const globalSearchOptionResults = !globalSearchActive ? [] : CAUSA_OPTIONS_REGISTRY
     .filter(opt => {
-      if (opt.roles && !hasRoleAccess(opt.roles) && !currentUser?.isSuperAdmin) {
+      if (opt.roles && !hasRoleAccess(opt.roles) && !(currentUser?.isSuperAdmin && !currentUser?.isRoleSimulationActive)) {
         return false;
       }
       if (typeof opt.visible === 'function' && !opt.visible(currentUser)) {
@@ -291088,7 +298190,7 @@ export default function Home() {
             </h2>
           </div>
           <p className="text-muted" style={{ margin: '0.8rem 0 0', textTransform: 'uppercase', fontSize: '0.85rem' }}>
-            {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') ? 'MÚLTIPLES EQUIPOS (GLOBAL) • VISIÓN MÚLTIPLES SEDES' : (currentCycle ? `${currentCycle.name} • ETAPA: ${currentStage}` : 'CARGANDO CICLO...')}
+            {((currentUser?.isSuperAdmin && !currentUser?.isRoleSimulationActive) || currentUser?.appRole === 'direccion') ? 'MÚLTIPLES EQUIPOS (GLOBAL) • VISIÓN MÚLTIPLES SEDES' : (currentCycle ? `${currentCycle.name} • ETAPA: ${currentStage}` : 'CARGANDO CICLO...')}
           </p>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginTop: '0.8rem', flexWrap: 'wrap' }}>
@@ -291272,11 +298374,11 @@ export default function Home() {
             <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <span style={{ fontSize: '0.9rem', fontWeight: 'bold', color: 'var(--text-main)' }}>{currentUser?.name || currentUser?.displayName || 'Usuario'}</span>
               <span style={{ fontSize: '0.75rem', color: 'var(--crear-gold)', fontWeight: 'bold', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'flex-end' }}>
-                {currentUser?.isSuperAdmin && !currentUser?.isSimulated
+                {currentUser?.isSuperAdmin && !currentUser?.isSimulated && !currentUser?.isRoleSimulationActive
                   ? <>Super Admin | Gerente Lima {getFlagForSede('Lima')}</>
-                  : <>{ROLE_DISPLAY_NAMES[currentUser?.appRole] || currentUser?.appRole?.replace(/_/g, ' ') || 'Miembro'} {getFlagForSede(currentUser?.sede)}</>}
+                  : <>{currentUser?.appRole === 'consolidado' ? 'Vista Consolidada (Global)' : (ROLE_DISPLAY_NAMES[currentUser?.appRole] || currentUser?.appRole?.replace(/_/g, ' ') || 'Miembro')} {getFlagForSede(currentUser?.sede)}</>}
               </span>
-              {currentUser?.roles && currentUser.roles.length > 1 && (
+              {((currentUser?.roles && currentUser.roles.length > 1) || currentUser?.isSuperAdmin) && (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.4rem', marginTop: '3px' }}>
                   <select
                     value={currentUser.activeRole || currentUser.appRole}
@@ -291294,9 +298396,9 @@ export default function Home() {
                     }}
                     title="Cambiar tu rol activo"
                   >
-                    {currentUser.roles.map(r => (
+                    {(currentUser?.isSuperAdmin ? ALL_SIMULATABLE_ROLES : currentUser.roles).map(r => (
                       <option key={r} value={r} style={{ background: '#0d152d', color: '#ffffff' }}>
-                        🎭 {ROLE_DISPLAY_NAMES[r] || r.toUpperCase()}
+                        🎭 {r === 'consolidado' ? 'Vista Consolidada (Global)' : (ROLE_DISPLAY_NAMES[r] || r.toUpperCase())}
                       </option>
                     ))}
                   </select>
@@ -291461,7 +298563,7 @@ export default function Home() {
                 boxShadow: '0 20px 50px rgba(0,0,0,0.95), 0 0 25px rgba(41, 171, 226, 0.2)',
                 border: '1px solid rgba(41, 171, 226, 0.4)'
               }}>
-                {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']) ? (
+                {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) ? (
                   <>
                     <button onClick={() => { setShowToolsDropdown(false); navigate('/gerente'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                       💼 Causa OS Gerencial
@@ -291521,22 +298623,26 @@ export default function Home() {
                 )}
 
                 {canAccessMonitorVuelos(currentUser) && (
-                  <>
-                    <button 
-                      onClick={() => { setShowToolsDropdown(false); navigate('/monitor-vuelos'); }} 
-                      className="btn-secondary" 
-                      style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem', border: '1px solid rgba(56, 189, 248, 0.3)', cursor: 'pointer' }}
-                    >
-                      ✈️ Monitor de Vuelos y Cartas
-                    </button>
-                    <button 
-                      onClick={() => { setShowToolsDropdown(false); navigate('/monitor-imos'); }} 
-                      className="btn-secondary" 
-                      style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(168, 85, 247, 0.15)', color: '#a855f7', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem', border: '1px solid rgba(168, 85, 247, 0.3)', cursor: 'pointer' }}
-                    >
-                      🦅 Monitor de IMOs
-                    </button>
-                  </>
+                  <button
+                    onClick={() => { setShowToolsDropdown(false); navigate('/monitor-vuelos'); }}
+                    className="btn-secondary"
+                    style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(56, 189, 248, 0.15)', color: '#38bdf8', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem', border: '1px solid rgba(56, 189, 248, 0.3)', cursor: 'pointer' }}
+                  >
+                    ✈️ Monitor de Vuelos y Cartas
+                  </button>
+                )}
+                {/* Antes usaba canAccessMonitorVuelos (compartía gate con "Monitor de
+                    Vuelos" vía la entrada 'sistema_cartas'), lo que excluía indebidamente
+                    a Coordinadores C1Y2 y de MJ que la Matriz Oficial sí autoriza para
+                    Monitor de IMOs. Corregido con su propio canAccessMonitorIMOs (08/09/2026). */}
+                {canAccessMonitorIMOs(currentUser) && (
+                  <button
+                    onClick={() => { setShowToolsDropdown(false); navigate('/monitor-imos'); }}
+                    className="btn-secondary"
+                    style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start', background: 'rgba(168, 85, 247, 0.15)', color: '#a855f7', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '0.4rem', border: '1px solid rgba(168, 85, 247, 0.3)', cursor: 'pointer' }}
+                  >
+                    🦅 Monitor de IMOs
+                  </button>
                 )}
 
                 {hasRoleAccess(['coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj', 'qt', 'capitan']) && (
@@ -291551,13 +298657,13 @@ export default function Home() {
                   </button>
                 )}
 
-                {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']) && (
+                {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) && (
                   <button onClick={() => { setShowToolsDropdown(false); navigate('/superadmin'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                     🌐 Centro de Mando
                   </button>
                 )}
 
-                {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']) && (
+                {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) && (
                   <button onClick={() => { setShowToolsDropdown(false); window.open('/calendario_global.html?v=' + Date.now() + '&email=' + encodeURIComponent(currentUser?.email || '') + '&name=' + encodeURIComponent(currentUser?.displayName || currentUser?.name || ''), '_blank'); }} className="btn-secondary" style={{ textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                     📅 Calendario Global Maestro ↗
                   </button>
@@ -291568,7 +298674,7 @@ export default function Home() {
                   🎓 Campus Interactivo ↗
                 </button>
 
-                {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin']) && (
+                {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'director_maestria']) && (
                   <div style={{ display: 'flex', gap: '0.2rem', padding: '0.2rem' }}>
                     <button onClick={() => { setShowToolsDropdown(false); navigate('/centro-managers'); }} className="btn-secondary" style={{ flex: 1, textAlign: 'left', padding: '0.5rem', fontSize: '0.82rem', justifyContent: 'flex-start' }}>
                       🎯 Centro de Managers
@@ -291622,7 +298728,7 @@ export default function Home() {
               ⏰ Horarios y Vestimenta
             </button>
           )}
-          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']) ? (
+          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) ? (
             <button onClick={() => navigate('/gerente')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'var(--crear-gold)', color: 'black' }}>
               💼 SO-AR Gerencial
             </button>
@@ -291631,7 +298737,7 @@ export default function Home() {
               💼 Mi Dashboard
             </button>
           )}
-          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']) && (
+          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) && (
             <>
               <button onClick={() => navigate('/portafolio')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #0ea5e9, #0369a1)', color: 'white', border: 'none' }}>
                 📈 Portafolio PMO
@@ -291652,7 +298758,13 @@ export default function Home() {
           )}
 
           {canAccessManualQT(currentUser) && (
-            <button onClick={() => navigate('/manual')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #0284c7, #2563eb)', color: 'white', border: 'none' }}>
+            // BUG REAL encontrado y corregido (08/09/2026, reportado por José: "esto debería
+            // de llevar al manual del QT no un manual de causa"). Antes navegaba a /manual
+            // (ManualGuia.jsx), que abre por defecto en la pestaña general "brochure" de
+            // Causa OS — la sección exclusiva de QT existe ahí (pestaña "Guía por Rol"), pero
+            // no es lo primero que se ve. José eligió la opción de llevar directo al Manual QT
+            // externo completo (el mismo enlace que ya existía dentro de esa sección).
+            <button onClick={() => window.open('https://crearpsl.net/manual_quantum_team.html', '_blank', 'noopener,noreferrer')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #0284c7, #2563eb)', color: 'white', border: 'none' }}>
               📘 Manual QT
             </button>
           )}
@@ -291669,13 +298781,13 @@ export default function Home() {
             </button>
           )}
 
-          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']) && (
+          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) && (
             <button onClick={() => navigate('/superadmin')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #8b5cf6, #29abe2)', color: 'white', border: 'none' }}>
               🌐 Centro de Mando
             </button>
           )}
 
-          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']) && (
+          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) && (
             <button onClick={() => window.open('/calendario_global.html?v=' + Date.now() + '&email=' + encodeURIComponent(currentUser?.email || '') + '&name=' + encodeURIComponent(currentUser?.displayName || currentUser?.name || ''), '_blank')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #ef4444)', color: 'white', border: 'none' }}>
               📅 Calendario Global
             </button>
@@ -291686,13 +298798,13 @@ export default function Home() {
             🎓 Campus Interactivo
           </button>
 
-          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin']) && (
+          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'coordinador_mj', 'coord_maestria', 'entrenador', 'entrenador_llamadas', 'superadmin', 'director_maestria']) && (
             <button onClick={() => navigate('/centro-managers')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#000', fontWeight: 'bold', border: 'none' }}>
               👑 Centro Managers
             </button>
           )}
 
-          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']) && (
+          {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) && (
             <button onClick={() => navigate('/crm-maestro')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #10b981, #047857)', color: 'white', fontWeight: 'bold', border: 'none' }}>
               <Users size={14} style={{ display: 'inline', marginRight: '4px' }} /> BASE MAESTRA CRM
             </button>
@@ -291711,14 +298823,14 @@ export default function Home() {
           )}
 
           {canAccessMonitorVuelos(currentUser) && (
-            <>
-              <button onClick={() => navigate('/monitor-vuelos')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #38bdf8, #0284c7)', color: 'white', fontWeight: 'bold', border: 'none' }}>
-                ✈️ Monitor de Vuelos
-              </button>
-              <button onClick={() => navigate('/monitor-imos')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #a855f7, #7e22ce)', color: 'white', fontWeight: 'bold', border: 'none' }}>
-                🦅 Monitor de IMOs
-              </button>
-            </>
+            <button onClick={() => navigate('/monitor-vuelos')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #38bdf8, #0284c7)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+              ✈️ Monitor de Vuelos
+            </button>
+          )}
+          {canAccessMonitorIMOs(currentUser) && (
+            <button onClick={() => navigate('/monitor-imos')} className="btn-primary" style={{ padding: '0.35rem 0.8rem', fontSize: '0.8rem', background: 'linear-gradient(135deg, #a855f7, #7e22ce)', color: 'white', fontWeight: 'bold', border: 'none' }}>
+              🦅 Monitor de IMOs
+            </button>
           )}
         </div>
       )}
@@ -291895,7 +299007,7 @@ export default function Home() {
               >
                 🎯 Mis Metas
               </button>
-              {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin']) && (
+              {hasRoleAccess(['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'director_maestria']) && (
                 <>
                   <button
                     className="btn-secondary hover-glow"
@@ -291968,7 +299080,7 @@ export default function Home() {
                     >
                       {hasRoleAccess(['entrenador', 'entrenador_llamadas']) ? 'MIS FECHAS' : 'MI SEDE'}
                     </button>
-                    {(!hasRoleAccess(['entrenador', 'entrenador_llamadas']) && (currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.isGerente || hasRoleAccess(['gerente', 'direccion', 'director_maestria', 'cfo']) || currentUser?.sede?.toLowerCase().includes('global'))) && (
+                    {(!hasRoleAccess(['entrenador', 'entrenador_llamadas']) && ((currentUser?.isSuperAdmin && !currentUser?.isRoleSimulationActive) || currentUser?.isDireccion || currentUser?.isGerente || hasRoleAccess(['gerente', 'direccion', 'director_maestria', 'cfo']) || currentUser?.sede?.toLowerCase().includes('global'))) && (
                       <button 
                         onClick={() => setActiveEventTab('globales')}
                         style={{ background: 'none', border: 'none', color: activeEventTab === 'globales' ? 'var(--crear-gold)' : 'var(--text-muted)', fontWeight: activeEventTab === 'globales' ? 'bold' : 'normal', cursor: 'pointer', fontSize: '0.85rem' }}
@@ -292055,8 +299167,9 @@ export default function Home() {
                         return isTrainerMatchingUser(ev.trainer || ev.entrenador, currentUser);
                       }
 
-                      // 2. Coordinadores C1/C2: solo los de su sede y solo C1/C2
-                      if (isCoordC1C2) {
+                      // 2. Coordinadores (C1/C2 y Maestría): Confirmado por José (08/09/2026):
+                      // "las coordinadoras de cada sede pueden ver todas las fechas de sus sedes tanto de mj como de c1y c2 todas las fechas y entrenadores"
+                      if (isCoordC1C2 || isCoordMJ) {
                         const userSede = currentUser?.sede || '';
                         const evSede = ev.sede || ev.sedeTag || '';
                         if (userSede && !userSede.toLowerCase().includes('global')) {
@@ -292064,21 +299177,8 @@ export default function Home() {
                             return false;
                           }
                         }
-                        const name = (ev.nombre || ev.name || '').toUpperCase();
-                        return name.includes('CAPITULO UNO') || name.includes('C1') || name.includes('CAPÍTULO UNO') || name.includes('CAPITULO DOS') || name.includes('C2') || name.includes('CAPÍTULO DOS');
-                      }
-
-                      // 3. Coordinadores MJ: solo los de su sede y solo MJ
-                      if (isCoordMJ) {
-                        const userSede = currentUser?.sede || '';
-                        const evSede = ev.sede || ev.sedeTag || '';
-                        if (userSede && !userSede.toLowerCase().includes('global')) {
-                          if (!evSede || (!evSede.toLowerCase().includes(userSede.toLowerCase()) && !userSede.toLowerCase().includes(evSede.toLowerCase()))) {
-                            return false;
-                          }
-                        }
-                        const name = (ev.nombre || ev.name || '').toUpperCase();
-                        return name.includes('MAESTRIA') || name.includes('MJ') || name.includes('MAESTRÍA');
+                        // Ven todos los eventos y entrenadores de su sede (C1, C2 y MJ)
+                        return true;
                       }
 
                       // 4. Capitanes, Aliados y Managers: solo los de su equipo
@@ -292100,7 +299200,17 @@ export default function Home() {
                       }
 
                       // 5. Filtro tab locales vs globales para Gerentes y Directivos
-                      if (activeEventTab === 'locales' || (isGerente && !isSuperOrDir)) {
+                      // BUG REAL encontrado y corregido (08/09/2026, confirmado explícitamente por
+                      // José: "los Directivos y Gerentes pueden ver todas las sedes"): antes,
+                      // Gerente quedaba forzado a "solo su sede" con "(isGerente && !isSuperOrDir)"
+                      // sin importar qué pestaña tuviera seleccionada — el botón "GLOBAL" ya era
+                      // visible para Gerente en la UI (ver el toggle más arriba) pero no tenía
+                      // ningún efecto real para ese rol, porque este OR lo ignoraba. La Matriz
+                      // Oficial pone a "gerente" en 'GLOBAL' para eventos_entrenamientos (ver
+                      // OFFICIAL_PERMISSION_MATRIX en permissions.js, corregido en esta misma
+                      // ronda). Ahora Gerente respeta la pestaña igual que Dirección: arranca en
+                      // "locales" (mismo default de siempre) pero el botón "GLOBAL" si funciona.
+                      if (activeEventTab === 'locales') {
                         const userSede = currentUser?.sede || '';
                         if (!userSede || userSede.toLowerCase().includes('global')) return true;
                         const evSede = ev.sede || ev.sedeTag || '';
@@ -292155,7 +299265,11 @@ export default function Home() {
                       return timeFilter === 'pasados' ? dateB - dateA : dateA - dateB; // Past events descending, future ascending
                     });
 
-                    // --- QT Filter Logic: solo de su sede, solo C1 y C2 actual y próximo ---
+                    // --- QT Filter Logic: solo de su sede, solo C1 y C2 actual y próximo, SIN entrenador asignado ---
+                    // La Matriz Oficial define este alcance como "SEDE_C1C2_PROXIMOS_SIN_TRAINER"
+                    // (ver OFFICIAL_PERMISSION_MATRIX.eventos_entrenamientos.qt en permissions.js).
+                    // Antes (hasta 08/09/2026) el filtro cubría sede + C1/C2 + actual/próximo, pero
+                    // NO excluía eventos que ya tienen entrenador asignado — corregido aquí.
                     if (isQT) {
                       const qtNow = new Date().getTime();
                       const userSede = currentUser?.sede || '';
@@ -292170,6 +299284,10 @@ export default function Home() {
                         }
                         const dateMs = new Date(ev.fecha_inicio || ev.start || 0).getTime();
                         if (dateMs < qtNow) return false;
+                        // "SIN TRAINER": si el evento ya tiene un entrenador asignado, QT ya no
+                        // necesita verlo en su lista de pendientes.
+                        const trainerAsignado = (ev.trainer || ev.entrenador || '').trim();
+                        if (trainerAsignado) return false;
                         const name = (ev.nombre || ev.name || '').toUpperCase();
                         if (name.includes('CAPITULO UNO') || name.includes('C1') || name.includes('CAPÍTULO UNO')) {
                           c1Count++;
@@ -292179,7 +299297,7 @@ export default function Home() {
                           c2Count++;
                           return c2Count <= 2;
                         }
-                        return false; // QTs SOLO ven C1 y C2 de su sede (actual y próximo)
+                        return false; // QTs SOLO ven C1 y C2 de su sede (actual y próximo, sin entrenador)
                       });
                     }
 
@@ -292488,7 +299606,7 @@ export default function Home() {
               <button className="btn-secondary" onClick={() => navigate('/metas')} style={{ padding: '0.8rem 1.4rem', fontSize: '1rem', fontWeight: 'bold' }}>
                 VER MIS METAS
               </button>
-              {(currentUser?.isSuperAdmin || currentUser?.isGerente || hasRoleAccess(['coord_c1', 'coord_maestria', 'capitan', 'qt', 'direccion', 'director_maestria'])) && (
+              {((currentUser?.isSuperAdmin && !currentUser?.isRoleSimulationActive) || currentUser?.isGerente || hasRoleAccess(['coord_c1', 'coord_maestria', 'capitan', 'qt', 'direccion', 'director_maestria'])) && (
                 <button className="btn-secondary" onClick={() => navigate('/reportes')} style={{ padding: '0.8rem 1.4rem', fontSize: '1rem', fontWeight: 'bold' }}>
                   ENVIAR REPORTES
                 </button>
@@ -295602,15 +302720,19 @@ export default function MisKPIs() {
 
 ```javascript
 import { useEffect, useState } from 'react';
-import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
+import { collection, query, orderBy, onSnapshot, deleteDoc, doc, writeBatch, addDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 
 export default function MonitorImos() {
   const [missions, setMissions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [expandedImo, setExpandedImo] = useState(null);
+  const [sendingEmail, setSendingEmail] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const q = query(collection(db, 'imo_missions'), orderBy('startedAt', 'desc'));
+    const q = query(collection(db, 'imo_missions'), orderBy('lastUpdated', 'desc'));
     
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const data = [];
@@ -295627,6 +302749,84 @@ export default function MonitorImos() {
     return () => unsubscribe();
   }, []);
 
+  const handleResetMission = async (missionId) => {
+    if (window.confirm('⚠️ ¿Estás seguro de que deseas resetear los datos de prueba de este IMO? Esto eliminará la telemetría actual y el tiempo volverá a cero.')) {
+      try {
+        await deleteDoc(doc(db, 'imo_missions', missionId));
+      } catch (error) {
+        console.error('Error al resetear la misión:', error);
+      }
+    }
+  };
+
+  const handleResetAll = async () => {
+    if (window.confirm('⚠️ ADVERTENCIA CRÍTICA: ¿Estás seguro de resetear TODOS los IMOs? Toda la trazabilidad de prueba se perderá y todos los contadores volverán a cero.')) {
+      try {
+        const batch = writeBatch(db);
+        missions.forEach(m => {
+          batch.delete(doc(db, 'imo_missions', m.id));
+        });
+        await batch.commit();
+      } catch (error) {
+        console.error('Error al resetear todas las misiones:', error);
+      }
+    }
+  };
+
+  const handleSendWelcomeEmail = async (enrolado) => {
+    if (!enrolado.email) {
+      alert("Este participante no tiene un correo registrado en la base de datos de IMOs. Por favor, actualiza los datos en la app de IMOs (imos_data.json) primero.");
+      return;
+    }
+
+    if (!window.confirm(`¿Enviar correo de bienvenida a ${enrolado.nombre} (${enrolado.email}) desde info.lima@crearpsl.net?`)) {
+      return;
+    }
+
+    try {
+      setSendingEmail(enrolado.id);
+      
+      const welcomeLink = "https://crearpsl.net/bienvenida_capitulo_uno.html?sede=LIM";
+      const htmlContent = `
+        <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 8px;">
+          <h2 style="color: #0ea5e9;">¡Bienvenido/a al Entrenamiento, ${enrolado.nombre}!</h2>
+          <p>Tu coordinador/a <strong>${enrolado.coordinadora_nombre}</strong> y tu equipo están emocionados de acompañarte en este proceso.</p>
+          <p>Hemos preparado una página de bienvenida muy especial con toda la información clave, la cuenta regresiva oficial y detalles importantes para tu primer fin de semana.</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${welcomeLink}" style="background-color: #0ea5e9; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">
+              Ver mi Bienvenida Oficial
+            </a>
+          </div>
+          <p>¡Nos vemos pronto!</p>
+          <p style="font-size: 12px; color: #888; margin-top: 40px; border-top: 1px solid #eaeaea; padding-top: 20px;">
+            Este es un mensaje automático enviado desde el Monitor de IMOs de Causa OS.<br>
+            CREAR Poder Sin Límites - Sede Lima
+          </p>
+        </div>
+      `;
+
+      await addDoc(collection(db, 'mail'), {
+        type: 'imo_welcome',
+        to: [enrolado.email],
+        message: {
+          subject: '¡Bienvenido/a al Entrenamiento! (Información Importante)',
+          html: htmlContent
+        },
+        delivery: {
+          state: 'PENDING'
+        },
+        createdAt: new Date().toISOString()
+      });
+
+      alert("Correo encolado exitosamente. Se enviará en los próximos 5 minutos automáticamente.");
+    } catch (error) {
+      console.error("Error al encolar correo:", error);
+      alert("Hubo un error al preparar el envío del correo.");
+    } finally {
+      setSendingEmail(null);
+    }
+  };
+
   if (loading) {
     return (
       <div className="p-8 text-center" style={{ color: 'var(--crear-gold)' }}>
@@ -295638,19 +302838,67 @@ export default function MonitorImos() {
 
   return (
     <div className="animate-fade-in p-8" style={{ maxWidth: '1400px', margin: '0 auto' }}>
-      <header style={{ marginBottom: '2rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.25rem' }}>
-          <span style={{ background: 'rgba(14, 165, 233, 0.15)', color: '#38bdf8', padding: '3px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 800 }}>
-            SISTEMA OPERATIVO CAUSA
-          </span>
-          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Misión IMO</span>
+      <button
+        onClick={() => navigate('/')}
+        style={{
+          background: 'transparent',
+          color: 'var(--crear-blue, #38bdf8)',
+          border: 'none',
+          padding: '0.4rem 0',
+          marginBottom: '1rem',
+          cursor: 'pointer',
+          fontSize: '0.9rem',
+          fontWeight: 600,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px',
+          transition: 'opacity 0.2s ease'
+        }}
+        onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.7'; }}
+        onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
+      >
+        ← Volver al Centro Operativo
+      </button>
+      <header style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.25rem' }}>
+            <span style={{ background: 'rgba(14, 165, 233, 0.15)', color: '#38bdf8', padding: '3px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 800 }}>
+              SISTEMA OPERATIVO CAUSA
+            </span>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Misión IMO</span>
+          </div>
+          <h1 className="text-gold" style={{ fontSize: '2.4rem', margin: '0 0 0.5rem 0', letterSpacing: '-0.02em' }}>
+            MONITOR DE IMOS
+          </h1>
+          <p className="text-muted" style={{ fontSize: '1.05rem', margin: 0 }}>
+            Supervisión en tiempo real de los IMOs conectados, sus enrolados y su progreso de llamadas.
+          </p>
         </div>
-        <h1 className="text-gold" style={{ fontSize: '2.4rem', margin: '0 0 0.5rem 0', letterSpacing: '-0.02em' }}>
-          MONITOR DE IMOS
-        </h1>
-        <p className="text-muted" style={{ fontSize: '1.05rem', margin: 0 }}>
-          Supervisión en tiempo real de los IMOs conectados, sus enrolados y su progreso de llamadas.
-        </p>
+        <button
+          onClick={handleResetAll}
+          disabled={missions.length === 0}
+          style={{
+            background: 'rgba(239, 68, 68, 0.15)',
+            color: '#ef4444',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            padding: '0.5rem 1rem',
+            borderRadius: '6px',
+            fontWeight: 600,
+            cursor: missions.length === 0 ? 'not-allowed' : 'pointer',
+            opacity: missions.length === 0 ? 0.5 : 1,
+            transition: 'all 0.2s ease'
+          }}
+          onMouseEnter={(e) => {
+            if (missions.length > 0) {
+              e.currentTarget.style.background = 'rgba(239, 68, 68, 0.25)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'rgba(239, 68, 68, 0.15)';
+          }}
+        >
+          Resetear Todos (Pruebas)
+        </button>
       </header>
 
       <div className="glass-panel" style={{ padding: '1.5rem', overflowX: 'auto', border: '1px solid rgba(255,255,255,0.08)' }}>
@@ -295662,47 +302910,132 @@ export default function MonitorImos() {
               <th style={{ padding: '1rem', color: 'var(--crear-gold)', fontSize: '0.85rem' }}>Avance Enrolados</th>
               <th style={{ padding: '1rem', color: 'var(--crear-gold)', fontSize: '0.85rem' }}>Total Confirmados</th>
               <th style={{ padding: '1rem', color: 'var(--crear-gold)', fontSize: '0.85rem' }}>Estado</th>
+              <th style={{ padding: '1rem', color: 'var(--crear-gold)', fontSize: '0.85rem', textAlign: 'right' }}>Acciones</th>
             </tr>
           </thead>
           <tbody>
             {missions.length === 0 ? (
               <tr>
-                <td colSpan={5} style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                <td colSpan={6} style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
                   No hay misiones de IMOs registradas actualmente.
                 </td>
               </tr>
             ) : missions.map((m) => {
-              const enrolledKeys = Object.keys(m.enrolledStatus || {});
-              const totalEnrolled = enrolledKeys.length;
-              let confirmed = 0;
-              let guaranteed = 0;
+              const enrolledKeys = Object.keys(m.checks || {});
+              const totalEnrolled = m.totalEnrolados || 0;
+              const confirmed = m.completados || 0;
+              let contacted = 0;
+              let assisted = 0;
               enrolledKeys.forEach(k => {
-                if (m.enrolledStatus[k]?.confirmed) confirmed++;
-                if (m.enrolledStatus[k]?.guaranteed) guaranteed++;
+                if (m.checks[k]?.contacto) contacted++;
+                if (m.checks[k]?.asistencia) assisted++;
               });
 
-              const isCompleted = m.missionCompleted;
-              const dateStarted = new Date(m.startedAt).toLocaleString();
+              const isCompleted = m.progreso === 100;
+              const dateStarted = m.lastUpdated?.toDate ? m.lastUpdated.toDate().toLocaleString() : 'Reciente';
+              const isExpanded = expandedImo === m.id;
 
               return (
-                <tr key={m.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                  <td style={{ padding: '1rem', fontWeight: 600 }}>{m.imoName || 'Desconocido'}</td>
-                  <td style={{ padding: '1rem', fontSize: '0.9rem' }} className="text-muted">{dateStarted}</td>
-                  <td style={{ padding: '1rem' }}>
-                    <div>Confirmados: {confirmed} / {totalEnrolled}</div>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--crear-blue)' }}>Garantizados: {guaranteed}</div>
-                  </td>
-                  <td style={{ padding: '1rem', fontWeight: 700 }}>
-                    {confirmed}
-                  </td>
-                  <td style={{ padding: '1rem' }}>
-                    {isCompleted ? (
-                      <span style={{ color: '#22c55e', background: 'rgba(34, 197, 94, 0.15)', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 700 }}>Completado</span>
-                    ) : (
-                      <span style={{ color: '#ef4444', background: 'rgba(239, 68, 68, 0.15)', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 700 }}>En Progreso</span>
-                    )}
-                  </td>
-                </tr>
+                <React.Fragment key={m.id}>
+                  <tr style={{ borderBottom: isExpanded ? 'none' : '1px solid rgba(255,255,255,0.06)', background: isExpanded ? 'rgba(255,255,255,0.02)' : 'transparent' }}>
+                    <td style={{ padding: '1rem', fontWeight: 600 }}>
+                      {m.imoNombre || 'Desconocido'}
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{m.equipo || ''}</div>
+                    </td>
+                    <td style={{ padding: '1rem', fontSize: '0.9rem' }} className="text-muted">{dateStarted}</td>
+                    <td style={{ padding: '1rem' }}>
+                      <div>Progreso: {m.progreso || 0}%</div>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--crear-blue)' }}>Contactados: {contacted} | Asistirán: {assisted}</div>
+                    </td>
+                    <td style={{ padding: '1rem', fontWeight: 700 }}>
+                      {confirmed} / {totalEnrolled}
+                    </td>
+                    <td style={{ padding: '1rem' }}>
+                      {isCompleted ? (
+                        <span style={{ color: '#22c55e', background: 'rgba(34, 197, 94, 0.15)', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 700 }}>Completado</span>
+                      ) : (
+                        <span style={{ color: '#ef4444', background: 'rgba(239, 68, 68, 0.15)', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 700 }}>En Progreso</span>
+                      )}
+                    </td>
+                    <td style={{ padding: '1rem', textAlign: 'right' }}>
+                      <button
+                        onClick={() => setExpandedImo(isExpanded ? null : m.id)}
+                        style={{
+                          background: isExpanded ? 'rgba(56, 189, 248, 0.15)' : 'transparent',
+                          color: isExpanded ? '#38bdf8' : 'var(--crear-blue)',
+                          border: `1px solid ${isExpanded ? '#38bdf8' : 'rgba(56, 189, 248, 0.3)'}`,
+                          padding: '4px 10px',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontSize: '0.8rem',
+                          fontWeight: 600,
+                          marginRight: '8px',
+                          transition: 'all 0.2s ease'
+                        }}
+                      >
+                        {isExpanded ? 'Ocultar Enrolados' : 'Ver Enrolados'}
+                      </button>
+                      <button
+                        onClick={() => handleResetMission(m.id)}
+                        title="Resetear IMO"
+                        style={{
+                          background: 'transparent',
+                          color: 'var(--text-muted)',
+                          border: '1px solid rgba(255,255,255,0.1)',
+                          padding: '4px 10px',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontSize: '0.8rem',
+                          transition: 'all 0.2s ease'
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.borderColor = '#ef4444'; e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.background = 'transparent'; }}
+                      >
+                        Resetear
+                      </button>
+                    </td>
+                  </tr>
+                  
+                  {isExpanded && m.enrolados && (
+                    <tr style={{ background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                      <td colSpan={6} style={{ padding: '1.5rem', paddingTop: '0.5rem' }}>
+                        <div style={{ background: 'rgba(0,0,0,0.2)', padding: '1.2rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                          <h4 style={{ margin: '0 0 1rem 0', color: 'var(--crear-gold)', fontSize: '0.9rem', textTransform: 'uppercase' }}>Lista de Enrolados</h4>
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1rem' }}>
+                            {m.enrolados.map(enrolado => (
+                              <div key={enrolado.id} style={{ background: 'rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                <div style={{ fontWeight: 600, fontSize: '0.95rem', marginBottom: '4px' }}>{enrolado.nombre}</div>
+                                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '8px' }}>Coord: {enrolado.coordinadora_nombre} ({enrolado.coordinadora_telefono})</div>
+                                <div style={{ fontSize: '0.8rem', color: enrolado.email ? '#38bdf8' : '#ef4444', marginBottom: '12px' }}>
+                                  {enrolado.email ? `✉️ ${enrolado.email}` : '⚠️ Sin correo registrado'}
+                                </div>
+                                
+                                <button
+                                  onClick={() => handleSendWelcomeEmail(enrolado)}
+                                  disabled={sendingEmail === enrolado.id || !enrolado.email}
+                                  style={{
+                                    width: '100%',
+                                    background: enrolado.email ? 'var(--crear-gold)' : 'rgba(255,255,255,0.1)',
+                                    color: enrolado.email ? '#000' : 'rgba(255,255,255,0.3)',
+                                    border: 'none',
+                                    padding: '6px 12px',
+                                    borderRadius: '4px',
+                                    fontWeight: 700,
+                                    fontSize: '0.8rem',
+                                    cursor: (sendingEmail === enrolado.id || !enrolado.email) ? 'not-allowed' : 'pointer',
+                                    opacity: sendingEmail === enrolado.id ? 0.7 : 1
+                                  }}
+                                >
+                                  {sendingEmail === enrolado.id ? 'Encolando...' : '📨 Enviar Bienvenida'}
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
               );
             })}
           </tbody>
@@ -295723,6 +303056,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
+import { canAccessMonitorVuelos, canAccessSistemaCartas } from '../config/permissions';
 import {
   Plane,
   FileText,
@@ -295975,6 +303309,7 @@ const OFICIAL_LETTERS = [
 export default function MonitorVuelosCartas() {
   const navigate = useNavigate();
   const { showToast } = useUI();
+  const { currentUser } = useAuth();
   const [activeTab, setActiveTab] = useState('radar'); // 'radar' | 'cartas' | 'logistica'
   const [trackerData, setTrackerData] = useState(FALLBACK_TRACKER);
   const [loading, setLoading] = useState(false);
@@ -295982,6 +303317,29 @@ export default function MonitorVuelosCartas() {
   const [searchFilter, setSearchFilter] = useState('');
   const [routeFilter, setRouteFilter] = useState('ALL');
   const [flightStatusFilter, setFlightStatusFilter] = useState('activos');
+
+  // Separación Monitor de Vuelos / Sistema de Cartas (08/09/2026, pedido explícito
+  // de José: "son dos cosas distintas de verdad"). Antes esta página no tenía NINGÚN
+  // gate interno por rol — cualquiera que entrara a /monitor-vuelos veía las 3
+  // pestañas completas. Ahora cada pestaña se gatea según su propia fila de la
+  // Matriz Oficial: "radar" (Monitor de Vuelos) = Directivos + Gerentes de su sede;
+  // "cartas" (Sistema de Cartas) = SOLO Gerentes, Directivos NO tienen acceso. La
+  // pestaña "logistica" (Hotel & Choferes) no tiene fila propia en la Matriz — se
+  // deja visible para quien ya pudo entrar a la página (Directivos o Gerentes),
+  // sin restricción adicional propia.
+  const puedeVerRadar = canAccessMonitorVuelos(currentUser);
+  const puedeVerCartas = canAccessSistemaCartas(currentUser);
+
+  // Si el usuario cae en una pestaña a la que no tiene acceso (p. ej. un Directivo
+  // cuyo activeTab por defecto es 'radar' pero de algún modo llega a 'cartas'),
+  // lo movemos a la primera pestaña que sí puede ver.
+  useEffect(() => {
+    if (activeTab === 'radar' && !puedeVerRadar) {
+      setActiveTab(puedeVerCartas ? 'cartas' : 'logistica');
+    } else if (activeTab === 'cartas' && !puedeVerCartas) {
+      setActiveTab(puedeVerRadar ? 'radar' : 'logistica');
+    }
+  }, [activeTab, puedeVerRadar, puedeVerCartas]);
 
   const fetchTrackerData = async () => {
     setLoading(true);
@@ -296146,73 +303504,77 @@ export default function MonitorVuelosCartas() {
           border: '1px solid rgba(255,255,255,0.08)',
           marginTop: '1.5rem'
         }}>
-          <button
-            onClick={() => setActiveTab('radar')}
-            style={{
-              flex: 1,
-              padding: '12px 18px',
-              borderRadius: '12px',
-              border: 'none',
-              background: activeTab === 'radar' ? 'linear-gradient(135deg, rgba(56,189,248,0.2) 0%, rgba(56,189,248,0.05) 100%)' : 'transparent',
-              color: activeTab === 'radar' ? '#38bdf8' : 'var(--text-muted)',
-              fontWeight: 700,
-              fontSize: '0.95rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              borderBottom: activeTab === 'radar' ? '2px solid #38bdf8' : '2px solid transparent',
-              transition: 'all 0.2s ease'
-            }}
-          >
-            <Plane size={18} />
-            <span>Radar de Vuelos en Vivo</span>
-            <span style={{
-              background: '#38bdf8',
-              color: '#000',
-              padding: '2px 8px',
-              borderRadius: '10px',
-              fontSize: '0.75rem',
-              fontWeight: 800
-            }}>
-              {flightsList.length}
-            </span>
-          </button>
+          {puedeVerRadar && (
+            <button
+              onClick={() => setActiveTab('radar')}
+              style={{
+                flex: 1,
+                padding: '12px 18px',
+                borderRadius: '12px',
+                border: 'none',
+                background: activeTab === 'radar' ? 'linear-gradient(135deg, rgba(56,189,248,0.2) 0%, rgba(56,189,248,0.05) 100%)' : 'transparent',
+                color: activeTab === 'radar' ? '#38bdf8' : 'var(--text-muted)',
+                fontWeight: 700,
+                fontSize: '0.95rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                borderBottom: activeTab === 'radar' ? '2px solid #38bdf8' : '2px solid transparent',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <Plane size={18} />
+              <span>Radar de Vuelos en Vivo</span>
+              <span style={{
+                background: '#38bdf8',
+                color: '#000',
+                padding: '2px 8px',
+                borderRadius: '10px',
+                fontSize: '0.75rem',
+                fontWeight: 800
+              }}>
+                {flightsList.length}
+              </span>
+            </button>
+          )}
 
-          <button
-            onClick={() => setActiveTab('cartas')}
-            style={{
-              flex: 1,
-              padding: '12px 18px',
-              borderRadius: '12px',
-              border: 'none',
-              background: activeTab === 'cartas' ? 'linear-gradient(135deg, rgba(255,183,3,0.2) 0%, rgba(255,183,3,0.05) 100%)' : 'transparent',
-              color: activeTab === 'cartas' ? 'var(--crear-gold)' : 'var(--text-muted)',
-              fontWeight: 700,
-              fontSize: '0.95rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              borderBottom: activeTab === 'cartas' ? '2px solid var(--crear-gold)' : '2px solid transparent',
-              transition: 'all 0.2s ease'
-            }}
-          >
-            <FileText size={18} />
-            <span>Repositorio de Cartas y Migraciones</span>
-            <span style={{
-              background: 'var(--crear-gold)',
-              color: '#000',
-              padding: '2px 8px',
-              borderRadius: '10px',
-              fontSize: '0.75rem',
-              fontWeight: 800
-            }}>
-              {OFICIAL_LETTERS.length}
-            </span>
-          </button>
+          {puedeVerCartas && (
+            <button
+              onClick={() => setActiveTab('cartas')}
+              style={{
+                flex: 1,
+                padding: '12px 18px',
+                borderRadius: '12px',
+                border: 'none',
+                background: activeTab === 'cartas' ? 'linear-gradient(135deg, rgba(255,183,3,0.2) 0%, rgba(255,183,3,0.05) 100%)' : 'transparent',
+                color: activeTab === 'cartas' ? 'var(--crear-gold)' : 'var(--text-muted)',
+                fontWeight: 700,
+                fontSize: '0.95rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                borderBottom: activeTab === 'cartas' ? '2px solid var(--crear-gold)' : '2px solid transparent',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <FileText size={18} />
+              <span>Repositorio de Cartas y Migraciones</span>
+              <span style={{
+                background: 'var(--crear-gold)',
+                color: '#000',
+                padding: '2px 8px',
+                borderRadius: '10px',
+                fontSize: '0.75rem',
+                fontWeight: 800
+              }}>
+                {OFICIAL_LETTERS.length}
+              </span>
+            </button>
+          )}
 
           <button
             onClick={() => setActiveTab('logistica')}
@@ -296243,7 +303605,7 @@ export default function MonitorVuelosCartas() {
       {/* ========================================================= */}
       {/* PESTAÑA 1: RADAR DE VUELOS EN TIEMPO REAL                 */}
       {/* ========================================================= */}
-      {activeTab === 'radar' && (
+      {activeTab === 'radar' && puedeVerRadar && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           
           {/* Barra de Filtros y Búsqueda de Vuelos */}
@@ -296582,7 +303944,7 @@ export default function MonitorVuelosCartas() {
       {/* ========================================================= */}
       {/* PESTAÑA 2: REPOSITORIO DE CARTAS Y MIGRACIONES            */}
       {/* ========================================================= */}
-      {activeTab === 'cartas' && (
+      {activeTab === 'cartas' && puedeVerCartas && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           
           {/* Buscador de Cartas */}
@@ -298224,16 +305586,17 @@ export default function ProtocoloEmergencias() {
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../services/firebase';
-import { collection, addDoc, getDocs, updateDoc, doc, query, where, orderBy, limit } from 'firebase/firestore';
+import { collection, addDoc, getDocs, getDoc, updateDoc, doc, query, where, orderBy, limit } from 'firebase/firestore';
 import { useAuth } from '../context/AuthContext';
 import { useCycles } from '../context/CyclesContext';
 import { useUI } from '../context/UIContext';
 import { 
   ArrowLeft, FileText, Send, Zap, Clock, ShieldAlert, Sparkles, 
   BarChart3, CheckCircle2, AlertTriangle, Star, RefreshCw, ThumbsUp, 
-  ThumbsDown, AlertCircle, Building2, Lock, Unlock, Eye
+  ThumbsDown, AlertCircle, Building2, Lock, Unlock, Eye, Database, Download
 } from 'lucide-react';
 import { OPERATIONAL_SEDES } from '../data/usersData';
+import nodusFallbackData from '../data/nodusFallbackData.json';
 
 // POOL MAESTRO DE 12 PREGUNTAS ROTATIVAS (NODUS & CAUSA OS V1.0)
 const POOL_PREGUNTAS = {
@@ -298268,6 +305631,20 @@ export default function ReportesBoard() {
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(false);
 
+  // Control estricto de visibilidad: Solo Directivos y Gerentes pueden ver el Dashboard de Evolución (08/09/2026 - Confirmado por José)
+  const role = (currentUser?.activeRole || currentUser?.appRole || currentUser?.role || '').toLowerCase();
+  const roles = (currentUser?.roles || []).map(r => String(r).toLowerCase());
+  const isDireccion = currentUser?.isDireccion || role === 'direccion' || roles.includes('direccion');
+  const isGerente = currentUser?.isGerente || role === 'gerente' || roles.includes('gerente');
+
+  const canViewEvolucionDashboard = Boolean(
+    currentUser?.isSuperAdmin ||
+    isDireccion ||
+    isGerente ||
+    ['gerente', 'direccion', 'cfo', 'ceo', 'cco', 'superadmin', 'consolidado', 'director_maestria'].includes(role) ||
+    roles.some(r => ['gerente', 'direccion', 'cfo', 'ceo', 'cco', 'superadmin', 'consolidado', 'director_maestria'].includes(r))
+  );
+
   // Micro-pulso state (selección aleatoria de 3 preguntas)
   const [pulsoQuestions, setPulsoQuestions] = useState([]);
   const [pulsoRespuestas, setPulsoRespuestas] = useState({});
@@ -298276,6 +305653,127 @@ export default function ReportesBoard() {
   const [relampagoReports, setRelampagoReports] = useState([]);
   const [pulsoReports, setPulsoReports] = useState([]);
   const [loadingDashboard, setLoadingDashboard] = useState(false);
+
+  // Sincronización inteligente de Nodus (Cero Pereza)
+  const [loadingNodus, setLoadingNodus] = useState(false);
+  const [nodusStatusMsg, setNodusStatusMsg] = useState('');
+  const [nodusEquiposDisponibles, setNodusEquiposDisponibles] = useState([]);
+  const [selectedNodusTeam, setSelectedNodusTeam] = useState('auto');
+  const [nodusMatchedCoord, setNodusMatchedCoord] = useState(null);
+
+  const handleExtraerDeNodus = async (teamOverride = null) => {
+    setLoadingNodus(true);
+    setNodusStatusMsg('');
+    try {
+      let nodusData = null;
+      try {
+        const docRef = doc(db, 'nodus_coordinadores_c1c2', 'latest');
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          nodusData = docSnap.data();
+        }
+      } catch (err) {
+        console.warn("Lectura Firestore nodus_coordinadores_c1c2 falló, usando respaldo local:", err);
+      }
+
+      if (!nodusData || !nodusData.coordinadores) {
+        nodusData = nodusFallbackData;
+      }
+
+      const userEmail = (currentUser?.email || '').toLowerCase().trim();
+      const userName = (currentUser?.displayName || currentUser?.name || '').toLowerCase().trim();
+      const userSede = (currentUser?.sede || '').toLowerCase().trim();
+
+      const coords = nodusData.coordinadores || [];
+      
+      // 1. Buscar coordinador por coincidencia de email o nombre
+      let coord = coords.find(c => {
+        const cEmail = (c.email || '').toLowerCase();
+        const cNombre = (c.nombre || '').toLowerCase();
+        const cNombreComp = (c.nombreCompleto || '').toLowerCase();
+        return (userEmail && (cEmail === userEmail || userEmail.includes(cNombre))) ||
+               (userName && (cNombreComp.includes(userName) || userName.includes(cNombreComp) || cNombre.includes(userName) || userName.includes(cNombre)));
+      });
+
+      // 2. Si Joyce está activa (simulada o real)
+      if (!coord && (userName.includes('joyce') || userEmail.includes('joyce'))) {
+        coord = coords.find(c => c.id === 'coord_joyce_lima' || (c.nombre || '').toLowerCase().includes('joyce'));
+      }
+
+      // 3. Si no se encuentra por nombre, buscar por sede operativa
+      if (!coord && userSede) {
+        coord = coords.find(c => (c.sede || '').toLowerCase() === userSede);
+      }
+
+      // 4. Fallback: primer coordinador
+      if (!coord && coords.length > 0) {
+        coord = coords[0];
+      }
+
+      if (!coord) {
+        showToast('No se encontró información registrada en Nodus para este usuario.', 'error');
+        setLoadingNodus(false);
+        return;
+      }
+
+      setNodusMatchedCoord(coord);
+      const equipos = coord.equipos || [];
+      setNodusEquiposDisponibles(equipos);
+
+      const targetTeamName = teamOverride !== null ? teamOverride : selectedNodusTeam;
+      let targetData = null;
+      let labelTarget = '';
+
+      if (targetTeamName && targetTeamName !== 'auto' && targetTeamName !== 'acumulado') {
+        targetData = equipos.find(e => e.equipo === targetTeamName);
+        labelTarget = targetTeamName;
+      } else if (targetTeamName === 'acumulado' || equipos.length === 0) {
+        targetData = coord.estados;
+        labelTarget = 'Total Acumulado';
+      } else {
+        // 'auto': primer equipo o el que tenga mayor actividad reciente
+        targetData = equipos.find(e => (e.confirmado || 0) > 0) || equipos[0] || coord.estados;
+        labelTarget = targetData?.equipo || 'Último Equipo';
+      }
+
+      if (!targetData) {
+        targetData = coord.estados || {};
+        labelTarget = 'General';
+      }
+
+      const nuevosValores = {
+        nuevos_OK: Number(targetData.confirmado || 0),
+        nuevos_XC: Number(targetData.porConfirmar || 0),
+        nuevos_NC: Number(targetData.noContesta || 0),
+        nuevos_NI: Number(targetData.noInteresa || 0),
+        nuevos_SIG: Number(targetData.siguiente || 0),
+        nuevos_OS: Number(targetData.yaAsistio || 0),
+        nuevos_PENDIENTES: Number(targetData.pendientes || 0),
+        rezagados_OK: Number(targetData.rezagados_OK || 0),
+        rezagados_XC: Number(targetData.rezagados_XC || 0),
+        rezagados_NC: Number(targetData.rezagados_NC || 0),
+        rezagados_NI: Number(targetData.rezagados_NI || 0),
+        rezagados_SIG: Number(targetData.rezagados_SIG || 0),
+        rezagados_PENDIENTES: Number(targetData.rezagados_PENDIENTES || 0),
+        sede_id: coord.sede || currentUser?.sede || 'Lima'
+      };
+
+      setFormData(prev => ({
+        ...prev,
+        ...nuevosValores
+      }));
+
+      const coordLabel = coord.nombreCompleto || coord.nombre;
+      const msg = `Nodus Sincronizado: ${coordLabel} (${coord.sede}) • ${labelTarget} -> ${nuevosValores.nuevos_OK} OK (Confirmados), ${nuevosValores.nuevos_XC} XC, ${nuevosValores.nuevos_NC} NC.`;
+      setNodusStatusMsg(msg);
+      showToast(`¡Datos extraídos de Nodus con éxito! (${labelTarget})`, 'success');
+    } catch (e) {
+      console.error("Error al extraer datos de Nodus:", e);
+      showToast('Error al extraer datos de Nodus.', 'error');
+    } finally {
+      setLoadingNodus(false);
+    }
+  };
 
   // Inicializar o regenerar preguntas del Micro-Pulso
   const shufflePulso = () => {
@@ -298293,12 +305791,16 @@ export default function ReportesBoard() {
     }
   }, [reportType]);
 
-  // Cargar datos para el dashboard de evolución
+  // Cargar datos para el dashboard de evolución (solo si tiene permisos de directivo o gerente)
   useEffect(() => {
-    if (activeTab === 'dashboard_evolucion') {
+    if (!canViewEvolucionDashboard && activeTab === 'dashboard_evolucion') {
+      setActiveTab('formulario');
+      return;
+    }
+    if (activeTab === 'dashboard_evolucion' && canViewEvolucionDashboard) {
       fetchEvolucionData();
     }
-  }, [activeTab]);
+  }, [activeTab, canViewEvolucionDashboard]);
 
   const fetchEvolucionData = async () => {
     setLoadingDashboard(true);
@@ -298421,10 +305923,6 @@ export default function ReportesBoard() {
       setLoading(false);
     }
   };
-
-  const role = currentUser?.activeRole || currentUser?.appRole || '';
-  const isDireccion = role === 'direccion';
-  const isGerente = currentUser?.isGerente || ['gerente', 'superadmin', 'direccion'].includes(role);
 
   // Renderizador de formularios
   const renderFormFields = () => {
@@ -298854,7 +306352,14 @@ export default function ReportesBoard() {
               {metrics.map(m => (
                 <div key={`nuevos_${m}`}>
                   <label className="text-muted" style={{ fontSize: '0.8rem', display: 'block', marginBottom: '0.2rem' }}>{m}</label>
-                  <input type="number" name={`nuevos_${m}`} onChange={handleChange} className="form-input" placeholder="0" />
+                  <input 
+                    type="number" 
+                    name={`nuevos_${m}`} 
+                    value={formData[`nuevos_${m}`] !== undefined ? formData[`nuevos_${m}`] : ''} 
+                    onChange={handleChange} 
+                    className="form-input" 
+                    placeholder="0" 
+                  />
                 </div>
               ))}
               <div style={{ background: 'rgba(255,255,255,0.05)', padding: '0.5rem', borderRadius: '4px' }}>
@@ -298869,7 +306374,14 @@ export default function ReportesBoard() {
               {metrics.filter(m => m !== 'OS').map(m => (
                 <div key={`rezagados_${m}`}>
                   <label className="text-muted" style={{ fontSize: '0.8rem', display: 'block', marginBottom: '0.2rem' }}>{m}</label>
-                  <input type="number" name={`rezagados_${m}`} onChange={handleChange} className="form-input" placeholder="0" />
+                  <input 
+                    type="number" 
+                    name={`rezagados_${m}`} 
+                    value={formData[`rezagados_${m}`] !== undefined ? formData[`rezagados_${m}`] : ''} 
+                    onChange={handleChange} 
+                    className="form-input" 
+                    placeholder="0" 
+                  />
                 </div>
               ))}
               <div style={{ background: 'rgba(255,255,255,0.05)', padding: '0.5rem', borderRadius: '4px' }}>
@@ -298878,10 +306390,94 @@ export default function ReportesBoard() {
               </div>
             </div>
           </div>
+
           <div style={{ background: 'rgba(52, 168, 83, 0.1)', border: '1px solid #34a853', padding: '1rem', borderRadius: '8px' }}>
             <p style={{ margin: 0, color: '#34a853', fontSize: '0.9rem' }}>
               💡 Al enviar este reporte, los "OK" se sumarán automáticamente a la Meta de Entrenamiento activa para evitar doble digitación.
             </p>
+          </div>
+
+          {/* BOTÓN Y PANEL DE EXTRACCIÓN AUTOMÁTICA DESDE NODUS */}
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(41, 171, 226, 0.12) 0%, rgba(3, 105, 161, 0.08) 100%)',
+            border: '1px solid rgba(41, 171, 226, 0.35)',
+            borderRadius: '10px',
+            padding: '1.2rem',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.8rem'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.8rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                <div style={{ background: 'rgba(41, 171, 226, 0.2)', padding: '8px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Database size={20} color="var(--crear-cyan, #29abe2)" />
+                </div>
+                <div>
+                  <div style={{ fontWeight: 800, color: '#fff', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    Sincronización Nodus
+                    <span style={{ fontSize: '0.7rem', background: 'rgba(41, 171, 226, 0.25)', color: 'var(--crear-cyan, #29abe2)', padding: '2px 8px', borderRadius: '12px', fontWeight: 700 }}>
+                      Cero Pereza
+                    </span>
+                  </div>
+                  <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                    Auto-completa los campos de llamadas directamente con los datos auditados en Nodus.
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+                {nodusEquiposDisponibles.length > 0 && (
+                  <select
+                    value={selectedNodusTeam}
+                    onChange={(e) => {
+                      setSelectedNodusTeam(e.target.value);
+                      handleExtraerDeNodus(e.target.value);
+                    }}
+                    className="form-input"
+                    style={{ width: 'auto', minWidth: '170px', padding: '0.5rem 0.8rem', fontSize: '0.85rem' }}
+                  >
+                    <option value="auto">⚡ Equipo Activo</option>
+                    <option value="acumulado">📊 Total Acumulado</option>
+                    {nodusEquiposDisponibles.map(eq => (
+                      <option key={eq.equipo} value={eq.equipo}>
+                        {eq.equipo} ({eq.confirmado || 0} OK)
+                      </option>
+                    ))}
+                  </select>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => handleExtraerDeNodus()}
+                  disabled={loadingNodus}
+                  style={{
+                    background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+                    color: '#fff',
+                    border: '1px solid #38bdf8',
+                    borderRadius: '8px',
+                    padding: '0.65rem 1.4rem',
+                    fontWeight: 800,
+                    fontSize: '0.92rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    boxShadow: '0 4px 14px rgba(2, 132, 199, 0.35)',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  {loadingNodus ? <RefreshCw size={16} className="spin" /> : <Download size={16} />}
+                  {loadingNodus ? 'Extrayendo de Nodus...' : 'Extraer de Nodus'}
+                </button>
+              </div>
+            </div>
+
+            {nodusStatusMsg && (
+              <div style={{ background: 'rgba(0, 0, 0, 0.35)', padding: '0.6rem 0.9rem', borderRadius: '6px', fontSize: '0.82rem', color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <CheckCircle2 size={16} color="#34d399" />
+                <span>{nodusStatusMsg}</span>
+              </div>
+            )}
           </div>
         </div>
       );
@@ -298958,6 +306554,13 @@ export default function ReportesBoard() {
         .form-input:focus {
           outline: none; border-color: var(--crear-cyan, #29abe2);
         }
+        .spin {
+          animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
       `}</style>
       
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
@@ -298965,45 +306568,51 @@ export default function ReportesBoard() {
           <ArrowLeft size={18} /> Volver al Inicio
         </button>
 
-        {/* CONMUTADOR DE VISTAS */}
-        <div style={{ display: 'flex', gap: '0.5rem', background: 'rgba(255,255,255,0.04)', padding: '4px', borderRadius: '8px' }}>
-          <button
-            onClick={() => setActiveTab('formulario')}
-            style={{
-              padding: '0.5rem 1.2rem',
-              borderRadius: '6px',
-              border: 'none',
-              background: activeTab === 'formulario' ? 'var(--crear-cyan, #29abe2)' : 'transparent',
-              color: activeTab === 'formulario' ? '#000' : 'var(--text-muted)',
-              fontWeight: 800,
-              fontSize: '0.85rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.4rem'
-            }}
-          >
-            <FileText size={16} /> Enviar Reportes
-          </button>
-          <button
-            onClick={() => setActiveTab('dashboard_evolucion')}
-            style={{
-              padding: '0.5rem 1.2rem',
-              borderRadius: '6px',
-              border: 'none',
-              background: activeTab === 'dashboard_evolucion' ? 'var(--crear-gold, #ffb703)' : 'transparent',
-              color: activeTab === 'dashboard_evolucion' ? '#000' : 'var(--text-muted)',
-              fontWeight: 800,
-              fontSize: '0.85rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.4rem'
-            }}
-          >
-            <BarChart3 size={16} /> Dashboard Evolución (Causa OS)
-          </button>
-        </div>
+        {/* CONMUTADOR DE VISTAS (Solo Directivos y Gerentes) */}
+        {canViewEvolucionDashboard ? (
+          <div style={{ display: 'flex', gap: '0.5rem', background: 'rgba(255,255,255,0.04)', padding: '4px', borderRadius: '8px' }}>
+            <button
+              onClick={() => setActiveTab('formulario')}
+              style={{
+                padding: '0.5rem 1.2rem',
+                borderRadius: '6px',
+                border: 'none',
+                background: activeTab === 'formulario' ? 'var(--crear-cyan, #29abe2)' : 'transparent',
+                color: activeTab === 'formulario' ? '#000' : 'var(--text-muted)',
+                fontWeight: 800,
+                fontSize: '0.85rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem'
+              }}
+            >
+              <FileText size={16} /> Enviar Reportes
+            </button>
+            <button
+              onClick={() => setActiveTab('dashboard_evolucion')}
+              style={{
+                padding: '0.5rem 1.2rem',
+                borderRadius: '6px',
+                border: 'none',
+                background: activeTab === 'dashboard_evolucion' ? 'var(--crear-gold, #ffb703)' : 'transparent',
+                color: activeTab === 'dashboard_evolucion' ? '#000' : 'var(--text-muted)',
+                fontWeight: 800,
+                fontSize: '0.85rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem'
+              }}
+            >
+              <BarChart3 size={16} /> Dashboard Evolución (Causa OS)
+            </button>
+          </div>
+        ) : (
+          <div style={{ fontWeight: 800, color: 'var(--crear-cyan)', fontSize: '0.88rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <FileText size={16} /> Módulo Oficial de Reportes
+          </div>
+        )}
       </div>
 
       {/* VISTA 1: FORMULARIO DE REPORTES */}
@@ -299021,31 +306630,33 @@ export default function ReportesBoard() {
 
           {/* ACCESOS DIRECTOS DESTACADOS */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
-            {/* CARD 1: REPORTE RELAMPAGO GERENTE */}
-            <div 
-              onClick={() => setReportType('ReporteRelampagoFDS')}
-              style={{
-                background: reportType === 'ReporteRelampagoFDS' ? 'rgba(245,158,11,0.2)' : 'rgba(255,255,255,0.03)',
-                border: reportType === 'ReporteRelampagoFDS' ? '2px solid #f59e0b' : '1px solid rgba(255,255,255,0.08)',
-                borderRadius: '12px',
-                padding: '1.2rem',
-                cursor: 'pointer',
-                transition: 'all 0.2s'
-              }}
-            >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
-                <span style={{ color: '#fbbf24', fontWeight: 800, fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                  <Zap size={15} /> GERENTES DE SEDE
-                </span>
-                <span style={{ background: 'rgba(245,158,11,0.2)', color: '#fbbf24', fontSize: '0.7rem', padding: '2px 8px', borderRadius: '10px', fontWeight: 'bold' }}>
-                  &lt; 3 minutos
-                </span>
+            {/* CARD 1: REPORTE RELAMPAGO GERENTE (Solo Directivos y Gerentes) */}
+            {canViewEvolucionDashboard && (
+              <div 
+                onClick={() => setReportType('ReporteRelampagoFDS')}
+                style={{
+                  background: reportType === 'ReporteRelampagoFDS' ? 'rgba(245,158,11,0.2)' : 'rgba(255,255,255,0.03)',
+                  border: reportType === 'ReporteRelampagoFDS' ? '2px solid #f59e0b' : '1px solid rgba(255,255,255,0.08)',
+                  borderRadius: '12px',
+                  padding: '1.2rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
+                  <span style={{ color: '#fbbf24', fontWeight: 800, fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                    <Zap size={15} /> GERENTES DE SEDE
+                  </span>
+                  <span style={{ background: 'rgba(245,158,11,0.2)', color: '#fbbf24', fontSize: '0.7rem', padding: '2px 8px', borderRadius: '10px', fontWeight: 'bold' }}>
+                    &lt; 3 minutos
+                  </span>
+                </div>
+                <h3 style={{ margin: '0 0 0.3rem', fontSize: '1.1rem', color: '#fff' }}>⚡ Reporte Relámpago Post-FDS</h3>
+                <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>
+                  Evaluación 5 Puntos (Entrenador, Logística, Staff, Retención TRO y Quiebres). Habilitado Domingo 21:00 a Lunes 12:00 PM.
+                </p>
               </div>
-              <h3 style={{ margin: '0 0 0.3rem', fontSize: '1.1rem', color: '#fff' }}>⚡ Reporte Relámpago Post-FDS</h3>
-              <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>
-                Evaluación 5 Puntos (Entrenador, Logística, Staff, Retención TRO y Quiebres). Habilitado Domingo 21:00 a Lunes 12:00 PM.
-              </p>
-            </div>
+            )}
 
             {/* CARD 2: MICRO-PULSO STAFF */}
             <div 
@@ -299090,7 +306701,9 @@ export default function ReportesBoard() {
                   className="form-input"
                 >
                   <option value="">-- Selecciona Formato Oficial Autorizado --</option>
-                  <option value="ReporteRelampagoFDS">⚡ Reporte Relámpago Post-FDS (Gerente de Sede &lt;3 min)</option>
+                  {canViewEvolucionDashboard && (
+                    <option value="ReporteRelampagoFDS">⚡ Reporte Relámpago Post-FDS (Gerente de Sede &lt;3 min)</option>
+                  )}
                   <option value="MicroPulsoStaff">🎧 Micro-Pulso de Staff (Escucha Activa 3 Preguntas &lt;30 seg)</option>
                   <option value="Llamadas">1. Reporte de Llamadas (C1)</option>
                   <option value="FDS">2. Reporte FDS (Sede C1 tradicional)</option>
@@ -299116,8 +306729,8 @@ export default function ReportesBoard() {
         </div>
       )}
 
-      {/* VISTA 2: DASHBOARD DE EVOLUCIÓN ORGANIZACIONAL (CAUSA OS) */}
-      {activeTab === 'dashboard_evolucion' && (
+      {/* VISTA 2: DASHBOARD DE EVOLUCIÓN ORGANIZACIONAL (CAUSA OS - Solo Directivos y Gerentes) */}
+      {activeTab === 'dashboard_evolucion' && canViewEvolucionDashboard && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.8rem' }}>
           
           {/* HEADER DEL DASHBOARD */}
