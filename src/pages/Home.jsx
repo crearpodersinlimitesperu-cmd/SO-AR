@@ -590,11 +590,37 @@ const MODULE_REGISTRY = [
   { id: 'generador-flyer', label: 'Generador de Flyers Oficiales', emoji: '🎨', route: '/generador-flyer', roles: ['gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj'] },
 ];
 
+// BUG REAL corregido (08/09/2026, reportado por José: "soy superusuario con
+// acceso a todo lo cual debería aparecer en mi selector"). El selector de rol
+// inline de la barra PRO (más abajo, junto al nombre/avatar) solo listaba
+// `currentUser.roles` — para un SuperAdmin eso son solo los 3-4 roles que
+// buildUserObject() le inyecta automáticamente en AuthContext.jsx (gerente,
+// direccion, consolidado, y entrenador si aplica DUAL_ROLE_TRAINER_EMAILS), no
+// TODOS los roles del sistema. Un SuperAdmin necesita poder simular cualquier
+// rol para probar la plataforma, así que para él la lista de opciones ahora es
+// esta lista fija de todos los roles reales de Causa OS (mismo catálogo que ya
+// usa RoleSelector.jsx en su `roleHierarchy`), en vez de su array personal de
+// roles asignados en Firestore. Se excluye 'student' a propósito: no es un rol
+// del sistema SO-AR (ver el comentario en ROLE_DISPLAY_NAMES, usersData.js).
+const ALL_SIMULATABLE_ROLES = [
+  'consolidado', 'direccion', 'cfo', 'gerente', 'director_maestria',
+  'coord_c1', 'coord_maestria', 'capitan', 'manager',
+  'entrenador', 'entrenador_llamadas', 'qt',
+  'finanzas', 'coordinador', 'talento_humano', 'legal',
+  'asistente_impuestos_quito', 'tecnico_sst'
+];
+
 const isModuleVisible = (mod, currentUser) => {
   if (typeof mod.visible === 'function') return mod.visible(currentUser);
   if (mod.roles === null) return true;
   const allowedRoles = mod.roles || [];
-  if (currentUser?.isSuperAdmin) return true;
+  // BUG REAL corregido (08/09/2026, reportado por José: "cuando cambio de rol
+  // esto se debería modificar, que solo se vean los del rol") — ver la nota
+  // completa en checkModuleAccess() (permissions.js) y en switchRole()
+  // (AuthContext.jsx). Mientras isRoleSimulationActive es true, un SuperAdmin
+  // ya NO recibe el bypass total: los botones del PRO bar (MODULE_REGISTRY) se
+  // filtran exactamente igual que para el rol que tiene elegido en el selector.
+  if (currentUser?.isSuperAdmin && !currentUser?.isRoleSimulationActive) return true;
   if (currentUser?.appRole === 'consolidado') {
     return (currentUser?.roles || []).some(r => allowedRoles.includes(r));
   }
@@ -632,7 +658,9 @@ const getCountdownInfo = (deadlineIso, now) => {
 
 export default function Home() {
   const hasRoleAccess = (allowedRoles) => {
-    if (currentUser?.isSuperAdmin) return true;
+    // Mismo fix de simulación de rol que isModuleVisible() más arriba y
+    // checkModuleAccess() en permissions.js (08/09/2026).
+    if (currentUser?.isSuperAdmin && !currentUser?.isRoleSimulationActive) return true;
     if (currentUser?.appRole === 'consolidado') {
       return (currentUser?.roles || []).some(r => allowedRoles.includes(r));
     }
@@ -832,7 +860,7 @@ export default function Home() {
   // de este archivo.
   // ==========================================================================
   const canSeeGlobalDirectory = Boolean(
-    currentUser?.isSuperAdmin ||
+    (currentUser?.isSuperAdmin && !currentUser?.isRoleSimulationActive) ||
     currentUser?.isDireccion ||
     isDireccionRole(currentUser?.appRole) ||
     canViewAllManagers(currentUser)
@@ -860,7 +888,7 @@ export default function Home() {
 
   const globalSearchOptionResults = !globalSearchActive ? [] : CAUSA_OPTIONS_REGISTRY
     .filter(opt => {
-      if (opt.roles && !hasRoleAccess(opt.roles) && !currentUser?.isSuperAdmin) {
+      if (opt.roles && !hasRoleAccess(opt.roles) && !(currentUser?.isSuperAdmin && !currentUser?.isRoleSimulationActive)) {
         return false;
       }
       if (typeof opt.visible === 'function' && !opt.visible(currentUser)) {
@@ -1073,7 +1101,7 @@ export default function Home() {
             </h2>
           </div>
           <p className="text-muted" style={{ margin: '0.8rem 0 0', textTransform: 'uppercase', fontSize: '0.85rem' }}>
-            {(currentUser?.isSuperAdmin || currentUser?.appRole === 'direccion') ? 'MÚLTIPLES EQUIPOS (GLOBAL) • VISIÓN MÚLTIPLES SEDES' : (currentCycle ? `${currentCycle.name} • ETAPA: ${currentStage}` : 'CARGANDO CICLO...')}
+            {((currentUser?.isSuperAdmin && !currentUser?.isRoleSimulationActive) || currentUser?.appRole === 'direccion') ? 'MÚLTIPLES EQUIPOS (GLOBAL) • VISIÓN MÚLTIPLES SEDES' : (currentCycle ? `${currentCycle.name} • ETAPA: ${currentStage}` : 'CARGANDO CICLO...')}
           </p>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginTop: '0.8rem', flexWrap: 'wrap' }}>
@@ -1257,11 +1285,11 @@ export default function Home() {
             <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <span style={{ fontSize: '0.9rem', fontWeight: 'bold', color: 'var(--text-main)' }}>{currentUser?.name || currentUser?.displayName || 'Usuario'}</span>
               <span style={{ fontSize: '0.75rem', color: 'var(--crear-gold)', fontWeight: 'bold', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'flex-end' }}>
-                {currentUser?.isSuperAdmin && !currentUser?.isSimulated
+                {currentUser?.isSuperAdmin && !currentUser?.isSimulated && !currentUser?.isRoleSimulationActive
                   ? <>Super Admin | Gerente Lima {getFlagForSede('Lima')}</>
-                  : <>{ROLE_DISPLAY_NAMES[currentUser?.appRole] || currentUser?.appRole?.replace(/_/g, ' ') || 'Miembro'} {getFlagForSede(currentUser?.sede)}</>}
+                  : <>{currentUser?.appRole === 'consolidado' ? 'Vista Consolidada (Global)' : (ROLE_DISPLAY_NAMES[currentUser?.appRole] || currentUser?.appRole?.replace(/_/g, ' ') || 'Miembro')} {getFlagForSede(currentUser?.sede)}</>}
               </span>
-              {currentUser?.roles && currentUser.roles.length > 1 && (
+              {((currentUser?.roles && currentUser.roles.length > 1) || currentUser?.isSuperAdmin) && (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.4rem', marginTop: '3px' }}>
                   <select
                     value={currentUser.activeRole || currentUser.appRole}
@@ -1279,9 +1307,9 @@ export default function Home() {
                     }}
                     title="Cambiar tu rol activo"
                   >
-                    {currentUser.roles.map(r => (
+                    {(currentUser?.isSuperAdmin ? ALL_SIMULATABLE_ROLES : currentUser.roles).map(r => (
                       <option key={r} value={r} style={{ background: '#0d152d', color: '#ffffff' }}>
-                        🎭 {ROLE_DISPLAY_NAMES[r] || r.toUpperCase()}
+                        🎭 {r === 'consolidado' ? 'Vista Consolidada (Global)' : (ROLE_DISPLAY_NAMES[r] || r.toUpperCase())}
                       </option>
                     ))}
                   </select>
@@ -1963,7 +1991,7 @@ export default function Home() {
                     >
                       {hasRoleAccess(['entrenador', 'entrenador_llamadas']) ? 'MIS FECHAS' : 'MI SEDE'}
                     </button>
-                    {(!hasRoleAccess(['entrenador', 'entrenador_llamadas']) && (currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.isGerente || hasRoleAccess(['gerente', 'direccion', 'director_maestria', 'cfo']) || currentUser?.sede?.toLowerCase().includes('global'))) && (
+                    {(!hasRoleAccess(['entrenador', 'entrenador_llamadas']) && ((currentUser?.isSuperAdmin && !currentUser?.isRoleSimulationActive) || currentUser?.isDireccion || currentUser?.isGerente || hasRoleAccess(['gerente', 'direccion', 'director_maestria', 'cfo']) || currentUser?.sede?.toLowerCase().includes('global'))) && (
                       <button 
                         onClick={() => setActiveEventTab('globales')}
                         style={{ background: 'none', border: 'none', color: activeEventTab === 'globales' ? 'var(--crear-gold)' : 'var(--text-muted)', fontWeight: activeEventTab === 'globales' ? 'bold' : 'normal', cursor: 'pointer', fontSize: '0.85rem' }}
@@ -2501,7 +2529,7 @@ export default function Home() {
               <button className="btn-secondary" onClick={() => navigate('/metas')} style={{ padding: '0.8rem 1.4rem', fontSize: '1rem', fontWeight: 'bold' }}>
                 VER MIS METAS
               </button>
-              {(currentUser?.isSuperAdmin || currentUser?.isGerente || hasRoleAccess(['coord_c1', 'coord_maestria', 'capitan', 'qt', 'direccion', 'director_maestria'])) && (
+              {((currentUser?.isSuperAdmin && !currentUser?.isRoleSimulationActive) || currentUser?.isGerente || hasRoleAccess(['coord_c1', 'coord_maestria', 'capitan', 'qt', 'direccion', 'director_maestria'])) && (
                 <button className="btn-secondary" onClick={() => navigate('/reportes')} style={{ padding: '0.8rem 1.4rem', fontSize: '1rem', fontWeight: 'bold' }}>
                   ENVIAR REPORTES
                 </button>

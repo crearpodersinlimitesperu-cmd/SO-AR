@@ -5,6 +5,7 @@ import { collection, query, limit, getDocs, where, getCountFromServer } from 'fi
 import { Search, RefreshCw, ArrowLeft, Users, CheckCircle, XCircle, Clock } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-hot-toast';
+import { canViewCRMMaestro } from '../config/permissions';
 
 // BUG REAL encontrado y corregido (08/09/2026, reportado por José: "esta base de
 // datos esta horrible"). Esta página usaba clases de Tailwind CSS (bg-emerald-500/20,
@@ -20,7 +21,19 @@ import { toast } from 'react-hot-toast';
 
 export default function CRMBaseMaster() {
   const navigate = useNavigate();
-  const { currentUser, isSuperAdmin } = useAuth();
+  const { currentUser } = useAuth();
+
+  // BUG REAL corregido (08/09/2026, pedido explícito de José: "esta base solo la
+  // puedo ver yo"). Antes esta página no tenía NINGÚN control de acceso propio —
+  // la ruta /crm-maestro en App.jsx solo exige <PrivateRoute> (cualquier usuario
+  // autenticado), así que cualquier colaborador logueado podía ver los 2999
+  // registros de participantes (nombre, DNI, teléfono, IMO enrolador) de toda la
+  // plataforma. Ver canViewCRMMaestro() en permissions.js — por ahora solo
+  // restringe la INTERFAZ; la colección "participants" en firestore.rules sigue
+  // permitiendo lectura a cualquier SuperAdmin o Gerente/Dirección a nivel de
+  // base de datos, y estrecharla ahí requiere autorización explícita antes de
+  // tocar firestore.rules.
+  const hasAccess = canViewCRMMaestro(currentUser);
 
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,9 +41,10 @@ export default function CRMBaseMaster() {
   const [stats, setStats] = useState({ total: 0, sentados: 0, pendientes: 0 });
 
   useEffect(() => {
+    if (!hasAccess) return;
     fetchStats();
     fetchData();
-  }, []);
+  }, [hasAccess]);
 
   const fetchStats = async () => {
     try {
@@ -98,6 +112,27 @@ export default function CRMBaseMaster() {
     p.nombreCompleto?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     p.dni?.includes(searchTerm)
   );
+
+  if (!hasAccess) {
+    return (
+      <div style={{ minHeight: '100vh', background: bgPage, color: textMain, padding: '1.5rem', fontFamily: 'inherit', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ maxWidth: '440px', textAlign: 'center', background: bgCard, border: `1px solid ${borderSubtle}`, borderRadius: '16px', padding: '2.5rem 2rem' }}>
+          <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>🔒</div>
+          <h2 style={{ margin: '0 0 0.6rem 0', color: gold, fontSize: '1.3rem' }}>Acceso Restringido</h2>
+          <p style={{ margin: '0 0 1.5rem 0', color: textMuted, fontSize: '0.9rem' }}>
+            Esta base de datos (Base Maestra CRM / Nodus) es de acceso exclusivo. No tienes permiso para verla.
+          </p>
+          <button
+            onClick={() => navigate('/home')}
+            className="btn-secondary"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1.2rem', borderRadius: '8px', cursor: 'pointer' }}
+          >
+            <ArrowLeft size={16} /> Volver a Causa OS
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ minHeight: '100vh', background: bgPage, color: textMain, padding: '1.5rem', fontFamily: 'inherit' }}>

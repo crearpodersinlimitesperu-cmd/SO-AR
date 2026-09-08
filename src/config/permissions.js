@@ -227,6 +227,30 @@ export const canViewLiquidacionEntrenadores = (currentUser) => {
 };
 
 /**
+ * Emails autorizados a ver "Base Maestra CRM (Nodus)" (/crm-maestro): el listado
+ * completo y SIN filtrar de participantes de TODA la plataforma — nombre, DNI,
+ * teléfono, estado C1, coordinadora e IMO enrolador, sin distinción de sede.
+ * REGLA ESTRICTA (pedido explícito de José, 08/09/2026): "esta base solo la puedo
+ * ver yo" — únicamente este correo, sin excepción automática para otros
+ * SuperAdmin ni Dirección (mismo patrón que LIQUIDACION_ENTRENADORES_EMAILS
+ * arriba). NOTA: esto solo controla el acceso en la interfaz (el componente
+ * CRMBaseMaster.jsx). A nivel de base de datos, firestore.rules todavía permite
+ * leer la colección "participants" a CUALQUIER SuperAdmin o Gerente/Dirección
+ * (regla existente: isSuperAdmin() || isGerenteODireccion()) — restringirla ahí
+ * también a solo este correo requeriría tocar firestore.rules, lo cual necesita
+ * tu autorización explícita antes de hacerse.
+ */
+export const CRM_MAESTRO_ACCESS_EMAILS = [
+  'jose.sanchez@crearpsl.net',
+];
+
+export const canViewCRMMaestro = (currentUser) => {
+  if (!currentUser) return false;
+  const email = (currentUser.email || '').trim().toLowerCase();
+  return CRM_MAESTRO_ACCESS_EMAILS.includes(email);
+};
+
+/**
  * Emails o roles autorizados a ver la pestaña "KPIs de Entrenadores de Llamadas" (Auditoría financiera,
  * facturación $77,550 USD, graduados, deserción y matriz de 16 llamadas).
  * REGLA ESTRICTA (pedido explícito de José, 05/09/2026):
@@ -560,8 +584,17 @@ export const OFFICIAL_PERMISSION_MATRIX = {
 export const checkModuleAccess = (currentUser, moduleKey) => {
   if (!currentUser) return { hasAccess: false, scope: 'NONE' };
 
-  // Super Admin tiene acceso GLOBAL a todo
-  if (currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email)) {
+  // Super Admin tiene acceso GLOBAL a todo — EXCEPTO mientras está simulando
+  // activamente un rol específico con el selector de rol (activeRoleOverride).
+  // BUG REAL corregido (08/09/2026, reportado por José: "cuando cambio de rol
+  // esto se debería modificar, que solo se vean los del rol"): antes este bypass
+  // se aplicaba siempre para cualquier SuperAdmin sin mirar qué rol tenía elegido
+  // en el selector, así que los botones del dashboard nunca se filtraban al
+  // simular otro rol. Ver isRoleSimulationActive en AuthContext.jsx (switchRole /
+  // buildUserObject) — se activa solo cuando se elige un rol concreto distinto de
+  // 'consolidado', y con eso esta función cae al cálculo normal de abajo, que ya
+  // usa currentUser.appRole (el rol simulado).
+  if ((currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email)) && !currentUser.isRoleSimulationActive) {
     return { hasAccess: true, scope: 'GLOBAL' };
   }
 
