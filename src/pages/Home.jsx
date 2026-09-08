@@ -6,6 +6,8 @@ import { useChecklist } from '../context/ChecklistContext';
 import { useUI } from '../context/UIContext';
 import { useTheme } from '../context/ThemeContext';
 import { useNotifications } from '../context/NotificationContext';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../services/firebase';
 import { 
   FileText, LogOut, Clock, Calendar as CalendarIcon, MapPin, CheckCircle2, 
   AlertCircle, Circle, RefreshCw, CalendarPlus, Bell, Users, AtSign, 
@@ -672,7 +674,7 @@ export default function Home() {
   const { tasks: allTasks, loading: loadingTasks, syncTasksToGoogle, acceptCollaboration, rejectCollaboration } = useChecklist();
   const { showToast, viewMode, setViewMode, customModules } = useUI();
   const { themeMode, setThemeMode } = useTheme();
-  const { notifications, unreadCount, markAllAsRead } = useNotifications();
+  const { notifications, unreadCount, markAllAsRead, markAsRead } = useNotifications();
   const navigate = useNavigate();
 
   // Reloj local
@@ -752,6 +754,91 @@ export default function Home() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Manejo de clic sobre una notificación para llevar SI O SI a la tarea
+  const handleNotificationClick = async (notif) => {
+    if (!notif) return;
+
+    // 1. Marcar como leída de inmediato
+    if (!notif.read && markAsRead) {
+      try {
+        await markAsRead(notif.id);
+      } catch (e) {
+        console.warn("Error marcando notificación como leída:", e);
+      }
+    }
+
+    // 2. Cerrar dropdown de notificaciones
+    setShowNotifications(false);
+
+    // 3. Buscar la tarea correspondiente
+    let targetTask = null;
+
+    // 3a. Por taskId exacto en allTasks
+    if (notif.taskId && allTasks && allTasks.length > 0) {
+      targetTask = allTasks.find(t => t.id === notif.taskId);
+    }
+
+    // 3b. Por título / nombre de tarea
+    if (!targetTask && notif.title && allTasks && allTasks.length > 0) {
+      const notifTitleNorm = notif.title.toLowerCase().trim();
+      targetTask = allTasks.find(t => {
+        const taskName = (t.task || t.title || '').toLowerCase().trim();
+        return taskName && (taskName === notifTitleNorm || notifTitleNorm.includes(taskName) || taskName.includes(notifTitleNorm));
+      });
+    }
+
+    // 3c. Si no está en memoria pero tiene taskId, consultar Firestore directamente
+    if (!targetTask && notif.taskId) {
+      try {
+        const snap = await getDoc(doc(db, 'checklist_tasks', notif.taskId));
+        if (snap.exists()) {
+          targetTask = { id: snap.id, ...snap.data() };
+        } else {
+          const snap2 = await getDoc(doc(db, 'tasks', notif.taskId));
+          if (snap2.exists()) {
+            targetTask = { id: snap2.id, ...snap2.data() };
+          }
+        }
+      } catch (err) {
+        console.warn("Error obteniendo tarea desde Firestore:", err);
+      }
+    }
+
+    // 4. Si encontramos la tarea o construimos una tarea coherente para abrir
+    const taskToOpen = targetTask || {
+      id: notif.taskId || notif.id,
+      task: notif.title || notif.message,
+      title: notif.title || notif.message,
+      description: notif.message || '',
+      assignedSede: notif.assignedSede || 'Lima',
+      deadline: notif.deadline || notif.created_at || new Date().toISOString(),
+      priority: notif.priority || 'Urgente',
+      createdBy: notif.createdBy || 'Sistema'
+    };
+
+    // Abrir modal de detalles y avances de la tarea SÍ O SÍ
+    setSelectedTaskForDetail(taskToOpen);
+    setShowTaskDetailModal(true);
+
+    // Si la tarea está en la lista visible de Mis Tareas Asignadas, cambiar filtro a 'Todas' y hacer scroll suave hacia ella
+    setTareasAsignadasFilter('Todas');
+    setTimeout(() => {
+      const cardEl = document.getElementById(`task-card-${taskToOpen.id}`);
+      if (cardEl) {
+        cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        cardEl.style.transition = 'box-shadow 0.3s ease, border-color 0.3s ease';
+        cardEl.style.boxShadow = '0 0 25px rgba(0, 212, 255, 0.8)';
+        cardEl.style.borderColor = '#00d4ff';
+        setTimeout(() => {
+          if (cardEl) {
+            cardEl.style.boxShadow = '';
+            cardEl.style.borderColor = '';
+          }
+        }, 3500);
+      }
+    }, 400);
+  };
 
   const handleAddEventToGoogle = async (ev, startDate, endDate) => {
     let token = sessionStorage.getItem('googleAccessToken');
@@ -1360,27 +1447,54 @@ export default function Home() {
                       Marcar leídas
                     </button>
                   </div>
-                  <div style={{ maxHeight: '350px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.6rem', paddingRight: '0.4rem' }}>
+                  <div style={{ maxHeight: '380px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.6rem', paddingRight: '0.4rem' }}>
                     {notifications?.length > 0 ? notifications.map(n => (
-                      <div key={n.id} style={{
-                        fontSize: '0.8rem',
-                        padding: '0.75rem',
-                        background: n.read ? 'rgba(255, 255, 255, 0.03)' : 'rgba(41, 171, 226, 0.12)',
-                        borderRadius: '8px',
-                        border: '1px solid rgba(255, 255, 255, 0.08)',
-                        borderLeft: n.read ? '1px solid rgba(255, 255, 255, 0.08)' : '3px solid var(--crear-cyan)'
-                      }}>
-                        <strong style={{ color: n.read ? 'var(--text-muted)' : '#ffffff', display: 'block', marginBottom: '0.2rem', fontSize: '0.84rem' }}>
-                          {n.title || 'Alerta'}
-                        </strong>
+                      <div 
+                        key={n.id} 
+                        onClick={() => handleNotificationClick(n)}
+                        style={{
+                          fontSize: '0.8rem',
+                          padding: '0.75rem 0.85rem',
+                          background: n.read ? 'rgba(255, 255, 255, 0.03)' : 'rgba(41, 171, 226, 0.12)',
+                          borderRadius: '8px',
+                          border: '1px solid rgba(255, 255, 255, 0.08)',
+                          borderLeft: n.read ? '2px solid rgba(255, 255, 255, 0.2)' : '3px solid var(--crear-cyan)',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = 'rgba(41, 171, 226, 0.22)';
+                          e.currentTarget.style.borderColor = 'rgba(41, 171, 226, 0.5)';
+                          e.currentTarget.style.transform = 'translateY(-1px)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = n.read ? 'rgba(255, 255, 255, 0.03)' : 'rgba(41, 171, 226, 0.12)';
+                          e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+                          e.currentTarget.style.transform = 'translateY(0)';
+                        }}
+                        title="Haz clic para abrir directamente los detalles y gestionar esta tarea"
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                          <strong style={{ color: n.read ? 'var(--text-muted)' : '#ffffff', fontSize: '0.86rem', lineHeight: 1.3 }}>
+                            {n.title || 'Alerta'}
+                          </strong>
+                          <span style={{ fontSize: '0.68rem', color: 'var(--crear-cyan)', opacity: 0.9, whiteSpace: 'nowrap', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '3px', background: 'rgba(41, 171, 226, 0.15)', padding: '2px 6px', borderRadius: '4px' }}>
+                            Abrir ↗
+                          </span>
+                        </div>
                         <p style={{ margin: 0, color: 'var(--text-main)', lineHeight: '1.4', fontSize: '0.78rem' }}>
                           {n.message}
                         </p>
-                        {n.created_at && (
-                          <span style={{ display: 'block', fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-                            {new Date(n.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
+                          {n.created_at && (
+                            <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
+                              {new Date(n.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          )}
+                          <span style={{ fontSize: '0.7rem', color: 'var(--crear-cyan)', fontWeight: 700 }}>
+                            Ver tarea →
                           </span>
-                        )}
+                        </div>
                       </div>
                     )) : (
                       <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', margin: '1.5rem 0' }}>
@@ -2404,6 +2518,7 @@ export default function Home() {
                   return (
                     <div
                       key={task.id}
+                      id={`task-card-${task.id}`}
                       onClick={() => {
                         setSelectedTaskForDetail(task);
                         setShowTaskDetailModal(true);
