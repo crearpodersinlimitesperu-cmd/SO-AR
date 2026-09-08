@@ -22,12 +22,13 @@ rules_version = '2';
 //     ciclos y reportes fallando en silencio para roles no-superadmin).
 //
 // Qu├® NO cambia (a prop├│sito, para no romper nada que no revis├® a fondo):
-//  Las colecciones staff_directory, excellence_standards,
-//  kpi_reports, learning_logs, qt_directory, success_patterns, sync_history y
-//  user_stats se dejan EXACTAMENTE como est├ín hoy (cualquier autenticado lee y
-//  escribe) porque no alcanc├® a auditar el detalle de cada una y prefiero no
-//  inventar una restricci├│n que bloquee algo que no vi. Quedan marcadas abajo
-//  con un TODO para una siguiente pasada.
+//  Las colecciones staff_directory, excellence_standards, kpi_reports,
+//  learning_logs, success_patterns, sync_history y user_stats se dejan
+//  EXACTAMENTE como decía este comentario que estaban (cualquier autenticado lee
+//  y escribe) — ver hallazgo del 08/09/2026 más abajo, porque en la práctica
+//  habían dejado de estarlo. Sigue pendiente una auditoría dedicada del detalle
+//  de cada una (marcado abajo con TODO para una siguiente pasada), pero al menos
+//  ya no están completamente cerradas.
 //
 // ACTUALIZACIÓN 02/09/2026 (confirmada explícitamente por José): managers_directory
 // SALIÓ de la lista de arriba — ya no se deja abierta a cualquier autenticado. Ver
@@ -46,6 +47,25 @@ rules_version = '2';
 // isOperationalProgressUpdate() en la regla de "tasks" — ver esa función más abajo
 // para el detalle del bug real que corrige (permission-denied al marcar checklists
 // del catálogo base, reportado como "Revisa los permisos de Firestore").
+//
+// ⚠️ HALLAZGO REAL, ACTUALIZACIÓN 08/09/2026 (confirmado explícitamente por José
+// antes de tocar este archivo, como "Fase 2" de la auditoría de permisos por rol):
+// managers_directory, llamadas_grupales_historial, liquidaciones_pagos,
+// qt_directory, staff_directory, excellence_standards, kpi_reports,
+// learning_logs, success_patterns, sync_history y user_stats — 11 colecciones en
+// total — NO TENÍAN NINGÚN bloque "match" propio en este archivo, a pesar de que
+// el comentario de arriba decía que las últimas 7 (más qt_directory) se dejaban
+// "exactamente como están" (abiertas a cualquier autenticado). Sin el catch-all
+// que existía antes del 26/08/2026 y sin un bloque específico, Firestore las
+// denegaba TOTALMENTE por defecto — ninguna de las 11 podía leerse ni escribirse
+// desde el cliente. managers_directory en particular se usa activamente desde
+// CentroManagers.jsx (onSnapshot/setDoc/updateDoc/addDoc), y qt_directory desde
+// AuthContext.jsx en cada login — es decir, es probable que ambas hayan estado
+// fallando en silencio en producción. Restauradas todas abajo. Además, se agregó
+// enforcement real de "SOLO SU SEDE" (pedido explícito de José) en venues
+// (Gerentes) y qt_directory (Coordinadores de C1Y2) — antes solo existía como
+// restricción visual en el cliente (VenueConfigModal.jsx, DirectorioQT.jsx), sin
+// nada que lo respaldara del lado del servidor.
 // ============================================================================
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -167,6 +187,16 @@ service cloud.firestore {
         effectiveRole() in ['coord_maestria', 'director_maestria'];
     }
 
+    // (08/09/2026) CALLER SEDE — para el enforcement real de "SOLO SU SEDE" en
+    // venues y qt_directory (Fase 2 de la auditoría de permisos, confirmada
+    // explícitamente por José antes de tocar firestore.rules). Mismo patrón de
+    // lectura que effectiveRole(): users/{uid real de Firebase Auth}.data.sede.
+    // Puede devolver null si el documento no tiene ese campo — quien lo use debe
+    // comparar contra null antes de comparar strings.
+    function callerSede() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.sede;
+    }
+
     // (02/09/2026) MANAGERS_DIRECTORY: mismo patrón que callerRole() (users/{uid}.data.role)
     // para permitir que Coordinación/Dirección de Maestría gestionen el directorio de
     // managers sin abrir la escritura a cualquier autenticado. Antes de este cambio,
@@ -186,6 +216,112 @@ service cloud.firestore {
     match /mj_calendars/{calendarId} {
       allow read: if isAuthenticated();
       allow write: if isSuperAdmin() || isGerenteODireccion() || callerRole();
+    }
+
+    // ⚠️ HALLAZGO REAL (08/09/2026), encontrado al implementar la Fase 2 de la
+    // auditoría de permisos, confirmado por José antes de tocar firestore.rules:
+    // el bloque "match /managers_directory/{document}" (junto con
+    // llamadas_grupales_historial y liquidaciones_pagos, agregados el mismo día
+    // que ese bloque, commit 257c3d6) DESAPARECIÓ de este archivo en algún punto
+    // posterior a esa fecha — no por un cambio hecho por esta sesión, y sin que
+    // ninguna sesión anterior lo documentara. Como ya no existe el catch-all
+    // "match /{document=**}" (removido el 26/08/2026), estas 3 colecciones
+    // quedaron con denegación TOTAL por defecto de Firestore: NINGÚN cliente podía
+    // leer ni escribir en ellas. Esto es grave porque CentroManagers.jsx las usa
+    // activamente desde el navegador (onSnapshot/setDoc/updateDoc/addDoc) — es
+    // decir, la pestaña de Centro de Managers probablemente ha estado fallando en
+    // silencio (permission-denied) para cualquier usuario, desde que se perdió
+    // este bloque. Restaurado aquí exactamente como estaba (mismas condiciones),
+    // ahora usando effectiveRole() en vez de leer users/{uid}.data.role directo,
+    // consistente con canManageManagers() (ver arriba).
+    match /managers_directory/{document} {
+      allow read: if isAuthenticated();
+      allow create, delete: if isSuperAdmin() || isGerenteODireccion() || canManageManagers();
+      allow update: if isSuperAdmin() || isGerenteODireccion() || canManageManagers() ||
+                    (isAuthenticated() &&
+                     request.resource.data.diff(resource.data).affectedKeys()
+                       .hasOnly(['llamadaFecha', 'llamadaAsistio']));
+    }
+
+    // Historial de llamadas grupales (nunca se sobrescribe, cada llamada es un
+    // documento nuevo) — base de la pestaña de Liquidación de Entrenadores.
+    // Restaurado junto con managers_directory, ver nota arriba.
+    match /llamadas_grupales_historial/{document} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated(); // cualquier entrenador registra su propia llamada
+      allow update, delete: if isSuperAdmin() || isGerenteODireccion() || canManageManagers();
+    }
+
+    // Liquidación de Entrenadores ($400 por equipo al llegar a 7 llamadas).
+    // REGLA ESTRICTA (pedido explícito de José, vigente desde 02/09/2026): "esta
+    // info solo la debo de ver yo y Elizabeth Escobar" — debe coincidir con
+    // LIQUIDACION_ENTRENADORES_EMAILS en src/config/permissions.js; si esa lista
+    // cambia hay que actualizar AMBOS lugares. Restaurado junto con lo de arriba.
+    match /liquidaciones_pagos/{document} {
+      allow read, write: if isAuthenticated() && email() in [
+        'jose.sanchez@crearpsl.net',
+        'contabilidad.global@crearpsl.net'
+      ];
+    }
+
+    // ⚠️ MISMO HALLAZGO (08/09/2026): estas 7 colecciones aparecían documentadas en
+    // el comentario de cabecera de este archivo ("Qué NO cambia... se dejan
+    // EXACTAMENTE como están hoy: cualquier autenticado lee y escribe") pero,
+    // igual que managers_directory arriba, NUNCA tuvieron su propio bloque "match"
+    // en este archivo — probablemente se perdieron junto con el catch-all que las
+    // cubría, sin que nadie agregara el bloque explícito prometido en ese
+    // comentario. Restauradas aquí tal como el comentario original decía que ya
+    // estaban, sin inventar ninguna restricción nueva (eso queda para una
+    // auditoría dedicada de cada una, como el comentario original ya avisaba).
+    match /staff_directory/{document} {
+      allow read, write: if isAuthenticated();
+    }
+    match /excellence_standards/{document} {
+      allow read, write: if isAuthenticated();
+    }
+    match /kpi_reports/{document} {
+      allow read, write: if isAuthenticated();
+    }
+    match /learning_logs/{document} {
+      allow read, write: if isAuthenticated();
+    }
+    match /success_patterns/{document} {
+      allow read, write: if isAuthenticated();
+    }
+    match /sync_history/{document} {
+      allow read, write: if isAuthenticated();
+    }
+    match /user_stats/{document} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // QT_DIRECTORY — Fase 2 (08/09/2026), confirmada explícitamente por José.
+    // MISMO HALLAZGO que arriba: esta colección tampoco tenía bloque "match"
+    // propio (a pesar de estar en la lista "se deja como está" del comentario de
+    // cabecera), así que estaba con denegación total — y se usa activamente desde
+    // el cliente (AuthContext.jsx en cada login, userService.js, qtSheetService.js,
+    // roleAgentDaemon.js). Restaurada con lectura abierta a cualquier autenticado
+    // (como decía el comentario original), y además — esto sí es nuevo, pedido
+    // explícito de José — la fila "Directorio QT" de la Matriz Oficial dice que
+    // Coordinadores de C1Y2 solo deben operar sobre SU sede; el resto de roles con
+    // acceso (Dirección, Gerentes, QT) siguen con alcance global, igual que ya
+    // tenían antes de perderse esta regla.
+    match /qt_directory/{document} {
+      allow read: if isAuthenticated();
+      allow create: if isSuperAdmin() || isGerenteODireccion() ||
+        (isAuthenticated() && (
+          effectiveRole() in ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'qt', 'director_maestria'] ||
+          (effectiveRole() in ['coord_c1', 'coord_c2', 'coordinador_c1c2'] &&
+           callerSede() != null && request.resource.data.sede != null &&
+           callerSede().lower() == request.resource.data.sede.lower())
+        ));
+      allow update, delete: if isSuperAdmin() || isGerenteODireccion() ||
+        (isAuthenticated() && (
+          effectiveRole() in ['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'qt', 'director_maestria'] ||
+          (effectiveRole() in ['coord_c1', 'coord_c2', 'coordinador_c1c2'] &&
+           callerSede() != null && resource.data.sede != null &&
+           callerSede().lower() == resource.data.sede.lower())
+        ));
     }
 
     // TASKS
@@ -230,10 +366,24 @@ service cloud.firestore {
       allow delete: if isAuthenticated() && resource.data.userId == email();
     }
 
-    // VENUES (sede, hotel, sal├│n)
+    // VENUES (sede, hotel, salón) — doc ID = nombre exacto de la sede
+    // (VenueConfigModal.jsx: doc(db, 'venues', selectedSede)).
+    // ⚠️ HALLAZGO REAL (08/09/2026): antes de este cambio, la única forma de
+    // escribir aquí era isGerenteODireccion() (una lista fija de ~12 correos de
+    // staff corporativo) o isSuperAdmin() — es decir, un Gerente de Sede normal,
+    // cuyo correo NO esté en esa lista fija, no podía guardar el hotel/salón de
+    // SU PROPIA sede aunque VenueConfigModal.jsx esté diseñado exactamente para
+    // eso ("Solo puedes configurar los salones de tu propia sede", comentario ya
+    // existente en ese componente). Se agrega el permiso real que faltaba:
+    // Gerente puede escribir SOLO el documento de su propia sede (comparación
+    // case-insensitive, igual que ya hace VenueConfigModal.jsx en el cliente).
+    // Dirección/SuperAdmin/la lista fija de staff conservan alcance global, sin
+    // cambio respecto a antes.
     match /venues/{venueId} {
       allow read: if isAuthenticated();
-      allow write: if isGerenteODireccion() || isSuperAdmin();
+      allow write: if isGerenteODireccion() || isSuperAdmin() ||
+        (isAuthenticated() && effectiveRole() == 'gerente' &&
+         callerSede() != null && callerSede().lower() == venueId.lower());
     }
 
     // CYCLES

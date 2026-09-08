@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
+import { canAccessMonitorVuelos, canAccessSistemaCartas } from '../config/permissions';
 import {
   Plane,
   FileText,
@@ -254,6 +255,7 @@ const OFICIAL_LETTERS = [
 export default function MonitorVuelosCartas() {
   const navigate = useNavigate();
   const { showToast } = useUI();
+  const { currentUser } = useAuth();
   const [activeTab, setActiveTab] = useState('radar'); // 'radar' | 'cartas' | 'logistica'
   const [trackerData, setTrackerData] = useState(FALLBACK_TRACKER);
   const [loading, setLoading] = useState(false);
@@ -261,6 +263,29 @@ export default function MonitorVuelosCartas() {
   const [searchFilter, setSearchFilter] = useState('');
   const [routeFilter, setRouteFilter] = useState('ALL');
   const [flightStatusFilter, setFlightStatusFilter] = useState('activos');
+
+  // Separación Monitor de Vuelos / Sistema de Cartas (08/09/2026, pedido explícito
+  // de José: "son dos cosas distintas de verdad"). Antes esta página no tenía NINGÚN
+  // gate interno por rol — cualquiera que entrara a /monitor-vuelos veía las 3
+  // pestañas completas. Ahora cada pestaña se gatea según su propia fila de la
+  // Matriz Oficial: "radar" (Monitor de Vuelos) = Directivos + Gerentes de su sede;
+  // "cartas" (Sistema de Cartas) = SOLO Gerentes, Directivos NO tienen acceso. La
+  // pestaña "logistica" (Hotel & Choferes) no tiene fila propia en la Matriz — se
+  // deja visible para quien ya pudo entrar a la página (Directivos o Gerentes),
+  // sin restricción adicional propia.
+  const puedeVerRadar = canAccessMonitorVuelos(currentUser);
+  const puedeVerCartas = canAccessSistemaCartas(currentUser);
+
+  // Si el usuario cae en una pestaña a la que no tiene acceso (p. ej. un Directivo
+  // cuyo activeTab por defecto es 'radar' pero de algún modo llega a 'cartas'),
+  // lo movemos a la primera pestaña que sí puede ver.
+  useEffect(() => {
+    if (activeTab === 'radar' && !puedeVerRadar) {
+      setActiveTab(puedeVerCartas ? 'cartas' : 'logistica');
+    } else if (activeTab === 'cartas' && !puedeVerCartas) {
+      setActiveTab(puedeVerRadar ? 'radar' : 'logistica');
+    }
+  }, [activeTab, puedeVerRadar, puedeVerCartas]);
 
   const fetchTrackerData = async () => {
     setLoading(true);
@@ -425,73 +450,77 @@ export default function MonitorVuelosCartas() {
           border: '1px solid rgba(255,255,255,0.08)',
           marginTop: '1.5rem'
         }}>
-          <button
-            onClick={() => setActiveTab('radar')}
-            style={{
-              flex: 1,
-              padding: '12px 18px',
-              borderRadius: '12px',
-              border: 'none',
-              background: activeTab === 'radar' ? 'linear-gradient(135deg, rgba(56,189,248,0.2) 0%, rgba(56,189,248,0.05) 100%)' : 'transparent',
-              color: activeTab === 'radar' ? '#38bdf8' : 'var(--text-muted)',
-              fontWeight: 700,
-              fontSize: '0.95rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              borderBottom: activeTab === 'radar' ? '2px solid #38bdf8' : '2px solid transparent',
-              transition: 'all 0.2s ease'
-            }}
-          >
-            <Plane size={18} />
-            <span>Radar de Vuelos en Vivo</span>
-            <span style={{
-              background: '#38bdf8',
-              color: '#000',
-              padding: '2px 8px',
-              borderRadius: '10px',
-              fontSize: '0.75rem',
-              fontWeight: 800
-            }}>
-              {flightsList.length}
-            </span>
-          </button>
+          {puedeVerRadar && (
+            <button
+              onClick={() => setActiveTab('radar')}
+              style={{
+                flex: 1,
+                padding: '12px 18px',
+                borderRadius: '12px',
+                border: 'none',
+                background: activeTab === 'radar' ? 'linear-gradient(135deg, rgba(56,189,248,0.2) 0%, rgba(56,189,248,0.05) 100%)' : 'transparent',
+                color: activeTab === 'radar' ? '#38bdf8' : 'var(--text-muted)',
+                fontWeight: 700,
+                fontSize: '0.95rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                borderBottom: activeTab === 'radar' ? '2px solid #38bdf8' : '2px solid transparent',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <Plane size={18} />
+              <span>Radar de Vuelos en Vivo</span>
+              <span style={{
+                background: '#38bdf8',
+                color: '#000',
+                padding: '2px 8px',
+                borderRadius: '10px',
+                fontSize: '0.75rem',
+                fontWeight: 800
+              }}>
+                {flightsList.length}
+              </span>
+            </button>
+          )}
 
-          <button
-            onClick={() => setActiveTab('cartas')}
-            style={{
-              flex: 1,
-              padding: '12px 18px',
-              borderRadius: '12px',
-              border: 'none',
-              background: activeTab === 'cartas' ? 'linear-gradient(135deg, rgba(255,183,3,0.2) 0%, rgba(255,183,3,0.05) 100%)' : 'transparent',
-              color: activeTab === 'cartas' ? 'var(--crear-gold)' : 'var(--text-muted)',
-              fontWeight: 700,
-              fontSize: '0.95rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              borderBottom: activeTab === 'cartas' ? '2px solid var(--crear-gold)' : '2px solid transparent',
-              transition: 'all 0.2s ease'
-            }}
-          >
-            <FileText size={18} />
-            <span>Repositorio de Cartas y Migraciones</span>
-            <span style={{
-              background: 'var(--crear-gold)',
-              color: '#000',
-              padding: '2px 8px',
-              borderRadius: '10px',
-              fontSize: '0.75rem',
-              fontWeight: 800
-            }}>
-              {OFICIAL_LETTERS.length}
-            </span>
-          </button>
+          {puedeVerCartas && (
+            <button
+              onClick={() => setActiveTab('cartas')}
+              style={{
+                flex: 1,
+                padding: '12px 18px',
+                borderRadius: '12px',
+                border: 'none',
+                background: activeTab === 'cartas' ? 'linear-gradient(135deg, rgba(255,183,3,0.2) 0%, rgba(255,183,3,0.05) 100%)' : 'transparent',
+                color: activeTab === 'cartas' ? 'var(--crear-gold)' : 'var(--text-muted)',
+                fontWeight: 700,
+                fontSize: '0.95rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                borderBottom: activeTab === 'cartas' ? '2px solid var(--crear-gold)' : '2px solid transparent',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <FileText size={18} />
+              <span>Repositorio de Cartas y Migraciones</span>
+              <span style={{
+                background: 'var(--crear-gold)',
+                color: '#000',
+                padding: '2px 8px',
+                borderRadius: '10px',
+                fontSize: '0.75rem',
+                fontWeight: 800
+              }}>
+                {OFICIAL_LETTERS.length}
+              </span>
+            </button>
+          )}
 
           <button
             onClick={() => setActiveTab('logistica')}
@@ -522,7 +551,7 @@ export default function MonitorVuelosCartas() {
       {/* ========================================================= */}
       {/* PESTAÑA 1: RADAR DE VUELOS EN TIEMPO REAL                 */}
       {/* ========================================================= */}
-      {activeTab === 'radar' && (
+      {activeTab === 'radar' && puedeVerRadar && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           
           {/* Barra de Filtros y Búsqueda de Vuelos */}
@@ -861,7 +890,7 @@ export default function MonitorVuelosCartas() {
       {/* ========================================================= */}
       {/* PESTAÑA 2: REPOSITORIO DE CARTAS Y MIGRACIONES            */}
       {/* ========================================================= */}
-      {activeTab === 'cartas' && (
+      {activeTab === 'cartas' && puedeVerCartas && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           
           {/* Buscador de Cartas */}

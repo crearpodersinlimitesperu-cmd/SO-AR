@@ -2144,7 +2144,11 @@ export default function Home() {
                       return timeFilter === 'pasados' ? dateB - dateA : dateA - dateB; // Past events descending, future ascending
                     });
 
-                    // --- QT Filter Logic: solo de su sede, solo C1 y C2 actual y próximo ---
+                    // --- QT Filter Logic: solo de su sede, solo C1 y C2 actual y próximo, SIN entrenador asignado ---
+                    // La Matriz Oficial define este alcance como "SEDE_C1C2_PROXIMOS_SIN_TRAINER"
+                    // (ver OFFICIAL_PERMISSION_MATRIX.eventos_entrenamientos.qt en permissions.js).
+                    // Antes (hasta 08/09/2026) el filtro cubría sede + C1/C2 + actual/próximo, pero
+                    // NO excluía eventos que ya tienen entrenador asignado — corregido aquí.
                     if (isQT) {
                       const qtNow = new Date().getTime();
                       const userSede = currentUser?.sede || '';
@@ -2159,6 +2163,10 @@ export default function Home() {
                         }
                         const dateMs = new Date(ev.fecha_inicio || ev.start || 0).getTime();
                         if (dateMs < qtNow) return false;
+                        // "SIN TRAINER": si el evento ya tiene un entrenador asignado, QT ya no
+                        // necesita verlo en su lista de pendientes.
+                        const trainerAsignado = (ev.trainer || ev.entrenador || '').trim();
+                        if (trainerAsignado) return false;
                         const name = (ev.nombre || ev.name || '').toUpperCase();
                         if (name.includes('CAPITULO UNO') || name.includes('C1') || name.includes('CAPÍTULO UNO')) {
                           c1Count++;
@@ -2168,7 +2176,7 @@ export default function Home() {
                           c2Count++;
                           return c2Count <= 2;
                         }
-                        return false; // QTs SOLO ven C1 y C2 de su sede (actual y próximo)
+                        return false; // QTs SOLO ven C1 y C2 de su sede (actual y próximo, sin entrenador)
                       });
                     }
 

@@ -463,12 +463,14 @@ export const OFFICIAL_PERMISSION_MATRIX = {
     gerente: 'GLOBAL'
   },
   // 'sistema_cartas': módulo confirmado por José (08/09/2026) como GENUINAMENTE
-  // DISTINTO de "Monitor de Vuelos" ("Son dos cosas distintas de verdad"), aunque
-  // hoy comparten página/ruta (/monitor-vuelos) en el código. Se deja esta entrada
-  // de la matriz documentada, pero NINGÚN botón la usa todavía — separarla en una
-  // vista propia es un cambio de producto más grande, pendiente de alcance con José.
+  // DISTINTO de "Monitor de Vuelos" ("Son dos cosas distintas de verdad"). Ahora sí
+  // tiene su propia pestaña gateada dentro de /monitor-vuelos (MonitorVuelosCartas.jsx,
+  // pestaña "Repositorio de Cartas y Migraciones") — antes ningún botón la usaba.
+  // CORREGIDO (08/09/2026): la fila real de la Matriz Oficial ("Sistema de Cartas: -
+  // | X | ...") NO le da acceso a Directivos, solo a Gerentes — esta entrada tenía
+  // por error 'directivos: GLOBAL', que nunca se había notado porque nada la leía
+  // todavía. Se removió esa clave.
   'sistema_cartas': {
-    directivos: 'GLOBAL',
     gerente: 'GLOBAL'
   },
   // 'monitor_vuelos': fila "✈️ Monitor de Vuelos" de la Matriz Oficial. Antes,
@@ -618,6 +620,16 @@ export const canAccessMonitorVuelos = (currentUser) => {
   // (un módulo distinto, confirmado por José). Ahora usa su propia entrada
   // 'monitor_vuelos' en la Matriz Oficial.
   return checkModuleAccess(currentUser, 'monitor_vuelos').hasAccess;
+};
+
+/**
+ * "Sistema de Cartas" (pestaña "Repositorio de Cartas y Migraciones" dentro de
+ * /monitor-vuelos) — nueva función (08/09/2026), separada de
+ * canAccessMonitorVuelos por pedido explícito de José ("son dos cosas distintas
+ * de verdad"). Según la Matriz Oficial: SOLO Gerentes, Directivos NO tienen acceso.
+ */
+export const canAccessSistemaCartas = (currentUser) => {
+  return checkModuleAccess(currentUser, 'sistema_cartas').hasAccess;
 };
 
 /**

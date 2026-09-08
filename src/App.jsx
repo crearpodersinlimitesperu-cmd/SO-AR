@@ -58,14 +58,26 @@ function PrivateRoute({ children }) {
 }
 
 // Componente para proteger autorización por Roles (S3 / Audit Fix)
-function RoleRoute({ children, allowedRoles = [], requireSuperAdmin = false }) {
+// NOTA (08/09/2026): "currentUser.isDireccion" es, por defecto, un bypass general —
+// cualquier usuario con ese flag en true pasa CUALQUIER RoleRoute, sin importar lo
+// que diga allowedRoles. Esto es intencional y se conserva para la enorme mayoría
+// de rutas (Dirección normalmente debe poder entrar a todo). Pero hay un puñado de
+// rutas donde la Matriz Oficial pide excluir explícitamente a Directivos (p. ej.
+// /calendario-mj, /generador-flyer) — para esas, se agregó el prop opcional
+// `excludeDireccionBypass` (default false, así que NINGUNA ruta existente cambia de
+// comportamiento a menos que lo declare explícitamente). Con
+// excludeDireccionBypass=true, isDireccion deja de ser un pase libre y el usuario
+// debe estar literalmente en `allowedRoles` (o en su array `roles` para multi-rol) —
+// isSuperAdmin SIGUE siendo un bypass total incluso con esta bandera, porque un
+// Super Admin debe poder entrar a cualquier sección para soporte/depuración.
+function RoleRoute({ children, allowedRoles = [], requireSuperAdmin = false, excludeDireccionBypass = false }) {
   const { currentUser, loading } = useAuth();
   const { showToast } = useUI();
-  
+
   if (loading) {
     return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><p className="text-gold">Verificando permisos...</p></div>;
   }
-  
+
   if (!currentUser) {
     return <Navigate to="/login" replace />;
   }
@@ -80,28 +92,17 @@ function RoleRoute({ children, allowedRoles = [], requireSuperAdmin = false }) {
   }
 
   // Verificación de Roles permitidos
-  // NOTA (08/09/2026, documentando comportamiento preexistente, NO modificado en
-  // esta ronda): "currentUser.isDireccion" es un bypass general — cualquier
-  // usuario con ese flag en true pasa CUALQUIER RoleRoute, sin importar lo que
-  // diga allowedRoles. Esto significa que rutas donde la Matriz Oficial pide
-  // excluir explícitamente a Directivos (p. ej. /calendario-mj, /generador-flyer)
-  // no quedan 100% bloqueadas por esta vía para quien ya tenga isDireccion=true —
-  // solo se bloquea a quien NO tenga ese flag. Cerrarlo del todo requeriría un
-  // parámetro explícito (p. ej. algo como `excludeDireccionBypass`) para que cada
-  // <RoleRoute> declare si esa excepción aplica o no — cambio más grande, no
-  // incluido en esta ronda (Fase 1: "sin tocar firestore.rules", y este mecanismo
-  // es compartido por TODAS las rutas protegidas de la app).
   if (allowedRoles.length > 0) {
     const hasRole = allowedRoles.includes(currentUser.appRole) ||
                     currentUser.isSuperAdmin ||
-                    currentUser.isDireccion ||
+                    (!excludeDireccionBypass && currentUser.isDireccion) ||
                     (currentUser.roles || []).some(r => allowedRoles.includes(r));
     if (!hasRole) {
       showToast(`ACCESO DENEGADO: Tu rol actual (${currentUser.appRole}) no tiene acceso a esta sección.`, "error");
       return <Navigate to="/home" replace />;
     }
   }
-  
+
   return children;
 }
 
@@ -347,15 +348,13 @@ function App() {
               Narrowed 08/09/2026: José confirmó explícitamente ("sí, así es
               correcto") que SOLO Coordinadores de MJ tienen acceso — se removieron
               direccion/cfo/ceo/cco/gerente/superadmin/consolidado/director_maestria.
-              LIMITACIÓN CONOCIDA: RoleRoute deja pasar igual a cualquier usuario con
-              currentUser.isDireccion=true (Directivos) o isSuperAdmin=true, sin
-              importar allowedRoles — ver comentario en el componente RoleRoute más
-              abajo. Esta narrowing bloquea el acceso vía URL directa a Gerentes y a
-              cualquier Directivo que NO tenga esos flags, pero no a quienes sí los
-              tienen. Arreglarlo del todo requiere tocar RoleRoute mismo (fuera de
-              alcance de esta ronda, no confirmado con José). */}
+              excludeDireccionBypass=true agregado 08/09/2026 (confirmado por José):
+              cierra el bypass general de RoleRoute para Directivos en ESTA ruta
+              específicamente, así que ahora si un Directivo entra por URL directa
+              también es rechazado — antes solo se ocultaba el botón. isSuperAdmin
+              sigue teniendo acceso (soporte/depuración). */}
           <Route path="/calendario-mj" element={
-            <RoleRoute allowedRoles={['coord_maestria', 'coordinador_mj']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['coord_maestria', 'coordinador_mj']} requireSuperAdmin={false} excludeDireccionBypass={true}>
               <CalendarioMJ />
             </RoleRoute>
           } />
@@ -365,18 +364,22 @@ function App() {
               tienen acceso (y director_maestria se trata como Directivos). Se
               removieron direccion/cfo/ceo/cco/superadmin/consolidado/director_maestria
               y se agregaron coord_maestria/coordinador_mj (presentes en la Matriz
-              Oficial pero ausentes antes). MISMA LIMITACIÓN CONOCIDA de RoleRoute
-              descrita arriba en /calendario-mj: no bloquea a quien ya tiene
-              isDireccion/isSuperAdmin=true. */}
+              Oficial pero ausentes antes). excludeDireccionBypass=true agregado
+              08/09/2026 (confirmado por José), misma razón que en /calendario-mj. */}
           <Route path="/generador-flyer" element={
-            <RoleRoute allowedRoles={['gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['gerente', 'coord_c1', 'coord_c2', 'coordinador_c1c2', 'coord_maestria', 'coordinador_mj']} requireSuperAdmin={false} excludeDireccionBypass={true}>
               <GeneradorFlyer />
             </RoleRoute>
           } />
 
           {/* Monitor de Vuelos y Cartas Oficiales */}
+          {/* Contiene AMBAS: "Monitor de Vuelos" (Directivos+Gerentes) y "Sistema de
+              Cartas" (solo Gerentes) como pestañas separadas dentro de
+              MonitorVuelosCartas.jsx (08/09/2026) — el guard de ruta debe cubrir la
+              UNIÓN de ambas audiencias; el gate fino por pestaña vive dentro del
+              componente (canAccessMonitorVuelos / canAccessSistemaCartas). */}
           <Route path="/monitor-vuelos" element={
-            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado']} requireSuperAdmin={false}>
+            <RoleRoute allowedRoles={['direccion', 'cfo', 'ceo', 'cco', 'gerente', 'superadmin', 'consolidado', 'director_maestria']} requireSuperAdmin={false}>
               <MonitorVuelosCartas />
             </RoleRoute>
           } />
