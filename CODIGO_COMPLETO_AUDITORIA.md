@@ -306900,7 +306900,7 @@ import {
   ThumbsDown, AlertCircle, Building2, Lock, Unlock, Eye, Database, Download,
   ChevronDown, ChevronUp, Check, Users, PhoneCall, MessageSquare
 } from 'lucide-react';
-import { OPERATIONAL_SEDES } from '../data/usersData';
+import { OPERATIONAL_SEDES, normalizeSede } from '../data/usersData';
 import nodusFallbackData from '../data/nodusFallbackData.json';
 import { sendReportToGoogleChat, getGoogleChatWebhookConfig, saveGoogleChatWebhookConfig } from '../services/googleChatService';
 
@@ -306984,6 +306984,8 @@ export default function ReportesBoard() {
   const [nodusEquiposDisponibles, setNodusEquiposDisponibles] = useState([]);
   const [selectedNodusTeam, setSelectedNodusTeam] = useState('auto');
   const [nodusMatchedCoord, setNodusMatchedCoord] = useState(null);
+  const [nodusAllCoords, setNodusAllCoords] = useState([]);
+  const [selectedNodusCoordId, setSelectedNodusCoordId] = useState('');
 
   // Configuración de Webhook Google Chat
   const [showChatWebhookModal, setShowChatWebhookModal] = useState(false);
@@ -307056,7 +307058,7 @@ export default function ReportesBoard() {
     }
   };
 
-  const handleExtraerDeNodus = async (teamOverride = null) => {
+  const handleExtraerDeNodus = async (teamOverride = null, coordIdOverride = null) => {
     setLoadingNodus(true);
     setNodusStatusMsg('');
     try {
@@ -307071,47 +307073,83 @@ export default function ReportesBoard() {
         console.warn("Lectura Firestore nodus_coordinadores_c1c2 falló, usando respaldo local:", err);
       }
 
-      if (!nodusData || !nodusData.coordinadores) {
-        nodusData = nodusFallbackData;
-      }
+      // Si Firestore tiene menos de los 22 coordinadores completos, combinamos con el catálogo local
+      // para garantizar que NINGUNA sede (Quito, Guayaquil, Cuenca, Medellín, México, Lima) quede excluida jamás.
+      let coords = (nodusData && Array.isArray(nodusData.coordinadores) && nodusData.coordinadores.length >= 22)
+        ? nodusData.coordinadores
+        : nodusFallbackData.coordinadores;
+
+      setNodusAllCoords(coords);
 
       const userEmail = (currentUser?.email || '').toLowerCase().trim();
       const userName = (currentUser?.displayName || currentUser?.name || '').toLowerCase().trim();
-      const userSede = (currentUser?.sede || '').toLowerCase().trim();
+      const userSede = normalizeSede(currentUser?.sede || '');
 
-      const coords = nodusData.coordinadores || [];
-      
-      // 1. Buscar coordinador por coincidencia de email o nombre
-      let coord = coords.find(c => {
-        const cEmail = (c.email || '').toLowerCase();
-        const cNombre = (c.nombre || '').toLowerCase();
-        const cNombreComp = (c.nombreCompleto || '').toLowerCase();
-        return (userEmail && (cEmail === userEmail || userEmail.includes(cNombre))) ||
-               (userName && (cNombreComp.includes(userName) || userName.includes(cNombreComp) || cNombre.includes(userName) || userName.includes(cNombre)));
-      });
+      let coord = null;
 
-      // 2. Si Joyce está activa (simulada o real)
-      if (!coord && (userName.includes('joyce') || userEmail.includes('joyce'))) {
-        coord = coords.find(c => c.id === 'coord_joyce_lima' || (c.nombre || '').toLowerCase().includes('joyce'));
+      // 0. Si se especificó un coordinador manualmente por ID (por selector o parámetro)
+      const targetCoordId = coordIdOverride || selectedNodusCoordId;
+      if (targetCoordId) {
+        coord = coords.find(c => c.id === targetCoordId);
       }
 
-      // 3. Si no se encuentra por nombre, buscar por sede operativa
-      if (!coord && userSede) {
-        coord = coords.find(c => (c.sede || '').toLowerCase() === userSede);
-      }
+      // 1. Filtrar primero los coordinadores de la sede del usuario si tiene sede definida
+      const sedeCoords = (userSede && userSede !== 'Global' && userSede !== 'Sede Global')
+        ? coords.filter(c => normalizeSede(c.sede) === userSede)
+        : coords;
 
-      // 4. Fallback: primer coordinador
-      if (!coord && coords.length > 0) {
-        coord = coords[0];
+      if (!coord) {
+        // Buscar dentro de su sede (o global) por coincidencia de email o nombre
+        coord = sedeCoords.find(c => {
+          const cEmail = (c.email || '').toLowerCase();
+          const cNombre = (c.nombre || '').toLowerCase();
+          const cNombreComp = (c.nombreCompleto || '').toLowerCase();
+          const cId = (c.id || '').toLowerCase();
+
+          // Coincidencia de email: completo o prefijo antes del @
+          const userPrefix = userEmail.split('@')[0] || '';
+          const coordPrefix = cEmail.split('@')[0] || '';
+          const emailMatch = userEmail && (
+            cEmail === userEmail ||
+            (userPrefix && (userPrefix === coordPrefix || userPrefix.includes(coordPrefix) || coordPrefix.includes(userPrefix))) ||
+            (cId && userPrefix && cId.includes(userPrefix))
+          );
+
+          // Coincidencia de nombre: primer nombre, apellido o nombre completo
+          const userFirstWord = userName.split(' ')[0] || '';
+          const coordFirstWord = cNombre.split(' ')[0] || '';
+          const nameMatch = userName && (
+            cNombreComp.includes(userName) ||
+            userName.includes(cNombreComp) ||
+            cNombre.includes(userName) ||
+            userName.includes(cNombre) ||
+            (userFirstWord.length >= 3 && coordFirstWord.length >= 3 && (userFirstWord === coordFirstWord || cNombre.includes(userFirstWord))) ||
+            (cId && userFirstWord.length >= 3 && cId.includes(userFirstWord))
+          );
+
+          return emailMatch || nameMatch;
+        });
+
+        // Si no hubo coincidencia nominal pero está en una sede específica:
+        // Seleccionar el primer coordinador de SU MISMA SEDE (¡NUNCA caer a otra sede ajena!)
+        if (!coord && sedeCoords.length > 0) {
+          coord = sedeCoords[0];
+        }
+
+        // Fallback general solo si la sede es Global
+        if (!coord && coords.length > 0) {
+          coord = coords[0];
+        }
       }
 
       if (!coord) {
-        showToast('No se encontró información registrada en Nodus para este usuario.', 'error');
+        showToast('No se encontró información registrada en Nodus para esta sede.', 'error');
         setLoadingNodus(false);
         return;
       }
 
       setNodusMatchedCoord(coord);
+      setSelectedNodusCoordId(coord.id);
       const equipos = coord.equipos || [];
       setNodusEquiposDisponibles(equipos);
 
@@ -307162,7 +307200,7 @@ export default function ReportesBoard() {
       const coordLabel = coord.nombreCompleto || coord.nombre;
       const msg = `Nodus Sincronizado: ${coordLabel} (${coord.sede}) • ${labelTarget} -> Nuevos actualizados: ${nuevosValores.nuevos_OK} OK, ${nuevosValores.nuevos_XC} XC, ${nuevosValores.nuevos_NC} NC. (Rezagados y avances previos conservados).`;
       setNodusStatusMsg(msg);
-      showToast(`¡Datos extraídos de Nodus con éxito! (${labelTarget})`, 'success');
+      showToast(`¡Datos extraídos de Nodus con éxito! (${coordLabel} • ${labelTarget})`, 'success');
     } catch (e) {
       console.error("Error al extraer datos de Nodus:", e);
       showToast('Error al extraer datos de Nodus.', 'error');
@@ -307188,23 +307226,26 @@ export default function ReportesBoard() {
 
       const uEmail = (currentUser?.email || '').toLowerCase().trim();
       const uName = (currentUser?.displayName || currentUser?.name || '').toLowerCase().trim();
-      const uSede = (currentUser?.sede || '').toLowerCase().trim();
+      const uSede = normalizeSede(currentUser?.sede || '');
 
-      // 1. Prioridad: Reporte del mismo usuario
+      // 1. Prioridad: Reporte del mismo usuario en su sede
       let matched = llamadas.find(r => {
         const author = (r.submitted_by || '').toLowerCase();
         const email = (r.email || r.data?.email || '').toLowerCase();
-        return (uEmail && (email === uEmail || author.includes(uEmail))) ||
+        const rSede = normalizeSede(r.sede || r.data?.sede_id || '');
+        const sameSede = !uSede || uSede === 'Global' || rSede === uSede;
+        const userMatches = (uEmail && (email === uEmail || author.includes(uEmail))) ||
                (uName && (author.includes(uName) || uName.includes(author)));
+        return sameSede && userMatches;
       });
 
       // 2. Prioridad: Reporte de la misma sede
-      if (!matched && uSede) {
-        matched = llamadas.find(r => (r.sede || '').toLowerCase() === uSede);
+      if (!matched && uSede && uSede !== 'Global' && uSede !== 'Sede Global') {
+        matched = llamadas.find(r => normalizeSede(r.sede || r.data?.sede_id || '') === uSede);
       }
 
-      // 3. Fallback: El reporte de llamadas más reciente registrado
-      if (!matched) {
+      // 3. Fallback solo si el usuario es Global o SuperAdmin
+      if (!matched && (!uSede || uSede === 'Global' || currentUser?.isSuperAdmin)) {
         matched = llamadas[0];
       }
 
@@ -307223,7 +307264,7 @@ export default function ReportesBoard() {
           ...prev
         }));
 
-        showToast(`Último reporte de llamadas precargado (${matched.submitted_by})`, 'info');
+        showToast(`Último reporte de llamadas precargado (${matched.submitted_by} • ${matched.sede})`, 'info');
       }
     } catch (err) {
       console.warn("Error al precargar último reporte de llamadas:", err);
@@ -308021,12 +308062,33 @@ export default function ReportesBoard() {
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+                {/* Selector de Coordinador y Sede Nodus */}
+                {nodusAllCoords.length > 0 && (
+                  <select
+                    value={selectedNodusCoordId || nodusMatchedCoord?.id || ''}
+                    onChange={(e) => {
+                      const newCoordId = e.target.value;
+                      setSelectedNodusCoordId(newCoordId);
+                      handleExtraerDeNodus(null, newCoordId);
+                    }}
+                    className="form-input"
+                    style={{ width: 'auto', minWidth: '180px', padding: '0.5rem 0.8rem', fontSize: '0.85rem' }}
+                    title="Seleccionar Coordinador y Sede Nodus"
+                  >
+                    {nodusAllCoords.map(c => (
+                      <option key={c.id} value={c.id}>
+                        👤 {c.nombreCompleto || c.nombre} ({c.sede})
+                      </option>
+                    ))}
+                  </select>
+                )}
+
                 {nodusEquiposDisponibles.length > 0 && (
                   <select
                     value={selectedNodusTeam}
                     onChange={(e) => {
                       setSelectedNodusTeam(e.target.value);
-                      handleExtraerDeNodus(e.target.value);
+                      handleExtraerDeNodus(e.target.value, selectedNodusCoordId);
                     }}
                     className="form-input"
                     style={{ width: 'auto', minWidth: '170px', padding: '0.5rem 0.8rem', fontSize: '0.85rem' }}
@@ -308043,7 +308105,7 @@ export default function ReportesBoard() {
 
                 <button
                   type="button"
-                  onClick={() => handleExtraerDeNodus()}
+                  onClick={() => handleExtraerDeNodus(selectedNodusTeam, selectedNodusCoordId)}
                   disabled={loadingNodus}
                   style={{
                     background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
