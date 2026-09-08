@@ -106,9 +106,9 @@ export function CyclesProvider({ children }) {
     });
 
     const today = new Date();
-    // Miramos hasta 21 días atrás para no saltar prematuramente al siguiente ciclo 
-    // mientras la sede sigue procesando las tareas POST-MJ del ciclo recién terminado.
-    const lookbackDate = new Date(today.getTime() - 21 * 24 * 60 * 60 * 1000);
+    // Miramos hasta 4 días atrás (el fin de semana concluye el domingo, y el martes siguiente
+    // ya se activa de inmediato la preparación del siguiente ciclo/equipo).
+    const lookbackDate = new Date(today.getTime() - 4 * 24 * 60 * 60 * 1000);
     
     let nextEvent = null;
     for (const e of sedeEvents) {
@@ -150,8 +150,9 @@ export function CyclesProvider({ children }) {
         return eEq === equipoStr || eEq.includes(equipoStr) || equipoStr.includes(eEq);
     });
 
-    // Ordenar descendente para que find() tome el evento más reciente si hay varios (ej. 3 C1s distintos)
-    equipoEvents.sort((a, b) => new Date(b.fecha_inicio || b.start) - new Date(a.fecha_inicio || a.start));
+    // Ordenar cronológicamente (ascendente) para tomar el C1, C2 y MJ correspondientes a este ciclo,
+    // y no eventos de varios meses después.
+    equipoEvents.sort((a, b) => new Date(a.fecha_inicio || a.start) - new Date(b.fecha_inicio || b.start));
 
     const c1 = equipoEvents.find(e => (e.nombre || e.name) === 'CAPITULO UNO');
     const c2 = equipoEvents.find(e => (e.nombre || e.name) === 'CAPITULO DOS');

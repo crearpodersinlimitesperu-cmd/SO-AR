@@ -184567,9 +184567,9 @@ export function CyclesProvider({ children }) {
     });
 
     const today = new Date();
-    // Miramos hasta 21 días atrás para no saltar prematuramente al siguiente ciclo 
-    // mientras la sede sigue procesando las tareas POST-MJ del ciclo recién terminado.
-    const lookbackDate = new Date(today.getTime() - 21 * 24 * 60 * 60 * 1000);
+    // Miramos hasta 4 días atrás (el fin de semana concluye el domingo, y el martes siguiente
+    // ya se activa de inmediato la preparación del siguiente ciclo/equipo).
+    const lookbackDate = new Date(today.getTime() - 4 * 24 * 60 * 60 * 1000);
     
     let nextEvent = null;
     for (const e of sedeEvents) {
@@ -184611,8 +184611,9 @@ export function CyclesProvider({ children }) {
         return eEq === equipoStr || eEq.includes(equipoStr) || equipoStr.includes(eEq);
     });
 
-    // Ordenar descendente para que find() tome el evento más reciente si hay varios (ej. 3 C1s distintos)
-    equipoEvents.sort((a, b) => new Date(b.fecha_inicio || b.start) - new Date(a.fecha_inicio || a.start));
+    // Ordenar cronológicamente (ascendente) para tomar el C1, C2 y MJ correspondientes a este ciclo,
+    // y no eventos de varios meses después.
+    equipoEvents.sort((a, b) => new Date(a.fecha_inicio || a.start) - new Date(b.fecha_inicio || b.start));
 
     const c1 = equipoEvents.find(e => (e.nombre || e.name) === 'CAPITULO UNO');
     const c2 = equipoEvents.find(e => (e.nombre || e.name) === 'CAPITULO DOS');
@@ -293204,8 +293205,8 @@ export default function ChecklistBoard() {
   const [taskForReflection, setTaskForReflection] = useState(null);
   const [taskForCompletionChoice, setTaskForCompletionChoice] = useState(null);
   const [taskForExcellence, setTaskForExcellence] = useState(null);
-  const [qtPhaseFilter, setQtPhaseFilter] = useState('all'); // 'all' o una de las fases reales del rol (ver PHASE_ORDER)
   const [selectedTaskForDetail, setSelectedTaskForDetail] = useState(null);
+  const [qtPhaseFilter, setQtPhaseFilter] = useState('active'); // 'active' (fase actual del ciclo) | 'all' | fase específica
   const [showTaskDetailModal, setShowTaskDetailModal] = useState(false);
 
   const { currentUser } = useAuth();
@@ -293276,13 +293277,11 @@ export default function ChecklistBoard() {
 
   const filterParam = searchParams.get('filter');
 
-  // Fases que este rol realmente tiene en su catálogo de tareas (según los datos, no inventadas).
-  const isCoordinatorRoleWithTabs = COORDINATOR_ROLES_WITH_PHASE_TABS.includes(roleId);
-  const phasesPresent = isCoordinatorRoleWithTabs
-    ? PHASE_ORDER.filter(p => myTasks.some(t => t.cyclePhase === p))
-    : [];
-  // Solo mostramos pestañas si el rol realmente abarca más de una fase (si tuviera solo una, no aporta navegar por pestañas)
+  // Fases que este rol realmente tiene en su catálogo de tareas (aplica a todos los roles y consolidado).
+  const phasesPresent = PHASE_ORDER.filter(p => myTasks.some(t => t.cyclePhase === p));
+  // Mostramos pestañas si el rol abarca más de una fase
   const showPhaseTabs = phasesPresent.length > 1;
+  const isCurrentStageInRole = currentStage && phasesPresent.includes(currentStage);
 
   let activeTasks = myTasks;
   let viewTitle = `Checklist Causa OS Activo: ${currentStage}`;
@@ -293309,30 +293308,35 @@ export default function ChecklistBoard() {
     activeTasks = sortByDeadline(activeTasks);
     viewTitle = "Mostrando: Tareas Importantes";
   } else if (showPhaseTabs) {
-    // Para roles de coordinación (QT, Coordinación C1/C2, Coordinación Maestría, Coordinación Administrativa):
-    // visualización prolija por pestañas de sus fases operativas reales.
-    if (qtPhaseFilter !== 'all' && phasesPresent.includes(qtPhaseFilter)) {
+    if (qtPhaseFilter === 'active') {
+      if (isCurrentStageInRole) {
+        const meta = PHASE_META[currentStage] || { label: currentStage };
+        activeTasks = myTasks.filter(t => t.cyclePhase === currentStage);
+        viewTitle = `${role?.name || 'Checklist'}: Fase Activa ${meta.label}`;
+      } else {
+        activeTasks = myTasks;
+        viewTitle = `${role?.name || 'Checklist'}: Catálogo Operativo Integral (${phasesPresent.join(', ')})`;
+      }
+    } else if (qtPhaseFilter !== 'all' && phasesPresent.includes(qtPhaseFilter)) {
       const meta = PHASE_META[qtPhaseFilter] || { label: qtPhaseFilter };
       activeTasks = myTasks.filter(t => t.cyclePhase === qtPhaseFilter);
-      viewTitle = `${role?.name || 'Coordinación'}: Fase ${meta.label}`;
+      viewTitle = `${role?.name || 'Checklist'}: Fase ${meta.label}`;
     } else {
       activeTasks = myTasks;
-      viewTitle = `${role?.name || 'Coordinación'}: Catálogo Operativo Integral (${phasesPresent.join(', ')})`;
+      viewTitle = `${role?.name || 'Checklist'}: Catálogo Operativo Integral (${phasesPresent.join(', ')})`;
     }
   } else {
-    // Vista Normal del Checklist Activo para otros roles
+    // Vista Normal del Checklist Activo para roles de fase única
     if (currentStage && currentStage !== 'GLOBAL' && currentStage !== 'INACTIVO') {
-      activeTasks = myTasks.filter(t => 
-        (t.cyclePhase === currentStage) || (t.associatedGoal && !t.completed) || (t.isCritical && !t.completed)
-      );
+      activeTasks = myTasks.filter(t => t.cyclePhase === currentStage);
     } else {
       activeTasks = myTasks;
     }
   }
 
-  // El progreso siempre es de mis tareas totales de la fase, no de la vista filtrada
+  // El progreso siempre es de mis tareas de la fase activa actual
   const stageTasks = (currentStage && currentStage !== 'GLOBAL' && currentStage !== 'INACTIVO') 
-    ? myTasks.filter(t => t.cyclePhase === currentStage || t.associatedGoal)
+    ? myTasks.filter(t => t.cyclePhase === currentStage)
     : myTasks;
   const completedActive = stageTasks.filter(t => t.completed || t.status === 'Completada').length;
   const progress = stageTasks.length > 0 ? Math.round((completedActive / stageTasks.length) * 100) : 100;
@@ -293483,30 +293487,36 @@ export default function ChecklistBoard() {
         </div>
         <p className="text-gold" style={{ marginTop: '0.5rem', fontWeight: 'bold' }}>{progress}% Completado en esta Fase</p>
 
-        {/* NAVEGACIÓN PROLIJA DE FASES PARA ROLES DE COORDINACIÓN (QT, C1/C2, Maestría, Administrativa) */}
+        {/* NAVEGACIÓN PROLIJA DE FASES OPERATIVAS */}
         {showPhaseTabs && (
           <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1.25rem', flexWrap: 'wrap', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '1rem' }}>
-            <button
-              onClick={() => setQtPhaseFilter('all')}
-              style={{
-                padding: '0.35rem 0.8rem',
-                borderRadius: '6px',
-                fontSize: '0.8rem',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-                background: qtPhaseFilter === 'all' ? 'var(--crear-blue)' : 'rgba(255,255,255,0.05)',
-                color: qtPhaseFilter === 'all' ? '#000000' : 'var(--text-muted)',
-                border: `1px solid ${qtPhaseFilter === 'all' ? 'var(--crear-blue)' : 'rgba(255,255,255,0.1)'}`
-              }}
-            >
-              📋 Todas las Tareas ({myTasks.length})
-            </button>
+            {/* Botón Fase Activa Actual */}
+            {isCurrentStageInRole && (
+              <button
+                type="button"
+                onClick={() => setQtPhaseFilter('active')}
+                style={{
+                  padding: '0.35rem 0.8rem',
+                  borderRadius: '6px',
+                  fontSize: '0.8rem',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  background: qtPhaseFilter === 'active' ? 'var(--color-success)' : 'rgba(255,255,255,0.05)',
+                  color: qtPhaseFilter === 'active' ? '#000000' : 'var(--text-muted)',
+                  border: `1px solid ${qtPhaseFilter === 'active' ? 'var(--color-success)' : 'rgba(255,255,255,0.1)'}`
+                }}
+              >
+                ⚡ Fase Activa: {currentStage} ({myTasks.filter(t => t.cyclePhase === currentStage).length})
+              </button>
+            )}
+
             {phasesPresent.map(phase => {
               const meta = PHASE_META[phase] || { emoji: '📌', label: phase, color: 'var(--crear-gold)' };
               const active = qtPhaseFilter === phase;
               return (
                 <button
                   key={phase}
+                  type="button"
                   onClick={() => setQtPhaseFilter(phase)}
                   style={{
                     padding: '0.35rem 0.8rem',
@@ -293523,6 +293533,24 @@ export default function ChecklistBoard() {
                 </button>
               );
             })}
+
+            {/* Botón Todas las Tareas del Catálogo */}
+            <button
+              type="button"
+              onClick={() => setQtPhaseFilter('all')}
+              style={{
+                padding: '0.35rem 0.8rem',
+                borderRadius: '6px',
+                fontSize: '0.8rem',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                background: qtPhaseFilter === 'all' ? 'var(--crear-blue)' : 'rgba(255,255,255,0.05)',
+                color: qtPhaseFilter === 'all' ? '#000000' : 'var(--text-muted)',
+                border: `1px solid ${qtPhaseFilter === 'all' ? 'var(--crear-blue)' : 'rgba(255,255,255,0.1)'}`
+              }}
+            >
+              📋 Todo el Catálogo ({myTasks.length})
+            </button>
           </div>
         )}
       </div>
