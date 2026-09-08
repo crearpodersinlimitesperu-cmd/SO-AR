@@ -341,7 +341,7 @@ export default function AuditoriaKPIs({ defaultTab }) {
 
       // 1. Cargar reportes operativos reales enviados desde el Centro de Reportes (Firestore 'reports')
       try {
-        const reportsSnap = await getDocs(query(collection(db, 'reports'), orderBy('created_at', 'desc'), limit(100)));
+        const reportsSnap = await getDocs(query(collection(db, 'reports'), orderBy('created_at', 'desc'), limit(500)));
         reportsSnap.docs.forEach(docSnap => {
           const r = docSnap.data();
           const data = r.data || {};
