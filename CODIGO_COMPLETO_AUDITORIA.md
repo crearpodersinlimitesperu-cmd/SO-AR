@@ -306963,6 +306963,10 @@ export default function ReportesBoard() {
     roles.some(r => ['gerente', 'direccion', 'cfo', 'ceo', 'cco', 'superadmin', 'consolidado', 'director_maestria'].includes(r))
   );
 
+  const canSwitchAnyCoord = Boolean(
+    (currentUser?.isSuperAdmin || isDireccion) && !currentUser?.isSimulated
+  );
+
   // Micro-pulso state (selección aleatoria de 3 preguntas)
   const [pulsoQuestions, setPulsoQuestions] = useState([]);
   const [pulsoRespuestas, setPulsoRespuestas] = useState({});
@@ -307058,7 +307062,7 @@ export default function ReportesBoard() {
     }
   };
 
-  const handleExtraerDeNodus = async (teamOverride = null, coordIdOverride = null) => {
+  const handleExtraerDeNodus = async (teamOverride = null, coordIdOverride = null, isSilent = false) => {
     setLoadingNodus(true);
     setNodusStatusMsg('');
     try {
@@ -307087,13 +307091,13 @@ export default function ReportesBoard() {
 
       let coord = null;
 
-      // 0. Si se especificó un coordinador manualmente por ID (por selector o parámetro)
-      const targetCoordId = coordIdOverride || selectedNodusCoordId;
+      // 0. Si se especificó un coordinador manualmente por ID (solo si tiene permisos y no es simulado)
+      const targetCoordId = canSwitchAnyCoord ? (coordIdOverride || selectedNodusCoordId) : null;
       if (targetCoordId) {
         coord = coords.find(c => c.id === targetCoordId);
       }
 
-      // 1. Filtrar primero los coordinadores de la sede del usuario si tiene sede definida
+      // 1. Filtrar estrictamente los coordinadores de la sede del usuario si tiene sede definida
       const sedeCoords = (userSede && userSede !== 'Global' && userSede !== 'Sede Global')
         ? coords.filter(c => normalizeSede(c.sede) === userSede)
         : coords;
@@ -307115,16 +307119,14 @@ export default function ReportesBoard() {
             (cId && userPrefix && cId.includes(userPrefix))
           );
 
-          // Coincidencia de nombre: primer nombre, apellido o nombre completo
-          const userFirstWord = userName.split(' ')[0] || '';
-          const coordFirstWord = cNombre.split(' ')[0] || '';
+          // Coincidencia de nombre: cualquier palabra del nombre del usuario (longitud >= 3)
+          const userWords = userName.split(/[\s,]+/).filter(w => w.length >= 3);
           const nameMatch = userName && (
             cNombreComp.includes(userName) ||
             userName.includes(cNombreComp) ||
             cNombre.includes(userName) ||
             userName.includes(cNombre) ||
-            (userFirstWord.length >= 3 && coordFirstWord.length >= 3 && (userFirstWord === coordFirstWord || cNombre.includes(userFirstWord))) ||
-            (cId && userFirstWord.length >= 3 && cId.includes(userFirstWord))
+            userWords.some(w => cNombre.includes(w) || cNombreComp.includes(w) || cId.includes(w))
           );
 
           return emailMatch || nameMatch;
@@ -307200,7 +307202,9 @@ export default function ReportesBoard() {
       const coordLabel = coord.nombreCompleto || coord.nombre;
       const msg = `Nodus Sincronizado: ${coordLabel} (${coord.sede}) • ${labelTarget} -> Nuevos actualizados: ${nuevosValores.nuevos_OK} OK, ${nuevosValores.nuevos_XC} XC, ${nuevosValores.nuevos_NC} NC. (Rezagados y avances previos conservados).`;
       setNodusStatusMsg(msg);
-      showToast(`¡Datos extraídos de Nodus con éxito! (${coordLabel} • ${labelTarget})`, 'success');
+      if (!isSilent) {
+        showToast(`¡Datos extraídos de Nodus con éxito! (${coordLabel} • ${labelTarget})`, 'success');
+      }
     } catch (e) {
       console.error("Error al extraer datos de Nodus:", e);
       showToast('Error al extraer datos de Nodus.', 'error');
@@ -307209,11 +307213,15 @@ export default function ReportesBoard() {
     }
   };
 
-  // Precargar el último reporte de llamadas emitido (por el usuario o de su sede)
+  // Función para precargar datos del último reporte de llamadas existente
   const fetchUltimoReporteLlamadas = async () => {
     setLoadingUltimoReporte(true);
     try {
-      const q = query(collection(db, 'reports'), orderBy('created_at', 'desc'), limit(40));
+      const q = query(
+        collection(db, 'reports'),
+        orderBy('created_at', 'desc'),
+        limit(20)
+      );
       const snap = await getDocs(q);
       const llamadas = snap.docs
         .map(d => ({ id: d.id, ...d.data() }))
@@ -307244,8 +307252,9 @@ export default function ReportesBoard() {
         matched = llamadas.find(r => normalizeSede(r.sede || r.data?.sede_id || '') === uSede);
       }
 
-      // 3. Fallback solo si el usuario es Global o SuperAdmin
-      if (!matched && (!uSede || uSede === 'Global' || currentUser?.isSuperAdmin)) {
+      // 3. Fallback solo si el usuario es Global o SuperAdmin (NO simulado)
+      const isSuperAdminNonSimulated = (currentUser?.isSuperAdmin || isDireccion) && !currentUser?.isSimulated;
+      if (!matched && (!uSede || uSede === 'Global' || isSuperAdminNonSimulated)) {
         matched = llamadas[0];
       }
 
@@ -307291,17 +307300,33 @@ export default function ReportesBoard() {
     setPulsoRespuestas({});
   };
 
+  // Al cambiar de usuario, simulación o tipo de reporte, sincronizar datos de su sede
   useEffect(() => {
-    if (reportType === 'Llamadas') {
-      fetchUltimoReporteLlamadas();
-    } else {
-      setFormData({});
-      setUltimoReporteInfo(null);
-    }
-    if (reportType === 'MicroPulsoStaff') {
-      shufflePulso();
-    }
-  }, [reportType]);
+    setSelectedNodusCoordId('');
+    setSelectedNodusTeam('auto');
+    setNodusMatchedCoord(null);
+    setNodusEquiposDisponibles([]);
+    setNodusStatusMsg('');
+
+    let isCancelled = false;
+    const initLlamadas = async () => {
+      if (reportType === 'Llamadas') {
+        await fetchUltimoReporteLlamadas();
+        if (!isCancelled) {
+          await handleExtraerDeNodus(null, null, true);
+        }
+      } else {
+        setFormData({});
+        setUltimoReporteInfo(null);
+      }
+      if (reportType === 'MicroPulsoStaff') {
+        shufflePulso();
+      }
+    };
+
+    initLlamadas();
+    return () => { isCancelled = true; };
+  }, [reportType, currentUser?.uid, currentUser?.email, currentUser?.sede, currentUser?.isSimulated]);
 
   // Cargar datos para el dashboard de evolución (solo si tiene permisos de directivo o gerente)
   useEffect(() => {
@@ -308062,8 +308087,8 @@ export default function ReportesBoard() {
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
-                {/* Selector de Coordinador y Sede Nodus */}
-                {nodusAllCoords.length > 0 && (
+                {/* Selector de Coordinador solo para SuperAdmin/Dirección no simulado; Badge privado para coordinadores */}
+                {canSwitchAnyCoord && nodusAllCoords.length > 0 ? (
                   <select
                     value={selectedNodusCoordId || nodusMatchedCoord?.id || ''}
                     onChange={(e) => {
@@ -308081,6 +308106,23 @@ export default function ReportesBoard() {
                       </option>
                     ))}
                   </select>
+                ) : (
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    background: 'rgba(255, 255, 255, 0.06)',
+                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                    padding: '0.45rem 0.9rem',
+                    borderRadius: '8px',
+                    fontSize: '0.85rem',
+                    color: '#fff',
+                    fontWeight: 600
+                  }}>
+                    <span style={{ color: 'var(--crear-cyan, #29abe2)' }}>📍 {nodusMatchedCoord?.sede || currentUser?.sede || 'Mi Sede'}</span>
+                    <span style={{ color: 'var(--text-muted)' }}>•</span>
+                    <span>👤 {nodusMatchedCoord?.nombreCompleto || nodusMatchedCoord?.nombre || currentUser?.displayName || currentUser?.name}</span>
+                  </div>
                 )}
 
                 {nodusEquiposDisponibles.length > 0 && (
