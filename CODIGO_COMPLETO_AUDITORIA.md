@@ -306888,7 +306888,7 @@ export default function ProtocoloEmergencias() {
 
 ```javascript
 import { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { db } from '../services/firebase';
 import { collection, addDoc, getDocs, getDoc, updateDoc, doc, query, where, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import { useAuth } from '../context/AuthContext';
@@ -306931,11 +306931,23 @@ export default function ReportesBoard() {
   const { currentCycle, currentStage } = useCycles();
   const { showToast } = useUI();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [activeTab, setActiveTab] = useState('formulario'); // 'formulario' | 'dashboard_evolucion'
   const [reportType, setReportType] = useState('');
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(false);
+
+  // Precarga inteligente del último reporte de llamadas
+  const [loadingUltimoReporte, setLoadingUltimoReporte] = useState(false);
+  const [ultimoReporteInfo, setUltimoReporteInfo] = useState(null);
+
+  useEffect(() => {
+    const urlType = searchParams.get('type');
+    if (urlType) {
+      setReportType(urlType);
+    }
+  }, [searchParams]);
 
   // Control estricto de visibilidad: Solo Directivos y Gerentes pueden ver el Dashboard de Evolución (08/09/2026 - Confirmado por José)
   const role = (currentUser?.activeRole || currentUser?.appRole || currentUser?.role || '').toLowerCase();
@@ -307124,6 +307136,8 @@ export default function ReportesBoard() {
         labelTarget = 'General';
       }
 
+      // SOLO actualizamos las métricas de "Nuevos" auditadas por Nodus.
+      // Preservamos estrictamente Rezagados y cualquier valor previo registrado.
       const nuevosValores = {
         nuevos_OK: Number(targetData.confirmado || 0),
         nuevos_XC: Number(targetData.porConfirmar || 0),
@@ -307131,15 +307145,14 @@ export default function ReportesBoard() {
         nuevos_NI: Number(targetData.noInteresa || 0),
         nuevos_SIG: Number(targetData.siguiente || 0),
         nuevos_OS: Number(targetData.yaAsistio || 0),
-        nuevos_PENDIENTES: Number(targetData.pendientes || 0),
-        rezagados_OK: Number(targetData.rezagados_OK || 0),
-        rezagados_XC: Number(targetData.rezagados_XC || 0),
-        rezagados_NC: Number(targetData.rezagados_NC || 0),
-        rezagados_NI: Number(targetData.rezagados_NI || 0),
-        rezagados_SIG: Number(targetData.rezagados_SIG || 0),
-        rezagados_PENDIENTES: Number(targetData.rezagados_PENDIENTES || 0),
         sede_id: coord.sede || currentUser?.sede || 'Lima'
       };
+
+      if (targetData.pendientes !== undefined) {
+        nuevosValores.nuevos_PENDIENTES = Number(targetData.pendientes);
+      } else if (targetData.asignados !== undefined && targetData.llamadas !== undefined) {
+        nuevosValores.nuevos_PENDIENTES = Math.max(0, Number(targetData.asignados) - Number(targetData.llamadas));
+      }
 
       setFormData(prev => ({
         ...prev,
@@ -307147,7 +307160,7 @@ export default function ReportesBoard() {
       }));
 
       const coordLabel = coord.nombreCompleto || coord.nombre;
-      const msg = `Nodus Sincronizado: ${coordLabel} (${coord.sede}) • ${labelTarget} -> ${nuevosValores.nuevos_OK} OK (Confirmados), ${nuevosValores.nuevos_XC} XC, ${nuevosValores.nuevos_NC} NC.`;
+      const msg = `Nodus Sincronizado: ${coordLabel} (${coord.sede}) • ${labelTarget} -> Nuevos actualizados: ${nuevosValores.nuevos_OK} OK, ${nuevosValores.nuevos_XC} XC, ${nuevosValores.nuevos_NC} NC. (Rezagados y avances previos conservados).`;
       setNodusStatusMsg(msg);
       showToast(`¡Datos extraídos de Nodus con éxito! (${labelTarget})`, 'success');
     } catch (e) {
@@ -307156,6 +307169,76 @@ export default function ReportesBoard() {
     } finally {
       setLoadingNodus(false);
     }
+  };
+
+  // Precargar el último reporte de llamadas emitido (por el usuario o de su sede)
+  const fetchUltimoReporteLlamadas = async () => {
+    setLoadingUltimoReporte(true);
+    try {
+      const q = query(collection(db, 'reports'), orderBy('created_at', 'desc'), limit(40));
+      const snap = await getDocs(q);
+      const llamadas = snap.docs
+        .map(d => ({ id: d.id, ...d.data() }))
+        .filter(d => d.type === 'Llamadas');
+
+      if (llamadas.length === 0) {
+        setLoadingUltimoReporte(false);
+        return;
+      }
+
+      const uEmail = (currentUser?.email || '').toLowerCase().trim();
+      const uName = (currentUser?.displayName || currentUser?.name || '').toLowerCase().trim();
+      const uSede = (currentUser?.sede || '').toLowerCase().trim();
+
+      // 1. Prioridad: Reporte del mismo usuario
+      let matched = llamadas.find(r => {
+        const author = (r.submitted_by || '').toLowerCase();
+        const email = (r.email || r.data?.email || '').toLowerCase();
+        return (uEmail && (email === uEmail || author.includes(uEmail))) ||
+               (uName && (author.includes(uName) || uName.includes(author)));
+      });
+
+      // 2. Prioridad: Reporte de la misma sede
+      if (!matched && uSede) {
+        matched = llamadas.find(r => (r.sede || '').toLowerCase() === uSede);
+      }
+
+      // 3. Fallback: El reporte de llamadas más reciente registrado
+      if (!matched) {
+        matched = llamadas[0];
+      }
+
+      if (matched && matched.data) {
+        setUltimoReporteInfo({
+          id: matched.id,
+          fecha: matched.created_at,
+          submitted_by: matched.submitted_by,
+          sede: matched.sede,
+          data: matched.data
+        });
+
+        // Precargar en formData
+        setFormData(prev => ({
+          ...matched.data,
+          ...prev
+        }));
+
+        showToast(`Último reporte de llamadas precargado (${matched.submitted_by})`, 'info');
+      }
+    } catch (err) {
+      console.warn("Error al precargar último reporte de llamadas:", err);
+    } finally {
+      setLoadingUltimoReporte(false);
+    }
+  };
+
+  const handleLimpiarFormulario = () => {
+    setFormData({
+      nuevos_OK: 0, nuevos_XC: 0, nuevos_NC: 0, nuevos_NI: 0, nuevos_SIG: 0, nuevos_OS: 0, nuevos_PENDIENTES: 0,
+      rezagados_OK: 0, rezagados_XC: 0, rezagados_NC: 0, rezagados_NI: 0, rezagados_SIG: 0, rezagados_PENDIENTES: 0
+    });
+    setUltimoReporteInfo(null);
+    showToast('Campos restablecidos en cero.', 'info');
   };
 
   // Inicializar o regenerar preguntas del Micro-Pulso
@@ -307168,7 +307251,12 @@ export default function ReportesBoard() {
   };
 
   useEffect(() => {
-    setFormData({});
+    if (reportType === 'Llamadas') {
+      fetchUltimoReporteLlamadas();
+    } else {
+      setFormData({});
+      setUltimoReporteInfo(null);
+    }
     if (reportType === 'MicroPulsoStaff') {
       shufflePulso();
     }
@@ -307351,6 +307439,13 @@ export default function ReportesBoard() {
       }
 
       showToast('¡Reporte enviado exitosamente con protocolo Cero Pereza!', 'success');
+      setUltimoReporteInfo({
+        id: newReportRef.id,
+        fecha: new Date().toISOString(),
+        submitted_by: currentUser?.displayName || currentUser?.email || 'Staff Autorizado',
+        sede: currentUser?.sede || formData.sede_id || 'Global',
+        data: finalData
+      });
       setReportType('');
       setFormData({});
       setPulsoRespuestas({});
@@ -307784,6 +307879,68 @@ export default function ReportesBoard() {
       const metrics = ['OK', 'XC', 'NC', 'NI', 'SIG', 'OS', 'PENDIENTES'];
       return (
         <div style={{ display: 'grid', gap: '2rem' }}>
+          {/* BANNER DE PRECARGA DE ÚLTIMO REPORTE */}
+          {loadingUltimoReporte && (
+            <div style={{
+              background: 'rgba(41, 171, 226, 0.1)',
+              border: '1px solid rgba(41, 171, 226, 0.3)',
+              borderRadius: '8px',
+              padding: '0.8rem 1.2rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.6rem',
+              color: 'var(--crear-cyan)',
+              fontSize: '0.88rem'
+            }}>
+              <RefreshCw size={16} className="spin" />
+              <span>Buscando y precargando tu último reporte de llamadas registrado...</span>
+            </div>
+          )}
+
+          {ultimoReporteInfo && !loadingUltimoReporte && (
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(34, 197, 94, 0.12) 0%, rgba(16, 185, 129, 0.05) 100%)',
+              border: '1px solid rgba(34, 197, 94, 0.35)',
+              borderRadius: '10px',
+              padding: '0.9rem 1.2rem',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: '0.8rem'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', fontSize: '0.88rem', color: '#86efac' }}>
+                <CheckCircle2 size={18} color="#22c55e" />
+                <div>
+                  <div>
+                    <strong>Último Reporte Precargado:</strong> {ultimoReporteInfo.submitted_by} ({ultimoReporteInfo.sede})
+                  </div>
+                  <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.1rem' }}>
+                    Registrado: {new Date(ultimoReporteInfo.fecha).toLocaleString()} • Rezagados y datos previos cargados en el formulario.
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={handleLimpiarFormulario}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  color: '#e2e8f0',
+                  borderRadius: '6px',
+                  padding: '0.35rem 0.8rem',
+                  fontSize: '0.78rem',
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                  transition: 'all 0.2s'
+                }}
+                title="Limpiar todos los campos e iniciar en cero"
+              >
+                🔄 Limpiar / Nuevo en 0
+              </button>
+            </div>
+          )}
+
           <div>
             <h4 className="text-blue" style={{ marginBottom: '1rem', borderBottom: '1px solid rgba(0,212,255,0.2)' }}>Nuevos</h4>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem' }}>
@@ -308168,6 +308325,32 @@ export default function ReportesBoard() {
               <h3 style={{ margin: '0 0 0.3rem', fontSize: '1.1rem', color: '#fff' }}>🎧 Micro-Pulso Aleatorio</h3>
               <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>
                 3 preguntas dinámicas (Seguridad psicológica, liderazgo y freno a la fricción Stop). Lunes 11:00 AM a Martes 18:00 PM.
+              </p>
+            </div>
+
+            {/* CARD 3: REPORTE DIARIO DE LLAMADAS (COORDINADORES C1 & C2) */}
+            <div 
+              onClick={() => setReportType('Llamadas')}
+              style={{
+                background: reportType === 'Llamadas' ? 'rgba(34,197,94,0.2)' : 'rgba(255,255,255,0.03)',
+                border: reportType === 'Llamadas' ? '2px solid #22c55e' : '1px solid rgba(255,255,255,0.08)',
+                borderRadius: '12px',
+                padding: '1.2rem',
+                cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
+                <span style={{ color: '#22c55e', fontWeight: 800, fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                  <PhoneCall size={15} /> COORDINACIÓN C1 & C2
+                </span>
+                <span style={{ background: 'rgba(34,197,94,0.2)', color: '#22c55e', fontSize: '0.7rem', padding: '2px 8px', borderRadius: '10px', fontWeight: 'bold' }}>
+                  Diario 20:00 PM
+                </span>
+              </div>
+              <h3 style={{ margin: '0 0 0.3rem', fontSize: '1.1rem', color: '#fff' }}>📞 Reporte Diario de Llamadas</h3>
+              <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>
+                Registro diario de llamadas (Nuevos y Rezagados). Precarga automática del último reporte y enlace directo a Nodus.
               </p>
             </div>
           </div>
