@@ -28,3 +28,8 @@ Estas reglas son absolutas y se han generado a partir del feedback crítico de D
     - El espacio configurado de Google Chat (`spaces/AAQAOaOPrZU`) pertenece **ÚNICA Y EXCLUSIVAMENTE a la Sede Lima**.
     - Todos los reportes diarios de llamadas y operativos emitidos por coordinadores de Lima se despachan automáticamente a dicho espacio.
     - PROHIBIDO mezclar reportes de otras sedes (Quito, Guayaquil, Cuenca, Medellín, México) en el espacio de Lima. Cada sede se conectará de manera independiente a su propio espacio a medida que compartan sus respectivos webhooks.
+17. **AISLAMIENTO TEMPORAL DE TAREAS POR FASE Y CICLO ACTIVO:**
+    - El Checklist Operativo NUNCA debe mostrar ni precargar al usuario tareas de meses o ciclos futuros lejanos como pendientes inmediatas (ej. tareas de noviembre en pleno ciclo de septiembre).
+    - La vista por defecto (`⚡ Fase Activa`) muestra estricta y exclusivamente las tareas correspondientes a la fase operativa actual del ciclo (`GATE 1`, `PRE-C1`, `C1`, `POST-C1`, `C2`, `PRE-MJ`, `MJ`, `POST-MJ`).
+    - Ninguna condición de urgencia o prioridad (`isCritical`) debe romper el aislamiento de fase: las tareas críticas de una fase futura permanecen en su fase respectiva y solo se activan cuando el ciclo entra a dicha fase.
+    - Todo rol con múltiples fases (incluido el Consolidado) dispone de selector explícito por pestañas (`⚡ Fase Activa`, cada fase operativa con conteo real, y `📋 Todo el Catálogo`) para auditar o planificar libremente sin saturar la operación diaria.
