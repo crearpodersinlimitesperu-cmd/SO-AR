@@ -307873,7 +307873,12 @@ export default function ReportesBoard() {
             {/* CARD 1: REPORTE RELAMPAGO GERENTE (Solo Directivos y Gerentes) */}
             {canViewEvolucionDashboard && (
               <div 
-                onClick={() => setReportType('ReporteRelampagoFDS')}
+                onClick={() => {
+                  setReportType('ReporteRelampagoFDS');
+                  setTimeout(() => {
+                    document.getElementById('formulario-reporte-activo')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }, 60);
+                }}
                 style={{
                   background: reportType === 'ReporteRelampagoFDS' ? 'rgba(245,158,11,0.2)' : 'rgba(255,255,255,0.03)',
                   border: reportType === 'ReporteRelampagoFDS' ? '2px solid #f59e0b' : '1px solid rgba(255,255,255,0.08)',
@@ -307900,7 +307905,12 @@ export default function ReportesBoard() {
 
             {/* CARD 2: MICRO-PULSO STAFF */}
             <div 
-              onClick={() => setReportType('MicroPulsoStaff')}
+              onClick={() => {
+                setReportType('MicroPulsoStaff');
+                setTimeout(() => {
+                  document.getElementById('formulario-reporte-activo')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 60);
+              }}
               style={{
                 background: reportType === 'MicroPulsoStaff' ? 'rgba(56,189,248,0.2)' : 'rgba(255,255,255,0.03)',
                 border: reportType === 'MicroPulsoStaff' ? '2px solid #38bdf8' : '1px solid rgba(255,255,255,0.08)',
@@ -307926,7 +307936,12 @@ export default function ReportesBoard() {
 
             {/* CARD 3: REPORTE DIARIO DE LLAMADAS (COORDINADORES C1 & C2) */}
             <div 
-              onClick={() => setReportType('Llamadas')}
+              onClick={() => {
+                setReportType('Llamadas');
+                setTimeout(() => {
+                  document.getElementById('formulario-reporte-activo')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 60);
+              }}
               style={{
                 background: reportType === 'Llamadas' ? 'rgba(34,197,94,0.2)' : 'rgba(255,255,255,0.03)',
                 border: reportType === 'Llamadas' ? '2px solid #22c55e' : '1px solid rgba(255,255,255,0.08)',
@@ -308178,49 +308193,57 @@ export default function ReportesBoard() {
             </div>
           )}
 
-          {isDireccion ? (
-            <div style={{ padding: '1.5rem', textAlign: 'center', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)' }}>
-              <p className="text-muted" style={{ margin: 0 }}>
-                Rol de Dirección Global: Puedes analizar la evolución histórica de liderazgo y clima en la pestaña <strong>Dashboard Evolución</strong>.
+          {isDireccion && (
+            <div style={{ padding: '0.9rem 1.2rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(218,165,32,0.08)', borderRadius: '12px', border: '1px solid rgba(218,165,32,0.3)', flexWrap: 'wrap', gap: '0.8rem' }}>
+              <p style={{ margin: 0, fontSize: '0.88rem', color: '#e2e8f0' }}>
+                👑 <strong>Modo Dirección / SuperAdmin:</strong> Tienes acceso global para llenar, auditar y emitir cualquier formato de reporte.
               </p>
+              <button 
+                type="button" 
+                onClick={() => setActiveTab('dashboard_evolucion')}
+                className="btn-secondary" 
+                style={{ fontSize: '0.8rem', padding: '4px 10px', borderColor: 'var(--crear-gold)', color: 'var(--crear-gold)' }}
+              >
+                Ver Dashboard Evolución →
+              </button>
             </div>
-          ) : (
-            <form onSubmit={handleSubmit}>
-              <div style={{ marginBottom: '1.5rem' }}>
-                <label className="text-white" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 700 }}>
-                  O selecciona otro formato operativo:
-                </label>
-                <select 
-                  value={reportType} 
-                  onChange={e => setReportType(e.target.value)} 
-                  className="form-input"
-                >
-                  <option value="">-- Selecciona Formato Oficial Autorizado --</option>
-                  {canViewEvolucionDashboard && (
-                    <option value="ReporteRelampagoFDS">⚡ Reporte Relámpago Post-FDS (Gerente de Sede &lt;3 min)</option>
-                  )}
-                  <option value="MicroPulsoStaff">🎧 Micro-Pulso de Staff (Escucha Activa 3 Preguntas &lt;30 seg)</option>
-                  <option value="Llamadas">1. Reporte de Llamadas (C1)</option>
-                  <option value="FDS">2. Reporte FDS (Sede C1 tradicional)</option>
-                  <option value="C2">3. Reporte Capítulo Dos</option>
-                  <option value="MJ">4. Reporte Maestría del Juego</option>
-                  <option value="QT_Contexto">5. Reporte de Contexto (QT)</option>
-                </select>
-              </div>
-
-              {reportType && (
-                <div style={{ background: 'rgba(255,255,255,0.02)', padding: '1.5rem', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', marginBottom: '2rem' }}>
-                  {renderFormFields()}
-                </div>
-              )}
-
-              {reportType && (
-                <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', padding: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', fontSize: '1.05rem' }}>
-                  <Send size={18} /> {loading ? 'Enviando...' : 'Enviar Reporte y Registrar en Causa OS'}
-                </button>
-              )}
-            </form>
           )}
+
+          <form id="formulario-reporte-activo" onSubmit={handleSubmit}>
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label className="text-white" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 700 }}>
+                {reportType ? 'Formato Operativo Seleccionado:' : 'O selecciona un formato operativo:'}
+              </label>
+              <select 
+                value={reportType} 
+                onChange={e => setReportType(e.target.value)} 
+                className="form-input"
+              >
+                <option value="">-- Selecciona Formato Oficial Autorizado --</option>
+                {canViewEvolucionDashboard && (
+                  <option value="ReporteRelampagoFDS">⚡ Reporte Relámpago Post-FDS (Gerente de Sede &lt;3 min)</option>
+                )}
+                <option value="MicroPulsoStaff">🎧 Micro-Pulso de Staff (Escucha Activa 3 Preguntas &lt;30 seg)</option>
+                <option value="Llamadas">1. Reporte de Llamadas (C1)</option>
+                <option value="FDS">2. Reporte FDS (Sede C1 tradicional)</option>
+                <option value="C2">3. Reporte Capítulo Dos</option>
+                <option value="MJ">4. Reporte Maestría del Juego</option>
+                <option value="QT_Contexto">5. Reporte de Contexto (QT)</option>
+              </select>
+            </div>
+
+            {reportType && (
+              <div style={{ background: 'rgba(255,255,255,0.02)', padding: '1.5rem', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', marginBottom: '2rem' }}>
+                {renderFormFields()}
+              </div>
+            )}
+
+            {reportType && (
+              <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', padding: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', fontSize: '1.05rem' }}>
+                <Send size={18} /> {loading ? 'Enviando...' : 'Enviar Reporte y Registrar en Causa OS'}
+              </button>
+            )}
+          </form>
         </div>
       )}
 
