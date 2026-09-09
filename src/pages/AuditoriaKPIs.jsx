@@ -12,6 +12,7 @@ import DriveDashboard from '../components/DriveDashboard';
 import CMJDashboard from '../components/CMJDashboard';
 import NodusCoordinadoresC1C2Dashboard from '../components/NodusCoordinadoresC1C2Dashboard';
 import ThemeSelector from '../components/ThemeSelector';
+import ZenModeSelector from '../components/ZenModeSelector';
 
 export default function AuditoriaKPIs({ defaultTab }) {
   const { currentUser } = useAuth();
@@ -675,6 +676,7 @@ export default function AuditoriaKPIs({ defaultTab }) {
             </div>
           )}
           <ThemeSelector />
+          <ZenModeSelector />
         </div>
       </div>
 
@@ -705,18 +707,6 @@ export default function AuditoriaKPIs({ defaultTab }) {
             Diagnóstico CMJ (Maestría)
           </button>
           <button
-            onClick={() => setActiveTab('entrenadores')}
-            style={{
-              padding: '0.6rem 1.2rem', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 'bold',
-              background: activeTab === 'entrenadores' ? 'rgba(212, 175, 55, 0.15)' : 'transparent',
-              color: activeTab === 'entrenadores' ? 'var(--crear-gold)' : 'var(--text-muted)',
-              borderBottom: activeTab === 'entrenadores' ? '2px solid var(--crear-gold)' : '2px solid transparent'
-            }}
-          >
-            <Users size={16} style={{ display: 'inline-block', verticalAlign: 'text-bottom', marginRight: '6px' }} />
-            Coordinadores de Maestría
-          </button>
-          <button
             onClick={() => setActiveTab('auditoria')}
             style={{
               padding: '0.6rem 1.2rem', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 'bold',
@@ -733,7 +723,6 @@ export default function AuditoriaKPIs({ defaultTab }) {
         {/* Dashboards Content */}
         {activeTab === 'coordinadores_nodus' && <NodusCoordinadoresC1C2Dashboard globalFilterSede={filterSede} />}
         {activeTab === 'cmj' && <CMJDashboard globalFilterSede={filterSede} />}
-        {activeTab === 'entrenadores' && <DriveDashboard globalFilterSede={filterSede} />}
   
       {/* Sección Legacy Auditoría de KPIs (solo cuando la tab está activa) */}
       {activeTab === 'auditoria' && (

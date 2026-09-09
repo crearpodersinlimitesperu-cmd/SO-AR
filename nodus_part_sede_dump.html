@@ -1,0 +1,1571 @@
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NODUS - Participantes Sede</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
+<style>
+:root {
+  /* Teal de marca oscurecido para que el texto/botones sean legibles (AA, ~4.9:1 sobre blanco).
+     --sidebar-active se mantiene con el tono claro original: ahí funciona como fondo detrás de texto oscuro. */
+  --primary:      #2d7d84;
+  --primary-dark: #1f5c62;
+  --sidebar-bg:   #1a3336;
+  --sidebar-hover:#224042;
+  --sidebar-active:#A2C8CC;
+  --accent:       #2d7d84;
+  --text-dark:    #1a3336;
+  /* Bootstrap override */
+  --bs-primary:        #2d7d84;
+  --bs-primary-rgb:    45,125,132;
+  --bs-link-color:     #2d7d84;
+  --bs-link-hover-color:#1f5c62;
+}
+body { background:#f0f2f5; font-family:'Segoe UI',system-ui,sans-serif; }
+#sidebar { width:260px; height:100vh; background:var(--sidebar-bg); flex-shrink:0; transition:all .3s; position:fixed; top:0; left:0; z-index:1000; overflow-y:auto; }
+#sidebar::-webkit-scrollbar { width:4px; }
+#sidebar::-webkit-scrollbar-thumb { background:rgba(255,255,255,.2); border-radius:4px; }
+#sidebar::-webkit-scrollbar-track { background:transparent; }
+#sidebar .brand { padding:20px 16px; border-bottom:1px solid rgba(255,255,255,.1); }
+#sidebar .brand h5 { color:#fff; font-weight:700; font-size:1.1rem; margin:0; }
+#sidebar .brand small { color:rgba(255,255,255,.5); font-size:.75rem; }
+#sidebar .nav-link { color:rgba(255,255,255,.7); padding:10px 16px; border-radius:8px; margin:2px 8px; font-size:.875rem; display:flex; align-items:center; gap:10px; transition:all .2s; }
+#sidebar .nav-link:hover { background:var(--sidebar-hover); color:#fff; }
+#sidebar .nav-link.active { background:var(--sidebar-active); color:var(--sidebar-bg); font-weight:700; box-shadow:0 4px 14px rgba(162,200,204,.45); }
+#sidebar .nav-link i { font-size:1rem; width:20px; text-align:center; }
+#sidebar .nav-section-toggle { background:none; border:none; width:100%; text-align:left; color:rgba(255,255,255,.35); font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; padding:16px 24px 4px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; }
+#sidebar .nav-section-toggle:hover { color:rgba(255,255,255,.65); }
+#sidebar .nav-section-toggle .toggle-icon { font-size:.7rem; transition:transform .2s; }
+#sidebar .nav-section-toggle.collapsed .toggle-icon { transform:rotate(-90deg); }
+.main-content { margin-left:260px; min-height:100vh; display:flex; flex-direction:column; }
+.topbar { background:#fff; padding:12px 24px; border-bottom:1px solid #e2e8f0; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; }
+.topbar .page-title { font-size:1.1rem; font-weight:600; color:var(--text-dark); margin:0; }
+.page-wrapper { padding:24px; flex:1; }
+.card { border:none; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,.06); }
+.card-header { background:#fff; border-bottom:1px solid #f0f2f5; font-weight:600; padding:16px 20px; border-radius:12px 12px 0 0 !important; }
+.btn-primary { background:var(--accent); border-color:var(--accent); color:#fff !important; }
+.btn-primary:hover,.btn-primary:focus,.btn-primary:active { background:var(--primary-dark); border-color:var(--primary-dark); color:#fff !important; }
+.btn-outline-primary { color:var(--accent); border-color:var(--accent); }
+.btn-outline-primary:hover { background:var(--accent); border-color:var(--accent); color:#fff; }
+.text-primary { color:var(--accent) !important; }
+.border-primary { border-color:var(--accent) !important; }
+.bg-primary { background-color:var(--accent) !important; }
+.modal-header[style*="background:#1a3336"],.modal-header-brand { background:var(--sidebar-bg) !important; }
+.table th { font-weight:600; font-size:.8rem; text-transform:uppercase; letter-spacing:.05em; color:#64748b; border-bottom:2px solid #f0f2f5; }
+.badge-rol { padding:4px 10px; border-radius:20px; font-size:.75rem; font-weight:600; }
+.stat-card { background:#fff; border-radius:12px; padding:20px; box-shadow:0 2px 12px rgba(0,0,0,.06); }
+.stat-card .stat-icon { width:52px; height:52px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.4rem; }
+footer { background:#fff; padding:12px 24px; border-top:1px solid #f0f2f5; font-size:.8rem; color:#94a3b8; }
+@media(max-width:768px){
+  #sidebar{left:-260px;} #sidebar.show{left:0;} .main-content{margin-left:0;}
+}
+</style>
+<style>:root{--swal2-outline: 0 0 0 3px rgba(100, 150, 200, 0.5);--swal2-container-padding: 0.625em;--swal2-backdrop: rgba(0, 0, 0, 0.4);--swal2-backdrop-transition: background-color 0.15s;--swal2-width: 32em;--swal2-padding: 0 0 1.25em;--swal2-border: none;--swal2-border-radius: 0.3125rem;--swal2-background: white;--swal2-color: #545454;--swal2-show-animation: swal2-show 0.3s;--swal2-hide-animation: swal2-hide 0.15s forwards;--swal2-icon-zoom: 1;--swal2-title-padding: 0.8em 1em 0;--swal2-html-container-padding: 1em 1.6em 0.3em;--swal2-input-border: 1px solid #d9d9d9;--swal2-input-border-radius: 0.1875em;--swal2-input-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.06), 0 0 0 3px transparent;--swal2-input-background: transparent;--swal2-input-transition: border-color 0.2s, box-shadow 0.2s;--swal2-input-hover-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.06), 0 0 0 3px transparent;--swal2-input-focus-border: 1px solid #b4dbed;--swal2-input-focus-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.06), 0 0 0 3px rgba(100, 150, 200, 0.5);--swal2-progress-step-background: #add8e6;--swal2-validation-message-background: #f0f0f0;--swal2-validation-message-color: #666;--swal2-footer-border-color: #eee;--swal2-footer-background: transparent;--swal2-footer-color: inherit;--swal2-timer-progress-bar-background: rgba(0, 0, 0, 0.3);--swal2-close-button-position: initial;--swal2-close-button-inset: auto;--swal2-close-button-font-size: 2.5em;--swal2-close-button-color: #ccc;--swal2-close-button-transition: color 0.2s, box-shadow 0.2s;--swal2-close-button-outline: initial;--swal2-close-button-box-shadow: inset 0 0 0 3px transparent;--swal2-close-button-focus-box-shadow: inset var(--swal2-outline);--swal2-close-button-hover-transform: none;--swal2-actions-justify-content: center;--swal2-actions-width: auto;--swal2-actions-margin: 1.25em auto 0;--swal2-actions-padding: 0;--swal2-actions-border-radius: 0;--swal2-actions-background: transparent;--swal2-action-button-transition: background-color 0.2s, box-shadow 0.2s;--swal2-action-button-hover: black 10%;--swal2-action-button-active: black 10%;--swal2-confirm-button-box-shadow: none;--swal2-confirm-button-border-radius: 0.25em;--swal2-confirm-button-background-color: #7066e0;--swal2-confirm-button-color: #fff;--swal2-deny-button-box-shadow: none;--swal2-deny-button-border-radius: 0.25em;--swal2-deny-button-background-color: #dc3741;--swal2-deny-button-color: #fff;--swal2-cancel-button-box-shadow: none;--swal2-cancel-button-border-radius: 0.25em;--swal2-cancel-button-background-color: #6e7881;--swal2-cancel-button-color: #fff;--swal2-toast-show-animation: swal2-toast-show 0.5s;--swal2-toast-hide-animation: swal2-toast-hide 0.1s forwards;--swal2-toast-border: none;--swal2-toast-box-shadow: 0 0 1px hsl(0deg 0% 0% / 0.075), 0 1px 2px hsl(0deg 0% 0% / 0.075), 1px 2px 4px hsl(0deg 0% 0% / 0.075), 1px 3px 8px hsl(0deg 0% 0% / 0.075), 2px 4px 16px hsl(0deg 0% 0% / 0.075)}[data-swal2-theme=dark]{--swal2-dark-theme-black: #19191a;--swal2-dark-theme-white: #e1e1e1;--swal2-background: var(--swal2-dark-theme-black);--swal2-color: var(--swal2-dark-theme-white);--swal2-footer-border-color: #555;--swal2-input-background: color-mix(in srgb, var(--swal2-dark-theme-black), var(--swal2-dark-theme-white) 10%);--swal2-validation-message-background: color-mix( in srgb, var(--swal2-dark-theme-black), var(--swal2-dark-theme-white) 10% );--swal2-validation-message-color: var(--swal2-dark-theme-white);--swal2-timer-progress-bar-background: rgba(255, 255, 255, 0.7)}@media(prefers-color-scheme: dark){[data-swal2-theme=auto]{--swal2-dark-theme-black: #19191a;--swal2-dark-theme-white: #e1e1e1;--swal2-background: var(--swal2-dark-theme-black);--swal2-color: var(--swal2-dark-theme-white);--swal2-footer-border-color: #555;--swal2-input-background: color-mix(in srgb, var(--swal2-dark-theme-black), var(--swal2-dark-theme-white) 10%);--swal2-validation-message-background: color-mix( in srgb, var(--swal2-dark-theme-black), var(--swal2-dark-theme-white) 10% );--swal2-validation-message-color: var(--swal2-dark-theme-white);--swal2-timer-progress-bar-background: rgba(255, 255, 255, 0.7)}}body.swal2-shown:not(.swal2-no-backdrop,.swal2-toast-shown){overflow:hidden}body.swal2-height-auto{height:auto !important}body.swal2-no-backdrop .swal2-container{background-color:rgba(0,0,0,0) !important;pointer-events:none}body.swal2-no-backdrop .swal2-container .swal2-popup{pointer-events:auto}body.swal2-no-backdrop .swal2-container .swal2-modal{box-shadow:0 0 10px var(--swal2-backdrop)}body.swal2-toast-shown .swal2-container{box-sizing:border-box;width:360px;max-width:100%;background-color:rgba(0,0,0,0);pointer-events:none}body.swal2-toast-shown .swal2-container.swal2-top{inset:0 auto auto 50%;transform:translateX(-50%)}body.swal2-toast-shown .swal2-container.swal2-top-end,body.swal2-toast-shown .swal2-container.swal2-top-right{inset:0 0 auto auto}body.swal2-toast-shown .swal2-container.swal2-top-start,body.swal2-toast-shown .swal2-container.swal2-top-left{inset:0 auto auto 0}body.swal2-toast-shown .swal2-container.swal2-center-start,body.swal2-toast-shown .swal2-container.swal2-center-left{inset:50% auto auto 0;transform:translateY(-50%)}body.swal2-toast-shown .swal2-container.swal2-center{inset:50% auto auto 50%;transform:translate(-50%, -50%)}body.swal2-toast-shown .swal2-container.swal2-center-end,body.swal2-toast-shown .swal2-container.swal2-center-right{inset:50% 0 auto auto;transform:translateY(-50%)}body.swal2-toast-shown .swal2-container.swal2-bottom-start,body.swal2-toast-shown .swal2-container.swal2-bottom-left{inset:auto auto 0 0}body.swal2-toast-shown .swal2-container.swal2-bottom{inset:auto auto 0 50%;transform:translateX(-50%)}body.swal2-toast-shown .swal2-container.swal2-bottom-end,body.swal2-toast-shown .swal2-container.swal2-bottom-right{inset:auto 0 0 auto}@media print{body.swal2-shown:not(.swal2-no-backdrop,.swal2-toast-shown){overflow-y:scroll !important}body.swal2-shown:not(.swal2-no-backdrop,.swal2-toast-shown)>[aria-hidden=true]{display:none}body.swal2-shown:not(.swal2-no-backdrop,.swal2-toast-shown) .swal2-container{position:static !important}}div:where(.swal2-container){display:grid;position:fixed;z-index:1060;inset:0;box-sizing:border-box;grid-template-areas:"top-start     top            top-end" "center-start  center         center-end" "bottom-start  bottom-center  bottom-end";grid-template-rows:minmax(min-content, auto) minmax(min-content, auto) minmax(min-content, auto);height:100%;padding:var(--swal2-container-padding);overflow-x:hidden;transition:var(--swal2-backdrop-transition);-webkit-overflow-scrolling:touch}div:where(.swal2-container).swal2-backdrop-show,div:where(.swal2-container).swal2-noanimation{background:var(--swal2-backdrop)}div:where(.swal2-container).swal2-backdrop-hide{background:rgba(0,0,0,0) !important}div:where(.swal2-container).swal2-top-start,div:where(.swal2-container).swal2-center-start,div:where(.swal2-container).swal2-bottom-start{grid-template-columns:minmax(0, 1fr) auto auto}div:where(.swal2-container).swal2-top,div:where(.swal2-container).swal2-center,div:where(.swal2-container).swal2-bottom{grid-template-columns:auto minmax(0, 1fr) auto}div:where(.swal2-container).swal2-top-end,div:where(.swal2-container).swal2-center-end,div:where(.swal2-container).swal2-bottom-end{grid-template-columns:auto auto minmax(0, 1fr)}div:where(.swal2-container).swal2-top-start>.swal2-popup{align-self:start}div:where(.swal2-container).swal2-top>.swal2-popup{grid-column:2;place-self:start center}div:where(.swal2-container).swal2-top-end>.swal2-popup,div:where(.swal2-container).swal2-top-right>.swal2-popup{grid-column:3;place-self:start end}div:where(.swal2-container).swal2-center-start>.swal2-popup,div:where(.swal2-container).swal2-center-left>.swal2-popup{grid-row:2;align-self:center}div:where(.swal2-container).swal2-center>.swal2-popup{grid-column:2;grid-row:2;place-self:center center}div:where(.swal2-container).swal2-center-end>.swal2-popup,div:where(.swal2-container).swal2-center-right>.swal2-popup{grid-column:3;grid-row:2;place-self:center end}div:where(.swal2-container).swal2-bottom-start>.swal2-popup,div:where(.swal2-container).swal2-bottom-left>.swal2-popup{grid-column:1;grid-row:3;align-self:end}div:where(.swal2-container).swal2-bottom>.swal2-popup{grid-column:2;grid-row:3;place-self:end center}div:where(.swal2-container).swal2-bottom-end>.swal2-popup,div:where(.swal2-container).swal2-bottom-right>.swal2-popup{grid-column:3;grid-row:3;place-self:end end}div:where(.swal2-container).swal2-grow-row>.swal2-popup,div:where(.swal2-container).swal2-grow-fullscreen>.swal2-popup{grid-column:1/4;width:100%}div:where(.swal2-container).swal2-grow-column>.swal2-popup,div:where(.swal2-container).swal2-grow-fullscreen>.swal2-popup{grid-row:1/4;align-self:stretch}div:where(.swal2-container).swal2-no-transition{transition:none !important}div:where(.swal2-container)[popover]{width:auto;border:0}div:where(.swal2-container) div:where(.swal2-popup){display:none;position:relative;box-sizing:border-box;grid-template-columns:minmax(0, 100%);width:var(--swal2-width);max-width:100%;padding:var(--swal2-padding);border:var(--swal2-border);border-radius:var(--swal2-border-radius);background:var(--swal2-background);color:var(--swal2-color);font-family:inherit;font-size:1rem}div:where(.swal2-container) div:where(.swal2-popup):focus{outline:none}div:where(.swal2-container) div:where(.swal2-popup).swal2-loading{overflow-y:hidden}div:where(.swal2-container) div:where(.swal2-popup).swal2-draggable{cursor:grab}div:where(.swal2-container) div:where(.swal2-popup).swal2-draggable div:where(.swal2-icon){cursor:grab}div:where(.swal2-container) div:where(.swal2-popup).swal2-dragging{cursor:grabbing}div:where(.swal2-container) div:where(.swal2-popup).swal2-dragging div:where(.swal2-icon){cursor:grabbing}div:where(.swal2-container) h2:where(.swal2-title){position:relative;max-width:100%;margin:0;padding:var(--swal2-title-padding);color:inherit;font-size:1.875em;font-weight:600;text-align:center;text-transform:none;overflow-wrap:break-word;cursor:initial}div:where(.swal2-container) div:where(.swal2-actions){display:flex;z-index:1;box-sizing:border-box;flex-wrap:wrap;align-items:center;justify-content:var(--swal2-actions-justify-content);width:var(--swal2-actions-width);margin:var(--swal2-actions-margin);padding:var(--swal2-actions-padding);border-radius:var(--swal2-actions-border-radius);background:var(--swal2-actions-background)}div:where(.swal2-container) div:where(.swal2-loader){display:none;align-items:center;justify-content:center;width:2.2em;height:2.2em;margin:0 1.875em;animation:swal2-rotate-loading 1.5s linear 0s infinite normal;border-width:.25em;border-style:solid;border-radius:100%;border-color:#2778c4 rgba(0,0,0,0) #2778c4 rgba(0,0,0,0)}div:where(.swal2-container) button:where(.swal2-styled){margin:.3125em;padding:.625em 1.1em;transition:var(--swal2-action-button-transition);border:none;box-shadow:0 0 0 3px rgba(0,0,0,0);font-weight:500}div:where(.swal2-container) button:where(.swal2-styled):not([disabled]){cursor:pointer}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-confirm){border-radius:var(--swal2-confirm-button-border-radius);background:initial;background-color:var(--swal2-confirm-button-background-color);box-shadow:var(--swal2-confirm-button-box-shadow);color:var(--swal2-confirm-button-color);font-size:1em}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-confirm):hover{background-color:color-mix(in srgb, var(--swal2-confirm-button-background-color), var(--swal2-action-button-hover))}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-confirm):active{background-color:color-mix(in srgb, var(--swal2-confirm-button-background-color), var(--swal2-action-button-active))}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-deny){border-radius:var(--swal2-deny-button-border-radius);background:initial;background-color:var(--swal2-deny-button-background-color);box-shadow:var(--swal2-deny-button-box-shadow);color:var(--swal2-deny-button-color);font-size:1em}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-deny):hover{background-color:color-mix(in srgb, var(--swal2-deny-button-background-color), var(--swal2-action-button-hover))}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-deny):active{background-color:color-mix(in srgb, var(--swal2-deny-button-background-color), var(--swal2-action-button-active))}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-cancel){border-radius:var(--swal2-cancel-button-border-radius);background:initial;background-color:var(--swal2-cancel-button-background-color);box-shadow:var(--swal2-cancel-button-box-shadow);color:var(--swal2-cancel-button-color);font-size:1em}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-cancel):hover{background-color:color-mix(in srgb, var(--swal2-cancel-button-background-color), var(--swal2-action-button-hover))}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-cancel):active{background-color:color-mix(in srgb, var(--swal2-cancel-button-background-color), var(--swal2-action-button-active))}div:where(.swal2-container) button:where(.swal2-styled):focus-visible{outline:none;box-shadow:var(--swal2-action-button-focus-box-shadow)}div:where(.swal2-container) button:where(.swal2-styled)[disabled]:not(.swal2-loading){opacity:.4}div:where(.swal2-container) button:where(.swal2-styled)::-moz-focus-inner{border:0}div:where(.swal2-container) div:where(.swal2-footer){margin:1em 0 0;padding:1em 1em 0;border-top:1px solid var(--swal2-footer-border-color);background:var(--swal2-footer-background);color:var(--swal2-footer-color);font-size:1em;text-align:center;cursor:initial}div:where(.swal2-container) .swal2-timer-progress-bar-container{position:absolute;right:0;bottom:0;left:0;grid-column:auto !important;overflow:hidden;border-bottom-right-radius:var(--swal2-border-radius);border-bottom-left-radius:var(--swal2-border-radius)}div:where(.swal2-container) div:where(.swal2-timer-progress-bar){width:100%;height:.25em;background:var(--swal2-timer-progress-bar-background)}div:where(.swal2-container) img:where(.swal2-image){max-width:100%;margin:2em auto 1em;cursor:initial}div:where(.swal2-container) button:where(.swal2-close){position:var(--swal2-close-button-position);inset:var(--swal2-close-button-inset);z-index:2;align-items:center;justify-content:center;width:1.2em;height:1.2em;margin-top:0;margin-right:0;margin-bottom:-1.2em;padding:0;overflow:hidden;transition:var(--swal2-close-button-transition);border:none;border-radius:var(--swal2-border-radius);outline:var(--swal2-close-button-outline);background:rgba(0,0,0,0);color:var(--swal2-close-button-color);font-family:monospace;font-size:var(--swal2-close-button-font-size);cursor:pointer;justify-self:end}div:where(.swal2-container) button:where(.swal2-close):hover{transform:var(--swal2-close-button-hover-transform);background:rgba(0,0,0,0);color:#f27474}div:where(.swal2-container) button:where(.swal2-close):focus-visible{outline:none;box-shadow:var(--swal2-close-button-focus-box-shadow)}div:where(.swal2-container) button:where(.swal2-close)::-moz-focus-inner{border:0}div:where(.swal2-container) div:where(.swal2-html-container){z-index:1;justify-content:center;margin:0;padding:var(--swal2-html-container-padding);overflow:auto;color:inherit;font-size:1.125em;font-weight:normal;line-height:normal;text-align:center;overflow-wrap:break-word;word-break:break-word;cursor:initial}div:where(.swal2-container) input:where(.swal2-input),div:where(.swal2-container) input:where(.swal2-file),div:where(.swal2-container) textarea:where(.swal2-textarea),div:where(.swal2-container) select:where(.swal2-select),div:where(.swal2-container) div:where(.swal2-radio),div:where(.swal2-container) label:where(.swal2-checkbox){margin:1em 2em 3px}div:where(.swal2-container) input:where(.swal2-input),div:where(.swal2-container) input:where(.swal2-file),div:where(.swal2-container) textarea:where(.swal2-textarea){box-sizing:border-box;width:auto;transition:var(--swal2-input-transition);border:var(--swal2-input-border);border-radius:var(--swal2-input-border-radius);background:var(--swal2-input-background);box-shadow:var(--swal2-input-box-shadow);color:inherit;font-size:1.125em}div:where(.swal2-container) input:where(.swal2-input).swal2-inputerror,div:where(.swal2-container) input:where(.swal2-file).swal2-inputerror,div:where(.swal2-container) textarea:where(.swal2-textarea).swal2-inputerror{border-color:#f27474 !important;box-shadow:0 0 2px #f27474 !important}div:where(.swal2-container) input:where(.swal2-input):hover,div:where(.swal2-container) input:where(.swal2-file):hover,div:where(.swal2-container) textarea:where(.swal2-textarea):hover{box-shadow:var(--swal2-input-hover-box-shadow)}div:where(.swal2-container) input:where(.swal2-input):focus,div:where(.swal2-container) input:where(.swal2-file):focus,div:where(.swal2-container) textarea:where(.swal2-textarea):focus{border:var(--swal2-input-focus-border);outline:none;box-shadow:var(--swal2-input-focus-box-shadow)}div:where(.swal2-container) input:where(.swal2-input)::placeholder,div:where(.swal2-container) input:where(.swal2-file)::placeholder,div:where(.swal2-container) textarea:where(.swal2-textarea)::placeholder{color:#ccc}div:where(.swal2-container) .swal2-range{margin:1em 2em 3px;background:var(--swal2-background)}div:where(.swal2-container) .swal2-range input{width:80%}div:where(.swal2-container) .swal2-range output{width:20%;color:inherit;font-weight:600;text-align:center}div:where(.swal2-container) .swal2-range input,div:where(.swal2-container) .swal2-range output{height:2.625em;padding:0;font-size:1.125em;line-height:2.625em}div:where(.swal2-container) .swal2-input{height:2.625em;padding:0 .75em}div:where(.swal2-container) .swal2-file{width:75%;margin-right:auto;margin-left:auto;background:var(--swal2-input-background);font-size:1.125em}div:where(.swal2-container) .swal2-textarea{height:6.75em;padding:.75em}div:where(.swal2-container) .swal2-select{min-width:50%;max-width:100%;padding:.375em .625em;background:var(--swal2-input-background);color:inherit;font-size:1.125em}div:where(.swal2-container) .swal2-radio,div:where(.swal2-container) .swal2-checkbox{align-items:center;justify-content:center;background:var(--swal2-background);color:inherit}div:where(.swal2-container) .swal2-radio label,div:where(.swal2-container) .swal2-checkbox label{margin:0 .6em;font-size:1.125em}div:where(.swal2-container) .swal2-radio input,div:where(.swal2-container) .swal2-checkbox input{flex-shrink:0;margin:0 .4em}div:where(.swal2-container) label:where(.swal2-input-label){display:flex;justify-content:center;margin:1em auto 0}div:where(.swal2-container) div:where(.swal2-validation-message){align-items:center;justify-content:center;margin:1em 0 0;padding:.625em;overflow:hidden;background:var(--swal2-validation-message-background);color:var(--swal2-validation-message-color);font-size:1em;font-weight:300}div:where(.swal2-container) div:where(.swal2-validation-message)::before{content:"!";display:inline-block;width:1.5em;min-width:1.5em;height:1.5em;margin:0 .625em;border-radius:50%;background-color:#f27474;color:#fff;font-weight:600;line-height:1.5em;text-align:center}div:where(.swal2-container) .swal2-progress-steps{flex-wrap:wrap;align-items:center;max-width:100%;margin:1.25em auto;padding:0;background:rgba(0,0,0,0);font-weight:600}div:where(.swal2-container) .swal2-progress-steps li{display:inline-block;position:relative}div:where(.swal2-container) .swal2-progress-steps .swal2-progress-step{z-index:20;flex-shrink:0;width:2em;height:2em;border-radius:2em;background:#2778c4;color:#fff;line-height:2em;text-align:center}div:where(.swal2-container) .swal2-progress-steps .swal2-progress-step.swal2-active-progress-step{background:#2778c4}div:where(.swal2-container) .swal2-progress-steps .swal2-progress-step.swal2-active-progress-step~.swal2-progress-step{background:var(--swal2-progress-step-background);color:#fff}div:where(.swal2-container) .swal2-progress-steps .swal2-progress-step.swal2-active-progress-step~.swal2-progress-step-line{background:var(--swal2-progress-step-background)}div:where(.swal2-container) .swal2-progress-steps .swal2-progress-step-line{z-index:10;flex-shrink:0;width:2.5em;height:.4em;margin:0 -1px;background:#2778c4}div:where(.swal2-icon){position:relative;box-sizing:content-box;justify-content:center;width:5em;height:5em;margin:2.5em auto .6em;zoom:var(--swal2-icon-zoom);border:.25em solid rgba(0,0,0,0);border-radius:50%;border-color:#000;font-family:inherit;line-height:5em;cursor:default;user-select:none}div:where(.swal2-icon) .swal2-icon-content{display:flex;align-items:center;font-size:3.75em}div:where(.swal2-icon).swal2-error{border-color:#f27474;color:#f27474}div:where(.swal2-icon).swal2-error .swal2-x-mark{position:relative;flex-grow:1}div:where(.swal2-icon).swal2-error [class^=swal2-x-mark-line]{display:block;position:absolute;top:2.3125em;width:2.9375em;height:.3125em;border-radius:.125em;background-color:#f27474}div:where(.swal2-icon).swal2-error [class^=swal2-x-mark-line][class$=left]{left:1.0625em;transform:rotate(45deg)}div:where(.swal2-icon).swal2-error [class^=swal2-x-mark-line][class$=right]{right:1em;transform:rotate(-45deg)}div:where(.swal2-icon).swal2-error.swal2-icon-show{animation:swal2-animate-error-icon .5s}div:where(.swal2-icon).swal2-error.swal2-icon-show .swal2-x-mark{animation:swal2-animate-error-x-mark .5s}div:where(.swal2-icon).swal2-warning{border-color:#f8bb86;color:#f8bb86}div:where(.swal2-icon).swal2-warning.swal2-icon-show{animation:swal2-animate-error-icon .5s}div:where(.swal2-icon).swal2-warning.swal2-icon-show .swal2-icon-content{animation:swal2-animate-i-mark .5s}div:where(.swal2-icon).swal2-info{border-color:#3fc3ee;color:#3fc3ee}div:where(.swal2-icon).swal2-info.swal2-icon-show{animation:swal2-animate-error-icon .5s}div:where(.swal2-icon).swal2-info.swal2-icon-show .swal2-icon-content{animation:swal2-animate-i-mark .8s}div:where(.swal2-icon).swal2-question{border-color:#87adbd;color:#87adbd}div:where(.swal2-icon).swal2-question.swal2-icon-show{animation:swal2-animate-error-icon .5s}div:where(.swal2-icon).swal2-question.swal2-icon-show .swal2-icon-content{animation:swal2-animate-question-mark .8s}div:where(.swal2-icon).swal2-success{border-color:#a5dc86;color:#a5dc86}div:where(.swal2-icon).swal2-success [class^=swal2-success-circular-line]{position:absolute;width:3.75em;height:7.5em;border-radius:50%}div:where(.swal2-icon).swal2-success [class^=swal2-success-circular-line][class$=left]{top:-0.4375em;left:-2.0635em;transform:rotate(-45deg);transform-origin:3.75em 3.75em;border-radius:7.5em 0 0 7.5em}div:where(.swal2-icon).swal2-success [class^=swal2-success-circular-line][class$=right]{top:-0.6875em;left:1.875em;transform:rotate(-45deg);transform-origin:0 3.75em;border-radius:0 7.5em 7.5em 0}div:where(.swal2-icon).swal2-success .swal2-success-ring{position:absolute;z-index:2;top:-0.25em;left:-0.25em;box-sizing:content-box;width:100%;height:100%;border:.25em solid rgba(165,220,134,.3);border-radius:50%}div:where(.swal2-icon).swal2-success .swal2-success-fix{position:absolute;z-index:1;top:.5em;left:1.625em;width:.4375em;height:5.625em;transform:rotate(-45deg)}div:where(.swal2-icon).swal2-success [class^=swal2-success-line]{display:block;position:absolute;z-index:2;height:.3125em;border-radius:.125em;background-color:#a5dc86}div:where(.swal2-icon).swal2-success [class^=swal2-success-line][class$=tip]{top:2.875em;left:.8125em;width:1.5625em;transform:rotate(45deg)}div:where(.swal2-icon).swal2-success [class^=swal2-success-line][class$=long]{top:2.375em;right:.5em;width:2.9375em;transform:rotate(-45deg)}div:where(.swal2-icon).swal2-success.swal2-icon-show .swal2-success-line-tip{animation:swal2-animate-success-line-tip .75s}div:where(.swal2-icon).swal2-success.swal2-icon-show .swal2-success-line-long{animation:swal2-animate-success-line-long .75s}div:where(.swal2-icon).swal2-success.swal2-icon-show .swal2-success-circular-line-right{animation:swal2-rotate-success-circular-line 4.25s ease-in}[class^=swal2]{-webkit-tap-highlight-color:rgba(0,0,0,0)}.swal2-show{animation:var(--swal2-show-animation)}.swal2-hide{animation:var(--swal2-hide-animation)}.swal2-noanimation{transition:none}.swal2-scrollbar-measure{position:absolute;top:-9999px;width:50px;height:50px;overflow:scroll}.swal2-rtl .swal2-close{margin-right:initial;margin-left:0}.swal2-rtl .swal2-timer-progress-bar{right:0;left:auto}.swal2-toast{box-sizing:border-box;grid-column:1/4 !important;grid-row:1/4 !important;grid-template-columns:min-content auto min-content;padding:1em;overflow-y:hidden;border:var(--swal2-toast-border);background:var(--swal2-background);box-shadow:var(--swal2-toast-box-shadow);pointer-events:auto}.swal2-toast>*{grid-column:2}.swal2-toast h2:where(.swal2-title){margin:.5em 1em;padding:0;font-size:1em;text-align:initial}.swal2-toast .swal2-loading{justify-content:center}.swal2-toast input:where(.swal2-input){height:2em;margin:.5em;font-size:1em}.swal2-toast .swal2-validation-message{font-size:1em}.swal2-toast div:where(.swal2-footer){margin:.5em 0 0;padding:.5em 0 0;font-size:.8em}.swal2-toast button:where(.swal2-close){grid-column:3/3;grid-row:1/99;align-self:center;width:.8em;height:.8em;margin:0;font-size:2em}.swal2-toast div:where(.swal2-html-container){margin:.5em 1em;padding:0;overflow:initial;font-size:1em;text-align:initial}.swal2-toast div:where(.swal2-html-container):empty{padding:0}.swal2-toast .swal2-loader{grid-column:1;grid-row:1/99;align-self:center;width:2em;height:2em;margin:.25em}.swal2-toast .swal2-icon{grid-column:1;grid-row:1/99;align-self:center;width:2em;min-width:2em;height:2em;margin:0 .5em 0 0}.swal2-toast .swal2-icon .swal2-icon-content{display:flex;align-items:center;font-size:1.8em;font-weight:bold}.swal2-toast .swal2-icon.swal2-success .swal2-success-ring{width:2em;height:2em}.swal2-toast .swal2-icon.swal2-error [class^=swal2-x-mark-line]{top:.875em;width:1.375em}.swal2-toast .swal2-icon.swal2-error [class^=swal2-x-mark-line][class$=left]{left:.3125em}.swal2-toast .swal2-icon.swal2-error [class^=swal2-x-mark-line][class$=right]{right:.3125em}.swal2-toast div:where(.swal2-actions){justify-content:flex-start;height:auto;margin:0;margin-top:.5em;padding:0 .5em}.swal2-toast button:where(.swal2-styled){margin:.25em .5em;padding:.4em .6em;font-size:1em}.swal2-toast .swal2-success{border-color:#a5dc86}.swal2-toast .swal2-success [class^=swal2-success-circular-line]{position:absolute;width:1.6em;height:3em;border-radius:50%}.swal2-toast .swal2-success [class^=swal2-success-circular-line][class$=left]{top:-0.8em;left:-0.5em;transform:rotate(-45deg);transform-origin:2em 2em;border-radius:4em 0 0 4em}.swal2-toast .swal2-success [class^=swal2-success-circular-line][class$=right]{top:-0.25em;left:.9375em;transform-origin:0 1.5em;border-radius:0 4em 4em 0}.swal2-toast .swal2-success .swal2-success-ring{width:2em;height:2em}.swal2-toast .swal2-success .swal2-success-fix{top:0;left:.4375em;width:.4375em;height:2.6875em}.swal2-toast .swal2-success [class^=swal2-success-line]{height:.3125em}.swal2-toast .swal2-success [class^=swal2-success-line][class$=tip]{top:1.125em;left:.1875em;width:.75em}.swal2-toast .swal2-success [class^=swal2-success-line][class$=long]{top:.9375em;right:.1875em;width:1.375em}.swal2-toast .swal2-success.swal2-icon-show .swal2-success-line-tip{animation:swal2-toast-animate-success-line-tip .75s}.swal2-toast .swal2-success.swal2-icon-show .swal2-success-line-long{animation:swal2-toast-animate-success-line-long .75s}.swal2-toast.swal2-show{animation:var(--swal2-toast-show-animation)}.swal2-toast.swal2-hide{animation:var(--swal2-toast-hide-animation)}@keyframes swal2-show{0%{transform:translate3d(0, -50px, 0) scale(0.9);opacity:0}100%{transform:translate3d(0, 0, 0) scale(1);opacity:1}}@keyframes swal2-hide{0%{transform:translate3d(0, 0, 0) scale(1);opacity:1}100%{transform:translate3d(0, -50px, 0) scale(0.9);opacity:0}}@keyframes swal2-animate-success-line-tip{0%{top:1.1875em;left:.0625em;width:0}54%{top:1.0625em;left:.125em;width:0}70%{top:2.1875em;left:-0.375em;width:3.125em}84%{top:3em;left:1.3125em;width:1.0625em}100%{top:2.8125em;left:.8125em;width:1.5625em}}@keyframes swal2-animate-success-line-long{0%{top:3.375em;right:2.875em;width:0}65%{top:3.375em;right:2.875em;width:0}84%{top:2.1875em;right:0;width:3.4375em}100%{top:2.375em;right:.5em;width:2.9375em}}@keyframes swal2-rotate-success-circular-line{0%{transform:rotate(-45deg)}5%{transform:rotate(-45deg)}12%{transform:rotate(-405deg)}100%{transform:rotate(-405deg)}}@keyframes swal2-animate-error-x-mark{0%{margin-top:1.625em;transform:scale(0.4);opacity:0}50%{margin-top:1.625em;transform:scale(0.4);opacity:0}80%{margin-top:-0.375em;transform:scale(1.15)}100%{margin-top:0;transform:scale(1);opacity:1}}@keyframes swal2-animate-error-icon{0%{transform:rotateX(100deg);opacity:0}100%{transform:rotateX(0deg);opacity:1}}@keyframes swal2-rotate-loading{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}@keyframes swal2-animate-question-mark{0%{transform:rotateY(-360deg)}100%{transform:rotateY(0)}}@keyframes swal2-animate-i-mark{0%{transform:rotateZ(45deg);opacity:0}25%{transform:rotateZ(-25deg);opacity:.4}50%{transform:rotateZ(15deg);opacity:.8}75%{transform:rotateZ(-5deg);opacity:1}100%{transform:rotateX(0);opacity:1}}@keyframes swal2-toast-show{0%{transform:translateY(-0.625em) rotateZ(2deg)}33%{transform:translateY(0) rotateZ(-2deg)}66%{transform:translateY(0.3125em) rotateZ(2deg)}100%{transform:translateY(0) rotateZ(0deg)}}@keyframes swal2-toast-hide{100%{transform:rotateZ(1deg);opacity:0}}@keyframes swal2-toast-animate-success-line-tip{0%{top:.5625em;left:.0625em;width:0}54%{top:.125em;left:.125em;width:0}70%{top:.625em;left:-0.25em;width:1.625em}84%{top:1.0625em;left:.75em;width:.5em}100%{top:1.125em;left:.1875em;width:.75em}}@keyframes swal2-toast-animate-success-line-long{0%{top:1.625em;right:1.375em;width:0}65%{top:1.25em;right:.9375em;width:0}84%{top:.9375em;right:0;width:1.125em}100%{top:.9375em;right:.1875em;width:1.375em}}</style></head>
+<body>
+
+<!-- Sidebar -->
+<nav id="sidebar">
+  <div class="brand d-flex align-items-center gap-2">
+    <img src="https://imo.crearpslglobal.com/public/assets/img/logo-crear.png" alt="NODUS" style="height:40px;width:40px;object-fit:contain;border-radius:50%;background:#fff;flex-shrink:0">
+    <div>
+      <h5 class="mb-0">NODUS</h5>
+      <small>v1.0.0</small>
+    </div>
+  </div>
+  <div class="pt-2 pb-3">
+    <button class="nav-section-toggle collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#nav-sistema" aria-expanded="false">
+                <span>Sistema</span>
+                <i class="bi bi-chevron-down toggle-icon"></i>
+              </button><div class="collapse" id="nav-sistema"><a href="https://imo.crearpslglobal.com/dashboard" class="nav-link ">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                  </a><a href="https://imo.crearpslglobal.com/usuarios" class="nav-link ">
+                    <i class="bi bi-people"></i> Usuarios
+                  </a><a href="https://imo.crearpslglobal.com/roles" class="nav-link ">
+                    <i class="bi bi-shield-check"></i> Roles
+                  </a><a href="https://imo.crearpslglobal.com/permisos" class="nav-link ">
+                    <i class="bi bi-key"></i> Permisos
+                  </a></div><button class="nav-section-toggle collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#nav-configuracin" aria-expanded="false">
+                <span>Configuración</span>
+                <i class="bi bi-chevron-down toggle-icon"></i>
+              </button><div class="collapse" id="nav-configuracin"><a href="https://imo.crearpslglobal.com/sedes" class="nav-link ">
+                    <i class="bi bi-geo-alt"></i> Sedes
+                  </a><a href="https://imo.crearpslglobal.com/entrenamientos" class="nav-link ">
+                    <i class="bi bi-book"></i> Entrenamientos
+                  </a><a href="https://imo.crearpslglobal.com/entrenadores" class="nav-link ">
+                    <i class="bi bi-person-badge"></i> Entrenadores
+                  </a><a href="https://imo.crearpslglobal.com/configuracion" class="nav-link ">
+                    <i class="bi bi-gear-fill"></i> Configuración
+                  </a><a href="https://imo.crearpslglobal.com/cronograma" class="nav-link ">
+                    <i class="bi bi-calendar3-range-fill"></i> Cronograma
+                  </a><a href="https://imo.crearpslglobal.com/saltoscuanticos" class="nav-link ">
+                    <i class="bi bi-collection"></i> Saltos Cuánticos
+                  </a></div><button class="nav-section-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#nav-participantes" aria-expanded="true">
+                <span>Participantes</span>
+                <i class="bi bi-chevron-down toggle-icon"></i>
+              </button><div class="collapse show" id="nav-participantes"><a href="https://imo.crearpslglobal.com/equipos" class="nav-link ">
+                    <i class="bi bi-people-fill"></i> Equipos
+                  </a><a href="https://imo.crearpslglobal.com/maestria" class="nav-link ">
+                    <i class="bi bi-mortarboard"></i> Maestrí­a
+                  </a><a href="https://imo.crearpslglobal.com/participantessede" class="nav-link active">
+                    <i class="bi bi-card-list"></i> Participantes Sede
+                  </a><a href="https://imo.crearpslglobal.com/registro" class="nav-link ">
+                    <i class="bi bi-link-45deg"></i> Links Registro
+                  </a><a href="https://imo.crearpslglobal.com/futurosimposibles" class="nav-link ">
+                    <i class="bi bi-stars"></i> Futuros Imposibles
+                  </a><a href="https://imo.crearpslglobal.com/reporterezagados" class="nav-link ">
+                    <i class="bi bi-person-dash"></i> Participantes Rezagados
+                  </a><a href="https://imo.crearpslglobal.com/entrenamientoadicional" class="nav-link ">
+                    <i class="bi bi-award"></i> Entrenamientos Adicionales
+                  </a></div><button class="nav-section-toggle collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#nav-seguimiento" aria-expanded="false">
+                <span>Seguimiento</span>
+                <i class="bi bi-chevron-down toggle-icon"></i>
+              </button><div class="collapse" id="nav-seguimiento"><a href="https://imo.crearpslglobal.com/capitulo1" class="nav-link ">
+                    <i class="bi bi-1-circle"></i> Capí­tulo 1
+                  </a><a href="https://imo.crearpslglobal.com/gestionc1" class="nav-link ">
+                    <i class="bi bi-telephone"></i> Gestión C1
+                  </a><a href="https://imo.crearpslglobal.com/capitulo2" class="nav-link ">
+                    <i class="bi bi-2-circle"></i> Capí­tulo 2
+                  </a><a href="https://imo.crearpslglobal.com/gestionc2" class="nav-link ">
+                    <i class="bi bi-telephone-fill"></i> Gestión C2
+                  </a><a href="https://imo.crearpslglobal.com/saltocuantico" class="nav-link ">
+                    <i class="bi bi-rocket-takeoff-fill"></i> Salto Cuántico
+                  </a><a href="https://imo.crearpslglobal.com/entrenamientocomplementario" class="nav-link ">
+                    <i class="bi bi-journal-check"></i> Entrenamiento Complementario
+                  </a><a href="https://imo.crearpslglobal.com/asignacionllamadas" class="nav-link ">
+                    <i class="bi bi-telephone-outbound"></i> Asignación de Llamadas
+                  </a><a href="https://imo.crearpslglobal.com/llamadasentrenador" class="nav-link ">
+                    <i class="bi bi-telephone-forward"></i> Llamadas Entrenador-Manager
+                  </a></div><button class="nav-section-toggle collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#nav-aliados" aria-expanded="false">
+                <span>Aliados</span>
+                <i class="bi bi-chevron-down toggle-icon"></i>
+              </button><div class="collapse" id="nav-aliados"><a href="https://imo.crearpslglobal.com/aliados" class="nav-link ">
+                    <i class="bi bi-star"></i> Aliados
+                  </a></div><button class="nav-section-toggle collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#nav-contabilidad" aria-expanded="false">
+                <span>Contabilidad</span>
+                <i class="bi bi-chevron-down toggle-icon"></i>
+              </button><div class="collapse" id="nav-contabilidad"><a href="https://imo.crearpslglobal.com/participantes" class="nav-link ">
+                    <i class="bi bi-receipt"></i> Facturación
+                  </a><a href="https://imo.crearpslglobal.com/conciliacion" class="nav-link ">
+                    <i class="bi bi-bank2"></i> Conciliación Bancaria
+                  </a><a href="https://imo.crearpslglobal.com/participantesformapago" class="nav-link ">
+                    <i class="bi bi-table"></i> Participantes / Forma de Pago
+                  </a></div><button class="nav-section-toggle collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#nav-mesaregistro" aria-expanded="false">
+                <span>Mesa Registro</span>
+                <i class="bi bi-chevron-down toggle-icon"></i>
+              </button><div class="collapse" id="nav-mesaregistro"><a href="https://imo.crearpslglobal.com/facturas" class="nav-link ">
+                    <i class="bi bi-receipt-cutoff"></i> Facturas
+                  </a><a href="https://imo.crearpslglobal.com/cierrecaja" class="nav-link ">
+                    <i class="bi bi-safe2-fill"></i> Cierre de Caja
+                  </a><a href="https://imo.crearpslglobal.com/mesaregistro" class="nav-link ">
+                    <i class="bi bi-cash-coin"></i> Mesa Registro
+                  </a></div><button class="nav-section-toggle collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#nav-certificados" aria-expanded="false">
+                <span>Certificados</span>
+                <i class="bi bi-chevron-down toggle-icon"></i>
+              </button><div class="collapse" id="nav-certificados"><a href="https://imo.crearpslglobal.com/certificados" class="nav-link ">
+                    <i class="bi bi-patch-check-fill"></i> Certificados
+                  </a></div><button class="nav-section-toggle collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#nav-reportes" aria-expanded="false">
+                <span>Reportes</span>
+                <i class="bi bi-chevron-down toggle-icon"></i>
+              </button><div class="collapse" id="nav-reportes"><a href="https://imo.crearpslglobal.com/reporte" class="nav-link ">
+                    <i class="bi bi-file-bar-graph-fill"></i> Reporte Asistencia
+                  </a><a href="https://imo.crearpslglobal.com/actividadcoordinadores" class="nav-link ">
+                    <i class="bi bi-person-lines-fill"></i> Actividad Coordinadores
+                  </a><a href="https://imo.crearpslglobal.com/reporteentrenadores" class="nav-link ">
+                    <i class="bi bi-clipboard-data"></i> Reporte de Entrenadores
+                  </a><a href="https://imo.crearpslglobal.com/enrolamiento" class="nav-link ">
+                    <i class="bi bi-person-lines-fill"></i> Enrolamiento
+                  </a><a href="https://imo.crearpslglobal.com/reporteprospectossinpago" class="nav-link ">
+                    <i class="bi bi-person-x"></i> Prospectos sin Pago
+                  </a><a href="https://imo.crearpslglobal.com/eres" class="nav-link ">
+                    <i class="bi bi-clipboard-data"></i> ERES
+                  </a></div><button class="nav-section-toggle collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#nav-juniors" aria-expanded="false">
+                <span>Juniors</span>
+                <i class="bi bi-chevron-down toggle-icon"></i>
+              </button><div class="collapse" id="nav-juniors"><a href="https://imo.crearpslglobal.com/juniors" class="nav-link ">
+                    <i class="bi bi-emoji-smile"></i> Entrenamiento Juniors
+                  </a></div><button class="nav-section-toggle collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#nav-inteligenciaartificial" aria-expanded="false">
+                <span>Inteligencia Artificial</span>
+                <i class="bi bi-chevron-down toggle-icon"></i>
+              </button><div class="collapse" id="nav-inteligenciaartificial"><a href="https://imo.crearpslglobal.com/asistenteia" class="nav-link ">
+                    <i class="bi bi-stars"></i> Asistente IA
+                  </a></div>  </div>
+</nav>
+
+<!-- Main -->
+<div class="main-content">
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="d-flex align-items-center gap-3">
+      <button class="btn btn-sm btn-outline-secondary d-md-none" onclick="document.getElementById('sidebar').classList.toggle('show')">
+        <i class="bi bi-list"></i>
+      </button>
+      <button class="btn btn-sm btn-outline-secondary" onclick="history.back()" title="Regresar">
+        <i class="bi bi-arrow-left"></i>
+      </button>
+      <button class="btn btn-sm btn-outline-secondary" onclick="location.reload()" title="Actualizar">
+        <i class="bi bi-arrow-clockwise"></i>
+      </button>
+      <h1 class="page-title">Participantes Sede</h1>
+    </div>
+    <div class="d-flex align-items-center gap-3">
+            <div class="dropdown">
+        <button class="btn btn-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">
+          <i class="bi bi-person-circle me-1"></i>JOSE LUIS SANCHEZ MORENO        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li><span class="dropdown-item-text small text-muted">Gerente</span></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item text-danger" href="https://imo.crearpslglobal.com/auth/logout"><i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Breadcrumb & Content -->
+  <div class="page-wrapper">
+    
+    <!-- Filtro de sede -->
+<div class="card mb-3">
+  <div class="card-body py-2">
+    <form class="row g-2 align-items-end">
+      <div class="col-md-4">
+        <label class="form-label small">Sede</label>
+                <div class="form-control form-control-sm bg-light d-flex align-items-center gap-2" style="cursor:default">
+          <i class="bi bi-geo-alt-fill text-primary"></i>
+          <span class="fw-semibold">LIMA CICLO 1</span>
+          <span class="badge bg-secondary ms-auto" style="font-size:.7rem">Tu sede</span>
+        </div>
+              </div>
+      <div class="col-md-3">
+        <label class="form-label small">Equipo</label>
+        <select name="id_equipo" class="form-select form-select-sm" onchange="this.form.submit()">
+          <option value="">Todos los equipos</option>
+                    <option value="11">EQUIPO 15</option>
+                    <option value="12">EQUIPO 16</option>
+                    <option value="21">EQUIPO 17</option>
+                    <option value="30">EQUIPO 18</option>
+                    <option value="42">EQUIPO 19</option>
+                    <option value="50">EQUIPO 20</option>
+                    <option value="58">EQUIPO 21</option>
+                    <option value="65">EQUIPO 22</option>
+                    <option value="75">EQUIPO 23</option>
+                    <option value="85">EQUIPO 24</option>
+                    <option value="92">EQUIPO 25</option>
+                    <option value="101">EQUIPO 26</option>
+                    <option value="107">EQUIPO 27</option>
+                    <option value="111">EQUIPO 28</option>
+                    <option value="127">EQUIPO 29</option>
+                    <option value="134">EQUIPO 30</option>
+                  </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small">Asist. C1</label>
+        <select name="asistio_c1" class="form-select form-select-sm" onchange="this.form.submit()">
+          <option value="">Todos</option>
+          <option value="1">Asistió</option>
+          <option value="0">No asistió</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small">Asist. C2</label>
+        <select name="asistio_c2" class="form-select form-select-sm" onchange="this.form.submit()">
+          <option value="">Todos</option>
+          <option value="1">Asistió</option>
+          <option value="0">No asistió</option>
+        </select>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <span><i class="bi bi-card-list me-2"></i>Participantes Sede (<span id="contTotalPS">3704</span>)</span>
+    <div class="d-flex gap-2">
+    <a href="https://imo.crearpslglobal.com/participantessede/exportarExcelC2" class="btn btn-sm btn-outline-success" title="Descargar Excel de participantes que ya hicieron C1 pero aún no asisten a Capítulo 2, con valor pagado y código de factura">
+      <i class="bi bi-file-earmark-excel me-1"></i>Excel Pendientes C2
+    </a>
+        <button type="button" class="btn btn-sm btn-outline-info" title="Distribuir pendientes de Capítulo 1 entre coordinadores" data-bs-toggle="modal" data-bs-target="#modalDistribuirC1">
+      <i class="bi bi-diagram-3 me-1"></i>Distribuir C1 Pendientes
+    </button>
+        </div>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <div id="tblParticipantesSede_wrapper" class="dataTables_wrapper dt-bootstrap5 no-footer"><div class="row"><div class="col-sm-12 col-md-6"><div class="dataTables_length" id="tblParticipantesSede_length"><label>Mostrar <select name="tblParticipantesSede_length" aria-controls="tblParticipantesSede" class="form-select form-select-sm"><option value="10">10</option><option value="25">25</option><option value="50">50</option><option value="100">100</option></select> registros</label></div></div><div class="col-sm-12 col-md-6"><div id="tblParticipantesSede_filter" class="dataTables_filter"><label>Buscar:<input type="search" class="form-control form-control-sm" placeholder="" aria-controls="tblParticipantesSede"></label></div></div></div><div class="row dt-row"><div class="col-sm-12"><table id="tblParticipantesSede" class="table table-hover mb-0 dataTable no-footer" style="font-size: 0.85rem; width: 1301px;" aria-describedby="tblParticipantesSede_info">
+        <thead>
+          <tr><th class="sorting_disabled" rowspan="1" colspan="1" style="width: 114px;">Identificación</th><th class="sorting_disabled" rowspan="1" colspan="1" style="width: 70px;">Nombres</th><th class="sorting_disabled" rowspan="1" colspan="1" style="width: 83px;">Apellidos</th><th class="sorting_disabled" rowspan="1" colspan="1" style="width: 74px;">Teléfono</th><th class="sorting_disabled" rowspan="1" colspan="1" style="width: 54px;">Equipo Origen</th><th class="sorting_disabled" rowspan="1" colspan="1" style="width: 56px;">Equipo Actual</th><th class="sorting_disabled" rowspan="1" colspan="1" style="width: 75px;">Nombre IMO</th><th class="sorting_disabled" rowspan="1" colspan="1" style="width: 80px;">Teléfono IMO</th><th class="sorting_disabled" rowspan="1" colspan="1" style="width: 54px;">Equipo IMO</th><th class="sorting_disabled text-center" rowspan="1" colspan="1" style="width: 45px;">Asist. C1</th><th class="sorting_disabled text-center" rowspan="1" colspan="1" style="width: 45px;">Asist. C2</th><th class="sorting_disabled text-center" rowspan="1" colspan="1" style="width: 60px;">Fin de Semana</th><th class="sorting_disabled text-center" rowspan="1" colspan="1" style="width: 56px;">Cambio Cupo</th><th class="sorting_disabled text-nowrap" rowspan="1" colspan="1" style="width: 211px;">Acciones</th></tr>
+        </thead>
+        <tbody><tr class="odd"><td>76614872</td><td>LESLIE NICOLE </td><td> ABREGU MONTANO </td><td>968539364</td><td><span class="text-muted">EQUIPO 24</span></td><td>EQUIPO 24</td><td>ARISKELA MONTANO MIRANDA</td><td>979375441</td><td>EQUIPO 21</td><td class="  text-center"><i class="bi bi-check-circle-fill text-success"></i></td><td class="  text-center"><i class="bi bi-circle text-muted"></i></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-nowrap"><a href="https://imo.crearpslglobal.com/participantessede/perfil/12675" target="_blank" class="btn btn-sm btn-outline-success" title="Hoja de Vida (imprimible)"><i class="bi bi-file-earmark-person"></i></a> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirDatos(12675)" title="Actualizar Datos"><i class="bi bi-pencil-square"></i></button> <button type="button" class="btn btn-sm btn-outline-warning" onclick="abrirCupo(12675,&quot;76614872&quot;,&quot;LESLIE NICOLE &quot;,&quot; ABREGU MONTANO &quot;,&quot;968539364&quot;,&quot;LA MOLINA&quot;,&quot;Leslieabregum16@gmail.com&quot;,85,null)" title="Cambio de Cupo (forzado — ya tiene Capítulo 1)"><i class="bi bi-arrow-repeat"></i></button> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirSede(12675,&quot;LESLIE NICOLE   ABREGU MONTANO &quot;)" title="Cambiar de Sede"><i class="bi bi-signpost-2"></i></button> <button type="button" class="btn btn-sm btn-outline-info" onclick="abrirHistorial(12675,&quot;LESLIE NICOLE   ABREGU MONTANO &quot;)" title="Historial de Cambios"><i class="bi bi-clock-history"></i></button> <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarParticipante(12675,&quot;LESLIE NICOLE   ABREGU MONTANO &quot;,&quot;76614872&quot;)" title="Eliminar definitivamente (borra también facturas, asistencia, certificados, etc.)"><i class="bi bi-trash"></i></button></td></tr><tr class="even"><td>43244635</td><td>WALTER HUMBERTO</td><td> CHILoN VARGAS</td><td>980497832</td><td><span class="text-muted">EQUIPO 22</span></td><td>EQUIPO 22</td><td>MARIO VICENTE PAUL MONTEJOS FIDEL</td><td>955134000</td><td>EQUIPO 20</td><td class="  text-center"><i class="bi bi-circle text-muted"></i></td><td class="  text-center"><i class="bi bi-circle text-muted"></i></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-nowrap"><a href="https://imo.crearpslglobal.com/participantessede/perfil/9807" target="_blank" class="btn btn-sm btn-outline-success" title="Hoja de Vida (imprimible)"><i class="bi bi-file-earmark-person"></i></a> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirDatos(9807)" title="Actualizar Datos"><i class="bi bi-pencil-square"></i></button> <button type="button" class="btn btn-sm btn-outline-warning" onclick="abrirCupo(9807,&quot;43244635&quot;,&quot;WALTER HUMBERTO&quot;,&quot; CHILoN VARGAS&quot;,&quot;980497832&quot;,&quot;COMANDANTE JIMeNEZ 298&quot;,&quot;Walter.chilonv@gmail.com&quot;,65,null)" title="Cambio de Cupo"><i class="bi bi-arrow-repeat"></i></button> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirSede(9807,&quot;WALTER HUMBERTO  CHILoN VARGAS&quot;)" title="Cambiar de Sede"><i class="bi bi-signpost-2"></i></button> <button type="button" class="btn btn-sm btn-outline-info" onclick="abrirHistorial(9807,&quot;WALTER HUMBERTO  CHILoN VARGAS&quot;)" title="Historial de Cambios"><i class="bi bi-clock-history"></i></button> <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarParticipante(9807,&quot;WALTER HUMBERTO  CHILoN VARGAS&quot;,&quot;43244635&quot;)" title="Eliminar definitivamente (borra también facturas, asistencia, certificados, etc.)"><i class="bi bi-trash"></i></button></td></tr><tr class="odd"><td>72749572</td><td>MELANNI BRENDA</td><td> DELGADILLO PALOMINO </td><td>900210139</td><td><span class="text-muted">-</span></td><td>EQUIPO 25</td><td><span class="text-muted">Sin invitador</span></td><td>-</td><td>-</td><td class="  text-center"><i class="bi bi-circle text-muted"></i></td><td class="  text-center"><i class="bi bi-circle text-muted"></i></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-nowrap"><a href="https://imo.crearpslglobal.com/participantessede/perfil/14526" target="_blank" class="btn btn-sm btn-outline-success" title="Hoja de Vida (imprimible)"><i class="bi bi-file-earmark-person"></i></a> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirDatos(14526)" title="Actualizar Datos"><i class="bi bi-pencil-square"></i></button> <button type="button" class="btn btn-sm btn-outline-warning" onclick="abrirCupo(14526,&quot;72749572&quot;,&quot;MELANNI BRENDA&quot;,&quot; DELGADILLO PALOMINO &quot;,&quot;900210139&quot;,&quot;PSJE. PRIMAVERA 121 STA ANA HUAMANGA AYACUCHO &quot;,&quot;melannibrenda@gmail.com&quot;,92,null)" title="Cambio de Cupo"><i class="bi bi-arrow-repeat"></i></button> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirSede(14526,&quot;MELANNI BRENDA  DELGADILLO PALOMINO &quot;)" title="Cambiar de Sede"><i class="bi bi-signpost-2"></i></button> <button type="button" class="btn btn-sm btn-outline-info" onclick="abrirHistorial(14526,&quot;MELANNI BRENDA  DELGADILLO PALOMINO &quot;)" title="Historial de Cambios"><i class="bi bi-clock-history"></i></button> <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarParticipante(14526,&quot;MELANNI BRENDA  DELGADILLO PALOMINO &quot;,&quot;72749572&quot;)" title="Eliminar definitivamente (borra también facturas, asistencia, certificados, etc.)"><i class="bi bi-trash"></i></button></td></tr><tr class="even"><td>21428247</td><td>NERY</td><td> ESCALANTE RAMIREZ </td><td>957328767</td><td><span class="text-muted">-</span></td><td>EQUIPO 28</td><td>YARISMAR ANDREiNA NAVARRO PALMA</td><td>922040104</td><td>EQUIPO 23</td><td class="  text-center"><i class="bi bi-check-circle-fill text-success"></i></td><td class="  text-center"><i class="bi bi-circle text-muted"></i></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-nowrap"><a href="https://imo.crearpslglobal.com/participantessede/perfil/18728" target="_blank" class="btn btn-sm btn-outline-success" title="Hoja de Vida (imprimible)"><i class="bi bi-file-earmark-person"></i></a> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirDatos(18728)" title="Actualizar Datos"><i class="bi bi-pencil-square"></i></button> <button type="button" class="btn btn-sm btn-outline-warning" onclick="abrirCupo(18728,&quot;21428247&quot;,&quot;NERY&quot;,&quot; ESCALANTE RAMIREZ &quot;,&quot;957328767&quot;,&quot;URB. SAN LUIS B-8&quot;,&quot;nery-san@hotmail.com&quot;,111,null)" title="Cambio de Cupo (forzado — ya tiene Capítulo 1)"><i class="bi bi-arrow-repeat"></i></button> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirSede(18728,&quot;NERY  ESCALANTE RAMIREZ &quot;)" title="Cambiar de Sede"><i class="bi bi-signpost-2"></i></button> <button type="button" class="btn btn-sm btn-outline-info" onclick="abrirHistorial(18728,&quot;NERY  ESCALANTE RAMIREZ &quot;)" title="Historial de Cambios"><i class="bi bi-clock-history"></i></button> <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarParticipante(18728,&quot;NERY  ESCALANTE RAMIREZ &quot;,&quot;21428247&quot;)" title="Eliminar definitivamente (borra también facturas, asistencia, certificados, etc.)"><i class="bi bi-trash"></i></button></td></tr><tr class="odd"><td>61177922</td><td>KIARA FERNANDA</td><td> GONZALES ALCARAZO</td><td>980660738</td><td><span class="text-muted">-</span></td><td>EQUIPO 22</td><td><span class="text-muted">Sin invitador</span></td><td>-</td><td>-</td><td class="  text-center"><i class="bi bi-circle text-muted"></i></td><td class="  text-center"><i class="bi bi-circle text-muted"></i></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-nowrap"><a href="https://imo.crearpslglobal.com/participantessede/perfil/10234" target="_blank" class="btn btn-sm btn-outline-success" title="Hoja de Vida (imprimible)"><i class="bi bi-file-earmark-person"></i></a> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirDatos(10234)" title="Actualizar Datos"><i class="bi bi-pencil-square"></i></button> <button type="button" class="btn btn-sm btn-outline-warning" onclick="abrirCupo(10234,&quot;61177922&quot;,&quot;KIARA FERNANDA&quot;,&quot; GONZALES ALCARAZO&quot;,&quot;980660738&quot;,&quot;LIMA&quot;,&quot;gonzales.kiafer21@gmail.com&quot;,65,null)" title="Cambio de Cupo"><i class="bi bi-arrow-repeat"></i></button> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirSede(10234,&quot;KIARA FERNANDA  GONZALES ALCARAZO&quot;)" title="Cambiar de Sede"><i class="bi bi-signpost-2"></i></button> <button type="button" class="btn btn-sm btn-outline-info" onclick="abrirHistorial(10234,&quot;KIARA FERNANDA  GONZALES ALCARAZO&quot;)" title="Historial de Cambios"><i class="bi bi-clock-history"></i></button> <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarParticipante(10234,&quot;KIARA FERNANDA  GONZALES ALCARAZO&quot;,&quot;61177922&quot;)" title="Eliminar definitivamente (borra también facturas, asistencia, certificados, etc.)"><i class="bi bi-trash"></i></button></td></tr><tr class="even"><td>73353888</td><td>ANiBAL RAFAEL </td><td> GONZaLES AMAYA</td><td>943241431</td><td><span class="text-muted">EQUIPO 19</span></td><td>EQUIPO 19</td><td>ANAMELVA QUInONES BELTRAN</td><td>920122990</td><td>EQUIPO 17</td><td class="  text-center"><i class="bi bi-check-circle-fill text-success"></i></td><td class="  text-center"><i class="bi bi-circle text-muted"></i></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-nowrap"><a href="https://imo.crearpslglobal.com/participantessede/perfil/5259" target="_blank" class="btn btn-sm btn-outline-success" title="Hoja de Vida (imprimible)"><i class="bi bi-file-earmark-person"></i></a> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirDatos(5259)" title="Actualizar Datos"><i class="bi bi-pencil-square"></i></button> <button type="button" class="btn btn-sm btn-outline-warning" onclick="abrirCupo(5259,&quot;73353888&quot;,&quot;ANiBAL RAFAEL &quot;,&quot; GONZaLES AMAYA&quot;,&quot;943241431&quot;,&quot;NInOS MaRTIRES 841B INDEPENDENCIA &quot;,&quot;rafael.gonzales2511@gmail.com&quot;,42,null)" title="Cambio de Cupo (forzado — ya tiene Capítulo 1)"><i class="bi bi-arrow-repeat"></i></button> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirSede(5259,&quot;ANiBAL RAFAEL   GONZaLES AMAYA&quot;)" title="Cambiar de Sede"><i class="bi bi-signpost-2"></i></button> <button type="button" class="btn btn-sm btn-outline-info" onclick="abrirHistorial(5259,&quot;ANiBAL RAFAEL   GONZaLES AMAYA&quot;)" title="Historial de Cambios"><i class="bi bi-clock-history"></i></button> <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarParticipante(5259,&quot;ANiBAL RAFAEL   GONZaLES AMAYA&quot;,&quot;73353888&quot;)" title="Eliminar definitivamente (borra también facturas, asistencia, certificados, etc.)"><i class="bi bi-trash"></i></button></td></tr><tr class="odd"><td>41658848</td><td>MARiA </td><td> HUAMANI OBREGoN </td><td>937015589</td><td><span class="text-muted">EQUIPO 19</span></td><td>EQUIPO 19</td><td>ROCIO DE LA CRUZ HUAYTALLA</td><td>929406665</td><td>EQUIPO 17</td><td class="  text-center"><i class="bi bi-circle text-muted"></i></td><td class="  text-center"><i class="bi bi-circle text-muted"></i></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-nowrap"><a href="https://imo.crearpslglobal.com/participantessede/perfil/5294" target="_blank" class="btn btn-sm btn-outline-success" title="Hoja de Vida (imprimible)"><i class="bi bi-file-earmark-person"></i></a> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirDatos(5294)" title="Actualizar Datos"><i class="bi bi-pencil-square"></i></button> <button type="button" class="btn btn-sm btn-outline-warning" onclick="abrirCupo(5294,&quot;41658848&quot;,&quot;MARiA &quot;,&quot; HUAMANI OBREGoN &quot;,&quot;937015589&quot;,&quot;VISTA ALEGRE NAZCA ICA&quot;,&quot;Mariahuamani@gmail.com&quot;,42,null)" title="Cambio de Cupo"><i class="bi bi-arrow-repeat"></i></button> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirSede(5294,&quot;MARiA   HUAMANI OBREGoN &quot;)" title="Cambiar de Sede"><i class="bi bi-signpost-2"></i></button> <button type="button" class="btn btn-sm btn-outline-info" onclick="abrirHistorial(5294,&quot;MARiA   HUAMANI OBREGoN &quot;)" title="Historial de Cambios"><i class="bi bi-clock-history"></i></button> <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarParticipante(5294,&quot;MARiA   HUAMANI OBREGoN &quot;,&quot;41658848&quot;)" title="Eliminar definitivamente (borra también facturas, asistencia, certificados, etc.)"><i class="bi bi-trash"></i></button></td></tr><tr class="even"><td>09677577</td><td>MILAGRITOS </td><td> MONTOYA CUEVA </td><td>972697127</td><td><span class="text-muted">EQUIPO 24</span></td><td>EQUIPO 24</td><td>KETTY DORIS BAUTISTA OCHOA</td><td>986890934</td><td>EQUIPO 23</td><td class="  text-center"><i class="bi bi-check-circle-fill text-success"></i></td><td class="  text-center"><i class="bi bi-check-circle-fill text-success"></i></td><td class="  text-center"><span class="badge bg-primary">TFD</span></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-nowrap"><a href="https://imo.crearpslglobal.com/participantessede/perfil/12678" target="_blank" class="btn btn-sm btn-outline-success" title="Hoja de Vida (imprimible)"><i class="bi bi-file-earmark-person"></i></a> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirDatos(12678)" title="Actualizar Datos"><i class="bi bi-pencil-square"></i></button> <button type="button" class="btn btn-sm btn-outline-warning" onclick="abrirCupo(12678,&quot;09677577&quot;,&quot;MILAGRITOS &quot;,&quot; MONTOYA CUEVA &quot;,&quot;972697127&quot;,&quot;:MZ A11 LT 12 URBANIZACIoN LOS SAUCES PRIMERA ETAPA.&quot;,&quot;mmontoyacueva@gmail.com&quot;,85,null)" title="Cambio de Cupo (forzado — ya tiene Capítulo 1)"><i class="bi bi-arrow-repeat"></i></button> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirSede(12678,&quot;MILAGRITOS   MONTOYA CUEVA &quot;)" title="Cambiar de Sede"><i class="bi bi-signpost-2"></i></button> <button type="button" class="btn btn-sm btn-outline-info" onclick="abrirHistorial(12678,&quot;MILAGRITOS   MONTOYA CUEVA &quot;)" title="Historial de Cambios"><i class="bi bi-clock-history"></i></button> <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarParticipante(12678,&quot;MILAGRITOS   MONTOYA CUEVA &quot;,&quot;09677577&quot;)" title="Eliminar definitivamente (borra también facturas, asistencia, certificados, etc.)"><i class="bi bi-trash"></i></button></td></tr><tr class="odd"><td>75190856</td><td>BRANDON JAIR </td><td> PAIMA IJUMA</td><td>973657938</td><td><span class="text-muted">EQUIPO 29</span></td><td>EQUIPO 29</td><td>GINA CaRDENAS LOPEZ</td><td>999699649</td><td>EQUIPO 27</td><td class="  text-center"><i class="bi bi-check-circle-fill text-success"></i></td><td class="  text-center"><i class="bi bi-circle text-muted"></i></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-nowrap"><a href="https://imo.crearpslglobal.com/participantessede/perfil/20355" target="_blank" class="btn btn-sm btn-outline-success" title="Hoja de Vida (imprimible)"><i class="bi bi-file-earmark-person"></i></a> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirDatos(20355)" title="Actualizar Datos"><i class="bi bi-pencil-square"></i></button> <button type="button" class="btn btn-sm btn-outline-warning" onclick="abrirCupo(20355,&quot;75190856&quot;,&quot;BRANDON JAIR &quot;,&quot; PAIMA IJUMA&quot;,&quot;973657938&quot;,&quot;VILLA EL SALVADOR SECTOR 1 GRUPO 9  MZ A LOTE 18&quot;,&quot;bpaima679@gmail.com&quot;,127,null)" title="Cambio de Cupo (forzado — ya tiene Capítulo 1)"><i class="bi bi-arrow-repeat"></i></button> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirSede(20355,&quot;BRANDON JAIR   PAIMA IJUMA&quot;)" title="Cambiar de Sede"><i class="bi bi-signpost-2"></i></button> <button type="button" class="btn btn-sm btn-outline-info" onclick="abrirHistorial(20355,&quot;BRANDON JAIR   PAIMA IJUMA&quot;)" title="Historial de Cambios"><i class="bi bi-clock-history"></i></button> <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarParticipante(20355,&quot;BRANDON JAIR   PAIMA IJUMA&quot;,&quot;75190856&quot;)" title="Eliminar definitivamente (borra también facturas, asistencia, certificados, etc.)"><i class="bi bi-trash"></i></button></td></tr><tr class="even"><td>72220963</td><td>YESSENIA BRILLITH</td><td> ROBLES ZAMORA</td><td>960715634</td><td><span class="text-muted">-</span></td><td>EQUIPO 24</td><td><span class="text-muted">Sin invitador</span></td><td>-</td><td>-</td><td class="  text-center"><i class="bi bi-circle text-muted"></i></td><td class="  text-center"><i class="bi bi-circle text-muted"></i></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-nowrap"><a href="https://imo.crearpslglobal.com/participantessede/perfil/13170" target="_blank" class="btn btn-sm btn-outline-success" title="Hoja de Vida (imprimible)"><i class="bi bi-file-earmark-person"></i></a> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirDatos(13170)" title="Actualizar Datos"><i class="bi bi-pencil-square"></i></button> <button type="button" class="btn btn-sm btn-outline-warning" onclick="abrirCupo(13170,&quot;72220963&quot;,&quot;YESSENIA BRILLITH&quot;,&quot; ROBLES ZAMORA&quot;,&quot;960715634&quot;,&quot;LIMA&quot;,&quot;Yessi_rz@hotmail.es&quot;,85,null)" title="Cambio de Cupo"><i class="bi bi-arrow-repeat"></i></button> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirSede(13170,&quot;YESSENIA BRILLITH  ROBLES ZAMORA&quot;)" title="Cambiar de Sede"><i class="bi bi-signpost-2"></i></button> <button type="button" class="btn btn-sm btn-outline-info" onclick="abrirHistorial(13170,&quot;YESSENIA BRILLITH  ROBLES ZAMORA&quot;)" title="Historial de Cambios"><i class="bi bi-clock-history"></i></button> <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarParticipante(13170,&quot;YESSENIA BRILLITH  ROBLES ZAMORA&quot;,&quot;72220963&quot;)" title="Eliminar definitivamente (borra también facturas, asistencia, certificados, etc.)"><i class="bi bi-trash"></i></button></td></tr><tr class="odd"><td>73108490</td><td>RONALDO</td><td> ROMAN YLLA</td><td>933400703</td><td><span class="text-muted">EQUIPO 26</span></td><td>EQUIPO 26</td><td><span class="text-muted">Sin invitador</span></td><td>-</td><td>-</td><td class="  text-center"><i class="bi bi-check-circle-fill text-success"></i></td><td class="  text-center"><i class="bi bi-check-circle-fill text-success"></i></td><td class="  text-center"><span class="badge bg-primary">TFD</span></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-nowrap"><a href="https://imo.crearpslglobal.com/participantessede/perfil/15943" target="_blank" class="btn btn-sm btn-outline-success" title="Hoja de Vida (imprimible)"><i class="bi bi-file-earmark-person"></i></a> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirDatos(15943)" title="Actualizar Datos"><i class="bi bi-pencil-square"></i></button> <button type="button" class="btn btn-sm btn-outline-warning" onclick="abrirCupo(15943,&quot;73108490&quot;,&quot;RONALDO&quot;,&quot; ROMAN YLLA&quot;,&quot;933400703&quot;,&quot;CUSCO&quot;,&quot;Ronaldoromanylla@gmail.com&quot;,101,null)" title="Cambio de Cupo (forzado — ya tiene Capítulo 1)"><i class="bi bi-arrow-repeat"></i></button> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirSede(15943,&quot;RONALDO  ROMAN YLLA&quot;)" title="Cambiar de Sede"><i class="bi bi-signpost-2"></i></button> <button type="button" class="btn btn-sm btn-outline-info" onclick="abrirHistorial(15943,&quot;RONALDO  ROMAN YLLA&quot;)" title="Historial de Cambios"><i class="bi bi-clock-history"></i></button> <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarParticipante(15943,&quot;RONALDO  ROMAN YLLA&quot;,&quot;73108490&quot;)" title="Eliminar definitivamente (borra también facturas, asistencia, certificados, etc.)"><i class="bi bi-trash"></i></button></td></tr><tr class="even"><td>46856366</td><td>FRANBERNI </td><td> SaNCHEZ QUISPE</td><td>901903695</td><td><span class="text-muted">EQUIPO 28</span></td><td>EQUIPO 28</td><td>FREDY LoPEZ HUAMANRAYME</td><td>993709784</td><td>EQUIPO 27</td><td class="  text-center"><i class="bi bi-check-circle-fill text-success"></i></td><td class="  text-center"><i class="bi bi-check-circle-fill text-success"></i></td><td class="  text-center"><span class="badge bg-primary">PFD</span></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-nowrap"><a href="https://imo.crearpslglobal.com/participantessede/perfil/18590" target="_blank" class="btn btn-sm btn-outline-success" title="Hoja de Vida (imprimible)"><i class="bi bi-file-earmark-person"></i></a> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirDatos(18590)" title="Actualizar Datos"><i class="bi bi-pencil-square"></i></button> <button type="button" class="btn btn-sm btn-outline-warning" onclick="abrirCupo(18590,&quot;46856366&quot;,&quot;FRANBERNI &quot;,&quot; SaNCHEZ QUISPE&quot;,&quot;901903695&quot;,&quot;PISTA PRINCIPAL CUSCO URCOS APV REAL NACIENTE &quot;,&quot;sanchezq.03@gmail.com&quot;,111,null)" title="Cambio de Cupo (forzado — ya tiene Capítulo 1)"><i class="bi bi-arrow-repeat"></i></button> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirSede(18590,&quot;FRANBERNI   SaNCHEZ QUISPE&quot;)" title="Cambiar de Sede"><i class="bi bi-signpost-2"></i></button> <button type="button" class="btn btn-sm btn-outline-info" onclick="abrirHistorial(18590,&quot;FRANBERNI   SaNCHEZ QUISPE&quot;)" title="Historial de Cambios"><i class="bi bi-clock-history"></i></button> <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarParticipante(18590,&quot;FRANBERNI   SaNCHEZ QUISPE&quot;,&quot;46856366&quot;)" title="Eliminar definitivamente (borra también facturas, asistencia, certificados, etc.)"><i class="bi bi-trash"></i></button></td></tr><tr class="odd"><td>19673864</td><td>FLOR DE MARIA</td><td> SOTO VILLENA</td><td>0961009053</td><td><span class="text-muted">EQUIPO 113</span></td><td>EQUIPO 23</td><td>LILIANA LILIBETH  CUBILLO VERA</td><td>0996521133</td><td>EQUIPO 109</td><td class="  text-center"><i class="bi bi-check-circle-fill text-success"></i></td><td class="  text-center"><i class="bi bi-circle text-muted"></i></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-nowrap"><a href="https://imo.crearpslglobal.com/participantessede/perfil/11711" target="_blank" class="btn btn-sm btn-outline-success" title="Hoja de Vida (imprimible)"><i class="bi bi-file-earmark-person"></i></a> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirDatos(11711)" title="Actualizar Datos"><i class="bi bi-pencil-square"></i></button> <button type="button" class="btn btn-sm btn-outline-warning" onclick="abrirCupo(11711,&quot;19673864&quot;,&quot;FLOR DE MARIA&quot;,&quot; SOTO VILLENA&quot;,&quot;0961009053&quot;,&quot;LIMA &quot;,&quot;lilicubillo916@gmail.com&quot;,75,null)" title="Cambio de Cupo (forzado — ya tiene Capítulo 1)"><i class="bi bi-arrow-repeat"></i></button> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirSede(11711,&quot;FLOR DE MARIA  SOTO VILLENA&quot;)" title="Cambiar de Sede"><i class="bi bi-signpost-2"></i></button> <button type="button" class="btn btn-sm btn-outline-info" onclick="abrirHistorial(11711,&quot;FLOR DE MARIA  SOTO VILLENA&quot;)" title="Historial de Cambios"><i class="bi bi-clock-history"></i></button> <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarParticipante(11711,&quot;FLOR DE MARIA  SOTO VILLENA&quot;,&quot;19673864&quot;)" title="Eliminar definitivamente (borra también facturas, asistencia, certificados, etc.)"><i class="bi bi-trash"></i></button></td></tr><tr class="even"><td>73472280</td><td>FELIPE</td><td> TRUJILLO NUNEZ </td><td>947157824</td><td><span class="text-muted">-</span></td><td>EQUIPO 29</td><td><span class="text-muted">Sin invitador</span></td><td>-</td><td>-</td><td class="  text-center"><i class="bi bi-circle text-muted"></i></td><td class="  text-center"><i class="bi bi-circle text-muted"></i></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-nowrap"><a href="https://imo.crearpslglobal.com/participantessede/perfil/20766" target="_blank" class="btn btn-sm btn-outline-success" title="Hoja de Vida (imprimible)"><i class="bi bi-file-earmark-person"></i></a> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirDatos(20766)" title="Actualizar Datos"><i class="bi bi-pencil-square"></i></button> <button type="button" class="btn btn-sm btn-outline-warning" onclick="abrirCupo(20766,&quot;73472280&quot;,&quot;FELIPE&quot;,&quot; TRUJILLO NUNEZ &quot;,&quot;947157824&quot;,&quot;CALLE SARA SARA NO. 120 - SAN MIGUEL &quot;,&quot;felipetn64@gmail.com&quot;,127,null)" title="Cambio de Cupo"><i class="bi bi-arrow-repeat"></i></button> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirSede(20766,&quot;FELIPE  TRUJILLO NUNEZ &quot;)" title="Cambiar de Sede"><i class="bi bi-signpost-2"></i></button> <button type="button" class="btn btn-sm btn-outline-info" onclick="abrirHistorial(20766,&quot;FELIPE  TRUJILLO NUNEZ &quot;)" title="Historial de Cambios"><i class="bi bi-clock-history"></i></button> <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarParticipante(20766,&quot;FELIPE  TRUJILLO NUNEZ &quot;,&quot;73472280&quot;)" title="Eliminar definitivamente (borra también facturas, asistencia, certificados, etc.)"><i class="bi bi-trash"></i></button></td></tr><tr class="odd"><td>41941503</td><td>CRUZ </td><td>ABAD MULATILLO </td><td>971111723</td><td><span class="text-muted">EQUIPO 24</span></td><td>EQUIPO 24</td><td>NASHA MERCEDES GUTIeRREZ CALERO</td><td>960343562</td><td>EQUIPO 23</td><td class="  text-center"><i class="bi bi-circle text-muted"></i></td><td class="  text-center"><i class="bi bi-circle text-muted"></i></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-nowrap"><a href="https://imo.crearpslglobal.com/participantessede/perfil/12816" target="_blank" class="btn btn-sm btn-outline-success" title="Hoja de Vida (imprimible)"><i class="bi bi-file-earmark-person"></i></a> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirDatos(12816)" title="Actualizar Datos"><i class="bi bi-pencil-square"></i></button> <button type="button" class="btn btn-sm btn-outline-warning" onclick="abrirCupo(12816,&quot;41941503&quot;,&quot;CRUZ &quot;,&quot;ABAD MULATILLO &quot;,&quot;971111723&quot;,&quot;CALLE ESCANDIO MZ N LT 9 - URB. SAN HILARION ALTO SJL&quot;,&quot;nashagutierrez@hotmail.com&quot;,85,null)" title="Cambio de Cupo"><i class="bi bi-arrow-repeat"></i></button> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirSede(12816,&quot;CRUZ  ABAD MULATILLO &quot;)" title="Cambiar de Sede"><i class="bi bi-signpost-2"></i></button> <button type="button" class="btn btn-sm btn-outline-info" onclick="abrirHistorial(12816,&quot;CRUZ  ABAD MULATILLO &quot;)" title="Historial de Cambios"><i class="bi bi-clock-history"></i></button> <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarParticipante(12816,&quot;CRUZ  ABAD MULATILLO &quot;,&quot;41941503&quot;)" title="Eliminar definitivamente (borra también facturas, asistencia, certificados, etc.)"><i class="bi bi-trash"></i></button></td></tr><tr class="even"><td>43428835</td><td>ELMER</td><td>ABANTO CHAVEZ</td><td>915145185</td><td><span class="text-muted">EQUIPO 28</span></td><td>EQUIPO 28</td><td>ROSITA ADRIANA MARQUINA DAZA</td><td>992052066</td><td>EQUIPO 27</td><td class="  text-center"><i class="bi bi-check-circle-fill text-success"></i></td><td class="  text-center"><i class="bi bi-check-circle-fill text-success"></i></td><td class="  text-center"><span class="badge bg-primary">PFD</span></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-nowrap"><a href="https://imo.crearpslglobal.com/participantessede/perfil/18628" target="_blank" class="btn btn-sm btn-outline-success" title="Hoja de Vida (imprimible)"><i class="bi bi-file-earmark-person"></i></a> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirDatos(18628)" title="Actualizar Datos"><i class="bi bi-pencil-square"></i></button> <button type="button" class="btn btn-sm btn-outline-warning" onclick="abrirCupo(18628,&quot;43428835&quot;,&quot;ELMER&quot;,&quot;ABANTO CHAVEZ&quot;,&quot;915145185&quot;,&quot;SAN MARTiN DE PORRES&quot;,&quot;empireace7@gmail.com&quot;,111,null)" title="Cambio de Cupo (forzado — ya tiene Capítulo 1)"><i class="bi bi-arrow-repeat"></i></button> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirSede(18628,&quot;ELMER ABANTO CHAVEZ&quot;)" title="Cambiar de Sede"><i class="bi bi-signpost-2"></i></button> <button type="button" class="btn btn-sm btn-outline-info" onclick="abrirHistorial(18628,&quot;ELMER ABANTO CHAVEZ&quot;)" title="Historial de Cambios"><i class="bi bi-clock-history"></i></button> <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarParticipante(18628,&quot;ELMER ABANTO CHAVEZ&quot;,&quot;43428835&quot;)" title="Eliminar definitivamente (borra también facturas, asistencia, certificados, etc.)"><i class="bi bi-trash"></i></button></td></tr><tr class="odd"><td>32827160</td><td>GREGORIO ELENA </td><td>ABANTO RIOS</td><td>986345816</td><td><span class="text-muted">EQUIPO 29</span></td><td>EQUIPO 29</td><td>MASSIMO PAUL URDIALES ABANTO </td><td>997969155</td><td>EQUIPO 26</td><td class="  text-center"><i class="bi bi-check-circle-fill text-success"></i></td><td class="  text-center"><i class="bi bi-circle text-muted"></i></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-nowrap"><a href="https://imo.crearpslglobal.com/participantessede/perfil/20462" target="_blank" class="btn btn-sm btn-outline-success" title="Hoja de Vida (imprimible)"><i class="bi bi-file-earmark-person"></i></a> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirDatos(20462)" title="Actualizar Datos"><i class="bi bi-pencil-square"></i></button> <button type="button" class="btn btn-sm btn-outline-warning" onclick="abrirCupo(20462,&quot;32827160&quot;,&quot;GREGORIO ELENA &quot;,&quot;ABANTO RIOS&quot;,&quot;986345816&quot;,&quot;CALLE JUAN JOSe PARDO 434&quot;,&quot;labanto35@gmail.com&quot;,127,null)" title="Cambio de Cupo (forzado — ya tiene Capítulo 1)"><i class="bi bi-arrow-repeat"></i></button> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirSede(20462,&quot;GREGORIO ELENA  ABANTO RIOS&quot;)" title="Cambiar de Sede"><i class="bi bi-signpost-2"></i></button> <button type="button" class="btn btn-sm btn-outline-info" onclick="abrirHistorial(20462,&quot;GREGORIO ELENA  ABANTO RIOS&quot;)" title="Historial de Cambios"><i class="bi bi-clock-history"></i></button> <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarParticipante(20462,&quot;GREGORIO ELENA  ABANTO RIOS&quot;,&quot;32827160&quot;)" title="Eliminar definitivamente (borra también facturas, asistencia, certificados, etc.)"><i class="bi bi-trash"></i></button></td></tr><tr class="even"><td>032959711</td><td>LUZ ISABEL</td><td>ABANTO RIOS</td><td>945963710</td><td><span class="text-muted">EQUIPO 25</span></td><td>EQUIPO 25</td><td>MARJORIE ZULAY CELEDONIO RIOS</td><td>997021124</td><td>EQUIPO 24</td><td class="  text-center"><i class="bi bi-check-circle-fill text-success"></i></td><td class="  text-center"><i class="bi bi-check-circle-fill text-success"></i></td><td class="  text-center"><span class="badge bg-primary">TFD</span></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-nowrap"><a href="https://imo.crearpslglobal.com/participantessede/perfil/14018" target="_blank" class="btn btn-sm btn-outline-success" title="Hoja de Vida (imprimible)"><i class="bi bi-file-earmark-person"></i></a> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirDatos(14018)" title="Actualizar Datos"><i class="bi bi-pencil-square"></i></button> <button type="button" class="btn btn-sm btn-outline-warning" onclick="abrirCupo(14018,&quot;032959711&quot;,&quot;LUZ ISABEL&quot;,&quot;ABANTO RIOS&quot;,&quot;945963710&quot;,&quot;CALLE JUAN JOSe PARDO 435 LA PERLA &quot;,&quot;labanto35@gmail.com&quot;,92,null)" title="Cambio de Cupo (forzado — ya tiene Capítulo 1)"><i class="bi bi-arrow-repeat"></i></button> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirSede(14018,&quot;LUZ ISABEL ABANTO RIOS&quot;)" title="Cambiar de Sede"><i class="bi bi-signpost-2"></i></button> <button type="button" class="btn btn-sm btn-outline-info" onclick="abrirHistorial(14018,&quot;LUZ ISABEL ABANTO RIOS&quot;)" title="Historial de Cambios"><i class="bi bi-clock-history"></i></button> <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarParticipante(14018,&quot;LUZ ISABEL ABANTO RIOS&quot;,&quot;032959711&quot;)" title="Eliminar definitivamente (borra también facturas, asistencia, certificados, etc.)"><i class="bi bi-trash"></i></button></td></tr><tr class="odd"><td>32979941</td><td>MARiA JESuS</td><td>ABANTO RIOS</td><td>943024033</td><td><span class="text-muted">EQUIPO 28</span></td><td>EQUIPO 29</td><td>LUZ ISABEL ABANTO RIOS</td><td>945963710</td><td>EQUIPO 25</td><td class="  text-center"><i class="bi bi-check-circle-fill text-success"></i></td><td class="  text-center"><i class="bi bi-circle text-muted"></i></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-nowrap"><a href="https://imo.crearpslglobal.com/participantessede/perfil/18577" target="_blank" class="btn btn-sm btn-outline-success" title="Hoja de Vida (imprimible)"><i class="bi bi-file-earmark-person"></i></a> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirDatos(18577)" title="Actualizar Datos"><i class="bi bi-pencil-square"></i></button> <button type="button" class="btn btn-sm btn-outline-warning" onclick="abrirCupo(18577,&quot;32979941&quot;,&quot;MARiA JESuS&quot;,&quot;ABANTO RIOS&quot;,&quot;943024033&quot;,&quot;CALLE CaCERES ARAMAYO I" _="" 34="" nuevo="" chimbote","mary_abanto_14@hotmail.com",127,null)'="" title="Cambio de Cupo (forzado — ya tiene Capítulo 1)"><i class="bi bi-arrow-repeat"></i></button> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirSede(18577,&quot;MARiA JESuS ABANTO RIOS&quot;)" title="Cambiar de Sede"><i class="bi bi-signpost-2"></i></button> <button type="button" class="btn btn-sm btn-outline-info" onclick="abrirHistorial(18577,&quot;MARiA JESuS ABANTO RIOS&quot;)" title="Historial de Cambios"><i class="bi bi-clock-history"></i></button> <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarParticipante(18577,&quot;MARiA JESuS ABANTO RIOS&quot;,&quot;32979941&quot;)" title="Eliminar definitivamente (borra también facturas, asistencia, certificados, etc.)"><i class="bi bi-trash"></i></button></td></tr><tr class="even"><td>45550853</td><td>JORGE LUIS</td><td>ACARO CoRDOVA</td><td>901288798</td><td><span class="text-muted">EQUIPO 21</span></td><td>EQUIPO 21</td><td><span class="text-muted">Sin invitador</span></td><td>-</td><td>-</td><td class="  text-center"><i class="bi bi-circle text-muted"></i></td><td class="  text-center"><i class="bi bi-circle text-muted"></i></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-nowrap"><a href="https://imo.crearpslglobal.com/participantessede/perfil/8171" target="_blank" class="btn btn-sm btn-outline-success" title="Hoja de Vida (imprimible)"><i class="bi bi-file-earmark-person"></i></a> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirDatos(8171)" title="Actualizar Datos"><i class="bi bi-pencil-square"></i></button> <button type="button" class="btn btn-sm btn-outline-warning" onclick="abrirCupo(8171,&quot;45550853&quot;,&quot;JORGE LUIS&quot;,&quot;ACARO CoRDOVA&quot;,&quot;901288798&quot;,&quot;JORGE&quot;,&quot;jorgeluis.051188@gmail.com&quot;,58,null)" title="Cambio de Cupo"><i class="bi bi-arrow-repeat"></i></button> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirSede(8171,&quot;JORGE LUIS ACARO CoRDOVA&quot;)" title="Cambiar de Sede"><i class="bi bi-signpost-2"></i></button> <button type="button" class="btn btn-sm btn-outline-info" onclick="abrirHistorial(8171,&quot;JORGE LUIS ACARO CoRDOVA&quot;)" title="Historial de Cambios"><i class="bi bi-clock-history"></i></button> <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarParticipante(8171,&quot;JORGE LUIS ACARO CoRDOVA&quot;,&quot;45550853&quot;)" title="Eliminar definitivamente (borra también facturas, asistencia, certificados, etc.)"><i class="bi bi-trash"></i></button></td></tr><tr class="odd"><td>42289383</td><td>EDWIN JOSE</td><td>ACCOSTUPA TTITO</td><td>+51 929 357 359</td><td><span class="text-muted">EQUIPO 30</span></td><td>EQUIPO 30</td><td>JOSUE ROVER ONOFRE VICUnA</td><td>968449556</td><td>EQUIPO 29</td><td class="  text-center"><i class="bi bi-check-circle-fill text-success"></i></td><td class="  text-center"><i class="bi bi-circle text-muted"></i></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-nowrap"><a href="https://imo.crearpslglobal.com/participantessede/perfil/900198" target="_blank" class="btn btn-sm btn-outline-success" title="Hoja de Vida (imprimible)"><i class="bi bi-file-earmark-person"></i></a> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirDatos(900198)" title="Actualizar Datos"><i class="bi bi-pencil-square"></i></button> <button type="button" class="btn btn-sm btn-outline-warning" onclick="abrirCupo(900198,&quot;42289383&quot;,&quot;EDWIN JOSE&quot;,&quot;ACCOSTUPA TTITO&quot;,&quot;+51 929 357 359&quot;,&quot;CUSCO&quot;,&quot;aguadulcek7@gmail.com&quot;,134,null)" title="Cambio de Cupo (forzado — ya tiene Capítulo 1)"><i class="bi bi-arrow-repeat"></i></button> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirSede(900198,&quot;EDWIN JOSE ACCOSTUPA TTITO&quot;)" title="Cambiar de Sede"><i class="bi bi-signpost-2"></i></button> <button type="button" class="btn btn-sm btn-outline-info" onclick="abrirHistorial(900198,&quot;EDWIN JOSE ACCOSTUPA TTITO&quot;)" title="Historial de Cambios"><i class="bi bi-clock-history"></i></button> <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarParticipante(900198,&quot;EDWIN JOSE ACCOSTUPA TTITO&quot;,&quot;42289383&quot;)" title="Eliminar definitivamente (borra también facturas, asistencia, certificados, etc.)"><i class="bi bi-trash"></i></button></td></tr><tr class="even"><td>42268433</td><td>JAIME CALIN</td><td>ACERO BOLANOS</td><td>945027280</td><td><span class="text-muted">EQUIPO 27</span></td><td>EQUIPO 27</td><td><span class="text-muted">Sin invitador</span></td><td>-</td><td>-</td><td class="  text-center"><i class="bi bi-check-circle-fill text-success"></i></td><td class="  text-center"><i class="bi bi-circle text-muted"></i></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-nowrap"><a href="https://imo.crearpslglobal.com/participantessede/perfil/17028" target="_blank" class="btn btn-sm btn-outline-success" title="Hoja de Vida (imprimible)"><i class="bi bi-file-earmark-person"></i></a> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirDatos(17028)" title="Actualizar Datos"><i class="bi bi-pencil-square"></i></button> <button type="button" class="btn btn-sm btn-outline-warning" onclick="abrirCupo(17028,&quot;42268433&quot;,&quot;JAIME CALIN&quot;,&quot;ACERO BOLANOS&quot;,&quot;945027280&quot;,&quot;AV. 28 DE JULIO MZ.25 LT.21A BUENOS AIRES DE VILLA - CHORRILOS&quot;,&quot;inversionesacerovaldez@gmail.com&quot;,107,null)" title="Cambio de Cupo (forzado — ya tiene Capítulo 1)"><i class="bi bi-arrow-repeat"></i></button> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirSede(17028,&quot;JAIME CALIN ACERO BOLANOS&quot;)" title="Cambiar de Sede"><i class="bi bi-signpost-2"></i></button> <button type="button" class="btn btn-sm btn-outline-info" onclick="abrirHistorial(17028,&quot;JAIME CALIN ACERO BOLANOS&quot;)" title="Historial de Cambios"><i class="bi bi-clock-history"></i></button> <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarParticipante(17028,&quot;JAIME CALIN ACERO BOLANOS&quot;,&quot;42268433&quot;)" title="Eliminar definitivamente (borra también facturas, asistencia, certificados, etc.)"><i class="bi bi-trash"></i></button></td></tr><tr class="odd"><td>41516528</td><td>EDITH MARIELA</td><td>ACHULLI INGA</td><td>993490434</td><td><span class="text-muted">EQUIPO 29</span></td><td>EQUIPO 29</td><td>KATHERINE ROJAS LIMA</td><td>984757533</td><td>EQUIPO 27</td><td class="  text-center"><i class="bi bi-check-circle-fill text-success"></i></td><td class="  text-center"><i class="bi bi-circle text-muted"></i></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-nowrap"><a href="https://imo.crearpslglobal.com/participantessede/perfil/20394" target="_blank" class="btn btn-sm btn-outline-success" title="Hoja de Vida (imprimible)"><i class="bi bi-file-earmark-person"></i></a> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirDatos(20394)" title="Actualizar Datos"><i class="bi bi-pencil-square"></i></button> <button type="button" class="btn btn-sm btn-outline-warning" onclick="abrirCupo(20394,&quot;41516528&quot;,&quot;EDITH MARIELA&quot;,&quot;ACHULLI INGA&quot;,&quot;993490434&quot;,&quot;CUSCO&quot;,&quot;edimarkilla@gmail.com&quot;,127,null)" title="Cambio de Cupo (forzado — ya tiene Capítulo 1)"><i class="bi bi-arrow-repeat"></i></button> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirSede(20394,&quot;EDITH MARIELA ACHULLI INGA&quot;)" title="Cambiar de Sede"><i class="bi bi-signpost-2"></i></button> <button type="button" class="btn btn-sm btn-outline-info" onclick="abrirHistorial(20394,&quot;EDITH MARIELA ACHULLI INGA&quot;)" title="Historial de Cambios"><i class="bi bi-clock-history"></i></button> <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarParticipante(20394,&quot;EDITH MARIELA ACHULLI INGA&quot;,&quot;41516528&quot;)" title="Eliminar definitivamente (borra también facturas, asistencia, certificados, etc.)"><i class="bi bi-trash"></i></button></td></tr><tr class="even"><td>74253437</td><td>LUIS</td><td>ACOSTA DEL AGUILA</td><td>981361371</td><td><span class="text-muted">EQUIPO 20</span></td><td>EQUIPO 20</td><td>PILAR MIRIAM TORRES MARCOS</td><td>933469542</td><td>EQUIPO 21</td><td class="  text-center"><i class="bi bi-check-circle-fill text-success"></i></td><td class="  text-center"><i class="bi bi-circle text-muted"></i></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-nowrap"><a href="https://imo.crearpslglobal.com/participantessede/perfil/7007" target="_blank" class="btn btn-sm btn-outline-success" title="Hoja de Vida (imprimible)"><i class="bi bi-file-earmark-person"></i></a> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirDatos(7007)" title="Actualizar Datos"><i class="bi bi-pencil-square"></i></button> <button type="button" class="btn btn-sm btn-outline-warning" onclick="abrirCupo(7007,&quot;74253437&quot;,&quot;LUIS&quot;,&quot;ACOSTA DEL AGUILA&quot;,&quot;981361371&quot;,&quot;CALLE ANDROEMBA 782 - CHORRILLOS&quot;,&quot;Lacostadelaguila@gmail.com&quot;,50,null)" title="Cambio de Cupo (forzado — ya tiene Capítulo 1)"><i class="bi bi-arrow-repeat"></i></button> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirSede(7007,&quot;LUIS ACOSTA DEL AGUILA&quot;)" title="Cambiar de Sede"><i class="bi bi-signpost-2"></i></button> <button type="button" class="btn btn-sm btn-outline-info" onclick="abrirHistorial(7007,&quot;LUIS ACOSTA DEL AGUILA&quot;)" title="Historial de Cambios"><i class="bi bi-clock-history"></i></button> <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarParticipante(7007,&quot;LUIS ACOSTA DEL AGUILA&quot;,&quot;74253437&quot;)" title="Eliminar definitivamente (borra también facturas, asistencia, certificados, etc.)"><i class="bi bi-trash"></i></button></td></tr><tr class="odd"><td>74925734</td><td>JHON ANDERSON</td><td>ACOSTA PURIZACA</td><td>983429718</td><td><span class="text-muted">EQUIPO 27</span></td><td>EQUIPO 27</td><td>BETZABE LoPEZ ZAPANA</td><td>999486012</td><td>EQUIPO 24</td><td class="  text-center"><i class="bi bi-check-circle-fill text-success"></i></td><td class="  text-center"><i class="bi bi-circle text-muted"></i></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-center"><span class="text-muted">-</span></td><td class="  text-nowrap"><a href="https://imo.crearpslglobal.com/participantessede/perfil/17309" target="_blank" class="btn btn-sm btn-outline-success" title="Hoja de Vida (imprimible)"><i class="bi bi-file-earmark-person"></i></a> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirDatos(17309)" title="Actualizar Datos"><i class="bi bi-pencil-square"></i></button> <button type="button" class="btn btn-sm btn-outline-warning" onclick="abrirCupo(17309,&quot;74925734&quot;,&quot;JHON ANDERSON&quot;,&quot;ACOSTA PURIZACA&quot;,&quot;983429718&quot;,&quot;LIMA&quot;,&quot;Complast_eltriunfo@hotmail.com&quot;,107,null)" title="Cambio de Cupo (forzado — ya tiene Capítulo 1)"><i class="bi bi-arrow-repeat"></i></button> <button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirSede(17309,&quot;JHON ANDERSON ACOSTA PURIZACA&quot;)" title="Cambiar de Sede"><i class="bi bi-signpost-2"></i></button> <button type="button" class="btn btn-sm btn-outline-info" onclick="abrirHistorial(17309,&quot;JHON ANDERSON ACOSTA PURIZACA&quot;)" title="Historial de Cambios"><i class="bi bi-clock-history"></i></button> <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarParticipante(17309,&quot;JHON ANDERSON ACOSTA PURIZACA&quot;,&quot;74925734&quot;)" title="Eliminar definitivamente (borra también facturas, asistencia, certificados, etc.)"><i class="bi bi-trash"></i></button></td></tr></tbody>
+      </table><div id="tblParticipantesSede_processing" class="dataTables_processing card" role="status" style="display: none;">Cargando...<div><div></div><div></div><div></div><div></div></div></div></div></div><div class="row"><div class="col-sm-12 col-md-5"><div class="dataTables_info" id="tblParticipantesSede_info" role="status" aria-live="polite">Mostrando 1 a 25 de 3.704 registros</div></div><div class="col-sm-12 col-md-7"><div class="dataTables_paginate paging_simple_numbers" id="tblParticipantesSede_paginate"><ul class="pagination"><li class="paginate_button page-item previous disabled" id="tblParticipantesSede_previous"><a aria-controls="tblParticipantesSede" aria-disabled="true" role="link" data-dt-idx="previous" tabindex="-1" class="page-link">Anterior</a></li><li class="paginate_button page-item active"><a href="#" aria-controls="tblParticipantesSede" role="link" aria-current="page" data-dt-idx="0" tabindex="0" class="page-link">1</a></li><li class="paginate_button page-item "><a href="#" aria-controls="tblParticipantesSede" role="link" data-dt-idx="1" tabindex="0" class="page-link">2</a></li><li class="paginate_button page-item "><a href="#" aria-controls="tblParticipantesSede" role="link" data-dt-idx="2" tabindex="0" class="page-link">3</a></li><li class="paginate_button page-item "><a href="#" aria-controls="tblParticipantesSede" role="link" data-dt-idx="3" tabindex="0" class="page-link">4</a></li><li class="paginate_button page-item "><a href="#" aria-controls="tblParticipantesSede" role="link" data-dt-idx="4" tabindex="0" class="page-link">5</a></li><li class="paginate_button page-item disabled" id="tblParticipantesSede_ellipsis"><a aria-controls="tblParticipantesSede" aria-disabled="true" role="link" data-dt-idx="ellipsis" tabindex="-1" class="page-link">…</a></li><li class="paginate_button page-item "><a href="#" aria-controls="tblParticipantesSede" role="link" data-dt-idx="148" tabindex="0" class="page-link">149</a></li><li class="paginate_button page-item next" id="tblParticipantesSede_next"><a href="#" aria-controls="tblParticipantesSede" role="link" data-dt-idx="next" tabindex="0" class="page-link">Siguiente</a></li></ul></div></div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Actualizar Datos -->
+<div class="modal fade" id="modalDatos" tabindex="-1">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header py-2">
+        <h6 class="modal-title"><i class="bi bi-pencil-square me-1"></i>Actualizar Datos</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" style="max-height:75vh; overflow-y:auto">
+        <h6 class="text-primary fw-bold border-bottom pb-1 mb-2">Datos Personales</h6>
+        <div class="row">
+          <div class="col-md-3 mb-2">
+            <label class="form-label small mb-1">Identificación</label>
+            <input type="text" id="datosIdentificacion" class="form-control form-control-sm">
+          </div>
+          <div class="col-md-3 mb-2">
+            <label class="form-label small mb-1">Nombres</label>
+            <input type="text" id="datosNombres" class="form-control form-control-sm">
+          </div>
+          <div class="col-md-3 mb-2">
+            <label class="form-label small mb-1">Apellidos</label>
+            <input type="text" id="datosApellidos" class="form-control form-control-sm">
+          </div>
+          <div class="col-md-3 mb-2">
+            <label class="form-label small mb-1">Nombre Preferido</label>
+            <input type="text" id="datosNombrePreferido" class="form-control form-control-sm">
+          </div>
+          <div class="col-md-3 mb-2">
+            <label class="form-label small mb-1">Género</label>
+            <select id="datosGenero" class="form-select form-select-sm">
+              <option value="">--</option>
+              <option value="MASCULINO">Masculino</option>
+              <option value="FEMENINO">Femenino</option>
+            </select>
+          </div>
+          <div class="col-md-3 mb-2">
+            <label class="form-label small mb-1">Fecha Nacimiento</label>
+            <input type="date" id="datosFechaNacimiento" class="form-control form-control-sm">
+          </div>
+          <div class="col-md-3 mb-2">
+            <label class="form-label small mb-1">Edad</label>
+            <input type="number" id="datosEdad" class="form-control form-control-sm" min="0">
+          </div>
+          <div class="col-md-3 mb-2">
+            <label class="form-label small mb-1">Teléfono</label>
+            <input type="text" id="datosTelefono" class="form-control form-control-sm">
+          </div>
+          <div class="col-md-3 mb-2">
+            <label class="form-label small mb-1">Correo Electrónico</label>
+            <input type="email" id="datosEmail" class="form-control form-control-sm">
+          </div>
+          <div class="col-md-6 mb-2">
+            <label class="form-label small mb-1">Dirección</label>
+            <input type="text" id="datosDireccion" class="form-control form-control-sm">
+          </div>
+          <div class="col-md-3 mb-2">
+            <label class="form-label small mb-1">Antecedentes Psiquiátricos</label>
+            <input type="text" id="datosAntecedentes" class="form-control form-control-sm">
+          </div>
+          <div class="col-md-3 mb-2">
+            <label class="form-label small mb-1">Medicamentos / Conducta</label>
+            <input type="text" id="datosMedicamentos" class="form-control form-control-sm">
+          </div>
+        </div>
+
+        <h6 class="text-primary fw-bold border-bottom pb-1 mb-2 mt-2">Quién lo invitó</h6>
+        <div class="row">
+          <div class="col-md-6 mb-2">
+            <input type="hidden" id="datosInvitadorId">
+            <div id="datosCardInvitador" class="d-none mb-1">
+              <div class="d-flex align-items-center gap-2 border rounded p-2 bg-light small">
+                <i class="bi bi-person-heart text-success"></i>
+                <div class="flex-grow-1">
+                  <span id="datosInvNombre" class="fw-semibold"></span>
+                  <span id="datosInvExtra" class="text-muted"></span>
+                </div>
+                <button type="button" class="btn btn-xs btn-outline-danger" onclick="quitarInvitadorDatos()" title="Quitar"><i class="bi bi-x-lg"></i></button>
+              </div>
+            </div>
+            <div id="datosSinInvitador" class="small text-muted mb-1">Sin invitador registrado.</div>
+            <input type="text" id="datosBuscarInv" class="form-control form-control-sm" placeholder="Buscar por nombre o identificación..." oninput="buscarInvDatos(this.value)" autocomplete="off">
+            <div id="datosResInv" style="max-height:140px;overflow-y:auto"></div>
+          </div>
+        </div>
+
+        <h6 class="text-primary fw-bold border-bottom pb-1 mb-2 mt-2">Asignaciones</h6>
+        <div class="row">
+          <div class="col-md-3 mb-2">
+            <label class="form-label small mb-1">Equipo</label>
+            <select id="datosEquipo" class="form-select form-select-sm">
+              <option value="">Sin equipo</option>
+                            <option value="37">EQUIPO 1000 (LIMA CICLO 1)</option>
+                            <option value="10">EQUIPO 14 (LIMA CICLO 1)</option>
+                            <option value="11">EQUIPO 15 (LIMA CICLO 1)</option>
+                            <option value="12">EQUIPO 16 (LIMA CICLO 1)</option>
+                            <option value="21">EQUIPO 17 (LIMA CICLO 1)</option>
+                            <option value="30">EQUIPO 18 (LIMA CICLO 1)</option>
+                            <option value="42">EQUIPO 19 (LIMA CICLO 1)</option>
+                            <option value="50">EQUIPO 20 (LIMA CICLO 1)</option>
+                            <option value="58">EQUIPO 21 (LIMA CICLO 1)</option>
+                            <option value="65">EQUIPO 22 (LIMA CICLO 1)</option>
+                            <option value="75">EQUIPO 23 (LIMA CICLO 1)</option>
+                            <option value="85">EQUIPO 24 (LIMA CICLO 1)</option>
+                            <option value="92">EQUIPO 25 (LIMA CICLO 1)</option>
+                            <option value="101">EQUIPO 26 (LIMA CICLO 1)</option>
+                            <option value="107">EQUIPO 27 (LIMA CICLO 1)</option>
+                            <option value="111">EQUIPO 28 (LIMA CICLO 1)</option>
+                            <option value="127">EQUIPO 29 (LIMA CICLO 1)</option>
+                            <option value="134">EQUIPO 30 (LIMA CICLO 1)</option>
+                            <option value="141">EQUIPO 31 (LIMA CICLO 1)</option>
+                          </select>
+          </div>
+          <div class="col-md-3 mb-2">
+            <label class="form-label small mb-1">Tipo de Persona</label>
+            <select id="datosTipoPersona" class="form-select form-select-sm">
+              <option value="participante">Participante</option>
+              <option value="manager">Manager</option>
+            </select>
+          </div>
+          <div class="col-md-3 mb-2">
+            <label class="form-label small mb-1">Coordinador</label>
+            <select id="datosCoordinador" class="form-select form-select-sm">
+              <option value="">Sin coordinador</option>
+                            <option value="638">DIANA</option>
+                            <option value="645">JOYCE</option>
+                            <option value="634">LEYLA</option>
+                            <option value="607">LINID</option>
+                          </select>
+          </div>
+          <div class="col-md-3 mb-2">
+            <label class="form-label small mb-1">Fecha Capítulo 1</label>
+            <input type="date" id="datosFechaC1" class="form-control form-control-sm">
+          </div>
+          <div class="col-md-3 mb-2">
+            <label class="form-label small mb-1">Asistencia</label>
+            <select id="datosAsistencia" class="form-select form-select-sm">
+              <option value="pendiente">Pendiente</option>
+              <option value="confirmado">Confirmado</option>
+            </select>
+          </div>
+          <div class="col-md-3 mb-2">
+            <label class="form-label small mb-1">Tipo de Facturación</label>
+            <select id="datosTipoFacturacion" class="form-select form-select-sm">
+              <option value="participante">Participante</option>
+              <option value="imo">IMO</option>
+              <option value="otro">Otro</option>
+            </select>
+          </div>
+        </div>
+
+        <h6 class="text-primary fw-bold border-bottom pb-1 mb-2 mt-2">Estado de Etapas</h6>
+        <div class="row">
+          <div class="col-md-auto"><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="datosCapitulo1"><label class="form-check-label small" for="datosCapitulo1">Capítulo 1</label></div></div>
+          <div class="col-md-auto"><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="datosCapitulo2"><label class="form-check-label small" for="datosCapitulo2">Capítulo 2</label></div></div>
+          <div class="col-md-auto"><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="datosMaestria"><label class="form-check-label small" for="datosMaestria">Maestría</label></div></div>
+          <div class="col-md-auto"><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="datosSaltoCuantico"><label class="form-check-label small" for="datosSaltoCuantico">Salto Cuántico</label></div></div>
+          <div class="col-md-auto"><div class="form-check form-switch"><input class="form-check-input" type="checkbox" id="datosAceptaTerminos"><label class="form-check-label small" for="datosAceptaTerminos">Acepta Términos</label></div></div>
+        </div>
+      </div>
+      <div class="modal-footer py-2">
+        <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-sm btn-primary" onclick="guardarDatos()"><i class="bi bi-check-lg me-1"></i>Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Cambio de Cupo -->
+<div class="modal fade" id="modalCupo" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header py-2">
+        <h6 class="modal-title"><i class="bi bi-arrow-repeat me-1"></i>Cambio de Cupo</h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-info py-2 small">
+          <i class="bi bi-info-circle me-1"></i>Cupo actual: <strong id="cupoOriginalNombre"></strong> — <span id="cupoOriginalIdentificacion"></span>.
+          Sus datos <strong>no se modifican</strong>; solo se registra qué identificación tomó el cupo.
+        </div>
+
+        <div class="mb-2">
+          <label class="form-label small mb-1">Equipo</label>
+          <select id="cupoEquipo" class="form-select form-select-sm">
+                        <option value="37">EQUIPO 1000 (LIMA CICLO 1)</option>
+                        <option value="10">EQUIPO 14 (LIMA CICLO 1)</option>
+                        <option value="11">EQUIPO 15 (LIMA CICLO 1)</option>
+                        <option value="12">EQUIPO 16 (LIMA CICLO 1)</option>
+                        <option value="21">EQUIPO 17 (LIMA CICLO 1)</option>
+                        <option value="30">EQUIPO 18 (LIMA CICLO 1)</option>
+                        <option value="42">EQUIPO 19 (LIMA CICLO 1)</option>
+                        <option value="50">EQUIPO 20 (LIMA CICLO 1)</option>
+                        <option value="58">EQUIPO 21 (LIMA CICLO 1)</option>
+                        <option value="65">EQUIPO 22 (LIMA CICLO 1)</option>
+                        <option value="75">EQUIPO 23 (LIMA CICLO 1)</option>
+                        <option value="85">EQUIPO 24 (LIMA CICLO 1)</option>
+                        <option value="92">EQUIPO 25 (LIMA CICLO 1)</option>
+                        <option value="101">EQUIPO 26 (LIMA CICLO 1)</option>
+                        <option value="107">EQUIPO 27 (LIMA CICLO 1)</option>
+                        <option value="111">EQUIPO 28 (LIMA CICLO 1)</option>
+                        <option value="127">EQUIPO 29 (LIMA CICLO 1)</option>
+                        <option value="134">EQUIPO 30 (LIMA CICLO 1)</option>
+                        <option value="141">EQUIPO 31 (LIMA CICLO 1)</option>
+                      </select>
+        </div>
+
+        <div class="mb-2">
+          <label class="form-label small mb-1">Identificación de la persona nueva <span class="text-danger">*</span></label>
+          <div class="input-group input-group-sm">
+            <input type="text" id="cupoIdentificacion" class="form-control form-control-sm" oninput="cupoResetBusqueda()">
+            <button type="button" class="btn btn-outline-secondary" onclick="buscarCupoIdentificacion()"><i class="bi bi-search"></i> Buscar</button>
+          </div>
+          <div id="cupoBuscarMsg" class="small mt-1"></div>
+        </div>
+
+        <div id="cupoCamposNuevo" class="d-none">
+          <div class="mb-2">
+            <label class="form-label small mb-1">Tipo ID</label>
+            <select id="cupoTipoId" class="form-select form-select-sm">
+              <option value="">--</option>
+                            <option value="1">Cédula</option>
+                            <option value="6">Cédula de Extranjería</option>
+                            <option value="9">Cédula de Extranjería</option>
+                            <option value="4">DNI</option>
+                            <option value="7">INE/CURP</option>
+                            <option value="5">NIT</option>
+                            <option value="2">Pasaporte</option>
+                            <option value="3">RUC</option>
+                          </select>
+          </div>
+          <div class="row">
+            <div class="col-6 mb-2">
+              <label class="form-label small mb-1">Nombres <span class="text-danger">*</span></label>
+              <input type="text" id="cupoNombres" class="form-control form-control-sm">
+            </div>
+            <div class="col-6 mb-2">
+              <label class="form-label small mb-1">Apellidos <span class="text-danger">*</span></label>
+              <input type="text" id="cupoApellidos" class="form-control form-control-sm">
+            </div>
+          </div>
+          <div class="mb-2">
+            <label class="form-label small mb-1">Teléfono</label>
+            <input type="text" id="cupoTelefono" class="form-control form-control-sm">
+          </div>
+          <div class="mb-2">
+            <label class="form-label small mb-1">Dirección</label>
+            <input type="text" id="cupoDireccion" class="form-control form-control-sm">
+          </div>
+          <div class="mb-2">
+            <label class="form-label small mb-1">Correo Electrónico</label>
+            <input type="email" id="cupoEmail" class="form-control form-control-sm">
+          </div>
+        </div>
+
+        <div class="mb-2">
+          <label class="form-label small mb-1">PDF del cambio de cupo (opcional)</label>
+          <input type="file" id="cupoPdf" class="form-control form-control-sm" accept="application/pdf">
+        </div>
+      </div>
+      <div class="modal-footer py-2">
+        <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-sm btn-warning" id="cupoBtnGuardar" onclick="guardarCupo()" disabled=""><i class="bi bi-check-lg me-1"></i>Registrar Cambio de Cupo</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Cambiar de Sede -->
+<div class="modal fade" id="modalSede" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header py-2">
+        <h6 class="modal-title"><i class="bi bi-signpost-2 me-1"></i>Cambiar de Sede — <span id="sedeNombreParticipante"></span></h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-2">
+          <label class="form-label small mb-1">Sede destino</label>
+          <select id="sedeDestino" class="form-select form-select-sm" onchange="cargarEquiposDestino()">
+            <option value="">Selecciona una sede…</option>
+                        <option value="5">Cuenca Ciclo 1</option>
+                        <option value="3">GUAYAQUIL CICLO 1</option>
+                        <option value="7">LIMA CICLO 1</option>
+                        <option value="13">MEDELLIN</option>
+                        <option value="11">MÉXICO CICLO 1</option>
+                        <option value="2">QUITO CICLO 2</option>
+                      </select>
+        </div>
+        <div class="mb-2">
+          <label class="form-label small mb-1">Equipo destino</label>
+          <select id="equipoDestino" class="form-select form-select-sm" disabled="">
+            <option value="">Elige primero la sede…</option>
+          </select>
+          <div class="form-text">Solo se muestran equipos que aún no han tenido su Capítulo 1.</div>
+        </div>
+      </div>
+      <div class="modal-footer py-2">
+        <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-sm btn-primary" onclick="guardarSede()"><i class="bi bi-check-lg me-1"></i>Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Historial de Cambios -->
+<div class="modal fade" id="modalHistorial" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header py-2">
+        <h6 class="modal-title"><i class="bi bi-clock-history me-1"></i>Historial de Cambios — <span id="historialNombre"></span></h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-0">
+        <div class="table-responsive">
+          <table class="table table-sm mb-0">
+            <thead><tr><th>Fecha</th><th>Usuario</th><th>Acción</th><th>Detalle</th></tr></thead>
+            <tbody id="historialBody">
+              <tr><td colspan="4" class="text-center text-muted py-3">Cargando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer py-2">
+        <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Distribuir C1 Pendientes -->
+<div class="modal fade" id="modalDistribuirC1" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+      <div class="modal-header py-2" style="background:#1a3336">
+        <h6 class="modal-title text-white fw-bold">
+          <i class="bi bi-diagram-3 me-2"></i>Distribuir Pendientes de Capítulo 1
+        </h6>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body p-4">
+        <div class="row g-4">
+          <div class="col-md-6">
+            <p class="fw-semibold mb-2">Tipo de distribución</p>
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="radio" name="modoDistC1" id="modoAutoC1" value="auto" checked="" onchange="toggleModoDistC1()">
+              <label class="form-check-label" for="modoAutoC1">
+                <strong>Automática equitativa</strong>
+                <div class="text-muted small">Reparte en partes iguales entre los coordinadores marcados</div>
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="modoDistC1" id="modoUnoC1" value="uno" onchange="toggleModoDistC1()">
+              <label class="form-check-label" for="modoUnoC1">
+                <strong>Asignar todos a uno</strong>
+                <div class="text-muted small">Todos los participantes van al mismo coordinador</div>
+              </label>
+            </div>
+            <hr>
+            <div id="panelSoloSinC1" class="form-check mb-2">
+              <input class="form-check-input" type="checkbox" id="soloSinAsignarC1" checked="">
+              <label class="form-check-label" for="soloSinAsignarC1">
+                Solo participantes <strong>sin coordinador asignado</strong>
+                <span class="text-muted small">(desmarcar para reasignar todos)</span>
+              </label>
+            </div>
+            <div id="notaAutoEquitativoC1" class="alert alert-light border small py-2 mb-2" style="display:none">
+              <i class="bi bi-info-circle me-1"></i>En modo automático se rebalancea <strong>todo</strong> el pool (incluye participantes ya asignados) entre los coordinadores marcados, para que el total quede parejo.
+            </div>
+            <div id="panelSelectCoordC1" style="display:none">
+              <label class="form-label fw-semibold">Coordinador</label>
+              <select id="selCoordMasivoC1" class="form-select">
+                <option value="">Seleccione coordinador...</option>
+                                <option value="594">JOSE LUIS — LIMA CICLO 1</option>
+                                <option value="638">DIANA — LIMA CICLO 1</option>
+                                <option value="645">JOYCE — LIMA CICLO 1</option>
+                                <option value="634">LEYLA — LIMA CICLO 1</option>
+                                <option value="607">LINID — LIMA CICLO 1</option>
+                              </select>
+            </div>
+          </div>
+
+          <div class="col-md-6" id="panelCoordsAutoC1">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <label class="form-label fw-semibold mb-0">Coordinadores incluidos</label>
+              <div>
+                <button type="button" class="btn btn-xs btn-outline-secondary py-0 px-2" onclick="marcarTodosC1('.chk-coord-c1', true)">Todos</button>
+                <button type="button" class="btn btn-xs btn-outline-secondary py-0 px-2" onclick="marcarTodosC1('.chk-coord-c1', false)">Ninguno</button>
+              </div>
+            </div>
+            <div class="border rounded p-2" style="max-height:160px;overflow-y:auto">
+                            <div class="form-check d-flex align-items-center justify-content-between">
+                <div>
+                  <input class="form-check-input chk-coord-c1" type="checkbox" value="594" id="chkCoordC1594" checked="">
+                  <label class="form-check-label" for="chkCoordC1594">JOSE LUIS</label>
+                </div>
+                <span class="badge bg-secondary" style="font-size:.6rem">LIMA CICLO 1 · Subdirector</span>
+              </div>
+                            <div class="form-check d-flex align-items-center justify-content-between">
+                <div>
+                  <input class="form-check-input chk-coord-c1" type="checkbox" value="638" id="chkCoordC1638" checked="">
+                  <label class="form-check-label" for="chkCoordC1638">DIANA</label>
+                </div>
+                <span class="badge bg-secondary" style="font-size:.6rem">LIMA CICLO 1</span>
+              </div>
+                            <div class="form-check d-flex align-items-center justify-content-between">
+                <div>
+                  <input class="form-check-input chk-coord-c1" type="checkbox" value="645" id="chkCoordC1645" checked="">
+                  <label class="form-check-label" for="chkCoordC1645">JOYCE</label>
+                </div>
+                <span class="badge bg-secondary" style="font-size:.6rem">LIMA CICLO 1</span>
+              </div>
+                            <div class="form-check d-flex align-items-center justify-content-between">
+                <div>
+                  <input class="form-check-input chk-coord-c1" type="checkbox" value="634" id="chkCoordC1634" checked="">
+                  <label class="form-check-label" for="chkCoordC1634">LEYLA</label>
+                </div>
+                <span class="badge bg-secondary" style="font-size:.6rem">LIMA CICLO 1</span>
+              </div>
+                            <div class="form-check d-flex align-items-center justify-content-between">
+                <div>
+                  <input class="form-check-input chk-coord-c1" type="checkbox" value="607" id="chkCoordC1607" checked="">
+                  <label class="form-check-label" for="chkCoordC1607">LINID</label>
+                </div>
+                <span class="badge bg-secondary" style="font-size:.6rem">LIMA CICLO 1</span>
+              </div>
+                                        </div>
+          </div>
+        </div>
+
+        <hr>
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <label class="form-label fw-semibold mb-0">Equipos incluidos en la bolsa a repartir</label>
+          <div>
+            <button type="button" class="btn btn-xs btn-outline-secondary py-0 px-2" onclick="marcarTodosC1('.chk-equipo-c1', true)">Todos</button>
+            <button type="button" class="btn btn-xs btn-outline-secondary py-0 px-2" onclick="marcarTodosC1('.chk-equipo-c1', false)">Ninguno</button>
+          </div>
+        </div>
+        <div class="border rounded p-2" style="max-height:180px;overflow-y:auto">
+                    <div class="form-check d-flex align-items-center justify-content-between">
+            <div>
+              <input class="form-check-input chk-equipo-c1" type="checkbox" value="37" id="chkEquipoC137" checked="">
+              <label class="form-check-label" for="chkEquipoC137">EQUIPO 1000 <span class="text-muted small">(LIMA CICLO 1)</span></label>
+            </div>
+            <span class="badge bg-light text-muted" style="font-size:.65rem">0 pend.</span>
+          </div>
+                    <div class="form-check d-flex align-items-center justify-content-between">
+            <div>
+              <input class="form-check-input chk-equipo-c1" type="checkbox" value="10" id="chkEquipoC110" checked="">
+              <label class="form-check-label" for="chkEquipoC110">EQUIPO 14 <span class="text-muted small">(LIMA CICLO 1)</span></label>
+            </div>
+            <span class="badge bg-warning text-dark" style="font-size:.65rem">22 pend.</span>
+          </div>
+                    <div class="form-check d-flex align-items-center justify-content-between">
+            <div>
+              <input class="form-check-input chk-equipo-c1" type="checkbox" value="11" id="chkEquipoC111" checked="">
+              <label class="form-check-label" for="chkEquipoC111">EQUIPO 15 <span class="text-muted small">(LIMA CICLO 1)</span></label>
+            </div>
+            <span class="badge bg-light text-muted" style="font-size:.65rem">0 pend.</span>
+          </div>
+                    <div class="form-check d-flex align-items-center justify-content-between">
+            <div>
+              <input class="form-check-input chk-equipo-c1" type="checkbox" value="12" id="chkEquipoC112" checked="">
+              <label class="form-check-label" for="chkEquipoC112">EQUIPO 16 <span class="text-muted small">(LIMA CICLO 1)</span></label>
+            </div>
+            <span class="badge bg-light text-muted" style="font-size:.65rem">0 pend.</span>
+          </div>
+                    <div class="form-check d-flex align-items-center justify-content-between">
+            <div>
+              <input class="form-check-input chk-equipo-c1" type="checkbox" value="21" id="chkEquipoC121" checked="">
+              <label class="form-check-label" for="chkEquipoC121">EQUIPO 17 <span class="text-muted small">(LIMA CICLO 1)</span></label>
+            </div>
+            <span class="badge bg-warning text-dark" style="font-size:.65rem">55 pend.</span>
+          </div>
+                    <div class="form-check d-flex align-items-center justify-content-between">
+            <div>
+              <input class="form-check-input chk-equipo-c1" type="checkbox" value="30" id="chkEquipoC130" checked="">
+              <label class="form-check-label" for="chkEquipoC130">EQUIPO 18 <span class="text-muted small">(LIMA CICLO 1)</span></label>
+            </div>
+            <span class="badge bg-warning text-dark" style="font-size:.65rem">44 pend.</span>
+          </div>
+                    <div class="form-check d-flex align-items-center justify-content-between">
+            <div>
+              <input class="form-check-input chk-equipo-c1" type="checkbox" value="42" id="chkEquipoC142" checked="">
+              <label class="form-check-label" for="chkEquipoC142">EQUIPO 19 <span class="text-muted small">(LIMA CICLO 1)</span></label>
+            </div>
+            <span class="badge bg-warning text-dark" style="font-size:.65rem">42 pend.</span>
+          </div>
+                    <div class="form-check d-flex align-items-center justify-content-between">
+            <div>
+              <input class="form-check-input chk-equipo-c1" type="checkbox" value="50" id="chkEquipoC150" checked="">
+              <label class="form-check-label" for="chkEquipoC150">EQUIPO 20 <span class="text-muted small">(LIMA CICLO 1)</span></label>
+            </div>
+            <span class="badge bg-warning text-dark" style="font-size:.65rem">51 pend.</span>
+          </div>
+                    <div class="form-check d-flex align-items-center justify-content-between">
+            <div>
+              <input class="form-check-input chk-equipo-c1" type="checkbox" value="58" id="chkEquipoC158" checked="">
+              <label class="form-check-label" for="chkEquipoC158">EQUIPO 21 <span class="text-muted small">(LIMA CICLO 1)</span></label>
+            </div>
+            <span class="badge bg-warning text-dark" style="font-size:.65rem">55 pend.</span>
+          </div>
+                    <div class="form-check d-flex align-items-center justify-content-between">
+            <div>
+              <input class="form-check-input chk-equipo-c1" type="checkbox" value="65" id="chkEquipoC165" checked="">
+              <label class="form-check-label" for="chkEquipoC165">EQUIPO 22 <span class="text-muted small">(LIMA CICLO 1)</span></label>
+            </div>
+            <span class="badge bg-warning text-dark" style="font-size:.65rem">87 pend.</span>
+          </div>
+                    <div class="form-check d-flex align-items-center justify-content-between">
+            <div>
+              <input class="form-check-input chk-equipo-c1" type="checkbox" value="75" id="chkEquipoC175" checked="">
+              <label class="form-check-label" for="chkEquipoC175">EQUIPO 23 <span class="text-muted small">(LIMA CICLO 1)</span></label>
+            </div>
+            <span class="badge bg-warning text-dark" style="font-size:.65rem">80 pend.</span>
+          </div>
+                    <div class="form-check d-flex align-items-center justify-content-between">
+            <div>
+              <input class="form-check-input chk-equipo-c1" type="checkbox" value="85" id="chkEquipoC185" checked="">
+              <label class="form-check-label" for="chkEquipoC185">EQUIPO 24 <span class="text-muted small">(LIMA CICLO 1)</span></label>
+            </div>
+            <span class="badge bg-warning text-dark" style="font-size:.65rem">97 pend.</span>
+          </div>
+                    <div class="form-check d-flex align-items-center justify-content-between">
+            <div>
+              <input class="form-check-input chk-equipo-c1" type="checkbox" value="92" id="chkEquipoC192" checked="">
+              <label class="form-check-label" for="chkEquipoC192">EQUIPO 25 <span class="text-muted small">(LIMA CICLO 1)</span></label>
+            </div>
+            <span class="badge bg-warning text-dark" style="font-size:.65rem">143 pend.</span>
+          </div>
+                    <div class="form-check d-flex align-items-center justify-content-between">
+            <div>
+              <input class="form-check-input chk-equipo-c1" type="checkbox" value="101" id="chkEquipoC1101" checked="">
+              <label class="form-check-label" for="chkEquipoC1101">EQUIPO 26 <span class="text-muted small">(LIMA CICLO 1)</span></label>
+            </div>
+            <span class="badge bg-warning text-dark" style="font-size:.65rem">144 pend.</span>
+          </div>
+                    <div class="form-check d-flex align-items-center justify-content-between">
+            <div>
+              <input class="form-check-input chk-equipo-c1" type="checkbox" value="107" id="chkEquipoC1107" checked="">
+              <label class="form-check-label" for="chkEquipoC1107">EQUIPO 27 <span class="text-muted small">(LIMA CICLO 1)</span></label>
+            </div>
+            <span class="badge bg-warning text-dark" style="font-size:.65rem">121 pend.</span>
+          </div>
+                    <div class="form-check d-flex align-items-center justify-content-between">
+            <div>
+              <input class="form-check-input chk-equipo-c1" type="checkbox" value="111" id="chkEquipoC1111" checked="">
+              <label class="form-check-label" for="chkEquipoC1111">EQUIPO 28 <span class="text-muted small">(LIMA CICLO 1)</span></label>
+            </div>
+            <span class="badge bg-warning text-dark" style="font-size:.65rem">62 pend.</span>
+          </div>
+                    <div class="form-check d-flex align-items-center justify-content-between">
+            <div>
+              <input class="form-check-input chk-equipo-c1" type="checkbox" value="127" id="chkEquipoC1127" checked="">
+              <label class="form-check-label" for="chkEquipoC1127">EQUIPO 29 <span class="text-muted small">(LIMA CICLO 1)</span></label>
+            </div>
+            <span class="badge bg-warning text-dark" style="font-size:.65rem">82 pend.</span>
+          </div>
+                    <div class="form-check d-flex align-items-center justify-content-between">
+            <div>
+              <input class="form-check-input chk-equipo-c1" type="checkbox" value="134" id="chkEquipoC1134" checked="">
+              <label class="form-check-label" for="chkEquipoC1134">EQUIPO 30 <span class="text-muted small">(LIMA CICLO 1)</span></label>
+            </div>
+            <span class="badge bg-warning text-dark" style="font-size:.65rem">63 pend.</span>
+          </div>
+                    <div class="form-check d-flex align-items-center justify-content-between">
+            <div>
+              <input class="form-check-input chk-equipo-c1" type="checkbox" value="141" id="chkEquipoC1141" checked="">
+              <label class="form-check-label" for="chkEquipoC1141">EQUIPO 31 <span class="text-muted small">(LIMA CICLO 1)</span></label>
+            </div>
+            <span class="badge bg-light text-muted" style="font-size:.65rem">0 pend.</span>
+          </div>
+                            </div>
+
+        <button class="btn btn-primary mt-3" onclick="aplicarMasivoC1()" id="btnAplicarMasivoC1">
+          <i class="bi bi-lightning-charge-fill me-1"></i>Aplicar distribución
+        </button>
+        <div class="alert alert-warning mt-3 mb-0 py-2 small d-none" id="alertaMasivoC1"></div>
+
+        <div class="border-top bg-light p-3 mt-4 mx-n4 mb-n4">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="fw-semibold text-muted small text-uppercase">
+              <i class="bi bi-bar-chart-fill me-1"></i>Resumen de distribución
+            </span>
+            <button class="btn btn-xs btn-outline-secondary py-0 px-2 btn-sm" onclick="cargarResumenC1()" title="Actualizar">
+              <i class="bi bi-arrow-clockwise"></i>
+            </button>
+          </div>
+          <div id="resumenModalC1">
+            <div class="text-center text-muted py-2 small">Cargando...</div>
+          </div>
+        </div>
+
+        <div id="detalleMasivoC1" class="mt-3"></div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var idDatos = null, idCupo = null;
+
+// ── Tabla de participantes: paginación server-side (ver ParticipantesSedeController::datosTabla()) ──
+var URL_BASE_PS  = 'https://imo.crearpslglobal.com/';
+var ID_SEDE_PS   = 0;
+var ID_EQUIPO_PS = 0;
+var ASISTIO_C1_PS = "";
+var ASISTIO_C2_PS = "";
+// Subdirector y Super Admin pueden forzar el Cambio de Cupo aunque el participante ya tenga
+// Capítulo 1 — el resto de roles sigue con la regla normal (solo si aún no lo tiene).
+var PUEDE_FORZAR_CUPO_PS = true;
+var PUEDE_ELIMINAR_PS = true;
+
+function escPS(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) {
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+}); }
+
+// El resto de scripts de esta vista (llamados desde onclick) pueden definirse ya mismo — solo
+// el init de DataTables necesita esperar a DOMContentLoaded: $content se imprime ANTES que los
+// <script src="jquery">/<script src="datatables"> del layout (ver app/Views/layouts/main.php),
+// así que un $(function(){...}) ejecutado aquí directo encuentra "$" todavía sin definir. Con
+// DOMContentLoaded alcanza (sin esperar "load" de imágenes) porque, al ser scripts sin defer/async,
+// el navegador ya terminó de descargar y ejecutar jQuery/DataTables antes de llegar a ese evento.
+document.addEventListener('DOMContentLoaded', function() {
+  var tabla = $('#tblParticipantesSede').DataTable({
+    serverSide: true,
+    processing: true,
+    ordering: false,
+    pageLength: 25,
+    lengthMenu: [10, 25, 50, 100],
+    language: {url: 'https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json', processing: 'Cargando...'},
+    ajax: {
+      url: URL_BASE_PS + 'participantessede/datosTabla',
+      data: function(d) {
+        d.id_sede    = ID_SEDE_PS;
+        d.id_equipo  = ID_EQUIPO_PS;
+        d.asistio_c1 = ASISTIO_C1_PS;
+        d.asistio_c2 = ASISTIO_C2_PS;
+      },
+      dataSrc: function(json) {
+        document.getElementById('contTotalPS').textContent = json.recordsFiltered;
+        return json.data;
+      }
+    },
+    columns: [
+      {data: 'identificacion', render: function(v){ return escPS(v || '-'); }},
+      {data: 'nombres', render: function(v){ return escPS(v); }},
+      {data: 'apellidos', render: function(v){ return escPS(v); }},
+      {data: 'telefono', render: function(v){ return escPS(v || '-'); }},
+      {data: 'equipo_origen', render: function(v){ return '<span class="text-muted">' + escPS(v || '-') + '</span>'; }},
+      {data: 'equipo_participante', render: function(v){ return escPS(v || '-'); }},
+      {data: null, render: function(d){ return d.id_invitador ? escPS(d.nombre_imo) : '<span class="text-muted">Sin invitador</span>'; }},
+      {data: 'telefono_imo', render: function(v){ return escPS(v || '-'); }},
+      {data: 'equipo_imo', render: function(v){ return escPS(v || '-'); }},
+      {data: 'asistio_c1', className: 'text-center', render: function(v){ return Number(v) ? '<i class="bi bi-check-circle-fill text-success"></i>' : '<i class="bi bi-circle text-muted"></i>'; }},
+      {data: 'asistio_c2', className: 'text-center', render: function(v){ return Number(v) ? '<i class="bi bi-check-circle-fill text-success"></i>' : '<i class="bi bi-circle text-muted"></i>'; }},
+      {data: 'fin_de_semana', className: 'text-center', render: function(v){ return v ? '<span class="badge bg-primary">' + escPS(v) + '</span>' : '<span class="text-muted">-</span>'; }},
+      {data: 'identificacioncambio', className: 'text-center', render: function(v, type, d) {
+        if (!v) return '<span class="text-muted">-</span>';
+        var out = escPS(v);
+        if (d.pdf_cambio_cupo) {
+          out += ' <a href="' + URL_BASE_PS + escPS(d.pdf_cambio_cupo) + '" target="_blank" title="Ver PDF del cambio de cupo"><i class="bi bi-file-earmark-pdf text-danger"></i></a>';
+        }
+        return out;
+      }},
+      {data: null, orderable: false, className: 'text-nowrap', render: function(d) {
+        var id = parseInt(d.id, 10);
+        var nombreCompleto = (d.nombres || '') + ' ' + (d.apellidos || '');
+        var html = '<a href="' + URL_BASE_PS + 'participantessede/perfil/' + id + '" target="_blank" class="btn btn-sm btn-outline-success" title="Hoja de Vida (imprimible)"><i class="bi bi-file-earmark-person"></i></a> '
+          + '<button type="button" class="btn btn-sm btn-outline-primary" onclick="abrirDatos(' + id + ')" title="Actualizar Datos"><i class="bi bi-pencil-square"></i></button> ';
+        if (Number(d.capitulo1) === 0 || PUEDE_FORZAR_CUPO_PS) {
+          var tituloCupo = Number(d.capitulo1) === 0 ? 'Cambio de Cupo' : 'Cambio de Cupo (forzado — ya tiene Capítulo 1)';
+          html += '<button type="button" class="btn btn-sm btn-outline-warning" '
+            + 'onclick=\'abrirCupo(' + id + ',' + JSON.stringify(d.identificacion) + ',' + JSON.stringify(d.nombres) + ',' + JSON.stringify(d.apellidos) + ',' + JSON.stringify(d.telefono) + ',' + JSON.stringify(d.direccion) + ',' + JSON.stringify(d.email) + ',' + JSON.stringify(d.id_equipo) + ',' + JSON.stringify(d.identificacioncambio) + ')\' '
+            + 'title="' + tituloCupo + '"><i class="bi bi-arrow-repeat"></i></button> ';
+        } else {
+          html += '<button type="button" class="btn btn-sm btn-outline-secondary" disabled title="Ya asistió a Capítulo 1 — no se puede cambiar el cupo"><i class="bi bi-arrow-repeat"></i></button> ';
+        }
+        html += '<button type="button" class="btn btn-sm btn-outline-primary" onclick=\'abrirSede(' + id + ',' + JSON.stringify(nombreCompleto) + ')\' title="Cambiar de Sede"><i class="bi bi-signpost-2"></i></button> ';
+        html += '<button type="button" class="btn btn-sm btn-outline-info" onclick=\'abrirHistorial(' + id + ',' + JSON.stringify(nombreCompleto) + ')\' title="Historial de Cambios"><i class="bi bi-clock-history"></i></button> ';
+        if (PUEDE_ELIMINAR_PS) {
+          html += '<button type="button" class="btn btn-sm btn-outline-danger" onclick=\'eliminarParticipante(' + id + ',' + JSON.stringify(nombreCompleto) + ',' + JSON.stringify(d.identificacion) + ')\' title="Eliminar definitivamente (borra también facturas, asistencia, certificados, etc.)"><i class="bi bi-trash"></i></button>';
+        }
+        return html;
+      }}
+    ]
+  });
+});
+
+function abrirDatos(id) {
+  idDatos = id;
+  fetch('https://imo.crearpslglobal.com/participantessede/datos/' + id)
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (!d.ok) { toastr.error(d.msg || 'No se pudo cargar el participante.'); return; }
+      llenarDatos(d.p);
+      new bootstrap.Modal(document.getElementById('modalDatos')).show();
+    });
+}
+
+function llenarDatos(p) {
+  document.getElementById('datosIdentificacion').value = p.identificacion || '';
+  document.getElementById('datosNombres').value = p.nombres || '';
+  document.getElementById('datosApellidos').value = p.apellidos || '';
+  document.getElementById('datosNombrePreferido').value = p.nombre_preferido || '';
+  document.getElementById('datosGenero').value = p.genero || '';
+  document.getElementById('datosFechaNacimiento').value = p.fecha_nacimiento || '';
+  document.getElementById('datosEdad').value = p.edad || '';
+  document.getElementById('datosEquipo').value = p.id_equipo || '';
+  document.getElementById('datosTelefono').value = p.telefono || '';
+  document.getElementById('datosDireccion').value = p.direccion || '';
+  document.getElementById('datosEmail').value = p.email || '';
+  document.getElementById('datosAntecedentes').value = p.antecedentes_psiquiatricos || '';
+  document.getElementById('datosMedicamentos').value = p.medicamentos_conducta || '';
+
+  document.getElementById('datosTipoPersona').value = p.tipo_persona || 'participante';
+  document.getElementById('datosCoordinador').value = p.id_coordinador || '';
+  document.getElementById('datosAsistencia').value = p.asistencia || 'pendiente';
+  document.getElementById('datosTipoFacturacion').value = p.tipo_facturacion || 'participante';
+  document.getElementById('datosFechaC1').value = p.fecha_c1 || '';
+  document.getElementById('datosCapitulo1').checked = !!Number(p.capitulo1);
+  document.getElementById('datosCapitulo2').checked = !!Number(p.capitulo2);
+  document.getElementById('datosMaestria').checked = !!Number(p.maestria);
+  document.getElementById('datosSaltoCuantico').checked = !!Number(p.salto_cuantico);
+  document.getElementById('datosAceptaTerminos').checked = !!Number(p.acepta_terminos);
+
+  document.getElementById('datosInvitadorId').value = p.id_invitador || '';
+  document.getElementById('datosBuscarInv').value = '';
+  document.getElementById('datosResInv').innerHTML = '';
+  if (p.id_invitador) {
+    document.getElementById('datosInvNombre').textContent = p.nombre_imo || '';
+    document.getElementById('datosInvExtra').textContent = p.telefono_imo ? (' · ' + p.telefono_imo) : '';
+    document.getElementById('datosCardInvitador').classList.remove('d-none');
+    document.getElementById('datosSinInvitador').classList.add('d-none');
+  } else {
+    document.getElementById('datosCardInvitador').classList.add('d-none');
+    document.getElementById('datosSinInvitador').classList.remove('d-none');
+  }
+}
+
+var _timerInvDatos = null;
+function buscarInvDatos(q) {
+  clearTimeout(_timerInvDatos);
+  var el = document.getElementById('datosResInv');
+  if (q.length < 2) { el.innerHTML = ''; return; }
+  _timerInvDatos = setTimeout(function() {
+    fetch('https://imo.crearpslglobal.com/participantes/buscarInvitador?q=' + encodeURIComponent(q))
+      .then(function(r) { return r.json(); })
+      .then(function(lista) {
+        if (!lista || !lista.length) { el.innerHTML = '<div class="text-muted small p-1">Sin resultados</div>'; return; }
+        var esc = function(s) { return String(s || '').replace(/[&<>"']/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); };
+        el.innerHTML = lista.map(function(p) {
+          return '<div class="border rounded p-1 mb-1 small" style="cursor:pointer" '
+            + 'onclick="selInvDatos(' + p.id + ',\'' + esc(p.nombre).replace(/'/g,"\\'") + '\',\'' + esc(p.telefono||'').replace(/'/g,"\\'") + '\')">'
+            + '<span class="fw-semibold">' + esc(p.nombre) + '</span>'
+            + '<span class="text-muted"> · ' + esc(p.identificacion || '—') + (p.telefono ? ' · ' + esc(p.telefono) : '') + '</span>'
+            + '</div>';
+        }).join('');
+      });
+  }, 350);
+}
+function selInvDatos(id, nombre, telefono) {
+  document.getElementById('datosInvitadorId').value = id;
+  document.getElementById('datosInvNombre').textContent = nombre;
+  document.getElementById('datosInvExtra').textContent = telefono ? (' · ' + telefono) : '';
+  document.getElementById('datosCardInvitador').classList.remove('d-none');
+  document.getElementById('datosSinInvitador').classList.add('d-none');
+  document.getElementById('datosBuscarInv').value = '';
+  document.getElementById('datosResInv').innerHTML = '';
+}
+function quitarInvitadorDatos() {
+  document.getElementById('datosInvitadorId').value = '';
+  document.getElementById('datosCardInvitador').classList.add('d-none');
+  document.getElementById('datosSinInvitador').classList.remove('d-none');
+}
+
+function guardarDatos() {
+  var identificacion = document.getElementById('datosIdentificacion').value.trim();
+  var nombres = document.getElementById('datosNombres').value.trim();
+  var apellidos = document.getElementById('datosApellidos').value.trim();
+  if (!identificacion || !nombres || !apellidos) { toastr.error('Identificación, nombres y apellidos son obligatorios.'); return; }
+
+  var fd = new FormData();
+  fd.append('identificacion', identificacion);
+  fd.append('nombres', nombres);
+  fd.append('apellidos', apellidos);
+  fd.append('nombre_preferido', document.getElementById('datosNombrePreferido').value);
+  fd.append('genero', document.getElementById('datosGenero').value);
+  fd.append('fecha_nacimiento', document.getElementById('datosFechaNacimiento').value);
+  fd.append('edad', document.getElementById('datosEdad').value);
+  fd.append('id_equipo', document.getElementById('datosEquipo').value);
+  fd.append('telefono', document.getElementById('datosTelefono').value);
+  fd.append('direccion', document.getElementById('datosDireccion').value);
+  fd.append('email', document.getElementById('datosEmail').value);
+  fd.append('antecedentes_psiquiatricos', document.getElementById('datosAntecedentes').value);
+  fd.append('medicamentos_conducta', document.getElementById('datosMedicamentos').value);
+  fd.append('id_quien_invito', document.getElementById('datosInvitadorId').value);
+  fd.append('tipo_persona', document.getElementById('datosTipoPersona').value);
+  fd.append('id_coordinador', document.getElementById('datosCoordinador').value);
+  fd.append('asistencia', document.getElementById('datosAsistencia').value);
+  fd.append('tipo_facturacion', document.getElementById('datosTipoFacturacion').value);
+  fd.append('fecha_c1', document.getElementById('datosFechaC1').value);
+  fd.append('capitulo1', document.getElementById('datosCapitulo1').checked ? '1' : '');
+  fd.append('capitulo2', document.getElementById('datosCapitulo2').checked ? '1' : '');
+  fd.append('maestria', document.getElementById('datosMaestria').checked ? '1' : '');
+  fd.append('salto_cuantico', document.getElementById('datosSaltoCuantico').checked ? '1' : '');
+  fd.append('acepta_terminos', document.getElementById('datosAceptaTerminos').checked ? '1' : '');
+
+  fetch('https://imo.crearpslglobal.com/participantessede/guardarDatos/' + idDatos, { method: 'POST', body: fd })
+  .then(r => r.json()).then(d => {
+    if (d.ok) {
+      toastr.success(d.msg);
+      bootstrap.Modal.getInstance(document.getElementById('modalDatos')).hide();
+      setTimeout(function() { location.reload(); }, 700);
+    } else {
+      toastr.error(d.msg || 'No se pudo guardar');
+    }
+  });
+}
+
+var cupoEncontrado = false;
+
+function abrirCupo(id, identificacion, nombres, apellidos, telefono, direccion, email, id_equipo, identificacioncambio) {
+  idCupo = id;
+  document.getElementById('cupoOriginalNombre').textContent = ((nombres || '') + ' ' + (apellidos || '')).trim() || '—';
+  document.getElementById('cupoOriginalIdentificacion').textContent = identificacion || '—';
+  if (id_equipo) { document.getElementById('cupoEquipo').value = id_equipo; }
+
+  document.getElementById('cupoIdentificacion').value = '';
+  document.getElementById('cupoTipoId').value = '';
+  document.getElementById('cupoNombres').value = '';
+  document.getElementById('cupoApellidos').value = '';
+  document.getElementById('cupoTelefono').value = '';
+  document.getElementById('cupoDireccion').value = '';
+  document.getElementById('cupoEmail').value = '';
+  document.getElementById('cupoPdf').value = '';
+  document.getElementById('cupoBuscarMsg').innerHTML = '';
+  document.getElementById('cupoCamposNuevo').classList.add('d-none');
+  cupoSetCamposEditables(true);
+  cupoEncontrado = false;
+  document.getElementById('cupoBtnGuardar').disabled = true;
+
+  new bootstrap.Modal(document.getElementById('modalCupo')).show();
+
+  // Si ya hay un cambio de cupo registrado antes, se precarga esa identificación y se busca de
+  // una — así al reabrir el modal se ve directo con qué datos quedó, en vez de partir en blanco.
+  if (identificacioncambio) {
+    document.getElementById('cupoIdentificacion').value = identificacioncambio;
+    buscarCupoIdentificacion();
+  }
+}
+
+function cupoResetBusqueda() {
+  document.getElementById('cupoCamposNuevo').classList.add('d-none');
+  document.getElementById('cupoBuscarMsg').innerHTML = '';
+  document.getElementById('cupoBtnGuardar').disabled = true;
+  cupoEncontrado = false;
+}
+
+function cupoSetCamposEditables(editable) {
+  ['cupoTipoId', 'cupoNombres', 'cupoApellidos', 'cupoTelefono', 'cupoDireccion', 'cupoEmail'].forEach(function(fid) {
+    document.getElementById(fid).disabled = !editable;
+  });
+}
+
+// Busca por identificación (participantes o prospecto) a la persona NUEVA que toma el cupo — si ya
+// está en el sistema, se usa tal cual (campos solo lectura); si no, se completan manualmente los
+// mismos campos del formulario de "Registrar Rezagado" para crearla como participante nuevo.
+function buscarCupoIdentificacion() {
+  var ident = document.getElementById('cupoIdentificacion').value.trim();
+  var msg = document.getElementById('cupoBuscarMsg');
+  if (!ident) { msg.innerHTML = '<span class="text-danger">Ingresa una identificación para buscar.</span>'; return; }
+  msg.innerHTML = '<span class="text-muted">Buscando…</span>';
+  fetch('https://imo.crearpslglobal.com/participantessede/buscarCupo?identificacion=' + encodeURIComponent(ident))
+    .then(r => r.json()).then(d => {
+      document.getElementById('cupoCamposNuevo').classList.remove('d-none');
+      if (d.ok) {
+        document.getElementById('cupoNombres').value = d.p.nombres || '';
+        document.getElementById('cupoApellidos').value = d.p.apellidos || '';
+        document.getElementById('cupoTelefono').value = d.p.telefono || '';
+        document.getElementById('cupoDireccion').value = d.p.direccion || '';
+        document.getElementById('cupoEmail').value = d.p.email || '';
+        document.getElementById('cupoTipoId').value = d.p.id_tipo_identificacion || '';
+        cupoSetCamposEditables(false);
+        cupoEncontrado = true;
+        msg.innerHTML = '<span class="text-success"><i class="bi bi-check-circle-fill me-1"></i>Ya existe en el sistema — se usará este registro tal cual (no se modifica).</span>';
+      } else {
+        document.getElementById('cupoNombres').value = '';
+        document.getElementById('cupoApellidos').value = '';
+        document.getElementById('cupoTelefono').value = '';
+        document.getElementById('cupoDireccion').value = '';
+        document.getElementById('cupoEmail').value = '';
+        document.getElementById('cupoTipoId').value = '';
+        cupoSetCamposEditables(true);
+        cupoEncontrado = false;
+        msg.innerHTML = '<span class="text-muted">No se encontró — completa los datos para crearla (formulario de Rezagado).</span>';
+      }
+      document.getElementById('cupoBtnGuardar').disabled = false;
+    });
+}
+
+function guardarCupo() {
+  var ident = document.getElementById('cupoIdentificacion').value.trim();
+  var nom   = document.getElementById('cupoNombres').value.trim();
+  var ape   = document.getElementById('cupoApellidos').value.trim();
+  if (!ident) { toastr.error('Ingresa y busca la identificación de la persona nueva.'); return; }
+  if (!nom || !ape) { toastr.error('Nombres y apellidos son obligatorios.'); return; }
+
+  var fd = new FormData();
+  fd.append('identificacion', ident);
+  fd.append('nombres', nom);
+  fd.append('apellidos', ape);
+  fd.append('telefono', document.getElementById('cupoTelefono').value);
+  fd.append('direccion', document.getElementById('cupoDireccion').value);
+  fd.append('email', document.getElementById('cupoEmail').value);
+  fd.append('id_tipo_identificacion', document.getElementById('cupoTipoId').value);
+  fd.append('id_equipo', document.getElementById('cupoEquipo').value);
+  var pdfFile = document.getElementById('cupoPdf').files[0];
+  if (pdfFile) { fd.append('pdf_cambio_cupo', pdfFile); }
+
+  fetch('https://imo.crearpslglobal.com/participantessede/cambiarCupo/' + idCupo, {
+    method: 'POST',
+    body: fd
+  }).then(r => r.json()).then(d => {
+    if (d.ok) {
+      toastr.success(d.msg);
+      bootstrap.Modal.getInstance(document.getElementById('modalCupo')).hide();
+      setTimeout(function() { location.reload(); }, 700);
+    } else {
+      toastr.error(d.msg || 'No se pudo registrar el cambio de cupo');
+    }
+  });
+}
+
+var idSede = null;
+
+function abrirSede(id, nombreCompleto) {
+  idSede = id;
+  document.getElementById('sedeNombreParticipante').textContent = nombreCompleto;
+  document.getElementById('sedeDestino').value = '';
+  var eqSel = document.getElementById('equipoDestino');
+  eqSel.innerHTML = '<option value="">Elige primero la sede…</option>';
+  eqSel.disabled = true;
+  new bootstrap.Modal(document.getElementById('modalSede')).show();
+}
+
+function cargarEquiposDestino() {
+  var idSedeDestino = document.getElementById('sedeDestino').value;
+  var eqSel = document.getElementById('equipoDestino');
+  if (!idSedeDestino) {
+    eqSel.innerHTML = '<option value="">Elige primero la sede…</option>';
+    eqSel.disabled = true;
+    return;
+  }
+  eqSel.innerHTML = '<option value="">Cargando…</option>';
+  eqSel.disabled = true;
+
+  fetch('https://imo.crearpslglobal.com/participantessede/equiposDestino/' + idSedeDestino)
+    .then(r => r.json())
+    .then(d => {
+      if (!d.ok || !d.equipos.length) {
+        eqSel.innerHTML = '<option value="">Sin equipos disponibles (sin Capítulo 1 pendiente)</option>';
+        eqSel.disabled = true;
+        return;
+      }
+      eqSel.innerHTML = '<option value="">Selecciona un equipo…</option>' + d.equipos.map(function(eq) {
+        return '<option value="' + eq.id + '">' + eq.nombre.replace(/</g, '&lt;') + '</option>';
+      }).join('');
+      eqSel.disabled = false;
+    })
+    .catch(function() {
+      eqSel.innerHTML = '<option value="">Error al cargar equipos</option>';
+      eqSel.disabled = true;
+    });
+}
+
+function guardarSede() {
+  var idSedeDestino = document.getElementById('sedeDestino').value;
+  var idEquipoDestino = document.getElementById('equipoDestino').value;
+  if (!idSedeDestino || !idEquipoDestino) { toastr.error('Selecciona la sede y el equipo destino.'); return; }
+
+  fetch('https://imo.crearpslglobal.com/participantessede/cambiarSede/' + idSede, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+    body: 'id_sede_destino=' + encodeURIComponent(idSedeDestino) + '&id_equipo_destino=' + encodeURIComponent(idEquipoDestino)
+  }).then(r => r.json()).then(d => {
+    if (d.ok) {
+      toastr.success(d.msg);
+      bootstrap.Modal.getInstance(document.getElementById('modalSede')).hide();
+      setTimeout(function() { location.reload(); }, 700);
+    } else {
+      toastr.error(d.msg || 'No se pudo cambiar de sede');
+    }
+  });
+}
+
+function abrirHistorial(id, nombreCompleto) {
+  document.getElementById('historialNombre').textContent = nombreCompleto;
+  var body = document.getElementById('historialBody');
+  body.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3">Cargando...</td></tr>';
+  new bootstrap.Modal(document.getElementById('modalHistorial')).show();
+
+  fetch('https://imo.crearpslglobal.com/participantessede/historial/' + id)
+    .then(r => r.json())
+    .then(d => {
+      if (!d.ok || !d.historial.length) {
+        body.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3">Sin cambios registrados.</td></tr>';
+        return;
+      }
+      var esc = function(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) {
+        return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+      }); };
+      body.innerHTML = d.historial.map(function(h) {
+        return '<tr>'
+          + '<td>' + esc(h.created_at) + '</td>'
+          + '<td>' + esc(h.usuario || 'Desconocido') + '</td>'
+          + '<td><span class="badge bg-secondary">' + esc(h.accion) + '</span></td>'
+          + '<td class="small">' + esc(h.descripcion) + '</td>'
+          + '</tr>';
+      }).join('');
+    })
+    .catch(function() {
+      body.innerHTML = '<tr><td colspan="4" class="text-center text-danger py-3">Error al cargar el historial.</td></tr>';
+    });
+}
+
+/* ── Modal Distribuir C1 Pendientes ─────────────────────────────────────── */
+function toggleModoDistC1() {
+  var modo = document.querySelector('input[name="modoDistC1"]:checked').value;
+  document.getElementById('panelSelectCoordC1').style.display = modo === 'uno'  ? '' : 'none';
+  document.getElementById('panelCoordsAutoC1').style.display  = modo === 'auto' ? '' : 'none';
+  // En modo automático el rebalanceo siempre incluye a todos (para lograr equidad real),
+  // así que la casilla "solo sin asignar" no aplica y se reemplaza por una nota informativa.
+  document.getElementById('panelSoloSinC1').style.display        = modo === 'auto' ? 'none' : '';
+  document.getElementById('notaAutoEquitativoC1').style.display  = modo === 'auto' ? '' : 'none';
+}
+
+function marcarTodosC1(selector, marcar) {
+  document.querySelectorAll(selector).forEach(function(chk) { chk.checked = marcar; });
+}
+
+function equiposMarcadosC1() {
+  var ids = [];
+  document.querySelectorAll('.chk-equipo-c1:checked').forEach(function(chk) { ids.push(chk.value); });
+  return ids;
+}
+
+function coordinadoresMarcadosC1() {
+  var ids = [];
+  document.querySelectorAll('.chk-coord-c1:checked').forEach(function(chk) { ids.push(chk.value); });
+  return ids;
+}
+
+function escC1(s) { return String(s || '').replace(/[&<>"']/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+function cargarResumenC1() {
+  var params = [];
+  equiposMarcadosC1().forEach(function(id) { params.push('ids_equipos[]=' + id); });
+  var modoSel = document.querySelector('input[name="modoDistC1"]:checked');
+  if (modoSel && modoSel.value === 'uno') {
+    var idCoordUno = document.getElementById('selCoordMasivoC1').value;
+    if (idCoordUno) { params.push('ids_coordinadores[]=' + idCoordUno); }
+  } else {
+    coordinadoresMarcadosC1().forEach(function(id) { params.push('ids_coordinadores[]=' + id); });
+  }
+  var qs = params.join('&');
+  fetch('https://imo.crearpslglobal.com/participantessede/resumenMasivo' + (qs ? ('?' + qs) : ''))
+    .then(function(r) { return r.json(); })
+    .then(function(res) {
+      if (!res.ok) return;
+      document.getElementById('resumenModalC1').innerHTML = renderResumenC1(res.data);
+    });
+}
+
+function renderResumenC1(data) {
+  if (!data || !data.total) return '<p class="text-muted small mb-0">No hay participantes pendientes de Capítulo 1 en los equipos marcados.</p>';
+  var paleta = ['#A2C8CC','#7db0b5','#6ba5aa','#8bc0c4','#5a9aa0','#3d8a91'];
+  var html = '';
+  html += '<div class="row g-2 mb-3">';
+  html += '<div class="col-auto"><div class="border rounded px-3 py-2 text-center"><div class="fw-bold fs-5">' + data.total + '</div><div class="text-muted" style="font-size:.72rem">TOTAL</div></div></div>';
+  var asignados = 0;
+  data.coordinadores.forEach(function(c) { asignados += parseInt(c.total || 0); });
+  html += '<div class="col-auto"><div class="border rounded px-3 py-2 text-center" style="border-color:#A2C8CC!important"><div class="fw-bold fs-5 text-primary">' + asignados + '</div><div class="text-muted" style="font-size:.72rem">ASIGNADOS</div></div></div>';
+  html += '<div class="col-auto"><div class="border rounded px-3 py-2 text-center"><div class="fw-bold fs-5 text-warning">' + data.sin_asignar + '</div><div class="text-muted" style="font-size:.72rem">SIN ASIGNAR</div></div></div>';
+  html += '</div>';
+  html += '<div class="row g-2">';
+  data.coordinadores.forEach(function(c, i) {
+    var n = parseInt(c.total || 0);
+    var pct = data.total ? Math.round(n / data.total * 100) : 0;
+    var col = paleta[i % paleta.length];
+    html += '<div class="col-12 col-md-6">';
+    html += '<div class="d-flex justify-content-between align-items-center mb-1">';
+    html += '<span class="small fw-semibold">' + escC1(c.nombre) + '<span class="text-muted"> (' + escC1(c.sede) + ')</span></span>';
+    html += '<span class="small text-muted">' + n + ' participante' + (n !== 1 ? 's' : '') + ' <span class="fw-bold" style="color:' + col + '">' + pct + '%</span></span>';
+    html += '</div>';
+    html += '<div class="progress mb-1" style="height:10px;border-radius:6px">';
+    html += '<div class="progress-bar" style="width:' + pct + '%;background:' + col + ';border-radius:6px" title="' + n + ' (' + pct + '%)"></div>';
+    html += '</div></div>';
+  });
+  if (data.sin_asignar > 0) {
+    var pct2 = data.total ? Math.round(data.sin_asignar / data.total * 100) : 0;
+    html += '<div class="col-12 col-md-6">';
+    html += '<div class="d-flex justify-content-between align-items-center mb-1">';
+    html += '<span class="small fw-semibold text-muted">Sin asignar</span>';
+    html += '<span class="small text-muted">' + data.sin_asignar + ' participante' + (data.sin_asignar !== 1 ? 's' : '') + ' <span class="fw-bold">' + pct2 + '%</span></span>';
+    html += '</div>';
+    html += '<div class="progress mb-1" style="height:10px;border-radius:6px">';
+    html += '<div class="progress-bar bg-secondary" style="width:' + pct2 + '%;border-radius:6px"></div>';
+    html += '</div></div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+function aplicarMasivoC1() {
+  var modo    = document.querySelector('input[name="modoDistC1"]:checked').value;
+  var soloSin = document.getElementById('soloSinAsignarC1').checked ? 1 : 0;
+  var idCoord = document.getElementById('selCoordMasivoC1').value;
+  var btn     = document.getElementById('btnAplicarMasivoC1');
+  var alerta  = document.getElementById('alertaMasivoC1');
+  alerta.classList.add('d-none');
+
+  if (modo === 'uno' && !idCoord) { toastr.warning('Selecciona un coordinador'); return; }
+
+  var idsEquipos = equiposMarcadosC1();
+  if (!idsEquipos.length) { toastr.warning('Marca al menos un equipo para incluir en el reparto'); return; }
+
+  var idsCoordAuto = [];
+  document.querySelectorAll('.chk-coord-c1:checked').forEach(function(chk) { idsCoordAuto.push(chk.value); });
+  if (modo === 'auto' && !idsCoordAuto.length) { toastr.warning('Marca al menos un coordinador para el reparto'); return; }
+
+  var fd = new FormData();
+  fd.append('modo',             modo);
+  fd.append('solo_sin_asignar', soloSin);
+  fd.append('id_coordinador',   idCoord);
+  idsEquipos.forEach(function(id) { fd.append('ids_equipos[]', id); });
+  idsCoordAuto.forEach(function(id) { fd.append('ids_coordinadores[]', id); });
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Aplicando...';
+
+  var yaAplicado = false;
+  fetch('https://imo.crearpslglobal.com/participantessede/asignarMasivo', { method: 'POST', body: fd })
+    .then(function(r) { return r.json(); })
+    .then(function(res) {
+      if (res.ok) {
+        yaAplicado = true;
+        toastr.success(res.msg);
+        document.getElementById('resumenModalC1').innerHTML = renderResumenC1(res.resumen);
+        document.getElementById('detalleMasivoC1').innerHTML = renderDetalleC1(res.detalle);
+        btn.onclick = function() { location.reload(); };
+      } else {
+        var msg = res.msg || 'Error al asignar';
+        toastr.error(msg);
+        alerta.textContent = msg;
+        alerta.classList.remove('d-none');
+      }
+    })
+    .catch(function() { toastr.error('Error de conexión'); })
+    .finally(function() {
+      btn.disabled = false;
+      btn.innerHTML = yaAplicado
+        ? '<i class="bi bi-arrow-clockwise me-1"></i>Cerrar y actualizar la lista'
+        : '<i class="bi bi-lightning-charge-fill me-1"></i>Aplicar distribución';
+    });
+}
+
+function renderDetalleC1(detalle) {
+  if (!detalle || !detalle.length) return '';
+  var html = '<div class="fw-semibold small text-muted text-uppercase mb-2"><i class="bi bi-list-check me-1"></i>Detalle de este reparto (' + detalle.length + ')</div>';
+  html += '<div class="table-responsive" style="max-height:260px;overflow-y:auto">';
+  html += '<table class="table table-sm table-hover mb-0"><thead class="table-light"><tr><th>Participante</th><th>Identificación</th><th>Equipo</th><th>Coordinador asignado</th></tr></thead><tbody>';
+  detalle.forEach(function(f) {
+    html += '<tr>' +
+      '<td>' + escC1(f.apellidos) + ', ' + escC1(f.nombres) + '</td>' +
+      '<td class="text-muted">' + escC1(f.identificacion || '-') + '</td>' +
+      '<td class="text-muted">' + escC1(f.equipo || '-') + '</td>' +
+      '<td class="fw-semibold">' + escC1(f.coordinador) + '</td>' +
+      '</tr>';
+  });
+  html += '</tbody></table></div>';
+  return html;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  var modalC1 = document.getElementById('modalDistribuirC1');
+  if (modalC1) {
+    modalC1.addEventListener('show.bs.modal', function() { toggleModoDistC1(); cargarResumenC1(); });
+  }
+});
+
+// Borrado físico en cascada (facturas, asistencia, certificados, gestión de llamadas, etc. — ver
+// ParticipantesSedeController::eliminar()) — irreversible, a diferencia del "Eliminar" del
+// módulo Participantes normal (ese solo desactiva). Por eso exige escribir la identificación
+// exacta en vez de un simple aceptar/cancelar, para que un clic de más no borre a alguien real.
+function eliminarParticipante(id, nombreCompleto, identificacion) {
+  Swal.fire({
+    icon: 'warning',
+    title: '¿Eliminar a ' + nombreCompleto + '?',
+    html: 'Esto borra <strong>definitivamente</strong> a esta persona y todo su historial: facturas y pagos, asistencia a Capítulo 1/2, certificados, gestión de llamadas, etc. <strong>No se puede deshacer.</strong>'
+      + '<br><br>Escribe su identificación para confirmar:<br><code>' + escPS(identificacion || '(sin identificación)') + '</code>',
+    input: 'text',
+    inputPlaceholder: 'Identificación',
+    showCancelButton: true,
+    confirmButtonText: 'Eliminar definitivamente',
+    confirmButtonColor: '#dc3545',
+    cancelButtonText: 'Cancelar',
+    preConfirm: function(valor) {
+      if ((valor || '').trim() !== (identificacion || '')) {
+        Swal.showValidationMessage('La identificación no coincide.');
+        return false;
+      }
+      return true;
+    }
+  }).then(function(r) {
+    if (!r.isConfirmed) return;
+    fetch(URL_BASE_PS + 'participantessede/eliminar/' + id, { method: 'POST' })
+      .then(function(res) { return res.json(); })
+      .then(function(res) {
+        if (res.ok) {
+          toastr.success(res.msg);
+          setTimeout(function() { location.reload(); }, 700);
+        } else {
+          toastr.error(res.msg || 'No se pudo eliminar.');
+        }
+      })
+      .catch(function() { toastr.error('Error de conexión.'); });
+  });
+}
+</script>
+  </div>
+
+  <footer><div class="d-flex justify-content-between"><span>NODUS © 2026</span><span>Desarrollado para CREAR PSL Global</span></div></footer>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+<script>
+flatpickr.localize(flatpickr.l10ns.es);
+toastr.options = {positionClass:'toast-top-right',timeOut:3500};
+function confirmDelete(url, msg = '¿Eliminar este registro?') {
+  Swal.fire({title:'¿Estás seguro?',text:msg,icon:'warning',showCancelButton:true,
+    confirmButtonColor:'#d33',cancelButtonText:'Cancelar',confirmButtonText:'Sí, eliminar'
+  }).then(r => { if(r.isConfirmed) window.location.href = url; });
+}
+$(function(){
+  $('table.datatable').each(function(){
+    $(this).DataTable({language:{url:'https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json'},pageLength:$(this).data('page-length')||25,deferRender:true});
+  });
+  flatpickr('.datepicker',{dateFormat:'Y-m-d'});
+  flatpickr('.datetimepicker',{dateFormat:'Y-m-d H:i',enableTime:true,time_24hr:true});
+});
+</script>
+
+
+</body></html>

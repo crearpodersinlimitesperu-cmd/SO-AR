@@ -66,6 +66,15 @@ export default function ReportesBoard() {
   const isDireccion = currentUser?.isDireccion || role === 'direccion' || roles.includes('direccion');
   const isGerente = currentUser?.isGerente || role === 'gerente' || roles.includes('gerente');
 
+  const canViewLlamadasForm = Boolean(
+    currentUser?.isSuperAdmin ||
+    isDireccion ||
+    isGerente ||
+    ['gerente', 'direccion', 'cfo', 'ceo', 'cco', 'superadmin', 'consolidado', 'coord_c1', 'coordinador_c1c2', 'coord_c2'].includes(role) ||
+    roles.some(r => ['gerente', 'direccion', 'cfo', 'ceo', 'cco', 'superadmin', 'consolidado', 'coord_c1', 'coordinador_c1c2', 'coord_c2'].includes(r))
+  );
+  
+
   const canViewEvolucionDashboard = Boolean(
     currentUser?.isSuperAdmin ||
     isDireccion ||
@@ -1554,6 +1563,7 @@ export default function ReportesBoard() {
             </div>
 
             {/* CARD 3: REPORTE DIARIO DE LLAMADAS (COORDINADORES C1 & C2) */}
+            {canViewLlamadasForm && (
             <div 
               onClick={() => {
                 setReportType('Llamadas');
@@ -1583,6 +1593,7 @@ export default function ReportesBoard() {
                 Revisión diaria a las 12:00 M (Nuevos y Rezagados). Precarga automática del último reporte y enlace directo a Nodus.
               </p>
             </div>
+            )}
           </div>
 
           {/* BANDEJA DE REPORTES DIARIOS (DIRECTIVOS Y GERENTES) */}
@@ -1843,11 +1854,11 @@ export default function ReportesBoard() {
                   <option value="ReporteRelampagoFDS">⚡ Reporte Relámpago Post-FDS (Gerente de Sede &lt;3 min)</option>
                 )}
                 <option value="MicroPulsoStaff">🎧 Micro-Pulso de Staff (Escucha Activa 3 Preguntas &lt;30 seg)</option>
-                <option value="Llamadas">1. Reporte de Llamadas (C1)</option>
-                <option value="FDS">2. Reporte FDS (Sede C1 tradicional)</option>
-                <option value="C2">3. Reporte Capítulo Dos</option>
-                <option value="MJ">4. Reporte Maestría del Juego</option>
-                <option value="QT_Contexto">5. Reporte de Contexto (QT)</option>
+                {canViewLlamadasForm && <option value="Llamadas">1. Reporte de Llamadas (C1)</option>}
+                {canViewLlamadasForm && <option value="FDS">2. Reporte FDS (Sede C1 tradicional)</option>}
+                {(canViewLlamadasForm || roles.includes("coord_c2") || role === "coord_c2") && <option value="C2">3. Reporte Capítulo Dos</option>}
+                {(isGerente || isDireccion || roles.includes("coord_maestria") || roles.includes("director_maestria") || role === "coord_maestria" || role === "director_maestria" || currentUser?.isSuperAdmin) && <option value="MJ">4. Reporte Maestría del Juego</option>}
+                {(isGerente || isDireccion || roles.includes("qt") || role === "qt" || currentUser?.isSuperAdmin) && <option value="QT_Contexto">5. Reporte de Contexto (QT)</option>}
               </select>
             </div>
 

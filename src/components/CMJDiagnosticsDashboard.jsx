@@ -19,8 +19,11 @@ import {
   getSedesBenchmark,
   CMJ_METADATA,
   SEDES_LIST,
-  normalizeSedeName
+  normalizeSedeName,
+  mergeNodusDataIntoEquipos
 } from '../services/cmjDataService';
+import { db, getDocResilient } from '../services/firebase';
+import { doc } from 'firebase/firestore';
 
 const RISK_COLORS = {
   CRITICO: { bg: 'rgba(239, 68, 68, 0.15)', border: '#ef4444', text: '#f87171', label: 'Riesgo Crítico' },
@@ -35,7 +38,7 @@ export default function CMJDiagnosticsDashboard({ globalFilterSede }) {
   const [riskFilter, setRiskFilter] = useState('ALL'); // 'ALL', 'CRITICO', 'ATENCION', 'OPTIMO'
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTrainer, setSelectedTrainer] = useState('ALL');
-  const [sortBy, setSortBy] = useState('desercion_desc');
+  const [sortBy, setSortBy] = useState('equipo_desc');
   const [expandedRow, setExpandedRow] = useState(null);
 
   // Sincronizar con filtro global si existe
@@ -47,12 +50,49 @@ export default function CMJDiagnosticsDashboard({ globalFilterSede }) {
   }, [globalFilterSede]);
 
   // Cargar datos
-  const rawEquipos = useMemo(() => getAllEquipos(), []);
+  const [rawEquipos, setRawEquipos] = useState(() => getAllEquipos());
   const rawEventos = useMemo(() => getAllEventos(), []);
-  const summary = useMemo(() => getCMJSummary(selectedSede), [selectedSede]);
-  const funnelData = useMemo(() => getFunnelData(selectedSede), [selectedSede]);
-  const evolutionData = useMemo(() => getRetentionEvolutionData(selectedSede), [selectedSede]);
-  const sedesBenchmark = useMemo(() => getSedesBenchmark(), []);
+
+  useEffect(() => {
+    const fetchNodus = async () => {
+      try {
+        const nodusRef = doc(db, 'nodus_kpis_sincronizados', 'latest_snapshot');
+        const snap = await getDocResilient(nodusRef);
+        if (snap.exists()) {
+          const nodusData = snap.data();
+          console.log("NODUS SNAPSHOT FETCHED in CMJ:", nodusData);
+          console.log("Equipos Reporte inside snap:", nodusData.equiposReporte);
+          
+          // FETCH MAESTRIA REAL DATA
+          let maestriaData = null;
+          try {
+            const mRef = doc(db, 'nodus_kpis_sincronizados', 'maestria_real_data');
+            const mSnap = await getDocResilient(mRef);
+            if (mSnap.exists()) {
+              maestriaData = mSnap.data().equipos_lima;
+            }
+          } catch(e) {
+            console.error("Error fetching maestria_real_data", e);
+          }
+          
+          const enrichedEquipos = mergeNodusDataIntoEquipos(getAllEquipos(), nodusData, maestriaData);
+
+          console.log("ENRICHED EQUIPOS:", enrichedEquipos.find(e => e.equipoNum === 30));
+          setRawEquipos(enrichedEquipos);
+        } else {
+          console.warn("Snapshot nodus_kpis_sincronizados/latest_snapshot doesn't exist");
+        }
+      } catch (err) {
+        console.warn('No se pudo cargar snapshot de Nodus para CMJ Dashboard:', err);
+      }
+    };
+    fetchNodus();
+  }, []);
+  
+  const summary = useMemo(() => getCMJSummary(selectedSede), [selectedSede, rawEquipos]);
+  const funnelData = useMemo(() => getFunnelData(selectedSede), [selectedSede, rawEquipos]);
+  const evolutionData = useMemo(() => getRetentionEvolutionData(selectedSede), [selectedSede, rawEquipos]);
+  const sedesBenchmark = useMemo(() => getSedesBenchmark(), [rawEquipos]);
 
   // Lista de entrenadores únicos para el filtro
   const uniqueTrainers = useMemo(() => {
@@ -90,6 +130,7 @@ export default function CMJDiagnosticsDashboard({ globalFilterSede }) {
       if (sortBy === 'retencion_desc') return b.resumen.tasaRetencion - a.resumen.tasaRetencion;
       if (sortBy === 'enrol_desc') return b.resumen.enrolTotalAcumulado - a.resumen.enrolTotalAcumulado;
       if (sortBy === 'equipo_asc') return a.equipoNum - b.equipoNum;
+      if (sortBy === 'equipo_desc') return b.equipoNum - a.equipoNum;
       return 0;
     });
   }, [rawEquipos, selectedSede, riskFilter, searchQuery, sortBy]);
@@ -598,12 +639,13 @@ export default function CMJDiagnosticsDashboard({ globalFilterSede }) {
                 cursor: 'pointer'
               }}
             >
+              <option value="equipo_desc">Equipos Más Recientes</option>
+              <option value="equipo_asc">Equipos Más Antiguos</option>
               <option value="desercion_desc">Mayor Deserción PX</option>
               <option value="desercion_asc">Menor Deserción PX</option>
               <option value="retencion_desc">Mayor Retención %</option>
               <option value="retencion_asc">Menor Retención %</option>
               <option value="enrol_desc">Mayor Enrolamiento</option>
-              <option value="equipo_asc">Número de Equipo</option>
             </select>
           )}
 
@@ -706,8 +748,8 @@ export default function CMJDiagnosticsDashboard({ globalFilterSede }) {
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <span>{sedeMeta.flag}</span>
                             <div>
-                              <div style={{ color: '#ffffff', fontWeight: 700 }}>{eq.equipoLabel}</div>
-                              <div style={{ fontSize: '0.75rem', color: sedeMeta.color }}>{eq.sedeNombreLargo}</div>
+                              <div style={{ color: '#ffffff', fontWeight: 700 }}>{eq.equipoLabel} {eq.equipoName ? `— ${eq.equipoName}` : ''}</div>
+                              <div style={{ fontSize: '0.75rem', color: sedeMeta.color }}>{eq.sedeNombreLargo} {eq.entrenador ? `• Entrenador: ${eq.entrenador}` : ''}</div>
                             </div>
                           </div>
                         </td>
@@ -786,7 +828,7 @@ export default function CMJDiagnosticsDashboard({ globalFilterSede }) {
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                   <span style={{ fontSize: '0.95rem', fontWeight: 700, color: '#d4af37' }}>
-                                    🔬 Desglose Clínico de Etapas: {eq.equipoLabel} ({eq.sedeNombreLargo})
+                                    🔬 Desglose Clínico de Etapas: {eq.equipoLabel} {eq.equipoName ? `— ${eq.equipoName}` : ''} ({eq.sedeNombreLargo})
                                   </span>
                                   {eq.isLiveSynced && (
                                     <span style={{

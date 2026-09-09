@@ -2087,22 +2087,10 @@ export default function Home() {
                   )}
 
                   <div style={{ display: 'flex', gap: '0.4rem', borderLeft: '1px solid rgba(255,255,255,0.1)', paddingLeft: '0.6rem' }}>
-                    <button 
-                      onClick={() => {
-                        setActiveEventTab('locales');
-                        setSelectedSedeFilter('todas');
-                      }}
-                      style={{ background: 'none', border: 'none', color: activeEventTab === 'locales' ? 'var(--crear-gold)' : 'var(--text-muted)', fontWeight: activeEventTab === 'locales' ? 'bold' : 'normal', cursor: 'pointer', fontSize: '0.85rem' }}
-                    >
-                      {hasRoleAccess(['entrenador', 'entrenador_llamadas']) ? 'MIS FECHAS' : 'MI SEDE'}
-                    </button>
-                    {(!hasRoleAccess(['entrenador', 'entrenador_llamadas']) && ((currentUser?.isSuperAdmin && !currentUser?.isSimulated) || currentUser?.isDireccion || currentUser?.isGerente || hasRoleAccess(['gerente', 'direccion', 'director_maestria', 'cfo']) || currentUser?.sede?.toLowerCase().includes('global'))) && (
-                      <button 
-                        onClick={() => setActiveEventTab('globales')}
-                        style={{ background: 'none', border: 'none', color: activeEventTab === 'globales' ? 'var(--crear-gold)' : 'var(--text-muted)', fontWeight: activeEventTab === 'globales' ? 'bold' : 'normal', cursor: 'pointer', fontSize: '0.85rem' }}
-                      >
-                        GLOBAL
-                      </button>
+                    {['entrenador', 'entrenador_llamadas'].includes(currentUser?.appRole) && (
+                      <span style={{ color: 'var(--crear-gold)', fontWeight: 'bold', fontSize: '0.85rem' }}>
+                        MIS FECHAS
+                      </span>
                     )}
                   </div>
                 </div>
@@ -2131,6 +2119,22 @@ export default function Home() {
                     <option value="hoy" style={{ background: '#0d152d' }}>🔥 Hoy</option>
                     <option value="todos" style={{ background: '#0d152d' }}>🗓 Todos</option>
                     <option value="pasados" style={{ background: '#0d152d' }}>📁 Historial</option>
+                  </select>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                  <span style={{ fontSize: '13px' }}>📍</span>
+                  <select 
+                    value={selectedSedeFilter}
+                    onChange={(e) => setSelectedSedeFilter(e.target.value)}
+                    style={{ background: 'rgba(255,255,255,0.07)', color: 'white', border: '1px solid rgba(255,255,255,0.15)', padding: '0.25rem 0.5rem', borderRadius: '6px', fontSize: '0.78rem', cursor: 'pointer' }}
+                  >
+                    <option value="todas" style={{ background: '#0d152d' }}>Todas las sedes</option>
+                    <option value="Lima" style={{ background: '#0d152d' }}>Lima</option>
+                    <option value="Arequipa" style={{ background: '#0d152d' }}>Arequipa</option>
+                    <option value="San Juan de Lurigancho" style={{ background: '#0d152d' }}>San Juan de Lurigancho</option>
+                    <option value="Trujillo" style={{ background: '#0d152d' }}>Trujillo</option>
+                    <option value="Los Olivos" style={{ background: '#0d152d' }}>Los Olivos</option>
                   </select>
                 </div>
 
@@ -2226,7 +2230,10 @@ export default function Home() {
                       // OFFICIAL_PERMISSION_MATRIX en permissions.js, corregido en esta misma
                       // ronda). Ahora Gerente respeta la pestaña igual que Dirección: arranca en
                       // "locales" (mismo default de siempre) pero el botón "GLOBAL" si funciona.
-                      if (activeEventTab === 'locales') {
+                      if (activeEventTab === 'locales' && selectedSedeFilter === 'todas') {
+                        // Bypass locales lock for directors/gerentes when they specifically select a sede filter (handled below) or just to see all
+                        if (isSuperOrDir || isGerente) return true;
+
                         const userSede = currentUser?.sede || '';
                         if (!userSede || userSede.toLowerCase().includes('global')) return true;
                         const evSede = ev.sede || ev.sedeTag || '';
@@ -2244,6 +2251,14 @@ export default function Home() {
                         const trainer = (ev.trainer || ev.entrenador || '').toLowerCase();
                         const sede = (ev.sede || ev.sedeTag || ev.place || ev.address || ev.lugar || '').toLowerCase();
                         return name.includes(q) || trainer.includes(q) || sede.includes(q);
+                      });
+                    }
+
+                    if (selectedSedeFilter !== 'todas') {
+                      const sf = selectedSedeFilter.toLowerCase();
+                      displayEvents = displayEvents.filter(ev => {
+                        const evSede = (ev.sede || ev.sedeTag || ev.place || ev.address || ev.lugar || '').toLowerCase();
+                        return evSede.includes(sf) || sf.includes(evSede);
                       });
                     }
 
@@ -2327,7 +2342,7 @@ export default function Home() {
 
                     return (
                       <div style={{ maxHeight: '320px', overflowY: 'auto', paddingRight: '0.4rem' }}>
-                        {displayEvents.slice(0, 8).map((ev, i) => {
+                        {displayEvents.map((ev, i) => {
                           const baseDate = ev.fecha_inicio || ev.start;
                           const evStartDate = new Date(baseDate || new Date());
                           let evEndDate = new Date(ev.fecha_fin || baseDate || new Date());

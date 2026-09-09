@@ -36,9 +36,16 @@ export function normalizeSedeName(rawSede) {
   return s;
 }
 
-let _cachedEquipos = null;
-
 import nodusMaestriaLive from '../data/nodus_maestria_live.json';
+
+const TEAM_NAMES_MAPPING = {
+  'LIMA CICLO 1': {
+    30: { nombre: 'TINKUY RURAY' },
+    29: { nombre: 'QUANTUM PHOENIX' },
+    28: { nombre: 'UBUNTU' },
+    27: { nombre: 'KAY THERON' }
+  }
+};
 
 export function getAllEquipos() {
   if (_cachedEquipos) return _cachedEquipos;
@@ -134,6 +141,7 @@ export function getAllEquipos() {
         liveSource: liveData ? nodusMaestriaLive._source : null,
         liveTimestamp: liveData ? nodusMaestriaLive._timestamp : null,
         equipoLabel: `Equipo ${eqNum}`,
+        equipoName: (TEAM_NAMES_MAPPING[sede] && TEAM_NAMES_MAPPING[sede][eqNum]) ? TEAM_NAMES_MAPPING[sede][eqNum].nombre : `Equipo ${eqNum}`,
         equipoNum: Number(eqNum),
         c1: { inician: inicianC1, terminan: terminanC1 },
         c2: { pagan: paganC2, inician: inicianC2, terminan: terminanC2 },
@@ -171,6 +179,222 @@ export function getAllEquipos() {
     console.error('Error parsing equipos in cmjDataService:', err);
     return [];
   }
+}
+
+/**
+ * Enriches the base equipos array with live data from the Nodus snapshot.
+ * Nodus tracks participants per team, and we can calculate the FDS history 
+ * by checking their finDeSemana stage and desertor status.
+ */
+export function mergeNodusDataIntoEquipos(baseEquipos, nodusSnap, maestriaData) {
+  if (!nodusSnap) return baseEquipos;
+
+  // Extraer datos usando reporteAsistenciaPorEquipo (la misma fuente que usa el Embudo)
+  let enrolamientoMap = {};
+  
+  if (nodusSnap.secciones?.reporteAsistenciaPorEquipo) {
+    const reportes = nodusSnap.secciones.reporteAsistenciaPorEquipo;
+    Object.keys(reportes).forEach(key => {
+      const kpis = reportes[key].kpis || [];
+      let baseC1 = 0;
+      let sentados = 0;
+      let desercion = 0;
+      let etapa = 'PFD';
+
+      kpis.forEach(k => {
+        const text = k.content?.join(' ') || '';
+        if (text.includes('Asistieron') && !isNaN(parseInt(k.content[0]))) sentados = parseInt(k.content[0]);
+        if (text.includes('Desertores') && !isNaN(parseInt(k.content[0]))) desercion = parseInt(k.content[0]);
+      });
+      
+      // Heurística simple para etapa
+      if (key.includes('FDS 3') || key.includes('TFD')) etapa = 'TFD';
+      else if (key.includes('FDS 2') || key.includes('SFD')) etapa = 'SFD';
+
+      enrolamientoMap[key.toUpperCase()] = { sentados, desercion, etapa };
+    });
+  }
+
+  const enriched = baseEquipos.map(eq => {
+    let c_pxInicio = 0, c_pxFinal = 0;
+    let r_pxInicio = 0, r_pxFinal = 0;
+    let g_pxInicio = 0, g_pxFinal = 0;
+    let desercionTotalPx = 0;
+    
+    // Intentar cruzar nombre de equipo y sede (ej. "EQUIPO 30" y "LIMA")
+    let matchedEqName = Object.keys(enrolamientoMap).find(key => 
+      key.includes(eq.equipoLabel.toUpperCase()) && key.includes(eq.sede.split(' ')[0].toUpperCase())
+    );
+    
+    if (!matchedEqName) {
+      matchedEqName = Object.keys(enrolamientoMap).find(key => key.includes(eq.equipoLabel.toUpperCase()));
+    }
+
+    
+    let currentStage = 0;
+    if (matchedEqName && enrolamientoMap[matchedEqName]) {
+      const stats = enrolamientoMap[matchedEqName];
+      const currentStageStr = stats.etapa;
+      if (currentStageStr === 'TFD') currentStage = 3;
+      else if (currentStageStr === 'SFD') currentStage = 2;
+      else if (currentStageStr === 'PFD') currentStage = 1;
+
+      const totalInician = stats.sentados + stats.desercion; 
+      const totalActivos = stats.sentados;
+      desercionTotalPx = stats.desercion;
+
+      if (currentStage >= 1) {
+        c_pxInicio = totalInician;
+        if (currentStage === 1) c_pxFinal = totalActivos;
+        else c_pxFinal = totalInician; 
+      }
+      if (currentStage >= 2) {
+        r_pxInicio = c_pxFinal;
+        if (currentStage === 2) r_pxFinal = totalActivos;
+        else r_pxFinal = c_pxFinal; 
+      }
+      if (currentStage >= 3) {
+        g_pxInicio = r_pxFinal;
+        g_pxFinal = totalActivos;
+      }
+    } else {
+      c_pxInicio = eq.creacion.pxInicio;
+      c_pxFinal = eq.creacion.pxFinal;
+      desercionTotalPx = eq.creacion.desercionPx;
+      r_pxInicio = eq.relacion.pxInicio;
+      r_pxFinal = eq.relacion.pxFinal;
+      g_pxInicio = eq.gratitud.pxInicio;
+      g_pxFinal = eq.gratitud.pxFinal;
+    }
+    
+    eq = JSON.parse(JSON.stringify(eq)); // Clone
+
+    // --- INTEGRADOR MAESTRIA DATA RECTIFICADOR (ABSOLUTO) ---
+    if (maestriaData) {
+      let maestriaEqId = null;
+      if (eq.equipoLabel.includes('30') && eq.sede === 'LIMA') maestriaEqId = '134';
+      if (eq.equipoLabel.includes('29') && eq.sede === 'LIMA') maestriaEqId = '127';
+      if (eq.equipoLabel.includes('28') && eq.sede === 'LIMA') maestriaEqId = '111';
+
+      // Intentar adivinar por iteración cruzando Sede y Equipo
+      if (!maestriaEqId) {
+        Object.keys(maestriaData).forEach(key => {
+          const md = maestriaData[key];
+          if (md && md.nombreNodus) {
+             const nodusUpper = md.nombreNodus.toUpperCase();
+             const expectedLabel = eq.equipoLabel.toUpperCase();
+             const expectedSede = eq.sede.split(' ')[0].toUpperCase();
+             if (nodusUpper.includes(expectedLabel) && nodusUpper.includes(expectedSede)) {
+                 maestriaEqId = key;
+             }
+          }
+        });
+      }
+
+      if (maestriaEqId && maestriaData[maestriaEqId]) {
+         const md = maestriaData[maestriaEqId];
+         
+         const pfdPx = md.PFD?.participantes?.length || 0;
+         const pfdDes = md.PFD?.desertores?.length || 0;
+         const sfdPx = md.SFD?.participantes?.length || 0;
+         const sfdDes = md.SFD?.desertores?.length || 0;
+         const tfdPx = md.TFD?.participantes?.length || 0;
+         const tfdDes = md.TFD?.desertores?.length || 0;
+
+         // Para saber en qué etapa está realmente
+         if (tfdPx > 0 || tfdDes > 0) currentStage = 3;
+         else if (sfdPx > 0 || sfdDes > 0) currentStage = 2;
+         else if (pfdPx > 0 || pfdDes > 0) currentStage = 1;
+
+         c_pxInicio = pfdPx + pfdDes;
+         c_pxFinal = pfdPx;
+         desercionTotalPx = pfdDes + sfdDes + tfdDes;
+
+         if (currentStage >= 2) {
+           r_pxInicio = sfdPx + sfdDes;
+           r_pxFinal = sfdPx;
+         } else {
+           r_pxInicio = 0; r_pxFinal = 0;
+         }
+
+         if (currentStage >= 3) {
+           g_pxInicio = tfdPx + tfdDes;
+           g_pxFinal = tfdPx;
+         } else {
+           g_pxInicio = 0; g_pxFinal = 0;
+         }
+         
+         // Calcular Enrolamiento sumando el array
+         let enrolTotal = 0;
+         [md.PFD?.participantes, md.SFD?.participantes, md.TFD?.participantes].forEach(pxArr => {
+           if (pxArr) pxArr.forEach(px => enrolTotal += (px.enrolados || 0));
+         });
+         // Solo lo sumamos de la etapa actual o del acumulado, pero spider guarda el acumulado en la etapa que extrajo
+         
+         // Para no duplicar si está en múltiples etapas, tomamos el array de la etapa actual:
+         let pxList = [];
+         if (currentStage === 3) pxList = md.TFD?.participantes || [];
+         else if (currentStage === 2) pxList = md.SFD?.participantes || [];
+         else if (currentStage === 1) pxList = md.PFD?.participantes || [];
+         
+         const realEnrol = pxList.reduce((acc, curr) => acc + (curr.enrolados || 0), 0);
+         eq.creacion.enrolTotal = realEnrol;
+         eq.creacion.enrolPx = realEnrol; // asumiendo que todos son px
+         eq.creacion.enrolMg = 0;
+      }
+    }
+    // --- FIN INTEGRADOR ---
+
+    // Asignar al objeto clonado
+    eq.creacion.pxInicio = c_pxInicio;
+    eq.creacion.pxFinal = c_pxFinal;
+    eq.creacion.desercionPx = currentStage === 1 ? desercionTotalPx : (currentStage > 1 ? c_pxInicio - c_pxFinal : 0);
+    
+    eq.relacion.pxInicio = r_pxInicio;
+    eq.relacion.pxFinal = r_pxFinal;
+    eq.relacion.desercionPx = currentStage === 2 ? desercionTotalPx : (currentStage > 2 ? r_pxInicio - r_pxFinal : 0);
+    
+    eq.gratitud.pxInicio = g_pxInicio;
+    eq.gratitud.pxFinal = g_pxFinal;
+    eq.gratitud.desercionPx = currentStage === 3 ? desercionTotalPx : 0;
+
+
+    const pxInicioReal = c_pxInicio || eq.c1.terminan;
+    const pxFinalReal = g_pxFinal || r_pxFinal || c_pxFinal;
+    const tasaRetencionGeneral = pxInicioReal > 0 ? (pxFinalReal / pxInicioReal) * 100 : 100;
+    const tasaDesercionGeneral = pxInicioReal > 0 ? (desercionTotalPx / pxInicioReal) * 100 : 0;
+
+    return {
+      ...eq,
+      creacion: {
+        ...eq.creacion,
+        pxInicio: c_pxInicio || eq.creacion.pxInicio,
+        pxFinal: c_pxFinal || eq.creacion.pxFinal,
+        desercionPx: desercionTotalPx || eq.creacion.desercionPx
+      },
+      relacion: {
+        ...eq.relacion,
+        pxInicio: r_pxInicio || eq.relacion.pxInicio,
+        pxFinal: r_pxFinal || eq.relacion.pxFinal
+      },
+      gratitud: {
+        ...eq.gratitud,
+        pxInicio: g_pxInicio || eq.gratitud.pxInicio,
+        pxFinal: g_pxFinal || eq.gratitud.pxFinal
+      },
+      resumen: {
+        ...eq.resumen,
+        pxIniciales: pxInicioReal,
+        pxFinales: pxFinalReal,
+        desercionTotalPx: desercionTotalPx,
+        tasaRetencion: Math.round(tasaRetencionGeneral * 10) / 10,
+        tasaDesercion: Math.round(tasaDesercionGeneral * 10) / 10
+      }
+    };
+  });
+  
+  _cachedEquipos = enriched;
+  return enriched;
 }
 
 let _cachedEventos = null;

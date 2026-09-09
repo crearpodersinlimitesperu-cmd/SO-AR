@@ -10,8 +10,8 @@ async function testReporteEquipos() {
   
   try {
     await page.goto('https://imo.crearpslglobal.com/auth/login', { waitUntil: 'networkidle2', timeout: 35000 });
-    await page.type('input[name="usuario"]', process.env.NODUS_USER || 'jsanchez');
-    await page.type('input[name="password"]', process.env.NODUS_PASSWORD || '123456');
+    await page.type('input[name="usuario"]', process.env.NODUS_GLOBAL_USER || 'CREARPSL');
+    await page.type('input[name="password"]', process.env.NODUS_GLOBAL_PASS || 'CREARPSL26*');
     await Promise.all([
       page.click('button[type="submit"]'),
       page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 35000 })
