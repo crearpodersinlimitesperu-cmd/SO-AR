@@ -38,6 +38,8 @@ export function normalizeSedeName(rawSede) {
 
 let _cachedEquipos = null;
 
+import nodusMaestriaLive from '../data/nodus_maestria_live.json';
+
 export function getAllEquipos() {
   if (_cachedEquipos) return _cachedEquipos;
   try {
@@ -53,64 +55,84 @@ export function getAllEquipos() {
       const sede = normalizeSedeName(rawSede);
       const cmjMeta = CMJ_METADATA[sede] || { cmj: 'Sin Asignar', color: '#64748b', flag: '📍' };
 
-      const inicianC1 = num(r['CAPITULO UNO']);
-      const terminanC1 = num(r['__EMPTY_2']);
-      const paganC2 = num(r['__EMPTY_3']);
-      const inicianC2 = num(r['__EMPTY_5']);
-      const terminanC2 = num(r['C2 A CREACION']);
-      const pagosMJ = num(r['__EMPTY_6']);
+      const liveKey = `${sede}_${eqNum}`;
+      const liveData = nodusMaestriaLive?.equipos?.[liveKey];
 
-      const c_pxInicio = num(r['__EMPTY_11']);
-      const c_mgInicio = num(r['__EMPTY_12']);
-      const c_pxFinal = num(r['__EMPTY_13']);
-      const c_mgFinal = num(r['__EMPTY_14']);
-      const c_desercionPx = num(r['__EMPTY_15']);
-      const c_desercionMg = num(r['__EMPTY_16']);
-      const c_enrolPx = num(r['__EMPTY_17']);
-      const c_enrolMg = num(r['__EMPTY_18']);
-      const c_enrolTotal = num(r['__EMPTY_19']) || (c_enrolPx + c_enrolMg);
+      const inicianC1 = (liveData && liveData.c1) ? liveData.c1.inician : num(r['CAPITULO UNO']);
+      const terminanC1 = (liveData && liveData.c1) ? liveData.c1.terminan : num(r['__EMPTY_2']);
+      const paganC2 = (liveData && liveData.c2) ? liveData.c2.pagan : num(r['__EMPTY_3']);
+      const inicianC2 = (liveData && liveData.c2) ? liveData.c2.inician : num(r['__EMPTY_5']);
+      const terminanC2 = (liveData && liveData.c2) ? liveData.c2.terminan : num(r['C2 A CREACION']);
+      const pagosMJ = (liveData && liveData.pagosMJ !== undefined) ? liveData.pagosMJ : num(r['__EMPTY_6']);
 
-      const r_pxInicio = num(r['CREACION A RELACION']);
-      const r_mgInicio = num(r['__EMPTY_20']);
-      const r_desercionPx = num(r['__EMPTY_21']);
-      const r_desercionMg = num(r['__EMPTY_22']);
-      const r_pxFinal = num(r['__EMPTY_23']);
-      const r_mgFinal = num(r['__EMPTY_24']);
-      const r_enrolTotal = num(r['__EMPTY_29']);
+      const c_pxInicio = liveData ? liveData.creacion.pxInicio : num(r['__EMPTY_11']);
+      const c_mgInicio = liveData ? liveData.creacion.mgInicio : num(r['__EMPTY_12']);
+      const c_pxFinal = liveData ? liveData.creacion.pxFinal : num(r['__EMPTY_13']);
+      const c_mgFinal = liveData ? liveData.creacion.mgFinal : num(r['__EMPTY_14']);
+      const c_desercionPx = liveData ? liveData.creacion.desercionPx : num(r['__EMPTY_15']);
+      const c_desercionMg = liveData ? liveData.creacion.desercionMg : num(r['__EMPTY_16']);
+      const c_enrolPx = liveData ? liveData.creacion.enrolPx : num(r['__EMPTY_17']);
+      const c_enrolMg = liveData ? liveData.creacion.enrolMg : num(r['__EMPTY_18']);
+      const c_enrolCap = liveData ? (liveData.creacion.enrolCap || 0) : 0;
+      const c_enrolTotal = liveData ? liveData.creacion.enrolTotal : (num(r['__EMPTY_19']) || (c_enrolPx + c_enrolMg));
 
-      const g_pxInicio = num(r[' RELACIÓN A GRATITUD']);
-      const g_mgInicio = num(r['__EMPTY_30']);
-      const g_desercionPx = num(r['__EMPTY_31']);
-      const g_desercionMg = num(r['__EMPTY_32']);
-      const g_pxFinal = num(r['__EMPTY_33']);
-      const g_mgFinal = num(r['__EMPTY_34']);
-      const g_enrolTotal = num(r['__EMPTY_39']);
+      const r_pxInicio = liveData ? liveData.relacion.pxInicio : num(r['CREACION A RELACION']);
+      const r_mgInicio = liveData ? liveData.relacion.mgInicio : num(r['__EMPTY_20']);
+      const r_desercionPx = liveData ? liveData.relacion.desercionPx : num(r['__EMPTY_21']);
+      const r_desercionMg = liveData ? liveData.relacion.desercionMg : num(r['__EMPTY_22']);
+      const r_pxFinal = liveData ? liveData.relacion.pxFinal : num(r['__EMPTY_23']);
+      const r_mgFinal = liveData ? liveData.relacion.mgFinal : num(r['__EMPTY_24']);
+      const r_enrolTotal = liveData ? liveData.relacion.enrolTotal : num(r['__EMPTY_29']);
 
-      const v_pxInicio = num(r[' GRATITUD AL VIAJE']);
-      const v_pxGraduados = num(r['__EMPTY_43']);
+      const g_pxInicio = liveData ? liveData.gratitud.pxInicio : num(r[' RELACIÓN A GRATITUD']);
+      const g_mgInicio = liveData ? liveData.gratitud.mgInicio : num(r['__EMPTY_30']);
+      const g_desercionPx = liveData ? liveData.gratitud.desercionPx : num(r['__EMPTY_31']);
+      const g_desercionMg = liveData ? liveData.gratitud.desercionMg : num(r['__EMPTY_32']);
+      const g_pxFinal = liveData ? liveData.gratitud.pxFinal : num(r['__EMPTY_33']);
+      const g_mgFinal = liveData ? liveData.gratitud.mgFinal : num(r['__EMPTY_34']);
+      const g_enrolTotal = liveData ? liveData.gratitud.enrolTotal : num(r['__EMPTY_39']);
 
-      const desercionTotalPx = c_desercionPx + r_desercionPx + g_desercionPx;
-      const desercionTotalMg = c_desercionMg + r_desercionMg + g_desercionMg;
-      const enrolTotalAcumulado = c_enrolTotal + r_enrolTotal + g_enrolTotal;
+      const v_pxInicio = liveData ? liveData.viaje.pxInicio : num(r[' GRATITUD AL VIAJE']);
+      const v_pxGraduados = liveData ? liveData.viaje.pxGraduados : num(r['__EMPTY_43']);
 
-      const pxInicioReal = c_pxInicio || terminanC2 || inicianC1;
-      const pxFinalReal = v_pxGraduados || g_pxFinal || r_pxFinal || c_pxFinal;
+      let desercionTotalPx = c_desercionPx + r_desercionPx + g_desercionPx;
+      let desercionTotalMg = c_desercionMg + r_desercionMg + g_desercionMg;
+      let enrolTotalAcumulado = c_enrolTotal + r_enrolTotal + g_enrolTotal;
 
-      const tasaRetencionGeneral = pxInicioReal > 0 ? (pxFinalReal / pxInicioReal) * 100 : 100;
-      const tasaDesercionGeneral = pxInicioReal > 0 ? (desercionTotalPx / pxInicioReal) * 100 : 0;
+      let pxInicioReal = c_pxInicio || terminanC2 || inicianC1;
+      let pxFinalReal = v_pxGraduados || g_pxFinal || r_pxFinal || c_pxFinal;
+
+      let tasaRetencionGeneral = pxInicioReal > 0 ? (pxFinalReal / pxInicioReal) * 100 : 100;
+      let tasaDesercionGeneral = pxInicioReal > 0 ? (desercionTotalPx / pxInicioReal) * 100 : 0;
 
       let nivelRiesgo = 'OPTIMO';
-      if (desercionTotalPx >= 5 || (pxInicioReal > 0 && tasaRetencionGeneral < 75) || tasaDesercionGeneral > 15) {
-        nivelRiesgo = 'CRITICO';
-      } else if (desercionTotalPx >= 2 || (pxInicioReal > 0 && tasaRetencionGeneral < 88) || tasaDesercionGeneral > 7) {
-        nivelRiesgo = 'ATENCION';
+      if (liveData && liveData.resumen) {
+        desercionTotalPx = liveData.resumen.desercionTotalPx;
+        desercionTotalMg = liveData.resumen.desercionTotalMg;
+        enrolTotalAcumulado = liveData.resumen.enrolTotalAcumulado;
+        pxInicioReal = liveData.resumen.pxIniciales;
+        pxFinalReal = liveData.resumen.pxFinales;
+        tasaRetencionGeneral = liveData.resumen.tasaRetencion;
+        tasaDesercionGeneral = liveData.resumen.tasaDesercion;
+        nivelRiesgo = liveData.resumen.nivelRiesgo;
+      } else {
+        if (desercionTotalPx >= 5 || (pxInicioReal > 0 && tasaRetencionGeneral < 75) || tasaDesercionGeneral > 15) {
+          nivelRiesgo = 'CRITICO';
+        } else if (desercionTotalPx >= 2 || (pxInicioReal > 0 && tasaRetencionGeneral < 88) || tasaDesercionGeneral > 7) {
+          nivelRiesgo = 'ATENCION';
+        }
       }
 
       equipos.push({
         id: `${sede}_EQ_${eqNum}_${idx}`,
         sede,
         sedeNombreLargo: cmjMeta.nombreLargo,
-        cmj: (r['COORDINADOR MAESTRIA DEL JUEGO'] || cmjMeta.cmj).trim(),
+        cmj: liveData?.coordinador || (r['COORDINADOR MAESTRIA DEL JUEGO'] || cmjMeta.cmj).trim(),
+        entrenador: liveData?.entrenador || (r['ENTRENADOR'] || '').trim(),
+        etapaActual: liveData?.etapaActual || null,
+        isLiveSynced: !!liveData,
+        liveSource: liveData ? nodusMaestriaLive._source : null,
+        liveTimestamp: liveData ? nodusMaestriaLive._timestamp : null,
         equipoLabel: `Equipo ${eqNum}`,
         equipoNum: Number(eqNum),
         c1: { inician: inicianC1, terminan: terminanC1 },
@@ -119,7 +141,7 @@ export function getAllEquipos() {
         creacion: {
           pxInicio: c_pxInicio, mgInicio: c_mgInicio, pxFinal: c_pxFinal, mgFinal: c_mgFinal,
           desercionPx: c_desercionPx, desercionMg: c_desercionMg,
-          enrolPx: c_enrolPx, enrolMg: c_enrolMg, enrolTotal: c_enrolTotal
+          enrolPx: c_enrolPx, enrolMg: c_enrolMg, enrolCap: c_enrolCap, enrolTotal: c_enrolTotal
         },
         relacion: {
           pxInicio: r_pxInicio, mgInicio: r_mgInicio, pxFinal: r_pxFinal, mgFinal: r_mgFinal,

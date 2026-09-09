@@ -783,63 +783,129 @@ export default function CMJDiagnosticsDashboard({ globalFilterSede }) {
                         <tr>
                           <td colSpan={9} style={{ padding: '1.25rem 1.5rem', background: 'rgba(15, 23, 42, 0.95)', borderBottom: '1px solid rgba(212, 175, 55, 0.2)' }}>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <span style={{ fontSize: '0.9rem', fontWeight: 700, color: '#d4af37' }}>
-                                  🔬 Desglose Clínico de Etapas: {eq.equipoLabel} ({eq.sedeNombreLargo})
-                                </span>
-                                <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
-                                  Inician C1: {eq.c1.inician} → Terminan C1: {eq.c1.terminan} | Inician C2: {eq.c2.inician} → Terminan C2: {eq.c2.terminan}
-                                </span>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                  <span style={{ fontSize: '0.95rem', fontWeight: 700, color: '#d4af37' }}>
+                                    🔬 Desglose Clínico de Etapas: {eq.equipoLabel} ({eq.sedeNombreLargo})
+                                  </span>
+                                  {eq.isLiveSynced && (
+                                    <span style={{
+                                      padding: '3px 10px',
+                                      borderRadius: '12px',
+                                      background: 'rgba(34, 197, 94, 0.15)',
+                                      border: '1px solid rgba(34, 197, 94, 0.4)',
+                                      color: '#4ade80',
+                                      fontSize: '0.75rem',
+                                      fontWeight: 700,
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      gap: '5px'
+                                    }}>
+                                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#22c55e', display: 'inline-block' }}></span>
+                                      🟢 Nodus Live Sync ({eq.etapaActual || 'Activo'})
+                                    </span>
+                                  )}
+                                </div>
+                                <div style={{ fontSize: '0.8rem', color: '#94a3b8', display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
+                                  {eq.entrenador && (
+                                    <span>
+                                      Entrenador: <strong style={{ color: '#f8fafc' }}>{eq.entrenador}</strong>
+                                    </span>
+                                  )}
+                                  <span>
+                                    Inician C1: <strong style={{ color: '#f8fafc' }}>{eq.c1.inician}</strong> → Terminan C1: <strong style={{ color: '#f8fafc' }}>{eq.c1.terminan}</strong>
+                                  </span>
+                                  <span>
+                                    Inician C2: <strong style={{ color: '#f8fafc' }}>{eq.c2.inician}</strong> → Terminan C2: <strong style={{ color: '#f8fafc' }}>{eq.c2.terminan}</strong>
+                                  </span>
+                                </div>
                               </div>
 
                               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
                                 {/* 1er FDS: Creación */}
                                 <div style={{ background: 'rgba(30, 41, 59, 0.8)', border: '1px solid rgba(212, 175, 55, 0.3)', borderRadius: '10px', padding: '1rem' }}>
-                                  <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#d4af37', marginBottom: '8px' }}>
-                                    ✨ 1er FDS: Creación
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                                    <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#d4af37' }}>
+                                      ✨ 1er FDS: Creación
+                                    </div>
+                                    {eq.etapaActual === 'PFD' && (
+                                      <span style={{ fontSize: '0.7rem', padding: '2px 6px', borderRadius: '4px', background: 'rgba(212, 175, 55, 0.2)', color: '#d4af37', fontWeight: 600 }}>
+                                        Etapa Actual
+                                      </span>
+                                    )}
                                   </div>
                                   <div style={{ fontSize: '0.8rem', color: '#cbd5e1', display: 'flex', flexDirection: 'column', gap: '4px' }}>
                                     <div>PX Inician: <strong style={{ color: '#ffffff' }}>{eq.creacion.pxInicio}</strong></div>
                                     <div>Deserción PX: <strong style={{ color: eq.creacion.desercionPx > 0 ? '#f87171' : '#4ade80' }}>{eq.creacion.desercionPx}</strong></div>
                                     <div>PX Final: <strong style={{ color: '#ffffff' }}>{eq.creacion.pxFinal}</strong></div>
-                                    <div>Deserción Managers: <strong style={{ color: eq.creacion.desercionMg > 0 ? '#f87171' : '#cbd5e1' }}>{eq.creacion.desercionMg}</strong></div>
+                                    <div>Managers: <strong style={{ color: '#cbd5e1' }}>{eq.creacion.mgInicio || 0} inician</strong> {eq.creacion.desercionMg > 0 ? `(${eq.creacion.desercionMg} deserc.)` : '(0 deserc.)'}</div>
                                     <div style={{ marginTop: '4px', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '4px' }}>
                                       Enrolamiento PX: <strong style={{ color: '#38bdf8' }}>{eq.creacion.enrolPx}</strong>
                                     </div>
                                     <div>Enrolamiento Managers: <strong style={{ color: '#a78bfa' }}>{eq.creacion.enrolMg}</strong></div>
+                                    {eq.creacion.enrolCap > 0 && <div>Enrolamiento Capitán: <strong style={{ color: '#f59e0b' }}>{eq.creacion.enrolCap}</strong></div>}
+                                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '4px', fontWeight: 700 }}>
+                                      Total Enrolados FDS 1: <strong style={{ color: '#d4af37' }}>{eq.creacion.enrolTotal}</strong>
+                                    </div>
                                   </div>
                                 </div>
 
                                 {/* 2do FDS: Relación */}
                                 <div style={{ background: 'rgba(30, 41, 59, 0.8)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: '10px', padding: '1rem' }}>
-                                  <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#34d399', marginBottom: '8px' }}>
-                                    🤝 2do FDS: Relación
-                                  </div>
-                                  <div style={{ fontSize: '0.8rem', color: '#cbd5e1', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                    <div>PX Inician: <strong style={{ color: '#ffffff' }}>{eq.relacion.pxInicio}</strong></div>
-                                    <div>Deserción PX: <strong style={{ color: eq.relacion.desercionPx > 0 ? '#f87171' : '#4ade80' }}>{eq.relacion.desercionPx}</strong></div>
-                                    <div>PX Final: <strong style={{ color: '#ffffff' }}>{eq.relacion.pxFinal}</strong></div>
-                                    <div>Deserción Managers: <strong style={{ color: eq.relacion.desercionMg > 0 ? '#f87171' : '#cbd5e1' }}>{eq.relacion.desercionMg}</strong></div>
-                                    <div style={{ marginTop: '4px', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '4px' }}>
-                                      Enrolamiento FDS 2: <strong style={{ color: '#38bdf8' }}>{eq.relacion.enrolTotal}</strong>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                                    <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#34d399' }}>
+                                      🤝 2do FDS: Relación
                                     </div>
+                                    {eq.etapaActual === 'SFD' && (
+                                      <span style={{ fontSize: '0.7rem', padding: '2px 6px', borderRadius: '4px', background: 'rgba(16, 185, 129, 0.2)', color: '#34d399', fontWeight: 600 }}>
+                                        Etapa Actual
+                                      </span>
+                                    )}
                                   </div>
+                                  {eq.relacion.pxInicio > 0 ? (
+                                    <div style={{ fontSize: '0.8rem', color: '#cbd5e1', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                      <div>PX Inician: <strong style={{ color: '#ffffff' }}>{eq.relacion.pxInicio}</strong></div>
+                                      <div>Deserción PX: <strong style={{ color: eq.relacion.desercionPx > 0 ? '#f87171' : '#4ade80' }}>{eq.relacion.desercionPx}</strong></div>
+                                      <div>PX Final: <strong style={{ color: '#ffffff' }}>{eq.relacion.pxFinal}</strong></div>
+                                      <div>Deserción Managers: <strong style={{ color: eq.relacion.desercionMg > 0 ? '#f87171' : '#cbd5e1' }}>{eq.relacion.desercionMg}</strong></div>
+                                      <div style={{ marginTop: '4px', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '4px' }}>
+                                        Enrolamiento FDS 2: <strong style={{ color: '#38bdf8' }}>{eq.relacion.enrolTotal}</strong>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <div style={{ fontSize: '0.8rem', color: '#64748b', fontStyle: 'italic', paddingTop: '1rem' }}>
+                                      ⏳ Etapa por iniciar / pendiente de ejecución
+                                    </div>
+                                  )}
                                 </div>
 
                                 {/* 3er FDS: Gratitud */}
                                 <div style={{ background: 'rgba(30, 41, 59, 0.8)', border: '1px solid rgba(6, 182, 212, 0.3)', borderRadius: '10px', padding: '1rem' }}>
-                                  <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#22d3ee', marginBottom: '8px' }}>
-                                    🙏 3er FDS: Gratitud
-                                  </div>
-                                  <div style={{ fontSize: '0.8rem', color: '#cbd5e1', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                    <div>PX Inician: <strong style={{ color: '#ffffff' }}>{eq.gratitud.pxInicio}</strong></div>
-                                    <div>Deserción PX: <strong style={{ color: eq.gratitud.desercionPx > 0 ? '#f87171' : '#4ade80' }}>{eq.gratitud.desercionPx}</strong></div>
-                                    <div>PX Final: <strong style={{ color: '#ffffff' }}>{eq.gratitud.pxFinal}</strong></div>
-                                    <div>Deserción Managers: <strong style={{ color: eq.gratitud.desercionMg > 0 ? '#f87171' : '#cbd5e1' }}>{eq.gratitud.desercionMg}</strong></div>
-                                    <div style={{ marginTop: '4px', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '4px' }}>
-                                      Enrolamiento FDS 3: <strong style={{ color: '#38bdf8' }}>{eq.gratitud.enrolTotal}</strong>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                                    <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#22d3ee' }}>
+                                      🙏 3er FDS: Gratitud
                                     </div>
+                                    {eq.etapaActual === 'TFD' && (
+                                      <span style={{ fontSize: '0.7rem', padding: '2px 6px', borderRadius: '4px', background: 'rgba(6, 182, 212, 0.2)', color: '#22d3ee', fontWeight: 600 }}>
+                                        Etapa Actual
+                                      </span>
+                                    )}
                                   </div>
+                                  {eq.gratitud.pxInicio > 0 ? (
+                                    <div style={{ fontSize: '0.8rem', color: '#cbd5e1', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                      <div>PX Inician: <strong style={{ color: '#ffffff' }}>{eq.gratitud.pxInicio}</strong></div>
+                                      <div>Deserción PX: <strong style={{ color: eq.gratitud.desercionPx > 0 ? '#f87171' : '#4ade80' }}>{eq.gratitud.desercionPx}</strong></div>
+                                      <div>PX Final: <strong style={{ color: '#ffffff' }}>{eq.gratitud.pxFinal}</strong></div>
+                                      <div>Deserción Managers: <strong style={{ color: eq.gratitud.desercionMg > 0 ? '#f87171' : '#cbd5e1' }}>{eq.gratitud.desercionMg}</strong></div>
+                                      <div style={{ marginTop: '4px', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '4px' }}>
+                                        Enrolamiento FDS 3: <strong style={{ color: '#38bdf8' }}>{eq.gratitud.enrolTotal}</strong>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <div style={{ fontSize: '0.8rem', color: '#64748b', fontStyle: 'italic', paddingTop: '1rem' }}>
+                                      ⏳ Etapa por iniciar / pendiente de ejecución
+                                    </div>
+                                  )}
                                 </div>
 
                                 {/* El Viaje: Graduación */}
