@@ -1,13 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { collection, query, orderBy, onSnapshot, deleteDoc, doc, writeBatch, addDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
+import { Search, Filter, X } from 'lucide-react';
 
 export default function MonitorImos() {
   const [missions, setMissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedImo, setExpandedImo] = useState(null);
   const [sendingEmail, setSendingEmail] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterEquipo, setFilterEquipo] = useState('todos');
+  const [filterEstado, setFilterEstado] = useState('todos');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -27,6 +31,86 @@ export default function MonitorImos() {
 
     return () => unsubscribe();
   }, []);
+
+  // Extrae de forma robusta la lista de enrolados (soporta array enrolados o claves en checks)
+  const getEnroladosList = (m) => {
+    if (Array.isArray(m.enrolados) && m.enrolados.length > 0) {
+      return m.enrolados;
+    }
+    const keys = Object.keys(m.checks || {});
+    return keys.map((k, index) => {
+      const chk = m.checks?.[k] || {};
+      const cleanName = k.replace(/_/g, ' ');
+      return {
+        id: `${m.id}_enr_${index}_${k}`,
+        nombre: cleanName,
+        contacto: Boolean(chk.contacto),
+        asistencia: Boolean(chk.asistencia),
+        email: chk.email || '',
+        telefono: chk.telefono || '',
+        coordinadora_nombre: chk.coordinadora_nombre || m.equipo || 'Coordinación'
+      };
+    });
+  };
+
+  // Equipos únicos para el filtro
+  const equiposDisponibles = useMemo(() => {
+    const setEq = new Set();
+    missions.forEach(m => {
+      if (m.equipo) setEq.add(m.equipo);
+    });
+    return Array.from(setEq).sort();
+  }, [missions]);
+
+  // Filtrado de misiones en tiempo real por búsqueda y selectores
+  const filteredMissions = useMemo(() => {
+    return missions.filter((m) => {
+      // Filtro Equipo
+      if (filterEquipo !== 'todos' && (m.equipo || '').toUpperCase() !== filterEquipo.toUpperCase()) {
+        return false;
+      }
+
+      // Filtro Estado
+      const isCompleted = m.progreso === 100;
+      if (filterEstado === 'completado' && !isCompleted) return false;
+      if (filterEstado === 'en_progreso' && isCompleted) return false;
+
+      // Filtro Búsqueda (IMO, Equipo o Enrolados)
+      if (searchTerm.trim()) {
+        const queryText = searchTerm.toLowerCase().trim();
+        const matchImo = (m.imoNombre || '').toLowerCase().includes(queryText);
+        const matchEquipo = (m.equipo || '').toLowerCase().includes(queryText);
+        const matchSede = (m.sede || '').toLowerCase().includes(queryText);
+
+        const enrolados = getEnroladosList(m);
+        const matchEnrolado = enrolados.some(e =>
+          (e.nombre || '').toLowerCase().includes(queryText) ||
+          (e.email || '').toLowerCase().includes(queryText)
+        );
+
+        if (!matchImo && !matchEquipo && !matchSede && !matchEnrolado) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [missions, searchTerm, filterEquipo, filterEstado]);
+
+  const totalEnroladosCount = useMemo(() => {
+    return filteredMissions.reduce((acc, m) => {
+      const enr = getEnroladosList(m);
+      return acc + (m.totalEnrolados || enr.length || 0);
+    }, 0);
+  }, [filteredMissions]);
+
+  const totalConfirmadosCount = useMemo(() => {
+    return filteredMissions.reduce((acc, m) => acc + (m.completados || 0), 0);
+  }, [filteredMissions]);
+
+  const completadosCount = useMemo(() => {
+    return filteredMissions.filter(m => m.progreso === 100).length;
+  }, [filteredMissions]);
 
   const handleResetMission = async (missionId) => {
     if (window.confirm('⚠️ ¿Estás seguro de que deseas resetear los datos de prueba de este IMO? Esto eliminará la telemetría actual y el tiempo volverá a cero.')) {
@@ -54,7 +138,7 @@ export default function MonitorImos() {
 
   const handleSendWelcomeEmail = async (enrolado) => {
     if (!enrolado.email) {
-      alert("Este participante no tiene un correo registrado en la base de datos de IMOs. Por favor, actualiza los datos en la app de IMOs (imos_data.json) primero.");
+      alert("Este participante no tiene un correo registrado.");
       return;
     }
 
@@ -138,7 +222,8 @@ export default function MonitorImos() {
       >
         ← Volver al Centro Operativo
       </button>
-      <header style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+
+      <header style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.25rem' }}>
             <span style={{ background: 'rgba(14, 165, 233, 0.15)', color: '#38bdf8', padding: '3px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 800 }}>
@@ -146,13 +231,14 @@ export default function MonitorImos() {
             </span>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Misión IMO</span>
           </div>
-          <h1 className="text-gold" style={{ fontSize: '2.4rem', margin: '0 0 0.5rem 0', letterSpacing: '-0.02em' }}>
+          <h1 className="text-gold" style={{ fontSize: '2.2rem', margin: '0 0 0.5rem 0', letterSpacing: '-0.02em' }}>
             MONITOR DE IMOS
           </h1>
-          <p className="text-muted" style={{ fontSize: '1.05rem', margin: 0 }}>
+          <p className="text-muted" style={{ fontSize: '0.95rem', margin: 0 }}>
             Supervisión en tiempo real de los IMOs conectados, sus enrolados y su progreso de llamadas.
           </p>
         </div>
+
         <button
           onClick={handleResetAll}
           disabled={missions.length === 0}
@@ -180,6 +266,96 @@ export default function MonitorImos() {
         </button>
       </header>
 
+      {/* Mini Tarjetas de Métricas Resumen */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+        <div className="glass-panel" style={{ padding: '0.9rem 1.2rem', border: '1px solid rgba(255,255,255,0.08)' }}>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>IMOs Filtrados</div>
+          <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#fff' }}>
+            {filteredMissions.length} <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 400 }}>/ {missions.length}</span>
+          </div>
+        </div>
+        <div className="glass-panel" style={{ padding: '0.9rem 1.2rem', border: '1px solid rgba(255,255,255,0.08)' }}>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>Total Enrolados</div>
+          <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#38bdf8' }}>{totalEnroladosCount}</div>
+        </div>
+        <div className="glass-panel" style={{ padding: '0.9rem 1.2rem', border: '1px solid rgba(255,255,255,0.08)' }}>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>Confirmados / Asistirán</div>
+          <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#22c55e' }}>{totalConfirmadosCount}</div>
+        </div>
+        <div className="glass-panel" style={{ padding: '0.9rem 1.2rem', border: '1px solid rgba(255,255,255,0.08)' }}>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>Misiones Completadas</div>
+          <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--crear-gold, #ffb703)' }}>{completadosCount}</div>
+        </div>
+      </div>
+
+      {/* Barra de Filtros y Búsqueda */}
+      <div className="glass-panel" style={{ padding: '1rem 1.25rem', marginBottom: '1.5rem', display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', border: '1px solid rgba(255,255,255,0.08)' }}>
+        {/* Buscador de IMOs y Enrolados */}
+        <div style={{ position: 'relative', flex: '1 1 320px', minWidth: '240px' }}>
+          <Search size={16} color="var(--text-muted)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+          <input
+            type="text"
+            placeholder="Buscar por Nombre de IMO, Enrolado o Equipo..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="form-input"
+            style={{ width: '100%', paddingLeft: '38px', paddingRight: searchTerm ? '32px' : '12px', fontSize: '0.88rem' }}
+          />
+          {searchTerm && (
+            <button
+              onClick={() => setSearchTerm('')}
+              style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.85rem' }}
+              title="Borrar búsqueda"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+
+        {/* Filtros Selectores */}
+        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
+          {/* Selector de Equipo */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Equipo:</span>
+            <select
+              value={filterEquipo}
+              onChange={(e) => setFilterEquipo(e.target.value)}
+              className="form-input"
+              style={{ width: 'auto', minWidth: '130px', fontSize: '0.85rem', padding: '0.4rem 0.8rem' }}
+            >
+              <option value="todos">Todos los Equipos</option>
+              {equiposDisponibles.map(eq => (
+                <option key={eq} value={eq}>{eq}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Selector de Estado */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Estado:</span>
+            <select
+              value={filterEstado}
+              onChange={(e) => setFilterEstado(e.target.value)}
+              className="form-input"
+              style={{ width: 'auto', minWidth: '140px', fontSize: '0.85rem', padding: '0.4rem 0.8rem' }}
+            >
+              <option value="todos">Todos los Estados</option>
+              <option value="completado">✅ Completados (100%)</option>
+              <option value="en_progreso">⏳ En Progreso</option>
+            </select>
+          </div>
+
+          {(searchTerm || filterEquipo !== 'todos' || filterEstado !== 'todos') && (
+            <button
+              onClick={() => { setSearchTerm(''); setFilterEquipo('todos'); setFilterEstado('todos'); }}
+              style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.15)', color: 'var(--crear-blue, #38bdf8)', padding: '0.4rem 0.8rem', borderRadius: '6px', fontSize: '0.8rem', cursor: 'pointer', fontWeight: 600 }}
+            >
+              Limpiar filtros
+            </button>
+          )}
+        </div>
+      </div>
+
       <div className="glass-panel" style={{ padding: '1.5rem', overflowX: 'auto', border: '1px solid rgba(255,255,255,0.08)' }}>
         <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse', minWidth: '900px' }}>
           <thead>
@@ -193,21 +369,22 @@ export default function MonitorImos() {
             </tr>
           </thead>
           <tbody>
-            {missions.length === 0 ? (
+            {filteredMissions.length === 0 ? (
               <tr>
                 <td colSpan={6} style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
-                  No hay misiones de IMOs registradas actualmente.
+                  {missions.length === 0 ? 'No hay misiones de IMOs registradas actualmente.' : 'Ningún IMO o enrolado coincide con los filtros aplicados.'}
                 </td>
               </tr>
-            ) : missions.map((m) => {
-              const enrolledKeys = Object.keys(m.checks || {});
-              const totalEnrolled = m.totalEnrolados || 0;
+            ) : filteredMissions.map((m) => {
+              const enroladosList = getEnroladosList(m);
+              const totalEnrolled = m.totalEnrolados || enroladosList.length || 0;
               const confirmed = m.completados || 0;
               let contacted = 0;
               let assisted = 0;
-              enrolledKeys.forEach(k => {
-                if (m.checks[k]?.contacto) contacted++;
-                if (m.checks[k]?.asistencia) assisted++;
+
+              enroladosList.forEach(e => {
+                if (e.contacto) contacted++;
+                if (e.asistencia) assisted++;
               });
 
               const isCompleted = m.progreso === 100;
@@ -252,7 +429,7 @@ export default function MonitorImos() {
                           transition: 'all 0.2s ease'
                         }}
                       >
-                        {isExpanded ? 'Ocultar Enrolados' : 'Ver Enrolados'}
+                        {isExpanded ? 'Ocultar Enrolados' : `Ver Enrolados (${enroladosList.length})`}
                       </button>
                       <button
                         onClick={() => handleResetMission(m.id)}
@@ -275,41 +452,88 @@ export default function MonitorImos() {
                     </td>
                   </tr>
                   
-                  {isExpanded && m.enrolados && (
+                  {isExpanded && (
                     <tr style={{ background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                       <td colSpan={6} style={{ padding: '1.5rem', paddingTop: '0.5rem' }}>
-                        <div style={{ background: 'rgba(0,0,0,0.2)', padding: '1.2rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                          <h4 style={{ margin: '0 0 1rem 0', color: 'var(--crear-gold)', fontSize: '0.9rem', textTransform: 'uppercase' }}>Lista de Enrolados</h4>
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1rem' }}>
-                            {m.enrolados.map(enrolado => (
-                              <div key={enrolado.id} style={{ background: 'rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                                <div style={{ fontWeight: 600, fontSize: '0.95rem', marginBottom: '4px' }}>{enrolado.nombre}</div>
-                                <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '8px' }}>Coord: {enrolado.coordinadora_nombre} ({enrolado.coordinadora_telefono})</div>
-                                <div style={{ fontSize: '0.8rem', color: enrolado.email ? '#38bdf8' : '#ef4444', marginBottom: '12px' }}>
-                                  {enrolado.email ? `✉️ ${enrolado.email}` : '⚠️ Sin correo registrado'}
-                                </div>
-                                
-                                <button
-                                  onClick={() => handleSendWelcomeEmail(enrolado)}
-                                  disabled={sendingEmail === enrolado.id || !enrolado.email}
-                                  style={{
-                                    width: '100%',
-                                    background: enrolado.email ? 'var(--crear-gold)' : 'rgba(255,255,255,0.1)',
-                                    color: enrolado.email ? '#000' : 'rgba(255,255,255,0.3)',
-                                    border: 'none',
-                                    padding: '6px 12px',
-                                    borderRadius: '4px',
-                                    fontWeight: 700,
-                                    fontSize: '0.8rem',
-                                    cursor: (sendingEmail === enrolado.id || !enrolado.email) ? 'not-allowed' : 'pointer',
-                                    opacity: sendingEmail === enrolado.id ? 0.7 : 1
-                                  }}
-                                >
-                                  {sendingEmail === enrolado.id ? 'Encolando...' : '📨 Enviar Bienvenida'}
-                                </button>
-                              </div>
-                            ))}
+                        <div style={{ background: 'rgba(0,0,0,0.35)', padding: '1.2rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                            <h4 style={{ margin: 0, color: 'var(--crear-gold, #ffb703)', fontSize: '0.95rem', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <span>👥</span> Enrolados de {m.imoNombre} ({enroladosList.length})
+                            </h4>
+                            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                              Confirmados / Asistirán: <strong style={{ color: '#22c55e' }}>{assisted}</strong> de <strong>{enroladosList.length}</strong>
+                            </div>
                           </div>
+
+                          {enroladosList.length === 0 ? (
+                            <div style={{ padding: '1rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                              No hay enrolados registrados para este IMO.
+                            </div>
+                          ) : (
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1rem' }}>
+                              {enroladosList.map(enrolado => (
+                                <div key={enrolado.id} style={{ background: 'rgba(255,255,255,0.04)', padding: '1rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                                  <div style={{ fontWeight: 700, fontSize: '0.95rem', marginBottom: '6px', color: '#fff' }}>
+                                    {enrolado.nombre}
+                                  </div>
+                                  
+                                  <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '10px' }}>
+                                    <span style={{
+                                      fontSize: '0.75rem',
+                                      padding: '3px 8px',
+                                      borderRadius: '4px',
+                                      fontWeight: 600,
+                                      background: enrolado.contacto ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                                      color: enrolado.contacto ? '#22c55e' : '#ef4444'
+                                    }}>
+                                      {enrolado.contacto ? '📞 Contactado' : '⏳ No Contactado'}
+                                    </span>
+                                    
+                                    <span style={{
+                                      fontSize: '0.75rem',
+                                      padding: '3px 8px',
+                                      borderRadius: '4px',
+                                      fontWeight: 600,
+                                      background: enrolado.asistencia ? 'rgba(56, 189, 248, 0.15)' : 'rgba(255, 255, 255, 0.08)',
+                                      color: enrolado.asistencia ? '#38bdf8' : 'var(--text-muted)'
+                                    }}>
+                                      {enrolado.asistencia ? '✅ Asistirá' : '⚪ Pendiente'}
+                                    </span>
+                                  </div>
+
+                                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
+                                    📍 {enrolado.coordinadora_nombre || m.equipo}
+                                    {enrolado.telefono ? ` • 📱 ${enrolado.telefono}` : ''}
+                                  </div>
+
+                                  <div style={{ fontSize: '0.8rem', color: enrolado.email ? '#38bdf8' : 'var(--text-muted)', marginBottom: '12px' }}>
+                                    {enrolado.email ? `✉️ ${enrolado.email}` : '⚪ Sin correo registrado'}
+                                  </div>
+
+                                  {enrolado.email ? (
+                                    <button
+                                      onClick={() => handleSendWelcomeEmail(enrolado)}
+                                      disabled={sendingEmail === enrolado.id}
+                                      style={{
+                                        width: '100%',
+                                        background: 'var(--crear-gold)',
+                                        color: '#000',
+                                        border: 'none',
+                                        padding: '6px 12px',
+                                        borderRadius: '4px',
+                                        fontWeight: 700,
+                                        fontSize: '0.8rem',
+                                        cursor: sendingEmail === enrolado.id ? 'not-allowed' : 'pointer',
+                                        opacity: sendingEmail === enrolado.id ? 0.7 : 1
+                                      }}
+                                    >
+                                      {sendingEmail === enrolado.id ? 'Encolando...' : '📨 Enviar Bienvenida'}
+                                    </button>
+                                  ) : null}
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </td>
                     </tr>
