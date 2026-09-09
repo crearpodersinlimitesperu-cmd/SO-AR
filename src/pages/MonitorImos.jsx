@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { collection, query, orderBy, onSnapshot, deleteDoc, doc, writeBatch, addDoc } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, deleteDoc, doc, writeBatch, addDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { Search, Filter, X } from 'lucide-react';
 
@@ -111,6 +111,17 @@ export default function MonitorImos() {
   const completadosCount = useMemo(() => {
     return filteredMissions.filter(m => m.progreso === 100).length;
   }, [filteredMissions]);
+
+  const handleToggleVerificado = async (missionId, currentValue) => {
+    try {
+      await updateDoc(doc(db, 'imo_missions', missionId), {
+        verificadoNodus: !currentValue
+      });
+    } catch (error) {
+      console.error('Error al actualizar verificación:', error);
+      alert('No se pudo actualizar el estado de verificación.');
+    }
+  };
 
   const handleResetMission = async (missionId) => {
     if (window.confirm('⚠️ ¿Estás seguro de que deseas resetear los datos de prueba de este IMO? Esto eliminará la telemetría actual y el tiempo volverá a cero.')) {
@@ -430,6 +441,24 @@ export default function MonitorImos() {
                         }}
                       >
                         {isExpanded ? 'Ocultar Enrolados' : `Ver Enrolados (${enroladosList.length})`}
+                      </button>
+                      <button
+                        onClick={() => handleToggleVerificado(m.id, m.verificadoNodus)}
+                        title="Marcar si lo que dice el IMO está verificado en Nodus"
+                        style={{
+                          background: m.verificadoNodus ? 'rgba(34, 197, 94, 0.15)' : 'transparent',
+                          color: m.verificadoNodus ? '#22c55e' : 'var(--text-muted)',
+                          border: `1px solid ${m.verificadoNodus ? 'rgba(34, 197, 94, 0.3)' : 'rgba(255,255,255,0.1)'}`,
+                          padding: '4px 10px',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontSize: '0.8rem',
+                          fontWeight: m.verificadoNodus ? 600 : 400,
+                          marginRight: '8px',
+                          transition: 'all 0.2s ease'
+                        }}
+                      >
+                        {m.verificadoNodus ? '✅ Nodus OK' : '☐ Validar Nodus'}
                       </button>
                       <button
                         onClick={() => handleResetMission(m.id)}
