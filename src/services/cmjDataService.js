@@ -160,10 +160,15 @@ export function mergeNodusDataIntoEquipos(baseEquipos, nodusSnap) {
   if (!nodusSnap || !nodusSnap.equiposReporte) return baseEquipos;
 
   const enriched = baseEquipos.map(eq => {
-    // Find the corresponding equipo in Nodus (e.g., "EQUIPO 30")
-    const nodusEq = nodusSnap.equiposReporte.find(n => 
-      n.equipoNombre && n.equipoNombre.toUpperCase().includes(eq.equipoLabel.toUpperCase())
-    );
+    // Find the corresponding equipo in Nodus
+    // We must match both the team number (e.g. "EQUIPO 30") and the Sede to avoid collisions
+    const nodusEq = nodusSnap.equiposReporte.find(n => {
+      if (!n.equipoNombre) return false;
+      const nodusName = n.equipoNombre.toUpperCase();
+      const isEqMatch = nodusName.includes(eq.equipoLabel.toUpperCase());
+      const isSedeMatch = nodusName.includes(eq.sede.toUpperCase());
+      return isEqMatch && isSedeMatch;
+    });
 
     if (!nodusEq || !nodusEq.participantes) return eq;
 
@@ -234,27 +239,27 @@ export function mergeNodusDataIntoEquipos(baseEquipos, nodusSnap) {
       ...eq,
       creacion: {
         ...eq.creacion,
-        pxInicio: c_pxInicio,
-        pxFinal: c_pxFinal,
-        desercionPx: c_desercionPx
+        pxInicio: c_pxInicio || eq.creacion.pxInicio,
+        pxFinal: c_pxFinal || eq.creacion.pxFinal,
+        desercionPx: c_desercionPx || eq.creacion.desercionPx
       },
       relacion: {
         ...eq.relacion,
-        pxInicio: r_pxInicio,
-        pxFinal: r_pxFinal,
-        desercionPx: r_desercionPx
+        pxInicio: r_pxInicio || eq.relacion.pxInicio,
+        pxFinal: r_pxFinal || eq.relacion.pxFinal,
+        desercionPx: r_desercionPx || eq.relacion.desercionPx
       },
       gratitud: {
         ...eq.gratitud,
-        pxInicio: g_pxInicio,
-        pxFinal: g_pxFinal,
-        desercionPx: g_desercionPx
+        pxInicio: g_pxInicio || eq.gratitud.pxInicio,
+        pxFinal: g_pxFinal || eq.gratitud.pxFinal,
+        desercionPx: g_desercionPx || eq.gratitud.desercionPx
       },
       resumen: {
         ...eq.resumen,
         pxIniciales: pxInicioReal,
         pxFinales: pxFinalReal,
-        desercionTotalPx,
+        desercionTotalPx: desercionTotalPx || eq.resumen.desercionTotalPx,
         tasaRetencion: Math.round(tasaRetencionGeneral * 10) / 10,
         tasaDesercion: Math.round(tasaDesercionGeneral * 10) / 10
       }
