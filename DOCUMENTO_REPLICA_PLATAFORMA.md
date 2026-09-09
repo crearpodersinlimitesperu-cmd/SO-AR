@@ -292402,7 +292402,7 @@ export default function CentroManagers() {
 ## Archivo: src\pages\ChecklistBoard.jsx
 
 ```javascript
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useChecklist } from '../context/ChecklistContext';
@@ -292476,6 +292476,16 @@ export default function ChecklistBoard() {
   const [selectedTaskForDetail, setSelectedTaskForDetail] = useState(null);
   const [qtPhaseFilter, setQtPhaseFilter] = useState('active'); // 'active' (fase actual del ciclo) | 'all' | fase específica
   const [showTaskDetailModal, setShowTaskDetailModal] = useState(false);
+  const [statusFilter, setStatusFilter] = useState(() => {
+    return searchParams.get('filter') === 'completed' ? 'completed' : 'pending';
+  });
+
+  useEffect(() => {
+    const f = searchParams.get('filter');
+    if (f === 'completed') {
+      setStatusFilter('completed');
+    }
+  }, [searchParams]);
 
   const { currentUser } = useAuth();
   const { tasks, toggleTask, updateTaskDetails, inviteCollaborator, syncTasksToGoogle } = useChecklist();
@@ -292551,9 +292561,6 @@ export default function ChecklistBoard() {
   const showPhaseTabs = phasesPresent.length > 1;
   const isCurrentStageInRole = currentStage && phasesPresent.includes(currentStage);
 
-  let activeTasks = myTasks;
-  let viewTitle = `Checklist Causa OS Activo: ${currentStage}`;
-
   const sortByDeadline = (tasksArray) => {
     return tasksArray.sort((a, b) => {
       const dA = a.deadline || calculateAutomaticDeadline(a, currentCycle);
@@ -292564,50 +292571,59 @@ export default function ChecklistBoard() {
     });
   };
 
-  if (filterParam === 'completed') {
-    activeTasks = myTasks.filter(t => t.completed || t.status === 'Completada');
-    viewTitle = "Mostrando: Tareas Completadas";
-  } else if (filterParam === 'criticas') {
-    activeTasks = myTasks.filter(t => !t.completed && (t.isCritical || t.priority === 'Crítica'));
-    activeTasks = sortByDeadline(activeTasks);
+  let scopedTasks = myTasks;
+  let viewTitle = `Checklist Causa OS Activo: ${currentStage}`;
+
+  if (filterParam === 'criticas') {
+    scopedTasks = myTasks.filter(t => t.isCritical || t.priority === 'Crítica');
     viewTitle = "Mostrando: Tareas Críticas (Urgentes)";
   } else if (filterParam === 'importantes') {
-    activeTasks = myTasks.filter(t => !t.completed && !t.isCritical && t.priority !== 'Crítica');
-    activeTasks = sortByDeadline(activeTasks);
+    scopedTasks = myTasks.filter(t => !t.isCritical && t.priority !== 'Crítica');
     viewTitle = "Mostrando: Tareas Importantes";
   } else if (showPhaseTabs) {
     if (qtPhaseFilter === 'active') {
       if (isCurrentStageInRole) {
         const meta = PHASE_META[currentStage] || { label: currentStage };
-        activeTasks = myTasks.filter(t => t.cyclePhase === currentStage);
+        scopedTasks = myTasks.filter(t => t.cyclePhase === currentStage);
         viewTitle = `${role?.name || 'Checklist'}: Fase Activa ${meta.label}`;
       } else {
-        activeTasks = myTasks;
+        scopedTasks = myTasks;
         viewTitle = `${role?.name || 'Checklist'}: Catálogo Operativo Integral (${phasesPresent.join(', ')})`;
       }
     } else if (qtPhaseFilter !== 'all' && phasesPresent.includes(qtPhaseFilter)) {
       const meta = PHASE_META[qtPhaseFilter] || { label: qtPhaseFilter };
-      activeTasks = myTasks.filter(t => t.cyclePhase === qtPhaseFilter);
+      scopedTasks = myTasks.filter(t => t.cyclePhase === qtPhaseFilter);
       viewTitle = `${role?.name || 'Checklist'}: Fase ${meta.label}`;
     } else {
-      activeTasks = myTasks;
+      scopedTasks = myTasks;
       viewTitle = `${role?.name || 'Checklist'}: Catálogo Operativo Integral (${phasesPresent.join(', ')})`;
     }
   } else {
     // Vista Normal del Checklist Activo para roles de fase única
     if (currentStage && currentStage !== 'GLOBAL' && currentStage !== 'INACTIVO') {
-      activeTasks = myTasks.filter(t => t.cyclePhase === currentStage);
+      scopedTasks = myTasks.filter(t => t.cyclePhase === currentStage);
     } else {
-      activeTasks = myTasks;
+      scopedTasks = myTasks;
     }
   }
 
-  // El progreso siempre es de mis tareas de la fase activa actual
-  const stageTasks = (currentStage && currentStage !== 'GLOBAL' && currentStage !== 'INACTIVO') 
-    ? myTasks.filter(t => t.cyclePhase === currentStage)
-    : myTasks;
-  const completedActive = stageTasks.filter(t => t.completed || t.status === 'Completada').length;
-  const progress = stageTasks.length > 0 ? Math.round((completedActive / stageTasks.length) * 100) : 100;
+  // Conteos precisos de estado dentro de la fase / ámbito seleccionado
+  const pendingCount = scopedTasks.filter(t => !t.completed && t.status !== 'Completada').length;
+  const completedCount = scopedTasks.filter(t => t.completed || t.status === 'Completada').length;
+  const totalCount = scopedTasks.length;
+
+  // Filtrado de tareas activas según la pestaña de estado seleccionada
+  let activeTasks = scopedTasks;
+  if (statusFilter === 'pending') {
+    activeTasks = scopedTasks.filter(t => !t.completed && t.status !== 'Completada');
+  } else if (statusFilter === 'completed') {
+    activeTasks = scopedTasks.filter(t => t.completed || t.status === 'Completada');
+  }
+  activeTasks = sortByDeadline([...activeTasks]);
+
+  // El progreso siempre refleja el completamiento de la fase / ámbito actual
+  const completedActive = scopedTasks.filter(t => t.completed || t.status === 'Completada').length;
+  const progress = scopedTasks.length > 0 ? Math.round((completedActive / scopedTasks.length) * 100) : 100;
 
   const handleStatusChange = async (task) => {
     if (processingTasks.has(task.id)) return;
@@ -292821,11 +292837,140 @@ export default function ChecklistBoard() {
             </button>
           </div>
         )}
+
+        {/* PESTAÑAS DE ESTADO: PENDIENTES VS COMPLETADAS */}
+        <div style={{ 
+          display: 'flex', 
+          gap: '0.6rem', 
+          alignItems: 'center', 
+          marginTop: '1.25rem', 
+          paddingTop: '1rem', 
+          borderTop: '1px solid rgba(255,255,255,0.08)',
+          flexWrap: 'wrap'
+        }}>
+          <button
+            type="button"
+            onClick={() => setStatusFilter('pending')}
+            style={{
+              padding: '0.45rem 1rem',
+              borderRadius: '8px',
+              fontSize: '0.85rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              background: statusFilter === 'pending' ? 'var(--crear-gold, #f59e0b)' : 'rgba(255,255,255,0.05)',
+              color: statusFilter === 'pending' ? '#000000' : 'var(--text-muted)',
+              border: `1px solid ${statusFilter === 'pending' ? 'var(--crear-gold, #f59e0b)' : 'rgba(255,255,255,0.1)'}`,
+              transition: 'all 0.2s ease',
+              boxShadow: statusFilter === 'pending' ? '0 0 12px rgba(245,158,11,0.25)' : 'none'
+            }}
+          >
+            <span>⏳ Pendientes</span>
+            <span style={{
+              background: statusFilter === 'pending' ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.1)',
+              padding: '2px 7px',
+              borderRadius: '10px',
+              fontSize: '0.75rem',
+              fontWeight: 800
+            }}>
+              {pendingCount}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setStatusFilter('completed')}
+            style={{
+              padding: '0.45rem 1rem',
+              borderRadius: '8px',
+              fontSize: '0.85rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              background: statusFilter === 'completed' ? 'var(--color-success, #22c55e)' : 'rgba(255,255,255,0.05)',
+              color: statusFilter === 'completed' ? '#000000' : 'var(--text-muted)',
+              border: `1px solid ${statusFilter === 'completed' ? 'var(--color-success, #22c55e)' : 'rgba(255,255,255,0.1)'}`,
+              transition: 'all 0.2s ease',
+              boxShadow: statusFilter === 'completed' ? '0 0 12px rgba(34,197,94,0.25)' : 'none'
+            }}
+          >
+            <span>✅ Completadas</span>
+            <span style={{
+              background: statusFilter === 'completed' ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.1)',
+              padding: '2px 7px',
+              borderRadius: '10px',
+              fontSize: '0.75rem',
+              fontWeight: 800
+            }}>
+              {completedCount}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setStatusFilter('all')}
+            style={{
+              padding: '0.45rem 0.9rem',
+              borderRadius: '8px',
+              fontSize: '0.85rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              background: statusFilter === 'all' ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.05)',
+              color: statusFilter === 'all' ? '#ffffff' : 'var(--text-muted)',
+              border: `1px solid ${statusFilter === 'all' ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.1)'}`,
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <span>📋 Todas</span>
+            <span style={{
+              background: statusFilter === 'all' ? 'rgba(0,0,0,0.25)' : 'rgba(255,255,255,0.1)',
+              padding: '2px 7px',
+              borderRadius: '10px',
+              fontSize: '0.75rem',
+              fontWeight: 800
+            }}>
+              {totalCount}
+            </span>
+          </button>
+        </div>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         {activeTasks.length === 0 ? (
-          <p className="text-muted text-center" style={{ margin: '2rem 0' }}>No hay tareas para esta fase del ciclo operativo.</p>
+          <div style={{ textAlign: 'center', padding: '3rem 1.5rem', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.06)' }}>
+            {statusFilter === 'pending' && completedCount > 0 ? (
+              <>
+                <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>🎉</div>
+                <h3 style={{ color: '#fff', margin: '0 0 0.5rem' }}>¡Todas las tareas pendientes de esta fase están completadas!</h3>
+                <p className="text-muted" style={{ margin: '0 0 1rem', fontSize: '0.9rem' }}>
+                  Has completado las {completedCount} tareas de esta fase con éxito y excelencia operativa.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setStatusFilter('completed')}
+                  className="btn-secondary"
+                  style={{ fontSize: '0.85rem', padding: '0.5rem 1rem' }}
+                >
+                  Ver Tareas Completadas ({completedCount}) →
+                </button>
+              </>
+            ) : statusFilter === 'completed' ? (
+              <p className="text-muted" style={{ margin: 0 }}>
+                No hay tareas completadas aún en esta fase.
+              </p>
+            ) : (
+              <p className="text-muted" style={{ margin: 0 }}>
+                No hay tareas para esta fase del ciclo operativo.
+              </p>
+            )}
+          </div>
         ) : (
           activeTasks.map(task => (
             <div key={task.id} className="glass-panel hover-glow" style={{ padding: '1.5rem', borderLeft: `4px solid ${getPriorityColor(task.priority)}`, opacity: task.completed ? 0.6 : 1, transition: 'all 0.3s' }}>
