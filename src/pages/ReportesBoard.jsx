@@ -1560,12 +1560,12 @@ export default function ReportesBoard() {
                   <PhoneCall size={15} /> COORDINACIÓN C1 & C2
                 </span>
                 <span style={{ background: 'rgba(34,197,94,0.2)', color: '#22c55e', fontSize: '0.7rem', padding: '2px 8px', borderRadius: '10px', fontWeight: 'bold' }}>
-                  Diario 20:00 PM
+                  Diario 12:00 M
                 </span>
               </div>
               <h3 style={{ margin: '0 0 0.3rem', fontSize: '1.1rem', color: '#fff' }}>📞 Reporte Diario de Llamadas</h3>
               <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.4 }}>
-                Registro diario de llamadas (Nuevos y Rezagados). Precarga automática del último reporte y enlace directo a Nodus.
+                Revisión diaria a las 12:00 M (Nuevos y Rezagados). Precarga automática del último reporte y enlace directo a Nodus.
               </p>
             </div>
           </div>
