@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   X, CheckCircle2, Clock, Calendar, AlertCircle, 
-  ExternalLink, Link as LinkIcon, Plus, Trash2, Edit3, 
+  ExternalLink, Link as LinkIcon, Plus, Trash2, Edit3,
   Send, Sparkles, User, FileText, Check, ShieldCheck,
   TrendingUp, RefreshCw, UploadCloud, Paperclip, FileCheck,
-  FolderPlus, Loader2
+  FolderPlus, Loader2, UserPlus
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useChecklist } from '../context/ChecklistContext';
@@ -479,6 +479,33 @@ export default function TaskDetailModal({
                     {assignedList.map(getDisplayName).join(', ')}
                   </strong>
                 </div>
+              )}
+              {isCreator && onEditTaskParams && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    onEditTaskParams(task);
+                  }}
+                  title="Agregar o quitar personas asignadas a esta tarea"
+                  style={{
+                    marginTop: '0.3rem',
+                    alignSelf: 'flex-start',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.3rem',
+                    padding: '0.3rem 0.6rem',
+                    borderRadius: '6px',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    border: '1px solid rgba(41, 171, 226, 0.4)',
+                    background: 'rgba(41, 171, 226, 0.12)',
+                    color: 'var(--crear-cyan)'
+                  }}
+                >
+                  <UserPlus size={13} /> Agregar colaborador
+                </button>
               )}
             </div>
           </div>
