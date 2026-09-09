@@ -2,7 +2,13 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { collection, query, orderBy, onSnapshot, deleteDoc, doc, writeBatch, addDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
-import { Search, Filter, X } from 'lucide-react';
+import { Search, Filter, X, ShieldCheck, AlertTriangle, PhoneCall, CheckCircle } from 'lucide-react';
+import {
+  initNodusRealtimeListener,
+  evaluateEnroladoVerification,
+  evaluateMissionVerification,
+  getGlobalNodusStats
+} from '../services/nodusVerificationService';
 
 export default function MonitorImos() {
   const [missions, setMissions] = useState([]);
@@ -12,8 +18,11 @@ export default function MonitorImos() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterEquipo, setFilterEquipo] = useState('todos');
   const [filterEstado, setFilterEstado] = useState('todos');
+  const [filterNodus, setFilterNodus] = useState('todos');
+  const [nodusSyncTick, setNodusSyncTick] = useState(0);
   const navigate = useNavigate();
 
+  // Escuchar misiones IMO en Firestore en tiempo real
   useEffect(() => {
     const q = query(collection(db, 'imo_missions'), orderBy('lastUpdated', 'desc'));
     
@@ -30,6 +39,13 @@ export default function MonitorImos() {
     });
 
     return () => unsubscribe();
+  }, []);
+
+  // Escuchar actualizaciones de llamadas de Coordinadoras en Nodus
+  useEffect(() => {
+    initNodusRealtimeListener(() => {
+      setNodusSyncTick(t => t + 1);
+    });
   }, []);
 
   // Extrae de forma robusta la lista de enrolados (soporta array enrolados o claves en checks)
@@ -75,6 +91,16 @@ export default function MonitorImos() {
       if (filterEstado === 'completado' && !isCompleted) return false;
       if (filterEstado === 'en_progreso' && isCompleted) return false;
 
+      // Filtro Validación Nodus
+      if (filterNodus !== 'todos') {
+        const enrolados = getEnroladosList(m);
+        const summ = evaluateMissionVerification(m, enrolados);
+        if (filterNodus === 'verificado_ok' && summ.overallStatus !== 'VERIFICADO_OK') return false;
+        if (filterNodus === 'parcial' && summ.overallStatus !== 'PARCIAL') return false;
+        if (filterNodus === 'discrepancia' && summ.overallStatus !== 'DISCREPANCIA') return false;
+        if (filterNodus === 'pendiente' && summ.overallStatus !== 'PENDIENTE_COORD') return false;
+      }
+
       // Filtro Búsqueda (IMO, Equipo o Enrolados)
       if (searchTerm.trim()) {
         const queryText = searchTerm.toLowerCase().trim();
@@ -95,7 +121,7 @@ export default function MonitorImos() {
 
       return true;
     });
-  }, [missions, searchTerm, filterEquipo, filterEstado]);
+  }, [missions, searchTerm, filterEquipo, filterEstado, filterNodus, nodusSyncTick]);
 
   const totalEnroladosCount = useMemo(() => {
     return filteredMissions.reduce((acc, m) => {
@@ -111,6 +137,11 @@ export default function MonitorImos() {
   const completadosCount = useMemo(() => {
     return filteredMissions.filter(m => m.progreso === 100).length;
   }, [filteredMissions]);
+
+  // Estadísticas globales de verificación cruzada Nodus
+  const globalNodusStats = useMemo(() => {
+    return getGlobalNodusStats(filteredMissions, getEnroladosList);
+  }, [filteredMissions, nodusSyncTick]);
 
   const handleToggleVerificado = async (missionId, currentValue) => {
     try {
@@ -205,13 +236,13 @@ export default function MonitorImos() {
     return (
       <div className="p-8 text-center" style={{ color: 'var(--crear-gold)' }}>
         <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>⚡</div>
-        <p>Cargando telemetría de IMOs...</p>
+        <p>Cargando telemetría de IMOs y sincronización Nodus...</p>
       </div>
     );
   }
 
   return (
-    <div className="animate-fade-in p-8" style={{ maxWidth: '1400px', margin: '0 auto' }}>
+    <div className="animate-fade-in p-8" style={{ maxWidth: '1440px', margin: '0 auto' }}>
       <button
         onClick={() => navigate('/')}
         style={{
@@ -240,13 +271,16 @@ export default function MonitorImos() {
             <span style={{ background: 'rgba(14, 165, 233, 0.15)', color: '#38bdf8', padding: '3px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 800 }}>
               SISTEMA OPERATIVO CAUSA
             </span>
+            <span style={{ background: 'rgba(34, 197, 94, 0.15)', color: '#22c55e', padding: '3px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 800 }}>
+              ● VALIDACIÓN AUTOMÁTICA NODUS
+            </span>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Misión IMO</span>
           </div>
           <h1 className="text-gold" style={{ fontSize: '2.2rem', margin: '0 0 0.5rem 0', letterSpacing: '-0.02em' }}>
             MONITOR DE IMOS
           </h1>
           <p className="text-muted" style={{ fontSize: '0.95rem', margin: 0 }}>
-            Supervisión en tiempo real de los IMOs conectados, sus enrolados y su progreso de llamadas.
+            Supervisión en tiempo real de IMOs y <strong style={{ color: '#22c55e' }}>validación automática</strong> cruzada con llamadas de Coordinadoras registradas en Nodus.
           </p>
         </div>
 
@@ -277,25 +311,63 @@ export default function MonitorImos() {
         </button>
       </header>
 
-      {/* Mini Tarjetas de Métricas Resumen */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+      {/* Tarjetas de Métricas Resumen y Validación Nodus */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
         <div className="glass-panel" style={{ padding: '0.9rem 1.2rem', border: '1px solid rgba(255,255,255,0.08)' }}>
           <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>IMOs Filtrados</div>
           <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#fff' }}>
             {filteredMissions.length} <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 400 }}>/ {missions.length}</span>
           </div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>Misiones en seguimiento</div>
         </div>
+
         <div className="glass-panel" style={{ padding: '0.9rem 1.2rem', border: '1px solid rgba(255,255,255,0.08)' }}>
           <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>Total Enrolados</div>
           <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#38bdf8' }}>{totalEnroladosCount}</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>Bajo responsabilidad IMO</div>
         </div>
+
         <div className="glass-panel" style={{ padding: '0.9rem 1.2rem', border: '1px solid rgba(255,255,255,0.08)' }}>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>Confirmados / Asistirán</div>
-          <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#22c55e' }}>{totalConfirmadosCount}</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>Reportados por IMOs</div>
+          <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#ffb703' }}>{totalConfirmadosCount}</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>Marcados como 'Asistirá'</div>
         </div>
+
+        {/* Tarjeta de Validación Automática Nodus vs Coordinadoras */}
+        <div className="glass-panel" style={{
+          padding: '0.9rem 1.2rem',
+          border: globalNodusStats.totalDiscrepancias > 0 ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(34, 197, 94, 0.3)',
+          background: globalNodusStats.totalDiscrepancias > 0 ? 'rgba(239, 68, 68, 0.05)' : 'rgba(34, 197, 94, 0.05)'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Validación Nodus en Llamadas</span>
+            <span style={{
+              fontSize: '0.7rem',
+              fontWeight: 800,
+              padding: '2px 6px',
+              borderRadius: '4px',
+              background: globalNodusStats.porcentajeGlobal >= 80 ? 'rgba(34, 197, 94, 0.2)' : 'rgba(245, 158, 11, 0.2)',
+              color: globalNodusStats.porcentajeGlobal >= 80 ? '#22c55e' : '#f59e0b'
+            }}>
+              {globalNodusStats.porcentajeGlobal}% Coincide
+            </span>
+          </div>
+          <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#22c55e' }}>
+            {globalNodusStats.totalValidadosLlamada} <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 400 }}>/ {globalNodusStats.totalReportadosImo} afirmados</span>
+          </div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>
+            {globalNodusStats.totalDiscrepancias > 0 ? (
+              <span style={{ color: '#ef4444', fontWeight: 700 }}>🚨 {globalNodusStats.totalDiscrepancias} Discrepancia(s) detectada(s)</span>
+            ) : (
+              <span>✅ Confirmados en llamada de Coordinadora</span>
+            )}
+          </div>
+        </div>
+
         <div className="glass-panel" style={{ padding: '0.9rem 1.2rem', border: '1px solid rgba(255,255,255,0.08)' }}>
           <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>Misiones Completadas</div>
           <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--crear-gold, #ffb703)' }}>{completadosCount}</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>Progreso al 100%</div>
         </div>
       </div>
 
@@ -325,6 +397,23 @@ export default function MonitorImos() {
 
         {/* Filtros Selectores */}
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
+          {/* Selector de Validación Nodus */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Cruce Nodus:</span>
+            <select
+              value={filterNodus}
+              onChange={(e) => setFilterNodus(e.target.value)}
+              className="form-input"
+              style={{ width: 'auto', minWidth: '170px', fontSize: '0.85rem', padding: '0.4rem 0.8rem' }}
+            >
+              <option value="todos">Todos los Estados Nodus</option>
+              <option value="verificado_ok">🟢 100% Verificados en Llamada</option>
+              <option value="parcial">🟡 En Verificación (Parcial)</option>
+              <option value="discrepancia">🚨 Con Discrepancias (Alerta)</option>
+              <option value="pendiente">⏳ Falta Confirma de Coord.</option>
+            </select>
+          </div>
+
           {/* Selector de Equipo */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Equipo:</span>
@@ -356,9 +445,9 @@ export default function MonitorImos() {
             </select>
           </div>
 
-          {(searchTerm || filterEquipo !== 'todos' || filterEstado !== 'todos') && (
+          {(searchTerm || filterEquipo !== 'todos' || filterEstado !== 'todos' || filterNodus !== 'todos') && (
             <button
-              onClick={() => { setSearchTerm(''); setFilterEquipo('todos'); setFilterEstado('todos'); }}
+              onClick={() => { setSearchTerm(''); setFilterEquipo('todos'); setFilterEstado('todos'); setFilterNodus('todos'); }}
               style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.15)', color: 'var(--crear-blue, #38bdf8)', padding: '0.4rem 0.8rem', borderRadius: '6px', fontSize: '0.8rem', cursor: 'pointer', fontWeight: 600 }}
             >
               Limpiar filtros
@@ -368,21 +457,22 @@ export default function MonitorImos() {
       </div>
 
       <div className="glass-panel" style={{ padding: '1.5rem', overflowX: 'auto', border: '1px solid rgba(255,255,255,0.08)' }}>
-        <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse', minWidth: '900px' }}>
+        <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse', minWidth: '950px' }}>
           <thead>
             <tr style={{ borderBottom: '2px solid rgba(255, 183, 3, 0.3)' }}>
               <th style={{ padding: '1rem', color: 'var(--crear-gold)', fontSize: '0.85rem' }}>IMO (Nombre)</th>
-              <th style={{ padding: '1rem', color: 'var(--crear-gold)', fontSize: '0.85rem' }}>Inicio Misión</th>
-              <th style={{ padding: '1rem', color: 'var(--crear-gold)', fontSize: '0.85rem' }}>Avance Enrolados</th>
-              <th style={{ padding: '1rem', color: 'var(--crear-gold)', fontSize: '0.85rem' }}>Total Confirmados</th>
+              <th style={{ padding: '1rem', color: 'var(--crear-gold)', fontSize: '0.85rem' }}>Equipo</th>
+              <th style={{ padding: '1rem', color: 'var(--crear-gold)', fontSize: '0.85rem' }}>Avance IMO</th>
+              <th style={{ padding: '1rem', color: 'var(--crear-gold)', fontSize: '0.85rem' }}>Confirmados IMO</th>
               <th style={{ padding: '1rem', color: 'var(--crear-gold)', fontSize: '0.85rem' }}>Estado</th>
+              <th style={{ padding: '1rem', color: 'var(--crear-gold)', fontSize: '0.85rem' }}>Validación Nodus (Llamadas)</th>
               <th style={{ padding: '1rem', color: 'var(--crear-gold)', fontSize: '0.85rem', textAlign: 'right' }}>Acciones</th>
             </tr>
           </thead>
           <tbody>
             {filteredMissions.length === 0 ? (
               <tr>
-                <td colSpan={6} style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                <td colSpan={7} style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
                   {missions.length === 0 ? 'No hay misiones de IMOs registradas actualmente.' : 'Ningún IMO o enrolado coincide con los filtros aplicados.'}
                 </td>
               </tr>
@@ -398,24 +488,35 @@ export default function MonitorImos() {
                 if (e.asistencia) assisted++;
               });
 
+              // Evaluación automática contra llamadas de Coordinadoras en Nodus
+              const nodusSummary = evaluateMissionVerification(m, enroladosList);
+
               const isCompleted = m.progreso === 100;
-              const dateStarted = m.lastUpdated?.toDate ? m.lastUpdated.toDate().toLocaleString() : 'Reciente';
               const isExpanded = expandedImo === m.id;
 
               return (
                 <React.Fragment key={m.id}>
                   <tr style={{ borderBottom: isExpanded ? 'none' : '1px solid rgba(255,255,255,0.06)', background: isExpanded ? 'rgba(255,255,255,0.02)' : 'transparent' }}>
                     <td style={{ padding: '1rem', fontWeight: 600 }}>
-                      {m.imoNombre || 'Desconocido'}
-                      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{m.equipo || ''}</div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span>{m.imoNombre || 'Desconocido'}</span>
+                        {m.verificadoNodus && (
+                          <span title="Marcado como verificado manualmente" style={{ fontSize: '0.7rem', color: '#22c55e', background: 'rgba(34, 197, 94, 0.15)', padding: '1px 5px', borderRadius: '3px' }}>
+                            Admin OK
+                          </span>
+                        )}
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{m.sede || 'Lima'}</div>
                     </td>
-                    <td style={{ padding: '1rem', fontSize: '0.9rem' }} className="text-muted">{dateStarted}</td>
+                    <td style={{ padding: '1rem', fontSize: '0.9rem', color: 'var(--crear-blue)' }}>
+                      {m.equipo || 'Sin Equipo'}
+                    </td>
                     <td style={{ padding: '1rem' }}>
-                      <div>Progreso: {m.progreso || 0}%</div>
-                      <div style={{ fontSize: '0.8rem', color: 'var(--crear-blue)' }}>Contactados: {contacted} | Asistirán: {assisted}</div>
+                      <div style={{ fontWeight: 600 }}>Progreso: {m.progreso || 0}%</div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>📞 Contactados: {contacted}</div>
                     </td>
                     <td style={{ padding: '1rem', fontWeight: 700 }}>
-                      {confirmed} / {totalEnrolled}
+                      <span style={{ color: assisted > 0 ? '#38bdf8' : '#fff' }}>{assisted}</span> / {totalEnrolled}
                     </td>
                     <td style={{ padding: '1rem' }}>
                       {isCompleted ? (
@@ -424,6 +525,32 @@ export default function MonitorImos() {
                         <span style={{ color: '#ef4444', background: 'rgba(239, 68, 68, 0.15)', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 700 }}>En Progreso</span>
                       )}
                     </td>
+
+                    {/* Insignia Reactiva de Validación Automática Nodus */}
+                    <td style={{ padding: '1rem' }}>
+                      <div
+                        onClick={() => setExpandedImo(isExpanded ? null : m.id)}
+                        title={nodusSummary.tooltip}
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          padding: '5px 10px',
+                          borderRadius: '6px',
+                          fontSize: '0.78rem',
+                          fontWeight: 700,
+                          background: nodusSummary.badgeBg,
+                          color: nodusSummary.badgeColor,
+                          border: `1px solid ${nodusSummary.badgeBorder}`,
+                          boxShadow: nodusSummary.overallStatus === 'DISCREPANCIA' ? '0 0 10px rgba(239, 68, 68, 0.25)' : 'none',
+                          cursor: 'pointer',
+                          transition: 'transform 0.15s ease'
+                        }}
+                      >
+                        <span>{nodusSummary.badgeLabel}</span>
+                      </div>
+                    </td>
+
                     <td style={{ padding: '1rem', textAlign: 'right' }}>
                       <button
                         onClick={() => setExpandedImo(isExpanded ? null : m.id)}
@@ -443,26 +570,8 @@ export default function MonitorImos() {
                         {isExpanded ? 'Ocultar Enrolados' : `Ver Enrolados (${enroladosList.length})`}
                       </button>
                       <button
-                        onClick={() => handleToggleVerificado(m.id, m.verificadoNodus)}
-                        title="Marcar si lo que dice el IMO está verificado en Nodus"
-                        style={{
-                          background: m.verificadoNodus ? 'rgba(34, 197, 94, 0.15)' : 'transparent',
-                          color: m.verificadoNodus ? '#22c55e' : 'var(--text-muted)',
-                          border: `1px solid ${m.verificadoNodus ? 'rgba(34, 197, 94, 0.3)' : 'rgba(255,255,255,0.1)'}`,
-                          padding: '4px 10px',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                          fontSize: '0.8rem',
-                          fontWeight: m.verificadoNodus ? 600 : 400,
-                          marginRight: '8px',
-                          transition: 'all 0.2s ease'
-                        }}
-                      >
-                        {m.verificadoNodus ? '✅ Nodus OK' : '☐ Validar Nodus'}
-                      </button>
-                      <button
                         onClick={() => handleResetMission(m.id)}
-                        title="Resetear IMO"
+                        title="Resetear telemetría de prueba de este IMO"
                         style={{
                           background: 'transparent',
                           color: 'var(--text-muted)',
@@ -483,14 +592,33 @@ export default function MonitorImos() {
                   
                   {isExpanded && (
                     <tr style={{ background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                      <td colSpan={6} style={{ padding: '1.5rem', paddingTop: '0.5rem' }}>
-                        <div style={{ background: 'rgba(0,0,0,0.35)', padding: '1.2rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-                            <h4 style={{ margin: 0, color: 'var(--crear-gold, #ffb703)', fontSize: '0.95rem', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <span>👥</span> Enrolados de {m.imoNombre} ({enroladosList.length})
-                            </h4>
-                            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                              Confirmados / Asistirán: <strong style={{ color: '#22c55e' }}>{assisted}</strong> de <strong>{enroladosList.length}</strong>
+                      <td colSpan={7} style={{ padding: '1.5rem', paddingTop: '0.5rem' }}>
+                        <div style={{ background: 'rgba(0,0,0,0.4)', padding: '1.2rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+                            <div>
+                              <h4 style={{ margin: 0, color: 'var(--crear-gold, #ffb703)', fontSize: '0.95rem', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <span>👥</span> Enrolados de {m.imoNombre} ({enroladosList.length})
+                              </h4>
+                              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                                Reportados como 'Asistirá' por IMO: <strong style={{ color: '#38bdf8' }}>{assisted}</strong> de <strong>{enroladosList.length}</strong>
+                              </div>
+                            </div>
+
+                            {/* Barra de Resumen de Cruce Nodus */}
+                            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                              <span style={{ fontSize: '0.78rem', padding: '4px 8px', borderRadius: '4px', background: 'rgba(34, 197, 94, 0.15)', color: '#22c55e', border: '1px solid rgba(34, 197, 94, 0.3)', fontWeight: 600 }}>
+                                ✅ {nodusSummary.validadosOk} Coinciden con Llamada Coord.
+                              </span>
+                              {nodusSummary.pendientesCoord > 0 && (
+                                <span style={{ fontSize: '0.78rem', padding: '4px 8px', borderRadius: '4px', background: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b', border: '1px solid rgba(245, 158, 11, 0.3)', fontWeight: 600 }}>
+                                  ⏳ {nodusSummary.pendientesCoord} Pendientes de Confirmar por Coord.
+                                </span>
+                              )}
+                              {nodusSummary.discrepancias > 0 && (
+                                <span style={{ fontSize: '0.78rem', padding: '4px 8px', borderRadius: '4px', background: 'rgba(239, 68, 68, 0.2)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.45)', fontWeight: 800 }}>
+                                  🚨 {nodusSummary.discrepancias} Discrepancia(s) Crítica(s)
+                                </span>
+                              )}
                             </div>
                           </div>
 
@@ -499,68 +627,104 @@ export default function MonitorImos() {
                               No hay enrolados registrados para este IMO.
                             </div>
                           ) : (
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1rem' }}>
-                              {enroladosList.map(enrolado => (
-                                <div key={enrolado.id} style={{ background: 'rgba(255,255,255,0.04)', padding: '1rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }}>
-                                  <div style={{ fontWeight: 700, fontSize: '0.95rem', marginBottom: '6px', color: '#fff' }}>
-                                    {enrolado.nombre}
-                                  </div>
-                                  
-                                  <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '10px' }}>
-                                    <span style={{
-                                      fontSize: '0.75rem',
-                                      padding: '3px 8px',
-                                      borderRadius: '4px',
-                                      fontWeight: 600,
-                                      background: enrolado.contacto ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.15)',
-                                      color: enrolado.contacto ? '#22c55e' : '#ef4444'
-                                    }}>
-                                      {enrolado.contacto ? '📞 Contactado' : '⏳ No Contactado'}
-                                    </span>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1rem' }}>
+                              {enroladosList.map(enrolado => {
+                                const evalRes = evaluateEnroladoVerification(enrolado, m.imoNombre, m.equipo);
+                                return (
+                                  <div key={enrolado.id} style={{
+                                    background: 'rgba(255,255,255,0.04)',
+                                    padding: '1rem',
+                                    borderRadius: '8px',
+                                    border: `1px solid ${evalRes.status === 'DISCREPANCIA' ? 'rgba(239, 68, 68, 0.4)' : evalRes.status === 'VERIFICADO_OK' ? 'rgba(34, 197, 94, 0.3)' : 'rgba(255,255,255,0.08)'}`,
+                                    position: 'relative'
+                                  }}>
+                                    <div style={{ fontWeight: 700, fontSize: '0.95rem', marginBottom: '6px', color: '#fff' }}>
+                                      {enrolado.nombre}
+                                    </div>
                                     
-                                    <span style={{
-                                      fontSize: '0.75rem',
-                                      padding: '3px 8px',
-                                      borderRadius: '4px',
-                                      fontWeight: 600,
-                                      background: enrolado.asistencia ? 'rgba(56, 189, 248, 0.15)' : 'rgba(255, 255, 255, 0.08)',
-                                      color: enrolado.asistencia ? '#38bdf8' : 'var(--text-muted)'
-                                    }}>
-                                      {enrolado.asistencia ? '✅ Asistirá' : '⚪ Pendiente'}
-                                    </span>
-                                  </div>
-
-                                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
-                                    📍 {enrolado.coordinadora_nombre || m.equipo}
-                                    {enrolado.telefono ? ` • 📱 ${enrolado.telefono}` : ''}
-                                  </div>
-
-                                  <div style={{ fontSize: '0.8rem', color: enrolado.email ? '#38bdf8' : 'var(--text-muted)', marginBottom: '12px' }}>
-                                    {enrolado.email ? `✉️ ${enrolado.email}` : '⚪ Sin correo registrado'}
-                                  </div>
-
-                                  {enrolado.email ? (
-                                    <button
-                                      onClick={() => handleSendWelcomeEmail(enrolado)}
-                                      disabled={sendingEmail === enrolado.id}
-                                      style={{
-                                        width: '100%',
-                                        background: 'var(--crear-gold)',
-                                        color: '#000',
-                                        border: 'none',
-                                        padding: '6px 12px',
+                                    {/* Insignias de lo que afirmó el IMO */}
+                                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '8px' }}>
+                                      <span style={{
+                                        fontSize: '0.75rem',
+                                        padding: '2px 7px',
                                         borderRadius: '4px',
-                                        fontWeight: 700,
-                                        fontSize: '0.8rem',
-                                        cursor: sendingEmail === enrolado.id ? 'not-allowed' : 'pointer',
-                                        opacity: sendingEmail === enrolado.id ? 0.7 : 1
-                                      }}
-                                    >
-                                      {sendingEmail === enrolado.id ? 'Encolando...' : '📨 Enviar Bienvenida'}
-                                    </button>
-                                  ) : null}
-                                </div>
-                              ))}
+                                        fontWeight: 600,
+                                        background: enrolado.contacto ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                                        color: enrolado.contacto ? '#22c55e' : '#ef4444'
+                                      }}>
+                                        {enrolado.contacto ? '📞 Contactado' : '⏳ No Contactado'}
+                                      </span>
+                                      
+                                      <span style={{
+                                        fontSize: '0.75rem',
+                                        padding: '2px 7px',
+                                        borderRadius: '4px',
+                                        fontWeight: 600,
+                                        background: enrolado.asistencia ? 'rgba(56, 189, 248, 0.15)' : 'rgba(255, 255, 255, 0.08)',
+                                        color: enrolado.asistencia ? '#38bdf8' : 'var(--text-muted)'
+                                      }}>
+                                        {enrolado.asistencia ? '✅ IMO: Asistirá' : '⚪ IMO: Pendiente'}
+                                      </span>
+                                    </div>
+
+                                    {/* Panel de Cruce Automático con Llamadas de Coordinadoras en Nodus */}
+                                    <div style={{
+                                      padding: '8px 10px',
+                                      borderRadius: '6px',
+                                      background: evalRes.statusBg,
+                                      border: `1px solid ${evalRes.statusBorder}`,
+                                      marginBottom: '10px'
+                                    }}>
+                                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                                        <span style={{ fontSize: '0.72rem', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 700 }}>
+                                          🎧 Nodus / Coordinación:
+                                        </span>
+                                        <span style={{ fontSize: '0.75rem', fontWeight: 800, color: evalRes.statusColor }}>
+                                          {evalRes.statusLabel}
+                                        </span>
+                                      </div>
+                                      <div style={{ fontSize: '0.8rem', color: '#fff', marginBottom: '2px' }}>
+                                        <strong>Coord. {evalRes.coordinador}</strong> • 1ra Llamada: <span style={{ color: evalRes.statusColor, fontWeight: 700 }}>{evalRes.llamada1}</span>
+                                        {evalRes.llamada2 && evalRes.llamada2 !== '—' && ` • 2da: ${evalRes.llamada2}`}
+                                        {evalRes.asistenciaNodus && evalRes.asistenciaNodus !== '—' && ` • Asistencia: ${evalRes.asistenciaNodus}`}
+                                      </div>
+                                      <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                                        {evalRes.detalle}
+                                      </div>
+                                    </div>
+
+                                    <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
+                                      📍 {enrolado.coordinadora_nombre || m.equipo}
+                                      {enrolado.telefono ? ` • 📱 ${enrolado.telefono}` : ''}
+                                    </div>
+
+                                    <div style={{ fontSize: '0.78rem', color: enrolado.email ? '#38bdf8' : 'var(--text-muted)', marginBottom: '12px' }}>
+                                      {enrolado.email ? `✉️ ${enrolado.email}` : '⚪ Sin correo registrado'}
+                                    </div>
+
+                                    {enrolado.email ? (
+                                      <button
+                                        onClick={() => handleSendWelcomeEmail(enrolado)}
+                                        disabled={sendingEmail === enrolado.id}
+                                        style={{
+                                          width: '100%',
+                                          background: 'var(--crear-gold)',
+                                          color: '#000',
+                                          border: 'none',
+                                          padding: '6px 12px',
+                                          borderRadius: '4px',
+                                          fontWeight: 700,
+                                          fontSize: '0.8rem',
+                                          cursor: sendingEmail === enrolado.id ? 'not-allowed' : 'pointer',
+                                          opacity: sendingEmail === enrolado.id ? 0.7 : 1
+                                        }}
+                                      >
+                                        {sendingEmail === enrolado.id ? 'Encolando...' : '📨 Enviar Bienvenida'}
+                                      </button>
+                                    ) : null}
+                                  </div>
+                                );
+                              })}
                             </div>
                           )}
                         </div>
