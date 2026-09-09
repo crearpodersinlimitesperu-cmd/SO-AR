@@ -19,8 +19,11 @@ import {
   getSedesBenchmark,
   CMJ_METADATA,
   SEDES_LIST,
-  normalizeSedeName
+  normalizeSedeName,
+  mergeNodusDataIntoEquipos
 } from '../services/cmjDataService';
+import { db, getDocResilient } from '../services/firebase';
+import { doc } from 'firebase/firestore';
 
 const RISK_COLORS = {
   CRITICO: { bg: 'rgba(239, 68, 68, 0.15)', border: '#ef4444', text: '#f87171', label: 'Riesgo Crítico' },
@@ -47,12 +50,30 @@ export default function CMJDiagnosticsDashboard({ globalFilterSede }) {
   }, [globalFilterSede]);
 
   // Cargar datos
-  const rawEquipos = useMemo(() => getAllEquipos(), []);
+  const [rawEquipos, setRawEquipos] = useState(() => getAllEquipos());
   const rawEventos = useMemo(() => getAllEventos(), []);
-  const summary = useMemo(() => getCMJSummary(selectedSede), [selectedSede]);
-  const funnelData = useMemo(() => getFunnelData(selectedSede), [selectedSede]);
-  const evolutionData = useMemo(() => getRetentionEvolutionData(selectedSede), [selectedSede]);
-  const sedesBenchmark = useMemo(() => getSedesBenchmark(), []);
+
+  useEffect(() => {
+    const fetchNodus = async () => {
+      try {
+        const nodusRef = doc(db, 'nodus_kpis_sincronizados', 'latest_snapshot');
+        const snap = await getDocResilient(nodusRef);
+        if (snap.exists()) {
+          const nodusData = snap.data();
+          const enrichedEquipos = mergeNodusDataIntoEquipos(getAllEquipos(), nodusData);
+          setRawEquipos(enrichedEquipos);
+        }
+      } catch (err) {
+        console.warn('No se pudo cargar snapshot de Nodus para CMJ Dashboard:', err);
+      }
+    };
+    fetchNodus();
+  }, []);
+  
+  const summary = useMemo(() => getCMJSummary(selectedSede), [selectedSede, rawEquipos]);
+  const funnelData = useMemo(() => getFunnelData(selectedSede), [selectedSede, rawEquipos]);
+  const evolutionData = useMemo(() => getRetentionEvolutionData(selectedSede), [selectedSede, rawEquipos]);
+  const sedesBenchmark = useMemo(() => getSedesBenchmark(), [rawEquipos]);
 
   // Lista de entrenadores únicos para el filtro
   const uniqueTrainers = useMemo(() => {

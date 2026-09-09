@@ -151,6 +151,120 @@ export function getAllEquipos() {
   }
 }
 
+/**
+ * Enriches the base equipos array with live data from the Nodus snapshot.
+ * Nodus tracks participants per team, and we can calculate the FDS history 
+ * by checking their finDeSemana stage and desertor status.
+ */
+export function mergeNodusDataIntoEquipos(baseEquipos, nodusSnap) {
+  if (!nodusSnap || !nodusSnap.equiposReporte) return baseEquipos;
+
+  const enriched = baseEquipos.map(eq => {
+    // Find the corresponding equipo in Nodus (e.g., "EQUIPO 30")
+    const nodusEq = nodusSnap.equiposReporte.find(n => 
+      n.equipoNombre && n.equipoNombre.toUpperCase().includes(eq.equipoLabel.toUpperCase())
+    );
+
+    if (!nodusEq || !nodusEq.participantes) return eq;
+
+    const parts = nodusEq.participantes;
+    const totalEnrolled = parts.length;
+
+    // Count participants by stage
+    const inPfd = parts.filter(p => p.finDeSemana === 'PFD').length;
+    const inSfd = parts.filter(p => p.finDeSemana === 'SFD').length;
+    const inTfd = parts.filter(p => p.finDeSemana === 'TFD').length;
+    
+    // Determine current stage of the team based on highest FDS reached by any participant
+    let currentStage = 0;
+    if (inTfd > 0) currentStage = 3;
+    else if (inSfd > 0) currentStage = 2;
+    else if (inPfd > 0) currentStage = 1;
+
+    // FDS 1: Creación
+    // Inician: Everyone who is currently in PFD, SFD, or TFD. 
+    // Plus any dropouts that happened during PFD. We approximate this as total participants
+    // minus those who never started (those who have '—' for FDS but aren't explicit dropouts).
+    // The user's logic: "cuantos inician un fds y terminan, la diferencia son los desertores"
+    let c_pxInicio = 0;
+    let c_pxFinal = 0;
+    let r_pxInicio = 0;
+    let r_pxFinal = 0;
+    let g_pxInicio = 0;
+    let g_pxFinal = 0;
+
+    // If team has reached at least PFD
+    if (currentStage >= 1) {
+      c_pxInicio = totalEnrolled; // Nodus shows all enrolled as starting point
+      if (currentStage === 1) {
+        c_pxFinal = inPfd; // Still in PFD, so final is whoever is active
+      } else {
+        c_pxFinal = inSfd + inTfd; // Passed PFD
+      }
+    }
+
+    // FDS 2: Relación
+    if (currentStage >= 2) {
+      r_pxInicio = c_pxFinal; 
+      if (currentStage === 2) {
+        r_pxFinal = inSfd; 
+      } else {
+        r_pxFinal = inTfd;
+      }
+    }
+
+    // FDS 3: Gratitud
+    if (currentStage >= 3) {
+      g_pxInicio = r_pxFinal;
+      g_pxFinal = inTfd; 
+    }
+
+    // Calculate Deserciones
+    const c_desercionPx = c_pxInicio > 0 ? c_pxInicio - c_pxFinal : 0;
+    const r_desercionPx = r_pxInicio > 0 ? r_pxInicio - r_pxFinal : 0;
+    const g_desercionPx = g_pxInicio > 0 ? g_pxInicio - g_pxFinal : 0;
+    const desercionTotalPx = c_desercionPx + r_desercionPx + g_desercionPx;
+
+    const pxInicioReal = c_pxInicio || eq.c1.terminan;
+    const pxFinalReal = g_pxFinal || r_pxFinal || c_pxFinal;
+    const tasaRetencionGeneral = pxInicioReal > 0 ? (pxFinalReal / pxInicioReal) * 100 : 100;
+    const tasaDesercionGeneral = pxInicioReal > 0 ? (desercionTotalPx / pxInicioReal) * 100 : 0;
+
+    return {
+      ...eq,
+      creacion: {
+        ...eq.creacion,
+        pxInicio: c_pxInicio,
+        pxFinal: c_pxFinal,
+        desercionPx: c_desercionPx
+      },
+      relacion: {
+        ...eq.relacion,
+        pxInicio: r_pxInicio,
+        pxFinal: r_pxFinal,
+        desercionPx: r_desercionPx
+      },
+      gratitud: {
+        ...eq.gratitud,
+        pxInicio: g_pxInicio,
+        pxFinal: g_pxFinal,
+        desercionPx: g_desercionPx
+      },
+      resumen: {
+        ...eq.resumen,
+        pxIniciales: pxInicioReal,
+        pxFinales: pxFinalReal,
+        desercionTotalPx,
+        tasaRetencion: Math.round(tasaRetencionGeneral * 10) / 10,
+        tasaDesercion: Math.round(tasaDesercionGeneral * 10) / 10
+      }
+    };
+  });
+  
+  _cachedEquipos = enriched;
+  return enriched;
+}
+
 let _cachedEventos = null;
 
 function parseSingleDriveSheet(sheetRows, sheetName, sede) {
