@@ -1276,15 +1276,18 @@ export const USERS_TO_IMPORT = [
   {
     "id": "qt_jorgewashingtonramrezmorejn",
     "name": "Jorge Washington Ramírez Morejón",
-    "role": "qt",
+    "role": "coord_c1",
     "roles": [
+      "coord_c1",
       "qt"
     ],
     "sede": "GYE",
+    "telefono": "593990431863",
     "emails": [
+      "jorge.ramirez@crearpsl.net",
       "jorgeramirezmorejon@gmail.com"
     ],
-    "email": "jorgeramirezmorejon@gmail.com"
+    "email": "jorge.ramirez@crearpsl.net"
   },
   {
     "id": "qt_mariafernandafloresnavarrete",

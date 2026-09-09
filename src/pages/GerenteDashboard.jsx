@@ -116,8 +116,21 @@ export default function GerenteDashboard() {
     const sedeMatches = usersData.filter(u => normalizeRole(u.role) === taskRoleNorm && (!u.sede || !targetSede || u.sede.toLowerCase().trim() === targetSede));
     if (sedeMatches.length > 0) return sedeMatches;
 
-    const roleMatches = usersData.filter(u => normalizeRole(u.role) === taskRoleNorm);
-    if (roleMatches.length > 0) return roleMatches.slice(0, 2);
+    // 🔒 (09/09/2026) José reportó, con captura, que un Gerente de sede (simulado: Josue
+    // Vera, GYE) veía en este panel nombres y botones de Chat/Correo de gerentes de OTRAS
+    // sedes (Jose, Yurany...) para tareas genéricas de rol 'gerente' sin sede propia
+    // asignada — "esto viola la confidencialidad". Causa confirmada leyendo el código:
+    // cuando no había ningún usuario con el rol buscado en la MISMA sede (sedeMatches
+    // vacío), este fallback caía a TODOS los usuarios del sistema con ese rol, sin
+    // importar la sede — exponía identidad y contacto de personal de otras sedes. Se
+    // restringe ese fallback global a quienes legítimamente ven todas las sedes
+    // (Super Admin, Vista Consolidada, Dirección); para cualquier otro usuario se cae
+    // directo al marcador genérico de abajo (sin nombres ni contacto de otra sede).
+    const hasGlobalScope = !!(currentUser?.isSuperAdmin || currentUser?.isConsolidatedView || currentUser?.appRole === 'consolidado' || currentUser?.isDireccion);
+    if (hasGlobalScope) {
+      const roleMatches = usersData.filter(u => normalizeRole(u.role) === taskRoleNorm);
+      if (roleMatches.length > 0) return roleMatches.slice(0, 2);
+    }
 
     return [{ name: `Resp: ${task.role.replace(/_/g, ' ')}`, email: '', role: task.role, sede: currentUser?.sede }];
   };

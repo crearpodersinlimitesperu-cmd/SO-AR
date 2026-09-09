@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { collection, query, orderBy, onSnapshot, deleteDoc, doc, writeBatch, addDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { Search, Filter, X, ShieldCheck, AlertTriangle, PhoneCall, CheckCircle } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { normalizeSede } from '../data/usersData';
 import {
   initNodusRealtimeListener,
   evaluateEnroladoVerification,
@@ -11,6 +13,7 @@ import {
 } from '../services/nodusVerificationService';
 
 export default function MonitorImos() {
+  const { currentUser } = useAuth();
   const [missions, setMissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedImo, setExpandedImo] = useState(null);
@@ -94,18 +97,36 @@ export default function MonitorImos() {
     });
   };
 
+  // 🔒 (09/09/2026) José reportó, con captura, que el Monitor de IMOs le mostraba a un
+  // Gerente de sede (simulado: Josue Vera) datos de TODAS las sedes ("esto viola la
+  // confidencialidad de lo que hacemos"). Confirmado leyendo el código: este componente
+  // nunca importaba useAuth ni currentUser, y el query a 'imo_missions' (línea ~44) no
+  // tenía ningún where() por sede — cualquier usuario veía el total global (378/378
+  // misiones, 955 enrolados en la captura). Se agrega aquí el mismo criterio de alcance
+  // que ya usa el resto de la plataforma: Super Admin / Vista Consolidada / Dirección ven
+  // TODO (alcance GLOBAL legítimo para supervisión); cualquier otro rol (Gerente de sede,
+  // Coordinador, etc.) solo ve las misiones cuya sede coincide con currentUser.sede,
+  // normalizada con normalizeSede() (la misma función que usa el resto del código para
+  // que "GYE" y "Guayaquil" se traten como la misma sede).
+  const isGlobalScopeUser = !!(currentUser?.isSuperAdmin || currentUser?.isConsolidatedView || currentUser?.appRole === 'consolidado' || currentUser?.isDireccion);
+  const sedeScopedMissions = useMemo(() => {
+    if (isGlobalScopeUser) return missions;
+    const mySede = normalizeSede(currentUser?.sede);
+    return missions.filter(m => normalizeSede(m.sede) === mySede);
+  }, [missions, isGlobalScopeUser, currentUser?.sede]);
+
   // Equipos únicos para el filtro
   const equiposDisponibles = useMemo(() => {
     const setEq = new Set();
-    missions.forEach(m => {
+    sedeScopedMissions.forEach(m => {
       if (m.equipo) setEq.add(m.equipo);
     });
     return Array.from(setEq).sort();
-  }, [missions]);
+  }, [sedeScopedMissions]);
 
   // Filtrado de misiones en tiempo real por búsqueda y selectores
   const filteredMissions = useMemo(() => {
-    return missions.filter((m) => {
+    return sedeScopedMissions.filter((m) => {
       // Filtro Equipo
       if (filterEquipo !== 'todos' && (m.equipo || '').toUpperCase() !== filterEquipo.toUpperCase()) {
         return false;
@@ -146,7 +167,7 @@ export default function MonitorImos() {
 
       return true;
     });
-  }, [missions, searchTerm, filterEquipo, filterEstado, filterNodus, nodusSyncTick]);
+  }, [sedeScopedMissions, searchTerm, filterEquipo, filterEstado, filterNodus, nodusSyncTick]);
 
   const totalEnroladosCount = useMemo(() => {
     return filteredMissions.reduce((acc, m) => {

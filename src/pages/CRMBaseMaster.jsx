@@ -129,8 +129,19 @@ export default function CRMBaseMaster() {
 
   if (!hasAccess) {
     return (
-      <div style={{ minHeight: '100vh', background: bgPage, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ minHeight: '100vh', background: bgPage, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1.2rem' }}>
         <div style={{ color: textMuted }}>Acceso restringido. Nivel insuficiente de administrador.</div>
+        {/* (09/09/2026) José reportó (con captura) que a esta pantalla le faltaba el botón
+            de regreso que sí tienen las demás pantallas de acceso restringido de la
+            plataforma (ChecklistBoard.jsx, NodusDataMap.jsx) — quedó fuera cuando este
+            archivo fue reescrito por otro agente. Se añade aquí el mismo patrón. */}
+        <button
+          onClick={() => navigate('/')}
+          className="btn-secondary"
+          style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 1rem', background: bgCard, border: `1px solid ${borderSubtle}`, color: textMain, borderRadius: '8px', cursor: 'pointer' }}
+        >
+          <ArrowLeft size={16} /> Volver a Causa OS
+        </button>
       </div>
     );
   }

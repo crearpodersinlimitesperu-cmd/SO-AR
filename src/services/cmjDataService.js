@@ -36,7 +36,27 @@ export function normalizeSedeName(rawSede) {
   return s;
 }
 
-import nodusMaestriaLive from '../data/nodus_maestria_live.json';
+// (09/09/2026) BUG REAL DE BUILD encontrado y corregido — reportado por José: "causa
+// dejo de funcionar, auxilio". Esta línea importaba estáticamente
+// 'src/data/nodus_maestria_live.json', pero ese nombre coincide con el patrón
+// 'nodus_*.json' de .gitignore (línea 46) — el archivo NUNCA se subió a git. Un
+// build hecho desde un clon fresco del repo (incluido el pipeline de GitHub
+// Actions que despliega a Firebase Hosting) falla en seco con "Could not resolve
+// '../data/nodus_maestria_live.json'" — confirmado reproduciendo `npx vite build`
+// contra origin/master (commit 6b13aed). El archivo solo existía localmente en la
+// máquina de quien hizo el commit 141b3af, así que desde ese commit el pipeline
+// automático no puede generar un build nuevo (Firebase Hosting se queda sirviendo
+// lo último que sí logró desplegarse, o falla, según qué haya pasado con el deploy
+// manual entre medio — no verificable desde este entorno sin acceso al historial
+// de GitHub Actions). Se quita el import y se deja `nodusMaestriaLive` en null:
+// todo el código que lo usa más abajo (liveData en la línea ~66, y su uso en
+// ~141-142) ya tiene su propio fallback seguro (`liveData ? ... : num(r[...])`),
+// el mismo camino que se usaba antes de que este archivo existiera — no se pierde
+// funcionalidad real, porque el archivo nunca llegó a producción vía git de todos
+// modos. Si se quiere reactivar el overlay de datos "live" de Nodus, ese JSON debe
+// generarse en un paso del propio pipeline (o sacarse de .gitignore y commitearse),
+// no depender de que exista solo en una laptop.
+const nodusMaestriaLive = null;
 
 const TEAM_NAMES_MAPPING = {
   'LIMA CICLO 1': {
