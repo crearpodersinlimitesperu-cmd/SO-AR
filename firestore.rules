@@ -492,7 +492,8 @@ service cloud.firestore {
     // cubierto por el mismo "allow read, write" de aquí abajo, dentro del mismo riesgo
     // ya aceptado en el párrafo anterior (no lo amplía).
     match /users/{userId} {
-      allow read, write: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());
 
       match /progress/{docId} {
         allow read, write: if isAuthenticated() && (request.auth.uid == userId || isSuperAdmin());

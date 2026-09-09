@@ -664,16 +664,26 @@ export default function ChecklistBoard() {
                     )}
 
                     {/* COLABORADORES ACTIVOS DE LA TAREA */}
-                    {task.collaboratorDetails && task.collaboratorDetails.length > 0 && (
-                      <div style={{ marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
-                        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>🤝 Colaborando:</span>
-                        {task.collaboratorDetails.map(c => (
-                          <span key={c.email} style={{ fontSize: '0.75rem', padding: '0.15rem 0.5rem', borderRadius: '9999px', background: 'rgba(0, 210, 255, 0.15)', color: 'var(--crear-blue)', border: '1px solid rgba(0, 210, 255, 0.3)' }}>
-                            @{c.name}
-                          </span>
-                        ))}
-                      </div>
-                    )}
+                    {task.collaboratorDetails && task.collaboratorDetails.length > 0 && (() => {
+                      const filteredCollabs = (currentUser?.isSuperAdmin || currentUser?.isDireccion || currentUser?.appRole === 'direccion')
+                        ? task.collaboratorDetails
+                        : task.collaboratorDetails.filter(c => {
+                            const cSede = c.sede?.toLowerCase();
+                            const uSede = currentUser?.sede?.toLowerCase();
+                            return !cSede || cSede === 'global' || cSede === 'sede global' || cSede === uSede;
+                          });
+                      if (filteredCollabs.length === 0) return null;
+                      return (
+                        <div style={{ marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+                          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>🤝 Colaborando:</span>
+                          {filteredCollabs.map(c => (
+                            <span key={c.email} style={{ fontSize: '0.75rem', padding: '0.15rem 0.5rem', borderRadius: '9999px', background: 'rgba(0, 210, 255, 0.15)', color: 'var(--crear-blue)', border: '1px solid rgba(0, 210, 255, 0.3)' }}>
+                              @{c.name}
+                            </span>
+                          ))}
+                        </div>
+                      );
+                    })()}
 
                     {/* MOSTRAR QUIÉN ASIGNÓ LA TAREA (COLOR POR ROL) */}
                     {task.createdBy && (task.assignedToEmail || (task.assignedToEmails && task.assignedToEmails.length > 0)) && (() => {

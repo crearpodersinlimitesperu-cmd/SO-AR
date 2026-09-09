@@ -363,6 +363,7 @@ export const getAssignableRoles = (currentUser) => {
 
   if (currentUser.isSuperAdmin || isDireccionRole(normRole) || normRole === 'director_maestria') {
     return [
+      { id: 'todos', name: '🌍 TODOS LOS EQUIPOS (Cross-Area)' },
       ...directivos,
       ...baseManagers
     ];

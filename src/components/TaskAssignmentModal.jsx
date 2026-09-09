@@ -286,7 +286,7 @@ export default function TaskAssignmentModal({ isOpen, onClose, prefilledUser = n
                   >
                     <option value="">Cualquiera en este Rol (No específico)</option>
                     {usersData
-                      .filter(u => normalizeRole(u.role) === newTask.role || u.role === newTask.role)
+                      .filter(u => newTask.role === 'todos' || normalizeRole(u.role) === newTask.role || u.role === newTask.role)
                       // (02/09/2026) FIX: este filtro solo miraba el rol e ignoraba
                       // "Sede Específica" por completo — seleccionar Lima seguía
                       // mostrando colaboradores de todas las sedes. Ahora, si hay

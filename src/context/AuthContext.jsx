@@ -467,113 +467,114 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const rawEmail = user.email.trim().toLowerCase();
-        const normalizedEmail = rawEmail.replace('@crearpsl.com', '@crearpsl.net');
-        
-        let foundUser = await findUserInFirestore(normalizedEmail);
-        
-        if (!foundUser) {
-          try {
-            const staffRef = collection(db, "staff_directory");
-            let sq = query(staffRef, where("emails", "array-contains", normalizedEmail));
-            let sSnap = await getDocs(sq);
-            if (!sSnap.empty) {
-              foundUser = sSnap.docs[0].data();
-            } else {
-              sq = query(staffRef, where("email", "==", normalizedEmail));
-              sSnap = await getDocs(sq);
-              if (!sSnap.empty) foundUser = sSnap.docs[0].data();
-            }
-          } catch (err) {
-            console.error("Error consultando staff_directory:", err);
-          }
-        }
-        
-        // 🆕 (02/09/2026) Mismo respaldo que en loginWithGoogle: catálogo estático
-        // antes de descartar al usuario por completo en esta ruta de sesión persistida.
-        if (!foundUser) {
-          const staticUser = findUserByAnyEmail(normalizedEmail);
-          if (staticUser) {
-            foundUser = { ...staticUser, uid: user.uid };
-          }
-        }
-
-        if (!foundUser && isSuperAdminEmail(normalizedEmail)) {
-          foundUser = {
-            id: user.uid,
-            uid: user.uid,
-            name: user.displayName || "Administrador",
-            role: "gerente",
-            sede: "Global",
-            emails: [normalizedEmail]
-          };
-        } else if (foundUser) {
-          foundUser.uid = user.uid;
-        }
-
-        if (foundUser) {
-          let canonicalUser = normalizeUserRecord(foundUser, 'onAuthStateChanged');
+      try {
+        if (user) {
+          const rawEmail = user.email.trim().toLowerCase();
+          const normalizedEmail = rawEmail.replace('@crearpsl.com', '@crearpsl.net');
           
-          // 🕵️‍♂️ AGENTE ONLINE: Validar y sanar multiroles 
-          const updatedRoles = await enforceUserRolesAgent(user, user.uid, canonicalUser.roles);
-          canonicalUser.roles = updatedRoles;
-
-          // 🔥 CRÍTICO: Guardar el usuario en la colección "users"
-          try {
+          let foundUser = await findUserInFirestore(normalizedEmail);
+          
+          if (!foundUser) {
             try {
-        await setDoc(doc(db, 'users', user.uid), canonicalUser, { merge: true });
-      } catch (e) {
-        console.warn('Cannot update /users since only superadmin can, continuing login');
-      }
-          } catch (err) {
-            console.error("Error guardando perfil de usuario en auth state:", err);
+              const staffRef = collection(db, "staff_directory");
+              let sq = query(staffRef, where("emails", "array-contains", normalizedEmail));
+              let sSnap = await getDocs(sq);
+              if (!sSnap.empty) {
+                foundUser = sSnap.docs[0].data();
+              } else {
+                sq = query(staffRef, where("email", "==", normalizedEmail));
+                sSnap = await getDocs(sq);
+                if (!sSnap.empty) foundUser = sSnap.docs[0].data();
+              }
+            } catch (err) {
+              console.error("Error consultando staff_directory:", err);
+            }
+          }
+          
+          // 🆕 (02/09/2026) Mismo respaldo que en loginWithGoogle: catálogo estático
+          // antes de descartar al usuario por completo en esta ruta de sesión persistida.
+          if (!foundUser) {
+            const staticUser = findUserByAnyEmail(normalizedEmail);
+            if (staticUser) {
+              foundUser = { ...staticUser, uid: user.uid };
+            }
           }
 
-          const userObj = buildUserObject(user, canonicalUser, normalizedEmail);
-          setCurrentUser(userObj);
-          
-          if (!userObj.isSimulated) {
-            setLoading(false);
+          if (!foundUser && isSuperAdminEmail(normalizedEmail)) {
+            foundUser = {
+              id: user.uid,
+              uid: user.uid,
+              name: user.displayName || "Administrador",
+              role: "gerente",
+              sede: "Global",
+              emails: [normalizedEmail]
+            };
+          } else if (foundUser) {
+            foundUser.uid = user.uid;
           }
-          try {
-            const todayStr = new Date().toISOString().slice(0, 10);
-            const sessionLogKey = `audit_login_${normalizedEmail}_${todayStr}`;
-            if (!sessionStorage.getItem(sessionLogKey)) {
-              await recordAuditEvent({
-                email: foundUser.email || normalizedEmail,
-                name: foundUser.name || user.displayName || 'Desconocido',
-                role: foundUser.role || 'Desconocido',
-                sede: foundUser.sede || 'Desconocida',
-                action: 'LOGIN',
-                details: 'Inicio de sesión / Actividad diaria'
-              });
-              sessionStorage.setItem(sessionLogKey, 'true');
+
+          if (foundUser) {
+            let canonicalUser = normalizeUserRecord(foundUser, 'onAuthStateChanged');
+            
+            // 🕵️‍♂️ AGENTE ONLINE: Validar y sanar multiroles 
+            const updatedRoles = await enforceUserRolesAgent(user, user.uid, canonicalUser.roles);
+            canonicalUser.roles = updatedRoles;
+
+            // 🔥 CRÍTICO: Guardar el usuario en la colección "users"
+            try {
+              try {
+                await setDoc(doc(db, 'users', user.uid), canonicalUser, { merge: true });
+              } catch (e) {
+                console.warn('Cannot update /users since only superadmin can, continuing login');
+              }
+            } catch (err) {
+              console.error("Error guardando perfil de usuario en auth state:", err);
             }
-          } catch(e) {
-            console.error("Error actualizando login en auditoría:", e);
+
+            const userObj = buildUserObject(user, canonicalUser, normalizedEmail);
+            setCurrentUser(userObj);
+            
+            try {
+              const todayStr = new Date().toISOString().slice(0, 10);
+              const sessionLogKey = `audit_login_${normalizedEmail}_${todayStr}`;
+              if (!sessionStorage.getItem(sessionLogKey)) {
+                await recordAuditEvent({
+                  email: foundUser.email || normalizedEmail,
+                  name: foundUser.name || user.displayName || 'Desconocido',
+                  role: foundUser.role || 'Desconocido',
+                  sede: foundUser.sede || 'Desconocida',
+                  action: 'LOGIN',
+                  details: 'Inicio de sesión / Actividad diaria'
+                });
+                sessionStorage.setItem(sessionLogKey, 'true');
+              }
+            } catch(e) {
+              console.error("Error actualizando login en auditoría:", e);
+            }
+          } else {
+            sessionStorage.removeItem('googleAccessToken');
+            sessionStorage.removeItem('cpsl_active_role');
+            auth.signOut();
+            setCurrentUser(null);
           }
         } else {
+          const mockDevUser = localStorage.getItem('cpsl_mock_user');
+          if (mockDevUser) {
+            try {
+              const parsed = JSON.parse(mockDevUser);
+              setCurrentUser(parsed);
+              return;
+            } catch(e) {}
+          }
           sessionStorage.removeItem('googleAccessToken');
           sessionStorage.removeItem('cpsl_active_role');
-          auth.signOut();
           setCurrentUser(null);
         }
-      } else {
-        const mockDevUser = localStorage.getItem('cpsl_mock_user');
-        if (mockDevUser) {
-          try {
-            const parsed = JSON.parse(mockDevUser);
-            setCurrentUser(parsed);
-            setLoading(false);
-            return;
-          } catch(e) {}
-        }
-        sessionStorage.removeItem('googleAccessToken');
-        sessionStorage.removeItem('cpsl_active_role');
-        setCurrentUser(null);
+      } catch (authErr) {
+        console.error("Error crítico durante autenticación en Causa OS:", authErr);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     });
     
     return unsubscribe;
@@ -581,7 +582,35 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider value={{ currentUser, originalAdminUser, loginWithGoogle, reauthenticateGoogle, logout, loading, switchRole, simulateUser, stopSimulation }}>
-      {!loading && children}
+      {loading ? (
+        <div style={{
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: '#0a0f1d',
+          color: '#ffffff',
+          fontFamily: 'system-ui, -apple-system, sans-serif'
+        }}>
+          <div style={{
+            width: '44px',
+            height: '44px',
+            border: '3px solid rgba(255, 183, 3, 0.2)',
+            borderTopColor: '#ffb703',
+            borderRadius: '50%',
+            animation: 'causaSpin 0.9s linear infinite',
+            marginBottom: '1rem'
+          }} />
+          <div style={{ fontSize: '1.05rem', fontWeight: 600, letterSpacing: '0.5px', color: '#ffb703' }}>
+            CREAR PODER SIN LÍMITES
+          </div>
+          <div style={{ fontSize: '0.85rem', color: '#94a3b8', marginTop: '0.35rem' }}>
+            Cargando Causa OS...
+          </div>
+          <style>{`@keyframes causaSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+        </div>
+      ) : children}
     </AuthContext.Provider>
   );
 }

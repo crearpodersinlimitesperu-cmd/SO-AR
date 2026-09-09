@@ -35,8 +35,12 @@ export default function TaskCollaborationModal({ isOpen, onClose, task, onSendIn
     if (task.collaborators && task.collaborators.includes(u.email)) return false;
 
     if (isGerenteOrAdmin) {
-      // Gerente puede invitar a cualquiera de su sede o global
-      return true;
+      if (currentUser?.isSuperAdmin || currentUser?.isDireccion || userRole === 'direccion') {
+        return true;
+      }
+      // Gerente solo puede invitar a miembros de su sede (o globales)
+      const sameSede = !u.sede || !currentUser?.sede || u.sede.toLowerCase() === currentUser.sede.toLowerCase();
+      return sameSede;
     }
 
     if (isCMJ || isCC1) {

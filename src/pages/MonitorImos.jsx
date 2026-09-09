@@ -32,10 +32,18 @@ export default function MonitorImos() {
     return () => unsubscribe();
   }, []);
 
-  // Extrae de forma robusta la lista de enrolados (soporta array enrolados o claves en checks)
+  // Extrae de forma robusta la lista de enrolados combinando el array con los checks
   const getEnroladosList = (m) => {
     if (Array.isArray(m.enrolados) && m.enrolados.length > 0) {
-      return m.enrolados;
+      // Fusionar los datos estáticos del enrolado con el progreso en 'checks'
+      return m.enrolados.map((enr) => {
+        const chk = (m.checks && m.checks[enr.id]) || {};
+        return {
+          ...enr,
+          contacto: Boolean(chk.contacto),
+          asistencia: Boolean(chk.asistencia),
+        };
+      });
     }
     const keys = Object.keys(m.checks || {});
     return keys.map((k, index) => {

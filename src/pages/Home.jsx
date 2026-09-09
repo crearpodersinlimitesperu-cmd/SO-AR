@@ -1385,7 +1385,7 @@ export default function Home() {
                     }}
                     title="Cambiar tu rol activo"
                   >
-                    {(currentUser?.isSuperAdmin ? ALL_SIMULATABLE_ROLES : currentUser.roles).map(r => (
+                    {(currentUser?.isSuperAdmin ? ALL_SIMULATABLE_ROLES : (currentUser?.roles || [])).map(r => (
                       <option key={r} value={r} style={{ background: '#0d152d', color: '#ffffff' }}>
                         🎭 {r === 'consolidado' ? 'Vista Consolidada (Global)' : (ROLE_DISPLAY_NAMES[r] || r.toUpperCase())}
                       </option>
