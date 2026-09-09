@@ -65,6 +65,17 @@ export default function AuditoriaKPIs({ defaultTab }) {
     fetchReports();
   }, [filterSede, currentUser?.sede]);
 
+  // Vista por defecto inteligente: si no hay pendientes (pendingCount === 0) y el filtro estaba en 'pending',
+  // cambia automáticamente a 'all' (Todos) para que el usuario siempre vea los datos por defecto.
+  useEffect(() => {
+    if (!loading && reports.length > 0) {
+      const pendingCount = reports.filter(r => r.status !== 'reviewed').length;
+      if (pendingCount === 0 && filterStatus === 'pending') {
+        setFilterStatus('all');
+      }
+    }
+  }, [reports, loading]);
+
   const parseNodusData = (data) => {
     let allData = [];
     if (data.secciones && data.secciones.actividadCoordinadores && data.secciones.actividadCoordinadores.kpis) {
@@ -1005,9 +1016,28 @@ export default function AuditoriaKPIs({ defaultTab }) {
                 <p style={{ margin: '0 0 0.5rem', fontWeight: 700, fontSize: '1.05rem', color: 'var(--text-heading, #0f172a)' }}>
                   No hay reportes en la pestaña "{filterStatus === 'pending' ? 'Pendientes por Revisar' : 'Revisados'}"
                 </p>
-                <p style={{ margin: 0, fontSize: '0.88rem' }}>
+                <p style={{ margin: '0 0 1rem', fontSize: '0.88rem' }}>
                   Puedes cambiar a <strong>"📋 Todos"</strong> para revisar el historial completo.
                 </p>
+                <button
+                  type="button"
+                  onClick={() => setFilterStatus('all')}
+                  style={{
+                    padding: '0.6rem 1.4rem',
+                    borderRadius: '8px',
+                    background: '#3b82f6',
+                    color: '#ffffff',
+                    border: 'none',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 8px rgba(59,130,246,0.35)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.5rem'
+                  }}
+                >
+                  📋 Ver Todos los Reportes ({reports.length})
+                </button>
               </div>
             );
           }
