@@ -586,17 +586,13 @@ export const OFFICIAL_PERMISSION_MATRIX = {
 export const checkModuleAccess = (currentUser, moduleKey) => {
   if (!currentUser) return { hasAccess: false, scope: 'NONE' };
 
-  // Super Admin tiene acceso GLOBAL a todo — EXCEPTO mientras está simulando
-  // activamente un rol específico con el selector de rol (activeRoleOverride).
-  // BUG REAL corregido (08/09/2026, reportado por José: "cuando cambio de rol
-  // esto se debería modificar, que solo se vean los del rol"): antes este bypass
-  // se aplicaba siempre para cualquier SuperAdmin sin mirar qué rol tenía elegido
-  // en el selector, así que los botones del dashboard nunca se filtraban al
-  // simular otro rol. Ver isRoleSimulationActive en AuthContext.jsx (switchRole /
-  // buildUserObject) — se activa solo cuando se elige un rol concreto distinto de
-  // 'consolidado', y con eso esta función cae al cálculo normal de abajo, que ya
-  // usa currentUser.appRole (el rol simulado).
-  if ((currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email)) && !currentUser.isRoleSimulationActive) {
+  // Super Admin tiene acceso GLOBAL incondicional (salvo simulación explícita de otro usuario)
+  if ((currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email)) && !currentUser.isSimulated) {
+    return { hasAccess: true, scope: 'GLOBAL' };
+  }
+
+  // Vista Consolidada: el usuario ve todas las opciones con alcance GLOBAL
+  if (currentUser.isConsolidatedView || currentUser.appRole === 'consolidado') {
     return { hasAccess: true, scope: 'GLOBAL' };
   }
 

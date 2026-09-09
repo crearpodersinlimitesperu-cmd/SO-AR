@@ -163438,6 +163438,18 @@ function RoleRoute({ children, allowedRoles = [], requireSuperAdmin = false, exc
     return <Navigate to="/login" replace />;
   }
 
+  // ACCESO TOTAL INCONDICIONAL PARA SUPER ADMIN:
+  // Salvo que esté simulando explícitamente a otro colaborador (currentUser.isSimulated),
+  // el Super Administrador jamás es bloqueado ni redirigido de ninguna sección.
+  if (currentUser.isSuperAdmin && !currentUser.isSimulated) {
+    return children;
+  }
+
+  // En vista consolidada, el usuario ve todo lo que sus roles abarcan sin restricciones
+  if (currentUser.isConsolidatedView || currentUser.appRole === 'consolidado') {
+    return children;
+  }
+
   // Verificación de Super Admin
   if (requireSuperAdmin) {
     if (currentUser.isSuperAdmin) {
@@ -182105,17 +182117,13 @@ export const OFFICIAL_PERMISSION_MATRIX = {
 export const checkModuleAccess = (currentUser, moduleKey) => {
   if (!currentUser) return { hasAccess: false, scope: 'NONE' };
 
-  // Super Admin tiene acceso GLOBAL a todo — EXCEPTO mientras está simulando
-  // activamente un rol específico con el selector de rol (activeRoleOverride).
-  // BUG REAL corregido (08/09/2026, reportado por José: "cuando cambio de rol
-  // esto se debería modificar, que solo se vean los del rol"): antes este bypass
-  // se aplicaba siempre para cualquier SuperAdmin sin mirar qué rol tenía elegido
-  // en el selector, así que los botones del dashboard nunca se filtraban al
-  // simular otro rol. Ver isRoleSimulationActive en AuthContext.jsx (switchRole /
-  // buildUserObject) — se activa solo cuando se elige un rol concreto distinto de
-  // 'consolidado', y con eso esta función cae al cálculo normal de abajo, que ya
-  // usa currentUser.appRole (el rol simulado).
-  if ((currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email)) && !currentUser.isRoleSimulationActive) {
+  // Super Admin tiene acceso GLOBAL incondicional (salvo simulación explícita de otro usuario)
+  if ((currentUser.isSuperAdmin || isSuperAdminEmail(currentUser.email)) && !currentUser.isSimulated) {
+    return { hasAccess: true, scope: 'GLOBAL' };
+  }
+
+  // Vista Consolidada: el usuario ve todas las opciones con alcance GLOBAL
+  if (currentUser.isConsolidatedView || currentUser.appRole === 'consolidado') {
     return { hasAccess: true, scope: 'GLOBAL' };
   }
 
@@ -182358,26 +182366,10 @@ export function AuthProvider({ children }) {
       const hasGerente = userRoles.some(r => isGerenciaRole(r)) || isGerenciaRole(prev.role);
       const isSuper = prev.isSuperAdmin || isSuperAdminEmail(prev.email);
 
-      // (08/09/2026) BUG REAL encontrado y corregido, reportado por José probando el
-      // selector de roles: "cuando cambio de rol esto se debería modificar, que solo
-      // se vean los del rol". Antes, isDireccion/isGerente quedaban forzados a `true`
-      // para cualquier SuperAdmin sin importar el rol elegido en el selector (por el
-      // "isSuper ||" al inicio de cada fórmula) — así que simular "Entrenador" o "QT"
-      // seguía mostrando TODO como si fuera Dirección/Gerente. Ahora, cuando se elige
-      // un rol específico (no 'consolidado'), estas banderas reflejan ÚNICAMENTE ese
-      // rol simulado — igual que las vería una persona real con ese rol — y se agrega
-      // `isRoleSimulationActive` para que checkModuleAccess() (permissions.js) y
-      // hasRoleAccess()/isModuleVisible() (Home.jsx) sepan que deben dejar de aplicar
-      // el bypass total de SuperAdmin mientras dura la simulación. `isSuperAdmin` en sí
-      // NUNCA se apaga (sigue siendo su identidad real de cuenta: conserva el badge,
-      // el acceso al propio selector, y la capacidad de volver a "Vista Consolidada").
-      const isRoleSimulationActive = !isConsolidated;
-      const isDireccion = isConsolidated
-        ? (isSuper || hasDireccion)
-        : isDireccionRole(canonicalNewRole);
-      const isGerente = isConsolidated
-        ? (isSuper || isDireccion || hasGerente)
-        : (isDireccion || canonicalNewRole === 'gerente' || canonicalNewRole === 'director_maestria');
+      // Las simulaciones de usuario ÚNICAMENTE las activa el usuario explícitamente mediante simulateUser().
+      // SuperAdmin SIEMPRE conserva sus privilegios reales, visibilidad total y acceso completo.
+      const isDireccion = isSuper || hasDireccion || isDireccionRole(canonicalNewRole);
+      const isGerente = isSuper || isDireccion || hasGerente || canonicalNewRole === 'gerente';
 
       const updated = {
         ...prev,
@@ -182387,7 +182379,7 @@ export function AuthProvider({ children }) {
         isDireccion,
         isGerente,
         isSuperAdmin: isSuper,
-        isRoleSimulationActive
+        isRoleSimulationActive: false
       };
 
       recordAuditEvent({
@@ -182490,29 +182482,21 @@ export function AuthProvider({ children }) {
     const hasGerente = assignedRoles.some(r => isGerenciaRole(r)) || isGerenciaRole(canonicalRole);
 
     const savedActiveRole = sessionStorage.getItem('cpsl_active_role');
-    const isConsolidated = savedActiveRole === 'consolidado';
     
-    let activeRole = canonicalRole;
-    if (isConsolidated) {
-      activeRole = 'consolidado';
-    } else if (savedActiveRole && assignedRoles.includes(savedActiveRole)) {
+    // Por defecto, SuperAdmin inicia SIEMPRE en 'consolidado' para ver todas las opciones sin límites
+    let activeRole = isSuperAdmin ? 'consolidado' : canonicalRole;
+    if (savedActiveRole && (assignedRoles.includes(savedActiveRole) || isSuperAdmin)) {
       activeRole = savedActiveRole;
+    } else if (isSuperAdmin) {
+      activeRole = 'consolidado';
     } else if (assignedRoles.length > 0) {
       activeRole = assignedRoles[0];
     }
+    const isConsolidated = activeRole === 'consolidado';
 
-    // (08/09/2026) Mismo fix que en switchRole() más abajo: si al cargar/recargar la
-    // página ya había un rol simulado guardado en sessionStorage (savedActiveRole, no
-    // 'consolidado'), isDireccion/isGerente deben reflejar SOLO ese rol para un
-    // SuperAdmin, no su privilegio real — si no, la simulación se "olvidaba" cada vez
-    // que la página se recargaba.
-    const isRoleSimulationActive = Boolean(savedActiveRole) && !isConsolidated;
-    const isDireccion = isConsolidated
-      ? (isSuperAdmin || hasDireccion)
-      : (isRoleSimulationActive ? isDireccionRole(activeRole) : (isSuperAdmin || isDireccionRole(activeRole)));
-    const isGerente = isConsolidated
-      ? (isSuperAdmin || isDireccion || hasGerente)
-      : (isRoleSimulationActive ? (isDireccion || activeRole === 'gerente' || activeRole === 'director_maestria') : (isSuperAdmin || isDireccion || activeRole === 'gerente' || activeRole === 'director_maestria'));
+    // Para SuperAdmin, isDireccion y isGerente son SIEMPRE true; nunca se limitan
+    const isDireccion = isSuperAdmin || hasDireccion || isDireccionRole(activeRole);
+    const isGerente = isSuperAdmin || isDireccion || hasGerente || activeRole === 'gerente';
 
     return {
       ...user,
@@ -182525,13 +182509,13 @@ export function AuthProvider({ children }) {
       isGerente,
       isSuperAdmin,
       isDireccion,
-      isRoleSimulationActive,
+      isRoleSimulationActive: false,
       sede: foundUser.sede || 'Global',
       document: foundUser.document || '',
       docType: foundUser.docType || '',
       dbId: foundUser.id,
       rawRole: foundUser.role,
-      role: canonicalRole
+      role: isSuperAdmin ? 'direccion' : canonicalRole
     };
   };
 
@@ -298307,16 +298291,9 @@ const isModuleVisible = (mod, currentUser) => {
   if (typeof mod.visible === 'function') return mod.visible(currentUser);
   if (mod.roles === null) return true;
   const allowedRoles = mod.roles || [];
-  // BUG REAL corregido (08/09/2026, reportado por José: "cuando cambio de rol
-  // esto se debería modificar, que solo se vean los del rol") — ver la nota
-  // completa en checkModuleAccess() (permissions.js) y en switchRole()
-  // (AuthContext.jsx). Mientras isRoleSimulationActive es true, un SuperAdmin
-  // ya NO recibe el bypass total: los botones del PRO bar (MODULE_REGISTRY) se
-  // filtran exactamente igual que para el rol que tiene elegido en el selector.
-  if (currentUser?.isSuperAdmin && !currentUser?.isRoleSimulationActive) return true;
-  if (currentUser?.appRole === 'consolidado') {
-    return (currentUser?.roles || []).some(r => allowedRoles.includes(r));
-  }
+  // Super Administrador (cuando NO está en simulación explícita de otro usuario) tiene acceso total a todos los módulos
+  if (currentUser?.isSuperAdmin && !currentUser?.isSimulated) return true;
+  if (currentUser?.appRole === 'consolidado') return true;
   return allowedRoles.includes(currentUser?.appRole);
 };
 
@@ -298351,12 +298328,8 @@ const getCountdownInfo = (deadlineIso, now) => {
 
 export default function Home() {
   const hasRoleAccess = (allowedRoles) => {
-    // Mismo fix de simulación de rol que isModuleVisible() más arriba y
-    // checkModuleAccess() en permissions.js (08/09/2026).
-    if (currentUser?.isSuperAdmin && !currentUser?.isRoleSimulationActive) return true;
-    if (currentUser?.appRole === 'consolidado') {
-      return (currentUser?.roles || []).some(r => allowedRoles.includes(r));
-    }
+    if (currentUser?.isSuperAdmin && !currentUser?.isSimulated) return true;
+    if (currentUser?.appRole === 'consolidado') return true;
     return allowedRoles.includes(currentUser?.appRole);
   };
 
@@ -298638,8 +298611,10 @@ export default function Home() {
   // de este archivo.
   // ==========================================================================
   const canSeeGlobalDirectory = Boolean(
-    (currentUser?.isSuperAdmin && !currentUser?.isRoleSimulationActive) ||
+    (currentUser?.isSuperAdmin && !currentUser?.isSimulated) ||
     currentUser?.isDireccion ||
+    currentUser?.isConsolidatedView ||
+    currentUser?.appRole === 'consolidado' ||
     isDireccionRole(currentUser?.appRole) ||
     canViewAllManagers(currentUser)
   );
@@ -298666,7 +298641,7 @@ export default function Home() {
 
   const globalSearchOptionResults = !globalSearchActive ? [] : CAUSA_OPTIONS_REGISTRY
     .filter(opt => {
-      if (opt.roles && !hasRoleAccess(opt.roles) && !(currentUser?.isSuperAdmin && !currentUser?.isRoleSimulationActive)) {
+      if (opt.roles && !hasRoleAccess(opt.roles) && !(currentUser?.isSuperAdmin && !currentUser?.isSimulated)) {
         return false;
       }
       if (typeof opt.visible === 'function' && !opt.visible(currentUser)) {
@@ -298879,7 +298854,7 @@ export default function Home() {
             </h2>
           </div>
           <p className="text-muted" style={{ margin: '0.8rem 0 0', textTransform: 'uppercase', fontSize: '0.85rem' }}>
-            {((currentUser?.isSuperAdmin && !currentUser?.isRoleSimulationActive) || currentUser?.appRole === 'direccion') ? 'MÚLTIPLES EQUIPOS (GLOBAL) • VISIÓN MÚLTIPLES SEDES' : (currentCycle ? `${currentCycle.name} • ETAPA: ${currentStage}` : 'CARGANDO CICLO...')}
+            {((currentUser?.isSuperAdmin && !currentUser?.isSimulated) || currentUser?.appRole === 'direccion' || currentUser?.isConsolidatedView || currentUser?.appRole === 'consolidado') ? 'MÚLTIPLES EQUIPOS (GLOBAL) • VISIÓN MÚLTIPLES SEDES' : (currentCycle ? `${currentCycle.name} • ETAPA: ${currentStage}` : 'CARGANDO CICLO...')}
           </p>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginTop: '0.8rem', flexWrap: 'wrap' }}>
@@ -299063,7 +299038,7 @@ export default function Home() {
             <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <span style={{ fontSize: '0.9rem', fontWeight: 'bold', color: 'var(--text-main)' }}>{currentUser?.name || currentUser?.displayName || 'Usuario'}</span>
               <span style={{ fontSize: '0.75rem', color: 'var(--crear-gold)', fontWeight: 'bold', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'flex-end' }}>
-                {currentUser?.isSuperAdmin && !currentUser?.isSimulated && !currentUser?.isRoleSimulationActive
+                {currentUser?.isSuperAdmin && !currentUser?.isSimulated
                   ? <>Super Admin | Gerente Lima {getFlagForSede('Lima')}</>
                   : <>{currentUser?.appRole === 'consolidado' ? 'Vista Consolidada (Global)' : (ROLE_DISPLAY_NAMES[currentUser?.appRole] || currentUser?.appRole?.replace(/_/g, ' ') || 'Miembro')} {getFlagForSede(currentUser?.sede)}</>}
               </span>
@@ -299796,7 +299771,7 @@ export default function Home() {
                     >
                       {hasRoleAccess(['entrenador', 'entrenador_llamadas']) ? 'MIS FECHAS' : 'MI SEDE'}
                     </button>
-                    {(!hasRoleAccess(['entrenador', 'entrenador_llamadas']) && ((currentUser?.isSuperAdmin && !currentUser?.isRoleSimulationActive) || currentUser?.isDireccion || currentUser?.isGerente || hasRoleAccess(['gerente', 'direccion', 'director_maestria', 'cfo']) || currentUser?.sede?.toLowerCase().includes('global'))) && (
+                    {(!hasRoleAccess(['entrenador', 'entrenador_llamadas']) && ((currentUser?.isSuperAdmin && !currentUser?.isSimulated) || currentUser?.isDireccion || currentUser?.isGerente || hasRoleAccess(['gerente', 'direccion', 'director_maestria', 'cfo']) || currentUser?.sede?.toLowerCase().includes('global'))) && (
                       <button 
                         onClick={() => setActiveEventTab('globales')}
                         style={{ background: 'none', border: 'none', color: activeEventTab === 'globales' ? 'var(--crear-gold)' : 'var(--text-muted)', fontWeight: activeEventTab === 'globales' ? 'bold' : 'normal', cursor: 'pointer', fontSize: '0.85rem' }}
@@ -300323,7 +300298,7 @@ export default function Home() {
               <button className="btn-secondary" onClick={() => navigate('/metas')} style={{ padding: '0.8rem 1.4rem', fontSize: '1rem', fontWeight: 'bold' }}>
                 VER MIS METAS
               </button>
-              {((currentUser?.isSuperAdmin && !currentUser?.isRoleSimulationActive) || currentUser?.isGerente || hasRoleAccess(['coord_c1', 'coord_maestria', 'capitan', 'qt', 'direccion', 'director_maestria'])) && (
+              {((currentUser?.isSuperAdmin && !currentUser?.isSimulated) || currentUser?.isGerente || hasRoleAccess(['coord_c1', 'coord_maestria', 'capitan', 'qt', 'direccion', 'director_maestria'])) && (
                 <button className="btn-secondary" onClick={() => navigate('/reportes')} style={{ padding: '0.8rem 1.4rem', fontSize: '1rem', fontWeight: 'bold' }}>
                   ENVIAR REPORTES
                 </button>

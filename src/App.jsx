@@ -82,6 +82,18 @@ function RoleRoute({ children, allowedRoles = [], requireSuperAdmin = false, exc
     return <Navigate to="/login" replace />;
   }
 
+  // ACCESO TOTAL INCONDICIONAL PARA SUPER ADMIN:
+  // Salvo que esté simulando explícitamente a otro colaborador (currentUser.isSimulated),
+  // el Super Administrador jamás es bloqueado ni redirigido de ninguna sección.
+  if (currentUser.isSuperAdmin && !currentUser.isSimulated) {
+    return children;
+  }
+
+  // En vista consolidada, el usuario ve todo lo que sus roles abarcan sin restricciones
+  if (currentUser.isConsolidatedView || currentUser.appRole === 'consolidado') {
+    return children;
+  }
+
   // Verificación de Super Admin
   if (requireSuperAdmin) {
     if (currentUser.isSuperAdmin) {

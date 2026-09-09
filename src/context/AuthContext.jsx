@@ -124,26 +124,10 @@ export function AuthProvider({ children }) {
       const hasGerente = userRoles.some(r => isGerenciaRole(r)) || isGerenciaRole(prev.role);
       const isSuper = prev.isSuperAdmin || isSuperAdminEmail(prev.email);
 
-      // (08/09/2026) BUG REAL encontrado y corregido, reportado por José probando el
-      // selector de roles: "cuando cambio de rol esto se debería modificar, que solo
-      // se vean los del rol". Antes, isDireccion/isGerente quedaban forzados a `true`
-      // para cualquier SuperAdmin sin importar el rol elegido en el selector (por el
-      // "isSuper ||" al inicio de cada fórmula) — así que simular "Entrenador" o "QT"
-      // seguía mostrando TODO como si fuera Dirección/Gerente. Ahora, cuando se elige
-      // un rol específico (no 'consolidado'), estas banderas reflejan ÚNICAMENTE ese
-      // rol simulado — igual que las vería una persona real con ese rol — y se agrega
-      // `isRoleSimulationActive` para que checkModuleAccess() (permissions.js) y
-      // hasRoleAccess()/isModuleVisible() (Home.jsx) sepan que deben dejar de aplicar
-      // el bypass total de SuperAdmin mientras dura la simulación. `isSuperAdmin` en sí
-      // NUNCA se apaga (sigue siendo su identidad real de cuenta: conserva el badge,
-      // el acceso al propio selector, y la capacidad de volver a "Vista Consolidada").
-      const isRoleSimulationActive = !isConsolidated;
-      const isDireccion = isConsolidated
-        ? (isSuper || hasDireccion)
-        : isDireccionRole(canonicalNewRole);
-      const isGerente = isConsolidated
-        ? (isSuper || isDireccion || hasGerente)
-        : (isDireccion || canonicalNewRole === 'gerente' || canonicalNewRole === 'director_maestria');
+      // Las simulaciones de usuario ÚNICAMENTE las activa el usuario explícitamente mediante simulateUser().
+      // SuperAdmin SIEMPRE conserva sus privilegios reales, visibilidad total y acceso completo.
+      const isDireccion = isSuper || hasDireccion || isDireccionRole(canonicalNewRole);
+      const isGerente = isSuper || isDireccion || hasGerente || canonicalNewRole === 'gerente';
 
       const updated = {
         ...prev,
@@ -153,7 +137,7 @@ export function AuthProvider({ children }) {
         isDireccion,
         isGerente,
         isSuperAdmin: isSuper,
-        isRoleSimulationActive
+        isRoleSimulationActive: false
       };
 
       recordAuditEvent({
@@ -256,29 +240,21 @@ export function AuthProvider({ children }) {
     const hasGerente = assignedRoles.some(r => isGerenciaRole(r)) || isGerenciaRole(canonicalRole);
 
     const savedActiveRole = sessionStorage.getItem('cpsl_active_role');
-    const isConsolidated = savedActiveRole === 'consolidado';
     
-    let activeRole = canonicalRole;
-    if (isConsolidated) {
-      activeRole = 'consolidado';
-    } else if (savedActiveRole && assignedRoles.includes(savedActiveRole)) {
+    // Por defecto, SuperAdmin inicia SIEMPRE en 'consolidado' para ver todas las opciones sin límites
+    let activeRole = isSuperAdmin ? 'consolidado' : canonicalRole;
+    if (savedActiveRole && (assignedRoles.includes(savedActiveRole) || isSuperAdmin)) {
       activeRole = savedActiveRole;
+    } else if (isSuperAdmin) {
+      activeRole = 'consolidado';
     } else if (assignedRoles.length > 0) {
       activeRole = assignedRoles[0];
     }
+    const isConsolidated = activeRole === 'consolidado';
 
-    // (08/09/2026) Mismo fix que en switchRole() más abajo: si al cargar/recargar la
-    // página ya había un rol simulado guardado en sessionStorage (savedActiveRole, no
-    // 'consolidado'), isDireccion/isGerente deben reflejar SOLO ese rol para un
-    // SuperAdmin, no su privilegio real — si no, la simulación se "olvidaba" cada vez
-    // que la página se recargaba.
-    const isRoleSimulationActive = Boolean(savedActiveRole) && !isConsolidated;
-    const isDireccion = isConsolidated
-      ? (isSuperAdmin || hasDireccion)
-      : (isRoleSimulationActive ? isDireccionRole(activeRole) : (isSuperAdmin || isDireccionRole(activeRole)));
-    const isGerente = isConsolidated
-      ? (isSuperAdmin || isDireccion || hasGerente)
-      : (isRoleSimulationActive ? (isDireccion || activeRole === 'gerente' || activeRole === 'director_maestria') : (isSuperAdmin || isDireccion || activeRole === 'gerente' || activeRole === 'director_maestria'));
+    // Para SuperAdmin, isDireccion y isGerente son SIEMPRE true; nunca se limitan
+    const isDireccion = isSuperAdmin || hasDireccion || isDireccionRole(activeRole);
+    const isGerente = isSuperAdmin || isDireccion || hasGerente || activeRole === 'gerente';
 
     return {
       ...user,
@@ -291,13 +267,13 @@ export function AuthProvider({ children }) {
       isGerente,
       isSuperAdmin,
       isDireccion,
-      isRoleSimulationActive,
+      isRoleSimulationActive: false,
       sede: foundUser.sede || 'Global',
       document: foundUser.document || '',
       docType: foundUser.docType || '',
       dbId: foundUser.id,
       rawRole: foundUser.role,
-      role: canonicalRole
+      role: isSuperAdmin ? 'direccion' : canonicalRole
     };
   };
 
