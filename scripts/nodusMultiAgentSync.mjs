@@ -1,9 +1,12 @@
-import puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer-extra';
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import 'dotenv/config';
 import fs from 'fs';
 import path from 'path';
 import { initializeApp } from "firebase/app";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
+
+puppeteer.use(StealthPlugin());
 
 // Configuración Resiliente de Firebase
 const firebaseConfig = {
