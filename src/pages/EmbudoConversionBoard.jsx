@@ -88,58 +88,41 @@ export default function EmbudoConversionBoard() {
 
   // Calcular las métricas del embudo relacional (Emulando la Vista SQL vista_embudo_conversion_c1_c2_mj)
   const getMetrics = () => {
-    if (!snapshotData?.secciones) {
-      // Fallback a los datos oficiales auditados de E30
-      return {
-        id_equipo: 134,
-        nombre_equipo: selectedEquipo,
-        sede: selectedSede,
-        graduados_c1: selectedEquipo === 'EQUIPO 30' ? 94 : selectedEquipo === 'EQUIPO 29' ? 127 : 110,
-        base_c1: selectedEquipo === 'EQUIPO 30' ? 158 : selectedEquipo === 'EQUIPO 29' ? 228 : 175,
-        pagos_promo_c1: selectedEquipo === 'EQUIPO 30' ? 37 : 55,
-        pct_pagos_promo_domingo: selectedEquipo === 'EQUIPO 30' ? 39.4 : 43.3,
-        sentados_c2: selectedEquipo === 'EQUIPO 30' ? 32 : 55,
-        pct_tasa_sentados_c2: selectedEquipo === 'EQUIPO 30' ? 34.0 : 43.3,
-        total_asignados_coord: selectedEquipo === 'EQUIPO 30' ? 158 : 228,
-        confirmados_coord: selectedEquipo === 'EQUIPO 30' ? 102 : 158,
-        no_contesta: selectedEquipo === 'EQUIPO 30' ? 23 : 26,
-        siguiente_fecha: selectedEquipo === 'EQUIPO 30' ? 13 : 17,
-        pct_confirmado_a_sentado: selectedEquipo === 'EQUIPO 30' ? 92.2 : 80.4,
-        pct_total_asignado_a_sentado: selectedEquipo === 'EQUIPO 30' ? 59.5 : 55.7,
-        desertores_c2: selectedEquipo === 'EQUIPO 30' ? 22 : 0,
-        pct_desertores_c2: selectedEquipo === 'EQUIPO 30' ? 23.4 : 0,
-        graduados_c2: selectedEquipo === 'EQUIPO 30' ? 72 : 127,
-        sentados_creacion_fds1: selectedEquipo === 'EQUIPO 30' ? 66 : 85,
-        sentados_relacion_fds2: selectedEquipo === 'EQUIPO 30' ? 60 : 80,
-        sentados_gratitud_fds3: selectedEquipo === 'EQUIPO 30' ? 58 : 78,
-        graduados_el_viaje: selectedEquipo === 'EQUIPO 30' ? 55 : 75,
-        pct_llegada_el_viaje: selectedEquipo === 'EQUIPO 30' ? 83.3 : 88.2
-      };
-    }
+    let baseC1 = 0;
+    let sentadosC1 = 0;
+    let confirmados = 0;
+    let desertores = 0;
+    let monetizadosC2 = 0;
+    let noContesta = 0;
+    let siguienteFecha = 0;
 
-    // Buscar en los reportes por equipo extraídos
-    const porEquipo = snapshotData.secciones.reporteAsistenciaPorEquipo || {};
-    let eqKey = Object.keys(porEquipo).find(k => k.toUpperCase().includes(selectedEquipo.toUpperCase()));
-    const eqData = eqKey ? porEquipo[eqKey] : null;
+    if (snapshotData?.secciones?.reporteAsistenciaPorEquipo) {
+      const porEquipo = snapshotData.secciones.reporteAsistenciaPorEquipo || {};
+      
+      // Intentar buscar cruzando el Equipo y la Sede
+      let eqKey = Object.keys(porEquipo).find(k => 
+        k.toUpperCase().includes(selectedEquipo.toUpperCase()) && 
+        k.toUpperCase().includes(selectedSede.toUpperCase())
+      );
+      
+      // Si no encuentra cruzado, buscar solo por Equipo
+      if (!eqKey) {
+        eqKey = Object.keys(porEquipo).find(k => k.toUpperCase().includes(selectedEquipo.toUpperCase()));
+      }
 
-    let baseC1 = 158;
-    let sentadosC1 = 94;
-    let confirmados = 102;
-    let desertores = 22;
-    let monetizadosC2 = 37;
-    let noContesta = 23;
-    let siguienteFecha = 13;
+      const eqData = eqKey ? porEquipo[eqKey] : null;
 
-    if (eqData?.kpis) {
-      eqData.kpis.forEach(k => {
-        const text = k.content?.join(' ') || '';
-        if (text.includes('Confirmado') && !isNaN(parseInt(k.content[0]))) confirmados = parseInt(k.content[0]);
-        if (text.includes('Asistieron') && !isNaN(parseInt(k.content[0]))) sentadosC1 = parseInt(k.content[0]);
-        if (text.includes('Desertores') && !isNaN(parseInt(k.content[0]))) desertores = parseInt(k.content[0]);
-        if (text.includes('Pagaron C2') && !isNaN(parseInt(k.content[0]))) monetizadosC2 = parseInt(k.content[0]);
-        if (text.includes('No Contesta') && !isNaN(parseInt(k.content[0]))) noContesta = parseInt(k.content[0]);
-        if (text.includes('Siguiente') && !isNaN(parseInt(k.content[0]))) siguienteFecha = parseInt(k.content[0]);
-      });
+      if (eqData?.kpis) {
+        eqData.kpis.forEach(k => {
+          const text = k.content?.join(' ') || '';
+          if (text.includes('Confirmado') && !isNaN(parseInt(k.content[0]))) confirmados = parseInt(k.content[0]);
+          if (text.includes('Asistieron') && !isNaN(parseInt(k.content[0]))) sentadosC1 = parseInt(k.content[0]);
+          if (text.includes('Desertores') && !isNaN(parseInt(k.content[0]))) desertores = parseInt(k.content[0]);
+          if (text.includes('Pagaron C2') && !isNaN(parseInt(k.content[0]))) monetizadosC2 = parseInt(k.content[0]);
+          if (text.includes('No Contesta') && !isNaN(parseInt(k.content[0]))) noContesta = parseInt(k.content[0]);
+          if (text.includes('Siguiente') && !isNaN(parseInt(k.content[0]))) siguienteFecha = parseInt(k.content[0]);
+        });
+      }
     }
 
     const pctConfirmadoASentado = confirmados > 0 ? ((sentadosC1 / confirmados) * 100).toFixed(1) : 0;
@@ -152,12 +135,12 @@ export default function EmbudoConversionBoard() {
       nombre_equipo: selectedEquipo,
       sede: selectedSede,
       graduados_c1: sentadosC1,
-      base_c1: baseC1,
+      base_c1: confirmados > 0 ? confirmados + noContesta + siguienteFecha : baseC1, // estimación
       pagos_promo_c1: monetizadosC2,
       pct_pagos_promo_domingo: pctPromo,
       sentados_c2: monetizadosC2,
       pct_tasa_sentados_c2: pctPromo,
-      total_asignados_coord: baseC1,
+      total_asignados_coord: confirmados + noContesta + siguienteFecha,
       confirmados_coord: confirmados,
       no_contesta: noContesta,
       siguiente_fecha: siguienteFecha,
@@ -165,12 +148,12 @@ export default function EmbudoConversionBoard() {
       pct_total_asignado_a_sentado: pctAsignadoASentado,
       desertores_c2: desertores,
       pct_desertores_c2: pctDesertores,
-      graduados_c2: sentadosC1 - desertores,
+      graduados_c2: Math.max(0, sentadosC1 - desertores),
       sentados_creacion_fds1: Math.round(monetizadosC2 * 0.9),
       sentados_relacion_fds2: Math.round(monetizadosC2 * 0.85),
       sentados_gratitud_fds3: Math.round(monetizadosC2 * 0.8),
       graduados_el_viaje: Math.round(monetizadosC2 * 0.75),
-      pct_llegada_el_viaje: 83.3
+      pct_llegada_el_viaje: monetizadosC2 > 0 ? 83.3 : 0
     };
   };
 
@@ -418,12 +401,33 @@ export default function EmbudoConversionBoard() {
                 </tr>
               </thead>
               <tbody>
-                {[
-                  { eq: 'EQUIPO 30', sede: 'LIMA', c1: 94, promo: 37, pctPromo: '39.4%', c2: 32, pctC2: '34.0%', asig: 158, conf: 102, pctConfSent: '92.2%', des: 22, viaje: 55, pctViaje: '83.3%' },
-                  { eq: 'EQUIPO 29', sede: 'LIMA', c1: 127, promo: 55, pctPromo: '43.3%', c2: 55, pctC2: '43.3%', asig: 228, conf: 158, pctConfSent: '80.4%', des: 0, viaje: 75, pctViaje: '88.2%' },
-                  { eq: 'EQUIPO 28', sede: 'LIMA', c1: 110, promo: 52, pctPromo: '47.3%', c2: 52, pctC2: '47.3%', asig: 175, conf: 115, pctConfSent: '95.7%', des: 0, viaje: 68, pctViaje: '85.0%' },
-                  { eq: 'EQUIPO 27', sede: 'LIMA', c1: 188, promo: 63, pctPromo: '33.5%', c2: 63, pctC2: '33.5%', asig: 329, conf: 238, pctConfSent: '79.0%', des: 0, viaje: 90, pctViaje: '81.8%' }
-                ].map((row, idx) => (
+                {snapshotData?.secciones?.reporteAsistenciaPorEquipo ? 
+                Object.keys(snapshotData.secciones.reporteAsistenciaPorEquipo).map((k, idx) => {
+                  const eqData = snapshotData.secciones.reporteAsistenciaPorEquipo[k];
+                  let sc1 = 0, mc2 = 0;
+                  if (eqData?.kpis) {
+                    eqData.kpis.forEach(kp => {
+                      const text = kp.content?.join(' ') || '';
+                      if (text.includes('Asistieron') && !isNaN(parseInt(kp.content[0]))) sc1 = parseInt(kp.content[0]);
+                      if (text.includes('Pagaron C2') && !isNaN(parseInt(kp.content[0]))) mc2 = parseInt(kp.content[0]);
+                    });
+                  }
+                  return {
+                    eq: k,
+                    sede: 'NODUS',
+                    c1: sc1,
+                    promo: mc2,
+                    pctPromo: sc1 > 0 ? ((mc2/sc1)*100).toFixed(1) + '%' : '0%',
+                    c2: mc2,
+                    pctC2: sc1 > 0 ? ((mc2/sc1)*100).toFixed(1) + '%' : '0%',
+                    asig: '-',
+                    conf: '-',
+                    pctConfSent: '-',
+                    des: '-',
+                    viaje: Math.round(mc2 * 0.75),
+                    pctViaje: '83.3%'
+                  };
+                }).map((row, idx) => (
                   <tr key={idx} style={{ borderBottom: `1px solid ${borderCard}`, background: row.eq === selectedEquipo ? '#1e3a8a33' : 'transparent' }}>
                     <td style={{ padding: '0.8rem', fontWeight: 'bold', color: row.eq === selectedEquipo ? gold : textLight }}>{row.eq}</td>
                     <td style={{ padding: '0.8rem' }}>{row.sede}</td>
@@ -439,7 +443,7 @@ export default function EmbudoConversionBoard() {
                     <td style={{ padding: '0.8rem' }}>{row.viaje}</td>
                     <td style={{ padding: '0.8rem', color: '#a855f7', fontWeight: 'bold' }}>{row.pctViaje}</td>
                   </tr>
-                ))}
+                )) : <tr><td colSpan="13">No data</td></tr>}
               </tbody>
             </table>
           </div>

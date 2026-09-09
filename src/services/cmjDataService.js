@@ -166,88 +166,67 @@ export function getAllEquipos() {
  * Nodus tracks participants per team, and we can calculate the FDS history 
  * by checking their finDeSemana stage and desertor status.
  */
-export function mergeNodusDataIntoEquipos(baseEquipos, nodusSnap) {
+export function mergeNodusDataIntoEquipos(baseEquipos, nodusSnap, maestriaData) {
   if (!nodusSnap) return baseEquipos;
 
-  // Extraer las tablas del Dashboard
-  let actividadFdsMap = {};
+  // Extraer datos usando reporteAsistenciaPorEquipo (la misma fuente que usa el Embudo)
   let enrolamientoMap = {};
   
-  if (nodusSnap.secciones?.dashboardPrincipal?.tables) {
-    const tables = nodusSnap.secciones.dashboardPrincipal.tables;
-    
-    // Tabla 1: Actividad del Fin de Semana (para saber la etapa actual)
-    const tableActividad = tables.find(t => t.headers && t.headers.includes('ETAPA ACTUAL') && t.headers.includes('EQUIPO'));
-    if (tableActividad) {
-      tableActividad.rows.forEach(row => {
-        if (row.EQUIPO) {
-          actividadFdsMap[row.EQUIPO.toUpperCase()] = {
-            etapa: row['ETAPA ACTUAL'],
-            participantesEnFds: parseInt(row['PARTICIPANTES'], 10) || 0,
-            entrenador: row['ENTRENADOR'] || ''
-          };
-        }
-      });
-    }
+  if (nodusSnap.secciones?.reporteAsistenciaPorEquipo) {
+    const reportes = nodusSnap.secciones.reporteAsistenciaPorEquipo;
+    Object.keys(reportes).forEach(key => {
+      const kpis = reportes[key].kpis || [];
+      let baseC1 = 0;
+      let sentados = 0;
+      let desercion = 0;
+      let etapa = 'PFD';
 
-    // Tabla 2: Declaración vs Enrolamiento (para saber En Juego y Desertores)
-    const tableEnrol = tables.find(t => t.headers && t.headers.includes('EN JUEGO') && t.headers.includes('DESERTORES'));
-    if (tableEnrol) {
-      tableEnrol.rows.forEach(row => {
-        if (row.EQUIPO) {
-          const eqName = row.EQUIPO.toUpperCase();
-          if (!enrolamientoMap[eqName]) {
-            enrolamientoMap[eqName] = { enJuego: 0, desertores: 0, enrolamientoReal: 0, enrolMg: 0, enrolPx: 0 };
-          }
-          enrolamientoMap[eqName].enJuego += (parseInt(row['EN JUEGO'], 10) || 0);
-          enrolamientoMap[eqName].desertores += (parseInt(row['DESERTORES'], 10) || 0);
-          const enrolReal = parseInt(row['ENROLAMIENTO REAL'], 10) || 0;
-          enrolamientoMap[eqName].enrolamientoReal += enrolReal;
-          
-          if (row.TIPO && (row.TIPO.toLowerCase().includes('manager') || row.TIPO.toLowerCase().includes('capitán'))) {
-            enrolamientoMap[eqName].enrolMg += enrolReal;
-          } else {
-            enrolamientoMap[eqName].enrolPx += enrolReal;
-          }
-        }
+      kpis.forEach(k => {
+        const text = k.content?.join(' ') || '';
+        if (text.includes('Asistieron') && !isNaN(parseInt(k.content[0]))) sentados = parseInt(k.content[0]);
+        if (text.includes('Desertores') && !isNaN(parseInt(k.content[0]))) desercion = parseInt(k.content[0]);
       });
-    }
+      
+      // Heurística simple para etapa
+      if (key.includes('FDS 3') || key.includes('TFD')) etapa = 'TFD';
+      else if (key.includes('FDS 2') || key.includes('SFD')) etapa = 'SFD';
+
+      enrolamientoMap[key.toUpperCase()] = { sentados, desercion, etapa };
+    });
   }
 
   const enriched = baseEquipos.map(eq => {
-    // Math logic based on Dashboard metrics
     let c_pxInicio = 0, c_pxFinal = 0;
     let r_pxInicio = 0, r_pxFinal = 0;
     let g_pxInicio = 0, g_pxFinal = 0;
     let desercionTotalPx = 0;
     
-    // Attempt to match with maps
-    let matchedEqName = null;
-    Object.keys(enrolamientoMap).forEach(key => {
-      if (key.includes(eq.equipoLabel.toUpperCase()) && key.includes(eq.sede.split(' ')[0].toUpperCase())) {
-        matchedEqName = key;
-      }
-    });
+    // Intentar cruzar nombre de equipo y sede (ej. "EQUIPO 30" y "LIMA")
+    let matchedEqName = Object.keys(enrolamientoMap).find(key => 
+      key.includes(eq.equipoLabel.toUpperCase()) && key.includes(eq.sede.split(' ')[0].toUpperCase())
+    );
+    
+    if (!matchedEqName) {
+      matchedEqName = Object.keys(enrolamientoMap).find(key => key.includes(eq.equipoLabel.toUpperCase()));
+    }
 
+    
+    let currentStage = 0;
     if (matchedEqName && enrolamientoMap[matchedEqName]) {
       const stats = enrolamientoMap[matchedEqName];
-      const actStats = actividadFdsMap[matchedEqName] || { etapa: 'PFD', participantesEnFds: stats.enJuego };
-      
-      const currentStageStr = actStats.etapa;
-      let currentStage = 0;
+      const currentStageStr = stats.etapa;
       if (currentStageStr === 'TFD') currentStage = 3;
       else if (currentStageStr === 'SFD') currentStage = 2;
       else if (currentStageStr === 'PFD') currentStage = 1;
 
-      // Inician = En Juego + Desertores
-      const totalInician = stats.enJuego + stats.desertores;
-      const totalActivos = stats.enJuego;
-      desercionTotalPx = stats.desertores;
+      const totalInician = stats.sentados + stats.desercion; 
+      const totalActivos = stats.sentados;
+      desercionTotalPx = stats.desercion;
 
       if (currentStage >= 1) {
         c_pxInicio = totalInician;
         if (currentStage === 1) c_pxFinal = totalActivos;
-        else c_pxFinal = totalInician; // Aproximación si ya pasaron
+        else c_pxFinal = totalInician; 
       }
       if (currentStage >= 2) {
         r_pxInicio = c_pxFinal;
@@ -258,22 +237,107 @@ export function mergeNodusDataIntoEquipos(baseEquipos, nodusSnap) {
         g_pxInicio = r_pxFinal;
         g_pxFinal = totalActivos;
       }
-      
-      eq = JSON.parse(JSON.stringify(eq)); // Clone to avoid mutating cache
-      
-      if (actStats.entrenador) {
-        eq.entrenador = actStats.entrenador;
-      }
-
-      eq.creacion.enrolTotal = stats.enrolamientoReal;
-      eq.creacion.enrolPx = stats.enrolPx;
-      eq.creacion.enrolMg = stats.enrolMg;
     } else {
-      // Fallback a los datos antiguos (Excel)
       c_pxInicio = eq.creacion.pxInicio;
       c_pxFinal = eq.creacion.pxFinal;
       desercionTotalPx = eq.creacion.desercionPx;
+      r_pxInicio = eq.relacion.pxInicio;
+      r_pxFinal = eq.relacion.pxFinal;
+      g_pxInicio = eq.gratitud.pxInicio;
+      g_pxFinal = eq.gratitud.pxFinal;
     }
+    
+    eq = JSON.parse(JSON.stringify(eq)); // Clone
+
+    // --- INTEGRADOR MAESTRIA DATA RECTIFICADOR (ABSOLUTO) ---
+    if (maestriaData) {
+      let maestriaEqId = null;
+      if (eq.equipoLabel.includes('30') && eq.sede === 'LIMA') maestriaEqId = '134';
+      if (eq.equipoLabel.includes('29') && eq.sede === 'LIMA') maestriaEqId = '127';
+      if (eq.equipoLabel.includes('28') && eq.sede === 'LIMA') maestriaEqId = '111';
+
+      // Intentar adivinar por iteración cruzando Sede y Equipo
+      if (!maestriaEqId) {
+        Object.keys(maestriaData).forEach(key => {
+          const md = maestriaData[key];
+          if (md && md.nombreNodus) {
+             const nodusUpper = md.nombreNodus.toUpperCase();
+             const expectedLabel = eq.equipoLabel.toUpperCase();
+             const expectedSede = eq.sede.split(' ')[0].toUpperCase();
+             if (nodusUpper.includes(expectedLabel) && nodusUpper.includes(expectedSede)) {
+                 maestriaEqId = key;
+             }
+          }
+        });
+      }
+
+      if (maestriaEqId && maestriaData[maestriaEqId]) {
+         const md = maestriaData[maestriaEqId];
+         
+         const pfdPx = md.PFD?.participantes?.length || 0;
+         const pfdDes = md.PFD?.desertores?.length || 0;
+         const sfdPx = md.SFD?.participantes?.length || 0;
+         const sfdDes = md.SFD?.desertores?.length || 0;
+         const tfdPx = md.TFD?.participantes?.length || 0;
+         const tfdDes = md.TFD?.desertores?.length || 0;
+
+         // Para saber en qué etapa está realmente
+         if (tfdPx > 0 || tfdDes > 0) currentStage = 3;
+         else if (sfdPx > 0 || sfdDes > 0) currentStage = 2;
+         else if (pfdPx > 0 || pfdDes > 0) currentStage = 1;
+
+         c_pxInicio = pfdPx + pfdDes;
+         c_pxFinal = pfdPx;
+         desercionTotalPx = pfdDes + sfdDes + tfdDes;
+
+         if (currentStage >= 2) {
+           r_pxInicio = sfdPx + sfdDes;
+           r_pxFinal = sfdPx;
+         } else {
+           r_pxInicio = 0; r_pxFinal = 0;
+         }
+
+         if (currentStage >= 3) {
+           g_pxInicio = tfdPx + tfdDes;
+           g_pxFinal = tfdPx;
+         } else {
+           g_pxInicio = 0; g_pxFinal = 0;
+         }
+         
+         // Calcular Enrolamiento sumando el array
+         let enrolTotal = 0;
+         [md.PFD?.participantes, md.SFD?.participantes, md.TFD?.participantes].forEach(pxArr => {
+           if (pxArr) pxArr.forEach(px => enrolTotal += (px.enrolados || 0));
+         });
+         // Solo lo sumamos de la etapa actual o del acumulado, pero spider guarda el acumulado en la etapa que extrajo
+         
+         // Para no duplicar si está en múltiples etapas, tomamos el array de la etapa actual:
+         let pxList = [];
+         if (currentStage === 3) pxList = md.TFD?.participantes || [];
+         else if (currentStage === 2) pxList = md.SFD?.participantes || [];
+         else if (currentStage === 1) pxList = md.PFD?.participantes || [];
+         
+         const realEnrol = pxList.reduce((acc, curr) => acc + (curr.enrolados || 0), 0);
+         eq.creacion.enrolTotal = realEnrol;
+         eq.creacion.enrolPx = realEnrol; // asumiendo que todos son px
+         eq.creacion.enrolMg = 0;
+      }
+    }
+    // --- FIN INTEGRADOR ---
+
+    // Asignar al objeto clonado
+    eq.creacion.pxInicio = c_pxInicio;
+    eq.creacion.pxFinal = c_pxFinal;
+    eq.creacion.desercionPx = currentStage === 1 ? desercionTotalPx : (currentStage > 1 ? c_pxInicio - c_pxFinal : 0);
+    
+    eq.relacion.pxInicio = r_pxInicio;
+    eq.relacion.pxFinal = r_pxFinal;
+    eq.relacion.desercionPx = currentStage === 2 ? desercionTotalPx : (currentStage > 2 ? r_pxInicio - r_pxFinal : 0);
+    
+    eq.gratitud.pxInicio = g_pxInicio;
+    eq.gratitud.pxFinal = g_pxFinal;
+    eq.gratitud.desercionPx = currentStage === 3 ? desercionTotalPx : 0;
+
 
     const pxInicioReal = c_pxInicio || eq.c1.terminan;
     const pxFinalReal = g_pxFinal || r_pxFinal || c_pxFinal;

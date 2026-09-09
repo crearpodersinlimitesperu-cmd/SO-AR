@@ -2087,22 +2087,10 @@ export default function Home() {
                   )}
 
                   <div style={{ display: 'flex', gap: '0.4rem', borderLeft: '1px solid rgba(255,255,255,0.1)', paddingLeft: '0.6rem' }}>
-                    <button 
-                      onClick={() => {
-                        setActiveEventTab('locales');
-                        setSelectedSedeFilter('todas');
-                      }}
-                      style={{ background: 'none', border: 'none', color: activeEventTab === 'locales' ? 'var(--crear-gold)' : 'var(--text-muted)', fontWeight: activeEventTab === 'locales' ? 'bold' : 'normal', cursor: 'pointer', fontSize: '0.85rem' }}
-                    >
-                      {hasRoleAccess(['entrenador', 'entrenador_llamadas']) ? 'MIS FECHAS' : 'MI SEDE'}
-                    </button>
-                    {(!hasRoleAccess(['entrenador', 'entrenador_llamadas']) && ((currentUser?.isSuperAdmin && !currentUser?.isSimulated) || currentUser?.isDireccion || currentUser?.isGerente || hasRoleAccess(['gerente', 'direccion', 'director_maestria', 'cfo']) || currentUser?.sede?.toLowerCase().includes('global'))) && (
-                      <button 
-                        onClick={() => setActiveEventTab('globales')}
-                        style={{ background: 'none', border: 'none', color: activeEventTab === 'globales' ? 'var(--crear-gold)' : 'var(--text-muted)', fontWeight: activeEventTab === 'globales' ? 'bold' : 'normal', cursor: 'pointer', fontSize: '0.85rem' }}
-                      >
-                        GLOBAL
-                      </button>
+                    {['entrenador', 'entrenador_llamadas'].includes(currentUser?.appRole) && (
+                      <span style={{ color: 'var(--crear-gold)', fontWeight: 'bold', fontSize: '0.85rem' }}>
+                        MIS FECHAS
+                      </span>
                     )}
                   </div>
                 </div>

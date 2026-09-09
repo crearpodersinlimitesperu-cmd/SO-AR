@@ -2,8 +2,8 @@ import puppeteer from 'puppeteer';
 import 'dotenv/config';
 
 async function testNodus() {
-  const user = process.env.NODUS_USER || 'jsanchez';
-  const pwd = process.env.NODUS_PASSWORD || '123456';
+  const user = process.env.NODUS_GLOBAL_USER || 'CREARPSL';
+  const pwd = process.env.NODUS_GLOBAL_PASS || 'CREARPSL26*';
   console.log('Testing Nodus login with user:', user);
   const browser = await puppeteer.launch({ 
     headless: true, 

@@ -1,0 +1,1322 @@
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NODUS - Maestría - Equipo EQUIPO 28 (TFD)</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<link href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
+<style>
+:root {
+  /* Teal de marca oscurecido para que el texto/botones sean legibles (AA, ~4.9:1 sobre blanco).
+     --sidebar-active se mantiene con el tono claro original: ahí funciona como fondo detrás de texto oscuro. */
+  --primary:      #2d7d84;
+  --primary-dark: #1f5c62;
+  --sidebar-bg:   #1a3336;
+  --sidebar-hover:#224042;
+  --sidebar-active:#A2C8CC;
+  --accent:       #2d7d84;
+  --text-dark:    #1a3336;
+  /* Bootstrap override */
+  --bs-primary:        #2d7d84;
+  --bs-primary-rgb:    45,125,132;
+  --bs-link-color:     #2d7d84;
+  --bs-link-hover-color:#1f5c62;
+}
+body { background:#f0f2f5; font-family:'Segoe UI',system-ui,sans-serif; }
+#sidebar { width:260px; height:100vh; background:var(--sidebar-bg); flex-shrink:0; transition:all .3s; position:fixed; top:0; left:0; z-index:1000; overflow-y:auto; }
+#sidebar::-webkit-scrollbar { width:4px; }
+#sidebar::-webkit-scrollbar-thumb { background:rgba(255,255,255,.2); border-radius:4px; }
+#sidebar::-webkit-scrollbar-track { background:transparent; }
+#sidebar .brand { padding:20px 16px; border-bottom:1px solid rgba(255,255,255,.1); }
+#sidebar .brand h5 { color:#fff; font-weight:700; font-size:1.1rem; margin:0; }
+#sidebar .brand small { color:rgba(255,255,255,.5); font-size:.75rem; }
+#sidebar .nav-link { color:rgba(255,255,255,.7); padding:10px 16px; border-radius:8px; margin:2px 8px; font-size:.875rem; display:flex; align-items:center; gap:10px; transition:all .2s; }
+#sidebar .nav-link:hover { background:var(--sidebar-hover); color:#fff; }
+#sidebar .nav-link.active { background:var(--sidebar-active); color:var(--sidebar-bg); font-weight:700; box-shadow:0 4px 14px rgba(162,200,204,.45); }
+#sidebar .nav-link i { font-size:1rem; width:20px; text-align:center; }
+#sidebar .nav-section-toggle { background:none; border:none; width:100%; text-align:left; color:rgba(255,255,255,.35); font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; padding:16px 24px 4px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; }
+#sidebar .nav-section-toggle:hover { color:rgba(255,255,255,.65); }
+#sidebar .nav-section-toggle .toggle-icon { font-size:.7rem; transition:transform .2s; }
+#sidebar .nav-section-toggle.collapsed .toggle-icon { transform:rotate(-90deg); }
+.main-content { margin-left:260px; min-height:100vh; display:flex; flex-direction:column; }
+.topbar { background:#fff; padding:12px 24px; border-bottom:1px solid #e2e8f0; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:100; }
+.topbar .page-title { font-size:1.1rem; font-weight:600; color:var(--text-dark); margin:0; }
+.page-wrapper { padding:24px; flex:1; }
+.card { border:none; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,.06); }
+.card-header { background:#fff; border-bottom:1px solid #f0f2f5; font-weight:600; padding:16px 20px; border-radius:12px 12px 0 0 !important; }
+.btn-primary { background:var(--accent); border-color:var(--accent); color:#fff !important; }
+.btn-primary:hover,.btn-primary:focus,.btn-primary:active { background:var(--primary-dark); border-color:var(--primary-dark); color:#fff !important; }
+.btn-outline-primary { color:var(--accent); border-color:var(--accent); }
+.btn-outline-primary:hover { background:var(--accent); border-color:var(--accent); color:#fff; }
+.text-primary { color:var(--accent) !important; }
+.border-primary { border-color:var(--accent) !important; }
+.bg-primary { background-color:var(--accent) !important; }
+.modal-header[style*="background:#1a3336"],.modal-header-brand { background:var(--sidebar-bg) !important; }
+.table th { font-weight:600; font-size:.8rem; text-transform:uppercase; letter-spacing:.05em; color:#64748b; border-bottom:2px solid #f0f2f5; }
+.badge-rol { padding:4px 10px; border-radius:20px; font-size:.75rem; font-weight:600; }
+.stat-card { background:#fff; border-radius:12px; padding:20px; box-shadow:0 2px 12px rgba(0,0,0,.06); }
+.stat-card .stat-icon { width:52px; height:52px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.4rem; }
+footer { background:#fff; padding:12px 24px; border-top:1px solid #f0f2f5; font-size:.8rem; color:#94a3b8; }
+@media(max-width:768px){
+  #sidebar{left:-260px;} #sidebar.show{left:0;} .main-content{margin-left:0;}
+}
+</style>
+<style>:root{--swal2-outline: 0 0 0 3px rgba(100, 150, 200, 0.5);--swal2-container-padding: 0.625em;--swal2-backdrop: rgba(0, 0, 0, 0.4);--swal2-backdrop-transition: background-color 0.15s;--swal2-width: 32em;--swal2-padding: 0 0 1.25em;--swal2-border: none;--swal2-border-radius: 0.3125rem;--swal2-background: white;--swal2-color: #545454;--swal2-show-animation: swal2-show 0.3s;--swal2-hide-animation: swal2-hide 0.15s forwards;--swal2-icon-zoom: 1;--swal2-title-padding: 0.8em 1em 0;--swal2-html-container-padding: 1em 1.6em 0.3em;--swal2-input-border: 1px solid #d9d9d9;--swal2-input-border-radius: 0.1875em;--swal2-input-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.06), 0 0 0 3px transparent;--swal2-input-background: transparent;--swal2-input-transition: border-color 0.2s, box-shadow 0.2s;--swal2-input-hover-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.06), 0 0 0 3px transparent;--swal2-input-focus-border: 1px solid #b4dbed;--swal2-input-focus-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.06), 0 0 0 3px rgba(100, 150, 200, 0.5);--swal2-progress-step-background: #add8e6;--swal2-validation-message-background: #f0f0f0;--swal2-validation-message-color: #666;--swal2-footer-border-color: #eee;--swal2-footer-background: transparent;--swal2-footer-color: inherit;--swal2-timer-progress-bar-background: rgba(0, 0, 0, 0.3);--swal2-close-button-position: initial;--swal2-close-button-inset: auto;--swal2-close-button-font-size: 2.5em;--swal2-close-button-color: #ccc;--swal2-close-button-transition: color 0.2s, box-shadow 0.2s;--swal2-close-button-outline: initial;--swal2-close-button-box-shadow: inset 0 0 0 3px transparent;--swal2-close-button-focus-box-shadow: inset var(--swal2-outline);--swal2-close-button-hover-transform: none;--swal2-actions-justify-content: center;--swal2-actions-width: auto;--swal2-actions-margin: 1.25em auto 0;--swal2-actions-padding: 0;--swal2-actions-border-radius: 0;--swal2-actions-background: transparent;--swal2-action-button-transition: background-color 0.2s, box-shadow 0.2s;--swal2-action-button-hover: black 10%;--swal2-action-button-active: black 10%;--swal2-confirm-button-box-shadow: none;--swal2-confirm-button-border-radius: 0.25em;--swal2-confirm-button-background-color: #7066e0;--swal2-confirm-button-color: #fff;--swal2-deny-button-box-shadow: none;--swal2-deny-button-border-radius: 0.25em;--swal2-deny-button-background-color: #dc3741;--swal2-deny-button-color: #fff;--swal2-cancel-button-box-shadow: none;--swal2-cancel-button-border-radius: 0.25em;--swal2-cancel-button-background-color: #6e7881;--swal2-cancel-button-color: #fff;--swal2-toast-show-animation: swal2-toast-show 0.5s;--swal2-toast-hide-animation: swal2-toast-hide 0.1s forwards;--swal2-toast-border: none;--swal2-toast-box-shadow: 0 0 1px hsl(0deg 0% 0% / 0.075), 0 1px 2px hsl(0deg 0% 0% / 0.075), 1px 2px 4px hsl(0deg 0% 0% / 0.075), 1px 3px 8px hsl(0deg 0% 0% / 0.075), 2px 4px 16px hsl(0deg 0% 0% / 0.075)}[data-swal2-theme=dark]{--swal2-dark-theme-black: #19191a;--swal2-dark-theme-white: #e1e1e1;--swal2-background: var(--swal2-dark-theme-black);--swal2-color: var(--swal2-dark-theme-white);--swal2-footer-border-color: #555;--swal2-input-background: color-mix(in srgb, var(--swal2-dark-theme-black), var(--swal2-dark-theme-white) 10%);--swal2-validation-message-background: color-mix( in srgb, var(--swal2-dark-theme-black), var(--swal2-dark-theme-white) 10% );--swal2-validation-message-color: var(--swal2-dark-theme-white);--swal2-timer-progress-bar-background: rgba(255, 255, 255, 0.7)}@media(prefers-color-scheme: dark){[data-swal2-theme=auto]{--swal2-dark-theme-black: #19191a;--swal2-dark-theme-white: #e1e1e1;--swal2-background: var(--swal2-dark-theme-black);--swal2-color: var(--swal2-dark-theme-white);--swal2-footer-border-color: #555;--swal2-input-background: color-mix(in srgb, var(--swal2-dark-theme-black), var(--swal2-dark-theme-white) 10%);--swal2-validation-message-background: color-mix( in srgb, var(--swal2-dark-theme-black), var(--swal2-dark-theme-white) 10% );--swal2-validation-message-color: var(--swal2-dark-theme-white);--swal2-timer-progress-bar-background: rgba(255, 255, 255, 0.7)}}body.swal2-shown:not(.swal2-no-backdrop,.swal2-toast-shown){overflow:hidden}body.swal2-height-auto{height:auto !important}body.swal2-no-backdrop .swal2-container{background-color:rgba(0,0,0,0) !important;pointer-events:none}body.swal2-no-backdrop .swal2-container .swal2-popup{pointer-events:auto}body.swal2-no-backdrop .swal2-container .swal2-modal{box-shadow:0 0 10px var(--swal2-backdrop)}body.swal2-toast-shown .swal2-container{box-sizing:border-box;width:360px;max-width:100%;background-color:rgba(0,0,0,0);pointer-events:none}body.swal2-toast-shown .swal2-container.swal2-top{inset:0 auto auto 50%;transform:translateX(-50%)}body.swal2-toast-shown .swal2-container.swal2-top-end,body.swal2-toast-shown .swal2-container.swal2-top-right{inset:0 0 auto auto}body.swal2-toast-shown .swal2-container.swal2-top-start,body.swal2-toast-shown .swal2-container.swal2-top-left{inset:0 auto auto 0}body.swal2-toast-shown .swal2-container.swal2-center-start,body.swal2-toast-shown .swal2-container.swal2-center-left{inset:50% auto auto 0;transform:translateY(-50%)}body.swal2-toast-shown .swal2-container.swal2-center{inset:50% auto auto 50%;transform:translate(-50%, -50%)}body.swal2-toast-shown .swal2-container.swal2-center-end,body.swal2-toast-shown .swal2-container.swal2-center-right{inset:50% 0 auto auto;transform:translateY(-50%)}body.swal2-toast-shown .swal2-container.swal2-bottom-start,body.swal2-toast-shown .swal2-container.swal2-bottom-left{inset:auto auto 0 0}body.swal2-toast-shown .swal2-container.swal2-bottom{inset:auto auto 0 50%;transform:translateX(-50%)}body.swal2-toast-shown .swal2-container.swal2-bottom-end,body.swal2-toast-shown .swal2-container.swal2-bottom-right{inset:auto 0 0 auto}@media print{body.swal2-shown:not(.swal2-no-backdrop,.swal2-toast-shown){overflow-y:scroll !important}body.swal2-shown:not(.swal2-no-backdrop,.swal2-toast-shown)>[aria-hidden=true]{display:none}body.swal2-shown:not(.swal2-no-backdrop,.swal2-toast-shown) .swal2-container{position:static !important}}div:where(.swal2-container){display:grid;position:fixed;z-index:1060;inset:0;box-sizing:border-box;grid-template-areas:"top-start     top            top-end" "center-start  center         center-end" "bottom-start  bottom-center  bottom-end";grid-template-rows:minmax(min-content, auto) minmax(min-content, auto) minmax(min-content, auto);height:100%;padding:var(--swal2-container-padding);overflow-x:hidden;transition:var(--swal2-backdrop-transition);-webkit-overflow-scrolling:touch}div:where(.swal2-container).swal2-backdrop-show,div:where(.swal2-container).swal2-noanimation{background:var(--swal2-backdrop)}div:where(.swal2-container).swal2-backdrop-hide{background:rgba(0,0,0,0) !important}div:where(.swal2-container).swal2-top-start,div:where(.swal2-container).swal2-center-start,div:where(.swal2-container).swal2-bottom-start{grid-template-columns:minmax(0, 1fr) auto auto}div:where(.swal2-container).swal2-top,div:where(.swal2-container).swal2-center,div:where(.swal2-container).swal2-bottom{grid-template-columns:auto minmax(0, 1fr) auto}div:where(.swal2-container).swal2-top-end,div:where(.swal2-container).swal2-center-end,div:where(.swal2-container).swal2-bottom-end{grid-template-columns:auto auto minmax(0, 1fr)}div:where(.swal2-container).swal2-top-start>.swal2-popup{align-self:start}div:where(.swal2-container).swal2-top>.swal2-popup{grid-column:2;place-self:start center}div:where(.swal2-container).swal2-top-end>.swal2-popup,div:where(.swal2-container).swal2-top-right>.swal2-popup{grid-column:3;place-self:start end}div:where(.swal2-container).swal2-center-start>.swal2-popup,div:where(.swal2-container).swal2-center-left>.swal2-popup{grid-row:2;align-self:center}div:where(.swal2-container).swal2-center>.swal2-popup{grid-column:2;grid-row:2;place-self:center center}div:where(.swal2-container).swal2-center-end>.swal2-popup,div:where(.swal2-container).swal2-center-right>.swal2-popup{grid-column:3;grid-row:2;place-self:center end}div:where(.swal2-container).swal2-bottom-start>.swal2-popup,div:where(.swal2-container).swal2-bottom-left>.swal2-popup{grid-column:1;grid-row:3;align-self:end}div:where(.swal2-container).swal2-bottom>.swal2-popup{grid-column:2;grid-row:3;place-self:end center}div:where(.swal2-container).swal2-bottom-end>.swal2-popup,div:where(.swal2-container).swal2-bottom-right>.swal2-popup{grid-column:3;grid-row:3;place-self:end end}div:where(.swal2-container).swal2-grow-row>.swal2-popup,div:where(.swal2-container).swal2-grow-fullscreen>.swal2-popup{grid-column:1/4;width:100%}div:where(.swal2-container).swal2-grow-column>.swal2-popup,div:where(.swal2-container).swal2-grow-fullscreen>.swal2-popup{grid-row:1/4;align-self:stretch}div:where(.swal2-container).swal2-no-transition{transition:none !important}div:where(.swal2-container)[popover]{width:auto;border:0}div:where(.swal2-container) div:where(.swal2-popup){display:none;position:relative;box-sizing:border-box;grid-template-columns:minmax(0, 100%);width:var(--swal2-width);max-width:100%;padding:var(--swal2-padding);border:var(--swal2-border);border-radius:var(--swal2-border-radius);background:var(--swal2-background);color:var(--swal2-color);font-family:inherit;font-size:1rem}div:where(.swal2-container) div:where(.swal2-popup):focus{outline:none}div:where(.swal2-container) div:where(.swal2-popup).swal2-loading{overflow-y:hidden}div:where(.swal2-container) div:where(.swal2-popup).swal2-draggable{cursor:grab}div:where(.swal2-container) div:where(.swal2-popup).swal2-draggable div:where(.swal2-icon){cursor:grab}div:where(.swal2-container) div:where(.swal2-popup).swal2-dragging{cursor:grabbing}div:where(.swal2-container) div:where(.swal2-popup).swal2-dragging div:where(.swal2-icon){cursor:grabbing}div:where(.swal2-container) h2:where(.swal2-title){position:relative;max-width:100%;margin:0;padding:var(--swal2-title-padding);color:inherit;font-size:1.875em;font-weight:600;text-align:center;text-transform:none;overflow-wrap:break-word;cursor:initial}div:where(.swal2-container) div:where(.swal2-actions){display:flex;z-index:1;box-sizing:border-box;flex-wrap:wrap;align-items:center;justify-content:var(--swal2-actions-justify-content);width:var(--swal2-actions-width);margin:var(--swal2-actions-margin);padding:var(--swal2-actions-padding);border-radius:var(--swal2-actions-border-radius);background:var(--swal2-actions-background)}div:where(.swal2-container) div:where(.swal2-loader){display:none;align-items:center;justify-content:center;width:2.2em;height:2.2em;margin:0 1.875em;animation:swal2-rotate-loading 1.5s linear 0s infinite normal;border-width:.25em;border-style:solid;border-radius:100%;border-color:#2778c4 rgba(0,0,0,0) #2778c4 rgba(0,0,0,0)}div:where(.swal2-container) button:where(.swal2-styled){margin:.3125em;padding:.625em 1.1em;transition:var(--swal2-action-button-transition);border:none;box-shadow:0 0 0 3px rgba(0,0,0,0);font-weight:500}div:where(.swal2-container) button:where(.swal2-styled):not([disabled]){cursor:pointer}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-confirm){border-radius:var(--swal2-confirm-button-border-radius);background:initial;background-color:var(--swal2-confirm-button-background-color);box-shadow:var(--swal2-confirm-button-box-shadow);color:var(--swal2-confirm-button-color);font-size:1em}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-confirm):hover{background-color:color-mix(in srgb, var(--swal2-confirm-button-background-color), var(--swal2-action-button-hover))}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-confirm):active{background-color:color-mix(in srgb, var(--swal2-confirm-button-background-color), var(--swal2-action-button-active))}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-deny){border-radius:var(--swal2-deny-button-border-radius);background:initial;background-color:var(--swal2-deny-button-background-color);box-shadow:var(--swal2-deny-button-box-shadow);color:var(--swal2-deny-button-color);font-size:1em}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-deny):hover{background-color:color-mix(in srgb, var(--swal2-deny-button-background-color), var(--swal2-action-button-hover))}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-deny):active{background-color:color-mix(in srgb, var(--swal2-deny-button-background-color), var(--swal2-action-button-active))}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-cancel){border-radius:var(--swal2-cancel-button-border-radius);background:initial;background-color:var(--swal2-cancel-button-background-color);box-shadow:var(--swal2-cancel-button-box-shadow);color:var(--swal2-cancel-button-color);font-size:1em}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-cancel):hover{background-color:color-mix(in srgb, var(--swal2-cancel-button-background-color), var(--swal2-action-button-hover))}div:where(.swal2-container) button:where(.swal2-styled):where(.swal2-cancel):active{background-color:color-mix(in srgb, var(--swal2-cancel-button-background-color), var(--swal2-action-button-active))}div:where(.swal2-container) button:where(.swal2-styled):focus-visible{outline:none;box-shadow:var(--swal2-action-button-focus-box-shadow)}div:where(.swal2-container) button:where(.swal2-styled)[disabled]:not(.swal2-loading){opacity:.4}div:where(.swal2-container) button:where(.swal2-styled)::-moz-focus-inner{border:0}div:where(.swal2-container) div:where(.swal2-footer){margin:1em 0 0;padding:1em 1em 0;border-top:1px solid var(--swal2-footer-border-color);background:var(--swal2-footer-background);color:var(--swal2-footer-color);font-size:1em;text-align:center;cursor:initial}div:where(.swal2-container) .swal2-timer-progress-bar-container{position:absolute;right:0;bottom:0;left:0;grid-column:auto !important;overflow:hidden;border-bottom-right-radius:var(--swal2-border-radius);border-bottom-left-radius:var(--swal2-border-radius)}div:where(.swal2-container) div:where(.swal2-timer-progress-bar){width:100%;height:.25em;background:var(--swal2-timer-progress-bar-background)}div:where(.swal2-container) img:where(.swal2-image){max-width:100%;margin:2em auto 1em;cursor:initial}div:where(.swal2-container) button:where(.swal2-close){position:var(--swal2-close-button-position);inset:var(--swal2-close-button-inset);z-index:2;align-items:center;justify-content:center;width:1.2em;height:1.2em;margin-top:0;margin-right:0;margin-bottom:-1.2em;padding:0;overflow:hidden;transition:var(--swal2-close-button-transition);border:none;border-radius:var(--swal2-border-radius);outline:var(--swal2-close-button-outline);background:rgba(0,0,0,0);color:var(--swal2-close-button-color);font-family:monospace;font-size:var(--swal2-close-button-font-size);cursor:pointer;justify-self:end}div:where(.swal2-container) button:where(.swal2-close):hover{transform:var(--swal2-close-button-hover-transform);background:rgba(0,0,0,0);color:#f27474}div:where(.swal2-container) button:where(.swal2-close):focus-visible{outline:none;box-shadow:var(--swal2-close-button-focus-box-shadow)}div:where(.swal2-container) button:where(.swal2-close)::-moz-focus-inner{border:0}div:where(.swal2-container) div:where(.swal2-html-container){z-index:1;justify-content:center;margin:0;padding:var(--swal2-html-container-padding);overflow:auto;color:inherit;font-size:1.125em;font-weight:normal;line-height:normal;text-align:center;overflow-wrap:break-word;word-break:break-word;cursor:initial}div:where(.swal2-container) input:where(.swal2-input),div:where(.swal2-container) input:where(.swal2-file),div:where(.swal2-container) textarea:where(.swal2-textarea),div:where(.swal2-container) select:where(.swal2-select),div:where(.swal2-container) div:where(.swal2-radio),div:where(.swal2-container) label:where(.swal2-checkbox){margin:1em 2em 3px}div:where(.swal2-container) input:where(.swal2-input),div:where(.swal2-container) input:where(.swal2-file),div:where(.swal2-container) textarea:where(.swal2-textarea){box-sizing:border-box;width:auto;transition:var(--swal2-input-transition);border:var(--swal2-input-border);border-radius:var(--swal2-input-border-radius);background:var(--swal2-input-background);box-shadow:var(--swal2-input-box-shadow);color:inherit;font-size:1.125em}div:where(.swal2-container) input:where(.swal2-input).swal2-inputerror,div:where(.swal2-container) input:where(.swal2-file).swal2-inputerror,div:where(.swal2-container) textarea:where(.swal2-textarea).swal2-inputerror{border-color:#f27474 !important;box-shadow:0 0 2px #f27474 !important}div:where(.swal2-container) input:where(.swal2-input):hover,div:where(.swal2-container) input:where(.swal2-file):hover,div:where(.swal2-container) textarea:where(.swal2-textarea):hover{box-shadow:var(--swal2-input-hover-box-shadow)}div:where(.swal2-container) input:where(.swal2-input):focus,div:where(.swal2-container) input:where(.swal2-file):focus,div:where(.swal2-container) textarea:where(.swal2-textarea):focus{border:var(--swal2-input-focus-border);outline:none;box-shadow:var(--swal2-input-focus-box-shadow)}div:where(.swal2-container) input:where(.swal2-input)::placeholder,div:where(.swal2-container) input:where(.swal2-file)::placeholder,div:where(.swal2-container) textarea:where(.swal2-textarea)::placeholder{color:#ccc}div:where(.swal2-container) .swal2-range{margin:1em 2em 3px;background:var(--swal2-background)}div:where(.swal2-container) .swal2-range input{width:80%}div:where(.swal2-container) .swal2-range output{width:20%;color:inherit;font-weight:600;text-align:center}div:where(.swal2-container) .swal2-range input,div:where(.swal2-container) .swal2-range output{height:2.625em;padding:0;font-size:1.125em;line-height:2.625em}div:where(.swal2-container) .swal2-input{height:2.625em;padding:0 .75em}div:where(.swal2-container) .swal2-file{width:75%;margin-right:auto;margin-left:auto;background:var(--swal2-input-background);font-size:1.125em}div:where(.swal2-container) .swal2-textarea{height:6.75em;padding:.75em}div:where(.swal2-container) .swal2-select{min-width:50%;max-width:100%;padding:.375em .625em;background:var(--swal2-input-background);color:inherit;font-size:1.125em}div:where(.swal2-container) .swal2-radio,div:where(.swal2-container) .swal2-checkbox{align-items:center;justify-content:center;background:var(--swal2-background);color:inherit}div:where(.swal2-container) .swal2-radio label,div:where(.swal2-container) .swal2-checkbox label{margin:0 .6em;font-size:1.125em}div:where(.swal2-container) .swal2-radio input,div:where(.swal2-container) .swal2-checkbox input{flex-shrink:0;margin:0 .4em}div:where(.swal2-container) label:where(.swal2-input-label){display:flex;justify-content:center;margin:1em auto 0}div:where(.swal2-container) div:where(.swal2-validation-message){align-items:center;justify-content:center;margin:1em 0 0;padding:.625em;overflow:hidden;background:var(--swal2-validation-message-background);color:var(--swal2-validation-message-color);font-size:1em;font-weight:300}div:where(.swal2-container) div:where(.swal2-validation-message)::before{content:"!";display:inline-block;width:1.5em;min-width:1.5em;height:1.5em;margin:0 .625em;border-radius:50%;background-color:#f27474;color:#fff;font-weight:600;line-height:1.5em;text-align:center}div:where(.swal2-container) .swal2-progress-steps{flex-wrap:wrap;align-items:center;max-width:100%;margin:1.25em auto;padding:0;background:rgba(0,0,0,0);font-weight:600}div:where(.swal2-container) .swal2-progress-steps li{display:inline-block;position:relative}div:where(.swal2-container) .swal2-progress-steps .swal2-progress-step{z-index:20;flex-shrink:0;width:2em;height:2em;border-radius:2em;background:#2778c4;color:#fff;line-height:2em;text-align:center}div:where(.swal2-container) .swal2-progress-steps .swal2-progress-step.swal2-active-progress-step{background:#2778c4}div:where(.swal2-container) .swal2-progress-steps .swal2-progress-step.swal2-active-progress-step~.swal2-progress-step{background:var(--swal2-progress-step-background);color:#fff}div:where(.swal2-container) .swal2-progress-steps .swal2-progress-step.swal2-active-progress-step~.swal2-progress-step-line{background:var(--swal2-progress-step-background)}div:where(.swal2-container) .swal2-progress-steps .swal2-progress-step-line{z-index:10;flex-shrink:0;width:2.5em;height:.4em;margin:0 -1px;background:#2778c4}div:where(.swal2-icon){position:relative;box-sizing:content-box;justify-content:center;width:5em;height:5em;margin:2.5em auto .6em;zoom:var(--swal2-icon-zoom);border:.25em solid rgba(0,0,0,0);border-radius:50%;border-color:#000;font-family:inherit;line-height:5em;cursor:default;user-select:none}div:where(.swal2-icon) .swal2-icon-content{display:flex;align-items:center;font-size:3.75em}div:where(.swal2-icon).swal2-error{border-color:#f27474;color:#f27474}div:where(.swal2-icon).swal2-error .swal2-x-mark{position:relative;flex-grow:1}div:where(.swal2-icon).swal2-error [class^=swal2-x-mark-line]{display:block;position:absolute;top:2.3125em;width:2.9375em;height:.3125em;border-radius:.125em;background-color:#f27474}div:where(.swal2-icon).swal2-error [class^=swal2-x-mark-line][class$=left]{left:1.0625em;transform:rotate(45deg)}div:where(.swal2-icon).swal2-error [class^=swal2-x-mark-line][class$=right]{right:1em;transform:rotate(-45deg)}div:where(.swal2-icon).swal2-error.swal2-icon-show{animation:swal2-animate-error-icon .5s}div:where(.swal2-icon).swal2-error.swal2-icon-show .swal2-x-mark{animation:swal2-animate-error-x-mark .5s}div:where(.swal2-icon).swal2-warning{border-color:#f8bb86;color:#f8bb86}div:where(.swal2-icon).swal2-warning.swal2-icon-show{animation:swal2-animate-error-icon .5s}div:where(.swal2-icon).swal2-warning.swal2-icon-show .swal2-icon-content{animation:swal2-animate-i-mark .5s}div:where(.swal2-icon).swal2-info{border-color:#3fc3ee;color:#3fc3ee}div:where(.swal2-icon).swal2-info.swal2-icon-show{animation:swal2-animate-error-icon .5s}div:where(.swal2-icon).swal2-info.swal2-icon-show .swal2-icon-content{animation:swal2-animate-i-mark .8s}div:where(.swal2-icon).swal2-question{border-color:#87adbd;color:#87adbd}div:where(.swal2-icon).swal2-question.swal2-icon-show{animation:swal2-animate-error-icon .5s}div:where(.swal2-icon).swal2-question.swal2-icon-show .swal2-icon-content{animation:swal2-animate-question-mark .8s}div:where(.swal2-icon).swal2-success{border-color:#a5dc86;color:#a5dc86}div:where(.swal2-icon).swal2-success [class^=swal2-success-circular-line]{position:absolute;width:3.75em;height:7.5em;border-radius:50%}div:where(.swal2-icon).swal2-success [class^=swal2-success-circular-line][class$=left]{top:-0.4375em;left:-2.0635em;transform:rotate(-45deg);transform-origin:3.75em 3.75em;border-radius:7.5em 0 0 7.5em}div:where(.swal2-icon).swal2-success [class^=swal2-success-circular-line][class$=right]{top:-0.6875em;left:1.875em;transform:rotate(-45deg);transform-origin:0 3.75em;border-radius:0 7.5em 7.5em 0}div:where(.swal2-icon).swal2-success .swal2-success-ring{position:absolute;z-index:2;top:-0.25em;left:-0.25em;box-sizing:content-box;width:100%;height:100%;border:.25em solid rgba(165,220,134,.3);border-radius:50%}div:where(.swal2-icon).swal2-success .swal2-success-fix{position:absolute;z-index:1;top:.5em;left:1.625em;width:.4375em;height:5.625em;transform:rotate(-45deg)}div:where(.swal2-icon).swal2-success [class^=swal2-success-line]{display:block;position:absolute;z-index:2;height:.3125em;border-radius:.125em;background-color:#a5dc86}div:where(.swal2-icon).swal2-success [class^=swal2-success-line][class$=tip]{top:2.875em;left:.8125em;width:1.5625em;transform:rotate(45deg)}div:where(.swal2-icon).swal2-success [class^=swal2-success-line][class$=long]{top:2.375em;right:.5em;width:2.9375em;transform:rotate(-45deg)}div:where(.swal2-icon).swal2-success.swal2-icon-show .swal2-success-line-tip{animation:swal2-animate-success-line-tip .75s}div:where(.swal2-icon).swal2-success.swal2-icon-show .swal2-success-line-long{animation:swal2-animate-success-line-long .75s}div:where(.swal2-icon).swal2-success.swal2-icon-show .swal2-success-circular-line-right{animation:swal2-rotate-success-circular-line 4.25s ease-in}[class^=swal2]{-webkit-tap-highlight-color:rgba(0,0,0,0)}.swal2-show{animation:var(--swal2-show-animation)}.swal2-hide{animation:var(--swal2-hide-animation)}.swal2-noanimation{transition:none}.swal2-scrollbar-measure{position:absolute;top:-9999px;width:50px;height:50px;overflow:scroll}.swal2-rtl .swal2-close{margin-right:initial;margin-left:0}.swal2-rtl .swal2-timer-progress-bar{right:0;left:auto}.swal2-toast{box-sizing:border-box;grid-column:1/4 !important;grid-row:1/4 !important;grid-template-columns:min-content auto min-content;padding:1em;overflow-y:hidden;border:var(--swal2-toast-border);background:var(--swal2-background);box-shadow:var(--swal2-toast-box-shadow);pointer-events:auto}.swal2-toast>*{grid-column:2}.swal2-toast h2:where(.swal2-title){margin:.5em 1em;padding:0;font-size:1em;text-align:initial}.swal2-toast .swal2-loading{justify-content:center}.swal2-toast input:where(.swal2-input){height:2em;margin:.5em;font-size:1em}.swal2-toast .swal2-validation-message{font-size:1em}.swal2-toast div:where(.swal2-footer){margin:.5em 0 0;padding:.5em 0 0;font-size:.8em}.swal2-toast button:where(.swal2-close){grid-column:3/3;grid-row:1/99;align-self:center;width:.8em;height:.8em;margin:0;font-size:2em}.swal2-toast div:where(.swal2-html-container){margin:.5em 1em;padding:0;overflow:initial;font-size:1em;text-align:initial}.swal2-toast div:where(.swal2-html-container):empty{padding:0}.swal2-toast .swal2-loader{grid-column:1;grid-row:1/99;align-self:center;width:2em;height:2em;margin:.25em}.swal2-toast .swal2-icon{grid-column:1;grid-row:1/99;align-self:center;width:2em;min-width:2em;height:2em;margin:0 .5em 0 0}.swal2-toast .swal2-icon .swal2-icon-content{display:flex;align-items:center;font-size:1.8em;font-weight:bold}.swal2-toast .swal2-icon.swal2-success .swal2-success-ring{width:2em;height:2em}.swal2-toast .swal2-icon.swal2-error [class^=swal2-x-mark-line]{top:.875em;width:1.375em}.swal2-toast .swal2-icon.swal2-error [class^=swal2-x-mark-line][class$=left]{left:.3125em}.swal2-toast .swal2-icon.swal2-error [class^=swal2-x-mark-line][class$=right]{right:.3125em}.swal2-toast div:where(.swal2-actions){justify-content:flex-start;height:auto;margin:0;margin-top:.5em;padding:0 .5em}.swal2-toast button:where(.swal2-styled){margin:.25em .5em;padding:.4em .6em;font-size:1em}.swal2-toast .swal2-success{border-color:#a5dc86}.swal2-toast .swal2-success [class^=swal2-success-circular-line]{position:absolute;width:1.6em;height:3em;border-radius:50%}.swal2-toast .swal2-success [class^=swal2-success-circular-line][class$=left]{top:-0.8em;left:-0.5em;transform:rotate(-45deg);transform-origin:2em 2em;border-radius:4em 0 0 4em}.swal2-toast .swal2-success [class^=swal2-success-circular-line][class$=right]{top:-0.25em;left:.9375em;transform-origin:0 1.5em;border-radius:0 4em 4em 0}.swal2-toast .swal2-success .swal2-success-ring{width:2em;height:2em}.swal2-toast .swal2-success .swal2-success-fix{top:0;left:.4375em;width:.4375em;height:2.6875em}.swal2-toast .swal2-success [class^=swal2-success-line]{height:.3125em}.swal2-toast .swal2-success [class^=swal2-success-line][class$=tip]{top:1.125em;left:.1875em;width:.75em}.swal2-toast .swal2-success [class^=swal2-success-line][class$=long]{top:.9375em;right:.1875em;width:1.375em}.swal2-toast .swal2-success.swal2-icon-show .swal2-success-line-tip{animation:swal2-toast-animate-success-line-tip .75s}.swal2-toast .swal2-success.swal2-icon-show .swal2-success-line-long{animation:swal2-toast-animate-success-line-long .75s}.swal2-toast.swal2-show{animation:var(--swal2-toast-show-animation)}.swal2-toast.swal2-hide{animation:var(--swal2-toast-hide-animation)}@keyframes swal2-show{0%{transform:translate3d(0, -50px, 0) scale(0.9);opacity:0}100%{transform:translate3d(0, 0, 0) scale(1);opacity:1}}@keyframes swal2-hide{0%{transform:translate3d(0, 0, 0) scale(1);opacity:1}100%{transform:translate3d(0, -50px, 0) scale(0.9);opacity:0}}@keyframes swal2-animate-success-line-tip{0%{top:1.1875em;left:.0625em;width:0}54%{top:1.0625em;left:.125em;width:0}70%{top:2.1875em;left:-0.375em;width:3.125em}84%{top:3em;left:1.3125em;width:1.0625em}100%{top:2.8125em;left:.8125em;width:1.5625em}}@keyframes swal2-animate-success-line-long{0%{top:3.375em;right:2.875em;width:0}65%{top:3.375em;right:2.875em;width:0}84%{top:2.1875em;right:0;width:3.4375em}100%{top:2.375em;right:.5em;width:2.9375em}}@keyframes swal2-rotate-success-circular-line{0%{transform:rotate(-45deg)}5%{transform:rotate(-45deg)}12%{transform:rotate(-405deg)}100%{transform:rotate(-405deg)}}@keyframes swal2-animate-error-x-mark{0%{margin-top:1.625em;transform:scale(0.4);opacity:0}50%{margin-top:1.625em;transform:scale(0.4);opacity:0}80%{margin-top:-0.375em;transform:scale(1.15)}100%{margin-top:0;transform:scale(1);opacity:1}}@keyframes swal2-animate-error-icon{0%{transform:rotateX(100deg);opacity:0}100%{transform:rotateX(0deg);opacity:1}}@keyframes swal2-rotate-loading{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}@keyframes swal2-animate-question-mark{0%{transform:rotateY(-360deg)}100%{transform:rotateY(0)}}@keyframes swal2-animate-i-mark{0%{transform:rotateZ(45deg);opacity:0}25%{transform:rotateZ(-25deg);opacity:.4}50%{transform:rotateZ(15deg);opacity:.8}75%{transform:rotateZ(-5deg);opacity:1}100%{transform:rotateX(0);opacity:1}}@keyframes swal2-toast-show{0%{transform:translateY(-0.625em) rotateZ(2deg)}33%{transform:translateY(0) rotateZ(-2deg)}66%{transform:translateY(0.3125em) rotateZ(2deg)}100%{transform:translateY(0) rotateZ(0deg)}}@keyframes swal2-toast-hide{100%{transform:rotateZ(1deg);opacity:0}}@keyframes swal2-toast-animate-success-line-tip{0%{top:.5625em;left:.0625em;width:0}54%{top:.125em;left:.125em;width:0}70%{top:.625em;left:-0.25em;width:1.625em}84%{top:1.0625em;left:.75em;width:.5em}100%{top:1.125em;left:.1875em;width:.75em}}@keyframes swal2-toast-animate-success-line-long{0%{top:1.625em;right:1.375em;width:0}65%{top:1.25em;right:.9375em;width:0}84%{top:.9375em;right:0;width:1.125em}100%{top:.9375em;right:.1875em;width:1.375em}}</style></head>
+<body>
+
+<!-- Sidebar -->
+<nav id="sidebar">
+  <div class="brand d-flex align-items-center gap-2">
+    <img src="https://imo.crearpslglobal.com/public/assets/img/logo-crear.png" alt="NODUS" style="height:40px;width:40px;object-fit:contain;border-radius:50%;background:#fff;flex-shrink:0">
+    <div>
+      <h5 class="mb-0">NODUS</h5>
+      <small>v1.0.0</small>
+    </div>
+  </div>
+  <div class="pt-2 pb-3">
+    <button class="nav-section-toggle collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#nav-sistema" aria-expanded="false">
+                <span>Sistema</span>
+                <i class="bi bi-chevron-down toggle-icon"></i>
+              </button><div class="collapse" id="nav-sistema"><a href="https://imo.crearpslglobal.com/dashboard" class="nav-link ">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                  </a><a href="https://imo.crearpslglobal.com/usuarios" class="nav-link ">
+                    <i class="bi bi-people"></i> Usuarios
+                  </a><a href="https://imo.crearpslglobal.com/roles" class="nav-link ">
+                    <i class="bi bi-shield-check"></i> Roles
+                  </a><a href="https://imo.crearpslglobal.com/permisos" class="nav-link ">
+                    <i class="bi bi-key"></i> Permisos
+                  </a></div><button class="nav-section-toggle collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#nav-configuracin" aria-expanded="false">
+                <span>Configuración</span>
+                <i class="bi bi-chevron-down toggle-icon"></i>
+              </button><div class="collapse" id="nav-configuracin"><a href="https://imo.crearpslglobal.com/sedes" class="nav-link ">
+                    <i class="bi bi-geo-alt"></i> Sedes
+                  </a><a href="https://imo.crearpslglobal.com/entrenamientos" class="nav-link ">
+                    <i class="bi bi-book"></i> Entrenamientos
+                  </a><a href="https://imo.crearpslglobal.com/entrenadores" class="nav-link ">
+                    <i class="bi bi-person-badge"></i> Entrenadores
+                  </a><a href="https://imo.crearpslglobal.com/configuracion" class="nav-link ">
+                    <i class="bi bi-gear-fill"></i> Configuración
+                  </a><a href="https://imo.crearpslglobal.com/cronograma" class="nav-link ">
+                    <i class="bi bi-calendar3-range-fill"></i> Cronograma
+                  </a><a href="https://imo.crearpslglobal.com/saltoscuanticos" class="nav-link ">
+                    <i class="bi bi-collection"></i> Saltos Cuánticos
+                  </a></div><button class="nav-section-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#nav-participantes" aria-expanded="true">
+                <span>Participantes</span>
+                <i class="bi bi-chevron-down toggle-icon"></i>
+              </button><div class="collapse show" id="nav-participantes"><a href="https://imo.crearpslglobal.com/equipos" class="nav-link ">
+                    <i class="bi bi-people-fill"></i> Equipos
+                  </a><a href="https://imo.crearpslglobal.com/maestria" class="nav-link active">
+                    <i class="bi bi-mortarboard"></i> Maestrí­a
+                  </a><a href="https://imo.crearpslglobal.com/participantessede" class="nav-link ">
+                    <i class="bi bi-card-list"></i> Participantes Sede
+                  </a><a href="https://imo.crearpslglobal.com/registro" class="nav-link ">
+                    <i class="bi bi-link-45deg"></i> Links Registro
+                  </a><a href="https://imo.crearpslglobal.com/futurosimposibles" class="nav-link ">
+                    <i class="bi bi-stars"></i> Futuros Imposibles
+                  </a><a href="https://imo.crearpslglobal.com/reporterezagados" class="nav-link ">
+                    <i class="bi bi-person-dash"></i> Participantes Rezagados
+                  </a><a href="https://imo.crearpslglobal.com/entrenamientoadicional" class="nav-link ">
+                    <i class="bi bi-award"></i> Entrenamientos Adicionales
+                  </a></div><button class="nav-section-toggle collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#nav-seguimiento" aria-expanded="false">
+                <span>Seguimiento</span>
+                <i class="bi bi-chevron-down toggle-icon"></i>
+              </button><div class="collapse" id="nav-seguimiento"><a href="https://imo.crearpslglobal.com/capitulo1" class="nav-link ">
+                    <i class="bi bi-1-circle"></i> Capí­tulo 1
+                  </a><a href="https://imo.crearpslglobal.com/gestionc1" class="nav-link ">
+                    <i class="bi bi-telephone"></i> Gestión C1
+                  </a><a href="https://imo.crearpslglobal.com/capitulo2" class="nav-link ">
+                    <i class="bi bi-2-circle"></i> Capí­tulo 2
+                  </a><a href="https://imo.crearpslglobal.com/gestionc2" class="nav-link ">
+                    <i class="bi bi-telephone-fill"></i> Gestión C2
+                  </a><a href="https://imo.crearpslglobal.com/saltocuantico" class="nav-link ">
+                    <i class="bi bi-rocket-takeoff-fill"></i> Salto Cuántico
+                  </a><a href="https://imo.crearpslglobal.com/entrenamientocomplementario" class="nav-link ">
+                    <i class="bi bi-journal-check"></i> Entrenamiento Complementario
+                  </a><a href="https://imo.crearpslglobal.com/asignacionllamadas" class="nav-link ">
+                    <i class="bi bi-telephone-outbound"></i> Asignación de Llamadas
+                  </a><a href="https://imo.crearpslglobal.com/llamadasentrenador" class="nav-link ">
+                    <i class="bi bi-telephone-forward"></i> Llamadas Entrenador-Manager
+                  </a></div><button class="nav-section-toggle collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#nav-aliados" aria-expanded="false">
+                <span>Aliados</span>
+                <i class="bi bi-chevron-down toggle-icon"></i>
+              </button><div class="collapse" id="nav-aliados"><a href="https://imo.crearpslglobal.com/aliados" class="nav-link ">
+                    <i class="bi bi-star"></i> Aliados
+                  </a></div><button class="nav-section-toggle collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#nav-contabilidad" aria-expanded="false">
+                <span>Contabilidad</span>
+                <i class="bi bi-chevron-down toggle-icon"></i>
+              </button><div class="collapse" id="nav-contabilidad"><a href="https://imo.crearpslglobal.com/participantes" class="nav-link ">
+                    <i class="bi bi-receipt"></i> Facturación
+                  </a><a href="https://imo.crearpslglobal.com/conciliacion" class="nav-link ">
+                    <i class="bi bi-bank2"></i> Conciliación Bancaria
+                  </a><a href="https://imo.crearpslglobal.com/participantesformapago" class="nav-link ">
+                    <i class="bi bi-table"></i> Participantes / Forma de Pago
+                  </a></div><button class="nav-section-toggle collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#nav-mesaregistro" aria-expanded="false">
+                <span>Mesa Registro</span>
+                <i class="bi bi-chevron-down toggle-icon"></i>
+              </button><div class="collapse" id="nav-mesaregistro"><a href="https://imo.crearpslglobal.com/facturas" class="nav-link ">
+                    <i class="bi bi-receipt-cutoff"></i> Facturas
+                  </a><a href="https://imo.crearpslglobal.com/cierrecaja" class="nav-link ">
+                    <i class="bi bi-safe2-fill"></i> Cierre de Caja
+                  </a><a href="https://imo.crearpslglobal.com/mesaregistro" class="nav-link ">
+                    <i class="bi bi-cash-coin"></i> Mesa Registro
+                  </a></div><button class="nav-section-toggle collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#nav-certificados" aria-expanded="false">
+                <span>Certificados</span>
+                <i class="bi bi-chevron-down toggle-icon"></i>
+              </button><div class="collapse" id="nav-certificados"><a href="https://imo.crearpslglobal.com/certificados" class="nav-link ">
+                    <i class="bi bi-patch-check-fill"></i> Certificados
+                  </a></div><button class="nav-section-toggle collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#nav-reportes" aria-expanded="false">
+                <span>Reportes</span>
+                <i class="bi bi-chevron-down toggle-icon"></i>
+              </button><div class="collapse" id="nav-reportes"><a href="https://imo.crearpslglobal.com/reporte" class="nav-link ">
+                    <i class="bi bi-file-bar-graph-fill"></i> Reporte Asistencia
+                  </a><a href="https://imo.crearpslglobal.com/actividadcoordinadores" class="nav-link ">
+                    <i class="bi bi-person-lines-fill"></i> Actividad Coordinadores
+                  </a><a href="https://imo.crearpslglobal.com/reporteentrenadores" class="nav-link ">
+                    <i class="bi bi-clipboard-data"></i> Reporte de Entrenadores
+                  </a><a href="https://imo.crearpslglobal.com/enrolamiento" class="nav-link ">
+                    <i class="bi bi-person-lines-fill"></i> Enrolamiento
+                  </a><a href="https://imo.crearpslglobal.com/reporteprospectossinpago" class="nav-link ">
+                    <i class="bi bi-person-x"></i> Prospectos sin Pago
+                  </a><a href="https://imo.crearpslglobal.com/eres" class="nav-link ">
+                    <i class="bi bi-clipboard-data"></i> ERES
+                  </a></div><button class="nav-section-toggle collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#nav-juniors" aria-expanded="false">
+                <span>Juniors</span>
+                <i class="bi bi-chevron-down toggle-icon"></i>
+              </button><div class="collapse" id="nav-juniors"><a href="https://imo.crearpslglobal.com/juniors" class="nav-link ">
+                    <i class="bi bi-emoji-smile"></i> Entrenamiento Juniors
+                  </a></div><button class="nav-section-toggle collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#nav-inteligenciaartificial" aria-expanded="false">
+                <span>Inteligencia Artificial</span>
+                <i class="bi bi-chevron-down toggle-icon"></i>
+              </button><div class="collapse" id="nav-inteligenciaartificial"><a href="https://imo.crearpslglobal.com/asistenteia" class="nav-link ">
+                    <i class="bi bi-stars"></i> Asistente IA
+                  </a></div>  </div>
+</nav>
+
+<!-- Main -->
+<div class="main-content">
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="d-flex align-items-center gap-3">
+      <button class="btn btn-sm btn-outline-secondary d-md-none" onclick="document.getElementById('sidebar').classList.toggle('show')">
+        <i class="bi bi-list"></i>
+      </button>
+      <button class="btn btn-sm btn-outline-secondary" onclick="history.back()" title="Regresar">
+        <i class="bi bi-arrow-left"></i>
+      </button>
+      <button class="btn btn-sm btn-outline-secondary" onclick="location.reload()" title="Actualizar">
+        <i class="bi bi-arrow-clockwise"></i>
+      </button>
+      <h1 class="page-title">Maestría - Equipo EQUIPO 28 (TFD)</h1>
+    </div>
+    <div class="d-flex align-items-center gap-3">
+            <div class="dropdown">
+        <button class="btn btn-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">
+          <i class="bi bi-person-circle me-1"></i>JOSE LUIS SANCHEZ MORENO        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li><span class="dropdown-item-text small text-muted">Gerente</span></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item text-danger" href="https://imo.crearpslglobal.com/auth/logout"><i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Breadcrumb & Content -->
+  <div class="page-wrapper">
+    
+    ﻿
+<style>
+/* Colores para el tipo de participante (PX/CAP/MGR). El estado SIN marcar queda pálido (para no
+   competir visualmente con el resto de la fila); el MARCADO pasa a un color sólido y saturado
+   con texto blanco + anillo de foco, para que se distinga de un vistazo de sus dos hermanos sin
+   marcar (con la versión anterior, ambos estados eran tonos pastel casi iguales). */
+.btn-tipo-px, .btn-tipo-cap, .btn-tipo-mgr { font-weight: 700; border-width: 1.5px; }
+.btn-tipo-px   { color:#2F4C73; border-color:#9DBFE3; background:#D6E4F5; }
+.btn-tipo-px:hover   { background:#C3D7F0; }
+.btn-check:checked + .btn-tipo-px   { background:#2F5FA8; color:#fff; border-color:#1F3350; box-shadow:0 0 0 2px rgba(47,95,168,.35); }
+
+.btn-tipo-cap  { color:#6E5620; border-color:#E0C878; background:#F5E8C2; }
+.btn-tipo-cap:hover  { background:#EFDCA0; }
+.btn-check:checked + .btn-tipo-cap  { background:#B8860B; color:#fff; border-color:#6E5620; box-shadow:0 0 0 2px rgba(184,134,11,.35); }
+
+.btn-tipo-mgr  { color:#255757; border-color:#7FC9C9; background:#C9EAEA; }
+.btn-tipo-mgr:hover  { background:#AEDEDE; }
+.btn-check:checked + .btn-tipo-mgr  { background:#1B8A8A; color:#fff; border-color:#153939; box-shadow:0 0 0 2px rgba(27,138,138,.35); }
+
+/* Cabeceras ordenables (JS) — flecha neutral por defecto, resaltada en la columna/orden activo. */
+.th-sort { cursor:pointer; user-select:none; white-space:nowrap; }
+.th-sort:hover { background:#e9ecef; }
+.th-sort .sort-icon { font-size:.75rem; }
+</style>
+
+<!-- Navegación etapas -->
+<div class="d-flex gap-2 mb-3 flex-wrap">
+  <a href="https://imo.crearpslglobal.com/maestria" class="btn btn-sm btn-outline-secondary">
+    <i class="bi bi-arrow-left me-1"></i>Volver
+  </a>
+    <a href="https://imo.crearpslglobal.com/maestria/equipo/111/PFD" class="btn btn-sm btn-outline-primary">PFD</a>
+    <a href="https://imo.crearpslglobal.com/maestria/equipo/111/SFD" class="btn btn-sm btn-outline-primary">SFD</a>
+    <a href="https://imo.crearpslglobal.com/maestria/equipo/111/TFD" class="btn btn-sm btn-primary">TFD</a>
+  </div>
+
+<!-- Cabecera equipo -->
+<div class="card mb-3 border-0 shadow-sm">
+  <div class="card-body py-2 px-3">
+    <div class="d-flex gap-3 align-items-center flex-wrap">
+      <strong class="fs-6">EQUIPO 28</strong>
+      <span class="badge bg-info">LIMA CICLO 1</span>
+      <span class="badge bg-primary">TFD</span>
+      <span class="text-muted small" id="contadorTotal">12 participante(s) en lista</span>
+          </div>
+  </div>
+</div>
+
+<!-- Formulario principal -->
+<div class="card shadow-sm">
+  <div class="card-header d-flex justify-content-between align-items-center py-2">
+    <span class="fw-semibold"><i class="bi bi-people me-2 text-primary"></i>Equipo TFD — Registro</span>
+    <div class="d-flex gap-2 flex-wrap">
+      <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modalDesertores">
+        <i class="bi bi-person-x me-1"></i>Rezagados <span class="badge bg-danger ms-1" id="badgeDesertores">0</span>
+      </button>
+      <a href="https://imo.crearpslglobal.com/maestria/exportar/111/TFD" class="btn btn-sm btn-outline-success">
+        <i class="bi bi-file-earmark-excel me-1"></i>Exportar Excel
+      </a>
+      <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalGafetesMaestria">
+        <i class="bi bi-person-vcard me-1"></i>Imprimir Gafetes
+      </button>
+                      <button type="button" class="btn btn-sm btn-warning fw-semibold" onclick="autoEnrolar()" id="btnAutoEnrolar">
+        <i class="bi bi-magic me-1"></i>Auto-enrolar desde SFD      </button>
+            <button type="button" class="btn btn-sm btn-outline-success" onclick="abrirModalMasivo()">
+        <i class="bi bi-people-fill me-1"></i>Agregar masivo
+      </button>
+      <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#modalBuscar">
+        <i class="bi bi-person-plus me-1"></i>Agregar uno
+      </button>
+        </div>
+  </div>
+
+  <form method="POST" action="https://imo.crearpslglobal.com/maestria/guardar" id="frmMaestria">
+    <input type="hidden" name="id_equipo" value="111">
+    <input type="hidden" name="id_entrenamiento" value="5">
+    <input type="hidden" name="etapa" value="TFD">
+
+    <div class="card-body p-0">
+      <div class="px-3 py-2 border-bottom bg-light d-flex align-items-center gap-2 flex-wrap">
+        <i class="bi bi-search text-muted"></i>
+        <input type="text" id="inpFiltroTabla" class="form-control form-control-sm" placeholder="Buscar por nombre, teléfono, cédula..." oninput="filtrarTabla(this.value)" style="max-width:300px" autocomplete="off">
+        <span id="infoFiltro" class="text-muted small" style="display:none"></span>
+        <button type="button" class="btn btn-sm btn-outline-secondary py-0" id="btnLimpiarFiltro" style="display:none" onclick="document.getElementById('inpFiltroTabla').value='';filtrarTabla('')">
+          <i class="bi bi-x-lg"></i>
+        </button>
+        <div class="ms-auto d-flex gap-3 align-items-center small fw-semibold">
+          <span title="Total en lista"><span class="badge bg-secondary" id="cntTotal">12</span> Lista</span>
+          <span title="Con asistencia SI"><span class="badge bg-success" id="cntAsiSi">12</span> Asistencia</span>
+          <span title="Rezagados"><span class="badge bg-danger" id="cntDesertor">0</span> Rezagados</span>
+          <span title="Total enrolados"><span class="badge bg-primary" id="cntEnrolados">44</span> Enrolados</span>
+          <span title="Total declaración"><span class="badge bg-info" id="cntDeclaracion">43</span> Declaración</span>
+        </div>
+      </div>
+      <div class="px-3 pt-3 pb-1 fw-semibold text-muted d-flex align-items-center gap-2">
+        <i class="bi bi-person-badge"></i>Capitán y Manager
+        <span class="badge bg-secondary" id="cntCapMgr">3</span>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0" style="font-size:.855rem" id="tablaCapMgr">
+          <thead class="table-light">
+            <tr>
+              <th style="width:34px">
+                <input type="checkbox" class="form-check-input chk-todos-tabla" data-tabla="tbodyCapMgr" title="Seleccionar todos">
+              </th>
+              <th class="th-sort" data-col="nombre" onclick="ordenarClick(this,'tbodyCapMgr')">Participante <i class="bi sort-icon bi-arrow-down-up text-muted"></i></th>
+              <th style="width:130px" class="th-sort" data-col="identificacion" onclick="ordenarClick(this,'tbodyCapMgr')">Identificación <i class="bi sort-icon bi-arrow-down-up text-muted"></i></th>
+              <th style="width:80px" class="text-center th-sort" data-col="enrolados" onclick="ordenarClick(this,'tbodyCapMgr')">#Enrolados <i class="bi sort-icon bi-caret-down-fill text-primary"></i></th>
+              <th style="width:130px">Tipo</th>
+              <th style="width:100px">Asistencia</th>
+              <th style="width:100px">Desertor</th>
+              <th style="width:80px" class="th-sort" data-col="declaracion" onclick="ordenarClick(this,'tbodyCapMgr')">Declaración <i class="bi sort-icon bi-arrow-down-up text-muted"></i></th>
+              <th style="width:130px" class="th-sort" data-col="fecha" onclick="ordenarClick(this,'tbodyCapMgr')">Fecha <i class="bi sort-icon bi-arrow-down-up text-muted"></i></th>
+              <th style="width:50px"></th>
+            </tr>
+          </thead>
+          <tbody id="tbodyCapMgr">
+                        <tr data-buscar="giovana elizabeth palomino marcos 993717944 46146483" data-enrolados="6" data-fecha="1788563695"><td><input type="checkbox" class="form-check-input chk-fila"></td><input type="hidden" name="id_participante[]" value="1971"><td><strong>GIOVANA ELIZABETH PALOMINO MARCOS</strong><div class="text-muted small"><i class="bi bi-phone me-1"></i>993717944</div></td><td class="text-muted small">46146483</td><td class="text-center"><span class="badge bg-success px-2" style="" id="enrolBadge_1971">6</span><input type="hidden" name="conteo_enrolados[]" value="6"></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check" name="tipo_participante[1971]" id="tp_px_1971" value="px" autocomplete="off"><label class="btn btn-tipo-px" for="tp_px_1971">PX</label><input type="radio" class="btn-check" name="tipo_participante[1971]" id="tp_capitan_1971" value="capitan" autocomplete="off" checked=""><label class="btn btn-tipo-cap" for="tp_capitan_1971">CAP</label><input type="radio" class="btn-check" name="tipo_participante[1971]" id="tp_manager_1971" value="manager" autocomplete="off"><label class="btn btn-tipo-mgr" for="tp_manager_1971">MGR</label></div></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check rdo-asistencia" name="asistencia_maestria[1971]" id="am_si_1971" value="si" autocomplete="off" checked=""><label class="btn btn-outline-success" for="am_si_1971">SI</label><input type="radio" class="btn-check rdo-asistencia" name="asistencia_maestria[1971]" id="am_no_1971" value="no" autocomplete="off"><label class="btn btn-outline-secondary" for="am_no_1971">NO</label></div></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check rdo-desertor" name="desertor[1971]" id="des_no_1971" value="no" autocomplete="off" checked=""><label class="btn btn-outline-secondary" for="des_no_1971">NO</label><input type="radio" class="btn-check rdo-desertor" name="desertor[1971]" id="des_si_1971" value="si" autocomplete="off"><label class="btn btn-outline-danger" for="des_si_1971">SI</label></div></td><td><input type="number" name="declaracion[]" class="form-control form-control-sm" min="0" max="10" value="5" placeholder="0-10" oninput="actualizarContadores()"></td><td class="text-muted small text-nowrap">04/09/2026 18:14</td><td><button type="button" class="btn btn-xs btn-outline-danger" onclick="quitarFila(this)" title="Marcar como rezagado"><i class="bi bi-x-lg"></i></button></td></tr>                        <tr data-buscar="francisco manuel huaman rios 988595686 09678253" data-enrolados="5" data-fecha="1788563695"><td><input type="checkbox" class="form-check-input chk-fila"></td><input type="hidden" name="id_participante[]" value="12661"><td><strong>FRANCISCO MANUEL HUAMAN RIOS</strong><div class="text-muted small"><i class="bi bi-phone me-1"></i>988595686</div></td><td class="text-muted small">09678253</td><td class="text-center"><span class="badge bg-success px-2" style="" id="enrolBadge_12661">5</span><input type="hidden" name="conteo_enrolados[]" value="5"></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check" name="tipo_participante[12661]" id="tp_px_12661" value="px" autocomplete="off"><label class="btn btn-tipo-px" for="tp_px_12661">PX</label><input type="radio" class="btn-check" name="tipo_participante[12661]" id="tp_capitan_12661" value="capitan" autocomplete="off"><label class="btn btn-tipo-cap" for="tp_capitan_12661">CAP</label><input type="radio" class="btn-check" name="tipo_participante[12661]" id="tp_manager_12661" value="manager" autocomplete="off" checked=""><label class="btn btn-tipo-mgr" for="tp_manager_12661">MGR</label></div></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check rdo-asistencia" name="asistencia_maestria[12661]" id="am_si_12661" value="si" autocomplete="off" checked=""><label class="btn btn-outline-success" for="am_si_12661">SI</label><input type="radio" class="btn-check rdo-asistencia" name="asistencia_maestria[12661]" id="am_no_12661" value="no" autocomplete="off"><label class="btn btn-outline-secondary" for="am_no_12661">NO</label></div></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check rdo-desertor" name="desertor[12661]" id="des_no_12661" value="no" autocomplete="off" checked=""><label class="btn btn-outline-secondary" for="des_no_12661">NO</label><input type="radio" class="btn-check rdo-desertor" name="desertor[12661]" id="des_si_12661" value="si" autocomplete="off"><label class="btn btn-outline-danger" for="des_si_12661">SI</label></div></td><td><input type="number" name="declaracion[]" class="form-control form-control-sm" min="0" max="10" value="5" placeholder="0-10" oninput="actualizarContadores()"></td><td class="text-muted small text-nowrap">04/09/2026 18:14</td><td><button type="button" class="btn btn-xs btn-outline-danger" onclick="quitarFila(this)" title="Marcar como rezagado"><i class="bi bi-x-lg"></i></button></td></tr>                        <tr data-buscar="liz carol trujillo mallqui 980496819 40801629" data-enrolados="5" data-fecha="1788563695"><td><input type="checkbox" class="form-check-input chk-fila"></td><input type="hidden" name="id_participante[]" value="1951"><td><strong>LIZ CAROL TRUJILLO MALLQUI</strong><div class="text-muted small"><i class="bi bi-phone me-1"></i>980496819</div></td><td class="text-muted small">40801629</td><td class="text-center"><span class="badge bg-success px-2" style="" id="enrolBadge_1951">5</span><input type="hidden" name="conteo_enrolados[]" value="5"></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check" name="tipo_participante[1951]" id="tp_px_1951" value="px" autocomplete="off"><label class="btn btn-tipo-px" for="tp_px_1951">PX</label><input type="radio" class="btn-check" name="tipo_participante[1951]" id="tp_capitan_1951" value="capitan" autocomplete="off"><label class="btn btn-tipo-cap" for="tp_capitan_1951">CAP</label><input type="radio" class="btn-check" name="tipo_participante[1951]" id="tp_manager_1951" value="manager" autocomplete="off" checked=""><label class="btn btn-tipo-mgr" for="tp_manager_1951">MGR</label></div></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check rdo-asistencia" name="asistencia_maestria[1951]" id="am_si_1951" value="si" autocomplete="off" checked=""><label class="btn btn-outline-success" for="am_si_1951">SI</label><input type="radio" class="btn-check rdo-asistencia" name="asistencia_maestria[1951]" id="am_no_1951" value="no" autocomplete="off"><label class="btn btn-outline-secondary" for="am_no_1951">NO</label></div></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check rdo-desertor" name="desertor[1951]" id="des_no_1951" value="no" autocomplete="off" checked=""><label class="btn btn-outline-secondary" for="des_no_1951">NO</label><input type="radio" class="btn-check rdo-desertor" name="desertor[1951]" id="des_si_1951" value="si" autocomplete="off"><label class="btn btn-outline-danger" for="des_si_1951">SI</label></div></td><td><input type="number" name="declaracion[]" class="form-control form-control-sm" min="0" max="10" value="5" placeholder="0-10" oninput="actualizarContadores()"></td><td class="text-muted small text-nowrap">04/09/2026 18:14</td><td><button type="button" class="btn btn-xs btn-outline-danger" onclick="quitarFila(this)" title="Marcar como rezagado"><i class="bi bi-x-lg"></i></button></td></tr>                      </tbody>
+          <tfoot class="table-light fw-bold">
+            <tr>
+              <td colspan="3" class="text-end">TOTALES</td>
+              <td class="text-center"><span class="badge bg-primary px-2" id="footEnroladosCapMgr">16</span></td>
+              <td colspan="3"></td>
+              <td class="text-center"><span class="badge bg-info text-dark px-2" id="footDeclaracionCapMgr">15</span></td>
+              <td></td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+        <div class="text-center text-muted py-3 small" id="sinCapMgr" style="display:none">Sin Capitán/Manager en la lista.</div>
+      </div>
+
+      <div class="px-3 pt-3 pb-1 fw-semibold text-muted d-flex align-items-center gap-2 border-top">
+        <i class="bi bi-person"></i>Participantes
+        <span class="badge bg-secondary" id="cntPx">9</span>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0" style="font-size:.855rem" id="tablaPx">
+          <thead class="table-light">
+            <tr>
+              <th style="width:34px">
+                <input type="checkbox" class="form-check-input chk-todos-tabla" data-tabla="tbodyPx" title="Seleccionar todos">
+              </th>
+              <th class="th-sort" data-col="nombre" onclick="ordenarClick(this,'tbodyPx')">Participante <i class="bi sort-icon bi-arrow-down-up text-muted"></i></th>
+              <th style="width:130px" class="th-sort" data-col="identificacion" onclick="ordenarClick(this,'tbodyPx')">Identificación <i class="bi sort-icon bi-arrow-down-up text-muted"></i></th>
+              <th style="width:80px" class="text-center th-sort" data-col="enrolados" onclick="ordenarClick(this,'tbodyPx')">#Enrolados <i class="bi sort-icon bi-caret-down-fill text-primary"></i></th>
+              <th style="width:130px">Tipo</th>
+              <th style="width:100px">Asistencia</th>
+              <th style="width:100px">Desertor</th>
+              <th style="width:80px" class="th-sort" data-col="declaracion" onclick="ordenarClick(this,'tbodyPx')">Declaración <i class="bi sort-icon bi-arrow-down-up text-muted"></i></th>
+              <th style="width:130px" class="th-sort" data-col="fecha" onclick="ordenarClick(this,'tbodyPx')">Fecha <i class="bi sort-icon bi-arrow-down-up text-muted"></i></th>
+              <th style="width:50px"></th>
+            </tr>
+          </thead>
+          <tbody id="tbodyPx">
+                        <tr data-buscar="rosa maria stepany calvo portal 916030745 70373184" data-enrolados="5" data-fecha="1788563695"><td><input type="checkbox" class="form-check-input chk-fila"></td><input type="hidden" name="id_participante[]" value="18513"><td><strong>ROSA MARIA STEPANY CALVO PORTAL</strong><div class="text-muted small"><i class="bi bi-phone me-1"></i>916030745</div></td><td class="text-muted small">70373184</td><td class="text-center"><span class="badge bg-success px-2" style="" id="enrolBadge_18513">5</span><input type="hidden" name="conteo_enrolados[]" value="5"></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check" name="tipo_participante[18513]" id="tp_px_18513" value="px" autocomplete="off" checked=""><label class="btn btn-tipo-px" for="tp_px_18513">PX</label><input type="radio" class="btn-check" name="tipo_participante[18513]" id="tp_capitan_18513" value="capitan" autocomplete="off"><label class="btn btn-tipo-cap" for="tp_capitan_18513">CAP</label><input type="radio" class="btn-check" name="tipo_participante[18513]" id="tp_manager_18513" value="manager" autocomplete="off"><label class="btn btn-tipo-mgr" for="tp_manager_18513">MGR</label></div></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check rdo-asistencia" name="asistencia_maestria[18513]" id="am_si_18513" value="si" autocomplete="off" checked=""><label class="btn btn-outline-success" for="am_si_18513">SI</label><input type="radio" class="btn-check rdo-asistencia" name="asistencia_maestria[18513]" id="am_no_18513" value="no" autocomplete="off"><label class="btn btn-outline-secondary" for="am_no_18513">NO</label></div></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check rdo-desertor" name="desertor[18513]" id="des_no_18513" value="no" autocomplete="off" checked=""><label class="btn btn-outline-secondary" for="des_no_18513">NO</label><input type="radio" class="btn-check rdo-desertor" name="desertor[18513]" id="des_si_18513" value="si" autocomplete="off"><label class="btn btn-outline-danger" for="des_si_18513">SI</label></div></td><td><input type="number" name="declaracion[]" class="form-control form-control-sm" min="0" max="10" value="3" placeholder="0-10" oninput="actualizarContadores()"></td><td class="text-muted small text-nowrap">04/09/2026 18:14</td><td><button type="button" class="btn btn-xs btn-outline-danger" onclick="quitarFila(this)" title="Marcar como rezagado"><i class="bi bi-x-lg"></i></button></td></tr>                        <tr data-buscar="jasmyn ruby cornejo neyra 973379820 72232249" data-enrolados="5" data-fecha="1788563695"><td><input type="checkbox" class="form-check-input chk-fila"></td><input type="hidden" name="id_participante[]" value="18593"><td><strong>JASMYN RUBY CORNEJO NEYRA</strong><div class="text-muted small"><i class="bi bi-phone me-1"></i>973379820</div></td><td class="text-muted small">72232249</td><td class="text-center"><span class="badge bg-success px-2" style="" id="enrolBadge_18593">5</span><input type="hidden" name="conteo_enrolados[]" value="5"></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check" name="tipo_participante[18593]" id="tp_px_18593" value="px" autocomplete="off" checked=""><label class="btn btn-tipo-px" for="tp_px_18593">PX</label><input type="radio" class="btn-check" name="tipo_participante[18593]" id="tp_capitan_18593" value="capitan" autocomplete="off"><label class="btn btn-tipo-cap" for="tp_capitan_18593">CAP</label><input type="radio" class="btn-check" name="tipo_participante[18593]" id="tp_manager_18593" value="manager" autocomplete="off"><label class="btn btn-tipo-mgr" for="tp_manager_18593">MGR</label></div></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check rdo-asistencia" name="asistencia_maestria[18593]" id="am_si_18593" value="si" autocomplete="off" checked=""><label class="btn btn-outline-success" for="am_si_18593">SI</label><input type="radio" class="btn-check rdo-asistencia" name="asistencia_maestria[18593]" id="am_no_18593" value="no" autocomplete="off"><label class="btn btn-outline-secondary" for="am_no_18593">NO</label></div></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check rdo-desertor" name="desertor[18593]" id="des_no_18593" value="no" autocomplete="off" checked=""><label class="btn btn-outline-secondary" for="des_no_18593">NO</label><input type="radio" class="btn-check rdo-desertor" name="desertor[18593]" id="des_si_18593" value="si" autocomplete="off"><label class="btn btn-outline-danger" for="des_si_18593">SI</label></div></td><td><input type="number" name="declaracion[]" class="form-control form-control-sm" min="0" max="10" value="3" placeholder="0-10" oninput="actualizarContadores()"></td><td class="text-muted small text-nowrap">04/09/2026 18:14</td><td><button type="button" class="btn btn-xs btn-outline-danger" onclick="quitarFila(this)" title="Marcar como rezagado"><i class="bi bi-x-lg"></i></button></td></tr>                        <tr data-buscar="erica magali perea noguni 900490075 10202624" data-enrolados="5" data-fecha="1788563695"><td><input type="checkbox" class="form-check-input chk-fila"></td><input type="hidden" name="id_participante[]" value="18727"><td><strong>ERICA MAGALI PEREA NOGUNI</strong><div class="text-muted small"><i class="bi bi-phone me-1"></i>900490075</div></td><td class="text-muted small">10202624</td><td class="text-center"><span class="badge bg-success px-2" style="" id="enrolBadge_18727">5</span><input type="hidden" name="conteo_enrolados[]" value="5"></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check" name="tipo_participante[18727]" id="tp_px_18727" value="px" autocomplete="off" checked=""><label class="btn btn-tipo-px" for="tp_px_18727">PX</label><input type="radio" class="btn-check" name="tipo_participante[18727]" id="tp_capitan_18727" value="capitan" autocomplete="off"><label class="btn btn-tipo-cap" for="tp_capitan_18727">CAP</label><input type="radio" class="btn-check" name="tipo_participante[18727]" id="tp_manager_18727" value="manager" autocomplete="off"><label class="btn btn-tipo-mgr" for="tp_manager_18727">MGR</label></div></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check rdo-asistencia" name="asistencia_maestria[18727]" id="am_si_18727" value="si" autocomplete="off" checked=""><label class="btn btn-outline-success" for="am_si_18727">SI</label><input type="radio" class="btn-check rdo-asistencia" name="asistencia_maestria[18727]" id="am_no_18727" value="no" autocomplete="off"><label class="btn btn-outline-secondary" for="am_no_18727">NO</label></div></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check rdo-desertor" name="desertor[18727]" id="des_no_18727" value="no" autocomplete="off" checked=""><label class="btn btn-outline-secondary" for="des_no_18727">NO</label><input type="radio" class="btn-check rdo-desertor" name="desertor[18727]" id="des_si_18727" value="si" autocomplete="off"><label class="btn btn-outline-danger" for="des_si_18727">SI</label></div></td><td><input type="number" name="declaracion[]" class="form-control form-control-sm" min="0" max="10" value="3" placeholder="0-10" oninput="actualizarContadores()"></td><td class="text-muted small text-nowrap">04/09/2026 18:14</td><td><button type="button" class="btn btn-xs btn-outline-danger" onclick="quitarFila(this)" title="Marcar como rezagado"><i class="bi bi-x-lg"></i></button></td></tr>                        <tr data-buscar="anthony hans reyes morales 999056488 72613338" data-enrolados="5" data-fecha="1788563695"><td><input type="checkbox" class="form-check-input chk-fila"></td><input type="hidden" name="id_participante[]" value="18542"><td><strong>ANTHONY HANS REYES MORALES</strong><div class="text-muted small"><i class="bi bi-phone me-1"></i>999056488</div></td><td class="text-muted small">72613338</td><td class="text-center"><span class="badge bg-success px-2" style="" id="enrolBadge_18542">5</span><input type="hidden" name="conteo_enrolados[]" value="5"></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check" name="tipo_participante[18542]" id="tp_px_18542" value="px" autocomplete="off" checked=""><label class="btn btn-tipo-px" for="tp_px_18542">PX</label><input type="radio" class="btn-check" name="tipo_participante[18542]" id="tp_capitan_18542" value="capitan" autocomplete="off"><label class="btn btn-tipo-cap" for="tp_capitan_18542">CAP</label><input type="radio" class="btn-check" name="tipo_participante[18542]" id="tp_manager_18542" value="manager" autocomplete="off"><label class="btn btn-tipo-mgr" for="tp_manager_18542">MGR</label></div></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check rdo-asistencia" name="asistencia_maestria[18542]" id="am_si_18542" value="si" autocomplete="off" checked=""><label class="btn btn-outline-success" for="am_si_18542">SI</label><input type="radio" class="btn-check rdo-asistencia" name="asistencia_maestria[18542]" id="am_no_18542" value="no" autocomplete="off"><label class="btn btn-outline-secondary" for="am_no_18542">NO</label></div></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check rdo-desertor" name="desertor[18542]" id="des_no_18542" value="no" autocomplete="off" checked=""><label class="btn btn-outline-secondary" for="des_no_18542">NO</label><input type="radio" class="btn-check rdo-desertor" name="desertor[18542]" id="des_si_18542" value="si" autocomplete="off"><label class="btn btn-outline-danger" for="des_si_18542">SI</label></div></td><td><input type="number" name="declaracion[]" class="form-control form-control-sm" min="0" max="10" value="5" placeholder="0-10" oninput="actualizarContadores()"></td><td class="text-muted small text-nowrap">04/09/2026 18:14</td><td><button type="button" class="btn btn-xs btn-outline-danger" onclick="quitarFila(this)" title="Marcar como rezagado"><i class="bi bi-x-lg"></i></button></td></tr>                        <tr data-buscar="eliana rocio jara ampuero 994191468 07938881" data-enrolados="2" data-fecha="1788563695"><td><input type="checkbox" class="form-check-input chk-fila"></td><input type="hidden" name="id_participante[]" value="18102"><td><strong>ELIANA ROCIO JARA AMPUERO</strong><div class="text-muted small"><i class="bi bi-phone me-1"></i>994191468</div></td><td class="text-muted small">07938881</td><td class="text-center"><span class="badge px-2" style="background:#0dcaf0;color:#000" id="enrolBadge_18102">2</span><input type="hidden" name="conteo_enrolados[]" value="2"></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check" name="tipo_participante[18102]" id="tp_px_18102" value="px" autocomplete="off" checked=""><label class="btn btn-tipo-px" for="tp_px_18102">PX</label><input type="radio" class="btn-check" name="tipo_participante[18102]" id="tp_capitan_18102" value="capitan" autocomplete="off"><label class="btn btn-tipo-cap" for="tp_capitan_18102">CAP</label><input type="radio" class="btn-check" name="tipo_participante[18102]" id="tp_manager_18102" value="manager" autocomplete="off"><label class="btn btn-tipo-mgr" for="tp_manager_18102">MGR</label></div></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check rdo-asistencia" name="asistencia_maestria[18102]" id="am_si_18102" value="si" autocomplete="off" checked=""><label class="btn btn-outline-success" for="am_si_18102">SI</label><input type="radio" class="btn-check rdo-asistencia" name="asistencia_maestria[18102]" id="am_no_18102" value="no" autocomplete="off"><label class="btn btn-outline-secondary" for="am_no_18102">NO</label></div></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check rdo-desertor" name="desertor[18102]" id="des_no_18102" value="no" autocomplete="off" checked=""><label class="btn btn-outline-secondary" for="des_no_18102">NO</label><input type="radio" class="btn-check rdo-desertor" name="desertor[18102]" id="des_si_18102" value="si" autocomplete="off"><label class="btn btn-outline-danger" for="des_si_18102">SI</label></div></td><td><input type="number" name="declaracion[]" class="form-control form-control-sm" min="0" max="10" value="5" placeholder="0-10" oninput="actualizarContadores()"></td><td class="text-muted small text-nowrap">04/09/2026 18:14</td><td><button type="button" class="btn btn-xs btn-outline-danger" onclick="quitarFila(this)" title="Marcar como rezagado"><i class="bi bi-x-lg"></i></button></td></tr>                        <tr data-buscar="lidia paulina  munaylla galindo 912950616 77503706" data-enrolados="2" data-fecha="1788563695"><td><input type="checkbox" class="form-check-input chk-fila"></td><input type="hidden" name="id_participante[]" value="18674"><td><strong>LIDIA PAULINA  MUNAYLLA GALINDO</strong><div class="text-muted small"><i class="bi bi-phone me-1"></i>912950616</div></td><td class="text-muted small">77503706</td><td class="text-center"><span class="badge px-2" style="background:#0dcaf0;color:#000" id="enrolBadge_18674">2</span><input type="hidden" name="conteo_enrolados[]" value="2"></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check" name="tipo_participante[18674]" id="tp_px_18674" value="px" autocomplete="off" checked=""><label class="btn btn-tipo-px" for="tp_px_18674">PX</label><input type="radio" class="btn-check" name="tipo_participante[18674]" id="tp_capitan_18674" value="capitan" autocomplete="off"><label class="btn btn-tipo-cap" for="tp_capitan_18674">CAP</label><input type="radio" class="btn-check" name="tipo_participante[18674]" id="tp_manager_18674" value="manager" autocomplete="off"><label class="btn btn-tipo-mgr" for="tp_manager_18674">MGR</label></div></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check rdo-asistencia" name="asistencia_maestria[18674]" id="am_si_18674" value="si" autocomplete="off" checked=""><label class="btn btn-outline-success" for="am_si_18674">SI</label><input type="radio" class="btn-check rdo-asistencia" name="asistencia_maestria[18674]" id="am_no_18674" value="no" autocomplete="off"><label class="btn btn-outline-secondary" for="am_no_18674">NO</label></div></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check rdo-desertor" name="desertor[18674]" id="des_no_18674" value="no" autocomplete="off" checked=""><label class="btn btn-outline-secondary" for="des_no_18674">NO</label><input type="radio" class="btn-check rdo-desertor" name="desertor[18674]" id="des_si_18674" value="si" autocomplete="off"><label class="btn btn-outline-danger" for="des_si_18674">SI</label></div></td><td><input type="number" name="declaracion[]" class="form-control form-control-sm" min="0" max="10" value="2" placeholder="0-10" oninput="actualizarContadores()"></td><td class="text-muted small text-nowrap">04/09/2026 18:14</td><td><button type="button" class="btn btn-xs btn-outline-danger" onclick="quitarFila(this)" title="Marcar como rezagado"><i class="bi bi-x-lg"></i></button></td></tr>                        <tr data-buscar="edith presentacion cantaro 932556726 10882623" data-enrolados="2" data-fecha="1788563695"><td><input type="checkbox" class="form-check-input chk-fila"></td><input type="hidden" name="id_participante[]" value="12522"><td><strong>EDITH PRESENTACIoN CaNTARO</strong><div class="text-muted small"><i class="bi bi-phone me-1"></i>932556726</div></td><td class="text-muted small">10882623</td><td class="text-center"><span class="badge px-2" style="background:#0dcaf0;color:#000" id="enrolBadge_12522">2</span><input type="hidden" name="conteo_enrolados[]" value="2"></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check" name="tipo_participante[12522]" id="tp_px_12522" value="px" autocomplete="off" checked=""><label class="btn btn-tipo-px" for="tp_px_12522">PX</label><input type="radio" class="btn-check" name="tipo_participante[12522]" id="tp_capitan_12522" value="capitan" autocomplete="off"><label class="btn btn-tipo-cap" for="tp_capitan_12522">CAP</label><input type="radio" class="btn-check" name="tipo_participante[12522]" id="tp_manager_12522" value="manager" autocomplete="off"><label class="btn btn-tipo-mgr" for="tp_manager_12522">MGR</label></div></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check rdo-asistencia" name="asistencia_maestria[12522]" id="am_si_12522" value="si" autocomplete="off" checked=""><label class="btn btn-outline-success" for="am_si_12522">SI</label><input type="radio" class="btn-check rdo-asistencia" name="asistencia_maestria[12522]" id="am_no_12522" value="no" autocomplete="off"><label class="btn btn-outline-secondary" for="am_no_12522">NO</label></div></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check rdo-desertor" name="desertor[12522]" id="des_no_12522" value="no" autocomplete="off" checked=""><label class="btn btn-outline-secondary" for="des_no_12522">NO</label><input type="radio" class="btn-check rdo-desertor" name="desertor[12522]" id="des_si_12522" value="si" autocomplete="off"><label class="btn btn-outline-danger" for="des_si_12522">SI</label></div></td><td><input type="number" name="declaracion[]" class="form-control form-control-sm" min="0" max="10" value="2" placeholder="0-10" oninput="actualizarContadores()"></td><td class="text-muted small text-nowrap">04/09/2026 18:14</td><td><button type="button" class="btn btn-xs btn-outline-danger" onclick="quitarFila(this)" title="Marcar como rezagado"><i class="bi bi-x-lg"></i></button></td></tr>                        <tr data-buscar="gilda mayte nolasco chipana 903551459 76357687" data-enrolados="1" data-fecha="1788563695"><td><input type="checkbox" class="form-check-input chk-fila"></td><input type="hidden" name="id_participante[]" value="9894"><td><strong>GILDA MAYTE NOLASCO CHIPANA</strong><div class="text-muted small"><i class="bi bi-phone me-1"></i>903551459</div></td><td class="text-muted small">76357687</td><td class="text-center"><span class="badge px-2" style="background:#0dcaf0;color:#000" id="enrolBadge_9894">1</span><input type="hidden" name="conteo_enrolados[]" value="1"></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check" name="tipo_participante[9894]" id="tp_px_9894" value="px" autocomplete="off" checked=""><label class="btn btn-tipo-px" for="tp_px_9894">PX</label><input type="radio" class="btn-check" name="tipo_participante[9894]" id="tp_capitan_9894" value="capitan" autocomplete="off"><label class="btn btn-tipo-cap" for="tp_capitan_9894">CAP</label><input type="radio" class="btn-check" name="tipo_participante[9894]" id="tp_manager_9894" value="manager" autocomplete="off"><label class="btn btn-tipo-mgr" for="tp_manager_9894">MGR</label></div></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check rdo-asistencia" name="asistencia_maestria[9894]" id="am_si_9894" value="si" autocomplete="off" checked=""><label class="btn btn-outline-success" for="am_si_9894">SI</label><input type="radio" class="btn-check rdo-asistencia" name="asistencia_maestria[9894]" id="am_no_9894" value="no" autocomplete="off"><label class="btn btn-outline-secondary" for="am_no_9894">NO</label></div></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check rdo-desertor" name="desertor[9894]" id="des_no_9894" value="no" autocomplete="off" checked=""><label class="btn btn-outline-secondary" for="des_no_9894">NO</label><input type="radio" class="btn-check rdo-desertor" name="desertor[9894]" id="des_si_9894" value="si" autocomplete="off"><label class="btn btn-outline-danger" for="des_si_9894">SI</label></div></td><td><input type="number" name="declaracion[]" class="form-control form-control-sm" min="0" max="10" value="3" placeholder="0-10" oninput="actualizarContadores()"></td><td class="text-muted small text-nowrap">04/09/2026 18:14</td><td><button type="button" class="btn btn-xs btn-outline-danger" onclick="quitarFila(this)" title="Marcar como rezagado"><i class="bi bi-x-lg"></i></button></td></tr>                        <tr data-buscar="lidia torres ortiz 953938717 09976870" data-enrolados="1" data-fecha="1788563695"><td><input type="checkbox" class="form-check-input chk-fila"></td><input type="hidden" name="id_participante[]" value="15512"><td><strong>LIDIA TORRES ORTIZ</strong><div class="text-muted small"><i class="bi bi-phone me-1"></i>953938717</div></td><td class="text-muted small">09976870</td><td class="text-center"><span class="badge px-2" style="background:#0dcaf0;color:#000" id="enrolBadge_15512">1</span><input type="hidden" name="conteo_enrolados[]" value="1"></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check" name="tipo_participante[15512]" id="tp_px_15512" value="px" autocomplete="off" checked=""><label class="btn btn-tipo-px" for="tp_px_15512">PX</label><input type="radio" class="btn-check" name="tipo_participante[15512]" id="tp_capitan_15512" value="capitan" autocomplete="off"><label class="btn btn-tipo-cap" for="tp_capitan_15512">CAP</label><input type="radio" class="btn-check" name="tipo_participante[15512]" id="tp_manager_15512" value="manager" autocomplete="off"><label class="btn btn-tipo-mgr" for="tp_manager_15512">MGR</label></div></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check rdo-asistencia" name="asistencia_maestria[15512]" id="am_si_15512" value="si" autocomplete="off" checked=""><label class="btn btn-outline-success" for="am_si_15512">SI</label><input type="radio" class="btn-check rdo-asistencia" name="asistencia_maestria[15512]" id="am_no_15512" value="no" autocomplete="off"><label class="btn btn-outline-secondary" for="am_no_15512">NO</label></div></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check rdo-desertor" name="desertor[15512]" id="des_no_15512" value="no" autocomplete="off" checked=""><label class="btn btn-outline-secondary" for="des_no_15512">NO</label><input type="radio" class="btn-check rdo-desertor" name="desertor[15512]" id="des_si_15512" value="si" autocomplete="off"><label class="btn btn-outline-danger" for="des_si_15512">SI</label></div></td><td><input type="number" name="declaracion[]" class="form-control form-control-sm" min="0" max="10" value="2" placeholder="0-10" oninput="actualizarContadores()"></td><td class="text-muted small text-nowrap">04/09/2026 18:14</td><td><button type="button" class="btn btn-xs btn-outline-danger" onclick="quitarFila(this)" title="Marcar como rezagado"><i class="bi bi-x-lg"></i></button></td></tr>                      </tbody>
+          <tfoot class="table-light fw-bold">
+            <tr>
+              <td colspan="3" class="text-end">TOTALES</td>
+              <td class="text-center"><span class="badge bg-primary px-2" id="footEnroladosPx">28</span></td>
+              <td colspan="3"></td>
+              <td class="text-center"><span class="badge bg-info text-dark px-2" id="footDeclaracionPx">28</span></td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+        <div class="text-center text-muted py-3 small" id="sinPx" style="display:none">Sin Participantes en la lista.</div>
+      </div>
+
+      <div class="text-center text-muted py-5" id="sinParticipantes" style="display:none">
+        <i class="bi bi-person-x fs-1 d-block mb-2 opacity-25"></i>
+        <p class="mb-1">No hay participantes elegibles para <strong>TFD</strong></p>
+                <p class="small text-muted">Requiere participantes con asistencia=SI y no desertores en SFD</p>
+                <p class="small">Usa <strong>Agregar masivo</strong> o <strong>Agregar uno</strong> para incluir participantes manualmente.</p>
+      </div>
+    </div>
+
+        <div class="card-footer d-flex justify-content-between align-items-center py-2">
+      <button type="button" class="btn btn-sm btn-outline-danger" id="btnEliminarSel" onclick="eliminarSeleccionados()" style="display:none!important">
+        <i class="bi bi-trash me-1"></i>Quitar seleccionados
+      </button>
+      <button type="submit" class="btn btn-primary ms-auto" id="btnGuardar">
+        <i class="bi bi-check-lg me-1"></i>Guardar Registros TFD      </button>
+    </div>
+      </form>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     MODAL: Desertores de esta etapa
+═══════════════════════════════════════════════════════ -->
+<div class="modal fade" id="modalDesertores" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header py-2" style="background:#1a3336">
+        <h6 class="modal-title text-white fw-bold mb-0"><i class="bi bi-person-x me-2"></i>Rezagados — TFD</h6>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-0">
+        <div class="text-center text-muted py-4" id="sinDesertores" style="">
+          <i class="bi bi-emoji-smile fs-1 d-block mb-2 opacity-25"></i>
+          Sin rezagados en TFD. Al marcar "Desertor: SI" en la lista, el participante aparece aquí.
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0" style="font-size:.855rem">
+            <thead class="table-light">
+              <tr>
+                <th style="width:34px"></th>
+                <th>Participante</th>
+                <th style="width:130px">Identificación</th>
+                <th style="width:80px" class="text-center">#Enrolados</th>
+                <th style="width:130px">Tipo</th>
+                <th style="width:100px">Asistencia</th>
+                <th style="width:100px">Desertor</th>
+                <th style="width:80px">Declaración</th>
+                <th style="width:130px">Fecha</th>
+                <th style="width:50px"></th>
+              </tr>
+            </thead>
+            <tbody id="tbodyDesertores">
+                          </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer py-2">
+        <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     MODAL: Agregar uno (búsqueda individual)
+═══════════════════════════════════════════════════════ -->
+<div class="modal fade" id="modalBuscar" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header py-2" style="background:#1a3336">
+        <h6 class="modal-title text-white fw-bold">
+          <i class="bi bi-person-plus me-2"></i>Agregar Participante — TFD        </h6>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="input-group mb-3">
+          <span class="input-group-text"><i class="bi bi-search"></i></span>
+          <input type="text" id="inpBuscarUno" class="form-control" placeholder="Buscar por nombre, apellido o cédula..." oninput="buscarParticipantes(this.value)">
+          <span class="input-group-text" id="spinnerBuscar" style="display:none">
+            <span class="spinner-border spinner-border-sm"></span>
+          </span>
+        </div>
+        <div id="resultadosBuscar" style="max-height:360px;overflow-y:auto">
+          <div class="text-center text-muted py-4">
+            <i class="bi bi-search fs-2 d-block mb-2 opacity-25"></i>
+            Escribe para buscar participantes
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     MODAL: Agregar masivo (lista con checkboxes)
+═══════════════════════════════════════════════════════ -->
+<div class="modal fade" id="modalMasivo" tabindex="-1">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header py-2" style="background:#1a3336">
+        <h6 class="modal-title text-white fw-bold">
+          <i class="bi bi-people-fill me-2"></i>Agregar Masivo — TFD        </h6>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-0">
+        <div class="p-3 border-bottom d-flex gap-3 align-items-center">
+          <div class="input-group" style="max-width:320px">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input type="text" id="inpBuscarMasivo" class="form-control form-control-sm" placeholder="Filtrar..." oninput="filtrarMasivo(this.value)">
+          </div>
+          <button class="btn btn-sm btn-outline-primary" onclick="selTodosMasivo(true)">
+            <i class="bi bi-check-all me-1"></i>Todos
+          </button>
+          <button class="btn btn-sm btn-outline-secondary" onclick="selTodosMasivo(false)">
+            <i class="bi bi-x me-1"></i>Ninguno
+          </button>
+          <span class="text-muted small ms-auto" id="contSelMasivo">0 seleccionados</span>
+        </div>
+        <div style="max-height:440px;overflow-y:auto">
+          <table class="table table-hover align-middle mb-0" style="font-size:.855rem" id="tablaMasivo">
+            <thead class="table-light sticky-top">
+              <tr>
+                <th style="width:42px"><input type="checkbox" class="form-check-input" id="chkMasivoTodos" onchange="selTodosMasivo(this.checked)"></th>
+                <th>Nombre</th>
+                <th>Identificación</th>
+                <th>Teléfono</th>
+                <th class="text-center">C2</th>
+                <th class="text-center">Maestría</th>
+                <th>Asistencia</th>
+                <th class="text-end">Pagado</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyMasivo">
+              <tr><td colspan="8" class="text-center text-muted py-4">
+                <span class="spinner-border spinner-border-sm me-2"></span>Cargando...
+              </td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer py-2">
+        <span class="text-muted small me-auto" id="infoMasivo"></span>
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-success btn-sm" onclick="agregarMasivo()" id="btnAgregarMasivo">
+          <i class="bi bi-plus-lg me-1"></i>Agregar seleccionados
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Plantilla fila (oculta) -->
+<template id="tplFila">
+<tr data-buscar="__BUSCAR__" data-enrolados="0" data-fecha="0"><td><input type="checkbox" class="form-check-input chk-fila"></td><input type="hidden" name="id_participante[]" value="__ID__"><td><strong>__NOM__ __APE__</strong><div class="text-muted small"><i class="bi bi-phone me-1"></i>__TEL__</div></td><td class="text-muted small">__IDE__</td><td class="text-center"><span class="text-muted">—</span><input type="hidden" name="conteo_enrolados[]" value="0"></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check" name="tipo_participante[__ID__]" id="tp_px___ID__" value="px" autocomplete="off" checked=""><label class="btn btn-tipo-px" for="tp_px___ID__">PX</label><input type="radio" class="btn-check" name="tipo_participante[__ID__]" id="tp_capitan___ID__" value="capitan" autocomplete="off"><label class="btn btn-tipo-cap" for="tp_capitan___ID__">CAP</label><input type="radio" class="btn-check" name="tipo_participante[__ID__]" id="tp_manager___ID__" value="manager" autocomplete="off"><label class="btn btn-tipo-mgr" for="tp_manager___ID__">MGR</label></div></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check rdo-asistencia" name="asistencia_maestria[__ID__]" id="am_si___ID__" value="si" autocomplete="off"><label class="btn btn-outline-success" for="am_si___ID__">SI</label><input type="radio" class="btn-check rdo-asistencia" name="asistencia_maestria[__ID__]" id="am_no___ID__" value="no" autocomplete="off" checked=""><label class="btn btn-outline-secondary" for="am_no___ID__">NO</label></div></td><td><div class="btn-group btn-group-sm" role="group"><input type="radio" class="btn-check rdo-desertor" name="desertor[__ID__]" id="des_no___ID__" value="no" autocomplete="off" checked=""><label class="btn btn-outline-secondary" for="des_no___ID__">NO</label><input type="radio" class="btn-check rdo-desertor" name="desertor[__ID__]" id="des_si___ID__" value="si" autocomplete="off"><label class="btn btn-outline-danger" for="des_si___ID__">SI</label></div></td><td><input type="number" name="declaracion[]" class="form-control form-control-sm" min="0" max="10" value="" placeholder="0-10" oninput="actualizarContadores()"></td><td class="text-muted small text-nowrap">—</td><td><button type="button" class="btn btn-xs btn-outline-danger" onclick="quitarFila(this)" title="Marcar como rezagado"><i class="bi bi-x-lg"></i></button></td></tr></template>
+
+<!-- ══════════════════════════════════════════════════════
+     MODAL: Imprimir Gafetes
+═══════════════════════════════════════════════════════ -->
+<div class="modal fade" id="modalGafetesMaestria" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form method="POST" action="https://imo.crearpslglobal.com/maestria/gafetes" target="_blank">
+        <input type="hidden" name="id_equipo" value="111">
+        <input type="hidden" name="etapa" value="TFD">
+        <div class="modal-header py-2" style="background:#1a3336">
+          <h6 class="modal-title text-white fw-bold"><i class="bi bi-person-vcard me-2"></i>Imprimir Gafetes — TFD</h6>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="text" class="form-control form-control-sm mb-2" id="buscarGafetesM" placeholder="Buscar por nombre o apellido..." oninput="aplicarFiltroGafetesM()">
+          <div class="form-check mb-2 border-bottom pb-2">
+            <input class="form-check-input" type="checkbox" id="checkAllGafetesM" onchange="seleccionarTodosGafetesM(this)">
+            <label class="form-check-label fw-semibold" for="checkAllGafetesM">Seleccionar todos (<span id="cntGafetesM">12</span> visibles)</label>
+          </div>
+          <div class="row row-cols-1 row-cols-md-2 g-1" id="listaGafetesM" style="max-height:45vh;overflow-y:auto">
+                        <div class="col" data-nombre="CALVO PORTAL ROSA MARIA STEPANY">
+              <div class="d-flex align-items-start justify-content-between gap-1 border-bottom pb-1 mb-1">
+                <div class="form-check flex-grow-1">
+                  <input class="form-check-input chkGafeteM" type="checkbox" name="ids[]" value="18513" id="gafM_18513">
+                  <label class="form-check-label small" for="gafM_18513">CALVO PORTAL ROSA MARIA STEPANY</label>
+                  <div class="small text-muted" id="npDisplayM_18513">Preferido: <span id="npValorM_18513">STEPANY</span></div>
+                  <div class="input-group input-group-sm mt-1 d-none" id="npEditM_18513">
+                    <input type="text" class="form-control form-control-sm" id="npInputM_18513" value="STEPANY" onkeydown="if(event.key==='Enter'){event.preventDefault();guardarNombrePreferidoM(18513);}">
+                    <button type="button" class="btn btn-outline-success" onclick="guardarNombrePreferidoM(18513)" title="Guardar"><i class="bi bi-check-lg"></i></button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="cancelarNombrePreferidoM(18513)" title="Cancelar"><i class="bi bi-x-lg"></i></button>
+                  </div>
+                </div>
+                                <button type="button" class="btn btn-sm btn-link p-0 text-muted" onclick="editarNombrePreferidoM(18513)" title="Editar nombre preferido">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                              </div>
+            </div>
+                        <div class="col" data-nombre="CORNEJO NEYRA JASMYN RUBY">
+              <div class="d-flex align-items-start justify-content-between gap-1 border-bottom pb-1 mb-1">
+                <div class="form-check flex-grow-1">
+                  <input class="form-check-input chkGafeteM" type="checkbox" name="ids[]" value="18593" id="gafM_18593">
+                  <label class="form-check-label small" for="gafM_18593">CORNEJO NEYRA JASMYN RUBY</label>
+                  <div class="small text-muted" id="npDisplayM_18593">Preferido: <span id="npValorM_18593">JASMYN</span></div>
+                  <div class="input-group input-group-sm mt-1 d-none" id="npEditM_18593">
+                    <input type="text" class="form-control form-control-sm" id="npInputM_18593" value="JASMYN" onkeydown="if(event.key==='Enter'){event.preventDefault();guardarNombrePreferidoM(18593);}">
+                    <button type="button" class="btn btn-outline-success" onclick="guardarNombrePreferidoM(18593)" title="Guardar"><i class="bi bi-check-lg"></i></button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="cancelarNombrePreferidoM(18593)" title="Cancelar"><i class="bi bi-x-lg"></i></button>
+                  </div>
+                </div>
+                                <button type="button" class="btn btn-sm btn-link p-0 text-muted" onclick="editarNombrePreferidoM(18593)" title="Editar nombre preferido">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                              </div>
+            </div>
+                        <div class="col" data-nombre="HUAMAN RIOS FRANCISCO MANUEL">
+              <div class="d-flex align-items-start justify-content-between gap-1 border-bottom pb-1 mb-1">
+                <div class="form-check flex-grow-1">
+                  <input class="form-check-input chkGafeteM" type="checkbox" name="ids[]" value="12661" id="gafM_12661">
+                  <label class="form-check-label small" for="gafM_12661">HUAMAN RIOS FRANCISCO MANUEL</label>
+                  <div class="small text-muted" id="npDisplayM_12661">Preferido: <span id="npValorM_12661">MANOLO</span></div>
+                  <div class="input-group input-group-sm mt-1 d-none" id="npEditM_12661">
+                    <input type="text" class="form-control form-control-sm" id="npInputM_12661" value="MANOLO" onkeydown="if(event.key==='Enter'){event.preventDefault();guardarNombrePreferidoM(12661);}">
+                    <button type="button" class="btn btn-outline-success" onclick="guardarNombrePreferidoM(12661)" title="Guardar"><i class="bi bi-check-lg"></i></button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="cancelarNombrePreferidoM(12661)" title="Cancelar"><i class="bi bi-x-lg"></i></button>
+                  </div>
+                </div>
+                                <button type="button" class="btn btn-sm btn-link p-0 text-muted" onclick="editarNombrePreferidoM(12661)" title="Editar nombre preferido">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                              </div>
+            </div>
+                        <div class="col" data-nombre="JARA AMPUERO ELIANA ROCIO">
+              <div class="d-flex align-items-start justify-content-between gap-1 border-bottom pb-1 mb-1">
+                <div class="form-check flex-grow-1">
+                  <input class="form-check-input chkGafeteM" type="checkbox" name="ids[]" value="18102" id="gafM_18102">
+                  <label class="form-check-label small" for="gafM_18102">JARA AMPUERO ELIANA ROCIO</label>
+                  <div class="small text-muted" id="npDisplayM_18102">Preferido: <span id="npValorM_18102">ROCIO</span></div>
+                  <div class="input-group input-group-sm mt-1 d-none" id="npEditM_18102">
+                    <input type="text" class="form-control form-control-sm" id="npInputM_18102" value="ROCIO" onkeydown="if(event.key==='Enter'){event.preventDefault();guardarNombrePreferidoM(18102);}">
+                    <button type="button" class="btn btn-outline-success" onclick="guardarNombrePreferidoM(18102)" title="Guardar"><i class="bi bi-check-lg"></i></button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="cancelarNombrePreferidoM(18102)" title="Cancelar"><i class="bi bi-x-lg"></i></button>
+                  </div>
+                </div>
+                                <button type="button" class="btn btn-sm btn-link p-0 text-muted" onclick="editarNombrePreferidoM(18102)" title="Editar nombre preferido">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                              </div>
+            </div>
+                        <div class="col" data-nombre="MUNAYLLA GALINDO LIDIA PAULINA ">
+              <div class="d-flex align-items-start justify-content-between gap-1 border-bottom pb-1 mb-1">
+                <div class="form-check flex-grow-1">
+                  <input class="form-check-input chkGafeteM" type="checkbox" name="ids[]" value="18674" id="gafM_18674">
+                  <label class="form-check-label small" for="gafM_18674">MUNAYLLA GALINDO LIDIA PAULINA </label>
+                  <div class="small text-muted" id="npDisplayM_18674">Preferido: <span id="npValorM_18674">PAO</span></div>
+                  <div class="input-group input-group-sm mt-1 d-none" id="npEditM_18674">
+                    <input type="text" class="form-control form-control-sm" id="npInputM_18674" value="PAO" onkeydown="if(event.key==='Enter'){event.preventDefault();guardarNombrePreferidoM(18674);}">
+                    <button type="button" class="btn btn-outline-success" onclick="guardarNombrePreferidoM(18674)" title="Guardar"><i class="bi bi-check-lg"></i></button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="cancelarNombrePreferidoM(18674)" title="Cancelar"><i class="bi bi-x-lg"></i></button>
+                  </div>
+                </div>
+                                <button type="button" class="btn btn-sm btn-link p-0 text-muted" onclick="editarNombrePreferidoM(18674)" title="Editar nombre preferido">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                              </div>
+            </div>
+                        <div class="col" data-nombre="NOLASCO CHIPANA GILDA MAYTE">
+              <div class="d-flex align-items-start justify-content-between gap-1 border-bottom pb-1 mb-1">
+                <div class="form-check flex-grow-1">
+                  <input class="form-check-input chkGafeteM" type="checkbox" name="ids[]" value="9894" id="gafM_9894">
+                  <label class="form-check-label small" for="gafM_9894">NOLASCO CHIPANA GILDA MAYTE</label>
+                  <div class="small text-muted" id="npDisplayM_9894">Preferido: <span id="npValorM_9894">MAYTE</span></div>
+                  <div class="input-group input-group-sm mt-1 d-none" id="npEditM_9894">
+                    <input type="text" class="form-control form-control-sm" id="npInputM_9894" value="MAYTE" onkeydown="if(event.key==='Enter'){event.preventDefault();guardarNombrePreferidoM(9894);}">
+                    <button type="button" class="btn btn-outline-success" onclick="guardarNombrePreferidoM(9894)" title="Guardar"><i class="bi bi-check-lg"></i></button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="cancelarNombrePreferidoM(9894)" title="Cancelar"><i class="bi bi-x-lg"></i></button>
+                  </div>
+                </div>
+                                <button type="button" class="btn btn-sm btn-link p-0 text-muted" onclick="editarNombrePreferidoM(9894)" title="Editar nombre preferido">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                              </div>
+            </div>
+                        <div class="col" data-nombre="PALOMINO MARCOS GIOVANA ELIZABETH">
+              <div class="d-flex align-items-start justify-content-between gap-1 border-bottom pb-1 mb-1">
+                <div class="form-check flex-grow-1">
+                  <input class="form-check-input chkGafeteM" type="checkbox" name="ids[]" value="1971" id="gafM_1971">
+                  <label class="form-check-label small" for="gafM_1971">PALOMINO MARCOS GIOVANA ELIZABETH</label>
+                  <div class="small text-muted" id="npDisplayM_1971">Preferido: <span id="npValorM_1971">—</span></div>
+                  <div class="input-group input-group-sm mt-1 d-none" id="npEditM_1971">
+                    <input type="text" class="form-control form-control-sm" id="npInputM_1971" value="" onkeydown="if(event.key==='Enter'){event.preventDefault();guardarNombrePreferidoM(1971);}">
+                    <button type="button" class="btn btn-outline-success" onclick="guardarNombrePreferidoM(1971)" title="Guardar"><i class="bi bi-check-lg"></i></button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="cancelarNombrePreferidoM(1971)" title="Cancelar"><i class="bi bi-x-lg"></i></button>
+                  </div>
+                </div>
+                                <button type="button" class="btn btn-sm btn-link p-0 text-muted" onclick="editarNombrePreferidoM(1971)" title="Editar nombre preferido">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                              </div>
+            </div>
+                        <div class="col" data-nombre="PEREA NOGUNI ERICA MAGALI">
+              <div class="d-flex align-items-start justify-content-between gap-1 border-bottom pb-1 mb-1">
+                <div class="form-check flex-grow-1">
+                  <input class="form-check-input chkGafeteM" type="checkbox" name="ids[]" value="18727" id="gafM_18727">
+                  <label class="form-check-label small" for="gafM_18727">PEREA NOGUNI ERICA MAGALI</label>
+                  <div class="small text-muted" id="npDisplayM_18727">Preferido: <span id="npValorM_18727">—</span></div>
+                  <div class="input-group input-group-sm mt-1 d-none" id="npEditM_18727">
+                    <input type="text" class="form-control form-control-sm" id="npInputM_18727" value="" onkeydown="if(event.key==='Enter'){event.preventDefault();guardarNombrePreferidoM(18727);}">
+                    <button type="button" class="btn btn-outline-success" onclick="guardarNombrePreferidoM(18727)" title="Guardar"><i class="bi bi-check-lg"></i></button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="cancelarNombrePreferidoM(18727)" title="Cancelar"><i class="bi bi-x-lg"></i></button>
+                  </div>
+                </div>
+                                <button type="button" class="btn btn-sm btn-link p-0 text-muted" onclick="editarNombrePreferidoM(18727)" title="Editar nombre preferido">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                              </div>
+            </div>
+                        <div class="col" data-nombre="PRESENTACION CANTARO EDITH">
+              <div class="d-flex align-items-start justify-content-between gap-1 border-bottom pb-1 mb-1">
+                <div class="form-check flex-grow-1">
+                  <input class="form-check-input chkGafeteM" type="checkbox" name="ids[]" value="12522" id="gafM_12522">
+                  <label class="form-check-label small" for="gafM_12522">PRESENTACIoN CaNTARO EDITH</label>
+                  <div class="small text-muted" id="npDisplayM_12522">Preferido: <span id="npValorM_12522">EDITH</span></div>
+                  <div class="input-group input-group-sm mt-1 d-none" id="npEditM_12522">
+                    <input type="text" class="form-control form-control-sm" id="npInputM_12522" value="EDITH" onkeydown="if(event.key==='Enter'){event.preventDefault();guardarNombrePreferidoM(12522);}">
+                    <button type="button" class="btn btn-outline-success" onclick="guardarNombrePreferidoM(12522)" title="Guardar"><i class="bi bi-check-lg"></i></button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="cancelarNombrePreferidoM(12522)" title="Cancelar"><i class="bi bi-x-lg"></i></button>
+                  </div>
+                </div>
+                                <button type="button" class="btn btn-sm btn-link p-0 text-muted" onclick="editarNombrePreferidoM(12522)" title="Editar nombre preferido">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                              </div>
+            </div>
+                        <div class="col" data-nombre="REYES MORALES ANTHONY HANS">
+              <div class="d-flex align-items-start justify-content-between gap-1 border-bottom pb-1 mb-1">
+                <div class="form-check flex-grow-1">
+                  <input class="form-check-input chkGafeteM" type="checkbox" name="ids[]" value="18542" id="gafM_18542">
+                  <label class="form-check-label small" for="gafM_18542">REYES MORALES ANTHONY HANS</label>
+                  <div class="small text-muted" id="npDisplayM_18542">Preferido: <span id="npValorM_18542">ANTHONY</span></div>
+                  <div class="input-group input-group-sm mt-1 d-none" id="npEditM_18542">
+                    <input type="text" class="form-control form-control-sm" id="npInputM_18542" value="ANTHONY" onkeydown="if(event.key==='Enter'){event.preventDefault();guardarNombrePreferidoM(18542);}">
+                    <button type="button" class="btn btn-outline-success" onclick="guardarNombrePreferidoM(18542)" title="Guardar"><i class="bi bi-check-lg"></i></button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="cancelarNombrePreferidoM(18542)" title="Cancelar"><i class="bi bi-x-lg"></i></button>
+                  </div>
+                </div>
+                                <button type="button" class="btn btn-sm btn-link p-0 text-muted" onclick="editarNombrePreferidoM(18542)" title="Editar nombre preferido">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                              </div>
+            </div>
+                        <div class="col" data-nombre="TORRES ORTIZ LIDIA">
+              <div class="d-flex align-items-start justify-content-between gap-1 border-bottom pb-1 mb-1">
+                <div class="form-check flex-grow-1">
+                  <input class="form-check-input chkGafeteM" type="checkbox" name="ids[]" value="15512" id="gafM_15512">
+                  <label class="form-check-label small" for="gafM_15512">TORRES ORTIZ LIDIA</label>
+                  <div class="small text-muted" id="npDisplayM_15512">Preferido: <span id="npValorM_15512">LIDIA</span></div>
+                  <div class="input-group input-group-sm mt-1 d-none" id="npEditM_15512">
+                    <input type="text" class="form-control form-control-sm" id="npInputM_15512" value="LIDIA" onkeydown="if(event.key==='Enter'){event.preventDefault();guardarNombrePreferidoM(15512);}">
+                    <button type="button" class="btn btn-outline-success" onclick="guardarNombrePreferidoM(15512)" title="Guardar"><i class="bi bi-check-lg"></i></button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="cancelarNombrePreferidoM(15512)" title="Cancelar"><i class="bi bi-x-lg"></i></button>
+                  </div>
+                </div>
+                                <button type="button" class="btn btn-sm btn-link p-0 text-muted" onclick="editarNombrePreferidoM(15512)" title="Editar nombre preferido">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                              </div>
+            </div>
+                        <div class="col" data-nombre="TRUJILLO MALLQUI LIZ CAROL">
+              <div class="d-flex align-items-start justify-content-between gap-1 border-bottom pb-1 mb-1">
+                <div class="form-check flex-grow-1">
+                  <input class="form-check-input chkGafeteM" type="checkbox" name="ids[]" value="1951" id="gafM_1951">
+                  <label class="form-check-label small" for="gafM_1951">TRUJILLO MALLQUI LIZ CAROL</label>
+                  <div class="small text-muted" id="npDisplayM_1951">Preferido: <span id="npValorM_1951">—</span></div>
+                  <div class="input-group input-group-sm mt-1 d-none" id="npEditM_1951">
+                    <input type="text" class="form-control form-control-sm" id="npInputM_1951" value="" onkeydown="if(event.key==='Enter'){event.preventDefault();guardarNombrePreferidoM(1951);}">
+                    <button type="button" class="btn btn-outline-success" onclick="guardarNombrePreferidoM(1951)" title="Guardar"><i class="bi bi-check-lg"></i></button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="cancelarNombrePreferidoM(1951)" title="Cancelar"><i class="bi bi-x-lg"></i></button>
+                  </div>
+                </div>
+                                <button type="button" class="btn btn-sm btn-link p-0 text-muted" onclick="editarNombrePreferidoM(1951)" title="Editar nombre preferido">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                              </div>
+            </div>
+                                  </div>
+        </div>
+        <div class="modal-footer py-2">
+          <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-printer me-1"></i>Generar Gafetes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+var URL_BASE_M = 'https://imo.crearpslglobal.com/';
+
+function aplicarFiltroGafetesM() {
+  var texto = document.getElementById('buscarGafetesM').value.trim().toUpperCase();
+  var cols = document.querySelectorAll('#listaGafetesM > .col');
+  var visibles = 0;
+  cols.forEach(function(col) {
+    var visible = !texto || col.dataset.nombre.indexOf(texto) !== -1;
+    col.style.display = visible ? '' : 'none';
+    if (!visible) {
+      var chk = col.querySelector('.chkGafeteM');
+      if (chk) chk.checked = false;
+    }
+    if (visible) visibles++;
+  });
+  document.getElementById('cntGafetesM').textContent = visibles;
+  document.getElementById('checkAllGafetesM').checked = false;
+}
+function seleccionarTodosGafetesM(checkAll) {
+  document.querySelectorAll('#listaGafetesM > .col').forEach(function(col) {
+    if (col.style.display === 'none') return;
+    var chk = col.querySelector('.chkGafeteM');
+    if (chk) chk.checked = checkAll.checked;
+  });
+}
+
+/* ── Editar nombre preferido (desde el modal Imprimir Gafetes de Maestría) ── */
+function editarNombrePreferidoM(id) {
+  document.getElementById('npDisplayM_' + id).classList.add('d-none');
+  var edit = document.getElementById('npEditM_' + id);
+  edit.classList.remove('d-none');
+  var input = document.getElementById('npInputM_' + id);
+  input.focus();
+  input.select();
+}
+function cancelarNombrePreferidoM(id) {
+  document.getElementById('npEditM_' + id).classList.add('d-none');
+  document.getElementById('npDisplayM_' + id).classList.remove('d-none');
+}
+function guardarNombrePreferidoM(id) {
+  var valor = document.getElementById('npInputM_' + id).value.trim();
+  fetch(URL_BASE_M + 'maestria/actualizarNombrePreferido', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+    body: 'id=' + id + '&nombre_preferido=' + encodeURIComponent(valor)
+  }).then(function(r){ return r.json(); }).then(function(d) {
+    if (d.ok) {
+      document.getElementById('npValorM_' + id).textContent = d.nombre_preferido || '—';
+      document.getElementById('npInputM_' + id).value = d.nombre_preferido || '';
+      cancelarNombrePreferidoM(id);
+      toastr.success('Nombre preferido actualizado');
+    } else {
+      toastr.error(d.msg || 'No se pudo actualizar el nombre preferido.');
+    }
+  }).catch(function() { toastr.error('Error de conexión.'); });
+}
+</script>
+
+<script>
+var URL_BASE    = 'https://imo.crearpslglobal.com/';
+var ID_EQUIPO   = 111;
+var ETAPA       = 'TFD';
+var _buscarTimer = null;
+var _todosMasivo = [];
+
+// Las dos tablas activas (Capitán/Manager y Participante) — Rezagados sigue siendo una sola
+// sección combinada, sin dividir.
+var TABLAS_ACTIVAS = ['tbodyCapMgr', 'tbodyPx'];
+
+// IDs ya en la tabla (activos de ambas tablas + desertores, todos siguen en el formulario)
+function idsEnTabla() {
+  var sel = TABLAS_ACTIVAS.map(function(t){ return '#' + t + ' input[name="id_participante[]"]'; })
+    .concat(['#tbodyDesertores input[name="id_participante[]"]']).join(',');
+  return Array.from(document.querySelectorAll(sel)).map(function(i){ return parseInt(i.value); });
+}
+
+// ── Contadores resumen (combinado + por tabla) ───────────────────────────
+function actualizarContadores() {
+  var totalGlobal = 0, asiSi = 0, enroladosGlobal = 0, declaracionGlobal = 0;
+  TABLAS_ACTIVAS.forEach(function(tablaId) {
+    var filas = document.querySelectorAll('#' + tablaId + ' tr');
+    var enr = 0, decl = 0;
+    filas.forEach(function(tr) {
+      var rAsi = tr.querySelector('.rdo-asistencia:checked');
+      if (rAsi && rAsi.value === 'si') { asiSi++; }
+      var hid = tr.querySelector('input[name^="conteo_enrolados"]');
+      if (hid) enr += parseInt(hid.value) || 0;
+      var d = tr.querySelector('input[name="declaracion[]"]');
+      if (d) decl += parseInt(d.value) || 0;
+    });
+    totalGlobal += filas.length;
+    enroladosGlobal += enr;
+    declaracionGlobal += decl;
+
+    var sufijo = tablaId === 'tbodyCapMgr' ? 'CapMgr' : 'Px';
+    var cntEl = document.getElementById(tablaId === 'tbodyCapMgr' ? 'cntCapMgr' : 'cntPx');
+    if (cntEl) cntEl.textContent = filas.length;
+    var footEnr = document.getElementById('footEnrolados' + sufijo);
+    if (footEnr) footEnr.textContent = enr;
+    var footDecl = document.getElementById('footDeclaracion' + sufijo);
+    if (footDecl) footDecl.textContent = decl;
+    var sinEl = document.getElementById(tablaId === 'tbodyCapMgr' ? 'sinCapMgr' : 'sinPx');
+    if (sinEl) sinEl.style.display = filas.length > 0 ? 'none' : '';
+  });
+
+  document.getElementById('cntTotal').textContent       = totalGlobal;
+  document.getElementById('cntAsiSi').textContent       = asiSi;
+  document.getElementById('cntDesertor').textContent    = document.querySelectorAll('#tbodyDesertores tr').length;
+  document.getElementById('cntEnrolados').textContent   = enroladosGlobal;
+  document.getElementById('cntDeclaracion').textContent = declaracionGlobal;
+}
+
+// Según el radio de Tipo marcado en la fila, a qué tabla activa pertenece (Capitán/Manager o Participante).
+function tablaSegunTipo(tr) {
+  var chk = tr.querySelector('input[name^="tipo_participante"]:checked');
+  var val = chk ? chk.value : 'px';
+  return (val === 'capitan' || val === 'manager') ? 'tbodyCapMgr' : 'tbodyPx';
+}
+
+// ── Mover fila entre su tabla activa (Capitán/Manager o Participante) al cambiar el Tipo ──
+function moverPorTipo(radio) {
+  var tr = radio.closest('tr');
+  var padre = tr.parentElement;
+  if (!padre || padre.id === 'tbodyDesertores') return; // un rezagado no cambia de tabla por tipo
+  var destinoId = tablaSegunTipo(tr);
+  if (padre.id !== destinoId) {
+    document.getElementById(destinoId).appendChild(tr);
+    actualizarContador();
+  }
+}
+
+// ── Mover fila entre la lista activa (la tabla que le toque por Tipo) y la de Rezagados al
+// togglear el radio de Desertor — se guarda al instante (AJAX), sin depender de "Guardar Registros".
+function moverPorDesertor(radio) {
+  var tr = radio.closest('tr');
+  var destinoId = radio.value === 'si' ? 'tbodyDesertores' : tablaSegunTipo(tr);
+  document.getElementById(destinoId).appendChild(tr);
+  actualizarContador();
+  actualizarSeccionDesertores();
+
+  var idInp = tr.querySelector('input[name="id_participante[]"]');
+  var idEntInp = document.querySelector('input[name="id_entrenamiento"]');
+  if (!idInp || !idEntInp || !idEntInp.value) return;
+
+  fetch(URL_BASE + 'maestria/marcarDesertor', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+    body: 'id_participante=' + encodeURIComponent(idInp.value)
+        + '&id_equipo=' + encodeURIComponent(ID_EQUIPO)
+        + '&id_entrenamiento=' + encodeURIComponent(idEntInp.value)
+        + '&desertor=' + encodeURIComponent(radio.value)
+  }).then(function(r){ return r.json(); })
+    .then(function(d){
+      if (d.ok) toastr.success(radio.value === 'si' ? 'Marcado como rezagado y guardado.' : 'Regresado a la lista y guardado.');
+      else toastr.error(d.msg || 'No se pudo guardar el cambio.');
+    })
+    .catch(function(){ toastr.error('Error de conexión al guardar el cambio.'); });
+}
+
+function actualizarSeccionDesertores() {
+  var n = document.querySelectorAll('#tbodyDesertores tr').length;
+  var badge = document.getElementById('badgeDesertores');
+  if (badge) badge.textContent = n;
+  var vacio = document.getElementById('sinDesertores');
+  if (vacio) vacio.style.display = n > 0 ? 'none' : '';
+}
+
+// ── Actualizar contador ───────────────────────────────────────────────────
+function actualizarContador() {
+  var n = TABLAS_ACTIVAS.reduce(function(acc, id) { return acc + document.querySelectorAll('#' + id + ' tr').length; }, 0);
+  document.getElementById('contadorTotal').textContent = n + ' participante(s) en lista';
+  var sinP = document.getElementById('sinParticipantes');
+  if (sinP) sinP.style.display = n > 0 ? 'none' : '';
+  // Re-aplicar filtro vigente si existe
+  var inp = document.getElementById('inpFiltroTabla');
+  if (inp && inp.value) filtrarTabla(inp.value);
+  actualizarContadores();
+}
+
+// ── Orden de columnas (clic en cabecera) ─────────────────────────────────
+// Por defecto cada tabla ya llega ordenada por #Enrolados de mayor a menor (desde el servidor);
+// esto solo reordena el DOM (moviendo las <tr> completas, sin recrearlas) para no perder el
+// estado de los inputs/radios de cada fila. Cada tabla activa tiene su propio estado de orden.
+var sortActual = {
+  tbodyCapMgr: { col: 'enrolados', dir: -1 },
+  tbodyPx:     { col: 'enrolados', dir: -1 },
+};
+
+function valorOrdenFila(tr, col) {
+  switch (col) {
+    case 'nombre':
+      return (tr.children[1].querySelector('strong')?.textContent || '').trim().toLowerCase();
+    case 'identificacion':
+      return (tr.children[2]?.textContent || '').trim().toLowerCase();
+    case 'enrolados':
+      return parseInt(tr.querySelector('input[name^="conteo_enrolados"]')?.value) || 0;
+    case 'declaracion':
+      var v = tr.querySelector('input[name="declaracion[]"]')?.value;
+      return v === '' || v == null ? -1 : parseInt(v);
+    case 'fecha':
+      return parseInt(tr.dataset.fecha) || 0;
+    default:
+      return 0;
+  }
+}
+
+function ordenarClick(th, tablaId) {
+  var col = th.dataset.col;
+  var estado = sortActual[tablaId];
+  if (estado.col === col) {
+    estado.dir *= -1;
+  } else {
+    sortActual[tablaId] = { col: col, dir: (col === 'enrolados' || col === 'declaracion') ? -1 : 1 };
+  }
+  aplicarOrden(tablaId);
+}
+
+function aplicarOrden(tablaId) {
+  var tbody = document.getElementById(tablaId);
+  var estado = sortActual[tablaId];
+  var filas = Array.from(tbody.querySelectorAll('tr'));
+  filas.sort(function(a, b) {
+    var va = valorOrdenFila(a, estado.col), vb = valorOrdenFila(b, estado.col);
+    if (va < vb) return -1 * estado.dir;
+    if (va > vb) return 1 * estado.dir;
+    return 0;
+  });
+  filas.forEach(function(tr) { tbody.appendChild(tr); });
+  actualizarIconosOrden(tablaId);
+}
+
+function actualizarIconosOrden(tablaId) {
+  var tablaElId = tablaId === 'tbodyCapMgr' ? 'tablaCapMgr' : 'tablaPx';
+  var estado = sortActual[tablaId];
+  document.querySelectorAll('#' + tablaElId + ' th.th-sort').forEach(function(th) {
+    var icon = th.querySelector('.sort-icon');
+    if (th.dataset.col === estado.col) {
+      icon.className = 'bi sort-icon ' + (estado.dir === 1 ? 'bi-caret-up-fill' : 'bi-caret-down-fill') + ' text-primary';
+    } else {
+      icon.className = 'bi sort-icon bi-arrow-down-up text-muted';
+    }
+  });
+}
+
+// ── Filtrar ambas tablas activas ──────────────────────────────────────────
+function filtrarTabla(q) {
+  q = q.trim().toLowerCase();
+  var sel = TABLAS_ACTIVAS.map(function(t){ return '#' + t + ' tr'; }).join(',');
+  var filas = document.querySelectorAll(sel);
+  var visibles = 0;
+  filas.forEach(function(tr) {
+    var match = !q || (tr.dataset.buscar || '').includes(q);
+    tr.style.display = match ? '' : 'none';
+    if (match) visibles++;
+  });
+  var info = document.getElementById('infoFiltro');
+  var btnX = document.getElementById('btnLimpiarFiltro');
+  if (q) {
+    info.textContent = visibles + ' de ' + filas.length + ' resultado(s)';
+    info.style.display = '';
+    btnX.style.display = '';
+  } else {
+    info.style.display = 'none';
+    btnX.style.display = 'none';
+  }
+}
+
+// ── Insertar fila desde datos de participante ─────────────────────────────
+function insertarFila(p) {
+  var _buscar = ((p.nombres||'') + ' ' + (p.apellidos||'') + ' ' + (p.telefono||'') + ' ' + (p.identificacion||'')).toLowerCase();
+  var tpl = document.getElementById('tplFila').innerHTML;
+  tpl = tpl.replace(/__ID__/g,     p.id)
+            .replace(/__NOM__/g,    p.nombres)
+            .replace(/__APE__/g,    p.apellidos)
+            .replace(/__TEL__/g,    p.telefono||'')
+            .replace(/__IDE__/g,    p.identificacion||'')
+            .replace(/__BUSCAR__/g, _buscar);
+  var tmp = document.createElement('tbody');
+  tmp.innerHTML = tpl;
+  var fila = tmp.querySelector('tr');
+  // Marcar como agregado manualmente — entra como Participante (PX) por defecto; si luego
+  // se reclasifica con los botones de Tipo, salta sola a la tabla de Capitán/Manager.
+  fila.classList.add('table-warning');
+  document.getElementById('tbodyPx').appendChild(fila);
+  actualizarContador();
+  // Scroll a la nueva fila
+  fila.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+// ── MODAL INDIVIDUAL ──────────────────────────────────────────────────────
+function buscarParticipantes(q) {
+  clearTimeout(_buscarTimer);
+  _buscarTimer = setTimeout(function(){
+    var excl = idsEnTabla().join(',');
+    document.getElementById('spinnerBuscar').style.display = '';
+    fetch(URL_BASE + 'maestria/buscar/' + ID_EQUIPO + '/' + ETAPA + '?q=' + encodeURIComponent(q) + '&excluidos=' + excl)
+      .then(function(r){ return r.json(); })
+      .then(function(res) {
+        document.getElementById('spinnerBuscar').style.display = 'none';
+        renderResultadosBuscar(res.participantes || []);
+      })
+      .catch(function(){ document.getElementById('spinnerBuscar').style.display = 'none'; });
+  }, 350);
+}
+
+function renderResultadosBuscar(lista) {
+  var el = document.getElementById('resultadosBuscar');
+  if (!lista.length) {
+    el.innerHTML = '<div class="text-center text-muted py-4"><i class="bi bi-person-x fs-2 d-block mb-2 opacity-25"></i>Sin resultados</div>';
+    return;
+  }
+  var html = '<table class="table table-hover align-middle mb-0" style="font-size:.85rem"><tbody>';
+  lista.forEach(function(p) {
+    html += '<tr style="cursor:pointer" onclick="agregarUno(' + JSON.stringify(p).replace(/"/g,'&quot;') + ')">' +
+      '<td><strong>' + esc(p.apellidos) + ', ' + esc(p.nombres) + '</strong>' +
+      '<div class="text-muted small">' + esc(p.identificacion||'') + (p.telefono?' · '+esc(p.telefono):'') + '</div></td>' +
+      '<td class="text-center">' + (p.capitulo2=='1'?'<i class="bi bi-check-circle-fill text-success"></i>':'<i class="bi bi-circle text-muted"></i>') + '</td>' +
+      '<td class="text-center">' + (p.maestria=='1'?'<i class="bi bi-star-fill text-warning"></i>':'<i class="bi bi-star text-muted"></i>') + '</td>' +
+      '<td><span class="badge bg-' + (p.asistencia==='confirmado'?'success':'warning') + '">' + esc(p.asistencia) + '</span></td>' +
+      '<td><button class="btn btn-xs btn-success px-2" onclick="event.stopPropagation();agregarUno(' + JSON.stringify(p).replace(/"/g,'&quot;') + ')"><i class="bi bi-plus-lg"></i></button></td>' +
+      '</tr>';
+  });
+  html += '</tbody></table>';
+  el.innerHTML = html;
+}
+
+function agregarUno(p) {
+  if (idsEnTabla().includes(parseInt(p.id))) {
+    toastr.warning('Este participante ya está en la lista.');
+    return;
+  }
+  insertarFila(p);
+  bootstrap.Modal.getInstance(document.getElementById('modalBuscar')).hide();
+  toastr.success(p.nombres + ' ' + p.apellidos + ' agregado.');
+}
+
+// ── MODAL MASIVO ──────────────────────────────────────────────────────────
+function abrirModalMasivo() {
+  _todosMasivo = [];
+  document.getElementById('tbodyMasivo').innerHTML =
+    '<tr><td colspan="8" class="text-center text-muted py-4"><span class="spinner-border spinner-border-sm me-2"></span>Cargando...</td></tr>';
+  new bootstrap.Modal(document.getElementById('modalMasivo')).show();
+
+  var excl = idsEnTabla().join(',');
+  fetch(URL_BASE + 'maestria/buscar/' + ID_EQUIPO + '/' + ETAPA + '?q=&excluidos=' + excl)
+    .then(function(r){ return r.json(); })
+    .then(function(res) {
+      _todosMasivo = res.participantes || [];
+      renderTablaMasivo(_todosMasivo);
+    });
+}
+
+function renderTablaMasivo(lista) {
+  var info = document.getElementById('infoMasivo');
+  if (!lista.length) {
+    document.getElementById('tbodyMasivo').innerHTML =
+      '<tr><td colspan="8" class="text-center text-muted py-4">No hay más participantes disponibles en este equipo.</td></tr>';
+    info.textContent = '';
+    return;
+  }
+  info.textContent = lista.length + ' participante(s) disponibles';
+  var html = '';
+  lista.forEach(function(p) {
+    html += '<tr data-id="' + p.id + '" data-nom="' + esc(p.apellidos+' '+p.nombres).toLowerCase() + '">' +
+      '<td><input type="checkbox" class="form-check-input chk-masivo" value="' + p.id + '" data-p=\'' + JSON.stringify(p).replace(/'/g,"&#39;") + '\' onchange="actualizarContSelMasivo()"></td>' +
+      '<td><strong>' + esc(p.apellidos) + ', ' + esc(p.nombres) + '</strong></td>' +
+      '<td class="text-muted small">' + esc(p.identificacion||'-') + '</td>' +
+      '<td class="text-muted small">' + esc(p.telefono||'-') + '</td>' +
+      '<td class="text-center">' + (p.capitulo2=='1'?'<i class="bi bi-check-circle-fill text-success"></i>':'<span class="text-muted">-</span>') + '</td>' +
+      '<td class="text-center">' + (p.maestria=='1'?'<i class="bi bi-star-fill text-warning"></i>':'<span class="text-muted">-</span>') + '</td>' +
+      '<td><span class="badge bg-' + (p.asistencia==='confirmado'?'success':'secondary') + ' bg-opacity-75">' + esc(p.asistencia) + '</span></td>' +
+      '<td class="text-end fw-semibold text-success">$' + parseFloat(p.valor_pagado).toFixed(2) + '</td>' +
+      '</tr>';
+  });
+  document.getElementById('tbodyMasivo').innerHTML = html;
+  actualizarContSelMasivo();
+}
+
+function filtrarMasivo(q) {
+  q = q.toLowerCase();
+  document.querySelectorAll('#tbodyMasivo tr[data-id]').forEach(function(tr) {
+    tr.style.display = (!q || tr.dataset.nom.includes(q)) ? '' : 'none';
+  });
+}
+
+function selTodosMasivo(state) {
+  document.querySelectorAll('#tbodyMasivo .chk-masivo').forEach(function(c) {
+    if (c.closest('tr').style.display !== 'none') c.checked = state;
+  });
+  document.getElementById('chkMasivoTodos').checked = state;
+  actualizarContSelMasivo();
+}
+
+function actualizarContSelMasivo() {
+  var n = document.querySelectorAll('#tbodyMasivo .chk-masivo:checked').length;
+  document.getElementById('contSelMasivo').textContent = n + ' seleccionado(s)';
+  document.getElementById('btnAgregarMasivo').disabled = n === 0;
+}
+
+function agregarMasivo() {
+  var checks = document.querySelectorAll('#tbodyMasivo .chk-masivo:checked');
+  var agregados = 0;
+  checks.forEach(function(c) {
+    var p = JSON.parse(c.dataset.p.replace(/&#39;/g,"'"));
+    if (!idsEnTabla().includes(parseInt(p.id))) {
+      insertarFila(p);
+      agregados++;
+    }
+  });
+  bootstrap.Modal.getInstance(document.getElementById('modalMasivo')).hide();
+  if (agregados > 0) toastr.success(agregados + ' participante(s) agregado(s) a la lista.');
+}
+
+// ── Quitar fila (= marcar como desertor, ya no se borra sin dejar rastro) ─────
+function quitarFila(btn) {
+  if (!confirm('¿Marcar como rezagado? Se guarda de inmediato.')) return;
+  var tr = btn.closest('tr');
+  var rdoSi = tr.querySelector('.rdo-desertor[value="si"]');
+  if (rdoSi) {
+    rdoSi.checked = true;
+    moverPorDesertor(rdoSi); // el 'change' no dispara solo al setear .checked por JS
+  } else {
+    tr.remove();
+    actualizarContador();
+  }
+}
+
+// Escaping helper
+function esc(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Auto-enrolar desde etapa anterior ────────────────────────────────────
+function autoEnrolar() {
+  var etapaOrigen = ETAPA === 'SFD' ? 'PFD' : 'SFD';
+  if (!confirm('¿Auto-enrolar en ' + ETAPA + ' a todos los participantes de ' + etapaOrigen + ' con asistencia=SI y desertor=NO?\n\nEsta acción creará registros nuevos (no sobreescribirá existentes).')) return;
+
+  var btn = document.getElementById('btnAutoEnrolar');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Procesando...'; }
+
+  fetch(URL_BASE + 'maestria/autoEnrolar', {
+    method:  'POST',
+    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+    body:    'id_equipo=' + ID_EQUIPO + '&etapa=' + ETAPA
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    if (d.ok) {
+      toastr.success(d.msg);
+      if (d.insertados > 0) setTimeout(function(){ location.reload(); }, 1200);
+    } else {
+      toastr.error(d.msg || 'Error al auto-enrolar');
+    }
+  })
+  .catch(function(){ toastr.error('Error de conexión'); })
+  .finally(function(){
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi bi-magic me-1"></i>Auto-enrolar desde ' + etapaOrigen; }
+  });
+}
+
+// Mostrar/ocultar botón "quitar seleccionados" cuando hay checks activos; actualizar contadores en cambios de radio
+document.addEventListener('change', function(e) {
+  if (e.target && e.target.classList.contains('chk-fila')) {
+    var any = document.querySelectorAll('.chk-fila:checked').length > 0;
+    document.getElementById('btnEliminarSel').style.setProperty('display', any?'':'none','important');
+  }
+  if (e.target && e.target.classList.contains('chk-todos-tabla')) {
+    var tabla = document.getElementById(e.target.dataset.tabla);
+    if (tabla) tabla.querySelectorAll('.chk-fila').forEach(function(c){ c.checked = e.target.checked; });
+  }
+  if (e.target && e.target.name && e.target.name.indexOf('tipo_participante') === 0) {
+    moverPorTipo(e.target);
+  }
+  if (e.target && e.target.classList.contains('rdo-desertor')) {
+    moverPorDesertor(e.target);
+  }
+  if (e.target && e.target.type === 'radio') actualizarContadores();
+});
+
+// Inicializar contadores al cargar
+actualizarSeccionDesertores();
+actualizarContadores();
+TABLAS_ACTIVAS.forEach(actualizarIconosOrden); // cada tabla ya llega ordenada por #Enrolados desc desde el servidor
+
+// La sección de Desertores vive en un modal fuera del <form> (para que el modal no quede
+// encajonado en el layout de la tabla) — sus filas se reincorporan al formulario justo antes
+// de enviarlo (a la tabla activa que les toque por Tipo), si no sus datos (incluido el propio
+// estado de desertor) nunca se guardarían.
+var frmMaestria = document.getElementById('frmMaestria');
+if (frmMaestria) {
+  frmMaestria.addEventListener('submit', function() {
+    document.querySelectorAll('#tbodyDesertores tr').forEach(function(tr) {
+      document.getElementById(tablaSegunTipo(tr)).appendChild(tr);
+    });
+  });
+}
+
+function eliminarSeleccionados() {
+  document.querySelectorAll('.chk-fila:checked').forEach(function(c){ c.closest('tr').remove(); });
+  document.getElementById('btnEliminarSel').style.setProperty('display','none','important');
+  actualizarContador();
+}
+</script>
+
+  </div>
+
+  <footer><div class="d-flex justify-content-between"><span>NODUS © 2026</span><span>Desarrollado para CREAR PSL Global</span></div></footer>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+<script>
+flatpickr.localize(flatpickr.l10ns.es);
+toastr.options = {positionClass:'toast-top-right',timeOut:3500};
+function confirmDelete(url, msg = '¿Eliminar este registro?') {
+  Swal.fire({title:'¿Estás seguro?',text:msg,icon:'warning',showCancelButton:true,
+    confirmButtonColor:'#d33',cancelButtonText:'Cancelar',confirmButtonText:'Sí, eliminar'
+  }).then(r => { if(r.isConfirmed) window.location.href = url; });
+}
+$(function(){
+  $('table.datatable').each(function(){
+    $(this).DataTable({language:{url:'https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json'},pageLength:$(this).data('page-length')||25,deferRender:true});
+  });
+  flatpickr('.datepicker',{dateFormat:'Y-m-d'});
+  flatpickr('.datetimepicker',{dateFormat:'Y-m-d H:i',enableTime:true,time_24hr:true});
+});
+</script>
+
+
+</body></html>

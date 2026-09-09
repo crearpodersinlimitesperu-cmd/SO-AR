@@ -62,7 +62,21 @@ export default function CMJDiagnosticsDashboard({ globalFilterSede }) {
           const nodusData = snap.data();
           console.log("NODUS SNAPSHOT FETCHED in CMJ:", nodusData);
           console.log("Equipos Reporte inside snap:", nodusData.equiposReporte);
-          const enrichedEquipos = mergeNodusDataIntoEquipos(getAllEquipos(), nodusData);
+          
+          // FETCH MAESTRIA REAL DATA
+          let maestriaData = null;
+          try {
+            const mRef = doc(db, 'nodus_kpis_sincronizados', 'maestria_real_data');
+            const mSnap = await getDocResilient(mRef);
+            if (mSnap.exists()) {
+              maestriaData = mSnap.data().equipos_lima;
+            }
+          } catch(e) {
+            console.error("Error fetching maestria_real_data", e);
+          }
+          
+          const enrichedEquipos = mergeNodusDataIntoEquipos(getAllEquipos(), nodusData, maestriaData);
+
           console.log("ENRICHED EQUIPOS:", enrichedEquipos.find(e => e.equipoNum === 30));
           setRawEquipos(enrichedEquipos);
         } else {

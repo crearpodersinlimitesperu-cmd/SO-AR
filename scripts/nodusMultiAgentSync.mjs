@@ -546,8 +546,8 @@ export async function runMultiAgentSync() {
   const dispatcher = new NodusDispatcherAgent();
 
   try {
-    const user = process.env.NODUS_USER || 'jsanchez';
-    const pwd = process.env.NODUS_PASSWORD || '123456';
+    const user = process.env.NODUS_GLOBAL_USER || 'CREARPSL';
+    const pwd = process.env.NODUS_GLOBAL_PASS || 'CREARPSL26*';
 
     await extractor.initBrowser();
     await extractor.login(user, pwd);
