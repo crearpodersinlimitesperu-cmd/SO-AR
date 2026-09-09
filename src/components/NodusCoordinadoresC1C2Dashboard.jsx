@@ -1430,8 +1430,8 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
                                   </span>
                                 )}
                               </div>
-                              <div style={{ fontSize: '0.75rem', color: 'var(--nodus-text-muted)', fontFamily: 'monospace' }}>
-                                {coord.email}
+                              <div style={{ fontSize: '0.75rem', color: coord.email ? 'var(--nodus-text-muted)' : '#f87171', fontFamily: 'monospace' }}>
+                                {coord.email || 'Email no registrado (Solicitar a RRHH)'}
                               </div>
                             </div>
                           </div>

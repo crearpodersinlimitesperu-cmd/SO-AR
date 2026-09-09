@@ -9,6 +9,13 @@ import { getFirestore, doc, setDoc } from "firebase/firestore";
 puppeteer.use(StealthPlugin());
 
 // Configuración Resiliente de Firebase
+// Diccionario dinámico cargado desde workspace
+let workspaceDirectory = [];
+try {
+  const data = fs.readFileSync(path.resolve(process.cwd(), 'scripts/google_workspace_users.json'), 'utf8');
+  workspaceDirectory = JSON.parse(data);
+} catch(e) { console.warn("No se pudo cargar el directorio"); }
+
 const firebaseConfig = {
   apiKey: process.env.VITE_FIREBASE_API_KEY || ['AIzaSy', 'CTMrA6A64s', '1ppDBBso', 'l-fqam5V', 'ch_Q5B0'].join(''),
   authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN || "centro-operativo-cpsl.firebaseapp.com",
@@ -21,19 +28,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Diccionario de homologación de coordinadores con cuentas oficiales de Crear Poder Sin Límites
-const COORDINADORES_OFICIALES = {
-  'MARIBEL': { nombreCompleto: 'Maribel Cuenca', sede: 'Cuenca', email: 'coordinacion.cuenca@crearpsl.net' },
-  'JOAO': { nombreCompleto: 'Joao Cuenca', sede: 'Cuenca', email: 'coordinacion.cuenca@crearpsl.net' },
-  'JUAN FERNANDO': { nombreCompleto: 'Juan Fernando', sede: 'Cuenca', email: 'coordinacion.cuenca@crearpsl.net' },
-  'JOYCE': { nombreCompleto: 'Joyce Lima', sede: 'Lima', email: 'coordinacion.lima@crearpsl.net' },
-  'DIANA': { nombreCompleto: 'Diana Carolina', sede: 'Lima', email: 'coordinacion.lima@crearpsl.net' },
-  'FRAN': { nombreCompleto: 'Franberni Sánchez', sede: 'Lima', email: 'coordinacion.lima@crearpsl.net' },
-  'KARLA': { nombreCompleto: 'Karla Quito', sede: 'Quito', email: 'coordinacion.quito@crearpsl.net' },
-  'ADAMS': { nombreCompleto: 'Adams Quito', sede: 'Quito', email: 'coordinacion.quito@crearpsl.net' },
-  'GABRIEL': { nombreCompleto: 'Gabriel Guayaquil', sede: 'Guayaquil', email: 'coordinacion.guayaquil@crearpsl.net' },
-  'VALERIA': { nombreCompleto: 'Valeria Medellín', sede: 'Medellín', email: 'coordinacion.medellin@crearpsl.net' },
-};
 
 /**
  * =========================================================================
@@ -352,10 +346,19 @@ class NodusNormalizerAgent {
       const yaAsistio = parseStatus('Ya Asistió');
       const devolucion = parseStatus('Devolución');
 
-      const infoOficial = COORDINADORES_OFICIALES[nombre.toUpperCase()] || {
-        nombreCompleto: nombre,
+      let officialEmail = '';
+      let officialName = nombre;
+      const cleanSearchName = nombre.toLowerCase().trim();
+      const match = workspaceDirectory.find(u => u.name.toLowerCase().includes(cleanSearchName));
+      if (match) {
+        officialEmail = match.email;
+        officialName = match.name;
+      }
+
+      const infoOficial = {
+        nombreCompleto: officialName,
         sede: sede,
-        email: `${nombre.toLowerCase().replace(/\s+/g, '.')}@crearpsl.net`
+        email: officialEmail
       };
 
       const totalAsistieron = (item.equipos || []).reduce((acc, eq) => acc + (eq.asistieron || 0), 0);
