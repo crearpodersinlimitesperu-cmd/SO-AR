@@ -734,8 +734,8 @@ export default function CMJDiagnosticsDashboard({ globalFilterSede }) {
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <span>{sedeMeta.flag}</span>
                             <div>
-                              <div style={{ color: '#ffffff', fontWeight: 700 }}>{eq.equipoLabel}</div>
-                              <div style={{ fontSize: '0.75rem', color: sedeMeta.color }}>{eq.sedeNombreLargo}</div>
+                              <div style={{ color: '#ffffff', fontWeight: 700 }}>{eq.equipoLabel} {eq.equipoName ? `— ${eq.equipoName}` : ''}</div>
+                              <div style={{ fontSize: '0.75rem', color: sedeMeta.color }}>{eq.sedeNombreLargo} {eq.entrenador ? `• Entrenador: ${eq.entrenador}` : ''}</div>
                             </div>
                           </div>
                         </td>
@@ -813,7 +813,7 @@ export default function CMJDiagnosticsDashboard({ globalFilterSede }) {
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <span style={{ fontSize: '0.9rem', fontWeight: 700, color: '#d4af37' }}>
-                                  🔬 Desglose Clínico de Etapas: {eq.equipoLabel} ({eq.sedeNombreLargo})
+                                  🔬 Desglose Clínico de Etapas: {eq.equipoLabel} {eq.equipoName ? `— ${eq.equipoName}` : ''} ({eq.sedeNombreLargo})
                                 </span>
                                 <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
                                   Inician C1: {eq.c1.inician} → Terminan C1: {eq.c1.terminan} | Inician C2: {eq.c2.inician} → Terminan C2: {eq.c2.terminan}

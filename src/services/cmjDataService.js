@@ -38,6 +38,16 @@ export function normalizeSedeName(rawSede) {
 
 let _cachedEquipos = null;
 
+
+const TEAM_NAMES_MAPPING = {
+  'LIMA CICLO 1': {
+    30: { nombre: 'TINKUY RURAY' },
+    29: { nombre: 'QUANTUM PHOENIX' },
+    28: { nombre: 'UBUNTU' },
+    27: { nombre: 'KAY THERON' }
+  }
+};
+
 export function getAllEquipos() {
   if (_cachedEquipos) return _cachedEquipos;
   try {
@@ -111,7 +121,7 @@ export function getAllEquipos() {
         sede,
         sedeNombreLargo: cmjMeta.nombreLargo,
         cmj: (r['COORDINADOR MAESTRIA DEL JUEGO'] || cmjMeta.cmj).trim(),
-        equipoLabel: `Equipo ${eqNum}`,
+        equipoLabel: `Equipo ${eqNum}`, equipoName: (TEAM_NAMES_MAPPING[sede] && TEAM_NAMES_MAPPING[sede][eqNum]) ? TEAM_NAMES_MAPPING[sede][eqNum].nombre : `Equipo ${eqNum}`,
         equipoNum: Number(eqNum),
         c1: { inician: inicianC1, terminan: terminanC1 },
         c2: { pagan: paganC2, inician: inicianC2, terminan: terminanC2 },
@@ -173,7 +183,8 @@ export function mergeNodusDataIntoEquipos(baseEquipos, nodusSnap) {
         if (row.EQUIPO) {
           actividadFdsMap[row.EQUIPO.toUpperCase()] = {
             etapa: row['ETAPA ACTUAL'],
-            participantesEnFds: parseInt(row['PARTICIPANTES'], 10) || 0
+            participantesEnFds: parseInt(row['PARTICIPANTES'], 10) || 0,
+            entrenador: row['ENTRENADOR'] || ''
           };
         }
       });
@@ -249,6 +260,11 @@ export function mergeNodusDataIntoEquipos(baseEquipos, nodusSnap) {
       }
       
       eq = JSON.parse(JSON.stringify(eq)); // Clone to avoid mutating cache
+      
+      if (actStats.entrenador) {
+        eq.entrenador = actStats.entrenador;
+      }
+
       eq.creacion.enrolTotal = stats.enrolamientoReal;
       eq.creacion.enrolPx = stats.enrolPx;
       eq.creacion.enrolMg = stats.enrolMg;
