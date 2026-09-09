@@ -38,7 +38,7 @@ export default function CMJDiagnosticsDashboard({ globalFilterSede }) {
   const [riskFilter, setRiskFilter] = useState('ALL'); // 'ALL', 'CRITICO', 'ATENCION', 'OPTIMO'
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTrainer, setSelectedTrainer] = useState('ALL');
-  const [sortBy, setSortBy] = useState('desercion_desc');
+  const [sortBy, setSortBy] = useState('equipo_desc');
   const [expandedRow, setExpandedRow] = useState(null);
 
   // Sincronizar con filtro global si existe
@@ -116,6 +116,7 @@ export default function CMJDiagnosticsDashboard({ globalFilterSede }) {
       if (sortBy === 'retencion_desc') return b.resumen.tasaRetencion - a.resumen.tasaRetencion;
       if (sortBy === 'enrol_desc') return b.resumen.enrolTotalAcumulado - a.resumen.enrolTotalAcumulado;
       if (sortBy === 'equipo_asc') return a.equipoNum - b.equipoNum;
+      if (sortBy === 'equipo_desc') return b.equipoNum - a.equipoNum;
       return 0;
     });
   }, [rawEquipos, selectedSede, riskFilter, searchQuery, sortBy]);
@@ -624,12 +625,13 @@ export default function CMJDiagnosticsDashboard({ globalFilterSede }) {
                 cursor: 'pointer'
               }}
             >
+              <option value="equipo_desc">Equipos Más Recientes</option>
+              <option value="equipo_asc">Equipos Más Antiguos</option>
               <option value="desercion_desc">Mayor Deserción PX</option>
               <option value="desercion_asc">Menor Deserción PX</option>
               <option value="retencion_desc">Mayor Retención %</option>
               <option value="retencion_asc">Menor Retención %</option>
               <option value="enrol_desc">Mayor Enrolamiento</option>
-              <option value="equipo_asc">Número de Equipo</option>
             </select>
           )}
 
