@@ -12,6 +12,7 @@ import DriveDashboard from '../components/DriveDashboard';
 import CMJDashboard from '../components/CMJDashboard';
 import NodusCoordinadoresC1C2Dashboard from '../components/NodusCoordinadoresC1C2Dashboard';
 import ThemeSelector from '../components/ThemeSelector';
+import ZenModeSelector from '../components/ZenModeSelector';
 
 export default function AuditoriaKPIs({ defaultTab }) {
   const { currentUser } = useAuth();
@@ -675,6 +676,7 @@ export default function AuditoriaKPIs({ defaultTab }) {
             </div>
           )}
           <ThemeSelector />
+          <ZenModeSelector />
         </div>
       </div>
 

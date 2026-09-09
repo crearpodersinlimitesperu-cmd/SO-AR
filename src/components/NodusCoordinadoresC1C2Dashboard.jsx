@@ -13,6 +13,7 @@ import {
 } from 'recharts';
 import { useTheme } from '../context/ThemeContext';
 import ThemeSelector from './ThemeSelector';
+import ZenModeSelector from './ZenModeSelector';
 import nodusFallbackData from '../data/nodusFallbackData.json';
 import { OPERATIONAL_SEDES } from '../data/usersData';
 import './NodusCoordinadoresC1C2Dashboard.css';
@@ -66,7 +67,7 @@ const COLORS = {
 const PIE_COLORS = ['#10b981', '#f59e0b', '#64748b', '#3b82f6', '#ef4444'];
 
 export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {}) {
-  const { activeTheme } = useTheme();
+  const { activeTheme, zenMode } = useTheme();
   const isLight = activeTheme === 'light';
 
   const gridStroke = isLight ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.08)';
@@ -823,6 +824,7 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
 
         <div className="nodus-header-right">
           <ThemeSelector compact={false} />
+          <ZenModeSelector />
 
           <div className="nodus-sync-indicator">
             <span className="nodus-pulse-dot" />
@@ -1103,9 +1105,10 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
         )}
       </div>
 
-      {/* 4. SECCIÓN DE GRÁFICOS */}
-      <div className="nodus-charts-section">
-        <div className="nodus-charts-header">
+      {/* 4. SECCIÓN DE GRÁFICOS (Oculto en Modo Zen) */}
+      {!zenMode && (
+        <div className="nodus-charts-section">
+          <div className="nodus-charts-header">
           <div className="nodus-chart-tabs">
             <button
               onClick={() => setActiveChartTab('coordinadores')}
@@ -1349,6 +1352,7 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
           )}
         </div>
       </div>
+      )}
 
       {/* 5. TABLA PRINCIPAL DE COORDINADORES CON DESGLOSE POR EQUIPO */}
       <div className="nodus-table-container">

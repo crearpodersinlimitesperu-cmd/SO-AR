@@ -8,6 +8,10 @@ export function ThemeProvider({ children }) {
     return localStorage.getItem('cpsl_theme_mode') || 'dark';
   });
 
+  const [zenMode, setZenModeState] = useState(() => {
+    return localStorage.getItem('cpsl_zen_mode') === 'true';
+  });
+
   const [activeTheme, setActiveTheme] = useState('dark');
 
   const setThemeMode = (mode) => {
@@ -15,17 +19,16 @@ export function ThemeProvider({ children }) {
     localStorage.setItem('cpsl_theme_mode', mode);
   };
 
+  const setZenMode = (isZen) => {
+    setZenModeState(isZen);
+    localStorage.setItem('cpsl_zen_mode', isZen ? 'true' : 'false');
+  };
+
   useEffect(() => {
     const calculateTheme = () => {
-      if (themeMode === 'light') {
-        return 'light';
-      }
-      if (themeMode === 'dark') {
-        return 'dark';
-      }
+      if (themeMode === 'light') return 'light';
+      if (themeMode === 'dark') return 'dark';
       
-      // MODO AUTOMÁTICO: Basado en el momento del día y reloj solar
-      // Horario Día: 06:00 AM a 18:30 PM (6.0 a 18.5)
       const now = new Date();
       const currentHour = now.getHours() + now.getMinutes() / 60;
       const isDayTime = currentHour >= 6.0 && currentHour < 18.5;
@@ -49,18 +52,15 @@ export function ThemeProvider({ children }) {
 
     applyTheme();
 
-    // Actualizar automáticamente cada minuto si está en modo auto
     const interval = setInterval(() => {
-      if (themeMode === 'auto') {
-        applyTheme();
-      }
+      if (themeMode === 'auto') applyTheme();
     }, 60000);
 
     return () => clearInterval(interval);
   }, [themeMode]);
 
   return (
-    <ThemeContext.Provider value={{ themeMode, setThemeMode, activeTheme }}>
+    <ThemeContext.Provider value={{ themeMode, setThemeMode, activeTheme, zenMode, setZenMode }}>
       {children}
     </ThemeContext.Provider>
   );
