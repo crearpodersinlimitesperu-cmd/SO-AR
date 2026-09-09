@@ -68,11 +68,47 @@ export default function MonitorImos() {
     });
   }, []);
 
+  // (09/09/2026) José reportó, con captura, un IMO (Veronica Patricia Prado Zeas) donde el
+  // mismo enrolado ("Veronica Elizabeth Clavijo Morocho", mismo teléfono) aparecía dos veces
+  // en pantalla — "esto está mal y sin sentido". Esto viene del array `m.enrolados` del propio
+  // documento de Firestore, que aquí se mapea 1:1 sin ninguna deduplicación: si esa persona
+  // quedó registrada dos veces en el documento (por ejemplo, un doble envío del formulario del
+  // IMO), esta función la mostraba dos veces también. No tengo acceso a Firestore en vivo desde
+  // este entorno para confirmar si el dato de origen tiene el duplicado o no — lo que sí puedo
+  // hacer, sin borrar ni tocar nada en la base de datos, es que la pantalla no vuelva a mostrar
+  // dos tarjetas idénticas para la misma persona. dedupeEnrolados() más abajo colapsa por
+  // nombre+teléfono normalizados, conservando el primer registro (y fusionando contacto/
+  // asistencia con OR, para no perder un "sí" registrado en cualquiera de los duplicados).
+  const dedupeEnrolados = (list) => {
+    const seen = new Map();
+    list.forEach((e) => {
+      const nombreNorm = (e.nombre || '').trim().toUpperCase().replace(/\s+/g, ' ');
+      const telNorm = (e.telefono || '').replace(/\D/g, '');
+      const key = telNorm ? `tel:${telNorm}` : `nom:${nombreNorm}`;
+      if (!key.trim() || key === 'tel:' || key === 'nom:') {
+        // Sin nombre ni teléfono para agrupar — se conserva tal cual, por su propio id.
+        seen.set(`id:${e.id}`, e);
+        return;
+      }
+      const prev = seen.get(key);
+      if (!prev) {
+        seen.set(key, e);
+      } else {
+        seen.set(key, {
+          ...prev,
+          contacto: prev.contacto || e.contacto,
+          asistencia: prev.asistencia || e.asistencia,
+        });
+      }
+    });
+    return Array.from(seen.values());
+  };
+
   // Extrae de forma robusta la lista de enrolados combinando el array con los checks
   const getEnroladosList = (m) => {
     if (Array.isArray(m.enrolados) && m.enrolados.length > 0) {
       // Fusionar los datos estáticos del enrolado con el progreso en 'checks'
-      return m.enrolados.map((enr) => {
+      const mapped = m.enrolados.map((enr) => {
         const chk = (m.checks && m.checks[enr.id]) || {};
         return {
           ...enr,
@@ -80,6 +116,7 @@ export default function MonitorImos() {
           asistencia: Boolean(chk.asistencia),
         };
       });
+      return dedupeEnrolados(mapped);
     }
     const keys = Object.keys(m.checks || {});
     return keys.map((k, index) => {

@@ -1079,7 +1079,7 @@ export default function CentroManagers() {
   // confirmó que casi siempre es un solo entrenador por equipo y no priorizó resolver
   // el reparto todavía.
   const liquidacionData = useMemo(() => {
-    if (!canViewLiquidacion) return { pendientes: [], pagados: [] };
+    if (!canViewLiquidacion) return { pendientes: [], pagados: [], enCamino: [], totalPendienteUSD: 0, totalPagadoUSD: 0 };
 
     const porEquipo = {};
     llamadasHistorial.forEach(r => {
@@ -1090,14 +1090,35 @@ export default function CentroManagers() {
 
     const pendientes = [];
     const pagados = [];
+    // (09/09/2026) NUEVO — pedido de José: "coherente, práctico y vivible, como un
+    // liquidador experto en finanzas". La pantalla original solo mostraba el disparador
+    // (7 llamadas) sin ningún contexto de qué viene antes — un equipo con 6 llamadas
+    // desaparecía sin dejar rastro. Se agrega "En camino a la meta" (5 o 6 llamadas,
+    // a 1-2 de activar el pago) para que la pantalla se lea como un pipeline financiero
+    // real, no solo un disparador binario.
+    const enCamino = [];
 
     Object.entries(porEquipo).forEach(([equipoKey, registros]) => {
       const count = registros.length;
-      if (count < 7) return; // Todavía no llega a la meta de 7 llamadas
-
       const sorted = [...registros].sort((a, b) => (a.fecha || '').localeCompare(b.fecha || ''));
-      const septimo = sorted[6]; // La llamada #7 (índice 6) es la que dispara el pago
       const ultimo = sorted[sorted.length - 1];
+
+      if (count < 7) {
+        if (count === 5 || count === 6) {
+          enCamino.push({
+            equipoKey,
+            equipo: ultimo.equipo,
+            numEquipo: ultimo.numEquipo,
+            sede: ultimo.sede,
+            entrenador: ultimo.entrenador || 'Sin Asignar',
+            totalLlamadas: count,
+            faltan: 7 - count
+          });
+        }
+        return; // Todavía no llega a la meta de 7 llamadas
+      }
+
+      const septimo = sorted[6]; // La llamada #7 (índice 6) es la que dispara el pago
       const pago = liquidacionesPagos[equipoKey];
 
       const item = {
@@ -1120,8 +1141,12 @@ export default function CentroManagers() {
 
     pendientes.sort((a, b) => (a.fechaAlcanzo7 || '').localeCompare(b.fechaAlcanzo7 || ''));
     pagados.sort((a, b) => (b.fechaPago || '').localeCompare(a.fechaPago || ''));
+    enCamino.sort((a, b) => b.totalLlamadas - a.totalLlamadas);
 
-    return { pendientes, pagados };
+    const totalPendienteUSD = pendientes.length * 400;
+    const totalPagadoUSD = pagados.length * 400;
+
+    return { pendientes, pagados, enCamino, totalPendienteUSD, totalPagadoUSD };
   }, [llamadasHistorial, liquidacionesPagos, canViewLiquidacion]);
 
   const handleMarcarPagado = async (item) => {
@@ -2445,93 +2470,173 @@ export default function CentroManagers() {
           )
         )}
 
-        {/* LIQUIDACIÓN DE ENTRENADORES (02/09/2026) — solo José Sánchez y Elizabeth Escobar */}
+        {/* LIQUIDACIÓN DE ENTRENADORES (02/09/2026, rediseño 09/09/2026) — solo José Sánchez y Elizabeth Escobar */}
         {activeTab === 'liquidacion' && canViewLiquidacion && (
-          <div style={{ background: bgCard, borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', border: `1px solid ${borderLight}`, padding: '1.5rem' }}>
-            <div style={{ marginBottom: '1.5rem' }}>
-              <h2 style={{ margin: 0, fontSize: '1.2rem', color: textDark }}>💰 Liquidación de Entrenadores</h2>
+          <div>
+            <div style={{ background: bgCard, borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', border: `1px solid ${borderLight}`, padding: '1.5rem', marginBottom: '1.2rem' }}>
+              <h2 style={{ margin: 0, fontSize: '1.2rem', color: textDark, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <DollarSign size={22} color="#059669" /> Liquidación de Entrenadores
+              </h2>
               <p style={{ margin: '0.3rem 0 0', fontSize: '0.85rem', color: textMuted }}>
-                $400 USD por equipo, pago único al llegar a 7 llamadas grupales registradas.
+                $400 USD por equipo, pago único al llegar a 7 llamadas grupales registradas en Nodus.
                 Acceso restringido a José Sánchez y Elizabeth Escobar.
               </p>
             </div>
 
-            <h3 style={{ fontSize: '1rem', color: textDark, marginBottom: '0.75rem' }}>
-              Pendientes de pago ({liquidacionData.pendientes.length})
-            </h3>
-            {liquidacionData.pendientes.length === 0 ? (
-              <p style={{ color: textMuted, fontSize: '0.9rem' }}>No hay equipos pendientes de liquidar por ahora.</p>
-            ) : (
-              <div style={{ overflowX: 'auto', marginBottom: '2rem' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
-                  <thead>
-                    <tr style={{ borderBottom: `2px solid ${borderLight}`, textAlign: 'left' }}>
-                      <th style={{ padding: '0.6rem' }}>Equipo</th>
-                      <th style={{ padding: '0.6rem' }}>Sede</th>
-                      <th style={{ padding: '0.6rem' }}>Entrenador</th>
-                      <th style={{ padding: '0.6rem' }}>Llamadas</th>
-                      <th style={{ padding: '0.6rem' }}>Llegó a 7 el</th>
-                      <th style={{ padding: '0.6rem' }}>Monto</th>
-                      <th style={{ padding: '0.6rem' }}></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {liquidacionData.pendientes.map(item => (
-                      <tr key={item.equipoKey} style={{ borderBottom: `1px solid ${borderLight}` }}>
-                        <td style={{ padding: '0.6rem', fontWeight: 600 }}>{item.equipo} {item.numEquipo ? `(#${item.numEquipo})` : ''}</td>
-                        <td style={{ padding: '0.6rem' }}><CountryFlag sede={item.sede} /> {item.sede}</td>
-                        <td style={{ padding: '0.6rem' }}>{item.entrenador}</td>
-                        <td style={{ padding: '0.6rem' }}>{item.totalLlamadas}</td>
-                        <td style={{ padding: '0.6rem' }}>{item.fechaAlcanzo7 || '—'}</td>
-                        <td style={{ padding: '0.6rem', fontWeight: 700, color: '#059669' }}>${item.montoUSD}</td>
-                        <td style={{ padding: '0.6rem' }}>
-                          <button
-                            onClick={() => handleMarcarPagado(item)}
-                            style={{ padding: '0.4rem 0.8rem', borderRadius: '6px', border: 'none', background: '#10b981', color: '#fff', fontWeight: 700, cursor: 'pointer', fontSize: '0.8rem' }}
-                          >
-                            Marcar como pagado
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+            {/* RESUMEN FINANCIERO — panel de 4 cifras clave, como lo pediría un liquidador */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.2rem' }}>
+              <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.2rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: 800, color: '#b45309', marginBottom: '0.4rem' }}>
+                  <Clock size={14} /> Por Pagar Ahora
+                </div>
+                <div style={{ fontSize: '1.8rem', fontWeight: 800, color: textDark }}>${liquidacionData.totalPendienteUSD.toLocaleString('en-US')}</div>
+                <div style={{ fontSize: '0.78rem', color: textMuted, marginTop: '0.2rem' }}>{liquidacionData.pendientes.length} equipo{liquidacionData.pendientes.length !== 1 ? 's' : ''} ya cumplió la meta</div>
               </div>
-            )}
+              <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.2rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: 800, color: '#059669', marginBottom: '0.4rem' }}>
+                  <CheckCircle size={14} /> Pagado (Histórico)
+                </div>
+                <div style={{ fontSize: '1.8rem', fontWeight: 800, color: textDark }}>${liquidacionData.totalPagadoUSD.toLocaleString('en-US')}</div>
+                <div style={{ fontSize: '0.78rem', color: textMuted, marginTop: '0.2rem' }}>{liquidacionData.pagados.length} pago{liquidacionData.pagados.length !== 1 ? 's' : ''} registrado{liquidacionData.pagados.length !== 1 ? 's' : ''}</div>
+              </div>
+              <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.2rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: 800, color: '#3b82f6', marginBottom: '0.4rem' }}>
+                  <Target size={14} /> En Camino a la Meta
+                </div>
+                <div style={{ fontSize: '1.8rem', fontWeight: 800, color: textDark }}>{liquidacionData.enCamino.length}</div>
+                <div style={{ fontSize: '0.78rem', color: textMuted, marginTop: '0.2rem' }}>a 1 o 2 llamadas de activar el pago</div>
+              </div>
+              <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.2rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.72rem', textTransform: 'uppercase', fontWeight: 800, color: '#6366f1', marginBottom: '0.4rem' }}>
+                  <BarChart3 size={14} /> Comprometido Total
+                </div>
+                <div style={{ fontSize: '1.8rem', fontWeight: 800, color: textDark }}>${(liquidacionData.totalPendienteUSD + liquidacionData.totalPagadoUSD).toLocaleString('en-US')}</div>
+                <div style={{ fontSize: '0.78rem', color: textMuted, marginTop: '0.2rem' }}>pendiente + pagado, ciclo actual</div>
+              </div>
+            </div>
 
-            <h3 style={{ fontSize: '1rem', color: textDark, marginBottom: '0.75rem' }}>
-              Historial de pagos ({liquidacionData.pagados.length})
-            </h3>
-            {liquidacionData.pagados.length === 0 ? (
-              <p style={{ color: textMuted, fontSize: '0.9rem' }}>Todavía no se ha marcado ningún pago.</p>
-            ) : (
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
-                  <thead>
-                    <tr style={{ borderBottom: `2px solid ${borderLight}`, textAlign: 'left' }}>
-                      <th style={{ padding: '0.6rem' }}>Equipo</th>
-                      <th style={{ padding: '0.6rem' }}>Sede</th>
-                      <th style={{ padding: '0.6rem' }}>Entrenador</th>
-                      <th style={{ padding: '0.6rem' }}>Monto</th>
-                      <th style={{ padding: '0.6rem' }}>Pagado el</th>
-                      <th style={{ padding: '0.6rem' }}>Pagado por</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {liquidacionData.pagados.map(item => (
-                      <tr key={item.equipoKey} style={{ borderBottom: `1px solid ${borderLight}` }}>
-                        <td style={{ padding: '0.6rem', fontWeight: 600 }}>{item.equipo} {item.numEquipo ? `(#${item.numEquipo})` : ''}</td>
-                        <td style={{ padding: '0.6rem' }}>{item.sede}</td>
-                        <td style={{ padding: '0.6rem' }}>{item.entrenador}</td>
-                        <td style={{ padding: '0.6rem', fontWeight: 700, color: '#059669' }}>${item.montoUSD}</td>
-                        <td style={{ padding: '0.6rem' }}>{item.fechaPago || '—'}</td>
-                        <td style={{ padding: '0.6rem' }}>{item.pagadoPorNombre || item.pagadoPorEmail || '—'}</td>
+            {/* PENDIENTES DE PAGO */}
+            <div style={{ background: bgCard, borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', border: `1px solid ${borderLight}`, padding: '1.5rem', marginBottom: '1.2rem' }}>
+              <h3 style={{ fontSize: '1rem', color: textDark, marginBottom: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <Clock size={16} color="#b45309" /> Pendientes de pago ({liquidacionData.pendientes.length})
+              </h3>
+              {liquidacionData.pendientes.length === 0 ? (
+                <p style={{ color: textMuted, fontSize: '0.9rem' }}>No hay equipos pendientes de liquidar por ahora — ningún equipo ha alcanzado todavía las 7 llamadas grupales registradas.</p>
+              ) : (
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                    <thead>
+                      <tr style={{ background: 'rgba(180,83,9,0.08)', textAlign: 'left' }}>
+                        <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Equipo</th>
+                        <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Sede</th>
+                        <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Entrenador</th>
+                        <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Llamadas</th>
+                        <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Llegó a 7 el</th>
+                        <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Monto</th>
+                        <th style={{ padding: '0.7rem 0.6rem' }}></th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+                    </thead>
+                    <tbody>
+                      {liquidacionData.pendientes.map((item, idx) => (
+                        <tr key={item.equipoKey} style={{ borderBottom: `1px solid ${borderLight}`, background: idx % 2 === 1 ? 'rgba(0,0,0,0.015)' : 'transparent' }}>
+                          <td style={{ padding: '0.65rem 0.6rem', fontWeight: 600 }}>{item.equipo} {item.numEquipo ? `(#${item.numEquipo})` : ''}</td>
+                          <td style={{ padding: '0.65rem 0.6rem' }}><CountryFlag sede={item.sede} /> {item.sede}</td>
+                          <td style={{ padding: '0.65rem 0.6rem' }}>{item.entrenador}</td>
+                          <td style={{ padding: '0.65rem 0.6rem' }}>{item.totalLlamadas}</td>
+                          <td style={{ padding: '0.65rem 0.6rem' }}>{item.fechaAlcanzo7 || '—'}</td>
+                          <td style={{ padding: '0.65rem 0.6rem', fontWeight: 700, color: '#059669' }}>${item.montoUSD}</td>
+                          <td style={{ padding: '0.65rem 0.6rem' }}>
+                            <button
+                              onClick={() => handleMarcarPagado(item)}
+                              style={{ padding: '0.4rem 0.8rem', borderRadius: '6px', border: 'none', background: '#10b981', color: '#fff', fontWeight: 700, cursor: 'pointer', fontSize: '0.8rem', whiteSpace: 'nowrap' }}
+                            >
+                              Marcar como pagado
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <tfoot>
+                      <tr style={{ borderTop: `2px solid ${borderLight}` }}>
+                        <td colSpan={5} style={{ padding: '0.65rem 0.6rem', textAlign: 'right', fontWeight: 700, color: textMuted }}>Total pendiente:</td>
+                        <td colSpan={2} style={{ padding: '0.65rem 0.6rem', fontWeight: 800, color: '#059669' }}>${liquidacionData.totalPendienteUSD.toLocaleString('en-US')}</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {/* EN CAMINO A LA META — pipeline, no solo el disparador binario */}
+            <div style={{ background: bgCard, borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', border: `1px solid ${borderLight}`, padding: '1.5rem', marginBottom: '1.2rem' }}>
+              <h3 style={{ fontSize: '1rem', color: textDark, marginBottom: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <Target size={16} color="#3b82f6" /> En camino a la meta ({liquidacionData.enCamino.length})
+              </h3>
+              {liquidacionData.enCamino.length === 0 ? (
+                <p style={{ color: textMuted, fontSize: '0.9rem' }}>Ningún equipo está a 1 o 2 llamadas de activar el pago por ahora.</p>
+              ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '0.8rem' }}>
+                  {liquidacionData.enCamino.map(item => (
+                    <div key={item.equipoKey} style={{ border: `1px solid ${borderLight}`, borderRadius: '10px', padding: '0.9rem' }}>
+                      <div style={{ fontWeight: 700, fontSize: '0.88rem', color: textDark }}>{item.equipo} {item.numEquipo ? `(#${item.numEquipo})` : ''}</div>
+                      <div style={{ fontSize: '0.78rem', color: textMuted, margin: '0.2rem 0 0.6rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                        <CountryFlag sede={item.sede} /> {item.sede} · {item.entrenador}
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '0.3rem' }}>
+                        <span style={{ color: textMuted }}>{item.totalLlamadas} de 7 llamadas</span>
+                        <span style={{ fontWeight: 700, color: '#3b82f6' }}>Falta{item.faltan !== 1 ? 'n' : ''} {item.faltan}</span>
+                      </div>
+                      <div style={{ height: '6px', background: 'rgba(0,0,0,0.08)', borderRadius: '4px', overflow: 'hidden' }}>
+                        <div style={{ height: '100%', width: `${(item.totalLlamadas / 7) * 100}%`, background: '#3b82f6', borderRadius: '4px' }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* HISTORIAL DE PAGOS */}
+            <div style={{ background: bgCard, borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', border: `1px solid ${borderLight}`, padding: '1.5rem' }}>
+              <h3 style={{ fontSize: '1rem', color: textDark, marginBottom: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <CheckCircle size={16} color="#059669" /> Historial de pagos ({liquidacionData.pagados.length})
+              </h3>
+              {liquidacionData.pagados.length === 0 ? (
+                <p style={{ color: textMuted, fontSize: '0.9rem' }}>Todavía no se ha marcado ningún pago.</p>
+              ) : (
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                    <thead>
+                      <tr style={{ background: 'rgba(5,150,105,0.08)', textAlign: 'left' }}>
+                        <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Equipo</th>
+                        <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Sede</th>
+                        <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Entrenador</th>
+                        <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Monto</th>
+                        <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Pagado el</th>
+                        <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Pagado por</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {liquidacionData.pagados.map((item, idx) => (
+                        <tr key={item.equipoKey} style={{ borderBottom: `1px solid ${borderLight}`, background: idx % 2 === 1 ? 'rgba(0,0,0,0.015)' : 'transparent' }}>
+                          <td style={{ padding: '0.65rem 0.6rem', fontWeight: 600 }}>{item.equipo} {item.numEquipo ? `(#${item.numEquipo})` : ''}</td>
+                          <td style={{ padding: '0.65rem 0.6rem' }}><CountryFlag sede={item.sede} /> {item.sede}</td>
+                          <td style={{ padding: '0.65rem 0.6rem' }}>{item.entrenador}</td>
+                          <td style={{ padding: '0.65rem 0.6rem', fontWeight: 700, color: '#059669' }}>${item.montoUSD}</td>
+                          <td style={{ padding: '0.65rem 0.6rem' }}>{item.fechaPago || '—'}</td>
+                          <td style={{ padding: '0.65rem 0.6rem' }}>{item.pagadoPorNombre || item.pagadoPorEmail || '—'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <tfoot>
+                      <tr style={{ borderTop: `2px solid ${borderLight}` }}>
+                        <td colSpan={3} style={{ padding: '0.65rem 0.6rem', textAlign: 'right', fontWeight: 700, color: textMuted }}>Total pagado:</td>
+                        <td colSpan={3} style={{ padding: '0.65rem 0.6rem', fontWeight: 800, color: '#059669' }}>${liquidacionData.totalPagadoUSD.toLocaleString('en-US')}</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
