@@ -43,9 +43,12 @@ export const USERS_TO_IMPORT = [
     "name": "Kerlie Carrillo",
     "role": "coord_maestria",
     "roles": [
-      "coord_maestria"
+      "coord_maestria",
+      "entrenador_llamadas",
+      "entrenador"
     ],
     "sede": "Cuenca",
+    "telefono": "593 99 430 2353",
     "emails": [
       "kerly.carrillo@crearpsl.net"
     ],
