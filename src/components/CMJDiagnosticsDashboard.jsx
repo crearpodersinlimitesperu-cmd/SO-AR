@@ -60,8 +60,13 @@ export default function CMJDiagnosticsDashboard({ globalFilterSede }) {
         const snap = await getDocResilient(nodusRef);
         if (snap.exists()) {
           const nodusData = snap.data();
+          console.log("NODUS SNAPSHOT FETCHED in CMJ:", nodusData);
+          console.log("Equipos Reporte inside snap:", nodusData.equiposReporte);
           const enrichedEquipos = mergeNodusDataIntoEquipos(getAllEquipos(), nodusData);
+          console.log("ENRICHED EQUIPOS:", enrichedEquipos.find(e => e.equipoNum === 30));
           setRawEquipos(enrichedEquipos);
+        } else {
+          console.warn("Snapshot nodus_kpis_sincronizados/latest_snapshot doesn't exist");
         }
       } catch (err) {
         console.warn('No se pudo cargar snapshot de Nodus para CMJ Dashboard:', err);
