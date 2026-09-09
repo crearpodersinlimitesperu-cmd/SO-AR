@@ -1,6 +1,6 @@
 import { runMultiAgentSync } from './nodusMultiAgentSync.mjs';
 
-const ONE_HOUR_MS = 60 * 60 * 1000; // 1 hora
+const SYNC_INTERVAL_MS = 15 * 60 * 1000; // 15 minutos
 let isRunning = false;
 
 async function executeCycle() {
@@ -11,15 +11,15 @@ async function executeCycle() {
 
   isRunning = true;
   console.log(`\n======================================================`);
-  console.log(`⏰ [Watchdog Daemon] Iniciando ciclo horario de sincronización: ${new Date().toISOString()}`);
+  console.log(`⏰ [Watchdog Daemon] Iniciando ciclo de sincronización: ${new Date().toISOString()}`);
   console.log(`======================================================`);
 
   try {
     await runMultiAgentSync();
-    console.log(`✅ [Watchdog Daemon] Ciclo horario completado exitosamente a las: ${new Date().toLocaleTimeString()}`);
+    console.log(`✅ [Watchdog Daemon] Ciclo completado exitosamente a las: ${new Date().toLocaleTimeString()}`);
   } catch (error) {
-    console.error(`❌ [Watchdog Daemon] Error en ciclo horario: ${error.message}`);
-    console.log("🔄 [Watchdog Daemon] El demonio permanece vivo y reintentará en el próximo ciclo horario.");
+    console.error(`❌ [Watchdog Daemon] Error en ciclo: ${error.message}`);
+    console.log("🔄 [Watchdog Daemon] El demonio permanece vivo y reintentará en el próximo ciclo.");
   } finally {
     isRunning = false;
   }
@@ -34,11 +34,11 @@ process.on('unhandledRejection', (reason, promise) => {
   console.error("🚨 [Watchdog Daemon] Rechazo no manejado interceptado:", reason);
 });
 
-console.log("🛡️ [Watchdog Daemon] Demonio autónomo horario de Nodus iniciado.");
-console.log(`🕒 [Watchdog Daemon] Intervalo configurado: Cada 60 minutos (${ONE_HOUR_MS} ms).`);
+console.log("🛡️ [Watchdog Daemon] Demonio autónomo de Nodus iniciado.");
+console.log(`🕒 [Watchdog Daemon] Intervalo configurado: Cada 15 minutos (${SYNC_INTERVAL_MS} ms).`);
 
 // Ejecutar ciclo inicial inmediato
 executeCycle();
 
-// Configurar intervalo horario persistente
-setInterval(executeCycle, ONE_HOUR_MS);
+// Configurar intervalo persistente
+setInterval(executeCycle, SYNC_INTERVAL_MS);
