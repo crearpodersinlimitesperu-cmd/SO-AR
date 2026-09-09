@@ -14,7 +14,43 @@ import {
 import { useTheme } from '../context/ThemeContext';
 import ThemeSelector from './ThemeSelector';
 import nodusFallbackData from '../data/nodusFallbackData.json';
+import { OPERATIONAL_SEDES } from '../data/usersData';
 import './NodusCoordinadoresC1C2Dashboard.css';
+
+// Combinación robusta y resiliente con el catálogo multi-sede de nodusFallbackData
+// Garantiza que JAMÁS se pierdan las 6 sedes (Cuenca, Guayaquil, Lima, Medellín, México, Quito) ni los 22 coordinadores
+function mergeWithFallbackData(remoteData) {
+  if (!remoteData) return nodusFallbackData;
+  const fallbackCoords = Array.isArray(nodusFallbackData?.coordinadores) ? nodusFallbackData.coordinadores : [];
+  const remoteCoords = Array.isArray(remoteData?.coordinadores) ? remoteData.coordinadores : [];
+  
+  // Mapa indexado por nombre normalizado
+  const map = new Map();
+  fallbackCoords.forEach(c => {
+    if (c && c.nombre) map.set(c.nombre.toUpperCase().trim(), c);
+  });
+  remoteCoords.forEach(c => {
+    if (c && c.nombre) {
+      const key = c.nombre.toUpperCase().trim();
+      const existing = map.get(key) || {};
+      map.set(key, { ...existing, ...c });
+    }
+  });
+
+  const mergedCoords = Array.from(map.values());
+  
+  // Sedes combinadas
+  const fallbackSedes = nodusFallbackData?.sedes || {};
+  const remoteSedes = remoteData?.sedes || {};
+  const mergedSedes = { ...fallbackSedes, ...remoteSedes };
+
+  return {
+    ...nodusFallbackData,
+    ...remoteData,
+    coordinadores: mergedCoords,
+    sedes: mergedSedes
+  };
+}
 
 const COLORS = {
   confirmado: '#10b981', // Emerald
@@ -165,7 +201,8 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
       const docRef = doc(db, 'nodus_coordinadores_c1c2', 'latest');
       unsubscribe = onSnapshot(docRef, (docSnap) => {
         if (docSnap.exists()) {
-          setData(docSnap.data());
+          const merged = mergeWithFallbackData(docSnap.data());
+          setData(merged);
           setLoading(false);
           setError(null);
         } else {
@@ -174,13 +211,14 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
           getDoc(fallbackRef).then((fSnap) => {
             if (fSnap.exists()) {
               const fData = fSnap.data();
-              setData({
+              const merged = mergeWithFallbackData({
                 timestamp: fData.timestamp,
                 totales: fData.totales,
                 sedes: fData.sedes,
                 coordinadores: fData.coordinadores || [],
                 equiposReporte: fData.equiposReporte || []
               });
+              setData(merged);
             }
             setLoading(false);
           }).catch(err => {
@@ -209,7 +247,7 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
       const docRef = doc(db, 'nodus_coordinadores_c1c2', 'latest');
       const snap = await getDoc(docRef);
       if (snap.exists()) {
-        setData(snap.data());
+        setData(mergeWithFallbackData(snap.data()));
       }
     } catch (e) {
       console.error(e);
@@ -358,6 +396,10 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
     }
 
     const set = new Set(coords.map(c => c.sede).filter(Boolean));
+    // Garantizar que las 6 sedes operativas oficiales estén disponibles si no hay filtros individuales
+    if (selectedCoordinador === 'TODOS' && !searchTerm.trim() && selectedEquipo === 'TODOS') {
+      OPERATIONAL_SEDES.forEach(s => set.add(s));
+    }
     return Array.from(set).sort();
   }, [c1c2Coordinadores, selectedCoordinador, searchTerm, selectedEquipo, selectedEntrenamiento, selectedCiclo]);
 
@@ -921,7 +963,7 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
                 title="Filtrar por colaborador / coordinador individual"
               >
                 <option value="TODOS">
-                  {coordinadoresList.length === 1 ? `Coord: ${coordinadoresList[0].nombre}` : `Todos Coord (${coordinadoresList.length})`}
+                  {`Todos Coord (${coordinadoresList.length})`}
                 </option>
                 {coordinadoresList.map(c => (
                   <option key={c.id || c.nombre} value={c.nombre}>
@@ -949,7 +991,7 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
                 className="nodus-select"
               >
                 <option value="TODAS">
-                  {sedesList.length === 1 ? `Sede: ${sedesList[0]}` : `Todas las Sedes (${sedesList.length})`}
+                  {`Todas las Sedes (${sedesList.length})`}
                 </option>
                 {sedesList.map(s => (
                   <option key={s} value={s}>{s}</option>
@@ -966,7 +1008,7 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
                 style={{ maxWidth: '145px' }}
               >
                 <option value="TODOS">
-                  {equiposList.length === 1 ? `Equipo: ${equiposList[0]}` : `Todos Equipos (${equiposList.length})`}
+                  {`Todos Equipos (${equiposList.length})`}
                 </option>
                 {equiposList.map(eq => (
                   <option key={eq} value={eq}>{eq}</option>

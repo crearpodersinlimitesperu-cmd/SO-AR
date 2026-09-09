@@ -23,15 +23,18 @@ export default function AuditoriaKPIs({ defaultTab }) {
   const [resumenGeneral, setResumenGeneral] = useState(null);
   const [filterStatus, setFilterStatus] = useState('all'); // 'all' | 'pending' | 'reviewed'
     
-  // Default to 'Todas' for SuperAdmins, Direccion or Consolidado, otherwise user's home sede
-  const initialSede = (() => {
-    if (!currentUser) return 'Todas';
-    if (currentUser.isSuperAdmin || currentUser.appRole === 'direccion' || currentUser.appRole === 'consolidado') {
-      return 'Todas';
-    }
-    return currentUser.sede || 'Todas';
-  })();
-    
+  // Default to 'Todas' for SuperAdmins, Direccion, Consolidado or SuperUser, otherwise user's home sede
+  const isSuperUser = Boolean(
+    currentUser?.isSuperAdmin ||
+    currentUser?.appRole === 'direccion' ||
+    currentUser?.appRole === 'superadmin' ||
+    currentUser?.appRole === 'consolidado' ||
+    currentUser?.isConsolidatedView ||
+    currentUser?.email === 'jose.sanchez@crearpsl.net' ||
+    (currentUser?.emails && currentUser.emails.includes('jose.sanchez@crearpsl.net'))
+  );
+
+  const initialSede = isSuperUser ? 'Todas' : (currentUser?.sede || 'Todas');
   const [filterSede, setFilterSede] = useState(initialSede);
     
   const [startDate, setStartDate] = useState('');
@@ -628,7 +631,40 @@ export default function AuditoriaKPIs({ defaultTab }) {
             📊 Embudo C1 ➔ C2 ➔ MJ
           </button>
         </div>
-        <ThemeSelector />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+          {isSuperUser && (
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '0.5rem', 
+              background: 'var(--bg-card, rgba(15,23,42,0.6))', 
+              padding: '0.4rem 0.8rem', 
+              borderRadius: '8px', 
+              border: '1px solid var(--border-subtle, rgba(255,255,255,0.12))' 
+            }}>
+              <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--crear-gold, #f59e0b)' }}>📍 Sede Global:</span>
+              <select
+                value={filterSede}
+                onChange={(e) => setFilterSede(e.target.value)}
+                style={{ 
+                  background: 'transparent', 
+                  color: 'inherit', 
+                  border: 'none', 
+                  fontWeight: 600, 
+                  fontSize: '0.82rem', 
+                  cursor: 'pointer', 
+                  outline: 'none' 
+                }}
+              >
+                <option value="Todas" style={{ background: '#1e293b', color: '#fff' }}>Todas las Sedes</option>
+                {OPERATIONAL_SEDES.map(s => (
+                  <option key={s} value={s} style={{ background: '#1e293b', color: '#fff' }}>{s}</option>
+                ))}
+              </select>
+            </div>
+          )}
+          <ThemeSelector />
+        </div>
       </div>
 
         {/* Dashboards Integrados Tabs */}

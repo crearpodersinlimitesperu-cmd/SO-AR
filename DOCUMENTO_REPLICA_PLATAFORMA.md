@@ -174955,7 +174955,43 @@ import {
 import { useTheme } from '../context/ThemeContext';
 import ThemeSelector from './ThemeSelector';
 import nodusFallbackData from '../data/nodusFallbackData.json';
+import { OPERATIONAL_SEDES } from '../data/usersData';
 import './NodusCoordinadoresC1C2Dashboard.css';
+
+// Combinación robusta y resiliente con el catálogo multi-sede de nodusFallbackData
+// Garantiza que JAMÁS se pierdan las 6 sedes (Cuenca, Guayaquil, Lima, Medellín, México, Quito) ni los 22 coordinadores
+function mergeWithFallbackData(remoteData) {
+  if (!remoteData) return nodusFallbackData;
+  const fallbackCoords = Array.isArray(nodusFallbackData?.coordinadores) ? nodusFallbackData.coordinadores : [];
+  const remoteCoords = Array.isArray(remoteData?.coordinadores) ? remoteData.coordinadores : [];
+  
+  // Mapa indexado por nombre normalizado
+  const map = new Map();
+  fallbackCoords.forEach(c => {
+    if (c && c.nombre) map.set(c.nombre.toUpperCase().trim(), c);
+  });
+  remoteCoords.forEach(c => {
+    if (c && c.nombre) {
+      const key = c.nombre.toUpperCase().trim();
+      const existing = map.get(key) || {};
+      map.set(key, { ...existing, ...c });
+    }
+  });
+
+  const mergedCoords = Array.from(map.values());
+  
+  // Sedes combinadas
+  const fallbackSedes = nodusFallbackData?.sedes || {};
+  const remoteSedes = remoteData?.sedes || {};
+  const mergedSedes = { ...fallbackSedes, ...remoteSedes };
+
+  return {
+    ...nodusFallbackData,
+    ...remoteData,
+    coordinadores: mergedCoords,
+    sedes: mergedSedes
+  };
+}
 
 const COLORS = {
   confirmado: '#10b981', // Emerald
@@ -175106,7 +175142,8 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
       const docRef = doc(db, 'nodus_coordinadores_c1c2', 'latest');
       unsubscribe = onSnapshot(docRef, (docSnap) => {
         if (docSnap.exists()) {
-          setData(docSnap.data());
+          const merged = mergeWithFallbackData(docSnap.data());
+          setData(merged);
           setLoading(false);
           setError(null);
         } else {
@@ -175115,13 +175152,14 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
           getDoc(fallbackRef).then((fSnap) => {
             if (fSnap.exists()) {
               const fData = fSnap.data();
-              setData({
+              const merged = mergeWithFallbackData({
                 timestamp: fData.timestamp,
                 totales: fData.totales,
                 sedes: fData.sedes,
                 coordinadores: fData.coordinadores || [],
                 equiposReporte: fData.equiposReporte || []
               });
+              setData(merged);
             }
             setLoading(false);
           }).catch(err => {
@@ -175150,7 +175188,7 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
       const docRef = doc(db, 'nodus_coordinadores_c1c2', 'latest');
       const snap = await getDoc(docRef);
       if (snap.exists()) {
-        setData(snap.data());
+        setData(mergeWithFallbackData(snap.data()));
       }
     } catch (e) {
       console.error(e);
@@ -175299,6 +175337,10 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
     }
 
     const set = new Set(coords.map(c => c.sede).filter(Boolean));
+    // Garantizar que las 6 sedes operativas oficiales estén disponibles si no hay filtros individuales
+    if (selectedCoordinador === 'TODOS' && !searchTerm.trim() && selectedEquipo === 'TODOS') {
+      OPERATIONAL_SEDES.forEach(s => set.add(s));
+    }
     return Array.from(set).sort();
   }, [c1c2Coordinadores, selectedCoordinador, searchTerm, selectedEquipo, selectedEntrenamiento, selectedCiclo]);
 
@@ -175862,7 +175904,7 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
                 title="Filtrar por colaborador / coordinador individual"
               >
                 <option value="TODOS">
-                  {coordinadoresList.length === 1 ? `Coord: ${coordinadoresList[0].nombre}` : `Todos Coord (${coordinadoresList.length})`}
+                  {`Todos Coord (${coordinadoresList.length})`}
                 </option>
                 {coordinadoresList.map(c => (
                   <option key={c.id || c.nombre} value={c.nombre}>
@@ -175890,7 +175932,7 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
                 className="nodus-select"
               >
                 <option value="TODAS">
-                  {sedesList.length === 1 ? `Sede: ${sedesList[0]}` : `Todas las Sedes (${sedesList.length})`}
+                  {`Todas las Sedes (${sedesList.length})`}
                 </option>
                 {sedesList.map(s => (
                   <option key={s} value={s}>{s}</option>
@@ -175907,7 +175949,7 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
                 style={{ maxWidth: '145px' }}
               >
                 <option value="TODOS">
-                  {equiposList.length === 1 ? `Equipo: ${equiposList[0]}` : `Todos Equipos (${equiposList.length})`}
+                  {`Todos Equipos (${equiposList.length})`}
                 </option>
                 {equiposList.map(eq => (
                   <option key={eq} value={eq}>{eq}</option>
@@ -286092,15 +286134,18 @@ export default function AuditoriaKPIs({ defaultTab }) {
   const [resumenGeneral, setResumenGeneral] = useState(null);
   const [filterStatus, setFilterStatus] = useState('all'); // 'all' | 'pending' | 'reviewed'
     
-  // Default to 'Todas' for SuperAdmins, Direccion or Consolidado, otherwise user's home sede
-  const initialSede = (() => {
-    if (!currentUser) return 'Todas';
-    if (currentUser.isSuperAdmin || currentUser.appRole === 'direccion' || currentUser.appRole === 'consolidado') {
-      return 'Todas';
-    }
-    return currentUser.sede || 'Todas';
-  })();
-    
+  // Default to 'Todas' for SuperAdmins, Direccion, Consolidado or SuperUser, otherwise user's home sede
+  const isSuperUser = Boolean(
+    currentUser?.isSuperAdmin ||
+    currentUser?.appRole === 'direccion' ||
+    currentUser?.appRole === 'superadmin' ||
+    currentUser?.appRole === 'consolidado' ||
+    currentUser?.isConsolidatedView ||
+    currentUser?.email === 'jose.sanchez@crearpsl.net' ||
+    (currentUser?.emails && currentUser.emails.includes('jose.sanchez@crearpsl.net'))
+  );
+
+  const initialSede = isSuperUser ? 'Todas' : (currentUser?.sede || 'Todas');
   const [filterSede, setFilterSede] = useState(initialSede);
     
   const [startDate, setStartDate] = useState('');
@@ -286697,7 +286742,40 @@ export default function AuditoriaKPIs({ defaultTab }) {
             📊 Embudo C1 ➔ C2 ➔ MJ
           </button>
         </div>
-        <ThemeSelector />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+          {isSuperUser && (
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '0.5rem', 
+              background: 'var(--bg-card, rgba(15,23,42,0.6))', 
+              padding: '0.4rem 0.8rem', 
+              borderRadius: '8px', 
+              border: '1px solid var(--border-subtle, rgba(255,255,255,0.12))' 
+            }}>
+              <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--crear-gold, #f59e0b)' }}>📍 Sede Global:</span>
+              <select
+                value={filterSede}
+                onChange={(e) => setFilterSede(e.target.value)}
+                style={{ 
+                  background: 'transparent', 
+                  color: 'inherit', 
+                  border: 'none', 
+                  fontWeight: 600, 
+                  fontSize: '0.82rem', 
+                  cursor: 'pointer', 
+                  outline: 'none' 
+                }}
+              >
+                <option value="Todas" style={{ background: '#1e293b', color: '#fff' }}>Todas las Sedes</option>
+                {OPERATIONAL_SEDES.map(s => (
+                  <option key={s} value={s} style={{ background: '#1e293b', color: '#fff' }}>{s}</option>
+                ))}
+              </select>
+            </div>
+          )}
+          <ThemeSelector />
+        </div>
       </div>
 
         {/* Dashboards Integrados Tabs */}
