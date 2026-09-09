@@ -1,32 +1,32 @@
 {
   "robot_token": "NODUS_ROBOT_CPSL_2026_SECRET",
-  "timestamp": "2026-09-06T21:28:03.571Z",
+  "timestamp": "2026-09-09T04:19:06.113Z",
   "fuente": "Sistema Autónomo Multi-Agente Nodus CPSL 2026",
   "usuarioExtraccion": "jsanchez (Super Administrador Global)",
   "totales": {
     "totalCoordinadores": 3,
-    "totalGestiones": 5450,
-    "totalAsignados": 1897,
-    "totalConfirmados": 2631,
+    "totalGestiones": 5483,
+    "totalAsignados": 2030,
+    "totalConfirmados": 2658,
     "totalNoContesta": 1548,
-    "totalPorConfirmar": 448,
-    "totalSiguiente": 401,
+    "totalPorConfirmar": 453,
+    "totalSiguiente": 402,
     "totalNoInteresa": 417,
     "totalAsistieron": 848,
-    "coberturaPromedio": 138,
+    "coberturaPromedio": 134,
     "productividadPromedio": 19
   },
   "sedes": [
     {
       "sede": "Lima",
       "coordinadoresCount": 3,
-      "gestionesTotal": 5450,
-      "asignadosTotal": 1897,
-      "confirmadosTotal": 2631,
+      "gestionesTotal": 5483,
+      "asignadosTotal": 2030,
+      "confirmadosTotal": 2658,
       "noContestaTotal": 1548,
-      "porConfirmarTotal": 448,
+      "porConfirmarTotal": 453,
       "asistieronTotal": 848,
-      "c1Total": 4728,
+      "c1Total": 4761,
       "c2Total": 722
     }
   ],
@@ -39,28 +39,41 @@
       "sede": "Lima",
       "ciclo": "Ciclo 1",
       "rol": "Coordinador C1 / C2",
-      "gestiones": 2739,
-      "c1": 2347,
+      "gestiones": 2756,
+      "c1": 2364,
       "c2": 392,
-      "asignados": 921,
-      "coberturaPct": 98,
-      "coberturaDetalle": "899/921 (98%)",
+      "asignados": 987,
+      "coberturaPct": 93,
+      "coberturaDetalle": "915/987 (93%)",
       "productividadPct": 21,
-      "productividadDetalle": "569/2739 (21%)",
+      "productividadDetalle": "569/2756 (21%)",
       "asistieron": 416,
       "tasaEfectividad": 46,
-      "ultConexion": "06/09/2026 01:38",
-      "ultGestion": "02/09/2026 15:31",
+      "ultConexion": "08/09/2026 15:34",
+      "ultGestion": "08/09/2026 21:18",
       "estados": {
-        "confirmado": 1263,
+        "confirmado": 1274,
         "noContesta": 705,
-        "siguiente": 210,
+        "siguiente": 211,
         "noInteresa": 236,
-        "porConfirmar": 324,
+        "porConfirmar": 329,
         "yaAsistio": 0,
         "devolucion": 0
       },
       "equipos": [
+        {
+          "equipo": "EQUIPO 31",
+          "llamadas": 17,
+          "confirmado": 10,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 1,
+          "porConfirmar": 5,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
         {
           "equipo": "EQUIPO 30",
           "llamadas": 117,
@@ -292,20 +305,20 @@
       "sede": "Lima",
       "ciclo": "Ciclo 1",
       "rol": "Coordinador C1 / C2",
-      "gestiones": 2084,
-      "c1": 1781,
+      "gestiones": 2100,
+      "c1": 1797,
       "c2": 303,
-      "asignados": 880,
-      "coberturaPct": 95,
-      "coberturaDetalle": "836/880 (95%)",
-      "productividadPct": 23,
-      "productividadDetalle": "470/2084 (23%)",
+      "asignados": 947,
+      "coberturaPct": 90,
+      "coberturaDetalle": "851/947 (90%)",
+      "productividadPct": 22,
+      "productividadDetalle": "470/2100 (22%)",
       "asistieron": 350,
-      "tasaEfectividad": 53,
-      "ultConexion": "06/09/2026 09:17",
-      "ultGestion": "01/09/2026 11:13",
+      "tasaEfectividad": 54,
+      "ultConexion": "08/09/2026 21:11",
+      "ultGestion": "08/09/2026 20:12",
       "estados": {
-        "confirmado": 1108,
+        "confirmado": 1124,
         "noContesta": 618,
         "siguiente": 139,
         "noInteresa": 165,
@@ -314,6 +327,19 @@
         "devolucion": 0
       },
       "equipos": [
+        {
+          "equipo": "EQUIPO 31",
+          "llamadas": 16,
+          "confirmado": 15,
+          "noContesta": 0,
+          "noInteresa": 0,
+          "siguiente": 0,
+          "porConfirmar": 0,
+          "devolucion": 0,
+          "yaAsistio": 0,
+          "cambioCupo": 0,
+          "asistieron": 0
+        },
         {
           "equipo": "EQUIPO 30",
           "llamadas": 132,
@@ -503,7 +529,7 @@
       "productividadDetalle": "89/627 (14%)",
       "asistieron": 82,
       "tasaEfectividad": 41,
-      "ultConexion": "05/09/2026 20:24",
+      "ultConexion": "08/09/2026 10:05",
       "ultGestion": "15/04/2026 12:48",
       "estados": {
         "confirmado": 260,
@@ -767,7 +793,7 @@
           "telefonoImo": "+51960273156",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "TFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,595.00) (C2 + MJ)"
@@ -842,7 +868,7 @@
           "telefonoImo": "+51934073078",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "TFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,250.00) (C2 + MJ)"
@@ -872,7 +898,7 @@
           "telefonoImo": "+51996299500",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "TFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -887,7 +913,7 @@
           "telefonoImo": "+51919563284",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "TFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,355.00) (C2 + MJ)"
@@ -962,7 +988,7 @@
           "telefonoImo": "+51970525691",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "TFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -977,7 +1003,7 @@
           "telefonoImo": "+51922926088",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "TFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -1007,7 +1033,7 @@
           "telefonoImo": "+51950088740",
           "llamada1": "—",
           "llamada2": "—",
-          "finDeSemana": "TFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -1022,7 +1048,7 @@
           "telefonoImo": "+51934960620",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "TFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -1037,7 +1063,7 @@
           "telefonoImo": "+51930526967",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "TFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,035.00) (C2 + MJ)"
@@ -1142,7 +1168,7 @@
           "telefonoImo": "+51960273156",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "TFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,595.00) (C2 + MJ)"
@@ -1217,7 +1243,7 @@
           "telefonoImo": "+51934073078",
           "llamada1": "Por Confirmar",
           "llamada2": "Siguiente",
-          "finDeSemana": "TFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,250.00) (C2 + MJ)"
@@ -1247,7 +1273,7 @@
           "telefonoImo": "+51996299500",
           "llamada1": "—",
           "llamada2": "—",
-          "finDeSemana": "TFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -1262,7 +1288,7 @@
           "telefonoImo": "+51919563284",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "TFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,355.00) (C2 + MJ)"
@@ -1337,7 +1363,7 @@
           "telefonoImo": "+51970525691",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "TFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -1352,7 +1378,7 @@
           "telefonoImo": "+51922926088",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "TFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -1382,7 +1408,7 @@
           "telefonoImo": "+51950088740",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "TFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -1397,7 +1423,7 @@
           "telefonoImo": "+51934960620",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "TFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -1412,7 +1438,7 @@
           "telefonoImo": "+51930526967",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "TFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,035.00) (C2 + MJ)"
@@ -1449,7 +1475,7 @@
           "telefonoImo": "+51999699649",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "SFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,035.00) (C2 + MJ)"
@@ -1464,7 +1490,7 @@
           "telefonoImo": "+51934073078",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "SFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -1479,7 +1505,7 @@
           "telefonoImo": "+51900490075",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "SFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,970.00) (C2 + MJ)"
@@ -1494,7 +1520,7 @@
           "telefonoImo": "+51952087914",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "SFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,595.00) (C2 + MJ)"
@@ -1554,7 +1580,7 @@
           "telefonoImo": "+51997343209",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "SFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -1569,7 +1595,7 @@
           "telefonoImo": "+51934073078",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "SFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -1584,7 +1610,7 @@
           "telefonoImo": "+51900490075",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "SFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -1599,7 +1625,7 @@
           "telefonoImo": "—",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "SFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -1614,7 +1640,7 @@
           "telefonoImo": "—",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "SFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
@@ -1629,7 +1655,7 @@
           "telefonoImo": "—",
           "llamada1": "No le Interesa",
           "llamada2": "No Contesta",
-          "finDeSemana": "SFD",
+          "finDeSemana": "—",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 4,035.00) (C2 + MJ)"
@@ -1689,7 +1715,7 @@
           "telefonoImo": "+51993709784",
           "llamada1": "Confirmado",
           "llamada2": "No Contesta",
-          "finDeSemana": "SFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -1734,7 +1760,7 @@
           "telefonoImo": "+51927101572",
           "llamada1": "Confirmado",
           "llamada2": "No le Interesa",
-          "finDeSemana": "SFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,595.00) (C2 + MJ)"
@@ -1749,7 +1775,7 @@
           "telefonoImo": "+51916030745",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "SFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -1779,7 +1805,7 @@
           "telefonoImo": "+51917980843",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "SFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -1794,7 +1820,7 @@
           "telefonoImo": "+51920472661",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "SFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -1824,7 +1850,7 @@
           "telefonoImo": "+51999699649",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "SFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,035.00) (C2 + MJ)"
@@ -1839,7 +1865,7 @@
           "telefonoImo": "+51934073078",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "SFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -1854,7 +1880,7 @@
           "telefonoImo": "+51900490075",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "SFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,970.00) (C2 + MJ)"
@@ -1869,7 +1895,7 @@
           "telefonoImo": "+51952087914",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "SFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,595.00) (C2 + MJ)"
@@ -1929,7 +1955,7 @@
           "telefonoImo": "+51997343209",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "SFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -1944,7 +1970,7 @@
           "telefonoImo": "+51934073078",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "SFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -1959,7 +1985,7 @@
           "telefonoImo": "+51900490075",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "SFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -1974,7 +2000,7 @@
           "telefonoImo": "—",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "SFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -1989,7 +2015,7 @@
           "telefonoImo": "—",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "SFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
@@ -2004,7 +2030,7 @@
           "telefonoImo": "—",
           "llamada1": "Por Confirmar",
           "llamada2": "Siguiente",
-          "finDeSemana": "SFD",
+          "finDeSemana": "—",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 4,035.00) (C2 + MJ)"
@@ -2064,7 +2090,7 @@
           "telefonoImo": "+51993709784",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "SFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -2109,7 +2135,7 @@
           "telefonoImo": "+51927101572",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "SFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,595.00) (C2 + MJ)"
@@ -2124,7 +2150,7 @@
           "telefonoImo": "+51916030745",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "SFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -2154,7 +2180,7 @@
           "telefonoImo": "+51917980843",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "SFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -2169,7 +2195,7 @@
           "telefonoImo": "+51920472661",
           "llamada1": "—",
           "llamada2": "Confirmado",
-          "finDeSemana": "SFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -2191,7 +2217,7 @@
           "telefonoImo": "+51959356266",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -2206,7 +2232,7 @@
           "telefonoImo": "+51944760103",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -2221,7 +2247,7 @@
           "telefonoImo": "+51944760103",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -2236,7 +2262,7 @@
           "telefonoImo": "+51948162114",
           "llamada1": "—",
           "llamada2": "—",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 4,250.00) (C2 + MJ)"
@@ -2251,7 +2277,7 @@
           "telefonoImo": "+51993709784",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -2266,7 +2292,7 @@
           "telefonoImo": "+51976090987",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -2281,7 +2307,7 @@
           "telefonoImo": "+51999940038",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -2296,7 +2322,7 @@
           "telefonoImo": "+51930326809",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -2326,7 +2352,7 @@
           "telefonoImo": "+51968367858",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -2356,7 +2382,7 @@
           "telefonoImo": "+51920738765",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,470.00) (C2 + MJ)"
@@ -2371,7 +2397,7 @@
           "telefonoImo": "+51952352271",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -2386,7 +2412,7 @@
           "telefonoImo": "+51920408573",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -2416,7 +2442,7 @@
           "telefonoImo": "+51980496819",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -2431,7 +2457,7 @@
           "telefonoImo": "+51916030745",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -2446,7 +2472,7 @@
           "telefonoImo": "+51930526967",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
@@ -2461,7 +2487,7 @@
           "telefonoImo": "+51976232368",
           "llamada1": "—",
           "llamada2": "—",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -2491,7 +2517,7 @@
           "telefonoImo": "+51989442068",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -2506,7 +2532,7 @@
           "telefonoImo": "—",
           "llamada1": "No le Interesa",
           "llamada2": "—",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -2521,7 +2547,7 @@
           "telefonoImo": "+51921979246",
           "llamada1": "—",
           "llamada2": "—",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
@@ -2536,7 +2562,7 @@
           "telefonoImo": "—",
           "llamada1": "—",
           "llamada2": "—",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 4,250.00) (C2 + MJ)"
@@ -2551,7 +2577,7 @@
           "telefonoImo": "—",
           "llamada1": "—",
           "llamada2": "—",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -2566,7 +2592,7 @@
           "telefonoImo": "+51959356266",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -2581,7 +2607,7 @@
           "telefonoImo": "+51944760103",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -2596,7 +2622,7 @@
           "telefonoImo": "+51944760103",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -2611,7 +2637,7 @@
           "telefonoImo": "+51948162114",
           "llamada1": "—",
           "llamada2": "—",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 4,250.00) (C2 + MJ)"
@@ -2626,7 +2652,7 @@
           "telefonoImo": "+51993709784",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -2641,7 +2667,7 @@
           "telefonoImo": "+51976090987",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -2656,7 +2682,7 @@
           "telefonoImo": "+51999940038",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -2671,7 +2697,7 @@
           "telefonoImo": "+51930326809",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -2701,7 +2727,7 @@
           "telefonoImo": "+51968367858",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -2731,7 +2757,7 @@
           "telefonoImo": "+51920738765",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,470.00) (C2 + MJ)"
@@ -2746,7 +2772,7 @@
           "telefonoImo": "+51952352271",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -2761,7 +2787,7 @@
           "telefonoImo": "+51920408573",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -2791,7 +2817,7 @@
           "telefonoImo": "+51980496819",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -2806,7 +2832,7 @@
           "telefonoImo": "+51916030745",
           "llamada1": "Confirmado",
           "llamada2": "—",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -2821,7 +2847,7 @@
           "telefonoImo": "+51930526967",
           "llamada1": "Por Confirmar",
           "llamada2": "Siguiente",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
@@ -2836,7 +2862,7 @@
           "telefonoImo": "+51976232368",
           "llamada1": "Confirmado",
           "llamada2": "Confirmado",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -2866,7 +2892,7 @@
           "telefonoImo": "+51989442068",
           "llamada1": "Siguiente",
           "llamada2": "Siguiente",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -2881,7 +2907,7 @@
           "telefonoImo": "—",
           "llamada1": "—",
           "llamada2": "—",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "Asistió",
           "desertor": "—",
           "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -2896,7 +2922,7 @@
           "telefonoImo": "+51921979246",
           "llamada1": "—",
           "llamada2": "—",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
@@ -2911,7 +2937,7 @@
           "telefonoImo": "—",
           "llamada1": "—",
           "llamada2": "—",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 4,250.00) (C2 + MJ)"
@@ -2926,7 +2952,7 @@
           "telefonoImo": "—",
           "llamada1": "—",
           "llamada2": "—",
-          "finDeSemana": "PFD",
+          "finDeSemana": "—",
           "asistencia": "—",
           "desertor": "—",
           "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -2938,9 +2964,22 @@
     "actividadCoordinadores": {
       "kpis": [
         {
-          "header": "JOYCE LIMA CICLO 1\nÚlt. conexión: 06/09/2026 01:38",
-          "fullText": "JOYCE LIMA CICLO 1\nÚlt. conexión: 06/09/2026 01:38\n2739\nGestiones\n2347\nC1\n392\nC2\n921\nAsignados\nCobertura (participantes con al menos 1 gestión)\n899/921 (98%)\nProductividad (llamadas que terminaron en asistencia real)\n569/2739 (21%)\nÚlt. gestión: 02/09/2026 15:31\nPor Confirmar: 324\nNo Contesta: 705\nConfirmado: 1263\nSiguiente: 210\nNo le Interesa: 236\nYa Asistiá: 1\nCapítulo 1 — detalle por equipo (personas únicas según su última gestión):\nEQUIPO\tLLAMADAS\tCONFIRMADO\tNO CONTESTA\tNO LE INTERESA\tSIGUIENTE\tPOR CONFIRMAR\tDEVOLUCIÓN\tYA ASISTIÁ\tCAMBIO CUPO\tASISTIERON\nEQUIPO 30\t117\t53\t11\t1\t4\t4\t\t\t\t43\nEQUIPO 27\t273\t72\t9\t14\t3\t5\t\t\t\t46\nEQUIPO 28\t121\t53\t4\t3\t1\t5\t\t\t\t49\nEQUIPO 29\t214\t77\t10\t1\t7\t6\t\t\t\t53\nEQUIPO 17\t3\t1\t\t\t\t\t\t\t\t\nEQUIPO 26\t312\t62\t9\t21\t1\t2\t\t\t\t52\nEQUIPO 117\t2\t1\t\t\t\t\t\t\t\t\nEQUIPO 25\t301\t40\t2\t27\t1\t\t\t\t\t32\nEQUIPO 24\t508\t85\t1\t48\t1\t\t\t\t\t85\nEQUIPO 112\t1\t1\t\t\t\t\t\t\t\t1\nEQUIPO 23\t303\t40\t3\t35\t2\t\t\t\t\t44\nEQUIPO 22\t79\t\t3\t14\t\t1\t\t\t\t4\nEQUIPO 21\t32\t\t1\t9\t\t\t\t\t\t1\nEQUIPO 20\t28\t\t1\t10\t\t\t\t\t\t1\nEQUIPO 19\t32\t\t1\t16\t\t1\t\t\t\t2\nEQUIPO 18\t9\t\t1\t3\t\t\t\t\t\t2\nEQUIPO 17\t12\t\t\t5\t\t\t\t\t\t1\nCapítulo 2 — detalle por equipo (personas únicas según su última gestión):\nEQUIPO\tLLAMADAS\tCONFIRMADO\tNO CONTESTA\tNO LE INTERESA\tSIGUIENTE\tPOR CONFIRMAR\tDEVOLUCIÓN\tYA ASISTIÁ\tCAMBIO CUPO\tASISTIERON\nEQUIPO 30\t41\t17\t1\t\t3\t\t\t\t\t16\nEQUIPO 27\t63\t22\t\t2\t2\t\t\t\t\t26\nEQUIPO 28\t61\t24\t\t4\t1\t\t\t\t\t29\nEQUIPO 29\t68\t23\t\t\t5\t1\t\t\t\t24\nEQUIPO 26\t48\t12\t\t5\t1\t1\t\t\t\t18\nEQUIPO 25\t65\t22\t1\t\t1\t1\t\t\t\t23\nEQUIPO 24\t16\t\t3\t1\t\t\t\t\t\t4\nEQUIPO 23\t9\t\t\t2\t\t\t\t\t\t2\nEQUIPO 22\t12\t1\t2\t2\t1\t\t\t\t\t6\nEQUIPO 21\t5\t\t1\t2\t\t\t\t\t\t3\nEQUIPO 20\t2\t\t\t1\t\t\t\t\t\t1\nEQUIPO 19\t2\t\t\t1\t\t\t\t\t\t1",
+          "header": "JOYCE LIMA CICLO 1\nÚlt. conexión: 08/09/2026 15:34",
+          "fullText": "JOYCE LIMA CICLO 1\nÚlt. conexión: 08/09/2026 15:34\n2756\nGestiones\n2364\nC1\n392\nC2\n987\nAsignados\nCobertura (participantes con al menos 1 gestión)\n915/987 (93%)\nProductividad (llamadas que terminaron en asistencia real)\n569/2756 (21%)\nÚlt. gestión: 08/09/2026 21:18\nPor Confirmar: 329\nNo Contesta: 705\nConfirmado: 1274\nSiguiente: 211\nNo le Interesa: 236\nYa Asistiá: 1\nCapítulo 1 — detalle por equipo (personas únicas según su última gestión):\nEQUIPO\tLLAMADAS\tCONFIRMADO\tNO CONTESTA\tNO LE INTERESA\tSIGUIENTE\tPOR CONFIRMAR\tDEVOLUCIÓN\tYA ASISTIÁ\tCAMBIO CUPO\tASISTIERON\nEQUIPO 31\t17\t10\t\t\t1\t5\t\t\t\t\nEQUIPO 30\t117\t53\t11\t1\t4\t4\t\t\t\t43\nEQUIPO 27\t273\t72\t9\t14\t3\t5\t\t\t\t46\nEQUIPO 28\t121\t53\t4\t3\t1\t5\t\t\t\t49\nEQUIPO 29\t214\t77\t10\t1\t7\t6\t\t\t\t53\nEQUIPO 17\t3\t1\t\t\t\t\t\t\t\t\nEQUIPO 26\t312\t62\t9\t21\t1\t2\t\t\t\t52\nEQUIPO 117\t2\t1\t\t\t\t\t\t\t\t\nEQUIPO 25\t301\t40\t2\t27\t1\t\t\t\t\t32\nEQUIPO 24\t508\t85\t1\t48\t1\t\t\t\t\t85\nEQUIPO 112\t1\t1\t\t\t\t\t\t\t\t1\nEQUIPO 23\t303\t40\t3\t35\t2\t\t\t\t\t44\nEQUIPO 22\t79\t\t3\t14\t\t1\t\t\t\t4\nEQUIPO 21\t32\t\t1\t9\t\t\t\t\t\t1\nEQUIPO 20\t28\t\t1\t10\t\t\t\t\t\t1\nEQUIPO 19\t32\t\t1\t16\t\t1\t\t\t\t2\nEQUIPO 18\t9\t\t1\t3\t\t\t\t\t\t2\nEQUIPO 17\t12\t\t\t5\t\t\t\t\t\t1\nCapítulo 2 — detalle por equipo (personas únicas según su última gestión):\nEQUIPO\tLLAMADAS\tCONFIRMADO\tNO CONTESTA\tNO LE INTERESA\tSIGUIENTE\tPOR CONFIRMAR\tDEVOLUCIÓN\tYA ASISTIÁ\tCAMBIO CUPO\tASISTIERON\nEQUIPO 30\t41\t17\t1\t\t3\t\t\t\t\t16\nEQUIPO 27\t63\t22\t\t2\t2\t\t\t\t\t26\nEQUIPO 28\t61\t24\t\t4\t1\t\t\t\t\t29\nEQUIPO 29\t68\t23\t\t\t5\t1\t\t\t\t24\nEQUIPO 26\t48\t12\t\t5\t1\t1\t\t\t\t18\nEQUIPO 25\t65\t22\t1\t\t1\t1\t\t\t\t23\nEQUIPO 24\t16\t\t3\t1\t\t\t\t\t\t4\nEQUIPO 23\t9\t\t\t2\t\t\t\t\t\t2\nEQUIPO 22\t12\t1\t2\t2\t1\t\t\t\t\t6\nEQUIPO 21\t5\t\t1\t2\t\t\t\t\t\t3\nEQUIPO 20\t2\t\t\t1\t\t\t\t\t\t1\nEQUIPO 19\t2\t\t\t1\t\t\t\t\t\t1",
           "equipos": [
+            {
+              "equipo": "EQUIPO 31",
+              "llamadas": 17,
+              "confirmado": 10,
+              "noContesta": 0,
+              "noInteresa": 0,
+              "siguiente": 1,
+              "porConfirmar": 5,
+              "devolucion": 0,
+              "yaAsistio": 0,
+              "cambioCupo": 0,
+              "asistieron": 0
+            },
             {
               "equipo": "EQUIPO 30",
               "llamadas": 117,
@@ -3165,9 +3204,22 @@
           ]
         },
         {
-          "header": "DIANA LIMA CICLO 1\nÚlt. conexión: 06/09/2026 09:17",
-          "fullText": "DIANA LIMA CICLO 1\nÚlt. conexión: 06/09/2026 09:17\n2084\nGestiones\n1781\nC1\n303\nC2\n880\nAsignados\nCobertura (participantes con al menos 1 gestión)\n836/880 (95%)\nProductividad (llamadas que terminaron en asistencia real)\n470/2084 (23%)\nÚlt. gestión: 01/09/2026 11:13\nNo Contesta: 618\nConfirmado: 1108\nPor Confirmar: 53\nNo le Interesa: 165\nSiguiente: 139\nYa Asistiá: 1\nCapítulo 1 — detalle por equipo (personas únicas según su última gestión):\nEQUIPO\tLLAMADAS\tCONFIRMADO\tNO CONTESTA\tNO LE INTERESA\tSIGUIENTE\tPOR CONFIRMAR\tDEVOLUCIÓN\tYA ASISTIÁ\tCAMBIO CUPO\tASISTIERON\nEQUIPO 30\t132\t52\t10\t1\t9\t3\t\t\t\t39\nEQUIPO 28\t172\t38\t33\t3\t1\t\t\t\t\t42\nEQUIPO 27\t214\t74\t23\t4\t3\t\t\t\t\t66\nEQUIPO 29\t229\t73\t14\t4\t6\t\t\t\t\t52\nEQUIPO 26\t329\t62\t51\t4\t\t\t\t\t\t50\nEQUIPO 25\t297\t28\t2\t80\t1\t\t\t\t\t27\nEQUIPO 24\t40\t1\t\t17\t\t\t\t\t\t1\nEQUIPO 23\t42\t2\t\t9\t\t\t\t\t\t2\nEQUIPO 22\t148\t45\t\t5\t\t\t\t\t\t35\nEQUIPO 21\t151\t40\t2\t1\t1\t\t\t\t\t36\nEQUIPO 20\t23\t\t\t2\t\t\t\t\t\t\nEQUIPO 19\t2\t\t\t\t\t\t\t\t\t\nEQUIPO 18\t2\t\t\t\t\t\t\t\t\t\nCapítulo 2 — detalle por equipo (personas únicas según su última gestión):\nEQUIPO\tLLAMADAS\tCONFIRMADO\tNO CONTESTA\tNO LE INTERESA\tSIGUIENTE\tPOR CONFIRMAR\tDEVOLUCIÓN\tYA ASISTIÁ\tCAMBIO CUPO\tASISTIERON\nEQUIPO 30\t54\t14\t\t\t4\t\t\t\t\t14\nEQUIPO 28\t52\t20\t\t1\t2\t\t\t\t\t22\nEQUIPO 27\t68\t24\t\t4\t\t\t\t\t\t27\nEQUIPO 29\t43\t17\t\t\t4\t1\t\t\t\t20\nEQUIPO 26\t38\t8\t1\t7\t1\t\t\t\t\t15\nEQUIPO 25\t45\t12\t\t7\t\t\t\t\t\t19\nEQUIPO 24\t2\t\t\t2\t\t\t\t\t\t2\nEQUIPO 23\t1\t\t\t1\t\t\t\t\t\t1",
+          "header": "DIANA LIMA CICLO 1\nÚlt. conexión: 08/09/2026 21:11",
+          "fullText": "DIANA LIMA CICLO 1\nÚlt. conexión: 08/09/2026 21:11\n2100\nGestiones\n1797\nC1\n303\nC2\n947\nAsignados\nCobertura (participantes con al menos 1 gestión)\n851/947 (90%)\nProductividad (llamadas que terminaron en asistencia real)\n470/2100 (22%)\nÚlt. gestión: 08/09/2026 20:12\nNo Contesta: 618\nConfirmado: 1124\nPor Confirmar: 53\nNo le Interesa: 165\nSiguiente: 139\nYa Asistiá: 1\nCapítulo 1 — detalle por equipo (personas únicas según su última gestión):\nEQUIPO\tLLAMADAS\tCONFIRMADO\tNO CONTESTA\tNO LE INTERESA\tSIGUIENTE\tPOR CONFIRMAR\tDEVOLUCIÓN\tYA ASISTIÁ\tCAMBIO CUPO\tASISTIERON\nEQUIPO 31\t16\t15\t\t\t\t\t\t\t\t\nEQUIPO 30\t132\t52\t10\t1\t9\t3\t\t\t\t39\nEQUIPO 28\t172\t38\t33\t3\t1\t\t\t\t\t42\nEQUIPO 27\t214\t74\t23\t4\t3\t\t\t\t\t66\nEQUIPO 29\t229\t73\t14\t4\t6\t\t\t\t\t52\nEQUIPO 26\t329\t62\t51\t4\t\t\t\t\t\t50\nEQUIPO 25\t297\t28\t2\t80\t1\t\t\t\t\t27\nEQUIPO 24\t40\t1\t\t17\t\t\t\t\t\t1\nEQUIPO 23\t42\t2\t\t9\t\t\t\t\t\t2\nEQUIPO 22\t148\t45\t\t5\t\t\t\t\t\t35\nEQUIPO 21\t151\t40\t2\t1\t1\t\t\t\t\t36\nEQUIPO 20\t23\t\t\t2\t\t\t\t\t\t\nEQUIPO 19\t2\t\t\t\t\t\t\t\t\t\nEQUIPO 18\t2\t\t\t\t\t\t\t\t\t\nCapítulo 2 — detalle por equipo (personas únicas según su última gestión):\nEQUIPO\tLLAMADAS\tCONFIRMADO\tNO CONTESTA\tNO LE INTERESA\tSIGUIENTE\tPOR CONFIRMAR\tDEVOLUCIÓN\tYA ASISTIÁ\tCAMBIO CUPO\tASISTIERON\nEQUIPO 30\t54\t14\t\t\t4\t\t\t\t\t14\nEQUIPO 28\t52\t20\t\t1\t2\t\t\t\t\t22\nEQUIPO 27\t68\t24\t\t4\t\t\t\t\t\t27\nEQUIPO 29\t43\t17\t\t\t4\t1\t\t\t\t20\nEQUIPO 26\t38\t8\t1\t7\t1\t\t\t\t\t15\nEQUIPO 25\t45\t12\t\t7\t\t\t\t\t\t19\nEQUIPO 24\t2\t\t\t2\t\t\t\t\t\t2\nEQUIPO 23\t1\t\t\t1\t\t\t\t\t\t1",
           "equipos": [
+            {
+              "equipo": "EQUIPO 31",
+              "llamadas": 16,
+              "confirmado": 15,
+              "noContesta": 0,
+              "noInteresa": 0,
+              "siguiente": 0,
+              "porConfirmar": 0,
+              "devolucion": 0,
+              "yaAsistio": 0,
+              "cambioCupo": 0,
+              "asistieron": 0
+            },
             {
               "equipo": "EQUIPO 30",
               "llamadas": 132,
@@ -3340,8 +3392,8 @@
           ]
         },
         {
-          "header": "LEYLA LIMA CICLO 1\nÚlt. conexión: 05/09/2026 20:24",
-          "fullText": "LEYLA LIMA CICLO 1\nÚlt. conexión: 05/09/2026 20:24\n627\nGestiones\n600\nC1\n27\nC2\n96\nAsignados\nCobertura (participantes con al menos 1 gestión)\n211/96 (220%)\nProductividad (llamadas que terminaron en asistencia real)\n89/627 (14%)\nÚlt. gestión: 15/04/2026 12:48\nNo Contesta: 225\nPor Confirmar: 71\nConfirmado: 260\nSiguiente: 52\nDevolución: 3\nNo le Interesa: 16\nCapítulo 1 — detalle por equipo (personas únicas según su última gestión):\nEQUIPO\tLLAMADAS\tCONFIRMADO\tNO CONTESTA\tNO LE INTERESA\tSIGUIENTE\tPOR CONFIRMAR\tDEVOLUCIÓN\tYA ASISTIÁ\tCAMBIO CUPO\tASISTIERON\nEQUIPO 27\t40\t1\t\t\t1\t\t\t\t\t1\nEQUIPO 28\t2\t1\t\t\t\t\t\t\t\t1\nEQUIPO 118\t3\t\t\t\t\t1\t\t\t\t1\nEQUIPO 26\t238\t39\t1\t3\t1\t\t\t\t\t30\nEQUIPO 14\t2\t1\t\t\t\t\t\t\t\t1\nEQUIPO 25\t205\t34\t\t6\t\t\t\t\t\t28\nEQUIPO 24\t33\t1\t\t5\t\t\t\t\t\t1\nEQUIPO 23\t2\t\t\t1\t\t\t\t\t\t\nEQUIPO 22\t7\t1\t\t\t1\t\t\t\t\t2\nEQUIPO 21\t8\t1\t\t\t2\t\t\t\t\t3\nEQUIPO 20\t60\t15\t4\t\t5\t\t\t\t\t14\nCapítulo 2 — detalle por equipo (personas únicas según su última gestión):\nEQUIPO\tLLAMADAS\tCONFIRMADO\tNO CONTESTA\tNO LE INTERESA\tSIGUIENTE\tPOR CONFIRMAR\tDEVOLUCIÓN\tYA ASISTIÁ\tCAMBIO CUPO\tASISTIERON\nEQUIPO 27\t4\t\t\t\t\t\t\t\t\t\nEQUIPO 26\t23\t7\t\t1\t\t1\t\t\t\t7",
+          "header": "LEYLA LIMA CICLO 1\nÚlt. conexión: 08/09/2026 10:05",
+          "fullText": "LEYLA LIMA CICLO 1\nÚlt. conexión: 08/09/2026 10:05\n627\nGestiones\n600\nC1\n27\nC2\n96\nAsignados\nCobertura (participantes con al menos 1 gestión)\n211/96 (220%)\nProductividad (llamadas que terminaron en asistencia real)\n89/627 (14%)\nÚlt. gestión: 15/04/2026 12:48\nNo Contesta: 225\nPor Confirmar: 71\nConfirmado: 260\nSiguiente: 52\nDevolución: 3\nNo le Interesa: 16\nCapítulo 1 — detalle por equipo (personas únicas según su última gestión):\nEQUIPO\tLLAMADAS\tCONFIRMADO\tNO CONTESTA\tNO LE INTERESA\tSIGUIENTE\tPOR CONFIRMAR\tDEVOLUCIÓN\tYA ASISTIÁ\tCAMBIO CUPO\tASISTIERON\nEQUIPO 27\t40\t1\t\t\t1\t\t\t\t\t1\nEQUIPO 28\t2\t1\t\t\t\t\t\t\t\t1\nEQUIPO 118\t3\t\t\t\t\t1\t\t\t\t1\nEQUIPO 26\t238\t39\t1\t3\t1\t\t\t\t\t30\nEQUIPO 14\t2\t1\t\t\t\t\t\t\t\t1\nEQUIPO 25\t205\t34\t\t6\t\t\t\t\t\t28\nEQUIPO 24\t33\t1\t\t5\t\t\t\t\t\t1\nEQUIPO 23\t2\t\t\t1\t\t\t\t\t\t\nEQUIPO 22\t7\t1\t\t\t1\t\t\t\t\t2\nEQUIPO 21\t8\t1\t\t\t2\t\t\t\t\t3\nEQUIPO 20\t60\t15\t4\t\t5\t\t\t\t\t14\nCapítulo 2 — detalle por equipo (personas únicas según su última gestión):\nEQUIPO\tLLAMADAS\tCONFIRMADO\tNO CONTESTA\tNO LE INTERESA\tSIGUIENTE\tPOR CONFIRMAR\tDEVOLUCIÓN\tYA ASISTIÁ\tCAMBIO CUPO\tASISTIERON\nEQUIPO 27\t4\t\t\t\t\t\t\t\t\t\nEQUIPO 26\t23\t7\t\t1\t\t1\t\t\t\t7",
           "equipos": [
             {
               "equipo": "EQUIPO 27",
@@ -3489,14 +3541,14 @@
           ]
         },
         {
-          "header": "LINID LIMA CICLO 1\nÚlt. conexión: 06/09/2026 11:29",
-          "fullText": "LINID LIMA CICLO 1\nÚlt. conexión: 06/09/2026 11:29\n0\nGestiones\n0\nC1\n0\nC2\n75\nAsignados\nCobertura (participantes con al menos 1 gestión)\n0/75 (0%)\nÚlt. gestión: —\nSin gestiones registradas en este filtro.",
+          "header": "LINID LIMA CICLO 1\nÚlt. conexión: 08/09/2026 09:58",
+          "fullText": "LINID LIMA CICLO 1\nÚlt. conexión: 08/09/2026 09:58\n0\nGestiones\n0\nC1\n0\nC2\n75\nAsignados\nCobertura (participantes con al menos 1 gestión)\n0/75 (0%)\nÚlt. gestión: —\nSin gestiones registradas en este filtro.",
           "equipos": []
         }
       ]
     },
     "dashboardPrincipal": {
-      "textSnippet": "NODUS\nv1.0.0\nSISTEMA\nDashboard\nUsuarios\nRoles\nPermisos\nCONFIGURACIÓN\nPARTICIPANTES\nSEGUIMIENTO\nALIADOS\nCONTABILIDAD\nMESA REGISTRO\nCERTIFICADOS\nREPORTES\nJUNIORS\nINTELIGENCIA ARTIFICIAL\nDashboard\nJOSE LUIS SANCHEZ MORENO \nAlcance\nLIMA CICLO 1\nTu sede\nPeríodo\nHoy\nÚltimos 3 meses\nÚltimos 6 meses\nÚltimos 12 meses\nÚltimos 24 meses\n Viendo indicadores de:\nResumen General\nAnalítica\n3,666\nParticipantes\n3\nEquipos Activos\n6\nEntrenadores Activos\n1\nSedes Activas\nActividad del Fin de Semana\n3 en curso\nEQUIPO\t",
+      "textSnippet": "NODUS\nv1.0.0\nSISTEMA\nDashboard\nUsuarios\nRoles\nPermisos\nCONFIGURACIÓN\nPARTICIPANTES\nSEGUIMIENTO\nALIADOS\nCONTABILIDAD\nMESA REGISTRO\nCERTIFICADOS\nREPORTES\nJUNIORS\nINTELIGENCIA ARTIFICIAL\nDashboard\nJOSE LUIS SANCHEZ MORENO \nAlcance\nLIMA CICLO 1\nTu sede\nPeríodo\nHoy\nÚltimos 3 meses\nÚltimos 6 meses\nÚltimos 12 meses\nÚltimos 24 meses\n Viendo indicadores de:\nResumen General\nAnalítica\n3,704\nParticipantes\n3\nEquipos Activos\n6\nEntrenadores Activos\n1\nSedes Activas\nActividad del Fin de Semana\n3 en curso\nEQUIPO\t",
       "selects": [
         {
           "name": "meses",
@@ -3563,11 +3615,33 @@
               "EQUIPO": "EQUIPO 28",
               "ENTRENADOR": "ALEJANDRO DIAZ",
               "ETAPA": "TFD",
+              "TIPO": "Capitán",
+              "EN JUEGO": "1",
+              "DECLARACIÓN": "5",
+              "ENROLAMIENTO REAL": "6",
+              "CUMPLIMIENTO": "120%",
+              "DESERTORES": "0"
+            },
+            {
+              "EQUIPO": "EQUIPO 28",
+              "ENTRENADOR": "ALEJANDRO DIAZ",
+              "ETAPA": "TFD",
+              "TIPO": "Manager",
+              "EN JUEGO": "2",
+              "DECLARACIÓN": "10",
+              "ENROLAMIENTO REAL": "10",
+              "CUMPLIMIENTO": "100%",
+              "DESERTORES": "0"
+            },
+            {
+              "EQUIPO": "EQUIPO 28",
+              "ENTRENADOR": "ALEJANDRO DIAZ",
+              "ETAPA": "TFD",
               "TIPO": "Participante",
-              "EN JUEGO": "12",
-              "DECLARACIÓN": "43",
-              "ENROLAMIENTO REAL": "30",
-              "CUMPLIMIENTO": "70%",
+              "EN JUEGO": "9",
+              "DECLARACIÓN": "28",
+              "ENROLAMIENTO REAL": "28",
+              "CUMPLIMIENTO": "100%",
               "DESERTORES": "0"
             },
             {
@@ -3577,8 +3651,8 @@
               "TIPO": "Participante",
               "EN JUEGO": "18",
               "DECLARACIÓN": "44",
-              "ENROLAMIENTO REAL": "18",
-              "CUMPLIMIENTO": "41%",
+              "ENROLAMIENTO REAL": "30",
+              "CUMPLIMIENTO": "68%",
               "DESERTORES": "6"
             },
             {
@@ -3610,8 +3684,8 @@
               "TIPO": "Participante",
               "EN JUEGO": "29",
               "DECLARACIÓN": "52",
-              "ENROLAMIENTO REAL": "18",
-              "CUMPLIMIENTO": "35%",
+              "ENROLAMIENTO REAL": "30",
+              "CUMPLIMIENTO": "58%",
               "DESERTORES": "7"
             }
           ]
@@ -3720,7 +3794,7 @@
             },
             {
               "Mes": "Sep 26",
-              "Participantes": "95"
+              "Participantes": "133"
             }
           ]
         },
@@ -3732,7 +3806,7 @@
           "rows": [
             {
               "Mes": "Oct 25",
-              "Recaudado": "$ 262,340.00"
+              "Recaudado": "$ 257,745.00"
             },
             {
               "Mes": "Nov 25",
@@ -3776,7 +3850,7 @@
             },
             {
               "Mes": "Sep 26",
-              "Recaudado": "$ 66,645.00"
+              "Recaudado": "$ 99,010.00"
             }
           ]
         },
@@ -3788,7 +3862,7 @@
           "rows": [
             {
               "Entrenamiento": "Capítulo 1",
-              "Participantes": "2,585"
+              "Participantes": "2,623"
             },
             {
               "Entrenamiento": "Capítulo 2",
@@ -3824,15 +3898,15 @@
       "cards": [
         "Alcance\nLIMA CICLO 1\nTu sede\nPeríodo\nHoy\nÚltimos 3 meses\nÚltimos 6 meses\nÚltimos 12 meses\nÚltimos 24 meses\n Viendo indicadores de:",
         "Actividad del Fin de Semana\n3 en curso\nEQUIPO\tSEDE\tENTRENADOR\tETAPA ACTUAL\tPARTICIPANTES\t\nEQUIPO 28\tLIMA CICLO 1\tALEJANDRO DIAZ\tTFD\t13\tVer Resultados\nEQUIPO 29\tLIMA CICLO 1\tLOURDES PATINO\tSFD\t24\tVer Resultados\nEQUIPO 30\tLIMA CICLO 1\tANDRES IDROBO\tPFD\t41\tVer Resultados",
-        "Declaración vs Enrolamiento Real (por Equipo)\n3 equipos en juego\nEQUIPO\tENTRENADOR\tETAPA\tTIPO\tEN JUEGO\tDECLARACIÓN\tENROLAMIENTO REAL\tCUMPLIMIENTO\tDESERTORES\nEQUIPO 28\tALEJANDRO DIAZ\tTFD\tParticipante\t12\t43\t30\t70%\t0\nEQUIPO 29\tLOURDES PATINO\tSFD\tParticipante\t18\t44\t18\t41%\t6\nEQUIPO 30\tANDRES IDROBO\tPFD\tCapitán\t1\t5\t5\t100%\t0\nEQUIPO 30\tANDRES IDROBO\tPFD\tManager\t7\t21\t24\t114%\t0\nEQUIPO 30\tANDRES IDROBO\tPFD\tParticipante\t29\t52\t18\t35%\t7\n\"Declaración\" es el compromiso autoreportado por cada participante en juego; \"Enrolamiento Real\" cuenta solo a los invitados que ya pagaron y están en el equipo vigente de su sede. \"Cumplimiento\" = Enrolamiento Real ÷ Declaración.",
-        "Por Entrenamiento\nTotal participantes activos en el alcance: 3,666\nCapítulo 1\n2,585 (71%)\nCapítulo 2\n885 (24%)\nMaestría\n749 (20%)",
+        "Declaración vs Enrolamiento Real (por Equipo)\n3 equipos en juego\nEQUIPO\tENTRENADOR\tETAPA\tTIPO\tEN JUEGO\tDECLARACIÓN\tENROLAMIENTO REAL\tCUMPLIMIENTO\tDESERTORES\nEQUIPO 28\tALEJANDRO DIAZ\tTFD\tCapitán\t1\t5\t6\t120%\t0\nEQUIPO 28\tALEJANDRO DIAZ\tTFD\tManager\t2\t10\t10\t100%\t0\nEQUIPO 28\tALEJANDRO DIAZ\tTFD\tParticipante\t9\t28\t28\t100%\t0\nEQUIPO 29\tLOURDES PATINO\tSFD\tParticipante\t18\t44\t30\t68%\t6\nEQUIPO 30\tANDRES IDROBO\tPFD\tCapitán\t1\t5\t5\t100%\t0\nEQUIPO 30\tANDRES IDROBO\tPFD\tManager\t7\t21\t24\t114%\t0\nEQUIPO 30\tANDRES IDROBO\tPFD\tParticipante\t29\t52\t30\t58%\t7\n\"Declaración\" es el compromiso autoreportado por cada participante en juego; \"Enrolamiento Real\" cuenta solo a los invitados que ya pagaron y están en el equipo vigente de su sede. \"Cumplimiento\" = Enrolamiento Real ÷ Declaración.",
+        "Por Entrenamiento\nTotal participantes activos en el alcance: 3,704\nCapítulo 1\n2,623 (71%)\nCapítulo 2\n885 (24%)\nMaestría\n749 (20%)",
         "Por Entrenador — Carga de Trabajo\nVer Cronograma\nENTRENADOR\tESTADO\tASIGNACIONES\nALEJANDRO DIAZ\tActivo\t\n1\n\nANDRES IDROBO\tActivo\t\n1\n\nLOURDES PATINO\tActivo\t\n1",
         "Por Equipo — Equipos en Actividad\nVer todos\nEQUIPO\tSEDE\tENTRENADOR\tPARTICIPANTES\nEQUIPO 29\tLIMA CICLO 1\tLOURDES PATINO\t223\nEQUIPO 28\tLIMA CICLO 1\tALEJANDRO DIAZ\t175\nEQUIPO 30\tLIMA CICLO 1\tANDRES IDROBO\t174",
-        "Registros Recientes\nVer todos\nJESSICA ILLANES ENCISO\nLIMA CICLO 1 · +51 989503386\n06/09\nLUIS ALBERTO CHIROQUE INFANTE\nLIMA CICLO 1 · +51 932 429 954\n06/09\nMARIA LUZMILA SABOGAL CARRILLO\nLIMA CICLO 1 · +51\n06/09\nJULIO CESAR MADERA GALARRETA\nLIMA CICLO 1 · +51 945284542\n06/09\nHILARY MEYLI TARAZONA CERVANTES\nLIMA CICLO 1 · +51 930374172\n06/09\nRUTH ABIGAIL RIMACHE HERRERA\nLIMA CICLO 1 · +51 920436909\n06/09\nFLORINDA HERRERA PALOMINO\nLIMA CICLO 1 · +51 957909468\n06/09\nRICARDO FABIAN CHACON MARCILLA\nLIMA CICLO 1 · +51 979355333\n06/09\nRAUL HUMBERTO BAUTISTA NAUPA\nLIMA CICLO 1 · +51 959898042\n06/09\nRICARDO LUIS CHACON MORALES\nLIMA CICLO 1 · +51 976389607\n06/09",
-        "Indicadores Financieros\n$ 4,935,193.12\nRecaudado\n$ 1,575.00\nPendiente\n$ 0.00\nDevoluciones\n4,486\nFacturas",
-        "Evolutivo — Participantes Registrados\n          Ver tabla\n        \n        \n          \n          \n            \n              MesParticipantes\n              \n                                Oct 250\n                                Nov 250\n                                Dic 250\n                                Ene 260\n                                Feb 260\n                                Mar 260\n                                Abr 260\n                                May 260\n                                Jun 260\n                                Jul 260\n                                Ago 263,571\n                                Sep 2695",
-        "Evolutivo — Ingresos Recaudados\n          Ver tabla\n        \n        \n          \n          \n            \n              MesRecaudado\n              \n                                Oct 25$ 262,340.00\n                                Nov 25$ 321,300.00\n                                Dic 25$ 274,095.00\n                                Ene 26$ 241,045.00\n                                Feb 26$ 383,370.00\n                                Mar 26$ 410,170.00\n                                Abr 26$ 258,350.00\n                                May 26$ 398,392.00\n                                Jun 26$ 199,468.00\n                                Jul 26$ 157,885.00\n                                Ago 26$ 247,820.00\n                                Sep 26$ 66,645.00",
-        "Comparativo — Progresión por Entrenamiento\n          Ver tabla\n        \n        \n          \n          \n            \n              EntrenamientoParticipantes\n              \n                                Capítulo 12,585\n                                Capítulo 2885\n                                Maestría749",
+        "Registros Recientes\nVer todos\nGIANINA FLORES CAVERO EGUSQUIZA\nLIMA CICLO 1 · +51 947 331 647\n06/09\nOSMIN SHARON ORTIZ DE ORUE PEREA\nLIMA CICLO 1 · +51 936281073\n06/09\nDANA VALERIA CRISPIN TEMOCHE\nLIMA CICLO 1 · +51 995002716\n06/09\nLUIS MAGNO RIVERA AGUILAR\nLIMA CICLO 1 · +51 921597528\n06/09\nJUAN DANIEL ESPINOZA MENDOZA\nLIMA CICLO 1 · +51 941690625\n06/09\nHECTOR ANDRES OLIVARES CHACON\nLIMA CICLO 1 · +51 926675516\n06/09\nCLAUDIA MILAGROS RIVERA PRESENTACION\nLIMA CICLO 1 · +51 957277490\n06/09\nJHON ALFONSO LEIVA TERREROS\nLIMA CICLO 1 · +51 938900783\n06/09\nDORA MARGOT MSRCOS CORONEL\nLIMA CICLO 1 · +51 984 963 685\n06/09\nARTURO CESAR CASTRO MORAN\nLIMA CICLO 1 · +51 945133934\n06/09",
+        "Indicadores Financieros\n$ 4,967,558.12\nRecaudado\n$ 1,575.00\nPendiente\n$ 0.00\nDevoluciones\n4,524\nFacturas",
+        "Evolutivo — Participantes Registrados\n          Ver tabla\n        \n        \n          \n          \n            \n              MesParticipantes\n              \n                                Oct 250\n                                Nov 250\n                                Dic 250\n                                Ene 260\n                                Feb 260\n                                Mar 260\n                                Abr 260\n                                May 260\n                                Jun 260\n                                Jul 260\n                                Ago 263,571\n                                Sep 26133",
+        "Evolutivo — Ingresos Recaudados\n          Ver tabla\n        \n        \n          \n          \n            \n              MesRecaudado\n              \n                                Oct 25$ 257,745.00\n                                Nov 25$ 321,300.00\n                                Dic 25$ 274,095.00\n                                Ene 26$ 241,045.00\n                                Feb 26$ 383,370.00\n                                Mar 26$ 410,170.00\n                                Abr 26$ 258,350.00\n                                May 26$ 398,392.00\n                                Jun 26$ 199,468.00\n                                Jul 26$ 157,885.00\n                                Ago 26$ 247,820.00\n                                Sep 26$ 99,010.00",
+        "Comparativo — Progresión por Entrenamiento\n          Ver tabla\n        \n        \n          \n          \n            \n              EntrenamientoParticipantes\n              \n                                Capítulo 12,623\n                                Capítulo 2885\n                                Maestría749",
         "Comparativo — Carga de Entrenadores (Top 10)\n          Ver tabla\n        \n        \n                    \n          \n            \n              EntrenadorAsignaciones\n              \n                                ALEJANDRO DIAZ1\n                                ANDRES IDROBO1\n                                LOURDES PATINO1"
       ]
     },
@@ -3942,7 +4016,7 @@
             "telefonoImo": "+51960273156",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "TFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,595.00) (C2 + MJ)"
@@ -4017,7 +4091,7 @@
             "telefonoImo": "+51934073078",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "TFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,250.00) (C2 + MJ)"
@@ -4047,7 +4121,7 @@
             "telefonoImo": "+51996299500",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "TFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -4062,7 +4136,7 @@
             "telefonoImo": "+51919563284",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "TFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,355.00) (C2 + MJ)"
@@ -4137,7 +4211,7 @@
             "telefonoImo": "+51970525691",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "TFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -4152,7 +4226,7 @@
             "telefonoImo": "+51922926088",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "TFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -4182,7 +4256,7 @@
             "telefonoImo": "+51950088740",
             "llamada1": "—",
             "llamada2": "—",
-            "finDeSemana": "TFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -4197,7 +4271,7 @@
             "telefonoImo": "+51934960620",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "TFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -4212,7 +4286,7 @@
             "telefonoImo": "+51930526967",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "TFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,035.00) (C2 + MJ)"
@@ -4317,7 +4391,7 @@
             "telefonoImo": "+51960273156",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "TFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,595.00) (C2 + MJ)"
@@ -4392,7 +4466,7 @@
             "telefonoImo": "+51934073078",
             "llamada1": "Por Confirmar",
             "llamada2": "Siguiente",
-            "finDeSemana": "TFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,250.00) (C2 + MJ)"
@@ -4422,7 +4496,7 @@
             "telefonoImo": "+51996299500",
             "llamada1": "—",
             "llamada2": "—",
-            "finDeSemana": "TFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -4437,7 +4511,7 @@
             "telefonoImo": "+51919563284",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "TFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,355.00) (C2 + MJ)"
@@ -4512,7 +4586,7 @@
             "telefonoImo": "+51970525691",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "TFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -4527,7 +4601,7 @@
             "telefonoImo": "+51922926088",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "TFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -4557,7 +4631,7 @@
             "telefonoImo": "+51950088740",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "TFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -4572,7 +4646,7 @@
             "telefonoImo": "+51934960620",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "TFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -4587,7 +4661,7 @@
             "telefonoImo": "+51930526967",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "TFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,035.00) (C2 + MJ)"
@@ -4624,7 +4698,7 @@
             "telefonoImo": "+51999699649",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "SFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,035.00) (C2 + MJ)"
@@ -4639,7 +4713,7 @@
             "telefonoImo": "+51934073078",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "SFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -4654,7 +4728,7 @@
             "telefonoImo": "+51900490075",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "SFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,970.00) (C2 + MJ)"
@@ -4669,7 +4743,7 @@
             "telefonoImo": "+51952087914",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "SFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,595.00) (C2 + MJ)"
@@ -4729,7 +4803,7 @@
             "telefonoImo": "+51997343209",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "SFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -4744,7 +4818,7 @@
             "telefonoImo": "+51934073078",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "SFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -4759,7 +4833,7 @@
             "telefonoImo": "+51900490075",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "SFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -4774,7 +4848,7 @@
             "telefonoImo": "—",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "SFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -4789,7 +4863,7 @@
             "telefonoImo": "—",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "SFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
@@ -4804,7 +4878,7 @@
             "telefonoImo": "—",
             "llamada1": "No le Interesa",
             "llamada2": "No Contesta",
-            "finDeSemana": "SFD",
+            "finDeSemana": "—",
             "asistencia": "—",
             "desertor": "—",
             "pago": "Pagado (S/. 4,035.00) (C2 + MJ)"
@@ -4864,7 +4938,7 @@
             "telefonoImo": "+51993709784",
             "llamada1": "Confirmado",
             "llamada2": "No Contesta",
-            "finDeSemana": "SFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -4909,7 +4983,7 @@
             "telefonoImo": "+51927101572",
             "llamada1": "Confirmado",
             "llamada2": "No le Interesa",
-            "finDeSemana": "SFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,595.00) (C2 + MJ)"
@@ -4924,7 +4998,7 @@
             "telefonoImo": "+51916030745",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "SFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -4954,7 +5028,7 @@
             "telefonoImo": "+51917980843",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "SFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -4969,7 +5043,7 @@
             "telefonoImo": "+51920472661",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "SFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -4999,7 +5073,7 @@
             "telefonoImo": "+51999699649",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "SFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,035.00) (C2 + MJ)"
@@ -5014,7 +5088,7 @@
             "telefonoImo": "+51934073078",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "SFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -5029,7 +5103,7 @@
             "telefonoImo": "+51900490075",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "SFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,970.00) (C2 + MJ)"
@@ -5044,7 +5118,7 @@
             "telefonoImo": "+51952087914",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "SFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,595.00) (C2 + MJ)"
@@ -5104,7 +5178,7 @@
             "telefonoImo": "+51997343209",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "SFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -5119,7 +5193,7 @@
             "telefonoImo": "+51934073078",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "SFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -5134,7 +5208,7 @@
             "telefonoImo": "+51900490075",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "SFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -5149,7 +5223,7 @@
             "telefonoImo": "—",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "SFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -5164,7 +5238,7 @@
             "telefonoImo": "—",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "SFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
@@ -5179,7 +5253,7 @@
             "telefonoImo": "—",
             "llamada1": "Por Confirmar",
             "llamada2": "Siguiente",
-            "finDeSemana": "SFD",
+            "finDeSemana": "—",
             "asistencia": "—",
             "desertor": "—",
             "pago": "Pagado (S/. 4,035.00) (C2 + MJ)"
@@ -5239,7 +5313,7 @@
             "telefonoImo": "+51993709784",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "SFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -5284,7 +5358,7 @@
             "telefonoImo": "+51927101572",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "SFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,595.00) (C2 + MJ)"
@@ -5299,7 +5373,7 @@
             "telefonoImo": "+51916030745",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "SFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -5329,7 +5403,7 @@
             "telefonoImo": "+51917980843",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "SFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -5344,7 +5418,7 @@
             "telefonoImo": "+51920472661",
             "llamada1": "—",
             "llamada2": "Confirmado",
-            "finDeSemana": "SFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,430.00) (C2 + MJ)"
@@ -5366,7 +5440,7 @@
             "telefonoImo": "+51959356266",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -5381,7 +5455,7 @@
             "telefonoImo": "+51944760103",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -5396,7 +5470,7 @@
             "telefonoImo": "+51944760103",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -5411,7 +5485,7 @@
             "telefonoImo": "+51948162114",
             "llamada1": "—",
             "llamada2": "—",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "—",
             "desertor": "—",
             "pago": "Pagado (S/. 4,250.00) (C2 + MJ)"
@@ -5426,7 +5500,7 @@
             "telefonoImo": "+51993709784",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -5441,7 +5515,7 @@
             "telefonoImo": "+51976090987",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -5456,7 +5530,7 @@
             "telefonoImo": "+51999940038",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -5471,7 +5545,7 @@
             "telefonoImo": "+51930326809",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -5501,7 +5575,7 @@
             "telefonoImo": "+51968367858",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -5531,7 +5605,7 @@
             "telefonoImo": "+51920738765",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,470.00) (C2 + MJ)"
@@ -5546,7 +5620,7 @@
             "telefonoImo": "+51952352271",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -5561,7 +5635,7 @@
             "telefonoImo": "+51920408573",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -5591,7 +5665,7 @@
             "telefonoImo": "+51980496819",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -5606,7 +5680,7 @@
             "telefonoImo": "+51916030745",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -5621,7 +5695,7 @@
             "telefonoImo": "+51930526967",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "—",
             "desertor": "—",
             "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
@@ -5636,7 +5710,7 @@
             "telefonoImo": "+51976232368",
             "llamada1": "—",
             "llamada2": "—",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -5666,7 +5740,7 @@
             "telefonoImo": "+51989442068",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "—",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -5681,7 +5755,7 @@
             "telefonoImo": "—",
             "llamada1": "No le Interesa",
             "llamada2": "—",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "—",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -5696,7 +5770,7 @@
             "telefonoImo": "+51921979246",
             "llamada1": "—",
             "llamada2": "—",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "—",
             "desertor": "—",
             "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
@@ -5711,7 +5785,7 @@
             "telefonoImo": "—",
             "llamada1": "—",
             "llamada2": "—",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "—",
             "desertor": "—",
             "pago": "Pagado (S/. 4,250.00) (C2 + MJ)"
@@ -5726,7 +5800,7 @@
             "telefonoImo": "—",
             "llamada1": "—",
             "llamada2": "—",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "—",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -5741,7 +5815,7 @@
             "telefonoImo": "+51959356266",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -5756,7 +5830,7 @@
             "telefonoImo": "+51944760103",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -5771,7 +5845,7 @@
             "telefonoImo": "+51944760103",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -5786,7 +5860,7 @@
             "telefonoImo": "+51948162114",
             "llamada1": "—",
             "llamada2": "—",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "—",
             "desertor": "—",
             "pago": "Pagado (S/. 4,250.00) (C2 + MJ)"
@@ -5801,7 +5875,7 @@
             "telefonoImo": "+51993709784",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -5816,7 +5890,7 @@
             "telefonoImo": "+51976090987",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -5831,7 +5905,7 @@
             "telefonoImo": "+51999940038",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -5846,7 +5920,7 @@
             "telefonoImo": "+51930326809",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -5876,7 +5950,7 @@
             "telefonoImo": "+51968367858",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -5906,7 +5980,7 @@
             "telefonoImo": "+51920738765",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,470.00) (C2 + MJ)"
@@ -5921,7 +5995,7 @@
             "telefonoImo": "+51952352271",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -5936,7 +6010,7 @@
             "telefonoImo": "+51920408573",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -5966,7 +6040,7 @@
             "telefonoImo": "+51980496819",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -5981,7 +6055,7 @@
             "telefonoImo": "+51916030745",
             "llamada1": "Confirmado",
             "llamada2": "—",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -5996,7 +6070,7 @@
             "telefonoImo": "+51930526967",
             "llamada1": "Por Confirmar",
             "llamada2": "Siguiente",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
@@ -6011,7 +6085,7 @@
             "telefonoImo": "+51976232368",
             "llamada1": "Confirmado",
             "llamada2": "Confirmado",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"
@@ -6041,7 +6115,7 @@
             "telefonoImo": "+51989442068",
             "llamada1": "Siguiente",
             "llamada2": "Siguiente",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 4,775.00) (C2 + MJ)"
@@ -6056,7 +6130,7 @@
             "telefonoImo": "—",
             "llamada1": "—",
             "llamada2": "—",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "Asistió",
             "desertor": "—",
             "pago": "Pagado (S/. 3,530.00) (C2 + MJ)"
@@ -6071,7 +6145,7 @@
             "telefonoImo": "+51921979246",
             "llamada1": "—",
             "llamada2": "—",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "—",
             "desertor": "—",
             "pago": "Pagado (S/. 4,380.00) (C2 + MJ)"
@@ -6086,7 +6160,7 @@
             "telefonoImo": "—",
             "llamada1": "—",
             "llamada2": "—",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "—",
             "desertor": "—",
             "pago": "Pagado (S/. 4,250.00) (C2 + MJ)"
@@ -6101,7 +6175,7 @@
             "telefonoImo": "—",
             "llamada1": "—",
             "llamada2": "—",
-            "finDeSemana": "PFD",
+            "finDeSemana": "—",
             "asistencia": "—",
             "desertor": "—",
             "pago": "Pagado (S/. 3,875.00) (C2 + MJ)"

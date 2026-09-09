@@ -157,78 +157,107 @@ export function getAllEquipos() {
  * by checking their finDeSemana stage and desertor status.
  */
 export function mergeNodusDataIntoEquipos(baseEquipos, nodusSnap) {
-  if (!nodusSnap || !nodusSnap.equiposReporte) return baseEquipos;
+  if (!nodusSnap) return baseEquipos;
+
+  // Extraer las tablas del Dashboard
+  let actividadFdsMap = {};
+  let enrolamientoMap = {};
+  
+  if (nodusSnap.secciones?.dashboardPrincipal?.tables) {
+    const tables = nodusSnap.secciones.dashboardPrincipal.tables;
+    
+    // Tabla 1: Actividad del Fin de Semana (para saber la etapa actual)
+    const tableActividad = tables.find(t => t.headers && t.headers.includes('ETAPA ACTUAL') && t.headers.includes('EQUIPO'));
+    if (tableActividad) {
+      tableActividad.rows.forEach(row => {
+        if (row.EQUIPO) {
+          actividadFdsMap[row.EQUIPO.toUpperCase()] = {
+            etapa: row['ETAPA ACTUAL'],
+            participantesEnFds: parseInt(row['PARTICIPANTES'], 10) || 0
+          };
+        }
+      });
+    }
+
+    // Tabla 2: Declaración vs Enrolamiento (para saber En Juego y Desertores)
+    const tableEnrol = tables.find(t => t.headers && t.headers.includes('EN JUEGO') && t.headers.includes('DESERTORES'));
+    if (tableEnrol) {
+      tableEnrol.rows.forEach(row => {
+        if (row.EQUIPO) {
+          const eqName = row.EQUIPO.toUpperCase();
+          if (!enrolamientoMap[eqName]) {
+            enrolamientoMap[eqName] = { enJuego: 0, desertores: 0, enrolamientoReal: 0, enrolMg: 0, enrolPx: 0 };
+          }
+          enrolamientoMap[eqName].enJuego += (parseInt(row['EN JUEGO'], 10) || 0);
+          enrolamientoMap[eqName].desertores += (parseInt(row['DESERTORES'], 10) || 0);
+          const enrolReal = parseInt(row['ENROLAMIENTO REAL'], 10) || 0;
+          enrolamientoMap[eqName].enrolamientoReal += enrolReal;
+          
+          if (row.TIPO && (row.TIPO.toLowerCase().includes('manager') || row.TIPO.toLowerCase().includes('capitán'))) {
+            enrolamientoMap[eqName].enrolMg += enrolReal;
+          } else {
+            enrolamientoMap[eqName].enrolPx += enrolReal;
+          }
+        }
+      });
+    }
+  }
 
   const enriched = baseEquipos.map(eq => {
-    // Find the corresponding equipo in Nodus
-    // We must match both the team number (e.g. "EQUIPO 30") and the Sede to avoid collisions
-    const nodusEq = nodusSnap.equiposReporte.find(n => {
-      if (!n.equipoNombre) return false;
-      const nodusName = n.equipoNombre.toUpperCase();
-      const isEqMatch = nodusName.includes(eq.equipoLabel.toUpperCase());
-      const isSedeMatch = nodusName.includes(eq.sede.toUpperCase());
-      return isEqMatch && isSedeMatch;
+    // Math logic based on Dashboard metrics
+    let c_pxInicio = 0, c_pxFinal = 0;
+    let r_pxInicio = 0, r_pxFinal = 0;
+    let g_pxInicio = 0, g_pxFinal = 0;
+    let desercionTotalPx = 0;
+    
+    // Attempt to match with maps
+    let matchedEqName = null;
+    Object.keys(enrolamientoMap).forEach(key => {
+      if (key.includes(eq.equipoLabel.toUpperCase()) && key.includes(eq.sede.split(' ')[0].toUpperCase())) {
+        matchedEqName = key;
+      }
     });
 
-    if (!nodusEq || !nodusEq.participantes) return eq;
+    if (matchedEqName && enrolamientoMap[matchedEqName]) {
+      const stats = enrolamientoMap[matchedEqName];
+      const actStats = actividadFdsMap[matchedEqName] || { etapa: 'PFD', participantesEnFds: stats.enJuego };
+      
+      const currentStageStr = actStats.etapa;
+      let currentStage = 0;
+      if (currentStageStr === 'TFD') currentStage = 3;
+      else if (currentStageStr === 'SFD') currentStage = 2;
+      else if (currentStageStr === 'PFD') currentStage = 1;
 
-    const parts = nodusEq.participantes;
-    const totalEnrolled = parts.length;
+      // Inician = En Juego + Desertores
+      const totalInician = stats.enJuego + stats.desertores;
+      const totalActivos = stats.enJuego;
+      desercionTotalPx = stats.desertores;
 
-    // Count participants by stage
-    const inPfd = parts.filter(p => p.finDeSemana === 'PFD').length;
-    const inSfd = parts.filter(p => p.finDeSemana === 'SFD').length;
-    const inTfd = parts.filter(p => p.finDeSemana === 'TFD').length;
-    
-    // Determine current stage of the team based on highest FDS reached by any participant
-    let currentStage = 0;
-    if (inTfd > 0) currentStage = 3;
-    else if (inSfd > 0) currentStage = 2;
-    else if (inPfd > 0) currentStage = 1;
-
-    // FDS 1: Creación
-    // Inician: Everyone who is currently in PFD, SFD, or TFD. 
-    // Plus any dropouts that happened during PFD. We approximate this as total participants
-    // minus those who never started (those who have '—' for FDS but aren't explicit dropouts).
-    // The user's logic: "cuantos inician un fds y terminan, la diferencia son los desertores"
-    let c_pxInicio = 0;
-    let c_pxFinal = 0;
-    let r_pxInicio = 0;
-    let r_pxFinal = 0;
-    let g_pxInicio = 0;
-    let g_pxFinal = 0;
-
-    // If team has reached at least PFD
-    if (currentStage >= 1) {
-      c_pxInicio = totalEnrolled; // Nodus shows all enrolled as starting point
-      if (currentStage === 1) {
-        c_pxFinal = inPfd; // Still in PFD, so final is whoever is active
-      } else {
-        c_pxFinal = inSfd + inTfd; // Passed PFD
+      if (currentStage >= 1) {
+        c_pxInicio = totalInician;
+        if (currentStage === 1) c_pxFinal = totalActivos;
+        else c_pxFinal = totalInician; // Aproximación si ya pasaron
       }
-    }
-
-    // FDS 2: Relación
-    if (currentStage >= 2) {
-      r_pxInicio = c_pxFinal; 
-      if (currentStage === 2) {
-        r_pxFinal = inSfd; 
-      } else {
-        r_pxFinal = inTfd;
+      if (currentStage >= 2) {
+        r_pxInicio = c_pxFinal;
+        if (currentStage === 2) r_pxFinal = totalActivos;
+        else r_pxFinal = c_pxFinal; 
       }
+      if (currentStage >= 3) {
+        g_pxInicio = r_pxFinal;
+        g_pxFinal = totalActivos;
+      }
+      
+      eq = JSON.parse(JSON.stringify(eq)); // Clone to avoid mutating cache
+      eq.creacion.enrolTotal = stats.enrolamientoReal;
+      eq.creacion.enrolPx = stats.enrolPx;
+      eq.creacion.enrolMg = stats.enrolMg;
+    } else {
+      // Fallback a los datos antiguos (Excel)
+      c_pxInicio = eq.creacion.pxInicio;
+      c_pxFinal = eq.creacion.pxFinal;
+      desercionTotalPx = eq.creacion.desercionPx;
     }
-
-    // FDS 3: Gratitud
-    if (currentStage >= 3) {
-      g_pxInicio = r_pxFinal;
-      g_pxFinal = inTfd; 
-    }
-
-    // Calculate Deserciones
-    const c_desercionPx = c_pxInicio > 0 ? c_pxInicio - c_pxFinal : 0;
-    const r_desercionPx = r_pxInicio > 0 ? r_pxInicio - r_pxFinal : 0;
-    const g_desercionPx = g_pxInicio > 0 ? g_pxInicio - g_pxFinal : 0;
-    const desercionTotalPx = c_desercionPx + r_desercionPx + g_desercionPx;
 
     const pxInicioReal = c_pxInicio || eq.c1.terminan;
     const pxFinalReal = g_pxFinal || r_pxFinal || c_pxFinal;
@@ -241,25 +270,23 @@ export function mergeNodusDataIntoEquipos(baseEquipos, nodusSnap) {
         ...eq.creacion,
         pxInicio: c_pxInicio || eq.creacion.pxInicio,
         pxFinal: c_pxFinal || eq.creacion.pxFinal,
-        desercionPx: c_desercionPx || eq.creacion.desercionPx
+        desercionPx: desercionTotalPx || eq.creacion.desercionPx
       },
       relacion: {
         ...eq.relacion,
         pxInicio: r_pxInicio || eq.relacion.pxInicio,
-        pxFinal: r_pxFinal || eq.relacion.pxFinal,
-        desercionPx: r_desercionPx || eq.relacion.desercionPx
+        pxFinal: r_pxFinal || eq.relacion.pxFinal
       },
       gratitud: {
         ...eq.gratitud,
         pxInicio: g_pxInicio || eq.gratitud.pxInicio,
-        pxFinal: g_pxFinal || eq.gratitud.pxFinal,
-        desercionPx: g_desercionPx || eq.gratitud.desercionPx
+        pxFinal: g_pxFinal || eq.gratitud.pxFinal
       },
       resumen: {
         ...eq.resumen,
         pxIniciales: pxInicioReal,
         pxFinales: pxFinalReal,
-        desercionTotalPx: desercionTotalPx || eq.resumen.desercionTotalPx,
+        desercionTotalPx: desercionTotalPx,
         tasaRetencion: Math.round(tasaRetencionGeneral * 10) / 10,
         tasaDesercion: Math.round(tasaDesercionGeneral * 10) / 10
       }
