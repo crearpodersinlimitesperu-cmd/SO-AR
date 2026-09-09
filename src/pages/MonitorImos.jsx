@@ -22,6 +22,23 @@ export default function MonitorImos() {
   const [nodusSyncTick, setNodusSyncTick] = useState(0);
   const navigate = useNavigate();
 
+  const formatDate = (ts) => {
+    if (!ts) return 'Sin registro';
+    try {
+      const date = ts.toDate ? ts.toDate() : new Date(ts);
+      return new Intl.DateTimeFormat('es-PE', { 
+        day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' 
+      }).format(date);
+    } catch(e) { return 'Fecha inválida'; }
+  };
+
+  const getUbicacion = (m) => {
+    if (m.ubicacion) return m.ubicacion;
+    if (m.ip) return `IP: ${m.ip}`;
+    return 'No reportada (Req. API IMO)';
+  };
+
+
   // Escuchar misiones IMO en Firestore en tiempo real
   useEffect(() => {
     const q = query(collection(db, 'imo_missions'), orderBy('lastUpdated', 'desc'));
@@ -465,6 +482,8 @@ export default function MonitorImos() {
               <th style={{ padding: '1rem', color: 'var(--crear-gold)', fontSize: '0.85rem' }}>Avance IMO</th>
               <th style={{ padding: '1rem', color: 'var(--crear-gold)', fontSize: '0.85rem' }}>Confirmados IMO</th>
               <th style={{ padding: '1rem', color: 'var(--crear-gold)', fontSize: '0.85rem' }}>Estado</th>
+              <th style={{ padding: '1rem', color: 'var(--crear-gold)', fontSize: '0.85rem' }}>Última Conexión</th>
+              <th style={{ padding: '1rem', color: 'var(--crear-gold)', fontSize: '0.85rem' }}>Ubicación</th>
               <th style={{ padding: '1rem', color: 'var(--crear-gold)', fontSize: '0.85rem' }}>Validación Nodus (Llamadas)</th>
               <th style={{ padding: '1rem', color: 'var(--crear-gold)', fontSize: '0.85rem', textAlign: 'right' }}>Acciones</th>
             </tr>
@@ -472,7 +491,7 @@ export default function MonitorImos() {
           <tbody>
             {filteredMissions.length === 0 ? (
               <tr>
-                <td colSpan={7} style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+                <td colSpan={9} style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
                   {missions.length === 0 ? 'No hay misiones de IMOs registradas actualmente.' : 'Ningún IMO o enrolado coincide con los filtros aplicados.'}
                 </td>
               </tr>
@@ -524,6 +543,13 @@ export default function MonitorImos() {
                       ) : (
                         <span style={{ color: '#ef4444', background: 'rgba(239, 68, 68, 0.15)', padding: '4px 8px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 700 }}>En Progreso</span>
                       )}
+                    </td>
+
+                    <td style={{ padding: '1rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                      {formatDate(m.lastUpdated)}
+                    </td>
+                    <td style={{ padding: '1rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                      {getUbicacion(m)}
                     </td>
 
                     {/* Insignia Reactiva de Validación Automática Nodus */}
@@ -592,7 +618,7 @@ export default function MonitorImos() {
                   
                   {isExpanded && (
                     <tr style={{ background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                      <td colSpan={7} style={{ padding: '1.5rem', paddingTop: '0.5rem' }}>
+                      <td colSpan={9} style={{ padding: '1.5rem', paddingTop: '0.5rem' }}>
                         <div style={{ background: 'rgba(0,0,0,0.4)', padding: '1.2rem', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.08)' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
                             <div>
