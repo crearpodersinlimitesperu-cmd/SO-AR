@@ -1078,6 +1078,37 @@ export default function CentroManagers() {
   // nombre combinado y se paga el monto completo una sola vez (no se divide) — José
   // confirmó que casi siempre es un solo entrenador por equipo y no priorizó resolver
   // el reparto todavía.
+  // (09/09/2026) NUEVO — pedido de José: "el entrenador ya terminó y el coordinador dice
+  // se graduaron o desertaron, se liquida para pago". José confirmó explícitamente que el
+  // disparador de cierre debe ser una acción MANUAL del coordinador (no automática al
+  // resolver el último integrante), y que convive con el disparador de 7 llamadas — gana
+  // el que llegue primero. Esto se guarda como campos nuevos en managers_directory (NO una
+  // colección nueva): canManageManagers() ya tiene permiso de escritura total sobre esa
+  // colección en firestore.rules (líneas 237-244), así que esto no requiere tocar las
+  // reglas de seguridad. Se agrupa aquí SIN los filtros de la pestaña Grupales (sede activa,
+  // Activos/Archivo, entrenador) porque Liquidación siempre debe ver TODOS los equipos,
+  // sin importar qué filtro esté seleccionado en otra pestaña.
+  const equiposParaLiquidacion = useMemo(() => {
+    const teams = {};
+    managers.forEach(m => {
+      if (!m.equipo) return;
+      const sede = normalizeSede(m.sede);
+      const key = `${sede}_${m.equipo}`;
+      if (!teams[key]) {
+        teams[key] = { equipoKey: key, sede, equipo: m.equipo, numEquipo: m.numEquipo, entrenadores: new Set(), cierreManual: null };
+      }
+      if (m.entrenador) parseTrainersList(m.entrenador).forEach(t => teams[key].entrenadores.add(t));
+      if (m.cierreLiquidacionActivo) {
+        teams[key].cierreManual = {
+          fecha: m.cierreLiquidacionFecha || '',
+          porNombre: m.cierreLiquidacionPorNombre || '',
+          porEmail: m.cierreLiquidacionPorEmail || ''
+        };
+      }
+    });
+    return teams;
+  }, [managers]);
+
   const liquidacionData = useMemo(() => {
     if (!canViewLiquidacion) return { pendientes: [], pagados: [], enCamino: [], totalPendienteUSD: 0, totalPagadoUSD: 0 };
 
@@ -1090,46 +1121,62 @@ export default function CentroManagers() {
 
     const pendientes = [];
     const pagados = [];
-    // (09/09/2026) NUEVO — pedido de José: "coherente, práctico y vivible, como un
-    // liquidador experto en finanzas". La pantalla original solo mostraba el disparador
-    // (7 llamadas) sin ningún contexto de qué viene antes — un equipo con 6 llamadas
-    // desaparecía sin dejar rastro. Se agrega "En camino a la meta" (5 o 6 llamadas,
-    // a 1-2 de activar el pago) para que la pantalla se lea como un pipeline financiero
-    // real, no solo un disparador binario.
+    // (09/09/2026) "En camino a la meta" (5 o 6 de 7 llamadas, a 1-2 de activar el pago por
+    // ese disparador) para que la pantalla se lea como un pipeline financiero real. No
+    // incluye el disparador de cierre manual porque ese es binario (cerrado o no) — no hay
+    // un "casi cerrado" que mostrar ahí.
     const enCamino = [];
 
-    Object.entries(porEquipo).forEach(([equipoKey, registros]) => {
+    // Unión de equipos candidatos: los que tienen llamadas registradas + los que el
+    // coordinador cerró manualmente aunque no lleguen a 7 llamadas.
+    const todosLosEquipoKeys = new Set([...Object.keys(porEquipo), ...Object.keys(equiposParaLiquidacion)]);
+
+    todosLosEquipoKeys.forEach((equipoKey) => {
+      const registros = porEquipo[equipoKey] || [];
       const count = registros.length;
       const sorted = [...registros].sort((a, b) => (a.fecha || '').localeCompare(b.fecha || ''));
-      const ultimo = sorted[sorted.length - 1];
+      const ultimoLlamada = sorted[sorted.length - 1];
+      const infoEquipo = equiposParaLiquidacion[equipoKey];
+      const cierreManual = infoEquipo?.cierreManual || null;
 
-      if (count < 7) {
-        if (count === 5 || count === 6) {
+      const cumpleLlamadas = count >= 7;
+      const cumpleCierre = !!cierreManual;
+
+      if (!cumpleLlamadas && !cumpleCierre) {
+        if ((count === 5 || count === 6) && ultimoLlamada) {
           enCamino.push({
             equipoKey,
-            equipo: ultimo.equipo,
-            numEquipo: ultimo.numEquipo,
-            sede: ultimo.sede,
-            entrenador: ultimo.entrenador || 'Sin Asignar',
+            equipo: ultimoLlamada.equipo,
+            numEquipo: ultimoLlamada.numEquipo,
+            sede: ultimoLlamada.sede,
+            entrenador: ultimoLlamada.entrenador || 'Sin Asignar',
             totalLlamadas: count,
             faltan: 7 - count
           });
         }
-        return; // Todavía no llega a la meta de 7 llamadas
+        return; // Todavía no llega a la meta de 7 llamadas ni fue cerrado manualmente
       }
 
-      const septimo = sorted[6]; // La llamada #7 (índice 6) es la que dispara el pago
+      // Datos del equipo: preferir el historial de llamadas (más completo); si el equipo
+      // se cerró manualmente sin ninguna llamada registrada, usar equiposParaLiquidacion.
+      const equipo = ultimoLlamada?.equipo || infoEquipo?.equipo || equipoKey;
+      const numEquipo = ultimoLlamada?.numEquipo || infoEquipo?.numEquipo || '';
+      const sede = ultimoLlamada?.sede || infoEquipo?.sede || '';
+      const entrenador = ultimoLlamada?.entrenador || Array.from(infoEquipo?.entrenadores || []).join(', ') || 'Sin Asignar';
+      const septimo = sorted[6]; // La llamada #7 (índice 6) es la que dispara el pago, si aplica
       const pago = liquidacionesPagos[equipoKey];
 
       const item = {
         equipoKey,
-        equipo: ultimo.equipo,
-        numEquipo: ultimo.numEquipo,
-        sede: ultimo.sede,
-        entrenador: ultimo.entrenador || 'Sin Asignar',
+        equipo,
+        numEquipo,
+        sede,
+        entrenador,
         totalLlamadas: count,
         fechaAlcanzo7: septimo?.fecha || '',
-        montoUSD: 400
+        montoUSD: 400,
+        motivo: cumpleLlamadas ? 'llamadas' : 'cierre_manual',
+        cierreManual
       };
 
       if (pago && pago.estado === 'pagado') {
@@ -1139,7 +1186,7 @@ export default function CentroManagers() {
       }
     });
 
-    pendientes.sort((a, b) => (a.fechaAlcanzo7 || '').localeCompare(b.fechaAlcanzo7 || ''));
+    pendientes.sort((a, b) => (a.fechaAlcanzo7 || a.cierreManual?.fecha || '').localeCompare(b.fechaAlcanzo7 || b.cierreManual?.fecha || ''));
     pagados.sort((a, b) => (b.fechaPago || '').localeCompare(a.fechaPago || ''));
     enCamino.sort((a, b) => b.totalLlamadas - a.totalLlamadas);
 
@@ -1147,7 +1194,7 @@ export default function CentroManagers() {
     const totalPagadoUSD = pagados.length * 400;
 
     return { pendientes, pagados, enCamino, totalPendienteUSD, totalPagadoUSD };
-  }, [llamadasHistorial, liquidacionesPagos, canViewLiquidacion]);
+  }, [llamadasHistorial, liquidacionesPagos, equiposParaLiquidacion, canViewLiquidacion]);
 
   const handleMarcarPagado = async (item) => {
     if (!canViewLiquidacion) return;
@@ -1160,6 +1207,7 @@ export default function CentroManagers() {
         entrenador: item.entrenador,
         montoUSD: item.montoUSD,
         llamadasAlPagar: item.totalLlamadas,
+        motivo: item.motivo || 'llamadas',
         fechaAlcanzo7: item.fechaAlcanzo7,
         estado: 'pagado',
         pagadoPorEmail: currentUser?.email || '',
@@ -1174,13 +1222,62 @@ export default function CentroManagers() {
         name: currentUser?.name || '',
         role: currentUser?.appRole || '',
         sede: item.sede,
-        details: `Liquidación marcada como pagada: ${item.equipo} (${item.sede}) - Entrenador: ${item.entrenador} - $${item.montoUSD} USD`
+        details: `Liquidación marcada como pagada: ${item.equipo} (${item.sede}) - Entrenador: ${item.entrenador} - $${item.montoUSD} USD - Motivo: ${item.motivo === 'cierre_manual' ? 'equipo cerrado por coordinador' : '7 llamadas alcanzadas'}`
       });
 
       showToast(`Marcado como pagado: ${item.equipo}`, 'success');
     } catch (e) {
       console.error(e);
       showToast('Error al marcar como pagado', 'error');
+    }
+  };
+
+  // (09/09/2026) Acción del COORDINADOR (no de José/Elizabeth): marca un equipo como
+  // cerrado — "ya se graduaron o desertaron" — para que entre a la cola de liquidación
+  // sin depender de que llegue a 7 llamadas. Usa el mismo permiso que ya gobierna
+  // Graduado/Desertor (canChangeStatus) y escribe en managers_directory, donde
+  // canManageManagers() ya tiene permiso total en firestore.rules — no requiere ninguna
+  // regla nueva.
+  const handleCerrarEquipoLiquidacion = async (team) => {
+    if (!canChangeStatus) {
+      showToast("Acceso restringido: cerrar un equipo para liquidación está reservado a Coordinación de Maestría del Juego y Dirección de Maestría.", "warning");
+      return;
+    }
+    const miembros = managers.filter(m => normalizeSede(m.sede) === team.sede && m.equipo === team.equipo);
+    if (miembros.length === 0) return;
+
+    try {
+      const batch = writeBatch(db);
+      const nowISO = new Date().toISOString();
+      miembros.forEach(m => {
+        const docRef = doc(db, 'managers_directory', m.id.toString());
+        batch.update(docRef, {
+          cierreLiquidacionActivo: true,
+          cierreLiquidacionFecha: nowISO,
+          cierreLiquidacionPorNombre: currentUser?.name || '',
+          cierreLiquidacionPorEmail: currentUser?.email || ''
+        });
+      });
+      await batch.commit();
+
+      setManagers(prev => prev.map(m => (normalizeSede(m.sede) === team.sede && m.equipo === team.equipo)
+        ? { ...m, cierreLiquidacionActivo: true, cierreLiquidacionFecha: nowISO, cierreLiquidacionPorNombre: currentUser?.name || '', cierreLiquidacionPorEmail: currentUser?.email || '' }
+        : m
+      ));
+
+      recordAuditEvent({
+        action: 'CIERRE_EQUIPO_LIQUIDACION',
+        email: currentUser?.email || '',
+        name: currentUser?.name || '',
+        role: currentUser?.appRole || '',
+        sede: team.sede,
+        details: `Equipo ${team.equipo} (${team.sede}) marcado como cerrado (graduados/desertores) para liquidación por ${currentUser?.name || currentUser?.email}`
+      });
+
+      showToast(`Equipo ${team.equipo} cerrado — pasará a "Pendientes de pago" en Liquidación aunque no llegue a 7 llamadas.`, 'success');
+    } catch (err) {
+      console.error('Error cerrando equipo para liquidación:', err);
+      showToast('No se pudo marcar el equipo como cerrado. Intenta de nuevo.', 'error');
     }
   };
 
@@ -2208,6 +2305,26 @@ export default function CentroManagers() {
                       </div>
                     </div>
 
+                    {/* CIERRE PARA LIQUIDACIÓN (09/09/2026) — visible solo a quien puede
+                        cambiar Graduado/Desertor (mismo permiso, mismo actor: "el
+                        coordinador dice se graduaron o desertaron, se liquida"). */}
+                    {canChangeStatus && (() => {
+                      const yaCerrado = t.managers.some(m => m.cierreLiquidacionActivo);
+                      return yaCerrado ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 0.7rem', marginBottom: '0.6rem', background: '#dcfce7', border: '1px solid #86efac', borderRadius: '8px', fontSize: '0.75rem', color: '#15803d', fontWeight: 700 }}>
+                          <CheckCircle size={14} /> Cerrado para liquidación
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => handleCerrarEquipoLiquidacion(t)}
+                          title="Marca el equipo como graduado/desertor para que entre a Liquidación aunque no llegue a 7 llamadas"
+                          style={{ width: '100%', marginBottom: '0.6rem', padding: '0.5rem 0.7rem', borderRadius: '8px', border: '1px solid #bfdbfe', background: '#eff6ff', color: '#1d4ed8', fontWeight: 700, fontSize: '0.78rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
+                        >
+                          <DollarSign size={14} /> Cerrar equipo para liquidación
+                        </button>
+                      );
+                    })()}
+
                     {/* BOTONES DE ACCION DEL EQUIPO */}
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
                       <button onClick={() => openGroupModal(t)} style={{ flex: 1, padding: '0.65rem', borderRadius: '8px', border: 'none', background: '#d97706', color: '#fff', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', boxShadow: '0 2px 4px rgba(217,119,6,0.2)' }}>
@@ -2521,7 +2638,7 @@ export default function CentroManagers() {
                 <Clock size={16} color="#b45309" /> Pendientes de pago ({liquidacionData.pendientes.length})
               </h3>
               {liquidacionData.pendientes.length === 0 ? (
-                <p style={{ color: textMuted, fontSize: '0.9rem' }}>No hay equipos pendientes de liquidar por ahora — ningún equipo ha alcanzado todavía las 7 llamadas grupales registradas.</p>
+                <p style={{ color: textMuted, fontSize: '0.9rem' }}>No hay equipos pendientes de liquidar por ahora — ningún equipo ha alcanzado todavía las 7 llamadas grupales registradas ni fue cerrado manualmente por un coordinador.</p>
               ) : (
                 <div style={{ overflowX: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
@@ -2530,8 +2647,8 @@ export default function CentroManagers() {
                         <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Equipo</th>
                         <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Sede</th>
                         <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Entrenador</th>
+                        <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Motivo</th>
                         <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Llamadas</th>
-                        <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Llegó a 7 el</th>
                         <th style={{ padding: '0.7rem 0.6rem', fontWeight: 700, color: textDark }}>Monto</th>
                         <th style={{ padding: '0.7rem 0.6rem' }}></th>
                       </tr>
@@ -2542,8 +2659,18 @@ export default function CentroManagers() {
                           <td style={{ padding: '0.65rem 0.6rem', fontWeight: 600 }}>{item.equipo} {item.numEquipo ? `(#${item.numEquipo})` : ''}</td>
                           <td style={{ padding: '0.65rem 0.6rem' }}><CountryFlag sede={item.sede} /> {item.sede}</td>
                           <td style={{ padding: '0.65rem 0.6rem' }}>{item.entrenador}</td>
+                          <td style={{ padding: '0.65rem 0.6rem' }}>
+                            {item.motivo === 'cierre_manual' ? (
+                              <span title={item.cierreManual?.porNombre ? `Cerrado por ${item.cierreManual.porNombre}` : ''} style={{ background: '#eff6ff', color: '#1d4ed8', padding: '0.2rem 0.5rem', borderRadius: '5px', fontSize: '0.72rem', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                                🎓 Equipo cerrado
+                              </span>
+                            ) : (
+                              <span style={{ background: '#fefce8', color: '#a16207', padding: '0.2rem 0.5rem', borderRadius: '5px', fontSize: '0.72rem', fontWeight: 700, whiteSpace: 'nowrap' }} title={item.fechaAlcanzo7 ? `Llegó a 7 el ${item.fechaAlcanzo7}` : ''}>
+                                📞 7 llamadas
+                              </span>
+                            )}
+                          </td>
                           <td style={{ padding: '0.65rem 0.6rem' }}>{item.totalLlamadas}</td>
-                          <td style={{ padding: '0.65rem 0.6rem' }}>{item.fechaAlcanzo7 || '—'}</td>
                           <td style={{ padding: '0.65rem 0.6rem', fontWeight: 700, color: '#059669' }}>${item.montoUSD}</td>
                           <td style={{ padding: '0.65rem 0.6rem' }}>
                             <button
