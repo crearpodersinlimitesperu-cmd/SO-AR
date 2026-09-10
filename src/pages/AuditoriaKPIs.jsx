@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
+import { useTheme } from '../context/ThemeContext';
 import { collection, getDocs, getDoc, updateDoc, doc, query, orderBy, limit } from 'firebase/firestore';
 import { db, auth, getDocResilient } from '../services/firebase';
 import { CheckCircle2, AlertCircle, ArrowLeft, Users, Target, PhoneCall } from 'lucide-react';
@@ -18,6 +19,12 @@ export default function AuditoriaKPIs({ defaultTab }) {
   const { currentUser } = useAuth();
   const { showToast } = useUI();
   const navigate = useNavigate();
+  // (09/09/2026) Vista Zen — pedido de José: "que funcione para todos los usuarios".
+  // Antes el toggle Vista Zen (ZenModeSelector) cambiaba currentUser/zenMode en el
+  // ThemeContext, pero en esta página ninguna sección lo consultaba — encenderlo no
+  // ocultaba nada aquí, solo dentro de NodusCoordinadoresC1C2Dashboard. Ahora se usa
+  // como "modo enfoque": oculta filtros/ruido y deja solo las tarjetas y números clave.
+  const { zenMode } = useTheme();
   
   const [loading, setLoading] = useState(true);
   const [reports, setReports] = useState([]);
@@ -40,6 +47,13 @@ export default function AuditoriaKPIs({ defaultTab }) {
     
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  // (09/09/2026) Filtro rápido de fecha — pedido de José: filtrar los reportes que YA
+  // están cargados en pantalla, al instante, sin disparar una extracción nueva de Nodus
+  // (eso es lo que hacen startDate/endDate + handleLiveFilter, más abajo — un proceso
+  // distinto que tarda 1-5 minutos). Estado separado a propósito para no mezclar los dos
+  // flujos ni cambiar el comportamiento de "Filtrar" que ya funciona.
+  const [quickDateFrom, setQuickDateFrom] = useState('');
+  const [quickDateTo, setQuickDateTo] = useState('');
   const [isScrapingLive, setIsScrapingLive] = useState(false);
   const [activeTab, setActiveTab] = useState(defaultTab || 'coordinadores_nodus'); // 'coordinadores_nodus', 'cmj', 'entrenadores', 'auditoria'
   const sedesDisponibles = ['Todas', ...OPERATIONAL_SEDES];
@@ -625,47 +639,49 @@ export default function AuditoriaKPIs({ defaultTab }) {
           <button onClick={() => navigate('/gerente')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <ArrowLeft size={16} /> Volver a Causa OS
           </button>
-          <button 
-            onClick={() => navigate('/embudo-conversion')} 
-            style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '0.5rem', 
-              background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', 
-              color: '#000', 
-              fontWeight: 'bold', 
-              padding: '0.6rem 1.2rem', 
-              borderRadius: '8px', 
-              border: 'none', 
-              cursor: 'pointer' 
-            }}
-          >
-            📊 Embudo C1 ➔ C2 ➔ MJ
-          </button>
+          {!zenMode && (
+            <button
+              onClick={() => navigate('/embudo-conversion')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                color: '#000',
+                fontWeight: 'bold',
+                padding: '0.6rem 1.2rem',
+                borderRadius: '8px',
+                border: 'none',
+                cursor: 'pointer'
+              }}
+            >
+              📊 Embudo C1 ➔ C2 ➔ MJ
+            </button>
+          )}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-          {isSuperUser && (
-            <div style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '0.5rem', 
-              background: 'var(--bg-card, rgba(15,23,42,0.6))', 
-              padding: '0.4rem 0.8rem', 
-              borderRadius: '8px', 
-              border: '1px solid var(--border-subtle, rgba(255,255,255,0.12))' 
+          {isSuperUser && !zenMode && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              background: 'var(--bg-card, rgba(15,23,42,0.6))',
+              padding: '0.4rem 0.8rem',
+              borderRadius: '8px',
+              border: '1px solid var(--border-subtle, rgba(255,255,255,0.12))'
             }}>
               <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--crear-gold, #f59e0b)' }}>📍 Sede Global:</span>
               <select
                 value={filterSede}
                 onChange={(e) => setFilterSede(e.target.value)}
-                style={{ 
-                  background: 'transparent', 
-                  color: 'inherit', 
-                  border: 'none', 
-                  fontWeight: 600, 
-                  fontSize: '0.82rem', 
-                  cursor: 'pointer', 
-                  outline: 'none' 
+                style={{
+                  background: 'transparent',
+                  color: 'inherit',
+                  border: 'none',
+                  fontWeight: 600,
+                  fontSize: '0.82rem',
+                  cursor: 'pointer',
+                  outline: 'none'
                 }}
               >
                 <option value="Todas" style={{ background: '#1e293b', color: '#fff' }}>Todas las Sedes</option>
@@ -727,11 +743,12 @@ export default function AuditoriaKPIs({ defaultTab }) {
       {/* Sección Legacy Auditoría de KPIs (solo cuando la tab está activa) */}
       {activeTab === 'auditoria' && (
         <>
-          <div style={{ 
-            background: 'var(--bg-card, #ffffff)', 
-            padding: '1rem', 
-            borderRadius: '12px', 
-            border: '1px solid var(--border-subtle, #e2e8f0)', 
+          {!zenMode && (
+          <div style={{
+            background: 'var(--bg-card, #ffffff)',
+            padding: '1rem',
+            borderRadius: '12px',
+            border: '1px solid var(--border-subtle, #e2e8f0)',
             marginBottom: '1.5rem',
             display: 'flex',
             flexWrap: 'wrap',
@@ -743,8 +760,8 @@ export default function AuditoriaKPIs({ defaultTab }) {
               <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)' }}>Sede</label>
               <div style={{ position: 'relative' }}>
                 <span style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#10b981' }}>📍</span>
-                <select 
-                  value={filterSede} 
+                <select
+                  value={filterSede}
                   onChange={(e) => setFilterSede(e.target.value)}
                   style={{ width: '100%', padding: '0.6rem 1rem 0.6rem 2.2rem', borderRadius: '8px', background: 'var(--bg-dark-alt, #f8fafc)', color: 'var(--text-main, #0f172a)', border: '1px solid var(--border-subtle, #cbd5e1)', fontWeight: 600 }}
                 >
@@ -757,8 +774,8 @@ export default function AuditoriaKPIs({ defaultTab }) {
 
             <div style={{ flex: '1 1 150px', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
               <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)' }}>Desde</label>
-              <input 
-                type="date" 
+              <input
+                type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
                 style={{ padding: '0.6rem 1rem', borderRadius: '8px', background: 'var(--bg-dark-alt, #f8fafc)', color: 'var(--text-main, #0f172a)', border: '1px solid var(--border-subtle, #cbd5e1)', fontWeight: 500 }}
@@ -767,8 +784,8 @@ export default function AuditoriaKPIs({ defaultTab }) {
 
             <div style={{ flex: '1 1 150px', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
               <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)' }}>Hasta</label>
-              <input 
-                type="date" 
+              <input
+                type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
                 style={{ padding: '0.6rem 1rem', borderRadius: '8px', background: 'var(--bg-dark-alt, #f8fafc)', color: 'var(--text-main, #0f172a)', border: '1px solid var(--border-subtle, #cbd5e1)', fontWeight: 500 }}
@@ -776,15 +793,16 @@ export default function AuditoriaKPIs({ defaultTab }) {
             </div>
 
             <div style={{ flex: '0 1 auto' }}>
-              <button 
+              <button
                 onClick={handleLiveFilter}
                 disabled={isScrapingLive}
-                style={{ 
-                  padding: '0.6rem 2rem', 
-                  borderRadius: '8px', 
-                  background: '#ffffff', 
-                  color: '#0ea5e9', 
-                  border: '1px solid #0ea5e9', 
+                title="Dispara una nueva extracción en vivo de Nodus con este rango de fechas (tarda 1-5 minutos)"
+                style={{
+                  padding: '0.6rem 2rem',
+                  borderRadius: '8px',
+                  background: '#ffffff',
+                  color: '#0ea5e9',
+                  border: '1px solid #0ea5e9',
                   fontWeight: 700,
                   cursor: isScrapingLive ? 'wait' : 'pointer',
                   display: 'flex',
@@ -796,11 +814,45 @@ export default function AuditoriaKPIs({ defaultTab }) {
                 {isScrapingLive ? (
                   <>⏳ Filtrando...</>
                 ) : (
-                  <>▽ Filtrar</>
+                  <>▽ Re-extraer de Nodus</>
                 )}
               </button>
             </div>
+            <div style={{ flex: '1 1 100%', fontSize: '0.72rem', color: 'var(--text-muted, #94a3b8)', marginTop: '-0.8rem' }}>
+              ⚠️ "Desde/Hasta" + "Re-extraer de Nodus" dispara una corrida nueva del robot (1-5 min). Para filtrar al instante lo que ya está cargado en pantalla, sin esperar, usa el filtro rápido de abajo.
+            </div>
+
+            <div style={{ flex: '1 1 150px', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              <label style={{ fontSize: '0.8rem', fontWeight: 600, color: '#0369a1' }}>⚡ Filtro rápido — Desde</label>
+              <input
+                type="date"
+                value={quickDateFrom}
+                onChange={(e) => setQuickDateFrom(e.target.value)}
+                style={{ padding: '0.6rem 1rem', borderRadius: '8px', background: 'var(--bg-dark-alt, #f8fafc)', color: 'var(--text-main, #0f172a)', border: '1px solid #7dd3fc', fontWeight: 500 }}
+              />
+            </div>
+            <div style={{ flex: '1 1 150px', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              <label style={{ fontSize: '0.8rem', fontWeight: 600, color: '#0369a1' }}>⚡ Filtro rápido — Hasta</label>
+              <input
+                type="date"
+                value={quickDateTo}
+                onChange={(e) => setQuickDateTo(e.target.value)}
+                style={{ padding: '0.6rem 1rem', borderRadius: '8px', background: 'var(--bg-dark-alt, #f8fafc)', color: 'var(--text-main, #0f172a)', border: '1px solid #7dd3fc', fontWeight: 500 }}
+              />
+            </div>
+            {(quickDateFrom || quickDateTo) && (
+              <div style={{ flex: '0 1 auto' }}>
+                <button
+                  type="button"
+                  onClick={() => { setQuickDateFrom(''); setQuickDateTo(''); }}
+                  style={{ padding: '0.6rem 1.2rem', borderRadius: '8px', background: 'transparent', color: 'var(--text-muted, #64748b)', border: '1px solid var(--border-subtle, #cbd5e1)', fontWeight: 600, cursor: 'pointer' }}
+                >
+                  ✕ Limpiar filtro rápido
+                </button>
+              </div>
+            )}
           </div>
+          )}
 
           <div className="glass-panel" style={{ padding: '2rem', borderRadius: '16px', background: 'var(--bg-card, #ffffff)', border: '1px solid var(--border-subtle, #e2e8f0)', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
         
@@ -977,9 +1029,22 @@ export default function AuditoriaKPIs({ defaultTab }) {
         )}
 
         {(() => {
+          // Filtro rápido de fecha (instantáneo, sobre lo ya cargado — ver quickDateFrom/quickDateTo).
+          // "Hasta" incluye el día completo (23:59:59), no solo las 00:00.
+          const quickFromMs = quickDateFrom ? new Date(quickDateFrom + 'T00:00:00').getTime() : null;
+          const quickToMs = quickDateTo ? new Date(quickDateTo + 'T23:59:59.999').getTime() : null;
+
           const displayedReports = reports.filter(r => {
-            if (filterStatus === 'pending') return r.status !== 'reviewed';
-            if (filterStatus === 'reviewed') return r.status === 'reviewed';
+            if (filterStatus === 'pending' && r.status === 'reviewed') return false;
+            if (filterStatus === 'reviewed' && r.status !== 'reviewed') return false;
+
+            if (quickFromMs != null || quickToMs != null) {
+              const repMs = r.createdAt ? new Date(r.createdAt).getTime() : NaN;
+              if (isNaN(repMs)) return false; // sin fecha registrada: no se puede ubicar en el rango, se excluye
+              if (quickFromMs != null && repMs < quickFromMs) return false;
+              if (quickToMs != null && repMs > quickToMs) return false;
+            }
+
             return true;
           });
 
@@ -1000,33 +1065,63 @@ export default function AuditoriaKPIs({ defaultTab }) {
           }
 
           if (displayedReports.length === 0) {
+            const dateFilterActive = quickFromMs != null || quickToMs != null;
             return (
               <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted, #64748b)', background: 'var(--bg-card-hover, #f8fafc)', borderRadius: '12px', border: '1px dashed var(--border-subtle, #cbd5e1)', margin: '1rem 0' }}>
                 <p style={{ margin: '0 0 0.5rem', fontWeight: 700, fontSize: '1.05rem', color: 'var(--text-heading, #0f172a)' }}>
-                  No hay reportes en la pestaña "{filterStatus === 'pending' ? 'Pendientes por Revisar' : 'Revisados'}"
+                  {filterStatus === 'all'
+                    ? 'No hay reportes que coincidan con estos filtros'
+                    : `No hay reportes en la pestaña "${filterStatus === 'pending' ? 'Pendientes por Revisar' : 'Revisados'}"`}
+                  {dateFilterActive ? ' con el filtro rápido de fecha activo' : ''}
                 </p>
                 <p style={{ margin: '0 0 1rem', fontSize: '0.88rem' }}>
-                  Puedes cambiar a <strong>"📋 Todos"</strong> para revisar el historial completo.
+                  {dateFilterActive && (
+                    <>Prueba a <strong>limpiar el filtro rápido de fecha</strong>{filterStatus !== 'all' ? ', o ' : '. '}</>
+                  )}
+                  {filterStatus !== 'all' && (
+                    <>cambia a <strong>"📋 Todos"</strong> para revisar el historial completo.</>
+                  )}
                 </p>
-                <button
-                  type="button"
-                  onClick={() => setFilterStatus('all')}
-                  style={{
-                    padding: '0.6rem 1.4rem',
-                    borderRadius: '8px',
-                    background: '#3b82f6',
-                    color: '#ffffff',
-                    border: 'none',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    boxShadow: '0 2px 8px rgba(59,130,246,0.35)',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.5rem'
-                  }}
-                >
-                  📋 Ver Todos los Reportes ({reports.length})
-                </button>
+                <div style={{ display: 'flex', gap: '0.6rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                  {dateFilterActive && (
+                    <button
+                      type="button"
+                      onClick={() => { setQuickDateFrom(''); setQuickDateTo(''); }}
+                      style={{
+                        padding: '0.6rem 1.4rem',
+                        borderRadius: '8px',
+                        background: 'transparent',
+                        color: '#0369a1',
+                        border: '1px solid #7dd3fc',
+                        fontWeight: 700,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      ✕ Limpiar filtro rápido de fecha
+                    </button>
+                  )}
+                  {filterStatus !== 'all' && (
+                    <button
+                      type="button"
+                      onClick={() => setFilterStatus('all')}
+                      style={{
+                        padding: '0.6rem 1.4rem',
+                        borderRadius: '8px',
+                        background: '#3b82f6',
+                        color: '#ffffff',
+                        border: 'none',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        boxShadow: '0 2px 8px rgba(59,130,246,0.35)',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.5rem'
+                      }}
+                    >
+                      📋 Ver Todos los Reportes ({reports.length})
+                    </button>
+                  )}
+                </div>
               </div>
             );
           }
@@ -1080,6 +1175,9 @@ export default function AuditoriaKPIs({ defaultTab }) {
                         </div>
                         <div style={{ fontSize: '0.8rem', color: 'var(--text-muted, #64748b)', marginTop: '0.25rem' }}>
                           Suma automática basada en el último envío vigente de cada coordinadora ({latestReps.length} vigentes, {repsInSede.length - latestReps.length} históricos guardados).
+                          {zenMode && repsInSede.length - latestReps.length > 0 && (
+                            <> ⚡ Vista Zen: {repsInSede.length - latestReps.length} envíos históricos ocultos — solo se muestran los vigentes.</>
+                          )}
                         </div>
                       </div>
                       <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
@@ -1099,7 +1197,7 @@ export default function AuditoriaKPIs({ defaultTab }) {
                     </div>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                      {repsInSede.map(rep => (
+                      {(zenMode ? latestReps : repsInSede).map(rep => (
                         <div key={rep.id} style={{
                           background: rep.status === 'reviewed' ? 'rgba(16, 185, 129, 0.04)' : 'var(--bg-card, #ffffff)',
                           border: '1px solid',
