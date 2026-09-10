@@ -527,33 +527,63 @@ class NodusDispatcherAgent {
         const imoName = p.imo.trim();
         if (!imoName) continue;
 
+        // Inferir sede del nombre del equipo si es posible
+        let sedeDetectada = "Lima";
+        const eqUpper = (eq.equipoNombre || '').toUpperCase();
+        if (eqUpper.includes("CUENCA")) sedeDetectada = "Cuenca";
+        else if (eqUpper.includes("QUITO")) sedeDetectada = "Quito";
+        else if (eqUpper.includes("GUAYAQUIL") || eqUpper.includes("GYE")) sedeDetectada = "Guayaquil";
+        else if (eqUpper.includes("BOGOTA") || eqUpper.includes("BOGOTÁ")) sedeDetectada = "Bogotá";
+        else if (eqUpper.includes("MEDELLIN") || eqUpper.includes("MEDELLÍN")) sedeDetectada = "Medellín";
+        else if (eqUpper.includes("MEXICO") || eqUpper.includes("MÉXICO")) sedeDetectada = "México";
+
         if (!imoMissionsMap[imoName]) {
           imoMissionsMap[imoName] = {
             id: `imo_${imoName.toLowerCase().replace(/[^a-z0-9]/g, '_')}_${eq.equipoId}`,
             imoNombre: imoName,
             equipo: eq.equipoNombre,
-            sede: "No especificada",
+            sede: sedeDetectada,
             enrolados: [],
             checks: {},
             lastUpdated: timestamp,
           };
+        } else if (imoMissionsMap[imoName].sede === "No especificada" || imoMissionsMap[imoName].sede === "Lima") {
+          imoMissionsMap[imoName].sede = sedeDetectada;
         }
 
+        const cleanPhone = (p.telefono || '').replace(/\D/g, '');
+        const normNombre = `${p.nombres || ''} ${p.apellidos || ''}`.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
         const enroladoId = `enr_${(p.nombres || '').toLowerCase().replace(/[^a-z0-9]/g, '_')}_${(p.apellidos || '').toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
         const hasAsistencia = p.asistencia && p.asistencia.toLowerCase().includes('si');
         const hasContacto = (p.llamada1 && p.llamada1.trim() !== '') || (p.llamada2 && p.llamada2.trim() !== '');
 
-        imoMissionsMap[imoName].enrolados.push({
-          id: enroladoId,
-          nombre: `${p.nombres || ''} ${p.apellidos || ''}`.trim(),
-          telefono: p.telefono || '',
-          coordinadora_nombre: p.coordinador || eq.equipoNombre,
-          email: '' 
+        // Evitar duplicados dentro de la misión
+        const yaExiste = imoMissionsMap[imoName].enrolados.some(e => {
+          const eCleanPhone = (e.telefono || '').replace(/\D/g, '');
+          if (cleanPhone.length >= 7 && eCleanPhone.length >= 7 && (cleanPhone === eCleanPhone || cleanPhone.endsWith(eCleanPhone) || eCleanPhone.endsWith(cleanPhone))) {
+            return true;
+          }
+          const eNormNombre = (e.nombre || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+          if (normNombre && eNormNombre && normNombre === eNormNombre) {
+            return true;
+          }
+          return false;
         });
 
+        if (!yaExiste) {
+          imoMissionsMap[imoName].enrolados.push({
+            id: enroladoId,
+            nombre: `${p.nombres || ''} ${p.apellidos || ''}`.trim(),
+            telefono: p.telefono || '',
+            coordinadora_nombre: p.coordinador || eq.equipoNombre,
+            email: '' 
+          });
+        }
+
+        // Registrar o actualizar checks
         imoMissionsMap[imoName].checks[enroladoId] = {
-          contacto: !!hasContacto,
-          asistencia: !!hasAsistencia
+          contacto: !!hasContacto || (imoMissionsMap[imoName].checks[enroladoId]?.contacto || false),
+          asistencia: !!hasAsistencia || (imoMissionsMap[imoName].checks[enroladoId]?.asistencia || false)
         };
       }
     }
@@ -562,7 +592,15 @@ class NodusDispatcherAgent {
     for (const imoName in imoMissionsMap) {
       const mission = imoMissionsMap[imoName];
       mission.totalEnrolados = mission.enrolados.length;
-      mission.completados = Object.values(mission.checks).filter(c => c.asistencia).length;
+      
+      // Contar completados solo entre los enrolados vigentes y únicos
+      let completadosCount = 0;
+      for (const enr of mission.enrolados) {
+        if (mission.checks[enr.id]?.asistencia) {
+          completadosCount++;
+        }
+      }
+      mission.completados = completadosCount;
       mission.progreso = mission.totalEnrolados > 0 ? Math.round((mission.completados / mission.totalEnrolados) * 100) : 0;
 
       // merge: true para respetar datos adicionales (como emails) agregados por otros medios

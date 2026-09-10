@@ -170,13 +170,14 @@ export default function MonitorImos() {
       }
 
       // Filtro Estado
-      const isCompleted = m.progreso === 100;
+      const enrolados = getEnroladosList(m);
+      const assisted = enrolados.filter(e => e.asistencia).length;
+      const isCompleted = enrolados.length > 0 && assisted === enrolados.length;
       if (filterEstado === 'completado' && !isCompleted) return false;
       if (filterEstado === 'en_progreso' && isCompleted) return false;
 
       // Filtro Validación Nodus
       if (filterNodus !== 'todos') {
-        const enrolados = getEnroladosList(m);
         const summ = evaluateMissionVerification(m, enrolados);
         if (filterNodus === 'verificado_ok' && summ.overallStatus !== 'VERIFICADO_OK') return false;
         if (filterNodus === 'parcial' && summ.overallStatus !== 'PARCIAL') return false;
@@ -191,7 +192,6 @@ export default function MonitorImos() {
         const matchEquipo = (m.equipo || '').toLowerCase().includes(queryText);
         const matchSede = (m.sede || '').toLowerCase().includes(queryText);
 
-        const enrolados = getEnroladosList(m);
         const matchEnrolado = enrolados.some(e =>
           (e.nombre || '').toLowerCase().includes(queryText) ||
           (e.email || '').toLowerCase().includes(queryText)
@@ -208,17 +208,22 @@ export default function MonitorImos() {
 
   const totalEnroladosCount = useMemo(() => {
     return filteredMissions.reduce((acc, m) => {
-      const enr = getEnroladosList(m);
-      return acc + (m.totalEnrolados || enr.length || 0);
+      return acc + getEnroladosList(m).length;
     }, 0);
   }, [filteredMissions]);
 
   const totalConfirmadosCount = useMemo(() => {
-    return filteredMissions.reduce((acc, m) => acc + (m.completados || 0), 0);
+    return filteredMissions.reduce((acc, m) => {
+      const enr = getEnroladosList(m);
+      return acc + enr.filter(e => e.asistencia).length;
+    }, 0);
   }, [filteredMissions]);
 
   const completadosCount = useMemo(() => {
-    return filteredMissions.filter(m => m.progreso === 100).length;
+    return filteredMissions.filter(m => {
+      const enr = getEnroladosList(m);
+      return enr.length > 0 && enr.every(e => e.asistencia);
+    }).length;
   }, [filteredMissions]);
 
   // Estadísticas globales de verificación cruzada Nodus
@@ -563,8 +568,7 @@ export default function MonitorImos() {
               </tr>
             ) : filteredMissions.map((m) => {
               const enroladosList = getEnroladosList(m);
-              const totalEnrolled = m.totalEnrolados || enroladosList.length || 0;
-              const confirmed = m.completados || 0;
+              const totalEnrolled = enroladosList.length;
               let contacted = 0;
               let assisted = 0;
 
@@ -576,7 +580,8 @@ export default function MonitorImos() {
               // Evaluación automática contra llamadas de Coordinadoras en Nodus
               const nodusSummary = evaluateMissionVerification(m, enroladosList);
 
-              const isCompleted = m.progreso === 100;
+              const progreso = totalEnrolled > 0 ? Math.round((assisted / totalEnrolled) * 100) : 0;
+              const isCompleted = totalEnrolled > 0 && assisted === totalEnrolled;
               const isExpanded = expandedImo === m.id;
 
               return (
@@ -597,7 +602,7 @@ export default function MonitorImos() {
                       {m.equipo || 'Sin Equipo'}
                     </td>
                     <td style={{ padding: '1rem' }}>
-                      <div style={{ fontWeight: 600 }}>Progreso: {m.progreso || 0}%</div>
+                      <div style={{ fontWeight: 600 }}>Progreso: {progreso}%</div>
                       <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>📞 Contactados: {contacted}</div>
                     </td>
                     <td style={{ padding: '1rem', fontWeight: 700 }}>
