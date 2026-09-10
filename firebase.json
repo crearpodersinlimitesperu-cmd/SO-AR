@@ -16,6 +16,7 @@
     }
   ],
   "hosting": {
+    "site": "centro-operativo-cpsl",
     "public": "dist",
     "ignore": [
       "firebase.json",
