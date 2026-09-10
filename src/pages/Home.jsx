@@ -2357,7 +2357,20 @@ export default function Home() {
                                 <span style={{ fontSize: '0.75rem', color: 'var(--crear-cyan)', display: 'block', marginTop: '0.1rem' }}>
                                   🏨 {hotelVenue}
                                 </span>
-                                {(!hasRoleAccess(['qt', 'capitan', 'manager', 'aliado'])) && (
+                                {/* (10/09/2026) FIX — José, viendo como SuperAdmin en "Vista Consolidada
+                                    (Global)" (sin simular ningún rol): "no me muestra los entrenadores
+                                    en los entrenamientos". Causa: hasRoleAccess(allowedRoles) devuelve
+                                    `true` para CUALQUIER lista de roles cuando el usuario es SuperAdmin
+                                    no-simulado (mismo bypass documentado en el fix de simulación de rol
+                                    del 08/09) — así que la negación "!hasRoleAccess([...])" usada aquí
+                                    para OCULTAR el nombre del entrenador a QT/capitán/manager/aliado
+                                    terminaba ocultándoselo también al SuperAdmin, que es justo a quien
+                                    NUNCA debería ocultársele. Ya existía este mismo patrón de arreglo en
+                                    esta página (línea ~969, filtro de búsqueda global) — se replica aquí
+                                    en vez de tocar hasRoleAccess() en sí (usado en muchos otros lugares,
+                                    cambiar su comportamiento general es más riesgo del que pide este bug
+                                    puntual). */}
+                                {(!hasRoleAccess(['qt', 'capitan', 'manager', 'aliado']) || (currentUser?.isSuperAdmin && !currentUser?.isSimulated)) && (
                                   <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginTop: '0.1rem' }}>
                                     🎙️ Trainer: {ev.trainer || ev.entrenador || 'Por confirmar'}
                                   </span>
