@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useUI } from '../context/UIContext';
 import { collection, addDoc, serverTimestamp, query, where, getDocs, orderBy } from 'firebase/firestore';
 import { db } from '../services/firebase';
-import { CheckCircle2, TrendingUp, AlertCircle, ArrowLeft } from 'lucide-react';
+import { CheckCircle2, TrendingUp, AlertCircle, ArrowLeft, Users, Target, PhoneCall, Award, ShieldCheck } from 'lucide-react';
 import { recordAuditEvent } from '../services/auditService';
 
 export default function MisKPIs() {
@@ -15,11 +15,25 @@ export default function MisKPIs() {
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState([]);
   
-  // Para la Fase 1, soportamos C1/C2 y QT
-  const isC1 = currentUser?.appRole === 'coord_c1';
-  const isQT = currentUser?.appRole === 'qt';
+  // Detección automática del rol para preseleccionar la pestaña adecuada
+  const detectDefaultTab = (role) => {
+    const r = (role || '').toLowerCase();
+    if (r.includes('maestr') || r.includes('mj')) return 'mj';
+    if (r.includes('capitan')) return 'capitan';
+    if (r.includes('qt') || r.includes('quantum')) return 'qt';
+    if (r.includes('gerente') || r.includes('direct') || r.includes('superadmin') || r.includes('cfo')) return 'gerencia';
+    return 'c1'; // Default: C1/C2
+  };
+
+  const [activeTab, setActiveTab] = useState(detectDefaultTab(currentUser?.appRole));
+
+  useEffect(() => {
+    if (currentUser?.appRole) {
+      setActiveTab(detectDefaultTab(currentUser.appRole));
+    }
+  }, [currentUser?.appRole]);
   
-  // Estado del formulario C1
+  // Estado del formulario C1 / C2
   const [c1Data, setC1Data] = useState({
     asistencia: '',
     retencion: '',
@@ -31,11 +45,38 @@ export default function MisKPIs() {
     eficienciaGestion: ''
   });
 
+  // Estado del formulario MJ
+  const [mjData, setMjData] = useState({
+    asistenciaMJ: '',
+    retencionMJ: '',
+    enroladosPorIMO: '',
+    conversionALider: '',
+    quiebresResueltos: '',
+    eficienciaSeguimiento: ''
+  });
+
+  // Estado del formulario Capitanía
+  const [capitanData, setCapitanData] = useState({
+    puntualidadEquipo: '',
+    cumplimientoMetas: '',
+    participacionActiva: '',
+    soporteCoaches: '',
+    observaciones: ''
+  });
+
   // Estado del formulario QT
   const [qtData, setQtData] = useState({
     efectividadLlamadas: '',
     futurosImposibles: '',
     resolucionQuiebres: ''
+  });
+
+  // Estado del formulario Gerencia
+  const [gerenciaData, setGerenciaData] = useState({
+    cumplimientoGlobalSede: '',
+    eficienciaOperativa: '',
+    controlDeQuiebres: '',
+    resumenDirectivo: ''
   });
 
   useEffect(() => {
@@ -90,117 +131,151 @@ export default function MisKPIs() {
     setHistory(local);
   };
 
-  const handleSubmitC1 = async (e) => {
-    e.preventDefault();
+  const saveReport = async (roleName, roleCategory, dataPayload) => {
     if (loading) return;
     setLoading(true);
 
     const newReport = {
       id: 'kpi_' + Date.now(),
-      userId: currentUser.uid || currentUser.id || currentUser.email,
-      userEmail: currentUser.email || '',
-      userName: currentUser.name || currentUser.displayName || 'Coordinador',
-      sede: currentUser.sede || 'Quito',
-      role: 'coord_c1',
-      data: { ...c1Data },
+      userId: currentUser?.uid || currentUser?.id || currentUser?.email || 'anon',
+      userEmail: currentUser?.email || 'sin-email',
+      userName: currentUser?.name || currentUser?.displayName || 'Usuario Causa OS',
+      userSede: currentUser?.sede || 'Global',
+      role: roleCategory,
+      roleName: roleName,
+      data: dataPayload,
       status: 'pending',
       createdAt: new Date().toISOString()
     };
 
-    // Guardar localmente
-    const currentList = getLocalReports();
-    saveLocalReports([newReport, ...currentList]);
-    setHistory(prev => [newReport, ...prev]);
-
-    // Intentar sync en Firestore en background
     try {
-      await addDoc(collection(db, 'kpi_reports'), {
-        ...newReport,
-        createdAt: serverTimestamp()
-      });
-      await recordAuditEvent({
-        email: currentUser.email,
-        name: currentUser.name || 'Coordinador',
-        role: 'coord_c1',
-        sede: currentUser.sede || 'Quito',
-        action: 'REPORTE_KPI_ENVIADO',
-        details: `Envío de reporte KPI C1/C2 para sede ${currentUser.sede || 'Quito'}`
-      });
-    } catch (error) {
-      console.warn("Reporte guardado localmente (Firestore offline):", error);
-    }
+      const local = getLocalReports();
+      saveLocalReports([newReport, ...local]);
 
-    showToast("¡Reporte de KPIs enviado exitosamente al Gerente!", "success");
-    setC1Data({
-      asistencia: '', retencion: '', conversionC1C2: '', conversionC2MJ: '',
-      declaracionBreakthrough: '', declaracionAliados: '', palabrasRotas: '', eficienciaGestion: ''
-    });
-    setLoading(false);
+      try {
+        await addDoc(collection(db, 'kpi_reports'), {
+          ...newReport,
+          createdAt: serverTimestamp()
+        });
+      } catch (err) {
+        console.warn("Firestore offline o denegado, guardado solo en cache local:", err);
+      }
+
+      await recordAuditEvent({
+        eventType: 'KPI_REPORT_SUBMITTED',
+        module: 'KPIS',
+        description: `${newReport.userName} envió reporte de KPIs (${roleName}) para la sede ${newReport.userSede}.`,
+        targetUser: newReport.userName,
+        targetEmail: newReport.userEmail,
+        status: 'SUCCESS'
+      });
+
+      showToast(`¡Reporte de KPIs (${roleName}) enviado a Gerencia con éxito!`, 'success');
+      await fetchHistory();
+    } catch (error) {
+      console.error("Error guardando reporte:", error);
+      showToast('Ocurrió un error al enviar el reporte.', 'error');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleSubmitQT = async (e) => {
-    e.preventDefault();
-    if (loading) return;
-    setLoading(true);
-
-    const newReport = {
-      id: 'kpi_' + Date.now(),
-      userId: currentUser.uid || currentUser.id || currentUser.email,
-      userEmail: currentUser.email || '',
-      userName: currentUser.name || currentUser.displayName || 'Quantum Team',
-      sede: currentUser.sede || 'Quito',
-      role: 'qt',
-      data: { ...qtData },
-      status: 'pending',
-      createdAt: new Date().toISOString()
-    };
-
-    // Guardar localmente
-    const currentList = getLocalReports();
-    saveLocalReports([newReport, ...currentList]);
-    setHistory(prev => [newReport, ...prev]);
-
-    // Intentar sync en Firestore en background
+  const formatDateSafe = (val) => {
+    if (!val) return 'Fecha no registrada';
     try {
-      await addDoc(collection(db, 'kpi_reports'), {
-        ...newReport,
-        createdAt: serverTimestamp()
-      });
-      await recordAuditEvent({
-        email: currentUser.email,
-        name: currentUser.name || 'Quantum Team',
-        role: 'qt',
-        sede: currentUser.sede || 'Quito',
-        action: 'REPORTE_KPI_ENVIADO',
-        details: `Envío de reporte KPI Quantum Team para sede ${currentUser.sede || 'Quito'}`
-      });
-    } catch (error) {
-      console.warn("Reporte guardado localmente (Firestore offline):", error);
-    }
-
-    showToast("¡Reporte de KPIs del Quantum Team enviado exitosamente!", "success");
-    setQtData({
-      efectividadLlamadas: '', futurosImposibles: '', resolucionQuiebres: ''
-    });
-    setLoading(false);
+      if (val.toDate && typeof val.toDate === 'function') {
+        return val.toDate().toLocaleString('es-ES', { dateStyle: 'medium', timeStyle: 'short' });
+      }
+      const d = new Date(val);
+      if (!isNaN(d.getTime())) {
+        return d.toLocaleString('es-ES', { dateStyle: 'medium', timeStyle: 'short' });
+      }
+    } catch (e) {}
+    return String(val);
   };
+
+  const isLeadership = Boolean(
+    currentUser?.isSuperAdmin || 
+    currentUser?.isGerente || 
+    currentUser?.isDireccion || 
+    currentUser?.appRole === 'gerente' || 
+    currentUser?.appRole === 'direccion' || 
+    currentUser?.appRole === 'superadmin' || 
+    currentUser?.appRole === 'director_maestria'
+  );
 
   return (
-    <div style={{ maxWidth: '900px', margin: '0 auto', padding: '2rem 1rem' }}>
-      <button onClick={() => navigate('/home')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
-        <ArrowLeft size={16} /> Volver
-      </button>
+    <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '1rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.8rem' }}>
+        <button onClick={() => navigate('/home')} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <ArrowLeft size={16} /> Volver al Inicio
+        </button>
+
+        {isLeadership && (
+          <button 
+            onClick={() => navigate('/auditoria-kpis')} 
+            className="btn-primary" 
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'linear-gradient(135deg, #10b981, #047857)', border: 'none', padding: '0.5rem 1rem', fontSize: '0.9rem', color: '#fff', borderRadius: '8px', cursor: 'pointer' }}
+          >
+            <ShieldCheck size={18} /> Ir a Auditoría de KPIs (Consolidado)
+          </button>
+        )}
+      </div>
 
       <div className="glass-panel" style={{ padding: '2rem', marginBottom: '2rem' }}>
         <h2 className="text-gold" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.8rem', marginBottom: '0.5rem' }}>
           <TrendingUp /> Reporte de KPIs Operativos
         </h2>
-        <p className="text-muted" style={{ marginBottom: '2rem' }}>
-          Ingresa tus métricas al finalizar el ciclo. Estos datos serán auditados directamente por la Gerencia de tu sede.
+        <p className="text-muted" style={{ marginBottom: '1.5rem' }}>
+          Selecciona el área operativa correspondiente a tu función para enviar las métricas auditables a Gerencia de Sede.
         </p>
 
-        {isC1 && (
-          <form onSubmit={handleSubmitC1} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+        {/* PESTAÑAS DE ROLES OPERATIVOS */}
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '1rem', marginBottom: '1.5rem' }}>
+          <button 
+            type="button" 
+            onClick={() => setActiveTab('c1')}
+            style={{ padding: '0.6rem 1.1rem', borderRadius: '8px', border: activeTab === 'c1' ? '1px solid var(--crear-gold)' : '1px solid rgba(255,255,255,0.1)', background: activeTab === 'c1' ? 'rgba(212, 175, 55, 0.15)' : 'rgba(255,255,255,0.03)', color: activeTab === 'c1' ? 'var(--crear-gold)' : '#94a3b8', fontWeight: activeTab === 'c1' ? 700 : 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}
+          >
+            <Users size={16} /> Coordinación C1 / C2
+          </button>
+
+          <button 
+            type="button" 
+            onClick={() => setActiveTab('mj')}
+            style={{ padding: '0.6rem 1.1rem', borderRadius: '8px', border: activeTab === 'mj' ? '1px solid #8b5cf6' : '1px solid rgba(255,255,255,0.1)', background: activeTab === 'mj' ? 'rgba(139, 92, 246, 0.15)' : 'rgba(255,255,255,0.03)', color: activeTab === 'mj' ? '#a78bfa' : '#94a3b8', fontWeight: activeTab === 'mj' ? 700 : 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}
+          >
+            <Award size={16} /> Maestría del Juego (CMJ)
+          </button>
+
+          <button 
+            type="button" 
+            onClick={() => setActiveTab('capitan')}
+            style={{ padding: '0.6rem 1.1rem', borderRadius: '8px', border: activeTab === 'capitan' ? '1px solid #22c55e' : '1px solid rgba(255,255,255,0.1)', background: activeTab === 'capitan' ? 'rgba(34, 197, 94, 0.15)' : 'rgba(255,255,255,0.03)', color: activeTab === 'capitan' ? '#4ade80' : '#94a3b8', fontWeight: activeTab === 'capitan' ? 700 : 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}
+          >
+            <Target size={16} /> Capitanía de Sede
+          </button>
+
+          <button 
+            type="button" 
+            onClick={() => setActiveTab('qt')}
+            style={{ padding: '0.6rem 1.1rem', borderRadius: '8px', border: activeTab === 'qt' ? '1px solid #ec4899' : '1px solid rgba(255,255,255,0.1)', background: activeTab === 'qt' ? 'rgba(236, 72, 153, 0.15)' : 'rgba(255,255,255,0.03)', color: activeTab === 'qt' ? '#f472b6' : '#94a3b8', fontWeight: activeTab === 'qt' ? 700 : 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}
+          >
+            <PhoneCall size={16} /> Quantum Team (QT)
+          </button>
+
+          <button 
+            type="button" 
+            onClick={() => setActiveTab('gerencia')}
+            style={{ padding: '0.6rem 1.1rem', borderRadius: '8px', border: activeTab === 'gerencia' ? '1px solid #f59e0b' : '1px solid rgba(255,255,255,0.1)', background: activeTab === 'gerencia' ? 'rgba(245, 158, 11, 0.15)' : 'rgba(255,255,255,0.03)', color: activeTab === 'gerencia' ? '#fbbf24' : '#94a3b8', fontWeight: activeTab === 'gerencia' ? 700 : 500, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem' }}
+          >
+            <ShieldCheck size={16} /> Gerencia de Sede
+          </button>
+        </div>
+
+        {/* 1. FORMULARIO C1 / C2 */}
+        {activeTab === 'c1' && (
+          <form onSubmit={(e) => { e.preventDefault(); saveReport('Coordinador C1 / C2', 'coord_c1', c1Data); }} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
             <div className="form-group">
               <label>Asistencia C1 / C2 (%) <span className="text-gold" style={{ fontSize: '0.8rem' }}>(Meta: 95%)</span></label>
               <input type="number" required value={c1Data.asistencia} onChange={e => setC1Data({...c1Data, asistencia: e.target.value})} placeholder="Ej: 96" />
@@ -234,44 +309,131 @@ export default function MisKPIs() {
               <input type="number" required value={c1Data.eficienciaGestion} onChange={e => setC1Data({...c1Data, eficienciaGestion: e.target.value})} placeholder="Ej: 100" />
             </div>
             <div style={{ gridColumn: '1 / -1', marginTop: '1rem' }}>
-              <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', padding: '1rem', fontSize: '1.1rem' }}>
-                {loading ? 'Enviando...' : 'Enviar Reporte a Gerencia'}
+              <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', padding: '1rem', fontSize: '1.05rem', background: 'var(--crear-gold)', color: '#000', fontWeight: 'bold' }}>
+                {loading ? 'Enviando...' : 'Enviar Reporte C1/C2 a Gerencia'}
               </button>
             </div>
           </form>
         )}
 
-        {isQT && (
-          <form onSubmit={handleSubmitQT} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+        {/* 2. FORMULARIO MAESTRÍA DEL JUEGO */}
+        {activeTab === 'mj' && (
+          <form onSubmit={(e) => { e.preventDefault(); saveReport('Coordinador Maestría del Juego', 'coord_maestria', mjData); }} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
+            <div className="form-group">
+              <label>Asistencia MJ (%) <span className="text-gold" style={{ fontSize: '0.8rem' }}>(Meta: 90%)</span></label>
+              <input type="number" required value={mjData.asistenciaMJ} onChange={e => setMjData({...mjData, asistenciaMJ: e.target.value})} placeholder="Ej: 92" />
+            </div>
+            <div className="form-group">
+              <label>Retención Maestría (%) <span className="text-gold" style={{ fontSize: '0.8rem' }}>(Meta: Menos de 8%)</span></label>
+              <input type="number" required value={mjData.retencionMJ} onChange={e => setMjData({...mjData, retencionMJ: e.target.value})} placeholder="Ej: 5" />
+            </div>
+            <div className="form-group">
+              <label>Promedio Enrolados por IMO <span className="text-gold" style={{ fontSize: '0.8rem' }}>(Meta: 3.0)</span></label>
+              <input type="number" step="0.1" required value={mjData.enroladosPorIMO} onChange={e => setMjData({...mjData, enroladosPorIMO: e.target.value})} placeholder="Ej: 2.8" />
+            </div>
+            <div className="form-group">
+              <label>Conversión a Líder (%) <span className="text-gold" style={{ fontSize: '0.8rem' }}>(Meta: 60%)</span></label>
+              <input type="number" required value={mjData.conversionALider} onChange={e => setMjData({...mjData, conversionALider: e.target.value})} placeholder="Ej: 64" />
+            </div>
+            <div className="form-group">
+              <label>Quiebres Resueltos Semanal <span className="text-gold" style={{ fontSize: '0.8rem' }}>(Meta: 100%)</span></label>
+              <input type="number" required value={mjData.quiebresResueltos} onChange={e => setMjData({...mjData, quiebresResueltos: e.target.value})} placeholder="Ej: 12" />
+            </div>
+            <div className="form-group">
+              <label>Eficiencia de Seguimiento (%) <span className="text-gold" style={{ fontSize: '0.8rem' }}>(Meta: 100%)</span></label>
+              <input type="number" required value={mjData.eficienciaSeguimiento} onChange={e => setMjData({...mjData, eficienciaSeguimiento: e.target.value})} placeholder="Ej: 98" />
+            </div>
+            <div style={{ gridColumn: '1 / -1', marginTop: '1rem' }}>
+              <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', padding: '1rem', fontSize: '1.05rem', background: '#8b5cf6', color: '#fff', fontWeight: 'bold' }}>
+                {loading ? 'Enviando...' : 'Enviar Reporte de Maestría a Gerencia'}
+              </button>
+            </div>
+          </form>
+        )}
+
+        {/* 3. FORMULARIO CAPITANÍA */}
+        {activeTab === 'capitan' && (
+          <form onSubmit={(e) => { e.preventDefault(); saveReport('Capitanía de Sede', 'capitan', capitanData); }} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
+            <div className="form-group">
+              <label>Puntualidad del Equipo (%) <span className="text-gold" style={{ fontSize: '0.8rem' }}>(Meta: 100%)</span></label>
+              <input type="number" required value={capitanData.puntualidadEquipo} onChange={e => setCapitanData({...capitanData, puntualidadEquipo: e.target.value})} placeholder="Ej: 98" />
+            </div>
+            <div className="form-group">
+              <label>Cumplimiento de Metas (%) <span className="text-gold" style={{ fontSize: '0.8rem' }}>(Meta: 90%)</span></label>
+              <input type="number" required value={capitanData.cumplimientoMetas} onChange={e => setCapitanData({...capitanData, cumplimientoMetas: e.target.value})} placeholder="Ej: 88" />
+            </div>
+            <div className="form-group">
+              <label>Participación Activa del Equipo (%) <span className="text-gold" style={{ fontSize: '0.8rem' }}>(Meta: 95%)</span></label>
+              <input type="number" required value={capitanData.participacionActiva} onChange={e => setCapitanData({...capitanData, participacionActiva: e.target.value})} placeholder="Ej: 95" />
+            </div>
+            <div className="form-group">
+              <label>Soporte y Respaldo a Coaches (%) <span className="text-gold" style={{ fontSize: '0.8rem' }}>(Meta: 100%)</span></label>
+              <input type="number" required value={capitanData.soporteCoaches} onChange={e => setCapitanData({...capitanData, soporteCoaches: e.target.value})} placeholder="Ej: 100" />
+            </div>
+            <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+              <label>Bitácora de Quiebres y Acciones del Capitán</label>
+              <textarea rows="3" value={capitanData.observaciones} onChange={e => setCapitanData({...capitanData, observaciones: e.target.value})} placeholder="Resumen de acciones de capitanía y apoyo al equipo durante el ciclo..." style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.15)', color: 'white', borderRadius: '8px' }}></textarea>
+            </div>
+            <div style={{ gridColumn: '1 / -1', marginTop: '1rem' }}>
+              <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', padding: '1rem', fontSize: '1.05rem', background: '#22c55e', color: '#000', fontWeight: 'bold' }}>
+                {loading ? 'Enviando...' : 'Enviar Reporte de Capitanía a Gerencia'}
+              </button>
+            </div>
+          </form>
+        )}
+
+        {/* 4. FORMULARIO QT */}
+        {activeTab === 'qt' && (
+          <form onSubmit={(e) => { e.preventDefault(); saveReport('Quantum Team (QT)', 'qt', qtData); }} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
             <div className="form-group">
               <label>Efectividad Llamadas C1 (%) <span className="text-gold" style={{ fontSize: '0.8rem' }}>(Meta: 60%)</span></label>
               <input type="number" required value={qtData.efectividadLlamadas} onChange={e => setQtData({...qtData, efectividadLlamadas: e.target.value})} placeholder="Ej: 65" />
             </div>
             <div className="form-group">
-              <label>Futuros Imposibles Mapeados <span className="text-gold" style={{ fontSize: '0.8rem' }}>(Meta: 2/ciclo min)</span></label>
-              <input type="number" required value={qtData.futurosImposibles} onChange={e => setQtData({...qtData, futurosImposibles: e.target.value})} placeholder="Ej: 3" />
+              <label>Futuros Imposibles C2 Declarados (%) <span className="text-gold" style={{ fontSize: '0.8rem' }}>(Meta: 80%)</span></label>
+              <input type="number" required value={qtData.futurosImposibles} onChange={e => setQtData({...qtData, futurosImposibles: e.target.value})} placeholder="Ej: 85" />
             </div>
             <div className="form-group" style={{ gridColumn: '1 / -1' }}>
               <label>Resumen de Quiebres y Rescates Operativos</label>
               <textarea required rows="3" value={qtData.resolucionQuiebres} onChange={e => setQtData({...qtData, resolucionQuiebres: e.target.value})} placeholder="Describe brevemente cuántos aliados desconectados rescataste y qué quiebres resolviste..." style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--crear-gold)', color: 'white', borderRadius: '8px' }}></textarea>
             </div>
             <div style={{ gridColumn: '1 / -1', marginTop: '1rem' }}>
-              <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', padding: '1rem', fontSize: '1.1rem' }}>
-                {loading ? 'Enviando...' : 'Enviar Reporte a Gerencia'}
+              <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', padding: '1rem', fontSize: '1.05rem', background: '#ec4899', color: '#fff', fontWeight: 'bold' }}>
+                {loading ? 'Enviando...' : 'Enviar Reporte QT a Gerencia'}
               </button>
             </div>
           </form>
         )}
 
-        {(!isC1 && !isQT) && (
-          <div style={{ padding: '2rem', textAlign: 'center', background: 'rgba(255,0,0,0.1)', borderRadius: '8px' }}>
-            <AlertCircle size={48} className="text-gold" style={{ margin: '0 auto 1rem' }} />
-            <h3 className="text-white">Formulario no disponible</h3>
-            <p className="text-muted">Tu rol actual no tiene un formulario de KPIs asignado en esta versión.</p>
-          </div>
+        {/* 5. FORMULARIO GERENCIA DE SEDE */}
+        {activeTab === 'gerencia' && (
+          <form onSubmit={(e) => { e.preventDefault(); saveReport('Gerencia de Sede', 'gerente', gerenciaData); }} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
+            <div className="form-group">
+              <label>Cumplimiento Global de Sede (%) <span className="text-gold" style={{ fontSize: '0.8rem' }}>(Meta: 95%)</span></label>
+              <input type="number" required value={gerenciaData.cumplimientoGlobalSede} onChange={e => setGerenciaData({...gerenciaData, cumplimientoGlobalSede: e.target.value})} placeholder="Ej: 94" />
+            </div>
+            <div className="form-group">
+              <label>Eficiencia Operativa Sedes (%) <span className="text-gold" style={{ fontSize: '0.8rem' }}>(Meta: 90%)</span></label>
+              <input type="number" required value={gerenciaData.eficienciaOperativa} onChange={e => setGerenciaData({...gerenciaData, eficienciaOperativa: e.target.value})} placeholder="Ej: 91" />
+            </div>
+            <div className="form-group">
+              <label>Control de Quiebres y Retención (%) <span className="text-gold" style={{ fontSize: '0.8rem' }}>(Meta: 85%)</span></label>
+              <input type="number" required value={gerenciaData.controlDeQuiebres} onChange={e => setGerenciaData({...gerenciaData, controlDeQuiebres: e.target.value})} placeholder="Ej: 88" />
+            </div>
+            <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+              <label>Conclusiones y Directivas de Sede</label>
+              <textarea rows="3" value={gerenciaData.resumenDirectivo} onChange={e => setGerenciaData({...gerenciaData, resumenDirectivo: e.target.value})} placeholder="Dictamen gerencial, asignación de recursos y soporte para el siguiente ciclo..." style={{ width: '100%', padding: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px solid #f59e0b', color: 'white', borderRadius: '8px' }}></textarea>
+            </div>
+            <div style={{ gridColumn: '1 / -1', marginTop: '1rem' }}>
+              <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', padding: '1rem', fontSize: '1.05rem', background: '#f59e0b', color: '#000', fontWeight: 'bold' }}>
+                {loading ? 'Enviando...' : 'Registrar Dictamen Gerencial'}
+              </button>
+            </div>
+          </form>
         )}
       </div>
 
+      {/* HISTORIAL DE REPORTES */}
       <div className="glass-panel" style={{ padding: '2rem' }}>
         <h3 className="text-gold" style={{ marginBottom: '1.5rem', fontSize: '1.3rem' }}>Tus Reportes Anteriores</h3>
         {history.length === 0 ? (
@@ -281,16 +443,22 @@ export default function MisKPIs() {
             {history.map(rep => (
               <div key={rep.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', borderLeft: rep.status === 'reviewed' ? '4px solid #10b981' : '4px solid #f59e0b' }}>
                 <div>
-                  <h4 style={{ margin: '0 0 0.25rem', color: 'white' }}>Reporte de {rep.role === 'qt' ? 'Quantum Team' : 'C1/C2'}</h4>
+                  <h4 style={{ margin: '0 0 0.25rem', color: 'white' }}>
+                    {rep.roleName || (rep.role === 'qt' ? 'Quantum Team (QT)' : 'Coordinación C1 / C2')} - {rep.userSede || 'Global'}
+                  </h4>
                   <p className="text-muted" style={{ margin: 0, fontSize: '0.85rem' }}>
-                    Enviado el {rep.createdAt?.toDate().toLocaleDateString() || '...'}
+                    Enviado el {formatDateSafe(rep.createdAt)}
                   </p>
                 </div>
                 <div>
                   {rep.status === 'reviewed' ? (
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', color: '#10b981', fontSize: '0.85rem', fontWeight: 'bold' }}><CheckCircle2 size={16} /> Revisado por Gerencia</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', color: '#10b981', fontSize: '0.85rem', fontWeight: 'bold' }}>
+                      <CheckCircle2 size={16} /> Revisado por Gerencia
+                    </span>
                   ) : (
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', color: '#f59e0b', fontSize: '0.85rem', fontWeight: 'bold' }}><AlertCircle size={16} /> Pendiente de Revisión</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', color: '#f59e0b', fontSize: '0.85rem', fontWeight: 'bold' }}>
+                      <AlertCircle size={16} /> Pendiente de Revisión
+                    </span>
                   )}
                 </div>
               </div>
@@ -301,3 +469,4 @@ export default function MisKPIs() {
     </div>
   );
 }
+
