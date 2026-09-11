@@ -3,16 +3,18 @@ import { useTheme } from '../context/ThemeContext';
 import { Leaf, LayoutTemplate } from 'lucide-react';
 
 export default function ZenModeSelector() {
-  const { zenMode, setZenMode, activeTheme } = useTheme();
+  const { zenMode, setZenMode, activeTheme, themeMode, setThemeMode } = useTheme();
+
+  const isZenActive = zenMode || themeMode === 'zen';
 
   return (
     <div 
       style={{
         display: 'inline-flex',
         alignItems: 'center',
-        background: activeTheme === 'light' ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.06)',
+        background: activeTheme === 'light' ? 'rgba(0, 0, 0, 0.06)' : activeTheme === 'zen' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(255, 255, 255, 0.06)',
         backdropFilter: 'blur(12px)',
-        border: activeTheme === 'light' ? '1px solid rgba(0, 0, 0, 0.12)' : '1px solid rgba(255, 255, 255, 0.12)',
+        border: activeTheme === 'light' ? '1px solid rgba(0, 0, 0, 0.12)' : activeTheme === 'zen' ? '1px solid rgba(52, 211, 153, 0.25)' : '1px solid rgba(255, 255, 255, 0.12)',
         borderRadius: '9999px',
         padding: '3px',
         gap: '2px',
@@ -24,7 +26,10 @@ export default function ZenModeSelector() {
     >
       <button
         type="button"
-        onClick={() => setZenMode(true)}
+        onClick={() => {
+          setZenMode(true);
+          setThemeMode('zen');
+        }}
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -37,9 +42,9 @@ export default function ZenModeSelector() {
           fontWeight: 700,
           letterSpacing: '0.5px',
           transition: 'all 0.25s',
-          background: zenMode ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 'transparent',
-          color: zenMode ? '#ffffff' : (activeTheme === 'light' ? '#64748b' : '#94a3b8'),
-          boxShadow: zenMode ? '0 2px 10px rgba(16, 185, 129, 0.4)' : 'none'
+          background: isZenActive ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 'transparent',
+          color: isZenActive ? '#ffffff' : (activeTheme === 'light' ? '#64748b' : '#94a3b8'),
+          boxShadow: isZenActive ? '0 2px 10px rgba(16, 185, 129, 0.4)' : 'none'
         }}
       >
         <Leaf size={13} strokeWidth={2.5} />
@@ -48,7 +53,10 @@ export default function ZenModeSelector() {
 
       <button
         type="button"
-        onClick={() => setZenMode(false)}
+        onClick={() => {
+          setZenMode(false);
+          setThemeMode('dark');
+        }}
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -61,9 +69,9 @@ export default function ZenModeSelector() {
           fontWeight: 700,
           letterSpacing: '0.5px',
           transition: 'all 0.25s',
-          background: !zenMode ? 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)' : 'transparent',
-          color: !zenMode ? '#ffffff' : (activeTheme === 'light' ? '#64748b' : '#94a3b8'),
-          boxShadow: !zenMode ? '0 2px 10px rgba(99, 102, 241, 0.4)' : 'none'
+          background: !isZenActive ? 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)' : 'transparent',
+          color: !isZenActive ? '#ffffff' : (activeTheme === 'light' ? '#64748b' : '#94a3b8'),
+          boxShadow: !isZenActive ? '0 2px 10px rgba(99, 102, 241, 0.4)' : 'none'
         }}
       >
         <LayoutTemplate size={13} strokeWidth={2.5} />
