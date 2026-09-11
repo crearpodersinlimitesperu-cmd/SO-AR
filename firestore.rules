@@ -374,6 +374,18 @@ service cloud.firestore {
       allow write: if request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET";
     }
 
+    // NODUS: Centinela de RRHH y desempeño de coordinadores
+    match /nodus_hr_sentinel/{document=**} {
+      allow read: if isAuthenticated();
+      allow write: if request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET";
+    }
+
+    // HABEAS DATA: Lista de bajas y opt-out de campañas de correo
+    match /opt_outs/{document=**} {
+      allow read: if isAuthenticated() || request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET";
+      allow write: if true; // Permite a prospectos desuscribirse desde la web sin login
+    }
+
     // NOTAS DE SEGUIMIENTO — feedback que el entrenador de llamadas deja después de
     // cada llamada (individual o grupal), para detectar y anticiparse a quiebres.
     // Pedido explícito de José (vigente desde antes de perderse esta regla): "deben
@@ -441,7 +453,7 @@ service cloud.firestore {
     // NOTIFICATIONS (userId siempre es el correo, nunca el uid)
     match /notifications/{notifId} {
       allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
+      allow create: if isAuthenticated() || request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET";
       allow update: if isAuthenticated() && resource.data.userId == email();
       allow delete: if isAuthenticated() && resource.data.userId == email();
     }
