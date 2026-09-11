@@ -15,8 +15,70 @@ import { useTheme } from '../context/ThemeContext';
 import ThemeSelector from './ThemeSelector';
 import ZenModeSelector from './ZenModeSelector';
 import nodusFallbackData from '../data/nodusFallbackData.json';
-import { OPERATIONAL_SEDES } from '../data/usersData';
+import { usersData, OPERATIONAL_SEDES } from '../data/usersData';
 import './NodusCoordinadoresC1C2Dashboard.css';
+
+const KNOWN_COORDINATOR_EMAILS = {
+  'DIANA MACAS': 'diana.macas@crearpsl.net',
+  'BRENDA RODRIGUEZ': 'brenda.rodriguez@crearpsl.net',
+  'VALENTINA RODRIGUEZ': 'valentina.r@crearpsl.net',
+  'JOYCE': 'joyce.marin@crearpsl.net',
+  'JOYCE MARIN': 'joyce.marin@crearpsl.net',
+  'LILIANA': 'liliana.cubillo@crearpsl.net',
+  'LILIANA CUBILLO': 'liliana.cubillo@crearpsl.net',
+  'ADAMS': 'coordinacion.quito@crearpsl.net',
+  'DIANA': 'diana.macas@crearpsl.net',
+  'DIANA MOSCOSO': 'diana.moscoso@crearpsl.net',
+  'JOSUE VERA': 'josue.vera@crearpsl.net',
+  'MARCOS VERA': 'josue.vera@crearpsl.net',
+  'JONATHAN LAROSA': 'jonathan.larosa@crearpsl.net',
+  'ERIKA GAVILANEZ': 'erika.gavilanez@crearpsl.net',
+  'LINID VALENCIA': 'linid.valencia@crearpsl.net',
+  'MAURICIO RAMIREZ': 'mauricio.ramirez@crearpsl.net',
+  'ALONSO SOLARES': 'alonso.solares@crearpsl.net',
+  'KERLIE CARRILLO': 'kerlie.carrillo@crearpsl.net'
+};
+
+function resolveCoordinatorEmail(coord) {
+  if (coord?.email && coord.email.includes('@') && !coord.email.toLowerCase().includes('solicitar')) {
+    return coord.email.trim();
+  }
+
+  const clean = (s) => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+  const rawName = coord?.nombre || coord?.nombreCompleto || '';
+  const nameClean = clean(rawName);
+
+  // 1. Catálogo conocido de coordinadores C1 / C2
+  for (const [key, email] of Object.entries(KNOWN_COORDINATOR_EMAILS)) {
+    const keyClean = clean(key);
+    if (nameClean === keyClean || nameClean.includes(keyClean) || keyClean.includes(nameClean)) {
+      return email;
+    }
+  }
+
+  // 2. Consulta en usersData
+  if (Array.isArray(usersData)) {
+    const match = usersData.find(u => {
+      const uName = clean(u.name || u.displayName);
+      return uName && (uName.includes(nameClean) || nameClean.includes(uName));
+    });
+    if (match?.email) return match.email;
+    if (match?.corporateEmail) return match.corporateEmail;
+    if (Array.isArray(match?.emails) && match.emails.length > 0) return match.emails[0];
+  }
+
+  // 3. Fallback: generación de correo institucional
+  const parts = rawName.split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) {
+    const first = clean(parts[0]);
+    const last = clean(parts[1]);
+    return `${first}.${last}@crearpsl.net`;
+  } else if (parts.length === 1 && parts[0]) {
+    return `${clean(parts[0])}@crearpsl.net`;
+  }
+
+  return 'coordinacion@crearpsl.net';
+}
 
 // Combinación robusta y resiliente con el catálogo multi-sede de nodusFallbackData
 // Garantiza que JAMÁS se pierdan las 6 sedes (Cuenca, Guayaquil, Lima, Medellín, México, Quito) ni los 22 coordinadores
@@ -316,6 +378,7 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
 
       return {
         ...c,
+        email: resolveCoordinatorEmail(c),
         sentadosC1: sentadosC1 || 0,
         sentadosC2: sentadosC2 || 0,
         sentadosTotal: totalSentados || 0,
@@ -1430,8 +1493,8 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
                                   </span>
                                 )}
                               </div>
-                              <div style={{ fontSize: '0.75rem', color: coord.email ? 'var(--nodus-text-muted)' : '#f87171', fontFamily: 'monospace' }}>
-                                {coord.email || 'Email no registrado (Solicitar a RRHH)'}
+                              <div style={{ fontSize: '0.75rem', color: 'var(--nodus-text-muted)', fontFamily: 'monospace' }}>
+                                {coord.email || resolveCoordinatorEmail(coord)}
                               </div>
                             </div>
                           </div>
@@ -1637,3 +1700,4 @@ export default function NodusCoordinadoresC1C2Dashboard({ globalFilterSede } = {
     </div>
   );
 }
+
