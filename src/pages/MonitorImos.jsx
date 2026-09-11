@@ -163,6 +163,26 @@ export default function MonitorImos() {
     return normalizeSede(s);
   };
 
+  // Helper para normalizar nombres de equipo evitando duplicidades o fragmentación
+  // (ej: EQUIPO 29 y EQUIPO 29 - LIMA CICLO 1 V corresponden al mismo equipo operativo)
+  const normalizeEquipoName = (raw) => {
+    if (!raw) return 'Sin Equipo';
+    const clean = raw.trim().replace(/\s+/g, ' ');
+    if (/^EQUIPO\s+28(\b|\s|$)/i.test(clean) && !clean.toUpperCase().includes('QUITO')) {
+      return 'EQUIPO 28 - LIMA CICLO 1';
+    }
+    if (/^EQUIPO\s+29(\b|\s|$)/i.test(clean)) {
+      return 'EQUIPO 29 - LIMA CICLO 1';
+    }
+    if (/^EQUIPO\s+30(\b|\s|$)/i.test(clean)) {
+      return 'EQUIPO 30 - LIMA CICLO 1';
+    }
+    if (/^EQUIPO\s+31(\b|\s|$)/i.test(clean)) {
+      return 'EQUIPO 31 - LIMA CICLO 1';
+    }
+    return clean.replace(/\s+V$/i, '').replace(/[✓✔]/g, '').trim();
+  };
+
   const isGlobalScopeUser = !!(currentUser?.isSuperAdmin || currentUser?.isConsolidatedView || currentUser?.appRole === 'consolidado' || currentUser?.isDireccion);
   const sedeScopedMissions = useMemo(() => {
     if (isGlobalScopeUser) return missions;
@@ -186,12 +206,12 @@ export default function MonitorImos() {
     return Array.from(setSedes).sort();
   }, [missions, sedeScopedMissions, isGlobalScopeUser]);
 
-  // Equipos únicos para el filtro (filtrados por sede si se seleccionó una)
+  // Equipos únicos para el filtro (filtrados por sede si se seleccionó una y normalizados)
   const equiposDisponibles = useMemo(() => {
     const setEq = new Set();
     sedeScopedMissions.forEach(m => {
       if (filterSede !== 'todos' && resolveMissionSede(m) !== filterSede) return;
-      if (m.equipo) setEq.add(m.equipo);
+      if (m.equipo) setEq.add(normalizeEquipoName(m.equipo));
     });
     return Array.from(setEq).sort();
   }, [sedeScopedMissions, filterSede]);
@@ -204,8 +224,8 @@ export default function MonitorImos() {
         return false;
       }
 
-      // Filtro Equipo
-      if (filterEquipo !== 'todos' && (m.equipo || '').toUpperCase() !== filterEquipo.toUpperCase()) {
+      // Filtro Equipo (unificado mediante normalización)
+      if (filterEquipo !== 'todos' && normalizeEquipoName(m.equipo) !== filterEquipo) {
         return false;
       }
 
@@ -229,7 +249,7 @@ export default function MonitorImos() {
       if (searchTerm.trim()) {
         const queryText = searchTerm.toLowerCase().trim();
         const matchImo = (m.imoNombre || '').toLowerCase().includes(queryText);
-        const matchEquipo = (m.equipo || '').toLowerCase().includes(queryText);
+        const matchEquipo = (m.equipo || '').toLowerCase().includes(queryText) || normalizeEquipoName(m.equipo).toLowerCase().includes(queryText);
         const matchSede = (resolveMissionSede(m) || '').toLowerCase().includes(queryText) || (m.sede || '').toLowerCase().includes(queryText);
 
         const matchEnrolado = enrolados.some(e =>
@@ -806,8 +826,8 @@ export default function MonitorImos() {
                       </div>
                       <div style={{ fontSize: '0.75rem', color: '#38bdf8', fontWeight: 600 }}>📍 {resolveMissionSede(m)}</div>
                     </td>
-                    <td style={{ padding: '1rem', fontSize: '0.9rem', color: 'var(--crear-blue)' }}>
-                      {m.equipo || 'Sin Equipo'}
+                    <td style={{ padding: '1rem', fontSize: '0.9rem', color: 'var(--crear-blue)', fontWeight: 600 }}>
+                      {normalizeEquipoName(m.equipo)}
                     </td>
                     <td style={{ padding: '1rem' }}>
                       <div style={{ fontWeight: 600 }}>Progreso: {progreso}%</div>
@@ -999,7 +1019,7 @@ export default function MonitorImos() {
                                     </div>
 
                                     <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '4px' }}>
-                                      📍 {enrolado.coordinadora_nombre || m.equipo}
+                                      📍 {enrolado.coordinadora_nombre || normalizeEquipoName(m.equipo)}
                                       {enrolado.telefono ? ` • 📱 ${enrolado.telefono}` : ''}
                                     </div>
 
