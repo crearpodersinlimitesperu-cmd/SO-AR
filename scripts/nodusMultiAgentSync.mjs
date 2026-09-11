@@ -40,22 +40,30 @@ class NodusExtractorAgent {
     this.page = null;
   }
 
-  async initBrowser() {
-    console.log("🤖 [Agente 1 - Extractor] Iniciando navegador Puppeteer blindado...");
+  async initBrowser(proxy = null) {
+    console.log("🤖 [Agente 1 - Extractor] Iniciando navegador Puppeteer blindado..." + (proxy ? ` (Proxy: ${proxy})` : ''));
+    const args = [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-accelerated-2d-canvas',
+      '--no-first-run',
+      '--no-zygote',
+      '--disable-gpu',
+      '--window-size=1920,1080'
+    ];
+    if (proxy) {
+      args.push(`--proxy-server=http://${proxy}`);
+    }
     this.browser = await puppeteer.launch({
       headless: true,
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-accelerated-2d-canvas',
-        '--no-first-run',
-        '--no-zygote',
-        '--disable-gpu',
-        '--window-size=1920,1080'
-      ]
+      args
     });
     this.page = await this.browser.newPage();
+    await this.page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36');
+    await this.page.setExtraHTTPHeaders({
+      'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8'
+    });
     await this.page.setViewport({ width: 1920, height: 1080 });
   }
 
@@ -86,23 +94,37 @@ class NodusExtractorAgent {
         attempts++;
         await this.safeGoto('https://imo.crearpslglobal.com/auth/login', 40000);
         
-        const userInput = await this.page.$('input[name="usuario"]');
-        if (userInput) {
-          await this.page.type('input[name="usuario"]', user);
-          await this.page.type('input[name="password"]', password);
-          await Promise.all([
-            this.page.click('button[type="submit"]'),
-            this.page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 40000 })
-          ]);
+        const currentUrl = this.page.url();
+        if (currentUrl.includes('sgcaptcha') || currentUrl.includes('.well-known/sgcaptcha')) {
+          throw new Error(`[SGCAPTCHA] Desafío Anti-Bot de SiteGround detectado en: ${currentUrl}`);
         }
 
-        const currentUrl = this.page.url();
-        if (!currentUrl.includes('/auth/login')) {
-          console.log(`✅ [Agente 1 - Extractor] Sesión iniciada con éxito. URL: ${currentUrl}`);
+        const userInput = await this.page.$('input[name="usuario"]');
+        if (!userInput) {
+          throw new Error(`[LOGIN_FORM_MISSING] Formulario de autenticación no encontrado. URL: ${currentUrl}`);
+        }
+
+        await this.page.type('input[name="usuario"]', user);
+        await this.page.type('input[name="password"]', password);
+        await Promise.all([
+          this.page.click('button[type="submit"]'),
+          this.page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 40000 })
+        ]);
+
+        const postLoginUrl = this.page.url();
+        if (postLoginUrl.includes('sgcaptcha') || postLoginUrl.includes('.well-known/sgcaptcha')) {
+          throw new Error(`[SGCAPTCHA] Desafío Anti-Bot de SiteGround detectado tras enviar credenciales: ${postLoginUrl}`);
+        }
+
+        if (!postLoginUrl.includes('/auth/login')) {
+          console.log(`✅ [Agente 1 - Extractor] Sesión iniciada con éxito. URL: ${postLoginUrl}`);
           return true;
         }
       } catch (err) {
         console.warn(`⚠️ [Agente 1 - Extractor] Intento ${attempts} de inicio de sesión falló: ${err.message}`);
+        if (err.message.includes('SGCAPTCHA')) {
+          throw err;
+        }
         await new Promise(r => setTimeout(r, 3000));
       }
     }
@@ -641,11 +663,54 @@ export async function runMultiAgentSync() {
   const dispatcher = new NodusDispatcherAgent();
 
   try {
-    const user = process.env.NODUS_GLOBAL_USER || 'CREARPSL';
-    const pwd = process.env.NODUS_GLOBAL_PASS || 'CREARPSL26*';
+    const user = process.env.NODUS_GLOBAL_USER || process.env.NODUS_USER || process.env.IMO_USER || 'CREARPSL';
+    const pwd = process.env.NODUS_GLOBAL_PASS || process.env.NODUS_PASSWORD || process.env.IMO_PASSWORD || 'CREARPSL26*';
 
-    await extractor.initBrowser();
-    await extractor.login(user, pwd);
+    let authenticated = false;
+    // 1. Intento inicial de conexión directa con navegador blindado
+    try {
+      await extractor.initBrowser();
+      await extractor.login(user, pwd);
+      authenticated = true;
+    } catch (directErr) {
+      console.warn(`⚠️ Intento directo falló: ${directErr.message}`);
+      await extractor.close();
+
+      // 2. Protocolo de Contingencia SiteGround: Si detecta sgcaptcha, rotar proxies desde proxies.txt
+      if (directErr.message.includes('SGCAPTCHA') || directErr.message.includes('Anti-Bot')) {
+        console.log("🛡️ [Contingencia SiteGround Anti-Bot] Activando rotación de proxies desde proxies.txt...");
+        let proxyList = [];
+        try {
+          if (fs.existsSync('proxies.txt')) {
+            proxyList = fs.readFileSync('proxies.txt', 'utf8')
+              .split('\n')
+              .map(s => s.trim())
+              .filter(s => s && !s.startsWith('#'));
+          }
+        } catch (e) {
+          console.warn("No se pudo leer proxies.txt:", e.message);
+        }
+
+        const candidateProxies = proxyList.sort(() => 0.5 - Math.random()).slice(0, 5);
+        for (const proxy of candidateProxies) {
+          console.log(`🔄 [Contingencia] Probando con proxy: ${proxy}...`);
+          try {
+            await extractor.initBrowser(proxy);
+            await extractor.login(user, pwd);
+            authenticated = true;
+            console.log(`✅ [Contingencia] Sesión superada con éxito mediante proxy: ${proxy}`);
+            break;
+          } catch (proxyErr) {
+            console.warn(`❌ Proxy ${proxy} rechazado: ${proxyErr.message}`);
+            await extractor.close();
+          }
+        }
+      }
+
+      if (!authenticated) {
+        throw directErr;
+      }
+    }
 
     // Navegación SECUENCIAL blindada para evitar cancelaciones net::ERR_ABORTED
     console.log("Iniciando secuencia de extracción por etapas...");
