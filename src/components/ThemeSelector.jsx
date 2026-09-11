@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTheme } from '../context/ThemeContext';
-import { Sun, Moon, Sparkles } from 'lucide-react';
+import { Sun, Moon, Leaf, Sparkles } from 'lucide-react';
 
 export default function ThemeSelector({ compact = false }) {
   const { themeMode, setThemeMode, activeTheme } = useTheme();
@@ -10,16 +10,28 @@ export default function ThemeSelector({ compact = false }) {
       style={{
         display: 'inline-flex',
         alignItems: 'center',
-        background: activeTheme === 'light' ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.06)',
+        background: activeTheme === 'light' 
+          ? 'rgba(0, 0, 0, 0.06)' 
+          : activeTheme === 'zen'
+            ? 'rgba(16, 185, 129, 0.1)'
+            : 'rgba(255, 255, 255, 0.06)',
         backdropFilter: 'blur(12px)',
-        border: activeTheme === 'light' ? '1px solid rgba(0, 0, 0, 0.12)' : '1px solid rgba(255, 255, 255, 0.12)',
+        border: activeTheme === 'light' 
+          ? '1px solid rgba(0, 0, 0, 0.12)' 
+          : activeTheme === 'zen'
+            ? '1px solid rgba(52, 211, 153, 0.25)'
+            : '1px solid rgba(255, 255, 255, 0.12)',
         borderRadius: '9999px',
         padding: '3px',
         gap: '2px',
-        boxShadow: activeTheme === 'light' ? '0 2px 8px rgba(0, 0, 0, 0.05)' : '0 4px 15px rgba(0, 0, 0, 0.4)',
+        boxShadow: activeTheme === 'light' 
+          ? '0 2px 8px rgba(0, 0, 0, 0.05)' 
+          : activeTheme === 'zen'
+            ? '0 2px 10px rgba(16, 185, 129, 0.2)'
+            : '0 4px 15px rgba(0, 0, 0, 0.4)',
         transition: 'all 0.3s ease'
       }}
-      title={`Modo actual: ${themeMode === 'auto' ? `Automático (${activeTheme === 'light' ? '☀️ Día' : '🌙 Noche'})` : themeMode === 'light' ? '☀️ Día' : '🌙 Noche'}`}
+      title={`Modo actual: ${themeMode === 'auto' ? `Automático (${activeTheme === 'light' ? '☀️ Día' : activeTheme === 'zen' ? '🌿 Zen' : '🌙 Noche'})` : themeMode === 'light' ? '☀️ Día' : themeMode === 'zen' ? '🌿 Zen' : '🌙 Noche'}`}
     >
       {/* BOTÓN DÍA */}
       <button
@@ -79,6 +91,35 @@ export default function ThemeSelector({ compact = false }) {
         {!compact && <span>NOCHE</span>}
       </button>
 
+      {/* BOTÓN ZEN */}
+      <button
+        type="button"
+        onClick={() => setThemeMode('zen')}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '4px',
+          padding: compact ? '4px 8px' : '5px 11px',
+          borderRadius: '9999px',
+          border: 'none',
+          cursor: 'pointer',
+          fontSize: '0.75rem',
+          fontWeight: 700,
+          letterSpacing: '0.5px',
+          transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+          background: themeMode === 'zen' 
+            ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' 
+            : 'transparent',
+          color: themeMode === 'zen' 
+            ? '#ffffff' 
+            : (activeTheme === 'light' ? '#64748b' : '#94a3b8'),
+          boxShadow: themeMode === 'zen' ? '0 2px 10px rgba(16, 185, 129, 0.45)' : 'none'
+        }}
+      >
+        <Leaf size={13} strokeWidth={2.5} />
+        {!compact && <span>ZEN</span>}
+      </button>
+
       {/* BOTÓN AUTOMÁTICO */}
       <button
         type="button"
@@ -99,7 +140,7 @@ export default function ThemeSelector({ compact = false }) {
             ? 'linear-gradient(135deg, #00d2ff 0%, #8b5cf6 100%)' 
             : 'transparent',
           color: themeMode === 'auto' 
-            ? '#030712' 
+            ? '#ffffff' 
             : (activeTheme === 'light' ? '#64748b' : '#94a3b8'),
           boxShadow: themeMode === 'auto' ? '0 2px 10px rgba(0, 210, 255, 0.4)' : 'none'
         }}
