@@ -3,32 +3,56 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 const ThemeContext = createContext();
 
 export function ThemeProvider({ children }) {
-  // 'auto' | 'light' | 'dark'
+  // 'auto' | 'light' | 'dark' | 'zen'
   const [themeMode, setThemeModeState] = useState(() => {
     return localStorage.getItem('cpsl_theme_mode') || 'dark';
   });
 
   const [zenMode, setZenModeState] = useState(() => {
-    return localStorage.getItem('cpsl_zen_mode') === 'true';
+    const savedZen = localStorage.getItem('cpsl_zen_mode');
+    const savedMode = localStorage.getItem('cpsl_theme_mode');
+    return savedZen === 'true' || savedMode === 'zen';
   });
 
-  const [activeTheme, setActiveTheme] = useState('dark');
+  const [activeTheme, setActiveTheme] = useState(() => {
+    const savedMode = localStorage.getItem('cpsl_theme_mode') || 'dark';
+    if (savedMode === 'zen') return 'zen';
+    if (savedMode === 'light') return 'light';
+    if (savedMode === 'dark') return 'dark';
+    return 'dark';
+  });
 
   const setThemeMode = (mode) => {
     setThemeModeState(mode);
     localStorage.setItem('cpsl_theme_mode', mode);
+    if (mode === 'zen') {
+      setZenModeState(true);
+      localStorage.setItem('cpsl_zen_mode', 'true');
+    } else if (mode === 'light' || mode === 'dark') {
+      setZenModeState(false);
+      localStorage.setItem('cpsl_zen_mode', 'false');
+    }
   };
 
   const setZenMode = (isZen) => {
     setZenModeState(isZen);
     localStorage.setItem('cpsl_zen_mode', isZen ? 'true' : 'false');
+    if (isZen) {
+      setThemeModeState('zen');
+      localStorage.setItem('cpsl_theme_mode', 'zen');
+    } else {
+      setThemeModeState('dark');
+      localStorage.setItem('cpsl_theme_mode', 'dark');
+    }
   };
 
   useEffect(() => {
     const calculateTheme = () => {
+      if (themeMode === 'zen') return 'zen';
       if (themeMode === 'light') return 'light';
       if (themeMode === 'dark') return 'dark';
       
+      // Modo Auto: Cálculo por horario solar (6:00 a 18:30 Día, resto Noche)
       const now = new Date();
       const currentHour = now.getHours() + now.getMinutes() / 60;
       const isDayTime = currentHour >= 6.0 && currentHour < 18.5;
@@ -41,13 +65,12 @@ export function ThemeProvider({ children }) {
       setActiveTheme(resolved);
       document.documentElement.setAttribute('data-theme', resolved);
       document.body.setAttribute('data-theme', resolved);
-      if (resolved === 'light') {
-        document.documentElement.classList.add('theme-light');
-        document.documentElement.classList.remove('theme-dark');
-      } else {
-        document.documentElement.classList.add('theme-dark');
-        document.documentElement.classList.remove('theme-light');
-      }
+      
+      document.documentElement.classList.remove('theme-light', 'theme-dark', 'theme-zen');
+      document.body.classList.remove('theme-light', 'theme-dark', 'theme-zen');
+      
+      document.documentElement.classList.add(`theme-${resolved}`);
+      document.body.classList.add(`theme-${resolved}`);
     };
 
     applyTheme();
@@ -60,7 +83,13 @@ export function ThemeProvider({ children }) {
   }, [themeMode]);
 
   return (
-    <ThemeContext.Provider value={{ themeMode, setThemeMode, activeTheme, zenMode, setZenMode }}>
+    <ThemeContext.Provider value={{ 
+      themeMode, 
+      setThemeMode, 
+      activeTheme, 
+      zenMode: zenMode || themeMode === 'zen', 
+      setZenMode 
+    }}>
       {children}
     </ThemeContext.Provider>
   );
