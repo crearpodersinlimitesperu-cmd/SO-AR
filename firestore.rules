@@ -359,6 +359,21 @@ service cloud.firestore {
       allow write: if request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET";
     }
 
+    match /nodus_predictor_portfolio/{document=**} {
+      allow read: if isAuthenticated();
+      allow write: if request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET";
+    }
+
+    match /nodus_prospectos_sin_pago/{document=**} {
+      allow read: if isAuthenticated();
+      allow write: if request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET";
+    }
+
+    match /nodus_managers_reconciliados/{document=**} {
+      allow read: if isAuthenticated();
+      allow write: if request.resource.data.robot_token == "NODUS_ROBOT_CPSL_2026_SECRET";
+    }
+
     // NOTAS DE SEGUIMIENTO — feedback que el entrenador de llamadas deja después de
     // cada llamada (individual o grupal), para detectar y anticiparse a quiebres.
     // Pedido explícito de José (vigente desde antes de perderse esta regla): "deben
