@@ -3,7 +3,7 @@ import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import 'dotenv/config';
 import fs from 'fs';
 import path from 'path';
-import { initializeApp } from "firebase/app";
+import { initializeApp, getApps } from "firebase/app";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
 import { NodusDataScientistAgent } from './nodusDataScientistAgent.mjs';
 import { NodusHrSentinelAgent } from './nodusHrSentinelAgent.mjs';
@@ -27,7 +27,7 @@ const firebaseConfig = {
   appId: process.env.VITE_FIREBASE_APP_ID || ['1:122588918051:web:', 'c85d6835b1b1f920fb1c96'].join(''),
 };
 
-const app = initializeApp(firebaseConfig);
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 const db = getFirestore(app);
 
 
