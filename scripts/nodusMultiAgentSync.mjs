@@ -6,6 +6,7 @@ import path from 'path';
 import { initializeApp } from "firebase/app";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
 import { NodusDataScientistAgent } from './nodusDataScientistAgent.mjs';
+import { NodusHrSentinelAgent } from './nodusHrSentinelAgent.mjs';
 
 puppeteer.use(StealthPlugin());
 
@@ -749,6 +750,19 @@ export async function runMultiAgentSync() {
       console.log("✅ [Agente 4 - Data Scientist] Modelos predictivos y reconciliación completados con éxito.");
     } catch (dsErr) {
       console.error("⚠️ [Agente 4 - Data Scientist] Error no bloqueante en modelado predictivo:", dsErr.message);
+    }
+
+    // =========================================================================
+    // AGENTE 5: CENTINELA DE TALENTO HUMANO Y DESEMPEÑO OPERATIVO
+    // =========================================================================
+    console.log("\n👔 [Agente 5 - RRHH] Activando auditoría de actividad de coordinadores y alertas para Gerentes...");
+    try {
+      const hrSentinel = new NodusHrSentinelAgent();
+      const diagnostico = hrSentinel.diagnosticarDesempeno(normalized.coordinadores);
+      await hrSentinel.publicarAlertasYCuadroDeMando(diagnostico);
+      console.log("✅ [Agente 5 - RRHH] Cuadro de mando de RRHH y alertas inyectadas a Gerentes con éxito.");
+    } catch (hrErr) {
+      console.error("⚠️ [Agente 5 - RRHH] Error no bloqueante en centinela de RRHH:", hrErr.message);
     }
 
     console.log("\n=======================================================");
