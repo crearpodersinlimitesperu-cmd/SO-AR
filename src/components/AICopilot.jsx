@@ -306,6 +306,7 @@ export default function AICopilot() {
     return (
       <button 
         onClick={() => setIsOpen(true)}
+        className="floating-copilot-btn"
         style={{ 
           position: 'fixed', bottom: '2rem', right: '2rem', width: '60px', height: '60px', 
           background: colors.primary, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', 
@@ -323,7 +324,7 @@ export default function AICopilot() {
 
   return (
     <div style={{ 
-      position: 'fixed', top: 0, right: 0, width: '400px', height: '100vh', 
+      position: 'fixed', top: 0, right: 0, width: '100%', maxWidth: '400px', height: '100vh', 
       background: colors.bg, boxShadow: '-5px 0 30px rgba(0,0,0,0.15)', zIndex: 9999, 
       display: 'flex', flexDirection: 'column', fontFamily: 'Inter, system-ui, sans-serif'
     }}>
@@ -469,3 +470,4 @@ export default function AICopilot() {
     </div>
   );
 }
+
