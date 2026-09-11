@@ -256,37 +256,39 @@ export default function CRMBaseMaster() {
 
                       {/* HOJAS (ENROLADOS) */}
                       {isExpanded && (
-                        <div style={{ borderTop: `1px solid ${borderSubtle}`, padding: '1rem 1rem 1rem 3rem', background: 'rgba(0,0,0,0.15)' }}>
-                          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                            <thead>
-                              <tr style={{ color: textMuted, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                                <th style={{ padding: '0.5rem 1rem', borderBottom: `1px solid ${borderSubtle}` }}>Enrolado (Participante)</th>
-                                <th style={{ padding: '0.5rem 1rem', borderBottom: `1px solid ${borderSubtle}` }}>Contacto</th>
-                                <th style={{ padding: '0.5rem 1rem', borderBottom: `1px solid ${borderSubtle}` }}>Estado C1</th>
-                                <th style={{ padding: '0.5rem 1rem', borderBottom: `1px solid ${borderSubtle}` }}>Coordinadora</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {node.participants.map((p, idx) => (
-                                <tr key={p.id} style={{ borderBottom: idx === node.participants.length - 1 ? 'none' : `1px solid ${borderSubtle}` }}>
-                                  <td style={{ padding: '0.8rem 1rem' }}>
-                                    <div style={{ fontWeight: 600, color: '#e2e8f0', fontSize: '0.9rem' }}>{p.nombreCompleto}</div>
-                                    <div style={{ fontSize: '0.7rem', color: textMuted, marginTop: '0.15rem' }}>DNI: {p.dni || '-'}</div>
-                                  </td>
-                                  <td style={{ padding: '0.8rem 1rem' }}>
-                                    <div style={{ fontSize: '0.8rem', color: '#cbd5e1' }}>{p.telefono || '-'}</div>
-                                    <div style={{ fontSize: '0.7rem', color: textMuted }}>{p.email || '-'}</div>
-                                  </td>
-                                  <td style={{ padding: '0.8rem 1rem' }}>
-                                    {getStatusBadge(p.estadoC1)}
-                                  </td>
-                                  <td style={{ padding: '0.8rem 1rem', fontSize: '0.8rem', color: textMuted }}>
-                                    {p.coordinadora || 'Sin Asignar'}
-                                  </td>
+                        <div style={{ borderTop: `1px solid ${borderSubtle}`, padding: 'clamp(0.5rem, 2vw, 1rem) clamp(0.5rem, 2vw, 1rem) clamp(0.5rem, 2vw, 1rem) clamp(0.75rem, 3vw, 2rem)', background: 'rgba(0,0,0,0.15)' }}>
+                          <div className="table-responsive" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+                            <table style={{ width: '100%', minWidth: '600px', borderCollapse: 'collapse', textAlign: 'left' }}>
+                              <thead>
+                                <tr style={{ color: textMuted, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                  <th style={{ padding: '0.5rem 1rem', borderBottom: `1px solid ${borderSubtle}` }}>Enrolado (Participante)</th>
+                                  <th style={{ padding: '0.5rem 1rem', borderBottom: `1px solid ${borderSubtle}` }}>Contacto</th>
+                                  <th style={{ padding: '0.5rem 1rem', borderBottom: `1px solid ${borderSubtle}` }}>Estado C1</th>
+                                  <th style={{ padding: '0.5rem 1rem', borderBottom: `1px solid ${borderSubtle}` }}>Coordinadora</th>
                                 </tr>
-                              ))}
-                            </tbody>
-                          </table>
+                              </thead>
+                              <tbody>
+                                {node.participants.map((p, idx) => (
+                                  <tr key={p.id} style={{ borderBottom: idx === node.participants.length - 1 ? 'none' : `1px solid ${borderSubtle}` }}>
+                                    <td style={{ padding: '0.8rem 1rem' }}>
+                                      <div style={{ fontWeight: 600, color: '#e2e8f0', fontSize: '0.9rem' }}>{p.nombreCompleto}</div>
+                                      <div style={{ fontSize: '0.7rem', color: textMuted, marginTop: '0.15rem' }}>DNI: {p.dni || '-'}</div>
+                                    </td>
+                                    <td style={{ padding: '0.8rem 1rem' }}>
+                                      <div style={{ fontSize: '0.85rem', color: '#cbd5e1' }}>{p.telefono || 'Sin teléfono'}</div>
+                                      <div style={{ fontSize: '0.75rem', color: textMuted }}>{p.email || 'Sin correo'}</div>
+                                    </td>
+                                    <td style={{ padding: '0.8rem 1rem' }}>
+                                      {getStatusBadge(p.estadoC1)}
+                                    </td>
+                                    <td style={{ padding: '0.8rem 1rem', fontSize: '0.8rem', color: textMuted }}>
+                                      {p.coordinadora || 'Sin Asignar'}
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -300,3 +302,4 @@ export default function CRMBaseMaster() {
     </div>
   );
 }
+
