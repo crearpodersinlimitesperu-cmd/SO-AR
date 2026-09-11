@@ -259,9 +259,9 @@ function App() {
           } />
 
           <Route path="/mis-kpis" element={
-            <RoleRoute allowedRoles={['coord_c1', 'coord_maestria', 'qt', 'capitan']} requireSuperAdmin={false}>
+            <PrivateRoute>
               <MisKPIs />
-            </RoleRoute>
+            </PrivateRoute>
           } />
 
           {/* Narrowed 08/09/2026: la fila "Auditoría de KPIs" de la Matriz Oficial es
