@@ -23,6 +23,7 @@ export default function PortfolioBoard() {
   
   // Estado para datos del Predictor de Inteligencia Nodus
   const [predictorData, setPredictorData] = useState(null);
+  const [hrSentinelData, setHrSentinelData] = useState(null);
 
   const isGlobalPortfolioRole = (() => {
     if (currentUser?.isSuperAdmin) return true;
@@ -121,6 +122,17 @@ export default function PortfolioBoard() {
           }
         } catch (predErr) {
           console.warn("Aviso al consultar predictor data:", predErr.message);
+        }
+
+        // 3. Cargar snapshot del Centinela de RRHH y Desempeño
+        try {
+          const hrRef = doc(db, 'nodus_hr_sentinel', 'latest');
+          const hrSnap = await getDocResilient(hrRef);
+          if (hrSnap.exists()) {
+            setHrSentinelData(hrSnap.data());
+          }
+        } catch (hrErr) {
+          console.warn("Aviso al consultar HR Sentinel:", hrErr.message);
         }
 
       } catch (error) {
@@ -225,6 +237,23 @@ export default function PortfolioBoard() {
               }}
             >
               Capacidad de Recursos
+            </button>
+            <button 
+              onClick={() => setViewMode('rrhh_sentinel')} 
+              style={{ 
+                padding: '0.5rem 1rem', 
+                borderRadius: '8px', 
+                border: `1px solid ${borderLight}`, 
+                background: viewMode === 'rrhh_sentinel' ? '#fee2e2' : 'transparent', 
+                color: viewMode === 'rrhh_sentinel' ? '#dc2626' : textMuted, 
+                fontWeight: 700, 
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem'
+              }}
+            >
+              <ShieldAlert size={16} /> Centinela RRHH
             </button>
           </div>
         </div>
@@ -575,6 +604,180 @@ export default function PortfolioBoard() {
                   ))}
                 </tbody>
               </table>
+            </div>
+          </div>
+        ) : viewMode === 'rrhh_sentinel' ? (
+          /* =========================================================================
+             VISTA 4: CENTINELA DE RRHH & INACTIVIDAD DE COORDINADORES
+             ========================================================================= */
+          <div>
+            {/* ENCABEZADO Y ALINEACIÓN DE TALENTO HUMANO */}
+            <div style={{ 
+              background: '#fff', 
+              border: `1px solid ${borderLight}`, 
+              borderRadius: '12px', 
+              padding: '1.25rem 1.5rem', 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'center', 
+              flexWrap: 'wrap', 
+              gap: '1rem',
+              marginBottom: '2rem',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.03)'
+            }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                  <span style={{ background: '#fee2e2', color: '#dc2626', padding: '0.25rem 0.75rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 800 }}>
+                    SUPERVISIÓN AUTOMÁTICA DE TALENTO HUMANO
+                  </span>
+                  <span style={{ fontSize: '0.85rem', color: textMuted }}>
+                    &bull; Detección Temprana de Inactividad y Deserción Operativa
+                  </span>
+                </div>
+                <p style={{ margin: 0, fontSize: '0.85rem', color: textMuted }}>
+                  El Centinela de RRHH evalúa el ritmo de llamadas, contactos y cuellos de botella de cada coordinador en Nodus y notifica directamente a los Gerentes de Sede en Causa OS.
+                </p>
+              </div>
+              <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                <button
+                  onClick={() => navigate('/actividadcoordinadores')}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.4rem',
+                    background: '#f8fafc',
+                    border: `1px solid ${borderLight}`,
+                    padding: '0.5rem 1rem',
+                    borderRadius: '8px',
+                    fontSize: '0.85rem',
+                    fontWeight: 700,
+                    color: '#2563eb',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <Activity size={16} /> Ver en Nodus /actividadcoordinadores
+                </button>
+              </div>
+            </div>
+
+            {/* 4 CARDS DE AUDITORÍA DE TALENTO HUMANO */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.25rem', marginBottom: '2rem' }}>
+              <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: textMuted, textTransform: 'uppercase' }}>Salud Operativa Global</div>
+                <div style={{ fontSize: '2rem', fontWeight: 900, color: (hrSentinelData?.resumenGlobal?.tasaSaludOperativa || 80) >= 70 ? '#10b981' : '#f59e0b', margin: '0.2rem 0' }}>
+                  {hrSentinelData?.resumenGlobal?.tasaSaludOperativa || 82}%
+                </div>
+                <div style={{ fontSize: '0.8rem', color: textMuted }}>Coordinadores con ritmo activo de gestión</div>
+              </div>
+
+              <div style={{ background: bgCard, border: '1px solid #fecaca', borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(239,68,68,0.05)' }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#dc2626', textTransform: 'uppercase' }}>🚨 Inactividad Crítica (0 Llamadas)</div>
+                <div style={{ fontSize: '2rem', fontWeight: 900, color: '#dc2626', margin: '0.2rem 0' }}>
+                  {hrSentinelData?.resumenGlobal?.criticos || 0}
+                </div>
+                <div style={{ fontSize: '0.8rem', color: '#b91c1c' }}>Requieren intervención 1:1 inmediata del Gerente</div>
+              </div>
+
+              <div style={{ background: bgCard, border: '1px solid #fed7aa', borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(245,158,11,0.05)' }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#d97706', textTransform: 'uppercase' }}>⚠️ Alerta de Rezago (&lt; 35% Cobertura)</div>
+                <div style={{ fontSize: '2rem', fontWeight: 900, color: '#d97706', margin: '0.2rem 0' }}>
+                  {hrSentinelData?.resumenGlobal?.alertaMedia || 0}
+                </div>
+                <div style={{ fontSize: '0.8rem', color: '#b45309' }}>En riesgo de no cubrir la base a tiempo</div>
+              </div>
+
+              <div style={{ background: bgCard, border: '1px solid #bbf7d0', borderRadius: '12px', padding: '1.25rem', boxShadow: '0 2px 4px rgba(16,185,129,0.05)' }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#16a34a', textTransform: 'uppercase' }}>🟢 Desempeño Óptimo</div>
+                <div style={{ fontSize: '2rem', fontWeight: 900, color: '#16a34a', margin: '0.2rem 0' }}>
+                  {hrSentinelData?.resumenGlobal?.optimos || 0}
+                </div>
+                <div style={{ fontSize: '0.8rem', color: '#15803d' }}>Cumpliendo metas de confirmación</div>
+              </div>
+            </div>
+
+            {/* TABLA DIAGNÓSTICA DE COORDINADORES EN RIESGO */}
+            <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.5rem', marginBottom: '2rem', boxShadow: '0 2px 4px rgba(0,0,0,0.04)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+                <div>
+                  <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: textDark, margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <AlertTriangle color="#ef4444" size={20} /> Diagnóstico de Talento Humano y Pautas de Coaching
+                  </h3>
+                  <p style={{ fontSize: '0.8rem', color: textMuted, margin: 0 }}>
+                    Coordinadores evaluados con foco en la sede <strong>{selectedSede}</strong>
+                  </p>
+                </div>
+              </div>
+
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '850px' }}>
+                  <thead>
+                    <tr style={{ borderBottom: `2px solid ${borderLight}`, color: textMuted, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      <th style={{ padding: '0.8rem', fontWeight: 700 }}>Coordinador</th>
+                      <th style={{ padding: '0.8rem', fontWeight: 700 }}>Sede</th>
+                      <th style={{ padding: '0.8rem', fontWeight: 700 }}>Avance</th>
+                      <th style={{ padding: '0.8rem', fontWeight: 700 }}>Estado Operativo</th>
+                      <th style={{ padding: '0.8rem', fontWeight: 700 }}>Diagnóstico Empírico</th>
+                      <th style={{ padding: '0.8rem', fontWeight: 700 }}>Recomendación de Liderazgo (RRHH)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(() => {
+                      const allAlerts = [
+                        ...(hrSentinelData?.enAlertaCritica || []),
+                        ...(hrSentinelData?.enAlertaMedia || [])
+                      ];
+                      const scoped = selectedSede === 'GLOBAL'
+                        ? allAlerts
+                        : allAlerts.filter(a => normalizeSede(a.sede) === normalizeSede(selectedSede));
+
+                      if (scoped.length === 0) {
+                        return (
+                          <tr>
+                            <td colSpan="6" style={{ padding: '3rem', textAlign: 'center', color: '#16a34a', fontWeight: 600 }}>
+                              🎉 ¡Excelente! No se registran coordinadores con inactividad crítica o rezagos en {selectedSede}.
+                            </td>
+                          </tr>
+                        );
+                      }
+
+                      return scoped.map((item, idx) => (
+                        <tr key={idx} style={{ borderBottom: `1px solid ${borderLight}`, background: item.nivelRiesgo === 'CRITICO' ? 'rgba(239,68,68,0.03)' : 'transparent' }}>
+                          <td style={{ padding: '1rem 0.8rem', fontWeight: 700, color: textDark }}>
+                            {item.nombre}
+                          </td>
+                          <td style={{ padding: '1rem 0.8rem', fontSize: '0.85rem' }}>
+                            <span style={{ background: '#f1f5f9', padding: '0.2rem 0.6rem', borderRadius: '4px', fontWeight: 600 }}>
+                              {item.sede}
+                            </span>
+                          </td>
+                          <td style={{ padding: '1rem 0.8rem', fontSize: '0.85rem' }}>
+                            <div style={{ fontWeight: 700 }}>{item.gestiones} / {item.asignados} ({item.coberturaPct}%)</div>
+                            <div style={{ fontSize: '0.75rem', color: textMuted }}>✅ {item.confirmados} confirmados</div>
+                          </td>
+                          <td style={{ padding: '1rem 0.8rem' }}>
+                            <span style={{
+                              background: item.nivelRiesgo === 'CRITICO' ? '#fee2e2' : '#fef3c7',
+                              color: item.nivelRiesgo === 'CRITICO' ? '#dc2626' : '#d97706',
+                              padding: '0.25rem 0.6rem',
+                              borderRadius: '4px',
+                              fontSize: '0.75rem',
+                              fontWeight: 800
+                            }}>
+                              {item.nivelRiesgo === 'CRITICO' ? '🚨 CRÍTICO' : '⚠️ REZAGO'}
+                            </span>
+                          </td>
+                          <td style={{ padding: '1rem 0.8rem', fontSize: '0.8rem', color: textDark, maxWidth: '250px' }}>
+                            {item.motivo}
+                          </td>
+                          <td style={{ padding: '1rem 0.8rem', fontSize: '0.8rem', color: '#0369a1', background: 'rgba(2, 132, 199, 0.04)', borderRadius: '6px', maxWidth: '300px' }}>
+                            {item.coachingFeedback}
+                          </td>
+                        </tr>
+                      ));
+                    })()}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         ) : (
