@@ -50,11 +50,14 @@ jobs:
           VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
           VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}
-        run: node scripts/nodusMultiAgentSync.mjs
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_PASS: ${{ secrets.GMAIL_PASS }}
+        run: |
+          node scripts/nodusMultiAgentSync.mjs || (echo "⚠️ Intento 1 desafiado o interrumpido. Reintentando tras 15s con contingencia..." && sleep 15 && node scripts/nodusMultiAgentSync.mjs)
 
       - name: Notify Success
         if: success()
-        run: echo "✅ Sincronización horaria Nodus ejecutada exitosamente a las $(date)"
+        run: echo "🎉 Sincronización horaria Nodus ejecutada exitosamente a las $(date)"
 
       - name: Notify Failure
         if: failure()
