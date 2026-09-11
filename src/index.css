@@ -197,6 +197,132 @@
   border-color: #0284c7 !important;
 }
 
+/* =========================================================================
+   TEMA ZEN (ZEN MODE - SERENO, VERDE BOTÁNICO, MINIMALISTA & ANTI-ESTRÉS)
+   ========================================================================= */
+[data-theme="zen"] {
+  --bg-dark: #071511;
+  --bg-dark-alt: #0c201a;
+  --bg-card: rgba(16, 185, 129, 0.04);
+  --bg-card-hover: rgba(16, 185, 129, 0.08);
+  --bg-glass-heavy: rgba(11, 26, 21, 0.95);
+  
+  --border-subtle: rgba(52, 211, 153, 0.16);
+  --border-strong: rgba(52, 211, 153, 0.35);
+  
+  --crear-gold: #10b981;
+  --crear-gold-hover: #34d399;
+  --crear-gold-light: rgba(16, 185, 129, 0.15);
+  
+  --crear-blue: #34d399;
+  --crear-blue-dark: #059669;
+  --crear-cyan: #34d399;
+  
+  --text-main: #e2e8f0;
+  --text-muted: #86a79c;
+  --text-heading: #f0fdf4;
+  --text-inverted: #022c22;
+  
+  --card-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.7);
+  --card-shadow-hover: 0 15px 50px -10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(16, 185, 129, 0.15);
+}
+
+[data-theme="zen"] body {
+  background-color: #071511 !important;
+  color: #e2e8f0 !important;
+}
+
+[data-theme="zen"] input,
+[data-theme="zen"] select,
+[data-theme="zen"] textarea {
+  background-color: #0c201a !important;
+  color: #f0fdf4 !important;
+  border: 1px solid rgba(52, 211, 153, 0.25) !important;
+}
+
+[data-theme="zen"] input::placeholder,
+[data-theme="zen"] textarea::placeholder {
+  color: #86a79c !important;
+}
+
+[data-theme="zen"] select option {
+  background-color: #0c201a !important;
+  color: #f0fdf4 !important;
+}
+
+[data-theme="zen"] .glass-panel {
+  background: rgba(12, 32, 26, 0.85) !important;
+  border: 1px solid rgba(52, 211, 153, 0.2) !important;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.45) !important;
+  color: #e2e8f0 !important;
+}
+
+[data-theme="zen"] .glass-panel p,
+[data-theme="zen"] .glass-panel li {
+  color: #cbd5e1;
+}
+
+[data-theme="zen"] .glass-panel h1,
+[data-theme="zen"] .glass-panel h2,
+[data-theme="zen"] .glass-panel h3,
+[data-theme="zen"] .glass-panel h4,
+[data-theme="zen"] .glass-panel h5,
+[data-theme="zen"] .glass-panel h6 {
+  color: #f0fdf4 !important;
+}
+
+[data-theme="zen"] .text-white {
+  color: #f0fdf4 !important;
+}
+
+[data-theme="zen"] .text-muted {
+  color: #86a79c !important;
+}
+
+[data-theme="zen"] .text-gold {
+  color: #34d399 !important;
+}
+
+[data-theme="zen"] .btn-secondary {
+  background: rgba(12, 32, 26, 0.9) !important;
+  color: #e2e8f0 !important;
+  border: 1px solid rgba(52, 211, 153, 0.3) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+}
+
+[data-theme="zen"] .btn-secondary:hover {
+  background: rgba(16, 185, 129, 0.15) !important;
+  border-color: #34d399 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="zen"] table th {
+  background: rgba(16, 185, 129, 0.08) !important;
+  color: #34d399 !important;
+  border-bottom: 2px solid rgba(52, 211, 153, 0.3) !important;
+}
+
+[data-theme="zen"] table td {
+  color: #e2e8f0 !important;
+  border-bottom: 1px solid rgba(52, 211, 153, 0.12) !important;
+}
+
+[data-theme="zen"] .evidence-dropzone {
+  background: rgba(12, 32, 26, 0.5) !important;
+  border-color: rgba(52, 211, 153, 0.25) !important;
+}
+
+[data-theme="zen"] .evidence-dropzone:hover {
+  background: rgba(16, 185, 129, 0.1) !important;
+  border-color: #10b981 !important;
+}
+
+/* Reducción de animaciones agresivas en Modo Zen para menor fatiga visual */
+[data-theme="zen"] .nodus-pulse-dot,
+[data-theme="zen"] .pulse-indicator {
+  animation: none !important;
+  opacity: 0.8 !important;
+}
 
 body {
   margin: 0;
