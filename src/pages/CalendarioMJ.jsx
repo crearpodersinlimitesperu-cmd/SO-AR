@@ -1076,29 +1076,32 @@ function CalendarioPreview({ cal, onClose }) {
           <img src="/logo.png" alt="CREAR Poder sin límites" style={{ height: '75px', width: 'auto', objectFit: 'contain', flexShrink: 0 }} />
         </div>
 
-        <table className="mj-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr className="mj-header-row" style={{ background: headerBg, color: 'white' }}>
-              <th style={{ width: '45%' }}>ACTIVIDAD</th>
-              <th style={{ width: '25%' }}>FECHA</th>
-              <th style={{ width: '30%' }}>HORA</th>
-            </tr>
-          </thead>
-          <tbody>
-            {displayCal.fds.map((fdsBlock) => (
-              <React.Fragment key={fdsBlock.id}>
-                <tr className="mj-row-fds" style={{ background: '#2f6fa8', color: 'white', fontWeight: 700 }}>
-                  <td>{fdsBlock.titulo}</td>
-                  <td>{formatRangoFds(fdsBlock)}</td>
-                  <td style={{ whiteSpace: 'pre-line' }}>{fdsBlock.horario}</td>
-                </tr>
-                {/* 31/08/2026, a pedido de José ("lo que no tenga fecha no se
-                    cargará en el PDF"): una actividad sin fecha todavía no
-                    está lista para mostrarse al equipo, así que se oculta del
-                    PDF/preview (no del editor, donde el coordinador SÍ debe
-                    seguir viéndola para completarla). La franja de cierre
-                    (esCierre) es la única excepción — no es un evento con
-                    fecha, así que siempre se muestra. */}
+        <div className="table-responsive" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+          <table className="mj-table" style={{ width: '100%', minWidth: '600px', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr className="mj-header-row" style={{ background: headerBg, color: 'white' }}>
+                <th style={{ width: '45%' }}>ACTIVIDAD</th>
+                <th style={{ width: '25%' }}>FECHA</th>
+                <th style={{ width: '30%' }}>HORA</th>
+              </tr>
+            </thead>
+            <tbody>
+              {displayCal.fds.map((fdsBlock) => (
+                <React.Fragment key={fdsBlock.id}>
+                  <tr className="mj-row-fds" style={{ background: '#2f6fa8', color: 'white', fontWeight: 700 }}>
+                    <td>{fdsBlock.titulo}</td>
+                    <td>{formatRangoFds(fdsBlock)}</td>
+                    <td style={{ whiteSpace: 'pre-line' }}>{fdsBlock.horario}</td>
+                  </tr>
+                  {/* 31/08/2026, a pedido de José ("lo que no tenga fecha no se
+                      cargará en el PDF"): una actividad sin fecha todavía no
+                      está lista para mostrarse al equipo, así que se oculta del
+                      PDF/preview (no del editor, donde el coordinador SÍ debe
+                      seguir viéndola para completarla). La franja de cierre
+                      (esCierre) es la única excepción — no es un evento con
+                      fecha, sino la línea divisoria obligatoria que separa los
+                      tres fines de semana del proceso (requisito innegociable
+                      del diseño institucional del PDF). */}
                 {displayCal.actividades.filter(a => a.seccion === fdsBlock.id && (a.esCierre || a.fecha)).map((act, i) => {
                   if (act.esCierre) {
                     return (
@@ -1121,8 +1124,9 @@ function CalendarioPreview({ cal, onClose }) {
                 })}
               </React.Fragment>
             ))}
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Página 2: fin de tu entrenamiento */}
@@ -1144,3 +1148,4 @@ function CalendarioPreview({ cal, onClose }) {
     </div>
   );
 }
+
