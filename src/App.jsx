@@ -442,7 +442,7 @@ function App() {
               ThemeToggle tal cual (mismo componente que ya funcionaba en Home) —
               no se tocó ThemeContext.jsx ni su lógica. */}
           {showFloatingThemeToggle && (
-            <div className="no-print" style={{ position: 'fixed', top: '1rem', right: '1rem', zIndex: 8500 }}>
+            <div className="no-print floating-theme-toggle" style={{ position: 'fixed', top: '1rem', right: '1rem', zIndex: 8500 }}>
               <ThemeToggle />
             </div>
           )}
@@ -453,7 +453,7 @@ function App() {
             </div>
           )}
           <button
-            className="no-print"
+            className="no-print floating-help-btn"
             onClick={() => setShowHelp(true)}
             title="Manual y Ayuda"
             style={{
