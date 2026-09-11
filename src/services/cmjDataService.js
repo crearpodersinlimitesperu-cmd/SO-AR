@@ -67,6 +67,8 @@ const TEAM_NAMES_MAPPING = {
   }
 };
 
+let _cachedEquipos = null;
+
 export function getAllEquipos() {
   if (_cachedEquipos) return _cachedEquipos;
   try {
@@ -859,3 +861,4 @@ export function getSedesBenchmark() {
     };
   });
 }
+
