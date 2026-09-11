@@ -571,8 +571,7 @@ class NodusDispatcherAgent {
       totales: normalizedData.totales,
       sedes: normalizedData.sedesSummary,
       coordinadores: normalizedData.coordinadores,
-      equiposReporte: normalizedData.equiposReporte,
-      secciones: rawData.secciones || {}
+      equiposReporte: normalizedData.equiposReporte
     };
 
     // 1. Guardar en nodus_kpis_sincronizados / latest_snapshot
