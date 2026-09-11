@@ -52,7 +52,8 @@ class NodusExtractorAgent {
       '--no-first-run',
       '--no-zygote',
       '--disable-gpu',
-      '--window-size=1920,1080'
+      '--window-size=1920,1080',
+      '--disable-blink-features=AutomationControlled'
     ];
     if (proxy) {
       args.push(`--proxy-server=http://${proxy}`);
@@ -62,6 +63,11 @@ class NodusExtractorAgent {
       args
     });
     this.page = await this.browser.newPage();
+    await this.page.evaluateOnNewDocument(() => {
+      Object.defineProperty(navigator, 'webdriver', {
+        get: () => undefined,
+      });
+    });
     await this.page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36');
     await this.page.setExtraHTTPHeaders({
       'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8'
@@ -101,8 +107,19 @@ class NodusExtractorAgent {
           throw new Error(`[SGCAPTCHA] Desafío Anti-Bot de SiteGround detectado en: ${currentUrl}`);
         }
 
+        // Si ya redirigió a /sedes o /dashboard, la sesión ya está activa exitosamente
+        if (currentUrl.includes('/sedes') || currentUrl.includes('/dashboard') || (!currentUrl.includes('/auth/login') && !currentUrl.includes('sgcaptcha'))) {
+          console.log(`✅ [Agente 1 - Extractor] Sesión ya activa o redirigida. URL: ${currentUrl}`);
+          return true;
+        }
+
         const userInput = await this.page.$('input[name="usuario"]');
         if (!userInput) {
+          const checkUrl = this.page.url();
+          if (checkUrl.includes('/sedes') || checkUrl.includes('/dashboard')) {
+            console.log(`✅ [Agente 1 - Extractor] Redirigido a panel principal: ${checkUrl}`);
+            return true;
+          }
           throw new Error(`[LOGIN_FORM_MISSING] Formulario de autenticación no encontrado. URL: ${currentUrl}`);
         }
 
@@ -708,7 +725,7 @@ export async function runMultiAgentSync() {
           console.warn("No se pudo leer proxies.txt:", e.message);
         }
 
-        const candidateProxies = proxyList.sort(() => 0.5 - Math.random()).slice(0, 5);
+        const candidateProxies = proxyList.sort(() => 0.5 - Math.random()).slice(0, 10);
         for (const proxy of candidateProxies) {
           console.log(`🔄 [Contingencia] Probando con proxy: ${proxy}...`);
           try {
