@@ -535,3 +535,29 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+/* =========================================================================
+   ESTILOS UNIVERSALES PARA SELECTORES Y MENÚS DESPLEGABLES (CROSS-BROWSER)
+   Asegura legibilidad total de <option> en cualquier modo (Dark / Light / Windows Chromium)
+   ========================================================================= */
+select, select.form-input {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  border: 1px solid #334155 !important;
+}
+
+select option, select.form-input option {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  padding: 8px 12px !important;
+}
+
+select option:hover,
+select option:focus,
+select option:checked,
+select.form-input option:hover,
+select.form-input option:focus,
+select.form-input option:checked {
+  background-color: #1e293b !important;
+  color: #38bdf8 !important;
+}
+
