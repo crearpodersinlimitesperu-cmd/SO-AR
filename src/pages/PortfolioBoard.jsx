@@ -37,11 +37,11 @@ export default function PortfolioBoard() {
 
   const sedesDisponibles = isGlobalPortfolioRole ? ['GLOBAL', ...OPERATIONAL_SEDES] : [normalizeSede(currentUser?.sede)];
 
-  const bgLight = "#f8fafc";
-  const bgCard = "#ffffff";
-  const textDark = "#0f172a";
-  const textMuted = "#64748b";
-  const borderLight = "#e2e8f0";
+  const bgLight = "var(--bg-dark, #0A192F)";
+  const bgCard = "var(--bg-card, rgba(17, 34, 64, 0.75))";
+  const textDark = "var(--text-main, #f8fafc)";
+  const textMuted = "var(--text-muted, #94a3b8)";
+  const borderLight = "var(--border-subtle, rgba(255, 255, 255, 0.08))";
 
   const [errorObj, setErrorObj] = useState(null);
 
@@ -199,13 +199,13 @@ export default function PortfolioBoard() {
                 padding: '0.5rem 1rem', 
                 borderRadius: '8px', 
                 border: viewMode === 'predictor' ? '1px solid #d97706' : `1px solid ${borderLight}`, 
-                background: viewMode === 'predictor' ? '#fef3c7' : 'transparent', 
-                color: viewMode === 'predictor' ? '#b45309' : textMuted, 
+                background: viewMode === 'predictor' ? 'rgba(245, 158, 11, 0.18)' : 'transparent', 
+                color: viewMode === 'predictor' ? '#f59e0b' : textMuted, 
                 fontWeight: 700, 
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.4rem'
+                cursor: 'pointer', 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '0.4rem' 
               }}
             >
               <Sparkles size={16} /> Predictor Data Science
@@ -215,9 +215,9 @@ export default function PortfolioBoard() {
               style={{ 
                 padding: '0.5rem 1rem', 
                 borderRadius: '8px', 
-                border: `1px solid ${borderLight}`, 
-                background: viewMode === 'active' ? '#f1f5f9' : 'transparent', 
-                color: viewMode === 'active' ? '#2563eb' : textMuted, 
+                border: viewMode === 'active' ? '1px solid #3b82f6' : `1px solid ${borderLight}`, 
+                background: viewMode === 'active' ? 'rgba(59, 130, 246, 0.18)' : 'transparent', 
+                color: viewMode === 'active' ? '#38bdf8' : textMuted, 
                 fontWeight: 700, 
                 cursor: 'pointer' 
               }}
@@ -229,9 +229,9 @@ export default function PortfolioBoard() {
               style={{ 
                 padding: '0.5rem 1rem', 
                 borderRadius: '8px', 
-                border: `1px solid ${borderLight}`, 
-                background: viewMode === 'resources' ? '#f1f5f9' : 'transparent', 
-                color: viewMode === 'resources' ? '#2563eb' : textMuted, 
+                border: viewMode === 'resources' ? '1px solid #3b82f6' : `1px solid ${borderLight}`, 
+                background: viewMode === 'resources' ? 'rgba(59, 130, 246, 0.18)' : 'transparent', 
+                color: viewMode === 'resources' ? '#38bdf8' : textMuted, 
                 fontWeight: 700, 
                 cursor: 'pointer' 
               }}
@@ -243,14 +243,14 @@ export default function PortfolioBoard() {
               style={{ 
                 padding: '0.5rem 1rem', 
                 borderRadius: '8px', 
-                border: `1px solid ${borderLight}`, 
-                background: viewMode === 'rrhh_sentinel' ? '#fee2e2' : 'transparent', 
-                color: viewMode === 'rrhh_sentinel' ? '#dc2626' : textMuted, 
+                border: viewMode === 'rrhh_sentinel' ? '1px solid #ef4444' : `1px solid ${borderLight}`, 
+                background: viewMode === 'rrhh_sentinel' ? 'rgba(239, 68, 68, 0.18)' : 'transparent', 
+                color: viewMode === 'rrhh_sentinel' ? '#ef4444' : textMuted, 
                 fontWeight: 700, 
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.4rem'
+                cursor: 'pointer', 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '0.4rem' 
               }}
             >
               <ShieldAlert size={16} /> Centinela RRHH
@@ -505,7 +505,7 @@ export default function PortfolioBoard() {
             </div>
 
             {/* SECCIÓN DE INTEGRIDAD Y RECONCILIACIÓN DE MANAGERS */}
-            <div style={{ background: '#f8fafc', border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.5rem' }}>
+            <div style={{ background: bgLight, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.5rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
                 <ShieldCheck color="#10b981" size={20} />
                 <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: textDark, margin: 0 }}>
@@ -577,22 +577,22 @@ export default function PortfolioBoard() {
                         </td>
                       </tr>
                       {expandedId === p.id && p.details && (
-                        <tr style={{ background: '#f8fafc', borderBottom: `1px solid ${borderLight}` }}>
+                        <tr style={{ background: bgLight, borderBottom: `1px solid ${borderLight}` }}>
                           <td colSpan="5" style={{ padding: '1.5rem', borderLeft: `4px solid ${p.health === 'good' ? '#10b981' : p.health === 'warning' ? '#f59e0b' : '#ef4444'}` }}>
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
-                              <div style={{ background: '#ffffff', padding: '1rem', borderRadius: '8px', border: `1px solid ${borderLight}` }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem' }}>
+                              <div style={{ background: bgCard, padding: '1rem', borderRadius: '8px', border: `1px solid ${borderLight}` }}>
                                 <div style={{ fontSize: '0.7rem', color: textMuted, textTransform: 'uppercase', fontWeight: 700 }}>Total Participantes</div>
                                 <div style={{ fontSize: '1.2rem', fontWeight: 800, color: textDark }}>{p.details.totalParticipantes}</div>
                               </div>
-                              <div style={{ background: '#ffffff', padding: '1rem', borderRadius: '8px', border: `1px solid ${borderLight}` }}>
+                              <div style={{ background: bgCard, padding: '1rem', borderRadius: '8px', border: `1px solid ${borderLight}` }}>
                                 <div style={{ fontSize: '0.7rem', color: textMuted, textTransform: 'uppercase', fontWeight: 700 }}>Total Enrolados</div>
                                 <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#10b981' }}>{p.details.totalEnrolados}</div>
                               </div>
-                              <div style={{ background: '#ffffff', padding: '1rem', borderRadius: '8px', border: `1px solid ${borderLight}` }}>
+                              <div style={{ background: bgCard, padding: '1rem', borderRadius: '8px', border: `1px solid ${borderLight}` }}>
                                 <div style={{ fontSize: '0.7rem', color: textMuted, textTransform: 'uppercase', fontWeight: 700 }}>Deserciones FDS</div>
                                 <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#ef4444' }}>{p.details.totalDesertores}</div>
                               </div>
-                              <div style={{ background: '#ffffff', padding: '1rem', borderRadius: '8px', border: `1px solid ${borderLight}` }}>
+                              <div style={{ background: bgCard, padding: '1rem', borderRadius: '8px', border: `1px solid ${borderLight}` }}>
                                 <div style={{ fontSize: '0.7rem', color: textMuted, textTransform: 'uppercase', fontWeight: 700 }}>Tasa de Deserción</div>
                                 <div style={{ fontSize: '1.2rem', fontWeight: 800, color: p.health === 'good' ? '#10b981' : p.health === 'warning' ? '#f59e0b' : '#ef4444' }}>{p.details.tasaDesercion}%</div>
                               </div>
@@ -746,7 +746,7 @@ export default function PortfolioBoard() {
                             {item.nombre}
                           </td>
                           <td style={{ padding: '1rem 0.8rem', fontSize: '0.85rem' }}>
-                            <span style={{ background: '#f1f5f9', padding: '0.2rem 0.6rem', borderRadius: '4px', fontWeight: 600 }}>
+                            <span style={{ background: 'rgba(255, 255, 255, 0.08)', padding: '0.2rem 0.6rem', borderRadius: '4px', fontWeight: 600, color: textDark }}>
                               {item.sede}
                             </span>
                           </td>
@@ -756,8 +756,8 @@ export default function PortfolioBoard() {
                           </td>
                           <td style={{ padding: '1rem 0.8rem' }}>
                             <span style={{
-                              background: item.nivelRiesgo === 'CRITICO' ? '#fee2e2' : '#fef3c7',
-                              color: item.nivelRiesgo === 'CRITICO' ? '#dc2626' : '#d97706',
+                              background: item.nivelRiesgo === 'CRITICO' ? 'rgba(239, 68, 68, 0.18)' : 'rgba(245, 158, 11, 0.18)',
+                              color: item.nivelRiesgo === 'CRITICO' ? '#ef4444' : '#fbbf24',
                               padding: '0.25rem 0.6rem',
                               borderRadius: '4px',
                               fontSize: '0.75rem',
