@@ -439,26 +439,46 @@ export default function MonitorImos() {
         </button>
       </header>
 
+      {/* Estilos para forzar contraste total en select y option en cualquier navegador y modo */}
+      <style>{`
+        select.form-input, select.form-input option {
+          background-color: #0f172a !important;
+          color: #f8fafc !important;
+        }
+        select.form-input option:hover, select.form-input option:focus, select.form-input option:checked {
+          background-color: #1e293b !important;
+          color: #38bdf8 !important;
+        }
+      `}</style>
+
       {/* Tarjetas de Métricas Resumen y Validación Nodus */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
         <div className="glass-panel" style={{ padding: '0.9rem 1.2rem', border: '1px solid rgba(255,255,255,0.08)' }}>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>IMOs Filtrados</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>IMOs en Misión</div>
           <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#fff' }}>
             {filteredMissions.length} <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 400 }}>/ {missions.length}</span>
           </div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>Misiones en seguimiento</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>Participantes asignados</div>
         </div>
 
-        <div className="glass-panel" style={{ padding: '0.9rem 1.2rem', border: '1px solid rgba(255,255,255,0.08)' }}>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>Total Enrolados</div>
+        <div className="glass-panel" style={{ padding: '0.9rem 1.2rem', border: '1px solid rgba(56, 189, 248, 0.25)', background: 'rgba(56, 189, 248, 0.05)' }}>
+          <div style={{ fontSize: '0.75rem', color: '#38bdf8', textTransform: 'uppercase', marginBottom: '4px', fontWeight: 700 }}>Total Enrolamientos</div>
           <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#38bdf8' }}>{totalEnroladosCount}</div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>Bajo responsabilidad IMO</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>Pedidos bajo responsabilidad IMO</div>
         </div>
 
-        <div className="glass-panel" style={{ padding: '0.9rem 1.2rem', border: '1px solid rgba(255,255,255,0.08)' }}>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>Reportados por IMOs</div>
-          <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#ffb703' }}>{totalConfirmadosCount}</div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>Marcados como 'Asistirá'</div>
+        <div className="glass-panel" style={{ padding: '0.9rem 1.2rem', border: '1px solid rgba(34, 197, 94, 0.25)', background: 'rgba(34, 197, 94, 0.05)' }}>
+          <div style={{ fontSize: '0.75rem', color: '#4ade80', textTransform: 'uppercase', marginBottom: '4px', fontWeight: 700 }}>Confirmados por IMO</div>
+          <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#22c55e' }}>{totalConfirmadosCount}</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>Marcados como 'Asistirá' ({totalEnroladosCount > 0 ? Math.round((totalConfirmadosCount / totalEnroladosCount) * 100) : 0}%)</div>
+        </div>
+
+        <div className="glass-panel" style={{ padding: '0.9rem 1.2rem', border: '1px solid rgba(239, 68, 68, 0.25)', background: 'rgba(239, 68, 68, 0.05)' }}>
+          <div style={{ fontSize: '0.75rem', color: '#f87171', textTransform: 'uppercase', marginBottom: '4px', fontWeight: 700 }}>Enrolados Pendientes</div>
+          <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#ef4444' }}>{totalEnroladosCount - totalConfirmadosCount}</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>
+            {filteredMissions.length - completadosCount} IMOs con llamadas pendientes
+          </div>
         </div>
 
         {/* Tarjeta de Validación Automática Nodus vs Coordinadoras */}
@@ -468,7 +488,7 @@ export default function MonitorImos() {
           background: globalNodusStats.totalDiscrepancias > 0 ? 'rgba(239, 68, 68, 0.05)' : 'rgba(34, 197, 94, 0.05)'
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Validación Nodus en Llamadas</span>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Validación Nodus</span>
             <span style={{
               fontSize: '0.7rem',
               fontWeight: 800,
@@ -481,21 +501,111 @@ export default function MonitorImos() {
             </span>
           </div>
           <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#22c55e' }}>
-            {globalNodusStats.totalValidadosLlamada} <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 400 }}>/ {globalNodusStats.totalReportadosImo} afirmados</span>
+            {globalNodusStats.totalValidadosLlamada} <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 400 }}>/ {globalNodusStats.totalReportadosImo}</span>
           </div>
           <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>
             {globalNodusStats.totalDiscrepancias > 0 ? (
-              <span style={{ color: '#ef4444', fontWeight: 700 }}>🚨 {globalNodusStats.totalDiscrepancias} Discrepancia(s) detectada(s)</span>
+              <span style={{ color: '#ef4444', fontWeight: 700 }}>🚨 {globalNodusStats.totalDiscrepancias} Discrepancia(s)</span>
             ) : (
-              <span>✅ Confirmados en llamada de Coordinadora</span>
+              <span>✅ Coordinadoras coinciden</span>
             )}
           </div>
         </div>
 
-        <div className="glass-panel" style={{ padding: '0.9rem 1.2rem', border: '1px solid rgba(255,255,255,0.08)' }}>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>Misiones Completadas</div>
-          <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--crear-gold, #ffb703)' }}>{completadosCount}</div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>Progreso al 100%</div>
+        <div className="glass-panel" style={{ padding: '0.9rem 1.2rem', border: '1px solid rgba(255, 183, 3, 0.25)', background: 'rgba(255, 183, 3, 0.05)' }}>
+          <div style={{ fontSize: '0.75rem', color: '#ffb703', textTransform: 'uppercase', marginBottom: '4px', fontWeight: 700 }}>Misiones al 100%</div>
+          <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#ffb703' }}>{completadosCount}</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>IMOs con todos confirmados</div>
+        </div>
+      </div>
+
+      {/* Panel de Auditoría Rápida de Sede / Equipo */}
+      <div className="glass-panel" style={{
+        padding: '1rem 1.25rem',
+        marginBottom: '1.5rem',
+        border: '1px solid rgba(56, 189, 248, 0.3)',
+        background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.85) 100%)',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: '1rem'
+      }}>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+            <span style={{
+              background: '#38bdf8',
+              color: '#0f172a',
+              fontSize: '0.72rem',
+              fontWeight: 800,
+              padding: '2px 8px',
+              borderRadius: '4px',
+              textTransform: 'uppercase'
+            }}>
+              Auditoría de Enrolamientos / Misión
+            </span>
+            <strong style={{ color: '#fff', fontSize: '1.05rem' }}>
+              {filterSede === 'todos' ? 'Todas las Sedes' : `Sede ${filterSede}`} {filterEquipo !== 'todos' ? `• ${filterEquipo}` : ''}
+            </strong>
+          </div>
+          <div style={{ fontSize: '0.85rem', color: '#94a3b8', lineHeight: 1.5 }}>
+            📋 <strong style={{ color: '#38bdf8' }}>{totalEnroladosCount} Enrolamientos</strong> asignados a <strong style={{ color: '#fff' }}>{filteredMissions.length} IMOs</strong> participantes.
+            {' • '}
+            ✅ <strong style={{ color: '#22c55e' }}>{totalConfirmadosCount} Confirmados</strong> ({totalEnroladosCount > 0 ? Math.round((totalConfirmadosCount / totalEnroladosCount) * 100) : 0}%)
+            {' • '}
+            ⏳ <strong style={{ color: '#f87171' }}>{totalEnroladosCount - totalConfirmadosCount} Pendientes</strong> ({totalEnroladosCount > 0 ? Math.round(((totalEnroladosCount - totalConfirmadosCount) / totalEnroladosCount) * 100) : 0}%)
+            {' • '}
+            🎯 <strong style={{ color: '#ffb703' }}>{completadosCount} IMOs al 100%</strong> ({filteredMissions.length - completadosCount} con pendientes).
+          </div>
+        </div>
+
+        {/* Botones de Filtro Rápido */}
+        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+          <button
+            onClick={() => setFilterEstado('todos')}
+            style={{
+              padding: '6px 12px',
+              borderRadius: '6px',
+              border: filterEstado === 'todos' ? '1px solid #38bdf8' : '1px solid rgba(255,255,255,0.15)',
+              background: filterEstado === 'todos' ? 'rgba(56, 189, 248, 0.2)' : 'transparent',
+              color: filterEstado === 'todos' ? '#38bdf8' : 'var(--text-muted)',
+              fontSize: '0.78rem',
+              fontWeight: 700,
+              cursor: 'pointer'
+            }}
+          >
+            Todos ({filteredMissions.length})
+          </button>
+          <button
+            onClick={() => setFilterEstado('completado')}
+            style={{
+              padding: '6px 12px',
+              borderRadius: '6px',
+              border: filterEstado === 'completado' ? '1px solid #22c55e' : '1px solid rgba(255,255,255,0.15)',
+              background: filterEstado === 'completado' ? 'rgba(34, 197, 94, 0.2)' : 'transparent',
+              color: filterEstado === 'completado' ? '#22c55e' : 'var(--text-muted)',
+              fontSize: '0.78rem',
+              fontWeight: 700,
+              cursor: 'pointer'
+            }}
+          >
+            ✅ Confirmaron Todo ({completadosCount})
+          </button>
+          <button
+            onClick={() => setFilterEstado('en_progreso')}
+            style={{
+              padding: '6px 12px',
+              borderRadius: '6px',
+              border: filterEstado === 'en_progreso' ? '1px solid #f87171' : '1px solid rgba(255,255,255,0.15)',
+              background: filterEstado === 'en_progreso' ? 'rgba(239, 68, 68, 0.2)' : 'transparent',
+              color: filterEstado === 'en_progreso' ? '#f87171' : 'var(--text-muted)',
+              fontSize: '0.78rem',
+              fontWeight: 700,
+              cursor: 'pointer'
+            }}
+          >
+            ⏳ Con Pendientes ({filteredMissions.length - completadosCount})
+          </button>
         </div>
       </div>
 
@@ -539,34 +649,44 @@ export default function MonitorImos() {
                 width: 'auto',
                 minWidth: '150px',
                 fontSize: '0.85rem',
-                padding: '0.4rem 0.8rem',
-                border: filterSede !== 'todos' ? '1px solid #38bdf8' : '1px solid rgba(255,255,255,0.15)',
-                color: filterSede !== 'todos' ? '#38bdf8' : 'inherit',
-                fontWeight: filterSede !== 'todos' ? 700 : 400,
-                background: filterSede !== 'todos' ? 'rgba(56, 189, 248, 0.1)' : 'rgba(255,255,255,0.05)'
+                padding: '0.45rem 0.85rem',
+                borderRadius: '6px',
+                border: filterSede !== 'todos' ? '1px solid #38bdf8' : '1px solid #475569',
+                color: filterSede !== 'todos' ? '#38bdf8' : '#f8fafc',
+                fontWeight: filterSede !== 'todos' ? 700 : 500,
+                backgroundColor: '#0f172a'
               }}
             >
-              <option value="todos">Todas las Sedes</option>
+              <option value="todos" style={{ backgroundColor: '#0f172a', color: '#f8fafc' }}>Todas las Sedes</option>
               {sedesDisponibles.map(s => (
-                <option key={s} value={s}>{s}</option>
+                <option key={s} value={s} style={{ backgroundColor: '#0f172a', color: '#f8fafc' }}>{s}</option>
               ))}
             </select>
           </div>
 
-          {/* Selector de Validación Nodus */}
+          {/* Selector de Cruce Nodus */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Cruce Nodus:</span>
             <select
               value={filterNodus}
               onChange={(e) => setFilterNodus(e.target.value)}
               className="form-input"
-              style={{ width: 'auto', minWidth: '170px', fontSize: '0.85rem', padding: '0.4rem 0.8rem' }}
+              style={{
+                width: 'auto',
+                minWidth: '170px',
+                fontSize: '0.85rem',
+                padding: '0.45rem 0.85rem',
+                borderRadius: '6px',
+                border: '1px solid #475569',
+                backgroundColor: '#0f172a',
+                color: '#f8fafc'
+              }}
             >
-              <option value="todos">Todos los Estados Nodus</option>
-              <option value="verificado_ok">🟢 100% Verificados en Llamada</option>
-              <option value="parcial">🟡 En Verificación (Parcial)</option>
-              <option value="discrepancia">🚨 Con Discrepancias (Alerta)</option>
-              <option value="pendiente">⏳ Falta Confirma de Coord.</option>
+              <option value="todos" style={{ backgroundColor: '#0f172a', color: '#f8fafc' }}>Todos los Estados Nodus</option>
+              <option value="verificado_ok" style={{ backgroundColor: '#0f172a', color: '#22c55e' }}>🟢 100% Verificados en Llamada</option>
+              <option value="parcial" style={{ backgroundColor: '#0f172a', color: '#f59e0b' }}>🟡 En Verificación (Parcial)</option>
+              <option value="discrepancia" style={{ backgroundColor: '#0f172a', color: '#ef4444' }}>🚨 Con Discrepancias (Alerta)</option>
+              <option value="pendiente" style={{ backgroundColor: '#0f172a', color: '#94a3b8' }}>⏳ Falta Confirma de Coord.</option>
             </select>
           </div>
 
@@ -577,11 +697,21 @@ export default function MonitorImos() {
               value={filterEquipo}
               onChange={(e) => setFilterEquipo(e.target.value)}
               className="form-input"
-              style={{ width: 'auto', minWidth: '130px', fontSize: '0.85rem', padding: '0.4rem 0.8rem' }}
+              style={{
+                width: 'auto',
+                minWidth: '140px',
+                fontSize: '0.85rem',
+                padding: '0.45rem 0.85rem',
+                borderRadius: '6px',
+                border: filterEquipo !== 'todos' ? '1px solid #ffb703' : '1px solid #475569',
+                color: filterEquipo !== 'todos' ? '#ffb703' : '#f8fafc',
+                fontWeight: filterEquipo !== 'todos' ? 700 : 500,
+                backgroundColor: '#0f172a'
+              }}
             >
-              <option value="todos">Todos los Equipos</option>
+              <option value="todos" style={{ backgroundColor: '#0f172a', color: '#f8fafc' }}>Todos los Equipos</option>
               {equiposDisponibles.map(eq => (
-                <option key={eq} value={eq}>{eq}</option>
+                <option key={eq} value={eq} style={{ backgroundColor: '#0f172a', color: '#f8fafc' }}>{eq}</option>
               ))}
             </select>
           </div>
@@ -593,11 +723,20 @@ export default function MonitorImos() {
               value={filterEstado}
               onChange={(e) => setFilterEstado(e.target.value)}
               className="form-input"
-              style={{ width: 'auto', minWidth: '140px', fontSize: '0.85rem', padding: '0.4rem 0.8rem' }}
+              style={{
+                width: 'auto',
+                minWidth: '140px',
+                fontSize: '0.85rem',
+                padding: '0.45rem 0.85rem',
+                borderRadius: '6px',
+                border: '1px solid #475569',
+                backgroundColor: '#0f172a',
+                color: '#f8fafc'
+              }}
             >
-              <option value="todos">Todos los Estados</option>
-              <option value="completado">✅ Completados (100%)</option>
-              <option value="en_progreso">⏳ En Progreso</option>
+              <option value="todos" style={{ backgroundColor: '#0f172a', color: '#f8fafc' }}>Todos los Estados</option>
+              <option value="completado" style={{ backgroundColor: '#0f172a', color: '#22c55e' }}>✅ Completados (100%)</option>
+              <option value="en_progreso" style={{ backgroundColor: '#0f172a', color: '#f59e0b' }}>⏳ En Progreso</option>
             </select>
           </div>
 
@@ -611,6 +750,7 @@ export default function MonitorImos() {
           )}
         </div>
       </div>
+
 
       <div className="glass-panel" style={{ padding: '1.5rem', overflowX: 'auto', border: '1px solid rgba(255,255,255,0.08)' }}>
         <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse', minWidth: '950px' }}>
