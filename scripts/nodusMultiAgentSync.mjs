@@ -290,22 +290,22 @@ class NodusExtractorAgent {
           const trs = Array.from(document.querySelectorAll('table tbody tr'));
           return trs.map(tr => {
             const tds = Array.from(tr.querySelectorAll('td')).map(td => td.innerText.trim());
-            return {
-              apellidos: tds[1] || '',
-              nombres: tds[2] || '',
-              nombrePreferido: tds[3] || '',
-              telefono: tds[4] || '',
-              coordinador: tds[5] || '',
-              imo: tds[6] || '',
-              telefonoImo: tds[7] || '',
-              llamada1: tds[8] || '',
-              llamada2: tds[9] || '',
-              finDeSemana: tds[10] || '',
-              asistencia: tds[11] || '',
-              desertor: tds[12] || '',
-              pago: tds[13] || ''
-            };
-          });
+            const item = {};
+            if (tds[1]) item.apellidos = tds[1];
+            if (tds[2]) item.nombres = tds[2];
+            if (tds[3]) item.nombrePreferido = tds[3];
+            if (tds[4]) item.telefono = tds[4];
+            if (tds[5]) item.coordinador = tds[5];
+            if (tds[6]) item.imo = tds[6];
+            if (tds[7]) item.telefonoImo = tds[7];
+            if (tds[8]) item.llamada1 = tds[8];
+            if (tds[9]) item.llamada2 = tds[9];
+            if (tds[10]) item.finDeSemana = tds[10];
+            if (tds[11]) item.asistencia = tds[11];
+            if (tds[12]) item.desertor = tds[12];
+            if (tds[13]) item.pago = tds[13];
+            return item;
+          }).filter(p => p.nombres || p.apellidos || p.telefono || p.imo);
         });
 
         equiposData.push({
@@ -563,6 +563,12 @@ class NodusDispatcherAgent {
     console.log("☁️ [Agente 3 - Despachador] Guardando datos en Firestore y respaldos locales...");
     const timestamp = new Date().toISOString();
 
+    const equiposSummary = (normalizedData.equiposReporte || []).map(eq => ({
+      equipoId: eq.equipoId,
+      equipoNombre: eq.equipoNombre,
+      totalParticipantes: eq.totalParticipantes || (eq.participantes ? eq.participantes.length : 0)
+    }));
+
     const masterSnapshot = {
       robot_token: "NODUS_ROBOT_CPSL_2026_SECRET",
       timestamp,
@@ -571,7 +577,7 @@ class NodusDispatcherAgent {
       totales: normalizedData.totales,
       sedes: normalizedData.sedesSummary,
       coordinadores: normalizedData.coordinadores,
-      equiposReporte: normalizedData.equiposReporte
+      equiposSummary
     };
 
     // 1. Guardar en nodus_kpis_sincronizados / latest_snapshot
@@ -579,13 +585,20 @@ class NodusDispatcherAgent {
     console.log("✅ [Agente 3 - Despachador] Guardado 'nodus_kpis_sincronizados/latest_snapshot'");
 
     // 2. Guardar en colección optimizada para Dashboard C1/C2: nodus_coordinadores_c1c2 / latest
+    let safeEquiposReporte = normalizedData.equiposReporte;
+    const serializedSize = JSON.stringify(safeEquiposReporte).length;
+    if (serializedSize > 800000) {
+      console.warn(`⚠️ [Agente 3 - Despachador] Tamaño de equiposReporte (${serializedSize} bytes) excede umbral de seguridad de 800KB. Guardando resumen para evitar límite de 1MB en Firestore.`);
+      safeEquiposReporte = equiposSummary;
+    }
+
     await setDoc(doc(db, 'nodus_coordinadores_c1c2', 'latest'), {
       robot_token: "NODUS_ROBOT_CPSL_2026_SECRET",
       timestamp,
       totales: normalizedData.totales,
       sedes: normalizedData.sedesSummary,
       coordinadores: normalizedData.coordinadores,
-      equiposReporte: normalizedData.equiposReporte
+      equiposReporte: safeEquiposReporte
     });
     console.log("✅ [Agente 3 - Despachador] Guardado 'nodus_coordinadores_c1c2/latest'");
 
