@@ -594,37 +594,39 @@ export default function GerenteDashboard() {
               <h3 style={{ color: "#8b5cf6", margin: 0, fontSize: "1.1rem" }}>Capítulo UNO (C1)</h3>
               <span style={{ fontSize: "0.75rem", padding: "2px 8px", borderRadius: "12px", background: "rgba(139, 92, 246, 0.15)", color: "#a78bfa", fontWeight: "bold" }}>Descubrimiento</span>
             </div>
-            <table style={{ width: "100%", fontSize: "0.85rem", borderCollapse: "collapse" }}>
-              <thead>
-                <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.1)", textAlign: "left", color: "var(--text-muted)", fontSize: "0.75rem" }}>
-                  <th style={{ padding: "0.4rem 0" }}>DÍA</th>
-                  <th style={{ padding: "0.4rem 0" }}>HORARIO</th>
-                  <th style={{ padding: "0.4rem 0", textAlign: "right" }}>VESTIMENTA</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                  <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Jueves</td>
-                  <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>4:30 PM - Cierre</td>
-                  <td style={{ padding: "0.6rem 0", textAlign: "right", color: "var(--text-main)" }}>Negro</td>
-                </tr>
-                <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                  <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Viernes</td>
-                  <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>7:30 AM - 3:00 PM<br/><span style={{ color: "var(--crear-cyan)" }}>5:00 PM - Cierre (Noche Confianza)</span></td>
-                  <td style={{ padding: "0.6rem 0", textAlign: "right", color: "#f59e0b", fontWeight: "600" }}>Negro formal</td>
-                </tr>
-                <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                  <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Sábado</td>
-                  <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>8:00 AM - 4:00 PM<br/>3:00 PM - Cierre</td>
-                  <td style={{ padding: "0.6rem 0", textAlign: "right", color: "var(--text-main)" }}>Polo / pantalón negro</td>
-                </tr>
-                <tr>
-                  <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Domingo</td>
-                  <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>8:00 AM - Cierre (Graduación)</td>
-                  <td style={{ padding: "0.6rem 0", textAlign: "right", color: "var(--text-main)" }}>Polo / pantalón negro</td>
-                </tr>
-              </tbody>
-            </table>
+            <div className="table-responsive" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+              <table style={{ width: "100%", minWidth: "300px", fontSize: "0.85rem", borderCollapse: "collapse" }}>
+                <thead>
+                  <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.1)", textAlign: "left", color: "var(--text-muted)", fontSize: "0.75rem" }}>
+                    <th style={{ padding: "0.4rem 0" }}>DÍA</th>
+                    <th style={{ padding: "0.4rem 0" }}>HORARIO</th>
+                    <th style={{ padding: "0.4rem 0", textAlign: "right" }}>VESTIMENTA</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                    <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Jueves</td>
+                    <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>4:30 PM - Cierre</td>
+                    <td style={{ padding: "0.6rem 0", textAlign: "right", color: "var(--text-main)" }}>Negro</td>
+                  </tr>
+                  <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                    <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Viernes</td>
+                    <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>7:30 AM - 3:00 PM<br/><span style={{ color: "var(--crear-cyan)" }}>5:00 PM - Cierre (Noche Confianza)</span></td>
+                    <td style={{ padding: "0.6rem 0", textAlign: "right", color: "#f59e0b", fontWeight: "600" }}>Negro formal</td>
+                  </tr>
+                  <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                    <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Sábado</td>
+                    <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>8:00 AM - 4:00 PM<br/>3:00 PM - Cierre</td>
+                    <td style={{ padding: "0.6rem 0", textAlign: "right", color: "var(--text-main)" }}>Polo / pantalón negro</td>
+                  </tr>
+                  <tr>
+                    <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Domingo</td>
+                    <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>8:00 AM - Cierre (Graduación)</td>
+                    <td style={{ padding: "0.6rem 0", textAlign: "right", color: "var(--text-main)" }}>Polo / pantalón negro</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
 
           {/* CAPITULO DOS */}
@@ -633,37 +635,39 @@ export default function GerenteDashboard() {
               <h3 style={{ color: "#29abe2", margin: 0, fontSize: "1.1rem" }}>Capítulo DOS (C2)</h3>
               <span style={{ fontSize: "0.75rem", padding: "2px 8px", borderRadius: "12px", background: "rgba(41, 171, 226, 0.15)", color: "#38bdf8", fontWeight: "bold" }}>Avanzado</span>
             </div>
-            <table style={{ width: "100%", fontSize: "0.85rem", borderCollapse: "collapse" }}>
-              <thead>
-                <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.1)", textAlign: "left", color: "var(--text-muted)", fontSize: "0.75rem" }}>
-                  <th style={{ padding: "0.4rem 0" }}>DÍA</th>
-                  <th style={{ padding: "0.4rem 0" }}>HORARIO</th>
-                  <th style={{ padding: "0.4rem 0", textAlign: "right" }}>VESTIMENTA</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                  <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Jueves</td>
-                  <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>10:30 AM - 4:00 PM<br/>4:00 PM - Cierre</td>
-                  <td style={{ padding: "0.6rem 0", textAlign: "right", color: "#f59e0b", fontWeight: "600" }}>Negro formal</td>
-                </tr>
-                <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                  <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Viernes</td>
-                  <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>7:15 AM - 4:00 PM<br/>4:00 PM - Cierre</td>
-                  <td style={{ padding: "0.6rem 0", textAlign: "right", color: "var(--text-main)" }}>Polo / pantalón negro</td>
-                </tr>
-                <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                  <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Sábado</td>
-                  <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>7:30 AM - 3:00 PM<br/>3:00 PM - Cierre</td>
-                  <td style={{ padding: "0.6rem 0", textAlign: "right", color: "var(--text-main)" }}>Polo / pantalón negro</td>
-                </tr>
-                <tr>
-                  <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Domingo</td>
-                  <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>Inicio - Cierre<br/>3:00 PM - Cierre</td>
-                  <td style={{ padding: "0.6rem 0", textAlign: "right", color: "var(--text-main)" }}>Polo / pantalón negro</td>
-                </tr>
-              </tbody>
-            </table>
+            <div className="table-responsive" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+              <table style={{ width: "100%", minWidth: "300px", fontSize: "0.85rem", borderCollapse: "collapse" }}>
+                <thead>
+                  <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.1)", textAlign: "left", color: "var(--text-muted)", fontSize: "0.75rem" }}>
+                    <th style={{ padding: "0.4rem 0" }}>DÍA</th>
+                    <th style={{ padding: "0.4rem 0" }}>HORARIO</th>
+                    <th style={{ padding: "0.4rem 0", textAlign: "right" }}>VESTIMENTA</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                    <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Jueves</td>
+                    <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>10:30 AM - 4:00 PM<br/>4:00 PM - Cierre</td>
+                    <td style={{ padding: "0.6rem 0", textAlign: "right", color: "#f59e0b", fontWeight: "600" }}>Negro formal</td>
+                  </tr>
+                  <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                    <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Viernes</td>
+                    <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>7:15 AM - 4:00 PM<br/>4:00 PM - Cierre</td>
+                    <td style={{ padding: "0.6rem 0", textAlign: "right", color: "var(--text-main)" }}>Polo / pantalón negro</td>
+                  </tr>
+                  <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                    <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Sábado</td>
+                    <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>7:30 AM - 3:00 PM<br/>3:00 PM - Cierre</td>
+                    <td style={{ padding: "0.6rem 0", textAlign: "right", color: "var(--text-main)" }}>Polo / pantalón negro</td>
+                  </tr>
+                  <tr>
+                    <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Domingo</td>
+                    <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>Inicio - Cierre<br/>3:00 PM - Cierre</td>
+                    <td style={{ padding: "0.6rem 0", textAlign: "right", color: "var(--text-main)" }}>Polo / pantalón negro</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
 
           {/* MAESTRIA */}
@@ -672,32 +676,34 @@ export default function GerenteDashboard() {
               <h3 style={{ color: "#f59e0b", margin: 0, fontSize: "1.1rem" }}>Maestría del Juego (MJ)</h3>
               <span style={{ fontSize: "0.75rem", padding: "2px 8px", borderRadius: "12px", background: "rgba(245, 158, 11, 0.15)", color: "#fbbf24", fontWeight: "bold" }}>Liderazgo Cuántico</span>
             </div>
-            <table style={{ width: "100%", fontSize: "0.85rem", borderCollapse: "collapse" }}>
-              <thead>
-                <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.1)", textAlign: "left", color: "var(--text-muted)", fontSize: "0.75rem" }}>
-                  <th style={{ padding: "0.4rem 0" }}>DÍA</th>
-                  <th style={{ padding: "0.4rem 0" }}>HORARIO</th>
-                  <th style={{ padding: "0.4rem 0", textAlign: "right" }}>VESTIMENTA</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                  <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Viernes</td>
-                  <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>3:00 PM - 9:00 PM</td>
-                  <td style={{ padding: "0.6rem 0", textAlign: "right", color: "#f59e0b", fontWeight: "600" }}>Negro formal</td>
-                </tr>
-                <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                  <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Sábado</td>
-                  <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>8:30 AM - 12:00 PM<br/>4:00 PM - 9:00 PM</td>
-                  <td style={{ padding: "0.6rem 0", textAlign: "right", color: "var(--text-main)" }}>Camiseta / pantalón negro</td>
-                </tr>
-                <tr>
-                  <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Domingo</td>
-                  <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>8:30 AM - 12:00 PM<br/>4:00 PM - Cierre</td>
-                  <td style={{ padding: "0.6rem 0", textAlign: "right", color: "var(--text-main)" }}>Camiseta / pantalón negro</td>
-                </tr>
-              </tbody>
-            </table>
+            <div className="table-responsive" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+              <table style={{ width: "100%", minWidth: "300px", fontSize: "0.85rem", borderCollapse: "collapse" }}>
+                <thead>
+                  <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.1)", textAlign: "left", color: "var(--text-muted)", fontSize: "0.75rem" }}>
+                    <th style={{ padding: "0.4rem 0" }}>DÍA</th>
+                    <th style={{ padding: "0.4rem 0" }}>HORARIO</th>
+                    <th style={{ padding: "0.4rem 0", textAlign: "right" }}>VESTIMENTA</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                    <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Viernes</td>
+                    <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>3:00 PM - 9:00 PM</td>
+                    <td style={{ padding: "0.6rem 0", textAlign: "right", color: "#f59e0b", fontWeight: "600" }}>Negro formal</td>
+                  </tr>
+                  <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                    <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Sábado</td>
+                    <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>8:30 AM - 12:00 PM<br/>4:00 PM - 9:00 PM</td>
+                    <td style={{ padding: "0.6rem 0", textAlign: "right", color: "var(--text-main)" }}>Camiseta / pantalón negro</td>
+                  </tr>
+                  <tr>
+                    <td style={{ padding: "0.6rem 0", fontWeight: "bold" }}>Domingo</td>
+                    <td style={{ padding: "0.6rem 0", color: "var(--text-muted)" }}>8:30 AM - 12:00 PM<br/>4:00 PM - Cierre</td>
+                    <td style={{ padding: "0.6rem 0", textAlign: "right", color: "var(--text-main)" }}>Camiseta / pantalón negro</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 
@@ -713,3 +719,4 @@ export default function GerenteDashboard() {
     </div>
   );
 }
+
