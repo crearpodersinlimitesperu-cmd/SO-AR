@@ -19,6 +19,7 @@ export default function MonitorImos() {
   const [expandedImo, setExpandedImo] = useState(null);
   const [sendingEmail, setSendingEmail] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [filterSede, setFilterSede] = useState('todos');
   const [filterEquipo, setFilterEquipo] = useState('todos');
   const [filterEstado, setFilterEstado] = useState('todos');
   const [filterNodus, setFilterNodus] = useState('todos');
@@ -145,25 +146,64 @@ export default function MonitorImos() {
   // Coordinador, etc.) solo ve las misiones cuya sede coincide con currentUser.sede,
   // normalizada con normalizeSede() (la misma función que usa el resto del código para
   // que "GYE" y "Guayaquil" se traten como la misma sede).
+  // Helper para resolver la sede exacta de cada misión (m.sede o deducida del equipo)
+  const resolveMissionSede = (m) => {
+    let s = m.sede;
+    if (!s || s === 'No especificada') {
+      const eqUpper = (m.equipo || '').toUpperCase();
+      if (eqUpper.includes("CUENCA")) s = "Cuenca";
+      else if (eqUpper.includes("QUITO")) s = "Quito";
+      else if (eqUpper.includes("GUAYAQUIL") || eqUpper.includes("GYE")) s = "Guayaquil";
+      else if (eqUpper.includes("LIMA")) s = "Lima";
+      else if (eqUpper.includes("BOGOTA") || eqUpper.includes("BOGOTÁ")) s = "Bogotá";
+      else if (eqUpper.includes("MEDELLIN") || eqUpper.includes("MEDELLÍN")) s = "Medellín";
+      else if (eqUpper.includes("MEXICO") || eqUpper.includes("MÉXICO") || eqUpper.includes("CDMX")) s = "México";
+      else s = "Lima";
+    }
+    return normalizeSede(s);
+  };
+
   const isGlobalScopeUser = !!(currentUser?.isSuperAdmin || currentUser?.isConsolidatedView || currentUser?.appRole === 'consolidado' || currentUser?.isDireccion);
   const sedeScopedMissions = useMemo(() => {
     if (isGlobalScopeUser) return missions;
     const mySede = normalizeSede(currentUser?.sede);
-    return missions.filter(m => normalizeSede(m.sede) === mySede);
+    return missions.filter(m => resolveMissionSede(m) === mySede);
   }, [missions, isGlobalScopeUser, currentUser?.sede]);
 
-  // Equipos únicos para el filtro
+  // Sedes disponibles para el selector de sede (dinámico según misiones existentes)
+  const sedesDisponibles = useMemo(() => {
+    const setSedes = new Set();
+    const sourceList = isGlobalScopeUser ? missions : sedeScopedMissions;
+    sourceList.forEach(m => {
+      const s = resolveMissionSede(m);
+      if (s && s !== 'Sede Global') setSedes.add(s);
+    });
+    // Sedes oficiales de operación
+    ['Lima', 'Quito', 'Cuenca', 'Guayaquil', 'Medellín', 'México'].forEach(s => {
+      const exists = sourceList.some(m => resolveMissionSede(m) === s);
+      if (exists) setSedes.add(s);
+    });
+    return Array.from(setSedes).sort();
+  }, [missions, sedeScopedMissions, isGlobalScopeUser]);
+
+  // Equipos únicos para el filtro (filtrados por sede si se seleccionó una)
   const equiposDisponibles = useMemo(() => {
     const setEq = new Set();
     sedeScopedMissions.forEach(m => {
+      if (filterSede !== 'todos' && resolveMissionSede(m) !== filterSede) return;
       if (m.equipo) setEq.add(m.equipo);
     });
     return Array.from(setEq).sort();
-  }, [sedeScopedMissions]);
+  }, [sedeScopedMissions, filterSede]);
 
   // Filtrado de misiones en tiempo real por búsqueda y selectores
   const filteredMissions = useMemo(() => {
     return sedeScopedMissions.filter((m) => {
+      // Filtro Sede
+      if (filterSede !== 'todos' && resolveMissionSede(m) !== filterSede) {
+        return false;
+      }
+
       // Filtro Equipo
       if (filterEquipo !== 'todos' && (m.equipo || '').toUpperCase() !== filterEquipo.toUpperCase()) {
         return false;
@@ -190,7 +230,7 @@ export default function MonitorImos() {
         const queryText = searchTerm.toLowerCase().trim();
         const matchImo = (m.imoNombre || '').toLowerCase().includes(queryText);
         const matchEquipo = (m.equipo || '').toLowerCase().includes(queryText);
-        const matchSede = (m.sede || '').toLowerCase().includes(queryText);
+        const matchSede = (resolveMissionSede(m) || '').toLowerCase().includes(queryText) || (m.sede || '').toLowerCase().includes(queryText);
 
         const matchEnrolado = enrolados.some(e =>
           (e.nombre || '').toLowerCase().includes(queryText) ||
@@ -204,7 +244,7 @@ export default function MonitorImos() {
 
       return true;
     });
-  }, [sedeScopedMissions, searchTerm, filterEquipo, filterEstado, filterNodus, nodusSyncTick]);
+  }, [sedeScopedMissions, searchTerm, filterSede, filterEquipo, filterEstado, filterNodus, nodusSyncTick]);
 
   const totalEnroladosCount = useMemo(() => {
     return filteredMissions.reduce((acc, m) => {
@@ -485,6 +525,34 @@ export default function MonitorImos() {
 
         {/* Filtros Selectores */}
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
+          {/* Selector de Sede */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Sede:</span>
+            <select
+              value={filterSede}
+              onChange={(e) => {
+                setFilterSede(e.target.value);
+                setFilterEquipo('todos');
+              }}
+              className="form-input"
+              style={{
+                width: 'auto',
+                minWidth: '150px',
+                fontSize: '0.85rem',
+                padding: '0.4rem 0.8rem',
+                border: filterSede !== 'todos' ? '1px solid #38bdf8' : '1px solid rgba(255,255,255,0.15)',
+                color: filterSede !== 'todos' ? '#38bdf8' : 'inherit',
+                fontWeight: filterSede !== 'todos' ? 700 : 400,
+                background: filterSede !== 'todos' ? 'rgba(56, 189, 248, 0.1)' : 'rgba(255,255,255,0.05)'
+              }}
+            >
+              <option value="todos">Todas las Sedes</option>
+              {sedesDisponibles.map(s => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
+          </div>
+
           {/* Selector de Validación Nodus */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Cruce Nodus:</span>
@@ -533,9 +601,9 @@ export default function MonitorImos() {
             </select>
           </div>
 
-          {(searchTerm || filterEquipo !== 'todos' || filterEstado !== 'todos' || filterNodus !== 'todos') && (
+          {(searchTerm || filterSede !== 'todos' || filterEquipo !== 'todos' || filterEstado !== 'todos' || filterNodus !== 'todos') && (
             <button
-              onClick={() => { setSearchTerm(''); setFilterEquipo('todos'); setFilterEstado('todos'); setFilterNodus('todos'); }}
+              onClick={() => { setSearchTerm(''); setFilterSede('todos'); setFilterEquipo('todos'); setFilterEstado('todos'); setFilterNodus('todos'); }}
               style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.15)', color: 'var(--crear-blue, #38bdf8)', padding: '0.4rem 0.8rem', borderRadius: '6px', fontSize: '0.8rem', cursor: 'pointer', fontWeight: 600 }}
             >
               Limpiar filtros
@@ -596,7 +664,7 @@ export default function MonitorImos() {
                           </span>
                         )}
                       </div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{m.sede || 'Lima'}</div>
+                      <div style={{ fontSize: '0.75rem', color: '#38bdf8', fontWeight: 600 }}>📍 {resolveMissionSede(m)}</div>
                     </td>
                     <td style={{ padding: '1rem', fontSize: '0.9rem', color: 'var(--crear-blue)' }}>
                       {m.equipo || 'Sin Equipo'}
