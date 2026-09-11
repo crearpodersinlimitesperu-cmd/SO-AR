@@ -6,6 +6,7 @@ import './index.css'
 import LearningDashboard from './pages/LearningDashboard'
 import ExcellenceDashboard from './pages/ExcellenceDashboard'
 import Login from './pages/Login'
+import OptOutPage from './pages/OptOutPage'
 import Home from './pages/Home'
 import RoleSelector from './pages/RoleSelector'
 import ChecklistBoard from './pages/ChecklistBoard'
@@ -169,6 +170,7 @@ function App() {
       <main style={{ flex: 1 }}>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/opt-out" element={<OptOutPage />} />
           
           <Route path="/" element={<Navigate to="/home" replace />} />
           
