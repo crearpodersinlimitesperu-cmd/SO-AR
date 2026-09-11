@@ -1,24 +1,49 @@
 import React, { useState } from 'react';
 import { useUI } from '../context/UIContext';
+import { useTheme } from '../context/ThemeContext';
 import { Zap, LayoutGrid, Sliders, Settings2 } from 'lucide-react';
 import CustomizeViewModal from './CustomizeViewModal';
 
 export default function ViewModeSelector() {
   const { viewMode, setViewMode } = useUI();
+  const { activeTheme } = useTheme();
   const [showCustomizeModal, setShowCustomizeModal] = useState(false);
+
+  const isLight = activeTheme === 'light';
+  const isZen = activeTheme === 'zen';
+
+  const pillBg = isLight 
+    ? 'rgba(0, 0, 0, 0.05)' 
+    : isZen 
+      ? 'rgba(7, 21, 17, 0.8)' 
+      : 'rgba(0, 0, 0, 0.4)';
+  const pillBorder = isLight 
+    ? '1px solid rgba(0, 0, 0, 0.12)' 
+    : isZen 
+      ? '1px solid rgba(52, 211, 153, 0.25)' 
+      : '1px solid rgba(255, 255, 255, 0.15)';
+  const inactiveColor = isLight 
+    ? '#475569' 
+    : isZen 
+      ? '#a7f3d0' 
+      : 'var(--text-muted, #94a3b8)';
 
   return (
     <>
-      <div style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        background: 'rgba(0, 0, 0, 0.4)',
-        border: '1px solid rgba(255, 255, 255, 0.15)',
-        borderRadius: '10px',
-        padding: '3px',
-        gap: '2px',
-        backdropFilter: 'blur(8px)'
-      }}>
+      <div 
+        className="view-mode-selector-pill"
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          background: pillBg,
+          border: pillBorder,
+          borderRadius: '10px',
+          padding: '3px',
+          gap: '2px',
+          backdropFilter: 'blur(8px)',
+          transition: 'all 0.3s ease'
+        }}
+      >
         <button
           type="button"
           onClick={() => setViewMode('lite')}
@@ -34,7 +59,7 @@ export default function ViewModeSelector() {
             cursor: 'pointer',
             transition: 'all 0.2s',
             background: viewMode === 'lite' ? 'linear-gradient(135deg, #22c55e, #16a34a)' : 'transparent',
-            color: viewMode === 'lite' ? '#ffffff' : 'var(--text-muted)'
+            color: viewMode === 'lite' ? '#ffffff' : inactiveColor
           }}
           title="Modo Lite: Vista ultra limpia, solo tus tareas y checklist sin saturación de botones"
         >
@@ -57,7 +82,7 @@ export default function ViewModeSelector() {
             cursor: 'pointer',
             transition: 'all 0.2s',
             background: viewMode === 'compact' ? 'linear-gradient(135deg, #29abe2, #0284c7)' : 'transparent',
-            color: viewMode === 'compact' ? '#ffffff' : 'var(--text-muted)'
+            color: viewMode === 'compact' ? '#ffffff' : inactiveColor
           }}
           title="Modo Compacto: Vista equilibrada con herramientas organizadas en menú inteligente"
         >
@@ -80,7 +105,7 @@ export default function ViewModeSelector() {
             cursor: 'pointer',
             transition: 'all 0.2s',
             background: viewMode === 'pro' ? 'linear-gradient(135deg, #f59e0b, #d97706)' : 'transparent',
-            color: viewMode === 'pro' ? '#ffffff' : 'var(--text-muted)'
+            color: viewMode === 'pro' ? '#ffffff' : inactiveColor
           }}
           title="Modo Pro: Todos los paneles y herramientas avanzadas visibles"
         >
@@ -101,7 +126,7 @@ export default function ViewModeSelector() {
               border: 'none',
               fontSize: '0.78rem',
               cursor: 'pointer',
-              background: 'rgba(255, 255, 255, 0.08)',
+              background: isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255, 255, 255, 0.08)',
               color: 'var(--crear-gold)'
             }}
             title="Personalizar qué módulos mostrar u ocultar"
@@ -120,3 +145,4 @@ export default function ViewModeSelector() {
     </>
   );
 }
+
