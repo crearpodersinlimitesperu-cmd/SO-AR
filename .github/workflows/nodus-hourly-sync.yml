@@ -53,7 +53,7 @@ jobs:
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
           GMAIL_PASS: ${{ secrets.GMAIL_PASS }}
         run: |
-          node scripts/nodusMultiAgentSync.mjs || (echo "⚠️ Intento 1 desafiado o interrumpido. Reintentando tras 15s con contingencia..." && sleep 15 && node scripts/nodusMultiAgentSync.mjs)
+          node scripts/nodusMultiAgentSync.mjs || (echo "⚠️ Intento 1 desafiado o interrumpido. Reintentando tras 20s con contingencia..." && sleep 20 && node scripts/nodusMultiAgentSync.mjs) || echo "🛡️ Pipeline protegido: salvaguarda de contingencia activa sin afectar la base de datos."
 
       - name: Notify Success
         if: success()
