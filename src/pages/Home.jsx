@@ -1215,7 +1215,7 @@ export default function Home() {
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.8rem' }}>
           
           {/* SELECTOR DE MODO DE VISTA Y TEMA */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', flexWrap: 'wrap' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
               <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '600' }}>Tema:</span>
               <ThemeToggle />
@@ -1908,11 +1908,11 @@ export default function Home() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           
           {/* TARJETA HERO: MI ENFOQUE DE HOY */}
-          <div className="glass-panel" style={{ padding: '1.8rem', border: '1px solid rgba(212, 175, 55, 0.3)', background: 'linear-gradient(180deg, rgba(212, 175, 55, 0.08) 0%, rgba(13, 21, 45, 0.9) 100%)', boxShadow: '0 15px 35px rgba(0,0,0,0.5)' }}>
+          <div className="glass-panel" style={{ padding: 'clamp(1rem, 3vw, 1.8rem)', border: '1px solid rgba(212, 175, 55, 0.3)', background: 'linear-gradient(180deg, rgba(212, 175, 55, 0.08) 0%, var(--bg-card) 100%)', boxShadow: '0 10px 30px rgba(0,0,0,0.2)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.2rem', flexWrap: 'wrap', gap: '0.8rem' }}>
               <div>
                 <span style={{ fontSize: '0.75rem', color: 'var(--crear-gold)', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '1px' }}>⚡ Vista Rápida Diaria</span>
-                <h2 style={{ margin: '0.2rem 0 0 0', color: '#ffffff', fontSize: '1.5rem', fontWeight: '800' }}>Tus Pendientes Críticos</h2>
+                <h2 style={{ margin: '0.2rem 0 0 0', color: 'var(--text-main)', fontSize: '1.5rem', fontWeight: '800' }}>Tus Pendientes Críticos</h2>
               </div>
               <div style={{ textAlign: 'right' }}>
                 <span style={{ fontSize: '1.8rem', fontWeight: '900', color: 'var(--crear-gold)' }}>{progressPercentage}%</span>
