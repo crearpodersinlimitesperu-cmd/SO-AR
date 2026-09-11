@@ -5,6 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import { initializeApp } from "firebase/app";
 import { getFirestore, doc, setDoc } from "firebase/firestore";
+import { NodusDataScientistAgent } from './nodusDataScientistAgent.mjs';
 
 puppeteer.use(StealthPlugin());
 
@@ -728,6 +729,27 @@ export async function runMultiAgentSync() {
 
     const normalized = normalizer.normalizeData(rawCoordinadores, rawDashboard, rawEquiposReporte);
     await dispatcher.dispatch(normalized, rawData);
+
+    // =========================================================================
+    // AGENTE 4: DATA SCIENTIST, INTEGRIDAD, PREDICTOR Y RECONCILIADOR
+    // =========================================================================
+    console.log("\n🔬 [Agente 4 - Data Scientist] Activando inteligencia predictiva y reconciliación...");
+    try {
+      const pageCookies = await extractor.page.cookies();
+      const cookieStr = pageCookies.map(c => `${c.name}=${c.value}`).join('; ');
+      
+      const dataScientist = new NodusDataScientistAgent(firebaseConfig);
+      const prospectosData = await dataScientist.extractProspectosSinPago(cookieStr);
+      const fdsData = await dataScientist.extractEntrenadoresFDS(cookieStr);
+      const maestriaTeams = await dataScientist.extractMaestriaTeams(cookieStr);
+
+      const predictions = dataScientist.calculatePredictiveModels(normalized, prospectosData, fdsData);
+      await dataScientist.reconcileManagers(normalized.coordinadores, maestriaTeams);
+      await dataScientist.dispatchIntelligence(predictions, prospectosData);
+      console.log("✅ [Agente 4 - Data Scientist] Modelos predictivos y reconciliación completados con éxito.");
+    } catch (dsErr) {
+      console.error("⚠️ [Agente 4 - Data Scientist] Error no bloqueante en modelado predictivo:", dsErr.message);
+    }
 
     console.log("\n=======================================================");
     console.log("✨ PIPELINE MULTI-AGENTE COMPLETADO EXITOSAMENTE");
