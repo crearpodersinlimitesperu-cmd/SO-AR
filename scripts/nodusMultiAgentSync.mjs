@@ -551,6 +551,20 @@ class NodusDispatcherAgent {
         const imoName = p.imo.trim();
         if (!imoName) continue;
 
+        // Normalizar nombre del equipo para evitar fragmentación (ej. EQUIPO 29 vs EQUIPO 29 - LIMA CICLO 1 V)
+        let normalizedEquipo = (eq.equipoNombre || '').trim().replace(/\s+/g, ' ');
+        if (/^EQUIPO\s+28(\b|\s|$)/i.test(normalizedEquipo) && !normalizedEquipo.toUpperCase().includes('QUITO')) {
+          normalizedEquipo = 'EQUIPO 28 - LIMA CICLO 1';
+        } else if (/^EQUIPO\s+29(\b|\s|$)/i.test(normalizedEquipo)) {
+          normalizedEquipo = 'EQUIPO 29 - LIMA CICLO 1';
+        } else if (/^EQUIPO\s+30(\b|\s|$)/i.test(normalizedEquipo)) {
+          normalizedEquipo = 'EQUIPO 30 - LIMA CICLO 1';
+        } else if (/^EQUIPO\s+31(\b|\s|$)/i.test(normalizedEquipo)) {
+          normalizedEquipo = 'EQUIPO 31 - LIMA CICLO 1';
+        } else {
+          normalizedEquipo = normalizedEquipo.replace(/\s+V$/i, '').replace(/[✓✔]/g, '').trim();
+        }
+
         // Inferir sede del nombre del equipo si es posible
         let sedeDetectada = "Lima";
         const eqUpper = (eq.equipoNombre || '').toUpperCase();
@@ -565,7 +579,7 @@ class NodusDispatcherAgent {
           imoMissionsMap[imoName] = {
             id: `imo_${imoName.toLowerCase().replace(/[^a-z0-9]/g, '_')}_${eq.equipoId}`,
             imoNombre: imoName,
-            equipo: eq.equipoNombre,
+            equipo: normalizedEquipo,
             sede: sedeDetectada,
             enrolados: [],
             checks: {},
@@ -573,6 +587,7 @@ class NodusDispatcherAgent {
           };
         } else if (imoMissionsMap[imoName].sede === "No especificada" || imoMissionsMap[imoName].sede === "Lima") {
           imoMissionsMap[imoName].sede = sedeDetectada;
+          imoMissionsMap[imoName].equipo = normalizedEquipo;
         }
 
         const cleanPhone = (p.telefono || '').replace(/\D/g, '');
