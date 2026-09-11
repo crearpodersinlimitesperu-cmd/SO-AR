@@ -150,6 +150,75 @@
   --nodus-sync-text: #334155;
 }
 
+/* --- 2.1 OVERRIDES PARA MODO ZEN (FOREST / BOTANICAL HARMONY) --- */
+[data-theme="zen"] .nodus-dashboard-container,
+.theme-zen .nodus-dashboard-container {
+  --nodus-bg-banner: linear-gradient(135deg, rgba(12, 32, 26, 0.95) 0%, rgba(7, 21, 17, 0.98) 100%);
+  --nodus-border-banner: rgba(52, 211, 153, 0.35);
+  --nodus-banner-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(52, 211, 153, 0.1);
+
+  --nodus-bg-card: rgba(12, 32, 26, 0.78);
+  --nodus-bg-card-hover: rgba(18, 46, 38, 0.9);
+  --nodus-border-card: rgba(52, 211, 153, 0.15);
+  --nodus-border-card-hover: rgba(52, 211, 153, 0.45);
+  --nodus-card-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+  --nodus-card-shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.5);
+
+  --nodus-bg-filters: rgba(12, 32, 26, 0.85);
+  --nodus-border-filters: rgba(52, 211, 153, 0.15);
+
+  --nodus-bg-input: rgba(7, 21, 17, 0.85);
+  --nodus-border-input: rgba(52, 211, 153, 0.2);
+  --nodus-color-input: #f0fdf4;
+  --nodus-placeholder-input: #6ee7b7;
+
+  --nodus-bg-select-item: rgba(7, 21, 17, 0.85);
+  --nodus-border-select-item: rgba(52, 211, 153, 0.2);
+  --nodus-color-select: #f0fdf4;
+  --nodus-bg-select-option: #0c201a;
+  --nodus-color-select-option: #f0fdf4;
+
+  --nodus-bg-charts: rgba(12, 32, 26, 0.85);
+  --nodus-border-charts: rgba(52, 211, 153, 0.15);
+  --nodus-chart-header-border: rgba(52, 211, 153, 0.12);
+  --nodus-chart-tab-hover: rgba(52, 211, 153, 0.08);
+  --nodus-chart-tab-hover-color: #f0fdf4;
+  --nodus-legend-bg: rgba(7, 21, 17, 0.75);
+  --nodus-legend-border: rgba(52, 211, 153, 0.12);
+
+  --nodus-bg-table: rgba(12, 32, 26, 0.85);
+  --nodus-border-table: rgba(52, 211, 153, 0.15);
+  --nodus-table-header-bg: rgba(7, 21, 17, 0.7);
+  --nodus-th-bg: rgba(7, 21, 17, 0.95);
+  --nodus-th-color: #a7f3d0;
+  --nodus-th-border: rgba(52, 211, 153, 0.15);
+  --nodus-td-border: rgba(52, 211, 153, 0.08);
+  --nodus-tr-hover: rgba(52, 211, 153, 0.05);
+  --nodus-tr-expanded: rgba(52, 211, 153, 0.08);
+
+  --nodus-btn-expand-bg: rgba(7, 21, 17, 0.9);
+  --nodus-btn-expand-border: rgba(52, 211, 153, 0.35);
+  --nodus-btn-expand-color: #34d399;
+  --nodus-btn-expand-hover: rgba(52, 211, 153, 0.2);
+
+  --nodus-nested-wrapper-bg: rgba(7, 21, 17, 0.98);
+  --nodus-nested-panel-bg: rgba(12, 32, 26, 0.95);
+  --nodus-nested-border: rgba(52, 211, 153, 0.25);
+  --nodus-nested-th-bg: rgba(7, 21, 17, 0.9);
+  --nodus-nested-th-color: #a7f3d0;
+  --nodus-nested-td-border: rgba(52, 211, 153, 0.06);
+
+  --nodus-text-main: #f0fdf4;
+  --nodus-text-title: #f0fdf4;
+  --nodus-text-sub: #a7f3d0;
+  --nodus-text-muted: #6ee7b7;
+  --nodus-progress-bg: rgba(52, 211, 153, 0.15);
+
+  --nodus-sync-bg: rgba(7, 21, 17, 0.85);
+  --nodus-sync-border: rgba(52, 211, 153, 0.2);
+  --nodus-sync-text: #a7f3d0;
+}
+
 .nodus-dashboard-container *,
 .nodus-dashboard-container *::before,
 .nodus-dashboard-container *::after {
@@ -646,11 +715,14 @@
 
 .nodus-table-scroll {
   width: 100%;
+  max-width: 100%;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .nodus-table {
   width: 100%;
+  min-width: 880px;
   border-collapse: collapse;
   text-align: left;
   font-size: 0.82rem;
@@ -1142,4 +1214,75 @@
 [data-theme="light"] .nodus-tooltip-divider {
   background: rgba(0, 0, 0, 0.08);
 }
+
+/* --- 6.3 TOOLTIP OVERRIDES PARA MODO ZEN --- */
+[data-theme="zen"] .nodus-chart-custom-tooltip,
+.theme-zen .nodus-chart-custom-tooltip {
+  background: rgba(7, 21, 17, 0.96);
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(52, 211, 153, 0.12);
+}
+
+[data-theme="zen"] .nodus-tooltip-header,
+.theme-zen .nodus-tooltip-header {
+  border-bottom-color: rgba(52, 211, 153, 0.15);
+}
+
+[data-theme="zen"] .nodus-tooltip-title,
+.theme-zen .nodus-tooltip-title {
+  color: #f0fdf4;
+}
+
+[data-theme="zen"] .nodus-tooltip-badge,
+.theme-zen .nodus-tooltip-badge {
+  background: rgba(52, 211, 153, 0.2);
+  color: #34d399;
+}
+
+[data-theme="zen"] .nodus-tooltip-row,
+.theme-zen .nodus-tooltip-row {
+  color: #a7f3d0;
+}
+
+[data-theme="zen"] .nodus-tooltip-val,
+.theme-zen .nodus-tooltip-val {
+  color: #f0fdf4;
+}
+
+[data-theme="zen"] .nodus-tooltip-divider,
+.theme-zen .nodus-tooltip-divider {
+  background: rgba(52, 211, 153, 0.12);
+}
+
+/* --- REFINAMIENTOS RESPONSIVOS MÓVILES (SMARTPHONES & TABLETS) --- */
+@media (max-width: 768px) {
+  .nodus-header-banner {
+    padding: 1rem;
+    gap: 0.8rem;
+  }
+
+  .nodus-header-left {
+    width: 100%;
+  }
+
+  .nodus-header-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .nodus-filters-bar {
+    padding: 0.75rem;
+  }
+
+  .nodus-select-group {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .nodus-select-item {
+    width: 100%;
+  }
+}
+
+
 
