@@ -593,12 +593,44 @@ h1, h2, h3, h4, h5, h6 {
     padding: 1.25rem !important;
   }
 
-  /* Tablas responsivas con scroll horizontal suave */
-  .table-responsive {
-    display: block;
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+  /* Tablas responsivas con scroll horizontal suave universal */
+  .table-responsive,
+  .table-container,
+  [class*="table-responsive"],
+  [class*="table-container"],
+  [class*="table-scroll"],
+  div:has(> table) {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  /* Padding adaptativo para tarjetas y paneles masivos en smartphones */
+  .p-8 { padding: 1.25rem 0.75rem !important; }
+  .p-6 { padding: 1rem 0.75rem !important; }
+  .p-5 { padding: 0.85rem 0.65rem !important; }
+  .p-4 { padding: 0.75rem 0.5rem !important; }
+
+  /* Ajuste vertical ergonómico de controles flotantes en smartphones */
+  .floating-theme-toggle {
+    top: 0.5rem !important;
+    right: 0.5rem !important;
+    transform: scale(0.85);
+    transform-origin: top right;
+  }
+  .floating-copilot-btn {
+    bottom: 1rem !important;
+    right: 1rem !important;
+    width: 48px !important;
+    height: 48px !important;
+  }
+  .floating-help-btn {
+    bottom: 4.5rem !important;
+    right: 1rem !important;
+    width: 48px !important;
+    height: 48px !important;
   }
 
   /* Pestañas de navegación con scroll horizontal deslizable */
@@ -663,27 +695,87 @@ h1, h2, h3, h4, h5, h6 {
 
 /* =========================================================================
    ESTILOS UNIVERSALES PARA SELECTORES Y MENÚS DESPLEGABLES (CROSS-BROWSER)
-   Asegura legibilidad total de <option> en cualquier modo (Dark / Light / Windows Chromium)
+   Asegura legibilidad total en los 4 modos: Noche (dark), Día (light), Zen (forest) y Auto
    ========================================================================= */
-select, select.form-input {
+
+/* --- 1. MODO NOCHE (DEFAULT) --- */
+:root,
+[data-theme="dark"] select,
+[data-theme="dark"] select.form-input,
+.theme-dark select,
+.theme-dark select.form-input {
   background-color: #0f172a !important;
   color: #f8fafc !important;
   border: 1px solid #334155 !important;
 }
 
-select option, select.form-input option {
+:root,
+[data-theme="dark"] select option,
+[data-theme="dark"] select.form-input option,
+.theme-dark select option,
+.theme-dark select.form-input option {
   background-color: #0f172a !important;
   color: #f8fafc !important;
   padding: 8px 12px !important;
 }
 
-select option:hover,
-select option:focus,
-select option:checked,
-select.form-input option:hover,
-select.form-input option:focus,
-select.form-input option:checked {
+[data-theme="dark"] select option:hover,
+[data-theme="dark"] select option:focus,
+[data-theme="dark"] select option:checked {
   background-color: #1e293b !important;
   color: #38bdf8 !important;
 }
+
+/* --- 2. MODO DÍA (LIGHT MODE) --- */
+[data-theme="light"] select,
+[data-theme="light"] select.form-input,
+.theme-light select,
+.theme-light select.form-input {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+[data-theme="light"] select option,
+[data-theme="light"] select.form-input option,
+.theme-light select option,
+.theme-light select.form-input option {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  padding: 8px 12px !important;
+}
+
+[data-theme="light"] select option:hover,
+[data-theme="light"] select option:focus,
+[data-theme="light"] select option:checked {
+  background-color: #f1f5f9 !important;
+  color: #0284c7 !important;
+}
+
+/* --- 3. MODO ZEN (FOREST GREEN) --- */
+[data-theme="zen"] select,
+[data-theme="zen"] select.form-input,
+.theme-zen select,
+.theme-zen select.form-input {
+  background-color: #0c201a !important;
+  color: #f0fdf4 !important;
+  border: 1px solid rgba(52, 211, 153, 0.3) !important;
+}
+
+[data-theme="zen"] select option,
+[data-theme="zen"] select.form-input option,
+.theme-zen select option,
+.theme-zen select.form-input option {
+  background-color: #0c201a !important;
+  color: #f0fdf4 !important;
+  padding: 8px 12px !important;
+}
+
+[data-theme="zen"] select option:hover,
+[data-theme="zen"] select option:focus,
+[data-theme="zen"] select option:checked {
+  background-color: #064e3b !important;
+  color: #34d399 !important;
+}
+
 
