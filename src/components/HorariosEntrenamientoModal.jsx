@@ -38,7 +38,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose }) {
           borderRadius: '16px',
           border: '1px solid rgba(41, 171, 226, 0.3)',
           boxShadow: '0 25px 60px rgba(0,0,0,0.8), 0 0 30px rgba(41, 171, 226, 0.15)',
-          padding: '2rem',
+          padding: 'clamp(1rem, 3vw, 2rem)',
           display: 'flex',
           flexDirection: 'column',
           gap: '1.4rem',
@@ -197,48 +197,50 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose }) {
                   Soporte Back-Office
                 </span>
               </div>
-              <table style={{ width: '100%', fontSize: '0.82rem', borderCollapse: 'collapse' }}>
-                <thead>
-                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.72rem' }}>
-                    <th style={{ padding: '0.4rem 0' }}>DÍA</th>
-                    <th style={{ padding: '0.4rem 0' }}>TURNO / ACTIVIDAD</th>
-                    <th style={{ padding: '0.4rem 0', textAlign: 'right' }}>HORARIO</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                    <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Lunes a Jueves</td>
-                    <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>Atención, cobranzas, facturación y soporte</td>
-                    <td style={{ padding: '0.5rem 0', textAlign: 'right', color: 'var(--crear-cyan)', fontWeight: 'bold' }}>09:00 - 18:00</td>
-                  </tr>
-                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                    <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Jueves</td>
-                    <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>Llegada de oficina, terminales Nodus y caja</td>
-                    <td style={{ padding: '0.5rem 0', textAlign: 'right' }}>15:00 - 20:00</td>
-                  </tr>
-                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(14, 165, 233, 0.08)' }}>
-                    <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Viernes</td>
-                    <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>
-                      Apertura mesas registro (07:45 Llegada)<br/>
-                      Reporte nocturno de caja y asistencia
-                    </td>
-                    <td style={{ padding: '0.5rem 0', textAlign: 'right', color: '#38bdf8', fontWeight: 'bold' }}>07:45 - 23:30</td>
-                  </tr>
-                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                    <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Sábado</td>
-                    <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>Entrega Ticket Naranja y soporte sala</td>
-                    <td style={{ padding: '0.5rem 0', textAlign: 'right' }}>08:00 - 22:30</td>
-                  </tr>
-                  <tr>
-                    <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Domingo</td>
-                    <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>
-                      Mesas de enrolamiento C2<br/>
-                      <strong style={{ color: '#ef4444' }}>Cierre Contable POS (21:00)</strong>
-                    </td>
-                    <td style={{ padding: '0.5rem 0', textAlign: 'right', color: '#ef4444', fontWeight: 'bold' }}>08:00 - 22:00</td>
-                  </tr>
-                </tbody>
-              </table>
+              <div className="table-responsive" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+                <table style={{ width: '100%', minWidth: '480px', fontSize: '0.82rem', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.72rem' }}>
+                      <th style={{ padding: '0.4rem 0' }}>DÍA</th>
+                      <th style={{ padding: '0.4rem 0' }}>TURNO / ACTIVIDAD</th>
+                      <th style={{ padding: '0.4rem 0', textAlign: 'right' }}>HORARIO</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                      <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Lunes a Jueves</td>
+                      <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>Atención, cobranzas, facturación y soporte</td>
+                      <td style={{ padding: '0.5rem 0', textAlign: 'right', color: 'var(--crear-cyan)', fontWeight: 'bold' }}>09:00 - 18:00</td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                      <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Jueves</td>
+                      <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>Llegada de oficina, terminales Nodus y caja</td>
+                      <td style={{ padding: '0.5rem 0', textAlign: 'right' }}>15:00 - 20:00</td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(14, 165, 233, 0.08)' }}>
+                      <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Viernes</td>
+                      <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>
+                        Apertura mesas registro (07:45 Llegada)<br/>
+                        Reporte nocturno de caja y asistencia
+                      </td>
+                      <td style={{ padding: '0.5rem 0', textAlign: 'right', color: '#38bdf8', fontWeight: 'bold' }}>07:45 - 23:30</td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                      <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Sábado</td>
+                      <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>Entrega Ticket Naranja y soporte sala</td>
+                      <td style={{ padding: '0.5rem 0', textAlign: 'right' }}>08:00 - 22:30</td>
+                    </tr>
+                    <tr>
+                      <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Domingo</td>
+                      <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>
+                        Mesas de enrolamiento C2<br/>
+                        <strong style={{ color: '#ef4444' }}>Cierre Contable POS (21:00)</strong>
+                      </td>
+                      <td style={{ padding: '0.5rem 0', textAlign: 'right', color: '#ef4444', fontWeight: 'bold' }}>08:00 - 22:00</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
 
@@ -261,52 +263,54 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose }) {
                   Nivel 8 (Gobernanza)
                 </span>
               </div>
-              <table style={{ width: '100%', fontSize: '0.82rem', borderCollapse: 'collapse' }}>
-                <thead>
-                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.72rem' }}>
-                    <th style={{ padding: '0.4rem 0' }}>DÍA</th>
-                    <th style={{ padding: '0.4rem 0' }}>SUPERVISIÓN / DEADLINE</th>
-                    <th style={{ padding: '0.4rem 0', textAlign: 'right' }}>HORARIO</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(239, 68, 68, 0.05)' }}>
-                    <td style={{ padding: '0.5rem 0', fontWeight: 'bold', color: '#fbbf24' }}>Lunes</td>
-                    <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>
-                      <strong style={{ color: '#ef4444' }}>DEADLINE REPORTE RELÁMPAGO (12:00 PM):</strong><br/>
-                      Cierre de Caja FDS en Nodus + Reporte de 5 Puntos.<br/>
-                      <span style={{ color: '#f87171', fontSize: '0.75rem' }}>🔒 Prerrequisito para liberación presupuestaria del siguiente FDS.</span>
-                    </td>
-                    <td style={{ padding: '0.5rem 0', textAlign: 'right', color: '#ef4444', fontWeight: 'bold' }}>Hasta 12:00 PM (Innegociable)</td>
-                  </tr>
-                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                    <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Martes</td>
-                    <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>Auditoría salones, hotel y honorarios coach</td>
-                    <td style={{ padding: '0.5rem 0', textAlign: 'right' }}>09:00 - 13:00</td>
-                  </tr>
-                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                    <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Miércoles</td>
-                    <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>
-                      <strong style={{ color: '#ef4444' }}>Deadline Alerta Deserción:</strong> validación de carga de FI en Nodus
-                    </td>
-                    <td style={{ padding: '0.5rem 0', textAlign: 'right', color: '#ef4444', fontWeight: 'bold' }}>Hasta 19:00 PM</td>
-                  </tr>
-                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                    <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Jueves</td>
-                    <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>Supervisión de montaje (techo mín 4.5m y audio)</td>
-                    <td style={{ padding: '0.5rem 0', textAlign: 'right' }}>14:30 - 20:30</td>
-                  </tr>
-                  <tr>
-                    <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Viernes a Domingo</td>
-                    <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>
-                      Viernes 14:01 Trigger Palabra Rota C2.<br/>
-                      Domingo liderazgo de mesas de enrolamiento.<br/>
-                      <strong style={{ color: '#38bdf8' }}>Domingo 21:00 PM: Habilitación Reporte Relámpago Post-FDS en Nodus</strong> (Cierre de puertas y POS).
-                    </td>
-                    <td style={{ padding: '0.5rem 0', textAlign: 'right', color: 'var(--crear-cyan)', fontWeight: 'bold' }}>08:00 - 21:00+</td>
-                  </tr>
-                </tbody>
-              </table>
+              <div className="table-responsive" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+                <table style={{ width: '100%', minWidth: '480px', fontSize: '0.82rem', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.72rem' }}>
+                      <th style={{ padding: '0.4rem 0' }}>DÍA</th>
+                      <th style={{ padding: '0.4rem 0' }}>SUPERVISIÓN / DEADLINE</th>
+                      <th style={{ padding: '0.4rem 0', textAlign: 'right' }}>HORARIO</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', background: 'rgba(239, 68, 68, 0.05)' }}>
+                      <td style={{ padding: '0.5rem 0', fontWeight: 'bold', color: '#fbbf24' }}>Lunes</td>
+                      <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>
+                        <strong style={{ color: '#ef4444' }}>DEADLINE REPORTE RELÁMPAGO (12:00 PM):</strong><br/>
+                        Cierre de Caja FDS en Nodus + Reporte de 5 Puntos.<br/>
+                        <span style={{ color: '#f87171', fontSize: '0.75rem' }}>🔒 Prerrequisito para liberación presupuestaria del siguiente FDS.</span>
+                      </td>
+                      <td style={{ padding: '0.5rem 0', textAlign: 'right', color: '#ef4444', fontWeight: 'bold' }}>Hasta 12:00 PM (Innegociable)</td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                      <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Martes</td>
+                      <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>Auditoría salones, hotel y honorarios coach</td>
+                      <td style={{ padding: '0.5rem 0', textAlign: 'right' }}>09:00 - 13:00</td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                      <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Miércoles</td>
+                      <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>
+                        <strong style={{ color: '#ef4444' }}>Deadline Alerta Deserción:</strong> validación de carga de FI en Nodus
+                      </td>
+                      <td style={{ padding: '0.5rem 0', textAlign: 'right', color: '#ef4444', fontWeight: 'bold' }}>Hasta 19:00 PM</td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                      <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Jueves</td>
+                      <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>Supervisión de montaje (techo mín 4.5m y audio)</td>
+                      <td style={{ padding: '0.5rem 0', textAlign: 'right' }}>14:30 - 20:30</td>
+                    </tr>
+                    <tr>
+                      <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Viernes a Domingo</td>
+                      <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>
+                        Viernes 14:01 Trigger Palabra Rota C2.<br/>
+                        Domingo liderazgo de mesas de enrolamiento.<br/>
+                        <strong style={{ color: '#38bdf8' }}>Domingo 21:00 PM: Habilitación Reporte Relámpago Post-FDS en Nodus</strong> (Cierre de puertas y POS).
+                      </td>
+                      <td style={{ padding: '0.5rem 0', textAlign: 'right', color: 'var(--crear-cyan)', fontWeight: 'bold' }}>08:00 - 21:00+</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
 
@@ -317,7 +321,7 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose }) {
               style={{ 
                 padding: '1.25rem', 
                 borderTop: '4px solid #8b5cf6', 
-                borderRadius: '12px',
+                borderRadius: '12px', 
                 background: 'rgba(139, 92, 246, 0.04)' 
               }}
             >
@@ -329,54 +333,56 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose }) {
                   CC1Y2 & CMJ (Nivel 5 y 6)
                 </span>
               </div>
-              <table style={{ width: '100%', fontSize: '0.82rem', borderCollapse: 'collapse' }}>
-                <thead>
-                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.72rem' }}>
-                    <th style={{ padding: '0.4rem 0' }}>DÍA</th>
-                    <th style={{ padding: '0.4rem 0' }}>GROUNDINGS & SALAS</th>
-                    <th style={{ padding: '0.4rem 0', textAlign: 'right' }}>HORARIO</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                    <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Miércoles</td>
-                    <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>
-                      CMJ: Deadline carga de FI (19:00)<br/>
-                      CC1Y2: Grounding virtual aliados (20:00)
-                    </td>
-                    <td style={{ padding: '0.5rem 0', textAlign: 'right', color: '#c4b5fd', fontWeight: 'bold' }}>19:00 - 21:00</td>
-                  </tr>
-                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                    <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Jueves</td>
-                    <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>
-                      15:00 Montaje de sala herradura<br/>
-                      18:00 Grounding presencial aliados C1
-                    </td>
-                    <td style={{ padding: '0.5rem 0', textAlign: 'right' }}>15:00 - 20:00</td>
-                  </tr>
-                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                    <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Viernes</td>
-                    <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>
-                      08:00 Grounding aliados C1<br/>
-                      22:00 Noche de Confianza con tinas
-                    </td>
-                    <td style={{ padding: '0.5rem 0', textAlign: 'right', color: 'var(--crear-cyan)', fontWeight: 'bold' }}>07:45 - 23:30</td>
-                  </tr>
-                  <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                    <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Sábado</td>
-                    <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>Seguridad Caída de Confianza (4 apoyos)</td>
-                    <td style={{ padding: '0.5rem 0', textAlign: 'right' }}>07:45 - 22:30</td>
-                  </tr>
-                  <tr>
-                    <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Domingo</td>
-                    <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>
-                      Control mesa enrolamiento C2 (Ticket Rojo)<br/>
-                      18:00 Pase de Antorcha de Maestría
-                    </td>
-                    <td style={{ padding: '0.5rem 0', textAlign: 'right', color: '#f59e0b', fontWeight: 'bold' }}>08:00 - 21:30</td>
-                  </tr>
-                </tbody>
-              </table>
+              <div className="table-responsive" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+                <table style={{ width: '100%', minWidth: '480px', fontSize: '0.82rem', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)', textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.72rem' }}>
+                      <th style={{ padding: '0.4rem 0' }}>DÍA</th>
+                      <th style={{ padding: '0.4rem 0' }}>GROUNDINGS & SALAS</th>
+                      <th style={{ padding: '0.4rem 0', textAlign: 'right' }}>HORARIO</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                      <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Miércoles</td>
+                      <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>
+                        CMJ: Deadline carga de FI (19:00)<br/>
+                        CC1Y2: Grounding virtual aliados (20:00)
+                      </td>
+                      <td style={{ padding: '0.5rem 0', textAlign: 'right', color: '#c4b5fd', fontWeight: 'bold' }}>19:00 - 21:00</td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                      <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Jueves</td>
+                      <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>
+                        15:00 Montaje de sala herradura<br/>
+                        18:00 Grounding presencial aliados C1
+                      </td>
+                      <td style={{ padding: '0.5rem 0', textAlign: 'right' }}>15:00 - 20:00</td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                      <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Viernes</td>
+                      <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>
+                        08:00 Grounding aliados C1<br/>
+                        22:00 Noche de Confianza con tinas
+                      </td>
+                      <td style={{ padding: '0.5rem 0', textAlign: 'right', color: 'var(--crear-cyan)', fontWeight: 'bold' }}>07:45 - 23:30</td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                      <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Sábado</td>
+                      <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>Seguridad Caída de Confianza (4 apoyos)</td>
+                      <td style={{ padding: '0.5rem 0', textAlign: 'right' }}>07:45 - 22:30</td>
+                    </tr>
+                    <tr>
+                      <td style={{ padding: '0.5rem 0', fontWeight: 'bold' }}>Domingo</td>
+                      <td style={{ padding: '0.5rem 0', color: 'var(--text-muted)' }}>
+                        Control mesa enrolamiento C2 (Ticket Rojo)<br/>
+                        18:00 Pase de Antorcha de Maestría
+                      </td>
+                      <td style={{ padding: '0.5rem 0', textAlign: 'right', color: '#f59e0b', fontWeight: 'bold' }}>08:00 - 21:30</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
 
@@ -471,3 +477,4 @@ export default function HorariosEntrenamientoModal({ isOpen, onClose }) {
     </div>
   );
 }
+
