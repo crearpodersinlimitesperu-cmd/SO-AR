@@ -34,14 +34,14 @@ const ROBOT_TOKEN = "NODUS_ROBOT_CPSL_2026_SECRET";
 const HABEAS_DATA_SECRET = "CPSL_HABEAS_DATA_TOKEN_KEY_2026";
 const APP_URL = "https://centro-operativo-cpsl.web.app";
 
-// Configuración SMTP oficial de Crear PSL
+// Configuración SMTP oficial de Crear PSL (obtenida exclusivamente de variables de entorno seguras)
 const SMTP_CONFIG = {
-  host: 'smtp.gmail.com',
-  port: 465,
+  host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  port: parseInt(process.env.SMTP_PORT || '465', 10),
   secure: true,
   auth: {
-    user: process.env.GMAIL_USER || 'servidorcrearpsl@gmail.com',
-    pass: process.env.GMAIL_PASS || 'oaqx kewm uirh bwuo'
+    user: process.env.GMAIL_USER || '',
+    pass: process.env.GMAIL_PASS || ''
   }
 };
 
@@ -248,10 +248,13 @@ export class NodusMarketingAgencyAgent {
 
     // 3. Preparar transporte SMTP si no es dryRun
     if (!this.dryRun && !this.transporter) {
+      if (!SMTP_CONFIG.auth.user || !SMTP_CONFIG.auth.pass) {
+        throw new Error("Credenciales SMTP no configuradas. Por favor configure las variables de entorno GMAIL_USER y GMAIL_PASS de forma segura (GitHub Secrets / .env).");
+      }
       this.transporter = nodemailer.createTransport(SMTP_CONFIG);
       try {
         await this.transporter.verify();
-        console.log("✅ [Agente 6 - Marketing] Conexión SMTP verificada con servidorcrearpsl@gmail.com.");
+        console.log(`✅ [Agente 6 - Marketing] Conexión SMTP verificada con ${SMTP_CONFIG.auth.user}.`);
       } catch (err) {
         console.error("❌ [Agente 6 - Marketing] Error al conectar con SMTP:", err.message);
         throw err;
