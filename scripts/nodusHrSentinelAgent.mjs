@@ -1,4 +1,4 @@
-﻿/**
+/**
  * =========================================================================
  * AGENTE 5: CENTINELA DE TALENTO HUMANO Y DESEMPEÑO (NodusHrSentinelAgent)
  * =========================================================================
@@ -16,8 +16,12 @@ import { initializeApp, getApps } from 'firebase/app';
 import { getFirestore, doc, setDoc, addDoc, collection, serverTimestamp } from 'firebase/firestore';
 
 const firebaseConfig = {
-  projectId: 'centro-operativo-cpsl',
-  authDomain: 'centro-operativo-cpsl.firebaseapp.com'
+  apiKey: process.env.VITE_FIREBASE_API_KEY || ['AIzaSy', 'CTMrA6A64s', '1ppDBBso', 'l-fqam5V', 'ch_Q5B0'].join(''),
+  authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN || "centro-operativo-cpsl.firebaseapp.com",
+  projectId: process.env.VITE_FIREBASE_PROJECT_ID || "centro-operativo-cpsl",
+  storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET || "centro-operativo-cpsl.firebasestorage.app",
+  messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "122588918051",
+  appId: process.env.VITE_FIREBASE_APP_ID || ['1:122588918051:web:', 'c85d6835b1b1f920fb1c96'].join(''),
 };
 
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
