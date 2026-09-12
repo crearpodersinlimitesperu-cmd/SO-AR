@@ -240,11 +240,39 @@ export function ChecklistProvider({ children }) {
         cleanData.assignedToEmail = sanitizeEmail(cleanData.assignedToEmail);
       }
 
+      // Asegurarse de tener un arreglo unificado de correos (legacy o nuevo)
+      const emailsToNotify = [];
+      if (cleanData.assignedToEmails && Array.isArray(cleanData.assignedToEmails)) {
+        emailsToNotify.push(...cleanData.assignedToEmails);
+      } else if (cleanData.assignedToEmail) {
+        emailsToNotify.push(cleanData.assignedToEmail);
+      }
+
+      // Inicializar seguimiento individual para tareas asignadas a varias personas / áreas
+      const assigneeProgress = cleanData.assigneeProgress || {};
+      if (emailsToNotify.length > 0) {
+        emailsToNotify.forEach(email => {
+          const cleanEmail = sanitizeEmail(email);
+          if (cleanEmail && !assigneeProgress[cleanEmail]) {
+            const u = usersData.find(usr => usr.email?.toLowerCase() === cleanEmail);
+            assigneeProgress[cleanEmail] = {
+              name: u?.name || cleanEmail,
+              role: u?.role || cleanData.role || 'colaborador',
+              sede: u?.sede || cleanData.assignedSede || 'Global',
+              completed: false,
+              completedAt: null,
+              progress: 0
+            };
+          }
+        });
+      }
+
       if (cleanData.isRecurringTemplate) {
         const templateRef = doc(db, 'recurring_tasks_templates', customId);
         batch.set(templateRef, {
           id: customId,
           ...cleanData,
+          assigneeProgress,
           created_at: new Date().toISOString(),
           active: true
         });
@@ -252,18 +280,11 @@ export function ChecklistProvider({ children }) {
         batch.set(taskRef, {
           id: customId,
           ...cleanData,
+          assigneeProgress,
           completed: false,
           status: 'Pendiente',
           created_at: new Date().toISOString()
         });
-      }
-
-      // Asegurarse de tener un arreglo unificado de correos (legacy o nuevo)
-      const emailsToNotify = [];
-      if (cleanData.assignedToEmails && Array.isArray(cleanData.assignedToEmails)) {
-        emailsToNotify.push(...cleanData.assignedToEmails);
-      } else if (cleanData.assignedToEmail) {
-        emailsToNotify.push(cleanData.assignedToEmail);
       }
 
       // Si la tarea tiene asignaciones directas a uno o más usuarios y no es una plantilla
@@ -770,6 +791,56 @@ export function ChecklistProvider({ children }) {
     }
   };
 
+  // 4. Actualización de progreso individual en tarjetas compartidas / multi-área
+  const updateIndividualProgress = async (taskId, userEmail, isCompleted, progressPercentage = null) => {
+    try {
+      const taskRef = doc(db, 'tasks', taskId);
+      const snap = await getDoc(taskRef);
+      if (!snap.exists()) return false;
+      const data = snap.data();
+      const currentProgress = { ...(data.assigneeProgress || {}) };
+      const em = (userEmail || currentUser?.email || '').toLowerCase().trim();
+      if (!em) return false;
+
+      const userObj = usersData.find(u => u.email?.toLowerCase() === em);
+      const prevEntry = currentProgress[em] || {
+        name: currentUser?.displayName || userObj?.name || em,
+        role: currentUser?.appRole || userObj?.role || 'colaborador',
+        sede: currentUser?.sede || userObj?.sede || 'Global'
+      };
+
+      currentProgress[em] = {
+        ...prevEntry,
+        completed: isCompleted,
+        completedAt: isCompleted ? new Date().toISOString() : null,
+        progress: progressPercentage !== null ? progressPercentage : (isCompleted ? 100 : 0)
+      };
+
+      // Si todos los asignados completaron, marcar la tarjeta general como completada
+      const allKeys = Object.keys(currentProgress);
+      const allCompleted = allKeys.length > 0 && allKeys.every(k => currentProgress[k].completed === true);
+      const anyCompleted = allKeys.some(k => currentProgress[k].completed === true);
+
+      const totalItems = allKeys.length;
+      const completedItems = allKeys.filter(k => currentProgress[k].completed === true).length;
+      const overallPercent = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : (isCompleted ? 100 : 0);
+
+      await updateDoc(taskRef, {
+        assigneeProgress: currentProgress,
+        completed: allCompleted,
+        status: allCompleted ? 'Completada' : (anyCompleted ? 'En Progreso' : 'Pendiente'),
+        progressPercentage: overallPercent,
+        updatedAt: new Date().toISOString()
+      });
+      showToast(isCompleted ? "¡Completaste tu parte de la tarea!" : "Marcaste tu parte como pendiente.", "success");
+      return true;
+    } catch (err) {
+      console.error("Error updating individual progress:", err);
+      showToast("No se pudo actualizar tu avance individual.", "error");
+      return false;
+    }
+  };
+
   return (
     <ChecklistContext.Provider value={{ 
       tasks, 
@@ -785,7 +856,8 @@ export function ChecklistProvider({ children }) {
       fetchSyncHistory,
       inviteCollaborator,
       acceptCollaboration,
-      rejectCollaboration
+      rejectCollaboration,
+      updateIndividualProgress
     }}>
       {children}
     </ChecklistContext.Provider>
