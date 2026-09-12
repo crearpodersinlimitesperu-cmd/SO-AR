@@ -35,14 +35,9 @@ export const normalizeRole = (role) => {
   if (r === 'cfo' || r.includes('jefa financiera') || r.includes('jefe financiero')) return 'cfo';
   if (r.includes('facturacion') || r.includes('contador lima') || r.includes('contador medellin') || r.includes('finanzas')) return 'finanzas';
   
-  // Coordinacion Administrativa Estricta (solo si es explícitamente administrativa)
-  if (r === 'coordinadora administrativa' || r === 'coordinador administrativo' || r.includes('coordinacion administrativa') || r.includes('coordinador administrativo') || r.includes('coordinadora administrativa')) return 'coordinador';
-  
-  // Coordinador genérico: si se pasa solo 'coordinador' o 'coordinadora', proteger para que no se colapse
-  if (r === 'coordinador' || r === 'coordinadora') {
-    // Si no tiene especificador, se preserva como 'coordinador_c1c2' por ser el rol base de operaciones de sede
-    return 'coord_c1';
-  }
+  // Coordinacion Administrativa (Karol Villarruel / Coordinacion Administrativa)
+  if (r === 'coordinador' || r === 'coordinadora' || r === 'coordinacion_administrativa' || r === 'coordinadora administrativa' || r === 'coordinador administrativo' || r.includes('coordinacion administrativa') || r.includes('coordinador administrativo') || r.includes('coordinadora administrativa') || r === 'colaborador') return 'coordinador';
+
 
   if (r.includes('talento humano')) return 'talento_humano';
   
@@ -132,6 +127,7 @@ export const ROLE_DISPLAY_NAMES = {
   direccion: 'Dirección Global',
   finanzas: 'Finanzas',
   coordinador: 'Coordinación Administrativa',
+  colaborador: 'Coordinación Administrativa',
   talento_humano: 'Talento Humano',
   legal: 'Legal / Jurídico',
   asistente_impuestos_quito: 'Impuestos & Tributación',
@@ -194,5 +190,6 @@ export const findUserByAnyEmail = (searchEmail) => {
     return false;
   }) || null;
 };
+
 
 
