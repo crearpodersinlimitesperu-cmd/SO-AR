@@ -64,23 +64,19 @@ export const normalizeRole = (role) => {
 
 export const normalizeSede = (sede) => {
   if (!sede) return 'Sede Global';
-  const s = sede.trim();
-  if (s === 'MED' || s.toLowerCase().includes('medell')) return 'Medellín';
-  if (s === 'LIM' || s.toLowerCase().includes('lima')) return 'Lima';
-  if (s === 'CUE' || s.toLowerCase().includes('cuenca')) return 'Cuenca';
-  if (s === 'GYE' || s.toLowerCase().includes('guayaquil')) return 'Guayaquil';
-  // (02/09/2026) "CDMX" no contiene la subcadena "mex", así que antes de este fix
-  // normalizeSede("CDMX") devolvía "CDMX" sin normalizar — distinto de "México" (el
-  // valor real del filtro de sede en Centro de Managers) y por eso el filtro
-  // "México" mostraba 0 resultados aunque sí había managers con sede "CDMX".
-  // Reportado por José con captura real del bug.
-  if (s === 'MEX' || s.toUpperCase() === 'CDMX' || s.toLowerCase().includes('mex') || s.toLowerCase().includes('méxico') || s.toLowerCase().includes('cdmx')) return 'México';
+  const s = sede.toString().trim();
+  const clean = s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  if (s === 'MED' || clean.includes('medell')) return 'Medell\u00EDn';
+  if (s === 'LIM' || clean.includes('lima')) return 'Lima';
+  if (s === 'CUE' || clean.includes('cuenca')) return 'Cuenca';
+  if (s === 'GYE' || clean.includes('guayaquil')) return 'Guayaquil';
+  if (s === 'MEX' || clean.includes('mex') || clean.includes('cdmx')) return 'M\u00E9xico';
   if (s === 'UIO-C1' || s === 'UIO-C2' || s === 'UIO' ||
-      s.toLowerCase().includes('ciclo 1') || s.toLowerCase().includes('ciclo1') ||
-      s.toLowerCase().includes('ciclo 2') || s.toLowerCase().includes('ciclo2') ||
-      s.toLowerCase().includes('quito')) return 'Quito';
-  if (s === 'INT' || s.toLowerCase().includes('intern')) return 'Internacional';
-  if (s.toLowerCase().includes('global')) return 'Sede Global';
+      clean.includes('ciclo 1') || clean.includes('ciclo1') ||
+      clean.includes('ciclo 2') || clean.includes('ciclo2') ||
+      clean.includes('quito')) return 'Quito';
+  if (s === 'INT' || clean.includes('intern')) return 'Internacional';
+  if (clean.includes('global')) return 'Sede Global';
   return s;
 };
 
@@ -106,11 +102,11 @@ export const normalizeUserRecord = (data) => {
 
 export const OPERATIONAL_SEDES = [
   'Lima',
-  'Quito',       // Ciclo 1 + Ciclo 2 fusionados (operan juntos)
+  'Quito',
   'Cuenca',
   'Guayaquil',
-  'Medellín',
-  'México'
+  'Medell\u00EDn',
+  'M\u00E9xico'
 ];
 
 export const ROLE_DISPLAY_NAMES = {
