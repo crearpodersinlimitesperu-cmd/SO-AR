@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Target, TrendingUp, AlertCircle, CheckCircle2, ChevronRight, BarChart2, Briefcase, ChevronDown, ArrowLeft, Loader2 } from 'lucide-react';
+import { Target, TrendingUp, AlertCircle, CheckCircle2, ChevronRight, BarChart2, Briefcase, ChevronDown, ArrowLeft, Loader2, Sparkles, Bell, AlertTriangle, Zap, ShieldAlert, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { doc } from 'firebase/firestore';
 import { db, getDocResilient } from '../services/firebase';
@@ -30,6 +30,8 @@ export default function StrategyBoard() {
   const [globalHealth, setGlobalHealth] = useState(0);
   const [okrs, setOkrs] = useState([]);
   const [errorObj, setErrorObj] = useState(null);
+  const [predictionData, setPredictionData] = useState(null);
+  const [managerAlerts, setManagerAlerts] = useState([]);
 
   const bgLight = "#f8fafc";
   const bgCard = "#ffffff";
@@ -101,6 +103,81 @@ export default function StrategyBoard() {
              prom = Math.round(okrGenerales.reduce((acc, curr) => acc + curr.progress, 0) / okrGenerales.length);
           }
           setGlobalHealth(prom || 0);
+
+          // CÁLCULO OBJETIVO DEL AGENTE DE PREDICCIÓN OPERATIVA
+          const diasCampanaTranscurridos = 8;
+          const diasRestantesSala = 4;
+          const ritmoDiario = totalConfirmados > 0 ? (totalConfirmados / diasCampanaTranscurridos) : 0;
+          const proyeccionFinal = Math.round(totalConfirmados + (ritmoDiario * diasRestantesSala));
+          const metaSalaSede = selectedSede === 'GLOBAL' ? 180 : 32;
+          const probabilidadCumplimiento = Math.min(100, Math.round((proyeccionFinal / metaSalaSede) * 100));
+
+          setPredictionData({
+            confirmados: totalConfirmados,
+            asignados: totalAsignados,
+            ritmoDiario: ritmoDiario.toFixed(1),
+            diasRestantes: diasRestantesSala,
+            proyeccionFinal,
+            meta: metaSalaSede,
+            probabilidad: probabilidadCumplimiento,
+            tendencia: ritmoDiario >= 2.5 ? 'ACELERANDO' : ritmoDiario >= 1.0 ? 'ESTABLE' : 'LENTO'
+          });
+
+          // CÁLCULO DEL AGENTE DE ALERTAS A GERENTES DE ACTIVIDAD EN NODUS
+          const coords = data.coordinadores || [];
+          const filteredCoords = selectedSede === 'GLOBAL' 
+            ? coords 
+            : coords.filter(c => String(c.sede).toUpperCase() === selectedSede.toUpperCase());
+
+          const generatedAlerts = [];
+          filteredCoords.forEach(c => {
+            const est = c.estados || {};
+            const asig = Number(est.asignados || 0);
+            const conf = Number(est.confirmado || 0);
+            const porConf = Number(est.porConfirmar || 0);
+            const noCont = Number(est.noContesta || 0);
+            const llam = Number(est.llamadas || 0);
+            const pend = asig - llam;
+
+            if (asig > 0 && llam === 0) {
+              generatedAlerts.push({
+                id: `alt_zero_${c.id}`,
+                tipo: 'CRITICA',
+                icono: 'AlertTriangle',
+                color: '#ef4444',
+                coordinador: c.nombre,
+                sede: c.sede,
+                mensaje: `Sin actividad registrada: 0 de ${asig} contactos llamados.`,
+                accionRecomendada: 'Comunicarse inmediatamente con el coordinador para verificar bloqueo o reasignar base.'
+              });
+            } else if (asig > 15 && pend > (asig * 0.6)) {
+              generatedAlerts.push({
+                id: `alt_pend_${c.id}`,
+                tipo: 'ADVERTENCIA',
+                icono: 'Clock',
+                color: '#f59e0b',
+                coordinador: c.nombre,
+                sede: c.sede,
+                mensaje: `Ritmo rezagado: ${pend} contactos pendientes de gestión (${Math.round((pend/asig)*100)}% de su base).`,
+                accionRecomendada: 'Habilitar apoyo telefónico con Quantum Team en bloque vespertino.'
+              });
+            }
+
+            if (porConf >= 8) {
+              generatedAlerts.push({
+                id: `alt_close_${c.id}`,
+                tipo: 'OPORTUNIDAD',
+                icono: 'Zap',
+                color: '#3b82f6',
+                coordinador: c.nombre,
+                sede: c.sede,
+                mensaje: `Alta reserva de cierre: ${porConf} contactos 'Por Confirmar' listos para pase a sala.`,
+                accionRecomendada: 'Realizar llamada de cierre con speech de bienvenida y confirmación de cupo.'
+              });
+            }
+          });
+
+          setManagerAlerts(generatedAlerts);
           setErrorObj(null);
 
         } else {
@@ -184,6 +261,149 @@ export default function StrategyBoard() {
               <div style={{ padding: '1rem', background: '#ecfdf5', borderRadius: '50%', color: '#10b981' }}>
                 <TrendingUp size={32} />
               </div>
+            </div>
+
+            {/* 1. AGENTE DE PREDICCIÓN OPERATIVA */}
+            {predictionData && (
+              <div style={{ background: bgCard, border: '1px solid #10b981', borderRadius: '12px', padding: '1.5rem', marginBottom: '2rem', boxShadow: '0 4px 12px rgba(16, 185, 129, 0.08)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.8rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <div style={{ padding: '0.4rem', borderRadius: '8px', background: '#ecfdf5', color: '#10b981', display: 'flex' }}>
+                      <Sparkles size={20} />
+                    </div>
+                    <div>
+                      <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: textDark, margin: 0 }}>
+                        Agente de Predicción Operativa (Causa OS Engine)
+                      </h3>
+                      <p style={{ fontSize: '0.75rem', color: textMuted, margin: 0 }}>
+                        Proyección algorítmica de confirmados al día de apertura de sala
+                      </p>
+                    </div>
+                  </div>
+                  <span style={{ padding: '0.3rem 0.8rem', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 800, background: predictionData.probabilidad >= 80 ? '#ecfdf5' : predictionData.probabilidad >= 50 ? '#fffbeb' : '#fef2f2', color: predictionData.probabilidad >= 80 ? '#10b981' : predictionData.probabilidad >= 50 ? '#f59e0b' : '#ef4444', border: `1px solid ${predictionData.probabilidad >= 80 ? '#10b981' : predictionData.probabilidad >= 50 ? '#f59e0b' : '#ef4444'}` }}>
+                    Probabilidad de Meta: {predictionData.probabilidad}%
+                  </span>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1rem', marginBottom: '1.25rem' }}>
+                  <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '8px', border: `1px solid ${borderLight}` }}>
+                    <div style={{ fontSize: '0.72rem', color: textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Confirmados Actuales</div>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 900, color: '#10b981' }}>{predictionData.confirmados}</div>
+                    <div style={{ fontSize: '0.68rem', color: textMuted }}>Enrolados auditados</div>
+                  </div>
+
+                  <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '8px', border: `1px solid ${borderLight}` }}>
+                    <div style={{ fontSize: '0.72rem', color: textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Ritmo de Enrolamiento</div>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 900, color: '#3b82f6' }}>{predictionData.ritmoDiario} <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>/día</span></div>
+                    <div style={{ fontSize: '0.68rem', color: textMuted }}>Tendencia: {predictionData.tendencia}</div>
+                  </div>
+
+                  <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '8px', border: `1px solid ${borderLight}` }}>
+                    <div style={{ fontSize: '0.72rem', color: textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Proyección al Cierre</div>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 900, color: predictionData.proyeccionFinal >= predictionData.meta ? '#10b981' : '#f59e0b' }}>
+                      {predictionData.proyeccionFinal} <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>/ {predictionData.meta}</span>
+                    </div>
+                    <div style={{ fontSize: '0.68rem', color: textMuted }}>En {predictionData.diasRestantes} días restantes</div>
+                  </div>
+
+                  <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: '8px', border: `1px solid ${borderLight}` }}>
+                    <div style={{ fontSize: '0.72rem', color: textMuted, fontWeight: 700, textTransform: 'uppercase' }}>Déficit a Cubrir</div>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 900, color: Math.max(0, predictionData.meta - predictionData.confirmados) === 0 ? '#10b981' : '#ef4444' }}>
+                      {Math.max(0, predictionData.meta - predictionData.confirmados)}
+                    </div>
+                    <div style={{ fontSize: '0.68rem', color: textMuted }}>Cupos para meta segura</div>
+                  </div>
+                </div>
+
+                {/* BARRA PREDICTIVA */}
+                <div style={{ marginBottom: '0.75rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', fontWeight: 700, marginBottom: '0.3rem' }}>
+                    <span>Progreso Proyectado vs Meta de Sala ({predictionData.meta} pax)</span>
+                    <span style={{ color: '#10b981' }}>{predictionData.probabilidad}% esperado</span>
+                  </div>
+                  <div style={{ width: '100%', height: '8px', background: borderLight, borderRadius: '6px', overflow: 'hidden' }}>
+                    <div style={{ width: `${Math.min(100, predictionData.probabilidad)}%`, height: '100%', background: predictionData.probabilidad >= 80 ? '#10b981' : predictionData.probabilidad >= 50 ? '#f59e0b' : '#ef4444', borderRadius: '6px' }} />
+                  </div>
+                </div>
+
+                <div style={{ fontSize: '0.8rem', color: textDark, background: '#f1f5f9', padding: '0.75rem 1rem', borderRadius: '8px', borderLeft: '4px solid #10b981' }}>
+                  🎯 <strong>Dictamen Algorítmico:</strong> Al ritmo actual de {predictionData.ritmoDiario} confirmaciones/día, la proyección de cierre es de {predictionData.proyeccionFinal} participantes. {predictionData.proyeccionFinal >= predictionData.meta ? 'La sede alcanzará la cuota programada de sala con holgura operativa.' : `Se requiere elevar el ritmo a ${((predictionData.meta - predictionData.confirmados) / predictionData.diasRestantes).toFixed(1)} confirmados/día para garantizar sala completa.`}
+                </div>
+              </div>
+            )}
+
+            {/* 2. AGENTE DE ALERTAS A GERENTES DE ACTIVIDAD EN NODUS */}
+            <div style={{ background: bgCard, border: `1px solid ${borderLight}`, borderRadius: '12px', padding: '1.5rem', marginBottom: '2rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.8rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <div style={{ padding: '0.4rem', borderRadius: '8px', background: '#fee2e2', color: '#ef4444', display: 'flex' }}>
+                    <Bell size={20} />
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: textDark, margin: 0 }}>
+                      Agente de Alertas a Gerentes (Monitoreo Nodus en Vivo)
+                    </h3>
+                    <p style={{ fontSize: '0.75rem', color: textMuted, margin: 0 }}>
+                      Detección automática de rezagos de gestión, cuellos de botella y oportunidades
+                    </p>
+                  </div>
+                </div>
+
+                <span style={{ fontSize: '0.75rem', fontWeight: 700, padding: '0.3rem 0.6rem', borderRadius: '6px', background: '#f1f5f9', color: textDark }}>
+                  {managerAlerts.length} Alerta{managerAlerts.length === 1 ? '' : 's'} Activa{managerAlerts.length === 1 ? '' : 's'}
+                </span>
+              </div>
+
+              {managerAlerts.length === 0 ? (
+                <div style={{ padding: '1.5rem', textAlign: 'center', color: '#10b981', background: '#ecfdf5', borderRadius: '8px', fontSize: '0.85rem', fontWeight: 600 }}>
+                  ✓ Sin anomalías operativas: Todos los coordinadores registran gestión activa y flujo normal en Nodus.
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  {managerAlerts.map(alert => (
+                    <div 
+                      key={alert.id}
+                      style={{ 
+                        padding: '1rem', 
+                        borderRadius: '8px', 
+                        border: `1px solid ${alert.color}40`, 
+                        background: `${alert.color}08`,
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        alignItems: 'flex-start',
+                        flexWrap: 'wrap',
+                        gap: '0.75rem'
+                      }}
+                    >
+                      <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start', flex: 1, minWidth: '280px' }}>
+                        <div style={{ color: alert.color, marginTop: '2px' }}>
+                          {alert.tipo === 'CRITICA' ? <AlertTriangle size={18} /> : alert.tipo === 'OPORTUNIDAD' ? <Zap size={18} /> : <Clock size={18} />}
+                        </div>
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
+                            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: alert.color, textTransform: 'uppercase' }}>
+                              [{alert.tipo}] {alert.sede}: {alert.coordinador}
+                            </span>
+                          </div>
+                          <div style={{ fontSize: '0.85rem', fontWeight: 600, color: textDark, marginBottom: '0.3rem' }}>
+                            {alert.mensaje}
+                          </div>
+                          <div style={{ fontSize: '0.75rem', color: textMuted }}>
+                            ⚡ <strong>Acción Sugerida para Gerente:</strong> {alert.accionRecomendada}
+                          </div>
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={() => navigate('/auditoria-coordinadores')}
+                        style={{ padding: '0.35rem 0.75rem', borderRadius: '6px', background: bgCard, border: `1px solid ${borderLight}`, fontSize: '0.75rem', fontWeight: 700, color: textDark, cursor: 'pointer' }}
+                      >
+                        Auditar en Nodus →
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* LISTA DE OKRS */}
