@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+﻿import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { collection, query, orderBy, onSnapshot, deleteDoc, doc, writeBatch, addDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
@@ -134,6 +134,61 @@ export default function MonitorImos() {
         coordinadora_nombre: chk.coordinadora_nombre || m.equipo || 'Coordinación'
       };
     });
+
+  // Normalizacion universal y robusta para busquedas (diacriticos/tildes, minusculas, espacios)
+  const cleanSearchStr = (str) =>
+    (str || '')
+      .toString()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim();
+
+  // Verifica si un enrolado individual coincide con la busqueda
+  const isEnroladoSearchMatch = (e, qNorm, qDigits) => {
+    if (!qNorm) return true;
+    const nomNorm = cleanSearchStr(e.nombre || e.enrolado || e.name);
+    if (nomNorm.includes(qNorm)) return true;
+
+    const emailNorm = cleanSearchStr(e.email || e.correo);
+    if (emailNorm.includes(qNorm)) return true;
+
+    const coordNorm = cleanSearchStr(e.coordinadora_nombre);
+    if (coordNorm.includes(qNorm)) return true;
+
+    // Telefono: UNICAMENTE si el termino contiene al menos 3 digitos numericos
+    // CRITICO: Previene que busquedas de texto/nombres ('giova') hagan includes('') = true
+    if (qDigits && qDigits.length >= 3) {
+      const telDigits = String(e.telefono || e.phone || e.celular || '').replace(/\D/g, '');
+      if (telDigits.includes(qDigits)) return true;
+    }
+
+    return false;
+  };
+
+  // Verifica si una mision de IMO coincide con la busqueda (en IMO, equipo, sede o enrolados)
+  const isMissionSearchMatch = (m, enrolados, qNorm, qDigits) => {
+    if (!qNorm) return true;
+    const imoName = cleanSearchStr(m.imoNombre || m.imo_nombre || m.nombre || m.imoEmail);
+    if (imoName.includes(qNorm)) return true;
+
+    const eqName = cleanSearchStr(m.equipo || '');
+    const eqNorm = cleanSearchStr(normalizeEquipoName(m.equipo));
+    if (eqName.includes(qNorm) || eqNorm.includes(qNorm)) return true;
+
+    // Si la busqueda es exactamente el nombre de la sede
+    const mSede = cleanSearchStr(resolveMissionSede(m)) || cleanSearchStr(m.sede);
+    if (qNorm === mSede) return true;
+
+    // Telefono del IMO si tuviera al menos 3 digitos
+    if (qDigits && qDigits.length >= 3) {
+      const imoTel = String(m.telefono || m.phone || m.celular || '').replace(/\D/g, '');
+      if (imoTel.includes(qDigits)) return true;
+    }
+
+    // Coincidencia nominal o telefonica en cualquiera de sus enrolados
+    return enrolados.some(e => isEnroladoSearchMatch(e, qNorm, qDigits));
+  };
   };
 
   // 🔒 (09/09/2026) José reportó, con captura, que el Monitor de IMOs le mostraba a un
@@ -220,16 +275,15 @@ export default function MonitorImos() {
     });
   }, [sedeScopedMissions, filterSede]);
 
-  // Filtrado de misiones en tiempo real por búsqueda y selectores
+  // Filtrado de misiones en tiempo real por busqueda y selectores
   const filteredMissions = useMemo(() => {
-    return sedeScopedMissions.filter((m) => {
+    const qNorm = cleanSearchStr(searchTerm);
+    const qDigits = searchTerm.replace(/\D/g, '');
+
+    // 1. Filtrar misiones de base segun Sede, Estado y Nodus
+    const baseMissions = sedeScopedMissions.filter((m) => {
       // Filtro Sede
       if (filterSede !== 'todos' && resolveMissionSede(m) !== filterSede) {
-        return false;
-      }
-
-      // Filtro Equipo (unificado mediante normalización)
-      if (filterEquipo !== 'todos' && normalizeEquipoName(m.equipo) !== filterEquipo) {
         return false;
       }
 
@@ -240,7 +294,7 @@ export default function MonitorImos() {
       if (filterEstado === 'completado' && !isCompleted) return false;
       if (filterEstado === 'en_progreso' && isCompleted) return false;
 
-      // Filtro Validación Nodus
+      // Filtro Validacion Nodus
       if (filterNodus !== 'todos') {
         const summ = evaluateMissionVerification(m, enrolados);
         if (filterNodus === 'verificado_ok' && summ.overallStatus !== 'VERIFICADO_OK') return false;
@@ -249,35 +303,71 @@ export default function MonitorImos() {
         if (filterNodus === 'pendiente' && summ.overallStatus !== 'PENDIENTE_COORD') return false;
       }
 
-      // Filtro Búsqueda (IMO, Equipo o Enrolados)
-      if (searchTerm.trim()) {
-        const queryText = searchTerm.toLowerCase().trim();
-        const matchImo = (m.imoNombre || '').toLowerCase().includes(queryText);
-        const matchEquipo = (m.equipo || '').toLowerCase().includes(queryText) || normalizeEquipoName(m.equipo).toLowerCase().includes(queryText);
-        const matchSede = (resolveMissionSede(m) || '').toLowerCase().includes(queryText) || (m.sede || '').toLowerCase().includes(queryText);
+      return true;
+    });
 
-        const matchEnrolado = enrolados.some(e =>
-          (e.nombre || '').toLowerCase().includes(queryText) ||
-          (e.email || '').toLowerCase().includes(queryText) ||
-          (e.telefono || '').replace(/\D/g, '').includes(queryText.replace(/\D/g, ''))
-        );
+    // 2. Si NO hay busqueda activa, aplicar el filtro de equipo estrictamente
+    if (!qNorm) {
+      if (filterEquipo === 'todos') return baseMissions;
+      return baseMissions.filter(m => normalizeEquipoName(m.equipo) === filterEquipo);
+    }
 
-        if (!matchImo && !matchEquipo && !matchSede && !matchEnrolado) {
-          return false;
-        }
+    // 3. SI HAY BUSQUEDA ACTIVA:
+    // a. Si hay un equipo seleccionado (ej. EQUIPO 31), verificar si la busqueda coincide dentro de ese equipo
+    if (filterEquipo !== 'todos') {
+      const inCurrentEquipo = baseMissions.filter(m => {
+        if (normalizeEquipoName(m.equipo) !== filterEquipo) return false;
+        const enrolados = getEnroladosList(m);
+        return isMissionSearchMatch(m, enrolados, qNorm, qDigits);
+      });
+
+      // Si se encuentra en el equipo seleccionado, devolvemos esos
+      if (inCurrentEquipo.length > 0) {
+        return inCurrentEquipo;
       }
 
-      return true;
+      // Si NO se encuentra en el equipo seleccionado, pero SI en otros equipos de la sede:
+      const inOtherEquipos = baseMissions.filter(m => {
+        const enrolados = getEnroladosList(m);
+        return isMissionSearchMatch(m, enrolados, qNorm, qDigits);
+      });
+
+      if (inOtherEquipos.length > 0) {
+        return inOtherEquipos;
+      }
+    }
+
+    // Si el filtro de equipo es 'todos' o no hubo match en el equipo seleccionado
+    return baseMissions.filter(m => {
+      const enrolados = getEnroladosList(m);
+      return isMissionSearchMatch(m, enrolados, qNorm, qDigits);
     });
   }, [sedeScopedMissions, searchTerm, filterSede, filterEquipo, filterEstado, filterNodus, nodusSyncTick]);
 
-  // Deduplicación global estricta de enrolados (por teléfono o nombre)
-  // Garantiza que ningún participante se duplique, redunde ni omita
+  // Deduplicacion global estricta de enrolados (por telefono o nombre)
+  // Filtrado reactivo al termino de busqueda para la Lista Plana
   const uniqueEnroladosList = useMemo(() => {
     const seen = new Map();
+    const qNorm = cleanSearchStr(searchTerm);
+    const qDigits = searchTerm.replace(/\D/g, '');
+
     filteredMissions.forEach(m => {
       const enrolados = getEnroladosList(m);
+      // Si la busqueda coincide con el IMO o Equipo completo, se muestran todos sus enrolados
+      const missionDirectMatch = qNorm && (
+        cleanSearchStr(m.imoNombre || m.imo_nombre || m.nombre).includes(qNorm) ||
+        cleanSearchStr(m.equipo).includes(qNorm) ||
+        cleanSearchStr(normalizeEquipoName(m.equipo)).includes(qNorm)
+      );
+
       enrolados.forEach(e => {
+        // Si hay busqueda y el IMO/Equipo no coinciden directamente, filtrar estrictamente al enrolado coincidente
+        if (qNorm && !missionDirectMatch) {
+          if (!isEnroladoSearchMatch(e, qNorm, qDigits)) {
+            return;
+          }
+        }
+
         const tel = (e.telefono || '').replace(/\D/g, '');
         const nom = (e.nombre || '').trim().toUpperCase().replace(/\s+/g, ' ');
         const key = (tel && tel.length >= 7) ? `tel:${tel}` : (nom ? `nom:${nom}` : `id:${e.id}`);
@@ -298,7 +388,7 @@ export default function MonitorImos() {
       });
     });
     return Array.from(seen.values());
-  }, [filteredMissions]);
+  }, [filteredMissions, searchTerm]);
 
   const totalEnroladosCount = uniqueEnroladosList.length;
 
@@ -312,6 +402,25 @@ export default function MonitorImos() {
       return enr.length > 0 && enr.every(e => e.asistencia);
     }).length;
   }, [filteredMissions]);
+
+  // Detectar si la busqueda encontro resultados en otros equipos distintos al seleccionado
+  const isSearchCrossTeam = Boolean(
+    searchTerm.trim() &&
+    filterEquipo !== 'todos' &&
+    filteredMissions.length > 0 &&
+    filteredMissions.some(m => normalizeEquipoName(m.equipo) !== filterEquipo)
+  );
+
+  // Contar coincidencias globales en todas las sedes si en la sede actual hay 0 resultados
+  const matchesInGlobalMissions = useMemo(() => {
+    if (!searchTerm.trim() || filteredMissions.length > 0) return 0;
+    const qNorm = cleanSearchStr(searchTerm);
+    const qDigits = searchTerm.replace(/\D/g, '');
+    return missions.filter(m => {
+      const enrs = getEnroladosList(m);
+      return isMissionSearchMatch(m, enrs, qNorm, qDigits);
+    }).length;
+  }, [missions, searchTerm, filteredMissions.length]);
 
   // Estadísticas globales de verificación cruzada Nodus
   const globalNodusStats = useMemo(() => {
@@ -905,6 +1014,82 @@ export default function MonitorImos() {
       </div>
 
 
+      {/* Aviso de Busqueda Cruzada Multiequipo */}
+      {isSearchCrossTeam && (
+        <div style={{
+          background: 'rgba(56, 189, 248, 0.12)',
+          border: '1px solid rgba(56, 189, 248, 0.35)',
+          borderRadius: '10px',
+          padding: '0.75rem 1.25rem',
+          marginBottom: '1.25rem',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '0.75rem'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#e0f2fe', fontSize: '0.86rem' }}>
+            <span style={{ fontSize: '1.1rem' }}>💡</span>
+            <span>
+              Mostrando <strong>{filteredMissions.length} IMO(s)</strong> / <strong>{uniqueEnroladosList.length} enrolamiento(s)</strong> coincidentes con "{searchTerm}" en otros equipos de <strong>{filterSede}</strong> (no estaban en {filterEquipo}).
+            </span>
+          </div>
+          <button
+            onClick={() => setFilterEquipo('todos')}
+            style={{
+              background: 'rgba(56, 189, 248, 0.25)',
+              border: '1px solid #38bdf8',
+              color: '#38bdf8',
+              padding: '4px 12px',
+              borderRadius: '6px',
+              fontSize: '0.78rem',
+              fontWeight: 700,
+              cursor: 'pointer'
+            }}
+          >
+            Ver todos los equipos
+          </button>
+        </div>
+      )}
+
+      {/* Aviso si hay 0 resultados en la sede pero existen en otras sedes */}
+      {filteredMissions.length === 0 && matchesInGlobalMissions > 0 && (
+        <div style={{
+          background: 'rgba(245, 158, 11, 0.12)',
+          border: '1px solid rgba(245, 158, 11, 0.35)',
+          borderRadius: '10px',
+          padding: '0.75rem 1.25rem',
+          marginBottom: '1.25rem',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '0.75rem'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#fef3c7', fontSize: '0.86rem' }}>
+            <span style={{ fontSize: '1.1rem' }}>🔍</span>
+            <span>
+              0 resultados en <strong>{filterSede}</strong> para "{searchTerm}", pero encontramos <strong>{matchesInGlobalMissions} coincidencia(s)</strong> en otras sedes.
+            </span>
+          </div>
+          <button
+            onClick={() => { setFilterSede('todos'); setFilterEquipo('todos'); }}
+            style={{
+              background: 'rgba(245, 158, 11, 0.25)',
+              border: '1px solid #f59e0b',
+              color: '#f59e0b',
+              padding: '4px 12px',
+              borderRadius: '6px',
+              fontSize: '0.78rem',
+              fontWeight: 700,
+              cursor: 'pointer'
+            }}
+          >
+            Buscar en Todas las Sedes
+          </button>
+        </div>
+      )}
+
       {viewMode === 'enrolados' ? (
         <div className="glass-panel" style={{ padding: '1.5rem', overflowX: 'auto', border: '1px solid rgba(56, 189, 248, 0.25)', borderRadius: '12px', background: 'rgba(15, 23, 42, 0.85)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
@@ -1071,7 +1256,7 @@ export default function MonitorImos() {
 
               const progreso = totalEnrolled > 0 ? Math.round((assisted / totalEnrolled) * 100) : 0;
               const isCompleted = totalEnrolled > 0 && assisted === totalEnrolled;
-              const isExpanded = expandedImo === m.id;
+              const isExpanded = expandedImo === m.id || (Boolean(searchTerm.trim()) && filteredMissions.length <= 4);
 
               return (
                 <React.Fragment key={m.id}>
@@ -1216,16 +1401,19 @@ export default function MonitorImos() {
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1rem' }}>
                               {enroladosList.map(enrolado => {
                                 const evalRes = evaluateEnroladoVerification(enrolado, m.imoNombre, m.equipo);
+                                const isMatchedInSearch = Boolean(searchTerm.trim()) && isEnroladoSearchMatch(enrolado, cleanSearchStr(searchTerm), searchTerm.replace(/\D/g, ''));
                                 return (
                                   <div key={enrolado.id} style={{
                                     background: 'rgba(255,255,255,0.04)',
                                     padding: '1rem',
                                     borderRadius: '8px',
-                                    border: `1px solid ${evalRes.status === 'DISCREPANCIA' ? 'rgba(239, 68, 68, 0.4)' : evalRes.status === 'VERIFICADO_OK' ? 'rgba(34, 197, 94, 0.3)' : 'rgba(255,255,255,0.08)'}`,
+                                    border: isMatchedInSearch ? '2px solid #38bdf8' : `1px solid ${evalRes.status === 'DISCREPANCIA' ? 'rgba(239, 68, 68, 0.4)' : evalRes.status === 'VERIFICADO_OK' ? 'rgba(34, 197, 94, 0.3)' : 'rgba(255,255,255,0.08)'}`,
+                                    boxShadow: isMatchedInSearch ? '0 0 12px rgba(56, 189, 248, 0.35)' : 'none',
                                     position: 'relative'
                                   }}>
-                                    <div style={{ fontWeight: 700, fontSize: '0.95rem', marginBottom: '6px', color: '#fff' }}>
-                                      {enrolado.nombre}
+                                      <div style={{ fontWeight: 700, fontSize: '0.95rem', marginBottom: '6px', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                        <span>{enrolado.nombre}</span>
+                                        {isMatchedInSearch && <span style={{ fontSize: '0.7rem', padding: '2px 6px', borderRadius: '4px', background: '#38bdf8', color: '#0f172a', fontWeight: 800 }}>🎯 Coincidencia</span>}
                                     </div>
                                     
                                     {/* Insignias de lo que afirmó el IMO */}
@@ -1327,3 +1515,4 @@ export default function MonitorImos() {
     </div>
   );
 }
+
