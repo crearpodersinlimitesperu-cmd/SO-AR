@@ -281,6 +281,8 @@ export function mapRowsToQTMembers(rows) {
       sedeCode: rawSede,
       sede,
       nombre,
+      role: 'qt',
+      roles: ['qt'],
       docTipo,
       docNumero,
       birthDate,
